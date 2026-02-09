@@ -24,7 +24,7 @@ import {
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
 
 const GITHUB_HISTORY_BASE =
-  "https://github.com/quantified-uncertainty/cairn/commits/main/apps/longterm/src/content/docs";
+  "https://github.com/quantified-uncertainty/longterm-wiki/commits/main/content/docs";
 
 interface PageProps {
   params: Promise<{ id: string }>;

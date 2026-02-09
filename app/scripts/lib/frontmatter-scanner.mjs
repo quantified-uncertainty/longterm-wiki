@@ -5,7 +5,7 @@
  * Auto-creates minimal entity objects for pages that declare entityType
  * but don't have a corresponding YAML entity entry.
  *
- * Ported from apps/longterm/scripts/build-data.mjs scanFrontmatterEntities().
+ * Used by build-data.mjs to discover entities declared only in MDX frontmatter.
  */
 
 import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
@@ -32,7 +32,7 @@ function extractFrontmatter(content) {
  * but don't have a corresponding YAML entity.
  *
  * @param {Set<string>} yamlEntityIds - Set of entity IDs already defined in YAML
- * @param {string} contentDir - Path to the content directory (e.g., apps/longterm/src/content/docs)
+ * @param {string} contentDir - Path to the content directory (e.g., ../content/docs)
  * @returns {Array<Object>} Auto-created entity objects
  */
 export function scanFrontmatterEntities(yamlEntityIds, contentDir) {

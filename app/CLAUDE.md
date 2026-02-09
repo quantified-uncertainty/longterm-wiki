@@ -1,18 +1,21 @@
-# Longterm-Next - Claude Code Config
+# Longterm Wiki - Claude Code Config
 
-Next.js 15 App Router wiki frontend for the Cairn AI safety knowledge base. Consumes MDX content and database.json from the sibling `apps/longterm` Astro app.
+Next.js 15 App Router wiki frontend for the AI safety knowledge base. Standalone repository — content, data, and tooling all live in this repo.
 
 ## Quick Reference
 
 ```bash
-# Development
-pnpm --filter longterm-next dev     # Start dev server on port 3001
-pnpm --filter longterm build:data   # Rebuild database.json (required before first build)
+# Development (from app/)
+pnpm dev                     # Start dev server on port 3001
+node scripts/build-data.mjs  # Rebuild database.json (required before first build)
 
-# Build & Test
-pnpm --filter longterm-next build   # Production build (runs build:data automatically via prebuild)
-pnpm --filter longterm-next test    # Run vitest tests
-pnpm --filter longterm-next test:watch  # Watch mode
+# Build & Test (from app/)
+pnpm build                   # Production build (runs prebuild automatically)
+pnpm test                    # Run vitest tests
+pnpm test:watch              # Watch mode
+
+# Tooling (from repo root)
+node tooling/crux.mjs validate   # Run validation suite
 ```
 
 ## Essential Conventions
@@ -20,12 +23,12 @@ pnpm --filter longterm-next test:watch  # Watch mode
 ### Import Path Aliases
 **Always use path aliases instead of relative imports.** Configured in `tsconfig.json`:
 ```tsx
-// ✅ Good
+// Good
 import { getEntityById } from "@/data";
 import { InfoBox } from "@/components/wiki/InfoBox";
 import { renderMdxPage } from "@/lib/mdx";
 
-// ❌ Bad
+// Bad
 import { getEntityById } from "../../data";
 ```
 
@@ -49,49 +52,41 @@ Key ported components: `EntityLink`, `ResourceLink`, `R`, `F`, `DataInfoBox`, `B
 
 42+ stub components exist for not-yet-ported Astro components.
 
-## Project Structure
+## Repository Structure
 
 ```
-src/
-├── app/                    # Next.js App Router pages
-│   ├── layout.tsx          # Root layout (header, nav)
-│   ├── globals.css         # Theme variables, prose styles
-│   ├── wiki/               # Wiki article pages
-│   │   ├── [id]/page.tsx   # Dynamic wiki page (E42 or slug)
-│   │   └── page.tsx        # Explore/browse page
-│   └── internal/           # Internal documentation pages
-│       └── [[...slug]]/    # Catch-all for internal MDX
-├── components/
-│   ├── wiki/               # Wiki-specific components
-│   │   ├── EntityLink.tsx  # Cross-reference links with tooltips
-│   │   ├── InfoBox.tsx     # Sidebar info boxes
-│   │   ├── F.tsx           # Canonical fact inline component
-│   │   └── shared/         # Shared utilities (style-config, etc.)
-│   ├── explore/            # Explore page grid/filters
-│   ├── ui/                 # shadcn/ui primitives
-│   ├── mdx-components.tsx  # MDX component registry
-│   ├── PageStatus.tsx      # Dev-mode quality panel
-│   └── DevModeToggle.tsx   # Header dev mode button
-├── data/
-│   ├── index.ts            # Data layer (reads database.json from longterm)
-│   ├── entity-ontology.ts  # Canonical type definitions, icons, colors
-│   └── entity-schemas.ts   # Zod schemas for typed entities
-└── lib/
-    ├── mdx.ts              # MDX compilation, path resolution, static params
-    ├── wiki-nav.ts          # Wiki sidebar navigation (models, ATM)
-    ├── remark-callouts.ts  # Remark plugin for :::note directives
-    └── utils.ts            # cn() helper
+longterm-wiki/
+├── content/docs/              # ~625 MDX wiki pages
+├── data/                      # YAML sources
+│   ├── entities/              # 24 YAML entity files
+│   ├── facts/                 # Canonical facts
+│   ├── resources/             # External resource links
+│   ├── insights/              # Extracted insights
+│   ├── graphs/                # Causal graph YAML
+│   └── id-registry.json       # Persistent entity ID mapping
+├── app/                       # Next.js 15 frontend (this directory)
+│   ├── src/
+│   │   ├── app/               # App Router pages
+│   │   ├── components/        # React components
+│   │   ├── data/              # Data layer (reads database.json)
+│   │   └── lib/               # Utilities (MDX, nav, etc.)
+│   ├── scripts/               # Build scripts (build-data.mjs)
+│   └── public/                # Static assets + LLM files
+├── tooling/                   # Crux CLI + validation
+│   ├── crux.mjs               # CLI entry point
+│   ├── commands/              # Command domains
+│   ├── lib/                   # Shared utilities + rules
+│   └── validate/              # Validation scripts
+└── package.json               # Workspace root
 ```
-
-**Important:** This app has NO local content or entity YAML files. All content lives in `apps/longterm/src/content/docs/` and all data in `apps/longterm/src/data/`. The app reads directly from those directories.
 
 ## Data Layer
 
-The app reads `apps/longterm/src/data/database.json` at build/server time. This file is generated by `pnpm --filter longterm build:data`.
+The app reads `src/data/database.json` at build/server time. This file is generated by `node scripts/build-data.mjs` which reads YAML from `../data/` and MDX frontmatter from `../content/docs/`.
 
 ### Entity Sources
 Entities come from two sources (merged at build time, YAML takes precedence):
-1. YAML files in `apps/longterm/src/data/entities/*.yaml` — rich entities with relatedEntries, sources, etc.
+1. YAML files in `data/entities/*.yaml` — rich entities with relatedEntries, sources, etc.
 2. MDX frontmatter `entityType` field — auto-creates minimal entities for pages without YAML entries
 
 Key data functions in `src/data/index.ts`:
@@ -114,13 +109,13 @@ All pages and most components are React Server Components. Only add `"use client
 Wiki pages use `generateStaticParams()` to pre-render all pages at build time from the ID registry.
 
 ### Content Pipeline
-1. MDX files live in `apps/longterm/src/content/docs/`
+1. MDX files live in `content/docs/` (repo root)
 2. `preprocessMdx()` strips imports and Astro directives
 3. `compileMDX()` from next-mdx-remote/rsc compiles with remark/rehype plugins
 4. Components injected via `mdxComponents` map
 
 ### Canonical Facts
-Facts are defined in `apps/longterm/src/data/facts/*.yaml`, computed by `build-data.mjs`, and accessed via `getFact(entity, factId)`. The `<F>` component renders inline fact values.
+Facts are defined in `data/facts/*.yaml`, computed by `build-data.mjs`, and accessed via `getFact(entity, factId)`. The `<F>` component renders inline fact values.
 
 ### Content Architecture
 Content directories are **flat** (max 2 levels). Grouping is done via frontmatter `subcategory` metadata, not directory nesting:

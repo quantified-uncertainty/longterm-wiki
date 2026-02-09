@@ -2,7 +2,6 @@
 
 // TransitionModelTableClient - Interactive table for the AI Transition Model
 // Receives pre-extracted data from the server component wrapper.
-// Ported from apps/longterm/src/components/TransitionModelTable.tsx
 
 import { useMemo, useState } from "react";
 import type { ColumnDef, Row } from "@tanstack/react-table";

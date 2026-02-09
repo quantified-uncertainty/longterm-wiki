@@ -133,6 +133,14 @@ These are potential follow-up tasks, not committed phases:
 - [x] `master-graph-data.ts` reads from `../data/graphs/` directly (no local fallback)
 - [ ] LLM files generation could move to tooling — deferred, tightly coupled to app build (reads database.json, writes to app/public/)
 
+### Repo cleanup (post-split)
+- [x] Fix pre-commit hook — was referencing `apps/longterm`, now runs `tooling/crux.mjs validate --quick` from repo root
+- [x] Fix validate-mdx-compile.mjs — `apps/longterm/` PREFIX broke --quick mode, now uses `content/` prefix
+- [x] Update app/CLAUDE.md — rewritten for standalone repo structure (removed all cairn monorepo references)
+- [x] Fix GitHub history URL — `page.tsx` GITHUB_HISTORY_BASE now points to `longterm-wiki` repo
+- [x] Clean up stale comments — removed "Ported from apps/longterm" comments, fixed facts path reference
+- [x] GitHub Actions CI — `.github/workflows/ci.yml` with build, test, and validate jobs
+
 ### Tooling — remaining pre-existing issues (not regressions)
 - [ ] `validate-yaml-schema.mjs` needs `npx tsx` but validate-all runs it with `node` — needs tsx integration
 - [ ] `validate-component-refs` reports 6457 errors — likely Astro component import pattern mismatches

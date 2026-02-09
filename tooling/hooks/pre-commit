@@ -1,20 +1,11 @@
 #!/bin/sh
-# Pre-commit hook for longterm wiki
+# Pre-commit hook for longterm-wiki
 # Runs validation before allowing commits
 
-# Find the longterm app directory
 GIT_ROOT="$(git rev-parse --show-toplevel)"
-LONGTERM_DIR="$GIT_ROOT/apps/longterm"
-
-if [ ! -d "$LONGTERM_DIR" ]; then
-  echo "longterm directory not found, skipping validation"
-  exit 0
-fi
-
-cd "$LONGTERM_DIR" || exit 1
 
 echo "🔍 Running precommit validation..."
-npm run precommit
+cd "$GIT_ROOT" && node tooling/crux.mjs validate --quick
 
 if [ $? -ne 0 ]; then
   echo ""

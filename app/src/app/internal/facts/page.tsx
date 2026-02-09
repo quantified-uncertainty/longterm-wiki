@@ -25,7 +25,7 @@ export default function FactsPage() {
       <h1>Canonical Facts Dashboard</h1>
       <p className="text-muted-foreground">
         All canonical facts from the YAML fact store, used by the <code>&lt;F&gt;</code> component.
-        Facts are defined in <code>apps/longterm/src/data/facts/*.yaml</code>.
+        Facts are defined in <code>data/facts/*.yaml</code>.
       </p>
       <FactDashboard facts={facts} />
     </article>

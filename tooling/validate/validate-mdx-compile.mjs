@@ -49,16 +49,12 @@ function getChangedMdxFiles() {
 
     if (!diffOutput) return [];
 
-    // Git returns paths relative to repo root (e.g., apps/longterm/src/...)
-    // We're running from apps/longterm/, so strip that prefix
-    const PREFIX = 'apps/longterm/';
-
+    // Git returns paths relative to repo root — content lives at content/docs/
     return diffOutput
       .split('\n')
       .filter(f => f && f.endsWith('.mdx'))
       .map(f => f.trim())
-      .filter(f => f.startsWith(PREFIX))  // Only files in this package
-      .map(f => f.slice(PREFIX.length))   // Strip prefix to get relative path
+      .filter(f => f.startsWith('content/'))  // Only content MDX files
       .filter(f => {
         try {
           statSync(f);
@@ -235,7 +231,7 @@ async function main() {
   }
 
   console.log(`${c.red}${c.bold}Summary: ${errors.length} file(s) have compilation errors${c.reset}`);
-  log.dim('These errors will cause the Astro build to fail.');
+  log.dim('These errors will cause the Next.js build to fail.');
   log.dim('Fix the issues above before committing.\n');
 
   process.exit(1);
