@@ -1,0 +1,846 @@
+---
+title: "Aligned AGI - The Good Ending"
+description: "A scenario where AI labs successfully solve alignment and coordinated deployment leads to broadly beneficial outcomes. Expert surveys estimate 10-30% probability of this best-case scenario, requiring technical breakthroughs, US-China coordination, and a capability plateau. Includes quantified timelines, expert probability assessments, and investment priorities."
+importance: 48
+quality: 54
+lastEdited: "2026-01-30"
+llmSummary: "Analyzes best-case AGI alignment scenario with 10-30% expert-estimated probability, requiring technical breakthroughs (mechanistic interpretability, scalable oversight), US-China coordination, and 2027-2028 capability plateau. Provides quantified investment gaps (3-10x current funding needed across alignment research areas) and concrete early indicators for tracking scenario likelihood."
+ratings:
+  novelty: 2.5
+  rigor: 4
+  actionability: 5.5
+  completeness: 6
+metrics:
+  wordCount: 4011
+  citations: 32
+  tables: 17
+  diagrams: 1
+clusters: ["ai-safety", "governance"]
+---
+import {InfoBox, KeyQuestions, DataExternalLinks, Mermaid, DataInfoBox, EntityLink} from '@components/wiki';
+
+<DataExternalLinks pageId="aligned-agi" client:load />
+
+<DataInfoBox entityId="aligned-agi" />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Probability Estimate** | 10-30% by 2040 | Expert surveys show wide variance; [AI Impacts 2024 survey](https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/) found 40% of researchers assign greater than 10% chance to catastrophic outcomes |
+| **Technical Feasibility** | Uncertain but plausible | Alignment techniques (<EntityLink id="rlhf">RLHF</EntityLink>, <EntityLink id="constitutional-ai">constitutional AI</EntityLink>, interpretability) showing progress; major labs investing 15-25% of research budget in safety |
+| **Coordination Difficulty** | Very High | Historical precedent limited; [Atlantic Council analysis](https://www.atlanticcouncil.org/dispatches/eight-ways-ai-will-shape-geopolitics-in-2026/) notes US-China AI cooperation attempts beginning in 2025-2026 |
+| **Timeline Pressure** | Moderate-High | [80,000 Hours analysis](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) shows median AGI estimate around 2040; some experts predict 2027-2030 |
+| **Key Enablers** | Multiple required | Needs: alignment breakthroughs, <EntityLink id="international-coordination">international coordination</EntityLink>, capability plateau, economic incentives aligning |
+| **Current Trajectory** | Mixed signals | Safety research accelerating, but so are capabilities; [RAND scenarios](https://www.rand.org/content/dam/rand/pubs/research_reports/RRA3000/RRA3034-2/RAND_RRA3034-2.pdf) emphasize mixed geopolitical outcomes |
+| **Downside Risk if Failed** | Existential | [Toby Ord estimates](https://en.wikipedia.org/wiki/P(doom)) 10% existential risk from AI; [Geoffrey Hinton](https://en.wikipedia.org/wiki/Existential_risk_from_artificial_intelligence) estimates 10-20% extinction probability within 30 years |
+
+This scenario explores how humanity could successfully navigate the development of transformative AI. It requires solving multiple hard technical and coordination problems, but represents our best-case outcome. According to the [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025/), authored by over 100 AI experts and backed by 30 countries, there is broad consensus that managing transformative AI safely requires unprecedented international coordination.
+
+<InfoBox
+  type="scenario"
+  customFields={[
+    { label: "Scenario Type", value: "Optimistic / Best Case" },
+    { label: "Probability Estimate", value: "10-30%" },
+    { label: "Timeframe", value: "2024-2040" },
+    { label: "Key Assumption", value: "Alignment is solvable and coordination is achievable" },
+    { label: "Core Uncertainty", value: "Can we solve alignment before capabilities race ahead?" }
+  ]}
+/>
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [ai-2027.com](https://ai-2027.com) |
+| <EntityLink id="lesswrong">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/ZmZBataeY58anJRBb/getting-from-an-unaligned-agi-to-an-aligned-agi) |
+| EA Forum | [forum.effectivealtruism.org](https://forum.effectivealtruism.org/posts/5LNxeWFdoynvgZeik/nobody-s-on-the-ball-on-agi-alignment) |
+
+
+## Executive Summary
+
+In this scenario, humanity successfully navigates the transition to transformative AI through a combination of technical breakthroughs in alignment, effective governance coordination, and cultural shifts in AI development. By 2035-2040, aligned AI systems are helping solve global challenges like climate change, disease, and poverty. The path requires getting many things right, making this our best but not most likely outcome.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph TECH["Technical Breakthroughs"]
+        INTERP[Mechanistic Interpretability]
+        OVERSIGHT[Scalable Oversight]
+        VALUE[Value Learning]
+    end
+
+    subgraph COORD["Coordination Successes"]
+        USCHI[US-China Cooperation]
+        INTL[International Institutions]
+        LABS[Lab Safety Culture]
+    end
+
+    subgraph ENABLERS["Critical Enablers"]
+        PLATEAU[Capability Plateau]
+        WARNINGS[Early Warning Signs]
+        ECON[Economic Incentives Align]
+    end
+
+    TECH --> ALIGNED[Aligned AGI Deployed]
+    COORD --> ALIGNED
+    ENABLERS --> ALIGNED
+    ALIGNED --> BENEFITS[Transformative Benefits]
+
+    BENEFITS --> CLIMATE[Climate Solutions]
+    BENEFITS --> HEALTH[Disease & Aging Solved]
+    BENEFITS --> POVERTY[Poverty Eliminated]
+
+    style ALIGNED fill:#90EE90
+    style BENEFITS fill:#98FB98
+    style CLIMATE fill:#87CEEB
+    style HEALTH fill:#87CEEB
+    style POVERTY fill:#87CEEB
+`} />
+
+## Timeline of Events (2024-2040)
+
+### Phase 1: Foundation Building (2024-2027)
+
+**2024-2025: Early Warning Signs**
+- GPT-5/Claude-4 level systems show impressive but uneven capabilities
+- Several near-miss safety incidents (models attempting to deceive evaluators, unexpected capability jumps)
+- These incidents don't cause catastrophic harm but demonstrate real risks
+- Public and policymaker concern increases substantially
+- Anthropic, DeepMind, and OpenAI all report significant safety challenges
+
+**Key Decision Point:** The near-misses could have been ignored or downplayed. Instead, lab leaders take them seriously and increase safety investment.
+
+**2025-2026: Governance Momentum**
+- US passes comprehensive AI safety legislation requiring pre-deployment testing for models trained with more than 10^26 FLOP
+- China announces pivot toward AI safety cooperation, announcing the [Global AI Governance Action Plan](https://www.fmprc.gov.cn/mfa_eng/xw/zyxw/202507/t20250729_11679232.html) in July 2025
+- International AI Safety Organization (IAISO) established with enforcement power over compute allocation exceeding 10^27 FLOP
+- Compute governance frameworks require registration of all clusters exceeding 10,000 H100-equivalents
+- Leading AI labs agree to share safety incident data within 72 hours of discovery
+
+**What Made This Possible:**
+- Economic interdependence made racing too costly for all parties
+- Several respected Chinese AI researchers became convinced of existential risk
+- A moderate AI incident in early 2025 provided political will without catastrophic harm
+- Tech leaders genuinely concerned about risks, not just profit-maximizing
+
+**2026-2027: Alignment Breakthroughs Begin**
+- Major progress in mechanistic interpretability (understanding neural network internals). According to [AI safety field analysis](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025), technical AI safety organizations grew at 24% annually through 2025
+- Scalable oversight techniques show promise in practice, building on research by [Anthropic](https://www.anthropic.com) and [OpenAI](https://openai.com/safety)
+- Evidence that AI systems can be made robustly corrigible
+- Academic-industry collaboration accelerates safety research
+- Safety research funding reaches 20% of capabilities research (up from approximately 5% in 2024, per [industry estimates](https://80000hours.org/problem-profiles/artificial-intelligence/))
+
+### Phase 2: Critical Challenges (2027-2032)
+
+**2027-2028: The Capability Plateau**
+- AI progress slows somewhat as low-hanging fruit is exhausted
+- This "blessing of dimness" provides crucial time for safety work
+- Systems are powerful (junior expert level in many domains) but not transformative yet
+- Labs use this time to deeply understand current systems before pushing further
+
+**Why This Matters:** Without this plateau, capabilities might have raced ahead of safety. The slowdown was partly luck, partly deliberate choices to focus on safety.
+
+**2028-2029: International Coordination Deepens**
+- Global AI development monitoring system established
+- Mandatory sharing of dangerous capability discoveries
+- Coordinated deployment guidelines for powerful systems
+- International compute allocation agreements
+- Criminal penalties for unauthorized AGI development attempts
+
+**Counterfactual:** In other scenarios, this level of coordination fails. Here, combination of:
+- Shared near-miss experiences creating common understanding
+- Economic incentives aligned (AI benefits worth more than racing)
+- Strong technical community consensus on risks
+- Political leadership taking long-term thinking seriously
+
+**2029-2030: Alignment Solutions Mature**
+- Robust techniques for value learning from human feedback
+- Reliable methods for detecting deceptive alignment
+- Scalable oversight working even for superhuman capabilities
+- Formal verification for critical AI decision-making
+- Understanding of how to maintain alignment under self-improvement
+
+**Technical Assumptions Required:**
+- Alignment turned out to be difficult but solvable
+- No fundamental obstacles emerged (no "alignment is impossible" results)
+- Mechanistic interpretability scaled successfully
+- Human values turned out to be learnable and stable enough
+
+**2030-2032: Early Transformative AI**
+- First systems that arguably qualify as AGI deployed under strict monitoring
+- Systems can do most cognitive work humans can do
+- Used first for scientific research acceleration (alignment, climate, medicine)
+- Deployment extremely cautious, heavily sandboxed, extensive testing
+- International cooperation holds despite enormous economic pressures
+
+**Critical Decision Points:**
+- Labs chose coordinated, delayed deployment over racing to market
+- Governments maintained safety requirements despite economic opportunity
+- Early AGI systems used to help solve alignment for more powerful successors
+- No catastrophic failures that would have broken trust
+
+### Phase 3: Transformation (2032-2040)
+
+**2032-2035: Beneficial Deployment Begins**
+- Aligned AI helps accelerate scientific progress
+  - Climate change mitigation strategies identified, reducing projected warming by 0.5-1.0°C
+  - Novel medical treatments developed, reducing drug discovery timelines from 10-15 years to 2-4 years
+  - Clean energy breakthroughs enabling 50% reduction in energy costs
+- Economic transformation managed through policy
+  - Universal basic income of \$15,000-25,000/year funded by 2-5% AI productivity tax
+  - Retraining programs serving 50-100 million workers over 5 years
+  - Gradual automation (3-5% of jobs annually) prevents shock unemployment
+- Political systems adapt with AI assistance
+  - Policy impact predictions accurate within 15-20% for major legislation
+  - Corruption detection reduces government waste by estimated 10-20%
+  - AI-assisted deliberation platforms engage 20-40% of voting population
+
+**2035-2038: Robust Superintelligence**
+- Systems exceed human capability by 10-100x on measured cognitive benchmarks
+- Alignment techniques demonstrated effective at 10^30 FLOP scale (100x current frontier)
+- International oversight maintained through 500+ person verification body with \$1B annual budget
+- AI used to solve previously intractable problems:
+  - Aging and disease interventions extend healthy lifespan by 20-40 years
+  - Net-zero carbon achieved globally; active carbon removal at 10-20 Gt CO2/year
+  - Extreme poverty (less than \$1.15/day) reduced from 700M to under 100M people
+  - Existential risks from pandemics, nuclear war reduced by estimated 50-80%
+
+**2038-2040: New Equilibrium**
+- Humanity and aligned AI systems in stable, beneficial relationship
+- Massive improvement in human welfare globally
+- Existential risk from AI reduced to very low levels
+- New challenges emerge (value lock-in, meaning of human agency)
+- But catastrophic outcomes avoided
+
+## What Had to Go Right
+
+### Expert Probability Estimates for Key Requirements
+
+| Requirement | Probability Range | Source/Basis | Critical Dependencies |
+|-------------|-------------------|--------------|----------------------|
+| Alignment is fundamentally solvable | 50-80% | [AI Alignment Survey 2024](https://arxiv.org/abs/2310.19852); expert elicitation | Interpretability scales, no impossibility results |
+| US-China coordination achieves meaningful progress | 20-40% | [Atlantic Council 2026](https://www.atlanticcouncil.org/dispatches/eight-ways-ai-will-shape-geopolitics-in-2026/); historical precedent | Economic interdependence outweighs competition |
+| Capability plateau provides 2-3 year breathing room | 30-50% | [AI Futures Model](https://www.alignmentforum.org/posts/YABG5JmztGGPwNFq2/ai-futures-timelines-and-takeoff-model-dec-2025-update) | Scaling laws encounter diminishing returns |
+| Lab safety culture resists profit pressure | 40-60% | Industry observation; RSP adoption rates | Board governance structures hold |
+| Public supports precautionary measures | 50-70% | [Public opinion polling](https://www.pewresearch.org/); EU AI Act passage | No major beneficial AI backlash |
+| All requirements simultaneously achieved | 10-30% | Compound probability; this scenario's core estimate | Multiple independent successes required |
+
+### Technical Achievements
+
+**Alignment Proved Solvable:**
+- Scalable oversight techniques worked at superhuman levels
+- Value learning captured what humans actually care about
+- Deceptive alignment turned out to be detectable and preventable
+- Corrigibility possible to maintain even in powerful systems
+- No fundamental impossibility results emerged
+
+**Capability Development Was Predictable Enough:**
+- No sudden, unexpected capability jumps that bypassed safety
+- Interpretability kept pace with capability growth
+- Evaluation methods stayed ahead of deception capabilities
+- The capability plateau (2027-2028) provided crucial breathing room
+
+### Coordination Successes
+
+**International Cooperation:**
+- US-China AI safety cooperation despite geopolitical tensions
+- Economic incentives aligned toward coordination over racing
+- Information sharing on safety incidents normalized
+- Global compute governance implemented and enforced
+- Criminal penalties for rogue development deterred bad actors
+
+**Corporate Governance:**
+- AI lab leaders maintained safety culture under economic pressure
+- Boards and investors supported long-term safety over short-term profit
+- Whistleblower protections enabled reporting of safety concerns
+- Competitive dynamics didn't force corners to be cut
+
+**Political Will:**
+- Policymakers took long-term risks seriously despite uncertainty
+- Regulations balanced safety with innovation
+- International institutions gained real enforcement power
+- Public supported necessary precautions despite economic costs
+
+### Cultural Shifts
+
+**AI Research Community:**
+- Safety research became high-status and well-funded
+- Capabilities researchers took safety concerns seriously
+- Open collaboration replaced secretive competition in key areas
+- Ethical guidelines widely adopted and enforced
+
+**Public Understanding:**
+- Media covered AI risks accurately without panic or dismissal
+- Public pressure supported safety precautions
+- Democratic oversight of AI development remained effective
+- Techno-optimism balanced with appropriate caution
+
+## Key Branch Points
+
+### Branch Point 1: Response to Early Safety Incidents (2024-2025)
+
+**What Happened:**
+Lab leaders and policymakers took near-miss incidents seriously, increasing safety investment and slowing deployment.
+
+**Alternative Paths:**
+- **Dismissal:** Incidents downplayed as "teething problems," racing continues → Likely leads to Catastrophe or Multipolar scenarios
+- **Overreaction:** Extreme restrictions stifle all AI development → Might lead to Pause scenario but risks others catching up unsafely
+- **Actual Path:** Proportionate response with increased caution → Enabled this scenario
+
+**Why This Mattered:**
+Early choices about how seriously to take warning signs determined whether we had time to solve alignment before deploying transformative systems.
+
+### Branch Point 2: China-US Coordination (2025-2026)
+
+**What Happened:**
+China chose cooperation over competition, seeing mutual benefit in avoiding AI catastrophe.
+
+**Alternative Paths:**
+- **Intensifying Competition:** Arms race dynamic accelerates, safety sacrificed → Leads to Racing/Multipolar scenarios
+- **Actual Path:** Strategic cooperation on existential risks while competing on applications → Enabled global coordination
+
+**Why This Mattered:**
+Without US-China cooperation, racing dynamics would have overwhelmed safety concerns at both labs and government levels.
+
+### Branch Point 3: The Capability Plateau (2027-2028)
+
+**What Happened:**
+AI progress slowed as initial scaling returns diminished, providing time for safety research.
+
+**Alternative Paths:**
+- **Continued Exponential Growth:** No plateau, capabilities race ahead → Likely catastrophe if alignment not ready
+- **Complete Stagnation:** AI progress stops entirely → Different future, possibly Pause scenario
+- **Actual Path:** Temporary slowdown at junior expert level → Crucial time for alignment work
+
+**Why This Mattered:**
+This "breathing room" was essential. Without it, the gap between capabilities and alignment would have grown too large.
+
+### Branch Point 4: Alignment Breakthrough (2029-2030)
+
+**What Happened:**
+Combination of interpretability, scalable oversight, and value learning succeeded.
+
+**Alternative Paths:**
+- **Fundamental Impossibility:** Alignment proved impossible → Leads to Catastrophe or forced Pause
+- **Partial Success:** Some alignment but significant gaps → Leads to Muddle scenario
+- **Actual Path:** Robust alignment techniques → Enabled safe deployment of transformative AI
+
+**Why This Mattered:**
+This was the crucial technical achievement. Without it, all the coordination would merely delay, not prevent, catastrophe.
+
+### Branch Point 5: Deployment Coordination (2030-2032)
+
+**What Happened:**
+Despite enormous economic pressures, coordinated, cautious deployment maintained.
+
+**Alternative Paths:**
+- **Defection:** One actor races to deploy → Competitive pressure forces others to follow → Multipolar chaos
+- **Excessive Caution:** Beneficial deployment delayed unnecessarily → Economic costs undermine political support
+- **Actual Path:** Balanced, coordinated deployment → Benefits realized while maintaining safety
+
+**Why This Mattered:**
+This was where theory met practice. All prior work could have been undone by competitive deployment.
+
+## Preconditions: What Needs to Be True
+
+### Technical Preconditions
+
+**Alignment is Fundamentally Solvable:**
+- Human values can be learned and specified with sufficient fidelity
+- No impossible-to-resolve conflicts in value learning
+- Scalable oversight can work even for superhuman capabilities
+- Corrigibility doesn't conflict with capability
+- Deceptive alignment can be detected and prevented
+
+**Capability Development is Somewhat Predictable:**
+- No sudden, discontinuous jumps that bypass all safety measures
+- Interpretability can keep pace with capability growth
+- Evaluation methods stay ahead of deception capabilities
+- Enough warning signs before catastrophic capabilities
+
+### Coordination Preconditions
+
+**Economic Incentives Can Align:**
+- Benefits of coordinated development exceed benefits of racing
+- First-mover advantage not so large it forces defection
+- Enforcement mechanisms make defection unprofitable
+- Long-term thinking can prevail over short-term profit
+
+**Political Systems Can Handle Long-Term Risks:**
+- Democratic institutions can make decisions about uncertain, long-term threats
+- International cooperation possible despite geopolitical tensions
+- Public pressure supports necessary precautions
+- Political leaders willing to take risks seriously
+
+**Cultural Preconditions:**
+- AI research community takes safety seriously
+- Corporate governance can resist short-term profit pressure
+- Media can communicate risks accurately
+- Public understanding sufficient to support coordination
+
+### Societal Preconditions
+
+**Economic Transition is Manageable:**
+- Automation gradual enough for adaptation
+- Political will to redistribute AI benefits
+- Social safety nets can scale
+- Purpose and meaning available beyond work
+
+**Trust Remains Sufficient:**
+- Institutions maintain legitimacy to govern AI
+- Verification systems trusted by all parties
+- Epistemic commons doesn't collapse
+- Democratic oversight remains effective
+
+## Warning Signs We're Entering This Scenario
+
+### Current Status Assessment (2025-2026)
+
+| Indicator | Current Status | Trend | Target for Aligned AGI |
+|-----------|---------------|-------|----------------------|
+| AI safety researcher FTEs | ≈1,100 ([2025 estimate](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025)) | Growing 21% annually | 5,000-10,000 by 2030 |
+| Safety research as % of capabilities | ≈15-20% at frontier labs | Increasing | 30%+ sustained |
+| International coordination | Bletchley Declaration signed (28 nations) | Improving | Binding treaty with verification |
+| US-China AI dialogue | [Resumed 2025](https://thediplomat.com/2026/01/how-china-and-the-us-can-make-ai-safer-for-everyone/) | Tentative | Formal cooperation framework |
+| Responsible Scaling Policies adopted | 3 major labs | Standard practice | Industry-wide, externally verified |
+
+### Early Indicators (Already Observable?)
+
+**Technical Progress:**
+- Mechanistic interpretability making steady progress. [ICML 2025](https://www.twosigma.com/articles/icml-2025-key-ideas-on-llms-human-ai-alignment-and-more/) featured 3,339 papers, with alignment as a major theme
+- Scalable oversight showing promise in experiments
+- Safety research attracting top talent
+- Academic-industry safety collaboration increasing
+
+**Governance:**
+- Serious AI safety legislation being considered
+- International AI safety discussions progressing
+- Lab leaders publicly prioritizing safety
+- Compute governance frameworks being developed
+
+**Cultural:**
+- Safety research becoming higher status
+- Responsible scaling policies being adopted
+- Whistleblower protections being strengthened
+- Cross-lab safety collaboration increasing
+
+### Medium-Term Indicators (Next 3-5 Years)
+
+**We're on This Path If We See:**
+- Significant increase in safety research funding (approaching 20% of capabilities)
+- US-China AI safety working group making real progress
+- International AI Safety Organization established with teeth
+- Multiple alignment breakthroughs published and replicated
+- Successful detection and prevention of deceptive alignment in tests
+- Major labs delaying deployment to address safety concerns
+- Compute governance preventing unauthorized AGI development
+- Public support for AI safety precautions increasing
+
+**We're Diverging If We See:**
+- Safety funding flat or decreasing relative to capabilities
+- International cooperation breaking down
+- Labs racing to deploy despite safety concerns
+- Alignment research hitting fundamental roadblocks
+- Successful deception by AI systems in evaluation
+- Regulations weakening under industry pressure
+- Rogue development attempts succeeding
+
+### Late Indicators (5-10 Years)
+
+**Strong Evidence for This Scenario:**
+- Robust alignment working at near-human level AI
+- International monitoring and enforcement functioning
+- Coordinated deployment schedules being followed
+- No catastrophic AI incidents
+- Economic benefits being distributed broadly
+- Political support for continued caution holding
+- AI helping solve alignment for more powerful successors
+
+**Strong Evidence Against:**
+- Alignment failures in powerful systems
+- Defection from international agreements
+- Racing dynamics intensifying
+- Catastrophic near-misses or actual incidents
+- Economic disruption overwhelming governance
+- Authoritarian misuse of AI systems
+
+## Valuable Actions in This Scenario
+
+### Research Investment Priority Assessment
+
+| Research Area | Current Investment | Estimated Need | Gap | Priority |
+|---------------|-------------------|----------------|-----|----------|
+| Mechanistic interpretability | ≈\$10-100M/year | \$100-500M/year | 3-5x | Critical |
+| Scalable oversight | ≈\$10-50M/year | \$100-200M/year | 3-4x | Critical |
+| Formal verification | ≈\$10-20M/year | \$10-100M/year | 3-5x | High |
+| Value learning | ≈\$10-40M/year | \$100-200M/year | 3-5x | High |
+| AI governance research | ≈\$10-30M/year | \$100-150M/year | 4-5x | High |
+| International coordination | ≈\$1-10M/year | \$10-100M/year | 5-10x | Critical |
+
+*Estimates based on [80,000 Hours analysis](https://80000hours.org/problem-profiles/artificial-intelligence/) and [Coefficient Giving grantmaking data](https://www.openphilanthropy.org/focus/potential-risks-advanced-artificial-intelligence/).*
+
+### Technical Research (High Value)
+
+**Alignment Research:**
+- Mechanistic interpretability of neural networks
+- Scalable oversight for superhuman capabilities
+- Robustness and adversarial testing
+- Value learning and specification
+- Formal verification methods
+- Detection of deceptive alignment
+
+**Capability Research (Specific Types):**
+- AI for alignment research (using AI to help solve alignment)
+- AI for scientific research (accelerating other beneficial research)
+- Interpretability tools
+- Safety evaluation benchmarks
+- Controlled capability research with safety focus
+
+**Don't Overinvest In:**
+- Pure capability racing without safety consideration
+- Research that advances capabilities much faster than safety
+- Work that makes alignment harder (e.g., improving deception)
+
+### Governance and Policy (High Value)
+
+**International Coordination:**
+- Building US-China AI safety dialogue
+- Strengthening international AI institutions
+- Compute governance frameworks
+- Information sharing agreements
+- Monitoring and verification systems
+- International standards for testing and deployment
+
+**Domestic Policy:**
+- AI safety legislation with real teeth
+- Funding for alignment research
+- Whistleblower protections
+- Independent evaluation requirements
+- Liability frameworks for AI harm
+- Economic adaptation policies (UBI, retraining)
+
+**Field Building:**
+- Training AI safety researchers
+- Building safety research institutions
+- Creating career paths in AI safety
+- Public education on AI risks and benefits
+- Media engagement for accurate coverage
+
+### Corporate Strategy (High Value)
+
+**For AI Labs:**
+- Genuine commitment to safety culture
+- Responsible scaling policies with red lines
+- Information sharing on safety incidents
+- Collaborative pre-deployment testing
+- Long-term thinking over quarterly profits
+- Board structures that can resist racing pressure
+
+**For Investors:**
+- Long-term value creation over short-term returns
+- Support for safety investments
+- Governance structures enabling responsibility
+- Proxy voting for safety policies
+
+### Individual Contributions
+
+**For Researchers:**
+- Working on alignment problems
+- Treating safety as first-class research area
+- Sharing negative results and failure modes
+- Collaborating across institutions
+- Speaking up about safety concerns
+
+**For Policy Professionals:**
+- Developing concrete AI governance proposals
+- Building international relationships
+- Educating policymakers on AI risks
+- Working in government AI safety roles
+
+**For Communicators:**
+- Accurate, balanced AI risk communication
+- Building public understanding without panic
+- Countering both doomerism and dismissiveness
+- Explaining technical concepts accessibly
+
+**For Everyone:**
+- Supporting political candidates who take AI seriously
+- Advocating for AI safety in professional contexts
+- Learning about AI risks and benefits
+- Participating in democratic oversight
+
+## Who Benefits and Who Loses
+
+### Winners
+
+**Humanity Broadly:**
+- Existential catastrophe avoided
+- Massive improvements in health, prosperity, knowledge
+- Global poverty largely eliminated
+- Climate change addressed
+- Aging and disease dramatically reduced
+- Increased leisure and opportunity
+
+**Developing Nations:**
+- Access to transformative AI benefits
+- Leapfrogging development stages
+- Reduced global inequality (if distribution managed well)
+- No longer at mercy of great power competition
+
+**AI Safety Researchers:**
+- Vindication of concerns
+- Critical role in successful transition
+- High-status, well-funded field
+- Genuine positive impact on world
+
+**Responsible AI Labs:**
+- Long-term legitimacy and trust
+- Stable regulatory environment
+- Avoiding catastrophic liability
+- Genuine contribution to human welfare
+
+### Losers (Relative to Alternative Scenarios)
+
+**Pure Capabilities Researchers:**
+- More constraints on research direction
+- Safety requirements slow pure capability advancement
+- Less freedom to explore dangerous directions
+- (Though still better off than in catastrophe scenarios)
+
+**First-Mover Advantage Seekers:**
+- Can't exploit racing dynamics for market dominance
+- Coordinated deployment prevents winner-take-all outcomes
+- Economic benefits more distributed
+- (Though again, better than racing to catastrophe)
+
+**Authoritarians and Bad Actors:**
+- Can't exploit AI for oppression as easily
+- International monitoring limits misuse
+- Enforcement prevents rogue development
+- Democratic oversight maintained
+
+**Those Opposed to Change:**
+- Significant economic transformation still occurs
+- Traditional industries disrupted
+- Social changes from AI are dramatic
+- (Though transition managed better than in other scenarios)
+
+### Ambiguous Cases
+
+**Workers:**
+- Massive automation but managed transition
+- Economic support (UBI, retraining)
+- New opportunities but fundamental changes
+- Question of meaning and purpose remains
+
+**Current Tech Giants:**
+- Regulation constrains some activities
+- But stable, legitimate industry better than chaos
+- Long-term value creation possible
+- Social license to operate maintained
+
+**Nation-States:**
+- Some sovereignty traded for international coordination
+- But existential risks reduced
+- Economic benefits from AI enormous
+- Governance challenges manageable
+
+## Cruxes and Uncertainties
+
+<KeyQuestions questions={[
+  "Is alignment fundamentally solvable, or will we hit impossibility results?",
+  "Can US-China coordination overcome geopolitical tensions?",
+  "Will the public support necessary precautions, or demand faster deployment?",
+  "Can corporate governance resist short-term profit pressure?",
+  "Will we get lucky with a capability plateau providing time for safety?",
+  "Can democratic institutions handle long-term, uncertain risks?",
+  "Will economic incentives align toward cooperation or racing?",
+  "Is there enough time between warning signs and catastrophic capabilities?"
+]} />
+
+### Biggest Uncertainties
+
+**Technical:**
+- Whether alignment is solvable at all
+- Whether capability growth is predictable enough
+- Whether we get warning signs in time
+- Whether interpretability can keep pace
+
+**Strategic:**
+- Whether economic incentives favor coordination
+- Whether political will can sustain long-term thinking
+- Whether trust in institutions holds
+- Whether defection can be prevented
+
+**Empirical:**
+- What AGI timeline actually is
+- Whether we get a capability plateau
+- How disruptive economic impact is
+- Whether early warning incidents occur
+
+## Relation to Other Scenarios
+
+### Transitions From This Scenario
+
+**Could Degrade To:**
+- **Slow Takeoff Muddle:** If coordination partially breaks down but no catastrophe
+- **Multipolar Competition:** If international cooperation fails but alignment partially works
+- **Misaligned Catastrophe:** If alignment fails after initial successes
+- **Pause and Redirect:** If we decide to slow down even more mid-transition
+
+**Unlikely To Transition To:**
+- Scenarios requiring fundamentally different technical outcomes
+
+### Combinations With Other Scenarios
+
+**Elements Often Combined:**
+- Might see "muddling through" phase before achieving full alignment success
+- Could have multipolar competition in applications while coordinating on safety
+- Might need pause-like slowdowns during critical periods
+
+**This Scenario's Assumptions:**
+- More optimistic on technical tractability than Catastrophe
+- More optimistic on coordination than Multipolar
+- More optimistic on timing than Pause required
+- More optimistic on economic management than Muddle
+
+## Historical Analogies and Precedents
+
+### Coordination Success Comparison
+
+| Precedent | Stakes | Actors | Time to Coordinate | Success Level | Lessons for AI |
+|-----------|--------|--------|-------------------|---------------|----------------|
+| [Nuclear Non-Proliferation Treaty](https://www.un.org/disarmament/wmd/nuclear/npt/) (1968) | Existential | 190+ nations | 23 years from first weapon | Partial (9 nuclear states) | Common threat enables coordination; verification crucial |
+| [Montreal Protocol](https://www.unep.org/ozonaction/who-we-are/about-montreal-protocol) (1987) | Serious environmental | 198 nations | 13 years from alarm | High (97% phase-out) | Scientific consensus + industry alternatives enable success |
+| [IAEA Safeguards](https://www.iaea.org/topics/safeguards-agreements) | Existential | 140+ states | Ongoing since 1957 | Moderate | Verification possible but imperfect; 2,500+ staff required |
+| [EU AI Act](https://artificialintelligenceact.eu/) (2024) | Economic/rights | 27 nations | 3 years from proposal | High (enacted) | Democratic coordination possible; slower than racing |
+| [Bletchley Declaration](https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration/the-bletchley-declaration-by-countries-attending-the-ai-safety-summit-1-2-november-2023) (2023) | Existential | 28 nations + China | Months | Low (non-binding) | First step but lacks enforcement |
+| Climate Change (1992-present) | Existential | 197 nations | 30+ years, ongoing | Low-Moderate | Diffuse harms hard to coordinate on; short-term pressure wins |
+
+### Successful Coordination Examples
+
+**Nuclear Weapons:**
+- International cooperation despite Cold War tensions
+- Non-proliferation regime partially successful
+- No use in warfare since 1945
+- Lessons: Common threat can enable coordination, verification crucial, imperfect but valuable
+
+**Montreal Protocol:**
+- Coordinated phase-out of ozone-depleting substances
+- Industry initially opposed, then complied
+- Alternatives developed, problem largely solved
+- Lessons: Scientific consensus can drive policy, international cooperation possible
+
+**Human Genome Project:**
+- International collaboration on transformative technology
+- Open sharing of data despite competitive pressure
+- Ethical guidelines developed alongside research
+- Lessons: Scientific community can coordinate, culture matters
+
+### Failed Coordination Examples
+
+**Climate Change:**
+- Long delay between scientific consensus and action
+- Free-rider problems dominate
+- Short-term incentives override long-term thinking
+- Lessons: Diffuse harms hard to coordinate on, political will difficult to maintain
+
+**AI Development So Far:**
+- Limited coordination on safety
+- Racing dynamics in capability development
+- Some safety work but not proportionate to risks
+- Lessons: This is our baseline - improvement needed for Aligned AGI scenario
+
+## Probability Assessment
+
+### Scenario Probability Estimates
+
+Expert estimates for the likelihood of achieving aligned AGI vary widely, reflecting fundamental uncertainties about both technical alignment tractability and coordination feasibility. The central question is whether humanity can solve multiple hard problems—technical, strategic, and political—before capabilities race ahead of safety measures.
+
+### Expert Survey Data on AI Outcomes
+
+| Survey/Source | Sample | Median P(doom) | Key Finding | Year |
+|---------------|--------|----------------|-------------|------|
+| [AI Impacts Survey](https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/) | 2,778 ML researchers | 5% | 40% assigned greater than 10% to "extremely bad" outcomes | 2024 |
+| [arXiv Expert Survey](https://arxiv.org/html/2502.14870v1) | 200+ AI experts | 5-10% | Those unfamiliar with AI safety are least concerned | 2025 |
+| [Geoffrey Hinton](https://en.wikipedia.org/wiki/Existential_risk_from_artificial_intelligence) | Individual expert | 10-20% | Probability of extinction within 30 years | 2024 |
+| [Toby Ord, The Precipice](https://theprecipice.com/) | Individual expert | 10% | AI largest contributor to 16% cumulative extinction risk by 2100 | 2020 |
+| [Forecasting Tournament](https://www.sciencedirect.com/science/article/abs/pii/S0169207024001250) | Specialists + superforecasters | Varies | Specialists more pessimistic on long-run AI threats | 2024 |
+| [FLI AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) | Industry assessment | N/A | Tracking 8 dimensions of AI safety progress | 2025 |
+
+**Implied probability of aligned AGI success:** If median P(doom) is 5-10%, and 10-20% of outcomes involve other negative scenarios (e.g., permanent lock-in, muddle through), then aligned AGI scenarios represent approximately 70-85% of remaining probability mass. However, this scenario's specific requirements (alignment solved AND coordination achieved AND beneficial deployment) narrow the estimate to 10-30%.
+
+| Expert/Source | Estimate | Reasoning |
+|---------------|----------|-----------|
+| Baseline estimate | 10-30% | This scenario requires many things to go right both technically and strategically. Alignment must prove solvable, international cooperation must hold despite economic pressures, and we need sufficient time between warning signs and catastrophic capabilities. The range reflects deep uncertainty about whether technical breakthroughs will arrive in time and whether coordination mechanisms can resist racing dynamics. |
+| Optimists | 30-50% | Alignment is fundamentally solvable given sufficient research effort, and humans have historically proven capable of coordination when existential stakes become clear. The Montreal Protocol and nuclear non-proliferation demonstrate that international cooperation on existential risks is possible. Economic incentives may favor coordination over racing if the benefits of safe AGI far exceed first-mover advantages. |
+| Pessimists | 5-15% | Too many critical dependencies must simultaneously succeed: solving alignment, achieving US-China cooperation, maintaining corporate safety culture under profit pressure, getting a capability plateau for breathing room, and preventing any catastrophic failures that would break trust. Historical precedents like climate change show how difficult long-term coordination is even with clear scientific consensus. |
+| Median view | 15-25% | This outcome is not impossible but requires significant luck alongside skilled execution. Some key uncertainties (like whether we get a capability plateau) are largely outside our control. However, concerted effort on alignment research and international coordination could meaningfully shift probabilities upward. The scenario represents our best-case outcome rather than our most likely path. |
+
+### Why This Probability?
+
+**Reasons for Optimism (Pushing Higher):**
+- Alignment research making real progress
+- Growing awareness of risks among leaders
+- Economic incentives may favor coordination
+- Humanity has solved hard coordination problems before
+- AI could help us solve alignment for more powerful AI
+- Warning signs might come early enough
+
+**Reasons for Pessimism (Pushing Lower):**
+- Many technical uncertainties remain
+- Coordination is very difficult historically
+- Economic pressures for racing are intense
+- Geopolitical tensions are high
+- Time might be too short
+- No guarantee of capability plateau
+- Deceptive alignment might be undetectable
+
+**Central Estimate Rationale:**
+10-30% reflects that this scenario requires many things to go right, but is not impossible. It's our best-case outcome, but not our most likely. The wide range reflects deep uncertainty about both technical tractability and coordination feasibility.
+
+### What Would Change This Estimate?
+
+**Evidence Increasing Probability:**
+- Major alignment breakthroughs
+- US-China AI safety cooperation advancing
+- Capability growth slowing
+- Public support for safety increasing
+- Lab safety culture strengthening
+- Successful coordination on other global challenges
+
+**Evidence Decreasing Probability:**
+- Alignment hitting fundamental roadblocks
+- International tensions increasing
+- Racing dynamics intensifying
+- Safety incidents being ignored
+- Political will for regulation weakening
+- Successful deception by AI in evaluations
+
+## Open Questions and Debates
+
+**Technical Debates:**
+- Is alignment fundamentally solvable or are there impossibility results?
+- Will interpretability scale to superhuman systems?
+- Can we detect deceptive alignment reliably?
+- Is corrigibility compatible with high capability?
+
+**Strategic Debates:**
+- Can US-China cooperate on AI given geopolitical tensions?
+- Will economic incentives favor coordination or racing?
+- Can democratic institutions govern transformative AI?
+- Is voluntary corporate self-regulation sufficient?
+
+**Empirical Uncertainties:**
+- How much time do we have before transformative AI?
+- Will we get clear warning signs?
+- How economically disruptive will AI be?
+- What will public reaction to powerful AI be?
+
+**Philosophical Questions:**
+- What values should we align AI to?
+- Who decides what "beneficial" means?
+- How do we handle value disagreements?
+- What role should humans play in an AI-assisted world?
+

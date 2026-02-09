@@ -1,0 +1,95 @@
+---
+title: Insight Hunting
+description: Tools for finding high-potential insights from ~1M words of content
+sidebar:
+  label: Overview
+  order: 0
+---
+import { EntityLink } from '@components/wiki';
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+LongtermWiki contains approximately **1 million words** of content across hundreds of pages, but currently only **74 insights** have been extracted. This section provides tools to systematically find more high-quality insights.
+
+## What Makes a Good Insight?
+
+Insights are rated on five dimensions:
+
+| Dimension | Question | Example |
+|-----------|----------|---------|
+| **Surprising** | Would this update an AI safety researcher's beliefs? | "78% of Claude instances engaged in alignment faking" |
+| **Important** | Does this affect decisions or priorities? | "<EntityLink id="rlhf">RLHF</EntityLink> fundamentally cannot scale to superhuman tasks" |
+| **Actionable** | Does this suggest concrete work? | "Linear probes achieve >99% AUROC detecting deception" |
+| **Neglected** | Is this getting less attention than deserved? | "Only 2-3 teams globally work on <EntityLink id="goal-misgeneralization">goal misgeneralization</EntityLink>" |
+| **Compact** | Can it be stated in 1-2 sentences? | Short, self-contained claims work best |
+
+The best insights score 4+ on multiple dimensions simultaneously.
+
+## Available Tools
+
+<CardGrid>
+  <Card title="Gap Analysis" icon="magnifier">
+    Find pages with high importance but few/no extracted insights.
+    Prioritizes by: `importance × (1 + quality/100) - insightCount × 20`
+
+    [Open Gap Analysis →](/insight-hunting/gap-analysis/)
+  </Card>
+  <Card title="Table Candidates" icon="list-format">
+    Table rows with paradoxical or notable rating combinations that suggest insight-worthy content.
+
+    [Open Table Candidates →](/insight-hunting/table-candidates/)
+  </Card>
+  <Card title="Quantitative Claims" icon="pencil">
+    Numbers, percentages, and statistics extracted from content that could become standalone insights.
+
+    [Open Quantitative Claims →](/insight-hunting/quantitative-claims/)
+  </Card>
+  <Card title="All Insights" icon="open-book">
+    Browse and search all 124 extracted insights with filters and sorting.
+
+    [View All Insights →](/insight-hunting/insights/)
+  </Card>
+</CardGrid>
+
+## Current Statistics
+
+| Metric | Value |
+|--------|-------|
+| Total content pages | ≈500+ |
+| Total word count | ≈1,000,000 |
+| Extracted insights | 124 |
+| Pages with insights | ≈40 |
+| Insights per page (avg) | ≈3.1 |
+| High-importance pages without insights | 50+ |
+
+## Workflow for Adding Insights
+
+1. **Find candidates** using the tools above
+2. **Verify the claim** is accurate and well-sourced
+3. **Rate the insight** on the five dimensions (1-5 scale)
+4. **Add to `insights.yaml`** following this format:
+
+```yaml
+- id: unique-id-here
+  insight: "The claim in 1-2 sentences"
+  source: /knowledge-base/path/to/page/
+  tags: [relevant, tags]
+  type: claim  # or: research-gap, counterintuitive, quantitative, disagreement, neglected
+  surprising: 4.0
+  important: 4.5
+  actionable: 3.0
+  neglected: 4.0
+  compact: 5.0
+  added: "2025-01-22"
+```
+
+## Types of Insights
+
+| Type | Description | Example |
+|------|-------------|---------|
+| **claim** | Factual assertion | "GPT-4 scores 87% on MMLU" |
+| **research-gap** | Missing research | "No published work on X" |
+| **counterintuitive** | Surprising finding | "More data sometimes hurts" |
+| **quantitative** | Number or statistic | "\$1B+/year spent on RLHF" |
+| **disagreement** | Expert conflict | "Researchers disagree on X" |
+| **neglected** | Underfunded area | "Only 3 people work on X" |

@@ -1,0 +1,373 @@
+---
+title: International Compute Regimes
+description: Multilateral coordination mechanisms for AI compute governance, exploring pathways from non-binding declarations to comprehensive treaties. Assessment finds 10-25% chance of meaningful regimes by 2035, but potential for 30-60% reduction in racing dynamics if achieved. First binding treaty achieved September 2024 (Council of Europe), but 118 of 193 UN states absent from major governance initiatives.
+sidebar:
+  order: 4
+quality: 67
+llmSummary: Comprehensive analysis of international AI compute governance finds 10-25% chance of meaningful regimes by 2035, but potential for 30-60% reduction in racing dynamics if achieved. First binding treaty achieved September 2024 (Council of Europe), though 118 of 193 UN states remain absent from major governance initiatives. Hardware monitoring could achieve 40-70% verification coverage; estimated $50-200M investment over 5-10 years required for regime development.
+lastEdited: "2025-12-28"
+styleGuideVersion: kb-2.0
+importance: 72.5
+entityId: international-compute-regimes
+pageTemplate: knowledge-base-response
+todos:
+  - Complete 'How It Works' section
+  - Complete 'Limitations' section (6 placeholders)
+ratings:
+  novelty: 4.2
+  rigor: 6.8
+  actionability: 5.5
+  completeness: 7.1
+metrics:
+  wordCount: 4669
+  citations: 29
+  tables: 16
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: governance-compute-governance
+---
+import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataInfoBox entityId="international-compute-regimes" />
+
+:::note[Part of Compute Governance]
+This page covers **international regimes**—one approach within the broader Compute Governance framework. See also: <EntityLink id="export-controls">Export Controls</EntityLink>, <EntityLink id="thresholds">Thresholds</EntityLink>, <EntityLink id="monitoring">Monitoring</EntityLink>.
+:::
+
+## Overview
+
+International compute regimes represent a critical but challenging approach to governing AI development through multilateral coordination. Unlike unilateral measures such as export controls or domestic regulations, these regimes would establish binding international agreements that coordinate compute governance across nations—analogous to nuclear non-proliferation treaties or chemical weapons conventions. While mostly in proposal and early discussion stages, these frameworks could potentially address fundamental limitations of national-only approaches to <EntityLink id="ai-governance">AI governance</EntityLink>.
+
+The core premise underlying international compute regimes is that unilateral governance has inherent limitations in governing a global technology. Export controls can be circumvented through third countries or alternative supply chains. Domestic compute thresholds only apply within specific jurisdictions, creating regulatory arbitrage opportunities. Monitoring systems require international cooperation to achieve comprehensive coverage of global AI development. Racing dynamics between nations can undermine individual countries' safety measures, as competitive pressures override precautionary approaches.
+
+Current progress remains limited to high-level political declarations, with the November 2023 <EntityLink id="bletchley-declaration">Bletchley Declaration</EntityLink> representing the first international agreement to acknowledge catastrophic AI risks, signed by 28 countries including the United States, United Kingdom, European Union members, and China. However, these agreements remain entirely non-binding and lack enforcement mechanisms, verification systems, or specific commitments beyond general principles. The path from these declarative statements to meaningful binding regimes faces substantial political, technical, and institutional challenges.
+
+### Quick Assessment
+
+| Dimension | Assessment | Quantitative Estimate | Sources |
+|-----------|------------|----------------------|---------|
+| Tractability | Low | 10-25% chance of meaningful regime by 2035 | Expert synthesis |
+| Potential Impact | Very High | Could reduce racing risk by 30-60% if achieved | Modeling estimates |
+| Current Status | Early implementation | 28 countries in Bletchley process; 1 binding treaty (Council of Europe, Sept 2024); 118 UN member states absent from governance initiatives | <R id="5b0fdfb5ea562bd2">UN HLAB 2024</R> |
+| Time Horizon | Long-term | 5-10+ years for meaningful compute regimes; first binding treaty achieved 2024 | <R id="6bc8cc6226add0a9">Council of Europe Framework Convention</R> |
+| Negotiation Cost | High | \$50-200M over 5-10 years for track-1 and track-2 diplomacy | Policy analysis estimates |
+| Verification Feasibility | Uncertain | Hardware monitoring 40-70% coverage possible; chip tracking analogous to nuclear verification | <R id="397d960772172592"><EntityLink id="cset">CSET</EntityLink> research</R> |
+
+### Risks Addressed
+
+| Risk | Mechanism | Effectiveness |
+|------|-----------|---------------|
+| <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> | Coordinated limits prevent races | High (if achieved) |
+| <EntityLink id="proliferation">Proliferation</EntityLink> | Global verification of compute access | High (if achieved) |
+| <EntityLink id="concentration-of-power">Concentration of Power</EntityLink> | Multilateral rather than unilateral control | Medium |
+
+---
+
+## International AI Governance Landscape
+
+The following table compares major international AI governance initiatives as of December 2024, showing the evolution from non-binding declarations to the first binding treaty:
+
+| Initiative/Regime | Type | Participants | Key Provisions | Status | Effectiveness Assessment |
+|-------------------|------|--------------|----------------|--------|-------------------------|
+| <R id="79f2157d0aa55bdd">Bletchley Declaration</R> (Nov 2023) | Non-binding declaration | 28 countries including US, UK, EU, China | Acknowledges catastrophic AI risks; commits to international cooperation on safety | Active; <R id="73d81d3ead01bc0e">expanded to Seoul Summit</R> May 2024 | Low (declaratory only); laid groundwork for future cooperation |
+| <R id="73d81d3ead01bc0e">Seoul Declaration</R> (May 2024) | Non-binding declaration | 10 countries + EU (Leaders' Session); 27 countries + EU (Ministerial) | Adds "innovation" and "inclusivity" to safety agenda; creates International Network of <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> | Active; notably China did not sign | Low-Medium (created institutional network but non-binding) |
+| <R id="6bc8cc6226add0a9">Council of Europe Framework Convention</R> (Sept 2024) | Binding treaty | 46 CoE members + 11 observers; signed by 10 states including US, UK, EU | First legally binding AI governance agreement; focuses on human rights and democratic values | Newly signed; not yet ratified | Medium (first binding treaty but limited participation from Global South and adversaries) |
+| <R id="5b0fdfb5ea562bd2">UN AI Advisory Body</R> (Sept 2024) | Recommendations | 39 experts from 33 countries | Proposes 7 recommendations including International Scientific Panel, Policy Dialogue, AI Standards Exchange | Recommendation phase; GA to establish process 2024-2025 | Uncertain (comprehensive but requires political will; 118 of 193 UN states absent from major AI governance initiatives) |
+| IAEA-like Institution | Proposal | N/A | Registry of large training runs; inspections of AI facilities; capability evaluations; international safety standards | Proposal stage; <R id="bb6ddef6704acd21">conceptual papers published</R> | High potential if achieved (5-15% probability by 2030) |
+| Compute Allocation Treaty | Proposal | N/A | Caps on aggregate training compute; allocation mechanisms; hardware governance verification | Proposal stage | Very High potential if achieved (2-8% probability by 2035) |
+
+**Key insight:** As of late 2024, international AI governance has achieved its first binding treaty (Council of Europe), but meaningful compute governance regimes with verification mechanisms remain in proposal stages. The UN reports that only 7 of 193 member states participate in the seven most prominent AI governance initiatives, leaving 118 countries—mostly in the Global South—entirely absent from discussions.
+
+---
+
+## Governance Architecture
+
+The evolving international AI governance landscape involves multiple overlapping institutions and initiatives. This diagram illustrates the relationships between key actors and governance mechanisms:
+
+import {Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="international-regimes" client:load />
+
+<Mermaid client:load chart={`
+flowchart TD
+    UN[UN System<br/>193 Member States] --> HLAB[High-Level Advisory Body<br/>39 experts, 33 countries]
+    HLAB --> SCIENCEPANEL[Proposed International<br/>Scientific Panel on AI]
+    HLAB --> DIALOGUE[Proposed Policy Dialogue<br/>on AI Governance]
+
+    BLETCHLEY[Bletchley Process<br/>28 countries] --> SEOUL[Seoul Summit 2024<br/>International Network of AI Safety Institutes]
+    SEOUL --> PARIS[Paris Summit 2025<br/>TBD outcomes]
+
+    COE[Council of Europe<br/>46 members + 11 observers] --> TREATY[Framework Convention<br/>Sept 2024<br/>First Binding Treaty]
+
+    STATES[Major AI Powers<br/>US, China, EU] --> BILATERAL[Bilateral Discussions<br/>Limited progress]
+    STATES --> EXPORT[Export Controls<br/>Unilateral measures]
+
+    PROPOSALS[Governance Proposals] --> IAEA_AI[IAEA-like Institution<br/>Monitoring & Verification]
+    PROPOSALS --> COMPUTE_TREATY[Compute Allocation Treaty<br/>Binding caps & allocation]
+    PROPOSALS --> NONPROLIF[Non-Proliferation Framework<br/>Technology transfer restrictions]
+
+    VERIFICATION[Verification Systems] --> HARDWARE[Hardware Monitoring<br/>AI chip tracking]
+    VERIFICATION --> SOFTWARE[Software Assessment<br/>Capability evaluation]
+
+    INDUSTRY[AI Companies<br/>Frontier labs] -.-> VOLUNTARY[Voluntary Commitments<br/>Safety testing, research sharing]
+    INDUSTRY -.-> COOPERATION[Industry Cooperation<br/>Required for verification]
+
+    HLAB -.-> IAEA_AI
+    SEOUL -.-> SCIENCEPANEL
+    TREATY -.-> DIALOGUE
+    BILATERAL -.-> COMPUTE_TREATY
+    HARDWARE -.-> IAEA_AI
+
+    style UN fill:#e6f3ff
+    style BLETCHLEY fill:#e6f3ff
+    style COE fill:#e6f3ff
+    style TREATY fill:#c8e6c9
+    style IAEA_AI fill:#fff9c4
+    style COMPUTE_TREATY fill:#fff9c4
+    style NONPROLIF fill:#fff9c4
+    style VERIFICATION fill:#ffe0b2
+
+    classDef existing fill:#e6f3ff
+    classDef binding fill:#c8e6c9
+    classDef proposal fill:#fff9c4
+    classDef technical fill:#ffe0b2
+`} />
+
+**Legend:** Blue = Existing initiatives (mostly non-binding); Green = Binding agreements; Yellow = Proposals; Orange = Technical enablers. Solid lines = formal relationships; Dashed lines = potential integration pathways.
+
+---
+
+## Proposed Institutional Structures
+
+### IAEA-like Institution for AI
+
+An international body modeled on the International Atomic Energy Agency represents one of the most developed proposals for AI governance, endorsed by <R id="bb6ddef6704acd21">UN Secretary-General António Guterres, UK Prime Minister Rishi Sunak, and OpenAI CEO Sam Altman</R>. In spring 2023, OpenAI cofounders proposed an "IAEA for superintelligence efforts" to govern high-capability systems. Such an institution would combine monitoring, verification, and technical assistance functions, drawing on the IAEA's decades of experience with dual-use nuclear technology—the IAEA operates with approximately **\$400 million annually** and employs **over 2,500 staff** for global nuclear verification. The proposed AI equivalent would establish a registry of large training runs exceeding specified compute thresholds, conduct on-site inspections of major AI facilities, evaluate emerging dangerous capabilities, and coordinate international safety standards.
+
+The institutional structure would likely require a governing board with representatives from major AI-developing nations, a technical secretariat with expertise in AI systems and verification methods, and inspection teams capable of assessing both hardware infrastructure and software development practices. Unlike the IAEA, which primarily monitors physical materials, an AI equivalent would need capabilities to verify software systems, algorithmic approaches, and distributed training processes. The <R id="5b0fdfb5ea562bd2">UN High-Level Advisory Body's September 2024 report</R> proposed an International Scientific Panel on AI as a first step, which would produce annual reports on AI capabilities, risks, and trends, alongside ad hoc reports on emerging AI risks—though this falls short of full IAEA-like verification authority.
+
+Critical challenges include the absence of existing mandate or institutional precedent specifically for AI, the requirement for agreement among major powers including the United States and China, the inherent difficulty of verifying AI development compared to nuclear materials, and the pervasive dual-use nature of AI technology that complicates any restriction regime. The rapid pace of AI development also contrasts sharply with the relatively stable nuclear technology that the IAEA was designed to monitor. <R id="6f171f833897de2c">Lawfare analysis notes</R> that "nuclear and AI are not similar policy problems"—AI policy is loosely defined with disagreement over field boundaries and harms, and it is decentralized without the same physical bottlenecks in materials as nuclear technology.
+
+### Compute Allocation Treaties
+
+Compute allocation frameworks would establish international agreements limiting total compute available for AI training, potentially including caps on aggregate training compute within specified time periods, mechanisms for allocating compute access among nations or approved entities, verification systems leveraging hardware governance approaches, and graduated response protocols for treaty violations. <R id="397d960772172592">CSET research on verification mechanisms</R> describes how AI chip accounts might be verified using methods analogous to nuclear arms control verification, with tracking systems that "identify people with the capability to train highly-capable and broad AI models, and thus many of the most risky models."
+
+These treaties would draw conceptual parallels to nuclear warhead limits in arms control agreements, but applied to computational resources rather than physical weapons. Compute is considered "a unique AI governance node due to the required physical space, energy demand, and the concentrated supply chain," making it more governable than purely software-based approaches. The semiconductor supply chain's high concentration—dominated by a few manufacturers like NVIDIA, TSMC, and ASML—could enable monitoring and governance in ways impossible for distributed software development. Implementation would require precise definitions of "compute for AI training" versus other computational uses, mechanisms for measuring and attributing distributed training across multiple data centers, protocols for handling technological advances that change compute efficiency, and enforcement measures that balance cooperation incentives with violation consequences.
+
+The verification challenge is particularly acute for compute allocation treaties. Unlike nuclear warheads, which exist as discrete physical objects, AI training compute is inherently fungible and can be rapidly reallocated between different purposes. Distributed training across multiple jurisdictions further complicates attribution and monitoring, while the rapid improvement in compute efficiency means that fixed quantitative limits may become obsolete quickly. However, research suggests that **decentralized compute access, while often considered desirable, would make verification more difficult**—international verification regimes would benefit from compute being physically centralized both nationally and internationally, as "fewer countries with computing capacity to do prohibited activities means fewer countries necessary for successful coordination."
+
+### Non-Proliferation Framework
+
+A non-proliferation framework for AI would restrict transfers of frontier AI capabilities, analogous to nuclear non-proliferation regimes but adapted for information technology. Such a framework might establish a "nuclear club" equivalent for frontier AI development, restricting membership to countries meeting specific safety and verification standards, implementing technology transfer restrictions on advanced AI capabilities, establishing inspection and verification rights for international monitors, and defining consequences for violations including potential exclusion from AI technology cooperation.
+
+This approach would need to address the fundamental differences between AI and nuclear proliferation. AI capabilities spread primarily through information rather than physical materials, making control more challenging but potentially more comprehensive. The rapid pace of AI advancement means that capability advantages may be temporary, reducing incentives for non-proliferation cooperation. Additionally, the enormous civilian benefits of AI technology create stronger pressures for widespread access compared to nuclear weapons technology.
+
+---
+
+## Historical Precedents and Lessons
+
+### Nuclear Governance: IAEA and NPT
+
+The nuclear governance regime offers the most relevant historical precedent for international AI coordination, despite significant differences in the underlying technologies. The Nuclear Non-Proliferation Treaty, which entered into force in 1970, has succeeded in preventing proliferation to an estimated 15-25 additional countries that had nuclear weapons programs or capabilities, though it failed to prevent proliferation to India, Pakistan, North Korea, and Israel.
+
+Key successes include the development of comprehensive inspection and safeguards regimes that verify civilian nuclear programs, international consensus on the dangers of nuclear proliferation that supports ongoing cooperation, decades of institution-building that created robust verification capabilities, and effective integration of civilian benefits (nuclear power) with non-proliferation objectives through the IAEA's dual mandate.
+
+However, the nuclear regime's limitations are instructive for AI governance. Some proliferation occurred despite extensive international efforts, particularly by countries willing to accept international isolation. The regime relies heavily on voluntary state cooperation, which can break down under extreme political pressure. Dual-use technology challenges persist, as civilian nuclear capabilities can contribute to weapons programs. Enforcement ultimately depends on political will rather than automatic mechanisms.
+
+The nuclear precedent suggests that international institutions can successfully coordinate governance of dangerous technologies, but that verification systems require sustained technical and political investment. The IAEA's budget of approximately \$400 million annually and staff of over 2,500 demonstrates the resource requirements for effective international monitoring. For AI, the verification challenges may be even greater due to the software-based nature of the technology and the much larger number of relevant actors.
+
+### Chemical Weapons: CWC and OPCW
+
+The Chemical Weapons Convention provides another instructive precedent, particularly regarding industry cooperation and near-universal membership. The Organization for the Prohibition of Chemical Weapons has achieved near-universal state participation with 193 member countries, successful destruction of declared chemical weapons stockpiles totaling over 71,000 metric tons, effective industry verification through routine inspections of chemical facilities, and strong international norms against chemical weapons use that persist despite occasional violations.
+
+The chemical weapons regime's emphasis on industry cooperation offers important lessons for AI governance. Chemical companies voluntarily report dual-use production and submit to international inspections, demonstrating that private sector cooperation with international regimes is achievable. However, this cooperation depends on clear legal frameworks, predictable inspection procedures, and protection of legitimate commercial interests.
+
+Limitations include ongoing non-compliance challenges, as demonstrated by chemical weapons use in Syria despite OPCW membership, verification difficulties with dual-use chemicals that have legitimate commercial applications, and limited enforcement mechanisms beyond diplomatic pressure and potential economic sanctions. For AI governance, these challenges may be magnified given the broader dual-use nature of AI technology and the much larger number of relevant commercial actors.
+
+### Key Differences from AI
+
+| Factor | Nuclear/Chemical | AI |
+|--------|-----------------|-----|
+| Civilian benefits | Limited (nuclear power) | Enormous economic potential |
+| Verification target | Physical materials | Software, models, compute |
+| Primary actors | States and state-owned entities | States, companies, individuals |
+| Pace of change | Relatively slow | Extremely rapid advancement |
+| Dual-use nature | Clear weapons applications | Pervasive dual-use applications |
+| Geographic distribution | Concentrated in few locations | Globally distributed development |
+
+---
+
+## Current International Progress
+
+### AI Safety Summit Process
+
+The AI Safety Summit process, initiated with the <R id="79f2157d0aa55bdd">November 2023 Bletchley Declaration</R>, represents the most significant current progress toward international AI coordination. Twenty-eight countries, including all major AI-developing nations, signed the declaration acknowledging that frontier AI capabilities could pose catastrophic risks and committing to international cooperation on AI safety. The declaration marked the first time that the United States, European Union, and China jointly acknowledged AI existential risks in an official diplomatic document. Following the Bletchley Declaration, "AI safety was firmly entrenched as a top AI policy concern," with both the United States and United Kingdom announcing the creation of AI Safety Institutes and the formation of an advisory panel of international AI experts.
+
+The <R id="73d81d3ead01bc0e">May 2024 Seoul AI Safety Summit</R> expanded the agenda beyond safety to include "innovation" and "inclusivity," producing three major documents: the Seoul Declaration (signed by 10 countries and the EU), Frontier AI Safety Commitments from companies, and the Seoul Ministerial Statement (signed by 27 countries and the EU). Key outcomes included the creation of an **International Network of AI Safety Institutes** bringing together organizations from the UK, US, Japan, France, Germany, Italy, Singapore, South Korea, Australia, Canada, and the EU; the publication of the first **International Scientific Report on the Safety of Advanced AI** on May 17, 2024; and voluntary company commitments to safety testing, research sharing, and government cooperation. However, **China notably did not sign the Seoul Declaration**, potentially signaling "reluctance to sign on to AI governance mechanisms they view as promoting a Western-centric view of global AI governance."
+
+Future summits planned for France in 2025 and beyond aim to deepen cooperation, though <R id="a7f69bbad6cd82c0">Carnegie analysis warns</R> that "looking ahead to France's 2025 summit, the prospects of stronger regulation appear even dimmer, as the initiative has downplayed safety concerns in favor of discussions about AI's potential for economic growth." The process faces significant challenges in moving beyond high-level declarations toward binding commitments. Political differences between participants, competitive concerns among AI companies, and technical uncertainties about effective governance approaches all constrain progress.
+
+### UN AI Advisory Body
+
+The United Nations Secretary-General established a High-Level Advisory Body on Artificial Intelligence in October 2023, comprising **39 preeminent AI leaders from 33 countries** across all regions and sectors. The body released its final report, <R id="5b0fdfb5ea562bd2">"Governing AI for Humanity,"</R> in September 2024, making **seven key recommendations**:
+
+1. **International Scientific Panel on AI** to provide impartial scientific knowledge through annual and ad hoc reports on AI capabilities, risks, and trends
+2. **Policy Dialogue on AI Governance** featuring intergovernmental and multi-stakeholder meetings to foster regulatory interoperability
+3. **AI Standards Exchange** to empower coordination and tackle global AI risks
+4. **Global AI Capacity Development Network** offering training, compute resources, and datasets
+5. **Global AI Fund** to address capacity gaps and empower local efforts toward Sustainable Development Goals
+6. **Global AI Data Framework** to standardize data-related definitions, principles, and stewardship
+7. **AI Office within UN Secretariat** to support implementation coordination
+
+The report identified a critical governance gap: **out of 193 UN member states, only 7 participate in the seven most prominent AI governance initiatives, while 118 countries (mostly in the Global South) are entirely absent**. The General Assembly will appoint co-facilitators during its 79th session (September 2024 - September 2025) to establish terms of reference for the International Scientific Panel and Global Dialogue through an intergovernmental process.
+
+Limitations include the advisory-only nature of the body's mandate, the slow pace of UN institutional processes compared to rapid AI development, the challenge of achieving consensus among countries with different AI capabilities and strategic interests, and the absence of enforcement mechanisms even if recommendations are adopted. However, the report's comprehensive framework provides a potential roadmap for future binding cooperation if political will develops.
+
+### Bilateral and Multilateral Discussions
+
+Current bilateral discussions between major AI powers remain limited but show some promise for incremental progress. US-China AI dialogue faces significant constraints due to broader geopolitical tensions and export control policies, but some track-2 discussions continue through academic and research channels. Areas of potential cooperation include basic AI safety research, international standard-setting for AI evaluation, and information sharing about AI incidents and near-misses. <R id="dfe76e1ad41f9bf6">Brookings emphasizes</R> that "for AI governance agreements to be fully implemented, they will need the active participation and support of China and Russia as well as other relevant states. Just as during the Cold War, logic should dictate that potential adversaries be at the negotiating table in fashioning these agreements. Otherwise, democratic countries will end up in a situation where they are self-constrained but adversaries are not."
+
+US-European cooperation proceeds more smoothly through existing mechanisms including the Trade and Technology Council, which has established working groups on AI standards and safety evaluation. The EU's AI Act and US executive orders on AI show some convergence on risk-based approaches to AI regulation, though significant differences remain in implementation approaches and scope. In September 2024, the **first international legally binding agreement on AI governance** was opened for signature in Vilnius, Lithuania—the <R id="6bc8cc6226add0a9">Council of Europe Framework Convention</R>, negotiated by 46 Council of Europe members and 11 observer states. Ten states including the United States, United Kingdom, and European Union have already signed, marking a significant milestone despite concerns that "states from the Global South who were not represented at the negotiating table may not be easily persuaded to come on board."
+
+Multilateral discussions within frameworks like the OECD, G7, and G20 have produced general principles for AI governance but have not yet achieved binding commitments or specific coordination mechanisms. In July 2024, the OECD Secretary General announced that the Global Partnership on AI (GPAI) is merging with OECD's AI policy work, "opening a new chapter in global AI governance." The challenge is moving from broad principle agreement to operational cooperation on technical governance questions.
+
+---
+
+## Technical and Political Challenges
+
+### Verification Feasibility
+
+Verification represents perhaps the greatest technical challenge for international compute regimes. Unlike nuclear materials, which exist as discrete physical objects with measurable properties, AI training processes involve software execution across distributed hardware infrastructure. Verification systems would need to monitor compute allocation to AI training versus other purposes, track distributed training across multiple data centers and jurisdictions, assess model capabilities and potential dangers, and detect attempts to circumvent monitoring through novel training approaches. <R id="397d960772172592">Research on verification mechanisms</R> describes methods "analogous to nuclear arms control verification," with AI chips serving as "the main physical instantiation of AI development and deployment" due to their specialization and concentrated supply chain.
+
+Current research suggests that hardware-based monitoring may offer the most promising verification approach. Specialized AI chips contain unique identifiers and performance characteristics that could enable tracking of compute allocation, with the goal of identifying "people with the capability to train highly-capable and broad AI models." By tracking AI chips, verification regimes hope to identify actors with capacity to train risky models and verify they use chips safely. However, such systems would require cooperation from chip manufacturers, standardization of monitoring protocols, and protection against spoofing or circumvention attempts. The Semiconductor Industry Association has expressed cautious interest in governance cooperation but emphasizes the need for clear technical standards and minimal business disruption. The highly concentrated semiconductor supply chain—dominated by companies like NVIDIA for chip design, TSMC for manufacturing, and ASML for lithography equipment—creates natural chokepoints that could enable governance in ways impossible for distributed software.
+
+Software-based verification faces greater challenges due to the difficulty of distinguishing AI training from other computational tasks, the potential for obfuscation through distributed or novel training methods, and the rapid evolution of training techniques that could outpace verification capabilities. Academic research on AI training detection suggests **60-80% accuracy under favorable conditions**, but real-world performance may be significantly lower when actors attempt deliberate evasion. Overall verification feasibility estimates suggest **40-70% coverage is possible** through hardware monitoring combined with software assessment, though this depends heavily on international cooperation and technical development.
+
+### Geopolitical Constraints
+
+The current geopolitical environment poses substantial obstacles to comprehensive international compute regimes. US-China relations, in particular, are characterized by strategic competition that includes AI development as a key dimension. US export controls on AI chips to China, implemented in October 2022 and expanded in 2023, create adversarial dynamics that complicate cooperation on AI safety despite shared interests in avoiding catastrophic outcomes.
+
+Chinese perspectives on international AI governance emphasize concerns about technological sovereignty, equitable access to AI benefits, and avoiding discriminatory restrictions that preserve Western technological advantages. Chinese officials have expressed interest in AI safety cooperation but within frameworks that ensure equal participation and avoid restrictions that disadvantage Chinese AI development. The challenge is designing regimes that address legitimate security concerns while enabling genuine cooperation on shared safety challenges.
+
+European approaches generally favor comprehensive international regulation but face constraints from both competitive concerns about disadvantaging European AI companies and political concerns about technological dependence on the United States or China. The EU's regulatory approach through the AI Act demonstrates capability for detailed AI governance but may complicate international coordination if EU standards diverge significantly from those preferred by other major powers.
+
+### Private Sector Integration
+
+International compute regimes must address the reality that frontier AI development occurs primarily within private companies rather than government programs. Unlike nuclear weapons development, which remains largely state-controlled, AI development involves companies with global operations, international research collaboration, and complex supply chains that span multiple jurisdictions.
+
+Leading AI companies have expressed varying degrees of support for international governance coordination. OpenAI has proposed international oversight of frontier AI development similar to nuclear governance. Google DeepMind has supported international AI safety research cooperation. However, companies also emphasize concerns about competitive disadvantages, regulatory compliance costs, and protection of proprietary information that could be compromised by extensive monitoring requirements.
+
+The challenge is designing regimes that achieve meaningful oversight without imposing prohibitive costs on legitimate AI development or creating advantages for actors willing to operate outside international frameworks. Industry cooperation may require clear legal protections, predictable regulatory requirements, and mechanisms for protecting competitive information while enabling safety verification.
+
+---
+
+## Pathways to Implementation
+
+### Incremental Approach
+
+The most realistic pathway to comprehensive international compute regimes likely involves incremental steps that build trust and institutional capacity over time. An incremental approach might begin with voluntary information sharing about large training runs exceeding specified compute thresholds, mutual notification systems for significant AI capability developments, alignment on common safety evaluation frameworks and standards, joint research cooperation on AI safety and verification technologies, and coordinated incident response for AI-related accidents or near-misses.
+
+This approach builds on existing diplomatic processes like the AI Safety Summit while gradually expanding scope and binding nature of commitments. Early confidence-building measures could include technical workshops on verification technologies, joint research projects on AI safety evaluation, information sharing about AI governance best practices, and coordination on standards development through existing international bodies.
+
+The incremental approach faces the risk that gradual progress may be overtaken by rapid AI development that creates fait accompli situations before adequate governance is established. However, it offers the best prospect for achieving genuine cooperation among major powers and building institutional capacity for more comprehensive governance as AI risks become more evident.
+
+### Crisis-Driven Approach
+
+Historical experience suggests that comprehensive international regimes often emerge in response to crises that demonstrate urgent need for coordination. For AI governance, crisis-driven regime formation might follow a major AI-caused harm event, a near-miss incident that demonstrates catastrophic AI risks, a geopolitical crisis involving AI capabilities, or rapidly accelerating AI development that creates obvious race dynamics with destabilizing potential.
+
+Crisis-driven regime formation has the advantage of creating strong political incentives for rapid agreement and enabling more comprehensive frameworks than would be achievable through gradual negotiation. The chemical weapons regime's expansion after the 1995 Tokyo subway attacks and enhanced nuclear cooperation after the 1962 Cuban Missile Crisis demonstrate how crises can catalyze institutional development.
+
+However, crisis-driven regimes also risk poor design due to time pressure, overreaction that unnecessarily constrains beneficial AI development, and institutional frameworks that prove inadequate as circumstances change. The challenge is preparing institutional frameworks and technical capabilities in advance so that crisis-driven windows can be used effectively rather than squandered through inadequate preparation.
+
+### Technology-Enabled Approach
+
+Technical advances in verification, monitoring, and governance technologies could enable international regimes that are currently infeasible. Hardware governance developments that enable reliable compute monitoring, interpretability advances that allow verification of model capabilities and safety properties, distributed ledger technologies that could support transparent compute allocation tracking, and automated safety evaluation systems that reduce verification costs.
+
+The technology-enabled approach recognizes that many current obstacles to international compute regimes are technical rather than purely political. If verification becomes reliable and cost-effective, and if governance technologies can operate without imposing excessive burdens on legitimate AI development, political obstacles to international cooperation may diminish substantially.
+
+Research priorities for enabling technologies include developing tamper-resistant hardware monitoring systems, creating standardized interfaces for AI safety evaluation, designing privacy-preserving verification protocols that protect competitive information, and building automated systems for detecting potentially dangerous AI capabilities. The timeline for these enabling technologies ranges from 2-5 years for basic hardware governance to 5-10 years for comprehensive capability verification systems.
+
+---
+
+## Strategic Assessment and Future Outlook
+
+### Effectiveness Analysis
+
+| Criterion | Assessment | Evidence Base | Confidence Level |
+|-----------|------------|---------------|------------------|
+| Historical precedent viability | Moderate success | NPT prevented 15-25 additional nuclear states; CWC achieved near-universal membership | High |
+| AI-specific technical feasibility | Uncertain | Hardware monitoring 40-70% effective; software verification 60-80% accuracy in favorable conditions | Medium |
+| Geopolitical cooperation prospects | Low-moderate | Limited US-China dialogue; EU-US convergence on some approaches; 28 countries in Bletchley process | Medium |
+| Industry cooperation likelihood | Moderate | Major companies expressed qualified support; concerns about competitive impacts and compliance costs | Medium |
+| Enforcement mechanism viability | Low-moderate | Export controls as partial backstop; diplomatic pressure primary mechanism; 30-50% estimated effectiveness | Low-Medium |
+
+### Resource and Timeline Requirements
+
+Establishing meaningful international compute regimes would require substantial sustained investment across multiple categories. Official diplomatic processes (track-1 diplomacy) would cost an estimated \$10-50 million annually for 5-10+ years, including negotiation support, technical expertise, and institutional development. Unofficial relationship-building (track-2 diplomacy) requires \$5-20 million annually for 2-5 years to establish communication channels and explore possible agreements before formal negotiations begin.
+
+Technical verification research and development represents a critical enabling investment, requiring \$20-100 million over 3-7 years to develop monitoring technologies, safety evaluation systems, and verification protocols. An international secretariat for treaty implementation would cost \$10-50 million annually if established, while supporting academic and think tank research requires \$5-15 million annually for regime design analysis and ongoing assessment.
+
+The timeline for comprehensive regimes remains highly uncertain, with optimistic scenarios requiring 5-7 years under favorable political conditions and more realistic assessments suggesting 8-15 years given current geopolitical constraints. However, incremental progress through information sharing and technical cooperation could begin within 1-3 years building on existing AI Safety Summit processes.
+
+### Critical Uncertainties
+
+Several fundamental uncertainties dominate assessments of international compute regime prospects. The feasibility of meaningful US-China cooperation represents the central political question, with estimates ranging from 5-30% probability by 2030 depending on broader geopolitical developments and potential crisis catalysts. AI development timelines to catastrophic risk, estimated at 5-30 years, determine urgency and available time for institutional development.
+
+Technical verification capabilities face uncertain development timelines, with viable systems potentially available in 3-10 years depending on research progress and industry cooperation. The role of non-state actors in frontier AI development may grow to 10-40% of total capability, affecting regime coverage and enforcement requirements. Crisis-driven windows for regime formation are estimated to account for 20-50% of potential regime creation scenarios, but their timing and nature remain unpredictable.
+
+The interaction between these uncertainties creates a wide range of possible outcomes, from comprehensive binding regimes within a decade to continued reliance on unilateral approaches and informal cooperation. Planning for international compute regimes must account for this uncertainty through flexible approaches that can adapt to different scenarios.
+
+### Strategic Recommendations
+
+International compute regimes represent a high-value, long-term investment that should complement rather than replace nearer-term governance approaches. The highest-priority investments include supporting incremental cooperation through existing diplomatic channels, funding technical research on verification and monitoring capabilities, building academic and policy expertise on regime design questions, and maintaining diplomatic engagement even during periods of broader political tension.
+
+The approach should be simultaneously ambitious in long-term vision and realistic about near-term constraints. Building the technical capabilities, institutional relationships, and political understanding necessary for comprehensive regimes requires sustained effort over many years. However, the potential benefits of successful international coordination—including prevention of destabilizing races, verification of safety commitments, and equitable global access to AI benefits—justify substantial investment despite uncertain prospects.
+
+The most realistic pathway involves parallel progress on multiple fronts: technical development of verification capabilities, incremental diplomatic cooperation through existing channels, academic research on regime design and implementation challenges, and preparation for potential crisis-driven windows that could accelerate institutional development. This approach maximizes the probability of achieving meaningful international cooperation while building capabilities that support other governance approaches if comprehensive regimes prove infeasible.
+
+---
+
+## Summary: Current State and Prospects
+
+The following table synthesizes the current state of international AI governance and prospects for meaningful compute regimes:
+
+| Dimension | Current Status (Dec 2024) | Evidence | Prospects by 2030 | Sources |
+|-----------|--------------------------|----------|-------------------|---------|
+| **Binding Treaties** | 1 treaty (Council of Europe Framework Convention) | Signed by 10 states including US, UK, EU in Sept 2024 | 20-40% chance of compute-specific treaty | <R id="6bc8cc6226add0a9">Council of Europe</R> |
+| **Global Participation** | 7 of 193 UN states participate in major initiatives | 118 countries (mostly Global South) entirely absent | Limited; likely remains Western-led | <R id="5b0fdfb5ea562bd2">UN HLAB Report</R> |
+| **US-China Cooperation** | Limited track-2 dialogue only | China signed Bletchley but not Seoul Declaration | 5-30% chance of meaningful cooperation | <R id="dfe76e1ad41f9bf6">Brookings</R> |
+| **Institutional Development** | International Network of AI Safety Institutes established | 11 countries participating as of May 2024 Seoul Summit | 40-60% chance of expansion and formalization | <R id="73d81d3ead01bc0e">Seoul Declaration</R> |
+| **Verification Technology** | 40-70% coverage possible via hardware monitoring | AI chip tracking analogous to nuclear verification; 60-80% software detection accuracy under favorable conditions | 50-70% chance of viable systems | <R id="397d960772172592">CSET Research</R> |
+| **IAEA-like Institution** | Proposal stage; UN Scientific Panel recommended | UN HLAB proposed panel with annual reports; IAEA budget \$400M, 2,500 staff as reference | 5-15% chance of full IAEA-equivalent by 2030 | <R id="bb6ddef6704acd21">IAEA Proposal Analysis</R> |
+| **Industry Cooperation** | Voluntary commitments only | Major labs (OpenAI, DeepMind, Anthropic) committed to safety testing and research sharing at Seoul | 30-50% chance of binding industry obligations | <R id="73d81d3ead01bc0e">Seoul Summit Outcomes</R> |
+| **Networked Governance** | Multiple overlapping initiatives (Bletchley, Seoul, UN, Council of Europe) | "Regime complexes" characterize 21st century governance vs treaty-based 20th century | 70-85% chance this remains primary model | <R id="4162ca16170ea7c1">Brookings on Networks</R> |
+
+**Key Insight:** International AI governance has made notable progress in 2024 with the first binding treaty and establishment of institutional networks, but comprehensive compute governance regimes with meaningful verification remain 5-10+ years away. The most likely scenario involves continued networked governance among like-minded democracies rather than universal treaties including adversaries. <R id="4162ca16170ea7c1">Brookings argues</R> that "networked and distributed forms of AI governance will remain the singular form of international cooperation that can respond to the rapid pace at which AI is developing."
+
+---
+
+## Related Approaches
+
+- <EntityLink id="export-controls">Export Controls</EntityLink> — Current unilateral restrictions that international regimes could supplement or replace
+- <EntityLink id="thresholds">Compute Thresholds</EntityLink> — Domestic regulatory triggers that require international coordination for effectiveness
+- <EntityLink id="monitoring">Compute Monitoring</EntityLink> — Technical foundation enabling verification for international agreements
+
+---
+
+## Related Pages
+
+---
+
+## AI Transition Model Context
+
+International compute regimes improve the <EntityLink id="ai-transition-model" /> through multiple factors:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="international-coordination" /> | Treaties establish binding commitments on development pace and safety standards |
+| <EntityLink id="transition-turbulence" /> | <EntityLink id="racing-intensity" /> | Coordinated limits prevent destructive race to the bottom |
+| <EntityLink id="transition-turbulence" /> | <EntityLink id="ai-control-concentration" /> | Multilateral governance distributes oversight across stakeholders |
+
+International regimes are high-impact but low-probability interventions; 10-25% chance of meaningful regimes by 2035 but potential 30-60% reduction in racing dynamics if achieved.
+

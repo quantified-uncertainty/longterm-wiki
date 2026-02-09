@@ -1,0 +1,287 @@
+---
+title: "About This Wiki"
+description: "Transparency about who made this, why, and how to evaluate it"
+sidebar:
+  order: 100
+  label: "About & Transparency"
+importance: 15
+quality: 48
+llmSummary: "Transparently documents that this wiki was created using AI assistance (Claude), explicitly acknowledges biases toward AI safety community perspectives, and provides structured guidance for evaluating claims. Offers unusual meta-level transparency about limitations, embedded assumptions, and coverage gaps, with concrete examples of what's well-covered vs. under-covered."
+ratings:
+  novelty: 6.5
+  rigor: 6
+  actionability: 3
+  completeness: 7.5
+metrics:
+  wordCount: 1081
+  citations: 0
+  tables: 6
+  diagrams: 0
+---
+import { InfoBox, EntityLink } from '@components/wiki';
+import { getWikiStats } from '@lib/dashboard';
+
+export const wikiStats = getWikiStats();
+
+<InfoBox
+  type="meta"
+  title="Transparency & Credibility"
+  customFields={[
+    { label: "Purpose", value: "Help you assess whether to trust this resource" },
+    { label: "Last Data Build", value: wikiStats.lastBuildDate },
+  ]}
+/>
+
+Before using this wiki to inform your views on AI risk, you should know who made it, what biases it has, and how to evaluate its claims.
+
+---
+
+## Who Made This?
+
+This wiki is an experimental project exploring how to structure and communicate AI safety arguments. It was created primarily using Claude Code (<EntityLink id="anthropic">Anthropic</EntityLink>'s AI coding assistant) as an experiment in AI-assisted content creation.
+
+**What this means for you:**
+- The content reflects what an AI system trained on AI safety discourse would produce
+- It may inherit biases present in that discourse
+- It has been reviewed but not comprehensively fact-checked
+- It should be treated as a starting point for exploration, not a definitive reference
+
+---
+
+## Wiki Statistics
+
+<div className="not-content grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{wikiStats.totalPages}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Content Pages</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{wikiStats.totalEntities}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Entities Tracked</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{wikiStats.totalResources}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">External Resources</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{wikiStats.totalWords}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Words (approx)</div>
+  </div>
+</div>
+
+| Metric | Value |
+|--------|-------|
+| **Content pages** | {wikiStats.totalPages} |
+| **Entities tracked** | {wikiStats.totalEntities} |
+| **External resources/citations** | {wikiStats.totalResources} |
+| **Approximate word count** | {wikiStats.totalWords} |
+| **Average quality score** | {wikiStats.avgQuality} / 5.0 |
+| **Created** | {wikiStats.createdDate} |
+| **Last data build** | {wikiStats.lastBuildDate} |
+
+### Content Breakdown
+
+| Category | Count |
+|----------|-------|
+| Risks & Risk Factors | {wikiStats.entityBreakdown.risks} |
+| Responses (Agendas, Interventions, Policies) | {wikiStats.entityBreakdown.responses} |
+| Organizations & Labs | {wikiStats.entityBreakdown.orgs} |
+| People | {wikiStats.entityBreakdown.people} |
+| Analytical Models | {wikiStats.entityBreakdown.models} |
+| Concepts & Capabilities | {wikiStats.entityBreakdown.concepts} |
+
+### Quality Distribution
+
+| Quality Level | Count |
+|---------------|-------|
+| Low (1-2) — Needs improvement | {wikiStats.qualitySummary.low} |
+| Adequate (3) — Meets basic standards | {wikiStats.qualitySummary.adequate} |
+| High (4-5) — Well-developed | {wikiStats.qualitySummary.high} |
+
+For detailed quality metrics and entity gap analysis, see the [Dashboard](/dashboard/).
+
+---
+
+## What Perspective Does This Wiki Represent?
+
+This wiki is written from within the **AI safety / x-risk community perspective**. This is a real intellectual community with:
+
+- Shared assumptions (AI could be transformatively powerful, alignment is hard, existential risk is possible)
+- Shared vocabulary (TAI, P(doom), alignment, <EntityLink id="mesa-optimization">mesa-optimization</EntityLink>)
+- Shared heroes (Bostrom, Yudkowsky, Russell, etc.)
+- Shared funding sources (<EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, EA funders)
+- Social dynamics that can create groupthink
+
+**The wiki tries to present counterarguments**, but it does so *from within* this perspective. The structure of the arguments, the choice of what to cover, and the framing all reflect AI safety community assumptions.
+
+### Embedded Assumptions
+
+Assumptions this wiki takes for granted (which are contested elsewhere):
+
+| Assumption | Contested By |
+|------------|--------------|
+| "AGI" is a coherent concept | Some ML researchers (LeCun, Marcus) |
+| Existential risk from AI is possible | AI ethics community, some ML researchers |
+| Theoretical risk analysis is valid before empirical evidence | Empiricists, mainstream ML |
+| Long-term future matters morally | Person-affecting ethicists |
+| The AI safety research agenda is roughly correct | AI ethics researchers, some ML researchers |
+
+If you reject these assumptions, this wiki may still be useful for understanding what AI safety researchers believe—but you should not treat it as a neutral source.
+
+---
+
+## How Was Content Created?
+
+### Sources
+- Alignment Forum and <EntityLink id="lesswrong">LessWrong</EntityLink> posts
+- Academic papers on AI safety
+- Public statements from researchers and organizations
+- AI safety organization websites
+- Forecasting platforms (<EntityLink id="metaculus">Metaculus</EntityLink>, <EntityLink id="ai-impacts">AI Impacts</EntityLink> surveys)
+
+### Process
+1. Initial content generated with AI assistance
+2. Structured around "cruxes" (key disagreement points)
+3. Reviewed for accuracy against primary sources
+4. Counterarguments added to major claims
+5. Limitations acknowledged explicitly
+
+### What's NOT Included
+- Systematic literature review
+- Original research or interviews
+- Comprehensive fact-checking
+- Peer review by subject matter experts
+- Input from AI ethics / critical AI studies perspectives
+
+---
+
+## Known Biases and Limitations
+
+### Coverage Biases
+
+| Well-Covered | Under-Covered |
+|--------------|---------------|
+| Technical alignment research | AI ethics / fairness |
+| X-risk arguments | Mundane AI harms |
+| Western/Anglophone perspectives | Non-Western perspectives |
+| EA-adjacent organizations | Academic ML safety |
+| Arguments for concern | Skeptical/dismissive views |
+
+### Structural Biases
+
+1. **Selection of "cruxes"**: The cruxes chosen reflect what the AI safety community considers important, not necessarily what's actually decision-relevant
+2. **Probability estimates**: Numbers are drawn primarily from AI safety-adjacent sources
+3. **Organization coverage**: More detail on orgs the AI safety community considers important
+4. **Framing of debates**: The "Is AI x-risk real?" debate is framed as a debate, not as one side potentially being correct
+
+### Potential Conflicts of Interest
+
+- Created using Anthropic's Claude, which has interests in AI safety being taken seriously
+- Content reflects perspectives likely to increase AI safety funding/attention
+- No financial conflicts, but intellectual/tribal ones exist
+
+---
+
+## How to Evaluate Claims in This Wiki
+
+### For Factual Claims
+1. Check the sources provided
+2. Look for the original source, not just citations
+3. Check if claims are contested by credible critics
+4. Note the date—AI safety discourse moves fast
+
+### For Probability Estimates
+1. Treat as rough intuitions, not rigorous calculations
+2. Note whose estimates are cited (selection bias)
+3. Remember these are uncertain by definition
+4. Your informed estimate is as valid as anyone's
+
+### For Arguments
+1. Check if counterarguments are addressed
+2. Look for the strongest version of opposing views
+3. Ask: "What would falsify this?"
+4. Consider whether the argument structure privileges certain conclusions
+
+### For Recommendations
+1. Consider who benefits from the recommendation
+2. Check if alternatives are fairly presented
+3. Ask if the recommendation follows from the arguments
+4. Consider your own situation and values
+
+---
+
+## How Has This Wiki Updated Over Time?
+
+A healthy knowledge resource should update based on evidence. Here's our track record:
+
+### Changes Made Based on Criticism
+- Added explicit "Limitations & Perspective" section
+- Added criticism sections to major argument pages
+- Changed fake-precise probabilities to ranges
+- Added sources for alternative viewpoints
+- Acknowledged non-neutral framing
+
+### What Would Make Us Update Further
+- Evidence of deceptive behavior in AI systems → would increase concern emphasis
+- Continued absence of concerning behaviors → would moderate concern emphasis
+- Major alignment breakthroughs → would increase optimism
+- Alignment techniques failing at scale → would increase pessimism
+- Feedback from AI ethics researchers → would improve coverage of that perspective
+
+### What We're NOT Tracking (Limitation)
+We don't have systematic tracking of predictions made in this wiki vs. outcomes. This is a significant limitation for assessing calibration.
+
+---
+
+## How to Contribute or Critique
+
+### If You Disagree With Coverage
+- Open an issue on GitHub explaining the gap
+- Suggest specific sources that should be included
+- Write a critique we can link to
+
+### If You Find Errors
+- Factual errors: Open an issue with correction and source
+- Broken links: Open an issue or PR
+- Outdated information: Suggest update with new source
+
+### If You Have Expertise
+- AI safety researchers: Help ensure technical accuracy
+- AI ethics researchers: Help improve coverage of that perspective
+- ML practitioners: Help ground theoretical claims in practice
+- Forecasters: Help improve probability estimates
+
+---
+
+## The Meta-Question: Can You Trust AI-Generated Content About AI Risk?
+
+This wiki was largely created with AI assistance. This creates an interesting epistemological situation:
+
+**Reasons for caution:**
+- AI systems might have biases toward certain conclusions about AI
+- The AI safety community's perspectives may be overrepresented in training data
+- AI assistance may create false confidence through fluent, confident-sounding prose
+
+**Reasons this might be okay:**
+- AI assistance is transparent (you know it was used)
+- The content can be checked against primary sources
+- Human review and editing occurred
+- Explicit acknowledgment of limitations
+
+**Our recommendation:**
+Treat this wiki as a well-organized *summary* of AI safety community views, not as an authoritative source. Use it to navigate the landscape and find primary sources—then form your own conclusions.
+
+---
+
+## Summary: How Credible Is This Wiki?
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Factual accuracy** | Moderate—based on reputable sources but not comprehensively fact-checked |
+| **Balanced coverage** | Low—systematically biased toward AI safety perspective |
+| **Source quality** | Moderate—mix of academic papers, forum posts, and public statements |
+| **Transparency** | High—explicit about limitations and perspective |
+| **Updatability** | High—can incorporate feedback and new evidence |
+
+**Bottom line**: Use this wiki to understand what the AI safety community believes and why. Don't use it as your only source on AI risk. Seek out critics and alternative perspectives.
+

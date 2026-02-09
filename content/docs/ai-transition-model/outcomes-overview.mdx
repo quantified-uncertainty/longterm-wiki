@@ -1,0 +1,97 @@
+---
+title: Ultimate Outcomes
+description: "The two ultimate outcomes of the AI transition: avoiding existential catastrophe and ensuring a positive long-term trajectory."
+sidebar:
+  order: 0
+  label: Overview
+lastEdited: "2026-01-03"
+subcategory: outcomes
+---
+import {Mermaid, OutcomesTable, FullModelDiagram, EntityLink} from '@components/wiki';
+
+Ultimate Outcomes represent what we fundamentally care about when thinking about AI's impact on humanity. Unlike <EntityLink id="scenarios-overview">Scenarios</EntityLink> (which describe intermediate scenarios) or <EntityLink id="__index__/ai-transition-model">parameters</EntityLink> (which measure specific factors), Ultimate Outcomes describe the **final states** we're trying to achieve or avoid.
+
+There are two Ultimate Outcomes:
+
+1. **<EntityLink id="existential-catastrophe">Existential Catastrophe</EntityLink>** — Does catastrophe occur?
+2. **<EntityLink id="long-term-trajectory">Long-term Trajectory</EntityLink>** — What's the expected value of the future?
+
+---
+
+## The Two Outcomes
+
+<Mermaid client:load chart={`
+flowchart LR
+    subgraph Outcomes["What We Ultimately Care About"]
+        ACUTE[Existential Catastrophe]
+        VALUE[Long-term Trajectory]
+    end
+
+    ACUTE -.->|"must avoid to reach"| VALUE
+
+    style ACUTE fill:#ff6b6b
+    style VALUE fill:#4ecdc4
+`} />
+
+<OutcomesTable client:load />
+
+---
+
+## Why Two Outcomes?
+
+A natural alternative would be three outcomes (adding something like "Transition Smoothness"). Two outcomes are preferable because:
+
+1. **Transition turbulence is a pathway, not an endpoint**: How rough the transition is affects *both* existential catastrophe and long-term trajectory. It belongs in <EntityLink id="factors-transition-turbulence-overview">Root Factors</EntityLink>.
+
+2. **Cleaner analytical structure**: Two outcomes are genuinely orthogonal:
+   - You can have low existential catastrophe but poor long-term trajectory (safe dystopia)
+   - You can have high existential catastrophe but good conditional value (high-stakes gamble)
+
+3. **Temporal clarity**: Existential Catastrophe is primarily about the transition period; Long-term Trajectory is about what comes after.
+
+---
+
+## How They Relate
+
+These outcomes are **partially independent**—you can have different combinations:
+
+| Scenario | Existential Catastrophe | Long-term Trajectory | Example |
+|----------|------------|----------------|---------|
+| Best case | Low | High | Aligned AI, smooth transition, flourishing |
+| Safe dystopia | Low | Low | No catastrophe but authoritarian lock-in |
+| High-stakes success | High (survived) | High | Near-misses but good outcome |
+| Extinction | Very High | N/A | Catastrophe occurs |
+
+This independence means:
+- **Different Ultimate Scenarios affect different Ultimate Outcomes**
+- **Trade-offs exist**: Some approaches that reduce existential catastrophe might worsen long-term trajectory (e.g., authoritarian control)
+- **Both matter**: We shouldn't sacrifice one entirely for the other
+
+---
+
+## How Ultimate Scenarios Flow to Ultimate Outcomes
+
+<FullModelDiagram client:load />
+
+Each ultimate scenario has sub-variants with different probability estimates. See the <EntityLink id="scenarios-overview">Ultimate Scenarios</EntityLink> section for details.
+
+---
+
+## Temporal Structure
+
+These outcomes map to different phases of the AI transition:
+
+| Phase | Primary Concern | Relevant Outcome |
+|-------|-----------------|------------------|
+| **Pre-transformative AI** (now) | Building capacity, avoiding racing | Existential Catastrophe (preparation) |
+| **Existential Catastrophe Period** | Surviving the transition | Existential Catastrophe |
+| **Resolution** | How it resolves | Both |
+| **Long-run Trajectory** | Quality of the future | Long-term Trajectory |
+
+---
+
+## Related Pages
+
+- <EntityLink id="scenarios-overview">Scenarios</EntityLink> — The intermediate scenarios
+- <EntityLink id="__index__/ai-transition-model">AI Transition Model</EntityLink> — All parameters
+- <EntityLink id="factors-overview">Aggregate Parameters</EntityLink> — How parameters group together

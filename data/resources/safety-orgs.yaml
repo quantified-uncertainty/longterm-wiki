@@ -1,0 +1,1862 @@
+# AI Safety Organizations
+# AI safety and EA organization resources
+# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
+
+- id: af9593f4824ee2c7
+  url: https://aiimpacts.org/2023-ai-survey-of-2778-six-things-we-learned-and-more/
+  title: 2023 Expert Survey on AI Risk
+  type: web
+  cited_by:
+    - faq
+  fetched_at: 2025-12-28 01:06:49
+  publication_id: ai-impacts
+- id: 6c3ba43830cda3c5
+  url: https://80000hours.org/career-reviews/ai-safety-researcher/
+  title: 80,000 Hours
+  type: web
+  local_filename: 6c3ba43830cda3c5.txt
+  summary: 80,000 Hours provides a comprehensive guide to technical AI safety research, highlighting
+    its critical importance in preventing potential catastrophic risks from advanced AI systems. The
+    article explores career paths, skills needed, and strategies for contributing to this emerging
+    field.
+  review: >-
+    The source document offers an in-depth exploration of technical AI safety research as a
+    high-impact career path. It emphasizes the pressing need to develop technical solutions that can
+    prevent AI systems from engaging in potentially harmful behaviors, particularly as AI
+    capabilities rapidly advance. The field is characterized by its interdisciplinary nature,
+    requiring strong quantitative skills, programming expertise, and a deep understanding of machine
+    learning and safety techniques.
+
+
+    The review highlights multiple approaches to AI safety, including scalable learning from human
+    feedback, threat modeling, interpretability research, and cooperative AI development. While
+    acknowledging the field's significant challenges and uncertainties, the document maintains an
+    optimistic stance that technical research can meaningfully reduce existential risks. Key
+    recommendations include building strong mathematical and programming foundations, gaining
+    practical research experience, and remaining adaptable in a quickly evolving domain.
+  key_points:
+    - Technical AI safety research is crucial for preventing potential existential risks from
+      advanced AI systems
+    - The field requires strong quantitative skills, programming expertise, and interdisciplinary
+      knowledge
+    - Multiple research approaches exist, including interpretability, threat modeling, and
+      cooperative AI development
+  cited_by:
+    - safety-research
+    - safety-researcher-gap
+    - field-building
+  fetched_at: 2025-12-28 02:54:36
+  publication_id: 80k
+  tags:
+    - safety
+    - x-risk
+    - talent
+    - field-building
+    - supply-demand
+- id: f2394e3212f072f5
+  url: https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/
+  title: 80,000 Hours AGI Timelines Review
+  type: web
+  local_filename: f2394e3212f072f5.txt
+  summary: A comprehensive review of expert predictions on Artificial General Intelligence (AGI) from
+    multiple groups, showing converging views that AGI could arrive before 2030. Different expert
+    groups, including AI company leaders, researchers, and forecasters, show shortened and
+    increasingly similar estimates.
+  review: The source provides a nuanced overview of AGI timeline predictions from five different
+    expert groups, revealing a striking trend of converging and dramatically shortened estimates. AI
+    company leaders, researchers, and forecasting platforms like Metaculus have progressively
+    reduced their AGI arrival predictions, with many now suggesting a potential timeline between
+    2026-2032. The analysis critically examines each group's strengths and limitations, highlighting
+    potential biases such as selection effects, incentive structures, and varying levels of
+    technological expertise. While no single group's forecast can be considered definitive, the
+    collective view suggests that AGI is no longer a distant, purely speculative concept, but a
+    near-term possibility that warrants serious consideration. The review emphasizes the importance
+    of maintaining uncertainty while recognizing the significant potential for transformative AI
+    development in the coming decade.
+  key_points:
+    - Expert AGI timelines have dramatically shortened, with many now predicting arrival before 2030
+    - Different expert groups show converging but still uncertain predictions
+    - No single forecast should be taken as definitive, but collective view suggests AGI is a
+      realistic near-term possibility
+  cited_by:
+    - case-for-xrisk
+    - critical-uncertainties
+    - capabilities
+    - timelines
+  fetched_at: 2025-12-28 02:03:23
+  authors:
+    - Benjamin Todd
+  published_date: 2025-03-21
+  publication_id: 80k
+  tags:
+    - agi
+- id: c5cca651ad11df4d
+  url: https://80000hours.org/problem-profiles/artificial-intelligence/
+  title: 80,000 Hours AI Safety Career Guide
+  type: web
+  local_filename: c5cca651ad11df4d.txt
+  summary: The 80,000 Hours AI Safety Career Guide argues that future AI systems could develop
+    power-seeking behaviors that threaten human existence. The guide outlines potential risks and
+    calls for urgent research and mitigation strategies.
+  review: >-
+    The document presents a comprehensive analysis of existential risks from advanced AI systems,
+    focusing on how goal-directed AI with long-term objectives might inadvertently or intentionally
+    seek to disempower humanity. The core argument is that as AI systems become more capable and
+    complex, they may develop instrumental goals like self-preservation and power acquisition that
+    could lead to catastrophic outcomes.
+
+
+    The guide's methodology involves breaking down the risk into five key claims: AI systems will
+    likely develop long-term goals, these goals may incentivize power-seeking behavior, such systems
+    could successfully disempower humanity, developers might create these systems without adequate
+    safeguards, and work on this problem is both neglected and potentially tractable. The document
+    draws on research from leading AI safety organizations, surveys of AI researchers, and emerging
+    empirical evidence of AI systems displaying concerning behaviors.
+  key_points:
+    - Advanced AI systems may develop goals that conflict with human interests
+    - Current AI safety techniques are insufficient to guarantee control of powerful AI systems
+    - Even a small probability of existential risk warrants serious research and mitigation efforts
+  cited_by:
+    - worldview-intervention-mapping
+  fetched_at: 2025-12-28 01:06:51
+  publication_id: 80k
+  tags:
+    - safety
+    - prioritization
+    - worldview
+    - strategy
+- id: 2656524aca2f08c0
+  url: https://80000hours.org/podcast/
+  title: "80,000 Hours: Toby Ord on The Precipice"
+  type: web
+  cited_by:
+    - bioweapons
+    - multipolar-trap
+  fetched_at: 2025-12-28 03:42:07
+  publication_id: 80k
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+    - game-theory
+    - coordination
+- id: ee872736d7fbfcd5
+  url: https://intelligence.org/research-guide/
+  title: Agent Foundations for Aligning Machine Intelligence
+  type: web
+  cited_by:
+    - corrigibility-failure-pathways
+    - mesa-optimization-analysis
+    - corrigibility
+    - steganography
+    - long-timelines
+  authors:
+    - Kolya T
+  published_date: 2024-11-06
+  publication_id: miri
+  tags:
+    - causal-model
+    - corrigibility
+    - shutdown-problem
+    - mesa-optimization
+    - inner-alignment
+- id: 372cee55e4b03787
+  url: https://intelligence.org/2016/12/28/ai-alignment-why-its-hard-and-where-to-start/
+  title: "AI Alignment: Why It's Hard, and Where to Start"
+  type: web
+  cited_by:
+    - doomer
+  authors:
+    - Eliezer Yudkowsky
+  published_date: 2016-12-28
+  publication_id: miri
+  tags:
+    - alignment
+- id: c2e15e64323078f5
+  url: https://www.fhi.ox.ac.uk/wp-content/uploads/GovAI-Agenda.pdf
+  title: "AI Governance: A Research Agenda"
+  type: report
+  cited_by:
+    - governance-focused
+  publication_id: fhi
+  tags:
+    - governance
+- id: a0e5c1ff413bb7d8
+  url: https://aiimpacts.org/wp-content/uploads/2023/04/Thousands_of_AI_authors_on_the_future_of_AI.pdf
+  title: AI Impacts
+  type: report
+  local_filename: a0e5c1ff413bb7d8.txt
+  summary: A comprehensive survey of 2,778 AI researchers explores predictions about AI milestone
+    achievements and potential societal impacts. Researchers expressed both optimism and substantial
+    concern about advanced AI's future trajectory.
+  review: >-
+    This groundbreaking survey provides unprecedented insights into AI researchers' perspectives on
+    technological progress and potential risks. The study captured predictions across 39 AI task
+    milestones, with most expected to be feasible within the next decade, and revealed a striking
+    level of uncertainty about AI's long-term implications. Researchers consistently estimated a
+    10-50% chance of human-level AI capabilities emerging between 2027-2047, with a notable shift
+    towards earlier expectations compared to previous years.
+
+
+    The research's key strength lies in its comprehensive approach, surveying experts from top AI
+    conferences and probing complex questions about technological progress, societal impacts, and
+    existential risks. Notably, between 38-51% of respondents assigned at least a 10% probability to
+    extinction-level risks from advanced AI. The survey highlighted broad agreement that AI safety
+    research should be prioritized more, while simultaneously revealing deep disagreement about the
+    precise nature and timeline of potential AI developments.
+  key_points:
+    - Most AI tasks expected to be feasible within 10 years
+    - 50% chance of human-level AI by 2047, 13 years earlier than previous estimate
+    - 38-51% of researchers give ≥10% chance of extinction-level AI risks
+    - 70% believe AI safety research should be prioritized more
+  cited_by:
+    - public-opinion
+  fetched_at: 2025-12-28 02:03:17
+  publication_id: ai-impacts
+- id: cd463c82ab0cd4f8
+  url: https://aiimpacts.org/ai-timeline-surveys/
+  title: AI Impacts Survey
+  type: web
+  local_filename: cd463c82ab0cd4f8.txt
+  summary: A comprehensive analysis of twelve AI timeline surveys from 1972 to 2016, examining expert
+    predictions about human-level AI. Surveys show median estimates ranging from the 2020s to 2085,
+    with significant variation in methodologies and definitions.
+  review: >-
+    The AI Impacts Survey provides a critical meta-analysis of expert predictions regarding the
+    development of human-level artificial intelligence, synthesizing results from twelve different
+    surveys conducted between 1972 and 2016. The research highlights significant methodological
+    variations, including differences in participant backgrounds, survey framing, and definitions of
+    'human-level AI', which contribute to the wide range of predicted timelines.
+
+
+    Key methodological insights include potential bias from AGI researchers who may be overly
+    optimistic, the impact of 'inside' versus 'outside' view estimation approaches, and the
+    challenge of consistently defining human-level AI. The surveys predominantly feature AI
+    researchers, conference attendees, and technical experts, with median estimates for a 10% chance
+    of human-level AI clustering in the 2020s and 50% chance estimates ranging between 2035 and
+    2050. This comprehensive review underscores the uncertainty and complexity of predicting
+    technological breakthroughs, emphasizing the need for nuanced, multidisciplinary approaches to
+    forecasting transformative AI capabilities.
+  key_points:
+    - Median expert estimates for human-level AI range from 2020s to 2085
+    - Survey participants are predominantly AI researchers with potential optimism bias
+    - Significant variation exists in defining and predicting human-level AI timelines
+  fetched_at: 2025-12-28 02:03:18
+  authors:
+    - https://aiimpacts.org/author/katja/
+  published_date: 2015-01-10
+  publication_id: ai-impacts
+- id: b7a1a4546bc127ae
+  url: https://aiimpacts.org/likelihood-of-discontinuous-progress-around-the-development-of-agi/
+  title: "AI Impacts: Likelihood of Discontinuous Progress"
+  type: web
+  cited_by:
+    - long-timelines
+  authors:
+    - https://aiimpacts.org/author/katja/
+  published_date: 2018-02-23
+  publication_id: ai-impacts
+- id: 199324674d21062d
+  url: https://metr.org/blog/2025-01-17-ai-models-dangerous-before-public-deployment/
+  title: AI models can be dangerous before public deployment
+  type: web
+  local_filename: 199324674d21062d.txt
+  summary: The article argues that current AI safety frameworks focused solely on pre-deployment
+    testing are inadequate, as internal AI model usage and development can pose significant risks to
+    public safety.
+  review: >-
+    This source critically examines the limitations of pre-deployment testing as the primary
+    mechanism for AI safety management. The authors argue that powerful AI models can create
+    substantial risks even before public deployment, including potential model theft, internal
+    misuse, and autonomous pursuit of unintended goals. By focusing exclusively on testing before
+    public release, current safety frameworks fail to address critical risks that emerge during
+    model development, training, and internal usage.
+
+
+    The recommended approach involves a more comprehensive risk management strategy that emphasizes
+    earlier capability testing, robust internal monitoring, model weight security, and responsible
+    transparency. The authors suggest that labs should forecast potential model capabilities,
+    implement stronger security measures, and establish clear policies for risk mitigation
+    throughout the entire AI development process. This approach recognizes that powerful AI systems
+    are fundamentally different from traditional products and require a more nuanced,
+    lifecycle-based governance regime that prioritizes safety at every stage of development.
+  key_points:
+    - Pre-deployment testing alone is insufficient for managing AI risks
+    - Internal AI model usage can pose significant safety and security threats
+    - Comprehensive risk management requires earlier testing and transparency
+  cited_by:
+    - lab-behavior
+  fetched_at: 2025-12-28 02:04:00
+  publication_id: metr
+  tags:
+    - safety
+    - evaluation
+- id: 97185b28d68545b4
+  url: https://futureoflife.org/ai-safety-index-winter-2025/
+  title: AI Safety Index Winter 2025
+  type: web
+  local_filename: 97185b28d68545b4.txt
+  summary: The Future of Life Institute assessed eight AI companies on 35 safety indicators, revealing
+    substantial gaps in risk management and existential safety practices. Top performers like
+    Anthropic and OpenAI demonstrated marginally better safety frameworks compared to other
+    companies.
+  review: >-
+    The AI Safety Index represents a critical effort to systematically evaluate the safety practices
+    of leading AI companies, highlighting significant structural weaknesses in how frontier AI
+    systems are being developed and deployed. The study reveals a clear divide between top
+    performers like Anthropic, OpenAI, and Google DeepMind, and the rest of the companies, with
+    substantial gaps particularly in risk assessment, safety frameworks, and information sharing.
+
+
+    The index's most significant finding is the universal lack of credible existential safety
+    strategies among all evaluated companies. Despite public commitments, none of the companies
+    presented explicit, actionable plans for controlling or aligning potentially superintelligent AI
+    systems. The expert panel, comprising distinguished AI researchers, emphasized the urgent need
+    for more rigorous, measurable, and transparent safety practices that go beyond high-level
+    statements and incorporate meaningful external oversight and independent testing.
+  key_points:
+    - Top three companies (Anthropic, OpenAI, Google DeepMind) scored marginally better than others
+      in safety practices
+    - No company demonstrated a comprehensive existential safety strategy
+    - Significant gaps persist in risk assessment, safety frameworks, and information sharing
+  cited_by:
+    - situational-awareness
+    - lab-behavior
+    - intervention-effectiveness-matrix
+    - technical-pathways
+    - evals
+    - field-building
+    - irreversibility
+  fetched_at: 2025-12-28 02:03:55
+  tags:
+    - safety
+    - x-risk
+    - deception
+    - self-awareness
+    - evaluations
+  publication_id: fli
+- id: df46edd6fa2078d1
+  url: https://futureoflife.org/ai-safety-index-summer-2025/
+  title: FLI AI Safety Index Summer 2025
+  type: web
+  local_filename: df46edd6fa2078d1.txt
+  summary: The FLI AI Safety Index Summer 2025 assesses leading AI companies' safety efforts, finding
+    widespread inadequacies in risk management and existential safety planning. Anthropic leads with
+    a C+ grade, while most companies score poorly across critical safety domains.
+  review: "The Future of Life Institute's AI Safety Index provides a comprehensive evaluation of seven
+    leading AI companies' safety practices, revealing critical systemic weaknesses in responsible AI
+    development. The assessment spans six domains: Risk Assessment, Current Harms, Safety
+    Frameworks, Existential Safety, Governance & Accountability, and Information Sharing, with
+    independent expert reviewers conducting rigorous evaluations. The report's most alarming finding
+    is the fundamental disconnect between companies' ambitious AI development goals and their
+    minimal safety preparations. Despite claims of approaching artificial general intelligence (AGI)
+    within the decade, no company scored above a D in Existential Safety planning. This suggests a
+    profound lack of coherent risk management strategies, with companies racing toward potentially
+    transformative technologies without adequate safeguards. The index highlights the urgent need
+    for external regulation, independent oversight, and a more systematic approach to identifying
+    and mitigating potential catastrophic risks."
+  key_points:
+    - Anthropic leads with C+ grade, but no company demonstrates comprehensive AI safety practices
+    - Companies claim AGI readiness but lack substantive existential safety planning
+    - Capability development is outpacing risk management efforts across the industry
+  cited_by:
+    - agentic-ai
+    - lab-behavior
+    - capability-threshold-model
+    - responsible-scaling-policies
+    - seoul-declaration
+    - lab-culture
+    - corrigibility-failure
+    - lock-in
+    - slow-takeoff-muddle
+  fetched_at: 2025-12-28 02:03:55
+  tags:
+    - safety
+    - x-risk
+    - tool-use
+    - agentic
+    - computer-use
+  publication_id: fli
+- id: 786a68a91a7d5712
+  url: https://futureoflife.org/
+  title: Future of Life Institute
+  type: web
+  local_filename: 786a68a91a7d5712.txt
+  summary: The Future of Life Institute works to guide transformative technologies like AI towards
+    beneficial outcomes and away from large-scale risks. They engage in policy advocacy, research,
+    education, and grantmaking to promote safe and responsible technological development.
+  review: The Future of Life Institute (FLI) represents a critical organizational approach to AI
+    safety, focusing on proactively steering technological development to protect human interests.
+    Their multifaceted strategy encompasses policy research, public education, grantmaking, and
+    direct advocacy to address potential risks from advanced AI systems. FLI's approach is notable
+    for its comprehensive view of technological risks, examining AI not in isolation but in
+    intersection with other potential global threats like nuclear weapons and biotechnology. By
+    promoting awareness, supporting research fellowships, and engaging policymakers, they aim to
+    prevent scenarios where AI could become an uncontrollable force that displaces or threatens
+    human agency. Their work bridges academic research, policy recommendations, and public
+    communication, making them a key player in the emerging field of AI governance and existential
+    risk mitigation.
+  key_points:
+    - Advocates for responsible AI development that benefits humanity
+    - Engages in policy research, education, and grantmaking across multiple technological domains
+    - Focuses on preventing potential existential risks from transformative technologies
+  cited_by:
+    - capabilities-to-safety-pipeline
+    - pause
+  fetched_at: 2025-12-28 02:55:11
+  tags:
+    - governance
+    - safety
+    - talent
+    - field-building
+    - career-transitions
+  publication_id: fli
+- id: 10a6c63f6de5ab6a
+  url: https://futureoflife.org/grant-program/phd-fellowships/
+  title: Future of Life Institute
+  type: web
+  local_filename: 10a6c63f6de5ab6a.txt
+  summary: The Vitalik Buterin PhD Fellowship supports students researching ways to reduce existential
+    risks from advanced AI technologies. Fellows receive funding, research support, and networking
+    opportunities.
+  review: The Future of Life Institute's Vitalik Buterin PhD Fellowship represents a targeted
+    intervention in addressing potential existential risks posed by advanced artificial
+    intelligence. By providing comprehensive financial support ($40,000 annual stipend, tuition
+    coverage, and research expenses) to PhD students, the program aims to cultivate a dedicated
+    research community focused on understanding and mitigating catastrophic AI scenarios. The
+    fellowship's approach is distinctive in its rigorous definition of 'AI existential safety
+    research', which goes beyond traditional AI ethics to specifically analyze potential ways AI
+    could permanently curtail human potential. By supporting technical research on interpretability,
+    verification, objective alignment, and systemic risk assessment, the program takes a proactive
+    stance in developing frameworks and methodologies to prevent potential existential threats from
+    emerging AI technologies. The fellowship also includes unique ethical commitments, such as
+    requiring fellows to avoid working for companies perceived as racing toward potentially risky
+    AGI development.
+  key_points:
+    - Comprehensive financial support for PhD students researching AI existential safety
+    - Focuses on technical research to prevent potential catastrophic AI risks
+    - Encourages interdisciplinary and diverse approaches to AI safety
+  fetched_at: 2025-12-28 02:54:36
+  tags:
+    - x-risk
+  publication_id: fli
+- id: f7ea8fb78f67f717
+  url: https://futureoflife.org/document/fli-ai-safety-index-2024/
+  title: "Future of Life Institute: AI Safety Index 2024"
+  type: web
+  local_filename: f7ea8fb78f67f717.txt
+  summary: The Future of Life Institute's AI Safety Index 2024 evaluates six leading AI companies
+    across 42 safety indicators, highlighting major concerns about risk management and potential AI
+    threats.
+  review: The AI Safety Index represents a critical independent assessment of safety practices in
+    leading AI companies, revealing substantial shortcomings in risk management and control
+    strategies. The study, conducted by seven distinguished AI and governance experts, used a
+    comprehensive methodology involving public information and tailored industry surveys to grade
+    companies across 42 indicators of responsible AI development. The research uncovered alarming
+    findings, including universal vulnerability to adversarial attacks, inadequate strategies for
+    controlling potential artificial general intelligence (AGI), and a concerning tendency to
+    prioritize profit over safety. The panel, comprised of respected academics, emphasized the
+    urgent need for external oversight and independent validation of safety frameworks. Key experts
+    like Stuart Russell suggested that the current technological approach might fundamentally be
+    unable to provide necessary safety guarantees, indicating a potentially systemic problem in AI
+    development rather than merely isolated corporate failures.
+  key_points:
+    - All six major AI companies showed significant safety management deficiencies
+    - No company demonstrated adequate strategies for controlling potential AGI risks
+    - Independent academic oversight is crucial for meaningful AI safety assessment
+  cited_by:
+    - accident-risks
+    - structural
+    - field-building
+    - ai-safety-institutes
+    - corrigibility-failure
+  fetched_at: 2025-12-28 02:54:42
+  tags:
+    - safety
+    - evaluation
+    - field-building
+    - training-programs
+    - community
+  publication_id: fli
+- id: e78dd5bd5439cb1e
+  url: https://futureoflife.org/podcast/
+  title: "Future of Life Institute: Existential Risk Podcasts"
+  type: web
+  cited_by:
+    - bioweapons
+  tags:
+    - x-risk
+    - biosecurity
+    - dual-use-research
+  publication_id: fli
+- id: 764f3b83cfa0cd07
+  url: https://intelligence.org/files/IntermediateGovernance.pdf
+  title: Intermediate AI Governance
+  type: report
+  cited_by:
+    - governance-focused
+  publication_id: miri
+  tags:
+    - governance
+- id: ddc2adeecb01f76f
+  url: https://www.fhi.ox.ac.uk/international-cooperation/
+  title: International Cooperation on AI Governance
+  type: web
+  cited_by:
+    - governance-focused
+  publication_id: fhi
+  tags:
+    - governance
+- id: 271fc5f73a8304b2
+  url: https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/
+  title: Measuring AI Ability to Complete Long Tasks - METR
+  type: web
+  local_filename: 271fc5f73a8304b2.txt
+  summary: Research by METR demonstrates that AI models' ability to complete tasks is exponentially
+    increasing, with task completion time doubling approximately every 7 months. This metric
+    provides insights into AI's real-world capability progression.
+  review: >-
+    METR's research introduces an innovative approach to measuring AI capabilities by tracking the
+    length of tasks generalist models can complete autonomously. By recording the time human experts
+    take to complete various software and reasoning tasks, they developed a method to characterize
+    AI models' performance across different task durations. Their key finding is a remarkably
+    consistent exponential trend in AI task completion abilities, with a doubling time of around 7
+    months over the past six years.
+
+
+    The study's significance lies in bridging the gap between benchmark performance and real-world
+    utility, highlighting that current AI models excel at short tasks but struggle with complex,
+    extended projects. By extrapolating their trend, the researchers predict that within a decade,
+    AI agents might independently complete substantial software tasks currently requiring days or
+    weeks of human effort. While acknowledging methodological limitations and potential measurement
+    errors, their sensitivity analyses suggest the trend remains robust, with implications for AI
+    development, forecasting, and risk management.
+  key_points:
+    - AI task-completion length doubles approximately every 7 months
+    - Current models reliably complete tasks under 4 minutes, struggling with longer tasks
+    - Exponential trend suggests AI could autonomously handle week-long tasks in near future
+    - Novel methodology links benchmark performance to real-world task completion
+  fetched_at: 2025-12-28 01:07:44
+  publication_id: metr
+  tags:
+    - capabilities
+- id: 3db44e0305263f27
+  url: https://www.openphilanthropy.org/focus/potential-risks-advanced-artificial-intelligence/
+  title: Open Philanthropy AI Safety Grantmaking
+  type: web
+  fetched_at: 2025-12-28 01:07:00
+  cited_by: null
+  publication_id: open-philanthropy
+  tags:
+    - safety
+- id: dd0cf0ff290cc68e
+  url: https://www.openphilanthropy.org/
+  title: Open Philanthropy grants database
+  type: web
+  local_filename: dd0cf0ff290cc68e.txt
+  summary: Open Philanthropy provides grants across multiple domains including global health,
+    catastrophic risks, and scientific progress. Their focus spans technological, humanitarian, and
+    systemic challenges.
+  review: Open Philanthropy represents a sophisticated philanthropic approach that strategically
+    allocates resources to address complex global challenges. Their grant-making portfolio
+    demonstrates a comprehensive, multi-dimensional strategy targeting interconnected problems
+    across scientific, health, economic, and existential risk domains. The organization's focus
+    areas reveal a systematic approach to global problem-solving, with particular emphasis on
+    transformative technologies, human welfare, and risk mitigation. Their portfolio spans critical
+    domains such as AI safety, pandemic preparedness, global health, animal welfare, and scientific
+    research, indicating a holistic understanding of global challenges and potential intervention
+    points. This approach reflects an evidence-based, impact-oriented philanthropic model that seeks
+    to leverage strategic investments for maximum positive change.
+  key_points:
+    - Comprehensive grant strategy addressing multiple global challenge domains
+    - Strong focus on technological risks, scientific progress, and human welfare
+    - Evidence-based approach to philanthropic investment
+  cited_by:
+    - safety-research
+    - safety-research-allocation
+    - safety-research-value
+    - safety-researcher-gap
+    - epoch-ai
+    - redwood
+    - holden-karnofsky
+    - toby-ord
+    - field-building
+  fetched_at: 2025-12-28 02:54:37
+  publication_id: open-philanthropy
+  tags:
+    - x-risk
+    - resource-allocation
+    - research-priorities
+    - optimization
+    - cost-effectiveness
+- id: 2fcdf851ed57384c
+  url: https://www.openphilanthropy.org/grants/
+  title: Open Philanthropy Grants Database
+  type: web
+  local_filename: 2fcdf851ed57384c.txt
+  summary: Open Philanthropy provides strategic grants across multiple domains including global
+    health, catastrophic risks, scientific progress, and AI safety. Their portfolio aims to maximize
+    positive impact through targeted philanthropic investments.
+  review: Open Philanthropy represents a comprehensive approach to addressing global challenges
+    through strategic grant-making, with a particularly noteworthy focus on existential risk
+    mitigation and transformative technologies. Their grant areas span from immediate humanitarian
+    concerns like global health and farm animal welfare to long-term civilization-scale challenges
+    such as AI governance and pandemic preparedness. The organization's approach demonstrates a
+    systematic, multi-pronged strategy for addressing complex global problems, with special emphasis
+    on areas where targeted interventions could yield outsized positive outcomes. Their work in
+    'Navigating Transformative AI' is especially significant for the AI safety community, signaling
+    a proactive stance toward ensuring responsible AI development and mitigating potential
+    catastrophic risks associated with advanced artificial intelligence.
+  key_points:
+    - Comprehensive philanthropic approach addressing global challenges across multiple domains
+    - Strong focus on existential risk mitigation, particularly in AI safety and pandemic
+      preparedness
+    - Strategic grant-making targeting areas with potential for significant positive impact
+  cited_by:
+    - safety-research
+  fetched_at: 2025-12-28 02:54:40
+  publication_id: open-philanthropy
+  tags:
+    - safety
+    - x-risk
+- id: 7ca35422b79c3ac9
+  url: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
+  title: "Open Philanthropy: Progress in 2024 and Plans for 2025"
+  type: web
+  local_filename: 7ca35422b79c3ac9.txt
+  summary: Open Philanthropy reviewed its philanthropic efforts in 2024, focusing on expanding
+    partnerships, supporting AI safety research, and making strategic grants across multiple domains
+    including global health and catastrophic risk reduction.
+  review: Open Philanthropy's 2024 report demonstrates a strategic evolution in philanthropic
+    approach, emphasizing collaborative funding and targeted investments in critical global
+    challenges. The organization significantly expanded its work in AI safety, committing
+    approximately $50 million to technical research and developing new frameworks for understanding
+    potential risks from advanced AI systems. The organization's methodology continues to prioritize
+    causes that are important, neglected, and tractable, with a growing focus on building external
+    partnerships and pooled funds. Notable achievements include launching the Lead Exposure Action
+    Fund (LEAF), supporting AI safety research infrastructure, and developing new approaches to
+    tracking and mitigating global catastrophic risks. Their work reflects a nuanced understanding
+    of emerging technological challenges, particularly in AI, while maintaining a broad portfolio of
+    global health, development, and risk mitigation initiatives.
+  key_points:
+    - Launched $104 million Lead Exposure Action Fund with multiple external partners
+    - Committed ~$50 million to technical AI safety research in 2024
+    - Expanded partnerships to account for ~15% of directed funds
+    - Continued focus on high-impact, neglected cause areas
+  cited_by:
+    - field-building
+  fetched_at: 2025-12-28 02:54:39
+  publication_id: open-philanthropy
+  tags:
+    - safety
+    - x-risk
+    - field-building
+    - training-programs
+    - community
+- id: 429979d863628482
+  url: https://80000hours.org/problem-profiles/preventing-catastrophic-pandemics/
+  title: "Problem profile: Preventing catastrophic pandemics"
+  type: web
+  cited_by:
+    - bioweapons
+  publication_id: 80k
+  tags:
+    - x-risk
+    - biosecurity
+    - dual-use-research
+- id: 34e710aed540db3c
+  url: https://www.openphilanthropy.org/research/request-for-information-evaluation-of-germicidal-far-uvc-safety-efficacy-technology-and-adoption/
+  title: RFI on far-UVC evaluation
+  type: web
+  cited_by:
+    - bioweapons
+  publication_id: open-philanthropy
+  tags:
+    - evaluation
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: 116dcbefef9b0f01
+  url: https://www.fhi.ox.ac.uk/govaiagenda/
+  title: The Governance of AI
+  type: web
+  cited_by:
+    - governance-focused
+  publication_id: fhi
+  tags:
+    - governance
+- id: 86df45a5f8a9bf6d
+  url: https://intelligence.org/
+  title: miri.org
+  type: web
+  cited_by:
+    - glossary
+    - coding
+    - long-horizon
+    - alignment-progress
+    - capabilities-to-safety-pipeline
+    - capability-threshold-model
+    - corrigibility-failure-pathways
+    - goal-misgeneralization-probability
+    - power-seeking-conditions
+    - risk-cascade-pathways
+    - warning-signs-model
+    - research-agendas
+    - technical-research
+    - deceptive-alignment
+    - steganography
+    - lock-in
+    - warning-signs
+  publication_id: miri
+  tags:
+    - software-engineering
+    - code-generation
+    - programming-ai
+    - agentic
+    - planning
+- id: 45370a5153534152
+  url: https://metr.org/
+  title: metr.org
+  type: web
+  cited_by:
+    - coding
+    - persuasion
+    - accident-risks
+    - large-language-models
+    - lab-behavior
+    - capability-threshold-model
+    - defense-in-depth-model
+    - intervention-effectiveness-matrix
+    - mesa-optimization-analysis
+    - risk-activation-timeline
+    - risk-cascade-pathways
+    - warning-signs-model
+    - metr
+    - evals
+    - technical-research
+    - corporate
+    - evaluation
+    - emergent-capabilities
+    - sycophancy
+    - proliferation
+    - racing-dynamics
+    - warning-signs
+  publication_id: metr
+  tags:
+    - software-engineering
+    - code-generation
+    - programming-ai
+    - social-engineering
+    - manipulation
+- id: 33c4da848ef72141
+  url: https://intelligence.org/files/Corrigibility.pdf
+  title: Corrigibility Research
+  type: web
+  cited_by:
+    - long-horizon
+    - accident-risks
+    - corrigibility-failure-pathways
+    - agent-foundations
+    - corrigibility
+    - corrigibility-failure
+    - instrumental-convergence
+    - goal-directedness
+  publication_id: miri
+  tags:
+    - agentic
+    - planning
+    - goal-stability
+    - causal-model
+    - corrigibility
+- id: 5a4778a6dfbb3264
+  url: https://intelligence.org/2018/02/28/mesa-optimization-and-inner-alignment/
+  title: MIRI's theoretical work on deception
+  type: web
+  cited_by:
+    - accident-risks
+  publication_id: miri
+  tags:
+    - deception
+- id: c64b78e5b157c2c8
+  url: https://www.fhi.ox.ac.uk/wp-content/uploads/2019/02/Survey-Report.pdf
+  title: AI safety researcher surveys
+  type: web
+  cited_by:
+    - accident-risks
+  publication_id: fhi
+  tags:
+    - safety
+- id: 1593095c92d34ed8
+  url: https://www.fhi.ox.ac.uk/
+  title: "**Future of Humanity Institute**"
+  type: web
+  cited_by:
+    - agi-development
+    - agi-timeline
+    - capabilities-to-safety-pipeline
+    - compounding-risks-analysis
+    - corrigibility-failure-pathways
+    - international-coordination-game
+    - risk-interaction-matrix
+    - risk-interaction-network
+    - safety-research-allocation
+    - safety-research-value
+    - safety-researcher-gap
+    - worldview-intervention-mapping
+    - deepmind
+    - chai
+    - epoch-ai
+    - miri
+    - redwood
+    - geoffrey-hinton
+    - toby-ord
+    - corporate
+    - coordination-tech
+    - evaluation
+    - public-education
+    - knowledge-monopoly
+    - disinformation
+    - concentration-of-power
+    - erosion-of-agency
+    - lock-in
+    - proliferation
+    - racing-dynamics
+  publication_id: fhi
+  tags:
+    - talent
+    - field-building
+    - career-transitions
+    - risk-interactions
+    - compounding-effects
+- id: efb578b3189ba3cb
+  url: https://aiimpacts.org/2023-ai-survey-of-2778-six-ai-safety-experts/
+  title: 2023 AI Impacts survey
+  type: web
+  cited_by:
+    - agi-timeline
+  publication_id: ai-impacts
+- id: 3b9fda03b8be71dc
+  url: https://aiimpacts.org/
+  title: AI Impacts 2023
+  type: web
+  cited_by:
+    - agi-timeline
+    - compounding-risks-analysis
+    - deceptive-alignment-decomposition
+    - international-coordination-game
+    - safety-research-value
+    - epoch-ai
+  tags:
+    - risk-interactions
+    - compounding-effects
+    - systems-thinking
+    - probability
+    - decomposition
+  publication_id: ai-impacts
+- id: 57e46933e5a96e78
+  url: https://www.openphilanthropy.org/research/report-on-whether-ai-could-drive-explosive-economic-growth/
+  title: Conservative Researchers
+  type: web
+  cited_by:
+    - capabilities
+  publication_id: open-philanthropy
+- id: c8782940b880d00f
+  url: https://metr.org/blog/2025-12-09-common-elements-of-frontier-ai-safety-policies/
+  title: METR's analysis of 12 companies
+  type: web
+  cited_by:
+    - lab-behavior
+    - capability-threshold-model
+    - intervention-timing-windows
+    - metr
+    - international-summits
+  publication_id: metr
+  tags:
+    - evaluations
+    - dangerous-capabilities
+    - autonomous-replication
+- id: 6cdea76b4414a41a
+  url: https://futureoflife.org/grants/vitalik-buterin-fellowship/
+  title: Vitalik Buterin PhD Fellowship
+  type: web
+  cited_by:
+    - safety-research
+  publication_id: fli
+- id: 95e836c510c4948d
+  url: https://www.openphilanthropy.org/research/progress-in-2024-and-plans-for-2025/
+  title: "Open Philanthropy: Progress in 2024 and Plans for 2025"
+  type: web
+  cited_by:
+    - safety-research
+  publication_id: open-philanthropy
+- id: 88d27a94bf54128c
+  url: https://futureoflife.org/ai-safety-index-2024/
+  title: FLI AI Safety Index 2024
+  type: web
+  cited_by:
+    - safety-research
+  tags:
+    - safety
+  publication_id: fli
+- id: d64c91adf6a2e394
+  url: https://www.openphilanthropy.org/research/some-key-ways-in-which-i-think-open-philanthropy-should-change/
+  title: Open Philanthropy's cause prioritization framework
+  type: web
+  cited_by:
+    - ai-risk-portfolio-analysis
+  publication_id: open-philanthropy
+  tags:
+    - prioritization
+    - resource-allocation
+    - portfolio
+- id: 38eba87d0a888e2e
+  url: https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/
+  title: AI experts show significant disagreement
+  type: web
+  cited_by:
+    - ai-risk-portfolio-analysis
+    - capability-alignment-race
+    - intervention-effectiveness-matrix
+    - risk-activation-timeline
+    - safety-research-value
+    - proliferation
+    - misaligned-catastrophe
+  tags:
+    - prioritization
+    - resource-allocation
+    - portfolio
+    - interventions
+    - effectiveness
+  publication_id: ai-impacts
+- id: ec456e4a78161d43
+  url: https://80000hours.org/
+  title: 80,000 Hours methodology
+  type: web
+  cited_by:
+    - glossary
+    - ai-risk-portfolio-analysis
+    - capabilities-to-safety-pipeline
+    - safety-research-allocation
+    - safety-researcher-gap
+    - worldview-intervention-mapping
+    - dario-amodei
+  publication_id: 80k
+  tags:
+    - prioritization
+    - resource-allocation
+    - portfolio
+    - talent
+    - field-building
+- id: f8f6f3ee55c2babe
+  url: https://www.openphilanthropy.org/focus/global-catastrophic-risks/potential-risks-advanced-artificial-intelligence/
+  title: Open Philanthropy
+  type: web
+  cited_by:
+    - ai-risk-portfolio-analysis
+  publication_id: open-philanthropy
+  tags:
+    - prioritization
+    - resource-allocation
+    - portfolio
+- id: 902320774d220a6c
+  url: https://www.fhi.ox.ac.uk/research/research-areas/
+  title: Future of Humanity Institute (2019)
+  type: web
+  cited_by:
+    - autonomous-weapons-escalation
+    - compounding-risks-analysis
+  publication_id: fhi
+  tags:
+    - escalation
+    - conflict
+    - speed
+    - risk-interactions
+    - compounding-effects
+- id: 9e229de82a60bdc2
+  url: https://www.fhi.ox.ac.uk/wp-content/uploads/Policymakers-Brief-Advanced-AI-Risk.pdf
+  title: Future of Humanity Institute surveys
+  type: web
+  cited_by:
+    - capability-alignment-race
+  publication_id: fhi
+- id: c134150bb0c55e87
+  url: https://intelligence.org/2013/05/05/intelligence-explosion-microeconomics/
+  title: MIRI's recursive self-improvement analysis
+  type: web
+  cited_by:
+    - corrigibility-failure-pathways
+  publication_id: miri
+  tags:
+    - causal-model
+    - corrigibility
+    - shutdown-problem
+- id: 9ce9f930ebdf18f2
+  url: https://intelligence.org/team/
+  title: Soares
+  type: web
+  cited_by:
+    - corrigibility-failure-pathways
+  publication_id: miri
+  tags:
+    - causal-model
+    - corrigibility
+    - shutdown-problem
+- id: 05787ce07007e661
+  url: https://www.fhi.ox.ac.uk/govai/
+  title: AI Governance
+  type: web
+  cited_by:
+    - corrigibility-failure-pathways
+  publication_id: fhi
+  tags:
+    - governance
+    - causal-model
+    - corrigibility
+    - shutdown-problem
+- id: a2615513dd46b36c
+  url: https://www.openphilanthropy.org/research/scheming-ais/
+  title: Joe Carlsmith's comprehensive analysis of scheming
+  type: web
+  cited_by:
+    - deceptive-alignment-decomposition
+  publication_id: open-philanthropy
+  tags:
+    - deception
+    - probability
+    - decomposition
+    - inner-alignment
+- id: bee76a6251b2a079
+  url: https://intelligence.org/2017/11/20/security/
+  title: intelligence.org
+  type: web
+  cited_by:
+    - defense-in-depth-model
+  publication_id: miri
+  tags:
+    - defense
+    - security
+    - layered-approach
+- id: 362f03c44a2f5073
+  url: https://www.fhi.ox.ac.uk/wp-content/uploads/racing-to-the-precipice-a-model-of-artificial-intelligence.pdf
+  title: others argue
+  type: web
+  cited_by:
+    - international-coordination-game
+  publication_id: fhi
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+- id: dfeaf87817e20677
+  url: https://metr.org/blog/2024-01-11-dangerous-capability-evaluations/
+  title: METR
+  type: web
+  cited_by:
+    - intervention-effectiveness-matrix
+  publication_id: metr
+  tags:
+    - interventions
+    - effectiveness
+    - prioritization
+- id: d6955ff937bf386d
+  url: https://www.fhi.ox.ac.uk/publications/
+  title: FHI expert elicitation
+  type: web
+  cited_by:
+    - intervention-effectiveness-matrix
+    - risk-activation-timeline
+    - risk-interaction-network
+    - proliferation
+  publication_id: fhi
+  tags:
+    - interventions
+    - effectiveness
+    - prioritization
+    - timeline
+    - capability
+- id: 64a253415795c91e
+  url: https://intelligence.org/research-updates/
+  title: MIRI research updates
+  type: web
+  cited_by:
+    - intervention-effectiveness-matrix
+  publication_id: miri
+  tags:
+    - interventions
+    - effectiveness
+    - prioritization
+- id: a4652ab64ea54b52
+  url: https://metr.org/research/
+  title: Evaluation Methodology
+  type: web
+  cited_by:
+    - mesa-optimization-analysis
+    - metr
+  publication_id: metr
+  tags:
+    - evaluation
+    - mesa-optimization
+    - inner-alignment
+    - learned-optimization
+    - evaluations
+- id: 3d9f335ddbdd4409
+  url: https://www.fhi.ox.ac.uk/govai-agenda/
+  title: Future of Humanity Institute
+  type: web
+  cited_by:
+    - multipolar-trap-dynamics
+  publication_id: fhi
+  tags:
+    - risk-factor
+    - game-theory
+    - coordination
+- id: a5ee696da305a1ce
+  url: https://www.fhi.ox.ac.uk/govai-blog/publication-norms-in-machine-learning/
+  title: FHI publication guidelines
+  type: web
+  cited_by:
+    - proliferation-risk-model
+  publication_id: fhi
+  tags:
+    - risk-factor
+    - diffusion
+    - control
+- id: c36ff7b8236cc941
+  url: https://intelligence.org/technical-reports/
+  title: MIRI Technical Reports
+  type: web
+  cited_by:
+    - risk-interaction-network
+  publication_id: miri
+  tags:
+    - networks
+    - risk-interactions
+    - systems-thinking
+- id: 13038c25338ba478
+  url: https://intelligence.org/files/SelfImprovementAnalysis.pdf
+  title: Recursive Self-Improvement Risks
+  type: web
+  cited_by:
+    - risk-interaction-network
+  publication_id: miri
+  tags:
+    - networks
+    - risk-interactions
+    - systems-thinking
+- id: 2aa20a88a0b0cbcf
+  url: https://www.openphilanthropy.org/research/technical-ai-safety/
+  title: Open Philanthropy
+  type: web
+  cited_by:
+    - safety-research-allocation
+    - safety-research-value
+  publication_id: open-philanthropy
+  tags:
+    - resource-allocation
+    - research-priorities
+    - optimization
+    - cost-effectiveness
+    - expected-value
+- id: ff4ccf1d5769e99e
+  url: https://80000hours.org/career-guide/top-careers/technical-ai-safety-research/
+  title: 80,000 Hours
+  type: web
+  cited_by:
+    - safety-research-allocation
+  publication_id: 80k
+  tags:
+    - resource-allocation
+    - research-priorities
+    - optimization
+- id: 076dbb82d053643f
+  url: https://www.openphilanthropy.org/research/
+  title: Open Philanthropy
+  type: web
+  cited_by:
+    - safety-research-allocation
+  publication_id: open-philanthropy
+  tags:
+    - resource-allocation
+    - research-priorities
+    - optimization
+- id: 41960c907549f786
+  url: https://www.openphilanthropy.org/grants/?focus-area=artificial-intelligence
+  title: Open Philanthropy AI Grant Database
+  type: web
+  cited_by:
+    - safety-researcher-gap
+  publication_id: open-philanthropy
+  tags:
+    - talent
+    - field-building
+    - supply-demand
+- id: 599472695a5fba70
+  url: https://intelligence.org/2017/10/13/fire-alarm/
+  title: MIRI position
+  type: web
+  cited_by:
+    - worldview-intervention-mapping
+  publication_id: miri
+  tags:
+    - prioritization
+    - worldview
+    - strategy
+- id: 83aa195b6b8dd512
+  url: https://www.openphilanthropy.org/research/cause-prioritization/
+  title: Open Philanthropy worldview reports
+  type: web
+  cited_by:
+    - worldview-intervention-mapping
+  publication_id: open-philanthropy
+  tags:
+    - prioritization
+    - worldview
+    - strategy
+- id: 1cb4e288c338edca
+  url: https://80000hours.org/speak-with-us/
+  title: 80,000 Hours coaching
+  type: web
+  cited_by:
+    - worldview-intervention-mapping
+  publication_id: 80k
+  tags:
+    - prioritization
+    - worldview
+    - strategy
+- id: fc77e6a5087586a3
+  url: https://intelligence.org/all-publications/
+  title: MIRI Papers
+  type: web
+  cited_by:
+    - miri
+    - corrigibility-failure
+  publication_id: miri
+  tags:
+    - agent-foundations
+    - decision-theory
+    - corrigibility
+    - shutdown-problem
+    - instrumental-convergence
+- id: 7f2ba8f23aeb7cd3
+  url: https://intelligence.org/blog/
+  title: MIRI Blog
+  type: web
+  cited_by:
+    - miri
+  publication_id: miri
+  tags:
+    - agent-foundations
+    - decision-theory
+    - corrigibility
+- id: 5714a008527a379a
+  url: https://www.openphilanthropy.org/focus/potential-risks-from-advanced-artificial-intelligence/ai-safety-via-market-incentives/
+  title: AI safety university programs
+  type: web
+  cited_by:
+    - holden-karnofsky
+  publication_id: open-philanthropy
+  tags:
+    - safety
+    - effective-altruism
+    - ai-safety-funding
+    - ai-timelines
+- id: 63739057bf3d421b
+  url: https://www.openphilanthropy.org/about/team/ajeya-cotra/
+  title: Ajeya Cotra
+  type: web
+  cited_by:
+    - holden-karnofsky
+  publication_id: open-philanthropy
+  tags:
+    - effective-altruism
+    - ai-safety-funding
+    - ai-timelines
+- id: f43f63419dbf2e6e
+  url: https://www.openphilanthropy.org/research/draft-report-on-ai-timelines/
+  title: Bio Anchors Report
+  type: web
+  cited_by:
+    - holden-karnofsky
+  publication_id: open-philanthropy
+  tags:
+    - effective-altruism
+    - ai-safety-funding
+    - ai-timelines
+- id: d849ef0dfbc68a42
+  url: https://www.openphilanthropy.org/focus/global-catastrophic-risks/
+  title: $10+ billion in philanthropic commitments
+  type: web
+  cited_by:
+    - toby-ord
+  publication_id: open-philanthropy
+  tags:
+    - x-risk
+    - effective-altruism
+    - longtermism
+- id: 35cc64aad5b46421
+  url: https://80000hours.org/podcast/episodes/toby-ord-the-precipice-existential-risk-future-humanity/
+  title: 80,000 Hours Podcast
+  type: web
+  cited_by:
+    - toby-ord
+  publication_id: 80k
+  tags:
+    - x-risk
+    - effective-altruism
+    - longtermism
+- id: 5c66c0b83538d580
+  url: https://80000hours.org/podcast/episodes/chris-olah-interpretability-research/
+  title: Chris Olah
+  type: web
+  cited_by:
+    - anthropic-core-views
+  publication_id: 80k
+  tags:
+    - ai-safety
+    - constitutional-ai
+    - interpretability
+- id: 8597d8a3122f13a8
+  url: https://www.fhi.ox.ac.uk/wp-content/uploads/Thinking-inside-the-box-AI.pdf
+  title: 'Armstrong, S., Sandberg, A., and Bostrom, N. (2012). "Thinking Inside the Box: Controlling
+    and Using an Oracle AI."'
+  type: web
+  cited_by:
+    - corrigibility
+  publication_id: fhi
+  tags:
+    - shutdown-problem
+    - ai-control
+    - value-learning
+- id: 3e49d1dd68865ace
+  url: https://intelligence.org/files/Interruptible.pdf
+  title: Orseau, L. and Armstrong, S. (2016). "Safely Interruptible Agents."
+  type: web
+  cited_by:
+    - corrigibility
+  publication_id: miri
+  tags:
+    - safety
+    - shutdown-problem
+    - ai-control
+    - value-learning
+- id: 2417abe9438129f1
+  url: https://metr.org/publications/
+  title: METR Publications
+  type: web
+  cited_by:
+    - red-teaming
+  publication_id: metr
+- id: b49be165093f1196
+  url: https://www.openphilanthropy.org/grants/arc-general-support/
+  title: $265,000 from Open Philanthropy in March 2022
+  type: web
+  cited_by:
+    - research-agendas
+  publication_id: open-philanthropy
+  tags:
+    - research-agendas
+    - alignment
+    - interpretability
+- id: 8c79e00bab007a63
+  url: https://www.openphilanthropy.org/grants/redwood-research-general-support/
+  title: over $9.4 million from Open Philanthropy
+  type: web
+  cited_by:
+    - research-agendas
+  publication_id: open-philanthropy
+  tags:
+    - research-agendas
+    - alignment
+    - interpretability
+- id: 1cb8ff7053544e01
+  url: https://intelligence.org/2025/12/01/miris-2025-fundraiser/
+  title: first fundraiser in six years
+  type: web
+  cited_by:
+    - research-agendas
+  publication_id: miri
+  tags:
+    - research-agendas
+    - alignment
+    - interpretability
+- id: 6df981403a3a2b8c
+  url: https://www.openphilanthropy.org/grants/miri-general-support-2019/
+  title: $2.1 million from Open Philanthropy in 2019
+  type: web
+  cited_by:
+    - research-agendas
+  publication_id: open-philanthropy
+  tags:
+    - research-agendas
+    - alignment
+    - interpretability
+- id: 07ccedd2d560ecb7
+  url: https://intelligence.org/2024/12/02/miris-2024-end-of-year-update/
+  title: MIRI's 2024 End-of-Year Update
+  type: web
+  cited_by:
+    - research-agendas
+    - technical-research
+  publication_id: miri
+  tags:
+    - research-agendas
+    - alignment
+    - interpretability
+    - scalable-oversight
+    - rlhf
+- id: 913cb820e5769c0b
+  url: https://www.openphilanthropy.org/request-for-proposals-technical-ai-safety-research/
+  title: Open Philanthropy
+  type: web
+  cited_by:
+    - technical-research
+    - field-building
+  publication_id: open-philanthropy
+  tags:
+    - interpretability
+    - scalable-oversight
+    - rlhf
+    - field-building
+    - training-programs
+- id: 435b669c11e07d8f
+  url: https://intelligence.org/2024/01/04/miri-2024-mission-and-strategy-update/
+  title: MIRI's 2024 assessment
+  type: web
+  cited_by:
+    - why-alignment-hard
+    - agent-foundations
+    - technical-research
+  publication_id: miri
+  tags:
+    - interpretability
+    - scalable-oversight
+    - rlhf
+- id: 601b00f2dabbdd2a
+  url: https://metr.org/blog/2024-03-13-autonomy-evaluation-resources/
+  title: METR's Autonomy Evaluation Resources (March 2024)
+  type: web
+  cited_by:
+    - technical-research
+  publication_id: metr
+  tags:
+    - evaluation
+    - interpretability
+    - scalable-oversight
+    - rlhf
+- id: 5b45342b68bf627e
+  url: https://metr.org/blog/2024-11-12-rogue-replication-threat-model/
+  title: The Rogue Replication Threat Model
+  type: web
+  cited_by:
+    - technical-research
+  publication_id: metr
+  tags:
+    - interpretability
+    - scalable-oversight
+    - rlhf
+- id: 259ff114f8c6586a
+  url: https://metr.org/blog/2024-03-11-autonomy-evaluation/
+  title: Evaluation methodology
+  type: web
+  cited_by:
+    - evaluation
+  publication_id: metr
+  tags:
+    - evaluation
+- id: 2a7c5d75ba75c574
+  url: https://www.openphilanthropy.org/grants/mats-research-ai-safety-research-expenses/
+  title: $23.6M in Open Philanthropy funding
+  type: web
+  cited_by:
+    - field-building
+  publication_id: open-philanthropy
+  tags:
+    - field-building
+    - training-programs
+    - community
+- id: be4b2c64d76a46b9
+  url: https://www.openphilanthropy.org/grants/?q=ai+safety
+  title: Open Philanthropy funding university-based safety research
+  type: web
+  cited_by:
+    - field-building
+  publication_id: open-philanthropy
+  tags:
+    - safety
+    - field-building
+    - training-programs
+    - community
+- id: 7d9c703f769e1142
+  url: https://80000hours.org/2025/06/technical-ai-safety-upskilling-resources/
+  title: 80,000 Hours technical AI safety upskilling resources
+  type: web
+  cited_by:
+    - field-building
+  publication_id: 80k
+  tags:
+    - safety
+    - field-building
+    - training-programs
+    - community
+- id: 7d10a79dcca9750a
+  url: https://80000hours.org/2024/08/updates-to-our-research-about-ai-risk-and-careers/
+  title: "80,000 Hours: Updates to Our Research About AI Risk and Careers"
+  type: web
+  cited_by:
+    - field-building
+  publication_id: 80k
+  tags:
+    - field-building
+    - training-programs
+    - community
+- id: 781f94a18d149640
+  url: https://www.fhi.ox.ac.uk/the-precipice/
+  title: Toby Ord's analysis
+  type: web
+  cited_by:
+    - governance-policy
+  publication_id: fhi
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: 911de1b5f5bbe17f
+  url: https://www.openphilanthropy.org/focus/global-catastrophic-risks/potential-risks-advanced-artificial-intelligence/grants/center-for-ai-policy-entrepreneurship/
+  title: AI Policy Entrepreneurship
+  type: web
+  cited_by:
+    - governance-policy
+  publication_id: open-philanthropy
+  tags:
+    - governance
+    - international
+    - compute-governance
+    - regulation
+- id: 30b9f5e826260d9d
+  url: https://metr.org/common-elements
+  title: "METR: Common Elements of Frontier AI Safety Policies"
+  type: web
+  cited_by:
+    - situational-awareness
+    - responsible-scaling-policies
+    - coordination
+  publication_id: metr
+  tags:
+    - safety
+    - deception
+    - self-awareness
+    - evaluations
+- id: 73bedb360b0de6ae
+  url: https://metr.org/blog/2023-09-26-rsp/
+  title: "METR: Responsible Scaling Policies"
+  type: web
+  cited_by:
+    - why-alignment-easy
+    - responsible-scaling-policies
+  publication_id: metr
+  tags:
+    - capabilities
+- id: 7e3b7146e1266c71
+  url: https://metr.org/faisc
+  title: METR's analysis
+  type: web
+  cited_by:
+    - seoul-declaration
+    - coordination
+  publication_id: metr
+- id: a37628e3a1e97778
+  url: https://metr.org/blog/2025-03-26-common-elements-of-frontier-ai-safety-policies/
+  title: footnote 17 problem
+  type: web
+  cited_by:
+    - lab-culture
+  publication_id: metr
+- id: 531f55cee64f6509
+  url: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
+  title: FLI open letter
+  type: web
+  cited_by:
+    - mainstream-era
+    - pause
+    - pause-and-redirect
+  publication_id: fli
+  tags:
+    - chatgpt
+    - gpt-4
+    - anthropic
+- id: 3e250a28699df556
+  url: https://intelligence.org/2017/08/31/incorrigibility-in-cirl/
+  title: CIRL corrigibility proved fragile
+  type: web
+  cited_by:
+    - instrumental-convergence
+  publication_id: miri
+  tags:
+    - power-seeking
+    - self-preservation
+    - corrigibility
+- id: d9fb00b6393b6112
+  url: https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/
+  title: 80,000 Hours. "Risks from Power-Seeking AI Systems"
+  type: web
+  cited_by:
+    - case-for-xrisk
+    - instrumental-convergence
+    - misaligned-catastrophe
+    - capabilities
+    - catastrophe
+  publication_id: 80k
+  tags:
+    - power-seeking
+    - self-preservation
+    - corrigibility
+- id: 83ae4cb7d004910a
+  url: https://intelligence.org/2022/07/04/a-central-ai-alignment-problem/
+  title: Nate Soares
+  type: web
+  cited_by:
+    - sharp-left-turn
+  publication_id: miri
+  tags:
+    - capability-generalization
+    - alignment-stability
+    - miri
+- id: e573623625e9d5d2
+  url: https://intelligence.org/learned-optimization/
+  title: MIRI
+  type: web
+  cited_by:
+    - sharp-left-turn
+    - alignment-difficulty
+  publication_id: miri
+  tags:
+    - capability-generalization
+    - alignment-stability
+    - miri
+- id: c3e44c68ce4e78a5
+  url: https://intelligence.org/research/
+  title: Work at MIRI
+  type: web
+  cited_by:
+    - lock-in
+  publication_id: miri
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: 2f4d6cb35b693d85
+  url: https://futureoflife.org/ai/the-pause-letter-one-year-later/
+  title: 64% of Americans polled
+  type: web
+  cited_by:
+    - pause-and-redirect
+  publication_id: fli
+- id: 14bfb02e6a6554c3
+  url: https://futureoflife.org/ai/the-unavoidable-problem-of-self-improvement-in-ai-an-interview-with-ramana-kumar-part-1/
+  title: Meta AI's Self-Rewarding Language Models
+  type: web
+  cited_by:
+    - capabilities
+  tags:
+    - llm
+  publication_id: fli
+- id: 2e70c8bf22b57596
+  url: https://www.fhi.ox.ac.uk/strategic-considerations-about-different-speeds-of-ai-takeoff/
+  title: Future of Humanity Institute research
+  type: web
+  cited_by:
+    - catastrophe
+  publication_id: fhi
+- id: 7d7f635e9eb6e77d
+  url: https://futureoflife.org/podcast/dan-hendrycks-on-ai-safety-and-x-risk/
+  title: Podcasts
+  type: web
+  cited_by:
+    - far-ai
+  tags:
+    - adversarial-robustness
+    - ml-safety
+    - benchmarking
+  publication_id: fli
+- id: 11c3bfe3f32f073c
+  url: https://80000hours.org/podcast/episodes/paul-christiano-ai-alignment-solutions/
+  title: Paul Christiano views
+  type: web
+  cited_by:
+    - why-alignment-easy
+  publication_id: 80k
+- id: 297ced45b445881c
+  url: https://80000hours.org/podcast/episodes/carl-shulman-society-agi/
+  title: Carl Shulman and colleagues
+  type: web
+  cited_by:
+    - lock-in
+  publication_id: 80k
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: 3ee11b82b7e1fd68
+  url: https://metr.org/blog/2025-10-14-malt-dataset-of-natural-and-prompted-behaviors/
+  title: metr.org
+  type: web
+  cited_by:
+    - metr
+  publication_id: metr
+  tags:
+    - evaluations
+    - dangerous-capabilities
+    - autonomous-replication
+- id: a86b4f04559de6da
+  url: https://metr.org/blog/2025-02-27-gpt-4-5-evals/
+  title: metr.org
+  type: web
+  cited_by:
+    - metr
+  publication_id: metr
+  tags:
+    - evaluations
+    - dangerous-capabilities
+    - autonomous-replication
+- id: 9ece1a3a9a30d8c1
+  url: https://metr.org/about
+  title: About METR
+  type: web
+  cited_by:
+    - metr
+  publication_id: metr
+  tags:
+    - evaluations
+    - dangerous-capabilities
+    - autonomous-replication
+- id: b52975eb93ce5be5
+  url: https://futureoflife.org/ai-policy/hardware-backed-compute-governance/
+  title: Future of Life Institute's research with Mithril Security
+  type: web
+  cited_by:
+    - monitoring
+  tags:
+    - cybersecurity
+  publication_id: fli
+- id: 3b5912fe113394f3
+  url: https://aiimpacts.org/wp-content/uploads/2024/01/EMBARGOED_-AI-Impacts-Survey-Release-Google-Docs.pdf
+  title: AI Impacts Survey (2023)
+  type: web
+  cited_by:
+    - case-for-xrisk
+  publication_id: ai-impacts
+- id: 056e0ff33675b825
+  url: https://metr.org/blog/2024-11-22-evaluating-r-d-capabilities-of-llms/
+  title: "RE-Bench: Evaluating frontier AI R&D capabilities"
+  type: web
+  publication_id: metr
+  tags:
+    - capabilities
+    - evaluation
+  cited_by:
+    - self-improvement
+- id: 89b92e6423256fc4
+  url: https://metr.org/blog/2025-01-31-update-sonnet-o1-evals/
+  title: METR's research
+  type: web
+  publication_id: metr
+  cited_by:
+    - capability-threshold-model
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+- id: f988e44183d1e204
+  url: https://aiimpacts.org/multipolar-research-projects/
+  title: AI Impacts
+  type: web
+  cited_by:
+    - multi-actor-landscape
+  publication_id: ai-impacts
+- id: 1da850cbb06cd522
+  url: https://intelligence.org/embedded-agency/
+  title: embedded agency
+  type: web
+  publication_id: miri
+  cited_by:
+    - agent-foundations
+- id: c03dfe0b505debd6
+  url: https://intelligence.org/2016/09/12/new-paper-logical-induction/
+  title: logical induction
+  type: web
+  publication_id: miri
+  cited_by:
+    - agent-foundations
+- id: 170ed59807cc7b2f
+  url: https://intelligence.org/2017/10/22/fdt/
+  title: functional decision theory
+  type: web
+  publication_id: miri
+  cited_by:
+    - agent-foundations
+- id: b781192f2704fdf4
+  url: https://intelligence.org/files/TechnicalAgenda.pdf
+  title: PDF
+  type: web
+  publication_id: miri
+  cited_by:
+    - agent-foundations
+- id: e7f61a6aa8370b8c
+  url: https://www.openphilanthropy.org/grants/funding-for-ai-alignment-projects-working-with-deep-learning-systems/
+  title: Open Philanthropy AI alignment grants
+  type: web
+  publication_id: open-philanthropy
+  tags:
+    - alignment
+  cited_by:
+    - research-agendas
+- id: b81d89ad5c71c87b
+  url: https://80000hours.org/podcast/episodes/nick-joseph-anthropic-safety-approach-responsible-scaling/
+  title: Nick Joseph on Anthropic's safety approach
+  type: web
+  publication_id: 80k
+  tags:
+    - safety
+  cited_by:
+    - corporate-influence
+- id: a41c4a40107e7d5d
+  url: https://futureoflife.org/project/ai-safety-summits/
+  title: AI Safety Summits Overview
+  type: web
+  tags:
+    - safety
+  cited_by:
+    - international-summits
+  publication_id: fli
+- id: 19b64fee1c4ea879
+  url: https://metr.org/blog/2025-06-05-recent-reward-hacking/
+  title: METR's June 2025 evaluation
+  type: web
+  publication_id: metr
+  tags:
+    - evaluation
+  cited_by:
+    - reward-hacking
+- id: 31e373770f16b09b
+  url: https://www.openphilanthropy.org/research/what-a-compute-centric-framework-says-about-takeoff-speeds/
+  title: Tom Davidson's compute-centric framework
+  type: web
+  publication_id: open-philanthropy
+  tags:
+    - compute
+  cited_by:
+    - takeoff
+- id: 9c8ec6cef670271d
+  url: https://intelligence.org/2021/11/22/yudkowsky-and-christiano-discuss-takeoff-speeds/
+  title: argues
+  type: web
+  publication_id: miri
+  cited_by:
+    - takeoff
+- id: e49b6ceff6dfc795
+  url: https://futureoflife.org/ai/are-we-close-to-an-intelligence-explosion/
+  title: Future of Life Institute notes
+  type: web
+  cited_by:
+    - takeoff
+  publication_id: fli

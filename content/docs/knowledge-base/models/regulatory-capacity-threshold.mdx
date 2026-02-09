@@ -1,0 +1,313 @@
+---
+title: Regulatory Capacity Threshold Model
+description: This model estimates minimum regulatory capacity for credible AI oversight. It finds current US/UK capacity at 0.15-0.25 of the 0.4-0.6 threshold needed, with a 3-5 year window to build capacity before capability acceleration makes catch-up prohibitively difficult.
+sidebar:
+  order: 37
+quality: 56
+lastEdited: "2025-12-29"
+ratings:
+  focus: 8.5
+  novelty: 6
+  rigor: 5.5
+  completeness: 7.5
+  concreteness: 7
+  actionability: 6.5
+importance: 74.5
+llmSummary: Quantitative model estimating current US/UK regulatory capacity at 0.15-0.25 versus 0.4-0.6 threshold needed, with capacity ratio declining from 0.20 to 0.02 by 2028 under baseline assumptions. Concludes 3-5 year window exists requiring crisis-level investment (80-150% capacity growth rate increases) to close gap before it becomes irreversible.
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+  - Complete 'Strategic Importance' section
+metrics:
+  wordCount: 450
+  citations: 0
+  tables: 29
+  diagrams: 2
+clusters:
+  - ai-safety
+  - governance
+subcategory: threshold-models
+---
+import { Aside } from '@astrojs/starlight/components';
+import { DataInfoBox, Backlinks, Mermaid , EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="regulatory-capacity-threshold" ratings={frontmatter.ratings} />
+
+## Overview
+
+Effective AI regulation requires regulatory bodies to possess sufficient technical understanding, legal authority, and operational capacity to credibly oversee an industry advancing rapidly. This model quantifies the minimum threshold of **regulatory-capacity** relative to industry capability needed for meaningful oversight.
+
+**Core insight:** <EntityLink id="regulatory-capacity">Regulatory capacity</EntityLink> is currently 0.15-0.25 of the threshold needed for credible oversight. The gap is widening as industry capability grows faster than regulatory capacity. There exists a window of approximately 3-5 years to build adequate capacity before the gap becomes prohibitively difficult to close.
+
+The critical question is not whether to regulate AI, but whether regulatory capacity can scale fast enough to remain relevant.
+
+## Conceptual Framework
+
+### Capacity Components
+
+Regulatory capacity ($C$) decomposes into three multiplicative factors:
+
+$$
+C = H \times A \times S
+$$
+
+Where:
+- $H$ = Human capital (technical expertise, staffing levels)
+- $A$ = Authority (legal powers, enforcement mechanisms)
+- $S$ = Scope (jurisdictional coverage, <EntityLink id="international-coordination">international coordination</EntityLink>)
+
+Each factor is necessary but not sufficient. Weak links constrain overall capacity.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Capacity["Regulatory Capacity"]
+        H[Human Capital]
+        A[Authority]
+        S[Scope]
+    end
+
+    subgraph Human["Human Capital Components"]
+        TS[Technical Staff]
+        EX[Domain Expertise]
+        RET[Retention Rates]
+    end
+
+    subgraph Auth["Authority Components"]
+        LP[Legal Powers]
+        EN[Enforcement Tools]
+        BU[Budget]
+    end
+
+    subgraph Scope["Scope Components"]
+        JU[Jurisdiction]
+        IC[International Coord]
+        IN[Industry Coverage]
+    end
+
+    H --> TS & EX & RET
+    A --> LP & EN & BU
+    S --> JU & IC & IN
+
+    C[Overall Capacity] --> H & A & S
+`} />
+
+### Threshold Definition
+
+The **regulatory capacity threshold** ($T$) is the minimum capacity needed for credible oversight, defined as:
+
+$$
+T = f(\text{Industry Capability}, \text{Risk Level}, \text{Oversight Ambition})
+$$
+
+Credible oversight means regulators can:
+1. **Evaluate** lab safety claims independently
+2. **Detect** non-compliance in reasonable timeframes
+3. **Enforce** requirements with meaningful consequences
+4. **Adapt** standards as capabilities evolve
+
+## Current State Assessment
+
+### Capacity by Jurisdiction
+
+| Jurisdiction | Human Capital | Authority | Scope | Overall Capacity | Notes |
+|--------------|---------------|-----------|-------|------------------|-------|
+| **US (AISI)** | 0.2 | 0.15 | 0.3 | 0.15-0.20 | No regulatory authority, advisory only |
+| **UK (AISI)** | 0.25 | 0.2 | 0.25 | 0.18-0.22 | Stronger evals team, limited legal powers |
+| **EU** | 0.15 | 0.4 | 0.35 | 0.15-0.25 | Legal framework exists, implementation weak |
+| **China** | 0.3 | 0.5 | 0.2 | 0.20-0.30 | Strong domestic authority, no international scope |
+| **Combined Global** | 0.25 | 0.3 | 0.2 | 0.18-0.25 | Fragmentation reduces effective capacity |
+
+### Capacity vs. Threshold Gap
+
+| Dimension | Current Level | Threshold Needed | Gap |
+|-----------|--------------|------------------|-----|
+| Technical staff (FTEs with ML expertise) | ≈100-200 globally | ≈500-1000 | 3-5x |
+| Evaluation capability (models assessable/year) | ≈5-10 | ≈20-50 | 3-5x |
+| Enforcement actions (credible threat) | Near zero | Demonstrated | Qualitative |
+| International coordination | Ad hoc | Treaty-based | Structural |
+| Response time to incidents | Months | Days-weeks | 10x |
+
+<Aside type="caution">
+**The gap is widening.** Industry capability is growing 2-3x per year while regulatory capacity grows 10-30% per year. Without intervention, the capacity ratio will fall below 0.1 within 3-5 years.
+</Aside>
+
+## Core Model
+
+### Capacity Ratio Dynamics
+
+Define the capacity ratio $R$:
+
+$$
+R(t) = \frac{C(t)}{I(t)}
+$$
+
+Where $C(t)$ is regulatory capacity and $I(t)$ is industry capability at time $t$.
+
+The dynamics follow:
+
+$$
+\frac{dR}{dt} = R \cdot (g_C - g_I)
+$$
+
+Where $g_C$ is capacity growth rate and $g_I$ is industry capability growth rate.
+
+### Parameter Estimates
+
+| Parameter | Current Estimate | Range | Source |
+|-----------|-----------------|-------|--------|
+| $g_C$ (capacity growth) | 15% per year | 10-30% | AISI staffing trends |
+| $g_I$ (industry growth) | 100-200% per year | 50-300% | Scaling law projections |
+| $R_0$ (current ratio) | 0.20 | 0.15-0.25 | Assessment above |
+| $T$ (threshold ratio) | 0.50 | 0.40-0.60 | Based on historical analogs |
+
+### Trajectory Projections
+
+| Year | Industry Capability Index | Regulatory Capacity Index | Ratio | Status |
+|------|--------------------------|--------------------------|-------|--------|
+| 2025 | 1.0 | 0.20 | 0.20 | Below threshold |
+| 2026 | 2.5 | 0.25 | 0.10 | Declining |
+| 2027 | 6.0 | 0.30 | 0.05 | Critical gap |
+| 2028 | 15.0 | 0.36 | 0.02 | Effective irrelevance |
+
+<Mermaid client:load chart={`
+xychart-beta
+    title "Capacity Ratio Trajectory"
+    x-axis [2025, 2026, 2027, 2028, 2029, 2030]
+    y-axis "Capacity Ratio" 0 --> 0.6
+    line "Baseline trajectory" [0.20, 0.10, 0.05, 0.02, 0.01, 0.005]
+    line "Threshold" [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    line "Accelerated investment" [0.20, 0.18, 0.20, 0.25, 0.35, 0.45]
+`} />
+
+## Intervention Analysis
+
+### Capacity Building Levers
+
+| Lever | Effect on $g_C$ | Feasibility | Timeline | Key Barriers |
+|-------|----------------|-------------|----------|--------------|
+| Increase AISI staffing 3x | +50% to $g_C$ | Medium | 2-3 years | Talent competition, budget |
+| Grant regulatory authority | +30% effectiveness | Low-Medium | 2-5 years | Political will |
+| International coordination | +40% scope | Low | 3-10 years | Geopolitics |
+| Private sector secondments | +20% expertise | Medium-High | 1-2 years | Conflicts of interest |
+| Academic partnerships | +15% research capacity | High | 1-3 years | Publication incentives |
+
+### Threshold Modification
+
+Alternatively, reduce the threshold needed:
+
+| Approach | Effect on $T$ | Feasibility | Tradeoff |
+|----------|--------------|-------------|----------|
+| Lab self-regulation | -20% threshold | Medium | Lower accountability |
+| Third-party auditing | -15% threshold | Medium-High | Quality variance |
+| Automated monitoring | -25% threshold | Medium | Technical limitations |
+| Narrow scope (frontier only) | -30% threshold | High | Coverage gaps |
+
+### Combined Scenario
+
+With aggressive intervention:
+
+| Intervention Package | $g_C$ Increase | $T$ Decrease | 2030 Ratio |
+|---------------------|----------------|--------------|------------|
+| Baseline | 0% | 0% | 0.01 |
+| Moderate investment | +30% | -15% | 0.12 |
+| Aggressive investment | +80% | -25% | 0.35 |
+| Crisis response + coordination | +150% | -30% | 0.55 |
+
+<Aside type="tip" title="Bottom Line">
+**Crossing the threshold requires crisis-level investment.** Moderate increases in regulatory capacity will not close the gap. Either (a) major incident triggers emergency capacity building, or (b) proactive "wartime-like" investment begins within 1-2 years.
+</Aside>
+
+## Historical Analogies
+
+### Regulatory Capacity in Other Domains
+
+| Domain | Initial Gap | Time to Threshold | Key Driver |
+|--------|-------------|-------------------|------------|
+| **Nuclear (NRC)** | Large | 10-15 years | Manhattan Project expertise transfer |
+| **Aviation (FAA)** | Moderate | 20-30 years | Gradual accident-driven expansion |
+| **Finance (SEC/Fed)** | Large | 20-40 years | Major crises (1929, 2008) |
+| **Pharma (FDA)** | Moderate | 15-25 years | Thalidomide + consumer pressure |
+| **AI (current)** | Very large | ? | TBD |
+
+**Lesson:** Capacity building typically takes 10-30 years without major crises. AI timelines may not allow this luxury.
+
+### Failure Modes
+
+| Failure Mode | Historical Example | AI Analog |
+|--------------|-------------------|-----------|
+| Capture | FAA-Boeing relationship | Lab-AISI personnel flows |
+| Underfunding | Pre-2008 SEC derivatives | Current AISI budget |
+| Jurisdictional gaps | Offshore finance | Compute arbitrage |
+| Technical lag | Crypto regulation | ML capability evaluation |
+
+## Strategic Implications
+
+### Priority Actions by Actor
+
+**For policymakers:**
+
+| Action | Priority | Reasoning |
+|--------|----------|-----------|
+| Triple AISI budget | High | Necessary but not sufficient |
+| Grant enforcement authority | Critical | Without this, capacity is advisory only |
+| Establish international coordination | High | Prevents arbitrage |
+| Create fast-track hiring | Medium | Reduce talent acquisition friction |
+
+**For funders:**
+
+| Action | Priority | Reasoning |
+|--------|----------|-----------|
+| Fund independent technical capacity | High | Supplements government capacity |
+| Support regulatory career pipelines | Medium | Long-term capacity building |
+| Back third-party audit infrastructure | High | Reduces threshold |
+
+**For labs:**
+
+| Action | Priority | Reasoning |
+|--------|----------|-----------|
+| Enable regulator access | Medium | Reduces information asymmetry |
+| Provide secondments | Medium | Builds mutual understanding |
+| Support regulatory authority | High | Self-interest in level playing field |
+
+### Window Analysis
+
+The **window for effective intervention** depends on:
+
+| Factor | Status | Implication |
+|--------|--------|-------------|
+| Capability timeline | 2-5 years to transformative AI | Urgency is high |
+| Political will | Low but rising | Incident may be required |
+| Talent availability | Constrained | Salary competition fierce |
+| International coordination | Weak | Unilateral action may be necessary |
+
+**Window estimate:** 3-5 years before the capacity gap becomes practically irreversible for traditional regulatory approaches.
+
+## Limitations
+
+1. **Capability measurement:** "Industry capability" is hard to quantify; proxies like compute or benchmark performance are imperfect.
+
+2. **Threshold uncertainty:** The 0.4-0.6 threshold is extrapolated from other domains; AI may require higher or lower ratios.
+
+3. **Non-linear dynamics:** Step-function changes in capability (e.g., recursive self-improvement) would invalidate gradual growth assumptions.
+
+4. **Political economy:** Model assumes regulators act in public interest; capture dynamics may reduce effective capacity.
+
+5. **Alternative governance:** Non-regulatory mechanisms (insurance, liability, standards) may substitute for government capacity.
+
+## Related Models
+
+- <EntityLink id="institutional-adaptation-speed" label="Institutional Adaptation Speed" /> - How fast institutions can adapt
+- <EntityLink id="racing-dynamics-impact" label="Racing Dynamics Impact" /> - Why capacity matters for racing
+- <EntityLink id="parameter-interaction-network" label="Parameter Interaction Network" /> - How regulatory-capacity connects to other parameters
+- <EntityLink id="safety-culture-equilibrium" label="Safety Culture Equilibrium" /> - Regulation-imposed equilibrium conditions
+
+## Sources
+
+- UK AI Safety Institute. "State of AI Safety 2024" (2024)
+- NIST. "AI Risk Management Framework" (2023)
+- Dafoe, Allan. "AI Governance: A Research Agenda" (2018)
+- Schneier, Bruce. "Regulating AI Means Regulating AI Companies" (2024)
+
+## Related Pages
+
+<Backlinks client:load entityId="regulatory-capacity-threshold" />

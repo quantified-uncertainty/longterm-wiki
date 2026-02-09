@@ -1,0 +1,365 @@
+---
+title: Provenance Tracing
+description: A proposed epistemic infrastructure making knowledge provenance transparent and traversable—enabling anyone to see the chain of citations, original data sources, methodological assumptions, and reliability scores for any claim they encounter.
+sidebar:
+  order: 15
+lastEdited: "2026-02-06"
+quality: 45
+importance: 50
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 5.5
+  rigor: 4.5
+  actionability: 5
+  completeness: 5
+metrics:
+  wordCount: 2950
+  citations: 18
+  tables: 8
+  diagrams: 1
+clusters:
+  - epistemics
+  - ai-safety
+subcategory: epistemic-tools-approaches
+---
+import {Backlinks, Mermaid, KeyQuestions, EntityLink} from '@components/wiki';
+
+*Part of the [Design Sketches for Collective Epistemics](/knowledge-base/responses/collective-epistemics-design-sketches/) series by Forethought Foundation.*
+
+## Overview
+
+Provenance Tracing is a proposed epistemic infrastructure that would make the origins, evidence base, and reliability of knowledge claims "transparent and traversable." Anyone encountering a claim—in an article, AI output, dataset, or conversation—could instantly bring up its complete "epistemic genealogy": the chain of citations, the original data sources, the methodological assumptions, and reliability scores for each link in the chain.
+
+The concept was outlined in Forethought Foundation's 2025 report "[Design Sketches for Collective Epistemics](https://www.forethought.org/research/design-sketches-collective-epistemics)" as the most ambitious of the five proposed technologies. While <EntityLink id="content-authentication">content authentication</EntityLink> (like C2PA) verifies *media* origin and edits, provenance tracing addresses *knowledge claims*—tracking not just where a photo came from, but where an idea, statistic, or argument originated and how robust the evidence chain is.
+
+## How It Would Work
+
+The system is composed of five layers:
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Layer1["1. Epistemic Decomposition"]
+        A[Document input] --> B[Break into atomic claims]
+        B --> C[Tag: context, originality, objectivity]
+    end
+
+    subgraph Layer2["2. Automated Provenance Tracking"]
+        C --> D[Follow explicit citations]
+        D --> E[Infer implicit connections probabilistically]
+        E --> F[Build citation chain for each claim]
+    end
+
+    subgraph Layer3["3. Trust Propagation"]
+        F --> G[Analyze source quality]
+        G --> H[Detect circular citations and citation cartels]
+        H --> I[Adjust for conflicts of interest]
+        I --> J[Calculate reliability score per claim]
+    end
+
+    subgraph Layer4["4. Repository Layer"]
+        J --> K[Public database of claims and provenance]
+        K --> L[Search, versioning, per-link endorsements]
+    end
+
+    subgraph Layer5["5. UI / API"]
+        L --> M[Interactive provenance trees]
+        L --> N[Trust digest summaries]
+        L --> O[API for downstream tools]
+    end
+
+    style J fill:#d4edda
+    style M fill:#e8f4fd
+    style N fill:#e8f4fd
+`} />
+
+### Layer 1: Epistemic Decomposition
+
+Break documents into atomic claims and tag each with:
+- **Context**: Where in the document it appears; what it's supporting
+- **Originality degree**: Is this a novel claim, a restatement, or a citation?
+- **Objectivity level**: Empirical fact, interpretation, opinion, or value judgment
+
+This is essentially "argument mining" applied systematically to all content, decomposing prose into structured epistemic units.
+
+### Layer 2: Automated Provenance Tracking
+
+For each atomic claim:
+- **Follow explicit citations**: When a paper cites another, trace the chain back to primary sources
+- **Infer implicit connections**: When a claim appears without citation, probabilistically identify likely sources—the same claim appearing in an earlier publication, a dataset, or an expert statement
+- **Handle transformations**: Track how claims mutate as they're transmitted—paraphrasing, simplification, and distortion
+
+### Layer 3: Trust Propagation
+
+Calculate reliability scores by analyzing the quality of the evidence chain:
+
+| Analysis | What It Detects |
+|----------|----------------|
+| **Source quality assessment** | Is the original source peer-reviewed, a press release, a blog post, or anonymous? |
+| **Circular citation detection** | Claims that ultimately cite themselves through chains of intermediaries |
+| **Citation cartel identification** | Groups of sources that primarily cite each other to inflate credibility |
+| **Conflict of interest adjustment** | Sources with financial or ideological stakes in the claim |
+| **Replication status** | For empirical claims, whether results have been independently replicated |
+| **Temporal degradation** | How accuracy decays as claims are transmitted through multiple intermediaries |
+
+### Layer 4: Repository Layer
+
+A public database providing:
+- **Searchable claim index**: Find provenance for any specific claim
+- **Versioning**: Track how understanding of a claim changes over time
+- **Per-link endorsements**: Researchers and organizations can endorse or dispute specific links
+- **Open data**: Accessible to researchers and downstream tools
+
+### Layer 5: User Interface / API
+
+Two primary user experiences:
+- **Interactive provenance trees**: Hovering or tapping a claim expands a visual tree showing its evidence chain
+- **Trust digest**: A quick summary explaining the claim's reliability—how well-sourced it is, whether it's contested, and key caveats
+
+Plus an API enabling other tools (including the other four design sketches) to query claim provenance.
+
+## User Experience
+
+### Reader Experience
+
+When a reader encounters a claim:
+1. **Hover/tap** to see a quick trust digest (e.g., "Well-sourced: based on 3 peer-reviewed studies, consistent findings")
+2. **Click** to expand full provenance tree showing the chain of citations back to primary sources
+3. **Explore** specific links to see source quality, potential conflicts of interest, and whether findings have been replicated
+4. **Compare** different source chains when claims are contested
+
+### AI Output Experience
+
+For AI-generated content specifically:
+- AI outputs without source citations would be regarded as "weak sources with little trust"
+- This creates incentives for AI systems to produce more auditable, cited outputs
+- Particularly valuable for RAG-based systems where attribution is technically possible
+- Could drive adoption of pedantic mode (see [Epistemic Virtue Evals](/knowledge-base/responses/epistemic-virtue-evals/))
+
+## Relationship to Content Authentication
+
+Provenance tracing is complementary to but distinct from <EntityLink id="content-authentication">content authentication</EntityLink>:
+
+| Dimension | Content Authentication (C2PA) | Provenance Tracing |
+|-----------|------------------------------|-------------------|
+| **What it tracks** | Media files (images, video, audio) | Knowledge claims and arguments |
+| **Verification type** | Cryptographic proof of origin and edits | Probabilistic assessment of evidence quality |
+| **Primary question** | "Where did this media come from?" | "What evidence supports this claim?" |
+| **Attack vector** | Forgery, credential stripping | Circular citation, citation cartels, misrepresentation |
+| **Technical maturity** | Moderate-high (C2PA v2.2, 200+ coalition) | Low (mostly conceptual) |
+| **Overlap** | Both trace origins and build trust chains | Both could share repository infrastructure |
+
+Together, these systems would provide comprehensive provenance: content authentication for media, provenance tracing for claims.
+
+## Technical Feasibility
+
+### What's Possible Now
+
+Forethought notes "no obvious technical blockers exist today" for the core components:
+- **Citation parsing**: Academic citation extraction is well-developed (Semantic Scholar, OpenAlex)
+- **Claim extraction**: LLMs can decompose text into individual claims with reasonable accuracy
+- **Citation verification**: LLMs can check whether cited sources support the claims attributed to them
+- **Knowledge graphs**: Graph databases for representing citation networks are mature technology
+
+### Key Technical Challenges
+
+| Challenge | Difficulty | Mitigation |
+|-----------|------------|------------|
+| **LLM reliability in recursive application** | High | Errors accumulate when LLMs assess LLM outputs; need human verification at key nodes |
+| **Scale** | High | Processing all published content is prohibitively expensive; must prioritize high-value domains |
+| **Implicit citations** | Medium | Probabilistic matching of uncited claims to likely sources is imprecise |
+| **Claim identity** | Medium | Determining when two differently-worded statements express the "same claim" |
+| **Temporal dynamics** | Medium | Claims change status (supported → refuted); provenance must be versioned |
+| **Adversarial manipulation** | High | Motivated actors could create fake source chains |
+
+### Cost Considerations
+
+The maximally ambitious vision—full provenance for all published content—faces cost challenges:
+- Epistemic decomposition of a single paper: \$1–10 at current LLM costs
+- Full provenance tracing for a single claim: potentially \$10–100 (following multiple citation chains)
+- At scale for all of scientific literature: millions to tens of millions of dollars
+
+However, costs are falling rapidly, and the system delivers value even with partial coverage.
+
+## Existing Work and Precursors
+
+### Citation and Knowledge Graph Infrastructure
+
+| Project | What It Does | Relevance |
+|---------|-------------|-----------|
+| **Semantic Scholar** | AI-powered academic search with citation analysis | Citation chain infrastructure |
+| **OpenAlex** | Open catalog of scholarly works, authors, institutions | Open citation data |
+| **Google Scholar** | Citation tracking and h-index calculations | Citation chain navigation |
+| **Wikidata** | Structured knowledge base with sourced claims | Claim-source linking |
+| **Wikipedia** | Verifiability policy requires citations for all claims | Social norms for provenance |
+| **Connected Papers** | Visual citation graph explorer | Citation network visualization |
+
+### Claim Verification Research
+
+| Research Area | Key Work | Status |
+|--------------|----------|--------|
+| **Automated fact-checking** | ClaimBuster, Full Fact, Google Fact Check Tools | Active development |
+| **Scientific claim verification** | SciFact dataset and benchmark | Active research |
+| **Citation intent classification** | Whether citations support, contradict, or merely mention claims | Active research |
+| **Replication prediction** | Models predicting which studies will replicate | Promising results |
+| **Argument mining** | Extracting structured arguments from text | Growing field |
+
+### Related Infrastructure Projects
+
+| Project | Description | Connection to Provenance Tracing |
+|---------|-------------|----------------------------------|
+| **<EntityLink id="content-authentication">C2PA</EntityLink>** | Content Credentials for media provenance | Complementary: media vs. claims |
+| **DOI system** | Digital Object Identifiers for persistent citation | Foundation for claim addressing |
+| **ORCID** | Researcher identification | Author attribution in provenance chains |
+| **CrossRef** | Citation linking infrastructure | Cross-publisher citation resolution |
+| **Web of Science / Scopus** | Citation databases | Source data for academic provenance |
+
+## Development Phases (from Forethought)
+
+Forethought suggests a phased development approach:
+
+### Phase 1: Strategic Mapping
+- Identify use-cases and "hair-on-fire" users who most urgently need provenance information
+- Map existing infrastructure that can be leveraged
+- Define minimum viable product scope
+
+### Phase 2: Epistemic Parser Development
+- Build systems that reliably decompose documents into atomic claims
+- Develop claim classification (fact, prediction, opinion, etc.)
+- Create source-claim matching capabilities
+
+### Phase 3: Seed Repository Creation
+- Re-index existing knowledge bases (arXiv, Wikipedia) as provenance-tracked claims
+- Build initial claim-source graph for a specific high-value domain
+- Validate trust propagation algorithms
+
+### Phase 4: Trust Digest Prototyping
+- Develop algorithms that produce useful reliability summaries
+- Test user experiences for provenance browsing
+- Iterate on what information is most valuable to present
+
+## Adoption Routes
+
+The most promising paths to adoption:
+
+1. **Knowledge graphs for RAG-based AI**: AI systems using retrieval-augmented generation already need to attribute sources; provenance tracing makes this attribution more rigorous and trustworthy
+2. **Scientific literature re-indexing**: Re-processing arXiv or specific journal collections to create provenance-tracked claim databases—high value for researchers
+3. **Policy analysis**: Government and think tank reports where claims need rigorous sourcing
+4. **Investigative journalism**: Following claim chains to identify original sources and distortions
+5. **Education**: Teaching students to evaluate sources by making provenance visible
+
+## Worked Example: Tracing a Viral AI Capability Claim
+
+Consider the claim: *"A recent study found that AI systems can now design novel bioweapons more effectively than human experts."*
+
+A provenance tracing system would decompose and trace this as follows:
+
+**Step 1 — Epistemic decomposition**:
+
+| Atomic Claim | Type | Originality |
+|-------------|------|-------------|
+| "A recent study found..." | Attribution claim | Cites external source |
+| "AI systems can now design novel bioweapons" | Empirical capability claim | Requires verification |
+| "more effectively than human experts" | Comparative claim | Requires benchmark data |
+
+**Step 2 — Provenance tracking**:
+
+Following the citation chain reveals:
+1. The viral tweet cites a news article
+2. The news article cites a blog post summarizing a preprint
+3. The blog post paraphrases the preprint's abstract
+4. The preprint actually studied whether AI systems could *identify known biological threats* from public databases—not "design novel bioweapons"
+5. The comparison was against *undergraduate students*, not "human experts"
+
+**Step 3 — Trust digest**:
+
+> **Provenance: Weak (2/10)**. This claim traces back to a preprint (not peer-reviewed) that studied a different capability than claimed. The claim mutated through 3 intermediaries: "identify known threats" → "identify biological threats" → "design bioweapons." The comparison group was misrepresented: undergrads → "human experts." Original source has moderate methodological quality but does not support the viral claim. [Expand full provenance tree →]
+
+**Step 4 — Claim mutation tracking**:
+
+| Source | Claim | Distortion |
+|--------|-------|------------|
+| Original preprint | "LLMs can identify 4 of 10 known biological agents from public databases at rates comparable to undergraduate biology students" | — |
+| Blog post summary | "AI can identify biological threats as well as trained scientists" | Upgraded comparison group; dropped "known agents" qualifier |
+| News article | "AI rivals human experts at identifying bioweapon risks" | Further upgraded to "experts"; "risks" added |
+| Viral tweet | "AI can design novel bioweapons more effectively than human experts" | "Identify" → "design"; "known" → "novel"; maximum distortion |
+
+This example illustrates the "telephone game" problem that provenance tracing aims to solve. Each intermediary introduced small distortions that compounded into a fundamentally different claim.
+
+## Extensions and Open Ideas
+
+**Distortion metrics**: Quantify how much a claim has mutated from its original source, creating a "distortion score." A claim with a distortion score of 0.9 has been substantially changed from the original; a score of 0.1 is a faithful representation. This could be displayed alongside any claim: "This version of this claim has a 73% distortion from the primary source."
+
+**Claim genealogy visualization**: Interactive visualizations showing how claims branch and mutate as they spread. Users can click on any node to see the specific changes introduced at that step. Like a git blame for knowledge claims—who changed what, when, and how it altered the meaning.
+
+**"Telephone game" alerts**: When a claim has passed through more than N intermediaries, automatically flag it with a warning: "This claim has been retransmitted 5 times since the original source. Click to see how it changed at each step." Even if each individual retransmission is minor, cumulative distortion can be large.
+
+**Provenance scores for AI outputs**: Every AI-generated response could come with provenance metadata: which claims are supported by retrieved sources, which are from training data (lower confidence), and which are novel synthesis (lowest confidence). RAG-based systems are particularly well-positioned for this since they already retrieve specific documents.
+
+**Cross-language provenance**: Track claims as they cross language barriers. A paper published in Chinese, summarized in English, and then cited in a Spanish-language article may undergo significant meaning shifts at each translation. Provenance tracing could flag translation-induced distortions.
+
+**"Citation karma"**: Sources that are frequently cited *accurately* receive higher trust scores. Sources that are frequently misrepresented get a "commonly misquoted" flag. Over time, this creates incentives for sources to write more clearly (reducing misrepresentation) and for intermediaries to cite more carefully.
+
+**Retroactive provenance construction**: For claims already in circulation, use LLMs to retroactively construct likely provenance chains. "This claim about AI capabilities probably originated from Paper X, was paraphrased in Blog Y, and reached mainstream media via Article Z." Even probabilistic provenance is more useful than none.
+
+**Provenance-aware search**: A search engine that ranks results not just by relevance but by provenance quality. Results closer to primary sources, with less distortion, and from more reliable citation chains rank higher. "Show me the most well-sourced version of this claim."
+
+**Integration with academic tools**: Build provenance tracing into existing research workflows—Zotero plugins, Google Scholar extensions, Semantic Scholar integrations—so researchers can see provenance data without leaving their normal tools.
+
+## Challenges and Risks
+
+### Complexity and Modularity
+
+Provenance tracing involves multiple interacting components, each with significant design choices. The system scales best when complete (all components working together) but individual components can provide isolated utility. This suggests a modular development approach—but the full value proposition only materializes when components are integrated.
+
+### Error Accumulation
+
+When LLMs are used recursively (LLM assesses a claim → LLM traces its sources → LLM evaluates those sources → ...), errors can compound. A 90% accuracy rate per step becomes 59% after 5 steps. Human verification is needed at critical junctions, limiting full automation.
+
+### Gaming and Manipulation
+
+Sophisticated actors could:
+- Create fake source networks to support specific claims
+- Establish legitimate-looking journals or websites as source laundering
+- Exploit the system's trust in certain source types (e.g., peer review)
+- Build citation cartels that appear legitimate
+
+### Philosophical Questions
+
+- **What counts as "provenance"?** For claims that emerge from many sources, there's no single origin
+- **Whose reliability ratings?** Different communities may assess source quality differently
+- **When is a claim "the same claim"?** Paraphrasing, simplification, and contextualization create identity problems
+- **How to handle evolving knowledge?** Claims that were well-sourced a decade ago may be outdated
+
+## Connection to AI Safety
+
+Provenance tracing has deep connections to AI safety:
+
+- **AI output accountability**: If AI systems must provide provenance for their claims, they become more auditable and trustworthy
+- **<EntityLink id="epistemic-health">Epistemic health</EntityLink>**: Making knowledge provenance visible strengthens the "civilizational immune system" against misinformation
+- **RAG reliability**: As AI systems increasingly use retrieval-augmented generation, provenance tracing ensures the retrieved information is itself well-sourced
+- **<EntityLink id="civilizational-competence">Civilizational competence</EntityLink>**: Better provenance infrastructure makes it harder for bad actors to launder false claims through seemingly credible channels
+- **AI governance**: Provenance-traced policy analysis could improve the quality of AI governance decisions
+
+Forethought argues that provenance tracing could cement "truth-respect into civilizational epistemics"—creating an infrastructure where claims without good provenance are automatically treated with appropriate skepticism.
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "Can epistemic decomposition be done reliably enough to build a trustworthy claim database?",
+    "Will error accumulation in recursive LLM assessment undermine trust propagation?",
+    "Is there a viable business model or funding mechanism for maintaining provenance infrastructure?",
+    "Can the system be made resistant to sophisticated gaming (fake source networks, citation cartels)?",
+    "Will users actually engage with provenance information, or is it too complex for mainstream adoption?"
+  ]}
+/>
+
+## Further Reading
+
+- **Original Report**: [Design Sketches for Collective Epistemics — Provenance Tracing](https://www.forethought.org/research/design-sketches-collective-epistemics#provenance-tracing) — Forethought Foundation
+- **Related Infrastructure**: <EntityLink id="content-authentication">Content Authentication & Provenance (C2PA)</EntityLink>
+- **Citation Infrastructure**: [Semantic Scholar](https://www.semanticscholar.org/), [OpenAlex](https://openalex.org/)
+- **Claim Verification**: [SciFact Benchmark](https://scifact.apps.allenai.org/) — AI2
+- **Overview**: [Design Sketches for Collective Epistemics](/knowledge-base/responses/collective-epistemics-design-sketches/) — parent page with all five proposed tools
+
+<Backlinks />

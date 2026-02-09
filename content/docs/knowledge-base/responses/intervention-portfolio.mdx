@@ -1,0 +1,402 @@
+---
+title: Intervention Portfolio
+description: "Strategic overview of AI safety interventions analyzing ~$650M annual investment across 1,100 FTEs. Maps 13+ interventions against 4 risk categories with ITN prioritization. Key finding: 85% of external funding from 5 sources, safety/capabilities ratio at 0.5-1.3%, and epistemic resilience severely neglected (under 5% of portfolio). Recommends rebalancing toward evaluations, AI control, and compute governance."
+sidebar:
+  order: 1
+lastEdited: "2026-01-30"
+pageTemplate: knowledge-base-response
+importance: 87.5
+quality: 91
+llmSummary: Provides a strategic framework for AI safety resource allocation by mapping 13+ interventions against 4 risk categories, evaluating each on ITN dimensions, and identifying portfolio gaps (epistemic resilience severely neglected, technical work over-concentrated in frontier labs). Total field investment ~$650M annually with 1,100 FTEs (21% annual growth), but 85% of external funding from 5 sources and safety/capabilities ratio at only 0.5-1.3%. Recommends rebalancing from very high RLHF investment toward evaluations (very high priority), AI control and compute governance (both high priority), with epistemic resilience increasing from very low to medium allocation.
+ratings:
+  novelty: 7
+  rigor: 7.5
+  actionability: 8
+  completeness: 7.5
+metrics:
+  wordCount: 2800
+  citations: 35
+  tables: 28
+  diagrams: 1
+clusters: ["ai-safety", "governance", "community"]
+---
+import {EntityLink, Mermaid, Backlinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Rating | Evidence |
+|-----------|--------|----------|
+| Tractability | Medium-High | Varies widely: evaluations (high), compute governance (high), international coordination (low). [Open Philanthropy's 2025 RFP](https://www.openphilanthropy.org/request-for-proposals-technical-ai-safety-research/) allocated \$40M for technical safety research. |
+| Scalability | High | Portfolio approach scales across 4 risk categories and multiple timelines. [AI Safety Field Growth Analysis](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025) shows 21% annual FTE growth rate. |
+| Current Maturity | Medium | Core interventions established; significant gaps in epistemic resilience (less than 5% of portfolio) and post-incident recovery (under 1%). |
+| Research Workforce | ≈1,100 FTEs | 600 technical + 500 non-<EntityLink id="technical-ai-safety">technical AI safety</EntityLink> FTEs in 2025, up from 400 total in 2022 ([AI Safety Field Growth Analysis](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025)). |
+| Time Horizon | Near-Long | Near-term (evaluations, control) complement long-term work (interpretability, governance). [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) emphasizes urgency. |
+| Funding Level | \$110-130M/year external | 2024 external funding. Early 2025 shows 40-50% acceleration with \$67M committed through July. Internal lab spending adds \$500-550M for ≈\$650M total ([Coefficient Giving analysis](https://coefficientgiving.org/research/ai-safety-and-security-need-more-funders/)). |
+| Funding Concentration | 85% from 5 sources | [Open Philanthropy](https://www.openphilanthropy.org/): \$63.6M (60%); <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink>: \$20M; Eric Schmidt: \$10M; [AI Safety Fund](https://www.frontiermodelforum.org/ai-safety-fund/): \$10M; FLI: \$5M |
+| Safety/Capabilities Ratio | ≈0.5-1.3% | \$600-650M safety vs \$50B+ capabilities spending. [FAS recommends](https://fas.org/publication/accelerating-ai-interpretability/) 30% of compute for safety research. |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [mop.wiki](https://mop.wiki/project-portfolios/) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Intervention_mapping) |
+
+
+## Overview
+
+This page provides a strategic view of the AI safety intervention landscape, analyzing how different interventions address different risk categories and improve key parameters in the <EntityLink id="__index__/ai-transition-model">AI Transition Model</EntityLink>. Rather than examining interventions individually, this portfolio view helps identify coverage gaps, complementarities, and allocation priorities.
+
+The intervention landscape can be divided into several categories: **technical approaches** (alignment, interpretability, control), **governance mechanisms** (legislation, compute governance, international coordination), **field building** (talent, funding, community), and **resilience measures** (epistemic security, economic adaptation). Each category has different tractability profiles, timelines, and risk coverage—understanding these tradeoffs is essential for strategic resource allocation.
+
+An effective safety portfolio requires both breadth (covering diverse failure modes) and depth (sufficient investment in each area to achieve impact). The current portfolio shows significant concentration in certain areas (RLHF, capability evaluations) while other areas remain relatively neglected (epistemic resilience, international coordination).
+
+### Field Growth Trajectory
+
+| Metric | 2022 | 2025 | Growth Rate | Notes |
+|--------|-----:|-----:|:-----------:|-------|
+| Technical AI Safety FTEs | 300 | 600 | 21%/year | [AI Safety Field Growth Analysis 2025](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025) |
+| Non-Technical AI Safety FTEs | 100 | 500 | 71%/year | Governance, policy, operations |
+| **Total AI Safety FTEs** | **400** | **1,100** | **40%/year** | Field-wide compound growth |
+| AI Safety Organizations | ≈50 | ≈120 | 24%/year | Exponential growth since 2020 |
+| Capabilities FTEs (comparison) | ≈3,000 | ≈15,000 | 30-40%/year | <EntityLink id="openai">OpenAI</EntityLink> alone: 300 → 3,000 |
+
+**Critical Comparison:** While AI safety workforce has grown substantially, capabilities research is growing 30-40% per year. The ratio of capabilities to safety researchers has remained roughly constant at 10-15:1, meaning the absolute gap continues to widen.
+
+**Top Research Categories (by FTEs):**
+1. Miscellaneous <EntityLink id="technical-research">technical AI safety research</EntityLink>
+2. LLM safety
+3. Interpretability
+
+---
+
+## Intervention Categories and Risk Coverage
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Technical["Technical Approaches"]
+        INT[Interpretability]
+        CTRL[AI Control]
+        ALIGN[Alignment Research]
+        EVAL[Evaluations]
+    end
+
+    subgraph Governance["Governance"]
+        COMP[Compute Governance]
+        LEG[Legislation]
+        INTL[International Coordination]
+        RSP[Responsible Scaling]
+    end
+
+    subgraph Meta["Field Building & Resilience"]
+        FIELD[Field Building]
+        EPIST[Epistemic Resilience]
+        ECON[Economic Resilience]
+    end
+
+    subgraph Risks["Risk Categories"]
+        ACC[Accident Risks]
+        MIS[Misuse Risks]
+        STR[Structural Risks]
+        EPI[Epistemic Risks]
+    end
+
+    INT --> ACC
+    CTRL --> ACC
+    ALIGN --> ACC
+    EVAL --> ACC
+    EVAL --> MIS
+
+    COMP --> MIS
+    COMP --> STR
+    LEG --> MIS
+    LEG --> STR
+    INTL --> STR
+    RSP --> ACC
+    RSP --> MIS
+
+    FIELD --> ACC
+    FIELD --> STR
+    EPIST --> EPI
+    ECON --> STR
+
+    style ACC fill:#ffcccc
+    style MIS fill:#ffe6cc
+    style STR fill:#fff3cc
+    style EPI fill:#e6ccff
+    style Technical fill:#cce6ff
+    style Governance fill:#ccffcc
+    style Meta fill:#ffccff
+`} />
+
+---
+
+## Intervention by Risk Matrix
+
+This matrix shows how strongly each major intervention addresses each risk category. Ratings are based on current evidence and expert assessments.
+
+| Intervention | Accident Risks | Misuse Risks | Structural Risks | Epistemic Risks | Primary Mechanism |
+|--------------|:--------------:|:------------:|:----------------:|:---------------:|-------------------|
+| **<EntityLink id="interpretability">Interpretability</EntityLink>** | High | Low | Low | -- | Detect deception and misalignment in model internals |
+| **<EntityLink id="ai-control">AI Control</EntityLink>** | High | Medium | -- | -- | External constraints regardless of AI intentions |
+| **<EntityLink id="evals">Evaluations</EntityLink>** | High | Medium | Low | -- | Pre-deployment testing for dangerous capabilities |
+| **<EntityLink id="rlhf">RLHF/Constitutional AI</EntityLink>** | Medium | Medium | -- | -- | Train models to follow human preferences |
+| **<EntityLink id="scalable-oversight">Scalable Oversight</EntityLink>** | Medium | Low | -- | -- | Human supervision of superhuman systems |
+| **Compute Governance** | Low | High | Medium | -- | Hardware chokepoints limit access |
+| **<EntityLink id="export-controls">Export Controls</EntityLink>** | Low | High | Medium | -- | Restrict adversary access to training compute |
+| **<EntityLink id="responsible-scaling-policies">Responsible Scaling</EntityLink>** | Medium | Medium | Low | -- | Capability thresholds trigger safety requirements |
+| **International Coordination** | Low | Medium | High | -- | Reduce racing dynamics through agreements |
+| **<EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink>** | Medium | Medium | Medium | -- | Government capacity for evaluation and oversight |
+| **Field Building** | Medium | Low | Medium | Low | Grow talent pipeline and research capacity |
+| **<EntityLink id="epistemic-security">Epistemic Security</EntityLink>** | -- | Low | Low | High | Protect collective truth-finding capacity |
+| **<EntityLink id="content-authentication">Content Authentication</EntityLink>** | -- | Medium | -- | High | Verify authentic content in synthetic era |
+
+**Legend:** High = primary focus, addresses directly; Medium = secondary impact; Low = indirect or limited; -- = minimal relevance
+
+---
+
+## Prioritization Framework
+
+This framework evaluates interventions across the standard Importance-Tractability-Neglectedness (ITN) dimensions, with additional consideration for timeline fit and portfolio complementarity.
+
+| Intervention | Tractability | Impact Potential | Neglectedness | Timeline Fit | Overall Priority |
+|--------------|:------------:|:----------------:|:-------------:|:------------:|:----------------:|
+| **Interpretability** | Medium | High | Low | Long | High |
+| **AI Control** | High | Medium-High | Medium | Near | Very High |
+| **Evaluations** | High | Medium | Low | Near | High |
+| **Compute Governance** | High | High | Low | Near | Very High |
+| **International Coordination** | Low | Very High | High | Long | High |
+| **Field Building** | High | Medium | Medium | Ongoing | Medium-High |
+| **Epistemic Resilience** | Medium | Medium | High | Near-Long | Medium-High |
+| **Scalable Oversight** | Medium-Low | High | Medium | Long | Medium |
+
+### Prioritization Rationale
+
+**Very High Priority:**
+- **AI Control** scores highly because it provides near-term safety benefits (70-85% tractability for human-level systems) regardless of whether alignment succeeds. It represents a practical bridge during the transition period. [Redwood Research received \$1.2M](https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/) for control research in 2024.
+- **Compute Governance** is one of few levers creating physical constraints on AI development. Hardware chokepoints exist, some measures are already implemented (EU AI Act compute thresholds, US export controls), and impact potential is substantial. [GovAI](https://www.governance.ai/research) produces leading research on compute governance mechanisms.
+
+**High Priority:**
+- **Interpretability** is potentially essential if alignment proves difficult (only reliable way to detect sophisticated deception). [MIT Technology Review named mechanistic interpretability a 2026 Breakthrough Technology](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/). Anthropic's attribution graphs revealed hidden reasoning in Claude 3.5 Haiku. [FAS recommends](https://fas.org/publication/accelerating-ai-interpretability/) federal R&D funding through DARPA and NSF.
+- **Evaluations** provide measurable near-term impact and are already standard practice at major labs. [Open Philanthropy launched an RFP](https://www.openphilanthropy.org/request-for-proposals-improving-capability-evaluations/) for capability evaluations (\$200K-\$5M grants). [METR](https://metr.org/) partners with Anthropic and OpenAI on frontier model evaluations. [NIST invested \$20M](https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical-infrastructure) in AI Economic Security Centers.
+- **International Coordination** has very high impact potential for addressing structural risks like racing dynamics, but low tractability given current geopolitical tensions. The [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025), led by Yoshua Bengio with 100+ authors from 30 countries, represents the largest global collaboration to date.
+
+**Medium-High Priority:**
+- **Field Building** and **Epistemic Resilience** are relatively neglected meta-level interventions that multiply the effectiveness of direct technical and governance work. [80,000 Hours notes](https://80000hours.org/2025/01/it-looks-like-there-are-some-good-funding-opportunities-in-ai-safety-right-now/) good funding opportunities in AI safety exist for qualified researchers.
+
+---
+
+## AI Transition Model Integration
+
+Each intervention affects different parameters in the <EntityLink id="__index__/ai-transition-model">AI Transition Model</EntityLink>. This mapping helps identify which interventions address which aspects of the transition.
+
+### Technical Approaches
+
+| Intervention | Primary Parameter | Secondary Parameters | Mechanism |
+|--------------|-------------------|---------------------|-----------|
+| <EntityLink id="interpretability">Interpretability</EntityLink> | <EntityLink id="interpretability-coverage" /> | <EntityLink id="alignment-robustness" />, <EntityLink id="safety-capability-gap" /> | Direct visibility into model internals |
+| <EntityLink id="ai-control">AI Control</EntityLink> | <EntityLink id="human-oversight-quality" /> | <EntityLink id="alignment-robustness" /> | External constraints maintain oversight |
+| <EntityLink id="evals">Evaluations</EntityLink> | <EntityLink id="safety-capability-gap" /> | <EntityLink id="safety-culture-strength" />, <EntityLink id="human-oversight-quality" /> | Pre-deployment testing identifies risks |
+| <EntityLink id="scalable-oversight">Scalable Oversight</EntityLink> | <EntityLink id="human-oversight-quality" /> | <EntityLink id="alignment-robustness" /> | Human supervision despite capability gaps |
+
+### Governance Approaches
+
+| Intervention | Primary Parameter | Secondary Parameters | Mechanism |
+|--------------|-------------------|---------------------|-----------|
+| Compute Governance | <EntityLink id="racing-intensity" /> | <EntityLink id="coordination-capacity" />, <EntityLink id="ai-control-concentration" /> | Hardware chokepoints slow development |
+| <EntityLink id="responsible-scaling-policies">Responsible Scaling</EntityLink> | <EntityLink id="safety-culture-strength" /> | <EntityLink id="safety-capability-gap" /> | Capability thresholds trigger requirements |
+| International Coordination | <EntityLink id="coordination-capacity" /> | <EntityLink id="racing-intensity" /> | Agreements reduce competitive pressure |
+| Legislation | <EntityLink id="regulatory-capacity" /> | <EntityLink id="safety-culture-strength" /> | Binding requirements with enforcement |
+
+### Meta-Level Interventions
+
+| Intervention | Primary Parameter | Secondary Parameters | Mechanism |
+|--------------|-------------------|---------------------|-----------|
+| Field Building | <EntityLink id="safety-research" /> | <EntityLink id="alignment-progress" /> | Grow talent pipeline and capacity |
+| <EntityLink id="epistemic-security">Epistemic Security</EntityLink> | <EntityLink id="epistemic-health" /> | <EntityLink id="societal-trust" />, <EntityLink id="reality-coherence" /> | Protect collective knowledge |
+| <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> | <EntityLink id="institutional-quality" /> | <EntityLink id="regulatory-capacity" /> | Government capacity for oversight |
+
+---
+
+## Portfolio Gaps and Complementarities
+
+### Coverage Gaps
+
+Analysis of the current intervention portfolio reveals several areas where coverage is thin:
+
+| Gap Area | Current Investment | Risk Exposure | Recommended Action |
+|----------|-------------------|---------------|-------------------|
+| **Epistemic Risks** | Under 5% of portfolio (\$3-5M/year) | <EntityLink id="epistemic-collapse" />, <EntityLink id="reality-fragmentation" /> | Increase to 8-10% of portfolio; invest in content authentication and epistemic infrastructure |
+| **Long-term Structural Risks** | 4-6% of portfolio; international coordination is low tractability | <EntityLink id="lock-in" />, <EntityLink id="concentration-of-power" /> | Develop alternative coordination mechanisms; invest in governance research |
+| **Post-Incident Recovery** | Under 1% of portfolio | All risk categories | Develop recovery protocols and resilience measures; allocate 3-5% of portfolio |
+| **Misuse by State Actors** | Export controls are primary lever; \$5-10M in policy research | <EntityLink id="authoritarian-tools" />, <EntityLink id="surveillance" /> | Research additional governance mechanisms; increase to \$15-25M |
+| **Independent Evaluation Capacity** | 70%+ of evals done by labs themselves | Conflict of interest, verification gaps | [Open Philanthropy's eval RFP](https://www.openphilanthropy.org/request-for-proposals-improving-capability-evaluations/) addresses this with \$200K-\$5M grants |
+
+### Key Complementarities
+
+Certain interventions work better together than in isolation:
+
+**Technical + Governance:**
+- <EntityLink id="evals" /> inform <EntityLink id="responsible-scaling-policies" /> thresholds
+- <EntityLink id="interpretability" /> enables verification for <EntityLink id="international-coordination" />
+- <EntityLink id="ai-control" /> provides safety margin while governance matures
+
+**Near-term + Long-term:**
+- <EntityLink id="compute-governance" /> buys time for <EntityLink id="interpretability" /> research
+- <EntityLink id="evals" /> identify near-term risks while <EntityLink id="scalable-oversight" /> develops
+- <EntityLink id="field-building" /> ensures capacity for future technical work
+
+**Prevention + Resilience:**
+- Technical safety research aims to prevent failures
+- <EntityLink id="epistemic-security" /> and economic resilience limit damage if prevention fails
+- Both are needed for robust defense-in-depth
+
+---
+
+## Portfolio Funding Allocation
+
+The following table estimates 2024 funding levels by intervention area and compares them to recommended allocations based on neglectedness and impact potential. Total external AI safety funding was approximately [\$110-130 million in 2024](https://coefficientgiving.org/research/ai-safety-and-security-need-more-funders/), with [Coefficient Giving providing ~60%](https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/) of this amount.
+
+| Intervention Area | Est. 2024 Funding | % of Total | Recommended Shift | Key Funders |
+|-------------------|------------------:|:----------:|:-----------------:|-------------|
+| **RLHF/Training Methods** | \$15-35M | ≈25% | Decrease to 20% | Frontier labs (internal), academic grants |
+| **Interpretability** | \$15-25M | ≈18% | Maintain | <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, [Superalignment Fast Grants](https://openai.com/index/superalignment-fast-grants/) (\$10M) |
+| **Evaluations & Evals Infrastructure** | \$12-18M | ≈13% | Increase to 20% | [CAIS (\$1.5M)](https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/), UK AISI, labs |
+| **AI Control Research** | \$1-12M | ≈9% | Increase to 15% | [Redwood Research (\$1.2M)](https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/), Anthropic |
+| **Compute Governance** | \$1-10M | ≈7% | Increase to 12% | Government programs, policy organizations |
+| **Field Building & Talent** | \$10-15M | ≈11% | Maintain | 80,000 Hours, MATS, various fellowships |
+| **Governance & Policy** | \$1-12M | ≈9% | Increase to 12% | <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> policy grants, government initiatives |
+| **International Coordination** | \$1-5M | ≈4% | Increase to 8% | [UK/EU government initiatives (≈\$14M total)](https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation) |
+| **Epistemic Resilience** | \$1-4M | ≈3% | Increase to 8% | Very few dedicated funders |
+
+### 2025 Funding Landscape Update
+
+| Funder | 2024 Allocation | Focus Areas | Source |
+|--------|---------------:|-------------|--------|
+| [Open Philanthropy](https://www.openphilanthropy.org/) | \$63.6M | Technical safety, governance, field building | 60% of external funding |
+| Jaan Tallinn | \$20M | Long-term alignment research | Personal foundation |
+| Eric Schmidt (Schmidt Sciences) | \$10M | Safety benchmarking, adversarial evaluation | [Quick Market Pitch](https://quickmarketpitch.com/blogs/news/ai-safety-investors) |
+| [AI Safety Fund](https://www.frontiermodelforum.org/ai-safety-fund/) | \$10M | Collaborative research (Anthropic, Google, Microsoft, OpenAI) | Frontier Model Forum |
+| Future of Life Institute | \$5M | Smaller grants, fellowships | Diverse portfolio |
+| Steven Schuurman Foundation | €5M/year | Various AI safety initiatives | Elastic co-founder |
+| **Total External** | **\$110-130M** | — | 2024 estimate |
+
+**2025 Trajectory:** Early data (through July 2025) shows \$67M already committed, putting the year on track to exceed 2024 totals by 40-50%.
+
+### Funding Gap Analysis
+
+The funding landscape reveals several structural imbalances:
+
+| Gap Type | Current State | Impact | Recommended Action |
+|----------|---------------|--------|-------------------|
+| **Climate vs AI safety** | Climate philanthropy: ≈\$1-15B; AI safety: ≈\$130M | ≈100x disparity despite comparable catastrophic potential | Increase AI safety funding to at least \$100M-1B annually |
+| **Capabilities vs safety** | [≈\$100B in AI data center capex (2024)](https://coefficientgiving.org/research/ai-safety-and-security-need-more-funders/) vs ≈\$130M safety | ≈1500:1 ratio | Redirect 0.5-1% of capabilities spending to safety |
+| **Funder concentration** | <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>: 60% of external funding | Single point of failure; limits diversity | [Diversify funding sources](https://www.insidephilanthropy.com/home/whos-funding-ai-regulation-and-safety); new initiatives like [Humanity AI (\$100M)](https://www.insidephilanthropy.com/home/whos-funding-ai-regulation-and-safety) |
+| **Talent pipeline** | [Over-optimized for researchers](https://forum.effectivealtruism.org/posts/m5dDrMfHjLtMu293G/ai-safety-s-talent-pipeline-is-over-optimised-for) | Shortage in governance, operations, advocacy | Expand non-research talent programs |
+
+---
+
+## Resource Allocation Assessment
+
+### Current vs. Recommended Allocation
+
+| Area | Current Allocation | Recommended | Rationale |
+|------|:-----------------:|:-----------:|-----------|
+| **RLHF/Training** | Very High | High | Deployed at scale but [limited effectiveness against deceptive alignment](https://arxiv.org/abs/2406.18346) |
+| **Interpretability** | High | High | Rapid progress; potential for fundamental breakthroughs |
+| **Evaluations** | High | Very High | Critical for identifying dangerous capabilities pre-deployment |
+| **AI Control** | Medium | High | Near-term tractable; provides safety regardless of alignment |
+| **Compute Governance** | Medium | High | One of few physical levers; already showing policy impact |
+| **International Coordination** | Low | Medium | Low tractability but very high stakes |
+| **Epistemic Resilience** | Very Low | Medium | Highly neglected; addresses underserved risk category |
+| **Field Building** | Medium | Medium | Maintain current investment; returns are well-established |
+
+### Investment Concentration Risks
+
+The current portfolio shows several structural vulnerabilities:
+
+| Concentration Type | Current State | Risk | Mitigation |
+|-------------------|---------------|------|------------|
+| **Funder concentration** | [Coefficient Giving provides ≈60% of external funding](https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/) | Strategy changes affect entire field | Cultivate diverse funding sources |
+| **Geographic concentration** | [US and UK receive majority of funding](https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation) | Limited global coordination capacity | Support emerging hubs (Berlin, Canada, Australia) |
+| **Frontier lab dependence** | Most technical safety at Anthropic, OpenAI, DeepMind | Conflicts of interest; limited independent verification | Increase funding to [MIRI (\$1.1M)](https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/), Redwood, ARC |
+| **Research over operations** | [Pipeline over-optimized for researchers](https://forum.effectivealtruism.org/posts/m5dDrMfHjLtMu293G/ai-safety-s-talent-pipeline-is-over-optimised-for) | Shortage of governance, advocacy, operations talent | Expand non-research career paths |
+| **Technical over governance** | Technical ~60% vs governance ≈15% of funding | Governance may be more neglected and tractable | Rebalance toward policy research |
+| **Prevention over resilience** | Minimal investment in post-incident recovery | No fallback if prevention fails | Develop recovery protocols |
+
+---
+
+## Strategic Considerations
+
+### Worldview Dependencies
+
+Different beliefs about AI risk lead to different portfolio recommendations:
+
+| Worldview | Prioritize | Deprioritize |
+|-----------|------------|--------------|
+| **Alignment is very hard** | Interpretability, Control, International coordination | RLHF, Voluntary commitments |
+| **Misuse is the main risk** | Compute governance, Content authentication, Legislation | Interpretability, Agent foundations |
+| **<EntityLink id="short-timeline-policy-implications">Short timelines</EntityLink>** | AI Control, Evaluations, Responsible scaling | Long-term governance research |
+| **Racing dynamics dominate** | International coordination, Compute governance | Unilateral safety research |
+| **Epistemic collapse is likely** | Epistemic security, Content authentication | Technical alignment |
+
+### Portfolio Robustness
+
+A robust portfolio should satisfy the following criteria, which can help evaluate current gaps and guide future allocation:
+
+| Robustness Criterion | Current Status | Gap Assessment | Target |
+|---------------------|----------------|----------------|--------|
+| **Cover multiple failure modes** | Accident risks: 60% coverage; Misuse: 50%; Structural: 30%; Epistemic: under 15% | Medium gap | 70%+ coverage across all categories |
+| **Prevention and resilience** | ~95% prevention, ≈5% resilience | Large gap | 80% prevention, 20% resilience |
+| **Near-term and long-term balance** | 55% near-term (evals, control), 45% long-term (interpretability, governance) | Small gap | Maintain current balance |
+| **Independent research capacity** | Frontier labs: 70%+ of technical safety; Independents: under 30% | Medium gap | 50/50 split between labs and independents |
+| **Support multiple worldviews** | Most interventions robust across scenarios | Small gap | Maintain |
+| **Geographic diversity** | US/UK: 80%+ of funding; EU: 10%; ROW: under 10% | Medium gap | US/UK: 60%, EU: 20%, ROW: 20% |
+| **Funder diversity** | 5 funders provide 85% of external funding; [Open Philanthropy alone provides 60%](https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/) | Large gap | No single funder greater than 25% |
+
+---
+
+## Key Sources
+
+| Source | Type | Relevance |
+|--------|------|-----------|
+| [Coefficient Giving Progress 2024](https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/) | Funder Report | Primary data on AI safety funding levels and priorities |
+| [AI Safety Funding Situation Overview](https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation) | Analysis | Comprehensive breakdown of funding sources and gaps |
+| [AI Safety Needs More Funders](https://coefficientgiving.org/research/ai-safety-and-security-need-more-funders/) | Policy Brief | Comparison to other catastrophic risk funding |
+| [AI Safety Field Growth Analysis 2025](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025) | Research | Field growth metrics, 1,100 FTEs, 21% annual growth |
+| [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) | Global Report | 100+ authors, 30 countries, Yoshua Bengio lead |
+| [Future of Life AI Safety Index 2025](https://futureoflife.org/ai-safety-index-summer-2025/) | Industry Assessment | 33 indicators across 6 domains for 7 leading companies |
+| [Open Philanthropy Technical AI Safety RFP](https://www.openphilanthropy.org/request-for-proposals-technical-ai-safety-research/) | Grant Program | \$40M allocation for technical safety research |
+| [Open Philanthropy Capability Evaluations RFP](https://www.openphilanthropy.org/request-for-proposals-improving-capability-evaluations/) | Grant Program | \$200K-\$5M grants for evaluation infrastructure |
+| [America's AI Action Plan (July 2025)](https://www.whitehouse.gov/wp-content/uploads/2025/07/Americas-AI-Action-Plan.pdf) | Policy | US government AI priorities including evaluations ecosystem |
+| [Accelerating AI Interpretability (FAS)](https://fas.org/publication/accelerating-ai-interpretability/) | Policy Brief | Federal funding recommendations for interpretability |
+| [80,000 Hours: AI Risk](https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/) | Career Guidance | Intervention prioritization and neglectedness analysis |
+| [RLHF Limitations Paper](https://arxiv.org/abs/2406.18346) | Research | Evidence on limitations of current alignment methods |
+| [Carnegie AI Safety as Global Public Good](https://carnegieendowment.org/research/2025/03/examining-ai-safety-as-a-global-public-good-implications-challenges-and-research-priorities?lang=en) | Policy Analysis | International coordination challenges and research priorities |
+| [ITU Annual AI Governance Report 2025](https://www.itu.int/epublications/en/publication/the-annual-ai-governance-report-2025-steering-the-future-of-ai/en/) | Global Report | AI governance landscape across nations |
+
+---
+
+## Related Pages
+
+- Responses Overview - Full list of interventions
+- Technical Approaches - Alignment, interpretability, control
+- Governance Approaches - Legislation, compute governance, international
+- Risks Overview - Risk categories addressed by interventions
+- <EntityLink id="__index__/ai-transition-model">AI Transition Model</EntityLink> - Framework for understanding AI transition dynamics
+
+---
+
+## AI Transition Model Context
+
+The intervention portfolio collectively affects the <EntityLink id="ai-transition-model" /> across all major factors:
+
+| Factor | Key Interventions | Coverage |
+|--------|-------------------|----------|
+| <EntityLink id="misalignment-potential" /> | Alignment research, interpretability, control | Technical safety |
+| <EntityLink id="civilizational-competence" /> | Governance, institutions, epistemic tools | Coordination capacity |
+| <EntityLink id="transition-turbulence" /> | Compute governance, international coordination | Racing dynamics |
+| <EntityLink id="misuse-potential" /> | Resilience, authentication, detection | Harm reduction |
+
+Portfolio balance matters: over-investment in any single intervention type creates vulnerability if that approach fails.

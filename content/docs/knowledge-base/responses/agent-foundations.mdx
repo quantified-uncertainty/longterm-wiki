@@ -1,0 +1,286 @@
+---
+title: Agent Foundations
+description: Agent foundations research develops mathematical frameworks for understanding aligned agency, including embedded agency, decision theory, logical induction, and corrigibility. MIRI's 2024 strategic shift away from this work, citing slow progress, has reignited debate about whether theoretical prerequisites exist for alignment or whether empirical approaches on neural networks are more tractable.
+importance: 65
+quality: 59
+lastEdited: "2025-12-28"
+llmSummary: Agent foundations research (MIRI's mathematical frameworks for aligned agency) faces low tractability after 10+ years with core problems unsolved, leading to MIRI's 2024 strategic pivot away from the field. Assessment shows ~15-25% probability the work is essential, 60-75% confidence in low tractability, with value 3-5x higher under long timeline assumptions.
+pageTemplate: knowledge-base-response
+todos:
+  - Complete 'How It Works' section
+  - Complete 'Limitations' section (6 placeholders)
+ratings:
+  novelty: 4.5
+  rigor: 6
+  actionability: 5.5
+  completeness: 7
+metrics:
+  wordCount: 1339
+  citations: 20
+  tables: 17
+  diagrams: 1
+clusters:
+  - ai-safety
+subcategory: alignment-theoretical
+---
+import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="agent-foundations" client:load />
+
+## Overview
+
+Agent foundations research seeks to develop mathematical frameworks for understanding agency, goals, and alignment before advanced AI systems <EntityLink id="manifest">manifest</EntityLink> the problems these frameworks aim to solve. The approach treats alignment as requiring theoretical prerequisites: formal definitions of concepts like "corrigibility," "embedded reasoning," and "value learning" that must be established before building reliably aligned systems.
+
+This research program was pioneered by the <EntityLink id="miri">Machine Intelligence Research Institute (MIRI)</EntityLink> starting in 2013. Key contributions include <R id="1da850cbb06cd522">embedded agency</R> (how agents reason about themselves within their environment), <R id="c03dfe0b505debd6">logical induction</R> (managing uncertainty about mathematical truths), <R id="170ed59807cc7b2f">functional decision theory</R> (how agents should make decisions under uncertainty), and <R id="33c4da848ef72141">formal corrigibility analysis</R> (conditions under which agents accept correction).
+
+The field faces a critical juncture. In January 2024, MIRI announced a strategic pivot away from agent foundations research, stating that "alignment research at MIRI and in the larger field had gone too slowly" and that they "now believed this research was extremely unlikely to succeed in time to prevent an unprecedented catastrophe." MIRI has shifted focus to policy and communications work, with their agent foundations team discontinued. This development has intensified debate about whether agent foundations represents essential groundwork or a research dead end.
+
+### Quick Assessment
+
+| Dimension | Assessment | Confidence | Notes |
+|-----------|------------|------------|-------|
+| Tractability | Low | Medium | MIRI's 2024 pivot suggests internal pessimism; key problems remain open after 10+ years |
+| Value if alignment hard | High | Medium | May be necessary for robust solutions to deceptive alignment |
+| Value if alignment easy | Low | High | Probably not needed if empirical methods suffice |
+| Neglectedness | Very High | High | Fewer than 20 full-time researchers globally; MIRI discontinuation further reduces |
+| Current momentum | Declining | High | Primary organization pivoted away; limited successor efforts |
+| Theory-practice gap | Unknown | Low | Core question: will formalisms apply to neural networks? |
+
+### Evaluation by Worldview
+
+| Worldview | Assessment | Reasoning |
+|-----------|------------|-----------|
+| <EntityLink id="doomer">Doomer</EntityLink> | Mixed | May need foundations for robust alignment, but pessimistic about tractability |
+| <EntityLink id="long-timelines">Long timelines</EntityLink> | Positive | More time for theoretical progress to compound |
+| <EntityLink id="optimistic">Optimistic</EntityLink> | Low priority | Empirical methods likely sufficient |
+| <EntityLink id="governance-focused">Governance-focused</EntityLink> | Low priority | Policy interventions more tractable in relevant timeframes |
+
+---
+
+## Core Research Areas
+
+Agent foundations research spans several interconnected problem domains. The 2018 "<R id="bbc4bc9c2577c2d0">Embedded Agency</R>" framework by Abram Demski and Scott Garrabrant unified these into a coherent research agenda, identifying four core subproblems of embedded agency: decision theory, embedded world-models, robust delegation, and subsystem alignment.
+
+<Mermaid client:load chart={`
+flowchart TD
+    EA[Embedded Agency] --> DT[Decision Theory]
+    EA --> EW[Embedded World-Models]
+    EA --> RD[Robust Delegation]
+    EA --> SA[Subsystem Alignment]
+
+    DT --> FDT[Functional Decision Theory]
+    DT --> LU[Logical Uncertainty]
+    EW --> NF[Naturalized Reasoning]
+    RD --> CORR[Corrigibility]
+    RD --> VL[Value Learning]
+    SA --> INNER[Inner Alignment]
+    SA --> MESA[Mesa-Optimization]
+
+    style EA fill:#e1f5fe
+    style DT fill:#fff3e0
+    style EW fill:#fff3e0
+    style RD fill:#fff3e0
+    style SA fill:#fff3e0
+`} />
+
+### Research Progress by Area
+
+| Area | Core Question | Key Results | Status |
+|------|---------------|-------------|--------|
+| **Embedded agency** | How can an agent reason about itself within the world? | Demski & Garrabrant (2018) framework identifies four subproblems | Conceptual clarity achieved; formal solutions lacking |
+| **Decision theory** | How should AI make decisions under uncertainty? | FDT/UDT developed as alternatives to CDT/EDT; logical causality still undefined | Active research; practical relevance debated |
+| **Logical induction** | How to have calibrated beliefs about math? | Garrabrant et al. (2016) algorithm achieves key desiderata | Major success; integration with decision theory incomplete |
+| **Corrigibility** | Can we formally define "willing to be corrected"? | Soares et al. (2015) proved utility indifference approach has fundamental limits | Open problem; no complete solution |
+| **Value learning** | How to learn values from observations? | CIRL (Hadfield-Menell et al. 2016) formalizes cooperative learning | Theoretical framework exists; practical applicability unclear |
+
+### Embedded Agency: The Central Framework
+
+Traditional models of rational agents treat them as separate from their environment, able to model it completely and act on it from "outside." Real AI systems are embedded: they exist within the world they're modeling, are made of the same stuff as their environment, and cannot fully model themselves.
+
+The <R id="bbc4bc9c2577c2d0">embedded agency sequence</R> identifies four interconnected challenges:
+
+**Decision Theory**: How should an embedded agent make decisions when its decision procedure is part of the world being reasoned about? Standard decision theories assume the agent can consider counterfactual actions, but an embedded agent's reasoning is itself a physical process that affects outcomes.
+
+**Embedded World-Models**: How can an agent maintain beliefs about a world that contains the agent itself? Self-referential reasoning creates paradoxes similar to Godel's incompleteness theorems.
+
+**Robust Delegation**: How can an agent create successor agents that reliably pursue the original agent's goals? This connects to corrigibility and value learning.
+
+**Subsystem Alignment**: How can an agent ensure its internal optimization processes remain aligned with its overall goals? This prefigured the <EntityLink id="mesa-optimization">mesa-optimization</EntityLink> concerns that later became central to alignment discourse.
+
+### Logical Induction: A Landmark Result
+
+<R id="c03dfe0b505debd6">Logical induction</R> (Garrabrant et al., 2016) is widely considered agent foundations' most significant concrete achievement. The algorithm provides a computable method for assigning probabilities to mathematical statements, analogous to how Solomonoff induction handles empirical uncertainty.
+
+A logical inductor assigns probabilities to mathematical claims that:
+- **Converge to truth**: Probabilities approach 1 for true statements, 0 for false ones
+- **Outpace deduction**: Assigns high probability to provable claims before proofs are found
+- **Resist exploitation**: No computationally bounded trader can profit systematically
+
+This addresses a fundamental gap: Bayesian reasoning assumed logical omniscience, but real reasoners (including AI systems) must be uncertain about mathematical facts. Logical induction provides the first satisfactory theory for such uncertainty.
+
+However, integration with decision theory remains incomplete. As Wei Dai and others have noted, the framework doesn't yet combine smoothly with updateless decision theory, limiting its practical applicability.
+
+### Corrigibility: An Open Problem
+
+<R id="33c4da848ef72141">Corrigibility</R> (Soares et al., 2015) formalized the challenge of building AI systems that accept human correction. A corrigible agent should:
+- Not manipulate its operators
+- Preserve oversight mechanisms
+- Follow shutdown instructions
+- Ensure these properties transfer to successors
+
+The paper proved that naive approaches fail. "Utility indifference"—giving equal utility to shutdown and continued operation—creates perverse incentives: if shutdown utility is too high, agents may engineer their own shutdown; if too low, they resist it.
+
+No complete solution exists. Stuart Armstrong's work at the Future of Humanity Institute continued exploring corrigibility, but fundamental obstacles remain. The problem connects to <EntityLink id="instrumental-convergence">instrumental convergence</EntityLink>: almost any goal creates incentives to resist modification.
+
+### Decision Theory: FDT, UDT, and Open Questions
+
+Agent foundations researchers developed novel decision theories to address problems with standard frameworks:
+
+| Theory | Key Insight | Limitations |
+|--------|-------------|-------------|
+| **CDT** (Causal) | Choose action with best causal consequences | Fails on Newcomb-like problems |
+| **EDT** (Evidential) | Choose action with best correlated outcomes | Can recommend "managing the news" |
+| **FDT** (Functional) | Choose as if choosing the output of your decision algorithm | Requires undefined "logical causation" |
+| **UDT** (Updateless) | Pre-commit to policies before receiving observations | Doesn't integrate well with logical induction |
+
+Functional Decision Theory (Yudkowsky & Soares, 2017) and Updateless Decision Theory (Wei Dai, 2009) were designed to handle cases where the agent's decision procedure is predicted by other agents or affects multiple instances of itself. These theories outperform CDT and EDT in specific scenarios but require technical machinery—particularly "logical counterfactuals"—that remains undefined.
+
+The <R id="db5e810911f924b1">MIRI/Open Philanthropy exchange on decision theory</R> reveals ongoing disagreement about whether this research direction is productive or has generated more puzzles than solutions.
+
+---
+
+## The Core Debate: Agent Foundations vs. Empirical Safety
+
+The most consequential disagreement in AI safety research methodology concerns whether theoretical foundations are necessary for alignment or whether empirical investigation of neural networks is more productive.
+
+### The Case for Agent Foundations
+
+Proponents argue that alignment requires understanding agency at a fundamental level:
+
+**Theoretical prerequisites exist**: Just as designing safe bridges requires understanding materials science, designing aligned AI may require understanding what goals, agency, and alignment formally mean. Ad hoc solutions may fail unpredictably on more capable systems.
+
+**Current methods won't scale**: Techniques like RLHF work on current systems but may fail catastrophically on more capable ones. The <EntityLink id="sharp-left-turn">sharp left turn</EntityLink> hypothesis suggests capabilities may generalize while alignment doesn't—requiring foundational understanding of why.
+
+**Deceptive alignment is fundamental**: <EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink> and <EntityLink id="mesa-optimization">mesa-optimization</EntityLink> may require formal analysis rather than empirical debugging. These failure modes are precisely about systems that pass empirical tests while remaining misaligned.
+
+**Conceptual clarity enables coordination**: Even if formal solutions aren't achieved, precise problem definitions help researchers coordinate and avoid talking past each other.
+
+### The Case for Empirical Safety Research
+
+Critics, including many who previously supported agent foundations, argue the approach has failed:
+
+**Slow progress on key problems**: After 10+ years of work, corrigibility remains unsolved, decision theory has generated more puzzles than solutions, and logical induction doesn't integrate with the rest of the framework. MIRI's 2024 pivot implicitly acknowledges this.
+
+**Neural networks may not fit formalisms**: Agent foundations research makes few assumptions about "gears-level properties" of AI systems. But modern AI is increasingly certain to be neural networks. <R id="05bdadec7b6b3ee9">Mechanistic interpretability</R> and empirical safety research can assume neural network architectures and make faster progress.
+
+**The Science of Deep Learning argument**: Researchers like <EntityLink id="neel-nanda">Neel Nanda</EntityLink> argue that understanding how neural networks actually work (through mechanistic interpretability, scaling laws, etc.) is more tractable than developing abstract theories. Neural network properties may generalize even if specific alignment techniques don't.
+
+**Theory-practice gap is uncertain**: It's unknown whether theoretical results will apply to systems that emerge from gradient descent. The gap between "ideal agents" studied in agent foundations and actual neural networks may be unbridgeable.
+
+### Resolution Attempts
+
+| Position | Probability | Implications |
+|----------|-------------|--------------|
+| Agent foundations essential | 15-25% | Major research effort needed; current neglect is harmful |
+| Agent foundations helpful but not necessary | 30-40% | Worth some investment; complements empirical work |
+| Agent foundations irrelevant to actual AI | 25-35% | Resources better allocated to empirical safety |
+| Agent foundations actively harmful (delays practical work) | 5-15% | Should be deprioritized or defunded |
+
+---
+
+## Key Cruxes
+
+### Crux 1: Tractability
+
+| Evidence for tractability | Evidence against |
+|---------------------------|------------------|
+| Logical induction solved a decades-old problem | Core problems (corrigibility, decision theory) remain open after 10+ years |
+| Progress on conceptual clarity (embedded agency framework) | MIRI's 2024 pivot suggests insider pessimism |
+| Problems are well-defined and mathematically precise | Precision hasn't translated to solutions |
+| Small field—more researchers might help | Field has been trying to expand for years with limited success |
+
+**Current assessment**: Low tractability (60-75% confidence). The difficulty appears intrinsic rather than due to resource constraints.
+
+### Crux 2: Theory-Practice Transfer
+
+| Evidence for transfer | Evidence against |
+|-----------------------|------------------|
+| Mesa-optimization concepts from agent foundations now guide empirical research | Actual neural networks may not have the structure assumed by formalisms |
+| Conceptual frameworks help identify what to look for empirically | Gradient descent produces systems very different from idealized agents |
+| Mathematical guarantees could provide confidence | Assumptions required for guarantees may not hold in practice |
+
+**Current assessment**: Uncertain (low confidence). This is the crux where evidence is weakest.
+
+### Crux 3: Timeline Sensitivity
+
+| Short timelines (AGI by 2030) | Long timelines (AGI 2040+) |
+|-------------------------------|----------------------------|
+| Agent foundations unlikely to produce results in time | More time for theoretical progress to compound |
+| Must work with practical methods on current systems | Can develop foundations before crisis |
+| MIRI's stated reason for pivoting | Theoretical work becomes higher-value investment |
+
+**Current assessment**: Conditional value. Agent foundations' expected value is 3-5x higher under long timelines assumptions.
+
+---
+
+## Who Should Work on This?
+
+### Good Fit Indicators
+
+| Factor | Weight | Notes |
+|--------|--------|-------|
+| Strong math/philosophy background | High | Research requires formal methods, logic, decision theory |
+| Belief alignment is fundamentally hard | High | Must expect empirical methods to be insufficient |
+| Long timeline assumptions | Medium | Affects expected value of theoretical work |
+| Tolerance for slow, uncertain progress | High | Field has historically moved slowly |
+| Interest in problems for their own sake | Medium | May need intrinsic motivation given uncertain practical payoff |
+
+### Career Considerations
+
+**Advantages**: Very neglected (high marginal value if tractable); intellectually interesting problems; potential for high-impact breakthroughs if successful.
+
+**Disadvantages**: Low tractability; uncertain practical relevance; declining institutional support (MIRI pivot); difficult to evaluate progress.
+
+**Alternatives to consider**: <EntityLink id="interpretability">Mechanistic interpretability</EntityLink>, <EntityLink id="scalable-oversight">scalable oversight</EntityLink>, <EntityLink id="ai-control">AI control</EntityLink>, governance research.
+
+---
+
+## Sources and Further Reading
+
+### Primary Research
+
+- **Embedded Agency** (Demski & Garrabrant, 2018): <R id="bbc4bc9c2577c2d0">AI Alignment Forum sequence</R> presenting the unified framework
+- **Logical Induction** (Garrabrant et al., 2016): <R id="c03dfe0b505debd6">MIRI announcement</R>
+- **Corrigibility** (Soares et al., 2015): <R id="33c4da848ef72141">PDF</R>
+- **Functional Decision Theory** (Yudkowsky & Soares, 2017): <R id="170ed59807cc7b2f">MIRI announcement</R>
+- **Agent Foundations Technical Agenda** (Soares & Fallenstein, 2017): <R id="b781192f2704fdf4">PDF</R>
+
+### Strategic and Meta-Level
+
+- **MIRI 2024 Mission and Strategy Update**: <R id="435b669c11e07d8f">MIRI blog</R> explaining pivot away from agent foundations
+- **MIRI/Open Philanthropy Exchange on Decision Theory**: <R id="db5e810911f924b1">AI Alignment Forum</R>
+- **Science of Deep Learning vs. Agent Foundations**: <R id="d0d2b99c32eb6001">LessWrong post</R> arguing for empirical approaches
+
+### Value Learning and CIRL
+
+- **Cooperative Inverse Reinforcement Learning** (Hadfield-Menell et al., 2016): <R id="821f65afa4c681ca">arXiv</R> - Formalizes value learning as cooperative game
+- **Inverse Reinforcement Learning**: <R id="6ebbb63a5bb271f2">AI Alignment Forum wiki</R>
+
+### Related Concepts
+
+- <EntityLink id="interpretability">Mechanistic Interpretability</EntityLink> - Empirical alternative to theoretical foundations
+- <EntityLink id="mesa-optimization">Mesa-Optimization</EntityLink> - Risk identified through agent foundations research
+- <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> - Core problem agent foundations aims to address
+
+---
+
+## AI Transition Model Context
+
+Agent foundations research improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="misalignment-potential" />:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Provides theoretical foundations for robust alignment across capability levels |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Formal understanding may enable alignment techniques that scale with capabilities |
+
+Agent foundations work is most valuable under long timeline assumptions where theoretical progress can compound before transformative AI development.

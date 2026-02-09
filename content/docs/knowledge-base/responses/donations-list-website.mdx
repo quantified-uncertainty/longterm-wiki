@@ -1,0 +1,387 @@
+---
+title: Donations List Website
+description: A comprehensive database tracking approximately $72.8 billion in philanthropic donations from 1969-2023, created by Vipul Naik to provide transparency into funding flows across cause areas including global health, AI safety, and effective altruism.
+importance: 22.5
+lastEdited: "2026-02-03"
+sidebar:
+  order: 45
+ratings:
+  focus: 8.5
+  novelty: 2
+  rigor: 4.5
+  completeness: 7
+  concreteness: 6
+  actionability: 3
+quality: 52
+llmSummary: Comprehensive documentation of an open-source database tracking $72.8B in philanthropic donations (1969-2023) across 75+ donors, with particular coverage of EA/AI safety funding. The page thoroughly describes the tool's features, data coverage, and limitations, but is purely descriptive reference material about an infrastructure tool rather than actionable prioritization guidance.
+metrics:
+  wordCount: 3439
+  citations: 6
+  tables: 2
+  diagrams: 0
+subcategory: epistemic-tools-tools
+---
+import {EntityLink, Backlinks, KeyPeople, KeyQuestions, Section} from '@components/wiki';
+
+## Quick Assessment
+
+| Aspect | Assessment |
+|--------|------------|
+| **Type** | Open-source philanthropic data repository and web portal |
+| **Primary Function** | Tracks and visualizes donation data across donors, donees, cause areas, and time periods |
+| **Scale** | ≈\$72.8 billion in donations tracked (1969-2023) |
+| **Coverage** | 75+ donors and recipients; includes major foundations and individual donors |
+| **Key Cause Areas** | Global health (\$23.3B), agriculture (\$3.9B), education (\$1.8B), AI safety, effective altruism |
+| **Creator** | <EntityLink id="vipul-naik">Vipul Naik</EntityLink>, with significant contributions from <EntityLink id="issa-rice">Issa Rice</EntityLink> |
+| **Data Availability** | Fully open-source on GitHub; publicly accessible web interface |
+| **Primary Users** | EA/AI safety researchers, philanthropic analysts, donation transparency advocates |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [donations.vipulnaik.com](https://donations.vipulnaik.com) |
+| GitHub Repository | [github.com/vipulnaik/donations](https://github.com/vipulnaik/donations) |
+| EA Forum Tutorial | [EA Forum post](https://forum.effectivealtruism.org/posts/A7NWTjnWZPmjyLdtT/donations-list-website-tutorial-and-request-for-feedback) |
+
+## Overview
+
+The Donations List Website (DLW) is an open-source database and web portal that aggregates publicly announced philanthropic donations of interest to creator Vipul Naik. The platform tracks approximately \$72.8 billion in donations spanning from 1969 to 2023, covering 75+ donors and recipients across multiple cause areas.[^1] All underlying data and code are publicly available on GitHub, making it one of the most transparent resources for tracking philanthropic funding flows.[^2]
+
+The project emerged from a need for better transparency in philanthropic giving, particularly within the effective altruism community. By consolidating donation data from public announcements, annual reports, and other disclosed sources, DLW enables researchers to analyze funding trends, identify gaps in charitable giving, and track the influence of major grantmakers. The platform is especially valuable for those researching funding in global health, AI safety, and other EA-relevant cause areas.[^1][^3]
+
+DLW distinguishes itself through its comprehensive tracking of not just donation amounts, but also relationships between donors and donees, disclosure timelines, and "money moved" claims by influencers like GiveWell. The site allows users to view donations filtered by cause area, time period, donor type, and geography, providing multiple analytical perspectives on philanthropic activity.[^1]
+
+## History and Development
+
+### Origins and Initial Development
+
+Vipul Naik created the Donations List Website to track donations that were publicly announced or shared with permission. The initial data collection was seeded by Issa Rice, who continues to make substantial contributions to the project through contracted work.[^2] According to the project documentation, all financially compensated contributions to the site are tracked on a dedicated contract work page, though ultimate responsibility for errors and inaccuracies remains with Naik.[^2]
+
+The project launched with preliminary data that has undergone continuous vetting and normalization. As of the project's documentation, developers expected to complete the first round of development by the end of July 2026, indicating ongoing refinement of data quality and platform features.[^2]
+
+### Technical Infrastructure
+
+DLW is built as a MySQL database with a PHP-based web interface. The open-source nature of the project means anyone can clone the repository, set up a local instance, and explore or modify the data.[^2] The platform includes several technical features:
+
+- **Database structure** with tables for donors, donees, donations, disclosures, influencers, and cause areas
+- **Similarity calculations** that help identify related entities and potential duplicates
+- **Sortable tables** using external JavaScript libraries
+- **Multiple view modes** including individual-scale donations, full dataset views, and curated top-30 lists[^2]
+
+The repository structure includes SQL schemas, Python scripts for data processing, similarity detection algorithms, and documentation for data updates. This technical openness has made DLW valuable not just as a data source, but as a template for other philanthropic transparency projects.[^2]
+
+### Community Reception
+
+Within the effective altruism community, DLW has been recognized as a valuable tool for funding transparency. An EA Forum tutorial post introducing the site praised its utility for "tracing funding origins transparently, especially outside EA circles."[^3] Community members have requested additional features, including:
+
+- More comprehensive foundation data beyond the currently tracked entities
+- Aggregation of EA Forum and <EntityLink id="lesswrong">LessWrong</EntityLink> discussions about specific donations
+- Links between donation records and community commentary[^3]
+
+Users particularly value the site's ability to track individual donations that aren't easily found elsewhere, providing visibility into funding patterns that might otherwise remain opaque.[^3]
+
+## Major Data Coverage
+
+### Tracked Donors and Foundations
+
+DLW tracks over 75 donors, ranging from major private foundations to individual philanthropists. Key tracked entities include:[^1][^3]
+
+- **Bill & Melinda Gates Foundation** - One of the largest tracked donors, with extensive global health and agriculture funding
+- **Wellcome Trust** - Major biomedical research funder
+- **W.K. Kellogg Foundation** - Focus on education and health equity
+- **Arnold Foundation** (now Arnold Ventures) - Criminal justice, education, and health policy
+- **Hewlett Foundation** - Environment, education, and performing arts
+- **Good Ventures/<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>** - EA-aligned funding across multiple cause areas
+- **Ford Foundation** - Social justice and human rights
+- Individual donors including Vitalik Buterin and anonymous contributors tracked under pseudonyms like "gwern"[^3]
+
+The platform distinguishes between donations made by private foundations and those made by individuals, allowing analysis of individual-scale philanthropy separately from institutional grantmaking.[^1]
+
+### Cause Area Distribution
+
+The largest cause area tracked by DLW is global health, representing \$23.3 billion across the dataset's timespan. This reflects the substantial funding directed toward infectious disease prevention, maternal and child health, and health systems strengthening by major foundations.[^1]
+
+Other significant cause areas include:
+
+- **Agriculture** - \$3.9 billion, primarily focused on food security and agricultural development
+- **Education** - \$1.8 billion across various educational levels and geographies
+- **Higher Education and Humanities Scholarship** - \$2.8 billion, often focused on building institutional capacity
+- **Family Planning** - \$1.4 billion in reproductive health and contraceptive access
+- **Nutrition** - \$1.2 billion in programs addressing malnutrition and food fortification
+- **Environmentalism** - \$1.4 billion in conservation and climate initiatives
+- **Population** - \$1.7 billion, often overlapping with family planning efforts[^1]
+
+Notably, the database includes a "FIXME" category representing \$20.8 billion in donations where cause area classification is incomplete or ambiguous, indicating areas for future data refinement.[^1]
+
+### EA and AI Safety Funding
+
+While not broken out as a separate top-level category in the main aggregation, DLW tracks donations relevant to effective altruism and AI safety, including:
+
+- <EntityLink id="open-philanthropy">Open Philanthropy Project</EntityLink> grants, which include substantial AI safety funding[^3]
+- Donations to organizations like the <EntityLink id="miri">Machine Intelligence Research Institute</EntityLink> (MIRI)[^2]
+- Funding to Lightcone Infrastructure (formerly LessWrong 2.0)[^2]
+- Grants to the Berkeley Existential Risk Initiative (BERI), tracked both as donor and donee[^2]
+
+This coverage makes DLW particularly valuable for researchers analyzing the growth and evolution of AI safety funding over time, especially when combined with complementary resources like the EA Forum's historical funding datasets.[^3]
+
+## Platform Features and Functionality
+
+### Page Types and Navigation
+
+DLW organizes information across several specialized page types, each offering different analytical perspectives:[^2]
+
+**Main Page** - Displays aggregated donation data with three view modes:
+- Default view showing top 30 donors, donees, and cause areas
+- Individual-scale view excluding foundation grants
+- Full view showing all tracked donations
+
+**Donor Pages** - Dedicated pages for each tracked donor showing their giving history, relationships with donees, and funding patterns over time. For example, the Open Philanthropy Project page includes a comprehensive table of historical disclosures from before the organization stopped announcing them publicly.[^2]
+
+**Donee Pages** - Pages for each recipient organization showing funding received, donor relationships, and related documentation. Some entities like BERI have both donor and donee pages when they both give and receive grants.[^2]
+
+**Donor-Donee Pages** - Specialized pages examining specific donor-donee pairs, showing all donations between them, their relationship evolution, and documents mentioning both entities. An example is the page tracking Open Philanthropy donations to MIRI.[^2]
+
+**Influencer Pages** - Track "money moved" by recommending organizations like GiveWell, comparing claimed money moved against documented donations. This allows verification of money moved claims by cross-referencing actual donor behavior.[^2]
+
+### Data Verification and Quality
+
+The platform explicitly notes that data is "preliminary and has not been completely vetted and normalized," recommending that anyone sharing links include caveats about preliminary status or check with Vipul Naik before sharing without caveats.[^2] This transparency about data limitations reflects a commitment to accuracy over premature claims of comprehensiveness.
+
+The project includes several data quality mechanisms:
+
+- **Similarity detection** algorithms that identify potential duplicate entities or donations
+- **Manual review** processes documented in a data update playbook
+- **Community feedback** solicited through EA Forum posts and GitHub issues
+- **Version control** through Git, allowing tracking of all data changes over time[^2]
+
+Files like `gates-foundation-maps.txt` and `google-org-discrepancies-to-resolve.txt` in the repository indicate ongoing efforts to reconcile inconsistencies and normalize entity names across different data sources.[^2]
+
+### Technical Access and Usage
+
+For researchers comfortable with SQL and data analysis, DLW offers multiple access methods:
+
+- **Web interface** for browsing and basic filtering
+- **GitHub repository** containing raw SQL files that can be imported into a local MySQL database
+- **API capabilities** through the PHP backend (though documentation is limited)
+- **Downloadable datasets** implicit in the open-source repository structure[^2]
+
+The technical setup documentation shows that users can clone the repository, initialize a local database, and run the site on localhost for custom analysis or modifications.[^2] This openness enables sophisticated users to perform analyses not supported by the web interface, such as complex multi-table joins or custom cause area classifications.
+
+## Research Applications
+
+### EA Community Usage
+
+Within the effective altruism community, DLW serves multiple research functions. EA Forum discussions highlight its value for:[^3]
+
+**Funding Landscape Analysis** - Understanding which cause areas are well-funded versus neglected. By comparing DLW data with EA-specific funding datasets like the EA Forum's historical funding spreadsheet, researchers can identify gaps where additional resources might have high impact.[^3]
+
+**Donor Behavior Tracking** - Following how individual donors and foundations evolve their giving over time. This helps identify emerging trends, such as increased attention to AI safety or shifts in global health priorities.[^3]
+
+**Transparency and Accountability** - Providing public records of funding decisions that might otherwise be difficult to access. Community members specifically praised DLW for making "funding origins transparent" in ways that complement but extend beyond EA-specific resources.[^3]
+
+**Money Moved Verification** - The influencer pages, particularly for GiveWell, allow independent verification of claimed impact. Researchers can compare what GiveWell reports as money moved with actual documented donations from individuals and foundations to recommended charities.[^2][^3]
+
+### Complementary Resources
+
+EA Forum discussions indicate that DLW is often used alongside other funding information sources:[^3]
+
+- **EA Forum historical funding datasets** - Provide more granular detail on EA-specific organizations
+- **Open Philanthropy's grants database** - Though this may miss approximately 50% of recent Global Catastrophic Risk spending[^3]
+- **Foundation Directory and Candid Learning** - For broader foundation research beyond DLW's tracked entities[^3]
+- **Founders Pledge and Farmkind grant data** - Community members have requested these be incorporated into consolidated analyses[^3]
+
+The integration of DLW data with these complementary sources enables more comprehensive funding landscape assessments than any single resource alone.
+
+### Limitations for Research
+
+Despite its value, DLW has acknowledged limitations for research applications:
+
+**Coverage Boundaries** - The dataset tracks donations "of interest to Vipul Naik," meaning coverage is intentionally selective rather than comprehensive.[^2] Researchers cannot assume absence of data indicates absence of donations.
+
+**Preliminary Status** - The ongoing data vetting means some information may be incorrect or incomplete. The project's own documentation recommends including caveats when citing data.[^2]
+
+**Time Lag** - As with most philanthropic databases, there is typically a delay between when donations occur and when they are publicly disclosed and added to the database.[^2]
+
+**Disclosure Dependency** - DLW can only track donations that have been publicly announced or shared with permission, missing private grants without disclosure.[^2]
+
+## AI Safety Funding Context
+
+For AI safety researchers specifically, DLW provides valuable historical context on funding evolution in the field. The platform tracks donations to key AI safety organizations and can help answer questions about funding centralization and diversification.
+
+### Major AI Safety Funders Tracked
+
+While comprehensive AI safety funding data would require integration with specialized resources like <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>'s grants database and the Long-Term Future Fund, DLW captures major contributions from:[^2][^3]
+
+- Good Ventures/Open Philanthropy donations to AI safety organizations
+- Individual philanthropists funding AI safety research
+- Foundation grants to organizations working on AI governance and policy
+
+The donor-donee pages for AI safety organizations show funding relationships and how they've evolved over time, which is valuable for understanding field development and potential funding concentration risks.[^2]
+
+### Integration with EA Funding Analysis
+
+A 2025 EA Forum post on historical EA funding data noted that Open Philanthropy's grants database may miss approximately 50% of 2025 Global Catastrophic Risk (GCR) spending.[^3] This highlights the value of resources like DLW that aggregate data from multiple disclosure sources rather than relying on a single funder's reporting.
+
+Community members have called for better integration of funding data sources, including incorporating DLW information into consolidated analyses of AI safety funding landscapes.[^3] Such integration could help identify:
+
+- **Funding concentration** - Whether AI safety funding is overly dependent on a small number of sources
+- **Geographic patterns** - Where AI safety funding flows globally
+- **Institutional types** - Whether funding favors academic institutions, nonprofits, or other organizational forms
+- **Trend analysis** - How AI safety funding has grown (or not) over time relative to other cause areas
+
+## Criticisms and Limitations
+
+### Methodological Concerns
+
+The preliminary nature of DLW data raises methodological concerns for researchers who might use it for quantitative analysis. According to the project's own documentation, data has "not been completely vetted and normalized," and users are advised to include caveats when sharing findings based on the data.[^2]
+
+Specific methodological limitations include:
+
+**Selection Bias** - Tracking donations "of interest to Vipul Naik" means the dataset reflects one individual's priorities rather than systematic sampling. This likely results in better coverage of EA-relevant donations than of philanthropic activity generally.[^2]
+
+**Classification Challenges** - The \$20.8 billion in the "FIXME" cause area category demonstrates significant challenges in consistently classifying donations, particularly for foundations with diverse portfolios.[^1] Without standardized classification, cross-cause-area comparisons may be misleading.
+
+**Incomplete Time Series** - Not all tracked donors have complete historical data, making trend analysis difficult for some entities. The dataset's strength is in recent years (2010s-2020s) with sparser coverage in earlier periods.[^1]
+
+**Attribution Ambiguity** - For donations influenced by multiple actors (e.g., a GiveWell recommendation plus independent due diligence), attribution in the influencer tracking may be imperfect.[^2]
+
+### Data Quality Issues
+
+The GitHub repository includes files like `google-org-discrepancies-to-resolve.txt` that document known data quality issues.[^2] While this transparency is commendable, it indicates ongoing challenges in data accuracy. Common data quality concerns in philanthropic databases include:
+
+- **Entity name variations** - The same organization may be listed under multiple names
+- **Missing donation details** - Purpose, restrictions, and payment schedules often unavailable
+- **Delayed disclosure** - Time lag between donation and public announcement
+- **Incomplete foundation coverage** - Community members have noted that more foundations could be added[^3]
+
+### Comparison with Professional Databases
+
+DLW is maintained by individuals rather than a professional organization with dedicated data staff. While this enables rapid iteration and community responsiveness, it contrasts with professionally maintained resources like Candid's Foundation Directory, which has:[^1]
+
+- Dedicated data validation teams
+- Standardized classification taxonomies
+- Systematic coverage goals
+- Regular update schedules
+
+However, professional databases typically have paywalls or access restrictions, whereas DLW's full openness enables types of analysis and sharing not possible with proprietary data.[^2]
+
+## Counterarguments and Strengths
+
+### Transparency and Openness
+
+Despite limitations, DLW offers significant advantages through its radical transparency. Every data point is traceable to source documents, every change is tracked in Git history, and the entire database can be downloaded and analyzed independently.[^2] This level of openness is rare in philanthropic data and enables:
+
+**Independent verification** - Researchers can check DLW's data against original sources
+**Custom analysis** - Technical users can query the database in ways not supported by the web interface
+**Derivative works** - Others can build on DLW's data collection without starting from scratch
+**Educational value** - Students and researchers can examine the data structure and methodology[^2]
+
+### Community Responsiveness
+
+Unlike static databases, DLW actively solicits community feedback and incorporates suggestions. The EA Forum tutorial post explicitly requested feedback on priorities for expansion, and community members have provided specific suggestions that have informed development priorities.[^3]
+
+This responsiveness makes DLW more aligned with actual user needs than databases designed without community input. The project's acknowledgment of contributions from Issa Rice and documentation of contracted work demonstrates a collaborative development model.[^2]
+
+### Niche Coverage
+
+For certain donors and cause areas, DLW may have better coverage than larger databases. The platform's EA community origins mean that donations relevant to longtermism, AI safety, and EA-aligned causes likely receive more attention than in general-purpose philanthropic databases.[^3]
+
+Individual donors like Vitalik Buterin who make donations of interest to the EA community are tracked in detail, whereas they might be below the threshold for inclusion in databases focused on major foundations.[^3]
+
+## Practical Usage Guidance
+
+### For Researchers
+
+Researchers using DLW should:
+
+**Understand selection effects** - Recognize that coverage reflects curator interests rather than random sampling
+**Cross-reference data** - Verify important figures against original sources or other databases
+**Include appropriate caveats** - Note preliminary status when citing specific figures
+**Check update recency** - Confirm when data was last updated for relevant entities
+**Contact maintainers** - Reach out to Vipul Naik for questions about specific data points[^2]
+
+The platform is most appropriate for exploratory analysis, identifying funding patterns, and generating hypotheses rather than as the sole source for definitive quantitative conclusions.
+
+### For Donors and Fundraisers
+
+Prospective donors can use DLW to:
+
+**Research funding gaps** - Identify cause areas or organizations that may be underfunded
+**Understand donor motivations** - See what entities with similar values are funding
+**Track funding trends** - Identify emerging areas attracting increased attention
+**Verify money moved claims** - Check whether recommenders' claimed influence matches documented behavior[^2][^3]
+
+Fundraisers might use the platform to identify foundations whose giving patterns align with their organization's mission, though they should recognize that absence from the database doesn't indicate lack of interest in a cause area.
+
+### For the Broader Public
+
+DLW serves a broader public transparency function by making philanthropic giving more visible. While most people won't engage with the technical database, journalists, activists, and informed citizens can use the platform to:
+
+**Hold foundations accountable** - Track whether giving aligns with stated priorities
+**Understand philanthropic influence** - See which causes attract major funding
+**Identify funding sources** - Learn who supports particular organizations or movements[^2]
+
+This transparency function is valuable for democratic accountability even if most users never directly access the database.
+
+## Future Directions
+
+### Planned Improvements
+
+The project documentation indicates ongoing development with completion of a first round expected by July 2026.[^2] Community suggestions for improvements include:[^3]
+
+**Expanded foundation coverage** - Adding more foundations beyond currently tracked entities
+**Discussion integration** - Linking to EA Forum and LessWrong discussions about specific donations
+**Improved cause area classification** - Resolving the \$20.8 billion in "FIXME" classifications
+**Enhanced verification** - Better documentation of data sources and verification processes
+
+### Potential Collaborations
+
+DLW could be enhanced through collaboration with:
+
+**Open Philanthropy** - Direct data sharing could improve accuracy of OP grant records
+**GiveWell** - Enhanced integration of money moved tracking with donor verification
+**EA organizations** - Coordinated efforts to ensure EA-relevant funding is comprehensively tracked
+**Academic researchers** - Partnerships that could improve methodology and expand coverage[^3]
+
+### Technical Enhancements
+
+Potential technical improvements include:
+
+**API development** - Formal API documentation would enable programmatic access
+**Data exports** - Standardized export formats (CSV, JSON) for easier analysis
+**Visualization tools** - Interactive charts and graphs beyond tabular display
+**Search improvements** - Enhanced search functionality across the full database
+**Mobile optimization** - Better mobile experience for casual browsing[^2]
+
+## Key Uncertainties
+
+Several important questions remain about DLW and its role in the philanthropic data ecosystem:
+
+**Sustainability** - Will the project continue to receive maintenance and updates long-term, or is it dependent on Vipul Naik's continued interest?
+
+**Comprehensiveness claims** - To what extent does the ≈\$72.8 billion tracked represent comprehensive coverage of tracked entities versus partial sampling?
+
+**Data accuracy** - How should researchers weight the "preliminary" data designation when making decisions based on DLW information?
+
+**Competitive landscape** - Will professional organizations develop similar open databases that supersede DLW, or does its community-driven model offer unique advantages?
+
+**Scope evolution** - Will DLW expand to cover more donors and cause areas, or maintain its current EA-aligned focus?
+
+**Integration potential** - Can DLW's data be effectively integrated with other funding databases to create more comprehensive pictures of philanthropic activity?
+
+## Conclusion
+
+The Donations List Website represents a significant contribution to philanthropic transparency, particularly for the effective altruism and AI safety communities. By tracking approximately \$72.8 billion in donations across 75+ donors and recipients from 1969 to 2023, the platform provides visibility into funding flows that might otherwise remain opaque.
+
+While the data's preliminary status and selective coverage require careful interpretation, DLW's radical openness—with all data and code available on GitHub—enables types of analysis and verification not possible with proprietary databases. For researchers studying AI safety funding, EA-aligned philanthropy, or charitable giving more broadly, DLW serves as a valuable complement to other resources.
+
+The platform's community-driven development model, documented limitations, and active solicitation of feedback demonstrate a commitment to continuous improvement. As the project continues toward its first major release milestone in mid-2026, it stands as an important example of how transparent data infrastructure can support better-informed decisions in high-stakes domains like AI safety and global health.
+
+## Sources
+
+[^1]: [Donations List Website - Main Page](https://donations.vipulnaik.com)
+[^2]: [GitHub - vipulnaik/donations](https://github.com/vipulnaik/donations)
+[^3]: [Donations List Website Tutorial and Request for Feedback - EA Forum](https://forum.effectivealtruism.org/posts/A7NWTjnWZPmjyLdtT/donations-list-website-tutorial-and-request-for-feedback)
+
+<Backlinks />

@@ -1,0 +1,264 @@
+---
+title: Stampy / AISafety.info
+description: A collaborative AI safety Q&A wiki and chatbot maintained by a global volunteer team, featuring 280+ human-written answers plus an LLM-powered chatbot that searches 10K-100K documents from the Alignment Research Dataset. Founded by Rob Miles, includes a Discord bot with YouTube integration and PageRank-style karma voting. Operates as a 501(c)(3) nonprofit.
+sidebar:
+  order: 6
+quality: 45
+llmSummary: AISafety.info is a volunteer-maintained wiki with 280+ answers on AI existential risk, complemented by Stampy, an LLM chatbot searching 10K-100K alignment documents via RAG. Features include a Discord bot bridging YouTube comments, PageRank-style karma voting for answer quality control, and the Distillation Fellowship program for content creation. Founded by Rob Miles as a 501(c)(3) nonprofit.
+lastEdited: "2026-02-02"
+importance: 50
+ratings:
+  novelty: 5
+  rigor: 5
+  actionability: 4
+  completeness: 6
+metrics:
+  wordCount: 1400
+  citations: 0
+  tables: 12
+  diagrams: 0
+clusters:
+  - epistemics
+  - community
+  - ai-safety
+subcategory: epistemic-tools-tools
+---
+import {DataInfoBox, Backlinks, EntityLink} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Content Coverage** | Substantial | 280+ live answers, hundreds of drafts |
+| **Data Sources** | Comprehensive | 10K-100K documents from alignment literature |
+| **Accessibility** | High | Free web interface, Discord bot, chatbot |
+| **Community Integration** | Strong | YouTube bridging, karma voting, write-a-thons |
+| **Open Source** | Yes | 10 public GitHub repositories |
+| **Maintenance** | Active | Global volunteer team + paid editor fellowships |
+
+## Project Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Name** | AISafety.info (also known as Stampy) |
+| **Organization** | Ashgro Inc (501(c)(3) nonprofit) |
+| **Founder** | Rob Miles |
+| **Website** | [aisafety.info](https://aisafety.info/) |
+| **GitHub** | [github.com/StampyAI](https://github.com/StampyAI) (10 repositories) |
+| **Dataset** | [HuggingFace: alignment-research-dataset](https://huggingface.co/datasets/StampyAI/alignment-research-dataset) |
+| **Discord** | Rob Miles AI Discord (active community) |
+| **License** | MIT (open source) |
+
+## Overview
+
+[AISafety.info](https://aisafety.info/) is a collaborative Q&A wiki focused on existential risk from artificial intelligence, founded by AI safety educator Rob Miles. The project combines human-written educational content with an LLM-powered chatbot, a Discord bot bridging YouTube and Discord communities, and structured programs for content creation.
+
+The site's core thesis is that "smarter-than-human AI may come soon" and "it could lead to human extinction." Rather than simply asserting these claims, the wiki provides structured explanations, addresses common objections, and offers pathways for further engagement.
+
+### Key Components
+
+| Component | Purpose | Technology |
+|-----------|---------|------------|
+| **Q&A Wiki** | Human-written answers to AI safety questions | Web frontend (Remix/Cloudflare) |
+| **Stampy Chatbot** | LLM-powered answers with citations | RAG pipeline + GPT models |
+| **Discord Bot** | YouTube integration, community moderation | Python, modular architecture |
+| **Alignment Research Dataset** | Curated corpus for chatbot | HuggingFace, 10K-100K documents |
+
+## Content & Statistics
+
+### Wiki Content
+
+| Metric | Value |
+|--------|-------|
+| **Live Answers** | 280+ |
+| **Draft Answers** | Hundreds in development |
+| **Content Updates** | Ongoing community contributions |
+| **Feedback System** | Google Docs integration for comments |
+
+### Alignment Research Dataset
+
+The chatbot draws from a curated corpus hosted on HuggingFace:
+
+| Metric | Value |
+|--------|-------|
+| **Document Count** | 10,000 - 100,000 |
+| **Monthly Downloads** | ≈1,600 |
+| **License** | MIT |
+| **Language** | English |
+
+**Sources include:**
+- Academic: arXiv papers, Arbital
+- Forums: Alignment Forum, <EntityLink id="lesswrong">LessWrong</EntityLink>, EA Forum
+- Organizational blogs: <EntityLink id="miri">MIRI</EntityLink>, DeepMind, <EntityLink id="openai">OpenAI</EntityLink>
+- Individual blogs: <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, <EntityLink id="gwern">Gwern Branwen</EntityLink>
+- Educational: AGI Safety Fundamentals course
+- Video: YouTube playlists on AI safety
+
+## Technical Architecture
+
+### Stampy Chatbot (RAG Pipeline)
+
+The chatbot uses Retrieval-Augmented Generation (RAG) with a three-step process:
+
+1. **Retrieval**: Search the alignment-research-dataset for semantically similar chunks using vector embeddings
+2. **Context Assembly**: Feed relevant text snippets into an LLM's context window
+3. **Generation**: Produce a summary with citations to source documents
+
+**Dual Response Strategy**: Stampy prioritizes human-written answers from the wiki when available, falling back to AI-generated responses for novel questions. This reduces hallucination risk for common questions while maintaining coverage for the "long tail."
+
+**Acknowledged Limitations**: The documentation explicitly warns that "like all LLM-based chatbots, it will sometimes hallucinate." Source citations allow users to verify accuracy.
+
+### Discord Bot Architecture
+
+The Discord bot ([StampyAI/stampy](https://github.com/StampyAI/stampy)) has evolved significantly from its original purpose:
+
+**Module System**: Rob Miles implemented a "bidding" architecture where different modules compete to handle messages, minimizing computation by only activating relevant handlers.
+
+**Key Modules**:
+- Question management (Questions, QuestionSetter)
+- Factoid database
+- Wolfram Alpha integration
+- LLM response generation (GPT-4 whitelist available)
+- Alignment Forum search
+
+### YouTube-Discord Bridge
+
+A distinctive feature is bidirectional integration with Rob Miles' YouTube channel:
+
+1. **YouTube → Discord**: Interesting comments from YouTube videos are posted to Discord, sparking community discussions
+2. **Discord → YouTube**: Quality responses can be posted back as official YouTube replies
+
+**Quality Control via Stamps**: The system uses a "stamp" emoji reaction for karma voting. When responses receive enough stamps, they can be posted to YouTube. Critically, **stamp value varies by user reputation** using a PageRank-style algorithm—users with more stamps have more voting power.
+
+| Feature | Description |
+|---------|-------------|
+| **Stamp Reactions** | Karma voting for response quality |
+| **PageRank Weighting** | Vote weight proportional to voter's reputation |
+| **Threshold Posting** | Responses posted to YouTube when stamp threshold met |
+| **Bot Identity** | Prevents random users from posting as official channel |
+
+## Repository Ecosystem
+
+Stampy maintains 10 public repositories:
+
+| Repository | Stars | Purpose |
+|------------|-------|---------|
+| **stampy-ui** | 41 | Web frontend (TypeScript) |
+| **stampy** | 40 | Discord bot (Python) |
+| **stampy-chat** | 15 | Conversational chatbot (TypeScript) |
+| **alignment-research-dataset** | 13 | Data scraping pipeline (Python) |
+| **stampede** | - | Elixir chatbot framework (alpha) |
+| **stampy-nlp** | - | NLP microservices (Python) |
+| **stampy-extension** | - | Browser extension |
+| **GDocsRelatedThings** | - | Google Docs integration |
+| **AISafety.com** | 1 | Issue tracker (54 open issues) |
+| **StampyAIAssets** | - | Logos and branding |
+
+## Team & Community Programs
+
+### Team Structure
+
+| Role | Description |
+|------|-------------|
+| **Founder** | Rob Miles (YouTube creator, AI safety educator) |
+| **Editors** | Paid staff from Distillation Fellowship programs |
+| **Developers** | Volunteer contributors |
+| **Community** | Discord members, write-a-thon participants |
+
+### Distillation Fellowship
+
+A structured 3-month paid program for content creation:
+
+- **Completed**: Two fellowship cohorts
+- **Purpose**: Train editors to distill complex AI safety content into accessible answers
+- **Output**: Significant portion of the 280+ live answers
+- **Future**: Additional cohorts planned pending funding
+
+### Write-a-thons
+
+Community events for collaborative content creation:
+
+- **Format**: Multi-day focused writing sprints
+- **Example**: October 6-9 write-a-thon (third event)
+- **Output**: Batch content creation and answer improvement
+
+## Use Cases
+
+### For Newcomers
+
+AISafety.info serves as an accessible entry point for people encountering AI risk arguments for the first time:
+
+- Start with basic questions and progress to advanced topics
+- Find responses to specific objections
+- Understand reasoning behind AI safety concerns
+- Access cited sources for deeper reading
+
+### For Content Creators
+
+The platform supports AI safety communication:
+
+- Reference answers when addressing common questions
+- Link skeptics to well-structured objection responses
+- Consistent explanations across audiences
+- Google Docs integration for collaborative editing
+
+### For Researchers
+
+While primarily aimed at broader audiences:
+
+- Entry points into technical literature via dataset
+- Career guidance for field entry
+- Community connections via Discord
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Accessible explanations** | Content written for general audiences |
+| **Quality control** | PageRank-style voting prevents low-quality YouTube responses |
+| **Community integration** | YouTube bridging creates feedback loop |
+| **Structured programs** | Distillation Fellowship produces consistent content |
+| **Comprehensive dataset** | 10K-100K documents from major alignment sources |
+| **Open source** | All code publicly available, MIT licensed |
+
+### Limitations
+
+| Limitation | Impact |
+|------------|--------|
+| **Chatbot accuracy** | LLM hallucination risk; users must verify sources |
+| **Volunteer capacity** | Development and content dependent on contributor availability |
+| **Opinionated framing** | Presents AI risk case rather than neutral overview |
+| **Dataset maintenance** | Ongoing work to clean and update sources |
+| **Single community perspective** | Primarily reflects EA/rationalist community views |
+
+## Funding & Sustainability
+
+### Current Model
+
+| Source | Type |
+|--------|------|
+| **Individual Donations** | Via website and Every.org |
+| **EA Community** | Grants and donations |
+| **<EntityLink id="manifund">Manifund</EntityLink>** | Project funding platform |
+| **Volunteer Labor** | Primary development resource |
+
+### Resource Needs
+
+- **Distillation Fellowship funding** for continued content creation
+- **Developer time** for frontend redesign and chatbot improvements
+- **Dataset curation** for ongoing maintenance
+
+## External Links
+
+- [AISafety.info](https://aisafety.info/)
+- [Stampy GitHub Organization](https://github.com/StampyAI)
+- [Alignment Research Dataset (HuggingFace)](https://huggingface.co/datasets/StampyAI/alignment-research-dataset)
+- [Rob Miles YouTube](https://www.youtube.com/c/RobertMilesAI)
+- [EA Forum Soft Launch Announcement](https://forum.effectivealtruism.org/posts/mHNoaNvpEuzzBEEfg/stampy-s-ai-safety-info-soft-launch)
+- [LessWrong Announcement](https://www.lesswrong.com/posts/obMiQv9K76nRZj9tE/stampy-s-ai-safety-info-soft-launch)
+- [Every.org Donation Page](https://www.every.org/aisafetyinfo)
+- [How Stampy Chatbot Works](https://aisafety.info/questions/NM1R/How-does-the-Stampy-chatbot-work)
+
+<Backlinks />

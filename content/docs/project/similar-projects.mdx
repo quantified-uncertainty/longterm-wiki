@@ -1,0 +1,447 @@
+---
+title: "Similar Projects to LongtermWiki: Research Report"
+description: "Analysis of 12+ AI safety knowledge bases, wikis, and prioritization tools. Key finding: projects succeed through narrow focus and clear ownership, fail through scope creep and volunteer dependency."
+topic: "longtermwiki-strategy"
+createdAt: 2025-01-13
+lastUpdated: 2025-01-13
+researchDepth: "standard"
+sources:
+  - "web"
+  - "codebase"
+pageType: "documentation"
+sidebar:
+  order: 3
+importance: 15
+quality: 64
+llmSummary: "Analysis of 12+ AI safety knowledge projects finds successful ones have narrow focus, paid contributors, and single editorial ownership (e.g., Stampy's $2,500/mo fellowship, EA Forum Wiki grant), while failures stemmed from scope creep and volunteer dependency (Arbital discontinued 2017). Key recommendation: start with 10-20 deep pages, appoint single owner, budget for paid content creation rather than relying on volunteers."
+ratings:
+  focus: 8.5
+  novelty: 4
+  rigor: 6.5
+  completeness: 7.5
+  concreteness: 7
+  actionability: 6
+metrics:
+  wordCount: 1490
+  citations: 26
+  tables: 17
+  diagrams: 0
+---
+import { Aside } from '@astrojs/starlight/components';
+
+## Executive Summary
+
+| Finding | Key Data | Implication for LongtermWiki |
+|---------|----------|----------------------|
+| **Arbital failed despite innovation** | Discontinued 2017, content migrated to LessWrong | Novel features alone don't ensure adoption |
+| **Stampy succeeds with narrow focus** | FAQ format, semantic search, paid fellowship (\$2,500/mo) | Clear use case + paid contributors > ambitious scope |
+| **MIT Risk Repository is authoritative** | 1,600+ risks, 65 frameworks, academic backing | Comprehensive databases need institutional support |
+| **EA Forum Wiki integrated with platform** | Tags = Wiki pages, visible in post context | Integration beats standalone wikis |
+| **BlueDot trained 7,000+ people** | 75% completion rate, structured curriculum | Educational scaffolding works at scale |
+| **Knowledge management fails without ownership** | "When everyone owns it, no one owns it" | Dedicated maintainer role is essential |
+
+---
+
+## Background
+
+LongtermWiki aims to be a strategic intelligence platform for AI safety prioritization. Before building, we should understand what similar projects have attempted, what worked, and what failed.
+
+<Aside type="tip" title="Core Question">
+What separates the AI safety knowledge projects that succeeded from those that failed or stagnated?
+</Aside>
+
+This report analyzes 12+ projects across categories: wikis/knowledge bases, educational resources, prioritization tools, and data repositories.
+
+---
+
+## Category 1: Wikis and Knowledge Bases
+
+### Arbital (2015-2017) — Cautionary Tale
+
+**What it was:** An ambitious "Wikipedia successor" for explanatory content, focused heavily on AI alignment and mathematics. Founded by Eliezer Yudkowsky and others.
+
+**Innovative features:**
+- "Lenses" for different reading levels
+- Custom summaries per audience
+- Redlinks for content that should exist
+- Requisites and dependencies between concepts
+
+**What happened:**
+- Discontinued in 2017
+- No ability to register new accounts by end of life
+- Content eventually migrated to LessWrong
+- Yudkowsky alone wrote ~250,000 words
+
+<Aside type="caution" title="Failure Pattern">
+Arbital built innovative features before proving product-market fit. The platform was "not very organized and a decent amount of it is in draft form" according to later reviews.
+</Aside>
+
+**Lessons:**
+1. Innovative features don't save unclear value proposition
+2. Heavy dependence on a few prolific authors is fragile
+3. Content organization matters as much as content quality
+4. Migration path to LessWrong preserved value — plan for graceful failure
+
+**Source:** [Arbital has been imported to LessWrong](https://www.lesswrong.com/posts/fwSnz5oNnq8HxQjTL/arbital-has-been-imported-to-lesswrong)
+
+---
+
+### LessWrong Wiki/Tags — Successful Integration
+
+**What it is:** A combined tagging and wiki system where tag pages serve as concept explanations, and posts tagged with concepts appear on the wiki page.
+
+**Key design choices:**
+- Wiki pages are not standalone — they're integrated with the discussion platform
+- Clicking a tag shows both the concept explanation AND all relevant posts
+- Anyone can tag posts, but quality control exists
+- "The Sequences" provide canonical content that wiki summarizes
+
+**Why it works:**
+- Wiki provides context for active discussion, not just reference
+- Content stays fresh because it's tied to ongoing posts
+- Clear purpose: "summarize concepts and link to blog posts"
+- Eliezer's original vision: "bounce back and forth between blog and wiki"
+
+<Aside type="note" title="Design Principle">
+"Philosophically, the tagging system is an attempt to give posts on LessWrong longevity. In contrast to news and social media sites where the main content being read is what was posted that week, LessWrong wants users to read the best and most relevant content regardless of when it was written."
+</Aside>
+
+**Implication for LongtermWiki:** Integration with active discourse may matter more than comprehensive standalone content.
+
+**Source:** [Wiki-Tag FAQ](https://www.lesswrong.com/posts/E6CF8JCQAWqqhg7ZA/wiki-tag-faq)
+
+---
+
+### EA Forum Wiki — Grant-Funded Bootstrap
+
+**What it is:** Wiki pages integrated with the EA Forum, similar to LessWrong's approach.
+
+**History:**
+- Multiple previous attempts failed (including "EA Concepts")
+- Current version succeeded because Pablo Stafforini received an EA Infrastructure Fund grant to create initial articles
+- Tag pages require relevance to at least 3 existing posts by different authors
+
+<Aside type="tip" title="What Worked">
+"It's hard to get the necessary volume of volunteer work to compile a strong encyclopedia on a topic as broad and complex as effective altruism." The solution: pay someone to bootstrap it, then community maintains.
+</Aside>
+
+**Key insight:** Volunteer-only approaches failed repeatedly. Paid initial creation + platform integration succeeded.
+
+**Source:** [Our plans for hosting an EA wiki on the Forum](https://forum.effectivealtruism.org/posts/X6SyxmhYEo4SofyAL/our-plans-for-hosting-an-ea-wiki-on-the-forum)
+
+---
+
+### Stampy / AISafety.info — Narrow Focus Success
+
+**What it is:** An interactive FAQ about existential risk from AI, started by Rob Miles.
+
+**Model:**
+- FAQ format with semantic search (avoids "too long/too short" trade-off)
+- Hundreds of questions with expandable answers
+- Related questions appear as you explore
+- Automated distiller chatbot for long-tail questions
+
+**Team structure:**
+- Rob Miles as quality control manager
+- Paid Distillation Fellowship: \$2,500/month for 3 months, up to 5 fellows
+- Global volunteer team for ongoing contributions
+
+<Aside type="tip" title="Success Pattern">
+Stampy succeeds by being opinionated about format (FAQ), audience (newcomers to AI safety), and having paid contributors for quality content.
+</Aside>
+
+**Key differentiators:**
+1. Clear user need: "I have a question about AI risk"
+2. Novel interface: semantic search + progressive disclosure
+3. Paid fellowship creates quality content pipeline
+4. Single owner (Rob Miles) with clear editorial vision
+
+**Implication for LongtermWiki:** FAQ format + paid contributors + clear owner = viable model.
+
+**Sources:**
+- [Stampy's AI Safety Info soft launch](https://www.lesswrong.com/posts/obMiQv9K76nRZj9tE/stampy-s-ai-safety-info-soft-launch)
+- [AI Safety Info Distillation Fellowship](https://forum.effectivealtruism.org/posts/4cCRCoYvcLEr7prC2/ai-safety-info-distillation-fellowship)
+
+---
+
+## Category 2: Educational Resources
+
+### BlueDot Impact / AI Safety Fundamentals — Scale Success
+
+**What it is:** Free courses on AI alignment and governance with cohort-based discussion groups.
+
+**Scale:**
+- 7,000+ people trained since 2022
+- 75% completion rate (far above typical online courses)
+- Alumni at Anthropic, DeepMind, UK AI Safety Institute
+
+**Curriculum structure (Alignment Course):**
+1. AI and the years ahead
+2. What is AI alignment?
+3. RLHF
+4. Scalable oversight
+5. Robustness, unlearning and control
+6. Mechanistic interpretability
+7. Technical governance approaches
+8. Contributing to AI safety
+
+**Why it works:**
+- Structured cohorts with facilitators create accountability
+- 2-3 hours reading + 2-hour discussion per week is sustainable
+- Clear goal: "prepare to work in the field"
+- Visible success stories (alumni placements)
+
+<Aside type="note" title="Educational Model">
+"Each day or week, participants complete 2-3 hours of reading and writing, and join approximately 8 peers in a 2-hour Zoom meeting to discuss the content. All discussions are facilitated by an AI safety expert."
+</Aside>
+
+**Implication for LongtermWiki:** Educational framing with cohort structure has proven adoption. A "LongtermWiki Study Group" format could work.
+
+**Source:** [BlueDot Impact](https://bluedot.org/)
+
+---
+
+### 80,000 Hours Problem Profiles — Deep Analysis Model
+
+**What it is:** Long-form analysis of cause areas, updated periodically.
+
+**Approach:**
+- Deep dives on specific problems (10,000+ word profiles)
+- Explicit framework: scale, neglectedness, tractability
+- Regular updates when understanding changes
+- Clear recommendations tied to career paths
+
+**AI Safety coverage:**
+- "80,000 Hours has considered risks from AI to be the world's most pressing problem since 2016"
+- Profile breaks argument into 5 explicit claims
+- Each claim gets its own evidence section
+
+<Aside type="tip" title="Epistemics">
+80K's AI profile explicitly states each claim in the argument chain, making disagreement points visible. This is the "crux-mapping" approach LongtermWiki wants.
+</Aside>
+
+**Implication for LongtermWiki:** Deep profiles with explicit argument structure is a proven format. But 80K's scope is careers, not field prioritization.
+
+**Source:** [Risks from power-seeking AI systems](https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/)
+
+---
+
+## Category 3: Data Repositories
+
+### MIT AI Risk Repository — Institutional Authority
+
+**What it is:** Comprehensive database of 1,600+ AI risks extracted from 65+ frameworks.
+
+**Structure:**
+- **Causal Taxonomy:** Entity (Human/AI) × Intentionality × Timing
+- **Domain Taxonomy:** 7 domains, 23 subdomains
+- Updated April 2025 with 22 new frameworks
+
+**Key findings from their data:**
+- 51% of risks attributed to AI systems vs 34% to humans
+- 65% of risks are post-deployment
+- 35% intentional vs 37% unintentional risks
+
+<Aside type="note" title="Academic Credibility">
+"The AI Risk Repository is, to their knowledge, the first attempt to rigorously curate, analyze, and extract AI risk frameworks into a publicly accessible, comprehensive, extensible, and categorized risk database."
+</Aside>
+
+**Why it works:**
+- MIT institutional backing provides credibility
+- Clear methodology (meta-review of existing frameworks)
+- Quantitative focus suits academic users
+- Regular updates with new frameworks
+
+**Implication for LongtermWiki:** Academic backing + systematic methodology + regular updates = authoritative resource. But this required significant institutional investment.
+
+**Sources:**
+- [MIT AI Risk Repository](https://airisk.mit.edu/)
+- [arXiv paper](https://arxiv.org/abs/2408.12622)
+
+---
+
+### Epoch AI — Data-First Approach
+
+**What it is:** Database of 3,200+ ML models tracking compute, parameters, and capabilities from 1950-present.
+
+**Key metrics tracked:**
+- Training compute (doubling every 6 months since 2010)
+- Cost trends (2-3x per year growth)
+- Capability benchmarks
+- Hardware specifications
+
+**Value proposition:**
+- Empirical grounding for AI progress discussions
+- Free data under Creative Commons
+- Regular blog posts interpreting trends
+- Cited widely in policy discussions
+
+<Aside type="tip" title="Data Advantage">
+Epoch succeeds by providing quantitative data that's hard to get elsewhere. The data itself is the product, analysis is the wrapper.
+</Aside>
+
+**Implication for LongtermWiki:** Pure data plays can be highly valuable, but LongtermWiki's focus is more qualitative/strategic.
+
+**Source:** [Epoch AI](https://epoch.ai/data)
+
+---
+
+## Category 4: Landscape Mappings
+
+### AI Alignment Survey Papers
+
+Multiple attempts to map the field:
+- **"AI Alignment: A Comprehensive Survey" (2023):** Introduces RICE framework (Robustness, Interpretability, Controllability, Ethicality)
+- **Neel Nanda's Bird's Eye View:** Focuses on threat models and research agendas
+- **Victoria Krakovna's resource list:** Regularly updated links to key papers
+
+**Common pattern:** These are snapshots, not living documents. They become outdated within 1-2 years.
+
+<Aside type="caution" title="Staleness Risk">
+"Existing maps of alignment research are mostly too old to guide you and the field has nearly no ratchet, no common knowledge of what everyone is doing and why."
+</Aside>
+
+**Implication for LongtermWiki:** Static mappings have limited shelf life. Living updates are essential but expensive.
+
+**Sources:**
+- [AI Alignment: A Comprehensive Survey](https://arxiv.org/abs/2310.19852)
+- [My Overview of the AI Alignment Landscape](https://www.lesswrong.com/posts/SQ9cZtfrzDJmw9A2m/my-overview-of-the-ai-alignment-landscape-a-bird-s-eye-view)
+
+---
+
+## Category 5: Organizational Resources
+
+### CAIS (Center for AI Safety)
+
+**What they provide:**
+- Compute cluster for researchers (free access)
+- Textbook: "AI Safety, Ethics and Society"
+- Research publications (e.g., "Overview of Catastrophic AI Risks")
+- The 2023 extinction risk statement (signed by 100s of AI leaders)
+
+**Success pattern:** CAIS combines resources (compute), education (textbook), research (papers), and advocacy (statement). Multiple touchpoints to the field.
+
+**Source:** [safe.ai](https://safe.ai/)
+
+---
+
+## Cross-Cutting Lessons
+
+### Why Knowledge Management Projects Fail
+
+| Failure Mode | Description | Mitigation |
+|--------------|-------------|------------|
+| **No clear owner** | "When everyone owns it, no one owns it" | Appoint single accountable maintainer |
+| **Volunteer dependency** | "Relies on initiative and goodwill" | Paid contributors for core content |
+| **Scope creep** | Trying to cover everything | Ruthlessly narrow initial scope |
+| **Staleness spiral** | Content rots faster than updates | Visible freshness dates, automated alerts |
+| **No integration** | Standalone wiki nobody visits | Integrate with active community platform |
+| **Novel features over fit** | Building innovation before validation | Prove value with simple version first |
+
+### What Successful Projects Have in Common
+
+| Success Factor | Examples | Application to LongtermWiki |
+|----------------|----------|---------------------|
+| **Clear, narrow purpose** | Stampy (FAQ), Epoch (data), 80K (careers) | Pick ONE thing LongtermWiki does best |
+| **Paid initial content** | EA Forum Wiki grant, Stampy fellowship | Budget for content creation, not just platform |
+| **Platform integration** | LW/EA Forum wikis | Consider building on existing platform |
+| **Institutional backing** | MIT Risk Repository, BlueDot | Partner with established org |
+| **Single editorial owner** | Rob Miles for Stampy | Hire/designate chief editor |
+| **Regular update cadence** | Epoch blog, 80K profile updates | Commit to quarterly review cycle |
+
+---
+
+## Causal Factors for LongtermWiki Success
+
+### Primary Factors (Strong Influence)
+
+| Factor | Direction | Type | Evidence | Confidence |
+|--------|-----------|------|----------|------------|
+| **Clear owner/editor** | ↑ Success | cause | EA Wiki failed without, succeeded with grant | High |
+| **Narrow initial scope** | ↑ Success | cause | Stampy FAQ vs Arbital everything | High |
+| **Paid contributors** | ↑ Quality | cause | Stampy fellowship, EA Wiki grant | High |
+| **Platform integration** | ↑ Adoption | cause | LW/EA Forum wikis get used | Medium |
+
+### Secondary Factors (Medium Influence)
+
+| Factor | Direction | Type | Evidence | Confidence |
+|--------|-----------|------|----------|------------|
+| **Visible freshness dates** | ↑ Trust | intermediate | Staleness is major failure mode | Medium |
+| **Institutional backing** | ↑ Credibility | cause | MIT Risk Repository cited widely | Medium |
+| **Novel features** | Mixed | intermediate | Arbital had them, still failed | Medium |
+
+### Minor Factors (Weak Influence)
+
+| Factor | Direction | Type | Evidence | Confidence |
+|--------|-----------|------|----------|------------|
+| **Comprehensive coverage** | Weak ↑ | cause | Narrow often beats broad | Low |
+| **Community contribution** | Mixed | intermediate | Works for Wikipedia, not most projects | Low |
+
+---
+
+## Open Questions
+
+<Aside type="note" title="Key Uncertainties">
+These questions represent the highest-value areas for follow-up research or user interviews.
+</Aside>
+
+| Question | Why It Matters | Current State |
+|----------|----------------|---------------|
+| **Would funders actually use a prioritization tool?** | Core value prop for LongtermWiki | Unvalidated; need interviews |
+| **Is crux-mapping valuable beyond intellectual interest?** | Unique LongtermWiki differentiator | No clear success examples |
+| **What's the minimum viable LongtermWiki?** | Determines initial scope | Options: FAQ, profiles, database |
+| **Should LongtermWiki be standalone or integrated?** | Platform strategy | LW/EAF integration worked for wikis |
+| **What's the maintenance budget long-term?** | Sustainability | Most projects underestimate this |
+
+---
+
+
+## Recommendations for LongtermWiki
+
+Based on this research, LongtermWiki should:
+
+
+### Do First
+1. **Interview 10+ potential users** before building — especially funders
+2. **Start with the narrowest possible scope** — probably 10-20 deep pages, not 200 shallow ones
+3. **Budget for paid content creation** — volunteer-only has repeatedly failed
+4. **Appoint a single editorial owner** — not a committee
+
+### Consider Strongly
+
+5. **Integrate with existing platform** (LessWrong, EA Forum) rather than standalone
+6. **Use FAQ format** for discoverable content (Stampy model)
+7. **Commit to update cadence** (quarterly review, visible dates)
+
+### Avoid
+
+8. **Don't build novel features** before proving basic value
+9. **Don't aim for comprehensiveness** initially
+10. **Don't rely on community contributions** for core content
+
+---
+
+## Sources
+
+### Research Organizations
+- [MIT AI Risk Repository](https://airisk.mit.edu/) - Comprehensive risk taxonomy
+- [Epoch AI](https://epoch.ai/) - ML model database and trends
+- [Center for AI Safety](https://safe.ai/) - Research and resources
+
+### Educational Resources
+- [BlueDot Impact](https://bluedot.org/) - AI Safety Fundamentals courses
+- [80,000 Hours](https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/) - Problem profiles
+
+### Community Platforms
+- [LessWrong Wiki-Tag FAQ](https://www.lesswrong.com/posts/E6CF8JCQAWqqhg7ZA/wiki-tag-faq)
+- [EA Forum Wiki Plans](https://forum.effectivealtruism.org/posts/X6SyxmhYEo4SofyAL/our-plans-for-hosting-an-ea-wiki-on-the-forum)
+- [Stampy's AI Safety Info](https://aisafety.info/)
+- [Arbital Migration to LessWrong](https://www.lesswrong.com/posts/fwSnz5oNnq8HxQjTL/arbital-has-been-imported-to-lesswrong)
+
+### Academic Papers
+- [AI Alignment: A Comprehensive Survey](https://arxiv.org/abs/2310.19852)
+- [AI Risk Repository Paper](https://arxiv.org/abs/2408.12622)
+
+### Knowledge Management
+- [Why Knowledge Management Fails](https://bloomfire.com/blog/why-knowledge-management-fails/)
+- [Wikis as Knowledge Management Systems](https://www.researchgate.net/publication/263168150_Wikis_as_knowledge_management_systems_Issues_and_challenges)

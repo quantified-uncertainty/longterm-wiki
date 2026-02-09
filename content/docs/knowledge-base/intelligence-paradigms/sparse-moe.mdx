@@ -1,0 +1,343 @@
+---
+title: "Sparse / MoE Transformers"
+description: "Analysis of Mixture-of-Experts and sparse transformer architectures where only a subset of parameters activates per token. Covers Mixtral, Switch Transformer, and rumored GPT-4 architecture. Rising efficiency-focused variant of transformers."
+sidebar:
+  label: "Sparse/MoE"
+  order: 6
+quality: 45
+lastEdited: "2026-01-28"
+importance: 62
+llmSummary: "MoE architectures activate only 3-18% of total parameters per token, achieving 2-7x compute savings while matching dense model performance (Mixtral 8x7B with 12.9B active matches Llama 2 70B). Safety research is underdeveloped - no expert-level interpretability tools exist despite rapid adoption (Mixtral, DeepSeek-V3, rumored GPT-4)."
+ratings:
+  novelty: 3.5
+  rigor: 5
+  actionability: 3
+  completeness: 6.5
+metrics:
+  wordCount: 115
+  citations: 18
+  tables: 33
+  diagrams: 1
+clusters: ["ai-safety"]
+---
+import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="sparse-moe" client:load />
+
+## Overview
+
+Sparse and Mixture-of-Experts (MoE) architectures are transformer variants where **only a subset of parameters activates for each token**. Instead of every parameter contributing to every forward pass, a routing mechanism selects which "expert" sub-networks to use.
+
+This offers dramatic **efficiency gains** - you can have a model with 8x the parameters but similar compute cost per token. Mixtral 8x7B (46B total, ~12B active) performs comparably to Llama 2 70B.
+
+MoE is likely already used in GPT-4 (based on leaks) and may become the default architecture for frontier models due to efficiency advantages.
+
+### Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Adoption Rate** | Rapidly increasing | Mixtral, DeepSeek-V3, DBRX, Qwen3-MoE all released 2024-2025; GPT-4 rumored MoE since 2023 |
+| **Efficiency Gains** | 2-7x compute savings | Switch Transformer: 7x pre-training speedup; DBRX: 2x faster inference than dense equivalent |
+| **Parameter Scaling** | Trillion+ parameters feasible | DeepSeek-V3: 671B total/37B active; GLaM: 1.2T total with 1/3 GPT-3 training energy |
+| **Quality Parity** | Matches dense models | Mixtral 8x7B (46B total, 12.9B active) matches Llama 2 70B across benchmarks |
+| **Safety Research** | Underdeveloped | Expert-level interpretability tools lacking; routing behavior understudied |
+| **Open-Weight Availability** | High | Mixtral, DBRX, DeepSeek, Qwen all Apache 2.0 licensed |
+| **Hardware Support** | Improving | MegaBlocks library enables dropless MoE; inference optimization ongoing |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [hyper.ai](https://hyper.ai/en/wiki/29102) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Mixture_of_experts) |
+| arXiv | [arxiv.org](https://arxiv.org/abs/2101.03961) |
+
+
+## Architecture
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph INPUT["Input Processing"]
+        token["Input Token Embedding"]
+    end
+
+    subgraph ROUTER["Gating/Router Network"]
+        gate["Softmax Router"]
+        scores["Expert Scores"]
+        topk["Top-k Selection"]
+        gate --> scores
+        scores --> topk
+    end
+
+    subgraph EXPERTS["Expert Feed-Forward Networks"]
+        exp1["Expert 1 (FFN)"]
+        exp2["Expert 2 (FFN)"]
+        exp3["Expert 3"]
+        exp4["Expert 4"]
+        expN["Expert N"]
+    end
+
+    subgraph OUTPUT["Output Combination"]
+        weights["Router Weights"]
+        combine["Weighted Sum"]
+        residual["+ Residual Connection"]
+        weights --> combine
+        combine --> residual
+    end
+
+    token --> gate
+    topk --> |"Selected (top-k)"| exp1
+    topk --> |"Selected (top-k)"| exp2
+    topk -.-> |"Not selected"| exp3
+    topk -.-> |"Not selected"| exp4
+    topk -.-> |"Not selected"| expN
+
+    exp1 --> combine
+    exp2 --> combine
+    token --> residual
+    residual --> final["Layer Output"]
+
+    style exp3 fill:#f5f5f5,stroke:#ccc
+    style exp4 fill:#f5f5f5,stroke:#ccc
+    style expN fill:#f5f5f5,stroke:#ccc
+    style exp1 fill:#d4edda,stroke:#28a745
+    style exp2 fill:#d4edda,stroke:#28a745
+`} />
+
+### Key Components
+
+| Component | Function | Trainable |
+|-----------|----------|-----------|
+| **Router** | Decides which experts to use | Yes |
+| **Experts** | Specialized FFN sub-networks | Yes |
+| **Load balancer** | Ensures experts are used evenly | Auxiliary loss |
+| **Combiner** | Merges expert outputs | Weighted by router |
+
+### Parameter Efficiency
+
+| Model | Total Params | Active Params | Efficiency Ratio | Developer |
+|-------|--------------|---------------|------------------|-----------|
+| Mixtral 8x7B | 46.7B | 12.9B | 3.6x | Mistral AI |
+| Mixtral 8x22B | 141B | 39B | 3.6x | Mistral AI |
+| DeepSeek-V3 | 671B | 37B | 18x | DeepSeek |
+| DBRX | 132B | 36B | 3.7x | Databricks |
+| GLaM | 1.2T | 96.6B | 12x | Google |
+| Switch-XXL | 1.6T | 100B | 16x | Google |
+| Qwen3-MoE | 235B | 22B | 10.7x | Alibaba |
+| GPT-4 (rumored) | 1.76T | 220B | 8x | OpenAI |
+
+## Key Properties
+
+| Property | Rating | Assessment |
+|----------|--------|------------|
+| **White-box Access** | LOW | Same opacity as dense transformers, plus routing complexity |
+| **Trainability** | HIGH | Standard training with load balancing losses |
+| **Predictability** | LOW | Routing adds another layer of unpredictability |
+| **Modularity** | MEDIUM | Expert boundaries exist but interact |
+| **Formal Verifiability** | LOW | Combinatorial explosion of expert combinations |
+
+## Safety Implications
+
+### Potential Advantages
+
+| Advantage | Explanation |
+|-----------|-------------|
+| **Expert analysis** | Can study what individual experts learn |
+| **Efficiency = more testing** | Same capability, lower cost → more safety evaluation budget |
+| **Modular structure** | Could potentially ablate/modify specific experts |
+| **Specialization visible** | Routing patterns reveal some structure |
+
+### Risks and Challenges
+
+| Risk | Severity | Explanation |
+|------|----------|-------------|
+| **Routing unpredictability** | MEDIUM | Which experts activate can be surprising |
+| **Combinatorial complexity** | HIGH | Cannot test all expert combinations |
+| **Emergent routing** | MEDIUM | Routing patterns may encode unexpected behaviors |
+| **Specialized deception** | UNKNOWN | Could specific experts learn deceptive behavior? |
+
+### Interpretability Comparison
+
+| Aspect | Dense | MoE |
+|--------|-------|-----|
+| Overall opacity | HIGH | HIGH |
+| Modular structure | NONE | SOME (experts) |
+| Analysis tools | SOME | FEWER |
+| Activation patterns | Complex | Complex + routing |
+
+## Current MoE Models Comparison
+
+| Model | Developer | Release | Total Params | Active Params | Experts | Top-k | Context | Training Data |
+|-------|-----------|---------|--------------|---------------|---------|-------|---------|---------------|
+| **Mixtral 8x7B** | Mistral AI | Dec 2023 | 46.7B | 12.9B | 8 | 2 | 32K | Unknown |
+| **Mixtral 8x22B** | Mistral AI | Apr 2024 | 141B | 39B | 8 | 2 | 64K | Unknown |
+| **DeepSeek-V2** | DeepSeek | May 2024 | 236B | 21B | 160 | 6 | 128K | Unknown |
+| **DeepSeek-V3** | DeepSeek | Dec 2024 | 671B | 37B | 256 | 8 | 128K | 14.8T tokens |
+| **DBRX** | Databricks | Mar 2024 | 132B | 36B | 16 | 4 | 32K | 12T tokens |
+| **Qwen3-MoE** | Alibaba | Apr 2025 | 235B | 22B | 128 | 8 | 32K | 36T tokens |
+| **Qwen3-Next** | Alibaba | Sep 2025 | 80B | 3B | 512 | Variable | 128K | Unknown |
+| **GLaM** | Google | Dec 2021 | 1.2T | 96.6B | 64 | 2 | Unknown | 1.6T tokens |
+| **Switch-C** | Google | Jan 2021 | 1.6T | 100B | 2048 | 1 | Unknown | C4 dataset |
+| **GPT-4** | OpenAI | Mar 2023 | ≈1.76T (rumored) | ≈220B | ≈16 | 2 | 128K | Unknown |
+
+**Performance benchmarks** (Mixtral 8x7B vs. dense models):
+- MMLU: 70.6% (vs. Llama 2 70B: 68.9%)
+- HellaSwag: 86.7% (vs. Llama 2 70B: 87.3%)
+- GSM8K: 74.4% (vs. Llama 2 70B: 56.8%)
+- HumanEval: 40.2% (vs. Llama 2 70B: 29.9%)
+
+## Technical Details
+
+### Router Mechanisms
+
+| Mechanism | Description | Trade-offs | Used By |
+|-----------|-------------|------------|---------|
+| **Top-k gating** | Select k highest-scoring experts per token | Simple, may cause load imbalance; requires auxiliary loss | Mixtral (k=2), DBRX (k=4) |
+| **Expert choice** | Each expert selects its top-k tokens | Guaranteed load balance; variable experts per token | Google research models |
+| **Soft routing** | Weighted combination of all experts | Fully differentiable; less sparse; higher compute | Early MoE research |
+| **Auxiliary-loss-free** | Bias terms adjusted based on load monitoring | No auxiliary loss needed; adaptive balancing | DeepSeek-V3 |
+
+### Load Balancing
+
+MoE training requires mechanisms to prevent expert collapse (where the model uses only 1-2 experts):
+
+**Auxiliary loss approach** (most common):
+- Total Loss = Task Loss + alpha x Load Balance Loss
+- Typical alpha values: 0.01-0.1
+- Balance loss penalizes uneven expert utilization
+
+**Without load balancing**: Studies show models collapse to using 10-20% of experts, negating efficiency benefits.
+
+**DeepSeek innovation**: Auxiliary-loss-free balancing adds learnable bias terms to routing scores, adjusted at each training step based on observed load. This avoids the training instability auxiliary losses can cause.
+
+### Expert Capacity and Overflow
+
+Each expert has a fixed capacity (maximum tokens it can process per batch). When both selected experts are full:
+- **Token dropping**: Overflow tokens skip MoE layer, passed via residual connection (GShard approach)
+- **Dropless MoE**: Dynamic allocation prevents dropping; used by DBRX via MegaBlocks library
+
+**Capacity factor**: Typical values of 1.0-2.0x mean experts can handle 100-200% of perfectly balanced load.
+
+## Research Landscape
+
+### Foundational Papers
+
+| Paper | Year | Key Contribution | Citation |
+|-------|------|------------------|----------|
+| [Outrageously Large Neural Networks](https://arxiv.org/abs/1701.06538) | 2017 | Introduced sparsely-gated MoE with 137B parameters; 1000x capacity increase with minor efficiency loss | Shazeer et al. (Google), ICLR 2017 |
+| [GShard](https://arxiv.org/abs/2006.16668) | 2020 | Scaled MoE to 600B parameters; auto-sharding for distributed training | Lepikhin et al. (Google) |
+| [Switch Transformers](https://arxiv.org/abs/2101.03961) | 2021 | Simplified to single-expert routing; achieved 7x pre-training speedup; scaled to 1.6T parameters | Fedus, Zoph, Shazeer (Google), JMLR 2022 |
+| [GLaM](https://arxiv.org/abs/2112.06905) | 2021 | 1.2T parameter model using 1/3 GPT-3 training energy; demonstrated MoE efficiency at scale | Du et al. (Google), ICML 2022 |
+| [Expert Choice Routing](https://arxiv.org/abs/2202.09368) | 2022 | Experts select tokens instead of vice versa; 2x faster convergence; intrinsic load balancing | Zhou et al. (Google), NeurIPS 2022 |
+| [Mixtral of Experts](https://arxiv.org/abs/2401.04088) | 2024 | Open-weight MoE matching Llama 2 70B with 3.6x fewer active parameters | Jiang et al. (Mistral AI) |
+| [DeepSeek-V3 Technical Report](https://arxiv.org/html/2412.19437v1) | 2024 | 671B/37B model with auxiliary-loss-free load balancing; 256 fine-grained experts | DeepSeek |
+
+### Key Labs and Contributions
+
+| Lab | Models | Focus | Notable Achievement |
+|-----|--------|-------|---------------------|
+| **Google** | Switch, GLaM, GShard | Research pioneering | First trillion-parameter MoE; routing innovations |
+| **Mistral AI** | Mixtral 8x7B, 8x22B | Open-weight quality | Matched Llama 70B with 12.9B active params |
+| **DeepSeek** | V2, V3 | Extreme sparsity | 671B total with only 37B active (5.5%) |
+| **Databricks** | DBRX | Enterprise deployment | Fine-grained MoE (16 experts, choose 4) |
+| **Alibaba** | Qwen3-MoE, Qwen3-Next | Ultra-sparse | 80B total with 3B active (3.7%) |
+| **OpenAI** | GPT-4 (rumored) | Production frontier | Reportedly ≈1.76T params, 8x220B MoE |
+
+## Trajectory
+
+### Why MoE Is Becoming Default
+
+| Factor | Evidence | Impact |
+|--------|----------|--------|
+| **Training efficiency** | GLaM achieved GPT-3 quality with 1/3 training energy; DBRX training is 2x more FLOP-efficient than dense | Major cost reduction |
+| **Inference efficiency** | DBRX: 2-3x higher throughput than 132B dense model; Mixtral serves at Llama 2 13B cost | Enables larger deployments |
+| **Quality parity** | Mixtral 8x7B matches/exceeds Llama 2 70B on MMLU (+1.7%), GSM8K (+17.6%), HumanEval (+10.3%) | No capability penalty |
+| **Scaling ceiling** | Dense models face diminishing returns; MoE enables continued scaling to 1T+ parameters | Extends scaling laws |
+| **Open ecosystem** | Mixtral, DBRX, DeepSeek, Qwen all Apache 2.0; enables research and fine-tuning | Accelerates adoption |
+
+### Adoption Timeline
+
+| Period | Development | Significance |
+|--------|-------------|--------------|
+| 2017 | Shazeer introduces modern MoE | Foundational architecture |
+| 2020-2021 | Google scales to 1T+ parameters | Proves viability at scale |
+| 2023 | GPT-4 launches (rumored MoE) | Frontier deployment |
+| 2024 | Mixtral, DBRX, DeepSeek-V2 | Open-weight MoE ecosystem emerges |
+| 2025 | DeepSeek-V3, Qwen3-Next | Ultra-sparse MoE (3-5% activation) |
+| 2026+ | Expected: MoE becomes default | Dense models may become niche |
+
+### Key Uncertainties
+
+| Question | Current Evidence | Research Priority |
+|----------|------------------|-------------------|
+| Do MoE models have different emergent behaviors? | Limited study; routing adds complexity | HIGH |
+| Is routing a new source of alignment risk? | Unknown; router learns token-expert mappings | HIGH |
+| Can we interpret expert specialization? | Some evidence experts specialize by domain/language | MEDIUM |
+| Will ultra-sparse (less than 5% activation) remain stable? | DeepSeek-V3, Qwen3-Next suggest yes | MEDIUM |
+| Does MoE training require different safety approaches? | Not yet studied systematically | HIGH |
+
+## Safety Research Implications
+
+### Research That Transfers
+
+- **Behavioral evaluations** - Testing still works
+- **RLHF** - Training approach unchanged
+- **Red teaming** - Can still probe for failures
+- **Capability evals** - Measuring what it can do
+
+### Research Gaps
+
+- **Expert-level interpretability** - What does each expert learn?
+- **Routing analysis** - When/why does routing change?
+- **Combinatorial testing** - How to cover expert combinations?
+- **Expert ablation** - Can we remove problematic experts?
+
+### Novel Research Opportunities
+
+MoE structure enables some new safety approaches:
+
+| Approach | Description | Feasibility |
+|----------|-------------|-------------|
+| Expert specialization analysis | Study what each expert learns | MEDIUM |
+| Selective expert ablation | Remove experts that encode bad behavior | UNKNOWN |
+| Routing intervention | Control which experts activate | POSSIBLE |
+| Expert-level alignment | Train specific experts for safety | SPECULATIVE |
+
+## Sources and References
+
+### Foundational Papers
+
+- Shazeer, N. et al. (2017). [Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer](https://arxiv.org/abs/1701.06538). ICLR 2017. The paper that revived MoE for deep learning, demonstrating 1000x capacity increase.
+
+- Lepikhin, D. et al. (2020). [GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding](https://arxiv.org/abs/2006.16668). First successful 600B parameter MoE for machine translation.
+
+- Fedus, W., Zoph, B., Shazeer, N. (2021). [Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity](https://arxiv.org/abs/2101.03961). JMLR 2022. Simplified MoE with single-expert routing, achieving 7x speedup.
+
+- Du, N. et al. (2022). [GLaM: Efficient Scaling of Language Models with Mixture-of-Experts](https://arxiv.org/abs/2112.06905). ICML 2022. 1.2T parameter model trained with 1/3 of GPT-3's energy.
+
+### Recent Models
+
+- Jiang, A. et al. (2024). [Mixtral of Experts](https://arxiv.org/abs/2401.04088). Mistral AI. Open-weight MoE matching Llama 2 70B performance.
+
+- Databricks (2024). [Introducing DBRX: A New State-of-the-Art Open LLM](https://www.databricks.com/blog/introducing-dbrx-new-state-art-open-llm). Fine-grained MoE with 16 experts.
+
+- DeepSeek (2024). [DeepSeek-V3 Technical Report](https://arxiv.org/html/2412.19437v1). 671B parameter model with auxiliary-loss-free load balancing.
+
+### Routing Research
+
+- Zhou, Y. et al. (2022). [Mixture-of-Experts with Expert Choice Routing](https://arxiv.org/abs/2202.09368). NeurIPS 2022. Novel routing where experts select tokens.
+
+- Google Research (2022). [Expert Choice Routing Blog Post](https://research.google/blog/mixture-of-experts-with-expert-choice-routing/). Accessible explanation of expert choice mechanism.
+
+### Architecture Leaks and Analysis
+
+- The Decoder (2023). [GPT-4 architecture, datasets, costs and more leaked](https://the-decoder.com/gpt-4-architecture-datasets-costs-and-more-leaked/). Summary of SemiAnalysis report on GPT-4's rumored MoE structure.
+
+- KDnuggets (2023). [GPT-4: 8 Models in One; The Secret is Out](https://www.kdnuggets.com/2023/08/gpt4-8-models-one-secret.html). Analysis of GPT-4 MoE rumors.
+
+## Related Pages
+
+- <EntityLink id="dense-transformers">Dense Transformers</EntityLink> - The simpler baseline
+- <EntityLink id="heavy-scaffolding">Heavy Scaffolding</EntityLink> - How MoE models are deployed
+- <EntityLink id="ssm-mamba">SSM/Mamba</EntityLink> - Alternative efficient architecture

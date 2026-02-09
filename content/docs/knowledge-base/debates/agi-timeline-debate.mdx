@@ -1,0 +1,449 @@
+---
+title: "When Will AGI Arrive?"
+description: "The debate over AGI timelines from imminent to decades away to never with current approaches"
+sidebar:
+  order: 7
+importance: 54
+quality: 33
+llmSummary: "Comprehensive survey of AGI timeline predictions ranging from 2025-2027 (ultra-short) to never with current approaches, with median expert estimates around 2032-2037. Key cruxes include whether scaling alone suffices, data/compute limits, and trust in lab leader claims; wide uncertainty reflects deep disagreement about fundamental capabilities questions."
+ratings:
+  novelty: 2.5
+  rigor: 3.5
+  actionability: 4
+  completeness: 5.5
+metrics:
+  wordCount: 1040
+  citations: 0
+  tables: 0
+  diagrams: 0
+clusters: ["ai-safety", "epistemics"]
+---
+import {DisagreementMap, EntityLink, InfoBox, KeyQuestions, TimelineViz, DataExternalLinks} from '@components/wiki';
+
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [firstmovers.ai](https://firstmovers.ai/agi-timeline/) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Artificial_general_intelligence) |
+
+<DataExternalLinks pageId="agi-timeline-debate" client:load />
+
+<InfoBox
+  type="crux"
+  title="AGI Timeline Debate"
+  customFields={[
+    { label: "Question", value: "When will we develop artificial general intelligence?" },
+    { label: "Range", value: "From 2-5 years to never with current approaches" },
+    { label: "Stakes", value: "Determines urgency of safety work and policy decisions" },
+  ]}
+/>
+
+Perhaps the most consequential forecasting question in history: When will we develop AI systems that match or exceed human-level intelligence across virtually all domains?
+
+The answer determines how much time we have to solve alignment, whether to prioritize AI safety over other causes, and how urgently we need governance frameworks.
+
+## Defining AGI
+
+**The challenge**: No consensus definition of AGI
+
+**Common criteria:**
+- Can perform any intellectual task humans can
+- Can learn new tasks quickly with minimal data
+- Generalizes broadly across domains
+- Autonomous planning and goal-pursuit
+- Economic productivity matching human workers
+
+**Proxy metrics:**
+- Pass rigorous expert-level tests across domains
+- Outperform median human on most economically valuable tasks
+- Can do the job of an AI researcher (recursive self-improvement)
+- \$100B+ annual economic value
+
+**Note**: Debate conflates different concepts:
+- Human-level AI (matches median human)
+- Transformative AI (drastically changes world)
+- Artificial General Intelligence (truly general intelligence)
+- Superintelligence (exceeds all humans)
+
+## Timeline Camps
+
+<TimelineViz
+  client:load
+  title="AGI Timeline Predictions"
+  events={[
+    {
+      year: 2025,
+      label: "Ultra-short timelines",
+      description: "AGI by 2025-2027",
+      probability: 0.05,
+      sources: ["Some e/acc", "Extreme optimists"]
+    },
+    {
+      year: 2028,
+      label: "Short timelines (median)",
+      description: "AGI by 2027-2030",
+      probability: 0.25,
+      sources: ["OpenAI leadership", "Some forecasters"]
+    },
+    {
+      year: 2035,
+      label: "Medium timelines",
+      description: "AGI by 2030-2040",
+      probability: 0.40,
+      sources: ["Median expert opinion", "Most forecasting platforms"]
+    },
+    {
+      year: 2050,
+      label: "Long timelines",
+      description: "AGI by 2040-2070",
+      probability: 0.20,
+      sources: ["Skeptics", "Some ML researchers"]
+    },
+    {
+      year: 2070,
+      label: "Very long / Never",
+      description: "After 2070 or never with current paradigms",
+      probability: 0.10,
+      sources: ["Gary Marcus", "Scaling skeptics"]
+    }
+  ]}
+/>
+
+## Key Forecasts and Positions
+
+<DisagreementMap
+  client:load
+  title="AGI Timeline Predictions"
+  description="When different people and organizations expect AGI"
+  positions={[
+    {
+      name: "Sam Altman (OpenAI)",
+      stance: "short-timelines",
+      confidence: "medium",
+      reasoning: "Believes current paradigm can reach AGI. OpenAI organized around AGI by late 2020s.",
+      evidence: ["Public statements", "OpenAI prep for AGI"],
+      quote: "AGI is achievable with current hardware and algorithms"
+    },
+    {
+      name: "Dario Amodei (Anthropic)",
+      stance: "short-timelines",
+      confidence: "medium",
+      reasoning: "Predicts 'powerful AI' by 2026-2027. Anthropic's urgency suggests short timelines.",
+      evidence: ["Essay on timelines", "Scaling plans"],
+      quote: "2026-2027 for transformative AI if trends continue"
+    },
+    {
+      name: "Demis Hassabis (DeepMind)",
+      stance: "medium-timelines",
+      confidence: "medium",
+      reasoning: "Predicted 'within a decade' in 2023. DeepMind pursuing AGI but less aggressive timeline.",
+      evidence: ["Public statements"],
+      quote: "AGI within a decade"
+    },
+    {
+      name: "Yann LeCun (Meta)",
+      stance: "long-timelines",
+      confidence: "high",
+      reasoning: "Believes current approaches won't reach AGI. Need new paradigms.",
+      evidence: ["Public statements", "JEPA proposal"],
+      quote: "Decades away, not years. Need different architectures."
+    },
+    {
+      name: "Gary Marcus",
+      stance: "very-long-never",
+      confidence: "high",
+      reasoning: "Argues current approaches are fundamentally limited. AGI may never come from scaling.",
+      evidence: ["Writing", "Public debates"],
+      quote: "Not close to AGI. Might never get there this way."
+    },
+    {
+      name: "Metaculus (Aggregate Forecast)",
+      stance: "medium-timelines",
+      confidence: "low",
+      reasoning: "Community prediction median around 2032-2037, but very wide distribution.",
+      evidence: ["Forecasting platform"],
+      quote: "Median 2035, but 25th-75th percentile spans 2027-2050"
+    },
+    {
+      name: "Ajeya Cotra (Coefficient Giving)",
+      stance: "medium-timelines",
+      confidence: "low",
+      reasoning: "Bio-anchors framework suggests median 2040-2050, but shifted shorter recently.",
+      evidence: ["Technical report"],
+      quote: "Median 2040 in 2020 report, likely shorter now"
+    }
+  ]}
+/>
+
+## Key Cruxes
+
+<KeyQuestions
+  client:load
+  questions={[
+    {
+      question: "Will scaling current approaches reach AGI?",
+      positions: [
+        {
+          position: "Yes - scaling is all you need",
+          confidence: "medium",
+          reasoning: "Scaling laws hold. Emergent capabilities appear. No fundamental blockers.",
+          implications: "Short timelines (2027-2032)"
+        },
+        {
+          position: "No - need new paradigms",
+          confidence: "medium",
+          reasoning: "Missing key capabilities won't emerge from scaling. Need architectural innovation.",
+          implications: "Long timelines (2040+) or never"
+        }
+      ]
+    },
+    {
+      question: "Is the data wall real?",
+      positions: [
+        {
+          position: "Yes - hitting limits by 2026",
+          confidence: "medium",
+          reasoning: "Finite internet text. Synthetic data degrades. Hard limit on scaling.",
+          implications: "Progress slows significantly, longer timelines"
+        },
+        {
+          position: "No - many ways around it",
+          confidence: "medium",
+          reasoning: "Multimodal data, synthetic data, efficiency improvements, curriculum learning.",
+          implications: "Scaling can continue, shorter timelines possible"
+        }
+      ]
+    },
+    {
+      question: "How much do we trust lab leaders' timelines?",
+      positions: [
+        {
+          position: "Trust them - most informed",
+          confidence: "medium",
+          reasoning: "They have non-public info about capabilities and scaling plans.",
+          implications: "Short timelines (2027-2030)"
+        },
+        {
+          position: "Discount hype - incentives matter",
+          confidence: "medium",
+          reasoning: "Labs benefit from hype. History of overpromising. Insiders have blindspots.",
+          implications: "Longer timelines than labs claim"
+        }
+      ]
+    },
+    {
+      question: "Will progress continue exponentially?",
+      positions: [
+        {
+          position: "Yes - no limits in sight",
+          confidence: "low",
+          reasoning: "Compute growing, investment massive, no fundamental obstacles.",
+          implications: "Rapid progress, short timelines"
+        },
+        {
+          position: "No - hitting diminishing returns",
+          confidence: "medium",
+          reasoning: "Low-hanging fruit picked. Costs rising. Approaching limits.",
+          implications: "Slower progress, longer timelines"
+        }
+      ]
+    }
+  ]}
+/>
+
+## What Would Update Timelines?
+
+**Evidence for shorter timelines:**
+- GPT-5/6 showing qualitative leap in <EntityLink id="reasoning">reasoning and planning</EntityLink>
+- Successful scaling past data limits
+- AI substantially accelerating AI research
+- Solving ARC benchmark or similar generalization tests
+- Continued exponential capability gains
+
+**Evidence for longer timelines:**
+- Scaling 100x with only incremental improvements
+- Hitting hard data or compute walls
+- Persistent failures on key capabilities despite scale
+- Need for architectural breakthroughs that don't arrive
+- Progress slowing on key benchmarks
+
+## Historical Track Record
+
+**Past AGI predictions:**
+- 1958: "Machines will be capable, within twenty years, of doing any work that a man can do" - Herbert Simon
+- 1965: "Machines will be capable, within twenty years, of doing any work that a man can do" - Herbert Simon (updated)
+- 1970: "In from three to eight years we will have a machine with the general intelligence of an average human being" - Marvin Minsky
+- 1980s: Expert systems will lead to AGI by 2000
+- 2000s: AGI by 2020
+
+**Pattern**: Always 20-30 years away. Should we believe this time is different?
+
+**Arguments it's different now:**
+- Have empirical scaling laws, not just speculation
+- Concrete progress on benchmarks and capabilities
+- Massive investment and resources
+- Clear path forward (scaling) vs unknown unknowns
+
+**Arguments it's the same:**
+- Still don't understand intelligence
+- Benchmarks may not capture true intelligence
+- Economic and technical obstacles remain
+- Same overconfidence as past predictions
+
+## The Distribution Shape
+
+Most forecasters have **heavy-tailed distributions**:
+
+**Short tail (optimistic):**
+- 5-10% chance: AGI by 2027
+- 20-25% chance: AGI by 2030
+- Driven by: Scaling working, rapid progress, no blockers
+
+**Central mass:**
+- 50% chance: AGI by 2035-2040
+- Most likely scenario: Continued progress with some obstacles
+
+**Long tail (pessimistic):**
+- 20-30% chance: AGI after 2050
+- 5-10% chance: Never with current paradigms
+- Driven by: Fundamental limits, need for new paradigms
+
+**Wide uncertainty is rational given:**
+- Deep uncertainty about scaling limits
+- Unknown unknowns
+- Dependence on definition
+- Historical poor track record
+
+## Implications for Different Timelines
+
+**If AGI by 2027-2030:**
+- Extremely urgent to solve alignment NOW
+- Current safety research may be too slow
+- Need immediate governance action
+- Race dynamics critical concern
+- May not get warning signs
+
+**If AGI by 2030-2040:**
+- Time to iterate on safety
+- Can learn from weaker systems
+- Governance frameworks can develop
+- Safety research can mature
+- More coordination opportunities
+
+**If AGI after 2050:**
+- Safety research can be thorough
+- Governance can be careful and democratic
+- Current hype may be overblown
+- Other causes may be higher priority
+- Different paradigms may emerge
+
+## Economic vs Philosophical AGI
+
+Important distinction often blurred:
+
+**Economically transformative AI:**
+- Automates most jobs
+- Generates trillions in value
+- Fundamentally changes society
+- Might come soon (2027-2035)
+- Doesn't require "general" intelligence
+
+**Philosophically general intelligence:**
+- True understanding across all domains
+- Quick learning like humans
+- Causal reasoning and abstraction
+- Might require paradigm shifts
+- Could be much further (2040+)
+
+**Why it matters:**
+- Economic transformation could happen without "AGI"
+- Most impacts come from economic transformation
+- But existential risk might require true AGI
+- Definitions determine timeline estimates
+
+## The Compute Bottleneck
+
+Different views on compute as limiting factor:
+
+**Optimistic: Compute is abundant**
+- Moore's law continues
+- Efficiency improvements ongoing
+- Cloud compute scales easily
+- No physical limits near
+
+**Pessimistic: Compute limits soon**
+- Training costs becoming prohibitive (\$1B+)
+- Energy and chip constraints
+- Economic feasibility limits
+- Can't scale 1000x more
+
+**Resolution matters:**
+- If compute limits: Longer timelines, regulated by economics
+- If compute abundant: Timelines depend on algorithmic progress
+
+## The China Factor
+
+How does China affect timelines?
+
+**Arguments China accelerates:**
+- Competition drives urgency
+- Massive investment
+- Less safety caution
+- Different approaches might work
+
+**Arguments China doesn't change much:**
+- US still ahead on capabilities
+- Chinese models lag 1-2 years
+- Limited to similar approaches
+- Compute restrictions bite
+
+**Strategic implications:**
+- If China racing: Pressure for <EntityLink id="short-timeline-policy-implications">short timelines</EntityLink>
+- If US leads comfortably: Can afford to be cautious
+- Matters for regulation and safety investment
+
+## Recursive Self-Improvement
+
+Wild card: AI accelerating its own development
+
+**If happens soon:**
+- Could dramatically shorten timelines
+- "Singularity" scenario
+- Hard to predict outcomes
+- Very fast takeoff possible
+
+**If doesn't happen:**
+- Progress continues at current pace
+- More time to prepare
+- Gradual development allows adjustment
+
+**Current status:**
+- AI assists with coding and research
+- But not yet transformative acceleration
+- Unclear if/when recursive improvement kicks in
+
+## Base Rates and Reference Classes
+
+What should we compare to?
+
+**Reference class: Major technologies**
+- Electricity: 50 years from invention to transformation
+- Computers: 40 years from invention to ubiquity
+- Internet: 20 years from invention to transformation
+- Suggests: Long timelines (decades)
+
+**Reference class: Exponential technologies**
+- Semiconductors: Exponential for 50+ years
+- Genomics: Exponential progress continues
+- Suggests: Continued rapid progress possible
+
+**Reference class: Breakthroughs**
+- Manhattan Project: 3 years when focused
+- Apollo Program: 8 years with resources
+- Suggests: Massive resources can compress timelines
+
+**Problem**: AGI is unique, unclear which reference class applies
+

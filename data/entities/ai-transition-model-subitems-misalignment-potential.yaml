@@ -1,0 +1,602 @@
+- id: "tmc-technical-ai-safety"
+  type: "ai-transition-model-subitem"
+  title: "Technical AI Safety"
+  parentFactor: "misalignment-potential"
+  path: "/ai-transition-model/technical-ai-safety/"
+  description: "Research and engineering practices aimed at ensuring AI systems reliably pursue
+    intended goals. Core challenges include goal misgeneralization (60-80% of RL agents exhibit this
+    in distribution-shifted environments) and supervising systems that may exceed human
+    capabilities."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "Technical AI Safety: Research Report"
+    risks:
+      - path: "/knowledge-base/risks/deceptive-alignment/"
+        title: "Deceptive Alignment"
+      - path: "/knowledge-base/risks/scheming/"
+        title: "Scheming"
+      - path: "/knowledge-base/risks/goal-misgeneralization/"
+        title: "Goal Misgeneralization"
+    responses:
+      - path: "/knowledge-base/responses/interpretability/"
+        title: "Interpretability"
+      - path: "/knowledge-base/responses/scalable-oversight/"
+        title: "Scalable Oversight"
+  causeEffectGraph:
+    title: "What Drives AI Safety Adequacy?"
+    description: "Causal factors affecting technical AI safety outcomes. The field faces a widening gap:
+      alignment methods show brittleness, interpretability is progressing but incomplete, and
+      evaluation benchmarks are unreliable."
+    primaryNodeId: "safety-adequacy"
+    nodes:
+      - id: "safety-field-growth"
+        label: "Safety Field Growth"
+        type: "leaf"
+        description: "~50 interpretability researchers, 140+ papers at ICML. Growing exponentially from
+          small base."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 6
+          certainty: 7
+        color: "emerald"
+      - id: "safety-funding"
+        label: "Safety Funding"
+        type: "leaf"
+        description: "OpenAI allocated 20% compute for Superalignment. Labs invest but far less than
+          capabilities."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 7
+          certainty: 6
+        color: "emerald"
+      - id: "racing-intensity"
+        label: "Racing Intensity"
+        type: "leaf"
+        description: "Safety timelines compressed 70-80% post-ChatGPT. Competitive pressure reduces safety
+          investment."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 4
+          certainty: 6
+        color: "rose"
+      - id: "safety-culture"
+        label: "Safety Culture"
+        type: "leaf"
+        description: "Only 3/7 frontier labs test dangerous capabilities. Mixed commitment across industry."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+      - id: "interpretability-progress"
+        label: "Interpretability Progress"
+        type: "cause"
+        description: "SAEs now extract features from Claude 3 Sonnet. 70% of features interpretable but only
+          ~10% of model mapped."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 6
+          certainty: 4
+        color: "emerald"
+      - id: "alignment-technique-development"
+        label: "Alignment Technique Development"
+        type: "cause"
+        description: "RLHF, Constitutional AI, weak-to-strong generalization. Methods exist but show
+          brittleness."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 7
+          certainty: 4
+      - id: "control-methodology-adoption"
+        label: "Control Methodology Adoption"
+        type: "cause"
+        description: "Redwood's AI control via red team/blue team. Safety without alignment assumption."
+        scores:
+          novelty: 7
+          sensitivity: 7
+          changeability: 7
+          certainty: 5
+      - id: "benchmark-development"
+        label: "Benchmark Development"
+        type: "cause"
+        description: "AILuminate, capability evaluations. But vulnerable to sandbagging and conflate safety
+          with capabilities."
+        scores:
+          novelty: 6
+          sensitivity: 6
+          changeability: 6
+          certainty: 4
+      - id: "alignment-robustness"
+        label: "Alignment Robustness"
+        type: "intermediate"
+        description: "RLHF shows preference collapse, deceptive alignment. 60-80% of RL agents exhibit goal
+          misgeneralization."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 5
+          certainty: 4
+        color: "violet"
+      - id: "interpretability-coverage"
+        label: "Interpretability Coverage"
+        type: "intermediate"
+        description: "Can explain safety-relevant features but far from comprehensive model understanding."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 5
+          certainty: 4
+      - id: "evaluation-reliability"
+        label: "Evaluation Reliability"
+        type: "intermediate"
+        description: "Models can sandbag dangerous capability evals. Benchmarks correlate with capabilities
+          not safety."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 5
+          certainty: 4
+      - id: "weak-supervision-capacity"
+        label: "Weak Supervision Capacity"
+        type: "intermediate"
+        description: "GPT-2 supervision recovers only 20-50% of GPT-4 capabilities. Superhuman alignment
+          unsolved."
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 5
+          certainty: 4
+      - id: "capabilities-safety-gap"
+        label: "Capabilities-Safety Gap"
+        type: "intermediate"
+        description: "Safety research trails capabilities by widening margin. ~50 interpretability
+          researchers vs thousands on capabilities."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 6
+          certainty: 6
+        color: "red"
+      - id: "safety-adequacy"
+        label: "Safety Adequacy"
+        type: "effect"
+        description: "Whether AI safety measures are sufficient to prevent catastrophic misalignment as
+          capabilities scale."
+        scores:
+          novelty: 5
+          sensitivity: 10
+          changeability: 5
+          certainty: 3
+        color: "emerald"
+    edges:
+      - source: "safety-field-growth"
+        target: "interpretability-progress"
+        strength: "strong"
+        effect: "increases"
+      - source: "safety-field-growth"
+        target: "alignment-technique-development"
+        strength: "strong"
+        effect: "increases"
+      - source: "safety-funding"
+        target: "interpretability-progress"
+        strength: "strong"
+        effect: "increases"
+      - source: "safety-funding"
+        target: "alignment-technique-development"
+        strength: "strong"
+        effect: "increases"
+      - source: "safety-funding"
+        target: "control-methodology-adoption"
+        strength: "medium"
+        effect: "increases"
+      - source: "racing-intensity"
+        target: "capabilities-safety-gap"
+        strength: "strong"
+        effect: "increases"
+      - source: "racing-intensity"
+        target: "evaluation-reliability"
+        strength: "medium"
+        effect: "decreases"
+      - source: "safety-culture"
+        target: "control-methodology-adoption"
+        strength: "medium"
+        effect: "increases"
+      - source: "safety-culture"
+        target: "benchmark-development"
+        strength: "medium"
+        effect: "increases"
+      - source: "safety-culture"
+        target: "evaluation-reliability"
+        strength: "medium"
+        effect: "increases"
+      - source: "interpretability-progress"
+        target: "interpretability-coverage"
+        strength: "strong"
+        effect: "increases"
+      - source: "alignment-technique-development"
+        target: "alignment-robustness"
+        strength: "medium"
+        effect: "increases"
+      - source: "control-methodology-adoption"
+        target: "alignment-robustness"
+        strength: "medium"
+        effect: "increases"
+      - source: "benchmark-development"
+        target: "evaluation-reliability"
+        strength: "weak"
+        effect: "increases"
+      - source: "alignment-technique-development"
+        target: "weak-supervision-capacity"
+        strength: "medium"
+        effect: "increases"
+      - source: "capabilities-safety-gap"
+        target: "alignment-robustness"
+        strength: "strong"
+        effect: "decreases"
+      - source: "capabilities-safety-gap"
+        target: "weak-supervision-capacity"
+        strength: "strong"
+        effect: "decreases"
+      - source: "alignment-robustness"
+        target: "safety-adequacy"
+        strength: "strong"
+        effect: "increases"
+      - source: "interpretability-coverage"
+        target: "safety-adequacy"
+        strength: "strong"
+        effect: "increases"
+      - source: "evaluation-reliability"
+        target: "safety-adequacy"
+        strength: "strong"
+        effect: "increases"
+      - source: "weak-supervision-capacity"
+        target: "safety-adequacy"
+        strength: "medium"
+        effect: "increases"
+      - source: "capabilities-safety-gap"
+        target: "safety-adequacy"
+        strength: "strong"
+        effect: "decreases"
+- id: "tmc-ai-governance"
+  type: "ai-transition-model-subitem"
+  title: "AI Governance"
+  parentFactor: "misalignment-potential"
+  path: "/ai-transition-model/ai-governance/"
+  description: "External governance mechanisms affecting misalignment risk—regulations, oversight
+    bodies, liability frameworks. Distinct from internal lab practices."
+  lastUpdated: "2026-01"
+  ratings:
+    changeability: 55
+    xriskImpact: 60
+    trajectoryImpact: 75
+    uncertainty: 50
+  relatedContent:
+    researchReports:
+        title: "AI Governance: Research Report"
+    risks:
+      - path: "/knowledge-base/risks/racing-dynamics/"
+        title: "Racing Dynamics"
+      - path: "/knowledge-base/risks/concentration-of-power/"
+        title: "Concentration of Power"
+    responses:
+      - path: "/knowledge-base/responses/governance/"
+        title: "AI Governance Overview"
+      - path: "/knowledge-base/responses/eu-ai-act/"
+        title: "EU AI Act"
+      - path: "/knowledge-base/responses/us-executive-order/"
+        title: "US Executive Order"
+      - path: "/knowledge-base/responses/coordination-mechanisms/"
+        title: "International Coordination"
+      - path: "/knowledge-base/responses/ai-safety-institutes/"
+        title: "AI Safety Institutes"
+    models:
+      - path: "/knowledge-base/models/international-coordination-game/"
+        title: "International Coordination Game"
+      - path: "/knowledge-base/models/institutional-adaptation-speed/"
+        title: "Institutional Adaptation Speed"
+  causeEffectGraph:
+    title: "How AI Governance Affects Misalignment Risk?"
+    description: "Causal factors connecting governance to misalignment potential. EU AI Act, US
+      Executive Order 14110 represent emerging frameworks."
+    primaryNodeId: "governance-effect"
+    nodes:
+      - id: "regulatory-frameworks"
+        label: "Regulatory Frameworks"
+        type: "leaf"
+        color: "blue"
+        description: "Laws and rules governing AI development. EU AI Act, US EO 14110."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 6
+          certainty: 5
+      - id: "oversight-bodies"
+        label: "Oversight Bodies"
+        type: "leaf"
+        color: "teal"
+        description: "AI Safety Institutes, regulatory agencies."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 7
+          certainty: 4
+      - id: "liability-rules"
+        label: "Liability Rules"
+        type: "leaf"
+        description: "Legal accountability for AI harms."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 5
+          certainty: 3
+      - id: "industry-capture"
+        label: "Industry Capture Risk"
+        type: "leaf"
+        color: "rose"
+        description: "Risk that governance becomes dominated by industry interests, weakening safety rules."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+      - id: "enforcement-question"
+        label: "Can Governance Keep Pace?"
+        type: "leaf"
+        color: "violet"
+        description: "Key uncertainty whether slow-moving governance can regulate fast-moving AI development."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 4
+          certainty: 3
+      - id: "international-fragmentation"
+        label: "International Fragmentation"
+        type: "leaf"
+        color: "rose"
+        description: "Lack of global coordination creates regulatory arbitrage and race-to-bottom risks."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 4
+          certainty: 5
+      - id: "evaluation-requirements"
+        label: "Evaluation Requirements"
+        type: "intermediate"
+        color: "emerald"
+        description: "Mandated safety testing before deployment."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 6
+          certainty: 4
+      - id: "transparency-mandates"
+        label: "Transparency Mandates"
+        type: "intermediate"
+        description: "Required disclosure of capabilities and risks."
+        scores:
+          novelty: 5
+          sensitivity: 5
+          changeability: 7
+          certainty: 4
+      - id: "governance-effect"
+        label: "Governance Effect on Misalignment"
+        type: "effect"
+        color: "emerald"
+        description: "How governance reduces misalignment risk."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 5
+          certainty: 3
+    edges:
+      - source: "regulatory-frameworks"
+        target: "evaluation-requirements"
+        strength: "strong"
+        effect: "increases"
+      - source: "oversight-bodies"
+        target: "evaluation-requirements"
+        strength: "strong"
+        effect: "increases"
+      - source: "liability-rules"
+        target: "governance-effect"
+        strength: "medium"
+        effect: "increases"
+      - source: "industry-capture"
+        target: "governance-effect"
+        strength: "medium"
+        effect: "decreases"
+      - source: "enforcement-question"
+        target: "governance-effect"
+        strength: "medium"
+        effect: "mixed"
+      - source: "international-fragmentation"
+        target: "governance-effect"
+        strength: "medium"
+        effect: "decreases"
+      - source: "evaluation-requirements"
+        target: "governance-effect"
+        strength: "strong"
+        effect: "increases"
+      - source: "transparency-mandates"
+        target: "governance-effect"
+        strength: "medium"
+        effect: "increases"
+- id: "tmc-lab-safety"
+  type: "ai-transition-model-subitem"
+  title: "Lab Safety Practices"
+  parentFactor: "misalignment-potential"
+  path: "/ai-transition-model/lab-safety-practices/"
+  description: "Internal safety practices at AI labs including RSPs, safety teams, red-teaming, and
+    deployment decisions. Critical determinant of how risks translate to outcomes."
+  lastUpdated: "2026-01"
+  ratings:
+    changeability: 65
+    xriskImpact: 50
+    trajectoryImpact: 45
+    uncertainty: 40
+  relatedContent:
+    researchReports:
+        title: "Lab Safety Practices: Research Report"
+    responses:
+      - path: "/knowledge-base/responses/responsible-scaling-policies/"
+        title: "Responsible Scaling Policies"
+      - path: "/knowledge-base/responses/voluntary-commitments/"
+        title: "Voluntary Commitments"
+      - path: "/knowledge-base/responses/lab-culture/"
+        title: "Lab Culture"
+      - path: "/knowledge-base/responses/whistleblower-protections/"
+        title: "Whistleblower Protections"
+      - path: "/knowledge-base/responses/red-teaming/"
+        title: "Red Teaming"
+    models:
+      - path: "/knowledge-base/models/safety-culture-equilibrium/"
+        title: "Safety Culture Equilibrium"
+      - path: "/knowledge-base/models/lab-incentives-model/"
+        title: "Lab Incentives Model"
+  causeEffectGraph:
+    title: "What Determines Lab Safety Practices?"
+    description: "Causal factors affecting internal safety at AI labs. Only 3/7 frontier labs test
+      dangerous capabilities."
+    primaryNodeId: "lab-safety"
+    nodes:
+      - id: "safety-culture"
+        label: "Safety Culture"
+        type: "leaf"
+        color: "emerald"
+        description: "Leadership commitment to safety. Varies across labs."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 4
+          certainty: 5
+      - id: "competitive-pressure"
+        label: "Competitive Pressure"
+        type: "leaf"
+        color: "rose"
+        description: "Racing dynamics compressing safety margins."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 4
+          certainty: 7
+      - id: "external-pressure"
+        label: "External Pressure"
+        type: "leaf"
+        color: "blue"
+        description: "Regulatory and public expectations."
+        scores:
+          novelty: 3
+          sensitivity: 6
+          changeability: 6
+          certainty: 5
+      - id: "safety-team-authority"
+        label: "Safety Team Authority"
+        type: "intermediate"
+        color: "emerald"
+        description: "Power of safety teams to delay/block deployments."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 5
+          certainty: 4
+      - id: "red-teaming-quality"
+        label: "Red-Teaming Quality"
+        type: "intermediate"
+        description: "Thoroughness of adversarial testing."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 7
+          certainty: 4
+      - id: "deployment-gates"
+        label: "Deployment Gates"
+        type: "intermediate"
+        color: "blue"
+        description: "RSPs and evaluation requirements before release."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 6
+          certainty: 5
+      - id: "whistleblower-protections"
+        label: "Whistleblower Protections"
+        type: "leaf"
+        color: "emerald"
+        description: "Legal and cultural protections for employees raising safety concerns."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 6
+          certainty: 4
+      - id: "investor-board-pressure"
+        label: "Investor/Board Pressure"
+        type: "leaf"
+        color: "teal"
+        description: "Influence of investors and board members on safety prioritization."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 5
+          certainty: 4
+      - id: "footnote-17-problem"
+        label: "Escape Clause Risk"
+        type: "leaf"
+        color: "violet"
+        description: "Will labs actually honor commitments under competitive pressure?"
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 5
+          certainty: 3
+      - id: "lab-safety"
+        label: "Lab Safety Practices"
+        type: "effect"
+        description: "Overall safety practices at AI labs."
+        scores:
+          novelty: 3
+          sensitivity: 9
+          changeability: 5
+          certainty: 4
+    edges:
+      - source: "safety-culture"
+        target: "safety-team-authority"
+        strength: "strong"
+        effect: "increases"
+      - source: "competitive-pressure"
+        target: "lab-safety"
+        strength: "strong"
+        effect: "decreases"
+      - source: "external-pressure"
+        target: "deployment-gates"
+        strength: "medium"
+        effect: "increases"
+      - source: "safety-team-authority"
+        target: "lab-safety"
+        strength: "strong"
+        effect: "increases"
+      - source: "red-teaming-quality"
+        target: "lab-safety"
+        strength: "medium"
+        effect: "increases"
+      - source: "deployment-gates"
+        target: "lab-safety"
+        strength: "strong"
+        effect: "increases"
+      - source: "whistleblower-protections"
+        target: "safety-team-authority"
+        strength: "medium"
+        effect: "increases"
+      - source: "investor-board-pressure"
+        target: "safety-culture"
+        strength: "medium"
+        effect: "increases"
+      - source: "footnote-17-problem"
+        target: "deployment-gates"
+        strength: "medium"
+        effect: "decreases"

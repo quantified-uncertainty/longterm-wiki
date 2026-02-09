@@ -1,0 +1,378 @@
+---
+title: Worldview-Intervention Mapping
+description: This model maps how beliefs about timelines, alignment difficulty, and coordination feasibility create distinct worldview clusters that drive 2-10x differences in optimal intervention priorities. It provides systematic guidance for aligning resource allocation with underlying beliefs about AI risk.
+sidebar:
+  order: 51
+quality: 62
+lastEdited: "2025-12-26"
+ratings:
+  focus: 8.5
+  novelty: 5
+  rigor: 4.5
+  completeness: 7.5
+  concreteness: 7
+  actionability: 8
+importance: 78.5
+llmSummary: This framework maps beliefs about AI timelines (short/medium/long), alignment difficulty (hard/medium/tractable), and coordination feasibility (feasible/difficult/impossible) to intervention priorities, showing 2-10x differences in optimal resource allocation across worldview clusters. The model identifies that 20-50% of field resources may be wasted through worldview-work mismatches, with specific portfolio recommendations for each worldview cluster.
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Conceptual Framework' section
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+  - Complete 'Strategic Importance' section
+  - Complete 'Limitations' section (6 placeholders)
+metrics:
+  wordCount: 307
+  citations: 25
+  tables: 51
+  diagrams: 2
+clusters:
+  - ai-safety
+  - epistemics
+subcategory: intervention-models
+---
+import { Aside } from '@astrojs/starlight/components';
+import {DataInfoBox, Backlinks, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="worldview-intervention-mapping" ratings={frontmatter.ratings} />
+
+## Overview
+
+This model maps how beliefs about AI risk create distinct worldview clusters with dramatically different intervention priorities. Different worldviews imply 2-10x differences in optimal resource allocation across <EntityLink id="pause">pause advocacy</EntityLink>, technical research, and governance work. 
+
+The model identifies that misalignment between personal beliefs and work focus may waste 20-50% of field resources. <R id="f771d4f56ad4dbaa">AI safety researchers</R> hold fundamentally different assumptions about timelines, technical difficulty, and coordination feasibility, but these differences often don't translate to coherent intervention choices.
+
+The framework reveals four major worldview clusters - from "doomer" (short timelines + hard alignment) prioritizing pause advocacy, to "technical optimist" (medium timelines + tractable alignment) emphasizing research investment.
+
+## Risk/Impact Assessment
+
+| Dimension | Assessment | Evidence | Timeline |
+|-----------|------------|----------|----------|
+| **Severity** | High | 2-10x resource allocation differences across worldviews | Immediate |
+| **Likelihood** | Very High | Systematic worldview-work mismatches observed | Ongoing |
+| **Scope** | Field-wide | Affects individual researchers, orgs, and funders | All levels |
+| **Trend** | Worsening | Field growth without explicit worldview coordination | 2024-2027 |
+
+## Strategic Question Framework
+
+**Given your beliefs about AI risk, which interventions should you prioritize?**
+
+The core problem: People work on interventions that don't match their stated beliefs about AI development. This model makes explicit which interventions are most valuable under specific worldview assumptions.
+
+### How to Use This Framework
+
+| Step | Action | Tool |
+|------|--------|------|
+| 1 | **Identify worldview** | Assess beliefs on timeline/difficulty/coordination |
+| 2 | **Check priorities** | Map beliefs to intervention recommendations |
+| 3 | **Audit alignment** | Compare current work to worldview implications |
+| 4 | **Adjust strategy** | Either change work focus or update worldview |
+
+## Core Worldview Dimensions
+
+Three belief dimensions drive most disagreement about intervention priorities:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Dimensions["Key Worldview Dimensions"]
+        T[Timeline: When does risk materialize?]
+        D[Difficulty: How hard is alignment?]
+        C[Coordination: Can actors cooperate?]
+    end
+
+    T --> |Short| TS[2025-2030]
+    T --> |Medium| TM[2030-2040]
+    T --> |Long| TL[2040+]
+
+    D --> |Hard| DH[Fundamental obstacles]
+    D --> |Medium| DM[Solvable with effort]
+    D --> |Tractable| DT[Largely solved already]
+
+    C --> |Feasible| CF[Treaties possible]
+    C --> |Difficult| CD[Limited cooperation]
+    C --> |Impossible| CI[Pure competition]
+
+    style T fill:#cceeff
+    style D fill:#ffcccc
+    style C fill:#ccffcc
+`} />
+
+### Dimension 1: Timeline Beliefs
+
+| Timeline | Key Beliefs | Strategic Constraints | Supporting Evidence |
+|----------|-------------|---------------------|---------------------|
+| **Short (2025-2030)** | AGI within 5 years; scaling continues; few obstacles | Little time for institutional change; must work with existing structures | <R id="8ebbaf2b6e4d269a">Amodei prediction</R> of powerful AI by 2026-2027 |
+| **Medium (2030-2040)** | Transformative AI in 10-15 years; surmountable obstacles | Time for institution-building; research can mature | <R id="d99a6d0fb1edc2db">Metaculus consensus</R> ≈2032 for AGI |
+| **Long (2040+)** | Major obstacles remain; slow takeoff; decades available | Full institutional development possible; fundamental research valuable | <R id="599472695a5fba70">MIRI position</R> on alignment difficulty |
+
+### Dimension 2: Alignment Difficulty
+
+| Difficulty | Core Assumptions | Research Implications | Current Status |
+|------------|------------------|---------------------|----------------|
+| **Hard** | Alignment fundamentally unsolved; deception likely; current techniques inadequate | Technical solutions insufficient; need to slow/stop development | <R id="f63ec9445ab2f0aa">Scheming research</R> shows deception possible |
+| **Medium** | Alignment difficult but tractable; techniques improve with scale | Technical research highly valuable; sustained investment needed | <R id="e99a5c1697baa07d">Constitutional AI</R> shows promise |
+| **Tractable** | Alignment largely solved; RLHF + interpretability sufficient | Focus on deployment governance; limited technical urgency | <R id="838d7a59a02e11a7">OpenAI safety approach</R> assumes tractability |
+
+### Dimension 3: Coordination Feasibility
+
+| Feasibility | Institutional View | Policy Implications | Historical Precedent |
+|-------------|-------------------|---------------------|---------------------|
+| **Feasible** | Treaties possible; labs coordinate; racing avoidable | Invest heavily in coordination mechanisms | Nuclear Test Ban Treaty, Montreal Protocol |
+| **Difficult** | Partial coordination; major actors defect; limited cooperation | Focus on willing actors; partial governance | Climate agreements with partial compliance |
+| **Impossible** | Pure competition; no stable equilibria; universal racing | Technical safety only; governance futile | Failed disarmament during arms races |
+
+## Four Major Worldview Clusters
+
+<Mermaid client:load chart={`
+quadrantChart
+    title Worldview Clusters by Timeline and Difficulty
+    x-axis Alignment Tractable --> Alignment Hard
+    y-axis Long Timelines --> Short Timelines
+    quadrant-1 PAUSE/STOP
+    quadrant-2 TECHNICAL SPRINT
+    quadrant-3 INSTITUTION BUILD
+    quadrant-4 STEADY PROGRESS
+    Doomer: [0.85, 0.85]
+    Accelerationist: [0.15, 0.75]
+    Governance-focused: [0.35, 0.25]
+    Technical optimist: [0.25, 0.55]
+`} />
+
+### Cluster 1: "Doomer" Worldview
+**Beliefs:** Short timelines + Hard alignment + Coordination difficult
+
+| Intervention Category | Priority | Expected ROI | Key Advocates |
+|----------------------|----------|-------------|---------------|
+| Pause/slowdown advocacy | **Very High** | 10x+ if successful | <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> |
+| Compute governance | **Very High** | 5-8x via bottlenecks | <R id="0b85365d787dfe9a">RAND reports</R> |
+| Technical safety research | **High** | 2-4x (low prob, high value) | <EntityLink id="miri">MIRI</EntityLink> approach |
+| International coordination | **Medium** | 8x if achieved (low prob) | <R id="1593095c92d34ed8">FHI governance work</R> |
+| Field-building | **Low** | 1-2x (insufficient time) | Long-term capacity building |
+| Public engagement | **Medium** | 3-5x via political support | <R id="a8fda81d4a00ec7c">Pause AI movement</R> |
+
+**Coherence Check:** If you believe this worldview but work on field-building or long-term institution design, your work may be misaligned with your beliefs.
+
+### Cluster 2: "Technical Optimist" Worldview
+**Beliefs:** Medium timelines + Medium difficulty + Coordination possible
+
+| Intervention Category | Priority | Expected ROI | Leading Organizations |
+|----------------------|----------|-------------|----------------------|
+| Technical safety research | **Very High** | 8-12x via direct solutions | <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="redwood-research">Redwood</EntityLink> |
+| <EntityLink id="interpretability">Interpretability</EntityLink> | **Very High** | 6-10x via understanding | <EntityLink id="chris-olah">Chris Olah's work</EntityLink> |
+| Lab safety standards | **High** | 4-6x via industry norms | <R id="0e7aef26385afeed">Partnership on AI</R> |
+| Compute governance | **Medium** | 3-5x supplementary value | <R id="f0d95954b449240a">CSET</R> research |
+| Pause advocacy | **Low** | 1x or negative (unnecessary) | Premature intervention |
+| Field-building | **High** | 5-8x via capacity | <EntityLink id="chai">CHAI</EntityLink>, <R id="ba3a8bd9c8404d7b">MATS</R> |
+
+**Coherence Check:** If you believe this worldview but work on pause advocacy or aggressive regulation, your efforts may be counterproductive.
+
+### Cluster 3: "Governance-Focused" Worldview
+**Beliefs:** Medium-long timelines + Medium difficulty + Coordination feasible
+
+| Intervention Category | Priority | Expected ROI | Key Institutions |
+|----------------------|----------|-------------|------------------|
+| International coordination | **Very High** | 10-15x via global governance | <EntityLink id="uk-aisi">UK AISI</EntityLink>, <EntityLink id="us-aisi">US AISI</EntityLink> |
+| Domestic regulation | **Very High** | 6-10x via norm-setting | <R id="1102501c88207df3">EU AI Act</R> |
+| Institution-building | **Very High** | 8-12x via capacity | <R id="fdf68a8f30f57dee">AI Safety Institute</R> development |
+| Technical standards | **High** | 4-6x enabling governance | <R id="54dbc15413425997">NIST AI RMF</R> |
+| Technical research | **Medium** | 3-5x (others lead) | Research coordination role |
+| Pause advocacy | **Low** | 1-2x premature | Governance development first |
+
+**Coherence Check:** If you believe this worldview but focus purely on technical research, you may be underutilizing comparative advantage.
+
+### Cluster 4: "Accelerationist/Optimist" Worldview
+**Beliefs:** Any timeline + Tractable alignment + Any coordination level
+
+| Intervention Category | Priority | Expected ROI | Rationale |
+|----------------------|----------|-------------|-----------|
+| Capability development | **Very High** | 15-25x via benefits | AI solves problems faster than creates them |
+| Deployment governance | **Medium** | 2-4x addressing specific harms | Targeted harm prevention |
+| Technical safety | **Low** | 1-2x already adequate | RLHF sufficient for current systems |
+| Pause/slowdown | **Very Low** | Negative ROI | Delays beneficial AI |
+| Aggressive regulation | **Very Low** | Large negative ROI | Stifles innovation unnecessarily |
+
+**Coherence Check:** If you hold this worldview but work on safety research or pause advocacy, your work contradicts your beliefs about AI risk levels.
+
+## Intervention Effectiveness Matrix
+
+The following analysis shows how intervention effectiveness varies dramatically across worldviews:
+
+| Intervention | Short+Hard (Doomer) | Short+Tractable (Sprint) | Long+Hard (Patient) | Long+Tractable (Optimist) |
+|--------------|---------------------|--------------------------|---------------------|-------------------------|
+| **Pause/slowdown** | Very High (10x) | Low (1x) | Medium (4x) | Very Low (-2x) |
+| **Compute governance** | Very High (8x) | Medium (3x) | High (6x) | Low (1x) |
+| **Alignment research** | High (3x) | Low (2x) | Very High (12x) | Low (1x) |
+| **<EntityLink id="interpretability">Interpretability</EntityLink>** | High (4x) | Medium (5x) | Very High (10x) | Medium (3x) |
+| **International treaties** | Medium (2x) | Low (1x) | Very High (15x) | Medium (4x) |
+| **Domestic regulation** | Medium (3x) | Medium (4x) | High (8x) | Medium (3x) |
+| **Lab safety standards** | High (6x) | High (7x) | High (8x) | Medium (4x) |
+| **Field-building** | Low (1x) | Low (2x) | Very High (12x) | Medium (5x) |
+| **Public engagement** | Medium (4x) | Low (2x) | High (7x) | Low (1x) |
+
+<Aside type="caution" title="Critical Insight">
+Working on "Very High" priority interventions under the wrong worldview can waste 5-10x resources compared to optimal allocation. This represents one of the largest efficiency losses in the AI safety field.
+</Aside>
+
+## Portfolio Strategies for Uncertainty
+
+### Timeline Uncertainty Management
+
+| Uncertainty Level | Recommended Allocation | Hedge Strategy |
+|------------------|----------------------|----------------|
+| **50/50 short vs long** | 60% urgent interventions, 40% patient capital | Compute governance + field-building |
+| **70% short, 30% long** | 80% urgent, 20% patient with option value | Standards + some institution-building |
+| **30% short, 70% long** | 40% urgent, 60% patient development | Institution-building + some standards |
+
+### Alignment Difficulty Hedging
+
+| Belief Distribution | Technical Research | Governance/Coordination | Rationale |
+|-------------------|-------------------|----------------------|-----------|
+| **50% hard, 50% tractable** | 40% allocation | 60% allocation | Governance has value regardless |
+| **80% hard, 20% tractable** | 20% allocation | 80% allocation | Focus on buying time |
+| **20% hard, 80% tractable** | 70% allocation | 30% allocation | Technical solutions likely |
+
+### Coordination Feasibility Strategies
+
+| Scenario | Unilateral Capacity | Multilateral Investment | Leading Actor Focus |
+|----------|-------------------|----------------------|-------------------|
+| **High coordination feasibility** | 20% | 60% | 20% |
+| **Medium coordination feasibility** | 40% | 40% | 20% |
+| **Low coordination feasibility** | 60% | 10% | 30% |
+
+## Current State & Trajectory
+
+### Field-Wide Worldview Distribution
+
+| Worldview Cluster | Estimated Prevalence | Resource Allocation | Alignment Score |
+|------------------|-------------------|-------------------|----------------|
+| **Doomer** | 15-20% of researchers | ≈30% of resources | **Moderate** misalignment |
+| **Technical Optimist** | 40-50% of researchers | ≈45% of resources | **Good** alignment |
+| **Governance-Focused** | 25-30% of researchers | ≈20% of resources | **Poor** alignment |
+| **Accelerationist** | 5-10% of researchers | ≈5% of resources | **Unknown** |
+
+### Observed Misalignment Patterns
+
+Based on <R id="2e0c662574087c2a">AI Alignment Forum</R> surveys and <R id="ec456e4a78161d43">80,000 Hours</R> career advising:
+
+| Common Mismatch | Frequency | Estimated Efficiency Loss |
+|----------------|-----------|-------------------------|
+| "Short timelines" researcher doing field-building | 25% of junior researchers | 3-5x effectiveness loss |
+| "Alignment solved" researcher doing safety work | 15% of technical researchers | 2-3x effectiveness loss |
+| "Coordination impossible" researcher doing policy | 10% of policy researchers | 4-6x effectiveness loss |
+
+### 2024-2027 Trajectory Predictions
+
+| Trend | Likelihood | Impact on Field Efficiency |
+|-------|------------|---------------------------|
+| **Increased worldview polarization** | High | -20% to -30% efficiency |
+| **Better worldview-work matching** | Medium | +15% to +25% efficiency |
+| **Explicit worldview institutions** | Low | +30% to +50% efficiency |
+
+## Key Uncertainties & Cruxes
+
+<KeyQuestions
+  questions={[
+    "What's the actual distribution of worldviews among AI safety researchers?",
+    "How much does worldview-work mismatch reduce field effectiveness quantitatively?",
+    "Can people reliably identify and articulate their own worldview assumptions?",
+    "Would explicit worldview discussion increase coordination or create harmful polarization?",
+    "How quickly should people update worldviews based on new evidence?",
+    "Do comparative advantages sometimes override worldview-based prioritization?"
+  ]}
+/>
+
+### Resolution Timelines
+
+| Uncertainty | Evidence That Would Resolve | Timeline |
+|-------------|---------------------------|----------|
+| **Actual worldview distribution** | Comprehensive field survey | 6-12 months |
+| **Quantified efficiency losses** | Retrospective impact analysis | 1-2 years |
+| **Worldview updating patterns** | Longitudinal researcher tracking | 2-5 years |
+| **Institutional coordination effects** | Natural experiments with explicit worldview orgs | 3-5 years |
+
+## Implementation Guidance
+
+### For Individual Researchers
+
+| Career Stage | Primary Action | Secondary Actions |
+|-------------|----------------|-------------------|
+| **Graduate students** | Identify worldview before specializing | Talk to advisors with different worldviews |
+| **Postdocs** | Audit current work against worldview | Consider switching labs if misaligned |
+| **Senior researchers** | Make worldview explicit in work | Mentor others on worldview coherence |
+| **Research leaders** | Hire for worldview diversity | Create space for worldview discussion |
+
+### For Organizations
+
+| Organization Type | Strategic Priority | Implementation Steps |
+|------------------|-------------------|---------------------|
+| **Research organizations** | Clarify institutional worldview | Survey staff, align strategy, communicate assumptions |
+| **Grantmaking organizations** | Develop worldview-coherent portfolios | Map grantee worldviews, identify gaps, fund strategically |
+| **Policy organizations** | Coordinate across worldview differences | Create cross-worldview working groups |
+| **Field-building organizations** | Facilitate worldview discussion | Host workshops, create assessment tools |
+
+### For Funders
+
+| Funding Approach | When Appropriate | Risk Management |
+|-----------------|------------------|-----------------|
+| **Single worldview concentration** | High confidence in specific worldview | Diversify across intervention types within worldview |
+| **Worldview hedging** | High uncertainty about key parameters | Fund complementary approaches, avoid contradictory grants |
+| **Worldview arbitrage** | Identified underinvested worldview-intervention combinations | Focus on neglected high-value combinations |
+
+## Failure Mode Analysis
+
+### Individual Failure Modes
+
+| Failure Mode | Prevalence | Mitigation Strategy |
+|-------------|------------|-------------------|
+| **Social conformity bias** | High | Create protected spaces for worldview diversity |
+| **Career incentive misalignment** | Medium | Reward worldview-coherent work choices |
+| **Worldview rigidity** | Medium | Encourage regular worldview updating |
+| **False precision in beliefs** | High | Emphasize uncertainty and portfolio approaches |
+
+### Institutional Failure Modes
+
+| Failure Mode | Symptoms | Solution |
+|-------------|----------|---------|
+| **Worldview monoculture** | All staff share same assumptions | Actively hire for belief diversity |
+| **Incoherent strategy** | Contradictory intervention portfolio | Make worldview assumptions explicit |
+| **Update resistance** | Strategy unchanged despite new evidence | Create structured belief updating processes |
+
+## Sources & Resources
+
+### Research Literature
+
+| Category | Key Sources | Quality | Focus |
+|----------|------------|---------|-------|
+| **Worldview surveys** | <R id="69b320e83d92f2a0">AI Alignment Forum survey</R> | Medium | Community beliefs |
+| **Intervention effectiveness** | <R id="c5cca651ad11df4d">80,000 Hours research</R> | High | Career prioritization |
+| **Strategic frameworks** | <R id="83aa195b6b8dd512">Open Philanthropy worldview reports</R> | High | Cause prioritization |
+
+### Tools & Assessments
+
+| Resource | Purpose | Access |
+|----------|---------|--------|
+| **Worldview self-assessment** | Individual belief identification | <R id="468cbf657896b529">AI Safety Fundamentals</R> |
+| **Intervention prioritization calculator** | Portfolio optimization | <R id="bff2f5843023e85e">EA Forum tools</R> |
+| **Career decision frameworks** | Work-belief alignment | <R id="1cb4e288c338edca">80,000 Hours coaching</R> |
+
+### Organizations by Worldview
+
+| Organization | Primary Worldview | Core Interventions |
+|-------------|-------------------|-------------------|
+| **<EntityLink id="miri">MIRI</EntityLink>** | Doomer (short+hard) | Agent foundations, pause advocacy |
+| **<EntityLink id="anthropic">Anthropic</EntityLink>** | Technical optimist | Constitutional AI, interpretability |
+| **<R id="f0d95954b449240a">CSET</R>** | Governance-focused | Policy research, international coordination |
+| **<EntityLink id="redwood-research">Redwood Research</EntityLink>** | Technical optimist | Alignment research, interpretability |
+
+## Related Models & Pages
+
+### Complementary Models
+- <EntityLink id="ai-risk-portfolio-analysis" /> - Risk category prioritization across scenarios
+- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> - How competition affects coordination feasibility
+- <EntityLink id="international-coordination-game" label="International Coordination Game" /> - Factors affecting cooperation
+
+### Related Worldviews
+- <EntityLink id="doomer">Doomer Worldview</EntityLink> - Short timelines, hard alignment assumptions
+- <EntityLink id="governance-focused">Governance-Focused Worldview</EntityLink> - Coordination optimism, institution-building focus
+- <EntityLink id="long-timelines">Long Timelines Worldview</EntityLink> - Patient capital, fundamental research emphasis
+
+<Backlinks client:load entityId="worldview-intervention-mapping" />

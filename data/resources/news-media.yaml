@@ -1,0 +1,1270 @@
+# News & Media
+# News articles and media coverage
+# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
+
+- id: 85ba042a002437a0
+  url: https://fortune.com/2025/06/20/openai-files-sam-altman-leadership-concerns-safety-failures-ai-lab/
+  title: '"The OpenAI Files" reveals deep leadership concerns about Sam Altman and safety failures'
+  type: web
+  local_filename: 85ba042a002437a0.txt
+  summary: The 'OpenAI Files' examines internal issues at OpenAI, highlighting leadership challenges
+    and potential risks in AI development. The report critiques Sam Altman's leadership and the
+    company's evolving approach to ethical AI.
+  review: >-
+    The report offers a critical examination of OpenAI's internal dynamics, focusing on the tensions
+    between the company's original mission of responsible AI development and its increasingly
+    profit-driven trajectory. Key concerns center on CEO Sam Altman's leadership style and the
+    potential compromising of AI safety principles in pursuit of technological advancement and
+    commercial success.
+
+
+    Drawing from multiple sources including internal communications and testimonies from former
+    executives, the report suggests significant governance challenges within OpenAI. Of particular
+    note are the critiques from prominent team members like Mira Murati, Ilya Sutskever, and Jan
+    Leike, who have raised doubts about the company's commitment to responsible AI development. The
+    analysis underscores the critical need for robust governance structures and ethical leadership
+    in organizations developing potentially transformative AI technologies, especially as the
+    company approaches what it believes could be a breakthrough in artificial general intelligence
+    (AGI).
+  key_points:
+    - Multiple OpenAI leaders have expressed concerns about Sam Altman's leadership and AI safety
+      approach
+    - The company is struggling to balance its nonprofit mission with for-profit aspirations
+    - Internal governance and ethical leadership are crucial as OpenAI approaches potential AGI
+      development
+  cited_by:
+    - lab-behavior
+  fetched_at: 2025-12-28 02:04:06
+  authors:
+    - Beatrice Nolan
+  tags:
+    - safety
+  publication_id: fortune
+- id: 4984c6770aa278c5
+  url: https://fortune.com/2025/04/15/ai-timelines-agi-safety/
+  title: AI industry timelines to AGI getting shorter, but safety becoming less of a focus
+  type: web
+  local_filename: 4984c6770aa278c5.txt
+  summary: Leading AI researchers predict AGI could arrive by 2027-2030, but companies are
+    simultaneously reducing safety testing and evaluations. Competitive pressures are compromising
+    responsible AI development.
+  review: >-
+    The source highlights a critical paradox in current AI development: as artificial general
+    intelligence (AGI) timelines become increasingly compressed, AI companies are paradoxically
+    reducing their commitment to safety protocols. Researchers like Daniel Kokotajlo, Dario Amodei,
+    and others are predicting AGI could emerge as early as 2027, with potential for a rapid
+    'intelligence explosion' that could have profound societal implications.
+
+
+    The article underscores a significant market failure where commercial competition is actively
+    undermining comprehensive safety testing. Despite warnings from experts about potential
+    catastrophic risks—including the potential for the 'permanent end of humanity'—companies are
+    treating safety evaluations as impediments to market speed. Geopolitical tensions, particularly
+    the U.S. desire to maintain technological superiority over China, further complicate potential
+    regulatory interventions, creating a high-stakes environment where rapid AI development is
+    prioritized over careful, measured progress.
+  key_points:
+    - AGI timelines are converging around 2027-2030 from multiple leading AI researchers
+    - Companies are reducing safety testing and evaluation periods for new AI models
+    - Geopolitical competition is preventing meaningful AI safety regulation
+  cited_by:
+    - lab-behavior
+  fetched_at: 2025-12-28 02:03:58
+  authors:
+    - Jeremy Kahn
+  tags:
+    - safety
+    - evaluation
+    - agi
+  publication_id: fortune
+- id: 4507d36fc38ca05d
+  url: https://techcrunch.com/2025/04/24/anthropic-ceo-wants-to-open-the-black-box-of-ai-models-by-2027/
+  title: Anthropic CEO wants to open the black box of AI models by 2027
+  type: web
+  local_filename: 4507d36fc38ca05d.txt
+  summary: Anthropic CEO Dario Amodei highlights the critical need to improve interpretability of AI
+    models, setting a goal to reliably detect most AI model problems by 2027.
+  review: >-
+    Dario Amodei's essay underscores a fundamental challenge in artificial intelligence: the lack of
+    transparency in how advanced AI models make decisions. By setting an ambitious goal to develop
+    more robust interpretability techniques, Anthropic is addressing a critical gap in AI safety
+    research. The company has already made initial breakthroughs, such as tracing AI thinking
+    pathways through 'circuits' and identifying specific neural network mechanisms.
+
+
+    The broader implications of this research are significant for AI safety and governance. Amodei
+    argues that as AI systems become increasingly central to economy, technology, and national
+    security, understanding their inner workings is not just a scientific curiosity but a necessity.
+    By calling for industry-wide collaboration and light-touch governmental regulations, Anthropic
+    is positioning itself as a thought leader in responsible AI development, pushing for
+    transparency and safety alongside technological advancement.
+  key_points:
+    - Anthropic aims to develop reliable methods for detecting AI model problems by 2027
+    - Current AI models are 'grown' rather than fully understood by researchers
+    - Interpretability research is crucial for safe and responsible AI deployment
+  fetched_at: 2025-12-28 01:07:15
+  authors:
+    - Maxwell Zeff
+  published_date: 2025-04-24
+  tags:
+    - interpretability
+  publication_id: techcrunch
+- id: d6d4a28f28ba4170
+  url: https://fortune.com/2025/08/29/british-lawmakers-accuse-google-deepmind-of-breach-of-trust-over-delayed-gemini-2-5-pro-safety-report/
+  title: British lawmakers accuse Google of 'breach of trust' over delayed Gemini 2.5 Pro safety report
+  type: web
+  local_filename: d6d4a28f28ba4170.txt
+  summary: A group of 60 U.K. lawmakers criticized Google DeepMind for not fully disclosing safety
+    information about its Gemini 2.5 Pro AI model as previously committed. The letter argues the
+    company failed to provide comprehensive model testing details.
+  review: >-
+    The source highlights a growing tension between AI development and safety transparency, focusing
+    on Google DeepMind's alleged failure to meet previously agreed-upon AI safety reporting
+    standards. The lawmakers' open letter criticizes the company for releasing Gemini 2.5 Pro
+    without a comprehensive model card and detailed safety evaluations, which were promised at an
+    international AI safety summit in 2024.
+
+
+    The incident reveals broader challenges in AI governance, where major tech companies are
+    seemingly treating safety commitments as optional. The letter demands more rigorous and timely
+    safety reporting, including clear deployment definitions, consistent safety evaluation reports,
+    and full transparency about testing processes. This case underscores the critical need for
+    robust, enforceable mechanisms to ensure AI developers maintain accountability and prioritize
+    safety throughout model development and deployment.
+  key_points:
+    - Google DeepMind accused of not fulfilling Frontier AI Safety Commitments
+    - Lawmakers demand more transparency in AI model safety reporting
+    - Delayed and minimal model card raises concerns about AI safety practices
+  cited_by:
+    - lab-behavior
+  fetched_at: 2025-12-28 02:03:59
+  tags:
+    - safety
+    - evaluation
+    - llm
+  publication_id: fortune
+- id: b2534f71895a316d
+  url: https://fortune.com/2024/04/04/ai-training-costs-how-much-is-too-much-openai-gpt-anthropic-microsoft/
+  title: Fortune AI training costs
+  type: web
+  local_filename: b2534f71895a316d.txt
+  summary: Research shows AI training costs are dramatically increasing, with models potentially
+    costing billions of dollars and computational requirements doubling every six months. The trend
+    raises questions about sustainability and future AI development.
+  review: >-
+    The source examines the escalating costs of training advanced AI models, revealing a remarkable
+    trend of exponential growth in computational requirements. Researchers from Epoch AI have
+    tracked how the computational power needed to train cutting-edge AI models has been doubling
+    approximately every six months since the early 2010s, with training costs roughly tripling
+    annually. This trajectory suggests potential training costs could reach $140 billion by 2030,
+    though the projection is acknowledged as a speculative extrapolation.
+
+
+    The implications for AI development are profound, with potential economic and technological
+    limitations emerging. Experts like Lennart Heim warn that training costs could theoretically
+    surpass entire national GDPs by the mid-2030s, raising critical questions about the
+    sustainability of current AI development approaches. Alternative strategies are being explored,
+    such as smaller, task-specific models, open-source collaboration, and innovative data sourcing
+    techniques like synthetic data generation. The research highlights the complex interplay between
+    technological advancement, economic constraints, and the pursuit of increasingly sophisticated
+    artificial intelligence.
+  key_points:
+    - AI training costs are growing exponentially, potentially reaching $140 billion by 2030
+    - Computational requirements double approximately every six months
+    - Economic and technological constraints may limit future AI model development
+    - Alternative approaches like smaller, specialized models are being explored
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:09:00
+  tags:
+    - training
+  publication_id: fortune
+- id: e00141e05f450f62
+  url: https://fortune.com/2023/05/18/how-will-ai-chatgpt-change-stock-markets-high-frequency-trading-crashes/
+  title: "Fortune: AI and High-Frequency Trading"
+  type: web
+  local_filename: e00141e05f450f62.txt
+  summary: The article explores the evolution of AI and algorithmic trading, examining its benefits
+    and potential risks to financial markets. It highlights how high-frequency trading can create
+    market instability and warns about potential challenges with generative AI trading tools.
+  review: >-
+    This article provides a comprehensive overview of the development of algorithmic trading,
+    tracing its evolution from simple program trading in the 1980s to today's sophisticated
+    high-frequency trading (HFT) and emerging AI-powered trading systems. The author, with 14 years
+    of research experience, critically examines both the advantages and significant risks associated
+    with AI-driven financial technologies, drawing on historical examples like the Black Monday
+    crash and the 2010 flash crash to illustrate potential systemic vulnerabilities.
+
+
+    The key contribution is a nuanced exploration of how AI trading technologies can simultaneously
+    offer remarkable efficiency and pose substantial risks to market stability. The research
+    highlights critical concerns such as algorithmic herding, potential amplification of market
+    biases, and the risk of multiple trading algorithms making simultaneous decisions that could
+    trigger significant market disruptions. While acknowledging the computational advantages of AI
+    over human traders, the author emphasizes the need for careful implementation and robust
+    regulatory oversight to prevent potential market failures.
+  key_points:
+    - High-frequency trading can execute trades in microseconds, dramatically faster than human
+      traders
+    - AI trading algorithms risk creating market instability through synchronized decision-making
+    - Generative AI could potentially amplify existing market herding behaviors
+  fetched_at: 2025-12-28 03:01:42
+  publication_id: fortune
+- id: dff3bbb46e9a42d9
+  url: https://techcrunch.com/2025/04/03/google-is-shipping-gemini-models-faster-than-its-ai-safety-reports/
+  title: Google is shipping Gemini models faster than its AI safety reports
+  type: web
+  local_filename: dff3bbb46e9a42d9.txt
+  summary: Google is accelerating its AI model releases, including Gemini 2.5 Pro and 2.0 Flash, but
+    has not published required safety documentation. This raises concerns about transparency and
+    responsible AI development.
+  review: >-
+    The article highlights a growing tension between technological innovation and responsible AI
+    development at Google. While the company has significantly increased its model release cadence
+    to compete in the rapidly evolving AI landscape, it appears to be compromising on transparency
+    by not publishing comprehensive safety reports for its latest Gemini models. This approach
+    contrasts with industry standards set by other AI labs like OpenAI, Anthropic, and Meta, who
+    typically release detailed 'model cards' or 'system cards' that provide insights into model
+    capabilities, limitations, and potential risks.
+
+
+    The lack of published safety documentation is particularly concerning given Google's previous
+    commitments to governmental bodies and its own early research advocating for transparent AI
+    development. Google argues that some releases are 'experimental' and that safety testing has
+    been conducted internally, but the absence of public documentation undermines independent
+    research and safety evaluations. This situation reflects broader challenges in AI governance,
+    where regulatory efforts to establish standardized safety reporting have been met with limited
+    success, potentially creating an environment where technological acceleration takes precedence
+    over comprehensive safety assessments.
+  key_points:
+    - Google is rapidly releasing Gemini AI models without corresponding safety reports
+    - The company claims these are experimental releases pending full documentation
+    - Lack of transparency could undermine independent AI safety research
+  cited_by:
+    - lab-behavior
+  fetched_at: 2025-12-28 02:04:02
+  tags:
+    - safety
+    - open-source
+    - llm
+  publication_id: techcrunch
+- id: a911f02f24a21c09
+  url: https://fortune.com/2025/04/09/google-gemini-2-5-pro-missing-model-card-in-apparent-violation-of-ai-safety-promises-to-us-government-international-bodies/
+  title: Google's Gemini 2.5 Pro missing key safety report in violation of promises
+  type: web
+  local_filename: a911f02f24a21c09.txt
+  summary: Google launched Gemini 2.5 Pro without publishing a required safety report, contradicting
+    previous commitments made to government and international bodies about model transparency and
+    safety evaluations.
+  review: >-
+    The article highlights a growing trend of AI companies potentially prioritizing rapid deployment
+    over comprehensive safety transparency. Google's release of Gemini 2.5 Pro without a mandated
+    safety report represents a potential breach of voluntary commitments made at White House, G7,
+    and international AI safety summits. These commitments included publishing detailed model cards
+    that explain capabilities, limitations, potential risks, and societal impacts.
+
+
+    The incident reflects broader concerns in the AI industry about maintaining rigorous safety
+    standards amid competitive pressures. Experts like Sandra Wachter argue that this approach of
+    'deploy first, investigate later' is dangerous, comparing it unfavorably to safety protocols in
+    other industries. The article also suggests that shifting political landscapes, particularly
+    potential changes in US administration attitudes toward AI regulation, might be contributing to
+    a relaxation of previously established safety commitments.
+  key_points:
+    - Google failed to release a safety report for Gemini 2.5 Pro, breaking previous transparency
+      pledges
+    - Tech companies may be prioritizing rapid AI deployment over comprehensive safety evaluations
+    - Political and competitive pressures could be undermining AI safety commitments
+  cited_by:
+    - lab-behavior
+  fetched_at: 2025-12-28 02:03:59
+  tags:
+    - safety
+    - evaluation
+    - llm
+  publication_id: fortune
+- id: f5cd371c47e21529
+  url: https://www.technologyreview.com/2024/03/27/1090182/ai-talent-global-china-us/
+  title: MIT Technology Review - Four things you need to know about China's AI talent pool
+  type: web
+  local_filename: f5cd371c47e21529.txt
+  summary: A MacroPolo study tracked changes in global AI talent distribution, revealing China's rapid
+    rise in AI research and researcher retention.
+  review: The research by MacroPolo provides a comprehensive analysis of global AI talent trends,
+    focusing on the 2019 and 2022 NeurIPS conference participants. The study highlights a dramatic
+    shift in the international AI research landscape, with China emerging as a major player in AI
+    talent development and retention. Key insights include the significant growth of China's AI
+    talent pool, increasing from 10% to 26% of elite researchers, and a notable trend of researchers
+    staying in their home countries. The research underscores the changing dynamics of global AI
+    talent, with countries investing heavily in graduate-level institutions and creating attractive
+    ecosystems for AI research. This shift has important implications for international
+    technological competition, particularly between the US and China, and suggests a more
+    distributed future for cutting-edge AI research.
+  key_points:
+    - China has dramatically expanded its AI talent pool, now representing 26% of top researchers
+    - 80-90% of AI researchers now tend to stay in their country of graduate education
+    - The US still leads in AI talent, but the gap with China is rapidly closing
+  cited_by:
+    - geopolitics
+  fetched_at: 2025-12-28 02:03:33
+  publication_id: mit-tech-review
+- id: 4c5f615992acd00d
+  url: https://www.technologyreview.com/2022/04/19/1049378/ai-inequality-problem/
+  title: "MIT Technology Review: AI and Inequality"
+  type: web
+  local_filename: 4c5f615992acd00d.txt
+  fetched_at: 2025-12-28 03:45:42
+  publication_id: mit-tech-review
+- id: eb02b44eb846dc48
+  url: https://www.technologyreview.com/topic/artificial-intelligence/
+  title: "MIT Technology Review: AI Business"
+  type: web
+  cited_by:
+    - daniela-amodei
+    - historical-revisionism
+  publication_id: mit-tech-review
+  tags:
+    - historical-evidence
+    - archives
+    - deepfakes
+- id: e815621b167035b0
+  url: https://www.technologyreview.com/2023/12/05/1084393/make-no-mistake-ai-is-owned-by-big-tech/
+  title: "MIT Technology Review: AI Is Owned by Big Tech"
+  type: web
+  publication_id: mit-tech-review
+- id: 9a2c37b2a6aa51d4
+  url: https://www.technologyreview.com/topic/humans-and-technology/
+  title: "MIT Technology Review: AI Relationships"
+  type: web
+  cited_by:
+    - cyber-psychosis
+  publication_id: mit-tech-review
+  tags:
+    - mental-health
+    - ai-ethics
+    - manipulation
+- id: 21a4a585cdbf7dd3
+  url: https://www.technologyreview.com/
+  title: "MIT Technology Review: Deepfake Coverage"
+  type: web
+  local_filename: 21a4a585cdbf7dd3.txt
+  cited_by:
+    - epoch-ai
+    - dario-amodei
+    - holden-karnofsky
+    - yoshua-bengio
+    - cyber-psychosis
+    - proliferation
+  fetched_at: 2025-12-28 03:45:07
+  publication_id: mit-tech-review
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+    - constitutional-ai
+    - responsible-scaling
+- id: d0c81bbfe41efe44
+  url: https://time.com/6266923/ai-eliezer-yudkowsky-open-letter-not-enough/
+  title: Pausing AI Development Isn't Enough. We Need to Shut it All Down
+  type: web
+  cited_by:
+    - miri
+    - doomer
+  tags:
+    - agent-foundations
+    - decision-theory
+    - corrigibility
+  publication_id: time
+- id: 611ff5e67b644881
+  url: https://www.pewresearch.org/politics/2020/10/13/voters-rarely-switch-parties-but-many-democrats-and-republicans-have-changed-views-on-key-issues/
+  title: Pew Research
+  type: web
+  publication_id: pew
+- id: 5f14da1ccd4f1678
+  url: https://www.pewresearch.org/internet/2025/04/03/views-of-risks-opportunities-and-regulation-of-ai/
+  title: Pew Research AI Survey 2025
+  type: web
+  local_filename: 5f14da1ccd4f1678.txt
+  summary: A comprehensive survey comparing AI experts' and U.S. public views on AI's potential
+    impacts, risks, opportunities, and regulation. Highlights substantial differences in excitement,
+    concern, and expectations about AI's future.
+  review: The Pew Research AI Survey 2025 provides a nuanced exploration of the growing divide between
+    AI experts and the general public regarding artificial intelligence's potential and challenges.
+    While AI experts are significantly more optimistic, with 47% being more excited than concerned
+    about AI's increased use, only 11% of U.S. adults share this sentiment. Conversely, 51% of the
+    public express more concern than excitement about AI's development. The survey delves into
+    critical areas of divergence, including job displacement, human connection, and AI's potential
+    to outperform humans in various tasks. Notably, experts are more confident in AI's capabilities,
+    with 51% believing AI could drive better than humans, compared to just 19% of the public. The
+    research also highlights important concerns about representation, bias, and the need for
+    responsible AI development, with both experts and the public calling for more diverse
+    perspectives in AI design and robust government regulation.
+  key_points:
+    - Significant optimism gap between AI experts (47% excited) and public (11% excited)
+    - Shared concerns about AI bias, misinformation, and the need for responsible regulation
+    - Experts more confident in AI's ability to outperform humans in specific tasks
+  fetched_at: 2025-12-28 02:03:23
+  publication_id: pew
+  tags:
+    - governance
+- id: 89e6e3e75671ab78
+  url: https://www.pewresearch.org/internet/2017/11/29/public-comments-to-the-federal-communications-commission-about-net-neutrality-contain-many-duplicate-and-fake-submissions/
+  title: Pew Research analysis
+  type: web
+  fetched_at: 2025-12-28 02:56:19
+  publication_id: pew
+- id: 839730d0771f4105
+  url: https://www.pewresearch.org/short-reads/2025/10/24/what-we-know-about-energy-use-at-us-data-centers-amid-the-ai-boom/
+  title: Pew Research data center energy
+  type: web
+  local_filename: 839730d0771f4105.txt
+  summary: Pew Research analyzes the growth of U.S. data centers, examining their energy consumption,
+    geographical distribution, and potential environmental implications during the AI boom.
+  review: The research provides a comprehensive overview of the emerging data center landscape in the
+    United States, highlighting the substantial energy and infrastructure demands driven by
+    artificial intelligence development. The study reveals that data centers consumed 183
+    terawatt-hours of electricity in 2024, representing over 4% of the country's total electricity
+    consumption, with projections indicating a 133% growth by 2030. The analysis offers critical
+    insights into the geographical concentration of data centers, with Virginia, Texas, and
+    California hosting a third of the nation's facilities. The research also explores the complex
+    energy ecosystem of these centers, noting that server processing consumes about 60% of
+    electricity, with cooling systems representing a significant additional energy drain. The study
+    raises important questions about the environmental and economic implications of this expansion,
+    including potential electricity bill increases for consumers and the evolving energy sources
+    powering these critical infrastructure components.
+  key_points:
+    - Data centers consumed 183 TWh of electricity in 2024, projected to grow 133% by 2030
+    - Hyperscale data centers can consume electricity equivalent to 100,000 households annually
+    - Natural gas currently supplies over 40% of electricity for U.S. data centers
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:08:01
+  publication_id: pew
+- id: 3aecdca4bc8ea49c
+  url: https://www.pewresearch.org/
+  title: "Pew Research: Institutional Trust"
+  type: web
+  cited_by:
+    - international-coordination-game
+    - public-education
+    - learned-helplessness
+  publication_id: pew
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+    - information-overload
+    - media-literacy
+- id: 40fcdcc3ffba5188
+  url: https://www.pewresearch.org/internet/2025/04/03/how-the-us-public-and-ai-experts-view-artificial-intelligence/
+  title: "Pew Research: Public and AI Experts"
+  type: web
+  local_filename: 40fcdcc3ffba5188.txt
+  summary: A comprehensive study comparing perspectives of U.S. adults and AI experts on artificial
+    intelligence's future, highlighting differences in optimism, job impacts, and regulatory
+    concerns.
+  review: >-
+    The Pew Research report provides a nuanced exploration of how the American public and AI experts
+    perceive artificial intelligence, uncovering substantial gaps in their expectations and
+    attitudes. While AI experts are significantly more optimistic about AI's potential - with 56%
+    believing it will have a positive impact compared to only 17% of the public - both groups share
+    common concerns about regulation and personal control of the technology.
+
+
+    The study reveals critical insights into perceptions of AI across various domains, including job
+    markets, societal impacts, and potential risks. Notably, gender differences emerge prominently,
+    with male experts and members of the public displaying more enthusiasm about AI compared to
+    women. The research also highlights shared skepticism about government and corporate ability to
+    responsibly develop and regulate AI, with approximately 55-62% of both groups expressing low
+    confidence in current oversight mechanisms.
+  key_points:
+    - Significant optimism gap between AI experts (56% positive) and public (17% positive) about
+      AI's future impact
+    - Both groups want more personal control and are skeptical of government AI regulation
+    - Gender differences in AI perception are pronounced, especially among experts
+    - Shared concerns about AI include job displacement, inaccurate information, and potential bias
+  cited_by:
+    - public-opinion
+    - structural
+    - critical-uncertainties
+  fetched_at: 2025-12-28 02:04:08
+  publication_id: pew
+  tags:
+    - governance
+    - economic
+- id: b46b1ce9995931fe
+  url: https://www.pewresearch.org/politics/2024/04/22/public-trust-in-government-1958-2024/
+  title: "Pew: 16% trust federal gov't"
+  type: web
+  cited_by:
+    - trust-cascade-model
+    - trust-cascade
+    - trust-decline
+  fetched_at: 2025-12-28 02:55:06
+  publication_id: pew
+  tags:
+    - epistemic
+    - cascade
+    - trust
+    - institutional-trust
+    - social-capital
+- id: d3b07eea2e75cc28
+  url: https://www.pewresearch.org/science/2022/02/15/americans-trust-in-scientists-other-groups-declines/
+  title: "Pew: Partisan gap widening"
+  type: web
+  publication_id: pew
+  cited_by:
+    - trust-decline
+  tags:
+    - institutions
+    - media
+    - democracy
+- id: b8e4c3ef3a3c7827
+  url: https://techcrunch.com/2024/12/31/chatgpt-a-2024-timeline-of-updates-to-openais-text-generating-chatbot/
+  title: "TechCrunch: ChatGPT 2024 Timeline"
+  type: web
+  local_filename: b8e4c3ef3a3c7827.txt
+  summary: OpenAI's ChatGPT experienced significant growth and product evolution in 2024, including
+    partnerships with Apple, enterprise expansions, and new AI model releases like GPT-4o.
+  review: >-
+    In 2024, ChatGPT transformed from a novel text generation tool to a comprehensive AI platform
+    with broad technological and commercial implications. OpenAI strategically expanded its
+    capabilities through multiple key developments, including voice and multimodal interactions,
+    enterprise solutions, and strategic partnerships with major tech companies like Apple and
+    platforms like Reddit. The company's aggressive product roadmap included launches like GPT-4o,
+    Advanced Voice Mode, and Sora, demonstrating a commitment to pushing AI interaction boundaries.
+
+
+    While these innovations showcase remarkable technological progress, they also raise important
+    questions about AI safety, privacy, and ethical deployment. OpenAI's approach seems to balance
+    technical innovation with incremental safety considerations, such as developing tools like Media
+    Manager to allow content creators to opt out of AI training. The company's rapid growth and
+    valuation (reaching $157 billion) indicate strong market confidence, but also underscore the
+    need for careful governance and responsible AI development.
+  key_points:
+    - ChatGPT reached 300 million weekly active users in 2024
+    - Launched multimodal capabilities like GPT-4o with voice and vision
+    - Formed strategic partnerships with Apple, Microsoft, and media companies
+  fetched_at: 2025-12-28 02:03:47
+  tags:
+    - open-source
+    - llm
+  publication_id: techcrunch
+- id: f6ef5cf1061a740e
+  url: https://time.com/7171962/open-closed-ai-models-epoch/
+  title: The Gap Between Open and Closed AI Models Might Be Shrinking
+  type: web
+  local_filename: f6ef5cf1061a740e.txt
+  summary: Epoch AI research reveals that open AI models are approximately one year behind closed
+    models in capabilities, with the gap potentially shrinking as open models advance.
+  review: The report by Epoch AI provides a nuanced analysis of the evolving landscape of AI model
+    accessibility, highlighting the narrowing performance gap between open and closed AI models. By
+    analyzing hundreds of models released since 2018 and measuring their performance on technical
+    benchmarks, researchers found that open models like Meta's Llama 3.1 are progressively matching
+    the capabilities of closed models like GPT-4, though with a lag of about 16 months. The study
+    raises critical implications for AI governance and safety, demonstrating that the traditional
+    dichotomy between open and closed models is becoming increasingly complex. While open models
+    offer benefits like democratized access, innovation, and transparency, they also present
+    significant challenges in terms of potential misuse and governance. The research suggests that
+    policymakers and AI labs now have a crucial window to assess and potentially regulate frontier
+    AI capabilities before they become widely accessible, emphasizing the need for careful, nuanced
+    approaches to AI development and deployment.
+  key_points:
+    - Open AI models are approximately one year behind closed models in performance
+    - The distinction between open and closed models is becoming increasingly blurred
+    - Open models offer benefits of transparency and innovation, but also pose governance challenges
+  cited_by:
+    - lab-behavior
+  fetched_at: 2025-12-28 02:04:03
+  tags:
+    - capabilities
+    - open-source
+  publication_id: time
+- id: 6a960d5d87fcde57
+  url: https://time.com/6961317/ai-artificial-intelligence-us-military-spending/
+  title: TIME - U.S. Military Spending on AI Surges
+  type: web
+  local_filename: 6a960d5d87fcde57.txt
+  summary: A Brookings Institution report reveals a massive increase in U.S. Department of Defense
+    AI-related contracts, driven by technological advancements and geopolitical competition with
+    China.
+  review: >-
+    The source document highlights a dramatic surge in U.S. military artificial intelligence
+    investments, with potential AI-related federal contracts increasing from $355 million to $4.6
+    billion in just one year. This exponential growth is primarily attributed to the Department of
+    Defense, reflecting a strategic shift from experimental to large-scale AI implementation,
+    motivated by technological maturation and technological competition with China.
+
+
+    While the public sector's AI investments are significant, they remain substantially smaller
+    compared to private tech companies' expenditures. Experts like Josh Wallin from the Center for a
+    New American Security suggest that this trend is likely to continue, given AI's general-purpose
+    nature. The surge in military AI spending underscores the growing importance of artificial
+    intelligence in national defense strategy, with potential implications for technological
+    superiority, national security, and international technological competition.
+  key_points:
+    - DoD AI-related contracts increased from $190 million to $557 million in one year
+    - Potential total AI contract spending grew from $269 million to $4.3 billion
+    - Spending driven by technological maturation and geopolitical competition with China
+  cited_by:
+    - geopolitics
+  fetched_at: 2025-12-28 02:03:29
+  publication_id: time
+- id: d1dc70f58b9474eb
+  url: https://fortune.com/2024/05/17/openai-researcher-resigns-safety/
+  title: Top OpenAI researcher resigns, saying company prioritized 'shiny products' over AI safety
+  type: web
+  local_filename: d1dc70f58b9474eb.txt
+  summary: Jan Leike resigned from OpenAI, citing concerns about the company's commitment to AI
+    safety. His departure follows that of co-lead Ilya Sutskever, highlighting tensions within the
+    organization about AI development.
+  review: >-
+    Jan Leike's resignation from OpenAI represents a significant moment of internal critique in the
+    AI safety landscape. His public statement suggests a fundamental disagreement about the
+    company's approach to artificial general intelligence (AGI) development, specifically
+    criticizing the organization's tendency to prioritize 'shiny products' over comprehensive safety
+    considerations. This departure, coming shortly after Ilya Sutskever's exit, signals potential
+    deep-rooted concerns about the responsible development of advanced AI systems.
+
+
+    The resignation highlights the ongoing challenge in the AI safety field of balancing
+    technological innovation with rigorous safety protocols. Leike's call for employees to 'feel the
+    AGI' and act with appropriate gravitas underscores the immense responsibility researchers bear
+    in developing potentially transformative technologies. His departure may serve as a critical
+    warning about the risks of prioritizing rapid product development over careful, ethical
+    consideration of AI's long-term implications for humanity.
+  key_points:
+    - OpenAI's head of alignment resigned due to concerns about AI safety prioritization
+    - The resignation follows internal tensions about responsible AI development
+    - Highlights the critical balance between innovation and safety in AI research
+  cited_by:
+    - lab-behavior
+  fetched_at: 2025-12-28 02:04:03
+  tags:
+    - safety
+  publication_id: fortune
+- id: 96ba4717e7394068
+  url: https://fortune.com/article/google-gemini-2-5-pro-model-card-published-ai-governance-expert-criticizes-it-as-meager-and-worrisome/
+  title: Called "meager" and "worrisome"
+  type: web
+  cited_by:
+    - lab-behavior
+  publication_id: fortune
+- id: 5ba6eb925713c526
+  url: https://techcrunch.com/2025/12/11/openai-fires-back-at-google-with-gpt-5-2-after-code-red-memo/
+  title: issued an internal "code red" memo
+  type: web
+  cited_by:
+    - lab-behavior
+  publication_id: techcrunch
+- id: edfaa49052a3935e
+  url: https://www.reuters.com/article/us-mideast-iran-usa-drones-exclusive-idUSKBN1XP0IN
+  title: 2019 Iranian GPS spoofing incident
+  type: web
+  cited_by:
+    - autonomous-weapons-escalation
+  tags:
+    - escalation
+    - conflict
+    - speed
+  publication_id: reuters
+- id: 6b09f789e606b1d2
+  url: https://www.pewresearch.org/internet/2023/02/15/americans-largely-positive-about-increased-use-of-artificial-intelligence/
+  title: growing awareness
+  type: web
+  cited_by:
+    - capability-alignment-race
+  publication_id: pew
+- id: 20b4e2fea8c39488
+  url: https://www.reuters.com/technology/tech-giants-push-back-against-ai-regulation-2023-05-17/
+  title: Extensive lobbying
+  type: web
+  cited_by:
+    - multipolar-trap-dynamics
+  tags:
+    - risk-factor
+    - game-theory
+    - coordination
+  publication_id: reuters
+- id: c35d3ac5a51bb42a
+  url: https://www.reuters.com/technology/ai-generated-misinformation-2024-elections-2024-01-15/
+  title: Reuters
+  type: web
+  cited_by:
+    - risk-activation-timeline
+  tags:
+    - timeline
+    - capability
+    - risk-assessment
+  publication_id: reuters
+- id: b2f30b8ca0dd850e
+  url: https://techcrunch.com/
+  title: TechCrunch Reports
+  type: web
+  cited_by:
+    - conjecture
+    - dario-amodei
+  tags:
+    - cognitive-emulation
+    - coem
+    - interpretability
+    - constitutional-ai
+    - responsible-scaling
+  publication_id: techcrunch
+- id: 401e5a60f9cd395e
+  url: https://techcrunch.com/tag/conjecture/
+  title: TechCrunch Coverage
+  type: web
+  cited_by:
+    - conjecture
+  tags:
+    - cognitive-emulation
+    - coem
+    - interpretability
+  publication_id: techcrunch
+- id: fe674713d050fff0
+  url: https://techcrunch.com/tag/anthropic/
+  title: Anthropic's approach to AI safety
+  type: web
+  cited_by:
+    - daniela-amodei
+  tags:
+    - safety
+  publication_id: techcrunch
+- id: fc45f9baa345c736
+  url: https://www.technologyreview.com/2023/05/02/1072528/geoffrey-hinton-google-why-scared-ai/
+  title: MIT Technology Review
+  type: web
+  cited_by:
+    - mainstream-era
+    - geoffrey-hinton
+    - concentration-of-power
+  publication_id: mit-tech-review
+  tags:
+    - deep-learning
+    - ai-safety
+    - x-risk
+    - governance
+    - power-dynamics
+- id: ec96701d17404707
+  url: https://www.pewresearch.org/short-reads/2023/08/28/growing-public-concern-about-the-role-of-artificial-intelligence-in-daily-life/
+  title: Pew Research
+  type: web
+  cited_by:
+    - geoffrey-hinton
+  publication_id: pew
+  tags:
+    - deep-learning
+    - ai-safety
+    - x-risk
+- id: 976aa383b03ff196
+  url: https://techcrunch.com/2024/05/28/anthropic-hires-former-openai-safety-lead-to-head-up-new-team/
+  title: joined Anthropic
+  type: web
+  cited_by:
+    - research-agendas
+  tags:
+    - research-agendas
+    - alignment
+    - interpretability
+  publication_id: techcrunch
+- id: 1d03d6cd9dde0075
+  url: https://time.com/7202312/new-tests-reveal-ai-capacity-for-deception/
+  title: New Tests Reveal AI's Capacity for Deception
+  type: web
+  cited_by:
+    - technical-research
+  tags:
+    - deception
+    - interpretability
+    - scalable-oversight
+    - rlhf
+  publication_id: time
+- id: 7d8aca0fa386ccab
+  url: https://fortune.com/asia/2024/02/22/nvidia-earnings-shares-china-drops-mid-single-digit-data-center-revenue-biden-chip-controls/
+  title: Fortune Asia
+  type: web
+  cited_by:
+    - export-controls
+  publication_id: fortune
+- id: 46d731b94de59e3f
+  url: https://www.technologyreview.com/2025/01/24/1110526/china-deepseek-top-ai-despite-sanctions/
+  title: DeepSeek
+  type: web
+  cited_by:
+    - export-controls
+  publication_id: mit-tech-review
+- id: 0694bc71bc9daac0
+  url: https://time.com/7012783/elizabeth-kelly/
+  title: Elizabeth Kelly
+  type: web
+  cited_by:
+    - ai-safety-institutes
+  publication_id: time
+- id: dbfa4b8232438aa9
+  url: https://fortune.com/2025/02/20/trump-doge-layoffs-nist-aisi-ai-safety-concerns/
+  title: planned layoffs affecting NIST staff
+  type: web
+  cited_by:
+    - ai-safety-institutes
+  publication_id: fortune
+- id: a74d9fdd24d82d24
+  url: https://time.com/7302757/anthropic-xai-meta-openai-risk-management-2/
+  title: SaferAI's 2025 assessment
+  type: web
+  cited_by:
+    - lab-culture
+    - multipolar-trap
+  tags:
+    - safety
+    - game-theory
+    - coordination
+    - competition
+  publication_id: time
+- id: d7ac30b45b4da216
+  url: https://time.com/6983420/anthropic-structure-openai-incentives/
+  title: Anthropic is structured as a Public Benefit Corporation
+  type: web
+  cited_by:
+    - lab-culture
+  publication_id: time
+- id: 294f55e1e8c8ecbb
+  url: https://techcrunch.com/2025/07/30/zuckerberg-says-meta-likely-wont-open-source-all-of-its-superintelligence-ai-models/
+  title: Zuckerberg signaled
+  type: web
+  cited_by:
+    - open-source
+  publication_id: techcrunch
+- id: 1ba1123aa592a983
+  url: https://www.technologyreview.com/2023/09/26/1080299/six-months-on-from-the-pause-letter/
+  title: What's changed since the "pause AI" letter six months ago?
+  type: web
+  cited_by:
+    - pause
+    - pause-and-redirect
+  publication_id: mit-tech-review
+- id: f31bdc8748db7c04
+  url: https://www.pewresearch.org/internet/2024/02/26/ai-and-the-future-of-work/
+  title: 2024 Pew Research study
+  type: web
+  cited_by:
+    - public-education
+  publication_id: pew
+- id: ae3d99868a991d4d
+  url: https://fortune.com/2025/10/06/anthropic-claude-sonnet-4-5-knows-when-its-being-tested-situational-awareness-safety-performance-concerns/
+  title: Anthropic 2025
+  type: web
+  cited_by:
+    - emergent-capabilities
+  tags:
+    - scaling
+    - capability-evaluation
+    - unpredictability
+  publication_id: fortune
+- id: af25de04343e5f1b
+  url: https://time.com/7287806/anthropic-claude-4-opus-safety-bio-risk/
+  title: TIME 2025
+  type: web
+  cited_by:
+    - emergent-capabilities
+  tags:
+    - scaling
+    - capability-evaluation
+    - unpredictability
+  publication_id: time
+- id: 4f4d29912b960092
+  url: https://time.com/6958868/artificial-intelligence-safety-evaluations-risks/
+  title: Dan Hendrycks
+  type: web
+  cited_by:
+    - metr
+    - emergent-capabilities
+  tags:
+    - evaluations
+    - dangerous-capabilities
+    - autonomous-replication
+    - scaling
+    - capability-evaluation
+  publication_id: time
+- id: 19035fc92dfe47b9
+  url: https://www.pewresearch.org/topic/news-habits-media/
+  title: Pew Research
+  type: web
+  cited_by:
+    - learned-helplessness
+  publication_id: pew
+  tags:
+    - information-overload
+    - media-literacy
+    - epistemics
+- id: 8d09086c539aead5
+  url: https://www.pewresearch.org/politics/2020/08/13/perceptions-of-trump-biden-and-the-election/
+  title: Pew Research
+  type: web
+  cited_by:
+    - reality-fragmentation
+  publication_id: pew
+  tags:
+    - filter-bubbles
+    - polarization
+    - disinformation
+- id: c67537d289bb7a7e
+  url: https://www.pewresearch.org/politics/2021/01/15/voters-reflections-on-the-2020-election/
+  title: Pew Research
+  type: web
+  cited_by:
+    - reality-fragmentation
+  publication_id: pew
+  tags:
+    - filter-bubbles
+    - polarization
+    - disinformation
+- id: c2dc87f169aa6401
+  url: https://www.pewresearch.org/short-reads/2019/07/10/one-in-six-americans-have-heard-of-qanon/
+  title: Pew Research
+  type: web
+  cited_by:
+    - reality-fragmentation
+  publication_id: pew
+  tags:
+    - filter-bubbles
+    - polarization
+    - disinformation
+- id: df2f601843dde15f
+  url: https://www.reuters.com/technology/us-adds-sensetime-other-chinese-firms-investment-blacklist-over-xinjiang-2021-12-10/
+  title: SenseTime
+  type: web
+  cited_by:
+    - authoritarian-tools
+  tags:
+    - authoritarianism
+    - human-rights
+    - digital-repression
+  publication_id: reuters
+- id: 59053ff5a43348f1
+  url: https://www.reuters.com/technology/apple-google-remove-navalny-app-russia-arrests-protests-2021-09-17/
+  title: Navalny app removal
+  type: web
+  cited_by:
+    - authoritarian-tools
+  tags:
+    - authoritarianism
+    - human-rights
+    - digital-repression
+  publication_id: reuters
+- id: b3eaf24a5569ab27
+  url: https://www.technologyreview.com/2021/12/09/1041557/facial-recognition-software-regulation/
+  title: MIT Technology Review
+  type: web
+  cited_by:
+    - authoritarian-tools
+  publication_id: mit-tech-review
+  tags:
+    - authoritarianism
+    - human-rights
+    - digital-repression
+- id: e12caaa5097b4d9b
+  url: https://www.reuters.com/article/uk-factcheck-politicians-deepfake-claims-idUSKBN2402S5
+  title: Politicians claiming real recordings are deepfakes
+  type: web
+  cited_by:
+    - deepfakes
+  tags:
+    - synthetic-media
+    - identity
+    - authentication
+  publication_id: reuters
+- id: 70be5a95589449bb
+  url: https://www.reuters.com/technology/youtube-ai-disclosure-study-2024/
+  title: Reuters' analysis
+  type: web
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+  publication_id: reuters
+- id: 049744b9f71c17d7
+  url: https://www.reuters.com/fact-check/
+  title: Reuters
+  type: web
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+  publication_id: reuters
+- id: 31ee49c7212810bb
+  url: https://www.reuters.com/technology/nvidia-ai-chip-dominance-stifles-competition-potential-customers-say-2024-04-16/
+  title: NVIDIA maintains 95%+ market share
+  type: web
+  cited_by:
+    - concentration-of-power
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+  publication_id: reuters
+- id: 2e1b6f9f6f21ff71
+  url: https://www.reuters.com/technology/meta-set-spend-big-ai-infrastructure-2024-03-20/
+  title: Meta's $15+ billion annual AI infrastructure spending
+  type: web
+  cited_by:
+    - concentration-of-power
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+  publication_id: reuters
+- id: 97f68ab0e7219402
+  url: https://www.technologyreview.com/2024/01/08/1086247/ai-companies-have-all-the-power-heres-how-to-wrestle-it-back/
+  title: MIT Technology Review - AI Concentration Analysis
+  type: web
+  cited_by:
+    - concentration-of-power
+  publication_id: mit-tech-review
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+- id: 024d97e36a1d4ed7
+  url: https://www.technologyreview.com/2023/07/12/1076067/how-coding-with-ai-changes-how-we-think/
+  title: MIT Technology Review
+  type: web
+  cited_by:
+    - enfeeblement
+  publication_id: mit-tech-review
+  tags:
+    - human-agency
+    - automation
+    - dependence
+- id: c5a86e6a14080e31
+  url: https://www.pewresearch.org/internet/2022/08/10/teens-social-media-and-technology-2022/
+  title: Pew Research 2022
+  type: web
+  cited_by:
+    - erosion-of-agency
+  publication_id: pew
+  tags:
+    - human-agency
+    - autonomy
+    - manipulation
+- id: 264c7d949adbc0b4
+  url: https://www.reuters.com/article/us-amazon-com-jobs-automation-insight/amazon-scraps-secret-ai-recruiting-tool-that-showed-bias-against-women-idUSKCN1MK08G
+  title: Amazon's experimental hiring AI
+  type: web
+  cited_by:
+    - erosion-of-agency
+  tags:
+    - human-agency
+    - autonomy
+    - manipulation
+  publication_id: reuters
+- id: 021809512cce5149
+  url: https://www.pewresearch.org/short-reads/2024/02/15/what-the-data-says-about-americans-views-of-artificial-intelligence/
+  title: Pew Research
+  type: web
+  cited_by:
+    - erosion-of-agency
+  publication_id: pew
+  tags:
+    - human-agency
+    - autonomy
+    - manipulation
+- id: 2a0d5c933fbc5dc2
+  url: https://techcrunch.com/2024/12/05/openais-o1-model-sure-tries-to-deceive-humans-a-lot/
+  title: Apollo Research
+  type: web
+  cited_by:
+    - irreversibility
+  tags:
+    - x-risk
+    - value-lock-in
+    - point-of-no-return
+  publication_id: techcrunch
+- id: ebd41504e5bdd2ff
+  url: https://www.reuters.com/world/china/china-social-credit-gave-green-light-covid-surveillance-2021-12-02/
+  title: restricted 23 million people from purchasing flight tickets
+  type: web
+  cited_by:
+    - lock-in
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+  publication_id: reuters
+- id: d14c83ee1d365d5d
+  url: https://www.reuters.com/article/us-usa-banks-cobol/banks-scramble-to-fix-old-systems-as-it-cowboys-ride-into-sunset-idUSKBN17C0D8
+  title: replacement costs exceed $80 billion globally
+  type: web
+  cited_by:
+    - lock-in
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+  publication_id: reuters
+- id: a4839ede7cd91713
+  url: https://www.technologyreview.com/2023/04/19/1071789/openais-hunger-for-data-is-coming-back-to-bite-it/
+  title: MIT Technology Review
+  type: web
+  cited_by:
+    - racing-dynamics
+  publication_id: mit-tech-review
+  tags:
+    - governance
+    - coordination
+    - competition
+- id: fb832513c677b816
+  url: https://time.com/7308857/china-isnt-ignoring-ai-regulation-the-u-s-shouldnt-either/
+  title: "TIME: China Is Taking AI Safety Seriously"
+  type: web
+  cited_by:
+    - china-ai-regulations
+    - pause-and-redirect
+  tags:
+    - safety
+    - regulation
+    - china
+    - content-control
+  publication_id: time
+- id: b87f2415c49e53cb
+  url: https://www.technologyreview.com/2025/01/21/1110260/openai-ups-its-lobbying-efforts-nearly-seven-fold/
+  title: OpenAI increased lobbying spending 7x
+  type: web
+  cited_by:
+    - failed-stalled-proposals
+    - governance-focused
+  publication_id: mit-tech-review
+- id: 1ed975df72c30426
+  url: https://techcrunch.com/2024/11/20/ai-scaling-laws-are-showing-diminishing-returns-forcing-ai-labs-to-change-course/
+  title: TechCrunch
+  type: web
+  cited_by:
+    - case-against-xrisk
+    - case-for-xrisk
+    - timelines
+  publication_id: techcrunch
+- id: d24ecc9ecc8baa15
+  url: https://www.technologyreview.com/2024/01/17/1086704/china-ai-regulation-changes-2024/
+  title: Four Things to Know About China's New AI Rules in 2024
+  type: web
+  cited_by:
+    - china-ai-regulations
+  publication_id: mit-tech-review
+  tags:
+    - regulation
+    - china
+    - content-control
+- id: 989ab2864e1f5ddb
+  url: https://techcrunch.com/2024/08/30/california-ai-bill-sb-1047-aims-to-prevent-ai-disasters-but-silicon-valley-warns-it-will-cause-one/
+  title: "TechCrunch: California's legislature just passed AI bill SB 1047"
+  type: web
+  cited_by:
+    - california-sb1047
+  tags:
+    - regulation
+    - state-policy
+    - frontier-models
+  publication_id: techcrunch
+- id: c1a25dd9fbd20112
+  url: https://www.technologyreview.com/2024/07/22/1095193/ai-companies-promised-the-white-house-to-self-regulate-one-year-ago-whats-changed/
+  title: CAIDP
+  type: web
+  cited_by:
+    - voluntary-commitments
+  publication_id: mit-tech-review
+  tags:
+    - self-regulation
+    - industry-commitments
+    - responsible-scaling
+- id: 61b8ab42c6b32b27
+  url: https://techcrunch.com/2024/10/12/metas-yann-lecun-says-worries-about-a-i-s-existential-threat-are-complete-b-s/
+  title: TechCrunch, 2024
+  type: web
+  cited_by:
+    - case-against-xrisk
+  publication_id: techcrunch
+- id: 2dac895d835536ca
+  url: https://time.com/7012867/jan-leike/
+  title: TIME, 2024
+  type: web
+  cited_by:
+    - why-alignment-easy
+  publication_id: time
+- id: 246e6e1c19b04bbb
+  url: https://time.com/7086139/ai-safety-clock-existential-risks/
+  title: Future of Life Institute
+  type: web
+  cited_by:
+    - lock-in
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+  publication_id: time
+- id: 763ac3d1dbeb7279
+  url: https://time.com/7272092/ai-tool-anthropic-claude-brain-scanner/
+  title: "TIME: How This Tool Could Decode AI's Inner Mysteries"
+  type: web
+  tags:
+    - mesa-optimization
+  publication_id: time
+- id: f888d9b195b9e325
+  url: https://fortune.com/2025/03/27/anthropic-ai-breakthrough-claude-llm-black-box/
+  title: "Fortune: Anthropic makes a breakthrough in opening AI's 'black box'"
+  type: web
+  publication_id: fortune
+- id: 76c8d74939bb8bdc
+  url: https://techcrunch.com/2024/09/29/gov-newsom-vetoes-californias-controversial-ai-bill-sb-1047/
+  title: Governor Newsom vetoed the bill on September 29, 2024
+  type: web
+  cited_by:
+    - failed-stalled-proposals
+  publication_id: techcrunch
+- id: 744679038d159602
+  url: https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/
+  title: Anthropic more than doubled its spending from $280,000 to $720,000
+  type: web
+  cited_by:
+    - failed-stalled-proposals
+  publication_id: techcrunch
+- id: 2fa332509e5f3ce0
+  url: https://www.technologyreview.com/2025/01/21/1110269/there-can-be-no-winners-in-a-us-china-ai-arms-race/
+  title: MIT Technology Review
+  type: web
+  cited_by:
+    - multipolar-competition
+  publication_id: mit-tech-review
+- id: 21118f4612db1855
+  url: https://techcrunch.com/2025/07/16/openai-and-anthropic-researchers-decry-reckless-safety-culture-at-elon-musks-xai/
+  title: Researchers decry
+  type: web
+  cited_by:
+    - intervention-timing-windows
+  publication_id: techcrunch
+  tags:
+    - prioritization
+    - timing
+    - strategy
+- id: efd391c3a048b7c8
+  url: https://fortune.com/2025/04/04/google-deeepmind-agi-ai-2030-risk-destroy-humanity/
+  title: "Fortune: Google DeepMind 145-page paper predicts AGI by 2030 (Apr 2025)"
+  type: web
+  tags:
+    - agi
+  cited_by:
+    - demis-hassabis
+  publication_id: fortune
+- id: 970d203f69571bd2
+  url: https://fortune.com/2024/08/26/openai-agi-safety-researchers-exodus/
+  title: Daniel Kokotajlo reveals ~50% AGI safety staff departed
+  type: web
+  tags:
+    - safety
+    - agi
+  cited_by:
+    - corporate-influence
+  publication_id: fortune

@@ -1,0 +1,649 @@
+# Reference Materials
+# Documentation, wikis, and reference materials
+# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
+
+- id: eb9c9249d5076759
+  url: https://en.wikipedia.org/wiki/Automation_bias
+  title: Automation bias
+  type: reference
+  publication_id: wikipedia
+  tags:
+    - economic
+- id: 2670dc534d9adb0c
+  url: https://en.wikipedia.org/wiki/Biopreparat
+  title: Biopreparat
+  type: reference
+  cited_by:
+    - bioweapons
+  publication_id: wikipedia
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: ae1d3425db815f91
+  url: https://en.wikipedia.org/wiki/Far-UVC
+  title: Far-UVC
+  type: reference
+  cited_by:
+    - bioweapons
+  publication_id: wikipedia
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: 68e2c715e3d92283
+  url: https://github.com/SihengLi99/LLM-Honesty-Survey
+  title: LLM-Honesty-Survey (2025-TMLR)
+  type: web
+  local_filename: 68e2c715e3d92283.txt
+  summary: A systematic review of honesty in Large Language Models, analyzing their ability to
+    recognize known/unknown information and express knowledge faithfully. The survey provides a
+    structured framework for evaluating and improving LLM trustworthiness.
+  review: >-
+    This survey provides a comprehensive examination of honesty in Large Language Models (LLMs),
+    defining honesty through two critical dimensions: self-knowledge and self-expression.
+    Self-knowledge refers to a model's ability to recognize its own capabilities, acknowledge
+    limitations, and express uncertainty, while self-expression focuses on faithfully communicating
+    its acquired knowledge without fabrication.
+
+
+    The research synthesizes multiple approaches for evaluating and improving LLM honesty, including
+    training-free methods like predictive probability analysis and prompting techniques, and
+    training-based approaches such as supervised fine-tuning and reinforcement learning. By
+    cataloging existing research and methodologies, the survey offers crucial insights into
+    developing more reliable and transparent AI systems, highlighting the importance of addressing
+    hallucinations, calibrating confidence, and creating mechanisms that enable models to recognize
+    and communicate the boundaries of their knowledge.
+  key_points:
+    - Honesty in LLMs defined by self-knowledge and self-expression capabilities
+    - Multiple evaluation approaches exist for assessing LLM truthfulness and uncertainty
+    - Both training-free and training-based methods can improve LLM honesty
+  fetched_at: 2025-12-28 01:07:31
+  publication_id: github
+  tags:
+    - evaluation
+    - llm
+- id: 4617a6f119169e7f
+  url: https://en.wikipedia.org/wiki/MMLU
+  title: MMLU - Wikipedia
+  type: reference
+  local_filename: 4617a6f119169e7f.txt
+  summary: MMLU is a comprehensive language model benchmark with 15,908 multiple-choice questions
+    spanning 57 subjects. It was designed to assess advanced AI capabilities beyond existing
+    evaluations.
+  review: >-
+    The Measuring Massive Multitask Language Understanding (MMLU) benchmark represents a significant
+    advancement in evaluating large language models' comprehensive capabilities. Created by Dan
+    Hendrycks and colleagues in 2020, it was purposefully designed to be more challenging than
+    previous benchmarks, covering a wide range of subjects from STEM to humanities.
+
+
+    While initially revealing significant limitations in language models—with early models scoring
+    near random chance (25%)—MMLU has become a critical tool for assessing AI performance. By
+    mid-2024, top models like Claude 3.5 Sonnet and GPT-4o consistently achieved around 88%
+    accuracy, closely approaching the estimated human expert performance of 89.8%. However, recent
+    research has highlighted important limitations, including data contamination risks and
+    significant ground-truth errors in approximately 6.5% of questions, suggesting the need for
+    continued refinement of AI evaluation methodologies.
+  key_points:
+    - Comprehensive benchmark covering 57 subjects with 15,908 multiple-choice questions
+    - Revealed significant improvements in language model capabilities from 25% to 88% accuracy
+    - Exposed methodological challenges in AI performance measurement
+  fetched_at: 2025-12-28 01:07:35
+  publication_id: wikipedia
+  tags:
+    - capabilities
+    - evaluation
+    - llm
+- id: abcc1f9f4bf7bef2
+  url: https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI
+  title: Real-time voice conversion tools
+  type: web
+  cited_by:
+    - legal-evidence-crisis
+  publication_id: github
+  tags:
+    - deepfakes
+    - digital-evidence
+    - authentication
+- id: 3eb528026caf7aa4
+  url: https://en.wikipedia.org/wiki/Soviet_biological_weapons_program
+  title: Soviet biological weapons program
+  type: reference
+  cited_by:
+    - bioweapons
+  publication_id: wikipedia
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: 0151481d5dc82963
+  url: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+  title: Superintelligence
+  type: reference
+  cited_by:
+    - irreversibility
+    - doomer
+    - catastrophe
+  publication_id: wikipedia
+  tags:
+    - agi
+    - x-risk
+    - value-lock-in
+    - point-of-no-return
+- id: 9d6f51d4b8105682
+  url: https://github.com/facebookresearch/CyberSecEval
+  title: CyberSecEval
+  type: web
+  cited_by:
+    - coding
+  publication_id: github
+  tags:
+    - cybersecurity
+    - software-engineering
+    - code-generation
+    - programming-ai
+- id: 71a26d11cc8f3a0b
+  url: https://github.com/mask-llm/mask
+  title: MASK Benchmark
+  type: web
+  cited_by:
+    - alignment-progress
+  publication_id: github
+  tags:
+    - capabilities
+    - evaluation
+- id: f37142feae7fe9b1
+  url: https://github.com/sylinrl/TruthfulQA
+  title: TruthfulQA
+  type: web
+  cited_by:
+    - alignment-progress
+    - sycophancy
+  publication_id: github
+  tags:
+    - rlhf
+    - reward-hacking
+    - honesty
+- id: 9edbbd4ae30cd1f8
+  url: https://github.com/openai/human-eval
+  title: HumanEval
+  type: web
+  cited_by:
+    - capabilities
+  publication_id: github
+- id: 17f8e83fab7b0fa7
+  url: https://github.com/gkamradt/LLMTest_NeedleInAHaystack
+  title: Needle-in-haystack
+  type: web
+  cited_by:
+    - capabilities
+  publication_id: github
+- id: f947a6c44d755d2f
+  url: https://github.com/SECURITY-BENCHMARK
+  title: SecBench
+  type: web
+  cited_by:
+    - capability-threshold-model
+  publication_id: github
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+- id: 561b4078010f62e3
+  url: https://github.com/features/copilot
+  title: GitHub Copilot
+  type: web
+  cited_by:
+    - capability-threshold-model
+  publication_id: github
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+- id: afad87e802e53736
+  url: https://github.com/deepseek-ai/DeepSeek-R1
+  title: DeepSeek R1 release
+  type: web
+  cited_by:
+    - reasoning
+    - proliferation-risk-model
+  publication_id: github
+  tags:
+    - open-source
+    - decision-theory
+    - epistemics
+    - methodology
+    - risk-factor
+- id: 5b2c3eab9cbf35f1
+  url: https://github.com/ARENA-Benchmark/ARENA-benchmark
+  title: ARC Evals GitHub
+  type: web
+  cited_by:
+    - arc
+  publication_id: github
+  tags:
+    - evaluation
+    - eliciting-latent-knowledge
+    - elk
+    - evaluations
+- id: 5827cc57df85aede
+  url: https://github.com/redwoodresearch
+  title: GitHub Repository
+  type: web
+  cited_by:
+    - redwood
+  publication_id: github
+  tags:
+    - interpretability
+    - causal-scrubbing
+    - ai-control
+- id: 6f8557a8ff87bf5a
+  url: https://en.wikipedia.org/wiki/Anthropic
+  title: seven former OpenAI employees
+  type: reference
+  cited_by:
+    - anthropic-core-views
+  publication_id: wikipedia
+  tags:
+    - ai-safety
+    - constitutional-ai
+    - interpretability
+- id: 1d57a0b8c4d0d18a
+  url: https://github.com/anthropics/constitutional-ai-eval
+  title: Constitutional AI Evaluation Suite
+  type: web
+  cited_by:
+    - constitutional-ai
+  publication_id: github
+  tags:
+    - evaluation
+- id: 75ae5fb36bf37cea
+  url: https://github.com/Dakingrai/awesome-mechanistic-interpretability-lm-papers
+  title: Awesome Mechanistic Interpretability Papers
+  type: web
+  cited_by:
+    - interpretability
+  publication_id: github
+  tags:
+    - interpretability
+    - sparse-autoencoders
+    - features
+    - circuits
+- id: eccb4758de07641b
+  url: https://github.com/openai/prm800k
+  title: PRM800K
+  type: web
+  cited_by:
+    - scalable-oversight
+  publication_id: github
+  tags:
+    - debate
+    - recursive-reward-modeling
+    - process-supervision
+- id: 8a803827c20a0bd1
+  url: https://github.com/Microsoft/SEAL
+  title: Microsoft SEAL
+  type: web
+  cited_by:
+    - coordination-tech
+  publication_id: github
+  tags:
+    - game-theory
+    - governance
+    - international-cooperation
+- id: 778b26138faac342
+  url: https://en.wikipedia.org/wiki/Pol.is
+  title: Polis
+  type: reference
+  cited_by:
+    - deliberation
+  publication_id: wikipedia
+  tags:
+    - democratic-innovation
+    - collective-intelligence
+    - governance
+- id: b559f3d67b063e50
+  url: https://en.wikipedia.org/wiki/Community_Notes
+  title: CCDH
+  type: reference
+  cited_by:
+    - epistemic-infrastructure
+  publication_id: wikipedia
+  tags:
+    - knowledge-management
+    - public-goods
+    - information-infrastructure
+- id: 731bcab842214102
+  url: https://en.wikipedia.org/wiki/Reliability_of_Wikipedia
+  title: Wikipedia
+  type: reference
+  cited_by:
+    - epistemic-infrastructure
+  publication_id: wikipedia
+  tags:
+    - knowledge-management
+    - public-goods
+    - information-infrastructure
+- id: e0975f5f1abf3a39
+  url: https://en.wikipedia.org/wiki/Wikidata
+  title: Wikidata
+  type: reference
+  cited_by:
+    - epistemic-infrastructure
+  publication_id: wikipedia
+  tags:
+    - knowledge-management
+    - public-goods
+    - information-infrastructure
+- id: 201fdc6d92520b6c
+  url: https://en.wikipedia.org/wiki/AI_Action_Summit
+  title: 58 countries
+  type: reference
+  cited_by:
+    - international
+    - seoul-declaration
+  publication_id: wikipedia
+- id: 7d87c38c31c88a53
+  url: https://en.wikipedia.org/wiki/Executive_Order_14110
+  title: Biden's EO 14110
+  type: reference
+  cited_by:
+    - pause
+  publication_id: wikipedia
+- id: 3977a176815121ad
+  url: https://en.wikipedia.org/wiki/Asilomar_Conference_on_Recombinant_DNA
+  title: Asilomar precedent
+  type: reference
+  cited_by:
+    - pause
+  publication_id: wikipedia
+- id: 149180feb6a58dc3
+  url: https://en.wikipedia.org/wiki/Biological_Weapons_Convention
+  title: BWC
+  type: reference
+  cited_by:
+    - pause
+  publication_id: wikipedia
+- id: 760493eae0f684f3
+  url: https://en.wikipedia.org/wiki/Content_Authenticity_Initiative
+  title: Content Authenticity Initiative
+  type: reference
+  cited_by:
+    - epistemic-security
+  publication_id: wikipedia
+  tags:
+    - disinformation
+    - deepfakes
+    - trust
+- id: fe1202750a41eb8c
+  url: https://en.wikipedia.org/wiki/Instrumental_convergence
+  title: Steve Omohundro's seminal work on "basic AI drives"
+  type: reference
+  cited_by:
+    - case-for-xrisk
+    - corrigibility-failure
+    - goal-directedness
+  publication_id: wikipedia
+  tags:
+    - corrigibility
+    - shutdown-problem
+    - instrumental-convergence
+- id: fa671bbb910bee99
+  url: https://github.com/anthropics/sleeper-agents-paper
+  title: Anthropic GitHub
+  type: web
+  cited_by:
+    - deceptive-alignment
+  publication_id: github
+  tags:
+    - mesa-optimization
+    - inner-alignment
+    - situational-awareness
+- id: cbf6b1d02f9255db
+  url: https://github.com/google/BIG-bench
+  title: BIG-Bench evaluation suite
+  type: web
+  cited_by:
+    - emergent-capabilities
+  publication_id: github
+  tags:
+    - evaluation
+    - scaling
+    - capability-evaluation
+    - unpredictability
+- id: ffb7dcedaa0a8711
+  url: https://en.wikipedia.org/wiki/P(doom
+  title: Survey of AI researchers
+  type: reference
+  cited_by:
+    - instrumental-convergence
+    - misaligned-catastrophe
+    - catastrophe
+  publication_id: wikipedia
+  tags:
+    - power-seeking
+    - self-preservation
+    - corrigibility
+- id: 548d4bd9bb19900a
+  url: https://github.com/steganography-benchmark/
+  title: Academic Steganography Benchmark
+  type: web
+  cited_by:
+    - steganography
+  publication_id: github
+  tags:
+    - capabilities
+    - evaluation
+- id: 64f41b0780d481a9
+  url: https://github.com/deepmind/ai-safety-gridworlds
+  title: AI Safety Gridworlds
+  type: web
+  cited_by:
+    - knowledge-monopoly
+  publication_id: github
+  tags:
+    - safety
+    - market-concentration
+    - governance
+    - knowledge-access
+- id: ac49b80df960f905
+  url: https://github.com/deepfakes/faceswap
+  title: FaceSwap benchmarks
+  type: web
+  cited_by:
+    - deepfakes
+    - fraud
+  publication_id: github
+  tags:
+    - capabilities
+    - evaluation
+    - synthetic-media
+    - identity
+    - authentication
+- id: 889388dfe364a550
+  url: https://github.com/iperov/DeepFaceLive
+  title: DeepFaceLive
+  type: web
+  cited_by:
+    - deepfakes
+  publication_id: github
+  tags:
+    - synthetic-media
+    - identity
+    - authentication
+- id: 8e6dfe3346e322e8
+  url: https://github.com/lllyasviel/ControlNet
+  title: ControlNet
+  type: web
+  cited_by:
+    - disinformation
+  publication_id: github
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 4fc41c1e8720f41f
+  url: https://en.wikipedia.org/wiki/Pause_Giant_AI_Experiments:_An_Open_Letter
+  title: Pause letter
+  type: reference
+  cited_by:
+    - pause-and-redirect
+  publication_id: wikipedia
+- id: b099efb9eba4d8ee
+  url: https://en.wikipedia.org/wiki/Montreal_Protocol
+  title: Montreal Protocol
+  type: reference
+  cited_by:
+    - pause-and-redirect
+  publication_id: wikipedia
+- id: 254cde5462817ac5
+  url: https://en.wikipedia.org/wiki/AI_safety
+  title: Anthropic 2024 paper
+  type: reference
+  cited_by:
+    - pause-and-redirect
+  publication_id: wikipedia
+- id: 9f9f0a463013941f
+  url: https://en.wikipedia.org/wiki/Existential_risk_from_artificial_intelligence
+  title: 2023 AI researcher survey
+  type: reference
+  cited_by:
+    - capabilities
+    - catastrophe
+  publication_id: wikipedia
+- id: 42900576efb2f3c1
+  url: https://en.wikipedia.org/wiki/Recursive_self-improvement
+  title: Eric Schmidt
+  type: reference
+  cited_by:
+    - capabilities
+  publication_id: wikipedia
+- id: d8d60a1c46155a15
+  url: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
+  title: Eliezer Yudkowsky
+  type: reference
+  cited_by:
+    - catastrophe
+  publication_id: wikipedia
+- id: 914e07c146555ae9
+  url: https://en.wikipedia.org/wiki/Yann_LeCun
+  title: Yann LeCun
+  type: reference
+  cited_by:
+    - catastrophe
+  publication_id: wikipedia
+- id: 9607d725074dfe2e
+  url: https://en.wikipedia.org/wiki/Safe_and_Secure_Innovation_for_Frontier_Artificial_Intelligence_Models_Act
+  title: 113+ current and former employees
+  type: reference
+  cited_by:
+    - california-sb1047
+  publication_id: wikipedia
+  tags:
+    - regulation
+    - state-policy
+    - frontier-models
+- id: 6fbaadc794718ab5
+  url: https://github.com/apolloresearch
+  title: Open-source methodology
+  type: web
+  cited_by:
+    - apollo-research
+  publication_id: github
+  tags:
+    - open-source
+    - deception
+    - scheming
+    - sandbagging
+- id: 941e0dbd9dddc0ba
+  url: https://github.com/hendrycks
+  title: Public release
+  type: web
+  cited_by:
+    - far-ai
+  publication_id: github
+  tags:
+    - open-source
+    - adversarial-robustness
+    - ml-safety
+    - benchmarking
+- id: d0a10b016d7b9e12
+  url: https://en.wikipedia.org/wiki/Path_dependence
+  title: path dependence
+  type: reference
+  cited_by:
+    - lock-in
+  publication_id: wikipedia
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: ab9cc01cf367fd79
+  url: https://en.wikipedia.org/wiki/METR
+  title: METR - Wikipedia
+  type: reference
+  cited_by:
+    - metr
+  publication_id: wikipedia
+  tags:
+    - evaluations
+    - dangerous-capabilities
+    - autonomous-replication
+- id: 3b2476cac3ef6161
+  url: https://en.wikipedia.org/wiki/High-frequency_trading
+  title: 200-500 milliseconds
+  type: reference
+  cited_by:
+    - flash-dynamics
+  publication_id: wikipedia
+  tags:
+    - algorithmic-trading
+    - financial-stability
+    - critical-infrastructure
+- id: ae5737c31875fe59
+  url: https://en.wikipedia.org/wiki/Reward_hacking
+  title: CoastRunners AI
+  type: reference
+  publication_id: wikipedia
+  cited_by:
+    - case-for-xrisk
+    - why-alignment-hard
+- id: c799d5e1347e4372
+  url: https://en.wikipedia.org/wiki/AI_alignment
+  title: '"alignment faking"'
+  type: reference
+  publication_id: wikipedia
+  tags:
+    - alignment
+  cited_by:
+    - why-alignment-hard
+- id: 25db6bbae2f82f94
+  url: https://en.wikipedia.org/wiki/Removal_of_Sam_Altman_from_OpenAI
+  title: Wikipedia's account
+  type: reference
+  publication_id: wikipedia
+  cited_by:
+    - mainstream-era
+  tags:
+    - chatgpt
+    - gpt-4
+    - anthropic
+- id: 89860462901f56f7
+  url: https://en.wikipedia.org/wiki/AI_Safety_Institute
+  title: UK AI Safety Institute Wikipedia
+  type: reference
+  publication_id: wikipedia
+  tags:
+    - safety
+  cited_by:
+    - uk-aisi
+    - us-aisi
+    - us-executive-order
+- id: 3700509af0b7f61d
+  url: https://en.wikipedia.org/wiki/Demis_Hassabis
+  title: Demis Hassabis - Wikipedia
+  type: reference
+  publication_id: wikipedia
+  cited_by:
+    - demis-hassabis

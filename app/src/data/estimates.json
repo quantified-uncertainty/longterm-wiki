@@ -1,0 +1,1023 @@
+[
+  {
+    "id": "p-transformative-ai-by-2030",
+    "variable": "P(Transformative AI by 2030)",
+    "category": "timelines",
+    "description": "Probability that we develop AI systems capable of causing transformative economic and social change by 2030.",
+    "aggregateRange": "10-35%",
+    "estimates": [
+      {
+        "source": "Metaculus Community",
+        "value": "25%",
+        "date": "2024",
+        "url": "https://metaculus.com"
+      },
+      {
+        "source": "AI Impacts Survey",
+        "value": "10%",
+        "date": "2023",
+        "notes": "Median expert estimate"
+      },
+      {
+        "source": "Epoch AI",
+        "value": "15-30%",
+        "date": "2024",
+        "notes": "Based on compute trends"
+      },
+      {
+        "source": "Ajeya Cotra (Open Phil)",
+        "value": "35%",
+        "date": "2022",
+        "notes": "Biological anchors framework"
+      },
+      {
+        "source": "Epoch AI",
+        "value": "15-25%",
+        "date": "2024",
+        "notes": "Compute-based forecast"
+      }
+    ]
+  },
+  {
+    "id": "p-agi-by-2040",
+    "variable": "P(AGI by 2040)",
+    "category": "timelines",
+    "description": "Probability of human-level artificial general intelligence by 2040.",
+    "aggregateRange": "40-70%",
+    "estimates": [
+      {
+        "source": "Metaculus Community",
+        "value": "65%",
+        "date": "2024"
+      },
+      {
+        "source": "Expert Survey Aggregate",
+        "value": "50%",
+        "date": "2023"
+      },
+      {
+        "source": "AI Impacts Survey",
+        "value": "40%",
+        "date": "2023"
+      },
+      {
+        "source": "AI Impacts Survey",
+        "value": "50%",
+        "date": "2023"
+      },
+      {
+        "source": "Epoch AI",
+        "value": "55%",
+        "date": "2024"
+      },
+      {
+        "source": "Samotsvety Forecasters",
+        "value": "45%",
+        "date": "2023"
+      }
+    ]
+  },
+  {
+    "id": "p-alignment-is-very-hard",
+    "variable": "P(Alignment is Very Hard)",
+    "category": "alignment",
+    "description": "Probability that aligning superintelligent AI requires fundamental breakthroughs we don't yet have.",
+    "aggregateRange": "25-60%",
+    "estimates": [
+      {
+        "source": "MIRI",
+        "value": "80%+",
+        "date": "2023",
+        "notes": "Pessimistic view on current approaches"
+      },
+      {
+        "source": "Anthropic",
+        "value": "30-50%",
+        "date": "2023",
+        "notes": "More optimistic on iterative approaches"
+      },
+      {
+        "source": "DeepMind",
+        "value": "25-40%",
+        "date": "2023",
+        "notes": "Expects incremental progress"
+      }
+    ]
+  },
+  {
+    "id": "p-ai-catastrophe-no-intervention",
+    "variable": "P(AI Catastrophe | No Intervention)",
+    "category": "risk",
+    "description": "Probability of existential or civilizational catastrophe from AI given current trajectories and no major intervention.",
+    "aggregateRange": "5-50%",
+    "estimates": [
+      {
+        "source": "Existential Risk Survey",
+        "value": "10%",
+        "date": "2023",
+        "notes": "Median across researchers"
+      },
+      {
+        "source": "MIRI/Yudkowsky",
+        "value": ">90%",
+        "date": "2023",
+        "notes": "Doom by default view"
+      },
+      {
+        "source": "AI Safety Community Survey",
+        "value": "20-30%",
+        "date": "2024"
+      },
+      {
+        "source": "Toby Ord (The Precipice)",
+        "value": "10%",
+        "date": "2020",
+        "notes": "This century"
+      },
+      {
+        "source": "Anthropic Leadership",
+        "value": "10-25%",
+        "date": "2023",
+        "notes": "Based on public statements"
+      }
+    ]
+  },
+  {
+    "id": "annual-ai-safety-funding",
+    "variable": "Annual AI Safety Funding",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "Conservative estimate",
+        "value": "100-200",
+        "date": "2024",
+        "notes": "Counting only explicit safety grants"
+      },
+      {
+        "source": "Including indirect work",
+        "value": "300-500",
+        "date": "2024",
+        "notes": "Including AI safety teams at major labs"
+      },
+      {
+        "source": "Historical (2019)",
+        "value": "10-50",
+        "date": "2019",
+        "notes": "Pre-scaling period"
+      }
+    ]
+  },
+  {
+    "id": "p-doom-and-timeline-estimates",
+    "variable": "P(doom) and Timeline Estimates",
+    "category": "timelines",
+    "estimates": [
+      {
+        "source": "Dario Amodei",
+        "value": "10-25%",
+        "date": "2023",
+        "notes": "Probability of AI-caused catastrophe (public talk)"
+      },
+      {
+        "source": "Anthropic Core Views",
+        "value": "2026-2028",
+        "date": "2023",
+        "notes": "Possible timeline for transformative AI"
+      },
+      {
+        "source": "RSP Framework",
+        "value": "ASL-3 within ~2 years",
+        "date": "2023",
+        "notes": "Expecting dangerous capability threshold soon"
+      },
+      {
+        "source": "Dario Amodei (Machines of Loving Grace)",
+        "value": "2026-2027 for powerful AI",
+        "date": "2024",
+        "notes": "Essay outlining optimistic potential"
+      }
+    ]
+  },
+  {
+    "id": "agi-timeline-and-risk-estimates",
+    "variable": "AGI Timeline and Risk Estimates",
+    "category": "timelines",
+    "estimates": [
+      {
+        "source": "Demis Hassabis",
+        "value": "Potentially within a decade",
+        "date": "2023",
+        "notes": "AGI timeline in various interviews"
+      },
+      {
+        "source": "Shane Legg",
+        "value": "50% by 2028",
+        "date": "2011 (historical)",
+        "notes": "Early estimate, may have updated"
+      },
+      {
+        "source": "Shane Legg",
+        "value": "Substantial existential risk",
+        "date": "2000s-present",
+        "notes": "Long-time AGI safety advocate"
+      },
+      {
+        "source": "Demis Hassabis",
+        "value": "Need to be careful",
+        "date": "2023",
+        "notes": "Emphasized responsible development"
+      }
+    ]
+  },
+  {
+    "id": "agi-timeline-estimates",
+    "variable": "AGI Timeline Estimates",
+    "category": "timelines",
+    "estimates": [
+      {
+        "source": "Sam Altman",
+        "value": "2025-2027",
+        "date": "2023-2024",
+        "notes": "Various public statements on AGI possibility"
+      },
+      {
+        "source": "Sam Altman",
+        "value": "10-20% catastrophic risk",
+        "date": "2023",
+        "notes": "But argues building it is necessary despite risk"
+      },
+      {
+        "source": "Greg Brockman",
+        "value": "This decade",
+        "date": "2023",
+        "notes": "Public statements on AGI timeline"
+      },
+      {
+        "source": "Ilya Sutskever (before departure)",
+        "value": "Sooner than most think",
+        "date": "2023",
+        "notes": "Expressed concern about rapid progress"
+      }
+    ]
+  },
+  {
+    "id": "arc-s-risk-and-timeline-views",
+    "variable": "ARC's Risk and Timeline Views",
+    "category": "timelines",
+    "estimates": [
+      {
+        "source": "Paul Christiano",
+        "value": "~50% P(doom)",
+        "date": "Historical",
+        "notes": "May have updated toward higher"
+      },
+      {
+        "source": "Paul Christiano",
+        "value": "AGI by 2030s-2040s",
+        "date": "2020s",
+        "notes": "Shortened from earlier estimates"
+      },
+      {
+        "source": "ARC position",
+        "value": "Adversarial scenarios possible",
+        "date": "Ongoing",
+        "notes": "Worst-case alignment focus"
+      },
+      {
+        "source": "ARC position",
+        "value": "Current approaches may be insufficient",
+        "date": "Ongoing",
+        "notes": "Basis for research program"
+      }
+    ]
+  },
+  {
+    "id": "conjecture-s-ai-risk-assessment",
+    "variable": "Conjecture's AI Risk Assessment",
+    "category": "risk",
+    "estimates": [
+      {
+        "source": "Connor Leahy",
+        "value": "AGI within years, not decades",
+        "date": "2023-2024",
+        "notes": "Short timeline estimates in various talks"
+      },
+      {
+        "source": "Connor Leahy",
+        "value": "High P(doom) without major changes",
+        "date": "2023",
+        "notes": "Expressed significant concern about default trajectory"
+      },
+      {
+        "source": "Conjecture position",
+        "value": "Prosaic alignment insufficient",
+        "date": "Ongoing",
+        "notes": "Motivation for CoEm research agenda"
+      },
+      {
+        "source": "Conjecture position",
+        "value": "Interpretability necessary for safety",
+        "date": "Ongoing",
+        "notes": "Core research bet"
+      }
+    ]
+  },
+  {
+    "id": "timeline-and-risk-estimates",
+    "variable": "Timeline and Risk Estimates",
+    "category": "timelines",
+    "estimates": [
+      {
+        "source": "Nate Soares",
+        "value": "2027-2030 for AGI",
+        "date": "2023",
+        "notes": "Median estimate, could be sooner"
+      },
+      {
+        "source": "Eliezer Yudkowsky",
+        "value": ">90% P(doom)",
+        "date": "2020s",
+        "notes": "Implied from various statements, not precise"
+      },
+      {
+        "source": "MIRI leadership consensus",
+        "value": "Current approaches insufficient",
+        "date": "2023",
+        "notes": "Strategic assessment"
+      },
+      {
+        "source": "Historical MIRI (2000s)",
+        "value": "AGI by 2050+",
+        "date": "Historical",
+        "notes": "Longer timelines in early days"
+      }
+    ]
+  },
+  {
+    "id": "redwood-s-assessments",
+    "variable": "Redwood's Assessments",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "Research agenda",
+        "value": "Alignment may not be solved",
+        "date": "2023+",
+        "notes": "Motivates control research"
+      },
+      {
+        "source": "Public statements",
+        "value": "Timelines relatively short",
+        "date": "2023+",
+        "notes": "Urgency of work"
+      },
+      {
+        "source": "Approach",
+        "value": "Need practical solutions",
+        "date": "Ongoing",
+        "notes": "Empirical focus"
+      }
+    ]
+  },
+  {
+    "id": "connor-leahy-s-risk-assessment",
+    "variable": "Connor Leahy's Risk Assessment",
+    "category": "risk",
+    "estimates": [
+      {
+        "source": "AGI timeline",
+        "value": "Could be 2-5 years",
+        "date": "2023",
+        "notes": "Believes AGI could arrive very soon"
+      },
+      {
+        "source": "P(doom)",
+        "value": "High without major changes",
+        "date": "2023",
+        "notes": "Very concerned about default outcomes"
+      },
+      {
+        "source": "Urgency",
+        "value": "Extreme",
+        "date": "2024",
+        "notes": "Emphasizes need for immediate action"
+      }
+    ]
+  },
+  {
+    "id": "dan-hendrycks-risk-assessment",
+    "variable": "Dan Hendrycks' Risk Assessment",
+    "category": "risk",
+    "estimates": [
+      {
+        "source": "Catastrophic risk priority",
+        "value": "On par with pandemics and nuclear war",
+        "date": "2023",
+        "notes": "Statement on AI Risk framing"
+      },
+      {
+        "source": "Need for action",
+        "value": "Urgent",
+        "date": "2023",
+        "notes": "Founded CAIS, coordinated major statement"
+      },
+      {
+        "source": "Technical tractability",
+        "value": "Research can reduce risk",
+        "date": "2024",
+        "notes": "Active research program at CAIS"
+      }
+    ]
+  },
+  {
+    "id": "dario-amodei-s-risk-assessment",
+    "variable": "Dario Amodei's Risk Assessment",
+    "category": "risk",
+    "estimates": [
+      {
+        "source": "P(catastrophe)",
+        "value": "10-25%",
+        "date": "2023",
+        "notes": "Chance of AI-caused catastrophe without additional safety work"
+      },
+      {
+        "source": "AGI Timeline",
+        "value": "2026-2030",
+        "date": "2024",
+        "notes": "Substantial probability of transformative AI this decade"
+      },
+      {
+        "source": "Alignment Difficulty",
+        "value": "Hard but tractable",
+        "date": "2023",
+        "notes": "Can be solved with sustained empirical research and responsible scaling"
+      }
+    ]
+  },
+  {
+    "id": "ilya-sutskever-s-priorities",
+    "variable": "Ilya Sutskever's Priorities",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "AGI timeline",
+        "value": "Near-term enough to be urgent",
+        "date": "2024",
+        "notes": "Founded company specifically for superintelligence"
+      },
+      {
+        "source": "Safety priority",
+        "value": "Absolute priority",
+        "date": "2024",
+        "notes": "Left OpenAI to focus purely on safety"
+      },
+      {
+        "source": "Technical approach",
+        "value": "Revolutionary breakthroughs needed",
+        "date": "2024",
+        "notes": "Stated in SSI announcement"
+      }
+    ]
+  },
+  {
+    "id": "jan-leike-s-risk-assessment",
+    "variable": "Jan Leike's Risk Assessment",
+    "category": "risk",
+    "estimates": [
+      {
+        "source": "Alignment urgency",
+        "value": "Very high",
+        "date": "2024",
+        "notes": "Left OpenAI over concerns about insufficient safety prioritization"
+      },
+      {
+        "source": "Timeline pressure",
+        "value": "Next 3-5 years critical",
+        "date": "2024",
+        "notes": "Emphasized need to solve alignment soon"
+      },
+      {
+        "source": "Technical tractability",
+        "value": "Difficult but solvable",
+        "date": "2024",
+        "notes": "Optimistic about scalable oversight approaches"
+      }
+    ]
+  },
+  {
+    "id": "paul-christiano-s-risk-assessment",
+    "variable": "Paul Christiano's Risk Assessment",
+    "category": "risk",
+    "estimates": [
+      {
+        "source": "P(doom)",
+        "value": "~10-20%",
+        "date": "2022",
+        "notes": "Baseline existential risk from AI this century"
+      },
+      {
+        "source": "AGI Timeline",
+        "value": "2030s-2040s",
+        "date": "2023",
+        "notes": "Median estimate for transformative AI"
+      },
+      {
+        "source": "Alignment Difficulty",
+        "value": "Tractable but hard",
+        "date": "2023",
+        "notes": "Solvable with sustained effort but not guaranteed"
+      }
+    ]
+  },
+  {
+    "id": "stuart-russell-s-risk-assessment",
+    "variable": "Stuart Russell's Risk Assessment",
+    "category": "risk",
+    "estimates": [
+      {
+        "source": "Existential risk",
+        "value": "Significant",
+        "date": "2019",
+        "notes": "Comparable to nuclear war and climate change"
+      },
+      {
+        "source": "Timeline",
+        "value": "Uncertain, potentially decades",
+        "date": "2021",
+        "notes": "Emphasizes uncertainty, warns against overconfidence"
+      },
+      {
+        "source": "Technical difficulty",
+        "value": "Solvable but requires paradigm shift",
+        "date": "2019",
+        "notes": "Need to change how we build AI systems fundamentally"
+      }
+    ]
+  },
+  {
+    "id": "toby-ord-s-risk-assessment",
+    "variable": "Toby Ord's Risk Assessment",
+    "category": "risk",
+    "estimates": [
+      {
+        "source": "AI existential risk this century",
+        "value": "10% (1 in 10)",
+        "date": "2020",
+        "notes": "From The Precipice"
+      },
+      {
+        "source": "All existential risks combined",
+        "value": "16.7% (1 in 6)",
+        "date": "2020",
+        "notes": "Across all risks this century"
+      },
+      {
+        "source": "AI as largest risk",
+        "value": "Yes",
+        "date": "2020",
+        "notes": "Considers AI the single biggest existential threat"
+      }
+    ]
+  },
+  {
+    "id": "yoshua-bengio-s-risk-assessment",
+    "variable": "Yoshua Bengio's Risk Assessment",
+    "category": "risk",
+    "estimates": [
+      {
+        "source": "Extinction risk",
+        "value": "Significant enough to act",
+        "date": "2023",
+        "notes": "Co-signed AI extinction risk statement"
+      },
+      {
+        "source": "Timeline to AGI",
+        "value": "10-20 years possible",
+        "date": "2024",
+        "notes": "More uncertain than many, but concerned about rapid progress"
+      },
+      {
+        "source": "Need for regulation",
+        "value": "Urgent",
+        "date": "2024",
+        "notes": "Testified in favor of AI regulation"
+      }
+    ]
+  },
+  {
+    "id": "value-of-whistleblower-protections",
+    "variable": "Value of Whistleblower Protections",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "Optimistic",
+        "value": "5-15%",
+        "notes": "Transparency enables oversight; prevents worst practices"
+      },
+      {
+        "source": "Moderate",
+        "value": "2-5%",
+        "notes": "Helps but insufficient alone; needs enforcement"
+      },
+      {
+        "source": "Pessimistic",
+        "value": "0.5-2%",
+        "notes": "Labs can continue risky work even if exposed"
+      }
+    ]
+  },
+  {
+    "id": "cost-per-career-change",
+    "variable": "Cost per Career Change",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "ARENA (successful cases)",
+        "value": "$5,000-15,000",
+        "notes": "Direct program costs per career change"
+      },
+      {
+        "source": "MATS",
+        "value": "$20,000-40,000",
+        "notes": "Higher touch, research mentorship"
+      },
+      {
+        "source": "AGI SF",
+        "value": "$500-2,000",
+        "notes": "Scalable but lower conversion rate"
+      }
+    ]
+  },
+  {
+    "id": "delay-to-chinese-frontier-ai-from-export-controls",
+    "variable": "Delay to Chinese Frontier AI from Export Controls",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "Optimistic",
+        "value": "3-5 years",
+        "notes": "Significant technological gap; domestic alternatives lag substantially"
+      },
+      {
+        "source": "Moderate",
+        "value": "1-3 years",
+        "notes": "Some delay but workarounds exist; indigenous development accelerating"
+      },
+      {
+        "source": "Pessimistic",
+        "value": "0.5-1 year",
+        "notes": "Stockpiling, smuggling, and rapid domestic development minimize impact"
+      }
+    ]
+  },
+  {
+    "id": "ai-capability-milestones",
+    "variable": "AI Capability Milestones",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "Chess",
+        "value": "1997",
+        "notes": "Deep Blue defeats world champion"
+      },
+      {
+        "source": "Jeopardy!",
+        "value": "2011",
+        "notes": "Watson wins"
+      },
+      {
+        "source": "Go",
+        "value": "2016",
+        "notes": "AlphaGo defeats Lee Sedol"
+      },
+      {
+        "source": "StarCraft II",
+        "value": "2019",
+        "notes": "AlphaStar reaches Grandmaster"
+      },
+      {
+        "source": "Protein folding",
+        "value": "2020",
+        "notes": "AlphaFold solves structure prediction"
+      },
+      {
+        "source": "Code generation",
+        "value": "2021",
+        "notes": "Codex/Copilot assists programmers"
+      },
+      {
+        "source": "General knowledge",
+        "value": "2022",
+        "notes": "GPT-4 passes bar exam, many college tests"
+      },
+      {
+        "source": "Math competitions",
+        "value": "2024",
+        "notes": "AI reaches IMO level"
+      }
+    ]
+  },
+  {
+    "id": "ai-lab-investment",
+    "variable": "AI Lab Investment",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "OpenAI capabilities vs safety",
+        "value": "80-20",
+        "notes": "Rough estimate based on team sizes"
+      },
+      {
+        "source": "Google capabilities vs safety",
+        "value": "90-10",
+        "notes": "Small dedicated safety team"
+      },
+      {
+        "source": "Anthropic capabilities vs safety",
+        "value": "60-40",
+        "notes": "More safety-focused but still need commercial viability"
+      },
+      {
+        "source": "Meta capabilities vs safety",
+        "value": "95-5",
+        "notes": "Primarily capabilities focus"
+      }
+    ]
+  },
+  {
+    "id": "ai-alignment-progress",
+    "variable": "AI Alignment Progress",
+    "category": "alignment",
+    "estimates": [
+      {
+        "source": "Helpfulness",
+        "value": "Massive improvement",
+        "notes": "GPT-3 → GPT-4 + RLHF is dramatically more helpful"
+      },
+      {
+        "source": "Harmlessness",
+        "value": "Large improvement",
+        "notes": "Refuses harmful requests, avoids biased outputs"
+      },
+      {
+        "source": "Honesty",
+        "value": "Moderate improvement",
+        "notes": "Better at admitting uncertainty, avoiding fabrication"
+      },
+      {
+        "source": "User satisfaction",
+        "value": "Massive improvement",
+        "notes": "ChatGPT vastly more useful than raw GPT-3"
+      }
+    ]
+  },
+  {
+    "id": "alignment-sub-problems",
+    "variable": "Alignment Sub-Problems",
+    "category": "alignment",
+    "estimates": [
+      {
+        "source": "Outer Alignment",
+        "value": "Hard",
+        "notes": "Specifying what we actually want"
+      },
+      {
+        "source": "Inner Alignment",
+        "value": "Very Hard",
+        "notes": "Ensuring the AI internalizes our goals"
+      },
+      {
+        "source": "Scalable Oversight",
+        "value": "Hard",
+        "notes": "Evaluating superhuman outputs"
+      },
+      {
+        "source": "Robustness",
+        "value": "Hard",
+        "notes": "Alignment holding in new situations"
+      },
+      {
+        "source": "Deception Detection",
+        "value": "Very Hard",
+        "notes": "Detecting if AI is faking alignment"
+      }
+    ]
+  },
+  {
+    "id": "capability-levels",
+    "variable": "Capability Levels",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "Narrow AI",
+        "value": "Current",
+        "notes": "Better than humans at specific tasks. No direct existential risk."
+      },
+      {
+        "source": "Human-Level AGI",
+        "value": "Maybe transformative",
+        "notes": "Matches humans across most cognitive tasks. Risk depends on deployment and goals."
+      },
+      {
+        "source": "Superhuman AI",
+        "value": "Transformative",
+        "notes": "Exceeds humans at nearly everything. Likely existential risk if misaligned."
+      },
+      {
+        "source": "Superintelligence",
+        "value": "Highly transformative",
+        "notes": "Vastly exceeds humans. Almost certainly existential risk if misaligned."
+      }
+    ]
+  },
+  {
+    "id": "outcome-severity-spectrum",
+    "variable": "Outcome Severity Spectrum",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "Contained Harm",
+        "value": "Recoverable",
+        "notes": "AI causes damage but we fix it; like industrial accidents"
+      },
+      {
+        "source": "Severe Harm",
+        "value": "Difficult recovery",
+        "notes": "Major setback, but humanity recovers over decades"
+      },
+      {
+        "source": "Civilizational Damage",
+        "value": "Very difficult recovery",
+        "notes": "Major collapse, centuries to rebuild"
+      },
+      {
+        "source": "Permanent Disempowerment",
+        "value": "Unrecoverable",
+        "notes": "Humans permanently lose control of the future"
+      },
+      {
+        "source": "Extinction",
+        "value": "Unrecoverable",
+        "notes": "Humanity ceases to exist"
+      }
+    ]
+  },
+  {
+    "id": "ai-agency-spectrum",
+    "variable": "AI Agency Spectrum",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "Pure Tool",
+        "value": "No agency",
+        "notes": "Responds to queries, no persistent goals, like a calculator"
+      },
+      {
+        "source": "Narrow Agent",
+        "value": "Limited agency",
+        "notes": "Pursues specific task goals, resets between tasks"
+      },
+      {
+        "source": "Goal-Directed AI",
+        "value": "Significant agency",
+        "notes": "Has goals across contexts, takes autonomous action"
+      },
+      {
+        "source": "Autonomous Agent",
+        "value": "Full agency",
+        "notes": "Persistent goals, plans over long horizons, resists interference"
+      }
+    ]
+  },
+  {
+    "id": "p-transformative-ai-by-2040",
+    "variable": "P(Transformative AI by 2040)",
+    "category": "timelines",
+    "estimates": [
+      {
+        "source": "Metaculus Community",
+        "value": "65%",
+        "date": "2024"
+      },
+      {
+        "source": "AI Impacts Expert Survey",
+        "value": "50%",
+        "date": "2023"
+      },
+      {
+        "source": "Epoch AI",
+        "value": "60-70%",
+        "date": "2024",
+        "notes": "Based on compute trends"
+      }
+    ]
+  },
+  {
+    "id": "takeoff-speed-scenarios",
+    "variable": "Takeoff Speed Scenarios",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "Fast (days-months)",
+        "value": "Critical",
+        "notes": "One shot; must solve alignment before deployment"
+      },
+      {
+        "source": "Medium (1-5 years)",
+        "value": "Concerning",
+        "notes": "Limited time to react, but some opportunity"
+      },
+      {
+        "source": "Slow (5-20 years)",
+        "value": "Manageable",
+        "notes": "Can iterate, learn from mistakes, adapt governance"
+      },
+      {
+        "source": "Gradual (decades)",
+        "value": "Comfortable",
+        "notes": "Technology diffuses slowly; society adapts"
+      }
+    ]
+  },
+  {
+    "id": "significance-of-current-warning-signs",
+    "variable": "Significance of Current Warning Signs",
+    "category": "other",
+    "estimates": [
+      {
+        "source": "Jailbreaks & prompt injection",
+        "value": "Moderate",
+        "date": "2023-2024",
+        "notes": "Shows robustness problems, but not catastrophic"
+      },
+      {
+        "source": "Hallucinations",
+        "value": "Low-Moderate",
+        "date": "Ongoing",
+        "notes": "Reliability issue, not alignment failure"
+      },
+      {
+        "source": "Sycophancy",
+        "value": "Moderate",
+        "date": "2024",
+        "notes": "Subtle misalignment with user intent"
+      },
+      {
+        "source": "Sleeper Agents research",
+        "value": "High concern",
+        "date": "2024",
+        "notes": "Demonstrates deception persistence"
+      },
+      {
+        "source": "Capability jumps (GPT-4)",
+        "value": "Moderate",
+        "date": "2023",
+        "notes": "Unexpected capabilities emerged"
+      },
+      {
+        "source": "Emergent deception in games",
+        "value": "Moderate",
+        "date": "2022-2023",
+        "notes": "AI learning to deceive in training"
+      }
+    ]
+  },
+  {
+    "id": "p-ai-existential-catastrophe-by-2100",
+    "variable": "P(AI existential catastrophe by 2100)",
+    "category": "risk",
+    "estimates": [
+      {
+        "source": "Doomer view",
+        "value": "30-90%",
+        "notes": "Short timelines, hard alignment, inadequate coordination"
+      },
+      {
+        "source": "Governance-focused view",
+        "value": "10-30%",
+        "notes": "Emphasis on policy and coordination as key levers"
+      },
+      {
+        "source": "Long-timelines view",
+        "value": "5-20%",
+        "notes": "Time for careful research reduces risk"
+      },
+      {
+        "source": "Optimistic view",
+        "value": "Under 5%",
+        "notes": "Alignment is tractable, iteration will work"
+      }
+    ]
+  },
+  {
+    "id": "timeline-to-agi",
+    "variable": "Timeline to AGI",
+    "category": "timelines",
+    "estimates": [
+      {
+        "source": "Long-timelines view",
+        "value": "20-40+ years",
+        "notes": "Based on skepticism of current progress continuing at this rate"
+      }
+    ]
+  }
+]

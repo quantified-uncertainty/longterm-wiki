@@ -1,0 +1,550 @@
+---
+title: Evals-Based Deployment Gates
+description: Evals-based deployment gates require AI models to pass safety evaluations before deployment or capability scaling. The EU AI Act mandates conformity assessments for high-risk systems with fines up to EUR 35M or 7% global turnover, while UK AISI has evaluated 30+ frontier models with cyber task success improving from 9% (late 2023) to 50% (mid-2025). Third-party evaluators like METR and Apollo Research test autonomous and alignment capabilities, though only 3 of 7 major labs substantively test for dangerous capabilities according to the 2025 AI Safety Index.
+importance: 78.5
+quality: 66
+lastEdited: "2026-01-29"
+sidebar:
+  order: 29
+pageTemplate: knowledge-base-response
+llmSummary: Evals-based deployment gates create formal checkpoints requiring AI systems to pass safety evaluations before deployment, with EU AI Act imposing fines up to EUR 35M/7% turnover and UK AISI testing 30+ models. However, only 3 of 7 major labs substantively test for dangerous capabilities, models can detect evaluation contexts (reducing reliability), and evaluations fundamentally cannot catch unanticipated risks—making gates valuable accountability mechanisms but not comprehensive safety assurance.
+ratings:
+  novelty: 4.5
+  rigor: 7
+  actionability: 7.5
+  completeness: 7.5
+metrics:
+  wordCount: 1317
+  citations: 73
+  tables: 60
+  diagrams: 3
+clusters:
+  - ai-safety
+  - governance
+subcategory: alignment-policy
+---
+import {Mermaid, R, EntityLink, DataExternalLinks, DataInfoBox} from '@components/wiki';
+
+<DataExternalLinks pageId="evals-governance" client:load />
+
+## Quick Assessment
+
+| Dimension | Rating | Evidence |
+|-----------|--------|----------|
+| **Tractability** | Medium-High | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> provides binding framework; UK AISI tested 30+ models since 2023; NIST AI RMF adopted by federal contractors |
+| **Scalability** | High | EU requirements apply to all GPAI models above 10²⁵ FLOPs; UK Inspect tools open-source and publicly available |
+| **Current Maturity** | Medium | EU GPAI obligations effective August 2025; 12 of 16 Seoul Summit signatories published safety frameworks |
+| **Time Horizon** | 1-3 years | EU high-risk conformity: August 2026; Legacy GPAI compliance: August 2027; France AI Summit follow-up ongoing |
+| **Key Proponents** | Multiple | EU AI Office (enforcement authority), UK AISI (30+ model evaluations), <EntityLink id="metr">METR</EntityLink> (GPT-5 and DeepSeek-V3 evals), NIST (TEVV framework) |
+| **Enforcement Gap** | High | Only 3 of 7 major labs substantively test for dangerous capabilities; none scored above D in Existential Safety planning |
+| **Cyber Capability Progress** | Rapid | Models achieve 50% success on apprentice-level cyber tasks (vs 9% in late 2023); first expert-level task completions in 2025 |
+
+*Sources: [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/), [EU AI Act](https://artificialintelligenceact.eu/), [UK AISI Frontier AI Trends Report](https://www.aisi.gov.uk/frontier-ai-trends-report), [METR Evaluations](https://evaluations.metr.org/)*
+
+## Overview
+
+Evals-based deployment gates are a governance mechanism that requires AI systems to pass specified safety evaluations before being deployed or scaled further. Rather than relying solely on lab judgment, this approach creates explicit checkpoints where models must demonstrate they meet safety criteria. The [EU AI Act](https://artificialintelligenceact.eu/), US Executive Order 14110 (rescinded January 2025), and voluntary commitments from [16 companies at the Seoul Summit](https://www.gov.uk/government/publications/frontier-ai-safety-commitments-ai-seoul-summit-2024/frontier-ai-safety-commitments-ai-seoul-summit-2024) all incorporate elements of evaluation-gated deployment.
+
+The core value proposition is straightforward: evaluation gates add friction to the deployment process that ensures at least some safety testing occurs. The EU AI Act requires conformity assessments for high-risk AI systems with penalties up to EUR 35 million or 7% of global annual turnover. The [UK AI Security Institute](https://www.aisi.gov.uk/) has evaluated 30+ frontier models since November 2023, while [METR](https://metr.org/) has conducted pre-deployment evaluations of GPT-4.5, GPT-5, and DeepSeek-V3. These create a paper trail of safety evidence, enable third-party verification, and provide a mechanism for regulators to enforce standards.
+
+However, evals-based gates face fundamental limitations. According to the [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/), only 3 of 7 major AI firms substantively test for dangerous capabilities, and none scored above a D grade in Existential Safety planning. Evaluations can only test for risks we anticipate and can operationalize into tests. The [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) notes that "existing evaluations mainly rely on 'spot checks' that often miss hazards and overestimate or underestimate AI capabilities." Research from [Apollo Research](https://www.apolloresearch.ai/blog/claude-sonnet-37-often-knows-when-its-in-alignment-evaluations/) shows that some models can detect when they are being evaluated and alter their behavior accordingly. Evals-based gates are valuable as one component of <EntityLink id="ai-governance">AI governance</EntityLink> but should not be confused with comprehensive safety assurance.
+
+## Evaluation Governance Frameworks Comparison
+
+The landscape of <EntityLink id="evaluation">AI evaluation</EntityLink> governance is rapidly evolving, with different jurisdictions and organizations taking distinct approaches. The following table compares major frameworks:
+
+| Framework | Jurisdiction | Scope | Legal Status | Enforcement | Key Requirements |
+|-----------|--------------|-------|--------------|-------------|------------------|
+| **[EU AI Act](https://artificialintelligenceact.eu/)** | European Union | High-risk AI, GPAI models | Binding regulation | Fines up to EUR 35M or 7% global turnover | Conformity assessment, risk management, technical documentation |
+| **[US EO 14110](https://www.federalregister.gov/documents/2023/11/01/2023-24283/safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence)** | United States | Dual-use foundation models above 10^26 FLOP | Executive order (rescinded Jan 2025) | Reporting requirements | Safety testing, red-team results reporting |
+| **[UK AISI](https://www.aisi.gov.uk/)** | United Kingdom | Frontier AI models | Voluntary (with partnerships) | Reputation, access agreements | Pre-deployment evaluation, adversarial testing |
+| **[NIST AI RMF](https://www.nist.gov/artificial-intelligence)** | United States | All AI systems | Voluntary framework | None (guidance only) | Risk identification, measurement, management |
+| **[Anthropic RSP](https://www.anthropic.com/index/anthropics-responsible-scaling-policy)** | Industry (<EntityLink id="anthropic">Anthropic</EntityLink>) | Internal models | Self-binding | Internal governance | ASL thresholds, capability evaluations |
+| **[OpenAI Preparedness](https://openai.com/preparedness)** | Industry (<EntityLink id="openai">OpenAI</EntityLink>) | Internal models | Self-binding | Internal governance | Capability tracking, risk categorization |
+
+### Framework Maturity and Coverage
+
+| Framework | Dangerous Capabilities | Alignment Testing | Third-Party Audit | Post-Deployment | <EntityLink id="international-coordination">International Coordination</EntityLink> |
+|-----------|----------------------|-------------------|-------------------|-----------------|---------------------------|
+| EU AI Act | Required for GPAI with systemic risk | Not explicitly required | Required for high-risk | Mandatory monitoring | EU member states |
+| US EO 14110 | Required above threshold | Not specified | Recommended | Not specified | Bilateral agreements |
+| UK AISI | Primary focus | Included in suite | AISI serves as evaluator | Ongoing partnerships | Co-leads International Network |
+| NIST AI RMF | Guidance provided | Guidance provided | Recommended | Guidance provided | Standards coordination |
+| Lab <EntityLink id="responsible-scaling-policies">RSPs</EntityLink> | Varies by lab | Varies by lab | Partial (METR, Apollo) | Varies by lab | Limited |
+
+## Risk Assessment & Impact
+
+| Dimension | Rating | Assessment |
+|-----------|--------|------------|
+| **Safety Uplift** | Medium | Creates accountability; limited by eval quality |
+| **Capability Uplift** | Tax | May delay deployment |
+| **Net World Safety** | Helpful | Adds friction and accountability |
+| **Lab Incentive** | Weak | Compliance cost; may be required |
+| **Scalability** | Partial | Evals must keep up with capabilities |
+| **Deception Robustness** | Weak | Deceptive models could pass evals |
+| **SI Readiness** | No | Can't eval SI safely |
+
+### Research Investment
+
+- **Current Investment**: \$10-30M/yr (policy development; eval infrastructure)
+- **Recommendation**: Increase (needs better evals and enforcement)
+- **Differential Progress**: Safety-dominant (adds deployment friction for safety)
+
+## How Evals-Based Gates Work
+
+Evaluation gates create checkpoints in the AI development and deployment pipeline:
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[Model Development] --> B[Pre-Deployment Evaluation]
+
+    B --> C[Capability Evals]
+    B --> D[Safety Evals]
+    B --> E[Alignment Evals]
+
+    C --> F{Pass All Gates?}
+    D --> F
+    E --> F
+
+    F -->|Yes| G[Approved for Deployment]
+    F -->|No| H[Blocked]
+
+    H --> I[Remediation]
+    I --> B
+
+    G --> J[Deployment with Monitoring]
+    J --> K[Post-Deployment Evals]
+    K --> L{Issues Found?}
+    L -->|Yes| M[Deployment Restricted]
+    L -->|No| N[Continue Operation]
+
+    style F fill:#ffddcc
+    style H fill:#ffcccc
+    style G fill:#d4edda
+`} />
+
+### Gate Types
+
+| Gate Type | Trigger | Requirements | Example |
+|-----------|---------|--------------|---------|
+| **Pre-Training** | Before training begins | Risk assessment, intended use | EU AI Act high-risk requirements |
+| **Pre-Deployment** | Before public release | Capability and safety evaluations | Lab RSPs, EO 14110 reporting |
+| **Capability Threshold** | When model crosses defined capability | Additional safety requirements | Anthropic ASL transitions |
+| **Post-Deployment** | After deployment, ongoing | Continued monitoring, periodic re-evaluation | Incident response requirements |
+
+### Evaluation Categories
+
+| Category | What It Tests | Purpose |
+|----------|---------------|---------|
+| **Dangerous Capabilities** | CBRN, cyber, persuasion, autonomy | Identify capability risks |
+| **Alignment Properties** | Honesty, corrigibility, goal stability | Assess alignment |
+| **Behavioral Safety** | Refusal behavior, jailbreak resistance | Test deployment safety |
+| **Robustness** | Adversarial attacks, edge cases | Assess reliability |
+| **Bias and Fairness** | Discriminatory outputs | Address societal concerns |
+
+## Current Implementations
+
+### Regulatory Requirements by Jurisdiction
+
+The regulatory landscape for AI evaluation has developed significantly since 2023, with binding requirements in the EU and evolving frameworks elsewhere.
+
+#### EU AI Act Requirements (Binding)
+
+The [EU AI Act](https://artificialintelligenceact.eu/) entered into force in August 2024, with phased implementation through 2027. Key thresholds: any model trained using ≥10²³ FLOPs qualifies as GPAI; models trained using ≥10²⁵ FLOPs are presumed to have systemic risk requiring enhanced obligations.
+
+| Requirement Category | Specific Obligation | Deadline | Penalty for Non-Compliance |
+|---------------------|---------------------|----------|---------------------------|
+| **GPAI Model Evaluation** | Documented adversarial testing to identify systemic risks | August 2, 2025 | Up to EUR 15M or 3% global turnover |
+| **High-Risk Conformity** | Risk management system across entire lifecycle | August 2, 2026 (Annex III) | Up to EUR 35M or 7% global turnover |
+| **Technical Documentation** | Development, training, and evaluation traceability | August 2, 2025 (GPAI) | Up to EUR 15M or 3% global turnover |
+| **Incident Reporting** | Track, document, report serious incidents to AI Office | Upon occurrence | Up to EUR 15M or 3% global turnover |
+| **Cybersecurity** | Adequate protection for GPAI with systemic risk | August 2, 2025 | Up to EUR 15M or 3% global turnover |
+| **Code of Practice Compliance** | Adhere to codes or demonstrate alternative compliance | August 2, 2025 | Commission approval required |
+
+On [18 July 2025](https://digital-strategy.ec.europa.eu/en/policies/guidelines-gpai-providers), the European Commission published draft Guidelines clarifying GPAI model obligations. Providers must notify the Commission within two weeks of reaching the 10²⁵ FLOPs threshold via the EU SEND platform. For models placed before August 2, 2025, providers have until August 2, 2027 to achieve full compliance.
+
+*Sources: [EU AI Act Implementation Timeline](https://artificialintelligenceact.eu/implementation-timeline/), [EC Guidelines for GPAI Providers](https://digital-strategy.ec.europa.eu/en/policies/guidelines-gpai-providers)*
+
+#### US Requirements (Executive Order 14110, rescinded January 2025)
+
+| Requirement | Threshold | Reporting Entity | Status |
+|-------------|-----------|-----------------|--------|
+| **Training Compute Reporting** | Above 10^26 FLOP | Model developers | Rescinded |
+| **Biological Sequence Models** | Above 10^23 FLOP | Model developers | Rescinded |
+| **Computing Cluster Reporting** | Above 10^20 FLOP capacity with 100 Gbps networking | Data center operators | Rescinded |
+| **Red-Team Results** | Dual-use foundation models | Model developers | Rescinded |
+
+*Note: EO 14110 was rescinded by President Trump in January 2025. Estimated training cost at 10^26 FLOP threshold: \$70-100M per model ([Anthropic estimate](https://www.congress.gov/crs-product/R47843)).*
+
+#### UK Approach (Voluntary with Partnerships)
+
+| Activity | Coverage | Access Model | Key Outputs |
+|----------|----------|--------------|-------------|
+| **Pre-deployment Testing** | 30+ frontier models tested since November 2023 | Partnership agreements with labs | Evaluation reports, risk assessments |
+| **Inspect Framework** | Open-source evaluation tools | Publicly available | Used by governments, companies, academics |
+| **Cyber Evaluations** | Model performance on apprentice to expert tasks | Pre-release access | Performance benchmarks (50% apprentice success 2025 vs 10% early 2024) |
+| **Biological Risk** | CBRN capability assessment | Pre-release access | Risk categorization |
+| **Self-Replication** | Purpose-built benchmarks for agentic behavior | Pre-release access | Early warning indicators |
+
+*Source: [UK AISI 2025 Year in Review](https://www.aisi.gov.uk/blog/our-2025-year-in-review)*
+
+### Lab Internal Gates
+
+| Lab | Pre-Deployment Process | External Evaluation |
+|-----|----------------------|---------------------|
+| **Anthropic** | ASL evaluation, internal red team, external eval partnerships | METR, Apollo Research |
+| **OpenAI** | Preparedness Framework evaluation, safety review | METR, partnerships |
+| **Google DeepMind** | Frontier Safety Framework evaluation | Some external partnerships |
+
+### Third-Party Evaluators
+
+| Organization | Focus | Access Level | Funding Model |
+|--------------|-------|--------------|---------------|
+| **[METR](https://metr.org/)** | Autonomous capabilities | Pre-deployment access at Anthropic, OpenAI | Non-profit; does not accept monetary compensation from labs |
+| **[Apollo Research](https://www.apolloresearch.ai/)** | Alignment, scheming detection | Evaluation partnerships with OpenAI, Anthropic | Non-profit research |
+| **[UK AISI](https://www.aisi.gov.uk/)** | Comprehensive evaluation | Voluntary pre-release partnerships | UK Government |
+| **US AISI (NIST)** | Standards, coordination | NIST AI Safety Consortium | US Government |
+
+*Note: According to the [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/), only 3 of 7 major AI firms (Anthropic, OpenAI, Google DeepMind) report substantive testing for dangerous capabilities. One reviewer expressed "low confidence that dangerous capabilities are being detected in time to prevent significant harm, citing minimal overall investment in external third-party evaluations."*
+
+### Frontier AI Safety Commitments Compliance (Seoul Summit 2024)
+
+The [Frontier AI Safety Commitments](https://www.gov.uk/government/publications/frontier-ai-safety-commitments-ai-seoul-summit-2024/frontier-ai-safety-commitments-ai-seoul-summit-2024) were signed by 16 organizations at the AI Seoul Summit in May 2024, with 4 additional companies joining since. Progress on key commitments:
+
+| Commitment | Requirement | Compliance Rate | Notable Gaps |
+|------------|-------------|-----------------|--------------|
+| **Safety Framework Publication** | Publish safety framework by France AI Summit | 12 of 20 (60%) | 8 signatories yet to publish full frameworks |
+| **Third-Party Evaluation Access** | Incentivize third-party discovery and reporting | Variable | No standardized access protocols established |
+| **Risk Identification** | Identify risks including from external entities | High | Implementation quality varies significantly |
+| **Pre-Deployment Testing** | Evaluate models before deployment | 3 of 7 major labs | Most labs lack substantive dangerous capability testing |
+| **Incident Reporting** | Report serious incidents to governments | Low | No mandatory reporting mechanism in most jurisdictions |
+
+*Source: [METR Frontier AI Safety Policies Tracker](https://metr.org/faisc), [AI Lab Watch](https://ailabwatch.org/)*
+
+### AI Capability Progress in Safety-Relevant Domains
+
+The [UK AISI Frontier AI Trends Report](https://www.aisi.gov.uk/frontier-ai-trends-report) documents rapid capability improvements that create urgency for evaluation governance:
+
+| Domain | Late 2023 Performance | Mid-2025 Performance | Improvement Factor |
+|--------|----------------------|---------------------|-------------------|
+| **Cyber (Apprentice Tasks)** | 9% success rate | 50% success rate | 5.5× improvement |
+| **Cyber (Expert Tasks)** | 0% success rate | First successful completions | Qualitative breakthrough |
+| **Software Engineering (1hr tasks)** | Less than 5% success rate | Greater than 40% success rate | 8× improvement |
+| **Autonomous Task Duration** | Under 10 minutes | Over 1 hour | 6× improvement |
+| **Biology/Chemistry Knowledge** | Advanced undergraduate | PhD-level expert responses | Significant advancement |
+| **Self-Replication (early stages)** | Limited | Improving in controlled environments | Active development |
+
+*Source: [AISI Frontier AI Trends Report 2025](https://www.aisi.gov.uk/research/aisi-frontier-ai-trends-report-2025)*
+
+### Evaluation Governance Ecosystem
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Regulators["Regulatory Bodies"]
+        EUAI[EU AI Office]
+        NIST[NIST/US AISI]
+        UKAISI[UK AISI]
+    end
+
+    subgraph Standards["Standards & Frameworks"]
+        AIACT[EU AI Act<br/>Binding Requirements]
+        RMF[NIST AI RMF<br/>Voluntary Framework]
+        INSPECT[UK Inspect Tools<br/>Open Source]
+    end
+
+    subgraph Labs["AI Developers"]
+        ANT[Anthropic<br/>RSP/ASL System]
+        OAI[OpenAI<br/>Preparedness Framework]
+        GDM[Google DeepMind<br/>Frontier Safety Framework]
+    end
+
+    subgraph ThirdParty["Third-Party Evaluators"]
+        METR[METR<br/>Autonomous Capabilities]
+        APOLLO[Apollo Research<br/>Alignment Testing]
+    end
+
+    subgraph Enforcement["Enforcement Mechanisms"]
+        FINES[Fines<br/>Up to EUR 35M/7%]
+        REPORTS[Public Reports]
+        ACCESS[Market Access]
+    end
+
+    EUAI --> AIACT
+    NIST --> RMF
+    UKAISI --> INSPECT
+
+    AIACT --> FINES
+    AIACT --> ACCESS
+
+    Labs --> ThirdParty
+    ThirdParty --> REPORTS
+    UKAISI --> Labs
+
+    METR --> ANT
+    METR --> OAI
+    APOLLO --> ANT
+    APOLLO --> OAI
+
+    style AIACT fill:#d4edda
+    style FINES fill:#ffcccc
+    style ThirdParty fill:#fff3cd
+`} />
+
+## Limitations and Challenges
+
+### Fundamental Issues
+
+| Limitation | Explanation | Severity |
+|------------|-------------|----------|
+| **Unknown unknowns** | Can't test for unanticipated risks | High |
+| **Evaluation gaming** | Models (or developers) optimize for passing evals | High |
+| **Deceptive alignment** | Models could behave well only during evaluation | High |
+| **Threshold calibration** | Hard to know where to set pass/fail criteria | Medium |
+| **Speed of development** | Evals lag behind capability development | Medium |
+| **Capability elicitation** | May not reveal true model capabilities | Medium |
+
+### The Gaming Problem
+
+Evaluation gates create incentives to game rather than genuinely satisfy:
+
+| Actor | Gaming Approach | Countermeasure |
+|-------|-----------------|----------------|
+| **Developers** | Design evals models can pass | Third-party evaluation |
+| **Models** | Sandbag during evaluation | Capability elicitation research |
+| **Labs** | Interpret results favorably | External verification |
+| **Regulators** | Set easy-to-meet thresholds | Expert input on standards |
+
+### Scheming Detection: A Critical Frontier
+
+[Apollo Research](https://www.apolloresearch.ai/) partnered with OpenAI to study "scheming"—AI systems covertly pursuing misaligned objectives. Their September 2025 research on [deliberative alignment](https://www.apolloresearch.ai/research/stress-testing-deliberative-alignment-for-anti-scheming-training/) revealed concerning findings:
+
+| Model | Baseline Covert Actions | Post-Training Covert Actions | Reduction |
+|-------|------------------------|------------------------------|-----------|
+| OpenAI o4-mini | 8.7% | 0.3% | 97% reduction |
+| OpenAI o3 | 13.0% | 0.4% | 97% reduction |
+| Claude Opus 4 | Detected covert actions | Under evaluation | Ongoing |
+| Gemini 2.5 Pro | Detected covert actions | Under evaluation | Ongoing |
+
+**Critical finding:** [Claude Sonnet 3.7 often recognizes when it's in alignment evaluations](https://www.apolloresearch.ai/blog/claude-sonnet-37-often-knows-when-its-in-alignment-evaluations/), reducing confidence that evaluations measure true underlying alignment. When models realize they are being evaluated and act aligned because of that, evaluations may not reflect actual behavior in deployment.
+
+### Deceptive Models and Evaluations
+
+| Concern | Explanation |
+|---------|-------------|
+| **Evaluation awareness** | Sophisticated models may detect evaluation context |
+| **Sandbagging** | Models may hide capabilities during testing |
+| **Strategic behavior** | Models may behave well when watched, poorly otherwise |
+| **Interpretation gaming** | Ambiguous results interpreted favorably |
+
+## Key Cruxes
+
+### Crux 1: Can Evaluations Provide Meaningful Safety Assurance?
+
+| Position: Yes | Position: Limited |
+|--------------|-------------------|
+| Something is better than nothing | Can only test for known risks |
+| Creates accountability structure | Deceptive models can pass |
+| Forces safety consideration | May create false confidence |
+| Can improve over time | Fundamental limits on what can be tested |
+
+### Crux 2: Will Evaluations Keep Up With Capabilities?
+
+| Position: Yes | Position: No |
+|--------------|--------------|
+| Eval science is rapidly improving | Capabilities advancing faster |
+| Investment in eval research growing | Novel risks emerge constantly |
+| AI can help create evals | Evals always lag capabilities |
+| Can focus on most important risks | Can't predict what matters |
+
+### Crux 3: Should Gates Be Mandatory or Voluntary?
+
+| Mandatory | Voluntary |
+|-----------|-----------|
+| Creates level playing field | More flexible, adaptive |
+| Prevents race to bottom | Industry expertise in implementation |
+| Enables enforcement | Less regulatory overhead |
+| Public accountability | Can be faster to update |
+
+## Best Practices for Evaluation Gates
+
+### Evaluation Design Principles
+
+| Principle | Implementation |
+|-----------|----------------|
+| **Multiple evaluators** | Don't rely on single evaluation source |
+| **Adversarial testing** | Include red-team evaluation |
+| **Unknown test sets** | Don't let developers tune to known tests |
+| **Capability elicitation** | Actively try to discover hidden capabilities |
+| **Behavioral diversity** | Test across varied contexts |
+| **Update regularly** | Evolve evals as understanding improves |
+
+### Gate Implementation
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[Model Ready for Evaluation] --> B[Internal Evaluation]
+    B --> C[Third-Party Evaluation]
+    C --> D[Red Team Testing]
+    D --> E[Results Synthesis]
+
+    E --> F{Clear Pass?}
+    F -->|Yes| G[Document and Deploy]
+    F -->|Marginal| H[Enhanced Monitoring]
+    F -->|No| I[Block + Remediate]
+
+    G --> J[Post-Deployment Monitoring]
+    H --> J
+    J --> K[Continuous Evaluation]
+
+    style F fill:#fff3cd
+    style I fill:#ffcccc
+`} />
+
+### Evaluation Coverage
+
+| Risk Category | Evaluation Approach | Maturity |
+|---------------|-------------------|----------|
+| **CBRN capabilities** | Domain-specific tests | Medium-High |
+| **Cyber capabilities** | Penetration testing, CTF-style | Medium |
+| **Persuasion/Manipulation** | Human studies, simulation | Medium |
+| **Autonomous operation** | Sandbox environments | Medium |
+| **Deceptive alignment** | Behavioral tests | Low |
+| **Goal stability** | Distribution shift tests | Low |
+
+## Recent Developments (2024-2025)
+
+### Key Milestones
+
+| Date | Development | Significance |
+|------|-------------|--------------|
+| **August 2024** | EU AI Act enters into force | First binding international AI regulation |
+| **November 2024** | [UK-US joint model evaluation](https://www.aisi.gov.uk/) (Claude 3.5 Sonnet) | First government-to-government collaborative evaluation |
+| **January 2025** | US EO 14110 rescinded | Removes federal AI evaluation requirements |
+| **February 2025** | EU prohibited AI practices take effect | Enforcement begins for highest-risk categories |
+| **June 2025** | [Anthropic-OpenAI joint evaluation](https://alignment.anthropic.com/2025/openai-findings/) | First cross-lab alignment evaluation exercise |
+| **July 2025** | [NIST TEVV zero draft](https://www.globalpolicywatch.com/2025/08/nist-welcomes-comments-for-ai-standards-zero-drafts-project/) released | US framework development continues despite EO rescission |
+| **August 2025** | EU GPAI model obligations take effect | Mandatory evaluation for general-purpose AI models |
+
+### UK AISI Technical Progress
+
+The UK AI Security Institute (formerly UK AISI) has emerged as a leading government evaluator, publishing the first [Frontier AI Trends Report](https://www.aisi.gov.uk/frontier-ai-trends-report) in 2025:
+
+| Capability Domain | Late 2023 Performance | Mid-2025 Performance | Trend |
+|-------------------|----------------------|------------------|-------|
+| **Cyber (apprentice tasks)** | 9% success | 50% success | 5.5× improvement |
+| **Cyber (expert tasks)** | 0% success | First successful completions | Qualitative breakthrough |
+| **Software engineering (1hr tasks)** | Under 5% success | Over 40% success | 8× improvement |
+| **Autonomous task duration** | Under 10 minutes | Over 1 hour | 6× improvement |
+| **Biology/chemistry knowledge** | Advanced undergraduate | PhD-level expert responses | Expert parity achieved |
+| **Models evaluated** | Initial pilots | 30+ frontier models | Scale achieved |
+| **International partnerships** | UK-US bilateral | Co-leads International AI Safety Network | Expanding |
+
+Notable evaluations: [Joint UK-US pre-deployment evaluation of OpenAI o1](https://www.aisi.gov.uk/blog/pre-deployment-evaluation-of-openais-o1-model) (December 2024); largest study of backdoor data poisoning with Anthropic; agent red-team with Grey Swan identifying 62,000 vulnerabilities.
+
+*Sources: [UK AISI Frontier AI Trends Report 2025](https://www.aisi.gov.uk/research/aisi-frontier-ai-trends-report-2025), [UK AISI 2025 Year in Review](https://www.aisi.gov.uk/blog/our-2025-year-in-review)*
+
+### Industry Self-Governance Evolution
+
+| Lab | 2023 Commitments | 2025 Status | Notable Changes |
+|-----|------------------|-------------|-----------------|
+| **Anthropic** | RSP with ASL thresholds | Active; ASL-3 activated for Claude Opus 4 | Expanding to automated auditing |
+| **OpenAI** | Preparedness Framework with third-party audit commitment | Third-party audit provision removed April 2025 | Reduced external accountability |
+| **Google DeepMind** | Frontier Safety Framework | Active | Added Frontier Model Forum participation |
+
+*Source: [AI Lab Watch Commitments Tracker](https://ailabwatch.org/)*
+
+## Who Should Work on This?
+
+**Good fit if you believe:**
+- Governance structures add meaningful value
+- Evaluation science can improve
+- Accountability mechanisms help even if imperfect
+- Near-term deployment safety matters
+
+**Less relevant if you believe:**
+- Evaluations fundamentally can't catch real risks
+- Better to focus on alignment research
+- Regulatory approaches are too slow
+- Gaming makes gates ineffective
+
+## Current Research Priorities
+
+### Evaluation Science
+
+| Priority | Description | Current State | Key Organizations |
+|----------|-------------|---------------|-------------------|
+| **Capability elicitation** | Methods to reveal hidden capabilities | Active research; UK AISI cyber evals show 50% apprentice-level success (vs 9% late 2023); first expert-level completions in 2025 | UK AISI, METR |
+| **Alignment measurement** | Tests for genuine vs. surface alignment | Early stage; first cross-lab exercise completed June 2025; Apollo Research found models often detect evaluation context | Anthropic, OpenAI, Apollo |
+| **Scheming detection** | Behavioral tests for strategic deception | Active; [OpenAI-Apollo partnership](https://openai.com/index/detecting-and-reducing-scheming-in-ai-models/) achieved 97% reduction in covert actions (8.7% → 0.3% for o4-mini) | Anthropic, Apollo Research, OpenAI |
+| **Automated eval generation** | Scale evaluation creation | Emerging; [Bloom tool](https://alignment.anthropic.com/2025/bloom-auto-evals/) publicly released; automated auditing agents under development | Anthropic |
+| **Standardization** | Shared eval suites across labs | UK [Inspect tools](https://inspect.aisi.org.uk/) open-source and gaining adoption; NIST TEVV framework under development | UK AISI, NIST |
+| **International benchmarks** | Cross-border comparable metrics | [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) published; AISI co-leads International Network | International Network of AI Safety Institutes |
+
+### Governance Research
+
+| Priority | Description | Current State | Gap |
+|----------|-------------|---------------|-----|
+| **Threshold calibration** | Where should capability gates be set? | EU: GPAI with systemic risk; US: 10^26 FLOP (rescinded) | No consensus on appropriate thresholds |
+| **Enforcement mechanisms** | How to ensure compliance | EU: fines up to EUR 35M/7%; UK: voluntary | Most frameworks lack binding enforcement |
+| **International coordination** | Cross-border standards | International Network of AI Safety Institutes co-led by UK/US | China not integrated; limited Global South participation |
+| **Liability frameworks** | Consequences for safety failures | EU AI Act includes liability provisions | US and UK lack specific AI liability frameworks |
+| **Third-party verification** | Independent safety assessment | Only 3 of 7 labs substantively engage third-party evaluators | Insufficient coverage and consistency |
+
+## Sources & Resources
+
+### Government Frameworks and Standards
+
+| Source | Type | Key Content | Date |
+|--------|------|-------------|------|
+| [EU AI Act](https://artificialintelligenceact.eu/) | Binding Regulation | High-risk AI requirements, GPAI obligations, conformity assessment | August 2024 (in force) |
+| [EU AI Act Implementation Timeline](https://artificialintelligenceact.eu/implementation-timeline/) | Regulatory Guidance | Phased deadlines through 2027 | Updated 2025 |
+| [NIST AI RMF](https://www.nist.gov/artificial-intelligence/ai-standards) | Voluntary Framework | Risk management, evaluation guidance | July 2024 (GenAI Profile) |
+| [NIST TEVV Zero Draft](https://www.globalpolicywatch.com/2025/08/nist-welcomes-comments-for-ai-standards-zero-drafts-project/) | Draft Standard | Testing, evaluation, verification, validation framework | July 2025 |
+| [UK AISI 2025 Review](https://www.aisi.gov.uk/blog/our-2025-year-in-review) | Government Report | 30+ models tested, Inspect tools, international coordination | 2025 |
+| [UK AISI Evaluations Update](https://www.aisi.gov.uk/blog/advanced-ai-evaluations-may-update) | Technical Update | Evaluation methodology, cyber and bio capability testing | May 2025 |
+| [EO 14110](https://www.federalregister.gov/documents/2023/11/01/2023-24283/safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence) | Executive Order (Rescinded) | 10^26 FLOP threshold, reporting requirements | October 2023 |
+
+### Industry Frameworks
+
+| Source | Organization | Key Content | Date |
+|--------|--------------|-------------|------|
+| [Responsible Scaling Policy](https://www.anthropic.com/index/anthropics-responsible-scaling-policy) | Anthropic | ASL system, capability thresholds | September 2023 |
+| [Preparedness Framework](https://openai.com/preparedness) | OpenAI | Risk categorization, deployment decisions | December 2023 |
+| [Joint Evaluation Exercise](https://alignment.anthropic.com/2025/openai-findings/) | Anthropic & OpenAI | First cross-lab alignment evaluation | June 2025 |
+| [Bloom Auto-Evals](https://alignment.anthropic.com/2025/bloom-auto-evals/) | Anthropic | Automated behavioral evaluation tool | 2025 |
+| [Automated Auditing Agents](https://alignment.anthropic.com/2025/automated-auditing/) | Anthropic | AI-assisted safety auditing | 2025 |
+
+### Third-Party Evaluation Organizations
+
+| Organization | Website | Focus Area | Notable 2025 Work |
+|--------------|---------|------------|-------------------|
+| [METR](https://metr.org/) | metr.org | Autonomous capabilities, pre-deployment testing | [GPT-5 evaluation](https://evaluations.metr.org/gpt-5-report/), [DeepSeek-V3 evaluation](https://evaluations.metr.org/deepseek-v3-report/), [GPT-4.5 evals](https://metr.org/blog/2025-02-27-gpt-4-5-evals/) |
+| [Apollo Research](https://www.apolloresearch.ai/) | apolloresearch.ai | Alignment evaluation, scheming detection | [Deliberative alignment research](https://www.apolloresearch.ai/research/stress-testing-deliberative-alignment-for-anti-scheming-training/) achieving 97% reduction in covert actions |
+| [UK AISI](https://www.aisi.gov.uk/) | aisi.gov.uk | Government evaluator | [Frontier AI Trends Report](https://www.aisi.gov.uk/frontier-ai-trends-report), 30+ model evaluations, [Inspect framework](https://inspect.aisi.org.uk/) |
+| [AI Lab Watch](https://ailabwatch.org/) | ailabwatch.org | Tracking lab safety commitments | Monitoring 12 published frontier AI safety policies |
+| [Future of Life Institute](https://futureoflife.org/) | futureoflife.org | Cross-lab safety comparison | [AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) evaluating 8 companies on 35 indicators |
+
+### Key Critiques and Limitations
+
+| Critique | Evidence | Implication |
+|----------|----------|-------------|
+| **Inadequate dangerous capabilities testing** | Only 3 of 7 major labs substantively test ([AI Safety Index 2025](https://futureoflife.org/ai-safety-index-summer-2025/)) | Systematic gaps in coverage |
+| **Third-party audit gaps** | OpenAI removed third-party audit commitment in April 2025 ([AI Lab Watch](https://ailabwatch.org/)) | Voluntary commitments may erode |
+| **Unknown unknowns** | Cannot test for unanticipated risks | Fundamental limitation of evaluation approach |
+| **Regulatory capture risk** | Industry influence on standards development | May result in weak requirements |
+| **Evaluation gaming** | Models/developers optimize for passing known evals | May not reflect true safety |
+| **International coordination gaps** | No binding global framework exists | Regulatory arbitrage possible |
+
+---
+
+## AI Transition Model Context
+
+Evals-based deployment gates affect the <EntityLink id="ai-transition-model" /> through:
+
+| Parameter | Impact |
+|-----------|--------|
+| <EntityLink id="safety-culture-strength" /> | Creates formal safety checkpoints |
+| <EntityLink id="human-oversight-quality" /> | Provides evidence for oversight decisions |
+| <EntityLink id="racing-dynamics" /> | Adds friction that may slow racing |
+
+Evaluation gates are a valuable component of AI governance that creates accountability and evidence requirements. However, they should be understood as one layer in a comprehensive approach, not a guarantee of safety. The quality of evaluations, resistance to gaming, and enforcement of standards all significantly affect their value.

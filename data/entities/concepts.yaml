@@ -1,0 +1,1055 @@
+# Concepts Entities
+# Auto-generated from entities.yaml - edit this file directly
+
+- id: corporate-influence
+  type: crux
+  title: Corporate Influence
+  customFields:
+    - label: Category
+      value: Direct engagement with AI companies
+    - label: Time to Impact
+      value: Immediate to 3 years
+    - label: Key Leverage
+      value: Inside access and relationships
+    - label: Risk Level
+      value: Medium-High
+    - label: Counterfactual Complexity
+      value: Very High
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: openai
+      type: lab
+    - id: deepmind
+      type: lab
+    - id: racing-dynamics
+      type: risk
+  sources:
+    - title: Working at Frontier AI Labs
+      url: https://80000hours.org/career-reviews/artificial-intelligence-risk-research/#working-at-leading-ai-labs
+      author: 80,000 Hours
+    - title: Right to Warn About Advanced Artificial Intelligence
+      url: https://righttowarn.ai/
+      author: Current/former OpenAI, DeepMind, Anthropic employees
+    - title: Anthropic's Responsible Scaling Policy
+      url: https://www.anthropic.com/news/anthropics-responsible-scaling-policy
+    - title: OpenAI Governance Crisis Analysis
+      author: Various
+      date: 2023-2024
+    - title: Should You Work at a Frontier Lab?
+      url: https://forum.effectivealtruism.org/topics/working-at-ai-labs
+      author: EA Forum discussions
+  description: >-
+    Rather than working on AI safety from outside, this category involves directly influencing frontier AI labs from
+    within or through stakeholder pressure. The theory is that since labs are building potentially dangerous systems,
+    shaping their decisions and culture may be the most direct path to safety.
+  tags:
+    - frontier-labs
+    - safety-culture
+    - whistleblowing
+    - responsible-scaling
+    - shareholder-activism
+    - corporate-governance
+  lastUpdated: 2025-12
+- id: field-building
+  type: crux
+  title: Field Building and Community
+  customFields:
+    - label: Category
+      value: Meta-level intervention
+    - label: Time Horizon
+      value: 3-10+ years
+    - label: Primary Mechanism
+      value: Human capital development
+    - label: Key Metric
+      value: Researchers produced per year
+    - label: Entry Barrier
+      value: Low to Medium
+  relatedEntries:
+    - id: redwood
+      type: lab
+    - id: anthropic
+      type: lab
+  sources:
+    - title: ARENA Program
+      url: https://www.arena.education/
+    - title: MATS Program
+      url: https://www.matsprogram.org/
+    - title: BlueDot Impact
+      url: https://www.bluedot.org/
+    - title: 80,000 Hours - AI Safety Community Building
+      url: https://80000hours.org/articles/ai-policy-guide/
+    - title: Centre for Effective Altruism
+      url: https://www.centreforeffectivealtruism.org/
+    - title: Coefficient Giving AI Grants
+      url: https://coefficientgiving.org/funds/navigating-transformative-ai/
+  description: >-
+    Field-building focuses on growing the AI safety ecosystem rather than doing direct research or policy work. The
+    theory is that by increasing the number and quality of people working on AI safety, we multiply the impact of all
+    other interventions.
+  tags:
+    - field-building
+    - training-programs
+    - community
+    - funding
+    - career-development
+  lastUpdated: 2025-12
+- id: governance-policy
+  type: crux
+  title: AI Governance and Policy
+  customFields:
+    - label: Category
+      value: Institutional coordination
+    - label: Primary Bottleneck
+      value: Political will + expertise
+    - label: Time to Impact
+      value: 2-10 years
+    - label: Estimated Practitioners
+      value: ~200-500 dedicated
+    - label: Entry Paths
+      value: Policy, law, international relations
+  relatedEntries:
+    - id: compute-governance
+      type: policy
+    - id: eu-ai-act
+      type: policy
+    - id: govai
+      type: lab
+    - id: racing-dynamics
+      type: risk
+  sources:
+    - title: The Governance of AI
+      url: https://www.governance.ai/
+      author: Centre for the Governance of AI
+    - title: AI Policy Career Guide
+      url: https://80000hours.org/career-reviews/ai-policy-and-strategy/
+      author: 80,000 Hours
+    - title: Computing Power and the Governance of AI
+      url: https://www.governance.ai/research-papers/computing-power-and-the-governance-of-artificial-intelligence
+      author: Heim et al.
+    - title: EU AI Act Summary
+      url: https://artificialintelligenceact.eu/
+    - title: AI Safety Summits
+      url: https://www.aisafetysummit.gov.uk/
+    - title: CSET Publications
+      url: https://cset.georgetown.edu/publications/
+  tags:
+    - international
+    - compute-governance
+    - regulation
+    - standards
+    - liability
+    - export-controls
+    - ai-safety-summits
+- id: research-agendas
+  type: crux
+  title: Research Agendas
+  customFields:
+    - label: Focus
+      value: Comparing approaches to AI alignment
+    - label: Key Tension
+      value: Empirical vs. theoretical, prosaic vs. novel
+    - label: Related To
+      value: Alignment Difficulty, Timelines
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: miri
+      type: organization
+    - id: arc-evals
+      type: organization
+    - id: redwood
+      type: organization
+  sources:
+    - title: Constitutional AI
+      url: https://arxiv.org/abs/2212.08073
+      author: Anthropic
+      date: '2022'
+    - title: Scaling Monosemanticity
+      url: https://www.anthropic.com/research/mapping-mind-language-model
+      author: Anthropic
+      date: '2024'
+    - title: AI Safety via Debate
+      url: https://arxiv.org/abs/1805.00899
+      author: Irving et al.
+      date: '2018'
+    - title: Eliciting Latent Knowledge
+      url: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8
+      author: Christiano et al.
+      date: '2021'
+    - title: AI Control
+      url: https://redwoodresearch.github.io/ai-control/
+      author: Redwood Research
+      date: '2024'
+  description: Side-by-side comparison of major AI safety research agendas
+  tags:
+    - research-agendas
+    - alignment
+    - interpretability
+    - constitutional-ai
+    - agent-foundations
+    - ai-control
+    - scalable-oversight
+  lastUpdated: 2025-12
+- id: technical-research
+  type: crux
+  title: Technical AI Safety Research
+  customFields:
+    - label: Category
+      value: Direct work on the problem
+    - label: Primary Bottleneck
+      value: Research talent
+    - label: Estimated Researchers
+      value: ~300-1000 FTE
+    - label: Annual Funding
+      value: $100M-500M
+    - label: Career Entry
+      value: PhD or self-study + demonstrations
+  relatedEntries:
+    - id: interpretability
+      type: safety-agenda
+    - id: anthropic
+      type: lab
+    - id: redwood
+      type: lab
+    - id: deceptive-alignment
+      type: risk
+  sources:
+    - title: AI Alignment Research Overview
+      url: https://www.alignmentforum.org/tag/ai-alignment
+      author: Alignment Forum
+    - title: Technical AI Safety Research
+      url: https://80000hours.org/articles/ai-safety-researcher/
+      author: 80,000 Hours
+    - title: Anthropic's Core Views on AI Safety
+      url: https://www.anthropic.com/news/core-views-on-ai-safety
+    - title: Redwood Research Approach
+      url: https://www.redwoodresearch.org/
+    - title: METR Evaluation Framework
+      url: https://metr.org/
+    - title: AGI Safety Fundamentals
+      url: https://www.agisafetyfundamentals.com/
+  description: >-
+    Technical AI safety research aims to make AI systems reliably safe and aligned with human values through direct
+    scientific and engineering work. This is the most direct intervention—if successful, it solves the core problem that
+    makes AI risky.
+  tags:
+    - interpretability
+    - scalable-oversight
+    - rlhf
+    - ai-control
+    - evaluations
+    - agent-foundations
+    - robustness
+  lastUpdated: 2025-12
+- id: misuse
+  type: concept
+  title: AI Misuse
+  description: >-
+    Intentional harmful use of AI systems by malicious actors, including applications in cyberattacks, disinformation,
+    or weapons.
+  status: stub
+  tags:
+    - misuse
+    - malicious-use
+    - ai-risk
+  lastUpdated: 2025-12
+- id: dual-use
+  type: concept
+  title: Dual-Use Technology
+  description: Technologies that have both beneficial civilian applications and potential military or harmful uses.
+  status: stub
+  tags:
+    - dual-use
+    - policy
+    - governance
+  lastUpdated: 2025-12
+- id: fast-takeoff
+  type: concept
+  title: Fast Takeoff
+  description: >-
+    A scenario where AI capabilities improve extremely rapidly, potentially giving little time for society to adapt or
+    implement safety measures.
+  status: stub
+  relatedEntries:
+    - id: superintelligence
+      type: concept
+    - id: self-improvement
+      type: capability
+  tags:
+    - ai-timelines
+    - takeoff-speeds
+    - x-risk
+  lastUpdated: 2025-12
+- id: superintelligence
+  type: concept
+  title: Superintelligence
+  description: Hypothetical AI systems with cognitive abilities vastly exceeding those of humans across virtually all domains.
+  status: stub
+  relatedEntries:
+    - id: fast-takeoff
+      type: concept
+    - id: self-improvement
+      type: capability
+  tags:
+    - superintelligence
+    - agi
+    - x-risk
+  lastUpdated: 2025-12
+- id: content-moderation
+  type: concept
+  title: Content Moderation
+  description: Techniques and policies for controlling AI outputs to prevent harmful, misleading, or inappropriate content.
+  status: stub
+  tags:
+    - safety
+    - policy
+    - deployment
+  lastUpdated: 2025-12
+- id: agi-race
+  type: concept
+  title: AGI Race
+  description: >-
+    Competition between AI labs and nations to develop artificial general intelligence first, potentially at the expense
+    of safety.
+  status: stub
+  relatedEntries:
+    - id: racing-dynamics
+      type: risk
+  tags:
+    - competition
+    - governance
+    - x-risk
+  lastUpdated: 2025-12
+- id: capability-evaluations
+  type: concept
+  title: Capability Evaluations
+  description: >-
+    Systematic assessment of AI systems' abilities, especially dangerous capabilities like deception, manipulation, or
+    autonomous operation.
+  status: stub
+  relatedEntries:
+    - id: metr
+      type: lab-research
+    - id: arc-evals
+      type: organization
+  tags:
+    - evaluations
+    - safety
+    - capabilities
+  lastUpdated: 2025-12
+- id: existential-risk
+  type: concept
+  title: Existential Risk
+  description: Risks that could cause human extinction or permanently curtail humanity's long-term potential.
+  status: stub
+  relatedEntries:
+    - id: superintelligence
+      type: concept
+  tags:
+    - x-risk
+    - catastrophic-risk
+    - longtermism
+  lastUpdated: 2025-12
+- id: adversarial-robustness
+  type: concept
+  title: Adversarial Robustness
+  description: AI systems' resistance to adversarial inputs designed to cause errors or unintended behaviors.
+  status: stub
+  tags:
+    - robustness
+    - security
+    - safety
+  lastUpdated: 2025-12
+- id: natural-abstractions
+  type: concept
+  title: Natural Abstractions
+  description: >-
+    Hypothesis that intelligent systems converge on similar high-level concepts when modeling the world, relevant to
+    interpretability.
+  status: stub
+  relatedEntries:
+    - id: interpretability
+      type: safety-agenda
+  tags:
+    - interpretability
+    - theory
+  lastUpdated: 2025-12
+- id: benchmarking
+  type: concept
+  title: AI Benchmarking
+  description: Standardized evaluation methods for comparing AI system performance across tasks and capabilities.
+  status: stub
+  tags:
+    - evaluations
+    - metrics
+    - capabilities
+  lastUpdated: 2025-12
+- id: transformative-ai
+  type: concept
+  title: Transformative AI
+  description: AI systems capable of causing changes to society as significant as the industrial or agricultural revolutions.
+  status: stub
+  relatedEntries:
+    - id: superintelligence
+      type: concept
+  tags:
+    - ai-timelines
+    - societal-impact
+  lastUpdated: 2025-12
+- id: scaling-laws
+  type: concept
+  title: Scaling Laws
+  description: Empirical relationships between model size, compute, data, and AI performance that have driven recent AI progress.
+  status: stub
+  relatedEntries:
+    - id: epoch-ai
+      type: organization
+  tags:
+    - capabilities
+    - research
+    - forecasting
+  lastUpdated: 2025-12
+- id: ai-timelines
+  type: concept
+  title: AI Timelines
+  description: Predictions and analysis of when various AI capability milestones (AGI, transformative AI) might be reached.
+  status: stub
+  relatedEntries:
+    - id: epoch-ai
+      type: organization
+  tags:
+    - forecasting
+    - capabilities
+    - ai-development
+  lastUpdated: 2025-12
+- id: data-constraints
+  type: concept
+  title: Data Constraints
+  description: Limitations on AI training due to availability, quality, or accessibility of training data.
+  status: stub
+  relatedEntries:
+    - id: scaling-laws
+      type: concept
+  tags:
+    - training
+    - capabilities
+    - limitations
+  lastUpdated: 2025-12
+- id: is-ai-xrisk-real
+  type: crux
+  title: Is AI Existential Risk Real?
+  description: The fundamental debate about whether AI poses existential risk to humanity.
+  customFields:
+    - label: Question
+      value: Does AI pose genuine existential risk?
+    - label: Stakes
+      value: Determines priority of AI safety work
+    - label: Expert Consensus
+      value: Significant disagreement
+  tags:
+    - debate
+    - existential-risk
+    - fundamental
+  lastUpdated: 2025-01
+- id: open-vs-closed
+  type: crux
+  title: Open vs Closed Source AI
+  description: The safety implications of releasing AI model weights publicly versus keeping them proprietary.
+  customFields:
+    - label: Question
+      value: Should frontier AI model weights be released publicly?
+    - label: Stakes
+      value: Balance between safety, innovation, and democratic access
+    - label: Current Trend
+      value: Major labs increasingly keeping models closed
+  tags:
+    - debate
+    - open-source
+    - governance
+  lastUpdated: 2025-01
+- id: pause-debate
+  type: crux
+  title: Should We Pause AI Development?
+  description: The debate over whether to halt or slow advanced AI research to ensure safety.
+  customFields:
+    - label: Question
+      value: Should we pause/slow development of advanced AI systems?
+    - label: Catalyst
+      value: 2023 FLI open letter signed by 30,000+ people
+    - label: Stakes
+      value: Trade-off between safety preparation and beneficial AI progress
+  tags:
+    - debate
+    - pause
+    - governance
+  lastUpdated: 2025-01
+- id: agi-timeline-debate
+  type: crux
+  title: When Will AGI Arrive?
+  description: The debate over AGI timelines from imminent to decades away to never with current approaches.
+  customFields:
+    - label: Question
+      value: When will we develop artificial general intelligence?
+    - label: Range
+      value: From 2-5 years to never with current approaches
+    - label: Stakes
+      value: Determines urgency of safety work and policy decisions
+  tags:
+    - debate
+    - timelines
+    - agi
+  lastUpdated: 2025-01
+- id: regulation-debate
+  type: crux
+  title: Government Regulation vs Industry Self-Governance
+  description: Should AI be controlled through government regulation or industry self-governance?
+  customFields:
+    - label: Question
+      value: Should governments regulate AI or should industry self-govern?
+    - label: Stakes
+      value: Balance between safety, innovation, and freedom
+    - label: Current Status
+      value: Patchwork of voluntary commitments and emerging regulations
+  tags:
+    - debate
+    - regulation
+    - governance
+  lastUpdated: 2025-01
+- id: interpretability-sufficient
+  type: crux
+  title: Is Interpretability Sufficient for Safety?
+  description: Debate over whether mechanistic interpretability can ensure AI safety.
+  customFields:
+    - label: Question
+      value: Is mechanistic interpretability sufficient to ensure AI safety?
+    - label: Stakes
+      value: Determines priority of interpretability vs other safety research
+    - label: Current Progress
+      value: Can interpret some circuits/features, far from full transparency
+  tags:
+    - debate
+    - interpretability
+    - safety-research
+  lastUpdated: 2025-01
+- id: scaling-debate
+  type: crux
+  title: Is Scaling All You Need?
+  description: The debate over whether scaling compute and data is sufficient for AGI or if we need new paradigms.
+  customFields:
+    - label: Question
+      value: Can we reach AGI through scaling alone, or do we need new paradigms?
+    - label: Stakes
+      value: Determines AI timeline predictions and research priorities
+    - label: Expert Consensus
+      value: Strong disagreement between scaling optimists and skeptics
+  tags:
+    - debate
+    - scaling
+    - capabilities
+  lastUpdated: 2025-01
+- id: why-alignment-easy
+  type: argument
+  title: Why Alignment Might Be Easy
+  description: >-
+    Arguments that AI alignment is tractable with current methods including RLHF, Constitutional AI, and
+    interpretability research.
+  customFields:
+    - label: Thesis
+      value: Aligning AI with human values is achievable with current or near-term techniques
+    - label: Implication
+      value: Can pursue beneficial AI without extreme precaution
+    - label: Key Evidence
+      value: Empirical progress and theoretical reasons for optimism
+  tags:
+    - argument
+    - alignment
+    - optimistic
+  lastUpdated: 2025-01
+- id: case-against-xrisk
+  type: argument
+  title: The Case Against AI Existential Risk
+  description: The strongest skeptical arguments against AI existential risk, presenting positions from prominent researchers.
+  customFields:
+    - label: Conclusion
+      value: AI x-risk is very low (under 1%) or highly uncertain
+    - label: Strength
+      value: Challenges many assumptions in the x-risk argument
+    - label: Key Claim
+      value: Current evidence doesn't support extreme risk scenarios
+  tags:
+    - argument
+    - existential-risk
+    - skeptical
+  lastUpdated: 2025-01
+- id: why-alignment-hard
+  type: argument
+  title: Why Alignment Might Be Hard
+  description: >-
+    Arguments that AI alignment faces fundamental challenges including specification problems, inner alignment failures,
+    and verification difficulties.
+  customFields:
+    - label: Thesis
+      value: Aligning advanced AI with human values is extremely difficult and may not be solved in time
+    - label: Implication
+      value: Need caution and potentially slowing capability development
+    - label: Key Uncertainty
+      value: Will current approaches scale to superhuman AI?
+  tags:
+    - argument
+    - alignment
+    - pessimistic
+  lastUpdated: 2025-01
+- id: case-for-xrisk
+  type: argument
+  title: The Case For AI Existential Risk
+  description: >-
+    The strongest formal argument that AI poses existential risk to humanity, based on expert surveys and logical
+    analysis.
+  customFields:
+    - label: Conclusion
+      value: AI poses significant probability of human extinction or permanent disempowerment
+    - label: Strength
+      value: Many find compelling; others reject key premises
+    - label: Key Uncertainty
+      value: Will alignment be solved before transformative AI?
+  tags:
+    - argument
+    - existential-risk
+    - concerned
+  lastUpdated: 2025-01
+
+- id: ai-welfare
+  type: concept
+  title: AI Welfare and Digital Minds
+  description: >-
+    An emerging field examining whether AI systems could deserve moral consideration due to
+    consciousness, sentience, or agency, and developing ethical frameworks to prevent potential
+    harm to digital minds.
+  tags:
+    - consciousness
+    - moral-patienthood
+    - digital-minds
+    - sentience
+    - ai-ethics
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: rethink-priorities
+      type: organization
+    - id: sycophancy
+      type: risk
+    - id: alignment
+      type: concept
+  lastUpdated: 2026-02
+
+- id: misuse-risks
+  type: crux
+  title: Misuse Risk Cruxes
+  description: >-
+    Key uncertainties that determine views on AI misuse risks, including capability uplift
+    (30-45% significant vs 35-45% modest), offense-defense balance, and mitigation effectiveness
+    across bioweapons, cyberweapons, and autonomous systems.
+  tags:
+    - misuse
+    - bioweapons
+    - cybersecurity
+    - deepfakes
+    - offense-defense-balance
+    - capability-uplift
+  clusters:
+    - ai-safety
+    - biorisks
+    - cyber
+    - governance
+  relatedEntries:
+    - id: deepfakes
+      type: risk
+    - id: bioweapons
+      type: risk
+    - id: disinformation
+      type: risk
+    - id: autonomous-weapons
+      type: risk
+    - id: solutions
+      type: crux
+  lastUpdated: 2026-02
+
+- id: solutions
+  type: crux
+  title: Solution Cruxes
+  description: >-
+    Key uncertainties that determine which technical, coordination, and epistemic solutions to
+    prioritize for AI safety and governance, mapping decision-relevant uncertainties across
+    verification scaling, international cooperation, and infrastructure funding with specific
+    probability estimates.
+  tags:
+    - verification
+    - coordination
+    - epistemic-infrastructure
+    - responsible-scaling
+    - international-cooperation
+    - solution-prioritization
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: interpretability
+      type: concept
+    - id: responsible-scaling-policies
+      type: policy
+    - id: international-coordination
+      type: concept
+    - id: epistemic-infrastructure
+      type: concept
+    - id: ai-governance
+      type: concept
+  lastUpdated: 2026-02
+
+- id: accident-risks
+  type: crux
+  title: Accident Risk Cruxes
+  description: >-
+    Key uncertainties that determine views on AI accident risks and alignment difficulty, including
+    mesa-optimization (15-55% probability), deceptive alignment (15-50%), and P(doom) estimates
+    (5-35% median). Integrates 2024-2025 empirical breakthroughs including Anthropic's Sleeper
+    Agents study.
+  tags:
+    - mesa-optimization
+    - deceptive-alignment
+    - situational-awareness
+    - alignment-difficulty
+    - p-doom
+    - inner-alignment
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: mesa-optimization
+      type: concept
+    - id: deceptive-alignment
+      type: risk
+    - id: situational-awareness
+      type: concept
+    - id: anthropic
+      type: lab
+    - id: miri
+      type: organization
+  lastUpdated: 2026-02
+
+- id: structural-risks
+  type: crux
+  title: Structural Risk Cruxes
+  description: >-
+    Key uncertainties that determine views on AI-driven structural risks including power
+    concentration, coordination feasibility, and institutional adaptation. Analysis of 12 cruxes
+    finds US-China AI coordination at 15-50% probability, winner-take-all dynamics at 30-45%,
+    and racing dynamics manageable at 35-45%.
+  tags:
+    - power-concentration
+    - lock-in
+    - racing-dynamics
+    - international-coordination
+    - institutional-adaptation
+    - winner-take-all
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: lock-in
+      type: risk
+    - id: human-agency
+      type: concept
+    - id: racing-dynamics
+      type: risk
+    - id: international-coordination
+      type: concept
+  lastUpdated: 2026-02
+
+- id: epistemic-risks
+  type: crux
+  title: Epistemic Cruxes
+  description: >-
+    Key uncertainties that fundamentally determine AI safety prioritization and epistemic risk
+    mitigation strategy. Analyzes detection-generation arms race (40-60% permanent offense
+    advantage), authentication adoption uncertainty (30-50%), and potentially irreversible
+    trust erosion dynamics.
+  tags:
+    - epistemic-risks
+    - detection-arms-race
+    - trust-erosion
+    - content-authentication
+    - skill-atrophy
+    - disinformation
+  clusters:
+    - epistemics
+    - ai-safety
+  relatedEntries:
+    - id: deepfakes
+      type: risk
+    - id: manifest
+      type: concept
+    - id: misuse-risks
+      type: crux
+    - id: solutions
+      type: crux
+  lastUpdated: 2026-02
+
+- id: governance-focused
+  type: concept
+  title: Governance-Focused Worldview
+  description: >-
+    This worldview holds that technical AI safety solutions require policy, coordination, and
+    institutional change to be effectively adopted, estimating 10-30% existential risk by 2100.
+    Evidence shows 85% of AI lobbyists represent industry and governance interventions like the
+    EU AI Act can meaningfully shape outcomes.
+  tags:
+    - governance
+    - regulation
+    - compute-governance
+    - regulatory-capture
+    - international-coordination
+    - policy
+  clusters:
+    - epistemics
+    - governance
+    - ai-safety
+  relatedEntries:
+    - id: racing-dynamics
+      type: risk
+    - id: eu-ai-act
+      type: policy
+    - id: international-coordination
+      type: concept
+    - id: existential-catastrophe
+      type: risk
+    - id: openai
+      type: organization
+  lastUpdated: 2026-02
+
+- id: critical-uncertainties
+  type: crux
+  title: Critical Uncertainties Model
+  description: >-
+    Model identifying 35 high-leverage uncertainties in AI risk across compute, governance, and
+    capabilities domains. Key cruxes include scaling law breakdown point (10^26-10^30 FLOP),
+    alignment difficulty (41-51% of experts assign >10% extinction probability), and AGI timeline
+    (Metaculus median 2027-2031).
+  tags:
+    - uncertainty-analysis
+    - scaling-laws
+    - compute-governance
+    - alignment-difficulty
+    - research-prioritization
+    - forecasting
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: ai-impacts
+      type: organization
+    - id: metaculus
+      type: organization
+    - id: epoch-ai
+      type: organization
+    - id: agi-timeline
+      type: concept
+    - id: ai-governance
+      type: concept
+  lastUpdated: 2026-02
+
+- id: agi-timeline
+  type: concept
+  title: AGI Timeline
+  description: >-
+    Expert forecasts and prediction markets suggest 50% probability of AGI by 2030-2045, with
+    Metaculus predicting median of November 2027 and lab leaders converging on 2026-2029.
+    Timelines have shortened dramatically, with Metaculus dropping from 50 years to 5 years
+    since 2020.
+  tags:
+    - agi
+    - forecasting
+    - prediction-markets
+    - timelines
+    - scaling
+    - expert-surveys
+  clusters:
+    - ai-safety
+    - epistemics
+  relatedEntries:
+    - id: prediction-markets
+      type: concept
+    - id: sam-altman
+      type: researcher
+    - id: dario-amodei
+      type: researcher
+    - id: metaculus
+      type: organization
+    - id: ai-impacts
+      type: organization
+  lastUpdated: 2026-02
+
+- id: large-language-models
+  type: concept
+  title: Large Language Models
+  description: >-
+    Transformer-based models trained on massive text datasets that exhibit emergent capabilities
+    and pose significant safety challenges. Training costs have grown 2.4x/year since 2016,
+    while frontier models demonstrate in-context scheming and unprecedented capability gains.
+    ChatGPT reached 800-900M weekly active users by late 2025.
+  tags:
+    - transformers
+    - training-costs
+    - scheming
+    - emergent-capabilities
+    - open-weights
+    - frontier-models
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: scheming
+      type: risk
+    - id: deceptive-alignment
+      type: risk
+    - id: anthropic
+      type: lab
+    - id: emergent-capabilities
+      type: concept
+    - id: interpretability
+      type: concept
+  lastUpdated: 2026-02
+
+- id: heavy-scaffolding
+  type: concept
+  title: Heavy Scaffolding / Agentic Systems
+  description: >-
+    Multi-agent AI systems with complex orchestration, persistent memory, and autonomous
+    operation. Includes Claude Code, Devin, and similar agentic architectures. Estimated
+    25-40% probability of being the dominant paradigm at transformative AI, with rapid
+    capability growth but persistent reliability challenges.
+  tags:
+    - agentic-systems
+    - multi-agent
+    - tool-use
+    - autonomous-operation
+    - scaffolding
+    - reliability
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: openai
+      type: lab
+    - id: anthropic
+      type: lab
+    - id: dense-transformers
+      type: concept
+    - id: light-scaffolding
+      type: concept
+  lastUpdated: 2026-02
+
+- id: provable-safe
+  type: concept
+  title: Provable / Guaranteed Safe AI
+  description: >-
+    AI systems designed with formal mathematical safety guarantees from the ground up. The UK's
+    ARIA programme has committed GBP 59M to develop guaranteed safe AI systems by 2028. Current
+    neural network verification handles networks up to 10^6 parameters, but frontier models
+    exceed 10^12, representing a 6 order-of-magnitude gap. Estimated 1-5% probability of
+    paradigm dominance at transformative AI.
+  tags:
+    - formal-verification
+    - mathematical-guarantees
+    - aria
+    - world-models
+    - neuro-symbolic
+    - safety-by-design
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: formal-verification
+      type: concept
+    - id: neuro-symbolic
+      type: concept
+    - id: dense-transformers
+      type: concept
+    - id: heavy-scaffolding
+      type: concept
+  lastUpdated: 2026-02
+
+- id: dense-transformers
+  type: concept
+  title: Dense Transformers
+  description: >-
+    The standard transformer architecture powering current frontier AI, where all parameters
+    are active for every token. Since Vaswani et al.'s 2017 paper (160,000+ citations), dense
+    transformers power GPT-4, Claude 3, Llama 3, and Gemini. Despite open weights for some
+    models, mechanistic interpretability remains primitive with a fundamental gap between
+    feature extraction and behavior prediction.
+  tags:
+    - transformer-architecture
+    - attention-mechanism
+    - scaling
+    - interpretability
+    - training-pipeline
+    - emergent-capabilities
+  clusters:
+    - ai-safety
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: rlhf
+      type: concept
+    - id: constitutional-ai
+      type: approach
+    - id: emergent-capabilities
+      type: concept
+    - id: heavy-scaffolding
+      type: concept
+  lastUpdated: 2026-02
+
+# === Auto-generated stubs for pages missing entities ===
+- id: doomer
+  type: concept
+  title: AI Doomer Worldview
+  description: >-
+    Comprehensive overview of the 'doomer' worldview on AI risk, characterized
+    by 30-90% P(doom) estimates, 10-15 year AGI timelines, and belief that
+    alignment is fundamentally hard. Documents core arguments (orthogonality
+    thesis, instrumental convergence, one-shot problem), key proponents
+    (Yudkowsky, M
+  clusters:
+    - ai-safety
+    - epistemics
+  lastUpdated: 2026-02
+- id: long-timelines
+  type: concept
+  title: Long-Timelines Technical Worldview
+  description: >-
+    Comprehensive overview of the long-timelines worldview (20-40+ years to AGI,
+    5-20% P(doom)), arguing for foundational research over rushed solutions
+    based on historical AI overoptimism, current systems' limitations, and
+    scaling constraints. Provides concrete career and research prioritization
+    guidan
+  clusters:
+    - ai-safety
+    - epistemics
+  lastUpdated: 2026-02
+- id: optimistic
+  type: concept
+  title: Optimistic Alignment Worldview
+  description: >-
+    Comprehensive overview of the optimistic AI alignment worldview, estimating
+    under 5% existential risk by 2100 based on beliefs that alignment is
+    tractable, current techniques (RLHF, Constitutional AI) demonstrate real
+    progress, and iterative deployment enables continuous improvement. Covers
+    key prop
+  clusters:
+    - ai-safety
+    - epistemics
+  lastUpdated: 2026-02

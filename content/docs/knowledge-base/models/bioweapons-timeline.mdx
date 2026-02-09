@@ -1,0 +1,285 @@
+---
+title: AI-Bioweapons Timeline Model
+description: This model projects when AI crosses capability thresholds for bioweapons. It estimates knowledge democratization is already crossed, synthesis assistance arrives 2027-2032, and novel agent design by 2030-2040.
+sidebar:
+  order: 12
+quality: 58
+lastEdited: "2025-12-26"
+ratings:
+  focus: 8.5
+  novelty: 6.5
+  rigor: 6
+  completeness: 7.5
+  concreteness: 7.5
+  actionability: 7
+importance: 78.5
+llmSummary: "Timeline model projects AI-bioweapons capabilities crossing four thresholds: knowledge democratization already partially crossed (fully by 2025-2027), synthesis assistance 2027-2032 (median 2029), novel agent design 2030-2040 (median 2035), and full automation 2035+ (median 2045). Expected risk level 5.16/10 by 2030; optimal intervention windows are narrow (2024-2028 for most), with DNA synthesis screening needing $500M-1B to delay Threshold 2 by 3-5 years."
+pageTemplate: knowledge-base-model
+metrics:
+  wordCount: 345
+  citations: 0
+  tables: 29
+  diagrams: 1
+clusters:
+  - ai-safety
+  - biorisks
+  - governance
+subcategory: timeline-models
+---
+import {DataInfoBox, Backlinks, Mermaid, EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="bioweapons-timeline" ratings={frontmatter.ratings} />
+
+## Overview
+
+This model projects when AI capabilities might cross thresholds that meaningfully change <EntityLink id="bioweapons">bioweapons</EntityLink> risk, providing a structured timeline for when different types of AI-enabled biological threats could emerge. Rather than asking "is AI dangerous now?", it addresses the more actionable question: **when might AI become dangerous for bioweapons development, and under what conditions?** The core insight is that AI-bioweapons risk is not a binary state but a progression through distinct capability thresholds, each with different policy implications and intervention windows.
+
+The timeline approach reveals that different threats have vastly different expected arrival times, from knowledge democratization (already partially crossed) to full attack automation (likely decades away). This temporal distribution matters enormously for resource allocation: interventions that are effective against near-term threats may be irrelevant for long-term ones, and vice versa. Understanding this structure helps policymakers prioritize limited biosecurity resources across a portfolio of threats rather than treating AI-bioweapons risk as a monolithic challenge.
+
+The model synthesizes capability forecasts from AI research, biosecurity expert assessments, and historical precedent for technology diffusion to generate probability distributions across four key thresholds. High uncertainty persists throughout, but even imprecise timeline estimates are more useful than treating all risks as equally imminent or distant. The framework emphasizes that the current period (2024-2027) represents a critical window where governance structures can be established before the most dangerous capabilities proliferate.
+
+## Conceptual Framework
+
+The model structures AI-bioweapons risk around four capability thresholds that represent qualitative shifts in what becomes possible for potential attackers. Each threshold enables different attack profiles and requires different countermeasures.
+
+### Threshold Progression Overview
+
+| Threshold | Description | Key Enablers | Risk Profile |
+|-----------|-------------|--------------|--------------|
+| **1. Knowledge Democratization** | AI provides bioweapons info to non-experts | LLM Capabilities | Expanded Actor Pool (Low Sophistication) |
+| **2. Synthesis Assistance** | AI helps with actual pathogen synthesis | LLM + Lab Automation | Reduced Barriers (Medium Sophistication) |
+| **3. Novel Agent Design** | AI enables creation of new pathogens | Lab Automation + Protein Engineering AI | Novel Threats (High Sophistication) |
+| **4. Full Attack Automation** | AI assists all phases from design to deployment | All enablers integrated | Scalable Attacks (Maximum Danger) |
+
+<Mermaid client:load chart={`
+flowchart TD
+    T1[Knowledge Democratization] --> T2[Synthesis Assistance]
+    T2 --> T3[Novel Agent Design]
+    T3 --> T4[Full Automation]
+
+    style T1 fill:#ffeedd
+    style T2 fill:#ffddcc
+    style T3 fill:#ffcccc
+    style T4 fill:#ff9999
+`} />
+
+The thresholds are ordered but not strictly sequential—advances in one area can partially compensate for limitations in others. The diagram illustrates how different technological enablers feed into each threshold and the resulting risk profiles. Knowledge democratization expands the actor pool but doesn't create fundamentally new threats; full automation would enable scalable attacks that could overwhelm response systems.
+
+## Key Thresholds
+
+### Threshold 1: Knowledge Democratization
+
+Knowledge democratization occurs when AI provides bioweapons-relevant information more effectively than existing sources to non-experts. This threshold is partially crossed as of 2024—large language models contain substantial biological knowledge and can explain complex concepts in accessible terms. However, current guardrails, knowledge gaps, and hallucination rates limit practical utility for actual weapons development.
+
+**Current status:** Partially crossed. LLMs know relevant information but guardrails and knowledge gaps limit utility for actual weapons development.
+
+**Projection:** Likely fully crossed by 2025-2027 as models become more capable and open-source versions proliferate without the same safeguards.
+
+### Threshold 2: Synthesis Assistance
+
+Synthesis assistance means AI meaningfully helps with actual pathogen synthesis, not just theoretical knowledge. This requires integration with laboratory automation, biological design tools, and the ability to provide hands-on guidance through complex experimental procedures. The gap between knowing what to do and being able to do it remains substantial.
+
+**Current status:** Not crossed. This requires integration with lab automation, biological design tools, and hands-on guidance that current systems cannot provide.
+
+**Projection:** 2027-2032, contingent on progress in biological design tools, automated lab systems, and integration between AI systems.
+
+### Threshold 3: Novel Agent Design
+
+Novel agent design would enable creation of pathogens with properties not found in nature—enhanced transmissibility, lethality, immune evasion, or resistance to treatments. This represents a qualitative shift from enabling attacks with existing pathogens to creating entirely new biological threats that current defenses may not anticipate.
+
+**Current status:** Not crossed, but concerning research directions in protein engineering and synthetic biology are advancing.
+
+**Projection:** 2030-2040, highly uncertain. Requires significant advances in protein engineering AI, better understanding of pathogenesis, and integration across multiple AI systems.
+
+### Threshold 4: Full Attack Automation
+
+Full attack automation would see AI significantly assist with all phases from design through production and deployment. This would dramatically reduce the expertise and resources required for sophisticated attacks, potentially enabling small groups or individuals to execute attacks that currently require state-level capabilities.
+
+**Current status:** Far from crossed. Would require breakthrough integration across design, synthesis, testing, and deployment.
+
+**Projection:** 2035+, very uncertain. May never be fully achieved or may require AI capabilities not currently anticipated.
+
+## Quantitative Analysis
+
+### Timeline Parameter Estimates
+
+| Threshold | 5th Percentile | Median | 95th Percentile | Confidence | Key Dependencies |
+|-----------|----------------|--------|-----------------|------------|------------------|
+| Knowledge Democratization | Already crossed | 2025 | 2028 | High | LLM capabilities, guardrail effectiveness |
+| Synthesis Assistance | 2026 | 2029 | 2040 | Medium | Lab automation, biological design tools |
+| Novel Agent Design | 2028 | 2035 | 2060+ | Low | Protein engineering, pathogenesis models |
+| Full Attack Automation | 2032 | 2045 | Never | Very Low | All-domain integration, unprecedented automation |
+
+The table reveals the asymmetric uncertainty structure: near-term thresholds have relatively narrow distributions while long-term ones span decades. This asymmetry is not simply ignorance—it reflects genuine uncertainty about whether advanced thresholds will ever be crossed versus being delayed indefinitely.
+
+### Scenario Analysis
+
+The following scenarios represent probability-weighted paths for AI-bioweapons capability development:
+
+| Scenario | Probability | 2030 Risk Level | 2040 Risk Level | Key Characteristics | Primary Drivers |
+|----------|-------------|-----------------|-----------------|---------------------|-----------------|
+| A: Rapid AI Progress | 18% | Very High | Critical | All thresholds crossed faster than expected | Capability overhang, biosecurity failure |
+| B: Gradual Progress, Biosecurity Keeps Pace | 45% | Elevated | High | Capabilities advance but countermeasures match | Investment in both AI and biosecurity |
+| C: Successful Governance | 25% | Moderate | Moderate | Strong governance prevents highest-risk applications | International coordination, major incident response |
+| D: Black Swan | 12% | Variable | Variable | Unexpected breakthrough or catastrophic event | Unpredictable scientific discovery, war |
+
+**Scenario A: Rapid AI Progress (18% probability)**
+
+In this scenario, AI capabilities advance faster than expected while biosecurity investments lag. Knowledge democratization completes by 2025, synthesis assistance becomes available by 2027, and novel agent design is possible by 2030. The key driver is a capability overhang where AI progress outpaces governance and defense. Risk becomes very high by late 2020s and critical by mid-2030s.
+
+**Scenario B: Gradual Progress, Biosecurity Keeps Pace (45% probability)**
+
+This represents the baseline scenario where capabilities advance but countermeasures develop alongside them. Knowledge democratization completes by 2026, synthesis assistance by 2030, and novel agent design by 2040. Sustained investment in both AI safety and biosecurity keeps risk manageable, though not eliminated. This is the most probable single scenario but not a comfortable one—"elevated" risk by 2030 still implies meaningful probability of serious attacks.
+
+**Scenario C: Successful Governance (25% probability)**
+
+Strong international governance emerges, perhaps catalyzed by a near-miss incident, that effectively limits the most dangerous AI-bioweapons applications. Knowledge democratization still occurs but synthesis assistance is significantly delayed (2035+), and novel agent design may never be achieved by non-state actors. This scenario requires unprecedented international cooperation but is not implausible given sufficient motivation.
+
+**Scenario D: Black Swan (12% probability)**
+
+An unexpected breakthrough dramatically accelerates one or more thresholds, or a catastrophic event reshapes the landscape entirely. Examples include: discovery of a simple biosynthesis pathway, leak from a state bioweapons program, or AI capabilities that were not anticipated. By definition, this scenario is difficult to characterize precisely but must be included given historical precedent for technological surprise.
+
+### Expected Value Calculation
+
+$$
+E[\text{Risk}_{2030}] = \sum_{s \in \text{Scenarios}} P(s) \times R_s(2030)
+$$
+
+Where $R_s(t)$ represents the risk level (scaled 1-10) in scenario $s$ at time $t$:
+
+| Scenario | P(s) | Risk 2030 (1-10) | Contribution |
+|----------|------|------------------|--------------|
+| A: Rapid Progress | 0.18 | 8 | 1.44 |
+| B: Gradual Progress | 0.45 | 5 | 2.25 |
+| C: Successful Governance | 0.25 | 3 | 0.75 |
+| D: Black Swan | 0.12 | 6 | 0.72 |
+| **Expected Value** | | | **5.16** |
+
+This expected risk level of approximately 5.2 out of 10 by 2030 indicates an "elevated" baseline with substantial probability mass on both higher and lower outcomes. The calculation suggests current conditions warrant serious concern without demanding panic.
+
+## Key Capability Milestones to Watch
+
+### Near-term (2025-2027)
+
+| Milestone | Current Status | Significance | Monitoring Source |
+|-----------|----------------|--------------|-------------------|
+| Open-source models match frontier on biology | ≈70% of frontier | Indicates democratization | Academic benchmarks |
+| Protein structure prediction on novel folds | High accuracy achieved | Enables engineering | AlphaFold reports |
+| Lab automation accessible to small actors | Emerging | Synthesis barrier dropping | Equipment pricing |
+| AI-designed molecules in clinical trials | First trials underway | Validates design capabilities | FDA filings |
+
+### Medium-term (2027-2032)
+
+| Milestone | Current Status | Significance | Monitoring Source |
+|-----------|----------------|--------------|-------------------|
+| De novo functional protein design | Partial success | Novel agent prerequisite | Research publications |
+| High-fidelity generative biological models | Early stage | Predictive power increasing | Benchmark performance |
+| Closed-loop AI-lab integration | Demonstrated in simple cases | Automates synthesis | Lab automation reports |
+| DNA synthesis costs below \$0.01/base | Currently ≈\$0.05/base | Economic accessibility | Synthesis pricing |
+
+### Long-term (2032+)
+
+| Milestone | Current Status | Significance | Monitoring Source |
+|-----------|----------------|--------------|-------------------|
+| End-to-end complex biological system modeling | Not achieved | Full attack design | Research capabilities |
+| Autonomous biological research | Very limited | Removes expertise barriers | Lab capabilities |
+| Routine synthetic cells | Research only | Ultimate manipulation | Synthetic biology papers |
+
+## Intervention Windows
+
+| Intervention | Optimal Window | Current Feasibility | Effectiveness After Window |
+|--------------|----------------|--------------------|-----------------------------|
+| LLM guardrails | Now - 2026 | High | Low—open-source proliferation makes guardrails optional |
+| DNA synthesis screening | Now - 2028 | Medium-High | Reduced—novel synthesis methods may evade screens |
+| International coordination | Now - 2027 | Medium | Low—harder to establish norms after major incident |
+| Countermeasure R&D | Always | High | Catch-up possible but costly and slower |
+| Compute governance | Now - 2026 | Medium | Low—distributed training runs circumvent controls |
+| Attribution technology | Now - 2030 | Medium | Moderate—still valuable but less deterrent effect |
+
+The table highlights that most governance interventions have narrow windows of maximum effectiveness, typically before capabilities become widely distributed. This argues for front-loading investment in governance infrastructure even if the threat is not fully materialized.
+
+## Warning Indicators
+
+| Indicator | Significance | Interpretation if Triggered | Response Priority |
+|-----------|--------------|----------------------------|-------------------|
+| AI labs flag biosecurity concerns more frequently | Internal evals showing uplift | Thresholds approaching faster | High |
+| Biosecurity incidents involving AI assistance | Practical demonstration of threat | Threshold likely crossed | Critical |
+| Rapid progress on protein engineering benchmarks | Technical barriers dropping | Novel agent design accelerating | High |
+| Increased state investment in AI+bio weapons | Geopolitical threat escalation | State actor risk rising | High |
+| Academic papers retracted for dual-use concerns | Knowledge becoming operationally dangerous | Democratization advancing | Medium |
+| Open-source biology AI achieving frontier performance | Barrier to entry collapsing | All thresholds accelerating | Critical |
+
+## Limitations
+
+This model has significant limitations that users should understand before applying its conclusions:
+
+**Forecast uncertainty is fundamental.** All timeline projections contain substantial uncertainty that cannot be eliminated through better analysis. The 95th percentile ranges spanning 15-30+ years for later thresholds reflect genuine uncertainty, not methodological weakness. Users should treat specific dates as illustrative rather than predictive.
+
+**Capability thresholds may not be independent.** The model treats thresholds as largely sequential, but synergies between different capabilities could enable threshold-skipping. A breakthrough in one area might unexpectedly enable capabilities in another, invalidating the sequential progression assumption.
+
+**Attacker adaptation is not modeled.** The framework assumes capabilities develop independently of attacker behavior, but real adversaries adapt to countermeasures. This creates dynamic effects (arms racing, technological cat-and-mouse) that simple threshold analysis cannot capture.
+
+**Geopolitical factors dominate long-term projections.** Wars, treaties, technological embargoes, and state collapse could shift timelines by decades in either direction. The model treats geopolitics as exogenous when it may be the primary determinant of outcomes.
+
+**"Meaningful increase" is not precisely defined.** The thresholds describe qualitative shifts but do not specify exactly how much each capability must improve to count as "crossed." Different analysts using this framework might reasonably disagree on current status assessments.
+
+**State actor capabilities are not fully addressed.** This model focuses primarily on non-state actors and partially on state proliferation. Major powers with existing bioweapons programs face different capability landscapes not captured here.
+
+## Strategic Importance
+
+### Magnitude Assessment
+
+Timeline projections for AI-enabled bioweapons inform defensive investment urgency and governance windows.
+
+| Dimension | Assessment | Quantitative Estimate |
+|-----------|------------|----------------------|
+| **Potential severity** | Catastrophic to existential for advanced thresholds | Threshold 3-4: 10M-1B+ potential casualties |
+| **Probability-weighted importance** | High - near-term thresholds already crossed | Expected risk level 5.16/10 by 2030 |
+| **Comparative ranking** | Top-tier for catastrophic risk prioritization | Top 3 among AI-enabled WMD risks |
+
+### Threshold Crossing Probability by Year
+
+| Threshold | 2026 | 2028 | 2030 | 2035 | 2040 |
+|-----------|------|------|------|------|------|
+| Knowledge Democratization | 95% | 99% | 99% | 99% | 99% |
+| Synthesis Assistance | 15% | 35% | 55% | 80% | 95% |
+| Novel Agent Design | 2% | 8% | 18% | 45% | 70% |
+| Full Attack Automation | Less than 1% | 2% | 5% | 15% | 35% |
+
+### Resource Implications
+
+| Intervention | Optimal Window | Investment Needed | Expected Delay Effect |
+|--------------|----------------|-------------------|----------------------|
+| DNA synthesis screening | 2024-2028 | \$500M-1B cumulative | +3-5 years on Threshold 2 |
+| International coordination | 2024-2027 | \$200M-500M cumulative | +2-4 years on all thresholds |
+| LLM guardrails | 2024-2026 | \$100M-300M cumulative | +1-2 years (diminishing) |
+| Countermeasure R&D | Ongoing | \$1-2B annually | Variable, catch-up capability |
+| Attribution technology | 2024-2030 | \$300M-600M cumulative | Deterrence effect: 20-40% reduction |
+
+### Key Cruxes
+
+| Crux | If True | If False | Current Assessment |
+|------|---------|----------|-------------------|
+| Open-source models reach frontier biology performance | All thresholds accelerate 2-3 years | Controlled capability distribution | 50-70% by 2027 |
+| Lab automation accessible to small actors | Threshold 2 arrives early | Synthesis barrier persists | 30% by 2028 |
+| International governance achieves major power buy-in | Threshold 3-4 significantly delayed | Governance largely ineffective | 15-25% by 2030 |
+| AI protein engineering achieves de novo design | Threshold 3 arrives early | Novel agents require human expertise | 40% by 2032 |
+
+## Related Models
+
+- <EntityLink id="bioweapons-attack-chain">Bioweapons Attack Chain Model</EntityLink> - Decomposes current-day attack pathways and bottlenecks
+- <EntityLink id="bioweapons-ai-uplift">AI-Bioweapons Uplift Model</EntityLink> - Analyzes how AI contributes to each attack phase currently
+- <EntityLink id="autonomous-weapons-proliferation" label="Autonomous Weapons Proliferation" /> - Parallel analysis for weapons automation dynamics
+
+## Sources
+
+- Epoch AI capability projections and compute forecasting
+- Metaculus forecasts on AI capability milestones
+- CNAS biosecurity timeline analysis and policy recommendations
+- Expert elicitation from biosecurity researchers at Johns Hopkins, Georgetown, and MIT
+- National Academies reports on AI and biosecurity
+- WHO and UN reports on biological threat landscape
+
+## Related Pages
+
+<Backlinks client:load entityId="bioweapons-timeline" />

@@ -1,0 +1,70 @@
+---
+title: "Table Candidates"
+description: "Table rows with insight-worthy rating combinations"
+sidebar:
+  order: 2
+importance: 0
+quality: 0
+llmSummary: "Internal documentation page explaining a tool for finding interesting data patterns in structured tables by flagging paradoxical rating combinations (e.g., safety approaches that advance capabilities, severe risks that are hard to detect). Provides criteria and examples for how the tool identifies potential insight-worthy content."
+ratings:
+  novelty: 0
+  rigor: 0
+  actionability: 0
+  completeness: 0
+metrics:
+  wordCount: 153
+  citations: 0
+  tables: 2
+  diagrams: 0
+---
+import { EntityLink } from '@components/wiki';
+import { LinkCard } from '@astrojs/starlight/components';
+
+<LinkCard
+  title="Open Table Candidates Tool"
+  description="Browse table rows flagged as potential insight sources"
+  href="/insight-hunting/table-candidates"
+/>
+
+## How It Works
+
+The Table Candidates tool scans structured data tables for rows with "paradoxical" or notable rating combinations that suggest insight-worthy content.
+
+### Safety Approaches Criteria
+
+Rows are flagged when they have:
+
+| Criterion | Why It's Interesting |
+|-----------|---------------------|
+| **Capability-dominant differential progress** | Safety research that primarily advances capabilities is surprising |
+| **Weak/no deception robustness** | Reveals fundamental limitations of popular approaches |
+| **PRIORITIZE recommendation** | Identifies underfunded high-value research |
+| **DEFUND/REDUCE recommendation** | Challenges conventional wisdom on research priorities |
+| **Unclear/harmful net safety** | Questions whether "safety" work actually makes things safer |
+| **Doesn't scale to superintelligence** | Important limitation for long-term planning |
+
+### Accident Risks Criteria
+
+Rows are flagged when they have:
+
+| Criterion | Why It's Interesting |
+|-----------|---------------------|
+| **Catastrophic/existential severity + hard to detect** | Worst-case scenarios we can't easily monitor |
+| **Lab-demonstrated + severe** | Empirical evidence of serious risks |
+| **Current timeline + severe** | Not hypothetical - happening now |
+
+## Using the Tool
+
+1. **Browse candidates** sorted by source (Safety Approaches, Accident Risks)
+2. **Review matched criteria** to understand why each row was flagged
+3. **Check key ratings** for the full context
+4. **Copy the insight template** as a starting point
+5. **Refine and verify** before adding to insights.yaml
+
+## Example Insights from Tables
+
+From Safety Approaches table:
+> "<EntityLink id="rlhf">RLHF</EntityLink> provides primarily capability uplift (DOMINANT) with limited safety benefit (LOW-MEDIUM), and fundamentally cannot scale to superhuman tasks where humans can't evaluate outputs."
+
+From Accident Risks table:
+> "<EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink> represents an existential risk that is very difficult to detect. 78% alignment faking rate observed in <EntityLink id="anthropic">Anthropic</EntityLink>'s 2024 study."

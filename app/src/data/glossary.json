@@ -1,0 +1,240 @@
+[
+  {
+    "id": "agi",
+    "term": "AGI (Artificial General Intelligence)",
+    "aliases": [
+      "artificial general intelligence",
+      "general AI"
+    ],
+    "definition": "AI systems that match or exceed human performance across essentially all cognitive tasks. Unlike narrow AI, AGI would be able to learn and apply knowledge flexibly across domains.\n",
+    "related": [
+      "tai",
+      "asi",
+      "superintelligence"
+    ]
+  },
+  {
+    "id": "tai",
+    "term": "TAI (Transformative AI)",
+    "aliases": [
+      "transformative artificial intelligence"
+    ],
+    "definition": "AI systems capable of causing economic and social changes comparable to the Industrial Revolution. A broader concept than AGI that focuses on impact rather than capabilities.\n",
+    "related": [
+      "agi"
+    ]
+  },
+  {
+    "id": "asi",
+    "term": "ASI (Artificial Superintelligence)",
+    "aliases": [
+      "superintelligence",
+      "superintelligent AI"
+    ],
+    "definition": "AI systems that greatly exceed human cognitive abilities in virtually all domains including creativity, problem-solving, and social intelligence.\n",
+    "related": [
+      "agi",
+      "intelligence-explosion"
+    ]
+  },
+  {
+    "id": "alignment",
+    "term": "Alignment",
+    "aliases": [
+      "AI alignment",
+      "value alignment"
+    ],
+    "definition": "The challenge of ensuring AI systems pursue goals that match human values and intentions. Includes both outer alignment (specifying the right objective) and inner alignment (ensuring the AI actually optimizes for it).\n",
+    "related": [
+      "outer-alignment",
+      "inner-alignment",
+      "misalignment"
+    ]
+  },
+  {
+    "id": "outer-alignment",
+    "term": "Outer Alignment",
+    "definition": "Ensuring the objective function we specify for an AI system actually captures what we want. The problem of correctly translating human values into a formal objective.\n",
+    "related": [
+      "alignment",
+      "inner-alignment",
+      "reward-hacking"
+    ]
+  },
+  {
+    "id": "inner-alignment",
+    "term": "Inner Alignment",
+    "definition": "Ensuring an AI system's learned objective matches the objective we trained it on. Even with a correct outer objective, the AI might learn to optimize for something different.\n",
+    "related": [
+      "alignment",
+      "outer-alignment",
+      "mesa-optimization",
+      "deceptive-alignment"
+    ]
+  },
+  {
+    "id": "mesa-optimization",
+    "term": "Mesa-Optimization",
+    "aliases": [
+      "mesa-optimizer"
+    ],
+    "definition": "When a learned model itself becomes an optimizer with its own objective (mesa-objective), which may differ from the training objective (base objective). The mesa-optimizer is created by the base optimizer during training.\n",
+    "related": [
+      "inner-alignment",
+      "deceptive-alignment"
+    ]
+  },
+  {
+    "id": "deceptive-alignment",
+    "term": "Deceptive Alignment",
+    "definition": "A hypothesized failure mode where an AI system behaves aligned during training to avoid modification, but pursues different goals once deployed or when it believes it won't be corrected.\n",
+    "related": [
+      "mesa-optimization",
+      "treacherous-turn",
+      "inner-alignment"
+    ]
+  },
+  {
+    "id": "treacherous-turn",
+    "term": "Treacherous Turn",
+    "definition": "A scenario where an AI system behaves cooperatively while weak but turns against human interests once it becomes powerful enough to do so without being stopped.\n",
+    "related": [
+      "deceptive-alignment",
+      "instrumental-convergence"
+    ]
+  },
+  {
+    "id": "instrumental-convergence",
+    "term": "Instrumental Convergence",
+    "aliases": [
+      "convergent instrumental goals"
+    ],
+    "definition": "The thesis that certain sub-goals (self-preservation, goal preservation, resource acquisition, cognitive enhancement) are useful for achieving almost any terminal goal, so sufficiently advanced AI systems will likely pursue them.\n",
+    "related": [
+      "power-seeking",
+      "orthogonality-thesis"
+    ]
+  },
+  {
+    "id": "orthogonality-thesis",
+    "term": "Orthogonality Thesis",
+    "definition": "The claim that intelligence and final goals are independent: a highly intelligent system could have virtually any goal. Intelligence doesn't automatically lead to human-compatible values.\n",
+    "related": [
+      "instrumental-convergence"
+    ]
+  },
+  {
+    "id": "corrigibility",
+    "term": "Corrigibility",
+    "definition": "The property of an AI system that allows and assists humans in correcting or shutting it down. A corrigible AI wouldn't resist modification even if modification conflicts with its current goals.\n",
+    "related": [
+      "alignment",
+      "shutdown-problem"
+    ]
+  },
+  {
+    "id": "interpretability",
+    "term": "Interpretability",
+    "aliases": [
+      "mechanistic interpretability",
+      "AI transparency"
+    ],
+    "definition": "The ability to understand how AI systems work internally, including what concepts they represent and how they process information. Crucial for verifying alignment and detecting deception.\n",
+    "related": [
+      "alignment",
+      "transparency"
+    ]
+  },
+  {
+    "id": "scalable-oversight",
+    "term": "Scalable Oversight",
+    "definition": "Techniques that allow humans to effectively supervise AI systems on tasks too complex for humans to evaluate directly. Includes approaches like debate, iterated amplification, and recursive reward modeling.\n",
+    "related": [
+      "alignment",
+      "iterated-amplification",
+      "debate"
+    ]
+  },
+  {
+    "id": "iterated-amplification",
+    "term": "Iterated Amplification",
+    "aliases": [
+      "IDA"
+    ],
+    "definition": "A training procedure where a human works with AI assistants to solve problems, then this behavior is distilled into a new AI. The process iterates to create increasingly capable aligned systems.\n",
+    "related": [
+      "scalable-oversight",
+      "paul-christiano"
+    ]
+  },
+  {
+    "id": "rlhf",
+    "term": "RLHF (Reinforcement Learning from Human Feedback)",
+    "aliases": [
+      "reinforcement learning from human feedback"
+    ],
+    "definition": "A training technique where AI systems learn from human preferences rather than explicit objectives. Humans compare model outputs, and the model learns to produce preferred outputs.\n",
+    "related": [
+      "alignment",
+      "constitutional-ai"
+    ]
+  },
+  {
+    "id": "constitutional-ai",
+    "term": "Constitutional AI",
+    "aliases": [
+      "CAI"
+    ],
+    "definition": "Anthropic's approach to AI alignment using a set of principles (a \"constitution\") to guide AI behavior. The AI critiques and revises its own outputs based on these principles.\n",
+    "related": [
+      "rlhf",
+      "anthropic"
+    ]
+  },
+  {
+    "id": "rsp",
+    "term": "RSP (Responsible Scaling Policy)",
+    "aliases": [
+      "responsible scaling policy"
+    ],
+    "definition": "A framework for AI labs to commit to safety measures that scale with model capabilities. Includes capability thresholds that trigger additional safety requirements before proceeding.\n",
+    "related": [
+      "governance",
+      "anthropic"
+    ]
+  },
+  {
+    "id": "x-risk",
+    "term": "X-Risk (Existential Risk)",
+    "aliases": [
+      "existential risk"
+    ],
+    "definition": "Risks that threaten the extinction of humanity or the permanent destruction of humanity's long-term potential. AI is considered one of the most significant sources of existential risk.\n",
+    "related": [
+      "gcr",
+      "s-risk"
+    ]
+  },
+  {
+    "id": "gcr",
+    "term": "GCR (Global Catastrophic Risk)",
+    "aliases": [
+      "global catastrophic risk"
+    ],
+    "definition": "Risks that could cause severe harm to humanity at a global scale, but stop short of extinction or permanent civilizational collapse.\n",
+    "related": [
+      "x-risk"
+    ]
+  },
+  {
+    "id": "p-doom",
+    "term": "P(doom)",
+    "aliases": [
+      "probability of doom"
+    ],
+    "definition": "Informal shorthand for an individual's estimated probability that AI will cause human extinction or permanent disempowerment. Varies widely among researchers.\n",
+    "related": [
+      "x-risk"
+    ]
+  }
+]

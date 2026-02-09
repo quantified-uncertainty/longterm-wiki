@@ -1,0 +1,418 @@
+---
+title: "Novel / Unknown Approaches"
+description: "Analysis of potential AI paradigm shifts drawing on historical precedent. Expert forecasts have shortened AGI timelines from 50 years to 5 years in just four years (Metaculus 2020-2024), with median expert estimates dropping from 2060 to 2047 between 2022-2023 surveys alone. Probability of novel paradigm dominance estimated at 1-15% depending on timeline assumptions."
+sidebar:
+  label: "Novel/Unknown"
+  order: 17
+quality: 53
+lastEdited: "2026-01-28"
+importance: 62.5
+llmSummary: "Analyzes probability (1-15%) of novel AI paradigms emerging before transformative AI, systematically reviewing historical prediction failures (expert AGI timelines shifted 43 years in 4 years, 13 years in one survey cycle) and comparing alternative approaches like neuro-symbolic (8-15% probability), SSMs (5-12%), and NAS (15-30%). Concludes current paradigm faces quantified limits (data exhaustion ~2028, compute costs approaching economic constraints) but near-term timelines favor incumbent approaches."
+ratings:
+  novelty: 4.5
+  rigor: 5.8
+  actionability: 4.2
+  completeness: 6.5
+metrics:
+  wordCount: 250
+  citations: 77
+  tables: 57
+  diagrams: 2
+clusters: ["ai-safety"]
+---
+import {Mermaid, EntityLink} from '@components/wiki';
+
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [stockholmresilience.org](https://www.stockholmresilience.org/research/planetary-boundaries.html) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Blindsight_(Watts_novel)) |
+
+## Overview
+
+This category represents the **probability mass we should assign to approaches not yet discovered or not included in our current taxonomy**. History shows that transformative technologies often come from unexpected directions, and intellectual humility requires acknowledging this. The field of AI has undergone [cyclical periods of growth and decline](https://gregrobison.medium.com/neuro-symbolic-ai-a-foundational-analysis-of-the-third-waves-hybrid-core-cc95bc69d6fa), known as AI summers and winters, with each cycle bringing unexpected architectural innovations. We are currently in the third AI summer, characterized by the transformer paradigm, but historical patterns suggest eventual disruption.
+
+The challenge of forecasting AI development is well-documented. According to [80,000 Hours' analysis of expert forecasts](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/), mean estimates on <EntityLink id="metaculus">Metaculus</EntityLink> for when AGI will be developed plummeted from 50 years to 5 years between 2020 and 2024. The [AI Impacts 2023 survey](https://ourworldindata.org/ai-timelines) found machine learning researchers expected AGI by 2047, compared to 2060 in the 2022 survey. This 13-year shift in a single year demonstrates the difficulty of prediction in this domain.
+
+Beyond the "known unknowns" such as scaling limits and alignment challenges, we face a vast terrain of "unknown unknowns": <EntityLink id="emergent-capabilities">emergent capabilities</EntityLink>, unforeseen risks, and [transformative shifts that defy prediction](https://www.science.org/doi/10.1126/science.adw9439). The technology itself is evolving so rapidly that even experts struggle to predict its capabilities 6 months ahead.
+
+Estimated probability of being dominant at transformative AI: **1-15%** (range reflects timeline uncertainty; shorter timelines favor current paradigms, longer timelines favor novel approaches)
+
+## Why Include This Category
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph known["Known Approaches"]
+        transformers["Transformers"]
+        moe["Sparse/MoE"]
+        ssm["SSMs"]
+        neuro["Neuromorphic"]
+        other["Other Known"]
+    end
+
+    subgraph unknown["Unknown Territory"]
+        notyet["Not Yet Discovered"]
+        overlooked["Overlooked Ideas"]
+        combinations["Novel Combinations"]
+        physics["New Physics?"]
+    end
+
+    known -->|"Sum to ≈85-99%"| total["Total Probability"]
+    unknown -->|"Residual 1-15%"| total
+`} />
+
+### Arguments for Allocating Probability Here
+
+| Argument | Explanation | Historical Evidence |
+|----------|-------------|---------------------|
+| **Historical track record** | Major breakthroughs often unexpected | Transformer attention mechanism existed since 2014; [breakout came in 2017](https://www.tandfonline.com/doi/full/10.1080/0952813X.2024.2323042) |
+| **Epistemic humility** | We don't know what we don't know | Expert AI timeline estimates shifted 13 years in one survey cycle |
+| **Active research** | Many smart people working on new ideas | [63% of neuro-symbolic papers](https://arxiv.org/html/2501.05435v1) focus on learning/inference innovation |
+| **Combinatorial space** | Possible architectures vastly exceed explored | [NAS tools](https://link.springer.com/article/10.1007/s10462-024-11058-w) discovering architectures matching human-designed ones |
+| **Scaling approaching limits** | Current paradigm may hit ceiling | [Epoch AI predicts](https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data) high-quality text data exhausted by 2028 |
+
+### Arguments Against High Probability
+
+| Argument | Explanation | Supporting Evidence |
+|----------|-------------|---------------------|
+| **Current approaches working** | Transformers haven't hit hard ceiling | [Training compute grew 5x/year](https://epoch.ai/blog/can-ai-scaling-continue-through-2030) 2020-2024 |
+| **Incremental progress** | Breakthroughs usually build on existing work | [Gen AI built on cloud, which built on internet](https://medium.com/@varunrustomji/paradigm-shifts-in-the-tech-industry-1ef2104fa60f) |
+| **Selection effects** | Best ideas tend to be discovered early | Attention, backprop, deep networks all pre-2000 concepts |
+| **Time constraints** | Limited years until TAI (if near) | Median expert estimate: [AGI by 2047](https://ourworldindata.org/ai-timelines) |
+| **Investment momentum** | \$109B US AI investment in 2024 | Massive resources dedicated to current paradigm |
+
+## Historical Precedents
+
+The history of technology provides crucial context for estimating the probability of paradigm shifts. As documented by [research on technological paradigm shifts](https://www.slideshare.net/johaf/technological-paradigm-shifts-updated), notable figures consistently fail to predict transformative changes. Wilbur Wright famously said in 1901 that "man would not fly for 50 years"; two years later, he and his brother achieved flight.
+
+### Past Paradigm Shifts in AI
+
+| Shift | Year | From | To | Lead Time | Was It Predicted? | Impact |
+|-------|------|------|-----|-----------|-------------------|--------|
+| Neural network revival | 2012 | Symbolic AI | Deep learning | 30+ years | Partially (by few) | AlexNet: 15% error reduction on ImageNet |
+| Attention/transformers | 2017 | RNNs/CNNs | Transformers | 3 years (attention existed 2014) | Somewhat surprising | Enabled 100B+ parameter models |
+| Scaling laws | 2020 | "Need new ideas" | "Just scale" | N/A | Surprising to many | Kaplan et al. showed predictable improvement |
+| In-context learning | 2020 | Fine-tuning | Prompting | N/A | Not predicted | GPT-3 few-shot emerged unexpectedly |
+| RLHF effectiveness | 2022 | Supervised only | RLHF | 5 years | Somewhat expected | ChatGPT achieved 100M users in 2 months |
+| Reasoning models | 2024 | Pre-training focus | Post-training scaling | N/A | Not predicted | [Novel RL techniques](https://epoch.ai/blog/top-10-data-insights-and-gradient-updates-of-2025) changed compute allocation |
+
+### Expert Forecasting Track Record
+
+| Forecast Source | Year Made | Prediction | Actual Outcome | Error |
+|-----------------|-----------|------------|----------------|-------|
+| [Metaculus AGI median](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) | 2020 | ≈2070 | Now estimate ≈2027 | 43 years shift |
+| [AI Impacts survey](https://ourworldindata.org/ai-timelines) | 2022 | AGI by 2060 | Updated to 2047 (2023) | 13 years shift |
+| [LEAP panel superforecasters](https://leap.forecastingresearch.org/reports/wave1) | 2024 | MATH benchmark 14% by 2026 | GPT-5.2 achieved 33% in 2025 | 2.4x underestimate |
+| [FrontierMath experts](https://forecastingresearch.substack.com/p/what-experts-and-superforecasters) | 2024 | 31% accuracy by end 2025 | 29% achieved Aug 2025 | Roughly accurate |
+
+### Lessons from History
+
+| Lesson | Implication | Quantified Example |
+|--------|-------------|-------------------|
+| **Old ideas revive** | Attention was known; transformers made it work | 3-year gap between attention (2014) and transformers (2017) |
+| **Combinations matter** | Transformer = attention + layernorm + scale | [Multiple paradigms combine](https://www.alliancebernstein.com/corporate/en/insights/investment-insights/ai-heralds-a-technology-paradigm-shift-but-not-so-fast.html) to create breakthroughs |
+| **Empirical surprises** | In-context learning emerged unexpectedly | Zero capability below ≈1B params, then emergent |
+| **Scaling surprises** | Scaling laws weren't obvious a priori | [5x/year compute growth](https://epoch.ai/blog/can-ai-scaling-continue-through-2030) 2020-2024 |
+| **Experts underestimate** | Specialists often wrong about own field | [Wilbur Wright](https://www.ignorance.ai/p/the-problem-with-agi-predictions): "50 years", achieved in 2 |
+
+## Potential Sources of Novelty
+
+### Paradigm Shift Candidates Comparison
+
+The following table compares the most promising alternative paradigms based on current research momentum and potential impact.
+
+| Paradigm | Maturity | Research Momentum | Key Advantage | Key Limitation | Est. Probability of Dominance by 2040 |
+|----------|----------|-------------------|---------------|----------------|---------------------------------------|
+| **Neuro-Symbolic AI** | Growing | [63% of papers](https://arxiv.org/html/2501.05435v1) focus on learning/inference | Combines reasoning + learning | [Scalability/joint-training](https://link.springer.com/article/10.1007/s13369-025-10887-3) remains "holy grail" | 8-15% |
+| **State Space Models** | Early | Mamba, RWKV active development | Linear complexity vs quadratic attention | Haven't matched transformer performance at scale | 5-12% |
+| **Neural Architecture Search** | Maturing | [NASNet, EfficientNet](https://link.springer.com/article/10.1007/s10462-024-11058-w) production-ready | AI-designed architectures | Often optimizes within existing paradigms | 3-8% |
+| **Neuromorphic Computing** | Early | Intel Loihi, IBM TrueNorth | 1000x energy efficiency | Software ecosystem immature | 2-5% |
+| **Quantum ML** | Nascent | NISQ-era experiments | Exponential state space | Coherence, error correction unsolved | 1-3% |
+| **World Models** | Growing | Video prediction, robotics | Causal understanding | Data requirements unclear | 5-10% |
+| **True Unknown** | N/A | N/A | Cannot be characterized | Cannot be characterized | 1-5% |
+
+### Areas Where Breakthroughs Might Emerge
+
+| Area | Potential | Current Status | Key Research Groups | Timeline Estimate |
+|------|-----------|----------------|--------------------|--------------------|
+| **Learning algorithms** | Beyond backprop/SGD | Active research | DeepMind, Anthropic | 3-7 years |
+| **Architectures** | Beyond attention | SSMs gaining traction | Mamba team, RWKV | 2-5 years |
+| **Objective functions** | Beyond token prediction | Minimal progress | Academic labs | 5-10 years |
+| **Training paradigms** | Beyond supervised/RL | [Post-training scaling](https://epoch.ai/gradient-updates/why-gpt5-used-less-training-compute-than-gpt45-but-gpt6-probably-wont) emerging | OpenAI, Anthropic | 1-3 years |
+| **Hardware-software co-design** | Novel compute substrates | Neuromorphic, analog | Intel, IBM, startups | 5-15 years |
+| **AI-for-AI** | AI designing AI | [AutoML/NAS advancing](https://academic.oup.com/nsr/article/11/8/nwae282/7740455) | Google, Microsoft | 2-5 years |
+
+### Specific Speculative Directions
+
+| Direction | Description | Current Evidence | Probability of Major Impact | Key Uncertainties |
+|-----------|-------------|------------------|----------------------------|-------------------|
+| **Algorithmic breakthroughs** | New training methods beyond gradient descent | [Forward-forward algorithm](https://www.cs.toronto.edu/~hinton/FFA13.pdf) (Hinton 2022) | 10-25% | Whether alternatives can match scale |
+| **Physics-based computing** | Quantum, analog, optical | [Google quantum supremacy](https://blog.google/technology/ai/2025-research-breakthroughs/) claims | 3-8% | Error correction, coherence |
+| **Biological insights** | From neuroscience | Sparse coding, predictive processing | 5-15% | Translation to algorithms |
+| **Emergent capabilities** | Unexpected abilities at scale | In-context learning, chain-of-thought | Ongoing (certain) | Which capabilities next |
+| **AI-discovered AI** | AI designs better architectures | [NAS matches human designs](https://www.automl.org/nas-overview/) | 15-30% | Search space definition |
+| **Causal/world models** | Move beyond correlation | [Causal AI research growing](https://www.tandfonline.com/doi/full/10.1080/0952813X.2024.2323042) | 10-20% | Scalable causal inference |
+
+## Paradigm Evolution Dynamics
+
+The following diagram illustrates potential pathways for paradigm evolution, including both incremental improvements and discontinuous shifts.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph current["Current Paradigm (2020-2025)"]
+        T[Transformers] --> S[Scaling Laws]
+        S --> PT[Pre-training Dominance]
+        PT --> RL[RL Post-training 2024]
+    end
+
+    subgraph limits["Approaching Limits"]
+        D[Data Exhaustion<br/>Est. 2028]
+        C[Compute Costs<br/>7T USD proposal]
+        E[Energy Constraints<br/>32% growth needed]
+    end
+
+    subgraph candidates["Paradigm Candidates"]
+        NS[Neuro-Symbolic<br/>8-15% probability]
+        SSM[State Space Models<br/>5-12% probability]
+        NAS[AI-Designed AI<br/>15-30% probability]
+        WM[World Models<br/>5-10% probability]
+        UK[Unknown Unknown<br/>1-5% probability]
+    end
+
+    subgraph outcomes["Possible Outcomes"]
+        INC[Incremental Extension<br/>Current paradigm continues]
+        HYB[Hybrid Integration<br/>Multiple paradigms merge]
+        DIS[Discontinuous Shift<br/>Novel paradigm dominates]
+    end
+
+    RL --> D
+    RL --> C
+    RL --> E
+
+    D --> NS
+    D --> SSM
+    D --> NAS
+    D --> WM
+    D --> UK
+
+    C --> NS
+    C --> SSM
+    C --> NAS
+
+    NS --> HYB
+    SSM --> INC
+    NAS --> HYB
+    WM --> HYB
+    UK --> DIS
+
+    style UK fill:#fff4e6,stroke:#ffa94d
+    style DIS fill:#fff4e6,stroke:#ffa94d
+    style T fill:#d0ebff,stroke:#339af0
+    style HYB fill:#d3f9d8,stroke:#40c057
+`} />
+
+## What Novel Approaches Might Look Like
+
+### Possible Characteristics
+
+| Characteristic | Explanation | Current Paradigm Comparison | Historical Precedent |
+|----------------|-------------|----------------------------|---------------------|
+| **More efficient** | Orders of magnitude less compute | GPT-4: ≈10^25 FLOP training | DeepSeek: [95% fewer resources](https://www.csis.org/analysis) claimed for similar performance |
+| **Different training** | Not gradient descent | Backprop since 1986 | Forward-forward algorithm (Hinton 2022) |
+| **Different objectives** | Not next-token prediction | Autoregressive LLMs dominant | World models, energy-based models |
+| **Different hardware** | Not GPUs | NVIDIA dominates | Neuromorphic: 1000x energy efficiency potential |
+| **Different capabilities** | Strong at what transformers struggle with | Reasoning, planning, efficiency | Neuro-symbolic: explicit reasoning |
+
+### Current Paradigm Constraints (Drivers of Potential Shift)
+
+According to [Epoch AI's scaling analysis](https://epoch.ai/blog/can-ai-scaling-continue-through-2030), the current paradigm faces several quantifiable constraints:
+
+| Constraint | Current Status | Projected Exhaustion | Implication |
+|------------|----------------|---------------------|-------------|
+| **Training Data** | High-quality text near exhaustion | [2028 median estimate](https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data) | New data sources or paradigms needed |
+| **Compute Costs** | [\$7 trillion infrastructure proposal](https://epoch.ai/gradient-updates/compute-scaling-will-slow-down-due-to-increasing-lead-times) (Altman 2024) | Investors prefer 10x increments | Economic limits approaching |
+| **Energy** | Data centers need [32% yearly growth](https://epoch.ai/blog/can-ai-scaling-continue-through-2030) | Grid capacity constraints | Physical infrastructure bottleneck |
+| **RL Scaling** | Labs report [1-2 year sustainability](https://epoch.ai/blog/top-10-data-insights-and-gradient-updates-of-2025) | Compute infrastructure limits | Post-training gains may plateau |
+| **Model Size** | GPT-4: ≈1.8 trillion params (estimated) | Diminishing returns observed | Architecture efficiency matters more |
+
+### Warning Signs We Might Miss Something
+
+| Sign | What It Suggests | Quantified Evidence |
+|------|------------------|---------------------|
+| Fundamental capability ceilings | Current approaches hitting limits | [Reasoning models required](https://intuitionlabs.ai/articles/latest-ai-research-trends-2025) novel techniques beyond scaling |
+| Efficiency gaps with biology | Brains use far less energy | Human brain: ~20W; GPT-4 inference: ≈100kW |
+| Certain tasks remain hard | Reasoning, planning, learning efficiency | [Neuro-symbolic needed](https://www.sciencedirect.com/science/article/pii/S2667305325000675) for explicit reasoning |
+| Theoretical gaps | Don't understand why current methods work | [Only 5% of neuro-symbolic papers](https://arxiv.org/html/2501.05435v1) address meta-cognition |
+| Benchmark saturation | Easy benchmarks solved | [GPT-5.2 hit 33%](https://forecastingresearch.substack.com/p/what-experts-and-superforecasters) on LiveCodeBench Pro |
+
+## Safety Implications
+
+A paradigm shift in AI development would have profound implications for AI safety research. The [Stanford HAI AI Index 2025](https://hai.stanford.edu/ai-index-report) notes that safety research investment trails capability investment by approximately 10:1. A novel paradigm could either invalidate existing safety research or provide new opportunities for alignment.
+
+### Why Novel Approaches Are Concerning
+
+| Concern | Explanation | Risk Level | Mitigation Difficulty |
+|---------|-------------|------------|----------------------|
+| **Unpredictability** | Can't prepare for unknown risks | High | Very High |
+| **Rapid capability jumps** | New paradigm might be much more capable | Very High | High |
+| **Different failure modes** | Safety research might not transfer | High | Medium |
+| **Misplaced confidence** | We might assume current understanding applies | Medium | Low |
+| **Compressed timelines** | Less time to develop safety measures | Very High | Very High |
+| **Open-source proliferation** | Novel techniques spread faster than safety measures | High | High |
+
+### Why They Might Be Better
+
+| Potential Benefit | Explanation | Probability | Example |
+|-------------------|-------------|-------------|---------|
+| **Designed for safety** | New approaches could prioritize interpretability | 15-25% | [Neuro-symbolic: 28% papers address explainability](https://arxiv.org/html/2501.05435v1) |
+| **Different incentives** | Might emerge from safety-focused research | 10-20% | Interpretability-first architectures |
+| **Better understanding** | New paradigms might be more theoretically grounded | 20-30% | [Causal AI](https://www.tandfonline.com/doi/full/10.1080/0952813X.2024.2323042) provides formal guarantees |
+| **Natural alignment** | Could have built-in alignment properties | 5-15% | Symbolic reasoning more auditable |
+| **Efficiency enables safety** | More compute for alignment research | 25-35% | If 10x more efficient, more safety testing possible |
+
+### Safety Research Transferability by Paradigm
+
+| Current Safety Research Area | Neuro-Symbolic | SSMs | Neuromorphic | Unknown |
+|-----------------------------|----------------|------|--------------|---------|
+| Interpretability | High transfer | Medium | Low | Unknown |
+| RLHF/Constitutional AI | Medium | High | Low | Unknown |
+| Formal verification | Very High | Medium | Medium | Unknown |
+| Scalable oversight | Medium | High | Low | Unknown |
+| Deceptive alignment detection | Low | Medium | Low | Unknown |
+
+## Research Questions
+
+### What Should We Monitor?
+
+| Area | What to Watch | Key Indicators | Monitoring Frequency |
+|------|---------------|----------------|---------------------|
+| **Academic ML** | Novel architectures, theoretical results | ArXiv papers, NeurIPS/ICML proceedings | Weekly |
+| **Industry labs** | Unpublished breakthroughs | Hiring patterns, patent filings, leaked benchmarks | Monthly |
+| **Interdisciplinary** | Physics, neuroscience, mathematics | Cross-disciplinary conferences, Nature/Science publications | Quarterly |
+| **AI-for-AI** | AI systems discovering new AI methods | [NAS/AutoML progress](https://link.springer.com/article/10.1007/s10462-024-11058-w), AI-generated code quality | Monthly |
+| **Hardware developments** | Novel compute substrates | Chip announcements, energy efficiency benchmarks | Quarterly |
+| **Scaling signals** | Evidence of plateaus or breakthroughs | [Epoch AI](https://epoch.ai/latest) tracking, benchmark progress | Continuous |
+
+### How to Prepare for Unknown Unknowns?
+
+| Strategy | Rationale | Investment Level | Priority |
+|----------|-----------|------------------|----------|
+| **General safety research** | Focus on principles that transfer | High | Critical |
+| **Monitoring infrastructure** | Track developments broadly | Medium | High |
+| **Paradigm-agnostic alignment** | Don't overfit to transformer-specific approaches | High | Critical |
+| **Worst-case planning** | Assume capabilities might jump unexpectedly | Medium | High |
+| **Rapid response capacity** | Ability to pivot safety research quickly | Medium | Medium |
+| **Diverse research portfolio** | Fund safety research across multiple paradigms | High | High |
+
+### Key Monitoring Organizations
+
+| Organization | Focus | Update Frequency | URL |
+|--------------|-------|------------------|-----|
+| [Epoch AI](https://epoch.ai/) | Compute trends, scaling analysis | Weekly | epoch.ai |
+| [LEAP Panel](https://leap.forecastingresearch.org/) | Expert forecasts on AI development | Monthly | forecastingresearch.org |
+| [AI Index (Stanford HAI)](https://hai.stanford.edu/ai-index-report) | Comprehensive AI metrics | Annual | hai.stanford.edu |
+| [Metaculus](https://www.metaculus.com/) | Prediction markets on AI timelines | Continuous | metaculus.com |
+| [80,000 Hours](https://80000hours.org/) | AI safety career/research priorities | Quarterly | 80000hours.org |
+
+## Bayesian Reasoning
+
+### How to Update
+
+| Observation | Update Direction | Magnitude | Current Signal (2025) |
+|-------------|------------------|-----------|----------------------|
+| Transformers continue scaling | Novel approaches less likely near-term | -3 to -5% | [5x/year growth continuing](https://epoch.ai/blog/can-ai-scaling-continue-through-2030) |
+| Hard ceiling hit | Novel approaches more likely | +10 to +20% | Not yet observed |
+| Data exhaustion | Novel approaches more likely | +5 to +10% | [2028 estimate](https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data) approaching |
+| Theoretical breakthrough | Pay attention to specific direction | Variable | [Neuro-symbolic momentum](https://arxiv.org/html/2501.05435v1) |
+| AI discovers better architecture | Accelerates unknown-unknown risk | +5 to +15% | [NAS producing competitive models](https://link.springer.com/article/10.1007/s10462-024-11058-w) |
+| Major lab pivots to new approach | Strong signal | +15 to +25% | Not observed |
+
+### Probability Estimate by Timeline
+
+| Timeframe | Probability of Novel Paradigm Dominance | Key Assumptions | Confidence |
+|-----------|----------------------------------------|-----------------|------------|
+| By 2027 | 1-3% | Current scaling continues; no major breakthroughs | Medium |
+| By 2030 | 5-12% | Data/compute limits start binding; research progresses | Medium |
+| By 2035 | 10-20% | Current paradigm hits fundamental limits | Low |
+| By 2040 | 15-30% | Long timeline allows paradigm maturation | Low |
+| By 2050+ | 25-45% | Historical base rate of paradigm shifts | Very Low |
+
+### Why 1-15% Range Is Reasonable
+
+The range reflects uncertainty about timelines and paradigm persistence:
+
+**Lower bound (1%):** If transformative AI arrives within 3-5 years via current paradigm scaling, novel approaches have insufficient time to mature. The [median Metaculus estimate](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) of AGI by ~2027 supports this scenario.
+
+**Upper bound (15%):** If current paradigm hits hard limits (data exhaustion, scaling saturation) before transformative AI, alternative approaches become necessary. [Epoch AI projections](https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data) of 2028 data exhaustion support this possibility.
+
+**Central estimate (5-8%):** Accounts for historical base rate of paradigm shifts (~1 per decade in computing), current research momentum in alternatives, and uncertainty in both timelines and scaling projections.
+
+### Critical Questions
+
+| Uncertainty | Scenarios | Current Evidence | Resolution Timeline |
+|-------------|-----------|------------------|---------------------|
+| **How locked-in is the current paradigm?** | Fundamental (like the wheel) vs. Transitional (like vacuum tubes) | [Transformer dominance 7+ years](https://www.tandfonline.com/doi/full/10.1080/0952813X.2024.2323042) suggests maturity | 2-5 years |
+| **How much does understanding matter?** | Empirical scaling sufficient vs. Theory needed for next leap | [Deep learning theory](https://arxiv.org/html/2501.05435v1) still immature | Unclear |
+| **Will AI-discovered AI come before TAI?** | Yes (accelerates) vs. No (current paradigm dominates) | [NAS producing competitive models](https://link.springer.com/article/10.1007/s10462-024-11058-w) | 2-4 years |
+| **How would we recognize a breakthrough?** | Clear benchmark jump vs. Gradual realization | Historical: transformers looked incremental initially | Retroactive |
+| **What are the true scaling limits?** | Near current frontier vs. Orders of magnitude remaining | [Epoch: 2e29 FLOP feasible by 2030](https://epoch.ai/blog/can-ai-scaling-continue-through-2030) | 3-5 years |
+| **Will safety concerns force paradigm change?** | Interpretability needs drive alternatives vs. Current approaches adapted | [28% of neuro-symbolic papers](https://arxiv.org/html/2501.05435v1) address explainability | Ongoing |
+
+### Scenario Analysis
+
+| Scenario | Probability | Key Trigger | Implications for Safety |
+|----------|-------------|-------------|------------------------|
+| **Transformer dominance continues** | 55-70% | Scaling continues working; no hard limits | Current safety research remains relevant |
+| **Hybrid integration (Transformer + Neuro-symbolic)** | 15-25% | Reasoning limitations drive integration | Safety approaches must span paradigms |
+| **Gradual SSM/alternative transition** | 5-12% | Efficiency requirements dominate | Moderate adaptation of safety research |
+| **Discontinuous breakthrough** | 3-8% | Fundamentally new approach discovered | Major safety research pivot required |
+| **AI-designed paradigm** | 5-10% | NAS/AutoML produces novel architecture | Accelerated timeline; compressed safety window |
+
+## Sources & Resources
+
+### Primary Research
+
+| Source | Type | Key Finding | Year |
+|--------|------|-------------|------|
+| [Epoch AI: Can AI Scaling Continue?](https://epoch.ai/blog/can-ai-scaling-continue-through-2030) | Analysis | 2e29 FLOP runs feasible by 2030; data exhaustion ≈2028 | 2024 |
+| [Neuro-Symbolic AI 2024 Systematic Review](https://arxiv.org/html/2501.05435v1) | Survey | 63% papers on learning/inference; 5% on meta-cognition | 2024 |
+| [LEAP Expert Panel](https://leap.forecastingresearch.org/reports/wave1) | Forecasts | Experts underestimate AI progress on benchmarks | 2024 |
+| [80,000 Hours: AGI Timeline Review](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) | Analysis | Metaculus median shifted from 50 years to 5 years (2020-2024) | 2025 |
+| [NAS Systematic Review](https://link.springer.com/article/10.1007/s10462-024-11058-w) | Survey | NAS producing architectures matching human designs | 2024 |
+
+### Paradigm Shift Analysis
+
+| Source | Focus | Relevance |
+|--------|-------|-----------|
+| [Paradigm Shifts in Tech (Medium)](https://medium.com/@varunrustomji/paradigm-shifts-in-the-tech-industry-1ef2104fa60f) | Historical patterns | Technologies build upon predecessors |
+| [AI Paradigm Analysis (Taylor & Francis)](https://www.tandfonline.com/doi/full/10.1080/0952813X.2024.2323042) | AI as paradigm shift | Pattern similarity to historical tech revolutions |
+| [Neuro-Symbolic AI Overview](https://gregrobison.medium.com/neuro-symbolic-ai-a-foundational-analysis-of-the-third-waves-hybrid-core-cc95bc69d6fa) | Third AI wave | Hybrid approaches as potential successor |
+| [AllianceBernstein: AI Paradigm Shift](https://www.alliancebernstein.com/corporate/en/insights/investment-insights/ai-heralds-a-technology-paradigm-shift-but-not-so-fast.html) | Investment perspective | Paradigm shift timing uncertainty |
+
+### Forecasting and Uncertainty
+
+| Source | Focus | Key Insight |
+|--------|-------|-------------|
+| [Our World in Data: AI Timelines](https://ourworldindata.org/ai-timelines) | Expert surveys | 13-year shift in AGI estimates (2022-2023 surveys) |
+| [The Problem with AGI Predictions](https://www.ignorance.ai/p/the-problem-with-agi-predictions) | Prediction failures | Experts often wrong about own field |
+| [Clearerthinking: AI Disagreement](https://www.clearerthinking.org/post/why-there-s-so-much-disagreement-about-the-timeline-for-advanced-ai) | Methodology | Sources of forecasting disagreement |
+| [Science: AI and Unknown Unknowns](https://www.science.org/doi/10.1126/science.adw9439) | Uncertainty | Even experts struggle to predict 6 months ahead |
+
+### Technical Directions
+
+| Source | Focus | Status |
+|--------|-------|--------|
+| [Neural Architecture Search Advances (NSR)](https://academic.oup.com/nsr/article/11/8/nwae282/7740455) | AutoML/NAS | AI designing AI architectures |
+| [Google 2025 Research Breakthroughs](https://blog.google/technology/ai/2025-research-breakthroughs/) | Industry progress | Quantum, weather, scientific applications |
+| [FTI Consulting: AI Frontiers 2025](https://www.fticonsulting.com/insights/articles/frontiers-ai-research-2025) | Research directions | Agentic AI, multimodal, reasoning |
+| [Neuro-symbolic for Robustness (Springer)](https://link.springer.com/article/10.1007/s13369-025-10887-3) | Hybrid approaches | Interpretability, uncertainty quantification |
+
+## Related Pages
+
+- <EntityLink id="dense-transformers">Dense Transformers</EntityLink> - The current dominant paradigm
+- <EntityLink id="ssm-mamba">SSM/Mamba</EntityLink> - A recent alternative architecture
+- <EntityLink id="neuromorphic">Neuromorphic</EntityLink> - Hardware-level novelty
+- <EntityLink id="neuro-symbolic">Neuro-Symbolic</EntityLink> - Combining known approaches

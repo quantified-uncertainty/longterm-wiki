@@ -1,0 +1,577 @@
+---
+title: Electoral Impact Assessment Model
+description: This model estimates AI disinformation's marginal impact on elections. It finds AI increases reach by 1.5-3x over traditional methods, with potential 2-5% vote margin shifts in close elections.
+sidebar:
+  order: 26
+quality: 65
+ratings:
+  focus: 8.5
+  novelty: 4.5
+  rigor: 6
+  completeness: 7.5
+  concreteness: 7
+  actionability: 6.5
+lastEdited: "2026-01-28"
+importance: 62.5
+llmSummary: This model estimates AI disinformation's marginal electoral impact by decomposing the causal pathway from AI capability to vote shifts. Analysis finds 0.2-5% probability of flipping individual elections (1-3 elections globally per year), with 2-5% potential vote margin shifts in close races, though systemic trust erosion (2-5% annual decline) may matter more than specific election outcomes.
+pageTemplate: knowledge-base-model
+metrics:
+  wordCount: 2689
+  citations: 22
+  tables: 17
+  diagrams: 2
+clusters:
+  - ai-safety
+  - governance
+subcategory: impact-models
+---
+import { DataInfoBox, Backlinks, Mermaid , EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="disinformation-electoral-impact" ratings={frontmatter.ratings} />
+
+## Overview
+
+AI dramatically lowers the cost of creating and distributing <EntityLink id="disinformation">disinformation</EntityLink> at scale. But does this translate to meaningful impact on election outcomes? This model provides a framework for estimating the marginal effect of AI-generated disinformation on electoral results and democratic processes.
+
+**Core Question:** By how much can AI disinformation shift election results, and under what conditions?
+
+## Strategic Importance
+
+Understanding AI disinformation's electoral impact matters because democratic legitimacy depends on elections reflecting genuine voter preferences. If AI disinformation can reliably shift 2-5% of votes in close elections (our central estimate), this represents a fundamental threat to democratic governance.
+
+### Magnitude Assessment
+
+| Dimension | Assessment | Quantitative Estimate |
+|-----------|------------|----------------------|
+| **Direct electoral impact** | Moderate - individual elections rarely flipped, but close races vulnerable | 0.2-5% chance of flipping any given election |
+| **Cumulative electoral impact** | High - across 50+ major elections annually, 1-3 likely flipped | 1-3 elections changed per year globally |
+| **Democratic trust erosion** | Very High - systemic effect may exceed direct vote impacts | Trust declining 2-5% annually, accelerating |
+| **Close election vulnerability** | Critical - races within 3% margin highly susceptible | 20-30% of elections are close enough to flip |
+| **Expected vote shift from AI** | Moderate - 1-3% of electorate potentially shifted | 1.5-4.5 million votes in US presidential election |
+
+| Factor | Assessment | Confidence |
+|--------|------------|------------|
+| Direct harm severity | High (threatens democracy) | Medium |
+| Tractability of defense | Medium (multiple interventions possible) | Low |
+| Neglectedness | Low-Medium (receiving attention, but not calibrated to threat) | Medium |
+| Time sensitivity | High (affects 2024-2026 elections) | High |
+
+### Resource Implications
+
+| Intervention | Investment Needed | Expected Impact | Priority |
+|--------------|-------------------|-----------------|----------|
+| **Platform detection and removal** | \$100-300 million annually | Reduces AI disinformation reach by 20-40%; declining effectiveness | High (near-term) |
+| **Provenance mandates for political ads** | \$20-50 million for implementation | Authenticates 60-80% of legitimate political content | High |
+| **Election security infrastructure** | \$200-500 million over 4 years | Rapid response capability; fact-checking coordination | High |
+| **Voter media literacy campaigns** | \$50-150 million per election cycle | Increases skepticism by 10-20%; limited reach to vulnerable populations | Medium |
+| **<EntityLink id="international-coordination">International coordination</EntityLink> on attribution** | \$30-80 million annually | Enables consequences for state-sponsored interference | Medium |
+| **Emergency content restrictions (if crisis)** | Political cost, not financial | Could prevent immediate crisis but raises free speech concerns | Conditional |
+
+### Key Cruxes
+
+| Crux | If True | If False | Current Assessment |
+|------|---------|----------|-------------------|
+| **AI disinformation can reliably shift greater than 2% of votes** | Fundamental threat to close elections; justifies major intervention | Threat overstated; focus resources elsewhere | 60-70% probability - evidence from micro-targeting suggests plausible |
+| **Detection can keep pace with generation quality** | Platform moderation remains effective defense | Detection fails; alternative defenses needed | 20-30% probability - declining trend suggests failure likely |
+| **Voters develop resistance to AI manipulation** | Natural adaptation reduces threat over time | Vulnerability persists or increases | 40-50% probability - some evidence of growing skepticism |
+| **Cheap fakes remain more effective than sophisticated AI** | AI adds marginal threat; traditional methods dominate | AI becomes primary disinformation vector | 55-65% probability near-term; declining as AI quality improves |
+| **Systemic trust erosion matters more than individual elections** | Prioritize long-term democratic health over election-specific defense | Focus on preventing specific election manipulation | 70-80% probability - trust trends more concerning than documented flips |
+
+**Key insight:** The marginal impact of AI disinformation is probably smaller than media coverage suggests for individual elections, but systemic effects on democratic trust may matter more than vote margin shifts.
+
+## Parameter Estimates
+
+The following table summarizes key model parameters derived from empirical research and expert elicitation.
+
+| Parameter | Best Estimate | Range | Confidence | Source |
+|-----------|--------------|-------|------------|--------|
+| AI content generation cost reduction | 100-1000x | 50-5000x | High | Industry benchmarks |
+| Personalized AI persuasion uplift | 1.3-2x | 1.1-3x | Medium | [Scientific Reports 2024](https://www.nature.com/articles/s41598-024-53755-0) |
+| AI vs human propaganda persuasiveness | ~Equal | 0.8-1.2x | Medium | [PNAS Nexus 2024](https://academic.oup.com/pnasnexus/article/3/2/pgae034/7610937) |
+| Traditional campaign effect on vote | ≈0% | -0.5 to 0.5% | High | [American Political Science Review](https://www.cambridge.org/core/journals/american-political-science-review/article/abs/minimal-persuasive-effects-of-campaign-contact-in-general-elections-evidence-from-49-field-experiments/753665A313C4AB433DBF7110299B7433) |
+| AI dialogue persuasion effect | Larger than video ads | 1.2-2x video ads | Medium | [Nature 2025](https://www.nature.com/articles/s41586-025-09771-9) |
+| Platform detection rate (AI content) | 30-60% | 20-80% | Low | Platform disclosures |
+| Cheap fakes vs AI ratio in 2024 | 7:1 | 5:1 to 10:1 | High | [Knight Columbia](https://knightcolumbia.org/blog/we-looked-at-78-election-deepfakes-political-misinformation-is-not-an-ai-problem) |
+| Close election threshold | 3% margin | 1-5% | High | Historical analysis |
+| P(election flipped by AI) | 0.2-5% | 0.1-10% | Very Low | Model estimate |
+
+Research from MIT Sloan found that false information spreads 70% faster than true information on social media, with political falsehoods showing particularly rapid diffusion. This suggests AI-generated disinformation may benefit from inherent platform dynamics that favor novel, emotionally engaging content.
+
+## The Marginal Impact Problem
+
+Elections are influenced by countless factors:
+- Economic conditions
+- Candidate quality
+- Campaign spending
+- Media coverage
+- Debates and events
+- Ground operations
+- Traditional advertising
+- **Disinformation (pre-AI)**
+- **AI-Generated disinformation (new)**
+
+**Challenge:** Isolating the marginal contribution of AI-enhanced disinformation from everything else.
+
+## Impact Pathway Model
+
+We can decompose the causal pathway from AI capability to electoral impact:
+
+<Mermaid client:load chart={`
+flowchart TD
+    AI[AI Capability<br/>Quality improvement: 30%/yr] --> DISINFO[Disinformation Volume/Quality<br/>150-3000x increase]
+    DISINFO --> EXPOSE[Audience Exposure<br/>1.5-4x multiplier vs traditional]
+    EXPOSE --> BELIEF[Belief Change<br/>2-6x multiplier for AI content]
+    BELIEF --> VOTE[Vote Choice Change<br/>5-15% of exposed shift]
+    VOTE --> OUTCOME[Election Outcome Change<br/>Critical in races within 3%]
+
+    style AI fill:#ffddcc
+    style OUTCOME fill:#ff9999
+`} />
+
+Each step has a probability/magnitude. The overall impact is the product of all steps.
+
+### Step 1: AI → Disinformation Volume/Quality
+
+**Pre-AI Disinformation Constraints:**
+- Human effort required for each piece of content
+- Limited personalization
+- Detectable patterns (template-based)
+- Cost: \$1-10 per piece for quality content
+
+**AI Enhancement:**
+- Automated generation at massive scale
+- Personalized to individual targets
+- High quality, indistinguishable from organic content
+- Cost: \$0.001-0.01 per piece
+
+**Multiplier Effect:**
+- Volume increase: 100-1000x
+- Quality increase: 1.5-3x (more convincing)
+- Personalization increase: 10-100x (targeted messaging)
+
+**Overall AI Impact on Content Creation:** ~150-3000x increase in effective disinformation output
+
+**Confidence:** High. Well-documented in 2024 elections.
+
+### Step 2: Volume/Quality → Exposure
+
+Not all content reaches audiences. Social media algorithms, platform moderation, and user behavior filter content.
+
+**Platform Moderation:**
+- Platforms remove ~20-40% of detected disinformation
+- AI-generated content currently detected at ~30-60% rate (falling)
+- **Net effect:** 50-80% of AI disinformation reaches audiences (vs ~60-90% of human disinformation)
+
+**Algorithmic Amplification:**
+- Engaging content (often outrage-inducing disinformation) promoted
+- AI-generated content can optimize for engagement
+- **Multiplier:** 1.2-2x amplification vs. baseline
+
+**Audience Reach:**
+- Traditional disinformation: reaches 5-15% of target audience
+- AI-personalized disinformation: reaches 10-30% of target audience (better targeting)
+
+**Overall Exposure Multiplier (AI vs traditional):** 1.5-4x
+
+**Confidence:** Medium. Platform algorithms are opaque; estimates based on disclosed data.
+
+### Step 3: Exposure → Belief Change
+
+How many people who see disinformation actually believe it?
+
+**Baseline Belief Rates (Pre-AI):**
+- Aligned with existing beliefs: 30-50% believe
+- Counter to existing beliefs: 5-15% believe
+- No prior opinion: 20-40% believe
+
+**AI Enhancement Factors:**
+
+**Personalization:** AI can tailor messaging to individual psychology
+- Estimated increase in persuasiveness: 1.3-2x
+
+**Multimodal Content:** Deepfakes, voice clones more convincing than text
+- Estimated increase for video/audio: 1.5-2.5x vs text
+
+**Repetition at Scale:** Multiple exposures via different "sources" (all AI)
+- Estimated increase per additional exposure: 1.2x (up to 3-4 exposures)
+
+**Overall Belief Change Multiplier (AI vs traditional):** 2-6x depending on content type and targeting
+
+**Confidence:** Low-Medium. Limited experimental data. Based on persuasion research and preliminary studies.
+
+### Step 4: Belief Change → Vote Choice Change
+
+Not all belief changes translate to vote switching.
+
+**Baseline Vote Impact (pre-AI disinformation):**
+- Partisans rarely switch: 1-3% affected
+- Swing voters more susceptible: 10-20% affected
+- Low-information voters most susceptible: 15-30% affected
+
+**Election Type Matters:**
+- Presidential elections: Voters have strong priors, hard to shift
+- Local elections: Lower information, easier to influence
+- Ballot initiatives: Voters often uncertain, highly influenceable
+
+**AI Disinformation Vote Impact:**
+Assuming AI increases belief change by 2-6x (Step 3):
+- Partisans: 2-8% affected (low end—beliefs don't translate to switching)
+- Swing voters: 15-35% affected
+- Low-info voters: 25-50% affected
+
+**Weighted Average (typical electorate):**
+- ~15% swing voters
+- ~30% low-info voters
+- ~55% strong partisans
+
+**Overall Vote Impact:** 5-15% of exposed population might shift vote due to AI disinformation
+
+**Confidence:** Low. Vote switching is multi-causal; attribution difficult.
+
+### Step 5: Vote Change → Outcome Change
+
+Finally, how many votes need to shift to change election results?
+
+**Close Elections:**
+- 2020 U.S. Presidential: Decided by ~44,000 votes across 3 states (~0.03% of total votes)
+- Many congressional races decided by 1-3%
+- **Close elections highly vulnerable to small shifts**
+
+**Landslide Elections:**
+- 10+ point margins require massive shifts to overturn
+- AI disinformation unlikely to swing
+
+**Quantitative Model:**
+
+Assume:
+- Close election (within 3%)
+- AI disinformation reaches 30% of electorate
+- Of those, 10% shift votes
+- Overall vote shift: 3%
+
+**Result:** Enough to flip a close election.
+
+## Case Study Analysis
+
+### 2024 Elections: The "AI Election" That Wasn't?
+
+Despite being called the "AI election year," post-election analysis found limited evidence of decisive AI disinformation impact.
+
+**Why the limited impact?**
+
+**Possible Explanations:**
+
+1. **Detection Worked:** Platform moderation caught enough AI content to limit spread
+   - **Evidence:** Multiple platforms reported removing AI-generated campaigns
+   - **Counter-evidence:** Much went undetected
+
+2. **Audience Skepticism:** Voters increasingly aware of AI manipulation, more skeptical
+   - **Evidence:** Increased media literacy campaigns
+   - **Counter-evidence:** Most voters unaware of specific AI threats
+
+3. **Cheap Fakes More Effective:** Simple edited videos outperformed sophisticated AI (7:1 ratio per News Literacy Project)
+   - **Evidence:** Well-documented
+   - **Implication:** Quality may matter less than simplicity
+
+4. **Existing Polarization Dominates:** Voters already so polarized that marginal disinformation doesn't matter
+   - **Evidence:** Historically high partisan loyalty
+   - **Implication:** AI disinformation adds noise, not signal
+
+5. **Measurement Problem:** Impact exists but is undetectable amid other factors
+   - **Evidence:** Close races in swing states consistent with small AI impact
+   - **Problem:** Can't prove counterfactual
+
+**Most Likely:** Combination of #3, #4, and #5. AI disinformation had some impact but was not decisive in 2024.
+
+### Slovakia 2023: Deepfake Audio Incident
+
+**Event:** Audio deepfake of liberal party leader discussing vote rigging surfaced days before election
+**Result:** Liberal party suffered upset loss
+**Attribution:** Unclear if deepfake was decisive
+
+**Analysis:**
+- Timing (just before election) maximized impact, minimized correction time
+- Topic (vote rigging) highly salient and credible to some voters
+- Close race amplified marginal effects
+
+**Estimated Impact:** Possibly 1-3% vote shift, potentially decisive in close race
+
+**Lessons:**
+- Timing matters enormously
+- Topic credibility affects impact
+- Close races vulnerable to small effects
+
+### Taiwan 2024: Documented AI Influence Campaign
+
+**Event:** Microsoft documented China-based AI-generated deepfakes targeting Taiwan election
+**Result:** Unclear impact on outcome
+**Characteristics:** First confirmed state-actor use of AI in foreign election
+
+**Analysis:**
+- Detected and publicized before election (reduced impact)
+- Taiwan electorate somewhat prepared for Chinese interference
+- Content quality varied (some obvious, some convincing)
+
+**Estimated Impact:** &lt;1% vote shift, not decisive
+
+**Lessons:**
+- Attribution and publicity can reduce impact
+- Prepared electorates more resilient
+
+### Empirical Evidence Summary
+
+The following table synthesizes experimental research on AI persuasion effects relevant to electoral contexts.
+
+| Study | Method | Key Finding | Effect Size | Relevance |
+|-------|--------|-------------|-------------|-----------|
+| [PNAS Nexus 2024](https://academic.oup.com/pnasnexus/article/3/2/pgae034/7610937) | Survey experiment comparing GPT-3 vs human propaganda | AI content equally persuasive as human-written | d ≈ 0 (no difference) | Establishes AI can match human quality |
+| [Scientific Reports 2024](https://www.nature.com/articles/s41598-024-53755-0) | 7 sub-studies on personalized AI messages (N=1,788) | Personalized AI messages more influential | 1.3-2x uplift | Shows personalization advantage |
+| [Nature 2025](https://www.nature.com/articles/s41586-025-09771-9) | Pre-registered experiments in US, Canada, Poland | AI dialogues change candidate preference | Larger than video ads | Most direct electoral evidence |
+| [APSR 2018](https://www.cambridge.org/core/journals/american-political-science-review/article/abs/minimal-persuasive-effects-of-campaign-contact-in-general-elections-evidence-from-49-field-experiments/753665A313C4AB433DBF7110299B7433) | Meta-analysis of 49 field experiments | Campaign contact has ~zero effect | d ≈ 0 | Baseline for traditional persuasion |
+| [Stanford 2020](https://pmc.ncbi.nlm.nih.gov/articles/PMC11126999/) | Facebook/Instagram deactivation (N=35,000) | Platform removal had little effect on views | Minimal | Suggests limited platform-specific impact |
+
+These findings suggest a paradox: while AI can produce highly persuasive content in experimental settings, real-world electoral effects remain difficult to detect. Possible explanations include: (1) experimental conditions differ from actual campaign contexts; (2) effects are real but small and distributed across many elections; (3) countervailing forces (skepticism, platform moderation) offset AI advantages in practice.
+
+## Quantitative Impact Estimates
+
+### Model 1: Multiplicative Probability
+
+```
+P(AI flips election) = P(close race) × P(AI campaign) × P(reaches voters) × P(shifts votes) × P(shift is decisive)
+
+Where:
+P(close race) = 0.15-0.30 (varies by election type)
+P(AI campaign) = 0.50-0.90 (becoming common)
+P(reaches voters) = 0.20-0.50 (platform moderation, virality)
+P(shifts votes) = 0.05-0.15 (small persuasion effect)
+P(shift is decisive) = 0.10-0.30 (in close race context)
+```
+
+**Result:** P(AI flips election) = 0.0015 to 0.054 (0.15% to 5.4%)
+
+**Interpretation:** In any given election, AI disinformation has a ~0.2-5% chance of being decisive.
+
+Over many elections (50+ major races in a year), **AI disinformation likely flips 1-3 elections annually** (current state).
+
+**Confidence:** Very low. Enormous uncertainty in each parameter.
+
+### Model 2: Vote Margin Approach
+
+**Baseline Assumptions:**
+- 100 million voters
+- 50-50 race
+- 30% exposed to AI disinformation
+- 5% of exposed shift votes
+- 1.5 million vote shift (1.5% of total)
+
+**In close elections (decided by &lt;1%):** AI disinformation likely decisive
+
+**In moderate elections (3-5% margin):** AI disinformation possibly influential but not clearly decisive
+
+**In landslide elections (>7% margin):** AI disinformation unlikely decisive
+
+**Implication:** ~20-30% of elections are close enough that AI disinformation could plausibly be decisive.
+
+### Scenario Analysis
+
+The following scenarios represent distinct trajectories for AI disinformation's electoral impact over the 2025-2030 period.
+
+| Scenario | Probability | Impact Level | Key Drivers | Policy Response |
+|----------|-------------|--------------|-------------|-----------------|
+| **Detection Keeps Pace** | 15-20% | Low (0.5-2% elections affected) | Platform investment in AI detection; regulatory pressure; content provenance adoption | Maintain current approach; enhance monitoring |
+| **Stalemate** | 30-40% | Moderate (2-5% elections affected) | Arms race between generation and detection; mixed regulatory success; public adaptation | Strengthen platform accountability; expand media literacy |
+| **Sophistication Wins** | 25-35% | High (5-15% elections affected) | Detection fails; personalization improves; state actors scale operations | Emergency measures; mandatory provenance; election reforms |
+| **Saturation Effect** | 15-25% | Moderate-Declining (3-5% then decreasing) | Information overload; voter skepticism universalizes; all content treated as suspect | Focus on trust restoration; institutional resilience |
+
+The most concerning finding from recent research is the Romania 2024 case, where election results were [annulled after evidence of AI-powered interference](https://www.cigionline.org/articles/then-and-now-how-does-ai-electoral-interference-compare-in-2025/) using manipulated videos. This represents the first documented case of AI disinformation being consequential enough to trigger institutional response.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Inputs["Model Inputs"]
+        AI_CAP[AI Capability Growth<br/>30%/year quality improvement]
+        PLAT[Platform Response<br/>Detection rate: 30-60%]
+        REG[Regulatory Environment<br/>20 states with laws by 2024]
+        VOTER[Voter Adaptation<br/>84% concerned about AI fakes]
+    end
+
+    subgraph Process["Impact Pathway"]
+        GEN[Content Generation<br/>100-1000x cost reduction]
+        DIST[Distribution<br/>1.5-4x reach vs traditional]
+        PERS[Persuasion<br/>1.3-2x with personalization]
+        VOTE[Vote Change<br/>5-15% of exposed shift]
+    end
+
+    subgraph Outcomes["Outcome Space"]
+        IND[Individual Election<br/>0.2-5% flip probability]
+        SYS[Systemic Trust<br/>2-5% annual decline]
+        CRISIS[Democratic Crisis<br/>Conditional on accumulation]
+    end
+
+    AI_CAP --> GEN
+    GEN --> DIST
+    PLAT --> DIST
+    DIST --> PERS
+    PERS --> VOTE
+    REG --> VOTE
+    VOTER --> PERS
+    VOTE --> IND
+    VOTE --> SYS
+    SYS --> CRISIS
+    IND --> CRISIS
+
+    style CRISIS fill:#ff6666
+    style SYS fill:#ffaa66
+    style IND fill:#ffdd66
+`} />
+
+## Factors Moderating Impact
+
+### Increasing AI Impact
+
+1. **Targeting Sophistication:** Better micro-targeting increases efficiency
+2. **Multimodal Content:** Video/audio more persuasive than text
+3. **Coordination:** Multiple AI campaigns from different sources reinforce messaging
+4. **Erosion of Trust:** As authentic media becomes suspect, all information becomes equally (un)reliable
+5. **Authoritarian Backing:** State-sponsored campaigns have more resources and persistence
+
+### Decreasing AI Impact
+
+1. **Platform Countermeasures:** Detection, labeling, removal
+2. **Media Literacy:** Educated populations more skeptical
+3. **Provenance Systems:** C2PA and similar make authentic content verifiable
+4. **Partisan Polarization:** Voters so entrenched that persuasion is difficult
+5. **Saturation:** So much disinformation that all becomes noise
+
+## Trajectory Projections
+
+### 2024-2026: Early Impact Phase
+
+**Characteristics:**
+- AI disinformation common but detectable
+- Platforms implementing countermeasures
+- Electorate beginning to adapt
+- **Estimated impact:** 1-3% of close elections flipped
+
+### 2026-2028: Escalation Phase
+
+**Characteristics:**
+- AI-generated content becomes harder to detect
+- Personalization improves (better targeting)
+- More actors deploy AI campaigns
+- Public awareness increases but so does volume
+- **Estimated impact:** 3-8% of close elections flipped
+
+### 2028-2030: Saturation or Adaptation
+
+**Two Possible Paths:**
+
+**Path A: Saturation (40% probability)**
+- So much disinformation that voters tune out
+- All information treated as equally suspect
+- Impact paradoxically decreases as volume increases
+- **Estimated impact:** 2-5% of elections (impact declines)
+
+**Path B: Sophistication Wins (60% probability)**
+- Personalized, multimodal AI content highly effective
+- Detection fails to keep pace
+- Provenance systems not widely adopted
+- **Estimated impact:** 10-20% of close elections flipped
+
+## Systemic Democratic Effects
+
+Beyond individual elections, AI disinformation affects democratic health:
+
+**Trust Erosion:**
+- Even if specific election impacts are small, aggregate trust in media declines
+- "Liar's dividend" makes all evidence deniable
+- Democratic deliberation requires shared reality—this breaks down
+
+**Measured Impact:**
+- Trust in media: Declining 3-5% annually (accelerating)
+- Belief in election integrity: Declining 2-4% annually
+- Political polarization: Increasing (AI contribution unclear but likely 10-30%)
+
+**These systemic effects may matter more than vote margins in individual elections.**
+
+## Policy Implications
+
+### If Impact is Currently Low (&lt;2% of elections)
+
+**Interpretation:** Current countermeasures working; worry may be overblown
+
+**Recommended Actions:**
+- Maintain current platform policies
+- Monitor for increasing impact
+- Continue media literacy efforts
+- Avoid over-regulation that might harm free speech
+
+### If Impact is Moderate (2-8% of elections)
+
+**Interpretation:** Significant threat but manageable with effort
+
+**Recommended Actions:**
+- Strengthen platform detection and removal
+- Mandate provenance systems (C2PA)
+- Increase funding for election security
+- International cooperation on attribution and consequences
+
+### If Impact is High (>10% of elections)
+
+**Interpretation:** Crisis-level threat to democratic integrity
+
+**Recommended Actions:**
+- Emergency measures: possible temporary restrictions on AI-generated political content
+- Mandatory authentication for all political advertising
+- Dramatic increase in election security budgets
+- Consider election reforms (longer voting periods to allow fact-checking)
+
+## Model Limitations
+
+This model faces fundamental measurement challenges that limit confidence in its estimates.
+
+**Counterfactual Problem.** The core limitation is that we cannot observe what would have happened without AI disinformation in any given election. Romania 2024 provides suggestive evidence, but even there, the annulment was based on evidence of interference, not proof of decisive impact. Every estimate in this model involves a counterfactual comparison that cannot be directly observed.
+
+**Multi-Causality and Attribution.** Elections are influenced by dozens of factors: economic conditions, candidate quality, campaign spending, media coverage, debates, and ground operations. Isolating the marginal contribution of AI disinformation from this complex system is methodologically challenging. The [meta-analysis of 49 field experiments](https://www.cambridge.org/core/journals/american-political-science-review/article/abs/minimal-persuasive-effects-of-campaign-contact-in-general-elections-evidence-from-49-field-experiments/753665A313C4AB433DBF7110299B7433) finding zero average effect from campaign contact illustrates how difficult persuasion measurement is even for well-controlled interventions.
+
+**Detection Bias.** We can only measure detected AI campaigns. The most sophisticated operations may go entirely unnoticed, meaning our estimates potentially undercount the most impactful instances. Conversely, the [Knight Columbia analysis of 78 election deepfakes](https://knightcolumbia.org/blog/we-looked-at-78-election-deepfakes-political-misinformation-is-not-an-ai-problem) found that 39 had no deceptive intent, suggesting overcount in some datasets.
+
+**Heterogeneity.** Impact varies dramatically by context: election type (presidential vs. local), electorate characteristics (polarization level, media literacy), and institutional environment (platform policies, legal frameworks). Parameter estimates that work for U.S. presidential elections may be inappropriate for local ballot initiatives or elections in developing democracies.
+
+**Rapid Technological Change.** Both AI generation capabilities and detection methods are improving rapidly. Model parameters derived from 2024 data may be obsolete by 2026. The finding that "cheap fakes" outperformed AI 7:1 in 2024 may not hold as AI quality improves and costs fall further.
+
+## Key Debates
+
+**Did AI "Break" 2024 Elections?** Research suggests no, but measurement problems make this uncertain. Absence of evidence is not evidence of absence.
+
+**What Matters More: Individual Elections or Systemic Trust?** Even if AI doesn't flip many elections, erosion of epistemic commons might be the bigger harm.
+
+**Can Democracy Survive in an Era of Undetectable Disinformation?** Pessimists say no; optimists argue humans have adapted to information threats before.
+
+## Related Models
+
+- <EntityLink id="disinformation-detection-race" label="Disinformation Detection Arms Race" /> - Can we detect it at all?
+- <EntityLink id="deepfakes-authentication-crisis" label="Deepfakes Authentication Crisis" /> - Visual media authenticity
+
+## Sources
+
+### AI Disinformation Research
+
+- Goldstein, J. et al. ["How persuasive is AI-generated propaganda?"](https://academic.oup.com/pnasnexus/article/3/2/pgae034/7610937) *PNAS Nexus* (2024). Found GPT-3 can create propaganda as persuasive as human-written content with minimal effort.
+- Matz, S. et al. ["The potential of generative AI for personalized persuasion at scale."](https://www.nature.com/articles/s41598-024-53755-0) *Scientific Reports* (2024). Demonstrated 1.3-2x persuasion uplift from AI personalization across 7 studies (N=1,788).
+- Bai, H. et al. ["Persuading voters using human-artificial intelligence dialogues."](https://www.nature.com/articles/s41586-025-09771-9) *Nature* (2025). Pre-registered experiments showing AI dialogues produce larger effects than traditional video ads.
+
+### Electoral Impact Studies
+
+- Kalla, J. & Broockman, D. ["The Minimal Persuasive Effects of Campaign Contact in General Elections."](https://www.cambridge.org/core/journals/american-political-science-review/article/abs/minimal-persuasive-effects-of-campaign-contact-in-general-elections-evidence-from-49-field-experiments/753665A313C4AB433DBF7110299B7433) *American Political Science Review* (2018). Meta-analysis of 49 field experiments finding ~zero average effect.
+- Simon, F. & Camargo, C. ["We Looked at 78 Election Deepfakes."](https://knightcolumbia.org/blog/we-looked-at-78-election-deepfakes-political-misinformation-is-not-an-ai-problem) *Knight Columbia* (2024). Found cheap fakes 7x more common than AI deepfakes; 39 of 78 cases had no deceptive intent.
+- CIGI. ["Then and Now: How Does AI Electoral Interference Compare in 2025?"](https://www.cigionline.org/articles/then-and-now-how-does-ai-electoral-interference-compare-in-2025/) Comprehensive comparison including Romania 2024 annulment case.
+
+### Platform and Social Media Effects
+
+- Aral, S. & Eckles, D. ["Protecting elections from social media manipulation."](https://www.science.org/doi/10.1126/science.aaw8243) *Science* (2019). Proposed research agenda for measuring manipulation effects.
+- Allcott, H. et al. ["The effects of Facebook and Instagram on the 2020 election."](https://pmc.ncbi.nlm.nih.gov/articles/PMC11126999/) *PMC* (2024). Deactivation experiment (N=35,000) finding limited effect on political views.
+- [Harvard Kennedy School Misinformation Review](https://misinforeview.hks.harvard.edu/article/the-origin-of-public-concerns-over-ai-supercharging-misinformation-in-the-2024-u-s-presidential-election/) (2024). Analysis of why predicted AI impacts in 2024 did not materialize.
+
+## Related Pages
+
+<Backlinks client:load entityId="disinformation-electoral-impact" />

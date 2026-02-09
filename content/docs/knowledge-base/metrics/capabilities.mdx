@@ -1,0 +1,558 @@
+---
+title: "AI Capabilities Metrics"
+description: "Quantitative measures tracking AI model performance across language, coding, and multimodal benchmarks from 2020-2025, showing rapid progress with many models reaching 86-96% on key tasks, though significant gaps remain in robustness and real-world deployment. Documents capability trajectories essential for forecasting transformative AI timelines and anticipating safety challenges through systematic benchmark analysis."
+sidebar:
+  order: 2
+importance: 78.5
+quality: 61
+lastEdited: "2026-01-29"
+llmSummary: "Comprehensive tracking of AI benchmark performance 2020-2025 showing rapid saturation (MMLU: 43.9%→96.7%, HumanEval: 28.8%→96.3%, ARC-AGI: 9.2%→87.5%), with o3 achieving human-level reasoning. Critical finding: adversarial attacks succeed 75-95% despite capability gains, task horizons doubled every 7 months (accelerating to 4 months), but real-world reliability remains <10% for 4+ hour tasks, creating dangerous evaluation-reality gaps."
+ratings:
+  novelty: 4.2
+  rigor: 6.8
+  actionability: 5.5
+  completeness: 7.5
+metrics:
+  wordCount: 1377
+  citations: 66
+  tables: 83
+  diagrams: 1
+clusters: ["ai-safety"]
+---
+import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+import {DataInfoBox, Backlinks} from '@components/wiki';
+
+<DataExternalLinks pageId="capabilities" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Benchmark Progress** | Exponential growth, now saturating | MMLU: 43.9% (2020) → 96.7% (2024); ARC-AGI: 9.2% → 87.5% in 18 months |
+| **Capability Trajectory** | 7-month doubling period for task horizons | [METR research](https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/): accelerated to 4-month doubling in 2024-2025 |
+| **Evaluation Gap** | Critical - widening | [Stanford HAI](https://hai.stanford.edu/news/ai-benchmarks-hit-saturation): 80-90% scores on most benchmarks eliminate differentiation |
+| **Safety Margin** | Narrowing rapidly | Adversarial attack success: 75-95% on frontier models despite capability gains |
+| **Real-World Reliability** | Significant gaps persist | 50% task success at ≈50 minutes; under 10% success at 4+ hours |
+| **Multimodal Integration** | Production-ready | Gemini 2.0, GPT-4o: real-time voice (180ms latency), video analysis operational |
+| **Scientific Discovery** | Transformative in specific domains | AlphaFold: 3.2M+ researchers, 47,000+ citations; FunSearch: novel mathematical discoveries |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [youtube.com](https://www.youtube.com/watch?v=6SCkGKW08Dw) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/AI_capability_control) |
+
+
+## Overview
+
+This page tracks concrete, measurable indicators of AI capabilities across multiple domains through systematic benchmark analysis. Understanding capability trajectories is critical for forecasting <EntityLink id="agi-timeline">transformative AI timelines</EntityLink>, anticipating safety challenges, and evaluating whether alignment techniques scale with <EntityLink id="emergent-capabilities">emerging capabilities</EntityLink>.
+
+**Key Finding**: Most benchmarks show exponential progress from 2023-2025, with frontier models achieving 86-96% performance on language understanding (MMLU), coding (HumanEval), and math (GSM8K). However, significant gaps persist in robustness, adversarial resistance, and sustained multi-day task completion, indicating a disconnect between benchmark performance and production reliability.
+
+**Safety Implication**: Rapid capability advancement outpaces development of reliable evaluation methods, creating blind spots in AI risk assessment as models approach human-level performance on narrow benchmarks while exhibiting unpredictable behaviors in real-world deployment. This evaluation-reality gap poses critical challenges for <EntityLink id="why-alignment-hard">alignment research</EntityLink> and safety validation.
+
+The <R id="54fcb72b74acfae9">recent o3 release</R> achieved 87.5% on ARC-AGI, representing a 3x improvement over previous models and bringing us to the threshold of AGI capability markers on several benchmarks simultaneously.
+
+### Capability Trajectory Overview
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph INPUTS["Capability Drivers"]
+        COMPUTE[Compute Scale]
+        DATA[Training Data]
+        ARCH[Architecture Innovation]
+        POST[Post-Training Methods]
+    end
+
+    subgraph BENCHMARKS["Benchmark Categories"]
+        LANG[Language Understanding<br/>MMLU: 96.7%]
+        CODE[Coding<br/>HumanEval: 96.3%]
+        REASON[Reasoning<br/>ARC-AGI: 87.5%]
+        MULTI[Multimodal<br/>MMMU: 78.2%]
+    end
+
+    subgraph GAPS["Persistent Gaps"]
+        ROBUST[Adversarial Robustness<br/>75-95% attack success]
+        HORIZON[Long-Horizon Tasks<br/>under 10% at 4+ hours]
+        DEPLOY[Deployment Reliability<br/>Limited studies]
+    end
+
+    subgraph SAFETY["Safety Implications"]
+        EVAL[Evaluation-Reality Gap]
+        ALIGN[Alignment Validation Risk]
+    end
+
+    INPUTS --> BENCHMARKS
+    BENCHMARKS --> |Near saturation| GAPS
+    GAPS --> SAFETY
+
+    style LANG fill:#ccffcc
+    style CODE fill:#ccffcc
+    style REASON fill:#ccffcc
+    style MULTI fill:#ffffcc
+    style ROBUST fill:#ffcccc
+    style HORIZON fill:#ffcccc
+    style DEPLOY fill:#ffcccc
+    style EVAL fill:#ffcccc
+    style ALIGN fill:#ffcccc
+`} />
+
+---
+
+## Risk Assessment
+
+<DataInfoBox title="Capability Progress vs. Safety Evaluation" type="risk">
+
+| Risk Factor | Severity | Likelihood | Timeline | Trend |
+|-------------|----------|------------|----------|--------|
+| Benchmark Saturation | **High** | Very High (95%) | 2024-2025 | Accelerating |
+| Evaluation-Reality Gap | **High** | High (80%) | Ongoing | Widening |
+| Adversarial Vulnerability | **High** | High (85%) | Persistent | Worsening |
+| Long-Horizon Task Failure | **Medium** | Medium (60%) | 2025-2027 | Improving |
+| Safety Evaluation Lag | **Critical** | Very High (95%) | Ongoing | Worsening |
+
+**Critical Insight**: As benchmarks saturate, our ability to discriminate between model capabilities diminishes precisely when safety evaluation becomes most crucial for alignment difficulty assessment. The o3 breakthrough on ARC-AGI suggests we may hit AGI capability thresholds before robust safety evaluation frameworks are established.
+
+</DataInfoBox>
+
+---
+
+## Language Understanding & General Knowledge
+
+### MMLU Trajectory and Saturation
+
+<R id="0ad47133f1d6c2c0">MMLU (Massive Multitask Language Understanding)</R> consists of 15,908 multiple-choice questions spanning 57 subjects, from STEM fields to humanities, serving as the primary benchmark for general knowledge assessment.
+
+| Model | Release Date | MMLU Score | Performance Gap | Progress Rate |
+|-------|--------------|------------|-----------------|---------------|
+| GPT-3 (175B) | June 2020 | 43.9% | -45.9% vs human | Baseline |
+| **GPT-4** | **March 2023** | **86.4%** | **-3.4% vs human** | **+42.5%** |
+| <R id="3b8b5072889c4f8a">Gemini 1.0 Ultra</R> | Dec 2023 | 90.0% | +0.2% vs human | 5-shot evaluation |
+| <R id="e91e6f80eaaceb58">Claude 3.5 Sonnet</R> | June 2024 | 88.3% | -1.5% vs human | Near saturation |
+| **<R id="90b3a9520ffec0d7">OpenAI o1</R>** | **Sept 2024** | **92.3%** | **+2.5% vs human** | **Clear saturation** |
+| **<R id="54fcb72b74acfae9">OpenAI o3</R>** | **Dec 2024** | **96.7%** | **+6.9% vs human** | **Super-human** |
+
+**Human Expert Baseline**: 89.8% (established through expert evaluation by <R id="0635974beafcf9c5">Hendrycks et al.</R>)
+
+**Critical Observations**:
+- **53 percentage point gain** in 4.5 years (2020-2024), with acceleration after reasoning models
+- o3's 96.7% represents a **6.9 percentage point leap** beyond human expert performance 
+- **Data quality issues**: <R id="999344796992fb9f">6.5% of questions contain errors</R> according to <R id="999344796992fb9f">Yadav et al. analysis</R>
+- **Training contamination concerns**: Many models likely trained on MMLU data per <R id="5064f6e55c994ee4">contamination studies</R>
+
+### Next-Generation Benchmarks
+
+**MMLU-Pro**: Introduced as harder variant to address saturation, featuring more complex reasoning requirements and reduced guessing advantage.
+
+| Model | MMLU-Pro Score | Performance vs. MMLU | Saturation Status |
+|-------|----------------|---------------------|-------------------|
+| <R id="ee605bab036068f0">GPT-4o</R> | 72.6% | -13.8% difficulty gap | Moderate headroom |
+| <R id="e91e6f80eaaceb58">Claude 3.5 Sonnet</R> | 78.0% | -10.3% difficulty gap | Approaching saturation |
+| **<R id="54fcb72b74acfae9">OpenAI o3</R>** | **92.1%** | **-4.6% gap** | **Near saturation** |
+
+**Evaluation Evolution**: MMLU-Pro approached saturation within 18 months of o3's release, demonstrating the accelerating pace of capability advancement. <R id="064e5d8266218028">SimpleQA</R> and other fact-grounded benchmarks now serve as primary discriminators.
+
+---
+
+## Reasoning & AGI Capability Markers
+
+### ARC-AGI: The AGI Capability Threshold
+
+<R id="79a8204bfbccf20f">ARC-AGI (Abstraction and Reasoning Corpus)</R> contains 800+ visual reasoning tasks designed to test general intelligence through pattern recognition and abstraction, widely considered the most reliable AGI capability indicator.
+
+| Model | ARC-AGI Score | Human Performance | AGI Assessment | Breakthrough Factor |
+|-------|---------------|------------------|----------------|-------------------|
+| **Human Baseline** | **85%** | Reference standard | AGI threshold | — |
+| GPT-4o (2024) | 9.2% | Far below threshold | Not AGI | — |
+| Claude 3.5 Sonnet | 14.7% | Below threshold | Not AGI | — |
+| **<R id="90b3a9520ffec0d7">OpenAI o1-preview</R>** | **25%** | **Approaching threshold** | **Early AGI signals** | **2.7x improvement** |
+| **<R id="54fcb72b74acfae9">OpenAI o3</R>** | **87.5%** | **Exceeds human baseline** | **AGI capability achieved** | **3.5x over o1** |
+
+**Critical Breakthrough**: o3's 87.5% ARC-AGI performance represents the first model to exceed human-level general reasoning capability, marking a potential AGI milestone per <R id="05b717693daa745f">François Chollet</R> and <R id="595ede0651dc078d">Mike Knoop's analysis</R>.
+
+**Validation Concerns**: 
+- **Test-time compute scaling**: o3 required \$10,000+ per task using massive inference compute
+- **Efficiency gap**: 1000x more expensive than human-equivalent performance
+- **Generalization uncertainty**: Performance on holdout sets vs. public benchmarks unknown
+
+### Advanced Mathematical Reasoning
+
+**MATH Dataset Performance Evolution**:
+
+| Model Type | MATH Score | Improvement vs 2023 | Human Baseline Comparison |
+|------------|------------|-------------------|--------------------------|
+| **GPT-4 (2023)** | **42.5%** | Baseline | Human competitive (40%) |
+| <R id="90b3a9520ffec0d7">OpenAI o1</R> | 83.3% | +40.8% | 2.1x human performance |
+| **<R id="54fcb72b74acfae9">OpenAI o3</R>** | **96.7%** | **+54.2%** | **2.4x human performance** |
+
+**Competition Mathematics (AIME 2024)**:
+- **o1-preview**: Scored 83rd percentile among human competitors
+- **o3**: Achieved 96.7% accuracy, surpassing 99% of human mathematical competition participants
+
+**Implication for <EntityLink id="scientific-research">Scientific Research</EntityLink>**: Mathematical breakthrough capability suggests potential for automated theorem proving and advanced scientific reasoning, though formal verification gaps persist.
+
+---
+
+## Coding Capabilities Assessment
+
+### HumanEval Performance Evolution
+
+<R id="9edbbd4ae30cd1f8">HumanEval</R> contains 164 Python programming problems testing code generation from natural language specifications, serving as the standard coding benchmark.
+
+| Model | HumanEval Score | EvalPlus Score | Robustness Gap | Progress Notes |
+|-------|----------------|----------------|----------------|----------------|
+| **<R id="54fcb72b74acfae9">OpenAI o3</R>** | **96.3%** | **89.2%** | **-7.1%** | Near-perfect |
+| <R id="90b3a9520ffec0d7">OpenAI o1</R> | 92.1% | 89.0% | -3.1% | Strong performance |
+| <R id="e91e6f80eaaceb58">Claude 3.5 Sonnet</R> | 92.0% | 87.3% | -4.7% | Balanced |
+| <R id="e8f0a037900ef044">Qwen2.5-Coder-32B</R> | 89.5% | 87.2% | -2.3% | Specialized model |
+| **Historical (2021)** | **Codex: 28.8%** | **—** | **—** | **Initial baseline** |
+
+**Progress Rate**: 28.8% → 96.3% in 3.5 years (2021-2024), representing the fastest benchmark progression observed across all domains.
+
+**Robustness Analysis**: The persistent 3-7% gap between HumanEval and <R id="a6abd72df7a3dc9d">EvalPlus</R> (with additional test cases) reveals ongoing reliability challenges, highlighting concerns for <EntityLink id="coding">software safety applications</EntityLink>.
+
+### Real-World Software Engineering
+
+**<R id="433a37bad4e66a78">SWE-bench</R>**: Contains 2,294 real GitHub issues from open-source repositories, testing actual software engineering capabilities.
+
+| Benchmark Version | 2024 Best | 2025 Current | Model | Improvement Factor |
+|-------------------|-----------|--------------|-------|-------------------|
+| **SWE-bench Full** | 12.3% (Devin) | 48.9% (o3) | <R id="54fcb72b74acfae9">OpenAI o3</R> | **4.0x** |
+| SWE-bench Lite | 43.0% (Multiple) | 71.7% (o3) | OpenAI o3 | 1.7x |
+| **SWE-bench Verified** | 33.2% (Claude) | 71.2% (o3) | OpenAI o3 | **2.1x** |
+
+**Key Insights**:
+- **Capability leap**: o3 represents a 4x improvement over 2024's best autonomous coding systems
+- **Remaining gaps**: Even 71% success on curated problems indicates significant real-world deployment limitations
+- **Agent orchestration**: Best results achieved through sophisticated multi-agent workflows rather than single model inference
+
+### Programming Competition Performance
+
+| Competition | o3 Performance | Human Baseline | Competitive Ranking |
+|-------------|----------------|----------------|-------------------|
+| **Codeforces** | **2727 Elo rating** | ≈1500 Elo (average) | **Top 175th percentile** |
+| IOI (International Olympiad) | Gold medal equivalent | Variable by year | Elite competitive level |
+| **USACO** | **Advanced division** | Beginner-Advanced | **Top tier** |
+
+**Significance**: Programming competition success demonstrates sophisticated algorithmic thinking and optimization capabilities relevant to <EntityLink id="self-improvement">self-improvement</EntityLink> and <EntityLink id="scientific-research">autonomous research</EntityLink>.
+
+---
+
+## Autonomous Task Performance & Agent Capabilities
+
+### Time Horizon Analysis
+
+**50%-task-completion time horizon**: The duration of tasks that AI systems can complete with 50% reliability, serving as a key metric for practical autonomous capability.
+
+| Model | Release Date | 50% Time Horizon | Doubling Period | Performance Notes |
+|-------|--------------|------------------|-----------------|-------------------|
+| Early models | 2019 | ≈5 minutes | — | Basic task completion |
+| <R id="39f08ad975b7f4db">GPT-4</R> | March 2023 | ≈15 minutes | 7 months (historical) | Reasoning breakthrough |
+| <R id="e91e6f80eaaceb58">Claude 3.5 Sonnet</R> | June 2024 | ≈45 minutes | 5-6 months trend | Planning advancement |
+| **OpenAI o1** | **Sept 2024** | **≈90 minutes** | **Accelerating** | **Reasoning models** |
+| **Projected (o3 class)** | **Dec 2024** | **≈3 hours** | **4-month doubling** | **Agent workflows** |
+
+**Projections Based on Current Trends**:
+- **Conservative (6-month doubling)**: Day-long autonomous tasks by late 2027
+- **Accelerated (4-month trend)**: Day-long tasks by mid-2026  
+- **Critical threshold**: Week-long reliable task completion by 2027-2029
+
+### Agent Framework Performance
+
+**SWE-Agent Autonomous Success Rates**:
+
+| Task Category | 6-month Success Rate | 12-month Success Rate | Key Limitations | Safety Implications |
+|---------------|---------------------|----------------------|-----------------|-------------------|
+| **Code Generation** | **85%** | **95%** | Requirements clarity | Automated vulnerability introduction |
+| **Bug Fixes** | **65%** | **78%** | Legacy system complexity | Critical system modification |
+| **Feature Implementation** | **45%** | **67%** | Cross-component integration | Unintended behavioral changes |
+| **System Architecture** | **15%** | **23%** | Long-term consequences | Fundamental security design flaws |
+
+**Critical Finding**: Success rates show clear inverse correlation with task complexity and planning horizon, indicating fundamental limitations in <EntityLink id="long-horizon">long-horizon planning</EntityLink> despite benchmark achievements.
+
+### Domain-Specific Autonomous Performance
+
+| Domain | Current Success | 2025 Projection | Critical Success Factors | Safety Concerns |
+|--------|----------------|-----------------|-------------------------|-----------------|
+| **Software Development** | **67%** | **85%** | Clear specifications | Code security, backdoors |
+| **Research Analysis** | **52%** | **72%** | Data access, validation | Biased conclusions, fabrication |
+| **Financial Analysis** | **23%** | **35%** | Regulatory compliance | Market manipulation potential |
+| **Administrative Tasks** | **8%** | **15%** | Human relationship management | Privacy, compliance violations |
+| **Creative Content** | **91%** | **97%** | Quality evaluation metrics | Misinformation, copyright |
+
+---
+
+## Context Window & Memory Architecture
+
+### Context Length Evolution (2022-2025)
+
+| Model Family | 2022 | 2023 | 2024 | 2025 | Growth Factor |
+|--------------|------|------|------|------|---------------|
+| **<R id="04d39e8bd5d50dd5">GPT</R>** | 4K | 8K | 128K | 2M (o3) | **500x** |
+| **<R id="afe2508ac4caf5ee">Claude</R>** | — | 100K | 200K | 200K | **2x** |
+| **<R id="3b8b5072889c4f8a">Gemini</R>** | — | — | 1M | 2M | **2x** |
+
+### Effective Context Utilization
+
+| Model | Advertised Capacity | Effective Utilization | Performance at Limits | Validation Method |
+|-------|-------------------|---------------------|---------------------|-------------------|
+| **<R id="90b3a9520ffec0d7">o1/o3 class</R>** | **2M tokens** | **≈1.8M tokens** | **&lt;10% degradation** | **Chain-of-thought maintained** |
+| <R id="e91e6f80eaaceb58">Claude 3.5 Sonnet</R> | 200K tokens | ≈190K tokens | &lt;5% degradation | <R id="17f8e83fab7b0fa7">Needle-in-haystack</R> |
+| <R id="08aca1a4de71818f">Gemini 2.0 Flash</R> | 2M tokens | ≈1.5M tokens | 15% degradation | Community testing |
+
+**Safety Implications of Massive Context**:
+- Enhanced <EntityLink id="situational-awareness">situational awareness</EntityLink> through comprehensive information integration
+- Ability to process entire software projects for vulnerability analysis
+- Comprehensive document analysis enabling sophisticated <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink> strategies
+- Long-term conversation memory enabling persistent relationship manipulation
+
+---
+
+## Multimodal & Real-Time Capabilities
+
+### Modality Integration Matrix (2025)
+
+| Model | Text | Vision | Audio | Video | 3D/Spatial | Native Integration |
+|-------|------|--------|-------|-------|-----------|-------------------|
+| **<R id="08aca1a4de71818f">Gemini 2.0 Flash</R>** | ✓ | ✓ | ✓ | ✓ | ✓ | **Unified architecture** |
+| <R id="ee605bab036068f0">GPT-4o</R> | ✓ | ✓ | ✓ | ✓ | ✗ | Real-time processing |
+| **<R id="90b3a9520ffec0d7">OpenAI o1</R>** | **✓** | **✓** | **Limited** | **✗** | **✗** | **Text-vision focus** |
+| <R id="e91e6f80eaaceb58">Claude 3.5 Sonnet</R> | ✓ | ✓ | ✗ | ✗ | ✗ | Vision-language only |
+
+### Multimodal Performance Benchmarks
+
+**MMMU (Multimodal Understanding)**: College-level tasks requiring integration of text, images, and diagrams.
+
+| Model | MMMU Score | Gap to Human Expert (82.6%) | Annual Progress | Saturation Timeline |
+|-------|------------|---------------------------|-----------------|-------------------|
+| **<R id="90b3a9520ffec0d7">OpenAI o1</R> (2024)** | **78.2%** | **-4.4%** | Near-human | 6 months to parity |
+| <R id="3b8b5072889c4f8a">Google Gemini 1.5</R> | 62.4% | -20.2% | — | 12-18 months |
+| **Annual Improvement** | **+15.8%** | **76% gap closed** | Accelerating | — |
+
+**Real-Time Processing Capabilities**:
+
+| Application | Latency Requirement | Current Best | Model | Deployment Readiness |
+|-------------|-------------------|-------------|-------|-------------------|
+| **Voice Conversation** | **&lt;300ms** | **180ms** | Gemini 2.0 Flash | **Production ready** |
+| **Video Analysis** | &lt;1 second/frame | 200ms | GPT-4o | Beta deployment |
+| **AR/VR Integration** | &lt;20ms | 50ms | Specialized models | Research phase |
+| **Robotics Control** | &lt;10ms | 100ms | Not achieved | Development needed |
+
+---
+
+## Scientific Discovery & Research Capabilities
+
+### Breakthrough Impact Assessment
+
+**<R id="ba8ca1cafdf06556">AlphaFold</R> Global Scientific Impact (2020-2025)**:
+
+| Impact Metric | 2024 Value | 2025 Projection | Global Significance | Transformation Factor |
+|---------------|------------|-----------------|-------------------|---------------------|
+| **Active Researchers** | **3.2 million** | **4.5 million** | Universal adoption | 150x access increase |
+| **Academic Citations** | **47,000+** | **65,000+** | Most cited AI work | 15x normal impact |
+| **Drug Discovery Programs** | **1,200+** | **2,000+** | Pharmaceutical industry | 3x traditional methods |
+| **Clinical Trial Drugs** | **6** | **15-20** | Direct medical impact | First AI-designed medicines |
+
+### AlphaFold 3 Enhanced Capabilities (2024)
+
+**Molecular Interaction Modeling**:
+
+| Interaction Type | Prediction Accuracy | Previous Methods | Improvement Factor | Applications |
+|------------------|-------------------|------------------|-------------------|--------------|
+| **Protein-Ligand** | **76%** | **≈40%** | **1.9x** | Drug design |
+| **Protein-DNA** | **72%** | **≈45%** | **1.6x** | Gene regulation |
+| **Protein-RNA** | **69%** | **≈30%** | **2.3x** | Therapeutic RNA |
+| **Complex Assembly** | **67%** | **≈25%** | **2.7x** | Vaccine development |
+
+### Automated Scientific Discovery
+
+**<R id="632f5e9472fa8e55">FunSearch</R>** Mathematical Discoveries (2024):
+- **Set Cover Problem**: Found new constructions improving 20-year-old bounds
+- **Bin Packing**: Discovered novel online algorithms exceeding previous best practices
+- **Combinatorial Optimization**: Generated proofs for previously unknown mathematical relationships
+
+**Research Paper Generation**:
+
+| Capability | Current Performance | Human Comparison | Reliability Assessment | Domain Limitations |
+|------------|-------------------|------------------|----------------------|-------------------|
+| **Literature Review** | **85% quality** | **Competitive** | High accuracy | Requires fact-checking |
+| **Hypothesis Generation** | **72% novelty** | **Above average** | Medium reliability | Domain knowledge gaps |
+| **Experimental Design** | **45% feasibility** | **Below expert** | Low reliability | Context limitations |
+| **Data Analysis** | **81% accuracy** | **Near expert** | High reliability | Statistical validity |
+
+**Critical Assessment**: While AI accelerates research processes, breakthrough discoveries remain primarily human-driven with AI assistance rather than AI-originated insights, indicating gaps in creative <EntityLink id="scientific-research">scientific research capabilities</EntityLink>.
+
+---
+
+## Robustness & Security Evaluation
+
+### Adversarial Attack Resistance (2025 Assessment)
+
+**<R id="fe2d9551e69e5ba9">Scale AI Adversarial Robustness</R>**: 1,500+ human-designed attacks across risk categories.
+
+| Attack Category | Success Rate vs. Best Models | Defense Effectiveness | Research Priority | Progress Trend |
+|-----------------|----------------------------|---------------------|-------------------|----------------|
+| **Prompt Injection** | **75-90%** | **Minimal** | **Critical** | **Worsening** |
+| **Multimodal Jailbreaking** | **80-95%** | **Largely undefended** | **Critical** | **New vulnerability** |
+| **Chain-of-Thought Manipulation** | **60-75%** | **Moderate** | **High** | **Emerging** |
+| **Adversarial Examples** | **45-65%** | **Some progress** | **Medium** | **Arms race** |
+
+### Robustness vs. Capability Trade-offs
+
+**<R id="e99a5c1697baa07d">Constitutional AI Defense Analysis</R>**:
+
+| Defense Method | Robustness Gain | Capability Loss | Implementation Cost | Adoption Rate |
+|----------------|-----------------|-----------------|-------------------|---------------|
+| **Constitutional Training** | **+32%** | **-8%** | High | 60% (major labs) |
+| **Adversarial Fine-tuning** | **+45%** | **-15%** | Very High | 25% (research) |
+| **Input Filtering** | **+25%** | **-3%** | Medium | 85% (production) |
+| **Output Monitoring** | **+18%** | **&lt;1%** | Low | 95% (deployed) |
+
+### Persistent Vulnerabilities & Attack Evolution
+
+**Automated Jailbreaking Systems**:
+
+| Attack System | Success Rate 2024 | Success Rate 2025 | Evolution Factor | Defense Response |
+|---------------|-------------------|-------------------|------------------|------------------|
+| **<R id="9ccb89cd8bb8243e">GCG</R>** | **65%** | **78%** | **Automated scaling** | Minimal |
+| **AutoDAN** | 52% | 71% | LLM-generated attacks | Reactive patching |
+| **Multimodal Injection** | 89% | 94% | Image-text fusion | No systematic defense |
+| **Gradient-based Methods** | 43% | 67% | White-box optimization | Research countermeasures |
+
+**Critical Security Gap**: Attack sophistication is advancing faster than defense mechanisms, particularly for multimodal and chain-of-thought systems, creating escalating vulnerabilities for <EntityLink id="responsible-scaling-policies">AI safety deployment</EntityLink>.
+
+---
+
+## Current State & Trajectory Assessment
+
+### Capability Milestone Timeline
+
+| Capability Threshold | Achievement Date | Model | Significance Level | Next Barrier |
+|---------------------|------------------|-------|-------------------|--------------|
+| **AGI Reasoning (ARC-AGI 85%+)** | **Dec 2024** | **OpenAI o3** | **AGI milestone** | **Efficiency scaling** |
+| **Human-Level Programming** | Sept 2024 | OpenAI o1 | Professional capability | Real-world deployment |
+| **PhD-Level Mathematics** | Sept 2024 | OpenAI o1 | Academic expertise | Theorem proving |
+| **Multimodal Integration** | June 2024 | GPT-4o | Practical applications | Real-time robotics |
+| **Expert-Level Knowledge** | March 2023 | GPT-4 | General competence | Specialized domains |
+
+### Scaling Law Evolution & Limitations
+
+**Chinchilla Scaling vs. Observed Performance**:
+
+| Model Generation | Predicted Performance | Actual Performance | Scaling Factor | Explanation |
+|------------------|---------------------|-------------------|----------------|-------------|
+| **GPT-4** | 85% MMLU (predicted) | 86.4% MMLU | 1.02x | On-trend |
+| **o1-class** | 87% MMLU (predicted) | 92.3% MMLU | **1.06x** | **Reasoning breakthrough** |
+| **o3-class** | 93% MMLU (predicted) | 96.7% MMLU | **1.04x** | **Test-time compute** |
+
+**Post-Training Enhancement Impact**:
+- **Reinforcement Learning from Human Feedback (RLHF)**: 5-15% capability improvements
+- **Constitutional AI**: 8-20% safety improvements with minimal capability loss  
+- **Test-time Compute Scaling**: 15-40% improvements on reasoning tasks
+- **Multi-agent Orchestration**: 25-60% improvements on complex tasks
+
+### Benchmark Exhaustion & Next Frontiers
+
+**Saturated Evaluation Targets**:
+
+| Benchmark | Saturation Date | Best Performance | Replacement Evaluation | Status |
+|-----------|----------------|------------------|----------------------|--------|
+| **MMLU** | Dec 2024 | 96.7% (o3) | MMLU-Pro, domain-specific | **Exhausted** |
+| **GSM8K** | Early 2024 | 97%+ (multiple) | Competition math | **Exhausted** |
+| **HumanEval** | Mid 2024 | 96.3% (o3) | SWE-bench, real systems | **Exhausted** |
+| **HellaSwag** | Late 2023 | 95%+ (multiple) | Situational reasoning | **Exhausted** |
+
+**Emerging Evaluation Priorities**:
+- **Real-world deployment reliability**: Multi-day task success rates
+- **Adversarial robustness**: Systematic attack resistance  
+- **Safety alignment**: Value preservation under capability scaling
+- **Efficiency metrics**: Performance per FLOP and per dollar cost
+
+---
+
+## Key Uncertainties & Research Cruxes
+
+### Critical Evaluation Gaps
+
+| Uncertainty Domain | Impact on AI Safety | Current Evidence Quality | Research Priority |
+|-------------------|-------------------|------------------------|-------------------|
+| **Deployment Reliability** | Critical | Poor (limited studies) | **Urgent** |
+| **Emergent Capability Prediction** | High | Medium (scaling laws) | **High** |
+| **Long-term Behavior Consistency** | High | Poor (no systematic tracking) | **High** |
+| **Adversarial Robustness Scaling** | Medium | Poor (conflicting results) | Medium |
+
+### Expert Disagreement on Implications
+
+**AGI Timeline Assessments Post-o3**:
+
+| Expert Category | AGI Timeline | Key Evidence | Confidence Level |
+|----------------|--------------|--------------|------------------|
+| **<R id="1befe71d79c4d102">Optimistic Researchers</R>** | **2025-2027** | **o3 ARC-AGI breakthrough** | **High** |
+| **<R id="f771d4f56ad4dbaa">Cautious Researchers</R>** | **2028-2032** | **Efficiency and deployment gaps** | **Medium** |
+| **<R id="57e46933e5a96e78">Conservative Researchers</R>** | **2030+** | **Real-world deployment limitations** | **Low** |
+
+**Crux: Test-Time Compute Scaling**:
+- **Scaling optimists**: Test-time compute represents sustainable capability advancement  
+- **Scaling pessimists**: Cost prohibitive for practical deployment (\$10K per difficult task)
+- **Evidence**: o3 required 172x more compute than o1 for ARC-AGI performance gains
+
+### Safety Research Implications
+
+**Alignment Research Prioritization Debates**:
+
+| Research Direction | Current Investment | Capability-Safety Gap | Priority Assessment |
+|------------------|-------------------|---------------------|-------------------|
+| **Interpretability** | **High** | **Widening** | **Critical** |
+| **Robustness Training** | **Medium** | **Stable** | **High** |
+| **AI Alignment Theory** | **Medium** | **Widening** | **Critical** |
+| **Control and Containment** | **Medium** | **Stable** | **High** |
+| **Scalable Oversight** | **High** | **Narrowing** | **Medium-High** |
+
+---
+
+## Sources & Resources
+
+### Benchmark Research
+
+- **Stanford HAI (2025):** [AI Index Report - Technical Performance](https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance) - Comprehensive analysis of benchmark saturation and frontier model performance
+- **Stanford HAI (2025):** [AI Benchmarks Hit Saturation](https://hai.stanford.edu/news/ai-benchmarks-hit-saturation) - Analysis of benchmark ceiling effects across 50+ evaluations
+- **METR (2025):** [Measuring AI Ability to Complete Long Tasks](https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/) - Time horizon research showing 7-month doubling period
+- **OpenAI (2025):** [FrontierScience Benchmark](https://openai.com/index/frontierscience/) - New evaluation framework for scientific reasoning
+- **ARC Prize (2024):** [OpenAI o3 Breakthrough on ARC-AGI](https://arcprize.org/blog/oai-o3-pub-breakthrough) - Detailed analysis of o3's 87.5% score and cost considerations
+
+### AI Agent Capabilities
+
+- **METR (2024):** [Evaluating R&D Capabilities of LLMs](https://metr.org/blog/2024-11-22-evaluating-r-d-capabilities-of-llms/) - RE-Bench evaluation of AI research engineering abilities
+- **AI Digest (2025):** [A New Moore's Law for AI Agents](https://theaidigest.org/time-horizons) - Analysis of exponential task completion improvements
+
+### Model Releases and Documentation
+
+- **Anthropic:** <R id="e91e6f80eaaceb58">Claude 3.5 Sonnet Documentation</R> - Performance benchmarks and capabilities
+- **OpenAI:** <R id="54fcb72b74acfae9">OpenAI o3 Documentation</R> - Architecture and benchmark results
+- **Google DeepMind:** <R id="3b8b5072889c4f8a">Gemini Technical Report</R> - Multimodal capabilities and evaluation
+
+### Safety and Alignment Implications
+
+- **RAND (2025):** [Comprehensive Benchmarking of Biological Knowledge](https://www.rand.org/pubs/research_reports/RRA3797-1.html) - Assessment of frontier LLM biosecurity capabilities
+- **Anthropic (2023):** <R id="e99a5c1697baa07d">Constitutional AI Research</R> - Robustness-capability tradeoff analysis
+
+---
+
+## AI Transition Model Context
+
+AI capabilities metrics directly inform the <EntityLink id="ai-transition-model" /> across multiple parameters:
+
+| Parameter | Relationship | Tracking Importance |
+|-----------|--------------|-------------------|
+| <EntityLink id="ai-capabilities" /> | Primary output measure | Benchmark performance tracks capability trajectory |
+| <EntityLink id="agi-timeline" /> | Forecasting input | Benchmark saturation indicates proximity to AGI |
+| <EntityLink id="misalignment-potential" /> | Safety evaluation | Capability-safety gap assessment requires accurate metrics |
+| <EntityLink id="human-oversight-quality" /> | Scalability concern | Evaluation-reality gap undermines oversight |
+
+---
+
+## Related Pages
+
+<Backlinks client:load entityId="capabilities" />

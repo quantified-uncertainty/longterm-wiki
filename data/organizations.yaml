@@ -1,0 +1,269 @@
+# Organizations Database
+# Labs, research orgs, government institutes, funders
+
+# =============================================================================
+# FRONTIER LABS
+# =============================================================================
+
+- id: anthropic
+  name: Anthropic
+  type: frontier-lab
+  founded: "2021"
+  headquarters: San Francisco, CA
+  website: https://anthropic.com
+  description: >
+    AI safety company founded by former OpenAI researchers. Develops Claude
+    family of models with focus on safety research.
+  keyPeople:
+    - dario-amodei
+    - daniela-amodei
+    - chris-olah
+    - jan-leike
+  funding: "$7B+"
+  employees: "~1000"
+  safetyFocus: >
+    Constitutional AI, interpretability research, responsible scaling policies.
+    Publishes safety research openly.
+
+- id: openai
+  name: OpenAI
+  type: frontier-lab
+  founded: "2015"
+  headquarters: San Francisco, CA
+  website: https://openai.com
+  description: >
+    Originally non-profit, now capped-profit. Develops GPT series and pursues AGI.
+    Founded superalignment team in 2023.
+  keyPeople:
+    - sam-altman
+    - ilya-sutskever
+  funding: "$13B+ from Microsoft"
+  employees: "~1500"
+  safetyFocus: >
+    Superalignment team (now disbanded). RLHF development. Some interpretability.
+    Safety culture has been criticized.
+
+- id: deepmind
+  name: Google DeepMind
+  type: frontier-lab
+  founded: "2010"
+  headquarters: London, UK
+  website: https://deepmind.google
+  description: >
+    Google's AI research lab. Merged with Google Brain in 2023. Developed AlphaGo,
+    AlphaFold, Gemini.
+  keyPeople:
+    - demis-hassabis
+    - shane-legg
+  funding: Google subsidiary
+  employees: "~2000"
+  safetyFocus: >
+    Scalable agent alignment team. Some interpretability. Safety culture varies by team.
+
+# =============================================================================
+# SAFETY RESEARCH ORGS
+# =============================================================================
+
+- id: miri
+  name: Machine Intelligence Research Institute
+  type: safety-org
+  founded: "2000"
+  headquarters: Berkeley, CA
+  website: https://intelligence.org
+  description: >
+    Pioneer AI safety research organization. Founded as Singularity Institute.
+    Focus on agent foundations and mathematical AI safety.
+  keyPeople:
+    - eliezer-yudkowsky
+    - nate-soares
+  funding: "~$5M/year"
+  employees: "~15"
+  safetyFocus: >
+    Agent foundations, decision theory, deceptive alignment. Currently
+    pursuing new research directions after pivoting from earlier approaches.
+
+- id: arc
+  name: Alignment Research Center
+  type: safety-org
+  founded: "2021"
+  headquarters: Berkeley, CA
+  website: https://alignment.org
+  description: >
+    Alignment research org founded by Paul Christiano. Focus on scalable
+    alignment and theoretical AI safety.
+  keyPeople:
+    - paul-christiano
+  funding: "~$10M/year"
+  employees: "~20"
+  safetyFocus: >
+    ELK (Eliciting Latent Knowledge), scalable oversight, evaluation of
+    dangerous capabilities.
+
+- id: redwood
+  name: Redwood Research
+  type: safety-org
+  founded: "2021"
+  headquarters: Berkeley, CA
+  website: https://redwoodresearch.org
+  description: >
+    Applied alignment research organization. Focus on empirical safety research.
+  keyPeople:
+    - buck-shlegeris
+    - neel-nanda
+  funding: "~$8M/year"
+  employees: "~25"
+  safetyFocus: >
+    Interpretability, adversarial training, ARENA training program.
+
+# =============================================================================
+# ACADEMIC INSTITUTIONS
+# =============================================================================
+
+- id: chai
+  name: Center for Human-Compatible AI
+  type: academic
+  founded: "2016"
+  headquarters: Berkeley, CA
+  website: https://humancompatible.ai
+  description: >
+    UC Berkeley research center directed by Stuart Russell. Focus on
+    value alignment and beneficial AI.
+  keyPeople:
+    - stuart-russell
+  parentOrg: uc-berkeley
+  safetyFocus: >
+    Inverse reinforcement learning, assistance games, value alignment.
+
+- id: cais
+  name: Center for AI Safety
+  type: academic
+  founded: "2022"
+  headquarters: San Francisco, CA
+  website: https://safe.ai
+  description: >
+    Research and field-building organization. Runs compute grants,
+    produces policy research.
+  keyPeople:
+    - dan-hendrycks
+  safetyFocus: >
+    Representation engineering, anomaly detection, AI safety advocacy,
+    field-building programs.
+
+# =============================================================================
+# GOVERNMENT INSTITUTES
+# =============================================================================
+
+- id: uk-aisi
+  name: UK AI Safety Institute
+  type: government
+  founded: "2023"
+  headquarters: London, UK
+  website: https://gov.uk/government/organisations/ai-safety-institute
+  description: >
+    UK government AI safety institute. Evaluates frontier models, develops
+    safety standards, coordinates internationally.
+  keyPeople:
+    - ian-hogarth
+  parentOrg: uk-dsit
+  safetyFocus: >
+    Pre-deployment evaluation, dangerous capability assessment, Inspect framework.
+
+- id: us-aisi
+  name: US AI Safety Institute
+  type: government
+  founded: "2024"
+  headquarters: Gaithersburg, MD
+  website: https://nist.gov/aisi
+  description: >
+    US government AI safety institute within NIST. Coordinates US AI safety policy.
+  keyPeople:
+    - paul-christiano
+    - elizabeth-kelly
+  parentOrg: nist
+  safetyFocus: >
+    Evaluation guidelines, coordinating with UK AISI, supporting executive order.
+
+# =============================================================================
+# ADDITIONAL ORGS
+# =============================================================================
+
+- id: fhi
+  name: Future of Humanity Institute
+  type: academic
+  founded: "2005"
+  headquarters: Oxford, UK
+  website: https://www.fhi.ox.ac.uk
+  description: >
+    Oxford research institute focused on existential risk. Closed in 2024.
+  keyPeople:
+    - nick-bostrom
+    - toby-ord
+  safetyFocus: >
+    Existential risk research, AI governance, macrostrategy.
+
+- id: mila
+  name: Mila - Quebec AI Institute
+  type: academic
+  founded: "1993"
+  headquarters: Montreal, Canada
+  website: https://mila.quebec
+  description: >
+    One of the world's largest academic AI research labs.
+  keyPeople:
+    - yoshua-bengio
+  safetyFocus: >
+    AI safety research, responsible AI development.
+
+- id: conjecture
+  name: Conjecture
+  type: safety-org
+  founded: "2022"
+  headquarters: London, UK
+  website: https://conjecture.dev
+  description: >
+    AI safety startup focused on alignment research.
+  keyPeople:
+    - connor-leahy
+  safetyFocus: >
+    Interpretability, cognitive emulation, alignment research.
+
+- id: ssi
+  name: Safe Superintelligence Inc.
+  type: safety-org
+  founded: "2024"
+  headquarters: Palo Alto, CA
+  website: https://ssi.inc
+  description: >
+    Startup focused solely on building safe superintelligence.
+  keyPeople:
+    - ilya-sutskever
+  safetyFocus: >
+    Pursuing superintelligence with safety as the core goal.
+
+# =============================================================================
+# FUNDERS
+# =============================================================================
+
+- id: coefficient-giving
+  name: Coefficient Giving
+  type: funder
+  founded: "2017"
+  headquarters: San Francisco, CA
+  website: https://coefficientgiving.org
+  description: >
+    Largest funder of AI safety research. EA-aligned foundation. Formerly known as Open Philanthropy (rebranded November 2025).
+  funding: "~$200M+/year to AI safety"
+  safetyFocus: >
+    Funds most major AI safety orgs, university programs, policy work.
+
+- id: sff
+  name: Survival and Flourishing Fund
+  type: funder
+  founded: "2019"
+  headquarters: San Francisco, CA
+  website: https://survivalandflourishing.fund
+  description: >
+    Donor-advised fund supporting existential risk reduction.
+  funding: "~$30-50M/year"
+  safetyFocus: >
+    AI safety research, unconventional projects, smaller grants.

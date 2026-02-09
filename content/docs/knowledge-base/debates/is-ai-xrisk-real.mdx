@@ -1,0 +1,80 @@
+---
+title: "Is AI Existential Risk Real?"
+description: "The fundamental debate about whether AI poses existential risk"
+sidebar:
+  order: 1
+importance: 25
+quality: 12
+llmSummary: "Presents two core cruxes in the AI x-risk debate: whether advanced AI would develop dangerous goals (instrumental convergence vs. trainable safety) and whether we'll get warning signs (gradual failures vs. deception/fast takeoff). No quantitative analysis, primary sources, or novel framing provided."
+ratings:
+  novelty: 1.5
+  rigor: 2
+  actionability: 1
+  completeness: 1.5
+metrics:
+  wordCount: 32
+  citations: 0
+  tables: 0
+  diagrams: 0
+clusters: ["ai-safety"]
+---
+import {InfoBox, KeyQuestions, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="is-ai-xrisk-real" client:load />
+
+<InfoBox
+  type="crux"
+  title="AI Existential Risk Debate"
+  customFields={[
+    { label: "Question", value: "Does AI pose genuine existential risk?" },
+    { label: "Stakes", value: "Determines priority of AI safety work" },
+    { label: "Expert Consensus", value: "Significant disagreement" },
+  ]}
+/>
+
+This is the foundational question in AI safety. Everything else depends on whether you believe AI could actually pose existential risk.
+
+## Key Cruxes
+
+What would change your mind on this debate?
+
+<KeyQuestions
+  client:load
+  questions={[
+    {
+      question: "If we built human-level AI, would it naturally develop dangerous goals?",
+      positions: [
+        {
+          position: "Yes - instrumental convergence applies",
+          confidence: "medium",
+          reasoning: "Power-seeking emerges from almost any goal. Training won't reliably prevent it.",
+          implications: "X-risk is real; alignment is critical"
+        },
+        {
+          position: "No - we can train safe systems",
+          confidence: "medium",
+          reasoning: "Goals come from training. We can instill safe goals and verify them.",
+          implications: "X-risk is manageable with standard safety engineering"
+        }
+      ]
+    },
+    {
+      question: "Will we get warning signs before catastrophe?",
+      positions: [
+        {
+          position: "Yes - problems will be visible first",
+          confidence: "low",
+          reasoning: "Weaker systems will fail in detectable ways. We can iterate to safety.",
+          implications: "Can learn from experience; less urgent"
+        },
+        {
+          position: "No - deception or fast takeoff prevents warning",
+          confidence: "medium",
+          reasoning: "Sufficiently capable AI might hide misalignment. Jump to dangerous capability.",
+          implications: "Must solve alignment before building dangerous AI"
+        }
+      ]
+    }
+  ]}
+/>
+

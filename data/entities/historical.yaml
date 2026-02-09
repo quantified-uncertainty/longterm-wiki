@@ -1,0 +1,259 @@
+# Historical Entities
+# Auto-generated from entities.yaml - edit this file directly
+
+- id: deep-learning-era
+  type: historical
+  title: Deep Learning Revolution Era
+  customFields:
+    - label: Period
+      value: 2012-2020
+    - label: Defining Event
+      value: AlexNet (2012) proves deep learning works at scale
+    - label: Key Theme
+      value: Capabilities acceleration makes safety urgent
+    - label: Outcome
+      value: AI safety becomes professionalized research field
+  relatedEntries:
+    - id: deepmind
+      type: organization
+    - id: openai
+      type: organization
+  sources:
+    - title: ImageNet Classification with Deep Convolutional Neural Networks
+      url: https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks
+      author: Krizhevsky et al.
+      date: '2012'
+    - title: Mastering the game of Go with deep neural networks
+      url: https://www.nature.com/articles/nature16961
+      author: Silver et al.
+      date: '2016'
+    - title: Concrete Problems in AI Safety
+      url: https://arxiv.org/abs/1606.06565
+      author: Amodei et al.
+      date: '2016'
+    - title: Language Models are Few-Shot Learners
+      url: https://arxiv.org/abs/2005.14165
+      author: Brown et al.
+      date: '2020'
+    - title: OpenAI Charter
+      url: https://openai.com/charter/
+      author: OpenAI
+      date: '2018'
+    - title: Safely Interruptible Agents
+      url: https://arxiv.org/abs/1606.06565
+      author: Orseau & Armstrong
+      date: '2016'
+    - title: Risks from Learned Optimization
+      url: https://arxiv.org/abs/1906.01820
+      author: Hubinger et al.
+      date: '2019'
+  description: >-
+    The deep learning revolution transformed AI from a field of limited successes to one of rapidly compounding
+    breakthroughs. For AI safety, this meant moving from theoretical concerns about far-future AGI to practical
+    questions about current and near-future systems.
+  tags:
+    - deep-learning
+    - alexnet
+    - alphago
+    - gpt
+    - deepmind
+    - openai
+    - concrete-problems
+    - scaling
+    - reward-hacking
+    - interpretability
+    - paul-christiano
+    - dario-amodei
+  lastUpdated: 2025-12
+- id: early-warnings
+  type: historical
+  title: Early Warnings Era
+  customFields:
+    - label: Period
+      value: 1950s-2000
+    - label: Key Theme
+      value: Philosophical foundations and prescient warnings
+    - label: Main Figures
+      value: Turing, Wiener, Good, Asimov, Vinge
+    - label: Reception
+      value: Largely dismissed as science fiction
+  sources:
+    - title: Computing Machinery and Intelligence
+      url: https://academic.oup.com/mind/article/LIX/236/433/986238
+      author: Alan Turing
+      date: '1950'
+    - title: Some Moral and Technical Consequences of Automation
+      url: https://en.wikipedia.org/wiki/Norbert_Wiener
+      author: Norbert Wiener
+      date: '1960'
+    - title: Speculations Concerning the First Ultraintelligent Machine
+      url: https://vtechworks.lib.vt.edu/handle/10919/89424
+      author: I.J. Good
+      date: '1965'
+    - title: I, Robot
+      url: https://en.wikipedia.org/wiki/I,_Robot
+      author: Isaac Asimov
+      date: '1950'
+    - title: The Coming Technological Singularity
+      url: https://edoras.sdsu.edu/~vinge/misc/singularity.html
+      author: Vernor Vinge
+      date: '1993'
+    - title: The Age of Em
+      url: https://ageofem.com/
+      author: Robin Hanson
+      date: '2016'
+    - title: 'Artificial Intelligence: A Modern Approach'
+      url: http://aima.cs.berkeley.edu/
+      author: Stuart Russell & Peter Norvig
+      date: '1995'
+  description: >-
+    Long before AI safety became a research field, a handful of visionaries recognized that machine intelligence might
+    pose unprecedented challenges to humanity. These early warnings—often dismissed as science fiction or philosophical
+    speculation—laid the conceptual groundwork for modern AI safety.
+  tags:
+    - alan-turing
+    - norbert-wiener
+    - ij-good
+    - isaac-asimov
+    - vernor-vinge
+    - intelligence-explosion
+    - three-laws-of-robotics
+    - technological-singularity
+    - control-problem
+    - science-fiction
+  lastUpdated: 2025-12
+- id: mainstream-era
+  type: historical
+  title: Mainstream Era
+  customFields:
+    - label: Period
+      value: 2020-Present
+    - label: Defining Moment
+      value: ChatGPT (November 2022)
+    - label: Key Theme
+      value: AI safety goes from fringe to central policy concern
+    - label: Status
+      value: Ongoing
+  relatedEntries:
+    - id: anthropic
+      type: organization
+    - id: openai
+      type: organization
+  sources:
+    - title: 'Constitutional AI: Harmlessness from AI Feedback'
+      url: https://arxiv.org/abs/2212.08073
+      author: Bai et al. (Anthropic)
+      date: '2022'
+    - title: GPT-4 Technical Report
+      url: https://arxiv.org/abs/2303.08774
+      author: OpenAI
+      date: '2023'
+    - title: GPT-4 System Card
+      url: https://cdn.openai.com/papers/gpt-4-system-card.pdf
+      author: OpenAI
+      date: '2023'
+    - title: The Bletchley Declaration
+      url: https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration
+      author: UK AI Safety Summit
+      date: '2023'
+    - title: Executive Order on Safe, Secure, and Trustworthy AI
+      url: >-
+        https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+      author: White House
+      date: '2023'
+    - title: 'Pause Giant AI Experiments: An Open Letter'
+      url: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
+      author: Future of Life Institute
+      date: '2023'
+  description: >-
+    The Mainstream Era marks AI safety's transformation from a niche research field to a central topic in technology
+    policy, corporate strategy, and public discourse. ChatGPT was the catalyst, but the shift reflected years of
+    groundwork meeting rapidly advancing capabilities.
+  tags:
+    - chatgpt
+    - gpt-4
+    - anthropic
+    - constitutional-ai
+    - geoffrey-hinton
+    - openai-leadership-crisis
+    - ai-safety-summit
+    - eu-ai-act
+    - pause-debate
+    - interpretability
+    - scalable-oversight
+    - government-regulation
+  lastUpdated: 2025-12
+- id: miri-era
+  type: historical
+  title: The MIRI Era
+  customFields:
+    - label: Period
+      value: 2000-2015
+    - label: Key Event
+      value: First dedicated AI safety organization founded
+    - label: Main Figures
+      value: Yudkowsky, Bostrom, Hanson, Tegmark
+    - label: Milestone
+      value: Superintelligence (2014) brings academic legitimacy
+  relatedEntries:
+    - id: miri
+      type: organization
+    - id: fhi
+      type: organization
+  sources:
+    - title: Creating Friendly AI
+      url: https://intelligence.org/files/CFAI.pdf
+      author: Eliezer Yudkowsky
+      date: '2001'
+    - title: 'Superintelligence: Paths, Dangers, Strategies'
+      url: https://www.amazon.com/Superintelligence-Dangers-Strategies-Nick-Bostrom/dp/0199678111
+      author: Nick Bostrom
+      date: '2014'
+    - title: The Sequences
+      url: https://www.lesswrong.com/rationality
+      author: Eliezer Yudkowsky
+      date: 2006-2009
+    - title: Existential Risk Prevention as Global Priority
+      url: https://www.existential-risk.org/concept.html
+      author: Nick Bostrom
+      date: '2013'
+    - title: The Hanson-Yudkowsky AI-Foom Debate
+      url: https://intelligence.org/ai-foom-debate/
+      author: Robin Hanson & Eliezer Yudkowsky
+      date: '2008'
+    - title: Future of Life Institute Open Letter
+      url: https://futureoflife.org/open-letter/ai-open-letter/
+      author: Various
+      date: '2015'
+  description: >-
+    The MIRI era marks the transition from scattered warnings to organized research. For the first time, AI safety had
+    an institution, a community, and a research agenda.
+  tags:
+    - miri
+    - eliezer-yudkowsky
+    - nick-bostrom
+    - lesswrong
+    - superintelligence
+    - friendly-ai
+    - orthogonality-thesis
+    - instrumental-convergence
+    - cev
+    - effective-altruism
+  lastUpdated: 2025-12
+- id: ai-safety-summit
+  type: historical
+  title: AI Safety Summit (Bletchley Park)
+  description: >-
+    International summit on AI safety held at Bletchley Park, UK in November 2023, resulting in the Bletchley
+    Declaration.
+  status: stub
+  relatedEntries:
+    - id: international-coordination
+      type: concept
+    - id: uk-aisi
+      type: organization
+  tags:
+    - policy
+    - international
+    - governance
+  lastUpdated: 2025-12

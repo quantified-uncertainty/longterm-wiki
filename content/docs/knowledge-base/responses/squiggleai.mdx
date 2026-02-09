@@ -1,0 +1,296 @@
+---
+title: SquiggleAI
+description: An LLM-powered tool for generating probabilistic models in Squiggle from natural language descriptions. Uses Claude Sonnet 4.5 with 20K token prompt caching to produce 100-500 line models within 20 seconds to 3 minutes. Integrated directly into Squiggle Hub, SquiggleAI addresses the challenge that domain experts often struggle with programming requirements for probabilistic modeling.
+sidebar:
+  order: 3
+quality: 37
+llmSummary: SquiggleAI is an LLM tool (primarily Claude Sonnet 4.5) that generates probabilistic Squiggle models from natural language, using ~20K tokens of cached documentation to produce 100-500 line models in 20 seconds to 3 minutes. While it lowers barriers for domain experts to create uncertainty models, it's a workflow improvement tool rather than a core AI safety intervention.
+lastEdited: "2026-01-29"
+importance: 22
+ratings:
+  novelty: 3
+  rigor: 4
+  actionability: 3
+  completeness: 6
+metrics:
+  wordCount: 790
+  citations: 7
+  tables: 23
+  diagrams: 0
+clusters:
+  - epistemics
+  - community
+  - ai-safety
+subcategory: epistemic-tools-tools
+---
+import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Innovation** | High | First LLM integration for probabilistic programming language |
+| **Practical Impact** | Growing | Lowers barrier to quantitative reasoning for domain experts |
+| **Technical Maturity** | Stable | Multiple model options, reliable prompt caching |
+| **Integration** | Seamless | Built directly into Squiggle Hub platform |
+| **Accessibility** | High | Natural language interface, no programming required |
+| **Output Quality** | Good | 100-500 line models with reasonable structure |
+
+## Project Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Name** | SquiggleAI |
+| **Organization** | <EntityLink id="quri">QURI</EntityLink> (Quantified Uncertainty Research Institute) |
+| **Lead** | Ozzie Gooen |
+| **Launched** | 2024 |
+| **Primary Model** | Claude Sonnet 4.5 |
+| **Platform** | Integrated into Squiggle Hub |
+| **Website** | [squiggle-language.com/docs/Ecosystem/SquiggleAI](https://www.squiggle-language.com/docs/Ecosystem/SquiggleAI) |
+
+## Overview
+
+[SquiggleAI](https://www.squiggle-language.com/docs/Ecosystem/SquiggleAI) integrates <EntityLink id="language-models">large language models</EntityLink> to assist with probabilistic model creation, addressing a critical barrier QURI identified through years of experience building forecasting tools: **even highly skilled domain experts frequently struggle with basic programming requirements** for probabilistic modeling.
+
+A subject matter expert might have deep knowledge about AI timelines, pandemic risk, or cost-effectiveness of interventions, but lack the programming fluency to translate their mental model into executable <EntityLink id="squiggle">Squiggle</EntityLink> code. SquiggleAI bridges this gap by accepting natural language descriptions and generating complete, runnable probabilistic models.
+
+The system uses prompt caching to embed approximately 20,000 tokens of information about the Squiggle language—syntax, distributions, best practices—ensuring the LLM has deep knowledge of the domain-specific language. Most workflows complete within 20 seconds to 3 minutes, producing models typically 100-500 lines long depending on the model used.
+
+### Design Philosophy
+
+SquiggleAI is designed around the principle that **domain expertise should not be bottlenecked by programming ability**. The tool aims to:
+
+1. **Lower the barrier** to quantitative reasoning for non-programmers
+2. **Accelerate model creation** even for experienced Squiggle users
+3. **Teach by example** through generated code that users can read and modify
+4. **Preserve human judgment** by making models transparent and editable
+
+This philosophy aligns with QURI's broader mission of making uncertainty quantification accessible to altruistic decision-makers.
+
+## Model Support
+
+SquiggleAI supports multiple LLM backends:
+
+| Model | Status | Output Size | Speed | Best For | Cost |
+|-------|--------|-------------|-------|----------|------|
+| **Claude Sonnet 4.5** | Primary | ≈500 lines | Medium | Complex multi-variable models | $$$ |
+| **Claude Haiku 4.5** | Available | ≈150 lines | Fast | Quick prototypes | $ |
+| **Grok Code Fast 1** | Available | ≈200 lines | Fast | Alternative provider | $$ |
+| **Claude Sonnet 3.5** | Legacy | ≈200 lines | Medium | Stable fallback | $$ |
+
+The default is Claude Sonnet 4.5, which produces the most sophisticated and detailed models but at higher API cost. Users can switch models based on their needs.
+
+### Prompt Caching
+
+SquiggleAI uses **prompt caching** to cache approximately 20,000 tokens of Squiggle documentation with each request. This means:
+
+- The LLM has consistent, deep knowledge of Squiggle syntax
+- API costs are reduced (cached tokens are cheaper)
+- Response quality is more reliable
+- Context is preserved across conversation turns
+
+## Capabilities
+
+### Model Generation
+
+Describe a problem in natural language, receive executable Squiggle code:
+
+**Example prompt**:
+> "Estimate the cost-effectiveness of hiring an AI safety researcher. Consider their salary, overhead costs, probability they produce useful research, and value of that research if successful."
+
+**Output**: ~300 line Squiggle model with:
+- Variable definitions for each uncertain input
+- Distribution choices justified by context
+- Sensitivity analysis visualization
+- Clear comments explaining logic
+
+### Iterative Refinement
+
+Conversation-based model improvement:
+
+**Follow-up prompt**:
+> "Add more uncertainty to the timeline assumptions and break down the research impact by type (interpretability vs alignment)."
+
+**Output**: Modified model with requested changes, preserving existing structure.
+
+### Fermi Estimation
+
+Generate complete uncertainty models from vague questions:
+
+| Question Type | Example | Output |
+|---------------|---------|--------|
+| **Classic Fermi** | "How many piano tuners in Chicago?" | ≈100 line model with breakdown |
+| **Technology adoption** | "When will 50% of US households have solar panels?" | ≈200 line S-curve model |
+| **Market sizing** | "Total addressable market for AI coding assistants?" | ≈250 line market model |
+
+### Code Debugging
+
+Identify and fix syntax and logic errors:
+
+**User**: "My model gives negative probabilities for the success rate"
+
+**SquiggleAI**: Identifies issue with distribution domain, suggests `truncate(distribution, 0, 1)`
+
+### Model Explanation
+
+Explain what existing Squiggle code does:
+
+**Input**: Inherited 300-line model from another researcher
+
+**Prompt**: "Explain what this model is calculating and what the key assumptions are"
+
+**Output**: Plain-language summary with identified cruxes
+
+## Integration with Squiggle Hub
+
+SquiggleAI is **directly accessible from within Squiggle Hub**, allowing users to:
+
+1. Generate models from the "New Model" interface
+2. Refine existing models through chat interface
+3. Immediately save generated models to their Hub account
+4. Version control AI-assisted iterations
+5. Share completed models publicly or keep private
+
+### Privacy Defaults
+
+SquiggleAI outputs on Squiggle Hub are **private by default**. Users who want to share models or make them public can explicitly do so by creating new public models. This privacy-first approach encourages experimentation without concern about incomplete drafts being visible.
+
+## Technical Implementation
+
+### Architecture
+
+```
+User Prompt
+    ↓
+Prompt Engineering Layer
+(Adds cached Squiggle docs, examples, constraints)
+    ↓
+LLM API (Claude Sonnet 4.5)
+    ↓
+Post-Processing
+(Syntax validation, auto-fixes)
+    ↓
+Executable Squiggle Code
+```
+
+### Prompt Engineering
+
+The system prepends each user request with:
+
+| Component | Tokens | Purpose |
+|-----------|--------|---------|
+| **Squiggle syntax guide** | ≈8,000 | Core language reference |
+| **Distribution creation examples** | ≈3,000 | Common patterns |
+| **Best practices** | ≈2,000 | Dos and don'ts |
+| **Common pitfalls** | ≈1,500 | Error prevention |
+| **Example models** | ≈5,500 | Full model templates |
+| **Total cached context** | ≈20,000 | Consistent knowledge base |
+
+This large cached context ensures the LLM produces idiomatic Squiggle code rather than generic probabilistic programming.
+
+## Use Cases
+
+### Domain Expert Assistance
+
+| Expert Type | Without SquiggleAI | With SquiggleAI |
+|-------------|-------------------|-----------------|
+| **Biosecurity researcher** | Cannot quantify risk model | Describes model in English, gets working code |
+| **EA charity evaluator** | Builds simple spreadsheet | Generates sophisticated uncertainty model |
+| **AI safety researcher** | Rough timeline estimates | Detailed probabilistic timeline model |
+| **Policy analyst** | Qualitative cost-benefit | Quantitative cost-benefit with distributions |
+
+### Rapid Prototyping
+
+Experienced Squiggle users leverage SquiggleAI for:
+
+- **First draft generation**: Get 80% of a model in 2 minutes, refine manually
+- **Boilerplate reduction**: Generate repetitive parameter definitions
+- **Exploration**: Try multiple model structures quickly
+- **Documentation**: Generate comments and explanations for existing code
+
+### Teaching and Learning
+
+SquiggleAI serves as a teaching tool:
+
+- New users learn by seeing working examples
+- Generated code demonstrates Squiggle idioms
+- Explanations help users understand probabilistic reasoning
+- Iteration teaches refinement process
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Lowers barrier** | Non-programmers can create models |
+| **Fast iteration** | 20 seconds to 3 minutes per model |
+| **Consistent quality** | Prompt caching ensures reliable syntax |
+| **Transparent output** | Generated code is readable and editable |
+| **Integrated workflow** | Seamless with Squiggle Hub |
+| **Multiple model options** | Can choose speed vs sophistication |
+
+### Limitations
+
+| Limitation | Impact | Mitigation |
+|------------|--------|------------|
+| **Output length bounded** | Claude models limit ≈500 lines | Break complex models into modules |
+| **Domain knowledge required** | LLM doesn't know your specific problem | User must provide context and check outputs |
+| **Hallucination risk** | May generate plausible but wrong assumptions | Always review and validate generated models |
+| **API cost** | Sonnet 4.5 usage adds up | Use Haiku for simpler models |
+| **Limited mathematical reasoning** | Struggles with novel math derivations | Use for structure, validate math manually |
+
+## Comparison with Other Approaches
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| **SquiggleAI** | Fast, accessible, integrated | Requires review, output bounded |
+| **Manual Squiggle coding** | Full control, no AI cost | Slow, requires programming skill |
+| **ChatGPT + copy/paste** | General purpose | No Squiggle-specific knowledge, awkward workflow |
+| **Excel/Guesstimate** | Familiar interface | Limited expressiveness, no distributions |
+| **Python + NumPy** | Full power | Much more complex, longer to write |
+
+## Relationship to QURI Ecosystem
+
+SquiggleAI fits into QURI's tool ecosystem:
+
+| Tool | Purpose | SquiggleAI's Role |
+|------|---------|-------------------|
+| **<EntityLink id="squiggle">Squiggle</EntityLink>** | Probabilistic language | SquiggleAI generates Squiggle code |
+| **Squiggle Hub** | Model hosting platform | SquiggleAI integrated directly |
+| **<EntityLink id="metaforecast">Metaforecast</EntityLink>** | Forecast aggregation | SquiggleAI could use Metaforecast data as inputs |
+| **<EntityLink id="roastmypost">RoastMyPost</EntityLink>** | LLM blog evaluation | Shared LLM integration experience |
+
+## Funding
+
+As a QURI project, SquiggleAI development is funded through QURI's grants:
+
+| Source | Amount | Period |
+|--------|--------|--------|
+| **Survival and Flourishing Fund** | \$150K+ to QURI | 2019-2022 |
+| **Future Fund** | \$100K to QURI | 2022 |
+| **Long-Term Future Fund** | Ongoing to QURI | 2023-present |
+
+SquiggleAI API costs (Claude API usage) are likely covered by QURI's operational budget, though specific allocation is not public.
+
+## Future Directions
+
+Potential enhancements based on the current trajectory:
+
+| Enhancement | Benefit | Challenge |
+|-------------|---------|-----------|
+| **Multi-model reasoning** | Generate multiple approaches, compare | Higher cost, longer runtime |
+| **Automatic sensitivity analysis** | Identify key cruxes programmatically | Requires sophisticated meta-analysis |
+| **Citation integration** | Ground generated assumptions in sources | Complex fact-checking, hallucination risk |
+| **Collaborative refinement** | Multiple users + AI iterating together | Coordination complexity |
+| **Custom expert modes** | Domain-specific prompt engineering | Requires curated expertise per domain |
+
+## External Links
+
+- [SquiggleAI Documentation](https://www.squiggle-language.com/docs/Ecosystem/SquiggleAI)
+- [Squiggle Hub](https://squigglehub.org/)
+- [EA Forum: Introducing SquiggleAI](https://forum.effectivealtruism.org/posts/jJ4pn3qvBopkEvGXb/introducing-squiggle-ai)
+- [QURI Website](https://quantifieduncertainty.org/)
+- [Claude API](https://www.anthropic.com/api)
+
+<Backlinks />

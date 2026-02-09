@@ -1,0 +1,52 @@
+---
+title: AI Ownership
+description: Root factor measuring AI control distribution across countries, companies, and individuals.
+sidebar:
+  label: Overview
+  order: 0
+lastEdited: "2026-01-05"
+pageTemplate: ai-transition-model-factor
+subcategory: factors-ai-ownership
+---
+import {DataInfoBox, FactorSubItemsList, PageCauseEffectGraph, Backlinks, EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="ai-ownership" />
+
+AI Ownership refers to who controls the most powerful AI systems and their outputs. Concentration among a few companies, countries, or individuals creates different risks than broad distribution. Ownership structure shapes incentives, accountability, and the distribution of AI benefits.
+
+**For interactive exploration of how AI Ownership relates to other factors, see the [AI Transition Model Graph](/ai-transition-model-views/graph/).**
+
+## Key Dimensions
+
+<FactorSubItemsList factorId="ai-ownership" client:load />
+
+## Relationship to Scenarios
+
+AI Ownership primarily affects **Long-term <EntityLink id="lock-in">Lock-in</EntityLink>** scenarios:
+
+- Concentrated ownership shapes what values and power structures get entrenched
+- Ownership patterns determine accountability and reversibility
+- Distribution of AI benefits affects social stability
+
+Also affects:
+- **<EntityLink id="scenarios-ai-takeover-overview">AI Takeover</EntityLink>**: Concentrated ownership could help or hurt depending on the actor
+- **<EntityLink id="scenarios-human-catastrophe-overview">Human-Caused Catastrophe</EntityLink>**: Depends on who controls AI and their intentions
+
+## Key Debates
+
+| Debate | Question |
+|--------|----------|
+| Concentration effects | Is AI lab concentration good (easier to regulate) or bad (single points of failure)? |
+| Profit vs safety | Can profit-motivated companies be trusted with AI safety? |
+| Open source role | Does open source AI democratize capability or make dangerous systems accessible? |
+| US-China dynamics | Is competition inevitable, or can cooperation emerge? |
+
+## See Also
+
+- <EntityLink id="scenarios-long-term-lockin-overview">Long-term Lock-in</EntityLink> - Primary outcome affected
+- <EntityLink id="concentration-of-power">Concentration of Power</EntityLink> - Related risk
+- [AI Transition Model](/ai-transition-model-views/graph/) - Interactive graph showing relationships
+
+<PageCauseEffectGraph slug="ai-ownership" client:load />
+
+<Backlinks entityId="ai-ownership" />

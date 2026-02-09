@@ -1,0 +1,263 @@
+---
+title: "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?"
+description: "An analysis of the full EA/x-risk biosecurity portfolio, examining whether the community's work consists primarily of AI capability restrictions or encompasses a broader set of interventions including DNA synthesis screening, pathogen surveillance, medical countermeasures, and governance reform."
+sidebar:
+  label: EA Biosecurity Scope
+  order: 0
+quality: 55
+lastEdited: "2026-02-06"
+importance: 72.5
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 6
+  rigor: 5
+  actionability: 6
+  completeness: 5
+metrics:
+  wordCount: 3800
+  citations: 42
+  tables: 8
+  diagrams: 1
+clusters: ["biorisks", "ai-safety", "governance", "community"]
+---
+import {Mermaid, EntityLink, Backlinks, KeyQuestions} from '@components/wiki';
+
+## Overview
+
+A common critique of the EA/x-risk community's biosecurity work is that it consists primarily of restricting what LLMs can say about biology. In reality, AI capability restrictions represent just one of at least six major intervention categories, and likely not the one receiving the most investment. The portfolio spans DNA synthesis screening, pathogen-agnostic surveillance, medical countermeasures, AI capability evaluations, physical environmental defenses, and governance reform.
+
+This report maps the full landscape of biosecurity interventions relevant to AI-enabled biological risks, organized by Kevin Esvelt's **Delay, Detect, Defend** framework—the dominant conceptual model in this space.
+
+### Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Total EA Biosecurity Funding** | \$230M+ from <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> alone | 140+ grants across Biosecurity & Pandemic Preparedness fund[^1] |
+| **Intervention Categories** | 6+ distinct categories | DNA screening, surveillance, countermeasures, AI evals, physical defenses, governance |
+| **% That Is "LLM Restrictions"** | Small minority | Most funding goes to detection infrastructure, screening technology, and countermeasures |
+| **Government Adoption** | Growing | CDC Biothreat Radar (\$52M proposed FY2026); OSTP synthesis screening framework; military ANTI-DOTE program |
+| **Key Framework** | Delay / Detect / Defend | <EntityLink id="securebio">SecureBio</EntityLink>'s organizing model, widely adopted |
+| **Biggest Gap** | Medical countermeasures | Resilience-based approaches like broad-spectrum antivirals remain underfunded relative to need |
+
+---
+
+## The Full Intervention Portfolio
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Delay["🛡️ Delay"]
+        DNS["DNA Synthesis Screening\n(SecureDNA, IBBIS)"]
+        AIR["AI Capability Restrictions\n(RSPs, output filtering)"]
+        GOV["Biosecurity Governance\n(BWC, OSTP framework)"]
+    end
+    subgraph Detect["🔍 Detect"]
+        MET["Metagenomic Surveillance\n(NAO, Biothreat Radar)"]
+        BIO["AI Bio-Capability Evaluations\n(VCT, red-teaming)"]
+    end
+    subgraph Defend["💊 Defend"]
+        MCM["Medical Countermeasures\n(Red Queen Bio, platform vaccines)"]
+        UVC["Far-UVC & Physical Defenses\n(Blueprint Biosecurity)"]
+        PPE["Next-Gen PPE\n(Improved filtration)"]
+    end
+    Delay --- Detect
+    Detect --- Defend
+`} />
+
+### Intervention Categories vs. Actors
+
+| Intervention | Key Actors | EA/x-Risk Adjacent? | Funding Scale |
+|---|---|---|---|
+| **DNA Synthesis Screening** | SecureDNA, IBBIS/NTI, IGSC | Yes (SecureDNA founded by Esvelt) | \$10M+ |
+| **Metagenomic Surveillance** | SecureBio/NAO, CDC NWSS | Yes (NAO is SecureBio project) | \$10M+; \$52M proposed government |
+| **AI Bio-Capability Evaluations** | SecureBio (VCT), Anthropic, OpenAI, RAND | Mixed (SecureBio is EA; labs are industry) | Embedded in lab budgets |
+| **Medical Countermeasures** | Red Queen Bio, BARDA, platform vaccine developers | Partially (Red Queen Bio funded by OpenAI) | \$15M seed; billions in government |
+| **Far-UVC & Physical Defenses** | Blueprint Biosecurity, Columbia University, Ushio | Yes (Blueprint is EA-funded) | \$1M+ in EA grants |
+| **AI Capability Restrictions** | Anthropic (ASL-3), OpenAI (preparedness), Google DeepMind | Industry-led with EA influence | Embedded in lab operations |
+| **Biosecurity Governance** | NTI Bio, CSIS, Council on Strategic Risks, Johns Hopkins CHS | Mixed | \$7.8M+ from Open Philanthropy to NTI |
+
+---
+
+## Delay: Slowing Dangerous Capability Proliferation
+
+### DNA Synthesis Screening
+
+DNA synthesis screening is arguably the most concrete, technically mature biosecurity intervention. The goal: prevent anyone from ordering synthetic DNA that could be used to reconstruct dangerous pathogens.
+
+**Key initiatives:**
+
+- **<EntityLink id="securedna">SecureDNA</EntityLink>** — A Swiss nonprofit foundation co-founded by Kevin Esvelt, providing free, privacy-preserving screening software to DNA synthesis providers. Uses cryptographic protocols so that neither the order contents nor the hazard database are revealed during screening. Can detect hazardous sequences down to 30 base pairs—already exceeding the OSTP framework's 2026 requirement of 50bp screening.[^2]
+
+- **<EntityLink id="ibbis">IBBIS (International Biosecurity and Biosafety Initiative for Science)</EntityLink>** — Launched by NTI in 2024, headquartered in Geneva, led by Piers Millett (former Deputy Head of the BWC Implementation Support Unit). Develops the **Common Mechanism** for international DNA synthesis screening.[^3]
+
+- **OSTP Synthesis Screening Framework** — The Biden administration's April 2024 framework requiring federally funded researchers to procure synthetic nucleic acids only from screened providers. Implementation began April 2025 (200nt minimum), with 50nt minimum from October 2026. The Trump administration's May 2025 Executive Order directed revision of the framework but maintained its core screening requirements.[^4]
+
+**Critical gap:** A January 2026 *Nature Communications* paper by Edison, Toner, and Esvelt demonstrated that unregulated DNA fragments can be assembled to bypass synthesis screening entirely—they acquired fragments sufficient to reconstruct the 1918 influenza virus from dozens of providers. The paper argues fragments must be regulated as select agents.[^5]
+
+### AI Capability Restrictions
+
+Some critics assume that AI capability restrictions constitute the entirety of EA biosecurity work. In practice, it's one piece of a much larger portfolio:
+
+- **Anthropic's ASL-3**: Activated for Claude Opus 4 specifically due to CBRN capability concerns. Involves increased internal security (preventing model theft) and deployment restrictions limiting misuse for weapons development.[^6]
+- **OpenAI's Preparedness Framework**: GPT-5 and ChatGPT Agent deployed with "High capability" safeguards after evaluations couldn't rule out meaningful assistance to novice bioweapon actors.[^7]
+- **Google DeepMind**: Gemini 2.5 Deep Think deployed with additional mitigations after CBRN knowledge assessments.[^7]
+- **Open-source gap**: DeepSeek described as "worst tested" for biosafety by Dario Amodei (2025), with minimal content filtering for dangerous biological information.[^8]
+
+### Biosecurity Governance
+
+- **Biological Weapons Convention (BWC)**: The primary international treaty, though lacking a verification protocol. EA-adjacent organizations (NTI Bio, Council on Strategic Risks) actively push for strengthening.[^9]
+- **CSIS 2025 Report**: Found current measures "ill-equipped" for AI-enabled bioterrorism threats.[^10]
+- **Dual-use research oversight**: Ongoing debates about gain-of-function research moratorium and DURC policies.
+
+---
+
+## Detect: Early Warning Systems
+
+### Metagenomic Pathogen Surveillance
+
+The **Nucleic Acid Observatory (NAO)**, operated by <EntityLink id="securebio">SecureBio</EntityLink> under Jeff Kaufman's leadership, represents perhaps the most distinctive EA contribution to biosecurity—and one that has nothing to do with LLM restrictions.
+
+**How it works:** Unlike traditional PCR-based surveillance (which can only detect known pathogens), the NAO performs **untargeted metagenomic sequencing** of wastewater—sequencing *all* genetic material in a sample. This means it can detect completely novel, engineered, or unknown pathogens, including those specifically designed to evade traditional surveillance.[^11]
+
+**Three detection modes:**
+1. **Known pathogen alerts** — Automated matching against pathogen databases
+2. **Genetic engineering detection** — "Chimera detection" pipeline flags signs of engineering
+3. **Growth-based anomaly detection** — Identifies *any* organism undergoing exponential growth, even if never seen before
+
+**Current scale (as of November 2025):**
+- 31 sampling sites across 19 US cities
+- ≈60 billion read pairs sequenced weekly
+- Demonstrated detections: measles in Kauai County wastewater, West Nile Virus in Missouri[^12]
+
+**Government adoption:** The President's FY2026 Budget proposes **\$52 million** for **Biothreat Radar**, a national pathogen detection system at CDC drawing directly on NAO's pilot findings. Designed to detect novel pathogens before 12 in 100,000 Americans are infected.[^13]
+
+**Military adoption:** Through the **ANTI-DOTE** program (Defense Innovation Unit), the NAO performs metagenomic sequencing at 5 US military facilities in the Indo-Pacific region.[^14]
+
+### AI Bio-Capability Evaluations
+
+Evaluating whether AI systems can meaningfully assist bioweapon development:
+
+- **Virology Capabilities Test (VCT)**: Developed by SecureBio, CAIS, and MIT. 322 multimodal questions testing practical virology laboratory knowledge. Key finding: leading AI models outperform the vast majority of practicing virologists sampled. Now adopted by major AI labs for pre-deployment testing.[^15]
+- **RAND Red-Team Study (2024)**: 12 teams of 3 people given 80 hours over 7 weeks to plan biological attacks with/without LLM access. Found **no statistically significant difference** in plan viability—but this was with 2024-era models.[^16]
+- **OpenAI 100-Person Study**: 50 biology PhDs + 50 students, assessed across 5 stages (ideation, acquisition, magnification, formulation, release). Found GPT-4 provided "at most a mild uplift."[^17]
+- **FRI Expert Survey**: Forecasting Research Institute survey estimated AI capabilities matching expert virologists would increase annual epidemic probability from 0.3% to 1.5% (5x increase).[^18]
+
+---
+
+## Defend: Resilience and Countermeasures
+
+Some critics have highlighted resilience-based approaches as more promising than restriction-based ones—and EA/x-risk organizations are actively working on both.
+
+### Medical Countermeasures
+
+- **<EntityLink id="red-queen-bio">Red Queen Bio</EntityLink>** — Spun out of HelixNano (clinical-stage mRNA therapeutics), raised a **\$15M seed round led by OpenAI** in 2025. Core thesis: "defensive co-scaling"—coupling defensive compute and funding to the same forces driving the AI capability race. Works with frontier labs to map AI-enabled biothreats and pre-build medical countermeasures.[^19]
+- **Platform vaccine technologies** — mRNA platforms (demonstrated during COVID-19) enable rapid design of vaccines against novel pathogens within days of sequencing. The <EntityLink id="coalition-for-epidemic-preparedness-innovations">Coalition for Epidemic Preparedness Innovations (CEPI)</EntityLink> has invested over \$1.5B in pandemic preparedness vaccines, including its 100 Days Mission to compress vaccine development timelines.
+- **Broad-spectrum antivirals** — Still underdeveloped relative to need. Could provide pathogen-agnostic treatment.
+
+### Far-UVC and Physical Defenses
+
+**<EntityLink id="blueprint-biosecurity">Blueprint Biosecurity</EntityLink>**, an EA-funded organization, has made **far-UVC technology** a centerpiece of their work:
+
+- Far-UVC light (222nm) can **inactivate 99.8% of airborne pathogens** in occupied spaces while remaining safe for human exposure—the light is absorbed by dead skin cells before reaching living tissue.[^20]
+- Columbia University research (David Brenner) demonstrated effectiveness; technology licensed to Ushio Inc. (Care222 product line).[^21]
+- Blueprint's **EXHALE Program**: ≈\$1M in grants to evaluate far-UVC against real human-generated respiratory aerosols (Emory, Virginia Tech, University of Nebraska). Results expected mid-2026.[^22]
+- Blueprint's **Project AIR**: Launched to address three bottlenecks—global health agency endorsements, real-world implementation guidance, and multinational funding.[^22]
+- **Key limitation**: No binding regulatory standards exist worldwide for safe far-UVC dosage as of 2025.[^23]
+
+---
+
+## How the X-Risk Approach Differs from Traditional Biosecurity
+
+| Dimension | Traditional Public Health | EA/X-Risk Approach |
+|-----------|--------------------------|-------------------|
+| **Detection method** | PCR targeting known pathogens | Untargeted metagenomic sequencing |
+| **Threat model** | Natural disease outbreaks | Natural pandemics AND deliberate/engineered threats |
+| **Design priority** | Sensitivity for known targets | Detection of completely novel threats |
+| **Scale of ambition** | Monitor known diseases | Early warning for civilization-threatening pandemics |
+| **Screening** | Voluntary industry guidelines | Cryptographic screening infrastructure (SecureDNA) |
+| **Countermeasures** | Reactive (design after pathogen identified) | Proactive (pre-build against AI-mapped threats) |
+
+---
+
+## Key Organizations
+
+| Organization | Focus | EA-Adjacent? | Key Funding |
+|---|---|---|---|
+| <EntityLink id="securebio">SecureBio</EntityLink> | Delay/Detect/Defend framework; NAO; AI evals | Yes | \$9.4M+ from Open Philanthropy |
+| <EntityLink id="securedna">SecureDNA</EntityLink> | DNA synthesis screening technology | Yes (Esvelt co-founder) | Swiss foundation |
+| <EntityLink id="ibbis">IBBIS</EntityLink> | International screening standards | Partially (NTI-launched) | Open Philanthropy via NTI |
+| <EntityLink id="blueprint-biosecurity">Blueprint Biosecurity</EntityLink> | Far-UVC technology deployment | Yes | \$900K from Open Philanthropy (2024) |
+| <EntityLink id="red-queen-bio">Red Queen Bio</EntityLink> | AI-driven medical countermeasures | Partially (OpenAI-funded) | \$15M seed (OpenAI-led) |
+| <EntityLink id="nti-bio">NTI Bio</EntityLink> | Biosecurity governance, BWC | Partially | \$7.8M from Open Philanthropy |
+| <EntityLink id="council-on-strategic-risks">Council on Strategic Risks</EntityLink> | National security biosecurity policy | No (traditional national security) | Various |
+| CSIS | Policy research on AI-bio threats | No | Various |
+| <EntityLink id="johns-hopkins-center-for-health-security">Johns Hopkins CHS</EntityLink> | Biosecurity policy and analysis | No | Various |
+| <EntityLink id="centre-for-long-term-resilience">Centre for Long-Term Resilience</EntityLink> | UK biosecurity policy | Yes | EA-funded |
+
+---
+
+## Key Funding Flows
+
+<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> (renamed Coefficient Giving in November 2025) is the dominant funder. Key biosecurity grants:
+
+| Recipient | Amount | Purpose |
+|-----------|--------|---------|
+| SecureBio | \$4,000,000 | General biosecurity research (3 years) |
+| SecureBio (NAO) | \$3,430,000 | Nucleic Acid Observatory program |
+| SecureBio | \$1,420,937 | Biosecurity research (3 years) |
+| SecureBio | \$570,000 | Pathogen Early Warning Project |
+| NTI Biosecurity | \$7,831,500 | Global catastrophic biological risk reduction (3 years) |
+| Blueprint Biosecurity | \$900,000 | General support (2024) |
+
+Other EA-aligned funders include the **Musk Foundation** (NAO sensitivity research), **Longview Philanthropy** (>\$50M directed in 2025 across x-risk areas), **Founders Pledge** (recommends SecureBio and IBBIS), and **Survival and Flourishing Fund**.
+
+---
+
+## The Restriction vs. Resilience Debate
+
+A key tension in biosecurity strategy is whether to prioritize **restricting dangerous capabilities** (limiting what AI models can say, restricting DNA synthesis) or **building resilience** (making it so that even if someone creates a pathogen, we can detect and respond fast enough to prevent catastrophe).
+
+The EA/x-risk community's actual position is: **both are necessary, and the portfolio reflects this.** The Delay/Detect/Defend framework explicitly incorporates both restriction (Delay) and resilience (Detect + Defend). The field generally agrees that:
+
+1. **Restrictions buy time** but are insufficient alone—information wants to be free, and restrictions become harder as capabilities proliferate (especially via open-source models)
+2. **Resilience is the long-term solution** but isn't ready yet—metagenomic surveillance, far-UVC, and platform vaccines are still scaling
+3. **The transition period is the most dangerous** — we need restrictions *now* while building resilience infrastructure for the future
+
+This is substantively different from the perception that EA biosecurity work is "only about limiting what LLMs can do."
+
+<KeyQuestions questions={[
+  "How much of total EA biosecurity funding goes to resilience/defense vs. restriction/delay interventions?",
+  "Will DNA synthesis screening remain effective as benchtop synthesizers proliferate?",
+  "Can metagenomic surveillance scale fast enough to detect engineered pathogens with long incubation periods?",
+  "Is the 'defense favored' assumption correct long-term, or will offense always have an advantage in biology?",
+  "How much does open-source AI (e.g., DeepSeek) undermine restriction-based approaches?"
+]} />
+
+---
+
+## Sources
+
+[^1]: [Coefficient Giving — Biosecurity & Pandemic Preparedness Fund](https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/)
+[^2]: [SecureDNA platform](https://securedna.org/); [Security analysis](https://arxiv.org/html/2512.09233v1)
+[^3]: [IBBIS Common Mechanism](https://ibbis.bio/our-work/common-mechanism/); [NTI announcement](https://www.nti.org/news/new-international-biosecurity-organization-launched-to-safeguard-bioscience/)
+[^4]: [OSTP Framework](https://bidenwhitehouse.archives.gov/ostp/news-updates/2024/04/29/framework-for-nucleic-acid-synthesis-screening/); [NIH implementation](https://grants.nih.gov/grants/guide/notice-files/NOT-OD-25-012.html)
+[^5]: [Edison, Toner & Esvelt 2026, Nature Communications](https://www.nature.com/articles/s41467-025-67955-3)
+[^6]: [2026 International AI Safety Report](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026)
+[^7]: [2026 International AI Safety Report](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026)
+[^8]: <EntityLink id="bioweapons">Bioweapons page analysis of open-source risks</EntityLink>
+[^9]: [NTI Bio BWC work](https://www.nti.org/news/nti-bio-offers-biosecurity-solutions-at-the-biological-weapons-convention-review-conference/)
+[^10]: [CSIS 2025 report](https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should)
+[^11]: [NAO methodology](https://naobservatory.org/); [P2RA study in The Lancet Microbe](https://www.thelancet.com/journals/lanmic/article/PIIS2666-5247(25)00115-6/fulltext)
+[^12]: [NAO Updates November 2025](https://securebio.substack.com/p/nao-updates-november-2025)
+[^13]: [Biothreat Radar proposal](https://naobservatory.org/blog/biothreat_radar/)
+[^14]: [PHC Global ANTI-DOTE program](https://kfor.com/business/press-releases/ein-presswire/781027758/phc-global-to-deploy-waste-water-surveillance-system-for-u-s-military-facilities/)
+[^15]: [VCT paper](https://arxiv.org/abs/2504.16137); [SecureBio announcement](https://securebio.substack.com/p/ais-can-provide-expert-level-virology)
+[^16]: [RAND 2024 study](https://www.rand.org/pubs/research_reports/RRA2977-2.html)
+[^17]: [OpenAI biological threat study](https://openai.com/index/building-an-early-warning-system-for-llm-aided-biological-threat-creation/)
+[^18]: [FRI AI-enabled biorisk survey](https://forecastingresearch.org/ai-enabled-biorisk)
+[^19]: [Red Queen Bio](https://www.redqueen.bio); [OpenAI \$15M seed](https://techinformed.com/openai-leads-15-million-seed-in-red-queen-bio-for-ai-biosecurity/)
+[^20]: [Far-UVC efficacy - Scientific Reports](https://www.nature.com/articles/s41598-024-57441-z)
+[^21]: [Columbia University far-UVC research](https://www.cuimc.columbia.edu/news/far-uvc-light-can-virtually-eliminate-airborne-virus-occupied-room)
+[^22]: [Blueprint Biosecurity far-UVC program](https://blueprintbiosecurity.org/works/far-uvc/); [EXHALE](https://blueprintbiosecurity.org/building-the-evidence-base-for-far-uvc/); [Project AIR](https://blueprintbiosecurity.org/introducing-project-air/)
+[^23]: [Far-UVC regulatory status](https://en.wikipedia.org/wiki/Far-UVC)
+
+<Backlinks />

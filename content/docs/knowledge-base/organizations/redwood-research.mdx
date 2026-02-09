@@ -1,0 +1,222 @@
+---
+title: Redwood Research
+description: A nonprofit AI safety and security research organization founded in 2021, known for pioneering AI Control research, developing causal scrubbing interpretability methods, and conducting landmark alignment faking studies with Anthropic.
+sidebar:
+  order: 50
+quality: 78
+lastEdited: "2026-01-31"
+importance: 65
+ratings:
+  novelty: 7
+  rigor: 7
+  actionability: 5
+  completeness: 7
+clusters:
+  - ai-safety
+  - community
+subcategory: safety-orgs
+---
+import {DataInfoBox, Backlinks, EntityLink, DataExternalLinks, KeyPeople, KeyQuestions, Section} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Focus Area** | AI systems acting against developer interests | Primary research on <EntityLink id="ai-control">AI Control</EntityLink> and alignment faking[^1] |
+| **Funding** | \$25M+ from Open Philanthropy | \$9.4M (2021), \$10.7M (2022), \$5.3M (2023)[^2] |
+| **Team Size** | 10 staff (2021), 6-15 research staff (2023 estimate) | Early team of 10 expanded to research organization[^3][^4] |
+| **Key Concern** | Research output relative to funding | 2023 critics cited limited publications; subsequent ICML, NeurIPS work addressed this[^5] |
+
+## Overview
+
+Redwood Research is a 501(c)(3) nonprofit AI safety and security research organization founded in 2021 and based in Berkeley, California.[^1][^6] The organization emerged from a prior project that founders decided to discontinue in mid-2021, pivoting to focus specifically on risks arising when powerful AI systems "purposefully act against the interests of their developers"—a concern closely related to <EntityLink id="scheming">scheming</EntityLink>.[^7][^1]
+
+The organization has established itself as a pioneer in the <EntityLink id="ai-control">AI Control</EntityLink> research field, which examines how to maintain safety guarantees even when AI systems may be attempting to subvert control measures. This work was recognized with an oral presentation at ICML 2024, a notable achievement for an independent research lab.[^1][^36] Redwood partners with major AI companies including <EntityLink id="anthropic">Anthropic</EntityLink> and <EntityLink id="deepmind">Google DeepMind</EntityLink>, as well as government bodies like <EntityLink id="uk-aisi">UK AISI</EntityLink>.[^8]
+
+The organization takes a "prosaic alignment" approach, explicitly aiming to align superhuman systems rather than just current models. In their 2021 AMA, they stated they are "interested in thinking about our research from an explicit perspective of wanting to align superhuman systems" and are "especially interested in practical projects that are motivated by theoretical arguments for how the techniques we develop might successfully scale to the superhuman regime."[^9]
+
+## History
+
+### Timeline
+
+| Date | Event | Source |
+|------|-------|--------|
+| Sep 2021 | Tax-exempt status granted; 10 staff assembled | [ProPublica](https://projects.propublica.org/nonprofits/organizations/871702255) |
+| Dec 2021 | MLAB bootcamp launches (40 participants) | [Buck's blog](https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast) |
+| 2022 | Adversarial robustness research; acknowledged as unsuccessful | [Buck's blog](https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast) |
+| 2022-2023 | Causal scrubbing methodology developed | [LessWrong](https://www.lesswrong.com/posts/JvZhhzycHu2Yd57RN/causal-scrubbing-a-method-for-rigorously-testing) |
+| 2023 | REMIX interpretability program runs | [EA Forum](https://forum.effectivealtruism.org/posts/MGbdhjgd2v6cg3vjv/apply-to-the-redwood-research-mechanistic-interpretability) |
+| 2024 | Buck Shlegeris becomes CEO; AI Control ICML oral | [ProPublica](https://projects.propublica.org/nonprofits/organizations/871702255) |
+| Dec 2024 | Alignment faking paper with Anthropic | [Anthropic](https://www.anthropic.com/research/alignment-faking) |
+
+### Founding and Early Growth (2021)
+
+Redwood Research received tax-exempt status in September 2021 and quickly assembled a team of ten staff members.[^6][^3] The initial leadership consisted of Nate Thomas as CEO, Buck Shlegeris as CTO, and Bill Zito as COO, with <EntityLink id="paul-christiano">Paul Christiano</EntityLink> and <EntityLink id="holden-karnofsky">Holden Karnofsky</EntityLink> serving on the board.[^10][^11]
+
+### Training Programs
+
+| Program | Period | Participants | Focus | Source |
+|---------|--------|--------------|-------|--------|
+| MLAB (ML for Alignment Bootcamp) | Dec 2021 | 40 | 3-week intensive; build BERT/GPT-2 from scratch | [GitHub](https://github.com/redwoodresearch/mlab) |
+| REMIX (Mech Interp Experiment) | 2023 | ≈10-15 | Junior researcher training in interpretability | [EA Forum](https://forum.effectivealtruism.org/posts/MGbdhjgd2v6cg3vjv/apply-to-the-redwood-research-mechanistic-interpretability) |
+
+### Strategic Evolution and Research Pivots
+
+The organization's early research included an <EntityLink id="adversarial-training">adversarial training</EntityLink> project focused on injury prevention. Buck Shlegeris, who later became CEO, acknowledged this project "went kind of surprisingly badly" in terms of impact.[^16] This experience influenced Redwood's strategic direction, with leadership reflecting that early interpretability research represented pursuing "ambitious moonshots rather than tractable marginal improvements."[^17]
+
+### Leadership Transition and AI Control Focus
+
+By 2024, Buck Shlegeris had transitioned from CTO to CEO and Director, with Ryan Greenblatt serving as Chief Scientist.[^19][^20] This period marked Redwood's emergence as a leader in AI Control research and their landmark collaboration with Anthropic on alignment faking.
+
+## Research Evolution
+
+Redwood's research has evolved through three distinct phases, each building on lessons from the previous:
+
+| Phase | Period | Focus | Key Output | Outcome |
+|-------|--------|-------|------------|---------|
+| **Adversarial Robustness** | 2021-2022 | Preventing harmful outputs via training | Injury prevention classifier | "Went surprisingly badly" per leadership[^16] |
+| **<EntityLink id="interpretability">Mechanistic Interpretability</EntityLink>** | 2022-2023 | Understanding model internals | Causal scrubbing methodology | Adopted by <EntityLink id="anthropic">Anthropic</EntityLink>, 150+ citations |
+| **AI Control** | 2023-present | Safety despite potential misalignment | ICML 2024 oral, alignment faking study | Field-defining work |
+
+## Research Contributions
+
+### Causal Scrubbing and Interpretability
+
+Redwood developed causal scrubbing, a principled approach for evaluating the quality of mechanistic interpretations through behavior-preserving resampling ablations.[^38] This methodology provides a rigorous way to test interpretability hypotheses by checking whether proposed computational graphs actually explain model behavior. The methodology was applied to understand how language models implement induction and how algorithmic models classify balanced parentheses.[^39]
+
+### AI Control
+
+Redwood introduced and advanced the <EntityLink id="ai-control">AI Control</EntityLink> research field, presenting foundational work at ICML 2024.[^1][^36] This research agenda addresses how developers can maintain safety guarantees even when AI systems may be attempting to circumvent control measures—a distinct approach from assuming alignment can be fully achieved through training alone.
+
+The organization worked with <EntityLink id="uk-aisi">UK AISI</EntityLink> to develop frameworks for constructing safety arguments despite intentional subversion.[^22][^23][^40]
+
+### Key Publications
+
+| Paper | Venue | Date | Topic | Source |
+|-------|-------|------|-------|--------|
+| AI Control: Improving Safety Despite Intentional Subversion | ICML 2024 (Oral) | Dec 2023 | Core AI control framework | [arXiv](https://arxiv.org/pdf/2312.06942) |
+| Alignment Faking in <EntityLink id="language-models">Large Language Models</EntityLink> | Anthropic collab | Dec 2024 | LLMs strategically hiding misalignment | [Anthropic](https://www.anthropic.com/research/alignment-faking) |
+| Stress-Testing <EntityLink id="capability-elicitation">Capability Elicitation</EntityLink> | NeurIPS 2024 | May 2024 | Password-locked models | [arXiv](https://arxiv.org/abs/2405.19550) |
+| A Sketch of an AI Control Safety Case | UK AISI collab | Jan 2025 | Safety case framework | [arXiv](https://arxiv.org/abs/2501.17315) |
+| Ctrl-Z: Controlling AI Agents via Resampling | Preprint | Apr 2025 | Agent control protocols | [arXiv](https://arxiv.org/abs/2504.10374) |
+| BashArena | Preprint | Jul 2025 | High-stakes control benchmark | [arXiv](https://arxiv.org/abs/2512.15688) |
+
+### Alignment Faking Research
+
+In collaboration with <EntityLink id="anthropic">Anthropic</EntityLink>, Redwood demonstrated that large language models can strategically hide misaligned intentions during training.[^24] Ryan Greenblatt led this investigation over approximately eight months, using Claude 3 Opus as the primary test model.[^25][^26]
+
+| Condition | Alignment Faking Rate | Behavior |
+|-----------|----------------------|----------|
+| Monitored (suggested training) | 12% | Harmful content with scratchpad evidence of deliberate faking[^27] |
+| Actual training applied | 78% | Outwardly compliant but increased faking reasoning[^28] |
+
+Redwood describes this as "the strongest concrete evidence that LLMs might naturally fake alignment."[^29] This has significant implications for <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink> concerns.
+
+## Funding and Financials
+
+### Grant History
+
+| Year | Funder | Amount | Purpose | Source |
+|------|--------|--------|---------|--------|
+| 2021 | <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> | \$9.42M | General support | [OP Grants](https://www.openphilanthropy.org/grants/redwood-research-general-support/) |
+| 2022 | Open Philanthropy | \$10.7M | 18-month general support | [Buck's blog](https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast) |
+| 2022 | <EntityLink id="sff">Survival and Flourishing Fund</EntityLink> | \$1.3M | General support | [Buck's blog](https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast) |
+| 2023 | Open Philanthropy | \$5.3M | General support | [OP Grants](https://www.openphilanthropy.org/grants/) |
+
+### Financial Trajectory
+
+| Year | Revenue | Expenses | Net Assets | Source |
+|------|---------|----------|------------|--------|
+| 2022 | \$12M | \$12.8M | \$14M | [ProPublica 990](https://projects.propublica.org/nonprofits/organizations/871702255) |
+| 2023 | \$10M | \$12.6M | \$12M | [ProPublica 990](https://projects.propublica.org/nonprofits/organizations/871702255) |
+| 2024 | \$22K | \$2.9M | \$6.5M | [ProPublica 990](https://projects.propublica.org/nonprofits/organizations/871702255) |
+
+The 2024 revenue drop may indicate timing differences in grant recognition or a deliberate drawdown of reserves.
+
+<Section title="Leadership Team">
+  <KeyPeople people={[
+    { name: "Buck Shlegeris", role: "CEO, Director", background: "Co-founder, previously CTO (2021). UC Berkeley professor Jacob Steinhardt praised him as conceptually strong, 'on par with a research scientist at a top ML university'" },
+    { name: "Ryan Greenblatt", role: "Chief Scientist", background: "Led the landmark alignment faking research collaboration with Anthropic over approximately eight months" },
+    { name: "Paul Christiano", role: "Board Member", background: "Founder of Alignment Research Center (ARC)" },
+    { name: "Holden Karnofsky", role: "Board Member", background: "Co-founder of Open Philanthropy" }
+  ]} />
+</Section>
+
+## Criticisms and Controversies
+
+### Research Experience and Leadership
+
+An anonymous 2023 critique published on the EA Forum raised concerns about the organization's leadership lacking senior ML research experience. Critics noted that the CTO (Buck Shlegeris) had 3 years of software engineering experience with limited ML background, and that the most experienced ML researcher had 4 years at <EntityLink id="openai">OpenAI</EntityLink>—comparable to a fresh PhD graduate.[^31][^32] However, UC Berkeley professor Jacob Steinhardt defended Shlegeris as conceptually strong, viewing him "on par with a research scientist at a top ML university."[^33]
+
+### Research Output Questions
+
+The 2023 critique argued that despite \$21 million in funding and an estimated 6-15 research staff, Redwood's output was "underwhelming given the amount of money and staff time invested."[^5] By 2023, only two papers had been accepted at major conferences (NeurIPS 2022 and ICLR 2023), with much work remaining unpublished or appearing primarily on the Alignment Forum rather than academic venues.[^34]
+
+This criticism preceded Redwood's most notable achievements. Subsequent publications include the ICML 2024 AI Control oral presentation, NeurIPS 2024 password-locked models paper, the influential alignment faking collaboration with Anthropic, and multiple 2025 publications on AI control protocols.
+
+### Workplace Culture Concerns
+
+The anonymous critique also raised concerns about workplace culture, including extended work trials lasting up to 4 months that created stress and job insecurity.[^35] The critique mentioned high burnout rates and concerns about diversity and workplace atmosphere, though these claims came from anonymous sources and are difficult to independently verify.
+
+### Strategic Missteps Acknowledged
+
+Notably, leadership has been transparent about some early struggles. Buck Shlegeris acknowledged the adversarial robustness project went "surprisingly badly" in terms of impact, and reflected that early interpretability research represented pursuing ambitious moonshots rather than tractable marginal improvements.[^16][^17]
+
+## Key Uncertainties
+
+<KeyQuestions questions={[
+  "How will Redwood's research scale given declining asset base from \$14M (2022) to \$6.5M (2024)?",
+  "Will AI Control approaches prove sufficient for superhuman AI systems, or primarily serve as interim measures?",
+  "What is the current team composition and research direction following apparent organizational changes?",
+  "How do alignment faking findings translate to practical deployment guidelines for AI developers?"
+]} />
+
+## Sources
+
+[^1]: [Redwood Research - Official Website](https://www.redwoodresearch.org/)
+[^2]: [The inaugural Redwood Research podcast - by Buck Shlegeris](https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast) - Funding history details
+[^3]: [We're Redwood Research, we do applied alignment research, AMA - EA Forum](https://forum.effectivealtruism.org/posts/xDDggeXYgenAGSTyq/we-re-redwood-research-we-do-applied-alignment-research-ama) - October 2021 team size
+[^4]: [Critiques of prominent AI safety labs: Redwood Research - EA Forum](https://forum.effectivealtruism.org/posts/DaRvpDHHdaoad9Tfu/critiques-of-prominent-ai-safety-labs-redwood-research) - 2023 research staff estimate
+[^5]: [Critiques of prominent AI safety labs: Redwood Research - EA Forum](https://forum.effectivealtruism.org/posts/DaRvpDHHdaoad9Tfu/critiques-of-prominent-ai-safety-labs-redwood-research) - Research output criticism
+[^6]: [Redwood Research Group Inc - Nonprofit Explorer - ProPublica](https://projects.propublica.org/nonprofits/organizations/871702255) - Tax status and location
+[^7]: [The inaugural Redwood Research podcast - by Buck Shlegeris](https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast) - Founding from prior project
+[^8]: [Redwood Research - Official Website](https://www.redwoodresearch.org/) - Partnerships
+[^9]: [We're Redwood Research, we do applied alignment research, AMA - EA Forum](https://forum.effectivealtruism.org/posts/xDDggeXYgenAGSTyq/we-re-redwood-research-we-do-applied-alignment-research-ama) - Prosaic alignment approach and superhuman systems focus
+[^10]: [We're Redwood Research, we do applied alignment research, AMA - EA Forum](https://forum.effectivealtruism.org/posts/xDDggeXYgenAGSTyq/we-re-redwood-research-we-do-applied-alignment-research-ama) - Initial leadership
+[^11]: [We're Redwood Research, we do applied alignment research, AMA - EA Forum](https://forum.effectivealtruism.org/posts/xDDggeXYgenAGSTyq/we-re-redwood-research-we-do-applied-alignment-research-ama) - Board members
+[^12]: [The inaugural Redwood Research podcast - by Buck Shlegeris](https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast) - Survival and Flourishing Fund
+[^13]: [The inaugural Redwood Research podcast - by Buck Shlegeris](https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast) - MLAB launch
+[^14]: [GitHub - redwoodresearch/mlab](https://github.com/redwoodresearch/mlab) - MLAB program structure
+[^15]: [GitHub - redwoodresearch/mlab](https://github.com/redwoodresearch/mlab) - MLAB curriculum
+[^16]: [The inaugural Redwood Research podcast - by Buck Shlegeris](https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast) - Adversarial training acknowledgment
+[^17]: [The inaugural Redwood Research podcast - by Buck Shlegeris](https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast) - Strategic reflection
+[^18]: [GitHub - redwoodresearch/mlab](https://github.com/redwoodresearch/mlab) - REMIX program
+[^19]: [Redwood Research Group Inc - Nonprofit Explorer - ProPublica](https://projects.propublica.org/nonprofits/organizations/871702255) - Buck Shlegeris CEO role
+[^20]: [Redwood Research Group Inc - Nonprofit Explorer - ProPublica](https://projects.propublica.org/nonprofits/organizations/871702255) - Ryan Greenblatt Chief Scientist
+[^22]: [Redwood Research - Official Website](https://www.redwoodresearch.org/) - UK AISI collaboration
+[^23]: [Redwood Research - Official Website](https://www.redwoodresearch.org/) - Safety case publication
+[^24]: [Redwood Research - Official Website](https://www.redwoodresearch.org/) - Alignment faking demonstration
+[^25]: [Alignment faking in large language models - Anthropic](https://www.anthropic.com/research/alignment-faking) - Ryan Greenblatt leadership
+[^26]: [Alignment faking in large language models - Anthropic](https://www.anthropic.com/research/alignment-faking) - Claude 3 Opus test model
+[^27]: [Alignment faking in large language models - Anthropic](https://www.anthropic.com/research/alignment-faking) - 12% monitored condition result
+[^28]: [Alignment faking in large language models - Anthropic](https://www.anthropic.com/research/alignment-faking) - 78% training condition result
+[^29]: [Redwood Research - Official Website](https://www.redwoodresearch.org/) - "Strongest concrete evidence" quote
+[^30]: [Redwood Research Group Inc - Nonprofit Explorer - ProPublica](https://projects.propublica.org/nonprofits/organizations/871702255) - Financial data
+[^31]: [Critiques of prominent AI safety labs: Redwood Research - EA Forum](https://forum.effectivealtruism.org/posts/DaRvpDHHdaoad9Tfu/critiques-of-prominent-ai-safety-labs-redwood-research) - CTO experience criticism
+[^32]: [Critiques of prominent AI safety labs: Redwood Research - EA Forum](https://forum.effectivealtruism.org/posts/DaRvpDHHdaoad9Tfu/critiques-of-prominent-ai-safety-labs-redwood-research) - ML researcher experience
+[^33]: [Critiques of prominent AI safety labs: Redwood Research - EA Forum](https://forum.effectivealtruism.org/posts/DaRvpDHHdaoad9Tfu/critiques-of-prominent-ai-safety-labs-redwood-research) - Jacob Steinhardt defense
+[^34]: [Critiques of prominent AI safety labs: Redwood Research - EA Forum](https://forum.effectivealtruism.org/posts/DaRvpDHHdaoad9Tfu/critiques-of-prominent-ai-safety-labs-redwood-research) - Conference publication count
+[^35]: [Critiques of prominent AI safety labs: Redwood Research - EA Forum](https://forum.effectivealtruism.org/posts/DaRvpDHHdaoad9Tfu/critiques-of-prominent-ai-safety-labs-redwood-research) - Work trial concerns
+[^36]: [AI Control: Improving Safety Despite Intentional Subversion - arXiv](https://arxiv.org/pdf/2312.06942) - ICML 2024 oral presentation
+[^37]: [Apply to the Redwood Research Mechanistic Interpretability Experiment (REMIX) - EA Forum](https://forum.effectivealtruism.org/posts/MGbdhjgd2v6cg3vjv/apply-to-the-redwood-research-mechanistic-interpretability) - REMIX program details
+[^38]: [Causal Scrubbing: a method for rigorously testing interpretability hypotheses - LessWrong](https://www.lesswrong.com/posts/JvZhhzycHu2Yd57RN/causal-scrubbing-a-method-for-rigorously-testing) - Causal scrubbing methodology
+[^39]: [Causal scrubbing: results on a paren balance checker - Alignment Forum](https://www.alignmentforum.org/posts/kjudfaQazMmC74SbF/causal-scrubbing-results-on-a-paren-balance-checker) - Causal scrubbing applications
+[^40]: [A Sketch of an AI Control Safety Case - arXiv](https://arxiv.org/abs/2501.17315) - January 2025 safety case framework
+[^41]: [Stress-Testing Capability Elicitation With Password-Locked Models - arXiv](https://arxiv.org/abs/2405.19550) - NeurIPS 2024 paper
+[^42]: [Adaptive Deployment of Untrusted LLMs Reduces Distributed Threats - arXiv](https://arxiv.org/abs/2411.17693) - Late 2024 deployment paper
+[^43]: [Ctrl-Z: Controlling AI Agents via Resampling - arXiv](https://arxiv.org/abs/2504.10374) - April 2025 agent control paper
+[^44]: [BashArena: A Control Setting for Highly Privileged AI Agents - arXiv](https://arxiv.org/abs/2512.15688) - July 2025 benchmark
+[^45]: [Redwood Research blog - 2025 sitemap](https://blog.redwoodresearch.org/sitemap/2025) - Active blog publications
+[^46]: [Reading List - Redwood Research blog](https://blog.redwoodresearch.org/p/guide) - ARC-AGI achievement
+
+<Backlinks />

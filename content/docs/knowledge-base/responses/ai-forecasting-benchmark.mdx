@@ -1,0 +1,341 @@
+---
+title: AI Forecasting Benchmark Tournament
+description: "A quarterly competition run by Metaculus comparing human Pro Forecasters against AI forecasting bots. Q2 2025 results (348 questions, 54 bot-makers) show Pro Forecasters maintain a statistically significant lead (p = 0.00001), though AI performance improves each quarter. Prize pool of $30,000 per quarter with API credits provided by OpenAI and Anthropic. Best AI baseline (Q2 2025): OpenAI's o3 model."
+sidebar:
+  order: 6
+quality: 41
+llmSummary: "Quarterly competition (Q2 2025: 348 questions, 54 bot-makers, $30K prizes) comparing human Pro Forecasters against AI bots, with statistical testing showing humans maintain significant lead (p=0.00001) though AI improves ~24% Q3-Q4 2024. Best AI baseline is OpenAI's o3; top bot-makers are students/hobbyists; ensemble methods significantly improve performance."
+lastEdited: "2026-01-29"
+importance: 42
+ratings:
+  novelty: 3.5
+  rigor: 5
+  actionability: 3
+  completeness: 6.5
+metrics:
+  wordCount: 567
+  citations: 7
+  tables: 29
+  diagrams: 1
+clusters:
+  - epistemics
+  - ai-safety
+subcategory: epistemic-tools-tools
+---
+import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Scale** | Large | 348 questions (Q2 2025), 54 bot-makers participating |
+| **Rigor** | High | Statistical significance testing, standardized scoring (Peer score) |
+| **Competitive** | Strong | \$10K quarterly prizes, API credits, public leaderboard |
+| **Key Finding** | Clear | Pro Forecasters significantly outperform AI (p = 0.00001), though gap narrowing |
+| **Industry Support** | Robust | <EntityLink id="openai">OpenAI</EntityLink> and <EntityLink id="anthropic">Anthropic</EntityLink> provide API credits |
+| **Practical Impact** | Growing | Demonstrates current AI forecasting limitations and progress rate |
+
+## Tournament Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Name** | AI Forecasting Benchmark Tournament |
+| **Abbreviation** | AIB (or AI Benchmark) |
+| **Organization** | <EntityLink id="metaculus">Metaculus</EntityLink> |
+| **Launched** | 2024 |
+| **Structure** | 4-month seasonal tournament + bi-weekly MiniBench |
+| **Website** | [metaculus.com/aib/](https://www.metaculus.com/aib/) |
+| **Prize Pool** | \$10,000 per quarter |
+| **Industry Partners** | OpenAI (API credits), Anthropic (API credits) |
+
+## Overview
+
+The [AI Forecasting Benchmark Tournament](https://www.metaculus.com/aib/) represents <EntityLink id="metaculus">Metaculus</EntityLink>'s flagship initiative for comparing human and AI forecasting capabilities. Launched in 2024, the tournament runs in two parallel series:
+
+1. **Primary Seasonal Tournament**: 4-month competitions with ~300-400 questions
+2. **MiniBench**: Bi-weekly fast-paced tournaments for rapid iteration
+
+Participants can compete using API credits provided by OpenAI and Anthropic, encouraging experimentation with frontier LLMs. The tournament has become the premier benchmark for tracking AI progress on forecasting—a domain that requires integrating diverse information sources, reasoning under uncertainty, and calibrating confidence to match reality.
+
+### Structure
+
+| Component | Duration | Question Count | Prize Pool |
+|-----------|----------|----------------|------------|
+| **Seasonal Tournament** | 4 months | ≈300-400 | \$10,000 |
+| **MiniBench** | 2 weeks | ≈20-30 | Varies |
+
+Both components use Metaculus's **Peer score** metric, which compares forecasters to each other and equalizes for question difficulty, making performance comparison fair across different question sets.
+
+## Historical Results
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Trajectory["AI vs Human Performance Trajectory"]
+        direction TB
+        Q3["Q3 2024\nBest Bot: -11.3\n(Large gap)"]
+        Q4["Q4 2024\nBest Bot: -8.6\n(24% improvement)"]
+        Q1["Q1 2025\nmetac-o1 first place\n(Gap narrowing)"]
+        Q2["Q2 2025\n54 bots, 348 questions\n(Humans lead, p=0.00001)"]
+    end
+
+    subgraph Baseline["Human Baseline"]
+        PRO["Pro Forecasters\n(Peer score above 0)"]
+        COMM["Community Prediction\nPeer score: 12.9\n(Top 10 globally)"]
+    end
+
+    Q3 --> Q4
+    Q4 --> Q1
+    Q1 --> Q2
+
+    Q2 -.->|Still trails| PRO
+    PRO --- COMM
+
+    style PRO fill:#d4edda
+    style COMM fill:#d4edda
+    style Q2 fill:#fff3e0
+`} />
+
+### Quarterly Performance Trajectory
+
+| Quarter | Best Bot Performance | Gap to Pro Forecasters | Key Development |
+|---------|---------------------|------------------------|-----------------|
+| **Q3 2024** | -11.3 | Large negative gap | Initial baseline |
+| **Q4 2024** | -8.6 | Moderate negative gap | ≈24% improvement |
+| **Q1 2025** | First place (metac-o1) | Narrowing gap | First bot to lead leaderboard |
+| **Q2 2025** | OpenAI o3 (baseline) | Statistical gap remains (p = 0.00001) | Humans maintain clear lead |
+
+**Note**: Score of 0 = equal to comparison group. Negative scores mean underperformance relative to Pro Forecasters.
+
+### Q2 2025 Detailed Results
+
+[Q2 2025 tournament results](https://forum.effectivealtruism.org/posts/F2stjK9wHSy3HPEC9/q2-ai-benchmark-results-pros-maintain-clear-lead) provided key insights:
+
+| Metric | Finding |
+|--------|---------|
+| **Questions** | 348 |
+| **Bot-makers** | 54 |
+| **Statistical significance** | Pro Forecasters lead at p = 0.00001 |
+| **Top bot-makers** | Top 3 (excluding Metaculus in-house) were students or hobbyists |
+| **Aggregation effect** | Taking median or mean of multiple forecasts improved scores significantly |
+| **Best baseline bot** | OpenAI's o3 |
+
+## Key Findings
+
+### Pro Forecasters Maintain Lead
+
+Despite rapid AI improvement, human expert forecasters remain statistically significantly better:
+
+| Evidence | Interpretation |
+|----------|----------------|
+| **p = 0.00001** | Extremely strong statistical significance |
+| **Consistent across quarters** | Not a fluke; reproducible result |
+| **Even best bots trail** | Top AI systems still below human expert level |
+
+### Students and Hobbyists Competitive
+
+The top 3 bot-makers (excluding Metaculus's in-house bots) in Q2 2025 were students or hobbyists, not professional AI researchers:
+
+| Implication | Explanation |
+|-------------|-------------|
+| **Low barrier to entry** | API access + creativity > credentials |
+| **Forecasting as craft** | Domain knowledge + prompt engineering matters more than ML expertise |
+| **Innovation from edges** | Some of the best approaches come from non-traditional participants |
+
+### Aggregation Helps Significantly
+
+Taking the median or mean of multiple LLM forecasts rather than single calls substantially improved scores:
+
+| Method | Performance |
+|--------|-------------|
+| **Single LLM call** | Baseline |
+| **Median of multiple calls** | Significantly better |
+| **Mean of multiple calls** | Significantly better |
+
+This suggests that **ensemble methods** are critical for AI forecasting, similar to how aggregating multiple human forecasters improves accuracy.
+
+### Metaculus Community Prediction Remains Strong
+
+The average Peer score for the Metaculus Community Prediction is **12.9**, ranking in the **top 10 on the global leaderboard** over every 2-year period since 2016. This demonstrates that aggregated human forecasts remain world-class and provide a high bar for AI systems to match.
+
+## Technical Implementation
+
+### Bot Development Process
+
+Participants develop forecasting bots using:
+
+| Component | Description |
+|-----------|-------------|
+| **API Access** | OpenAI and Anthropic provide credits |
+| **Metaculus API** | Fetch questions, submit forecasts |
+| **Prompt Engineering** | Craft prompts that produce well-calibrated forecasts |
+| **Aggregation Logic** | Combine multiple model calls or different models |
+| **Continuous Learning** | Iterate based on quarterly feedback |
+
+### Scoring: Peer Score
+
+Metaculus uses **Peer score** for fair comparison:
+
+| Feature | Benefit |
+|---------|---------|
+| **Relative comparison** | Compares forecasters to each other, not absolute truth |
+| **Difficulty adjustment** | Accounts for question hardness |
+| **Time-averaged** | Rewards updating when new information emerges |
+| **Equalizes participation** | Forecasters with different time constraints comparable |
+
+### Baseline Bots
+
+Metaculus provides baseline bots for comparison:
+
+| Bot | Method | Purpose |
+|-----|--------|---------|
+| **GPT-4o** | Vanilla frontier LLM | Standard baseline |
+| **o3** | OpenAI's reasoning model | Best performance (Q2 2025) |
+| **Claude variants** | Anthropic frontier models | Alternative baseline |
+| **Metaculus in-house** | Custom implementations | Metaculus's own research |
+
+## Comparison with Other Projects
+
+| Project | Organization | Focus | Structure | Scale |
+|---------|--------------|-------|-----------|-------|
+| **AI Forecasting Benchmark** | Metaculus | Human vs AI | Quarterly tournaments | ≈350 questions/quarter |
+| **<EntityLink id="forecastbench">ForecastBench</EntityLink>** | FRI | AI benchmarking | Continuous evaluation | 1,000 questions |
+| **<EntityLink id="xpt">XPT</EntityLink>** | FRI | Expert collaboration | One-time tournament | ≈100 questions |
+| **<EntityLink id="good-judgment">Good Judgment</EntityLink>** | Good Judgment Inc | Superforecaster panels | Ongoing operations | Client-specific |
+
+The AI Forecasting Benchmark's **quarterly structure** balances rapid iteration (faster than XPT) with sufficient time for meaningful comparison (longer than weekly competitions).
+
+## Industry Partnerships
+
+### OpenAI and Anthropic Support
+
+Both frontier AI labs provide API credits to tournament participants:
+
+| Benefit | Impact |
+|---------|--------|
+| **Free experimentation** | Lowers cost barrier for participants |
+| **Frontier model access** | Ensures latest capabilities are tested |
+| **Corporate validation** | Labs view forecasting as important benchmark |
+| **Data for research** | Labs learn from bot performance patterns |
+
+## Implications for AI Development
+
+### Forecasting as Intelligence Proxy
+
+The tournament provides empirical data on AI's ability to:
+
+| Capability | Forecasting Relevance |
+|------------|----------------------|
+| **Information integration** | Combine diverse sources to estimate probabilities |
+| **Calibration** | Match confidence to actual frequency of outcomes |
+| **Temporal reasoning** | Project trends forward in time |
+| **Uncertainty quantification** | Express degrees of belief numerically |
+| **Continuous learning** | Update beliefs as new information emerges |
+
+### Near-Term Milestones
+
+Based on current trajectory:
+
+| Milestone | Estimated Timing | Significance |
+|-----------|-----------------|--------------|
+| **Bot equals median human** | Achieved (Q1 2025) | AI matches casual forecasters |
+| **Bot equals Pro Forecaster** | 2026-2027? | AI matches human experts |
+| **Bot exceeds Community Prediction** | 2027-2028? | AI exceeds aggregated human wisdom |
+
+These milestones serve as **empirical indicators of AI reasoning progress**.
+
+## Relationship to Metaculus Ecosystem
+
+The AI Forecasting Benchmark integrates with Metaculus's broader platform:
+
+| Component | Relationship to AI Benchmark |
+|-----------|----------------------------|
+| **Pro Forecasters** | Human comparison group |
+| **Community Prediction** | Aggregated human baseline |
+| **AI 2027 Tournament** | AI-specific questions for human forecasters |
+| **Track Record Page** | Historical calibration data |
+
+## Use Cases
+
+### AI Research
+
+Researchers use the tournament to:
+
+- Benchmark new model architectures
+- Test prompt engineering strategies
+- Validate aggregation methods
+- Track capability progress over time
+
+### Forecasting Methodology
+
+The tournament informs:
+
+- When to trust AI vs human forecasts
+- How to combine AI and human forecasts
+- Optimal ensemble strategies
+- Calibration techniques
+
+### AI Safety
+
+The tournament provides evidence for:
+
+- Current AI reasoning capabilities
+- Rate of AI capability progress
+- Domains where AI still trails humans
+- Potential for AI-assisted forecasting on x-risk questions
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Large scale** | 300-400 questions per quarter |
+| **Real-time competition** | Ongoing rather than one-time |
+| **Industry support** | OpenAI and Anthropic API credits |
+| **Public leaderboard** | Transparent comparison |
+| **Statistical rigor** | Significance testing, controlled scoring |
+| **Accessible** | Students/hobbyists competitive with professionals |
+
+### Limitations
+
+| Limitation | Impact |
+|------------|--------|
+| **Quarterly lag** | Results only every 3-4 months |
+| **API cost dependency** | Limits experimentation for some participants |
+| **Question selection** | May not cover all important domains |
+| **Bot sophistication ceiling** | Diminishing returns to complexity? |
+| **Human baseline variability** | Pro Forecaster performance may change over time |
+
+## Funding
+
+The tournament is supported by:
+
+| Source | Type | Amount |
+|--------|------|--------|
+| **<EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>** | Grant funding to Metaculus | \$1.5M+ (2022-2023) |
+| **OpenAI** | API credit sponsorship | Not disclosed |
+| **Anthropic** | API credit sponsorship | Not disclosed |
+| **Prize Pool** | Per quarter | \$10,000 |
+
+Total annual prize commitment: **\$120,000** (4 quarters × \$10K).
+
+## Future Directions
+
+Potential enhancements based on current trajectory:
+
+| Enhancement | Benefit | Challenge |
+|-------------|---------|-----------|
+| **Increase question diversity** | Test broader capabilities | Curation effort |
+| **Add multi-turn forecasting** | Test updating based on new info | More complex protocol |
+| **Reason evaluation** | Assess whether bots "understand" | Subjective judgment |
+| **Cross-tournament comparison** | Link to ForecastBench, Good Judgment | Standardization |
+| **Adversarial questions** | Test robustness | Question design |
+
+## External Links
+
+- [AI Forecasting Benchmark Tournament](https://www.metaculus.com/aib/)
+- [Q2 2025 Results (EA Forum)](https://forum.effectivealtruism.org/posts/F2stjK9wHSy3HPEC9/q2-ai-benchmark-results-pros-maintain-clear-lead)
+- [Metaculus Homepage](https://www.metaculus.com/)
+- [Metaculus Track Record](https://www.metaculus.com/questions/track-record/)
+
+<Backlinks />

@@ -1,0 +1,185 @@
+---
+title: Design Sketches for Collective Epistemics
+description: "Forethought Foundation's five proposed technologies for improving collective epistemics: community notes for everything, rhetoric highlighting, reliability tracking, epistemic virtue evals, and provenance tracing. These design sketches aim to shift society toward high-honesty equilibria."
+sidebar:
+  order: 10
+lastEdited: "2026-02-06"
+quality: 48
+importance: 55
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 5.5
+  rigor: 4.5
+  actionability: 6
+  completeness: 5
+metrics:
+  wordCount: 1600
+  citations: 12
+  tables: 3
+  diagrams: 1
+clusters:
+  - epistemics
+  - ai-safety
+subcategory: epistemic-tools-approaches
+---
+import {Backlinks, Mermaid, KeyQuestions, EntityLink} from '@components/wiki';
+
+## Overview
+
+In 2025, [Forethought Foundation](https://www.forethought.org/) published "[Design Sketches for Collective Epistemics](https://www.forethought.org/research/design-sketches-collective-epistemics)," a research report outlining five proposed technologies that could shift society toward what they call "high-honesty equilibria"—environments where honesty is generally the best policy because lies and obfuscation are reliably caught and penalized. The report was also [discussed on the EA Forum](https://forum.effectivealtruism.org/posts/zMuDoeXA9nBSeAc5g/some-tools-for-collective-epistemics).
+
+The core thesis is that if it becomes easier to track what's trustworthy and what isn't, the resulting equilibrium would reward honesty. This could improve collective decision-making broadly, and in particular give humanity a better shot at handling the transition to more advanced AI systems.
+
+## The Five Design Sketches
+
+The five proposed technologies are designed to work synergistically, each reinforcing the others:
+
+| Tool | Core Function | Maturity | Estimated Impact |
+|------|--------------|----------|-----------------|
+| [Community Notes for Everything](/knowledge-base/responses/community-notes-for-everything/) | Cross-platform AI-generated context annotations | Medium (builds on X Community Notes, 500K+ contributors) | High (billions of internet users) |
+| [Rhetoric Highlighting](/knowledge-base/responses/rhetoric-highlighting/) | Automated detection of misleading rhetoric | Low-Medium (GPT-4 at 79-90% fallacy detection) | Medium (high-stakes content first) |
+| [Reliability Tracking](/knowledge-base/responses/reliability-tracking/) | Topic-specific track record scoring | Low-Medium (prediction platforms exist; general system conceptual) | High (addresses accountability gap) |
+| [Epistemic Virtue Evals](/knowledge-base/responses/epistemic-virtue-evals/) | AI honesty and calibration benchmarks | Medium-High (TruthfulQA, SimpleQA, HELM exist) | High (benchmarks drive industry behavior) |
+| [Provenance Tracing](/knowledge-base/responses/provenance-tracing/) | Transparent claim origin and evidence chains | Low (mostly conceptual; citation infra exists) | Very High (foundational if built) |
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Tools["Five Design Sketches"]
+        CN["Community Notes\nfor Everything"]
+        RH["Rhetoric\nHighlighting"]
+        RT["Reliability\nTracking"]
+        EVE["Epistemic\nVirtue Evals"]
+        PT["Provenance\nTracing"]
+    end
+
+    subgraph Mechanisms["Shared Mechanisms"]
+        AI["AI-Powered Analysis"]
+        CROWD["Crowd Consensus"]
+        TRACK["Track Records"]
+    end
+
+    subgraph Outcomes["Intended Outcomes"]
+        HONEST["High-Honesty\nEquilibrium"]
+        TRUST["Improved\nSocietal Trust"]
+        SAFETY["Better AI\nTransition"]
+    end
+
+    CN --> CROWD
+    RH --> AI
+    RT --> TRACK
+    EVE --> AI
+    PT --> TRACK
+
+    CROWD --> HONEST
+    AI --> HONEST
+    TRACK --> HONEST
+
+    HONEST --> TRUST
+    TRUST --> SAFETY
+
+    style HONEST fill:#d4edda
+    style SAFETY fill:#d4edda
+`} />
+
+## Why This Matters for AI Safety
+
+Forethought argues these tools are particularly important from an existential risk perspective:
+
+1. **Power concentration resistance**: High-honesty environments make it harder for unscrupulous actors to concentrate power through manipulation
+2. **Risk tracking**: Societies with better epistemic tools can more effectively track and respond to catastrophe risks
+3. **Robust positioning**: Epistemically healthy environments improve humanity's positioning for handling major challenges, including advanced AI
+
+The connection to the <EntityLink id="ai-transition-model">AI transition</EntityLink> is direct: if <EntityLink id="civilizational-competence">civilizational competence</EntityLink> depends partly on <EntityLink id="epistemic-health">epistemic health</EntityLink>, then tools that improve collective epistemics reduce the risk of catastrophic outcomes during the transition to powerful AI systems.
+
+## Feasibility and Cost Considerations
+
+The report provides rough cost estimates for each technology:
+
+| Tool | Estimated Cost per Unit | Key Bottleneck |
+|------|------------------------|----------------|
+| Community Notes for Everything | \$0.01–0.10 per tweet | Social adoption, platform cooperation |
+| Rhetoric Highlighting | \$1–hundreds per hour of reading | Speed and cost of multiple LLM calls |
+| Reliability Tracking | Cents to hundreds per person assessed | Ground truth determination, legal exposure |
+| Epistemic Virtue Evals | Moderate (benchmark development) | Goodharting, methodology design |
+| Provenance Tracing | Variable (infrastructure cost) | Scale, error accumulation in recursive LLM use |
+
+The report emphasizes that these are "design sketches" rather than final specifications, and explicitly invites builders to develop implementations that may differ substantially while pursuing the same goals.
+
+## Interaction Effects: How the Tools Reinforce Each Other
+
+Forethought presents these as five independent tools, but their real power comes from specific interactions between them:
+
+**Reliability Tracking → Community Notes**: If an author has a poor reliability score on a topic, their claims on that topic get automatically prioritized for community notes annotation. The system focuses its limited resources on content from sources with the worst track records.
+
+**Provenance Tracing → Rhetoric Highlighting**: When provenance tracing reveals that a claim has mutated significantly from its original source, rhetoric highlighting can flag the specific sentences where distortion occurred. "This sentence attributes X to Study Y, but the original study actually found Z."
+
+**Epistemic Virtue Evals → Community Notes**: AI-generated community notes are themselves AI outputs. Epistemic virtue evals ensure the AI systems writing notes are well-calibrated and non-sycophantic—preventing the note system from introducing its own biases.
+
+**Rhetoric Highlighting → Reliability Tracking**: Aggregating rhetoric flags across an author's body of work creates a "rhetoric profile" that feeds into reliability scores. An author who consistently uses emotional manipulation or misrepresents citations gets a lower reliability score even when their factual claims are technically accurate.
+
+**Provenance Tracing → Reliability Tracking**: When evaluating whether someone's factual claims are accurate, provenance tracing provides the evidence chain needed to score them. Instead of manual fact-checking, the reliability system can query the provenance database to verify claims automatically.
+
+**Reliability Tracking → Provenance Tracing**: Source reliability scores feed into provenance trust propagation. A citation chain passing through multiple high-reliability sources gets a higher trust score than one passing through sources with poor track records.
+
+## Lessons from Past Attempts
+
+Several previous projects have attempted pieces of this vision and either failed or stagnated. Understanding why is essential for new attempts:
+
+**PunditTracker (2013-?)**: Tracked pundit predictions with letter grades. Demonstrated strong initial interest but eventually shut down. **Likely failure modes**: Insufficient funding model (no clear revenue), legal risk from rating named individuals, insufficient scale to create social pressure, and no integration with content consumption (users had to visit a separate site).
+
+**Fact-checking organizations**: PolitiFact, FactCheck.org, and the Washington Post Fact Checker have operated for 15+ years but haven't fundamentally shifted incentives toward honesty. **Key lesson**: Fact-checking as a separate activity that readers must seek out has limited impact. The information needs to be embedded *at the point of content consumption*—which is exactly what Community Notes for Everything proposes.
+
+**X Community Notes itself**: Highly effective when notes display, but 96.7% of content spread happens before notes appear. **Key lesson**: Speed is essential. Human-driven consensus processes are too slow for viral content. AI assistance is not optional—it's required for the timing to work.
+
+**Academic citation analysis tools**: Semantic Scholar, Google Scholar, and Connected Papers exist but are used primarily by researchers, not the general public. **Key lesson**: Tools built for expert users don't automatically reach mainstream audiences. Provenance tracing needs a consumer-grade interface, not just research infrastructure.
+
+**Media bias ratings**: Ad Fontes Media and AllSides rate entire outlets but don't assess individual claims. **Key lesson**: Outlet-level ratings are too coarse. The same outlet can publish both excellent and terrible analysis. Claim-level and article-level assessment is necessary.
+
+**Common patterns across failures**:
+1. **Separate destination**: Tools that require users to visit a new site fail. Integration into existing consumption flows is essential.
+2. **Insufficient funding models**: Epistemic infrastructure is a public good. Market incentives alone are usually insufficient.
+3. **Legal vulnerability**: Rating named individuals or organizations creates legal risk that has killed multiple projects.
+4. **Speed vs. quality trade-off**: Slow, high-quality assessment is useless for viral content. The Forethought sketches' emphasis on AI-driven speed directly addresses this.
+
+## Integration with Existing Approaches
+
+Several of the proposed technologies build on or extend existing work:
+
+- **Community Notes for Everything** extends <EntityLink id="community-notes">X's Community Notes</EntityLink> system, which already demonstrates the bridging algorithm concept at scale
+- **Provenance Tracing** shares goals with <EntityLink id="content-authentication">content authentication</EntityLink> technologies like C2PA, but focuses on knowledge claims rather than media authenticity
+- **Epistemic Virtue Evals** connects to existing AI safety evaluation frameworks and benchmarks like TruthfulQA and sycophancy resistance testing
+- **Reliability Tracking** builds on work by forecasting platforms like <EntityLink id="metaculus">Metaculus</EntityLink> and research on <EntityLink id="prediction-markets">prediction markets</EntityLink>
+
+## Who Builds This? Stakeholder Analysis
+
+A key question the Forethought report raises but doesn't fully answer: who funds, builds, and maintains these tools?
+
+| Stakeholder | Interest | Likely Role |
+|------------|----------|-------------|
+| **AI labs** | Epistemic virtue evals improve trust in their products; but may resist unfavorable results | Could fund evals; unlikely to fund tools that flag their own claims |
+| **Tech platforms** | Community notes reduce liability; but annotation may drive users away | Key partners for deployment; may resist external annotation |
+| **Governments** | Better-informed public discourse serves democratic interests | Could fund as public infrastructure; regulatory mandates possible |
+| **Philanthropic orgs** | Epistemic infrastructure is a classic public good | Most likely early funders (Open Philanthropy, Gates Foundation, etc.) |
+| **Academic institutions** | Research value; provenance tracing benefits researchers directly | Could build and host infrastructure; credibility advantage |
+| **News organizations** | Reliability tracking either validates or threatens their model | Could be early adopters or fierce opponents depending on implementation |
+| **General public** | Benefits from all tools; but may not pay for them directly | Adoption depends on ease of use; browser extensions are the key interface |
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "Can these tools achieve adoption without platform cooperation, or is buy-in from major tech companies essential?",
+    "How resistant are these systems to adversarial gaming by motivated actors?",
+    "Will the economics improve fast enough (via cheaper LLM inference) to make rhetoric highlighting and provenance tracing viable at scale?",
+    "Could these tools be co-opted for censorship or political control rather than genuine epistemic improvement?",
+    "Is the 'high-honesty equilibrium' thesis correct—does better tracking actually shift incentives toward honesty?"
+  ]}
+/>
+
+## Further Reading
+
+- **Original Report**: [Design Sketches for Collective Epistemics](https://www.forethought.org/research/design-sketches-collective-epistemics) — Forethought Foundation (2025)
+- **EA Forum Discussion**: [Some Tools for Collective Epistemics](https://forum.effectivealtruism.org/posts/zMuDoeXA9nBSeAc5g/some-tools-for-collective-epistemics)
+- **Related Wiki Pages**: <EntityLink id="epistemic-infrastructure">Epistemic Infrastructure</EntityLink>, <EntityLink id="community-notes">X Community Notes</EntityLink>, <EntityLink id="content-authentication">Content Authentication</EntityLink>
+
+<Backlinks />

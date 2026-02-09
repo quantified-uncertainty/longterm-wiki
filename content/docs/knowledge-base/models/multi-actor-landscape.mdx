@@ -1,0 +1,612 @@
+---
+title: Multi-Actor Strategic Landscape
+description: This model analyzes how risk depends on which actors develop TAI. Using 2024-2025 capability data, it finds the US-China model performance gap narrowed from 9.26% to 1.70% (Recorded Future), while open-source closed to within 1.70% of frontier. Actor identity may determine 40-60% of total risk variance.
+tableOfContents: false
+quality: 59
+lastEdited: "2025-12-28"
+ratings:
+  focus: 7.5
+  novelty: 4.5
+  rigor: 6
+  completeness: 7
+  concreteness: 7.5
+  actionability: 5.5
+importance: 72.5
+llmSummary: Analyzes how AI x-risk depends on which actors develop TAI, finding US-China capability gap narrowed from 9.26% to 1.70% (2024-2025) while open-source closed to within 1.70% of frontier. Estimates actor identity determines 40-60% of total risk variance across four pathways (singleton 8%, conflict 6%, lock-in 5%, misuse 7%), with 25% combined x-risk.
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Conceptual Framework' section
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+metrics:
+  wordCount: 698
+  citations: 26
+  tables: 23
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: governance-models
+---
+import CauseEffectGraph from '@components/CauseEffectGraph';
+import {Mermaid, R, EntityLink} from '@components/wiki';
+
+**Core thesis**: Risk is primarily determined by which actors develop TAI and their incentive structures. The strategic landscape of competition and cooperation shapes outcomes.
+
+<div class="breakout">
+<CauseEffectGraph
+  client:load
+  height={950}
+  fitViewPadding={0.05}
+  initialNodes={[
+    {
+      id: 'us-labs',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'US Lab Capability',
+        description: 'Aggregate capability of leading US AI labs.',
+        type: 'cause',
+        confidence: 0.85,
+        confidenceLabel: 'vs frontier',
+        details: 'OpenAI, Anthropic, Google DeepMind, Meta AI. Currently at frontier (~0.85 of theoretical max).',
+        relatedConcepts: ['OpenAI', 'Anthropic', 'Google', 'Meta']
+      }
+    },
+    {
+      id: 'china-labs',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'China Lab Capability',
+        description: 'Aggregate capability of leading Chinese AI labs.',
+        type: 'cause',
+        confidence: 0.65,
+        confidenceLabel: 'vs frontier',
+        details: 'ByteDance, Baidu, Alibaba, DeepSeek, etc. Currently ~0.65 of US frontier.',
+        relatedConcepts: ['DeepSeek', 'Baidu', 'Alibaba', 'ByteDance']
+      }
+    },
+    {
+      id: 'opensource',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Open-Source Capability',
+        description: 'Best freely available AI models.',
+        type: 'cause',
+        confidence: 0.55,
+        confidenceLabel: 'vs frontier',
+        details: 'Llama, Mistral, etc. Currently ~0.55 of frontier, closing gap rapidly.',
+        relatedConcepts: ['Llama', 'Mistral', 'Hugging Face', 'Open weights']
+      }
+    },
+    {
+      id: 'malicious-access',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Malicious Actor Access',
+        description: 'AI capability available to bad actors.',
+        type: 'cause',
+        confidence: 0.4,
+        confidenceLabel: 'vs frontier',
+        details: 'Criminals, terrorists, rogue states. Access through open-source, theft, or APIs. Currently ~0.4 of frontier.',
+        relatedConcepts: ['Cybercrime', 'Terrorism', 'Rogue states']
+      }
+    },
+    {
+      id: 'us-china-competition',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'US-China Competition',
+        description: 'Intensity of strategic AI competition.',
+        type: 'cause',
+        confidence: 0.75,
+        confidenceLabel: 'intensity (0-1)',
+        details: 'Geopolitical rivalry driving AI race. Currently high (~0.75). Affects safety investment.',
+        relatedConcepts: ['Decoupling', 'Chip war', 'Tech rivalry']
+      }
+    },
+    {
+      id: 'profit-pressure',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Profit Pressure',
+        description: 'Corporate pressure to monetize AI.',
+        type: 'cause',
+        confidence: 0.8,
+        confidenceLabel: 'intensity (0-1)',
+        details: 'Investor pressure, revenue targets, market share. Very high (~0.8). Drives deployment speed.',
+        relatedConcepts: ['Investors', 'Revenue', 'Market share']
+      }
+    },
+    {
+      id: 'democratic-oversight',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Democratic Oversight',
+        description: 'Strength of democratic accountability over AI.',
+        type: 'cause',
+        confidence: 0.35,
+        confidenceLabel: 'strength (0-1)',
+        details: 'Congressional oversight, public input, transparency requirements. Currently weak (~0.35).',
+        relatedConcepts: ['Congress', 'FOIA', 'Public comment']
+      }
+    },
+    {
+      id: 'authoritarian-control',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Authoritarian AI Goals',
+        description: 'Intensity of authoritarian control objectives.',
+        type: 'cause',
+        confidence: 0.7,
+        confidenceLabel: 'intensity (0-1)',
+        details: 'Surveillance, censorship, control priorities. China: ~0.7. Shapes AI development direction.',
+        relatedConcepts: ['Surveillance', 'Censorship', 'Social credit']
+      }
+    },
+    {
+      id: 'transparency',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Capability Transparency',
+        description: 'Honesty about AI capabilities.',
+        type: 'cause',
+        confidence: 0.4,
+        confidenceLabel: 'level (0-1)',
+        details: 'How much do labs reveal about capabilities? Currently ~0.4 (moderate secrecy).',
+        relatedConcepts: ['Model cards', 'Evals', 'Disclosure']
+      }
+    },
+    {
+      id: 'safety-sharing',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Safety Research Sharing',
+        description: 'How much safety research is shared.',
+        type: 'cause',
+        confidence: 0.6,
+        confidenceLabel: 'openness (0-1)',
+        details: 'Alignment research, red-teaming results. Currently ~0.6 (fairly open).',
+        relatedConcepts: ['Publications', 'Alignment Forum', 'Conferences']
+      }
+    },
+    {
+      id: 'us-alignment',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'US Actor Alignment',
+        description: 'Quality of alignment in US-developed AI.',
+        type: 'intermediate',
+        confidence: 0.5,
+        confidenceLabel: 'quality (0-1)',
+        details: 'How well-aligned are models from US labs? Currently ~0.5 (partial).',
+        relatedConcepts: ['RLHF', 'Constitutional AI', 'Safety teams']
+      }
+    },
+    {
+      id: 'china-alignment',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'China Actor Alignment',
+        description: 'Quality of alignment in Chinese AI.',
+        type: 'intermediate',
+        confidence: 0.35,
+        confidenceLabel: 'quality (0-1)',
+        details: 'Less transparency, different values. Currently ~0.35 (lower than US).',
+        relatedConcepts: ['CCP values', 'Censorship', 'State priorities']
+      }
+    },
+    {
+      id: 'first-mover',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'First-Mover Advantage',
+        description: 'How large is the TAI first-mover advantage?',
+        type: 'intermediate',
+        confidence: 0.7,
+        confidenceLabel: 'magnitude (0-1)',
+        details: 'Winner-take-all dynamics. Currently estimated high (~0.7).',
+        relatedConcepts: ['Decisive advantage', 'Lock-in', 'Monopoly']
+      }
+    },
+    {
+      id: 'multipolar',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Multipolar AI World',
+        description: 'Probability of multiple AI powers.',
+        type: 'intermediate',
+        confidence: 0.55,
+        confidenceLabel: 'probability',
+        details: 'Multiple actors with powerful AI vs. singleton. Currently ~55% multipolar.',
+        relatedConcepts: ['Bipolar', 'Multipolar', 'Singleton']
+      }
+    },
+    {
+      id: 'diffusion-speed',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Technology Diffusion',
+        description: 'How fast do AI capabilities spread?',
+        type: 'intermediate',
+        confidence: 0.7,
+        confidenceLabel: 'speed (0-1)',
+        details: 'Open-source, espionage, independent development. Currently fast (~0.7).',
+        relatedConcepts: ['Proliferation', 'Espionage', 'Reverse engineering']
+      }
+    },
+    {
+      id: 'offense-defense',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Offense-Defense Balance',
+        description: 'Does AI favor offense or defense?',
+        type: 'intermediate',
+        confidence: 0.65,
+        confidenceLabel: 'offense advantage',
+        details: 'Cyber, bio, manipulation. Currently offense-favored (~0.65).',
+        relatedConcepts: ['Cyber offense', 'Defense', 'Asymmetry']
+      }
+    },
+    {
+      id: 'unaligned-singleton',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Unaligned Singleton',
+        description: 'Risk of single unaligned AI dominance.',
+        type: 'intermediate',
+        confidence: 0.08,
+        confidenceLabel: 'expected loss',
+        details: 'One misaligned AI gains decisive advantage.',
+        relatedConcepts: ['Singleton', 'Takeoff', 'Decisive advantage']
+      }
+    },
+    {
+      id: 'multi-agent-conflict',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Multi-Agent Conflict',
+        description: 'Risk from AI systems in conflict.',
+        type: 'intermediate',
+        confidence: 0.06,
+        confidenceLabel: 'expected loss',
+        details: 'Multiple powerful AI systems with conflicting goals.',
+        relatedConcepts: ['AI war', 'Escalation', 'Coordination failure']
+      }
+    },
+    {
+      id: 'authoritarian-lock',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Authoritarian Lock-in',
+        description: 'Risk of permanent authoritarian control via AI.',
+        type: 'intermediate',
+        confidence: 0.05,
+        confidenceLabel: 'expected loss',
+        details: 'AI enables permanent surveillance state or dictatorship.',
+        relatedConcepts: ['Surveillance', 'Totalitarianism', 'Lock-in']
+      }
+    },
+    {
+      id: 'misuse-catastrophe',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Catastrophic Misuse',
+        description: 'Risk of catastrophic intentional misuse.',
+        type: 'intermediate',
+        confidence: 0.07,
+        confidenceLabel: 'expected loss',
+        details: 'Bioweapons, cyberattacks, manipulation at scale.',
+        relatedConcepts: ['Bioweapons', 'Cyber', 'WMD']
+      }
+    },
+    {
+      id: 'total-risk',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Combined X-Risk',
+        description: 'Total existential risk from all pathways.',
+        type: 'effect',
+        confidence: 0.25,
+        confidenceLabel: 'expected loss',
+        details: 'Sum of singleton, conflict, lock-in, and misuse risks.',
+        relatedConcepts: ['P(doom)', 'Existential risk', 'Catastrophe']
+      }
+    }
+  ]}
+  initialEdges={[
+    { id: 'e-us-competition', source: 'us-labs', target: 'us-china-competition', data: { impact: 0.30 } },
+    { id: 'e-china-competition', source: 'china-labs', target: 'us-china-competition', data: { impact: 0.30 } },
+    { id: 'e-us-first', source: 'us-labs', target: 'first-mover', data: { impact: 0.35 } },
+    { id: 'e-china-first', source: 'china-labs', target: 'first-mover', data: { impact: 0.25 } },
+    { id: 'e-competition-first', source: 'us-china-competition', target: 'first-mover', data: { impact: 0.40 } },
+    { id: 'e-opensource-diffusion', source: 'opensource', target: 'diffusion-speed', data: { impact: 0.50 } },
+    { id: 'e-transparency-diffusion', source: 'transparency', target: 'diffusion-speed', data: { impact: 0.25 } },
+    { id: 'e-competition-diffusion', source: 'us-china-competition', target: 'diffusion-speed', data: { impact: 0.25 } },
+    { id: 'e-opensource-malicious', source: 'opensource', target: 'malicious-access', data: { impact: 0.60 } },
+    { id: 'e-diffusion-malicious', source: 'diffusion-speed', target: 'malicious-access', data: { impact: 0.40 } },
+    { id: 'e-us-usalign', source: 'us-labs', target: 'us-alignment', data: { impact: 0.30 } },
+    { id: 'e-democratic-usalign', source: 'democratic-oversight', target: 'us-alignment', data: { impact: 0.25 } },
+    { id: 'e-profit-usalign', source: 'profit-pressure', target: 'us-alignment', data: { impact: 0.25 } },
+    { id: 'e-sharing-usalign', source: 'safety-sharing', target: 'us-alignment', data: { impact: 0.20 } },
+    { id: 'e-china-cnalign', source: 'china-labs', target: 'china-alignment', data: { impact: 0.30 } },
+    { id: 'e-auth-cnalign', source: 'authoritarian-control', target: 'china-alignment', data: { impact: 0.40 } },
+    { id: 'e-sharing-cnalign', source: 'safety-sharing', target: 'china-alignment', data: { impact: 0.30 } },
+    { id: 'e-first-multipolar', source: 'first-mover', target: 'multipolar', data: { impact: 0.50 } },
+    { id: 'e-diffusion-multipolar', source: 'diffusion-speed', target: 'multipolar', data: { impact: 0.50 } },
+    { id: 'e-competition-offense', source: 'us-china-competition', target: 'offense-defense', data: { impact: 0.50 } },
+    { id: 'e-us-offense', source: 'us-labs', target: 'offense-defense', data: { impact: 0.25 } },
+    { id: 'e-china-offense', source: 'china-labs', target: 'offense-defense', data: { impact: 0.25 } },
+    { id: 'e-usalign-singleton', source: 'us-alignment', target: 'unaligned-singleton', data: { impact: 0.35 } },
+    { id: 'e-cnalign-singleton', source: 'china-alignment', target: 'unaligned-singleton', data: { impact: 0.35 } },
+    { id: 'e-first-singleton', source: 'first-mover', target: 'unaligned-singleton', data: { impact: 0.30 } },
+    { id: 'e-multipolar-conflict', source: 'multipolar', target: 'multi-agent-conflict', data: { impact: 0.50 } },
+    { id: 'e-offense-conflict', source: 'offense-defense', target: 'multi-agent-conflict', data: { impact: 0.30 } },
+    { id: 'e-competition-conflict', source: 'us-china-competition', target: 'multi-agent-conflict', data: { impact: 0.20 } },
+    { id: 'e-auth-lock', source: 'authoritarian-control', target: 'authoritarian-lock', data: { impact: 0.50 } },
+    { id: 'e-china-lock', source: 'china-labs', target: 'authoritarian-lock', data: { impact: 0.30 } },
+    { id: 'e-democratic-lock', source: 'democratic-oversight', target: 'authoritarian-lock', data: { impact: 0.20 } },
+    { id: 'e-malicious-misuse', source: 'malicious-access', target: 'misuse-catastrophe', data: { impact: 0.60 } },
+    { id: 'e-offense-misuse', source: 'offense-defense', target: 'misuse-catastrophe', data: { impact: 0.40 } },
+    { id: 'e-singleton-total', source: 'unaligned-singleton', target: 'total-risk', data: { impact: 0.30 } },
+    { id: 'e-conflict-total', source: 'multi-agent-conflict', target: 'total-risk', data: { impact: 0.25 } },
+    { id: 'e-lock-total', source: 'authoritarian-lock', target: 'total-risk', data: { impact: 0.20 } },
+    { id: 'e-misuse-total', source: 'misuse-catastrophe', target: 'total-risk', data: { impact: 0.25 } }
+  ]}
+/>
+</div>
+
+## Overview
+
+This model analyzes how AI existential risk depends on which actors—US frontier labs, Chinese developers, open-source communities, or malicious actors—develop transformative AI first, and under what competitive conditions. The core insight is that actor identity and incentive structures may matter as much as technical <EntityLink id="alignment-progress">alignment progress</EntityLink> in determining outcomes.
+
+The strategic landscape shifted dramatically in 2024-2025. According to <R id="b8bad1a09894ea24">Recorded Future analysis</R>, the gap in overall model performance between the best US and Chinese models narrowed from **9.26% in January 2024 to just 1.70% by February 2025**. This was catalyzed by DeepSeek's R1 release in January 2025, which <R id="db0aa2438bb8a7f0">matched <EntityLink id="openai">OpenAI</EntityLink>'s o1 performance</R> while training for just \$1.6 million—a fraction of US costs. Similarly, <R id="42b42eecf63e696b">open-source models closed to within 1.70%</R> of frontier closed models on Chatbot Arena, fundamentally changing <EntityLink id="proliferation">proliferation</EntityLink> dynamics.
+
+Despite narrowing capability gaps, structural asymmetries persist. US private AI investment topped <R id="ea0b56f929844b43">\$109 billion in 2024</R>—over 12 times China's figure. The US maintains roughly 4,049 data centers versus China's 379, representing the <R id="389433dce3720ea6">largest single advantage</R> the US enjoys. Yet China leads in deployment: it installed approximately 295,000 industrial robots in 2024 alone—more than the rest of the world combined—and accounts for 69.7% of all AI patents.
+
+## Capability Gap Estimates (2024-2025)
+
+The following table synthesizes publicly available data on relative AI capabilities across actor categories. Estimates draw from benchmark performance, investment levels, and expert assessments.
+
+| Actor Category | Capability vs Frontier | Trend | Key Evidence | Source |
+|----------------|----------------------|-------|--------------|--------|
+| **US Frontier Labs** | 100% (reference) | Stable | GPT-4.5, Claude 3.5, Gemini 2.0 define frontier | Industry consensus |
+| **Chinese Labs (aggregate)** | 98.3% | Rapidly closing | Gap narrowed from 9.26% to 1.70% (Jan 2024 - Feb 2025) | <R id="b8bad1a09894ea24">Recorded Future</R> |
+| **DeepSeek specifically** | ≈100% on benchmarks | Matched frontier | R1 matched o1 at \$1.6M training cost; gold medal at IMO 2025 | <R id="87e132ccb0722909">CSIS</R> |
+| **Open-Source (Llama, Qwen)** | 98.3% | Rapidly closing | Gap narrowed from 8.04% to 1.70% on Chatbot Arena | <R id="42b42eecf63e696b">State of Open-Source AI</R> |
+| **Malicious Actor Access** | ≈40-60% | Increasing | Access via open-source, jailbreaks, or theft | Expert estimate |
+
+### Investment and Infrastructure Asymmetries
+
+| Dimension | United States | China | Ratio | Implications |
+|-----------|--------------|-------|-------|--------------|
+| Private AI Investment (2024) | \$109 billion | ≈\$1 billion | **12:1** | US leads funding despite capability parity |
+| Data Centers | 4,049 | 379 | **11:1** | Largest structural US advantage |
+| New Data Center Capacity (2024) | 5.8 GW | Lower | — | Continued infrastructure expansion |
+| Industrial Robot Installations (2024) | 34,000 | 295,000 | **1:9** | China leads deployment/application |
+| AI Patents (2023) | 13% of global | 69.7% of global | **1:5** | China dominates IP filings |
+| AI Research Citations (2023) | 13% of global | 22.6% of global | **1:2** | China leads academic output |
+
+*Sources: <R id="ea0b56f929844b43">CFR</R>, <R id="389433dce3720ea6">RAND</R>, <R id="11bfa4c484dd1403">Stanford HAI</R>*
+
+## Key Dynamics
+
+The following diagram illustrates how actor competition dynamics flow through to risk outcomes:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Actors["Actor Competition"]
+        USL[US Frontier Labs]
+        CNL[Chinese Labs]
+        OSS[Open-Source]
+        MAL[Malicious Actors]
+    end
+
+    subgraph Dynamics["Competitive Pressures"]
+        RACE[Racing Dynamics]
+        DIFF[Capability Diffusion]
+        SAFE[Safety Investment]
+    end
+
+    subgraph Outcomes["Risk Pathways"]
+        SING[Unaligned Singleton]
+        MULT[Multi-Agent Conflict]
+        AUTH[Authoritarian Lock-in]
+        MISUSE[Catastrophic Misuse]
+    end
+
+    USL -->|competes with| CNL
+    CNL -->|closes gap| RACE
+    USL -->|pressure to lead| RACE
+
+    OSS -->|enables access| DIFF
+    DIFF -->|reaches| MAL
+
+    RACE -->|reduces| SAFE
+    SAFE -->|insufficient| SING
+
+    CNL -->|if wins| AUTH
+    MAL -->|enables| MISUSE
+    RACE -->|increases| MULT
+
+    style USL fill:#e6f3ff
+    style CNL fill:#ffe6e6
+    style OSS fill:#e6ffe6
+    style MAL fill:#ffcccc
+    style SING fill:#ffdddd
+    style MULT fill:#ffdddd
+    style AUTH fill:#ffdddd
+    style MISUSE fill:#ffdddd
+`} />
+
+The key mechanisms are:
+
+1. **Competition intensity → Safety shortcuts → Misalignment risk**: As US-China competition intensifies (currently 0.75 on normalized scale), labs face pressure to accelerate timelines, potentially cutting safety corners.
+
+2. **Capability diffusion → Malicious access → Misuse risk**: Open-source releases (now within 1.70% of frontier) enable rapid proliferation to actors who may lack safety constraints or beneficial intent.
+
+3. **First-mover advantage → Winner-take-all → Reduced caution**: If decisive strategic advantage exists for first-mover, actors rationally accept higher alignment risk to capture it.
+
+4. **Democratic oversight → Deployment delays → Capability gaps**: Strong oversight in democratic nations may create windows where authoritarian actors gain advantages, creating perverse incentives against regulation.
+
+5. **Transparency → Better coordination → Reduced racing**: Conversely, capability transparency and safety research sharing (currently ~0.6 openness) can reduce competitive pressure.
+
+## Risk Pathways
+
+| Pathway | Description | Estimate |
+|---------|-------------|----------|
+| **Unaligned Singleton** | One misaligned AI gains decisive advantage | 8% |
+| **Multi-Agent Conflict** | Multiple powerful AI systems in conflict | 6% |
+| **Authoritarian Lock-in** | AI enables permanent authoritarian control | 5% |
+| **Catastrophic Misuse** | Intentional misuse causes catastrophe | 7% |
+| **Combined X-Risk** | Total from all pathways | ≈25% |
+
+## Actor Categories
+
+| Category | Key Actors |
+|----------|------------|
+| **Leading US** | OpenAI, Anthropic, Google DeepMind, Meta |
+| **Leading China** | DeepSeek, Baidu, Alibaba, ByteDance |
+| **Open-Source** | Meta (Llama), Mistral, Hugging Face ecosystem |
+| **Malicious** | Cybercriminals, terrorists, rogue states |
+| **Governments** | US (NSA, DARPA), China (PLA, MSS), EU |
+
+## Full Variable List
+
+This diagram simplifies the full model. The complete Multi-Actor Strategic Landscape includes:
+
+**Actor Capabilities (15 variables)**: Leading US lab, leading Chinese lab, US government AI, Chinese government AI, open-source ecosystem, second-tier corporate labs, academic research, cybercriminal AI, terrorist access, authoritarian regime AI, democratic allies AI, corporate espionage, state IP theft, insider threat, supply chain security.
+
+**Actor Incentives (12 variables)**: US-China competition, profit pressure, academic openness, classification levels, democratic accountability, authoritarian control, geopolitical crises, economic desperation, military doctrine, regulatory arbitrage, talent mobility, public-private partnerships.
+
+**Information & Transparency (7 variables)**: Capability disclosure, safety sharing, incident reporting, capability intelligence, dual-use publication norms, evaluation standards, third-party verification.
+
+**Alignment & Control (8 variables)**: US actor alignment, China actor alignment, Constitutional AI effectiveness, human oversight scalability, kill switch reliability, containment protocols, red-teaming, post-deployment monitoring.
+
+**Strategic Outcomes (8 variables)**: First-mover advantage, winner-take-all dynamics, diffusion speed, multipolar vs bipolar, offense-defense balance, escalation control, governance lock-in, misuse probability.
+
+**Existential Risk Paths (5 variables)**: Unaligned singleton, multi-agent conflict, authoritarian lock-in, economic/social collapse, combined risk.
+
+## Strategic Importance
+
+### Magnitude Assessment
+
+The multi-actor landscape determines whether AI development is coordinated or conflictual. Actor heterogeneity creates both risks (racing, proliferation) and opportunities (diverse approaches).
+
+| Dimension | Assessment | Quantitative Estimate |
+|-----------|------------|----------------------|
+| **Potential severity** | High - multipolar dynamics drive racing and proliferation | Actor landscape contributes 40-60% of total risk variance |
+| **Probability-weighted importance** | High - currently in competitive multipolar phase | 75% probability of continued multipolar competition through 2030 |
+| **Comparative ranking** | Essential context for governance and coordination strategies | #2 priority behind technical alignment |
+| **Malleability** | Medium - actor incentives partially shiftable | 20-30% of racing dynamics addressable via policy |
+
+### Actor Safety Assessment
+
+| Actor Category | Safety Investment | Safety Culture | Transparency | Overall Safety Grade |
+|----------------|-------------------|----------------|--------------|---------------------|
+| Anthropic | ≈30% of budget | Strong | High | A- |
+| OpenAI | ≈15% of budget | Declining | Medium | B- |
+| Google DeepMind | ≈20% of budget | Strong | Medium | B+ |
+| Meta AI | ≈10% of budget | Moderate | High (open-source) | B- |
+| Chinese Labs | ≈5% of budget | Unknown | Low | C- (estimated) |
+| Open-Source Ecosystem | Minimal | Variable | Very high | C |
+
+### Diffusion Timeline Estimates
+
+| Capability Level | US Labs | Chinese Labs | Open-Source | Malicious Actors |
+|-----------------|---------|--------------|-------------|------------------|
+| GPT-4 class | 2023 | 2024-2025 | 2024-2025 | 2025-2026 |
+| GPT-5 class (projected) | 2025 | 2026-2027 | 2027-2028 | 2028-2030 |
+| Autonomous agents (dangerous) | 2025-2026 | 2026-2027 | 2027-2028 | 2028-2029 |
+
+**Key Finding:** The open-source lag has collapsed. As of late 2025, the center of gravity for open-weight models has <R id="42b42eecf63e696b">shifted toward China</R>, with DeepSeek and Qwen becoming household names. US firms released fewer open-weight models citing commercial and safety constraints, while Chinese labs treated open-weight leadership as a deliberate catch-up strategy. Meta—long a champion of frontier open models—has <R id="4c47576f1afcffc3">delayed release of Llama Behemoth</R> and suggested it may keep future "superintelligence" models behind paywalls.
+
+### First-Mover Advantage: Evidence Assessment
+
+The model's risk estimates depend critically on the magnitude of first-mover advantage. Strong first-mover advantages create racing incentives; weak ones reduce them. Current evidence suggests first-mover advantages are significant but not overwhelming:
+
+| Evidence Type | Finding | Implication for FMA |
+|--------------|---------|---------------------|
+| Historical analysis | First movers have 47% failure rate; only 11% become market leaders (<R id="1a43908865a78d9c">Golder & Tellis</R>) | **Weak FMA** |
+| AI competitive landscape | 2,011 companies in 2024 ML/AI landscape, 578 new entrants since 2023 | **Weak FMA** |
+| Model replication | 11 different developers globally achieved GPT-4-level models in 2024 | **Weak FMA** |
+| Cloud market | AWS and Azure trading leadership position; "more than one winner" possible | **Moderate FMA** |
+| Network effects | AI systems less network-effect-driven than social platforms | **Weak FMA** |
+| TAI-specific dynamics | Decisive strategic advantage at TAI level remains uncertain | **Unknown** |
+
+**Key insight:** Evidence from the <R id="7ab94e5b904cd46f">Abundance Institute</R> suggests "no signs of winner-take-all dynamics" in the current AI ecosystem. However, TAI (transformative AI) may differ qualitatively if it enables rapid capability improvements or strategic advantages not available to followers. The model's 0.7 first-mover advantage estimate may be too high based on current evidence, but TAI-level dynamics remain highly uncertain.
+
+### Resource Implications
+
+Understanding actor landscape enables:
+- Targeted engagement with highest-leverage actors: Focus on top 3-4 US labs could cover 70% of frontier capability
+- Coalition-building for safety standards: Anthropic-OpenAI-DeepMind coalition would set de facto standards
+- Monitoring of capability diffusion: \$50-100M/year for comprehensive capability intelligence
+- Anticipation of strategic behavior and reactions: Game-theoretic modeling investment ≈\$10-20M/year
+
+**Recommended investment:** \$100-200M/year in actor-focused governance work (vs. ≈\$20-30M current).
+
+### Key Cruxes
+
+| Crux | If True | If False | Current Probability |
+|------|---------|----------|---------------------|
+| Leading coalition is stable | Top 3 can set norms | Racing to bottom | 45% |
+| Safety can be coordination point | Voluntary standards viable | Regulation required | 35% |
+| China is engageable on safety | Global coordination possible | Bifurcated governance | 30% |
+| Diffusion to malicious actors is slow | Window for governance | Proliferation dominates | 50% |
+
+### Multipolar vs Unipolar Governance Considerations
+
+A crucial variable in this model is whether AI development converges toward **unipolar** (single dominant actor or coalition) or **multipolar** (distributed power among multiple actors) outcomes. Each presents distinct risk profiles:
+
+| Governance Structure | Key Risks | Key Advantages |
+|---------------------|-----------|----------------|
+| **Unipolar (single dominant actor)** | Value lock-in, institutional stagnation, internal corruption, single points of failure | Coordination easier, racing reduced, unified safety standards |
+| **Multipolar (distributed power)** | Unchecked proliferation, system instability, coordination failures, racing dynamics | Diversity of approaches, no single point of failure, competitive pressure for safety |
+
+Current research from <R id="f988e44183d1e204">AI Impacts</R> identifies key research questions: What "considerations might tip us between multipolar and unipolar scenarios"? What "risks [are] distinctive to a multipolar scenario"? The <R id="747f779110c2fad4">CO/AI analysis</R> notes that while current AI safety discussions often default to unipolar frameworks, "exploring decentralized governance structures could address key risks like value lock-in and institutional stagnation."
+
+**Current assessment:** The model estimates 55% probability of continued multipolar development, with the US-China bifurcation appearing increasingly stable. Geopolitical tensions, divergent regulatory approaches, and the collapse of open-source lags all point toward a world with multiple competing AI powers rather than a single dominant actor.
+
+## Limitations
+
+1. **Capability estimates rapidly outdating**: The 2024-2025 data showing near-parity may not persist; breakthrough capabilities could restore gaps.
+
+2. **Safety investment data opaque**: Lab safety budgets are not publicly disclosed; estimates are inferential.
+
+3. **TAI dynamics uncertain**: Current competitive patterns may not predict TAI-level dynamics where decisive advantages could differ fundamentally.
+
+4. **Geopolitical volatility**: US-China relations, export control effectiveness, and regulatory trajectories are highly uncertain.
+
+5. **Malicious actor access hard to estimate**: Underground markets and state-sponsored theft create significant uncertainty in capability diffusion.
+
+## Sources
+
+- <R id="b8bad1a09894ea24">Recorded Future: US-China AI Gap Analysis (2025)</R>
+- <R id="389433dce3720ea6">RAND: China's AI Models Closing the Gap (2025)</R>
+- <R id="ea0b56f929844b43">Council on Foreign Relations: China, the United States, and the AI Race</R>
+- <R id="db0aa2438bb8a7f0">Boston University: DeepSeek and AI Frontier (2025)</R>
+- <R id="42b42eecf63e696b">State of Open-Source AI 2025</R>
+- <R id="87e132ccb0722909">CSIS: DeepSeek, Huawei, and US-China AI Race</R>
+- <R id="7ab94e5b904cd46f">Abundance Institute: AI Competitive Landscape</R>
+- <R id="f988e44183d1e204">AI Impacts: Multipolar Research Projects</R>
+- <R id="51e8802a5aef29f6">Frontier Model Forum: Progress Update 2024</R>

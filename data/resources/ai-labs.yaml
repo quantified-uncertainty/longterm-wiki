@@ -1,0 +1,2898 @@
+# AI Labs
+# Resources from major AI labs and companies
+# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
+
+- id: 384cd95f0c4dbbc6
+  url: https://scholar.google.com/scholar?q=replika+parasocial+relationship
+  title: Academic research on Replika relationships
+  type: web
+  cited_by:
+    - cyber-psychosis
+  publication_id: google-scholar
+  tags:
+    - mental-health
+    - ai-ethics
+    - manipulation
+- id: ea71869e9fa90e9d
+  url: https://openai.com/index/advancing-red-teaming-with-people-and-ai/
+  title: Advancing red teaming with people and AI
+  type: web
+  local_filename: ea71869e9fa90e9d.txt
+  summary: OpenAI explores external and automated red teaming approaches to systematically test AI
+    model safety and potential risks. The research focuses on developing more diverse and effective
+    methods for identifying AI system vulnerabilities.
+  review: OpenAI's research on red teaming represents a critical approach to proactively identifying
+    and mitigating potential risks in AI systems. By combining external human expertise with
+    automated testing methods, the research aims to create more comprehensive safety evaluations
+    that can capture diverse potential failure modes and misuse scenarios. The methodology involves
+    carefully designed testing campaigns that include selecting diverse experts, creating structured
+    testing interfaces, and developing advanced automated techniques that can generate novel and
+    effective attack strategies. Notably, the research leverages more capable AI models like GPT-4
+    to improve the diversity and effectiveness of red teaming, demonstrating a meta-approach to
+    using AI for improving AI safety. While acknowledging limitations such as temporal relevance and
+    potential information hazards, the research represents an important step towards more robust AI
+    risk assessment strategies.
+  key_points:
+    - Red teaming combines human and AI approaches to systematically test AI system risks
+    - Advanced techniques can generate more diverse and tactically effective attack scenarios
+    - Careful design of testing campaigns is crucial for meaningful safety evaluations
+  cited_by:
+    - lab-behavior
+  fetched_at: 2025-12-28 02:03:57
+  publication_id: openai
+  tags:
+    - safety
+    - economic
+    - cybersecurity
+- id: 940d2564cdb677d6
+  url: https://www.anthropic.com/index/measuring-ai-safety
+  title: AI Safety Seems Hard to Measure
+  type: web
+  cited_by:
+    - optimistic
+  publication_id: anthropic
+  tags:
+    - safety
+- id: 54d3477036ea8c07
+  url: https://deepmind.google/blog/alphafold-five-years-of-impact/
+  title: "AlphaFold: Five Years of Impact - Google DeepMind"
+  type: web
+  local_filename: 54d3477036ea8c07.txt
+  summary: DeepMind's AlphaFold AI technology has revolutionized protein structure prediction,
+    providing unprecedented insights into biological systems and potential medical treatments.
+  review: >-
+    AlphaFold represents a transformative breakthrough in computational biology, enabling precise
+    prediction of protein structures with unprecedented accuracy. By leveraging advanced machine
+    learning techniques, the system has solved a decades-long challenge in understanding complex
+    molecular configurations, with wide-ranging implications for scientific research and therapeutic
+    development.
+
+
+    The technology's impact spans multiple domains, from revealing critical protein structures in
+    heart disease research to supporting conservation efforts for endangered species like honeybees.
+    By providing atomic-level structural insights into proteins like apolipoprotein B100 and
+    Vitellogenin, AlphaFold is accelerating research in genetics, drug discovery, and biological
+    understanding, potentially revolutionizing approaches to medical treatment and ecological
+    preservation.
+  key_points:
+    - Solves 50-year-old challenge in protein structure prediction
+    - Enables precise molecular-level insights across biological domains
+    - Supports research in medicine, genetics, and conservation
+  fetched_at: 2025-12-28 01:07:42
+  publication_id: deepmind
+  tags:
+    - biosecurity
+- id: 69941143594b10ea
+  url: https://www.anthropic.com/news/collective-constitutional-ai-aligning-a-language-model-with-public-input
+  title: "Anthropic: Collective Constitutional AI"
+  type: web
+  local_filename: 69941143594b10ea.txt
+  summary: Researchers involved ~1,000 Americans in drafting an AI system constitution using the Polis
+    platform. They trained a model using this publicly sourced constitution and compared it to their
+    standard model.
+  review: This research represents a pioneering attempt to democratize AI value alignment by
+    incorporating public input into an AI system's constitutional principles. By using the Polis
+    online deliberation platform, Anthropic engaged a representative sample of Americans to
+    collaboratively draft normative guidelines for an AI chatbot, moving beyond developer-only value
+    selection. The methodology involved collecting public statements, moderating them, consolidating
+    similar ideas, and translating them into Constitutional AI principles. When training a model
+    against this public constitution, they discovered interesting differences from their standard
+    model, particularly in reduced bias across social dimensions and a greater emphasis on
+    objectivity, impartiality, and accessibility. While the research is preliminary, it demonstrates
+    a potential pathway for more participatory and transparent AI development, highlighting both the
+    opportunities and challenges of integrating democratic processes into technically complex AI
+    alignment strategies.
+  key_points:
+    - First known attempt to collectively direct a language model's behavior through public input
+    - Public constitution showed lower bias and more emphasis on objectivity compared to Anthropic's
+      original constitution
+    - Revealed significant methodological challenges in translating public input into AI training
+      principles
+  fetched_at: 2025-12-28 02:55:15
+  publication_id: anthropic
+- id: 4d535568cbd37c26
+  url: https://www.anthropic.com/news/compliance-framework-SB53
+  title: "Anthropic: Compliance framework for California SB 53"
+  type: web
+  local_filename: 4d535568cbd37c26.txt
+  summary: Anthropic outlines its Frontier Compliance Framework (FCF) in response to California's
+    Transparency in Frontier AI Act, detailing approaches to assess and mitigate potential
+    catastrophic risks from AI systems.
+  review: >-
+    Anthropic's document presents a comprehensive approach to AI safety regulation, specifically
+    addressing the requirements of California's SB 53. The Frontier Compliance Framework (FCF)
+    represents a proactive stance on managing potential catastrophic risks from advanced AI systems,
+    covering areas such as cyber offense, chemical, biological, radiological, and nuclear threats,
+    as well as risks of AI sabotage and loss of control.
+
+
+    The framework goes beyond mere compliance, proposing a broader vision for AI safety regulation
+    at the federal level. Anthropic advocates for a flexible, adaptive approach to AI transparency
+    that balances safety concerns with innovation, emphasizing public visibility into safety
+    practices, protection of whistleblowers, and targeted application to the most advanced AI
+    developers. This approach demonstrates a sophisticated understanding of the evolving AI
+    landscape, recognizing the need for regulatory frameworks that can adapt to rapid technological
+    changes while maintaining robust safety standards.
+  key_points:
+    - Comprehensive framework for assessing and mitigating AI catastrophic risks
+    - Advocates for federal AI transparency legislation with flexible standards
+    - Emphasizes protecting whistleblowers and public visibility into AI development
+  cited_by:
+    - lab-behavior
+  fetched_at: 2025-12-28 02:04:05
+  publication_id: anthropic
+  tags:
+    - x-risk
+- id: 5fa46de681ff9902
+  url: https://www.anthropic.com/news/core-views-on-ai-safety
+  title: Anthropic's Core Views on AI Safety
+  type: web
+  local_filename: 5fa46de681ff9902.txt
+  summary: Anthropic believes AI could have an unprecedented impact within the next decade and is
+    pursuing comprehensive AI safety research to develop reliable and aligned AI systems across
+    different potential scenarios.
+  review: >-
+    Anthropic's core perspective on AI safety centers on the potential for rapid, transformative AI
+    progress and the urgent need to develop techniques to ensure these systems remain aligned with
+    human values. They recognize significant uncertainty about AI development trajectories, ranging
+    from optimistic scenarios where alignment is relatively straightforward to pessimistic scenarios
+    where AI safety might be fundamentally unsolvable.
+
+
+    Their approach is empirically driven and multi-pronged, focusing on research areas like
+    mechanistic interpretability, scalable oversight, process-oriented learning, and understanding
+    AI generalization. Unlike some organizations, they do not commit to a single theoretical
+    framework but instead aim to develop a 'portfolio' of safety research that can be adaptive as
+    more information becomes available. This pragmatic stance acknowledges both the potential
+    benefits and serious risks of advanced AI systems, emphasizing the importance of proactive,
+    iterative research to mitigate potential catastrophic outcomes.
+  key_points:
+    - AI could have transformative impacts within the next decade
+    - Current AI safety techniques are insufficient for highly capable systems
+    - An empirical, multi-faceted approach is needed to address potential risks
+    - Continued research and adaptability are crucial for managing AI development
+  cited_by:
+    - compounding-risks-analysis
+    - multipolar-trap-dynamics
+    - racing-dynamics-impact
+    - anthropic
+    - alignment
+    - anthropic-core-views
+    - concentration-of-power
+    - alignment-difficulty
+  fetched_at: 2025-12-28 01:07:00
+  publication_id: anthropic
+  tags:
+    - alignment
+    - safety
+    - risk-interactions
+    - compounding-effects
+    - systems-thinking
+- id: afe1e125f3ba3f14
+  url: https://www.anthropic.com/responsible-scaling-policy
+  title: Anthropic's Responsible Scaling Policy
+  type: web
+  local_filename: afe1e125f3ba3f14.txt
+  summary: Anthropic introduces a systematic approach to managing AI risks by establishing AI Safety
+    Level (ASL) Standards that dynamically adjust safety measures based on model capabilities. The
+    policy focuses on mitigating potential catastrophic risks through rigorous testing and
+    governance.
+  review: >-
+    Anthropic's Responsible Scaling Policy represents a pioneering approach to proactively managing
+    AI development risks. By introducing AI Safety Level (ASL) Standards, the policy creates a
+    dynamic and adaptable framework that scales safety measures proportionally to increasing model
+    capabilities. The approach is particularly innovative in its emphasis on iterative risk
+    assessment, with clear mechanisms for identifying and responding to emerging capability
+    thresholds in domains like CBRN weapons and autonomous AI research and development.
+
+
+    The policy's strengths include its comprehensive methodology for capability and safeguards
+    assessment, transparent governance structures, and commitment to external expert consultation.
+    By establishing a Responsible Scaling Officer, creating robust internal review processes, and
+    pledging public transparency, Anthropic demonstrates a serious commitment to responsible AI
+    development. However, the policy also acknowledges its own limitations, recognizing that risk
+    assessment in rapidly evolving AI domains requires continuous refinement and humble uncertainty.
+  key_points:
+    - Introduces AI Safety Level (ASL) Standards that dynamically adjust based on model capabilities
+    - Establishes clear thresholds for capabilities in CBRN weapons and autonomous AI research
+    - Commits to transparent governance and external expert consultation
+  cited_by:
+    - lab-behavior
+    - technical-pathways
+    - anthropic-core-views
+    - evals
+    - corporate
+    - pause
+  fetched_at: 2025-12-28 02:03:55
+  publication_id: anthropic
+  tags:
+    - governance
+    - capabilities
+    - safety
+    - x-risk
+    - evaluation
+- id: b4ae03bf1fb0da13
+  url: https://scholar.google.com/scholar?q=automation+skill+decay
+  title: Automation and Skill Decay
+  type: web
+  local_filename: b4ae03bf1fb0da13.txt
+  summary: >-
+    I apologize, but the source document appears to be a search results page with fragments of
+    citations and abstracts, not a complete document. Without a coherent full text, I cannot
+    comprehensively analyze this source as requested. 
+
+
+    The search results suggest multiple papers about skill decay and automation, but no single
+    complete source is available. To properly complete the JSON template, I would need the full text
+    of a specific research paper.
+
+
+    If you'd like, I can:
+
+    1. Request the full text of a specific citation
+
+    2. Help you locate the complete source document
+
+    3. Provide a generalized analysis based on the citation fragments
+
+
+    Would you like to proceed in one of those directions?
+  cited_by:
+    - expertise-atrophy
+  fetched_at: 2025-12-28 03:01:32
+  publication_id: google-scholar
+  tags:
+    - economic
+    - automation
+    - human-factors
+    - skill-degradation
+- id: 29e83038187711cc
+  url: https://www.amazon.com/Superintelligence-Dangers-Strategies-Nick-Bostrom/dp/0198739834
+  title: "Bostrom (2014): Superintelligence"
+  type: web
+  cited_by:
+    - self-improvement
+    - instrumental-convergence
+  tags:
+    - agi
+    - intelligence-explosion
+    - recursive-self-improvement
+    - automl
+    - power-seeking
+  publication_id: amazon
+- id: 2f918741de446a84
+  url: https://openai.com/index/building-an-early-warning-system-for-llm-aided-biological-threat-creation/
+  title: Building an early warning system for LLM-aided biological threat creation
+  type: web
+  cited_by:
+    - bioweapons
+  publication_id: openai
+  tags:
+    - biosecurity
+    - llm
+    - dual-use-research
+    - x-risk
+- id: 348c5f5154e92163
+  url: https://scholar.google.com/scholar?q=cognitive+offloading
+  title: Cognitive Offloading Research
+  type: web
+  local_filename: 348c5f5154e92163.txt
+  summary: Research explores how humans use external resources to support cognitive tasks, examining
+    benefits and potential limitations of this cognitive strategy.
+  review: >-
+    Cognitive offloading research investigates how individuals leverage external tools,
+    technologies, and environmental resources to reduce cognitive processing demands. Multiple
+    studies examine the psychological mechanisms, developmental aspects, and metacognitive processes
+    underlying this strategy.
+
+
+    The field appears to be exploring both the performance benefits and potential cognitive
+    consequences of offloading, such as potential memory reduction or changes in internal cognitive
+    processing. Researchers are particularly interested in understanding individual differences,
+    confidence levels, and how offloading strategies develop across different age groups.
+  key_points:
+    - Cognitive offloading is a strategy for managing mental workload using external resources
+    - Research spans developmental psychology, metacognition, and human-technology interaction
+  cited_by:
+    - expertise-atrophy
+  fetched_at: 2025-12-28 03:01:38
+  publication_id: google-scholar
+  tags:
+    - automation
+    - human-factors
+    - skill-degradation
+- id: 02828439f34ad89c
+  url: https://www.anthropic.com/index/constitutional-ai-harmlessness-from-ai-feedback
+  title: "Constitutional AI: Anthropic"
+  type: web
+  cited_by:
+    - long-horizon
+    - hybrid-systems
+  fetched_at: 2025-12-28 03:44:28
+  publication_id: anthropic
+  tags:
+    - agentic
+    - planning
+    - goal-stability
+    - human-ai-interaction
+    - ai-control
+- id: 5e519ccc8385ade8
+  url: https://www.deepmind.com/safety-and-ethics
+  title: "DeepMind: AI Safety"
+  type: web
+  local_filename: 5e519ccc8385ade8.txt
+  fetched_at: 2025-12-28 03:45:52
+  publication_id: deepmind
+  tags:
+    - safety
+- id: 40eb92468f802d50
+  url: https://scholar.google.com/scholar?q=deskilling+technology
+  title: Deskilling Literature
+  type: web
+  local_filename: 40eb92468f802d50.txt
+  summary: Deskilling literature explores how technology transforms work by reducing skill complexity
+    and changing labor requirements across different industries.
+  review: >-
+    The deskilling literature examines how technological advancements systematically reduce skill
+    complexity in various professional domains. Research indicates that emerging technologies like
+    AI and automation can simplify tasks, potentially reducing the specialized skills needed to
+    perform certain jobs.
+
+
+    While deskilling presents potential efficiency gains, it also raises critical questions about
+    workforce adaptation, professional expertise, and the long-term implications of technological
+    substitution of human skills.
+  key_points:
+    - Technology can progressively reduce skill complexity in professional tasks
+    - Deskilling impacts vary across different industries and job types
+  cited_by:
+    - expertise-atrophy
+  fetched_at: 2025-12-28 03:01:38
+  publication_id: google-scholar
+  tags:
+    - economic
+    - automation
+    - human-factors
+    - skill-degradation
+- id: fc492fd338071abd
+  url: https://deepmind.google/technologies/synthid/
+  title: Google SynthID
+  type: web
+  local_filename: fc492fd338071abd.txt
+  summary: SynthID embeds imperceptible watermarks in AI-generated content to help identify synthetic
+    media without degrading quality. It works across images, audio, and text platforms.
+  review: SynthID represents an innovative approach to content authentication in the era of generative
+    AI, providing a method to trace and verify synthetic media. By embedding invisible watermarks
+    that survive common transformations like cropping, compression, and filtering, Google has
+    developed a technical solution to the growing challenge of distinguishing AI-generated from
+    human-created content. The methodology relies on subtle modifications to generation
+    probabilities in different media types - adjusting pixel values in images, embedding inaudible
+    audio signals, and manipulating token probability scores in text. This approach is particularly
+    significant for AI safety, as it offers a potential mechanism to increase transparency and
+    accountability in AI-generated content. While promising, the technology's effectiveness will
+    depend on widespread adoption and the ability to withstand increasingly sophisticated attempts
+    to circumvent or remove watermarks.
+  key_points:
+    - Watermarks are imperceptible and do not degrade content quality
+    - "Works across multiple media types: images, audio, and text"
+    - Designed to survive common modifications and transformations
+  cited_by:
+    - solutions
+    - disinformation
+  fetched_at: 2025-12-28 02:55:07
+  publication_id: deepmind
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 31799a46d8d0ae2f
+  url: https://openai.com/index/gpt-4-1/
+  title: GPT-4.1 Announcement - OpenAI
+  type: web
+  local_filename: 31799a46d8d0ae2f.txt
+  summary: OpenAI introduces GPT-4.1, GPT-4.1 mini, and GPT-4.1 nano models with enhanced performance
+    across coding, instruction following, and long-context understanding. The models offer improved
+    reliability and efficiency at lower costs.
+  review: >-
+    The GPT-4.1 release represents a substantial advancement in AI model capabilities, focusing on
+    practical improvements for developers. The models demonstrate significant performance gains
+    across multiple dimensions, including coding accuracy, instruction following, and long-context
+    comprehension. Key improvements include a 54.6% score on SWE-bench Verified for software
+    engineering tasks, a 10.5% absolute improvement in multi-turn instruction following, and the
+    ability to process up to 1 million tokens of context.
+
+
+    The release is notable for its emphasis on real-world utility, with performance gains validated
+    through extensive benchmarking and partnerships with industry leaders like Thomson Reuters and
+    Carlyle. The models also introduce pricing efficiencies, with GPT-4.1 being 26% less expensive
+    than previous iterations. While the improvements are impressive, OpenAI acknowledges that
+    benchmarks don't tell the full story and emphasizes the importance of practical applications.
+    The release signals a continued focus on making AI more reliable, context-aware, and accessible
+    to developers across various domains.
+  key_points:
+    - Significant improvements in coding accuracy, instruction following, and long-context
+      understanding
+    - Ability to process up to 1 million tokens of context
+    - Lower pricing and improved inference efficiency
+    - Enhanced performance across academic, coding, and vision benchmarks
+  fetched_at: 2025-12-28 01:07:42
+  publication_id: openai
+  tags:
+    - capabilities
+    - llm
+- id: e583320c2e05b167
+  url: https://scholar.google.com/scholar?q=information+overload+decision+making
+  title: Information Overload Research
+  type: web
+  publication_id: google-scholar
+- id: d05d86b6fe3b45a3
+  url: https://openai.com/index/gdpval/
+  title: Measuring Real-World Task Performance - OpenAI
+  type: web
+  local_filename: d05d86b6fe3b45a3.txt
+  summary: GDPval is a new evaluation framework assessing AI models' capabilities on economically
+    valuable tasks across 44 occupations. It provides a realistic measure of how AI can support
+    professional work across different industries.
+  review: OpenAI's GDPval represents a significant advancement in AI performance measurement by moving
+    beyond abstract academic benchmarks to evaluate models on genuine, economically relevant
+    professional tasks. By spanning 44 occupations across 9 industries and using tasks created by
+    professionals with over 14 years of experience, the framework offers an unprecedented look at
+    AI's real-world capabilities. The methodology is particularly noteworthy, involving meticulous
+    task design, multi-round expert reviews, and blind comparative evaluations where industry
+    experts grade model outputs against human work. Early results suggest frontier models are
+    approaching expert-level performance, with some models like Claude Opus 4.1 producing outputs
+    rated as good as or better than human experts in nearly half the tasks. This work not only
+    provides a robust assessment of current AI capabilities but also creates a pathway for tracking
+    AI progress, potentially transforming how we understand AI's economic and professional impact.
+  key_points:
+    - First comprehensive evaluation of AI performance across 44 real-world professional occupations
+    - Models showed ability to complete tasks 100x faster and cheaper than human experts
+    - Performance improved significantly from GPT-4o to GPT-5, more than tripling in one year
+  fetched_at: 2025-12-28 01:07:53
+  publication_id: openai
+  tags:
+    - capabilities
+    - evaluation
+    - economic
+- id: 4bebc087d3244cc2
+  url: https://scholar.google.com/scholar?q=gps+navigation+skills+decline
+  title: Multiple studies
+  type: web
+  local_filename: 4bebc087d3244cc2.txt
+  summary: >-
+    I apologize, but the source content appears to be a search results page with fragmented and
+    incomplete text, which makes it impossible to generate a comprehensive summary. The content does
+    not provide a coherent document or study to analyze.
+
+
+    To proceed, I would need:
+
+    1. A complete research paper or article
+
+    2. Clear, readable source text
+
+    3. Sufficient context to understand the main arguments and findings
+
+
+    Would you like to:
+
+    - Provide the full text of the source document
+
+    - Select a different source
+
+    - Clarify the specific document you want summarized
+  cited_by:
+    - expertise-atrophy
+  fetched_at: 2025-12-28 03:01:32
+  publication_id: google-scholar
+  tags:
+    - automation
+    - human-factors
+    - skill-degradation
+- id: 456dceb78268f206
+  url: https://openai.com/index/ai-and-efficiency/
+  title: OpenAI efficiency research
+  type: web
+  local_filename: 456dceb78268f206.txt
+  summary: OpenAI research demonstrates significant algorithmic efficiency gains in AI, showing neural
+    networks require less computational resources over time to achieve similar performance levels.
+  review: This research provides an important quantitative analysis of algorithmic progress in
+    artificial intelligence by tracking the computational efficiency of neural network training. By
+    examining various domains like ImageNet classification, the study reveals that the compute
+    needed to train neural networks has been decreasing by a factor of 2 every 16 months since 2012
+    - a rate substantially faster than Moore's Law hardware improvements. The methodology focuses on
+    measuring training efficiency by holding performance constant across different neural network
+    implementations, allowing for a clear comparison of algorithmic progress. The research suggests
+    that for AI tasks with high investment, algorithmic improvements are driving efficiency gains
+    more significantly than hardware advancements. While acknowledging limitations in
+    generalizability and data points, the study highlights the potential long-term implications of
+    continuous algorithmic efficiency improvements and calls for more systematic measurement of AI
+    progress.
+  key_points:
+    - Neural network training efficiency improves faster than hardware efficiency
+    - Compute requirements for AI tasks can halve every 16 months
+    - Algorithmic improvements are a key driver of AI progress
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:08:01
+  publication_id: openai
+  tags:
+    - capabilities
+- id: 05e9b1b71e40fa13
+  url: https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text
+  title: OpenAI on detection limits
+  type: web
+  local_filename: 05e9b1b71e40fa13.txt
+  summary: OpenAI created an experimental classifier to distinguish between human and AI-written text,
+    acknowledging significant limitations in detection capabilities. The tool aims to help mitigate
+    potential misuse of AI-generated content.
+  review: >-
+    OpenAI's AI text classifier represents an important early attempt to address the challenges of
+    detecting AI-generated content. The classifier was trained on paired human and AI-written texts,
+    with the goal of providing a preliminary tool to identify potentially machine-generated text.
+    However, the tool demonstrates significant limitations, with only a 26% true positive rate for
+    detecting AI-written text and a 9% false positive rate for misclassifying human-written text.
+
+
+    The research highlights critical challenges in AI content detection, including the difficulty of
+    reliably distinguishing AI-generated text, especially for shorter passages. OpenAI explicitly
+    warns against using the classifier as a primary decision-making tool and acknowledges that
+    AI-written text can be deliberately edited to evade detection. This work is important for the AI
+    safety community as it transparently demonstrates the current limitations of AI detection
+    technologies and underscores the need for continued research into more robust verification
+    methods.
+  key_points:
+    - Classifier can only correctly identify 26% of AI-written text
+    - Accuracy improves with longer text inputs
+    - Tool is not reliable for short texts or non-English content
+    - Detection methods are likely to be an ongoing challenge
+  cited_by:
+    - authentication-collapse
+    - disinformation
+  fetched_at: 2025-12-28 02:56:11
+  publication_id: openai
+  tags:
+    - capabilities
+    - deepfakes
+    - content-verification
+    - watermarking
+    - disinformation
+- id: bf5ddf1979671053
+  url: https://openai.com/index/understanding-the-source-of-what-we-see-and-hear-online/
+  title: OpenAI text watermarking
+  type: web
+  local_filename: bf5ddf1979671053.txt
+  summary: OpenAI is exploring methods like text watermarking, metadata, and image detection
+    classifiers to help identify AI-generated content and promote transparency in digital media.
+  review: OpenAI's research into content provenance represents a critical approach to addressing
+    potential misuse and misinformation in AI-generated content. The organization is investigating
+    multiple technical solutions, including text watermarking, metadata tagging, and detection
+    classifiers, with a particular focus on balancing technological effectiveness and potential
+    societal impacts. Their approach demonstrates nuanced consideration of the challenges,
+    acknowledging limitations such as potential circumvention techniques and the risk of
+    disproportionately impacting certain user groups, like non-native English speakers. By joining
+    the Coalition for Content Provenance and Authenticity and launching a $2 million societal
+    resilience fund, OpenAI is positioning itself as a collaborative leader in developing
+    industry-wide standards for content authentication and responsible AI deployment.
+  key_points:
+    - Developing text watermarking methods with high accuracy but known circumvention risks
+    - Creating image detection classifiers with ~98% accuracy for DALL-E 3 images
+    - Joining industry efforts to establish content provenance standards
+  fetched_at: 2025-12-28 02:55:55
+  publication_id: openai
+- id: ded0b05862511312
+  url: https://openai.com/index/updating-our-preparedness-framework/
+  title: Preparedness Framework
+  type: web
+  cited_by:
+    - lab-behavior
+    - responsible-scaling-policies
+    - bioweapons
+  publication_id: openai
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: 32d5fc9565036b29
+  url: https://scholar.google.com/scholar?q=replika+ai+companion
+  title: Replika Academic Studies
+  type: web
+  cited_by:
+    - cyber-psychosis
+  publication_id: google-scholar
+  tags:
+    - mental-health
+    - ai-ethics
+    - manipulation
+- id: 394ea6d17701b621
+  url: https://www.anthropic.com/news/anthropics-responsible-scaling-policy
+  title: Responsible Scaling Policy
+  type: web
+  cited_by:
+    - agentic-ai
+    - capability-threshold-model
+    - warning-signs-model
+    - anthropic
+    - arc
+    - daniela-amodei
+    - dario-amodei
+    - alignment
+    - open-source
+    - bioweapons
+    - coordination
+  publication_id: anthropic
+  tags:
+    - governance
+    - capabilities
+    - tool-use
+    - agentic
+    - computer-use
+- id: e1f512a932def9e2
+  url: https://openai.com/index/introducing-swe-bench-verified/
+  title: SWE-bench Verified - OpenAI
+  type: web
+  local_filename: e1f512a932def9e2.txt
+  summary: OpenAI collaborated with software developers to improve the SWE-bench benchmark by
+    identifying and filtering out problematic test samples. The resulting SWE-bench Verified
+    provides a more reliable evaluation of AI models' software engineering skills.
+  review: >-
+    OpenAI's SWE-bench Verified represents a significant advancement in AI model evaluation for
+    software engineering tasks. By systematically screening 1,699 samples with 93 professional
+    software developers, they identified critical issues in the original benchmark that could
+    systematically underestimate AI models' capabilities. The key problems included underspecified
+    issue descriptions, overly specific or unrelated unit tests, and unreliable development
+    environment setups.
+
+
+    The research methodology involved a rigorous human annotation process where each sample was
+    labeled three times across multiple criteria, including problem specification clarity, test
+    validity, and task difficulty. This approach led to filtering out 68.3% of the original samples,
+    resulting in a more robust 500-sample dataset. Notably, the GPT-4o model's performance improved
+    from 16% to 33.2% on this verified dataset, demonstrating that the original benchmark was indeed
+    constraining. The work highlights the importance of continuous improvement in AI evaluation
+    benchmarks and the need for careful, nuanced assessment of AI capabilities.
+  key_points:
+    - Human-validated benchmark that addresses limitations in original SWE-bench dataset
+    - 68.3% of original samples filtered due to evaluation inconsistencies
+    - Performance improvements show previous benchmarks underestimated AI capabilities
+  fetched_at: 2025-12-28 01:07:40
+  cited_by:
+    - agentic-ai
+    - tool-use
+  publication_id: openai
+  tags:
+    - capabilities
+    - evaluation
+    - tool-use
+    - agentic
+    - computer-use
+- id: e64c8268e5f58e63
+  url: https://openai.com/index/weak-to-strong-generalization/
+  title: Weak-to-strong generalization
+  type: web
+  local_filename: e64c8268e5f58e63.txt
+  summary: A research approach investigating weak-to-strong generalization, demonstrating how a less
+    capable model can guide a more powerful AI model's behavior and alignment.
+  review: "The paper introduces a novel approach to the superalignment problem by exploring whether
+    smaller, less capable AI models can effectively supervise and control more powerful models. This
+    addresses a critical challenge in AI safety: how humans can maintain control over increasingly
+    sophisticated AI systems that may soon exceed human intelligence. The researchers conducted
+    experiments using GPT-2 to supervise GPT-4, achieving performance levels between GPT-3 and
+    GPT-3.5, which suggests promising potential for scalable alignment techniques. While
+    acknowledging current limitations, the study presents a proof-of-concept that naive human
+    supervision might not suffice for superhuman models, and proposes methods like encouraging model
+    confidence and strategic disagreement to improve generalization. The work opens up a crucial
+    research direction for developing reliable oversight mechanisms as AI systems become more
+    advanced."
+  key_points:
+    - Explores supervision of stronger models by weaker models as an alignment strategy
+    - Demonstrated ability to recover significant capabilities through careful supervision methods
+    - Highlights the challenges of aligning superhuman AI systems
+  cited_by:
+    - ai-assisted
+    - alignment
+    - rlhf
+    - technical-research
+    - alignment-difficulty
+  fetched_at: 2025-12-28 01:07:29
+  publication_id: openai
+  tags:
+    - alignment
+    - training
+    - human-feedback
+    - interpretability
+    - scalable-oversight
+- id: 539a045ff82fdb28
+  url: https://www.anthropic.com/news/claude-engineer
+  title: industry estimates
+  type: web
+  cited_by:
+    - coding
+  publication_id: anthropic
+  tags:
+    - software-engineering
+    - code-generation
+    - programming-ai
+- id: 064636c20bcd4ce6
+  url: https://www.anthropic.com/research/claude-engineer
+  title: Anthropic
+  type: web
+  cited_by:
+    - coding
+  publication_id: anthropic
+  tags:
+    - software-engineering
+    - code-generation
+    - programming-ai
+- id: 93776140180d8185
+  url: https://deepmind.google/research/
+  title: DeepMind
+  type: web
+  cited_by:
+    - language-models
+    - instrumental-convergence-framework
+  publication_id: deepmind
+  tags:
+    - foundation-models
+    - transformers
+    - scaling
+    - framework
+    - instrumental-goals
+- id: afe2508ac4caf5ee
+  url: https://www.anthropic.com/
+  title: Anthropic
+  type: web
+  cited_by:
+    - language-models
+    - accident-risks
+    - agi-timeline
+    - large-language-models
+    - alignment-progress
+    - capabilities
+    - autonomous-weapons-escalation
+    - capabilities-to-safety-pipeline
+    - capability-threshold-model
+    - compounding-risks-analysis
+    - corrigibility-failure-pathways
+    - defense-in-depth-model
+    - goal-misgeneralization-probability
+    - intervention-effectiveness-matrix
+    - mesa-optimization-analysis
+    - power-seeking-conditions
+    - racing-dynamics-impact
+    - risk-interaction-network
+    - safety-research-value
+    - warning-signs-model
+    - openai
+    - cais
+    - miri
+    - ai-control
+    - evaluation
+    - steganography
+    - sycophancy
+    - concentration-of-power
+    - proliferation
+    - racing-dynamics
+    - catastrophe
+  publication_id: anthropic
+  tags:
+    - foundation-models
+    - transformers
+    - scaling
+    - escalation
+    - conflict
+- id: 04d39e8bd5d50dd5
+  url: https://openai.com/
+  title: OpenAI
+  type: web
+  cited_by:
+    - language-models
+    - accident-risks
+    - solutions
+    - agi-timeline
+    - large-language-models
+    - capabilities
+    - capabilities-to-safety-pipeline
+    - capability-threshold-model
+    - defense-in-depth-model
+    - intervention-effectiveness-matrix
+    - mesa-optimization-analysis
+    - risk-interaction-network
+    - safety-research-value
+    - cais
+    - eu-ai-act
+    - sycophancy
+    - concentration-of-power
+    - proliferation
+    - racing-dynamics
+  publication_id: openai
+  tags:
+    - foundation-models
+    - transformers
+    - scaling
+    - talent
+    - field-building
+- id: ea91ee7755dc9d40
+  url: https://www.deepmind.com/safety
+  title: DeepMind
+  type: web
+  cited_by:
+    - long-horizon
+  publication_id: deepmind
+  tags:
+    - agentic
+    - planning
+    - goal-stability
+- id: 5c218350c60516a8
+  url: https://www.anthropic.com/research/persuasion-and-manipulation
+  title: Anthropic (2024)
+  type: web
+  cited_by:
+    - persuasion
+  publication_id: anthropic
+  tags:
+    - social-engineering
+    - manipulation
+    - deception
+- id: c7c04fa2b3e2f088
+  url: https://www.anthropic.com/research#safety
+  title: Anthropic Safety Blog
+  type: web
+  cited_by:
+    - persuasion
+  publication_id: anthropic
+  tags:
+    - safety
+    - social-engineering
+    - manipulation
+    - deception
+- id: 838d7a59a02e11a7
+  url: https://openai.com/safety/
+  title: OpenAI Safety Updates
+  type: web
+  cited_by:
+    - persuasion
+    - intervention-effectiveness-matrix
+    - racing-dynamics-impact
+    - risk-interaction-network
+    - safety-research-allocation
+    - safety-research-value
+    - worldview-intervention-mapping
+    - evaluation
+    - steganography
+    - knowledge-monopoly
+    - racing-dynamics
+  publication_id: openai
+  tags:
+    - safety
+    - social-engineering
+    - manipulation
+    - deception
+    - interventions
+- id: f6d7ef2b80ff1e4c
+  url: https://www.anthropic.com/research#interpretability
+  title: interpretability
+  type: web
+  cited_by:
+    - accident-risks
+  publication_id: anthropic
+  tags:
+    - interpretability
+- id: 3c2487da42fb53cb
+  url: https://openai.com/research/weak-to-strong-generalization
+  title: OpenAI's alignment research
+  type: web
+  cited_by:
+    - accident-risks
+    - goal-misgeneralization-probability
+  publication_id: openai
+  tags:
+    - alignment
+    - probability
+    - generalization
+    - distribution-shift
+- id: e64764924758e86b
+  url: https://openai.com/policies/usage-policies
+  title: OpenAI
+  type: web
+  cited_by:
+    - misuse-risks
+    - proliferation-risk-model
+    - disinformation
+  publication_id: openai
+  tags:
+    - risk-factor
+    - diffusion
+    - control
+    - disinformation
+    - influence-operations
+- id: dd1c59d8d7c26f28
+  url: https://www.microsoft.com/en-us/ai/responsible-ai
+  title: Microsoft
+  type: web
+  cited_by:
+    - solutions
+  publication_id: microsoft
+- id: 0ef9b0fe0f3c92b4
+  url: https://deepmind.google/
+  title: Google DeepMind
+  type: web
+  cited_by:
+    - solutions
+    - agi-development
+    - agi-timeline
+    - large-language-models
+    - capability-threshold-model
+    - intervention-effectiveness-matrix
+    - mesa-optimization-analysis
+    - safety-research-value
+    - deepmind
+    - evaluation
+    - concentration-of-power
+  publication_id: deepmind
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+    - interventions
+    - effectiveness
+- id: 2cf42e643cef8840
+  url: https://openai.com/blog/
+  title: OpenAI funding announcements
+  type: web
+  cited_by:
+    - agi-development
+  publication_id: openai
+- id: bfe69ae9f1411da1
+  url: https://www.anthropic.com/news/anthropic-series-c
+  title: Anthropic Series C
+  type: web
+  cited_by:
+    - agi-development
+  publication_id: anthropic
+- id: 1f21fae8ed666710
+  url: https://www.anthropic.com/news/anthropic-constitution
+  title: Leading AI researchers
+  type: web
+  cited_by:
+    - agi-timeline
+  publication_id: anthropic
+- id: 0948b00677caaf7e
+  url: https://openai.com/research/learning-to-summarize-with-human-feedback
+  title: OpenAI
+  type: web
+  cited_by:
+    - large-language-models
+    - sycophancy
+  publication_id: openai
+  tags:
+    - rlhf
+    - reward-hacking
+    - honesty
+- id: 1000c5dea784ef64
+  url: https://www.anthropic.com/news/constitutional-ai-harmlessness-from-ai-feedback
+  title: Anthropic's
+  type: web
+  cited_by:
+    - large-language-models
+    - racing-dynamics-impact
+    - paul-christiano
+    - lock-in
+    - proliferation
+  publication_id: anthropic
+  tags:
+    - risk-factor
+    - competition
+    - game-theory
+    - iterated-amplification
+    - scalable-oversight
+- id: 4ff5ab7d45bc6dc5
+  url: https://www.anthropic.com/news/golden-gate-claude
+  title: Mechanistic Interpretability
+  type: web
+  cited_by:
+    - alignment-progress
+  publication_id: anthropic
+  tags:
+    - interpretability
+- id: 1f77387d97ddcdfe
+  url: https://www.anthropic.com/news/ceo-message-q1-2025
+  title: Dario Amodei
+  type: web
+  cited_by:
+    - alignment-progress
+  publication_id: anthropic
+- id: 9edf2bd5938d8386
+  url: https://openai.com/index/learning-to-reason-with-llms/
+  title: OpenAI's o1
+  type: web
+  cited_by:
+    - reasoning
+    - alignment-progress
+    - timelines
+  publication_id: openai
+  tags:
+    - decision-theory
+    - epistemics
+    - methodology
+- id: 41000216ddbfc99d
+  url: https://openai.com/blog/introducing-superalignment
+  title: OpenAI's 2023 commitment
+  type: web
+  cited_by:
+    - alignment-progress
+  publication_id: openai
+- id: e91e6f80eaaceb58
+  url: https://www.anthropic.com/news/claude-3-5-sonnet
+  title: Claude 3.7 Sonnet
+  type: web
+  cited_by:
+    - alignment-progress
+    - capabilities
+  publication_id: anthropic
+  tags:
+    - llm
+- id: 61e0b20e9ae20876
+  url: https://www.anthropic.com/research/sparse-autoencoders
+  title: Sparse Autoencoders
+  type: web
+  cited_by:
+    - alignment-progress
+  publication_id: anthropic
+- id: 9aad80c8b7a4f191
+  url: https://www.anthropic.com/news/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training
+  title: Sleeper Agents
+  type: web
+  cited_by:
+    - alignment-progress
+  publication_id: anthropic
+- id: d451b68232884e88
+  url: https://deepmind.google/discover/blog/
+  title: DeepMind
+  type: web
+  cited_by:
+    - alignment-progress
+    - intervention-effectiveness-matrix
+    - proliferation
+  publication_id: deepmind
+  tags:
+    - interventions
+    - effectiveness
+    - prioritization
+    - open-source
+    - governance
+- id: 54fcb72b74acfae9
+  url: https://openai.com/12-days/
+  title: recent o3 release
+  type: web
+  cited_by:
+    - capabilities
+  publication_id: openai
+  tags:
+    - open-source
+- id: 3b8b5072889c4f8a
+  url: https://deepmind.google/technologies/gemini/
+  title: Gemini 1.0 Ultra
+  type: web
+  cited_by:
+    - capabilities
+    - eu-ai-act
+    - knowledge-monopoly
+    - disinformation
+    - concentration-of-power
+  publication_id: deepmind
+  tags:
+    - llm
+    - regulation
+    - gpai
+    - foundation-models
+    - market-concentration
+- id: 90b3a9520ffec0d7
+  url: https://openai.com/o1/
+  title: OpenAI o1
+  type: web
+  cited_by:
+    - capabilities
+  publication_id: openai
+- id: ee605bab036068f0
+  url: https://openai.com/index/hello-gpt-4o/
+  title: GPT-4o
+  type: web
+  cited_by:
+    - capabilities
+    - concentration-of-power
+  publication_id: openai
+  tags:
+    - llm
+    - governance
+    - power-dynamics
+    - inequality
+- id: 064e5d8266218028
+  url: https://openai.com/research/simpleqa
+  title: SimpleQA
+  type: web
+  cited_by:
+    - capabilities
+  publication_id: openai
+- id: 39f08ad975b7f4db
+  url: https://openai.com/gpt-4
+  title: GPT-4
+  type: web
+  cited_by:
+    - capabilities
+    - disinformation
+  publication_id: openai
+  tags:
+    - llm
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: ba8ca1cafdf06556
+  url: https://deepmind.google/technologies/alphafold/
+  title: AlphaFold
+  type: web
+  cited_by:
+    - capabilities
+  publication_id: deepmind
+- id: 632f5e9472fa8e55
+  url: https://deepmind.google/discover/blog/funsearch-making-new-discoveries-in-mathematical-sciences-using-large-language-models/
+  title: FunSearch
+  type: web
+  cited_by:
+    - capabilities
+  publication_id: deepmind
+- id: 1b5c7b499756dd8f
+  url: https://deepmind.google/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/
+  title: AlphaEvolve
+  type: web
+  cited_by:
+    - self-improvement
+    - compute-hardware
+  publication_id: deepmind
+  tags:
+    - intelligence-explosion
+    - recursive-self-improvement
+    - automl
+- id: c6766d463560b923
+  url: https://www.anthropic.com/rsp-updates
+  title: Anthropic pioneered the Responsible Scaling Policy
+  type: web
+  cited_by:
+    - lab-behavior
+    - pause
+  publication_id: anthropic
+  tags:
+    - governance
+    - capabilities
+- id: 7512ddb574f82249
+  url: https://www.anthropic.com/news/activating-asl3-protections
+  title: activated ASL-3 protections
+  type: web
+  cited_by:
+    - lab-behavior
+    - responsible-scaling-policies
+  publication_id: anthropic
+- id: 1d4ad7089731ec79
+  url: https://www.anthropic.com/team
+  title: Dario Amodei
+  type: web
+  cited_by:
+    - safety-research
+  publication_id: anthropic
+- id: f6aa679babd7a46a
+  url: https://www.anthropic.com/news
+  title: OpenAI disbanded super-alignment team
+  type: web
+  cited_by:
+    - safety-research
+    - daniela-amodei
+  publication_id: anthropic
+  tags:
+    - alignment
+- id: 0da4780ac681e4a4
+  url: https://www.anthropic.com/careers#fellowships
+  title: Anthropic Fellows Program
+  type: web
+  cited_by:
+    - safety-research
+  publication_id: anthropic
+- id: 6f97cf442cbf04b8
+  url: https://www.amazon.com/Army-None-Autonomous-Weapons-Future/dp/0393635732
+  title: Scharre (2018) "Army of None"
+  type: web
+  cited_by:
+    - autonomous-weapons-escalation
+  tags:
+    - escalation
+    - conflict
+    - speed
+  publication_id: amazon
+- id: 8478b13c6bec82ac
+  url: https://www.anthropic.com/news/frontier-threats-red-teaming-for-ai-safety
+  title: Anthropic Frontier Threats Assessment (2023)
+  type: web
+  cited_by:
+    - bioweapons-attack-chain
+  publication_id: anthropic
+  tags:
+    - probability
+    - decomposition
+    - bioweapons
+- id: a2cf0d0271acb097
+  url: https://www.anthropic.com/news/claude-3-family
+  title: Anthropic
+  type: web
+  cited_by:
+    - capability-alignment-race
+    - anthropic
+    - dario-amodei
+    - constitutional-ai
+    - concentration-of-power
+  publication_id: anthropic
+  tags:
+    - constitutional-ai
+    - rlhf
+    - interpretability
+    - responsible-scaling
+    - claude
+- id: 3182b02b8073e217
+  url: https://openai.com/sora
+  title: Sora quality
+  type: web
+  cited_by:
+    - capability-threshold-model
+  publication_id: openai
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+- id: 81908b7f23602e1c
+  url: https://www.anthropic.com/index/claude-3-model-card
+  title: Anthropic (2024)
+  type: web
+  cited_by:
+    - capability-threshold-model
+  publication_id: anthropic
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+- id: 90a03954db3c77d5
+  url: https://openai.com/preparedness/
+  title: OpenAI Preparedness
+  type: web
+  cited_by:
+    - capability-threshold-model
+    - instrumental-convergence-framework
+    - corporate
+  publication_id: openai
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+    - framework
+    - instrumental-goals
+- id: 085feee8a2702182
+  url: https://www.anthropic.com/safety
+  title: Anthropic safety evaluations
+  type: web
+  cited_by:
+    - corrigibility-failure-pathways
+    - safety-research-allocation
+    - constitutional-ai
+    - deceptive-alignment
+    - steganography
+    - racing-dynamics
+  publication_id: anthropic
+  tags:
+    - safety
+    - evaluation
+    - causal-model
+    - corrigibility
+    - shutdown-problem
+- id: 6a28ebdd777540fa
+  url: https://www.deepmind.com/publications
+  title: DeepMind's game theory research
+  type: web
+  cited_by:
+    - corrigibility-failure-pathways
+  publication_id: deepmind
+  tags:
+    - causal-model
+    - corrigibility
+    - shutdown-problem
+- id: 0e46bc2e525e992b
+  url: https://www.anthropic.com/research/ai-cyber-operations
+  title: Anthropic documented
+  type: web
+  cited_by:
+    - cyberweapons-attack-automation
+  publication_id: anthropic
+  tags:
+    - timeline
+    - automation
+    - cybersecurity
+- id: 23665cecf2453df6
+  url: https://www.anthropic.com/research/measuring-model-persuasiveness
+  title: Self-modeling is instrumentally useful
+  type: web
+  cited_by:
+    - deceptive-alignment-decomposition
+  publication_id: anthropic
+  tags:
+    - probability
+    - decomposition
+    - inner-alignment
+- id: 71fda98623acc80d
+  url: https://www.anthropic.com/research/responsible-scaling-policy
+  title: Staged deployment
+  type: web
+  cited_by:
+    - defense-in-depth-model
+  publication_id: anthropic
+  tags:
+    - defense
+    - security
+    - layered-approach
+- id: 159d6fe09ae0fe4a
+  url: https://deepmind.com/safety-research
+  title: DeepMind Safety
+  type: web
+  cited_by:
+    - goal-misgeneralization-probability
+  publication_id: deepmind
+  tags:
+    - safety
+    - probability
+    - generalization
+    - distribution-shift
+- id: 1c87555cd7523903
+  url: https://deepmind.com/blog/article/specification-gaming-the-flip-side-of-ai-ingenuity
+  title: DeepMind's specification gaming research
+  type: web
+  cited_by:
+    - goal-misgeneralization-probability
+  publication_id: deepmind
+  tags:
+    - probability
+    - generalization
+    - distribution-shift
+- id: 2111dc0026710661
+  url: https://www.anthropic.com/constitutional-ai
+  title: Anthropic's Constitutional AI work
+  type: web
+  cited_by:
+    - goal-misgeneralization-probability
+    - risk-interaction-network
+    - steganography
+    - knowledge-monopoly
+    - disinformation
+  publication_id: anthropic
+  tags:
+    - probability
+    - generalization
+    - distribution-shift
+    - networks
+    - risk-interactions
+- id: 6ff01553c3d5a60f
+  url: https://openai.com/research/learning-dexterity
+  title: OpenAI
+  type: web
+  cited_by:
+    - goal-misgeneralization-probability
+  publication_id: openai
+  tags:
+    - probability
+    - generalization
+    - distribution-shift
+- id: 5daacc9a4d42f6eb
+  url: https://openai.com/research/faulty-reward-functions
+  title: reinforcement learning agents
+  type: web
+  cited_by:
+    - instrumental-convergence-framework
+  publication_id: openai
+  tags:
+    - framework
+    - instrumental-goals
+    - convergent-evolution
+- id: 0b3e91bf191dfe02
+  url: https://www.anthropic.com/constitutional-ai-harmlessness-from-ai-feedback
+  title: large language models
+  type: web
+  cited_by:
+    - instrumental-convergence-framework
+    - enfeeblement
+  publication_id: anthropic
+  tags:
+    - llm
+    - framework
+    - instrumental-goals
+    - convergent-evolution
+    - human-agency
+- id: b89bfbc59a4b133c
+  url: https://www.anthropic.com/model-card
+  title: Anthropic Model Card
+  type: web
+  cited_by:
+    - instrumental-convergence-framework
+  publication_id: anthropic
+  tags:
+    - framework
+    - instrumental-goals
+    - convergent-evolution
+- id: 5d0c50035bac37ed
+  url: https://openai.com/blog/chatgpt
+  title: ChatGPT launch
+  type: web
+  cited_by:
+    - multipolar-trap-dynamics
+    - concentration-of-power
+  publication_id: openai
+  tags:
+    - risk-factor
+    - game-theory
+    - coordination
+    - governance
+    - power-dynamics
+- id: f5041642fb213c07
+  url: https://www.anthropic.com/news/introducing-claude
+  title: Anthropic Claude release
+  type: web
+  cited_by:
+    - multipolar-trap-dynamics
+    - constitutional-ai
+  publication_id: anthropic
+  tags:
+    - open-source
+    - llm
+    - risk-factor
+    - game-theory
+    - coordination
+- id: 69fd2801fb4eba7d
+  url: https://www.deepmind.com/publications/mastering-the-game-of-go-with-deep-neural-networks-and-tree-search
+  title: strategic game-playing systems
+  type: web
+  cited_by:
+    - power-seeking-conditions
+  publication_id: deepmind
+  tags:
+    - formal-analysis
+    - power-seeking
+    - optimal-policies
+- id: 67242d35f03b20a1
+  url: https://www.anthropic.com/news/model-card-claude-2
+  title: Anthropic
+  type: web
+  cited_by:
+    - racing-dynamics-impact
+  publication_id: anthropic
+  tags:
+    - risk-factor
+    - competition
+    - game-theory
+- id: 3b81fef7f559b573
+  url: https://www.anthropic.com/news/ceo-dario-amodei-on-anthropics-responsible-scaling-policy
+  title: Dario Amodei
+  type: web
+  cited_by:
+    - racing-dynamics-impact
+  publication_id: anthropic
+  tags:
+    - risk-factor
+    - competition
+    - game-theory
+- id: 0116b24a50f52f44
+  url: https://www.anthropic.com/news/evaluating-ai-systems
+  title: Anthropic evals
+  type: web
+  cited_by:
+    - risk-activation-timeline
+  publication_id: anthropic
+  tags:
+    - evaluation
+    - timeline
+    - capability
+    - risk-assessment
+- id: 431d6df5aeacc896
+  url: https://openai.com/safety/preparedness
+  title: OpenAI
+  type: web
+  cited_by:
+    - risk-activation-timeline
+    - rlhf
+    - governance-policy
+  publication_id: openai
+  tags:
+    - timeline
+    - capability
+    - risk-assessment
+    - training
+    - human-feedback
+- id: 4dc64a4d0b095a81
+  url: https://www.anthropic.com/news/measuring-and-forecasting-risks-from-ai
+  title: Anthropic research
+  type: web
+  cited_by:
+    - risk-interaction-matrix
+    - proliferation
+  publication_id: anthropic
+  tags:
+    - risk-interactions
+    - compounding-risks
+    - systems-thinking
+    - open-source
+    - governance
+- id: b7e532e4a2ee8270
+  url: https://www.anthropic.com/research/mesa-optimization
+  title: Anthropic Safety Research
+  type: web
+  cited_by:
+    - risk-interaction-network
+  publication_id: anthropic
+  tags:
+    - safety
+    - networks
+    - risk-interactions
+    - systems-thinking
+- id: 1bcc2acc6c2a1721
+  url: https://deepmind.com/
+  title: DeepMind
+  type: web
+  cited_by:
+    - risk-interaction-network
+    - racing-dynamics
+  publication_id: deepmind
+  tags:
+    - networks
+    - risk-interactions
+    - systems-thinking
+    - governance
+    - coordination
+- id: 898065a672b179c6
+  url: https://www.anthropic.com/research/ai-safety-via-debate
+  title: Expert analysis
+  type: web
+  cited_by:
+    - safety-research-allocation
+  publication_id: anthropic
+  tags:
+    - resource-allocation
+    - research-priorities
+    - optimization
+- id: 813e2062445e680d
+  url: https://deepmind.google/discover/blog/building-safe-artificial-intelligence/
+  title: DeepMind
+  type: web
+  cited_by:
+    - safety-research-allocation
+  publication_id: deepmind
+  tags:
+    - resource-allocation
+    - research-priorities
+    - optimization
+- id: 70b4461a02951e08
+  url: https://deepmind.google/research/publications/?tag=safety
+  title: DeepMind
+  type: web
+  cited_by:
+    - safety-research-value
+  publication_id: deepmind
+  tags:
+    - cost-effectiveness
+    - research-priorities
+    - expected-value
+- id: 4d2d026d3cca4d9d
+  url: https://www.anthropic.com/careers
+  title: Anthropic careers
+  type: web
+  cited_by:
+    - safety-researcher-gap
+  publication_id: anthropic
+  tags:
+    - talent
+    - field-building
+    - supply-demand
+- id: e86c6559775d4746
+  url: https://openai.com/careers
+  title: OpenAI jobs
+  type: web
+  cited_by:
+    - safety-researcher-gap
+  publication_id: openai
+  tags:
+    - economic
+    - talent
+    - field-building
+    - supply-demand
+- id: 013fa77665db256f
+  url: https://www.anthropic.com/news/claude-2-1
+  title: observations of strategic reasoning
+  type: web
+  cited_by:
+    - scheming-likelihood-model
+    - proliferation
+  publication_id: anthropic
+  tags:
+    - probability
+    - strategic-deception
+    - situational-awareness
+    - open-source
+    - governance
+- id: d9117e91a2b1b2d4
+  url: https://www.anthropic.com/claude
+  title: Claude
+  type: web
+  cited_by:
+    - scheming-likelihood-model
+    - eu-ai-act
+    - disinformation
+  publication_id: anthropic
+  tags:
+    - llm
+    - probability
+    - strategic-deception
+    - situational-awareness
+    - regulation
+- id: 568093e306b18188
+  url: https://www.amazon.com/Human-Compatible-Artificial-Intelligence-Problem/dp/0525558616
+  title: Human Compatible
+  type: web
+  cited_by:
+    - self-improvement
+    - scheming-likelihood-model
+    - chai
+    - instrumental-convergence
+  tags:
+    - intelligence-explosion
+    - recursive-self-improvement
+    - automl
+    - probability
+    - strategic-deception
+  publication_id: amazon
+- id: d8c3d29798412b9f
+  url: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
+  title: DeepMind Frontier Safety Framework
+  type: web
+  cited_by:
+    - warning-signs-model
+    - research-agendas
+    - technical-research
+    - governance-policy
+    - coordination
+  publication_id: deepmind
+  tags:
+    - safety
+    - monitoring
+    - early-warning
+    - tripwires
+    - research-agendas
+- id: 8ebbaf2b6e4d269a
+  url: https://www.anthropic.com/news/ceo-letter
+  title: Amodei prediction
+  type: web
+  cited_by:
+    - worldview-intervention-mapping
+  publication_id: anthropic
+  tags:
+    - prioritization
+    - worldview
+    - strategy
+- id: f63ec9445ab2f0aa
+  url: https://www.anthropic.com/research/sleeper-agents-training-deceptive-llms
+  title: Scheming research
+  type: web
+  cited_by:
+    - worldview-intervention-mapping
+  publication_id: anthropic
+  tags:
+    - deception
+    - prioritization
+    - worldview
+    - strategy
+- id: 8461503b21c33504
+  url: https://deepmind.com/blog/article/Specification-gaming-the-flip-side-of-AI-ingenuity
+  title: Specification gaming examples
+  type: web
+  cited_by:
+    - deepmind
+  publication_id: deepmind
+  tags:
+    - gemini
+    - alphafold
+    - alphago
+- id: 022861b62403527a
+  url: https://deepmind.google/discover/blog/introducing-our-frontier-safety-framework/
+  title: Frontier Safety
+  type: web
+  cited_by:
+    - deepmind
+  publication_id: deepmind
+  tags:
+    - safety
+    - gemini
+    - alphafold
+    - alphago
+- id: 2e25c39dd31a5caa
+  url: https://scholar.google.com/citations?user=qOXLyWAAAAAJ
+  title: scholar.google.com
+  type: web
+  cited_by:
+    - deepmind
+  publication_id: google-scholar
+  tags:
+    - gemini
+    - alphafold
+    - alphago
+- id: 5997a86ca8939834
+  url: https://openai.com/blog/superalignment-fast-grants
+  title: OpenAI
+  type: web
+  cited_by:
+    - openai
+  publication_id: openai
+  tags:
+    - gpt-4
+    - chatgpt
+    - rlhf
+- id: e09fc9ef04adca70
+  url: https://openai.com/research/gpt-4-system-card
+  title: OpenAI System Card
+  type: web
+  cited_by:
+    - arc
+    - red-teaming
+  publication_id: openai
+  tags:
+    - eliciting-latent-knowledge
+    - elk
+    - evaluations
+- id: da9dc068f95f855d
+  url: https://scholar.google.com/citations?user=WOSlKqcAAAAJ
+  title: 15+ citations
+  type: web
+  cited_by:
+    - cais
+  publication_id: google-scholar
+  tags:
+    - ai-safety
+    - x-risk
+    - representation-engineering
+- id: 1de7c0ba4f50708d
+  url: https://scholar.google.com/citations?user=conjecture
+  title: Google Scholar
+  type: web
+  cited_by:
+    - conjecture
+  publication_id: google-scholar
+  tags:
+    - cognitive-emulation
+    - coem
+    - interpretability
+- id: fb3ace4d4c5a824a
+  url: https://scholar.google.com
+  title: Google Scholar
+  type: web
+  cited_by:
+    - epoch-ai
+    - dario-amodei
+    - toby-ord
+  publication_id: google-scholar
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+    - constitutional-ai
+    - responsible-scaling
+- id: a0ae3e6a11d6187f
+  url: https://scholar.google.com/scholar?q="Epoch+AI"+compute+trends
+  title: Google Scholar search
+  type: web
+  cited_by:
+    - epoch-ai
+  publication_id: google-scholar
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+- id: 27ce8f3b89dcdaa1
+  url: https://www.anthropic.com/news/open-philanthropy-investment
+  title: $580M investment in Anthropic
+  type: web
+  cited_by:
+    - holden-karnofsky
+  publication_id: anthropic
+  tags:
+    - effective-altruism
+    - ai-safety-funding
+    - ai-timelines
+- id: 664f6ab2e2488b0d
+  url: https://openai.com/research/scalable-oversight-of-ai-systems
+  title: OpenAI
+  type: web
+  cited_by:
+    - paul-christiano
+  publication_id: openai
+  tags:
+    - iterated-amplification
+    - scalable-oversight
+    - ai-safety-via-debate
+- id: 367c57adf0c2bc75
+  url: https://scholar.google.com/citations?user=BqAeRdAAAAAJ
+  title: Geoffrey Irving
+  type: web
+  cited_by:
+    - paul-christiano
+  publication_id: google-scholar
+  tags:
+    - iterated-amplification
+    - scalable-oversight
+    - ai-safety-via-debate
+- id: a0406a8b2e9bffe0
+  url: https://openai.com/research/training-language-models-to-follow-instructions-with-human-feedback
+  title: Implemented at OpenAI
+  type: web
+  cited_by:
+    - paul-christiano
+  publication_id: openai
+  tags:
+    - iterated-amplification
+    - scalable-oversight
+    - ai-safety-via-debate
+- id: 5a7093fe510e8fe2
+  url: https://scholar.google.com/citations?user=5swZZT4AAAAJ
+  title: Google Scholar
+  type: web
+  cited_by:
+    - paul-christiano
+  publication_id: google-scholar
+  tags:
+    - iterated-amplification
+    - scalable-oversight
+    - ai-safety-via-debate
+- id: f61180d269fdcb26
+  url: https://scholar.google.com/citations?user=kukA0LcAAAAJ
+  title: 300+ peer-reviewed papers
+  type: web
+  cited_by:
+    - yoshua-bengio
+  publication_id: google-scholar
+  tags:
+    - deep-learning
+    - ai-safety
+    - governance
+- id: 7c3cb789d06c4384
+  url: https://www.anthropic.com/news/constitutional-classifiers
+  title: Constitutional Classifiers
+  type: web
+  cited_by:
+    - ai-assisted
+  publication_id: anthropic
+- id: c355237bfc2d213d
+  url: https://www.anthropic.com/research/decomposing-language-models-into-understandable-components
+  title: 10 million features extracted
+  type: web
+  cited_by:
+    - ai-assisted
+    - technical-research
+  publication_id: anthropic
+  tags:
+    - interpretability
+    - scalable-oversight
+    - rlhf
+- id: 704f57dfad89c1b3
+  url: https://openai.com/index/introducing-superalignment/
+  title: Superalignment team
+  type: web
+  cited_by:
+    - ai-assisted
+    - research-agendas
+    - technical-research
+    - alignment-difficulty
+  publication_id: openai
+  tags:
+    - research-agendas
+    - alignment
+    - interpretability
+    - scalable-oversight
+    - rlhf
+- id: 8f63dfa1697f2fa8
+  url: https://www.anthropic.com/news/claudes-constitution
+  title: Claude's constitution
+  type: web
+  cited_by:
+    - anthropic-core-views
+    - constitutional-ai
+    - lock-in
+  publication_id: anthropic
+  tags:
+    - llm
+    - ai-safety
+    - constitutional-ai
+    - interpretability
+    - x-risk
+- id: 132aaa63c43beb04
+  url: https://openai.com/research/learning-from-human-feedback
+  title: OpenAI RLHF comparisons
+  type: web
+  cited_by:
+    - constitutional-ai
+  publication_id: openai
+  tags:
+    - training
+- id: c5bed38f0ec371f8
+  url: https://www.anthropic.com/news/constitutional-ai-policy
+  title: Constitutional AI Policy Brief
+  type: web
+  cited_by:
+    - constitutional-ai
+  publication_id: anthropic
+  tags:
+    - governance
+- id: b3f335edccfc5333
+  url: https://openai.com/index/detecting-and-reducing-scheming-in-ai-models/
+  title: OpenAI Preparedness Framework
+  type: web
+  cited_by:
+    - situational-awareness
+    - technical-pathways
+    - evals
+    - technical-research
+    - scheming
+  publication_id: openai
+  tags:
+    - deception
+    - self-awareness
+    - evaluations
+    - benchmarks
+    - red-teaming
+- id: a1036bc63472c5fc
+  url: https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/
+  title: Gemma Scope 2
+  type: web
+  cited_by:
+    - interpretability-sufficient
+    - interpretability
+  publication_id: deepmind
+  tags:
+    - sparse-autoencoders
+    - features
+    - circuits
+- id: dfc21a319f95a75d
+  url: https://www.anthropic.com/research/team/interpretability
+  title: anthropic.com/research/team/interpretability
+  type: web
+  cited_by:
+    - technical-pathways
+    - interpretability
+  publication_id: anthropic
+  tags:
+    - interpretability
+    - sparse-autoencoders
+    - features
+    - circuits
+- id: 1d07abc7b6f1c574
+  url: https://www.anthropic.com/research/red-teaming-language-models
+  title: Anthropic
+  type: web
+  cited_by:
+    - red-teaming
+  publication_id: anthropic
+- id: c637506d2cd4d849
+  url: https://www.anthropic.com/index/anthropics-responsible-scaling-policy
+  title: Anthropic's Responsible Scaling Policy
+  type: web
+  cited_by:
+    - rlhf
+  publication_id: anthropic
+  tags:
+    - governance
+    - capabilities
+    - training
+    - human-feedback
+    - alignment
+- id: ca07d6bcd57e7027
+  url: https://openai.com/index/learning-complex-goals-with-iterated-amplification/
+  title: OpenAI's iterated amplification work
+  type: web
+  cited_by:
+    - scalable-oversight
+  publication_id: openai
+  tags:
+    - debate
+    - recursive-reward-modeling
+    - process-supervision
+- id: 72d83671b5f929a1
+  url: https://www.anthropic.com/research/measuring-progress-on-scalable-oversight-for-large-language-models
+  title: Anthropic's research program
+  type: web
+  cited_by:
+    - scalable-oversight
+  publication_id: anthropic
+  tags:
+    - debate
+    - recursive-reward-modeling
+    - process-supervision
+- id: f232f1723d6802e7
+  url: https://deepmind.google/discover/blog/updating-the-frontier-safety-framework/
+  title: DeepMind
+  type: web
+  cited_by:
+    - technical-research
+  publication_id: deepmind
+  tags:
+    - interpretability
+    - scalable-oversight
+    - rlhf
+- id: 5019b9256d83a04c
+  url: https://www.anthropic.com/research/mapping-mind-language-model
+  title: Mapping the Mind of a Large Language Model
+  type: web
+  cited_by:
+    - technical-research
+  publication_id: anthropic
+  tags:
+    - llm
+    - interpretability
+    - scalable-oversight
+    - rlhf
+- id: 89a73ebf9fe4310d
+  url: https://deepmind.google/about/responsibility/
+  title: DeepMind Principles
+  type: web
+  cited_by:
+    - corporate
+  publication_id: deepmind
+- id: 804f5f9f594ba214
+  url: https://deepmind.google/models/synthid/
+  title: SynthID - Google DeepMind
+  type: web
+  cited_by:
+    - content-authentication
+    - epistemic-security
+  publication_id: deepmind
+  tags:
+    - deepfakes
+    - digital-evidence
+    - verification
+    - disinformation
+    - trust
+- id: e6cbc0bbfb5a35fd
+  url: https://deepmind.com/research
+  title: Google DeepMind
+  type: web
+  cited_by:
+    - hybrid-systems
+    - lock-in
+  publication_id: deepmind
+  tags:
+    - human-ai-interaction
+    - ai-control
+    - decision-making
+    - x-risk
+    - irreversibility
+- id: fde48590fcbc5504
+  url: https://www.anthropic.com/voluntary-commitments
+  title: Anthropic continue upholding these principles
+  type: web
+  cited_by:
+    - effectiveness-assessment
+  publication_id: anthropic
+- id: cb58a79362e4cd0b
+  url: https://www.anthropic.com/index/responsible-scaling-policy
+  title: Responsible Scaling Policies
+  type: web
+  cited_by:
+    - governance-policy
+  publication_id: anthropic
+  tags:
+    - capabilities
+    - international
+    - compute-governance
+    - regulation
+- id: 285437f1cd06ab89
+  url: https://www.anthropic.com/index/core-views-on-ai-safety
+  title: Dario Amodei's analysis
+  type: web
+  cited_by:
+    - governance-policy
+  publication_id: anthropic
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: 2f79f30986ba6b99
+  url: https://www.anthropic.com/index/the-case-for-constitutional-ai
+  title: Safety-washing concerns
+  type: web
+  cited_by:
+    - governance-policy
+  publication_id: anthropic
+  tags:
+    - safety
+    - international
+    - compute-governance
+    - regulation
+- id: eb5c0fc91a34568d
+  url: https://www.anthropic.com/index/anthropics-response-to-the-eu-ai-act
+  title: Anthropic's compliance analysis
+  type: web
+  cited_by:
+    - governance-policy
+  publication_id: anthropic
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: 825843053766d808
+  url: https://openai.com/blog/governance-of-superintelligence
+  title: OpenAI's advocacy for licensing
+  type: web
+  cited_by:
+    - governance-policy
+  publication_id: openai
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: d0ba81cc7a8fdb2b
+  url: https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy
+  title: "Anthropic: Announcing our updated Responsible Scaling Policy"
+  type: web
+  cited_by:
+    - why-alignment-easy
+    - responsible-scaling-policies
+    - lab-culture
+  publication_id: anthropic
+  tags:
+    - governance
+    - capabilities
+- id: a5154ccbf034e273
+  url: https://deepmind.google/blog/strengthening-our-frontier-safety-framework/
+  title: "Google DeepMind: Strengthening our Frontier Safety Framework"
+  type: web
+  cited_by:
+    - responsible-scaling-policies
+  publication_id: deepmind
+  tags:
+    - safety
+- id: 8c8edfbc52769d52
+  url: https://deepmind.google/blog/introducing-the-frontier-safety-framework/
+  title: "Google DeepMind: Introducing the Frontier Safety Framework"
+  type: web
+  cited_by:
+    - responsible-scaling-policies
+    - scheming
+  publication_id: deepmind
+  tags:
+    - safety
+- id: 8ffc465752f15d66
+  url: https://openai.com/index/evolving-our-structure/
+  title: OpenAI is transitioning from a capped-profit structure
+  type: web
+  cited_by:
+    - lab-culture
+  publication_id: openai
+- id: a8bbfa34e7210ac2
+  url: https://www.anthropic.com/news/reflections-on-our-responsible-scaling-policy
+  title: Anthropic acknowledged
+  type: web
+  cited_by:
+    - pause
+  publication_id: anthropic
+- id: c2cfd72baafd64a9
+  url: https://www.anthropic.com/research/alignment-faking
+  title: Anthropic's 2024 alignment faking study
+  type: web
+  cited_by:
+    - situational-awareness
+    - corrigibility-failure
+    - mesa-optimization
+    - scheming
+    - sharp-left-turn
+    - misaligned-catastrophe
+    - alignment-difficulty
+    - goal-directedness
+  publication_id: anthropic
+  tags:
+    - alignment
+    - deception
+    - self-awareness
+    - evaluations
+    - corrigibility
+- id: 5b6a9c3085e30e07
+  url: https://www.anthropic.com/claude-4-system-card
+  title: Observed in Apollo Research evaluations
+  type: web
+  cited_by:
+    - corrigibility-failure
+  publication_id: anthropic
+  tags:
+    - evaluation
+    - corrigibility
+    - shutdown-problem
+    - instrumental-convergence
+- id: cc554bd1593f0504
+  url: https://openai.com/index/openai-anthropic-safety-evaluation/
+  title: 2025 OpenAI-Anthropic joint evaluation
+  type: web
+  cited_by:
+    - corrigibility-failure
+    - emergent-capabilities
+    - goal-directedness
+  publication_id: openai
+  tags:
+    - evaluation
+    - corrigibility
+    - shutdown-problem
+    - instrumental-convergence
+    - scaling
+- id: 93afca21d4d8f51c
+  url: https://deepmind.google/blog/google-deepmind-at-icml-2024/
+  title: Google DeepMind's AGI framework
+  type: web
+  cited_by:
+    - emergent-capabilities
+  publication_id: deepmind
+  tags:
+    - agi
+    - scaling
+    - capability-evaluation
+    - unpredictability
+- id: f57d22d3ff1e8745
+  url: https://openai.com/index/chatgpt-plugins/
+  title: tool use and search
+  type: web
+  cited_by:
+    - instrumental-convergence
+  publication_id: openai
+  tags:
+    - power-seeking
+    - self-preservation
+    - corrigibility
+- id: ca0da848a3ad4301
+  url: https://www.anthropic.com/research/constitutional-ai
+  title: Anthropic (2023)
+  type: web
+  cited_by:
+    - glossary
+    - instrumental-convergence
+    - disinformation
+  publication_id: anthropic
+  tags:
+    - power-seeking
+    - self-preservation
+    - corrigibility
+    - disinformation
+    - influence-operations
+- id: 43e19cac5ca4688d
+  url: https://www.anthropic.com/research/team/alignment
+  title: Anthropic Alignment Science
+  type: web
+  cited_by:
+    - sharp-left-turn
+  publication_id: anthropic
+  tags:
+    - alignment
+    - capability-generalization
+    - alignment-stability
+    - miri
+- id: 4192216fa338fec6
+  url: https://openai.com/research/steganography
+  title: OpenAI (2023)
+  type: web
+  cited_by:
+    - steganography
+  publication_id: openai
+- id: a77b1b1f530bacea
+  url: https://deepmind.google/responsibility/
+  title: DeepMind
+  type: web
+  cited_by:
+    - steganography
+  publication_id: deepmind
+- id: 8ac723f7b23f4ab3
+  url: https://www.anthropic.com/research/measuring-and-mitigating-sycophancy
+  title: Anthropic (2023)
+  type: web
+  cited_by:
+    - sycophancy
+  publication_id: anthropic
+  tags:
+    - rlhf
+    - reward-hacking
+    - honesty
+- id: 0727e48c90269b22
+  url: https://www.microsoft.com/en-us/research/project/vall-e-x/
+  title: Microsoft VALL-E
+  type: web
+  cited_by:
+    - deepfakes
+  tags:
+    - synthetic-media
+    - identity
+    - authentication
+  publication_id: microsoft
+- id: abb5ddea57c82ce1
+  url: https://www.microsoft.com/
+  title: Microsoft
+  type: web
+  cited_by:
+    - deepfakes
+  tags:
+    - synthetic-media
+    - identity
+    - authentication
+  publication_id: microsoft
+- id: 058ff9d6c86939fd
+  url: https://www.microsoft.com/en-us/research/
+  title: Microsoft Research
+  type: web
+  cited_by:
+    - deepfakes
+  tags:
+    - synthetic-media
+    - identity
+    - authentication
+  publication_id: microsoft
+- id: d003c0f1cb55479e
+  url: https://www.microsoft.com/en-us/ai/ai-lab-video-authenticator
+  title: Microsoft Video Authenticator
+  type: web
+  cited_by:
+    - deepfakes
+  tags:
+    - synthetic-media
+    - identity
+    - authentication
+  publication_id: microsoft
+- id: c1e4ec9705138642
+  url: https://www.microsoft.com/en-us/security/
+  title: Microsoft Threat Analysis Center
+  type: web
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+  publication_id: microsoft
+- id: 227741d31f8b2459
+  url: https://openai.com/dall-e-3
+  title: DALL-E 3
+  type: web
+  cited_by:
+    - disinformation
+  publication_id: openai
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 0d1473d24de0fe49
+  url: https://www.microsoft.com/en-us/security/blog/2024/08/08/iranian-cyber-actors-accelerate-ai-enabled-influence-operations/
+  title: Iranian
+  type: web
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+  publication_id: microsoft
+- id: c2bdd5f797fdc5cc
+  url: https://openai.com/blog/planning-for-agi-and-beyond
+  title: OpenAI's roadmap
+  type: web
+  cited_by:
+    - disinformation
+  publication_id: openai
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 037327b4c727ffb0
+  url: https://www.microsoft.com/en-us/hololens
+  title: augmented reality
+  type: web
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+  publication_id: microsoft
+- id: fea58fc7b42be865
+  url: https://www.microsoft.com/en-us/security/business/security-insider/
+  title: Microsoft Security Intelligence
+  type: web
+  cited_by:
+    - fraud
+  tags:
+    - cybersecurity
+    - social-engineering
+    - voice-cloning
+    - deepfakes
+  publication_id: microsoft
+- id: fc0252d4510069a7
+  url: https://www.anthropic.com/news/amazon-investment
+  title: Amazon's $4 billion investment in Anthropic
+  type: web
+  cited_by:
+    - concentration-of-power
+  publication_id: anthropic
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+- id: d0dcb570edc50d34
+  url: https://www.microsoft.com/en-us/research/publication/differential-privacy/
+  title: Differential privacy
+  type: web
+  cited_by:
+    - concentration-of-power
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+  publication_id: microsoft
+- id: d29dc57bf7f78b2e
+  url: https://www.microsoft.com/en-us/investor/earnings/fy-2023-q2/press-release-webcast
+  title: Microsoft extends OpenAI investment to $10B+
+  type: web
+  cited_by:
+    - concentration-of-power
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+  publication_id: microsoft
+- id: 27d22b6c3bd3fa6a
+  url: https://openai.com/research/learning-from-human-preferences
+  title: Reinforcement Learning from Human Feedback (RLHF)
+  type: web
+  cited_by:
+    - lock-in
+  publication_id: openai
+  tags:
+    - training
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: 62fb4cae73514bec
+  url: https://www.anthropic.com/news/ai-safety-and-security-risks-from-advanced-ai
+  title: Research from Anthropic
+  type: web
+  cited_by:
+    - proliferation
+  publication_id: anthropic
+  tags:
+    - open-source
+    - governance
+    - dual-use
+- id: 60cfe5fed32e34e8
+  url: https://openai.com/index/chatgpt/
+  title: ChatGPT's November 2022 launch
+  type: web
+  cited_by:
+    - racing-dynamics
+  publication_id: openai
+  tags:
+    - governance
+    - coordination
+    - competition
+- id: f92eef86f39c6038
+  url: https://openai.com/index/preparedness/
+  title: Preparedness Framework
+  type: web
+  cited_by:
+    - coordination
+  publication_id: openai
+- id: 9e4ef9c155b6d9f3
+  url: https://www.anthropic.com/news/3-5-models-and-computer-use
+  title: Claude with computer use
+  type: web
+  cited_by:
+    - agentic-ai
+    - tool-use
+    - goal-directedness
+  publication_id: anthropic
+  tags:
+    - compute
+    - llm
+    - tool-use
+    - agentic
+    - computer-use
+- id: 53efc4cca47a6c8b
+  url: https://openai.com/research/scalable-oversight
+  title: OpenAI
+  type: web
+  cited_by:
+    - glossary
+  publication_id: openai
+- id: bf92f3d905c3de0d
+  url: https://openai.com/index/introducing-o3-and-o4-mini/
+  title: announced December 2024
+  type: web
+  cited_by:
+    - reasoning
+    - self-improvement
+  publication_id: openai
+  tags:
+    - decision-theory
+    - epistemics
+    - methodology
+- id: 83b187f91a7c6b88
+  url: https://www.anthropic.com/research/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training
+  title: Anthropic's sleeper agents research (2024)
+  type: web
+  cited_by:
+    - reasoning
+    - situational-awareness
+    - power-seeking
+  publication_id: anthropic
+  tags:
+    - decision-theory
+    - epistemics
+    - methodology
+    - deception
+    - self-awareness
+- id: 72c1254d07071bf7
+  url: https://www.anthropic.com/research/probes-catch-sleeper-agents
+  title: Anthropic's follow-up research on defection probes
+  type: web
+  cited_by:
+    - case-for-xrisk
+    - why-alignment-hard
+    - reasoning
+    - situational-awareness
+    - accident-risks
+    - mesa-optimization
+    - treacherous-turn
+  publication_id: anthropic
+  tags:
+    - decision-theory
+    - epistemics
+    - methodology
+    - deception
+    - self-awareness
+- id: defa3a63243864e2
+  url: https://scholar.google.com/citations?user=8Q1x_kEAAAAJ
+  title: Google Scholar
+  type: web
+  cited_by:
+    - far-ai
+  publication_id: google-scholar
+  tags:
+    - adversarial-robustness
+    - ml-safety
+    - benchmarking
+- id: 474033f678dfe09a
+  url: https://openai.com/index/preparedness-framework/
+  title: Preparedness Framework
+  type: web
+  cited_by:
+    - agentic-ai
+  publication_id: openai
+  tags:
+    - tool-use
+    - agentic
+    - computer-use
+- id: c9e3f9e7022bacf3
+  url: https://deepmind.google/about/responsibility-safety/frontier-safety-framework/
+  title: Frontier Safety Framework v2
+  type: web
+  cited_by:
+    - agentic-ai
+  publication_id: deepmind
+  tags:
+    - safety
+    - tool-use
+    - agentic
+    - computer-use
+- id: e283b9c34207eff8
+  url: https://www.anthropic.com/news/model-context-protocol
+  title: Model Context Protocol (MCP)
+  type: web
+  cited_by:
+    - tool-use
+  publication_id: anthropic
+  tags:
+    - computer-use
+    - function-calling
+    - api-integration
+- id: 461efab2a94bf7c5
+  url: https://openai.com/index/function-calling-and-other-api-updates/
+  title: OpenAI introduces function calling
+  type: web
+  cited_by:
+    - tool-use
+  publication_id: openai
+  tags:
+    - computer-use
+    - function-calling
+    - api-integration
+- id: d648a6e2afc00d15
+  url: https://deepmind.google/blog/deepening-our-partnership-with-the-uk-ai-security-institute/
+  title: "DeepMind: Deepening AI Safety Research with UK AISI"
+  type: web
+  publication_id: deepmind
+  tags:
+    - safety
+  cited_by:
+    - international-summits
+- id: 1c299d732cb07cb3
+  url: https://openai.com/global-affairs/our-approach-to-frontier-risk/
+  title: OpenAI's Approach to Frontier Risk
+  type: web
+  publication_id: openai
+- id: 9d653677d03c2df3
+  url: https://www.anthropic.com/research/sabotage-evaluations
+  title: Anthropic's sabotage evaluations
+  type: web
+  cited_by:
+    - sandbagging
+  publication_id: anthropic
+  tags:
+    - evaluation
+    - evaluations
+    - deception
+    - situational-awareness
+- id: 6936fd77e804a8c7
+  url: https://www.amazon.com/Superintelligence-Dangers-Strategies-Nick-Bostrom/dp/0199678111
+  title: "Superintelligence: Paths, Dangers, Strategies"
+  type: web
+  cited_by:
+    - treacherous-turn
+  tags:
+    - agi
+    - scheming
+    - superintelligence
+    - nick-bostrom
+  publication_id: amazon
+- id: 4ba107b71a0707f9
+  url: https://www.anthropic.com/news/disrupting-AI-espionage
+  title: first documented AI-orchestrated cyberattack
+  type: web
+  cited_by:
+    - cyberweapons
+  publication_id: anthropic
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+- id: 695ebc69943bd9c1
+  url: https://openai.com/index/introducing-aardvark/
+  title: OpenAI announced Aardvark
+  type: web
+  cited_by:
+    - cyberweapons
+  publication_id: openai
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+- id: 31a6292dc5d9663b
+  url: https://www.microsoft.com/en-us/security/security-insider/threat-landscape/microsoft-digital-defense-report-2025
+  title: Microsoft research
+  type: web
+  cited_by:
+    - cyberweapons
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+  publication_id: microsoft
+- id: 3b187a21ee711c65
+  url: https://www.microsoft.com/en-us/security/blog/2025/03/24/microsoft-unveils-microsoft-security-copilot-agents-and-new-protections-for-ai/
+  title: Microsoft Security Copilot agents
+  type: web
+  cited_by:
+    - cyberweapons
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+  publication_id: microsoft
+- id: 2a58921d1b9c8ca0
+  url: https://www.amazon.com/Prisoners-Dilemma-Neumann-Theory-Puzzle/dp/038541580X
+  title: "Prisoner's Dilemma: John von Neumann, Game Theory, and the Puzzle of the Bomb"
+  type: web
+  cited_by:
+    - multipolar-trap
+  tags:
+    - game-theory
+    - coordination
+    - competition
+  publication_id: amazon
+- id: 4de7c52c31b082a5
+  url: https://www.amazon.com/Human-Compatible-Artificial-Intelligence-Problem/dp/0525558632
+  title: Human Compatible
+  type: web
+  cited_by:
+    - why-alignment-hard
+  publication_id: amazon
+- id: b0f5f87778543882
+  url: https://deepmind.google/blog/specification-gaming-the-flip-side-of-ai-ingenuity/
+  title: "Specification Gaming: The Flip Side of AI Ingenuity"
+  type: web
+  publication_id: deepmind
+  cited_by:
+    - why-alignment-hard
+    - reward-hacking-taxonomy
+    - reward-hacking
+  tags:
+    - taxonomy
+    - reward-modeling
+    - specification-gaming
+    - goodharts-law
+    - outer-alignment
+- id: c24eaf8358ed061c
+  url: https://www.amazon.com/Anyone-Builds-Everyone-Dies-Superhuman-ebook/dp/B0DWL1STHX
+  title: 2025 book
+  type: web
+  cited_by:
+    - why-alignment-hard
+  publication_id: amazon
+- id: dae2f41face269b9
+  url: https://deepmind.google/blog/millions-of-new-materials-discovered-with-deep-learning/
+  title: Graph Networks for Materials Exploration (GNoME)
+  type: web
+  publication_id: deepmind
+  cited_by:
+    - scientific-research
+  tags:
+    - alphafold
+    - drug-discovery
+    - scientific-ai
+- id: 62c583fb4c6af13a
+  url: https://www.anthropic.com/research/petri-open-source-auditing
+  title: Petri framework
+  type: web
+  publication_id: anthropic
+  cited_by:
+    - accident-risks
+- id: f7b06d857b564d78
+  url: https://openai.com/index/extracting-concepts-from-gpt-4/
+  title: Extracting Concepts from GPT-4
+  type: web
+  publication_id: openai
+  tags:
+    - llm
+  cited_by:
+    - interpretability-sufficient
+- id: a31c49bf9c1df71f
+  url: https://deepmind.google/discover/blog/gemma-scope-helping-the-safety-community-shed-light-on-the-inner-workings-of-language-models/
+  title: Gemma Scope
+  type: web
+  publication_id: deepmind
+  cited_by:
+    - interpretability-sufficient
+- id: 7a21b9c5237a8a16
+  url: https://www.anthropic.com/research/emergent-misalignment-reward-hacking
+  title: Natural Emergent Misalignment from Reward Hacking
+  type: web
+  publication_id: anthropic
+  tags:
+    - alignment
+    - cybersecurity
+  cited_by:
+    - reward-hacking-taxonomy
+- id: 58937cef1e4311e9
+  url: https://openai.com/index/measuring-goodharts-law/
+  title: OpenAI Goodhart Measurement
+  type: web
+  publication_id: openai
+  cited_by:
+    - reward-hacking-taxonomy
+    - reward-hacking
+  tags:
+    - taxonomy
+    - reward-modeling
+    - specification-gaming
+    - goodharts-law
+    - outer-alignment
+- id: d4700c15258393ad
+  url: https://openai.com/index/chain-of-thought-monitoring/
+  title: OpenAI CoT Monitoring
+  type: web
+  publication_id: openai
+  cited_by:
+    - reward-hacking-taxonomy
+  tags:
+    - taxonomy
+    - reward-modeling
+    - specification-gaming
+- id: 62ca4ea53749d1ff
+  url: https://deepmind.google/about/leadership/
+  title: Demis Hassabis - Google DeepMind
+  type: web
+  publication_id: deepmind
+  cited_by:
+    - demis-hassabis
+- id: 82eb0a4b47c95d2a
+  url: https://openai.com/index/superalignment-fast-grants/
+  title: OpenAI Superalignment Fast Grants
+  type: web
+  publication_id: openai
+  cited_by:
+    - research-agendas
+  tags:
+    - research-agendas
+    - alignment
+    - interpretability
+- id: ac5f8a05b1ace50c
+  url: https://www.anthropic.com/research/reward-tampering
+  title: Anthropic system card
+  type: web
+  publication_id: anthropic
+  cited_by:
+    - reward-hacking
+    - epistemic-sycophancy
+  tags:
+    - specification-gaming
+    - goodharts-law
+    - outer-alignment
+    - alignment
+    - truthfulness
+- id: b5d44bf4a1e9b96a
+  url: https://openai.com/index/faulty-reward-functions/
+  title: CoastRunners boat
+  type: web
+  publication_id: openai
+  cited_by:
+    - reward-hacking
+  tags:
+    - specification-gaming
+    - goodharts-law
+    - outer-alignment
+- id: 6aca063a1249c289
+  url: https://www.anthropic.com/research/towards-understanding-sycophancy-in-language-models
+  title: Anthropic's research on sycophancy
+  type: web
+  publication_id: anthropic
+  cited_by:
+    - reward-hacking
+  tags:
+    - specification-gaming
+    - goodharts-law
+    - outer-alignment
+- id: f435f5756eed9e6e
+  url: https://openai.com/index/sycophancy-in-gpt-4o/
+  title: OpenAI rolled back a GPT-4o update
+  type: web
+  publication_id: openai
+  tags:
+    - llm
+  cited_by:
+    - epistemic-sycophancy
+- id: 0e972e075968c5e0
+  url: https://openai.com/index/expanding-on-sycophancy/
+  title: postmortem
+  type: web
+  publication_id: openai
+  cited_by:
+    - epistemic-sycophancy
+  tags:
+    - alignment
+    - truthfulness
+    - user-experience

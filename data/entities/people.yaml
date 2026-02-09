@@ -1,0 +1,1158 @@
+# People Entities
+# Auto-generated from entities.yaml - edit this file directly
+
+- id: buck-shlegeris
+  type: researcher
+  title: Buck Shlegeris
+  website: https://redwoodresearch.org
+  customFields:
+    - label: Role
+      value: CEO
+    - label: Known For
+      value: AI safety research, Redwood Research leadership
+- id: chris-olah
+  type: researcher
+  title: Chris Olah
+  website: https://colah.github.io
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: interpretability
+      type: safety-agenda
+    - id: dario-amodei
+      type: researcher
+  customFields:
+    - label: Role
+      value: Co-founder, Head of Interpretability
+    - label: Known For
+      value: Mechanistic interpretability, neural network visualization, clarity of research communication
+  sources:
+    - title: Chris Olah's Blog
+      url: https://colah.github.io
+    - title: Distill Journal
+      url: https://distill.pub
+    - title: Anthropic Interpretability Research
+      url: https://www.anthropic.com/research#interpretability
+    - title: Scaling Monosemanticity
+      url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
+  description: >
+    Chris Olah is one of the most influential figures in AI interpretability research. Before co-founding Anthropic in
+    2021, he worked at Google Brain and OpenAI, where he pioneered techniques for understanding what neural networks
+    learn internally. His blog posts and papers on neural network visualization have become canonical references in the
+    field.
+
+
+    Olah's research focuses on "mechanistic interpretability" - the effort to understand neural networks by
+    reverse-engineering the algorithms they implement. His team at Anthropic has made breakthrough discoveries including
+    identifying "features" in large language models using sparse autoencoders, understanding how transformers perform
+    computations through "circuits," and mapping the representations that models develop during training. The 2024
+    "Scaling Monosemanticity" paper demonstrated that interpretability techniques could scale to production models like
+    Claude.
+
+
+    Beyond his technical contributions, Olah is known for his exceptional clarity of communication. He co-founded
+    Distill, an academic journal that emphasized interactive visualizations and clear explanations. His approach -
+    treating neural networks as objects to be understood rather than black boxes to be optimized - has shaped how a
+    generation of AI safety researchers think about the problem.
+  tags:
+    - interpretability
+    - feature-visualization
+    - neural-network-circuits
+    - sparse-autoencoders
+    - ai-safety
+    - transparency
+    - monosemanticity
+  lastUpdated: 2025-12
+- id: connor-leahy
+  type: researcher
+  title: Connor Leahy
+  website: https://conjecture.dev
+  relatedEntries:
+    - id: interpretability
+      type: safety-agenda
+    - id: chris-olah
+      type: researcher
+    - id: neel-nanda
+      type: researcher
+  customFields:
+    - label: Role
+      value: CEO & Co-founder
+    - label: Known For
+      value: Founding Conjecture, AI safety advocacy, interpretability research
+  sources:
+    - title: Conjecture
+      url: https://conjecture.dev
+    - title: Connor Leahy on Twitter/X
+      url: https://twitter.com/ConnorLeahy
+    - title: Various podcast appearances
+      url: https://www.youtube.com/results?search_query=connor+leahy
+  description: >
+    Connor Leahy is the CEO and co-founder of Conjecture, an AI safety research company based in London. He rose to
+    prominence as a founding member of EleutherAI, an open-source collective that trained GPT-NeoX and other large
+    language models to democratize access to AI research. This experience gave him direct insight into how frontier
+    capabilities are developed.
+
+
+    Leahy founded Conjecture in 2022 with the thesis that AGI might emerge from "prosaic" deep learning - scaling
+    current architectures - rather than requiring fundamental algorithmic breakthroughs. This worldview emphasizes the
+    urgency of alignment research, since transformative AI could arrive without warning through continued scaling.
+    Conjecture's research focuses on interpretability, capability evaluation, and developing tools to understand AI
+    systems before they become too powerful.
+
+
+    As a public advocate for AI safety, Leahy is known for his direct communication style and willingness to engage with
+    uncomfortable scenarios. He has appeared on numerous podcasts and media outlets to discuss AI risk, often
+    emphasizing the potential for rapid capability gains and the inadequacy of current safety measures. His perspective
+    combines technical expertise from building large models with serious concern about the trajectory of AI development.
+  tags:
+    - interpretability
+    - prosaic-alignment
+    - agi-timelines
+    - ai-safety
+    - capability-evaluation
+    - eleutherai
+    - red-teaming
+  lastUpdated: 2025-12
+- id: dan-hendrycks
+  type: researcher
+  title: Dan Hendrycks
+  website: https://hendrycks.com
+  relatedEntries:
+    - id: cais
+      type: lab
+    - id: compute-governance
+      type: policy
+    - id: yoshua-bengio
+      type: researcher
+  customFields:
+    - label: Role
+      value: Director
+    - label: Known For
+      value: AI safety research, benchmark creation, CAIS leadership
+  sources:
+    - title: Dan Hendrycks' Website
+      url: https://hendrycks.com
+    - title: Center for AI Safety
+      url: https://safe.ai
+    - title: Statement on AI Risk
+      url: https://safe.ai/statement-on-ai-risk
+    - title: Google Scholar Profile
+      url: https://scholar.google.com/citations?user=VEvOFxQAAAAJ
+  description: >
+    Dan Hendrycks is the Director of the Center for AI Safety (CAIS) and one of the most prolific researchers in AI
+    safety. His work spans technical safety research, benchmark creation, and public advocacy for taking AI risks
+    seriously. He is known for combining rigorous empirical research with clear communication about catastrophic risks.
+
+
+    Hendrycks has made foundational contributions to AI safety evaluation. He created MMLU (Massive Multitask Language
+    Understanding), one of the most widely-used benchmarks for measuring AI capabilities, as well as numerous benchmarks
+    for robustness, calibration, and safety. His research on out-of-distribution detection, adversarial robustness, and
+    AI ethics has been highly cited and influenced how the field measures progress.
+
+
+    As CAIS director, Hendrycks has focused on building the case for AI risk as a serious issue. He was instrumental in
+    organizing the 2023 Statement on AI Risk, signed by hundreds of AI researchers including Turing Award winners, which
+    stated that "mitigating the risk of extinction from AI should be a global priority." His approach emphasizes
+    engaging mainstream ML researchers and policymakers who may not be part of the existing AI safety community.
+  tags:
+    - ai-safety
+    - x-risk
+    - robustness
+    - governance
+    - benchmarks
+    - compute-governance
+  lastUpdated: 2025-12
+- id: daniela-amodei
+  type: researcher
+  title: Daniela Amodei
+  website: https://anthropic.com
+  customFields:
+    - label: Role
+      value: Co-founder & President
+    - label: Known For
+      value: Co-founding Anthropic, Operations and business leadership
+- id: dario-amodei
+  type: researcher
+  title: Dario Amodei
+  website: https://anthropic.com
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: anthropic-core-views
+      type: safety-agenda
+    - id: jan-leike
+      type: researcher
+    - id: chris-olah
+      type: researcher
+  customFields:
+    - label: Role
+      value: Co-founder & CEO
+    - label: Known For
+      value: Constitutional AI, Responsible Scaling Policy, Claude development
+  sources:
+    - title: Anthropic Website
+      url: https://anthropic.com
+    - title: Anthropic Core Views on AI Safety
+      url: https://anthropic.com/news/core-views-on-ai-safety
+    - title: Responsible Scaling Policy
+      url: https://anthropic.com/news/anthropics-responsible-scaling-policy
+    - title: Dwarkesh Podcast Interview
+      url: https://www.dwarkeshpatel.com/p/dario-amodei
+  description: >
+    Dario Amodei is the CEO and co-founder of Anthropic, one of the leading AI safety-focused companies. Before founding
+    Anthropic in 2021, he was VP of Research at OpenAI, where he led the team that developed GPT-2 and GPT-3. He left
+    OpenAI along with his sister Daniela and several colleagues over concerns about the company's direction,
+    particularly its increasing commercialization and partnership with Microsoft.
+
+
+    Amodei's approach to AI safety emphasizes empirical research on current systems rather than purely theoretical work.
+    Under his leadership, Anthropic has developed Constitutional AI (a method for training helpful, harmless, and honest
+    AI without extensive human feedback), pioneered "responsible scaling policies" that tie safety commitments to
+    capability levels, and invested heavily in interpretability research. The company's Claude models have become
+    leading examples of safety-conscious AI development.
+
+
+    As a public voice for AI safety, Amodei occupies a distinctive position - arguing that AI development is likely to
+    continue rapidly regardless of individual company decisions, so the priority should be ensuring that safety-focused
+    labs are at the frontier. He has advocated for industry self-regulation, compute governance, and international
+    coordination while maintaining that slowing AI development unilaterally would simply cede the field to less
+    safety-conscious actors. His essay "Machines of Loving Grace" outlined a vision for how powerful AI could be
+    beneficial if developed carefully.
+  tags:
+    - constitutional-ai
+    - responsible-scaling
+    - claude
+    - rlhf
+    - interpretability
+    - ai-safety-levels
+    - empirical-alignment
+  lastUpdated: 2025-12
+- id: demis-hassabis
+  type: researcher
+  title: Demis Hassabis
+- id: eliezer-yudkowsky
+  type: researcher
+  title: Eliezer Yudkowsky
+  website: https://intelligence.org
+  relatedEntries:
+    - id: miri
+      type: lab
+    - id: deceptive-alignment
+      type: risk
+    - id: sharp-left-turn
+      type: risk
+    - id: paul-christiano
+      type: researcher
+  customFields:
+    - label: Role
+      value: Co-founder & Research Fellow
+    - label: Known For
+      value: Early AI safety work, decision theory, rationalist community
+  sources:
+    - title: MIRI Research
+      url: https://intelligence.org/research/
+    - title: LessWrong
+      url: https://www.lesswrong.com/users/eliezer_yudkowsky
+    - title: 'AGI Ruin: A List of Lethalities'
+      url: https://www.lesswrong.com/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities
+    - title: The Sequences
+      url: https://www.lesswrong.com/rationality
+  description: >
+    Eliezer Yudkowsky is one of the founding figures of AI safety as a field. In 2000, he co-founded the Machine
+    Intelligence Research Institute (MIRI), originally called the Singularity Institute for Artificial Intelligence,
+    making it one of the first organizations dedicated to studying the risks from advanced AI. His early writings on AI
+    risk predated academic interest in the topic by over a decade.
+
+
+    Yudkowsky's technical contributions include foundational work on decision theory, the formalization of Friendly AI
+    concepts, and the identification of failure modes like deceptive alignment and the "sharp left turn." His 2022 essay
+    "AGI Ruin: A List of Lethalities" provides a comprehensive catalog of why he believes aligning superintelligent AI
+    is extremely difficult. He has been pessimistic about humanity's chances, arguing that current approaches to
+    alignment are inadequate and that AI development should be slowed or halted.
+
+
+    Beyond AI safety, Yudkowsky founded the "rationalist" community through his sequences of blog posts on human
+    rationality, later compiled as "Rationality: From AI to Zombies." This community has been a major source of AI
+    safety researchers and has shaped how the field thinks about reasoning under uncertainty. His writing style -
+    blending technical concepts with accessible explanations and science fiction examples - has influenced how AI risk
+    is communicated. Despite his pessimism, he remains an active voice advocating for taking AI risk seriously at the
+    highest levels of government and industry.
+  tags:
+    - alignment
+    - x-risk
+    - agent-foundations
+    - rationality
+    - decision-theory
+    - cev
+    - sharp-left-turn
+    - deception
+  lastUpdated: 2025-12
+- id: elizabeth-kelly
+  type: researcher
+  title: Elizabeth Kelly
+  customFields:
+    - label: Role
+      value: Director
+    - label: Known For
+      value: Leading US AI Safety Institute, AI policy
+- id: evan-hubinger
+  type: researcher
+  title: Evan Hubinger
+- id: gary-marcus
+  type: researcher
+  title: Gary Marcus
+- id: geoffrey-hinton
+  type: researcher
+  title: Geoffrey Hinton
+  website: https://www.cs.toronto.edu/~hinton/
+  relatedEntries:
+    - id: yoshua-bengio
+      type: researcher
+    - id: deepmind
+      type: lab
+  customFields:
+    - label: Role
+      value: Professor Emeritus, AI Safety Advocate
+    - label: Known For
+      value: Deep learning pioneer, backpropagation, now AI risk vocal advocate
+  sources:
+    - title: Geoffrey Hinton's Homepage
+      url: https://www.cs.toronto.edu/~hinton/
+    - title: CBS 60 Minutes Interview
+      url: https://www.cbsnews.com/news/geoffrey-hinton-ai-dangers-60-minutes-transcript/
+    - title: 'NYT: ''Godfather of AI'' Quits Google'
+      url: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
+    - title: Google Scholar Profile
+      url: https://scholar.google.com/citations?user=JicYPdAAAAAJ
+  description: >
+    Geoffrey Hinton is a cognitive psychologist and computer scientist who received the 2018 Turing Award for his
+    foundational work on deep learning. Often called the "Godfather of AI," he developed many of the techniques that
+    enabled the current AI revolution, including the backpropagation algorithm, Boltzmann machines, and key advances in
+    neural network training.
+
+
+    In May 2023, Hinton resigned from Google after a decade at the company specifically to speak freely about AI risks.
+    His public statements marked a significant moment for AI safety - one of the field's most respected pioneers was now
+    warning that the technology he helped create posed existential risks. He expressed regret about his life's work,
+    stating that the dangers from AI might be more imminent and severe than he previously believed.
+
+
+    Hinton's concerns focus on several areas: that AI systems might become more intelligent than humans sooner than
+    expected, that we don't understand how to control systems smarter than ourselves, and that bad actors could use AI
+    for manipulation and warfare. He has called for government intervention to slow AI development and international
+    coordination to prevent an AI arms race. His transition from AI optimist to public warner has lent significant
+    credibility to AI safety concerns and helped bring them into mainstream discourse.
+  tags:
+    - deep-learning
+    - ai-safety
+    - x-risk
+    - neural-networks
+    - backpropagation
+    - regulation
+    - autonomous-weapons
+  lastUpdated: 2025-12
+- id: holden-karnofsky
+  type: researcher
+  title: Holden Karnofsky
+  website: https://coefficientgiving.org
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: toby-ord
+      type: researcher
+  customFields:
+    - label: Role
+      value: Former Co-CEO (now at Anthropic)
+    - label: Known For
+      value: Directing billions toward AI safety, effective altruism leadership, AI timelines work
+  sources:
+    - title: Coefficient Giving
+      url: https://coefficientgiving.org
+    - title: Cold Takes Blog
+      url: https://www.cold-takes.com/
+    - title: Most Important Century Series
+      url: https://www.cold-takes.com/most-important-century/
+    - title: AI Timelines Post
+      url: https://www.cold-takes.com/where-ai-forecasting-stands-today/
+  description: >
+    Holden Karnofsky is the former Co-CEO of Coefficient Giving (formerly Open Philanthropy), one of the largest funders of AI safety research and related
+    work. Through Coefficient Giving, he directed hundreds of millions of dollars toward reducing existential risks
+    from AI, making him one of the most influential figures in shaping the field's growth and direction. In 2025, he joined Anthropic.
+
+
+    Karnofsky's intellectual contributions have been equally significant. His "Most Important Century" series of blog
+    posts on Cold Takes presents a detailed argument that the 21st century could be the most pivotal in human history
+    due to transformative AI. He has developed frameworks for thinking about AI timelines, the potential for a
+    "galaxy-brained" AI to manipulate humans, and how philanthropic funding should be allocated given deep uncertainty
+    about AI trajectories.
+
+
+    Before focusing on AI risk, Karnofsky co-founded GiveWell, a charity evaluator that became the intellectual
+    foundation for effective altruism. His transition to prioritizing AI safety reflects a broader shift in the EA
+    movement. Through Coefficient Giving's grants to organizations like Anthropic, MIRI, Redwood Research, and many
+    others, Karnofsky helped build the institutional infrastructure of AI safety as a field.
+  tags:
+    - effective-altruism
+    - ai-safety-funding
+    - ai-timelines
+    - transformative-ai
+    - x-risk
+    - most-important-century
+    - grantmaking
+  lastUpdated: 2025-12
+- id: ian-hogarth
+  type: researcher
+  title: Ian Hogarth
+  customFields:
+    - label: Role
+      value: Chair
+    - label: Known For
+      value: Leading UK AI Safety Institute, AI investor and writer
+- id: ilya-sutskever
+  type: researcher
+  title: Ilya Sutskever
+  website: https://ssi.inc
+  relatedEntries:
+    - id: openai
+      type: lab
+    - id: jan-leike
+      type: researcher
+    - id: geoffrey-hinton
+      type: researcher
+  customFields:
+    - label: Role
+      value: Co-founder & Chief Scientist
+    - label: Known For
+      value: Deep learning breakthroughs, OpenAI leadership, now focused on safe superintelligence
+  sources:
+    - title: Safe Superintelligence Inc.
+      url: https://ssi.inc
+    - title: SSI Founding Announcement
+      url: https://ssi.inc/announcement
+    - title: AlexNet Paper
+      url: https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks
+  description: >
+    Ilya Sutskever is one of the most influential figures in modern AI development. As a PhD student of Geoffrey Hinton,
+    he co-authored the AlexNet paper that sparked the deep learning revolution. He went on to co-found OpenAI in 2015
+    and served as Chief Scientist for nearly a decade, leading the technical direction that produced GPT-3, GPT-4, and
+    other breakthrough systems.
+
+
+    Sutskever's departure from OpenAI in 2024 followed a tumultuous period during which he briefly joined the board in
+    attempting to remove CEO Sam Altman, then reversed course. The episode highlighted tensions between commercial
+    pressures and safety concerns at frontier AI labs. His departure, along with Jan Leike and other safety-focused
+    researchers, raised questions about OpenAI's commitment to its original mission.
+
+
+    In 2024, Sutskever founded Safe Superintelligence Inc. (SSI), a company focused exclusively on developing safe
+    superintelligent AI. Unlike other AI labs that balance commercial products with safety research, SSI's stated
+    mission is to solve superintelligence safety before building superintelligence - a departure from the "race to the
+    frontier" dynamic that characterizes much of the industry. Whether this approach can succeed commercially and
+    technically while maintaining its safety focus remains to be seen.
+  tags:
+    - superintelligence
+    - ai-safety
+    - deep-learning
+    - alignment-research
+    - openai
+    - scalable-oversight
+    - gpt
+  lastUpdated: 2025-12
+- id: jan-leike
+  type: researcher
+  title: Jan Leike
+  website: https://anthropic.com
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: scalable-oversight
+      type: safety-agenda
+    - id: dario-amodei
+      type: researcher
+    - id: paul-christiano
+      type: researcher
+  customFields:
+    - label: Role
+      value: Head of Alignment
+    - label: Known For
+      value: Alignment research, scalable oversight, RLHF
+  sources:
+    - title: Jan Leike on X/Twitter
+      url: https://twitter.com/janleike
+    - title: Deep RL from Human Preferences
+      url: https://arxiv.org/abs/1706.03741
+    - title: OpenAI Superalignment Announcement
+      url: https://openai.com/blog/introducing-superalignment
+    - title: Departure Statement
+      url: https://twitter.com/janleike/status/1790517668677865835
+  description: >
+    Jan Leike is the Head of Alignment at Anthropic, where he leads research on ensuring AI systems remain beneficial as
+    they become more capable. Before joining Anthropic in 2024, he co-led OpenAI's Superalignment team, which was tasked
+    with solving alignment for superintelligent AI systems within four years.
+
+
+    Leike's research has been foundational for modern alignment techniques. He co-authored key papers on learning from
+    human feedback, including "Deep Reinforcement Learning from Human Preferences" which helped establish RLHF as the
+    dominant paradigm for aligning large language models. His work on scalable oversight explores how to maintain human
+    control over AI systems even when they become too capable for humans to directly evaluate their outputs.
+
+
+    Leike's departure from OpenAI in May 2024 was publicly significant - he stated that safety had "taken a backseat to
+    shiny products" and that the company was not adequately preparing for the challenges of superintelligence. His move
+    to Anthropic, along with several colleagues from the Superalignment team, signaled broader concerns about safety
+    culture at frontier labs. At Anthropic, he continues work on scalable oversight, weak-to-strong generalization, and
+    detecting deceptive behavior in AI systems.
+  tags:
+    - rlhf
+    - scalable-oversight
+    - superalignment
+    - reward-modeling
+    - weak-to-strong-generalization
+    - process-supervision
+    - deception
+  lastUpdated: 2025-12
+- id: nate-soares
+  type: researcher
+  title: Nate Soares (MIRI)
+- id: neel-nanda
+  type: researcher
+  title: Neel Nanda
+  website: https://www.neelnanda.io
+  relatedEntries:
+    - id: deepmind
+      type: lab
+    - id: chris-olah
+      type: researcher
+    - id: interpretability
+      type: safety-agenda
+  customFields:
+    - label: Role
+      value: Alignment Researcher
+    - label: Known For
+      value: Mechanistic interpretability, TransformerLens library, educational content
+  sources:
+    - title: Neel Nanda's Website
+      url: https://www.neelnanda.io
+    - title: TransformerLens
+      url: https://github.com/neelnanda-io/TransformerLens
+    - title: 200 Open Problems in Mech Interp
+      url: https://www.lesswrong.com/posts/LbrPTJ4fmABEdEnLf/200-concrete-open-problems-in-mechanistic-interpretability
+    - title: Blog Posts
+      url: https://www.neelnanda.io/blog
+  description: >
+    Neel Nanda is an alignment researcher at Google DeepMind who has become one of the leading figures in mechanistic
+    interpretability. His work focuses on understanding the internal computations of transformer models -
+    reverse-engineering how these neural networks implement algorithms and form representations.
+
+
+    Nanda's most significant contribution to the field is TransformerLens, an open-source library that makes it vastly
+    easier to conduct interpretability research on language models. By providing clean abstractions for accessing model
+    internals, the library has enabled hundreds of researchers to enter the field and accelerated the pace of discovery.
+    He has also authored influential posts cataloging open problems in mechanistic interpretability, helping to define
+    the research agenda.
+
+
+    Beyond his technical work, Nanda is known for his commitment to growing the interpretability research community. He
+    actively mentors new researchers, creates educational content explaining complex concepts, and maintains a strong
+    online presence where he discusses research directions and results. His approach exemplifies a field-building
+    philosophy - that progress on AI safety requires not just individual research contributions but growing the number
+    of capable researchers working on the problem.
+  tags:
+    - interpretability
+    - transformer-circuits
+    - transformerlens
+    - induction-heads
+    - ai-safety
+    - research-tools
+    - science-communication
+  lastUpdated: 2025-12
+- id: nick-bostrom
+  type: researcher
+  title: Nick Bostrom
+  website: https://nickbostrom.com
+  relatedEntries:
+    - id: instrumental-convergence
+      type: risk
+    - id: treacherous-turn
+      type: risk
+    - id: toby-ord
+      type: researcher
+  customFields:
+    - label: Role
+      value: Founding Director (until FHI closure in 2024)
+    - label: Known For
+      value: Superintelligence, existential risk research, simulation hypothesis
+  sources:
+    - title: Nick Bostrom's Website
+      url: https://nickbostrom.com
+    - title: Superintelligence (book)
+      url: https://www.superintelligence.com/
+    - title: FHI Publications
+      url: https://www.fhi.ox.ac.uk/publications/
+    - title: Existential Risk Prevention as Global Priority
+      url: https://www.existential-risk.org/concept.html
+  description: >
+    Nick Bostrom is a philosopher who founded the Future of Humanity Institute (FHI) at Oxford University and authored
+    "Superintelligence: Paths, Dangers, Strategies" (2014), the book that brought AI existential risk into mainstream
+    academic and policy discourse. His work laid the conceptual foundations for much of modern AI safety thinking.
+
+
+    Bostrom's key contributions include the orthogonality thesis (intelligence and goals are independent - a
+    superintelligent AI could pursue any objective), instrumental convergence (most goal-pursuing systems will converge
+    on certain subgoals like self-preservation and resource acquisition), and the concept of the "treacherous turn" (an
+    AI might behave well until it's powerful enough to act on misaligned goals). These ideas are now standard reference
+    points in AI safety discussions.
+
+
+    Beyond AI, Bostrom has shaped the broader study of existential risk as an academic field, arguing that reducing the
+    probability of human extinction should be a global priority given the astronomical value of humanity's potential
+    future. Though FHI closed in 2024 due to administrative issues at Oxford, its influence persists through the
+    researchers it trained and the research agendas it established. Bostrom's work continues to frame how many
+    researchers and policymakers think about the stakes of advanced AI development.
+  tags:
+    - superintelligence
+    - x-risk
+    - orthogonality-thesis
+    - instrumental-convergence
+    - treacherous-turn
+    - value-alignment
+    - control-problem
+  lastUpdated: 2025-12
+- id: paul-christiano
+  type: researcher
+  title: Paul Christiano
+  website: https://alignment.org
+  relatedEntries:
+    - id: arc
+      type: lab
+    - id: scalable-oversight
+      type: safety-agenda
+    - id: eliezer-yudkowsky
+      type: researcher
+    - id: jan-leike
+      type: researcher
+  customFields:
+    - label: Role
+      value: Founder
+    - label: Known For
+      value: Iterated amplification, AI safety via debate, scalable oversight
+  sources:
+    - title: ARC Website
+      url: https://alignment.org
+    - title: Paul's Alignment Forum Posts
+      url: https://www.alignmentforum.org/users/paulfchristiano
+    - title: Iterated Amplification Paper
+      url: https://arxiv.org/abs/1810.08575
+    - title: ELK Report
+      url: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
+  description: >
+    Paul Christiano is the founder of the Alignment Research Center (ARC) and one of the most technically influential
+    figures in AI alignment. His research has shaped how the field thinks about scaling alignment techniques to
+    superintelligent systems, particularly through his work on iterated amplification, AI safety via debate, and
+    scalable oversight.
+
+
+    Christiano's key insight is that we need alignment techniques that work even when AI systems are smarter than their
+    human overseers. Iterated amplification proposes training AI systems by having them decompose complex tasks into
+    simpler subtasks that humans can evaluate. AI safety via debate imagines training AI systems by having them argue
+    with each other, with humans judging the debates. These approaches aim to amplify human judgment rather than replace
+    it entirely. His work on "Eliciting Latent Knowledge" (ELK) addresses how to get AI systems to honestly report what
+    they believe, even if they're capable of deception.
+
+
+    Before founding ARC in 2021, Christiano was a researcher at OpenAI where he led early work on RLHF and helped
+    establish many of the techniques now used to train large language models. He is known for taking AI risk seriously
+    while maintaining that there are tractable technical paths to safe AI - a position between those who think alignment
+    is essentially impossible and those who think it will be solved by default. His probability estimates for AI-caused
+    catastrophe (around 10-20%) are often cited as representing a serious but not inevitable risk.
+  tags:
+    - iterated-amplification
+    - scalable-oversight
+    - ai-safety-via-debate
+    - elk
+    - prosaic-alignment
+    - recursive-reward-modeling
+    - deception
+  lastUpdated: 2025-12
+- id: robin-hanson
+  type: researcher
+  title: Robin Hanson
+- id: sam-altman
+  type: researcher
+  title: Sam Altman
+- id: shane-legg
+  type: researcher
+  title: Shane Legg
+  website: https://deepmind.google
+  customFields:
+    - label: Role
+      value: Co-founder & Chief AGI Scientist
+    - label: Known For
+      value: Co-founding DeepMind, Early work on AGI, Machine super intelligence thesis
+- id: stuart-russell
+  type: researcher
+  title: Stuart Russell
+  website: https://people.eecs.berkeley.edu/~russell/
+  relatedEntries:
+    - id: chai
+      type: lab
+    - id: corrigibility-failure
+      type: risk
+    - id: paul-christiano
+      type: researcher
+  customFields:
+    - label: Role
+      value: Professor of Computer Science, CHAI Founder
+    - label: Known For
+      value: Human Compatible, inverse reinforcement learning, AI safety advocacy
+  sources:
+    - title: Stuart Russell's Homepage
+      url: https://people.eecs.berkeley.edu/~russell/
+    - title: Human Compatible (book)
+      url: https://www.penguinrandomhouse.com/books/566677/human-compatible-by-stuart-russell/
+    - title: CHAI Website
+      url: https://humancompatible.ai/
+    - title: 'TED Talk: 3 Principles for Creating Safer AI'
+      url: https://www.ted.com/talks/stuart_russell_3_principles_for_creating_safer_ai
+  description: >
+    Stuart Russell is a professor of computer science at UC Berkeley and one of the most prominent mainstream AI
+    researchers to seriously engage with AI safety. He is the author of "Artificial Intelligence: A Modern Approach,"
+    the standard textbook used in AI courses worldwide, giving him unusual credibility when he warns about AI risks.
+
+
+    Russell founded the Center for Human-Compatible AI (CHAI) at Berkeley to pursue his vision of AI systems that are
+    inherently safe because they are designed to be uncertain about human values and deferential to human preferences.
+    His book "Human Compatible" (2019) articulated this vision for a general audience, arguing that the standard
+    paradigm of optimizing AI systems for fixed objectives is fundamentally flawed. Instead, he proposes that AI systems
+    should be designed to defer to humans, allow themselves to be corrected, and actively seek to learn human
+    preferences rather than assume they already know them.
+
+
+    Russell has been active in AI governance advocacy, working with the UN and various governments on policy issues
+    including lethal autonomous weapons. He signed open letters calling for AI research to prioritize safety and has
+    testified before legislative bodies on AI risks. His approach emphasizes that AI safety is a solvable technical
+    problem if we redesign AI systems from the ground up with the right objectives, rather than trying to patch safety
+    onto systems designed without it.
+  tags:
+    - inverse-reinforcement-learning
+    - value-alignment
+    - cooperative-ai
+    - off-switch-problem
+    - corrigibility
+    - human-compatible-ai
+    - governance
+  lastUpdated: 2025-12
+- id: toby-ord
+  type: researcher
+  title: Toby Ord
+  website: https://www.tobyord.com
+  relatedEntries:
+    - id: nick-bostrom
+      type: researcher
+    - id: holden-karnofsky
+      type: researcher
+  customFields:
+    - label: Role
+      value: Senior Research Fellow in Philosophy
+    - label: Known For
+      value: The Precipice, existential risk quantification, effective altruism
+  sources:
+    - title: Toby Ord's Website
+      url: https://www.tobyord.com
+    - title: The Precipice
+      url: https://theprecipice.com/
+    - title: 80,000 Hours Podcast
+      url: https://80000hours.org/podcast/episodes/toby-ord-the-precipice-existential-risk-future-humanity/
+    - title: Giving What We Can
+      url: https://www.givingwhatwecan.org/
+  description: >
+    Toby Ord is a philosopher at Oxford University and author of "The Precipice: Existential Risk and the Future of
+    Humanity" (2020), a comprehensive treatment of existential risks that helped establish AI as a central concern for
+    humanity's long-term future. His work has been influential in shaping how policymakers and researchers think about
+    catastrophic risks.
+
+
+    In "The Precipice," Ord provides quantitative estimates of existential risk from various sources, with AI among the
+    highest. He argues that we are living through a critical period in human history where our technological
+    capabilities have outpaced our wisdom, and that reducing existential risk should be a global priority. His estimates
+    - placing the probability of existential catastrophe this century at about 1 in 6, with AI being a major contributor
+    - are frequently cited in discussions of AI risk.
+
+
+    Ord is also a founding figure in the effective altruism movement. In 2009, he co-founded Giving What We Can, which
+    encourages people to donate significant portions of their income to effective charities. His transition from
+    focusing on global health and development to prioritizing existential risks mirrors a broader shift in the EA
+    movement. Through his writing, teaching, and advisory roles (including advising the UK government on AI), Ord has
+    helped translate abstract concerns about humanity's future into concrete policy discussions.
+  tags:
+    - x-risk
+    - effective-altruism
+    - longtermism
+    - ai-safety
+    - moral-philosophy
+    - risk-assessment
+    - future-generations
+  lastUpdated: 2025-12
+- id: yoshua-bengio
+  type: researcher
+  title: Yoshua Bengio
+  website: https://yoshuabengio.org
+  relatedEntries:
+    - id: geoffrey-hinton
+      type: researcher
+    - id: interpretability
+      type: safety-agenda
+  customFields:
+    - label: Role
+      value: Scientific Director of Mila, Professor
+    - label: Known For
+      value: Deep learning pioneer, now AI safety advocate
+  sources:
+    - title: Yoshua Bengio's Website
+      url: https://yoshuabengio.org
+    - title: Mila Institute
+      url: https://mila.quebec/
+    - title: Statement on AI Risk
+      url: https://www.safe.ai/statement-on-ai-risk
+    - title: Google Scholar Profile
+      url: https://scholar.google.com/citations?user=kukA0LcAAAAJ
+  description: >
+    Yoshua Bengio is a pioneer of deep learning who shared the 2018 Turing Award with Geoffrey Hinton and Yann LeCun for
+    their foundational work on neural networks. As Scientific Director of Mila, the Quebec AI Institute, he leads one of
+    the world's largest academic AI research centers. His technical contributions include fundamental work on neural
+    network optimization, recurrent networks, and attention mechanisms.
+
+
+    In recent years, Bengio has increasingly focused on AI safety and governance. He was an early signatory of the 2023
+    Statement on AI Risk and has become a prominent voice arguing that frontier AI development requires more caution and
+    oversight. His concerns span both near-term harms (misinformation, job displacement) and longer-term risks from
+    systems that might become difficult to control. Unlike some AI researchers who dismiss existential risk concerns,
+    Bengio has engaged seriously with these arguments.
+
+
+    Bengio's research agenda has evolved to include safety-relevant directions like causal representation learning,
+    which could help AI systems develop more robust and generalizable understanding of the world. He has advocated for
+    international governance mechanisms for AI, including proposals for compute governance and safety standards. His
+    position as one of the founding figures of modern AI gives his safety advocacy significant weight with policymakers
+    and the broader research community.
+  tags:
+    - deep-learning
+    - ai-safety
+    - governance
+    - interpretability
+    - causal-representation-learning
+    - regulation
+    - x-risk
+  lastUpdated: 2025-12
+- id: elon-musk
+  type: researcher
+  title: Elon Musk
+  description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
+  status: stub
+  relatedEntries:
+    - id: xai
+      type: lab
+    - id: openai
+      type: lab
+  tags:
+    - entrepreneur
+    - ai-labs
+  lastUpdated: 2025-12
+- id: beth-barnes
+  type: researcher
+  title: Beth Barnes
+  description: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
+  status: stub
+  relatedEntries:
+    - id: metr
+      type: lab-research
+    - id: arc-evals
+      type: organization
+  tags:
+    - evaluations
+    - ai-safety
+  lastUpdated: 2025-12
+# Batch 4 - People Entity Definitions
+# Generated 2026-02-08
+
+- id: david-sacks
+  type: researcher
+  title: David Sacks
+  description: >-
+    South African-American entrepreneur, venture capitalist, and White House AI and
+    Crypto Czar who co-founded Craft Ventures and played key roles at PayPal and
+    Yammer. Appointed by President Trump in December 2024 to shape U.S. AI and
+    cryptocurrency policy.
+  tags:
+    - venture-capital
+    - ai-policy
+    - government-advisor
+    - anti-regulation
+    - paypal-mafia
+  clusters:
+    - governance
+  relatedEntries:
+    - id: elon-musk
+      type: researcher
+    - id: anthropic
+      type: lab
+    - id: dario-amodei
+      type: researcher
+    - id: open-philanthropy
+      type: organization
+    - id: openai
+      type: organization
+  lastUpdated: 2026-02
+
+- id: marc-andreessen
+  type: researcher
+  title: Marc Andreessen
+  description: >-
+    American software engineer, entrepreneur, and venture capitalist who co-created
+    Mosaic, founded Netscape, and co-founded Andreessen Horowitz. Known for
+    techno-optimist views on AI development.
+  tags:
+    - venture-capital
+    - techno-optimism
+    - ai-deregulation
+    - andreessen-horowitz
+    - anti-alignment
+  clusters:
+    - governance
+  relatedEntries:
+    - id: elon-musk
+      type: researcher
+    - id: alignment
+      type: concept
+    - id: bioweapons
+      type: risk
+    - id: deepfakes
+      type: risk
+  lastUpdated: 2026-02
+
+- id: max-tegmark
+  type: researcher
+  title: Max Tegmark
+  description: >-
+    Swedish-American physicist at MIT, co-founder of the Future of Life Institute,
+    and prominent AI safety advocate known for his work on the Mathematical
+    Universe Hypothesis and efforts to promote safe artificial intelligence
+    development.
+  tags:
+    - ai-safety-advocacy
+    - future-of-life-institute
+    - ai-pause
+    - mechanistic-interpretability
+    - physics
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: fli
+      type: organization
+    - id: elon-musk
+      type: researcher
+    - id: yoshua-bengio
+      type: researcher
+    - id: interpretability
+      type: safety-agenda
+    - id: prediction-markets
+      type: concept
+  lastUpdated: 2026-02
+
+- id: philip-tetlock
+  type: researcher
+  title: Philip Tetlock
+  description: >-
+    Psychologist and forecasting researcher who pioneered the science of
+    superforecasting through the Good Judgment Project, demonstrating that
+    systematic forecasting methods can outperform expert predictions and
+    intelligence analysts.
+  tags:
+    - forecasting
+    - superforecasting
+    - prediction-accuracy
+    - decision-making
+    - calibration
+  clusters:
+    - epistemics
+  relatedEntries:
+    - id: good-judgment
+      type: organization
+    - id: fri
+      type: organization
+    - id: metaculus
+      type: organization
+  lastUpdated: 2026-02
+
+- id: eli-lifland
+  type: researcher
+  title: Eli Lifland
+  description: >-
+    AI researcher, forecaster, and entrepreneur specializing in AGI timelines
+    forecasting, scenario planning, and AI governance. Ranks #1 on the RAND
+    Forecasting Initiative all-time leaderboard and co-authored the influential
+    AI 2027 scenario forecast.
+  tags:
+    - forecasting
+    - agi-timelines
+    - scenario-planning
+    - samotsvety
+    - ai-governance
+  clusters:
+    - ai-safety
+    - epistemics
+  relatedEntries:
+    - id: ai-futures-project
+      type: organization
+    - id: samotsvety
+      type: organization
+    - id: metaculus
+      type: organization
+    - id: open-philanthropy
+      type: organization
+    - id: lesswrong
+      type: organization
+  lastUpdated: 2026-02
+
+- id: dustin-moskovitz
+  type: researcher
+  title: Dustin Moskovitz
+  description: >-
+    Facebook co-founder who became the world's youngest self-made billionaire in
+    2011. Together with his wife Cari Tuna, he has given away over $4 billion
+    through Good Ventures and Coefficient Giving, including approximately $336
+    million to AI safety research since 2017, making him the largest individual
+    funder of AI safety.
+  tags:
+    - ai-safety-funding
+    - effective-altruism
+    - philanthropy
+    - facebook
+    - coefficient-giving
+    - giving-pledge
+  clusters:
+    - ai-safety
+    - community
+  relatedEntries:
+    - id: coefficient-giving
+      type: organization
+    - id: open-philanthropy
+      type: organization
+    - id: jaan-tallinn
+      type: researcher
+    - id: sff
+      type: organization
+  lastUpdated: 2026-02
+
+
+# === Auto-generated stubs for pages missing entities ===
+- id: gwern
+  type: researcher
+  title: Gwern Branwen
+  description: >-
+    Comprehensive biographical profile of pseudonymous researcher Gwern Branwen,
+    documenting his early advocacy of AI scaling laws (predicting AGI by 2030),
+    extensive self-experimentation work, and influence within rationalist/EA
+    communities. While well-sourced with 47 citations, the page functions as r
+  clusters:
+    - ai-safety
+    - epistemics
+  lastUpdated: 2026-02
+- id: helen-toner
+  type: researcher
+  title: Helen Toner
+  description: >-
+    Comprehensive biographical profile of Helen Toner documenting her career
+    from EA Melbourne founder to CSET Interim Executive Director, with detailed
+    timeline of the November 2023 OpenAI board crisis where she voted to remove
+    Sam Altman. Compiles public testimony, publications, and media appearances 
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: issa-rice
+  type: researcher
+  title: Issa Rice
+  description: >-
+    Issa Rice is an independent researcher who has created valuable knowledge
+    infrastructure tools like Timelines Wiki and AI Watch for the EA and AI
+    safety communities, though his work focuses on data aggregation rather than
+    original research. His contributions are primarily utilitarian reference
+    mater
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: jaan-tallinn
+  type: researcher
+  title: Jaan Tallinn
+  description: >-
+    Comprehensive profile of Jaan Tallinn documenting $150M+ lifetime AI safety
+    giving (86% of $51M in 2024), primarily through SFF ($34.33M distributed in
+    2025). Net worth likely $3-10B+ (2019 public estimate of $900M-$1B excludes
+    Anthropic stake appreciation to $2-6B+ and crypto gains). Evidence shows
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: leopold-aschenbrenner
+  type: researcher
+  title: Leopold Aschenbrenner
+  description: >-
+    Comprehensive biographical profile of Leopold Aschenbrenner, covering his
+    trajectory from Columbia valedictorian to OpenAI researcher to $1.5B hedge
+    fund founder, with detailed documentation of his controversial "Situational
+    Awareness" essay predicting AGI by 2027, his disputed firing from OpenAI ov
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: nuno-sempere
+  type: researcher
+  title: Nuño Sempere
+  description: >-
+    Nuño Sempere is a Spanish superforecaster who co-founded the highly
+    successful Samotsvety forecasting group and now runs Sentinel for global
+    catastrophe early warning, while being known for skeptical views on high AI
+    existential risk estimates and critical perspectives on EA institutions. The
+    articl
+  clusters:
+    - epistemics
+  lastUpdated: 2026-02
+- id: vidur-kapur
+  type: researcher
+  title: Vidur Kapur
+  description: >-
+    Vidur Kapur is a superforecaster and AI policy researcher involved in
+    multiple forecasting organizations and the Sentinel early warning system,
+    contributing to AI risk assessment and EA Forum discussions. While he
+    appears to be a competent practitioner in forecasting and risk assessment,
+    his individ
+  clusters:
+    - ai-safety
+    - epistemics
+  lastUpdated: 2026-02
+- id: vipul-naik
+  type: researcher
+  title: Vipul Naik
+  description: >-
+    Vipul Naik is a mathematician and EA community member who has funded ~$255K
+    in contract research (primarily to Sebastian Sanchez and Issa Rice) and
+    created the Donations List Website tracking $72.8B in philanthropic
+    donations. His main contribution is transparency infrastructure for EA
+    funding patte
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: yann-lecun
+  type: researcher
+  title: Yann LeCun
+  description: >-
+    Comprehensive biographical profile of Yann LeCun documenting his technical
+    contributions (CNNs, JEPA), his ~0% AI extinction risk estimate, and his
+    opposition to AI safety regulation including SB 1047. Includes detailed
+    'Statements & Track Record' section analyzing his prediction accuracy—noting
+    str
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02

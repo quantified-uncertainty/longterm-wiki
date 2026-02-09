@@ -1,0 +1,137 @@
+---
+title: "Anthropic Pages Refactor Notes"
+description: "Internal notes on potential future refactoring of the Anthropic page cluster"
+pageType: documentation
+lastEdited: "2026-02-04"
+sidebar:
+  order: 90
+---
+
+# Anthropic Pages Refactor Notes
+
+This document captures ideas for future improvements to the Anthropic page cluster.
+
+## Current Structure (as of Feb 2026)
+
+We implemented a **Hub-and-Spoke Model**:
+
+| Page | Role | Canonical For |
+|------|------|---------------|
+| `anthropic.mdx` | **Hub** | Company overview, history, products, safety research |
+| `anthropic-valuation.mdx` | Spoke | All valuation analysis (bull/bear, scenarios, multiples) |
+| `anthropic-ipo.mdx` | Spoke | IPO timeline, preparation, prediction markets |
+| `anthropic-investors.mdx` | Spoke | EA capital (pledges, matching, investor stakes) |
+| `anthropic-impact.mdx` | Spoke | Net safety impact model |
+
+Each spoke has a scope note at the top clarifying its purpose and linking to related pages.
+
+---
+
+## Option B: Data Module (Recommended for Future)
+
+### Problem Solved
+Key facts (revenue, valuation, customer concentration) appear in multiple pages. When data changes, you must update 3-4 places manually. This caused the "3.8x cheaper" error to persist.
+
+### Solution
+Create a YAML data file that pages import:
+
+```yaml
+# src/data/entities/anthropic-facts.yaml
+financials:
+  valuation: "$350B"
+  valuation_date: "January 2026"
+  revenue_arr: "$9B"
+  revenue_date: "end 2025"
+  revenue_2026_guidance: "$20-26B"
+  gross_margin: "40%"
+  breakeven_target: "2028"
+
+competitors:
+  openai_valuation: "$500B"
+  openai_revenue: "$20B"
+  openai_revenue_date: "January 2026"
+
+risks:
+  customer_concentration: "25%"
+  top_customers: ["Cursor", "GitHub Copilot"]
+
+enterprise:
+  retention_rate: "88%"
+  industry_avg_retention: "76%"
+  business_customers: "300,000+"
+
+talent:
+  interpretability_team_size: "40-60"
+  safety_researchers: "200-330"
+  safety_pct_of_technical: "20-30%"
+```
+
+### Implementation
+
+1. Create the YAML file
+2. Create a React component `<AnthropicFact field="valuation" />` that reads from the data
+3. Replace hardcoded figures in MDX with component calls
+4. Add a build step that validates the YAML
+
+### Benefits
+- **Single source of truth**: Update once, propagates everywhere
+- **Auto-staleness detection**: Could flag if `valuation_date` is >3 months old
+- **Structured data**: Could power dashboards, comparisons
+
+### Complexity
+- Requires new component
+- Build step changes
+- Migration effort for existing pages
+
+### Priority
+**Medium-High**. Worth doing when we have time, especially as data changes frequently.
+
+---
+
+## Option C: Merge IPO into Valuation
+
+### Problem Solved
+`anthropic-ipo.mdx` and `anthropic-valuation.mdx` have significant overlap—both discuss financial trajectory, valuation scenarios, and market context.
+
+### Solution
+Merge into a single `anthropic-financial-analysis.mdx` page with sections:
+1. Current Valuation Context
+2. Bull/Bear Cases
+3. IPO Timeline and Preparation
+4. Valuation Scenarios
+5. Implications
+
+### Benefits
+- One fewer page to maintain
+- No redundancy between IPO and valuation content
+- Clearer scope: "everything financial about Anthropic"
+
+### Downsides
+- Longer page (would be ~6000 words)
+- IPO content might become stale faster than valuation content
+- Loses granularity in linking (can't link specifically to "IPO timeline")
+
+### Priority
+**Low**. Current hub-and-spoke model with scope notes is working. Merge only if maintaining two pages becomes burdensome.
+
+---
+
+## Other Ideas for Future
+
+### 1. Timeline Visualization
+Create a visual timeline of Anthropic's funding rounds, valuation progression, and key events. Could use Mermaid or a custom component.
+
+### 2. Comparison Page
+Create `anthropic-vs-openai.mdx` that directly compares the two across dimensions: safety, commercial, talent, governance. Currently this info is scattered.
+
+### 3. Automated Data Freshness
+Add frontmatter field `dataAsOf: "2026-01-15"` and surface warnings when data is >90 days old.
+
+### 4. Cross-Wiki Consistency
+Ensure OpenAI page uses same metrics/timeframes as Anthropic pages for fair comparison.
+
+---
+
+## Changelog
+
+- **2026-02-04**: Implemented hub-and-spoke model, added scope notes to all pages, created this document.

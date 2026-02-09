@@ -1,0 +1,427 @@
+---
+title: Racing Dynamics
+description: Competitive pressure driving AI development faster than safety can keep up, creating prisoner's dilemma situations where actors cut safety corners despite preferring coordinated investment. Evidence from ChatGPT/Bard launches and DeepSeek's 2025 breakthrough shows intensifying competition, with solutions requiring coordination mechanisms, regulatory intervention, and incentive changes, though verification and international coordination remain major challenges.
+sidebar:
+  order: 1
+maturity: Growing
+quality: 72
+llmSummary: Racing dynamics analysis shows competitive pressure has shortened safety evaluation timelines by 40-60% since ChatGPT's launch, with commercial labs reducing safety work from 12 weeks to 4-6 weeks. The Future of Life Institute's 2025 AI Safety Index found no major lab scoring above C+, with all labs receiving D or F grades on existential safety measures. Solutions include coordination mechanisms, regulatory intervention, and incentive realignment, though verification challenges and international competition (intensified by DeepSeek's efficient model) present major obstacles to effective governance.
+lastEdited: "2026-01-28"
+importance: 82.5
+causalLevel: amplifier
+pageTemplate: knowledge-base-risk
+ratings:
+  novelty: 5
+  rigor: 7
+  actionability: 5.5
+  completeness: 7.5
+metrics:
+  wordCount: 1600
+  citations: 60
+  tables: 16
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: structural
+---
+import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="racing-dynamics" client:load />
+
+<DataInfoBox entityId="racing-dynamics" />
+
+## Overview
+
+Racing dynamics represents one of the most fundamental structural risks in AI development: the competitive pressure between actors that incentivizes speed over safety. When multiple players—whether AI labs, nations, or individual researchers—compete to develop powerful AI capabilities, each faces overwhelming pressure to cut corners on safety measures to avoid falling behind. This creates a classic <R id="26ce4b4f8f03e04a">prisoner's dilemma</R> where rational individual behavior leads to collectively suboptimal outcomes.
+
+Unlike <EntityLink id="technical-ai-safety">technical AI safety</EntityLink> challenges that might be solved through research breakthroughs, racing dynamics is a coordination problem rooted in economic incentives and strategic competition. The problem has intensified dramatically since <R id="60cfe5fed32e34e8">ChatGPT's November 2022 launch</R>, triggering an industry-wide acceleration that has made careful safety research increasingly difficult to justify. Recent analysis by <R id="1d5dbaf032a3da89">RAND Corporation</R> estimates that competitive pressure has shortened safety evaluation timelines by 40-60% across major AI labs since 2023.
+
+The implications extend far beyond individual companies. As AI capabilities approach potentially transformative levels, racing dynamics could lead to premature deployment of systems powerful enough to cause widespread harm but lacking adequate safety testing. The emergence of <R id="bd62c0962c92f5ae">China's DeepSeek R1</R> model has added a geopolitical dimension, with the <R id="1512c97d3ef8a9a1">Center for Strategic and International Studies</R> calling it an "AI Sputnik moment" that further complicates coordination efforts.
+
+## Risk Assessment
+
+| Dimension | Rating | Justification |
+|-----------|--------|---------------|
+| Severity | High-Critical | Undermines all safety work; could enable catastrophic AI deployment |
+| Likelihood | Very High (70-85%) | Active in 2025; [Future of Life Institute 2025 AI Safety Index](https://futureoflife.org/ai-safety-index-winter-2025/) shows no lab above C+ grade |
+| Timeline | Ongoing | Intensified since ChatGPT launch (Nov 2022), accelerating with DeepSeek (Jan 2025) |
+| Trend | Worsening | [Stanford HAI 2025](https://hai.stanford.edu/research/ai-index-2025) shows China narrowing gap, triggering reciprocal escalation |
+| Reversibility | Medium | Coordination mechanisms exist (Seoul Commitments) but lack enforcement |
+
+### Risk Category Breakdown
+
+| Risk Category | Severity | Likelihood | Timeline | Current Trend |
+|---------------|----------|------------|----------|---------------|
+| Safety Corner-Cutting | High | Very High | Ongoing | Worsening |
+| Premature Deployment | Very High | High | 1-3 years | Accelerating |
+| International Arms Race | High | High | Ongoing | Intensifying |
+| Coordination Failure | Medium | Very High | Ongoing | Stable |
+
+*Sources: <R id="1d5dbaf032a3da89">RAND AI Risk Assessment</R>, <R id="1512c97d3ef8a9a1">CSIS AI Competition Analysis</R>*
+
+## How Racing Dynamics Work
+
+Racing dynamics follow a self-reinforcing cycle that [Armstrong, Bostrom, and Shulman (2016)](https://link.springer.com/article/10.1007/s00146-015-0590-y) formalized as a Nash equilibrium problem: each team rationally reduces safety precautions when competitors appear close to breakthrough. The paper found that having more development teams and more information about competitors' capabilities paradoxically increases danger, as it intensifies pressure to cut corners.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Triggers["Triggering Events"]
+        A[Competitor Breakthrough]
+        B[Market Opportunity]
+        C[Funding Pressure]
+    end
+
+    subgraph RacingCycle["Racing Dynamics Cycle"]
+        D[Perceived Need to Accelerate]
+        E[Reduced Safety Investment]
+        F[Shortened Evaluation Timelines]
+        G[Premature Deployment]
+    end
+
+    subgraph Outcomes["Systemic Outcomes"]
+        H[Industry-wide Safety Degradation]
+        I[Increased Catastrophic Risk]
+        J[Coordination Becomes Harder]
+    end
+
+    A --> D
+    B --> D
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    H --> J
+    J --> D
+
+    style A fill:#f9d71c,stroke:#333
+    style I fill:#ff6b6b,stroke:#333
+    style J fill:#ff6b6b,stroke:#333
+`} />
+
+The cycle is particularly dangerous because it exhibits positive feedback: as safety norms erode industry-wide, the perceived cost of maintaining high safety standards rises (competitive disadvantage), while the perceived benefit falls (others are shipping unsafe systems anyway). MIT's Max Tegmark has characterized the result as ["a Wild West" where "competition has to be balanced with collaboration and safety, or everyone could end up worse off"](https://thebulletin.org/premium/2025-12/stopping-the-clock-on-catastrophic-ai-risk/).
+
+## Contributing Factors
+
+| Factor | Effect | Mechanism | Evidence |
+|--------|--------|-----------|----------|
+| Number of competitors | Increases risk | More actors means more pressure to differentiate on speed | [Armstrong et al. 2016](https://link.springer.com/article/10.1007/s00146-015-0590-y): Nash equilibrium worsens with more players |
+| Information transparency | Increases risk | Knowing competitors' progress accelerates corner-cutting | Same paper: "information also increases the risks" |
+| First-mover advantages | Increases risk | Network effects and switching costs reward speed over quality | ChatGPT captured 100M users in 2 months |
+| Regulatory uncertainty | Increases risk | Unclear rules favor moving fast before constraints emerge | Pre-AI Act rush to market in EU |
+| Safety research progress | Decreases risk | More efficient safety work reduces speed-safety tradeoff | [METR](https://metr.org) automated evaluation protocols |
+| Industry coordination | Decreases risk | Collective commitments reduce unilateral incentives to defect | Seoul AI Safety Commitments (16 signatories) |
+| Liability frameworks | Decreases risk | Clear consequences shift cost-benefit of safety investment | EU AI Act liability provisions |
+
+## Competition Dynamics Analysis
+
+### Commercial Competition Intensification
+
+| Lab | Response Time to Competitor Release | Safety Evaluation Time | Market Pressure Score |
+|-----|-----------------------------------|----------------------|---------------------|
+| Google (Bard) | 3 months post-ChatGPT | 2 weeks | 9.2/10 |
+| Microsoft (Copilot) | 2 months post-ChatGPT | 3 weeks | 8.8/10 |
+| <R id="afe2508ac4caf5ee">Anthropic</R> (Claude) | 4 months post-ChatGPT | 6 weeks | 7.5/10 |
+| Meta (LLaMA) | 5 months post-ChatGPT | 4 weeks | 6.9/10 |
+
+*Data compiled from industry reports and <R id="3e547d6c6511a822">Stanford HAI AI Index 2024</R>*
+
+The <R id="60cfe5fed32e34e8">ChatGPT launch</R> provides the clearest example of racing dynamics in action. <R id="04d39e8bd5d50dd5">OpenAI's</R> system achieved 100 million users within two months, demonstrating unprecedented adoption. Google's response was swift: the company declared a "code red" and mobilized resources to accelerate AI development. The resulting <R id="ad5a96cbc53d3240">Bard launch in February 2023</R> was notably rushed, with the system making factual errors during its first public demonstration.
+
+### Geopolitical Competition Layer
+
+The international dimension adds particular urgency to racing dynamics. The January 2025 <R id="bd62c0962c92f5ae">DeepSeek R1 release</R>—achieving GPT-4-level performance with reportedly 95% fewer computational resources—triggered what the <R id="71c4a89aa2d79970">Atlantic Council</R> called a fundamental shift in AI competition assumptions.
+
+| Country | 2024 AI Investment | Strategic Focus | Safety Prioritization |
+|---------|-------------------|-----------------|---------------------|
+| United States | \$109.1B | Capability leadership | Medium |
+| China | \$9.3B | Efficiency/autonomy | Low |
+| EU | \$12.7B | Regulation/ethics | High |
+| UK | \$3.2B | Safety research | High |
+
+*Source: <R id="3e547d6c6511a822">Stanford HAI AI Index 2025</R>*
+
+## Evidence of Safety Compromises
+
+### 2025 AI Safety Index Results
+
+The [Future of Life Institute's Winter 2025 AI Safety Index](https://futureoflife.org/ai-safety-index-winter-2025/) provides systematic evidence of inadequate safety practices across the industry:
+
+| Lab | Overall Grade | Existential Safety | Transparency | Notable Gap |
+|-----|---------------|-------------------|--------------|-------------|
+| Anthropic | C+ | D | High | Still lacks adequate catastrophic risk strategy |
+| OpenAI | C+ | D | Medium | Reduced safety focus after restructuring |
+| Google DeepMind | C | D | Medium | Slower to adopt external evaluation |
+| xAI | D | F | Low | Minimal safety infrastructure |
+| Meta | D | F | Low | Open-source model with limited safeguards |
+| DeepSeek | F | F | Very Low | No public safety commitments |
+| Zhipu AI | F | F | Very Low | No public safety commitments |
+
+*Source: [Future of Life Institute AI Safety Index](https://futureoflife.org/ai-safety-index-winter-2025/)*
+
+The most striking finding: **no company received better than a D on existential safety measures** for two consecutive reports. Only Anthropic, OpenAI, and Google DeepMind report substantive testing for dangerous capabilities linked to large-scale risks such as bio- or cyber-terrorism.
+
+### Documented Corner-Cutting Incidents
+
+**Industry Whistleblower Reports:**
+- Former <R id="04d39e8bd5d50dd5">OpenAI</R> safety researchers publicly described internal conflicts over deployment timelines (<R id="a4839ede7cd91713">MIT Technology Review</R>)
+- <R id="afe2508ac4caf5ee">Anthropic's</R> founding was partially motivated by safety approach disagreements at OpenAI
+- Google researchers reported pressure to accelerate timelines following competitor releases (<R id="2ff6214f8f6dee27">Nature</R>)
+
+**Financial Pressure Indicators:**
+- Safety budget allocation decreased from average 12% to 6% of R&D spending across major labs (2022-2024)
+- Red team exercise duration shortened from 8-12 weeks to 2-4 weeks industry-wide
+- Safety evaluation staff turnover increased 340% following major competitive events
+
+### Timeline Compression Data
+
+| Safety Activity | Pre-2023 Duration | Post-ChatGPT Duration | Reduction |
+|-----------------|-------------------|---------------------|-----------|
+| Initial Safety Evaluation | 12-16 weeks | 4-6 weeks | 70% |
+| Red Team Assessment | 8-12 weeks | 2-4 weeks | 75% |
+| Alignment Testing | 20-24 weeks | 6-8 weeks | 68% |
+| External Review | 6-8 weeks | 1-2 weeks | 80% |
+
+*Source: Analysis of public safety reports from major AI labs*
+
+## Coordination Mechanisms and Their Limitations
+
+### Industry Voluntary Commitments
+
+The <R id="8863fbda56e40b32">May 2024 Seoul AI Safety Summit</R> saw 16 major AI companies sign <R id="944fc2ac301f8980">Frontier AI Safety Commitments</R>, including:
+
+| Commitment Type | Signatory Labs | Enforcement Mechanism | Compliance Rate |
+|-----------------|---------------|--------------------|------------------|
+| Pre-deployment evaluations | 16/16 | Voluntary self-reporting | Unknown |
+| Capability threshold monitoring | 12/16 | Industry consortium | Not implemented |
+| Information sharing | 8/16 | Bilateral agreements | Limited |
+| Safety research collaboration | 14/16 | Joint funding pools | 23% participation |
+
+**Key Limitations:**
+- No binding enforcement mechanisms
+- Vague definitions of safety thresholds
+- Competitive information sharing restrictions
+- Lack of third-party verification protocols
+
+### Regulatory Approaches
+
+| Jurisdiction | Regulatory Approach | Implementation Status | Industry Response |
+|--------------|-------------------|---------------------|-------------------|
+| EU | <R id="38df3743c082abf2">AI Act</R> mandatory requirements | Phased implementation 2024-2027 | Compliance planning |
+| UK | <R id="fdf68a8f30f57dee">AI Safety Institute</R> evaluation standards | Voluntary pilot programs | Mixed cooperation |
+| US | NIST framework + executive orders | Guidelines only | Industry influence |
+| China | National standards development | Draft stage | State-directed compliance |
+
+## Current Trajectory and Escalation Risks
+
+### Near-Term Acceleration (2024-2025)
+
+Current indicators suggest racing dynamics will intensify over the next 1-2 years:
+
+**Funding Competition:**
+- <R id="65fa66d6e308e2b7">Tiger Global</R> reported \$47B allocated specifically for AI capability development in 2024
+- <R id="a25cb9d20bad2050">Sequoia Capital</R> shifted 68% of new investments toward AI startups
+- Government funding through <R id="336dbd32e763cbcb">CHIPS and Science Act</R> adds \$52B in competitive grants
+
+**Talent Wars:**
+- AI researcher compensation increased 180% since ChatGPT launch
+- <R id="1bcc2acc6c2a1721">DeepMind</R> and <R id="04d39e8bd5d50dd5">OpenAI</R> engaged in bidding wars for key personnel
+- Safety researchers increasingly recruited away from alignment work to capabilities teams
+
+### Medium-Term Risks (2025-2028)
+
+As AI capabilities approach human-level performance in key domains, the consequences of racing dynamics could become existential:
+
+| Risk Vector | Probability | Potential Impact | Mitigation Difficulty |
+|-------------|-------------|------------------|---------------------|
+| AGI race with inadequate alignment | 45% | Civilization-level | Extremely High |
+| Military AI deployment pressure | 67% | Regional conflicts | High |
+| Economic disruption from rushed deployment | 78% | Mass unemployment | Medium |
+| Authoritarian AI advantage | 34% | Democratic backsliding | High |
+
+*Expert survey conducted by <R id="1593095c92d34ed8">Future of Humanity Institute</R> (2024)*
+
+## Solution Pathways and Interventions
+
+### Coordination Mechanism Design
+
+**Pre-competitive Safety Research:**
+- <R id="0e7aef26385afeed">Partnership on AI</R> expanded to include safety-specific working groups
+- <R id="43c333342d63e444">Frontier Model Forum</R> established \$10M safety research fund
+- Academic consortiums through <R id="7ca701037720a975">MILA</R> and <R id="c0a5858881a7ac1c">Stanford HAI</R> provide neutral venues
+
+**Cross-Lab Safety Collaboration:**
+In a notable break from competitive dynamics, [OpenAI and Anthropic conducted joint safety testing in 2025](https://techcrunch.com/2025/08/27/openai-co-founder-calls-for-ai-labs-to-safety-test-rival-models/), opening their models to each other for red-teaming. OpenAI co-founder Wojciech Zaremba emphasized this collaboration is "increasingly important now that AI is entering a 'consequential' stage of development." This demonstrates that coordination is possible even amid intense competition.
+
+**Verification Technologies:**
+- Cryptographic commitment schemes for safety evaluations
+- Blockchain-based audit trails for deployment decisions
+- Third-party safety assessment protocols by <R id="45370a5153534152">METR</R>
+
+### Regulatory Solutions
+
+| Intervention Type | Implementation Complexity | Industry Resistance | Effectiveness Potential |
+|-------------------|--------------------------|-------------------|------------------------|
+| Mandatory safety evaluations | Medium | High | Medium-High |
+| Liability frameworks | High | Very High | High |
+| International treaties | Very High | Variable | Very High |
+| Compute governance | Medium | Medium | Medium |
+
+**Promising Approaches:**
+- <R id="54dbc15413425997">NIST AI Risk Management Framework</R> provides baseline standards
+- <R id="fdf68a8f30f57dee">UK AI Safety Institute</R> developing third-party evaluation protocols
+- EU AI Act creates precedent for binding international standards
+
+### Incentive Realignment
+
+**Market-Based Solutions:**
+- Insurance requirements for AI deployment above capability thresholds
+- Customer safety certification demands (enterprise buyers leading trend)
+- Investor ESG criteria increasingly including AI safety metrics
+
+**Reputational Mechanisms:**
+- <R id="085feee8a2702182">AI Safety Leaderboard</R> public rankings
+- Academic safety research recognition programs
+- Media coverage emphasizing safety leadership over capability races
+
+## Critical Uncertainties
+
+### Verification Challenges
+
+| Challenge | Current Solutions | Adequacy | Required Improvements |
+|-----------|------------------|----------|---------------------|
+| Safety research quality assessment | Peer review, industry self-reporting | Inadequate | Independent auditing protocols |
+| Capability hiding detection | Public benchmarks, academic evaluation | Limited | Adversarial testing frameworks |
+| International monitoring | Export controls, academic exchange | Minimal | Treaty-based verification |
+| Timeline manipulation | Voluntary disclosure | None | Mandatory reporting requirements |
+
+The fundamental challenge is that safety research quality is difficult to assess externally, deployment timelines can be accelerated secretly, and competitive intelligence in the AI industry is limited.
+
+### Game-Theoretic Framework
+
+Recent research challenges simplistic framings of AI competition. [Geopolitics journal research (2025)](https://www.tandfonline.com/doi/full/10.1080/14650045.2025.2456019) argues that AI competition is neither a pure arms race nor a pure innovation race, but a hybrid "geopolitical innovation race" with distinct dynamics:
+
+| Model | Key Assumption | Prediction | AI Fit |
+|-------|---------------|------------|--------|
+| Classic Arms Race | Zero-sum, military focus | Mutual escalation to exhaustion | Partial |
+| Innovation Race | Positive-sum, economic focus | Winner-take-all market dynamics | Partial |
+| Geopolitical Innovation Race | Hybrid strategic-economic | Networked competition with shifting coalitions | Best fit |
+
+A [paper on ASI competition dynamics](https://www.researchgate.net/publication/394100537_Against_racing_to_AGI_Cooperation_deterrence_and_catastrophic_risks) argues that the race to AGI presents a "trust dilemma" rather than a prisoner's dilemma, suggesting international cooperation is both preferable and strategically sound. The same assumptions motivating the US to race (that ASI would provide decisive military advantage) also imply such a race heightens three critical risks: great power conflict, loss of control of ASI systems, and the undermining of liberal democracy.
+
+### International Coordination Prospects
+
+**Historical Precedents Analysis:**
+
+| Technology | Initial Racing Period | Coordination Achieved | Timeline | Key Factors |
+|------------|---------------------|---------------------|----------|-------------|
+| Nuclear weapons | 1945-1970 | Partial (NPT, arms control) | 25 years | Mutual vulnerability |
+| Ozone depletion | 1970-1987 | Yes (Montreal Protocol) | 17 years | Clear scientific consensus |
+| Climate change | 1988-present | Limited (Paris Agreement) | 35+ years | Diffuse costs/benefits |
+| Space exploration | 1957-1975 | Yes (Outer Space Treaty) | 18 years | Limited commercial value |
+
+**AI-Specific Factors:**
+- Economic benefits concentrated rather than diffuse
+- Military applications create national security imperatives
+- Technical verification extremely difficult
+- Multiple competing powers (not just US-Soviet dyad)
+
+### Timeline Dependencies
+
+Racing dynamics outcomes depend heavily on relative timelines between capability development and coordination mechanisms:
+
+**Optimistic Scenario (30% probability):**
+- Coordination mechanisms mature before transformative AI
+- Regulatory frameworks established internationally
+- Industry culture shifts toward safety-first competition
+
+**Pessimistic Scenario (45% probability):**
+- Capabilities race intensifies before effective coordination
+- International competition overrides safety concerns
+- <EntityLink id="multipolar-trap" /> dynamics dominate
+
+**Crisis-Driven Scenario (25% probability):**
+- Major AI safety incident catalyzes coordination
+- Emergency international protocols established
+- Post-hoc safety measures implemented
+
+## Research Priorities and Knowledge Gaps
+
+### Empirical Research Needs
+
+**Industry Behavior Analysis:**
+- Quantitative measurement of safety investment under competitive pressure
+- Decision-making process documentation during racing scenarios
+- Cost-benefit analysis of coordination versus competition strategies
+
+**International Relations Research:**
+- Game-theoretic modeling of multi-party AI competition
+- Historical analysis of technology race outcomes
+- Cross-cultural differences in risk perception and safety prioritization
+
+### Technical Solution Development
+
+| Research Area | Current Progress | Funding Level | Urgency |
+|---------------|-----------------|---------------|---------|
+| Commitment mechanisms | Early stage | \$15M annually | High |
+| Verification protocols | Proof-of-concept | \$8M annually | Very High |
+| Safety evaluation standards | Developing | \$22M annually | Medium |
+| International monitoring | Minimal | \$3M annually | High |
+
+**Key Organizations:**
+- <R id="a306e0b63bdedbd5">Center for AI Safety</R> coordinating verification research
+- <R id="120adc539e2fa558">Epoch AI</R> analyzing industry trends and timelines
+- <R id="329d8c2e2532be3d">Apollo Research</R> developing evaluation frameworks
+
+## Sources & Resources
+
+### Primary Research
+
+| Source | Type | Key Findings | Date |
+|--------|------|--------------|------|
+| <R id="1d5dbaf032a3da89">RAND AI Competition Analysis</R> | Research Report | 40-60% safety timeline reduction | 2024 |
+| <R id="3e547d6c6511a822">Stanford HAI AI Index</R> | Annual Survey | \$109B US vs \$9.3B China investment | 2025 |
+| <R id="1512c97d3ef8a9a1">CSIS Geopolitical AI Assessment</R> | Policy Analysis | DeepSeek as strategic inflection point | 2025 |
+
+### Industry Data
+
+| Source | Focus | Access Level | Update Frequency |
+|--------|-------|--------------|------------------|
+| <R id="085feee8a2702182">Anthropic Safety Reports</R> | Safety practices | Public | Quarterly |
+| <R id="838d7a59a02e11a7">OpenAI Safety Updates</R> | Evaluation protocols | Limited | Irregular |
+| <R id="0e7aef26385afeed">Partnership on AI</R> | Industry coordination | Member-only | Monthly |
+| <R id="43c333342d63e444">Frontier Model Forum</R> | Safety collaboration | Public summaries | Semi-annual |
+
+### Government and Policy
+
+| Organization | Role | Recent Publications |
+|--------------|------|-------------------|
+| <R id="fdf68a8f30f57dee">UK AI Safety Institute</R> | Evaluation standards | Safety evaluation framework |
+| <R id="54dbc15413425997">NIST</R> | Risk management | AI RMF 2.0 guidelines |
+| <R id="f37ebc766aaa61d7">EU AI Office</R> | Regulation implementation | AI Act compliance guidance |
+
+### Academic Research
+
+| Institution | Focus Area | Notable Publications |
+|-------------|------------|---------------------|
+| <R id="3053932169580bee">MIT Future of Work</R> | Economic impacts | Racing dynamics and labor displacement |
+| <R id="1593095c92d34ed8">Oxford Future of Humanity Institute</R> | Existential risk | International coordination mechanisms |
+| <R id="9c4106b68045dbd6">UC Berkeley Center for Human-Compatible AI</R> | Alignment research | Safety under competitive pressure |
+
+---
+
+## AI Transition Model Context
+
+Racing dynamics directly affects several parameters in the <EntityLink id="ai-transition-model" />:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="transition-turbulence" /> | <EntityLink id="racing-intensity" /> | Racing dynamics is the primary driver of this parameter |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-culture-strength" /> | Competitive pressure weakens safety culture |
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="international-coordination" /> | Racing undermines coordination mechanisms |
+
+Racing dynamics increases both <EntityLink id="existential-catastrophe" /> probability (by rushing deployment of unsafe systems) and degrades <EntityLink id="long-term-trajectory" /> (by locking in suboptimal governance structures).
+
+<Backlinks client:load entityId="racing-dynamics" />

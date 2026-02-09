@@ -1,0 +1,330 @@
+# Safety Research Generalizability Model - Option B (Approach-Centric)
+#
+# Each safety approach is a central node with its specific dependencies
+# and threats flowing into it.
+
+nodes:
+  # === SAFETY APPROACHES (central nodes) ===
+
+  - id: mechanistic-interp
+    label: Mechanistic Interpretability
+    description: >-
+      Circuit-level understanding of model internals. High value if it works,
+      but highly dependent on architecture stability and access.
+    type: effect
+    order: 0
+    subItems:
+      - id: mi-examples
+        label: "Examples: Circuits, probing, activation patching"
+      - id: mi-verdict
+        label: "Generalization: LOW - architecture-specific"
+
+  - id: training-based
+    label: Training-Based Alignment
+    description: >-
+      Shaping model behavior through training signals (RLHF, Constitutional AI,
+      debate). Requires training access but somewhat architecture-agnostic.
+    type: effect
+    order: 1
+    subItems:
+      - id: tb-examples
+        label: "Examples: RLHF, Constitutional AI, debate"
+      - id: tb-verdict
+        label: "Generalization: MEDIUM - needs training access"
+
+  - id: blackbox-evals
+    label: Black-box Evaluations
+    description: >-
+      Behavioral testing, capability evals, red-teaming. Only requires
+      query access, relatively architecture-agnostic.
+    type: effect
+    order: 2
+    subItems:
+      - id: be-examples
+        label: "Examples: Capability evals, red-teaming, benchmarks"
+      - id: be-verdict
+        label: "Generalization: MEDIUM-HIGH - needs query access"
+
+  - id: control-containment
+    label: Control & Containment
+    description: >-
+      Boxing, monitoring, tripwires, capability control. Focuses on constraining
+      systems regardless of their internals.
+    type: effect
+    order: 3
+    subItems:
+      - id: cc-examples
+        label: "Examples: Sandboxing, monitoring, kill switches"
+      - id: cc-verdict
+        label: "Generalization: HIGH - mostly architecture-agnostic"
+
+  - id: theoretical-alignment
+    label: Theoretical Alignment
+    description: >-
+      Mathematical frameworks, optimization theory, agent foundations.
+      Architecture-independent by nature.
+    type: effect
+    order: 4
+    subItems:
+      - id: ta-examples
+        label: "Examples: Agent foundations, decision theory, formal frameworks"
+      - id: ta-verdict
+        label: "Generalization: HIGHEST - architecture-independent"
+
+  # === CRUXES SPECIFIC TO MECHANISTIC INTERP ===
+
+  - id: mi-whitebox
+    label: "White-box access available?"
+    description: >-
+      Can researchers inspect model weights and activations? Regulatory
+      mandates vs. proprietary secrecy.
+    type: cause
+    subgroup: mi-deps
+    order: 0
+
+  - id: mi-repr-converge
+    label: "Representations converge?"
+    description: >-
+      Do similar concepts emerge across different architectures? If yes,
+      interpretability insights might transfer.
+    type: cause
+    subgroup: mi-deps
+    order: 1
+
+  - id: mi-arch-stable
+    label: "Architecture stable enough?"
+    description: >-
+      Will transformers persist long enough for interpretability research
+      to pay off before needing to start over?
+    type: cause
+    subgroup: mi-deps
+    order: 2
+
+  - id: mi-scaffolding-threat
+    label: "Heavy scaffolding?"
+    description: >-
+      Multi-agent systems and heavy tool use make it unclear which
+      component to interpret. Emergent behavior from composition.
+    type: cause
+    subgroup: mi-threats
+    order: 0
+
+  - id: mi-novel-arch-threat
+    label: "Novel architecture emerges?"
+    description: >-
+      If transformers are replaced by something fundamentally different,
+      current circuit-level understanding won't transfer.
+    type: cause
+    subgroup: mi-threats
+    order: 1
+
+  # === CRUXES SPECIFIC TO TRAINING-BASED ===
+
+  - id: tb-training-access
+    label: "Training access available?"
+    description: >-
+      Can alignment researchers influence the training process? Or is
+      training done behind closed doors?
+    type: cause
+    subgroup: tb-deps
+    order: 0
+
+  - id: tb-gradient-based
+    label: "Gradient-based training continues?"
+    description: >-
+      RLHF assumes we can compute gradients. Pure RL, evolutionary, or
+      other methods might not allow fine-grained shaping.
+    type: cause
+    subgroup: tb-deps
+    order: 1
+
+  - id: tb-single-system
+    label: "Single trainable system?"
+    description: >-
+      Training-based methods work best on unified systems. Multi-agent
+      scaffolds complicate who/what to train.
+    type: cause
+    subgroup: tb-deps
+    order: 2
+
+  - id: tb-distillation-threat
+    label: "Long distillation chains?"
+    description: >-
+      If models are products of many distillation steps, the training
+      history becomes opaque and hard to influence.
+    type: cause
+    subgroup: tb-threats
+    order: 0
+
+  # === CRUXES SPECIFIC TO BLACK-BOX EVALS ===
+
+  - id: be-query-access
+    label: "Query access available?"
+    description: >-
+      Can we at least prompt the system and observe outputs? Even
+      black-box evals need this minimum access.
+    type: cause
+    subgroup: be-deps
+    order: 0
+
+  - id: be-behavioral-predict
+    label: "Behavior predictable enough?"
+    description: >-
+      Evals assume similar inputs → similar outputs. Highly stochastic
+      or context-dependent systems are harder to evaluate.
+    type: cause
+    subgroup: be-deps
+    order: 1
+
+  - id: be-emergent-threat
+    label: "Emergent multi-agent behavior?"
+    description: >-
+      Scaffolded systems may exhibit emergent behaviors that don't
+      appear in component-level evaluations.
+    type: cause
+    subgroup: be-threats
+    order: 0
+
+  # === CRUXES SPECIFIC TO CONTROL ===
+
+  - id: cc-sandbox-possible
+    label: "Sandboxing feasible?"
+    description: >-
+      Can we meaningfully constrain the system's access to resources
+      and the outside world?
+    type: cause
+    subgroup: cc-deps
+    order: 0
+
+  - id: cc-monitoring-works
+    label: "Monitoring effective?"
+    description: >-
+      Can we observe system behavior well enough to detect concerning
+      actions before they cause harm?
+    type: cause
+    subgroup: cc-deps
+    order: 1
+
+  - id: cc-capability-boundaries
+    label: "Capability boundaries clear?"
+    description: >-
+      Can we reliably identify and limit dangerous capabilities? Or
+      do capabilities emerge unpredictably?
+    type: cause
+    subgroup: cc-deps
+    order: 2
+
+  # === CRUXES FOR THEORETICAL (few dependencies) ===
+
+  - id: ta-math-applies
+    label: "Math applies to real systems?"
+    description: >-
+      Will theoretical insights about idealized agents translate to
+      messy real-world AI systems?
+    type: cause
+    subgroup: ta-deps
+    order: 0
+
+# === EDGES ===
+
+edges:
+  # Mechanistic Interp dependencies
+  - id: e-mi-1
+    source: mi-whitebox
+    target: mechanistic-interp
+    strength: strong
+    effect: increases
+
+  - id: e-mi-2
+    source: mi-repr-converge
+    target: mechanistic-interp
+    strength: strong
+    effect: increases
+
+  - id: e-mi-3
+    source: mi-arch-stable
+    target: mechanistic-interp
+    strength: strong
+    effect: increases
+
+  - id: e-mi-4
+    source: mi-scaffolding-threat
+    target: mechanistic-interp
+    strength: strong
+    effect: decreases
+
+  - id: e-mi-5
+    source: mi-novel-arch-threat
+    target: mechanistic-interp
+    strength: strong
+    effect: decreases
+
+  # Training-based dependencies
+  - id: e-tb-1
+    source: tb-training-access
+    target: training-based
+    strength: strong
+    effect: increases
+
+  - id: e-tb-2
+    source: tb-gradient-based
+    target: training-based
+    strength: medium
+    effect: increases
+
+  - id: e-tb-3
+    source: tb-single-system
+    target: training-based
+    strength: medium
+    effect: increases
+
+  - id: e-tb-4
+    source: tb-distillation-threat
+    target: training-based
+    strength: medium
+    effect: decreases
+
+  # Black-box evals dependencies
+  - id: e-be-1
+    source: be-query-access
+    target: blackbox-evals
+    strength: strong
+    effect: increases
+
+  - id: e-be-2
+    source: be-behavioral-predict
+    target: blackbox-evals
+    strength: medium
+    effect: increases
+
+  - id: e-be-3
+    source: be-emergent-threat
+    target: blackbox-evals
+    strength: medium
+    effect: decreases
+
+  # Control dependencies
+  - id: e-cc-1
+    source: cc-sandbox-possible
+    target: control-containment
+    strength: strong
+    effect: increases
+
+  - id: e-cc-2
+    source: cc-monitoring-works
+    target: control-containment
+    strength: strong
+    effect: increases
+
+  - id: e-cc-3
+    source: cc-capability-boundaries
+    target: control-containment
+    strength: medium
+    effect: increases
+
+  # Theoretical dependencies
+  - id: e-ta-1
+    source: ta-math-applies
+    target: theoretical-alignment
+    strength: weak
+    effect: increases

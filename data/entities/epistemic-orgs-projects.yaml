@@ -1,0 +1,67 @@
+# Epistemic Organizations and Projects
+# Organizations and projects focused on forecasting and epistemic tools
+
+# Organizations
+- id: quri
+  type: organization
+  title: QURI (Quantified Uncertainty Research Institute)
+  description: Nonprofit research organization developing tools for probabilistic reasoning and forecasting, including Squiggle, Metaforecast, and SquiggleAI.
+  path: /knowledge-base/organizations/quri/
+  lastUpdated: 2026-01
+
+- id: metaculus
+  type: organization
+  title: Metaculus
+  description: Reputation-based prediction aggregation platform that has become the primary source for AI timeline forecasts, with over 1 million predictions across 15,000+ questions.
+  path: /knowledge-base/organizations/metaculus/
+  lastUpdated: 2026-01
+
+- id: fri
+  type: organization
+  title: Forecasting Research Institute (FRI)
+  description: Research institute advancing forecasting methodology through large-scale tournaments and rigorous experiments, led by Philip Tetlock.
+  path: /knowledge-base/organizations/fri/
+  lastUpdated: 2026-01
+
+# Projects
+- id: squiggle
+  type: project
+  title: Squiggle
+  description: Domain-specific programming language for probabilistic estimation with native distribution types and Monte Carlo sampling.
+  path: /knowledge-base/responses/squiggle/
+  lastUpdated: 2026-01
+
+- id: metaforecast
+  type: project
+  title: Metaforecast
+  description: Forecast aggregation platform combining predictions from 10+ sources into a unified search interface.
+  path: /knowledge-base/responses/metaforecast/
+  lastUpdated: 2026-01
+
+- id: squiggleai
+  type: project
+  title: SquiggleAI
+  description: LLM-powered tool for generating probabilistic models in Squiggle from natural language descriptions.
+  path: /knowledge-base/responses/squiggleai/
+  lastUpdated: 2026-01
+
+- id: xpt
+  type: project
+  title: XPT (Existential Risk Persuasion Tournament)
+  description: Four-month structured forecasting tournament bringing together superforecasters and domain experts through adversarial collaboration.
+  path: /knowledge-base/responses/xpt/
+  lastUpdated: 2026-01
+
+- id: forecastbench
+  type: project
+  title: ForecastBench
+  description: Dynamic, contamination-free benchmark for evaluating LLM forecasting capabilities, published at ICLR 2025.
+  path: /knowledge-base/responses/forecastbench/
+  lastUpdated: 2026-01
+
+- id: ai-forecasting-benchmark
+  type: project
+  title: AI Forecasting Benchmark Tournament
+  description: Quarterly competition run by Metaculus comparing human Pro Forecasters against AI forecasting bots.
+  path: /knowledge-base/responses/ai-forecasting-benchmark/
+  lastUpdated: 2026-01

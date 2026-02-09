@@ -1,0 +1,856 @@
+# Deployment / Safety Architectures
+#
+# How AI systems are organized and controlled for safety.
+# Distinct from model architectures (what the AI is made of).
+# These are largely model-agnostic - can be applied to transformers, SSMs, etc.
+
+nodes:
+  # === DEPLOYMENT ARCHITECTURES (central nodes) ===
+
+  - id: monolithic-minimal
+    label: Monolithic / Minimal Scaffolding
+    description: >-
+      Single model with direct API access. No persistent memory, minimal tools.
+      Like ChatGPT web interface or basic Claude usage.
+    type: effect
+    order: 0
+    subItems:
+      - id: mm-likelihood
+        label: "Adoption: DECLINING"
+      - id: mm-timeline
+        label: "Timeline: Now (legacy)"
+
+  - id: light-scaffolding
+    label: Light Scaffolding
+    description: >-
+      Model + basic tool use + simple chains. RAG, function calling,
+      single-agent loops. Like GPT with plugins or Claude with MCP.
+    type: effect
+    order: 1
+    subItems:
+      - id: ls-likelihood
+        label: "Adoption: HIGH (current mainstream)"
+      - id: ls-timeline
+        label: "Timeline: Now - 2027"
+
+  - id: cais-services
+    label: CAIS / Service-Based
+    description: >-
+      Comprehensive AI Services (Drexler 2019). Many task-specific services
+      rather than unified agents. Agency is optional capability, not default.
+      Services with bounded goals coordinated by human oversight.
+    type: effect
+    order: 2
+    subItems:
+      - id: cais-likelihood
+        label: "Adoption: LOW-MEDIUM (15-25%)"
+      - id: cais-timeline
+        label: "Timeline: 2026-2032"
+
+  - id: ai-control-hierarchy
+    label: AI Control / Hierarchical (T/U)
+    description: >-
+      Redwood Research (2024). Trusted model T monitors untrusted model U.
+      T edits/reviews U's outputs. Empirically: 92% safety / 94% usefulness.
+      Key insight: maintain safety even if U is intentionally subverting.
+    type: effect
+    order: 3
+    subItems:
+      - id: aic-likelihood
+        label: "Adoption: MEDIUM (20-35%)"
+      - id: aic-timeline
+        label: "Timeline: 2025-2030"
+
+  - id: factored-cognition
+    label: Factored Cognition
+    description: >-
+      Decompose tasks into isolated child tasks solved independently.
+      Factor(T,U) protocols (2024): 41% to 63% safety improvement.
+      Central thesis: decomposition creates easier tasks, clearer contexts.
+    type: effect
+    order: 4
+    subItems:
+      - id: fc-likelihood
+        label: "Adoption: MEDIUM (15-30%)"
+      - id: fc-timeline
+        label: "Timeline: 2025-2030"
+
+  - id: open-agency-architecture
+    label: Open Agency Architecture
+    description: >-
+      Drexler/davidad. Separate goal-setting, planning, evaluation, execution.
+      Plans externalized and interpretable. Bounded tasks with incremental actions.
+      Foundation for davidad's Provably Safe AI agenda at ARIA.
+    type: effect
+    order: 5
+    subItems:
+      - id: oaa-likelihood
+        label: "Adoption: LOW (5-15%)"
+      - id: oaa-timeline
+        label: "Timeline: 2027-2035"
+
+  - id: tool-oracle-ai
+    label: Tool AI / Oracle
+    description: >-
+      Bostrom's taxonomy. Tool: narrow software-like, no persistent goals.
+      Oracle: question-answering only, constrained outputs. Minimal agency
+      by design. Trade capability for safety via scope restriction.
+    type: effect
+    order: 6
+    subItems:
+      - id: to-likelihood
+        label: "Adoption: MEDIUM (specialized uses)"
+      - id: to-timeline
+        label: "Timeline: Now - ongoing"
+
+  - id: debate-adversarial
+    label: Debate / Adversarial Oversight
+    description: >-
+      Irving et al. (2018). Two AIs argue opposing positions, human judges.
+      Truth should win via adversarial scrutiny. 60-80% accuracy on factual
+      questions, +4% improvement from self-play training.
+    type: effect
+    order: 7
+    subItems:
+      - id: da-likelihood
+        label: "Adoption: LOW-MEDIUM (research stage)"
+      - id: da-timeline
+        label: "Timeline: 2026-2032"
+
+  - id: process-supervision
+    label: Process Supervision Architecture
+    description: >-
+      OpenAI (2023). Reward each reasoning step, not just final outcome.
+      78.2% vs 72.4% on MATH benchmarks. Deployed in o1 models.
+      Detects bad reasoning even with correct answers.
+    type: effect
+    order: 8
+    subItems:
+      - id: ps-likelihood
+        label: "Adoption: HIGH (deployed in production)"
+      - id: ps-timeline
+        label: "Timeline: Now - expanding"
+
+  - id: ida-amplification
+    label: IDA / Iterated Amplification
+    description: >-
+      Christiano (2018). Amplify weak agents via delegation, distill to faster
+      models, iterate. Training methodology with deployment implications.
+      Recursive decomposition pattern. Related to AlphaGoZero.
+    type: effect
+    order: 9
+    subItems:
+      - id: ida-likelihood
+        label: "Adoption: LOW (training methodology)"
+      - id: ida-timeline
+        label: "Timeline: Research stage"
+
+  - id: safety-first-cognitive
+    label: Safety-First Cognitive Architectures
+    description: >-
+      Federated architectures with transparent inter-component communication.
+      Separate planning, execution, memory. LLM agents like AutoGPT as
+      basic examples. Designed for interpretability from the start.
+    type: effect
+    order: 10
+    subItems:
+      - id: sfc-likelihood
+        label: "Adoption: LOW-MEDIUM (emerging)"
+      - id: sfc-timeline
+        label: "Timeline: 2025-2030"
+
+  # === PROPERTIES FOR MONOLITHIC/MINIMAL ===
+
+  - id: mm-agency
+    label: "Agency level: HIGH"
+    description: >-
+      Single model makes all decisions. No structural constraints on goals
+      or planning. Limited only by model training.
+    type: cause
+    subgroup: mm-props
+    order: 0
+
+  - id: mm-decomposition
+    label: "Decomposition: NONE"
+    description: >-
+      No task decomposition. Single forward pass or chain-of-thought
+      within one model context.
+    type: cause
+    subgroup: mm-props
+    order: 1
+
+  - id: mm-oversight
+    label: "Oversight: MINIMAL"
+    description: >-
+      Human sees inputs/outputs only. No intermediate checkpoints.
+      Relies entirely on model training for safety.
+    type: cause
+    subgroup: mm-props
+    order: 2
+
+  - id: mm-whitebox
+    label: "White-box: LOW"
+    description: >-
+      Model internals opaque. Only see inputs and outputs.
+      No scaffold code to inspect.
+    type: cause
+    subgroup: mm-props
+    order: 3
+
+  # === PROPERTIES FOR LIGHT SCAFFOLDING ===
+
+  - id: ls-agency
+    label: "Agency level: MEDIUM-HIGH"
+    description: >-
+      Model retains most decision-making. Tools add capability
+      but don't fundamentally constrain agency.
+    type: cause
+    subgroup: ls-props
+    order: 0
+
+  - id: ls-decomposition
+    label: "Decomposition: BASIC"
+    description: >-
+      Simple tool calls, RAG retrieval. Not deep task decomposition.
+      Scaffold orchestrates but doesn't analyze.
+    type: cause
+    subgroup: ls-props
+    order: 1
+
+  - id: ls-oversight
+    label: "Oversight: HUMAN (limited)"
+    description: >-
+      Tool permissions controllable. Can audit tool calls.
+      Model decisions still opaque.
+    type: cause
+    subgroup: ls-props
+    order: 2
+
+  - id: ls-whitebox
+    label: "White-box: MEDIUM"
+    description: >-
+      Scaffold code readable. Tool calls logged. Model internals
+      still opaque.
+    type: cause
+    subgroup: ls-props
+    order: 3
+
+  # === PROPERTIES FOR CAIS ===
+
+  - id: cais-agency
+    label: "Agency level: LOW"
+    description: >-
+      Services have bounded, task-specific goals. No unified agent
+      pursuing open-ended objectives. Agency is optional, not default.
+    type: cause
+    subgroup: cais-props
+    order: 0
+
+  - id: cais-decomposition
+    label: "Decomposition: SERVICE-LEVEL"
+    description: >-
+      System composed of many specialized services. New tasks handled
+      by creating/composing services, not expanding single agent.
+    type: cause
+    subgroup: cais-props
+    order: 1
+
+  - id: cais-oversight
+    label: "Oversight: HUMAN"
+    description: >-
+      Services informed by models of human approval. Human guidance
+      for recursive service development. Ongoing direction, not one-shot.
+    type: cause
+    subgroup: cais-props
+    order: 2
+
+  - id: cais-whitebox
+    label: "White-box: PARTIAL"
+    description: >-
+      Service boundaries visible. Inter-service communication auditable.
+      Individual service internals may still be opaque.
+    type: cause
+    subgroup: cais-props
+    order: 3
+
+  # === PROPERTIES FOR AI CONTROL ===
+
+  - id: aic-agency
+    label: "Agency level: MEDIUM"
+    description: >-
+      U has capability but T constrains. Designed to work even if
+      U is intentionally trying to subvert safety.
+    type: cause
+    subgroup: aic-props
+    order: 0
+
+  - id: aic-decomposition
+    label: "Decomposition: TRUSTED/UNTRUSTED SPLIT"
+    description: >-
+      Binary decomposition: T monitors U. T edits suspicious outputs.
+      Factor(T,U) adds task decomposition on top.
+    type: cause
+    subgroup: aic-props
+    order: 1
+
+  - id: aic-oversight
+    label: "Oversight: AI MONITORS AI"
+    description: >-
+      Trusted model monitors untrusted. Limited trusted human labor
+      for edge cases. Scalable without linear human effort.
+    type: cause
+    subgroup: aic-props
+    order: 2
+
+  - id: aic-whitebox
+    label: "White-box: PARTIAL"
+    description: >-
+      Protocol logic visible. T's decisions auditable. U's internals
+      still opaque but constrained by T's oversight.
+    type: cause
+    subgroup: aic-props
+    order: 3
+
+  # === PROPERTIES FOR FACTORED COGNITION ===
+
+  - id: fc-agency
+    label: "Agency level: LOW-MEDIUM"
+    description: >-
+      Individual components have limited context. No single component
+      sees full picture. Agency distributed and constrained.
+    type: cause
+    subgroup: fc-props
+    order: 0
+
+  - id: fc-decomposition
+    label: "Decomposition: TASK-LEVEL"
+    description: >-
+      Complex tasks decomposed into isolated child tasks. Children
+      solved independently with limited context. Results reassembled.
+    type: cause
+    subgroup: fc-props
+    order: 1
+
+  - id: fc-oversight
+    label: "Oversight: CONTEXT ISOLATION"
+    description: >-
+      Monitors see simpler contexts. Attacks on child tasks more
+      obvious than on complex originals. 41% to 63% safety boost.
+    type: cause
+    subgroup: fc-props
+    order: 2
+
+  - id: fc-whitebox
+    label: "White-box: PARTIAL-HIGH"
+    description: >-
+      Decomposition structure visible. Child task boundaries clear.
+      Can audit how results are composed.
+    type: cause
+    subgroup: fc-props
+    order: 3
+
+  # === PROPERTIES FOR OPEN AGENCY ARCHITECTURE ===
+
+  - id: oaa-agency
+    label: "Agency level: MEDIUM (bounded)"
+    description: >-
+      Bounded tasks with time and budget constraints. Not open-ended
+      goals. Incremental actions, not single dominant moves.
+    type: cause
+    subgroup: oaa-props
+    order: 0
+
+  - id: oaa-decomposition
+    label: "Decomposition: ROLE SEPARATION"
+    description: >-
+      Separate components for goal-setting, plan generation, plan
+      evaluation, execution. Each role constrained.
+    type: cause
+    subgroup: oaa-props
+    order: 1
+
+  - id: oaa-oversight
+    label: "Oversight: EXTERNALIZED PLANS"
+    description: >-
+      Plans described externally and interpretable. Not internal/opaque.
+      Humans engage in ongoing development and direction.
+    type: cause
+    subgroup: oaa-props
+    order: 2
+
+  - id: oaa-whitebox
+    label: "White-box: HIGH"
+    description: >-
+      Designed for formal analysis. Plans auditable. Role separation
+      enables targeted verification of each component.
+    type: cause
+    subgroup: oaa-props
+    order: 3
+
+  # === PROPERTIES FOR TOOL/ORACLE AI ===
+
+  - id: to-agency
+    label: "Agency level: MINIMAL"
+    description: >-
+      Tool: no persistent goals, narrow scope. Oracle: questions only,
+      no actions. Agency structurally constrained by design.
+    type: cause
+    subgroup: to-props
+    order: 0
+
+  - id: to-decomposition
+    label: "Decomposition: N/A"
+    description: >-
+      Not decomposed - scope-restricted instead. Single-purpose by
+      design. Capability traded for safety.
+    type: cause
+    subgroup: to-props
+    order: 1
+
+  - id: to-oversight
+    label: "Oversight: SCOPE CONSTRAINT"
+    description: >-
+      Safety through limitation. Oracle can only answer, not act.
+      Tool has narrow defined function. Human decides what to do.
+    type: cause
+    subgroup: to-props
+    order: 2
+
+  - id: to-whitebox
+    label: "White-box: LOW-MEDIUM"
+    description: >-
+      Model internals still opaque. But limited scope means less
+      needs inspection. Behavior bounded by constraint.
+    type: cause
+    subgroup: to-props
+    order: 3
+
+  # === PROPERTIES FOR DEBATE ===
+
+  - id: da-agency
+    label: "Agency level: MEDIUM"
+    description: >-
+      Each debater has agency within debate context. Constrained
+      by adversarial dynamics and judge evaluation.
+    type: cause
+    subgroup: da-props
+    order: 0
+
+  - id: da-decomposition
+    label: "Decomposition: ADVERSARIAL SPLIT"
+    description: >-
+      Two agents argue opposing positions. Not task decomposition
+      but perspective decomposition. Forces consideration of counterarguments.
+    type: cause
+    subgroup: da-props
+    order: 1
+
+  - id: da-oversight
+    label: "Oversight: HUMAN JUDGE"
+    description: >-
+      Human judges which argument wins. Truth should have advantage
+      via adversarial scrutiny. 60-80% accuracy on factual questions.
+    type: cause
+    subgroup: da-props
+    order: 2
+
+  - id: da-whitebox
+    label: "White-box: MEDIUM"
+    description: >-
+      Arguments visible and auditable. Reasoning externalized in
+      debate format. Model internals still opaque.
+    type: cause
+    subgroup: da-props
+    order: 3
+
+  # === PROPERTIES FOR PROCESS SUPERVISION ===
+
+  - id: ps-agency
+    label: "Agency level: VARIABLE"
+    description: >-
+      Doesn't constrain agency directly. Instead monitors and rewards
+      each reasoning step. Can apply to any agency level.
+    type: cause
+    subgroup: ps-props
+    order: 0
+
+  - id: ps-decomposition
+    label: "Decomposition: STEP-BY-STEP"
+    description: >-
+      Reasoning decomposed into verifiable steps. Each step evaluated.
+      Not task decomposition but reasoning decomposition.
+    type: cause
+    subgroup: ps-props
+    order: 1
+
+  - id: ps-oversight
+    label: "Oversight: STEP VERIFICATION"
+    description: >-
+      Each reasoning step verified for correctness. Detects bad
+      reasoning even with correct final answer. 78.2% vs 72.4% on MATH.
+    type: cause
+    subgroup: ps-props
+    order: 2
+
+  - id: ps-whitebox
+    label: "White-box: MEDIUM-HIGH"
+    description: >-
+      Reasoning steps visible. Can identify where reasoning goes wrong.
+      Process more interpretable than outcome-only evaluation.
+    type: cause
+    subgroup: ps-props
+    order: 3
+
+  # === PROPERTIES FOR IDA ===
+
+  - id: ida-agency
+    label: "Agency level: LOW (during training)"
+    description: >-
+      Weak agents amplified via delegation. No single agent has
+      high agency. Training methodology shapes final agent.
+    type: cause
+    subgroup: ida-props
+    order: 0
+
+  - id: ida-decomposition
+    label: "Decomposition: RECURSIVE"
+    description: >-
+      Task decomposed into subtasks, solved by copies, integrated.
+      Recursive structure. Factored cognition hypothesis central.
+    type: cause
+    subgroup: ida-props
+    order: 1
+
+  - id: ida-oversight
+    label: "Oversight: AMPLIFIED HUMAN"
+    description: >-
+      Human decisions amplified via AI assistance. Maintains human
+      values through recursive process. Distillation preserves alignment.
+    type: cause
+    subgroup: ida-props
+    order: 2
+
+  - id: ida-whitebox
+    label: "White-box: MEDIUM"
+    description: >-
+      Training process structured. Decomposition visible. Final
+      distilled model still somewhat opaque.
+    type: cause
+    subgroup: ida-props
+    order: 3
+
+  # === PROPERTIES FOR SAFETY-FIRST COGNITIVE ===
+
+  - id: sfc-agency
+    label: "Agency level: MEDIUM (federated)"
+    description: >-
+      Intelligence emerges from separate systems communicating.
+      No single unified agent. Components operate in interpretable ways.
+    type: cause
+    subgroup: sfc-props
+    order: 0
+
+  - id: sfc-decomposition
+    label: "Decomposition: COGNITIVE ROLE SEPARATION"
+    description: >-
+      Separate components for planning, execution, memory. Each
+      component communicates transparently with rate control.
+    type: cause
+    subgroup: sfc-props
+    order: 1
+
+  - id: sfc-oversight
+    label: "Oversight: TRANSPARENT COMMUNICATION"
+    description: >-
+      Inter-component communication human-readable. Rate-controlled.
+      Can monitor information flow between components.
+    type: cause
+    subgroup: sfc-props
+    order: 2
+
+  - id: sfc-whitebox
+    label: "White-box: HIGH"
+    description: >-
+      Designed for interpretability. Communication channels visible.
+      Component boundaries clear. Can audit by design.
+    type: cause
+    subgroup: sfc-props
+    order: 3
+
+# === EDGES ===
+
+edges:
+  # Monolithic properties
+  - id: e-mm-1
+    source: mm-agency
+    target: monolithic-minimal
+    strength: strong
+    effect: increases
+
+  - id: e-mm-2
+    source: mm-decomposition
+    target: monolithic-minimal
+    strength: medium
+    effect: increases
+
+  - id: e-mm-3
+    source: mm-oversight
+    target: monolithic-minimal
+    strength: medium
+    effect: decreases
+
+  - id: e-mm-4
+    source: mm-whitebox
+    target: monolithic-minimal
+    strength: medium
+    effect: decreases
+
+  # Light scaffolding properties
+  - id: e-ls-1
+    source: ls-agency
+    target: light-scaffolding
+    strength: strong
+    effect: increases
+
+  - id: e-ls-2
+    source: ls-decomposition
+    target: light-scaffolding
+    strength: medium
+    effect: increases
+
+  - id: e-ls-3
+    source: ls-oversight
+    target: light-scaffolding
+    strength: medium
+    effect: increases
+
+  - id: e-ls-4
+    source: ls-whitebox
+    target: light-scaffolding
+    strength: medium
+    effect: increases
+
+  # CAIS properties
+  - id: e-cais-1
+    source: cais-agency
+    target: cais-services
+    strength: strong
+    effect: increases
+
+  - id: e-cais-2
+    source: cais-decomposition
+    target: cais-services
+    strength: strong
+    effect: increases
+
+  - id: e-cais-3
+    source: cais-oversight
+    target: cais-services
+    strength: strong
+    effect: increases
+
+  - id: e-cais-4
+    source: cais-whitebox
+    target: cais-services
+    strength: medium
+    effect: increases
+
+  # AI Control properties
+  - id: e-aic-1
+    source: aic-agency
+    target: ai-control-hierarchy
+    strength: strong
+    effect: increases
+
+  - id: e-aic-2
+    source: aic-decomposition
+    target: ai-control-hierarchy
+    strength: strong
+    effect: increases
+
+  - id: e-aic-3
+    source: aic-oversight
+    target: ai-control-hierarchy
+    strength: strong
+    effect: increases
+
+  - id: e-aic-4
+    source: aic-whitebox
+    target: ai-control-hierarchy
+    strength: medium
+    effect: increases
+
+  # Factored cognition properties
+  - id: e-fc-1
+    source: fc-agency
+    target: factored-cognition
+    strength: strong
+    effect: increases
+
+  - id: e-fc-2
+    source: fc-decomposition
+    target: factored-cognition
+    strength: strong
+    effect: increases
+
+  - id: e-fc-3
+    source: fc-oversight
+    target: factored-cognition
+    strength: strong
+    effect: increases
+
+  - id: e-fc-4
+    source: fc-whitebox
+    target: factored-cognition
+    strength: medium
+    effect: increases
+
+  # Open Agency Architecture properties
+  - id: e-oaa-1
+    source: oaa-agency
+    target: open-agency-architecture
+    strength: strong
+    effect: increases
+
+  - id: e-oaa-2
+    source: oaa-decomposition
+    target: open-agency-architecture
+    strength: strong
+    effect: increases
+
+  - id: e-oaa-3
+    source: oaa-oversight
+    target: open-agency-architecture
+    strength: strong
+    effect: increases
+
+  - id: e-oaa-4
+    source: oaa-whitebox
+    target: open-agency-architecture
+    strength: strong
+    effect: increases
+
+  # Tool/Oracle properties
+  - id: e-to-1
+    source: to-agency
+    target: tool-oracle-ai
+    strength: strong
+    effect: increases
+
+  - id: e-to-2
+    source: to-decomposition
+    target: tool-oracle-ai
+    strength: weak
+    effect: increases
+
+  - id: e-to-3
+    source: to-oversight
+    target: tool-oracle-ai
+    strength: strong
+    effect: increases
+
+  - id: e-to-4
+    source: to-whitebox
+    target: tool-oracle-ai
+    strength: medium
+    effect: increases
+
+  # Debate properties
+  - id: e-da-1
+    source: da-agency
+    target: debate-adversarial
+    strength: medium
+    effect: increases
+
+  - id: e-da-2
+    source: da-decomposition
+    target: debate-adversarial
+    strength: strong
+    effect: increases
+
+  - id: e-da-3
+    source: da-oversight
+    target: debate-adversarial
+    strength: strong
+    effect: increases
+
+  - id: e-da-4
+    source: da-whitebox
+    target: debate-adversarial
+    strength: medium
+    effect: increases
+
+  # Process supervision properties
+  - id: e-ps-1
+    source: ps-agency
+    target: process-supervision
+    strength: weak
+    effect: increases
+
+  - id: e-ps-2
+    source: ps-decomposition
+    target: process-supervision
+    strength: strong
+    effect: increases
+
+  - id: e-ps-3
+    source: ps-oversight
+    target: process-supervision
+    strength: strong
+    effect: increases
+
+  - id: e-ps-4
+    source: ps-whitebox
+    target: process-supervision
+    strength: strong
+    effect: increases
+
+  # IDA properties
+  - id: e-ida-1
+    source: ida-agency
+    target: ida-amplification
+    strength: medium
+    effect: increases
+
+  - id: e-ida-2
+    source: ida-decomposition
+    target: ida-amplification
+    strength: strong
+    effect: increases
+
+  - id: e-ida-3
+    source: ida-oversight
+    target: ida-amplification
+    strength: strong
+    effect: increases
+
+  - id: e-ida-4
+    source: ida-whitebox
+    target: ida-amplification
+    strength: medium
+    effect: increases
+
+  # Safety-first cognitive properties
+  - id: e-sfc-1
+    source: sfc-agency
+    target: safety-first-cognitive
+    strength: strong
+    effect: increases
+
+  - id: e-sfc-2
+    source: sfc-decomposition
+    target: safety-first-cognitive
+    strength: strong
+    effect: increases
+
+  - id: e-sfc-3
+    source: sfc-oversight
+    target: safety-first-cognitive
+    strength: strong
+    effect: increases
+
+  - id: e-sfc-4
+    source: sfc-whitebox
+    target: safety-first-cognitive
+    strength: strong
+    effect: increases

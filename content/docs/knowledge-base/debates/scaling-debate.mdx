@@ -1,0 +1,393 @@
+---
+title: "Is Scaling All You Need?"
+description: "The scaling debate examines whether current AI approaches will reach AGI through more compute and data, or require new paradigms. By 2025, evidence is mixed: o3 achieved 87.5% on ARC-AGI-1, but GPT-5 took 2 years longer than expected and ARC-AGI-2 remains unsolved by all models. The emerging consensus favors 'scaling-plus'—combining pretraining with reasoning via test-time compute."
+sidebar:
+  order: 2
+importance: 42
+quality: 42
+lastEdited: "2026-01-29"
+llmSummary: "Comprehensive survey of the 2024-2025 scaling debate, documenting the shift from pure pretraining to 'scaling-plus' approaches after o3 achieved 87.5% on ARC-AGI-1 but GPT-5 faced 2-year delays. Expert consensus has moved to ~45% favoring hybrid approaches, with data wall projected 2026-2030 and AGI timelines spanning 5-30+ years depending on paradigm."
+ratings:
+  novelty: 2.5
+  rigor: 4
+  actionability: 3
+  completeness: 5.5
+metrics:
+  wordCount: 946
+  citations: 35
+  tables: 12
+  diagrams: 1
+clusters: ["ai-safety"]
+---
+import {DisagreementMap, InfoBox, KeyQuestions, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
+
+<DataExternalLinks pageId="scaling-debate" client:load />
+
+<InfoBox
+  type="crux"
+  title="The Scaling Debate"
+  customFields={[
+    { label: "Question", value: "Can we reach AGI through scaling alone, or do we need new paradigms?" },
+    { label: "Stakes", value: "Determines AI timeline predictions and research priorities" },
+    { label: "Expert Consensus", value: "Strong disagreement between scaling optimists and skeptics" },
+  ]}
+/>
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Resolution Status** | Partially resolved toward scaling-plus | Reasoning models (o1, o3) demonstrate new scaling regimes; pure pretraining scaling stalling |
+| **Expert Consensus** | ~25% favor pure scaling, ~30% favor new paradigms, ≈45% favor hybrid | [Stanford AI Index 2025](https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance) surveys; lab behavior |
+| **Key Milestone (Pro-Scaling)** | o3 achieves 87.5% on ARC-AGI-1 | [ARC Prize Technical Report](https://arcprize.org/blog/oai-o3-pub-breakthrough): \$3,460/task at maximum compute |
+| **Key Milestone (Anti-Scaling)** | GPT-5 delayed 2 years; pure pretraining hits ceiling | [Fortune (Feb 2025)](https://fortune.com/2025/02/25/what-happened-gpt-5-openai-orion-pivot-scaling-pre-training-llm-agi-reasoning/): Industry pivots to reasoning |
+| **Data Wall Timeline** | 2026-2030 for human-generated text | [Epoch AI (2022)](https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data): Stock exhausted depending on overtraining |
+| **Investment Level** | \$500B+ committed through 2029 | [Stargate Project](https://openai.com/index/announcing-the-stargate-project/): <EntityLink id="openai">OpenAI</EntityLink>, SoftBank, Oracle joint venture |
+| **Stakes** | Determines timeline predictions (5-15 vs 15-30+ years to AGI) | Affects safety research priorities, resource allocation, policy |
+
+One of the most consequential debates in AI: Can we achieve AGI simply by making current approaches (transformers, neural networks) bigger, or do we need fundamental breakthroughs in architecture and methodology?
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [debutinfotech.com](https://www.debutinfotech.com/blog/unseen-data-harvesting-by-tech-giants-for-ai-development) |
+
+
+## The Question
+
+The debate centers on whether the remarkable progress of AI from 2019-2024 will continue along the same trajectory, or whether we're approaching fundamental limits that require new approaches.
+
+<Mermaid client:load chart={`
+flowchart TD
+    PROGRESS[AI Progress 2019-2024] --> QUESTION{Will Scaling<br/>Continue Working?}
+
+    QUESTION -->|"Yes"| SCALING[Scaling Optimists]
+    QUESTION -->|"Partially"| HYBRID[Hybrid View]
+    QUESTION -->|"No"| SKEPTICS[New Paradigm Needed]
+
+    SCALING --> S1[More compute]
+    SCALING --> S2[More data]
+    SCALING --> S3[Better engineering]
+    S1 --> AGI_SOON[AGI 5-15 years]
+    S2 --> AGI_SOON
+    S3 --> AGI_SOON
+
+    HYBRID --> H1[Scaling + Reasoning]
+    HYBRID --> H2[Test-time compute]
+    HYBRID --> H3[New training methods]
+    H1 --> AGI_MED[AGI 10-20 years]
+    H2 --> AGI_MED
+    H3 --> AGI_MED
+
+    SKEPTICS --> N1[World models needed]
+    SKEPTICS --> N2[Symbolic reasoning]
+    SKEPTICS --> N3[New architectures]
+    N1 --> AGI_FAR[AGI 20-40+ years]
+    N2 --> AGI_FAR
+    N3 --> AGI_FAR
+
+    style PROGRESS fill:#e6f3ff
+    style AGI_SOON fill:#ccffcc
+    style AGI_MED fill:#ffffcc
+    style AGI_FAR fill:#ffcccc
+`} />
+
+**Scaling hypothesis**: Current deep learning approaches will reach human-level and superhuman intelligence through:
+- More compute (bigger models, longer training)
+- More data (larger, higher-quality datasets)
+- Better engineering (efficiency improvements)
+
+**New paradigms hypothesis**: We need fundamentally different approaches because current methods hit fundamental limits.
+
+### The Evidence Landscape
+
+| Evidence Type | Favors Scaling | Favors New Paradigms | Interpretation |
+|---------------|----------------|---------------------|----------------|
+| GPT-3 → GPT-4 gains | Strong: Major capability jumps | — | Pretraining scaling worked through 2023 |
+| GPT-4 → GPT-5 delays | — | Strong: 2-year development time | [Fortune](https://fortune.com/2025/02/25/what-happened-gpt-5-openai-orion-pivot-scaling-pre-training-llm-agi-reasoning/): Pure pretraining ceiling hit |
+| o1/o3 reasoning models | Strong: New scaling regime found | Moderate: Required paradigm shift | Reinforcement learning unlocked gains |
+| ARC-AGI-1 scores | Strong: o3 achieves 87.5% | Moderate: \$3,460/task cost | Brute force, not generalization |
+| ARC-AGI-2 benchmark | — | Strong: Under 5% for all models | Humans still solve 100% |
+| Model convergence | — | Moderate: Top-10 Elo gap shrunk 11.9% → 5.4% | [Stanford AI Index](https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance): Diminishing differentiation |
+| Parameter efficiency | Strong: 142x reduction for MMLU 60% | — | 540B (2022) → 3.8B (2024) |
+
+## Key Positions
+
+<DisagreementMap
+  client:load
+  title="Positions on Scaling"
+  description="Where different researchers and organizations stand"
+  positions={[
+    {
+      name: "Ilya Sutskever (OpenAI)",
+      stance: "strong-scaling",
+      confidence: "high",
+      reasoning: "Has consistently predicted that scaling will be sufficient. OpenAI's strategy is built on this.",
+      evidence: ["GPT-2/3/4 trajectory", "Scaling law predictions"],
+      quote: "Unsupervised learning + scaling is all you need"
+    },
+    {
+      name: "Dario Amodei (Anthropic)",
+      stance: "scaling-plus",
+      confidence: "high",
+      reasoning: "Believes scaling is primary driver but with important safety additions (Constitutional AI, etc.)",
+      evidence: ["Anthropic's research strategy"],
+      quote: "Scaling works, but we need to scale safely"
+    },
+    {
+      name: "Yann LeCun (Meta)",
+      stance: "new-paradigm",
+      confidence: "high",
+      reasoning: "Argues LLMs are missing crucial components like world models and planning.",
+      evidence: ["JEPA proposal", "Critique of autoregressive models"],
+      quote: "Auto-regressive LLMs are a dead end for AGI"
+    },
+    {
+      name: "Gary Marcus",
+      stance: "strong-skeptic",
+      confidence: "high",
+      reasoning: "Argues deep learning is fundamentally limited, scaling just makes bigger versions of the same limitations.",
+      evidence: ["Persistent reasoning failures", "Lack of compositionality"],
+      quote: "Scaling just gives you more of the same mistakes"
+    },
+    {
+      name: "DeepMind",
+      stance: "scaling-plus",
+      confidence: "medium",
+      reasoning: "Combines scaling with algorithmic innovations (AlphaGo, AlphaFold, Gemini)",
+      evidence: ["Hybrid approaches"],
+      quote: "Scale and innovation together"
+    },
+    {
+      name: "François Chollet",
+      stance: "new-paradigm",
+      confidence: "high",
+      reasoning: "Created ARC benchmark to show LLMs can't generalize. Argues we need fundamentally different approaches.",
+      evidence: ["ARC benchmark results", "On the Measure of Intelligence"],
+      quote: "LLMs memorize, they don't generalize"
+    }
+  ]}
+/>
+
+## Key Cruxes
+
+<KeyQuestions
+  client:load
+  questions={[
+    {
+      question: "Will scaling unlock planning and reasoning?",
+      positions: [
+        {
+          position: "Yes - these are emergent capabilities",
+          confidence: "medium",
+          reasoning: "Many capabilities emerged unpredictably. Planning/reasoning may too at sufficient scale.",
+          implications: "Continue scaling, AGI within years"
+        },
+        {
+          position: "No - these require architectural changes",
+          confidence: "medium",
+          reasoning: "These capabilities require different computational structures than next-token prediction.",
+          implications: "Need new paradigms, AGI more distant"
+        }
+      ]
+    },
+    {
+      question: "Is the data wall real?",
+      positions: [
+        {
+          position: "Yes - we'll run out of quality data soon",
+          confidence: "medium",
+          reasoning: "Finite internet, synthetic data degrades. Fundamental limit on scaling.",
+          implications: "Scaling hits wall by ~2026"
+        },
+        {
+          position: "No - many ways around it",
+          confidence: "medium",
+          reasoning: "Synthetic data, multimodal, data efficiency, curriculum learning all help.",
+          implications: "Scaling can continue for decade+"
+        }
+      ]
+    },
+    {
+      question: "Do reasoning failures indicate fundamental limits?",
+      positions: [
+        {
+          position: "Yes - architectural gap",
+          confidence: "high",
+          reasoning: "Same types of failures persist across scales. Not improving on these dimensions.",
+          implications: "Scaling insufficient"
+        },
+        {
+          position: "No - just need more scale",
+          confidence: "low",
+          reasoning: "Performance is improving. May cross threshold with more scale.",
+          implications: "Keep scaling"
+        }
+      ]
+    },
+    {
+      question: "What would disprove the scaling hypothesis?",
+      positions: [
+        {
+          position: "Scaling 100x with no qualitative improvement",
+          confidence: "medium",
+          reasoning: "If we scale 100x from GPT-4 and see only incremental gains, suggests limits.",
+          implications: "Would validate skeptics"
+        },
+        {
+          position: "Running out of data/compute",
+          confidence: "medium",
+          reasoning: "If practical limits prevent further scaling, question becomes moot.",
+          implications: "Would require new approaches by necessity"
+        }
+      ]
+    }
+  ]}
+/>
+
+## What Would Change Minds?
+
+**For scaling optimists to update toward skepticism:**
+- Scaling 100x with only marginal capability improvements
+- Hitting hard data or compute walls
+- Proof that key capabilities (planning, causality) can't emerge from current architectures
+- Persistent failures on simple reasoning despite increasing scale
+
+**For skeptics to update toward scaling:**
+- GPT-5/6 showing qualitatively new reasoning capabilities
+- Solving ARC or other generalization benchmarks via pure scaling
+- Continued emergent abilities at each scale-up
+- Clear path around data limitations
+
+## The Data Wall
+
+A critical constraint on scaling is the availability of training data. [Epoch AI research](https://epoch.ai/blog/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data) projects that high-quality human-generated text will be exhausted between 2026-2030, depending on training efficiency.
+
+### Data Availability Projections
+
+| Data Source | Current Usage | Exhaustion Timeline | Mitigation |
+|-------------|---------------|---------------------|------------|
+| High-quality web text | ≈300B tokens/year | 2026-2028 | Quality filtering, multimodal |
+| Books and academic papers | ≈10% utilized | 2028-2030 | OCR improvements, licensing |
+| Code repositories | ≈50B tokens/year | 2027-2029 | Synthetic generation |
+| Multimodal (video, audio) | Under 5% utilized | 2030+ | [Epoch AI](https://epoch.ai/blog/can-ai-scaling-continue-through-2030): Could 3x available data |
+| Synthetic data | Nascent | Unlimited potential | [Microsoft SynthLLM](https://www.microsoft.com/en-us/research/articles/synthllm-breaking-the-ai-data-wall-with-scalable-synthetic-data/): Performance plateaus at 300B tokens |
+
+[Elon Musk stated in 2024](https://ncfacanada.org/musk-says-human-data-for-ai-training-is-depleted/) that AI has "already exhausted all human-generated publicly available data." However, Anthropic's position is that "data quality and quantity challenges are a solvable problem rather than a fundamental limitation," with synthetic data remaining "highly promising."
+
+### The Synthetic Data Question
+
+A key uncertainty is whether synthetic data can substitute for human-generated data. Research shows mixed results:
+
+- **Positive**: [Microsoft's SynthLLM](https://www.microsoft.com/en-us/research/articles/synthllm-breaking-the-ai-data-wall-with-scalable-synthetic-data/) demonstrates scaling laws hold for synthetic data
+- **Negative**: A [Nature study](https://www.weforum.org/stories/2025/12/data-ai-training-synthetic/) found that "abusing" synthetic data leads to "irreversible defects" and "model collapse" after a few generations
+- **Nuanced**: Performance improvements plateau at approximately 300B synthetic tokens
+
+## Implications for AI Safety
+
+This debate has major implications for AI safety strategy, resource allocation, and policy priorities.
+
+### Timeline and Strategy Implications
+
+| Scenario | AGI Timeline | Safety Research Priority | Policy Urgency |
+|----------|--------------|-------------------------|----------------|
+| **Scaling works** | 5-10 years | LLM alignment, RLHF improvements | Critical: Must act now |
+| **Scaling-plus** | 8-15 years | Reasoning model safety, scalable oversight | High: 5-10 year window |
+| **New paradigms** | 15-30+ years | Broader alignment theory, unknown architectures | Moderate: Time to prepare |
+| **Hybrid** | 10-20 years | Both LLM and novel approaches | High: Uncertainty requires robustness |
+
+**If scaling works:**
+- Short timelines (AGI within 5-10 years)
+- Predictable capability trajectory
+- Safety research can focus on aligning scaled-up LLMs
+- Winner-take-all dynamics (whoever scales most wins)
+
+**If new paradigms needed:**
+- Longer timelines (10-30+ years)
+- More uncertainty about capability trajectory
+- Safety research needs to consider unknown architectures
+- More opportunity for safety-by-default designs
+
+**Hybrid scenario (emerging consensus):**
+- Medium timelines (5-15 years)
+- Some predictability, some surprises
+- Safety research should cover both scaled LLMs and new architectures
+- The [o1/o3 reasoning paradigm](https://openai.com/index/introducing-o3-and-o4-mini/) suggests this is the most likely path
+
+### Resource Allocation Implications
+
+The debate affects billions of dollars in investment decisions:
+
+- **Stargate Project**: [\$500B committed through 2029](https://openai.com/index/announcing-the-stargate-project/) by OpenAI, SoftBank, Oracle—implicitly betting on scaling
+- **Meta's LLM focus**: [Yann LeCun's November 2025 departure](https://fortune.com/2026/01/23/deepmind-demis-hassabis-anthropic-dario-amodei-yann-lecun-ai-davos/) to found Advanced Machine Intelligence Labs signals internal disagreement
+- **DeepMind's approach**: Combines scaling with algorithmic innovation (AlphaFold, Gemini)—hedging both sides
+
+## Historical Parallels
+
+**Cases where scaling worked:**
+- ImageNet → Deep learning revolution (2012)
+- GPT-2 → GPT-3 → GPT-4 trajectory
+- AlphaGo scaling to AlphaZero
+- Transformer scaling unlocking new capabilities
+
+**Cases where new paradigms were needed:**
+- Perceptrons → Neural networks (needed backprop + hidden layers)
+- RNNs → Transformers (needed attention mechanism)
+- Expert systems → Statistical learning (needed paradigm shift)
+
+The question: Which pattern are we in now?
+
+## 2024-2025: The Scaling Debate Intensifies
+
+The past two years have provided significant new evidence, though interpretation remains contested.
+
+### Key Developments
+
+| Date | Event | Implications |
+|------|-------|--------------|
+| Sep 2024 | OpenAI releases o1 reasoning model | New scaling paradigm: test-time compute |
+| Dec 2024 | o3 achieves 87.5% on ARC-AGI-1 | [ARC Prize](https://arcprize.org/blog/oai-o3-pub-breakthrough): "Surprising step-function increase" |
+| Dec 2024 | [Ilya Sutskever NeurIPS speech](https://fortune.com/2025/02/19/generative-ai-scaling-agi-deep-learning/) | "Pretraining as we know it will end" |
+| Feb 2025 | [GPT-5 pivot revealed](https://fortune.com/2025/02/25/what-happened-gpt-5-openai-orion-pivot-scaling-pre-training-llm-agi-reasoning/) | 2-year delay; pure pretraining ceiling hit |
+| May 2025 | [ARC-AGI-2 benchmark launched](https://arcprize.org/arc-agi) | All frontier models score under 5%; humans 100% |
+| Aug 2025 | GPT-5 released | [Performance gains](https://aicommission.org/2025/08/gpt-5-is-finally-here-can-it-put-openai-back-on-top/) mainly from inference-time reasoning |
+| Nov 2025 | [Yann LeCun leaves Meta](https://www.pymnts.com/artificial-intelligence-2/2025/meta-large-language-models-will-not-get-to-human-level-intelligence/) | Founds AMI Labs to pursue world models |
+| Jan 2026 | [Davos AI debates](https://fortune.com/2026/01/23/deepmind-demis-hassabis-anthropic-dario-amodei-yann-lecun-ai-davos/) | Hassabis vs LeCun on AGI timelines |
+
+### The Reasoning Revolution
+
+The emergence of "reasoning models" in 2024-2025 partially resolved the debate by introducing a new scaling paradigm:
+
+- **Test-time compute scaling**: [OpenAI observed](https://www.interconnects.ai/p/openais-o3-the-2024-finale-of-ai) that reinforcement learning exhibits "more compute = better performance" trends similar to pretraining
+- **o3 benchmark results**: 96.7% on AIME 2024, 87.7% on GPQA Diamond, 71.7% on SWE-bench Verified (vs o1's 48.9%)
+- **Key insight**: Rather than scaling model parameters, scale inference-time reasoning through reinforcement learning
+
+This suggests a "scaling-plus" resolution: pure pretraining scaling has diminishing returns, but new scaling regimes (reasoning, test-time compute) can unlock continued progress.
+
+### Expert Positions Have Shifted
+
+[Around 75% of AI experts](https://www.metaintro.com/blog/ai-scaling-debate) don't believe scaling LLMs alone will lead to AGI—but many now believe scaling *reasoning* could work:
+
+| Expert | 2023 Position | 2025 Position | Key Quote |
+|--------|---------------|---------------|-----------|
+| Sam Altman | Pure scaling works | Scaling + reasoning | "There is no wall" (disputed) |
+| Dario Amodei | Scaling is primary | Scaling "probably will continue" | Synthetic data "highly promising" |
+| Yann LeCun | Skeptic | Strong skeptic | "LLMs are a dead end for AGI" |
+| Ilya Sutskever | Strong scaling optimist | Nuanced | "Pretraining as we know it will end" |
+| François Chollet | Skeptic | Skeptic validated | [Predicts human-level AI 2038-2048](https://www.freethink.com/robots-ai/arc-prize-agi) |
+| Demis Hassabis | Hybrid approach | AGI by 2030 possible | Scaling + algorithmic innovation |
+
+## Sources and Further Reading
+
+- **OpenAI**: [Introducing o3 and o4-mini](https://openai.com/index/introducing-o3-and-o4-mini/) - Reasoning model capabilities
+- **ARC Prize**: [Technical Report 2024](https://arcprize.org/blog/arc-prize-2024-results-analysis) - Benchmark analysis
+- **Fortune**: [The \$19.6 billion pivot](https://fortune.com/2025/02/25/what-happened-gpt-5-openai-orion-pivot-scaling-pre-training-llm-agi-reasoning/) - GPT-5 development challenges
+- **Fortune**: [Pure scaling has failed](https://fortune.com/2025/02/19/generative-ai-scaling-agi-deep-learning/) - Industry analysis
+- **Epoch AI**: [Can AI scaling continue through 2030?](https://epoch.ai/blog/can-ai-scaling-continue-through-2030) - Quantitative projections
+- **Stanford HAI**: [AI Index 2025](https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance) - Technical performance trends
+- **Nathan Lambert**: [o3: The grand finale of AI in 2024](https://www.interconnects.ai/p/openais-o3-the-2024-finale-of-ai) - Technical analysis
+- **Cameron Wolfe**: [Scaling Laws for LLMs](https://cameronrwolfe.substack.com/p/llm-scaling-laws) - Historical overview
+- **HEC Paris**: [AI Beyond the Scaling Laws](https://www.hec.edu/en/dare/tech-ai/ai-beyond-scaling-laws) - Academic perspective
+

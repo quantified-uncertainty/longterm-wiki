@@ -1,0 +1,277 @@
+---
+title: Parameter Interaction Network
+description: This model maps causal relationships between 22 key AI safety parameters. It identifies 7 feedback loops and 4 critical dependency clusters, showing that epistemic-health and institutional-quality are highest-leverage intervention points.
+sidebar:
+  order: 35
+quality: 51
+lastEdited: "2025-12-29"
+ratings:
+  focus: 8.5
+  novelty: 5
+  rigor: 4
+  completeness: 7
+  concreteness: 6.5
+  actionability: 6
+importance: 72.5
+llmSummary: Maps causal relationships between 22 AI safety parameters, identifying 7 feedback loops and 4 clusters. Finds epistemic-health and institutional-quality as highest-leverage intervention points with net influence scores of +5 and +3 respectively.
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+  - Complete 'Strategic Importance' section
+metrics:
+  wordCount: 543
+  citations: 0
+  tables: 20
+  diagrams: 2
+clusters:
+  - ai-safety
+  - governance
+subcategory: dynamics-models
+---
+import { Aside } from '@astrojs/starlight/components';
+import { DataInfoBox, Backlinks, Mermaid , EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="parameter-interaction-network" ratings={frontmatter.ratings} />
+
+## Overview
+
+AI safety parameters don't exist in isolation—they form a complex web of causal relationships where changes to one parameter ripple through the system. This model maps these interactions to identify leverage points, feedback loops, and critical dependencies.
+
+**Core insight:** The parameter space clusters into four interconnected groups: (1) epistemic/trust parameters, (2) governance/coordination parameters, (3) technical safety parameters, and (4) exposure/threat parameters. Interventions on "hub" parameters like epistemic-health and institutional-quality propagate effects across multiple clusters.
+
+Understanding these interactions matters for intervention design. Targeting isolated parameters yields limited returns; targeting hub parameters or breaking negative feedback loops offers higher leverage.
+
+## Conceptual Framework
+
+### Network Structure
+
+The 22 parameters form a directed graph where edges represent causal influence. We distinguish three types of relationships:
+
+| Relationship Type | Definition | Example |
+|-------------------|-----------|---------|
+| **Reinforcing** (+) | Increase in A → Increase in B | Higher racing-intensity → Lower safety-culture-strength |
+| **Dampening** (-) | Increase in A → Decrease in B | Higher regulatory-capacity → Lower racing-intensity |
+| **Conditional** (?) | Effect depends on context | Information-authenticity's effect on societal-trust depends on baseline trust |
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Epistemic["Epistemic Cluster"]
+        EH[Epistemic Health]
+        IA[Information Authenticity]
+        ST[Societal Trust]
+        RC[Reality Coherence]
+        PA[Preference Authenticity]
+    end
+
+    subgraph Governance["Governance Cluster"]
+        IQ[Institutional Quality]
+        RCap[Regulatory Capacity]
+        IC[International Coordination]
+        CC[Coordination Capacity]
+        SCStr[Safety Culture Strength]
+    end
+
+    subgraph Technical["Technical Safety Cluster"]
+        AR[Alignment Robustness]
+        SCG[Safety-Capability Gap]
+        RI[Racing Intensity]
+        HO[Human Oversight Quality]
+        IntC[Interpretability Coverage]
+    end
+
+    subgraph Exposure["Threat Exposure Cluster"]
+        BTE[Biological Threat Exposure]
+        CTE[Cyber Threat Exposure]
+        ACC[AI Control Concentration]
+        ES[Economic Stability]
+        HA[Human Agency]
+        SR[Societal Resilience]
+        HE[Human Expertise]
+    end
+
+    EH --> ST
+    IA --> EH
+    ST --> IQ
+    IQ --> RCap
+    RI --> SCStr
+    SCStr --> AR
+    AR --> SCG
+    HO --> AR
+    ACC --> HA
+    ES --> SR
+    HE --> HO
+`} />
+
+## Parameter Dependency Matrix
+
+### Core Causal Relationships
+
+| Source Parameter | Target Parameter | Effect | Strength | Lag |
+|-----------------|------------------|--------|----------|-----|
+| racing-intensity | safety-culture-strength | Negative | Strong | Months |
+| racing-intensity | safety-capability-gap | Negative | Strong | Years |
+| institutional-quality | regulatory-capacity | Positive | Strong | Years |
+| regulatory-capacity | racing-intensity | Negative | Medium | Months |
+| epistemic-health | societal-trust | Positive | Strong | Years |
+| societal-trust | institutional-quality | Positive | Medium | Years |
+| information-authenticity | epistemic-health | Positive | Strong | Months |
+| human-expertise | human-oversight-quality | Positive | Strong | Years |
+| human-oversight-quality | alignment-robustness | Positive | Medium | Immediate |
+| alignment-robustness | safety-capability-gap | Positive | Strong | Immediate |
+| ai-control-concentration | human-agency | Negative | Strong | Years |
+| economic-stability | societal-resilience | Positive | Medium | Years |
+| international-coordination | coordination-capacity | Positive | Strong | Months |
+| coordination-capacity | racing-intensity | Negative | Medium | Months |
+
+### Influence Scores
+
+Counting direct outgoing edges weighted by strength:
+
+| Parameter | Outgoing Influence | Incoming Influence | Net Influence |
+|-----------|-------------------|-------------------|---------------|
+| epistemic-health | 8 | 3 | +5 |
+| institutional-quality | 7 | 4 | +3 |
+| racing-intensity | 6 | 5 | +1 |
+| societal-trust | 5 | 4 | +1 |
+| regulatory-capacity | 5 | 3 | +2 |
+| human-expertise | 4 | 2 | +2 |
+| alignment-robustness | 3 | 5 | -2 |
+| human-agency | 2 | 6 | -4 |
+| safety-capability-gap | 1 | 5 | -4 |
+
+<Aside type="tip" title="Bottom Line">
+**Epistemic-health and institutional-quality are the highest-leverage parameters.** They have the most downstream effects and fewer dependencies, making them upstream intervention points.
+</Aside>
+
+## Feedback Loops
+
+### Identified Loops
+
+The network contains 7 major feedback loops:
+
+| Loop | Type | Parameters Involved | Timescale |
+|------|------|---------------------|-----------|
+| Racing-Safety Spiral | Reinforcing (vicious) | racing-intensity ↔ safety-culture-strength | Months |
+| Trust-Institution Cycle | Reinforcing (virtuous) | societal-trust → institutional-quality → epistemic-health → societal-trust | Years |
+| Expertise Erosion Loop | Reinforcing (vicious) | human-expertise → human-oversight-quality → alignment-robustness → accidents → human-expertise | Years-Decades |
+| Coordination Trap | Reinforcing (vicious) | international-coordination → coordination-capacity → racing-intensity → international-coordination | Years |
+| Regulatory Response Cycle | Dampening | racing-intensity → accidents → regulatory-capacity → racing-intensity | Years |
+| Concentration-Agency Spiral | Reinforcing (vicious) | ai-control-concentration → human-agency → institutional-quality → regulatory-capacity → ai-control-concentration | Decades |
+| Authenticity Cascade | Reinforcing (vicious) | information-authenticity → epistemic-health → preference-authenticity → reality-coherence → information-authenticity | Months-Years |
+
+### Loop Dynamics
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph ViciousLoop["Racing-Safety Spiral"]
+        RI2[Racing Intensity ↑] --> |reduces| SCS[Safety Culture ↓]
+        SCS --> |enables| RI2
+    end
+
+    subgraph VirtuousLoop["Trust-Institution Cycle"]
+        ST2[Societal Trust ↑] --> |improves| IQ2[Institutional Quality ↑]
+        IQ2 --> |enables| EH2[Epistemic Health ↑]
+        EH2 --> |builds| ST2
+    end
+
+    subgraph DampeningLoop["Regulatory Response"]
+        RI3[Racing Intensity ↑] --> |causes| ACC2[Accidents]
+        ACC2 --> |triggers| RC2[Regulatory Capacity ↑]
+        RC2 --> |reduces| RI3
+    end
+`} />
+
+**Racing-Safety Spiral:** As racing intensifies, labs cut safety investments to maintain competitive position. Lower safety culture further normalizes speed-first decisions, intensifying the race. This loop operates on monthly timescales and is currently active in frontier AI development.
+
+**Trust-Institution Cycle:** When societal trust is high, institutions attract talent and funding, improving their quality. Better institutions produce more reliable information, improving epistemic health, which feeds back to trust. This virtuous cycle takes years to establish but is self-reinforcing once started.
+
+**Expertise Erosion Loop:** The most dangerous long-term loop. As humans defer to AI systems, expertise atrophies. Lower expertise reduces oversight quality, which eventually leads to alignment failures. Each failure damages the human knowledge base further. This loop operates over decades and may be effectively irreversible.
+
+## Cluster Analysis
+
+### Parameter Clusters
+
+| Cluster | Parameters | Internal Cohesion | External Dependencies |
+|---------|------------|-------------------|----------------------|
+| **Epistemic** | epistemic-health, information-authenticity, societal-trust, reality-coherence, preference-authenticity | Very High | Feeds into Governance |
+| **Governance** | institutional-quality, regulatory-capacity, international-coordination, coordination-capacity, safety-culture-strength | High | Receives from Epistemic, affects Technical |
+| **Technical Safety** | alignment-robustness, safety-capability-gap, racing-intensity, human-oversight-quality, interpretability-coverage | Medium | Affected by Governance, affects Exposure |
+| **Threat Exposure** | biological-threat-exposure, cyber-threat-exposure, ai-control-concentration, economic-stability, human-agency, societal-resilience, human-expertise | Low | Receives from all clusters |
+
+### Cross-Cluster Dependencies
+
+The clusters form a rough hierarchy:
+
+$$
+\text{Epistemic} \rightarrow \text{Governance} \rightarrow \text{Technical} \rightarrow \text{Exposure}
+$$
+
+This hierarchy suggests interventions should prioritize upstream clusters. Improving epistemic-health propagates through governance improvements to technical safety to reduced threat exposure. However, the time lags mean upstream interventions require patience—direct technical interventions may be necessary for near-term risk reduction.
+
+## Scenario Analysis
+
+### Cluster Degradation Scenarios
+
+| Scenario | Trigger | Cascade Path | Time to Major Impact | Recovery Difficulty |
+|----------|---------|--------------|---------------------|-------------------|
+| Epistemic Collapse | Major deepfake incident | information-authenticity → epistemic-health → societal-trust → institutional-quality | 6-18 months | Very Hard |
+| Governance Failure | Regulatory capture | regulatory-capacity → racing-intensity → safety-culture-strength → alignment-robustness | 1-3 years | Hard |
+| Technical Breakdown | Alignment failure | alignment-robustness → accidents → human-expertise → human-oversight-quality | Immediate | Medium |
+| Exposure Spike | Economic disruption | economic-stability → societal-resilience → human-agency → institutional-quality | 6-12 months | Medium |
+
+### Positive Intervention Scenarios
+
+| Intervention | Primary Target | Secondary Effects | Cascade Timeline |
+|--------------|---------------|-------------------|-----------------|
+| Content authentication infrastructure | information-authenticity | epistemic-health (+), societal-trust (+) | 2-5 years |
+| International AI treaty | international-coordination | coordination-capacity (+), racing-intensity (-) | 3-10 years |
+| Interpretability breakthrough | interpretability-coverage | alignment-robustness (+), safety-capability-gap (+) | 1-3 years |
+| Economic safety nets | economic-stability | societal-resilience (+), human-agency (+) | 5-15 years |
+
+## Strategic Implications
+
+### High-Leverage Intervention Points
+
+Based on network centrality and feedback loop positions:
+
+| Rank | Parameter | Leverage Type | Key Intervention |
+|------|-----------|--------------|------------------|
+| 1 | epistemic-health | Hub (many outputs) | Information verification systems |
+| 2 | institutional-quality | Hub + loop anchor | Regulatory capacity building |
+| 3 | racing-intensity | Loop anchor | Coordination mechanisms, compute governance |
+| 4 | safety-culture-strength | Loop anchor | Whistleblower protections, third-party audits |
+| 5 | human-expertise | Irreversibility prevention | Training/education investment |
+
+### Intervention Timing
+
+Different parameters have different optimal intervention windows:
+
+| Parameter Type | Window Characteristics | Examples |
+|----------------|----------------------|----------|
+| **Epistemic** | Prevent degradation; hard to rebuild | information-authenticity, societal-trust |
+| **Governance** | Build capacity early; slow to establish | institutional-quality, regulatory-capacity |
+| **Technical** | Continuous investment; fast iteration possible | alignment-robustness, interpretability-coverage |
+| **Exposure** | Defensive; react to threats as they emerge | biological-threat-exposure, cyber-threat-exposure |
+
+## Limitations
+
+1. **Causal uncertainty:** Many relationships are theorized rather than empirically confirmed. The strength estimates are order-of-magnitude guesses.
+
+2. **Missing parameters:** The 22 parameters don't capture everything relevant. Military dynamics, public opinion volatility, and AI capability trajectories are underrepresented.
+
+3. **Static structure:** The network structure itself may change as AI capabilities advance. New feedback loops may emerge.
+
+4. **Aggregate treatment:** Each parameter aggregates many underlying variables. "Institutional quality" obscures differences between regulatory agencies, courts, and legislatures.
+
+5. **Linear approximation:** Relationships may be non-linear with threshold effects not captured by simple positive/negative coding.
+
+## Related Models
+
+- <EntityLink id="risk-interaction-network" label="Risk Interaction Network" /> - Similar network approach for risks
+- <EntityLink id="risk-cascade-pathways" label="Risk Cascade Pathways" /> - How risks propagate
+- <EntityLink id="epistemic-collapse-threshold" label="Epistemic Collapse Threshold" /> - Deep dive on epistemic parameters
+- <EntityLink id="trust-cascade-model" label="Trust Cascade Model" /> - Trust dynamics in detail
+
+## Related Pages
+
+<Backlinks client:load entityId="parameter-interaction-network" />

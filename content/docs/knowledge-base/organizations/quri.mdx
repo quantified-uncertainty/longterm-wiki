@@ -1,0 +1,683 @@
+---
+title: QURI (Quantified Uncertainty Research Institute)
+description: QURI develops epistemic tools for probabilistic reasoning and forecasting, with Squiggle as their flagship project—a domain-specific programming language enabling complex uncertainty modeling through native distribution types, Monte Carlo sampling, and algebraic operations on distributions. QURI also maintains Squiggle Hub (collaborative platform hosting models with 17,000+ from Guesstimate), Metaforecast (aggregating 2,100+ forecasts from 10+ platforms including Metaculus, Polymarket, and Good Judgment Open), SquiggleAI (Claude Sonnet 4.5-powered model generation producing 100-500 line models), and RoastMyPost (LLM-based blog evaluation). Founded in 2019 by Ozzie Gooen (former FHI Research Scholar, Guesstimate creator), QURI has received \$850K+ in funding from SFF (\$650K), Future Fund (\$200K), and LTFF. Squiggle 0.10.0 released January 2025 with multi-model projects, Web Worker support, and compile-time type inference.
+sidebar:
+  order: 4
+quality: 48
+llmSummary: QURI develops Squiggle (probabilistic programming language with native distribution types), SquiggleAI (Claude-powered model generation producing 100-500 line models), Metaforecast (aggregating 2,100+ forecasts from 10+ platforms), and related epistemic tools. Founded 2019 by Ozzie Gooen with \$850K+ funding (SFF \$650K, Future Fund \$200K), primarily serving EA/rationalist community for cost-effectiveness analysis and Fermi estimation.
+lastEdited: "2026-01-29"
+importance: 28.5
+ratings:
+  novelty: 3.2
+  rigor: 4.8
+  actionability: 2.1
+  completeness: 6.4
+metrics:
+  wordCount: 2527
+  citations: 70
+  tables: 42
+  diagrams: 1
+clusters:
+  - epistemics
+  - community
+subcategory: epistemic-orgs
+---
+import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Innovation** | High | Squiggle is unique probabilistic language with native distribution algebra; <EntityLink id="squiggleai">SquiggleAI</EntityLink> generates 100-500 line models |
+| **Practical Impact** | Growing | GiveWell CEA quantification projects (≈300 hours of work), AI timeline models, EA cause prioritization |
+| **Open Source** | Fully | All projects MIT licensed on [GitHub](https://github.com/quantified-uncertainty); monorepo includes <EntityLink id="squiggle">Squiggle</EntityLink>, Hub, and <EntityLink id="metaforecast">Metaforecast</EntityLink> |
+| **Funding** | Stable | \$850K+ total: SFF (\$650K through 2022), Future Fund (\$200K, 2022), <EntityLink id="ltff">LTFF</EntityLink> (ongoing) |
+| **Team Size** | Small | ≈3-5 core contributors including Ozzie Gooen (founder), with fiscal sponsorship from <EntityLink id="rethink-priorities">Rethink Priorities</EntityLink> |
+| **AI Integration** | Active | SquiggleAI uses Claude Sonnet 4.5 (20K token context cached); <EntityLink id="roastmypost">RoastMyPost</EntityLink> uses Claude + Perplexity |
+| **Community** | Niche but Engaged | EA Forum presence, Forecasting & Epistemics Slack (#squiggle-dev), \$300 Fermi competitions |
+| **Data Scale** | Significant | Metaforecast indexes 2,100+ forecasts; Guesstimate models: 17,000+ public |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [nobelprize.org](https://www.nobelprize.org/prizes/physics/1903/marie-curie/biographical/) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Quri_(Lima-Jun%C3%ADn)) |
+| GitHub | [github.com](https://github.com/fukamachi/quri) |
+
+
+## Organization Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Full Name** | Quantified Uncertainty Research Institute |
+| **Founded** | 2019 (evolved from Guesstimate, founded 2016) |
+| **Founder & Executive Director** | [Ozzie Gooen](https://forum.effectivealtruism.org/users/oagr) |
+| **Location** | Berkeley, California (primarily remote) |
+| **Status** | 501(c)(3) nonprofit; fiscally sponsored by [Rethink Priorities](https://rethinkpriorities.org/) |
+| **EIN** | 84-3847921 |
+| **Website** | [quantifieduncertainty.org](https://quantifieduncertainty.org/) |
+| **GitHub** | [github.com/quantified-uncertainty](https://github.com/quantified-uncertainty) (monorepo structure) |
+| **Substack** | [quri.substack.com](https://quri.substack.com/) |
+| **Primary Funders** | <EntityLink id="sff">Survival and Flourishing Fund</EntityLink> (SFF), Long-Term Future Fund (LTFF), Future Fund (pre-FTX) |
+| **Total Funding** | \$850,000+ through 2022 |
+
+## Overview
+
+The [Quantified Uncertainty Research Institute](https://quantifieduncertainty.org/) (QURI) is a nonprofit research organization focused on developing tools and methodologies for probabilistic reasoning and forecasting. Founded in 2019 by Ozzie Gooen, QURI aims to make uncertainty quantification more accessible and rigorous, particularly for decisions affecting the long-term future of humanity. The organization evolved from Gooen's earlier work on [Guesstimate](https://www.getguesstimate.com/), a spreadsheet tool for Monte Carlo simulations that demonstrated strong demand for accessible uncertainty tools in the effective altruism community.
+
+QURI's flagship project is Squiggle, a domain-specific programming language designed specifically for probabilistic estimation. Unlike general-purpose languages, Squiggle provides first-class support for probability distributions, enabling analysts to express complex uncertainties naturally. The language powers Fermi estimates, cost-effectiveness analyses, and forecasting models used throughout the effective altruism and rationalist communities. QURI's experience building tools like Squiggle and Guesstimate has revealed a significant challenge: even highly skilled domain experts frequently struggle with basic programming requirements and often make errors in their probabilistic models.
+
+The organization has expanded beyond Squiggle to encompass a suite of epistemic tools: Squiggle Hub for collaborative model sharing (hosting 17,000+ Guesstimate models), Metaforecast for aggregating predictions across 10+ platforms, SquiggleAI for LLM-assisted model generation, and <EntityLink id="roastmypost">RoastMyPost</EntityLink> for AI-powered blog post evaluation. Together, these tools form an ecosystem aimed at improving quantitative reasoning in high-stakes domains.
+
+Organizations in the effective altruism and rationalist communities regularly rely on cost-effectiveness analyses and Fermi estimates to guide their decisions. QURI's mission is to make these probabilistic tools more accessible and reliable for altruistic causes, bridging the gap between sophisticated quantitative methods and practical decision-making.
+
+## Founder: Ozzie Gooen
+
+Ozzie Gooen is the founder and Executive Director of QURI, with a background spanning engineering, effective altruism, and forecasting research.
+
+### Background and Career
+
+| Period | Role | Focus |
+|--------|------|-------|
+| 2008-2012 | Harvey Mudd College | B.S. General Engineering (Economics concentration) |
+| ≈2014 | Founding Engineer, ZenTrust | Estate planning web service |
+| 2015-2016 | .impact co-founder | EA community building infrastructure |
+| 2016 | [Guesstimate](https://www.getguesstimate.com/) founder | Monte Carlo spreadsheet tool |
+| 2017-2019 | Research Scholar, [Future of Humanity Institute](https://www.fhi.ox.ac.uk/) | Forecasting infrastructure research |
+| 2019-present | Executive Director, QURI | Epistemic tools development |
+
+Gooen discovered effective altruism in college after learning he "sounded like a utilitarian." His path from engineering to forecasting research reflects a consistent interest in applying quantitative methods to important decisions. At FHI, he focused on forecasting infrastructure research, exploring how <EntityLink id="prediction-markets">prediction markets</EntityLink> and aggregation methods could improve institutional decision-making.
+
+Beyond QURI, Gooen serves on the boards of [Rethink Charity](https://www.rethinkcharity.org/) and Rethink Priorities. He has contributed to discussions on <EntityLink id="ai-governance">AI governance</EntityLink>, forecasting methodology, and quantitative cause prioritization through extensive writing on the [EA Forum](https://forum.effectivealtruism.org/users/oagr) and [LessWrong](https://www.lesswrong.com/users/ozziegooen).
+
+### Notable Contributions
+
+- **Guesstimate**: Created the first widely-used Monte Carlo spreadsheet, which runs 5,000 simulations per model and has accumulated 17,000+ public models
+- **Forecasting Research**: Developed proposals for prediction market improvements and forecast aggregation methods
+- **QURI Tools Ecosystem**: Oversaw development of Squiggle, Metaforecast, SquiggleAI, and <EntityLink id="roastmypost">RoastMyPost</EntityLink>
+- **EA Community**: Helped build early EA infrastructure through .impact and ongoing community engagement
+
+## Core Projects
+
+<Mermaid client:load chart={`
+flowchart TD
+    QURI[QURI] --> SQUIGGLE[Squiggle Language]
+    QURI --> HUB[Squiggle Hub]
+    QURI --> META[Metaforecast]
+    QURI --> TOOLS[Additional Tools]
+
+    SQUIGGLE --> LANG[Language Core<br/>Probabilistic primitives]
+    SQUIGGLE --> AI[SquiggleAI<br/>LLM integration]
+    SQUIGGLE --> PLAY[Playground<br/>Browser IDE]
+
+    HUB --> SHARE[Model Sharing]
+    HUB --> COLLAB[Collaboration]
+    HUB --> VERSIONING[Version Control]
+
+    META --> AGG[Forecast Aggregation]
+    META --> PLATFORMS[Platform Integration]
+
+    TOOLS --> ROAST[<EntityLink id="roastmypost">RoastMyPost</EntityLink><br/>Blog evaluation]
+    TOOLS --> FERMI[Fermi Competition]
+
+    style QURI fill:#e6f3ff
+    style SQUIGGLE fill:#ccffcc
+    style HUB fill:#ccffcc
+    style META fill:#ffffcc
+`} />
+
+## Squiggle Language
+
+[Squiggle](https://www.squiggle-language.com/) is QURI's primary project—a domain-specific programming language for probabilistic estimation that runs in the browser via JavaScript. It can be useful to think of Squiggle as similar to SQL, Excel, or probabilistic programming languages like WebPPL: there are simple ways to declare variables and write functions, but don't expect classes, inheritance, or monads.
+
+### Design Philosophy
+
+Squiggle is meant for intuitively-driven quantitative estimation rather than data analysis or data-driven statistical techniques. It's designed for situations where there is very little data available, and most variables will be intuitively estimated by domain experts. The syntax is forked from Guesstimate and Foretold, optimized for readable probabilistic expressions.
+
+### Core Features
+
+| Feature | Description | Example |
+|---------|-------------|---------|
+| **Distribution Types** | Native support for normal, lognormal, uniform, beta, cauchy, gamma, logistic, exponential, bernoulli, triangular | `normal(10, 2)`, `beta(2, 8)` |
+| **The "to" Syntax** | Intuitive lognormal creation using 5th/95th percentiles | `1 to 10` equals `lognormal({p5: 1, p95: 10})` |
+| **Distribution Algebra** | Mathematical operations propagate through distributions | `normal(10, 2) * uniform(0.8, 1.2)` |
+| **Multiple Parameterizations** | Same distribution, different inputs | `normal({p5: 5, p95: 15})`, `normal({mean: 10, stdev: 3})` |
+| **Functions with Domains** | Type-checked parameter ranges | `f(x: [1,10]) = x * 2` fails if called with `f(15)` |
+| **Three Representations** | Sample Set (default, supports correlations), Point Set, Symbolic | `Sym.normal(10, 2)` for symbolic |
+| **Monte Carlo Sampling** | Automatic sampling and propagation | Built into runtime |
+| **Visualization** | Native plotting of distributions | Integrated in playground |
+
+### Distribution Creation Syntax
+
+Squiggle offers flexible distribution creation with multiple parameterization options:
+
+```ts
+// Normal distribution - multiple ways to specify
+normal(10, 2)                    // mean, standard deviation
+normal({mean: 10, stdev: 2})     // explicit parameters
+normal({p5: 5, p95: 15})         // percentile-based
+normal({p10: 6, p90: 14})        // different percentiles
+normal({p25: 8, p75: 12})        // quartile-based
+
+// Lognormal distribution - the workhorse for positive quantities
+lognormal(2, 0.5)                // mu, sigma (log-scale parameters)
+lognormal({mean: 10, stdev: 5})  // arithmetic mean/stdev
+5 to 50                          // shorthand for lognormal({p5: 5, p95: 50})
+
+// Beta distribution - for probabilities between 0 and 1
+beta(2, 8)                       // alpha, beta parameters (~20% mean)
+beta({mean: 0.3, stdev: 0.1})    // mean/stdev parameterization
+
+// Other distributions
+uniform(5, 15)                   // uniform between bounds
+triangular(5, 10, 15)            // min, mode, max
+exponential(0.1)                 // rate parameter
+```
+
+### Squiggle Code Examples
+
+**Basic Cost-Effectiveness Model**:
+```ts
+// Cost-effectiveness model for AI safety intervention
+interventionCost = lognormal(1e6, 1.5) // \$1M median, high uncertainty
+probabilityOfSuccess = beta(2, 8) // ~20% base rate
+valueIfSuccessful = lognormal(1e12, 2) // High but uncertain value
+
+expectedValue = probabilityOfSuccess * valueIfSuccessful
+costEffectiveness = expectedValue / interventionCost
+```
+
+**Function with Domain Constraints**:
+```ts
+// Calculate expected value with bounded probability
+calculateEV(probability: [0, 1], value) = {
+  adjustedProb = probability * normal(1, 0.1) // Add estimation uncertainty
+  truncate(adjustedProb, 0, 1) * value
+}
+
+// Use the function
+projectValue = calculateEV(0.3, lognormal(1e9, 2))
+```
+
+**Multi-Variable Fermi Estimate**:
+```ts
+// Estimate: Number of piano tuners in Chicago
+chicagoPopulation = 2.7M to 2.9M
+householdsPerPerson = 0.35 to 0.45
+pianoOwnershipRate = 0.02 to 0.05
+tuningsPerYear = 0.5 to 2
+hoursPerTuning = 1.5 to 2.5
+workingHoursPerYear = 1800 to 2200
+
+totalTunings = chicagoPopulation * householdsPerPerson *
+               pianoOwnershipRate * tuningsPerYear
+tunerCapacity = workingHoursPerYear / hoursPerTuning
+numberOfTuners = totalTunings / tunerCapacity
+```
+
+### Version History
+
+| Version | Date | Key Changes |
+|---------|------|-------------|
+| **0.10.0** | January 2025 | SqProject rewrite, Web Workers by default, compile-time type inference, unit type annotations, UI overhaul |
+| **0.9.4-0.9.5** | 2024 | Experimental Web Worker runner, version selection in playground |
+| **0.8.6** | 2024 | Import/export support, multi-model projects |
+| **0.8.x** | 2023 | Performance improvements, Squiggle Hub integration |
+| **0.7.0** | 2023 | SquiggleAI integration foundations |
+| **Early Access** | 2020 | [Initial public release](https://forum.effectivealtruism.org/posts/TfPdb2aMKzgWXFvc3/announcing-squiggle-early-access) |
+
+### Squiggle 0.10.0 Deep Dive
+
+The January 2025 release of [Squiggle 0.10.0](https://quantifieduncertainty.org/posts/squiggle-0-10-0/) represented six months of development with significant architectural changes:
+
+**Web Workers**: All Squiggle code now runs in a separate Web Worker thread by default, with results marshaled back asynchronously. This prevents UI freezes during complex calculations.
+
+**Type System**: New compile-time type inference transforms AST to typed AST, enabling earlier error detection. The pipeline now includes semantic analysis for type checks.
+
+**Unit Type Annotations** (experimental, contributed by Michael Dickens): Variables can be annotated with physical units like kilograms, dollars, or compound units like m/s^2.
+
+**UI Changes**: The output viewer now defaults to collapsed variables. Use the `@startOpen` decorator to expand variables by default.
+
+### Strengths and Limitations
+
+**Strengths**:
+- Simple, readable syntax optimized for probabilistic math
+- Fast for small-to-medium models
+- Strong for rapid prototyping
+- Optimized for numeric and symbolic approaches, not just Monte Carlo
+- Embeddable in JavaScript applications
+- Free and open-source (MIT license)
+
+**Limitations**:
+- Does not support Bayesian inference (cannot do backwards inference from data)
+- Much slower than languages like Stan or PyMC on large models
+- Limited scientific computing ecosystem
+- Beta distributions display poorly when alpha or beta are below 1.0
+
+## SquiggleAI
+
+[SquiggleAI](https://www.squiggle-language.com/docs/Ecosystem/SquiggleAI) integrates large language models to assist with probabilistic model creation, addressing a key challenge QURI identified: even highly skilled domain experts frequently struggle with basic programming requirements for probabilistic modeling.
+
+### How It Works
+
+SquiggleAI uses prompt caching to cache approximately 20,000 tokens of information about the Squiggle language, ensuring the LLM has deep knowledge of syntax, distributions, and best practices. Most workflows complete within 20 seconds to 3 minutes, producing models typically 100-500 lines long depending on the model used.
+
+### Model Support
+
+| Model | Status | Output Size | Speed | Best For |
+|-------|--------|-------------|-------|----------|
+| **Claude Sonnet 4.5** | Primary | ≈500 lines | Medium | Complex multi-variable models |
+| **Claude Haiku 4.5** | Available | ≈150 lines | Fast | Quick prototypes |
+| **Grok Code Fast 1** | Available | ≈200 lines | Fast | Alternative provider |
+| **Claude Sonnet 3.5** | Legacy | ≈200 lines | Medium | Stable fallback |
+
+### Capabilities
+
+| Capability | Description | Example Use Case |
+|------------|-------------|------------------|
+| **Model Generation** | Describe a problem in natural language, receive executable Squiggle code | "Estimate the cost-effectiveness of hiring an AI safety researcher" |
+| **Iterative Refinement** | Conversation-based model improvement | "Add more uncertainty to the timeline assumptions" |
+| **Fermi Estimation** | Generate complete uncertainty models from vague questions | "How many piano tuners are in Chicago?" |
+| **Code Debugging** | Identify and fix syntax and logic errors | Fix distribution domain mismatches |
+| **Model Explanation** | Explain what existing Squiggle code does | Document inherited models |
+
+### SquiggleAI Outputs
+
+SquiggleAI outputs on Squiggle Hub are private by default. Users who want to share models or make them public can explicitly do so by creating new public models. This privacy-first approach encourages experimentation without concern about incomplete drafts being visible.
+
+### Integration with Squiggle Hub
+
+SquiggleAI is directly accessible from within Squiggle Hub, allowing users to generate models and immediately save, version, and share them through the platform. The tight integration reduces friction between ideation and publication.
+
+## Squiggle Hub
+
+[Squiggle Hub](https://squigglehub.org/) is a platform for creating, sharing, and collaborating on Squiggle models. It was [announced in 2024](https://quantifieduncertainty.org/posts/announcing-squiggle-hub/) as a central repository for probabilistic models in the EA and rationalist communities.
+
+### Core Features
+
+| Feature | Description | Details |
+|---------|-------------|---------|
+| **Model Hosting** | Publish and share Squiggle models | Public or private visibility options |
+| **Versioning** | Track model history and changes | Git-like version control for models |
+| **Imports/Exports** | Multi-model projects | Import functions and distributions between models |
+| **Collaboration** | Multiple contributors per project | Group-based permissions |
+| **Embedding** | Embed models in external sites | React components for documentation |
+| **Version Selection** | Pick Squiggle version per model | Test on different versions, avoid breaking changes |
+| **SquiggleAI Integration** | AI-assisted model creation | Direct access within the platform |
+
+### Groups and Collections
+
+Squiggle Hub organizes models into groups for easier discovery:
+- **Meta-Squiggle**: Models about Squiggle itself and QURI operations
+- **Innovation**: Models exploring novel estimation techniques
+- **User Collections**: Individual user portfolios
+
+### Notable Models and Use Cases
+
+The platform hosts various types of probabilistic models:
+
+| Category | Example Models | Typical Complexity |
+|----------|---------------|-------------------|
+| **Cost-Effectiveness** | GiveWell charity evaluations, AI safety interventions | 200-500 lines |
+| **Fermi Estimates** | Population estimates, market sizing | 50-150 lines |
+| **Forecasting** | Election probabilities, technology timelines | 100-300 lines |
+| **Decision Models** | Career choice analysis, funding allocation | 150-400 lines |
+
+### Guesstimate Legacy
+
+Squiggle Hub also provides access to 17,000+ public models from Guesstimate, Gooen's earlier Monte Carlo spreadsheet tool. This archive represents years of probabilistic modeling by the EA community and serves as a reference library for common estimation patterns.
+
+## Metaforecast
+
+[Metaforecast](https://metaforecast.org/) aggregates forecasts from multiple prediction platforms into a single searchable interface. The initial version was created by [Nuño Sempere](https://forum.effectivealtruism.org/users/nunosempere), with help from Ozzie Gooen, at QURI.
+
+### Purpose and Design
+
+Forecasting is a public good, but platform fragmentation reduces its utility. Metaforecast addresses this by combining data from 10+ platforms into a unified search interface. Data is fetched daily, showing immediate forecasts without historical data—optimized for quick lookups rather than trend analysis.
+
+### Platforms Aggregated
+
+| Platform | Type | Questions | Notes |
+|----------|------|-----------|-------|
+| **Metaculus** | Reputation-based | ≈1,200 (55% of total) | Largest source; research-focused |
+| **Manifold** | Play money market | Varies | Research-focused, no profit motive |
+| **Polymarket** | Real money (crypto) | Varies | Rose to prominence in 2024 US election |
+| **Good Judgment Open** | Superforecaster platform | ≈100-200 | Connected to Good Judgment Project |
+| **PredictIt** | Political market | ≈50-100 | US political focus |
+| **Kalshi** | CFTC-regulated market | ≈100-200 | Regulatory compliance focus |
+| **Insight Prediction** | Prediction market | Varies | Additional source |
+| **INFER** | Policy forecasting | Varies | Government-adjacent |
+
+**Scale**: Currently indexes approximately 2,100 active forecasting questions across all platforms, plus access to 17,000+ public Guesstimate models.
+
+### Features
+
+| Feature | Description | Technical Details |
+|---------|-------------|-------------------|
+| **Unified Search** | Find forecasts across all platforms | Elasticsearch-powered |
+| **Platform Comparison** | See estimates from different sources | Side-by-side probability views |
+| **GraphQL API** | Programmatic access | Available for integrations |
+| **Daily Updates** | Fresh data fetched automatically | Scheduled scraping pipeline |
+| **Open Source** | [GitHub repository](https://github.com/quantified-uncertainty/metaforecast) | Part of Squiggle monorepo |
+
+### Integrations
+
+Metaforecast has been integrated with several external services:
+- **Twitter**: Bot posting notable forecasts
+- **Fletcher**: Discord bot integration
+- **GlobalGuessing**: Forecasting community platform
+- **Elicit** (previously): AI research assistant
+
+The open-source nature and GraphQL API enable custom integrations for research and analysis workflows.
+
+### 2024 US Election Performance
+
+During the 2024 US presidential election, Polymarket (one of Metaforecast's sources) demonstrated the value of prediction market aggregation. Polymarket strongly favored Trump's victory even as traditional polls showed a closer race. The market's prediction proved correct, with reports of approximately \$30 million in bets from individual traders helping shape the odds.
+
+## Additional Tools
+
+### <EntityLink id="roastmypost">RoastMyPost</EntityLink>
+
+[<EntityLink id="roastmypost">RoastMyPost</EntityLink>](https://www.roastmypost.org/) is a QURI application that uses LLMs and code to evaluate blog posts and research documents. It was [announced](https://forum.effectivealtruism.org/posts/BdufL4GZmeBht3fak/announcing-roastmypost-llms-eval-blog-posts-and-more) as a tool for improving writing quality in the EA and rationalist communities.
+
+**Evaluators Available**:
+
+| Evaluator | Focus | Technical Implementation |
+|-----------|-------|-------------------------|
+| **Fact Check** | Verify claims against sources | Perplexity API via OpenRouter |
+| **Spell Check** | Identify typos and errors | Programmatic checks |
+| **Fallacy Check** | Detect logical fallacies | Claude Sonnet 4.5 |
+| **Math Check** | Verify calculations | Claude + symbolic verification |
+| **Link Check** | Validate URLs | HTTP requests |
+| **Forecast Check** | Evaluate probabilistic claims | Squiggle integration |
+| **Custom Evaluators** | User-submitted checks | Community contributions |
+
+**How It Works**:
+1. Import document via markdown text or URL (optimized for EA Forum and LessWrong)
+2. Select evaluators (system-recommended or custom)
+3. Processing takes 1-5 minutes
+4. Review flagged issues for human judgment
+
+**Use Cases**:
+- **Draft polishing**: Catch errors before publication
+- **Public trust signaling**: Link to evaluations in blog posts (like GitHub badges)
+- **LLM-assisted workflows**: Automated quality checks on AI-generated content
+
+**Limitations**: The false positive rate for error detection is significant. <EntityLink id="roastmypost">RoastMyPost</EntityLink> is best for flagging issues for human review, not for treating results as authoritative. Fact Check and Fallacy Check work best on fact-dense, rigorous articles.
+
+### Fermi Competition
+
+QURI runs periodic [\$100 Fermi Model Competitions](https://forum.effectivealtruism.org/posts/Zc5jki9nXihueDcKj/usd300-fermi-model-competition) to encourage creative Fermi estimation using AI tools. The February 2025 competition used Claude 3.5 Sonnet and the QURI team as judges.
+
+**Evaluation Criteria**:
+| Criterion | Weight | Description |
+|-----------|--------|-------------|
+| **Surprise** | 40% | How unexpected/novel are the findings? |
+| **Topic Relevance** | 20% | Relevance to rationalist/EA communities |
+| **Robustness** | 20% | Reliability of methodology and assumptions |
+| **Other** | 20% | Presentation, creativity, clarity |
+
+The competition explicitly encourages novel approaches over exhaustively researched calculations, promoting experimentation with AI-assisted quantitative reasoning.
+
+### Squigglepy (Python Implementation)
+
+[Squigglepy](https://github.com/rethinkpriorities/squigglepy) is a Python package developed by Rethink Priorities that implements Squiggle-like functionalities for those who prefer working in the Python ecosystem. While Squiggle is implemented in JavaScript, Squigglepy allows integration with Python's scientific computing stack (NumPy, SciPy, pandas).
+
+## Funding and Organization
+
+### Funding History
+
+| Source | Amount | Period | Notes |
+|--------|--------|--------|-------|
+| **Survival and Flourishing Fund** | \$650,000+ | 2019-2022 | Primary early funder; Jaan Tallinn's philanthropic vehicle |
+| **Future Fund** | \$200,000 | 2022 | Pre-FTX collapse; lost future commitments |
+| **Long-Term Future Fund** | Ongoing | 2023-present | Current primary funder |
+| **Individual Donors** | Various | Ongoing | Via Every.org and direct giving |
+| **Total Historical** | **\$850,000+** | Through 2022 | Documented funding |
+
+### Funding Context
+
+The Survival and Flourishing Fund (SFF) is financed primarily by Jaan Tallinn (Skype co-founder, AI safety advocate). In 2025, SFF allocated \$34.33 million to organizations working on existential risk, with ~86% (\$29M) going to AI-related projects. QURI represents one of several epistemic infrastructure investments in SFF's portfolio.
+
+The Future Fund's 2022 grant was affected by the FTX collapse, which eliminated potential future funding from that source. QURI has since diversified funding through LTFF and individual donors.
+
+### Organizational Structure
+
+| Aspect | Details |
+|--------|---------|
+| **Legal Status** | 501(c)(3) nonprofit (EIN: 84-3847921) |
+| **Fiscal Sponsor** | [Rethink Priorities](https://rethinkpriorities.org/) Special Projects Program |
+| **Sponsorship Model** | QURI maintains autonomy; RP provides operational support, fiduciary oversight, tax-exempt status |
+| **Team Size** | ≈3-5 core contributors |
+| **Key Contributors** | Ozzie Gooen (founder), Sam Nolan, Nuño Sempere (Metaforecast), Michael Dickens (unit types) |
+| **Communication** | EA Forecasting & Epistemics Slack (#squiggle-dev), [QURI Substack](https://quri.substack.com/) |
+| **Code Repository** | Monorepo at [github.com/quantified-uncertainty/squiggle](https://github.com/quantified-uncertainty/squiggle) |
+
+### Rethink Priorities Fiscal Sponsorship
+
+QURI works with Rethink Priorities under their Special Projects Program, which provides:
+- Fiscal sponsorship and tax-exempt status
+- Financial administration and payroll
+- Recruitment support
+- Operational infrastructure
+
+This model allows QURI to focus on tool development while RP handles administrative overhead. The arrangement is common in the EA ecosystem for small research organizations.
+
+## Research Collaborations
+
+### Arb Research Collaboration
+
+QURI collaborated with Arb Research on their 2025 technical AI safety review, building the interactive [shallowreview.ai](https://shallowreview.ai/) website. The Shallow Review is "a shallow-by-design review of technical AI safety research in 2025: 800+ papers and posts across 80+ research agendas."
+
+The website was created by QURI (Ozzie and Tomáš) to make the research more navigable. The review covers alignment, control, capability restraint, and risk awareness work, processing every arXiv paper on alignment and all Alignment Forum posts. The project was funded by Coefficient Giving.
+
+### GiveWell Cost-Effectiveness Quantification
+
+Multiple projects have used Squiggle to add uncertainty quantification to GiveWell's cost-effectiveness analyses:
+
+| Project | Authors | Effort | Key Finding |
+|---------|---------|--------|-------------|
+| **GiveDirectly CEA** | Sam Nolan | ≈40 hours | Mean cost to double consumption: \$469 (95% CI: \$131-\$1,185) |
+| **Against Malaria Foundation** | Various | Research project | GiveWell point estimate \$7,759 vs. Squiggle mean \$6,980 |
+| **GiveWell Change Our Mind Submission** | Sam Nolan, Hannah Rokebrand, Tanae Rao | ≈300 hours | Full CEA uncertainty quantification |
+
+These projects demonstrate Squiggle's utility for making cost-effectiveness analyses more transparent and explorable.
+
+### EA/Rationalist Community Integration
+
+QURI tools are widely used across the effective altruism and rationalist communities:
+
+| Use Case | Tools Used | Example Organizations |
+|----------|------------|----------------------|
+| **Cost-effectiveness analyses** | Squiggle, Squiggle Hub | GiveWell evaluators, EA Funds |
+| **Fermi estimates for cause prioritization** | SquiggleAI, Squiggle | <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, 80,000 Hours |
+| **AI timeline modeling** | Squiggle | AI safety researchers |
+| **Forecast aggregation** | Metaforecast | Forecasting community |
+| **Writing quality checks** | <EntityLink id="roastmypost">RoastMyPost</EntityLink> | EA Forum authors |
+
+## Comparison with Similar Tools
+
+| Tool | Focus | Strengths | Limitations | Learning Curve |
+|------|-------|-----------|-------------|----------------|
+| **Squiggle** | Probabilistic estimation | Native distributions, web-based, readable syntax | No Bayesian inference, smaller ecosystem | Low-Medium |
+| **Guesstimate** | Spreadsheet Monte Carlo | Familiar spreadsheet UI, 5,000 simulations | Less programmable, limited functions | Low |
+| **Stan** | Bayesian inference | Powerful MCMC, HMC sampling | Steep learning curve, slower iteration | High |
+| **PyMC** | Bayesian Python | Full Python ecosystem, Theano/JAX backend | Requires Python expertise | Medium-High |
+| **WebPPL** | Probabilistic programming | Inference, conditioning | Academic focus, limited tooling | Medium |
+| **Excel** | General spreadsheets | Ubiquitous, familiar | Poor uncertainty support, no distributions | Low |
+| **Causal** | Business modeling | Scenario planning, team collaboration | Less probabilistic focus | Low |
+
+### When to Use Squiggle vs. Alternatives
+
+**Use Squiggle when**:
+- You need intuition-driven estimation without much data
+- Rapid prototyping of uncertainty models is priority
+- Web-based sharing and collaboration is important
+- You want readable, auditable probabilistic code
+
+**Use Stan/PyMC when**:
+- You have data and need Bayesian inference
+- Model complexity requires advanced MCMC methods
+- Performance on large models is critical
+
+**Use Guesstimate when**:
+- Spreadsheet interface is preferred
+- Quick one-off calculations
+- Non-programmers need to contribute
+
+## Use Cases
+
+### Cost-Effectiveness Analysis
+
+Organizations use Squiggle for intervention comparisons with explicit uncertainty:
+
+| Use Case | Example | Typical Model Size |
+|----------|---------|-------------------|
+| **Charity evaluation** | GiveDirectly, AMF cost per life saved | 200-500 lines |
+| **AI safety interventions** | Research funding, field-building ROI | 150-400 lines |
+| **Policy cost-benefit** | Regulation impacts, safety standards | 200-600 lines |
+| **Career decisions** | Expected value of different paths | 100-300 lines |
+
+The [GiveWell CEA quantification project](https://forum.effectivealtruism.org/posts/Nb2HnrqG4nkjCqmRg/quantifying-uncertainty-in-givewell-cost-effectiveness) demonstrated that Squiggle can make charity evaluations more transparent by showing full probability distributions rather than point estimates.
+
+### Forecasting Models
+
+Squiggle enables structured forecasts with explicit uncertainty:
+- **AI timeline models**: When will specific capabilities emerge?
+- **Technology adoption curves**: S-curves with uncertainty bounds
+- **Risk scenario analysis**: Probability-weighted outcome trees
+- **Market sizing**: Fermi estimates for business planning
+
+### Research Communication
+
+Squiggle models embedded in publications enable:
+- **Transparent assumptions**: Every input visible and adjustable
+- **Reproducible calculations**: Same code produces same outputs
+- **Interactive exploration**: Readers can modify parameters
+- **Sensitivity analysis**: Identify which inputs matter most
+
+### Academic and Policy Applications
+
+While primarily used in EA/rationalist communities, Squiggle has potential applications in:
+- Academic research requiring uncertainty quantification
+- Policy analysis requiring transparent assumptions
+- Risk assessment in regulated industries
+- Teaching probabilistic reasoning
+
+## QURI Timeline
+
+| Year | Milestone | Significance |
+|------|-----------|--------------|
+| **2016** | Guesstimate launched | First Monte Carlo spreadsheet for EA community |
+| **2017-2019** | Gooen at FHI | Forecasting infrastructure research |
+| **2019** | QURI founded | 501(c)(3) nonprofit established |
+| **2020** | [Squiggle Early Access](https://forum.effectivealtruism.org/posts/TfPdb2aMKzgWXFvc3/announcing-squiggle-early-access) | First public release of Squiggle language |
+| **2021** | Metaforecast launched | [Forecast aggregation](https://forum.effectivealtruism.org/posts/tEo5oXeSNcB3sYr8m/introducing-metaforecast-a-forecast-aggregator-and-search) across 10+ platforms |
+| **2022** | \$650K+ SFF funding | Major funding milestone |
+| **2022** | Future Fund grant (\$200K) | Expansion funding (pre-FTX) |
+| **2023** | Squiggle 0.8.x | Performance improvements, Hub integration |
+| **2024** | [Squiggle Hub launch](https://quantifieduncertainty.org/posts/announcing-squiggle-hub/) | Collaborative model platform |
+| **2024** | SquiggleAI released | [LLM-powered model generation](https://forum.effectivealtruism.org/posts/jJ4pn3qvBopkEvGXb/introducing-squiggle-ai) |
+| **2024** | [<EntityLink id="roastmypost">RoastMyPost</EntityLink> launch](https://forum.effectivealtruism.org/posts/BdufL4GZmeBht3fak/announcing-roastmypost-llms-eval-blog-posts-and-more) | LLM blog evaluation tool |
+| **2025** | [Squiggle 0.10.0](https://quantifieduncertainty.org/posts/squiggle-0-10-0/) | Major release with type inference, Web Workers |
+| **2025** | shallowreview.ai collaboration | Arb Research AI safety review website |
+| **2025** | Fermi Competition | \$300 prizes for creative Fermi estimates |
+
+## Strengths and Limitations
+
+### Organizational Strengths
+- **Purpose-built tools**: Each product addresses specific epistemic needs
+- **Accessible**: Browser-based, no installation needed
+- **Open Source**: All code MIT licensed, community contributions welcome
+- **AI Integration**: SquiggleAI and <EntityLink id="roastmypost">RoastMyPost</EntityLink> leverage frontier LLMs
+- **Community**: Active EA/rationalist user base, responsive to feedback
+- **Ecosystem approach**: Tools work together (Squiggle + Hub + AI + Metaforecast)
+
+### Organizational Limitations
+- **Niche adoption**: Limited use outside EA/rationalist communities
+- **Small team**: ~3-5 core contributors limits development velocity
+- **Funding dependency**: Reliant on EA-adjacent funders (SFF, LTFF)
+- **Learning curve**: New syntax requires investment to learn
+- **Documentation gaps**: Some features under-documented
+- **Ecosystem size**: Fewer libraries than general-purpose languages
+
+### Strategic Challenges
+
+| Challenge | Description | Mitigation |
+|-----------|-------------|------------|
+| **Adoption ceiling** | EA community is finite | Explore academic/policy applications |
+| **LLM competition** | General LLMs can do Fermi estimates | Integrate LLMs (SquiggleAI) rather than compete |
+| **Sustainability** | Small team, concentrated funding | Fiscal sponsorship, diverse funders |
+| **Feature scope** | Pressure to add features vs. maintain simplicity | Clear design philosophy prioritizing estimation |
+
+## Future Directions
+
+Based on QURI's development trajectory and stated priorities:
+
+### Near-Term (2025-2026)
+- **Squiggle language improvements**: Continued type system development, performance optimization
+- **SquiggleAI expansion**: Support for more LLM providers, longer context windows
+- **Squiggle Hub features**: Better collaboration tools, API improvements
+- **Community building**: More Fermi competitions, educational content
+
+### Medium-Term
+- **Academic adoption**: Partnerships with universities for teaching probabilistic reasoning
+- **Policy applications**: Tools for government cost-benefit analysis
+- **Integration depth**: Tighter connections between Squiggle, Metaforecast, and <EntityLink id="roastmypost">RoastMyPost</EntityLink>
+
+### Strategic Questions
+- Can QURI expand beyond the EA community without losing focus?
+- How should the tools evolve as general LLMs become better at estimation?
+- What role should QURI play in AI safety evaluation/forecasting infrastructure?
+
+## Sources and Citations
+
+### Primary Sources
+- [QURI Official Website](https://quantifieduncertainty.org/)
+- [QURI About Page](https://quantifieduncertainty.org/about/)
+- [QURI Team Page](https://quantifieduncertainty.org/team/)
+- [Ozzie Gooen EA Forum Profile](https://forum.effectivealtruism.org/users/oagr)
+- [Ozzie Gooen Interview (Mutual Understanding)](https://mutualunderstanding.substack.com/p/ozzie-gooen)
+
+### Squiggle Documentation
+- [Squiggle Language Documentation](https://www.squiggle-language.com/docs)
+- [Squiggle Distribution Creation Guide](https://www.squiggle-language.com/docs/Guides/DistributionCreation)
+- [Squiggle Functions Guide](https://www.squiggle-language.com/docs/Guides/Functions)
+- [Squiggle 0.10.0 Release Notes](https://quantifieduncertainty.org/posts/squiggle-0-10-0/)
+- [Squiggle GitHub Repository](https://github.com/quantified-uncertainty/squiggle)
+
+### EA Forum Posts
+- [Introducing Squiggle: Early Access](https://forum.effectivealtruism.org/posts/TfPdb2aMKzgWXFvc3/announcing-squiggle-early-access)
+- [Introducing SquiggleAI](https://forum.effectivealtruism.org/posts/jJ4pn3qvBopkEvGXb/introducing-squiggle-ai)
+- [Announcing <EntityLink id="roastmypost">RoastMyPost</EntityLink>](https://forum.effectivealtruism.org/posts/BdufL4GZmeBht3fak/announcing-roastmypost-llms-eval-blog-posts-and-more)
+- [Introducing Metaforecast](https://forum.effectivealtruism.org/posts/tEo5oXeSNcB3sYr8m/introducing-metaforecast-a-forecast-aggregator-and-search)
+- [\$100 Fermi Model Competition](https://forum.effectivealtruism.org/posts/Zc5jki9nXihueDcKj/usd300-fermi-model-competition)
+- [Squiggle: Why and How to Use It](https://forum.effectivealtruism.org/posts/TsaRbCotCaWpcrt8F/squiggle-why-and-how-to-use-it)
+- [GiveWell CEA Quantification](https://forum.effectivealtruism.org/posts/Nb2HnrqG4nkjCqmRg/quantifying-uncertainty-in-givewell-cost-effectiveness)
+- [QURI EA Forum Topic](https://forum.effectivealtruism.org/topics/quantified-uncertainty-research-institute)
+
+### Funding and Organization
+- [Survival and Flourishing Fund](https://survivalandflourishing.fund/)
+- [SFF 2025 Funding Announcement](https://forum.effectivealtruism.org/posts/vhw6R5P52qJr6opou/sff-2025-funding-by-cause-area-usd34-million-to-ai-86-bio-7)
+- [QURI Charity Navigator Profile](https://www.charitynavigator.org/ein/843847921)
+- [Rethink Priorities Special Projects](https://forum.effectivealtruism.org/posts/AFgvA9imsT6bww8E3/announcing-the-rethink-priorities-special-projects-program)
+
+### Collaborations
+- [Shallow Review 2025 (shallowreview.ai)](https://shallowreview.ai/about)
+- [Squigglepy (Rethink Priorities)](https://github.com/rethinkpriorities/squigglepy)
+
+## External Links
+
+- [QURI Website](https://quantifieduncertainty.org/)
+- [Squiggle Language](https://squiggle-language.com/)
+- [Squiggle Hub](https://squigglehub.org/)
+- [Metaforecast](https://metaforecast.org/)
+- [<EntityLink id="roastmypost">RoastMyPost</EntityLink>](https://www.roastmypost.org/)
+- [GitHub Organization](https://github.com/quantified-uncertainty)
+- [QURI Substack](https://quri.substack.com/)
+- [EA Forum Topic](https://forum.effectivealtruism.org/topics/quantified-uncertainty-research-institute)
+- [QURI Donate Page](https://quantifieduncertainty.org/donate/)
+
+<Backlinks />

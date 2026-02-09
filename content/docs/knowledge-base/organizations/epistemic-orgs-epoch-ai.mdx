@@ -1,0 +1,619 @@
+---
+title: Epoch AI
+description: Epoch AI is a research institute tracking AI development trends through comprehensive databases on training compute, model parameters, and hardware capabilities. Their data shows training compute growing 4.4x annually since 2010, with over 30 models now exceeding 10^25 FLOP. Their work directly informs major AI policy including the EU AI Act's 10^25 FLOP threshold and US Executive Order 14110's compute requirements. In 2025, they launched the Epoch Capabilities Index showing ~90% acceleration in AI progress since April 2024, and the FrontierMath benchmark where frontier models solve less than 2% of problems (o3 achieved ~10-25%).
+sidebar:
+  order: 1
+quality: 51
+llmSummary: Epoch AI maintains comprehensive databases tracking 3,200+ ML models showing 4.4x annual compute growth and projects data exhaustion 2026-2032. Their empirical work directly informed EU AI Act's 10^25 FLOP threshold and US EO 14110, with their Epoch Capabilities Index showing ~90% acceleration in AI progress since April 2024.
+lastEdited: "2026-01-29"
+importance: 42
+ratings:
+  novelty: 2.5
+  rigor: 6
+  actionability: 3.5
+  completeness: 7.5
+metrics:
+  wordCount: 1111
+  citations: 66
+  tables: 55
+  diagrams: 1
+clusters:
+  - community
+  - epistemics
+  - ai-safety
+subcategory: epistemic-orgs
+---
+import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks, KeyQuestions, Section, DisagreementMap} from '@components/wiki';
+
+<DataExternalLinks pageId="epoch-ai" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Research Impact** | Very High | Cited in US AI Executive Order 14110, <EntityLink id="eu-ai-act">EU AI Act</EntityLink> 10^25 FLOP threshold, Congressional testimony |
+| **Data Quality** | Exceptional | [3,200+ ML models](https://epoch.ai/data/ai-models) tracked from 1950-present; most comprehensive public dataset |
+| **Methodology Rigor** | High | Peer-reviewed publications ([arXiv:2202.05924](https://arxiv.org/abs/2202.05924)); transparent compute estimation methodology |
+| **Policy Influence** | Strong | UK DSIT collaboration; JRC European Commission consultations; House of Lords evidence submission |
+| **Industry Usage** | Widespread | <EntityLink id="openai">OpenAI</EntityLink> commissioned [FrontierMath](https://epoch.ai/frontiermath/about); <EntityLink id="deepmind">Google DeepMind</EntityLink> collaborated on [ECI methodology](https://epoch.ai/benchmarks/eci) |
+| **Funding** | Stable | ≈\$7M through 2025 via <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> grants |
+| **Team Size** | ≈34 employees | Founded by 7 researchers; now includes ML, economics, statistics, policy backgrounds |
+| **Key Metrics** | Quantified | 15M+ H100-equivalents tracked; 30+ models above 10^25 FLOP; 7-month doubling time for AI compute |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [epoch.ai](https://epoch.ai) |
+
+
+## Organization Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Full Name** | Epoch AI |
+| **Founded** | April 2022 |
+| **Location** | San Francisco, CA (headquarters); remote-first operations |
+| **Status** | Independent 501(c)(3) nonprofit (since early 2025; previously fiscally sponsored by <EntityLink id="rethink-priorities">Rethink Priorities</EntityLink>) |
+| **Website** | [epoch.ai](https://epoch.ai/) |
+| **Director** | [Jaime Sevilla](https://epoch.ai/team) (Mathematics and Computer Science background) |
+| **Key Outputs** | ML Trends Database, Epoch Capabilities Index, FrontierMath Benchmark, GATE Economic Model, AI Chip Sales Tracker |
+| **Primary Funders** | <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (\$6.3M+ in grants), Carl Shulman (\$100K), individual donors |
+| **GitHub** | [epoch-research](https://github.com/epoch-research) |
+
+## Overview
+
+[Epoch AI](https://epoch.ai/) is a research institute dedicated to tracking and forecasting AI development through rigorous empirical analysis. Founded in April 2022 by Jaime Sevilla and six co-founders, Epoch has become the authoritative source for data on AI training compute, model parameters, hardware capabilities, and development timelines. Their research directly informs policy discussions, corporate planning, and academic research on AI trajectories. The New York Times praised their work for bringing "much-needed rigor and empiricism to an industry that often runs on hype and vibes," and featured them in their [2024 Good Tech Awards](https://epoch.ai/blog/epoch-impact-report-2025).
+
+The organization's core contribution is maintaining comprehensive databases that enable quantitative analysis of AI progress. Their public database tracks over 3,200 machine learning models from 1950 to present, documenting the training compute, parameters, and capabilities of each system. By cataloging these metrics, Epoch provides the empirical foundation for discussions about AI timelines, resource constraints, and capability trajectories. Their work bridges the gap between speculative AI forecasting and evidence-based analysis.
+
+Epoch's research has been directly cited in major policy documents including the EU AI Act (which adopted their 10^25 FLOP compute threshold) and US Executive Order 14110. Their data informs Congressional hearings, and leading AI labs use their metrics for planning. As director Jaime Sevilla stated, "We want to do something similar for artificial intelligence to what William Nordhaus, the Nobel laureate, did for climate change. He set the basis for rigorous study and thoughtful action guided by evidence." The organization represents a critical piece of <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink> for understanding where AI development is headed and what constraints may shape its trajectory.
+
+## History and Evolution
+
+### Founding (2022)
+
+Epoch AI emerged from a collaborative research effort that began when Jaime Sevilla, a Spanish researcher, put his Ph.D. on pause and issued a call for volunteers to systematically document the critical inputs of every significant AI model ever created. The initial team that responded went on to become Epoch's founding members: Jaime Sevilla, Tamay Besiroglu, Lennart Heim, Pablo Villalobos, Eduardo Infante-Roldan, Marius Hobbhahn, and Anson Ho. Collectively, they brought backgrounds in Machine Learning, Statistics, Economics, Forecasting, Physics, Computer Engineering, and Software Engineering.
+
+During Epoch's first retreat in April 2022, the members decided to formalize as an organization and chose the name "Epoch" through a Twitter poll. When they published their findings in the paper "Compute Trends Across Three Eras of Machine Learning" in early 2022, the reaction was overwhelmingly positive, with the paper going viral in AI research communities. The paper documented the 10-billion-fold increase in training compute since 2010 and identified three distinct eras of ML development with different scaling dynamics.
+
+### Growth and Fiscal Sponsorship (2022-2024)
+
+From its founding, Epoch was fiscally sponsored and operationally supported by <EntityLink id="rethink-priorities">Rethink Priorities</EntityLink>, whose Special Projects team provided critical infrastructure for the growing organization. At founding, Epoch had a staff of 13 people (9 FTEs). <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (then <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>) provided early support with a \$1.96M grant for general support, followed by additional grants totaling over \$6M through 2025.
+
+During this period, Epoch expanded its database from the initial 123 models documented in their founding paper to over 3,200 models. They launched new data products including the AI Chip Sales tracker, Parameter Counts database, and AI Supercomputer Tracker. The team grew to approximately 34 employees with headquarters established in San Francisco.
+
+### Independence and Expansion (2025-Present)
+
+In early 2025, Epoch spun out from its fiscal sponsor and began operating as an independent 501(c)(3) nonprofit organization. This transition marked their maturation from a research project to a fully independent institution. Key 2025 developments included:
+
+- Launch of the [Epoch Capabilities Index (ECI)](https://epoch.ai/benchmarks/eci) in October 2025, a unified metric combining scores from 37 benchmarks
+- Completion of [FrontierMath Tier 4](https://epoch.ai/frontiermath/the-benchmark), commissioned by OpenAI, featuring 50 research-level mathematics problems
+- Publication of more plots and visualizations in 2025 than in all previous years combined
+- Development of the [GATE model](https://epoch.ai/gate) for forecasting AI's economic impact
+
+## Team
+
+### Leadership and Key Researchers
+
+| Name | Role | Background | Key Contributions |
+|------|------|------------|-------------------|
+| **Jaime Sevilla** | Director | Mathematics, Computer Science | Founded Epoch; leads research on AI forecasting and trends |
+| **Tamay Besiroglu** | Research Advisor (former co-founder) | Economics of computing | Co-authored founding paper; now leads Mechanize startup |
+| **Lennart Heim** | Co-founder | Computer Engineering | Compute governance research; hardware tracking |
+| **Pablo Villalobos** | Researcher | Statistics | Data constraints research; "Will We Run Out of Data?" paper |
+| **Marius Hobbhahn** | Co-founder | ML, Physics | Compute trends analysis |
+| **Anson Ho** | Co-founder | ML, Software Engineering | Database development; trend analysis |
+| **Eduardo Infante-Roldan** | Co-founder | Economics | Economic modeling |
+
+### Team Composition
+
+The current team of approximately 34 employees includes researchers with diverse backgrounds:
+
+- **Machine Learning researchers**: Core technical expertise in model architectures and training
+- **Economists**: Analyze AI's economic implications and build forecasting models
+- **Statisticians**: Develop rigorous methodologies for trend analysis
+- **Policy analysts**: Translate research findings for governance contexts
+- **Data engineers**: Maintain and expand the organization's databases
+
+## Key Research Areas
+
+<Mermaid client:load chart={`
+flowchart TD
+    EPOCH[Epoch AI] --> DATA[Data Infrastructure]
+    EPOCH --> RESEARCH[Research Analysis]
+    EPOCH --> FORECAST[Forecasting]
+    EPOCH --> BENCH[Benchmarking]
+
+    DATA --> MODELS[ML Model Database<br/>3,200+ models tracked]
+    DATA --> COMPUTE[Training Compute<br/>Estimates]
+    DATA --> HARDWARE[AI Chip Sales<br/>15M+ H100-equiv]
+    DATA --> SUPER[AI Supercomputers<br/>Capacity mapping]
+
+    RESEARCH --> TRENDS[Trend Analysis]
+    RESEARCH --> CONSTRAINTS[Constraint Analysis]
+    RESEARCH --> ECON[AI Economics]
+
+    TRENDS --> GROWTH[4.4x compute<br/>growth/year]
+    CONSTRAINTS --> DATAWALL[Data Wall<br/>2026-2032]
+    CONSTRAINTS --> POWER[Power Constraints<br/>9GW by 2030]
+
+    BENCH --> ECI[Epoch Capabilities<br/>Index]
+    BENCH --> FMATH[FrontierMath<br/>Benchmark]
+
+    FORECAST --> GATE[GATE Economic<br/>Model]
+    FORECAST --> POLICY[Policy<br/>Implications]
+
+    style EPOCH fill:#e6f3ff
+    style GROWTH fill:#ffddcc
+    style DATAWALL fill:#ffddcc
+    style POWER fill:#ffddcc
+    style ECI fill:#d4edda
+    style FMATH fill:#d4edda
+`} />
+
+## Training Compute Estimation Methodology
+
+A critical contribution of Epoch AI is their rigorous methodology for estimating the compute used to train machine learning models. This methodology enables accurate comparisons across models and time periods, forming the foundation for their scaling analysis.
+
+### Two Primary Estimation Strategies
+
+Epoch uses two complementary approaches to estimate training compute:
+
+| Method | Inputs Required | When Used | Precision |
+|--------|-----------------|-----------|-----------|
+| **Architecture-based** | Model architecture, training data size, parameter count | When architecture details are published | High |
+| **Hardware-based** | GPU type, training time, utilization rate | When hardware details are available | Moderate |
+
+**Architecture-based estimation**: Epoch maintains [detailed tables](https://epoch.ai/blog/estimating-training-compute) of common neural network layers, estimating parameters and FLOP per forward pass. For many layers, forward pass FLOP approximately equals twice the parameter count. A backward pass adds approximately 2x the forward pass FLOP, yielding the common heuristic: total training FLOP approximately equals 6 times parameters times tokens.
+
+**Hardware-based estimation**: When architecture details are unavailable, Epoch calculates compute from GPU training time multiplied by peak GPU performance, adjusted by utilization rate. Their empirical analysis found utilization rates typically range from 0.3 to 0.75 depending on architecture and batch size.
+
+### Key Methodological Insights
+
+- The backward/forward FLOP ratio is "very likely 2:1" after correcting for common counting errors
+- The "Theory method" multiplies forward pass FLOP by 3.0 to account for backward pass
+- Larger batch sizes yield more consistent utilization rates
+- [Parameter sharing](https://epoch.ai/blog/estimating-training-compute) (as in CNNs) and word embeddings require special handling
+
+## Training Compute Trends
+
+| Metric | Finding | Time Period | Source |
+|--------|---------|-------------|--------|
+| **Compute Growth** | 4.4x per year | 2010-2025 | [Epoch Trends](https://epoch.ai/trends) |
+| **Doubling Time** | ≈5-6 months | Deep Learning era (2012+) | [arXiv:2202.05924](https://arxiv.org/abs/2202.05924) |
+| **Pre-Deep Learning Doubling** | ≈20 months | Before 2010 | Moore's Law trajectory |
+| **Models above 10^25 FLOP** | 30+ models from 12 developers | As of June 2025 | [Epoch Data](https://epoch.ai/data/ai-models) |
+| **Global AI Chip Capacity** | 15M+ H100-equivalents | 2025 | [AI Chip Sales](https://epoch.ai/data-insights/ai-chip-production) |
+
+### Three Eras of Machine Learning
+
+Epoch's foundational 2022 paper identified three distinct eras with different compute scaling dynamics:
+
+| Era | Period | Doubling Time | Characteristics |
+|-----|--------|---------------|-----------------|
+| **Pre-Deep Learning** | Before 2010 | ≈20 months | Followed Moore's Law; academic-dominated |
+| **Deep Learning** | 2010-2015 | ≈5-6 months | Rapid scaling; breakthrough architectures |
+| **Large-Scale** | 2015-present | ≈5-6 months | 2-3 OOM more compute than previous trend; industry-dominated |
+
+This analysis corrected earlier estimates (Amodei and Hernandez 2018) that suggested 3.4-month doubling, finding the actual rate closer to 5-6 months with approximately 10x more data points.
+
+### Historical Compute Scaling
+
+Epoch's database reveals the dramatic scaling of AI training compute:
+
+| Era | Representative Model | Training Compute (FLOP) | Approximate Cost |
+|-----|---------------------|------------------------|------------------|
+| 2012 | AlexNet | 10^17 | Thousands |
+| 2017 | Transformer (original) | 10^18 | Tens of thousands |
+| 2020 | GPT-3 | 10^23 | Millions |
+| 2023 | GPT-4 | 10^25 | Tens of millions |
+| 2024 | Frontier models | 10^26 | ≈\$100 million |
+| 2027 (proj.) | Next-gen frontier | 10^27+ | Greater than \$1 billion |
+
+The first model trained at the 10^25 FLOP scale was GPT-4, released in March 2023. As of June 2025, Epoch has identified over 30 publicly announced AI models from 12 different developers that exceed this threshold.
+
+## Hardware Trends
+
+| Metric | Annual Growth | Current Status |
+|--------|---------------|----------------|
+| **GPU FLOP/s (FP32)** | 1.35x | Continuing Moore's Law trajectory |
+| **GPU FLOP/s (FP16)** | Similar to FP32 | Optimized for ML workloads |
+| **NVIDIA Total Compute** | 2.3x since 2019 | Hopper generation: 77% of total |
+| **Global AI Compute Capacity** | 3.3x per year (7-month doubling) | 15M+ H100-equivalents total |
+
+### AI Chip Sales Database
+
+Epoch's [AI Chip Sales data explorer](https://epoch.ai/data-insights/ai-chip-production) is the most comprehensive public dataset tracking global AI compute capacity across vendors:
+
+| Vendor | Coverage | Key Metrics Tracked |
+|--------|----------|---------------------|
+| NVIDIA | Primary | GPU sales, FLOP capacity, power consumption |
+| Google (TPU) | Included | Custom silicon production |
+| Amazon (Trainium) | Included | Cloud AI accelerators |
+| AMD | Included | MI series GPUs |
+| Huawei | Included | Ascend chips (domestic China) |
+
+Key finding: Global computing capacity has been growing by 3.3x per year, equivalent to a doubling time of approximately 7 months.
+
+### AI Supercomputer Projections
+
+Epoch's analysis of AI supercomputer trends projects significant scaling challenges:
+
+| Year | Projected Chips | Estimated Cost | Power Required |
+|------|-----------------|----------------|----------------|
+| 2024 | ≈100,000 | ≈\$10 billion | ≈1 GW |
+| 2027 | ≈500,000 | ≈\$50 billion | ≈4 GW |
+| 2030 | ≈2 million | ≈\$200 billion | ≈9 GW |
+
+The 9 GW power requirement for 2030 frontier training represents the equivalent of 9 nuclear reactors—a scale beyond any existing industrial facility. This represents a potential binding constraint on AI scaling.
+
+## Geographic Distribution of AI Compute
+
+| Region | Share of AI Supercomputer Capacity | Trend |
+|--------|-----------------------------------|-------|
+| United States | ≈75% | Dominant and growing |
+| China | ≈15% | Second place, facing chip restrictions |
+| Europe | ≈5% | Limited domestic capacity |
+| Other | ≈5% | Emerging efforts |
+
+The shift from academic to industry dominance has been dramatic:
+
+| Year | Industry Share | Academic/Government Share |
+|------|---------------|---------------------------|
+| 2019 | ≈40% | ≈60% |
+| 2022 | ≈65% | ≈35% |
+| 2025 | ≈80% | ≈20% |
+
+## Data Constraints Research
+
+Epoch's influential research on training data constraints (the "data wall") has become central to discussions of AI scaling limits. Their paper "[Will We Run Out of ML Data?](https://epoch.ai/publications/will-we-run-out-of-ml-data-evidence-from-projecting-dataset)" projects when AI development may exhaust human-generated training data.
+
+### Key Projections
+
+| Data Source | Current Status | Exhaustion Projection (80% CI) |
+|-------------|----------------|-------------------------------|
+| Public web text | Heavily utilized | 2026-2028 |
+| Books and academic papers | Largely incorporated | 2027-2030 |
+| All human-generated text | Approaching limits | 2026-2032 |
+
+The exact date depends on scaling assumptions. According to researcher Tamay Besiroglu: "There is a serious bottleneck here. If you start hitting those constraints about how much data you have, then you can't really scale up your models efficiently anymore. And scaling up models has been probably the most important way of expanding their capabilities."
+
+### Overtraining Factor Analysis
+
+| Overtraining Factor | Data Exhaustion Year | Example |
+|---------------------|---------------------|---------|
+| Compute-optimal (1x) | ≈2028 | Enough for 5x10^28 FLOP model |
+| 5x overtrained | ≈2027 | Common practice |
+| 10x overtrained | ≈2026-2027 | Llama 3-70B level |
+| 100x overtrained | ≈2025 | Extreme efficiency |
+
+### Updated Estimates (2025)
+
+Epoch's analysis has evolved based on new evidence:
+
+- The effectiveness of carefully filtered web data and multi-epoch training has substantially increased estimates of available high-quality data
+- After accounting for data quality, availability, multiple epochs, and multimodal tokenizer efficiency, Epoch estimates **400 trillion to 20 quadrillion tokens** available for training by 2030
+- This allows for training runs from 6x10^28 to 2x10^32 FLOP
+
+### Mitigating Factors
+
+Epoch identifies three categories of innovation that could extend the scaling runway:
+
+| Mitigation | Mechanism | Status |
+|------------|-----------|--------|
+| **Synthetic data** | AI-generated training data | Active research; quality concerns remain |
+| **Multimodal data** | Images, video, audio expand data pool | Increasingly used |
+| **Data efficiency** | Better algorithms require less data | Ongoing improvements |
+
+While Sam Altman noted OpenAI experiments with "generating lots of synthetic data," he expressed reservations: "There'd be something very strange if the best way to train a model was to just generate, like, a quadrillion tokens of synthetic data and feed that back in." Research shows training on AI-generated data can produce "model collapse" with degraded outputs.
+
+## Epoch Capabilities Index (ECI)
+
+The [Epoch Capabilities Index](https://epoch.ai/benchmarks/eci) (ECI), launched in October 2025, represents a major methodological advance in measuring AI progress. As individual benchmarks saturate, ECI provides a unified scale for comparing models across time.
+
+### Methodology
+
+ECI combines scores from 37 distinct benchmarks into a single "general capability" scale, similar to how IQ tests capture broad underlying capability:
+
+| Aspect | Details |
+|--------|---------|
+| **Benchmarks included** | 37 distinct benchmarks |
+| **Evaluations used** | 1,123 distinct evaluations |
+| **Models covered** | 147 models |
+| **Time span** | December 2021 - December 2025 |
+| **Methodology basis** | "A Rosetta Stone for AI Benchmarks" (collaboration with Google DeepMind AGI Safety team) |
+
+ECI scores function like Elo ratings: absolute values are less meaningful than relative comparisons. The scale is linear, so a 10-point jump should be equally significant whether moving from 100 to 110 or from 140 to 150.
+
+### Key Finding: 90% Acceleration
+
+Epoch's analysis reveals a significant acceleration in AI capabilities progress:
+
+| Period | Annual ECI Growth | Key Driver |
+|--------|-------------------|------------|
+| December 2021 - April 2024 | ≈8 points/year | Scaling laws, architecture improvements |
+| April 2024 - December 2025 | ≈15 points/year | Reasoning models, reinforcement learning |
+| **Acceleration** | **≈90%** | Coincides with rise of o1-style reasoning models |
+
+This acceleration is corroborated by [METR's Time Horizon benchmark](https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/), which found a ~40% acceleration in task completion capabilities starting around the same period.
+
+## FrontierMath Benchmark
+
+[FrontierMath](https://epoch.ai/frontiermath/about) is Epoch's benchmark of original, expert-crafted mathematics problems designed to evaluate advanced reasoning capabilities—problems that typically require hours or days for expert mathematicians to solve.
+
+### Development and Structure
+
+| Aspect | Details |
+|--------|---------|
+| **Total problems** | 350 (300 base + 50 Tier 4 expansion) |
+| **Collaborating mathematicians** | 60+ from leading institutions |
+| **Notable contributors** | 14 International Mathematical Olympiad gold medalists, 1 Fields Medal recipient |
+| **Problem domains** | Computational number theory, abstract algebraic geometry, and other advanced fields |
+| **Commissioning** | OpenAI commissioned the core 300 problems |
+
+### Tier Structure
+
+| Tier | Problem Count | Difficulty | Typical Human Solve Time |
+|------|---------------|------------|-------------------------|
+| Tier 1 | ≈100 | Advanced undergraduate | Hours |
+| Tier 2 | ≈100 | Graduate level | Hours to days |
+| Tier 3 | ≈100 | Research level | Days |
+| Tier 4 | 50 | Short research projects | Days to weeks |
+
+### Model Performance
+
+While leading AI models achieve near-perfect scores on traditional math benchmarks (GSM-8k, MATH), FrontierMath reveals substantial gaps:
+
+| Model | FrontierMath Score | Traditional Benchmarks | Notes |
+|-------|-------------------|------------------------|-------|
+| GPT-4o, Claude 3.5 | Less than 2% | Greater than 90% on MATH | Baseline frontier models |
+| o3 (December 2024) | ≈25% (announced) | Near-perfect on MATH | Pre-release version |
+| o3 (April 2025 release) | ≈10% | Near-perfect on MATH | [Official Epoch evaluation](https://epoch.ai/blog/openai-and-frontiermath) |
+
+The discrepancy between o3's announced 25% and measured 10% reflects differences in model versions and benchmark composition over time. Both the model and benchmark changed between December 2024 and April 2025.
+
+### Significance
+
+FrontierMath addresses two critical challenges:
+1. **Benchmark saturation**: Traditional math benchmarks no longer differentiate frontier models
+2. **Data contamination**: Using entirely new, unpublished problems with automated verification
+
+## GATE Economic Model
+
+The [GATE model](https://epoch.ai/gate) (Growth and AI Transition Endogenous) is Epoch's integrated assessment model of AI's economic impact, published in 2025 ([arXiv:2503.04941](https://arxiv.org/abs/2503.04941)).
+
+### Core Dynamics
+
+GATE models an automation feedback loop: investments drive increases in compute for training and deploying AI, which leads to gradual task automation, which generates returns enabling further investment.
+
+### Key Predictions
+
+| Metric | GATE Projection | Context |
+|--------|-----------------|---------|
+| **AI Investment Peak** | Greater than 10% of world GDP | ≈50x increase over current levels |
+| **Growth at 30% automation** | Greater than 20% annual GWP growth | Comparable to industrial revolution peaks |
+| **Growth at 40% automation** | ≈12% annual GWP growth | Comparable to East Asian miracle economies |
+
+### Interpretation Caveats
+
+Epoch explicitly cautions against treating GATE outputs as precise quantitative predictions. The model illustrates key dynamics rather than providing forecasts. According to their analysis: "These findings suggest that those who are confidently either extremely skeptical or extremely bullish about an unprecedented growth acceleration due to AI are likely miscalibrated."
+
+A public [GATE playground](https://epoch.ai/gate) allows users to modify parameters and explore scenarios.
+
+## Policy Impact
+
+Epoch's research has directly influenced major AI governance frameworks. Their compute trend data provides the empirical foundation for regulatory thresholds.
+
+### Compute Thresholds in Regulation
+
+| Policy | Threshold | Epoch's Role |
+|--------|-----------|--------------|
+| **EU AI Act** | 10^25 FLOP for systemic risk models | Epoch data cited in [JRC technical documents](https://publications.jrc.ec.europa.eu/repository/bitstream/JRC143255/JRC143255_01.pdf) |
+| **US Executive Order 14110** | 10^26 FLOP for reporting requirements | Threshold informed by Epoch trend analysis |
+| **UK Frontier AI Safety** | Uses compute as capability proxy | Methodology collaboration with UK DSIT |
+
+The EU AI Act explicitly references the statistical relationship between training compute and model capabilities documented by Epoch, noting that "performance of 231 language models (measured in log-perplexity) against scale (measured in FLOP)" shows clear trends.
+
+### Government Engagements
+
+| Government Body | Engagement Type | Year |
+|-----------------|-----------------|------|
+| **UK DSIT** | Consultation on "Frontier AI: capabilities and risks" | 2023 |
+| **JRC European Commission** | Collaboration on AI Act technical documentation | 2023-2024 |
+| **House of Lords** | Evidence submission on language models | 2023 |
+| **NIST** | Input on AI Risk Management Framework | 2023-2024 |
+| **US OSTP** | Briefings on compute trends | 2023-2024 |
+
+### Model Count Projections
+
+Epoch's analysis of [how many models will exceed compute thresholds](https://epoch.ai/blog/model-counts-compute-thresholds) directly informs regulatory planning:
+
+| Threshold | Models (June 2025) | Developers |
+|-----------|-------------------|------------|
+| 10^23 FLOP | Hundreds | Dozens |
+| 10^25 FLOP | 30+ | 12 |
+| 10^26 FLOP | Several | Major labs |
+
+## Key Publications
+
+| Publication | Year | Key Finding | Citation |
+|-------------|------|-------------|----------|
+| "Compute Trends Across Three Eras of Machine Learning" | 2022 | 4.4x annual growth; 5-6 month doubling; three distinct eras | [arXiv:2202.05924](https://arxiv.org/abs/2202.05924) |
+| "Will We Run Out of ML Data?" | 2022 | Data exhaustion projected 2026-2032 | [Epoch Blog](https://epoch.ai/publications/will-we-run-out-of-ml-data-evidence-from-projecting-dataset) |
+| "Estimating Training Compute of Deep Learning Models" | 2022 | Methodology for FLOP estimation | [Epoch Blog](https://epoch.ai/blog/estimating-training-compute) |
+| "Can AI Scaling Continue Through 2030?" | 2024 | Analysis of compute, data, energy constraints | [Epoch Blog](https://epoch.ai/blog/can-ai-scaling-continue-through-2030) |
+| "AI Capabilities Progress Has Sped Up" | 2024 | ≈90% acceleration since April 2024 | [Epoch Data Insights](https://epoch.ai/data-insights/ai-capabilities-progress-has-sped-up) |
+| "FrontierMath: A Benchmark for Evaluating Advanced Mathematical Reasoning in AI" | 2024 | Frontier models solve less than 2% | [arXiv:2411.04872](https://arxiv.org/abs/2411.04872) |
+| "GATE: An Integrated Assessment Model for AI Automation" | 2025 | Economic modeling of AI transition | [arXiv:2503.04941](https://arxiv.org/abs/2503.04941) |
+| "How Well Did Forecasters Predict 2025 AI Progress?" | 2025 | Metacognitive evaluation of forecasting | [Epoch Blog](https://epoch.ai/gradient-updates/how-well-did-forecasters-predict-2025-ai-progress) |
+| "Global AI Computing Capacity is Doubling Every 7 Months" | 2025 | 15M+ H100-equivalents; 3.3x annual growth | [Epoch Data Insights](https://epoch.ai/data-insights/ai-chip-production) |
+
+## Funding
+
+Epoch AI has raised approximately \$7 million through September 2025, primarily from <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> grants.
+
+### Coefficient Giving Grants
+
+| Grant | Amount | Purpose | Date |
+|-------|--------|---------|------|
+| General Support (2022) | \$1,960,000 | Initial organizational support | 2022 |
+| General Support (2023) | \$4,132,488 | Two-year general support | 2023 |
+| Worldview Investigations | \$188,558 | AI-related worldview research | 2023 |
+| General Support (2025) | Undisclosed | Independent operations | 2025 |
+
+### Other Funding
+
+- Carl Shulman: \$100,000 individual donation
+- Various individual donors
+- Contract revenue from clients including AI labs and government offices
+
+Coefficient Giving has cited Epoch as producing "world-class work that is widely read, used, and shared."
+
+## Comparison with Other Forecasting Organizations
+
+| Organization | Focus | Methodology | Key Strength | Compute Expertise |
+|--------------|-------|-------------|--------------|-------------------|
+| **Epoch AI** | Empirical AI trends | Database analysis, benchmark development | Hardware/compute tracking; 3,200+ models | Primary focus |
+| **<EntityLink id="metaculus">Metaculus</EntityLink>** | Crowd forecasting | Prediction aggregation | Diverse questions; large forecaster base | Questions only |
+| **[Our World in Data](https://ourworldindata.org/)** | Data visualization | Curates authoritative sources | Broad topic coverage; accessibility | Uses Epoch data |
+| **AI Impacts** | AI forecasting | Expert surveys, trend extrapolation | Timeline estimates | Moderate |
+| **<EntityLink id="quri">QURI</EntityLink>** | Epistemic tools | Software development | Probabilistic modeling | Limited |
+
+Our World in Data [directly incorporates Epoch's compute trend data](https://ourworldindata.org/grapher/artificial-intelligence-training-computation) in their AI visualizations, extending Epoch's reach to a broader audience.
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Comprehensive data** | Most complete public database: 3,200+ ML models from 1950-present |
+| **Transparent methodology** | Open documentation of compute estimation methods; peer-reviewed publications |
+| **Policy relevance** | Directly cited in EU AI Act, US EO 14110; collaborations with UK DSIT, JRC |
+| **Regular updates** | Databases continuously maintained; published more plots in 2025 than all previous years |
+| **Methodological innovation** | ECI provides unified capability measurement; FrontierMath addresses benchmark saturation |
+| **Industry recognition** | New York Times "Good Tech Awards" 2024; praised for "rigor and empiricism" |
+
+### Limitations
+
+| Limitation | Implication |
+|------------|-------------|
+| **Historical focus** | Primarily backward-looking; projections carry significant uncertainty |
+| **Compute-centric** | Algorithmic efficiency improvements harder to quantify than hardware scaling |
+| **Industry opacity** | Labs don't disclose training details; estimates rely on public information |
+| **Threshold arbitrariness** | 10^25 FLOP thresholds are useful proxies but don't directly measure capability |
+| **US-centric** | Limited visibility into Chinese AI development due to information barriers |
+| **Funding concentration** | Heavy reliance on Coefficient Giving creates potential dependency |
+
+## Critical Assessment
+
+### What Epoch Does Well
+
+Epoch fills a crucial gap in the AI ecosystem by providing rigorous empirical grounding for discussions that previously relied on intuition and speculation. Before Epoch, claims about AI progress rates were often based on anecdotes or marketing materials. Epoch's systematic data collection enables evidence-based analysis of trends that matter for policy and planning.
+
+Their methodology for compute estimation has become the de facto standard, cited by academics, policymakers, and industry alike. The FrontierMath benchmark addresses a genuine problem—traditional benchmarks saturating—with a thoughtful approach using novel problems from credentialed experts.
+
+### Key Uncertainties
+
+<KeyQuestions questions={[
+  "How reliable are compute estimates for models where labs don't disclose training details?",
+  "Will the historical relationship between compute and capabilities continue, or are we approaching diminishing returns?",
+  "Can policy thresholds based on compute (10^25 FLOP) remain meaningful as algorithmic efficiency improves?",
+  "How should Epoch's projections be weighted against insider knowledge from labs?",
+  "Will data constraints prove as binding as projected, or will synthetic data and efficiency gains extend the runway?",
+  "Can a small organization maintain comprehensive coverage as AI development accelerates globally?"
+]} />
+
+### Perspectives on Epoch's Role
+
+<Section title="Views on Epoch AI's Contribution">
+  <DisagreementMap
+    client:load
+    topic="Value and Limitations of Empirical AI Tracking"
+    positions={[
+      {
+        name: "Essential Infrastructure",
+        description: "Epoch provides irreplaceable empirical grounding for AI policy and research. Their data and analysis have elevated discourse from speculation to evidence-based discussion. Expansion of their work should be a priority.",
+        proponents: ["AI governance researchers", "Policymakers", "Safety-focused AI researchers"],
+        strength: 5
+      },
+      {
+        name: "Valuable but Incomplete",
+        description: "Epoch's compute tracking is useful but overemphasizes hardware relative to algorithms and data quality. Capability improvements from techniques like RLHF and chain-of-thought are harder to quantify but equally important.",
+        proponents: ["ML researchers", "Industry practitioners"],
+        strength: 3
+      },
+      {
+        name: "Projection Skepticism",
+        description: "Historical trends are useful for backward-looking analysis but extrapolation to future capabilities is unreliable. Past growth rates may not predict discontinuities or saturation.",
+        proponents: ["Forecasting skeptics", "Some AI researchers"],
+        strength: 2
+      }
+    ]}
+  />
+</Section>
+
+## Timeline
+
+| Date | Event |
+|------|-------|
+| April 2022 | Epoch AI founded; team of 7 researchers; fiscally sponsored by Rethink Priorities |
+| February 2022 | "Compute Trends Across Three Eras" published; paper goes viral in AI research community |
+| 2022 | First Coefficient Giving (then Open Philanthropy) grant (\$1.96M) |
+| 2022 | "Will We Run Out of ML Data?" published; establishes data wall projections |
+| 2023 | Database grows to 800+ models; UK DSIT and JRC collaborations begin |
+| 2023 | Additional Coefficient Giving (then Open Philanthropy) grants (\$4.3M); House of Lords evidence submission |
+| 2024 | FrontierMath benchmark developed with 60+ mathematicians; OpenAI commissions 300 problems |
+| 2024 | Database exceeds 3,200 models; AI Chip Sales tracker launched |
+| 2024 | New York Times "Good Tech Awards" recognition |
+| October 2024 | Epoch Capabilities Index (ECI) launched with 37 benchmarks |
+| December 2024 | o3 announced with 25% FrontierMath score (later measured at ≈10%) |
+| Early 2025 | Spin out from fiscal sponsor to independent 501(c)(3) |
+| 2025 | GATE economic model published; 15M+ H100-equivalents tracked |
+| 2025 | Published more visualizations than all previous years combined |
+
+## Sources and External Links
+
+### Official Resources
+- [Epoch AI Website](https://epoch.ai/)
+- [ML Trends Dashboard](https://epoch.ai/trends)
+- [Epoch AI Database](https://epoch.ai/data)
+- [Epoch Substack](https://epochai.substack.com/)
+- [2025 Impact Report](https://epoch.ai/blog/epoch-impact-report-2025)
+- [GitHub: epoch-research](https://github.com/epoch-research)
+- [Team Page](https://epoch.ai/team)
+- [Funding Information](https://epoch.ai/our-funding)
+
+### Key Data Products
+- [AI Models Database](https://epoch.ai/data/ai-models) - 3,200+ models from 1950-present
+- [AI Chip Sales](https://epoch.ai/data-insights/ai-chip-production) - Global compute capacity tracking
+- [Epoch Capabilities Index](https://epoch.ai/benchmarks/eci) - Unified capability measurement
+- [FrontierMath Benchmark](https://epoch.ai/frontiermath/about) - Advanced mathematical reasoning
+- [GATE Model Playground](https://epoch.ai/gate) - Interactive economic modeling
+
+### Academic Publications
+- [Compute Trends Across Three Eras (arXiv:2202.05924)](https://arxiv.org/abs/2202.05924)
+- [FrontierMath: A Benchmark for Evaluating Advanced Mathematical Reasoning in AI (arXiv:2411.04872)](https://arxiv.org/abs/2411.04872)
+- [GATE: An Integrated Assessment Model for AI Automation (arXiv:2503.04941)](https://arxiv.org/abs/2503.04941)
+
+### Methodology Documentation
+- [Estimating Training Compute](https://epoch.ai/blog/estimating-training-compute)
+- [How to Measure FLOP Empirically](https://epoch.ai/blog/measure-FLOP-empirically)
+- [Interpreting the Epoch Capabilities Index](https://epoch.ai/data-insights/interpreting-eci)
+
+### Coefficient Giving Grants
+- [Epoch General Support (2022)](https://www.openphilanthropy.org/grants/epoch-general-support/)
+- [Epoch AI General Support (2025)](https://www.openphilanthropy.org/grants/epoch-ai-general-support-2025/)
+- [Epoch AI Worldview Investigations](https://www.openphilanthropy.org/grants/epoch-ai-worldview-investigations/)
+
+### Policy Documents Citing Epoch
+- [EU AI Act Technical Documentation (JRC)](https://publications.jrc.ec.europa.eu/repository/bitstream/JRC143255/JRC143255_01.pdf)
+- [Training Compute Thresholds in AI Regulation (arXiv:2405.10799)](https://arxiv.org/html/2405.10799v2)
+
+### Media Coverage
+- [The Epoch AI Researcher Trying to Glimpse the Future of AI (TIME)](https://time.com/6985850/jaime-sevilla-epoch-ai/)
+- [Announcing Epoch (EA Forum)](https://forum.effectivealtruism.org/posts/zqRDNChFburJMmpqK/announcing-epoch-a-research-organization-investigating-the)
+
+<Backlinks />

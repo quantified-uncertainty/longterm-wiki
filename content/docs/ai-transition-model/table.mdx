@@ -1,0 +1,40 @@
+---
+title: "Parameter Table"
+description: "Sortable tables showing all parameters in the AI Transition Model with ratings for changeability, uncertainty, and impact."
+sidebar:
+  order: 5
+tableOfContents: false
+fullWidth: true
+importance: 42
+quality: 24
+llmSummary: "An interactive sortable table displaying parameters from the AI Transition Model with ratings for changeability, uncertainty, and impact. Links to similar frameworks from Open Philanthropy and other sources for comparison."
+ratings:
+  novelty: 2
+  rigor: 3
+  actionability: 4
+  completeness: 3
+metrics:
+  wordCount: 11
+  citations: 0
+  tables: 0
+  diagrams: 0
+clusters: ["ai-safety"]
+---
+import TransitionModelTable from '@components/TransitionModelTable';
+import FullWidthLayout from '@components/FullWidthLayout';
+import { EntityLink } from '@components/wiki';
+
+<FullWidthLayout />
+
+<details className="mb-4 max-w-4xl">
+  <summary className="text-sm text-slate-500 cursor-pointer hover:text-slate-700 select-none">
+    Similar tables elsewhere ↗
+  </summary>
+  <div className="mt-2 pl-4 border-l-2 border-slate-200 text-sm text-slate-600 space-y-1">
+    <div><a href="https://www.alignmentforum.org/posts/sGkRDrpphsu6Jhega/a-model-based-approach-to-ai-existential-risk" className="text-sky-600 hover:underline" target="_blank" rel="noopener">Model-based Approach to AI X-risk</a> – <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>'s framework</div>
+    <div><a href="https://www.alignmentforum.org/posts/8vgi3fBWPFDLBBcAx/planning-for-extreme-ai-risks" className="text-sky-600 hover:underline" target="_blank" rel="noopener">Planning for Extreme AI Risks</a> – Intervention scoring</div>
+    <div><a href="https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025" className="text-sky-600 hover:underline" target="_blank" rel="noopener">Int'l AI Safety Report 2025</a> – Expert consensus</div>
+  </div>
+</details>
+
+<TransitionModelTable client:load />

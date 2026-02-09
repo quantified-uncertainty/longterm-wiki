@@ -1,0 +1,484 @@
+---
+title: Trust Erosion Dynamics Model
+description: This model analyzes how AI systems erode institutional trust through deepfakes, disinformation, and authentication collapse. It finds trust erodes 3-10x faster than it builds, with only 46% of people globally willing to trust AI systems and US institutional trust at 18-30%, approaching critical governance failure thresholds.
+sidebar:
+  order: 34
+quality: 59
+lastEdited: "2026-01-28"
+ratings:
+  focus: 8.5
+  novelty: 4
+  rigor: 6.5
+  completeness: 7
+  concreteness: 6
+  actionability: 4.5
+importance: 56.5
+llmSummary: Analyzes how AI systems erode institutional trust through deepfakes, disinformation, and authentication collapse, finding trust erodes 3-10x faster than it builds, with US institutional trust at 18-30% approaching critical governance failure thresholds below 20%. Finds 46% global AI trust rate, 245% YoY deepfake misinformation growth, and 61% high-grievance population globally, with estimated 5-10 years to critical media trust threshold.
+pageTemplate: knowledge-base-model
+metrics:
+  wordCount: 1957
+  citations: 21
+  tables: 17
+  diagrams: 1
+clusters:
+  - ai-safety
+  - epistemics
+subcategory: societal-models
+---
+import { DataInfoBox, Backlinks , EntityLink, Mermaid} from '@components/wiki';
+
+<DataInfoBox entityId="trust-erosion-dynamics" ratings={frontmatter.ratings} />
+
+## Overview
+
+This model examines how AI systems contribute to the erosion of trust in institutions, experts, and interpersonal relationships. The [2025 KPMG/University of Melbourne global study](https://kpmg.com/xx/en/our-insights/ai-and-technology/trust-attitudes-and-use-of-ai.html) found that while 66% of people use AI regularly, only 46% globally are willing to trust AI systems—and trust levels have declined as adoption has increased. Meanwhile, the [2025 Edelman Trust Barometer](https://www.edelman.com/trust/2025/trust-barometer) documented that multi-decade institutional trust erosion has accelerated into what researchers call a "grievance" phenomenon, with 61% of respondents globally reporting moderate to high grievance levels.
+
+The central question this model addresses: **How do AI systems erode trust, and why is trust so difficult to rebuild once lost?** The answer lies in a fundamental asymmetry: trust erodes 3-10x faster than it builds, and AI technologies dramatically accelerate erosion mechanisms while offering few pathways to restoration.
+
+## Trust Erosion Framework
+
+The following diagram illustrates how AI-driven erosion mechanisms cascade through different trust domains, ultimately producing self-reinforcing distrust cycles.
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Mechanisms["AI Erosion Mechanisms"]
+        DF[Deepfakes & Synthetic Media]
+        DI[AI-Enabled Disinformation]
+        SU[Surveillance & Monitoring]
+        ED[Expert Displacement]
+        AC[Authentication Collapse]
+    end
+
+    subgraph TrustDomains["Trust Domains"]
+        IT[Institutional Trust]
+        ET[Expert Trust]
+        INF[Information Trust]
+        IP[Interpersonal Trust]
+        TT[Technology Trust]
+    end
+
+    subgraph Outcomes["Cascade Effects"]
+        GF[Governance Failure]
+        EF[Epistemic Fragmentation]
+        SA[Social Atomization]
+        SRD[Self-Reinforcing Distrust]
+    end
+
+    DF --> INF
+    DF --> IT
+    DI --> INF
+    DI --> IT
+    SU --> IT
+    SU --> IP
+    ED --> ET
+    ED --> TT
+    AC --> IP
+    AC --> INF
+
+    IT --> GF
+    INF --> EF
+    IP --> SA
+    ET --> GF
+
+    GF --> SRD
+    EF --> SRD
+    SA --> SRD
+
+    SRD -.->|Feedback Loop| IT
+    SRD -.->|Feedback Loop| IP
+`} client:load />
+
+### Types of Trust Affected
+
+**1. Institutional Trust**
+- Trust in government, media, science, corporations
+- Eroded by: AI-enabled manipulation, deepfakes, surveillance
+- Consequences: Governance breakdown, policy resistance
+
+**2. Expert Trust**
+- Trust in professionals, specialists, authorities
+- Eroded by: AI competing with experts, AI errors attributed to experts
+- Consequences: Ignoring expert advice, dangerous self-reliance
+
+**3. Information Trust**
+- Trust in media, facts, shared reality
+- Eroded by: Deepfakes, AI-generated misinformation, authentication failures
+- Consequences: Epistemic fragmentation, inability to coordinate
+
+**4. Interpersonal Trust**
+- Trust in other individuals, social relationships
+- Eroded by: AI impersonation, synthetic relationships, surveillance
+- Consequences: Social atomization, reduced cooperation
+
+**5. Technology Trust**
+- Trust in AI and technology systems themselves
+- Eroded by: AI failures, unexpected behaviors, opacity
+- Consequences: Resistance to beneficial AI, or paradoxically, excessive trust
+
+## Erosion Mechanisms
+
+### 1. Deepfake Reality Distortion
+
+**Mechanism:** AI-generated synthetic media makes it impossible to trust visual/audio evidence. Globally, deepfake-related misinformation rose by 245% year-over-year in 2024, with spikes in countries holding major elections.
+
+**Process:**
+- Deepfakes become increasingly convincing—research confirms humans cannot consistently identify AI-generated voices
+- Authentic content becomes indistinguishable from fake
+- All evidence becomes suspect (the "liar's dividend" allows dismissal of authentic recordings as probable fakes)
+- Visual evidence loses probative value in legal and journalistic contexts
+
+**Trust Impact:**
+- Media trust: Severe erosion—[Deloitte's 2024 study](https://www.deloitte.com/us/en/insights/industry/technology/technology-media-and-telecom-predictions/2025/gen-ai-trust-standards.html) found 50% of respondents more skeptical of online information than a year ago
+- Legal evidence trust: Significant erosion
+- Interpersonal trust: Growing concern—68% of those familiar with generative AI report concern about deceptive synthetic content
+
+**Current Status:** Early-to-mid stage; detection still possible but rapidly declining. While 57% of people believe they could spot a deepfake, research suggests this confidence is misplaced for high-quality synthetic media.
+
+**Timeline:**
+- 2020-2023: Detectable deepfakes, limited impact
+- 2024-2026: Near-undetectable deepfakes, significant impact; fraud losses projected to grow from \$12.3B (2023) to \$40B (2027)
+- 2027+: Post-authenticity era (assuming no breakthrough in verification)
+
+### 2. AI-Enabled Disinformation
+
+**Mechanism:** AI dramatically scales and personalizes disinformation campaigns.
+
+**Process:**
+- AI generates vast quantities of convincing misinformation
+- Personalization makes disinformation more persuasive
+- Detection cannot keep pace with generation
+- Information environment becomes unreliable
+
+**Trust Impact:**
+- Media trust: Severe erosion
+- Platform trust: Moderate erosion
+- Peer information trust: Moderate erosion
+
+**Current Status:** Active and accelerating
+
+### 3. Surveillance Chilling Effects
+
+**Mechanism:** Awareness of AI surveillance erodes trust in private communication and institutions.
+
+**Process:**
+- AI enables pervasive surveillance (facial recognition, communications monitoring)
+- People assume they are being watched
+- Self-censorship and guardedness increase
+- Authentic interaction and trust formation impaired
+
+**Trust Impact:**
+- Government trust: Severe erosion (in surveillance states)
+- Institutional trust: Moderate erosion
+- Interpersonal trust: Moderate erosion
+
+**Current Status:** Severe in authoritarian contexts, emerging in democracies
+
+### 4. Expert Displacement
+
+**Mechanism:** AI competing with and sometimes outperforming human experts undermines expert trust.
+
+**Process:**
+- AI provides faster, sometimes better answers than experts
+- But AI also makes confident errors
+- Unclear when to trust AI vs. human expert
+- Both AI and human expert trust become uncertain
+
+**Trust Impact:**
+- Expert trust: Moderate erosion
+- Professional institution trust: Moderate erosion
+
+**Current Status:** Emerging, accelerating with LLM adoption
+
+### 5. Authentication Collapse
+
+**Mechanism:** AI impersonation undermines ability to verify identity and authenticity.
+
+**Process:**
+- AI can impersonate voices, faces, writing styles
+- Traditional authentication methods fail
+- Impossible to verify identity of remote communications
+- Fundamental interpersonal trust undermined
+
+**Trust Impact:**
+- Interpersonal trust: Potentially severe erosion
+- Transaction trust: Moderate erosion
+- Legal identity trust: Growing concern
+
+**Current Status:** Early stage but accelerating
+
+## Model Parameters
+
+The following table quantifies key parameters in the trust erosion model, drawing on recent survey data and research.
+
+| Parameter | Best Estimate | Range | Confidence | Source |
+|-----------|--------------|-------|------------|--------|
+| Global AI trust rate | 46% | 32-72% | High | [KPMG/Melbourne 2025](https://kpmg.com/xx/en/our-insights/ai-and-technology/trust-attitudes-and-use-of-ai.html) |
+| US AI trust rate | 32% | 25-40% | High | [Edelman 2025](https://www.edelman.com/trust/2025/trust-barometer) |
+| Trust erosion/building asymmetry | 5x | 3-10x | Medium | [Trust asymmetry research](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2023.1207453/full) |
+| Deepfake misinformation growth (YoY) | 245% | 150-350% | Medium | [Deloitte 2024](https://www.deloitte.com/us/en/insights/industry/technology/technology-media-and-telecom-predictions/2025/gen-ai-trust-standards.html) |
+| Public concern about AI (US) | 50% | 45-55% | High | [Pew Research 2025](https://www.pewresearch.org/internet/2025/04/03/how-the-us-public-and-ai-experts-view-artificial-intelligence/) |
+| High grievance population (global) | 61% | 55-67% | High | [Edelman 2025](https://www.edelman.com/trust/2025/trust-barometer) |
+| AI contribution to trust decline | 15-25% | 5-40% | Low | Model estimate |
+| Detection accuracy for deepfakes | Below 60% | 40-65% | Medium | [iProov 2024](https://www.iproov.com/blog/deepfakes-statistics-solutions-biometric-protection) |
+
+## Trust Dynamics Model
+
+### Building vs. Eroding Trust
+
+**Trust Building:**
+- Slow, cumulative process
+- Requires repeated positive interactions
+- Depends on vulnerability and follow-through
+- Takes years to build strong trust
+
+**Trust Erosion:**
+- Can be rapid (single betrayal)
+- Negative events weighted more than positive
+- Cascades through networks (distrust spreads)
+- Generalized from specific failures
+
+**Asymmetry:** Trust erodes faster than it builds. Research on [trust asymmetry](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2023.1207453/full) confirms the adage that "trust goes on horseback and goes back on foot"—negative information has a greater impact on trust levels than equivalent positive information. Estimated 3-10x asymmetry in speed, with the ratio higher for institutional trust than interpersonal trust.
+
+### The Trust Cascade
+
+```
+Single Trust Failure
+  ↓ (Generalization)
+Category Trust Erosion (e.g., distrust one news source → distrust all news)
+  ↓ (Expansion)
+Institutional Trust Erosion (distrust media → distrust government)
+  ↓ (Network Effects)
+Social Trust Erosion (nobody can be trusted)
+  ↓ (Feedback)
+Self-reinforcing distrust (distrust causes behaviors that confirm distrust)
+```
+
+### Quantitative Framework
+
+Trust level $T$ decays over time with negative events according to the following dynamics:
+
+$$T(t) = T_0 \cdot e^{-\lambda n(t)} \cdot (1 - \gamma C)$$
+
+Where:
+- $T_0$ = Initial trust level (0 to 1)
+- $\lambda$ = Erosion rate per negative event (0.1-0.5 for institutional trust)
+- $n(t)$ = Cumulative negative events experienced
+- $\gamma$ = Cascade multiplier (0.2-0.8)
+- $C$ = Cross-domain contamination factor (0 to 1)
+
+The key insight is that erosion is multiplicative while rebuilding is additive. A single high-profile trust violation (deepfake-enabled fraud, institutional deception revealed) can reduce trust by 20-40%, while rebuilding requires hundreds of positive interactions over years.
+
+## Trust Threshold Analysis
+
+### Critical Trust Thresholds
+
+| Trust Type | Warning Level | Critical Level | Consequences at Critical |
+|------------|---------------|----------------|-------------------------|
+| Institutional | Below 40% | Below 20% | Governance failure |
+| Expert | Below 50% | Below 30% | Public health/safety crises |
+| Information | Below 40% | Below 25% | Epistemic fragmentation |
+| Interpersonal | Below 60% | Below 40% | Social breakdown |
+| Technology | Below 30% or above 80% | Extremes | Either rejection or dangerous over-reliance |
+
+### Current Trust Levels (US Estimates)
+
+| Trust Type | 2010 Level | 2020 Level | 2025 Level | Trend |
+|------------|------------|------------|------------|-------|
+| Government trust | 22% | 20% | 18% | Declining |
+| Media trust | 32% | 29% | 24% | Declining |
+| Science trust | 70% | 65% | 58% | Declining |
+| Tech company trust | 45% | 35% | 30% | Declining |
+| AI trust (US) | N/A | N/A | 32% | Baseline |
+| Interpersonal trust | 48% | 42% | 38% | Declining |
+
+**Note:** Estimates based on [Edelman 2025](https://www.edelman.com/trust/2025/trust-barometer), [Pew Research 2025](https://www.pewresearch.org/internet/2025/04/03/how-the-us-public-and-ai-experts-view-artificial-intelligence/), and Gallup surveys. Five of the 10 largest global economies (Japan, Germany, UK, US, France) are among the least trusting nations. In contrast, China reports 72% AI trust.
+
+### Approach to Critical Thresholds
+
+| Trust Type | Distance to Critical | Estimated Time (current trend) |
+|------------|---------------------|-------------------------------|
+| Government | Near critical | Already at risk |
+| Media | Near critical | 3-7 years |
+| Science | Moderate buffer | 10-20 years |
+| Tech companies | Moderate | 5-10 years |
+| Interpersonal | Some buffer | 10-15 years |
+
+## Scenario Analysis
+
+The trajectory of trust erosion depends on technological developments, regulatory responses, and institutional adaptation. The following scenarios represent plausible futures over the next decade.
+
+| Scenario | Probability | Trust Outcome | Key Drivers | Implications |
+|----------|-------------|---------------|-------------|--------------|
+| **Managed Authentication** | 20% | Stabilization at 35-45% institutional trust | Successful content provenance standards, cryptographic verification widely adopted | Epistemic commons preserved but fragmented; trust rebuilding possible over 20-30 years |
+| **Accelerated Erosion** | 35% | Decline to 15-25% institutional trust | Deepfake detection fails, no regulatory coordination, synthetic content indistinguishable | Post-truth environment; governance based on identity rather than evidence; high polarization |
+| **Two-Tier Trust** | 30% | Elite trust at 50-60%, mass trust at 20-30% | Verification tools available but expensive/complex; digital literacy gap widens | Functional elite discourse; mass populations susceptible to manipulation; increased inequality |
+| **Trust Collapse Crisis** | 15% | Rapid decline below 15% after major incident | High-profile deepfake causes international crisis or mass casualty event; authentication systems compromised | Emergency governance measures; potential for authoritarian responses; social cohesion breakdown |
+
+The most likely trajectory (55% combined probability) involves continued trust erosion with varying degrees of mitigation, reaching critical thresholds for government and media trust within 5-10 years. The [Urban Institute's 2024 analysis](https://www.urban.org/sites/default/files/2024-04/Understanding_the_Crisis_in_Institutional_Trust.pdf) notes that trust erosion is "intertwined with broader issues of polarization, gridlock, and social malaise," suggesting that AI-specific interventions alone cannot reverse the trend.
+
+## Trust Rebuilding Challenges
+
+### Why Trust is Hard to Rebuild
+
+**1. Betrayal Trauma**
+- Trust violations are remembered longer than trust-building
+- Emotional weight of betrayal persists
+- Risk aversion increases after violation
+
+**2. Changed Baseline**
+- Once trust is lost, default becomes distrust
+- Burden of proof shifts to trustee
+- Every interaction scrutinized
+
+**3. Confirmation Bias**
+- Distrust looks for evidence of untrustworthiness
+- Positive evidence discounted
+- Negative evidence amplified
+
+**4. Collective Action Problem**
+- Individual trustworthiness insufficient
+- Need systemic change to rebuild institutional trust
+- Coordination difficult when trust is low
+
+**5. Generational Effects**
+- Those who experienced trust violation never fully trust
+- Younger generations may have higher baseline distrust
+- Cultural transmission of distrust
+
+### Rebuilding Requirements
+
+| Factor | Importance | Difficulty |
+|--------|------------|------------|
+| Acknowledged wrongdoing | Essential | Medium |
+| Structural change | Very High | Very High |
+| Consistent behavior over time | Essential | High |
+| Transparency | High | Medium |
+| Accountability | High | High |
+| Time | Essential | Inherent |
+
+**Estimated Rebuilding Time:**
+- Minor trust violation: Months to years
+- Moderate violation: Years to decades
+- Severe systemic violation: Generations
+- Some violations: May be permanent within living memory
+
+## Intervention Strategies
+
+### Preventing Erosion
+
+**1. Authenticity Infrastructure**
+- Develop robust content provenance systems
+- Create identity verification mechanisms
+- Invest in deepfake detection and watermarking
+- Challenge: Technical arms race, adoption barriers
+
+**2. Transparency and Accountability**
+- Require disclosure of AI use and capabilities
+- Implement algorithmic accountability
+- Create meaningful oversight mechanisms
+- Challenge: Conflicts with business interests
+
+**3. Media Literacy and Epistemic Resilience**
+- Education on information evaluation
+- Critical thinking training
+- Healthy skepticism without cynicism
+- Challenge: Scale, reaching vulnerable populations
+
+### Slowing Erosion
+
+**4. Platform Responsibility**
+- Hold platforms accountable for amplifying distrust
+- Require moderation of trust-eroding content
+- Incentivize trust-building features
+- Challenge: Free speech concerns, business models
+
+**5. Institutional Reform**
+- Address legitimate grievances driving distrust
+- Increase transparency and responsiveness
+- Demonstrate trustworthiness through action
+- Challenge: Institutional resistance to change
+
+### Rebuilding Trust
+
+**6. Long-term Commitment**
+- Accept that rebuilding takes years/decades
+- Consistent trustworthy behavior over time
+- No shortcuts to restored trust
+- Challenge: Political/business cycles shorter than needed
+
+**7. New Trust Mechanisms**
+- Decentralized verification systems
+- Reputation mechanisms
+- Community-based trust networks
+- Challenge: May not scale, vulnerable to gaming
+
+## Model Limitations
+
+**1. Cultural Variation**
+- Trust dynamics vary across cultures
+- Baseline trust levels differ
+- Model calibrated primarily on Western/US context
+
+**2. Measurement Challenges**
+- Trust difficult to measure precisely
+- Survey responses may not reflect behavior
+- Different definitions across studies
+
+**3. Causation Complexity**
+- AI is one factor among many eroding trust
+- Isolating AI-specific effects difficult
+- Political, economic factors also significant
+
+**4. Prediction Uncertainty**
+- Trust behavior in novel situations hard to predict
+- Tipping points may exist but are hard to identify
+- Future AI capabilities uncertain
+
+**5. Rebuilding Understudied**
+- Less research on rebuilding than erosion
+- Historical analogies may not apply
+- AI-specific rebuilding strategies unknown
+
+## Uncertainty Ranges
+
+| Parameter | Best Estimate | Range | Confidence |
+|-----------|--------------|-------|------------|
+| Erosion/building rate asymmetry | 5x | 3-10x | Medium |
+| Current US institutional trust | 20-30% | 15-40% | Medium |
+| Years to media trust critical threshold | 5-10 | 3-20 | Low |
+| Trust rebuilding time after major violation | 10-20 years | 5-50 years | Low |
+| AI contribution to recent trust decline | 10-25% | 5-40% | Very Low |
+
+## Key Insights
+
+1. **Asymmetry is fundamental** - Trust erodes faster than it builds, making prevention crucial
+
+2. **Cascades are dangerous** - Trust erosion in one domain spreads to others
+
+3. **Thresholds matter** - Below certain levels, trust becomes self-reinforcing distrust
+
+4. **Rebuilding is generational** - Severe trust violations may only heal across generations
+
+5. **AI accelerates existing trends** - AI amplifies trust erosion mechanisms that existed before
+
+6. **Technical solutions insufficient** - Rebuilding trust requires social and institutional change, not just technical fixes
+
+## Related Models
+
+- <EntityLink id="trust-cascade-model" label="Trust Cascade Model" /> - Cascade dynamics in detail
+- <EntityLink id="epistemic-collapse-threshold" label="Epistemic Collapse Threshold" /> - Information trust failure
+- <EntityLink id="deepfakes-authentication-crisis" label="Deepfakes Authentication Crisis" /> - Visual evidence trust
+
+## Sources
+
+- [KPMG/University of Melbourne: Trust, Attitudes and Use of AI: A Global Study 2025](https://kpmg.com/xx/en/our-insights/ai-and-technology/trust-attitudes-and-use-of-ai.html) - Survey of 48,000+ people across 47 countries on AI trust and adoption
+- [2025 Edelman Trust Barometer](https://www.edelman.com/trust/2025/trust-barometer) - 25th annual survey of 33,000+ respondents on institutional trust
+- [Pew Research Center: How the US Public and AI Experts View Artificial Intelligence (2025)](https://www.pewresearch.org/internet/2025/04/03/how-the-us-public-and-ai-experts-view-artificial-intelligence/) - Comparative analysis of public vs expert AI attitudes
+- [Urban Institute: Understanding the Crisis in Institutional Trust (2024)](https://www.urban.org/sites/default/files/2024-04/Understanding_the_Crisis_in_Institutional_Trust.pdf) - Academic analysis of trust erosion dynamics
+- [Frontiers in Psychology: Trust Asymmetry Research (2023)](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2023.1207453/full) - Research on asymmetric impacts of negative vs positive events on trust
+- [Deloitte: Deepfake Disruption Report (2025)](https://www.deloitte.com/us/en/insights/industry/technology/technology-media-and-telecom-predictions/2025/gen-ai-trust-standards.html) - Projections on AI fraud losses and deepfake proliferation
+- [UNESCO: Deepfakes and the Crisis of Knowing](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing) - Analysis of synthetic media's impact on shared reality
+
+## Related Pages
+
+<Backlinks client:load entityId="trust-erosion-dynamics" />

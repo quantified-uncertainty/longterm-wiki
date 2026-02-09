@@ -1,0 +1,219 @@
+---
+title: MIT AI Risk Repository
+description: "A comprehensive living database of 1,700+ AI risks extracted from 65+ published frameworks, organized using two taxonomies: a Causal Taxonomy (who/intent/timing) and a Domain Taxonomy (7 domains, 24 subdomains). Created by MIT FutureTech researchers, the repository provides a shared framework for industry, policymakers, and academics to monitor and manage AI risks."
+sidebar:
+  order: 7
+quality: 40
+llmSummary: The MIT AI Risk Repository catalogs 1,700+ AI risks from 65+ frameworks into a searchable database with dual taxonomies (causal and domain-based). Updated quarterly since August 2024, it provides the first comprehensive public catalog of AI risks but is limited by framework extraction methodology and lacks quantitative risk assessments.
+lastEdited: "2026-02-02"
+importance: 60
+ratings:
+  novelty: 6
+  rigor: 7
+  actionability: 5
+  completeness: 7
+metrics:
+  wordCount: 900
+  citations: 0
+  tables: 10
+  diagrams: 0
+clusters:
+  - epistemics
+  - ai-safety
+  - governance
+subcategory: epistemic-tools-tools
+---
+import {DataInfoBox, Backlinks, EntityLink} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Coverage** | Comprehensive | 1,700+ risks from 65+ frameworks |
+| **Data Freshness** | Quarterly updates | Regular additions since August 2024 |
+| **Accessibility** | High | Free access via Google Sheets/OneDrive |
+| **Methodology** | Rigorous | Systematic review, expert consultation |
+| **Target Audience** | Broad | Industry, policymakers, academics, auditors |
+| **Maintenance** | Active | MIT FutureTech team |
+
+## Project Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Name** | MIT AI Risk Repository |
+| **Organization** | MIT FutureTech / MIT AI Risk Initiative |
+| **Lead Researcher** | Peter Slattery |
+| **Team** | Alexander Saeri, Michael Noetel, Jess Graham, Neil Thompson |
+| **Website** | [airisk.mit.edu](https://airisk.mit.edu/) |
+| **Paper** | [arXiv:2408.12622](https://arxiv.org/abs/2408.12622) |
+| **License** | CC BY 4.0 |
+| **Data Access** | Google Sheets, OneDrive |
+
+## Overview
+
+The [MIT AI Risk Repository](https://airisk.mit.edu/) is a living database cataloging over 1,700 AI risks extracted from 65+ published frameworks and taxonomies. It represents the first comprehensive attempt to curate, analyze, and organize AI risk frameworks into a publicly accessible, categorized database.
+
+The repository serves multiple stakeholders:
+- **Industry**: Identifying risks for product development and compliance
+- **Policymakers**: Understanding the risk landscape for regulation
+- **Academics**: Research foundation and gap analysis
+- **Risk Evaluators**: Structured framework for auditing AI systems
+
+### The Problem It Solves
+
+Before the repository, AI risk knowledge was fragmented across dozens of separate frameworks, each with different terminology, scope, and categorization schemes. This fragmentation made it difficult to:
+
+- Compare risks across frameworks
+- Identify gaps in coverage
+- Develop comprehensive risk management strategies
+- Coordinate across organizations and jurisdictions
+
+The repository provides a unified view, extracting risks from existing frameworks and organizing them using consistent taxonomies.
+
+## Dual Taxonomy Structure
+
+The repository uses two complementary classification systems:
+
+### Causal Taxonomy
+
+Classifies risks by **how, when, and why they occur**:
+
+| Dimension | Categories | Examples |
+|-----------|------------|----------|
+| **Entity** | Human, AI | Who causes the risk |
+| **Intentionality** | Intentional, Unintentional | Malicious vs. accidental |
+| **Timing** | Pre-deployment, Post-deployment | When risk manifests |
+
+This enables filtering by causal pathway—e.g., "show me all unintentional AI-caused post-deployment risks."
+
+### Domain Taxonomy
+
+Organizes risks into **7 domains and 24 subdomains**:
+
+| Domain | Subdomains | Examples |
+|--------|------------|----------|
+| **Discrimination & Toxicity** | Bias, unfairness, harmful content | Algorithmic discrimination |
+| **Privacy & Security** | Data breaches, surveillance | Model inversion attacks |
+| **Misinformation** | <EntityLink id="deepfakes">Deepfakes</EntityLink>, manipulation | AI-generated <EntityLink id="disinformation">disinformation</EntityLink> |
+| **Malicious Actors & Misuse** | Cyberattacks, weapons | <EntityLink id="autonomous-weapons">Autonomous weapons</EntityLink> |
+| **Human-Computer Interaction** | Overreliance, manipulation | <EntityLink id="automation-bias">Automation bias</EntityLink> |
+| **Socioeconomic & Environmental** | Job displacement, energy use | Labor market disruption |
+| **AI System Safety** | Failures, alignment issues | <EntityLink id="goal-misgeneralization">Goal misgeneralization</EntityLink> |
+
+The April 2025 update added a new subdomain: **multi-agent risks**.
+
+## Database Evolution
+
+| Version | Date | Frameworks | Risks | Key Additions |
+|---------|------|------------|-------|---------------|
+| **v1** | August 2024 | 43 | ≈770 | Initial release |
+| **v2** | December 2024 | 56 | ≈1,070 | +13 frameworks, +300 risks |
+| **v3** | April 2025 | 65+ | 1,612 | +22 frameworks, multi-agent subdomain |
+| **Current** | December 2025 | 74+ | 1,700+ | Ongoing additions |
+
+## Methodology
+
+### Framework Identification
+
+Researchers used multiple methods to identify source frameworks:
+
+1. **Systematic search strategy**: Academic databases, grey literature
+2. **Forward/backward searching**: References within identified frameworks
+3. **Expert consultation**: Input from AI safety researchers
+
+### Risk Extraction
+
+For each framework:
+1. Extract individual risk categories
+2. Normalize terminology to consistent vocabulary
+3. Classify using both taxonomies
+4. Link to source material
+
+### Quality Assurance
+
+- **Best fit framework synthesis**: Iterative refinement of taxonomies
+- **Expert review**: Validation by AI safety researchers
+- **Regular updates**: Quarterly incorporation of new frameworks
+
+## Use Cases
+
+### Risk Management
+
+Organizations use the repository to:
+
+| Use Case | Application |
+|----------|-------------|
+| **Gap Analysis** | Identify risks not covered by current policies |
+| **Compliance Mapping** | Match internal categories to regulatory frameworks |
+| **Audit Checklists** | Structured approach to AI system review |
+| **Training Materials** | Comprehensive risk awareness resources |
+
+### Research
+
+Academics leverage the database for:
+
+- **Systematic reviews**: Foundation for literature analysis
+- **Taxonomy development**: Building on established categorization
+- **Comparative analysis**: Understanding how frameworks differ
+- **Trend identification**: Tracking emerging risk categories
+
+### Policy Development
+
+Policymakers reference the repository for:
+
+- **Regulatory scope**: Understanding what risks exist to regulate
+- **<EntityLink id="international-coordination">International coordination</EntityLink>**: Common vocabulary across jurisdictions
+- **Framework comparison**: Evaluating existing approaches
+
+## Related Work: Risk Mitigations
+
+In December 2025, the MIT team extended the repository with a **Risk Mitigations** database, mapping interventions to the risks they address. This enables:
+
+- Identifying which risks lack adequate mitigations
+- Comparing mitigation strategies across domains
+- Prioritizing intervention research
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Comprehensive coverage** | 1,700+ risks from 65+ frameworks |
+| **Rigorous methodology** | Systematic review, expert validation |
+| **Dual taxonomy** | Enables multiple analysis perspectives |
+| **Regular updates** | Quarterly additions of new frameworks |
+| **Open access** | CC BY 4.0 license, free database access |
+| **Institutional backing** | MIT credibility and resources |
+
+### Limitations
+
+| Limitation | Impact |
+|------------|--------|
+| **Framework-dependent** | Only captures risks identified in published sources |
+| **No quantification** | Doesn't assess likelihood or severity |
+| **Extraction methodology** | Interpretation decisions affect categorization |
+| **English-language focus** | May miss non-English frameworks |
+| **Static snapshots** | Individual risks don't track evolution over time |
+| **Aggregation challenges** | Similar risks may appear duplicated across frameworks |
+
+## Comparison with Other Resources
+
+| Resource | Focus | Coverage | Updates |
+|----------|-------|----------|---------|
+| **MIT AI Risk Repository** | Comprehensive catalog | 1,700+ risks | Quarterly |
+| **NIST AI RMF** | Risk management process | Process-focused | Periodic |
+| **<EntityLink id="eu-ai-act">EU AI Act</EntityLink> Categories** | Regulatory compliance | Regulatory risks | Legislative cycle |
+| **<EntityLink id="stampy-aisafety-info">AISafety.info</EntityLink>** | <EntityLink id="public-education">Public education</EntityLink> | Conceptual | Community-driven |
+| **This Wiki (Longterm)** | Prioritization analysis | X-risk focused | Ongoing |
+
+## External Links
+
+- [MIT AI Risk Repository](https://airisk.mit.edu/)
+- [arXiv Paper](https://arxiv.org/abs/2408.12622)
+- [MIT Sloan Coverage](https://mitsloan.mit.edu/ideas-made-to-matter/new-database-details-ai-risks)
+- [MIT IDE Announcement](https://ide.mit.edu/insights/mit-researchers-create-an-open-ai-risk-repository/)
+- [VentureBeat Coverage](https://venturebeat.com/ai/mit-releases-comprehensive-database-of-ai-risks)
+- [Risk Mitigations Blog Post](https://airisk.mit.edu/blog/mapping-ai-risk-mitigations)
+
+<Backlinks />

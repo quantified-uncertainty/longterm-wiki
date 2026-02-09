@@ -1,0 +1,277 @@
+---
+title: "Enhancement Queue"
+description: "Track content enhancement progress across models, risks, and responses"
+sidebar:
+  order: 5
+lastEdited: "2025-12-27"
+importance: 0
+quality: 0
+llmSummary: "Internal project management page tracking editorial work across ~100 wiki pages, organizing them by completion status and content type. Provides checklists for applying style guide requirements."
+ratings:
+  novelty: 0
+  rigor: 0
+  actionability: 0
+  completeness: 0
+metrics:
+  wordCount: 245
+  citations: 0
+  tables: 22
+  diagrams: 0
+---
+import {EntityLink} from '@components/wiki';
+import { Tabs, TabItem, Badge } from '@astrojs/starlight/components';
+
+This page tracks which pages need enhancement to match their respective style guides. Use this to prioritize work and avoid duplicate effort.
+
+---
+
+## Quick Stats
+
+| Content Type | Pending | In Progress | Complete | Style Guide |
+|--------------|---------|-------------|----------|-------------|
+| Models | ≈26 | 0 | 29 | [Model Style Guide](/internal/models/) |
+| Risks | ≈34 | 0 | 0 | [KB Style Guide](/internal/knowledge-base/) |
+| Responses | ≈40 | 0 | 1 | [KB Style Guide](/internal/knowledge-base/) |
+
+---
+
+## Enhancement Queues
+
+<Tabs>
+<TabItem label="Risks" icon="warning">
+
+### High Priority (quality &lt; 3)
+
+| Page | Quality | Status | Notes |
+|------|---------|--------|-------|
+| <EntityLink id="mesa-optimization">mesa-optimization</EntityLink> | 2 | Pending | Needs significant work |
+
+### Accident Risks
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="corrigibility-failure">corrigibility-failure</EntityLink> | Pending |
+| <EntityLink id="distributional-shift">distributional-shift</EntityLink> | Pending |
+| <EntityLink id="emergent-capabilities">emergent-capabilities</EntityLink> | Pending |
+| <EntityLink id="goal-misgeneralization">goal-misgeneralization</EntityLink> | Pending |
+| <EntityLink id="instrumental-convergence">instrumental-convergence</EntityLink> | Pending |
+| <EntityLink id="power-seeking">power-seeking</EntityLink> | Pending |
+| <EntityLink id="reward-hacking">reward-hacking</EntityLink> | Pending |
+| <EntityLink id="sandbagging">sandbagging</EntityLink> | Pending |
+| <EntityLink id="scheming">scheming</EntityLink> | Pending |
+| <EntityLink id="sharp-left-turn">sharp-left-turn</EntityLink> | Pending |
+| <EntityLink id="sycophancy">sycophancy</EntityLink> | Pending |
+| <EntityLink id="treacherous-turn">treacherous-turn</EntityLink> | Pending |
+
+### Misuse Risks
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="autonomous-weapons">autonomous-weapons</EntityLink> | Pending |
+| <EntityLink id="deepfakes">deepfakes</EntityLink> | Pending |
+| <EntityLink id="disinformation">disinformation</EntityLink> | Pending |
+| <EntityLink id="fraud">fraud</EntityLink> | Pending |
+| <EntityLink id="surveillance">surveillance</EntityLink> | Pending |
+
+### Structural Risks
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="concentration-of-power">concentration-of-power</EntityLink> | Pending |
+| <EntityLink id="enfeeblement">enfeeblement</EntityLink> | Pending |
+| <EntityLink id="erosion-of-agency">erosion-of-agency</EntityLink> | Pending |
+| <EntityLink id="lock-in">lock-in</EntityLink> | Pending |
+
+### Epistemic Risks
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="epistemic-collapse">epistemic-collapse</EntityLink> | Pending |
+| <EntityLink id="institutional-capture">institutional-capture</EntityLink> | Pending |
+| <EntityLink id="knowledge-monopoly">knowledge-monopoly</EntityLink> | Pending |
+| <EntityLink id="learned-helplessness">learned-helplessness</EntityLink> | Pending |
+| <EntityLink id="reality-fragmentation">reality-fragmentation</EntityLink> | Pending |
+| <EntityLink id="trust-cascade">trust-cascade</EntityLink> | Pending |
+
+### Already High Quality (quality 4+)
+
+These are lower priority but could still benefit from kb-2.0 alignment:
+
+| Page | Quality | Status |
+|------|---------|--------|
+| <EntityLink id="authoritarian-takeover">authoritarian-takeover</EntityLink> | 4 | Pending |
+| <EntityLink id="bioweapons">bioweapons</EntityLink> | 4 | Pending |
+| <EntityLink id="cyber-psychosis">cyber-psychosis</EntityLink> | 4 | Pending |
+| <EntityLink id="cyberweapons">cyberweapons</EntityLink> | 4 | Pending |
+| <EntityLink id="deceptive-alignment">deceptive-alignment</EntityLink> | 4 | Pending |
+| <EntityLink id="legal-evidence-crisis">legal-evidence-crisis</EntityLink> | 4 | Pending |
+
+</TabItem>
+
+<TabItem label="Responses" icon="rocket">
+
+### Technical
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="ai-control">ai-control</EntityLink> | Pending |
+| <EntityLink id="anthropic-core-views">anthropic-core-views</EntityLink> | Pending |
+| <EntityLink id="interpretability">interpretability</EntityLink> | Pending |
+| <EntityLink id="research-agendas">research-agendas</EntityLink> | Pending |
+| <EntityLink id="scalable-oversight">scalable-oversight</EntityLink> | Pending |
+| <EntityLink id="technical-research">technical-research</EntityLink> | Pending |
+
+### Governance - Legislation
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="california-sb1047">california-sb1047</EntityLink> | Pending |
+| <EntityLink id="canada-aida">canada-aida</EntityLink> | Pending |
+| <EntityLink id="china-ai-regulations">china-ai-regulations</EntityLink> | Pending |
+| <EntityLink id="colorado-ai-act">colorado-ai-act</EntityLink> | Pending |
+| <EntityLink id="eu-ai-act">eu-ai-act</EntityLink> | Pending |
+| <EntityLink id="failed-stalled-proposals">failed-stalled-proposals</EntityLink> | Pending |
+| <EntityLink id="nist-ai-rmf">nist-ai-rmf</EntityLink> | Pending |
+| <EntityLink id="us-executive-order">us-executive-order</EntityLink> | Pending |
+| <EntityLink id="us-state-legislation">us-state-legislation</EntityLink> | Pending |
+
+### Governance - Compute
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="export-controls">export-controls</EntityLink> | Pending |
+| <EntityLink id="international-regimes">international-regimes</EntityLink> | Pending |
+| <EntityLink id="monitoring">monitoring</EntityLink> | Pending |
+| <EntityLink id="thresholds">thresholds</EntityLink> | Pending |
+
+### Governance - Industry
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="responsible-scaling-policies">responsible-scaling-policies</EntityLink> | Pending |
+| <EntityLink id="voluntary-commitments">voluntary-commitments</EntityLink> | Pending |
+
+### Governance - International
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="international-summits">international-summits</EntityLink> | Pending |
+| <EntityLink id="seoul-declaration">seoul-declaration</EntityLink> | Pending |
+
+### Governance - General
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="effectiveness-assessment">effectiveness-assessment</EntityLink> | Pending |
+| <EntityLink id="governance-policy">governance-policy</EntityLink> | Pending |
+
+### Epistemic Tools
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="ai-forecasting">ai-forecasting</EntityLink> | Pending |
+| <EntityLink id="content-authentication">content-authentication</EntityLink> | Pending |
+| <EntityLink id="coordination-tech">coordination-tech</EntityLink> | Pending |
+| <EntityLink id="deliberation">deliberation</EntityLink> | Pending |
+| <EntityLink id="epistemic-infrastructure">epistemic-infrastructure</EntityLink> | Pending |
+| <EntityLink id="hybrid-systems">hybrid-systems</EntityLink> | Pending |
+| <EntityLink id="prediction-markets">prediction-markets</EntityLink> | Pending |
+
+### Field Building
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="corporate-influence">corporate-influence</EntityLink> | Pending |
+| <EntityLink id="field-building-analysis">field-building</EntityLink> | Pending |
+
+### Institutions
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="ai-safety-institutes">ai-safety-institutes</EntityLink> | **Complete** |
+| <EntityLink id="standards-bodies">standards-bodies</EntityLink> | Pending |
+
+### Other
+
+| Page | Status |
+|------|--------|
+| <EntityLink id="epistemic-security">epistemic-security</EntityLink> | Pending |
+| <EntityLink id="pause">pause</EntityLink> | Pending |
+
+</TabItem>
+
+<TabItem label="Models" icon="document">
+
+See the Model Enhancement TODO for the full list.
+
+### Summary
+
+- **29 complete** (already enhanced)
+- **~26 pending** enhancement
+
+### High Priority Pending
+
+| Page | Status |
+|------|--------|
+| capabilities-to-safety-pipeline | Pending |
+| compounding-risks-analysis | Pending |
+| consensus-manufacturing-dynamics | Pending |
+| cyber-psychosis-cascade | Pending |
+| cyberweapons-attack-automation | Pending |
+| disinformation-detection-race | Pending |
+| disinformation-electoral-impact | Pending |
+| economic-disruption | Pending |
+
+View full list →
+
+</TabItem>
+</Tabs>
+
+---
+
+## How to Use This
+
+### For Claude Code Sessions
+
+1. Pick 3-5 items marked "Pending" from one category
+2. Update their status to "In Progress" in this file
+3. Enhance the pages following the style guide
+4. Mark as "Complete" when done
+5. Commit changes
+
+### Enhancement Checklist
+
+**For All Pages ([Common Writing Principles](/internal/common-writing-principles/)):**
+- [ ] No insider jargon ("EA money", "non-EA causes") — use descriptive terms
+- [ ] Estimates use ranges, not point values; labeled "Est." or "Approx."
+- [ ] Analytical tone, not prescriptive ("this suggests..." not "we recommend...")
+- [ ] Counter-arguments included for key claims
+- [ ] `objectivity` rating in frontmatter
+
+**For Risk Pages (kb-2.0):**
+- [ ] 2-3 paragraph Overview
+- [ ] Risk Assessment table (Severity, Likelihood, Timeline)
+- [ ] Responses That Address This Risk table
+- [ ] Why This Matters section
+- [ ] Key Uncertainties section
+- [ ] Proper h2/h3 hierarchy
+- [ ] `styleGuideVersion: "kb-2.0"` in frontmatter
+
+**For Response Pages (kb-2.0):**
+- [ ] 2-3 paragraph Overview
+- [ ] Quick Assessment table
+- [ ] Risks Addressed table
+- [ ] How It Works section
+- [ ] Critical Assessment section
+- [ ] Getting Involved section
+- [ ] Proper h2/h3 hierarchy
+- [ ] `styleGuideVersion: "kb-2.0"` in frontmatter
+
+**For Model Pages:**
+- [ ] Overview with flowing prose
+- [ ] Mermaid diagram
+- [ ] Quantitative tables with estimates/ranges
+- [ ] Scenario analysis
+- [ ] Limitations section
+- [ ] "Why These Numbers Might Be Wrong" section (for CE estimates)
+- [ ] Ratings in frontmatter (including objectivity)

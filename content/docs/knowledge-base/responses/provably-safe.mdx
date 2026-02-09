@@ -1,0 +1,308 @@
+---
+title: Provably Safe AI (davidad agenda)
+description: An ambitious research agenda to design AI systems with mathematical safety guarantees from the ground up, led by ARIA's £59M Safeguarded AI programme with the goal of creating superintelligent systems that are provably beneficial through formal verification of world models and value specifications.
+sidebar:
+  order: 54
+quality: 65
+importance: 72.5
+lastEdited: "2025-01-28"
+llmSummary: Davidad's provably safe AI agenda aims to create AI systems with mathematical safety guarantees through formal verification of world models and values, primarily funded by ARIA's £59M Safeguarded AI programme. The approach faces extreme technical challenges (world modeling, value specification) with uncertain tractability but would provide very high effectiveness if successful, addressing misalignment, deception, and power-seeking through proof-based constraints.
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 5
+  rigor: 5.5
+  actionability: 4
+  completeness: 7
+metrics:
+  wordCount: 1200
+  citations: 8
+  tables: 36
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: alignment-theoretical
+---
+import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="provably-safe" client:load />
+
+## Overview
+
+Provably Safe AI represents one of the most ambitious research agendas in AI safety: designing advanced AI systems where safety is guaranteed by mathematical construction rather than verified through empirical testing. Led primarily by [David "davidad" Dalrymple](https://davidad.org/davidad_cv.pdf)---the youngest-ever MIT graduate degree recipient at age 16, former Filecoin co-inventor, and current Programme Director at [ARIA](https://www.aria.org.uk/programme-safeguarded-ai/)---this agenda seeks to create AI systems whose safety properties can be formally proven before deployment, potentially enabling safe development even of superintelligent systems.
+
+The foundational paper <R id="d8da577aed1e4384">Towards Guaranteed Safe AI</R>, published in May 2024 by Dalrymple, Joar Skalse, and co-authors including <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>, <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, <EntityLink id="max-tegmark">Max Tegmark</EntityLink>, and Sanjit Seshia, introduces the core framework of "guaranteed safe (GS) AI." The approach requires three components: a **world model** (mathematical description of how the AI affects the outside world), a **safety specification** (mathematical description of acceptable effects), and a **verifier** (auditable proof certificate that the AI satisfies the specification relative to the world model).
+
+The core insight motivating this work is that current AI safety approaches fundamentally rely on empirical testing and behavioral observation, which may be insufficient for systems capable of strategic deception or operating in novel circumstances. If we could instead construct AI systems where safety properties are mathematically guaranteed, we could have much stronger assurance that these properties will hold regardless of the system's capabilities or intentions. This parallels how we trust airplanes because their structural properties are verified through engineering analysis, not just flight testing. Crucially, this approach does not require interpretability to be solved and could still rule out deceptive alignment.
+
+The agenda faces extraordinary technical challenges. It requires solving multiple hard problems including: constructing formal world models that accurately represent relevant aspects of reality, specifying human values in mathematically precise terms, building AI systems that can reason within these formal frameworks, and proving that the resulting systems satisfy desired safety properties. Many researchers consider one or more of these components to be fundamentally intractable. However, proponents argue that even partial progress could provide valuable safety assurances, and that the potential payoff justifies significant research investment.
+
+## Risk Assessment & Impact
+
+| Dimension | Assessment | Evidence | Timeline |
+|-----------|------------|----------|----------|
+| **Safety Uplift** | Critical (if works) | Would provide mathematical safety guarantees | Long-term (10+ years) |
+| **Capability Uplift** | Tax | Constraints likely reduce capabilities | Expected |
+| **Net World Safety** | Helpful | Best-case: solves alignment; current: research only | Long-term |
+| **Lab Incentive** | Weak | Very long-term; no near-term commercial value | Current |
+| **Research Investment** | \$10-50M/yr | ARIA funding; some academic work | Current |
+| **Current Adoption** | None | Research only; ARIA programme | Current |
+
+## How It Works
+
+The Guaranteed Safe AI framework operates through a verification pipeline that checks every action before execution:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Input["Core Inputs"]
+        WM[World Model]
+        SPEC[Safety Specification]
+    end
+
+    subgraph Agent["AI System"]
+        PROPOSE[Propose Action]
+        PROVE[Generate Proof]
+    end
+
+    subgraph Verify["Verification Layer"]
+        CHECK[Proof Checker]
+        CERT{Valid?}
+    end
+
+    WM --> PROPOSE
+    SPEC --> PROPOSE
+    PROPOSE --> PROVE
+    PROVE --> CHECK
+    CHECK --> CERT
+    CERT -->|Yes| EXEC[Execute Action]
+    CERT -->|No| BLOCK[Block and Retry]
+    BLOCK --> PROPOSE
+
+    style Input fill:#e1f5ff
+    style Verify fill:#d4edda
+`} />
+
+The key insight is that the **proof checker can be much simpler than the proof generator**. While generating proofs of safety may require sophisticated AI reasoning, verifying those proofs can be done by a small, formally verified checker---similar to how a calculator can verify a proof even if generating it requires human creativity.
+
+## The davidad Agenda
+
+### Core Components
+
+| Component | Description | Challenge Level |
+|-----------|-------------|-----------------|
+| **Formal World Model** | Mathematical representation of relevant reality | Extreme |
+| **Value Specification** | Precise formal statement of human values/safety | Extreme |
+| **Bounded Agent** | AI system operating within formal constraints | High |
+| **Proof Generation** | AI produces proofs that actions are safe | Very High |
+| **Proof Verification** | Independent checking of safety proofs | Medium |
+
+### Key Technical Requirements
+
+| Requirement | Description | Current Status |
+|-------------|-------------|----------------|
+| **World Model Expressiveness** | Must capture relevant aspects of reality | Theoretical |
+| **World Model Accuracy** | Model must correspond to actual world | Unknown how to guarantee |
+| **Value Completeness** | Must specify all relevant values | Philosophical challenge |
+| **Proof Tractability** | Proofs must be feasible to generate | Open question |
+| **Verification Independence** | Checker must be simpler than prover | Possible in principle |
+
+## ARIA Programme Structure
+
+ARIA's [Safeguarded AI programme](https://www.aria.org.uk/safeguarded-ai/) is the primary funder of provably safe AI research globally. The programme aims to develop quantitative safety guarantees for AI "in the way we have come to expect for nuclear power and passenger aviation."
+
+### Programme Overview
+
+| Aspect | Detail |
+|--------|--------|
+| **Total Funding** | [£59 million](https://www.aria.org.uk/opportunity-spaces/mathematics-for-safe-ai/safeguarded-ai/funding/) over 3-5 years |
+| **Lead** | David "davidad" Dalrymple (Programme Director) |
+| **Focus** | Guaranteed safe AI through formal methods |
+| **TA1 (Theory)** | £18M for core research agenda (Phase 2) |
+| **TA3 (Applications)** | £5.4M for cyber-physical domains |
+| **TA1.4 (Sociotechnical)** | £3.4M for integration research |
+
+### Research Themes
+
+| Theme | Goal | Approach |
+|-------|------|----------|
+| **World Modelling** | Formal models of physical and social reality | Category theory, physics-based models |
+| **Value Learning** | Formally specifying human preferences | Utility theory, formal ethics |
+| **Safe Agents** | AI that reasons within formal constraints | Theorem proving AI |
+| **Verification** | Proving safety of AI actions | Formal verification, proof assistants |
+
+## Technical Approach
+
+### World Model Requirements
+
+| Property | Requirement | Challenge |
+|----------|-------------|-----------|
+| **Soundness** | Model doesn't claim impossible | Critical |
+| **Completeness** | Model covers relevant phenomena | Extremely hard |
+| **Computability** | Reasoning in model is tractable | Trade-off with expressiveness |
+| **Updateability** | Can refine model with evidence | Must maintain guarantees |
+
+### Value Specification Approaches
+
+| Approach | Mechanism | Limitations |
+|----------|-----------|-------------|
+| **Utility Functions** | Numerical representation of preferences | May miss important values |
+| **Constraint-Based** | Hard constraints on behavior | Doesn't capture positive goals |
+| **Formal Ethics** | Encode ethical frameworks | Philosophy is contested |
+| **Learned Preferences** | Infer from human behavior | May not generalize |
+
+### Proof-Based Safety
+
+| Aspect | Description | Status |
+|--------|-------------|--------|
+| **Action Verification** | Prove each action is safe before execution | Theoretical |
+| **Policy Verification** | Prove entire policy satisfies properties | Theoretical |
+| **Runtime Verification** | Check proofs at execution time | More tractable |
+| **Incremental Verification** | Build on previous proofs | Efficiency technique |
+
+## Feasibility Assessment
+
+### Optimistic View
+
+Proponents point to the remarkable success of formal verification in other domains. [CompCert](https://compcert.org/), a formally verified C compiler, was tested for six CPU-years by the Csmith random testing tool without finding a single wrong-code error---the only compiler tested for which this was true. [seL4](https://sel4.systems/), a formally verified operating system microkernel, has machine-checked mathematical proofs for Arm, RISC-V, and Intel architectures and is used in aerospace, autonomous aviation, and IoT platforms. These demonstrate that formal verification can scale to real systems.
+
+| Argument | Support | Proponents |
+|----------|---------|------------|
+| **Formal methods have scaled before** | CompCert, seL4 showed scaling possible | Formal methods community |
+| **AI can help with proofs** | Automated theorem proving advancing rapidly | AI researchers |
+| **Partial solutions valuable** | Even limited guarantees help | davidad |
+| **Alternative to behavioral safety** | Fundamentally different approach | Safety researchers |
+
+### Skeptical View
+
+| Concern | Argument | Proponents |
+|---------|----------|------------|
+| **World model problem** | Can't formally specify reality | Many researchers |
+| **Value specification problem** | Human values resist formalization | Philosophers |
+| **Capability tax** | Constraints make systems unusable | Capability researchers |
+| **Verification complexity** | Proofs may be intractable | Complexity theorists |
+
+### Key Uncertainties
+
+| Uncertainty | Range of Views | Critical For |
+|-------------|----------------|--------------|
+| **World model feasibility** | Possible to impossible | Entire agenda |
+| **Value specification feasibility** | Possible to impossible | Entire agenda |
+| **Capability preservation** | Minimal to prohibitive tax | Practical deployment |
+| **Proof tractability** | Feasible to intractable | Runtime safety |
+
+## Comparison with Related Approaches
+
+| Approach | Similarity | Key Difference |
+|----------|------------|----------------|
+| **<EntityLink id="formal-verification" />** | Both use proofs | Provably safe designs from scratch |
+| **<EntityLink id="constitutional-ai" />** | Both specify rules | Mathematical vs natural language |
+| **<EntityLink id="ai-control" />** | Both aim for safety | Internal guarantees vs external constraints |
+| **<EntityLink id="interpretability" />** | Both seek understanding | Formal specification vs empirical analysis |
+
+## Scalability Assessment
+
+| Dimension | Assessment | Rationale |
+|-----------|------------|-----------|
+| **Technical Scalability** | Unknown | Core question of the research agenda |
+| **Deception Robustness** | Strong (by design) | Proofs rule out deception |
+| **SI Readiness** | Yes (if works) | Designed for this; success uncertain |
+| **Capability Scalability** | Unknown | Capability tax may be prohibitive |
+
+## Quick Assessment
+
+| Dimension | Rating | Notes |
+|-----------|--------|-------|
+| **Tractability** | Low | Core components (world modeling, value specification) may be fundamentally intractable; requires major breakthroughs |
+| **Scalability** | Unknown | If solved, would apply to arbitrarily capable systems by design |
+| **Current Maturity** | Early Research | No working prototypes; theoretical frameworks only |
+| **Time Horizon** | 10-20+ years | Long-term moonshot research program |
+| **Key Proponents** | ARIA, davidad | £59M committed; some academic groups |
+| **Effectiveness if Achieved** | Very High | Would provide mathematical guarantees against misalignment and deception |
+
+## Risks Addressed
+
+If successful, provably safe AI would provide mathematical guarantees against several core AI safety risks:
+
+| Risk | Relevance | How It Helps |
+|------|-----------|--------------|
+| <EntityLink id="misalignment-potential" /> | High | Safety specification formally encodes human values; verifier proves actions satisfy specification |
+| <EntityLink id="deceptive-alignment" /> | High | Proofs preclude deception by construction---no gap between training and deployment behavior |
+| <EntityLink id="power-seeking" /> | High | Actions mathematically constrained to proven-safe subset; cannot acquire unauthorized resources |
+| <EntityLink id="goal-misgeneralization" /> | High | Formal world model and specification prevent unintended optimization targets |
+| <EntityLink id="scheming" /> | Medium | Bounded agent cannot pursue hidden agendas if all actions must pass verification |
+
+## Current State
+
+As of early 2025, provably safe AI remains in the early research phase with no working prototypes:
+
+| Milestone | Status | Details |
+|-----------|--------|---------|
+| **Foundational Theory** | Published | <R id="d8da577aed1e4384" /> outlines the framework (May 2024) |
+| **ARIA Funding** | Active | £59M programme launched; TA1 Phase 2 opens June 2025 |
+| **Research Teams** | Forming | [Oxford researchers awarded initial funding](https://www.ox.ac.uk/news/2025-04-10-oxford-researchers-awarded-aria-funding-develop-safety-first-ai) (April 2025) |
+| **Neural Network Verification** | Advancing | [VNN-COMP](https://neural-network-verification.com/) competition driving tool development |
+| **Working Prototype** | Not Yet | No demonstrations of GS AI components on realistic systems |
+
+The [International Neural Network Verification Competition](https://neural-network-verification.com/) represents related work on verifying properties of neural networks, with tools like α,β-CROWN achieving significant speedups over traditional algorithms. However, this work addresses a narrower problem than full GS AI.
+
+## Limitations
+
+- **May Be Impossible**: Core components may be fundamentally intractable
+- **Capability Tax**: Constraints may make systems unusable
+- **World Model Problem**: Cannot formally specify reality comprehensively
+- **Value Specification Problem**: Human values resist precise formalization
+- **Long Timeline**: Decades of research may be needed
+- **Alternative Approaches May Suffice**: Empirical safety might be enough
+- **Verification Complexity**: Proofs may be too expensive to generate
+
+## Open Questions
+
+| Question | Importance | Status |
+|----------|------------|--------|
+| **Can world models be expressive enough?** | Critical | Active research; no consensus |
+| **How do we specify human values formally?** | Critical | Philosophical and technical challenge |
+| **Can proofs scale to complex actions?** | High | Unknown; depends on proof automation advances |
+| **What capability tax is acceptable?** | High | Depends on risk level and alternatives |
+| **Can AI help generate its own safety proofs?** | High | Promising but creates bootstrap problem |
+| **What partial guarantees are valuable?** | Medium | May enable incremental progress |
+
+## Sources & Resources
+
+### Key Documents
+
+| Document | Author | Contribution |
+|----------|--------|--------------|
+| <R id="d8da577aed1e4384">Towards Guaranteed Safe AI</R> | Dalrymple et al. (2024) | Foundational agenda paper with Bengio, Russell, Tegmark, Seshia |
+| [ARIA Safeguarded AI Programme](https://www.aria.org.uk/programme-safeguarded-ai/) | ARIA | Official £59M programme description |
+| [davidad's Programme Thesis](https://www.lesswrong.com/posts/qweXJ6v9heSn4wvdk/davidad-s-provably-safe-ai-architecture-aria-s-programme) | David Dalrymple | Comprehensive technical exposition on LessWrong |
+| [The Gradient Interview](https://thegradientpub.substack.com/p/davidad-dalrymple-towards-provably) | The Gradient | In-depth interview on the agenda |
+
+### Key Organizations
+
+| Organization | Role | Contribution |
+|--------------|------|--------------|
+| [ARIA](https://www.aria.org.uk/) | Funding body | £59M Safeguarded AI programme |
+| [University of Oxford](https://www.ox.ac.uk/news/2025-04-10-oxford-researchers-awarded-aria-funding-develop-safety-first-ai) | Research | Multiple ARIA-funded projects |
+| **MIRI (historically)** | Research | Early theoretical work on agent foundations |
+
+### Formal Verification Precedents
+
+| System | Achievement | Relevance |
+|--------|-------------|-----------|
+| [seL4](https://sel4.systems/) | Formally verified OS kernel | Proves verification can scale to real systems; used in aerospace |
+| [CompCert](https://compcert.org/) | Formally verified C compiler | Zero wrong-code bugs found in 6 CPU-years of testing |
+| [CertiKOS](https://flint.cs.yale.edu/certikos/) | Verified concurrent OS | Built on seL4 foundations at Yale |
+
+---
+
+## AI Transition Model Context
+
+Provably safe AI affects the <EntityLink id="ai-transition-model" /> through fundamental safety guarantees:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="alignment-robustness" /> | Verification strength | Would provide mathematical alignment guarantees |
+| <EntityLink id="misalignment-potential" /> | Alignment approach | Eliminates misalignment by construction |
+| <EntityLink id="safety-capability-gap" /> | Gap closure | Verified systems have provable safety properties |
+
+The provably safe AI agenda represents a moonshot approach that could fundamentally solve AI safety if successful. The extreme difficulty of the technical challenges means success is uncertain, but the potential value of even partial progress justifies significant research investment. This approach is particularly valuable as a complement to empirical safety work, providing a fundamentally different path to safe AI.

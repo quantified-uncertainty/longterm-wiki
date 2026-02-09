@@ -1,0 +1,136 @@
+---
+title: RoastMyPost
+description: An LLM-powered document evaluation tool that analyzes blog posts and research documents for errors, logical fallacies, and factual inaccuracies using specialized AI evaluators. Uses Claude Sonnet 4.5 with Perplexity integration for fact-checking.
+sidebar:
+  order: 4
+quality: 35
+llmSummary: RoastMyPost is an LLM tool (Claude Sonnet 4.5 + Perplexity) that evaluates written content through multiple specialized AI agents—fact-checking, logical fallacy detection, math verification, and more. Aimed at improving epistemic quality of research posts, particularly in EA/rationalist communities. Significant false positive rate means it's a complement to, not replacement for, human review.
+lastEdited: "2026-02-01"
+importance: 25
+ratings:
+  novelty: 6
+  rigor: 4
+  actionability: 7
+  completeness: 5
+metrics:
+  wordCount: 950
+  citations: 3
+  tables: 6
+  diagrams: 0
+clusters:
+  - epistemics
+  - ai-safety
+  - community
+subcategory: epistemic-tools-tools
+---
+import {EntityLink, Backlinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Innovation** | Moderate | Multi-agent evaluation approach for document review |
+| **Practical Impact** | Growing | Useful for pre-publication review of research posts |
+| **Technical Maturity** | Experimental | Developer acknowledges significant false positive rate |
+| **Integration** | Good | Direct import from LessWrong and EA Forum |
+| **Accessibility** | High | Free, web-based, no setup required |
+| **Output Quality** | Mixed | Helpful for catching errors but requires human filtering |
+
+## Project Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Name** | RoastMyPost |
+| **Organization** | <EntityLink id="quri">QURI</EntityLink> (Quantified Uncertainty Research Institute) |
+| **Lead** | Ozzie Gooen |
+| **Launched** | December 2025 |
+| **Primary Model** | Claude Sonnet 4.5 |
+| **Fact-Checking** | Perplexity integration |
+| **Website** | [roastmypost.org](https://www.roastmypost.org/) |
+| **Source** | [GitHub](https://github.com/quantified-uncertainty/roast-my-post) (open-source) |
+
+## Overview
+
+[RoastMyPost](https://www.roastmypost.org/) is an experimental web application that uses <EntityLink id="language-models">large language models</EntityLink> to evaluate written content through multiple specialized AI evaluators.[^1] Developed by Ozzie Gooen at <EntityLink id="quri">QURI</EntityLink>, the platform analyzes documents for errors, logical fallacies, factual inaccuracies, and other issues that human reviewers might miss or find tedious to check manually.
+
+The tool is designed to provide "roasts" — critical feedback that highlights potential problems in written work before publication. Unlike general-purpose AI assistants, RoastMyPost deploys specialized evaluator agents that each focus on specific types of analysis.
+
+The platform is particularly relevant to the AI safety and rationalist communities, as it can import posts directly from <EntityLink id="lesswrong">LessWrong</EntityLink> and the EA Forum via URL, making it easy to get feedback on research posts common in these communities.
+
+## How It Works
+
+### Import Methods
+
+- **Direct text**: Paste markdown content directly
+- **Forum URLs**: Import posts from LessWrong and EA Forum automatically
+- **Web URLs**: Extract content from general web pages
+
+### Evaluators
+
+RoastMyPost runs multiple specialized evaluators in parallel:[^1]
+
+| Evaluator | Function |
+|-----------|----------|
+| **Fact Checker** | Uses Perplexity searches to verify factual claims |
+| **Spelling/Grammar** | Identifies language errors |
+| **Logical Fallacy Detector** | Flags potential reasoning errors |
+| **Math Verifier** | Checks mathematical equations and calculations |
+| **Link Validator** | Tests whether referenced URLs are accessible |
+| **Binary Forecast Checker** | Compares predictions against actual outcomes |
+| **Epistemic Auditor** | High-level assessment of reasoning quality |
+
+Processing typically completes in 1-5 minutes depending on document length.
+
+### Output
+
+- **Inline annotations**: Specific comments highlighted in the text with importance ratings
+- **Summary reports**: Overall assessment and key findings
+- **Grades**: Letter grades for different quality dimensions
+- **Export**: XML export for further processing
+
+## Ideal Use Cases
+
+Works best with:
+- Documents between 200-10,000 words
+- Content containing factual claims that can be verified
+- Research posts and analyses
+- <EntityLink id="squiggle">Squiggle</EntityLink> probabilistic models
+
+Less suitable for:
+- Very long documents (performance issues)
+- LaTeX-formatted content
+- Highly specialized technical content requiring domain expertise
+
+## Limitations
+
+The developers explicitly acknowledge significant limitations:[^1]
+
+| Limitation | Description |
+|------------|-------------|
+| **False positives** | Significant rate of incorrect error flagging |
+| **Context gaps** | Lacks nuanced understanding for some interpretations |
+| **Fallacy checker** | Sometimes flags valid reasoning patterns |
+| **Complex fact-checking** | Struggles with claims requiring multiple research iterations |
+| **No domain expertise** | Cannot replace human expert review in specialized fields |
+
+The platform is experimental and should be used as one input among many rather than a definitive quality assessment.
+
+## Development
+
+Ozzie Gooen has committed to dedicating approximately one-third of his annual work time to maintaining and improving RoastMyPost.[^1] The roadmap includes model updates as new Claude versions become available and improved evaluator accuracy.
+
+RoastMyPost is currently free for reasonable use, funded through QURI. Usage limits exist to prevent abuse.
+
+## Related Tools
+
+| Tool | Purpose | Relationship |
+|------|---------|--------------|
+| **<EntityLink id="squiggle">Squiggle</EntityLink>** | Probabilistic modeling language | RoastMyPost can evaluate Squiggle models |
+| **<EntityLink id="squiggleai">SquiggleAI</EntityLink>** | LLM model generation | Shared LLM integration patterns |
+| **<EntityLink id="elicit">Elicit</EntityLink>** | Research assistant | Similar LLM-for-research space |
+
+## Sources
+
+[^1]: [Announcing RoastMyPost: LLMs eval blog posts and more](https://forum.effectivealtruism.org/posts/BdufL4GZmeBht3fak/announcing-roastmypost-llms-eval-blog-posts-and-more), EA Forum, December 2025
+
+<Backlinks />

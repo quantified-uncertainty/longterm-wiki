@@ -1,0 +1,311 @@
+---
+title: "AGI Timeline"
+description: "Expert forecasts and prediction markets suggest 50% probability of AGI by 2030-2045, with Metaculus predicting median of November 2027 and lab leaders (Altman, Amodei, Hassabis) converging on 2026-2029. Timelines have shortened dramatically—Metaculus dropped from 50 years to 5 years since 2020."
+sidebar:
+  order: 51
+quality: 59
+importance: 74.5
+lastEdited: "2026-01-29"
+llmSummary: "Comprehensive synthesis of AGI timeline forecasts showing dramatic acceleration: expert median dropped from 2061 (2018) to 2047 (2023), Metaculus from 50 years to 5 years since 2020, with current predictions clustering around 2027-2045 median (50% probability). Aggregates 9,300+ predictions across expert surveys, prediction markets, and lab leader statements, documenting key uncertainties around scaling limits, definitions, and technical bottlenecks."
+ratings:
+  novelty: 4.2
+  rigor: 6.8
+  actionability: 5.5
+  completeness: 7.5
+metrics:
+  wordCount: 689
+  citations: 38
+  tables: 35
+  diagrams: 1
+clusters: ["ai-safety", "epistemics"]
+---
+import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="agi-timeline" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Median Expert Forecast (2026)** | 2040-2047 (50% HLMI) | [AI Impacts 2023 Survey](https://aiimpacts.org/2023-expert-survey-on-progress-in-ai/) found 50% probability of HLMI by 2047, down 13 years from 2022 |
+| **<EntityLink id="prediction-markets">Prediction Markets</EntityLink>** | 2027-2031 median | [Metaculus](https://www.metaculus.com/questions/5121/when-will-the-first-general-ai-system-be-devised-tested-and-publicly-announced/) forecasters predict median of November 2027 (1,700+ forecasters) |
+| **Lab Leader Estimates** | 2026-2029 | <EntityLink id="sam-altman">Sam Altman</EntityLink>, <EntityLink id="dario-amodei">Dario Amodei</EntityLink>, and <EntityLink id="demis-hassabis">Demis Hassabis</EntityLink> converge on late 2020s |
+| **Timeline Trend** | Rapidly shortening | Expert median dropped from 2061 (2018) → 2059 (2022) → 2047 (2023); <EntityLink id="metaculus">Metaculus</EntityLink> dropped from 50 years to 5 years since 2020 |
+| **Uncertainty Range** | Very high (±15-20 years) | 80% confidence intervals span 2026-2045+ across forecasts |
+| **Definition Sensitivity** | High | Different AGI definitions shift predictions by 10-20 years |
+| **Confidence Level** | Low-Medium | Expert surveys show framing effects of 15+ years; historical predictions consistently too pessimistic |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [timelines.issarice.com](https://timelines.issarice.com/wiki/Timeline_of_AI_timelines) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Artificial_general_intelligence) |
+
+
+## Overview
+
+AGI timeline predictions represent attempts to forecast when artificial intelligence will match or exceed human cognitive abilities across all domains. Current expert consensus suggests a 50% probability of <EntityLink id="agi-development">AGI development</EntityLink> between 2040-2050, though estimates vary widely based on AGI definitions and measurement criteria.
+
+Recent surveys show accelerating timelines compared to historical predictions. The <R id="efb578b3189ba3cb">2023 <EntityLink id="ai-impacts">AI Impacts</EntityLink> survey</R> found median expert predictions of 2045 for "High-Level Machine Intelligence," while <R id="8fef0d8c902de618">Metaculus prediction markets</R> aggregate to approximately 2040-2045. However, significant uncertainty remains around capability thresholds, measurement methodologies, and potential discontinuous progress.
+
+### AGI Timeline Factors
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph DRIVERS["Accelerating Factors"]
+        COMPUTE[Compute Scaling<br/>10x per 18 months]
+        ALGO[Algorithmic Improvements<br/>2x efficiency per year]
+        INVEST[Investment Surge<br/>\$100B+ training clusters by 2027]
+        DATA[Data Availability<br/>Synthetic and multimodal]
+    end
+
+    subgraph BRAKES["Decelerating Factors"]
+        SCALING[Scaling Limits<br/>Diminishing returns]
+        ENERGY[Energy Constraints<br/>Data center capacity]
+        REGULATION[Regulatory Barriers<br/>AI governance]
+        SAFETY[Safety Research<br/>Alignment requirements]
+    end
+
+    subgraph UNCERTAINTY["Key Uncertainties"]
+        PARADIGM[Paradigm Shifts<br/>New architectures needed?]
+        DEFINITION[Definition Disputes<br/>What counts as AGI?]
+        MEASURE[Measurement<br/>How to evaluate AGI?]
+    end
+
+    DRIVERS --> TIMELINE[AGI Timeline<br/>Forecast]
+    BRAKES --> TIMELINE
+    UNCERTAINTY --> TIMELINE
+
+    TIMELINE --> SHORT[Optimistic: 2026-2029]
+    TIMELINE --> MED[Median: 2035-2045]
+    TIMELINE --> LONG[Conservative: 2050+]
+
+    style SHORT fill:#ffcccc
+    style MED fill:#ffffcc
+    style LONG fill:#ccffcc
+    style TIMELINE fill:#e6f3ff
+`} />
+
+## AGI Timeline Risk Assessment
+
+| Factor | Assessment | Timeline Impact | Source |
+|--------|------------|----------------|---------|
+| Expert Survey Median | 2040-2050 | Baseline estimate | <R id="3b9fda03b8be71dc">AI Impacts 2023</R> |
+| Prediction Market Aggregate | 2040-2045 | Market consensus | <R id="d99a6d0fb1edc2db">Metaculus</R> |
+| Lab Leader Statements | 2025-2035 | Optimistic bound | <R id="04d39e8bd5d50dd5">OpenAI</R>, <R id="0ef9b0fe0f3c92b4">DeepMind</R> |
+| Scaling Limitations | 2050+ | Conservative bound | <R id="120adc539e2fa558">Epoch AI</R> |
+
+## Expert Survey Results
+
+### Recent Survey Data (2023-2026)
+
+| Survey | Year | Sample Size | Median AGI Timeline | Key Finding | Source |
+|--------|------|-------------|-------------------|-------------|--------|
+| AI Impacts ESPAI | 2023 | 2,778 experts | 2047 (HLMI) | 13-year drop from 2060 in 2022 | [AI Impacts](https://aiimpacts.org/2023-expert-survey-on-progress-in-ai/) |
+| Digital Minds Survey | 2025 | 67 experts | 2050 (50% probability) | 20% by 2030, 40% by 2040 | [Digital Minds Report](https://digitalminds.report/) |
+| AI Multiple Meta-Analysis | 2026 | 9,300 predictions | 2040 (aggregated) | Synthesized all public forecasts | [AI Multiple](https://research.aimultiple.com/artificial-general-intelligence-singularity-timing/) |
+| Metaculus Community | 2026 | 1,700+ forecasters | Nov 2027 median | 80% CI: July 2026 - Feb 2031 | [Metaculus](https://www.metaculus.com/questions/5121/) |
+| Samotsvety Superforecasters | 2023 | 15 forecasters | 28% by 2030 | Professional forecasters more conservative | [80,000 Hours](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) |
+
+### Timeline Acceleration Trends
+
+Expert timelines have consistently shortened over the past decade, with dramatic acceleration since 2022:
+
+| Year | Expert Median (HLMI) | Metaculus Median | Change from Previous |
+|------|---------------------|------------------|---------------------|
+| 2018 | 2061 | 2070+ | Baseline |
+| 2022 | 2059-2060 | 2055 | -2 years |
+| 2023 | 2045-2047 | 2040 | -13 to -15 years |
+| 2024 | ≈2040 | 2035 | -5 years |
+| 2025 | ≈2035 | 2030 | -5 years |
+| 2026 | Varied | Nov 2027 | -3 years |
+
+The [80,000 Hours analysis](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) notes that "in four years, the mean estimate on Metaculus for when AGI will be developed has plummeted from 50 years to five years." Historical expert predictions have consistently been too pessimistic—in 2022, researchers thought AI wouldn't write simple Python code until ~2027, but AI met that threshold by 2023-2024.
+
+<R id="1f21fae8ed666710">Leading AI researchers</R> increasingly cite rapid scaling of <EntityLink id="language-models">language models</EntityLink> and emergent capabilities as evidence for shorter timelines.
+
+## Prediction Market Analysis
+
+### Metaculus Aggregates (January 2026)
+
+| Question | Current Prediction | Confidence Interval | Forecasters | Source |
+|----------|------------------|-------------------|-------------|--------|
+| First General AI Announced | Nov 30, 2027 median | July 2026 - Feb 2031 (80%) | 1,700+ | [Metaculus](https://www.metaculus.com/questions/5121/) |
+| Weakly General AI | Nov 2033 | Dec 2028 - Sep 2045 | 1,800+ | [Metaculus](https://www.metaculus.com/questions/3479/) |
+| Transformative AI | 2031 median | 2027-2045 (80%) | 1,000+ | [AGI Dashboard](https://agi.goodheartlabs.com/) |
+| AGI by 2030 | ≈40% probability | 25-55% range | Aggregated | Market consensus |
+| AGI by 2040 | ≈75% probability | 60-85% range | Aggregated | Market consensus |
+
+### Platform Comparison
+
+| Platform | AGI Median | 50% Probability Year | Key Difference |
+|----------|-----------|---------------------|----------------|
+| Metaculus | Mid-2030 | 2030-2031 | Stricter definition requiring robotics |
+| Manifold | 2028 | ≈50% before 2028 | More aggressive, market-based |
+| Polymarket | 2029-2030 | ≈45% by 2029 | Real-money incentives |
+| Expert Surveys | 2040-2047 | 2040-2045 | Academic conservatism |
+
+### Market Dynamics
+
+Prediction markets show several notable patterns:
+- **Dramatic shortening**: Metaculus dropped from 50 years to 5 years median since 2020
+- **Volatility spikes** following major capability announcements (GPT-4, Claude 3, o1, o3)
+- **Shorter timelines** in technical communities vs. academic surveys (10-15 year gap)
+- **Definition sensitivity** with different AGI operationalizations varying by 10-20 years
+
+## Lab Leader Statements
+
+### Industry Timeline Claims (Updated January 2026)
+
+| Organization | Leader | Claimed Timeline | Key Statement | Source |
+|--------------|--------|-----------------|---------------|--------|
+| <EntityLink id="openai">OpenAI</EntityLink> | Sam Altman | 2025-2028 | "We are now confident we know how to build AGI"; 2026 models will "amaze us" | [Sam Altman Blog](https://blog.samaltman.com/the-gentle-singularity) |
+| <EntityLink id="anthropic">Anthropic</EntityLink> | Dario Amodei | 2026-2027 | "AI may surpass humans in most tasks by 2027"; "rapidly running out of convincing blockers" | [Lex Fridman Interview](https://lexfridman.com/dario-amodei-transcript/) |
+| <EntityLink id="deepmind">DeepMind</EntityLink> | Demis Hassabis | "Within this decade" (by 2030) | <R id="76ad6e98c47f6ff5">Nature interview 2024</R> | Internal planning |
+| <EntityLink id="deepmind">DeepMind</EntityLink> | Shane Legg | 50% by 2028 | "Minimal AGI" prediction (January 2026) | DeepMind cofounder |
+| Meta | Yann LeCun | "Many decades away" | Skeptical of current paradigm reaching AGI | <R id="278254c1e0630e9d">Public statements 2024</R> |
+| xAI | Elon Musk | 2026 | AI "smarter than any single human" | Public statements |
+
+### Implied Timelines from Investment Plans
+
+Several labs' public roadmaps suggest aggressive acceleration:
+
+| Metric | 2024 | 2025 | 2026 | 2027 | Source |
+|--------|------|------|------|------|--------|
+| Training Run Cost | ≈\$100M | ≈\$1B | \$10B+ | \$100B clusters | [Dario Amodei](https://lexfridman.com/dario-amodei-transcript/) |
+| Compute per Training | Baseline | 3-10x | 30-100x | 300-1000x | Scaling projections |
+| Data Center Power | 100-500 MW | 500 MW-1 GW | 1-5 GW | 5-10 GW | Industry reports |
+| Researcher FTEs | 5,000+ | 10,000+ | 20,000+ | 50,000+ | Lab hiring plans |
+
+## Key Uncertainty Factors
+
+### Definition Problems
+
+| AGI Definition | Timeline Range | Key Challenge |
+|----------------|---------------|---------------|
+| Human-level performance | 2030-2040 | Benchmark gaming |
+| Economic substitution | 2040-2060 | Deployment lags |
+| Scientific breakthrough | 2035-2050 | Discovery vs. automation |
+| Consciousness/sentience | 2050+ | Hard problem of consciousness |
+
+### Technical Bottlenecks
+
+Current limitations that may extend timelines:
+- **<EntityLink id="reasoning">Reasoning capabilities</EntityLink>**: Current models struggle with complex multi-step reasoning
+- **<EntityLink id="long-horizon">Long-horizon planning</EntityLink>**: Limited ability for extended autonomous operation  
+- **Robustness**: Brittleness to distribution shifts and adversarial examples
+- **Sample efficiency**: Still require massive training data compared to humans
+
+### Scaling Constraints
+
+| Constraint Type | Impact on Timeline | Mitigation Strategies |
+|-----------------|-------------------|---------------------|
+| <EntityLink id="compute-hardware">Compute hardware</EntityLink> | +5-10 years if hits limits | Advanced chip architectures |
+| Data availability | +3-5 years | Synthetic data generation |
+| Energy requirements | +2-5 years | Efficiency improvements |
+| Regulatory barriers | +5-15 years | International coordination |
+
+## Current Capability Trajectory  
+
+### 2024 State Assessment
+
+Recent capabilities suggest accelerating progress toward AGI:
+- **Multi-modal integration**: Vision, text, and code in single models
+- **<EntityLink id="tool-use">Tool use</EntityLink>**: Effective API calls and workflow automation
+- **Emergent reasoning**: Chain-of-thought and constitutional approaches
+- **<EntityLink id="scientific-research">Scientific research</EntityLink>**: Automated hypothesis generation and testing
+
+### Projection Methods
+
+| Approach | 2030 Prediction | Methodology | Limitations |
+|----------|----------------|-------------|-------------|
+| Scaling laws | 85% human performance | Extrapolate compute trends | May hit diminishing returns |
+| Expert elicitation | 60% probability | Survey aggregation | Bias and overconfidence |
+| Benchmark tracking | 90% on specific tasks | Performance trajectory | Narrow evaluation |
+| Economic modeling | 40% job automation | Labor substitution | Deployment friction |
+
+## Disagreement and Cruxes
+
+### Major Points of Contention
+
+**Timeline Pessimists** (2050+) argue:
+- Current paradigms (transformers, scaling) will hit fundamental limits
+- Alignment difficulty will require extensive safety research before deployment
+- Economic and regulatory barriers will slow deployment
+- Key cognitive capabilities (long-horizon planning, true reasoning) may require architectural breakthroughs
+
+**Timeline Optimists** (2025-2035) contend:
+- Scaling laws will continue with current paradigms through 2030+
+- Emergent capabilities from larger models will bridge remaining capability gaps
+- Competitive pressure and \$100B+ investments will accelerate development
+- Recent progress (o1, o3 reasoning, agents) shows faster-than-expected capability gains
+
+### Key Cruxes
+
+| Question | Impact on Timeline | Current Evidence | Optimist View | Pessimist View |
+|----------|------------------|------------------|---------------|----------------|
+| Will scaling laws continue? | ±10 years | Mixed signals since GPT-4 | Compute scaling to \$100B clusters will unlock new capabilities | Diminishing returns visible; new paradigms needed |
+| Can transformers achieve AGI? | ±15-20 years | Chain-of-thought, o1/o3 reasoning | Architecture is sufficient with scale | Fundamental limits on reasoning and planning |
+| How hard is alignment? | ±10-15 years | Constitutional AI, RLHF improvements | Tractable with current approaches | Requires deep unsolved problems |
+| Will regulation slow progress? | ±5-15 years | EU AI Act, compute governance | Light touch will prevail | Precautionary regulation inevitable |
+| Is AGI a single threshold? | ±10 years | Definitional debates | Continuous capability improvement | Discrete capability jumps required |
+
+## Timeline Implications
+
+### Strategic Considerations
+
+Different timelines imply varying urgency for:
+- **Safety research**: Shorter timelines require immediate focus on <EntityLink id="solutions">alignment solutions</EntityLink>
+- **Governance frameworks**: International coordination becomes critical
+- **Economic preparation**: Labor market disruption planning
+- **<EntityLink id="international-coordination">Coordination mechanisms</EntityLink>**: Preventing dangerous racing dynamics
+
+### Policy Relevance
+
+Timeline uncertainty affects <EntityLink id="regulation-debate">regulation approaches</EntityLink>:
+- **Precautionary principle**: Plan for shortest reasonable timelines
+- **Adaptive governance**: Build flexible frameworks for multiple scenarios
+- **Research prioritization**: Balance capability and safety advancement
+
+## Sources & Resources
+
+### Primary Research
+
+| Category | Source | Key Contribution |
+|----------|--------|-----------------|
+| Expert Surveys | <R id="3b9fda03b8be71dc">AI Impacts 2023 Survey</R> | Largest expert survey (2,778 respondents) |
+| Prediction Markets | <R id="d99a6d0fb1edc2db">Metaculus AGI Questions</R> | Continuous probability tracking (1,700+ forecasters) |
+| Technical Analysis | <R id="120adc539e2fa558">Epoch AI Scaling Reports</R> | Compute and training cost projections |
+| Industry Perspectives | <R id="04d39e8bd5d50dd5">OpenAI Planning Documents</R> | Lab development roadmaps |
+| Meta-Analysis | [80,000 Hours Timeline Review](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) | Synthesis of forecaster disagreements |
+
+### 2025-2026 Key Sources
+
+| Source | Date | Key Finding | URL |
+|--------|------|-------------|-----|
+| Sam Altman "Gentle Singularity" | Jan 2025 | "We know how to build AGI"; 2026 will see "systems that figure out novel insights" | [Blog](https://blog.samaltman.com/the-gentle-singularity) |
+| Dario Amodei Lex Fridman Interview | Nov 2024 | "Rapidly running out of convincing blockers"; 2026-2027 possible | [Transcript](https://lexfridman.com/dario-amodei-transcript/) |
+| AI Multiple Meta-Analysis | Jan 2026 | 9,300 predictions analyzed; aggregated median ≈2040 | [Analysis](https://research.aimultiple.com/artificial-general-intelligence-singularity-timing/) |
+| Digital Minds Forecasting | 2025 | 67 experts: 20% by 2030, 50% by 2050 | [Report](https://digitalminds.report/) |
+| AGI Timelines Dashboard | Jan 2026 | Combined forecasts: 2031 median (80% CI: 2027-2045) | [Dashboard](https://agi.goodheartlabs.com/) |
+
+### Forecasting Organizations
+
+| Organization | Focus Area | Key Resources |
+|--------------|-----------|---------------|
+| <R id="3b9fda03b8be71dc">AI Impacts</R> | Expert surveys and trend analysis | Annual ESPAI survey reports |
+| <R id="d99a6d0fb1edc2db">Metaculus</R> | Prediction markets | AGI timeline questions, AGI Horizons tournament |
+| <EntityLink id="epoch-ai">Epoch AI</EntityLink> | Compute trends and scaling laws | Technical reports, training cost projections |
+| <R id="1593095c92d34ed8">Future of Humanity Institute</R> | Long-term forecasting | Academic papers (now closed) |
+| [Samotsvety Forecasting](https://samotsvety.org/) | Superforecaster aggregation | AGI probability estimates |
+
+### Related Analysis
+
+- **Scaling debates**: See <EntityLink id="scaling-debate">scaling law discussion</EntityLink>
+- **Capability analysis**: Review core capabilities development
+- **Timeline uncertainty**: Explore <EntityLink id="agi-timeline">forecasting methodology</EntityLink>
+- **Risk implications**: Consider <EntityLink id="__index__/ai-transition-model">takeoff dynamics</EntityLink> scenarios
+
+<Backlinks />

@@ -1,0 +1,122 @@
+---
+title: "Insight Grid Experiments"
+description: "Experimental visualizations for showing knowledge density and gaps"
+sidebar:
+  order: 50
+importance: 2
+quality: 14
+llmSummary: "Internal experimental page testing various visualization approaches (sparse grids, treemaps, pixel maps) to represent knowledge gaps in AI safety research, showing ~2-4% coverage of conceptual space. Purely infrastructure/UI experimentation with no substantive research content."
+ratings:
+  novelty: 2
+  rigor: 1
+  actionability: 0.5
+  completeness: 3
+metrics:
+  wordCount: 302
+  citations: 0
+  tables: 0
+  diagrams: 0
+---
+import { InsightGridExperiments, SparseKnowledgeGrid, KnowledgeTreemap, InsightScoreMatrix, PixelDensityMap, ResearchFrontier, PriorityMatrix, TopicQuestionGrid } from '@components/InsightGridExperiment';
+
+These experiments visualize the **Critical Insight** framework—showing where we have knowledge versus the vast space of potential insights we haven't yet discovered.
+
+---
+
+## All Experiments
+
+<InsightGridExperiments client:load />
+
+---
+
+## Concept
+
+The core idea: **most of the "insight space" is unexplored**.
+
+If we imagine all possible questions × topics × granularities as a huge grid, we've only filled in a tiny fraction. These visualizations make that visible:
+
+1. **Sparse Grid**: Each cell is a potential insight area. Filled cells (bright) = we have something. Empty (dark) = unknown.
+
+2. **Treemap**: Hierarchical view where the filled portion of each rectangle shows knowledge density. Most areas are mostly empty.
+
+3. **Score Matrix**: Individual insights rated on Surprising × Important × Compact.
+
+4. **Pixel Map**: Ultra-dense view showing thousands of potential insight areas, with ~2% explored.
+
+---
+
+## Individual Components
+
+### Sparse Knowledge Grid
+
+A 40×60 grid with ~4% fill rate:
+
+<SparseKnowledgeGrid client:load rows={40} cols={60} fillProbability={0.04} cellSize={10} />
+
+---
+
+### Knowledge Treemap
+
+Nested rectangles showing knowledge density by domain:
+
+<KnowledgeTreemap client:load width={700} height={400} />
+
+---
+
+### Insight Score Matrix
+
+Individual insights rated on the three criteria:
+
+<InsightScoreMatrix client:load />
+
+---
+
+### Pixel Density Map
+
+High-resolution view of the insight space:
+
+<PixelDensityMap client:load width={200} height={200} pixelSize={3} />
+
+---
+
+### Research Frontier
+
+3D-style columns showing exploration depth by research area:
+
+<ResearchFrontier client:load width={650} height={400} />
+
+---
+
+### Priority Matrix (ITN Framework)
+
+Classic Importance × Tractability × Neglectedness visualization:
+
+<PriorityMatrix client:load />
+
+---
+
+### Topic × Question Grid
+
+Categorical grid showing which question types we've addressed for each topic:
+
+<TopicQuestionGrid client:load />
+
+---
+
+## Design Notes
+
+**Color encoding:**
+- Brightness = importance (brighter = more important)
+- Saturation/hue = surprising (warmer = more surprising)
+- Opacity = quality/confidence
+
+**Interactivity:**
+- Hover to see details
+- Toggle color modes
+- Sort by different criteria
+
+**The key insight these visualizations convey:**
+We've barely scratched the surface of what's knowable. Most cells are dark. This should motivate:
+1. Systematic exploration of the space
+2. Prioritizing high-importance regions
+3. Seeking surprising findings (they carry more information)

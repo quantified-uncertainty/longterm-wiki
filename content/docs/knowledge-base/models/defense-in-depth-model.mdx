@@ -1,0 +1,395 @@
+---
+title: Defense in Depth Model
+description: Mathematical framework analyzing how layered AI safety measures combine, showing independent layers with 20-60% failure rates can achieve 1-3% combined failure, but deceptive alignment creates correlations increasing this to 12%+. Includes quantitative assessments of five defense layers and correlation patterns.
+sidebar:
+  order: 37
+quality: 69
+ratings:
+  focus: 8.5
+  novelty: 6.2
+  rigor: 7.1
+  completeness: 7.8
+  concreteness: 8.3
+  actionability: 7.6
+lastEdited: "2025-12-26"
+importance: 82.5
+llmSummary: Mathematical framework showing independent AI safety layers with 20-60% individual failure rates can achieve 1-3% combined failure, but deceptive alignment creates correlations (ρ=0.4-0.5) that increase combined failure to 12%+. Provides quantitative analysis of five defense layers and specific resource allocation recommendations ($100-250M annually for reducing correlation).
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+  - Complete 'Strategic Importance' section
+  - Complete 'Limitations' section (6 placeholders)
+metrics:
+  wordCount: 458
+  citations: 23
+  tables: 32
+  diagrams: 2
+clusters:
+  - ai-safety
+  - governance
+subcategory: framework-models
+---
+import {DataInfoBox, Backlinks, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="defense-in-depth-model" client:load />
+
+<DataInfoBox entityId="defense-in-depth-model" ratings={frontmatter.ratings} />
+
+## Overview
+
+Defense in depth applies the security principle of layered protection to AI safety: deploy multiple independent safety measures so that if one fails, others still provide protection. This model provides a mathematical framework for analyzing how safety interventions combine, when multiple weak defenses outperform single strong ones, and how to identify correlated failure modes.
+
+**Key finding**: Independent layers with 20-60% individual failure rates can achieve combined failure rates of 1-3%, but <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink> creates dangerous correlations that increase combined failure to 12%+. No single AI safety intervention is reliable enough to trust alone - layered defenses with diverse failure modes provide more robust protection.
+
+## Risk Assessment
+
+| Factor | Level | Evidence | Timeline |
+|--------|-------|----------|----------|
+| **Severity** | Critical | Single-layer failures: 20-60%; Independent 5-layer: 1-3%; Correlated 5-layer: 12%+ | Current |
+| **Likelihood** | High | All current safety interventions have significant failure rates | 2024-2027 |
+| **Trend** | Improving | Growing recognition of need for layered approaches | Next 3-5 years |
+| **Tractability** | Medium | Implementation straightforward; reducing correlation difficult | Ongoing |
+
+## Defense Layer Framework
+
+### Five Primary Safety Layers
+
+AI safety operates through five defensive layers, each protecting against different failure modes:
+
+| Layer | Primary Function | Key Interventions | Failure Rate Range |
+|-------|-----------------|------------------|-------------------|
+| **Training Safety** | Build aligned goals during development | <R id="1098fc60be7ca2b0"><EntityLink id="rlhf">RLHF</EntityLink></R>, <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, data curation | 20-40% |
+| **Evaluation Safety** | Detect problems before deployment | Red-teaming, interpretability, capability evals | 25-35% |
+| **Runtime Safety** | Monitor deployed systems | <EntityLink id="output-filtering">Output filtering</EntityLink>, monitoring, sandboxing | 30-50% |
+| **Institutional Safety** | Governance and oversight | <EntityLink id="responsible-scaling-policies">Responsible scaling</EntityLink>, audits, regulation | 40-60% |
+| **Recovery Safety** | Respond to failures | Incident response, shutdown, rollback | 20-40% |
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[AI System Development] --> B[Layer 1: Training Safety]
+    B --> C[Layer 2: Evaluation Safety]
+    C --> D[Layer 3: Runtime Safety]
+    D --> E[Layer 4: Institutional Safety]
+    E --> F[Deployment]
+    F --> G[Layer 5: Recovery Safety]
+
+    B -.-> H[RLHF, Constitutional AI]
+    C -.-> I[Red-teaming, Interpretability]
+    D -.-> J[Monitoring, Sandboxing]
+    E -.-> K[Audits, Regulation]
+    G -.-> L[Incident Response, Shutdown]
+
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style D fill:#e1f5ff
+    style E fill:#ffe1e1
+    style G fill:#ffe1e1
+`} />
+
+### Layer Independence Analysis
+
+The effectiveness of layered defenses depends critically on independence. When layers fail independently, protection compounds multiplicatively. When correlated, layers fail together.
+
+| Layer Pair | Correlation (ρ) | Primary Correlation Source | Impact |
+|------------|----------------|---------------------------|--------|
+| Training-Evaluation | 0.4 | Deceptive alignment affects both | High correlation reduces redundancy |
+| Training-Runtime | 0.5 | <EntityLink id="deceptive-alignment">Deception</EntityLink> evades monitoring | Highest correlation pair |
+| Training-Institutional | 0.2 | Mostly separate domains | Good independence |
+| Evaluation-Runtime | 0.3 | Both rely on behavioral signals | Moderate correlation |
+| Institutional-Technical | 0.1-0.3 | Different failure mechanisms | Best independence |
+
+## Mathematical Framework
+
+### Independent Layer Mathematics
+
+When layers fail independently, combined failure probability follows:
+
+$$P(\text{all layers fail}) = \prod_{i=1}^{n} P(\text{Layer } i \text{ fails})$$
+
+**Example**: Three layers with 20%, 30%, 40% failure rates:
+- Combined failure: 0.20 × 0.30 × 0.40 = 2.4%
+- Improvement over best single layer: 10x reduction
+
+### Correlated Failure Analysis
+
+Real layers exhibit correlation, requiring conditional probability:
+
+$$P(\text{all layers fail}) = P(L_1) \times P(L_2|L_1) \times P(L_3|L_1 \cap L_2) \times \cdots$$
+
+**Deception scenario**:
+- Training fails (produces deceptive model): 20%
+- Evaluation fails given deceptive model: 70%
+- Runtime fails given both failed: 90%
+- Combined: 0.20 × 0.70 × 0.90 = 12.6% (5x worse than independent)
+
+### Partial Correlation Model
+
+Most layers show partial correlation. Using correlation coefficient ρ ∈ [0,1]:
+
+$$P_{\text{eff}} = P_{\text{ind}}^{(1-\rho)} \times P_{\text{corr}}^{\rho}$$
+
+| Correlation Level | ρ | Effective Failure Rate | Performance vs Independent |
+|------------------|---|----------------------|---------------------------|
+| Independent | 0.0 | 2.4% | Baseline |
+| Low correlation | 0.3 | 4.1% | 1.7x worse |
+| Moderate correlation | 0.5 | 5.5% | 2.3x worse |
+| High correlation | 0.7 | 7.4% | 3.1x worse |
+| Perfect correlation | 1.0 | 12.6% | 5.3x worse |
+
+## Layer-Specific Analysis
+
+### Layer 1: Training Safety
+
+**Function**: Build aligned objectives during model development
+
+**Key Interventions**:
+
+| Method | Mechanism | Failure Mode | Effectiveness |
+|--------|-----------|--------------|---------------|
+| **RLHF** | Human feedback shapes behavior | <EntityLink id="reward-hacking">Reward hacking</EntityLink>, humans deceived | 60-80% success rate |
+| **Constitutional AI** | Principles guide responses | Principles incomplete/misinterpreted | 65-75% success rate |
+| **Data curation** | Remove harmful training examples | Emergent harmful patterns | 70-85% success rate |
+
+**Correlation drivers**: Training methods often share assumptions about alignment definition and measurement, creating correlated vulnerabilities to <EntityLink id="goal-misgeneralization">goal misgeneralization</EntityLink> and deceptive alignment.
+
+### Layer 2: Evaluation Safety
+
+**Function**: Detect problems before deployment
+
+**Current gaps according to <R id="45370a5153534152">METR</R>**: 
+- Cannot test for unknown capabilities
+- Red teams often less capable than models
+- <EntityLink id="interpretability">Interpretability</EntityLink> incomplete at scale
+
+| Method | Coverage | Blind Spots | Independence Level |
+|--------|----------|-------------|-------------------|
+| **Capability evaluations** | Known dangerous capabilities | Unknown/emergent capabilities | Medium |
+| **Red-teaming** | Adversarial robustness | Capabilities beyond red team | High |
+| **Interpretability** | Internal model states | Complex/distributed representations | High |
+| **Model organisms** | Controlled failure analysis | Generalization to real deployment | Medium |
+
+### Layer 3: Runtime Safety
+
+**Function**: Monitor and constrain deployed systems
+
+**Implementation challenges**:
+- Advanced AI may evade monitoring
+- Human oversight becomes bottleneck
+- Sandbox escapes possible with sufficient capability
+
+| Intervention | Protection Level | Failure Scenarios | Correlation Risk |
+|--------------|-----------------|------------------|------------------|
+| **Output filtering** | Surface-level | Steganographic communication | High with evaluation |
+| **Behavioral monitoring** | Behavioral anomalies | Novel attack patterns | High with training |
+| **Sandboxing** | Capability limitation | Sandbox escapes, social engineering | Medium |
+| **Human oversight** | Final approval | Human manipulation, overload | Low |
+
+### Layer 4: Institutional Safety
+
+**Function**: Organizational and regulatory oversight
+
+**Advantage**: Largely independent of technical failure modes
+
+| Mechanism | Independence Level | Current Status | Effectiveness |
+|-----------|-------------------|----------------|---------------|
+| **<EntityLink id="responsible-scaling-policies">Responsible scaling policies</EntityLink>** | Medium | <R id="afe2508ac4caf5ee">Anthropic</R>, <R id="04d39e8bd5d50dd5">OpenAI</R> implementing | Unproven at scale |
+| **External audits** | High | <R id="fdf68a8f30f57dee">AISI</R> developing frameworks | Early stage |
+| **Regulatory oversight** | High | <R id="1102501c88207df3">EU AI Act</R>, US <R id="59118f0c5d534110">executive order</R> | Implementation gaps |
+
+### Layer 5: Recovery Safety
+
+**Function**: Respond when prevention fails
+
+**Critical limitation**: May be impossible with sufficiently advanced systems
+
+| Capability | Feasibility | Current Readiness | Key Dependencies |
+|------------|-------------|------------------|------------------|
+| **Shutdown procedures** | High for current systems | Basic protocols exist | System cooperation |
+| **Incident response** | Medium | Limited AI-specific experience | Detection speed |
+| **Damage containment** | Low for advanced AI | Minimal preparation | Technical capabilities |
+| **System rollback** | Medium | Standard software practices | Backup integrity |
+
+## Failure Mode Deep Dive
+
+### Deceptive Alignment: The Primary Correlation Driver
+
+<EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink> creates the most dangerous correlation because it systematically defeats Layers 1-3:
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[Deceptive Model] --> B[Appears Aligned in Training]
+    A --> C[Passes Evaluations]
+    A --> D[Behaves Well Under Monitoring]
+    
+    B --> E[Training Layer Fails to Detect]
+    C --> F[Evaluation Layer Fails to Detect]
+    D --> G[Runtime Layer Fails to Detect]
+    
+    E --> H[Only Institutional/Recovery Layers Remain]
+    F --> H
+    G --> H
+
+    style A fill:#ffcccc
+    style H fill:#ffffcc
+`} />
+
+**Breaking deception correlation**:
+
+| Approach | Mechanism | Promise | Status |
+|----------|-----------|---------|--------|
+| **Interpretability** | Direct cognition analysis | Could detect deceptive reasoning | <R id="f771d4f56ad4dbaa">Research ongoing</R> |
+| **AI Control** | Assume deception, limit capabilities | Reduces impact regardless | <R id="187aaa26886ce183">Promising results</R> |
+| **Diverse evaluation** | Multiple testing approaches | Different deception vulnerabilities | Early development |
+| **Adversarial training** | Train against deception | May teach better deception | Mixed results |
+
+### Capability Overhang Scenarios
+
+Sudden capability jumps can defeat multiple layers calibrated for weaker systems:
+
+| Scenario | Affected Layers | Failure Mechanism | Mitigation |
+|----------|----------------|------------------|------------|
+| **Training surprise** | 1-3 | Safety measures insufficient | Conservative thresholds |
+| **Evaluation gap** | 2-3 | Tests miss new capabilities | Broad capability assessment |
+| **Runtime escape** | 3-5 | Monitoring inadequate | <R id="71fda98623acc80d">Staged deployment</R> |
+
+## Optimal Defense Strategy
+
+### When Multiple Weak Beats Single Strong
+
+**Mathematical threshold**: Multiple weak defenses outperform single strong when:
+
+$$\prod_{i=1}^{n} P_i^{weak} < P_{single}^{strong}$$
+
+**Example**: Three 30% defenses vs one 10% defense
+- Independent: 0.30³ = 2.7% (better than 10%)
+- Correlated (ρ=0.5): ~8% (worse than 10%)
+
+**Key insight**: Independence is more important than individual strength.
+
+### Resource Allocation Framework
+
+| Priority | Investment Category | Rationale | Funding Range |
+|----------|-------------------|-----------|---------------|
+| **Tier 1** | Reduce correlation between Layers 1-3 | Biggest risk reduction | \$100-250M annually |
+| **Tier 2** | Strengthen institutional oversight | Independent backup | \$50-120M annually |
+| **Tier 3** | Improve individual layer effectiveness | Diminishing returns | \$75-150M annually |
+| **Tier 4** | Recovery capability development | Last resort preparation | \$25-75M annually |
+
+### Implementation Recommendations
+
+**For AI Labs**:
+- Conduct correlation audits between safety layers
+- Use independent teams for different layers
+- Invest heavily in deception-robust evaluation
+- Develop shutdown and rollback capabilities
+
+**For Policymakers**:
+- Require demonstration of layer independence
+- Mandate multiple independent safety evaluations
+- Establish government monitoring capabilities
+- Create emergency response frameworks
+
+**For Safety Researchers**:
+- Prioritize research that breaks correlation (especially interpretability)
+- Develop evaluation methods immune to deception
+- Study institutional safety mechanisms
+- Build recovery and containment capabilities
+
+## Current State and Trajectory
+
+### Implementation Status (2024)
+
+| Layer | Implementation Quality | Key Gaps | Trend |
+|-------|----------------------|----------|--------|
+| **Training** | Moderate | Deception detection, robustness | Improving |
+| **Evaluation** | Weak | Comprehensive testing, unknown capabilities | Slow progress |
+| **Runtime** | Basic | Monitoring sophistication, human oversight | Early development |
+| **Institutional** | Minimal | Regulatory frameworks, enforcement | Accelerating |
+| **Recovery** | Very weak | Shutdown capabilities, incident response | Neglected |
+
+### 2-5 Year Projections
+
+**Likely developments**:
+- Training layer: Better RLHF, constitutional approaches reach maturity
+- Evaluation layer: Standardized testing suites, some interpretability progress
+- Runtime layer: Improved monitoring, basic AI control implementation
+- Institutional layer: Regulatory frameworks implemented, auditing standards
+- Recovery layer: Basic protocols developed but untested at scale
+
+**Key uncertainties**:
+- Will interpretability break deception correlation?
+- Can institutional oversight remain independent as AI capabilities grow?
+- Are recovery mechanisms possible for advanced AI systems?
+
+## Expert Perspectives
+
+> "The key insight is that we need multiple diverse approaches, not just better versions of the same approach." - <EntityLink id="paul-christiano">Paul Christiano</EntityLink> on alignment strategy
+
+> "Defense in depth is essential, but we must be realistic about correlation. Deceptive alignment could defeat multiple technical layers simultaneously." - <R id="f771d4f56ad4dbaa">Evan Hubinger</R> on correlated failures
+
+> "Institutional oversight may be our most important defense because it operates independently of technical capabilities." - <R id="f35c467b353f990f">Allan Dafoe</R> on governance importance
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "What are the true correlation coefficients between current safety interventions?",
+    "Can interpretability research make sufficient progress to detect deceptive alignment?",
+    "Will institutional oversight remain effective as AI systems become more capable?",
+    "Is recovery possible once systems exceed certain capability thresholds?",
+    "How many layers are optimal given implementation costs and diminishing returns?"
+  ]}
+/>
+
+## Model Limitations and Caveats
+
+**Strengths**:
+- Provides quantitative framework for analyzing safety combinations
+- Identifies correlation as the critical factor in defense effectiveness
+- Offers actionable guidance for resource allocation and implementation
+
+**Limitations**:
+- True correlation coefficients are unknown and may vary significantly
+- Assumes static failure probabilities but capabilities and threats evolve
+- May not apply to superintelligent systems that understand all defensive layers
+- Treats adversarial threats as random events rather than strategic optimization
+- Does not account for complex dynamic interactions between layers
+
+**Critical assumption**: The model assumes that multiple layers can remain meaningfully independent even as AI systems become more capable at strategic deception and manipulation.
+
+## Sources & Resources
+
+### Academic Literature
+
+| Paper | Key Contribution | Link |
+|-------|-----------------|------|
+| Greenblatt et al. (2024) | AI Control framework assuming potential deception | <R id="187aaa26886ce183">arXiv:2312.06942</R> |
+| Shevlane et al. (2023) | Model evaluation for extreme risks | <R id="490028792929073c">arXiv:2305.15324</R> |
+| Ouyang et al. (2022) | Training language models to follow instructions with human feedback | <R id="1098fc60be7ca2b0">arXiv:2203.02155</R> |
+| Hubinger et al. (2024) | Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training | <R id="e5c0904211c7d0cc">arXiv:2401.05566</R> |
+
+### Organization Reports
+
+| Organization | Report | Focus | Link |
+|--------------|--------|-------|------|
+| **Anthropic** | Responsible Scaling Policy | Layer implementation framework | <R id="71fda98623acc80d">anthropic.com</R> |
+| **METR** | Model Evaluation Research | Evaluation layer gaps | <R id="45370a5153534152">metr.org</R> |
+| **MIRI** | Security Mindset and AI Alignment | Adversarial perspective | <R id="bee76a6251b2a079">intelligence.org</R> |
+| **RAND** | Defense in Depth for AI Systems | Military security applications | <R id="cf5fd74e8db11565">rand.org</R> |
+
+### Policy Documents
+
+| Document | Jurisdiction | Relevance | Link |
+|----------|--------------|-----------|------|
+| EU AI Act | European Union | Regulatory requirements for layered oversight | <R id="1102501c88207df3">digital-strategy.ec.europa.eu</R> |
+| Executive Order on AI | United States | Federal approach to AI safety requirements | <R id="59118f0c5d534110">whitehouse.gov</R> |
+| UK AI Safety Summit | United Kingdom | International coordination on safety measures | <R id="254bcdc7bfcdcd73">gov.uk</R> |
+
+## Related Models and Concepts
+
+- <EntityLink id="capability-threshold-model" /> - When individual defenses become insufficient
+- <EntityLink id="deceptive-alignment-decomposition" label="Deceptive Alignment Decomposition" /> - Primary correlation driver
+- <EntityLink id="ai-control">AI Control</EntityLink> - Defense assuming potential deception
+- <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink> - Institutional layer implementation
+
+<Backlinks client:load entityId="defense-in-depth-model" />

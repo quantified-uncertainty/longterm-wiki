@@ -1,0 +1,18 @@
+{
+  "name": "longterm-wiki",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter longterm-next dev",
+    "build": "pnpm --filter longterm-next build",
+    "test": "pnpm --filter longterm-next test",
+    "validate": "cd . && node tooling/crux.mjs validate",
+    "crux": "node tooling/crux.mjs"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.4"
+}

@@ -1,0 +1,152 @@
+{
+  "totalFiles": 625,
+  "totalLinks": 172,
+  "brokenLinks": [
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/ai-transition-model/factors-ai-ownership-overview.mdx",
+      "line": 17,
+      "href": "/ai-transition-model-views/graph/",
+      "text": "AI Transition Model Graph"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/ai-transition-model/factors-ai-ownership-overview.mdx",
+      "line": 48,
+      "href": "/ai-transition-model-views/graph/",
+      "text": "AI Transition Model"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/ai-transition-model/factors-ai-uses-overview.mdx",
+      "line": 17,
+      "href": "/ai-transition-model-views/graph/",
+      "text": "AI Transition Model Graph"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/ai-transition-model/factors-ai-uses-overview.mdx",
+      "line": 48,
+      "href": "/ai-transition-model-views/graph/",
+      "text": "AI Transition Model"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/ai-transition-model/index.mdx",
+      "line": 33,
+      "href": "/ai-transition-model-views/graph/",
+      "text": "Graph View"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/ai-transition-model/index.mdx",
+      "line": 34,
+      "href": "/ai-transition-model-views/data/",
+      "text": "Data View"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "line": 26,
+      "href": "/tables/",
+      "text": "Tables Gallery"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "line": 26,
+      "href": "/diagrams/",
+      "text": "Cause-Effect Diagrams"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "line": 33,
+      "href": "/knowledge-base/architecture-scenarios/table/",
+      "text": "Architecture Scenarios Table"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "line": 34,
+      "href": "/knowledge-base/deployment-architectures/table/",
+      "text": "Deployment Architectures Table"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "line": 40,
+      "href": "/knowledge-base/responses/safety-generalizability/table/",
+      "text": "Safety Generalizability Table"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "line": 41,
+      "href": "/knowledge-base/responses/safety-generalizability/matrix/",
+      "text": "Safety × Architecture Matrix"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "line": 42,
+      "href": "/knowledge-base/responses/safety-generalizability/graph/",
+      "text": "Safety Generalizability Graph"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "line": 54,
+      "href": "/knowledge-base/models/eval-types/table/",
+      "text": "Eval Types Table"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "line": 60,
+      "href": "/diagrams/master-graph/",
+      "text": "Master Graph"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "line": 61,
+      "href": "/ai-transition-model-views/",
+      "text": "AI Transition Model Views"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/index.mdx",
+      "line": 75,
+      "href": "/explore/",
+      "text": "Browse all content →"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/internal/cause-effect-diagrams.mdx",
+      "line": 46,
+      "href": "/diagrams/",
+      "text": "/diagrams"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/internal/reports/causal-diagram-visualization.mdx",
+      "line": 317,
+      "href": "/diagrams/master-graph/",
+      "text": "Master Graph Viewer"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/internal/reports/causal-diagram-visualization.mdx",
+      "line": 331,
+      "href": "/diagrams/master-graph/",
+      "text": "/diagrams/master-graph"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/internal/reports/causal-diagram-visualization.mdx",
+      "line": 332,
+      "href": "/diagrams/master-graph?level=interactive",
+      "text": "/diagrams/master-graph?level=interactive"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/internal/reports/causal-diagram-visualization.mdx",
+      "line": 333,
+      "href": "/diagrams/master-graph?level=expanded",
+      "text": "/diagrams/master-graph?level=expanded"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/internal/reports/causal-diagram-visualization.mdx",
+      "line": 334,
+      "href": "/diagrams/master-graph?level=detailed",
+      "text": "/diagrams/master-graph?level=detailed"
+    },
+    {
+      "file": "/Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/content/docs/knowledge-base/index.mdx",
+      "line": 61,
+      "href": "/explore/",
+      "text": "Explore page"
+    }
+  ],
+  "conventionIssues": [],
+  "valid": 144
+}

@@ -1,0 +1,589 @@
+---
+title: Manifold
+description: Manifold is a play-money prediction market platform founded in December 2021 by Austin Chen (ex-Google) and brothers James and Stephen Grugett (CEO). Users trade using Mana currency on thousands of user-created markets covering AI timelines, politics, technology, and more. The platform has facilitated millions of predictions with ~2,000 daily active users at peak, though activity declined in 2025. Key innovations include permissionless market creation, social forecasting features, leagues, and the annual Manifest conference (250 attendees in 2023, 600 in 2024). 2024 election analysis showed Polymarket outperformed Manifold (Brier scores 0.0296 vs 0.0342), though Manifold remained competitive. Funded by FTX Future Fund (1.5M USD), SFF (340K USD+), and ACX Grants. Real-money Sweepcash was sunset March 2025 to refocus on core play-money platform.
+sidebar:
+  order: 5
+quality: 43
+llmSummary: Manifold is a play-money prediction market with millions of predictions and ~2,000 peak daily users, showing AGI by 2030 at ~60% vs Metaculus ~45%. Platform scored Brier 0.0342 on 2024 election (vs Polymarket's 0.0296), demonstrating play-money markets can approach real-money accuracy but with systematic gaps due to lower liquidity and financial incentives.
+lastEdited: "2026-01-29"
+importance: 18.5
+ratings:
+  novelty: 2.5
+  rigor: 4
+  actionability: 2
+  completeness: 6.5
+metrics:
+  wordCount: 1285
+  citations: 68
+  tables: 41
+  diagrams: 2
+clusters:
+  - epistemics
+  - community
+subcategory: epistemic-orgs
+---
+import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Scale** | Large | Millions of predictions, thousands of active users |
+| **AI Coverage** | Extensive | Dedicated AI categories, timeline markets |
+| **Accuracy** | Good | Competitive with <EntityLink id="polymarket">Polymarket</EntityLink> on most questions |
+| **Accessibility** | High | Free to use, user-created markets |
+| **Community** | Active | <EntityLink id="manifest">Manifest</EntityLink> conference, EA/rationalist engagement |
+| **Funding** | \$1.84M+ | FTX Future Fund, SFF, ACX Grants |
+| **Business Model** | Evolving | Play money core; sunset real-money feature 2025 |
+
+## Organization Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Full Name** | Manifold (formerly Manifold Markets) |
+| **Founded** | December 2021 |
+| **Founders** | Austin Chen, James Grugett, Stephen Grugett (CEO) |
+| **Location** | San Francisco Bay Area / Austin, Texas |
+| **Status** | For-profit startup |
+| **Website** | [manifold.markets](https://manifold.markets/) |
+| **Currency** | Mana (play money) |
+| **Key Event** | Manifest Conference (annual) |
+| **GitHub** | [manifoldmarkets/manifold](https://github.com/manifoldmarkets/manifold) |
+| **Investors** | Leonis Capital, Soma Capital |
+
+## Overview
+
+[Manifold](https://manifold.markets/) is an online prediction market platform where users engage in competitive forecasting using play money called "Mana." Unlike traditional forecasting platforms that require question approval, Manifold allows anyone to create markets on any topic, enabling rapid coverage of emerging events and niche questions. This permissionless approach has made Manifold particularly valuable for AI forecasting, where new developments constantly create new prediction opportunities.
+
+Founded in December 2021 by Austin Chen and brothers James and Stephen Grugett, Manifold emerged from the effective altruism and rationalist communities with seed funding from the [Astral Codex Ten grant program](https://astralcodexten.substack.com/p/acx-grants-results). The platform quickly grew to become one of the most active <EntityLink id="prediction-markets">prediction markets</EntityLink>, with particular strength in technology, AI, and intellectual community questions. By March 2024, Manifold had reached over 2,000 daily active users and up to 200,000 unique visitors per month, though user activity [declined in 2025](https://manifold.markets/TheAllMemeingEye/will-manifold-hit-another-record-lo) following the sunset of real-money features.
+
+Manifold's design emphasizes social features and accessibility over maximum accuracy. Users can follow forecasters, comment on markets, and build reputations through the platform's [leagues system](https://manifold.markets/leagues). While this approach sacrifices some accuracy compared to real-money markets like Polymarket, it dramatically lowers barriers to participation and enables forecasting on questions too niche or legally risky for real-money platforms. The platform has become an unofficial "training ground" for professional traders, with many top-ranked individuals on <EntityLink id="kalshi">Kalshi</EntityLink> having started by accumulating Mana on Manifold.
+
+## Founders and Leadership
+
+### Austin Chen
+
+Austin Chen co-founded Manifold in December 2021 alongside the Grugett brothers. Chen studied at UC Berkeley and built a career in technology before founding Manifold, having worked as an engineer at [Google](https://www.linkedin.com/in/austinch/) and as a Tech Lead at Streamlit. He also previously founded One Word. Chen brought experience in both large tech companies and startups to Manifold's development.
+
+In April 2024, Chen [departed from Manifold](https://www.lesswrong.com/posts/GHusbyeLEn45HaM5B/podcast-elizabeth-and-austin-on-what-manifold-was-allowed-to) to focus full-time on [Manifund](https://manifund.org/), the related charitable giving platform. His farewell post cited four reasons for leaving: Manifold had become stable with less room for iteration, he wasn't excited about the planned pivot to real-money sweepstakes, prediction markets seemed "insufficiently powerful" for his interests, and short AI timelines were reshaping his priorities. Chen's wife, Rachel Weinberg, is a software engineer who joined <EntityLink id="manifund">Manifund</EntityLink> as co-founder and engineer.
+
+### Stephen Grugett (CEO)
+
+Stephen Grugett serves as CEO of Manifold. He grew up in Atlanta with his brother James and developed early economic intuitions playing games like RuneScape and Neopets, where trading was central. Grugett studied computer science and philosophy at [Yale](https://www.theojaffee.com/p/16-stephen-grugett-and-austin-chen), then worked as a programmer at SIG (Susquehanna International Group), an options trading firm, for a year.
+
+After leaving SIG, Grugett moved to New York to work at a friend's robo-advisor startup for a year, then became a digital nomad living primarily in Southeast Asia. During this period, he and James started their previous venture—a subscription group chat app for online creators—before co-founding Manifold.
+
+### James Grugett
+
+James Grugett is a co-founder of Manifold and attended [Carnegie Mellon University](https://www.linkedin.com/in/james-grugett/). He worked closely with his brother Stephen on both their earlier subscription group chat startup and Manifold. James has been an active speaker at Manifest conferences, delivering talks including "Prediction Markets Will Save the World" at Manifest 2023.
+
+In late 2024, James participated in [Y Combinator's Fall 2024 batch](https://x.com/jahooma) with a new project called Manicode (now Codebuff), a CLI tool that uses AI to write code with your codebase as context. While James has shifted some focus to this new venture, he remains involved with Manifold.
+
+## Platform History
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Y2021["2021"]
+        FOUND[December: Founded by<br/>Chen, J. Grugett, S. Grugett]
+        ACX[Seed funding from<br/>ACX Grants]
+    end
+
+    subgraph Y2022["2022"]
+        FTX[FTX Future Fund<br/>1.5M USD]
+        SFF[SFF funding<br/>340K USD+]
+        GROW[Platform growth<br/>to thousands of users]
+    end
+
+    subgraph Y2023["2023"]
+        M23[Sept: Manifest 2023<br/>250 attendees]
+        SCALE[100K+ markets created]
+    end
+
+    subgraph Y2024["2024"]
+        AUSTIN[Apr: Austin Chen<br/>departs for Manifund]
+        M24[June: Manifest 2024<br/>600 attendees]
+        SWEEP[Sweepcash<br/>real-money launch]
+        ELECT[Nov: 2024 Election<br/>coverage]
+    end
+
+    subgraph Y2025["2025"]
+        END[Mar 28: Sweepcash<br/>sunset]
+        DECLINE[User activity<br/>decline]
+    end
+
+    FOUND --> ACX
+    ACX --> FTX
+    FTX --> SFF
+    SFF --> GROW
+    GROW --> M23
+    M23 --> SCALE
+    SCALE --> AUSTIN
+    AUSTIN --> M24
+    M24 --> SWEEP
+    SWEEP --> ELECT
+    ELECT --> END
+    END --> DECLINE
+
+    style FOUND fill:#90EE90
+    style END fill:#FFB6C1
+    style M23 fill:#87CEEB
+    style M24 fill:#87CEEB
+`} />
+
+| Period | Key Events |
+|--------|------------|
+| **Dec 2021** | Founded by Austin Chen, James Grugett, and Stephen Grugett with ACX Grants seed funding |
+| **2022** | Received 1.5M USD from FTX Future Fund (before collapse); 340K USD+ from SFF |
+| **Sept 2023** | First Manifest conference with 250 attendees including Nate Silver, Robin Hanson |
+| **Apr 2024** | Austin Chen departs to focus on Manifund |
+| **June 2024** | Manifest 2024 grows to 600 attendees |
+| **Nov 2024** | Major coverage of 2024 US election |
+| **Mar 2025** | Sweepcash real-money feature sunset to refocus on core platform |
+| **2025** | User activity declines; record low of 886 daily active traders in March |
+
+## Platform Features
+
+<Mermaid client:load chart={`
+flowchart TD
+    MANIFOLD[Manifold Platform] --> MARKETS[Market Types]
+    MANIFOLD --> SOCIAL[Social Features]
+    MANIFOLD --> TOOLS[Analysis Tools]
+
+    MARKETS --> BINARY[Binary Markets<br/>Yes/No questions]
+    MARKETS --> MULTI[Multiple Choice<br/>Several options]
+    MARKETS --> NUMERIC[Numeric Markets<br/>Number predictions]
+    MARKETS --> DATE[Date Markets<br/>When events occur]
+
+    SOCIAL --> FOLLOW[Follow Users]
+    SOCIAL --> COMMENT[Comments/Discussion]
+    SOCIAL --> LEAGUES[Leagues/Competitions]
+    SOCIAL --> PROFILE[Forecaster Profiles]
+
+    TOOLS --> TRACK[Track Record]
+    TOOLS --> EMBED[Market Embedding]
+    TOOLS --> API[Developer API]
+
+    style MANIFOLD fill:#e6f3ff
+    style MARKETS fill:#ccffcc
+    style SOCIAL fill:#ffffcc
+`} />
+
+### Market Types
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| **Binary** | Yes/No questions | "Will GPT-5 be released by 2025?" |
+| **Multiple Choice** | Several options | "Which lab will release AGI first?" |
+| **Numeric** | Number predictions | "What will GPT-5's MMLU score be?" |
+| **Date** | When something happens | "When will AI beat humans at X?" |
+| **Free Response** | Open-ended options | Exploratory questions |
+
+### Currency System
+
+| Currency | Type | Status |
+|----------|------|--------|
+| **Mana** | Play money | Primary currency, free to earn |
+| **Sweepcash** | Real money | Sunset March 28, 2025 |
+| **Prize Points** | Redeemable | For charity donations |
+
+### Social and Community Features
+
+Manifold distinguishes itself from other prediction markets through its emphasis on social features. The platform functions as a "social prediction game" designed for community engagement rather than pure financial speculation.
+
+**Leagues System**: Users compete in seasonal [leagues](https://manifold.markets/leagues) that rank forecasters by performance. "Mana Whales"—users who have accumulated large balances through accurate forecasting—hold significant status within the community and often use their wealth to "boost" niche markets on topics like science and AI safety.
+
+**Reputation Capital**: Users develop track records measured by [Brier Score](https://manifold.markets/calibration), which they can use to build credibility. Market creators who demonstrate reliability earn followers, positive reviews, and increased activity on their questions. This reputation system has made Manifold an effective training ground for professional forecasters.
+
+**Incentive Structure**:
+- Daily streak bonuses provide escalating rewards (M5 on day one, increasing by M5 daily to a M25 cap)
+- Quests and bounties offer targeted Mana payouts for tasks like market creation
+- In EA communities, Mana earnings can be redeemed for donations to approved charities
+
+**Topics and Groups**: Users can filter markets by topic, create custom groups, and invite communities from other platforms. Popular topics include AI, politics, sports, and effective altruism.
+
+### Developer Tools and API
+
+Manifold is [open source](https://github.com/manifoldmarkets/manifold) and provides a comprehensive [API](https://docs.manifold.markets/api) for developers. The platform's data architecture includes:
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Public API** | Vercel-hosted | Market listing, search, basic operations |
+| **Database** | Supabase (SQL) | Primary data storage (migrated from Firebase) |
+| **Internal API** | Google Cloud Docker | Complex operations (e.g., share trading) |
+| **Python Library** | manifoldpy | Data analysis, accuracy metrics, API bindings |
+
+The API supports market creation, trading operations, liquidity management, and information retrieval. Developers use it for probability modeling, sentiment analysis, and research projects. Type definitions are available in the repository's `common/src/api/schema.ts`.
+
+### Sweepcash: The Real-Money Experiment
+
+In 2024, Manifold launched "Sweepcash," a real-money betting feature where users could redeem winnings for cash (with a 5% fee) or donate to charity (no fee). The experiment aimed to increase user engagement and provide stronger forecasting incentives.
+
+However, in [March 2025](https://news.manifold.markets/p/focusing-on-mana-bringing-sweepstakes), Manifold announced the sunset of Sweepcash, effective March 28, 2025:
+
+| Reason | Explanation |
+|--------|-------------|
+| **Usage goals not met** | Real-money trading didn't attract expected user growth |
+| **Platform focus diluted** | Sweepstakes development drew resources from core features |
+| **Regulatory complexity** | Operating real-money markets required ongoing compliance work |
+| **Strategic realignment** | Decision to "double-down on user-created markets that make Manifold unique" |
+
+After the sunset, non-cashed-out Sweepcash was converted to Mana at a rate of 100:1. Despite losing real-money features, Manifold has emphasized that users continue trading for "reputation capital" and forecasting skill development rather than financial returns.
+
+## AI Forecasting on Manifold
+
+Manifold has become a significant venue for AI forecasting, with an [active AI market dashboard](https://manifold.markets/AI) and dedicated [AGI timelines page](https://manifold.markets/news/agi). The platform's permissionless market creation enables rapid coverage of AI developments that regulated markets cannot address.
+
+### Key AI Markets
+
+| Question Type | Examples | Activity Level |
+|---------------|----------|----------------|
+| **AGI Timelines** | "AGI by 2028?", "AGI by 2030?" | Very High |
+| **Model Releases** | "GPT-5 release date", "Claude 4 capabilities" | High |
+| **Benchmarks** | "ARC-AGI grand prize", "Turing Test by 2029" | High |
+| **Lab Events** | "Will Anthropic raise X?", "OpenAI leadership" | Moderate |
+| **Safety Events** | "AI safety incident by 2030?" | Moderate |
+| **Superintelligence** | "Superintelligence by 2030?", "by 2040?" | Moderate |
+
+### AGI Timeline Estimates (January 2026)
+
+| Question | Manifold | Metaculus | Polymarket/Kalshi |
+|----------|----------|-----------|-------------------|
+| AGI by 2028 | ≈47% | ≈30% | — |
+| AGI by 2030 (OpenAI) | High volume YES | — | 40% (Kalshi) |
+| AGI by 2030 | ≈60% | ≈45% | 9% by 2027 (Polymarket) |
+| Weak AGI by end 2025 | 3% | — | — |
+| Superintelligence by 2030 | 26% | — | — |
+| Superintelligence by 2040 | 69% | — | — |
+| ARC-AGI grand prize | 78% | — | — |
+| Turing Test (Long Bets) by 2029 | 50-53% | — | — |
+
+Manifold's AGI estimates tend to be [higher than Metaculus](https://www.lesswrong.com/posts/dRbvHfEwb6Cuf6xn3/forecasting-agi-insights-from-prediction-markets-and-1), partly due to different user bases, less stringent AGI definitions, and the platform's rationalist community overlap. A combined [AGI Timelines Dashboard](https://agi.goodheartlabs.com/) aggregating multiple sources estimates AGI will arrive in 2031 (with 80% confidence range of 2027-2045) as of January 2026.
+
+## 2024 Election Performance
+
+The 2024 US presidential election provided a significant test of prediction market accuracy. [Analysis](https://www.mikesblog.net/p/scoring-2024-election-forecasts) of platform performance revealed clear differences between play-money and real-money markets.
+
+### Brier Score Comparison (2024 Presidential Election)
+
+| Platform | Mean Brier Score | Currency Type | Notes |
+|----------|------------------|---------------|-------|
+| **Polymarket** | 0.0296 | Real (crypto) | Best performer |
+| **Futuur** | 0.0315 | Real | |
+| **Kalshi** | 0.0319 | Real (USD) | |
+| **Manifold** | 0.0342 | Play money | Statistical difference from Polymarket |
+| **Nate Silver** | 0.0396 | N/A | Least accurate |
+
+All prediction markets scored below 0.035, reflecting high accuracy overall. However, a [two-tailed paired t-test](https://manifold.markets/benshindel/will-manifold-be-more-accurate-than) found Polymarket beat Manifold with statistical significance (p < 0.05).
+
+### Detailed Performance Analysis
+
+| Metric | Manifold | Polymarket | Winner |
+|--------|----------|------------|--------|
+| **Overall Accuracy** | Good | Better | Polymarket |
+| **High-Volume Races** | Competitive | Superior | Polymarket (liquidity advantage) |
+| **Market Stability** | More stable throughout | More volatile | Manifold |
+| **Trump Confidence** | Lower | Higher | Polymarket (more accurate) |
+| **Democrat Wins (Gallego, Slotkin)** | Less accurate | More accurate | Polymarket |
+
+### Key Factors Explaining the Gap
+
+1. **Trading Volume**: Polymarket had billions in volume vs. much lower activity on Manifold
+2. **Real vs. Play Money**: Financial incentives on Polymarket drove more rigorous forecasting
+3. **Arbitrage**: Real-money markets can be arbitraged against each other; play-money cannot
+4. **Marginal Corrections**: Lower liquidity on Manifold made it slower to adjust prices by a few percentage points
+
+Despite the gap, Manifold was "pretty close" to Polymarket, and the difference was primarily at the margins. Both platforms outperformed traditional polls, consistent with broader findings that [prediction markets beat polls](https://futuur.substack.com/p/prediction-markets-beat-polls) in forecasting elections.
+
+## Platform Calibration and Accuracy Research
+
+Manifold publishes [real-time calibration data](https://manifold.markets/calibration) that assesses whether events occurred as often as predicted. The methodology samples 2% of all past trades on resolved binary questions with 15 or more traders every hour.
+
+### Calibration Methodology
+
+| Metric | Value | Notes |
+|--------|-------|-------|
+| **Sample Size** | ≈89,000 trades | As of late 2024 |
+| **Sampling Rate** | 2% of all trades | Hourly updates |
+| **Minimum Traders** | 15 per market | For inclusion in calibration |
+| **Optimal Traders** | 10-20+ | Research shows calibration stops improving beyond this |
+
+### Key Accuracy Findings
+
+| Finding | Source | Implication |
+|---------|--------|-------------|
+| **2022 Midterms**: Manifold outperformed real-money markets, nearly matched FiveThirtyEight | [Manifold internal analysis](https://docs.manifold.markets/faq) | Play-money can compete with real-money in some contexts |
+| **16+ traders sufficient** for quality predictions | Academic research | Smaller markets may exhibit favourite-longshot bias |
+| **Play-money vs. real-money accuracy**: No systematic difference across 208 games | "Prediction Markets: Does Money Matter?" study | Theoretical justification for play-money approach |
+| **Favourite-longshot bias** exists; predictions improve closer to event | Page & Clemen research | Long-term forecasts biased toward 50% |
+| **Metaculus vs. Manifold Brier scores**: 0.111 vs. 0.168 | [Comparative analysis](https://forum.effectivealtruism.org/posts/PGqu4MD3AKHun7kaF/predictive-performance-on-metaculus-vs-manifold-markets) | Curated platforms may outperform permissionless ones |
+
+[Calibration City](https://manifund.org/projects/calibration-city), a cross-platform accuracy analysis project funded through Manifund, integrates data from Kalshi, Manifold, Metaculus, and Polymarket with over 130,000 total markets.
+
+## Funding History
+
+| Source | Amount | Year | Notes |
+|--------|--------|------|-------|
+| **Astral Codex Ten Grants** | Seed funding | 2021 | Initial support |
+| **FTX Future Fund** | 1,500,000 USD | 2022 | Before FTX collapse |
+| **Survival and Flourishing Fund** | 340,000+ USD | 2022+ | Ongoing support |
+| **Leonis Capital** | Undisclosed | 2022+ | Institutional investor |
+| **Soma Capital** | Undisclosed | 2022+ | Institutional investor |
+| **Total Known** | 1,840,000+ USD | | Grants and investments |
+
+## Manifest Conference
+
+Manifold hosts "[Manifest](https://manifest.is/)," an annual festival for forecasts, markets, and ideas. It represents the largest in-person gathering of the prediction market and forecasting community, attracting participants from EA, rationalist, economics, journalism, and tech communities.
+
+### Conference History
+
+| Year | Dates | Attendance | Key Features |
+|------|-------|------------|--------------|
+| **Manifest 2023** | Sept 22-24 | 250 | First in-person forecasting festival; held at Lighthaven |
+| **Manifest 2024** | June 7-9 | 600 | Expanded program; part of 10-day extravaganza with LessOnline |
+| **Manifest 2025** | June 6-8 | TBD | Announced; registration open |
+
+### Manifest 2023 Details
+
+The [inaugural Manifest](https://forum.effectivealtruism.org/posts/uv88CMAmbRtzjcKb2/announcing-manifest-2023-sep-22-24-in-berkeley-3) was held September 22-24, 2023 at Lighthaven in Berkeley. Sponsors included Kalshi, Polymarket, Sovereign, and Metaculus.
+
+**Sample Schedule**:
+- 10-11 AM: Opening session
+- 11-12 PM: Fireside chat with Robin Hanson
+- 1-2 PM: Estimathon (fermi estimation with prizes)
+- 2-3 PM: Speed friending
+- 4-5 PM: Panel: Forecasting Founders (Manifold, Metaculus, Polymarket, Kalshi, FRI)
+- 7-8 PM: Workshop: How to Write Good Forecasting Questions
+- 8 PM-12 AM: "Murder She Bet" (murder mystery + prediction market game)
+
+### Manifest 2024 Details
+
+[Manifest 2024](https://forum.effectivealtruism.org/posts/jCcgAHoN6MKEce9ph/come-to-manifest-2024-june-7-9-in-berkeley) was held June 7-9, 2024, part of a 10-day event series with Lightcone Infrastructure's [LessOnline](https://lessonline.com/) conference the preceding weekend.
+
+**Programming Innovations**:
+- Interest-specific meetups for politics, journalism, AI, mechanism design
+- Serious talks combined with attendee-run workshops
+- Fun side events including prediction-market-based games
+- Overnight accommodations at Lighthaven
+
+### Notable Speakers (All Editions)
+
+| Speaker | Background | Year(s) |
+|---------|------------|---------|
+| **Nate Silver** | FiveThirtyEight founder, *The Signal and the Noise* author | 2023, 2024 |
+| **Scott Alexander** | Astral Codex Ten author | 2023, 2024 |
+| **Robin Hanson** | Economist, prediction market pioneer | 2023, 2024 |
+| **Dwarkesh Patel** | Podcaster, interviewer | 2024 |
+| **Cate Hall** | Poker player, forecaster | 2024 |
+| **Eliezer Yudkowsky** | AI safety researcher, MIRI founder | 2023 |
+| **Dylan Matthews** | Vox journalist | 2023 |
+| **Zvi Mowshowitz** | Forecaster, blogger | 2023 |
+| **Katja Grace** | AI Impacts founder | 2023 |
+| **Aella** | Researcher, data analyst | 2023 |
+| **Destiny** | Political streamer | 2023 |
+| **Robert Miles** | AI safety communicator | 2023 |
+| **Richard Hanania** | Political scientist | 2023 |
+| **Emmett Shear** | Former Twitch CEO, brief OpenAI CEO | 2023 |
+| **James Grugett** | Manifold co-founder | 2023 |
+
+### Session Topics
+
+| Category | Example Sessions |
+|----------|------------------|
+| **Prediction Markets & Journalism** | Scott Alexander (ACX) + Dylan Matthews (Vox) |
+| **Markets vs. Financial Markets** | Byrne Hobart (The Diff) |
+| **Genetic Enhancement** | Jonathan Anomaly |
+| **Platform Comparisons** | Founders from Manifold, Kalshi, Polymarket, Metaculus |
+| **Quantitative Tools** | Squiggle and other forecasting tools |
+
+## Manifund
+
+[Manifund](https://manifund.org/) is a charitable giving platform co-founded by Austin Chen and closely related to Manifold (hence the similar names). The platform experiments with innovative funding mechanisms to support effective altruism and AI safety projects.
+
+### Organization Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Founded** | 2023 |
+| **Co-founders** | Austin Chen, Rachel Weinberg |
+| **Board** | Austin Chen, Barak Gila, Vishal Maini |
+| **Staff** | Rachel Weinberg (full-time), Austin Chen (~half-time as of 2023) |
+| **2023 Funding Distributed** | 2,000,000+ USD |
+| **2025 Regrant Budget** | 2,250,000 USD |
+
+### Core Programs
+
+| Program | Description | 2023-2024 Scale |
+|---------|-------------|-----------------|
+| **Regranting** | Donors delegate budgets to expert "regrantors" who make fast, small grants | 1.6M USD to 6 AI safety regrantors in 2024 |
+| **Impact Certificates** | Retroactive funding based on demonstrated impact | ≈50K USD invested in 12 projects via ACX 2024 |
+| **Open Applications** | Direct applications for funding | Part of 2M USD total 2023 |
+| **Prize Challenges** | Competition-based funding | Experimental in 2024 |
+
+### Regranting Program
+
+Manifund's signature innovation is its [regranting model](https://forum.effectivealtruism.org/posts/RMXctNAksBgXgoszY/announcing-manifund-regrants). Rather than centralized grantmaking, donors give to individual "regrantors"—experts in specific fields—who then distribute funds according to their judgment.
+
+**Key Advantages**:
+- Speed: Manifund can move dollars to grantees within days
+- Expertise: Regrantors have domain knowledge donors may lack
+- Autonomy: Regrantors can fund time-sensitive opportunities (compute, travel, talent)
+
+**2024-2025 AI Safety Regrantors** (100K USD+ budgets each):
+- Adam Gleave (Redwood Research)
+- Dan Hendrycks (CAIS)
+- Evan Hubinger (Anthropic researcher)
+- Leopold Aschenbrenner (former OpenAI, "Situational Awareness" author)
+- Ryan Kidd
+- Neel Nanda (mechanistic interpretability researcher)
+
+For 2025, Manifund [raised 2.25M USD](https://manifund.substack.com/p/manifund-2025-regrants) and announced their first 10 regrantors.
+
+### Impact Certificates
+
+Manifund has experimented with [impact certificates](https://www.lesswrong.com/posts/AzoopyYgzNimBJDdY/manifund-q1-retro-learnings-from-impact-certs)—a mechanism for retroactive funding where investors purchase shares in projects and later sell them to donors who want to fund demonstrated impact.
+
+**2024 ACX Grants Partnership**:
+- ACX directly funded 33 projects for 1.35M USD
+- Impact market funded 12 additional projects for ~50K USD at ~200K USD combined valuation
+- Projects that opted-in but didn't receive direct funding could seek impact market investment
+
+**Lessons Learned**:
+- Difficult to attract sufficient investor interest
+- Haven't found use cases where certificates led to clearly better decisions than traditional grants
+- Show promise but haven't achieved product-market fit
+- Need more participants and bigger use cases to validate
+
+## Comparison with Other Platforms
+
+| Platform | Currency | Market Creation | Strengths | Weaknesses |
+|----------|----------|-----------------|-----------|------------|
+| **Manifold** | Play money | Anyone | Accessibility, breadth | Lower accuracy |
+| **Polymarket** | Crypto (real) | Approved | Accuracy, liquidity | Legal restrictions |
+| **Kalshi** | USD (real) | Approved | Regulated, legitimate | Limited topics |
+| **Metaculus** | Reputation | Approved | AI focus, rigor | Not a market |
+| **PredictIt** | USD (real) | Approved | Political focus | Capped positions |
+
+## Platform Statistics
+
+| Metric | Value | Period | Notes |
+|--------|-------|--------|-------|
+| **Total Markets Created** | 100,000+ | Cumulative | User-created, permissionless |
+| **Peak Daily Active Users** | ≈2,000 | March 2024 | Before Sweepcash sunset |
+| **Monthly Unique Visitors** | Up to 200,000 | March 2024 | Peak engagement |
+| **2025 Daily Active Traders** | ≈886-1,000 | March-July 2025 | [Record low in March 2025](https://manifold.markets/TheAllMemeingEye/will-manifold-hit-another-record-lo) |
+| **User Decline** | ≈50% | Jan 2024 - Mar 2025 | Daily active traders roughly halved |
+| **AI/Tech Markets** | 5,000+ | Cumulative | High activity category |
+| **Total Predictions** | Millions | Cumulative | Across all market types |
+
+### User Activity Trends
+
+The platform experienced significant growth through 2023-2024, peaking around the 2024 US election. However, user activity has [declined substantially in 2025](https://manifold.markets/stats), with the number of daily active traders roughly halving since records began in early 2024. The March 2025 low of 886 daily active traders represents a new record low.
+
+Contributing factors to the decline include:
+- Sunset of Sweepcash real-money feature
+- Reduced novelty after initial growth phase
+- Competition from expanding real-money platforms like Kalshi
+- Questions about long-term business model sustainability
+
+## Prediction Market Industry Context
+
+The prediction market industry has grown significantly:
+
+| Metric | Late 2025 |
+|--------|-----------|
+| **Total Industry Volume** | ≈\$13 billion/month |
+| **Key Milestone** | Kalshi won CFTC lawsuit (Oct 2024) |
+| **Regulatory Trend** | Increasing legitimacy |
+
+Manifold occupies the "accessible, social" niche in this growing ecosystem.
+
+## Critical Assessment
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Accessibility** | Free to use, no financial risk, anyone can create markets on any topic |
+| **Speed** | New markets can respond to events within minutes of news breaking |
+| **Breadth** | Covers niche topics other platforms cannot (legal, regulatory, or liquidity constraints) |
+| **Community** | Active discussion, social features, strong EA/rationalist engagement |
+| **Innovation** | Experiments with new market types (date markets, numeric), leagues, embedding |
+| **Training Ground** | Many professional forecasters developed skills on Manifold before moving to real-money platforms |
+| **Open Source** | Transparent codebase; developers can audit and contribute |
+
+### Limitations
+
+| Limitation | Evidence |
+|------------|----------|
+| **Lower Accuracy** | Play money reduces financial incentives; Brier score gap vs. Polymarket (0.0342 vs. 0.0296) |
+| **Liquidity** | Lower trading volume makes markets slower to adjust to new information |
+| **Manipulation Risk** | Easier to move markets without financial cost |
+| **Business Model Uncertainty** | Revenue model unclear after Sweepcash sunset; depends on grants |
+| **User Decline** | 50% drop in daily active traders from 2024 peak to 2025 |
+| **Regulatory Risk** | Prediction market legal status continues evolving |
+
+### Role in AI Forecasting
+
+Manifold serves several unique functions in AI forecasting that complement other platforms:
+
+1. **Rapid Coverage**: When new AI developments occur, Manifold markets often appear within hours
+2. **Niche Questions**: Topics too specific or speculative for curated platforms
+3. **Community Thermometer**: Reflects EA/rationalist community beliefs, which influence AI policy discourse
+4. **Training Data**: Large corpus of resolved forecasts useful for calibration research
+
+However, for high-stakes decisions, real-money markets (Polymarket, Kalshi) or curated platforms (Metaculus) may provide more reliable signals.
+
+## Sources and Further Reading
+
+### Primary Sources
+
+- [Manifold Homepage](https://manifold.markets/)
+- [Manifold API Documentation](https://docs.manifold.markets/api)
+- [Manifold FAQ](https://docs.manifold.markets/faq)
+- [Manifold Statistics Page](https://manifold.markets/stats)
+- [Manifold Calibration](https://manifold.markets/calibration)
+- [Manifold GitHub Repository](https://github.com/manifoldmarkets/manifold)
+- [Manifold AGI Timelines Dashboard](https://manifold.markets/news/agi)
+- [Manifold AI Forecast Page](https://manifold.markets/AI)
+
+### Manifest Conference
+
+- [Manifest 2025 Homepage](https://manifest.is/)
+- [Manifest 2024 Announcement (EA Forum)](https://forum.effectivealtruism.org/posts/jCcgAHoN6MKEce9ph/come-to-manifest-2024-june-7-9-in-berkeley)
+- [Manifest 2023 Announcement (EA Forum)](https://forum.effectivealtruism.org/posts/uv88CMAmbRtzjcKb2/announcing-manifest-2023-sep-22-24-in-berkeley-3)
+
+### Manifund
+
+- [Manifund Homepage](https://manifund.org/)
+- [Manifund 2023 in Review](https://forum.effectivealtruism.org/posts/aWLXGW99GyhtjydyF/manifund-2023-in-review)
+- [Manifund 2025 Regrants Announcement](https://manifund.substack.com/p/manifund-2025-regrants)
+- [Impact Certificates Q1 Retro](https://www.lesswrong.com/posts/AzoopyYgzNimBJDdY/manifund-q1-retro-learnings-from-impact-certs)
+- [Announcing Manifund Regrants](https://forum.effectivealtruism.org/posts/RMXctNAksBgXgoszY/announcing-manifund-regrants)
+
+### Founder Interviews and Background
+
+- [Stephen Grugett and Austin Chen Interview (Theo Jaffee)](https://www.theojaffee.com/p/16-stephen-grugett-and-austin-chen)
+- [Austin Chen LinkedIn](https://www.linkedin.com/in/austinch/)
+- [James Grugett LinkedIn](https://www.linkedin.com/in/james-grugett/)
+- [Austin Chen on "What Manifold Was Allowed To Do" (LessWrong)](https://www.lesswrong.com/posts/GHusbyeLEn45HaM5B/podcast-elizabeth-and-austin-on-what-manifold-was-allowed-to)
+
+### Accuracy and Research
+
+- [Scoring 2024 Election Forecasts (Mike Saint-Antoine)](https://www.mikesblog.net/p/scoring-2024-election-forecasts)
+- [Prediction Markets Beat Polls (Futuur)](https://futuur.substack.com/p/prediction-markets-beat-polls)
+- [Forecasting AGI: Insights from Prediction Markets (LessWrong)](https://www.lesswrong.com/posts/dRbvHfEwb6Cuf6xn3/forecasting-agi-insights-from-prediction-markets-and-1)
+- [AGI Timelines Dashboard](https://agi.goodheartlabs.com/)
+- [Predictive Performance: Metaculus vs. Manifold (EA Forum)](https://forum.effectivealtruism.org/posts/PGqu4MD3AKHun7kaF/predictive-performance-on-metaculus-vs-manifold-markets)
+- [Calibration City (Manifund Project)](https://manifund.org/projects/calibration-city)
+
+### Platform News and Updates
+
+- [Focusing on Mana, Bringing Sweepstakes to an End](https://news.manifold.markets/p/focusing-on-mana-bringing-sweepstakes)
+- [Manifold Wikipedia](https://en.wikipedia.org/wiki/Manifold_(prediction_market))
+- [Manifold Markets Crunchbase](https://www.crunchbase.com/organization/manifold-markets)
+
+### Mobile and Apps
+
+- [Manifold on App Store](https://apps.apple.com/us/app/manifold-markets/id6444136749)
+
+<Backlinks />

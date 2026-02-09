@@ -1,0 +1,1624 @@
+- id: misalignment-potential
+  type: ai-transition-model-factor
+  title: Misalignment Potential
+  description: The aggregate risk that AI systems pursue goals misaligned with human values—combining
+    technical alignment challenges, interpretability gaps, and oversight limitations.
+  customFields:
+    - label: Model Role
+      value: Root Factor (AI System)
+    - label: Key Parameters
+      value: Alignment Robustness, Interpretability Coverage, Human Oversight Quality
+    - label: Primary Outcome
+      value: Existential Catastrophe
+  relatedEntries:
+    - id: existential-catastrophe
+      type: ai-transition-model-scenario
+      relationship: drives
+    - id: ai-takeover
+      type: ai-transition-model-scenario
+      relationship: enables
+    - id: alignment-robustness
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: interpretability-coverage
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: human-oversight-quality
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: safety-capability-gap
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: safety-culture-strength
+      type: ai-transition-model-parameter
+      relationship: composed-of
+  tags:
+    - ai-transition-model
+    - factor
+    - technical
+    - alignment
+  lastUpdated: 2026-01
+  causeEffectGraph:
+    title: What Drives Misalignment Potential?
+    description: The three pillars of alignment assurance, their drivers, and key uncertainties.
+    primaryNodeId: misalignment-potential
+    nodes:
+      - id: interpretability-progress
+        label: Interpretability Progress
+        type: leaf
+        description: Ability to understand model internals. SAEs, probes, mechanistic interpretability research.
+        scores:
+          novelty: 6        # Active research area but details not widely known
+          sensitivity: 8    # Key enabler for detecting misalignment
+          changeability: 6  # Research can accelerate with funding/talent
+          certainty: 3      # Unclear if interpretability will scale to frontier models
+        color: emerald
+      - id: alignment-techniques
+        label: Alignment Techniques
+        type: leaf
+        description: RLHF, constitutional AI, debate, scalable oversight methods.
+        scores:
+          novelty: 5        # RLHF discussed widely, newer methods less known
+          sensitivity: 9    # Core determinant of whether AI stays aligned
+          changeability: 7  # Active research area with room for breakthroughs
+          certainty: 4      # Current methods work but scalability uncertain
+        color: emerald
+      - id: safety-research-talent
+        label: Safety Research Talent
+        type: leaf
+        description: Number of researchers working on alignment. Currently small relative to capabilities.
+        scores:
+          novelty: 3        # Talent shortage well documented
+          sensitivity: 6    # Important but not decisive alone
+          changeability: 5  # Can grow but takes years to train researchers
+          certainty: 7      # Talent numbers relatively well known
+        color: slate
+      - id: regulatory-frameworks
+        label: Regulatory Frameworks
+        type: leaf
+        description: EU AI Act, US executive orders, sector-specific rules for high-risk AI.
+        scores:
+          novelty: 4        # AI regulation widely discussed in policy circles
+          sensitivity: 5    # Affects deployment but not core alignment
+          changeability: 7  # Policy can change relatively quickly
+          certainty: 6      # Regulatory landscape fairly clear, effects uncertain
+        color: blue
+      - id: liability-regimes
+        label: Liability Regimes
+        type: leaf
+        description: Legal accountability for AI harms. Currently unclear who's responsible.
+        scores:
+          novelty: 5        # Emerging legal question, details less known
+          sensitivity: 4    # Incentive effects moderate
+          changeability: 6  # Courts and legislatures can clarify
+          certainty: 3      # Highly unsettled legal landscape
+        color: slate
+      - id: safety-culture
+        label: Safety Culture
+        type: leaf
+        description: Organizational prioritization of safety vs speed. Varies significantly across labs.
+        scores:
+          novelty: 4        # Discussed in AI safety community
+          sensitivity: 7    # Strong culture can catch problems early
+          changeability: 5  # Hard to change organizational DNA quickly
+          certainty: 5      # Observable but hard to measure precisely
+        color: emerald
+      - id: deployment-incentives
+        label: Deployment Incentives
+        type: leaf
+        description: Competitive pressure to release quickly. Racing dynamics undermine caution.
+        scores:
+          novelty: 3        # Racing dynamics well understood
+          sensitivity: 7    # Strong driver of corner-cutting
+          changeability: 4  # Structural competitive forces hard to change
+          certainty: 8      # Observable market dynamics
+        color: rose
+      - id: technical-ai-safety
+        label: Technical AI Safety
+        type: intermediate
+        entityRef: tmc-technical-ai-safety
+        description: Technical methods to ensure AI systems remain aligned.
+        scores:
+          novelty: 5        # Field is known but depth underappreciated
+          sensitivity: 9    # Primary defense against misalignment
+          changeability: 6  # Research progress possible with resources
+          certainty: 3      # High uncertainty about whether solutions exist
+        color: slate
+      - id: ai-governance
+        label: AI Governance
+        type: intermediate
+        entityRef: tmc-ai-governance
+        description: Rules, institutions, and oversight mechanisms for AI development.
+        scores:
+          novelty: 4        # Governance discussions common
+          sensitivity: 6    # Can slow deployment but not solve alignment
+          changeability: 6  # Policy can change, implementation slower
+          certainty: 5      # Policy landscape evolving rapidly
+        color: slate
+      - id: lab-safety
+        label: Lab Safety Practices
+        type: intermediate
+        entityRef: tmc-lab-safety
+        description: How individual labs approach safety in development and deployment.
+        scores:
+          novelty: 5        # Some public awareness, details less known
+          sensitivity: 7    # Labs are where safety decisions happen
+          changeability: 5  # Culture hard to change, procedures easier
+          certainty: 4      # Internal practices not fully visible
+        color: slate
+      - id: alignment-scalability-question
+        label: Does alignment scale with capability?
+        type: leaf
+        description: "Core uncertainty: will current techniques work for much more capable systems?"
+        scores:
+          novelty: 7        # Sophisticated question, implications not widely grasped
+          sensitivity: 10   # If alignment doesn't scale, catastrophe likely
+          changeability: 3  # Fundamental property of the problem space
+          certainty: 2      # Core unresolved question in alignment
+        color: violet
+      - id: deception-detection-question
+        label: Can we detect deceptive alignment?
+        type: leaf
+        description: If models learn to fake alignment, can we catch them before deployment?
+        scores:
+          novelty: 8        # Deceptive alignment is a subtle, less-known concern
+          sensitivity: 9    # Undetected deception could be catastrophic
+          changeability: 4  # May require interpretability breakthroughs
+          certainty: 2      # Highly uncertain if detection is possible
+        color: violet
+      - id: misalignment-potential
+        label: Misalignment Potential
+        type: effect
+        description: Risk that AI systems pursue goals misaligned with human values.
+        scores:
+          novelty: 5        # Alignment risk discussed but often misunderstood
+          sensitivity: 10   # Final outcome node for alignment risk
+          changeability: 5  # Depends on all upstream factors
+          certainty: 3      # High aggregate uncertainty about magnitude
+    edges:
+      - source: interpretability-progress
+        target: technical-ai-safety
+        strength: strong
+        effect: increases
+      - source: alignment-techniques
+        target: technical-ai-safety
+        strength: strong
+        effect: increases
+      - source: safety-research-talent
+        target: technical-ai-safety
+        strength: medium
+        effect: increases
+      - source: regulatory-frameworks
+        target: ai-governance
+        strength: strong
+        effect: increases
+      - source: liability-regimes
+        target: ai-governance
+        strength: medium
+        effect: increases
+      - source: safety-culture
+        target: lab-safety
+        strength: strong
+        effect: increases
+      - source: deployment-incentives
+        target: lab-safety
+        strength: strong
+        effect: decreases
+      - source: technical-ai-safety
+        target: misalignment-potential
+        strength: strong
+        effect: decreases
+      - source: ai-governance
+        target: misalignment-potential
+        strength: medium
+        effect: decreases
+      - source: lab-safety
+        target: misalignment-potential
+        strength: medium
+        effect: decreases
+      - source: alignment-scalability-question
+        target: misalignment-potential
+        strength: strong
+        effect: mixed
+      - source: deception-detection-question
+        target: misalignment-potential
+        strength: medium
+        effect: mixed
+- id: misuse-potential
+  type: ai-transition-model-factor
+  title: Misuse Potential
+  description: The aggregate risk from deliberate harmful use of AI—including biological weapons,
+    cyber attacks, autonomous weapons, and surveillance misuse.
+  customFields:
+    - label: Model Role
+      value: Root Factor (AI System)
+    - label: Key Parameters
+      value: Biological Threat Exposure, Cyber Threat Exposure, Racing Intensity
+    - label: Primary Outcome
+      value: Existential Catastrophe
+  relatedEntries:
+    - id: existential-catastrophe
+      type: ai-transition-model-scenario
+      relationship: drives
+    - id: human-catastrophe
+      type: ai-transition-model-scenario
+      relationship: enables
+    - id: biological-threat-exposure
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: cyber-threat-exposure
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: racing-intensity
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: ai-control-concentration
+      type: ai-transition-model-parameter
+      relationship: composed-of
+  tags:
+    - ai-transition-model
+    - factor
+    - misuse
+    - weapons
+  lastUpdated: 2026-01
+  causeEffectGraph:
+    title: What Drives Misuse Potential?
+    description: The threat domains, their drivers, and key uncertainties about AI-enabled harm.
+    primaryNodeId: misuse-potential
+    nodes:
+      - id: ai-biology-knowledge
+        label: AI Biology Knowledge
+        type: leaf
+        description: LLM knowledge of virology, synthesis routes, and lab techniques. Growing with each
+          generation.
+        scores:
+          novelty: 5        # AI bio knowledge is discussed but details less known
+          sensitivity: 8    # Key enabler for bio-threat path
+          changeability: 3  # Tied to model advancement, hard to roll back
+          certainty: 5      # Some benchmarks exist but real-world uplift uncertain
+        color: rose
+      - id: dna-synthesis-access
+        label: DNA Synthesis Access
+        type: leaf
+        description: Ease of ordering genetic material. Screening exists but has gaps.
+        scores:
+          novelty: 4        # DNA synthesis is somewhat known in biosecurity circles
+          sensitivity: 7    # Critical chokepoint for bioweapons
+          changeability: 7  # Can be regulated with better screening
+          certainty: 7      # Well-understood technical landscape
+        color: slate
+      - id: biosecurity-defenses
+        label: Biosecurity Defenses
+        type: leaf
+        description: Metagenomic surveillance, mRNA vaccine platforms, broad-spectrum countermeasures.
+        scores:
+          novelty: 5        # Known field but specifics less familiar
+          sensitivity: 6    # Moderates but doesn't eliminate threat
+          changeability: 6  # Can be improved with investment
+          certainty: 4      # Uncertain efficacy against novel threats
+        color: emerald
+      - id: ai-hacking-capability
+        label: AI Hacking Capability
+        type: leaf
+        description: AI vulnerability discovery, exploit generation, social engineering automation.
+        scores:
+          novelty: 6        # Emerging area, capabilities less documented
+          sensitivity: 8    # Key driver of cyber threat
+          changeability: 3  # Hard to stop capability growth
+          certainty: 4      # Few public benchmarks, uncertain effectiveness
+        color: slate
+      - id: attack-surface-growth
+        label: Attack Surface Growth
+        type: leaf
+        description: More connected systems, IoT proliferation, critical infrastructure digitization.
+        scores:
+          novelty: 2        # Very well known trend
+          sensitivity: 5    # Moderate impact on cyber risk
+          changeability: 3  # IoT proliferation hard to stop
+          certainty: 9      # Well documented
+        color: slate
+      - id: cybersecurity-workforce
+        label: Cybersecurity Workforce
+        type: leaf
+        description: Defender talent pool. Currently 3.5M unfilled positions globally.
+        scores:
+          novelty: 3        # Talent shortage well known
+          sensitivity: 4    # Important but not decisive
+          changeability: 5  # Training takes time but possible
+          certainty: 8      # Well documented shortage
+        color: slate
+      - id: model-access-controls
+        label: Model Access Controls
+        type: leaf
+        description: API restrictions, KYC requirements, open-weight availability.
+        scores:
+          novelty: 6        # Emerging policy area
+          sensitivity: 6    # Important for limiting misuse
+          changeability: 7  # Policy can change this
+          certainty: 3      # Unclear if controls actually work
+        color: slate
+      - id: actor-intent
+        label: Actor Intent
+        type: leaf
+        description: Presence of state, terrorist, criminal actors motivated to cause harm.
+        scores:
+          novelty: 2        # Obvious that bad actors exist
+          sensitivity: 9    # No intent = no misuse
+          changeability: 2  # Hard to change human motivation
+          certainty: 8      # We know malicious actors exist
+        color: rose
+      - id: bio-threat
+        label: Biological Threat Exposure
+        type: intermediate
+        entityRef: biological-threat-exposure
+        description: Risk from AI-enabled bioweapons development.
+        scores:
+          novelty: 5        # Discussed in policy circles but details murky
+          sensitivity: 9    # Major contributor to catastrophic outcomes
+          changeability: 5  # Depends on upstream factors
+          certainty: 3      # High uncertainty about magnitude
+        color: red
+      - id: cyber-threat
+        label: Cyber Threat Exposure
+        type: intermediate
+        entityRef: cyber-threat-exposure
+        description: Risk from AI-enhanced cyberattacks.
+        scores:
+          novelty: 4        # AI-cyber discussed more commonly
+          sensitivity: 7    # Significant but less existential than bio
+          changeability: 5  # Depends on upstream factors
+          certainty: 5      # Some evidence but uncertain at scale
+        color: red
+      - id: actor-capability
+        label: Malicious Actor Capability
+        type: intermediate
+        description: What bad actors can actually do with AI access.
+        scores:
+          novelty: 5        # Discussed in security circles
+          sensitivity: 8    # Key mediating variable
+          changeability: 5  # Can be affected by access controls
+          certainty: 4      # Hard to assess real capabilities
+        color: slate
+      - id: offense-defense-balance
+        label: Does offense or defense win?
+        type: leaf
+        description: "Core uncertainty: will AI-enhanced attacks outpace AI-enhanced defenses?"
+        scores:
+          novelty: 7        # Sophisticated strategic question
+          sensitivity: 9    # Determines which direction outcomes go
+          changeability: 4  # Hard to deliberately shift the balance
+          certainty: 2      # Core unresolved question
+        color: violet
+      - id: democratization-question
+        label: Does AI democratize WMD?
+        type: leaf
+        description: Can small groups cause harm previously requiring state resources?
+        scores:
+          novelty: 7        # Novel framing of an important concern
+          sensitivity: 8    # Major implications if true
+          changeability: 3  # Knowledge spread is hard to stop
+          certainty: 3      # Highly uncertain
+        color: violet
+      - id: misuse-potential
+        label: Misuse Potential
+        type: effect
+        description: Aggregate risk from deliberate harmful use of AI.
+        scores:
+          novelty: 4        # Well discussed in AI safety
+          sensitivity: 10   # Final outcome node
+          changeability: 5  # Depends on all input factors
+          certainty: 3      # High aggregate uncertainty
+    edges:
+      - source: ai-biology-knowledge
+        target: bio-threat
+        strength: strong
+        effect: increases
+      - source: dna-synthesis-access
+        target: bio-threat
+        strength: strong
+        effect: increases
+      - source: biosecurity-defenses
+        target: bio-threat
+        strength: medium
+        effect: decreases
+      - source: ai-hacking-capability
+        target: cyber-threat
+        strength: strong
+        effect: increases
+      - source: attack-surface-growth
+        target: cyber-threat
+        strength: medium
+        effect: increases
+      - source: cybersecurity-workforce
+        target: cyber-threat
+        strength: medium
+        effect: decreases
+      - source: model-access-controls
+        target: actor-capability
+        strength: medium
+        effect: decreases
+      - source: actor-intent
+        target: actor-capability
+        strength: strong
+        effect: increases
+      - source: bio-threat
+        target: misuse-potential
+        strength: strong
+        effect: increases
+      - source: cyber-threat
+        target: misuse-potential
+        strength: strong
+        effect: increases
+      - source: actor-capability
+        target: misuse-potential
+        strength: strong
+        effect: increases
+      - source: offense-defense-balance
+        target: misuse-potential
+        strength: strong
+        effect: mixed
+      - source: democratization-question
+        target: misuse-potential
+        strength: medium
+        effect: mixed
+- id: ai-capabilities
+  type: ai-transition-model-factor
+  title: AI Capabilities
+  description: The aggregate advancement of AI system capabilities—including reasoning, autonomy,
+    generality, and domain expertise. Higher capabilities amplify both benefits and risks.
+  customFields:
+    - label: Model Role
+      value: Root Factor (AI System)
+    - label: Character
+      value: Amplifier (neither inherently good nor bad)
+    - label: Trajectory
+      value: Rapidly increasing
+  relatedEntries:
+    - id: misalignment-potential
+      type: ai-transition-model-factor
+      relationship: amplifies
+    - id: misuse-potential
+      type: ai-transition-model-factor
+      relationship: amplifies
+    - id: safety-capability-gap
+      type: ai-transition-model-parameter
+      relationship: affects
+  tags:
+    - ai-transition-model
+    - factor
+    - capabilities
+    - scaling
+  lastUpdated: 2026-01
+  causeEffectGraph:
+    title: What Drives AI Capabilities?
+    description: The three pillars of AI capability, their drivers, and key uncertainties.
+    primaryNodeId: ai-capabilities
+    nodes:
+      - id: chip-supply-chain
+        label: Chip Supply Chain
+        type: leaf
+        description: TSMC/ASML concentration, Taiwan geopolitical risk, fab construction timelines.
+        scores:
+          novelty: 4        # Well-known supply chain issue in tech/policy circles
+          sensitivity: 8    # Major bottleneck - disruption would significantly slow AI progress
+          changeability: 4  # Fabs take 3-5 years to build, geopolitics hard to shift
+          certainty: 7      # Supply chain well-documented, though future disruption risk uncertain
+        color: slate
+      - id: energy-infrastructure
+        label: Energy Infrastructure
+        type: leaf
+        description: Data center power availability, grid capacity, nuclear/renewable buildout.
+        scores:
+          novelty: 5        # Emerging as major constraint; less discussed than chips until recently
+          sensitivity: 7    # Growing bottleneck for large training runs and inference scaling
+          changeability: 5  # New plants take years, but efficiency gains possible
+          certainty: 6      # Power requirements well-understood, future demand less certain
+        color: slate
+      - id: capital-investment
+        label: Capital Investment
+        type: leaf
+        description: Willingness of investors to fund $1B+ training runs, hyperscaler budgets.
+        scores:
+          novelty: 3        # Widely reported; $100B+ investments make headlines
+          sensitivity: 8    # Critical enabler - no capital = no frontier models
+          changeability: 6  # Market-driven, can shift with sentiment or ROI evidence
+          certainty: 8      # Current investment levels well-documented
+        color: teal
+      - id: research-talent-pool
+        label: Research Talent Pool
+        type: leaf
+        description: Number of top ML researchers, PhD pipeline, brain drain dynamics.
+        scores:
+          novelty: 4        # Talent concentration known; specific dynamics less discussed
+          sensitivity: 7    # Key bottleneck, though AI-assisted research may reduce importance
+          changeability: 4  # Training takes years; immigration policy affects distribution
+          certainty: 6      # Talent pools estimated but future supply uncertain
+        color: slate
+      - id: paradigm-discoveries
+        label: Paradigm Discoveries
+        type: leaf
+        description: Transformers, RLHF, chain-of-thought - unpredictable breakthroughs that reshape the field.
+        scores:
+          novelty: 7        # Paradigm shifts are hard to predict; timing surprises experts
+          sensitivity: 9    # Can dramatically reshape the field - transformers changed everything
+          changeability: 2  # Cannot be directed; emerge from research ecosystem unpredictably
+          certainty: 2      # Inherently unpredictable by nature
+        color: violet
+      - id: economic-incentives
+        label: Economic Incentives
+        type: leaf
+        description: Productivity gains, labor cost arbitrage, competitive pressure to adopt.
+        scores:
+          novelty: 2        # Standard economic logic; widely understood
+          sensitivity: 7    # Strong driver of adoption speed and investment
+          changeability: 4  # Market forces hard to redirect directly
+          certainty: 7      # Economic drivers well-understood, though magnitude varies
+        color: slate
+      - id: regulatory-friction
+        label: Regulatory Friction
+        type: leaf
+        description: EU AI Act, sector-specific rules, liability concerns slowing deployment.
+        scores:
+          novelty: 4        # EU AI Act well-publicized; implementation details less known
+          sensitivity: 5    # Slows deployment but hasn't stopped frontier development
+          changeability: 7  # Policy can be changed through political process
+          certainty: 5      # Current rules known, but enforcement and effects uncertain
+        color: blue
+      - id: compute
+        label: Compute
+        type: intermediate
+        entityRef: tmc-compute
+        description: Hardware and energy available for training and inference.
+        scores:
+          novelty: 3        # Compute as driver widely recognized in AI discourse
+          sensitivity: 9    # Fundamental input - more compute = more capable models
+          changeability: 5  # Depends on upstream factors (chips, energy, capital)
+          certainty: 7      # Scaling laws well-established, though limits debated
+        color: slate
+      - id: algorithms
+        label: Algorithms
+        type: intermediate
+        entityRef: tmc-algorithms
+        description: Architectures, training methods, and efficiency improvements.
+        scores:
+          novelty: 4        # Algorithmic progress known but often underweighted vs compute
+          sensitivity: 9    # Algorithmic gains can match or exceed compute scaling
+          changeability: 3  # Research-driven; hard to direct specific breakthroughs
+          certainty: 5      # Historical progress documented, but future rate uncertain
+        color: slate
+      - id: adoption
+        label: Adoption
+        type: intermediate
+        entityRef: tmc-adoption
+        description: How quickly and broadly AI gets deployed and iterated on.
+        scores:
+          novelty: 3        # Deployment patterns receive less attention than capabilities
+          sensitivity: 6    # Affects real-world impact but less direct on frontier capabilities
+          changeability: 6  # Can be influenced by policy, incentives, and UX
+          certainty: 5      # Current adoption measurable; future diffusion rates uncertain
+        color: slate
+      - id: scaling-ceiling-question
+        label: Will scaling hit a ceiling?
+        type: leaf
+        description: "Core uncertainty: are we near diminishing returns or far from limits?"
+        scores:
+          novelty: 6        # Debated among experts; public less aware of nuances
+          sensitivity: 9    # Answer determines trajectory of AI progress entirely
+          changeability: 1  # Physical/mathematical reality - we discover rather than change it
+          certainty: 2      # Core unresolved question; experts disagree significantly
+        color: violet
+      - id: recursive-improvement-question
+        label: Can AI accelerate AI research?
+        type: leaf
+        description: If AI improves AI development, capabilities could accelerate non-linearly.
+        scores:
+          novelty: 7        # Key concern in AI safety; less discussed in mainstream
+          sensitivity: 10   # If true, completely changes timeline and control dynamics
+          changeability: 3  # Depends on capability trajectory; hard to deliberately prevent
+          certainty: 3      # Early evidence emerging but magnitude highly uncertain
+        color: violet
+      - id: ai-capabilities
+        label: AI Capabilities
+        type: effect
+        description: Aggregate frontier AI capability level.
+        scores:
+          novelty: 2        # Central topic in AI discourse; widely discussed
+          sensitivity: 10   # Final outcome node - all upstream factors flow here
+          changeability: 5  # Depends on all input factors combined
+          certainty: 4      # Current capabilities measurable; trajectory highly uncertain
+    edges:
+      - source: chip-supply-chain
+        target: compute
+        strength: strong
+        effect: increases
+      - source: energy-infrastructure
+        target: compute
+        strength: strong
+        effect: increases
+      - source: capital-investment
+        target: compute
+        strength: strong
+        effect: increases
+      - source: research-talent-pool
+        target: algorithms
+        strength: strong
+        effect: increases
+      - source: paradigm-discoveries
+        target: algorithms
+        strength: strong
+        effect: increases
+      - source: economic-incentives
+        target: adoption
+        strength: strong
+        effect: increases
+      - source: regulatory-friction
+        target: adoption
+        strength: medium
+        effect: decreases
+      - source: compute
+        target: ai-capabilities
+        strength: strong
+        effect: increases
+      - source: algorithms
+        target: ai-capabilities
+        strength: strong
+        effect: increases
+      - source: adoption
+        target: ai-capabilities
+        strength: medium
+        effect: increases
+      - source: scaling-ceiling-question
+        target: ai-capabilities
+        strength: medium
+        effect: mixed
+      - source: recursive-improvement-question
+        target: ai-capabilities
+        strength: medium
+        effect: mixed
+- id: ai-uses
+  type: ai-transition-model-factor
+  title: AI Uses
+  description: How AI capabilities are deployed across sectors—including research acceleration,
+    industry automation, government applications, and coordination tools.
+  customFields:
+    - label: Model Role
+      value: Root Factor (AI System)
+    - label: Character
+      value: Distribution factor
+    - label: Key Domains
+      value: Recursive AI, Industries, Governments, Coordination
+  relatedEntries:
+    - id: ai-capabilities
+      type: ai-transition-model-factor
+      relationship: shaped-by
+    - id: economic-stability
+      type: ai-transition-model-parameter
+      relationship: affects
+    - id: human-expertise
+      type: ai-transition-model-parameter
+      relationship: affects
+  tags:
+    - ai-transition-model
+    - factor
+    - deployment
+    - applications
+  lastUpdated: 2026-01
+  causeEffectGraph:
+    title: How AI Gets Deployed
+    description: The four deployment domains, their drivers, and key uncertainties.
+    primaryNodeId: ai-uses
+    nodes:
+      - id: ai-coding-ability
+        label: AI Coding Ability
+        type: leaf
+        description: AI's capacity to write, debug, and improve code. Key enabler for accelerating AI
+          development itself.
+        scores:
+          novelty: 3        # Well-documented capability, widely discussed
+          sensitivity: 9    # Key enabler for recursive AI improvement
+          changeability: 3  # Tied to model capability advancement
+          certainty: 8      # Current capabilities well-benchmarked
+        color: slate
+      - id: ai-research-ability
+        label: AI Research Ability
+        type: leaf
+        description: AI's capacity for scientific reasoning, experiment design, and hypothesis generation.
+        scores:
+          novelty: 6        # Emerging capability, less well understood than coding
+          sensitivity: 9    # Critical for recursive improvement trajectory
+          changeability: 3  # Follows capability growth, hard to steer
+          certainty: 4      # Limited evidence on real research automation
+        color: violet
+      - id: productivity-pressure
+        label: Productivity Pressure
+        type: leaf
+        description: Competitive pressure to adopt AI for efficiency gains. Varies by sector.
+        scores:
+          novelty: 2        # Basic economic dynamic, well understood
+          sensitivity: 7    # Major driver of industry adoption rate
+          changeability: 4  # Market forces hard to change, policy can modulate
+          certainty: 8      # Clear evidence across industries
+        color: slate
+      - id: workflow-compatibility
+        label: Workflow Compatibility
+        type: leaf
+        description: How easily AI integrates into existing work processes. Easier for digital, harder for
+          physical.
+        scores:
+          novelty: 4        # Discussed in enterprise AI literature
+          sensitivity: 6    # Significant friction factor for adoption
+          changeability: 6  # Can improve with better tooling and APIs
+          certainty: 7      # Well-studied in organizational research
+        color: slate
+      - id: procurement-processes
+        label: Procurement Processes
+        type: leaf
+        description: Government acquisition rules, compliance requirements, multi-year budget cycles.
+        scores:
+          novelty: 3        # Known bottleneck in govtech
+          sensitivity: 5    # Slows but doesn't block government adoption
+          changeability: 5  # Can be reformed, but institutional inertia strong
+          certainty: 8      # Well-documented government process
+        color: blue
+      - id: public-trust-concerns
+        label: Public Trust Concerns
+        type: leaf
+        description: Citizen expectations for transparency, due process, and accountability in government AI.
+        scores:
+          novelty: 4        # Growing discussion but not new concept
+          sensitivity: 6    # Can significantly slow public sector adoption
+          changeability: 5  # Affected by incidents, media, and policy choices
+          certainty: 6      # Survey data exists but volatile
+        color: rose
+      - id: collective-action-problems
+        label: Collective Action Problems
+        type: leaf
+        description: "Challenges requiring coordination: climate, pandemics, AI governance itself."
+        scores:
+          novelty: 2        # Classic political science concept
+          sensitivity: 7    # Major demand driver for coordination tools
+          changeability: 3  # Fundamental problem, won't disappear
+          certainty: 9      # Well-established academic literature
+        color: slate
+      - id: coordination-technology
+        label: Coordination Technology
+        type: leaf
+        description: AI tools for negotiation, prediction markets, mechanism design, information aggregation.
+        scores:
+          novelty: 7        # Emerging field, less explored than other AI uses
+          sensitivity: 7    # Could be transformative if effective
+          changeability: 6  # Depends on research and investment choices
+          certainty: 3      # Highly speculative, limited real-world testing
+        color: emerald
+      - id: recursive-ai
+        label: Recursive AI
+        type: intermediate
+        entityRef: tmc-recursive-ai
+        description: AI used to improve AI development. Potential for acceleration.
+        scores:
+          novelty: 6        # Discussed conceptually, empirical data emerging
+          sensitivity: 10   # Could dramatically change capability trajectory
+          changeability: 4  # Hard to stop once economically advantageous
+          certainty: 3      # Key uncertainty about takeoff dynamics
+        color: red
+      - id: industries
+        label: AI in Industries
+        type: intermediate
+        entityRef: tmc-industries
+        description: Commercial adoption across sectors. High variability.
+        scores:
+          novelty: 3        # Widely covered in business press
+          sensitivity: 7    # Major determinant of economic impact
+          changeability: 5  # Market-driven, policy can influence
+          certainty: 6      # Good data on current adoption, future uncertain
+        color: slate
+      - id: governments
+        label: AI in Governments
+        type: intermediate
+        entityRef: tmc-governments
+        description: Public sector use. Slower adoption, high stakes.
+        scores:
+          novelty: 4        # Discussed in policy circles, less public attention
+          sensitivity: 6    # Affects governance capacity and legitimacy
+          changeability: 6  # Policy choices can accelerate or slow adoption
+          certainty: 5      # Varied implementations, limited outcome data
+        color: teal
+      - id: coordination
+        label: AI for Coordination
+        type: intermediate
+        entityRef: tmc-coordination
+        description: AI to solve collective action problems.
+        scores:
+          novelty: 8        # Underexplored compared to other AI applications
+          sensitivity: 7    # Could significantly improve global cooperation
+          changeability: 6  # Depends on research priorities and adoption
+          certainty: 2      # Highly speculative, few examples
+        color: emerald
+      - id: recursive-takeoff-question
+        label: Will recursive improvement accelerate?
+        type: leaf
+        description: If AI improves AI, could development speed increase dramatically?
+        scores:
+          novelty: 5        # Classic AI safety concern, discussed for decades
+          sensitivity: 10   # Could determine entire trajectory
+          changeability: 4  # Depends on technical factors and choices
+          certainty: 2      # Core unresolved question
+        color: violet
+      - id: deployment-governance-gap
+        label: Can governance keep pace with deployment?
+        type: leaf
+        description: Deployment often outpaces regulatory frameworks.
+        scores:
+          novelty: 4        # Recognized concern in policy discussions
+          sensitivity: 7    # Determines if guardrails are effective
+          changeability: 6  # Regulatory reform possible but slow
+          certainty: 6      # Pattern well-established, gap size uncertain
+        color: violet
+      - id: ai-uses
+        label: AI Uses
+        type: effect
+        description: Aggregate pattern of AI deployment across all domains.
+        scores:
+          novelty: 3        # Central topic in AI discussions
+          sensitivity: 10   # Final outcome node
+          changeability: 5  # Depends on all upstream factors
+          certainty: 4      # High aggregate uncertainty
+    edges:
+      - source: ai-coding-ability
+        target: recursive-ai
+        strength: strong
+        effect: increases
+      - source: ai-research-ability
+        target: recursive-ai
+        strength: strong
+        effect: increases
+      - source: productivity-pressure
+        target: industries
+        strength: strong
+        effect: increases
+      - source: workflow-compatibility
+        target: industries
+        strength: medium
+        effect: increases
+      - source: procurement-processes
+        target: governments
+        strength: medium
+        effect: decreases
+      - source: public-trust-concerns
+        target: governments
+        strength: medium
+        effect: decreases
+      - source: collective-action-problems
+        target: coordination
+        strength: medium
+        effect: increases
+      - source: coordination-technology
+        target: coordination
+        strength: strong
+        effect: increases
+      - source: recursive-ai
+        target: ai-uses
+        strength: strong
+        effect: increases
+      - source: industries
+        target: ai-uses
+        strength: strong
+        effect: increases
+      - source: governments
+        target: ai-uses
+        strength: medium
+        effect: increases
+      - source: coordination
+        target: ai-uses
+        strength: medium
+        effect: increases
+      - source: recursive-takeoff-question
+        target: ai-uses
+        strength: strong
+        effect: mixed
+      - source: deployment-governance-gap
+        target: ai-uses
+        strength: medium
+        effect: mixed
+- id: ai-ownership
+  type: ai-transition-model-factor
+  title: AI Ownership
+  description: The distribution of control over AI systems across actors—countries, companies, and
+    individuals. Concentration creates both coordination opportunities and power risks.
+  customFields:
+    - label: Model Role
+      value: Root Factor (AI System)
+    - label: Character
+      value: Distribution factor
+    - label: Key Dimensions
+      value: Countries, Companies, Shareholders
+  relatedEntries:
+    - id: long-term-trajectory
+      type: ai-transition-model-scenario
+      relationship: drives
+    - id: long-term-lockin
+      type: ai-transition-model-scenario
+      relationship: enables
+    - id: ai-control-concentration
+      type: ai-transition-model-parameter
+      relationship: composed-of
+  tags:
+    - ai-transition-model
+    - factor
+    - ownership
+    - concentration
+  lastUpdated: 2026-01
+  causeEffectGraph:
+    title: Who Controls AI?
+    description: The three dimensions of AI control, their drivers, and key uncertainties.
+    primaryNodeId: ai-ownership
+    nodes:
+      - id: capital-requirements
+        label: Capital Requirements
+        type: leaf
+        description: Training costs of $100M-1B+ create high barriers to entry. Favors well-funded incumbents.
+        scores:
+          novelty: 3        # Well-known barrier to entry in AI
+          sensitivity: 7    # Major driver of company concentration
+          changeability: 4  # Tied to physics of compute, hard to change quickly
+          certainty: 8      # Well-documented cost figures from labs
+        color: rose
+      - id: talent-concentration
+        label: Talent Concentration
+        type: leaf
+        description: Top researchers cluster at few labs. Network effects and compensation drive concentration.
+        scores:
+          novelty: 4        # Known pattern but specific dynamics less discussed
+          sensitivity: 6    # Important for company advantage but not decisive alone
+          changeability: 5  # Immigration policy, remote work could shift this
+          certainty: 7      # Clear patterns in researcher distribution
+        color: rose
+      - id: cloud-partnerships
+        label: Cloud Partnerships
+        type: leaf
+        description: Azure-OpenAI, AWS-Anthropic, GCP-DeepMind. Compute access tied to big tech.
+        scores:
+          novelty: 5        # Specific deals known, strategic implications less discussed
+          sensitivity: 5    # Important but secondary to core capabilities
+          changeability: 6  # New partnerships possible, existing ones evolving
+          certainty: 8      # Partnership structures are public
+        color: blue
+      - id: chip-manufacturing-geography
+        label: Chip Manufacturing Geography
+        type: leaf
+        description: TSMC in Taiwan, ASML in Netherlands. Critical supply chain concentration.
+        scores:
+          novelty: 4        # TSMC concentration widely discussed post-COVID
+          sensitivity: 9    # Taiwan scenario could reshape global AI power
+          changeability: 3  # Fab construction takes years, geography fixed
+          certainty: 9      # Well-documented supply chain structure
+        color: red
+      - id: export-controls
+        label: Export Controls
+        type: leaf
+        description: US restrictions on chips to China. Fragmenting global AI development.
+        scores:
+          novelty: 4        # Export controls widely covered in tech press
+          sensitivity: 8    # Major factor in US-China AI competition dynamics
+          changeability: 7  # Policy lever, can be tightened or loosened
+          certainty: 6      # Controls exist but effectiveness debated
+        color: emerald
+      - id: national-ai-strategies
+        label: National AI Strategies
+        type: leaf
+        description: Government investments, industrial policy, sovereignty concerns.
+        scores:
+          novelty: 3        # Most major countries have published AI strategies
+          sensitivity: 5    # Important but often underwhelm in practice
+          changeability: 6  # Government priorities can shift with elections
+          certainty: 5      # Strategies exist but actual commitment varies
+        color: blue
+      - id: corporate-structures
+        label: Corporate Structures
+        type: leaf
+        description: OpenAI's capped-profit, Anthropic's PBC, DeepMind as subsidiary. Varied governance.
+        scores:
+          novelty: 6        # Novel structures but implications less analyzed
+          sensitivity: 7    # Governance shapes lab priorities and behavior
+          changeability: 4  # Corporate structures hard to change once set
+          certainty: 5      # Structures known but real influence unclear
+        color: blue
+      - id: investor-influence
+        label: Investor Influence
+        type: leaf
+        description: Microsoft, Amazon, Google as major funders. Potential mission drift pressure.
+        scores:
+          novelty: 5        # Known investments but influence dynamics less discussed
+          sensitivity: 6    # Significant pressure on lab direction
+          changeability: 5  # New investors possible but existing stakes locked in
+          certainty: 4      # Hard to observe actual influence in decisions
+        color: rose
+      - id: companies
+        label: Company Ownership
+        type: intermediate
+        entityRef: tmc-companies
+        description: Which companies control frontier AI development.
+        scores:
+          novelty: 3        # Company concentration is well known
+          sensitivity: 8    # Core dimension of AI control
+          changeability: 5  # New entrants possible but hard
+          certainty: 7      # Clear picture of major players
+        color: teal
+      - id: countries
+        label: Country Control
+        type: intermediate
+        entityRef: tmc-countries
+        description: Which nations have AI capabilities and influence.
+        scores:
+          novelty: 3        # US-China AI competition widely discussed
+          sensitivity: 9    # Geopolitical dimension hugely consequential
+          changeability: 4  # National capabilities hard to shift quickly
+          certainty: 6      # US leads but China's position debated
+        color: teal
+      - id: shareholders
+        label: Shareholder Power
+        type: intermediate
+        entityRef: tmc-shareholders
+        description: Who actually owns and governs AI companies.
+        scores:
+          novelty: 6        # Often overlooked - focus is on companies not owners
+          sensitivity: 7    # Shareholders shape incentives and governance
+          changeability: 5  # Ownership can shift with new funding rounds
+          certainty: 5      # Ownership known but influence mechanisms unclear
+        color: teal
+      - id: concentration-stability
+        label: Will concentration persist?
+        type: leaf
+        description: Open-source, efficiency gains, new entrants could disrupt. Or concentration could increase.
+        scores:
+          novelty: 7        # Key strategic question, less analyzed than capabilities
+          sensitivity: 8    # Determines long-term power structure
+          changeability: 5  # Multiple factors could shift dynamics either way
+          certainty: 2      # Core uncertainty - could go either direction
+        color: violet
+      - id: power-alignment
+        label: Are controllers aligned with humanity?
+        type: leaf
+        description: Even if AI is aligned, are its controllers acting in broad interest?
+        scores:
+          novelty: 8        # Often overlooked - AI alignment != controller alignment
+          sensitivity: 9    # Ultimate question of who benefits from AI
+          changeability: 6  # Governance, policy, and social pressure can influence
+          certainty: 2      # Deep uncertainty about actor motivations
+        color: violet
+      - id: ai-ownership
+        label: AI Ownership
+        type: effect
+        description: Distribution of control over AI systems.
+        scores:
+          novelty: 5        # Ownership discussed but less than capabilities
+          sensitivity: 10   # Final outcome node - determines power distribution
+          changeability: 5  # Depends on all upstream factors
+          certainty: 4      # Current state known, trajectory uncertain
+    edges:
+      - source: capital-requirements
+        target: companies
+        strength: strong
+        effect: increases
+      - source: talent-concentration
+        target: companies
+        strength: strong
+        effect: increases
+      - source: cloud-partnerships
+        target: companies
+        strength: medium
+        effect: increases
+      - source: chip-manufacturing-geography
+        target: countries
+        strength: strong
+        effect: increases
+      - source: export-controls
+        target: countries
+        strength: medium
+        effect: increases
+      - source: national-ai-strategies
+        target: countries
+        strength: medium
+        effect: increases
+      - source: corporate-structures
+        target: shareholders
+        strength: strong
+        effect: increases
+      - source: investor-influence
+        target: shareholders
+        strength: medium
+        effect: increases
+      - source: companies
+        target: ai-ownership
+        strength: strong
+        effect: increases
+      - source: countries
+        target: ai-ownership
+        strength: strong
+        effect: increases
+      - source: shareholders
+        target: ai-ownership
+        strength: medium
+        effect: increases
+      - source: concentration-stability
+        target: ai-ownership
+        strength: medium
+        effect: mixed
+      - source: power-alignment
+        target: ai-ownership
+        strength: medium
+        effect: mixed
+- id: civilizational-competence
+  type: ai-transition-model-factor
+  title: Civilizational Competence
+  description: Society's aggregate capacity to navigate AI transition well—including governance
+    effectiveness, epistemic health, coordination capacity, and adaptive resilience.
+  customFields:
+    - label: Model Role
+      value: Root Factor (Societal)
+    - label: Key Parameters
+      value: Governance, Epistemics, Societal Resilience, Adaptability
+    - label: Primary Outcomes
+      value: Long-term Trajectory, Transition Smoothness
+  relatedEntries:
+    - id: long-term-trajectory
+      type: ai-transition-model-scenario
+      relationship: drives
+    - id: transition-turbulence
+      type: ai-transition-model-factor
+      relationship: mitigates
+    - id: regulatory-capacity
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: institutional-quality
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: international-coordination
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: societal-resilience
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: epistemic-health
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: societal-trust
+      type: ai-transition-model-parameter
+      relationship: composed-of
+  tags:
+    - ai-transition-model
+    - factor
+    - governance
+    - institutions
+  lastUpdated: 2026-01
+  causeEffectGraph:
+    title: What Determines Civilizational Competence?
+    description: The three pillars of societal capacity, their drivers, and key uncertainties.
+    primaryNodeId: civilizational-competence
+    nodes:
+      - id: institutional-trust
+        label: Institutional Trust
+        type: leaf
+        description: Public confidence in government, experts, and institutions. Enables collective action.
+        scores:
+          novelty: 3 # Well-known factor in governance literature
+          sensitivity: 7 # Low trust severely constrains governance options
+          changeability: 4 # Trust erodes faster than it builds; slow to change
+          certainty: 6 # Extensively studied, but causal mechanisms debated
+        color: emerald
+      - id: regulatory-expertise
+        label: Regulatory Expertise
+        type: leaf
+        description: Government capacity to understand and regulate AI. Currently limited.
+        scores:
+          novelty: 5 # Known gap, but scale of AI-specific expertise deficit less appreciated
+          sensitivity: 8 # Poor regulation can enable catastrophic outcomes
+          changeability: 6 # Can build expertise through hiring, training, partnerships
+          certainty: 5 # Hard to measure; varies greatly by jurisdiction
+        color: emerald
+      - id: international-cooperation
+        label: International Cooperation
+        type: leaf
+        description: Ability of nations to coordinate on AI. US-China tensions a major obstacle.
+        scores:
+          novelty: 4 # Well-documented in IR literature; AI-specific dynamics newer
+          sensitivity: 9 # Global coordination failures could enable races to the bottom
+          changeability: 3 # Deep geopolitical tensions; requires major diplomatic shifts
+          certainty: 4 # Highly contingent on unpredictable political events
+        color: blue
+      - id: information-environment
+        label: Information Environment
+        type: leaf
+        description: Quality of public discourse. AI-generated content, deepfakes, polarization.
+        scores:
+          novelty: 6 # AI's transformative impact on info ecosystem underappreciated
+          sensitivity: 8 # Epistemic collapse undermines all other coordination
+          changeability: 5 # Platform regulation possible; but AI makes defenses harder
+          certainty: 3 # Rapidly evolving; very hard to predict AI's effects
+        color: rose
+      - id: scientific-consensus
+        label: Scientific Consensus Processes
+        type: leaf
+        description: Mechanisms for establishing expert agreement. Under stress from AI-generated content.
+        scores:
+          novelty: 7 # AI threat to peer review and consensus-building less discussed
+          sensitivity: 6 # Important for quality decisions but not sole determinant
+          changeability: 5 # Institutional reform possible; AI tools could help or hurt
+          certainty: 4 # Emerging threat; limited empirical data on AI impacts
+        color: emerald
+      - id: media-ecosystem
+        label: Media Ecosystem
+        type: leaf
+        description: News, social media, information distribution. Fragmented and attention-optimized.
+        scores:
+          novelty: 3 # Media fragmentation widely discussed
+          sensitivity: 6 # Shapes public opinion but not sole driver of outcomes
+          changeability: 5 # Regulation possible; business models hard to shift
+          certainty: 6 # Well-studied ecosystem; AI effects less certain
+        color: slate
+      - id: economic-flexibility
+        label: Economic Flexibility
+        type: leaf
+        description: Labor mobility, retraining systems, safety nets. Capacity to absorb disruption.
+        scores:
+          novelty: 4 # Labor economics well-studied; AI-scale disruption newer
+          sensitivity: 7 # Economic instability could cause political backlash
+          changeability: 6 # Policy levers exist (UBI, retraining); political will unclear
+          certainty: 5 # Past transitions informative but may not apply to AI speed
+        color: emerald
+      - id: social-cohesion
+        label: Social Cohesion
+        type: leaf
+        description: Shared identity, cross-group trust, willingness to cooperate despite differences.
+        scores:
+          novelty: 3 # Classic sociological concept; widely discussed
+          sensitivity: 7 # Low cohesion makes collective response to AI harder
+          changeability: 3 # Deep cultural/structural factors; slow to change
+          certainty: 5 # Measured via surveys; causal impact debated
+        color: slate
+      - id: governance
+        label: Governance Capacity
+        type: intermediate
+        entityRef: tmc-civ-governance
+        description: Society's ability to make and enforce good AI policy.
+        scores:
+          novelty: 4 # Governance gaps well-known; AI-specific challenges newer
+          sensitivity: 9 # Poor governance enables most catastrophic scenarios
+          changeability: 5 # Can improve with effort; institutional inertia significant
+          certainty: 5 # What constitutes "good" AI governance still debated
+        color: slate
+      - id: epistemics
+        label: Epistemic Health
+        type: intermediate
+        entityRef: tmc-civ-epistemics
+        description: Society's truth-finding and sense-making capacity.
+        scores:
+          novelty: 6 # AI-driven epistemic threats less widely appreciated
+          sensitivity: 8 # Cannot coordinate on problems we cannot understand
+          changeability: 4 # Some interventions possible; fundamental challenges deep
+          certainty: 4 # Hard to measure societal-level epistemic health
+        color: slate
+      - id: adaptability
+        label: Adaptability
+        type: intermediate
+        entityRef: tmc-adaptability
+        description: Society's ability to adjust to rapid change.
+        scores:
+          novelty: 5 # Resilience concepts known; AI-specific adaptation challenges newer
+          sensitivity: 7 # Determines whether society absorbs or fragments under AI pressure
+          changeability: 5 # Can build adaptive capacity; requires sustained investment
+          certainty: 4 # Uncertain how past adaptation patterns apply to AI
+        color: slate
+      - id: pace-question
+        label: Can institutions keep pace with AI?
+        type: leaf
+        description: AI develops faster than governance. Is this gap closeable?
+        scores:
+          novelty: 7 # Pace mismatch recognized but full implications underappreciated
+          sensitivity: 9 # If gap is uncloseable, most governance interventions fail
+          changeability: 4 # Requires institutional innovation; path-dependent
+          certainty: 2 # Core uncertainty; depends on both AI and governance trajectories
+        color: violet
+      - id: epistemics-collapse-question
+        label: Will AI erode shared reality?
+        type: leaf
+        description: AI-generated content may make truth harder to establish.
+        scores:
+          novelty: 8 # Underappreciated existential epistemic risk from AI content
+          sensitivity: 8 # Shared reality collapse undermines all coordination
+          changeability: 4 # Some technical/policy tools; fundamental tension hard to resolve
+          certainty: 2 # Unprecedented situation; limited empirical basis for predictions
+        color: violet
+      - id: civilizational-competence
+        label: Civilizational Competence
+        type: effect
+        description: Society's aggregate capacity to navigate AI transition well.
+        scores:
+          novelty: 5 # Concept of societal capacity known; AI-specific framing newer
+          sensitivity: 10 # Ultimate outcome variable for societal response to AI
+          changeability: 5 # Aggregate of sub-factors; some levers available
+          certainty: 3 # Hard to measure; depends on many uncertain sub-components
+    edges:
+      - source: institutional-trust
+        target: governance
+        strength: strong
+        effect: increases
+      - source: regulatory-expertise
+        target: governance
+        strength: strong
+        effect: increases
+      - source: international-cooperation
+        target: governance
+        strength: medium
+        effect: increases
+      - source: information-environment
+        target: epistemics
+        strength: strong
+        effect: increases
+      - source: scientific-consensus
+        target: epistemics
+        strength: medium
+        effect: increases
+      - source: media-ecosystem
+        target: epistemics
+        strength: medium
+        effect: mixed
+      - source: economic-flexibility
+        target: adaptability
+        strength: strong
+        effect: increases
+      - source: social-cohesion
+        target: adaptability
+        strength: medium
+        effect: increases
+      - source: governance
+        target: civilizational-competence
+        strength: strong
+        effect: increases
+      - source: epistemics
+        target: civilizational-competence
+        strength: strong
+        effect: increases
+      - source: adaptability
+        target: civilizational-competence
+        strength: medium
+        effect: increases
+      - source: pace-question
+        target: civilizational-competence
+        strength: strong
+        effect: mixed
+      - source: epistemics-collapse-question
+        target: civilizational-competence
+        strength: medium
+        effect: mixed
+- id: transition-turbulence
+  type: ai-transition-model-factor
+  title: Transition Turbulence
+  description: The severity of disruption during the AI transition period—economic displacement,
+    social instability, and institutional stress. Distinct from long-term outcomes.
+  customFields:
+    - label: Model Role
+      value: Intermediate Factor
+    - label: Key Parameters
+      value: Economic Stability, Human Agency, Societal Resilience
+    - label: Character
+      value: Process quality (not destination)
+  relatedEntries:
+    - id: civilizational-competence
+      type: ai-transition-model-factor
+      relationship: mitigated-by
+    - id: economic-stability
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: human-agency
+      type: ai-transition-model-parameter
+      relationship: composed-of
+    - id: human-expertise
+      type: ai-transition-model-parameter
+      relationship: composed-of
+  tags:
+    - ai-transition-model
+    - factor
+    - transition
+    - disruption
+  lastUpdated: 2026-01
+  causeEffectGraph:
+    title: What Causes Transition Turbulence?
+    description: The three dimensions of disruption, their drivers, and key uncertainties.
+    primaryNodeId: transition-turbulence
+    nodes:
+      - id: automation-speed
+        label: Automation Speed
+        type: leaf
+        description: How fast AI displaces human work. Faster = less time to adapt.
+        scores:
+          novelty: 4        # Widely discussed in economic literature
+          sensitivity: 9    # Core driver - faster automation = more turbulence
+          changeability: 4  # Tied to capability advancement, hard to slow down
+          certainty: 3      # High uncertainty about actual pace of automation
+        color: rose
+      - id: job-displacement-scope
+        label: Job Displacement Scope
+        type: leaf
+        description: Which jobs affected. White-collar newly vulnerable, unlike previous automation.
+        scores:
+          novelty: 6        # White-collar displacement is a novel concern
+          sensitivity: 8    # Determines who is affected and political response
+          changeability: 3  # Depends on which tasks AI can do, hard to redirect
+          certainty: 4      # Uncertainty about which jobs will actually be automated
+        color: rose
+      - id: safety-net-adequacy
+        label: Safety Net Adequacy
+        type: leaf
+        description: Unemployment insurance, retraining programs, potential UBI. Currently underdeveloped.
+        scores:
+          novelty: 3        # UBI and safety nets widely discussed
+          sensitivity: 7    # Major buffer against economic turbulence
+          changeability: 7  # Policy lever that can be changed with political will
+          certainty: 6      # Current programs well-understood, future expansion uncertain
+        color: emerald
+      - id: ai-decision-authority
+        label: AI Decision Authority
+        type: leaf
+        description: How much authority shifts from humans to AI systems. Hiring, loans, medical, legal.
+        scores:
+          novelty: 5        # Discussed in AI ethics but implications underappreciated
+          sensitivity: 8    # Core driver of human agency erosion
+          changeability: 6  # Can be regulated through policy choices
+          certainty: 5      # Current trends visible but future scope uncertain
+        color: rose
+      - id: human-oversight-design
+        label: Human Oversight Design
+        type: leaf
+        description: Whether AI systems are designed for human control. Automation bias concerns.
+        scores:
+          novelty: 5        # Human-in-the-loop discussed but often superficial
+          sensitivity: 6    # Important for preserving agency but not decisive alone
+          changeability: 7  # Design choices can be mandated through regulation
+          certainty: 5      # Automation bias well-documented, effectiveness of oversight unclear
+        color: emerald
+      - id: skill-atrophy-pressure
+        label: Skill Atrophy Pressure
+        type: leaf
+        description: Risk of human skills degrading from AI dependence. Pilots, doctors, programmers.
+        scores:
+          novelty: 7        # Underappreciated concern even among AI-aware audiences
+          sensitivity: 7    # Could undermine human capacity to oversee AI
+          changeability: 5  # Can be addressed with training requirements but hard
+          certainty: 4      # Limited empirical data on AI-specific skill atrophy
+        color: rose
+      - id: education-adaptation
+        label: Education Adaptation
+        type: leaf
+        description: How well education systems prepare for AI-changed economy.
+        scores:
+          novelty: 3        # Education reform is a perennial topic
+          sensitivity: 5    # Moderate long-term impact on expertise preservation
+          changeability: 5  # Education systems change slowly, decades-long lag
+          certainty: 4      # Unclear what skills will remain valuable
+        color: slate
+      - id: ai-augmentation-tools
+        label: AI Augmentation Tools
+        type: leaf
+        description: AI that enhances rather than replaces human capabilities.
+        scores:
+          novelty: 5        # Augmentation vs replacement framing becoming common
+          sensitivity: 6    # Could preserve human expertise and agency
+          changeability: 6  # Product design choices, can be incentivized
+          certainty: 4      # Unclear if augmentation tools will win over automation
+        color: emerald
+      - id: economic-stability
+        label: Economic Stability
+        type: intermediate
+        entityRef: economic-stability
+        description: Labor market health, income distribution, growth patterns.
+        scores:
+          novelty: 3        # Economic impacts of AI widely discussed
+          sensitivity: 9    # Major component of transition turbulence
+          changeability: 5  # Depends on upstream factors and policy responses
+          certainty: 4      # High uncertainty about economic trajectory
+        color: slate
+      - id: human-agency
+        label: Human Agency
+        type: intermediate
+        entityRef: human-agency
+        description: Degree to which humans remain in control of important decisions.
+        scores:
+          novelty: 6        # Growing concern but less discussed than economic impacts
+          sensitivity: 8    # Core dimension of human flourishing in AI era
+          changeability: 6  # Design and policy choices can preserve agency
+          certainty: 4      # Uncertain how much agency will actually erode
+        color: slate
+      - id: human-expertise
+        label: Human Expertise
+        type: intermediate
+        entityRef: human-expertise
+        description: Preservation of human skills and knowledge.
+        scores:
+          novelty: 7        # Expertise atrophy is an underappreciated risk
+          sensitivity: 7    # Important for maintaining human oversight capacity
+          changeability: 5  # Hard to counteract once delegation occurs
+          certainty: 3      # Limited data on long-term expertise effects
+        color: slate
+      - id: adaptation-speed-question
+        label: Can adaptation keep pace with disruption?
+        type: leaf
+        description: AI may change faster than humans/institutions can adapt.
+        scores:
+          novelty: 6        # Key framing question, implications underappreciated
+          sensitivity: 9    # Determines whether transition is manageable
+          changeability: 4  # Hard to speed up human/institutional adaptation
+          certainty: 2      # Core unresolved question about transition dynamics
+        color: violet
+      - id: meaningful-work-question
+        label: What replaces displaced work?
+        type: leaf
+        description: Even with UBI, will people have purpose and dignity?
+        scores:
+          novelty: 6        # Philosophical question, less discussed than economics
+          sensitivity: 7    # Major determinant of human wellbeing post-transition
+          changeability: 5  # Cultural and social choices, not purely technical
+          certainty: 2      # Deep uncertainty about future of meaning and work
+        color: violet
+      - id: transition-turbulence
+        label: Transition Turbulence
+        type: effect
+        description: Overall severity of disruption during AI transition.
+        scores:
+          novelty: 5        # Transition costs discussed but often underweighted vs x-risk
+          sensitivity: 10   # Final outcome node for transition quality
+          changeability: 5  # Depends on all upstream factors and choices
+          certainty: 3      # High aggregate uncertainty about transition severity
+    edges:
+      - source: automation-speed
+        target: economic-stability
+        strength: strong
+        effect: decreases
+      - source: job-displacement-scope
+        target: economic-stability
+        strength: strong
+        effect: decreases
+      - source: safety-net-adequacy
+        target: economic-stability
+        strength: medium
+        effect: increases
+      - source: ai-decision-authority
+        target: human-agency
+        strength: strong
+        effect: decreases
+      - source: human-oversight-design
+        target: human-agency
+        strength: medium
+        effect: increases
+      - source: skill-atrophy-pressure
+        target: human-expertise
+        strength: strong
+        effect: decreases
+      - source: education-adaptation
+        target: human-expertise
+        strength: medium
+        effect: increases
+      - source: ai-augmentation-tools
+        target: human-expertise
+        strength: medium
+        effect: increases
+      - source: economic-stability
+        target: transition-turbulence
+        strength: strong
+        effect: decreases
+      - source: human-agency
+        target: transition-turbulence
+        strength: medium
+        effect: decreases
+      - source: human-expertise
+        target: transition-turbulence
+        strength: medium
+        effect: decreases
+      - source: adaptation-speed-question
+        target: transition-turbulence
+        strength: strong
+        effect: mixed
+      - source: meaningful-work-question
+        target: transition-turbulence
+        strength: medium
+        effect: mixed

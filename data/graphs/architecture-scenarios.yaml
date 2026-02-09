@@ -1,0 +1,390 @@
+# Potential AI Architecture Scenarios
+#
+# Each scenario represents a possible future AI architecture/paradigm.
+# For each, we identify key properties relevant to safety research.
+
+nodes:
+  # === ARCHITECTURE SCENARIOS (central nodes) ===
+
+  - id: scaled-transformers
+    label: Scaled Transformers
+    description: >-
+      Current transformer architecture continues to scale. GPT-style models get
+      larger, with incremental improvements but no fundamental architectural change.
+    type: effect
+    order: 0
+    subItems:
+      - id: st-likelihood
+        label: "Likelihood: HIGH (40-60%)"
+      - id: st-timeline
+        label: "Timeline: Now - 2030+"
+
+  - id: scaffolded-agents
+    label: Scaffolded Agent Systems
+    description: >-
+      Systems composed of multiple models, tools, and orchestration layers.
+      Individual components may be transformers, but the "system" is the scaffold.
+    type: effect
+    order: 1
+    subItems:
+      - id: sa-likelihood
+        label: "Likelihood: HIGH (already emerging)"
+      - id: sa-timeline
+        label: "Timeline: Now - 2027+"
+
+  - id: ssm-based
+    label: State-Space Models (SSMs)
+    description: >-
+      Mamba-style architectures replace or complement transformers. Different
+      internal structure, potentially different interpretability properties.
+    type: effect
+    order: 2
+    subItems:
+      - id: ssm-likelihood
+        label: "Likelihood: MEDIUM (20-35%)"
+      - id: ssm-timeline
+        label: "Timeline: 2025-2030"
+
+  - id: hybrid-neurosymbolic
+    label: Hybrid Neuro-Symbolic
+    description: >-
+      Systems combining neural networks with symbolic reasoning, knowledge graphs,
+      or explicit world models. More structured internal representations.
+    type: effect
+    order: 3
+    subItems:
+      - id: hns-likelihood
+        label: "Likelihood: MEDIUM (15-30%)"
+      - id: hns-timeline
+        label: "Timeline: 2026-2032"
+
+  - id: novel-unknown
+    label: Novel Unknown Architecture
+    description: >-
+      Something fundamentally different we can't predict - new paradigm from
+      neuroscience, physics-based computing, or emergent research direction.
+    type: effect
+    order: 4
+    subItems:
+      - id: nu-likelihood
+        label: "Likelihood: LOW-MEDIUM (10-25%)"
+      - id: nu-timeline
+        label: "Timeline: 2028+"
+
+  # === PROPERTIES FOR SCALED TRANSFORMERS ===
+
+  - id: st-whitebox
+    label: "White-box access: LIKELY"
+    description: >-
+      Open-weight models exist. Regulatory pressure for transparency.
+      Well-understood architecture enables meaningful inspection.
+    type: cause
+    subgroup: st-props
+    order: 0
+
+  - id: st-training
+    label: "Training access: HIGH"
+    description: >-
+      Standard pretraining + RLHF pipeline. Well-established techniques
+      for shaping behavior through training.
+    type: cause
+    subgroup: st-props
+    order: 1
+
+  - id: st-predictable
+    label: "Behavioral predictability: MEDIUM-HIGH"
+    description: >-
+      Relatively consistent outputs for similar inputs. Some emergent
+      behaviors but generally stable.
+    type: cause
+    subgroup: st-props
+    order: 2
+
+  - id: st-repr
+    label: "Representation convergence: HIGH"
+    description: >-
+      Similar concepts emerge across different transformer models.
+      Transfer learning works well.
+    type: cause
+    subgroup: st-props
+    order: 3
+
+  # === PROPERTIES FOR SCAFFOLDED AGENTS ===
+
+  - id: sa-whitebox
+    label: "White-box access: PARTIAL"
+    description: >-
+      Can inspect individual components, but system behavior emerges
+      from interactions. Which component to interpret?
+    type: cause
+    subgroup: sa-props
+    order: 0
+
+  - id: sa-training
+    label: "Training access: LIMITED"
+    description: >-
+      Can train base models, but scaffold behavior often shaped by
+      prompts, tools, and orchestration logic, not gradients.
+    type: cause
+    subgroup: sa-props
+    order: 1
+
+  - id: sa-predictable
+    label: "Behavioral predictability: LOW"
+    description: >-
+      Emergent behaviors from component interactions. Multi-step
+      reasoning can diverge unpredictably. Tool use adds variance.
+    type: cause
+    subgroup: sa-props
+    order: 2
+
+  - id: sa-modular
+    label: "Modularity: HIGH"
+    description: >-
+      Clear component boundaries. Can swap out pieces. But integration
+      points create new failure modes.
+    type: cause
+    subgroup: sa-props
+    order: 3
+
+  # === PROPERTIES FOR SSMs ===
+
+  - id: ssm-whitebox
+    label: "White-box access: UNCERTAIN"
+    description: >-
+      Weights are inspectable, but internal dynamics differ from
+      transformers. Current interp tools may not apply.
+    type: cause
+    subgroup: ssm-props
+    order: 0
+
+  - id: ssm-training
+    label: "Training access: SIMILAR"
+    description: >-
+      Still gradient-based training. RLHF-style methods should
+      largely transfer, though details may differ.
+    type: cause
+    subgroup: ssm-props
+    order: 1
+
+  - id: ssm-predictable
+    label: "Behavioral predictability: MEDIUM"
+    description: >-
+      Different recurrence dynamics. Long-context behavior may
+      differ from transformers in ways we don't yet understand.
+    type: cause
+    subgroup: ssm-props
+    order: 2
+
+  - id: ssm-repr
+    label: "Representation convergence: UNKNOWN"
+    description: >-
+      Key question: do SSMs develop similar internal concepts to
+      transformers, or fundamentally different representations?
+    type: cause
+    subgroup: ssm-props
+    order: 3
+
+  # === PROPERTIES FOR HYBRID NEURO-SYMBOLIC ===
+
+  - id: hns-whitebox
+    label: "White-box access: PARTIAL-HIGH"
+    description: >-
+      Symbolic components are inherently interpretable. Neural
+      components still opaque. Mixed inspectability.
+    type: cause
+    subgroup: hns-props
+    order: 0
+
+  - id: hns-training
+    label: "Training access: COMPLEX"
+    description: >-
+      Neural parts trainable, symbolic parts often hand-crafted
+      or learned differently. Hybrid training is hard.
+    type: cause
+    subgroup: hns-props
+    order: 1
+
+  - id: hns-predictable
+    label: "Behavioral predictability: MEDIUM-HIGH"
+    description: >-
+      Explicit reasoning steps may be more predictable than
+      pure neural. But integration can create edge cases.
+    type: cause
+    subgroup: hns-props
+    order: 2
+
+  - id: hns-structured
+    label: "Structured representations: HIGH"
+    description: >-
+      Explicit knowledge graphs, world models, or logical structures.
+      More amenable to formal verification.
+    type: cause
+    subgroup: hns-props
+    order: 3
+
+  # === PROPERTIES FOR NOVEL UNKNOWN ===
+
+  - id: nu-whitebox
+    label: "White-box access: UNKNOWN"
+    description: >-
+      Depends entirely on what emerges. Could be more or less
+      interpretable than current architectures.
+    type: cause
+    subgroup: nu-props
+    order: 0
+
+  - id: nu-training
+    label: "Training access: UNKNOWN"
+    description: >-
+      May not use gradient descent at all. Evolutionary, neuromorphic,
+      or physics-based approaches could be very different.
+    type: cause
+    subgroup: nu-props
+    order: 1
+
+  - id: nu-predictable
+    label: "Behavioral predictability: UNKNOWN"
+    description: >-
+      No basis for prediction. Could be more predictable (if more
+      structured) or less (if more alien).
+    type: cause
+    subgroup: nu-props
+    order: 2
+
+  - id: nu-transfer
+    label: "Knowledge transfer: LOW"
+    description: >-
+      Most current safety research assumes transformer-like systems.
+      Novel architectures may invalidate core assumptions.
+    type: cause
+    subgroup: nu-props
+    order: 3
+
+# === EDGES ===
+
+edges:
+  # Scaled Transformers properties
+  - id: e-st-1
+    source: st-whitebox
+    target: scaled-transformers
+    strength: strong
+    effect: increases
+
+  - id: e-st-2
+    source: st-training
+    target: scaled-transformers
+    strength: strong
+    effect: increases
+
+  - id: e-st-3
+    source: st-predictable
+    target: scaled-transformers
+    strength: medium
+    effect: increases
+
+  - id: e-st-4
+    source: st-repr
+    target: scaled-transformers
+    strength: strong
+    effect: increases
+
+  # Scaffolded Agents properties
+  - id: e-sa-1
+    source: sa-whitebox
+    target: scaffolded-agents
+    strength: medium
+    effect: increases
+
+  - id: e-sa-2
+    source: sa-training
+    target: scaffolded-agents
+    strength: medium
+    effect: increases
+
+  - id: e-sa-3
+    source: sa-predictable
+    target: scaffolded-agents
+    strength: medium
+    effect: decreases
+
+  - id: e-sa-4
+    source: sa-modular
+    target: scaffolded-agents
+    strength: medium
+    effect: increases
+
+  # SSM properties
+  - id: e-ssm-1
+    source: ssm-whitebox
+    target: ssm-based
+    strength: medium
+    effect: increases
+
+  - id: e-ssm-2
+    source: ssm-training
+    target: ssm-based
+    strength: strong
+    effect: increases
+
+  - id: e-ssm-3
+    source: ssm-predictable
+    target: ssm-based
+    strength: medium
+    effect: increases
+
+  - id: e-ssm-4
+    source: ssm-repr
+    target: ssm-based
+    strength: strong
+    effect: increases
+
+  # Hybrid properties
+  - id: e-hns-1
+    source: hns-whitebox
+    target: hybrid-neurosymbolic
+    strength: medium
+    effect: increases
+
+  - id: e-hns-2
+    source: hns-training
+    target: hybrid-neurosymbolic
+    strength: medium
+    effect: increases
+
+  - id: e-hns-3
+    source: hns-predictable
+    target: hybrid-neurosymbolic
+    strength: medium
+    effect: increases
+
+  - id: e-hns-4
+    source: hns-structured
+    target: hybrid-neurosymbolic
+    strength: strong
+    effect: increases
+
+  # Novel Unknown properties
+  - id: e-nu-1
+    source: nu-whitebox
+    target: novel-unknown
+    strength: weak
+    effect: increases
+
+  - id: e-nu-2
+    source: nu-training
+    target: novel-unknown
+    strength: weak
+    effect: increases
+
+  - id: e-nu-3
+    source: nu-predictable
+    target: novel-unknown
+    strength: weak
+    effect: increases
+
+  - id: e-nu-4
+    source: nu-transfer
+    target: novel-unknown
+    strength: strong
+    effect: decreases

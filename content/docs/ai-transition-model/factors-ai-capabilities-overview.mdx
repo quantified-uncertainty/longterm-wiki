@@ -1,0 +1,63 @@
+---
+title: AI Capabilities
+description: Root factor measuring AI system power across speed, generality, and autonomy dimensions.
+sidebar:
+  label: Overview
+  order: 0
+lastEdited: "2026-01-03"
+pageTemplate: ai-transition-model-factor
+subcategory: factors-ai-capabilities
+---
+import {Backlinks, DataInfoBox, FactorSubItemsList, PageCauseEffectGraph, EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="ai-capabilities" />
+
+AI Capabilities refers to how powerful AI systems become across multiple dimensions. This is a key root factor in the AI Transition Model because capability levels directly influence the probability and severity of various scenarios.
+
+**For detailed tracking of current AI capabilities, see the Capabilities section.**
+
+## Key Dimensions
+
+<FactorSubItemsList factorId="ai-capabilities" client:load />
+
+## Capability Categories
+
+The Knowledge Base tracks capabilities across several domains:
+
+| Capability | Status | Risk Relevance |
+|------------|--------|----------------|
+| <EntityLink id="language-models">Language Models</EntityLink> | Rapidly advancing | Foundation for all other capabilities |
+| <EntityLink id="reasoning">Reasoning</EntityLink> | Emerging | Key for general intelligence |
+| <EntityLink id="coding">Coding</EntityLink> | Human-competitive | Enables self-improvement |
+| <EntityLink id="agentic-ai">Agentic AI</EntityLink> | Early stage | Enables autonomous action |
+| <EntityLink id="tool-use">Tool Use</EntityLink> | Growing | Expands action space |
+| <EntityLink id="scientific-research">Scientific Research</EntityLink> | Emerging | Could accelerate capability growth |
+| <EntityLink id="situational-awareness">Situational Awareness</EntityLink> | Emerging | Key prerequisite for <EntityLink id="scheming">scheming</EntityLink> |
+| <EntityLink id="self-improvement">Self-improvement</EntityLink> | Theoretical | Could lead to recursive improvement |
+| <EntityLink id="persuasion">Persuasion</EntityLink> | Concerning | Enables manipulation at scale |
+| <EntityLink id="long-horizon">Long-horizon Tasks</EntityLink> | Early stage | Enables complex autonomous projects |
+
+## Relationship to Scenarios
+
+Higher AI capabilities primarily increase the probability and severity of **AI Takeover** scenarios:
+
+- **<EntityLink id="rapid">Rapid Takeover</EntityLink>**: Requires sufficient capability for decisive action
+- **<EntityLink id="gradual">Gradual Takeover</EntityLink>**: Enabled by increasing autonomy and generality over time
+
+Capabilities also affect <EntityLink id="scenarios-human-catastrophe-overview">Human-Caused Catastrophe</EntityLink> scenarios by enabling more powerful <EntityLink id="bioweapons">Bioweapons</EntityLink>, <EntityLink id="cyberweapons">Cyberweapons</EntityLink>, and <EntityLink id="autonomous-weapons">Autonomous Weapons</EntityLink>.
+
+## Current Trajectory
+
+AI capabilities are advancing rapidly across all dimensions, driven by:
+- Scaling laws (more compute, data, parameters)
+- Algorithmic improvements (transformers, <EntityLink id="rlhf">RLHF</EntityLink>, reasoning chains)
+- Hardware advances (specialized AI chips, larger clusters)
+- Increased investment (≈\$100B+ annually in US alone)
+
+**Key metrics** are tracked at [Epoch AI](https://epochai.org/) and [Stanford HAI AI Index](https://aiindex.stanford.edu/).
+
+## Related Pages
+
+<PageCauseEffectGraph slug="ai-capabilities" client:load />
+
+<Backlinks entityId="ai-capabilities" />

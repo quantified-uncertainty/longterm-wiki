@@ -1,0 +1,438 @@
+---
+title: Mechanistic Interpretability
+description: Mechanistic interpretability reverse-engineers neural networks to understand their internal computations and circuits. With $500M+ annual investment, Anthropic extracted 30M+ features from Claude 3 Sonnet in 2024, while DeepMind deprioritized SAE research after finding linear probes outperform on practical tasks. Amodei predicts "MRI for AI" achievable in 5-10 years, but warns AI may advance faster.
+sidebar:
+  order: 10
+quality: 59
+importance: 78.5
+lastEdited: "2026-01-29"
+llmSummary: Mechanistic interpretability aims to reverse-engineer neural networks to understand internal computations, with $100M+ annual investment across major labs. Anthropic extracted 30M+ features from Claude 3 Sonnet (2024), while DeepMind deprioritized SAE research after finding linear probes outperform on practical tasks; Amodei predicts 'MRI for AI' achievable in 5-10 years but warns AI may advance faster, with 3 of 4 blue teams detecting planted misalignment using interpretability tools.
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 4.5
+  rigor: 6.8
+  actionability: 5.2
+  completeness: 7.5
+metrics:
+  wordCount: 583
+  citations: 62
+  tables: 57
+  diagrams: 1
+clusters:
+  - ai-safety
+subcategory: alignment-interpretability
+---
+import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="mech-interp" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Tractability** | Medium | SAEs successfully extract millions of features from Claude 3 Sonnet; [DeepMind deprioritized SAE research](https://deepmindsafetyresearch.medium.com/negative-results-for-sparse-autoencoders-on-downstream-tasks-and-deprioritising-sae-research-6cadcfc125b9) after finding linear probes outperform on practical tasks |
+| **Scalability** | Uncertain | 30M+ features extracted from Claude 3 Sonnet; estimated 1B+ features may exist in even small models ([Amodei 2025](https://www.darioamodei.com/post/the-urgency-of-interpretability)) |
+| **Current Investment** | \$100M+ combined | Anthropic, OpenAI, DeepMind internal safety research; interpretability represents over 40% of AI safety funding ([2025 analysis](https://quickmarketpitch.com/blogs/news/ai-safety-investors)) |
+| **Time Horizon** | 5-10 years | Amodei predicts "MRI for AI" achievable by 2030-2035, but warns AI may outpace interpretability |
+| **Field Status** | Active debate | MIT Technology Review named <EntityLink id="interpretability">mechanistic interpretability</EntityLink> a [2026 Breakthrough Technology](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/); DeepMind pivoted away from SAEs in March 2025 |
+| **Key Risk** | Capability outpacing | Amodei warns "country of geniuses in a datacenter" could arrive 2026-2027, potentially before interpretability matures |
+| **Safety Application** | Promising early results | Anthropic's internal "blue teams" detected planted misalignment in 3 of 4 trials using interpretability tools |
+
+## Overview
+
+Mechanistic interpretability is a research field focused on understanding neural networks by reverse-engineering their internal computations, identifying interpretable features and circuits that explain how models process information and generate outputs. Unlike behavioral approaches that treat models as black boxes, mechanistic interpretability aims to open the box and understand the algorithms implemented by neural network weights. As [Anthropic CEO Dario Amodei noted](https://www.darioamodei.com/post/the-urgency-of-interpretability), "People outside the field are often surprised and alarmed to learn that we do not understand how our own AI creations work. They are right to be concerned: this lack of understanding is essentially unprecedented in the history of technology."
+
+The field has grown substantially since <EntityLink id="chris-olah">Chris Olah</EntityLink>'s foundational ["Zoom In: An Introduction to Circuits"](https://distill.pub/2020/circuits/zoom-in/) work at <EntityLink id="openai">OpenAI</EntityLink> and subsequent research at <EntityLink id="anthropic">Anthropic</EntityLink> and <EntityLink id="deepmind">DeepMind</EntityLink>. Key discoveries include identifying specific circuits responsible for indirect object identification, induction heads that enable in-context learning, and features that represent interpretable concepts. The development of Sparse Autoencoders (SAEs) for finding interpretable features has accelerated recent progress, with Anthropic's ["Scaling Monosemanticity"](https://transformer-circuits.pub/2024/scaling-monosemanticity/) (May 2024) demonstrating that 30 million+ interpretable features can be extracted from Claude 3 Sonnet—though researchers estimate 1 billion or more concepts may exist even in small models. Safety-relevant features identified include those related to deception, <EntityLink id="sycophancy">sycophancy</EntityLink>, and dangerous content.
+
+Mechanistic interpretability is particularly important for AI safety because it offers one of the few potential paths to detecting deception and verifying alignment at a fundamental level. If we can understand what a model is actually computing - not just what outputs it produces - we might be able to verify that it has genuinely aligned objectives rather than merely exhibiting aligned behavior. However, significant challenges remain: current techniques don't yet scale to understanding complete models at the frontier, and it's unclear whether interpretability research can keep pace with capability advances.
+
+### How Mechanistic Interpretability Works
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph INPUT["Input Processing"]
+        A[Neural Network] --> B[Extract Activations]
+    end
+
+    subgraph ANALYSIS["Feature Analysis"]
+        B --> C[Sparse Autoencoder]
+        C --> D[Decompose into Features]
+        D --> E[Identify Interpretable Directions]
+    end
+
+    subgraph DISCOVERY["Circuit Discovery"]
+        E --> F[Trace Feature Connections]
+        F --> G[Map Circuits]
+        G --> H[Understand Algorithms]
+    end
+
+    subgraph SAFETY["Safety Applications"]
+        H --> I[Detect Deception Features]
+        H --> J[Verify Alignment]
+        H --> K[Identify Dangerous Capabilities]
+    end
+
+    style INPUT fill:#e8f4f8
+    style ANALYSIS fill:#fff3e0
+    style DISCOVERY fill:#e8f5e9
+    style SAFETY fill:#fce4ec
+`} />
+
+## Risk Assessment & Impact
+
+| Risk Category | Assessment | Key Metrics | Evidence Source |
+|---------------|------------|-------------|-----------------|
+| **Safety Uplift** | Low (now) / High (potential) | Currently limited impact; could be transformative | Anthropic research |
+| **Capability Uplift** | Neutral | Doesn't directly improve capabilities | By design |
+| **Net World Safety** | Helpful | One of few approaches that could detect deception | Structural analysis |
+| **Lab Incentive** | Moderate | Some debugging value; mostly safety-motivated | Mixed motivations |
+
+### Risks Addressed
+
+| Risk | Relevance | How It Helps |
+|------|-----------|--------------|
+| <EntityLink id="deceptive-alignment" /> | **High** | Could detect when stated outputs differ from internal representations |
+| <EntityLink id="scheming" /> | **High** | May identify strategic reasoning or hidden goal pursuit in activations |
+| <EntityLink id="mesa-optimization" /> | **Medium** | Could reveal unexpected optimization targets in model internals |
+| <EntityLink id="reward-hacking" /> | **Medium** | May expose when models exploit reward proxies vs. intended objectives |
+| <EntityLink id="emergent-capabilities" /> | **Low-Medium** | Could identify latent dangerous capabilities before behavioral manifestation |
+
+### Core Concepts
+
+| Concept | Description | Importance |
+|---------|-------------|------------|
+| **Features** | Interpretable directions in activation space | Basic units of meaning |
+| **Circuits** | Connected features that perform computations | Algorithms in the network |
+| **Superposition** | Multiple features encoded in same neurons | Key challenge to interpretability |
+| **Monosemanticity** | One neuron = one concept (rare in practice) | Interpretability ideal |
+
+### Research Methodology
+
+| Stage | Process | Goal |
+|-------|---------|------|
+| **Feature Identification** | Find interpretable directions in activations | Identify units of meaning |
+| **Circuit Tracing** | Trace information flow between features | Understand computations |
+| **Verification** | Test hypotheses about what features/circuits do | Confirm understanding |
+| **Scaling** | Apply techniques to larger models | Practical applicability |
+
+### Key Techniques
+
+| Technique | Description | Status |
+|-----------|-------------|--------|
+| **Probing** | Train classifiers on activations | Widely used, limited depth |
+| **Activation Patching** | Swap activations to test causality | Standard tool |
+| **Sparse Autoencoders** | Find interpretable features via sparsity | Active development |
+| **Circuit Analysis** | Map feature-to-feature connections | Labor-intensive |
+| **Representation Engineering** | Steer behavior via activation modification | Growing technique |
+
+## Key Discoveries
+
+### Identified Circuits
+
+| Circuit | Function | Significance |
+|---------|----------|--------------|
+| **Indirect Object Identification** | Track which entity is which in text | First complete circuit |
+| **Induction Heads** | Enable in-context learning | Fundamental capability |
+| **Copy-Paste Circuits** | Reproduce text patterns | Basic mechanism |
+| **Negation Circuits** | Handle negation in logic | Reasoning component |
+
+### Feature Categories Found
+
+| Category | Examples | Discovery Method |
+|----------|----------|-----------------|
+| **Concepts** | "Golden Gate Bridge," "deception," "code" | SAE analysis |
+| **Relationships** | Subject-object, cause-effect | Circuit tracing |
+| **Meta-Cognition** | "Unsure," "refusing" | Probing |
+| **Languages** | Different language representations | Cross-lingual analysis |
+
+## Why It Matters for Safety
+
+### Potential Safety Applications
+
+| Application | Description | Current Status |
+|-------------|-------------|---------------|
+| **Deception Detection** | Identify when model believes vs states | Theoretical, limited empirical |
+| **Alignment Verification** | Check if goals are actually aligned | Research goal |
+| **Dangerous Capability ID** | Find capabilities before behavioral manifestation | Early research |
+| **Explanation Generation** | Explain why model produced output | Some progress |
+
+### The Deception Detection Promise
+
+Mechanistic interpretability could address deception in ways behavioral approaches cannot:
+
+| Approach | What It Tests | Limitation |
+|----------|---------------|-----------|
+| **Behavioral Evaluation** | Does model produce safe outputs? | Model could produce safe outputs while misaligned |
+| **RLHF** | Does model optimize for human preferences? | Optimizes for appearance of preference |
+| **Interpretability** | What is model actually computing? | Could detect true vs stated beliefs |
+
+### The Core Insight
+
+> If we can read a model's "beliefs" directly from its activations, we can potentially detect when stated outputs differ from internal representations - the hallmark of deception.
+
+### Strengths
+
+| Strength | Description | Significance |
+|----------|-------------|--------------|
+| **Addresses Root Cause** | Understands model internals, not just behavior | Fundamental approach |
+| **Deception-Robust Potential** | Could detect misalignment at source | Unique capability |
+| **Safety-Focused** | Primarily safety-motivated research | Good for differential safety |
+| **Scientifically Rigorous** | Empirical, falsifiable approach | Solid methodology |
+
+### Limitations
+
+| Limitation | Description | Severity |
+|------------|-------------|----------|
+| **Scaling Challenge** | Current techniques don't fully explain frontier models | High |
+| **Feature Completeness** | May miss important features | Medium |
+| **Circuit Complexity** | Full models have billions of connections | High |
+| **Interpretation Gap** | Even understood features may be hard to interpret | Medium |
+
+## Scalability Analysis
+
+### Current Progress
+
+| Model Scale | Interpretability Status | Quantified Results |
+|-------------|------------------------|-------------------|
+| **Small Models (under 1B params)** | Substantial understanding | Complete circuits mapped (e.g., indirect object identification, induction heads) |
+| **Medium Models (1-10B params)** | Partial understanding | 30M+ features extracted from Claude 3 Sonnet; estimated 1B+ total features |
+| **Frontier Models (100B+ params)** | Very limited | SAE features found; full circuits rare; GPT-4 analyzed with 16M latent autoencoder |
+| **Future Models** | Unknown | [Open Problems survey](https://arxiv.org/abs/2501.16496) identifies scaling as critical unsolved challenge |
+
+### Key Scaling Questions
+
+1. **Can features be found in arbitrarily large models?** SAEs show promise but unclear at extreme scale
+2. **Do circuits compose predictably?** Small circuits understood but combination unclear
+3. **Is full understanding necessary?** Maybe partial understanding suffices for safety
+4. **Can automation help?** Current work labor-intensive; automation needed
+
+### The Race Against Capability
+
+| Scenario | Interpretability Progress | Capability Progress | Outcome |
+|----------|--------------------------|--------------------|---------|
+| **Optimistic** | Scales with model size | Continues | Verification before deployment |
+| **Neutral** | Lags but catches up | Continues | Late but useful |
+| **Pessimistic** | Fundamentally limited | Accelerates | Never catches up |
+
+## Sparse Autoencoders (SAEs)
+
+### How SAEs Work
+
+SAEs find interpretable features by training autoencoders with sparsity constraints:
+
+| Component | Function | Purpose |
+|-----------|----------|---------|
+| **Encoder** | Maps activations to sparse feature space | Extract features |
+| **Sparsity Constraint** | Only few features active per input | Encourage interpretability |
+| **Decoder** | Reconstructs activations from features | Verify features capture information |
+| **Dictionary** | Learned feature directions | Interpretable units |
+
+### SAE Results
+
+| Finding | Quantified Results | Source |
+|---------|-------------------|--------|
+| **Monosemantic Features** | Found in GPT-2, Claude 3 Sonnet, GPT-4 | [Anthropic 2024](https://transformer-circuits.pub/2024/scaling-monosemanticity/), [OpenAI 2024](https://cdn.openai.com/papers/sparse-autoencoders.pdf) |
+| **Feature Count (Claude 3 Sonnet)** | 30M+ features extracted; estimated 1B+ total | [Amodei 2025](https://www.darioamodei.com/post/the-urgency-of-interpretability) |
+| **Feature Count (GPT-4)** | 16M latent autoencoder trained on 40B tokens | [OpenAI SAE paper](https://cdn.openai.com/papers/sparse-autoencoders.pdf) |
+| **Practical Performance** | SAEs underperform linear probes on OOD harmful-intent detection | [DeepMind 2025](https://deepmindsafetyresearch.medium.com/negative-results-for-sparse-autoencoders-on-downstream-tasks-and-deprioritising-sae-research-6cadcfc125b9) |
+| **Safety Application** | 3 of 4 "blue teams" detected planted misalignment using interpretability tools | [Anthropic internal testing](https://www.darioamodei.com/post/the-urgency-of-interpretability) |
+
+### Recent Research Developments (2024-2025)
+
+**Anthropic's Scaling Monosemanticity (May 2024):** Anthropic successfully extracted [30 million+ interpretable features](https://transformer-circuits.pub/2024/scaling-monosemanticity/) from Claude 3 Sonnet using SAEs trained on 8 billion residual-stream activations. Key findings included:
+- Features ranging from concrete concepts ("Golden Gate Bridge") to abstract ones ("code bugs," "sycophantic praise")
+- Safety-relevant features related to deception, sycophancy, bias, and dangerous content
+- "Feature steering" demonstrated remarkably effective at modifying model outputs—most famously creating "Golden Gate Claude" where the bridge feature was amplified, causing obsessive references to the bridge
+
+**OpenAI's GPT-4 Interpretability (2024):** OpenAI trained a [16 million latent autoencoder on GPT-4](https://cdn.openai.com/papers/sparse-autoencoders.pdf) for 40 billion tokens and released training code and autoencoders for open-source models. Key findings included "humans have flaws" concepts and clean scaling laws with respect to autoencoder size and sparsity.
+
+**DeepMind's Strategic Pivot (March 2025):** Google DeepMind's mechanistic interpretability team [announced they are deprioritizing fundamental SAE research](https://deepmindsafetyresearch.medium.com/negative-results-for-sparse-autoencoders-on-downstream-tasks-and-deprioritising-sae-research-6cadcfc125b9) after systematic evaluation showed SAEs underperform linear probes on out-of-distribution harmful-intent detection tasks. The team shifted focus toward "model diffing, interpreting model organisms of deception, and trying to interpret thinking models." As a corollary, they found "linear probes are actually really good, cheap, and perform great."
+
+**Amodei's "MRI for AI" Vision (April 2025):** In his essay ["The Urgency of Interpretability"](https://www.darioamodei.com/post/the-urgency-of-interpretability), Anthropic CEO Dario Amodei argued that "multiple recent breakthroughs" have convinced him they are "now on the right track" toward creating interpretability as "a sophisticated and reliable way to diagnose problems in even very advanced AI—a true 'MRI for AI'." He estimates this goal is achievable within 5-10 years, but warns AI systems equivalent to a "country of geniuses in a datacenter" could arrive as soon as 2026 or 2027—potentially before interpretability matures.
+
+**Practical Safety Testing (2025):** Anthropic has begun prototyping interpretability tools for safety. In internal testing, they deliberately embedded a misalignment into one of their models and challenged "blue teams" to detect the issue. [Three of four teams found the planted flaw](https://www.darioamodei.com/post/the-urgency-of-interpretability), with some using neural dashboards and interpretability tools, suggesting real-time AI audits could soon be possible.
+
+**Open Problems Survey (January 2025):** A comprehensive survey by [30+ researchers titled "Open Problems in Mechanistic Interpretability"](https://arxiv.org/abs/2501.16496) catalogued the field's remaining challenges. Key issues include validation problems ("interpretability illusions" where convincing interpretations later prove false), the need for training-time interpretability rather than post-hoc analysis, and limited understanding of how weights compute activation structures.
+
+**Neel Nanda's Updated Assessment (2025):** The head of DeepMind's mechanistic interpretability team has shifted from hoping mech interp would fully reverse-engineer AI models to seeing it as "one useful tool among many." In an [80,000 Hours podcast interview](https://80000hours.org/podcast/episodes/neel-nanda-mechanistic-interpretability/), his perspective evolved from "low chance of incredibly big deal" to "high chance of medium big deal"—acknowledging that full understanding won't be achieved as models are "too complex and messy to give robust guarantees like 'this model isn't deceptive'—but partial understanding is valuable."
+
+## Current Research & Investment
+
+### Funding Landscape (2024-2025)
+
+| Organization | Investment Focus | Estimated Annual Spend | Key Outputs |
+|--------------|------------------|------------------------|-------------|
+| **Anthropic** | SAEs, circuits, safety applications | \$10-100M+ (internal) | [Scaling Monosemanticity](https://transformer-circuits.pub/2024/scaling-monosemanticity/) (2024), [Circuits July 2025 update](https://transformer-circuits.pub/2025/july-update/index.html) |
+| **OpenAI** | SAE scaling, GPT-4 interpretability | \$10-50M+ (internal) | [16M latent autoencoder on GPT-4](https://cdn.openai.com/papers/sparse-autoencoders.pdf), public training code release |
+| **DeepMind** | Model diffing, deception detection | \$10-40M+ (internal) | [SAE deprioritization](https://deepmindsafetyresearch.medium.com/negative-results-for-sparse-autoencoders-on-downstream-tasks-and-deprioritising-sae-research-6cadcfc125b9), pivot to pragmatic interpretability |
+| **EleutherAI** | Open-source tools | ≈\$1M (grants) | TransformerLens, community resources |
+| **Academic/Independent** | Theoretical foundations | \$18M Bay Area, \$12M London/Oxford (2024) | [Open Problems survey](https://arxiv.org/abs/2501.16496) |
+
+**Total estimated field investment:** \$100M+ annually combined across internal safety research at major labs, with mechanistic interpretability and constitutional AI representing over 40% of total AI safety funding.
+
+### Research Group Priorities
+
+| Metric | Value | Notes |
+|--------|-------|-------|
+| **Annual Investment** | \$150-250M/year | Major labs + independent researchers |
+| **Adoption Level** | Experimental | Growing; MIT named it [2026 Breakthrough Technology](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/) |
+| **Primary Researchers** | Anthropic, DeepMind, EleutherAI, Apollo Research | Active community with academic expansion |
+| **Strategic Importance** | High | One of few paths to detecting deception and verifying alignment |
+
+### Key Research Groups
+
+| Group | Focus | Key Contributions | Links |
+|-------|-------|-------------------|-------|
+| **Anthropic Interpretability Team** | SAEs, circuits, safety applications | [Scaling Monosemanticity](https://transformer-circuits.pub/2024/scaling-monosemanticity/), [Transformer Circuits](https://transformer-circuits.pub/) | [Research page](https://www.anthropic.com/research/team/interpretability) |
+| **Google DeepMind** | Model diffing, deception detection, pragmatic interpretability | [SAE deprioritization](https://deepmindsafetyresearch.medium.com/negative-results-for-sparse-autoencoders-on-downstream-tasks-and-deprioritising-sae-research-6cadcfc125b9), negative results sharing | Led by [Neel Nanda](https://80000hours.org/podcast/episodes/neel-nanda-mechanistic-interpretability/) |
+| **OpenAI** | SAE scaling, GPT-4 interpretability | [16M latent autoencoder](https://cdn.openai.com/papers/sparse-autoencoders.pdf), public code release | [SAE codebase](https://github.com/openai/sparse_autoencoder) |
+| **Apollo Research** | Safety applications, alignment testing | Co-authored [Open Problems survey](https://arxiv.org/abs/2501.16496) | Independent safety org |
+| **EleutherAI** | Open-source tools | TransformerLens, community resources | [Papers & blog](https://www.eleuther.ai/papers-blog/tag/Mechanistic+Interpretability) |
+| **Academic (MIT, Oxford, Berkeley)** | Theoretical foundations | Bay Area: \$18M, London/Oxford: \$12M (2024 funding) | Various institutions |
+
+### Differential Progress Analysis
+
+| Factor | Assessment |
+|--------|------------|
+| **Safety Benefit** | Potentially very high - unique path to deception detection |
+| **Capability Benefit** | Low - primarily understanding, not capability |
+| **Overall Balance** | Safety-dominant |
+
+## Research Directions
+
+### Current Priorities
+
+| Direction | Purpose | Status |
+|-----------|---------|--------|
+| **SAE Scaling** | Apply to larger models | Active development |
+| **Circuit Discovery** | Find more circuits in frontier models | Labor-intensive progress |
+| **Automation** | Reduce manual analysis | Early exploration |
+| **Safety Applications** | Apply findings to detect deception | Research goal |
+
+### Open Problems
+
+1. **Superposition**: How to disentangle compressed representations?
+2. **Compositionality**: How do features combine into complex computations?
+3. **Abstraction**: How to understand high-level reasoning?
+4. **Verification**: How to confirm understanding is complete?
+
+## Relationship to Other Approaches
+
+### Complementary Techniques
+
+- **<EntityLink id="representation-engineering">Representation Engineering</EntityLink>**: Uses interpretability findings to steer behavior; places population-level representations rather than neurons at the center of analysis
+- **<EntityLink id="process-supervision">Process Supervision</EntityLink>**: Interpretability could verify reasoning matches shown steps
+- **Probing**: Simpler technique that trains classifiers on activations; DeepMind found linear probes outperform SAEs on some practical tasks
+- **Activation Patching**: Swaps activations between contexts to establish causal relationships
+
+### Key Distinctions
+
+| Approach | Depth | Scalability | Deception Robustness | Current Status |
+|----------|-------|-------------|---------------------|----------------|
+| **Mechanistic Interp** | Deep | Challenging | Potentially strong | Research phase |
+| **Representation Engineering** | Medium-Deep | Better | Moderate | Active development |
+| **Behavioral Evals** | Shallow | Good | Weak | Production use |
+| **Linear Probing** | Medium | Good | Medium | Surprisingly effective |
+
+### The SAE vs. RepE Debate
+
+A growing debate in the field concerns whether sparse autoencoders (SAEs) or representation engineering (RepE) approaches are more promising:
+
+| Factor | SAEs | RepE |
+|--------|------|------|
+| **Unit of analysis** | Individual features/neurons | Population-level representations |
+| **Scalability** | Challenging; compute-intensive | Generally better |
+| **Interpretability** | High per-feature | Moderate overall |
+| **Practical performance** | Mixed; underperforms probes on some tasks | Strong on steering tasks |
+| **Theoretical grounding** | Sparse coding hypothesis | Cognitive neuroscience-inspired |
+
+Some researchers argue that even if mechanistic interpretability proves intractable, we can "design safety objectives and directly assess and engineer the model's compliance with them at the representational level."
+
+## Key Uncertainties & Research Cruxes
+
+### Central Questions
+
+| Question | Optimistic View | Pessimistic View |
+|----------|-----------------|------------------|
+| **Can it scale?** | Techniques will improve with investment | Fundamentally intractable |
+| **Is it fast enough?** | Can keep pace with capabilities | Capabilities outrun understanding |
+| **Is it complete?** | Partial understanding suffices | Need full understanding |
+| **Does it detect deception?** | Could read true beliefs | Deception could evade |
+
+### What Would Change Assessment
+
+| Evidence | Would Support |
+|----------|---------------|
+| **SAEs working on 100B+ models** | Major positive update |
+| **Automated circuit discovery** | Scalability breakthrough |
+| **Detecting planted deception** | Validation of safety applications |
+| **Fundamental complexity barriers** | Negative update on feasibility |
+
+## Timeline of Key Developments
+
+| Date | Event | Significance |
+|------|-------|--------------|
+| **2017** | [Feature Visualization](https://distill.pub/2017/feature-visualization/) published in Distill | Established visual interpretability foundations |
+| **2020** | [Zoom In: An Introduction to Circuits](https://distill.pub/2020/circuits/zoom-in/) by Chris Olah et al. | Founded mechanistic interpretability as a field; proposed features and circuits as fundamental units |
+| **2022** | Anthropic identifies induction heads | Discovered circuits enabling in-context learning |
+| **2023 Oct** | [Toward Monosemanticity](https://transformer-circuits.pub/2023/monosemantic-features/) published | Demonstrated SAEs could extract monosemantic features from small transformers |
+| **2024 May** | [Scaling Monosemanticity](https://transformer-circuits.pub/2024/scaling-monosemanticity/) released | Extracted 30M+ features from Claude 3 Sonnet; "Golden Gate Claude" demonstration |
+| **2024 Jun** | OpenAI publishes [SAE scaling research](https://cdn.openai.com/papers/sparse-autoencoders.pdf) | 16M latent autoencoder trained on GPT-4; released training code |
+| **2025 Jan** | [Open Problems in Mechanistic Interpretability](https://arxiv.org/abs/2501.16496) survey | 30+ authors catalogued remaining challenges |
+| **2025 Mar** | DeepMind [deprioritizes SAE research](https://deepmindsafetyresearch.medium.com/negative-results-for-sparse-autoencoders-on-downstream-tasks-and-deprioritising-sae-research-6cadcfc125b9) | Found SAEs underperform linear probes; pivoted to model diffing and deception detection |
+| **2025 Apr** | Amodei publishes ["The Urgency of Interpretability"](https://www.darioamodei.com/post/the-urgency-of-interpretability) | "MRI for AI" vision; 5-10 year timeline; warns AI may advance faster |
+| **2025 Jul** | Anthropic [Circuits July 2025 update](https://transformer-circuits.pub/2025/july-update/index.html) | Progress on tracing paths from prompt to response |
+| **2026 Jan** | MIT Technology Review names mechanistic interpretability a [2026 Breakthrough Technology](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/) | Mainstream recognition of field's importance |
+
+---
+
+## Sources & Resources
+
+### Primary Research
+
+| Type | Source | Key Contributions |
+|------|--------|------------------|
+| **Foundational Work** | [Zoom In: An Introduction to Circuits](https://distill.pub/2020/circuits/zoom-in/) (Olah et al., 2020) | Established field; proposed features and circuits as fundamental units |
+| **Circuits Research** | [Transformer Circuits Thread](https://transformer-circuits.pub/) | Ongoing circuit methodology and discoveries |
+| **Anthropic SAE Work** | [Scaling Monosemanticity](https://transformer-circuits.pub/2024/scaling-monosemanticity/) (May 2024) | 30M+ features from Claude 3 Sonnet; 8B tokens training |
+| **OpenAI SAE Work** | [Scaling and Evaluating Sparse Autoencoders](https://cdn.openai.com/papers/sparse-autoencoders.pdf) (2024) | 16M latent autoencoder on GPT-4; 40B tokens; released training code |
+| **SAE Survey** | [A Survey on Sparse Autoencoders](https://arxiv.org/abs/2503.05613) (2025) | Comprehensive overview of SAE techniques and results |
+| **Open Problems** | [Open Problems in Mechanistic Interpretability](https://arxiv.org/abs/2501.16496) (January 2025) | 30+ authors; comprehensive survey of remaining challenges |
+| **Strategic Vision** | [The Urgency of Interpretability](https://www.darioamodei.com/post/the-urgency-of-interpretability) (Amodei, April 2025) | "MRI for AI" vision; 5-10 year timeline; 3/4 blue teams detected planted misalignment |
+| **Negative Results** | [DeepMind SAE Deprioritization](https://deepmindsafetyresearch.medium.com/negative-results-for-sparse-autoencoders-on-downstream-tasks-and-deprioritising-sae-research-6cadcfc125b9) (March 2025) | SAEs underperform linear probes on OOD harmful-intent detection |
+| **Academic Review** | [Mechanistic Interpretability for AI Safety: A Review](https://leonardbereska.github.io/blog/2024/mechinterpreview/) (TMLR, 2024) | Comprehensive field overview |
+| **Representation Engineering** | [RepE: A Top-Down Approach](https://safe.ai/blog/representation-engineering-a-new-way-of-understanding-models) (CAIS) | Alternative population-level approach |
+| **2026 Recognition** | [MIT Technology Review: 2026 Breakthrough Technologies](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/) (January 2026) | Named mechanistic interpretability as breakthrough technology |
+
+### Key Research Venues
+
+| Venue | Focus | Access |
+|-------|-------|--------|
+| [Transformer Circuits](https://transformer-circuits.pub/) | Anthropic's interpretability research | Open access |
+| [Distill Journal](https://distill.pub/) | High-quality interpretability articles | Open access (archived) |
+| [EleutherAI](https://www.eleuther.ai/papers-blog/tag/Mechanistic+Interpretability) | Open-source tools and community research | Open access |
+| [NeurIPS Mechanistic Interpretability Workshop](https://mechinterpworkshop.com/) | Academic venue for mech interp research | Annual conference |
+
+### Expert Perspectives
+
+- **Chris Olah** (Anthropic): Pioneer of the field; advocates treating interpretability as natural science, studying neurons and circuits like biology studies cells
+- **Dario Amodei** (Anthropic CEO): Optimistic about "MRI for AI" within 5-10 years; concerned AI advances may outpace interpretability
+- **Neel Nanda** (DeepMind): Shifted to "high chance of medium big deal" view; sees partial understanding as valuable even without full guarantees
+- **[80,000 Hours podcast with Chris Olah](https://80000hours.org/podcast/episodes/chris-olah-interpretability-research/)**: In-depth discussion of interpretability research and career paths
+
+---
+
+## AI Transition Model Context
+
+Mechanistic interpretability relates to the <EntityLink id="ai-transition-model" /> through:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Could verify alignment at fundamental level |
+| <EntityLink id="ai-capability-level" /> | Transparency | Makes AI systems more understandable |
+
+Mechanistic interpretability is one of the few research directions that could provide genuine confidence in AI alignment rather than relying on behavioral proxies. Its success or failure significantly impacts the viability of building safe advanced AI.
+
+## Related Pages
+
+<Backlinks />

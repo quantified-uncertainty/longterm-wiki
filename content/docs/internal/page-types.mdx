@@ -1,0 +1,489 @@
+---
+title: "Page Type System"
+description: "Comprehensive reference for LongtermWiki's page classification system"
+pageType: "documentation"
+sidebar:
+  order: 5
+importance: 5
+quality: 65
+llmSummary: "Documents LongtermWiki's four-level page classification system (content, stub, documentation, overview) with explicit validation rules for each type, where content pages receive full quality grading while stubs/documentation are excluded from validation pipelines."
+ratings:
+  focus: 9
+  novelty: 2
+  rigor: 8
+  completeness: 9
+  concreteness: 9
+  actionability: 8
+metrics:
+  wordCount: 1364
+  citations: 0
+  tables: 9
+  diagrams: 0
+---
+# Page Type System
+
+LongtermWiki uses a two-level classification system to categorize content:
+
+1. **Page Type** (`pageType`): Controls validation behavior and quality scoring eligibility
+2. **Page Template** (`pageTemplate`): Determines expected structure and applicable style guide
+
+Understanding this distinction is critical: a page can have `pageType: content` (meaning it receives full validation) while also having `pageTemplate: knowledge-base-risk` (meaning it should follow risk page structure).
+
+---
+
+## Page Types Overview
+
+| Type | Set By | Quality Scored? | Validated? | Count |
+|------|--------|-----------------|------------|-------|
+| `content` | Default | Yes | Full | ≈450 |
+| `stub` | Explicit frontmatter | No | Minimal | ≈10 |
+| `documentation` | Explicit frontmatter | No | No | ≈10 |
+| `overview` | Auto (index.mdx) | No | Navigation only | ≈50 |
+
+---
+
+## `content` (Default)
+
+### What It Is
+
+The default page type for all substantive knowledge base content. If you don't specify a `pageType` in frontmatter, the page is treated as `content`. This is the workhorse type covering risks, responses, models, organizations, people, and all analytical content.
+
+### When to Use
+
+- **All knowledge base pages** that should be graded, improved, and maintained
+- Any page where quality matters and should be tracked
+- Pages that will appear in improvement queues and quality reports
+- You don't need to explicitly set `pageType: content` - it's the default
+
+### Validation Behavior
+
+Content pages receive **full validation**:
+
+- **Quality grading**: Must go through `grade-content.mjs` to get a quality score (0-100)
+- **Structural checks**: Tables, citations, diagrams are counted and affect quality
+- **Style guide compliance**: Must follow the relevant template's style guide
+- **Staleness warnings**: Old `lastEdited` dates trigger alerts
+- **EntityLink validation**: All referenced entities must exist
+- **MDX compilation**: Syntax errors fail CI
+- **Dollar sign escaping**: Unescaped `$` causes failures
+
+### Quality Scoring
+
+Content pages are scored on four dimensions by `grade-content.mjs`:
+
+| Dimension | Scale | What It Measures |
+|-----------|-------|------------------|
+| **Novelty** | 0-10 | Originality beyond summarizing sources |
+| **Rigor** | 0-10 | Evidence quality, citations, quantification |
+| **Actionability** | 0-10 | Usefulness for decisions |
+| **Completeness** | 0-10 | Coverage of the topic |
+
+These combine into an overall **quality score (0-100)** plus automated **metrics** (wordCount, citations, tables, diagrams).
+
+**Important**: Quality must ONLY be set by `grade-content.mjs`, never manually or by LLM self-assessment. The `quality-source` validation rule enforces this by checking that pages with `quality` also have `ratings`.
+
+### Relevant Frontmatter Fields
+
+```yaml
+---
+title: "Page Title"
+description: "Brief description for search and previews"
+# pageType: content  # Optional - this is the default
+pageTemplate: knowledge-base-risk  # Which structure to follow
+quality: 45  # Set ONLY by grade-content.mjs
+importance: 60  # How significant for AI safety prioritization
+lastEdited: "2026-01-31"
+llmSummary: "One-sentence summary with key conclusions"
+ratings:
+  novelty: 4
+  rigor: 5
+  actionability: 3
+  completeness: 5
+metrics:
+  wordCount: 1500
+  citations: 8
+  tables: 2
+  diagrams: 1
+todos:
+  - "Add more quantitative estimates"
+  - "Include counterarguments section"
+---
+```
+
+### Examples
+
+- `/knowledge-base/risks/deceptive-alignment.mdx`
+- `/knowledge-base/responses/interpretability.mdx`
+- `/knowledge-base/organizations/anthropic.mdx`
+- `/knowledge-base/models/takeover-scenarios.mdx`
+
+---
+
+## `stub`
+
+### What It Is
+
+A **stub** is an intentionally minimal page that exists primarily for navigation or reference purposes. Stubs are explicitly marked and excluded from quality scoring because their brevity is by design, not a deficiency.
+
+### When to Use
+
+1. **Redirect pages**: When content has moved or been consolidated elsewhere
+   - Use `seeAlso` field to point to the primary page
+   - Example: Open Philanthropy → Coefficient Giving after rebrand
+
+2. **Brief profiles**: People or organizations that don't warrant full pages
+   - Just enough info to be useful in search/browse
+   - Links to external resources
+
+3. **Deprecated concepts**: Topics kept for link stability
+   - Old terminology that redirects to current naming
+   - Historical pages that shouldn't be deleted but aren't maintained
+
+4. **Intentional placeholders**: Topics planned for future expansion
+   - Better than a 404, but marked as incomplete by design
+
+### Validation Behavior
+
+Stub pages are **excluded from most validation**:
+
+- ❌ Not graded by `grade-content.mjs`
+- ❌ Not checked by style guide validators
+- ❌ Not included in improvement queues
+- ❌ Not counted in quality reports
+- ✅ Still validated for MDX compilation
+- ✅ Still validated for EntityLink references
+- ✅ Still validated for dollar sign escaping
+
+### Relevant Frontmatter Fields
+
+```yaml
+---
+title: "Open Philanthropy"
+description: "Redirects to Coefficient Giving"
+pageType: stub
+seeAlso: "coefficient-giving"  # Points to the primary page
+sidebar:
+  order: 10
+lastEdited: "2026-01-29"
+---
+```
+
+The `seeAlso` field is particularly important for stubs - it tells readers (and automated tools) where the real content lives.
+
+### Content Expectations
+
+A stub should contain:
+
+1. **Brief explanation** of what this page is about (1-3 sentences)
+2. **Clear pointer** to where comprehensive coverage exists (EntityLink)
+3. **Backlinks component** to show what references this page
+4. Optionally: minimal quick facts if genuinely useful
+
+A stub should NOT contain:
+
+- Detailed analysis or substantial content
+- Multiple sections with headers
+- Tables, diagrams, or extensive formatting
+- Content that duplicates the primary page
+
+### Example
+
+```mdx
+---
+title: "Open Philanthropy"
+description: "Redirects to Coefficient Giving after November 2025 rebrand"
+pageType: stub
+seeAlso: "coefficient-giving"
+---
+import {Backlinks, EntityLink} from '@components/wiki';
+
+**Open Philanthropy rebranded to <EntityLink id="coefficient-giving" /> in November 2025.**
+
+For comprehensive information about AI safety funding, grants, and the 2025 Technical AI Safety RFP, see the Coefficient Giving page.
+
+<Backlinks />
+```
+
+---
+
+## `documentation`
+
+### What It Is
+
+Documentation pages contain **internal reference material** about LongtermWiki itself - style guides, process documentation, code examples, and meta-content. They are excluded from content validation because they may contain intentional examples of "bad" formatting, placeholder text, or code snippets.
+
+### When to Use
+
+1. **Style guides**: Documentation of how to write different page types
+   - `/internal/risk-style-guide/`
+   - `/internal/response-style-guide/`
+
+2. **Process documentation**: How LongtermWiki systems work
+   - This page (`/internal/page-types/`)
+   - Rating system documentation
+
+3. **Internal planning**: Strategy documents, project notes
+   - `/project/similar-projects/`
+   - `/project/strategy-brainstorm/`
+
+4. **Technical reference**: Code examples, API documentation
+   - Content database documentation
+   - Script usage guides
+
+### Validation Behavior
+
+Documentation pages are **excluded from all content validation**:
+
+- ❌ Not graded by `grade-content.mjs`
+- ❌ Not checked by style guide validators
+- ❌ Not checked for content quality issues
+- ❌ Not included in any improvement queues
+- ✅ Still validated for MDX compilation (must render)
+- ✅ Basic frontmatter schema validation
+
+This exclusion is important because documentation pages often contain:
+
+- Example code with intentional placeholders
+- Demonstrations of what NOT to do
+- Reference tables that don't follow content patterns
+- Technical details irrelevant to content quality
+
+### Relevant Frontmatter Fields
+
+```yaml
+---
+title: "Risk Style Guide"
+description: "How to write risk analysis pages for LongtermWiki"
+pageType: documentation
+sidebar:
+  order: 3
+---
+```
+
+Documentation pages typically have minimal frontmatter - no quality, importance, ratings, or metrics since they're not graded.
+
+### Content Expectations
+
+Documentation pages should be:
+
+- **Clear and actionable** for their intended audience (usually contributors)
+- **Well-organized** with logical structure
+- **Up-to-date** when processes change
+- **Self-contained** or linking to relevant external resources
+
+Unlike content pages, documentation can freely include:
+
+- Code blocks and technical examples
+- Placeholder text for illustration
+- Checklists and process steps
+- Screenshots and interface mockups
+
+### Examples
+
+- `/internal/page-types.mdx` (this page)
+- `/internal/risk-style-guide.mdx`
+- `/internal/rating-system.mdx`
+- `/project/similar-projects.mdx`
+
+---
+
+## `overview` (Auto-detected)
+
+### What It Is
+
+Overview pages are **automatically detected** from the filename `index.mdx`. They serve as navigation hubs for sections of the site, providing an entry point and links to child pages. You never set `pageType: overview` in frontmatter - it's inferred.
+
+### When to Use
+
+Any `index.mdx` file is automatically treated as an overview page. These exist at:
+
+- Section roots: `/knowledge-base/risks/index.mdx`
+- Category roots: `/knowledge-base/organizations/index.mdx`
+- Topic clusters: `/knowledge-base/responses/index.mdx`
+
+### Validation Behavior
+
+Overview pages receive **limited validation**:
+
+- ❌ Not graded by `grade-content.mjs`
+- ❌ Not included in quality reports
+- ✅ Sidebar structure validation (must be properly configured)
+- ✅ Link integrity checking
+- ✅ MDX compilation
+
+### Content Expectations
+
+Overview pages should provide:
+
+1. **Brief introduction** to the section (1-2 paragraphs)
+2. **Navigation structure** - links to key child pages
+3. **Organizational logic** - why pages are grouped this way
+4. Optionally: summary tables, key takeaways across the section
+
+Overview pages should NOT:
+
+- Duplicate substantial content from child pages
+- Require extensive maintenance as children change
+- Include detailed analysis (that belongs in child pages)
+
+### Example
+
+```mdx
+---
+title: "AI Risks"
+description: "Analysis of risks from advanced AI systems"
+---
+
+This section covers the landscape of risks from AI development and deployment.
+
+## Categories
+
+- **Accident Risks**: Unintended harmful behaviors from AI systems
+- **Misuse Risks**: Deliberate harmful applications of AI
+- **Structural Risks**: Systemic issues from AI development dynamics
+
+## Key Pages
+
+- [Deceptive Alignment](/knowledge-base/risks/deceptive-alignment/)
+- [Power Concentration](/knowledge-base/risks/power-concentration/)
+```
+
+---
+
+## Page Templates
+
+While `pageType` controls validation behavior, `pageTemplate` controls the **expected structure** and which style guide applies. A page can be `pageType: content` (fully validated) with different templates.
+
+### Available Templates
+
+| Template | Used For | Style Guide |
+|----------|----------|-------------|
+| `knowledge-base-risk` | Risk analysis pages | `/internal/risk-style-guide/` |
+| `knowledge-base-response` | Intervention/response pages | `/internal/response-style-guide/` |
+| `knowledge-base-model` | Analytical models | `/internal/models-style-guide/` |
+| `ai-transition-model-factor` | ATM top-level factors | `/internal/ai-transition-model-style-guide/` |
+| `ai-transition-model-sub-item` | ATM sub-factors | `/internal/ai-transition-model-style-guide/` |
+| `ai-transition-model-scenario` | ATM scenarios | `/internal/ai-transition-model-style-guide/` |
+
+### Template Detection
+
+Templates can be:
+
+1. **Explicitly set** in frontmatter: `pageTemplate: knowledge-base-risk`
+2. **Inferred from URL** for some paths (e.g., `/knowledge-base/risks/**`)
+
+### Example with Both Fields
+
+```yaml
+---
+title: "Deceptive Alignment"
+description: "Risk of AI systems appearing aligned during training but pursuing different goals"
+pageType: content  # Optional - default
+pageTemplate: knowledge-base-risk  # Required structure
+quality: 67
+importance: 85
+---
+```
+
+---
+
+## Interaction with Quality Pipeline
+
+### What Gets Graded
+
+| Page Type | Graded by `grade-content.mjs`? | In improvement queues? |
+|-----------|-------------------------------|------------------------|
+| `content` | Yes | Yes |
+| `stub` | No | No |
+| `documentation` | No | No |
+| `overview` | No | No |
+
+### The `quality-source` Validation Rule
+
+To enforce that quality ratings come from the grading script (not manual entry or LLM self-assessment), the `quality-source` rule checks:
+
+- If a page has `quality` set
+- But does NOT have `ratings` (novelty, rigor, etc.)
+- Then it was set outside the proper pipeline → **warning**
+
+This catches pages where someone manually typed `quality: 75` or an LLM suggested a quality score during content generation.
+
+### Fixing Pages with Manual Quality
+
+If you see: `Quality (X) set without ratings - use 'npm run regrade -- page-id'`
+
+Run:
+```bash
+npm run regrade -- page-id
+```
+
+This will use Claude to properly grade the page and set both `quality` and `ratings`.
+
+---
+
+## Quick Reference
+
+### Setting Page Type
+
+```yaml
+# Content page (default - can omit)
+pageType: content
+
+# Stub page
+pageType: stub
+seeAlso: "primary-page-id"
+
+# Documentation page
+pageType: documentation
+```
+
+### Checking Page Types
+
+```bash
+# Count pages by type
+grep -r "pageType:" src/content/docs/ | cut -d: -f3 | sort | uniq -c
+
+# Find pages without explicit type (default to content)
+find src/content/docs -name "*.mdx" -not -name "index.mdx" | \
+  xargs grep -L "pageType:" | wc -l
+
+# List all stubs
+grep -l "pageType: stub" src/content/docs/**/*.mdx
+```
+
+### Validation Commands
+
+```bash
+# Run all validation
+npm run validate
+
+# Run quality-source check specifically
+npm run crux -- validate unified --rules=quality-source
+
+# Grade a specific page
+npm run regrade -- page-id
+
+# Grade all ungraded pages
+node scripts/content/grade-content.mjs --skip-graded --apply
+```
+
+---
+
+## Adding a New Page Type
+
+If you need a new page type (rare), follow these steps:
+
+1. **Update schema** in `src/content.config.ts`:
+   ```typescript
+   pageType: z.enum(['content', 'stub', 'documentation', 'new-type']).optional()
+   ```
+
+2. **Update validation rules** in `scripts/lib/rules/quality-source.mjs` and other rules that check `pageType`
+
+3. **Update PageStatus component** in `src/components/wiki/PageStatus.tsx`
+
+4. **Create style guide** at `/internal/new-type-style-guide/`
+
+5. **Update this documentation**
+
+Most new content needs should be handled by adding a new `pageTemplate`, not a new `pageType`. Only add a page type if you need fundamentally different validation behavior.

@@ -1,0 +1,243 @@
+---
+title: "Mermaid Diagram Style Guide"
+description: "Guidelines for creating effective Mermaid diagrams in this wiki"
+sidebar:
+  order: 3
+importance: 2
+quality: 37
+llmSummary: "Internal style guide for creating Mermaid diagrams in the wiki, recommending vertical layouts over horizontal (max 3-4 parallel nodes), providing semantic color palette, and advocating tables over diagrams for taxonomies. Includes practical width limits and anti-patterns for common diagram issues."
+ratings:
+  novelty: 1
+  rigor: 4
+  actionability: 6
+  completeness: 7
+metrics:
+  wordCount: 337
+  citations: 0
+  tables: 6
+  diagrams: 6
+---
+import { Aside } from '@astrojs/starlight/components';
+import { Mermaid } from '@components/wiki';
+
+## Quick Reference
+
+```jsx
+<Mermaid client:load chart={`
+flowchart TD
+    A[Node A] --> B[Node B]
+`} />
+```
+
+## Layout Rules
+
+### Prefer Vertical (TD/TB) Over Horizontal (LR)
+
+The content area is often narrow (600-800px). Wide diagrams get compressed and become unreadable.
+
+<Aside type="danger" title="Avoid">
+`flowchart LR` with many parallel branches - creates very wide diagrams that compress poorly.
+</Aside>
+
+<Aside type="tip" title="Prefer">
+`flowchart TD` (top-down) or use tables for taxonomies with many categories.
+</Aside>
+
+**Bad:** 5 parallel branches with 4 children each = 20+ nodes horizontally
+
+**Good:** Linear flow with subgraphs, or convert to a table
+
+### When to Use Tables Instead
+
+If your diagram is essentially a **taxonomy or matrix**, use a markdown table:
+
+| Category | Type A | Type B | Type C |
+|----------|--------|--------|--------|
+| **Row 1** | Value | Value | Value |
+| **Row 2** | Value | Value | Value |
+
+Tables handle narrow viewports gracefully; wide tree diagrams don't.
+
+### Maximum Practical Widths
+
+| Diagram Type | Max Horizontal Nodes | Notes |
+|--------------|---------------------|-------|
+| Flowchart | 3-4 parallel paths | Use subgraphs to stack |
+| Pie chart | N/A | Always works |
+| Quadrant | N/A | Always works |
+| Timeline | 4-5 items per row | Wrap to multiple sections |
+| Sequence | 4-5 participants | Gets cramped beyond this |
+
+## Color Palette
+
+Use these semantic colors for consistency across the wiki:
+
+### Risk/Severity Colors
+
+```
+style NodeName fill:#ffcccc   /* Light red - high risk/danger */
+style NodeName fill:#ffddcc   /* Light orange - medium risk */
+style NodeName fill:#ffeedd   /* Light peach - low risk */
+style NodeName fill:#ffe1e1   /* Pink - warning */
+style NodeName fill:#ff9999   /* Darker red - critical */
+```
+
+### Category Colors
+
+```
+style NodeName fill:#ccffcc   /* Light green - positive/intervention */
+style NodeName fill:#cceeff   /* Light blue - neutral/factor */
+style NodeName fill:#fff4e1   /* Light yellow - category/dimension */
+style NodeName fill:#e1f5ff   /* Pale blue - root/overview */
+```
+
+### Example with Colors
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[Risk Assessment] --> B[High Risk]
+    A --> C[Medium Risk]
+    A --> D[Low Risk]
+
+    B --> B1[Immediate action]
+    C --> C1[Monitor closely]
+    D --> D1[Standard process]
+
+    style A fill:#e1f5ff
+    style B fill:#ffcccc
+    style C fill:#ffddcc
+    style D fill:#ccffcc
+`} />
+
+## Diagram Type Selection
+
+| Use Case | Diagram Type | Reliability | Example |
+|----------|--------------|-------------|---------|
+| Process flow | `flowchart TD` | High | Decision trees, pipelines |
+| Causal relationships | `flowchart` with labeled edges | High | Influence diagrams |
+| Proportions | `pie` | High | Risk breakdown, allocation |
+| 2x2 comparisons | `quadrantChart` | High | Priority matrices |
+| Temporal sequences | `timeline` | Medium | Roadmaps |
+| State changes | `stateDiagram-v2` | Medium | System states |
+| Actor interactions | `sequenceDiagram` | **Low** | Avoid - use tables instead |
+
+<Aside type="caution" title="Avoid Sequence Diagrams">
+`sequenceDiagram` has rendering issues in some environments. For actor interactions over time, use a **table** with Date/Actor/Event columns instead.
+</Aside>
+
+## Common Patterns
+
+### Influence Diagram (Causal)
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[Factor A] -->|"increases"| B[Outcome]
+    C[Factor C] -->|"decreases"| B
+    D[Intervention] -->|"mitigates"| A
+
+    style A fill:#ffddcc
+    style B fill:#ffcccc
+    style D fill:#ccffcc
+`} />
+
+### Priority Quadrant
+
+<Mermaid client:load chart={`
+quadrantChart
+    title Priority Matrix
+    x-axis Low Effort --> High Effort
+    y-axis Low Impact --> High Impact
+    quadrant-1 Do First
+    quadrant-2 Plan Carefully
+    quadrant-3 Delegate
+    quadrant-4 Quick Wins
+    Task A: [0.8, 0.9]
+    Task B: [0.3, 0.7]
+    Task C: [0.2, 0.3]
+`} />
+
+### Simple Proportion
+
+<Mermaid client:load chart={`
+pie title Resource Allocation
+    "Category A" : 45
+    "Category B" : 30
+    "Category C" : 25
+`} />
+
+## Anti-Patterns
+
+### Don't: Deep Horizontal Trees
+
+Trees with 5+ branches, each with children, become unreadable:
+
+```
+A --> B --> B1, B2, B3, B4
+A --> C --> C1, C2, C3, C4
+A --> D --> D1, D2, D3, D4
+...
+```
+
+**Fix:** Use a table, or restructure as vertical flow with subgraphs.
+
+### Don't: Extremely Tall Diagrams
+
+Stacking 3+ subgraphs with 4-6 nodes each creates diagrams that are 800+ pixels tall:
+
+```
+subgraph "Level 1"
+    6 nodes chained vertically
+end
+subgraph "Level 2"
+    6 more nodes
+end
+subgraph "Level 3"
+    5 more nodes
+end
+```
+
+**Fix:** Use a table for the details, with a small summary diagram showing just the phases/levels.
+
+### Don't: Too Many Nodes
+
+More than 15-20 nodes makes diagrams cluttered. Split into multiple diagrams or simplify.
+
+### Don't: Long Node Labels
+
+Keep node text short (2-4 words). Put details in the surrounding text.
+
+```
+/* Bad */
+A[This is a very long label that explains everything about the node]
+
+/* Good */
+A[Short Label]
+```
+
+## Subgraph Technique
+
+Use subgraphs to create vertical sections in complex diagrams:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Inputs["Inputs"]
+        I1[Data]
+        I2[Config]
+    end
+
+    subgraph Process["Processing"]
+        P1[Transform]
+        P2[Validate]
+    end
+
+    subgraph Outputs["Outputs"]
+        O1[Result]
+    end
+
+    I1 --> P1
+    I2 --> P1
+    P1 --> P2
+    P2 --> O1
+`} />
+
+This keeps the diagram tall rather than wide.

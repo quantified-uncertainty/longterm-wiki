@@ -1,0 +1,149 @@
+---
+title: SecureDNA
+description: A Swiss nonprofit foundation providing free, privacy-preserving DNA synthesis screening software using novel cryptographic protocols. Co-founded by Kevin Esvelt and Turing Award winner Andrew Yao, SecureDNA screens sequences down to 30 base pairs—already exceeding 2026 US regulatory requirements—while keeping both customer orders and the hazard database confidential.
+sidebar:
+  order: 2
+quality: 60
+lastEdited: "2026-02-05"
+importance: 50
+ratings:
+  novelty: 8
+  rigor: 7
+  actionability: 7
+  completeness: 5
+clusters:
+  - biorisks
+  - ai-safety
+  - governance
+subcategory: biosecurity-orgs
+---
+import {Backlinks, EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Focus Area** | DNA synthesis screening technology | Free, privacy-preserving screening for synthesis providers worldwide[^1] |
+| **Founded** | November 2022 (Swiss Stiftung) | Project originated 2019 at MIT Media Lab; incorporated in Zug, now Basel[^2] |
+| **Key Innovation** | DOPRF cryptographic protocol | Screens to 30bp while keeping both orders and hazard database confidential[^3] |
+| **Deployment** | Operational, global | Validated on 67M nucleotides from US, European, and Chinese providers[^4] |
+| **Regulatory Position** | Already exceeds 2026 requirements | OSTP framework requires 50nt by October 2026; SecureDNA screens at 30bp[^5] |
+| **Key Concern** | Adoption metrics not public | Number of onboarded providers not disclosed[^4] |
+
+## Overview
+
+SecureDNA is a Swiss nonprofit foundation (Stiftung) that provides free DNA synthesis screening software to prevent the ordering of dangerous pathogen sequences. Co-founded by Kevin Esvelt and Turing Award winner Andrew Yao, the system uses a novel cryptographic protocol that allows screening without revealing either the customer's order or the contents of the hazard database—addressing the key tension between biosecurity and commercial confidentiality.[^1]
+
+The system screens orders down to **30 base pairs** (bp and nt are used interchangeably in screening contexts, referring to the contiguous sequence window size), far exceeding current and planned US regulatory requirements (the OSTP framework requires 50 nucleotide minimum screening by October 2026). It generates millions of predicted functional variants of each known hazard to prevent evasion through sequence redesign, and uses patented reverse screening against non-hazard databases to achieve approximately zero false positives.[^3]
+
+SecureDNA is legally separate from but closely related to <EntityLink id="securebio">SecureBio</EntityLink>—both were co-founded by Kevin Esvelt, but SecureDNA is specifically focused on the synthesis screening chokepoint while SecureBio works on the broader Delay/Detect/Defend framework. See the <EntityLink id="responses/biosecurity">Biosecurity Interventions</EntityLink> overview for how synthesis screening fits within the broader portfolio.
+
+## How It Works
+
+### The DOPRF Protocol
+
+SecureDNA uses **Distributed Oblivious Pseudorandom Functions (DOPRF)**, a cryptographic protocol that ensures neither party learns the other's secrets during screening:[^3][^6]
+
+1. **Windowing**: Each DNA order is broken into overlapping subsequences of 30 base pairs (also screens 20 amino acid peptides)
+2. **Hashing and Blinding**: Each subsequence is cryptographically hashed and "blinded by being raised to an arbitrary secret power"
+3. **Distributed Key Server Encryption**: The blinded hash passes through multiple independent keyservers, each applying an additional encryption layer. No single server can reconstruct the original sequence
+4. **Unblinding and Comparison**: Results are unblinded on-premises at the provider and compared against the encrypted hazard database
+
+The hazard database is centrally maintained and rapidly updated when new threats are identified. Providers do not maintain local installations—they connect via REST API or web UI.[^1]
+
+### What Gets Screened
+
+The hazard database contains all known pathogens, BSAT and CCL listed agents, Australia Group/US ITAR/Chinese/EU regulated sequences, potential pandemic pathogens, and emerging threats. The system also generates **millions of predicted functional variants** of each hazard, specifically to prevent evasion through sequence mutation or AI-guided redesign.[^3]
+
+## History
+
+### Origins at MIT (2019-2022)
+
+The project originated in 2019 as an academic collaboration at MIT Media Lab's Sculpting Evolution group. The team deliberately avoided involving government employees or relying on government funding to maintain political neutrality and enable international adoption.[^2]
+
+### Incorporation (2022)
+
+SecureDNA Stiftung was incorporated on November 28, 2022, in Zug, Switzerland (CHE-269.863.420). The choice of Switzerland was deliberate—providing a neutral international jurisdiction. The registered office later moved to Basel in May 2024.[^2]
+
+### Security Audit (December 2025)
+
+An independent security audit by Sherman et al. (to appear at NDSS 2026) identified a vulnerability in SecureDNA's custom SCEP authentication protocol: it achieved only one-way authentication, meaning the hazard database and keyservers "never learn with whom they communicate." This could theoretically allow a malicious keyserver to bypass rate limits. SecureDNA v1.1.0 implemented the proposed **SCEP+ protocol** fix—requiring approximately five lines of code—which was formally verified to achieve mutual authentication.[^7]
+
+## Team
+
+<Section title="Foundation Council">
+  <KeyPeople people={[
+    { name: "Andrew Yao", role: "Foundation Council Member", background: "2000 Turing Award winner; Dean of Interdisciplinary Information Sciences, Tsinghua University" },
+    { name: "Benjamin Mueller", role: "Foundation Council President", background: "Also Executive Director of SecureBio" },
+    { name: "Raphael Egger", role: "Foundation Council Member", background: "Attorney-at-Law, Egger Dommer Bar" }
+  ]} />
+</Section>
+
+**Management**: Jens Berlips (Project Manager), Dr. Leonard Foner (Software Architect and Security Lead), Kirsten Engel (Global Strategic Partnerships).[^8]
+
+**Advisory board** includes world-class cryptographers: Adi Shamir and Ron Rivest (RSA co-inventors), Vinod Vaikuntanathan (fully homomorphic encryption pioneer, Godel Prize winner), Ivan Damgård (Merkle-Damgård construction co-inventor), and Yu Yu (Shanghai Jiao Tong University). The 2024 technical paper had 63 authors from MIT, Aarhus University, Tsinghua University, Weizmann Institute, and others.[^8][^6]
+
+The codebase is approximately 64,000 lines of Rust across 300 files.[^7]
+
+## Deployment
+
+SecureDNA does not publicly disclose specific adoption numbers. Known deployment details:[^4]
+
+- **Validation**: 67 million base pairs of real-world DNA from providers in the US, Europe, and China
+- **Geographic reach**: "Diverse implementation" across multinational corporations, academic institutions, and specialized providers across North America, Europe, and Asia
+- **Capacity**: Claims ability to screen all gene synthesis orders in the world
+- **Speed**: Thousands of base pairs per second
+
+## Funding
+
+SecureDNA is funded by "several generous donations from philanthropists in the United States, Europe, China, and elsewhere." The team deliberately avoided government funding.[^9]
+
+<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> is listed as their only philanthropic collaborator. Indirect support flowed through grants to <EntityLink id="securebio">SecureBio</EntityLink> (≈\$9.4M total), which provided operational support during SecureDNA's development.[^9] An anonymous Chinese philanthropist donated to team members at Tsinghua University and Shanghai Jiao Tong University.[^2]
+
+## Policy Relevance
+
+### OSTP Framework Compliance
+
+| Requirement | OSTP Framework | SecureDNA |
+|---|---|---|
+| Initial screening window | 200nt | 30bp (≈6.7x smaller window) |
+| October 2026 window | 50nt | 30bp (already exceeds) |
+| Sequence-based screening | Required | Yes, plus millions of functional variants |
+| Customer verification | Required | API integration + Exemption Certification System |
+| Verifiable compliance | Required by May 2025 EO | Cryptographic proof of screening |
+
+The Trump administration's May 2025 Executive Order mandating "verifiable" screening mechanisms directly aligns with SecureDNA's cryptographic verification capabilities—providing "mathematically secure, unalterable proof of screening compliance."[^5]
+
+### Known Limitations
+
+Despite its technical sophistication, SecureDNA faces the same fundamental challenges as all screening approaches:
+
+- **Fragment assembly bypass**: Edison, Toner, and Esvelt (2026) demonstrated that short unregulated DNA fragments can be assembled to bypass screening entirely[^10]
+- **AI-designed evasion**: Microsoft's "Paraphrase Project" showed AI protein design tools can generate functional toxin variants that evade homology-based screening[^11]
+- **Benchtop synthesizers**: Desktop DNA synthesis devices could bypass centralized screening altogether[^12]
+- **Adoption gap**: ≈20% of global synthesis capacity operates outside voluntary screening frameworks[^13]
+
+<KeyQuestions questions={[
+  "Can SecureDNA achieve near-universal adoption among DNA synthesis providers before benchtop synthesizers proliferate?",
+  "Will function-based screening (predicting what a protein does, not just what it looks like) become necessary as AI protein design tools improve?",
+  "How effective is the cryptographic privacy guarantee at encouraging adoption by providers who resist screening on IP grounds?",
+  "Will the regulatory vacuum following the Trump EO's rescission of the Biden framework help or hinder screening adoption?"
+]} />
+
+## Sources
+
+[^1]: [SecureDNA Official Site](https://securedna.org/)
+[^2]: [MIT Media Lab — Secure DNA Project](https://www.media.mit.edu/projects/secure-dna/overview/); [Moneyhouse — SecureDNA Stiftung](https://www.moneyhouse.ch/en/company/securedna-stiftung-10005579341)
+[^3]: [SecureDNA Features](https://securedna.org/features/)
+[^4]: [SecureDNA Impact](https://securedna.org/our-impact/)
+[^5]: [SecureDNA and the Executive Order on Biological Research Safety](https://securedna.org/securedna-and-the-executive-order-on-biological-research-safety/); [SecureDNA and the OSTP Framework](https://securedna.org/securedna-and-the-ostp-framework/)
+[^6]: [arXiv:2403.14023 — A system capable of verifiably and privately screening global DNA synthesis](https://arxiv.org/abs/2403.14023)
+[^7]: [arXiv:2512.09233 — Security audit of SecureDNA](https://arxiv.org/abs/2512.09233)
+[^8]: [SecureDNA Team](https://securedna.org/team/)
+[^9]: [SecureDNA FAQ](https://securedna.org/faq/)
+[^10]: [Edison, Toner & Esvelt 2026 — Nature Communications](https://www.nature.com/articles/s41467-025-67955-3)
+[^11]: [Microsoft — The Paraphrase Project](https://www.microsoft.com/en-us/research/story/the-paraphrase-project-designing-defense-for-an-era-of-synthetic-biology/)
+[^12]: [IFP — Securing Benchtop DNA Synthesizers](https://ifp.org/securing-benchtop-dna-synthesizers/)
+[^13]: [IGSC market coverage](https://genesynthesisconsortium.org/)
+
+<Backlinks />

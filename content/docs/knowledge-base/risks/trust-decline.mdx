@@ -1,0 +1,286 @@
+---
+title: Trust Decline
+description: The systematic decline in public confidence in institutions, media, and verification systems—accelerated by AI's capacity to fabricate evidence and exploit epistemic vulnerabilities. US government trust has fallen from 73% (1958) to 17% (2025), with AI-generated deepfakes projected to reach 8 million by 2025.
+sidebar:
+  order: 28
+maturity: Growing
+quality: 55
+llmSummary: US government trust declined from 73% (1958) to 17% (2025), with AI deepfakes projected to reach 8M by 2025 accelerating erosion through the 'liar's dividend' effect—where synthetic content possibility undermines all evidence. Media literacy interventions show d=0.60 effect size, while C2PA content authentication provides medium-high promise for verification, though adoption rates remain uncertain (10-60% by 2027).
+lastEdited: "2026-01-29"
+importance: 62
+seeAlso: societal-trust
+causalLevel: pathway
+pageTemplate: knowledge-base-risk
+ratings:
+  novelty: 4.5
+  rigor: 6
+  actionability: 5
+  completeness: 6.5
+metrics:
+  wordCount: 577
+  citations: 29
+  tables: 16
+  diagrams: 1
+clusters:
+  - epistemics
+  - ai-safety
+  - governance
+subcategory: epistemic
+---
+import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="trust-decline" client:load />
+
+<DataInfoBox entityId="trust-decline" />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Current Trust Level** | Critical (17-22% federal government trust) | [Pew Research Center 2025](https://www.pewresearch.org/politics/2025/12/04/public-trust-in-government-1958-2025/): down from 73% in 1958 |
+| **Decline Rate** | Accelerating | 55-point drop since 1958; 5-point decline 2024→2025 alone |
+| **AI Acceleration** | High | 500K deepfake videos shared on social media in 2023, projected 8M by 2025 |
+| **Coordination Impact** | Severe | Only 34% trust government to use AI responsibly ([Edelman 2025](https://www.edelman.com/trust/2025/trust-barometer)) |
+| **Reversibility** | Low (decades) | Trust rebuilding requires sustained institutional reform over 10-20+ years |
+| **Intervention Readiness** | Medium | C2PA standard gaining traction; media literacy shows d=0.60 effect size |
+| **Cross-Domain Risk** | High | Trust collapse undermines pandemic response, climate action, <EntityLink id="ai-governance">AI governance</EntityLink> |
+
+## Overview
+
+Trust erosion describes the **active process** of declining public confidence in institutions, experts, media, and verification systems. While the current *state* of societal trust is analyzed in the <EntityLink id="societal-trust">Societal Trust</EntityLink> parameter page, this page focuses on trust erosion as a **risk**—examining the threat model, acceleration mechanisms, and responses.
+
+> **For comprehensive data and analysis**, see <EntityLink id="societal-trust">Societal Trust</EntityLink>, which covers:
+> - Current trust levels (US government trust: 77% in 1964 → 22% in 2024)
+> - International comparisons and benchmarks
+> - AI-driven acceleration mechanisms (liar's dividend, deepfakes, scale asymmetry)
+> - Factors that increase trust (interventions, C2PA standards, media literacy)
+> - Trajectory scenarios through 2030
+
+---
+
+## Risk Assessment
+
+| Dimension | Assessment | Notes |
+|-----------|------------|-------|
+| **Severity** | High | Undermines democratic governance, collective action on existential risks |
+| **Likelihood** | Very High | Already occurring; AI accelerating pre-existing trends |
+| **Timeline** | Ongoing | Effects visible now, intensifying over 2-5 years |
+| **Trend** | Accelerating | AI content generation scaling faster than verification capacity |
+| **Reversibility** | Difficult | Rebuilding trust requires sustained effort over decades |
+
+---
+
+## Why Trust Erosion Is a Risk
+
+Trust erosion threatens AI safety and existential risk response through several mechanisms:
+
+| Domain | Impact | Evidence |
+|--------|--------|----------|
+| **AI Governance** | Regulatory resistance, lab-government distrust | Only ≈40% trust government to regulate AI appropriately (OECD 2024) |
+| **Elections** | Contested results, violence | 4 in 10 with high grievance approve hostile activism (<R id="1312df71e6a1ca40">Edelman 2025</R>) |
+| **Public Health** | Pandemic response failure | Healthcare trust dropped 30.4 pts during COVID-19 |
+| **Climate Action** | Policy paralysis | Only ≈40% believe government will reduce emissions effectively |
+| **International Cooperation** | Treaty verification failures | Liar's dividend undermines evidence-based agreements |
+
+The core dynamic: **low trust prevents the coordination needed to address catastrophic risks**, while AI capabilities make trust harder to maintain.
+
+---
+
+## Causal Mechanisms
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Drivers["Trust Erosion Drivers"]
+        AI[AI Content Generation]
+        POLAR[Political Polarization]
+        INST[Institutional Failures]
+    end
+
+    subgraph Mechanisms["Key Mechanisms"]
+        LIAR[Liar's Dividend]
+        SCALE[Scale Asymmetry]
+        AUTH[Authentication Gaps]
+    end
+
+    subgraph Outcomes["Systemic Impacts"]
+        GOV[Governance Paralysis]
+        COORD[Coordination Failure]
+        CASCADE[Trust Cascade]
+    end
+
+    AI --> LIAR
+    AI --> SCALE
+    POLAR --> LIAR
+    INST --> AUTH
+
+    LIAR --> GOV
+    SCALE --> AUTH
+    AUTH --> COORD
+    GOV --> CASCADE
+    COORD --> CASCADE
+
+    CASCADE --> XRISK[Existential Risk Response Failure]
+
+    style AI fill:#ffcccc
+    style CASCADE fill:#ffcccc
+    style XRISK fill:#ff9999
+    style GOV fill:#ffe6cc
+    style COORD fill:#ffe6cc
+`} />
+
+The diagram illustrates how AI-driven content generation combines with existing polarization and institutional failures to create compounding trust erosion through the liar's dividend (where synthetic media possibility undermines all evidence) and scale asymmetry (where misinformation production vastly outpaces verification capacity).
+
+---
+
+## Historical Trust Trajectory
+
+Trust erosion is not new, but AI capabilities threaten to accelerate existing trends dramatically:
+
+| Period | US Government Trust | Key Driver | AI Relevance |
+|--------|---------------------|------------|--------------|
+| 1958-1964 | 73-77% | Post-WWII institutional confidence | None |
+| 1965-1980 | 77% → 26% | Vietnam War, Watergate | None |
+| 1980-2000 | 26-44% | Economic growth, Cold War end | None |
+| 2001-2008 | 25-49% | 9/11 rally, Iraq War decline | Early internet |
+| 2009-2020 | 17-24% | Financial crisis, polarization | Social media amplification |
+| 2021-2025 | 17-22% | Pandemic, election disputes, AI content | **Deepfakes, LLM misinformation** |
+
+*Sources: [Pew Research Center](https://www.pewresearch.org/politics/2025/12/04/public-trust-in-government-1958-2025/), [Gallup](https://news.gallup.com/poll/697421/trust-government-depends-upon-party-control.aspx)*
+
+---
+
+## The AI Acceleration Factor
+
+AI capabilities are fundamentally changing the trust erosion dynamic through several mechanisms:
+
+### Scale Asymmetry
+
+The volume of synthetic content is growing exponentially:
+- **2023**: 500,000+ deepfake videos shared on social media
+- **2025 projection**: 8 million deepfake videos
+- **Daily AI image generation**: 34 million images/day via tools like DALL-E, Midjourney
+- **Total since 2022**: Over 15 billion AI-generated images created
+
+This creates a fundamental asymmetry: misinformation can be produced faster than it can be verified, and the mere possibility of synthetic content undermines trust in authentic content ([Atlantic Council Digital Forensics Lab](https://reutersinstitute.politics.ox.ac.uk/news/trust-conference-2024-six-things-we-learnt-about-impact-ai-misinformation-and-news-business)).
+
+### Mass-Class Digital Divide
+
+The [2025 Edelman Trust Barometer](https://www.edelman.com/trust/2025/trust-barometer) reveals a significant trust gap:
+- **71% of UK bottom income quartile** feel they will be "left behind" by AI
+- **65% of US bottom income quartile** share this concern
+- Only **1 in 4 non-managers** regularly use AI vs. **2 in 3 managers**
+
+This creates a two-tier information environment where those with AI literacy can navigate synthetic content while others cannot, exacerbating existing inequality and trust divides.
+
+---
+
+## Responses That Address This Risk
+
+| Response | Mechanism | Effectiveness | Evidence |
+|----------|-----------|---------------|----------|
+| <EntityLink id="content-authentication">Content Authentication</EntityLink> | Cryptographic verification via [C2PA standard](https://c2pa.org/) | Medium-High | Fast-tracked to ISO 22144; adopted by Adobe, Microsoft, BBC |
+| <EntityLink id="epistemic-infrastructure">Epistemic Infrastructure</EntityLink> | Fact-checking networks, verification tools (Vera.ai, WeVerify) | Medium | Fact-checks reduce belief by 0.27 d ([meta-analysis](https://journals.sagepub.com/doi/10.1177/00936502241288103)) |
+| <EntityLink id="epistemic-security">Epistemic Security</EntityLink> | Platform policies, algorithmic demotion of misinformation | Medium | Variable by platform; X Community Notes shows promise |
+| <EntityLink id="deepfake-detection">Deepfake Detection</EntityLink> | AI-based detection tools, watermarking | Medium | Cat-and-mouse dynamic; detection lags generation by 6-18 months |
+| Media Literacy Programs | Critical evaluation training, prebunking | **High** | d=0.60 overall; d=1.04 for sharing reduction ([Huang et al. 2024](https://journals.sagepub.com/doi/10.1177/00936502241288103)) |
+
+See <EntityLink id="societal-trust">Societal Trust</EntityLink> for detailed intervention analysis.
+
+---
+
+## Key Acceleration Mechanism: The Liar's Dividend
+
+The most concerning AI-driven dynamic is the **liar's dividend** (<R id="ad6fe8bb9c2db0d9">Chesney & Citron</R>): the mere *possibility* of fabricated evidence undermines trust in *all* evidence.
+
+### Research Findings
+
+A landmark study published in the [American Political Science Review (February 2025)](https://www.cambridge.org/core/journals/american-political-science-review/article/liars-dividend-can-politicians-claim-misinformation-to-evade-accountability/687FEE54DBD7ED0C96D72B26606AA073) by Schiff, Schiff, and Bueno administered five survey experiments to over 15,000 American adults:
+
+| Finding | Effect | Implication |
+|---------|--------|-------------|
+| Politicians claiming "fake news" | Higher support than apologizing | Incentivizes denialism |
+| Effect crosses party lines | Both parties' supporters susceptible | Not limited to polarized base |
+| Text vs. video evidence | Liar's dividend works for text, **not video** | Video still retains credibility |
+| Mechanism | Informational uncertainty + oppositional rallying | Two distinct pathways |
+
+**Key insight**: The effect operates through two channels—creating informational uncertainty ("maybe it really is fake") and rallying supporters against perceived media attacks. Both strategies work independently.
+
+### Real-World Examples
+
+| Case | Year | Impact |
+|------|------|--------|
+| Slovakia election deepfake | 2023 | Fake audio of opposition leader discussing election rigging went viral days before election |
+| Gabon coup attempt | 2019 | Claims that president's video was deepfake helped spur military coup attempt |
+| Turkey election withdrawal | 2023 | Presidential candidate withdrew after explicit AI-generated videos spread |
+| UK Keir Starmer audio | 2024 | Deepfake audio spread rapidly before being exposed as fabrication |
+
+This creates a double bind where neither belief nor disbelief in evidence can be rationally justified—and the effect will intensify as deepfake capabilities improve. According to a [YouGov survey](https://www.brennancenter.org/our-work/research-reports/deepfakes-elections-and-shrinking-liars-dividend), **85% of Americans** are "very" or "somewhat" concerned about misleading deepfakes.
+
+---
+
+## Key Uncertainties
+
+| Uncertainty | Range | Implications |
+|-------------|-------|--------------|
+| **Content authentication adoption rate** | 10-60% of major platforms by 2027 | High adoption could restore verification; low adoption means continued erosion |
+| **AI detection keeping pace** | 40-80% detection accuracy | Determines whether technical defenses remain viable |
+| **Trust recovery timeline** | 10-30+ years | Shapes whether coordination for long-term risks is achievable |
+| **Generational divergence** | 18-34: 59% AI trust vs. 55+: 18% (UK) | May resolve naturally or create permanent trust gap |
+| **Institutional reform success** | Unknown | Trust rebuilding requires demonstrable competence over sustained period |
+
+### Crux Questions
+
+1. **Can content authentication scale?** The [C2PA standard](https://c2pa.org/) provides a technical solution, but adoption requires coordination across platforms, media organizations, and hardware manufacturers. If adoption reaches critical mass (estimated 40-60% of content), the liar's dividend may shrink.
+
+2. **Will AI detection capabilities keep pace with generation?** Currently, detection lags generation by 6-18 months. If this gap widens, technical verification becomes impossible; if it narrows, authentication systems become viable.
+
+3. **Does media literacy scale?** Individual interventions show d=0.60 effect size, but effects decay over time ([PNAS study](https://www.pnas.org/doi/10.1073/pnas.1920498117)). Requires recurring reinforcement rather than one-time training.
+
+---
+
+## Related Pages
+
+### Primary Reference
+- **<EntityLink id="societal-trust">Societal Trust</EntityLink>** — Comprehensive parameter page with current levels, data, mechanisms, interventions, and scenarios
+
+### Related Risks
+- <EntityLink id="epistemic-collapse">Epistemic Collapse</EntityLink> — Catastrophic trust failure scenario
+- <EntityLink id="trust-cascade">Trust Cascade</EntityLink> — Cascading institutional trust failures
+- <EntityLink id="authentication-collapse">Authentication Collapse</EntityLink> — Verification system breakdown
+- <EntityLink id="deepfakes">Deepfakes</EntityLink> — AI capability that accelerates erosion
+
+### Related Parameters
+- <EntityLink id="epistemic-health">Epistemic Health</EntityLink> — Collective ability to distinguish truth from falsehood
+- <EntityLink id="information-authenticity">Information Authenticity</EntityLink> — Verifiability of information
+
+### Related Interventions
+- <EntityLink id="content-authentication">Content Authentication</EntityLink> — C2PA provenance standards
+- <EntityLink id="epistemic-infrastructure">Epistemic Infrastructure</EntityLink> — Verification systems
+
+---
+
+## Sources
+
+### Trust Data
+- <R id="b46b1ce9995931fe">Pew Research Center: Public Trust in Government</R>
+- [Pew Research Center: Public Trust 1958-2025](https://www.pewresearch.org/politics/2025/12/04/public-trust-in-government-1958-2025/)
+- <R id="1312df71e6a1ca40">Edelman Trust Barometer</R>
+- [2025 Edelman Trust Barometer: AI Flash Poll](https://www.edelman.com/trust/2025/trust-barometer/flash-poll-trust-artifical-intelligence)
+- [Gallup: Trust in Government Depends on Party Control](https://news.gallup.com/poll/697421/trust-government-depends-upon-party-control.aspx)
+
+### Liar's Dividend Research
+- <R id="ad6fe8bb9c2db0d9">Chesney & Citron: Deep Fakes—A Looming Challenge</R>
+- [Schiff, Schiff & Bueno: The Liar's Dividend (APSR 2025)](https://www.cambridge.org/core/journals/american-political-science-review/article/liars-dividend-can-politicians-claim-misinformation-to-evade-accountability/687FEE54DBD7ED0C96D72B26606AA073)
+- [Brennan Center: Deepfakes, Elections, and Shrinking the Liar's Dividend](https://www.brennancenter.org/our-work/research-reports/deepfakes-elections-and-shrinking-liars-dividend)
+
+### AI Misinformation
+- [Reuters Institute: AI and Misinformation Trust Conference 2024](https://reutersinstitute.politics.ox.ac.uk/news/trust-conference-2024-six-things-we-learnt-about-impact-ai-misinformation-and-news-business)
+- [Carnegie Endowment: Can Democracy Survive AI?](https://carnegieendowment.org/research/2024/12/can-democracy-survive-the-disruptive-power-of-ai)
+- [Generative AI and Misinformation: Scoping Review (AI & Society 2025)](https://link.springer.com/article/10.1007/s00146-025-02620-3)
+
+### Interventions
+- [Media Literacy Meta-Analysis (Huang et al. 2024)](https://journals.sagepub.com/doi/10.1177/00936502241288103)
+- [PNAS: Digital Media Literacy Intervention](https://www.pnas.org/doi/10.1073/pnas.1920498117)
+- [C2PA: Coalition for Content Provenance and Authenticity](https://c2pa.org/)
+
+<Backlinks entityId="trust-decline" />

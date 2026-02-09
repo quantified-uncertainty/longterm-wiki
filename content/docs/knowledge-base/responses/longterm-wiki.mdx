@@ -1,0 +1,430 @@
+---
+title: Longterm Wiki
+description: A strategic intelligence platform for AI safety prioritization that consolidates knowledge about risks, interventions, and key uncertainties to support resource allocation decisions. Features crux mapping, worldview-priority linkages, and comprehensive cross-linking across ~550 pages.
+sidebar:
+  order: 3
+importance: 12
+clusters:
+  - epistemics
+  - community
+quality: 63
+llmSummary: A self-referential documentation page describing the Longterm Wiki platform itself—a strategic intelligence tool with ~550 pages, crux mapping of ~50 uncertainties, and quality scoring across 6 dimensions. Features include entity cross-linking, interactive causal diagrams, and structured YAML databases tracking expert positions on key AI safety cruxes.
+ratings:
+  focus: 9.5
+  novelty: 2
+  rigor: 7.5
+  completeness: 9
+  concreteness: 8
+  actionability: 1.5
+metrics:
+  wordCount: 619
+  citations: 14
+  tables: 43
+  diagrams: 7
+subcategory: epistemic-tools-tools
+---
+import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Scope** | AI safety focused | ≈550 pages covering risks, interventions, organizations, cruxes |
+| **Content Model** | Curated synthesis | Editorial control, quality scoring, not community wiki |
+| **Unique Value** | Crux mapping | Explicit uncertainty tracking, worldview→priority linkages |
+| **Technical** | Modern stack | Astro/Starlight, React, interactive causal diagrams |
+| **Open Source** | Fully | MIT licensed, GitHub repository |
+| **Status** | Active development | Launched 2025, ongoing content expansion |
+
+## Project Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Name** | Longterm Wiki (LongtermWiki) |
+| **Organization** | <EntityLink id="quri">QURI</EntityLink> (Quantified Uncertainty Research Institute) |
+| **Lead** | Ozzie Gooen |
+| **Launched** | 2025 |
+| **Website** | [longtermwiki.com](https://www.longtermwiki.com/) |
+| **GitHub** | [github.com/quantified-uncertainty/cairn](https://github.com/quantified-uncertainty/cairn) |
+| **License** | MIT |
+| **Platform** | Static site (Astro/Starlight) |
+
+## Overview
+
+The Longterm Wiki is a strategic intelligence platform for AI safety prioritization. Unlike general encyclopedias or community wikis, it serves as a **decision-support tool** for funders, researchers, and policymakers asking: *"Where should the next marginal dollar or researcher-hour go?"*
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Problem["Current State of AI Safety Field"]
+        A[Scattered Knowledge<br/>Papers, blogs, forum threads] --> D[Poor Prioritization]
+        B[Hidden Cruxes<br/>Unclear why people disagree] --> D
+        C[Slow Synthesis<br/>Months to propagate insights] --> D
+        D --> E[Suboptimal Resource Allocation]
+    end
+
+    subgraph Solution["Longterm Wiki"]
+        F[Structured Knowledge Graph<br/>550+ cross-linked pages] --> I[Clear Strategic Priorities]
+        G[Explicit Crux Mapping<br/>50+ tracked uncertainties] --> I
+        H[Living Document System<br/>Quality scores, staleness tracking] --> I
+        I --> J[Better Marginal Decisions]
+    end
+
+    E -.->|"LongtermWiki bridges this"| F
+
+    style Problem fill:#ffebee
+    style Solution fill:#e8f5e9
+`} />
+
+The project addresses four problems in the AI safety field:
+
+| Problem | How the Wiki Addresses It |
+|---------|---------------------------|
+| **Fragmented knowledge** | Consolidated, cross-linked knowledge base with ≈550 pages |
+| **Unclear cruxes** | Explicit mapping of key uncertainties and expert disagreements |
+| **Poor prioritization legibility** | Worldview → intervention mapping showing how assumptions lead to priorities |
+| **Slow information synthesis** | Quality tracking, staleness monitoring, regular updates |
+
+### Design Philosophy
+
+The wiki is deliberately **opinionated about importance and uncertainty**—it rates content quality, tracks expert positions on cruxes, and makes prioritization implications explicit. This distinguishes it from neutral reference works like Wikipedia or discussion platforms like LessWrong.
+
+Content is editorially curated rather than community-contributed, ensuring consistency and quality control. Each page goes through a grading pipeline that scores novelty, rigor, actionability, and completeness.
+
+## Content Architecture
+
+The wiki has four interconnected layers of content:
+
+<Mermaid client:load chart={`
+flowchart TD
+    L1[Factual Foundation<br/>Risks, interventions, orgs] --> L2[Causal Models<br/>How risks unfold]
+    L2 --> L3[Uncertainty Structure<br/>Cruxes, expert positions]
+    L3 --> L4[Strategic Implications<br/>Priority rankings]
+
+    style L1 fill:#e3f2fd
+    style L2 fill:#fff3e0
+    style L3 fill:#f3e5f5
+    style L4 fill:#e8f5e9
+`} />
+
+| Layer | Contents | Scale |
+|-------|----------|-------|
+| **Factual Foundation** | Risks, interventions, organizations, people, concepts | ≈350 pages |
+| **Causal Models** | Risk pathways, intervention effects, transition dynamics | ≈80 models |
+| **Uncertainty Structure** | Key cruxes, expert positions, worldview clusters | ≈50 cruxes, ~30 experts |
+| **Strategic Implications** | Priority rankings, robust interventions, high-VOI research | Derived from above |
+
+### Major Sections
+
+| Section | Content | Page Count | Example Pages |
+|---------|---------|------------|---------------|
+| **Knowledge Base** | Risks, interventions, organizations, people | ≈350 | <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink>, <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> |
+| **AI Transition Model** | Comprehensive factor network with outcomes and scenarios | ≈80 | Factors, scenarios, quantitative estimates |
+| **Analytical Models** | Risk models, cascade models, governance dynamics | ≈80 | Cascade models, dynamics models |
+| **Project** | Vision, strategy, similar projects analysis | ≈10 | [Vision](/project/vision/), [Similar Projects](/project/similar-projects/) |
+| **Internal** | Style guides, automation tools, technical docs | ≈30 | [Automation Tools](/internal/automation-tools/) |
+
+### Content Types
+
+| Type | Purpose | Quality Scored? | Validation |
+|------|---------|-----------------|------------|
+| **Content** | Substantive knowledge base pages | Yes (0-100 scale) | Full (schema, links, escaping, quality) |
+| **Stub** | Redirects, brief profiles | No | Minimal (compilation, links) |
+| **Documentation** | Style guides, internal reference | No | Compilation only |
+| **Overview** | Navigation hub pages (index.mdx) | No | Sidebar structure |
+
+## Key Features
+
+### Crux Mapping System
+
+The wiki explicitly tracks key uncertainties that drive disagreement and prioritization:
+
+<Mermaid client:load chart={`
+flowchart LR
+    C[Key Cruxes] -->|"inform"| W[Worldviews]
+    W -->|"imply"| P[Priority Rankings]
+    P -->|"guide"| A[Resource Allocation]
+
+    style C fill:#fff3e0
+    style W fill:#f3e5f5
+    style P fill:#e8f5e9
+`} />
+
+| Crux Category | Examples | Tracked In |
+|---------------|----------|------------|
+| **Technical** | P(deceptive alignment), interpretability tractability, mesa-optimization risk | `cruxes.yaml` |
+| **Timeline** | Years to transformative AI, takeoff speed, capability jumps | `estimates.yaml` |
+| **Governance** | Coordination tractability, warning shot likelihood, regulatory capacity | `cruxes.yaml` |
+| **Value** | Weight on near-term vs. long-term, risk tolerance, discount rates | `experts.yaml` positions |
+
+Expert positions on cruxes are tracked in structured YAML databases, enabling:
+- **Disagreement decomposition**: Breaking "Is alignment hard?" into component empirical claims
+- **Worldview clustering**: Grouping experts by crux positions (e.g., "short-timeline technical doomer")
+- **Priority implications**: Showing how different assumptions lead to different resource allocations
+
+### Entity Cross-Linking
+
+Stable ID-based linking system that survives URL reorganization:
+
+```mdx
+import {EntityLink} from '@components/wiki';
+
+The <EntityLink id="scheming">scheming</EntityLink> risk relates to
+<EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>.
+```
+
+| Feature | Benefit |
+|---------|---------|
+| **Stable IDs** | Links survive path reorganization |
+| **Auto title lookup** | Component fetches current title from database |
+| **Backlink tracking** | Every page shows what links to it |
+| **CI validation** | Broken links caught before deployment |
+| **Type icons** | Visual distinction between risks, responses, orgs |
+
+### Interactive Causal Diagrams
+
+ReactFlow-based cause-effect graphs for complex causal models:
+
+<Mermaid client:load chart={`
+flowchart LR
+    Y[YAML Definition] -->|"Dagre/ELK"| L[Layout Engine]
+    L --> I[Interactive Graph]
+
+    style L fill:#fff3e0
+`} />
+
+| Node Type | Purpose | Visual |
+|-----------|---------|--------|
+| **Leaf** | Input factors | Light blue |
+| **Intermediate** | Mediating factors | White |
+| **Effect** | Outcomes | Green/Red |
+| **Group** | Clusters of related nodes | Dashed border |
+
+### Quality Scoring System
+
+<Mermaid client:load chart={`
+flowchart LR
+    M[MDX Page] -->|"Claude API"| G[Grading Pipeline]
+    G --> Q[Quality 0-100]
+    G --> R[6 Ratings]
+    G --> S[LLM Summary]
+
+    style G fill:#fff3e0
+`} />
+
+Six-dimension rating system (0-10 scale, harsh—7+ is exceptional):
+
+| Dimension | What It Measures | Weight by Page Type |
+|-----------|------------------|---------------------|
+| **Focus** | Does it answer the title's promise? | All types |
+| **Novelty** | Value beyond obvious sources | Higher for analysis |
+| **Rigor** | Evidence quality and precision | Higher for reference |
+| **Completeness** | Thorough coverage of claimed topic | Higher for reference |
+| **Concreteness** | Specific vs. abstract recommendations | Higher for analysis |
+| **Actionability** | Can readers make different decisions? | Higher for analysis |
+
+Quality is set only through automated grading pipeline using Claude, never manually. The `quality-source` validation rule enforces this.
+
+### Data Layer
+
+<Mermaid client:load chart={`
+flowchart LR
+    Y[YAML Sources] -->|"build-data.mjs"| J[JSON Outputs]
+    J -->|"imported by"| C[React Components]
+
+    style Y fill:#fff3e0
+    style J fill:#e3f2fd
+    style C fill:#e8f5e9
+`} />
+
+Structured YAML databases enable data-aware components:
+
+| Database | Contents | Size | Example Usage |
+|----------|----------|------|---------------|
+| `experts.yaml` | AI safety researchers with positions on cruxes | ≈30 entries | `<DataInfoBox expertId="paul-christiano" />` |
+| `organizations.yaml` | Labs, research orgs, funders | ≈15 entries | `<DataInfoBox orgId="anthropic" />` |
+| `cruxes.yaml` | Key uncertainties with expert positions | ≈50 entries | `<DataCrux dataId="deceptive-alignment-likelihood" />` |
+| `estimates.yaml` | Probability distributions for key variables | ≈35 entries | `<DataEstimateBox dataId="p-doom" />` |
+| `external-links.yaml` | Curated external resources with metadata | ≈200 entries | `<R id="hash">Link text</R>` |
+
+## Technical Architecture
+
+### Stack
+
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| **Framework** | Astro 5 + Starlight | Static site generation, documentation theme |
+| **Components** | React 19 | Interactive UI components |
+| **Styling** | Tailwind CSS 4 | Utility-first styling |
+| **Type Safety** | TypeScript + Zod | Compile-time and runtime validation |
+| **Graphs** | ReactFlow + Dagre/ELK | Interactive causal diagrams |
+| **Diagrams** | Mermaid 11 | Declarative flowcharts |
+| **Math** | KaTeX | LaTeX rendering |
+| **Data** | YAML → JSON | Structured entity databases |
+| **UI Components** | shadcn/ui + Radix | Accessible component primitives |
+
+### Automation CLI
+
+Unified CLI (`crux`) provides comprehensive tooling:
+
+```bash
+npm run crux -- --help           # Show all domains
+npm run crux -- validate         # Run all validators
+npm run crux -- analyze          # Analysis and reporting
+npm run crux -- fix              # Auto-fix common issues
+npm run crux -- content          # Page management
+npm run crux -- generate         # Content generation
+```
+
+| Domain | Commands | Example |
+|--------|----------|---------|
+| **Validation** | compile, frontmatter, entity-links, escaping, mermaid | `crux validate compile --quick` |
+| **Analysis** | mentions, entity-links, quality, redundancy | `crux analyze entity-links sam-altman` |
+| **Content** | grade, improve, regrade, create | `crux content grade --page scheming` |
+| **Fixes** | escaping, entity-links, markdown | `crux fix escaping` |
+| **Generate** | summaries, content, diagrams | `crux generate summaries --batch 50` |
+
+### Validation Pipeline
+
+| Rule | What It Checks | Failure Mode |
+|------|----------------|--------------|
+| `compile` | MDX syntax and React components | Build failure |
+| `frontmatter-schema` | YAML frontmatter against Zod schema | CI failure |
+| `dollar-signs` | LaTeX escaping (`\$100` not `$100`) | Rendering issues |
+| `comparison-operators` | JSX escaping (`\<100ms` not `<100ms`) | Build failure |
+| `entitylink-ids` | All EntityLink references exist in database | Broken links |
+| `quality-source` | Quality set by pipeline, not manually | Data integrity |
+| `mermaid` | Diagram syntax validation | Rendering issues |
+| `markdown-lists` | Consistent list formatting | Markdown errors |
+
+## Use Cases
+
+### For Funders
+
+| Use Case | Wiki Feature | Example |
+|----------|--------------|---------|
+| **Intervention comparison** | Side-by-side pages with explicit uncertainty | Compare <EntityLink id="interpretability">interpretability</EntityLink> vs <EntityLink id="governance">governance</EntityLink> approaches |
+| **Crux identification** | Crux mapping shows which uncertainties matter most | Which assumptions drive different funding priorities? |
+| **Expert landscape** | Expert profiles with positions | Who believes what about deceptive alignment? |
+| **Gap analysis** | Quality scores reveal under-developed areas | Which important topics lack quality coverage? |
+
+### For Researchers
+
+| Use Case | Wiki Feature | Example |
+|----------|--------------|---------|
+| **Literature synthesis** | Consolidated coverage with citations | Find all sources on a specific risk |
+| **Gap identification** | Coverage analysis, importance vs quality | What important topics need more research? |
+| **Position mapping** | Disagreement visualization | Where do Yudkowsky and Christiano diverge? |
+| **Model building** | Causal diagrams as starting points | Use wiki models as research scaffolding |
+
+### For Policymakers
+
+| Use Case | Wiki Feature | Example |
+|----------|--------------|---------|
+| **Risk taxonomy** | Structured hierarchy with assessments | Navigate from high-level categories to specific risks |
+| **Response options** | Comprehensive intervention catalog | What governance tools exist? |
+| **Expert consensus** | Crux tracking shows agreement/disagreement | Where do experts converge vs diverge? |
+| **Quick briefings** | LLM summaries on every page | One-sentence takeaways for busy readers |
+
+## Comparison with Similar Projects
+
+| Resource | Focus | Update Model | Longterm Wiki Differentiator |
+|----------|-------|--------------|------------------------------|
+| **[Wikipedia](https://en.wikipedia.org/wiki/AI_safety)** | General reference | Community edits | LW is opinionated about importance and uncertainty |
+| **[LessWrong](https://www.lesswrong.com/) / [AI Alignment Forum](https://www.alignmentforum.org/)** | Discussion | Continuous posts | LW is curated synthesis, not discussion platform |
+| **[80K Problem Profiles](https://80000hours.org/problem-profiles/)** | Career guidance | Periodic updates | LW goes deeper on cruxes, covers more interventions |
+| **[Stampy / AISafety.info](https://aisafety.info/)** | FAQ for newcomers | Community + fellowship | LW is strategic (prioritization), not educational |
+| **[MIT AI Risk Repository](https://airisk.mit.edu/)** | Academic taxonomy | Research updates | LW adds expert positions, crux mapping, intervention analysis |
+| **[EA Forum Wiki](https://forum.effectivealtruism.org/topics/all)** | Integrated tags | Tag-based | LW is standalone with dedicated editorial |
+
+### Lessons from Similar Projects
+
+The [Similar Projects Analysis](/project/similar-projects/) identified key success factors:
+
+| Factor | Failed Projects | LW Approach |
+|--------|-----------------|-------------|
+| **Ownership** | Arbital (committee), EA Wiki v1 (volunteer) | Dedicated editorial lead |
+| **Funding** | Most wikis (volunteer-only) | Paid core team |
+| **Scope** | Arbital (everything) | AI safety prioritization only |
+| **Integration** | Standalone wikis (low traffic) | Links to LW/EAF, doesn't replace |
+| **Updates** | Survey papers (stale in 1-2 years) | Quality tracking, staleness monitoring |
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence | Impact |
+|----------|----------|--------|
+| **Crux-first design** | 50+ tracked uncertainties, expert positions | Enables disagreement decomposition |
+| **Quality control** | Automated grading, 6-dimension scoring | Consistent content standards |
+| **Cross-linking** | 550+ pages with stable entity references | Knowledge graph navigation |
+| **Open source** | MIT license, public GitHub | Transparency, reproducibility |
+| **Modern stack** | Astro, React, TypeScript | Fast, maintainable, accessible |
+| **Interactive visualizations** | ReactFlow graphs, Mermaid diagrams | Complex relationships made legible |
+
+### Limitations
+
+| Limitation | Impact | Mitigation |
+|------------|--------|------------|
+| **Single editorial voice** | May reflect particular worldview | Explicit about opinions, tracks disagreement |
+| **Staleness risk** | Content can become outdated | Quality tracking, freshness monitoring, dated pages |
+| **Limited community contribution** | Slower content growth | Focus on quality over volume, open for feedback |
+| **AI safety focus** | Narrow scope | Intentional limitation, links to broader resources |
+| **Early stage** | Incomplete coverage | Active development, prioritized expansion |
+| **No real-time data** | Static forecasts | Links to <EntityLink id="metaforecast">Metaforecast</EntityLink> for live data |
+
+## Relationship to QURI Ecosystem
+
+<Mermaid client:load chart={`
+flowchart LR
+    LW[Longterm Wiki] <-->|"concepts"| SQ[Squiggle]
+    LW <-->|"forecasts"| MF[Metaforecast]
+    SQ <--> SH[Squiggle Hub]
+    SQ <--> SA[SquiggleAI]
+
+    style LW fill:#e8f5e9
+`} />
+
+| Tool | Relationship to Longterm Wiki |
+|------|-------------------------------|
+| **<EntityLink id="squiggle">Squiggle</EntityLink>** | LW documents probabilistic concepts; Squiggle enables quantification |
+| **<EntityLink id="squiggleai">SquiggleAI</EntityLink>** | LW models could be converted to executable Squiggle estimates |
+| **<EntityLink id="metaforecast">Metaforecast</EntityLink>** | LW links to relevant forecasts as evidence for claims |
+| **Squiggle Hub** | Potential future integration for interactive models embedded in pages |
+
+## Development Roadmap
+
+Based on the [Vision Document](/project/vision/):
+
+| Phase | Goals | Status |
+|-------|-------|--------|
+| **Foundation** | Core knowledge base structure, 30+ high-quality pages, initial crux taxonomy | Complete |
+| **Depth** | 80+ quality pages, full crux graph, worldview archetypes | In progress |
+| **Polish** | Expert review, interactive worldview→priority tool, public launch | Planned |
+| **Maintenance** | Quarterly review cycle, community contribution guidelines | Planned |
+
+## Contributing
+
+The wiki is open source and welcomes contributions:
+
+| Contribution Type | How to Help |
+|-------------------|-------------|
+| **Content feedback** | Report issues or suggest improvements via [GitHub Issues](https://github.com/quantified-uncertainty/cairn/issues) |
+| **Technical contributions** | PRs welcome for components, validation, automation |
+| **Expert input** | Contact for crux positions, disagreement mapping |
+| **Bug reports** | File issues for broken links, rendering problems |
+
+See [Internal Documentation](/internal/) for:
+- [About This Wiki](/internal/about-this-wiki/) — Technical overview for contributors
+- [Style guides](/internal/knowledge-base/) for content creation
+- [Automation tools](/internal/automation-tools/) for development workflows
+- [Page types](/internal/page-types/) for classification system
+
+## External Links
+
+- [Longterm Wiki](https://www.longtermwiki.com/)
+- [GitHub Repository](https://github.com/quantified-uncertainty/cairn)
+- [Vision Document](/project/vision/)
+- [Similar Projects Analysis](/project/similar-projects/)
+- [QURI Website](https://quantifieduncertainty.org/)
+
+<Backlinks />

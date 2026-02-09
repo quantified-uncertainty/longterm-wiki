@@ -1,0 +1,108 @@
+---
+title: Ultimate Scenarios
+description: The intermediate pathways connecting root factors to ultimate outcomes—AI Takeover, Human-Caused Catastrophe, and Long-term Lock-in.
+sidebar:
+  label: Overview
+  order: 0
+lastEdited: "2026-01-04"
+subcategory: scenarios
+---
+
+import {ScenariosTable, FullModelDiagram, EntityLink} from '@components/wiki';
+
+Ultimate Scenarios are the intermediate pathways that connect <EntityLink id="factors-overview">root factors</EntityLink> to <EntityLink id="outcomes-overview">ultimate outcomes</EntityLink>. They describe *how* parameter changes lead to catastrophe (or success)—the specific mechanisms and pathways that determine what kind of future we get.
+
+The <EntityLink id="__index__/ai-transition-model">AI Transition Model</EntityLink> uses **three main ultimate scenarios**:
+
+1. **<EntityLink id="scenarios-ai-takeover-overview">AI Takeover</EntityLink>** — AI gains decisive control
+2. **<EntityLink id="scenarios-human-catastrophe-overview">Human-Caused Catastrophe</EntityLink>** — Humans use AI for mass harm
+3. **<EntityLink id="scenarios-long-term-lockin-overview">Long-term Lock-in</EntityLink>** — Permanent entrenchment of values/power
+
+Each ultimate scenario has sub-variants that describe more specific pathways (e.g., "rapid" vs "gradual" AI takeover, "state" vs "rogue actor" catastrophe).
+
+---
+
+## The Three-Layer Model
+
+<FullModelDiagram client:load />
+
+**Color coding:**
+- **Red**: Ultimate negative outcome (<EntityLink id="existential-catastrophe">existential catastrophe</EntityLink>)
+- **Green**: Ultimate trajectory measure (could be good or bad)
+- **Pink**: Negative ultimate scenarios (catastrophes)
+- **Orange**: Symmetric ultimate scenario (could entrench good or bad values)
+
+---
+
+## Ultimate Scenarios Summary
+
+<ScenariosTable client:load />
+
+---
+
+## How Ultimate Scenarios Differ from Other Concepts
+
+| Concept | What It Is | Example |
+|---------|-----------|---------|
+| **Root Factors** | Aggregate variables that shape scenarios | "Misalignment Potential" |
+| **Parameters** | Specific measurable factors | "<EntityLink id="alignment-robustness">Alignment Robustness</EntityLink>" |
+| **Risks** | Things that could go wrong | "<EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink>" |
+| **Ultimate Scenarios** | Intermediate pathways connecting factors to outcomes | "AI Takeover" |
+| **Ultimate Outcomes** | High-level goals we care about | "Existential Catastrophe", "<EntityLink id="long-term-trajectory">Long-term Trajectory</EntityLink>" |
+
+**Key distinction**: A *risk* like "deceptive alignment" is a mechanism that could happen. An *ultimate scenario* like "AI Takeover" is the outcome that results if such mechanisms play out. Multiple risks can contribute to a single ultimate scenario.
+
+---
+
+## Why This Layer Matters
+
+### 1. Clarifies Causal Chains
+
+Without this layer, the connection between "Misalignment Potential increasing" and "Existential Catastrophe increasing" is abstract. Ultimate scenarios show the specific pathway: alignment fails → AI develops misaligned goals → AI takes over → catastrophe.
+
+### 2. Enables Different Intervention Strategies
+
+Different ultimate scenarios require different interventions:
+- **AI Takeover**: Technical alignment, capability restrictions
+- **Human-Caused Catastrophe**: <EntityLink id="international-coordination">International coordination</EntityLink>, misuse prevention
+- **Long-term <EntityLink id="lock-in">Lock-in</EntityLink>**: Power distribution, institutional design
+
+### 3. Supports Scenario Planning
+
+Ultimate scenarios map directly onto scenarios that organizations can plan for. Rather than asking "what if Existential Catastrophe increases?", planners can ask "what if we're heading toward a Human-Caused Catastrophe?"
+
+### 4. Connects to Existing Threat Models
+
+Each ultimate scenario corresponds to threat models discussed in the AI safety literature:
+- <EntityLink id="carlsmith-six-premises">Carlsmith's six-premise argument</EntityLink> → AI Takeover scenarios
+- Christiano's "What Failure Looks Like" → <EntityLink id="gradual">Gradual AI Takeover</EntityLink>
+- Ord's "The Precipice" risk categories → Multiple ultimate scenarios
+- Kasirzadeh's decisive vs. accumulative → Rapid vs. Gradual takeover
+
+---
+
+## Using This Section
+
+### For Analysts
+- Map specific risks to the ultimate scenarios they could produce
+- Estimate which ultimate scenarios are most likely given current parameter trends
+- Identify which parameters to prioritize based on which ultimate scenarios concern you most
+
+### For Policymakers
+- Design interventions targeted at preventing specific ultimate scenarios
+- Coordinate across domains (a single ultimate scenario may require multiple types of intervention)
+- Track early warning signs for each ultimate scenario
+
+### For Researchers
+- Use ultimate scenarios to frame research priorities
+- Connect technical work to concrete scenarios it addresses
+- Identify gaps in our understanding of specific pathways
+
+---
+
+## Related Sections
+
+- <EntityLink id="factors-overview">Root Factors</EntityLink> — The parameter groupings that feed into ultimate scenarios
+- <EntityLink id="outcomes-overview">Ultimate Outcomes</EntityLink> — The high-level goals ultimate scenarios affect
+- <EntityLink id="__index__/ai-transition-model">Interactive Model</EntityLink> — Full interactive visualization
+- Models — Analytical frameworks for understanding pathways

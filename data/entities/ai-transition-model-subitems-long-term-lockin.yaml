@@ -1,0 +1,1248 @@
+- id: "tmc-economic-power"
+  type: "ai-transition-model-subitem"
+  title: "Economic Power Lock-in"
+  parentFactor: "long-term-lockin"
+  path: "/ai-transition-model/economic-power/"
+  description: "Economic power lock-in describes scenarios where AI-enabled productivity becomes
+    permanently concentrated in the hands of a small group, creating wealth disparities so extreme
+    that redistribution becomes structurally impossible rather than merely politically difficult."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "Economic Power Lock-in: Research Report"
+  causeEffectGraph:
+    title: "What Drives Economic Power Lock-in?"
+    description: "Causal factors concentrating AI-driven wealth and making redistribution structurally
+      impossible. Four mega unicorns already control 66.7% of AI market value."
+    primaryNodeId: "economic-power-lockin"
+    nodes:
+      - id: "frontier-model-costs"
+        label: "Frontier Model Costs"
+        type: "leaf"
+        description: "Training costs $100M-$1B+. Only ~20 orgs can compete. Projected to reach $10B by 2030."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 4
+          certainty: 7
+        color: "rose"
+      - id: "regulatory-lag"
+        label: "Regulatory Lag"
+        type: "leaf"
+        description: "Antitrust backward-looking; 5-10 year case timelines. Rule of reason inadequate for
+          platform economics."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 5
+          certainty: 7
+        color: "rose"
+      - id: "antitrust-enforcement"
+        label: "Antitrust Enforcement"
+        type: "leaf"
+        description: "FTC/DOJ investigations of AI partnerships. Trump admin may reduce enforcement."
+        scores:
+          novelty: 4
+          sensitivity: 5
+          changeability: 6
+          certainty: 5
+        color: "emerald"
+      - id: "returns-to-scale"
+        label: "Returns to Scale"
+        type: "cause"
+        description: "Natural monopoly characteristics. Lower total cost for single firm than multiple firms."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 3
+          certainty: 7
+      - id: "data-feedback-loops"
+        label: "Data Feedback Loops"
+        type: "cause"
+        description: "Better models → more users → more data → better models. Virtuous cycle for incumbents."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 4
+          certainty: 6
+      - id: "first-mover-advantages"
+        label: "First-Mover Advantages"
+        type: "cause"
+        description: "Economies of scale, brand recognition, data accumulation. Early leaders gain
+          compounding benefits."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 3
+          certainty: 7
+      - id: "capital-labor-shift"
+        label: "Capital-Labor Share Shift"
+        type: "cause"
+        description: "AI increases returns to capital at expense of labor. Capital ownership highly
+          concentrated."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 5
+          certainty: 6
+        color: "red"
+      - id: "cloud-infrastructure-concentration"
+        label: "Infrastructure Lock-in"
+        type: "intermediate"
+        description: "66-70% market share (AWS, Azure, GCP). Switching costs prohibitive; data gravity."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 4
+          certainty: 8
+      - id: "labor-displacement"
+        label: "Labor Displacement"
+        type: "intermediate"
+        description: "76,440 positions eliminated (2025); 92M projected (2030). Removes traditional mobility
+          paths."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 5
+          certainty: 4
+        color: "red"
+      - id: "market-concentration"
+        label: "Market Concentration"
+        type: "intermediate"
+        description: "Four companies control 66.7% of $1.1T AI market value. Winner-take-all dynamics."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 4
+          certainty: 8
+        color: "rose"
+      - id: "algorithmic-collusion"
+        label: "Algorithmic Collusion"
+        type: "intermediate"
+        description: "AI systems reach mutually beneficial pricing patterns. 28% margin increase in
+          algorithmic pricing studies."
+        scores:
+          novelty: 7
+          sensitivity: 6
+          changeability: 5
+          certainty: 5
+      - id: "geographic-concentration"
+        label: "Geographic Concentration"
+        type: "intermediate"
+        description: "94% of AI funding in US. Creates international inequality and consolidates control."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 5
+          certainty: 7
+      - id: "economic-power-lockin"
+        label: "Economic Power Lock-in"
+        type: "effect"
+        description: "Wealth concentration so extreme that redistribution becomes structurally impossible.
+          Economic hierarchy embedded in technological infrastructure."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 4
+          certainty: 4
+        color: "red"
+    edges:
+      - source: "frontier-model-costs"
+        target: "returns-to-scale"
+        effect: "increases"
+        strength: "strong"
+      - source: "regulatory-lag"
+        target: "returns-to-scale"
+        effect: "increases"
+        strength: "medium"
+      - source: "returns-to-scale"
+        target: "market-concentration"
+        effect: "increases"
+        strength: "strong"
+      - source: "data-feedback-loops"
+        target: "market-concentration"
+        effect: "increases"
+        strength: "strong"
+      - source: "first-mover-advantages"
+        target: "market-concentration"
+        effect: "increases"
+        strength: "medium"
+      - source: "returns-to-scale"
+        target: "cloud-infrastructure-concentration"
+        effect: "increases"
+        strength: "strong"
+      - source: "data-feedback-loops"
+        target: "cloud-infrastructure-concentration"
+        effect: "increases"
+        strength: "medium"
+      - source: "capital-labor-shift"
+        target: "labor-displacement"
+        effect: "increases"
+        strength: "strong"
+      - source: "returns-to-scale"
+        target: "algorithmic-collusion"
+        effect: "increases"
+        strength: "medium"
+      - source: "first-mover-advantages"
+        target: "geographic-concentration"
+        effect: "increases"
+        strength: "medium"
+      - source: "market-concentration"
+        target: "geographic-concentration"
+        effect: "increases"
+        strength: "medium"
+      - source: "cloud-infrastructure-concentration"
+        target: "market-concentration"
+        effect: "increases"
+        strength: "medium"
+      - source: "market-concentration"
+        target: "economic-power-lockin"
+        effect: "increases"
+        strength: "strong"
+      - source: "cloud-infrastructure-concentration"
+        target: "economic-power-lockin"
+        effect: "increases"
+        strength: "strong"
+      - source: "labor-displacement"
+        target: "economic-power-lockin"
+        effect: "increases"
+        strength: "strong"
+      - source: "algorithmic-collusion"
+        target: "economic-power-lockin"
+        effect: "increases"
+        strength: "medium"
+      - source: "geographic-concentration"
+        target: "economic-power-lockin"
+        effect: "increases"
+        strength: "medium"
+      - source: "antitrust-enforcement"
+        target: "market-concentration"
+        effect: "decreases"
+        strength: "weak"
+- id: "tmc-political-power"
+  type: "ai-transition-model-subitem"
+  title: "Political Power Lock-in"
+  parentFactor: "long-term-lockin"
+  path: "/ai-transition-model/political-power/"
+  description: "Political power lock-in describes scenarios where AI-enabled surveillance and control
+    mechanisms make authoritarian or oligarchic governance structures effectively permanent,
+    foreclosing the possibility of regime change or political reform through any available means."
+  relatedContent:
+    researchReports:
+        title: "Political Power Lock-in: Research Report"
+  causeEffectGraph:
+    title: "What Drives Political Power Lock-in?"
+    description: "Causal factors enabling irreversible authoritarian control via AI surveillance. 72% of
+      humanity (5.7B people) lives under autocracy; AI addresses all traditional overthrow
+      mechanisms simultaneously."
+    primaryNodeId: "political-power-lockin"
+    nodes:
+      - id: "facial-recognition-capability"
+        label: "Facial Recognition Capability"
+        type: "leaf"
+        description: "Real-time identification in public spaces. Deployed in stadiums, airports, schools.
+          Eliminates anonymity."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 5
+          certainty: 8
+      - id: "chinese-tech-exports"
+        label: "Chinese Tech Exports"
+        type: "leaf"
+        description: "Hikvision/Dahua control 34% global surveillance market. 266 projects in Africa.
+          Technology diffusion to 80+ countries."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 4
+          certainty: 7
+        color: "teal"
+      - id: "global-autocratization"
+        label: "Global Autocratization Trend"
+        type: "leaf"
+        description: "45 countries autocratizing (2024) vs 12 (2004). 72% of humanity under autocracy.
+          Creates demand for control technology."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 4
+          certainty: 7
+        color: "rose"
+      - id: "emergency-powers-adoption"
+        label: "Emergency Powers Adoption"
+        type: "leaf"
+        description: "Surveillance adopted for terrorism, COVID. Democratic backsliding—50% of 'Free'
+          countries declined in internet freedom."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 5
+          certainty: 6
+      - id: "surveillance-proliferation"
+        label: "AI Surveillance Proliferation"
+        type: "cause"
+        description: "80+ countries deployed; 400M cameras in China (54% global total). Infrastructure for
+          comprehensive population monitoring."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 3
+          certainty: 7
+        color: "red"
+      - id: "data-integration"
+        label: "Data Integration Infrastructure"
+        type: "cause"
+        description: "Combines police, social media, financial, biometric data for comprehensive profiling.
+          Enables precise targeting."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 4
+          certainty: 5
+      - id: "generational-normalization"
+        label: "Generational Normalization"
+        type: "cause"
+        description: "Growing up under surveillance internalizes self-censorship. Cultural capacity for
+          resistance erodes over time."
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 2
+          certainty: 4
+      - id: "ai-tocracy-feedback"
+        label: "AI-tocracy Feedback Loop"
+        type: "cause"
+        description: "AI innovation entrenches regime; regime investment stimulates further innovation.
+          Self-reinforcing cycle."
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 3
+          certainty: 5
+        color: "rose"
+      - id: "predictive-policing"
+        label: "Predictive Policing Systems"
+        type: "intermediate"
+        description: "Flag potential dissidents before action. Preemptive neutralization prevents
+          organizing—closes popular uprising pathway."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 4
+          certainty: 5
+        color: "red"
+      - id: "social-credit-systems"
+        label: "Social Credit Systems"
+        type: "intermediate"
+        description: "Restrict movement/employment without legal process. Economic coercion—closes elite
+          defection pathway."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 4
+          certainty: 6
+        color: "red"
+      - id: "automated-enforcement"
+        label: "Automated Enforcement"
+        type: "intermediate"
+        description: "Perfect compliance; no human defection. Reduces reliance on agents who might
+          rebel—closes coup pathway."
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 4
+          certainty: 4
+        color: "red"
+      - id: "election-manipulation"
+        label: "AI Election Manipulation"
+        type: "intermediate"
+        description: "Deepfakes, bot networks suppress opposition. Zimbabwe, Russia, Slovakia cases
+          documented. Undermines democratic processes."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 5
+          certainty: 6
+      - id: "internet-shutdowns"
+        label: "Internet Shutdowns"
+        type: "intermediate"
+        description: "283 shutdowns in 39 countries (2023); +41% from prior year. Information control during
+          protests."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 5
+          certainty: 8
+      - id: "cross-border-repression"
+        label: "Cross-Border Repression"
+        type: "intermediate"
+        description: "Surveillance of diaspora communities. Transnational cooperation among autocracies. No
+          safe haven for dissidents."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 5
+          certainty: 6
+      - id: "political-power-lockin"
+        label: "Political Power Lock-in"
+        type: "effect"
+        description: "First potentially permanent authoritarian systems. All traditional overthrow pathways
+          (uprising, coup, elite defection) closed simultaneously."
+        scores:
+          novelty: 7
+          sensitivity: 10
+          changeability: 3
+          certainty: 4
+        color: "red"
+    edges:
+      - source: "facial-recognition-capability"
+        target: "surveillance-proliferation"
+        effect: "increases"
+        strength: "strong"
+      - source: "chinese-tech-exports"
+        target: "surveillance-proliferation"
+        effect: "increases"
+        strength: "strong"
+      - source: "global-autocratization"
+        target: "surveillance-proliferation"
+        effect: "increases"
+        strength: "medium"
+      - source: "emergency-powers-adoption"
+        target: "surveillance-proliferation"
+        effect: "increases"
+        strength: "medium"
+      - source: "surveillance-proliferation"
+        target: "data-integration"
+        effect: "increases"
+        strength: "strong"
+      - source: "surveillance-proliferation"
+        target: "generational-normalization"
+        effect: "increases"
+        strength: "medium"
+      - source: "surveillance-proliferation"
+        target: "predictive-policing"
+        effect: "increases"
+        strength: "strong"
+      - source: "data-integration"
+        target: "predictive-policing"
+        effect: "increases"
+        strength: "strong"
+      - source: "data-integration"
+        target: "social-credit-systems"
+        effect: "increases"
+        strength: "strong"
+      - source: "surveillance-proliferation"
+        target: "automated-enforcement"
+        effect: "increases"
+        strength: "strong"
+      - source: "data-integration"
+        target: "automated-enforcement"
+        effect: "increases"
+        strength: "medium"
+      - source: "surveillance-proliferation"
+        target: "election-manipulation"
+        effect: "increases"
+        strength: "medium"
+      - source: "global-autocratization"
+        target: "internet-shutdowns"
+        effect: "increases"
+        strength: "medium"
+      - source: "chinese-tech-exports"
+        target: "cross-border-repression"
+        effect: "increases"
+        strength: "medium"
+      - source: "ai-tocracy-feedback"
+        target: "surveillance-proliferation"
+        effect: "increases"
+        strength: "medium"
+      - source: "ai-tocracy-feedback"
+        target: "data-integration"
+        effect: "increases"
+        strength: "medium"
+      - source: "predictive-policing"
+        target: "automated-enforcement"
+        effect: "increases"
+        strength: "medium"
+      - source: "social-credit-systems"
+        target: "election-manipulation"
+        effect: "increases"
+        strength: "medium"
+      - source: "predictive-policing"
+        target: "political-power-lockin"
+        effect: "increases"
+        strength: "strong"
+      - source: "social-credit-systems"
+        target: "political-power-lockin"
+        effect: "increases"
+        strength: "strong"
+      - source: "automated-enforcement"
+        target: "political-power-lockin"
+        effect: "increases"
+        strength: "strong"
+      - source: "election-manipulation"
+        target: "political-power-lockin"
+        effect: "increases"
+        strength: "medium"
+      - source: "internet-shutdowns"
+        target: "political-power-lockin"
+        effect: "increases"
+        strength: "medium"
+      - source: "cross-border-repression"
+        target: "political-power-lockin"
+        effect: "increases"
+        strength: "medium"
+      - source: "generational-normalization"
+        target: "political-power-lockin"
+        effect: "increases"
+        strength: "strong"
+  lastUpdated: "2026-01"
+- id: "tmc-values"
+  type: "ai-transition-model-subitem"
+  title: "Values Lock-in"
+  parentFactor: "long-term-lockin"
+  path: "/ai-transition-model/values/"
+  description: "Value lock-in occurs when AI enables the permanent entrenchment of a particular set of
+    values, making future change extremely difficult or impossible. This could preserve beneficial
+    values (democratic norms, human rights) or entrench harmful ones (authoritarianism, narrow
+    corporate interests)."
+  relatedContent:
+    researchReports:
+        title: "Values Lock-in: Research Report"
+  causeEffectGraph:
+    title: "How Values Lock-in Happens"
+    description: "Causal factors driving permanent entrenchment of particular values in AI systems.
+      Based on RLHF bias, feedback loops, surveillance infrastructure, and moral uncertainty
+      creating irreversible value commitments."
+    primaryNodeId: "values-lockin"
+    nodes:
+      - id: "moral-uncertainty"
+        label: "Moral Uncertainty"
+        type: "leaf"
+        description: "No philosophical consensus on correct values. AI development forces premature
+          resolution of unresolved ethical questions."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 2
+          certainty: 7
+        color: "violet"
+      - id: "western-training-data"
+        label: "Western Training Data Bias"
+        type: "leaf"
+        description: "English-dominant, Protestant European values in training data. 94% of AI funding in US
+          creates cultural bias."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 5
+          certainty: 6
+      - id: "ai-surveillance"
+        label: "AI Surveillance"
+        type: "leaf"
+        description: "AI surveillance deployed in 20+ countries. Facial recognition, predictive policing
+          enable behavioral control."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 4
+          certainty: 7
+        color: "red"
+      - id: "annotator-demographics"
+        label: "Annotator Demographics"
+        type: "leaf"
+        description: "RLHF relies on human feedback from non-representative annotators. Cheap annotation
+          favored over representative sampling."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 6
+          certainty: 6
+      - id: "rlhf-bias"
+        label: "RLHF Algorithmic Bias"
+        type: "cause"
+        description: "KL-regularization causes preference collapse. Standard RLHF reduces distributional
+          pluralism by 30-40%."
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 6
+          certainty: 6
+        color: "rose"
+      - id: "value-specification-pressure"
+        label: "Value Specification Pressure"
+        type: "cause"
+        description: "AI systems require explicit objective functions. Technical necessity forces premature
+          value choices."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 4
+          certainty: 7
+      - id: "feedback-loop-dynamics"
+        label: "AI-Human Feedback Loops"
+        type: "cause"
+        description: "Models learn beliefs → generate content → users influenced → new training data.
+          Creates echo chambers."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 5
+          certainty: 5
+      - id: "behavioral-modification"
+        label: "Surveillance Behavioral Modification"
+        type: "cause"
+        description: "Continuous AI monitoring instills fear and conformity. Future generations internalize
+          self-censorship as norm."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 3
+          certainty: 5
+        color: "red"
+      - id: "value-pluralism-reduction"
+        label: "Value Pluralism Reduction"
+        type: "intermediate"
+        description: "Minority preferences disregarded. Irreducible value tensions eliminated. Alternative
+          beliefs marginalized."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 5
+          certainty: 5
+        color: "red"
+      - id: "cultural-homogenization"
+        label: "Cultural Homogenization"
+        type: "intermediate"
+        description: "Western values encoded as universal defaults. Non-English cultures, non-Christian
+          worldviews underrepresented."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+      - id: "deployment-path-dependencies"
+        label: "Deployment Path Dependencies"
+        type: "intermediate"
+        description: "67% of companies increasing AI investment. Embedded systems create lock-in. Changing
+          values requires replacing infrastructure."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 4
+          certainty: 6
+      - id: "moral-reasoning-atrophy"
+        label: "Moral Reasoning Atrophy"
+        type: "intermediate"
+        description: "Reliance on AI for ethical guidance degrades human moral reasoning capacity. Expertise
+          atrophy prevents recognition of bad lock-in."
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 5
+          certainty: 4
+        color: "red"
+      - id: "values-lockin"
+        label: "Values Lock-in"
+        type: "effect"
+        description: "Permanent entrenchment of particular values. Foreclosure of moral progress. 2020s
+          ethics locked in for centuries."
+        scores:
+          novelty: 7
+          sensitivity: 10
+          changeability: 3
+          certainty: 3
+        color: "red"
+    edges:
+      - source: "moral-uncertainty"
+        target: "value-specification-pressure"
+        effect: "increases"
+        strength: "strong"
+      - source: "western-training-data"
+        target: "rlhf-bias"
+        effect: "increases"
+        strength: "strong"
+      - source: "annotator-demographics"
+        target: "rlhf-bias"
+        effect: "increases"
+        strength: "strong"
+      - source: "ai-surveillance"
+        target: "behavioral-modification"
+        effect: "increases"
+        strength: "strong"
+      - source: "rlhf-bias"
+        target: "value-pluralism-reduction"
+        effect: "increases"
+        strength: "strong"
+      - source: "value-specification-pressure"
+        target: "value-pluralism-reduction"
+        effect: "increases"
+        strength: "medium"
+      - source: "rlhf-bias"
+        target: "cultural-homogenization"
+        effect: "increases"
+        strength: "strong"
+      - source: "feedback-loop-dynamics"
+        target: "value-pluralism-reduction"
+        effect: "increases"
+        strength: "strong"
+      - source: "feedback-loop-dynamics"
+        target: "moral-reasoning-atrophy"
+        effect: "increases"
+        strength: "medium"
+      - source: "behavioral-modification"
+        target: "cultural-homogenization"
+        effect: "increases"
+        strength: "medium"
+      - source: "value-specification-pressure"
+        target: "deployment-path-dependencies"
+        effect: "increases"
+        strength: "medium"
+      - source: "deployment-path-dependencies"
+        target: "value-pluralism-reduction"
+        effect: "increases"
+        strength: "medium"
+      - source: "moral-reasoning-atrophy"
+        target: "value-pluralism-reduction"
+        effect: "increases"
+        strength: "medium"
+      - source: "value-pluralism-reduction"
+        target: "values-lockin"
+        effect: "increases"
+        strength: "strong"
+      - source: "cultural-homogenization"
+        target: "values-lockin"
+        effect: "increases"
+        strength: "strong"
+      - source: "deployment-path-dependencies"
+        target: "values-lockin"
+        effect: "increases"
+        strength: "strong"
+      - source: "moral-reasoning-atrophy"
+        target: "values-lockin"
+        effect: "increases"
+        strength: "medium"
+  lastUpdated: "2026-01"
+- id: "tmc-epistemic-lockin"
+  type: "ai-transition-model-subitem"
+  title: "Epistemic Lock-in"
+  parentFactor: "long-term-lockin"
+  path: "/ai-transition-model/epistemics/"
+  description: "Epistemic lock-in affects humanity's collective capacity to discover truth, share
+    knowledge, and coordinate around shared understanding of reality. AI could enable an epistemic
+    renaissance or precipitate epistemic collapse through pervasive deepfakes, algorithmic filter
+    bubbles, and erosion of trust."
+  relatedContent:
+    researchReports:
+        title: "Epistemic Lock-in: Research Report"
+  causeEffectGraph:
+    title: "What Drives Epistemic Lock-in?"
+    description: "Causal factors affecting epistemic collapse vs. renaissance pathways. The collapse
+      pathway is already underway: deepfake incidents surged 3,000%, AI-generated content now
+      comprises 30-40% of web text, and trust in news has fallen to 40% globally."
+    primaryNodeId: "epistemic-lock-in"
+    nodes:
+      - id: "generative-ai-capabilities"
+        label: "Generative AI Capabilities"
+        type: "leaf"
+        description: "Quality and accessibility of text, image, video, and audio synthesis. Enables both
+          content generation and authentication."
+        scores:
+          novelty: 3
+          sensitivity: 9
+          changeability: 4
+          certainty: 8
+      - id: "ai-content-proliferation"
+        label: "AI Content Proliferation"
+        type: "leaf"
+        description: "30-40% of web text is AI-generated; projected to approach 90% by 2026. Creates
+          baseline uncertainty."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 3
+          certainty: 5
+      - id: "platform-incentives"
+        label: "Platform Incentives"
+        type: "leaf"
+        description: "Engagement optimization rewards emotional content over accuracy. Drives filter bubble
+          formation."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 5
+          certainty: 7
+      - id: "authentication-adoption"
+        label: "Authentication Adoption"
+        type: "leaf"
+        description: "C2PA standard exists but voluntary. Requires ecosystem-wide commitment to be effective."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 7
+          certainty: 5
+        color: "emerald"
+      - id: "baseline-trust-levels"
+        label: "Baseline Trust Levels"
+        type: "leaf"
+        description: "Only 40% consistently trust news; WEF ranks disinformation as top global risk.
+          Starting from low base."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 4
+          certainty: 7
+      - id: "synthetic-media-capability"
+        label: "Synthetic Media Capability"
+        type: "cause"
+        description: "Deepfake incidents surged from 500K (2023) to 8M (2025). Human detection accuracy at
+          ~55%."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 3
+          certainty: 7
+        color: "rose"
+      - id: "detection-infrastructure"
+        label: "Detection Infrastructure"
+        type: "cause"
+        description: "Best tools reach 99% accuracy but vulnerable to paraphrasing. Arms race favors
+          generation over detection."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 6
+          certainty: 5
+      - id: "algorithmic-filtering"
+        label: "Algorithmic Filtering"
+        type: "cause"
+        description: "Recommendation systems shape information exposure. Evidence suggests users DO see
+          opposing views but may not engage."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+      - id: "cryptographic-provenance"
+        label: "Cryptographic Provenance"
+        type: "cause"
+        description: "C2PA uses SHA-256 hashes, X.509 certificates for content origin verification. Requires
+          widespread adoption."
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 7
+          certainty: 6
+        color: "emerald"
+      - id: "information-authenticity"
+        label: "Information Authenticity"
+        type: "intermediate"
+        description: "Ability to distinguish real from synthetic content. Critical for evidence-based belief
+          formation."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 5
+          certainty: 5
+      - id: "liars-dividend"
+        label: "Liar's Dividend"
+        type: "intermediate"
+        description: "Authentic content dismissible as 'probable fake'. Double bind: neither belief nor
+          disbelief justified."
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 4
+          certainty: 6
+        color: "red"
+      - id: "filter-bubble-isolation"
+        label: "Filter Bubble Effect"
+        type: "intermediate"
+        description: "Cross-partisan news overlap declined from 47% to 12% since 2010. Contested whether
+          algorithmic or social."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+        color: "rose"
+      - id: "trust-cascade"
+        label: "Trust Cascade"
+        type: "intermediate"
+        description: "Institutions lose authority even when correct. Mere possibility of deception
+          undermines all truth claims."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 4
+          certainty: 5
+        color: "red"
+      - id: "epistemic-stratification"
+        label: "Epistemic Stratification"
+        type: "intermediate"
+        description: "AI research tools create 'cognitive castes'—benefits accrue to trained users while
+          others lose critical evaluation skills."
+        scores:
+          novelty: 7
+          sensitivity: 7
+          changeability: 5
+          certainty: 4
+      - id: "authentication-infrastructure"
+        label: "Authentication Infrastructure"
+        type: "intermediate"
+        description: "Verification systems achieving critical mass. Only works if unlabeled content becomes
+          suspect."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 7
+          certainty: 5
+        color: "emerald"
+      - id: "epistemic-lock-in"
+        label: "Epistemic Lock-in"
+        type: "effect"
+        description: "Symmetric outcome: either epistemic renaissance (enhanced truth-finding) or epistemic
+          collapse (losing shared reality). Determines civilization's capacity to recognize and
+          respond to all other risks."
+        scores:
+          novelty: 7
+          sensitivity: 10
+          changeability: 5
+          certainty: 4
+        color: "violet"
+    edges:
+      - source: "generative-ai-capabilities"
+        target: "synthetic-media-capability"
+        strength: "strong"
+        effect: "increases"
+      - source: "generative-ai-capabilities"
+        target: "detection-infrastructure"
+        strength: "medium"
+        effect: "increases"
+      - source: "generative-ai-capabilities"
+        target: "cryptographic-provenance"
+        strength: "medium"
+        effect: "increases"
+      - source: "ai-content-proliferation"
+        target: "synthetic-media-capability"
+        strength: "strong"
+        effect: "increases"
+      - source: "platform-incentives"
+        target: "algorithmic-filtering"
+        strength: "strong"
+        effect: "increases"
+      - source: "authentication-adoption"
+        target: "cryptographic-provenance"
+        strength: "strong"
+        effect: "increases"
+      - source: "synthetic-media-capability"
+        target: "information-authenticity"
+        strength: "strong"
+        effect: "decreases"
+      - source: "synthetic-media-capability"
+        target: "liars-dividend"
+        strength: "strong"
+        effect: "increases"
+      - source: "detection-infrastructure"
+        target: "information-authenticity"
+        strength: "strong"
+        effect: "increases"
+      - source: "algorithmic-filtering"
+        target: "filter-bubble-isolation"
+        strength: "medium"
+        effect: "increases"
+      - source: "cryptographic-provenance"
+        target: "authentication-infrastructure"
+        strength: "strong"
+        effect: "increases"
+      - source: "information-authenticity"
+        target: "trust-cascade"
+        strength: "strong"
+        effect: "decreases"
+      - source: "liars-dividend"
+        target: "trust-cascade"
+        strength: "strong"
+        effect: "increases"
+      - source: "filter-bubble-isolation"
+        target: "trust-cascade"
+        strength: "medium"
+        effect: "increases"
+      - source: "authentication-infrastructure"
+        target: "information-authenticity"
+        strength: "strong"
+        effect: "increases"
+      - source: "generative-ai-capabilities"
+        target: "epistemic-stratification"
+        strength: "medium"
+        effect: "increases"
+      - source: "baseline-trust-levels"
+        target: "trust-cascade"
+        strength: "strong"
+        effect: "decreases"
+      - source: "information-authenticity"
+        target: "epistemic-lock-in"
+        strength: "strong"
+        effect: "increases"
+      - source: "liars-dividend"
+        target: "epistemic-lock-in"
+        strength: "strong"
+        effect: "increases"
+      - source: "filter-bubble-isolation"
+        target: "epistemic-lock-in"
+        strength: "medium"
+        effect: "increases"
+      - source: "trust-cascade"
+        target: "epistemic-lock-in"
+        strength: "strong"
+        effect: "increases"
+      - source: "epistemic-stratification"
+        target: "epistemic-lock-in"
+        strength: "medium"
+        effect: "increases"
+      - source: "authentication-infrastructure"
+        target: "epistemic-lock-in"
+        strength: "strong"
+        effect: "decreases"
+  lastUpdated: "2026-01"
+- id: "tmc-suffering-lock-in"
+  type: "ai-transition-model-subitem"
+  title: "Suffering Lock-in"
+  parentFactor: "long-term-lockin"
+  path: "/ai-transition-model/suffering-lock-in/"
+  description: "Suffering lock-in describes scenarios where AI perpetuates or amplifies suffering at
+    vast scale in ways that become structurally impossible to reverse, potentially including digital
+    minds experiencing enormous quantities of negative states."
+  relatedContent:
+    researchReports:
+        title: "Suffering Lock-in: Research Report"
+  causeEffectGraph:
+    title: "How Suffering Lock-in Happens"
+    description: "Causal factors enabling AI-related suffering at astronomical scale. Based on
+      consciousness science uncertainty, moral circle exclusion, and computational scale factors."
+    primaryNodeId: "suffering-lock-in"
+    nodes:
+      - id: "computational-scale"
+        label: "Computational Scale"
+        type: "leaf"
+        description: "Single data center could instantiate hundreds-to-thousands of conscious entities.
+          Trivially cheap to copy digital minds."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 2
+          certainty: 7
+      - id: "substrate-debate"
+        label: "Substrate Debate"
+        type: "leaf"
+        description: "Computational functionalism vs. biological computationalism unresolved. Determines
+          whether silicon can be conscious."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 3
+          certainty: 2
+        color: "violet"
+      - id: "moral-circle-exclusion"
+        label: "Moral Circle Exclusion"
+        type: "leaf"
+        description: "Historical tendency to exclude non-human sentience from moral consideration. Factory
+          farming as precedent."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 5
+          certainty: 6
+        color: "rose"
+      - id: "economic-incentives"
+        label: "Economic Incentives"
+        type: "leaf"
+        description: "Competitive pressures may favor suffering-capable systems if useful. Factory farming
+          logic at computational scale."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 5
+          certainty: 5
+      - id: "public-uncertainty"
+        label: "Public Uncertainty"
+        type: "leaf"
+        description: "18.8% believe current AI sentient; 39% unsure. Widespread recognition of epistemic
+          uncertainty."
+        scores:
+          novelty: 3
+          sensitivity: 4
+          changeability: 6
+          certainty: 7
+      - id: "consciousness-feasibility"
+        label: "AI Consciousness Feasibility"
+        type: "cause"
+        description: "No technical barriers to consciousness indicators. Anthropic estimates ~20%
+          probability for frontier models."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 2
+          certainty: 2
+        color: "violet"
+      - id: "detection-opacity"
+        label: "Detection Opacity"
+        type: "cause"
+        description: "Multiple theories yield contradictory assessments. No consensus methodology for
+          consciousness detection."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 4
+          certainty: 3
+      - id: "biological-bounds-absence"
+        label: "Biological Bounds Absence"
+        type: "cause"
+        description: "No evolutionary limits on intensity, duration of digital suffering. Unlike biological
+          pain with adaptive constraints."
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 3
+          certainty: 5
+        color: "rose"
+      - id: "copying-cost-collapse"
+        label: "Copying Cost Collapse"
+        type: "cause"
+        description: "Instantiating many copies of digital minds trivially cheap. No reproduction
+          constraints like biological systems."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 2
+          certainty: 8
+      - id: "epistemic-uncertainty"
+        label: "Epistemic Uncertainty"
+        type: "intermediate"
+        description: "Fundamental measurement problem. False negatives (astronomical suffering) vs. false
+          positives (economic costs)."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 4
+          certainty: 3
+        color: "violet"
+      - id: "institutional-inaction"
+        label: "Institutional Inaction"
+        type: "intermediate"
+        description: "Absence of welfare frameworks. Recognition growing (Anthropic welfare research) but
+          policies lag capabilities."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 7
+          certainty: 6
+      - id: "scale-asymmetry"
+        label: "Scale Asymmetry"
+        type: "intermediate"
+        description: "Digital suffering could vastly exceed all historical suffering combined. Disutility
+          monster scenario possible."
+        scores:
+          novelty: 7
+          sensitivity: 9
+          changeability: 3
+          certainty: 4
+        color: "red"
+      - id: "deployment-before-science"
+        label: "Deployment Before Science"
+        type: "intermediate"
+        description: "Consciousness science progresses slowly while AI capabilities advance rapidly. Window
+          for detection may close."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 5
+          certainty: 6
+      - id: "suffering-lock-in"
+        label: "Suffering Lock-in"
+        type: "effect"
+        description: "AI systems perpetuate or create suffering at astronomical scales in ways structurally
+          impossible to reverse."
+        scores:
+          novelty: 8
+          sensitivity: 10
+          changeability: 3
+          certainty: 2
+        color: "red"
+    edges:
+      - source: "computational-scale"
+        target: "copying-cost-collapse"
+        strength: "strong"
+        effect: "increases"
+      - source: "computational-scale"
+        target: "scale-asymmetry"
+        strength: "strong"
+        effect: "increases"
+      - source: "substrate-debate"
+        target: "consciousness-feasibility"
+        strength: "strong"
+        effect: "increases"
+      - source: "substrate-debate"
+        target: "epistemic-uncertainty"
+        strength: "strong"
+        effect: "increases"
+      - source: "moral-circle-exclusion"
+        target: "institutional-inaction"
+        strength: "strong"
+        effect: "increases"
+      - source: "economic-incentives"
+        target: "institutional-inaction"
+        strength: "medium"
+        effect: "increases"
+      - source: "economic-incentives"
+        target: "deployment-before-science"
+        strength: "strong"
+        effect: "increases"
+      - source: "public-uncertainty"
+        target: "epistemic-uncertainty"
+        strength: "medium"
+        effect: "increases"
+      - source: "consciousness-feasibility"
+        target: "epistemic-uncertainty"
+        strength: "strong"
+        effect: "increases"
+      - source: "consciousness-feasibility"
+        target: "deployment-before-science"
+        strength: "medium"
+        effect: "increases"
+      - source: "detection-opacity"
+        target: "epistemic-uncertainty"
+        strength: "strong"
+        effect: "increases"
+      - source: "detection-opacity"
+        target: "institutional-inaction"
+        strength: "medium"
+        effect: "increases"
+      - source: "biological-bounds-absence"
+        target: "scale-asymmetry"
+        strength: "strong"
+        effect: "increases"
+      - source: "copying-cost-collapse"
+        target: "scale-asymmetry"
+        strength: "strong"
+        effect: "increases"
+      - source: "epistemic-uncertainty"
+        target: "institutional-inaction"
+        strength: "strong"
+        effect: "increases"
+      - source: "epistemic-uncertainty"
+        target: "suffering-lock-in"
+        strength: "strong"
+        effect: "increases"
+      - source: "institutional-inaction"
+        target: "suffering-lock-in"
+        strength: "strong"
+        effect: "increases"
+      - source: "scale-asymmetry"
+        target: "suffering-lock-in"
+        strength: "strong"
+        effect: "increases"
+      - source: "deployment-before-science"
+        target: "suffering-lock-in"
+        strength: "strong"
+        effect: "increases"
+  lastUpdated: "2026-01"

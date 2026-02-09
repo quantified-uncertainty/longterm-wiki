@@ -1,0 +1,566 @@
+---
+title: AI Surveillance and Regime Durability Model
+description: "This model analyzes how AI surveillance affects authoritarian regime durability. Using historical regime collapse data (military: 9 years, single-party: 30 years) and evidence from 80+ countries adopting Chinese surveillance technology, it estimates AI-enabled regimes may be 2-3x more durable than historical autocracies through mechanisms including preemptive suppression and perfect information on dissent."
+sidebar:
+  order: 27
+quality: 64
+lastEdited: "2025-12-28"
+ratings:
+  focus: 8.5
+  novelty: 4.5
+  rigor: 6.5
+  completeness: 7.5
+  concreteness: 7
+  actionability: 5.5
+importance: 72.5
+llmSummary: "Using historical regime collapse data (military regimes: 9 years, single-party: 30 years) and evidence from 80+ countries adopting surveillance technology, this model estimates AI-enabled authoritarian regimes may be 2-3x more durable than historical autocracies, with collapse probability within 20 years dropping from 35-50% to 10-20%. The analysis identifies four blocked collapse pathways (popular uprising, elite defection, security force defection, economic suppression) while noting external pressure and fundamental economic failures remain viable, projecting 50% probability of stable autocracy lasting 50-100+ years."
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Limitations' section (6 placeholders)
+metrics:
+  wordCount: 2486
+  citations: 29
+  tables: 18
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: societal-models
+---
+import { DataInfoBox, Backlinks, Mermaid, R , EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="surveillance-authoritarian-stability" ratings={frontmatter.ratings} />
+
+## Overview
+
+Throughout history, authoritarian regimes have eventually fallen to revolutions, coups, or external pressure. Political scientist Barbara Geddes' research at UCLA shows that military regimes last an average of 9 years, personalist regimes 16.5 years, and single-party regimes nearly 30 years. AI-powered <EntityLink id="surveillance">mass surveillance</EntityLink> fundamentally changes this calculus by addressing the information asymmetries and coordination problems that historically enabled regime change.
+
+This model analyzes whether AI creates durable authoritarianism by making resistance nearly impossible, or whether it introduces new vulnerabilities. The stakes are significant: as of 2024, approximately 65 authoritarian regimes govern nearly 40% of the world's population, and <R id="79e8eaf2d9108898">at least 80 countries have adopted Chinese police and surveillance technology</R>.
+
+**Core Question:** Does AI surveillance enable permanent authoritarianism, or does it just delay the inevitable collapse?
+
+### Key Findings Summary
+
+| Dimension | Pre-AI Baseline | AI-Enhanced Estimate | Evidence Basis |
+|-----------|----------------|---------------------|----------------|
+| **Average regime lifespan** | 9-30 years (by type) | 18-90+ years (projected) | Geddes dataset extrapolation |
+| **P(collapse within 20 years)** | 35-50% | 10-20% | Model estimate |
+| **Coordination capability** | 40/100 | 10/100 | Case studies |
+| **Suppression capacity** | 50/100 | 85/100 | Technology assessment |
+| **Global surveillance adoption** | N/A | 80+ countries | <R id="79e8eaf2d9108898">CNAS testimony</R> |
+
+## Historical Context: Why Authoritarian Regimes Fall
+
+Political science research, particularly the <R id="2351d3c1aca0193a">Geddes-Wright-Frantz Autocratic Regimes dataset</R>, has catalogued 262 authoritarian regimes from 1946 to 2010. This research reveals that regimes collapse through predictable pathways, each of which AI surveillance can disrupt.
+
+### Historical Regime Durability by Type
+
+| Regime Type | Average Lifespan | Key Vulnerability | AI Impact on Vulnerability |
+|-------------|-----------------|-------------------|---------------------------|
+| **Military** | 9 years | Internal coup, factionalism | High: elite monitoring prevents coordination |
+| **Personalist** | 16.5 years | Leader death/incapacity, economic failure | Medium: surveillance can't prevent aging |
+| **Single-party** | 30 years | Economic collapse, elite defection | High: tracks dissent within party |
+| **Monarchy** | 25+ years | Succession crises, modernization pressure | Medium: tradition provides alternative legitimacy |
+| **Semi-democracy** | 9 years | Electoral manipulation exposure | High: surveillance targets opposition |
+
+*Source: Geddes (1999, 2018), UCLA Political Science*
+
+### Collapse Pathways and AI Disruption
+
+Traditional authoritarian regimes collapse through five primary pathways. AI surveillance transforms each:
+
+**1. Popular Uprising** — Citizens organize protests and movements. Historically, regimes lacked information about dissent until too late. AI enables preemptive identification and suppression: <R id="ab07daad4930dfc4">Freedom House reports</R> that in 2024, citizens in 57 of 72 countries covered were arrested for online expression, a record high. The Eastern European revolutions of 1989 succeeded partly because surveillance couldn't scale; modern AI surveillance has no such limitation.
+
+**2. Elite Defection** — Inner circles lose confidence in leaders and coordinate removal. Information asymmetries historically allowed plotting. AI now enables monitoring of generals, ministers, and oligarchs' communications and associations. Russia's <R id="42a5e14076f5b5f5">leaked surveillance documents</R> reveal 11.2 billion rubles (over 111 million euros) allocated for AI surveillance development in 2024-2026, with elite monitoring as a key function.
+
+**3. Security Force Defection** — Military or police refuse to repress. Romania (1989) fell when the Securitate lost control; Egypt's 2011 transition occurred when the military stepped aside. AI surveillance creates a feedback loop: forces that refuse orders are themselves monitored, making defection coordination extremely risky.
+
+**4. Economic Collapse** — Regimes lose ability to provide material benefits. The Soviet Union and various Latin American regimes fell this way. This pathway remains partially viable because AI cannot fix economic fundamentals, though surveillance can suppress the resulting discontent longer than traditional methods.
+
+**5. External Pressure** — Military defeat or international isolation enables opposition. Iraq and Libya are examples. AI surveillance has minimal impact on this pathway.
+
+**Common Thread:** All pathways require coordination among resisters, and regimes face information problems about dissent. AI surveillance transforms both factors, potentially closing four of five pathways.
+
+### Model Framework: Surveillance and Regime Collapse
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph THREATS["Traditional Collapse Threats"]
+        POP[Popular Uprising]
+        ELITE[Elite Defection]
+        MIL[Security Force Defection]
+        ECON[Economic Collapse]
+        EXT[External Pressure]
+    end
+
+    subgraph AI["AI Surveillance Capabilities"]
+        PRED[Predictive Policing]
+        FACIAL[Facial Recognition]
+        COMMS[Communications Monitoring]
+        SOCIAL[Social Network Analysis]
+    end
+
+    subgraph EFFECTS["Suppression Effects"]
+        COORD[Coordination Blocked]
+        PREEMPT[Preemptive Detention]
+        CHILL[Chilling Effects]
+    end
+
+    AI --> EFFECTS
+    EFFECTS --> |"Blocks 70-90%"| POP
+    EFFECTS --> |"Blocks 50-70%"| ELITE
+    EFFECTS --> |"Blocks 40-60%"| MIL
+    EFFECTS --> |"Delays but cannot prevent"| ECON
+    EXT --> |"Unaffected"| REGIME[Regime Survival]
+
+    POP --> |"Reduced"| REGIME
+    ELITE --> |"Reduced"| REGIME
+    MIL --> |"Reduced"| REGIME
+    ECON --> |"Delayed impact"| REGIME
+
+    style AI fill:#ffdddd
+    style EFFECTS fill:#ffeecc
+    style REGIME fill:#ddffdd
+`} />
+
+The model demonstrates that AI surveillance primarily addresses coordination-dependent collapse pathways (popular uprising, elite defection, security force defection) while having limited impact on external pressure and only delaying rather than preventing economically-driven collapse.
+
+## How AI Surveillance Strengthens Authoritarianism
+
+### 1. Perfect Information on Dissent
+
+**Pre-AI Limitations:**
+- Regimes relied on informants (limited coverage)
+- Monitoring required human analysts (bottleneck)
+- Dissidents could operate in shadows
+
+**AI Enhancement:**
+- Facial recognition tracks everyone's movements
+- Communications monitoring at total population scale
+- Behavioral analysis predicts dissent before it manifests
+- Social network analysis identifies potential organizers
+
+**Effect:** Regime knows about opposition before opposition knows about itself.
+
+**Case Study: Xinjiang, China**
+
+The Xinjiang surveillance system represents the most comprehensive AI-enabled population control program documented. According to the <R id="c113de4b5c97e711">Uyghur Human Rights Project (2024)</R>, the region has the world's highest prison rate at 2,234 per 100,000 people. Key statistics:
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| Estimated Uyghurs imprisoned | 449,000 (≈1 in 17) | UHRP, April 2024 |
+| Share of China's prison population | 34% (from 1% of population) | UHRP analysis |
+| People convicted since 2016 | 250,000+ | Human Rights Watch |
+| Biodata collection coverage | 100% (DNA, iris, fingerprints) | Human Rights Watch |
+
+Predictive algorithms reportedly flag patterns such as "If 6 Uyghurs appear in a neighborhood within 20 days." <R id="55e4268835e1e5f3">Human Rights Watch documentation</R> confirms that organized resistance has been effectively impossible under this system.
+
+**Implication:** Surveillance makes the uprising pathway extremely difficult when fully implemented.
+
+### 2. Preemptive Suppression
+
+**Pre-AI:** Regimes respond to protests after they occur
+**AI:** Regimes prevent protests from forming
+
+**Mechanism:**
+- AI identifies potential organizers
+- Preemptive detention or harassment
+- Coordination becomes impossible
+- Movement strangled in cradle
+
+**Effect:** Reduces mass mobilization probability by ~70-90% (estimated)
+
+### 3. Elite Monitoring
+
+Historically, autocrats faced information problems about their own elites. Who's loyal? Who's plotting?
+
+**AI Solution:**
+- Monitor communications of generals, ministers, oligarchs
+- Detect coordination attempts
+- Predict coups before they crystallize
+
+**Case Study: Russia**
+
+Moscow's surveillance infrastructure demonstrates AI-enabled protest suppression at scale. According to <R id="e852883c362d9896">OVD-Info</R>, the human rights monitoring group:
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| Moscow CCTV cameras | 200,000-220,000 | Government data |
+| Cameras with facial recognition | 3,000+ | OVD-Info research |
+| 2022 political arrests | 20,000+ | OVD-Info |
+| Preventative detentions via facial recognition (2022) | 141 confirmed | OVD-Info |
+| Regions using facial recognition | 62 (up from 5 in 2021) | NtechLab |
+| Budget for AI surveillance (2024-2026) | 11.2 billion rubles | Leaked documents |
+
+Key finding: "After spring 2022, mass protests practically disappeared." The system now enables <R id="d25e8cd7fd2cfefe">preventative detention</R> of individuals identified at previous protests, intervening before they can participate again. Following Alexei Navalny's death, cameras identified mourners laying flowers, with at least 19 subsequently detained.
+
+**Implication:** Coup and uprising pathways become significantly harder with comprehensive elite and population monitoring.
+
+### 4. Social Control Through Fear
+
+**Panopticon Effect:** When people know they're watched, they self-censor.
+
+**AI Amplification:**
+- Omnipresent surveillance creates assumption of total monitoring
+- Fear of consequences suppresses not just action but even private thought sharing
+- Social trust erodes (anyone could be informant or could be monitored)
+
+**Measured Effects:**
+- Self-censorship in China: 85%+ avoid politically sensitive topics online (various surveys)
+- VPN usage (attempting to evade surveillance): considered suspicious, itself monitored
+- Chilling effects compound over time
+
+**Implication:** Even if surveillance isn't perfect, belief in surveillance is sufficient.
+
+## Quantitative Durability Model
+
+We can model regime durability as a function of suppression capability vs. discontent:
+
+```
+P(regime collapse) = f(Discontent, Coordination_Capability, Regime_Suppression)
+
+Where:
+Discontent = Economic + Political + Social grievances
+Coordination_Capability = Ability of opposition to organize
+Regime_Suppression = State capacity to prevent/crush resistance
+```
+
+### Pre-AI Baseline
+
+**Typical Authoritarian Regime:**
+- Discontent: 60/100 (moderate)
+- Coordination Capability: 40/100 (secret networks, social media)
+- Suppression: 50/100 (informants, traditional policing)
+
+**P(collapse within 20 years) ≈ 35-50%** (historical base rate)
+
+### AI-Enhanced Surveillance Regime
+
+**With Comprehensive AI Surveillance:**
+- Discontent: 65/100 (increased due to surveillance itself)
+- Coordination Capability: 10/100 (dramatically reduced)
+- Suppression: 85/100 (dramatically increased)
+
+**P(collapse within 20 years) ≈ 10-20%** (model estimate)
+
+**Interpretation:** AI surveillance could reduce regime collapse probability by 60-70%.
+
+**In other words: Authoritarian regimes with AI surveillance might be 2-3x more durable than historical autocracies.**
+
+## Counter-Arguments: Why AI Might Not Ensure Durability
+
+### 1. Technology Dependence Creates Vulnerability
+
+**Thesis:** Regimes dependent on AI surveillance create single point of failure.
+
+**Vulnerabilities:**
+- Cyber attacks could disable surveillance infrastructure
+- Internal sabotage by disaffected technicians
+- Supply chain dependencies (chips, software often foreign)
+- System failures (bugs, outages) create windows of opportunity
+
+**Historical Parallel:** Ceaușescu's Romania fell partly because communication systems were captured by revolutionaries.
+
+**Counter:** Modern regimes have redundancy and can rapidly restore systems. But vulnerability exists.
+
+### 2. AI Surveillance Increases Discontent
+
+**Thesis:** Surveillance is intrusive and resented. It creates new grievances even as it suppresses old ones.
+
+**Mechanisms:**
+- Population resentment of lack of privacy
+- Economic costs of surveillance state (resources diverted from public goods)
+- Perception of injustice from AI errors (false positives, algorithmic bias)
+
+**Quantitative Effect:** Surveillance might increase baseline discontent by 10-20%
+
+**Net Effect:** Even if true, suppression effect likely outweighs discontent increase. But matters at margins.
+
+### 3. External Pressure Remains Viable
+
+**Thesis:** Even if domestic opposition is suppressed, external forces can still apply pressure.
+
+**Mechanisms:**
+- Economic sanctions
+- Military intervention
+- Support for insurgencies
+- Cyber sabotage from outside
+
+**Effectiveness:** Mixed. External pressure historically has limited success absent internal instability.
+
+**AI Surveillance Impact:** Minimal. Doesn't protect against external threats.
+
+### 4. Elite Defection Can't Be Fully Prevented
+
+**Thesis:** Even with surveillance, elites have power and can coordinate.
+
+**Mechanisms:**
+- Elites control surveillance apparatus itself (could turn it against leader)
+- Face-to-face coordination remains possible
+- Elites might coordinate with external actors
+
+**Case Study:** Failed surveillance states (e.g., East Germany's Stasi ultimately couldn't prevent collapse)
+
+**Counter:** East Germany lacked AI-scale surveillance. Modern systems are qualitatively different.
+
+**Verdict:** Uncertain. This is perhaps the strongest counter-argument.
+
+### 5. Economic Necessity Trumps Surveillance
+
+**Thesis:** Regimes still need economic performance. AI can't fix economic fundamentals.
+
+**Mechanism:**
+- Economic collapse creates discontent surveillance can't suppress
+- Sanctions and isolation harm economy
+- Technological dependence creates vulnerabilities to economic leverage
+
+**Effect:** Economic pathway to collapse remains viable even with perfect surveillance
+
+**Implication:** AI extends regime durability but doesn't make it infinite
+
+## Case Studies
+
+### China: Prototype AI Surveillance State
+
+China represents the most advanced and comprehensive AI surveillance state. The <R id="d01dcea0fc975a9e">Australian Strategic Policy Institute (ASPI)</R> reports that China's government AI tools to "automate censorship, enhance surveillance and pre-emptively suppress dissent" have grown substantially more sophisticated in recent years. <R id="ab07daad4930dfc4">Freedom House</R> identifies China as one of the "world's worst environments for internet freedom."
+
+| Component | Scale | Function |
+|-----------|-------|----------|
+| CCTV cameras | ~600 million (≈3 per 7 people) | Physical monitoring |
+| Facial recognition | Nationwide deployment | Identity verification, tracking |
+| Sharp Eyes program | Millions of cameras in public spaces | AI-monitored community surveillance |
+| Social credit system | Covers 1.4 billion citizens | Behavioral incentives |
+| Communications monitoring | WeChat, Weibo, etc. | Real-time content analysis |
+| Xinjiang system | 100% biometric collection | Testing ground for comprehensive surveillance |
+
+**Global Export Dimension:** According to the <R id="c2d3c5e8ef0a4b0b">Carnegie Endowment AI Global Surveillance Index</R>, "Huawei alone is responsible for providing AI surveillance technology to at least 50 countries worldwide. No other company comes close." Chinese technology is linked to surveillance in 63 countries, 36 of which have signed onto China's Belt and Road Initiative.
+
+**Durability Assessment:**
+- CCP has maintained power since 1949 (76 years as of 2025)
+- No serious internal threat visible despite significant economic slowdown
+- Youth unemployment (~20%+) and COVID policy discontent were suppressed effectively
+- Hong Kong protests (2019-2020) contained through combination of police action and national security law
+
+**Projected Durability:** Likely stable for 20+ years barring major external shock or severe economic collapse
+
+**Confidence:** Medium. CCP has multiple sources of legitimacy (economic development, nationalism) beyond surveillance, but surveillance is increasingly central as growth slows.
+
+### Russia: Hybrid Surveillance State
+
+Russia represents a hybrid surveillance state—less comprehensive than China but rapidly expanding. In July 2023, the <R id="78e5940b1afe382a">EU placed Tevian and NtechLab under sanctions</R> because their facial recognition technology was used for "serious human rights violations in Russia, including arbitrary arrests and detentions."
+
+| Component | Coverage | Status |
+|-----------|----------|--------|
+| Moscow CCTV cameras | 200,000-220,000 | Operational |
+| Facial recognition cameras | 3,000+ in Moscow | Expanding to 62 regions |
+| AI surveillance budget | 11.2 billion rubles (2024-2026) | Allocated |
+| Protest suppression (2022) | 20,000+ arrests | Effective |
+| Communications monitoring | Major platforms | Comprehensive |
+
+**Durability Assessment:**
+- Putin regime has faced multiple protest waves (2011-2012, 2022 anti-war)
+- All were suppressed with AI-assisted surveillance; mass protests "practically disappeared" after Spring 2022
+- Opposition leaders systematically monitored and imprisoned (Navalny died in custody, February 2024)
+- Elite loyalty maintained despite war strains; surveillance helps identify potential defectors
+
+**Projected Durability:** Likely stable for 10-20 years depending on Ukraine war outcome
+
+**Confidence:** Medium-Low. Elite dynamics remain uncertain, and economic pressure from sanctions creates stress that surveillance cannot fully address.
+
+### North Korea: Pre-AI Totalitarianism
+
+**Comparison Case:** Extreme surveillance without AI
+
+**System Components:**
+- Neighborhood informant networks (human-based)
+- Total information control
+- Brutal punishment for dissent
+- Generational punishment
+
+**Durability:** 76 years and counting (Kim dynasty since 1948)
+
+**Lesson:** Even without AI, sufficiently comprehensive surveillance enables durability. **AI makes this model exportable at scale.**
+
+### Global Surveillance Technology Proliferation
+
+The export of surveillance technology, primarily from China but also from Western democracies, is enabling the spread of AI-enhanced authoritarianism globally. Research by <R id="ea81f9f6cfd7e2f8">Martin Beraja, David Yang, and Noam Yuchtman</R> demonstrates that "in the world's autocracies, Huawei technology facilitates digital repression" while finding no effect in democracies with stronger privacy laws.
+
+| Supplier | Countries Supplied | Primary Technology | Notable Recipients |
+|----------|-------------------|-------------------|-------------------|
+| **Huawei** | 50+ | AI surveillance, 5G, "Safe City" | Venezuela, Zimbabwe, Pakistan |
+| **Hikvision/Dahua** | 100+ | ≈40% of world's surveillance cameras | Global distribution |
+| **Chinese firms (total)** | 63 | Comprehensive surveillance packages | 36 Belt and Road countries |
+| **Western firms** | 30+ | Targeted surveillance, spyware | Various (more covert) |
+
+*Sources: <R id="c2d3c5e8ef0a4b0b">Carnegie Endowment AIGS Index</R>, <R id="79e8eaf2d9108898">CNAS testimony</R>*
+
+**Regional patterns documented:**
+- **Africa:** Zimbabwe signed a partnership with CloudWalk in 2018 for mass facial recognition; Uganda and Zambia have used Chinese systems to surveil political opponents
+- **Southeast Asia:** Cambodia developing a "National Internet Gateway" modeled on China's Great Firewall; Vietnam and Myanmar implementing restrictive cybersecurity laws following Chinese engagement
+- **Latin America:** Venezuela using Chinese surveillance technology for population monitoring
+- **Central Asia:** Multiple Belt and Road recipients adopting Chinese systems
+
+## Timeline Projections
+
+### 2025-2030: Expansion Phase
+
+**Characteristics:**
+- 30-50 authoritarian/hybrid regimes adopt AI surveillance
+- China exports "Safe City" packages globally
+- Early evidence of increased regime stability
+- Some high-profile dissidents caught via AI
+
+**Collapses:** 1-3 authoritarian regimes (baseline rate)
+**AI Surveillance Role:** Prevents additional 1-2 collapses that would otherwise occur
+
+### 2030-2035: Entrenchment Phase
+
+**Characteristics:**
+- 50-80 regimes with mature AI surveillance
+- 10-15 years of data show increased durability
+- "Color revolutions" effectively impossible in surveilled states
+- Remaining non-surveilled autocracies face instability, incentivizing adoption
+
+**Collapses:** 2-4 regimes (mostly non-surveilled)
+**AI Surveillance Role:** Prevents 3-5 collapses
+
+### 2035+: Equilibrium or Rupture
+
+**Two Scenarios:**
+
+**Scenario A: Stable Autocracy (50% probability)**
+- AI-surveilled regimes achieve unprecedented durability
+- Democratic transitions cease in surveilled states
+- World increasingly divided between democracies and durable autocracies
+- Autocracies persist 50-100+ years without internal collapse
+
+**Scenario B: Technology Backfires (50% probability)**
+- Surveillance creates resentment that eventually overcomes suppression
+- Economic stagnation in autocracies creates pressure surveillance can't contain
+- Cyber vulnerabilities or insider threats undermine systems
+- External pressure (democratic alliance) succeeds in some cases
+- Collapses resume at historical rates after 10-20 year delay
+
+## Policy Implications
+
+### If AI Enables Durable Authoritarianism (Scenario A)
+
+**Implications:**
+- End of "arc of history bends toward democracy"
+- Permanent global autocratic bloc
+- Billions live under stable tyranny
+- Geopolitical competition becomes more entrenched
+
+**Recommended Actions:**
+- Democratic countries must not export surveillance technology
+- Sanctions on surveillance tech exports (U.S. Entity List expansion)
+- Cyber efforts to disrupt authoritarian surveillance infrastructure
+- Support for opposition even if largely symbolic
+- Prepare for long-term coexistence with durable autocracies
+
+### If AI Only Delays Collapse (Scenario B)
+
+**Implications:**
+- Autocracies still eventually fall, just slower
+- Window of 10-20 years of enhanced stability
+- Economic and external pressures matter more than internal dissent
+
+**Recommended Actions:**
+- Economic pressure (sanctions, isolation)
+- Support cyber resistance movements
+- Invest in counter-surveillance technology
+- Patient approach—regimes will eventually fall
+- Maintain engagement to support eventual transition
+
+## Strategic Importance
+
+### Magnitude Assessment
+
+| Dimension | Assessment | Quantitative Estimate |
+|-----------|------------|----------------------|
+| **Potential severity** | Civilizational - permanent autocracy affects billions | 2-4 billion people under AI-enhanced authoritarian control by 2035 |
+| **Probability-weighted importance** | Very High - stable autocracy scenario at 50% | 50% probability of unprecedented regime durability |
+| **Comparative ranking** | Top 5 AI governance risks; distinct from technical alignment | Most significant for global political trajectory |
+| **Timeline** | Ongoing expansion; entrenchment phase 2030-2035 | 30-50 regimes with mature AI surveillance by 2030 |
+
+### Resource Implications
+
+| Category | Current Investment | Recommended | Rationale |
+|----------|-------------------|-------------|-----------|
+| Counter-surveillance technology | \$50-200M/year | \$500M-1B/year | Critical for resistance movements |
+| Surveillance export controls | Limited enforcement | Comprehensive regime | Slow proliferation to additional countries |
+| Research on regime vulnerability | \$10-30M/year | \$50-100M/year | Identify intervention points |
+| Support for civil society in surveilled states | \$100-500M/year | \$1-2B/year | Maintain opposition capacity |
+| Cyber capabilities against surveillance infrastructure | Classified | Significant | Create vulnerability in authoritarian systems |
+
+### Key Cruxes
+
+1. **Economic interdependence:** Can democracies sanction surveillance tech without major economic costs? China supplies critical components; decoupling is expensive.
+2. **Technology asymmetry:** Will counter-surveillance technology (encryption, anonymity tools) keep pace with surveillance? Current trajectory favors surveillance.
+3. **Elite dynamics:** Are coups and elite defection permanently suppressed, or just delayed? This is the weakest link in the surveillance state model.
+4. **Democratic resilience:** Will democracies adopt surveillance for "security" reasons, eroding the distinction? Surveillance creep is observable in democratic states.
+
+## Model Limitations
+
+1. **Historical Data Limited:** Modern AI surveillance is unprecedented; historical analogies imperfect
+
+2. **Unknown Unknowns:** Technologies or social movements we can't predict might change dynamics
+
+3. **Economic Factors Understudied:** Model focuses on political suppression, less on economic determinants
+
+4. **Elite Dynamics Opaque:** Hardest to model; could be crucial factor
+
+5. **Assumes Static Technology:** Counter-surveillance, encryption might evolve to help resisters
+
+## Key Debates
+
+**Is This Permanent?** Some argue AI surveillance creates irreversible lock-in. Others argue all regimes eventually fall.
+
+**Does Legitimacy Matter?** If surveillance makes resistance impossible, does regime legitimacy become irrelevant? Or do fundamental human needs for dignity and freedom create inevitable pressure?
+
+**Can Democracies Resist Adopting Surveillance?** If democracies compete with autocracies, will democratic surveillance become necessary for security, eroding the distinction?
+
+## Related Models
+
+- <EntityLink id="surveillance-chilling-effects" /> - How surveillance affects individual behavior
+- <EntityLink id="winner-take-all-concentration" label="Winner-Take-All Concentration" /> - Power concentration dynamics
+
+## Sources
+
+### Primary Research and Datasets
+
+- **Geddes, Barbara, Joseph Wright, and Erica Frantz.** <R id="2351d3c1aca0193a">"Autocratic Breakdown and Regime Transitions: A New Data Set."</R> *Perspectives on Politics* 12.1 (2014). The foundational dataset on authoritarian regime durability covering 262 regimes (1946-2010).
+
+- **Carnegie Endowment for International Peace.** <R id="c2d3c5e8ef0a4b0b">"AI Global Surveillance Technology."</R> The most comprehensive index of AI surveillance adoption across 176 countries.
+
+- **Feldstein, Steven.** <R id="376a24ba14f02ebc">"The Global Expansion of AI Surveillance."</R> Carnegie Endowment (2019). Foundational study on AI surveillance proliferation.
+
+### Human Rights Documentation
+
+- **Freedom House.** <R id="ab07daad4930dfc4">"The Repressive Power of Artificial Intelligence."</R> *Freedom on the Net 2023*. Annual assessment of internet freedom and AI's role in repression.
+
+- **Human Rights Watch.** <R id="55e4268835e1e5f3">"World Report 2024: China."</R> Comprehensive documentation of human rights situation including surveillance.
+
+- **Uyghur Human Rights Project.** <R id="c113de4b5c97e711">"Analysis Finds 1 in 26 Uyghurs Imprisoned."</R> (April 2024). Statistical analysis of detention rates in Xinjiang.
+
+- **OVD-Info.** <R id="e852883c362d9896">"How the Russian State Uses Cameras Against Protesters."</R> Documentation of facial recognition for political repression in Russia.
+
+### Policy Analysis
+
+- **CNAS.** <R id="79e8eaf2d9108898">"The Dangers of the Global Spread of China's Digital Authoritarianism."</R> Congressional testimony on surveillance technology exports.
+
+- **Beraja, Martin, David Y. Yang, and Noam Yuchtman.** <R id="ea81f9f6cfd7e2f8">"China Is Exporting Its AI Surveillance State."</R> *Project Syndicate* (July 2024). Research on the differential effects of surveillance technology in democracies vs. autocracies.
+
+- **Bulletin of the Atomic Scientists.** <R id="6599034c38c596b2">"How AI Surveillance Threatens Democracy Everywhere."</R> (June 2024). Analysis of global democracy implications.
+
+### Investigative Journalism
+
+- **VSquare.** <R id="42a5e14076f5b5f5">"Kremlin Leaks: How Putin's Regime is Building AI Surveillance Operations."</R> Investigation into Russian surveillance budget and operations.
+
+- **Rest of World.** <R id="e1825f216a436e05">"How Governments Use Facial Recognition for Protest Surveillance."</R> (2024). Global survey of facial recognition deployment against protesters.
+
+- **Australian Strategic Policy Institute.** China AI surveillance report covered in <R id="d01dcea0fc975a9e">CNN</R> (December 2024).
+
+## Related Pages
+
+<Backlinks client:load entityId="surveillance-authoritarian-stability" />

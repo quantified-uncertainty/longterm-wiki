@@ -1,0 +1,282 @@
+---
+title: Texas TRAIGA Responsible AI Governance Act
+description: Comprehensive AI regulation law signed by Governor Greg Abbott in June 2025, establishing prohibitions on harmful AI practices, a regulatory sandbox program, and an AI advisory council
+importance: 45
+lastEdited: "2026-02-01"
+sidebar:
+  order: 50
+ratings:
+  novelty: 4
+  rigor: 6
+  actionability: 5
+  completeness: 7
+quality: 55
+llmSummary: TRAIGA represents a state-level AI regulation focused on intent-based liability for harmful AI practices rather than comprehensive safety requirements, creating enforcement mechanisms but avoiding technical safety standards. The law establishes useful precedent for AI governance but doesn't address core AI safety alignment or existential risk concerns.
+metrics:
+  wordCount: 2686
+  citations: 46
+  tables: 4
+  diagrams: 0
+clusters:
+  - governance
+  - ai-safety
+subcategory: governance-legislation
+---
+import {EntityLink, Backlinks, KeyPeople, KeyQuestions, Section} from '@components/wiki';
+
+## Quick Assessment
+
+| Aspect | Details |
+|--------|---------|
+| **Type** | State-level AI regulation |
+| **Enacted** | June 22, 2025 (effective January 1, 2026) |
+| **Jurisdiction** | Texas, United States |
+| **Key Features** | Intent-based liability, regulatory sandbox, AI advisory council |
+| **Enforcement** | Texas Attorney General (exclusive) |
+| **Penalties** | \$10,000–\$200,000 per violation; up to \$40,000/day for continuing violations |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [capitol.texas.gov](https://capitol.texas.gov/BillLookup/History.aspx?LegSess=89R&Bill=HB149) |
+
+
+## Overview
+
+The **Texas Responsible <EntityLink id="ai-governance">AI Governance</EntityLink> Act (TRAIGA)** is comprehensive state-level artificial intelligence regulation signed into law by Governor Greg Abbott on June 22, 2025, and effective January 1, 2026.[^1][^2] Texas became the third state to adopt comprehensive AI legislation, following Colorado. The law establishes prohibitions on harmful AI practices, creates a regulatory sandbox program for testing innovative AI systems, and establishes the Texas Artificial Intelligence Council to oversee ethical AI development in the public interest.
+
+TRAIGA represents a significant shift from its original December 2024 proposal, which would have imposed sweeping <EntityLink id="eu-ai-act">EU AI Act</EntityLink>-style requirements on private sector AI developers.[^3] The final enacted version focuses on an **intent-based liability framework** that targets purposeful harmful behavior rather than impact-based regulation. This approach emphasizes protecting public safety, individual rights, and privacy while encouraging safe AI advancement—reflecting Texas's effort to balance innovation with consumer protection.[^4]
+
+The Act applies to any entity that develops or deploys an AI system in Texas, advertises or conducts business in the state, or offers products or services used by Texas residents.[^5] TRAIGA defines an "AI system" broadly as "any machine-based system that, for any explicit or implicit objective, infers from the inputs the system receives how to generate outputs, including content, decisions, predictions, or recommendations, that can influence physical or virtual environments."[^6]
+
+## Legislative History
+
+### Original Proposal (December 2024)
+
+State Representative **Giovanni Capriglione** introduced the original draft of TRAIGA in December 2024 as HB 1709, touted as the nation's most comprehensive AI legislation.[^7] The initial bill was modeled after the Colorado AI Act and EU AI Act, with extensive requirements for high-risk AI systems including mandatory impact assessments, consumer protections from foreseeable harm, semiannual risk management reviews, and corrective actions for non-compliance.[^8]
+
+The original version would have imposed substantial private sector obligations and created a detailed regulatory framework focused on identifying and managing high-risk AI applications across various sectors.
+
+### Evolution to Final Version (March 2025)
+
+The bill underwent dramatic transformation between December 2024 and March 2025. In response to stakeholder feedback, the Trump administration's push for AI innovation, and concerns about regulatory burden, Representative Capriglione introduced a significantly pared-back version as HB 149.[^9] This revised bill shifted from comprehensive high-risk AI regulation to a more targeted approach focusing on prohibiting specific harmful AI practices through an intent-based liability framework.
+
+The changes eliminated most private sector obligations such as mandatory impact assessments and risk management requirements, instead concentrating on government transparency requirements and prohibitions against intentional misuse.[^10]
+
+### Legislative Passage
+
+The bill moved rapidly through the Texas legislature in spring 2025:
+
+- **March 14, 2025**: HB 149 filed
+- **April 23, 2025**: Passed Texas House of Representatives 146-3
+- **May 23, 2025**: Unanimously approved by Texas Senate
+- **June 22, 2025**: Signed into law by Governor Greg Abbott
+- **January 1, 2026**: Law took effect[^11]
+
+In July 2025, shortly after TRAIGA's enactment, the U.S. Senate voted 99-1 to remove a proposed 10-year federal moratorium on state AI regulations from President Trump's domestic policy bill, allowing TRAIGA to proceed without federal preemption.[^12]
+
+## Key Provisions
+
+### Prohibited AI Practices
+
+TRAIGA prohibits the development or deployment of AI systems designed with intent for:[^13][^14]
+
+- **Harm to persons**: Including inciting violence, self-harm, or criminal activity
+- **Behavioral manipulation**: Designed to manipulate behavior for harmful purposes
+- **Constitutional rights violations**: Infringing, restricting, or impairing constitutional rights
+- **Unlawful discrimination**: Against protected classes (race, color, national origin, sex, age, religion, disability), with exemptions for certain regulated insurance and financial institution uses
+- **Illegal sexual content**: Production and distribution of sexually explicit conduct, child pornography, or <EntityLink id="deepfakes">deepfakes</EntityLink> impersonating children
+- **Social scoring systems**: By government entities that categorize individuals for detrimental treatment
+
+Critically, **developers and deployers cannot be held liable if end users misuse an AI system for prohibited purposes**—liability depends on the creator's intent, not how the system is actually used.[^15] This represents a significant departure from impact-based liability frameworks in other jurisdictions.
+
+### Government Agency Requirements
+
+For governmental entities specifically, TRAIGA requires:[^16][^17]
+
+- **Mandatory disclosure**: Clear and conspicuous notice to consumers before or at the point of interaction with an AI system, written in plain language without dark patterns, regardless of whether it would be obvious they're interacting with AI
+- **Prohibition on biometric identification**: Restrictions on using AI to uniquely identify persons via biometric data from publicly available sources without consent
+- **No social scoring**: Cannot use AI systems to categorize individuals for detrimental treatment based on behavior or characteristics
+
+### Texas Artificial Intelligence Council
+
+The Act creates the **Texas Artificial Intelligence Council** within the Department of Information Resources, with members serving staggered four-year terms.[^18] The governor appoints the chair, and the council elects a vice chair. The Council is tasked with:[^19]
+
+- Overseeing ethical AI system use and development in the public interest
+- Ensuring AI systems do not harm public safety or undermine individual freedoms through legislative recommendations
+- Making recommendations to state agencies on AI system use to improve efficiency and effectiveness
+- Assisting the state legislature in identifying effective AI policy and law
+- Advising on improvements to the regulatory sandbox program
+- Issuing reports to the legislature on AI system use
+- Conducting training programs and educational outreach for state and local agencies
+
+However, the Council has important limitations: it **cannot adopt binding rules, promulgate guidance, interfere with agency operations, or exercise powers beyond those granted by TRAIGA**.[^20] The Council may establish an advisory board of public experts with technical, ethical, and regulatory expertise.[^21]
+
+### Regulatory Sandbox Program
+
+TRAIGA establishes a **36-month regulatory sandbox program** administered by the Texas Department of Information Resources.[^22] This first-in-nation program allows participating entities to test AI systems without licenses, registration, or other regulatory authorization while certain laws are waived or suspended.
+
+The program is designed to:[^23]
+
+- Promote safe and innovative AI use
+- Encourage responsible deployment
+- Provide clear development guidelines
+- Allow entities to research, train, and test AI systems in sectors like healthcare, finance, and education
+
+Participants must submit applications detailing system descriptions, anticipated benefits, potential risks, and mitigation plans. The Department of Information Resources coordinates with relevant agencies and can remove participants who pose undue public safety risks or violate legal requirements.[^24]
+
+## Enforcement and Penalties
+
+### Enforcement Authority
+
+The **Texas Attorney General has exclusive enforcement authority** for TRAIGA; there is no private right of action for consumers or employees.[^25] Employees and consumers may submit complaints to the AG, who must provide a 60-day cure period before bringing enforcement actions against violators.[^26]
+
+### Penalty Structure
+
+Penalties vary by violation type:[^27][^28]
+
+| Violation Type | Penalty Range |
+|---------------|---------------|
+| Curable violations (after 60-day cure period) | \$10,000–\$12,000 per violation |
+| Uncurable violations | \$80,000–\$200,000 per violation |
+| Continuing violations | \$2,000–\$40,000 per day |
+
+State agencies can also sanction licensed parties found liable under TRAIGA, including license suspension or revocation and monetary penalties up to \$100,000.[^29]
+
+### Safe Harbors and Defenses
+
+TRAIGA includes safe harbor provisions for companies that demonstrate good-faith compliance efforts. Organizations can establish affirmative defenses by implementing testing frameworks such as NIST standards, red-teaming exercises, or bias assessments.[^30] The law also preempts local AI regulation, creating statewide uniformity.[^31]
+
+## Scope and Applicability
+
+TRAIGA applies broadly to any entity that:[^32]
+
+- Develops or deploys an AI system in Texas
+- Advertises, promotes, or conducts business in the state
+- Offers products or services used by Texas residents
+
+This jurisdictional reach means out-of-state companies serving Texas customers must comply with TRAIGA's requirements, similar to how other state privacy laws operate extraterritorially.
+
+The Act's definition of "AI system" is technology-neutral and outcome-focused: "any machine-based system that, for any explicit or implicit objective, infers from the inputs the system receives how to generate outputs, including content, decisions, predictions, or recommendations, that can influence physical or virtual environments."[^33] This broad definition captures machine learning systems, <EntityLink id="language-models">large language models</EntityLink>, recommendation algorithms, and many other automated decision-making technologies.
+
+## Compliance Considerations
+
+Legal experts advise organizations to take several steps to ensure TRAIGA compliance:[^34]
+
+1. **Form AI governance teams**: Establish cross-functional teams with technical, legal, and compliance expertise
+2. **Implement data governance**: Develop robust data management practices to support AI systems
+3. **Create risk frameworks**: Design internal frameworks to assess and mitigate AI-related risks
+4. **Establish monitoring**: Implement ongoing monitoring for bias, model drift, and performance issues
+5. **Document intent**: Maintain thorough documentation to prove lack of harmful intent in AI system design and deployment
+6. **Review existing systems**: Audit current AI deployments for potential compliance issues before January 1, 2026
+
+Companies had approximately six months between the law's enactment in June 2025 and its effective date in January 2026 to prepare compliance programs.[^35]
+
+## Criticisms and Limitations
+
+### Narrow Focus on Intent
+
+TRAIGA's emphasis on **intentional misconduct** distinguishes it from other AI regulatory frameworks but raises concerns about gaps in coverage. The law targets only deliberate harms such as discrimination, manipulation, and illegal content production, potentially overlooking unintentional biases or systemic risks in AI deployment.[^36] Critics note that many harmful <EntityLink id="ai-impacts">AI impacts</EntityLink> arise from negligent design or unintended consequences rather than malicious intent.
+
+The burden of proving intent may create enforcement challenges, as establishing a developer's subjective purpose can be difficult compared to demonstrating measurable impacts or harms.[^37]
+
+### Limited Council Powers
+
+The Texas AI Council's authority is significantly constrained. The Council **cannot adopt binding rules, promulgate guidance, or override agency operations**, limiting its effectiveness in providing clear standards or rapidly responding to emerging AI risks.[^38] This advisory-only structure means the Council's recommendations depend on voluntary adoption by agencies and legislative action for implementation.
+
+### Patchwork Regulation Concerns
+
+TRAIGA adds to a growing **fragmented landscape of state AI laws** in the United States, potentially complicating compliance for businesses operating across multiple states with differing requirements.[^39] While TRAIGA preempts local Texas regulation to create intrastate uniformity, companies must still navigate varying approaches in Colorado, California, and other states pursuing AI legislation.
+
+### Enforcement Constraints
+
+The exclusive reliance on **Attorney General enforcement** with no private right of action means enforcement depends on AG resources and priorities.[^40] The 60-day cure period, while employer-friendly, may delay responses to serious harms. Additionally, the law provides no mechanism for rapid intervention in cases of emergent risks.
+
+### Sandbox Oversight Questions
+
+While the regulatory sandbox program aims to promote innovation, **details about oversight rigor and liability during testing remain unclear**.[^41] The program allows waiver of certain laws, but the extent of regulatory relief and safeguards for participants and affected individuals require further clarification through implementation.
+
+## Relationship to AI Safety
+
+TRAIGA does **not directly address AI safety alignment or existential risk** concerns prominent in the AI safety research community. The law focuses on preventing specific harmful and illegal uses of AI systems in the near term rather than addressing long-term risks from advanced AI development.[^42]
+
+The Act does not impose technical safety standards, alignment testing, or risk assessment protocols typical of existential risk mitigation frameworks. It emphasizes compliance with prohibitions on harmful intent rather than proactive safety engineering or capability evaluations.[^43]
+
+This approach reflects the final law's evolution from the original December 2024 proposal, which was more comprehensive and modeled after frameworks that addressed high-risk systems more broadly. The enacted version prioritizes innovation and compliance flexibility over precautionary technical governance aligned with long-term AI safety concerns.[^44]
+
+## Recent Developments and Implementation
+
+As of February 2026, TRAIGA has been in effect for approximately one month. No enforcement actions, regulatory sandbox participants, or Texas AI Council activities have been publicly reported in available sources as of early 2026.[^45]
+
+Organizations subject to TRAIGA were advised to use the approximately six-month period between enactment and effectiveness to develop compliance programs, audit existing AI systems, and establish governance frameworks.[^46] The Department of Information Resources is responsible for administering the regulatory sandbox and coordinating with the AI Council on implementation.
+
+## Key Uncertainties
+
+Several important questions about TRAIGA's implementation and impact remain:
+
+1. **How will "intent" be established and proven** in enforcement actions? What evidence will suffice to demonstrate that an AI system was designed with prohibited purposes?
+
+2. **What standards will the AI Council develop** for evaluating ethical AI use, and how influential will its recommendations be without binding rulemaking authority?
+
+3. **How will the regulatory sandbox operate in practice?** What specific laws will be waived, what safeguards will protect participants and affected individuals, and how will the program balance innovation with safety?
+
+4. **How will enforcement prioritization work?** With exclusive AG enforcement and limited resources, which violations will receive attention, and will enforcement be consistent?
+
+5. **Will federal AI regulation preempt or harmonize with TRAIGA?** The July 2025 Senate vote preserved state regulatory authority, but future federal legislation could change this landscape.
+
+6. **How will TRAIGA interact with other state AI laws?** As more states adopt different regulatory approaches, how will multistate compliance work in practice?
+
+7. **What constitutes sufficient documentation of non-harmful intent?** What compliance practices will effectively establish safe harbor protections?
+
+## Sources
+
+[^1]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^2]: [Pared-Back Version of the Texas Responsible Artificial Intelligence Governance Act Signed Into Law](https://www.klgates.com/Pared-Back-Version-of-the-Texas-Responsible-Artificial-Intelligence-Governance-Act-Signed-Into-Law-6-24-2025)
+[^3]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^4]: [Texas Legislature Analysis - HB 149](https://capitol.texas.gov/tlodocs/89R/analysis/html/HB00149S.htm)
+[^5]: [Texas Enacts New Law for Employers Using Artificial Intelligence](https://www.berkshireassociates.com/blog/texas-enacts-new-law-for-employers-using-artificial-intelligence)
+[^6]: [Pared-Back Version of the Texas Responsible Artificial Intelligence Governance Act Signed Into Law](https://www.klgates.com/Pared-Back-Version-of-the-Texas-Responsible-Artificial-Intelligence-Governance-Act-Signed-Into-Law-6-24-2025)
+[^7]: [How Texas is Pioneering President Trump's AI Agenda](https://www.workforcebulletin.com/lone-star-state-how-texas-is-pioneering-president-trumps-ai-agenda)
+[^8]: [Draft Texas AI Bill](https://www.mba.org/docs/default-source/policy/state-relations/draft_texas-ai_10.28.24.pdf?sfvrsn=9f83267e_1)
+[^9]: [Pared-Back Version of the Texas Responsible Artificial Intelligence Governance Act Signed Into Law](https://www.klgates.com/Pared-Back-Version-of-the-Texas-Responsible-Artificial-Intelligence-Governance-Act-Signed-Into-Law-6-24-2025)
+[^10]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^11]: [Texas Responsible AI Governance Act (TRAIGA) Overview](https://www.schellman.com/blog/ai-services/texas-responsible-ai-governance-act-traiga)
+[^12]: [How Texas is Pioneering President Trump's AI Agenda](https://www.workforcebulletin.com/lone-star-state-how-texas-is-pioneering-president-trumps-ai-agenda)
+[^13]: [Texas Signs Responsible AI Governance Act into Law](https://www.lw.com/en/insights/texas-signs-responsible-ai-governance-act-into-law)
+[^14]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^15]: [Texas Signs Responsible AI Governance Act into Law](https://www.lw.com/en/insights/texas-signs-responsible-ai-governance-act-into-law)
+[^16]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^17]: [Texas Responsible AI Governance Act Enacted](https://www.wiley.law/alert-Texas-Responsible-AI-Governance-Act-Enacted)
+[^18]: [Texas Legislature Analysis - HB 149](https://capitol.texas.gov/tlodocs/89R/analysis/html/HB00149S.htm)
+[^19]: [Texas Enacts Responsible AI Governance Act, Adding to Patchwork of AI Laws](https://www.sheppardhealthlaw.com/2025/07/articles/artificial-intelligence/texas-enacts-responsible-ai-governance-act-adding-to-patchwork-of-ai-laws/)
+[^20]: [Texas Responsible AI Governance Act Enacted](https://www.wiley.law/alert-Texas-Responsible-AI-Governance-Act-Enacted)
+[^21]: [Texas Legislature Analysis - HB 149](https://capitol.texas.gov/tlodocs/89R/analysis/html/HB00149S.htm)
+[^22]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^23]: [Pared-Back Version of the Texas Responsible Artificial Intelligence Governance Act Signed Into Law](https://www.klgates.com/Pared-Back-Version-of-the-Texas-Responsible-Artificial-Intelligence-Governance-Act-Signed-Into-Law-6-24-2025)
+[^24]: [Texas Legislature Analysis - HB 149](https://capitol.texas.gov/tlodocs/89R/analysis/html/HB00149S.htm)
+[^25]: [Texas Enacts New Law for Employers Using Artificial Intelligence](https://www.berkshireassociates.com/blog/texas-enacts-new-law-for-employers-using-artificial-intelligence)
+[^26]: [Texas Legislature Passes Texas Responsible Artificial Intelligence Governance Act](https://www.hunton.com/privacy-and-information-security-law/texas-legislature-passes-texas-responsible-artificial-intelligence-governance-act)
+[^27]: [Pared-Back Version of the Texas Responsible Artificial Intelligence Governance Act Signed Into Law](https://www.klgates.com/Pared-Back-Version-of-the-Texas-Responsible-Artificial-Intelligence-Governance-Act-Signed-Into-Law-6-24-2025)
+[^28]: [Texas Legislature Passes Texas Responsible Artificial Intelligence Governance Act](https://www.hunton.com/privacy-and-information-security-law/texas-legislature-passes-texas-responsible-artificial-intelligence-governance-act)
+[^29]: [Texas Signs Responsible AI Governance Act into Law](https://www.lw.com/en/insights/texas-signs-responsible-ai-governance-act-into-law)
+[^30]: [Client Alert: Texas Passes TRAIGA](https://www.dickinson-wright.com/news-alerts/client-alert-texas-passes-traiga)
+[^31]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^32]: [Texas Enacts New Law for Employers Using Artificial Intelligence](https://www.berkshireassociates.com/blog/texas-enacts-new-law-for-employers-using-artificial-intelligence)
+[^33]: [Pared-Back Version of the Texas Responsible Artificial Intelligence Governance Act Signed Into Law](https://www.klgates.com/Pared-Back-Version-of-the-Texas-Responsible-Artificial-Intelligence-Governance-Act-Signed-Into-Law-6-24-2025)
+[^34]: [Texas Signs Responsible AI Governance Act into Law](https://www.lw.com/en/insights/texas-signs-responsible-ai-governance-act-into-law)
+[^35]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^36]: [Texas Signs Responsible AI Governance Act into Law](https://www.lw.com/en/insights/texas-signs-responsible-ai-governance-act-into-law)
+[^37]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^38]: [Texas Responsible AI Governance Act Enacted](https://www.wiley.law/alert-Texas-Responsible-AI-Governance-Act-Enacted)
+[^39]: [Client Alert: Texas Passes TRAIGA](https://www.dickinson-wright.com/news-alerts/client-alert-texas-passes-traiga)
+[^40]: [Texas Enacts New Law for Employers Using Artificial Intelligence](https://www.berkshireassociates.com/blog/texas-enacts-new-law-for-employers-using-artificial-intelligence)
+[^41]: [Texas Legislature Analysis - HB 149](https://capitol.texas.gov/tlodocs/89R/analysis/html/HB00149S.htm)
+[^42]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^43]: [Texas Enacts New AI Law](https://www.wilmerhale.com/en/insights/blogs/wilmerhale-privacy-and-cybersecurity-law/20250721-texas-enacts-new-ai-law)
+[^44]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+[^45]: [Texas Signs Responsible AI Governance Act into Law](https://www.lw.com/en/insights/texas-signs-responsible-ai-governance-act-into-law)
+[^46]: [Texas Enacts Responsible AI Governance Act: What Companies Need to Know](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know)
+
+<Backlinks />

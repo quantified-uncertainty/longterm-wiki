@@ -1,0 +1,1185 @@
+# Academic Sources
+# Academic papers, journals, and university research
+# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
+
+- id: a039c6ec78c7a344
+  url: https://www.sciencedirect.com/science/article/pii/S0169207008000320
+  title: Berg et al. (2008)
+  type: web
+  local_filename: a039c6ec78c7a344.txt
+  summary: A study comparing prediction markets to polls across five U.S. Presidential elections found
+    that market predictions were closer to the eventual outcome 74% of the time, particularly when
+    forecasting over 100 days in advance.
+  review: "This research examines the effectiveness of prediction markets, specifically the Iowa
+    Electronic Markets (IEM), in forecasting election outcomes compared to traditional polling
+    methods. The study analyzed 964 polls across five Presidential elections from 1988 to 2004,
+    demonstrating that prediction markets provide more accurate forecasts, especially at longer time
+    horizons. The methodology's strength lies in its direct comparison of market predictions to poll
+    results, without complex statistical adjustments. The authors argue that prediction markets are
+    superior due to several key factors: traders must invest real money, which incentivizes accurate
+    predictions; the market aggregates diverse information dynamically; and participants are
+    motivated to gather and process information effectively. The research significantly contributes
+    to understanding alternative forecasting methods, suggesting that market-based predictive
+    approaches can be more reliable than conventional polling techniques, particularly when trying
+    to forecast election outcomes months in advance."
+  key_points:
+    - Prediction markets were closer to the actual election outcome 74% of the time
+    - Markets significantly outperformed polls when forecasting more than 100 days in advance
+    - Traders' financial stake creates strong incentives for accurate predictions
+  fetched_at: 2025-12-28 02:55:47
+  publication_id: sciencedirect
+- id: 3f7845e45a86b465
+  url: https://www.sciencedirect.com/journal/computers-in-human-behavior
+  title: Computers in Human Behavior
+  type: web
+  cited_by:
+    - cyber-psychosis
+  tags:
+    - compute
+    - mental-health
+    - ai-ethics
+    - manipulation
+  publication_id: sciencedirect
+- id: 120adc539e2fa558
+  url: https://epochai.org/
+  title: Epoch AI
+  type: web
+  local_filename: 120adc539e2fa558.txt
+  summary: Epoch AI provides comprehensive data and insights on AI model scaling, tracking
+    computational performance, training compute, and model developments across various domains.
+  review: >-
+    Epoch AI represents a critical effort to systematically document and analyze the trajectory of
+    artificial intelligence technologies, focusing on quantitative metrics related to computational
+    scaling. Their research provides unique insights into the exponential growth of AI model
+    training compute, demonstrating that training compute for frontier AI models has grown
+    approximately 5x per year since 2020, with significant implications for understanding
+    technological progress.
+
+
+    The project's key contributions include tracking trends in computational performance, training
+    costs, and model complexity across different domains. By maintaining detailed databases of AI
+    models, computing power, and hardware developments, Epoch AI offers a data-driven perspective on
+    AI's rapid evolution. Their work is particularly valuable for researchers, policymakers, and
+    industry professionals seeking to understand the technical and economic dynamics driving AI
+    advancement.
+  key_points:
+    - Training compute for frontier AI models has grown approximately 5x per year since 2020
+    - Over 30 AI models have been trained at the scale of GPT-4 as of June 2025
+    - Total available computing power from NVIDIA chips has grown by approximately 2.3x per year
+      since 2019
+  cited_by:
+    - agi-development
+    - agi-timeline
+    - large-language-models
+    - ai-risk-portfolio-analysis
+    - capability-threshold-model
+    - compounding-risks-analysis
+    - international-coordination-game
+    - racing-dynamics-impact
+    - risk-cascade-pathways
+    - warning-signs-model
+    - ai-forecasting
+    - knowledge-monopoly
+    - proliferation
+    - racing-dynamics
+  fetched_at: 2025-12-28 02:03:52
+  tags:
+    - capabilities
+    - training
+    - compute
+    - prioritization
+    - resource-allocation
+  publication_id: epoch
+- id: c660a684a423d4ac
+  url: https://epoch.ai/
+  title: Epoch AI
+  type: web
+  local_filename: c660a684a423d4ac.txt
+  summary: Epoch AI is a research organization collecting and analyzing data on AI model training
+    compute, computational performance, and technological trends in artificial intelligence.
+  review: >-
+    Epoch AI provides comprehensive insights into the trajectory of AI development, focusing on
+    quantitative metrics like training compute, model scaling, and hardware performance. Their
+    research highlights exponential growth in computational resources dedicated to AI model
+    training, with notable trends such as training compute doubling approximately every six months
+    since 2010.
+
+
+    Their methodology involves collecting and analyzing data from published AI models across domains
+    like language, vision, and games, tracking metrics such as floating-point operations (FLOP),
+    training costs, and computational performance. While their approach provides valuable empirical
+    insights, limitations include potential selection bias in model reporting and the challenge of
+    comprehensively capturing global AI development.
+  key_points:
+    - Training compute for frontier AI models has grown by approximately 5x per year since 2020
+    - Over 30 AI models have been trained at the scale of GPT-4 as of June 2025
+    - Total available computing power from NVIDIA chips doubles approximately every 10 months
+  fetched_at: 2025-12-28 01:09:04
+  tags:
+    - capabilities
+    - training
+    - compute
+  publication_id: epoch
+- id: e4dcabf233a3f7f6
+  url: https://epoch.ai/blog/algorithmic-progress-in-language-models
+  title: Epoch AI algorithmic progress
+  type: web
+  local_filename: e4dcabf233a3f7f6.txt
+  summary: A comprehensive analysis of language model algorithmic progress reveals rapid efficiency
+    improvements, with compute requirements halving approximately every 8 months. However, compute
+    scaling contributes 60-95% of performance improvements.
+  review: >-
+    Epoch AI's research provides a rigorous quantitative analysis of algorithmic progress in
+    language models, focusing on how technological innovations have reduced computational
+    requirements for achieving specific performance levels. The study finds an extraordinary rate of
+    algorithmic improvement, with compute needs halving roughly every 8 months—a pace significantly
+    faster than Moore's Law and algorithmic progress in other computing domains.
+
+
+    While the findings highlight remarkable efficiency gains, the research also reveals that compute
+    scaling remains the primary driver of performance improvements. Through Shapley value analysis,
+    the authors estimate that 60-95% of performance gains come from increased compute and training
+    data, with algorithmic innovations contributing only 5-40%. Notable algorithmic breakthroughs
+    like the transformer architecture and Chinchenko scaling laws have been significant, but their
+    impact is dwarfed by massive compute scaling. The study acknowledges several limitations,
+    including difficulties in precisely attributing performance improvements and uncertainties in
+    modeling algorithmic progress, which underscore the complexity of quantifying technological
+    advancement in AI.
+  key_points:
+    - Compute requirements for language models halve approximately every 8 months
+    - Compute scaling contributes 60-95% of performance improvements
+    - Transformer architecture represents a major algorithmic breakthrough
+    - Algorithmic progress in language models outpaces many other computing domains
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:08:01
+  tags:
+    - capabilities
+    - compute
+    - llm
+  publication_id: epoch
+- id: 6826ca9823556158
+  url: https://epoch.ai/data-insights/computing-capacity
+  title: Epoch AI computing capacity
+  type: web
+  local_filename: 6826ca9823556158.txt
+  summary: Epoch AI analyzed computing capacity across leading tech companies, estimating their AI
+    chip holdings in H100 equivalents. Google, Microsoft, Meta, and Amazon collectively own
+    substantial AI computing power, primarily through NVIDIA and Google's TPU chips.
+  review: Epoch AI's analysis provides a comprehensive overview of AI computing capacity among leading
+    tech companies, offering unprecedented insight into the computational infrastructure driving
+    advanced AI development. By converting various chip types to H100 equivalents, the research
+    enables direct comparisons of computational power across different organizations and chip
+    architectures. The methodology combines NVIDIA revenue data, chip sales estimates, and TPU
+    deployment reports to create probabilistic estimates of computing capacity. Key findings reveal
+    that companies like Google may have access to over one million H100-equivalent chips, with
+    Microsoft likely possessing around 500,000. The research highlights the concentration of AI
+    computing power among a few major tech players while acknowledging significant uncertainty in
+    precise estimates. This work is crucial for understanding the computational landscape underlying
+    current and future AI capabilities, offering valuable insights for AI safety researchers and
+    policymakers tracking computational trends.
+  key_points:
+    - Google potentially has over one million H100-equivalent chips, primarily through NVIDIA and
+      TPU technologies
+    - Microsoft likely owns around 500,000 H100-equivalent chips, making it a major computational
+      power holder
+    - The analysis covers the period from 2022 to mid-2024, capturing a critical phase of AI
+      infrastructure development
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:07:58
+  tags:
+    - compute
+  publication_id: epoch
+- id: eefd99cc15906eab
+  url: https://epoch.ai/data-insights/nvidia-chip-production
+  title: Epoch AI GPU production tracking
+  type: web
+  local_filename: eefd99cc15906eab.txt
+  summary: Epoch AI tracked NVIDIA GPU computing power growth, finding a 2.3x annual increase since
+    2019. The Hopper generation currently dominates with 77% of total AI hardware computing power.
+  review: Epoch AI conducted a comprehensive analysis of NVIDIA's GPU computing power trajectory,
+    revealing a remarkable exponential growth pattern in AI hardware capabilities. By integrating
+    data from AI cluster datasets, financial reports, and hardware performance metrics, they
+    estimated the total available computing power and its evolution over time. The research provides
+    critical insights into the rapid advancement of AI computing infrastructure, demonstrating that
+    the stock of NVIDIA chips is expanding at an impressive rate of 2.3x annually. This growth has
+    significant implications for AI development, suggesting an accelerating capacity for training
+    increasingly complex machine learning models. The study also highlights the quick depreciation
+    of older GPU generations, with the current Hopper generation representing 77% of total computing
+    power, indicating a fast-paced technological turnover in AI hardware.
+  key_points:
+    - NVIDIA GPU computing power doubles approximately every 10 months
+    - Current estimated computing power is around 4e21 FLOP/s
+    - Hopper generation accounts for 77% of AI hardware computing power
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:07:58
+  tags:
+    - compute
+  publication_id: epoch
+- id: a4ed6ea28bb1c34a
+  url: https://epoch.ai/blog/optimally-allocating-compute-between-inference-and-training
+  title: Epoch AI inference allocation
+  type: web
+  local_filename: a4ed6ea28bb1c34a.txt
+  summary: A theoretical analysis suggests that the most efficient compute spending for AI models
+    involves approximately equal investment in training and inference, with techniques like pruning
+    and sampling allowing compute trade-offs.
+  review: >-
+    This analysis explores the training-inference compute tradeoff, a critical concept in
+    understanding how computational resources are optimally allocated in AI model development. The
+    key insight is that techniques like overtraining, pruning, chain-of-thought prompting, and
+    repeated sampling allow labs to trade compute between training and inference without
+    significantly degrading model performance.
+
+
+    The methodology involves mathematical modeling and empirical observations from existing AI
+    models, demonstrating that when labs can trade roughly one order of magnitude of training
+    compute for one order of magnitude reduction in inference compute, the optimal strategy is to
+    spend approximately equal amounts on training and inference. This counterintuitive result
+    challenges naive assumptions that one phase should dominate computational investment.
+  key_points:
+    - Compute can be traded between training and inference with minimal performance loss
+    - Optimal compute allocation tends to be roughly 50/50 between training and inference
+    - Multiple techniques like pruning and sampling enable compute trade-offs
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:08:02
+  tags:
+    - training
+    - compute
+  publication_id: epoch
+- id: fd8f9f551acc3e69
+  url: https://epoch.ai/data-insights/models-over-1e25-flop
+  title: Epoch AI model database
+  type: web
+  local_filename: fd8f9f551acc3e69.txt
+  summary: Epoch AI analyzed the landscape of large-scale AI models, identifying over 30 models
+    trained with more than 10^25 floating-point operations (FLOP). The analysis covers models from
+    leading AI developers across language, reasoning, and multimodal domains.
+  review: The Epoch AI model database provides a comprehensive tracking of AI models trained at
+    unprecedented computational scales, representing a critical resource for understanding AI
+    technological progress. By meticulously examining model releases from major AI labs like OpenAI,
+    Google, Meta, and others, the researchers developed a systematic methodology to estimate
+    training compute using a combination of direct reporting, benchmark performance, and expert
+    estimation techniques. The research is significant for AI safety because it offers unprecedented
+    transparency into the computational scale of frontier AI models, which is a key indicator of
+    potential capabilities and risks. By tracking models exceeding 10^25 FLOP, the database helps
+    researchers, policymakers, and AI safety experts monitor the rapid advancement of large AI
+    systems. The study also highlights emerging trends like the proliferation of high-compute
+    models, with approximately two models per month reaching this threshold in 2024, and provides
+    insights into regulatory implications like the EU AI Act's upcoming requirements for such
+    large-scale models.
+  key_points:
+    - Over 30 AI models trained with more than 10^25 FLOP since March 2023
+    - Models estimated using benchmark performance, training details, and expert analysis
+    - Training such models costs tens of millions of dollars
+    - Regulatory frameworks like EU AI Act will apply to models at this computational scale
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:07:58
+  publication_id: epoch
+- id: e5457746f2524afb
+  url: https://epoch.ai/data-insights/openai-compute-spend
+  title: Epoch AI OpenAI compute spend
+  type: web
+  local_filename: e5457746f2524afb.txt
+  summary: Epoch AI analyzed OpenAI's 2024 compute spending, estimating $5 billion in R&D compute and
+    $2 billion in inference compute. Most compute was likely used for experimental and unreleased
+    model training.
+  review: >-
+    The Epoch AI analysis provides a comprehensive breakdown of OpenAI's computational expenditure
+    in 2024, revealing significant investments in cloud computing infrastructure. By examining
+    reports from The Information and The New York Times, the researchers estimated OpenAI's total
+    compute spending at approximately $7 billion, with $5 billion dedicated to research and
+    development and $2 billion to inference compute.
+
+
+    The study's methodology involves detailed estimates of training compute costs for models like
+    GPT-4.5, GPT-4o, and Sora Turbo, using confidence intervals and assumptions about cluster sizes,
+    training durations, and GPU costs. The analysis highlights that most of OpenAI's compute
+    resources were likely allocated to experimental and unreleased model training runs, rather than
+    final production models. This insight offers valuable transparency into the computational
+    resources required for cutting-edge AI development and underscores the massive investments
+    needed to maintain leadership in frontier AI technologies.
+  key_points:
+    - OpenAI spent approximately $7 billion on compute in 2024
+    - Majority of compute was used for research and experimental training
+    - Estimates based on investor documents and industry trends
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:09:00
+  tags:
+    - training
+    - compute
+  publication_id: epoch
+- id: 8184b32280fed0ce
+  url: https://epoch.ai/blog/tracking-large-scale-ai-models
+  title: Epoch AI tracking
+  type: web
+  local_filename: 8184b32280fed0ce.txt
+  summary: Epoch AI presents a comprehensive dataset tracking the development of large-scale AI
+    models, showing exponential growth in training compute and model complexity across various
+    domains.
+  review: >-
+    The Epoch AI tracking project provides a critical overview of the rapidly evolving landscape of
+    large-scale AI models. By establishing a threshold of 10^23 floating point operations (FLOP) for
+    'large-scale' models, the researchers have mapped the exponential growth of computational
+    resources dedicated to AI development. In just four years, the number of models meeting this
+    threshold has grown from 2 in 2020 to 81 in 2024, with a clear dominance of language models.
+
+
+    The study's methodology involves an exhaustive search process, tracking models across various
+    domains and geographies. Key insights include the concentration of model development in the
+    United States (over 50%) and China (about 25%), and the increasing diversity of model
+    applications beyond pure language tasks. The research also highlights the potential implications
+    for AI regulation, as compute thresholds become a critical metric for monitoring technological
+    progress and potential risks.
+  key_points:
+    - Exponential growth in large-scale AI models, from 2 models in 2020 to 81 in 2024
+    - 85% of large-scale models are language models, with increasing diversity in domains
+    - Over half of models developed in the United States, with significant contributions from China
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:07:59
+  tags:
+    - training
+    - compute
+  publication_id: epoch
+- id: 61f779ab178f217b
+  url: https://epoch.ai/blog/trends-in-the-dollar-training-cost-of-machine-learning-systems
+  title: Epoch AI training costs
+  type: web
+  local_filename: 61f779ab178f217b.txt
+  summary: A comprehensive study examining the dollar cost of training machine learning systems shows
+    training costs have been increasing by around 0.5 orders of magnitude annually, with significant
+    uncertainties and variations between different types of systems.
+  review: >-
+    This research provides a critical examination of the economic trends in AI training, focusing on
+    how the dollar cost of training machine learning systems has evolved between 2009 and 2022. By
+    analyzing a dataset of 124 machine learning systems, the study estimates that training costs
+    have grown by approximately 0.49 orders of magnitude per year, with a 90% confidence interval
+    ranging from 0.37 to 0.56. This growth rate is notably slower than the concurrent growth in
+    computational capabilities, suggesting potential constraints or strategic choices in AI
+    development.
+
+
+    The methodology employs two primary estimation approaches: one using an overall GPU
+    price-performance trend and another using the specific hardware prices of the GPUs used in
+    training. The research highlights significant uncertainties in cost estimation, including
+    variability in hardware prices, utilization rates, and the specific economic contexts of
+    different AI projects. Importantly, the study finds that large-scale systems show a slower
+    growth rate of about 0.2 orders of magnitude per year, indicating potential economic or
+    technological limitations in scaling AI training infrastructure.
+  key_points:
+    - Training costs for AI systems have grown by approximately 0.5 orders of magnitude per year
+      from 2009-2022
+    - Large-scale AI systems show a slower cost growth rate of about 0.2 orders of magnitude per year
+    - Significant uncertainties exist in cost estimation methods and underlying assumptions
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:07:59
+  tags:
+    - training
+  publication_id: epoch
+- id: 7799bbdc58fe571f
+  url: https://www.sciencedirect.com/science/article/abs/pii/S0736585324001278
+  title: Ittefaq et al. (2024)
+  type: web
+  local_filename: 7799bbdc58fe571f.txt
+  summary: A comprehensive analysis of AI news coverage in 12 newspapers from 2010-2023 using topic
+    modeling and sentiment analysis. The study reveals differences in AI framing between Global
+    North and South media outlets.
+  review: This study provides a comprehensive examination of how artificial intelligence is portrayed
+    in news media across 12 countries, bridging a significant research gap in understanding global
+    media representations of AI. Using Latent Dirichlet Allocation (LDA) topic modeling and
+    sentiment analysis, the researchers analyzed 38,787 news articles to identify prevalent frames
+    and sentiment tones in AI coverage. The research reveals critical insights into how different
+    regions frame AI, with Global North newspapers giving lower coverage to AI solutions and
+    healthcare applications, while Global South media emphasized economic cooperation. The sentiment
+    analysis showed a predominantly neutral tone (65.63%), with 21.04% negative and 13.33% positive
+    headlines. Notably, newspapers like The Guardian and The New York Times tended to frame AI more
+    negatively, while China Daily and Bangkok Post presented more positive perspectives. This study
+    contributes significantly to understanding how media framing shapes public perception of AI and
+    highlights the divergent narratives emerging from different global contexts.
+  key_points:
+    - Analyzed AI news coverage across 12 countries from 2010-2023 using advanced text analysis
+      techniques
+    - Identified nine major frames of AI coverage, with business and economic impacts being most
+      prevalent
+    - Revealed significant differences in AI framing between Global North and South media outlets
+  cited_by:
+    - public-opinion
+  fetched_at: 2025-12-28 02:54:35
+  publication_id: sciencedirect
+- id: 2d9ad53e8ba08df4
+  url: https://www.cambridge.org/core/journals/perspectives-on-psychological-science/article/inoculating-against-fake-news-about-covid19/7E4AA9F7B7E78CAF22F21DB01F03EC2A
+  title: "Sander van der Linden: Inoculation Theory"
+  type: web
+  fetched_at: 2025-12-28 02:55:57
+  publication_id: cambridge
+- id: 1db7de7741f907e5
+  url: https://hai.stanford.edu/ai-index/2025-ai-index-report/economy
+  title: Stanford AI Index 2025
+  type: web
+  local_filename: 1db7de7741f907e5.txt
+  summary: The 2025 AI Index Report documents massive growth in global AI private investment, with the
+    U.S. leading in funding and organizational AI adoption reaching 78%. The report highlights
+    transformative impacts across business functions and technological domains.
+  review: The Stanford AI Index 2025 provides a comprehensive snapshot of the global AI landscape,
+    revealing unprecedented growth and transformation across technological, economic, and regional
+    dimensions. The report's key contribution is documenting the dramatic expansion of AI investment
+    and adoption, with private AI investment reaching $252.3 billion in 2024 and organizational AI
+    use jumping from 55% to 78% in just one year. The report's methodology combines quantitative
+    investment data, organizational surveys, and technological trend analysis to paint a nuanced
+    picture of AI's evolving role. Particularly noteworthy are the regional dynamics, with the U.S.
+    maintaining a significant lead in AI investment, and emerging markets like Greater China showing
+    rapid growth. The findings suggest AI is not just a technological phenomenon but a critical
+    economic driver, with early evidence of productivity gains and skill gap bridging across various
+    business functions. While the report offers an optimistic view of AI's potential, it also
+    implicitly highlights the need for careful governance and strategic investment to manage the
+    technology's rapid development.
+  key_points:
+    - U.S. leads global AI investment with $109.1 billion in 2024, dwarfing other nations
+    - Organizational AI adoption surged from 55% to 78% in one year
+    - Generative AI funding grew 8.5x since 2022, representing 20% of AI investment
+    - AI shows promising productivity impacts across business functions
+  cited_by:
+    - economic-labor
+  fetched_at: 2025-12-28 01:09:09
+  publication_id: hai-stanford
+- id: da87f2b213eb9272
+  url: https://hai.stanford.edu/ai-index/2025-ai-index-report
+  title: Stanford AI Index 2025
+  type: web
+  local_filename: da87f2b213eb9272.txt
+  summary: The 2025 AI Index Report from Stanford HAI offers a detailed analysis of AI's
+    technological, economic, and social developments. It highlights key trends in performance,
+    investment, global leadership, and responsible AI adoption.
+  review: The Stanford AI Index 2025 represents a critical annual assessment of artificial
+    intelligence's rapid evolution, offering an unprecedented, data-driven panorama of AI's global
+    landscape. The report meticulously tracks developments across multiple dimensions, including
+    technical performance, economic investment, responsible AI practices, and public perception,
+    providing stakeholders with a nuanced understanding of AI's transformative potential and
+    emerging challenges. The report's key strengths lie in its comprehensive methodology, drawing
+    from diverse global sources to present an unbiased view of AI's progress. Notable findings
+    include the substantial improvements in AI benchmark performance, record-breaking private
+    investment (particularly in the US), and the narrowing technological gaps between global AI
+    leaders. The analysis also critically examines responsible AI development, highlighting both
+    progress and persistent challenges in areas like safety evaluation, governance, and ethical
+    deployment. By offering granular insights into AI's technical, economic, and societal
+    dimensions, the report serves as an essential resource for policymakers, researchers, and
+    industry leaders seeking to navigate the complex and rapidly evolving AI landscape.
+  key_points:
+    - AI performance on benchmarks continues to improve dramatically
+    - Global AI investment reached record levels, with US leading private sector developments
+    - Responsible AI ecosystem is evolving, with increasing government and industry attention
+  cited_by:
+    - structural
+    - critical-uncertainties
+    - governance-focused
+  fetched_at: 2025-12-28 02:54:53
+  publication_id: hai-stanford
+  tags:
+    - capabilities
+    - economic
+- id: d2b4293d703f4451
+  url: https://hai.stanford.edu/ai-index/2025-ai-index-report/public-opinion
+  title: Stanford HAI AI Index
+  type: web
+  local_filename: d2b4293d703f4451.txt
+  summary: A comprehensive global survey examining public perceptions of AI across 26 nations,
+    tracking changes in attitudes towards AI's benefits, risks, and potential impacts on society and
+    work.
+  review: The Stanford HAI AI Index report provides a nuanced snapshot of global public opinion on
+    artificial intelligence, highlighting a gradual shift towards cautious optimism. The research
+    reveals that from 2022 to 2024, the percentage of people viewing AI products and services as
+    beneficial has increased from 52% to 55%, with two-thirds of respondents expecting significant
+    AI impact on daily life within the next three to five years. Despite this growing optimism, the
+    report also underscores persistent concerns and regional variations. While countries like China
+    (83%), Indonesia (80%), and Thailand (77%) show high AI optimism, Western nations like the
+    United States (39%) and Canada (40%) remain more skeptical. Additionally, there are emerging
+    concerns about data privacy, algorithmic bias, and potential job displacement, with 60% of
+    workers expecting AI to change their jobs and 36% fearing potential job replacement. The report
+    also highlights growing support for AI regulation, with 73.7% of local U.S. policymakers
+    advocating for regulatory frameworks, signaling a maturing public discourse around AI's societal
+    integration.
+  key_points:
+    - Global AI optimism has increased from 52% to 55% between 2022-2024
+    - Two-thirds of people expect significant AI impact on daily life in next 3-5 years
+    - Regional variations exist, with Asian countries showing higher AI optimism
+    - Growing support for AI regulation and concerns about data privacy and job displacement
+  cited_by:
+    - public-opinion
+  fetched_at: 2025-12-28 02:54:35
+  publication_id: hai-stanford
+- id: 4213de3094dc4264
+  url: https://hai.stanford.edu/ai-index/2025-ai-index-report/policy-and-governance
+  title: "Stanford HAI: 2025 AI Index Report - Policy and Governance"
+  type: web
+  local_filename: 4213de3094dc4264.txt
+  summary: The 2025 AI Index Report highlights significant growth in AI-related legislation,
+    government investments, and international safety collaboration across multiple countries.
+  review: >-
+    The Stanford HAI AI Index Report reveals a dramatic acceleration in AI policy and governance
+    efforts worldwide. In 2023, state-level AI legislation in the U.S. surged from just one law in
+    2016 to 131 in 2024, demonstrating a rapid and expansive regulatory response to AI's growing
+    impact. Governments are simultaneously investing heavily in AI infrastructure, with countries
+    like Canada, China, France, India, and Saudi Arabia committing billions of dollars to AI and
+    semiconductor development, signaling a global recognition of AI's strategic importance.
+
+
+    Particularly notable is the international coordination around AI safety, with multiple countries
+    establishing AI safety institutes following the AI Safety Summit in 2023. The report shows a
+    21.3% increase in AI mentions in legislative proceedings across 75 countries, underscoring the
+    global policy community's heightened focus on AI governance. The expansion of deepfake
+    regulations and the proliferation of federal AI-related regulations in the U.S. further
+    illustrate the emerging comprehensive approach to managing AI's societal implications, balancing
+    innovation with risk mitigation.
+  key_points:
+    - State-level AI legislation in the U.S. grew from 1 law in 2016 to 131 in 2024
+    - Global governments are investing billions in AI and semiconductor infrastructure
+    - International AI safety institutes are rapidly expanding across multiple countries
+    - AI mentions in legislative proceedings increased 21.3% in 2024
+  fetched_at: 2025-12-28 02:03:38
+  publication_id: hai-stanford
+  tags:
+    - governance
+    - safety
+- id: c0a5858881a7ac1c
+  url: https://hai.stanford.edu/
+  title: "Stanford HAI: AI Companions and Mental Health"
+  type: web
+  cited_by:
+    - cyberweapons-attack-automation
+    - racing-dynamics-impact
+    - safety-research-allocation
+    - warning-signs-model
+    - alignment
+    - red-teaming
+    - evaluation
+    - governance-policy
+    - public-education
+    - cyber-psychosis
+    - knowledge-monopoly
+    - learned-helplessness
+    - reality-fragmentation
+    - disinformation
+    - racing-dynamics
+    - warning-signs
+  publication_id: hai-stanford
+  tags:
+    - timeline
+    - automation
+    - cybersecurity
+    - risk-factor
+    - competition
+- id: cfd7b21d0ae4298d
+  url: https://hai.stanford.edu/news/disinformation-machine-how-susceptible-are-we-ai-propaganda
+  title: "Stanford HAI: The Disinformation Machine"
+  type: web
+  publication_id: hai-stanford
+- id: 1a26f870e37dcc68
+  url: https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance
+  title: Technical Performance - 2025 AI Index Report
+  type: web
+  local_filename: 1a26f870e37dcc68.txt
+  summary: The 2025 AI Index Report highlights dramatic improvements in AI model performance,
+    including faster benchmark mastery, convergence of model capabilities, and emerging reasoning
+    paradigms.
+  review: The report provides a comprehensive overview of AI technical performance in 2024-2025,
+    demonstrating unprecedented rates of progress across multiple dimensions. Key trends include
+    rapid improvement in benchmark performance, with AI solving increasingly complex problems—for
+    instance, jumping from 4.4% to 71.7% on SWE-bench coding challenges, and narrowing performance
+    gaps between open and closed-weight models, as well as between US and Chinese AI systems. The
+    research reveals critical nuances in AI development, such as the emergence of smaller, more
+    efficient models like Microsoft's Phi-3-mini achieving high performance with significantly fewer
+    parameters, and the introduction of novel reasoning techniques like test-time compute. However,
+    the report also highlights persistent challenges, particularly in complex reasoning and
+    long-horizon tasks, suggesting that while AI capabilities are expanding dramatically,
+    fundamental limitations remain in areas requiring sustained logical reasoning and strategic
+    planning.
+  key_points:
+    - AI performance on challenging benchmarks improved dramatically in 2024-2025
+    - Performance gaps between different model types and regions are rapidly converging
+    - Smaller models are achieving higher performance with fewer parameters
+    - Complex reasoning and long-horizon tasks remain significant challenges
+  fetched_at: 2025-12-28 01:07:53
+  cited_by:
+    - tool-use
+  publication_id: hai-stanford
+  tags:
+    - capabilities
+    - evaluation
+    - computer-use
+    - function-calling
+    - api-integration
+- id: fa779b112eb03198
+  url: https://hai.stanford.edu/news/ai-persuasion
+  title: Stanford HAI (2024)
+  type: web
+  cited_by:
+    - persuasion
+  publication_id: hai-stanford
+  tags:
+    - social-engineering
+    - manipulation
+    - deception
+- id: b029bfc231e620cc
+  url: https://epoch.ai/trends
+  title: Epoch AI
+  type: web
+  cited_by:
+    - compute-hardware
+    - capability-threshold-model
+  publication_id: epoch
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+- id: 7d0515f6079d8beb
+  url: https://epoch.ai/blog/training-compute-of-frontier-ai-models-grows-by-4-5x-per-year
+  title: Epoch AI
+  type: web
+  cited_by:
+    - compute-hardware
+    - capability-threshold-model
+  publication_id: epoch
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+- id: 5d060ee231580656
+  url: https://epoch.ai/data-insights/open-weights-vs-closed-weights-models
+  title: Epoch AI research from October 2025
+  type: web
+  cited_by:
+    - lab-behavior
+  publication_id: epoch
+- id: 2efa03ce0d906d78
+  url: https://epochai.org/blog/trends-in-machine-learning-hardware
+  title: Epoch AI
+  type: web
+  cited_by:
+    - capability-alignment-race
+    - concentration-of-power
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+  publication_id: epoch
+- id: 9fc081c471fb3bb0
+  url: https://hai.stanford.edu/news/humans-are-more-likely-believe-messages-ai
+  title: Stanford HAI study
+  type: web
+  cited_by:
+    - capability-threshold-model
+  publication_id: hai-stanford
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+- id: 1b76c90a236aea24
+  url: https://hai.stanford.edu/policy
+  title: Research by Stanford's Human-Centered AI Institute
+  type: web
+  cited_by:
+    - international-coordination-game
+  publication_id: hai-stanford
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+- id: dff8fae99b47e61d
+  url: https://www.epochai.org/blog/trends-in-the-dollar-training-cost-of-machine-learning-systems
+  title: Compute trend analysis
+  type: web
+  cited_by:
+    - proliferation-risk-model
+  tags:
+    - compute
+    - risk-factor
+    - diffusion
+    - control
+  publication_id: epoch
+- id: 9c49c7c29ce5d079
+  url: https://epochai.org/blog/tracking-compute-per-dollar
+  title: Epoch AI
+  type: web
+  cited_by:
+    - racing-dynamics-impact
+  tags:
+    - risk-factor
+    - competition
+    - game-theory
+  publication_id: epoch
+- id: e11b8206d307690a
+  url: https://hai.stanford.edu/news/academic-integrity-age-ai
+  title: Stanford study
+  type: web
+  cited_by:
+    - risk-activation-timeline
+  publication_id: hai-stanford
+  tags:
+    - timeline
+    - capability
+    - risk-assessment
+- id: d1c7d3fe408d3988
+  url: https://epochai.org/blog/compute-trends
+  title: Current compute trends
+  type: web
+  cited_by:
+    - risk-activation-timeline
+  tags:
+    - compute
+    - timeline
+    - capability
+    - risk-assessment
+  publication_id: epoch
+- id: 6ad4c5252100a556
+  url: https://hai.stanford.edu/news/study-finds-chatgpt-boosts-worker-productivity-14
+  title: Stanford HAI research
+  type: web
+  cited_by:
+    - risk-cascade-pathways
+  publication_id: hai-stanford
+  tags:
+    - cascades
+    - risk-pathways
+    - systems-thinking
+- id: 372e9f38880996cb
+  url: https://hai.stanford.edu/research
+  title: Stanford HAI Research
+  type: web
+  cited_by:
+    - risk-interaction-network
+  publication_id: hai-stanford
+  tags:
+    - networks
+    - risk-interactions
+    - systems-thinking
+- id: 342acf7e721544e6
+  url: https://epochai.org/blog/trends-in-machine-learning-funding
+  title: Epoch AI (2024)
+  type: web
+  cited_by:
+    - safety-research-value
+  tags:
+    - cost-effectiveness
+    - research-priorities
+    - expected-value
+  publication_id: epoch
+- id: 835981f69d1bf99a
+  url: https://epochai.org/data/epochdb/visualization
+  title: Epoch's compute database
+  type: web
+  cited_by:
+    - epoch-ai
+  tags:
+    - compute
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+  publication_id: epoch
+- id: 22818e0a00496c03
+  url: https://epochai.org/blog/will-we-run-out-of-data
+  title: '"Will We Run Out of Data?"'
+  type: web
+  cited_by:
+    - epoch-ai
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+  publication_id: epoch
+- id: 07b3dfad309f0eb3
+  url: https://epochai.org/data/epochdb
+  title: Real-time updates
+  type: web
+  cited_by:
+    - epoch-ai
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+  publication_id: epoch
+- id: 8a3ab5bfcf7a96f8
+  url: https://epochai.org/blog
+  title: epochai.org/blog
+  type: web
+  cited_by:
+    - epoch-ai
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+  publication_id: epoch
+- id: 81c9d43e271c63be
+  url: https://epochai.org/research
+  title: epochai.org/research
+  type: web
+  cited_by:
+    - epoch-ai
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+  publication_id: epoch
+- id: 96438391f56ab6bb
+  url: https://epochai.org/blog/parameter-compute-data-trends
+  title: Epoch AI
+  type: web
+  cited_by:
+    - epoch-ai
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+  publication_id: epoch
+- id: 5c1ad27ec9acc6f4
+  url: https://www.sciencedirect.com/science/article/pii/S2451958824001714
+  title: "Human performance in detecting deepfakes: A systematic review and meta-analysis"
+  type: web
+  cited_by:
+    - content-authentication
+    - epistemic-security
+    - epistemic-collapse
+  tags:
+    - capabilities
+    - deepfakes
+    - digital-evidence
+    - verification
+    - disinformation
+  publication_id: sciencedirect
+- id: 192429705bed4c16
+  url: https://www.sciencedirect.com/science/article/pii/S0740624X25000735
+  title: Research shows
+  type: web
+  cited_by:
+    - deliberation
+  tags:
+    - democratic-innovation
+    - collective-intelligence
+    - governance
+  publication_id: sciencedirect
+- id: 0553835ccb1cde82
+  url: https://www.sciencedirect.com/science/article/pii/S0010945212001433
+  title: Goddard et al. (2012)
+  type: web
+  cited_by:
+    - hybrid-systems
+  tags:
+    - human-ai-interaction
+    - ai-control
+    - decision-making
+  publication_id: sciencedirect
+- id: cca85af69dffa3bd
+  url: https://www.sciencedirect.com/science/article/abs/pii/S0160791X21003183
+  title: voluntary commitments only lead to socially beneficial outcomes when combined with
+    enforcement mechanisms
+  type: web
+  cited_by:
+    - effectiveness-assessment
+  publication_id: sciencedirect
+- id: b5265b94ee633a33
+  url: https://epochai.org/data/compute-trends
+  title: Epoch AI estimates
+  type: web
+  cited_by:
+    - eu-ai-act
+  tags:
+    - regulation
+    - gpai
+    - foundation-models
+  publication_id: epoch
+- id: 9d45634c7e8ec752
+  url: https://hai.stanford.edu/news/how-will-ai-act-affect-ai-research-and-development
+  title: Stanford HAI
+  type: web
+  cited_by:
+    - eu-ai-act
+  publication_id: hai-stanford
+  tags:
+    - regulation
+    - gpai
+    - foundation-models
+- id: 6d3e85b51201e286
+  url: https://epochai.org/blog/will-we-run-out-of-ml-data-evidence-from-projections
+  title: Epoch AI research
+  type: web
+  cited_by:
+    - eu-ai-act
+  tags:
+    - regulation
+    - gpai
+    - foundation-models
+  publication_id: epoch
+- id: 09ab44a606206c11
+  url: https://www.sciencedirect.com/science/article/pii/S0016328725000254
+  title: strategic insights from simulation gaming of AI race dynamics
+  type: web
+  cited_by:
+    - pause
+  publication_id: sciencedirect
+- id: 4698ada2ded384d1
+  url: https://hai.stanford.edu/news/americans-attitudes-toward-ai-are-shifting
+  title: Stanford HAI
+  type: web
+  cited_by:
+    - public-education
+  publication_id: hai-stanford
+- id: f20909e6ca726b00
+  url: https://www.cambridge.org/core/journals/behavioral-and-brain-sciences
+  title: AI Risk visualizations
+  type: web
+  cited_by:
+    - public-education
+  publication_id: cambridge
+- id: 7e5fe2dbe1228ac8
+  url: https://hai.stanford.edu/news/ais-ostensible-emergent-abilities-are-mirage
+  title: Stanford research
+  type: web
+  cited_by:
+    - emergent-capabilities
+  publication_id: hai-stanford
+  tags:
+    - scaling
+    - capability-evaluation
+    - unpredictability
+- id: d53c6b234827504e
+  url: https://www.sciencedirect.com/science/article/abs/pii/S0169207024001250
+  title: ScienceDirect
+  type: web
+  cited_by:
+    - case-for-xrisk
+    - instrumental-convergence
+    - catastrophe
+  tags:
+    - power-seeking
+    - self-preservation
+    - corrigibility
+  publication_id: sciencedirect
+- id: 1597b60a507bf25b
+  url: https://www.sciencedirect.com/science/article/abs/pii/S0749597818303388
+  title: algorithm appreciation
+  type: web
+  cited_by:
+    - institutional-capture
+  tags:
+    - ai-bias
+    - algorithmic-accountability
+    - automation-bias
+  publication_id: sciencedirect
+- id: 90c93f4a5a4dbcfd
+  url: https://hai.stanford.edu/news/how-flawed-data-aggravates-inequality-credit
+  title: Stanford research
+  type: web
+  cited_by:
+    - institutional-capture
+  publication_id: hai-stanford
+  tags:
+    - ai-bias
+    - algorithmic-accountability
+    - automation-bias
+- id: 232261cfe3c236b9
+  url: https://www.cambridge.org/core/journals/data-and-policy/article/explainable-and-transparent-artificial-intelligence-for-public-policymaking/51D4C6E27CFDEB3CD19EC5E1A6F4FAE7
+  title: Explainable and transparent artificial intelligence for public policymaking
+  type: web
+  cited_by:
+    - institutional-capture
+  tags:
+    - governance
+    - ai-bias
+    - algorithmic-accountability
+    - automation-bias
+  publication_id: cambridge
+- id: f7201855f3b3ca38
+  url: https://hai.stanford.edu/news/synthetic-media-detection-breakthrough
+  title: research at Stanford's HAI
+  type: web
+  cited_by:
+    - disinformation
+  publication_id: hai-stanford
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 33fd8453487235be
+  url: https://www.sciencedirect.com/topics/psychology/mental-arithmetic
+  title: Educational Psychology Studies
+  type: web
+  cited_by:
+    - enfeeblement
+  tags:
+    - human-agency
+    - automation
+    - dependence
+  publication_id: sciencedirect
+- id: 7ad5ba93e985bcce
+  url: https://www.cambridge.org/core/books/democracy-and-technology/C8B8E8F8E8F8E8F8E8F8E8F8
+  title: Democracy and Technology
+  type: web
+  cited_by:
+    - erosion-of-agency
+  tags:
+    - human-agency
+    - autonomy
+    - manipulation
+  publication_id: cambridge
+- id: 9587b65b1192289d
+  url: https://epoch.ai/blog/can-ai-scaling-continue-through-2030
+  title: Epoch AI
+  type: web
+  cited_by:
+    - case-for-xrisk
+    - critical-uncertainties
+    - timelines
+  publication_id: epoch
+- id: 2cb4447b6a55df95
+  url: https://epoch.ai/blog/literature-review-of-transformative-artificial-intelligence-timelines
+  title: "Epoch AI: Literature Review of TAI Timelines"
+  type: web
+  cited_by:
+    - timelines
+  publication_id: epoch
+- id: 080da6a9f43ad376
+  url: https://epoch.ai/blog/model-counts-compute-thresholds
+  title: Epoch AI projections
+  type: web
+  cited_by:
+    - capability-threshold-model
+    - monitoring
+  publication_id: epoch
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+- id: adc7475b9d9e8300
+  url: https://hai.stanford.edu/policy/policy-efforts/tracking-us-executive-action-ai
+  title: Stanford HAI's implementation tracker
+  type: web
+  cited_by:
+    - monitoring
+    - us-executive-order
+  publication_id: hai-stanford
+  tags:
+    - compute-thresholds
+    - governance
+    - us-aisi
+- id: 2a2365be0b3f496c
+  url: https://www.cambridge.org/core/journals/data-and-policy/article/missed-opportunities-in-ai-regulation-lessons-from-canadas-ai-and-data-act/5178DE82B270CD41FA3B7ECFC94BF810
+  title: Cambridge Data & Policy Study
+  type: web
+  cited_by:
+    - canada-aida
+  tags:
+    - governance
+  publication_id: cambridge
+- id: 9d9b7c2172169a9c
+  url: https://www.sciencedirect.com/science/article/abs/pii/S1532046425001315
+  title: systematic review of healthcare ML (2025)
+  type: web
+  cited_by:
+    - distributional-shift
+  tags:
+    - robustness
+    - generalization
+    - ml-safety
+  publication_id: sciencedirect
+- id: c75d8df0bbf5a94d
+  url: https://www.cambridge.org/core/journals/american-political-science-review/article/liars-dividend-can-politicians-claim-misinformation-to-evade-accountability/687FEE54DBD7ED0C96D72B26606AA073
+  title: 2024 study in the American Political Science Review
+  type: web
+  cited_by:
+    - epistemic-collapse
+    - trust-decline
+  tags:
+    - truth
+    - epistemology
+    - disinformation
+  publication_id: cambridge
+- id: 663417bdb09208a4
+  url: https://epoch.ai/data-insights/ai-capabilities-progress-has-sped-up
+  title: Epoch AI's analysis
+  type: web
+  cited_by:
+    - scientific-research
+    - takeoff
+  publication_id: epoch
+  tags:
+    - alphafold
+    - drug-discovery
+    - scientific-ai
+- id: 215d1160b90a9948
+  url: https://epoch.ai/blog/announcing-expanded-biology-ai-coverage
+  title: Epoch AI 2024
+  type: web
+  cited_by:
+    - scientific-research
+  publication_id: epoch
+  tags:
+    - alphafold
+    - drug-discovery
+    - scientific-ai
+- id: 5eacdec296a81a08
+  url: https://epoch.ai/blog/interviewing-ai-researchers-on-automation-of-ai-rnd
+  title: Interviewing AI researchers on automation of AI R&D
+  type: web
+  tags:
+    - economic
+  cited_by:
+    - self-improvement
+  publication_id: epoch
+- id: 95b25b23b19320df
+  url: https://epoch.ai/blog/power-demands-of-frontier-ai-training
+  title: Epoch AI power analysis
+  type: web
+  cited_by:
+    - capability-threshold-model
+  publication_id: epoch
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+- id: 562abe1030193354
+  url: https://epoch.ai/data-insights/consumer-gpu-model-gap
+  title: Epoch AI consumer GPU analysis
+  type: web
+  tags:
+    - compute
+  cited_by:
+    - capability-threshold-model
+  publication_id: epoch
+- id: 2351d3c1aca0193a
+  url: https://www.cambridge.org/core/journals/perspectives-on-politics/article/abs/autocratic-breakdown-and-regime-transitions-a-new-data-set/EBDB9E5E64CF899AD50B9ACC630B593F
+  title: Geddes-Wright-Frantz Autocratic Regimes dataset
+  type: web
+  cited_by:
+    - surveillance-authoritarian-stability
+  publication_id: cambridge
+  tags:
+    - authoritarianism
+    - stability
+    - surveillance
+- id: 42f78f51ca2fdb71
+  url: https://www.sciencedirect.com/science/article/pii/S1477388025000131
+  title: Research shows humans near random chance
+  type: web
+  cited_by:
+    - consensus-manufacturing
+  publication_id: sciencedirect
+  tags:
+    - disinformation
+    - astroturfing
+    - bot-detection
+- id: 46010026d8feac35
+  url: https://epoch.ai/frontiermath/the-benchmark
+  title: FrontierMath benchmark
+  type: web
+  tags:
+    - capabilities
+    - evaluation
+  cited_by:
+    - takeoff
+  publication_id: epoch

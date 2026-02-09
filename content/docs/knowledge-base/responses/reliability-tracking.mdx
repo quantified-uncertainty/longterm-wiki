@@ -1,0 +1,327 @@
+---
+title: Reliability Tracking
+description: A proposed system for systematically assessing the track records of public actors by topic, scoring factual claims against sources, predictions against outcomes, and promises against delivery. Aims to heal broken feedback loops where bold claims face no consequences.
+sidebar:
+  order: 13
+lastEdited: "2026-02-06"
+quality: 45
+importance: 52
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 5.5
+  rigor: 4.5
+  actionability: 5.5
+  completeness: 5
+metrics:
+  wordCount: 2900
+  citations: 22
+  tables: 11
+  diagrams: 1
+clusters:
+  - epistemics
+  - ai-safety
+subcategory: epistemic-tools-approaches
+---
+import {Backlinks, Mermaid, KeyQuestions, EntityLink} from '@components/wiki';
+
+*Part of the [Design Sketches for Collective Epistemics](/knowledge-base/responses/collective-epistemics-design-sketches/) series by Forethought Foundation.*
+
+## Overview
+
+Reliability Tracking is a proposed system for systematically assessing the accuracy and trustworthiness of public actors—individuals, organizations, media outlets—by creating topic-specific track records rather than generalized reputation scores. The concept was outlined in Forethought Foundation's 2025 report "[Design Sketches for Collective Epistemics](https://www.forethought.org/research/design-sketches-collective-epistemics)."
+
+The core problem: in current public discourse, bold predictions and confident factual claims face few consequences when they turn out to be wrong. A pundit who confidently predicts economic collapse every year suffers no reputational penalty; a company that repeatedly overpromises on product timelines faces no systematic accountability. Reliability tracking aims to "heal that feedback loop" by making track records visible and searchable.
+
+Unlike a simple credibility score, the system would provide *topic-specific* assessments. Someone might be highly reliable on climate science but consistently wrong about economic predictions, or accurate about technical capabilities but unreliable about timelines.
+
+## How It Would Work
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Collection["1. Statement Database"]
+        A[Compile public statements] --> B[Classify: factual claims, predictions, promises]
+        B --> C[Timestamp and archive]
+    end
+
+    subgraph Scoring["2. Evaluation"]
+        C --> D1[Factual claims vs. primary sources]
+        C --> D2[Predictions vs. subsequent events]
+        C --> D3[Promises vs. actual delivery]
+        D1 & D2 & D3 --> E[LLM-assisted scoring]
+    end
+
+    subgraph Aggregation["3. Track Record"]
+        E --> F[Aggregate by claim type]
+        F --> G[Aggregate by topic area]
+        G --> H[Detect patterns]
+        H --> I["Reliable on X, overpromises on Y"]
+    end
+
+    subgraph Display["4. User Interface"]
+        I --> J[Browser widget rates public actors]
+        J --> K[Health warnings for unreliable sources]
+        J --> L[Browse evaluations and methodology]
+        J --> M[User-customizable scoring]
+    end
+
+    style K fill:#ffcccc
+    style I fill:#d4edda
+`} />
+
+### Step-by-Step Process
+
+1. **Compile database**: Gather past public statements from articles, interviews, social media, reports, and press releases
+2. **Classify and timestamp**: Identify specific claims—factual assertions, forward-looking predictions, concrete promises—and record them with dates
+3. **Score trustworthiness** via LLM evaluation:
+   - Do factual claims match primary sources?
+   - Did predictions match subsequent events?
+   - Were promises kept in a timely manner?
+
+4. **Aggregate scores** by claim type and topic area, with user-customizable methodology
+5. **Detect patterns**: Identify where an actor is consistently reliable or unreliable (e.g., "reliable on topic X, consistently overpromises on Y")
+
+### Three Types of Claims Tracked
+
+| Claim Type | Evaluation Method | Example |
+|-----------|-------------------|---------|
+| **Factual claims** | Compare against primary sources and expert consensus | "Our product has 10 million users" → Check against actual user data |
+| **Predictions** | Compare against subsequent events | "AGI by 2027" → Track against timeline |
+| **Promises** | Check whether commitments were fulfilled | "We'll open-source the model" → Did they? When? |
+
+### Browser Integration
+
+The envisioned user experience includes:
+- A **browser widget** that provides reliability ratings when viewing content from tracked actors
+- **Health warnings** displayed for sources with poor track records in the relevant topic area
+- **Drill-down capability** to browse specific evaluations, see the methodology, and adjust scoring parameters
+- **User-customizable methodology**: Different users might weight different factors, choose different trusted sources for ground truth, or set different thresholds
+
+## Design Challenges
+
+Forethought identifies several significant design challenges:
+
+### Vague Claims
+
+Many public statements are deliberately vague, making evaluation difficult:
+
+| Challenge | Proposed Approach |
+|-----------|------------------|
+| "AI will transform everything" | Weight average score across plausible interpretations |
+| "We expect significant growth" | Score based on reasonable interpretation given context |
+| "This could be dangerous" | Track whether the implicit prediction was directionally correct |
+| Weasel words ("sources say," "some believe") | Distinguish strength of claim in scoring |
+
+### Ground Truth Determination
+
+Not all facts are uncontested:
+
+| Scenario | Proposed Approach |
+|----------|------------------|
+| Claim contradicts expert consensus | Score against consensus; flag if consensus later shifts |
+| Contested scientific findings | Let users specify trusted sources; mark controversial items |
+| Future predictions | Score probabilistically; weight by specificity |
+| Value judgments disguised as facts | Classify separately; don't score as factual claims |
+
+### Gameability
+
+Reliability tracking systems are inherently gameable:
+
+| Gaming Strategy | Countermeasure |
+|----------------|----------------|
+| Making only safe, boring predictions | Track "interestingness" of claims; reward specific predictions |
+| Deleting past statements | Monitor for deletions via web archives; deletions count negatively |
+| Speaking vaguely to avoid accountability | Score vague claims lower; reward specificity |
+| Making many predictions to cherry-pick | Track all statements, not just self-reported ones |
+| Strategic ambiguity | Human review for high-profile assessments |
+
+## Cost Considerations
+
+Forethought estimates that assessing a single person's track record costs "between cents and hundreds of dollars," depending on:
+
+| Factor | Low-Cost Scenario | High-Cost Scenario |
+|--------|-------------------|-------------------|
+| Statement volume | Few public statements | Thousands of articles/tweets |
+| Source complexity | Simple factual claims | Nuanced predictions requiring context |
+| Verification depth | Automated LLM scoring | Human review of LLM assessments |
+| Topic breadth | Single topic area | Cross-domain assessment |
+| Historical depth | Recent statements only | Full career retrospective |
+
+## Existing Work and Precursors
+
+### Prediction Tracking Platforms
+
+Several existing platforms implement aspects of reliability tracking:
+
+| Platform | What It Tracks | Scale | Key Metric | Status |
+|----------|---------------|-------|-----------|--------|
+| **<EntityLink id="metaculus">Metaculus</EntityLink>** | Probabilistic predictions; public track records | 15K+ forecasters | Brier 0.107; \$30K tournament prizes | Active; largest |
+| **[Good Judgment Open](https://www.gjopen.com/)** | Forecasting tournaments; Superforecaster recruitment | Thousands | Public leaderboards | Active |
+| **[Manifold Markets](https://manifold.markets/)** | Play-money market; public calibration data | 89K+ trades | Probability-outcome alignment | Active |
+| **[Polymarket](https://www.polymarket.com/)** | Real-money market; defined resolution criteria | \$1-3B/year volume | Best liquidity for prediction markets | Active |
+| **[Fatebook](https://fatebook.io/)** | Personal prediction tracking; Brier scores | Hundreds of users | Slack/Discord integrations | Active |
+| **[PredictionBook](https://predictionbook.com/)** | Personal predictions with calibration graphs | Small (legacy) | Good calibration except at 90%+ | Active (legacy) |
+| **[Calibration City](https://calibration.city/)** | Cross-platform forecast comparison | 130K+ markets | Compares Kalshi, Manifold, Metaculus, Polymarket | Active |
+| **ForecastBench** | AI forecasting system benchmark | 1,000 questions | Tracks AI vs superforecaster accuracy | Active |
+
+### Pundit and Public Figure Accountability Projects
+
+| Project | Approach | Impact | Outcome |
+|---------|----------|--------|---------|
+| **PunditTracker** (2013-?) | Letter grades for pundit predictions across finance, politics, sports | Low (niche; no sustained funding) | Most pundits at or below chance; now defunct |
+| **[PunditFact](https://www.politifact.com/punditfact/)** | PolitiFact/Poynter — checks pundit and columnist claims | Medium (millions of monthly readers) | Active; Truth-O-Meter scale |
+| **[PolitiFact](https://www.politifact.com/)** | Six-level Truth-O-Meter; campaign promise trackers | High (10M+ monthly visits) | Active since 2007; Pulitzer Prize 2009 |
+| **Washington Post Fact Checker** | "Pinocchio" rating (1-4 scale); 30K+ claims tracked | High (major newspaper) | Glenn Kessler departed July 2025 |
+| **[FactCheck.org](https://www.factcheck.org/)** | Nonpartisan monitoring by Annenberg/UPenn | Medium-High (trusted academic backing) | Active |
+| **[FiveThirtyEight](https://projects.fivethirtyeight.com/checking-our-work/)** | Public self-evaluation of own model calibration | High (rare media self-accountability) | Legacy (Silver left 2023) |
+| **Hamilton College Study (2011)** | Evaluated 472 predictions from 26 pundits over 16 months | Medium (widely cited) | Pundits no better than coin toss |
+| **[Holden Karnofsky compilation](https://www.cold-takes.com/prediction-track-records-i-know-of/)** | Links to documented prediction track records (2021) | Low-Medium (EA/rationalist niche) | Reference compilation |
+
+### Individual Track Record Practices
+
+Some individuals have established personal accountability norms that demonstrate the concept:
+
+- **Scott Alexander**: Since 2014, publishes annual predictions with explicit probabilities on Astral Codex Ten, then publicly scores them at year's end with calibration results
+- **Open Philanthropy**: Published "[How Accurate Are Our Predictions?](https://www.openphilanthropy.org/research/how-accurate-are-our-predictions/)" evaluating their own internal prediction calibration
+
+### Research on Accountability and Calibration
+
+Key research findings that support reliability tracking:
+
+- **Tetlock (2005)**: 20-year study with 284 experts making about 28,000 predictions. Average expert "roughly as accurate as a dart-throwing chimpanzee." "Foxes" (drawing on many frameworks) consistently outperformed "hedgehogs." Published as *Expert Political Judgment* (Princeton University Press).
+- **IARPA ACE Tournament (2011-2015)**: Tetlock's Good Judgment Project beat all competing teams by 35-72%. Top 2% "superforecasters" were 30% more accurate than professional intelligence analysts with classified information access.
+- **Mellers et al. (2014)**: Identified superforecasters who are consistently well-calibrated across domains, suggesting reliability is a somewhat stable trait
+- **Atanasov et al. (2016)**: Tracking and feedback on predictions improves individual calibration by 20-30%
+- **DellaVigna & Pope (2018)**: Expert predictions about behavioral interventions were poorly calibrated, suggesting need for systematic tracking
+- **Brier Score**: The standard proper scoring rule for probabilistic predictions (0=perfect, 1=worst). Incentivizes honest forecasting by simultaneously measuring calibration and resolution.
+
+### Calibration Training Tools
+
+Several tools exist specifically to improve individual calibration:
+
+| Tool | Description |
+|------|-------------|
+| **[Clearer Thinking / Open Philanthropy App](https://www.clearerthinking.org/)** | Thousands of calibration training questions; measures improvement over time |
+| **[Quantified Intuitions](https://www.quantifiedintuitions.org/)** | Calibration games, estimation quizzes, flashcard-based calibration exercises |
+| **CFAR Credence Calibration Game** | Trains users to convert internal confidence into reportable credence levels |
+| **[Hubbard Decision Research](https://hubbardresearch.com/calibration-training/)** | Automated calibration training for business/risk analysis contexts |
+
+## Niche Applications
+
+Forethought suggests several high-value starting points:
+
+| Application | Description | Value Proposition |
+|------------|-------------|-------------------|
+| **Tech pundit reliability leaderboards** | Rate tech commentators on prediction accuracy | High interest; easily verifiable claims |
+| **Corporate statement assessments** | Track company claims about products, timelines, safety | Financial value (informing investment decisions) |
+| **Organizational prediction tracking** | Internal prediction markets and track records | Improve organizational decision-making |
+| **Academic citation reliability** | Score cited studies by replication likelihood | Address replication crisis |
+| **AI lab claim tracking** | Specifically track AI company predictions vs. outcomes | Directly relevant to AI safety |
+
+### AI Lab Claim Tracking
+
+A particularly relevant application for AI safety would be tracking the reliability of AI lab statements about:
+- Capability timelines ("We'll achieve X by date Y")
+- Safety commitments ("We won't release models above threshold Z")
+- Benchmark claims ("Our model achieves state-of-the-art on benchmark B")
+- Risk assessments ("This model poses minimal risk of X")
+
+This could provide empirical grounding for debates about AI governance by making it visible which organizations consistently overpromise, underdeliver on safety commitments, or make accurate predictions about capabilities.
+
+## Worked Example: Tracking AI Lab Timeline Predictions
+
+Consider tracking the reliability of a prominent AI lab CEO who has made repeated public predictions about AI capabilities:
+
+**Statement database (sampled)**:
+
+| Date | Statement | Type | Resolution |
+|------|-----------|------|------------|
+| Jan 2023 | "We'll have AGI within 3 years" | Prediction | Pending (due Jan 2026) |
+| Mar 2023 | "Our next model will pass the bar exam" | Prediction | Partially correct — passed but below top human scores |
+| Jun 2023 | "We will open-source our safety research" | Promise | Broken — research not published by stated deadline |
+| Sep 2023 | "Our model has no known dangerous capabilities" | Factual claim | Contradicted by later red-team findings published in 2024 |
+| Jan 2024 | "We'll invest \$1B in safety research this year" | Promise | Partially kept — \$600M invested by year end |
+| May 2024 | "Superintelligence is 2-3 years away" | Prediction | Pending (due 2026-2027) |
+
+**Topic-specific reliability scores**:
+
+| Topic | Score | Pattern |
+|-------|-------|---------|
+| **Capability predictions** | 0.45 / 1.0 | Consistently overpromises on timelines; directionally correct but 1-3 years early |
+| **Safety claims** | 0.30 / 1.0 | Multiple instances of safety claims contradicted by later evidence |
+| **Business commitments** | 0.60 / 1.0 | Usually delivers but often partially or late |
+| **Technical descriptions** | 0.75 / 1.0 | Generally accurate about technical details when being specific |
+
+**Browser widget display**: When this CEO's next blog post appears, users would see: "Reliability: Mixed. This source is generally accurate on technical details but consistently overpromises on timelines (average 2 years early) and has made multiple safety claims later contradicted by evidence. [See full assessment →]"
+
+This example illustrates both the power (concrete accountability) and the difficulty (judgment calls on "partially correct," handling predictions not yet resolved, legal risks of publishing low scores for named individuals).
+
+## Extensions and Open Ideas
+
+**Confidence-weighted prediction tracking**: Rather than just right/wrong, score predictions based on the confidence expressed. Someone who says "I'm 90% confident AGI arrives by 2027" and is wrong should lose more credibility than someone who said "there's maybe a 30% chance." This connects to forecasting best practices and rewards epistemic humility.
+
+**Prediction network analysis**: Map who influences whose predictions. If 10 commentators all predicted the same thing and were all wrong, did they independently reach the same conclusion, or did one person's prediction cascade through the network? Tracking influence chains helps identify independent vs. correlated errors.
+
+**"Reliability API"**: Provide a public API that other tools can query. A browser could check the reliability score of every author on a page. An AI chatbot could weight sources by their reliability scores when doing retrieval. [Community Notes](/knowledge-base/responses/community-notes-for-everything/) could use reliability data to prioritize which content to annotate.
+
+**Self-tracking mode**: Let individuals track their own reliability privately before any public accountability. People often overestimate their prediction accuracy. A tool that says "You thought you were right 85% of the time, but you were actually right 62%" could improve personal calibration without the social pressure of public scores.
+
+**Temporal decay weighting**: Old predictions should matter less than recent ones. Someone who made bad predictions 10 years ago but has been well-calibrated for the last 3 years should have a higher current score. This incentivizes improvement rather than creating permanent reputation damage.
+
+**Institutional reliability tracking**: Track organizations (labs, think tanks, government agencies, media outlets) in addition to individuals. This sidesteps some privacy concerns while still providing useful information. "This think tank's economic predictions have been right 40% of the time over the last decade."
+
+**"Steelman" mode**: When displaying a poor reliability score, also show the subject's best predictions and most honest moments. This reduces the adversarial feel and encourages engagement rather than defensive reactions.
+
+**Cross-reference with prediction markets**: Automatically compare a person's stated predictions with the contemporaneous prediction market price. "This person predicted X with 90% confidence, but the prediction market at the time was at 35%. Their prediction was both confident and contrarian—and turned out to be correct." This highlights when people add genuine information vs. repeating conventional wisdom.
+
+## Challenges and Risks
+
+### Social Challenges
+
+- **Trust in the tracker**: Unreliable sources may attack the tracking system rather than improve their accuracy
+- **Legal exposure**: Public reliability scores could face defamation lawsuits, especially from well-resourced actors
+- **Adoption**: Requires sufficient users to create social pressure for accuracy
+- **Polarization**: Risk that reliability tracking becomes a political weapon
+
+### Technical Challenges
+
+- **Statement attribution**: Correctly attributing claims to the right person/organization
+- **Interpretation**: Same statement can be interpreted differently
+- **Scale**: Tracking all public statements from all actors is computationally expensive
+- **Temporal dynamics**: Beliefs should update; how do you handle changing views?
+
+### Ethical Challenges
+
+- **Privacy**: Tracking statements of private individuals raises consent issues
+- **Power asymmetry**: More public = more tracked; could disproportionately scrutinize certain groups
+- **Context collapse**: Statements made in specific contexts may be unfairly evaluated out of context
+- **Rehabilitation**: How do people escape bad track records? Is there a path to redemption?
+
+## Connection to AI Safety
+
+Reliability tracking is directly relevant to several aspects of the <EntityLink id="ai-transition-model">AI transition model</EntityLink>:
+
+- **<EntityLink id="epistemic-health">Epistemic health</EntityLink>**: Making track records visible creates accountability for claims about AI capabilities, risks, and timelines
+- **<EntityLink id="civilizational-competence">Civilizational competence</EntityLink>**: Better-calibrated public discourse about AI improves the quality of governance decisions
+- **<EntityLink id="societal-trust">Societal trust</EntityLink>**: Trust based on track records is more robust than trust based on authority or charisma
+- **Lab accountability**: Systematic tracking of AI lab claims could be a lightweight governance mechanism that complements formal regulation
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "Can LLM-assisted evaluation of claim accuracy be reliable enough to base public scores on?",
+    "Will tracked actors game the system faster than countermeasures can be developed?",
+    "Is there sufficient demand for reliability information to drive adoption?",
+    "Can the legal risks (defamation, etc.) be managed through transparent methodology?",
+    "Would topic-specific reliability scores actually change behavior, or would people ignore them?"
+  ]}
+/>
+
+## Further Reading
+
+- **Original Report**: [Design Sketches for Collective Epistemics — Reliability Tracking](https://www.forethought.org/research/design-sketches-collective-epistemics#reliability-tracking) — Forethought Foundation
+- **Key Research**: *Expert Political Judgment* by Philip Tetlock (2005) — foundational work on prediction accuracy and calibration
+- **Prediction Platforms**: <EntityLink id="metaculus">Metaculus</EntityLink>, <EntityLink id="prediction-markets">Prediction Markets</EntityLink>
+- **Overview**: [Design Sketches for Collective Epistemics](/knowledge-base/responses/collective-epistemics-design-sketches/) — parent page with all five proposed tools
+
+<Backlinks />

@@ -1,0 +1,391 @@
+---
+title: "Heavy Scaffolding / Agentic Systems"
+description: "Analysis of multi-agent AI systems with complex orchestration, persistent memory, and autonomous operation. Includes Claude Code, Devin, and similar agentic architectures. Estimated 25-40% probability of being the dominant paradigm at transformative AI."
+sidebar:
+  label: "Heavy Scaffolding"
+  order: 3
+quality: 57
+lastEdited: "2026-01-29"
+importance: 72.5
+llmSummary: "Comprehensive analysis of multi-agent AI systems with extensive benchmarking data showing rapid capability growth (77.2% SWE-bench, 5.5x improvement 2023-2025) but persistent reliability challenges (45-60% error propagation rates, 2:1 human advantage at 32-hour tasks). Estimates 25-40% probability of paradigm dominance at transformative AI, with 67% Fortune 500 deployment but only 6% full trust for core processes."
+ratings:
+  novelty: 4.5
+  rigor: 6.5
+  actionability: 5.5
+  completeness: 7
+metrics:
+  wordCount: 179
+  citations: 73
+  tables: 39
+  diagrams: 2
+clusters: ["ai-safety", "governance"]
+---
+import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="heavy-scaffolding" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Current Capability** | Moderate-High | Claude Sonnet 4.5 achieves 77.2% on SWE-bench Verified; WebArena agents improved from 14% to 60% success rate (2023-2025) |
+| **Reliability** | Low-Moderate | Multi-agent systems show 50%+ failure rates on complex tasks; error propagation remains key bottleneck |
+| **Safety Profile** | Mixed | Scaffold code is auditable, but autonomy amplifies scope of potential harms across physical, financial, and digital dimensions |
+| **Research Maturity** | Medium | ReAct (ICLR 2023) established foundations; 1,600+ annotated failure traces now available via MAST-Data |
+| **Deployment Status** | Production | Claude Code, Devin, <EntityLink id="openai">OpenAI</EntityLink> Assistants in commercial use; enterprise adoption accelerating |
+| **Scalability** | Uncertain | Performance gains plateau at longer time horizons; 32-hour tasks show humans outperforming AI 2:1 |
+| **Dominance Probability** | 25-40% | Strong growth trends but reliability constraints may limit ceiling |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [lilianweng.github.io](https://lilianweng.github.io/posts/2023-06-23-agent/) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Movable_scaffolding_system) |
+| <EntityLink id="lesswrong">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/mAwxebLw3nYbDivmt/scaffolded-llms-less-obvious-concerns) |
+| arXiv | [arxiv.org](https://arxiv.org/html/2510.25445v1) |
+
+
+## Overview
+
+Heavy scaffolding refers to AI systems where significant capability and behavior emerges from the **orchestration code** rather than just the underlying model. These systems combine foundation models with tools, persistent memory, multi-agent coordination, and autonomous operation loops.
+
+Examples include Claude Code (<EntityLink id="anthropic">Anthropic</EntityLink>'s coding agent), Devin (Cognition's software engineer), AutoGPT, and various research agent frameworks. The key distinguishing feature is that the **scaffold itself is a major determinant of system behavior**, not just a thin wrapper around model calls.
+
+This paradigm has an estimated **25-40% probability** of being dominant at transformative AI, with strong growth trends as scaffolding becomes easier to build and demonstrates clear capability gains. The [2025 International AI Safety Report](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) notes that "increasingly capable AI agents will likely present new, significant challenges for risk management."
+
+## Agentic Architecture Patterns
+
+The following diagram illustrates the common architectural patterns found in modern agentic systems, showing how different components interact across the planning, execution, and feedback loops:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph input["User Input"]
+        task["Task/Goal"]
+    end
+
+    subgraph planning["Planning Layer"]
+        decompose["Task Decomposition"]
+        select["Strategy Selection"]
+        schedule["Action Scheduling"]
+    end
+
+    subgraph execution["Execution Layer"]
+        toolcall["Tool Invocation"]
+        observe["Observation Processing"]
+        reflect["Self-Reflection"]
+    end
+
+    subgraph memory["Memory Systems"]
+        short["Short-term Context"]
+        long["Long-term Storage"]
+        episodic["Episodic Memory"]
+    end
+
+    subgraph external["External Environment"]
+        apis["APIs/Web"]
+        files["File Systems"]
+        code["Code Execution"]
+        browser["Browser"]
+    end
+
+    task --> decompose
+    decompose --> select
+    select --> schedule
+    schedule --> toolcall
+    toolcall --> apis
+    toolcall --> files
+    toolcall --> code
+    toolcall --> browser
+    apis --> observe
+    files --> observe
+    code --> observe
+    browser --> observe
+    observe --> reflect
+    reflect --> short
+    short --> long
+    long --> episodic
+    episodic --> decompose
+    reflect --> schedule
+
+    style planning fill:#e8f4f8
+    style execution fill:#f0f8e8
+    style memory fill:#f8f0e8
+    style external fill:#f8e8e8
+`} />
+
+## Conceptual Architecture
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph scaffold["Scaffold Layer (Readable Code)"]
+        orchestrator["Orchestrator"]
+        memory["Persistent Memory"]
+        tools["Tool Registry"]
+        planner["Planning Module"]
+        critic["Self-Critique"]
+    end
+
+    subgraph models["Model Layer (Black Box)"]
+        llm1["LLM: Reasoning"]
+        llm2["LLM: Coding"]
+        llm3["LLM: Critique"]
+    end
+
+    subgraph external["External World"]
+        files["File System"]
+        web["Web/APIs"]
+        exec["Code Execution"]
+    end
+
+    orchestrator --> planner
+    planner --> llm1
+    llm1 --> critic
+    critic --> llm3
+    orchestrator --> tools
+    tools --> llm2
+    llm2 --> exec
+    tools --> web
+    memory --> orchestrator
+    exec --> files
+`} />
+
+## Key Properties
+
+| Property | Rating | Assessment |
+|----------|--------|------------|
+| **White-box Access** | MEDIUM-HIGH | Scaffold code is fully readable and auditable; model calls remain black boxes |
+| **Trainability** | LOW | Models trained separately; scaffold is engineered code, not learned |
+| **Predictability** | LOW | Multi-step plans can diverge unpredictably; emergent behavior from agent loops |
+| **Modularity** | HIGH | Explicit component architecture with clear boundaries |
+| **Formal Verifiability** | PARTIAL | Scaffold logic can be formally verified; model outputs cannot |
+
+## Safety Implications
+
+### Advantages
+
+| Advantage | Explanation |
+|-----------|-------------|
+| **Auditable orchestration** | Every decision point in the scaffold can be logged, reviewed, and understood |
+| **Insertable safety checks** | Can add human approval, sandboxing, or constraint checking in code |
+| **Modular failure isolation** | When something breaks, you can identify which component failed |
+| **Testable control flow** | Can write unit tests for scaffold behavior, even if model outputs vary |
+| **Interpretable planning** | Multi-step plans are often explicitly represented and inspectable |
+
+### Risks
+
+| Risk | Severity | Explanation | Mitigation Status |
+|------|----------|-------------|-------------------|
+| **Emergent multi-step behavior** | HIGH | Behavior emerges from interaction of components over many steps; 14 failure modes identified in MAST taxonomy | Active research; 14% improvement achievable with interventions |
+| **Autonomous operation** | HIGH | Less human oversight when agents run for extended periods; agents now run 30+ hours autonomously | Human-in-loop checkpoints being standardized |
+| **Tool use enables real harm** | HIGH | File system, web access, code execution = real-world consequences | Sandboxing, permission systems widely deployed |
+| **Deceptive scaffolding** | MEDIUM | Scaffold could be designed (or evolve) to hide intentions | Audit trails, logging standard practice |
+| **Scaling unpredictability** | MEDIUM | More agents, longer loops = harder to predict outcomes | [Gradient Institute](https://www.gradientinstitute.org/assets/gradient_multiagent_report.pdf) developing risk analysis techniques |
+| **Security vulnerabilities** | HIGH | [Survey](https://arxiv.org/abs/2510.23883) identifies 4 knowledge gaps: unpredictable inputs, complex execution, variable environments, untrusted entities | Emerging field; defenses lagging threats |
+
+## Current Examples
+
+| System | Developer | Key Features | Benchmark Performance | Status |
+|--------|-----------|--------------|----------------------|--------|
+| **[Claude Code](https://www.anthropic.com/news/claude-sonnet-4-5)** | Anthropic | Coding agent with file access, terminal, multi-file editing | 77.2% SWE-bench Verified | Production |
+| **[Devin](https://www.cognition.ai/)** | Cognition | Full software engineer agent with browser, terminal | First to reach 13.86% SWE-bench (Mar 2024); valued at \$10.2B | Production |
+| **[CUGA](https://research.ibm.com/blog/cuga-agent-framework)** | IBM Research | Enterprise-ready hierarchical planner-executor | 61.7% WebArena (SOTA) | Production |
+| **[AutoGPT](https://github.com/significant-gravitas/AutoGPT)** | Open source | General autonomous agent with plugins | 181K+ GitHub stars | Research/Hobby |
+| **[MetaGPT](https://github.com/geekan/MetaGPT)** | Open source | Multi-agent framework with SOPs | 83%+ on HumanEval | Framework |
+| **[Voyager](https://voyager.minedojo.org/)** | NVIDIA | Minecraft agent with skill library | First LLM-powered embodied agent | Research |
+| **[OpenAI Assistants](https://platform.openai.com/docs/assistants)** | OpenAI | API for building custom agents with tools | Code Interpreter, retrieval | Production |
+| **[LangChain Agents](https://python.langchain.com/)** | LangChain | Framework for building agent pipelines | 140M+ monthly downloads | Framework |
+
+## Benchmark Performance Data
+
+Empirical benchmarks provide quantitative evidence of agentic system capabilities and limitations. The table below summarizes performance across major evaluation suites:
+
+| Benchmark | Task Type | Best Agent Performance | Human Baseline | Key Finding |
+|-----------|-----------|----------------------|----------------|-------------|
+| **[SWE-bench Verified](https://www.swebench.com/)** | Software engineering | 77.2% ([Claude Sonnet 4.5](https://www.anthropic.com/news/claude-sonnet-4-5)); 80.9% (Opus 4.5) | ≈90% (estimated) | 5.5x improvement from 13.86% (Devin, Mar 2024) to 77.2% (Sep 2025) |
+| **[SWE-bench Pro](https://www.swebench.com/)** | Complex software tasks | 23.3% (GPT-5/Claude Opus 4.1) | Not measured | Significant drop from Verified; highlights reliability gap |
+| **[WebArena](https://webarena.dev/)** | Web navigation | 61.7% ([IBM CUGA](https://research.ibm.com/blog/cuga-agent-framework), Feb 2025) | 78.24% | 4.3x improvement from 14.41% baseline (2023); [Zhou et al. 2023](https://arxiv.org/abs/2307.13854) |
+| **WebChoreArena** | Tedious web tasks | 37.8% (Gemini 2.5 Pro) | Not measured | Memory and calculation tasks remain challenging |
+| **[ALFWorld](https://alfworld.github.io/)** | Embodied tasks | 48.5% (GPT-4 AutoGPT) | ≈95% | Surpassed imitation learning baselines; [Liu et al. 2023](https://arxiv.org/abs/2306.02224) |
+| **[HotPotQA](https://hotpotqa.github.io/)** | Multi-hop QA | 27.4% (ReAct) | ≈60% | ReAct trails CoT slightly but gains interpretability; [Yao et al. 2022](https://arxiv.org/abs/2210.03629) |
+| **[RE-Bench](https://metr.org/)** | Complex tasks (2hr) | 4x human score | Baseline | At 32 hours, humans outperform AI 2:1; time-horizon dependent |
+| **[AppWorld](https://arxiv.org/abs/2403.19953)** | API orchestration | 48.2% (IBM CUGA) | Not measured | 87.5% on Level 1 tasks; complex multi-API coordination |
+
+### Performance Trends
+
+The trajectory of agentic systems shows rapid improvement but persistent reliability gaps:
+
+| Metric | 2023 | 2024 | 2025 | Trend |
+|--------|------|------|------|-------|
+| SWE-bench (best agent) | 13.86% (Devin) | 49% (Claude 3.5 Sonnet) | 77.2% (Claude Sonnet 4.5) | +463% over 2 years |
+| WebArena success rate | 14.41% | ≈45% | 61.7% | +328% over 2 years |
+| Multi-agent task completion | 35-40% | 45-55% | 55-65% | Steady improvement |
+| Error propagation rate | High (unmeasured) | ≈60% cascade failures | ≈45% with mitigations | Improving with research |
+
+## Research Landscape
+
+### Key Papers
+
+| Paper | Year | Venue | Contribution | Key Metrics |
+|-------|------|-------|--------------|-------------|
+| [ReAct: Synergizing Reasoning and Acting](https://arxiv.org/abs/2210.03629) | 2022 | ICLR 2023 | Foundational reasoning+action framework | +34% absolute on ALFWorld; 94% fact accuracy |
+| [Toolformer](https://arxiv.org/abs/2302.04761) | 2023 | NeurIPS | Self-supervised tool use learning | Models learn APIs from 25K demonstrations |
+| [Voyager](https://voyager.minedojo.org/) | 2023 | NeurIPS | First LLM-powered embodied agent | 3.3x more unique items discovered vs baselines |
+| [Generative Agents](https://arxiv.org/abs/2304.03442) | 2023 | UIST | Believable simulacra with memory | 25 agents; 2-week simulated time |
+| [AgentVerse](https://arxiv.org/abs/2308.10848) | 2024 | ICLR 2024 | Multi-agent collaboration framework | Meta-programming; dynamic role adjustment |
+| [SWE-bench](https://arxiv.org/abs/2310.06770) | 2023 | ICLR 2024 | Real GitHub issue resolution benchmark | 2,294 tasks from 12 popular repositories |
+| [MAST-Data](https://arxiv.org/abs/2503.13657) | 2025 | arXiv | Multi-agent failure taxonomy | 1,600+ traces; 14 modes; κ=0.88 agreement |
+| [Agentic AI Security](https://arxiv.org/abs/2510.23883) | 2025 | arXiv | Security threat taxonomy | 4 knowledge gaps; comprehensive defense survey |
+
+### Multi-Agent Failure Taxonomy
+
+Research from the [MAST-Data study](https://arxiv.org/abs/2503.13657) identifies 14 unique failure modes clustered into three categories:
+
+| Category | Failure Modes | Frequency | Mitigation |
+|----------|--------------|-----------|------------|
+| **System Design Issues** | Improper task decomposition, inadequate tool selection, memory overflow | 35-40% of failures | Better planning modules, explicit verification |
+| **Inter-Agent Misalignment** | Conflicting objectives, communication breakdowns, role confusion | 25-30% of failures | Standardized protocols, centralized coordination |
+| **Task Verification** | Incomplete outputs, quality control failures, premature termination | 30-35% of failures | Human-in-loop checkpoints, automated testing |
+
+The study found inter-annotator agreement (kappa = 0.88) validating the taxonomy, and that interventions yielded +14% improvement for ChatDev but "remain insufficiently [high] for real-world deployment."
+
+### Key Labs and Organizations
+
+| Organization | Focus Area | Key Achievements | Notable Systems |
+|--------------|------------|------------------|-----------------|
+| **[Anthropic](https://www.anthropic.com/)** | Frontier agents + safety | 77.2% SWE-bench; 30+ hour sustained operation | Claude Code, Computer Use |
+| **[Cognition](https://www.cognition.ai/)** | Autonomous software engineering | First 13.86% SWE-bench (Mar 2024); \$10.2B valuation | Devin |
+| **[OpenAI](https://openai.com/)** | Agent APIs + reasoning | Code Interpreter, function calling ecosystem | Assistants API, o1/o3 reasoning |
+| **[IBM Research](https://research.ibm.com/)** | Enterprise-ready agents | 61.7% WebArena SOTA (Feb 2025); open-source | [CUGA](https://research.ibm.com/blog/cuga-agent-framework) |
+| **[LangChain](https://www.langchain.com/)** | Agent frameworks | 140M+ monthly PyPI downloads | LangGraph, LangSmith |
+| **[MetaGPT](https://github.com/geekan/MetaGPT)** | Multi-agent SOPs | 47K+ GitHub stars; standardized workflows | MetaGPT framework |
+| **[NVIDIA](https://www.nvidia.com/)** | Embodied agents | First LLM-powered embodied agent | [Voyager](https://voyager.minedojo.org/) |
+
+## Trend Analysis
+
+Heavy scaffolding is experiencing rapid growth due to several factors:
+
+1. **Scaffolding is getting cheaper** - Frameworks like LangChain, LlamaIndex, MetaGPT reduce development time by 60-80%
+2. **Clear capability gains** - Agents demonstrably outperform single-turn interactions; SWE-bench improved 5.5x in two years
+3. **Tool use is mature** - Function calling, code execution are well-understood; 90%+ of production agents use tool calling
+4. **Enterprise demand** - [McKinsey reports](https://www.mckinsey.com/capabilities/risk-and-resilience/our-insights/deploying-agentic-ai-with-safety-and-security-a-playbook-for-technology-leaders) agentic AI adds "additional dimension to the risk landscape" as systems move from enabling interactions to driving transactions
+
+### Enterprise Adoption Landscape
+
+| Metric | 2024 | 2025 | Change | Source |
+|--------|------|------|--------|--------|
+| Fortune 500 production deployments | 19% | 67% | +248% YoY | [Axis Intelligence](https://axis-intelligence.com/agentic-ai-statistics-2025-2026/) |
+| Organizations using Microsoft Copilot Studio | — | 230,000+ | Including 90% of Fortune 500 | [Kong Inc. Report](https://konghq.com/company/press-room/press-release/agentic-ai-report) |
+| Fortune 100 using AutoGen framework | — | 40%+ | For internal agentic systems | [Microsoft Research](https://www.microsoft.com/en-us/research/) |
+| Full trust in AI agents for core processes | — | 6% | 43% trust for limited tasks only | [HBR Survey 2025](https://fortune.com/2025/12/09/harvard-business-review-survey-only-6-percent-companies-trust-ai-agents/) |
+| Gartner projection: Enterprise software with agentic AI | less than 1% | 33% by 2028 | 33x growth projected | [Gartner](https://www.gartner.com/) |
+
+**Trust Gap Analysis:** While [90% of enterprises report actively adopting AI agents](https://konghq.com/company/press-room/press-release/agentic-ai-report), only 6% express full trust for core business processes. 43% trust agents only for limited/routine operational tasks, and 39% restrict them to supervised use cases. This trust gap represents both a current limitation and an opportunity for safety-focused development.
+
+### Trajectory Projection
+
+| Period | Expected Development | Confidence |
+|--------|---------------------|------------|
+| 2024-2025 | Specialized vertical agents (coding, research, customer service) | High (already occurring) |
+| 2025-2027 | General-purpose agents with longer autonomy; 70%+ benchmark performance | Medium-High |
+| 2027-2030 | Multi-agent ecosystems, agent-to-agent collaboration | Medium |
+| 2030+ | Potential dominant paradigm if reliability exceeds 90% | Low-Medium |
+
+### Growth Indicators
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| GitHub stars (AutoGPT) | 181,000+ | [GitHub Repository](https://github.com/significant-gravitas/AutoGPT) |
+| Agent framework downloads/month | 140M+ (LangChain) | [PyPI Stats](https://pypistats.org/packages/langchain) |
+| Enterprise agent deployments | 67% of Fortune 500 in production | [Axis Intelligence 2025](https://axis-intelligence.com/agentic-ai-statistics-2025-2026/) |
+| AI startup funding (2025) | \$202B total, 50% of all VC | [Crunchbase 2025](https://news.crunchbase.com/ai/big-funding-trends-charts-eoy-2025/) |
+| Agent-related papers (2024) | 500+ on arXiv | [Awesome-Agent-Papers](https://github.com/luo-junyu/Awesome-Agent-Papers) |
+| Agentic AI market projection | \$89.6B by 2026 | [DigitalDefynd 2025](https://digitaldefynd.com/IQ/agentic-ai-statistics/) |
+
+## Cost and Economics
+
+Understanding the economics of agentic systems is critical for both deployment decisions and safety considerations.
+
+### API and Compute Costs
+
+| Model/System | Input Cost | Output Cost | Context Window | Typical Task Cost |
+|--------------|-----------|-------------|----------------|-------------------|
+| Claude Sonnet 4.5 | \$3/M tokens | \$15/M tokens | 200K tokens | \$0.50-5.00 per SWE-bench task |
+| GPT-4o | \$2.50/M tokens | \$10/M tokens | 128K tokens | \$0.30-3.00 per task |
+| Claude Opus 4.5 | \$15/M tokens | \$75/M tokens | 200K tokens | \$2.00-20.00 per complex task |
+| Open-source (Llama 3.1 70B) | ≈\$0.50/M tokens | ≈\$0.75/M tokens | 128K tokens | \$0.10-1.00 per task |
+
+### Cost-Benefit Analysis
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| Average agent task cost (coding) | \$0.50-5.00 | API pricing estimates |
+| Human developer hourly rate | \$75-200/hour | Industry averages |
+| Break-even threshold | Agent 3-4x slower than human | Cost parity analysis |
+| Enterprise ROI on agent deployment | 2-5x within first year | [McKinsey 2025](https://www.mckinsey.com/capabilities/risk-and-resilience/our-insights/deploying-agentic-ai-with-safety-and-security-a-playbook-for-technology-leaders) |
+| Venture funding in AI agents (2025) | \$202B total AI; agents dominate | [Crunchbase](https://news.crunchbase.com/ai/big-funding-trends-charts-eoy-2025/) |
+
+## Comparison with Other Paradigms
+
+| Aspect | Heavy Scaffolding | Minimal Scaffolding | Provable Systems |
+|--------|-------------------|---------------------|------------------|
+| Interpretability | Scaffold: HIGH, Model: LOW | LOW | HIGH by design |
+| Capability ceiling | HIGH (tool use) | LIMITED | UNKNOWN |
+| Development speed | FAST | FAST | SLOW |
+| Safety guarantees | PARTIAL (scaffold only) | NONE | STRONG |
+| Current maturity | MEDIUM | HIGH | LOW |
+
+## Key Uncertainties
+
+| Uncertainty | Current Evidence | Implications |
+|-------------|------------------|--------------|
+| **Reliability at scale** | RE-Bench shows humans outperform AI 2:1 at 32-hour tasks; error propagation causes 45-60% of failures | May limit agent autonomy to shorter task horizons (under 8 hours) |
+| **Emergent deception** | [ACM survey](https://dl.acm.org/doi/10.1145/3716628) identifies "emergent behaviors" including "destructive behaviors leading to undesired outcomes" | Multi-agent coordination introduces unpredictability absent in single-agent systems |
+| **Human oversight integration** | [Nature study](https://www.nature.com/articles/s41467-025-63913-1) proposes triadic framework: human regulation, agent alignment, environmental feedback | Current systems lack standardized oversight mechanisms |
+| **Scaffold complexity** | Agent Workflow Memory achieved 51% success boost; architectural choices matter as much as model capability | Scaffold engineering may become a specialized discipline |
+| **Error propagation** | Chain-of-Thought acts as "error amplifier" where minor mistakes cascade through subsequent actions | Early detection and correction are critical; memory and reflection reduce risk |
+
+## Implications for Safety Research
+
+### Research That Transfers Well
+
+- **Control and containment** - Sandboxing, permission systems, action constraints
+- **Interpretability of plans** - Understanding multi-step reasoning
+- **Human-in-the-loop design** - Approval workflows, uncertainty communication
+- **Testing and red-teaming** - Adversarial evaluation of agent systems
+
+### Research That May Not Transfer
+
+- **Mechanistic interpretability** - Scaffold behavior isn't in weights
+- **Training-time interventions** - Scaffold isn't trained
+- **Representation analysis** - Scaffold doesn't have representations
+
+## Sources and Further Reading
+
+### Primary Research
+- [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) - Yao et al., ICLR 2023. Foundational paper establishing reasoning+action paradigm; 34% absolute improvement on ALFWorld.
+- [WebArena: A Realistic Web Environment for Building Autonomous Agents](https://arxiv.org/abs/2307.13854) - Zhou et al., 2023. Standard benchmark for web agents with 812 tasks.
+- [Why Do Multi-Agent LLM Systems Fail?](https://arxiv.org/abs/2503.13657) - Cemri et al., 2025. MAST-Data with 1,600+ annotated failure traces; 14 failure modes identified.
+- [Agentic AI Security: Threats, Defenses, Evaluation](https://arxiv.org/abs/2510.23883) - Comprehensive security analysis identifying 4 knowledge gaps.
+- [Towards Enterprise-Ready Computer Using Generalist Agent](https://arxiv.org/html/2503.01861v2) - IBM CUGA technical paper; 61.7% WebArena SOTA.
+- [SWE-bench: Can Language Models Resolve Real-World GitHub Issues?](https://arxiv.org/abs/2310.06770) - Jimenez et al., 2023. Software engineering benchmark.
+
+### Industry Reports
+- [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) - Multi-government assessment: "increasingly capable AI agents will likely present new, significant challenges for risk management."
+- [McKinsey: Deploying Agentic AI with Safety and Security](https://www.mckinsey.com/capabilities/risk-and-resilience/our-insights/deploying-agentic-ai-with-safety-and-security-a-playbook-for-technology-leaders) - Enterprise deployment playbook for technology leaders.
+- [Anthropic Claude Sonnet 4.5 Technical Report](https://www.anthropic.com/news/claude-sonnet-4-5) - 77.2% SWE-bench Verified; 30+ hour sustained operation.
+- [Kong Inc.: Agentic AI Report](https://konghq.com/company/press-room/press-release/agentic-ai-report) - 90% of enterprises actively adopting AI agents; 79% expect full-scale adoption within 3 years.
+- [Crunchbase: AI Funding Trends 2025](https://news.crunchbase.com/ai/big-funding-trends-charts-eoy-2025/) - AI captured 50% of all global funding (\$202B total).
+
+### Surveys and Collections
+- [Awesome-Agent-Papers](https://github.com/luo-junyu/Awesome-Agent-Papers) - Curated collection of 500+ LLM agent papers.
+- [LLM-Agents-Papers](https://github.com/AGI-Edgerunners/LLM-Agents-Papers) - Comprehensive repository of agent research.
+- [ACM Computing Surveys: AI Agents Under Threat](https://dl.acm.org/doi/10.1145/3716628) - Security challenges survey; identifies "emergent behaviors" including "destructive behaviors."
+- [Gradient Institute: Multi-Agent Risk Analysis](https://www.gradientinstitute.org/assets/gradient_multiagent_report.pdf) - Risk analysis techniques for multi-agent systems.
+
+## Related Pages
+
+- <EntityLink id="light-scaffolding">Light Scaffolding</EntityLink> - Simpler tool use patterns
+- <EntityLink id="dense-transformers">Dense Transformers</EntityLink> - Underlying model architecture
+- AI Control Problem - Broader control challenges

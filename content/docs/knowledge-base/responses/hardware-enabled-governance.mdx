@@ -1,0 +1,514 @@
+---
+title: Hardware-Enabled Governance
+description: Technical mechanisms built into AI chips enabling monitoring, access control, and enforcement of AI governance policies. RAND analysis identifies attestation-based licensing as most feasible with 5-10 year timeline, while an estimated 100,000+ export-controlled GPUs were smuggled to China in 2024, demonstrating urgent enforcement gaps that HEMs could address.
+sidebar:
+  order: 5
+quality: 70
+lastEdited: "2026-01-29"
+importance: 78.5
+llmSummary: RAND analysis identifies attestation-based licensing as most feasible hardware-enabled governance mechanism with 5-10 year timeline, while 100,000+ export-controlled GPUs were smuggled to China in 2024 demonstrating urgent enforcement gaps. Location verification prototyped on H100 chips offers medium-high technical feasibility but raises significant privacy/abuse risks; appropriate only for narrow use cases like export control verification and large training run detection.
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 6.8
+  rigor: 7.2
+  actionability: 7.5
+  completeness: 7.8
+metrics:
+  wordCount: 660
+  citations: 70
+  tables: 52
+  diagrams: 3
+clusters:
+  - ai-safety
+  - governance
+subcategory: governance-compute-governance
+---
+import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="hardware-enabled-governance" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Technical Feasibility** | Medium-High | Location verification [already prototyped on H100 chips](https://ai-frontiers.org/articles/location-verification-ai-chips); TPM technology widely deployed |
+| **Implementation Timeline** | 5-10 years | Requires chip design cycles (2-3 years) plus deployment; [RAND estimates](https://www.rand.org/pubs/working_papers/WRA3056-1.html) significant market penetration needed |
+| **Privacy Risk** | Medium-High | Could enable compute surveillance; [delay-based verification](https://www.iaps.ai/research/location-verification-for-ai-chips) reveals only coarse location data |
+| **Security Risk** | High | Creates new attack surfaces; must defend against state-level adversaries per [RAND workshop](https://www.rand.org/pubs/conf_proceedings/CFA3056-1.html) |
+| **Abuse Potential** | High | Authoritarian regimes could misuse for suppression; requires international governance safeguards |
+| **Current Status** | Early Research | [RAND working paper](https://www.rand.org/pubs/working_papers/WRA3056-1.html) (2024); [Chip Security Act](https://www.transformernews.ai/p/ai-chip-location-verification-nvidia-china-csa) proposed in Congress; Nvidia piloting tracking software |
+| **Grade** | B- | High potential but significant risks; appropriate only for narrow use cases |
+
+## Overview
+
+Hardware-enabled governance mechanisms (HEMs) represent a potentially powerful but controversial approach to <EntityLink id="ai-governance">AI governance</EntityLink>: embedding monitoring and control capabilities directly into the AI chips and computing infrastructure used to train and deploy advanced AI systems. Unlike export controls that prevent initial access to hardware or compute thresholds that trigger regulatory requirements, HEMs would enable ongoing verification and enforcement even after hardware has been deployed.
+
+The appeal is significant. [RAND Corporation research](https://www.rand.org/pubs/working_papers/WRA3056-1.html) argues that HEMs could "provide a new way of limiting the uses of U.S.-designed high-performance microchips" that complements existing controls. The policy urgency is real: an [estimated 100,000 export-controlled GPUs were smuggled into China](https://www.transformernews.ai/p/ai-chip-location-verification-nvidia-china-csa) in 2024 alone, with some estimates ranging up to one million. If AI governance requires not just knowing who has advanced chips, but verifying how they're used, hardware-level mechanisms offer a potential solution. Remote attestation could verify that chips are running approved workloads; cryptographic licensing could prevent unauthorized large-scale training; geolocation constraints could enforce export controls on a continuing basis.
+
+However, HEMs also raise serious concerns. Privacy implications, security risks from attack surfaces, potential for abuse by authoritarian regimes, and fundamental questions about appropriate scope of surveillance make this a highly contested intervention. A [RAND workshop with 13 experts](https://www.rand.org/pubs/conf_proceedings/CFA3056-1.html) in April 2024 found that narrow-scope HEMs may be more feasible, whereas broader designs could pose greater security and misuse risks. Implementation would require unprecedented coordination between governments and chip manufacturers, with chip design cycles of 2-3 years before new features can reach production. HEMs represent high-risk, high-reward governance infrastructure that merits serious research while demanding careful attention to safeguards.
+
+## Policy Landscape and Current Developments
+
+The policy debate around HEMs has accelerated significantly in 2024-2025, driven by concerns about enforcement of existing export controls.
+
+### Legislative Proposals
+
+| Legislation | Sponsors | Key Provisions | Status |
+|-------------|----------|----------------|--------|
+| [Chip Security Act](https://www.transformernews.ai/p/ai-chip-location-verification-nvidia-china-csa) (CSA) | Sen. Tom Cotton, Reps. Bill Huizenga, Bill Foster | Requires geolocation tracking of GPUs; 180-day implementation timeline | Introduced May 2024 |
+| Foster Tracking Bill | Rep. Bill Foster (D-IL) | Embedded tracking technology; remote disable capability for unlicensed chips | In preparation |
+| [AI Diffusion Framework](https://www.federalregister.gov/documents/2025/01/15/2025-00636/framework-for-artificial-intelligence-diffusion) | BIS (Biden Admin) | Three-tier country system; location verification for NVEU authorization | Published Jan 2025; rescinded May 2025 |
+
+### Industry Response
+
+| Actor | Position | Actions |
+|-------|----------|---------|
+| [Nvidia](https://www.cnbc.com/2025/12/11/nvidias-new-software-could-help-trace-where-its-ai-chips-end-up.html) | Cautious cooperation | Piloting opt-in tracking software; explicitly states "no kill switch" |
+| [Semiconductor Industry Association](https://www.transformernews.ai/p/ai-chip-location-verification-nvidia-china-csa) | Opposed to CSA | Letter urging reconsideration of "burdensome" tracking requirements |
+| Google | Already implementing | Uses delay-based tracking for in-house TPU chips |
+| China | Strongly opposed | Warning Nvidia against tracking features; launched security investigation into Nvidia chips |
+
+### Enforcement Gap
+
+Current export controls face significant enforcement challenges:
+
+| Metric | Estimate | Source |
+|--------|----------|--------|
+| Smuggled GPUs to China (2024) | 100,000+ (range: tens of thousands to 1 million) | [CNAS upcoming report](https://www.cnas.org/publications/reports/technology-to-secure-the-ai-chip-supply-chain-a-primer) |
+| Value of chips diverted in 3 months | \$1 billion | [Financial Times investigation](https://www.transformernews.ai/p/ai-chip-location-verification-nvidia-china-csa) |
+| Entities added to Entity List (2025) | 65 new Chinese entities | [BIS actions](https://www.sidley.com/en/insights/newsupdates/2025/01/new-us-export-controls-on-advanced-computing-items-and-artificial-intelligence-model-weights) |
+| Tier 2 GPU cap (2025-2027) | ≈50,000 GPUs | [AI Diffusion Framework](https://introl.com/blog/ai-export-controls-navigating-chip-restrictions-globally-2025) |
+
+## Technical Mechanisms
+
+Hardware-enabled governance encompasses several distinct technical approaches with different capabilities, costs, and risks:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph DETECTION["Detection Mechanisms"]
+        A[Remote Attestation] --> A1["Verify chip is running<br/>expected software"]
+        B[Usage Metering] --> B1["Track compute consumption<br/>on-device"]
+        C[Geolocation] --> C1["Verify physical location<br/>of hardware"]
+    end
+
+    subgraph CONTROL["Control Mechanisms"]
+        D[Cryptographic Licensing] --> D1["Require authorization<br/>for operation"]
+        E[Kill Switch] --> E1["Remote disable<br/>capability"]
+        F[Workload Filtering] --> F1["Prevent specific<br/>computation patterns"]
+    end
+
+    subgraph GOVERNANCE["Governance Applications"]
+        A1 --> G[Verify compliance]
+        B1 --> G
+        C1 --> G
+        D1 --> H[Enforce restrictions]
+        E1 --> H
+        F1 --> H
+    end
+
+    style DETECTION fill:#e1f5ff
+    style CONTROL fill:#fff3cd
+    style GOVERNANCE fill:#d4edda
+`} />
+
+### Mechanism Overview
+
+| Mechanism | Description | Technical Feasibility | Governance Use | Risk Profile |
+|-----------|-------------|----------------------|----------------|--------------|
+| **Remote Attestation** | Cryptographically verify hardware state and software configuration | High | Verify chips running approved firmware | Medium |
+| **Secure Enclaves** | Isolated execution environments for sensitive operations | High | Protect governance checks from tampering | Low-Medium |
+| **Usage Metering** | On-chip tracking of compute operations | Medium | Monitor for large training runs | Medium |
+| **Cryptographic Licensing** | Require digital license for operation | Medium | Control who can use chips | Medium-High |
+| **Geolocation** | Track physical location of chips | Medium | Enforce geographic restrictions | High |
+| **Remote Disable** | Ability to shut down chips remotely | Medium-High | Enforcement mechanism | Very High |
+| **Workload Detection** | Identify specific computation patterns | Low-Medium | Detect prohibited uses | Medium-High |
+
+### Trusted Platform Module (TPM) Foundation
+
+Many HEM proposals build on existing Trusted Platform Module technology:
+
+| Feature | Current TPM | Enhanced for AI Governance |
+|---------|-------------|---------------------------|
+| Secure boot | Verify startup software | Verify AI framework integrity |
+| Attestation | Report device state | Report training workload characteristics |
+| Key storage | Protect encryption keys | Store governance credentials |
+| Sealed storage | Encrypt to specific state | Bind data to compliance state |
+
+TPMs are already deployed in most modern computers. Extending this infrastructure for AI governance is technically feasible but raises scope and purpose questions.
+
+## RAND Research Framework
+
+[RAND Corporation's 2024 working paper](https://www.rand.org/pubs/working_papers/WRA3056-1.html), authored by Gabriel Kulp, Daniel Gonzales, Everett Smith, Lennart Heim, Prateek Puri, Michael J. D. Vermeer, and Zev Winkelman, provides the most comprehensive public analysis of HEMs for AI governance. The research specifically focuses on Export Control Classification Numbers 3A090 and 4A090 (advanced AI chips).
+
+### Two Main HEM Approaches Proposed
+
+| Approach | Mechanism | Use Case | RAND Assessment |
+|----------|-----------|----------|-----------------|
+| **Offline Licensing** | Renewable licenses limit processing per chip; requires authorization from chipmaker or government | Prevent unauthorized users from utilizing illicitly obtained chips | Most feasible; builds on existing TPM infrastructure |
+| **Fixed Set** | Restricts networking capabilities to prevent aggregation of computing power | Prevent large-scale unauthorized training clusters | Technically challenging; requires chip redesign |
+
+### Proposed Mechanisms Detail
+
+| Mechanism | RAND Assessment | Implementation Path | Timeline Estimate |
+|-----------|-----------------|---------------------|-------------------|
+| **Attestation-based licensing** | Most feasible | Build on existing TPM infrastructure | 2-3 years |
+| **Compute tracking** | Technically challenging | Would require chip redesign | 3-5 years |
+| **Geographic restrictions** | Moderate feasibility | Delay-based verification (not GPS) | 6 months for firmware; 2+ years for deployment |
+| **Remote disable** | Technically feasible | Requires fail-safe design | 3-5 years |
+
+### Design Principles (RAND)
+
+1. **Proportionality**: Governance mechanisms should match risk levels
+2. **Minimal intrusiveness**: Collect only necessary information
+3. **Fail-safe design**: Errors should default to safe states
+4. **International coordination**: Effective only with broad adoption
+5. **Abuse prevention**: Strong safeguards against misuse
+
+### Limitations Acknowledged
+
+RAND explicitly notes that HEMs would "provide a complement to, but not a substitute for all, export controls." Key limitations include:
+- Cannot prevent all circumvention—improvements in [algorithmic efficiency](https://www.governance.ai/analysis/computing-power-and-the-governance-of-artificial-intelligence) decrease compute required for given capabilities
+- Require ongoing enforcement infrastructure costing \$10-200M annually
+- Create attack surfaces for adversaries—must defend against state-level actors
+- May be defeated by determined state actors with sufficient resources
+- New chips must gain significant market share before affecting adversary capabilities (5-10 year cycle)
+
+## Location Verification Technology
+
+Location verification has emerged as the most concrete near-term HEM proposal, with [active prototyping on Nvidia H100 chips](https://ai-frontiers.org/articles/location-verification-ai-chips).
+
+### How Delay-Based Verification Works
+
+Unlike GPS (which cannot penetrate data center walls and is easily spoofed), delay-based verification uses the physics of signal propagation:
+
+1. A trusted "landmark server" at a known location sends a cryptographic challenge to the chip
+2. The chip responds with its authenticated identity
+3. By measuring round-trip delay based on the speed of light, servers can verify the chip is within a certain distance
+4. Multiple landmark servers can triangulate approximate location without revealing exact position
+
+| Property | Specification |
+|----------|---------------|
+| Location precision | Coarse-grained only (country/region level) |
+| Data revealed | Does not expose what computation is occurring or data being processed |
+| Privacy model | [Similar to consumer devices](https://www.iaps.ai/research/location-verification-for-ai-chips) (iPhones can be remotely located/disabled) |
+| Spoofing resistance | Higher than GPS; requires physical proximity to landmark servers |
+
+### Implementation Status
+
+| Milestone | Status | Source |
+|-----------|--------|--------|
+| Proof of concept on H100 | Completed | [AI Frontiers](https://ai-frontiers.org/articles/location-verification-ai-chips) |
+| Nvidia tracking software pilot | Active | [CNBC](https://www.cnbc.com/2025/12/11/nvidias-new-software-could-help-trace-where-its-ai-chips-end-up.html) |
+| H100 hardware security features | Already present | Firmware verification, rollback protection, secure non-volatile memory |
+| Encryption keys for tracking | Already embedded | [Future of Life Institute](https://ai-frontiers.org/articles/location-verification-ai-chips) analysis of Nvidia documentation |
+| BIS policy integration | Partial | [NVEU authorization](https://www.sidley.com/en/insights/newsupdates/2025/01/new-us-export-controls-on-advanced-computing-items-and-artificial-intelligence-model-weights) conditional on location verification capability |
+
+### Implementation Requirements
+
+According to [IAPS analysis](https://www.iaps.ai/research/location-verification-for-ai-chips), scaling location verification would require:
+
+1. **Firmware update** allowing AI chips to perform rapid location verification (estimated 6 months)
+2. **Landmark network** of trusted servers near major data centers worldwide
+3. **Policy framework** defining who operates servers and what actions follow verification failure
+
+### Comparison with Alternative Approaches
+
+| Approach | Precision | Privacy | Spoofability | Data Center Compatibility |
+|----------|-----------|---------|--------------|--------------------------|
+| GPS | High | Low | High (easily spoofed) | Low (signals blocked) |
+| IP geolocation | Low | Medium | High (VPNs) | High |
+| Delay-based verification | Medium | High | Low | High |
+| Cell tower triangulation | Medium | Low | Medium | Variable |
+
+## Implementation Considerations
+
+### Current Industry Practices
+
+[Hardware-enabled mechanisms are already widely used](https://arxiv.org/html/2505.03742v1) in defense products and commercial contexts:
+
+| Feature | Current Use | AI Governance Extension | Example Deployment |
+|---------|-------------|------------------------|-------------------|
+| **Device attestation** | DRM, enterprise security | Verify compute environment | [Apple iPhone](https://arxiv.org/html/2505.03742v1) (prevents unauthorized apps) |
+| **Remote wipe** | Lost device protection | Enforcement mechanism | Consumer smartphones |
+| **Licensing servers** | Software activation | Compute authorization | Windows, Adobe products |
+| **Firmware verification** | Security patches | Policy updates | [Nvidia H100](https://ai-frontiers.org/articles/location-verification-ai-chips) (already has this) |
+| **Hardware attestation** | Chip integrity | Compliance monitoring | [Google TPUs](https://arxiv.org/html/2505.03742v1) (verify chips not compromised) |
+| **TPM-based anti-cheat** | Video game integrity | Prevent compute circumvention | Many modern games |
+
+Extending these mechanisms for governance involves primarily scope and purpose changes rather than fundamental technical innovation. The [Trusted Platform Module (TPM) standard](https://media.defense.gov/2024/Nov/06/2003579882/-1/-1/0/CSI-TPM-USE-CASES.PDF), endorsed by NSA for device attestation, provides a foundation that could be extended for AI governance.
+
+### Required Infrastructure
+
+Effective HEM deployment would require:
+
+<Mermaid client:load chart={`
+flowchart LR
+    subgraph CHIP["Chip-Level"]
+        A[Hardware Security Module]
+        B[Attestation Capability]
+        C[Tamper Detection]
+    end
+
+    subgraph NETWORK["Network Level"]
+        D[Licensing Servers]
+        E[Monitoring Infrastructure]
+        F[Update Distribution]
+    end
+
+    subgraph GOVERNANCE["Governance Level"]
+        G[Policy Definition]
+        H[Verification Authority]
+        I[Enforcement Authority]
+    end
+
+    A --> D
+    B --> E
+    C --> I
+    D --> G
+    E --> H
+    F --> G
+
+    style CHIP fill:#e1f5ff
+    style NETWORK fill:#fff3cd
+    style GOVERNANCE fill:#d4edda
+`} />
+
+### Cost Estimates
+
+Cost estimates are highly uncertain given the nascent state of HEM development:
+
+| Component | Development Cost | Ongoing Cost | Who Bears Cost | Notes |
+|-----------|-----------------|--------------|----------------|-------|
+| Chip modifications | \$10-200M | \$1-20M/year maintenance | Manufacturers | Similar to existing security feature development |
+| Landmark server network | \$10-100M | \$1-50M/year | Governments or public-private partnership | Depends on geographic coverage |
+| Verification infrastructure | \$10-200M | \$10-50M/year | Governments | Software, personnel, legal framework |
+| Enforcement systems | \$10-50M | \$10-30M/year | Governments | Investigation, penalties, coordination |
+| Compliance systems | \$1-5M per company | \$1.5-2M/year per company | Operators | Integration with existing IT infrastructure |
+
+For comparison, the [U.S. and EU have each invested approximately \$10 billion](https://www.governance.ai/analysis/computing-power-and-the-governance-of-artificial-intelligence) through their Chips Acts in semiconductor manufacturing subsidies.
+
+## Risk Analysis
+
+### Security Risks
+
+The [RAND workshop](https://www.rand.org/pubs/conf_proceedings/CFA3056-1.html) emphasized that HEMs must be "robustly secured against skilled, well-resourced attackers," potentially including state-level adversaries:
+
+| Risk | Description | Mitigation | Severity |
+|------|-------------|------------|----------|
+| **New attack surface** | Governance mechanisms can be exploited; [critical infrastructure integration](https://arxiv.org/html/2505.03742v1) increases stakes | Security-first design; formal verification | High |
+| **Key management** | Compromise of governance keys catastrophic | Distributed key management; rotation; HSMs | Critical |
+| **Insider threats** | Those with access could abuse systems | Multi-party controls; auditing; whistleblower protections | High |
+| **Nation-state attacks** | Advanced adversaries target infrastructure | Defense in depth; international redundancy; [robust anti-tamper techniques](https://arxiv.org/html/2505.03742v1) | Critical |
+| **Supply chain attacks** | Compromised chips introduced during manufacturing | Trusted foundry programs; hardware verification | High |
+
+### Privacy Risks
+
+[Privacy-preserving measures are essential](https://arxiv.org/html/2505.03742v1) to uphold established data and code privacy norms. If not implemented carefully, HEMs could enable harmful surveillance:
+
+| Risk | Description | Mitigation | Privacy-Preserving Alternative |
+|------|-------------|------------|-------------------------------|
+| **Compute surveillance** | Detailed visibility into all computation | Minimal logging; privacy-preserving attestation | [Delay-based verification](https://www.iaps.ai/research/location-verification-for-ai-chips) reveals only coarse location, not computation content |
+| **Location tracking** | Continuous geographic monitoring | Limit to high-risk contexts only | Country/region level only; no exact coordinates |
+| **Workload analysis** | Infer sensitive research activities | Aggregate reporting; differential privacy | Verify workload size without revealing type |
+| **IP exposure** | Model weights or training data could leak | Hardware isolation; secure enclaves | [Confidential computing](https://www.cncf.io/blog/2025/10/08/a-tpm-based-combined-remote-attestation-method-for-confidential-computing/) preserves IP while enabling attestation |
+
+Critics have drawn comparisons to the [Clipper Chip controversy](https://www.transformernews.ai/p/ai-chip-location-verification-nvidia-china-csa) of the 1990s, when the U.S. government proposed mandatory backdoors for encrypted communications. Advocates counter that location verification is fundamentally different—revealing only where chips are, not what they compute.
+
+### Abuse Risks
+
+| Risk | Description | Mitigation |
+|------|-------------|------------|
+| **Authoritarian use** | Regimes use for oppression | International governance; human rights constraints |
+| **Competitive weaponization** | Block rival companies/countries | Neutral administration |
+| **Mission creep** | Expand beyond AI safety | Clear legal constraints; sunset provisions |
+| **Capture** | Governance controlled by incumbents | Diverse oversight; transparency |
+
+## Strategic Assessment
+
+### Arguments For HEMs
+
+| Argument | Reasoning | Confidence |
+|----------|-----------|------------|
+| **Unique verification capability** | Software-only verification can be circumvented | High |
+| **Enforcement teeth** | Export controls meaningless without enforcement | Medium |
+| **Scalability** | Can govern millions of chips automatically | Medium |
+| **International coordination** | Common technical standard enables cooperation | Medium |
+| **Proportional response** | Different levels for different risks | Medium |
+
+### Arguments Against HEMs
+
+| Argument | Reasoning | Confidence |
+|----------|-----------|------------|
+| **Privacy threat** | Creates unprecedented compute surveillance | High |
+| **Attack surface** | New vulnerabilities in critical infrastructure | High |
+| **Authoritarian tool** | Will be adopted and abused by repressive regimes | High |
+| **Circumvention** | Sufficiently motivated actors will defeat | Medium |
+| **Chilling effect** | Discourages legitimate AI research | Medium |
+| **Implementation complexity** | International coordination very difficult | Medium-High |
+
+### Where HEMs Might Be Appropriate
+
+Given the risk/benefit tradeoffs, [RAND analysis](https://www.rand.org/pubs/working_papers/WRA3056-1.html) suggests HEMs may be appropriate for narrow, high-value use cases:
+
+| Context | Appropriateness | Rationale | Current Policy Status |
+|---------|-----------------|-----------|----------------------|
+| Export control verification | Medium-High | Extends existing policy; addresses \$1B+ diversion problem | [NVEU authorization](https://www.sidley.com/en/insights/newsupdates/2025/01/new-us-export-controls-on-advanced-computing-items-and-artificial-intelligence-model-weights) requires location verification capability |
+| Large training run detection | Medium | Clear capability threshold (10^26 FLOP under [EO 14110](https://www.governance.ai/analysis/computing-power-and-the-governance-of-artificial-intelligence)) | Under consideration |
+| Post-incident investigation | Medium | Limited, targeted use | No current policy |
+| Ongoing surveillance of all compute | Low | Disproportionate; massive privacy cost | [Workshop consensus](https://www.rand.org/pubs/conf_proceedings/CFA3056-1.html) against broad scope |
+| Inference monitoring | Very Low | Massive scope, limited benefit; chilling effect on AI deployment | Not under serious consideration |
+
+**Key insight from RAND:** "Although it is premature to definitively endorse the use of HEMs in such high-performance chips as GPUs, dismissing HEM use outright is equally premature."
+
+## HEM Governance Ecosystem
+
+The following diagram shows how HEMs fit within the broader AI governance landscape:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph POLICY["Policy Layer"]
+        A[Export Controls<br/>3A090/4A090] --> B[Compute Thresholds<br/>10^26 FLOP]
+        B --> C[Reporting<br/>Requirements]
+    end
+
+    subgraph HEM["Hardware-Enabled Mechanisms"]
+        D[Location<br/>Verification] --> E[Delay-Based<br/>Attestation]
+        F[Licensing<br/>Controls] --> G[Offline<br/>Renewal]
+        H[Usage<br/>Monitoring] --> I[Training Run<br/>Detection]
+    end
+
+    subgraph ACTORS["Key Actors"]
+        J[BIS/Commerce<br/>Dept]
+        K[Chip Makers<br/>Nvidia/AMD]
+        L[Data Center<br/>Operators]
+    end
+
+    subgraph OUTCOMES["Outcomes"]
+        M[Smuggling<br/>Deterrence]
+        N[Compliance<br/>Verification]
+        O[Enforcement<br/>Actions]
+    end
+
+    A --> D
+    A --> F
+    B --> H
+    J --> D
+    K --> E
+    L --> G
+    E --> M
+    G --> N
+    I --> O
+
+    style POLICY fill:#e1f5ff
+    style HEM fill:#fff3cd
+    style ACTORS fill:#d4edda
+    style OUTCOMES fill:#f8d7da
+`} />
+
+## International Dimensions
+
+### Coordination Challenges
+
+| Challenge | Description | Current Status | Potential Resolution |
+|-----------|-------------|----------------|---------------------|
+| **Chip manufacturing concentration** | TSMC produces [over 90% of advanced chips](https://www.governance.ai/analysis/computing-power-and-the-governance-of-artificial-intelligence) | Creates leverage but also single point of failure | Leverage market power for standards; diversify production |
+| **Three-tier country system** | [18 Tier 1 allies](https://introl.com/blog/ai-export-controls-navigating-chip-restrictions-globally-2025) with no limits; ~120 Tier 2 with caps; ≈20 Tier 3 prohibited | Creates pressure for circumvention | Harmonized international controls |
+| **Technology transfer** | HEM tech could be misused by authoritarian regimes | No international agreement | Careful capability scoping; human rights conditions |
+| **Verification of verifiers** | Who monitors governance systems? | No multilateral framework | International oversight body (IAEA model discussed) |
+| **Chinese opposition** | China has [warned Nvidia against tracking features](https://www.transformernews.ai/p/ai-chip-location-verification-nvidia-china-csa) and launched security investigations | Creates market pressure on manufacturers | May require accepting reduced China market access |
+
+### Relationship to Export Controls
+
+HEMs would function alongside export controls:
+
+| Control Type | What It Does | HEM Complement |
+|--------------|--------------|----------------|
+| Export licenses | Control initial transfer | Verify ongoing location |
+| End-use restrictions | Require stated purpose | Verify actual use |
+| Entity lists | Block specific actors | Prevent circumvention |
+| Compute thresholds | Trigger requirements | Detect threshold crossing |
+
+## Future Research Needs
+
+### Technical Research
+
+| Question | Importance | Current Status | Key Researchers/Orgs |
+|----------|------------|----------------|---------------------|
+| Privacy-preserving attestation | Critical | Active research; [confidential computing integration](https://www.cncf.io/blog/2025/10/08/a-tpm-based-combined-remote-attestation-method-for-confidential-computing/) | CNCF, cloud providers |
+| Tamper-resistant design | High | [Robust anti-tamper techniques](https://arxiv.org/html/2505.03742v1) needed for state-level adversaries | Defense contractors, chip makers |
+| Minimal-information verification | High | [Delay-based verification](https://www.iaps.ai/research/location-verification-for-ai-chips) prototyped | IAPS, academic researchers |
+| Formal security analysis | High | Limited public analysis | Academic security researchers |
+| Quantum-resistant cryptography | Medium | [NSA TPM guidance](https://media.defense.gov/2024/Nov/06/2003579882/-1/-1/0/CSI-TPM-USE-CASES.PDF) highlights transition need | NIST, cryptography community |
+
+### Policy Research
+
+| Question | Importance | Current Status | Key Researchers/Orgs |
+|----------|------------|----------------|---------------------|
+| Appropriate scope limitations | Critical | [RAND workshop](https://www.rand.org/pubs/conf_proceedings/CFA3056-1.html) recommends narrow scope | RAND, GovAI |
+| International governance models | High | [IAEA analogy](https://arxiv.org/pdf/2507.06379) discussed; no concrete proposals | Arms control community |
+| Abuse prevention mechanisms | Critical | Identified as major concern; underexplored solutions | Civil society, human rights orgs |
+| Democratic accountability | High | Underexplored; few governance proposals | AI governance researchers |
+| Human rights conditions | High | Not yet integrated into proposals | Human Rights Watch, Amnesty |
+
+## Risks Addressed
+
+| Risk | Mechanism | Effectiveness |
+|------|-----------|---------------|
+| Export control evasion | Ongoing verification | Medium-High |
+| Unauthorized large training | Compute detection | Medium |
+| Geographic restrictions | Location verification | Medium |
+| Incident response | Remote disable capability | High (if implemented) |
+
+## Complementary Interventions
+
+- <EntityLink id="export-controls">Export Controls</EntityLink> - Initial access controls that HEMs verify
+- <EntityLink id="thresholds">Compute Thresholds</EntityLink> - Thresholds that HEMs could detect
+- <EntityLink id="monitoring">Compute Monitoring</EntityLink> - Broader monitoring framework
+- <EntityLink id="international-regimes">International Regimes</EntityLink> - Governance for global coordination
+
+## Sources
+
+### Primary Research
+
+- **[RAND Corporation (2024): Hardware-Enabled Governance Mechanisms](https://www.rand.org/pubs/working_papers/WRA3056-1.html)** - The most comprehensive public analysis of HEMs for AI governance, exploring attestation-based licensing and fixed-set approaches
+- **[RAND Workshop Proceedings (2024)](https://www.rand.org/pubs/conf_proceedings/CFA3056-1.html)** - Insights from 13 experts on HEM feasibility, risks, and design principles
+- **[GovAI (2023): Computing Power and the Governance of AI](https://www.governance.ai/analysis/computing-power-and-the-governance-of-artificial-intelligence)** - Framework for why compute is a feasible governance lever (detectable, excludable, quantifiable)
+- **[CNAS (2024): Technology to Secure the AI Chip Supply Chain](https://www.cnas.org/publications/reports/technology-to-secure-the-ai-chip-supply-chain-a-primer)** - Analysis of supply chain security and smuggling concerns
+- **[IAPS: Location Verification for AI Chips](https://www.iaps.ai/research/location-verification-for-ai-chips)** - Technical analysis of delay-based verification mechanisms
+
+### Policy Developments
+
+- **[BIS AI Diffusion Framework (2025)](https://www.federalregister.gov/documents/2025/01/15/2025-00636/framework-for-artificial-intelligence-diffusion)** - Three-tier country classification and NVEU authorization requirements
+- **[Sidley Austin Analysis (2025)](https://www.sidley.com/en/insights/newsupdates/2025/01/new-us-export-controls-on-advanced-computing-items-and-artificial-intelligence-model-weights)** - Seven key takeaways on export control developments
+- **[Chip Security Act Coverage](https://www.transformernews.ai/p/ai-chip-location-verification-nvidia-china-csa)** - Analysis of legislative proposals and industry response
+
+### Technical Background
+
+- **[NSA TPM Use Cases (2024)](https://media.defense.gov/2024/Nov/06/2003579882/-1/-1/0/CSI-TPM-USE-CASES.PDF)** - Government guidance on Trusted Platform Module applications
+- **[Hardware-Enabled Mechanisms for Verifying AI Development (2025)](https://arxiv.org/html/2505.03742v1)** - Academic analysis of HEM security and privacy considerations
+- **[CNCF TPM Attestation for Confidential Computing (2025)](https://www.cncf.io/blog/2025/10/08/a-tpm-based-combined-remote-attestation-method-for-confidential-computing/)** - Technical implementation of hybrid attestation frameworks
+
+### News and Analysis
+
+- **[CNBC: Nvidia Tracking Software (2025)](https://www.cnbc.com/2025/12/11/nvidias-new-software-could-help-trace-where-its-ai-chips-end-up.html)** - Coverage of Nvidia's pilot tracking program
+- **[AI Frontiers: Location Verification Analysis](https://ai-frontiers.org/articles/location-verification-ai-chips)** - Deep dive on technical implementation and policy implications
+- **[Data Innovation: Policy Critique (2024)](https://datainnovation.org/2024/03/u-s-policymakers-should-reject-kill-switches-for-ai/)** - Arguments against hardware kill switches
+
+---
+
+## AI Transition Model Context
+
+Hardware-enabled governance affects the <EntityLink id="ai-transition-model" /> through multiple factors:
+
+| Factor | Parameter | Impact | Confidence |
+|--------|-----------|--------|------------|
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="regulatory-capacity" /> | Enables verification of safety requirements even after hardware deployment; could increase regulatory capacity by 20-40% | Medium |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Remote attestation could verify AI systems are running approved workloads; enables [workload verification without exposing IP](https://arxiv.org/html/2505.03742v1) | Medium |
+| <EntityLink id="transition-turbulence" /> | <EntityLink id="ai-control-concentration" /> | Risk of authoritarian misuse if governance mechanisms are captured; requires strong abuse prevention | Medium-High |
+
+**Key uncertainties:**
+- Whether [algorithmic efficiency improvements](https://www.governance.ai/analysis/computing-power-and-the-governance-of-artificial-intelligence) will outpace hardware controls
+- Whether international coordination can be achieved given [Chinese opposition](https://www.transformernews.ai/p/ai-chip-location-verification-nvidia-china-csa)
+- Whether narrow HEM use cases can resist scope creep
+
+HEMs are high-risk, high-reward infrastructure requiring 5-10 year development timelines; [RAND analysis](https://www.rand.org/pubs/working_papers/WRA3056-1.html) suggests appropriate use cases limited to export control verification and large training run detection.

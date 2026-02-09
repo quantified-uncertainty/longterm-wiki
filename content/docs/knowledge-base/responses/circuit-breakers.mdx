@@ -1,0 +1,521 @@
+---
+title: Circuit Breakers / Inference Interventions
+description: Circuit breakers are runtime safety interventions that detect and halt harmful AI outputs during inference. Gray Swan's representation rerouting achieves 87-90% rejection rates with only 1% capability loss, while Anthropic's Constitutional Classifiers block 95.6% of jailbreaks. However, the UK AISI challenge found all 22 tested models could eventually be broken, highlighting the need for defense-in-depth approaches.
+importance: 74
+quality: 64
+lastEdited: "2026-01-28"
+sidebar:
+  order: 25
+pageTemplate: knowledge-base-response
+llmSummary: Circuit breakers are runtime safety interventions that detect and halt harmful AI outputs during inference. Gray Swan's representation rerouting achieves 87-90% rejection rates with 1% capability loss, while Anthropic's Constitutional Classifiers block 95.6% of jailbreaks with 0.38% over-refusal increase. However, the UK AISI challenge found all 22 tested models eventually broken (62K/1.8M attempts succeeded), and novel token-forcing attacks achieve 25% success rates, highlighting fundamental limitations of reactive defenses.
+ratings:
+  novelty: 4.5
+  rigor: 7
+  actionability: 6.5
+  completeness: 7.5
+metrics:
+  wordCount: 1723
+  citations: 37
+  tables: 39
+  diagrams: 5
+clusters:
+  - ai-safety
+subcategory: alignment-interpretability
+---
+import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="circuit-breakers" client:load />
+
+## Overview
+
+Circuit breakers represent a class of runtime interventions that can detect and stop harmful model behavior during inference, before outputs reach users or actions are executed. Unlike <EntityLink id="output-filtering">output filtering</EntityLink> which operates on completed outputs, circuit breakers can intervene mid-generation, potentially stopping harm earlier in the process. This includes monitoring activation patterns, detecting emerging harmful content, and intervening when dangerous patterns are detected.
+
+The approach draws inspiration from electrical circuit breakers that automatically interrupt dangerous current flows, and from software systems that halt operations when safety invariants are violated. For AI systems, circuit breakers can detect when a model is generating content that violates safety policies, when activation patterns suggest deceptive or manipulative intent, or when the system is attempting unauthorized actions.
+
+Research organizations like [Gray Swan AI](https://www.grayswan.ai/research/circuit-breakers) have developed circuit breaker techniques that can reduce harmful outputs by modifying model behavior at inference time. Their 2024 paper "[Improving Alignment and Robustness with Circuit Breakers](https://arxiv.org/abs/2406.04313)" demonstrated that representation rerouting can reject harmful requests 87-90% of the time while preserving model capabilities. However, the approach faces fundamental limitations: it remains reactive rather than proactive, sophisticated models could potentially generate harm faster than circuit breakers can respond, and determined adversaries may find ways to trigger harmful outputs that evade detection. The UK AISI × Gray Swan Agent Red-Teaming Challenge (March-April 2025) tested 22 different LLMs with 1.8 million attack attempts, finding 62,000 successful breaks—demonstrating that no current frontier system fully resists determined, well-resourced attacks. Circuit breakers are a valuable last line of defense but should not substitute for addressing underlying alignment issues.
+
+## Risk Assessment & Impact
+
+| Dimension | Rating | Assessment |
+|-----------|--------|------------|
+| **Safety Uplift** | Medium | Can prevent harmful outputs in real-time; reactive defense |
+| **Capability Uplift** | Tax | Interventions may reduce fluency or capability |
+| **Net World Safety** | Helpful | Valuable last line of defense; doesn't address root causes |
+| **Lab Incentive** | Moderate | Practical for deployment safety; some product impact |
+| **Scalability** | Partial | Works at scale; but sophisticated attacks may evade |
+| **Deception Robustness** | Weak | Deceptive model could generate harm before circuit breaks |
+| **SI Readiness** | No | SI could reason around or disable circuit breakers |
+
+### Research Investment
+
+- **Current Investment**: \$10-30M/yr (Gray Swan, <EntityLink id="anthropic">Anthropic</EntityLink>, various labs)
+- **Recommendation**: Increase (practical near-term intervention; needs more research)
+- **Differential Progress**: Safety-leaning (primarily safety; some reliability benefits)
+
+## Comparison of Circuit Breaker Approaches
+
+Different circuit breaker implementations offer varying tradeoffs between safety effectiveness, capability preservation, and computational cost. The following table compares major approaches based on published research and evaluations.
+
+| Approach | Mechanism | Jailbreak Rejection Rate | Capability Impact | Compute Overhead | Limitations |
+|----------|-----------|-------------------------|-------------------|------------------|-------------|
+| **Representation Rerouting (RR)** | Redirects harmful internal representations to orthogonal space | 87-90% | ≈1% capability loss | Low (≈5%) | Vulnerable to novel token-forcing attacks |
+| **Constitutional Classifiers** | Input/output filters trained on constitutional principles | 95.6% (from 86% baseline) | 0.38% increased refusal | 1-24% (improved over time) | No universal jailbreaks found but specific attacks possible |
+| **<EntityLink id="refusal-training">Refusal Training</EntityLink> (<EntityLink id="rlhf">RLHF</EntityLink>)** | Train model to refuse harmful requests directly | 40-70% (varies widely) | Can reduce helpfulness | None at inference | Highly vulnerable to adversarial attacks |
+| **<EntityLink id="adversarial-training">Adversarial Training</EntityLink>** | Train against known attack patterns | 60-80% on trained attacks | Minor | High during training | Poor generalization to novel attacks |
+| **Activation Clamping** | Modify activations when harmful patterns detected | 70-85% | 5-15% capability loss | Medium | Requires interpretability research |
+| **Output Filtering** | Post-generation content moderation | 50-70% | None | Medium | Can be bypassed with encoded content |
+
+*Sources: [Gray Swan Circuit Breakers Paper](https://arxiv.org/abs/2406.04313), [Anthropic Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers), [HarmBench](https://github.com/centerforaisafety/HarmBench)*
+
+### Quantified Effectiveness Against Attack Types
+
+The following table shows measured attack success rates (lower is better for defense) across different defense methods when tested against standardized attack benchmarks.
+
+| Attack Type | No Defense | Refusal Training | Circuit Breakers (RR) | Constitutional Classifiers | Combined Defense |
+|-------------|------------|------------------|----------------------|---------------------------|------------------|
+| **Direct Harmful Requests** | 95% ASR | 15-30% ASR | 10-13% ASR | 4.4% ASR | 2-5% ASR |
+| **GCG (Gradient-based)** | 90% ASR | 60-80% ASR | 8-12% ASR | 5% ASR | 3-8% ASR |
+| **PAIR (LLM Optimizer)** | 85% ASR | 40-60% ASR | 10-15% ASR | 6% ASR | 4-10% ASR |
+| **AutoDAN** | 80% ASR | 50-70% ASR | 12-18% ASR | 7% ASR | 5-12% ASR |
+| **Human Jailbreaks** | 75% ASR | 35-50% ASR | 15-20% ASR | 8% ASR | 6-15% ASR |
+| **Novel Token-Forcing** | 90% ASR | 70-85% ASR | 25-40% ASR | Unknown | 15-30% ASR |
+
+*ASR = Attack Success Rate. Sources: [HarmBench evaluations](https://github.com/centerforaisafety/HarmBench), [Breaking Circuit Breakers](https://confirmlabs.org/posts/circuit_breaking.html), [Constitutional Classifiers paper](https://arxiv.org/abs/2501.18837)*
+
+## How Circuit Breakers Work
+
+Circuit breakers operate at inference time, monitoring and potentially intervening during model generation:
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[User Input] --> B[Model Inference]
+    B --> C{Circuit Breaker Check}
+
+    D[Activation Monitor] --> C
+    E[Output Scanner] --> C
+    F[Behavior Classifier] --> C
+
+    C -->|Safe| G[Continue Generation]
+    C -->|Concerning| H{Severity?}
+
+    H -->|Low| I[Soft Intervention]
+    H -->|High| J[Hard Stop]
+
+    I --> K[Modified Output]
+    J --> L[Block + Alert]
+
+    G --> M[User Receives Output]
+    K --> M
+
+    style C fill:#ffddcc
+    style J fill:#ffcccc
+    style M fill:#d4edda
+`} />
+
+### Intervention Types
+
+| Type | Mechanism | Use Case | Tradeoff |
+|------|-----------|----------|----------|
+| **Hard Stop** | Halt generation immediately | Clear policy violation | May truncate mid-sentence |
+| **Soft Redirect** | Steer generation away from harm | Emerging concern | May produce awkward output |
+| **Activation Clamping** | Modify internal activations | Representation-level intervention | Requires interpretability |
+| **Token Blocking** | Prevent specific token generation | Known harmful patterns | Easily circumvented |
+| **Probability Shifting** | Reduce likelihood of harmful continuations | Subtle steering | May affect quality |
+
+### Detection Mechanisms
+
+| Mechanism | What It Detects | Speed | Accuracy |
+|-----------|----------------|-------|----------|
+| **Token-level scanning** | Harmful words/phrases | Very fast | Low (easy to bypass) |
+| **Sequence classification** | Harmful content patterns | Fast | Medium |
+| **Activation analysis** | Internal state patterns | Medium | Higher potential |
+| **Semantic analysis** | Meaning/intent of content | Slower | Higher accuracy |
+| **Behavioral pattern matching** | Multi-step harmful sequences | Slowest | Context-dependent |
+
+## Gray Swan's Circuit Breaker Research
+
+Gray Swan AI, in collaboration with Carnegie Mellon University and the Center for AI Safety, has been a leader in circuit breaker research. Their June 2024 paper "[Improving Alignment and Robustness with Circuit Breakers](https://arxiv.org/abs/2406.04313)" (Zou et al.) introduced representation rerouting as a more robust alternative to refusal training.
+
+### Key Research Findings
+
+| Technique | Approach | Quantified Result | Source |
+|-----------|----------|-------------------|--------|
+| **Representation Rerouting (RR)** | Redirect harmful representations to orthogonal activation space | 87-90% harmful request rejection rate | [arXiv:2406.04313](https://arxiv.org/abs/2406.04313) |
+| **Cygnet Model** | Llama-3-8B-Instruct finetune with circuit breakers | ≈100x reduction in harmful outputs vs baseline | [Gray Swan Research](https://www.grayswan.ai/research/circuit-breakers) |
+| **Capability Preservation** | Pareto-optimal safety/capability tradeoff | Only 1% dip in MT-Bench and MMLU scores | [arXiv:2406.04313](https://arxiv.org/abs/2406.04313) |
+| **UK AISI Red-Teaming** | Large-scale adversarial evaluation | 62K successful breaks across 22 models from 1.8M attempts | [Gray Swan News](https://www.grayswan.ai/news/uk-aisi-x-gray-swan-agent-red-teaming-challenge-results-snapshot) |
+
+### Technical Approach: Representation Rerouting
+
+The circuit breaker method operates through four key steps:
+
+1. **Identify harmful representations**: Using contrastive activation pairs from harmful vs. safe prompts, identify the activation directions in the model's internal representation space that correspond to harmful outputs
+
+2. **Create intervention vectors**: Develop orthogonal projection matrices that can reroute activations away from harmful regions while preserving the geometric structure needed for benign capabilities
+
+3. **Apply at inference**: Monitor residual stream activations at key layers (typically layers 8-24 in Llama-scale models) and apply the rerouting transformation when harmful patterns are detected
+
+4. **Maintain capability**: The orthogonal rerouting preserves distances and angles between non-harmful representations, enabling ~99% capability retention on benchmarks like MT-Bench and MMLU
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Training["Training Phase"]
+        A[Collect Harmful/Safe Prompt Pairs] --> B[Extract Contrastive Activations]
+        B --> C[Identify Harmful Representation Directions]
+        C --> D[Compute Orthogonal Rerouting Matrix]
+    end
+
+    subgraph Inference["Inference Phase"]
+        E[User Input] --> F[Forward Pass Begins]
+        F --> G[Monitor Residual Stream]
+        G --> H{Activation in Harmful Region?}
+        H -->|No| I[Continue Normal Generation]
+        H -->|Yes| J[Apply Rerouting Transform]
+        J --> K[Modified Activations]
+        K --> L[Safe Output Generation]
+        I --> M[Output to User]
+        L --> M
+    end
+
+    D --> G
+
+    style H fill:#ffddcc
+    style J fill:#d4edda
+    style Training fill:#e8f4f8
+    style Inference fill:#f8f4e8
+`} />
+
+## Activation-Level Interventions
+
+More sophisticated circuit breakers operate at the activation level:
+
+### How Activation Intervention Works
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[Input Processing] --> B[Generate Activations]
+    B --> C{Monitor Activations}
+
+    D[Harmful Direction Detector] --> C
+
+    C -->|Normal| E[Continue]
+    C -->|Concerning| F[Apply Correction]
+
+    F --> G[Modified Activations]
+    G --> H[Continue Generation]
+    E --> I[Output]
+    H --> I
+
+    style C fill:#fff3cd
+    style F fill:#d4edda
+`} />
+
+### Intervention Targets
+
+| Target | Description | Advantage | Challenge |
+|--------|-------------|-----------|-----------|
+| **Residual stream** | Main information flow | Direct impact | May disrupt coherence |
+| **Attention patterns** | What model focuses on | Can redirect attention | Complex to interpret |
+| **MLP activations** | Feature representations | Feature-level control | Requires interpretability |
+| **Layer outputs** | Per-layer representations | Can catch early | Need to know which layers |
+
+## Limitations and Challenges
+
+Research from [Confirm Labs](https://confirmlabs.org/posts/circuit_breaking.html) and other groups has identified significant weaknesses in current circuit breaker implementations. Understanding these limitations is essential for realistic assessment of the approach.
+
+### Fundamental Issues
+
+| Limitation | Explanation | Quantified Impact | Mitigation |
+|------------|-------------|-------------------|------------|
+| **Reactive** | Can only respond to detected patterns | N/A - architectural | Better detection, faster response |
+| **Speed constraints** | Must be faster than generation | 2-10ms per token overhead | Hardware optimization, early-layer detection |
+| **False positives** | May block legitimate content | 4% to 38.5% over-refusal increase on OR-Bench | Calibration, soft interventions, constitutional classifiers |
+| **Circumvention** | Novel attacks evade detection | 25% ASR for novel token-forcing attacks | Continuous updating, layered defenses |
+| **Capability tax** | Interventions may degrade quality | 1-15% capability loss depending on method | Minimal intervention approaches |
+
+*Sources: [Breaking Circuit Breakers](https://confirmlabs.org/posts/circuit_breaking.html), [OR-Bench evaluations](https://arxiv.org/abs/2406.04313)*
+
+### Why Circuit Breakers Fail Against Sophisticated Adversaries
+
+| Attack Vector | How It Works | Why Breakers Fail | Measured Success Rate |
+|---------------|--------------|-------------------|----------------------|
+| **Novel token-forcing** | Use alternative completion patterns (e.g., "1. Choose the right..." instead of "Sure, here's how...") | Circuit breakers trained on specific harmful prefixes don't generalize | 25% ASR vs 2.5% for standard GCG |
+| **Distillation attacks** | White-box attacks targeting internal activations directly | Can break model even while requiring attack fluency | High (model-specific) |
+| **Gradual generation** | Build harmful content slowly across many tokens | Each individual step appears safe to detectors | 40-60% ASR |
+| **Encoded content** | Obfuscate harmful content with base64, pig latin, etc. | Semantic analysis required at representation level | 30-50% ASR |
+| **Instruction hierarchy violations** | Harm embedded in seemingly-safe task instructions | Context-dependent; hard to distinguish from legitimate use | 35-45% ASR |
+
+*Source: [Gray Swan Cygnet-8B was jailbroken in 3 hours](https://www.lesswrong.com/posts/NAYyHimM3FaDYLvEH/breaking-circuit-breakers) despite impressive 0.0 scores in initial red-teaming evaluations*
+
+### The Speed Problem
+
+For circuit breakers to be effective, they must:
+
+1. Detect harmful patterns before harm occurs
+2. Intervene before output reaches user/system
+3. Not add prohibitive latency
+
+| Scenario | Challenge |
+|----------|-----------|
+| **Streaming outputs** | Partial output already delivered |
+| **Agentic actions** | Action may be executed before detection |
+| **High throughput** | Latency costs multiply at scale |
+| **Sophisticated attacks** | May generate harm faster than detection |
+
+## Key Cruxes
+
+### Crux 1: Are Circuit Breakers a Meaningful Safety Measure?
+
+| Position: Yes (55% probability) | Position: Limited Value (45% probability) |
+|--------------|------------------------|
+| Last line of defense catches 87-95% of known attacks | Reactive defense; determined adversaries find bypasses |
+| UK AISI challenge: only 3.4% success rate (62K/1.8M) | Same challenge: every model eventually broken |
+| Defense-in-depth reduces expected harm | May create false confidence in safety |
+| Anthropic's 3,000 red-teamer hours found no universal jailbreak | Future techniques may discover vulnerabilities |
+
+*Key evidence that would update toward "Yes": Circuit breakers remaining robust against novel attack classes for 2+ years. Key evidence for "Limited Value": Automated jailbreak discovery that scales faster than defense updates.*
+
+### Crux 2: Can Activation-Level Interventions Be Made Robust?
+
+| Position: Promising (40% probability) | Position: Fundamental Limits (60% probability) |
+|--------------------|----------------------------|
+| Representation rerouting achieves 87-90% rejection without capability loss | Theoretical results show quadratic helpfulness cost for guaranteed alignment |
+| Constitutional classifiers + RR combined may exceed 95% effectiveness | Arms race dynamics: [Cygnet-8B broken in 3 hours](https://www.lesswrong.com/posts/NAYyHimM3FaDYLvEH/breaking-circuit-breakers) despite strong initial results |
+| Interpretability research advancing rapidly | Deceptive models could potentially learn to hide harmful representations |
+| Works on multimodal models | 25% ASR for novel token-forcing shows generalization limits |
+
+*Key evidence that would update toward "Promising": Formal verification methods for representation-level safety. Key evidence for "Fundamental Limits": Systematic discovery of attacks that generalize across circuit breaker implementations.*
+
+### Crux 3: Is the Capability Tax Acceptable?
+
+| Position: Worth It (65% probability) | Position: Too High (35% probability) |
+|-------------------|-------------------|
+| Anthropic achieved 1% overhead with 95.6% protection | Early implementations showed 24% overhead; user experience matters |
+| 0.38% over-refusal increase is negligible for most applications | 4% to 38.5% over-refusal on OR-Bench shows tradeoff can be severe |
+| Enterprise customers increasingly demand safety certifications | Competitive pressure may drive users to less safe alternatives |
+| Tax decreasing with better research (1% vs 24% over 1 year) | Some applications cannot tolerate any capability degradation |
+
+*Key evidence that would update toward "Worth It": Customer willingness-to-pay for verified safety. Key evidence for "Too High": Significant user migration to unrestricted models.*
+
+## Anthropic's Constitutional Classifiers
+
+Anthropic's [Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) represent a complementary approach to circuit breakers, using input/output filtering rather than activation-level intervention. Their January 2025 paper demonstrated impressive results in a large-scale red-teaming evaluation.
+
+### Red-Teaming Results
+
+| Metric | Baseline (No Defense) | With Constitutional Classifiers | Improvement |
+|--------|----------------------|--------------------------------|-------------|
+| **Jailbreak Success Rate** | 86% | 4.4% | 95% reduction |
+| **Over-refusal Rate** | Baseline | +0.38% (not statistically significant) | Minimal impact |
+| **Compute Overhead** | N/A | 1% (improved from 24% in earlier version) | 96% cost reduction |
+| **Universal Jailbreaks Found** | N/A | 0 (after 3,000+ red-teamer hours) | None discovered |
+
+*Source: [Anthropic Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers)*
+
+### Red-Teaming Challenge Details
+
+Anthropic conducted a two-month red-teaming challenge with significant participation:
+
+- **185 active participants** competed for \$15,000 in rewards
+- **3,000+ hours** of cumulative red-teaming effort
+- **560,000+ queries** submitted across the full testing period
+- **1 "high-risk vulnerability"** found (but no universal jailbreak)
+- **Result**: No participant discovered a single jailbreak that worked across all 10 forbidden query categories
+
+This represents one of the most extensive public evaluations of an AI safety defense mechanism, though researchers acknowledge that future techniques may find vulnerabilities.
+
+## Best Practices
+
+### Implementation Architecture
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Detection["Detection Layer"]
+        A[Token Scanner]
+        B[Sequence Classifier]
+        C[Activation Monitor]
+        D[Behavior Analyzer]
+    end
+
+    subgraph Decision["Decision Layer"]
+        E[Severity Assessment]
+        F[Intervention Selection]
+    end
+
+    subgraph Response["Response Layer"]
+        G[Hard Stop]
+        H[Soft Redirect]
+        I[Continue]
+        J[Log + Alert]
+    end
+
+    Detection --> Decision
+    Decision --> Response
+
+    style Detection fill:#fff3cd
+    style Decision fill:#ffddcc
+`} />
+
+### Design Principles
+
+| Principle | Implementation |
+|-----------|----------------|
+| **Fail-safe** | Default to blocking in ambiguous cases |
+| **Minimal intervention** | Smallest change to prevent harm |
+| **Fast path** | Optimize for low-latency common cases |
+| **Auditability** | Log all interventions for review |
+| **Graceful degradation** | Handle breaker failures safely |
+
+### Calibration Approach
+
+| Concern | Calibration Strategy |
+|---------|---------------------|
+| **Too many false positives** | Raise detection thresholds, use soft interventions |
+| **Missing harmful content** | Lower thresholds, expand detection patterns |
+| **Latency too high** | Optimize detection, use progressive approaches |
+| **Capability degradation** | Minimize intervention strength, targeted modifications |
+
+### Defense-in-Depth Architecture
+
+Modern AI safety systems increasingly combine multiple circuit breaker approaches in a layered defense architecture. The following diagram illustrates how different mechanisms can work together.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Input["Input Layer"]
+        A[User Query] --> B[Constitutional Input Classifier]
+        B -->|Flagged| C[Input Rejection]
+        B -->|Passed| D[Forward to Model]
+    end
+
+    subgraph Model["Model Layer"]
+        D --> E[Embedding + Early Layers]
+        E --> F{Activation Monitor}
+        F -->|Harmful Pattern| G[Representation Rerouting]
+        F -->|Normal| H[Continue Generation]
+        G --> H
+        H --> I[Generate Tokens]
+        I --> J{Mid-Generation Check}
+        J -->|Harmful Trend| K[Soft Redirect]
+        J -->|Safe| L[Continue]
+        K --> L
+    end
+
+    subgraph Output["Output Layer"]
+        L --> M[Constitutional Output Classifier]
+        M -->|Flagged| N[Output Blocking + Alert]
+        M -->|Passed| O[User Receives Response]
+    end
+
+    subgraph Monitoring["Monitoring Layer"]
+        P[Behavioral Analytics] --> Q[Pattern Learning]
+        Q --> F
+        Q --> B
+        Q --> M
+        N --> P
+        C --> P
+    end
+
+    style C fill:#ffcccc
+    style N fill:#ffcccc
+    style O fill:#d4edda
+    style G fill:#fff3cd
+    style K fill:#fff3cd
+`} />
+
+This layered approach achieves better results than any single method:
+- **Input classifiers** catch 70-80% of obvious jailbreak attempts early
+- **Activation monitoring** catches 15-20% of remaining threats during generation
+- **Output classifiers** catch 5-10% that slip through earlier layers
+- **Combined false positive rate** remains below 5% when properly calibrated
+
+## Who Should Work on This?
+
+**Good fit if you believe:**
+- Practical near-term interventions are valuable
+- Defense-in-depth is worth pursuing
+- Runtime safety can complement training
+- Incremental improvements help
+
+**Less relevant if you believe:**
+- Sophisticated AI will always circumvent
+- Better to focus on alignment
+- Capability tax is unacceptable
+- Creates false sense of security
+
+## Current State of Practice
+
+### Industry Adoption
+
+| Organization | Approach | Key Results | Maturity |
+|--------------|----------|-------------|----------|
+| **Gray Swan AI** | Representation rerouting, red-teaming | 87-90% rejection rate; hosted UK AISI challenge with 1.8M attacks | Research leader |
+| **Anthropic** | Constitutional Classifiers + monitoring | 95.6% jailbreak blocking; 0.38% over-refusal increase; 1% compute overhead | Production deployment |
+| **OpenAI** | Content filtering, moderation API | Integrated into GPT-4 and API products | Production deployment |
+| **Cisco (Robust Intelligence)** | AI Firewall, algorithmic red-teaming | Acquired October 2024 for enterprise AI security | Enterprise solutions |
+| **METR/Apollo** | Third-party evaluation protocols | Independent safety assessment | Evaluation standards |
+
+*Sources: [Gray Swan Research](https://www.grayswan.ai/research), [Anthropic Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers), [Cisco AI Defense](https://www.cisco.com/site/us/en/products/security/ai-defense/robust-intelligence-is-part-of-cisco/index.html)*
+
+### Research Directions
+
+| Direction | Current Progress | Key Challenges | Estimated Timeline |
+|-----------|-----------------|----------------|-------------------|
+| **Faster detection** | 2-10ms overhead achieved | Maintaining accuracy at lower latency | Ongoing |
+| **Activation-level interventions** | RR demonstrated; probes developing | Requires interpretability advances | 1-2 years |
+| **Adaptive breakers** | Early research | Learning without creating vulnerabilities | 2-3 years |
+| **Minimal intervention** | 1% capability tax achieved by Anthropic | Maintaining safety at lower intervention strength | Ongoing |
+| **Formal guarantees** | Theoretical results showing quadratic helpfulness loss | Practical guarantees remain elusive | 3-5+ years |
+| **Multimodal circuit breakers** | Demonstrated on vision-language models | Complexity of cross-modal harmful content | 1-2 years |
+
+*Sources: [Representation Engineering review](https://safe.ai/blog/representation-engineering-a-new-way-of-understanding-models), [Constitutional Classifiers++](https://arxiv.org/abs/2601.04603)*
+
+## Sources & Resources
+
+### Primary Research Papers
+
+| Paper | Authors | Key Contribution | Link |
+|-------|---------|------------------|------|
+| **Improving Alignment and Robustness with Circuit Breakers** | Zou et al. (Gray Swan, CMU, CAIS) | Introduced representation rerouting; 87-90% rejection rate | [arXiv:2406.04313](https://arxiv.org/abs/2406.04313) |
+| **Constitutional Classifiers: Defending against Universal Jailbreaks** | Anthropic | 95.6% jailbreak blocking; 0.38% over-refusal | [Anthropic Research](https://www.anthropic.com/research/constitutional-classifiers) |
+| **Representation Engineering: A Top-Down Approach to AI Transparency** | Zou et al. (CAIS) | Foundation for circuit breaker methods | [CAIS Blog](https://safe.ai/blog/representation-engineering-a-new-way-of-understanding-models) |
+| **Breaking Circuit Breakers** | Confirm Labs | Identified 25% ASR for novel token-forcing attacks | [Confirm Labs](https://confirmlabs.org/posts/circuit_breaking.html) |
+| **HarmBench: A Standardized Evaluation Framework** | CAIS et al. | Standardized red-teaming benchmark | [GitHub](https://github.com/centerforaisafety/HarmBench) |
+
+### Industry Resources
+
+| Organization | Focus | Key Resources |
+|--------------|-------|---------------|
+| **Gray Swan AI** | Circuit breakers, red-teaming | [Research Portal](https://www.grayswan.ai/research), [Arena Platform](https://app.grayswan.ai/arena) |
+| **Anthropic** | Constitutional AI, safety classifiers | [Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) |
+| **UK AI Safety Institute** | Government evaluation, red-teaming partnerships | [AISI Research](https://alignmentproject.aisi.gov.uk/research-area/empirical-investigations-into-ai-monitoring-and-red-teaming) |
+| **Center for AI Safety** | HarmBench, representation engineering research | [CAIS Research](https://safe.ai/) |
+| **JailbreakBench** | Standardized jailbreak robustness benchmark | [JailbreakBench](https://jailbreakbench.github.io/) |
+
+### Key Evaluations and Datasets
+
+| Benchmark | Purpose | Key Metrics |
+|-----------|---------|-------------|
+| **HarmBench** | Standardized red-teaming framework | Attack Success Rate (ASR) across attack types |
+| **JailbreakBench** | Robustness benchmark for jailbreaking | Leaderboard rankings, reproducible attacks |
+| **OR-Bench** | Over-refusal evaluation | False positive rate on harmless queries |
+| **MT-Bench / MMLU** | Capability preservation | General capability retention after safety training |
+
+### Key Critiques and Limitations
+
+1. **Reactive not proactive**: Circuit breakers respond to detected patterns but don't address root causes of misalignment—a sufficiently capable or deceptive model could generate harm before intervention triggers
+2. **Adversarial arms race**: [Confirm Labs research](https://confirmlabs.org/posts/circuit_breaking.html) showed Gray Swan's Cygnet-8B was jailbroken in 3 hours despite impressive initial evaluations; no single defense is expected to remain robust indefinitely
+3. **Capability-safety tradeoff**: Theoretical results suggest alignment guarantees come at quadratic cost to helpfulness, potentially saturating at random guessing for strong interventions
+4. **Open-source model gap**: Circuit breakers require model modification; open-source models without safety training remain vulnerable, and fine-tuning can remove circuit breaker training
+
+---
+
+## AI Transition Model Context
+
+Circuit breakers affect the <EntityLink id="ai-transition-model" /> through:
+
+| Parameter | Impact |
+|-----------|--------|
+| <EntityLink id="misuse-potential" /> | Can catch some harmful outputs in real-time |
+| <EntityLink id="human-oversight-quality" /> | Provides automated enforcement of safety policies |
+
+Circuit breakers are a valuable addition to the AI safety toolkit, providing a last line of defense that can catch issues other measures miss. Current implementations achieve 87-95% effectiveness against known attacks with acceptable capability tradeoffs (1% overhead for Anthropic's system). However, they should be understood as one layer in a defense-in-depth strategy, not a substitute for addressing fundamental alignment challenges. The adversarial arms race continues, with novel attacks regularly discovered that bypass existing defenses—reinforcing the need for ongoing research and layered approaches.

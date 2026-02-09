@@ -1,0 +1,404 @@
+---
+title: "Controlled Vocabulary for Longtermist Analysis"
+description: "A standardized terminology system for categorizing risks, interventions, and concepts in longtermist discourse, designed for consistent use across diagrams and documentation"
+createdAt: 2025-01-20
+lastUpdated: 2025-01-20
+sidebar:
+  order: 30
+importance: 8.5
+quality: 55
+llmSummary: "A hierarchical controlled vocabulary system for standardizing longtermist risk terminology, enabling combinatorial analysis across ~500-1000 meaningful risk scenarios (Domain × AI-Stage × Actor × Intent × Scale). Enables searchable/comparable concepts through composable tags and supports gap analysis by making 2,304 theoretical cells explicit (though most pruned as implausible)."
+ratings:
+  novelty: 6.5
+  rigor: 5
+  actionability: 7.5
+  completeness: 6.5
+metrics:
+  wordCount: 518
+  citations: 6
+  tables: 20
+  diagrams: 0
+---
+import { EntityLink } from '@components/wiki';
+import { Aside, Badge, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Executive Summary
+
+| Challenge | Solution | Benefit |
+|-----------|----------|---------|
+| Inconsistent terminology across longtermist writing | Controlled vocabulary with composable terms | Searchable, comparable concepts |
+| Thousands of concepts to organize | Hierarchical specificity with modifiers | Flexible precision without explosion |
+| AI is both a risk domain AND a context modifier | Separate vocabularies for each | Clearer analysis |
+| Visual clutter in diagrams | Colored clickable tags | Scannable, interactive |
+
+<Aside type="tip" title="Core Principle">
+**Hierarchical Specificity**: Use the most general term that captures what matters for the context. Add modifiers only when the distinction is load-bearing for the argument.
+</Aside>
+
+---
+
+## Terminology System
+
+### Risk Domains
+
+The primary categories of existential and catastrophic risk:
+
+| Domain | Abbrev | Description |
+|--------|--------|-------------|
+| **Bio** | BIO | Biological/pandemic risks |
+| **Cyber** | CYBER | Digital infrastructure attacks |
+| **Nuclear** | NUC | Nuclear weapons/war |
+| **Epistemic** | EPIS | Information integrity, collective reasoning |
+| **Authoritarian** | AUTH | <EntityLink id="lock-in">Lock-in</EntityLink> of oppressive governance |
+| **Misaligned-AI** | MAI | AI systems pursuing goals humans don't endorse |
+| **Power-Concentrating-AI** | PCAI | AI enabling extreme human power concentration |
+| **Unknown** | UNK | Surprise/unforeseen threats |
+
+<Aside type="note" title="AI as Risk Domain vs Context">
+Note that MAI and PCAI are risks *from* AI. This is distinct from AI as a *context modifier* (see AI Stages below), which describes how AI transforms the landscape for all risks.
+</Aside>
+
+---
+
+### Cross-Cutting Modifiers
+
+Modifiers can be appended to any domain when the distinction matters:
+
+<Tabs>
+  <TabItem label="Origin">
+    | Modifier | Meaning |
+    |----------|---------|
+    | **Natural** | Not human-engineered |
+    | **Engineered** | Human-created or modified |
+    | **Emergent** | Arising from system dynamics |
+  </TabItem>
+  <TabItem label="Intent">
+    | Modifier | Meaning |
+    |----------|---------|
+    | **Accidental** | Unintended occurrence |
+    | **Deliberate** | Intentional action |
+    | **Negligent** | Foreseeable but ignored |
+  </TabItem>
+  <TabItem label="Actor">
+    | Modifier | Meaning |
+    |----------|---------|
+    | **State** | Nation-state actors |
+    | **Corp** | Corporate entities |
+    | **Lab** | Research institutions |
+    | **Individual** | Solo actors |
+    | **AI-Agent** | Autonomous AI systems |
+    | **Coalition** | Multi-actor groups |
+  </TabItem>
+  <TabItem label="Posture">
+    | Modifier | Meaning |
+    |----------|---------|
+    | **Offensive** | Capability to cause harm |
+    | **Defensive** | Capability to prevent harm |
+  </TabItem>
+  <TabItem label="Scale">
+    | Modifier | Meaning |
+    |----------|---------|
+    | **Local** | Limited geographic scope |
+    | **Regional** | Multi-country impact |
+    | **Global** | Worldwide effects |
+    | **Existential** | Threatens human potential |
+  </TabItem>
+</Tabs>
+
+#### Composition Examples
+
+```
+Bio                           # General biological risk
+Bio-Engineered                # When engineering is relevant
+Bio-Engineered-Deliberate     # True bioweapon scenario
+Bio-State-Offensive           # State bioweapons capability
+
+Cyber-Individual              # Lone actor cyber threat
+NUC-State-Accidental          # Nuclear accident by state actor
+EPIS-Corp-Deliberate          # Corporate disinformation campaign
+```
+
+---
+
+### AI Stages (Context Modifier)
+
+AI stages describe *when* risks and interventions occur relative to transformative AI. These are **abstract** by default, with optional concrete annotations.
+
+| Stage | Meaning | Character |
+|-------|---------|-----------|
+| **Near** | Close to present | High confidence about world state |
+| **Mid** | Between Near and TAI | More uncertainty, longer-term positioning |
+| **TAI** | Transformation point | Critical period, possibly short |
+| **Post-TAI** | After transformation | Different action landscape |
+
+<Aside type="caution" title="Relative, Not Absolute">
+These stages are defined relative to TAI, not calendar years. If TAI is 2030, "Mid" means something different than if TAI is 2045.
+</Aside>
+
+#### Concrete Annotations (Optional)
+
+When making specific claims, annotate with your assumptions:
+
+```
+Near (~2028)
+Mid (TAI-50% capability)
+Mid (10^28 FLOP threshold)
+TAI (assuming 2035 timeline)
+```
+
+The abstract terms are the controlled vocabulary. Concrete annotations clarify individual assumptions without forcing agreement on timelines.
+
+#### Combining AI Stage with Risk Domains
+
+Every non-AI risk domain gets transformed by AI stage:
+
+```
+Bio-Near                  # Bio risks in current context
+Bio-Mid                   # Bio risks as AI advances
+Bio-TAI                   # Bio risks during transformation
+Cyber-Mid-State           # State cyber threats in mid-period
+NUC-TAI-Accidental        # Nuclear accident risk during TAI transition
+```
+
+---
+
+### State Variables
+
+Concepts for describing the current risk landscape:
+
+| Concept | Definition | Usage |
+|---------|------------|-------|
+| **Offensive-Potential** | Total capability to cause harm | `[Domain]-Offensive-Potential` |
+| **Defensive-Potential** | Total capability to prevent harm | `[Domain]-Defensive-Potential` |
+| **Exposure** | Net vulnerability (Offensive - Defensive) | `[Domain]-Exposure` |
+| **Resilience** | Ability to recover from harm | `[Domain]-Resilience` |
+| **Fragility** | Susceptibility to cascading failure | `[Domain]-Fragility` |
+
+Example usage:
+```
+Bio-Near-Offensive-Potential     # Current bioweapon capability
+Bio-Near-Defensive-Potential     # Current biodefense capability
+Bio-Near-Exposure                # Net bio vulnerability today
+```
+
+---
+
+### Intervention Categories
+
+#### By Mechanism
+
+| Mechanism | Description |
+|-----------|-------------|
+| **Technical** | Engineering solutions |
+| **Governance** | Rules, laws, institutions |
+| **Coordination** | Multi-actor agreements |
+| **Cultural** | Norms, values, education |
+| **Economic** | Incentive structures |
+| **Epistemic** | Information/knowledge improvements |
+
+#### By Target
+
+| Target | Description |
+|--------|-------------|
+| **Prevention** | Stop bad events from occurring |
+| **Detection** | Identify threats early |
+| **Mitigation** | Reduce severity if occurs |
+| **Recovery** | Restore after harm |
+| **Adaptation** | Long-term adjustment |
+
+#### Composition
+
+```
+Technical-Bio-Prevention         # Technical solutions to prevent biopandemics
+Governance-MAI-Detection         # Governance for detecting AI misalignment
+Coordination-NUC-Mitigation      # International coordination to limit nuclear damage
+```
+
+---
+
+### Epistemic Markers
+
+For qualifying claims and tracking disagreements:
+
+| Marker | Use |
+|--------|-----|
+| **Assumption** | Premise taken as given |
+| **Crux** | Disagreement that would change conclusions if resolved |
+| **Uncertainty** | Known unknowns |
+| **Speculation** | Reasoned but weakly-grounded |
+| **Consensus** | Broadly agreed upon |
+| **Contested** | Actively disputed |
+
+---
+
+## Visual Presentation
+
+In diagrams and interfaces, vocabulary terms appear as **colored clickable tags**:
+
+### Tag Display
+
+```
+┌─────────────────────────────────────────────────────┐
+│ AI-enabled pandemic creation by non-state actors   │
+│                                                     │
+│ [Bio] [Engineered] [Mid] [Individual] [Deliberate] │
+│  red    orange    blue    purple       yellow      │
+└─────────────────────────────────────────────────────┘
+```
+
+Each tag:
+- Has a consistent color by category (domains = red, AI stages = blue, etc.)
+- Is clickable to filter/search for related concepts
+- Expands on hover to show definition
+
+### Alternative Layouts
+
+For different contexts:
+
+**Inline with separators:**
+```
+Bio · Engineered · Mid · Individual
+```
+
+**Primary + context:**
+```
+┌─────────────────────────────────┐
+│ Bio Risk                        │  ← Primary (large)
+│ in Mid period, Individual actor │  ← Context (smaller)
+└─────────────────────────────────┘
+```
+
+---
+
+## Use Cases
+
+### 1. Tagging Concrete Risks
+
+When discussing specific risks, apply vocabulary tags for consistency:
+
+| Risk Description | Tags |
+|------------------|------|
+| "GPT-7 used to design novel pathogen" | `Bio`, `Engineered`, `Mid`, `Deliberate` |
+| "Accidental nuclear launch from AI misinterpretation" | `NUC`, `Mid`, `AI-Agent`, `Accidental` |
+| "State-sponsored disinformation undermining elections" | `EPIS`, `Near`, `State`, `Deliberate` |
+| "Recursive self-improvement leads to misaligned superintelligence" | `MAI`, `TAI`, `Existential` |
+
+This enables:
+- **Search**: Find all `Bio-Mid` risks
+- **Comparison**: Compare `State` vs `Individual` actor risks
+- **Gap analysis**: Which combinations have no coverage?
+
+### 2. Combinatorial Risk Maps
+
+Generate importance scores across all meaningful combinations:
+
+#### Simple 2D Slice: Domain × AI Stage
+
+| | Near | Mid | TAI | Post-TAI |
+|---|:---:|:---:|:---:|:---:|
+| **Bio** | 4 | 7 | 8 | 5 |
+| **Cyber** | 5 | 6 | 6 | 4 |
+| **Nuclear** | 5 | 6 | 7 | 5 |
+| **MAI** | 2 | 5 | 10 | 8 |
+| **EPIS** | 6 | 7 | 8 | 6 |
+| **AUTH** | 4 | 5 | 7 | 9 |
+
+*Scores are illustrative. Actual scores would be developed through structured elicitation.*
+
+#### Multi-Dimensional Analysis
+
+Full dimensionality:
+```
+Domain (8) × AI-Stage (4) × Actor (6) × Intent (3) × Scale (4)
+= 2,304 cells
+```
+
+With pruning of implausible combinations (e.g., `NUC-Individual-Existential`), perhaps 500-1000 meaningful cells.
+
+#### What This Enables
+
+1. **Gap analysis**: High importance + low attention = opportunity
+2. **Priority disputes made explicit**: "You rate MAI-TAI as 10, I rate it 6"
+3. **Neglectedness identification**: Which cells have no interventions?
+4. **Interaction effects**: How does moving along one dimension shift others?
+
+---
+
+## Open Questions
+
+<Aside type="caution" title="Work in Progress">
+This vocabulary is evolving. The following questions remain open.
+</Aside>
+
+### Granularity Decisions
+
+- Should `Cyber` split into `Cyber-Infrastructure`, `Cyber-Financial`, `Cyber-Military`?
+- Is `Power-Concentrating-AI` distinct enough from `Authoritarian`?
+- Do we need `AI-Accident` separate from `MAI`?
+
+### Scoring Approach
+
+Starting simple (single importance score), expanding over time:
+- **Phase 1**: Single importance score (1-10)
+- **Phase 2**: Probability × Severity decomposition
+- **Phase 3**: Add Neglectedness, Tractability
+- **Phase 4**: Full ITN framework per cell
+
+### Timeline Uncertainty
+
+The AI stages are relative to TAI. How do we handle:
+- People with very different TAI timelines?
+- Possibility that TAI never arrives?
+- Multiple transformation points rather than single TAI?
+
+### Positive Outcomes
+
+Current vocabulary is risk-focused. Should we add:
+- `Flourishing-Potential`
+- `Coordination-Success`
+- `Alignment-Success`
+
+---
+
+## Implementation Notes
+
+### Data Model
+
+```typescript
+type RiskConcept = {
+  domain: Domain;                    // Bio, Cyber, NUC, etc.
+  aiStage?: AIStage;                 // Near, Mid, TAI, Post-TAI
+  modifiers?: Modifier[];            // Engineered, State, Deliberate, etc.
+  stageAnnotation?: string;          // Optional: "~2028", "TAI-50%"
+  importanceScore?: number;          // 1-10
+  epistemicStatus?: EpistemicMarker; // Assumption, Crux, Contested, etc.
+}
+```
+
+### Serialization Format
+
+For plain text contexts (filenames, URLs, search):
+```
+[Domain](-[Modifier])*(-[AIStage])?
+
+Examples:
+  bio-engineered-mid
+  nuc-state-accidental-tai
+  mai-existential-post-tai
+```
+
+---
+
+## Sources & References
+
+### AI Development Frameworks
+- [DeepMind Levels of AGI Paper](https://arxiv.org/pdf/2311.02462) - Capability-based AGI levels
+- [AGI Definitions Comparison](https://www.forwardfuture.ai/p/the-different-concepts-of-agi-openai-anthropic-and-google-in-comparison-and-when-agi-is-achieved) - OpenAI, Anthropic, DeepMind approaches
+
+### Existential Risk Literature
+- [How Do AI Timelines Affect Existential Risk?](https://www.lesswrong.com/posts/cnKvxehpHqWjZJNry/how-do-ai-timelines-affect-existential-risk) - LessWrong analysis
+- [Existential Risk from AI - Wikipedia](https://en.wikipedia.org/wiki/Existential_risk_from_artificial_intelligence)
+
+### Related Vocabulary Projects
+- [EA Forum: Crucial Consideration](https://forum.effectivealtruism.org/topics/crucial-consideration/) - Bostrom's framework
+- [CFAR Double Crux](https://www.rationality.org/resources/updates/2016/double-crux) - Crux terminology origin

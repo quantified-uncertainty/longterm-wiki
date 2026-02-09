@@ -1,0 +1,901 @@
+- id: "tmc-state-actor"
+  type: "ai-transition-model-subitem"
+  title: "State-Caused Catastrophe"
+  parentFactor: "human-catastrophe"
+  path: "/ai-transition-model/state-actor/"
+  description: "Catastrophic outcomes caused by state actors using AI as a weapon—including AI-enabled
+    great power conflict, permanent AI-enabled authoritarianism, and state-deployed weapons of mass
+    destruction. Unlike AI takeover, humans remain in control but use that control destructively."
+  lastUpdated: "2026-01"
+  relatedContent:
+    risks:
+      - path: "/knowledge-base/risks/authoritarian-takeover/"
+        title: "Authoritarian Takeover"
+      - path: "/knowledge-base/risks/bioweapons/"
+        title: "AI-Enabled Bioweapons"
+      - path: "/knowledge-base/risks/cyberweapons/"
+        title: "AI Cyberweapons"
+      - path: "/knowledge-base/risks/autonomous-weapons/"
+        title: "Autonomous Weapons"
+  causeEffectGraph:
+    title: "How State-Caused AI Catastrophe Happens"
+    description: "Causal factors driving state misuse of AI for mass harm. State actors have resources
+      and legitimacy that non-state actors lack."
+    primaryNodeId: "state-catastrophe"
+    nodes:
+      - id: "great-power-tensions"
+        label: "Great Power Tensions"
+        type: "leaf"
+        description: "US-China competition, Russia-NATO tensions. Creates pressure for military AI deployment."
+        scores:
+          novelty: 2
+          sensitivity: 8
+          changeability: 2
+          certainty: 7
+      - id: "authoritarian-regimes"
+        label: "Authoritarian Regimes"
+        type: "leaf"
+        description: "72% of humanity lives under autocracy (2024). Creates demand for AI control technologies."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 2
+          certainty: 8
+        color: "teal"
+      - id: "ai-military-capability"
+        label: "AI Military Capability"
+        type: "leaf"
+        description: "Autonomous weapons, cyber capabilities, WMD enhancement. Technical enablers for state
+          harm."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 3
+          certainty: 5
+      - id: "coordination-failure"
+        label: "International Coordination Failure"
+        type: "leaf"
+        description: "No binding agreements on military AI. Verification and enforcement gaps."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 4
+          certainty: 6
+        color: "blue"
+      - id: "ai-arms-race"
+        label: "AI Arms Race"
+        type: "cause"
+        description: "Military AI development pressure between major powers. Safety concerns secondary to
+          capability."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 3
+          certainty: 6
+        color: "red"
+      - id: "surveillance-proliferation"
+        label: "Surveillance Proliferation"
+        type: "cause"
+        description: "AI surveillance deployed in 80+ countries. Chinese tech exports spreading control
+          technology."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 3
+          certainty: 7
+      - id: "deterrence-instability"
+        label: "Deterrence Instability"
+        type: "cause"
+        description: "AI may undermine nuclear deterrence or create first-strike incentives."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 4
+          certainty: 3
+        color: "violet"
+      - id: "great-power-war"
+        label: "AI-Enhanced Great Power War"
+        type: "intermediate"
+        description: "Conflict between major powers escalated by autonomous systems, speed of AI
+          decision-making."
+        scores:
+          novelty: 4
+          sensitivity: 10
+          changeability: 3
+          certainty: 3
+        color: "red"
+      - id: "permanent-tyranny"
+        label: "Permanent AI-Enabled Tyranny"
+        type: "intermediate"
+        description: "Authoritarian control so comprehensive it forecloses regime change through any mechanism."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 4
+          certainty: 3
+        color: "red"
+      - id: "state-wmd"
+        label: "State WMD Programs"
+        type: "intermediate"
+        description: "AI-designed bioweapons, cyberweapons, or novel weapons deployed by state actors."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 3
+          certainty: 4
+      - id: "state-catastrophe"
+        label: "State-Caused Catastrophe"
+        type: "effect"
+        description: "Mass casualties, civilizational damage, or permanent loss of human freedom from state
+          misuse of AI."
+        scores:
+          novelty: 4
+          sensitivity: 10
+          changeability: 3
+          certainty: 3
+    edges:
+      - source: "great-power-tensions"
+        target: "ai-arms-race"
+        strength: "strong"
+        effect: "increases"
+      - source: "authoritarian-regimes"
+        target: "surveillance-proliferation"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-military-capability"
+        target: "ai-arms-race"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-military-capability"
+        target: "deterrence-instability"
+        strength: "medium"
+        effect: "increases"
+      - source: "coordination-failure"
+        target: "ai-arms-race"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-arms-race"
+        target: "great-power-war"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-arms-race"
+        target: "state-wmd"
+        strength: "medium"
+        effect: "increases"
+      - source: "surveillance-proliferation"
+        target: "permanent-tyranny"
+        strength: "strong"
+        effect: "increases"
+      - source: "deterrence-instability"
+        target: "great-power-war"
+        strength: "strong"
+        effect: "increases"
+      - source: "great-power-war"
+        target: "state-catastrophe"
+        strength: "strong"
+        effect: "increases"
+      - source: "permanent-tyranny"
+        target: "state-catastrophe"
+        strength: "strong"
+        effect: "increases"
+      - source: "state-wmd"
+        target: "state-catastrophe"
+        strength: "strong"
+        effect: "increases"
+  content:
+    intro: "A state actor catastrophe occurs when governments use AI capabilities to cause mass
+      harm—either through interstate conflict (great power war enhanced by AI), internal repression
+      (AI-enabled authoritarian control), or state-sponsored attacks (biological, cyber, or other
+      weapons of mass destruction). Unlike [rogue actor
+      catastrophes](/ai-transition-model/scenarios/human-catastrophe/rogue-actor/), these scenarios
+      involve the resources and legitimacy of nation-states.
+
+
+      This is the \"bad actor risk\" that governance researchers emphasize alongside technical
+      alignment concerns. Even perfectly aligned AI systems could enable catastrophic outcomes if
+      wielded by states with harmful intentions."
+    sections:
+      - heading: "Polarity"
+        body: "**Inherently negative.** Beneficial state use of AI (effective governance, improved public
+          services) is not the focus here. This page specifically addresses catastrophic misuse
+          pathways."
+      - heading: "How This Happens"
+        mermaid: "flowchart TD
+
+          \    subgraph Scenarios[\"Catastrophe Scenarios\"]
+
+          \        WAR[Great Power AI War]
+
+          \        AUTH[AI-Enabled Authoritarianism]
+
+          \        STATE_WMD[State WMD Program]
+
+          \    end
+
+
+          \    subgraph Enablers[\"Enabling Conditions\"]
+
+          \        RACE[AI Arms Race]
+
+          \        COORD_FAIL[Coordination Failure]
+
+          \        CAPABILITY[Advanced AI Capabilities]
+
+          \    end
+
+
+          \    subgraph Outcomes[\"Catastrophic Outcomes\"]
+
+          \        MASS_DEATH[Mass Casualties]
+
+          \        PERM_TYRANNY[Permanent Tyranny]
+
+          \        CIV_COLLAPSE[Civilization Damage]
+
+          \    end
+
+
+          \    RACE --> WAR
+
+          \    COORD_FAIL --> WAR
+
+          \    CAPABILITY --> WAR
+
+
+          \    CAPABILITY --> AUTH
+
+          \    CAPABILITY --> STATE_WMD
+
+
+          \    WAR --> MASS_DEATH
+
+          \    WAR --> CIV_COLLAPSE
+
+          \    AUTH --> PERM_TYRANNY
+
+          \    STATE_WMD --> MASS_DEATH
+
+
+          \    style MASS_DEATH fill:#ff6b6b
+
+          \    style PERM_TYRANNY fill:#ff6b6b
+
+          \    style CIV_COLLAPSE fill:#ff6b6b\n"
+        body: "### Scenario 1: Great Power AI War
+
+
+          AI transforms military capabilities, increasing the risk and severity of great power
+          conflict:
+
+          - **Autonomous weapons**: AI-enabled weapons systems that can select and engage targets
+          without human intervention
+
+          - **Speed of conflict**: AI accelerates decision-making beyond human timescales, making
+          escalation harder to control
+
+          - **New attack surfaces**: AI enables novel attack vectors (cyber, information, economic)
+
+          - **Deterrence instability**: AI may undermine nuclear deterrence or create first-strike
+          incentives
+
+
+          ### Scenario 2: AI-Enabled Authoritarianism
+
+
+          AI provides tools for unprecedented state control over populations:
+
+          - **Mass surveillance**: AI-powered monitoring of all communications and movements
+
+          - **Predictive policing**: Preemptive detention based on predicted behavior
+
+          - **Propaganda optimization**: AI-generated content that maximally influences beliefs
+
+          - **Economic control**: AI management of resources to reward loyalty and punish dissent
+
+
+          If such systems become entrenched globally, this could constitute a permanent loss of
+          human freedom—a form of existential catastrophe.
+
+
+          ### Scenario 3: State WMD Programs
+
+
+          AI enhances state capacity to develop and deploy weapons of mass destruction:
+
+          - **Bioweapons**: AI-designed pathogens optimized for lethality or spread
+
+          - **Cyberweapons**: AI-enabled attacks on critical infrastructure at civilizational scale
+
+          - **Novel weapons**: AI-discovered attack vectors humans haven't conceived\n"
+      - heading: "Key Parameters"
+        table:
+          headers:
+            - "Parameter"
+            - "Direction"
+            - "Impact"
+          rows:
+            - - "[International
+                Coordination](/ai-transition-model/factors/civilizational-competence/international-coordination/)"
+              - "Low → Enables"
+              - "Unable to establish norms or verify compliance"
+            - - "[Racing Intensity](/ai-transition-model/factors/transition-turbulence/racing-intensity/)"
+              - "High → Accelerates"
+              - "Pressure to deploy military AI without adequate safety"
+            - - "[Governance Capacity](/ai-transition-model/factors/civilizational-competence/governance/)"
+              - "Low → Enables"
+              - "Institutions can't manage AI development"
+            - - "[Cyber Threat Exposure](/ai-transition-model/factors/misuse-potential/cyber-threat-exposure/)"
+              - "High → Amplifies"
+              - "More attack surfaces for state-level conflict"
+            - - "[Biological Threat
+                Exposure](/ai-transition-model/factors/misuse-potential/biological-threat-exposure/)"
+              - "High → Amplifies"
+              - "AI-enabled bioweapons become more feasible"
+      - heading: "Which Ultimate Outcomes It Affects"
+        body: "### Existential Catastrophe (Primary)
+
+          State actor catastrophe is a major pathway to acute existential risk:
+
+          - Nuclear war escalated by AI systems
+
+          - Engineered pandemic released by state program
+
+          - Permanent global authoritarianism
+
+
+          ### Long-term Trajectory (Secondary)
+
+          Even short of extinction, state misuse shapes the long-run trajectory:
+
+          - Authoritarian control may become the global norm
+
+          - International system may fragment or collapse
+
+          - Trust and cooperation may be permanently damaged
+
+          - State conflict intensifies racing dynamics and diverts resources from beneficial
+          development\n"
+      - heading: "Historical Analogies"
+        table:
+          headers:
+            - "Technology"
+            - "State Misuse"
+            - "Lessons"
+          rows:
+            - - "**Nuclear weapons**"
+              - "Arms race, Cold War brinkmanship"
+              - "International coordination possible but fragile"
+            - - "**Chemical weapons**"
+              - "WWI, ongoing use"
+              - "Norms can develop but enforcement is hard"
+            - - "**Biological weapons**"
+              - "State programs (USSR, others)"
+              - "Even with treaties, verification is difficult"
+            - - "**Cyber capabilities**"
+              - "State-sponsored attacks"
+              - "Attribution difficult, escalation risks"
+      - heading: "Warning Signs"
+        body: "1. **Military AI deployments**: Autonomous weapons systems entering service
+
+          2. **AI arms race rhetoric**: Leaders framing AI as key to military dominance
+
+          3. **Coordination breakdown**: International AI governance efforts failing
+
+          4. **Authoritarian AI exports**: Surveillance technology spreading to repressive states
+
+          5. **State bioweapon indicators**: AI capabilities at state biological research facilities
+
+          6. **Escalation incidents**: Near-misses involving AI-enabled military systems\n"
+      - heading: "Interventions That Address This"
+        body: "**International:**
+
+          - Arms control agreements for AI weapons systems
+
+          - Verification regimes for military AI
+
+          - Confidence-building measures between great powers
+
+          - Export controls on surveillance AI
+
+
+          **Domestic:**
+
+          - Human control requirements for lethal autonomous systems
+
+          - Democratic oversight of military AI programs
+
+          - Whistleblower protections for concerning programs
+
+
+          **Technical:**
+
+          - AI systems designed with escalation prevention
+
+          - Kill switches and human override capabilities
+
+          - Defensive AI (cyber defense, attribution)\n"
+      - heading: "Probability Estimates"
+        body: "This is one of the harder catastrophe pathways to estimate because it depends heavily on
+          geopolitics:"
+        table:
+          headers:
+            - "Factor"
+            - "Assessment"
+          rows:
+            - - "Great power war probability"
+              - "Low but non-trivial; AI may increase risk"
+            - - "AI impact on war severity"
+              - "Likely significant—faster, more autonomous, new domains"
+            - - "Authoritarian AI entrenchment"
+              - "Already occurring in some states"
+            - - "State WMD enhancement"
+              - "Plausible; verification very difficult"
+      - heading: "Related Content"
+        body: "### Existing Risk Pages
+
+          - [Authoritarian Takeover](/knowledge-base/risks/structural/authoritarian-takeover/)
+
+          - [AI-Enabled Bioweapons](/knowledge-base/risks/misuse/bioweapons/)
+
+          - [AI Cyberweapons](/knowledge-base/risks/misuse/cyberweapons/)
+
+          - [Racing Dynamics](/knowledge-base/risks/structural/racing-dynamics/)
+
+
+          ### External Resources
+
+          - Dafoe, A. (2018). \"[AI Governance: A Research
+          Agenda](https://www.fhi.ox.ac.uk/ai-governance/)\"
+
+          - Ord, T. (2020). *The Precipice* — Discussion of state-level AI risks
+
+          - Future of Life Institute — Work on lethal autonomous weapons\n"
+- id: "tmc-rogue-actor"
+  type: "ai-transition-model-subitem"
+  title: "Rogue Actor Catastrophe"
+  parentFactor: "human-catastrophe"
+  path: "/ai-transition-model/rogue-actor/"
+  description: "Catastrophic outcomes caused by non-state actors using AI—including terrorists, lone
+    wolves, criminal organizations, or apocalyptic cults. AI lowers barriers to acquiring dangerous
+    capabilities, potentially enabling small groups to cause harm previously requiring nation-state
+    resources."
+  lastUpdated: "2026-01"
+  relatedContent:
+    risks:
+      - path: "/knowledge-base/risks/bioweapons/"
+        title: "AI-Enabled Bioweapons"
+      - path: "/knowledge-base/risks/cyberweapons/"
+        title: "AI Cyberweapons"
+  causeEffectGraph:
+    title: "How Rogue Actor AI Catastrophe Happens"
+    description: "Causal factors enabling non-state actors to cause mass harm with AI assistance. The
+      'democratization of destruction' problem."
+    primaryNodeId: "rogue-catastrophe"
+    nodes:
+      - id: "ai-capability-democratization"
+        label: "AI Capability Democratization"
+        type: "leaf"
+        description: "Open-source models, accessible APIs. Lowers barriers to dangerous capability access."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 4
+          certainty: 7
+      - id: "dual-use-knowledge"
+        label: "Dual-Use Knowledge"
+        type: "leaf"
+        description: "LLMs can provide WMD synthesis guidance. Tacit knowledge requirements reduced."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 4
+          certainty: 5
+        color: "red"
+      - id: "radicalization-potential"
+        label: "Radicalization Potential"
+        type: "leaf"
+        description: "AI-optimized recruitment and radicalization. Extremist content harder to counter."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 4
+          certainty: 4
+      - id: "attribution-difficulty"
+        label: "Attribution Difficulty"
+        type: "leaf"
+        description: "Hard to identify attackers. Reduces deterrence effectiveness."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 4
+          certainty: 6
+        color: "violet"
+      - id: "bio-capability-uplift"
+        label: "Bio Capability Uplift"
+        type: "cause"
+        description: "AI helps non-experts design pathogens. Current LLMs provide some uplift; future models
+          more concerning."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 4
+          certainty: 4
+        color: "red"
+      - id: "cyber-capability-uplift"
+        label: "Cyber Capability Uplift"
+        type: "cause"
+        description: "Automated vulnerability discovery, AI-generated social engineering. Offensive advantage."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 4
+          certainty: 6
+        color: "red"
+      - id: "coordination-enhancement"
+        label: "Coordination Enhancement"
+        type: "cause"
+        description: "AI helps rogue actors plan, recruit, and evade detection."
+        scores:
+          novelty: 6
+          sensitivity: 6
+          changeability: 3
+          certainty: 4
+      - id: "engineered-pandemic"
+        label: "Engineered Pandemic"
+        type: "intermediate"
+        description: "AI-designed pathogen released by non-state actor. Potential billions of casualties."
+        scores:
+          novelty: 4
+          sensitivity: 10
+          changeability: 4
+          certainty: 3
+        color: "red"
+      - id: "infrastructure-collapse"
+        label: "Infrastructure Collapse"
+        type: "intermediate"
+        description: "AI-enhanced cyberattacks on critical infrastructure causing cascading failures."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 5
+          certainty: 4
+        color: "red"
+      - id: "mass-casualty-attack"
+        label: "Mass Casualty Attack"
+        type: "intermediate"
+        description: "Novel attack vectors enabled by AI planning and execution."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 4
+          certainty: 3
+      - id: "rogue-catastrophe"
+        label: "Rogue Actor Catastrophe"
+        type: "effect"
+        description: "Civilizational-scale harm from non-state actors empowered by AI capabilities."
+        scores:
+          novelty: 5
+          sensitivity: 10
+          changeability: 4
+          certainty: 3
+    edges:
+      - source: "ai-capability-democratization"
+        target: "bio-capability-uplift"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-capability-democratization"
+        target: "cyber-capability-uplift"
+        strength: "strong"
+        effect: "increases"
+      - source: "dual-use-knowledge"
+        target: "bio-capability-uplift"
+        strength: "strong"
+        effect: "increases"
+      - source: "radicalization-potential"
+        target: "coordination-enhancement"
+        strength: "medium"
+        effect: "increases"
+      - source: "attribution-difficulty"
+        target: "coordination-enhancement"
+        strength: "medium"
+        effect: "increases"
+      - source: "bio-capability-uplift"
+        target: "engineered-pandemic"
+        strength: "strong"
+        effect: "increases"
+      - source: "cyber-capability-uplift"
+        target: "infrastructure-collapse"
+        strength: "strong"
+        effect: "increases"
+      - source: "coordination-enhancement"
+        target: "engineered-pandemic"
+        strength: "medium"
+        effect: "increases"
+      - source: "coordination-enhancement"
+        target: "mass-casualty-attack"
+        strength: "medium"
+        effect: "increases"
+      - source: "engineered-pandemic"
+        target: "rogue-catastrophe"
+        strength: "strong"
+        effect: "increases"
+      - source: "infrastructure-collapse"
+        target: "rogue-catastrophe"
+        strength: "strong"
+        effect: "increases"
+      - source: "mass-casualty-attack"
+        target: "rogue-catastrophe"
+        strength: "medium"
+        effect: "increases"
+  content:
+    intro: "A rogue actor catastrophe occurs when non-state actors use AI to cause mass harm—potentially
+      at civilizational scale. Unlike [state actor
+      catastrophes](/ai-transition-model/scenarios/human-catastrophe/state-actor/), these scenarios
+      involve individuals or groups operating outside governmental authority. AI lowers the barriers
+      to acquiring dangerous capabilities, potentially enabling small groups to cause harm
+      previously requiring nation-state resources.
+
+
+      This is a key \"misuse\" risk that may be more tractable than alignment failures, since it
+      involves known bad actors using AI as a tool rather than AI systems developing misaligned
+      goals."
+    sections:
+      - heading: "Polarity"
+        body: "**Inherently negative.** There is no positive version of rogue actors causing mass harm.
+          Beneficial non-state use of AI (innovation, civil society empowerment) is a separate
+          consideration."
+      - heading: "How This Happens"
+        mermaid: "flowchart TD
+
+          \    subgraph Actors[\"Rogue Actors\"]
+
+          \        TERROR[Terrorist Groups]
+
+          \        LONE[Lone Wolves]
+
+          \        CRIME[Criminal Organizations]
+
+          \        CULT[Apocalyptic Cults]
+
+          \    end
+
+
+          \    subgraph Capabilities[\"AI-Enhanced Capabilities\"]
+
+          \        BIO[Bioweapon Design]
+
+          \        CYBER[Cyberattack Planning]
+
+          \        COORD[Attack Coordination]
+
+          \        MANIP[Recruitment/Radicalization]
+
+          \    end
+
+
+          \    subgraph Outcomes[\"Catastrophic Outcomes\"]
+
+          \        PANDEMIC[Engineered Pandemic]
+
+          \        INFRA[Infrastructure Collapse]
+
+          \        MASS_CAS[Mass Casualties]
+
+          \    end
+
+
+          \    TERROR --> BIO
+
+          \    TERROR --> CYBER
+
+          \    LONE --> BIO
+
+          \    LONE --> CYBER
+
+          \    CRIME --> CYBER
+
+          \    CULT --> BIO
+
+
+          \    BIO --> PANDEMIC
+
+          \    CYBER --> INFRA
+
+          \    PANDEMIC --> MASS_CAS
+
+          \    INFRA --> MASS_CAS
+
+
+          \    style PANDEMIC fill:#ff6b6b
+
+          \    style INFRA fill:#ff6b6b
+
+          \    style MASS_CAS fill:#ff6b6b"
+        body: "### Primary Pathways
+
+
+          **1. AI-Enabled Bioweapons**
+
+
+          AI could help non-experts design and synthesize dangerous pathogens:
+
+          - LLMs providing step-by-step synthesis guidance
+
+          - AI-designed pathogens optimized for transmissibility or lethality
+
+          - Reduced need for tacit knowledge that currently limits bioweapon development
+
+          - Potential for pandemic-scale casualties (millions to billions)
+
+
+          **2. AI-Enhanced Cyberattacks**
+
+
+          AI dramatically improves offensive cyber capabilities:
+
+          - Automated vulnerability discovery and exploitation
+
+          - AI-generated social engineering at scale
+
+          - Attacks on critical infrastructure (power grids, water, financial systems)
+
+          - Potential for cascading failures across interdependent systems
+
+
+          **3. Coordination and Recruitment**
+
+
+          AI amplifies organizational capabilities of rogue actors:
+
+          - AI-optimized radicalization and recruitment
+
+          - Better operational security and planning
+
+          - Coordination of complex multi-stage attacks
+
+          - Harder for defenders to infiltrate or monitor"
+      - heading: "Key Parameters"
+        body: "| Parameter | Direction | Impact |
+
+          |-----------|-----------|--------|
+
+          | [Biological Threat
+          Exposure](/ai-transition-model/factors/misuse-potential/biological-threat-exposure/) | High → Enables |
+          Easier access to dangerous biological knowledge |
+
+          | [Cyber Threat Exposure](/ai-transition-model/factors/misuse-potential/cyber-threat-exposure/) | High →
+          Enables | More attack surfaces and vulnerabilities |
+
+          | [Information Authenticity](/ai-transition-model/factors/civilizational-competence/information-authenticity/) |
+          Low → Enables | Harder to counter radicalization content |
+
+          | [Safety Culture Strength](/ai-transition-model/factors/misalignment-potential/safety-culture-strength/) |
+          Low → Enables | Labs may not implement access controls |"
+      - heading: "Which Ultimate Outcomes It Affects"
+        body: "### Existential Catastrophe (Primary)
+
+          Rogue actor catastrophes could cause existential-scale harm:
+
+          - Engineered pandemic causing billions of deaths
+
+          - Cascading infrastructure failures
+
+          - Even if not extinction, could cause civilizational collapse
+
+
+          ### Long-term Trajectory (Secondary)
+
+          Successful attacks would reshape the long-run trajectory:
+
+          - Permanent surveillance and security measures
+
+          - Loss of trust and openness
+
+          - Reduced innovation due to fear of misuse
+
+          - Backlash could lead to heavy-handed regulation or divert resources from beneficial
+          development"
+      - heading: "Why AI Changes the Risk Profile"
+        body: "| Dimension | Pre-AI | Post-AI |
+
+          |-----------|--------|---------|
+
+          | **Expertise required** | High (needed tacit knowledge) | Lower (AI provides guidance) |
+
+          | **Resources required** | Significant (state-level for WMD) | Reduced (smaller groups can
+          act) |
+
+          | **Attack sophistication** | Limited by human planning | Enhanced by AI optimization |
+
+          | **Defense effectiveness** | Often adequate | Offense may outpace defense |
+
+
+          ### The \"Democratization of Destruction\" Problem
+
+
+          AI potentially allows small groups to cause harm that previously required nation-state
+          resources. This is particularly concerning for bioweapons, where the barriers have been:
+
+          1. Access to dangerous pathogen sequences (now more available)
+
+          2. Knowledge of synthesis techniques (AI can provide)
+
+          3. Lab equipment (increasingly available)
+
+          4. Tacit knowledge (AI reduces this requirement)"
+      - heading: "Warning Signs"
+        body: "1. **Capability proliferation**: AI tools that could assist attack planning becoming widely
+          available
+
+          2. **Concerning queries**: Reports of AI systems being asked about attack methods
+
+          3. **Radicalization AI**: Use of AI for recruitment by extremist groups
+
+          4. **Near-misses**: Foiled attacks that show AI involvement in planning
+
+          5. **Lab security failures**: Breaches at facilities with dangerous biological materials
+
+          6. **Infrastructure vulnerabilities**: Discovery of critical systems susceptible to
+          AI-enhanced attack"
+      - heading: "Interventions That Address This"
+        body: "**Technical/Access Controls:**
+
+          - DNA synthesis screening — Prevent synthesis of dangerous sequences (see [Bioweapons
+          Risk](/knowledge-base/risks/misuse/bioweapons/) for details)
+
+          - AI model access restrictions for dangerous queries
+
+          - Know-Your-Customer requirements for AI services
+
+          - Watermarking and monitoring of AI-generated content
+
+
+          **Defensive Measures:**
+
+          - AI-enhanced detection and response
+
+          - Infrastructure hardening and redundancy
+
+          - Broad-spectrum medical countermeasures (e.g., metagenomic sequencing)
+
+
+          **Governance:**
+
+          - International coordination on AI misuse prevention
+
+          - Export controls on dual-use capabilities
+
+          - Liability frameworks for AI providers"
+      - heading: "Probability Estimates"
+        body: "| Factor | Assessment |
+
+          |--------|------------|
+
+          | **Bio attack capability** | Increasing; current LLMs provide some uplift |
+
+          | **Bio attack motivation** | Low base rate but non-zero |
+
+          | **Cyber attack capability** | Significantly enhanced by AI |
+
+          | **Civilizational-scale outcome** | Uncertain; depends on specific attack and response |
+
+
+          The combination of low base rates (most people don't want to cause mass harm) with
+          increasing capability (AI lowers barriers) creates genuine uncertainty about risk levels."
+      - heading: "Related Content"
+        body: "### Existing Risk Pages
+
+          - [AI-Enabled Bioweapons](/knowledge-base/risks/misuse/bioweapons/)
+
+          - [AI Cyberweapons](/knowledge-base/risks/misuse/cyberweapons/)
+
+
+          ### External Resources
+
+          - Sandbrink, J. (2023). \"Artificial Intelligence and Biological Misuse\" — Nature Machine
+          Intelligence
+
+          - CSET reports on AI and weapons of mass destruction
+
+          - Nuclear Threat Initiative — Biosecurity and AI work"
+  sidebarOrder: 4

@@ -1,0 +1,252 @@
+---
+title: Failed and Stalled AI Policy Proposals
+description: Analysis of failed AI governance initiatives reveals systematic patterns including industry opposition spending $61.5M from Big Tech alone in 2024 (up 13% YoY), definitional challenges, jurisdictional complexity, and fundamental mismatches between technology development speed and legislative cycles. The 118th Congress introduced over 150 AI bills with zero becoming law. While comprehensive frameworks like California's SB 1047 face vetoes, incremental approaches with industry support show higher success rates.
+sidebar:
+  order: 15
+quality: 70
+llmSummary: "Analysis of failed AI legislation reveals systematic patterns: 150+ bills introduced in 118th Congress with zero passing, while industry lobbying increased 141% YoY (648 companies, $11.5M Big Tech spending). Comprehensive frameworks consistently fail while incremental, sectoral approaches show 30-60% passage rates; voluntary frameworks serve as stepping stones but require catalyzing events for mandatory regulation."
+lastEdited: "2025-12-28"
+importance: 74.5
+pageTemplate: knowledge-base-response
+todos:
+  - Complete 'Quick Assessment' section (4 placeholders)
+  - Complete 'How It Works' section
+  - Complete 'Limitations' section (6 placeholders)
+ratings:
+  novelty: 6.2
+  rigor: 7.1
+  actionability: 6.8
+  completeness: 6.5
+metrics:
+  wordCount: 3233
+  citations: 28
+  tables: 11
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: governance-legislation
+---
+import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="failed-stalled-proposals" />
+
+## Overview
+
+Failed and stalled AI policy proposals provide critical insights into the political economy of AI governance, revealing systematic patterns that explain why comprehensive regulation remains elusive despite widespread concern about AI risks. The failure rate for ambitious AI legislation is remarkably high: during the 118th Congress, lawmakers introduced <R id="f9d8f4d8fe616cb3">over 150 AI-related bills with none passing into law</R>. Meanwhile, industry opposition has intensified dramatically, with <R id="9a9150d749ff70a4">648 companies lobbying on AI in 2024 versus 458 in 2023</R>—a 141% year-over-year increase—while <R id="1a81c2c66e7e8fd8">Big Tech firms spent \$11.5 million on lobbying in 2024</R>, up 13% from the previous year.
+
+These failures illuminate fundamental tensions in <EntityLink id="ai-governance">AI governance</EntityLink>: the speed mismatch between rapid technological development and deliberative legislative processes, the challenge of defining "artificial intelligence" in legally precise terms, and the complex jurisdictional landscape where multiple agencies and levels of government claim regulatory authority. Perhaps most significantly, failed proposals demonstrate how industry opposition mobilizes around specific regulatory mechanisms, particularly liability provisions and mandatory compliance requirements, while showing greater tolerance for disclosure obligations and voluntary frameworks.
+
+The pattern of failures suggests that successful AI governance may require accepting incremental progress rather than comprehensive solutions, with <EntityLink id="voluntary-commitments">voluntary industry commitments</EntityLink> serving as necessary stepping stones to eventual binding regulation. This dynamic has profound implications for AI safety, as it may mean that meaningful oversight emerges only after significant harms occur, rather than through proactive prevention.
+
+### Major Failed and Stalled AI Proposals (2019-2024)
+
+| Proposal | Jurisdiction | Year | Key Provisions | Primary Failure Reason | Status |
+|----------|-------------|------|----------------|----------------------|--------|
+| <EntityLink id="california-sb1047">California SB 1047</EntityLink> | California | 2024 | Safety testing for models >\$100M compute, shutdown requirements, liability | Governor veto citing federal preemption, industry opposition | Vetoed Sep 2024 |
+| Algorithmic Accountability Act | US Federal | 2019, 2022, 2023 | Impact assessments for automated decision systems | Failed to exit committee in three consecutive Congresses | Stalled |
+| SAFE Innovation Framework | US Federal | 2024 | Regulatory sandboxes for AI development | Jurisdictional conflicts, partisan disagreement | Stalled in committee |
+| AI Labeling Act | US Federal | 2024 | Mandatory disclosure for AI-generated content | Industry lobbying, definitional challenges | Stalled in committee |
+| National AI Commission Act | US Federal | 2023-2024 | Independent AI oversight body | Diluted to advisory function, opposition to new authorities | Weakened/Stalled |
+| UN AI Treaty | International | 2024 | Binding international AI governance | US-China competition, verification challenges, sovereignty concerns | No progress |
+| 10-Year State AI Moratorium | US Federal | 2024 | Preempt all state AI regulations | Stripped by 99-1 Senate vote in budget reconciliation | Rejected |
+
+## Major Failed Initiatives
+
+### California SB 1047: A Case Study in State-Level Challenges
+
+California's Safe and Secure Innovation for Frontier Artificial Intelligence Models Act represented the most ambitious state-level AI regulation attempted in the United States. Introduced by Senator Scott Wiener in February 2024, the bill established safety testing requirements for AI models trained with more than \$100 million in compute resources or equivalent computational power, required developers to implement shutdown capabilities and conduct red-team evaluations before deployment, and created potential liability for developers whose models caused critical harms defined as mass casualties, critical infrastructure damage, or economic losses exceeding \$100 million. <R id="76c8d74939bb8bdc">Governor Newsom vetoed the bill on September 29, 2024</R>, stating that "SB 1047 does not take into account whether an AI system is deployed in high-risk environments, involves critical decision-making or the use of sensitive data."
+
+The bill passed both houses of the California legislature with bipartisan support, demonstrating that concerns about AI risks transcend traditional partisan divides. The opposition coalition proved formidable: <R id="2408076a24b70f71">Meta, <EntityLink id="openai">OpenAI</EntityLink>, and House Speaker Nancy Pelosi opposed the bill</R>, with Members of California's congressional delegation—including Speaker Emerita Pelosi, and Representatives Ro Khanna, Anna Eschoo, Zoe Lofgren, and Jay Obernolte—publicly urging the Governor to reject it. Meanwhile, the <EntityLink id="cais">Center for AI Safety</EntityLink>, <EntityLink id="elon-musk">Elon Musk</EntityLink>, and the L.A. Times editorial board supported the bill, revealing unusual cross-cutting alliances on AI safety.
+
+The <R id="604c3963cf77f0fe">veto message</R> highlighted several critical vulnerabilities in state-level AI regulation. Newsom cited concerns that the bill's focus on high-cost, large-scale models would provide a "false sense of security," emphasizing that smaller, specialized models could pose equally significant risks. Senator Scott Wiener criticized the veto as "a setback for artificial intelligence accountability," noting that "this veto leaves us with the troubling reality that companies aiming to create an extremely powerful technology face no binding restrictions from U.S. policymakers."
+
+The SB 1047 failure revealed how definitional challenges plague AI legislation. The bill's reliance on <EntityLink id="thresholds">compute thresholds</EntityLink> and cost metrics created apparent precision but masked underlying questions about what constitutes a "frontier" AI model. As capabilities improve and costs decline, static definitions risk becoming either overly broad or quickly obsolete. Industry critics successfully argued that such rigid criteria could not anticipate future technological developments or distinguish between beneficial and harmful applications.
+
+### Federal AI Legislation: Congressional Gridlock and Competing Priorities
+
+The 118th Congress saw unprecedented introduction of AI-related legislation, with <R id="f9d8f4d8fe616cb3">over 150 bills addressing various aspects of artificial intelligence governance, yet none passed into law</R>. Major proposals included the <R id="062cfbc2c8fdb5d5">Algorithmic Accountability Act</R>, reintroduced for the third time by Senators Ron Wyden and Cory Booker and Rep. Yvette Clarke, which would have required automated decision system impact assessments for large companies; the <R id="9957afc55cf6d23e">Protect Elections from Deceptive AI Act</R> to prohibit AI-generated political <EntityLink id="deepfakes">deepfakes</EntityLink>; and the <R id="8bb39f0d501ab089">ASSESS AI Act</R> directing a task force on AI privacy and civil liberties implications.
+
+Congressional dysfunction played a significant role in these failures, reflecting broader challenges in American legislative processes rather than AI-specific issues. The vacuum has driven state-level action: <R id="8ef2d19987d8cfcb">nearly 700 AI-related state bills were introduced in 2024</R>, with nearly 100 passing into law. This <EntityLink id="proliferation">proliferation</EntityLink> prompted a counter-reaction at the federal level: the House attempted to include a <R id="7e5a15cbb6dc5018">10-year moratorium on state and local AI laws</R> in budget reconciliation, which was <R id="ec2411f2638bd8fe">stripped by a near-unanimous 99-1 Senate vote</R>.
+
+Industry lobbying proved particularly effective at the federal level. <R id="b87f2415c49e53cb">OpenAI increased its lobbying spend nearly seven-fold to \$1.76 million in 2024</R>, while <R id="744679038d159602"><EntityLink id="anthropic">Anthropic</EntityLink> more than doubled its spending from \$180,000 to \$120,000</R>. Together, <R id="1a81c2c66e7e8fd8">Big Tech companies employed nearly 300 lobbyists in 2024</R>—approximately one for every two members of Congress. The narrative that regulation would harm American competitiveness against China proved especially potent, with AI companies increasingly <R id="744679038d159602">positioning the technology as pivotal to national security</R> to argue for government support rather than regulation.
+
+The stalled federal legislation also reflected deeper partisan divisions about the appropriate role of government in technology regulation. Republican lawmakers generally favored market-driven approaches and expressed skepticism about new regulatory authorities, while Democrats emphasized civil rights protections and algorithmic bias concerns. These different priorities made comprehensive legislation difficult to construct and sustain.
+
+### International Treaty Efforts: Great Power Competition and Sovereignty Concerns
+
+International efforts to establish binding AI governance agreements have consistently failed to achieve meaningful progress, despite widespread recognition that AI's global nature requires coordinated responses. The <R id="2aa5bb51da378b79">UN Secretary-General's High-level Advisory Body on AI</R> released its final report "Governing AI for Humanity" in September 2024, recommending seven initiatives including an international scientific panel and global AI data framework, but no binding treaty or enforcement mechanism has emerged. A <R id="6bc8cc6226add0a9">UN report found that 118 countries were not parties to any significant international AI governance initiatives</R>, with only seven developed nations participating in all major frameworks.
+
+Great power competition, particularly US-China tensions, represents the primary obstacle to international AI agreements. The <R id="68769a80d4b544c4">US explicitly rejected "centralized control and global governance" of AI</R> at the UN Global Dialogue, signaling skepticism of UN-anchored rule-setting. The US also declined to sign the nonbinding Paris AI summit declaration in 2025. Both superpowers view AI capabilities as strategic assets essential to military and economic competitiveness, making them reluctant to accept external constraints. <R id="6c58ff596c71969a">Western nations worry that UN involvement could open the door to Chinese and autocratic influence</R> over AI governance.
+
+Verification challenges compound these political obstacles. Unlike nuclear or chemical weapons, AI capabilities are largely software-based and can be rapidly modified or concealed. International monitoring would require unprecedented access to corporate research facilities and source code, raising both security and intellectual property concerns. The dual-use nature of most AI research makes it difficult to identify which activities warrant international oversight.
+
+The <R id="58462eaba21b0729">G7's Hiroshima AI Process</R> exemplifies the limitations of voluntary international approaches. The <R id="4bbbfcce32a89a06">October 2023 code of conduct</R> received significant attention but is explicitly designed as a transitional measure—a "voluntary guidance for actions by organizations developing the most advanced AI systems"—while governments develop binding regulation. The framework's effectiveness depends entirely on corporate self-interest rather than binding obligations, and it remains to be seen whether it will spread beyond G7 nations to the <R id="6bc8cc6226add0a9">Global South countries not represented at the negotiating table</R>.
+
+## Systematic Failure Patterns
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Proposal["Regulatory Proposal Introduced"]
+        A[Comprehensive AI Bill]
+    end
+
+    subgraph Opposition["Industry Response"]
+        B[Lobbying Mobilization<br/>\$11.5M Big Tech 2024]
+        C[Innovation Flight<br/>Narrative]
+        D[Competitiveness<br/>vs China Argument]
+        E[Technical Complexity<br/>Claims]
+    end
+
+    subgraph Barriers["Structural Barriers"]
+        F[Definitional<br/>Challenges]
+        G[Jurisdictional<br/>Conflicts]
+        H[Speed Mismatch:<br/>Tech vs Legislation]
+        I[Partisan<br/>Divisions]
+    end
+
+    subgraph Outcomes["Typical Outcomes"]
+        J[Stalled in Committee]
+        K[Weakened/Diluted]
+        L[Vetoed]
+        M[Voluntary Framework<br/>Substitute]
+    end
+
+    A --> B
+    B --> C & D & E
+    C --> J
+    D --> K
+    E --> F
+    A --> F & G & H & I
+    F & G --> J
+    H & I --> K
+    J & K & L --> M
+
+    style A fill:#e74c3c,color:#fff
+    style B fill:#f39c12,color:#fff
+    style M fill:#3498db,color:#fff
+`} />
+
+### Industry Opposition Architecture
+
+Analysis of failed AI proposals reveals sophisticated industry opposition strategies that go beyond traditional lobbying. Technology companies have invested heavily in policy expertise, hiring former government officials and establishing dedicated government relations teams. This investment has created an asymmetric information advantage, where industry representatives often possess deeper technical knowledge than legislative staff, allowing them to shape debates around implementation feasibility and unintended consequences.
+
+### AI Industry Lobbying Spending (2024)
+
+| Company/Category | 2024 Lobbying Spend | YoY Change | Lobbyists | Key Focus Areas |
+|-----------------|--------------------:|:----------:|:---------:|-----------------|
+| Meta | \$14.4M | +27% | — | AI regulation, content moderation |
+| Microsoft | \$10.35M | — | — | CHIPS Act, AI, facial recognition |
+| ByteDance (TikTok) | \$10.4M | +19% | — | TikTok ban, AI policy |
+| OpenAI | \$1.76M | +577% | — | AI research, benchmarking, safety |
+| Anthropic | \$120K | +157% | — | AI safety, frontier model policy |
+| Cohere | \$130K | +229% | — | Enterprise AI, safety standards |
+| **Big Tech Total** | **\$11.5M** | **+13%** | **≈300** | National security, competitiveness |
+| **Companies lobbying on AI** | — | **+141%** | **648 total** | Across all AI policy areas |
+
+*Sources: <R id="9a9150d749ff70a4">OpenSecrets</R>, <R id="1a81c2c66e7e8fd8">Issue One</R>, <R id="744679038d159602">TechCrunch</R>, <R id="b87f2415c49e53cb">MIT Technology Review</R>*
+
+The "innovation flight" narrative has proven particularly effective, warning that strict regulation will drive AI development to more permissive jurisdictions. This argument resonates with policymakers concerned about economic competitiveness, particularly in states like California that depend heavily on technology sector employment. However, empirical evidence for this claim remains limited—financial services and pharmaceutical companies continue to invest heavily in highly regulated jurisdictions when market opportunities justify compliance costs.
+
+Astroturfing efforts have supplemented direct lobbying, with industry-funded organizations presenting themselves as grassroots voices for innovation or consumer interests. These groups amplify concerns about regulatory overreach while obscuring their corporate funding sources. The proliferation of such organizations makes it difficult for policymakers to assess genuine public opinion versus manufactured opposition.
+
+Industry opposition also exploits the collective action problem in AI safety. Even companies that privately acknowledge safety risks may oppose regulation if competitors could gain advantages by avoiding compliance costs. This dynamic suggests that voluntary industry initiatives, while valuable for norm-setting, may be insufficient for addressing systemic risks that require universal participation.
+
+### Definitional and Technical Challenges
+
+The failure to establish precise, legally enforceable definitions of artificial intelligence has undermined numerous regulatory proposals. Traditional legal frameworks assume clear categorical boundaries, but AI exists on a spectrum of capabilities that resist binary classification. The European Union's AI Act attempted to address this challenge through risk-based categorization, but implementation guidance reveals ongoing struggles with edge cases and technological evolution.
+
+Technical complexity creates additional barriers to effective regulation. Many AI governance proposals rely on metrics like computational resources or model parameters that may not correlate with actual capabilities or risks. The focus on "frontier" or "advanced" AI systems often assumes linear progression in capabilities, when breakthrough developments may emerge from unexpected research directions or architectural innovations.
+
+The dual-use nature of AI technology complicates regulatory design, as the same underlying capabilities can enable both beneficial and harmful applications. Unlike nuclear technology, where weapons applications are clearly distinguishable from civilian uses, AI systems designed for legitimate purposes can be adapted for malicious ends with minimal modification. This reality makes it difficult to craft regulations that prevent harm without stifling beneficial innovation.
+
+Speed of technological development outpaces regulatory comprehension, creating a persistent knowledge gap between cutting-edge AI capabilities and policymaker understanding. By the time comprehensive legislation addresses current AI systems, the technology has evolved in ways that make existing frameworks obsolete. This dynamic suggests need for more adaptive regulatory approaches, but such flexibility conflicts with legal requirements for predictability and due process.
+
+### Jurisdictional Complexity and Coordination Failures
+
+Failed AI proposals often founder on jurisdictional complexity, with multiple agencies and levels of government claiming overlapping authority. In the United States, the Federal Trade Commission, Securities and Exchange Commission, Food and Drug Administration, and various other agencies all assert relevance to AI governance within their respective domains. This fragmentation creates regulatory gaps where harmful activities fall between jurisdictions, while also enabling forum shopping by companies seeking the most permissive oversight.
+
+State versus federal tensions have proven particularly problematic for comprehensive AI regulation. Federal preemption arguments against state initiatives like SB 1047 assume that uniform national standards are preferable to regulatory experimentation, but federal inaction leaves this assumption untested. The resulting stalemate benefits companies that prefer regulatory uncertainty to clear but demanding requirements.
+
+International coordination failures reflect deeper structural problems in global governance systems designed for a world of discrete nation-states rather than borderless digital technologies. Existing international institutions lack both technical expertise and enforcement authority to address AI governance effectively. Treaty-making processes that require consensus among hundreds of nations are poorly suited to rapidly evolving technologies that demand quick responses to emerging risks.
+
+The failure of international coordination also stems from asymmetric capabilities and interests among nations. Countries with advanced AI industries have different priorities from those primarily concerned about being subject to others' AI systems. This dynamic creates resistance to governance frameworks that might constrain technological leaders while providing insufficient protection for other nations.
+
+## Successful Approaches and Lessons Learned
+
+### Regulatory Approach Success Comparison
+
+| Approach Type | Examples | Passage Rate | Industry Opposition | Key Success Factors |
+|--------------|----------|:------------:|:-------------------:|---------------------|
+| Comprehensive Frameworks | SB 1047, Algorithmic Accountability Act | Very Low (≈5%) | High (\$10M+) | Rare; typically requires crisis |
+| Sectoral/Use-Case Specific | Colorado AI Act, AI in hiring laws | Medium (30-40%) | Moderate | Narrow scope, clear harms |
+| Disclosure Requirements | AB 2013 (CA), AI labeling | Higher (50-60%) | Low-Moderate | No liability, transparency focus |
+| Executive Orders | Biden AI EO (Oct 2023) | N/A (executive) | Low | Uses existing authority |
+| Voluntary Frameworks | G7 Hiroshima Process, NIST RMF | High (non-binding) | Minimal | Industry-friendly, no enforcement |
+| International Treaties | UN binding AI treaty | Near Zero | N/A | US-China competition blocks |
+
+### Incremental Progress Over Comprehensive Frameworks
+
+Analysis of successful AI governance initiatives reveals that incremental approaches with limited scope achieve higher passage rates than comprehensive frameworks attempting to address multiple AI governance challenges simultaneously. Executive orders like President Biden's October 2023 AI Executive Order succeed by building on existing regulatory authorities rather than creating new ones, while narrow sectoral regulations addressing specific applications (like AI in hiring or medical devices) face less opposition than broad technology mandates.
+
+Disclosure requirements prove more politically viable than liability provisions or performance mandates. Requirements for algorithmic transparency or AI-generated content labeling typically generate less industry opposition than rules imposing legal responsibility for harmful outcomes. This pattern suggests that information-based interventions may be necessary precursors to more substantive regulatory obligations.
+
+Voluntary frameworks often serve as stepping stones to mandatory requirements, allowing industry to demonstrate either compliance or inadequacy of self-regulation. The development of technical standards through organizations like NIST provides foundations for future regulatory requirements while building consensus around best practices. However, the timeline for this progression remains uncertain and may depend on catalyzing events that shift political incentives.
+
+Multi-stakeholder approaches that include industry participation from early stages show higher success rates than adversarial regulatory processes. The UK's AI Safety Institute model of collaborative risk assessment and the EU's approach of extensive industry consultation during AI Act development both demonstrate how procedural inclusion can build legitimacy for substantive requirements. However, such approaches risk capture by well-resourced industry participants unless carefully designed to include diverse perspectives.
+
+### Building Coalitions and Managing Opposition
+
+Successful AI governance initiatives typically build broad coalitions that include both technology industry participants and civil rights advocates, rather than relying solely on safety-focused arguments. Bipartisan framing that emphasizes economic competitiveness, national security, and innovation leadership alongside safety concerns proves more durable than approaches that position regulation as primarily about constraining industry.
+
+The role of catalyzing events in overcoming political resistance cannot be understated. Financial crisis prompted financial services regulation, data breaches enabled privacy legislation, and algorithmic bias scandals facilitated AI transparency requirements. However, relying on such events for regulatory progress means that governance often lags behind harm, making proactive approaches more desirable but politically more difficult.
+
+Technical communities within industry can serve as allies for safety-focused regulation when their concerns align with external advocacy. AI safety researchers within major technology companies often share external researchers' concerns about risks, though their ability to influence corporate positions may be limited. Building relationships with these internal allies can provide valuable intelligence about industry positions and potentially moderate opposition to reasonable regulatory proposals.
+
+International coordination can strengthen domestic regulatory efforts by reducing concerns about competitive disadvantage. The EU AI Act's passage made it easier for other jurisdictions to consider similar requirements, as companies were already adapting to European standards. However, this dynamic depends on major markets taking initial regulatory steps, creating first-mover disadvantages that must be overcome through political leadership.
+
+## Current State and Future Trajectory
+
+### Near-Term Prospects (2025-2026)
+
+The immediate trajectory of AI governance depends heavily on several key variables that will largely determine whether the pattern of failure continues or shifts toward more successful regulatory outcomes. The 2024 US elections and subsequent congressional composition will significantly influence federal AI legislation prospects, with different electoral outcomes suggesting vastly different regulatory approaches. A continuation of divided government likely means persistent gridlock on comprehensive AI legislation, while unified party control could enable either aggressive regulation or systematic deregulation depending on which party prevails.
+
+State-level initiatives appear more likely to succeed in the near term, particularly in jurisdictions where SB 1047's failure demonstrated the political viability of AI safety concerns even when specific legislation fails. Colorado's AI bias law and similar proposals in New York and Illinois suggest that narrower, use-case specific regulation may achieve passage where comprehensive frameworks fail. However, the federal preemption argument that contributed to SB 1047's veto remains a significant challenge for ambitious state-level initiatives.
+
+Industry positions show signs of evolution, with some major AI developers acknowledging the inevitability of regulation and seeking to influence its form rather than prevent it entirely. This shift from opposition to engagement could reduce the systematic resistance that has characterized failed proposals, though it may also lead to industry capture of regulatory processes. The key question is whether this engagement represents genuine acceptance of safety constraints or strategic positioning to minimize regulatory burden.
+
+International coordination faces continued challenges from great power competition, but the proliferation of national AI strategies and governance initiatives may create opportunities for bottom-up coordination around technical standards and best practices. The AI Safety Institutes network, initiated by the UK and now including multiple countries, represents a promising model for technical cooperation that avoids the political challenges of binding agreements.
+
+### Medium-Term Evolution (2025-2030)
+
+The medium-term trajectory of AI governance will likely be shaped by whether voluntary industry commitments prove adequate to address emerging risks or whether their limitations become apparent through failure to prevent harmful incidents. Current voluntary frameworks rely heavily on corporate self-assessment and public commitments without independent verification mechanisms. If these approaches prove inadequate—either through obvious failures or more subtle erosion of safety practices under competitive pressure—political support for mandatory regulation may increase substantially.
+
+Technological developments over this period will significantly influence regulatory approaches, potentially making current debates obsolete. The emergence of artificial general intelligence or highly capable autonomous systems could create risks that dwarf current concerns, shifting political calculations about acceptable regulatory costs. Conversely, if AI capabilities plateau or prove more manageable than current concerns suggest, the urgency driving regulatory efforts may diminish.
+
+The international landscape may evolve toward greater fragmentation or coordination depending on geopolitical developments. Continued US-China competition suggests persistent barriers to comprehensive international agreements, but shared interests in preventing catastrophic risks could enable limited cooperation. The development of technical standards and safety practices through multilateral institutions may provide foundations for future coordination even without binding treaties.
+
+Liability frameworks represent a critical uncertainty that could fundamentally alter the regulatory landscape. Current opposition to liability provisions reflects uncertainty about AI capabilities and appropriate responsibility allocation, but major AI-caused harms could shift both public opinion and legal precedent toward stricter accountability. The development of case law around AI liability through tort litigation may provide de facto regulation even without comprehensive legislation.
+
+### Long-Term Uncertainties (2030+)
+
+The long-term trajectory of AI governance depends on fundamental questions about technological development, international order, and democratic governance that remain deeply uncertain. If AI development continues its current trajectory toward increasingly capable and general systems, the stakes for governance failures may become existentially high, potentially overcoming political obstacles that currently prevent ambitious regulation. However, if AI capabilities stabilize or develop along different trajectories than currently anticipated, existing governance approaches may prove adequate or require fundamental reconceptualization.
+
+The relationship between democratic governance and AI oversight presents particular challenges that may reshape political systems themselves. AI's speed and complexity may exceed the capacity of traditional democratic deliberation, potentially requiring new institutions or decision-making processes. The failure of current governance approaches may reflect not just political obstacles but fundamental limitations of existing democratic institutions when confronting rapidly evolving technological risks.
+
+International governance may require new institutions and approaches that go beyond current state-centric models. The failure of traditional treaty-making processes for AI governance suggests need for more adaptive and technically informed international coordination mechanisms. Whether existing international institutions can evolve to meet these challenges or whether new forms of global governance will emerge remains an open question with profound implications for AI safety and human welfare.
+
+The ultimate success or failure of AI governance may depend on whether humanity can develop institutional innovations that match the pace and complexity of technological development while preserving democratic accountability and human agency. The pattern of current failures suggests that existing approaches are inadequate, but whether better alternatives will emerge before they become urgently necessary remains uncertain.
+
+---
+
+## AI Transition Model Context
+
+Failed AI policy proposals reveal constraints on improving the <EntityLink id="ai-transition-model" />:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="regulatory-capacity" /> | \$11.5M Big Tech lobbying (648 companies, up 141% YoY) systematically opposes comprehensive regulation |
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="institutional-quality" /> | 150+ bills in 118th Congress with zero becoming law shows governance speed mismatch |
+| <EntityLink id="transition-turbulence" /> | <EntityLink id="racing-intensity" /> | Industry preference for minimal regulation allows competitive pressure to override safety |
+
+Pattern suggests incremental approaches with industry support succeed more than comprehensive frameworks; definitional challenges remain a persistent barrier.

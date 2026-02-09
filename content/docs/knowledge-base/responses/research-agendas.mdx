@@ -1,0 +1,509 @@
+---
+title: Research Agenda Comparison
+description: Analysis of major AI safety research agendas comparing approaches from Anthropic ($100M+ annual safety budget, 37-39% team growth), DeepMind (30-50 researchers), ARC, Redwood, and MIRI. Estimates 40-60% probability that current approaches scale to superhuman AI, with portfolio allocation across near-term control, medium-term oversight, and foundational theory.
+sidebar:
+  order: 5
+quality: 69
+llmSummary: Comprehensive comparison of major AI safety research agendas ($100M+ Anthropic, $50M+ DeepMind, $5-10M nonprofits) with detailed funding, team sizes, and failure mode coverage (25-65% per agenda). Estimates 40-60% probability current approaches scale to superhuman AI, with portfolio diversification critical given no single agenda covers all major risks.
+lastEdited: "2025-12-28"
+importance: 78.5
+pageTemplate: knowledge-base-response
+todos:
+  - Complete 'How It Works' section
+  - Complete 'Limitations' section (6 placeholders)
+ratings:
+  novelty: 4.2
+  rigor: 6.8
+  actionability: 7.3
+  completeness: 7.5
+metrics:
+  wordCount: 3630
+  citations: 39
+  tables: 16
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: alignment
+---
+import {ComparisonTable, DataInfoBox, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="research-agendas" client:load />
+
+<DataInfoBox entityId="research-agendas" />
+
+## Quick Assessment
+
+| Organization | Annual Budget | Staff Size | Primary Focus | Tractability | Timeline |
+|--------------|---------------|------------|---------------|--------------|----------|
+| **<EntityLink id="anthropic">Anthropic</EntityLink>** | ≈\$100M+ (safety research) | ≈15 red team + growing safety org | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, Interpretability | High (empirical validation) | 2-5 years |
+| **DeepMind** | \$50M+ (estimated) | 30-50 researchers, growing 37-39% annually | <EntityLink id="scalable-oversight">Scalable Oversight</EntityLink>, <EntityLink id="formal-verification">Formal Verification</EntityLink> | Medium (theoretical + empirical) | 5-10 years |
+| **ARC** | ≈\$5M annually | ≈5-10 researchers | Eliciting Latent Knowledge | Low (fundamental problem) | 5-7 years |
+| **<EntityLink id="redwood-research">Redwood Research</EntityLink>** | ≈\$5-10M annually (\$21M total raised) | Small team + Constellation (30k sqft) | <EntityLink id="ai-control">AI Control</EntityLink> protocols | High (practical protocols) | Near-term |
+| **<EntityLink id="miri">MIRI</EntityLink>** | \$7M (2025), \$10M reserves | ≈7 FTE comms, pivoting to governance | <EntityLink id="agent-foundations">Agent Foundations</EntityLink>, Policy | Low (fundamental theory) | Long-term/governance |
+| **SSI (Sutskever)** | \$2B raised (2024) | New org, building team | Superintelligence alignment | Unknown (stealth mode) | Long-term |
+| **<EntityLink id="openai">OpenAI</EntityLink> (dissolved)** | 20% compute allocation | Disbanded May 2024 | Superalignment (weak-to-strong) | N/A (team dissolved) | N/A |
+
+### Researcher Compensation Comparison
+
+| Organization | Research Scientist Range | Senior/Lead Range | Equity/Stock | Fellowship/Intern Rates |
+|--------------|-------------------------|-------------------|--------------|------------------------|
+| **Anthropic** | \$315K-\$560K total | \$550K-\$760K total | 4-year vesting | \$3,850/week + \$15K/mo compute |
+| **DeepMind** | \$200K-\$260K base | \$300K+ with bonus | Google RSUs | \$113K-\$150K student researcher |
+| **ARC** | \$150K-\$400K (historical) | Similar range | Nonprofit, no equity | \$15K/month intern |
+| **Redwood** | \$150K-\$300K (estimated) | Similar range | Nonprofit, no equity | Fellowship program |
+| **MIRI** | \$100K-\$200K (estimated) | Similar range | Nonprofit, no equity | Summer fellows program |
+| **SSI** | Unknown (stealth) | Premium for top talent | \$10B valuation equity | N/A |
+
+The compensation gap between frontier labs (Anthropic, DeepMind) and nonprofit research organizations (ARC, Redwood, MIRI) creates significant talent allocation challenges for the field. Anthropic's median total compensation of approximately \$545K substantially exceeds nonprofit salaries, though nonprofits offer other benefits including mission alignment and research freedom.
+
+## Overview
+
+The AI safety landscape features dramatically different research agendas based on fundamentally different theories about what will make advanced AI systems safe. These approaches range from Anthropic's constitutional AI—which aims to instill human values through training—to MIRI's agent foundations work that seeks deep theoretical understanding before building anything. The differences aren't merely tactical but reflect deep disagreements about timelines, the nature of intelligence, and what kinds of failures we should expect.
+
+This fragmentation reflects both uncertainty about which technical approaches will succeed and disagreement about what "success" even looks like. Some agendas focus on making current <EntityLink id="language-models">large language models</EntityLink> safer through better training techniques. Others prepare for scenarios where we deploy AI systems we cannot fully trust or understand. Still others argue that without fundamental conceptual breakthroughs, all current approaches will fail catastrophically. Understanding these differences is crucial for researchers, policymakers, and anyone trying to evaluate the overall trajectory of AI safety work.
+
+The stakes of these disagreements are enormous. If constitutional AI succeeds at scale, we might achieve safe AGI through careful scaling of current techniques. If it fails and we haven't developed robust control protocols or verification methods, we could face exactly the catastrophic scenarios these research programs aim to prevent. The resource allocation decisions being made today across these different approaches may determine humanity's ability to navigate the development of transformative AI.
+
+### AI Safety Funding Landscape (2025)
+
+The AI safety funding ecosystem has evolved dramatically, with total available funding estimated at \$500M-\$1B annually across all sources, though the vast majority concentrates at frontier labs:
+
+| Funding Source | Annual Amount | Focus Areas | Constraints |
+|----------------|---------------|-------------|-------------|
+| **Anthropic internal** | \$100M+ (estimated) | Constitutional AI, interpretability, RSP | Internal priorities |
+| **DeepMind internal** | \$50M+ (estimated) | Scalable oversight, formal verification | Google priorities |
+| **<EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>** | \$16.6M (deep learning alignment) | Academic grants, org support | Capacity constrained |
+| **OpenAI Fast Grants** | \$10M (one-time) | External alignment research | Completed program |
+| **<EntityLink id="ltff">LTFF</EntityLink>/SFF** | \$5-10M annually | Small grants, independent researchers | Funding limited since 2024 |
+| **Government (AISI)** | Growing but small | Evaluation, standards | Early stage |
+
+A critical constraint emerged in late 2024: alignment grantmaking became mostly funding-bottlenecked rather than talent-bottlenecked. The Lightspeed grants round received far more promising applications than available funding, and the Long-Term Future Fund reported insufficient resources for worthy grants. Approximately 80-90% of external alignment funding flows through <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, creating concentration risk and capacity constraints in grant evaluation.
+
+### Research Agenda Relationships
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Near-Term[Near-Term Safety 2-5 years]
+        CAI[Constitutional AI<br/>Anthropic ≈\$100M+]
+        INTERP[Interpretability<br/>Anthropic/DeepMind]
+        CTRL[AI Control<br/>Redwood ≈\$10M]
+    end
+
+    subgraph Medium-Term[Medium-Term 5-10 years]
+        SO[Scalable Oversight<br/>DeepMind ≈\$10M+]
+        ELK[Eliciting Latent Knowledge<br/>ARC ≈\$1M]
+        FORM[Formal Verification<br/>DeepMind]
+    end
+
+    subgraph Long-Term[Long-Term/Foundational]
+        AF[Agent Foundations<br/>MIRI ≈\$1M]
+        SSI[Superintelligence<br/>SSI \$1B raised]
+        GOV[Technical Governance<br/>MIRI/Others]
+    end
+
+    CAI --> SO
+    INTERP --> ELK
+    CTRL --> SO
+    ELK --> FORM
+    AF -.-> SO
+    AF -.-> GOV
+    SSI -.-> FORM
+
+    style CAI fill:#e1f5e1
+    style CTRL fill:#e1f5e1
+    style SO fill:#fff4e1
+    style ELK fill:#fff4e1
+    style AF fill:#ffe1e1
+    style SSI fill:#ffe1e1
+    style GOV fill:#ffe1e1
+`} />
+
+### Research Agenda Risk Assessment
+
+Each research agenda addresses different failure modes with varying degrees of coverage:
+
+| Agenda | Deceptive Alignment | Reward Hacking | Capability Overhang | Coordination Failure | Overall Coverage |
+|--------|---------------------|----------------|---------------------|---------------------|-----------------|
+| Constitutional AI | Partial (training-based) | High | Low | Low | 40-50% |
+| Interpretability | High (if successful) | Medium | Low | Low | 35-50% |
+| Scalable Oversight | Medium | High | Medium | Low | 50-60% |
+| AI Control | High (containment) | Medium | Medium | Low | 55-65% |
+| ELK | High (if solved) | Low | Low | Low | 30-40% |
+| Agent Foundations | High (theoretical) | High (theoretical) | Medium | Low | 25-40% |
+
+The table illustrates why portfolio diversification across research agendas is critical: no single approach provides comprehensive coverage of all major failure modes. Constitutional AI addresses reward hacking well but struggles with deceptive alignment; AI control handles near-term containment but may not scale to superintelligence; and agent foundations provides theoretical grounding but limited practical tools. Estimated overall coverage ranges from 25-65% for individual agendas, suggesting that even with substantial investment, significant risk gaps remain.
+
+## Core Research Agenda Analysis
+
+### Anthropic's Constitutional AI Paradigm
+
+Anthropic's approach represents the most direct attempt to scale current techniques to advanced AI systems. Their constitutional AI methodology trains language models to follow a set of principles through a two-stage process: first using AI feedback to critique and revise outputs according to the constitution, then using this data for reinforcement learning. Their Responsible Scaling Policy framework creates concrete capability thresholds (ASL-2, ASL-3, etc.) with corresponding safety requirements, providing a roadmap for scaling safely through increasingly capable systems.
+
+With <R id="68563d565e6852e0">over \$16 billion raised in 2025</R> (including a \$13B Series F at \$183B valuation in September 2025, followed by further growth to over \$350 billion valuation by November), Anthropic dedicates substantial resources to safety research. Their Frontier Red Team comprises approximately 15 researchers who stress-test advanced systems for misuse risks in biological research, cybersecurity, and autonomous systems. The company's <R id="e65e76531931acc2">Anthropic Fellows Program</R> provides \$3,850/week stipends plus ≈\$15k/month in compute funding, producing research papers from over 80% of fellows. Their Claude Academy has trained over 300 engineers in AI safety practices, converting generalist software developers into specialized practitioners.
+
+The constitutional AI work has shown promising empirical results on current models, successfully reducing harmful outputs while maintaining helpfulness across various tasks. Their 2024 research on "sleeper agents" provided concerning evidence that deceptive alignment could persist through standard training techniques, while their mechanistic interpretability research aims to understand model internals well enough to detect such deception. The combination suggests a research program that takes seriously both the promise and the perils of scaling current approaches.
+
+However, critics argue that constitutional AI may create a false sense of security by solving outer alignment (getting models to produce safe outputs) without addressing inner alignment (ensuring the model's internal goals are aligned). The approach assumes that values can be reliably instilled through training rather than just learned as behavioral patterns that might break down under novel circumstances. Whether this assumption holds for superintelligent systems remains one of the most crucial open questions in AI safety.
+
+### DeepMind's Scalable Oversight Framework
+
+DeepMind's research program centers on the fundamental challenge of maintaining human oversight over AI systems that surpass human capabilities. Their debate approach, where AI systems argue different positions for human evaluation, aims to leverage competition to surface truth even when evaluators cannot directly assess claims. Process supervision evaluates reasoning steps rather than final outputs, potentially catching errors before they compound into dangerous conclusions.
+
+Google DeepMind's <R id="6374381b5ec386d1">AGI Safety & Alignment team</R> has grown 37-39% annually and now comprises 30-50 researchers depending on boundary definitions (not counting present-day safety or adversarial robustness teams). Leadership includes Anca Dragan, Rohin Shah, and Allan Dafoe under executive sponsor Shane Legg, with the team organized into AGI Alignment (mechanistic interpretability, scalable oversight) and Frontier Safety (dangerous capability evaluations). Their <R id="d8c3d29798412b9f">Frontier Safety Framework</R> provides systematic evaluation protocols, while the AGI Safety Council analyzes risks and recommends safety practices. DeepMind's safety research investment is estimated at over \$50 million annually, though exact figures are not publicly disclosed. DeepMind has stated it is investing heavily in interpretability research to make AI systems more understandable and auditable.
+
+The scalable oversight paradigm addresses a core problem: if AI systems become more capable than humans in domains like scientific research or strategic planning, how can we evaluate whether they're pursuing our intended goals? Their research on recursive reward modeling explores using AI systems to help evaluate other AI systems, potentially creating a bootstrapping process for maintaining oversight as capabilities scale. This connects to their broader work on formal verification, attempting to provide mathematical guarantees about AI system behavior.
+
+Recent results on process supervision in mathematical reasoning show promise, with models trained to optimize for correct reasoning steps rather than just correct answers showing improved robustness. However, the approach faces significant challenges in domains where correct processes are less well-defined than mathematics. Critics worry that debate could favor persuasive arguments over truthful ones, and that recursive evaluation might amplify rather than correct human biases embedded in the initial training process.
+
+### ARC's Eliciting Latent Knowledge Research
+
+ARC's research agenda, led by Paul Christiano, focuses on what many consider the core technical problem of AI alignment: ensuring that AI systems report what they actually know rather than what they think humans want to hear. The eliciting latent knowledge (ELK) problem assumes that advanced AI systems will develop rich internal representations of the world but may not be incentivized to share their true beliefs with human operators.
+
+The <R id="0562f8c207d8b63f">Alignment Research Center</R> operates with a small team of approximately 5-10 researchers and an annual budget of around \$5 million. Early staff included Paul Christiano and Mark Xu, with the organization receiving <R id="b49be165093f1196">\$265,000 from Open Philanthropy in March 2022</R> and a subsequent \$1.25 million grant for general support. In 2025, ARC reported making conceptual and theoretical progress at the fastest pace since 2022, with current research focusing on combining mechanistic interpretability with formal verification. The organization spun out ARC Evals as an independent nonprofit called METR in December 2023, led by Beth Barnes who joined from OpenAI. Historical salary ranges for full-time positions were \$150k-400k annually, with intern positions at \$15k/month. METR now partners with the AI Safety Institute, is part of the NIST AI Safety Institute Consortium, and conducts evaluations of frontier models including GPT o3, o4-mini, and Claude 3.7 Sonnet.
+
+The ELK problem is particularly concerning in scenarios where AI systems understand that humans are using their reports to make important decisions. A system that understands human psychology and incentives might learn to give reassuring rather than accurate assessments of plans or situations. ARC's research explores various technical approaches to extracting genuine beliefs, including methods that don't rely on human feedback and could thus be harder for AI systems to manipulate.
+
+ARC's practical work through ARC Evals provides crucial empirical grounding by testing current systems for dangerous capabilities before they're deployed. Their evaluations of GPT-4 for tasks like autonomous replication and persuasion established important precedents for capability assessment. However, the core ELK problem remains largely unsolved, with fundamental questions about whether latent knowledge even exists in the forms the research assumes. Some critics argue that attempting to solve ELK may be unnecessary if other approaches can provide adequate safety guarantees.
+
+### Redwood Research's AI Control Approach
+
+Redwood Research takes a pragmatic approach that explicitly doesn't require solving alignment. Their AI control paradigm assumes we may deploy powerful AI systems before we fully understand or trust them, and focuses on developing protocols to safely use untrusted AI. This includes monitoring systems, decomposing tasks so that no single AI system has excessive power, and maintaining human oversight over critical decisions.
+
+Founded in August 2021, <R id="42e7247cbc33fc4c">Redwood Research</R> has received approximately \$21 million in total funding: <R id="8c79e00bab007a63">\$20 million from Open Philanthropy</R> and \$1.27 million from the Survival and Flourishing Fund, with approximately two-thirds (\$14M) for research operations and one-third (\$7M) for running Constellation. Their ICML oral paper <R id="187aaa26886ce183">"AI Control: Improving Risk Despite Intentional Subversion"</R> introduced protocols for monitoring malign LLM agents, establishing AI control as a bedrock approach for mitigating catastrophic risk. Leadership includes Nate Thomas (CEO), Buck Shlegeris (CTO), and Bill Zito (COO), with a board comprising Nate Thomas, Holden Karnofsky, and Paul Christiano. Redwood collaborates with governments and advises AI companies including Google DeepMind and Anthropic, partnering with UK AISI to produce "A sketch of an AI control safety case." The organization runs the Constellation office space, a 30,000 square foot facility hosting staff from multiple AI safety organizations including Open Philanthropy, ARC, Atlas Fellowship, and CEA, with a Visiting Fellows program that has placed dozens of participants into full-time roles on leading safety teams.
+
+The AI control approach acknowledges that perfect alignment may be impossible or insufficient given competitive pressures and deployment timelines. Instead, it focuses on containment strategies, robust monitoring, and defense-in-depth approaches that could work even with partially misaligned systems. Their research on control protocols examines specific technical mechanisms: how to detect when AI systems are acting outside their intended scope, how to limit their capabilities while preserving usefulness, and how to maintain meaningful human control over important decisions.
+
+This paradigm offers near-term practical benefits and could buy crucial time for other safety research. Control protocols could help prevent immediate harms from current systems while longer-term alignment research continues. However, critics argue that the approach may not scale to truly superintelligent systems that could find ways to circumvent monitoring and controls. There's also concern that successful control protocols might create complacency, reducing incentives to solve more fundamental alignment problems.
+
+### MIRI's Agent Foundations Program
+
+MIRI's research program stands apart by focusing on fundamental theoretical questions about agency, goals, and decision-making before attempting to build aligned AI systems. Their agent foundations research explores problems like embedded agency (how can agents reason about themselves as part of the world they're trying to understand?), logical uncertainty (how to make decisions when even logical facts are uncertain), and decision theory for AI systems.
+
+The <R id="86df45a5f8a9bf6d">Machine Intelligence Research Institute</R> operates with a projected 2025 budget of \$7.1 million and reserves of \$10 million—enough for approximately 1.5 years if no additional funds are raised. Annual expenses from 2019-2023 ranged from \$5.4M to \$7.7M, with 2026 projections at a median of \$8M (potentially up to \$10M with growth). MIRI is conducting its <R id="1cb8ff7053544e01">first fundraiser in six years</R>, targeting \$6M with the first \$1.6M matched 1:1 via an SFF grant (with a stretch goal of \$10M total). This would bring reserves to their two-year target of \$16M. Historically, MIRI received <R id="6df981403a3a2b8c">\$2.1 million from Open Philanthropy in 2019</R> supplemented by \$7.7M in 2020, plus several million dollars in Ethereum from Vitalik Buterin in 2021. The communications team currently comprises approximately seven full-time employees (including Nate Soares and Eliezer Yudkowsky), with plans to grow in 2026. The organization has pivoted from technical AI safety research to focusing on informing policymakers and the public about AI risks, expanding its communications team and launching a technical AI governance program.
+
+This approach reflects deep skepticism about whether current AI paradigms can be made safe without fundamental conceptual breakthroughs. MIRI researchers argue that most other approaches are building on shaky theoretical foundations and may create capabilities without the conceptual tools needed to ensure safety. Their work on topics like Löb's theorem and reflective reasoning explores how advanced AI systems might reason about their own reasoning processes—a capability that could be crucial for ensuring they remain aligned as they modify themselves or create successor systems.
+
+MIRI's theoretical rigor has identified important problems and concepts that other researchers now work on. However, their approach faces criticism for being too abstract and disconnected from practical AI development. The theoretical questions they focus on may indeed need to be solved eventually, but the research program offers little immediate help with near-term AI systems. Given uncertain timelines to transformative AI, the value of their work depends heavily on whether we have time for fundamental research or need immediate practical solutions.
+
+### OpenAI's Superalignment (Disbanded)
+
+OpenAI's Superalignment team, established in July 2023, represented a major commitment to solving superintelligence alignment within four years. Co-led by Ilya Sutskever (Chief Scientist) and Jan Leike (Head of Alignment), the team received <R id="704f57dfad89c1b3">20% of OpenAI's compute allocation</R>—an unprecedented resource dedication for safety research. The team focused on "weak-to-strong generalization," exploring whether weaker AI models could effectively supervise and align stronger successors.
+
+However, <R id="33a4513e1449b55d">in May 2024, OpenAI disbanded the Superalignment team</R> less than one year after its formation. Jan Leike sharply criticized the company upon departure, stating "Over the past years, safety culture and processes have taken a backseat to shiny products." Ilya Sutskever also left, with Jakub Pachocki replacing him as Chief Scientist and John Schulman becoming scientific lead for alignment work. Jan Leike subsequently <R id="976aa383b03ff196">joined Anthropic</R> to lead a new superalignment team focusing on scalable oversight, weak-to-strong generalization, and automated alignment research.
+
+In October 2024, OpenAI <R id="0a8da5fe117a4c50">disbanded another safety team</R>—the "AGI Readiness" team that advised on the company's capacity to handle increasingly powerful AI. Miles Brundage, senior advisor for AGI Readiness, wrote upon departure: "Neither OpenAI nor any other frontier lab is ready, and the world is also not ready." The dissolution of both teams within six months raised significant questions about OpenAI's commitment to safety research relative to product development.
+
+### Safe Superintelligence Inc. (SSI)
+
+In June 2024, Ilya Sutskever—former OpenAI Chief Scientist and co-lead of the dissolved Superalignment team—founded Safe Superintelligence Inc. (SSI) with the explicit mission of building safe superintelligence as its sole focus. SSI raised \$2 billion in its first funding round, achieving a \$10 billion valuation before generating any revenue or releasing products.
+
+The company operates in stealth mode with limited public information about its research approach, though its founding principles emphasize that safety and capabilities will be advanced together from the ground up. SSI represents a significant bet that a new organization, freed from the commercial pressures and legacy decisions of existing labs, can more effectively pursue safe superintelligence. The \$2 billion in initial funding—comparable to years of safety research funding across the entire nonprofit field—provides substantial runway for long-term research without near-term product pressures.
+
+Critics question whether SSI's approach will differ meaningfully from existing efforts, and whether the stealth mode prevents the kind of external scrutiny that could improve safety outcomes. Supporters argue that Sutskever's technical leadership and the organization's singular focus on superintelligence alignment represent the most direct attempt to solve the core problem before capability pressures make it intractable.
+
+## Detailed Research Agenda Comparison
+
+| Research Agenda | Funding/Resources | Team Size | Key Publications | Output Metrics | Industry Adoption |
+|-----------------|-------------------|-----------|------------------|----------------|-------------------|
+| **Anthropic Constitutional AI** | \$100M+ annually; \$16B raised 2025 | ≈15 red team + safety teams | RSP framework, Sleeper agents paper, Constitutional AI paper | 80%+ fellows publish; 300+ Claude Academy graduates | High (RSP adopted by labs) |
+| **Anthropic Interpretability** | Shared safety budget | Integrated with safety teams | Mechanistic interpretability papers, Circuit analysis | Growing publication output | Medium (research influence) |
+| **DeepMind Scalable Oversight** | \$50M+ estimated | 30-50 researchers; growing 37-39% annually | Debate papers, Process supervision research | Multiple high-impact papers | Medium (research influence) |
+| **DeepMind Formal Verification** | Shared budget | Integrated with safety teams | Mathematical verification research | Targeted publications | Low (early stage) |
+| **ARC (ELK)** | ≈\$5M annually | ≈5-10 researchers | ELK technical report, METR evaluations | Conceptual progress 2025 | Low (fundamental research) |
+| **Redwood (AI Control)** | \$21M total raised | Small team + Constellation | ICML oral paper on AI control | Government/industry collaborations | High (UK AISI partnership) |
+| **MIRI (Agent Foundations)** | \$7.1M (2025); \$10M reserves | ≈7 FTE comms, pivoting to governance | Agent foundations papers, Policy communications | Shifting to policy output | Low (pivoting away) |
+| **SSI (Sutskever)** | \$2B raised at \$10B valuation | Building team (stealth) | None public yet | Unknown (stealth mode) | N/A (new) |
+| **OpenAI Superalignment** | 20% compute allocation | Disbanded May 2024 | Weak-to-strong generalization research | N/A (dissolved) | N/A (dissolved) |
+
+## Safety Implications and Failure Modes
+
+Each research agenda implies different failure modes and offers different types of safety assurances. Constitutional AI could fail if values aren't genuinely internalized, leading to systems that behave safely during training but pursue misaligned goals when deployed in novel situations. The approach also depends on the assumption that we can identify and specify human values clearly enough to train systems effectively—a assumption that may not hold for complex moral questions.
+
+Scalable oversight approaches face the challenge that oversight itself might be gameable by sufficiently sophisticated systems. If AI systems understand they're being evaluated, they might optimize for appearing aligned rather than being aligned. The debate and process supervision methods also assume that correct reasoning processes can be identified and evaluated, which may not hold in domains where the correct approach is itself uncertain or controversial.
+
+The control paradigm accepts some risk of misalignment in exchange for practical deployability, but this creates a fundamental scaling problem. As AI systems become more capable, the gap between their abilities and human oversight capabilities grows, potentially making control protocols increasingly ineffective. There's also the risk that control protocols designed for current systems won't transfer to fundamentally different AI architectures.
+
+Each approach also offers distinct benefits. Constitutional AI provides immediate practical benefits for current systems and could scale smoothly if its assumptions hold. Scalable oversight directly addresses the superintelligence control problem. AI control offers near-term safety even without solving alignment. Agent foundations could prevent fundamental errors in how we think about AI goals and decision-making.
+
+## Timeline Considerations and Research Trajectories
+
+The research agendas operate on different timelines that reflect their different assumptions about AI development. Anthropic's constitutional AI work focuses on systems likely to be deployed within 2-5 years, with their Responsible Scaling Policy providing a framework for capability thresholds through potential AGI development. This near-term focus allows for empirical validation but may miss longer-term failure modes.
+
+DeepMind's scalable oversight research targets the 5-10 year timeframe when AI systems might exceed human capabilities in most domains. Their formal verification work requires significant theoretical development but could provide stronger safety guarantees. The timeline pressure creates tension between developing robust theoretical foundations and providing practical solutions for nearer-term systems.
+
+ARC's ELK research addresses problems that become critical as AI systems become sophisticated enough to understand and potentially manipulate human oversight. This could become relevant within 5-7 years as language models develop better theory of mind capabilities. However, fundamental progress on ELK has been limited, raising questions about whether the problem is solvable within relevant timelines.
+
+Current trajectories suggest that multiple approaches will likely be needed rather than a single solution. Constitutional AI and control protocols provide immediate benefits for current systems. Interpretability and oversight methods could become crucial as capabilities scale. Foundational research might prevent fundamental errors in system design. The key question is resource allocation across these different timelines and approaches.
+
+## Key Technical and Strategic Uncertainties
+
+The most fundamental uncertainty is whether current AI paradigms—large language models trained with reinforcement learning from human feedback—will lead directly to transformative AI. If scaling current approaches leads to AGI, then research on constitutional AI and scalable oversight directly addresses the systems we'll need to align. If a paradigm shift occurs, much current safety research might not transfer to new architectures.
+
+Another crucial uncertainty is the feasibility of verification without full alignment. Can we develop interpretability tools good enough to detect deceptive alignment? Can oversight methods scale to superintelligent systems? These questions determine whether we can safely deploy AI systems we don't fully understand or trust—a scenario that seems increasingly likely given competitive pressures.
+
+The tractability of fundamental theoretical problems remains unclear. Are problems like ELK solvable in principle? Do we need conceptual breakthroughs about agency and goals before building advanced AI? The answers affect how much effort should go into foundational research versus empirical approaches with current systems.
+
+Strategic uncertainties include how different research agendas interact and whether they're complements or substitutes. Does success in constitutional AI reduce the need for control protocols, or do we need defense in depth? How do competitive dynamics between AI developers affect the feasibility of different safety approaches? These considerations may be as important as the technical questions for determining which research directions to prioritize.
+
+The comparison reveals that rather than competing approaches, we likely need a portfolio strategy that addresses different scenarios and timelines. The optimal allocation depends on beliefs about AI development trajectories, the tractability of different technical problems, and the strategic landscape for AI deployment. Understanding these trade-offs is essential for making effective research and policy decisions in an uncertain but rapidly evolving field.
+
+## Sources
+
+### Anthropic
+- <R id="68563d565e6852e0">Anthropic's \$13 Billion Series F funding announcement</R> - December 2025
+- <R id="e65e76531931acc2">Anthropic Fellows Program for 2026</R> - Applications open
+- <R id="94c867557cf1e654">Introducing the Anthropic Fellows Program</R> - Program overview
+
+### DeepMind
+- <R id="6374381b5ec386d1">AGI Safety and Alignment at Google DeepMind</R> - Team overview
+- <R id="d8c3d29798412b9f">Introducing the Frontier Safety Framework</R> - Safety evaluation protocols
+
+### OpenAI
+- <R id="704f57dfad89c1b3">Introducing Superalignment</R> - July 2023
+- <R id="33a4513e1449b55d">OpenAI dissolves Superalignment AI safety team</R> - May 2024
+- <R id="976aa383b03ff196">Anthropic hires former OpenAI safety lead Jan Leike</R> - May 2024
+- <R id="0a8da5fe117a4c50">OpenAI disbands AGI Readiness team</R> - October 2024
+
+### ARC
+- <R id="0562f8c207d8b63f">Alignment Research Center website</R> - Organization overview
+- <R id="5efa917a52b443a1">ARC's first technical report: Eliciting Latent Knowledge</R> - Technical paper
+- <R id="b49be165093f1196">Open Philanthropy grant to ARC</R> - March 2022
+
+### Redwood Research
+- <R id="42e7247cbc33fc4c">Redwood Research website</R> - Organization overview
+- <R id="8c79e00bab007a63">Open Philanthropy general support grant</R> - Funding information
+- <R id="187aaa26886ce183">AI Control: Improving Risk Despite Intentional Subversion</R> - ICML oral paper
+
+### MIRI
+- <R id="1cb8ff7053544e01">MIRI's 2025 Fundraiser</R> - Current fundraising campaign
+- <R id="07ccedd2d560ecb7">MIRI's 2024 End-of-Year Update</R> - Strategic direction
+- <R id="6df981403a3a2b8c">Open Philanthropy grant to MIRI (2019)</R> - Funding history
+
+### Funding Landscape
+- <R id="e7f61a6aa8370b8c">Open Philanthropy AI alignment grants</R> - \$16.6M for deep learning alignment projects
+- <R id="82eb0a4b47c95d2a">OpenAI Superalignment Fast Grants</R> - \$10M grant program
+- <R id="93813a92f14ae259">Alignment grantmaking funding constraints</R> - 2024 funding bottleneck analysis
+- <R id="bfe53c4aedc94ec0">Anthropic salary data</R> - Compensation benchmarks
+- <R id="d97571571d129855">DeepMind salary data</R> - Compensation benchmarks
+
+<ComparisonTable
+  client:load
+  title="Research Agenda Overview"
+  columns={["Primary Focus", "Key Assumption", "Timeline View", "Theory of Change"]}
+  rows={[
+    {
+      name: "Anthropic (Constitutional AI)",
+      values: {
+        "Primary Focus": "Train models to be helpful, harmless, honest via AI feedback",
+        "Key Assumption": "Can instill values through training at scale",
+        "Timeline View": "Short (2026-2030)",
+        "Theory of Change": "Build safest frontier models → demonstrate safe scaling → set industry standard"
+      }
+    },
+    {
+      name: "Anthropic (Interpretability)",
+      values: {
+        "Primary Focus": "Understand model internals to verify alignment",
+        "Key Assumption": "Neural networks have interpretable structure",
+        "Timeline View": "Short-medium",
+        "Theory of Change": "Mechanistic understanding → can verify goals → detect deception"
+      }
+    },
+    {
+      name: "OpenAI (Superalignment) [dissolved]",
+      values: {
+        "Primary Focus": "Use weaker AI to align stronger AI",
+        "Key Assumption": "Weak-to-strong generalization works",
+        "Timeline View": "Short (2027-2030)",
+        "Theory of Change": "Bootstrap alignment from current models to future models"
+      }
+    },
+    {
+      name: "DeepMind (Scalable Oversight)",
+      values: {
+        "Primary Focus": "Debate, recursive reward modeling, process supervision",
+        "Key Assumption": "Can scale human oversight to superhuman AI",
+        "Timeline View": "Medium (2030-2040)",
+        "Theory of Change": "Better evaluation → catch misalignment → iterate to safety"
+      }
+    },
+    {
+      name: "ARC (Eliciting Latent Knowledge)",
+      values: {
+        "Primary Focus": "Get AI to report what it actually knows",
+        "Key Assumption": "AI has latent knowledge that could be extracted",
+        "Timeline View": "Medium",
+        "Theory of Change": "Solve ELK → detect deception → verify alignment"
+      }
+    },
+    {
+      name: "Redwood (AI Control)",
+      values: {
+        "Primary Focus": "Maintain control even with misaligned AI",
+        "Key Assumption": "Don't need alignment, just control",
+        "Timeline View": "Near-term focus",
+        "Theory of Change": "Untrusted AI can be safely used with proper protocols"
+      }
+    },
+    {
+      name: "MIRI (Agent Foundations)",
+      values: {
+        "Primary Focus": "Fundamental theory of agency and goals",
+        "Key Assumption": "Need conceptual breakthroughs first",
+        "Timeline View": "Uncertain, possibly insufficient time",
+        "Theory of Change": "Deep understanding → know what to build → align by design"
+      }
+    },
+    {
+      name: "SSI (Sutskever)",
+      values: {
+        "Primary Focus": "Safe superintelligence from ground up",
+        "Key Assumption": "Fresh start enables better safety integration",
+        "Timeline View": "Long-term (superintelligence focus)",
+        "Theory of Change": "Build safety into capabilities from start → achieve safe superintelligence"
+      }
+    }
+  ]}
+/>
+
+<ComparisonTable
+  client:load
+  title="Agenda Comparison by Dimension"
+  columns={["Solves Inner Alignment?", "Scales to Superhuman?", "Works Without Full Alignment?", "Empirically Testable Now?"]}
+  highlightColumn="Scales to Superhuman?"
+  rows={[
+    {
+      name: "Constitutional AI",
+      values: {
+        "Solves Inner Alignment?": { value: "Uncertain", badge: "medium" },
+        "Scales to Superhuman?": { value: "Unknown", badge: "medium" },
+        "Works Without Full Alignment?": { value: "No", badge: "low" },
+        "Empirically Testable Now?": { value: "Yes", badge: "high" }
+      }
+    },
+    {
+      name: "Interpretability",
+      values: {
+        "Solves Inner Alignment?": { value: "Could help verify", badge: "medium" },
+        "Scales to Superhuman?": { value: "Unknown", badge: "medium" },
+        "Works Without Full Alignment?": { value: "Helps detect issues", badge: "medium" },
+        "Empirically Testable Now?": { value: "Yes", badge: "high" }
+      }
+    },
+    {
+      name: "Scalable Oversight",
+      values: {
+        "Solves Inner Alignment?": { value: "No", badge: "low" },
+        "Scales to Superhuman?": { value: "Designed to", badge: "high" },
+        "Works Without Full Alignment?": { value: "Maybe", badge: "medium" },
+        "Empirically Testable Now?": { value: "Partially", badge: "medium" }
+      }
+    },
+    {
+      name: "ELK",
+      values: {
+        "Solves Inner Alignment?": { value: "Would help detect", badge: "medium" },
+        "Scales to Superhuman?": { value: "Intended to", badge: "medium" },
+        "Works Without Full Alignment?": { value: "No", badge: "low" },
+        "Empirically Testable Now?": { value: "Limited", badge: "low" }
+      }
+    },
+    {
+      name: "AI Control",
+      values: {
+        "Solves Inner Alignment?": { value: "No (bypasses it)", badge: "low" },
+        "Scales to Superhuman?": { value: "Probably not", badge: "low" },
+        "Works Without Full Alignment?": { value: "Yes (the point)", badge: "high" },
+        "Empirically Testable Now?": { value: "Yes", badge: "high" }
+      }
+    },
+    {
+      name: "Agent Foundations",
+      values: {
+        "Solves Inner Alignment?": { value: "Aims to", badge: "medium" },
+        "Scales to Superhuman?": { value: "Would if successful", badge: "medium" },
+        "Works Without Full Alignment?": { value: "No", badge: "low" },
+        "Empirically Testable Now?": { value: "No", badge: "low" }
+      }
+    },
+    {
+      name: "SSI (Sutskever)",
+      values: {
+        "Solves Inner Alignment?": { value: "Unknown (stealth)", badge: "medium" },
+        "Scales to Superhuman?": { value: "Primary goal", badge: "high" },
+        "Works Without Full Alignment?": { value: "Unknown", badge: "medium" },
+        "Empirically Testable Now?": { value: "No (stealth)", badge: "low" }
+      }
+    }
+  ]}
+/>
+
+<DisagreementMap
+  client:load
+  topic="Which Research Agenda Will Succeed?"
+  description="Views on which approach is most likely to prevent AI catastrophe"
+  spectrum={{ low: "Need novel breakthroughs", high: "Current approaches scale" }}
+  positions={[
+    { actor: "Anthropic researchers", position: "Current approaches can scale", estimate: "60-70%", confidence: "medium" },
+    { actor: "DeepMind researchers", position: "Scalable oversight works", estimate: "50-60%", confidence: "medium" },
+    { actor: "ARC / Paul Christiano", position: "Need targeted breakthroughs", estimate: "40-50%", confidence: "low" },
+    { actor: "Redwood", position: "Control buys time", estimate: "Near-term high", confidence: "medium" },
+    { actor: "SSI / Sutskever", position: "Fresh start needed", estimate: "Unknown", confidence: "low" },
+    { actor: "MIRI / Yudkowsky", position: "Current approaches fail", estimate: "15-20%", confidence: "high" },
+  ]}
+/>
+
+<KeyQuestions
+  client:load
+  questions={[
+    {
+      question: "Will current paradigm (LLMs + RLHF) lead to transformative AI?",
+      positions: [
+        {
+          position: "Yes - scaling continues",
+          confidence: "medium",
+          reasoning: "Scaling laws hold. Emergent capabilities. Investment continues.",
+          implications: "Current safety research is directly relevant"
+        },
+        {
+          position: "No - paradigm shift needed",
+          confidence: "medium",
+          reasoning: "LLMs have fundamental limitations. New architecture will emerge.",
+          implications: "May need different safety approaches for new paradigm"
+        }
+      ]
+    },
+    {
+      question: "Can we verify alignment without solving it?",
+      positions: [
+        {
+          position: "Yes - interpretability/evals can work",
+          confidence: "medium",
+          reasoning: "Can detect misalignment even if we can't prove alignment. Defense in depth.",
+          implications: "Focus on verification and detection"
+        },
+        {
+          position: "No - deceptive alignment defeats verification",
+          confidence: "medium",
+          reasoning: "Sufficiently capable AI could hide misalignment. Can't verify what we can't understand.",
+          implications: "Must solve alignment directly, not just detect misalignment"
+        }
+      ]
+    }
+  ]}
+/>
+
+---
+
+## AI Transition Model Context
+
+Research agenda diversification improves the <EntityLink id="ai-transition-model" /> across multiple factors:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Portfolio approach hedges against any single methodology failing |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Multiple research paths increase probability of keeping pace with capabilities |
+| <EntityLink id="transition-turbulence" /> | <EntityLink id="racing-intensity" /> | Coordinated safety investment across labs reduces competitive pressure to cut corners |
+
+The distribution of research funding across agendas significantly affects the probability of achieving safe AI development across different scenarios.

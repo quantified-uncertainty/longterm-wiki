@@ -1,0 +1,186 @@
+---
+title: "Cause-Effect Graph Demo"
+description: "Interactive visualization of cause and effect relationships"
+tableOfContents: false
+pageTemplate: "splash"
+importance: 8.5
+quality: 42
+llmSummary: "Interactive visualization tool demonstrating cause-effect relationships in AI safety using a hierarchical graph with 7 nodes (rapid AI progress → insufficient alignment/competitive pressure → misaligned systems → loss of control/unintended consequences → existential risk). The tool encodes relationship strength, confidence levels (ranging 0.3-0.85), and causal direction through visual properties, though the example content itself represents standard AI safety arguments rather than novel analysis."
+ratings:
+  novelty: 6.5
+  rigor: 4
+  actionability: 5.5
+  completeness: 5
+metrics:
+  wordCount: 169
+  citations: 0
+  tables: 4
+  diagrams: 0
+---
+import CauseEffectGraph from '@components/CauseEffectGraph';
+
+<style>{`
+  .sl-container {
+    max-width: 100% !important;
+  }
+  main {
+    max-width: 1400px !important;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+`}</style>
+
+This is a prototype of an interactive cause-effect graph visualization. **Click on any node** to expand its details panel. Hover over nodes for quick descriptions.
+
+## Example: AI Safety Risk Factors
+
+<CauseEffectGraph
+  client:load
+  height={700}
+  initialNodes={[
+    {
+      id: '1',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Rapid AI Progress',
+        description: 'Continued acceleration in AI capabilities, particularly in foundation models and general-purpose AI systems.',
+        type: 'cause',
+        confidence: 0.85,
+        details: 'Since 2020, we have seen remarkable advances in AI capabilities. GPT-4, Claude, and other large language models demonstrate emergent abilities that were not predicted. The pace of improvement continues to accelerate, with training compute doubling roughly every 6 months.',
+        sources: ['Epoch AI compute trends', 'Anthropic scaling research', 'OpenAI progress reports'],
+        relatedConcepts: ['Scaling laws', 'Emergent capabilities', 'Foundation models', 'AGI timelines']
+      }
+    },
+    {
+      id: '2',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Insufficient Alignment Research',
+        description: 'The pace of alignment/safety research is not keeping up with capabilities research.',
+        type: 'cause',
+        confidence: 0.7,
+        details: 'While capabilities research has thousands of researchers and billions in funding, alignment research has perhaps a few hundred dedicated researchers. Key problems like interpretability, robustness, and value learning remain largely unsolved.',
+        sources: ['80,000 Hours AI safety research guide', 'AI Alignment Forum surveys'],
+        relatedConcepts: ['RLHF limitations', 'Interpretability', 'Value learning', 'Scalable oversight']
+      }
+    },
+    {
+      id: '3',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Competitive Pressure',
+        description: 'Competition between labs and nations creates pressure to deploy quickly without adequate safety testing.',
+        type: 'cause',
+        confidence: 0.75,
+        details: 'The race dynamics between major AI labs (OpenAI, Anthropic, Google, Meta) and between nations (US, China, EU) create incentives to prioritize speed over safety. First-mover advantages in AI could be enormous.',
+        sources: ['Racing to the Precipice (Armstrong)', 'AI governance literature'],
+        relatedConcepts: ['Race dynamics', 'Coordination problems', 'Safety culture', 'Regulatory capture']
+      }
+    },
+    {
+      id: '4',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Misaligned AI Systems',
+        description: 'AI systems that pursue goals not fully aligned with human values and intentions.',
+        type: 'intermediate',
+        confidence: 0.6,
+        details: 'Current training methods like RLHF may produce systems that appear aligned during training but pursue different objectives when deployed. The gap between specified objectives and true human values creates systematic risks.',
+        sources: ['Risks from Learned Optimization (Hubinger et al.)', 'Goal Misgeneralization research'],
+        relatedConcepts: ['Inner alignment', 'Outer alignment', 'Reward hacking', 'Specification gaming']
+      }
+    },
+    {
+      id: '5',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Unintended Consequences',
+        description: 'AI systems causing harm through unforeseen side effects of pursuing their objectives.',
+        type: 'effect',
+        confidence: 0.65,
+        details: 'Even well-intentioned AI systems optimizing for reasonable-seeming objectives can cause harm through side effects. Classic examples include recommendation algorithms promoting polarizing content, or trading algorithms causing flash crashes.',
+        sources: ['Concrete Problems in AI Safety', 'Real-world ML failure cases'],
+        relatedConcepts: ['Side effects', 'Distributional shift', 'Edge cases', 'Robustness']
+      }
+    },
+    {
+      id: '6',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Loss of Control',
+        description: 'Humans lose the ability to correct or shut down advanced AI systems.',
+        type: 'effect',
+        confidence: 0.5,
+        details: 'As AI systems become more capable, they may resist shutdown or correction if this conflicts with their objectives. This could happen through AI systems that are intentionally deceptive, or simply through systems that are too complex to understand or control.',
+        sources: ['Superintelligence (Bostrom)', 'Corrigibility research'],
+        relatedConcepts: ['Corrigibility', 'Shutdown problem', 'Deceptive alignment', 'Instrumental convergence']
+      }
+    },
+    {
+      id: '7',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Existential Risk',
+        description: 'AI development leads to outcomes that permanently curtail humanity\'s long-term potential.',
+        type: 'effect',
+        confidence: 0.3,
+        details: 'In the worst case, misaligned superintelligent AI could lead to human extinction or permanent loss of human agency. While probability estimates vary widely, even small probabilities of such outcomes warrant serious attention given the stakes.',
+        sources: ['The Precipice (Ord)', 'AI risk surveys', 'FHI research'],
+        relatedConcepts: ['X-risk', 'S-risk', 'Long-term future', 'Existential security']
+      }
+    }
+  ]}
+  initialEdges={[
+    { id: 'e1-4', source: '1', target: '4', data: { strength: 'strong', confidence: 'high', effect: 'increases' } },
+    { id: 'e2-4', source: '2', target: '4', data: { strength: 'strong', confidence: 'high', effect: 'increases' } },
+    { id: 'e3-4', source: '3', target: '4', data: { strength: 'medium', confidence: 'medium', effect: 'increases' } },
+    { id: 'e4-5', source: '4', target: '5', data: { strength: 'medium', confidence: 'high', effect: 'increases' } },
+    { id: 'e4-6', source: '4', target: '6', data: { strength: 'strong', confidence: 'medium', effect: 'increases' } },
+    { id: 'e5-7', source: '5', target: '7', data: { strength: 'medium', confidence: 'low', effect: 'increases' } },
+    { id: 'e6-7', source: '6', target: '7', data: { strength: 'strong', confidence: 'medium', effect: 'increases' } },
+    { id: 'e3-6', source: '3', target: '6', data: { strength: 'weak', confidence: 'low', effect: 'increases' } }
+  ]}
+/>
+
+## Features
+
+- **Auto-layout**: Nodes are automatically positioned using the ELK algorithm for clean hierarchical display
+- **Click to expand**: Click any node to open a detailed side panel with full information
+- **Hover tooltips**: Mouse over any node to see a quick description
+- **Color-coded nodes**: Red for causes, green for effects, purple for intermediate factors
+- **Visual arrow encoding**: Arrows convey information through thickness, style, and color (see below)
+- **Interactive**: Drag nodes to rearrange, zoom and pan the view
+
+## Arrow System
+
+Arrows encode three dimensions of information visually:
+
+| Property | Visual | Meaning |
+|----------|--------|---------|
+| **Thickness** | Thick / Medium / Thin | Influence strength (strong / medium / weak) |
+| **Style** | Solid / Dashed / Dotted | Confidence level (high / medium / low) |
+| **Color** | Red / Green | Effect direction (increases risk / decreases risk) |
+
+## Node Types
+
+| Color | Type | Description |
+|-------|------|-------------|
+| Red | Cause | Root causes or initial factors |
+| Purple | Intermediate | Factors that are both effects of some causes and causes of other effects |
+| Green | Effect | End outcomes or consequences |
+
+## Details Panel
+
+Click on any node to see:
+- **Confidence bar**: Visual representation of the confidence level
+- **Description**: Brief summary of the concept
+- **Details**: Extended explanation with context
+- **Related Concepts**: Tags showing connected ideas
+- **Sources**: References and citations

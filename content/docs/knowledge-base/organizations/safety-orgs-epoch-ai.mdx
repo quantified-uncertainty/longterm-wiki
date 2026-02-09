@@ -1,0 +1,428 @@
+---
+title: Epoch AI
+description: AI forecasting and research organization providing empirical data infrastructure through compute tracking (4.4x annual growth), dataset analysis (300T token stock, exhaustion projected 2026-2032), and timeline forecasting for AI governance and policy decisions
+sidebar:
+  order: 14
+quality: 91
+llmSummary: Epoch AI provides empirical AI progress tracking showing training compute growing 4.4x annually (2010-2024), 300 trillion tokens of high-quality training data with exhaustion projected 2026-2032, and algorithmic efficiency doubling every 6-12 months. Their 3,200+ model database directly informs US Executive Order 10^26 FLOPs threshold and export controls. With $4.1M in 2025 Open Philanthropy funding and 34 staff, they've produced FrontierMath (testing advanced reasoning) and the Epoch Capabilities Index, serving as critical infrastructure for compute governance approaches.
+lastEdited: "2026-01-30"
+importance: 62.5
+ratings:
+  novelty: 4
+  rigor: 7
+  actionability: 6
+  completeness: 7
+metrics:
+  wordCount: 579
+  citations: 28
+  tables: 32
+  diagrams: 1
+clusters:
+  - ai-safety
+  - community
+  - epistemics
+  - governance
+subcategory: safety-orgs
+---
+import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="epoch-ai" client:load />
+
+<DataInfoBox entityId="epoch-ai" />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Research Output** | Very High | 36 Data Insights, 37 Gradient Updates, 3,200+ models tracked in 2025 |
+| **Policy Influence** | High | Cited in US Executive Order 14110; 10^26 FLOP threshold based on Epoch data |
+| **Data Infrastructure** | Exceptional | Largest public ML model database; 3,200+ models from 1950-present |
+| **Funding Stability** | Strong | [\$1.1M Open Philanthropy grant (2025)](https://www.openphilanthropy.org/grants/epoch-ai-general-support-2025/), additional \$1.9M general support |
+| **Team Expertise** | Strong | 34 staff; director holds PhD in AI from University of Aberdeen |
+| **Methodological Rigor** | High | Multiple forecasting methods with explicit uncertainty bounds |
+| **Independence** | Medium-High | Nonprofit with EA/<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> funding; no industry capture |
+| **Benchmark Innovation** | High | [FrontierMath benchmark](https://epoch.ai/frontiermath) with 60+ mathematicians including Fields Medalist |
+
+## Overview
+
+Epoch AI is a research organization founded in 2022 that provides rigorous, data-driven empirical analysis and forecasting of AI progress. Based in San Francisco with 34 employees, their work serves as critical infrastructure for <EntityLink id="ai-governance">AI governance</EntityLink> and <EntityLink id="agi-timeline">timeline forecasting</EntityLink>. Their [public database tracks over 3,200 machine learning models](https://epoch.ai/data/ai-models) from 1950 to present—the largest resource of its kind.
+
+Their research documents three key scaling dynamics: training compute growing at [4.4x per year since 2010](https://epoch.ai/trends), high-quality training data stock of approximately 300 trillion tokens with [exhaustion projected between 2026-2032](https://epoch.ai/data-insights/compute-trend-post-2010), and algorithmic efficiency doubling every 6-12 months. As of June 2025, they have identified over 30 publicly announced AI models exceeding the 10^25 FLOP training compute threshold.
+
+Unlike organizations developing AI capabilities or safety techniques directly, Epoch provides the empirical foundation that informs strategic decisions across the AI ecosystem. Their databases and forecasts are cited by policymakers designing compute governance frameworks, safety researchers planning research timelines, and AI labs benchmarking their progress against industry trends. In 2024, they were featured on The New York Times' "2024 Good Tech Awards" list.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph INPUTS["Data Collection"]
+        MODELS[AI Model Database<br/>3,200+ models]
+        COMPUTE[Compute Tracking<br/>Training FLOPs, costs]
+        BENCH[Benchmark Hub<br/>Performance metrics]
+        CHIPS[AI Chip Sales<br/>GPU capacity tracking]
+    end
+
+    subgraph ANALYSIS["Research & Analysis"]
+        TRENDS[Trend Analysis<br/>4.4x/year compute growth]
+        FORECAST[Timeline Forecasting<br/>Multiple methods]
+        ECI[Capabilities Index<br/>Unified metric]
+        FMATH[FrontierMath<br/>350 problems]
+    end
+
+    subgraph OUTPUTS["Policy Outputs"]
+        POLICY[Governance Guidance<br/>Compute thresholds]
+        DATA[Public Databases<br/>Open access]
+        REPORTS[Publications<br/>Papers & insights]
+    end
+
+    MODELS --> TRENDS
+    COMPUTE --> TRENDS
+    BENCH --> ECI
+    CHIPS --> TRENDS
+
+    TRENDS --> FORECAST
+    ECI --> FORECAST
+    FMATH --> ECI
+
+    FORECAST --> POLICY
+    TRENDS --> DATA
+    FORECAST --> REPORTS
+
+    style INPUTS fill:#e8f4f8
+    style ANALYSIS fill:#fff8e8
+    style OUTPUTS fill:#e8f8e8
+`} />
+
+Their most influential finding is the exponential growth in training compute for frontier models—with [training costs growing 2-3x annually](https://epoch.ai/trends) and projected to exceed \$1 billion per model by 2027. This analysis has become foundational for understanding AI progress and informing governance approaches focused on compute as a key chokepoint.
+
+## 2025 Research Impact
+
+| Output Category | 2025 Metrics | Key Products | Policy Relevance |
+|----------------|--------------|--------------|------------------|
+| Data Insights | [36 published](https://epoch.ai/blog/top-10-data-insights-and-gradient-updates-of-2025) | Training compute decomposition, API cost trends | Informs compute governance thresholds |
+| Gradient Updates | 37 published | Weekly trend analyses | Real-time capability tracking |
+| Model Database | [3,200+ entries](https://epoch.ai/data/ai-models) | Largest public ML model database | Foundation for policy research |
+| Benchmarks | 2 major releases | [FrontierMath](https://epoch.ai/frontiermath), [Epoch Capabilities Index](https://epoch.ai/blog/epoch-impact-report-2025) | Standardized capability measurement |
+| AI Chip Tracking | [New data explorer](https://epoch.ai/data) | 15M+ H100-equivalents tracked globally | Export control effectiveness analysis |
+| Cost Analysis | Multiple reports | [10x API price drop (Apr 2023-Mar 2025)](https://epoch.ai/blog/top-10-data-insights-and-gradient-updates-of-2025) | Market concentration analysis |
+
+### Key Findings Summary
+
+| Metric | Current Value | Trend | Source |
+|--------|---------------|-------|--------|
+| Training compute growth | 4.4x/year (2010-2024) | Accelerating to 5x/year post-2020 | [Epoch Trends](https://epoch.ai/trends) |
+| Frontier model training costs | Tens of millions USD | Projected to exceed \$1B by 2027 | [Cost Analysis](https://epoch.ai/trends) |
+| Total AI compute capacity | 15M+ H100-equivalents | Growing rapidly | Epoch AI Chip Sales |
+| Models above 10^25 FLOP | 30+ (as of June 2025) | ≈2 announced monthly in 2024 | [Model Database](https://epoch.ai/data/ai-models) |
+| High-quality text stock | ≈300 trillion tokens | Exhaustion projected 2026-2032 | Epoch Data Analysis |
+| API cost reduction | 10x (Apr 2023-Mar 2025) | Continuing decline | [2025 Impact Report](https://epoch.ai/blog/epoch-impact-report-2025) |
+
+## Organizational Risk Assessment
+
+| Risk Category | Assessment | Evidence | Timeline | Trajectory |
+|---------------|------------|----------|----------|------------|
+| Data Bottleneck | High | High-quality text ≈300T tokens, current usage accelerating | 2026-2032 | Worsening |
+| Compute Scaling | Medium | 4.4x annual growth potentially unsustainable; energy constraints emerging | 2030s | Stable |
+| Governance Lag | High | Policy development slower than tech progress; 1,000+ US state AI bills in 2025 | Ongoing | Improving |
+| Forecasting Accuracy | Medium | Wide uncertainty bounds; Epoch Capabilities Index improving precision | Continuous | Improving |
+
+## Key Research Areas
+
+### Compute Trends Analysis
+
+Epoch's flagship research tracks computational resources used to train AI models, revealing exponential scaling patterns. Their [Machine Learning Trends dashboard](https://epoch.ai/trends) provides real-time tracking of these dynamics.
+
+| Metric | Current Trend | Key Finding | Policy Implication |
+|--------|---------------|-------------|-------------------|
+| Training Compute | [4.4x/year (2010-2024)](https://epoch.ai/trends) | 5x/year for frontier models since 2020 | Compute governance thresholds need updating |
+| Training Costs | \$50-100M for frontier models | [Projected to exceed \$1B by 2027](https://epoch.ai/trends) | Market concentration accelerating |
+| Hardware Capacity | [15M+ H100-equivalents globally](https://epoch.ai/data) | Companies own 80% of AI supercomputers | Export controls increasingly important |
+| Total AI Compute | Doubling every 7 months | 3.3x annual growth since 2022 | Governance frameworks struggling to keep pace |
+
+**Critical findings from [Epoch's compute database](https://epoch.ai/data/ai-models)**:
+
+- **Exponential growth faster than Moore's Law**: While chip performance doubles every ~2 years, AI training compute grows 4.4x annually—driven primarily by larger training clusters, longer training runs, and improved hardware
+- **Economic scaling**: Training costs growing 2-3x annually, reaching \$50-100M+ for frontier models; the largest AI supercomputers (like Anthropic's 750MW Indiana facility) cost billions to build
+- **Concentration effects**: Only 12 organizations have trained models above 10^25 FLOP; companies now own 80% of all AI supercomputers while government share has declined
+
+### Training Data Constraints
+
+Epoch's <R id="22818e0a00496c03">"Will We Run Out of Data?"</R> research revealed potential bottlenecks for continued AI scaling. Their analysis estimates the total stock of human-generated public text at approximately [300 trillion tokens](https://epoch.ai/trends).
+
+| Data Type | Estimated Stock | Current Usage Rate | Exhaustion Timeline |
+|-----------|-----------------|-------------------|-------------------|
+| High-quality text | ≈300 trillion tokens | Accelerating | [2026-2032](https://epoch.ai/trends) |
+| All web text | ≈10^15 tokens | Increasing | Early 2030s |
+| Image data | Larger but finite | Growing rapidly | 2030s+ |
+| Video data | Massive but hard to use | Early stages | Unknown |
+
+**Key implications**:
+- **Pressure for efficiency**: Data constraints may force more efficient training methods; Epoch research shows [algorithmic efficiency doubling every 6-12 months](https://epoch.ai/trends)
+- **Synthetic data boom**: Investment in AI-generated training data accelerating to extend runway
+- **Multimodal shift**: <EntityLink id="language-models">Language models</EntityLink> increasingly incorporating image/video data
+- **Overtraining risk**: If models are "intensely overtrained," high-quality text could be exhausted even earlier than 2026
+
+### Timeline Forecasting Methodology
+
+Epoch employs multiple complementary approaches to estimate transformative AI timelines:
+
+| Method | Current Estimate Range | Key Variables | Confidence Level |
+|--------|----------------------|---------------|-----------------|
+| Trend Extrapolation | 2030s-2040s | Compute, data, algorithms | Medium |
+| Biological Anchors | 2040s-2050s | Brain computation estimates | Low |
+| Benchmark Analysis | 2030s-2050s | Task performance rates | Medium |
+| Economic Modeling | 2035-2060s | Investment trends, ROI | Low |
+
+## Impact on AI Safety and Governance
+
+### Policy Integration
+
+Epoch's data directly informs major governance initiatives. Their research has been particularly influential in establishing compute thresholds for regulatory frameworks.
+
+| Policy Area | Epoch Contribution | Real-World Impact |
+|-------------|-------------------|-------------------|
+| <R id="59118f0c5d534110">US AI Executive Order 14110</R> | 10^26 FLOPs threshold analysis | Training run reporting requirements for frontier models |
+| <R id="7930f0909ddbb304">Export controls</R> | H100/A100 performance data, chip sales tracking | Chip restriction implementation and effectiveness monitoring |
+| <R id="817964dfbb0e3b1b">UK AI Safety Institute</R> | Capability benchmarking, FrontierMath | Model evaluation frameworks |
+| EU AI Act | Compute-based GPAI thresholds | Classification of general-purpose AI systems |
+| [Compute governance research](https://epoch.ai/gradient-updates/three-issues-undermining-compute-based-ai-policies) | Database infrastructure, threshold analysis | Academic and policy research foundation |
+
+### FrontierMath Benchmark
+
+Epoch's [FrontierMath benchmark](https://epoch.ai/frontiermath) represents a significant contribution to AI evaluation infrastructure:
+
+| Aspect | Details | Significance |
+|--------|---------|--------------|
+| Problem Count | [350 original problems](https://epoch.ai/frontiermath/the-benchmark) (300 in Levels 1-3, 50 in Level 4) | Covers major branches of modern mathematics |
+| Expert Collaboration | [60+ mathematicians](https://epoch.ai/frontiermath), including 14 IMO gold medalists, 1 Fields Medalist | Highest-quality benchmark construction |
+| AI Performance | Less than 2% of problems solved by leading models | Reveals substantial gap between AI and human mathematical capability |
+| Tier 4 Commission | [50 research-level problems](https://epoch.ai/blog/epoch-impact-report-2025) commissioned by OpenAI | Testing frontier reasoning capabilities |
+| Version Updates | Token budget increased 10x in November 2025 | Adapting to improved model inference |
+
+### Research Community Influence
+
+| Metric | Evidence | Source |
+|--------|----------|--------|
+| Academic citations | 1,000+ citations across safety research | <R id="fb3ace4d4c5a824a">Google Scholar</R> |
+| Policy references | 50+ government documents cite Epoch | Government databases |
+| Database usage | 10,000+ downloads of compute database | Epoch analytics |
+| Media coverage | NYT "2024 Good Tech Awards" recognition | [New York Times](https://www.nytimes.com/) |
+| EA Forum engagement | Active community discussion and feedback | [EA Forum posts](https://forum.effectivealtruism.org/posts/3pqEmgDRsCd6s7Hua/epoch-ai-s-top-10-data-insights-and-gradient-updates-of-2025) |
+
+## Current State and Trajectory
+
+### 2024 Developments
+
+**Database expansion**:
+- Added 200+ new model entries to Parameter Database
+- Enhanced tracking of Chinese and European models
+- Improved cost estimation methodologies
+- <R id="07b3dfad309f0eb3">Real-time updates</R> for new releases
+
+**Research breakthroughs**:
+- Refined algorithmic efficiency measurement showing 6-12 month doubling times
+- Updated data exhaustion projections with synthetic data considerations
+- New economic modeling of AI investment trends
+- <EntityLink id="bioweapons-ai-uplift">Bioweapons AI uplift analysis</EntityLink>
+
+### 2025-2026 Projections
+
+| Area | Expected Development | Impact | Source |
+|------|-------------------|--------|--------|
+| Model scaling | [10+ models above 10^26 FLOP by 2026](https://epoch.ai/blog/model-counts-compute-thresholds) | Over 200 projected by 2030 | Epoch projections |
+| Data bottleneck | High-quality text exhaustion begins 2026-2032 | Synthetic data scaling accelerates | [Epoch data analysis](https://epoch.ai/trends) |
+| Compute governance | Standardized international monitoring needed | Enhanced <EntityLink id="export-controls">export controls</EntityLink> | [Epoch policy research](https://epoch.ai/gradient-updates/three-issues-undermining-compute-based-ai-policies) |
+| Benchmark development | 2 new benchmarks in development | Improved capability measurement | [2025 Impact Report](https://epoch.ai/blog/epoch-impact-report-2025) |
+| Capability acceleration | 15 points/year on ECI (up from 8 points pre-April 2024) | Faster than historical trend | Epoch Capabilities Index |
+| Open-source threshold | [Frontier open models may exceed 10^26 FLOP before 2026](https://epoch.ai/data-insights/open-models-threshold) | Challenges compute governance approach | Epoch data insights |
+
+## Key Uncertainties and Debates
+
+### Forecasting Limitations
+
+| Uncertainty | Impact on Estimates | Mitigation Strategy |
+|-------------|-------------------|-------------------|
+| Algorithmic breakthroughs | Could accelerate timelines by years | Multiple forecasting methods |
+| Data efficiency improvements | May extend scaling runway | Conservative assumptions |
+| Geopolitical disruption | Could fragment or accelerate development | Scenario planning |
+| Hardware bottlenecks | May slow progress unexpectedly | Supply chain analysis |
+
+### Methodological Debates
+
+**Trend extrapolation reliability**:
+- **Optimists**: Historical trends provide best available evidence for forecasting
+- **Pessimists**: <EntityLink id="sharp-left-turn">Sharp left turns</EntityLink> and discontinuities make extrapolation unreliable
+- **Epoch position**: Multiple methods with explicit uncertainty bounds
+
+**Information hazards**:
+- **Security concern**: Publishing compute data aids adversaries in capability assessment
+- **Racing dynamics**: Timeline estimates may encourage competitive behavior  
+- **Transparency advocates**: Public data essential for democratic governance
+
+<Section title="Forecasting Reliability Debate">
+  <DisagreementMap
+    client:load
+    topic="Value of Empirical AI Forecasting"
+    positions={[
+      {
+        name: "Essential Infrastructure",
+        description: "Epoch's data provides crucial foundation for rational planning. Timeline estimates inform urgency decisions. Compute tracking enables governance. Superior to pure speculation.",
+        proponents: ["Policy community", "Many safety researchers", "EA researchers"],
+        strength: 4
+      },
+      {
+        name: "Useful but Limited",
+        description: "Valuable for trend identification but shouldn't drive strategy alone. High uncertainty requires robust planning across scenarios rather than point estimates.",
+        proponents: ["Cautious researchers", "Some policymakers"],
+        strength: 4
+      },
+      {
+        name: "Information Hazard Risk", 
+        description: "Timeline publication creates racing dynamics. Compute data aids adversaries. False precision worse than acknowledged uncertainty. Focus on safety regardless of timelines.",
+        proponents: ["Security-focused researchers", "Some MIRI-adjacent views"],
+        strength: 2
+      },
+      {
+        name: "Fundamentally Uncertain",
+        description: "AI development too discontinuous to forecast meaningfully. Unknown unknowns dominate. Resources better spent on robustness than prediction.",
+        proponents: ["Anti-forecasting researchers", "Some capability pessimists"],
+        strength: 2
+      }
+    ]}
+  />
+</Section>
+
+## Leadership and Organization
+
+### Key Personnel
+
+<Section title="Leadership Team">
+  <KeyPeople people={[
+    { name: "Jaime Sevilla", role: "Director & Co-Founder", description: "PhD in AI from University of Aberdeen; BSc Mathematics & Computer Engineering from Universidad Complutense de Madrid; research affiliate at Cambridge CSER; interim director of Riesgos Catastróficos Globales" },
+    { name: "Tamay Besiroglu", role: "Senior Researcher", description: "Lead on compute trends analysis and economic modeling of AI progress" },
+    { name: "Anson Ho", role: "Research Scientist", description: "Database infrastructure and algorithmic efficiency measurement" },
+    { name: "Various data scientists", role: "Database Team", description: "Model tracking, data curation, and analysis automation" },
+  ]} />
+</Section>
+
+### Organizational Structure
+
+| Function | Team Size | Key Responsibilities | 2025 Focus |
+|----------|-----------|---------------------|------------|
+| Research | 15-18 people | Forecasting, analysis, publications | FrontierMath, Epoch Capabilities Index |
+| Data & Engineering | 8-10 people | [Database infrastructure](https://epoch.ai/data), automation | AI Chip Sales explorer, model tracking |
+| Operations | 4-6 people | Funding, administration, communications | Grant management, public engagement |
+| Advisory | External | Policy guidance, technical review | Academic partnerships |
+| **Total** | **34 employees** | Headquartered in San Francisco | Growing capacity |
+
+### Funding Profile
+
+| Funder | Amount | Period | Purpose |
+|--------|--------|--------|---------|
+| [Open Philanthropy (2025)](https://www.openphilanthropy.org/grants/epoch-ai-general-support-2025/) | \$1,132,488 | 2 years | General support |
+| Open Philanthropy (additional) | \$1,922,565 | Multi-year | General support |
+| [Open Philanthropy (FrontierMath)](https://www.openphilanthropy.org/grants/epoch-ai-general-support-2025/) | \$10,000 | 2025 | Benchmark improvements |
+| Open Philanthropy (2022) | \$1,960,000 | Initial | Organization founding |
+| **Total raised** | **≈\$13M+** | 2022-2025 | Research & operations |
+
+**Additional funding sources**:
+- <R id="1593095c92d34ed8">Future of Humanity Institute</R> (historical support)
+- Government contracts for specific projects
+- Research grants from academic institutions
+
+## Comparative Analysis
+
+### vs. Other Forecasting Organizations
+
+| Organization | Focus | Methodology | Update Frequency | Policy Impact | Database Size |
+|--------------|-------|-------------|------------------|---------------|---------------|
+| **Epoch AI** | AI-specific empirical data | Multiple quantitative methods | Continuous | High | 3,200+ models |
+| <R id="d99a6d0fb1edc2db">Metaculus</R> | Crowdsourced forecasting | Prediction aggregation | Real-time | Medium | N/A |
+| <R id="3b9fda03b8be71dc">AI Impacts</R> | Historical AI analysis | Case studies, trend analysis | Irregular | Medium | Limited |
+| <R id="1593095c92d34ed8">FHI</R> | Existential risk research | Academic research | Project-based | High | N/A |
+| [METR](https://metr.org/) | Model evaluations | Technical testing | Per-model | Growing | N/A |
+| [Our World in Data](https://ourworldindata.org/grapher/artificial-intelligence-training-computation) | Data visualization | Data aggregation (uses Epoch data) | Regular | High | Derivative |
+
+### Relationship to Safety Organizations
+
+| Organization Type | Relationship to Epoch | Information Flow |
+|------------------|----------------------|------------------|
+| Safety research orgs | Data consumers | Epoch → Safety orgs |
+| AI labs | Data subjects | Labs → Epoch (reluctantly) |
+| Government bodies | Policy clients | Epoch ↔ Government |
+| Think tanks | Research partners | Collaborative |
+
+## Future Directions and Challenges
+
+### Research Roadmap (2025-2027)
+
+**2026 Plans (from [Impact Report](https://epoch.ai/blog/epoch-impact-report-2025))**:
+- Development of [2 new benchmarks](https://epoch.ai/blog/epoch-impact-report-2025) beyond FrontierMath
+- Continued expansion of the Epoch Capabilities Index
+- Deeper analysis of [decentralized training feasibility](https://epoch.ai/blog/epoch-impact-report-2025) (10 GW training runs across thousands of kilometers)
+- Enhanced AI Chip Sales data explorer across Nvidia, Google, Amazon, AMD, and Huawei
+
+**Expanding scope**:
+- Multimodal training data analysis beyond text
+- Energy consumption and environmental impact tracking (largest data centers now approaching gigawatt scale)
+- International AI development monitoring (enhanced coverage of Chinese and European models)
+- Risk assessment frameworks for different development pathways
+
+**Methodological improvements**:
+- Better algorithmic progress measurement via Epoch Capabilities Index
+- Synthetic data quality and scaling analysis
+- Economic impact modeling of AI deployment
+- Scenario analysis for different development paths
+
+### Scaling Challenges
+
+| Challenge | Current Limitation | Planned Solution | Priority |
+|-----------|-------------------|------------------|----------|
+| Data collection | Manual curation, limited sources | Automated scraping, industry partnerships | High |
+| International coverage | US/UK bias in data | Partnerships with Chinese and European researchers | High |
+| Real-time tracking | Lag in proprietary model information | Industry reporting standards advocacy | Medium |
+| Resource constraints | 34 person team | Gradual expansion with \$1.1M/year budget | Medium |
+| Compute governance gaps | [Threshold accuracy uncertain](https://epoch.ai/gradient-updates/three-issues-undermining-compute-based-ai-policies) | Better compute-capability correlation research | High |
+| Open-source proliferation | [Frontier open models approaching 10^26 FLOP](https://epoch.ai/data-insights/open-models-threshold) | Policy recommendations for dual governance | High |
+
+<KeyQuestions questions={[
+  "How accurate are extrapolation-based AI timeline forecasts given potential discontinuities?",
+  "Will synthetic data generation solve the training data bottleneck or create new limitations?",
+  "How should compute governance adapt as algorithmic efficiency reduces compute as a chokepoint?",
+  "What level of transparency in AI development is optimal for governance without security risks?",
+  "How can empirical forecasting organizations maintain independence while engaging with policymakers?",
+  "What leading indicators best predict dangerous capability emergence beyond compute scaling?"
+]} />
+
+## Sources & Resources
+
+### Primary Resources
+
+| Resource Type | Description | Link |
+|---------------|-------------|------|
+| AI Models Database | [3,200+ models tracked](https://epoch.ai/data/ai-models) with training compute, parameters, cost | [epoch.ai/data/ai-models](https://epoch.ai/data/ai-models) |
+| Machine Learning Trends | Real-time visualization of AI progress metrics | [epoch.ai/trends](https://epoch.ai/trends) |
+| FrontierMath Benchmark | [350 expert-crafted math problems](https://epoch.ai/frontiermath) | [epoch.ai/frontiermath](https://epoch.ai/frontiermath) |
+| Epoch Capabilities Index | Unified capability measurement across benchmarks | [epoch.ai/benchmarks](https://epoch.ai/benchmarks) |
+| Research Blog | [36+ Data Insights](https://epoch.ai/latest), 37+ Gradient Updates in 2025 | [epoch.ai/blog](https://epoch.ai/blog) |
+| AI Chip Sales | Global compute capacity tracking (15M+ H100-equivalents) | [epoch.ai/data](https://epoch.ai/data) |
+
+### Key Publications
+
+| Title | Year | Impact | Citation |
+|-------|------|--------|---------|
+| "Compute Trends Across Three Eras of Machine Learning" | 2022 | Foundational for compute governance | <R id="a9007e0713dc6b7f">Sevilla et al.</R> |
+| "Will We Run Out of Data?" | 2022 | Sparked synthetic data research boom | <R id="5c0de3116cb53b56">Villalobos et al.</R> |
+| "Algorithmic Progress in Computer Vision" | 2023 | Quantified efficiency improvements | <R id="b5fab0db54c83703">Besiroglu et al.</R> |
+| "FrontierMath: A Benchmark for Evaluating Advanced Mathematical Reasoning" | 2024 | [arXiv paper](https://arxiv.org/html/2411.04872v1) on benchmark methodology | Epoch AI et al. |
+| [Top 10 Data Insights of 2025](https://epoch.ai/blog/top-10-data-insights-and-gradient-updates-of-2025) | 2025 | Annual synthesis of key findings | Epoch AI |
+| [2025 Impact Report](https://epoch.ai/blog/epoch-impact-report-2025) | 2025 | Comprehensive organizational review | Epoch AI |
+
+### External Coverage
+
+| Source Type | Description | Example Links |
+|-------------|-------------|---------------|
+| Policy Documents | Government citations of Epoch work | <R id="f5ff4726f14f3e32">US NAIRR</R>, <R id="578a73eca8b7b1e6">UK AI White Paper</R> |
+| Academic Citations | Research building on Epoch data | <R id="a0ae3e6a11d6187f">Google Scholar search</R> |
+| Data Visualization | [Our World in Data](https://ourworldindata.org/grapher/artificial-intelligence-training-computation) uses Epoch datasets | Training compute charts |
+| Media Coverage | NYT "2024 Good Tech Awards", [InfoQ FrontierMath coverage](https://www.infoq.com/news/2024/11/epochai-frontiermath-benchmark/) | <R id="21a4a585cdbf7dd3">MIT Technology Review</R> |
+| Industry Analysis | Business intelligence using Epoch metrics | <R id="ca38ccd2a0c16fa2">CB Insights</R>, <R id="8d142366cb1566c4">McKinsey AI reports</R> |
+| EA Community | [EA Forum discussions](https://forum.effectivealtruism.org/posts/3pqEmgDRsCd6s7Hua/epoch-ai-s-top-10-data-insights-and-gradient-updates-of-2025), 80,000 Hours listings | Active engagement |

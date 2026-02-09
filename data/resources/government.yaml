@@ -1,0 +1,3126 @@
+# Government Resources
+# Government documents, policy reports, and regulatory materials
+# Part of the split resources system - see src/data/resources/
+
+- id: 689a9ff80da2437f
+  url: https://pubmed.ncbi.nlm.nih.gov/
+  title: Academic papers
+  type: government
+  local_filename: 689a9ff80da2437f.txt
+  summary: PubMed is a leading online resource for biomedical research literature, providing citations
+    and access to scientific publications across multiple disciplines. The platform continually
+    updates its features and search capabilities.
+  review: PubMed serves as a critical infrastructure for scientific research, offering an extensive
+    repository of biomedical literature that encompasses citations from MEDLINE, life science
+    journals, and online books. The platform not only provides access to millions of research
+    citations but also continuously evolves its technological capabilities, with recent updates
+    focusing on improved search tools, reference rendering, and user experience enhancements. The
+    platform's significance extends beyond mere citation listing, as it provides links to full-text
+    content, enables advanced searching techniques, and supports researchers through features like
+    clinical queries, citation matching, and API access. Its ongoing improvements, such as
+    synchronizing FTP data with website content and reintroducing customizable email features,
+    demonstrate a commitment to supporting the scientific community's research and information
+    discovery needs.
+  key_points:
+    - Contains over 39 million biomedical literature citations
+    - Offers advanced search and discovery tools for researchers
+    - Continuously updates platform features and technological capabilities
+  cited_by:
+    - expertise-atrophy
+  fetched_at: 2025-12-28 03:01:32
+  tags:
+    - interpretability
+    - capabilities
+    - automation
+    - human-factors
+    - skill-degradation
+- id: 6f1d4fd3b52c7cb7
+  url: https://www.cisa.gov/news-events/news/ai-red-teaming-applying-software-tevv-ai-evaluations
+  title: "AI Red Teaming: Applying Software TEVV for AI Evaluations"
+  type: government
+  local_filename: 6f1d4fd3b52c7cb7.txt
+  summary: >-
+    I apologize, but the provided text does not appear to be a substantive document about AI red
+    teaming. Instead, it seems to be a collection of blog post titles related to cybersecurity.
+    Without a proper source document, I cannot generate a meaningful summary.
+
+
+    To proceed, I would need:
+
+    1. The full text of the document
+
+    2. Verifiable content about AI red teaming
+
+    3. Actual research or analysis related to AI safety evaluations
+
+
+    If you have the complete source document, please share it, and I'll be happy to analyze it using
+    the specified JSON format.
+
+
+    Would you like to provide the full source document?
+  cited_by:
+    - lab-behavior
+    - evals
+  fetched_at: 2025-12-28 02:03:58
+  tags:
+    - safety
+    - evaluation
+    - cybersecurity
+    - benchmarks
+    - red-teaming
+  publication_id: cisa
+- id: 7042c7f8de04ccb1
+  url: https://www.aisi.gov.uk/frontier-ai-trends-report
+  title: AISI Frontier AI Trends
+  type: government
+  local_filename: 7042c7f8de04ccb1.txt
+  summary: A comprehensive government assessment of frontier AI systems shows exponential performance
+    improvements in multiple domains. The report highlights emerging capabilities, risks, and the
+    need for robust safeguards.
+  review: The AISI Frontier AI Trends report provides a groundbreaking evidence-based analysis of AI
+    system capabilities, tracking performance across critical domains like cyber, chemistry,
+    biology, and autonomy. The research reveals extraordinary progress, with AI models increasingly
+    matching or surpassing human expert performance in complex tasks, often with capabilities
+    doubling every eight months. The report's key contribution lies in its rigorous,
+    multi-dimensional evaluation approach, which not only measures technical capabilities but also
+    assesses potential risks and societal impacts. While demonstrating remarkable technological
+    advancement, the research also underscores significant challenges in AI safety, including
+    persistent vulnerabilities in model safeguards, potential for misuse, and emerging risks related
+    to model autonomy and potential loss of control. The findings suggest that while AI systems are
+    becoming increasingly powerful, ensuring their reliable and safe deployment remains a complex,
+    evolving challenge requiring continuous monitoring and adaptive governance strategies.
+  key_points:
+    - AI models are rapidly improving, with performance doubling approximately every eight months in
+      tested domains
+    - Every tested AI system has universal jailbreak vulnerabilities despite improving safeguards
+    - Models are developing concerning autonomous capabilities, including potential self-replication
+      skills
+  cited_by:
+    - uk-aisi
+    - evals
+    - technical-research
+    - international-summits
+    - seoul-declaration
+    - sandbagging
+    - lock-in
+  fetched_at: 2025-12-28 02:03:23
+  tags:
+    - capabilities
+    - safety
+    - benchmarks
+    - red-teaming
+    - capability-assessment
+  publication_id: uk-aisi
+- id: 1c3727edad48f707
+  url: https://www.governance.ai/research-paper/auditing-large-language-models
+  title: Auditing for Large Language Models
+  type: government
+  cited_by:
+    - governance-focused
+  tags:
+    - llm
+  publication_id: govai
+- id: 59118f0c5d534110
+  url: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+  title: Biden Administration AI Executive Order 14110
+  type: government
+  cited_by:
+    - coding
+    - mainstream-era
+    - structural
+    - defense-in-depth-model
+    - proliferation-risk-model
+    - us-aisi
+    - epoch-ai
+    - concentration-of-power
+    - erosion-of-agency
+    - proliferation
+  fetched_at: 2025-12-28 02:54:57
+  tags:
+    - software-engineering
+    - code-generation
+    - programming-ai
+    - defense
+    - security
+  publication_id: whitehouse
+- id: e331256e28403b8d
+  url: https://www.bls.gov/opub/mlr/2025/article/incorporating-ai-impacts-in-bls-employment-projections.htm
+  title: BLS Employment Projections
+  type: government
+  local_filename: e331256e28403b8d.txt
+  summary: The Bureau of Labor Statistics examines how AI might affect employment in different
+    sectors, finding that productivity gains will vary by occupation but are unlikely to cause
+    widespread job losses in the near term.
+  review: The Bureau of Labor Statistics' report provides a comprehensive analysis of potential AI
+    impacts on employment across multiple professional sectors. By examining case studies in
+    computer, legal, business, financial, and engineering occupations, the study reveals a nuanced
+    perspective on technological disruption. Rather than predicting wholesale job elimination, the
+    research suggests that AI will primarily enhance worker productivity, with employment effects
+    varying significantly by occupation. The methodology involves carefully assessing each
+    occupation's tasks, technological readiness, and underlying demand, acknowledging that
+    technological integration is typically gradual. For instance, while some roles like insurance
+    adjusters and paralegals may see reduced employment, others like software developers and
+    financial advisors are projected to grow. The study emphasizes that human expertise, complex
+    decision-making, and regulatory requirements will continue to create robust demand for skilled
+    professionals, even as AI tools become more sophisticated.
+  key_points:
+    - AI is expected to enhance productivity more than replace workers in most occupations
+    - Employment projections vary widely across different professional sectors
+    - Human expertise and complex decision-making remain crucial despite AI advances
+  cited_by:
+    - economic-labor
+  fetched_at: 2025-12-28 01:19:14
+  tags:
+    - economic
+- id: ac97a109486292aa
+  url: https://www.bls.gov/news.release/pdf/ecopro.pdf
+  title: BLS Employment Projections 2024-2034
+  type: government
+  local_filename: ac97a109486292aa.txt
+  summary: The Bureau of Labor Statistics forecasts moderate employment growth of 3.1% from 2024-2034,
+    with healthcare and technology sectors experiencing the most significant job increases.
+  review: The Bureau of Labor Statistics' 2024-2034 employment projections provide a comprehensive
+    overview of anticipated labor market trends, highlighting the transformative impact of emerging
+    technologies and demographic shifts. The report emphasizes the growing importance of healthcare,
+    artificial intelligence, and renewable energy sectors, projecting substantial job growth in
+    areas like healthcare support, computer and mathematical occupations, and solar/wind energy
+    technologies. The methodology reflects a conservative approach to technological disruption,
+    acknowledging the potential of AI and automation while maintaining historical trend analysis.
+    Key insights include the expected growth in AI-related jobs, the continued expansion of
+    healthcare services due to an aging population, and the gradual technological transformation of
+    traditional industries. The projections underscore the need for workforce adaptation, skill
+    development, and educational alignment with emerging job market demands.
+  key_points:
+    - Healthcare and social assistance projected to grow 8.4%, driven by aging population
+    - AI and technology sectors expected to see significant employment increases
+    - Computer and mathematical occupations projected to grow 10.1%
+    - Automation likely to reduce employment in administrative and sales roles
+  cited_by:
+    - economic-labor
+  fetched_at: 2025-12-28 02:03:15
+  tags:
+    - economic
+- id: ef020d882d6579a6
+  url: https://www.bls.gov/opub/mlr/2024/article/industry-and-occupational-employment-projections-overview-and-highlights-2023-33.htm
+  title: BLS Industry Projections
+  type: government
+  local_filename: ef020d882d6579a6.txt
+  summary: The Bureau of Labor Statistics forecasts total employment will grow to 174.6 million by
+    2033, with significant job gains in healthcare, professional services, and emerging technologies
+    like clean energy and AI.
+  review: >-
+    The BLS Industry Projections report provides a comprehensive analysis of anticipated employment
+    trends from 2023-2033, highlighting transformative shifts driven by technological advancements
+    and demographic changes. The report identifies key growth sectors including healthcare,
+    professional and technical services, and clean energy, while also examining potential
+    disruptions from technologies like artificial intelligence and electric vehicles.
+
+
+    Methodologically, the BLS approach assumes gradual technological integration based on historical
+    data, acknowledging the inherent uncertainty in predicting emerging technology impacts. The
+    projections underscore significant structural changes, such as the expected 12.9% growth in
+    computer and mathematical occupations, contrasted with potential job losses in administrative
+    and sales roles due to AI productivity gains. The report's nuanced approach provides valuable
+    insights into the complex interplay between technological innovation, workforce dynamics, and
+    economic transformation.
+  key_points:
+    - Healthcare and professional services expected to drive job growth
+    - AI and clean energy technologies will significantly reshape employment landscape
+    - Total employment projected to grow 4.0% to 174.6 million by 2033
+  cited_by:
+    - economic-labor
+  fetched_at: 2025-12-28 02:03:16
+  tags:
+    - economic
+- id: 08973e0c4ac54944
+  url: https://www.bls.gov/opub/mlr/2024/article/labor-force-and-macroeconomic-projections-overview-and-highlights-2023-33.htm
+  title: BLS Labor Force Projections
+  type: government
+  local_filename: 08973e0c4ac54944.txt
+  summary: The Bureau of Labor Statistics forecasts a continued slowdown in labor force and population
+    growth through 2033, primarily due to an aging population and declining fertility rates. These
+    trends will impact GDP growth, employment, and overall economic dynamics.
+  review: >-
+    The Bureau of Labor Statistics (BLS) provides a comprehensive analysis of projected labor force
+    and macroeconomic trends from 2023 to 2033, highlighting significant demographic shifts that
+    will reshape the U.S. economy. The primary driver of these changes is the aging population,
+    particularly the movement of baby boomers into older age groups, which will substantially impact
+    labor force participation and economic growth.
+
+
+    The projection methodology combines detailed demographic analysis with macroeconomic modeling,
+    revealing key trends such as a projected 0.4% annual labor force growth, a decline in
+    participation rates from 62.6% to 61.2%, and a modest 1.9% annual GDP growth. The report
+    emphasizes structural changes across different demographic groups, including declining youth
+    participation, stabilizing prime-age workforce participation, and increasing Hispanic
+    representation in the labor force. These projections underscore the complex interplay between
+    population dynamics, labor market trends, and economic performance, offering valuable insights
+    for policymakers and economists.
+  key_points:
+    - Labor force projected to grow 0.4% annually through 2033, slower than population growth
+    - Aging population and declining fertility rates are primary drivers of workforce changes
+    - GDP growth projected to slow to 1.9% annually, reflecting demographic constraints
+  cited_by:
+    - economic-labor
+  fetched_at: 2025-12-28 02:03:15
+  tags:
+    - economic
+    - agi
+- id: 641872cbfea515f5
+  url: https://www.bls.gov/ooh/math/data-scientists.htm
+  title: BLS Projections
+  type: government
+  local_filename: 641872cbfea515f5.txt
+  summary: Data scientist employment is expected to grow 34% from 2024-2034, with a median annual wage
+    of $112,590. The field requires strong analytical and technical skills.
+  review: >-
+    The Bureau of Labor Statistics report provides a comprehensive overview of the data science
+    profession, highlighting its rapid growth and significant economic potential. The projection of
+    34% employment growth—substantially higher than the average 3% across all
+    occupations—underscores the increasing importance of data-driven decision-making in modern
+    organizations.
+
+
+    Key methodological insights reveal that data scientists will be critical in transforming large
+    volumes of raw data into actionable business intelligence. The report emphasizes the need for
+    advanced educational backgrounds, typically requiring at least a bachelor's degree in
+    mathematics, statistics, or computer science. While the projections are promising, they also
+    suggest the field will become increasingly competitive, with employers seeking candidates with
+    strong analytical skills, programming expertise, and the ability to communicate complex findings
+    to diverse stakeholders.
+  key_points:
+    - Projected 34% employment growth from 2024-2034
+    - Median annual wage of $112,590 in May 2024
+    - Requires strong analytical, computer, and communication skills
+    - Driven by increasing demand for data-driven organizational decisions
+  cited_by:
+    - economic-labor
+  fetched_at: 2025-12-28 01:24:16
+  tags:
+    - economic
+- id: 0c58f8e2be57f450
+  url: https://oag.ca.gov/privacy/ccpa
+  title: California Consumer Privacy Act
+  type: government
+  published_date: "2018"
+  local_filename: 0c58f8e2be57f450.txt
+  cited_by:
+    - preference-manipulation
+  fetched_at: 2025-12-28 03:43:55
+  tags:
+    - ai-ethics
+    - persuasion
+    - autonomy
+- id: 4811c92649a83adf
+  url: https://www.cisa.gov/ai
+  title: CISA Cybersecurity Videos
+  type: government
+  cited_by:
+    - cyberweapons
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+  publication_id: cisa
+- id: a7d8c8e501716ea2
+  url: https://www.governance.ai/research-paper/compute-based-regulations
+  title: Compute-Based Regulations
+  type: government
+  cited_by:
+    - governance-focused
+  tags:
+    - governance
+    - compute
+  publication_id: govai
+- id: 28f665fbfcf4ac0b
+  url: https://www.defense.gov/
+  title: DoD reports
+  type: government
+  cited_by:
+    - expertise-atrophy
+  fetched_at: 2025-12-28 03:01:31
+  tags:
+    - automation
+    - human-factors
+    - skill-degradation
+- id: 762bc619ffb44a99
+  url: https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers
+  title: DOE data center report
+  type: government
+  local_filename: 762bc619ffb44a99.txt
+  summary: A Department of Energy report highlights significant growth in data center energy usage,
+    with electricity consumption expected to increase dramatically by 2028 due to AI and
+    technological advances.
+  review: >-
+    The DOE report from Lawrence Berkeley National Laboratory provides a comprehensive analysis of
+    data center energy consumption trends in the United States, revealing a dramatic increase in
+    electricity usage driven by technological innovations, particularly in artificial intelligence.
+    From 2014 to 2023, data center electricity consumption has already tripled from 58 TWh to 176
+    TWh, with projections suggesting a further increase to between 325-580 TWh by 2028.
+
+
+    The report's implications for energy infrastructure and AI development are significant,
+    highlighting the need for adaptive energy strategies. The DOE is proactively addressing these
+    challenges through multiple approaches, including developing flexible power generation and
+    storage solutions, exploring energy community opportunities, and supporting innovative
+    technologies like geothermal and advanced nuclear power. The findings underscore the critical
+    intersection of technological innovation, energy infrastructure, and sustainability, presenting
+    both challenges and opportunities for managing the growing energy demands of emerging
+    technologies.
+  key_points:
+    - Data center electricity consumption projected to double or triple by 2028
+    - Expected to consume 6.7-12% of total US electricity by 2028
+    - DOE developing strategies to meet increasing energy demand sustainably
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:08:02
+- id: 91aba7bf6c174f9d
+  url: https://www.faa.gov/about/office_org/headquarters_offices/ang/offices/tc/about/campus/faa_host/ahi
+  title: FAA Human Factors Division
+  type: government
+  cited_by:
+    - expertise-atrophy
+  fetched_at: 2025-12-28 03:01:41
+  tags:
+    - automation
+    - human-factors
+    - skill-degradation
+- id: a9d7143ed49b479f
+  url: https://www.faa.gov/regulations_policies/rulemaking/committees/documents/media/TAShARC-12021985.pdf
+  title: FAA studies
+  type: government
+  cited_by:
+    - expertise-atrophy
+  fetched_at: 2025-12-28 03:01:28
+  tags:
+    - automation
+    - human-factors
+    - skill-degradation
+- id: 5f1b50c36bbedab1
+  url: https://www.fbi.gov/investigate/cyber
+  title: FBI Internet Crime Report
+  type: government
+  cited_by:
+    - misuse-risks
+- id: 8e077efb75c0d69a
+  url: https://www.federalregister.gov/documents/2025/01/15/2025-00636/framework-for-artificial-intelligence-diffusion
+  title: "Federal Register: Framework for AI Diffusion"
+  type: government
+  local_filename: 8e077efb75c0d69a.txt
+  summary: The Bureau of Industry and Security (BIS) introduces new regulations controlling the export
+    of advanced AI model weights and computing integrated circuits. The framework aims to balance
+    national security concerns with enabling responsible global AI development.
+  review: This Federal Register document represents a significant policy intervention in the global AI
+    technology landscape. The rule establishes a multi-layered approach to controlling the export of
+    advanced AI technologies, focusing specifically on model weights and large computing clusters
+    that could pose national security risks. The methodology involves creating worldwide license
+    requirements, implementing strategic exceptions for low-risk destinations, and establishing
+    detailed security conditions for AI technology transfers. The approach is notably nuanced,
+    seeking to prevent malicious actors from accessing frontier AI capabilities while simultaneously
+    preserving opportunities for responsible international AI development. By creating a graduated
+    control system that considers compute power, destination risks, and end-user validation, BIS
+    demonstrates a sophisticated understanding of the complex technological and geopolitical
+    challenges surrounding advanced AI diffusion.
+  key_points:
+    - Imposes global license requirements for advanced AI model weights and computing integrated
+      circuits
+    - Creates exceptions for low-risk destinations with robust technology transfer safeguards
+    - Aims to prevent AI technology diversion while maintaining U.S. technological leadership
+  cited_by:
+    - intervention-timing-windows
+    - coordination
+  fetched_at: 2025-12-28 02:03:46
+  tags:
+    - interpretability
+    - governance
+    - cybersecurity
+- id: 14ff22ab7e571166
+  url: https://bidenwhitehouse.archives.gov/ostp/news-updates/2024/04/29/framework-for-nucleic-acid-synthesis-screening/
+  title: Framework for Nucleic Acid Synthesis Screening
+  type: government
+  cited_by:
+    - bioweapons
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: 68a8c48537561a43
+  url: https://www.ftc.gov/news-events/news/press-releases/2022/03/ftc-report-shows-rise-sophisticated-dark-patterns-designed-trick-trap-consumers
+  title: FTC Dark Patterns enforcement
+  type: government
+  published_date: "2021"
+  local_filename: 68a8c48537561a43.txt
+  cited_by:
+    - preference-manipulation
+  fetched_at: 2025-12-28 03:43:58
+  tags:
+    - ai-ethics
+    - persuasion
+    - autonomy
+  publication_id: ftc
+- id: 1b0729e61c29c0fb
+  url: https://www.ftc.gov/enforcement
+  title: FTC enforcement actions
+  type: government
+  local_filename: 1b0729e61c29c0fb.txt
+  summary: The Federal Trade Commission (FTC) enforces over 70 laws to prevent fraud, deception, and
+    anticompetitive business practices. Its mission is to protect consumers and maintain fair market
+    competition.
+  review: >-
+    The Federal Trade Commission (FTC) serves as a critical regulatory body in protecting consumer
+    interests and maintaining fair market competition. By administering a comprehensive set of
+    federal laws, the FTC addresses a wide range of potential business misconduct, from
+    telemarketing fraud and internet scams to anticompetitive mergers and price-fixing schemes.
+
+
+    The agency's broad enforcement mandate spans multiple domains, including consumer protection,
+    antitrust regulation, and prevention of unfair business practices. Key laws under its purview
+    include the Federal Trade Commission Act, Telemarketing Sale Rule, Identity Theft Act, Fair
+    Credit Reporting Act, and Clayton Act. This multi-faceted approach allows the FTC to respond to
+    evolving market challenges and protect consumers from emerging forms of economic exploitation
+    and technological fraud.
+  key_points:
+    - Enforces over 70 federal laws related to consumer protection and market competition
+    - Addresses fraud, deception, and anticompetitive business practices across multiple sectors
+    - Administers comprehensive regulations to protect consumer interests
+  fetched_at: 2025-12-28 02:56:22
+  tags:
+    - deception
+  publication_id: ftc
+- id: 5ec470db3bb548fd
+  url: https://www.ftc.gov/news-events/news/press-releases/2022/10/ftc-explores-rule-cracking-down-fake-reviews-other-forms-deceptive-endorsements
+  title: FTC fake review enforcement
+  type: government
+  fetched_at: 2025-12-28 02:56:20
+  publication_id: ftc
+- id: f861f0eac65f083f
+  url: https://www.ftc.gov/news-events/news/press-releases/2024/09/ftc-announces-crackdown-deceptive-ai-claims-schemes
+  title: "FTC: Crackdown on Deceptive AI Claims"
+  type: government
+  local_filename: f861f0eac65f083f.txt
+  summary: The Federal Trade Commission initiated a law enforcement sweep targeting companies using AI
+    technology to engage in fraudulent business practices. The actions focus on preventing deceptive
+    claims and protecting consumers from misleading AI-powered services.
+  review: The FTC's Operation AI Comply represents a significant regulatory response to the growing
+    prevalence of AI-enabled deceptive business practices. By targeting companies like DoNotPay,
+    Ascend Ecom, and Rytr, the initiative demonstrates a proactive approach to addressing potential
+    consumer harm from overhyped and unsubstantiated AI claims. The enforcement actions reveal
+    multiple strategies of deception, including fake review generation, false promises of income
+    generation, and claims of professional service substitution. By issuing legal complaints,
+    monetary penalties, and mandatory consumer notifications, the FTC is establishing clear
+    boundaries for AI technology marketing and usage. This approach signals that AI technologies are
+    not exempt from existing consumer protection laws and sets an important precedent for
+    responsible AI development and deployment.
+  key_points:
+    - FTC targets AI-powered business schemes that make false or misleading claims
+    - Enforcement actions include monetary penalties and mandatory consumer notifications
+    - No special exemptions exist for AI technologies under consumer protection laws
+  fetched_at: 2025-12-28 02:03:45
+  tags:
+    - deception
+  publication_id: ftc
+- id: b6f5313f59c5e764
+  url: https://www.gao.gov/products/gao-24-107332
+  title: "GAO: AI Agencies Implementing Management Requirements"
+  type: government
+  fetched_at: 2025-12-28 02:51:20
+- id: f35c467b353f990f
+  url: https://www.governance.ai/
+  title: GovAI
+  type: government
+  local_filename: f35c467b353f990f.txt
+  summary: A research organization focused on understanding AI's societal impacts, governance
+    challenges, and policy implications across various domains like workforce, infrastructure, and
+    public perception.
+  review: GovAI represents a critical research initiative examining the intersection of artificial
+    intelligence, public policy, and societal implications. Their work spans multiple critical areas
+    including technical AI governance, public attitudes toward AI technologies, and potential
+    governmental roles in AI infrastructure development. The organization appears to take a
+    comprehensive approach to AI safety, investigating not just technical challenges but also
+    broader socioeconomic implications. By exploring topics like AI's impact on labor markets, agent
+    infrastructure, and public perceptions, GovAI provides nuanced insights that could help
+    policymakers and researchers develop more holistic strategies for responsible AI development.
+    Their research seems particularly valuable in bridging technical understanding with practical
+    policy considerations, potentially helping to shape proactive and informed governance frameworks
+    for emerging AI technologies.
+  key_points:
+    - Focuses on technical AI governance and policy research
+    - Examines public attitudes and potential societal impacts of AI
+    - Investigates governmental roles in AI infrastructure and safety
+  cited_by:
+    - glossary
+    - long-horizon
+    - solutions
+    - defense-in-depth-model
+    - international-coordination-game
+    - intervention-effectiveness-matrix
+    - mesa-optimization-analysis
+    - safety-researcher-gap
+    - arc
+    - conjecture
+    - dario-amodei
+    - governance-policy
+    - governance-focused
+  fetched_at: 2025-12-28 01:06:53
+  tags:
+    - governance
+    - agentic
+    - planning
+    - goal-stability
+    - defense
+  publication_id: govai
+- id: 52cd62455aa915b5
+  url: https://www.faa.gov/about/initiatives/maintenance_hf
+  title: Human Factors in Aviation
+  type: government
+  local_filename: 52cd62455aa915b5.txt
+  summary: The FAA's human factors research focuses on understanding and improving human performance
+    in aviation maintenance through scientific and applied studies. The research aims to reduce
+    errors by identifying critical performance factors.
+  review: >-
+    The FAA's human factors research in aviation maintenance represents a comprehensive approach to
+    understanding and mitigating human-related risks in a critical safety domain. By identifying the
+    'Dirty Dozen' - twelve common causes of maintenance errors - the research provides a systematic
+    framework for addressing potential performance issues, ranging from communication and knowledge
+    gaps to psychological factors like fatigue and stress.
+
+
+    The research's multidisciplinary methodology integrates scientific understanding of human
+    capabilities and limitations with practical industry applications. By developing actionable
+    plans, procedures, and software, the FAA bridges the gap between theoretical research and
+    real-world implementation. The emphasis on creating a 'safety culture' that prioritizes human
+    factors suggests a proactive approach to preventing errors, which could have significant
+    implications for reducing accidents and improving overall aviation safety.
+  key_points:
+    - Identified 12 most common maintenance-related error causes
+    - Develops scientific and practical solutions to improve human performance
+    - Promotes a comprehensive safety culture in aviation maintenance
+  cited_by:
+    - expertise-atrophy
+  fetched_at: 2025-12-28 03:01:38
+  tags:
+    - capabilities
+    - automation
+    - human-factors
+    - skill-degradation
+- id: 22c85b5d39fd754f
+  url: https://www.iarpa.gov/
+  title: IARPA forecasting
+  type: government
+  fetched_at: 2025-12-28 02:55:47
+- id: 10bb1720c1af1006
+  url: https://www.loc.gov/item/global-legal-monitor/2024-09-23/council-of-europe-international-treaty-on-artificial-intelligence-opens-for-signature/
+  title: "Library of Congress: CoE AI Treaty"
+  type: government
+  local_filename: 10bb1720c1af1006.txt
+  summary: A framework treaty opened for signature in September 2024, establishing broad legal
+    commitments for responsible AI development across 46 member states and 11 non-member countries.
+  review: The Council of Europe's AI Treaty represents a significant multilateral effort to create a
+    comprehensive international framework for governing artificial intelligence technologies through
+    a human rights lens. By adopting a risk-based approach, the treaty aims to ensure AI systems are
+    developed and deployed in alignment with fundamental principles of human dignity, transparency,
+    accountability, and non-discrimination. The treaty's key innovation is its flexible framework
+    that allows for national implementation while establishing core global standards. It requires
+    parties to develop robust risk management processes, provide remedies for potential human rights
+    violations, and establish oversight mechanisms. While not imposing absolute prohibitions, it
+    mandates graduated responses to AI risks and requires ongoing assessment of potential negative
+    impacts. This approach distinguishes it from more prescriptive regulations, offering a balanced
+    strategy that promotes innovation while maintaining strong ethical safeguards.
+  key_points:
+    - Legally binding international framework for AI governance focused on human rights
+    - Applies to both public and private AI system developers and users
+    - Requires risk assessment, transparency, and accountability mechanisms
+  fetched_at: 2025-12-28 02:03:41
+- id: e92bd3d9eb6b3a88
+  url: https://mn.gov/deed/assets/jobs-at-risk-us-automation_tcm1045-684799.pdf?sourcePage=/deed/newscenter/publications/blank/?id%3D1045-684806
+  title: Minnesota DEED Automation Study
+  type: government
+  local_filename: e92bd3d9eb6b3a88.txt
+  summary: SHRM research analyzed job automation risk using worker-reported data, finding that 19.2
+    million U.S. jobs are at high or very high risk of automation. Risk varies significantly by
+    occupation and industry.
+  review: The Minnesota DEED Automation Study presents a novel approach to assessing job automation
+    risk by leveraging worker-reported data from O*NET and employment statistics. By developing a
+    nuanced methodology that goes beyond simple job displacement predictions, the research provides
+    a sophisticated view of how technology might transform the workforce. The study's key
+    contribution is its granular analysis, showing that automation risk is not uniform but depends
+    on specific job characteristics, with routine and repetitive tasks being most vulnerable. The
+    research highlights critical insights for workforce planning and economic policy, demonstrating
+    that while 12.6% of jobs face high automation risk, the impact varies dramatically across
+    sectors. Blue-collar, service, and administrative support roles are most at risk, while jobs
+    requiring creativity, critical thinking, and interpersonal skills remain relatively protected.
+    The study's approach is particularly valuable because it emphasizes potential job transformation
+    rather than wholesale replacement, suggesting that reskilling and adaptive workforce strategies
+    will be crucial in managing technological disruption.
+  key_points:
+    - 12.6% of U.S. jobs (19.2 million) face high or very high automation risk
+    - Automation risk varies significantly by occupation and industry
+    - Routine and repetitive jobs are most vulnerable to technological replacement
+  cited_by:
+    - economic-labor
+  fetched_at: 2025-12-28 01:58:14
+  tags:
+    - economic
+- id: bf080d59ad5b5aa7
+  url: https://www.archives.gov/
+  title: National Archives
+  type: government
+  local_filename: bf080d59ad5b5aa7.txt
+  summary: >-
+    I apologize, but the provided text appears to be a webpage fragment from the National Archives
+    website with no substantive content about a research document or AI safety topic. The text
+    contains only HTML elements, a Google Tag Manager iframe, and some navigation/header content,
+    but no actual research or analysis to summarize.
+
+
+    To properly complete the requested JSON summary, I would need the actual source document or
+    research text. Without meaningful content, I cannot generate valid entries for the one-liner,
+    summary, review, key points, or key claims.
+
+
+    Would you like to provide the complete source document for analysis?
+  cited_by:
+    - historical-revisionism
+  fetched_at: 2025-12-28 03:01:42
+  tags:
+    - safety
+    - historical-evidence
+    - archives
+    - deepfakes
+- id: 54dbc15413425997
+  url: https://www.nist.gov/itl/ai-risk-management-framework
+  title: NIST AI Risk Management Framework
+  type: government
+  cited_by:
+    - glossary
+    - coding
+    - language-models
+    - persuasion
+    - agi-development
+    - large-language-models
+    - capability-threshold-model
+    - compounding-risks-analysis
+    - corrigibility-failure-pathways
+    - deceptive-alignment-decomposition
+    - instrumental-convergence-framework
+    - intervention-timing-windows
+    - risk-activation-timeline
+    - risk-cascade-pathways
+    - risk-interaction-matrix
+    - safety-research-allocation
+    - safety-research-value
+    - scheming-likelihood-model
+    - warning-signs-model
+    - worldview-intervention-mapping
+    - ai-control
+    - alignment
+    - red-teaming
+    - corporate
+    - coordination-tech
+    - hybrid-systems
+    - evaluation
+    - governance-policy
+    - colorado-ai-act
+    - standards-bodies
+    - sycophancy
+    - institutional-capture
+    - fraud
+    - concentration-of-power
+    - proliferation
+    - racing-dynamics
+    - winner-take-all
+  publication_id: nist
+  tags:
+    - software-engineering
+    - code-generation
+    - programming-ai
+    - foundation-models
+    - transformers
+- id: e4c2d8b8332614cc
+  url: https://www.nist.gov/artificial-intelligence/ai-standards
+  title: "NIST: AI Standards Portal"
+  type: government
+  local_filename: e4c2d8b8332614cc.txt
+  summary: NIST is coordinating federal and international efforts to create comprehensive AI standards
+    focusing on risk management, performance, and trustworthy AI development.
+  review: >-
+    The National Institute of Standards and Technology (NIST) is playing a pivotal role in
+    developing and coordinating AI standards across government and international bodies. Their
+    approach emphasizes collaborative, open development of technical standards that promote
+    innovation while ensuring responsible AI deployment through comprehensive risk management
+    frameworks.
+
+
+    Key to NIST's strategy is the AI Risk Management Framework (AI RMF 1.0), which seeks to align
+    international standards, guidelines, and best practices for managing AI risks. By facilitating
+    coordination through mechanisms like the Interagency Committee on Standards Policy and engaging
+    globally, NIST aims to create a cohesive, adaptable approach to AI standardization that can help
+    mitigate potential risks while encouraging technological advancement.
+  key_points:
+    - NIST is leading federal and international efforts to develop comprehensive AI standards
+    - The AI Risk Management Framework (AI RMF 1.0) is a central tool for promoting responsible AI
+      development
+    - NIST prioritizes collaboration, openness, and alignment of international AI governance
+      approaches
+  fetched_at: 2025-12-28 02:03:49
+  publication_id: nist
+  tags:
+    - capabilities
+- id: 579ec2c3e039a7a6
+  url: https://www.nist.gov/news-events/news/2025/12/draft-nist-guidelines-rethink-cybersecurity-ai-era
+  title: "NIST: Draft Cybersecurity Framework for AI"
+  type: government
+  local_filename: 579ec2c3e039a7a6.txt
+  summary: "NIST has released a preliminary draft Cybersecurity Framework Profile for Artificial
+    Intelligence to guide organizations in adopting AI securely. The profile focuses on three key
+    areas: securing AI systems, AI-enabled cyber defense, and thwarting AI-enabled cyberattacks."
+  review: "The NIST Cyber AI Profile represents a critical effort to address the complex cybersecurity
+    challenges emerging from rapid AI advancement. By providing a structured framework, NIST aims to
+    help organizations navigate the intersection of AI technologies and cybersecurity, offering
+    guidance on how to integrate AI responsibly while mitigating potential risks. The profile is
+    distinguished by its comprehensive approach, covering three interconnected focus areas: securing
+    AI systems, leveraging AI for defensive operations, and protecting against AI-enabled threats.
+    Developed through extensive community engagement, with over 6,500 individuals contributing, the
+    draft represents a collaborative approach to understanding and managing AI-related cybersecurity
+    challenges. The framework is designed to be adaptable, recognizing that organizations are at
+    different stages of AI adoption, and aims to provide practical, actionable insights that can be
+    integrated into existing cybersecurity strategies."
+  key_points:
+    - Provides a structured approach to managing cybersecurity risks in AI integration
+    - Covers securing AI systems, AI-enabled defense, and protection against AI threats
+    - Developed through extensive community input and expert collaboration
+  fetched_at: 2025-12-28 02:03:49
+  publication_id: nist
+  tags:
+    - cybersecurity
+    - open-source
+- id: abbb1f4748d244a1
+  url: https://www.congress.gov/crs-product/R47114
+  title: "Oversight of Gain-of-Function Research with Pathogens: Issues for Congress"
+  type: government
+  cited_by:
+    - bioweapons
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+  publication_id: congress
+- id: 2200ae108bcdce25
+  url: https://aspr.hhs.gov/S3/Documents/USG-Policy-for-Oversight-of-DURC-and-PEPP-May2024-508.pdf
+  title: Policy for Oversight of Dual Use Research of Concern and Pathogens with Enhanced Pandemic
+    Potential
+  type: government
+  cited_by:
+    - bioweapons
+  tags:
+    - governance
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: a0bcc81243f8fbee
+  url: https://www.nist.gov/news-events/news/2024/11/pre-deployment-evaluation-anthropics-upgraded-claude-35-sonnet
+  title: Pre-deployment evaluation of Claude 3.5 Sonnet
+  type: government
+  cited_by:
+    - us-aisi
+    - us-executive-order
+    - ai-safety-institutes
+    - emergent-capabilities
+    - bioweapons
+  publication_id: nist
+  tags:
+    - evaluation
+    - llm
+    - scaling
+    - capability-evaluation
+    - unpredictability
+- id: e23f70e673a090c1
+  url: https://www.aisi.gov.uk/blog/pre-deployment-evaluation-of-openais-o1-model
+  title: Pre-Deployment evaluation of OpenAI's o1 model
+  type: government
+  local_filename: e23f70e673a090c1.txt
+  summary: A comprehensive safety assessment of OpenAI's o1 model by US and UK AI Safety Institutes,
+    testing capabilities across cyber, biological, and software development domains. The evaluation
+    compared o1's performance against several reference models.
+  review: The research represents a significant collaborative effort in AI safety evaluation, focusing
+    on systematically assessing the potential capabilities and risks of OpenAI's o1 model through
+    structured testing methodologies. By examining the model's performance across cyber
+    capabilities, biological research tasks, and software development challenges, the institutes
+    aimed to provide a nuanced understanding of its potential impacts and limitations. The
+    methodology employed a multi-faceted approach, including question answering, agent tasks, and
+    qualitative probing, with evaluations conducted by expert engineers and scientists. While the
+    findings suggest o1's performance is largely comparable to reference models, with notable
+    exceptions in cryptography-related challenges, the researchers emphasize the preliminary nature
+    of the assessment. The study underscores the importance of rigorous, independent safety
+    evaluations in a rapidly evolving AI landscape, highlighting the need for continuous assessment
+    and improvement of AI safety protocols.
+  key_points:
+    - Comprehensive pre-deployment evaluation of OpenAI's o1 model across multiple technical domains
+    - Model demonstrated comparable performance to reference models, with unique strengths in
+      cryptography
+    - Collaborative assessment by US and UK AI Safety Institutes using advanced testing methodologies
+  cited_by:
+    - lab-behavior
+    - international-summits
+  fetched_at: 2025-12-28 02:03:59
+  tags:
+    - capabilities
+    - safety
+    - evaluation
+    - biosecurity
+    - cybersecurity
+  publication_id: uk-aisi
+- id: be88ea80f559e453
+  url: https://www.nist.gov/news-events/news/2024/12/pre-deployment-evaluation-openais-o1-model
+  title: Pre-Deployment Evaluation of OpenAI's o1 Model
+  type: government
+  local_filename: be88ea80f559e453.txt
+  summary: Joint evaluation by US and UK AI Safety Institutes tested OpenAI's o1 model across three
+    domains, comparing its performance to reference models and assessing potential capabilities and
+    risks.
+  review: The study represents a significant collaborative effort to systematically evaluate an
+    advanced AI model's capabilities and potential safety implications before public deployment. By
+    conducting rigorous testing across cyber capabilities, biological research tasks, and software
+    development challenges, the institutes aimed to understand the model's performance, limitations,
+    and potential dual-use risks. The methodology employed a multi-faceted approach, including
+    question answering, agent tasks, and qualitative probing, with expert involvement from various
+    government agencies. While the findings suggest o1's performance is largely comparable to
+    reference models, notable advances were observed in cryptography-related cyber challenges. The
+    research underscores the importance of pre-deployment safety assessments, acknowledging the
+    preliminary nature of the findings and the rapidly evolving landscape of AI safety research.
+  key_points:
+    - First joint pre-deployment safety evaluation by US and UK AI Safety Institutes
+    - Tested o1 model across cyber, biological, and software development domains
+    - Identified potential risks and performance capabilities compared to reference models
+    - Demonstrated the importance of systematic AI safety testing
+  cited_by:
+    - lab-behavior
+    - us-aisi
+    - us-executive-order
+    - ai-safety-institutes
+    - lock-in
+  fetched_at: 2025-12-28 02:03:59
+  publication_id: nist
+  tags:
+    - capabilities
+    - safety
+    - evaluation
+    - x-risk
+    - irreversibility
+- id: ddc1cda95aff4dd2
+  url: https://www.intelligence.senate.gov/sites/default/files/documents/Report_Volume2.pdf
+  title: Senate Intelligence Committee Report
+  type: government
+  local_filename: ddc1cda95aff4dd2.txt
+  summary: The Senate Intelligence Committee report details how the Internet Research Agency (IRA)
+    used social media platforms to spread disinformation and divisive content targeting American
+    voters during the 2016 election.
+  review: The report provides a comprehensive analysis of Russia's sophisticated social media
+    influence operation during the 2016 U.S. presidential election. The Internet Research Agency
+    (IRA) conducted a targeted campaign designed to exploit social divisions, particularly around
+    race, immigration, and political polarization. The operation went beyond simply supporting a
+    specific candidate, with a broader goal of undermining faith in democratic institutions and
+    sowing societal discord. The methodology involved using a multi-platform approach across social
+    media, creating fake personas, and generating high-volume, emotionally charged content. The
+    committee found that the IRA's efforts were part of a larger Russian strategy of information
+    warfare, leveraging social media's connectivity to manipulate public opinion at a low cost and
+    with plausible deniability.
+  key_points:
+    - The IRA targeted African-Americans more than any other group, with 66% of Facebook ads
+      containing race-related terms
+    - Russian operatives created over 61,500 Facebook posts, 116,000 Instagram posts, and 10.4
+      million tweets
+    - The campaign aimed to provoke real-world events and deepen societal divisions
+  cited_by:
+    - authoritarian-tools
+  fetched_at: 2025-12-28 02:56:24
+  tags:
+    - authoritarianism
+    - human-rights
+    - digital-repression
+- id: b078d1a5e78fc1aa
+  url: https://ag.ny.gov/sites/default/files/fake-comments-report.pdf
+  title: State attorney general investigation
+  type: government
+  fetched_at: 2025-12-28 02:56:17
+- id: 2e37589bf4cafca7
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10134958/
+  title: The History of Anthrax Weaponization in the Soviet Union
+  type: government
+  cited_by:
+    - bioweapons
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: 63b721b9a08aed10
+  url: https://www.commerce.gov/news/press-releases/2024/04/us-and-uk-announce-partnership-science-ai-safety
+  title: US Department of Commerce - U.S. and UK Announce Partnership on Science of AI Safety
+  type: government
+  local_filename: 63b721b9a08aed10.txt
+  summary: The US and UK have signed a Memorandum of Understanding to jointly develop AI safety tests
+    and evaluations, focusing on information sharing and cooperative research between their
+    respective AI Safety Institutes.
+  review: The US Department of Commerce and UK Technology Department have initiated a groundbreaking
+    bilateral partnership aimed at addressing the complex challenges of AI safety through
+    coordinated scientific research and testing. By establishing a joint framework for evaluating
+    advanced AI models, systems, and agents, the partnership represents a strategic approach to
+    mitigating potential risks associated with rapidly evolving artificial intelligence
+    technologies. The collaboration includes concrete plans such as conducting joint testing
+    exercises, exploring personnel exchanges, and developing a shared methodology for assessing AI
+    safety. This initiative goes beyond bilateral cooperation, with an explicit intention to expand
+    partnerships globally and create a unified scientific foundation for understanding and managing
+    AI risks. The partnership reflects a proactive stance toward technological governance,
+    recognizing AI as a transformative technology that requires immediate, collaborative, and
+    rigorous scientific investigation to ensure responsible development and deployment.
+  key_points:
+    - First bilateral government partnership specifically focused on AI safety testing and evaluation
+    - Commits to joint research, model testing, and personnel exchanges between US and UK AI Safety
+      Institutes
+    - Aims to develop a global, collaborative approach to understanding and mitigating AI risks
+  cited_by:
+    - geopolitics
+  fetched_at: 2025-12-28 02:03:27
+  tags:
+    - safety
+    - evaluation
+- id: 26d9f37ec369dd6f
+  url: https://www.state.gov/releases/office-of-the-spokesperson/2025/11/joint-statement-the-strategic-artificial-intelligence-partnership
+  title: US State Department - Strategic AI Partnership with Saudi Arabia
+  type: government
+  local_filename: 26d9f37ec369dd6f.txt
+  summary: A bilateral agreement between the US and Saudi Arabia to collaborate on AI technologies,
+    infrastructure development, and strategic investments across multiple sectors.
+  review: >-
+    The Strategic AI Partnership represents a significant diplomatic and technological collaboration
+    between the United States and Saudi Arabia, focusing on advancing artificial intelligence
+    capabilities and economic opportunities. By combining Saudi Arabia's geographical and energy
+    resources with the United States' technological ecosystem, the partnership aims to create AI
+    technology clusters and develop innovative solutions across critical industries including
+    healthcare, education, energy, mining, and transportation.
+
+
+    While the partnership highlights potential economic and technological benefits, it also raises
+    important questions about technology transfer, geopolitical implications, and the ethical
+    considerations of AI development in a complex geopolitical context. The agreement suggests a
+    strategic approach to AI development that goes beyond traditional bilateral economic
+    partnerships, positioning both countries to potentially influence global AI innovation and
+    infrastructure development.
+  key_points:
+    - Comprehensive strategic partnership targeting AI technology development and infrastructure
+    - Focuses on leveraging unique strengths of both countries in technology and resources
+    - Aims to create cross-sector innovations in critical industries
+  cited_by:
+    - geopolitics
+  fetched_at: 2025-12-28 02:03:29
+- id: 2aa9514c9047ada3
+  url: https://www.governance.ai/research-paper/us-china-ai-safety
+  title: US-China Cooperation on AI Safety
+  type: government
+  cited_by:
+    - governance-focused
+  tags:
+    - safety
+  publication_id: govai
+- id: 65e0dbf2f02256c0
+  url: https://www.whitehouse.gov/ostp/ai-bill-of-rights/
+  title: White House AI Bill of Rights
+  type: government
+  cited_by:
+    - erosion-of-agency
+  tags:
+    - human-agency
+    - autonomy
+    - manipulation
+  publication_id: whitehouse
+- id: fdf68a8f30f57dee
+  url: https://www.aisi.gov.uk/
+  title: AI Safety Institute
+  type: government
+  cited_by:
+    - coding
+    - persuasion
+    - solutions
+    - large-language-models
+    - compounding-risks-analysis
+    - defense-in-depth-model
+    - international-coordination-game
+    - safety-research-value
+    - worldview-intervention-mapping
+    - uk-aisi
+    - red-teaming
+    - technical-research
+    - governance-policy
+    - seoul-declaration
+    - ai-safety-institutes
+    - authoritarian-tools
+    - lock-in
+    - racing-dynamics
+  tags:
+    - safety
+    - software-engineering
+    - code-generation
+    - programming-ai
+    - social-engineering
+  publication_id: uk-aisi
+- id: 9ae4c87175cc63c0
+  url: https://www.whitehouse.gov/briefing-room/statements-releases/2022/08/09/fact-sheet-chips-and-science-act-will-lower-costs-create-jobs-strengthen-supply-chains-and-counter-china/
+  title: CHIPS Act
+  type: government
+  cited_by:
+    - solutions
+  tags:
+    - compute
+    - prioritization
+    - timing
+    - strategy
+  publication_id: whitehouse
+- id: 26494a9f05b9db4d
+  url: https://www.governance.ai/research-areas/compute-governance
+  title: Compute governance research
+  type: government
+  cited_by:
+    - solutions
+  tags:
+    - governance
+    - compute
+  publication_id: govai
+- id: 84d60eae6e6d9261
+  url: https://www.congress.gov/crs-product/IF12968
+  title: CRS
+  type: government
+  cited_by:
+    - structural-risks
+  publication_id: congress
+- id: 331246d11298126e
+  url: https://www.sandia.gov/app/uploads/sites/148/2025/04/Challenges-and-Opportunities-for-US-China-Collaboration-on-Artificial-Intelligence-Governance.pdf
+  title: "Sandia National Labs: US-China AI Collaboration Challenges"
+  type: government
+  cited_by:
+    - structural-risks
+    - intervention-timing-windows
+    - multipolar-trap
+    - coordination
+  tags:
+    - game-theory
+    - coordination
+    - competition
+- id: 87839ba10d81d954
+  url: https://www.fmprc.gov.cn/eng./xw/zyxw/202507/t20250729_11679232.html
+  title: China's Global AI Governance Action Plan
+  type: government
+  cited_by:
+    - structural-risks
+    - governance-focused
+  tags:
+    - governance
+- id: 817964dfbb0e3b1b
+  url: https://www.gov.uk/government/organisations/ai-safety-institute
+  title: UK AISI
+  type: government
+  cited_by:
+    - alignment-progress
+    - capability-threshold-model
+    - international-coordination-game
+    - intervention-effectiveness-matrix
+    - risk-cascade-pathways
+    - warning-signs-model
+    - uk-aisi
+    - conjecture
+    - epoch-ai
+    - evaluation
+    - concentration-of-power
+    - proliferation
+    - winner-take-all
+  publication_id: uk-gov
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+    - game-theory
+    - international-coordination
+- id: 9e9ac2fcca71af43
+  url: https://www.gov.uk/government/publications/ai-safety-institute-approach-to-evaluations
+  title: UK AISI/Gray Swan challenge
+  type: government
+  cited_by:
+    - alignment-progress
+  publication_id: uk-gov
+- id: 181a6c57dd4cbc02
+  url: https://www.gov.uk/government/publications/international-ai-safety-report-2025
+  title: inaugural International AI Safety Report
+  type: government
+  cited_by:
+    - alignment-progress
+    - misaligned-catastrophe
+    - alignment-difficulty
+  publication_id: uk-gov
+  tags:
+    - safety
+- id: c9c2bcaca0d2c3e6
+  url: https://www.nist.gov/artificial-intelligence/artificial-intelligence-safety-institute
+  title: US AI Safety Institute
+  type: government
+  cited_by:
+    - alignment-progress
+    - international-coordination-game
+    - coordination-tech
+    - governance-policy
+    - proliferation
+  publication_id: nist
+  tags:
+    - safety
+    - game-theory
+    - international-coordination
+    - governance
+    - international-cooperation
+- id: af80c5cb69ab7db1
+  url: https://www.sec.gov/news/studies/2010/marketevents-report.pdf
+  title: May 6, 2010 Flash Crash
+  type: government
+  cited_by:
+    - autonomous-weapons-escalation
+    - flash-dynamics
+  tags:
+    - escalation
+    - conflict
+    - speed
+    - algorithmic-trading
+    - financial-stability
+- id: 6ffa04fdb736b046
+  url: https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5013a1.htm
+  title: Aum Shinrikyo's biological weapons program
+  type: government
+  cited_by:
+    - bioweapons-attack-chain
+  tags:
+    - biosecurity
+    - probability
+    - decomposition
+    - bioweapons
+- id: feb9976b920ca665
+  url: https://www.dhs.gov/biowatch-program
+  title: CDC's BioWatch program
+  type: government
+  cited_by:
+    - bioweapons-attack-chain
+  tags:
+    - probability
+    - decomposition
+    - bioweapons
+- id: 8c1e3b9b117ff6ca
+  url: https://www.cdc.gov/biowatch
+  title: cdc.gov/biowatch
+  type: government
+  cited_by:
+    - bioweapons-attack-chain
+  tags:
+    - probability
+    - decomposition
+    - bioweapons
+- id: 209a744648b905db
+  url: https://www.nist.gov/cyberframework
+  title: nist.gov/cyberframework
+  type: government
+  cited_by:
+    - bioweapons-attack-chain
+    - cyberweapons-attack-automation
+  publication_id: nist
+  tags:
+    - cybersecurity
+    - probability
+    - decomposition
+    - bioweapons
+    - timeline
+- id: a1b515ecca4cbca9
+  url: https://www.cisa.gov
+  title: CISA
+  type: government
+  cited_by:
+    - bioweapons-attack-chain
+    - cyberweapons-attack-automation
+    - warning-signs-model
+    - warning-signs
+  tags:
+    - probability
+    - decomposition
+    - bioweapons
+    - timeline
+    - automation
+  publication_id: cisa
+- id: a7ee24a3e54a5678
+  url: https://www.nsa.gov/
+  title: NSA TAO
+  type: government
+  cited_by:
+    - cyberweapons-attack-automation
+  tags:
+    - timeline
+    - automation
+    - cybersecurity
+- id: c07e9c2ebb5728c2
+  url: https://www.ncsc.gov.uk/
+  title: NCSC
+  type: government
+  cited_by:
+    - cyberweapons-attack-automation
+  tags:
+    - timeline
+    - automation
+    - cybersecurity
+- id: 7a424a228e98ef14
+  url: https://www.gchq.gov.uk/
+  title: GCHQ
+  type: government
+  cited_by:
+    - cyberweapons-attack-automation
+  tags:
+    - timeline
+    - automation
+    - cybersecurity
+- id: 48260fdda615dafa
+  url: https://www.cisa.gov/sites/default/files/publications/Commercial-Spyware-Factsheet-508.pdf
+  title: Rapid diffusion
+  type: government
+  cited_by:
+    - cyberweapons-attack-automation
+  tags:
+    - timeline
+    - automation
+    - cybersecurity
+  publication_id: cisa
+- id: b1df6d22a2a02199
+  url: https://www.cisa.gov/topics/cybersecurity-best-practices
+  title: CISA
+  type: government
+  cited_by:
+    - cyberweapons-attack-automation
+  tags:
+    - timeline
+    - automation
+    - cybersecurity
+  publication_id: cisa
+- id: 254bcdc7bfcdcd73
+  url: https://www.gov.uk/government/topical-events/ai-safety-summit-2023
+  title: gov.uk
+  type: government
+  cited_by:
+    - defense-in-depth-model
+    - risk-activation-timeline
+    - warning-signs-model
+    - coordination-tech
+  publication_id: uk-gov
+  tags:
+    - defense
+    - security
+    - layered-approach
+    - timeline
+    - capability
+- id: dec73d8dc8263303
+  url: https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/china
+  title: Export control measures implemented in October 2022
+  type: government
+  cited_by:
+    - international-coordination-game
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+  publication_id: bis
+- id: 571cb6299c6d27cf
+  url: https://www.governance.ai/research
+  title: Governance research
+  type: government
+  cited_by:
+    - intervention-effectiveness-matrix
+    - governance-policy
+  tags:
+    - governance
+    - interventions
+    - effectiveness
+    - prioritization
+    - international
+  publication_id: govai
+- id: 85ee8e554a07476b
+  url: https://www.nist.gov/artificial-intelligence
+  title: Guidelines and standards
+  type: government
+  cited_by:
+    - intervention-effectiveness-matrix
+    - safety-research-allocation
+    - safety-research-value
+  publication_id: nist
+  tags:
+    - interventions
+    - effectiveness
+    - prioritization
+    - resource-allocation
+    - research-priorities
+- id: 5357f8642f7ac07e
+  url: https://crsreports.congress.gov/product/pdf/R/R47036
+  title: Congressional Research Service
+  type: government
+  cited_by:
+    - intervention-timing-windows
+  tags:
+    - prioritization
+    - timing
+    - strategy
+- id: 0748954ed8e210a3
+  url: https://www.bis.doc.gov/index.php/policy-guidance/product-guidance/25-new-controls-on-emerging-technology/1674-commerce-controls-certain-emerging-technologies
+  title: Export controls
+  type: government
+  cited_by:
+    - multipolar-trap-dynamics
+  tags:
+    - risk-factor
+    - game-theory
+    - coordination
+  publication_id: bis
+- id: d6d8d74ef87d7711
+  url: https://www.whitehouse.gov/briefing-room/statements-releases/2023/07/21/fact-sheet-biden-harris-administration-secures-voluntary-commitments-from-leading-artificial-intelligence-companies-to-manage-the-risks-posed-by-ai/
+  title: Weak voluntary
+  type: government
+  cited_by:
+    - multipolar-trap-dynamics
+    - proliferation-risk-model
+  tags:
+    - risk-factor
+    - game-theory
+    - coordination
+    - diffusion
+    - control
+  publication_id: whitehouse
+- id: 52e78ce64cda0297
+  url: https://www.commerce.gov/news/press-releases/2022/10/commerce-implements-new-export-controls-advanced-computing-and
+  title: Export controls
+  type: government
+  cited_by:
+    - multipolar-trap-dynamics
+  tags:
+    - risk-factor
+    - game-theory
+    - coordination
+- id: 57c361337d44f07d
+  url: https://www.sec.gov/spotlight/algo_trading/algo_trading_report.pdf
+  title: AI trading systems
+  type: government
+  cited_by:
+    - power-seeking-conditions
+  tags:
+    - formal-analysis
+    - power-seeking
+    - optimal-policies
+- id: ce78270338a5b946
+  url: https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/export-controls-on-semiconductor
+  title: Partial (US export controls)
+  type: government
+  cited_by:
+    - proliferation-risk-model
+  tags:
+    - risk-factor
+    - diffusion
+    - control
+  publication_id: bis
+- id: 5f1b2cc0fb23f0b8
+  url: https://www.gov.uk/government/publications/ai-safety-summit-2023-chairs-statement-2-november
+  title: Early stages
+  type: government
+  cited_by:
+    - proliferation-risk-model
+    - uk-aisi
+  publication_id: uk-gov
+  tags:
+    - risk-factor
+    - diffusion
+    - control
+- id: e4bf76ba23c0cfdc
+  url: https://home.treasury.gov/policy-issues/international/the-committee-on-foreign-investment-in-the-united-states-cfius
+  title: CFIUS review process
+  type: government
+  cited_by:
+    - proliferation-risk-model
+  tags:
+    - risk-factor
+    - diffusion
+    - control
+- id: 4440e819b5d307a6
+  url: https://www.gov.uk/government/publications/seoul-declaration-on-ai-safety
+  title: Seoul Summit
+  type: government
+  cited_by:
+    - racing-dynamics-impact
+  publication_id: uk-gov
+  tags:
+    - risk-factor
+    - competition
+    - game-theory
+- id: eeb73db67a2f4a75
+  url: https://www.nist.gov/itl/ai
+  title: NIST
+  type: government
+  cited_by:
+    - racing-dynamics-impact
+  publication_id: nist
+  tags:
+    - risk-factor
+    - competition
+    - game-theory
+- id: 307a0a71be752d69
+  url: https://www.nist.gov/itl/ai/ai-risk-management-framework
+  title: NIST AI RMF
+  type: government
+  cited_by:
+    - racing-dynamics-impact
+  publication_id: nist
+  tags:
+    - risk-factor
+    - competition
+    - game-theory
+- id: 8f7eda84e4f5d1fe
+  url: https://www.ftc.gov/business-guidance/blog/2024/01/ai-voice-cloning-your-loved-one-distress-scam
+  title: FTC reports
+  type: government
+  cited_by:
+    - risk-activation-timeline
+  tags:
+    - timeline
+    - capability
+    - risk-assessment
+  publication_id: ftc
+- id: 0a52c15a31cd8d81
+  url: https://www.gov.uk/government/publications/frontier-ai-capabilities-and-risks-discussion-paper
+  title: UK Government
+  type: government
+  cited_by:
+    - safety-research-allocation
+  publication_id: uk-gov
+  tags:
+    - resource-allocation
+    - research-priorities
+    - optimization
+- id: d683b677912915e2
+  url: https://www.nsf.gov/
+  title: NSF
+  type: government
+  cited_by:
+    - safety-research-value
+  tags:
+    - cost-effectiveness
+    - research-priorities
+    - expected-value
+- id: 47fe3aee53671108
+  url: https://www.nsf.gov/funding/
+  title: NSF
+  type: government
+  cited_by:
+    - safety-research-value
+  tags:
+    - cost-effectiveness
+    - research-priorities
+    - expected-value
+- id: 8b2974317b4ed44a
+  url: https://www.selectagents.gov/
+  title: CDC Select Agents
+  type: government
+  cited_by:
+    - warning-signs-model
+  tags:
+    - monitoring
+    - early-warning
+    - tripwires
+- id: 693d1d9d9eff5021
+  url: https://www.bls.gov/
+  title: Bureau of Labor Statistics
+  type: government
+  cited_by:
+    - warning-signs-model
+  tags:
+    - economic
+    - monitoring
+    - early-warning
+    - tripwires
+- id: 25fd927348343183
+  url: https://www.nist.gov/
+  title: US AI Safety Institute
+  type: government
+  cited_by:
+    - warning-signs-model
+    - content-authentication
+    - warning-signs
+  publication_id: nist
+  tags:
+    - safety
+    - monitoring
+    - early-warning
+    - tripwires
+    - deepfakes
+- id: f3d937f613f2f6d8
+  url: https://www.federalreserve.gov/
+  title: Federal Reserve
+  type: government
+  cited_by:
+    - warning-signs-model
+  tags:
+    - monitoring
+    - early-warning
+    - tripwires
+- id: 0ad92b04c3d40b7e
+  url: https://www.cdc.gov/
+  title: CDC
+  type: government
+  cited_by:
+    - warning-signs-model
+  tags:
+    - monitoring
+    - early-warning
+    - tripwires
+- id: 72036c5d7e086291
+  url: https://www.nrc.gov/
+  title: Nuclear Regulatory Commission
+  type: government
+  cited_by:
+    - warning-signs-model
+  tags:
+    - governance
+    - monitoring
+    - early-warning
+    - tripwires
+- id: 7930f0909ddbb304
+  url: https://www.bis.doc.gov/index.php/policy-guidance/product-guidance/artificial-intelligence
+  title: Export controls
+  type: government
+  cited_by:
+    - epoch-ai
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+  publication_id: bis
+- id: f5ff4726f14f3e32
+  url: https://www.ai.gov/nairr/
+  title: US NAIRR
+  type: government
+  cited_by:
+    - epoch-ai
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+- id: 578a73eca8b7b1e6
+  url: https://www.gov.uk/government/publications/ai-regulation-a-pro-innovation-approach
+  title: UK AI White Paper
+  type: government
+  cited_by:
+    - epoch-ai
+  publication_id: uk-gov
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+- id: 61a25df56fb982d8
+  url: https://www.schumer.senate.gov/newsroom/press-releases/schumer-announces-bipartisan-senate-ai-insight-forums
+  title: Senate AI Insight Forum
+  type: government
+  cited_by:
+    - daniela-amodei
+- id: f1247f92ea8d022a
+  url: https://www.senate.gov/
+  title: Senate Testimony 2023
+  type: government
+  cited_by:
+    - dario-amodei
+  tags:
+    - constitutional-ai
+    - responsible-scaling
+    - claude
+- id: 52748445fab0e8cc
+  url: https://www.congress.gov/
+  title: Congressional Hearing
+  type: government
+  cited_by:
+    - holden-karnofsky
+  tags:
+    - effective-altruism
+    - ai-safety-funding
+    - ai-timelines
+  publication_id: congress
+- id: 243fa770c13b0c44
+  url: https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration
+  title: government AI policies
+  type: government
+  cited_by:
+    - mainstream-era
+    - uk-aisi
+    - toby-ord
+    - coordination-tech
+    - voluntary-commitments
+    - international
+    - seoul-declaration
+    - pause-and-redirect
+  publication_id: uk-gov
+  tags:
+    - x-risk
+    - effective-altruism
+    - longtermism
+    - game-theory
+    - governance
+- id: a604eb8a03efa82d
+  url: https://www.gov.uk/
+  title: Various gov sources
+  type: government
+  cited_by:
+    - toby-ord
+  publication_id: uk-gov
+  tags:
+    - x-risk
+    - effective-altruism
+    - longtermism
+- id: c356e299bf784464
+  url: https://www.gov.uk/government/publications/ai-white-paper
+  title: AI White Paper
+  type: government
+  cited_by:
+    - toby-ord
+    - erosion-of-agency
+  publication_id: uk-gov
+  tags:
+    - x-risk
+    - effective-altruism
+    - longtermism
+    - human-agency
+    - autonomy
+- id: 627bb42e8f74be04
+  url: https://www.nist.gov/news-events/news/2024/08/us-ai-safety-institute-signs-agreements-regarding-ai-safety-research
+  title: MOU with US AI Safety Institute
+  type: government
+  cited_by:
+    - accident-risks
+    - us-aisi
+    - anthropic-core-views
+    - us-executive-order
+    - ai-safety-institutes
+    - lab-culture
+  publication_id: nist
+  tags:
+    - safety
+    - ai-safety
+    - constitutional-ai
+    - interpretability
+- id: 94173523d006b3b4
+  url: https://www.nist.gov/caisi
+  title: NIST Center for AI Standards and Innovation (CAISI)
+  type: government
+  cited_by:
+    - evals
+  publication_id: nist
+  tags:
+    - benchmarks
+    - red-teaming
+    - capability-assessment
+- id: 50ddf0138c02a04f
+  url: https://media.defense.gov/2025/Jan/29/2003634788/-1/-1/0/CSI-CONTENT-CREDENTIALS.PDF
+  title: Content Credentials guidance
+  type: government
+  cited_by:
+    - content-authentication
+    - epistemic-infrastructure
+  tags:
+    - deepfakes
+    - digital-evidence
+    - verification
+    - knowledge-management
+    - public-goods
+- id: bf32ae99c8920f85
+  url: https://www.gao.gov/products/gao-24-107292
+  title: GAO-24-107292
+  type: government
+  cited_by:
+    - content-authentication
+  tags:
+    - deepfakes
+    - digital-evidence
+    - verification
+- id: 661fa26a6de38861
+  url: https://csrc.nist.gov/Projects/post-quantum-cryptography
+  title: NIST post-quantum standards
+  type: government
+  cited_by:
+    - coordination-tech
+  tags:
+    - game-theory
+    - governance
+    - international-cooperation
+- id: 180a1f7ab9ba4a6e
+  url: https://www.nsf.gov/awardsearch/showAward?AWD_ID=2120496
+  title: NSF
+  type: government
+  cited_by:
+    - epistemic-infrastructure
+  tags:
+    - knowledge-management
+    - public-goods
+    - information-infrastructure
+- id: 817822d0744697cf
+  url: https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-and-machine-learning-aiml-enabled-medical-devices
+  title: FDA AI/ML Guidance
+  type: government
+  cited_by:
+    - hybrid-systems
+  tags:
+    - human-ai-interaction
+    - ai-control
+    - decision-making
+- id: 7546a582e1adddff
+  url: https://www.cftc.gov/
+  title: CFTC
+  type: government
+  cited_by:
+    - prediction-markets
+  tags:
+    - forecasting
+    - information-aggregation
+    - mechanism-design
+- id: 5c0ba994490ba1ec
+  url: https://www.gov.uk/government/publications/frontier-ai-capabilities-evaluation
+  title: Frontier AI capability evaluation
+  type: government
+  cited_by:
+    - evaluation
+  publication_id: uk-gov
+  tags:
+    - capabilities
+    - evaluation
+- id: 1c9f348c6a465818
+  url: https://www.gov.uk/government/collections/ai-safety-institute-work
+  title: Model evaluation transparency
+  type: government
+  cited_by:
+    - evaluation
+  publication_id: uk-gov
+  tags:
+    - evaluation
+- id: 6498f2b0ae358adc
+  url: https://www.nist.gov/artificial-intelligence/ai-safety-institute-consortium
+  title: US AISI
+  type: government
+  cited_by:
+    - evaluation
+  publication_id: nist
+- id: 409aff2720d97129
+  url: https://www.congress.gov/crs-product/R48642
+  title: Congressional Research Service
+  type: government
+  cited_by:
+    - export-controls
+    - international
+  publication_id: congress
+- id: 58bf458c4de920d0
+  url: https://www.bis.gov/press-release/commerce-strengthens-export-controls-restrict-chinas-capability-produce-advanced-semiconductors-military
+  title: Commerce Strengthens Export Controls
+  type: government
+  cited_by:
+    - export-controls
+- id: 723ffe2c01da7245
+  url: https://www.justice.gov/opa/pr/us-authorities-shut-down-major-china-linked-ai-tech-smuggling-network
+  title: U.S. Authorities Shut Down Major China-Linked AI Tech Smuggling Network
+  type: government
+  cited_by:
+    - export-controls
+- id: a9468089fafed8cd
+  url: https://bidenwhitehouse.archives.gov/briefing-room/statements-releases/2023/07/21/fact-sheet-biden-harris-administration-secures-voluntary-commitments-from-leading-artificial-intelligence-companies-to-manage-the-risks-posed-by-ai/
+  title: White House AI commitments
+  type: government
+  cited_by:
+    - effectiveness-assessment
+    - voluntary-commitments
+  tags:
+    - self-regulation
+    - industry-commitments
+    - responsible-scaling
+- id: 93f76003cf5c5875
+  url: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-deployment-of-artificial-intelligence/
+  title: Executive Order on AI
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - international
+    - compute-governance
+    - regulation
+  publication_id: whitehouse
+- id: 4c0cce743341851e
+  url: https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration/the-bletchley-declaration-by-countries-attending-the-ai-safety-summit-1-2-november-2023
+  title: Bletchley Declaration
+  type: government
+  cited_by:
+    - governance-policy
+    - international-summits
+    - coordination
+  publication_id: uk-gov
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: 1b4616cecfae83d5
+  url: https://www.gov.uk/government/topical-events/ai-seoul-summit-2024
+  title: Seoul AI Safety Summit
+  type: government
+  cited_by:
+    - us-aisi
+    - governance-policy
+    - seoul-declaration
+    - ai-safety-institutes
+  publication_id: uk-gov
+  tags:
+    - safety
+    - international
+    - compute-governance
+    - regulation
+- id: c9f5136cc14977ab
+  url: https://www.state.gov/partnership-for-global-inclusivity-on-ai/
+  title: Partnership for Global Inclusivity on AI
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: dccefa4a8b251727
+  url: https://www.governance.ai/research-paper/compute-governance-conclusions-and-recommendations
+  title: Lennart Heim's research
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - international
+    - compute-governance
+    - regulation
+  publication_id: govai
+- id: cea53a894c42360f
+  url: https://www.congress.gov/bill/118th-congress/house-bill/6573
+  title: CREATE AI Act
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - international
+    - compute-governance
+    - regulation
+  publication_id: congress
+- id: a133a08eabc8368e
+  url: http://www.cac.gov.cn/2023-04/11/c_1682854275475410.htm
+  title: Draft measures
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: ed351270124b85e0
+  url: https://www.pdpc.gov.sg/help-and-resources/2020/01/model-ai-governance-framework
+  title: Model AI Governance Framework
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - governance
+    - international
+    - compute-governance
+    - regulation
+- id: 6b19ea80881fa488
+  url: https://www.gov.uk/government/publications/ai-seoul-summit-2024-commitments-by-ai-companies
+  title: commitments
+  type: government
+  cited_by:
+    - governance-policy
+  publication_id: uk-gov
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: 9048db53387ec0c5
+  url: https://www.bis.doc.gov/index.php/documents/about-bis/newsroom/press-releases/3158-2022-10-07-bis-press-release-advanced-computing-and-semiconductor-manufacturing-controls-final/file
+  title: October 2022 semiconductor restrictions
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - international
+    - compute-governance
+    - regulation
+  publication_id: bis
+- id: 2fcc940c3afeb469
+  url: https://www.bis.doc.gov/index.php/documents/about-bis/newsroom/press-releases/3403-2023-10-17-bis-press-release-bis-advances-national-security-by-strengthening-semiconductor-export-controls/file
+  title: Updated controls (October 2023)
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - international
+    - compute-governance
+    - regulation
+  publication_id: bis
+- id: 98eb66f7ab29f617
+  url: https://legistar.council.nyc.gov/LegislationDetail.aspx?ID=4344524&GUID=B051915D-A9AC-451E-81F8-6596032FA3F9
+  title: NYC Local Law 144
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: c77c0edc7e70036b
+  url: https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB1001
+  title: California SB 1001
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: 52012e850e0d9bf3
+  url: https://www.dhs.gov/AI-Safety-Security-Board
+  title: US AI Safety and Security Board
+  type: government
+  cited_by:
+    - governance-policy
+  tags:
+    - safety
+    - cybersecurity
+    - international
+    - compute-governance
+    - regulation
+- id: cbc2716bca946ee0
+  url: https://www.gov.uk/government/groups/ai-council
+  title: UK AI Council
+  type: government
+  cited_by:
+    - governance-policy
+  publication_id: uk-gov
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: a65ad4f1a30f1737
+  url: https://www.nist.gov/news-events/news/2024/11/fact-sheet-us-department-commerce-us-department-state-launch-international
+  title: International Network of AI Safety Institutes
+  type: government
+  cited_by:
+    - international
+    - us-executive-order
+    - coordination
+  publication_id: nist
+  tags:
+    - safety
+- id: 944fc2ac301f8980
+  url: https://www.gov.uk/government/publications/frontier-ai-safety-commitments-ai-seoul-summit-2024
+  title: Seoul Frontier AI Commitments
+  type: government
+  cited_by:
+    - voluntary-commitments
+    - international-summits
+    - international
+    - seoul-declaration
+    - racing-dynamics
+  publication_id: uk-gov
+  tags:
+    - self-regulation
+    - industry-commitments
+    - responsible-scaling
+    - governance
+    - coordination
+- id: 3705a6ea6864e940
+  url: https://www.commerce.gov/news/fact-sheets/2024/11/fact-sheet-us-department-commerce-us-department-state-launch-international
+  title: International Network of AI Safety Institutes
+  type: government
+  cited_by:
+    - us-aisi
+    - international
+    - lock-in
+  tags:
+    - safety
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: 697b30a2dacecc26
+  url: https://www.governance.ai/research-paper/international-control-of-powerful-technology-lessons-from-the-baruch-plan-for-nuclear-weapons
+  title: GovAI research paper on the Baruch Plan
+  type: government
+  cited_by:
+    - international
+  publication_id: govai
+- id: 2c62af9e9fdd09c2
+  url: https://www.gov.uk/government/publications/seoul-declaration-for-safe-innovative-and-inclusive-ai-ai-seoul-summit-2024
+  title: Seoul Declaration for Safe, Innovative and Inclusive AI
+  type: government
+  cited_by:
+    - international-summits
+    - international
+    - seoul-declaration
+  publication_id: uk-gov
+  tags:
+    - safety
+- id: 9d15bf121467eba7
+  url: https://www.gov.uk/government/publications/seoul-declaration-for-safe-innovative-and-inclusive-ai-ai-seoul-summit-2024/seoul-statement-of-intent-toward-international-cooperation-on-ai-safety-science-ai-seoul-summit-2024-annex
+  title: Seoul Statement of Intent toward International Cooperation on AI Safety Science
+  type: government
+  cited_by:
+    - seoul-declaration
+    - ai-safety-institutes
+  publication_id: uk-gov
+  tags:
+    - safety
+- id: 0fd3b1f5c81a37d8
+  url: https://www.aisi.gov.uk/blog/early-lessons-from-evaluating-frontier-ai-systems
+  title: UK AI Security Institute's evaluations
+  type: government
+  cited_by:
+    - uk-aisi
+    - seoul-declaration
+  tags:
+    - evaluation
+    - cybersecurity
+  publication_id: uk-aisi
+- id: 35aa12c9e0592b30
+  url: https://coag.gov/ai/
+  title: Colorado Attorney General
+  type: government
+  cited_by:
+    - colorado-ai-act
+    - us-state-legislation
+- id: 886f3fed50ae776d
+  url: https://leg.colorado.gov/bills/sb24-205
+  title: Colorado AI Act (SB 24-205)
+  type: government
+  cited_by:
+    - colorado-ai-act
+- id: 58d1964448921e0c
+  url: https://content.leg.colorado.gov/sites/default/files/2024a_205_signed.pdf
+  title: Signed Bill Text (PDF)
+  type: government
+  cited_by:
+    - colorado-ai-act
+- id: 84e0da6d5092e27d
+  url: https://www.nist.gov/aisi
+  title: US AISI
+  type: government
+  cited_by:
+    - ai-safety-institutes
+    - open-source
+    - sharp-left-turn
+  publication_id: nist
+  tags:
+    - capability-generalization
+    - alignment-stability
+    - miri
+- id: 587a6715a0cb4099
+  url: https://www.gov.uk/government/publications/ai-safety-institute-overview/introducing-the-ai-safety-institute
+  title: Ian Hogarth
+  type: government
+  cited_by:
+    - uk-aisi
+    - ai-safety-institutes
+  publication_id: uk-gov
+  tags:
+    - governance
+    - government-ai-safety
+    - international
+- id: 7515ea53a1461224
+  url: https://www.commerce.gov/news/press-releases/2024/02/us-commerce-secretary-gina-raimondo-announces-key-executive-leadership
+  title: established in February 2024
+  type: government
+  cited_by:
+    - us-aisi
+    - ai-safety-institutes
+  tags:
+    - governance
+    - government-oversight
+    - ai-standards
+- id: 36f1ab33b8ba7130
+  url: https://www.commerce.gov/news/press-releases/2024/11/us-ai-safety-institute-establishes-new-us-government-taskforce
+  title: Testing Risks of AI for National Security (TRAINS) Taskforce
+  type: government
+  cited_by:
+    - ai-safety-institutes
+  tags:
+    - evaluation
+    - cybersecurity
+- id: a6ec2c2fe408fea3
+  url: https://www.ntia.gov/sites/default/files/publications/ntia-ai-open-model-report.pdf
+  title: NTIA report on open-weight AI models
+  type: government
+  cited_by:
+    - open-source
+- id: f95732dfb1848c18
+  url: https://www.ntia.gov/press-release/2024/ntia-supports-open-models-promote-ai-innovation
+  title: NTIA 2024
+  type: government
+  cited_by:
+    - open-source
+- id: d76d92e6cd91fb5d
+  url: https://www.governance.ai/research-paper/training-compute-thresholds-features-and-functions-in-ai-regulation
+  title: compute governance
+  type: government
+  cited_by:
+    - pause
+  tags:
+    - governance
+    - compute
+  publication_id: govai
+- id: 6aee33556a4b6429
+  url: https://www.nist.gov/artificial-intelligence/ai-safety-institute
+  title: US AI Safety Institute
+  type: government
+  cited_by:
+    - emergent-capabilities
+  publication_id: nist
+  tags:
+    - safety
+    - scaling
+    - capability-evaluation
+    - unpredictability
+- id: 533b576199ec323d
+  url: https://www.gov.uk/government/publications/ai-safety-institute-approach-to-evaluations/ai-safety-institute-approach-to-evaluations
+  title: UK AI Safety Institute
+  type: government
+  cited_by:
+    - emergent-capabilities
+  publication_id: uk-gov
+  tags:
+    - safety
+    - scaling
+    - capability-evaluation
+    - unpredictability
+- id: c58e765c25f6288c
+  url: https://csrc.nist.gov/projects/steganography
+  title: NIST Steganography Guidelines
+  type: government
+  cited_by:
+    - steganography
+- id: fe06413dd34d8309
+  url: https://justice.gov/
+  title: DOJ AI Probe
+  type: government
+  cited_by:
+    - knowledge-monopoly
+  tags:
+    - market-concentration
+    - governance
+    - knowledge-access
+- id: c7c2cec66fc88667
+  url: https://justice.gov/atr
+  title: US DOJ Antitrust
+  type: government
+  cited_by:
+    - knowledge-monopoly
+  tags:
+    - market-concentration
+    - governance
+    - knowledge-access
+- id: b790a5f783c3fdfe
+  url: https://gov.uk/cma
+  title: UK CMA
+  type: government
+  cited_by:
+    - knowledge-monopoly
+  publication_id: uk-gov
+  tags:
+    - market-concentration
+    - governance
+    - knowledge-access
+- id: 50a8c7ee43b53abe
+  url: https://ftc.gov/
+  title: FTC
+  type: government
+  cited_by:
+    - knowledge-monopoly
+  tags:
+    - market-concentration
+    - governance
+    - knowledge-access
+  publication_id: ftc
+- id: e73f53ac06daa75a
+  url: https://grants.nih.gov/grants/research_integrity/research_misconduct.htm
+  title: NIH Guidelines
+  type: government
+  cited_by:
+    - scientific-corruption
+  tags:
+    - scientific-integrity
+    - paper-mills
+    - replication-crisis
+- id: 550619720b216f79
+  url: https://www.bis.doc.gov/
+  title: Bureau of Industry and Security
+  type: government
+  cited_by:
+    - authoritarian-tools
+  tags:
+    - cybersecurity
+    - authoritarianism
+    - human-rights
+    - digital-repression
+  publication_id: bis
+- id: 7cfac8f3f8a27b01
+  url: https://www.ic3.gov/Media/Y2024/PSA240314
+  title: FBI IC3
+  type: government
+  cited_by:
+    - deepfakes
+  tags:
+    - synthetic-media
+    - identity
+    - authentication
+- id: 5a59669b48e227c8
+  url: https://www.ic3.gov/
+  title: FBI IC3 Reports
+  type: government
+  cited_by:
+    - deepfakes
+  tags:
+    - synthetic-media
+    - identity
+    - authentication
+- id: fb9d27d075721c3b
+  url: https://www.gov.uk/government/collections/online-safety-bill
+  title: UK Online Safety
+  type: government
+  cited_by:
+    - deepfakes
+  publication_id: uk-gov
+  tags:
+    - safety
+    - synthetic-media
+    - identity
+    - authentication
+- id: 75d6069fea955f27
+  url: https://www.fbi.gov/news/press-releases/2024
+  title: The FBI's 2024 Internet Crime Report
+  type: government
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 434720c0bc5b0712
+  url: https://www.fcc.gov/document/fcc-proposes-fine-political-consultant-ai-generated-robocalls
+  title: The Federal Communications Commission's investigation
+  type: government
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 0cf38370d215a835
+  url: https://www.sec.gov/news/press-release/2024-142
+  title: The Securities and Exchange Commission's 2024 risk assessment
+  type: government
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 63d18a7e6b3ef957
+  url: https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240AB2655
+  title: California's AB 2655
+  type: government
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 552d5edc283dd8f0
+  url: https://capitol.texas.gov/BillLookup/History.aspx?LegSess=88R&Bill=SB751
+  title: Texas's SB 751
+  type: government
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 1a35cabf1d831f67
+  url: https://www.fec.gov/updates/artificial-intelligence-disclaimers-political-ads/
+  title: The Federal Election Commission
+  type: government
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: af6f5fd6cf5edf1f
+  url: https://www.fbi.gov/news/press-releases/
+  title: FBI Internet Crime Report
+  type: government
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 9f1f2bd060950a8c
+  url: https://www.fcc.gov/
+  title: Federal Communications Commission AI Guidelines
+  type: government
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 8b4ae87542118b74
+  url: https://www.ic3.gov/Media/PDF/AnnualReport/2024_IC3Report.pdf
+  title: $16.6 billion in 2024
+  type: government
+  cited_by:
+    - fraud
+  tags:
+    - social-engineering
+    - voice-cloning
+    - deepfakes
+- id: 5baf02f8176e8c7a
+  url: https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240AB2273
+  title: AB 2273
+  type: government
+  cited_by:
+    - fraud
+  tags:
+    - social-engineering
+    - voice-cloning
+    - deepfakes
+- id: 3b10c7a4176fbaac
+  url: https://www.whitehouse.gov/briefing-room/statements-releases/2023/10/30/fact-sheet-president-biden-issues-executive-order-on-safe-secure-and-trustworthy-artificial-intelligence/
+  title: mandatory deepfake watermarking
+  type: government
+  cited_by:
+    - fraud
+  tags:
+    - social-engineering
+    - voice-cloning
+    - deepfakes
+  publication_id: whitehouse
+- id: 336dbd32e763cbcb
+  url: https://www.nist.gov/chips
+  title: CHIPS and Science Act
+  type: government
+  cited_by:
+    - concentration-of-power
+    - racing-dynamics
+  publication_id: nist
+  tags:
+    - compute
+    - governance
+    - power-dynamics
+    - inequality
+    - coordination
+- id: 152eb0e573a57ec7
+  url: https://www.bis.doc.gov/index.php/policy-guidance/product-guidance/semiconductors
+  title: export controls on advanced semiconductors
+  type: government
+  cited_by:
+    - concentration-of-power
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+  publication_id: bis
+- id: 7dfb933e3a30fa2d
+  url: https://www.gov.uk/government/news/cma-finds-interconnected-web-of-over-90-partnerships-and-strategic-investments-involving-ai-foundation-model-developers
+  title: UK CMA investigations
+  type: government
+  cited_by:
+    - concentration-of-power
+  publication_id: uk-gov
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+- id: 8d9e154a2c2b9e23
+  url: https://www.ftc.gov/news-events/news/press-releases/2024/01/ftc-launches-inquiry-generative-ai-investments-partnerships
+  title: FTC's investigation
+  type: government
+  cited_by:
+    - concentration-of-power
+    - winner-take-all
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+    - economic-inequality
+    - market-concentration
+  publication_id: ftc
+- id: 6c3746ba93cb5f9c
+  url: https://www.warren.senate.gov/oversight/reports/senator-warren-releases-report-on-how-big-tech-uses-ai-to-consolidate-power
+  title: Senator Elizabeth Warren's proposed legislation
+  type: government
+  cited_by:
+    - concentration-of-power
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+- id: ff44cfc4609c4696
+  url: https://www.nsf.gov/cise/nairr/
+  title: National AI Research Resource (NAIRR)
+  type: government
+  cited_by:
+    - concentration-of-power
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+- id: a313c9f60bc924b0
+  url: https://www.gov.uk/government/collections/online-safety-act-implementation
+  title: Online Safety Act
+  type: government
+  cited_by:
+    - erosion-of-agency
+  publication_id: uk-gov
+  tags:
+    - safety
+    - human-agency
+    - autonomy
+    - manipulation
+- id: 642b61fae673145c
+  url: https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202320240SB362
+  title: Delete Act
+  type: government
+  cited_by:
+    - erosion-of-agency
+  tags:
+    - human-agency
+    - autonomy
+    - manipulation
+- id: d22dcd6d3bc6e78a
+  url: https://www.cftc.gov/sites/default/files/idc/groups/public/%40economicanalysis/documents/file/oce_aimlreport0218.pdf
+  title: High-frequency trading algorithms
+  type: government
+  cited_by:
+    - lock-in
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: 4e56cdf6b04b126b
+  url: https://www.aisi.gov.uk/blog/advanced-ai-evaluations-may-update
+  title: UK AI Safety Institute renamed to AI Security Institute
+  type: government
+  cited_by:
+    - lock-in
+  tags:
+    - safety
+    - cybersecurity
+    - x-risk
+    - irreversibility
+    - path-dependence
+  publication_id: uk-aisi
+- id: 71df85ba1f294b46
+  url: https://www.ai.gov/
+  title: Coordinated federal approach
+  type: government
+  cited_by:
+    - lock-in
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: 9f90a50d63c2f1eb
+  url: https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202320240SB1047
+  title: Senate Bill 1047
+  type: government
+  cited_by:
+    - california-sb1047
+    - proliferation
+  tags:
+    - regulation
+    - state-policy
+    - frontier-models
+    - open-source
+    - governance
+- id: 604c3963cf77f0fe
+  url: https://www.gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf
+  title: veto statement
+  type: government
+  cited_by:
+    - california-sb1047
+    - failed-stalled-proposals
+    - proliferation
+  tags:
+    - regulation
+    - state-policy
+    - frontier-models
+    - open-source
+    - governance
+- id: 4e891388d61ef3c7
+  url: https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/export-controls-for-artificial-intelligence-and-semiconductors
+  title: Export controls on advanced semiconductors
+  type: government
+  cited_by:
+    - proliferation
+  tags:
+    - open-source
+    - governance
+    - dual-use
+  publication_id: bis
+- id: 8863fbda56e40b32
+  url: https://www.gov.uk/government/publications/seoul-declaration-for-ai-safety
+  title: May 2024 Seoul AI Safety Summit
+  type: government
+  cited_by:
+    - racing-dynamics
+  publication_id: uk-gov
+  tags:
+    - safety
+    - governance
+    - coordination
+    - competition
+- id: 3b766ea17775d5f2
+  url: https://www.sec.gov/
+  title: Company earnings reports
+  type: government
+  cited_by:
+    - winner-take-all
+  tags:
+    - economic-inequality
+    - market-concentration
+    - big-tech
+- id: c20ca3e50387eaca
+  url: http://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm
+  title: AI regulation
+  type: government
+  cited_by:
+    - winner-take-all
+  tags:
+    - governance
+    - economic-inequality
+    - market-concentration
+    - big-tech
+- id: b4402422d8628b71
+  url: https://cdn.governance.ai/Open_Problems_in_Technical_AI_Governance.pdf
+  title: "Governance.ai: Open Problems in Technical AI Governance"
+  type: government
+  cited_by:
+    - pause-and-redirect
+  tags:
+    - governance
+- id: 1dca0ff590bf6189
+  url: https://www.governance.ai/research-paper/agenda
+  title: "AI Governance: A Research Agenda"
+  type: government
+  cited_by:
+    - governance-focused
+  tags:
+    - governance
+  publication_id: govai
+- id: 323869129eb799dc
+  url: https://cdn.governance.ai/GovAI-Research-Agenda.pdf
+  title: Allan Dafoe
+  type: government
+  cited_by:
+    - governance-focused
+- id: 73d81d3ead01bc0e
+  url: https://www.industry.gov.au/publications/seoul-declaration-countries-attending-ai-seoul-summit-21-22-may-2024
+  title: Seoul Declaration
+  type: government
+  cited_by:
+    - international-regimes
+    - slow-takeoff-muddle
+    - coordination
+- id: 4487a62bbc1c45d6
+  url: https://www.gov.uk/government/publications/frontier-ai-safety-commitments-ai-seoul-summit-2024/frontier-ai-safety-commitments-ai-seoul-summit-2024
+  title: Seoul Frontier AI Safety Commitments
+  type: government
+  cited_by:
+    - coordination
+  publication_id: uk-gov
+  tags:
+    - safety
+- id: 9e51adf4818d142f
+  url: https://www.nhtsa.gov/
+  title: NHTSA AV Safety Reports
+  type: government
+  cited_by:
+    - warning-signs
+  tags:
+    - safety
+- id: 0757487caf1a4dd3
+  url: https://www.fda.gov/
+  title: FDA FAERS Database
+  type: government
+  cited_by:
+    - warning-signs
+- id: 2c4a2453c12b4df9
+  url: https://aisafetysummit.gov.uk/
+  title: AI Safety Summit
+  type: government
+  cited_by:
+    - warning-signs
+  tags:
+    - safety
+- id: 5a4d26f4d2d9cae9
+  url: https://www.loc.gov/item/global-legal-monitor/2023-04-25/china-provisions-on-deep-synthesis-technology-enter-into-effect/
+  title: Deep Synthesis Provisions
+  type: government
+  cited_by:
+    - china-ai-regulations
+  tags:
+    - regulation
+    - china
+    - content-control
+- id: b787cbfa4af4ca4d
+  url: https://www.loc.gov/item/global-legal-monitor/2023-07-18/china-generative-ai-measures-finalized/
+  title: Library of Congress analysis
+  type: government
+  cited_by:
+    - china-ai-regulations
+  tags:
+    - regulation
+    - china
+    - content-control
+- id: c56de7a1e7f178b3
+  url: https://sd11.senate.ca.gov/
+  title: Senator Scott Wiener
+  type: government
+  cited_by:
+    - california-sb1047
+  tags:
+    - regulation
+    - state-policy
+    - frontier-models
+- id: 3769d55b2bcad8fa
+  url: https://sd11.senate.ca.gov/news/senator-wieners-groundbreaking-artificial-intelligence-bill-advances-assembly-floor-amendments
+  title: Removed Frontier Model Division
+  type: government
+  cited_by:
+    - california-sb1047
+  tags:
+    - regulation
+    - state-policy
+    - frontier-models
+- id: 8ed00b431a52bee4
+  url: https://apcp.assembly.ca.gov/system/files/2024-06/sb-1047-wiener-apcp-analysis_0.pdf
+  title: California Assembly Privacy and Consumer Protection Committee Analysis
+  type: government
+  cited_by:
+    - california-sb1047
+  tags:
+    - regulation
+    - state-policy
+    - frontier-models
+- id: 0b8728beea7ab266
+  url: https://sd11.senate.ca.gov/news/bipartisan-vote-senate-passes-senator-wieners-landmark-ai-safety-and-innovation-bill
+  title: "Senator Wiener: Bipartisan Vote, Senate Passes Landmark AI Safety Bill"
+  type: government
+  cited_by:
+    - california-sb1047
+  tags:
+    - safety
+    - regulation
+    - state-policy
+    - frontier-models
+- id: ec3e5f2801057f7d
+  url: https://bidenwhitehouse.archives.gov/briefing-room/statements-releases/2023/09/12/fact-sheet-biden-harris-administration-secures-voluntary-commitments-from-eight-additional-artificial-intelligence-companies-to-manage-the-risks-posed-by-ai/
+  title: later expanded
+  type: government
+  cited_by:
+    - voluntary-commitments
+  tags:
+    - self-regulation
+    - industry-commitments
+    - responsible-scaling
+- id: 46c0b419e8afe3fb
+  url: https://www.schumer.senate.gov/imo/media/doc/Andrew%20Ng%20-%20Statement.pdf
+  title: Senate testimony, 2023
+  type: government
+  cited_by:
+    - case-against-xrisk
+- id: 166215ac6c1d1698
+  url: https://www.governance.ai/research-paper/oversight-for-frontier-ai-through-kyc-scheme-for-compute-providers
+  title: GovAI's research on KYC schemes for compute providers
+  type: government
+  cited_by:
+    - monitoring
+  tags:
+    - compute
+  publication_id: govai
+- id: 6ffbbc7f418b8330
+  url: https://www.whitehouse.gov/presidential-actions/2025/01/initial-rescissions-of-harmful-executive-orders-and-actions/
+  title: rescinded by President Trump
+  type: government
+  cited_by:
+    - monitoring
+  publication_id: whitehouse
+- id: 062cfbc2c8fdb5d5
+  url: https://www.congress.gov/bill/118th-congress/senate-bill/2892
+  title: Algorithmic Accountability Act
+  type: government
+  cited_by:
+    - failed-stalled-proposals
+  publication_id: congress
+- id: 8bb39f0d501ab089
+  url: https://www.congress.gov/bill/118th-congress/senate-bill/1356
+  title: ASSESS AI Act
+  type: government
+  cited_by:
+    - failed-stalled-proposals
+  publication_id: congress
+- id: 5976d3e9be0cd5a1
+  url: https://www.tn.gov/governor/news/2024/3/21/photos--gov--lee-signs-elvis-act-into-law.html
+  title: signed by Governor Bill Lee on March 21, 2024
+  type: government
+  cited_by:
+    - us-state-legislation
+- id: b8df5c37607d20c3
+  url: https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf
+  title: Generative AI Profile (AI 600-1)
+  type: government
+  cited_by:
+    - standards-bodies
+- id: 0017a9e19e40df48
+  url: https://www.nist.gov/system/files/documents/2024/05/21/AISI-vision-21May2024.pdf
+  title: US AI Safety Institute vision document
+  type: government
+  cited_by:
+    - goal-misgeneralization
+  publication_id: nist
+  tags:
+    - safety
+    - inner-alignment
+    - distribution-shift
+    - capability-generalization
+- id: "65548750e4511847"
+  url: https://www.congress.gov/crs-product/IF11150
+  title: Section 1066 of the FY2025 NDAA
+  type: government
+  cited_by:
+    - autonomous-weapons
+  tags:
+    - laws
+    - military-ai
+    - arms-control
+  publication_id: congress
+- id: 15e962e71ad2627c
+  url: https://www.cisa.gov/resources-tools/resources/roadmap-ai
+  title: CISA Roadmap for AI
+  type: government
+  cited_by:
+    - cyberweapons
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+  publication_id: cisa
+- id: 7786ae9986ce7a71
+  url: https://www.dhs.gov/sites/default/files/2024-04/24_0426_dhs_ai-ci-safety-security-guidelines-508c.pdf
+  title: AI-CI safety guidelines
+  type: government
+  cited_by:
+    - cyberweapons
+  tags:
+    - safety
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+- id: 122efbdd52167837
+  url: https://www.cisa.gov/resources-tools/resources/principles-secure-integration-artificial-intelligence-operational-technology
+  title: CISA OT AI integration principles
+  type: government
+  cited_by:
+    - cyberweapons
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+  publication_id: cisa
+- id: ff1a185c3aa33003
+  url: https://www.nist.gov/news-events/news/2025/09/caisi-evaluation-deepseek-ai-models-finds-shortcomings-and-risks
+  title: CAISI Evaluation of DeepSeek AI Models Finds Shortcomings and Risks
+  type: government
+  cited_by:
+    - multipolar-trap
+  publication_id: nist
+  tags:
+    - evaluation
+    - game-theory
+    - coordination
+    - competition
+- id: 8f7ca1a7a9889160
+  url: https://bidenwhitehouse.archives.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+  title: US Executive Order 14110
+  type: government
+- id: b787ccc64e78cae8
+  url: https://bidenwhitehouse.archives.gov/briefing-room/statements-releases/2023/10/30/fact-sheet-president-biden-issues-executive-order-on-safe-secure-and-trustworthy-artificial-intelligence/
+  title: Executive Order 14110
+  type: government
+- id: 8a9de448c7130623
+  url: https://www.aisi.gov.uk/blog/5-key-findings-from-our-first-frontier-ai-trends-report
+  title: nearly 5x more likely
+  type: government
+  publication_id: uk-aisi
+- id: 01b21b3341aba80e
+  url: https://newscenter.lbl.gov/2023/11/29/google-deepmind-new-compounds-materials-project/
+  title: Materials Project
+  type: government
+  cited_by:
+    - scientific-research
+  tags:
+    - alphafold
+    - drug-discovery
+    - scientific-ai
+- id: f0d32e32904b59d6
+  url: https://newscenter.lbl.gov/2025/09/04/how-berkeley-lab-is-using-ai-and-automation-to-speed-up-science-and-discovery/
+  title: A-Lab
+  type: government
+  cited_by:
+    - scientific-research
+  tags:
+    - alphafold
+    - drug-discovery
+    - scientific-ai
+- id: 7df0f96fbb215c0a
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12298131/
+  title: Insilico Medicine's AI-designed drug candidate INS018_055
+  type: government
+  cited_by:
+    - scientific-research
+  tags:
+    - alphafold
+    - drug-discovery
+    - scientific-ai
+- id: db963c9c0a90cb2e
+  url: https://www.aisi.gov.uk/work/fourth-progress-report
+  title: Fourth Progress Report
+  type: government
+  cited_by:
+    - uk-aisi
+  publication_id: uk-aisi
+  tags:
+    - governance
+    - government-ai-safety
+    - international
+- id: 3dec5f974c5da5ec
+  url: https://www.aisi.gov.uk/blog/our-2025-year-in-review
+  title: Our 2025 Year in Review
+  type: government
+  cited_by:
+    - uk-aisi
+  publication_id: uk-aisi
+  tags:
+    - governance
+    - government-ai-safety
+    - international
+- id: 2c54187a89647ed5
+  url: https://alignmentproject.aisi.gov.uk/
+  title: The Alignment Project
+  type: government
+  tags:
+    - alignment
+  cited_by:
+    - uk-aisi
+- id: acc3e352f95e2fea
+  url: https://www.aisi.gov.uk/grants
+  title: Grants Overview
+  type: government
+  cited_by:
+    - uk-aisi
+  publication_id: uk-aisi
+  tags:
+    - governance
+    - government-ai-safety
+    - international
+- id: 5afddab390f2dcdb
+  url: https://www.aisi.gov.uk/blog/advancing-the-field-of-systemic-ai-safety-grants-open
+  title: Systemic Safety Grants
+  type: government
+  tags:
+    - safety
+  cited_by:
+    - uk-aisi
+  publication_id: uk-aisi
+- id: 860b4b3c4ea0f158
+  url: https://www.nist.gov/news-events/news/2024/02/biden-harris-administration-announces-first-ever-consortium-dedicated-ai
+  title: AI Safety Institute Consortium (AISIC) launched
+  type: government
+  publication_id: nist
+  tags:
+    - safety
+  cited_by:
+    - us-aisi
+- id: d7f3b09c8828f487
+  url: https://www.commerce.gov/news/press-releases/2024/05/us-secretary-commerce-gina-raimondo-releases-strategic-vision-ai-safety
+  title: International Network of AI Safety Institutes
+  type: government
+  tags:
+    - safety
+  cited_by:
+    - us-aisi
+- id: 2ef355efe9937701
+  url: https://www.nist.gov/news-events/news/us-ai-safety-institute-consortium-holds-first-plenary-meeting-reflect-progress-2024
+  title: First AISIC plenary meeting
+  type: government
+  publication_id: nist
+  cited_by:
+    - us-aisi
+  tags:
+    - governance
+    - government-oversight
+    - ai-standards
+- id: 3b79fd4c944be02b
+  url: https://www.commerce.gov/news/press-releases/2025/06/statement-us-secretary-commerce-howard-lutnick-transforming-us-ai
+  title: Renamed to Center for AI Standards and Innovation (CAISI)
+  type: government
+  cited_by:
+    - us-aisi
+  tags:
+    - governance
+    - government-oversight
+    - ai-standards
+- id: bfe77d043707ba19
+  url: https://www.nist.gov/artificial-intelligence/artificial-intelligence-safety-institute-consortium-aisic
+  title: AI Safety Institute Consortium (AISIC)
+  type: government
+  publication_id: nist
+  tags:
+    - safety
+  cited_by:
+    - us-aisi
+- id: d9723cc62cbaaaac
+  url: https://www.grassley.senate.gov/news/news-releases/grassley-introduces-ai-whistleblower-protection-act
+  title: Senate Judiciary Committee Chair Chuck Grassley introduced the AI Whistleblower Protection Act
+  type: government
+  cited_by:
+    - corporate-influence
+  tags:
+    - frontier-labs
+    - safety-culture
+    - whistleblowing
+- id: 863da0838b7bc974
+  url: https://www.judiciary.senate.gov/press/rep/releases/grassley-introduces-ai-whistleblower-protection-act
+  title: Grassley Introduces AI Whistleblower Protection Act
+  type: government
+  cited_by:
+    - corporate-influence
+  tags:
+    - frontier-labs
+    - safety-culture
+    - whistleblowing
+- id: 80350b150694b2ae
+  url: https://www.federalregister.gov/documents/2023/11/01/2023-24283/safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence
+  title: Executive Order 14110
+  type: government
+  cited_by:
+    - us-executive-order
+  tags:
+    - compute-thresholds
+    - governance
+    - us-aisi
+- id: fcd447df4800db2e
+  url: https://www.aisi.gov.uk/blog/pre-deployment-evaluation-of-anthropics-upgraded-claude-3-5-sonnet
+  title: November 2024 joint evaluation of Claude 3.5 Sonnet
+  type: government
+  tags:
+    - evaluation
+    - llm
+  cited_by:
+    - us-executive-order
+  publication_id: uk-aisi
+- id: b6506e398d982ec2
+  url: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
+  title: Executive Order 14179
+  type: government
+  cited_by:
+    - us-executive-order
+  tags:
+    - compute-thresholds
+    - governance
+    - us-aisi
+- id: 57552ba16045ed79
+  url: https://www.nist.gov/artificial-intelligence/executive-order-safe-secure-and-trustworthy-artificial-intelligence
+  title: NIST AI Safety Institute
+  type: government
+  publication_id: nist
+  tags:
+    - safety
+  cited_by:
+    - us-executive-order
+- id: 7f5cff0680d15cc8
+  url: https://www.congress.gov/crs-product/R47843
+  title: Congress.gov CRS Report
+  type: government
+  cited_by:
+    - us-executive-order
+  publication_id: congress
+  tags:
+    - compute-thresholds
+    - governance
+    - us-aisi
+- id: 2c518cd00364f234
+  url: https://ag.ny.gov/press-release/2021/attorney-general-james-issues-report-detailing-millions-fake-comments-revealing
+  title: multi-year investigation by the New York Attorney General
+  type: government
+  cited_by:
+    - consensus-manufacturing
+  tags:
+    - disinformation
+    - astroturfing
+    - bot-detection
+- id: 3a27f53a06ca364b
+  url: https://ag.ny.gov/sites/default/files/reports/oag-fakecommentsreport.pdf
+  title: NY AG Report
+  type: government
+  cited_by:
+    - consensus-manufacturing
+  tags:
+    - disinformation
+    - astroturfing
+    - bot-detection
+- id: e1f4ebffa91d70f1
+  url: https://www.ftc.gov/news-events/news/press-releases/2024/08/federal-trade-commission-announces-final-rule-banning-fake-reviews-testimonials
+  title: FTC's August 2024 final rule
+  type: government
+  cited_by:
+    - consensus-manufacturing
+  publication_id: ftc
+  tags:
+    - disinformation
+    - astroturfing
+    - bot-detection
+- id: 66ecd8562638e6de
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12331776/
+  title: Research
+  type: government
+  cited_by:
+    - consensus-manufacturing
+  tags:
+    - disinformation
+    - astroturfing
+    - bot-detection
+- id: 49c71f5788c7df3d
+  url: https://www.gov.uk/government/news/global-leaders-agree-to-launch-first-international-network-of-ai-safety-institutes-to-boost-understanding-of-ai
+  title: international network of AI Safety Institutes
+  type: government
+  publication_id: uk-gov
+  tags:
+    - safety
+  cited_by:
+    - slow-takeoff-muddle
+- id: e6f690f02232ca33
+  url: https://www.gov.uk/government/publications/international-ai-safety-report
+  title: International AI Safety Report (2025)
+  type: government
+  publication_id: uk-gov
+  tags:
+    - safety
+  cited_by:
+    - slow-takeoff-muddle

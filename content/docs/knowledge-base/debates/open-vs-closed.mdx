@@ -1,0 +1,449 @@
+---
+title: "Open vs Closed Source AI"
+description: "The safety implications of releasing AI model weights publicly versus keeping them proprietary. Open model performance gap narrowed from 8% to 1.7% in 2024, with 1.2B+ Llama downloads by April 2025. DeepSeek R1 demonstrated 90-95% cost reduction. NTIA 2024 concluded evidence insufficient to warrant restrictions, while EU AI Act exempts non-systemic open models."
+sidebar:
+  order: 3
+importance: 67.5
+quality: 60
+lastEdited: "2026-01-29"
+llmSummary: "Comprehensive analysis of open vs closed source AI debate, documenting that open model performance gap narrowed from 8% to 1.7% in 2024, with 1.2B+ Llama downloads by April 2025 and DeepSeek R1 demonstrating 90-95% cost reduction. Research shows fine-tuning can remove safety guardrails in hours, while NTIA 2024 found insufficient evidence to restrict open weights and EU AI Act exempts non-systemic open models below 10²⁵ FLOPs."
+ratings:
+  novelty: 4.2
+  rigor: 6.8
+  actionability: 5.5
+  completeness: 7.5
+metrics:
+  wordCount: 1203
+  citations: 41
+  tables: 14
+  diagrams: 1
+clusters: ["ai-safety", "governance"]
+---
+import {ComparisonTable, DisagreementMap, InfoBox, KeyQuestions, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
+
+<DataExternalLinks pageId="open-vs-closed" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Market Trajectory** | Open models closing gap rapidly | Performance difference narrowed from 8% to 1.7% in one year ([Stanford HAI 2025](https://hai.stanford.edu/ai-index/2025-ai-index-report)) |
+| **Adoption Scale** | 1.2B+ Llama downloads by April 2025 | [Meta reports](https://ai.meta.com/blog/future-of-ai-built-with-llama/) 53% growth in Q1 2025; 50%+ Fortune 500 experimenting |
+| **Enterprise Share** | Open source declining slightly | 11-13% enterprise workloads use open models, down from 19% in 2024 ([Menlo Ventures](https://menlovc.com/perspective/2025-mid-year-llm-market-update/)) |
+| **Cost Efficiency** | Open dramatically cheaper | DeepSeek R1 runs 20-50x cheaper than comparable closed models; 90-95% training cost reduction |
+| **Safety Guardrails** | Significant vulnerability | Fine-tuning can remove safety training in hours; "uncensored" variants appear within days of release |
+| **Regulatory Status** | Cautiously permissive | NTIA 2024: insufficient evidence to restrict; <EntityLink id="eu-ai-act">EU AI Act</EntityLink>: exemptions for non-systemic open models |
+| **Geopolitical Impact** | Complicates Western restraint | DeepSeek demonstrates frontier capabilities from China; unilateral restrictions less effective |
+
+<InfoBox
+  type="crux"
+  title="Open vs Closed Source AI"
+  customFields={[
+    { label: "Question", value: "Should frontier AI model weights be released publicly?" },
+    { label: "Stakes", value: "Balance between safety, innovation, and democratic access" },
+    { label: "Current Trend", value: "Major labs increasingly keeping models closed" },
+  ]}
+/>
+
+One of the most heated debates in AI: Should powerful AI models be released as open source (weights publicly available), or kept closed to prevent misuse? The debate intensified following Meta's Llama releases, Mistral's emergence as a European open-weights champion, and DeepSeek's 2025 disruption demonstrating Chinese open models at the frontier.
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [techtarget.com](https://www.techtarget.com/searchenterpriseai/feature/Attributes-of-open-vs-closed-AI-explained) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Open-source_artificial_intelligence) |
+
+
+## Key Arguments Summary
+
+| Argument | For Open Weights | For Closed Models |
+|----------|------------------|-------------------|
+| **Safety** | Enables external scrutiny and vulnerability discovery; "security through transparency" parallels open-source software | Prevents removal of safety guardrails; maintains ability to revoke access; enables monitoring for misuse |
+| **Innovation** | Accelerates research through global collaboration; enables startups and academics to build on frontier work | Controlled deployment allows careful capability assessment before wider release |
+| **Security** | Distributed development reduces single points of failure | Prevents adversaries from accessing and weaponizing capabilities |
+| **Power Concentration** | Prevents AI monopoly by a few corporations; [LeCun argues](https://time.com/6694432/yann-lecun-meta-ai-interview/) concentration is "a much bigger danger than everything else" | Responsible actors can implement safety measures that open release cannot |
+| **Accountability** | Public weights enable third-party auditing and bias detection | Clear liability chain; developers can update, patch, and control deployment |
+| **Misuse Potential** | Knowledge democratization; misuse happens regardless of openness | [RAND research](https://www.rand.org/content/dam/rand/pubs/research_reports/RRA2800/RRA2849-1/RAND_RRA2849-1.pdf) shows weights are theft targets; "uncensored" derivatives appear within days of release |
+
+## Trade-offs Overview
+
+<Mermaid client:load chart={`
+flowchart TD
+    RELEASE[Model Weight Release Decision] --> OPEN[Open Weights]
+    RELEASE --> CLOSED[Closed Weights]
+
+    OPEN --> O_GOOD[Benefits]
+    OPEN --> O_BAD[Risks]
+
+    O_GOOD --> O1[External scrutiny<br/>and red-teaming]
+    O_GOOD --> O2[Innovation acceleration<br/>global collaboration]
+    O_GOOD --> O3[Reduced power<br/>concentration]
+    O_GOOD --> O4[Lower costs<br/>20-50x cheaper inference]
+
+    O_BAD --> O5[Guardrail removal<br/>via fine-tuning]
+    O_BAD --> O6[No usage monitoring<br/>or access revocation]
+    O_BAD --> O7[Irreversible release<br/>cannot recall weights]
+
+    CLOSED --> C_GOOD[Benefits]
+    CLOSED --> C_BAD[Risks]
+
+    C_GOOD --> C1[Maintained control<br/>and monitoring]
+    C_GOOD --> C2[Enforceable<br/>safety guardrails]
+    C_GOOD --> C3[Ability to patch<br/>and update]
+
+    C_BAD --> C4[Power concentration<br/>in few companies]
+    C_BAD --> C5[Higher costs<br/>access barriers]
+    C_BAD --> C6[Limited external<br/>safety research]
+
+    style OPEN fill:#e6f3ff
+    style CLOSED fill:#ffe6e6
+    style O_GOOD fill:#ccffcc
+    style O_BAD fill:#ffcccc
+    style C_GOOD fill:#ccffcc
+    style C_BAD fill:#ffcccc
+`} />
+
+## Stakeholder Positions
+
+| Stakeholder | Position | Key Rationale | Evidence |
+|-------------|----------|---------------|----------|
+| **Meta (Yann LeCun)** | Strong open | Power concentration is the real existential risk; open source enables safety through scrutiny | Released Llama 2, Llama 3 (8B-405B parameters) |
+| **Anthropic (Dario Amodei)** | Cautious closed | Irreversibility of release; responsible scaling requires control | Claude models closed; Responsible Scaling Policy |
+| **OpenAI (Sam Altman)** | Closed (shifted) | Safety concerns grew with capabilities; GPT-4 too capable for open release | Shifted from GPT-2 open to GPT-4 closed |
+| **Mistral AI** | Strong open | European AI sovereignty; innovation through openness | Mistral 7B/8x7B/Large released with minimal restrictions |
+| **DeepSeek (China)** | Strategic open | Demonstrates Chinese frontier capabilities; [signed AI Safety Commitments](https://carnegieendowment.org/research/2025/01/deepseek-and-other-chinese-firms-converge-with-western-companies-on-ai-promises) alongside 16 Chinese firms | DeepSeek-R1 open weights, though with [documented censorship and security issues](https://www.nist.gov/news-events/news/2025/09/caisi-evaluation-deepseek-ai-models-finds-shortcomings-and-risks) |
+| **U.S. Government (NTIA)** | Cautiously pro-open | [2024 report](https://www.ntia.gov/programs-and-initiatives/artificial-intelligence/open-model-weights-report) found insufficient evidence to restrict open weights; recommends monitoring | Called for research and risk indicators, not immediate restrictions |
+| **EU Regulators** | Risk-based | AI Act applies stricter rules to "foundation models" including open ones | Foundation models face transparency and safety testing requirements |
+| **Eliezer Yudkowsky** | Strongly closed | Open-sourcing powerful AI is existential risk | Public advocacy against any frontier model release |
+
+## What's At Stake
+
+**Open weights** (often called "open source" though technically distinct) means releasing model weights so anyone can download, modify, and run the model locally. Meta clarified in 2024 that Llama models are "open weight" rather than fully open source, as the training data and code remain proprietary. Examples include Llama 2/3, Mistral, Falcon, and DeepSeek-R1. As of April 2025, Llama models alone had been downloaded over 1.2 billion times, with 20,000+ derivative models published on [Hugging Face](https://huggingface.co/). Once released, weights cannot be recalled or controlled, and anyone can fine-tune for any purpose—including removing safety features. Research shows that "jailbreak-tuning" can remove essentially all safety training within hours using modest compute ([FAR.AI 2024](https://far.ai/post/2024-10-poisoning/)). Within days of Meta releasing Llama 2, "uncensored" versions appeared on Hugging Face with safety guardrails stripped away.
+
+**Closed source** means keeping weights proprietary, providing access only via API. Examples include GPT-4, Claude, and Gemini. Labs maintain control and can monitor usage patterns, update models, revoke access for policy violations, and refuse harmful requests. However, this concentrates power in a small number of corporations.
+
+## Current Landscape (2024-2025)
+
+The landscape shifted dramatically with DeepSeek's January 2025 release of R1, demonstrating that Chinese labs could produce frontier-competitive open models. Before DeepSeek, Meta's Llama family dominated the open-weights ecosystem, with models ranging from 7B to 405B parameters.
+
+### Market Statistics (2024-2025)
+
+| Metric | Value | Source | Trend |
+|--------|-------|--------|-------|
+| **Open source model downloads** | 30,000-60,000 new models/month on Hugging Face | [Red Hat](https://developers.redhat.com/articles/2026/01/07/state-open-source-ai-models-2025) | Exponential growth |
+| **Llama cumulative downloads** | 1.2 billion (April 2025) | [Meta](https://ai.meta.com/blog/future-of-ai-built-with-llama/) | +53% in Q1 2025 |
+| **Enterprise open source share** | 11-13% of LLM workloads | [Menlo Ventures](https://menlovc.com/perspective/2025-mid-year-llm-market-update/) | Down from 19% in 2024 |
+| **Performance gap (open vs closed)** | 1.7% on Chatbot Arena | [Stanford HAI](https://hai.stanford.edu/ai-index/2025-ai-index-report) | Narrowed from 8% in Jan 2024 |
+| **Global AI spending** | \$17B in 2025 | [Menlo Ventures](https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/) | 3.2x YoY increase from \$11.5B |
+| **DeepSeek R1 training cost** | Under \$1 million | [World Economic Forum](https://www.weforum.org/stories/2025/02/open-source-ai-innovation-deepseek/) | 90-95% below Western frontier models |
+| **Fortune 500 Llama adoption** | 50%+ experimenting | [Meta](https://ai.meta.com/blog/future-of-ai-built-with-llama/) | Including Spotify, AT&T, DoorDash |
+
+<ComparisonTable
+  client:load
+  title="Open vs Closed Models"
+  items={[
+    {
+      name: "GPT-4/4o",
+      attributes: {
+        "Openness": "Closed",
+        "Access": "API only",
+        "Safety": "Strong guardrails, monitored",
+        "Customization": "Limited fine-tuning via API",
+        "Cost": "Pay per token",
+        "Control": "OpenAI maintains full control"
+      }
+    },
+    {
+      name: "Claude 3/3.5",
+      attributes: {
+        "Openness": "Closed",
+        "Access": "API only",
+        "Safety": "Constitutional AI, monitored",
+        "Customization": "Limited",
+        "Cost": "Pay per token",
+        "Control": "Anthropic maintains full control"
+      }
+    },
+    {
+      name: "Llama 3.1 405B",
+      attributes: {
+        "Openness": "Open weights",
+        "Access": "Download and run locally",
+        "Safety": "Responsible Use Guide (often ignored)",
+        "Customization": "Full fine-tuning possible",
+        "Cost": "Free (need substantial compute)",
+        "Control": "No control after release"
+      }
+    },
+    {
+      name: "Mistral Large 2",
+      attributes: {
+        "Openness": "Open weights",
+        "Access": "Download and run locally",
+        "Safety": "Transparent 'no moderation mechanism'",
+        "Customization": "Full fine-tuning possible",
+        "Cost": "Free (need own compute)",
+        "Control": "No control after release"
+      }
+    },
+    {
+      name: "DeepSeek-R1",
+      attributes: {
+        "Openness": "Open weights",
+        "Access": "Download and run locally",
+        "Safety": "Censors Chinese-sensitive topics; security vulnerabilities on political prompts",
+        "Customization": "Full fine-tuning possible",
+        "Cost": "Free (need own compute)",
+        "Control": "Subject to Chinese regulatory environment"
+      }
+    }
+  ]}
+/>
+
+## Key Positions
+
+<DisagreementMap
+  client:load
+  title="Positions on Open Source AI"
+  description="Where different actors stand on releasing model weights"
+  positions={[
+    {
+      name: "Yann LeCun (Meta)",
+      stance: "strong-open",
+      confidence: "high",
+      reasoning: "Argues open source is essential for safety, innovation, and preventing corporate monopoly. Concentration of AI power is the real risk.",
+      evidence: ["Llama releases", "Public statements"],
+      quote: "Open source makes AI safer, not more dangerous"
+    },
+    {
+      name: "Dario Amodei (Anthropic)",
+      stance: "cautious-closed",
+      confidence: "high",
+      reasoning: "Concerned about irreversibility and misuse. Believes responsible scaling means keeping frontier models closed.",
+      evidence: ["Claude is closed", "Responsible Scaling Policy"],
+      quote: "Can't unring the bell once weights are public"
+    },
+    {
+      name: "Sam Altman (OpenAI)",
+      stance: "closed",
+      confidence: "high",
+      reasoning: "Shifted from open (GPT-2) to closed (GPT-4) as capabilities increased. Cites safety concerns.",
+      evidence: ["GPT-4 closed", "Public statements"],
+      quote: "GPT-4 is too dangerous to release openly"
+    },
+    {
+      name: "Demis Hassabis (Google DeepMind)",
+      stance: "mostly-closed",
+      confidence: "medium",
+      reasoning: "Gemini models are closed, but Google has history of open research. Pragmatic about risks.",
+      evidence: ["Gemini closed", "Some open research"],
+      quote: "Case-by-case based on capabilities"
+    },
+    {
+      name: "Stability AI",
+      stance: "strong-open",
+      confidence: "high",
+      reasoning: "Business model and philosophy built on open source. Argues openness is ethical imperative.",
+      evidence: ["Stable Diffusion", "Open models"],
+      quote: "AI should be accessible to everyone"
+    },
+    {
+      name: "Eliezer Yudkowsky",
+      stance: "strongly-closed",
+      confidence: "high",
+      reasoning: "Believes open sourcing powerful AI is one of the most dangerous things we could do.",
+      evidence: ["Public writing"],
+      quote: "Open sourcing AGI would be suicide"
+    }
+  ]}
+/>
+
+## Safety Guardrail Effectiveness
+
+Research on open model safety reveals significant challenges in maintaining guardrails once weights are released.
+
+| Factor | Finding | Implication | Source |
+|--------|---------|-------------|--------|
+| **Guardrail bypass techniques** | Emoji smuggling achieves 100% evasion against some guardrails | Even production-grade defenses can be bypassed | [arXiv](https://arxiv.org/html/2504.11168v1) |
+| **Fine-tuning vulnerability** | "Jailbreak-tuning" enables removal of all safety training | Every fine-tunable model has an "evil twin" potential | [FAR.AI](https://far.ai/post/2024-10-poisoning/) |
+| **Open model guardrail scores** | Best open model (Phi-4): 84/100; Worst (Gemma-3): 57/100 | Wide variance in baseline safety | [ADL](https://www.adl.org/resources/report/safety-divide-open-source-ai-models-fall-short-guardrails-antisemitic-dangerous) |
+| **Larger models more vulnerable** | Tested 23 LLMs: larger models more susceptible to poisoning | Capability-safety tradeoff worsens at scale | [FAR.AI](https://far.ai/post/2024-10-poisoning/) |
+| **Time to "uncensored" variants** | Hours to days after release | Community rapidly removes restrictions | Hugging Face observations |
+| **Multilingual guardrails** | OpenGuardrails supports 119 languages | Safety coverage possible but not universal | [Help Net Security](https://www.helpnetsecurity.com/2025/11/06/openguardrails-open-source-make-ai-safer/) |
+
+## Key Cruxes
+
+<KeyQuestions
+  client:load
+  questions={[
+    {
+      question: "Can safety guardrails be made robust to fine-tuning?",
+      positions: [
+        {
+          position: "No - always removable",
+          confidence: "high",
+          reasoning: "Research shows safety training is superficial and easily overridden with fine-tuning.",
+          implications: "Open source will always enable misuse"
+        },
+        {
+          position: "Yes - with better techniques",
+          confidence: "low",
+          reasoning: "We can make safety intrinsic to the model, not just surface-level training.",
+          implications: "Open source can be safe"
+        }
+      ]
+    },
+    {
+      question: "Will open models leak or be recreated anyway?",
+      positions: [
+        {
+          position: "Yes - inevitable",
+          confidence: "medium",
+          reasoning: "Too many actors with capability and motivation. Secrets don't keep in ML.",
+          implications: "Better to shape open ecosystem than fight it"
+        },
+        {
+          position: "No - frontier models stay ahead",
+          confidence: "medium",
+          reasoning: "Leading labs maintain advantage. Not everything leaks.",
+          implications: "Keeping closed is feasible and valuable"
+        }
+      ]
+    },
+    {
+      question: "At what capability level does open source become too dangerous?",
+      positions: [
+        {
+          position: "Already crossed it",
+          confidence: "low",
+          reasoning: "Current models can assist in serious harms if unconstrained.",
+          implications: "Should stop open sourcing now"
+        },
+        {
+          position: "Not even close yet",
+          confidence: "medium",
+          reasoning: "Current models not capable enough for catastrophic misuse.",
+          implications: "Continue open sourcing current generations"
+        },
+        {
+          position: "Dangerous at AGI-level",
+          confidence: "high",
+          reasoning: "When models can autonomously plan and execute complex tasks, open source becomes untenable.",
+          implications: "Have time to decide on framework"
+        }
+      ]
+    },
+    {
+      question: "Do the benefits of scrutiny outweigh misuse risks?",
+      positions: [
+        {
+          position: "Yes - security through transparency",
+          confidence: "medium",
+          reasoning: "More eyes finding and fixing problems. History of open source security.",
+          implications: "Open source is safer"
+        },
+        {
+          position: "No - attackers benefit more than defenders",
+          confidence: "medium",
+          reasoning: "One attacker can exploit what thousands of defenders miss.",
+          implications: "Closed is safer"
+        }
+      ]
+    }
+  ]}
+/>
+
+## Possible Middle Grounds
+
+Several proposals aim to capture benefits of both approaches while mitigating risks:
+
+| Approach | Description | Adoption Status | Effectiveness Estimate |
+|----------|-------------|-----------------|----------------------|
+| **Staged Release** | 6-12 month delay after initial deployment before open release | Proposed; not yet implemented at scale | Medium (allows risk monitoring) |
+| **Structured Access** | Weights provided to vetted researchers under agreement | GPT-2 XL initially; some academic partnerships | Medium-High for research |
+| **Differential Access** | Smaller models open, frontier models closed | Current de facto standard | Medium (capability gap narrows) |
+| **Safety-Contingent Release** | Release only if safety evaluations pass thresholds | Anthropic RSP (for deployment, not release) | High if thresholds appropriate |
+| **Hardware Controls** | Release weights but require specialized hardware to run | Not implemented | Low-Medium (hardware becomes accessible) |
+| **Capability Thresholds** | Open below certain compute/parameter thresholds | EU AI Act: 10²⁵ FLOPs as "systemic risk" cutoff | Uncertain (thresholds may become obsolete) |
+
+## The International Dimension
+
+The geopolitical calculus shifted dramatically in 2025. DeepSeek's R1 release demonstrated that keeping Western models closed does not prevent capable open models from emerging globally. The market impact was immediate: NVIDIA reportedly lost [\$100 billion in market capitalization](https://www.whitefiber.com/blog/deepseek-r1-explained) in a single day, and by month's end DeepSeek had overtaken ChatGPT as the most downloaded free app on the Apple App Store in the US.
+
+**DeepSeek's Impact:**
+DeepSeek's January 2025 release sent "shockwaves globally" by demonstrating frontier capabilities in an open Chinese model at a fraction of Western costs—reportedly [under \$1 million](https://www.weforum.org/stories/2025/02/open-source-ai-innovation-deepseek/) in training costs compared to hundreds of millions for comparable Western models. The model runs 20-50x cheaper at inference than OpenAI's comparable offerings. However, [NIST/CAISI evaluations](https://www.nist.gov/news-events/news/2025/09/caisi-evaluation-deepseek-ai-models-finds-shortcomings-and-risks) found significant issues: DeepSeek models were 12x more susceptible to agent hijacking attacks than U.S. frontier models, and [CrowdStrike research](https://thehackernews.com/2025/11/chinese-ai-model-deepseek-r1-generates.html) showed the model produces insecure code when prompted with politically sensitive terms (Tibet, Uyghurs). Several countries including Italy, Australia, and Taiwan have banned government use of DeepSeek.
+
+**If US/Western labs stay closed:**
+- May slow dangerous capabilities domestically
+- But China has demonstrated strategic open-sourcing (DeepSeek)
+- Could lose innovation race and talent to more open ecosystems
+- Does not prevent proliferation given global competition
+
+**If US/Western labs open source:**
+- Loses monitoring capability over deployment
+- But levels playing field globally and enables allies
+- Benefits developing world and academic research
+- May shape global norms through responsible release practices
+
+**Coordination problem:**
+- Optimal if all major powers coordinate on release thresholds
+- [Carnegie research](https://carnegieendowment.org/research/2024/07/beyond-open-vs-closed-emerging-consensus-and-key-questions-for-foundation-ai-model-governance) notes emerging convergence on risk frameworks
+- Unilateral Western restraint may simply cede ground to less safety-conscious actors
+- DeepSeek's signing of AI Safety Commitments suggests potential for Chinese engagement
+
+## Implications for Different Risks
+
+The open vs closed question has different implications for different risks:
+
+**Misuse risks (bioweapons, cyberattacks):**
+- Clear case for closed: irreversibility, removal of guardrails
+- Open source dramatically increases risk once capabilities cross danger thresholds
+- However, the March 2024 "ShadowRay" attack on Ray (an open-source AI framework used by Uber, Amazon, OpenAI) showed that open ecosystems create [additional attack surfaces](https://www.rstreet.org/?post_type=research&p=85817)
+
+**Accident risks (unintended behavior):**
+- Mixed: Open source enables external safety research and red-teaming
+- But also enables less careful deployment by actors who may not understand risks
+- Depends on whether scrutiny benefits or proliferation risks dominate
+
+**Structural risks (power concentration):**
+- Clear case for open: prevents AI monopoly by a few corporations
+- But only if open source is actually accessible (frontier models require substantial compute)
+- LeCun's concern: "a very bad future in which all of our information diet is controlled by a small number of companies"
+
+**Race dynamics:**
+- Open source may accelerate race (lower barriers to entry)
+- But also may reduce duplicated effort (can build on shared base)
+- DeepSeek's cost-efficient training suggests open release may not slow capability development
+
+## Key Policy Developments
+
+**U.S. Policy:** The [NTIA's July 2024 report](https://www.ntia.gov/programs-and-initiatives/artificial-intelligence/open-model-weights-report) concluded that evidence is "insufficient to definitively determine either that restrictions on such open-weight models are warranted, or that restrictions will never be appropriate in the future." It recommended monitoring and research rather than immediate restrictions.
+
+**California SB-1047:** In September 2024, Governor Newsom vetoed this bill which would have imposed liability requirements on AI developers. The veto cited concerns about stifling innovation without meaningfully improving safety.
+
+**EU AI Act:** Takes a risk-based approach, entered into force August 2024 with GPAI model obligations applicable from [August 2025](https://digital-strategy.ec.europa.eu/en/policies/guidelines-gpai-providers). Open-source models receive [exemptions](https://linuxfoundation.eu/newsroom/ai-act-explainer) from transparency obligations if they use permissive licenses and publicly share architecture information—but models with "systemic risk" (training compute exceeding 10²⁵ FLOPs) face full compliance requirements regardless of openness. France, Germany, and Italy initially opposed applying strict rules to open models, citing innovation concerns.
+
+**Emerging Consensus:** [Carnegie Endowment research](https://carnegieendowment.org/research/2024/07/beyond-open-vs-closed-emerging-consensus-and-key-questions-for-foundation-ai-model-governance) in July 2024 found it is "no longer accurate to cast decisions about model and weight release as an ideological debate between rigid 'pro-open' and 'anti-open' camps." Instead, different camps have begun to converge on recognizing open release as a "positive and enduring feature of the AI ecosystem, even as it also brings potential risks."
+
+### Regulatory Comparison
+
+| Jurisdiction | Policy Stance | Open Model Treatment | Enforcement Status |
+|--------------|---------------|---------------------|-------------------|
+| **United States (NTIA)** | Cautiously pro-open | [No restrictions recommended](https://www.ntia.gov/programs-and-initiatives/artificial-intelligence/open-model-weights-report) without clearer risk evidence | Monitoring via AISI |
+| **EU AI Act** | Risk-based | [Exemptions](https://linuxfoundation.eu/newsroom/ai-act-explainer) for non-systemic models; full rules above 10²⁵ FLOPs | Applicable August 2025 |
+| **California (SB-1047)** | Proposed liability | Would have imposed developer liability; vetoed September 2024 | Not enacted |
+| **China** | Strategic openness | State-backed labs releasing competitive open models (DeepSeek, Qwen) | Active support |
+| **UK** | Light-touch | No specific open model restrictions; voluntary commitments | Monitoring via AISI |
+
+## References
+
+- [NTIA Report on Dual-Use Foundation Models with Widely Available Model Weights (July 2024)](https://www.ntia.gov/programs-and-initiatives/artificial-intelligence/open-model-weights-report)
+- [Carnegie Endowment: Beyond Open vs. Closed (July 2024)](https://carnegieendowment.org/research/2024/07/beyond-open-vs-closed-emerging-consensus-and-key-questions-for-foundation-ai-model-governance)
+- [RAND: Securing AI Model Weights (2024)](https://www.rand.org/content/dam/rand/pubs/research_reports/RRA2800/RRA2849-1/RAND_RRA2849-1.pdf)
+- [TIME: Yann LeCun Interview on Open AI (2024)](https://time.com/6694432/yann-lecun-meta-ai-interview/)
+- [NIST/CAISI: Evaluation of DeepSeek AI Models (September 2025)](https://www.nist.gov/news-events/news/2025/09/caisi-evaluation-deepseek-ai-models-finds-shortcomings-and-risks)
+- [Carnegie: DeepSeek and Chinese AI Safety Commitments (January 2025)](https://carnegieendowment.org/research/2025/01/deepseek-and-other-chinese-firms-converge-with-western-companies-on-ai-promises)
+- [R Street Institute: Mapping the Open-Source AI Debate (2024)](https://www.rstreet.org/?post_type=research&p=85817)
+

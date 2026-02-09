@@ -1,0 +1,364 @@
+---
+title: "Provable / Guaranteed Safe AI"
+description: "Analysis of AI systems designed with formal mathematical safety guarantees from the ground up. The UK's ARIA programme has committed £59M to develop 'Guaranteed Safe AI' systems with verifiable properties, targeting Stage 3 by 2028. Current neural network verification handles networks up to 10^6 parameters, but frontier models exceed 10^12—a 6 order-of-magnitude gap."
+sidebar:
+  label: "Provable Safe"
+  order: 10
+quality: 64
+lastEdited: "2026-01-28"
+importance: 72.5
+llmSummary: "Provable Safe AI uses formal verification to provide mathematical safety guarantees, with UK's ARIA investing £59M through 2028. Current verification handles ~10^6 parameters while frontier models exceed 10^12 (6 orders of magnitude gap), yielding 1-5% probability of dominance at TAI, with critical unsolved challenge of verifying world models match reality."
+ratings:
+  novelty: 5.5
+  rigor: 7
+  actionability: 6.5
+  completeness: 7.5
+metrics:
+  wordCount: 287
+  citations: 20
+  tables: 32
+  diagrams: 2
+clusters: ["ai-safety", "governance"]
+---
+import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="provable-safe" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Technical Maturity** | Early-stage (TRL 2-3) | VNN-COMP 2024 verified networks with ≈10^6 parameters; frontier models have 10^12+ |
+| **Funding Commitment** | Substantial (£59M+) | UK ARIA's Safeguarded AI programme, 3-5 year timeline through 2028 |
+| **Research Community** | Growing coalition | 17 co-authors on foundational paper including Bengio, Russell, Tegmark, Szegedy |
+| **Scalability Gap** | 6 orders of magnitude | Current verification handles ~1M parameters; GPT-4 class models have ≈1.7T parameters |
+| **Timeline to Competitiveness** | 2032+ for general AI | ARIA targets Stage 3 by 2028; competitive general AI remains speculative |
+| **Adoption Likelihood** | 1-5% at TAI | Strong safety properties but severe capability-competitiveness uncertainty |
+| **Key Bottleneck** | World model verification | Proving formal models match physical reality is fundamentally undecidable in general |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [alignmentforum.org](https://www.alignmentforum.org/posts/DZuBHHKao6jsDDreH/in-response-to-critiques-of-guaranteed-safe-ai) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/AI_safety) |
+| <EntityLink id="lesswrong">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/P8XcbnYi7ooB2KR2j/provably-safe-ai-worldview-and-projects) |
+| arXiv | [arxiv.org](https://arxiv.org/html/2405.06624v2) |
+
+
+## Overview
+
+Provable or "Guaranteed Safe" AI refers to approaches that aim to build AI systems with **mathematical safety guarantees** rather than empirical safety measures. The core premise is that we should be able to *prove* that an AI system will behave safely, not merely *hope* based on testing.
+
+The most prominent current effort is **Davidad's Open Agency Architecture**, funded through the UK's ARIA (Advanced Research + Invention Agency) programme. This approach represents a fundamentally different philosophy from mainstream AI development: safety through <EntityLink id="formal-verification">formal verification</EntityLink> rather than alignment through training.
+
+Estimated probability of being dominant at transformative AI: **1-5%**. This is ambitious and faces significant scalability questions, but offers uniquely strong safety properties if achievable.
+
+## Formal Verification Approaches
+
+The field of guaranteed safe AI encompasses multiple verification methodologies, each with different tradeoffs between expressiveness, scalability, and the strength of guarantees provided.
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph approaches["Guaranteed Safe AI Approaches"]
+        direction TB
+        subgraph formal["Formal Verification"]
+            smt["SMT-Based<br/>(Satisfiability Modulo Theories)"]
+            abstract["Abstract Interpretation"]
+            bound["Bound Propagation<br/>(α,β-CROWN)"]
+        end
+
+        subgraph hybrid["Hybrid Approaches"]
+            neuro["Neuro-Symbolic<br/>Integration"]
+            shield["Verification-Guided<br/>Shielding"]
+            runtime["Runtime<br/>Monitoring"]
+        end
+
+        subgraph world["World Model Approaches"]
+            physics["Physics-Based<br/>Simulators"]
+            causal["Causal<br/>Models"]
+            probabilistic["Probabilistic<br/>Programs"]
+        end
+    end
+
+    subgraph guarantees["Safety Guarantee Types"]
+        local["Local Robustness<br/>(perturbation bounds)"]
+        global["Global Properties<br/>(invariants)"]
+        temporal["Temporal Properties<br/>(always/eventually)"]
+    end
+
+    formal --> local
+    formal --> global
+    hybrid --> temporal
+    world --> global
+
+    style approaches fill:#e8f4e8
+    style guarantees fill:#fff3e0
+`} />
+
+### Verification Methodology Comparison
+
+| Approach | Scalability | Guarantee Strength | Current Capability | Key Tools |
+|----------|-------------|-------------------|-------------------|-----------|
+| **SMT-Based** | Low (≈10^4 neurons) | Complete | Image classifiers | Reluplex, Marabou |
+| **Bound Propagation** | Medium (≈10^6 neurons) | Sound but incomplete | CNNs, transformers | α,β-CROWN, auto_LiRPA |
+| **Abstract Interpretation** | Medium | Over-approximate | Safety-critical systems | DeepPoly, PRIMA |
+| **Runtime Monitoring** | High | Empirical | Production systems | NNV 2.0, SafeRL |
+| **Compositional** | Potentially high | Modular proofs | Research stage | ARIA programme |
+
+### VNN-COMP 2024 Results
+
+The [5th International Verification of Neural Networks Competition (VNN-COMP 2024)](https://arxiv.org/abs/2412.19985) provides the most recent benchmarks for the field:
+
+| Metric | VNN-COMP 2024 | Trend |
+|--------|---------------|-------|
+| Participating teams | 8 | Stable |
+| Benchmark categories | 12 regular + 8 extended | Expanding |
+| Top performer | α,β-CROWN | Consistent leader since 2021 |
+| Largest verified network | ≈10^6 parameters | ≈10x improvement since 2021 |
+| Average solve time | Minutes to hours | Improving 30-50% annually |
+
+**Key finding:** The best tools can now verify local robustness properties on networks with millions of parameters in reasonable time, but this remains 6 orders of magnitude below frontier model scale.
+
+## Conceptual Framework
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph world["World Model (Verified)"]
+        physics["Physics Simulator"]
+        state["State Representation"]
+        predict["Prediction Engine"]
+    end
+
+    subgraph agent["Agent (Bounded)"]
+        goals["Formal Goal Spec"]
+        planner["Verified Planner"]
+        bounds["Safety Bounds"]
+    end
+
+    subgraph verify["Verification Layer"]
+        proofs["Safety Proofs"]
+        monitor["Runtime Monitor"]
+        audit["Audit Trail"]
+    end
+
+    goals --> planner
+    planner --> world
+    world --> predict
+    predict --> bounds
+    bounds --> proofs
+    proofs --> monitor
+    monitor --> |"Safe Action"| output["Output"]
+`} />
+
+## Key Properties
+
+| Property | Rating | Assessment |
+|----------|--------|------------|
+| **White-box Access** | HIGH | Designed for formal analysis from the ground up |
+| **Trainability** | DIFFERENT | May use verified synthesis, not just gradient descent |
+| **Predictability** | HIGH | Behavior bounded by formal proofs |
+| **Modularity** | HIGH | Compositional by design for modular proofs |
+| **Formal Verifiability** | HIGH | This is the core value proposition |
+
+## ARIA's Safeguarded AI Programme
+
+The UK's Advanced Research + Invention Agency (ARIA) has committed [£59 million over 3-5 years](https://www.aria.org.uk/) to the Safeguarded AI programme, led by Programme Director David "davidad" Dalrymple. This represents the largest government investment specifically targeting provably safe AI.
+
+### The Guaranteed Safe AI Framework
+
+The foundational paper ["Towards Guaranteed Safe AI"](https://arxiv.org/abs/2405.06624) (May 2024) was co-authored by 17 prominent researchers including Yoshua Bengio, Stuart Russell, Max Tegmark, Sanjit Seshia, Steve Omohundro, Christian Szegedy, Joe Halpern, Clark Barrett, Jeannette Wing, and Joshua Tenenbaum. It defines the core architecture:
+
+### Core Components
+
+| Component | Function | Verification Approach | Current Status |
+|-----------|----------|----------------------|----------------|
+| **World Model** | Formal representation of environment physics | Must be verifiably accurate for relevant domains | Research phase; physics simulators exist but verification gap remains |
+| **Safety Specification** | Mathematical statement of acceptable effects | Formal language being developed by ARIA TA 1.1 | Language spec targeted for 2025-2026 |
+| **Verifier** | Provides auditable proof certificates | Must check frontier model outputs against specs | Architecture defined; implementation pending |
+| **Runtime Monitor** | Checks all actions against safety proofs | Blocks any action that can't be verified safe | Demonstrated in narrow domains (ACAS Xu) |
+
+### ARIA Programme Structure
+
+| Technical Area | Focus | Funding | Timeline |
+|----------------|-------|---------|----------|
+| **TA 1.1** | Formal proof language development | £3.5M (10-16 grants) | April-May 2024 round completed |
+| **TA 1.2** | AI Production Facility | £18M | Winner announced October 2025; operational January 2026 |
+| **TA 2** | World model development | Not yet announced | 2025-2027 |
+| **TA 3** | Integration and demonstration | Not yet announced | 2027-2028 |
+
+**Key quote from davidad:** "The frontier model needs to submit a proof certificate, which is something that is written in a formal language that we're defining in another part of the program... This new language for proofs will hopefully be easy for frontier models to generate and then also easy for a deterministic, human-audited algorithm to check."
+
+### Key Technical Challenges
+
+| Challenge | Difficulty | Current Status | Quantified Gap |
+|-----------|------------|----------------|----------------|
+| **World model accuracy** | CRITICAL | Core unsolved problem - verifying model matches reality is undecidable in general | Physics simulators achieve less than 1% error in constrained domains; open-world accuracy unknown |
+| **Specification completeness** | HIGH | Formal specs may miss important values/constraints | Estimated 60-80% of human values may be difficult to formalize |
+| **Computational tractability** | HIGH | Verification can be exponentially expensive | SAT solving is NP-complete; neural network verification is co-NP-complete |
+| **Scalability gap** | VERY HIGH | Current tools verify ~10^6 parameters; frontier models have ≈10^12 | 6 orders of magnitude gap; closing at ≈10x per 3 years |
+| **Capability competitiveness** | HIGH | Unknown if verified systems can match unverified ones | No competitive benchmarks yet exist |
+| **Handling uncertainty** | MEDIUM | Formal methods traditionally assume certainty | Probabilistic verification emerging but less mature |
+
+According to the [Stanford Center for AI Safety whitepaper](https://aisafety.stanford.edu/whitepaper.pdf), the complexity and heterogeneity of AI systems means that formal verification of specifications is undecidable in general—even deciding whether a state of a linear hybrid system is reachable is undecidable.
+
+## Safety Implications
+
+### Advantages
+
+| Advantage | Explanation |
+|-----------|-------------|
+| **Mathematical guarantees** | If proofs hold, safety follows logically, not probabilistically |
+| **Auditable by construction** | Every decision can be traced to verified components |
+| **Clear failure modes** | When something fails, you know *which* assumption was violated |
+| **No emergent deception** | Behavior is bounded by proofs, not learned tendencies |
+| **Compositionality** | Can build larger safe systems from smaller verified components |
+
+### Limitations and Risks
+
+| Limitation | Severity | Explanation |
+|------------|----------|-------------|
+| **May not scale to AGI** | HIGH | Unknown if formal methods can handle AGI-level complexity |
+| **Capability tax** | HIGH | Verified systems may be significantly less capable |
+| **World model verification** | CRITICAL | The world model must be correct; this is extremely hard |
+| **Specification gaming** | MEDIUM | System optimizes formal spec, which may miss true intent |
+| **Implementation bugs** | MEDIUM | The implementation must match the formal model |
+
+## Research Landscape
+
+### Key Organizations
+
+| Organization | Role | Funding | Focus |
+|--------------|------|---------|-------|
+| **ARIA (UK)** | Primary funder of Safeguarded AI | £59M committed | End-to-end verified AI systems |
+| **Stanford Center for AI Safety** | Academic research | University + grants | Formal methods for ML |
+| **George Mason ROARS Lab** | Verification tool development | NSF funding | NeuralSAT verifier (2nd place VNN-COMP 2024) |
+| **CMU + Berkeley** | α,β-CROWN development | DARPA, NSF | Leading verification tool |
+| **MIRI** | Theoretical foundations | Private donors (≈\$1M/year) | Agent foundations theory |
+
+### Key People
+
+| Person | Affiliation | Contribution |
+|--------|-------------|--------------|
+| **David "davidad" Dalrymple** | ARIA | Safeguarded AI programme lead; GS AI framework author |
+| **Yoshua Bengio** | Mila/ARIA | GS AI paper co-author; Scientific Director for ARIA |
+| **Stuart Russell** | UC Berkeley | GS AI co-author; provably beneficial AI advocate |
+| **Sanjit Seshia** | UC Berkeley | Verified AI, scenic language for testing |
+| **Clark Barrett** | Stanford | SMT solver development (CVC5) |
+| **Jeannette Wing** | Columbia | Trustworthy AI initiative |
+
+### Key Publications
+
+| Publication | Year | Authors | Impact |
+|-------------|------|---------|--------|
+| [Towards Guaranteed Safe AI](https://arxiv.org/abs/2405.06624) | 2024 | Dalrymple, Skalse, Bengio, Russell, Tegmark + 12 others | Foundational framework paper defining GS AI |
+| [VNN-COMP 2024 Report](https://arxiv.org/abs/2412.19985) | 2024 | Brix, Bak, Johnson, Wu | State-of-the-art verification benchmarks |
+| [Safety Verification of DNNs](https://arxiv.org/abs/1610.06940) | 2017 | Huang et al. | First systematic DNN verification framework |
+| [ARIA Programme Thesis v1.2](https://www.aria.org.uk/media/3nhijno4/aria-safeguarded-ai-programme-thesis-v1.pdf) | 2024 | Dalrymple | Detailed technical roadmap |
+| [Survey: LLM Safety via V&V](https://arxiv.org/abs/2305.11391) | 2024 | Huang et al. | Comprehensive review of verification for LLMs |
+| [Toward Verified AI](https://cacm.acm.org/research/toward-verified-artificial-intelligence/) | 2017 | Seshia, Sadigh, Sastry | CACM overview of challenges |
+
+## Comparison with Other Approaches
+
+| Aspect | Provable Safe | Heavy Scaffolding | Standard RLHF |
+|--------|---------------|-------------------|---------------|
+| Safety guarantees | STRONG (if achievable) | PARTIAL (scaffold only) | WEAK (empirical) |
+| Current capability | LOW | MEDIUM | HIGH |
+| Scalability | UNKNOWN | PROVEN | PROVEN |
+| Development cost | VERY HIGH | MEDIUM | LOW |
+| Interpretability | HIGH by design | MEDIUM | LOW |
+
+## Probability Assessment
+
+### Quantified Probability Factors
+
+| Factor | Estimate | Reasoning |
+|--------|----------|-----------|
+| **Technical feasibility by 2035** | 15-30% | Scalability gap closing at ≈10x/3 years; still 3-4 doublings needed |
+| **Competitive capability if feasible** | 20-40% | Compositional approaches may enable capability parity |
+| **Adoption if competitive** | 40-60% | Regulatory pressure and liability concerns favor verified systems |
+| **Compound probability** | 1.2-7.2% | Product of above factors |
+| **Central estimate** | **3-5%** | Accounting for correlation and unknown unknowns |
+
+### Arguments for Higher Probability (greater than 5%)
+
+1. **Strong safety incentives** - As AI gets more powerful, demand for guarantees may increase; [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) emphasizes need for mathematical guarantees in safety-critical domains
+2. **Regulatory pressure** - EU AI Act requires risk assessment for high-risk AI; formal verification may become compliance pathway
+3. **ARIA funding** - £59M+ committed with clear milestones; additional £110M in related ARIA funding in 2024
+4. **Compositionality** - Verified components could be combined with other approaches; modular verification enables scaling
+
+### Arguments for Lower Probability (less than 1%)
+
+1. **Capability gap** - Unverified systems may always be 10-100x more capable due to verification overhead
+2. **Speed of AI progress** - TAI may arrive by 2030-2035; verification likely not ready
+3. **World model problem** - [Alignment Forum analysis](https://www.alignmentforum.org/posts/B2bg677TaS4cmDPzL/limitations-on-formal-verification-for-ai-safety) shows verifying world models may be fundamentally impossible in open domains
+4. **Economic incentives** - Labs optimizing for capabilities face 10-30% performance tax from verification requirements
+
+## Key Uncertainties
+
+1. **Can world models be verified?** The entire approach depends on having provably accurate world models. This is the crux.
+
+2. **What's the capability ceiling?** We don't know if verified systems can be competitive with unverified ones.
+
+3. **Can it handle novel situations?** Formal verification typically requires known domains; how to handle unprecedented situations?
+
+4. **Will anyone adopt it?** Even if possible, will competitive pressures prevent adoption?
+
+## Implications for Safety Research
+
+### This Approach Changes the Game If...
+
+- World model verification is solved
+- Verified systems reach capability parity
+- Regulatory frameworks require formal safety proofs
+- A major AI accident increases demand for guarantees
+
+### Research That Contributes
+
+- **Formal methods** - Core verification techniques
+- **World modeling** - Understanding physical systems
+- **Specification learning** - Translating values to formal specs
+- **Compositional verification** - Building larger proofs from smaller ones
+
+## Timeline Considerations
+
+| Milestone | Estimated Timeline | Confidence | Key Dependencies |
+|-----------|-------------------|------------|------------------|
+| ARIA TA 1.1 proof language | 2025-2026 | HIGH | Funding secured; teams selected |
+| AI Production Facility operational | January 2026 | HIGH | £18M grant awarded October 2025 |
+| Proof-of-concept (constrained domain) | 2026-2027 | MEDIUM | World model quality for target domain |
+| ARIA Stage 3 (integrated demo) | 2028 | MEDIUM | Per ARIA roadmap; dependent on prior stages |
+| Competitive narrow AI (e.g., grid control) | 2028-2032 | LOW | Requires capability parity in domain |
+| Competitive general AI | 2032+? | VERY LOW | Fundamental scalability breakthrough needed |
+| TAI-level verified system | Unknown | SPECULATIVE | May require paradigm shift in verification |
+
+### Historical Progress in Neural Network Verification
+
+| Year | Largest Verified Network | Improvement | Key Advance |
+|------|-------------------------|-------------|-------------|
+| 2017 | ≈10^3 neurons | Baseline | First DNN verification (Reluplex) |
+| 2019 | ≈10^4 neurons | 10x | Complete verification methods |
+| 2021 | ≈10^5 neurons | 10x | GPU-accelerated bound propagation |
+| 2024 | ≈10^6 neurons | 10x | α,β-CROWN optimizations |
+| 2027 (projected) | ≈10^7 neurons | 10x | If trend continues |
+| 2030 (projected) | ≈10^8 neurons | 10x | Still 4 orders of magnitude from frontier |
+
+**Critical observation:** At the current rate of ~10x improvement every 3 years, verification tools will not reach frontier model scale until 2039-2042—potentially after transformative AI has already been developed via other paradigms.
+
+## Sources and Further Reading
+
+- Dalrymple, D., et al. (2024). [Towards Guaranteed Safe AI: A Framework for Ensuring Robust and Reliable AI Systems](https://arxiv.org/abs/2405.06624). arXiv:2405.06624.
+- Brix, C., Bak, S., Johnson, T., Wu, H. (2024). [The Fifth International Verification of Neural Networks Competition (VNN-COMP 2024)](https://arxiv.org/abs/2412.19985). arXiv:2412.19985.
+- ARIA. (2024). [Safeguarded AI Programme Thesis v1.2](https://www.aria.org.uk/media/3nhijno4/aria-safeguarded-ai-programme-thesis-v1.pdf).
+- Huang, X., et al. (2024). [A Survey of Safety and Trustworthiness of LLMs through V&V](https://arxiv.org/abs/2305.11391). Artificial Intelligence Review.
+- Seshia, S., Sadigh, D., Sastry, S. (2017). [Toward Verified Artificial Intelligence](https://cacm.acm.org/research/toward-verified-artificial-intelligence/). Communications of the ACM.
+- Stanford Center for AI Safety. [Verified AI Whitepaper](https://aisafety.stanford.edu/whitepaper.pdf).
+- International AI Safety Report. (2025). [Second Key Update: Technical Safeguards and Risk Management](https://internationalaisafetyreport.org/publication/second-key-update-technical-safeguards-and-risk-management).
+- Fortune. (2025). [Can AI be used to control safety critical systems?](https://fortune.com/2025/06/10/aria-safeguarded-ai-safety-critical-systems-davidad-eye-on-ai/)
+
+## Related Pages
+
+- <EntityLink id="neuro-symbolic">Neuro-Symbolic Hybrids</EntityLink> - Related approach using symbolic reasoning
+- AI Governance - Policy context for formal verification requirements
+- Technical AI Safety - Comparison with other safety approaches

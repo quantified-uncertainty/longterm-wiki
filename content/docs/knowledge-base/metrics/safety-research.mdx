@@ -1,0 +1,407 @@
+---
+title: "Safety Research & Resources"
+description: "Tracking AI safety researcher headcount, funding, and research output to assess field capacity relative to AI capabilities development. Current analysis shows ~1,100 FTE safety researchers globally with severe under-resourcing (1:10,000 funding ratio) despite 21-30% annual growth."
+sidebar:
+  order: 4
+importance: 72.5
+quality: 62
+lastEdited: "2026-01-30"
+llmSummary: "Comprehensive analysis of AI safety research capacity shows ~1,100 FTE researchers globally (600 technical, 500 governance) with $150-400M annual funding, representing severe under-resourcing (1:10,000 funding ratio vs capabilities). Field growing 21-24% annually but lagging capabilities growth of 30-40%, creating widening absolute gap despite tripling from ~400 FTEs in 2022."
+ratings:
+  novelty: 4.5
+  rigor: 6.5
+  actionability: 6
+  completeness: 7.5
+metrics:
+  wordCount: 1534
+  citations: 50
+  tables: 32
+  diagrams: 1
+clusters: ["ai-safety", "community", "governance"]
+---
+import {R, EntityLink, Mermaid} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Total Safety Researchers** | ≈1,100 FTEs globally (2025) | [AI Safety Field Growth Analysis](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025): 600 technical + 500 governance |
+| **Annual Funding** | \$150-400M total; \$10M <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (2024) | [Coefficient Giving 2024 Report](https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/) |
+| **Safety:Capabilities Ratio** | 1:50-100 researcher ratio; 1:10,000 funding ratio | [Stuart Russell](https://www.safe.ai/work/stuart-russell) estimates |
+| **Field Growth Rate** | 21-24% annually (safety) vs 30-40% (capabilities) | [EA Forum analysis](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025) |
+| **Government Investment** | \$160M+ combined (UK AISI: £240M, US AISI: \$10M) | [UK AISI grants](https://www.aisi.gov.uk/grants), NIST budget |
+| **Training Pipeline** | ≈300 new researchers/year via structured programs | MATS (98 scholars), SPAR (50+), ERA (30+) |
+| **Industry Safety Index** | D average for existential safety across all labs | [FLI AI Safety Index 2025](https://futureoflife.org/ai-safety-index-winter-2025/) |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [safetyresearch.net](https://safetyresearch.net) |
+
+
+## Overview
+
+This page tracks the **size, growth, and resource allocation** of the AI safety research field. Understanding these metrics helps assess whether safety research is keeping pace with capabilities development and identify critical capacity gaps. The analysis encompasses researcher headcount, funding flows, publication trends, and educational programs.
+
+**Key finding**: Despite rapid growth, AI safety research remains severely under-resourced relative to capabilities development, with spending ratios estimated at 1:10,000 or worse. The field has tripled from ~400 to ~1,100 FTEs (2022-2025) but capabilities research is growing faster, creating a widening absolute gap. Current safety funding represents just 0.0004% of global GDP, while AI capabilities investment exceeds \$100 billion annually. This creates significant questions about whether AI safety research can develop adequate solutions before transformative AI capabilities emerge.
+
+## Risk Assessment
+
+| Dimension | Assessment | Evidence | Trend |
+|-----------|------------|----------|--------|
+| **Researcher Shortage** | Critical | 1:50-100 safety:capabilities ratio | Worsening |
+| **Funding Gap** | Severe | 1:10,000 spending ratio | Stable disparity |
+| **Experience Gap** | High | Median 2-5 years experience | Slowly improving |
+| **Growth Rate Mismatch** | Concerning | 21% vs 30-40% annual growth | Gap widening |
+
+---
+
+## Current Safety Research Capacity
+
+### Field Structure Overview
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph FUNDING["Funding Sources (\$150-400M)"]
+        OP[Coefficient Giving<br/>\$10M/year]
+        GOV[Government Programs<br/>\$160M+]
+        CORP[Corporate Labs<br/>Undisclosed]
+    end
+
+    subgraph ORGS["Organizations (70+)"]
+        LABS[Frontier Labs<br/>Anthropic, OpenAI, DeepMind]
+        NONPROF[Nonprofits<br/>MIRI, Redwood, ARC]
+        ACAD[Academia<br/>CHAI, MILA, Oxford]
+        GOVT[Safety Institutes<br/>UK AISI, US AISI]
+    end
+
+    subgraph RESEARCHERS["Researchers (~1,100 FTEs)"]
+        TECH[Technical Safety<br/>600 FTEs]
+        GOV_R[Governance/Policy<br/>500 FTEs]
+    end
+
+    subgraph PIPELINE["Training Pipeline (~300/year)"]
+        MATS[MATS<br/>98 scholars]
+        SPAR[SPAR<br/>50+ participants]
+        PHD[PhD Programs<br/>Growing]
+    end
+
+    FUNDING --> ORGS
+    ORGS --> RESEARCHERS
+    PIPELINE --> RESEARCHERS
+
+    style FUNDING fill:#e8f5e9
+    style ORGS fill:#e3f2fd
+    style RESEARCHERS fill:#fff3e0
+    style PIPELINE fill:#fce4ec
+`} />
+
+### Full-Time Researcher Headcount (2025)
+
+| Category | Count | Organizations | Growth Rate |
+|----------|--------|--------------|-------------|
+| Technical AI Safety | ≈600 FTEs | 68 active orgs | 21% annually |
+| AI Governance/Policy | ≈500 FTEs | Various | 30% annually |
+| **Total Safety Research** | **≈1,100 FTEs** | **70+ orgs** | **25% annually** |
+
+**Data source**: <R id="241ffc16c6786bd6">AI Safety Field Growth Analysis 2025</R> tracking organizations explicitly branded as "AI safety."
+
+**Key limitations**: <R id="6c3ba43830cda3c5">80,000 Hours</R> estimates "several thousand people" work on major AI risks when including researchers at major labs and academia, suggesting significant undercounting of part-time and embedded safety researchers.
+
+### Field Composition by Research Area
+
+**Top technical research areas** by organization count:
+1. Miscellaneous technical AI safety research
+2. <EntityLink id="language-models">LLM safety</EntityLink>
+3. <EntityLink id="interpretability">Interpretability</EntityLink>
+4. <EntityLink id="alignment">Alignment research</EntityLink>
+
+**Historical growth trajectory**:
+- 2022: ~400 FTE researchers total
+- 2023: ~650 FTE researchers  
+- 2024: ~900 FTE researchers
+- 2025: ~1,100 FTE researchers
+
+This represents consistent 25%+ annual growth, but still lags behind estimated capabilities research expansion of 30-40% annually.
+
+---
+
+## Funding Analysis
+
+### Annual Safety Research Funding (2024-2025)
+
+| Funding Source | Amount | Focus Area | Reliability |
+|----------------|--------|------------|-------------|
+| [Coefficient Giving](https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/) | ≈\$10M (2024); \$10M RFP (2025) | Technical safety (21 research areas), governance | High |
+| <R id="9baa7f54db71864d">Long-Term Future Fund</R> | ≈\$1-10M annually | Individual grants, upskilling | Medium |
+| Government Programs | ≈\$160M+ | UK AISI (£240M), US AISI (\$10M), Canada (\$10M) | Growing |
+| Corporate Labs | Undisclosed | Internal safety teams | Unknown |
+| **Total Estimated** | **\$150-400M** | **Global safety research** | **Medium confidence** |
+
+**Coefficient Giving context**: Since 2017, Coefficient Giving (then Open Philanthropy) has donated ≈\$136 million to AI safety (~12% of their \$1.8B total grants). They acknowledged their 2024 spending rate was "too slow" and are "more aggressively expanding support for technical AI safety work." Their [2025 RFP](https://www.openphilanthropy.org/request-for-proposals-technical-ai-safety-research/) covers 21 research directions including adversarial testing, model transparency, and theoretical alignment.
+
+### Government Safety Investment
+
+| Country/Region | Program | Funding | Key Initiatives | Timeline |
+|----------------|---------|---------|-----------------|----------|
+| United Kingdom | [UK AI Security Institute](https://www.aisi.gov.uk/) | £240M total | £15M Alignment Project, £8.5M Systemic Safety Grants, £200K Challenge Fund | 2023+ |
+| United States | <EntityLink id="us-aisi">US AISI</EntityLink> (renamed CAISI 2025) | \$10M (chronically underfunded) | Model evaluation partnerships with Anthropic/OpenAI | 2024+ |
+| Canada | Canada AISI | \$10M | Research coordination | 2024+ |
+| European Union | AI Act implementation | €100M+ | Regulatory infrastructure | 2024+ |
+
+**Note**: The UK-US AI Safety Institutes signed a landmark agreement in 2024 to jointly test advanced AI models, share research insights, and enable expert talent transfers. However, US funding remains substantially lower than UK investment—the [NIST budget](https://www.nist.gov/) that hosts AISI has faced congressional budget cuts rather than the expansion requested by the Biden administration.
+
+### Capabilities vs Safety Spending
+
+**Critical disparity metrics**:
+- **10,000:1** ratio of capabilities to safety investment (<R id="9d9b64da39fc8be9">Stuart Russell, UC Berkeley</R>)
+- Companies spend **more than \$100 billion** building AGI vs **≈\$10 million** philanthropic safety research annually
+- AI safety funding: **0.0004% of global GDP** vs **\$131.5B** in AI startup VC funding (2024)
+- Only **2% of AI publications** concern safety issues despite 312% growth in safety research (2018-2023)
+- External safety organizations operate on budgets smaller than a frontier lab's daily burn
+
+**Capability researcher growth comparison** ([AI Safety Field Growth Analysis 2025](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025)):
+
+| Metric | Safety Field | Capabilities Field | Gap |
+|--------|-------------|-------------------|-----|
+| Annual growth rate | 21-24% | 30-40% | Widening |
+| OpenAI headcount | N/A | 300 → 3,000 (2021-2025) | 10x growth |
+| Anthropic, DeepMind | N/A | Each grown more than 3x | Rapid expansion |
+| ML papers per year | ≈45,000 safety-related (2018-2023) | Doubles every 2 years | Exponential |
+
+**For context**: Global philanthropic climate funding reaches **\$1-15 billion annually**, making climate funding 20-40x larger than AI safety funding. Prominent AI safety advocates recommend increasing safety investment to at least **30% of compute resources**, a level far above current allocations.
+
+---
+
+## Research Output & Quality
+
+### Publication Trends (2024-2025)
+
+**Major alignment research developments**:
+
+| Research Area | Notable 2024-2025 Papers | Impact |
+|---------------|---------------------------|--------|
+| Alignment Foundations | "AI Alignment: A Comprehensive Survey" (RICE framework) | Comprehensive taxonomy |
+| Mechanistic Interpretability | "Mechanistic Interpretability Benchmark (MIB)" | Standardized evaluation |
+| Safety Benchmarks | WMDP Benchmark (ICML 2024) | Dangerous capability assessment |
+| Training Methods | "Is DPO Superior to PPO for LLM Alignment?" | Training optimization |
+
+**Industry research contributions**:
+- <EntityLink id="anthropic">Anthropic</EntityLink>: Circuit tracing research revealing Claude's "shared conceptual space" (March 2025)
+- <EntityLink id="deepmind">Google DeepMind</EntityLink>: Announced deprioritizing sparse autoencoders (March 2025)
+- <EntityLink id="cais">CAIS</EntityLink>: Supported 77 safety papers through compute cluster (2024)
+
+**Field debates**: Intensified discussion about mechanistic interpretability value, with <R id="1d4ad7089731ec79">Dario Amodei</R> advocating focus while other labs shift priorities.
+
+### Research Quality Indicators
+
+**Positive signals**:
+- Research "moving beyond raw performance to explainability, alignment, legal and ethical robustness"
+- Standardized benchmarks emerging (MIB, WMDP)
+- Industry-academic collaboration increasing
+
+**Concerning signals**:
+- <R id="f6aa679babd7a46a">OpenAI disbanded super-alignment team</R> (May 2024)
+- Safety leader departures citing safety "took a back seat to shiny products"
+- **56.4% surge** in AI incidents from 2023 to 2024
+
+### FLI AI Safety Index: Company Comparison (Winter 2025)
+
+The [Future of Life Institute AI Safety Index](https://futureoflife.org/ai-safety-index-winter-2025/) evaluates leading AI companies across six domains using 33 indicators. Scores use US GPA system (A+ to F).
+
+| Company | Overall | Risk Assessment | Current Harms | Safety Framework | Existential Safety | Governance | Information Sharing |
+|---------|---------|-----------------|---------------|------------------|-------------------|------------|---------------------|
+| **Anthropic** | B- | B | B+ | B | D | B | B- |
+| **OpenAI** | C+ | B- | B | B- | D | C+ | C |
+| **Google DeepMind** | C+ | B- | B- | B- | D | C | C |
+| **xAI** | D+ | D | C | D | D- | D | D |
+| **Meta** | D | D+ | C+ | D- | D- | D- | D |
+| **Zhipu AI** | D- | D | C | D- | F | D- | D- |
+| **DeepSeek** | D- | D- | C- | D- | F | F | D- |
+
+**Key finding**: No company achieved above a D in Existential Safety, indicating industry-wide structural failure to prevent catastrophic misuse or loss of control. The top three performers (Anthropic, OpenAI, DeepMind) show substantially stronger practices than others, particularly in risk assessment and safety frameworks.
+
+---
+
+## Educational Pipeline & Training
+
+### PhD Programs and Fellowships
+
+| Program | Funding | Duration | Focus |
+|---------|---------|----------|-------|
+| <R id="6cdea76b4414a41a">Vitalik Buterin PhD Fellowship</R> | \$10K/year + tuition | 5 years | AI safety PhD research |
+| Google PhD Fellowship | \$85K/year | Variable | AI research including safety |
+| Global AI Safety Fellowship | Up to \$30K | 6 months | Career transitions |
+| <R id="0da4780ac681e4a4">Anthropic Fellows Program</R> | \$2,100/week | Flexible | Mid-career transitions |
+
+### Training Program Capacity
+
+| Program | Annual Capacity | Target Audience | Outcomes | Support |
+|---------|----------------|-----------------|----------|---------|
+| [MATS](https://www.matsprogram.org/) | 98 scholars (Summer 2025) | Aspiring safety researchers | 80% now work in AI safety; 10% co-founded startups | \$15K stipend, \$12K compute, housing |
+| <R id="e93ee72da2a36177">SPAR</R> | 50+ participants | Undergraduate to professional | Research publications | Mentorship, resources |
+| ERA Fellowship | 30+ fellows | Early-career researchers | Career transitions | Funding, network |
+| LASR Labs | Variable | Research transitions | Lab placements | Project-based |
+
+**MATS program details**: The [MATS Summer 2025](https://www.matsprogram.org/program/summer-2025) cohort supported 98 scholars with 57 mentors across interpretability, governance, and security research tracks. Alumni outcomes show ~80% continue in AI safety/security roles, with ~75% continuing in fully-funded 6-12 month extensions. Notable alumni have published award-winning papers (ACL 2024 Outstanding Paper) and joined frontier labs like Anthropic. Program satisfaction averages 9.4/10.
+
+**Estimated field pipeline**: ~300 new safety researchers entering annually through structured programs, plus unknown numbers through academic and industry pathways.
+
+---
+
+## Conference Participation & Community
+
+### Major AI Conference Attendance (2024-2025)
+
+| Conference | Total Submissions | Attendance | AI Safety Content | Growth |
+|------------|------------------|------------|-------------------|--------|
+| [NeurIPS 2025](https://neurips.cc/) | 21,575 valid submissions (5,290 accepted, 24.5%) | 16,000+ | 8 safety-focused social sessions | 61% submission increase |
+| NeurIPS 2024 | 19,756 participants | ≈16,000 | Safety workshops, CAIS papers | 27% increase |
+| ICML 2024 | 9,095 participants | 9,095 | "Next Generation of AI Safety" workshop | 15% increase |
+| ICLR 2024 | ≈8,000 participants | ≈8,000 | Alignment research track | 12% increase |
+
+**NeurIPS 2025 context**: The conference saw a 61% increase in submissions over 2024, supported by 20,518 reviewers, 1,663 area chairs, and 199 senior area chairs. This massive growth reflects the global surge in AI research productivity, though safety-specific research remains a small fraction of total submissions.
+
+**Safety-specific events**:
+- <EntityLink id="cais">CAIS</EntityLink> online course: 240 participants (2024)
+- AI safety conference workshops and socials organized by multiple organizations
+- NeurIPS 2025 split between Mexico City and Copenhagen due to capacity constraints
+
+### Community Growth Indicators
+
+**Positive trends**:
+- Safety workshops becoming standard at major AI conferences
+- Industry participation in safety research increasing
+- Graduate programs adding AI safety coursework
+
+**Infrastructure constraints**:
+- Major conferences approaching venue capacity limits
+- Competition for safety researcher talent intensifying
+- Funding concentration creating bottlenecks
+
+---
+
+## Field Trajectory & Projections
+
+### Current Growth Rates vs Requirements
+
+| Metric | Current State (2025) | Current Growth | Required Growth | Gap Assessment |
+|--------|---------------------|----------------|-----------------|----------------|
+| Safety researchers | ≈1,100 FTEs | 21-24% annually | 50%+ (to catch up) | Critical: widening |
+| Safety funding | \$150-400M | ≈25% annually | 100%+ (recommended 30% of compute) | Severe |
+| Safety publications | ≈2% of AI papers | ≈20% annually (312% growth 2018-2023) | Unknown | Moderate |
+| Training pipeline | ≈300/year | Growing | ≈1,000/year needed | Significant |
+
+### 2-5 Year Projections
+
+Based on current exponential growth models from the [AI Safety Field Growth Analysis 2025](https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025):
+
+**Optimistic scenario** (current 21-24% growth continues):
+- **~2,500-3,000 FTE safety researchers** by 2030 (extrapolating from current 1,100)
+- **≈\$100M-1B annual safety funding** by 2028
+- Mature graduate programs producing **500+ researchers annually**
+- UK AISI Alignment Project produces breakthrough research
+
+**Concerning scenario** (capabilities growth accelerates to 50%+):
+- Safety research remains under 5% of total AI research
+- <EntityLink id="racing-dynamics">Racing dynamics</EntityLink> intensify as <EntityLink id="agi-timeline">AGI timelines</EntityLink> compress
+- 30-40% capabilities growth vs 21-24% safety growth creates widening absolute gap
+- External safety organizations continue operating on budgets smaller than frontier lab daily burn
+
+---
+
+## Key Uncertainties & Research Gaps
+
+### Critical Unknowns
+
+**Capability researcher count**: No comprehensive database exists for AI capabilities researchers. Estimates suggest 30,000-100,000 globally based on:
+- <EntityLink id="openai">OpenAI</EntityLink> growth: 300→3,000 employees (2021-2025)
+- Similar expansion at <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">DeepMind</EntityLink>
+- ML conference attendance doubling every 2-3 years
+
+**Industry safety spending**: Most AI labs don't disclose safety vs capabilities budget breakdowns. Known examples:
+- IBM: 2.9%→4.6% of AI budgets (2022-2024)
+- OpenAI: Super-alignment team disbanded (May 2024)
+- Anthropic: Constitutional AI research ongoing but budget undisclosed
+
+### Expert Disagreements
+
+**Field size adequacy**:
+- **Optimists**: Current growth sufficient if focused on highest-impact research
+- **Pessimists**: Need 10x more researchers given <EntityLink id="agi-timeline">AI risk timeline</EntityLink>
+
+**Research prioritization**:
+- **Technical focus**: Emphasize <EntityLink id="interpretability">interpretability</EntityLink>, <EntityLink id="alignment">alignment</EntityLink>
+- **Governance focus**: Prioritize policy interventions, <EntityLink id="international-coordination">coordination</EntityLink>
+
+**Funding allocation**:
+- Large grants to established organizations vs distributed funding for diverse approaches
+- Academic vs industry vs independent researcher support ratios
+
+---
+
+## Data Quality Assessment
+
+| Metric | Data Quality | Primary Limitations | Improvement Needs |
+|--------|-------------|-------------------|------------------|
+| FTE researchers | Medium | Undercounts independents, part-time contributors | Comprehensive workforce survey |
+| Total funding | Medium | Many corporate/government grants undisclosed | Disclosure requirements |
+| Spending ratios | Low | Labs don't publish safety budget breakdowns | Industry transparency standards |
+| Publication trends | Medium | No centralized safety research database | Standardized taxonomy and tracking |
+| Experience levels | Very Low | No systematic demographic data collection | Regular field census |
+| Researcher ratios | Low | No capability researcher baseline count | Comprehensive AI workforce analysis |
+
+**Most critical data gaps**:
+1. **Industry safety spending**: Mandatory disclosure of safety vs capabilities R&D budgets
+2. **Researcher demographics**: Experience, background, career transition patterns
+3. **Research impact assessment**: Citation analysis and influence tracking for safety work
+4. **International coordination**: Non-English language safety research and global South participation
+
+---
+
+## Sources & Resources
+
+### Primary Field Analysis
+- <R id="241ffc16c6786bd6">AI Safety Field Growth Analysis 2025 (EA Forum)</R>
+- <R id="6c3ba43830cda3c5">80,000 Hours: AI Safety Researcher Career Review</R>
+- <R id="105eb55d58314718">An Overview of the AI Safety Funding Situation (LessWrong)</R>
+- [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) - 96 AI experts contributing, nominated by 30 countries
+- [ETO AI Safety Research Almanac](https://almanac.eto.tech/topics/ai-safety/) - Comprehensive research statistics
+
+### Funding & Investment Data
+- <R id="95e836c510c4948d">Coefficient Giving: Progress in 2024 and Plans for 2025</R>
+- [Coefficient Giving Technical AI Safety RFP](https://www.openphilanthropy.org/request-for-proposals-technical-ai-safety-research/) - \$10M across 21 research areas
+- <R id="2fcdf851ed57384c">Coefficient Giving Grants Database</R>
+- <R id="200c40509f20d569">Center for AI Safety 2024 Year in Review (EA Forum)</R>
+- [UK AISI Grants Programs](https://www.aisi.gov.uk/grants) - £240M total funding
+
+### Research Output & Quality
+- <R id="f612547dcfb62f8d">AI Alignment: A Comprehensive Survey (arXiv)</R>
+- [Anthropic: Recommended Directions for AI Safety Research](https://alignment.anthropic.com/2025/recommended-directions/)
+- <R id="0299355341a06205">NeurIPS 2024 Fact Sheet</R>
+- <R id="6ff39b72f51ef369">ICML 2024 Statistics</R>
+- [ETO: Still a drop in the bucket - AI safety research](https://eto.tech/blog/still-drop-bucket-ai-safety-research/)
+
+### Training & Educational Programs
+- <R id="6cdea76b4414a41a">Future of Life Institute: PhD Fellowships</R>
+- [MATS Research Program](https://www.matsprogram.org/) - 98 scholars, 57 mentors (Summer 2025)
+- <R id="0da4780ac681e4a4">Anthropic Fellows Program</R>
+- [SPAR - Research Program for AI Risks](https://sparai.org/)
+
+### Safety Assessment & Monitoring
+- [FLI AI Safety Index Winter 2025](https://futureoflife.org/ai-safety-index-winter-2025/) - 33 indicators across 6 domains
+- [FLI AI Safety Index Summer 2025](https://futureoflife.org/ai-safety-index-summer-2025/)
+- <R id="d565a96e10eb1f28">Our World in Data: AI Conference Attendance</R>
+
+### Government Programs
+- [UK AI Security Institute](https://www.aisi.gov.uk/) - Research agenda and publications
+- [UK AISI Year in Review 2025](https://www.aisi.gov.uk/blog/our-2025-year-in-review)
+- [UK AISI Alignment Project](https://www.aisi.gov.uk/blog/advancing-the-field-of-systemic-ai-safety-grants-open) - £15M alignment research initiative
+
+---
+
+*Last updated: January 30, 2026*
+
+*Note: This analysis synthesizes data from multiple sources with varying quality and coverage. Quantitative estimates should be interpreted as order-of-magnitude indicators rather than precise counts. The field would benefit significantly from standardized data collection and reporting practices.*

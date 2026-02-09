@@ -1,0 +1,198 @@
+---
+title: X Community Notes
+description: Crowdsourced fact-checking system using bridging algorithms to surface cross-partisan consensus. 500K+ contributors, 8.3% note visibility rate, 25-50% repost reduction when notes display. Open-source algorithm enables independent verification.
+sidebar:
+  order: 6
+lastEdited: "2026-01-30"
+quality: 54
+importance: 42
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 4.2
+  rigor: 6.5
+  actionability: 3.8
+  completeness: 6
+metrics:
+  wordCount: 1502
+  citations: 42
+  tables: 8
+  diagrams: 1
+llmSummary: Community Notes uses a bridging algorithm requiring cross-partisan consensus to display fact-checks, reducing retweets 25-50% when notes appear. However, only 8.3% of notes achieve visibility, taking median 7 hours (mean 38.5 hours) by which time 96.7% of spread has occurred, limiting aggregate effectiveness despite high accuracy (98% for COVID-19 notes).
+clusters:
+  - epistemics
+  - governance
+subcategory: epistemic-tools-tools
+---
+import {Backlinks, Mermaid, KeyQuestions, EntityLink} from '@components/wiki';
+
+## Overview
+
+X Community Notes (formerly Birdwatch) is a crowdsourced content moderation system that allows users to add contextual notes to potentially misleading posts. Unlike traditional fact-checking, which relies on centralized editorial teams, Community Notes uses a [bridging algorithm](https://vitalik.eth.limo/general/2023/08/16/communitynotes.html) that requires agreement across ideologically diverse users before displaying a note publicly. This design aims to produce fact-checks perceived as more legitimate by people across the political spectrum.
+
+The system launched as Birdwatch in January 2021, weeks after the January 6 Capitol attack, and was rebranded to Community Notes in November 2022 under <EntityLink id="elon-musk">Elon Musk</EntityLink>'s ownership. As of 2024, the platform has over [500,000 contributors from 70 countries](https://x.com/CommunityNotes/status/1788617818784792880), with 1.18 million notes written in 2024 alone. However, only 8.3% of submitted notes achieve "helpful" status and become visible to the broader community.
+
+Research findings on effectiveness are mixed. An internal Twitter A/B test found that displayed notes reduced retweets by [25-34%](https://arxiv.org/pdf/2210.15723), while subsequent research suggests even larger effects—nearly [50% reduction in retweets](https://orbilu.uni.lu/bitstream/10993/59462/1/3686967.pdf) and an 80% increase in the probability that misleading content gets deleted by its author. However, timing is a critical limitation: the average note takes [38.5 hours](https://ddia.org/en/a-deep-dive-into-xs-community-notes-report) to become visible, by which time [96.7% of reposts](https://arxiv.org/html/2510.09585v2) have already occurred.
+
+Community Notes represents a significant experiment in decentralized epistemics. Its [fully open-source algorithm](https://github.com/twitter/communitynotes) and publicly available data enable independent verification—a level of transparency unprecedented among major social media platforms. Meta announced in January 2025 that it would [adopt a similar system](https://about.fb.com/news/2025/01/meta-more-speech-fewer-mistakes/) for Facebook and Instagram, potentially making this approach the dominant paradigm for platform-level fact-checking.
+
+## Quick Assessment
+
+| Dimension | Rating | Notes |
+|-----------|--------|-------|
+| Accuracy | High | 98% of COVID-19 notes rated accurate by medical professionals |
+| Speed | Low | Median 7 hours, mean 38.5 hours to note visibility |
+| Coverage | Low | Only 8.3% of notes achieve helpful status and display |
+| Transparency | Very High | Fully open-source algorithm, daily data releases |
+| Cross-partisan Trust | High | Perceived as significantly more trustworthy than traditional fact-check labels |
+| Manipulation Resistance | Medium | Bridging algorithm resists simple attacks but vulnerable to coordinated efforts |
+| Scalability | High | 500K+ contributors; scales with user participation |
+
+## How the Bridging Algorithm Works
+
+The core innovation of Community Notes is its "bridging-based ranking" algorithm, which uses [matrix factorization](https://jonathanwarden.com/understanding-community-notes/) to identify notes that receive support from ideologically diverse raters. Rather than showing notes that a simple majority finds helpful, the system specifically promotes notes where people who usually disagree end up agreeing.
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Contributors["Contributors Write Notes"]
+        A[User sees potentially misleading post] --> B[Contributor writes note with context/sources]
+        B --> C[Note enters rating queue]
+    end
+
+    subgraph Rating["Rating Phase"]
+        C --> D[Other contributors rate note as Helpful/Somewhat/Not Helpful]
+        D --> E[Matrix factorization analyzes rating patterns]
+    end
+
+    subgraph Algorithm["Bridging Algorithm"]
+        E --> F[Assign polarity factor to each rater]
+        F --> G[Assign polarity + helpfulness factors to note]
+        G --> H{Helpfulness score >= 0.4?}
+    end
+
+    subgraph Output["Display Decision"]
+        H -->|Yes| I[Note displayed publicly on post]
+        H -->|No| J[Note remains visible only to contributors]
+        I --> K[Post engagement typically drops 25-50%]
+    end
+`} />
+
+The algorithm works by simultaneously estimating two values for each note and each rater:
+
+1. **Polarity factor**: Captures where the rater or note falls on an ideological spectrum (roughly left-right, though the algorithm discovers this dimension automatically)
+2. **Helpfulness factor**: Captures intrinsic quality independent of ideology
+
+A note's final displayed score is its helpfulness factor alone. This means a note that appeals only to one ideological group will have a high polarity factor that "explains away" its ratings, leaving a low helpfulness score. Only notes that receive positive ratings from raters across the political spectrum achieve the 0.4 threshold required for display.
+
+As [Vitalik Buterin explains](https://vitalik.eth.limo/general/2023/08/16/communitynotes.html), "the 'polarity' terms absorb the properties of a note that cause it to be liked by some users and not others, and the 'helpfulness' term only measures the properties that a note has that cause it to be liked by all." This design makes Community Notes resistant to simple political capture—purely partisan notes get filtered out regardless of how many supporters they have.
+
+## Effectiveness Research
+
+Research on Community Notes effectiveness shows strong effects when notes display, but significant limitations in coverage and timing.
+
+### Impact When Notes Display
+
+| Metric | Effect Size | Source |
+|--------|-------------|--------|
+| Retweet reduction | 25-34% (internal A/B test) | [Wojcik et al., 2022](https://arxiv.org/pdf/2210.15723) |
+| Retweet reduction | ≈50% (observational) | [Chuai et al., 2024](https://dl.acm.org/doi/10.1145/3686967) |
+| Author deletion increase | 80% more likely | [Chuai et al., 2024](https://dl.acm.org/doi/10.1145/3686967) |
+| Belief change | 20-40% less likely to agree with misleading tweet | [Twitter internal surveys](https://en.wikipedia.org/wiki/Community_Notes) |
+| Note accuracy (COVID-19) | 98% accurate per medical professionals | [Allen et al., 2024](https://arxiv.org/html/2510.09585v2) |
+
+The causal evidence from Twitter's internal A/B test at launch found that displaying a note reduced retweets by 25-34%. Subsequent observational research using difference-in-differences designs suggests even larger effects—[Chuai et al. (2024)](https://dl.acm.org/doi/10.1145/3686967) found that adding context below a tweet reduces retweets by approximately half, and increases the probability of author deletion by 80%.
+
+Community Notes also appears to increase trust in fact-checking relative to alternatives. A [PNAS Nexus study](https://pmc.ncbi.nlm.nih.gov/articles/PMC11212665/) found that "across both sides of the political spectrum, community notes were perceived as significantly more trustworthy than simple misinformation flags." This effect stemmed primarily from the explanatory context provided rather than inherent trust in crowd-sourced moderation.
+
+### Coverage and Timing Limitations
+
+The critical limitation is that most notes never display, and those that do arrive too late:
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| Notes achieving helpful status | 8.3% | [DDIA, 2025](https://ddia.org/en/a-deep-dive-into-xs-community-notes-report) |
+| Notes rated helpful citing fact-checkers | 12% (vs 8.3% overall) | [EDMO, 2024](https://edmo.eu/publications/the-role-of-fact-checkers-in-xs-community-notes-faster-trusted-and-more-effective/) |
+| Mean time to note visibility | 38.5 hours | [DDIA, 2025](https://ddia.org/en/a-deep-dive-into-xs-community-notes-report) |
+| Median time to note visibility | 7 hours | [DDIA, 2025](https://ddia.org/en/a-deep-dive-into-xs-community-notes-report) |
+| Reposts occurring before note displays | 96.7% | [Chuai et al., 2024](https://arxiv.org/html/2510.09585v2) |
+| 2024 US election notes reaching helpful status | \<6% (3 days pre-election) | [Washington Post](https://arxiv.org/html/2510.09585v2) |
+
+[Chuai et al. (2024)](https://arxiv.org/abs/2307.07960) found "no evidence that the introduction of Community Notes significantly reduced engagement with misleading tweets on X/Twitter" at the aggregate level, because notes are "too slow to effectively reduce engagement with misinformation in the early and most viral stage of its spread."
+
+The speed problem is structural: the bridging algorithm requires ratings from ideologically diverse users, which takes time to accumulate. Notes citing professional fact-checkers appear [90 minutes earlier](https://edmo.eu/publications/the-role-of-fact-checkers-in-xs-community-notes-faster-trusted-and-more-effective/) than average, suggesting that leveraging existing fact-check infrastructure could partially address timing limitations.
+
+## Criticisms and Vulnerabilities
+
+### Partisan Bias Concerns
+
+Despite the bridging algorithm's design to resist partisan capture, research suggests it may not fully succeed. [Renault, Mosleh, and Rand (2025)](https://arxiv.org/html/2510.09585v2) found that "Republicans are flagged more often than Democrats for sharing misinformation on X's Community Notes." Whether this reflects genuine asymmetry in misinformation sharing or bias in the contributor pool remains debated.
+
+A [2024 citation analysis](https://arxiv.org/html/2510.09585v2) found that "the most frequently referenced sources were X and Wikipedia, with a noticeable left-leaning bias." However, notes citing more balanced or factually rigorous sources received higher helpfulness scores, suggesting the algorithm may partially correct for contributor bias.
+
+### Manipulation Vulnerability
+
+Research from [late 2025](https://arxiv.org/html/2511.02615) demonstrates that Community Notes is "vulnerable to rater bias and manipulation." The study found that a coordinated minority of 5-20% of raters could strategically suppress targeted helpful notes, "effectively censoring reliable information."
+
+The attack vector is subtle: as [one analysis explains](https://jonathanwarden.com/understanding-community-notes/), "an attacker trying to break Community Notes using a lot of sockpuppet accounts won't succeed just by upvoting notes that support some political agenda. Downvotes will not shift the intercept for a post if the Matrix Factorization can 'explain' these downvotes by the polarity factors of the users." Instead, effective manipulation requires coordinated cross-partisan voting patterns that confuse the algorithm's polarity estimation.
+
+### Structural Limitations
+
+Several structural issues limit Community Notes' effectiveness:
+
+1. **Dependence on professional fact-checking**: Research shows community notes [cite fact-checking sources up to five times more than previously reported](https://edmo.eu/publications/the-role-of-fact-checkers-in-xs-community-notes-faster-trusted-and-more-effective/), and notes citing fact-checkers are more likely to achieve helpful status. This suggests Community Notes may amplify rather than replace professional fact-checking infrastructure.
+
+2. **Contributor sustainability**: The system faces significant [churn](https://arxiv.org/html/2510.00650v1)—fewer than half (46%) of contributors active in early 2023 remained active one year later, declining to 29% by early 2025. Many contributors write only one note and never return.
+
+3. **Narrow misinformation framing**: Critics argue the system has a "[narrow understanding of disinformation](https://www.techpolicy.press/community-notes-and-its-narrow-understanding-of-disinformation/)" that focuses on factual falsity while ignoring "deeper critical commentary" and harder-to-verify claims involving sarcasm, context manipulation, or misleading framing.
+
+## Platform Adoption
+
+Community Notes has become an influential model for content moderation beyond X.
+
+**Meta's adoption (2025)**: In January 2025, Meta [announced](https://about.fb.com/news/2025/01/meta-more-speech-fewer-mistakes/) it would end partnerships with third-party fact-checkers and implement Community Notes on Facebook and Instagram. The company cited X's implementation as a model, emphasizing that notes would "require agreement between people with a range of perspectives to help prevent biased ratings." The rollout began in the US in early 2025.
+
+**Open-source ecosystem**: Community Notes' code and data are [fully public](https://github.com/twitter/communitynotes) under an Apache 2.0 license. Researchers can download daily data releases containing all notes, ratings, and contributor information, then run the algorithm locally to verify that outputs match what appears on X. This represents unprecedented transparency for a major platform's content moderation system.
+
+**Broader influence**: The bridging algorithm concept has influenced thinking about [epistemic infrastructure](https://www.lesswrong.com/posts/sx9wTyCp5kgy8xGac/community-notes-by-x) more broadly. Vitalik Buterin called Community Notes "the closest thing to an instantiation of 'crypto values' that we have seen in the mainstream world," highlighting its combination of decentralization, transparency, and resistance to capture. The EA Forum has discussed applying similar [consensus mechanisms](https://forum.effectivealtruism.org/posts/w3HtGrEp8RKLQGDtG/is-ea-prepared-for-an-influx-of-new-medium-sized-donors) to community governance.
+
+## Comparison with Traditional Fact-Checking
+
+| Dimension | Community Notes | Professional Fact-Checkers |
+|-----------|----------------|---------------------------|
+| Speed | Slow (median 7 hours) | Faster for high-priority claims |
+| Scale | High (500K contributors) | Limited by staff size |
+| Trust (cross-partisan) | Higher | Lower among conservatives |
+| Accuracy | 98% (COVID sample) | ~Similar for verified claims |
+| Coverage | Low (8.3% visibility rate) | Selective but higher quality |
+| Transparency | Fully open source | Methods often opaque |
+| Cost | Near-zero marginal cost | \$2-10M+ per organization annually |
+| Independence | Dependent on X platform | Independent organizations |
+
+The evidence suggests these approaches are complementary rather than substitutes. Notes citing fact-checking organizations are [more likely to achieve helpful status](https://edmo.eu/publications/the-role-of-fact-checkers-in-xs-community-notes-faster-trusted-and-more-effective/) and appear faster. As one researcher noted, "crowdsourced detection is useful, but professional, methodological, standardized collaboration is essential alongside it."
+
+The key advantage of Community Notes is perceived legitimacy across political divides. The key advantage of traditional fact-checking is depth, speed on important claims, and independence from platform incentives.
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "Can the bridging algorithm be strengthened against coordinated manipulation while maintaining transparency?",
+    "Will Meta's adoption validate the model or expose scalability limitations?",
+    "How can note visibility timing be improved without compromising the cross-partisan consensus requirement?",
+    "What is the long-term sustainability of volunteer contributor bases?",
+    "Can Community Notes effectively address novel misinformation types (deepfakes, AI-generated content) where ground truth is harder to establish?"
+  ]}
+/>
+
+## Further Reading
+
+**Wikipedia**: [Community Notes](https://en.wikipedia.org/wiki/Community_Notes) - Comprehensive overview including history, algorithm description, and criticisms.
+
+**LessWrong**: [Community Notes by X](https://www.lesswrong.com/posts/sx9wTyCp5kgy8xGac/community-notes-by-x) - Detailed technical analysis of the bridging algorithm and its implications for epistemic infrastructure.
+
+**Technical Analysis**: [What do I think about Community Notes?](https://vitalik.eth.limo/general/2023/08/16/communitynotes.html) by Vitalik Buterin - In-depth examination of the algorithm's game-theoretic properties.
+
+**Academic Research**: [From Birdwatch to Community Notes](https://arxiv.org/abs/2510.09585) - Comprehensive systematic review of four years of research (2021-2025).
+
+**Open Source**: [GitHub Repository](https://github.com/twitter/communitynotes) - Full algorithm source code and documentation.
+
+<Backlinks />

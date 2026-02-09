@@ -1,0 +1,416 @@
+---
+title: "Factor Diagram Naming: Research Report"
+description: "Research on naming alternatives for cause-effect diagrams, surveying influence diagrams, crux maps, argument maps, and related frameworks across decision analysis, systems thinking, and philosophy"
+createdAt: 2025-01-20
+lastUpdated: 2025-01-20
+sidebar:
+  order: 20
+importance: 0
+quality: 31
+llmSummary: "Internal research report comparing terminology for factor diagrams across 8 frameworks (influence diagrams, causal loop diagrams, crux maps, etc.), recommending 'Crux Map' as most appropriate for the EA/rationalist audience. Provides implementation checklist for renaming component throughout codebase."
+ratings:
+  novelty: 0.5
+  rigor: 3
+  actionability: 2
+  completeness: 4
+metrics:
+  wordCount: 956
+  citations: 55
+  tables: 22
+  diagrams: 0
+---
+import { EntityLink } from '@components/wiki';
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+## Executive Summary
+
+| Finding | Key Insight | Recommendation |
+|---------|-------------|----------------|
+| **"Cause-effect" is misleading** | Our diagrams aren't strictly causal—they include uncertainties, considerations, and influence relationships | Rename to something more accurate |
+| **Multiple established frameworks exist** | Influence diagrams, driver diagrams, argument maps, crux maps all map similar territory | Borrow terminology strategically |
+| **Uncertainty types matter** | Aleatoric (inherent randomness) vs epistemic (knowledge gaps) distinction is well-established | Consider incorporating uncertainty typology |
+| **"Crux" has traction in target audience** | Rationalist/EA community already uses "crux" terminology from <EntityLink id="center-for-applied-rationality">CFAR</EntityLink> | Strong candidate for naming |
+| **Recommended name** | **"Crux Map"** or **"Factor Map"** | Balances clarity, accuracy, and audience fit |
+
+---
+
+## Background
+
+<Aside type="tip" title="The Problem">
+Our current "cause-effect diagrams" visualize factors that influence outcomes, including uncertainties, considerations, and decision-relevant relationships. The name "cause-effect" implies strict causality that doesn't match what we're actually modeling.
+</Aside>
+
+This report surveys similar conceptual frameworks across multiple fields to identify appropriate terminology for LongtermWiki's factor visualization system. We examined:
+
+- **Decision analysis**: Influence diagrams, decision trees, tornado diagrams
+- **Systems thinking**: Causal loop diagrams, stock-flow models
+- **Philosophy/Argumentation**: Argument maps, IBIS, crucial considerations
+- **Rationalist community**: Crux mapping, double crux
+- **Quality improvement**: Driver diagrams, theory of change
+- **Knowledge representation**: Concept maps, knowledge graphs
+
+---
+
+## Framework Comparison
+
+### 1. Influence Diagrams (Decision Analysis)
+
+<Badge text="Established 1981" variant="note" />
+
+**Origin**: Introduced by [Howard and Matheson](https://pubsonline.informs.org/doi/abs/10.1287/deca.1050.0020) in 1981, building on [Howard Raiffa's](https://en.wikipedia.org/wiki/Howard_Raiffa) decision analysis work.
+
+**Definition**: A graph representing a Bayesian decision problem with three node types:
+- **Circles**: Random variables (uncertainties)
+- **Rectangles**: Decision variables (choices)
+- **Diamonds**: Utility/value variables (outcomes)
+
+| Strength | Weakness |
+|----------|----------|
+| Distinguishes uncertainty from decisions | Technical/academic connotation |
+| Well-established in decision theory | Implies quantitative Bayesian framework |
+| Supports automatic model generation | Less familiar outside specialized fields |
+
+<Aside type="note" title="Relevance">
+Influence diagrams share our goal of mapping what affects outcomes, but they're specifically designed for quantitative decision analysis with probability distributions. Our diagrams are more qualitative and conceptual.
+</Aside>
+
+**Sources**: [Decision Analysis Wikipedia](https://en.wikipedia.org/wiki/Decision_analysis), [INFORMS Decision Analysis](https://pubsonline.informs.org/doi/abs/10.1287/deca.1050.0020)
+
+---
+
+### 2. Causal Loop Diagrams (Systems Thinking)
+
+<Badge text="Systems Dynamics" variant="note" />
+
+**Origin**: Emerged from [System Dynamics](https://en.wikipedia.org/wiki/Causal_loop_diagram) practice, popularized by Jay Forrester and the MIT school.
+
+**Definition**: A diagram showing causal relationships between variables, with emphasis on feedback loops:
+- **Reinforcing loops (R)**: Change compounds (e.g., compound interest)
+- **Balancing loops (B)**: Change counteracts (e.g., thermostat)
+- **Polarity (+/-)**: Whether variables move together or opposite
+
+| Strength | Weakness |
+|----------|----------|
+| Handles feedback loops natively | Our diagrams are DAGs (no cycles) |
+| Clear visual conventions | "Causal" in the name has same problem |
+| Popular in organizational contexts | Emphasizes dynamics over static factors |
+
+<Aside type="caution" title="Key Difference">
+CLDs are designed for systems with feedback loops. Our current implementation uses Dagre (DAG layout), which doesn't support cycles. If we wanted to support feedback, we'd need different rendering.
+</Aside>
+
+**Sources**: [Causal Loop Diagram Wikipedia](https://en.wikipedia.org/wiki/Causal_loop_diagram), [Systems Thinker](https://thesystemsthinker.com/causal-loop-construction-the-basics/), [Cascade Institute Handbook](https://cascadeinstitute.org/wp-content/uploads/2024/06/Causal-Loop-Diagrams-Handbook-June-27-2024.pdf)
+
+---
+
+### 3. Argument Maps & IBIS (Argumentation)
+
+<Badge text="Philosophy/Design" variant="note" />
+
+**Origin**: [IBIS (Issue-Based Information System)](https://en.wikipedia.org/wiki/Issue-based_information_system) invented by Werner Kunz and Horst Rittel in the 1960s for tackling "wicked problems."
+
+**Core Elements**:
+- **Issues**: Questions to be addressed
+- **Positions**: Proposed answers/solutions
+- **Arguments**: Pro/con rationales supporting or opposing positions
+
+| Strength | Weakness |
+|----------|----------|
+| Designed for complex, ill-defined problems | Focused on argumentation, not factors |
+| Captures disagreement structure | Three-type ontology is restrictive |
+| Software tools exist (Compendium) | Less familiar than other terms |
+
+<Aside type="tip" title="Insight">
+IBIS's focus on structuring discourse around "wicked problems" resonates with LongtermWiki's goal. The emphasis on capturing positions and arguments for/against is similar to how we model different views on factors.
+</Aside>
+
+**Tools**: [Compendium](https://en.wikipedia.org/wiki/Issue-based_information_system), DRed, designVUE
+
+**Sources**: [IBIS Wikipedia](https://en.wikipedia.org/wiki/Issue-based_information_system), [Kunz & Rittel 1970](http://magrawal.myweb.usf.edu/phd/articles/ibis_wp_70.pdf), [Cognexus](http://www.cognexus.org/IBIS-A_Tool_for_All_Reasons.pdf)
+
+---
+
+### 4. Crucial Considerations (Philosophy)
+
+<Badge text="Bostrom 2007/2014" variant="tip" />
+
+**Origin**: Concept introduced by [Nick Bostrom](https://nickbostrom.com/papers/crucial-considerations/) in 2007, elaborated in a 2014 talk.
+
+**Definition**: "A consideration such that if it were taken into account, it would overturn the conclusions we would otherwise reach about how we should direct our efforts."
+
+**Key concepts**:
+- **Crucial consideration**: Overturns conclusions
+- **Crucial consideration component**: Becomes crucial when combined with other considerations
+- **Deliberation ladder**: Sequence of successive reassessments
+
+| Strength | Weakness |
+|----------|----------|
+| Directly relevant to LongtermWiki's mission | "Consideration" is abstract |
+| Familiar to EA/rationalist audience | More about ideas than structure |
+| Captures the "changes your mind" aspect | Not specifically a diagram type |
+
+<Aside type="note" title="Key Quote">
+"If we have overlooked even just one such consideration, then all our best efforts might be for naught – or less. When headed the wrong way, the last thing needed is progress." — <EntityLink id="nick-bostrom">Nick Bostrom</EntityLink>
+</Aside>
+
+**Sources**: [Bostrom's website](https://nickbostrom.com/papers/crucial-considerations/), [EA Forum](https://forum.effectivealtruism.org/topics/crucial-consideration/), [Effective Altruism article](https://www.effectivealtruism.org/articles/crucial-considerations-and-wise-philanthropy-nick-bostrom)
+
+---
+
+### 5. Crux Mapping (Rationalist Community)
+
+<Badge text="CFAR" variant="tip" />
+
+**Origin**: Developed by [CFAR (Center for Applied Rationality)](https://www.rationality.org/resources/updates/2016/double-crux) as part of their curriculum.
+
+**Definitions**:
+- **Crux**: A belief C that, if changed, would change your belief in B
+- **Double crux**: A shared crux where two disagreeing people would both change their minds
+
+**Victory condition**: "Agreement on a shared causal model of the world—you've won when both you and your partner agree to the same if-then statements."
+
+| Strength | Weakness |
+|----------|----------|
+| Familiar to target audience | Jargon outside rationalist circles |
+| Emphasizes "what would change your mind" | Originally about dyadic disagreement |
+| "Crux" is memorable and specific | Some critique it as overly idealized |
+
+<Aside type="tip" title="Perfect Fit">
+The crux concept directly aligns with LongtermWiki's goal of mapping key uncertainties that drive prioritization. "What would change your mind about this intervention?" is exactly what we're trying to capture.
+</Aside>
+
+**Sources**: [LessWrong Double Crux](https://www.lesswrong.com/posts/exa5kmvopeRyfJgCy/double-crux-a-strategy-for-mutual-understanding), [CFAR Resources](https://www.rationality.org/resources/updates/2016/double-crux), [Basic Double Crux Pattern](https://www.lesswrong.com/posts/hNztRARB52Riy36Kz/the-basic-double-crux-pattern)
+
+---
+
+### 6. Driver Diagrams (Quality Improvement)
+
+<Badge text="Healthcare QI" variant="note" />
+
+**Origin**: Widely used in [healthcare quality improvement](https://www.ihi.org/resources/tools/driver-diagram), particularly with Plan-Do-Study-Act (PDSA) cycles.
+
+**Structure**:
+- **Aim**: What you're trying to achieve
+- **Primary drivers**: High-level factors that must be influenced
+- **Secondary drivers**: Specific factors/interventions
+- **Change ideas**: Concrete actions
+
+| Strength | Weakness |
+|----------|----------|
+| Clear hierarchical structure | Associated with healthcare/QI |
+| "Driver" is intuitive | Implies more agency than we model |
+| Links factors to interventions | May feel too operational |
+
+**Sources**: [IHI Driver Diagram](https://www.ihi.org/resources/tools/driver-diagram), [AHRQ Key Driver Diagram](https://www.ahrq.gov/evidencenow/tools/key-driver-diagram.html)
+
+---
+
+### 7. Theory of Change / Logic Models (Nonprofit)
+
+<Badge text="Philanthropy" variant="note" />
+
+**Origin**: Common in [nonprofit and philanthropic](https://ctb.ku.edu/en/table-of-contents/overview/models-for-community-health-and-development/logic-model-development/main) contexts.
+
+**Key distinction**:
+- **Theory of Change**: Explains *why* change will occur, works backward from impact
+- **Logic Model**: Describes *what* will happen, works forward from inputs
+
+| Strength | Weakness |
+|----------|----------|
+| Familiar to funders/nonprofits | Associated with program evaluation |
+| Emphasizes causal pathways | Less about uncertainty |
+| Links to impact measurement | May feel too outcome-focused |
+
+**Sources**: [NPC Theory of Change](https://www.thinknpc.org/wp-content/uploads/2018/07/Creating-your-theory-of-change1.pdf), [La Piana comparison](https://www.lapiana.org/theory-of-change-or-a-logic-model/), [TOC Toolkit](https://toctoolkit.org/article/theory-of-change-vs-logic-model-complete-comparison/)
+
+---
+
+### 8. Concept Maps vs Knowledge Graphs
+
+<Badge text="Knowledge Representation" variant="default" />
+
+| Feature | Mind Map | Concept Map | Knowledge Graph |
+|---------|----------|-------------|-----------------|
+| **Structure** | Tree (single center) | Network (multiple hubs) | Graph/Network |
+| **Relationships** | Implicit | Labeled connections | Typed relationships |
+| **Origin** | Tony Buzan (1974) | Joseph Novak (1970s) | Computer science |
+
+Our diagrams are most similar to **concept maps**: network structure with labeled relationships between nodes.
+
+**Sources**: [NN/g Cognitive Maps](https://www.nngroup.com/articles/cognitive-mind-concept/), [Gloow comparison](https://gloow.io/blog/concept-map-vs-mind-map-vs-knowledge-graph), [Concept Map Wikipedia](https://en.wikipedia.org/wiki/Concept_map)
+
+---
+
+## Uncertainty Types
+
+<Aside type="note" title="Why This Matters">
+Our diagrams include nodes with varying confidence levels. Understanding established uncertainty typologies helps us communicate what kinds of uncertainty we're representing.
+</Aside>
+
+### Aleatoric vs Epistemic Uncertainty
+
+| Type | Definition | Can be reduced? | Example |
+|------|------------|-----------------|---------|
+| **Aleatoric** | Inherent randomness in the system | No—only quantified | Coin flip outcome |
+| **Epistemic** | Uncertainty due to lack of knowledge | Yes—with more information | "Will this policy pass?" |
+
+**Key insight**: "Epistemic uncertainty tends to be expressed using phrases like 'I am 90% sure' whereas aleatory uncertainty tends to be expressed using phrases like 'I think there's a 90% chance.'"
+
+Our diagrams mostly represent **epistemic uncertainty**—things we don't know but could learn—rather than inherent randomness.
+
+**Sources**: [Springer Machine Learning](https://link.springer.com/article/10.1007/s10994-021-05946-3), [Berkeley Statistics](https://www.stat.berkeley.edu/~aldous/157/Papers/Fox_Ulkumen.pdf), [Towards Data Science](https://towardsdatascience.com/aleatoric-and-epistemic-uncertainty-in-deep-learning-77e5c51f9423/)
+
+---
+
+## Naming Options Analysis
+
+Based on this research, here are the main naming candidates:
+
+### Option 1: Crux Map
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Accuracy** | High—captures "what would change your mind" |
+| **Familiarity** | High for EA/rationalist audience, low outside |
+| **Distinctiveness** | High—not easily confused with other diagram types |
+| **Fit with LongtermWiki** | Excellent—aligns with Crux Graph component |
+
+<Aside type="tip" title="Recommended">
+"Crux Map" directly aligns with LongtermWiki's mission (mapping key uncertainties) and the target audience's vocabulary. The "crux" terminology is already established in the rationalist/EA community.
+</Aside>
+
+### Option 2: Factor Map
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Accuracy** | High—we are mapping factors |
+| **Familiarity** | Medium—generic but clear |
+| **Distinctiveness** | Medium—could be confused with factor analysis |
+| **Fit with LongtermWiki** | Good—neutral, accessible |
+
+### Option 3: Influence Map
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Accuracy** | High—captures influence relationships |
+| **Familiarity** | Medium—some association with decision analysis |
+| **Distinctiveness** | Medium—could be confused with influence diagrams |
+| **Fit with LongtermWiki** | Good—clear meaning |
+
+### Option 4: Consideration Map
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Accuracy** | High—we're mapping considerations |
+| **Familiarity** | Low—not established terminology |
+| **Distinctiveness** | High—distinctive |
+| **Fit with LongtermWiki** | Good—connects to "crucial considerations" |
+
+### Option 5: Driver Map/Diagram
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Accuracy** | Medium—implies more agency |
+| **Familiarity** | Medium—established in QI |
+| **Distinctiveness** | Medium—associated with healthcare |
+| **Fit with LongtermWiki** | Moderate—less about uncertainty |
+
+### Option 6: Priority Map
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Accuracy** | Medium—we map factors, not just priorities |
+| **Familiarity** | Low—not established |
+| **Distinctiveness** | Medium |
+| **Fit with LongtermWiki** | Moderate—captures decision-relevance |
+
+### Option 7: Leverage Map
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Accuracy** | Medium—emphasizes tractability |
+| **Familiarity** | Low—not established |
+| **Distinctiveness** | High |
+| **Fit with LongtermWiki** | Moderate—overemphasizes changeability |
+
+---
+
+## Recommendations
+
+### Primary Recommendation: **Crux Map**
+
+**Rationale**:
+1. Directly aligns with LongtermWiki's mission ("Crux Graph" is already a core component)
+2. Familiar to the target audience (EA/rationalist community)
+3. Captures the key insight: "what would change your mind?"
+4. Distinctive—won't be confused with other diagram types
+5. The word "crux" conveys importance and decision-relevance
+
+### Alternative: **Factor Map**
+
+**Use if**: You want broader accessibility outside the rationalist community. "Factor" is neutral, clear, and doesn't require explaining jargon.
+
+### Naming for Node Scores
+
+Our diagrams include four scoring dimensions. Consider renaming to clarify uncertainty types:
+
+| Current Name | Suggested Rename | Rationale |
+|--------------|------------------|-----------|
+| `novelty` | Keep as is | Clear meaning |
+| `sensitivity` | Keep as is | Clear meaning |
+| `changeability` | `tractability` | More common in EA |
+| `certainty` | `epistemic confidence` | Distinguishes from aleatoric |
+
+---
+
+## Implementation Checklist
+
+If renaming to "Crux Map":
+
+- [ ] Update `cause-effect-diagrams.mdx` → `crux-maps.mdx`
+- [ ] Update component name: `CauseEffectGraph` → `CruxMap`
+- [ ] Update YAML property: `causeEffectGraph` → `cruxMap`
+- [ ] Update style guide references
+- [ ] Update skill name: `/cause-effect-diagram` → `/crux-map`
+- [ ] Update documentation throughout
+
+---
+
+## Sources
+
+### Decision Analysis
+- [Decision Analysis Wikipedia](https://en.wikipedia.org/wiki/Decision_analysis)
+- [Howard Raiffa Wikipedia](https://en.wikipedia.org/wiki/Howard_Raiffa)
+- [INFORMS Influence Diagrams](https://pubsonline.informs.org/doi/abs/10.1287/deca.1050.0020)
+
+### Systems Thinking
+- [Causal Loop Diagram Wikipedia](https://en.wikipedia.org/wiki/Causal_loop_diagram)
+- [The Systems Thinker](https://thesystemsthinker.com/causal-loop-construction-the-basics/)
+- [Cascade Institute CLD Handbook](https://cascadeinstitute.org/wp-content/uploads/2024/06/Causal-Loop-Diagrams-Handbook-June-27-2024.pdf)
+
+### Argumentation
+- [IBIS Wikipedia](https://en.wikipedia.org/wiki/Issue-based_information_system)
+- [Kunz & Rittel Original Paper](http://magrawal.myweb.usf.edu/phd/articles/ibis_wp_70.pdf)
+- [Eight to Late on IBIS](https://eight2late.com/2009/07/08/the-what-and-whence-of-issue-based-information-systems/)
+
+### Crucial Considerations & Crux
+- [Nick Bostrom on Crucial Considerations](https://nickbostrom.com/papers/crucial-considerations/)
+- [EA Forum: Crucial Consideration](https://forum.effectivealtruism.org/topics/crucial-consideration/)
+- [LessWrong: Double Crux](https://www.lesswrong.com/posts/exa5kmvopeRyfJgCy/double-crux-a-strategy-for-mutual-understanding)
+- [CFAR Double Crux](https://www.rationality.org/resources/updates/2016/double-crux)
+
+### Quality Improvement
+- [IHI Driver Diagram](https://www.ihi.org/resources/tools/driver-diagram)
+- [AHRQ Key Driver Diagram](https://www.ahrq.gov/evidencenow/tools/key-driver-diagram.html)
+
+### Theory of Change
+- [NPC Theory of Change Guide](https://www.thinknpc.org/wp-content/uploads/2018/07/Creating-your-theory-of-change1.pdf)
+- [TOC Toolkit Comparison](https://toctoolkit.org/article/theory-of-change-vs-logic-model-complete-comparison/)
+
+### Uncertainty
+- [Springer: Aleatoric and Epistemic Uncertainty](https://link.springer.com/article/10.1007/s10994-021-05946-3)
+- [Berkeley: Two Dimensions of Uncertainty](https://www.stat.berkeley.edu/~aldous/157/Papers/Fox_Ulkumen.pdf)
+
+### Knowledge Representation
+- [NN/g: Cognitive Maps](https://www.nngroup.com/articles/cognitive-mind-concept/)
+- [Concept Map Wikipedia](https://en.wikipedia.org/wiki/Concept_map)

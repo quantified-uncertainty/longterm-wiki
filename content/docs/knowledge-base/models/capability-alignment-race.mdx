@@ -1,0 +1,562 @@
+---
+title: Capability-Alignment Race Model
+description: This model analyzes the critical gap between AI capability progress and safety/governance readiness. Currently, capabilities are ~3 years ahead of alignment with the gap increasing at 0.5 years annually, driven by 10²⁶ FLOP scaling vs. 15% interpretability coverage.
+tableOfContents: false
+quality: 62
+lastEdited: "2025-12-28"
+ratings:
+  focus: 8.5
+  novelty: 5
+  rigor: 6.5
+  completeness: 7.5
+  concreteness: 8
+  actionability: 7
+importance: 82.5
+llmSummary: Quantifies the capability-alignment race showing capabilities currently ~3 years ahead of alignment readiness, with gap widening at 0.5 years/year driven by 10²⁶ FLOP scaling vs. 15% interpretability coverage and 30% scalable oversight maturity. Projects gap reaching 5-7 years by 2030 unless alignment research funding increases from $200M to $800M annually, with 60% chance of warning shot before TAI potentially triggering governance response.
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Conceptual Framework' section
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+  - Complete 'Strategic Importance' section
+  - Complete 'Limitations' section (6 placeholders)
+metrics:
+  wordCount: 515
+  citations: 14
+  tables: 26
+  diagrams: 0
+clusters:
+  - ai-safety
+  - governance
+subcategory: race-models
+---
+import {R, EntityLink} from '@components/wiki';
+
+import CauseEffectGraph from '@components/CauseEffectGraph';
+
+## Overview
+
+The Capability-Alignment Race Model quantifies the fundamental dynamic determining AI safety: the gap between advancing capabilities and our readiness to safely deploy them. Current analysis shows capabilities ~3 years ahead of alignment readiness, with this gap widening at 0.5 years annually. 
+
+The model tracks how frontier compute (currently 10²⁶ FLOP for largest training runs) and algorithmic improvements drive capability progress at ~10-15 percentage points per year, while alignment research (interpretability at ~15% coverage, <EntityLink id="scalable-oversight">scalable oversight</EntityLink> at ~30% maturity) advances more slowly. This creates deployment pressure worth \$100B annually, racing against governance systems operating at ~25% effectiveness.
+
+<div class="breakout">
+<CauseEffectGraph
+  client:load
+  height={900}
+  fitViewPadding={0.05}
+  initialNodes={[
+    {
+      id: 'compute',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Compute Available',
+        description: 'FLOP/s available to leading labs.',
+        type: 'cause',
+        confidence: 26,
+        confidenceLabel: 'log₁₀ FLOP/s',
+        details: 'Training compute for frontier models. Currently ~10²⁶ FLOP for largest runs. Doubling every 6-12 months.',
+        relatedConcepts: ['Scaling laws', 'GPU clusters', 'Training runs']
+      }
+    },
+    {
+      id: 'algorithmic',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Algorithmic Efficiency',
+        description: 'Improvement over 2024 baseline.',
+        type: 'cause',
+        confidence: 2,
+        confidenceLabel: 'x baseline',
+        details: 'Algorithmic improvements compound with compute. Architecture innovations, training techniques, data efficiency.',
+        relatedConcepts: ['Transformers', 'MoE', 'Chinchilla scaling']
+      }
+    },
+    {
+      id: 'frontier-labs',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Frontier Lab Lead',
+        description: 'Lead time from 1st to 2nd place lab.',
+        type: 'cause',
+        confidence: 6,
+        confidenceLabel: 'months',
+        details: 'How concentrated is the frontier? Smaller lead = more racing pressure. Currently ~6 months between top labs.',
+        relatedConcepts: ['Racing dynamics', 'Concentration', 'Competition']
+      }
+    },
+    {
+      id: 'opensource-lag',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Open-Source Lag',
+        description: 'Time from frontier to open-source.',
+        type: 'cause',
+        confidence: 18,
+        confidenceLabel: 'months',
+        details: 'How quickly do capabilities proliferate? Affects misuse risk and governance difficulty. Currently ~18 months.',
+        relatedConcepts: ['Llama', 'Mistral', 'Proliferation']
+      }
+    },
+    {
+      id: 'capability-level',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Frontier Capability',
+        description: 'Current frontier model capabilities.',
+        type: 'intermediate',
+        confidence: 0.7,
+        confidenceLabel: 'vs. human expert',
+        details: 'Aggregate capability level of best models. Currently ~70% of human expert on most cognitive tasks.',
+        relatedConcepts: ['Benchmarks', 'MMLU', 'Coding', 'Reasoning']
+      }
+    },
+    {
+      id: 'interp',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Interpretability',
+        description: 'Understanding of model internals.',
+        type: 'cause',
+        confidence: 0.15,
+        confidenceLabel: 'coverage',
+        details: 'What fraction of model behavior can we mechanistically explain? Currently ~15% for key circuits.',
+        relatedConcepts: ['Sparse autoencoders', 'Circuits', 'Features']
+      }
+    },
+    {
+      id: 'oversight',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Scalable Oversight',
+        description: 'Techniques to supervise superhuman AI.',
+        type: 'cause',
+        confidence: 0.3,
+        confidenceLabel: 'maturity',
+        details: 'Debate, recursive reward modeling, etc. Currently ~30% mature. Critical for superhuman alignment.',
+        relatedConcepts: ['Debate', 'Amplification', 'Weak-to-strong']
+      }
+    },
+    {
+      id: 'alignment-tax',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Alignment Tax',
+        description: 'Capability cost of safety measures.',
+        type: 'cause',
+        confidence: 0.15,
+        confidenceLabel: 'capability loss',
+        details: 'How much capability do you sacrifice for safety? Currently ~15%. Lower tax = more adoption.',
+        relatedConcepts: ['RLHF overhead', 'Safety fine-tuning', 'Refusals']
+      }
+    },
+    {
+      id: 'deception-detect',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Deception Detection',
+        description: 'Ability to detect deceptive alignment.',
+        type: 'cause',
+        confidence: 0.2,
+        confidenceLabel: 'capability',
+        details: 'Can we tell if a model is strategically deceiving us? Currently ~20% reliable.',
+        relatedConcepts: ['Sleeper agents', 'Trojans', 'Honeypots']
+      }
+    },
+    {
+      id: 'alignment-gap',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Capability-Alignment Gap',
+        description: 'How far ahead are capabilities vs. alignment?',
+        type: 'intermediate',
+        confidence: 3,
+        confidenceLabel: 'years gap',
+        details: 'The core race metric. Currently capabilities ~3 years ahead of alignment. Gap increasing.',
+        relatedConcepts: ['Racing', 'Differential progress', 'Safety lag']
+      }
+    },
+    {
+      id: 'econ-value',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Economic Value',
+        description: 'Annual value of AI capabilities.',
+        type: 'cause',
+        confidence: 500,
+        confidenceLabel: '$B/year',
+        details: 'Revenue and productivity gains from AI. Creates deployment pressure. Currently ≈\$500B/year and growing rapidly.',
+        relatedConcepts: ['GDP impact', 'Automation', 'Productivity']
+      }
+    },
+    {
+      id: 'arms-race',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Military AI Race',
+        description: 'Intensity of AI arms race.',
+        type: 'cause',
+        confidence: 0.6,
+        confidenceLabel: 'intensity (0-1)',
+        details: 'US-China military AI competition. Higher intensity = less safety focus. Currently ~0.6.',
+        relatedConcepts: ['Autonomous weapons', 'Defense AI', 'Strategic competition']
+      }
+    },
+    {
+      id: 'deploy-pressure',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Deployment Pressure',
+        description: 'Pressure to deploy quickly.',
+        type: 'intermediate',
+        confidence: 0.7,
+        confidenceLabel: 'intensity (0-1)',
+        details: 'Combined economic, military, and competitive pressure. Currently high (~0.7).',
+        relatedConcepts: ['Time to market', 'First mover', 'Racing']
+      }
+    },
+    {
+      id: 'us-reg',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'US AI Regulation',
+        description: 'Stringency of US AI rules.',
+        type: 'cause',
+        confidence: 0.25,
+        confidenceLabel: 'stringency (0-1)',
+        details: 'Executive orders, potential legislation. Currently ~0.25 (low). Increasing.',
+        relatedConcepts: ['EO 14110', 'Congress', 'NIST']
+      }
+    },
+    {
+      id: 'intl-coord',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'International Coordination',
+        description: 'Strength of global AI governance.',
+        type: 'cause',
+        confidence: 0.2,
+        confidenceLabel: 'effectiveness (0-1)',
+        details: 'Treaties, safety institutes, coordination. Currently ~0.2 (weak).',
+        relatedConcepts: ['AI Safety Summit', 'GPAI', 'Treaties']
+      }
+    },
+    {
+      id: 'compute-gov',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Compute Governance',
+        description: 'Monitoring and control of AI compute.',
+        type: 'cause',
+        confidence: 0.15,
+        confidenceLabel: 'coverage (0-1)',
+        details: 'Export controls, KYC for cloud, hardware tracking. Currently ~0.15.',
+        relatedConcepts: ['Chip controls', 'Cloud KYC', 'Hardware tracking']
+      }
+    },
+    {
+      id: 'public-concern',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Public Concern',
+        description: 'Public awareness and worry about AI risk.',
+        type: 'cause',
+        confidence: 0.4,
+        confidenceLabel: 'level (0-1)',
+        details: 'Drives political will for regulation. Currently ~0.4 and rising.',
+        relatedConcepts: ['Media coverage', 'Polling', 'Advocacy']
+      }
+    },
+    {
+      id: 'governance-strength',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Governance Strength',
+        description: 'Overall AI governance effectiveness.',
+        type: 'intermediate',
+        confidence: 0.25,
+        confidenceLabel: 'effectiveness (0-1)',
+        details: 'Combined domestic and international governance. Currently weak (~0.25).',
+        relatedConcepts: ['Regulation', 'Enforcement', 'Standards']
+      }
+    },
+    {
+      id: 'warning-shot',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Warning Shot',
+        description: 'Probability of visible AI incident.',
+        type: 'intermediate',
+        confidence: 0.6,
+        confidenceLabel: 'P(before TAI)',
+        details: 'A significant but recoverable AI accident that galvanizes action. 60% chance before TAI.',
+        relatedConcepts: ['Near miss', 'Wake-up call', 'Incident']
+      }
+    },
+    {
+      id: 'accident-risk',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Accident Risk',
+        description: 'Risk from unintentional misalignment.',
+        type: 'intermediate',
+        confidence: 0.12,
+        confidenceLabel: 'expected loss',
+        details: 'Driven by capability-alignment gap and deployment pressure.',
+        relatedConcepts: ['Misalignment', 'Mesa-optimization', 'Goal misgeneralization']
+      }
+    },
+    {
+      id: 'misuse-risk',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Misuse Risk',
+        description: 'Risk from intentional harmful use.',
+        type: 'intermediate',
+        confidence: 0.08,
+        confidenceLabel: 'expected loss',
+        details: 'Driven by proliferation and weak governance.',
+        relatedConcepts: ['Bioweapons', 'Cyber', 'Manipulation']
+      }
+    },
+    {
+      id: 'structural-risk',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Structural Risk',
+        description: 'Risk from systemic failures.',
+        type: 'intermediate',
+        confidence: 0.06,
+        confidenceLabel: 'expected loss',
+        details: 'Multi-agent dynamics, race to bottom, coordination failures.',
+        relatedConcepts: ['Racing', 'Lock-in', 'Collective action']
+      }
+    },
+    {
+      id: 'total-risk',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Total X-Risk',
+        description: 'Combined existential risk from AI.',
+        type: 'effect',
+        confidence: 0.25,
+        confidenceLabel: 'expected loss',
+        details: 'Sum of accident, misuse, and structural risk pathways.',
+        relatedConcepts: ['P(doom)', 'Existential risk', 'Catastrophe']
+      }
+    }
+  ]}
+  initialEdges={[
+    { id: 'e-compute-cap', source: 'compute', target: 'capability-level', data: { impact: 0.35 } },
+    { id: 'e-algo-cap', source: 'algorithmic', target: 'capability-level', data: { impact: 0.35 } },
+    { id: 'e-frontier-cap', source: 'frontier-labs', target: 'capability-level', data: { impact: 0.15 } },
+    { id: 'e-opensource-cap', source: 'opensource-lag', target: 'capability-level', data: { impact: 0.15 } },
+    { id: 'e-interp-gap', source: 'interp', target: 'alignment-gap', data: { impact: 0.25 } },
+    { id: 'e-oversight-gap', source: 'oversight', target: 'alignment-gap', data: { impact: 0.25 } },
+    { id: 'e-tax-gap', source: 'alignment-tax', target: 'alignment-gap', data: { impact: 0.15 } },
+    { id: 'e-deception-gap', source: 'deception-detect', target: 'alignment-gap', data: { impact: 0.20 } },
+    { id: 'e-cap-gap', source: 'capability-level', target: 'alignment-gap', data: { impact: 0.15 } },
+    { id: 'e-econ-deploy', source: 'econ-value', target: 'deploy-pressure', data: { impact: 0.40 } },
+    { id: 'e-arms-deploy', source: 'arms-race', target: 'deploy-pressure', data: { impact: 0.35 } },
+    { id: 'e-frontier-deploy', source: 'frontier-labs', target: 'deploy-pressure', data: { impact: 0.25 } },
+    { id: 'e-us-gov', source: 'us-reg', target: 'governance-strength', data: { impact: 0.30 } },
+    { id: 'e-intl-gov', source: 'intl-coord', target: 'governance-strength', data: { impact: 0.25 } },
+    { id: 'e-compute-gov', source: 'compute-gov', target: 'governance-strength', data: { impact: 0.25 } },
+    { id: 'e-public-gov', source: 'public-concern', target: 'governance-strength', data: { impact: 0.20 } },
+    { id: 'e-cap-warning', source: 'capability-level', target: 'warning-shot', data: { impact: 0.50 } },
+    { id: 'e-deploy-warning', source: 'deploy-pressure', target: 'warning-shot', data: { impact: 0.50 } },
+    { id: 'e-warning-public', source: 'warning-shot', target: 'public-concern', data: { impact: 0.60 }, style: { strokeDasharray: '5,5' } },
+    { id: 'e-gap-accident', source: 'alignment-gap', target: 'accident-risk', data: { impact: 0.50 } },
+    { id: 'e-deploy-accident', source: 'deploy-pressure', target: 'accident-risk', data: { impact: 0.30 } },
+    { id: 'e-gov-accident', source: 'governance-strength', target: 'accident-risk', data: { impact: 0.20 } },
+    { id: 'e-opensource-misuse', source: 'opensource-lag', target: 'misuse-risk', data: { impact: 0.40 } },
+    { id: 'e-cap-misuse', source: 'capability-level', target: 'misuse-risk', data: { impact: 0.30 } },
+    { id: 'e-gov-misuse', source: 'governance-strength', target: 'misuse-risk', data: { impact: 0.30 } },
+    { id: 'e-deploy-struct', source: 'deploy-pressure', target: 'structural-risk', data: { impact: 0.35 } },
+    { id: 'e-arms-struct', source: 'arms-race', target: 'structural-risk', data: { impact: 0.35 } },
+    { id: 'e-gov-struct', source: 'governance-strength', target: 'structural-risk', data: { impact: 0.30 } },
+    { id: 'e-accident-total', source: 'accident-risk', target: 'total-risk', data: { impact: 0.45 } },
+    { id: 'e-misuse-total', source: 'misuse-risk', target: 'total-risk', data: { impact: 0.30 } },
+    { id: 'e-struct-total', source: 'structural-risk', target: 'total-risk', data: { impact: 0.25 } }
+  ]}
+/>
+</div>
+
+## Risk Assessment
+
+| Factor | Severity | Likelihood | Timeline | Trend |
+|--------|----------|------------|----------|-------|
+| Gap widens to 5+ years | Catastrophic | 50% | 2027-2030 | Accelerating |
+| Alignment breakthroughs | Critical (positive) | 20% | 2025-2027 | Uncertain |
+| Governance catches up | High (positive) | 25% | 2026-2028 | Slow |
+| Warning shots trigger response | Medium (positive) | 60% | 2025-2027 | Increasing |
+
+## Key Dynamics & Evidence
+
+### Capability Acceleration
+
+| Component | Current State | Growth Rate | 2027 Projection | Source |
+|-----------|---------------|-------------|------------------|--------|
+| Training compute | 10²⁶ FLOP | 4x/year | 10²⁸ FLOP | <R id="2efa03ce0d906d78"><EntityLink id="epoch-ai">Epoch AI</EntityLink></R> |
+| Algorithmic efficiency | 2x 2024 baseline | 1.5x/year | 3.4x baseline | <R id="6c2f85e163e0c4a4">Erdil & Besiroglu (2023)</R> |
+| Performance (MMLU) | 89% | +8pp/year | >95% | <R id="a2cf0d0271acb097">Anthropic</R> |
+| Frontier lab lead | 6 months | Stable | 3-6 months | <R id="0532c540957038e6">RAND</R> |
+
+### Alignment Lag
+
+| Component | Current Coverage | Improvement Rate | 2027 Projection | Critical Gap |
+|-----------|------------------|------------------|-----------------|--------------|
+| Interpretability | 15% | +5pp/year | 30% | Need 80% for safety |
+| Scalable oversight | 30% | +8pp/year | 54% | Need 90% for superhuman |
+| Deception detection | 20% | +3pp/year | 29% | Need 95% for AGI |
+| Alignment tax | 15% loss | -2pp/year | 9% loss | Target \&lt;5% for adoption |
+
+### Deployment Pressure
+
+Economic value drives rapid deployment, creating misalignment between safety needs and market incentives.
+
+| Pressure Source | Current Impact | Annual Growth | 2027 Impact | Mitigation |
+|----------------|----------------|---------------|-------------|------------|
+| Economic value | \$500B/year | 40% | \$1.5T/year | Regulation, liability |
+| Military competition | 0.6/1.0 intensity | Increasing | 0.8/1.0 | Arms control treaties |
+| Lab competition | 6 month lead | Shortening | 3 month lead | Industry coordination |
+
+Quote from <R id="ebb2f8283d5a6014"><EntityLink id="paul-christiano">Paul Christiano</EntityLink></R>: "The core challenge is that capabilities are advancing faster than our ability to align them. If this gap continues to widen, we'll be in serious trouble."
+
+## Current State & Trajectory
+
+### 2025 Snapshot
+
+The race is in a critical phase with capabilities accelerating faster than alignment solutions:
+
+- **Frontier models** approaching human-level performance (70% expert-level)
+- **Alignment research** still in early stages with limited coverage
+- **Governance systems** lagging significantly behind technical progress
+- **Economic incentives** strongly favor rapid deployment over safety
+
+### 5-Year Projections
+
+| Metric | Current | 2027 | 2030 | Risk Level |
+|--------|---------|------|------|------------|
+| Capability-alignment gap | 3 years | 4-5 years | 5-7 years | Critical |
+| Deployment pressure | 0.7/1.0 | 0.85/1.0 | 0.9/1.0 | High |
+| Governance strength | 0.25/1.0 | 0.4/1.0 | 0.6/1.0 | Improving |
+| Warning shot probability | 15%/year | 20%/year | 25%/year | Increasing |
+
+Based on <R id="8fef0d8c902de618"><EntityLink id="metaculus">Metaculus</EntityLink> forecasts</R> and expert surveys from <R id="38eba87d0a888e2e"><EntityLink id="ai-impacts">AI Impacts</EntityLink></R>.
+
+### Potential Turning Points
+
+Critical junctures that could alter trajectories:
+
+- **Major alignment breakthrough** (20% chance by 2027): Interpretability or oversight advance that halves the gap
+- **Capability plateau** (15% chance): Scaling laws break down, slowing capability progress  
+- **Coordinated pause** (10% chance): International agreement to pause frontier development
+- **Warning shot incident** (60% chance by 2027): Serious but recoverable AI accident that triggers policy response
+
+## Key Uncertainties & Research Cruxes
+
+### Technical Uncertainties
+
+| Question | Current Evidence | Expert Consensus | Implications |
+|----------|------------------|------------------|--------------|
+| Can interpretability scale to frontier models? | Limited success on smaller models | 45% optimistic | Determines alignment feasibility |
+| Will scaling laws continue? | Some evidence of slowdown | 70% continue to 2027 | Core driver of capability timeline |
+| How much alignment tax is acceptable? | Currently 15% | Target \&lt;5% | Adoption vs. safety tradeoff |
+
+### Governance Questions
+
+- **Regulatory capture**: Will AI labs co-opt government oversight? <R id="5cde1bae73096dd7">CNAS analysis</R> suggests 40% risk
+- **<EntityLink id="international-coordination">International coordination</EntityLink>**: Can major powers cooperate on AI safety? <R id="0532c540957038e6">RAND assessment</R> shows limited progress
+- **Democratic response**: Will public concern drive effective policy? Polling shows <R id="6b09f789e606b1d2">growing awareness</R> but uncertain translation to action
+
+### Strategic Cruxes
+
+Core disagreements among experts on alignment difficulty:
+
+1. **Technical optimism**: 35% believe alignment will prove tractable
+2. **Governance solution**: 25% think coordination/pause is the path forward  
+3. **Warning shots help**: 60% expect helpful wake-up calls before catastrophe
+4. **Timeline matters**: 80% agree slower development improves outcomes
+
+## Timeline of Critical Events
+
+| Period | Capability Milestones | <EntityLink id="alignment-progress">Alignment Progress</EntityLink> | Governance Developments |
+|--------|----------------------|-------------------|------------------------|
+| **2025** | GPT-5 level, 80% human tasks | Basic interpretability tools | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> implementation |
+| **2026** | Multimodal AGI claims | Scalable oversight demos | US federal AI legislation |
+| **2027** | Superhuman in most domains | Alignment tax \&lt;10% | International AI treaty |
+| **2028** | Recursive self-improvement | Deception detection tools | Compute governance regime |
+| **2030** | Transformative AI deployment | Mature alignment stack | Global coordination framework |
+
+Based on <R id="8fef0d8c902de618">Metaculus community predictions</R> and <R id="9e229de82a60bdc2"><EntityLink id="fhi">Future of Humanity Institute</EntityLink> surveys</R>.
+
+## Resource Requirements & Strategic Investments
+
+### Priority Funding Areas
+
+Analysis suggests optimal resource allocation to narrow the gap:
+
+| Investment Area | Current Funding | Recommended | Gap Reduction | ROI |
+|----------------|-----------------|-------------|---------------|-----|
+| Alignment research | \$200M/year | \$800M/year | 0.8 years | High |
+| Interpretability | \$50M/year | \$300M/year | 0.3 years | Very high |
+| Governance capacity | \$100M/year | \$400M/year | Indirect (time) | Medium |
+| Coordination/pause | \$30M/year | \$200M/year | Variable | High if successful |
+
+### Key Organizations & Initiatives
+
+Leading efforts to address the capability-alignment gap:
+
+| Organization | Focus | Annual Budget | Approach |
+|-------------|-------|---------------|----------|
+| <EntityLink id="anthropic">Anthropic</EntityLink> | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> | \$500M | Constitutional training |
+| <EntityLink id="deepmind">DeepMind</EntityLink> | Alignment team | \$100M | Scalable oversight |
+| <EntityLink id="miri">MIRI</EntityLink> | <EntityLink id="agent-foundations">Agent foundations</EntityLink> | \$15M | Theoretical foundations |
+| <EntityLink id="arc">ARC</EntityLink> | Alignment research | \$20M | Empirical alignment |
+
+## Related Models & Cross-References
+
+This model connects to several other risk analyses:
+
+- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink>: How competition accelerates capability development
+- <EntityLink id="multipolar-trap">Multipolar Trap</EntityLink>: Coordination failures in competitive environments  
+- Warning Signs: Indicators of dangerous capability-alignment gaps
+- <EntityLink id="__index__/ai-transition-model">Takeoff Dynamics</EntityLink>: Speed of AI development and adaptation time
+
+The model also informs key debates:
+- <EntityLink id="pause-debate">Pause vs. Proceed</EntityLink>: Whether to slow capability development
+- <EntityLink id="open-vs-closed">Open vs. Closed</EntityLink>: Model release policies and <EntityLink id="proliferation">proliferation</EntityLink> speed
+- <EntityLink id="regulation-debate">Regulation Approaches</EntityLink>: Government responses to the race dynamic
+
+## Sources & Resources
+
+### Academic Papers & Research
+
+| Study | Key Finding | Citation |
+|-------|------------|----------|
+| Scaling Laws | Compute-capability relationship | <R id="85f66a6419d173a7">Kaplan et al. (2020)</R> |
+| Alignment Tax Analysis | Safety overhead quantification | <R id="fe2a3307a3dae3e5">Kenton et al. (2021)</R> |
+| Governance Lag Study | Policy adaptation timelines | [D

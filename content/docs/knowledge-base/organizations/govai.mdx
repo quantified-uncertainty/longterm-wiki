@@ -1,0 +1,300 @@
+---
+title: GovAI
+description: The Centre for the Governance of AI is a leading AI policy research organization that has shaped compute governance frameworks, trained 100+ AI governance researchers, and now directly influences EU AI Act implementation through Vice-Chair roles in GPAI Code drafting.
+sidebar:
+  order: 13
+quality: 43
+llmSummary: GovAI is an AI policy research organization with ~15-20 staff, funded primarily by Coefficient Giving ($1.8M+ in 2023-2024), that has trained 100+ governance researchers through fellowships and currently holds Vice-Chair position in EU GPAI Code drafting. Their compute governance research has influenced regulatory thresholds across US, UK, and EU, with alumni now occupying key positions in frontier labs, think tanks, and government.
+lastEdited: "2025-12-28"
+importance: 42
+ratings:
+  novelty: 3.5
+  rigor: 5
+  actionability: 4
+  completeness: 6.5
+metrics:
+  wordCount: 554
+  citations: 7
+  tables: 26
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+  - community
+subcategory: safety-orgs
+---
+import {DataInfoBox, KeyPeople, Section, Backlinks, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
+
+<DataExternalLinks pageId="govai" client:load />
+
+<DataInfoBox entityId="govai" />
+
+## Overview
+
+The Centre for the Governance of AI (GovAI) is one of the most influential AI policy research organizations globally, combining rigorous research with direct policy engagement at the highest levels. Originally founded as part of the <EntityLink id="fhi">Future of Humanity Institute</EntityLink> at Oxford, GovAI became an independent nonprofit in 2023 when FHI closed, and subsequently relocated to London in 2024 to enhance its policy engagement capabilities.
+
+GovAI's theory of impact centers on producing foundational research that shapes how governments and industry approach <EntityLink id="ai-governance">AI governance</EntityLink>, while simultaneously training the next generation of AI governance professionals. Their 2018 research agenda helped define the nascent field of AI governance, and their subsequent work on compute governance has become a cornerstone of regulatory thinking in the US, UK, and EU. The organization receives substantial support from <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, with grants totaling over \$1.8 million in 2023-2024 alone.
+
+The organization's influence extends beyond research: GovAI alumni now occupy key positions across the AI governance landscape—in frontier AI labs (DeepMind, <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink>), major think tanks (<EntityLink id="cset">CSET</EntityLink>, RAND), and government positions in the US, UK, and EU. Perhaps most significantly, GovAI's Director of Policy Markus Anderljung currently serves as Vice-Chair of the EU's General-Purpose AI Code of Practice drafting process, directly shaping how the world's first comprehensive AI law will be implemented.
+
+### Organization Profile
+
+| Attribute | Details |
+|-----------|---------|
+| Founded | 2018 (as part of FHI); Independent 2023 |
+| Location | London, UK (moved from Oxford in 2024) |
+| Structure | Independent nonprofit |
+| Staff Size | ≈15-20 researchers and staff |
+| Annual Budget | ≈\$1-4M (estimated from grants) |
+| Primary Funder | <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (\$1.8M+ in 2023-2024) |
+| Affiliations | <EntityLink id="us-aisi">US AI Safety Institute</EntityLink> Consortium member |
+
+### Key Metrics
+
+| Metric | Value | Notes |
+|--------|-------|-------|
+| Publications in peer-reviewed venues | 50+ | Nature, Science, NeurIPS, International Organization |
+| Fellowship alumni placed | 100+ | Since 2018 |
+| Government advisory engagements | UK, US, EU | Direct policy input |
+| Current policy roles | EU GPAI Code Vice-Chair | Markus Anderljung |
+
+---
+
+## Research Areas
+
+GovAI's research spans four interconnected domains, with particular depth in compute governance where they have produced foundational work cited by policymakers globally.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph RESEARCH["Research Domains"]
+        CG[Compute Governance]
+        IC[International Coordination]
+        FR[Frontier AI Regulation]
+        FB[Field Building]
+    end
+
+    subgraph OUTPUTS["Policy Outputs"]
+        FRAME[Governance Frameworks]
+        STAND[Standards Development]
+        TALENT[Trained Researchers]
+    end
+
+    subgraph IMPACT["Real-World Impact"]
+        UKPOL[UK Policy]
+        EUPOL[EU AI Act]
+        USPOL[US Executive Order]
+    end
+
+    CG --> FRAME
+    IC --> STAND
+    FR --> FRAME
+    FB --> TALENT
+
+    FRAME --> UKPOL
+    FRAME --> EUPOL
+    STAND --> USPOL
+    TALENT --> UKPOL
+    TALENT --> EUPOL
+    TALENT --> USPOL
+
+    style RESEARCH fill:#e6f3ff
+    style OUTPUTS fill:#fff3e6
+    style IMPACT fill:#e6ffe6
+`} />
+
+### Compute Governance
+
+GovAI's signature contribution is the compute governance framework—the idea that computing power, unlike data or algorithms, is physical, measurable, and therefore governable. Their February 2024 paper "Computing Power and the Governance of AI" (Anderljung, Heim, et al.) has become the definitive reference, cited in policy discussions from Washington to Brussels.
+
+| Research Stream | Key Papers | Policy Impact |
+|----------------|------------|---------------|
+| Compute thresholds | Training Compute Thresholds (2024) | Informed EU 10^25 FLOP threshold |
+| Cloud governance | Governing Through the Cloud (2024) | Know-Your-Customer proposals |
+| Hardware controls | Chip Tracking Mechanisms (2023) | Export control discussions |
+| Verification | AI Verification (2023) | International monitoring concepts |
+
+Lennart Heim, formerly GovAI's compute governance lead (now at RAND), regularly advises governments on implementation. His work demonstrates how compute provides a "governance surface"—a point where regulators can observe and influence AI development without requiring access to proprietary algorithms.
+
+### International Coordination
+
+GovAI researches how nations can coordinate on AI governance despite competitive pressures. Their work on "AI Race Dynamics" examines why rational actors might collectively produce suboptimal outcomes, and what mechanisms might enable cooperation.
+
+| Research Topic | Key Finding | Policy Relevance |
+|---------------|-------------|------------------|
+| Race dynamics | Competitive pressure degrades safety investments | Supports international coordination |
+| Standards harmonization | Technical standards can enable verification | Informs AI safety summits |
+| Information sharing | Incident reporting reduces collective risk | Model for international registries |
+
+### Frontier AI Regulation
+
+Recent GovAI work focuses specifically on governing frontier AI—systems at or near the capability frontier that pose novel safety and security risks.
+
+| Publication | Year | Contribution |
+|-------------|------|--------------|
+| Frontier AI Regulation: Managing Emerging Risks | 2023 | Proposed tiered regulatory framework |
+| Safety Cases for Frontier AI | 2024 | Framework for demonstrating system safety |
+| Coordinated Pausing Scheme | 2024 | Evaluation-based pause mechanism for dangerous capabilities |
+
+GovAI collaborated with UK AISI on safety case sketches for offensive cyber capabilities, demonstrating practical application of their theoretical frameworks.
+
+### Field Building
+
+GovAI runs competitive fellowship programs that have trained 100+ AI governance researchers since 2018. The fellowship provides mentorship from leading experts and has become a primary talent pipeline for the field.
+
+---
+
+## Key People
+
+GovAI's leadership combines academic rigor with policy experience. Several former team members have moved to positions of significant influence.
+
+<Section title="Current Leadership">
+  <KeyPeople people={[
+    { name: "Ben Garfinkel", role: "Director" },
+    { name: "Markus Anderljung", role: "Director of Policy & Research" },
+    { name: "Emma Bluemke", role: "Research Manager" },
+    { name: "Anton Korinek", role: "Economics of AI Lead" },
+  ]} />
+</Section>
+
+### Leadership Profiles
+
+| Person | Role | Background | Notable Contributions |
+|--------|------|------------|----------------------|
+| Ben Garfinkel | Director | DPhil Oxford (IR); Former OpenAI consultant | Sets organizational direction; security implications research |
+| Markus Anderljung | Director of Policy | EY Sweden; UK Cabinet Office secondee | EU GPAI Code Vice-Chair; compute governance |
+| Allan Dafoe | President (now at DeepMind) | Yale PhD; Founded GovAI 2018 | Foundational research agenda; field definition |
+| Lennart Heim | Adjunct Fellow (at RAND) | Technical AI policy | Compute governance lead; OECD expert group |
+
+### Alumni Placements
+
+GovAI's impact extends through its alumni network, which now spans the AI governance ecosystem:
+
+| Sector | Organizations | Significance |
+|--------|--------------|--------------|
+| Frontier Labs | DeepMind, OpenAI, Anthropic | Policy and governance roles |
+| Government | UK Cabinet Office, US OSTP, EU AI Office | Direct policy influence |
+| Think Tanks | CSET, RAND, CNAS | Research leadership |
+| Academia | Oxford, Cambridge | Academic positions |
+
+---
+
+## Key Publications
+
+GovAI has published extensively in peer-reviewed venues and policy outlets. Their work is notable for bridging academic rigor with practical policy relevance.
+
+### Major Publications (2023-2025)
+
+| Title | Year | Authors | Venue | Impact |
+|-------|------|---------|-------|--------|
+| Computing Power and the Governance of AI | 2024 | Anderljung, Heim, et al. | GovAI | Foundational compute governance reference |
+| Safety Cases for Frontier AI | 2024 | GovAI/AISI | GovAI | Framework for demonstrating AI safety |
+| Coordinated Pausing: An Evaluation-Based Scheme | 2024 | GovAI | GovAI | Proposes pause mechanism for dangerous capabilities |
+| Training Compute Thresholds | 2024 | Heim, Koessler | White paper | Informs regulatory threshold-setting |
+| Governing Through the Cloud | 2024 | Fist, Heim, et al. | Oxford | Cloud provider regulatory role |
+| Frontier AI Regulation | 2023 | GovAI | GovAI | Tiered regulatory framework proposal |
+| Standards for AI Governance | 2023 | GovAI | GovAI | International standards analysis |
+
+### Publication Venues
+
+GovAI researchers have published in leading journals and conferences:
+
+| Venue Type | Examples |
+|------------|----------|
+| Academic journals | Nature, Nature Machine Intelligence, Science, International Organization |
+| CS conferences | NeurIPS, AAAI AIES, ICML |
+| Policy outlets | Journal of Strategic Studies |
+
+---
+
+## Policy Influence
+
+GovAI's influence operates through multiple channels: direct government advisory, regulatory participation, talent placement, and intellectual framework-setting.
+
+### Direct Policy Engagement (2024-2025)
+
+| Engagement | Role | Significance |
+|------------|------|--------------|
+| EU GPAI Code of Practice | Vice-Chair (Anderljung) | Drafting Safety & Security chapter for AI Act implementation |
+| UK Cabinet Office | Secondment (Anderljung, past) | Senior AI Policy Specialist |
+| US AI Safety Institute Consortium | Member organization | Contributing to US AI safety standards |
+| OECD AI Expert Group | Member (Heim) | AI Compute and Climate |
+
+### Framework Influence
+
+GovAI's conceptual frameworks have shaped regulatory thinking:
+
+| Framework | Adoption |
+|-----------|----------|
+| Compute governance | Referenced in EU AI Act (10^25 FLOP threshold); US Executive Order |
+| Tiered frontier regulation | Informs UK, EU, US approaches to frontier AI |
+| Safety cases | Adopted by UK AISI as assessment framework |
+
+### Comparison with Peer Organizations
+
+| Organization | Focus | Size | Budget | Policy Access |
+|--------------|-------|------|--------|---------------|
+| GovAI | AI governance research + field building | ≈20 | ≈\$1M | High (EU, UK, US) |
+| CSET (Georgetown) | Security + emerging tech | ≈50 | ≈\$10M+ | High (US focus) |
+| RAND AI | Broad AI policy | ≈30 | ≈\$1M+ | High (US focus) |
+| Oxford AI Governance | Academic research | ≈10 | ≈\$1M | Medium |
+
+GovAI is distinctive for combining research depth with direct regulatory participation—particularly through Anderljung's Vice-Chair role in EU AI Act implementation.
+
+---
+
+## Funding
+
+GovAI is primarily funded by <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, which has provided substantial support for AI governance work.
+
+| Grant | Year | Amount | Purpose |
+|-------|------|--------|---------|
+| General Support | 2024 | \$1,800,000 | Core operations |
+| General Support | 2023 | \$1,000,000 | Core operations |
+| Field Building | 2021 | \$141,613 | Fellowship programs |
+
+---
+
+## Strategic Assessment
+
+### Strengths
+
+GovAI occupies a distinctive niche: producing rigorous, policy-relevant research while maintaining direct access to regulatory processes. Key strengths include:
+
+1. **Compute governance expertise**: Arguably the leading research group on this topic globally
+2. **Talent pipeline**: Fellowship program has trained significant portion of AI governance workforce
+3. **Policy access**: Direct participation in EU AI Act implementation; alumni in key government roles
+4. **Academic credibility**: Publications in top venues; Oxford affiliation (historical)
+
+### Limitations
+
+1. **Funding concentration**: Heavy reliance on <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> creates potential vulnerability
+2. **Geographic focus**: Primarily UK/US/EU; limited Global South engagement
+3. **Implementation gap**: Research excellence doesn't always translate to implementation capacity
+4. **Scale constraints**: Small team relative to policy influence ambitions
+
+### Key Uncertainties
+
+| Question | Significance |
+|----------|--------------|
+| Will compute governance prove tractable? | GovAI's signature bet |
+| EU AI Act implementation success | Test of direct policy influence |
+| Talent pipeline sustainability | Central to long-term impact |
+| Funding diversification | Reduces single-funder risk |
+
+---
+
+## Related Pages
+
+<Backlinks client:load entityId="govai" />
+
+---
+
+## Sources
+
+- [GovAI Homepage](https://www.governance.ai/)
+- [GovAI Annual Report 2024](https://cdn.governance.ai/GovAI_Annual_Report_2024.pdf)
+- [Coefficient Giving GovAI Grant 2024](https://www.openphilanthropy.org/grants/govai-general-support-2024/)
+- [EU GPAI Code of Practice Chairs](https://digital-strategy.ec.europa.eu/en/news/meet-chairs-leading-development-first-general-purpose-ai-code-practice)
+- [Ben Garfinkel GovAI Profile](https://www.governance.ai/team/ben-garfinkel)
+- [Markus Anderljung GovAI Profile](https://www.governance.ai/team/markus-anderljung)
+- [Lennart Heim RAND Profile](https://www.rand.org/about/people/h/heim_lennart.html)

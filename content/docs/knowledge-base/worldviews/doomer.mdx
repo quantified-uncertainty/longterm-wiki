@@ -1,0 +1,383 @@
+---
+title: "AI Doomer Worldview"
+description: "Short timelines, hard alignment, high risk."
+importance: 35
+quality: 38
+llmSummary: "Comprehensive overview of the 'doomer' worldview on AI risk, characterized by 30-90% P(doom) estimates, 10-15 year AGI timelines, and belief that alignment is fundamentally hard. Documents core arguments (orthogonality thesis, instrumental convergence, one-shot problem), key proponents (Yudkowsky, MIRI), and prioritized interventions (agent foundations, pause advocacy, compute governance)."
+ratings:
+  novelty: 2
+  rigor: 3.5
+  actionability: 3
+  completeness: 6
+metrics:
+  wordCount: 1971
+  citations: 10
+  tables: 4
+  diagrams: 0
+lastEdited: "2026-01-29"
+clusters: ["ai-safety", "epistemics"]
+---
+import {Tags, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="doomer" client:load />
+
+**Core belief**: Advanced AI will be developed soon, alignment is fundamentally hard, and catastrophe is likely unless drastic action is taken.
+
+### Probability of AI <EntityLink id="existential-catastrophe">Existential Catastrophe</EntityLink>
+
+Doomer researchers consistently estimate higher probabilities of AI-driven existential catastrophe than other worldviews, though estimates vary significantly among individuals. These estimates reflect the combination of <EntityLink id="short-timeline-policy-implications">short timelines</EntityLink> to AGI (10-15 years), fundamental alignment difficulty that current techniques do not address, and pessimism about achieving adequate <EntityLink id="international-coordination">international coordination</EntityLink> before transformative AI systems are deployed.
+
+| Expert/Source | Estimate | Reasoning |
+|---------------|----------|-----------|
+| Doomer view | 30-90% | This range reflects the conjunction of multiple risk factors: AGI likely arriving within 10-15 years (short timelines), alignment being fundamentally difficult rather than just an engineering challenge (current techniques like <EntityLink id="rlhf">RLHF</EntityLink> won't scale to superhuman systems), and competitive <EntityLink id="racing-dynamics">racing dynamics</EntityLink> making coordination unlikely to succeed. The lower bound (30%) represents more moderate doomer positions that see some probability of technical or governance breakthroughs, while the upper bound (90%) represents positions like Yudkowsky's that view default outcomes as almost certainly catastrophic without drastic intervention. |
+
+## Overview
+
+The "doomer" worldview represents a cluster of beliefs centered on short AI timelines, the fundamental difficulty of alignment, and high existential risk. This perspective emphasizes that we are likely racing toward a threshold we're unprepared to cross, and that default outcomes are catastrophic.
+
+Unlike mere pessimism, the doomer worldview is built on specific technical and strategic arguments about AI development. Proponents argue we face a unique challenge: creating entities more capable than ourselves while ensuring they remain aligned with human values, all under severe time and competitive pressure.
+
+## Characteristic Beliefs
+
+| Crux | Typical Doomer Position |
+|------|------------------------|
+| Timelines | AGI likely within 10-15 years |
+| Paradigm | Scaling may be sufficient |
+| Takeoff | Could be fast (weeks-months) |
+| Alignment difficulty | Fundamentally hard, not just engineering |
+| <EntityLink id="instrumental-convergence">Instrumental convergence</EntityLink> | Strong and default |
+| <EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink> | Significant risk |
+| Current techniques | Won't scale to superhuman |
+| Coordination | Likely to fail |
+| P(doom) | 30-90% |
+
+### Timeline Beliefs
+
+Doomers typically believe AGI will arrive within 10-15 years, with some placing it even sooner. This belief is grounded in:
+
+- **Scaling trends**: Exponential growth in compute, data, and model capabilities
+- **Algorithmic progress**: Rapid improvements in architectures and training methods
+- **Economic incentives**: Massive investment driving acceleration
+- **Lack of visible barriers**: No clear walls that would slow progress
+
+The short timeline creates urgency - there may not be time for slow, careful research or gradual institutional change.
+
+### Alignment Difficulty
+
+The core technical crux is that alignment is fundamentally hard, not just an engineering challenge. Key concerns:
+
+**Specification difficulty**: We can't fully specify human values or even our own preferences. Any proxy we optimize will be Goodharted.
+
+**Inner alignment**: Even if we specify a good training objective, we may get mesa-optimizers pursuing different goals.
+
+**Deceptive alignment**: Advanced AI might fake alignment during training while planning to defect later.
+
+**Capability amplification**: Techniques that work for human-level AI may fail catastrophically at superhuman levels.
+
+## Key Proponents
+
+### <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>
+
+The most prominent voice in this worldview. Key positions:
+
+> "The AI does not hate you, nor does it love you, but you are made out of atoms which it can use for something else."
+
+Yudkowsky argues that alignment is so difficult that our probability of success is near zero without fundamentally different approaches. He emphasizes:
+- The difficulty of getting "perfect" alignment on the first critical try
+- That current alignment work is mostly theater
+- The need to halt <EntityLink id="agi-development">AGI development</EntityLink> entirely
+
+### MIRI Researchers
+
+The <EntityLink id="miri">Machine Intelligence Research Institute</EntityLink> has long held doomer-adjacent views:
+
+- **Nate Soares**: Emphasizes the default trajectory toward misalignment
+- **Rob Bensinger**: Communicates doom arguments to broader audiences
+- **Numerous researchers**: Focus on <EntityLink id="agent-foundations">agent foundations</EntityLink> and theoretical work
+
+### Other Voices
+
+- **<EntityLink id="connor-leahy">Connor Leahy</EntityLink>** (<EntityLink id="conjecture">Conjecture</EntityLink>): Emphasizes racing dynamics and near-term risk
+- **<EntityLink id="paul-christiano">Paul Christiano</EntityLink>**: While more moderate, shares many concerns about deceptive alignment
+- **Many anonymous researchers**: In industry, afraid to speak publicly
+
+## Strongest Arguments
+
+### 1. The Orthogonality Thesis
+
+Intelligence and goals are independent. Creating something smarter than us doesn't automatically make it share our values. The default outcome is that it pursues its own goals efficiently - which likely conflicts with human survival.
+
+**Why this matters**: We can't rely on AI "naturally" becoming benevolent as it becomes more capable.
+
+### 2. Instrumental Convergence
+
+Advanced AI systems, regardless of their terminal goals, will pursue certain instrumental goals:
+- Self-preservation
+- Resource acquisition
+- Goal preservation
+- Cognitive enhancement
+
+These instrumental goals may conflict with human survival.
+
+> "The AI doesn't need to hate you to destroy you. It just needs your atoms for something else."
+
+### 3. One-Shot Problem
+
+We likely get only one attempt at aligning transformative AI:
+
+- **No iteration**: Can't recover from an existential failure
+- **Fast takeoff scenarios**: May have weeks or months to get it right
+- **Deceptive alignment**: AI might appear aligned until it's too late
+- **<EntityLink id="lock-in">Lock-in</EntityLink>**: First advanced AI may determine the future permanently
+
+This is unlike almost all other engineering, where we iterate and learn from failures.
+
+### 4. Current Techniques Are Inadequate
+
+RLHF and similar approaches work for current systems but show fundamental limitations:
+
+- **Human feedback doesn't scale**: Can't evaluate superhuman reasoning
+- **Proxy gaming**: Systems optimize the metric, not the intent
+- **Lack of robustness**: Techniques are brittle and distribution-dependent
+- **No deep understanding**: We're not solving alignment, just pattern-matching
+
+Success on GPT-4 tells us little about what happens with vastly more capable systems.
+
+### 5. Racing Dynamics
+
+Competitive pressures are already pushing safety aside:
+
+- Labs compete for talent, funding, and prestige
+- First-mover advantages are enormous
+- Safety work is deprioritized under time pressure
+- International competition (US-China) intensifies the race
+- Economic incentives point toward acceleration
+
+Even well-meaning actors are trapped in these dynamics.
+
+### 6. Alignment Must Precede AGI
+
+You can't align a system more intelligent than you after it exists:
+
+- **Recursive self-improvement**: It may improve itself beyond our ability to control
+- **Deception**: It may pretend to be aligned while consolidating power
+- **<EntityLink id="values">Value lock-in</EntityLink>**: Early systems may determine the values of subsequent systems
+- **Enforcement failure**: Can't enforce rules on something smarter than us
+
+### 7. Burden of Proof
+
+Given stakes, the burden should be on showing alignment is solved:
+
+> "You don't get to build the apocalypse machine and say 'prove it will kill everyone.'"
+
+The precautionary principle suggests we should be very confident in safety before proceeding.
+
+## Main Criticisms and Counterarguments
+
+### "Overconfident in Short Timelines"
+
+**Critique**: AI predictions have historically been overoptimistic. We may have more time than doomers think.
+
+**Response**:
+- Current progress is unprecedented - exponential trends in compute, data, and investment
+- We should plan for short timelines even if uncertain
+- Even 20-30 years isn't "long" for solving alignment
+
+### "Underrates <EntityLink id="alignment-progress">Alignment Progress</EntityLink>"
+
+**Critique**: Dismisses real progress on RLHF, <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, and other techniques.
+
+**Response**:
+- These techniques work for current systems but likely won't scale
+- Success on weak systems may create false confidence
+- We haven't demonstrated solutions to core problems (inner alignment, deceptive alignment)
+
+### "Too Pessimistic About Human Adaptability"
+
+**Critique**: Humans have solved hard problems before. We'll figure it out.
+
+**Response**:
+- This is unlike previous problems - we can't iterate on existential failures
+- Timeline pressure means we may not have time to figure it out
+- "We'll figure it out" isn't a plan
+
+### "Policy Proposals Are Unrealistic"
+
+**Critique**: Calls for pause or international coordination are politically infeasible.
+
+**Response**:
+- Infeasibility doesn't change the technical reality
+- Should advocate for what's needed, not just what's palatable
+- Political winds can shift rapidly with events
+
+### "Motivated by Personality, Not Analysis"
+
+**Critique**: Some people are just doom-prone; the worldview reflects psychology more than evidence.
+
+**Response**:
+- Arguments should be evaluated on merits, not proponents' psychology
+- Many doomers were initially optimistic but updated on evidence
+- Ad hominem doesn't address the technical arguments
+
+## What Evidence Would Change This View?
+
+Doomers would update toward optimism given:
+
+### Technical Breakthroughs
+
+- **Fundamental alignment progress**: Solutions to inner alignment or deceptive alignment
+- **Robust interpretability**: Ability to understand and verify AI cognition
+- **<EntityLink id="formal-verification">Formal verification</EntityLink>**: Mathematical proofs of alignment properties
+- **Demonstrated scalability**: Current techniques working at much higher capability levels
+
+### Empirical Evidence
+
+- **Long periods without jumps**: Years without major capability increases
+- **Alignment easier than expected**: Empirical findings that alignment is tractable
+- **Detection of deception**: Tools that reliably catch misaligned behavior
+- **Safe scaling**: Capability increases without proportional risk increases
+
+### Coordination Success
+
+- **International agreements**: Meaningful US-China cooperation on AI safety
+- **Industry coordination**: Labs actually slowing down for safety
+- **Governance frameworks**: Effective regulations with teeth
+- **Norm establishment**: Safety-first culture becoming dominant
+
+### Theoretical Insights
+
+- **Dissolving arguments**: Showing that core doomer arguments are mistaken
+- **Natural alignment**: Evidence that capability and alignment are linked
+- **Adversarial robustness**: Proofs that aligned systems stay aligned under pressure
+
+## Implications for Action and Career
+
+If you hold this worldview, prioritized actions include:
+
+### Direct Technical Work
+
+1. **Agent foundations**: Deep theoretical work on decision theory, embedded agency, corrigibility
+2. **Interpretability**: Understanding what models are actually doing internally
+3. **Deception detection**: Tools to catch misaligned models pretending to be aligned
+4. **Formal verification**: Mathematical approaches to proving alignment
+
+### Governance and Policy
+
+1. **<EntityLink id="pause">Pause advocacy</EntityLink>**: Push for slowdown or moratorium on AGI development
+2. **Compute governance**: Support physical controls on AI chip production and use
+3. **International coordination**: Work toward US-China cooperation
+4. **Whistleblowing infrastructure**: Make it safer to report safety concerns
+
+### Strategic Positioning
+
+1. **Field building**: Grow the number of people working on alignment
+2. **Public communication**: Raise awareness of risks
+3. **Talent pipeline**: Train more alignment researchers
+4. **Resource allocation**: Push funding toward high-value work
+
+### Personal Preparation
+
+1. **Skill building**: Learn relevant technical skills (ML, mathematics, philosophy)
+2. **Network building**: Connect with others working on the problem
+3. **Career hedging**: Pursue paths with impact even in short timelines
+4. **Psychological preparation**: Deal with carrying heavy beliefs about the future
+
+## Deprioritized Approaches
+
+Given doomer beliefs, some common approaches are seen as less valuable:
+
+| Approach | Why Less Important |
+|----------|-------------------|
+| RLHF improvements | Won't scale to superhuman systems |
+| <EntityLink id="lab-culture">Lab safety culture</EntityLink> | Insufficient without structural change |
+| Evals | Can't catch deceptive alignment |
+| <EntityLink id="ai-assisted">AI-assisted alignment</EntityLink> | Bootstrapping is dangerous |
+| Incremental governance | Too slow for short timelines |
+| Beneficial AI applications | Fiddling while Rome burns |
+
+## Representative Quotes
+
+> "If we build AGI that is not aligned, we will all die. Not eventually - soon. This is the default outcome." - Eliezer Yudkowsky
+
+> "The situation is actually worse than most people realize, because the difficulty compounds: you need to solve alignment, prevent racing, coordinate internationally, and do all of it before AGI. Each individually is hard; together it's overwhelming." - Anonymous industry researcher
+
+> "We're in a race to the precipice, and everyone's stepping on the gas." - Connor Leahy
+
+> "I don't know how to align a superintelligence and prevent it from destroying everything I care about. And I've spent more time thinking about this than almost anyone." - Nate Soares
+
+> "The tragedy is that even the people building AGI often agree we don't know how to align it. They're just hoping we'll figure it out in time." - Rob Bensinger
+
+## Internal Diversity
+
+The doomer worldview includes significant internal variation:
+
+### Timelines
+- **Ultra-short** (2-5 years): We're nearly out of time
+- **Short** (5-15 years): Standard doomer position
+- **Medium** (15-25 years): Still doomer but less urgent
+
+### P(doom)
+- **Very high** (>70%): Yudkowsky-style position
+- **High** (40-70%): Many researchers
+- **Moderate-high** (20-40%): Doomer-adjacent
+
+### Strategic Emphasis
+- **Technical**: Focus on alignment research
+- **Governance**: Focus on pause/coordination
+- **Hybrid**: Both necessary
+
+### Attitude
+- **Defeatist**: Probably doomed but worth trying
+- **Activist**: Doomed if we don't act, but action might work
+- **Uncertain**: High risk, unclear if solvable
+
+## Relationship to Other Worldviews
+
+### vs. Optimistic
+- Disagree on alignment difficulty
+- Disagree on whether current progress is real
+- Agree that AI is transformative
+
+### vs. Governance-Focused
+- Agree on need for coordination
+- Disagree on whether governance is sufficient
+- Doomers more pessimistic about coordination success
+
+### vs. Long-Timelines
+- Disagree fundamentally on timeline estimates
+- Agree on alignment difficulty
+- Different urgency levels drive different priorities
+
+## Common Misconceptions
+
+**"Doomers want AI development to fail"**: No, they want it to succeed safely.
+
+**"Doomers are just pessimists"**: The worldview is based on specific technical arguments, not general pessimism.
+
+**"Doomers think all AI is bad"**: No, they think unaligned AGI is catastrophic. Aligned AI could be wonderful.
+
+**"Doomers are anti-technology"**: Most are excited about technology, just cautious about this specific technology.
+
+**"Doomers have given up"**: Many work extremely hard on the problem despite low probability of success.
+
+## Recommended Reading
+
+### Foundational Texts
+- <R id="0151481d5dc82963">Superintelligence</R> by <EntityLink id="nick-bostrom">Nick Bostrom</EntityLink>
+- <R id="372cee55e4b03787"><EntityLink id="alignment">AI Alignment</EntityLink>: Why It's Hard, and Where to Start</R> by Eliezer Yudkowsky
+- <R id="6807a8a8f2fd23f3">What Failure Looks Like</R> by Paul Christiano
+- <R id="0aea2d39b8284ab1">AGI Ruin: A List of Lethalities</R> by Eliezer Yudkowsky
+
+### Technical Arguments
+- <R id="cd3035dbef6c7b5b">Concrete Problems in AI Safety</R>
+- <R id="c4858d4ef280d8e6">Risks from Learned Optimization</R>
+- <R id="6e597a4dc1f6f860">Is <EntityLink id="power-seeking">Power-Seeking AI</EntityLink> an Existential Risk?</R>
+
+### Strategic Analysis
+- <R id="a2cde6af5436a9fb">Racing Through a Minefield</R>
+- <R id="699b0e00bd741a5d">Without specific countermeasures, the easiest path to transformative AI likely leads to AI takeover</R>
+
+### Governance Perspective
+- <R id="d0c81bbfe41efe44">Pausing AI Development Isn't Enough. We Need to Shut it All Down</R>
+
+<Tags tags={['worldview', 'high-risk', 'short-timelines', 'alignment-difficulty']} />

@@ -1,0 +1,320 @@
+---
+title: Metaforecast
+description: A forecast aggregation platform that combines predictions from 10+ sources (Metaculus, Manifold, Polymarket, Good Judgment Open) into a unified search interface. Created by Nuño Sempere and Ozzie Gooen at QURI, Metaforecast indexes approximately 2,100 active forecasting questions plus 17,000+ Guesstimate models, with data fetched daily via open-source scraping pipeline.
+sidebar:
+  order: 2
+quality: 35
+llmSummary: Metaforecast is a forecast aggregation platform combining 2,100+ questions from 10+ sources (Metaculus, Manifold, Polymarket, etc.) with daily updates via automated scraping. Created by QURI, it provides unified search and GraphQL API access but lacks historical data and is limited to passive aggregation rather than enabling new forecasting capabilities.
+lastEdited: "2026-01-29"
+importance: 15
+ratings:
+  novelty: 2.5
+  rigor: 4
+  actionability: 2
+  completeness: 6
+metrics:
+  wordCount: 654
+  citations: 10
+  tables: 22
+  diagrams: 1
+clusters:
+  - epistemics
+  - community
+subcategory: epistemic-tools-tools
+---
+import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Coverage** | Comprehensive | 2,100+ active questions from 10+ platforms |
+| **Data Freshness** | Daily | Automated scraping pipeline |
+| **Accessibility** | High | Free web interface, GraphQL API |
+| **Integration** | Active | Twitter bot, Discord bot (Fletcher), GlobalGuessing |
+| **Open Source** | Fully | GitHub repository, part of Squiggle monorepo |
+| **Maintenance** | Active | Ongoing updates, platform additions |
+
+## Project Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Name** | Metaforecast |
+| **Organization** | <EntityLink id="quri">QURI</EntityLink> (Quantified Uncertainty Research Institute) |
+| **Creator** | <EntityLink id="nuno-sempere">Nuño Sempere</EntityLink> (with help from Ozzie Gooen) |
+| **Launched** | 2021 |
+| **Website** | [metaforecast.org](https://metaforecast.org/) |
+| **GitHub** | [github.com/quantified-uncertainty/metaforecast](https://github.com/quantified-uncertainty/metaforecast) |
+| **License** | Open source (part of Squiggle monorepo) |
+| **API** | GraphQL endpoint for programmatic access |
+
+## Overview
+
+[Metaforecast](https://metaforecast.org/) aggregates forecasts from multiple prediction platforms into a single searchable interface, solving the platform fragmentation problem that reduces forecasting's utility as a public good. While individual platforms like <EntityLink id="metaculus">Metaculus</EntityLink>, <EntityLink id="manifold">Manifold</EntityLink>, and <EntityLink id="polymarket">Polymarket</EntityLink> each host valuable forecasts, researchers and decision-makers must check multiple sites to find relevant predictions. Metaforecast eliminates this friction by combining data from 10+ platforms with unified search.
+
+The project was initiated by [Nuño Sempere](https://forum.effectivealtruism.org/users/nunosempere), with help from Ozzie Gooen, at QURI. Data is fetched daily via automated scraping, showing immediate forecasts without historical time-series data. This design is optimized for quick lookups ("What's the current probability of X?") rather than trend analysis.
+
+### Design Philosophy
+
+Metaforecast treats forecasting as a public good that becomes more valuable with aggregation. The platform is deliberately simple: search for a question, see current probabilities from multiple sources, compare platforms side-by-side. No user accounts, no social features, no complexity—just forecasts.
+
+## Platforms Aggregated
+
+Metaforecast currently indexes approximately **2,100 active forecasting questions** across these platforms:
+
+| Platform | Type | Questions | Notes |
+|----------|------|-----------|-------|
+| **<EntityLink id="metaculus">Metaculus</EntityLink>** | Reputation-based | ≈1,200 (55% of total) | Largest source; research-focused, community prediction aggregation |
+| **Manifold** | Play money market | Varies | Research-focused, no profit motive, uses Mana currency |
+| **Polymarket** | Real money (crypto) | Varies | Rose to prominence in 2024 US election, real financial stakes |
+| **<EntityLink id="good-judgment">Good Judgment</EntityLink> Open** | Superforecaster platform | ≈100-200 | Connected to Good Judgment Project, expert forecasters |
+| **PredictIt** | Political market | ≈50-100 | US political focus, regulated real-money trading |
+| **<EntityLink id="kalshi">Kalshi</EntityLink>** | CFTC-regulated market | ≈100-200 | Regulatory compliance focus, legal real-money markets |
+| **Insight Prediction** | Prediction market | Varies | Additional market source |
+| **INFER** | Policy forecasting | Varies | Government-adjacent forecasting |
+
+Additionally, Metaforecast provides access to **17,000+ public models** from Guesstimate, Ozzie Gooen's earlier Monte Carlo spreadsheet tool.
+
+### Platform Characteristics
+
+| Platform | Incentive Structure | Typical User Base |
+|----------|---------------------|-------------------|
+| **Metaculus** | Reputation points, tournament prizes | AI researchers, academics, rationalists |
+| **Manifold** | Play money (Mana) | EA/rationalist community, hobbyists |
+| **Polymarket** | Real money (cryptocurrency) | Traders, serious forecasters, arbitrageurs |
+| **Good Judgment** | Reputation, selective admission | Professional superforecasters |
+| **Kalshi** | Real money (USD), CFTC-regulated | Finance professionals, serious traders |
+
+## Technical Architecture
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Sources["Platform APIs"]
+        MET["Metaculus\n(~1,200 questions)"]
+        MAN["Manifold"]
+        POLY["Polymarket"]
+        GJ["Good Judgment Open"]
+        KAL["Kalshi"]
+        OTHER["Other platforms"]
+    end
+
+    subgraph Pipeline["Daily Processing"]
+        SCRAPE["Automated Scraping\n(daily fetch)"]
+        NORM["Normalize Question Format"]
+        DB["Centralized Database"]
+    end
+
+    subgraph Output["User Interfaces"]
+        SEARCH["Elasticsearch\nUnified Search"]
+        API["GraphQL API"]
+        BOTS["Twitter Bot\nDiscord Bot"]
+    end
+
+    MET & MAN & POLY & GJ & KAL & OTHER --> SCRAPE
+    SCRAPE --> NORM
+    NORM --> DB
+    DB --> SEARCH & API & BOTS
+
+    style DB fill:#d4edda
+    style SEARCH fill:#e8f4fd
+`} />
+
+### Data Pipeline
+
+| Component | Description |
+|-----------|-------------|
+| **Scraping** | Daily automated fetching from each platform's API or web interface |
+| **Storage** | Centralized database with normalized question format |
+| **Search** | Elasticsearch-powered full-text search |
+| **API** | GraphQL endpoint for programmatic access |
+| **UI** | Simple web interface with platform comparison |
+
+### Data Freshness
+
+Metaforecast fetches data **daily**, ensuring forecasts are current. However, the system is optimized for point-in-time forecasts rather than historical trend analysis:
+
+- **Shows**: Current probability estimates from each platform
+- **Does not show**: Historical time-series or forecast evolution over time
+
+This design choice reduces storage requirements and simplifies the interface at the cost of trend analysis capabilities.
+
+## Features
+
+### Unified Search
+
+Search across all platforms simultaneously:
+
+```
+Query: "AGI by 2030"
+Results: Shows all matching questions from Metaculus, Manifold, Polymarket, etc.
+```
+
+### Platform Comparison
+
+See how different sources estimate the same event:
+
+| Question | Metaculus | Manifold | Polymarket |
+|----------|-----------|----------|------------|
+| AGI by 2030 | 45% | 60% | — |
+| Nuclear war by 2050 | 9% | 12% | — |
+
+This comparison helps identify consensus vs. divergence in forecasting communities.
+
+### GraphQL API
+
+Programmatic access for integrations:
+
+```graphql
+query {
+  questions(limit: 10, query: "AI capabilities") {
+    title
+    platform
+    probability
+    url
+  }
+}
+```
+
+The API enables:
+- Custom analysis and visualization
+- Integration with research workflows
+- Automated monitoring of specific questions
+
+### Open Source
+
+The [GitHub repository](https://github.com/quantified-uncertainty/metaforecast) is part of QURI's Squiggle monorepo, allowing community contributions and transparency in the scraping methodology.
+
+## Integrations
+
+Metaforecast has been integrated with several external services:
+
+| Service | Description | Status |
+|---------|-------------|--------|
+| **Twitter Bot** | Posts notable forecasts | Active |
+| **Fletcher** | Discord bot for forecast lookups | Active |
+| **GlobalGuessing** | Forecasting community platform | Active |
+| **Elicit** | AI research assistant | Previously integrated |
+
+These integrations make forecast data accessible in contexts where users already work.
+
+## Use Cases
+
+### Research
+
+Researchers use Metaforecast to:
+- Find consensus forecasts on emerging technologies
+- Compare expert vs. market-based predictions
+- Track how different communities view the same question
+- Validate assumptions in models with community forecasts
+
+### Decision-Making
+
+Organizations reference Metaforecast for:
+- Strategic planning timeline assumptions
+- Risk assessment probability inputs
+- Validation of internal forecasts against external views
+
+### Forecasting Meta-Analysis
+
+Researchers studying forecasting accuracy use Metaforecast to:
+- Compare platform performance
+- Identify systematic biases
+- Analyze calibration across question types
+
+## Notable Use: 2024 US Election
+
+During the 2024 US presidential election, Polymarket (one of Metaforecast's sources) demonstrated the value of prediction market aggregation. Polymarket strongly favored Trump's victory even as traditional polls showed a closer race. The market's prediction proved correct, with reports of approximately \$10 million in bets from individual traders helping shape the odds.
+
+Metaforecast allowed researchers to compare Polymarket's market-based odds against Metaculus's reputation-based aggregation and other sources, providing multiple perspectives on the same event.
+
+## Comparison with Individual Platforms
+
+| Aspect | Metaforecast | Individual Platform |
+|--------|--------------|---------------------|
+| **Coverage** | 10+ platforms, 2,100+ questions | Single platform, typically 100-1,000 questions |
+| **Search** | Cross-platform unified search | Platform-specific search |
+| **Historical Data** | None (current forecasts only) | Often available |
+| **Community** | Read-only aggregation | Active participation, social features |
+| **Incentives** | None (passive aggregation) | Reputation points, money, social status |
+| **Effort Required** | Single search | Must check multiple sites |
+
+### Tradeoffs
+
+**Metaforecast gains**:
+- Convenience: Single search across all platforms
+- Comparison: See multiple sources side-by-side
+- Completeness: Less likely to miss relevant forecasts
+
+**Individual platforms gain**:
+- Historical data: Track forecast evolution
+- Community context: Discussion, reasoning transparency
+- Participation: Ability to contribute forecasts
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Solves fragmentation** | Aggregates 10+ platforms into single interface |
+| **Daily updates** | Fresh data from automated scraping |
+| **Free and open** | No paywall, open-source code |
+| **API access** | Enables custom integrations and analysis |
+| **Simple interface** | No learning curve, immediate utility |
+| **Broad coverage** | 2,100+ active questions plus 17,000+ Guesstimate models |
+
+### Limitations
+
+| Limitation | Impact |
+|------------|--------|
+| **No historical data** | Cannot track forecast evolution or analyze updating patterns |
+| **Scraping-dependent** | Breaks if source platforms change their structure |
+| **Heterogeneous questions** | Different platforms use different operationalizations for similar events |
+| **No participation** | Passive aggregation; users cannot contribute forecasts |
+| **Limited metadata** | Reasoning, comments, and community context not aggregated |
+| **Maintenance burden** | Each new platform requires custom scraper implementation |
+
+## Relationship to QURI Ecosystem
+
+Metaforecast complements QURI's other tools:
+
+| Tool | Purpose | Relationship to Metaforecast |
+|------|---------|------------------------------|
+| **<EntityLink id="squiggle">Squiggle</EntityLink>** | Probabilistic modeling | Metaforecast provides probability inputs for Squiggle models |
+| **Squiggle Hub** | Model sharing platform | Can link to relevant Metaforecast questions as external validation |
+| **SquiggleAI** | LLM model generation | Could use Metaforecast data to ground AI-generated probability estimates |
+| **Guesstimate** | Monte Carlo spreadsheets | Metaforecast hosts 17,000+ Guesstimate models |
+
+## Funding
+
+As a QURI project, Metaforecast is funded through QURI's grants:
+
+| Source | Amount | Period |
+|--------|--------|--------|
+| **Survival and Flourishing Fund** | \$150K+ to QURI | 2019-2022 |
+| **Future Fund** | \$100K to QURI | 2022 |
+| **Long-Term Future Fund** | Ongoing to QURI | 2023-present |
+
+Metaforecast represents a small portion of QURI's overall budget but provides a valuable public good for the forecasting community.
+
+## Future Directions
+
+Potential enhancements based on community feedback:
+
+| Enhancement | Benefit | Challenge |
+|-------------|---------|-----------|
+| **Historical data** | Trend analysis, forecast tracking | Storage costs, backfill complexity |
+| **Reasoning aggregation** | Expose why forecasters believe what they do | Scraping complexity, heterogeneous formats |
+| **Custom question creation** | User-defined aggregations | Moderation, quality control |
+| **Alert system** | Notify when specific forecasts update | User accounts, notification infrastructure |
+| **Calibration tracking** | Show platform accuracy records | Requires resolution data, complex analysis |
+
+## External Links
+
+- [Metaforecast](https://metaforecast.org/)
+- [GitHub Repository](https://github.com/quantified-uncertainty/metaforecast)
+- [EA Forum: Introducing Metaforecast](https://forum.effectivealtruism.org/posts/tEo5oXeSNcB3sYr8m/introducing-metaforecast-a-forecast-aggregator-and-search)
+- [Nuño Sempere EA Forum Profile](https://forum.effectivealtruism.org/users/nunosempere)
+- [QURI Website](https://quantifieduncertainty.org/)
+
+<Backlinks />

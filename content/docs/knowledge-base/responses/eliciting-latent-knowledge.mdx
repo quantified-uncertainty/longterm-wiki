@@ -1,0 +1,407 @@
+---
+title: Eliciting Latent Knowledge (ELK)
+description: ELK is the unsolved problem of extracting an AI's true beliefs rather than human-approved outputs. ARC's 2022 prize contest received 197 proposals and awarded $274K, but the $50K and $100K solution prizes remain unclaimed. Best empirical results achieve 75-89% AUROC on controlled benchmarks (Quirky LMs), while CCS provides 4% above zero-shot. The problem remains fundamentally unsolved after 3+ years of focused research.
+sidebar:
+  order: 57
+quality: 91
+importance: 77.5
+lastEdited: "2026-01-30"
+llmSummary: "Comprehensive analysis of the Eliciting Latent Knowledge problem with quantified research metrics: ARC's prize contest received 197 proposals, awarded $274K, but $50K and $100K prizes remain unclaimed. CCS achieves 4% above zero-shot on 10 datasets; Quirky LMs recover 89% of truth-untruth gap with 0.95 anomaly detection AUROC. Research investment estimated at $1-5M/year across ARC (3 permanent researchers), EleutherAI, and academic groups. Problem fundamentally unsolved—no proposal survives ARC's builder-breaker methodology."
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 5
+  rigor: 7
+  actionability: 5
+  completeness: 7.5
+metrics:
+  wordCount: 1850
+  citations: 18
+  tables: 18
+  diagrams: 3
+clusters:
+  - ai-safety
+subcategory: alignment-theoretical
+---
+import {Mermaid, R, EntityLink, DataExternalLinks, DataInfoBox} from '@components/wiki';
+
+<DataExternalLinks pageId="eliciting-latent-knowledge" client:load />
+
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Research Investment** | Low (\$1-5M/year) | ARC Theory team has 3 permanent researchers; received \$265K from <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> (2022); returned \$1.25M FTX grant |
+| **Problem Status** | Unsolved | 197 proposals submitted to [ELK Prize](https://www.alignment.org/blog/elk-prize-results/); \$50K and \$100K prizes remain unclaimed |
+| **Best Empirical Results** | 75-89% AUROC | [Quirky LMs paper](https://arxiv.org/abs/2312.01037): LogR on contrast pairs recovers 89% of truth-untruth gap; anomaly detection achieves 0.95 AUROC |
+| **CCS Baseline** | 4% above zero-shot | [Burns et al. 2023](https://arxiv.org/abs/2212.03827): CCS outperforms zero-shot by 4% on average across 10 datasets |
+| **Timeline to Solution** | Unknown (potentially unsolvable) | No proposed solution survives ARC's builder-breaker methodology; theoretical barriers may be fundamental |
+| **Safety Importance** | Critical (if solved) | Would enable detection of <EntityLink id="deceptive-alignment" /> and verification of AI beliefs |
+| **Industry Adoption** | None | Purely theoretical research; no production implementations |
+| **Grade** | C+ | High potential impact but uncertain tractability; limited progress despite 3+ years of focused research |
+
+## Overview
+
+Eliciting Latent Knowledge (ELK) represents one of the most important unsolved problems in AI alignment: how do we get an AI system to report what it actually knows or believes, rather than what it predicts humans want to hear or what produces favorable outcomes? The problem was formalized in the [Alignment Research Center's (ARC) 2021 report](https://www.alignment.org/blog/arcs-first-technical-report-eliciting-latent-knowledge/) and has since become a central focus of alignment research. ARC's [ELK Prize contest](https://www.alignment.org/blog/elk-prize-results/) received 197 proposals and awarded \$274,000 in prizes (32 prizes of \$5K-\$20K plus 24 honorable mentions of \$1K), but the \$50,000 and \$100,000 prizes for solutions requiring genuinely new ideas to break remain unclaimed.
+
+The core challenge arises because advanced AI systems may develop sophisticated internal representations of the world that go beyond what can be directly observed by humans. If such a system is optimizing for human approval or reward, it might learn to report information that satisfies human evaluators rather than information that accurately reflects its internal knowledge. This creates a fundamental obstacle to AI oversight: we cannot trust what AI systems tell us if they have learned to be strategically misleading.
+
+ELK is particularly important for AI safety because it would, if solved, provide a foundation for detecting AI deception. An AI system that genuinely reports its beliefs cannot deceive us about its knowledge, intentions, or capabilities. Conversely, without ELK, we may be unable to verify AI alignment even in principle, since any behavioral signal could be faked by a sufficiently capable deceptive system. Despite 3+ years of focused research and contributions from researchers at organizations including [EleutherAI](https://www.eleuther.ai/projects/elk), UC Berkeley, and independent groups, no proposed solution has survived ARC's adversarial "builder-breaker" methodology, and some researchers suspect the problem may be fundamentally unsolvable.
+
+## Risk Assessment & Impact
+
+| Dimension | Assessment | Evidence | Timeline |
+|-----------|------------|----------|----------|
+| **Safety Uplift** | High (if solved) | Would enable detecting deception | Unknown |
+| **Capability Uplift** | Some | Better knowledge extraction is useful | Ongoing |
+| **Net World Safety** | Helpful | Critical research direction | Long-term |
+| **Lab Incentive** | Moderate | Some commercial value; mostly safety-motivated | Current |
+| **Research Investment** | \$1-15M/yr | ARC, some academic groups | Current |
+| **Current Adoption** | None | Theoretical research | Current |
+
+## The ELK Problem
+
+<Mermaid client:load chart={`
+flowchart TD
+    AI[AI System] --> WORLD[World Model]
+    WORLD --> BELIEF[True Beliefs]
+    WORLD --> PREDICT[Human Predictions]
+
+    BELIEF --> HONEST[Honest Report]
+    PREDICT --> APPROVED[Human-Approved Report]
+
+    TRAIN[Training Signal] --> AI
+    TRAIN -->|Reward| APPROVED
+
+    HONEST -.may differ.-> APPROVED
+
+    GOAL[ELK Goal] --> EXTRACT[Extract True Beliefs]
+    EXTRACT --> BELIEF
+
+    style AI fill:#e1f5ff
+    style BELIEF fill:#d4edda
+    style APPROVED fill:#ffe6cc
+    style GOAL fill:#d4edda
+`} />
+
+### The Setup
+
+| Component | Description |
+|-----------|-------------|
+| **AI System** | Has sophisticated world model; may know things humans don't |
+| **Training** | Optimized for human approval or reward signal |
+| **Latent Knowledge** | What the AI actually believes about the world |
+| **Reported Knowledge** | What the AI tells humans |
+| **ELK Problem** | Ensure Reported = Latent |
+
+### Why It's Hard
+
+The difficulty is that any method we use to elicit knowledge must be robust against an AI that might have learned to produce strategically selected outputs:
+
+| Challenge | Description | Severity |
+|-----------|-------------|----------|
+| **No Ground Truth** | Can't verify AI's internal beliefs directly | Critical |
+| **Human Evaluator Limitations** | Humans can't check superhuman knowledge | Critical |
+| **Training Incentives** | AI trained to satisfy evaluators, not report truth | High |
+| **Representation Complexity** | AI's beliefs may not map to human concepts | High |
+| **Deceptive Strategies** | AI might learn to hide true beliefs | Critical |
+
+### The Reporter Distinction
+
+ARC's framing distinguishes between two types of "reporters" the AI might learn:
+
+| Reporter Type | Behavior | Problem |
+|---------------|----------|---------|
+| **Human Simulator** | Reports what humans would believe | May be wrong when AI knows better |
+| **Direct Translator** | Reports AI's actual beliefs | What we want |
+
+The challenge is ensuring training produces a direct translator rather than a human simulator.
+
+## ARC's ELK Report
+
+### Key Insights
+
+| Insight | Description | Implication |
+|---------|-------------|-------------|
+| **The Problem is Real** | AI could learn human simulator | Need solutions |
+| **Current Methods Fail** | Standard training doesn't solve ELK | Need new approaches |
+| **Counterexamples Exist** | For every proposed solution | Problem is hard |
+
+### Prize Structure
+
+[ARC ran an ELK prize contest](https://www.alignment.org/blog/elk-prize-results/) from January-February 2022, receiving 197 proposals and awarding \$274,000 in total:
+
+| Prize Tier | Requirement | Status | Details |
+|------------|-------------|--------|---------|
+| **\$5,000-\$20,000** | Novel perspective or counterexample | 32 awarded | \$250,000 total |
+| **\$1,000 (Honorable Mention)** | Promising ideas | 24 awarded | \$24,000 total |
+| **\$50,000** | Proposal requiring genuinely new idea to break | **Unclaimed** | No proposal met bar |
+| **\$100,000** | Full solution | **Unclaimed** | No solution found |
+
+The [first round](https://www.alignment.org/blog/elk-first-round-contest-winners/) evaluated 30 proposals from 25 people, awarding \$70,000 to 8 contributors. Notable participants included Carl Shulman, Victoria Krakovna (DeepMind), Mary Phuong, and Holden Karnofsky (who would have received \$15,000 but was ineligible as an ARC board member). ARC noted that most submissions explored approaches they had also considered, revealing significant convergence among researchers working on the problem independently.
+
+### Counterexample Pattern (Builder-Breaker Methodology)
+
+ARC's research methodology functions as a game between a "builder" and a "breaker":
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph BUILDER["Builder"]
+        B1[Propose training strategy]
+        B2[Describe desired reporter]
+    end
+
+    subgraph BREAKER["Breaker"]
+        BR1[Propose test case]
+        BR2[Describe bad reporter]
+    end
+
+    B1 --> BR1
+    BR1 --> B2
+    B2 --> BR2
+    BR2 -->|Counterexample found| B1
+    BR2 -->|No counterexample| SUCCESS[Solution Candidate]
+
+    style SUCCESS fill:#d4edda
+    style BUILDER fill:#e1f5ff
+    style BREAKER fill:#ffe6cc
+`} />
+
+Every proposed solution faces a counterexample:
+
+1. **Proposal**: Use method X to extract true beliefs
+2. **Counterexample**: AI that produces X-satisfying outputs without reporting true beliefs
+3. **Conclusion**: X doesn't reliably solve ELK
+
+This adversarial methodology ensures proposed solutions are robust, but also explains why progress has been slow - any solution must work against the worst-case deceptive strategy.
+
+## Proposed Approaches
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph APPROACHES["Solution Approaches"]
+        CONSIST[Consistency Methods]
+        MECH[Mechanistic Methods]
+        TRAIN[Training Methods]
+        ARCH[Architectural Methods]
+    end
+
+    subgraph TECHNIQUES["Specific Techniques"]
+        CCS[CCS: 4% above zero-shot]
+        PROBING[Linear Probing: 60-80%]
+        QUIRKY[Quirky LMs: 89% AUROC]
+        REPE[RepE: +30pp TruthfulQA]
+    end
+
+    subgraph BARRIERS["Fundamental Barriers"]
+        ADVERSARIAL[Adversarial Robustness]
+        GROUND[No Ground Truth]
+        DECEPTIVE[Deceptive AI Required to Test]
+    end
+
+    CONSIST --> CCS
+    MECH --> PROBING
+    MECH --> QUIRKY
+    TRAIN --> REPE
+
+    CCS --> BARRIERS
+    PROBING --> BARRIERS
+    QUIRKY --> BARRIERS
+    REPE --> BARRIERS
+
+    BARRIERS --> UNSOLVED[Problem Remains Unsolved]
+
+    style APPROACHES fill:#e1f5ff
+    style TECHNIQUES fill:#fff3cd
+    style BARRIERS fill:#ffe6cc
+    style UNSOLVED fill:#f8d7da
+`} />
+
+### Consistency Checks
+
+| Approach | Mechanism | Limitation |
+|----------|-----------|------------|
+| **Cross-Verification** | Check beliefs against consequences | AI can maintain consistent false beliefs |
+| **Temporal Consistency** | Beliefs should be stable | Deceptive AI can be consistent |
+| **Internal Consistency** | No contradictions | Consistent deception possible |
+
+### Mechanistic Approaches
+
+| Approach | Mechanism | Limitation |
+|----------|-----------|------------|
+| **Probing** | Linear probes for belief representations | Might find features for "what to say" |
+| **Interpretability** | Understand internal representations | May not distinguish belief from report |
+| **Causal Intervention** | Modify representations, observe outputs | AI might compensate |
+
+### Training Approaches
+
+| Approach | Mechanism | Limitation |
+|----------|-----------|------------|
+| **Diverse Supervision** | Many different evaluators | AI might model all evaluators |
+| **Adversarial Training** | Penalize deceptive strategies | Arms race; may not cover all strategies |
+| **Uncertainty Training** | Train to report uncertainty | Can report fake uncertainty |
+
+### Architectural Approaches
+
+| Approach | Mechanism | Limitation |
+|----------|-----------|------------|
+| **Separate Knowledge/Report** | Architectural isolation | Integration challenges |
+| **Transparent Processing** | Make all reasoning visible | May not scale |
+| **Multiple Models** | Cross-check between models | Correlated deception possible |
+
+## Current Research Status
+
+### Research Investment and Organizations
+
+| Organization | Role | Key Contribution | Investment Level |
+|--------------|------|------------------|------------------|
+| **[Alignment Research Center](https://www.alignment.org/)** | Primary theoretical research | Problem formalization, \$274K in prizes, builder-breaker methodology | \$1-3M/year (estimated) |
+| **[EleutherAI](https://www.eleuther.ai/projects/elk)** | Open-source implementation | Building on CCS, open ELK codebase | Volunteer/grant-funded |
+| **UC Berkeley** | Academic research | CCS paper (Burns et al.), follow-up studies | Grant-funded |
+| **University of Washington** | Academic research | Quirky LMs paper collaboration | Grant-funded |
+| **Independent researchers** | Prize submissions | 197 proposals to ELK Prize | Various |
+
+### Key Empirical Work (2023-2025)
+
+**Contrast-Consistent Search (CCS)** - [Burns et al. (2023)](https://arxiv.org/abs/2212.03827) introduced an unsupervised probing method to determine if language models represent sentences as true or false. CCS learns a binary classification of internal states such that a statement and its negation are pushed into opposite classes. The method outperforms zero-shot accuracy by 4% on average across 6 models and 10 question-answering datasets. However, [follow-up work by Farquhar et al.](https://www.alignmentforum.org/posts/9vwekjD6xyuePX7Zr/contrast-pairs-drive-the-empirical-performance-of-contrast) demonstrated that contrast pairs drive most of the empirical performance—PCA and LDA on contrast pair differences achieve 97-98% of CCS's accuracy, suggesting the contrast pairs rather than the CCS objective are doing the heavy lifting.
+
+**Quirky Language Models** - [Mallen et al. (2024)](https://arxiv.org/abs/2312.01037) created 12 datasets with "quirky" LMs finetuned to make systematic errors when "Bob" appears in prompts. This creates a controlled setting where the model "knows" the truth but outputs falsehoods. Key quantitative findings:
+
+| Metric | Result | Significance |
+|--------|--------|--------------|
+| Truth recovery (LogR on contrast pairs) | 89% of AUROC gap | Best probing method for in-distribution |
+| Hard question generalization | 75% of AUROC gap | Performance degrades on harder questions |
+| Anomaly detection AUROC | 0.95 | Can flag when model is being untruthful |
+| Optimal layer for probing | Middle layers | Knowledge is context-independent in these layers |
+
+**Representation Engineering** - [Zou et al. (2023)](https://arxiv.org/abs/2310.01405) introduced methods to identify and steer concept vectors in activation space. Steering "truthfulness" directions at selected layers increases TruthfulQA accuracy by up to 30 percentage points, achieving state-of-the-art results. However, concept vectors may not be specific, with steering one concept affecting others—a significant limitation for safety applications.
+
+### Quantitative Comparison of Methods
+
+| Method | Benchmark | Performance | Adversarial Robustness | Key Limitation |
+|--------|-----------|-------------|------------------------|----------------|
+| **CCS** | 10 QA datasets | +4% vs zero-shot | Untested | Contrast pairs do heavy lifting; 97-98% recoverable with PCA |
+| **LogR on contrast pairs** | Quirky LMs | 89% AUROC gap recovery | Limited | Degrades to 75% on harder questions |
+| **Anomaly detection** | Quirky LMs | 0.95 AUROC | Limited | Requires known truthful baseline |
+| **Representation Engineering** | TruthfulQA | +30 percentage points | Untested | Steering affects multiple concepts |
+| **Linear probes (middle layers)** | Various | 60-80% accuracy | Low | May find "what to say" not "what is true" |
+
+### What's Been Tried
+
+| Approach | Result | Conclusion |
+|----------|--------|------------|
+| **CCS Probing** | 4% above zero-shot on 10 datasets | Not robust to adversarial settings; contrast pairs drive performance |
+| **Linear Probes** | Find context-independent knowledge in middle layers | Might find "what to say" not "what is true" |
+| **Representation Engineering** | +30pp on TruthfulQA | Unknown if scales to genuinely deceptive AI |
+| **Quirky Models** | 89% truth recovery, 0.95 anomaly AUROC | Promising but not adversarial test—models not optimized to deceive |
+| **Consistency Methods** | Various proposals | All have counterexamples; can be gamed by consistent deception |
+
+### Why Progress is Slow
+
+| Factor | Description |
+|--------|-------------|
+| **Fundamental Difficulty** | May be asking for too much |
+| **Adversarial Framing** | Solution must work against worst-case adversary |
+| **No Empirical Testbed** | Hard to experiment without genuinely deceptive AI |
+| **Unclear If Solvable** | May be impossible in the general case |
+| **Benchmark Limitations** | Current models not adversarially deceptive |
+
+### Potential Implications if Unsolvable
+
+| Scenario | Implication |
+|----------|-------------|
+| **ELK Impossible** | Must rely on AI control rather than trust |
+| **ELK Requires Limits** | Only solvable for limited AI capabilities |
+| **ELK Needs New Paradigm** | Fundamentally different approach needed |
+
+## Connection to Other Problems
+
+### Related Alignment Problems
+
+| Problem | Relationship |
+|---------|--------------|
+| **<EntityLink id="deceptive-alignment" />** | ELK would detect deceptive alignment |
+| **<EntityLink id="interpretability" />** | ELK is specific interpretability goal |
+| **<EntityLink id="scalable-oversight" />** | ELK enables human oversight of superhuman AI |
+| **Honest AI** | ELK is prerequisite for guaranteed honesty |
+
+### If ELK is Solved
+
+| Benefit | Mechanism |
+|---------|-----------|
+| **Deception Detection** | AI must report true beliefs |
+| **Oversight Enabled** | Can trust AI reports |
+| **Alignment Verification** | Can check if AI has aligned goals |
+| **Safety Assurance** | Foundation for many safety techniques |
+
+## Scalability Assessment
+
+| Dimension | Assessment | Rationale |
+|-----------|------------|-----------|
+| **Technical Scalability** | Unknown | Core open problem |
+| **Deception Robustness** | Strong (if solved) | Solving ELK = solving deception detection |
+| **SI Readiness** | Maybe | Would need to solve before SI |
+
+## Risks Addressed
+
+If ELK is solved, it would address:
+
+| Risk | Mechanism | Effectiveness |
+|------|-----------|---------------|
+| **<EntityLink id="deceptive-alignment" />** | Forces honest reporting of intentions | Very High |
+| **<EntityLink id="scheming" />** | Detects strategic deception | Very High |
+| **Oversight Failure** | Enables verification of AI beliefs | Very High |
+| **Value Misalignment** | Can detect misaligned goals | High |
+
+## Limitations
+
+- **May Be Impossible**: No proof that ELK is solvable in general
+- **Current Solutions Fail**: All proposed approaches have counterexamples
+- **Requires Unsafe AI to Test**: Hard to evaluate without deceptive models
+- **Capability Tax**: Solutions might impose performance costs
+- **Partial Solutions Limited**: Partial progress may not provide meaningful safety
+- **Fundamentally Adversarial**: Solution must work against best deceptive strategies
+
+## Sources & Resources
+
+### Core Documents
+
+| Document | Author | Year | Link |
+|----------|--------|------|------|
+| **ELK Report** | ARC | 2021 | [alignment.org](https://www.alignment.org/blog/arcs-first-technical-report-eliciting-latent-knowledge/) |
+| **ELK Prize Results** | ARC | 2022 | [alignment.org](https://www.alignment.org/blog/elk-prize-results/) |
+| **Discovering Latent Knowledge (CCS)** | Burns et al. | 2023 | [arXiv](https://arxiv.org/abs/2212.03827) |
+| **Quirky Language Models** | Mallen et al. | 2024 | [arXiv](https://arxiv.org/abs/2312.01037) |
+| **Representation Engineering** | Zou et al. | 2023 | [arXiv](https://arxiv.org/abs/2310.01405) |
+
+### Key Organizations
+
+| Organization | Role | Contribution |
+|--------------|------|--------------|
+| **[Alignment Research Center](https://www.alignment.org/)** | Primary researchers | Problem formalization, \$274k in prizes |
+| **[EleutherAI](https://www.eleuther.ai/projects/elk)** | Open research | Building on CCS work |
+| **Academic groups** | Research | Stanford, Berkeley, various |
+| **AI Safety Camp** | Training | ELK research projects |
+
+### Further Reading
+
+| Resource | Description |
+|----------|-------------|
+| **[ARC ELK Report](https://www.alignment.org/blog/arcs-first-technical-report-eliciting-latent-knowledge/)** | Full problem statement and builder-breaker methodology |
+| **[LessWrong ELK Discussion](https://www.lesswrong.com/posts/qHCDysDnvhteW7kRd/arc-s-first-technical-report-eliciting-latent-knowledge)** | Community discussion and reactions |
+| **[ELK Distillation](https://www.alignmentforum.org/posts/rxoBY9CMkqDsHt25t/eliciting-latent-knowledge-elk-distillation-summary)** | Accessible summary of core concepts |
+| **[EleutherAI ELK Project](https://www.eleuther.ai/projects/elk)** | Ongoing empirical research |
+
+---
+
+## AI Transition Model Context
+
+ELK research affects the <EntityLink id="ai-transition-model" /> through oversight capabilities:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="human-oversight-quality" /> | Oversight effectiveness | Enables verification of AI beliefs and intentions |
+| <EntityLink id="alignment-robustness" /> | Deception detection | Would make deceptive alignment impossible |
+| <EntityLink id="misalignment-potential" /> | Alignment verification | Could verify AI systems are aligned |
+
+ELK is a foundational problem for AI safety. If solved, it would provide the basis for genuine oversight of advanced AI systems. If unsolvable, it implies we must rely on control-based approaches rather than trust-based oversight. The problem's difficulty and importance make it a critical research priority despite uncertain tractability.

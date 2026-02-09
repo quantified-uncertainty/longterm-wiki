@@ -1,0 +1,238 @@
+---
+title: Content Quality Dashboard
+description: Overview of content quality, staleness, and entity relationship health
+sidebar:
+  label: Dashboard
+  order: 100
+tableOfContents: false
+fullWidth: true
+---
+
+import { getDashboardMetrics, getSummaryStats, getEnhancementQueue, getLinkHealthStats } from '@lib/dashboard';
+import QualityDashboard from '@components/dashboard/QualityDashboard';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@components/ui/table';
+import FullWidthLayout from '@components/FullWidthLayout';
+
+<FullWidthLayout />
+
+export const metrics = getDashboardMetrics();
+export const stats = getSummaryStats();
+export const enhancementQueue = getEnhancementQueue(15);
+export const linkHealth = getLinkHealthStats();
+
+This dashboard provides an overview of content quality, staleness tracking, and entity relationship health across the knowledge base.
+
+---
+
+## Summary Statistics
+
+<div className="not-content grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 my-6">
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{stats.total}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Total Entities</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{stats.risks}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Risks</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{stats.responses}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Responses</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{stats.models}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Models</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{stats.avgQuality}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Avg Quality</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold text-orange-600">{stats.gaps}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Gaps Found</div>
+  </div>
+</div>
+
+---
+
+## Quality Distribution
+
+<QualityDashboard client:load metrics={metrics} />
+
+---
+
+## Content by Type
+
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Type</TableHead>
+      <TableHead className="text-right">Count</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {metrics.contentByType.map(t => (
+      <TableRow key={t.type}>
+        <TableCell>{t.type}</TableCell>
+        <TableCell className="text-right">{t.count}</TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+
+---
+
+## Recently Updated
+
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Entity</TableHead>
+      <TableHead>Last Updated</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {metrics.recentlyUpdated.map(e => (
+      <TableRow key={e.id}>
+        <TableCell><a href={`/knowledge-base/${e.id}/`}>{e.title}</a></TableCell>
+        <TableCell>{e.date}</TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+
+---
+
+## Entity Gaps
+
+### Risks Without Responses
+
+These risks don't have any response pages linking to them:
+
+{metrics.risksWithoutResponses.length === 0 ? (
+  <p className="text-green-600">✓ All risks have linked responses</p>
+) : (
+  <ul>
+    {metrics.risksWithoutResponses.slice(0, 10).map(gap => (
+      <li key={gap.id}><strong>{gap.title}</strong> ({gap.type})</li>
+    ))}
+    {metrics.risksWithoutResponses.length > 10 && (
+      <li className="text-gray-500">...and {metrics.risksWithoutResponses.length - 10} more</li>
+    )}
+  </ul>
+)}
+
+### Responses Without Risk Links
+
+These response pages don't link to any risks:
+
+{metrics.responsesWithoutRisks.length === 0 ? (
+  <p className="text-green-600">✓ All responses link to risks</p>
+) : (
+  <ul>
+    {metrics.responsesWithoutRisks.slice(0, 10).map(gap => (
+      <li key={gap.id}><strong>{gap.title}</strong> ({gap.type})</li>
+    ))}
+    {metrics.responsesWithoutRisks.length > 10 && (
+      <li className="text-gray-500">...and {metrics.responsesWithoutRisks.length - 10} more</li>
+    )}
+  </ul>
+)}
+
+### Orphaned Entities
+
+These entities have no incoming or outgoing links:
+
+{metrics.orphanedEntities.length === 0 ? (
+  <p className="text-green-600">✓ No orphaned entities</p>
+) : (
+  <ul>
+    {metrics.orphanedEntities.slice(0, 10).map(gap => (
+      <li key={gap.id}><strong>{gap.title}</strong> ({gap.type})</li>
+    ))}
+    {metrics.orphanedEntities.length > 10 && (
+      <li className="text-gray-500">...and {metrics.orphanedEntities.length - 10} more</li>
+    )}
+  </ul>
+)}
+
+---
+
+## Enhancement Queue
+
+Pages prioritized for improvement based on (importance - quality × 10). High importance + low quality = priority target for enhancement.
+
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Page</TableHead>
+      <TableHead className="text-center">Quality</TableHead>
+      <TableHead className="text-center">Importance</TableHead>
+      <TableHead className="text-center">Gap</TableHead>
+      <TableHead>Category</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {enhancementQueue.map(p => (
+      <TableRow key={p.path}>
+        <TableCell><a href={p.path}>{p.title}</a></TableCell>
+        <TableCell className="text-center">{p.quality}</TableCell>
+        <TableCell className="text-center">{p.importance}</TableCell>
+        <TableCell className="text-center">{p.gap}</TableCell>
+        <TableCell>{p.category}</TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+
+To improve these pages, use the `/improving-pages` skill or run:
+```bash
+npm run crux -- content improve <page-id>
+```
+
+---
+
+## Link Health
+
+<div className="not-content grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{linkHealth.totalLinks}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Total Links</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold text-green-600">{linkHealth.validLinks}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Valid Links</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold text-red-600">{linkHealth.brokenLinks}</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Broken Links</div>
+  </div>
+  <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+    <div className="text-2xl font-bold">{linkHealth.healthScore}%</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Health Score</div>
+  </div>
+</div>
+
+To get current link health status, run:
+```bash
+npm run crux -- validate refs
+```
+
+---
+
+## Running Validation
+
+To run the full validation suite locally:
+
+```bash
+npm run validate
+```
+
+Individual validators:
+
+```bash
+npm run crux -- validate templates     # Template compliance
+npm run crux -- validate data          # Entity data integrity
+npm run crux -- validate refs          # Internal link validation
+npm run crux -- validate unified       # Formatting and escaping rules
+```

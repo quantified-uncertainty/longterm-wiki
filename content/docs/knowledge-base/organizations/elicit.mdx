@@ -1,0 +1,215 @@
+---
+title: Elicit
+description: An AI-powered research assistant that automates literature reviews and research workflows, developed from AI alignment research and used by over 2 million researchers
+importance: 18.5
+lastEdited: "2026-02-01"
+sidebar:
+  order: 50
+ratings:
+  focus: 8.2
+  novelty: 2.8
+  rigor: 6.5
+  completeness: 7.8
+  concreteness: 7.1
+  actionability: 2.3
+clusters:
+  - ai-safety
+  - community
+  - epistemics
+quality: 63
+llmSummary: Elicit is an AI research assistant with 2M+ users that searches 138M papers and automates literature reviews, founded by AI alignment researchers from Ought and funded by Open Philanthropy ($31M total). The platform achieved 90%+ extraction accuracy and claims 80% time savings for systematic reviews, though its alignment theory (that decomposed reasoning is safer than end-to-end training) remains empirically unvalidated at scale.
+metrics:
+  wordCount: 3200
+  citations: 34
+  tables: 2
+  diagrams: 0
+subcategory: epistemic-orgs
+---
+import {EntityLink, Backlinks, KeyPeople, KeyQuestions, Section} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Type** | AI research tool / public benefit corporation |
+| **Founded** | 2020 (spun out from Ought in 2023) |
+| **Headquarters** | Oakland, California, USA |
+| **Users** | 2 million+ researchers in academia and industry |
+| **Database Coverage** | 125-138 million academic papers |
+| **Funding** | \$31 million total (\$9M seed 2023, \$22M Series A 2025) |
+| **Key Innovation** | Sentence-level citations and decomposed reasoning for literature review automation |
+| **AI Safety Connection** | Founded by <EntityLink id="alignment">AI alignment</EntityLink> researchers; funded by <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [elicit.com](https://elicit.com) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Elicitation) |
+
+
+## Overview
+
+Elicit is an AI-powered research assistant designed to automate scientific research tasks including literature search, summarization, data extraction, and synthesis across over 125 million academic papers.[^1][^2] The platform distinguishes itself through its emphasis on scale (analyzing up to 1,000 papers and 20,000 data points), accuracy validation for scientific use, and transparency through sentence-level citations rather than simple chat interfaces.[^2][^3] With over 2 million users including researchers from top academic institutions and enterprises, Elicit has grown organically through word-of-mouth while generating millions in annual revenue from tens of thousands of paying subscribers.[^4]
+
+Elicit emerged from Ought, a non-profit AI alignment research organization founded in 2017 to explore how machine learning could scale up good reasoning.[^5][^6] The transition from alignment research tool to commercial product reflects the founders' belief that making good reasoning cheaper and more accessible—even for less careful actors—ultimately reduces existential risk by shifting machine learning development toward safer, more alignable paradigms based on task decomposition rather than end-to-end training.[^7] The platform supports workflows ranging from systematic literature reviews (claiming up to 80% time savings) to research reports, screening, and data extraction across disciplines including materials science, biotech, software development, and health technology.[^1][^3]
+
+The platform draws from three major academic databases: Semantic Scholar (200+ million publications with partnerships to 50+ major publishers), OpenAlex (243 million publications from 260,000+ sources, approximately twice the coverage of Web of Science or Scopus), and PubMed (biomedical and life sciences literature).[^8] Recent developments include the \$22 million Series A funding round in February 2025 aimed at expanding beyond academia into industries like pharmaceuticals, medical technology, and consumer goods, positioning Elicit as a potential "research operating system" for evidence-based decision-making.[^9]
+
+## History
+
+### Founding and Early Development
+
+Elicit was co-founded in 2018 by Andreas Stuhlmüller and Jungwon Byun, emerging from Ought, a non-profit organization Stuhlmüller had initiated in 2017 to explore how machine learning could assist with thinking, reflection, and evidence-based decision-making.[^5][^10] Stuhlmüller, who holds a Ph.D. in Cognitive Science from MIT (Josh Tenenbaum's group) and completed postdoctoral work at Stanford (Noah Goodman's Computational Cognitive Science lab), had been focused on automating reasoning since his teenage years and co-created the WebPPL programming language for probabilistic machine learning.[^11][^12] Byun brought operational expertise from her role as Head of Growth at Upstart (where she helped scale revenue and originations fivefold pre-IPO), management consulting experience at Oliver Wyman, and leadership of the Elmseed Enterprise Fund.[^11][^12]
+
+The initial focus centered on transforming research processes using language models to automate workflows like literature reviews, with the project incubated within Ought's broader mission to scale good reasoning through machine learning.[^5][^10] The founders' approach emphasized task decomposition—breaking complex reasoning into verifiable subtasks—as a potentially safer alternative to end-to-end AI training methods.[^13] By mid-2022, Elicit had gained substantial traction in automating research tasks, leading the founders to transition the project from a non-profit tool to an independent public benefit corporation in 2023.[^5][^10][^14]
+
+### Funding and Growth
+
+In September 2023, shortly after spinning out from Ought, Elicit secured \$9 million in seed funding.[^5] The company's growth was characterized by organic word-of-mouth adoption and high Net Promoter Scores (NPS), which the team tracked as their North Star metric and improved monthly through rapid iteration.[^4] By late 2024, Elicit had achieved tens of thousands of paying subscribers and millions in annual revenue while serving over 400,000 monthly active users among the 2 million total researchers using the platform.[^4][^9]
+
+On February 26, 2025, Elicit announced a \$22 million Series A funding round led by Spark Capital and Footwork, with participation from existing investors including Fifty Years, Basis Set, and Mythos.[^9] The funding was explicitly aimed at expanding beyond academia into evidence-based AI applications for industries, particularly in anticipation of AI-driven economic shifts potentially occurring by 2027.[^9] The company emphasized building "the most trusted AI platform for evidence-backed decisions" while maintaining its focus on high-stakes applications requiring rigorous validation.[^9]
+
+### Product Evolution and Recent Developments
+
+From its initial focus on literature reviews, Elicit expanded to offer features including Deep Research, automated research overviews, Elicit Reports, systematic reviews, and meta-analyses.[^5][^14] The platform's product philosophy centered on reliability in complex research through task decomposition and depth of processing, directly reflecting the founders' AI alignment research background.[^14] Key 2025 developments included:
+
+- Integration of Claude Opus 4.5, which Elicit evaluated as outperforming peer models in data extraction and report generation (December 17, 2025)[^15]
+- Introduction of Research Agents for competitive landscape analysis and topic exploration (December 9, 2025)[^15]
+- Launch of Strict Screening and 80-Paper Reports capabilities (December 19, 2025)[^15]
+- Integration of ClinicalTrials.gov, making 545,000 clinical studies searchable through the platform[^15]
+- Achievement of SOC 2 Type II certification (October 30, 2025), demonstrating security and privacy controls[^16]
+
+The platform's feature set emphasizes interactive workflows with large tables, multi-step processes, customizable reports, and the ability to upload custom documents or integrate company subscriptions for additional full-text access.[^3][^17] Elicit's positioning as a systematic review tool with keyword search capabilities across Elicit, PubMed, and ClinicalTrials.gov, combined with claims of up to 80% time savings, reflects its evolution toward comprehensive research automation.[^15][^18]
+
+## Key People and Organizational Structure
+
+### Leadership Team
+
+**Andreas Stuhlmüller** serves as Co-founder and CEO, bringing deep expertise in cognitive science and probabilistic programming. His academic background includes doctoral work in Josh Tenenbaum's group at MIT and postdoctoral research in Noah Goodman's lab at Stanford, where he co-created WebPPL, a programming language for probabilistic machine learning.[^11][^12] His lifelong focus on automating reasoning, dating back to his teenage years, directly shaped Elicit's emphasis on decomposed, verifiable AI systems rather than opaque end-to-end models.[^11] He served as an advisor to the 2025 <EntityLink id="ai-for-human-reasoning-fellowship">AI for Human Reasoning Fellowship</EntityLink>.
+
+**Jungwon Byun** serves as Co-founder and COO, responsible for operational strategy and growth. Before joining Ought in 2019, she led growth at Upstart, where she scaled revenue and loan originations fivefold prior to the company's IPO.[^11][^12] Her background also includes management consulting at Oliver Wyman and leadership of the Elmseed Enterprise Fund, as well as undergraduate work on microfinance in Africa during her time at Yale, where she earned her B.A. in Economics cum laude.[^11][^19]
+
+**James Brady** (also referred to as James Barry in some sources) heads engineering, bringing extensive experience from his role as VP of Technology at Spring, a creator commerce platform.[^11][^20] He previously founded startups in personal knowledge management and developer tools and built the Payroll product team at Square.[^11][^20]
+
+**Kevin Bird** serves as Head of Product, joining from Nubank where he was the first product manager and spent eight years building fintech products.[^20] **Chad Thornton** leads design with a background at major technology companies including Airtable, Dropbox, and Medium.[^20] **Sarah Park** heads operations, though specific background details were not provided in available sources.[^11]
+
+### Engineering and Technical Team
+
+The team includes **Spruce Bondera**, an AI Engineer who previously founded Continuum and worked on vehicle motion planning at Waymo.[^21] The company maintains a high hiring bar and emphasizes values aligned with scaling reasoning for science, rapid product shipping, and organic growth through product-market fit.[^20]
+
+## Technology and Product Capabilities
+
+### Core Functionality
+
+Elicit's primary functionality centers on searching, summarizing, and extracting data from academic literature. The platform provides semantic search capabilities that find relevant papers even without perfect keyword matches, searching across 138 million papers from Semantic Scholar, PubMed, and OpenAlex.[^8][^17] This coverage includes over 200 million publications from Semantic Scholar (with direct partnerships to more than 50 major publishers) and 243 million from OpenAlex, approximately double the coverage of Web of Science or Scopus.[^8] The platform does not include books, dissertations, patents, or non-academic publications.[^8]
+
+The platform's research reports follow a mini systematic review process, capable of synthesizing up to 40-80 papers into a single report with sentence-level citations backing every claim.[^2][^22][^15] This citation approach distinguishes Elicit from chat-based AI tools that only link to references without specifying which sentences support which claims.[^3] For systematic literature reviews, Elicit automates screening and data extraction steps, providing detailed rationale for screening decisions and supporting refinement of criteria before full-scale application.[^18] Researchers using Elicit for systematic reviews report time savings of up to 80%.[^2][^18]
+
+### Data Sources and Integration
+
+Elicit pulls from three major academic databases:[^8]
+
+- **Semantic Scholar**: 200+ million publications with direct partnerships to 50+ major publishers
+- **OpenAlex**: 243 million publications from 260,000+ sources, with approximately twice the coverage of Web of Science or Scopus
+- **PubMed**: Biomedical and life sciences literature
+
+The 2025 integration of ClinicalTrials.gov added 545,000 clinical studies to Elicit's searchable corpus, expanding its utility for medical and pharmaceutical research.[^15] Users can also upload custom documents or integrate company subscriptions for additional full-text access.[^17]
+
+### Advanced Features and Workflows
+
+Elicit provides interactive workflows through multi-step processes and large interactive tables that allow researchers to explore literature dynamically and refine searches in real-time.[^3] Research Agents, introduced in December 2025, enable automated competitive landscape analysis and topic exploration.[^15] The platform's Notebooks feature allows researchers to organize and annotate findings, while Alerts notify users of new relevant publications.[^15]
+
+The systematic review workflow includes keyword search capabilities across Elicit, PubMed, and ClinicalTrials.gov, with Strict Screening options for applying inclusion/exclusion criteria.[^15][^18] Reports can be customized and follow systematic review-inspired methodologies, supporting workflows in materials discovery, UX innovation, algorithmic performance analysis, and health technology assessment.[^1][^15]
+
+Elicit's technical approach emphasizes accuracy validation for scientific use, claiming to be the most accurate AI tool for research applications.[^1] The platform's December 2025 evaluation of Claude Opus 4.5 demonstrated superior performance in data extraction and report generation compared to peer models, reflecting ongoing investment in model selection and validation.[^15]
+
+## Connection to AI Safety and Alignment Research
+
+### Origins in AI Alignment Work
+
+Elicit's development is deeply rooted in AI alignment research conducted at Ought, the non-profit organization founded by Andreas Stuhlmüller in 2017.[^5][^6] Ought's research program explored how machine learning could scale up good reasoning, with a particular focus on "<EntityLink id="scalable-oversight">scalable oversight</EntityLink>" methods that would allow humans to verify AI systems' reasoning processes even for tasks too complex for direct human evaluation.[^23][^7] This work investigated debate-based alignment methods where AI systems would justify their conclusions through decomposed reasoning steps that humans could audit.[^23][^24]
+
+The theoretical foundation emphasized task decomposition as a potentially safer paradigm for AI development compared to end-to-end training. By breaking complex reasoning tasks into verifiable subtasks—such as separating literature search from summarization, extraction, and synthesis—Ought hypothesized that AI systems could be more alignable because humans could inspect intermediate steps rather than only evaluating final outputs.[^13][^14] A 2021 AI alignment literature review highlighted how Elicit tested compositional AI training by decomposing science questions into subtasks, potentially creating systems less prone to <EntityLink id="reward-hacking">reward hacking</EntityLink> or emergent misalignment.[^13]
+
+### Theory of Change and X-Risk Considerations
+
+Ought's theory of change, articulated in posts on the EA Forum and <EntityLink id="lesswrong">LessWrong</EntityLink>, positioned Elicit as net positive for existential risk reduction through two primary mechanisms.[^7] First, by making good reasoning cheaper and more accessible, Elicit would increase the total amount of careful thinking about existential risks, including AI alignment itself. Second, by demonstrating the viability of decomposition-based approaches to AI development, Elicit could shift machine learning research efforts toward paradigms that are inherently more alignable than black-box, end-to-end systems.[^7]
+
+The founders acknowledged potential downsides, noting that making reasoning more accessible could benefit "less careful actors" and that scaling research automation could accelerate AI capabilities development without proportional safety work.[^7][^25] However, they argued that the approach of making good reasoning cheaper would disproportionately benefit careful actors (who face higher opportunity costs for time spent on research) and that monitoring for misuse was part of their ongoing strategy.[^7] <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>, which provided approximately \$15 million in funding across Elicit's seed and Series A rounds, explicitly frames its support as contributing to AI alignment efforts aimed at reducing existential risks from misaligned artificial general intelligence.[^25][^26]
+
+### Alignment Techniques in Practice
+
+In practice, Elicit incorporates several alignment techniques that have become standard in language model deployment. The platform uses reinforcement learning from human feedback (<EntityLink id="rlhf">RLHF</EntityLink>) to ensure outputs align with researcher intentions and avoid harmful content.[^27][^28] Red-teaming processes test the system for potential failure modes, and the platform emphasizes transparency through sentence-level citations that allow users to verify AI claims against source material.[^2][^28] The integration of models like <EntityLink id="anthropic">Anthropic</EntityLink>'s Claude, which employs <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> for alignment, reflects ongoing attention to incorporating safety-focused language models.[^29]
+
+Elicit's accuracy validation, which the company claims makes it the most accurate AI for scientific research, includes rigorous testing of data extraction and summarization against ground truth research findings.[^1] This emphasis on verifiability and accuracy serves dual purposes: ensuring the tool is scientifically reliable while also addressing alignment concerns about AI systems producing plausible but incorrect information (a form of specification gaming where the system optimizes for sounding correct rather than being correct).[^30]
+
+## Criticisms and Limitations
+
+### Inherited Alignment Risks from Foundation Models
+
+Critics within the AI safety community note that Elicit's reliance on frontier <EntityLink id="language-models">large language models</EntityLink> (such as GPT variants and Claude) means the platform inherits the general alignment risks present in those underlying systems.[^25][^30][^31] These risks include potential reward hacking (where models optimize for proxy metrics rather than true objectives), emergent behaviors that weren't present during training, and the possibility of specification gaming where systems produce outputs that satisfy evaluation criteria without genuinely meeting user intent.[^25][^30] If Elicit's approach were scaled to AGI-level research tools without addressing these fundamental alignment challenges, it could potentially amplify existential risk by accelerating capabilities development faster than safety research advances.[^25][^30]
+
+Discussions on EA Forum and LessWrong have debated whether Elicit sufficiently prioritizes safety over productivity in its commercial deployment.[^25] Some argue that the shift from Ought's non-profit research focus to a for-profit company optimizing for revenue and user growth may dilute the original alignment-focused mission, potentially prioritizing features that increase engagement and subscriptions over those that ensure long-term safety.[^25] While no major scandals have emerged, the general concern about rare but potentially harmful outputs from language models applies to Elicit as it does to all LLM-based tools.[^27]
+
+### Methodological and Coverage Limitations
+
+Elicit's database coverage, while extensive at 138 million papers across Semantic Scholar, OpenAlex, and PubMed, explicitly excludes books, dissertations, patents, and non-academic publications.[^8] This limitation means researchers conducting comprehensive literature reviews in fields that rely heavily on gray literature, policy documents, or industry reports may find gaps in coverage. The platform's focus on academic papers also means it may miss practitioner knowledge published in conference proceedings, technical reports, or preprint servers not indexed by its three primary sources.
+
+The platform's accuracy claims, while validated through internal testing showing 90%+ accuracy in paper extraction, lack comprehensive independent validation published in peer-reviewed venues.[^32] The December 2025 evaluation of Claude Opus 4.5 showing superior performance was conducted by Elicit itself rather than by independent researchers, raising questions about potential evaluation bias.[^15] Users report generally high satisfaction through Net Promoter Score metrics, but systematic studies comparing Elicit's output quality against human expert literature reviews remain limited in published literature.[^4]
+
+### Scope and Accessibility Constraints
+
+Elicit's pricing model, with tens of thousands of paying subscribers supporting millions in annual revenue, suggests that full access to advanced features requires paid subscriptions.[^4] While this is standard for commercial research tools, it creates accessibility barriers for researchers at institutions or in regions with limited funding, potentially concentrating the benefits of AI-augmented research among already well-resourced researchers. The platform's focus on English-language academic literature, typical of major scholarly databases, also limits its utility for research that requires multilingual coverage or access to non-English academic traditions.
+
+The tool's emphasis on systematic review and literature synthesis workflows means it is optimized for specific research tasks rather than serving as a general-purpose research assistant. Researchers conducting highly specialized searches, working with niche databases, or requiring deep domain expertise in result interpretation may find Elicit's automated approach less suitable than traditional manual methods combined with specialist librarian assistance. The platform's ability to analyze up to 1,000 papers, while substantial, still represents a fraction of the corpus in some research domains where comprehensive reviews might require examining tens of thousands of studies.
+
+## Key Uncertainties
+
+**Long-term alignment trajectory under commercial pressures**: It remains uncertain whether Elicit's for-profit structure will maintain the alignment-focused development approach that characterized Ought's non-profit research, particularly as the company scales and faces pressure to maximize revenue and market share. The balance between rapid feature development for user acquisition and careful safety validation will be tested as the platform expands into new industries and use cases beyond academic research.
+
+**Scalability of decomposition-based alignment**: While Elicit demonstrates that task decomposition can work for literature review automation, it is unclear whether this approach will scale to more complex reasoning tasks or whether it can prevent emergent misalignment in systems approaching AGI-level capabilities. The founders' theory that decomposition creates more alignable systems remains a hypothesis requiring validation across increasingly difficult domains.
+
+**Impact on research quality and scientific culture**: The net effect of widespread research automation on scientific rigor and reproducibility is uncertain. While Elicit may democratize access to literature review capabilities and save researcher time, it could also enable publication of lower-quality research if users rely too heavily on automated summaries without deep engagement with primary sources. The platform's influence on citation patterns, literature synthesis quality, and researcher skill development warrants ongoing empirical investigation.
+
+**Market positioning and competitive landscape**: Elicit's expansion beyond academia into industrial applications faces competition from established enterprise research tools, general-purpose AI assistants, and specialized vertical solutions. Whether the platform can maintain its emphasis on accuracy, transparency, and sentence-level citations while competing on speed and user experience with less rigorous but potentially more convenient alternatives remains to be seen.
+
+**Effectiveness for existential risk reduction**: Whether Elicit's approach—making good reasoning cheaper and shifting ML development toward decomposition—actually reduces existential risk on net is fundamentally uncertain. The accelerating-capabilities-without-proportional-safety concern raised by critics could outweigh the benefits of increasing careful thinking about risks, particularly if the tool enables faster AI development timelines without corresponding advances in alignment solutions.
+
+## Sources
+
+[^1]: [Elicit Homepage](https://elicit.com)
+[^2]: [Built In SF - Elicit Company Profile](https://www.builtinsf.com/company/elicit)
+[^3]: [Elicit for Education](https://elicit.com/industries/edu)
+[^4]: [Elicit - NBT Substack Profile](https://nbt.substack.com/p/elicit)
+[^5]: [Canvas Business Model - Brief History of Elicit](https://canvasbusinessmodel.com/blogs/brief-history/elicit-brief-history)
+[^6]: [Fifty Years - Elicit Investment](https://substack.fiftyyears.com/p/elicit)
+[^7]: [EA Forum - Ought's Theory of Change](https://forum.effectivealtruism.org/posts/raFAKyw7ofSo9mRQ3/ought-s-theory-of-change)
+[^8]: [Elicit Support - Data Sources](https://support.elicit.com/en/articles/553025)
+[^9]: [Elicit Blog - Series A Announcement](https://elicit.com/blog/series-a/)
+[^10]: [IT History - Elicit](https://www.ithistory.org/db/companies/elicit)
+[^11]: [Elicit Team Page](https://elicit.com/team)
+[^12]: [Cognitive Revolution - Unbounded AI-Assisted Research with Elicit Founders](https://www.cognitiverevolution.ai/unbounded-ai-assisted-research-with-elicit-founders-andreas-stuhlmuller-and-jungwon-byun/)
+[^13]: [Alignment Forum - 2021 AI Alignment Literature Review](https://www.alignmentforum.org/posts/C4tR3BEpuWviT7Sje/2021-ai-alignment-literature-review-and-charity-comparison)
+[^14]: [Elicit Blog - AI for Human Reasoning](https://elicit.com/blog/ai-for-human-reasoning)
+[^15]: [Elicit Blog - Features Tag](https://elicit.com/blog/tag/features)
+[^16]: [Elicit Blog - Company Tag](https://elicit.com/blog/tag/company)
+[^17]: [Elicit Solutions - Search](https://elicit.com/solutions/search)
+[^18]: [Elicit Solutions - Systematic Review](https://elicit.com/solutions/systematic-review)
+[^19]: [TechCrunch - Elicit Building Tool to Automate Scientific Literature Review](https://techcrunch.com/2023/09/25/elicit-is-building-a-tool-to-automate-scientific-literature-review/)
+[^20]: [NBT Substack - Elicit (Team Details)](https://nbt.substack.com/p/elicit)
+[^21]: [Elicit Team Page - Spruce Bondera](https://elicit.com/team)
+[^22]: [Elicit Solutions - Reports](https://elicit.com/solutions/reports)
+[^23]: [Alignment Forum - Newcomer's Guide to Technical AI Safety Field](https://www.alignmentforum.org/posts/5rsa37pBjo4Cf9fkE/a-newcomer-s-guide-to-the-technical-ai-safety-field)
+[^24]: [OpenAI - How We Think About Safety Alignment](https://openai.com/safety/how-we-think-about-safety-alignment/)
+[^25]: [Alignment Forum - Newcomer's Guide to Technical AI Safety Field (Funding Details)](https://www.alignmentforum.org/posts/5rsa37pBjo4Cf9fkE/a-newcomer-s-guide-to-the-technical-ai-safety-field)
+[^26]: [Open Philanthropy - Other Scientific Research Areas](https://www.openphilanthropy.org/focus/scientific-research/other-scientific-research-areas/)
+[^27]: [Wikipedia - AI Alignment](https://en.wikipedia.org/wiki/AI_alignment)
+[^28]: [Tigera - AI Safety Guide](https://www.tigera.io/learn/guides/llm-security/ai-safety/)
+[^29]: [Witness.ai - AI Alignment Blog](https://witness.ai/blog/ai-alignment/)
+[^30]: [arXiv - AI Alignment Paper (2310.19852)](https://arxiv.org/abs/2310.19852)
+[^31]: [Stanford AI Alignment - What is AI Safety](https://stanfordaialignment.org/what-is-ai-safety)
+[^32]: [University of Arizona LibGuides - AI for Researchers: Elicit](https://libguides.library.arizona.edu/ai-researchers/elicit)
+
+<Backlinks />

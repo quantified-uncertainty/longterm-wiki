@@ -1,0 +1,11 @@
+# Next.js
+.next/
+out/
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# Generated data (rebuilt by prebuild script)
+src/data/database.json
+
+# Vercel
+.vercel

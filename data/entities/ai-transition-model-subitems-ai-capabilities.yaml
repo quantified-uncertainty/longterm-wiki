@@ -1,0 +1,669 @@
+- id: "tmc-compute"
+  type: "ai-transition-model-subitem"
+  title: "Compute"
+  parentFactor: "ai-capabilities"
+  path: "/ai-transition-model/compute/"
+  description: "Compute refers to the hardware resources required to train and run AI systems,
+    including GPUs, TPUs, and specialized AI accelerators. The current generation of frontier AI
+    models requires extraordinary amounts of computational power—training runs cost tens to hundreds
+    of millions of dollars in compute alone.
+
+    The significance of compute for AI governance stems from several unique properties: it is
+    measurable (training runs can be quantified in FLOPs), concentrated (the global semiconductor
+    supply chain depends on chokepoints like ASML, TSMC, and NVIDIA), and physical (unlike
+    algorithms that can be copied infinitely, hardware must be manufactured and shipped)."
+  ratings:
+    changeability: 30
+    xriskImpact: 70
+    trajectoryImpact: 80
+    uncertainty: 35
+  currentAssessment:
+    level: 35
+    trend: "declining"
+    confidence: 0.7
+    lastUpdated: "2026-01"
+    notes: "Compute concentration increasing; export controls having effect but circumvention growing"
+  warningIndicators:
+    - indicator: "Training run costs"
+      status: "$100M+ for frontier models"
+      trend: "worsening"
+      concern: "medium"
+    - indicator: "Chip concentration"
+      status: "TSMC produces 90%+ advanced chips"
+      trend: "stable"
+      concern: "high"
+    - indicator: "Export control effectiveness"
+      status: "Significant circumvention observed"
+      trend: "worsening"
+      concern: "high"
+  addressedBy:
+    - id: "compute-governance"
+      title: "Compute Governance"
+      effect: "positive"
+      strength: "strong"
+    - id: "export-controls"
+      title: "Export Controls"
+      effect: "positive"
+      strength: "medium"
+  causeEffectGraph:
+    title: "What Drives Effective AI Compute?"
+    description: "Causal factors affecting frontier AI training compute. Note: This forms a cycle—AI
+      capabilities drive revenue, which funds more compute—but feedback loops are omitted for
+      clarity."
+    primaryNodeId: "effective-compute"
+    nodes:
+      - id: "taiwan-stability"
+        label: "Taiwan Stability"
+        type: "leaf"
+        description: "Geopolitical risk to TSMC. 90%+ of advanced chips."
+        scores:
+          novelty: 4
+          sensitivity: 9
+          changeability: 2
+          certainty: 6
+        color: "rose"
+      - id: "asml-capacity"
+        label: "ASML Capacity"
+        type: "leaf"
+        description: "Sole EUV lithography supplier. ~50 machines/year."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 3
+          certainty: 8
+        color: "teal"
+      - id: "power-grid"
+        label: "Power Grid Capacity"
+        type: "leaf"
+        description: "Grid expansion, permitting. Binding constraint for large clusters."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 4
+          certainty: 7
+        color: "blue"
+      - id: "pretraining-data"
+        label: "Training Data Quality"
+        type: "leaf"
+        description: "Available high-quality data. May become binding as models scale."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 5
+          certainty: 4
+      - id: "ai-revenue"
+        label: "AI Revenue"
+        type: "leaf"
+        description: "Revenue from AI products. Justifies continued investment."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 5
+          certainty: 6
+      - id: "fab-capacity"
+        label: "Fab Capacity"
+        type: "cause"
+        description: "Advanced node manufacturing. New fabs: 3-5 years, $20-40B."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 3
+          certainty: 7
+        color: "teal"
+      - id: "ai-valuations"
+        label: "AI Valuations"
+        type: "cause"
+        description: "Market caps enabling capital raises. $1-3T for frontier labs."
+        scores:
+          novelty: 3
+          sensitivity: 6
+          changeability: 4
+          certainty: 5
+      - id: "chip-supply"
+        label: "Chip Supply"
+        type: "intermediate"
+        description: "Total advanced AI chips produced."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 4
+          certainty: 7
+      - id: "chip-architecture"
+        label: "Chip Architecture"
+        type: "intermediate"
+        description: "FLOPS per chip. ~2-3x improvement per generation."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 5
+          certainty: 7
+      - id: "algorithmic-efficiency"
+        label: "Algorithmic Efficiency"
+        type: "intermediate"
+        description: "Software improvements. Historically ~4x/year."
+        entityRef: "tmc-algorithms"
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 6
+          certainty: 5
+        color: "emerald"
+      - id: "datacenter-capacity"
+        label: "Datacenter Capacity"
+        type: "intermediate"
+        description: "Infrastructure: power, cooling, networking."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 5
+          certainty: 7
+      - id: "ai-compute-spending"
+        label: "AI Compute Spending"
+        type: "intermediate"
+        description: "Capital deployed for compute infrastructure."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 5
+          certainty: 6
+      - id: "effective-compute"
+        label: "Effective Compute"
+        type: "effect"
+        description: "Net compute available for frontier AI training."
+        scores:
+          novelty: 4
+          sensitivity: 9
+          changeability: 5
+          certainty: 6
+        color: "blue"
+    edges:
+      - source: "asml-capacity"
+        target: "fab-capacity"
+        strength: "strong"
+        effect: "increases"
+      - source: "taiwan-stability"
+        target: "fab-capacity"
+        strength: "strong"
+        effect: "increases"
+      - source: "fab-capacity"
+        target: "chip-supply"
+        strength: "strong"
+        effect: "increases"
+      - source: "chip-supply"
+        target: "datacenter-capacity"
+        strength: "strong"
+        effect: "increases"
+      - source: "power-grid"
+        target: "datacenter-capacity"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-revenue"
+        target: "ai-valuations"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-valuations"
+        target: "ai-compute-spending"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-compute-spending"
+        target: "datacenter-capacity"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-compute-spending"
+        target: "chip-supply"
+        strength: "medium"
+        effect: "increases"
+      - source: "taiwan-stability"
+        target: "ai-valuations"
+        strength: "medium"
+        effect: "increases"
+      - source: "ai-compute-spending"
+        target: "chip-architecture"
+        strength: "medium"
+        effect: "increases"
+      - source: "ai-compute-spending"
+        target: "algorithmic-efficiency"
+        strength: "medium"
+        effect: "increases"
+      - source: "datacenter-capacity"
+        target: "effective-compute"
+        strength: "strong"
+        effect: "increases"
+      - source: "chip-architecture"
+        target: "effective-compute"
+        strength: "strong"
+        effect: "increases"
+      - source: "algorithmic-efficiency"
+        target: "effective-compute"
+        strength: "strong"
+        effect: "increases"
+      - source: "pretraining-data"
+        target: "effective-compute"
+        strength: "medium"
+        effect: "increases"
+  relatedEntries:
+    - id: "compute-governance"
+      type: "approach"
+      relationship: "addresses"
+    - id: "ai-capabilities"
+      type: "ai-transition-model-factor"
+      relationship: "child-of"
+    - id: "compute-hardware"
+      type: "ai-transition-model-metric"
+      relationship: "measured-by"
+    - id: "racing-intensity"
+      type: "ai-transition-model-parameter"
+      relationship: "affects"
+  tags:
+    - "compute"
+    - "hardware"
+    - "governance"
+    - "ai-capabilities"
+  relatedContent:
+    researchReports:
+        title: "Compute (AI Capabilities): Research Report"
+    responses:
+      - path: "/knowledge-base/responses/compute-governance/"
+        title: "Compute Governance Overview"
+      - path: "/knowledge-base/responses/export-controls/"
+        title: "Export Controls"
+      - path: "/knowledge-base/responses/monitoring/"
+        title: "Compute Monitoring"
+      - path: "/knowledge-base/responses/hardware-enabled-governance/"
+        title: "Hardware-Enabled Governance"
+  lastUpdated: "2026-01"
+- id: "tmc-algorithms"
+  type: "ai-transition-model-subitem"
+  title: "Algorithms"
+  parentFactor: "ai-capabilities"
+  path: "/ai-transition-model/algorithms/"
+  description: "Algorithmic progress determines how efficiently AI systems convert compute into
+    capabilities. Unlike hardware, algorithms are intangible—discoveries spread instantly through
+    publications, making direct governance nearly impossible."
+  ratings:
+    changeability: 20
+    xriskImpact: 75
+    trajectoryImpact: 85
+    uncertainty: 55
+  causeEffectGraph:
+    title: "What Drives Algorithmic Progress?"
+    description: "Causal factors affecting AI algorithmic efficiency. Research shows 91% of gains are
+      scale-dependent (Transformers, Chinchilla), coupling algorithmic progress to compute
+      availability. Software optimizations (23x) dramatically outpace hardware improvements."
+    primaryNodeId: "algorithmic-progress"
+    nodes:
+      - id: "research-talent"
+        label: "Research Talent"
+        type: "leaf"
+        description: "Supply of skilled ML researchers and engineers. Growing exponentially but still
+          concentrated."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 5
+          certainty: 6
+      - id: "compute-availability"
+        label: "Compute Availability"
+        type: "leaf"
+        description: "Access to frontier compute for scaling studies. 91% of efficiency gains depend on scale."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 4
+          certainty: 7
+      - id: "open-science-norms"
+        label: "Open Science Norms"
+        type: "leaf"
+        description: "Culture of publishing papers/code. Algorithms diffuse instantly—cannot be physically
+          controlled."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 4
+          certainty: 6
+        color: "emerald"
+      - id: "competitive-pressure"
+        label: "Competitive Pressure"
+        type: "leaf"
+        description: "Racing dynamics between labs/nations. Accelerates innovation but may compromise safety."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 4
+          certainty: 5
+        color: "rose"
+      - id: "scaling-laws"
+        label: "Scaling Laws"
+        type: "cause"
+        description: "Chinchilla 20:1 token-to-parameter ratio. Compute-optimal training enables smaller,
+          better-trained models."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 3
+          certainty: 7
+      - id: "academic-research"
+        label: "Academic Research"
+        type: "cause"
+        description: "Volume of ML papers and experiments. Transformer (2017) was transformative but
+          unpredicted."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 6
+          certainty: 5
+      - id: "paradigm-shifts"
+        label: "Paradigm Shifts"
+        type: "cause"
+        description: "Architectural breakthroughs like Transformers. Transformers + Chinchilla account for
+          91% of gains at frontier."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 2
+          certainty: 4
+        color: "violet"
+      - id: "post-training-methods"
+        label: "Post-Training Methods"
+        type: "cause"
+        description: "RLHF, distillation, test-time compute. Add 3-16x efficiency gains beyond pre-training."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 7
+          certainty: 6
+      - id: "architecture-innovations"
+        label: "Architecture Innovations"
+        type: "intermediate"
+        description: "MoE (DeepSeek 40% compute), GQA, RoPE. Core component of 23x software improvements."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 6
+          certainty: 6
+        color: "teal"
+      - id: "training-efficiency"
+        label: "Training Efficiency"
+        type: "intermediate"
+        description: "FP8 quantization, curriculum learning, optimization methods. Enables compute-optimal
+          training."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 6
+          certainty: 6
+      - id: "software-optimizations"
+        label: "Software Optimizations"
+        type: "intermediate"
+        description: "Speculative decoding, KV caching, quantization. 23x improvement vs. 1.3x hardware gains."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 6
+          certainty: 7
+        color: "emerald"
+      - id: "deployment-efficiency"
+        label: "Deployment Efficiency"
+        type: "intermediate"
+        description: "Inference optimization, batching. 280x cost reduction over 24 months."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 7
+          certainty: 7
+      - id: "algorithmic-progress"
+        label: "Algorithmic Progress"
+        type: "effect"
+        description: "Compute required to reach fixed performance halves every 8 months (95% CI: 5-14
+          months). Combined pre-training + post-training: ~9x/year."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 4
+          certainty: 5
+        color: "blue"
+    edges:
+      - source: "compute-availability"
+        target: "paradigm-shifts"
+        strength: "strong"
+        effect: "increases"
+      - source: "compute-availability"
+        target: "scaling-laws"
+        strength: "strong"
+        effect: "increases"
+      - source: "research-talent"
+        target: "academic-research"
+        strength: "strong"
+        effect: "increases"
+      - source: "competitive-pressure"
+        target: "academic-research"
+        strength: "medium"
+        effect: "increases"
+      - source: "competitive-pressure"
+        target: "post-training-methods"
+        strength: "medium"
+        effect: "increases"
+      - source: "open-science-norms"
+        target: "paradigm-shifts"
+        strength: "medium"
+        effect: "increases"
+      - source: "open-science-norms"
+        target: "architecture-innovations"
+        strength: "medium"
+        effect: "increases"
+      - source: "academic-research"
+        target: "architecture-innovations"
+        strength: "strong"
+        effect: "increases"
+      - source: "academic-research"
+        target: "training-efficiency"
+        strength: "medium"
+        effect: "increases"
+      - source: "paradigm-shifts"
+        target: "architecture-innovations"
+        strength: "strong"
+        effect: "increases"
+      - source: "scaling-laws"
+        target: "training-efficiency"
+        strength: "strong"
+        effect: "increases"
+      - source: "post-training-methods"
+        target: "deployment-efficiency"
+        strength: "strong"
+        effect: "increases"
+      - source: "architecture-innovations"
+        target: "algorithmic-progress"
+        strength: "strong"
+        effect: "increases"
+      - source: "training-efficiency"
+        target: "algorithmic-progress"
+        strength: "strong"
+        effect: "increases"
+      - source: "software-optimizations"
+        target: "algorithmic-progress"
+        strength: "strong"
+        effect: "increases"
+      - source: "deployment-efficiency"
+        target: "algorithmic-progress"
+        strength: "medium"
+        effect: "increases"
+  relatedContent:
+    researchReports:
+        title: "Algorithms (AI Capabilities): Research Report"
+  relatedEntries:
+    - id: "ai-capabilities"
+      type: "ai-transition-model-factor"
+      relationship: "child-of"
+  tags:
+    - "algorithms"
+    - "research"
+    - "ai-capabilities"
+  lastUpdated: "2026-01"
+- id: "tmc-adoption"
+  type: "ai-transition-model-subitem"
+  title: "AI Adoption"
+  parentFactor: "ai-capabilities"
+  path: "/ai-transition-model/adoption/"
+  description: "The rate and breadth of AI deployment across sectors. High adoption accelerates both
+    benefits and risks, creating path dependencies and increasing societal exposure to AI failures."
+  lastUpdated: "2026-01"
+  ratings:
+    changeability: 40
+    xriskImpact: 45
+    trajectoryImpact: 70
+    uncertainty: 40
+  relatedContent:
+    researchReports:
+        title: "AI Adoption: Research Report"
+    risks:
+      - path: "/knowledge-base/risks/enfeeblement/"
+        title: "Enfeeblement"
+      - path: "/knowledge-base/risks/economic-disruption/"
+        title: "Economic Disruption"
+      - path: "/knowledge-base/risks/expertise-atrophy/"
+        title: "Expertise Atrophy"
+    responses:
+      - path: "/knowledge-base/responses/labor-transition/"
+        title: "Labor Transition"
+    models:
+      - path: "/knowledge-base/models/expertise-atrophy-progression/"
+        title: "Expertise Atrophy Progression"
+  causeEffectGraph:
+    title: "What Drives AI Adoption?"
+    description: "Causal factors affecting the rate and breadth of AI deployment across sectors."
+    primaryNodeId: "ai-adoption"
+    nodes:
+      - id: "capability-improvements"
+        label: "Capability Improvements"
+        type: "leaf"
+        description: "AI systems becoming more capable and reliable. Enables new use cases."
+        scores:
+          novelty: 2
+          sensitivity: 8
+          changeability: 3
+          certainty: 8
+      - id: "cost-reduction"
+        label: "Cost Reduction"
+        type: "leaf"
+        color: "emerald"
+        description: "Declining inference costs (~280x over 24 months). Makes deployment economical."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 3
+          certainty: 7
+      - id: "competitive-pressure"
+        label: "Competitive Pressure"
+        type: "leaf"
+        color: "rose"
+        description: "Fear of falling behind drives rapid adoption even with uncertainty."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 4
+          certainty: 7
+      - id: "regulatory-environment"
+        label: "Regulatory Environment"
+        type: "leaf"
+        color: "blue"
+        description: "Rules that slow or accelerate deployment decisions."
+        scores:
+          novelty: 3
+          sensitivity: 5
+          changeability: 6
+          certainty: 5
+      - id: "workforce-readiness"
+        label: "Workforce Readiness"
+        type: "leaf"
+        color: "slate"
+        description: "Availability of skilled workers to deploy, maintain, and oversee AI systems."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 5
+          certainty: 6
+      - id: "dependency-risks"
+        label: "Dependency Risks"
+        type: "leaf"
+        color: "rose"
+        description: "Concerns about over-reliance on AI vendors and correlated failure modes."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 4
+          certainty: 5
+      - id: "adoption-speed-question"
+        label: "Too Fast for Safeguards?"
+        type: "leaf"
+        color: "violet"
+        description: "Key uncertainty whether adoption outpaces ability to implement adequate safeguards."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 4
+          certainty: 3
+      - id: "integration-ease"
+        label: "Integration Ease"
+        type: "intermediate"
+        description: "How easily AI fits into existing workflows and systems."
+        scores:
+          novelty: 3
+          sensitivity: 6
+          changeability: 5
+          certainty: 6
+      - id: "demonstrated-roi"
+        label: "Demonstrated ROI"
+        type: "intermediate"
+        color: "emerald"
+        description: "Proven business value from AI deployments."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+      - id: "ai-adoption"
+        label: "AI Adoption Rate"
+        type: "effect"
+        description: "Speed and breadth of AI deployment across economy."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+    edges:
+      - source: "capability-improvements"
+        target: "integration-ease"
+        strength: "strong"
+        effect: "increases"
+      - source: "cost-reduction"
+        target: "demonstrated-roi"
+        strength: "strong"
+        effect: "increases"
+      - source: "competitive-pressure"
+        target: "ai-adoption"
+        strength: "strong"
+        effect: "increases"
+      - source: "regulatory-environment"
+        target: "ai-adoption"
+        strength: "medium"
+        effect: "decreases"
+      - source: "workforce-readiness"
+        target: "integration-ease"
+        strength: "medium"
+        effect: "increases"
+      - source: "dependency-risks"
+        target: "ai-adoption"
+        strength: "medium"
+        effect: "decreases"
+      - source: "adoption-speed-question"
+        target: "ai-adoption"
+        strength: "medium"
+        effect: "mixed"
+      - source: "integration-ease"
+        target: "ai-adoption"
+        strength: "medium"
+        effect: "increases"
+      - source: "demonstrated-roi"
+        target: "ai-adoption"
+        strength: "strong"
+        effect: "increases"

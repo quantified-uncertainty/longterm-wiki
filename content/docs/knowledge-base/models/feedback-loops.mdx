@@ -1,0 +1,689 @@
+---
+title: Feedback Loop & Cascade Model
+description: This model analyzes how AI risks emerge from reinforcing feedback loops. Capabilities compound at 2.5x per year on key benchmarks while safety measures improve at only 1.2x per year, with current safety investment at just 0.1% of capability investment.
+tableOfContents: false
+quality: 59
+lastEdited: "2026-01-28"
+ratings:
+  focus: 8.5
+  novelty: 4
+  rigor: 5.5
+  completeness: 7
+  concreteness: 6.5
+  actionability: 5.5
+importance: 72.5
+llmSummary: System dynamics model showing AI capabilities growing at 2.5x/year vs safety at 1.2x/year, with positive feedback loops (investment→value, AI→automation) 2-3x stronger than negative loops (accidents→regulation). Estimates 10-20% probability of crossing critical thresholds (recursive improvement, deception capability) within 2-5 years, requiring $500M-2B/year to strengthen dampening mechanisms.
+pageTemplate: knowledge-base-model
+metrics:
+  wordCount: 1406
+  citations: 22
+  tables: 26
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: dynamics-models
+---
+import CauseEffectGraph from '@components/CauseEffectGraph';
+import { Mermaid, EntityLink } from '@components/wiki';
+
+**Core thesis**: AI risk isn't static—it emerges from reinforcing feedback loops that can rapidly accelerate through critical thresholds. Understanding these dynamics is crucial for intervention timing.
+
+<div class="breakout">
+<CauseEffectGraph
+  client:load
+  height={1100}
+  fitViewPadding={0.05}
+  initialNodes={[
+    {
+      id: 'capability-growth',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Capability Growth Rate',
+        description: 'Speed of AI capability improvement.',
+        type: 'cause',
+        confidence: 2.5,
+        confidenceLabel: 'x/year (OOM)',
+        details: 'Current growth ~2.5x per year on key benchmarks. Accelerating with scale.',
+        relatedConcepts: ['Scaling', 'Progress', 'Benchmarks']
+      }
+    },
+    {
+      id: 'investment-rate',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Investment Rate',
+        description: 'Capital flowing into AI.',
+        type: 'cause',
+        confidence: 100,
+        confidenceLabel: '$B/year',
+        details: 'Currently ≈\$100B/year globally. Doubling roughly every 2 years.',
+        relatedConcepts: ['VC', 'Corporate', 'Government']
+      }
+    },
+    {
+      id: 'economic-value',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Economic Value Generated',
+        description: 'Revenue and cost savings from AI.',
+        type: 'intermediate',
+        confidence: 500,
+        confidenceLabel: '$B/year',
+        details: 'Currently ≈\$500B/year value. Growing faster than investment.',
+        relatedConcepts: ['Revenue', 'Productivity', 'Value']
+      }
+    },
+    {
+      id: 'talent-pool',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'AI Talent Pool',
+        description: 'Cumulative skilled AI researchers.',
+        type: 'cause',
+        confidence: 50000,
+        confidenceLabel: 'researchers',
+        details: 'Currently ~50K serious AI researchers globally. Growing 15%/year.',
+        relatedConcepts: ['Talent', 'PhDs', 'Engineers']
+      }
+    },
+    {
+      id: 'compute-stock',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Compute Stock',
+        description: 'Cumulative training compute available.',
+        type: 'cause',
+        confidence: 26,
+        confidenceLabel: 'log FLOP (total)',
+        details: 'Current frontier training ~10^26 FLOP. Doubling every 6 months.',
+        relatedConcepts: ['GPUs', 'TPUs', 'Datacenters']
+      }
+    },
+    {
+      id: 'ai-research-automation',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'AI Research Automation',
+        description: 'Fraction of AI R&D done by AI.',
+        type: 'intermediate',
+        confidence: 0.15,
+        confidenceLabel: 'fraction (0-1)',
+        details: 'Currently ~15% of ML research tasks automated. Key acceleration trigger.',
+        relatedConcepts: ['AutoML', 'AI scientists', 'Recursive']
+      }
+    },
+    {
+      id: 'deployment-pressure',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Deployment Pressure',
+        description: 'Competitive pressure to deploy fast.',
+        type: 'intermediate',
+        confidence: 0.7,
+        confidenceLabel: 'pressure (0-1)',
+        details: 'Currently ~0.7. Intense competition drives rushed releases.',
+        relatedConcepts: ['Competition', 'Time-to-market', 'Racing']
+      }
+    },
+    {
+      id: 'safety-investment',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Safety Investment',
+        description: 'Resources devoted to AI safety.',
+        type: 'cause',
+        confidence: 1,
+        confidenceLabel: '$B/year',
+        details: 'Currently ≈\$1B/year. Growing but fraction declining.',
+        relatedConcepts: ['Safety', 'Alignment', 'Funding']
+      }
+    },
+    {
+      id: 'safety-progress',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Safety Progress Rate',
+        description: 'Speed of alignment advances.',
+        type: 'intermediate',
+        confidence: 1.2,
+        confidenceLabel: 'x/year',
+        details: 'Currently ~1.2x improvement per year. Slower than capabilities.',
+        relatedConcepts: ['Alignment', 'Interpretability', 'Safety']
+      }
+    },
+    {
+      id: 'capability-safety-gap',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Capability-Safety Gap',
+        description: 'Difference between capability and safety.',
+        type: 'intermediate',
+        confidence: 0.6,
+        confidenceLabel: 'gap size (0-1)',
+        details: 'Currently ~0.6 gap. Widening as capabilities outpace safety.',
+        relatedConcepts: ['Gap', 'Differential', 'Race']
+      }
+    },
+    {
+      id: 'accident-rate',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'AI Accident Rate',
+        description: 'Frequency of harmful AI incidents.',
+        type: 'intermediate',
+        confidence: 0.3,
+        confidenceLabel: 'serious/year',
+        details: 'Currently ~0.3 serious incidents/year. Rising with deployment.',
+        relatedConcepts: ['Incidents', 'Failures', 'Harm']
+      }
+    },
+    {
+      id: 'public-concern',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Public Concern',
+        description: 'Level of societal worry about AI.',
+        type: 'intermediate',
+        confidence: 0.45,
+        confidenceLabel: 'level (0-1)',
+        details: 'Currently ~0.45. Rising but not dominant issue yet.',
+        relatedConcepts: ['Concern', 'Fear', 'Awareness']
+      }
+    },
+    {
+      id: 'regulatory-pressure',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Regulatory Pressure',
+        description: 'Government push for AI regulation.',
+        type: 'intermediate',
+        confidence: 0.35,
+        confidenceLabel: 'pressure (0-1)',
+        details: 'Currently ~0.35. Growing but lagging tech progress.',
+        relatedConcepts: ['Regulation', 'Policy', 'Government']
+      }
+    },
+    {
+      id: 'autonomy-level',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Deployed Autonomy Level',
+        description: 'How agentic are deployed systems?',
+        type: 'intermediate',
+        confidence: 0.3,
+        confidenceLabel: 'level (0-1)',
+        details: 'Currently ~0.3 autonomy. Rising fast with agent frameworks.',
+        relatedConcepts: ['Agency', 'Autonomy', 'Agents']
+      }
+    },
+    {
+      id: 'human-oversight',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Human Oversight Quality',
+        description: 'Effectiveness of human supervision.',
+        type: 'intermediate',
+        confidence: 0.5,
+        confidenceLabel: 'quality (0-1)',
+        details: 'Currently ~0.5. Declining as systems become more complex.',
+        relatedConcepts: ['Oversight', 'Supervision', 'Control']
+      }
+    },
+    {
+      id: 'concentration',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Power Concentration',
+        description: 'AI capability concentration in few actors.',
+        type: 'intermediate',
+        confidence: 0.7,
+        confidenceLabel: 'concentration (0-1)',
+        details: 'Currently ~0.7 (top 3 labs dominate). Could enable lock-in.',
+        relatedConcepts: ['Monopoly', 'Concentration', 'Power']
+      }
+    },
+    {
+      id: 'coordination-capacity',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Global Coordination',
+        description: 'International AI governance capacity.',
+        type: 'intermediate',
+        confidence: 0.2,
+        confidenceLabel: 'capacity (0-1)',
+        details: 'Currently ~0.2. Very limited international coordination.',
+        relatedConcepts: ['Treaties', 'Cooperation', 'UN']
+      }
+    },
+    {
+      id: 'threshold-recursive',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Recursive Improvement Threshold',
+        description: 'Has AI crossed recursive improvement point?',
+        type: 'intermediate',
+        confidence: 0.1,
+        confidenceLabel: 'P(crossed)',
+        details: 'Currently ~10% likely crossed. Key phase transition point.',
+        relatedConcepts: ['Recursion', 'Takeoff', 'Threshold']
+      }
+    },
+    {
+      id: 'threshold-deception',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Deception Capability Threshold',
+        description: 'Can AI systematically deceive evaluators?',
+        type: 'intermediate',
+        confidence: 0.15,
+        confidenceLabel: 'P(crossed)',
+        details: 'Currently ~15% likely. Undermines all evaluation methods.',
+        relatedConcepts: ['Deception', 'Sandbagging', 'Evals']
+      }
+    },
+    {
+      id: 'threshold-autonomy',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Autonomous Action Threshold',
+        description: 'Can AI take consequential actions independently?',
+        type: 'intermediate',
+        confidence: 0.2,
+        confidenceLabel: 'P(crossed)',
+        details: 'Currently ~20% likely. Reduces human correction opportunities.',
+        relatedConcepts: ['Agency', 'Independence', 'Autonomy']
+      }
+    },
+    {
+      id: 'controllability',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'System Controllability',
+        description: 'Can humans effectively control AI systems?',
+        type: 'intermediate',
+        confidence: 0.6,
+        confidenceLabel: 'controllability (0-1)',
+        details: 'Currently ~0.6. Declining with capability and autonomy.',
+        relatedConcepts: ['Control', 'Shutdown', 'Override']
+      }
+    },
+    {
+      id: 'cascade-risk',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Cascade Risk',
+        description: 'Risk of rapid system-wide failure.',
+        type: 'intermediate',
+        confidence: 0.15,
+        confidenceLabel: 'probability',
+        details: 'Currently ~15%. Interconnected systems create cascade potential.',
+        relatedConcepts: ['Cascade', 'Contagion', 'Systemic']
+      }
+    },
+    {
+      id: 'lockin-risk',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Lock-in Risk',
+        description: 'Risk of irreversible bad outcomes.',
+        type: 'intermediate',
+        confidence: 0.2,
+        confidenceLabel: 'probability',
+        details: 'Currently ~20%. Concentration + autonomy enables lock-in.',
+        relatedConcepts: ['Lock-in', 'Irreversibility', 'Permanence']
+      }
+    },
+    {
+      id: 'total-risk',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Total Existential Risk',
+        description: 'Combined probability of catastrophe.',
+        type: 'effect',
+        confidence: 0.15,
+        confidenceLabel: 'P(catastrophe)',
+        details: 'Current estimate ~15% risk. Driven by feedback loop dynamics.',
+        relatedConcepts: ['X-risk', 'Catastrophe', 'Extinction']
+      }
+    }
+  ]}
+  initialEdges={[
+    { id: 'e-invest-econ', source: 'investment-rate', target: 'economic-value', data: { impact: 0.50 } },
+    { id: 'e-cap-econ', source: 'capability-growth', target: 'economic-value', data: { impact: 0.50 } },
+    { id: 'e-econ-invest', source: 'economic-value', target: 'investment-rate', data: { impact: 0.60 }, style: { strokeDasharray: '5,5' }, label: 'LOOP' },
+    { id: 'e-invest-cap', source: 'investment-rate', target: 'capability-growth', data: { impact: 0.35 } },
+    { id: 'e-talent-cap', source: 'talent-pool', target: 'capability-growth', data: { impact: 0.30 } },
+    { id: 'e-compute-cap', source: 'compute-stock', target: 'capability-growth', data: { impact: 0.35 } },
+    { id: 'e-cap-auto', source: 'capability-growth', target: 'ai-research-automation', data: { impact: 0.70 } },
+    { id: 'e-invest-auto', source: 'investment-rate', target: 'ai-research-automation', data: { impact: 0.30 } },
+    { id: 'e-auto-cap', source: 'ai-research-automation', target: 'capability-growth', data: { impact: 0.50 }, style: { strokeDasharray: '5,5' }, label: 'LOOP' },
+    { id: 'e-econ-pressure', source: 'economic-value', target: 'deployment-pressure', data: { impact: 0.60 } },
+    { id: 'e-invest-pressure', source: 'investment-rate', target: 'deployment-pressure', data: { impact: 0.40 } },
+    { id: 'e-invest-safety', source: 'investment-rate', target: 'safety-investment', data: { impact: 0.30 } },
+    { id: 'e-concern-safety', source: 'public-concern', target: 'safety-investment', data: { impact: 0.40 } },
+    { id: 'e-reg-safety', source: 'regulatory-pressure', target: 'safety-investment', data: { impact: 0.30 } },
+    { id: 'e-safety-progress', source: 'safety-investment', target: 'safety-progress', data: { impact: 0.70 } },
+    { id: 'e-talent-safetyprog', source: 'talent-pool', target: 'safety-progress', data: { impact: 0.30 } },
+    { id: 'e-cap-gap', source: 'capability-growth', target: 'capability-safety-gap', data: { impact: 0.60 } },
+    { id: 'e-safetyprog-gap', source: 'safety-progress', target: 'capability-safety-gap', data: { impact: 0.40 } },
+    { id: 'e-gap-accident', source: 'capability-safety-gap', target: 'accident-rate', data: { impact: 0.50 } },
+    { id: 'e-pressure-accident', source: 'deployment-pressure', target: 'accident-rate', data: { impact: 0.30 } },
+    { id: 'e-autonomy-accident', source: 'autonomy-level', target: 'accident-rate', data: { impact: 0.20 } },
+    { id: 'e-accident-concern', source: 'accident-rate', target: 'public-concern', data: { impact: 0.50 } },
+    { id: 'e-cap-concern', source: 'capability-growth', target: 'public-concern', data: { impact: 0.30 } },
+    { id: 'e-econ-concern', source: 'economic-value', target: 'public-concern', data: { impact: 0.20 } },
+    { id: 'e-concern-reg', source: 'public-concern', target: 'regulatory-pressure', data: { impact: 0.60 } },
+    { id: 'e-accident-reg', source: 'accident-rate', target: 'regulatory-pressure', data: { impact: 0.40 } },
+    { id: 'e-cap-autonomy', source: 'capability-growth', target: 'autonomy-level', data: { impact: 0.50 } },
+    { id: 'e-pressure-autonomy', source: 'deployment-pressure', target: 'autonomy-level', data: { impact: 0.50 } },
+    { id: 'e-cap-oversight', source: 'capability-growth', target: 'human-oversight', data: { impact: 0.40 } },
+    { id: 'e-autonomy-oversight', source: 'autonomy-level', target: 'human-oversight', data: { impact: 0.40 } },
+    { id: 'e-safety-oversight', source: 'safety-progress', target: 'human-oversight', data: { impact: 0.20 } },
+    { id: 'e-invest-conc', source: 'investment-rate', target: 'concentration', data: { impact: 0.40 } },
+    { id: 'e-compute-conc', source: 'compute-stock', target: 'concentration', data: { impact: 0.35 } },
+    { id: 'e-reg-conc', source: 'regulatory-pressure', target: 'concentration', data: { impact: 0.25 } },
+    { id: 'e-concern-coord', source: 'public-concern', target: 'coordination-capacity', data: { impact: 0.40 } },
+    { id: 'e-reg-coord', source: 'regulatory-pressure', target: 'coordination-capacity', data: { impact: 0.35 } },
+    { id: 'e-conc-coord', source: 'concentration', target: 'coordination-capacity', data: { impact: 0.25 } },
+    { id: 'e-auto-recursive', source: 'ai-research-automation', target: 'threshold-recursive', data: { impact: 0.60 } },
+    { id: 'e-cap-recursive', source: 'capability-growth', target: 'threshold-recursive', data: { impact: 0.40 } },
+    { id: 'e-cap-deception', source: 'capability-growth', target: 'threshold-deception', data: { impact: 0.60 } },
+    { id: 'e-gap-deception', source: 'capability-safety-gap', target: 'threshold-deception', data: { impact: 0.40 } },
+    { id: 'e-autonomy-thresh', source: 'autonomy-level', target: 'threshold-autonomy', data: { impact: 0.60 } },
+    { id: 'e-cap-thresh', source: 'capability-growth', target: 'threshold-autonomy', data: { impact: 0.40 } },
+    { id: 'e-deception-control', source: 'threshold-deception', target: 'controllability', data: { impact: 0.35 } },
+    { id: 'e-autonomythresh-control', source: 'threshold-autonomy', target: 'controllability', data: { impact: 0.35 } },
+    { id: 'e-oversight-control', source: 'human-oversight', target: 'controllability', data: { impact: 0.30 } },
+    { id: 'e-control-cascade', source: 'controllability', target: 'cascade-risk', data: { impact: 0.40 } },
+    { id: 'e-autonomy-cascade', source: 'autonomy-level', target: 'cascade-risk', data: { impact: 0.30 } },
+    { id: 'e-recursive-cascade', source: 'threshold-recursive', target: 'cascade-risk', data: { impact: 0.30 } },
+    { id: 'e-conc-lockin', source: 'concentration', target: 'lockin-risk', data: { impact: 0.35 } },
+    { id: 'e-control-lockin', source: 'controllability', target: 'lockin-risk', data: { impact: 0.35 } },
+    { id: 'e-coord-lockin', source: 'coordination-capacity', target: 'lockin-risk', data: { impact: 0.30 } },
+    { id: 'e-cascade-total', source: 'cascade-risk', target: 'total-risk', data: { impact: 0.30 } },
+    { id: 'e-lockin-total', source: 'lockin-risk', target: 'total-risk', data: { impact: 0.25 } },
+    { id: 'e-gap-total', source: 'capability-safety-gap', target: 'total-risk', data: { impact: 0.25 } },
+    { id: 'e-control-total', source: 'controllability', target: 'total-risk', data: { impact: 0.20 } }
+  ]}
+/>
+</div>
+
+## Overview
+
+This model analyzes how AI risks emerge from reinforcing feedback loops. Capabilities compound at 2.5x per year on key benchmarks while safety measures improve at only 1.2x per year. The fundamental asymmetry—current AI safety investment totals approximately \$110-130 million annually compared to \$152 billion in corporate AI investment—creates a structural gap that widens with each development cycle.
+
+Research from the [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) confirms that "capabilities are accelerating faster than risk-management practice, and the gap between firms is widening." The [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) from the <EntityLink id="fli">Future of Life Institute</EntityLink> argues that "the steady increase in capabilities is severely outpacing any expansion of safety-focused efforts," describing this as leaving "the sector structurally unprepared for the risks it is actively creating."
+
+System dynamics research by [Frontiers in Complex Systems (2024)](https://www.frontiersin.org/journals/complex-systems/articles/10.3389/fcpxs.2024.1323321/full) demonstrates that with even 3-5 co-occurring catastrophes and modest interaction effects, cascading dynamics can lead to catastrophic macro-outcomes. This model applies similar stock-and-flow thinking to AI risk specifically, identifying the feedback structures that could produce rapid phase transitions.
+
+## Conceptual Framework
+
+The model uses system dynamics methodology to capture how AI development creates self-reinforcing cycles. Positive feedback loops drive capability acceleration while negative feedback loops (regulation, public concern, coordination) provide potential braking mechanisms. The critical insight is that positive loops currently operate at 3-4x the strength of negative loops.
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Positive["Positive Loops (Accelerating)"]
+        INV[Investment] -->|+0.6| ECON[Economic Value]
+        ECON -->|+0.6| INV
+        CAP[Capability Growth] -->|+0.7| AUTO[AI Research Automation]
+        AUTO -->|+0.5| CAP
+        CAP -->|+0.5| PRESS[Deployment Pressure]
+    end
+
+    subgraph Negative["Negative Loops (Dampening)"]
+        ACC[Accident Rate] -->|+0.5| CONC[Public Concern]
+        CONC -->|+0.6| REG[Regulatory Pressure]
+        REG -->|+0.3| SAFE[Safety Investment]
+    end
+
+    subgraph Thresholds["Critical Thresholds"]
+        TH1[Recursive Improvement<br/>P=10%]
+        TH2[Deception Capability<br/>P=15%]
+        TH3[Autonomous Action<br/>P=20%]
+    end
+
+    CAP -->|drives| TH1
+    AUTO -->|enables| TH1
+    CAP -->|drives| TH2
+    CAP -->|enables| TH3
+
+    TH1 -->|accelerates| CAP
+    TH2 -->|undermines| SAFE
+    TH3 -->|reduces| REG
+
+    style Positive fill:#ffcccc
+    style Negative fill:#ccffcc
+    style Thresholds fill:#ffffcc
+`} client:load />
+
+## Key Feedback Loops
+
+### Positive (Accelerating) Loops
+
+| Loop | Mechanism | Current Status |
+|------|-----------|----------------|
+| **Investment → Value → Investment** | Economic success drives more investment | Active, strengthening |
+| **AI → Research Automation → AI** | AI accelerates its own development | Emerging, ≈15% automated |
+| **Capability → Pressure → Deployment → Accidents → Concern** | Success breeds complacency | Active |
+| **Autonomy → Complexity → Less Oversight → More Autonomy** | Systems escape human supervision | Early stage |
+
+### Negative (Dampening) Loops
+
+| Loop | Mechanism | Current Status |
+|------|-----------|----------------|
+| **Accidents → Concern → Regulation → Safety** | Harm triggers protective response | Weak, ≈0.3 coupling |
+| **Concern → Coordination → Risk Reduction** | Public worry enables cooperation | Very weak, ≈0.2 |
+| **Concentration → Regulation → Deconcentration** | Monopoly power triggers intervention | Not yet active |
+
+## Model Parameters
+
+The following parameter estimates are derived from publicly available data on AI investment, capability benchmarks, and governance metrics. The [2025 AI Index Report from Stanford HAI](https://hai.stanford.edu/ai-index/2025-ai-index-report) provides key quantitative grounding for investment and capability growth rates.
+
+| Parameter | Best Estimate | Range | Confidence | Source |
+|-----------|---------------|-------|------------|--------|
+| Capability growth rate | 2.5x/year | 1.8-3.5x | Medium (55%) | Benchmark analyses |
+| Safety progress rate | 1.2x/year | 1.0-1.5x | Medium (50%) | [AISI Research Direction](https://www.aisi.gov.uk/work/aisis-research-direction-for-technical-solutions) |
+| Annual AI investment | \$152B | \$100-300B | High (75%) | [Stanford HAI 2025](https://hai.stanford.edu/ai-index/2025-ai-index-report/economy) |
+| Annual safety investment | \$110-130M | \$10-200M | Medium (60%) | [LessWrong Analysis](https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation) |
+| Safety/Capability ratio | 0.05% | 0.03-0.1% | Medium (55%) | Calculated |
+| Positive loop strength | 0.55 | 0.4-0.7 | Low (40%) | Model estimation |
+| Negative loop strength | 0.25 | 0.15-0.35 | Low (35%) | Model estimation |
+| Loop strength ratio | 2.2:1 | 1.5:1-4:1 | Low (35%) | Derived |
+
+The capability-safety ratio of approximately 2000:1 (some analyses suggest up to 10,000:1) represents the core structural imbalance that drives gap widening. As [UK researcher David Dalrymple warned](https://the420.in/david-dalrymple-uk-aria-ai-safety-warning-control/), "the pace of technological progress inside leading AI labs is often poorly understood by policymakers, even as breakthroughs arrive with increasing frequency."
+
+## Critical Thresholds
+
+The model identifies key **phase transition points** where dynamics fundamentally change:
+
+| Threshold | Description | Current P(Crossed) | Consequence If Crossed |
+|-----------|-------------|-------------------|------------------------|
+| **Recursive Improvement** | AI can substantially improve itself | ≈10% | Rapid capability acceleration |
+| **Deception Capability** | AI can systematically deceive evaluators | ≈15% | Safety evaluations unreliable |
+| **Autonomous Action** | AI takes consequential actions without approval | ≈20% | Reduced correction opportunities |
+| **Oversight Failure** | Humans can't effectively supervise | ≈30% | Loss of control |
+
+## Stock Variables (Accumulations)
+
+| Stock | Current Level | Trend | Implication |
+|-------|---------------|-------|-------------|
+| **Compute Stock** | 10^26 FLOP | Doubling/6mo | Capability foundation |
+| **Talent Pool** | ≈50K researchers | +15%/year | Persistent advantage |
+| **Safety Debt** | ≈0.6 gap | Widening | Accumulated risk |
+| **Deployed Systems** | Billions of instances | Expanding | Systemic exposure |
+
+## Cascade Dynamics
+
+The model highlights how **local failures can propagate**:
+
+1. **Technical cascade**: One system failure triggers others (interconnected infrastructure)
+2. **Economic cascade**: AI-driven market crash → funding collapse → safety cuts
+3. **Political cascade**: AI incident → regulation → race dynamics → accidents
+4. **Trust cascade**: Deception discovered → all AI distrusted → coordination collapse
+
+## Rate Variables
+
+Key **velocities** that determine trajectory:
+
+| Rate | Current Value | Danger Zone | Safe Zone |
+|------|---------------|-------------|-----------|
+| Capability growth | 2.5x/year | &gt;3x/year | &lt;1.5x/year |
+| Safety progress | 1.2x/year | &lt;1x/year | &gt;2x/year |
+| Deployment acceleration | +30%/year | &gt;50%/year | &lt;10%/year |
+| Coordination building | +5%/year | &lt;0%/year | &gt;20%/year |
+
+## Intervention Timing
+
+The feedback loop structure suggests **when** interventions matter most:
+
+| Phase | Characteristics | Key Interventions |
+|-------|-----------------|-------------------|
+| **Pre-threshold** | Loops weak, thresholds distant | Build safety capacity, coordination infrastructure |
+| **Acceleration** | Positive loops strengthening | Slow capability growth, mandate safety investment |
+| **Near-threshold** | Approaching phase transitions | Emergency coordination, possible pause |
+| **Post-threshold** | New dynamics active | Depends on which threshold crossed |
+
+## Full Variable List
+
+This diagram simplifies the complete Feedback Loop Model:
+
+**Positive Feedback Loops (13)**: Investment→value→investment, AI→research→AI, capability→pressure→deployment, success→talent→success, data→performance→data, autonomy→complexity→autonomy, speed→winner→speed, profit→compute→capability, deployment→learning→capability, concentration→resources→concentration, lock-in→stability→lock-in, capability→applications→funding, and more.
+
+**Negative Feedback Loops (9)**: Accidents→regulation, concern→caution, competition→scrutiny, concentration→antitrust, capability→fear→restriction, deployment→saturation, talent→wages→barriers, profit→taxation, growth→resistance.
+
+**Threshold/Phase Transition Nodes (11)**: Recursive improvement, deception capability, autonomous action, oversight failure, coordination collapse, economic dependency, infrastructure criticality, political capture, societal lock-in, existential event, recovery failure.
+
+**Rate/Velocity Nodes (12)**: Capability growth rate, safety progress rate, deployment rate, investment acceleration, talent flow rate, compute expansion, autonomy increase, oversight degradation, coordination building, regulatory adaptation, concern growth, gap widening rate.
+
+**Stock/Accumulation Nodes (8)**: Compute stock, talent pool, deployed systems, safety knowledge, institutional capacity, public awareness, coordination infrastructure, safety debt.
+
+**Cascade/Contagion Nodes (7)**: Technical cascade, economic cascade, political cascade, trust cascade, infrastructure cascade, coordination cascade, recovery cascade.
+
+**Critical Path Nodes (5)**: Time to recursive threshold, time to deception threshold, time to autonomy threshold, intervention window, recovery capacity.
+
+## Scenario Analysis
+
+The following scenarios emerge from different combinations of loop strength and threshold crossing timing. These are probability-weighted based on current trajectory assessments.
+
+| Scenario | Probability | Positive Loop Strength | Negative Loop Response | Outcome | Timeline |
+|----------|-------------|----------------------|----------------------|---------|----------|
+| **Coordinated Slowdown** | 12% | Weakens to 0.3 | Strengthens to 0.5 | Managed transition | 2027-2035 |
+| **Regulatory Catch-up** | 18% | Stable at 0.5 | Strengthens to 0.4 | Moderate gap | 2026-2030 |
+| **Continued Drift** | 35% | Stable at 0.5 | Stays at 0.25 | Widening gap | 2025-2028 |
+| **Acceleration** | 25% | Strengthens to 0.7 | Weakens to 0.2 | Rapid threshold crossing | 2025-2027 |
+| **Runaway Dynamics** | 10% | Exceeds 0.8 | Collapses to 0.1 | Multiple thresholds crossed | 2025-2026 |
+
+### Scenario Drivers
+
+**Coordinated Slowdown** requires a major AI incident triggering international cooperation, significantly increased safety funding (10x current levels), and voluntary or mandated deployment slowdowns from frontier labs. The [ICLR 2026 Workshop on Recursive Self-Improvement](https://iclr.cc/virtual/2026/workshop/10000796) highlights that governance mechanisms for self-improving systems remain underdeveloped.
+
+**Regulatory Catch-up** assumes the EU AI Act and similar frameworks gain traction, combined with industry-led safety standards and modestly increased public concern translating to policy action.
+
+**Continued Drift** (baseline) represents the current trajectory where investment continues growing (reaching [\$100-500B annually by 2028](https://empirixpartners.com/the-trillion-dollar-horizon/) according to industry projections) while safety investment grows more slowly and coordination remains weak.
+
+**Acceleration** occurs if recursive self-improvement thresholds are crossed. Recent developments like [Google DeepMind's AlphaEvolve](https://www.datapro.news/p/the-risks-of-recursive-self-improvement) (May 2025), which can optimize components of itself, and the [SICA system](https://www.vktr.com/ai-technology/researchers-warn-of-oversight-gaps-as-ai-begins-self-rewriting/) achieving performance leaps through self-rewriting demonstrate that this threshold may be closer than commonly assumed.
+
+**Runaway Dynamics** represents a tail risk where multiple reinforcing effects compound—AI research automation exceeds 50%, recursive improvement becomes dominant, and negative feedback loops are overwhelmed. Research suggests this scenario, while low probability, would leave "humanity either needing to avoid significant cascading effects at all costs or needing to identify novel ways to recover."
+
+## Strategic Importance
+
+### Magnitude Assessment
+
+The feedback loop structure determines whether AI development is self-correcting or self-reinforcing toward dangerous outcomes. Identifying loop dominance is crucial.
+
+| Dimension | Assessment | Quantitative Estimate |
+|-----------|------------|----------------------|
+| **Potential severity** | Critical - positive loops can drive runaway dynamics | Unchecked loops could reach irreversible thresholds within 3-7 years |
+| **Probability-weighted importance** | High - current evidence suggests positive loops dominating | Positive loops 3-4x stronger than negative loops currently |
+| **Comparative ranking** | Essential for understanding dynamics of all other risks | Foundation model - all other risks modulate through these dynamics |
+| **Intervention timing sensitivity** | Very high - loop strength compounds | Each year of delay reduces intervention effectiveness by ≈20% |
+
+### Loop Strength Comparison
+
+| Feedback Loop | Current Strength | Trend | Time to 2x |
+|---------------|-----------------|-------|-----------|
+| Investment → Value → Investment | 0.60 | Strengthening | ≈18 months |
+| AI → Research Automation → AI | 0.50 | Accelerating rapidly | ≈12 months |
+| Accidents → Concern → Regulation | 0.30 | Slowly strengthening | ≈36 months |
+| Concern → Coordination → Risk Reduction | 0.20 | Stagnant | Unknown |
+
+**Key Finding:** Positive loops are strengthening 2-3x faster than protective negative loops.
+
+### Resource Implications
+
+Priority interventions target loop structure:
+- Strengthen negative feedback loops (regulation, oversight, coordination): **\$500M-2B/year needed** vs. ≈\$100M currently
+- Slow positive feedback loops (deployment speed limits, compute governance): Requires regulatory action, not primarily funding
+- Identify and monitor phase transition thresholds: **\$50-100M/year** for robust monitoring infrastructure
+- Build capacity for rapid response when approaching thresholds: **\$100-200M/year** for institutional capacity
+
+### Threshold Proximity Assessment
+
+| Threshold | Distance Estimate | Confidence | Key Uncertainties |
+|-----------|------------------|------------|-------------------|
+| Recursive Improvement | 2-5 years | Low (40%) | Speed of AI R&D automation |
+| Deception Capability | 1-4 years | Medium (55%) | Interpretability progress |
+| Autonomous Action | 1-3 years | Medium (60%) | Agent framework development |
+| Oversight Failure | 2-6 years | Low (35%) | Human-AI collaboration methods |
+
+### Key Cruxes
+
+| Crux | Implication if True | Implication if False | Current Assessment |
+|------|---------------------|---------------------|-------------------|
+| Positive loops currently dominate | Urgent intervention needed | More time available | 75% likely true |
+| Thresholds are closer than monitoring suggests | May already be too late for some | Standard response adequate | 45% likely true |
+| Negative loops can be strengthened fast enough | Technical governance viable | Need pause or slowdown | 35% likely true |
+| Early warning signals are detectable | Targeted intervention possible | Must act on priors | 50% likely true |
+
+## Limitations
+
+This model has several important limitations that constrain its applicability and precision.
+
+**Parameter estimation uncertainty.** The loop strength parameters (0.2-0.6 range) are model estimates rather than empirically measured values. Real-world feedback dynamics are difficult to quantify precisely, and small changes in these parameters can produce significantly different trajectory projections. The confidence intervals on threshold proximity estimates are appropriately wide (Low to Medium confidence) but may still understate true uncertainty.
+
+**Omitted feedback mechanisms.** The model simplifies the actual feedback landscape. Important omitted dynamics include: international competitive dynamics between nation-states, the role of open-source development in capability diffusion, labor market effects and their feedback on development pace, and potential discontinuities from paradigm shifts (like the transformer architecture emergence). Research by [Springer (2025)](https://link.springer.com/article/10.1007/s00146-025-02419-2) emphasizes that "structural risks are classified into three interrelated categories: antecedent structural causes, antecedent AI system causes, and deleterious feedback loops"—this model focuses primarily on the third category.
+
+**Linearity assumptions.** The model assumes relatively smooth exponential dynamics, but real systems often exhibit discontinuities, phase transitions, and emergent behaviors that linear extrapolation cannot capture. The [arXiv research on AI growth dynamics](https://arxiv.org/html/2502.19425) notes that logistic growth models may fit better than pure exponential models for technological development.
+
+**Threshold identification.** The four critical thresholds identified (recursive improvement, deception capability, autonomous action, oversight failure) are conceptual constructs. Determining when such thresholds have been crossed in practice is extremely difficult—we may not recognize threshold crossing until well after it occurs.
+
+**Intervention effectiveness assumptions.** The model assumes interventions targeting loop structure can achieve meaningful effects, but the actual tractability of strengthening negative feedback loops or weakening positive ones remains uncertain. Political, economic, and technical barriers to implementing such interventions are not fully modeled.
+
+## Sources
+
+Key references informing this model:
+
+- [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) - Assessment of capability-safety gap dynamics
+- [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) - Future of Life Institute analysis of safety preparedness
+- [Stanford HAI 2025 AI Index Report](https://hai.stanford.edu/ai-index/2025-ai-index-report) - Investment and capability growth data
+- [Frontiers: Cascading Risks (2024)](https://www.frontiersin.org/journals/complex-systems/articles/10.3389/fcpxs.2024.1323321/full) - Quantitative scenario modeling for catastrophic risks
+- [AI Safety Funding Overview](https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation) - Analysis of safety investment levels
+- [ICLR 2026 Workshop on Recursive Self-Improvement](https://iclr.cc/virtual/2026/workshop/10000796) - Technical research on self-improving systems
+- [AISI Research Direction](https://www.aisi.gov.uk/work/aisis-research-direction-for-technical-solutions) - UK AI Safety Institute on capability-mitigation gap
+- [Springer: Structural Risk Dynamics (2025)](https://link.springer.com/article/10.1007/s00146-025-02419-2) - Framework for understanding AI structural risks
+

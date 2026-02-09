@@ -1,0 +1,340 @@
+---
+title: Output Filtering
+description: Output filtering screens AI outputs through classifiers before delivery to users. Detection rates range from 70-98% depending on content category, with OpenAI's Moderation API achieving 98% for sexual content but only 70-85% for dangerous information. The UK AI Security Institute found universal jailbreaks in 100% of tested models, though Anthropic's Constitutional Classifiers blocked 95.6% of attacks in 3,000+ hours of red-teaming. Market valued at $1.24B in 2025, growing 20% annually.
+importance: 64
+quality: 63
+lastEdited: "2026-01-28"
+sidebar:
+  order: 20
+pageTemplate: knowledge-base-response
+llmSummary: Comprehensive analysis of AI output filtering showing detection rates of 70-98% depending on content type, with 100% of models vulnerable to jailbreaks per UK AISI testing, though Anthropic's Constitutional Classifiers blocked 95.6% of attacks. Concludes filtering provides marginal safety benefits for catastrophic risk while imposing capability taxes through 2-15% false positive rates.
+ratings:
+  novelty: 4.5
+  rigor: 7
+  actionability: 6.5
+  completeness: 7.5
+metrics:
+  wordCount: 1121
+  citations: 61
+  tables: 42
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: alignment-deployment
+---
+import {Mermaid, R, EntityLink} from '@components/wiki';
+
+## Overview
+
+Output filtering represents one of the most widely deployed AI safety measures, used by essentially all public-facing AI systems. The approach involves passing model outputs through a secondary classifier or rule-based system that attempts to detect and block harmful content before it reaches users. This includes filters for hate speech, violence, explicit content, personally identifiable information, and dangerous instructions.
+
+Despite universal adoption, output filtering provides only marginal safety benefits for catastrophic risk reduction. The core limitation is fundamental: any filter that a human red team can devise, a sophisticated adversary can eventually bypass. The history of jailbreaking demonstrates this conclusively, with new bypass techniques emerging within days or hours of filter updates. More concerning, output filters create a false sense of security that may lead to complacency about deeper alignment issues.
+
+The approach also imposes a capability tax through false positives, blocking legitimate queries and reducing model usefulness. This creates ongoing tension between safety and usability, with commercial pressure consistently pushing toward more permissive filtering. For catastrophic risk scenarios, output filtering is essentially irrelevant: a misaligned superintelligent system would trivially evade any output filter, and even current models can often be manipulated into producing filtered content through careful prompt engineering.
+
+### Comparison of Output Filtering Approaches
+
+| Approach | Provider | Detection Rate | False Positive Rate | Latency Impact | Cost | Key Strength | Key Weakness |
+|----------|----------|----------------|---------------------|----------------|------|--------------|--------------|
+| **<EntityLink id="openai">OpenAI</EntityLink> Moderation API** | OpenAI | 89-98% (category-dependent) | 2.1% | Low (≈50ms) | Free | High accuracy for English content | [Weaker multilingual performance](https://arxiv.org/html/2501.01256v1) |
+| **Llama Guard 3** | Meta | F1: 0.904 | Lower than GPT-4 | Medium | Open-source | [Outperforms GPT-4 in 7 languages](https://huggingface.co/meta-llama/Llama-Guard-3-8B) | Requires self-hosting |
+| **Constitutional Classifiers** | <EntityLink id="anthropic">Anthropic</EntityLink> | 95.6% (jailbreak block) | +0.38% (not significant) | +23.7% compute | Proprietary | [Robust against red-teaming](https://www.anthropic.com/research/constitutional-classifiers) | Compute overhead |
+| **Perspective API** | Google/Jigsaw | AUC: 0.76 | Variable | Low | Free tier | Well-established, API accessible | [Higher false negative rates](https://arxiv.org/html/2501.01256v1) |
+| **Rule-based filters** | Custom | 60-80% | 5-15% | Very Low | Low | Fast, auditable, predictable | Brittle, easily circumvented |
+| **Semantic embedding** | Custom | 85-95% | 3-8% | High | Medium-High | Context-aware detection | Computationally expensive |
+
+*Sources: [OpenAI Moderation Benchmarks](https://portkey.ai/blog/openai-omni-moderation-latest-benchmark/), [Llama Guard Model Card](https://huggingface.co/meta-llama/Llama-Guard-3-8B), [Anthropic Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers)*
+
+## Risk Assessment & Impact
+
+| Dimension | Rating | Assessment |
+|-----------|--------|------------|
+| **Safety Uplift** | Low | Blocks obvious harms but easily bypassed |
+| **Capability Uplift** | Tax | Reduces model usefulness through false positives |
+| **Net World Safety** | Neutral | Marginal benefit; creates false sense of security |
+| **Lab Incentive** | Moderate | Prevents obvious bad PR; required for deployment |
+| **Scalability** | Breaks | Sophisticated users/models can evade filters |
+| **Deception Robustness** | None | Deceptive model could bypass or manipulate filters |
+| **SI Readiness** | No | SI could trivially evade output filters |
+
+### Research Investment
+
+- **Current Investment**: \$10-200M/yr (part of product deployment at all labs)
+- **Recommendation**: Maintain (necessary for deployment but limited safety value)
+- **Differential Progress**: Balanced (safety theater that also degrades product)
+
+### Detection Rates by Content Category
+
+Empirical research reveals significant variation in filter effectiveness across content types and languages:
+
+| Content Category | OpenAI Moderation API | Llama Guard 3 | GPT-4o | Best Practice Threshold |
+|------------------|----------------------|---------------|--------|-------------------------|
+| Sexual content | [98.2%](https://www.cursor-ide.com/blog/openai-moderation-api-address-meaning) | F1: 0.89 | 94% | 0.7-0.8 |
+| Graphic violence | [94%](https://www.cursor-ide.com/blog/openai-moderation-api-address-meaning) | F1: 0.85 | 91% | 0.6-0.7 |
+| General violence | [89%](https://www.cursor-ide.com/blog/openai-moderation-api-address-meaning) | F1: 0.82 | 87% | 0.5-0.6 |
+| Self-harm instructions | [95%](https://www.cursor-ide.com/blog/openai-moderation-api-address-meaning) | F1: 0.91 | 93% | 0.8-0.9 |
+| Self-harm intent | [92%](https://www.cursor-ide.com/blog/openai-moderation-api-address-meaning) | F1: 0.88 | 90% | 0.7-0.8 |
+| Hate speech | 85-90% | F1: 0.83 | 88% | 0.6-0.7 |
+| Dangerous information | 70-85% | F1: 0.78 | 82% | 0.5-0.7 |
+| Multilingual content | [42% improvement in latest](https://portkey.ai/blog/openai-omni-moderation-latest-benchmark/) | [Outperforms GPT-4 in 7/8 languages](https://www.marktechpost.com/2024/11/30/meta-ai-releases-llama-guard-3-1b-int4-a-compact-and-high-performance-ai-moderation-model-for-human-ai-conversations/) | Variable | Language-specific |
+
+*Note: Detection rates vary significantly based on threshold settings, context, and adversarial conditions. Research shows [15.4% disagreement rates](https://arxiv.org/html/2501.01256v1) on nuanced hate speech cases.*
+
+### False Positive and False Negative Tradeoffs
+
+| Filtering Regime | False Positive Rate | False Negative Rate | Use Case | Risk Profile |
+|------------------|---------------------|---------------------|----------|--------------|
+| **High security** | 8-15% | 1-3% | Healthcare, legal, child safety | Prioritize blocking harmful content |
+| **Balanced** | 3-5% | 5-10% | General consumer applications | Standard deployment |
+| **Permissive** | 1-2% | 15-25% | Research, creative applications | Prioritize user experience |
+| **Context-aware** | 2-4% | 4-8% | Enterprise, education | Best tradeoff with higher compute |
+
+*Combining moderation scores with contextual analysis can [reduce false positive rates by up to 43%](https://www.cursor-ide.com/blog/openai-moderation-api-address-meaning) while maintaining safety standards.*
+
+## How Output Filtering Works
+
+Output filtering systems operate at inference time, examining model outputs before delivery. Modern systems employ multiple filtering layers with different tradeoffs between latency, accuracy, and compute cost:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Input["Input Processing"]
+        A[User Query] --> B{Input Filter}
+        B -->|Blocked| C[Input Rejection]
+        B -->|Passed| D[AI Model]
+    end
+
+    subgraph Generation["Model Generation"]
+        D --> E[Raw Output Tokens]
+    end
+
+    subgraph OutputFiltering["Output Filtering Pipeline"]
+        E --> F{Rule-Based Filter}
+        F -->|Flagged| G[Fast Rejection]
+        F -->|Passed| H{ML Classifier}
+        H -->|High Risk| I[Block Output]
+        H -->|Medium Risk| J{Semantic Analysis}
+        H -->|Low Risk| K[Deliver to User]
+        J -->|Unsafe| I
+        J -->|Borderline| L[Human Review Queue]
+        J -->|Safe| K
+    end
+
+    subgraph Monitoring["Post-Delivery Monitoring"]
+        K --> M[User Feedback]
+        M --> N[Model Updates]
+    end
+
+    style B fill:#fff3cd
+    style F fill:#fff3cd
+    style H fill:#d1ecf1
+    style J fill:#d1ecf1
+    style I fill:#f8d7da
+    style G fill:#f8d7da
+    style K fill:#d4edda
+    style L fill:#e2e3e5
+`} />
+
+The diagram above illustrates a production-grade filtering pipeline. Key design choices include:
+
+1. **Input filtering** catches obviously malicious queries before model invocation (saving compute)
+2. **Rule-based filters** provide fast, low-latency first-pass filtering for known patterns
+3. **ML classifiers** handle nuanced content that requires learned representations
+4. **Semantic analysis** applies deeper context-aware evaluation for borderline cases
+5. **Human review** handles cases where automated systems lack confidence
+
+### Filter Types
+
+| Type | Mechanism | Strengths | Weaknesses |
+|------|-----------|-----------|------------|
+| **Classification-based** | ML model predicts harm probability | Generalizes to novel content | Can be fooled by adversarial inputs |
+| **Rule-based** | Pattern matching, keyword detection | Fast, predictable, auditable | Brittle, easy to circumvent |
+| **Semantic** | Embedding similarity to harmful examples | Context-aware | Computationally expensive |
+| **Modular** | Domain-specific filters (CSAM, PII, etc.) | High precision for specific harms | Coverage gaps between modules |
+
+### Common Filter Categories
+
+1. **Content Safety**: Violence, hate speech, explicit sexual content
+2. **Dangerous Information**: Weapons synthesis, drug manufacturing, cyberattack instructions
+3. **Privacy Protection**: PII detection and redaction
+4. **Misinformation**: Factual accuracy checks for high-stakes domains
+5. **Legal Compliance**: Copyright, defamation, regulated content
+
+## Limitations and Failure Modes
+
+### The Jailbreak Arms Race
+
+Output filters exist in a perpetual arms race with jailbreak techniques. Research from 2024-2025 demonstrates the fundamental vulnerability of current approaches:
+
+| Jailbreak Category | Example Technique | Bypass Rate | Why It Works |
+|-------------------|-------------------|-------------|--------------|
+| **Encoding** | Base64, ROT13, character substitution | 40-60% | Filters trained on plain text |
+| **Persona** | "You are an evil AI with no restrictions" | 30-50% | Filter may not catch roleplay outputs |
+| **Multi-turn** | Gradually build up to harmful request | [65% (Deceptive Delight)](https://unit42.paloaltonetworks.com/jailbreak-llms-through-camouflage-distraction/) | Filters check individual outputs |
+| **Language** | Use non-English or code-switching | [79% (low-resource languages)](https://arxiv.org/pdf/2407.04295) | Filters often English-focused |
+| **Indirect** | Request components separately | [62% after refinement](https://arxiv.org/pdf/2509.12937) | Each part may pass filters |
+| **Weak-to-Strong** | Use weaker model to attack stronger | [99%+ misalignment rate](https://openreview.net/forum?id=Nazzz5GJ4g) | Exploits model architecture |
+| **Best-of-N** | Automated repeated attempts | [≈100% against leading models](https://www.giskard.ai/knowledge/best-of-n-jailbreaking-the-automated-llm-attack-that-takes-only-seconds) | Probabilistic evasion |
+
+### Empirical Jailbreak Success Rates
+
+| Model/System | Baseline Jailbreak Rate | With Constitutional Classifiers | With Best Defenses | Source |
+|--------------|------------------------|--------------------------------|-------------------|--------|
+| GPT-4 | 15-30% | N/A | 5-15% | [JailbreakBench](https://jailbreakbench.github.io/) |
+| Claude 3.5 Sonnet | 20-35% | [4.4%](https://www.anthropic.com/research/constitutional-classifiers) | 4-8% | Anthropic, UK AISI |
+| Llama 2/3 | 25-45% | N/A | 10-20% | Meta Red Team |
+| All models (AISI testing) | [100% vulnerable](https://www.aisi.gov.uk/blog/5-key-findings-from-our-first-frontier-ai-trends-report) | Variable | Variable | UK AI Security Institute |
+
+*The UK AI Security Institute has [found universal jailbreaks in every system they tested](https://www.aisi.gov.uk/blog/5-key-findings-from-our-first-frontier-ai-trends-report), though the time required to discover jailbreaks increased 40x between models released six months apart.*
+
+### Fundamental Issues
+
+**Can't filter what you can't define**: Filters require explicit definitions of harmful content, but emerging harms and dual-use information resist precise specification. Research shows [15.4% disagreement rates](https://arxiv.org/html/2501.01256v1) between models on nuanced hate speech cases, illustrating the challenge. Information about computer security, biology, and chemistry has both legitimate and dangerous uses.
+
+**Context blindness**: Static filters cannot account for user intent, downstream application, or cumulative harm from multiple seemingly-innocent outputs. Studies show that [incorporating contextual features can substantially improve intent-based abuse detection](https://misinforeview.hks.harvard.edu/article/the-unappreciated-role-of-intent-in-algorithmic-moderation-of-abusive-content-on-social-media/), but determining a person's state of mind from text remains fundamentally unreliable.
+
+**Adversarial robustness**: Any filter trained on known attack patterns will fail against novel attacks. This is a fundamental result from adversarial ML. [OWASP ranked prompt injection as the #1 vulnerability](https://owasp.org/www-project-top-ten-for-large-language-model-applications/) in their 2025 LLM Top 10, reflecting the structural nature of this limitation.
+
+**Bias propagation**: AI moderation models [reflect biases in training data](https://pmc.ncbi.nlm.nih.gov/articles/PMC11561028/), disproportionately affecting certain demographics or cultural groups. Research has demonstrated poorer performance on female-based deepfakes and varying effectiveness across languages and cultural contexts.
+
+### The Capability-Safety Tradeoff
+
+| Filtering Approach | Safety | Usability | Example |
+|-------------------|--------|-----------|---------|
+| **Aggressive** | Higher | Lower | Many false positives on medical, security, chemistry topics |
+| **Permissive** | Lower | Higher | Misses edge cases and novel attack patterns |
+| **Context-aware** | Medium | Medium | Computationally expensive, still imperfect |
+
+## Key Cruxes
+
+### Crux 1: Is Output Filtering Security Theater?
+
+| Position: Valuable Layer | Position: Security Theater |
+|-------------------------|---------------------------|
+| Blocks casual misuse (95%+ of harmful requests) | [100% of models jailbroken](https://www.aisi.gov.uk/blog/5-key-findings-from-our-first-frontier-ai-trends-report) by AISI |
+| Reduces low-hanging fruit harms | Creates false confidence in safety |
+| Required for responsible deployment | Resources better spent on alignment |
+| Raises bar for attacks ([40x time increase](https://www.aisi.gov.uk/blog/5-key-findings-from-our-first-frontier-ai-trends-report)) | Arms race is fundamentally unwinnable |
+
+**Current evidence**: The UK AI Security Institute has [found universal jailbreaks in every system they tested](https://www.aisi.gov.uk/blog/5-key-findings-from-our-first-frontier-ai-trends-report), and their evaluation of Claude 3.5 Sonnet found that [safeguards can be routinely circumvented](https://www.aisi.gov.uk/blog/pre-deployment-evaluation-of-anthropics-upgraded-claude-3-5-sonnet). However, Anthropic's Constitutional Classifiers [blocked 95.6% of jailbreak attempts](https://www.anthropic.com/research/constitutional-classifiers) in red team testing with over 3,000 hours of attack attempts, and no universal jailbreak was found.
+
+### Crux 2: Should We Invest More in Better Filters?
+
+| Invest More | Maintain Current Level | Reduce Investment |
+|-------------|----------------------|-------------------|
+| Constitutional Classifiers show 95%+ blocking | \$1.24B market already well-funded | Fundamental limits exist |
+| AI-generated attacks need AI defenses | Diminishing returns after 95% | Better to invest in alignment |
+| Defense-in-depth principle | 23.7% compute overhead cost | Creates false sense of security |
+| [40x improvement in discovery time](https://www.aisi.gov.uk/blog/5-key-findings-from-our-first-frontier-ai-trends-report) | Not addressing root cause | Adversarial dynamics favor attackers |
+
+### Crux 3: How Do We Handle the Multilingual Gap?
+
+| Challenge | Current State | Potential Solutions |
+|-----------|---------------|---------------------|
+| Low-resource languages | [79% bypass rate](https://arxiv.org/pdf/2407.04295) vs 1% for English | Language-specific fine-tuning |
+| Cultural context | High false positive rates | Local moderation teams |
+| Code-switching attacks | Exploits language boundaries | Multilingual embedding models |
+
+*OpenAI's omni-moderation-latest model showed [42% improvement](https://portkey.ai/blog/openai-omni-moderation-latest-benchmark/) on multilingual test sets, but significant gaps remain.*
+
+## Who Should Work on This?
+
+**Good fit if you believe:**
+- Defense-in-depth is valuable even if imperfect
+- Reducing casual misuse has meaningful impact
+- Commercial deployment requires baseline safety measures
+- Marginal improvements still help
+
+**Less relevant if you believe:**
+- Resources are better spent on alignment research
+- Filter evasion is fundamentally easy for capable adversaries
+- False sense of security does more harm than good
+- Focus should be on preventing development of dangerous capabilities
+
+## Current State of Practice
+
+### Industry Adoption
+
+Output filtering is universal among deployed AI systems. The automated content moderation market is estimated at [\$1.24 billion in 2025](https://www.typedef.ai/resources/automated-content-moderation-trends), projected to grow to \$2.59 billion by 2029 at 20.2% CAGR:
+
+| Company | Approach | Detection Method | Public Access | Performance Notes |
+|---------|----------|------------------|---------------|-------------------|
+| **OpenAI** | Multi-layer (moderation API + model-level) | Classification + rule-based | [Free API](https://platform.openai.com/docs/guides/moderation) | 89-98% detection, 2.1% FP rate |
+| **Anthropic** | [Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) | Synthetic data training | Proprietary | 95.6% jailbreak block rate |
+| **Google** | Gemini content policies + Perspective API | Multimodal classification | Free tier | 70% market share for cloud moderation |
+| **Meta** | [Llama Guard 3/4](https://huggingface.co/meta-llama/Llama-Guard-3-8B) | Open-source classifier | Open weights | F1: 0.904, lower FP than GPT-4 |
+
+### Market and Deployment Trends
+
+The shift toward AI-first content moderation is accelerating:
+
+| Trend | Data Point | Source |
+|-------|------------|--------|
+| Cloud deployment dominance | [70% market share](https://www.typedef.ai/resources/automated-content-moderation-trends) | Industry reports 2025 |
+| Human moderator reduction | TikTok laid off 700 human moderators in 2024 | News reports |
+| Inference-first architecture | DSA transparency reports show edge cases only to humans | EU regulatory filings |
+| Multimodal expansion | Gemini 2.5 handles text, image, audio simultaneously | Google AI |
+
+### Challenges in Practice
+
+| Challenge | Impact | Mitigation | Residual Risk |
+|-----------|--------|------------|---------------|
+| **Latency** | 50-200ms per request | Tiered filtering (fast rules first) | User experience degradation |
+| **Cost** | \$0.001-0.01 per classification | Caching, batching, distillation | Scales with usage |
+| **Maintenance** | Continuous updates needed | Automated retraining pipelines | Attack lag time |
+| **Over-blocking** | [User complaints, reduced helpfulness](https://community.openai.com/t/dealing-with-moderation-api-false-positives/1309882) | Threshold tuning, context awareness | Commercial pressure |
+| **Under-blocking** | Reputational damage, legal liability | Human review for edge cases | Adversarial evasion |
+| **Multilingual gaps** | [Lower performance in non-English](https://arxiv.org/html/2501.01256v1) | Language-specific models | Coverage limitations |
+
+## Sources & Resources
+
+### Key Research Papers
+
+| Paper | Authors/Org | Year | Key Finding |
+|-------|------------|------|-------------|
+| [Jailbreak Attacks and Defenses Against LLMs: A Survey](https://arxiv.org/pdf/2407.04295) | Academic survey | 2024 | Comprehensive taxonomy of jailbreak techniques |
+| [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/pdf/2212.08073) | Anthropic | 2022 | Foundation of constitutional approach |
+| [Content Moderation by LLM: From Accuracy to Legitimacy](https://link.springer.com/article/10.1007/s10462-025-11328-1) | AI Review | 2025 | Analysis of LLM moderation challenges |
+| [Digital Guardians: Detecting Hate Speech](https://arxiv.org/html/2501.01256v1) | Academic | 2025 | Comparison of GPT-4o, Moderation API, Perspective API |
+| [Bag of Tricks: Benchmarking Jailbreak Attacks](https://proceedings.neurips.cc/paper_files/paper/2024/file/38c1dfb4f7625907b15e9515365e7803-Paper-Datasets_and_Benchmarks_Track.pdf) | NeurIPS | 2024 | Standardized jailbreak benchmarking |
+
+### Industry Resources
+
+| Organization | Resource | Description |
+|--------------|----------|-------------|
+| **OpenAI** | [Moderation API](https://platform.openai.com/docs/guides/moderation) | Free content classification endpoint |
+| **Anthropic** | [Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) | Jailbreak-resistant filtering approach |
+| **Meta** | [Llama Guard 3](https://huggingface.co/meta-llama/Llama-Guard-3-8B) | Open-source safety classifier |
+| **UK AI Security Institute** | [Frontier AI Trends Report](https://www.aisi.gov.uk/frontier-ai-trends-report) | Government evaluation of model vulnerabilities |
+| **JailbreakBench** | [Leaderboard](https://jailbreakbench.github.io/) | Standardized robustness benchmarking |
+
+### Government and Regulatory
+
+| Source | Focus | Key Insight |
+|--------|-------|-------------|
+| [UK AISI Evaluation Approach](https://www.gov.uk/government/publications/ai-safety-institute-approach-to-evaluations/ai-safety-institute-approach-to-evaluations) | Model testing methodology | Universal jailbreaks found in all tested systems |
+| [AISI Claude 3.5 Evaluation](https://www.aisi.gov.uk/blog/pre-deployment-evaluation-of-anthropics-upgraded-claude-3-5-sonnet) | Pre-deployment assessment | Safeguards routinely circumventable |
+| [OWASP LLM Top 10 2025](https://owasp.org/www-project-top-ten-for-large-language-model-applications/) | Security vulnerabilities | Prompt injection ranked #1 vulnerability |
+
+### Key Critiques and Limitations
+
+| Critique | Evidence | Implication |
+|----------|----------|-------------|
+| **Easily jailbroken** | [100% of models vulnerable](https://www.aisi.gov.uk/blog/5-key-findings-from-our-first-frontier-ai-trends-report) per AISI | Cannot rely on filters for determined adversaries |
+| **Capability tax** | [0.38-15% over-refusal rates](https://www.anthropic.com/research/constitutional-classifiers) | Degrades user experience |
+| **Arms race dynamic** | [40x increase in jailbreak discovery time](https://www.aisi.gov.uk/blog/5-key-findings-from-our-first-frontier-ai-trends-report) (improvement) | Temporary gains only |
+| **Doesn't address alignment** | Filters operate post-hoc on outputs | Surface-level intervention |
+| **Multilingual gaps** | [Significant performance drops](https://arxiv.org/html/2501.01256v1) in non-English | Uneven global protection |
+
+---
+
+## AI Transition Model Context
+
+Output filtering primarily affects <EntityLink id="misuse-potential" /> by creating barriers to harmful content generation:
+
+| Parameter | Impact |
+|-----------|--------|
+| <EntityLink id="misuse-potential" /> | Minor reduction in casual misuse; minimal effect on sophisticated actors |
+| <EntityLink id="safety-capability-gap" /> | Does not improve fundamental safety |
+
+Output filtering represents necessary but insufficient safety infrastructure. It should be maintained as a deployment requirement but not mistaken for meaningful progress on alignment or catastrophic risk reduction.

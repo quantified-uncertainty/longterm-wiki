@@ -1,0 +1,426 @@
+---
+title: Structured Access / API-Only
+description: Structured access provides AI capabilities through controlled APIs rather than releasing model weights, maintaining developer control over deployment and enabling monitoring, intervention, and policy enforcement. Enterprise LLM spend reached $8.4B by mid-2025 under this model, but effectiveness depends on maintaining capability gaps with open-weight models, which have collapsed from 17.5 to 0.3 percentage points on MMLU (2023-2025).
+importance: 78.5
+quality: 91
+lastEdited: "2026-01-30"
+sidebar:
+  order: 26
+pageTemplate: knowledge-base-response
+llmSummary: Structured access (API-only deployment) provides meaningful safety benefits through monitoring (80-95% detection rates), intervention capability, and controlled proliferation. Enterprise LLM spend reached $8.4B by mid-2025 with Anthropic leading at 32% market share. However, effectiveness depends on maintaining capability gaps with open-weight models, which have collapsed from 17.5 to 0.3 percentage points on MMLU (2023-2025), with frontier capabilities now running on consumer GPUs with only 6-12 month lag.
+ratings:
+  novelty: 4.5
+  rigor: 7.5
+  actionability: 7.5
+  completeness: 8
+metrics:
+  wordCount: 1850
+  citations: 42
+  tables: 18
+  diagrams: 2
+clusters:
+  - ai-safety
+  - governance
+subcategory: alignment-deployment
+---
+import {Mermaid, R, EntityLink, DataExternalLinks, DataInfoBox} from '@components/wiki';
+
+<DataExternalLinks pageId="structured-access" client:load />
+
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Market Adoption** | High (dominant for frontier) | 100% of frontier models (GPT-4, Claude, Gemini) use API-only; [enterprise LLM spend reached \$1.4B](https://natlawreview.com/press-releases/enterprise-llm-spend-reaches-84b-anthropic-overtakes-openai-according-new) by mid-2025 |
+| **Misuse Detection** | Medium-High (80-95%) | ML anomaly detection achieves 80-90% detection; behavioral analysis reaches 85-95%; [53% of orgs experienced bot attacks](https://www.traceable.ai/2025-state-of-api-security) without proper API security |
+| **Capability Gap Erosion** | Critical concern | MMLU gap collapsed from 17.5 to [0.3 percentage points](https://developers.redhat.com/articles/2026/01/07/state-open-source-ai-models-2025) (2023-2025); open models run on consumer GPUs with 6-12 month lag |
+| **Investment Level** | \$10-50M/yr | Core to lab deployment strategy; commercially incentivized |
+| **Grade: Frontier Control** | B+ | Effective for latest capabilities; degrading as open models improve |
+| **Grade: <EntityLink id="proliferation">Proliferation</EntityLink> Prevention** | C+ | Works short-term; long-term value uncertain as capability gap narrows |
+| **SI Readiness** | Partial | Maintains human control point; SI might manipulate API users or exploit open alternatives |
+
+## Overview
+
+Structured access refers to providing AI capabilities through controlled interfaces, typically APIs, rather than releasing model weights that allow unrestricted use. This approach, championed by organizations like <EntityLink id="openai">OpenAI</EntityLink> and <EntityLink id="anthropic">Anthropic</EntityLink> for their most capable models, maintains developer control over how AI systems are used. Through an API, the provider can implement usage policies, monitor for misuse, update models, and revoke access if necessary. According to [GovAI research](https://www.governance.ai/analysis/sharing-powerful-ai-models), structured access aims to "prevent dangerous AI capabilities from being widely accessible, whilst preserving access to AI capabilities that can be used safely." The enterprise LLM market has grown rapidly under this model, with [total enterprise spend reaching \$1.4 billion](https://natlawreview.com/press-releases/enterprise-llm-spend-reaches-84b-anthropic-overtakes-openai-according-new) by mid-2025—more than doubling from \$1.5 billion in November 2024.
+
+The concept was formally articulated in Toby Shevlane's [2022 paper](https://arxiv.org/abs/2201.05159) proposing a middle ground between fully open and fully closed AI development. Rather than the binary choice of "release weights" or "don't deploy at all," structured access enables wide access to capabilities while maintaining meaningful oversight. Shevlane argued that structured access is "most effective when implemented through cloud-based AI services, rather than disseminating AI software that runs locally on users' hardware" because cloud-based interfaces provide developers greater scope for controlling usage and protecting against unauthorized modifications.
+
+Structured access has become the default for frontier AI systems, with GPT-4, Claude, and Gemini all available primarily through APIs. This creates a significant control point that enables other safety measures: <EntityLink id="output-filtering">output filtering</EntityLink>, usage monitoring, rate limiting, and the ability to update or retract capabilities. However, structured access faces mounting pressure from open-weight alternatives. Analysis of 94 leading LLMs shows open-source models now within [0.3 percentage points](https://fourweekmba.com/the-open-model-convergence-how-the-frontier-gap-collapsed-to-6-months/) of proprietary systems on MMLU benchmarks—down from a 17.5-point gap in 2024. The capability gap has collapsed from years to approximately 6 months, significantly reducing the window during which structured access provides meaningful differentiation.
+
+## Enterprise Market Adoption
+
+The structured access model has become dominant for enterprise AI deployment, with distinct market dynamics across providers.
+
+| Provider | Market Share (2025) | Primary Use Cases | Key Differentiator |
+|----------|:-------------------:|-------------------|-------------------|
+| **Anthropic** | 32% | Coding (42% of market), complex reasoning | Developer-focused, safety emphasis |
+| **OpenAI** | 25% | Programming, general enterprise | Largest ecosystem, ChatGPT integration |
+| **Google (Gemini)** | 20% | Multimodal, enterprise search | Cloud integration, data center scale |
+| **Others** | 23% | Specialized applications | Cost, latency, customization |
+
+*Source: [Menlo Ventures 2025 Report](https://natlawreview.com/press-releases/enterprise-llm-spend-reaches-84b-anthropic-overtakes-openai-according-new). OpenAI market share declined from 50% in 2023 to 25% by mid-2025.*
+
+### Usage Patterns
+
+| Metric | Value | Trend |
+|--------|-------|-------|
+| Enterprise automation rate | 77% of deployments follow automation patterns | Increasing |
+| AI agent adoption | [65% of orgs piloting/deploying](https://www.obsidiansecurity.com/blog/ai-agent-market-landscape) agent systems | Rapid growth |
+| Claude code generation share | 42% of developer market | +21% vs OpenAI |
+| API security incidents | [53% of orgs experienced attacks](https://www.traceable.ai/2025-state-of-api-security) | Persistent concern |
+
+## Risk Assessment & Impact
+
+| Dimension | Rating | Assessment |
+|-----------|--------|------------|
+| **Safety Uplift** | Medium-High | Maintains control over deployment; enables monitoring and intervention |
+| **Capability Uplift** | Tax | Reduces flexibility for users; latency and cost overhead |
+| **Net World Safety** | Helpful | Key control point; prevents uncontrolled proliferation |
+| **Lab Incentive** | Strong | Protects business model; maintains competitive advantage |
+| **Scalability** | Yes | API access scales well; control maintained |
+| **Deception Robustness** | N/A | External control; doesn't address model-level deception |
+| **SI Readiness** | Partial | Maintains human control point; SI might manipulate API users |
+
+### Research Investment
+
+- **Current Investment**: \$10-50M/yr (core to lab deployment strategy)
+- **Recommendation**: Maintain (important default; well-resourced by commercial incentives)
+- **Differential Progress**: Safety-leaning (primarily about control; also protects IP)
+
+## Comparison of Access Approaches
+
+The AI deployment landscape encompasses a spectrum from fully closed to fully open access. Each approach carries distinct safety, governance, and innovation tradeoffs.
+
+| Approach | Safety Control | Monitoring | Innovation | Proliferation Risk | Example |
+|----------|---------------|------------|------------|-------------------|---------|
+| **Fully Closed** | Maximum | Complete | Minimal | None | Internal-only models |
+| **Structured API** | High | Complete | Moderate | Low | GPT-4, Claude 3.5 |
+| **Tiered API** | High | Complete | High | Low-Medium | OpenAI Enterprise tiers |
+| **Hybrid (API + smaller open)** | Medium-High | Partial | High | Medium | Mistral (Large API, small open) |
+| **Open Weights (restrictive license)** | Low | None | Very High | High | Llama (commercial restrictions) |
+| **Fully Open** | None | None | Maximum | Maximum | Fully permissive releases |
+
+### Approach Effectiveness by Use Case
+
+| Use Case | Best Approach | Rationale |
+|----------|--------------|-----------|
+| **Frontier capability deployment** | Structured API | Maintains control over most dangerous capabilities |
+| **Enterprise production** | Tiered API with SLAs | Predictable performance, compliance support |
+| **Academic research** | Researcher access programs | Enables reproducibility with oversight |
+| **Privacy-sensitive applications** | Self-hosted open weights | Data never leaves organization |
+| **Cost-sensitive high-volume** | Open weights | 80-95% capability at fraction of API costs |
+| **Safety-critical applications** | Structured API + monitoring | Real-time intervention capability |
+
+## Benefits of Structured Access
+
+### Safety Benefits
+
+| Benefit | Mechanism | Effectiveness Estimate |
+|---------|-----------|----------------------|
+| **Monitoring** | ML anomaly detection, behavioral baselines | 80-95% detection rate for misuse patterns; 84% of enterprises experienced API security incidents without proper monitoring ([Gartner 2024](https://www.moesif.com/blog/technical/api-development/How-to-Track-the-Usage-of-AI-APIs-The-Ultimate-Guide/)) |
+| **Intervention** | Real-time content filtering, rate limiting | Response within milliseconds for known threats; hours-days for novel attacks |
+| **Coordination** | Centralized policy updates | Single point enables ecosystem-wide safety improvements |
+| **Accountability** | User authentication, audit logging | Enables attribution of misuse; OpenAI terminates access for harassment, deception, radicalization |
+| **Update capability** | Model versioning, prompt adjustments | Can patch vulnerabilities without user action; Anthropic's rapid response protocol |
+| **Revocation** | Access key management, ban systems | Can immediately cut off bad actors; Anthropic revoked OpenAI access (Aug 2025), Windsurf access (Jun 2025) |
+
+### Governance Benefits
+
+| Benefit | Mechanism | Quantified Impact |
+|---------|-----------|-------------------|
+| **Policy enforcement** | Terms of service, content filtering | Can update policies within hours; ≈15% of employees paste sensitive data into uncontrolled LLMs ([source](https://www.protecto.ai/blog/ai-data-privacy-statistics-trends/)) |
+| **Regulatory compliance** | Audit logs, data retention controls | Enterprise features enable SOC 2, HIPAA, ISO 27001 compliance |
+| **Incident response** | Rapid model updates, access revocation | Anthropic maintains jailbreak response procedures with same-day patching capability |
+| **Research access** | Tiered researcher programs | <EntityLink id="govai">GovAI</EntityLink> framework enables safety research while limiting proliferation |
+| **Gradual deployment** | Staged rollouts, A/B testing | OpenAI's production review process evaluates risk before full deployment |
+| **Geographic controls** | IP blocking, ownership verification | Anthropic blocks Chinese-controlled entities globally as of 2025 |
+
+### Research Benefits
+
+| Benefit | Explanation |
+|---------|-------------|
+| **Staged release** | Test capabilities with limited audiences first |
+| **A/B testing** | Compare safety interventions |
+| **Data collection** | Learn from usage patterns |
+| **External evaluation** | Enable third-party safety assessment |
+
+## Limitations and Challenges
+
+### Structural Limitations
+
+| Limitation | Explanation |
+|------------|-------------|
+| **Open weights exist** | Once comparable open models exist, control is lost |
+| **Circumvention** | Determined adversaries may find workarounds |
+| **Doesn't address alignment** | Controls access, not model values |
+| **Centralization concerns** | Concentrates power with providers |
+| **Stifles innovation** | Limits beneficial uses and research |
+
+### Pressure Points
+
+| Pressure | Source | Challenge |
+|----------|--------|-----------|
+| **Open-source movement** | Researchers, developers, companies | Ideological and practical push for openness |
+| **Competition** | Meta, Mistral, others | Open-weight models as competitive strategy |
+| **Cost** | Users | API costs vs. self-hosting economics |
+| **Latency** | Real-time applications | Network round-trip overhead |
+| **Privacy** | Enterprise users | Concerns about sending data to third parties |
+| **Censorship concerns** | Various stakeholders | View restrictions as overreach |
+
+### The Open Weights Challenge
+
+The effectiveness of structured access depends on frontier capabilities remaining closed. The gap has been [collapsing rapidly](https://developers.redhat.com/articles/2026/01/07/state-open-source-ai-models-2025):
+
+| Year | MMLU Gap (Closed vs Open) | Consumer GPU Lag | Time to Parity |
+|------|--------------------------|------------------|----------------|
+| 2023 | ≈17.5 percentage points | 18-24 months | 12-18 months |
+| 2024 | ≈5 percentage points | 12-18 months | 6-9 months |
+| 2025 | ≈0.3 percentage points | [6-12 months](https://epoch.ai/data-insights/consumer-gpu-model-gap) | 3-6 months |
+
+**Key finding:** With a single top-of-the-line gaming GPU like NVIDIA's RTX 5090 (under \$1,500), anyone can locally run models matching the [absolute frontier from 6-12 months ago](https://epoch.ai/data-insights/consumer-gpu-model-gap).
+
+| Scenario | Probability (2026) | Structured Access Value | Implications |
+|----------|-------------------|------------------------|--------------|
+| **Frontier gap large (greater than 6 months)** | 15-25% | High | Control remains meaningful |
+| **Frontier gap small (1-3 months)** | 40-50% | Medium | Differentiation limited to latest capabilities |
+| **Open models at parity** | 25-35% | Low | Value shifts to latency, reliability, support |
+| **Open surpasses closed** | 5-10% | Minimal | Structured access becomes premium service only |
+
+### Leading Open Models (2025)
+
+| Model | Parameters | MMLU Score | Key Capability |
+|-------|-----------|-----------|----------------|
+| DeepSeek-V3 | 671B (37B active) | 88.5% | MoE efficiency, reasoning |
+| Kimi K2 | ≈1T (32B active) | ≈87% | Runs on A6000 with 4-bit quantization |
+| Llama 4 | Various | ≈86% | Meta ecosystem integration |
+
+*[89% of organizations](https://www.swfte.com/blog/open-source-ai-models-frontier-2026) now use open-source AI. MMLU is becoming saturated (top models at 90%+), making the benchmark less discriminative.*
+
+The DeepSeek R1 release in early 2025 marked a turning point—an open reasoning model matching OpenAI's o1 capabilities at a fraction of training cost. As [Jensen Huang noted](https://medium.com/@justjlee/the-rise-of-open-source-ai-models-2024-2025-11354a0e8e23), it was "the first open reasoning model that caught the world by surprise and activated this entire movement." Open-weight frontier models like Llama 4, Mistral 3, and DeepSeek V3.2 now deliver 80-95% of flagship performance, making cost and infrastructure control increasingly compelling alternatives to API access.
+
+## Key Cruxes
+
+### Crux 1: Does Structured Access Provide Meaningful Safety?
+
+| Position: Yes | Position: Limited |
+|--------------|-------------------|
+| Control point for many safety measures | Open weights exist and proliferate |
+| Enables monitoring and response | Doesn't address underlying alignment |
+| Prevents worst-case proliferation | Commercial interest, not safety motivation |
+| Default for most capable models | Sophisticated adversaries find alternatives |
+
+### Crux 2: Is Centralization Acceptable?
+
+| Position: Acceptable | Position: Problematic |
+|---------------------|----------------------|
+| Safety requires control | Concentrates power dangerously |
+| Better than uncontrolled proliferation | Enables censorship and discrimination |
+| Providers have safety incentives | Commercial interests may conflict with safety |
+| Accountability is valuable | Reduces innovation and access |
+
+### Crux 3: Will the Frontier Gap Persist?
+
+| Position: Yes | Position: No |
+|--------------|--------------|
+| Frontier models require enormous resources | Algorithmic efficiency improving rapidly |
+| Safety investments create moat | Open-source community resourceful |
+| Scaling laws favor well-resourced labs | Small models may be "good enough" |
+| Proprietary data advantages | Data advantages may erode |
+
+## Implementation Best Practices
+
+### API Design for Safety
+
+| Practice | Implementation |
+|----------|----------------|
+| **Tiered access** | Different capability levels for different users |
+| **Use case declaration** | Users explain intended use |
+| **Progressive trust** | Start with limited access, expand with track record |
+| **Audit logging** | Complete records for all API calls |
+| **Anomaly detection** | Flag unusual usage patterns |
+| **Policy versioning** | Clear communication of policy changes |
+
+### Access Tiers: Real-World Implementation
+
+Major AI providers implement tiered access systems that balance accessibility with control. The following table synthesizes actual tier structures from OpenAI and Anthropic as of 2025.
+
+| Tier | Typical Rate Limits | Monthly Cost | Verification | Use Cases |
+|------|--------------------:|-------------:|--------------|-----------|
+| **Free** | 3 RPM, 40K TPM | \$1 | Email | Evaluation, learning |
+| **Tier 1** | 500 RPM, 500K TPM | \$1-100 spent | Payment | Prototyping, small apps |
+| **Tier 2** | 5K RPM, 1M TPM | \$10-500 spent | Payment history | Production apps |
+| **Tier 3** | 5K RPM, 2M TPM | \$100-1K spent | Track record | High-volume production |
+| **Tier 4** | 10K RPM, 4M TPM | \$150-5K spent | Track record | Enterprise applications |
+| **Enterprise** | Custom (10K+ RPM) | Negotiated | Business verification, contract | Mission-critical, compliance |
+| **Scale Tier** | Dedicated capacity | \$1K+/model/month | Enterprise agreement | Predictable latency, 99.9% SLA |
+| **Researcher** | Special access | Free-reduced | Institutional affiliation, approval | Safety research, red-teaming |
+
+*RPM = Requests Per Minute; TPM = Tokens Per Minute. Based on [OpenAI rate limits](https://platform.openai.com/docs/guides/rate-limits) and [Anthropic policies](https://www.anthropic.com/rsp-updates).*
+
+### Structured Access Architecture
+
+The following diagram illustrates how structured access creates control points throughout the AI deployment pipeline.
+
+<Mermaid client:load chart={`
+flowchart TD
+    USER[User Request] --> AUTH[Authentication & Rate Limiting]
+    AUTH --> GATEWAY[API Gateway]
+    GATEWAY --> SAFETY[Safety Layer: Input/Output Filtering]
+    SAFETY --> MODEL[Model Inference]
+    MODEL --> MONITOR{Anomaly Detection}
+
+    MONITOR -->|Clean| RESPONSE[Normal Response]
+    MONITOR -->|Suspicious| REVIEW[Human Review]
+    REVIEW -->|Violation| ACTION[Warn / Suspend / Ban]
+    REVIEW -->|False Positive| RESPONSE
+
+    style GATEWAY fill:#e3f2fd
+    style SAFETY fill:#fff3e0
+    style ACTION fill:#ffddcc
+`} />
+
+### Monitoring and Response
+
+API-based deployment enables comprehensive usage monitoring that would be impossible with open-weight releases. According to [industry surveys](https://www.traceable.ai/2025-state-of-api-security), 53% of organizations have experienced bot-related attacks, and only 21% can effectively mitigate bot traffic—underscoring the importance of robust monitoring infrastructure.
+
+| Detection Method | Detection Rate | False Positive Rate | Response Time |
+|-----------------|---------------:|--------------------:|--------------:|
+| **Static rule-based filtering** | 60-75% | 10-20% | Real-time |
+| **ML anomaly detection** | 80-90% | 5-15% | Near real-time |
+| **Behavioral baseline analysis** | 85-95% | 3-10% | Minutes-hours |
+| **Human review escalation** | 95-99% | 1-5% | Hours-days |
+
+**Key monitoring metrics** (from [AI observability best practices](https://www.montecarlodata.com/blog-best-ai-observability-tools/)):
+- **MTTD (Mean Time to Detect):** Critical for minimizing blast radius
+- **MTTR (Mean Time to Respond):** Directly reduces customer impact and remediation costs
+- **False positive rate:** Must be tuned to avoid alert fatigue
+
+Anthropic's [August 2025 threat intelligence report](https://www.anthropic.com/news/detecting-countering-misuse-aug-2025) revealed that threat actors have adapted operations to exploit AI's most advanced capabilities, with agentic AI now being weaponized to perform sophisticated cyberattacks. In response, accounts are banned immediately upon discovery, tailored classifiers are developed to detect similar activity, and technical indicators are shared with relevant authorities.
+
+Anthropic's monitoring system uses a [tiered approach](https://www.anthropic.com/transparency): simpler models like Claude 3 Haiku quickly scan content and trigger detailed analysis with advanced models like Claude 3.5 Sonnet when anything suspicious is found. The company maintains "jailbreak rapid response procedures" to identify and mitigate bypass attempts, with immediate patching or prompt adjustments to reinforce safety constraints.
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[API Request] --> B[Log Request]
+    B --> C[Pattern Analysis]
+    C --> D{Suspicious?}
+
+    D -->|No| E[Normal Operation]
+    D -->|Yes| F[Review Queue]
+
+    F --> G{Policy Violation?}
+    G -->|No| E
+    G -->|Yes| H[Response]
+
+    H --> I[Warning]
+    H --> J[Rate Limit]
+    H --> K[Suspension]
+    H --> L[Ban]
+
+    style D fill:#fff3cd
+    style G fill:#ffddcc
+`} />
+
+## Who Should Work on This?
+
+**Good fit if you believe:**
+- Control points are valuable for safety
+- Proliferation risk is significant
+- Monitoring enables meaningful oversight
+- Incremental safety measures help
+
+**Less relevant if you believe:**
+- Open-source will always catch up
+- Centralization is worse than the alternative
+- Doesn't address real alignment risks
+- Slows beneficial AI development
+
+## Current State of Practice
+
+### Industry Adoption (2025)
+
+| Provider | Frontier Model | Access Model | Key Safety Features | Geographic Restrictions |
+|----------|---------------|--------------|---------------------|------------------------|
+| **OpenAI** | GPT-5, o3 | API-only + ChatGPT | Traffic-light content system, production review | China, Russia embargo |
+| **Anthropic** | Claude Opus 4 | API-only + Claude.ai | ASL-3 protections, tiered access system | [Chinese-controlled entities blocked globally](https://www.crnasia.com/news/2025/artificial-intelligence/anthropic-tightens-ai-access-rules) |
+| **Google** | Gemini Ultra 2 | API-only + Gemini | Capability thresholds, staged rollout | Standard export controls |
+| **Meta** | Llama 4 | Open weights | LlamaGuard, PromptGuard, LlamaFirewall | License restrictions only |
+| **Mistral** | Mistral Large 2 | Hybrid (API + open small) | API-only for largest models | EU-based, GDPR compliant |
+| **DeepSeek** | DeepSeek V3 | Open weights | Minimal built-in restrictions | No geographic restrictions |
+
+### Anthropic's 2025 Access Policy Changes
+
+On September 5, 2025, Anthropic [announced far-reaching policy changes](https://www.anthropic.com/news/updating-restrictions-of-sales-to-unsupported-regions) that illustrate the evolution of structured access. According to [Bloomberg](https://www.bloomberg.com/news/articles/2025-09-05/anthropic-clamps-down-on-ai-services-for-chinese-owned-firms), this is "the first time a major US AI company has imposed a formal, public prohibition of this kind." An Anthropic executive told the Financial Times that the move would have an impact on revenues in the "low hundreds of millions of dollars."
+
+| Policy | Implementation | Rationale |
+|--------|---------------|-----------|
+| **Chinese entity block** | Global, regardless of incorporation | Companies face legal requirements to share data with intelligence services |
+| **50% ownership threshold** | Indirect ownership counts | Covers subsidiaries, joint ventures (ByteDance, Tencent, Alibaba affected) |
+| **Third-party harness crackdown** | Technical blocks on spoofing | Prevent pricing/limit circumvention |
+| **Enterprise data isolation** | Zero-retention options, BYOK (H1 2026) | Enable compliance-sensitive deployments |
+| **Tiered safeguard system** | Adjusted guardrails for vetted partners | Balance safety with beneficial use cases |
+
+*Source: [Anthropic official announcement](https://www.anthropic.com/news/updating-restrictions-of-sales-to-unsupported-regions), [CRN Asia coverage](https://www.crnasia.com/news/2025/artificial-intelligence/anthropic-tightens-ai-access-rules)*
+
+### Emerging Patterns
+
+1. **Hybrid approaches**: Open weights for smaller models, API for frontier—Meta offers Llama 4 openly but competitors keep largest models API-only
+2. **Differential deployment**: Staged release with [researcher access programs](https://cdn.governance.ai/Structured_Access_for_Third-Party_Research.pdf) providing controlled early access for safety evaluation
+3. **Federated deployment**: On-premise deployment with monitoring for enterprise customers requiring data sovereignty
+4. **Fine-tuning restrictions**: Limiting customization to maintain safety properties; Anthropic prohibits API use for training competing models
+5. **Geographic access controls**: Expanding beyond traditional export controls to ownership-based restrictions
+
+## Sources & Resources
+
+### Foundational Research
+
+| Source | Key Contribution | Year |
+|--------|-----------------|------|
+| [Structured Access: An Emerging Paradigm for Safe AI Deployment](https://arxiv.org/abs/2201.05159) | Toby Shevlane's foundational paper defining structured access framework; published in [Oxford Handbook of AI Governance](https://academic.oup.com/edited-volume/41989/chapter-abstract/355438814) | 2022 |
+| [Structured Access for Third-Party Research on Frontier AI Models](https://cdn.governance.ai/Structured_Access_for_Third-Party_Research.pdf) | GovAI taxonomy of system access (sampling, fine-tuning, inspecting, modifying, meta); researcher interview findings | 2023 |
+| [Towards Publicly Accountable Frontier LLMs (ASPIRE Framework)](https://www.governance.ai/research-paper/towards-publicly-accountable-frontier-llms) | Six requirements for external scrutiny: Access, Searching attitude, Proportionality, Independence, Resources, Expertise | 2024 |
+| [Frontier AI Regulation: Managing Emerging Risks to Public Safety](https://arxiv.org/abs/2307.03718) | Three regulatory building blocks: standards, registration, compliance mechanisms | 2023 |
+| [Towards Data Governance of Frontier AI Models](https://arxiv.org/abs/2412.03824) | Data as governance lever for monitoring and risk mitigation | 2024 |
+| [How Does Access Impact Risk?](https://securityandtechnology.org/wp-content/uploads/2023/12/How-Does-Access-Impact-Risk-Assessing-AI-Foundation-Model-Risk-Along-A-Gradient-of-Access-Dec-2023.pdf) | Gradient of access model for risk assessment | 2023 |
+
+### Market & Adoption Data
+
+| Source | Key Finding | Date |
+|--------|-------------|------|
+| [Menlo Ventures Enterprise LLM Report](https://natlawreview.com/press-releases/enterprise-llm-spend-reaches-84b-anthropic-overtakes-openai-according-new) | Enterprise LLM spend reached \$1.4B; Anthropic leads with 32% market share | 2025 |
+| [OpenRouter State of AI 2025](https://openrouter.ai/state-of-ai) | 100T token LLM usage study; Claude leads in programming at 42% | 2025 |
+| [Red Hat State of Open Source AI](https://developers.redhat.com/articles/2026/01/07/state-open-source-ai-models-2025) | MMLU gap collapsed to 0.3 percentage points; 89% of orgs use open-source AI | 2025 |
+| [Epoch AI Consumer GPU Analysis](https://epoch.ai/data-insights/consumer-gpu-model-gap) | Frontier capabilities run on consumer GPUs with 6-12 month lag | 2025 |
+| [Traceable API Security Report](https://www.traceable.ai/2025-state-of-api-security) | 53% of orgs experienced bot attacks; only 21% can effectively mitigate | 2025 |
+
+### Industry Policies
+
+- **Anthropic**: [Responsible Scaling Policy](https://www.anthropic.com/rsp-updates) - Tiered access system, ASL framework
+- **OpenAI**: [API Rate Limits](https://platform.openai.com/docs/guides/rate-limits) - Tier-based access controls
+- **OpenAI**: [Scale Tier for Enterprise](https://openai.com/api-scale-tier/) - Dedicated capacity offerings
+- **Meta**: [Open vs. Closed LLM Tradeoffs](https://ai.meta.com/blog/llama-4-multimodal-intelligence/) - Case for open weights approach
+
+### Key Critiques
+
+| Critique | Source | Counter-argument |
+|----------|--------|------------------|
+| **Concentrates power** | [ACLU analysis](https://www.aclu.org/news/privacy-technology/open-source-llms) | Accountability requires some centralization |
+| **Slows beneficial research** | GovAI researcher interviews | Structured researcher access programs can mitigate |
+| **Becomes irrelevant as open models improve** | Industry trend data | May still provide latency, reliability, compliance value |
+| **Commercial interest, not safety motivation** | Various critics | Commercial and safety interests often align for frontier models |
+| **Cannot verify compliance without weight access** | [Security researchers](https://promptengineering.org/llm-open-source-vs-open-weights-vs-restricted-weights/) | Behavioral testing at API level provides meaningful assurance |
+
+---
+
+## AI Transition Model Context
+
+Structured access affects the <EntityLink id="ai-transition-model" /> through multiple pathways:
+
+| Parameter | Impact |
+|-----------|--------|
+| <EntityLink id="misuse-potential" /> | Enables monitoring and intervention to reduce misuse |
+| <EntityLink id="human-oversight-quality" /> | Maintains human control point over AI capabilities |
+| <EntityLink id="safety-culture-strength" /> | Demonstrates commitment to responsible deployment |
+
+Structured access is a valuable safety measure that should be the default for frontier AI systems. However, its effectiveness is contingent on maintaining a significant capability gap with open-weight alternatives, and it should be understood as one layer of a defense-in-depth strategy rather than a complete solution to AI safety.

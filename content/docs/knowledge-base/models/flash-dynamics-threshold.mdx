@@ -1,0 +1,467 @@
+---
+title: Flash Dynamics Threshold Model
+description: This model identifies thresholds where AI speed exceeds human oversight capacity. Current systems already operate 10-10,000x faster than humans in key domains, with oversight thresholds crossed in many areas.
+sidebar:
+  order: 22
+quality: 59
+lastEdited: "2025-12-26"
+ratings:
+  focus: 8.5
+  novelty: 6
+  rigor: 6.5
+  completeness: 7.5
+  concreteness: 7
+  actionability: 6.5
+importance: 73.5
+llmSummary: Analyzes five thresholds where AI speed exceeds human control capacity (oversight, intervention, comprehension, cascade, recursive), finding T1-T2 already crossed in finance (10,000x speed difference) and approaching in cybersecurity and infrastructure. Quantifies expected 3.2+ domains exceeding T2 by 2030, recommending speed limits and circuit breakers as high-leverage interventions with proven precedent.
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+metrics:
+  wordCount: 1690
+  citations: 0
+  tables: 46
+  diagrams: 4
+clusters:
+  - ai-safety
+  - governance
+subcategory: threshold-models
+---
+import { DataInfoBox, Backlinks, Mermaid , EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="flash-dynamics-threshold" ratings={frontmatter.ratings} />
+
+## Overview
+
+This model analyzes critical thresholds where AI system interaction speeds exceed human capacity for oversight, intervention, or comprehension. The central insight is that speed differences between AI and human systems create qualitative changes in risk: a system operating 10x faster than humans is not merely "faster" but may be fundamentally uncontrollable because humans cannot observe, understand, or intervene in its operation. The 2010 Flash Crash, which erased \$1 trillion in market value within 30 minutes while human traders watched helplessly, demonstrates that this is not a theoretical concern but a demonstrated reality in financial markets.
+
+Understanding <EntityLink id="flash-dynamics">flash dynamics</EntityLink> matters because we are progressively crossing thresholds across multiple domains simultaneously. Financial markets already operate beyond human intervention speed; content moderation systems process millions of decisions daily that no human could review; autonomous vehicles make collision-avoidance decisions in timeframes where human override is physically impossible. The model identifies five distinct thresholds—oversight latency, intervention impossibility, comprehension gap, cascade criticality, and recursive acceleration—each representing a qualitative shift in the human-<EntityLink id="ai-control">AI control</EntityLink> relationship. Current evidence suggests we have exceeded Thresholds 1-2 in finance and are approaching them in cybersecurity, infrastructure, and AI development itself.
+
+The policy implications are urgent: speed limits, circuit breakers, and redundancy requirements can prevent crossing the most dangerous thresholds, but these interventions face coordination problems and efficiency tradeoffs. The baseline trajectory without intervention shows multiple domains approaching Threshold 4 (cascade criticality) by 2030, where cascades complete faster than countermeasures can be designed. The model provides a framework for prioritizing interventions in domains closest to critical thresholds while there is still time to implement safeguards.
+
+## Conceptual Framework
+
+### Threshold Summary
+
+| Threshold | Definition | Current Status | Risk Level |
+|-----------|-----------|----------------|------------|
+| **T1: Oversight Latency** | Actions faster than monitoring | Largely past in finance, content mod | Medium |
+| **T2: Intervention Impossibility** | Actions faster than physical intervention | Mostly past in HFT, degrading in cyber | High |
+| **T3: Comprehension Gap** | Complexity exceeds human understanding | Degrading in finance, social media | Very High |
+| **T4: Cascade Criticality** | Cascades faster than countermeasure design | Partially degraded in finance | Critical |
+| **T5: Recursive Acceleration** | Self-improvement faster than governance | Not yet significantly affected | Existential |
+
+<Mermaid client:load chart={`
+flowchart TD
+    T1[T1: Oversight] --> T2[T2: Intervention]
+    T2 --> T3[T3: Comprehension]
+    T3 --> T4[T4: Cascade]
+    T4 --> T5[T5: Recursive]
+
+    style T1 fill:#fff4e1
+    style T2 fill:#ffddcc
+    style T3 fill:#ffcc99
+    style T4 fill:#ff9999
+    style T5 fill:#ff6666
+`} />
+
+The thresholds represent a progression of control loss, with each stage building on the previous. **Important caveat:** These "thresholds" are not sharp cutoffs but represent gradual degradation of human control. A system operating at 199ms is not magically controllable while one at 201ms is uncontrollable—human capacity varies by individual, context, fatigue, and training. The threshold framing is useful for policy thinking but should not be interpreted as predicting discrete phase transitions.
+
+## Speed Hierarchy
+
+### Human Cognitive Limits
+
+| Task Type | Typical Speed | Range | Intervention Capacity |
+|-----------|--------------|-------|----------------------|
+| Recognition | 200-500ms | 150-800ms | Perceive what is happening |
+| Simple decision | 0.5-2s | 0.3-5s | React to clear threat |
+| Complex decision | 5-60s | 2s-10min | Evaluate options |
+| Expert judgment | 1-30min | 30s-hours | Consider implications |
+| Collective deliberation | Hours-days | 30min-months | Coordinate response |
+| Policy change | Days-months | Weeks-years | Implement governance |
+
+### AI System Speeds (Current)
+
+| System Type | Operation Speed | Speed Ratio vs Human | Threshold Status |
+|-------------|----------------|----------------------|-----------------|
+| High-frequency trading | 64 microseconds | 10,000,000x faster | T1-T2 largely past |
+| AI model inference | 10-100ms | 10-100x faster | T1 degrading |
+| Autonomous vehicle decisions | 50-200ms | 5-20x faster | T1-T2 degrading |
+| Content recommendation | 100-500ms | 2-10x faster | T1 largely past |
+| AI-to-AI communication | 1-100ms | 100-10,000x faster | T1-T2 largely past |
+| Network propagation | Microseconds-seconds | Variable | Context-dependent |
+
+### AI System Speed Projections
+
+| Timeframe | Key Developments | Risk Implications |
+|-----------|-----------------|-------------------|
+| **Near-term (2025-2027)** | 10x inference improvement; More autonomous decision cycles; Multi-agent systems common | T1-T2 crossed in more domains |
+| **Medium-term (2027-2030)** | Real-time multi-modal processing; Continuous learning/adaptation; Autonomous experimentation | T3 approached in critical domains |
+| **Long-term (2030+)** | Recursive self-improvement; Human comprehension lag unbridgeable; Unknown upper bounds | T4-T5 risk increases |
+
+<Mermaid client:load chart={`
+flowchart TD
+    NEAR[Near-term: 10x Speed] --> MED[Medium-term: Continuous Learning]
+    MED --> LONG[Long-term: Self-improvement]
+
+    style NEAR fill:#fff4e1
+    style MED fill:#ffddcc
+    style LONG fill:#ff9999
+`} />
+
+## Threshold Framework
+
+### Threshold 1: Oversight Latency
+
+**Definition:** AI system completes actions faster than humans can monitor them.
+
+**Mathematical Criterion:**
+$$
+T_{\text{action}} < T_{\text{human recognition}} \approx 200\text{-}500\text{ms}
+$$
+
+**Consequences and Status:**
+
+| Domain | Status | Evidence | Risk Level |
+|--------|--------|----------|------------|
+| Financial markets | Largely beyond monitoring | Microsecond trading, millions of transactions/second | Medium |
+| Content moderation | Largely beyond monitoring | Millions of decisions/day, no human review | Medium |
+| Autonomous vehicles | Partially beyond monitoring | 50-200ms decisions | Medium |
+| Infrastructure management | Increasingly beyond monitoring | Increasing automation | Low-Medium |
+
+**Control Implications:** Humans see only outcomes, not process. Real-time intervention impossible. Trust without understanding required. Post-hoc analysis only option.
+
+### Threshold 2: Intervention Impossibility
+
+**Definition:** AI system completes consequential action sequences faster than humans can physically intervene.
+
+**Mathematical Criterion:**
+$$
+T_{\text{action sequence}} < T_{\text{human intervention}} = T_{\text{recognition}} + T_{\text{decision}} + T_{\text{physical action}} \approx 1\text{-}2\text{s}
+$$
+
+**Consequences and Status:**
+
+| Domain | Status | Evidence | Risk Level |
+|--------|--------|----------|------------|
+| Financial markets | Largely beyond intervention | Flash Crash 2010, 2024: cascades completed in minutes | High |
+| Cybersecurity | Increasingly beyond intervention | Automated attack/defense cycles | High |
+| Infrastructure | Mixed—varies by system | Some systems automated, others not | Medium |
+| Military | Increasingly beyond intervention | Autonomous weapons development | Very High |
+
+**Control Implications:** "Kill switch" too slow. Damage occurs before stopping. Cascade completion inevitable. Requires automated safeguards.
+
+### Threshold 3: Comprehension Gap
+
+**Definition:** AI system interactions create emergent behaviors too complex for human understanding during operation.
+
+**Mathematical Criterion:**
+$$
+\text{Complexity}(\text{AI interactions}) > \text{Human working memory capacity}
+$$
+$$
+\text{AND: } T_{\text{analysis}} > T_{\text{system evolution}}
+$$
+
+**Consequences and Status:**
+
+| Domain | Status | Evidence | Risk Level |
+|--------|--------|----------|------------|
+| Financial markets | Partially beyond comprehension | Some flash crashes unexplained | Very High |
+| Social media | Increasingly beyond comprehension | Viral dynamics + AI recommendations | High |
+| Large language models | Increasingly beyond comprehension | Emergent capabilities, unexpected interactions | Very High |
+
+**Control Implications:** Cannot predict system behavior. Cannot diagnose failures in real-time. Cannot design interventions confidently. Reliance on AI to understand AI.
+
+### Threshold 4: Cascade Criticality
+
+**Definition:** AI systems' speed enables cascades that complete before countermeasures can be designed, let alone implemented.
+
+**Mathematical Criterion:**
+$$
+T_{\text{cascade completion}} < T_{\text{countermeasure design}}
+$$
+$$
+\text{AND: Cascade impact} > \text{Recovery capacity}
+$$
+
+**Consequences and Status:**
+
+| Domain | Status | Evidence | Risk Level |
+|--------|--------|----------|------------|
+| Financial markets | Partially at risk | Flash crashes recover, but could be worse | Critical |
+| Infrastructure | Limited risk currently | Limited AI integration | Medium |
+| Military | Limited risk currently | Autonomous weapons not widely deployed | Critical (if degraded) |
+| AI development | Limited risk currently | But risk increases with capability | Critical (potential) |
+
+**Control Implications:** Irreversible changes possible. Catastrophic outcomes without recovery. No second chances. System becomes fundamentally unsafe.
+
+### Threshold 5: Recursive Acceleration
+
+**Definition:** AI systems improve themselves faster than humans can track or govern the improvement process.
+
+**Mathematical Criterion:**
+$$
+T_{\text{AI improvement cycle}} < T_{\text{human evaluation cycle}}
+$$
+$$
+\text{AND: Improvement rate} > \text{Human learning rate}
+$$
+
+**Status:** NOT REACHED. Foundation for fast takeoff scenarios. Depends on AI's ability to improve AI.
+
+**Control Implications:** Capability trajectory unpredictable. Governance permanently behind. Human control fundamentally lost. "Intelligence explosion" dynamics possible.
+
+**Risk Level:** Existential (if reached)
+
+## Domain-Specific Analysis
+
+### Threshold Status by Domain
+
+| Domain | T1: Oversight | T2: Intervention | T3: Comprehension | T4: Cascade | T5: Recursive |
+|--------|--------------|------------------|-------------------|-------------|---------------|
+| **Financial Markets** | Largely past | Largely past | Degrading | Partially at risk | N/A |
+| **Cybersecurity** | Largely past | Degrading | Degrading | Limited | N/A |
+| **Infrastructure** | Degrading | Limited | Limited | Limited | N/A |
+| **AI Development** | Limited | Limited | Degrading | Limited | Limited |
+
+<Mermaid client:load chart={`
+flowchart TD
+    FIN[Finance: T1-T2 past] --> HIGHEST[Highest Risk]
+    CYBER[Cyber: T1 past, T2-T3 degrading] --> HIGH[High Risk]
+    AI[AI Dev: T3 degrading] --> MED[Medium Risk]
+    INFRA[Infrastructure: T1 degrading] --> LOW[Lower Risk]
+
+    style FIN fill:#ff6666
+    style CYBER fill:#ff9999
+    style AI fill:#ffcc99
+    style INFRA fill:#ffddcc
+`} />
+
+### Financial Markets
+
+| Aspect | Status | Evidence |
+|--------|--------|----------|
+| Threshold Status | T1-T2 largely past, T3 degrading, T4 partial risk | Flash Crashes 2010, 2024 |
+| Interventions in Place | Circuit breakers, position limits, monitoring | Partial effectiveness |
+| Trend | Worsening | More AI trading, faster systems, greater interconnection |
+| IMF Assessment (Oct 2024) | AI increasing volatility | Shorter-timescale correlations |
+
+### Cybersecurity
+
+| Aspect | Status | Evidence |
+|--------|--------|----------|
+| Threshold Status | T1 largely past, T2-T3 degrading | Automated attack/defense cycles |
+| Dynamics | Arms race accelerating | AI attack tools faster and adaptive |
+| Human Role | Increasingly sidelined | Operators cannot keep pace |
+| Concern | Both sides beyond human oversight | Attack and defense beyond human speed |
+
+### AI Development
+
+| Aspect | Status | Evidence |
+|--------|--------|----------|
+| Threshold Status | T3 degrading, others limited | Emergent capabilities |
+| Key Risk | All thresholds may be approached rapidly | If AI can improve AI |
+| Trigger Conditions | AI automates ML research, can improve own architecture | Feedback loops in capability development |
+| Time to Threshold | Highly uncertain | Possibly 3-10 years |
+
+## Causal Pathways to Risk
+
+### Direct Harm Pathways
+
+| Pathway | Mechanism | Probability | Severity |
+|---------|-----------|-------------|----------|
+| Flash Crash Amplification | AI interactions → Cascade → No intervention time → Economic damage | Medium (already occurred) | High (trillions at risk) |
+| Infrastructure Cascade | Optimization → Unexpected interaction → Cross-domain cascade → Disruption | Low-Medium | Very High (critical infrastructure) |
+| Autonomous Weapons Escalation | Military AI → Rapid engagement → Escalation cascade → War | Low (not yet deployed widely) | Extreme (potentially nuclear) |
+
+### Indirect Harm Pathways
+
+| Pathway | Mechanism | Probability | Severity |
+|---------|-----------|-------------|----------|
+| Comprehension Loss | AI too fast → Humans defer → Bad recommendations → Systemic errors | Medium-High (already occurring) | Medium-High |
+| Testing Inadequacy | Systems too fast to test → Unknown risks → Production failures | High | Variable |
+| Accountability Erosion | "AI did it too fast" → No accountability → Perverse incentives | High | Medium |
+
+## Scenario Analysis
+
+The following scenarios represent probability-weighted paths for flash dynamics evolution:
+
+| Scenario | Probability | 2030 Status | 2035 Status | Key Characteristics |
+|----------|-------------|-------------|-------------|---------------------|
+| A: Baseline (Current Trajectory) | 40% | Multiple T2 exceeded, T4 approached | T4 in some domains, T5 risk rising | No major intervention |
+| B: Intervention Success | 25% | T2 managed, T3 contained | Sustainable human-on-loop | Strong safeguards implemented |
+| C: Major Flash Event | 25% | Determined by event timing | Post-event governance tightening | Infrastructure or military cascade |
+| D: Recursive Takeoff | 10% | Rapid threshold progression | T5 approached or crossed | AI self-improvement accelerates |
+
+### Scenario A: Baseline Trajectory (40% probability)
+
+Without major intervention, current trends continue. By 2027, more domains exceed Threshold 1 (oversight), financial systems approach Threshold 3 (comprehension), and cybersecurity approaches Threshold 2 (intervention). The first major infrastructure flash event becomes likely. By 2030, multiple domains exceed Threshold 2, some approach Threshold 4 (cascade criticality), and human comprehension gap widens significantly. By 2035, multiple cascade events occur, infrastructure is increasingly vulnerable, and human oversight becomes largely nominal.
+
+### Scenario B: Intervention Success (25% probability)
+
+Strong safeguards are implemented beginning 2025-2027: speed limits in financial markets, expanded circuit breakers, mandatory stress testing for critical infrastructure AI. By 2027-2030, AI monitoring systems mature, redundancy requirements are established, and some domains are pulled back from thresholds. By 2030-2035, sustainable human-on-loop governance is achieved, cascade events are prevented or contained, and the comprehension gap is managed via AI tools. This scenario requires sustained political will and international coordination.
+
+### Scenario C: Major Flash Event (25% probability)
+
+A major cascade event occurs in infrastructure, finance, or military domain, causing sufficient damage to trigger governance response. Timing and domain determine outcome severity. If event occurs early (2026-2028), it may catalyze intervention similar to Scenario B. If late (2030+) or in military domain, damage may be catastrophic before governance can respond. Post-event trajectory depends on whether the event demonstrates controllability or fundamental uncontrollability.
+
+### Scenario D: Recursive Takeoff (10% probability)
+
+AI capabilities in self-improvement accelerate faster than anticipated. Thresholds 1-4 are crossed rapidly as AI systems improve themselves beyond human oversight. If this occurs before robust governance, Threshold 5 (recursive acceleration) may be approached or crossed. This scenario has the highest variance in outcomes, ranging from contained takeoff with beneficial outcomes to uncontrolled takeoff with existential risk. Probability is highly uncertain but non-negligible.
+
+### Expected Threshold Status Calculation
+
+$$
+E[\text{Domains Exceeding T2 by 2030}] = \sum_{s} P(s) \times D_s
+$$
+
+| Scenario | P(s) | Domains Exceeding T2 | Contribution |
+|----------|------|---------------------|--------------|
+| A: Baseline | 0.40 | 4 | 1.60 |
+| B: Intervention | 0.25 | 1 | 0.25 |
+| C: Flash Event | 0.25 | 3 | 0.75 |
+| D: Recursive | 0.10 | 6+ | 0.60+ |
+| **Expected Value** | | | **3.2+** |
+
+This suggests that by 2030, approximately 3+ major domains will exceed Threshold 2 (intervention impossibility) in expectation, with significant probability mass on higher numbers.
+
+## Intervention Analysis
+
+### High-Leverage Interventions
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph HighLeverage["High Leverage"]
+        H1["Speed Limits<br/>Effectiveness: High<br/>Difficulty: Medium-High"]
+        H2["Circuit Breakers<br/>Effectiveness: Medium-High<br/>Difficulty: Medium"]
+        H3["Redundancy/Isolation<br/>Effectiveness: Medium<br/>Difficulty: Medium"]
+    end
+
+    subgraph MediumLeverage["Medium Leverage"]
+        M1["AI Monitoring AI<br/>Effectiveness: Medium<br/>Difficulty: High"]
+        M2["Stress Testing<br/>Effectiveness: Medium<br/>Difficulty: Medium"]
+        M3["Transparency<br/>Effectiveness: Low-Medium<br/>Difficulty: High"]
+    end
+
+    subgraph LowLeverage["Lower Leverage"]
+        L1["Governance/Oversight<br/>Effectiveness: Low<br/>Difficulty: Very High"]
+    end
+
+    H1 --> |"Mandatory delays"| Implementation
+    H2 --> |"Automatic halts"| Implementation
+    H3 --> |"Limit interconnection"| Implementation
+
+    style H1 fill:#90EE90
+    style H2 fill:#90EE90
+    style H3 fill:#FFEB3B
+`} />
+
+### Intervention Comparison Matrix
+
+| Intervention | Effectiveness | Difficulty | Tradeoffs | Precedent |
+|--------------|---------------|------------|-----------|-----------|
+| Speed Limits | High | Medium-High | Reduces efficiency, coordination challenges | Circuit breakers in finance |
+| Circuit Breakers | Medium-High | Medium | Only prevents worst outcomes, can be gamed | Trading halts (proven) |
+| Redundancy/Isolation | Medium | Medium | Increases costs, limits optimization | Air gaps in critical systems |
+| AI Monitoring | Medium | High | Who monitors monitors? New failure modes | Anomaly detection (early) |
+| Stress Testing | Medium | Medium | Can't test all possibilities | Nuclear/aerospace |
+| Transparency | Low-Medium | High | Performance tradeoff, may not be feasible | Limited success |
+| Governance | Low | Very High | Regulators slower than technology | Struggling globally |
+
+## Interactions with Other Risk Factors
+
+| Risk Combination | Interaction Type | Effect | Priority |
+|------------------|------------------|--------|----------|
+| Flash + Racing Dynamics | Reinforcing | Racing → Deploy faster → Skip safety → Exceed thresholds | High |
+| Flash + Irreversibility | Multiplicative | Fast cascades → No reversal time → Permanent changes | Critical |
+| Flash + Proliferation | Additive | More actors → More cascade initiation points | Medium |
+| Flash + Expertise Atrophy | Reinforcing | Fast systems → Humans can't practice → Skills decline | High |
+
+## Limitations
+
+This model has significant limitations that affect the reliability of its predictions:
+
+**Speed is not the only factor.** The model emphasizes speed but reality involves complex interactions between speed, complexity, interconnection, and stakes. A slow but highly interconnected system might be more dangerous than a fast isolated one. The model may overweight speed relative to other risk factors.
+
+**Threshold precision is fundamentally uncertain.** The thresholds described are fuzzy, context-dependent, and may not represent discrete transitions. We may not know a threshold has been crossed until well after the fact. The mathematical criteria provide useful framing but should not be interpreted as precise measurements.
+
+**Assumes linear speed progression.** The model generally assumes gradual speed increases, but technological progress often features discontinuous jumps. Sudden capability increases could cross multiple thresholds rapidly, catching governance unprepared. Conversely, technical barriers might slow progress unpredictably.
+
+**Does not fully model adaptive responses.** Both AI systems and governance structures may adapt in ways the model doesn't capture. Governance might prove more flexible than expected; alternatively, adversarial actors might find ways to exploit any intervention. The interaction between intervention and adaptation is complex and uncertain.
+
+**Domain interactions are more complex than modeled.** The domain-specific analysis treats domains somewhat independently, but cascades may cross domains in unpredictable ways. A financial flash crash could trigger infrastructure failures; an infrastructure cascade could have military implications. Cross-domain dynamics are poorly understood.
+
+**Projections beyond 5 years are highly speculative.** The 2030+ projections in particular should be treated as illustrative scenarios rather than forecasts. Uncertainty compounds rapidly, and the possibility space widens. The model cannot anticipate technological breakthroughs or governance innovations.
+
+## Policy Recommendations
+
+### Immediate (0-2 years)
+
+| Action | Priority | Rationale |
+|--------|----------|-----------|
+| Implement speed limits in financial markets | Critical | Proven concept, domain already at T2 |
+| Expand circuit breaker mechanisms | High | Low cost, high impact |
+| Mandate stress testing for critical infrastructure AI | High | Prevents T2 crossing |
+
+### Medium-term (2-5 years)
+
+| Action | Priority | Rationale |
+|--------|----------|-----------|
+| Develop AI monitoring systems with appropriate oversight | High | Necessary for T3+ domains |
+| Create redundancy requirements for critical systems | High | Prevents cascade propagation |
+| Establish international coordination on speed governance | Medium | Global systems require global governance |
+
+### Long-term (5+ years)
+
+| Action | Priority | Rationale |
+|--------|----------|-----------|
+| Build comprehensive multi-domain cascade prevention | Critical | Address cross-domain risks |
+| Develop advanced AI interpretability for fast systems | High | Address comprehension gap |
+| Create adaptive governance capable of pacing AI speed | High | Prevent governance obsolescence |
+
+## Strategic Importance
+
+### Magnitude Assessment
+
+Flash dynamics represent a fundamental challenge to human oversight of AI systems, with thresholds already crossed in finance and approaching in multiple other domains.
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Potential severity** | Critical - enables cascading failures beyond human intervention |
+| **Probability-weighted importance** | High priority - T1-T2 already crossed in HFT, degrading elsewhere |
+| **Comparative ranking** | Top-tier for control loss; enabling factor for other catastrophic risks |
+
+### Resource Implications
+
+Immediate investment needed in:
+- Speed limits and circuit breakers across critical domains (high tractability)
+- Redundancy requirements for AI-critical infrastructure
+- Human-in-the-loop mandates where intervention windows still exist
+- Research into maintaining oversight as AI speeds continue increasing
+
+### Key Cruxes
+
+- Can meaningful human oversight be preserved as AI speeds increase 10-1000x?
+- Are circuit breakers and speed limits politically feasible in competitive markets?
+- How much efficiency loss is acceptable to maintain human control?
+- Can verification systems operate at AI speed while remaining trustworthy?
+
+## Related Models
+
+- <EntityLink id="racing-dynamics-impact" label="Racing Dynamics Impact" /> - Why speed pressure increases
+- <EntityLink id="expertise-atrophy-progression" label="Expertise Atrophy Progression" /> - Human capacity degradation
+- <EntityLink id="autonomous-weapons-escalation" /> - Military flash dynamics
+- <EntityLink id="compounding-risks-analysis" label="Compounding Risks Analysis" /> - Flash dynamics interactions
+
+## Sources
+
+- 2010 Flash Crash analysis (SEC/CFTC)
+- 2024 Flash Crash reports
+- IMF Global Financial Stability Report (October 2024)
+- Lawfare: "Selling Spirals: Avoiding an AI Flash Crash"
+- Various human factors and reaction time studies
+
+## Related Pages
+
+<Backlinks client:load entityId="flash-dynamics-threshold" />

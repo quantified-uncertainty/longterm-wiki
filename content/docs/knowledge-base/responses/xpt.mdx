@@ -1,0 +1,287 @@
+---
+title: XPT (Existential Risk Persuasion Tournament)
+description: A four-month structured forecasting tournament (June-October 2022) that brought together 169 participants—89 superforecasters and 80 domain experts—to forecast existential risks through adversarial collaboration. Results published in the International Journal of Forecasting found superforecasters severely underestimated AI progress (2.3% probability for IMO gold achievement vs actual occurrence in July 2025) and gave dramatically lower extinction risk estimates than domain experts (0.38% vs 3% for AI-caused extinction by 2100).
+sidebar:
+  order: 4
+quality: 54
+llmSummary: A 2022 forecasting tournament with 169 participants found superforecasters severely underestimated AI progress (2.3% probability for IMO gold vs actual 2025 achievement) and gave 8x lower AI extinction risk estimates than domain experts (0.38% vs 3% by 2100), with minimal belief convergence despite four months of structured debate. The key actionable finding is that domain experts were 2.5x more accurate than superforecasters on AI benchmarks, suggesting AI researcher predictions deserve more weight on AI-specific questions.
+lastEdited: "2026-01-29"
+importance: 64.5
+ratings:
+  novelty: 4.5
+  rigor: 6
+  actionability: 5.5
+  completeness: 7
+metrics:
+  wordCount: 852
+  citations: 13
+  tables: 27
+  diagrams: 0
+clusters:
+  - epistemics
+  - ai-safety
+  - community
+subcategory: epistemic-tools-tools
+---
+import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Methodological Innovation** | Exceptional | First structured adversarial collaboration tournament on existential risk |
+| **Research Quality** | Peer-reviewed | Published in *International Journal of Forecasting* (2025) |
+| **Participant Quality** | World-class | 89 superforecasters, 80 domain experts across AI, bio, nuclear, climate |
+| **Key Finding** | Striking | Superforecasters severely underestimated AI progress; 8x gap on AI extinction risk |
+| **Impact** | Significant | Informs how to weight expert vs superforecaster predictions on AI |
+| **Replicability** | High | Methodology documented, could be applied to other domains |
+
+## Project Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Full Name** | Existential Risk Persuasion Tournament |
+| **Abbreviation** | XPT |
+| **Organization** | <EntityLink id="fri">Forecasting Research Institute (FRI)</EntityLink> |
+| **Chief Scientist** | <EntityLink id="philip-tetlock">Philip Tetlock</EntityLink> |
+| **Timeline** | June - October 2022 (4 months) |
+| **Participants** | 169 total: 89 superforecasters, 80 domain experts |
+| **Published** | *International Journal of Forecasting*, Vol. 41, Issue 2 (2025) |
+| **Funding** | <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> grants to FRI (part of \$16M+ total) |
+
+## Overview
+
+The [Existential Risk Persuasion Tournament (XPT)](https://forecastingresearch.org/xpt) represents a landmark attempt to improve forecasting rigor on catastrophic risks through structured adversarial collaboration. Running from June through October 2022, the tournament brought together 169 participants—89 superforecasters with proven track records from the <EntityLink id="good-judgment">Good Judgment</EntityLink> Project and 80 domain experts recruited from AI safety, biosecurity, nuclear security, and climate organizations—to forecast existential threats facing humanity.
+
+Unlike traditional forecasting tournaments that simply aggregate independent predictions, the XPT required participants to:
+
+1. Make initial anonymous forecasts
+2. Explain their reasoning publicly
+3. Engage in adversarial collaboration with those who disagreed
+4. Update forecasts based on debate outcomes
+
+The methodology aimed to extract genuine disagreements (cruxes) and potentially reduce them through structured dialogue with monetary incentives for persuasion and accuracy.
+
+The results, published in the [*International Journal of Forecasting*](https://www.sciencedirect.com/science/article/abs/pii/S0169207024001250) in 2025, produced a **striking finding**: superforecasters systematically underestimated AI progress. On questions about AI achieving gold-level performance on the International Mathematical Olympiad, superforecasters gave only 2.3% probability to outcomes that actually occurred in July 2025, compared to 8.6% from domain experts.
+
+Perhaps more importantly, the tournament documented an **8x gap** between superforecasters (0.38%) and domain experts (3%) on AI-caused extinction risk by 2100, with **minimal convergence** despite four months of structured debate.
+
+## XPT Methodology
+
+### Four-Stage Process
+
+| Stage | Activity | Purpose | Duration |
+|-------|----------|---------|----------|
+| **Stage 1** | Anonymous probability judgments | Establish baseline forecasts without social influence | Initial |
+| **Stage 2** | Explain reasoning | Expose assumptions and evidence transparently | Weeks 1-4 |
+| **Stage 3** | Adversarial collaboration | Structured debate to identify cruxes and potential agreement | Weeks 5-12 |
+| **Stage 4** | Final forecasts | Update based on debate outcomes with accuracy incentives | Final |
+
+### Monetary Incentives
+
+Participants received financial incentives for:
+
+- **Persuasion**: Payment if you convinced others to update toward your view
+- **Accuracy**: Payment if your final forecast was well-calibrated on resolvable questions
+- **Participation**: Base compensation for completing all stages
+
+This incentive structure was designed to encourage both honest belief expression and genuine engagement with opposing views.
+
+### Participant Selection
+
+| Group | Number | Selection Criteria | Expertise |
+|-------|--------|-------------------|-----------|
+| **Superforecasters** | 89 | Top performers from Good Judgment Project with track records of predictive accuracy | Generalists with proven calibration |
+| **Domain Experts** | 80 | Specialists recruited via organizations, academic departments, and research labs | Subject matter experts |
+
+Domain expert breakdown:
+
+| Expert Category | Number | Focus Areas |
+|-----------------|--------|-------------|
+| **AI Experts** | 32 | Machine learning, AI safety, computer science |
+| **General X-risk Experts** | 15 | Long-run threats, existential risk research |
+| **Biorisk Experts** | 12 | Pandemics, biosecurity, biotechnology |
+| **Nuclear Experts** | 12 | Arms control, nuclear policy, deterrence |
+| **Climate Experts** | 9 | Climate science, environmental policy |
+
+## Key Findings
+
+### AI Progress Forecasting Accuracy
+
+A [2025 follow-up analysis](https://forecastingresearch.substack.com/p/what-did-forecasters-get-right-and) evaluated how well XPT participants predicted three years of AI progress since summer 2022:
+
+| Benchmark | Superforecasters | Domain Experts | Actual Outcome |
+|-----------|-----------------|----------------|----------------|
+| **IMO Gold by 2025** | 2.3% | 8.6% | **Achieved July 2025** |
+| **MATH benchmark** | 9.3% | 21.4% | **Exceeded expectations** |
+| **MMLU benchmark** | 7.2% | 25.0% | **Exceeded expectations** |
+| **QuALITY benchmark** | 20.1% | 43.5% | **Exceeded expectations** |
+| **Average across benchmarks** | **9.7%** | **24.6%** | **All exceeded predictions** |
+
+**Critical insight**: Both groups systematically underestimated AI progress, but domain experts were **2.5x more accurate** than superforecasters. Superforecasters initially thought an AI would achieve IMO Gold in 2035—a decade late.
+
+The only strategy that reliably worked was **aggregating everyone's forecasts**: taking the median of all predictions (both superforecasters and domain experts combined) produced substantially more accurate forecasts than any individual or group.
+
+### Existential Risk Estimates by 2100
+
+| Risk Category | Superforecasters (Median) | Domain Experts (Median) | Ratio (Expert/SF) |
+|---------------|---------------------------|-------------------------|-------------------|
+| **Any catastrophe** | 9% | 20% | 2.2x |
+| **Any extinction** | 1% | 6% | 6x |
+| **AI-caused extinction** | 0.38% | 3% | **7.9x** |
+| **Nuclear extinction** | 0.1% | 0.3% | 3x |
+| **Bio extinction** | 0.08% | 1% | 12.5x |
+
+The ~8x gap between superforecasters and domain experts on AI-caused extinction represents one of the **largest disagreements** in the tournament.
+
+### Conditional vs. Unconditional Risk
+
+The XPT revealed how conditional framing affects risk estimates:
+
+| Framing | Superforecaster Estimate | Domain Expert Estimate |
+|---------|--------------------------|------------------------|
+| **Unconditional AI extinction by 2100** | 0.38% | 3% |
+| **Conditional on AGI by 2070** | 1% | — |
+| **Increase factor** | 2.6x | — |
+
+### Minimal Belief Updating
+
+A striking finding was the **minimal convergence of beliefs** despite four months of structured debate with monetary incentives:
+
+> "Despite incentives to share their best arguments during four months of discussion, neither side materially moved the other's views."
+
+The published paper suggests this would be puzzling if participants were Bayesian agents but is less puzzling if participants were "boundedly rational agents searching for confirmatory evidence as the risks of embarrassing accuracy feedback receded."
+
+Strong AI-risk proponents made particularly extreme long-range forecasts but not short-range forecasts, suggesting possible motivated reasoning or genuine structural uncertainty about distant futures.
+
+## Implications for AI Safety
+
+### What Should We Conclude?
+
+The XPT results have significant implications for how the AI safety community interprets forecasts:
+
+| Implication | Evidence | Recommended Action |
+|-------------|----------|-------------------|
+| **Superforecasters may systematically underestimate AI progress** | 2.5x gap on benchmark predictions; thought IMO Gold in 2035 vs 2025 actual | Weight superforecaster AI timeline estimates with skepticism |
+| **Domain experts better calibrated on AI specifically** | Closer to actual outcomes on MATH, MMLU, QuALITY, IMO | Give more weight to AI researcher predictions on AI questions |
+| **Aggregation outperforms individuals** | Combined median was most accurate forecast | Use wisdom-of-crowds rather than individual expert opinions |
+| **Structured debate has limited impact** | Minimal belief updating despite four months of discussion | Don't expect debates to resolve fundamental disagreements |
+| **Long-range forecasts particularly unreliable** | Extreme positions taken on 2100 but not 2025 questions | Focus policy on near-term measurable outcomes |
+
+### The Calibration Paradox
+
+The XPT reveals a paradox: **superforecasters are selected specifically for their calibration** on historical questions, yet they significantly underperformed on AI progress. This suggests that:
+
+1. **Base-rate reasoning fails for unprecedented change**: Superforecasters may anchor on historical rates of technological progress that don't account for potential AI acceleration
+2. **Domain expertise matters for novel domains**: On questions requiring deep understanding of AI capabilities, specialists outperformed generalists
+3. **Neither group is reliable for extinction risk**: With no feedback available, even the best forecasters may be poorly calibrated
+
+## Comparison with Other Forecasting Approaches
+
+| Approach | Methodology | Strengths | Limitations |
+|----------|-------------|-----------|-------------|
+| **XPT** | Multi-stage adversarial collaboration | Structured debate, expert+SF mix, incentivized | Small scale (169 participants), expensive |
+| **<EntityLink id="metaculus">Metaculus</EntityLink>** | Continuous community aggregation | Large scale (50K+ users), real-time updates | Less structured debate, selection bias |
+| **Delphi Surveys** | Anonymous multi-round polling | Simple, expert-focused | No debate, poor track record |
+| **<EntityLink id="prediction-markets">Prediction Markets</EntityLink>** | Financial incentives via trading | Strong incentives, liquidity signals | Requires funding, regulatory issues |
+| **Good Judgment** | Superforecaster panels | Proven track record | Commercial, smaller question set |
+
+The XPT's innovation is the **structured adversarial collaboration** component, which aims to extract genuine cruxes rather than just aggregate opinions.
+
+## Methodology Contributions
+
+### Innovations
+
+The XPT introduced several methodological innovations applicable beyond existential risk:
+
+| Innovation | Description | Potential Application |
+|------------|-------------|----------------------|
+| **Adversarial collaboration** | Pairing forecasters with opposite views | Any high-stakes forecasting domain |
+| **Persuasion incentives** | Payment for moving others' beliefs | Encouraging genuine engagement |
+| **Expert-SF comparison** | Direct head-to-head on same questions | Determining when to trust whom |
+| **Conditional forecasting** | Separating P(outcome) from P(outcome given condition) | Identifying key cruxes |
+
+### Replicability
+
+The XPT methodology is **highly replicable**:
+
+- Documented four-stage process
+- Incentive structure specified
+- Participant selection criteria clear
+- Question operationalization transparent
+
+Future tournaments could apply this methodology to:
+- Climate change scenarios
+- Biosecurity threats
+- Geopolitical risks
+- Technology adoption forecasts
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **World-class participants** | 89 proven superforecasters + 80 domain experts |
+| **Structured methodology** | Four-stage process with clear incentives |
+| **Peer-reviewed publication** | *International Journal of Forecasting* (2025) |
+| **Documented cruxes** | Explicit disagreements between groups |
+| **Retrospective validation** | Could check 2025 AI predictions against reality |
+| **Methodological innovation** | Adversarial collaboration approach |
+
+### Limitations
+
+| Limitation | Impact |
+|------------|--------|
+| **Small sample** | 169 participants vs thousands on platforms like Metaculus |
+| **Expensive** | Intensive methodology requires significant resources per study |
+| **Four-month snapshot** | May not capture long-term belief evolution |
+| **Minimal updating** | Debate had limited impact on beliefs |
+| **Selection bias** | Volunteers may not represent broader expert/SF populations |
+| **Long-horizon uncertainty** | No ground truth for 2100 forecasts to validate against |
+
+## Funding and Organization
+
+The XPT was conducted by <EntityLink id="fri">FRI</EntityLink> with funding from <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>:
+
+| Grant | Amount | Purpose |
+|-------|--------|---------|
+| [Initial FRI funding](https://www.openphilanthropy.org/grants/forecasting-research-institute-science-of-forecasting/) | \$175K | Planning (2021) |
+| [Science of Forecasting](https://www.openphilanthropy.org/grants/forecasting-research-institute-science-of-forecasting/) | \$1.3M (over 3 years) | Core research program including XPT (2022) |
+| [General Support](https://www.openphilanthropy.org/grants/forecasting-research-institute-general-support/) | \$10M (over 3 years) | Expanded research (2023) |
+
+The XPT likely consumed a significant portion of FRI's 2022-2023 budget given the intensive participant engagement and analysis required.
+
+## Related Projects
+
+### ForecastBench
+
+FRI's follow-up project <EntityLink id="forecastbench">ForecastBench</EntityLink> addresses some XPT limitations:
+
+- **Continuous validation**: New questions resolve weekly/monthly
+- **AI benchmarking**: Compares LLMs to human forecasters
+- **Larger scale**: 1,000 questions vs ~100 in XPT
+- **Dynamic**: Ongoing rather than one-time tournament
+
+### Future XPT-Style Tournaments
+
+The XPT methodology could be applied to other domains:
+
+| Domain | Key Questions | Expert Communities |
+|--------|---------------|-------------------|
+| **Climate** | Tipping points, geoengineering risks | Climate scientists vs policy experts |
+| **Biosecurity** | Pandemic likelihood, lab leak scenarios | Virologists vs biosecurity specialists |
+| **Geopolitics** | Taiwan invasion, nuclear escalation | IR scholars vs intelligence analysts |
+| **Technology** | Quantum computing, fusion timelines | Physicists vs technology forecasters |
+
+## External Links
+
+- [XPT Project Page](https://forecastingresearch.org/xpt)
+- [Published Paper (*International Journal of Forecasting*)](https://www.sciencedirect.com/science/article/abs/pii/S0169207024001250)
+- [Working Paper (2023)](https://static1.squarespace.com/static/635693acf15a3e2a14a56a4a/t/64f0a7838ccbf43b6b5ee40c/1693493128111/XPT.pdf)
+- [FRI 2025 Retrospective Analysis](https://forecastingresearch.substack.com/p/what-did-forecasters-get-right-and)
+- [Astral Codex Ten: The Extinction Tournament](https://www.astralcodexten.com/p/the-extinction-tournament)
+- [EA Forum: Announcing XPT Results](https://forum.effectivealtruism.org/posts/un42vaZgyX7ch2kaj/announcing-forecasting-existential-risks-evidence-from-a)
+- [80,000 Hours Podcast with Ezra Karger](https://80000hours.org/podcast/episodes/ezra-karger-forecasting-existential-risks/)
+
+<Backlinks />

@@ -1,0 +1,380 @@
+---
+title: "Whole Brain Emulation"
+description: "Analysis of uploading/simulating complete biological brains at sufficient fidelity to replicate cognition. The 2008 Sandberg-Bostrom Roadmap estimated scanning requirements of 5-10nm resolution and 10^18-10^25 FLOPS for simulation. Progress has been slower than AI, with the fruit fly connectome (140,000 neurons) completed in 2024 while human brains have 86 billion neurons. Estimated less than 1% probability of arriving before AI-based TAI."
+sidebar:
+  label: "Brain Emulation"
+  order: 20
+quality: 48
+lastEdited: "2026-01-28"
+importance: 24
+llmSummary: "Comprehensive analysis of whole brain emulation finding <1% probability of arriving before AI-based TAI, with scanning speed (100,000x too slow for human brains) as the primary bottleneck despite resolution requirements being met. Documents technical requirements (10^18-10^25 FLOPS depending on detail level), current progress (fruit fly complete at 140K neurons vs 86B human), and concludes WBE is peripheral to AI prioritization given AI's faster trajectory."
+ratings:
+  novelty: 3.5
+  rigor: 6
+  actionability: 2
+  completeness: 7.5
+metrics:
+  wordCount: 222
+  citations: 44
+  tables: 45
+  diagrams: 1
+clusters: ["ai-safety"]
+---
+import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="whole-brain-emulation" client:load />
+
+## Overview
+
+Whole Brain Emulation (WBE), sometimes called "mind uploading," refers to creating a functional copy of a biological brain in a computational substrate. Unlike AI systems trained on data, a brain emulation would replicate the actual neural structure of a specific brain. The approach assumes that "total understanding of the brain is not needed, just understanding of the component parts and their functional interactions," as stated in the foundational [Sandberg-Bostrom Roadmap](https://www.fhi.ox.ac.uk/brain-emulation-roadmap-report.pdf).
+
+This was once considered a leading path to artificial general intelligence. The 2008 [Whole Brain Emulation: A Roadmap](https://www.openphilanthropy.org/wp-content/uploads/SandbergandBostrom2008.pdf) by Anders Sandberg and <EntityLink id="nick-bostrom">Nick Bostrom</EntityLink> at FHI provided detailed technical analysis across scanning, data processing, and simulation requirements. The report estimated that depending on the level of biological detail required, computational demands range from 10^18 to 10^25 FLOPS. However, **progress has been much slower than AI**, and most researchers now expect AI to reach transformative capabilities first. A [2011 AI workshop](https://hpluspedia.org/wiki/Whole_Brain_Emulation) estimated an 85% probability that neuromorphic AI would arrive before brain emulation.
+
+Estimated probability of being the dominant path to transformative intelligence: **less than 1%**
+
+## Technical Requirements
+
+The WBE pipeline involves three major phases, each with distinct technical challenges and bottlenecks. The following diagram illustrates the complete pathway from biological brain to running emulation:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph acquire["Acquisition"]
+        brain["Biological Brain"]
+        preserve["Preservation + Sectioning"]
+        scan["EM Imaging"]
+    end
+
+    subgraph reconstruct["Reconstruction"]
+        segment["Neural Segmentation"]
+        connect["Connectome Mapping"]
+        params["Parameter Extraction"]
+    end
+
+    subgraph emulate["Emulation"]
+        model["Neural Model"]
+        run["Running Emulation"]
+    end
+
+    brain --> preserve
+    preserve --> scan
+    scan --> segment
+    segment --> connect
+    connect --> params
+    params --> model
+    model --> run
+
+    style brain fill:#e1f5fe
+    style run fill:#c8e6c9
+`} />
+
+### Brain Scanning Approaches Comparison
+
+Different scanning technologies offer tradeoffs between resolution, speed, and preservation requirements. The table below compares major approaches being developed for connectomics:
+
+| Technology | Resolution | Speed | Preservation Method | Current Status | Key Limitation |
+|------------|------------|-------|---------------------|----------------|----------------|
+| **Serial Section EM (ssEM)** | 4-10nm | ≈1mm^3/year | Aldehyde fixation | Gold standard for connectomics | Extremely slow |
+| **Focused Ion Beam SEM (FIB-SEM)** | 4-8nm isotropic | ≈0.01mm^3/year | Chemical fixation | High resolution, very slow | Not scalable |
+| **Multi-beam SEM** | 4nm | ≈10mm^3/year | Aldehyde fixation | [Allen Institute mouse cortex](https://www.nature.com/articles/s41586-025-08985-1) | Still 100x too slow |
+| **SmartEM (ML-guided)** | 4-10nm | 7x faster than standard | Chemical fixation | [Published 2024](https://www.nature.com/articles/s41592-025-02929-3) | Early stage |
+| **X-ray Holographic Nanotomography** | 20-50nm | Non-destructive | Cryogenic | Research phase | Insufficient resolution |
+| **Expansion Microscopy** | ≈60nm effective | Faster than EM | Chemical expansion | [LICONN 2025](https://www.nature.com/articles/s41586-025-08985-1) | May miss fine detail |
+
+Nature Methods selected [EM-based connectomics as Method of the Year 2025](https://www.nature.com/collections/aegegbhcdh), noting that "connectomics has so far outpaced Moore's law predictions about technological progress."
+
+### Key Technical Challenges
+
+The Sandberg-Bostrom Roadmap identified specific quantitative requirements for each stage. Current progress and remaining gaps are summarized below:
+
+| Challenge | Current Capability (2025) | WBE Requirement | Gap Factor | Key Bottleneck |
+|-----------|---------------------------|-----------------|------------|----------------|
+| **Scanning resolution** | 4-10nm with multi-beam SEM | 5-10nm for synapse detail | ≈1x (achieved) | No longer limiting |
+| **Scanning speed** | ≈10mm^3/year (mouse visual cortex) | ≈1,200,000mm^3 for human brain | 100,000x | Primary bottleneck |
+| **Data volume** | 1.4 petabytes (1mm^3 mouse cortex) | ≈1-2 exabytes for human brain | 1,000x storage | Manageable with scale |
+| **Preservation** | [ASC preserves connectome](https://www.brainpreservation.org/small-mammal-announcement/) (pig brain, 2018) | Preserve synaptic weights | Uncertain | May need more than structure |
+| **Segmentation** | [AI-automated for EM](https://mcgovern.mit.edu/2025/12/15/all-the-connections/) (fruit fly complete) | Human-scale automation | 600,000x neurons | Scaling challenge |
+| **Neural modeling** | 31,000 neurons + 36M synapses (Blue Brain) | 86 billion neurons | 2,700,000x | Computational scaling |
+| **Compute (run-time)** | 1.7 exaFLOPS (El Capitan, 2024) | 10^18-10^25 FLOPS depending on detail | 1x to 10^7x | May already be sufficient |
+
+The resolution requirement has essentially been met, but scanning speed remains the dominant bottleneck. At current rates, scanning a complete human brain would take approximately 100,000 years. Even with optimistic 100x improvements per decade, whole-brain scanning would require multiple additional decades of technological development.
+
+### Computational Requirements by Simulation Detail
+
+The compute required for WBE varies enormously depending on the level of biological fidelity. The Sandberg-Bostrom Roadmap and subsequent analyses provide the following estimates:
+
+| Simulation Level | FLOPS Required | Current Hardware Status | Year Affordable (≈\$1M) | Key Trade-off |
+|------------------|----------------|------------------------|------------------------|---------------|
+| **Functional/behavioral** | ≈10^15 (1 PFLOPS) | [Available since 2008](https://aiimpacts.org/brain-performance-in-flops/) | Already | May miss critical dynamics |
+| **Neural network level** | 10^18-10^19 (1-10 EFLOPS) | El Capitan: 1.7 EFLOPS (2024) | 2024-2030 | Standard target estimate |
+| **Detailed compartmental** | ≈10^22 FLOPS | Not yet available | 2040-2050 | Includes dendritic computation |
+| **Molecular/metabolome** | 10^25-10^29 FLOPS | Far future | 2087+ (per Sandberg) | May be unnecessary |
+
+Henry Markram (Blue Brain Project founder) estimated 10^18 FLOPS for detailed simulation, though his 2018 estimate for "real-time molecular simulation" was dramatically higher at ~4x10^29 FLOPS. The key uncertainty is which level of detail is actually necessary to preserve cognition and identity.
+
+**Power comparison:** An exascale computer consumes 20-30 megawatts. The human brain consumes approximately 20 watts - a factor of one million more efficient. This suggests that even if WBE becomes computationally feasible, energy costs may constrain how many emulations can run simultaneously.
+
+## Key Properties
+
+| Property | Rating | Assessment |
+|----------|--------|------------|
+| **White-box Access** | LOW | Brain structure visible but not interpretable |
+| **Trainability** | N/A | Copied from biological learning, not trained |
+| **Predictability** | LOW | Human-like cognition is inherently unpredictable |
+| **Modularity** | LOW | Brains are highly interconnected |
+| **Formal Verifiability** | LOW | Too complex, poorly understood |
+
+## Current Progress
+
+The history of connectomics demonstrates steady progress but also reveals how far WBE remains from human-scale implementation. Each milestone has exposed new challenges previously underappreciated.
+
+### Major Achievements Timeline
+
+| Milestone | Year | Details | Significance |
+|-----------|------|---------|--------------|
+| **C. elegans connectome** | 1986 | 302 neurons, 7,000 synapses mapped via serial EM | First complete connectome of any organism |
+| **OpenWorm project launched** | 2011 | [Open-source C. elegans simulation](https://openworm.org/) | Demonstrated gap between structure and function |
+| **Blue Brain cortical column** | 2015 | 31,000 neurons, 36 million synapses simulated | Most detailed mammalian circuit simulation |
+| **ASC wins Brain Preservation Prize** | 2018 | [Pig brain preserved with verifiable connectome](https://www.brainpreservation.org/small-mammal-announcement/) | Showed long-term storage is feasible |
+| **Fruit fly connectome (brain)** | 2023 | ≈140,000 neurons fully mapped | Largest complete brain connectome |
+| **Fruit fly complete CNS** | 2024 | Brain + ventral nerve cord in both sexes | [First complete adult insect nervous system](https://www.nature.com/collections/aegegbhcdh) |
+| **Mouse visual cortex mapped** | 2025 | [1mm^3, 500 million connections](https://www.princeton.edu/news/2025/04/09/first-time-scientists-map-half-billion-connections-allow-mice-see) | Largest mammalian connectome volume |
+| **Blue Brain Project concluded** | 2024 | [Delivered open-source mouse brain models](https://bluebrain.epfl.ch/) | Transitioned to Open Brain Institute |
+
+### Scale Comparison: Connectome Progress
+
+| Organism | Neurons | Synapses | Connectome Status | Functional Simulation | Gap to Human |
+|----------|---------|----------|-------------------|----------------------|--------------|
+| **C. elegans** | 302 | ≈7,000 | Complete (1986) | [Partial (BAAIWorm 2024)](https://www.nature.com/articles/s43588-024-00738-w) | 285 million x |
+| **Fruit fly** | 140,000 | ≈50 million | Complete CNS (2024) | Functional analysis ongoing | 614,000 x |
+| **Mouse** | 70 million | ≈100 billion | 1mm^3 complete (0.08%) | No | 1,200 x |
+| **Marmoset** | 600 million | ≈1 trillion | Not started | No | 140 x |
+| **Human** | 86 billion | ≈150 trillion | Not started | No | - |
+
+### The C. elegans Lesson
+
+Despite having the complete C. elegans connectome since 1986 - nearly 40 years ago - functional simulation remains incomplete. [As OpenWorm researchers note](https://www.lesswrong.com/posts/mHqQxwKuzZS69CXX5/whole-brain-emulation-no-progress-on-c-elegans-after-10): "Although we have the complete structural connectome, we do not know the synaptic weights at each of the known synapses. We do not even know whether the synapses are inhibitory or excitatory."
+
+The OpenWorm project focused on anatomical data from dead worms, but the connectome alone doesn't specify the relative importance of connections or their dynamic properties. This suggests that **structural mapping alone may be insufficient** - WBE may require capturing dynamic state information that current preservation methods don't retain.
+
+## Brain Preservation Technologies
+
+A critical prerequisite for WBE is preserving brain structure at sufficient resolution. Recent advances in preservation technology have made significant progress, though key questions remain about what information must be preserved.
+
+### Preservation Methods Comparison
+
+| Method | Mechanism | Resolution Preserved | Scalability | Key Advantage | Key Limitation |
+|--------|-----------|---------------------|-------------|---------------|----------------|
+| **Aldehyde Fixation** | Chemical crosslinking | Synaptic (nm-scale) | High | Standard, well-understood | Requires perfusion; destructive |
+| **Vitrification** | Glass-state freezing | Cellular to synaptic | Moderate | No ice crystal damage | Dramatic brain shrinkage |
+| **[ASC (Aldehyde-Stabilized Cryopreservation)](https://www.sciencedirect.com/science/article/pii/S001122401500245X)** | Fixation + vitrification | Synaptic verified | High | [Won Brain Preservation Prize](https://www.brainpreservation.org/small-mammal-announcement/) | Irreversible |
+| **Plastination** | Polymer replacement | Variable | High | Stable at room temperature | May alter fine structure |
+| **Cryonics (current practice)** | Vitrification attempt | Uncertain | Limited | Preserves biological viability hope | [Not verified to preserve connectome](https://www.brainpreservation.org/21cm-cryopreservation-eval-page/) |
+
+The [Brain Preservation Foundation](https://www.brainpreservation.org/) awarded its Small Mammal Prize in 2018 to 21st Century Medicine for demonstrating that ASC preserves synaptic ultrastructure in a whole pig brain. Their evaluation found "preservation was uniformly excellent: processes were easily traceable and synapses were crisp."
+
+### What Needs to be Preserved?
+
+A fundamental uncertainty is whether the connectome (structural wiring) alone is sufficient, or whether additional information is required:
+
+| Information Type | Likely Necessary? | Currently Preservable? | Notes |
+|------------------|-------------------|----------------------|-------|
+| **Connectome** (neuron connectivity) | Yes | Yes (ASC verified) | Necessary but possibly not sufficient |
+| **Synapse weights** | Likely yes | Uncertain | Not directly observable in dead tissue |
+| **Synaptic protein composition** | Possibly | Partially | The "synaptome" may encode memory |
+| **Neuromodulator state** | Possibly | No | Dopamine, serotonin levels lost at death |
+| **Epigenetic markers** | Possibly | Partially | May modulate memory storage |
+| **Glial cell states** | Unknown | Partially | Astrocytes may contribute to computation |
+
+As one [review notes](https://pmc.ncbi.nlm.nih.gov/articles/PMC11416988/): "Many neuroscientists would agree that preserving the connectome alone may not be sufficient to preserve memory. Aspects of what is called the synaptome and perhaps the epigenome may modulate human memory storage as well."
+
+## Safety Implications
+
+### Potential Advantages
+
+| Advantage | Explanation |
+|-----------|-------------|
+| **Human values by default** | Emulation of human has human values (in theory) |
+| **Understood entity type** | We have experience with humans |
+| **Gradual development** | Progress is incremental and visible |
+| **Legal/ethical frameworks** | Could extend human rights frameworks |
+
+### Risks and Concerns
+
+[Anders Sandberg's analysis of WBE ethics](https://www.researchgate.net/publication/263474325_Ethics_of_Brain_Emulations) notes that "emulations can be instantiated several times, stopped, deleted, restored from backups and so on. This confuses many ethical systems."
+
+| Risk | Severity | Explanation | Mitigation Difficulty |
+|------|----------|-------------|----------------------|
+| **Identity discontinuity** | HIGH | Is the copy the same person? Creating an emulation may be "equivalent to assisted suicide with an unknown probability of success" | Philosophical - cannot be resolved technically |
+| **Speed-up risk** | HIGH | Emulations could run 1000x+ faster than biological time, making oversight impossible | Requires hard speed limits |
+| **Copy proliferation** | HIGH | Could create millions of copies; who owns them? Can they vote? | Requires entirely new legal frameworks |
+| **Suffering at scale** | HIGH | [Digital minds might experience suffering](https://www.sciencedaily.com/releases/2014/05/140527214940.htm); could create vast quantities of suffering entities | Unclear if detectable |
+| **Deletion ethics** | HIGH | Is deleting an em murder? What about backup restoration? | No current ethical framework applies |
+| **Modification risk** | MEDIUM | Easier to modify than biological brains; could remove values, add compulsions | Technical access controls possible |
+| **Value drift** | MEDIUM | Emulations may diverge from human values, especially if running faster | May be unavoidable |
+| **Malicious use** | MEDIUM | Creating copies of unwilling individuals; torture; forced labor | Requires strong legal protections |
+
+**Stuart Russell's warning:** Computer scientist Stuart Russell, in [Human Compatible](https://en.wikipedia.org/wiki/Mind_uploading), calls creating a WBE-based superintelligence "so obviously a bad idea" due to the control problem - human-derived motivations may not remain stable under self-improvement, and emulations may inherit humanity's "darker motivations."
+
+### Comparison with AI Safety
+
+| Aspect | WBE | AI (Transformers) |
+|--------|-----|-------------------|
+| Value alignment | Starts aligned (human brain) | Must be trained/aligned |
+| Interpretability | As opaque as human minds | Opaque but different |
+| Speed of development | Slow, predictable | Fast, unpredictable |
+| Controllability | Similar to humans | Unknown |
+| Existential risk | Unclear | Actively debated |
+
+## Economic and Social Implications
+
+### Potential Impacts
+
+| Impact | Assessment |
+|--------|------------|
+| **Labor market** | Could create unlimited skilled labor (copies of experts) |
+| **Economic growth** | Potentially explosive if emulations work faster |
+| **Inequality** | Who gets emulated? Who controls emulations? |
+| **Mortality** | Potential path to "immortality" for the wealthy |
+
+### Robin Hanson's "Age of Em"
+
+Economist Robin Hanson's 2016 book [The Age of Em](https://ageofem.com/) provides the most detailed analysis of a world dominated by brain emulations. Drawing on economics, physics, and computer science, Hanson explores the social and economic implications:
+
+| Prediction | Mechanism | Implications |
+|------------|-----------|--------------|
+| **Economic doubling every 1-2 weeks** | Copying ems is as easy as copying software | Growth rates unimaginable by current standards |
+| **Wages at subsistence (compute costs)** | Perfect labor markets; unlimited copy supply | Ems work for the cost of running them |
+| **Variable-speed operation** | Faster ems cost more to run | Speed stratification by wealth/importance |
+| **Em "clans"** | Copies of successful individuals dominate | A few thousand original humans might provide all labor |
+| **Subjective centuries in years** | Ems experience time faster than wall-clock | 1-2 years of "human time" = ≈1000 years of em experience |
+| **Humans become like retirees** | Can't compete economically, but not eliminated | Human wealth fraction falls, but absolute wealth rises |
+
+Hanson estimates this scenario could occur [within roughly a century](https://www.economicrockstar.com/robinhanson/) if WBE becomes feasible. However, he notes this analysis is conditional on WBE arriving before other transformative AI - a condition that seems increasingly unlikely.
+
+## Research Landscape
+
+### Key Organizations (2025)
+
+| Organization | Focus | Status | Key Output |
+|--------------|-------|--------|------------|
+| [**Allen Institute for Brain Science**](https://alleninstitute.org/) | Brain mapping and connectomics | Active | Mouse visual cortex connectome (2025) |
+| [**Open Brain Institute**](https://bluebrain.epfl.ch/) | Successor to Blue Brain Project | Launched March 2025 | Open-source brain models |
+| [**EBRAINS**](https://www.ebrains.eu/) | European brain research infrastructure | Active | Hosts Blue Brain-derived models |
+| [**Carboncopies**](https://carboncopies.org/) | WBE advocacy and coordination | Active | Roadmap updates, community building |
+| [**Brain Preservation Foundation**](https://www.brainpreservation.org/) | Preservation technology validation | Active | Prize competitions, evaluations |
+| **Princeton/Janelia Connectomics** | Fly and mouse connectomes | Active | Fruit fly complete connectome |
+| **Google Connectomics** | AI for neural reconstruction | Active | Flood-filling networks, SmartEM |
+
+### Key Publications and Milestones
+
+| Publication/Milestone | Year | Contribution |
+|----------------------|------|--------------|
+| [Whole Brain Emulation: A Roadmap](https://www.openphilanthropy.org/wp-content/uploads/SandbergandBostrom2008.pdf) | 2008 | Foundational technical analysis |
+| [The Age of Em](https://ageofem.com/) | 2016 | Comprehensive economic/social analysis |
+| Blue Brain neocortical microcircuit | 2015 | First detailed mammalian simulation |
+| [ASC Brain Preservation Prize](https://www.brainpreservation.org/small-mammal-announcement/) | 2018 | Verified preservation quality |
+| [Drosophila connectome](https://www.nature.com/collections/aegegbhcdh) | 2024 | First complete adult brain connectome |
+| [EM-based connectomics (Method of Year)](https://www.nature.com/nmeth/volumes/22/issues/12) | 2025 | Nature Methods recognition |
+| [Mouse visual cortex connectome](https://www.princeton.edu/news/2025/04/09/first-time-scientists-map-half-billion-connections-allow-mice-see) | 2025 | Largest mammalian connectome |
+| [BAAIWorm C. elegans model](https://www.nature.com/articles/s43588-024-00738-w) | 2024 | Most complete worm simulation |
+
+## Timeline Analysis
+
+Expert predictions for WBE timelines vary significantly, reflecting deep uncertainty about both technical requirements and the pace of progress.
+
+### Published Timeline Estimates
+
+| Source | Estimate | Methodology | Notes |
+|--------|----------|-------------|-------|
+| [Sandberg (2013)](https://www.researchgate.net/publication/269477453_The_Prospects_of_Whole_Brain_Emulation_within_the_next_Half-_Century) | 50% by 2064 | Expert judgment | Conservative estimate |
+| [Kurzweil (2005)](https://en.wikipedia.org/wiki/Mind_uploading) | By 2045 | Technology extrapolation | Optimistic; relies on continued exponential progress |
+| [2024 Technology Trend Analysis](https://www.sciencedirect.com/science/article/pii/S016801022400138X) | Mouse ~2034, Marmoset ≈2044, Human >2044 | Trend extrapolation | Based on supercomputer, connectomics, and activity measurement progress |
+| Henry Markram (2009) | Human brain by 2019 | Blue Brain extrapolation | **Did not occur** - illustrates prediction difficulty |
+| [80,000 Hours](https://80000hours.org/problem-profiles/whole-brain-emulation/) | This century likely, but after AI | Expert synthesis | Conditional on AI not transforming trajectory first |
+
+### Milestone Probability Estimates
+
+| Milestone | Optimistic (20%) | Median (50%) | Pessimistic (80%) | Key Dependencies |
+|-----------|------------------|--------------|-------------------|------------------|
+| **Complete mouse connectome** | 2028 | 2032 | 2040 | Scanning speed improvements |
+| **Functional mouse brain emulation** | 2032 | 2038 | 2050 | Modeling + compute |
+| **Human brain scanning feasible** | 2040 | 2055 | 2080 | Major scanning breakthrough |
+| **Human brain emulation** | 2045 | 2065 | Never | Multiple breakthroughs needed |
+
+### Why WBE Will Likely Not Arrive Before AI
+
+| Factor | Impact | Confidence |
+|--------|--------|------------|
+| **AI progress rate** | Deep learning capabilities doubling every 6-18 months | High |
+| **WBE progress rate** | Connectomics roughly doubling every 3-5 years | High |
+| **Current gap** | AI approaching human-level; WBE at insect level | High |
+| **Investment differential** | >\$100B/year in AI vs. ≈\$1B/year in connectomics | High |
+| **Parallel vs. serial** | AI research parallelizes; brain scanning is sequential | Medium |
+
+A [2011 workshop](https://hpluspedia.org/wiki/Whole_Brain_Emulation) of AI researchers estimated an **85% probability that neuromorphic AI would arrive before brain emulation**. Given subsequent AI progress (GPT-4, etc.), this probability has likely increased.
+
+### The "AI Moots It" Scenario
+
+The most likely outcome is that transformative AI arrives before WBE becomes feasible, fundamentally changing the trajectory. This could manifest in several ways:
+
+1. **AI accelerates WBE** - Superhuman AI dramatically speeds scanning, reconstruction, and modeling
+2. **AI makes WBE unnecessary** - If AI achieves similar capabilities, motivation for WBE decreases
+3. **AI poses new risks** - Resources shift to AI safety rather than WBE development
+4. **AI enables alternatives** - Brain-computer interfaces or neural enhancement may become more attractive
+
+## Relevance to AI Safety
+
+### Why Study WBE Despite Low Probability?
+
+1. **Backup path** - If AI proves unalignably dangerous, WBE is an alternative
+2. **Informs AI safety** - Understanding biological intelligence helps understand artificial
+3. **Hybrid systems** - WBE insights may inform brain-computer interfaces
+4. **Comparative analysis** - Different path illuminates unique AI risks
+
+### Key Differences from AI Safety Concerns
+
+| AI Safety Concern | WBE Equivalent |
+|-------------------|----------------|
+| Goal misgeneralization | Human values may be context-dependent |
+| Mesa-optimization | Humans already have inner optimizers |
+| Deceptive alignment | Humans can be deceptive |
+| Capability overhang | Speed-up creates sudden capability jump |
+
+## Key Uncertainties
+
+The feasibility and timeline of WBE depends on resolving several fundamental uncertainties, both technical and philosophical:
+
+### Technical Cruxes
+
+| Uncertainty | Optimistic View | Pessimistic View | Resolution Method |
+|-------------|-----------------|------------------|-------------------|
+| **Required simulation detail** | Neuron-level (10^18 FLOPS) sufficient | Molecular-level (10^25+ FLOPS) required | C. elegans functional validation |
+| **Connectome sufficiency** | Structure encodes everything | Dynamic state (neuromodulators, etc.) essential | Preservation + revival experiments |
+| **Scanning speed ceiling** | 100x improvement per decade possible | Physical limits near current rates | Engineering progress |
+| **Preservation completeness** | Current methods preserve enough | Critical information lost at death | Brain Preservation Foundation validation |
+
+### Philosophical Cruxes
+
+| Question | Implications if Yes | Implications if No |
+|----------|--------------------|--------------------|
+| **Is the copy "you"?** | WBE is a path to continuity/immortality | WBE creates a copy, not continuation; original dies |
+| **Can digital minds be conscious?** | Moral status clear; WBE creates persons | Uncertain moral status; may be "philosophical zombies" |
+| **Does continuity require gradual transition?** | Destructive scanning acceptable | Must develop non-destructive methods first |
+| **Are human values stable under self-modification?** | WBE inherits human alignment | WBE may diverge rapidly from human values |
+
+### Key Crux: The Information Preservation Problem
+
+The most consequential uncertainty may be **what information must be preserved**. The C. elegans case is instructive: despite having the complete structural connectome for 40 years, functional simulation remains incomplete because:
+
+1. **Synaptic weights** are not directly observable in fixed tissue
+2. **Inhibitory vs. excitatory** nature of synapses must be inferred
+3. **Dynamic properties** (learning rates, plasticity) are not encoded in structure
+4. **Neuromodulator states** are lost at death
+
+If these gaps prevent C. elegans emulation, human WBE faces even greater challenges given the brain's 285-million-fold greater complexity.
+
+## Related Pages
+
+- <EntityLink id="brain-computer-interfaces">Brain-Computer Interfaces</EntityLink> - Related technology path
+- <EntityLink id="biological-organoid">Biological/Organoid Computing</EntityLink> - Alternative biological approach
+- <EntityLink id="dense-transformers">Dense Transformers</EntityLink> - The likely faster path

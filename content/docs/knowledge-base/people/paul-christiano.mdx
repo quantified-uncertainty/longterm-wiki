@@ -1,0 +1,227 @@
+---
+title: Paul Christiano
+description: Founder of ARC, creator of iterated amplification and AI safety via debate. Current risk assessment ~10-20% P(doom), AGI 2030s-2040s. Pioneered prosaic alignment approach focusing on scalable oversight mechanisms.
+sidebar:
+  order: 2
+quality: 39
+llmSummary: Comprehensive biography of Paul Christiano documenting his technical contributions (IDA, debate, scalable oversight), risk assessment (~10-20% P(doom), AGI 2030s-2040s), and evolution from higher optimism to current moderate concern. Documents implementation of his ideas at major labs (RLHF at OpenAI, Constitutional AI at Anthropic) with specific citation to papers and organizational impact.
+lastEdited: "2026-01-02"
+importance: 25
+ratings:
+  novelty: 2
+  rigor: 4.5
+  actionability: 2
+  completeness: 6
+metrics:
+  wordCount: 349
+  citations: 18
+  tables: 25
+  diagrams: 0
+clusters: ["ai-safety"]
+---
+import {DataInfoBox, DisagreementMap, Backlinks, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="paul-christiano" client:load />
+
+<DataInfoBox entityId="paul-christiano" />
+
+## Overview
+
+Paul Christiano is one of the most influential researchers in AI alignment, known for developing concrete, empirically testable approaches to the alignment problem. With a PhD in theoretical computer science from UC Berkeley, he has worked at OpenAI, DeepMind, and founded the <EntityLink id="arc">Alignment Research Center (ARC)</EntityLink>.
+
+Christiano pioneered the "prosaic alignment" approach—aligning AI without requiring exotic theoretical breakthroughs. His current risk assessment places ~10-20% probability on existential risk from AI this century, with AGI arrival in the 2030s-2040s. His work has directly influenced alignment research programs at major labs including <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink>, and <EntityLink id="deepmind">DeepMind</EntityLink>.
+
+## Risk Assessment
+
+| Risk Factor | Christiano's Assessment | Evidence/Reasoning | Comparison to Field |
+|-------------|------------------------|-------------------|-------------------|
+| P(doom) | ≈10-20% | Alignment tractable but challenging | Moderate (vs 50%+ doomers, &lt;5% optimists) |
+| <EntityLink id="agi-timeline">AGI Timeline</EntityLink> | 2030s-2040s | Gradual capability increase | Mainstream range |
+| Alignment Difficulty | Hard but tractable | Iterative progress possible | More optimistic than <EntityLink id="miri">MIRI</EntityLink> |
+| Coordination Feasibility | Moderately optimistic | Labs have incentives to cooperate | More optimistic than average |
+
+## Key Technical Contributions
+
+### Iterated Amplification and Distillation (IDA)
+
+Published in <R id="f0980ca7010a4a44">"Supervising strong learners by amplifying weak experts"</R> (2018):
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| Human + AI Collaboration | Human overseer works with AI assistant on complex tasks | Tested at scale by <R id="664f6ab2e2488b0d">OpenAI</R> |
+| Distillation | Extract human+AI behavior into standalone AI system | Standard ML technique |
+| Iteration | Repeat process with increasingly capable systems | Theoretical framework |
+| Bootstrapping | Build aligned AGI from aligned weak systems | Core theoretical hope |
+
+**Key insight**: If we can align a weak system and use it to help align slightly stronger systems, we can bootstrap to aligned AGI without solving the full problem directly.
+
+### <EntityLink id="debate">AI Safety via Debate</EntityLink>
+
+Co-developed with <R id="367c57adf0c2bc75">Geoffrey Irving</R> at DeepMind in <R id="61da2f8e311a2bbf">"AI safety via debate"</R> (2018):
+
+| Mechanism | Implementation | Results |
+|-----------|---------------|---------|
+| <EntityLink id="adversarial-training">Adversarial Training</EntityLink> | Two AIs argue for different positions | Deployed at <R id="1000c5dea784ef64">Anthropic</R> |
+| Human Judgment | Human evaluates which argument is more convincing | Scales human oversight capability |
+| Truth Discovery | Debate incentivizes finding flaws in opponent arguments | Mixed empirical results |
+| Scalability | Works even when AIs are smarter than humans | Theoretical hope |
+
+### <EntityLink id="scalable-oversight">Scalable Oversight</EntityLink> Framework
+
+Christiano's broader research program on supervising superhuman AI:
+
+| Problem | Proposed Solution | Current Status |
+|---------|------------------|---------------|
+| Task too complex for direct evaluation | Process-based feedback vs outcome evaluation | <R id="a0406a8b2e9bffe0">Implemented at OpenAI</R> |
+| AI reasoning opaque to humans | Eliciting Latent Knowledge (ELK) | Active research area |
+| Deceptive alignment | Recursive <EntityLink id="reward-modeling">reward modeling</EntityLink> | Early stage research |
+| Capability-alignment gap | Assistance games framework | Theoretical foundation |
+
+## Intellectual Evolution and Current Views
+
+### Early Period (2016-2019)
+
+- **Higher optimism**: Alignment seemed more tractable
+- **IDA focus**: Believed iterative amplification could solve core problems  
+- **Less doom**: Lower estimates of catastrophic risk
+
+### Current Period (2020-Present)
+
+| Shift | From | To | Evidence |
+|-------|------|----|---------| 
+| Risk assessment | ≈5% P(doom) | ≈10-20% P(doom) | <R id="6807a8a8f2fd23f3">"What failure looks like"</R> |
+| Research focus | IDA/Debate | Eliciting Latent Knowledge | <R id="e6ff505f606f86cf">ARC's ELK report</R> |
+| Governance views | Lab-focused | Broader coordination | Recent policy writings |
+| Timelines | Longer | Shorter (2030s-2040s) | Following capability advances |
+
+## Strategic Disagreements in the Field
+
+<DisagreementMap
+  client:load
+  topic="Can we learn alignment iteratively?"
+  positions={[
+    {
+      person: "Paul Christiano",
+      position: "Yes, alignment tax should be acceptable, we can catch problems in weaker systems",
+      confidence: "medium-high",
+      reasoning: "Prosaic alignment through iterative improvement"
+    },
+    {
+      person: "Eliezer Yudkowsky",
+      position: "No, sharp capability jumps mean we won't get useful feedback",
+      confidence: "high", 
+      reasoning: "Deceptive alignment, treacherous turns, alignment is anti-natural"
+    },
+    {
+      person: "Jan Leike",
+      position: "Yes, but we need to move fast as capabilities advance rapidly",
+      confidence: "medium",
+      reasoning: "Similar to Paul but more urgency given current pace"
+    }
+  ]}
+/>
+
+### Core Crux Positions
+
+| Issue | Christiano's View | Alternative Views | Implication |
+|-------|------------------|------------------|-------------|
+| Alignment difficulty | Prosaic solutions sufficient | Need fundamental breakthroughs (<EntityLink id="miri">MIRI</EntityLink>) | Different research priorities |
+| <EntityLink id="__index__/ai-transition-model">Takeoff speeds</EntityLink> | Gradual, time to iterate | Fast, little warning | Different preparation strategies |
+| Coordination feasibility | Moderately optimistic | Pessimistic (<EntityLink id="racing-dynamics">racing dynamics</EntityLink>) | Different governance approaches |
+| Current system alignment | Meaningful progress possible | Current systems too limited | Different research timing |
+
+## Research Influence and Impact
+
+### Direct Implementation
+
+| Technique | Organization | Implementation | Results |
+|-----------|-------------|---------------|---------|
+| RLHF | OpenAI | InstructGPT, ChatGPT | Massive improvement in helpfulness |
+| <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> | Anthropic | Claude training | Reduced harmful outputs |
+| Debate methods | DeepMind | Sparrow | Mixed results on truthfulness |
+| <EntityLink id="process-supervision">Process supervision</EntityLink> | OpenAI | Math reasoning | Better than outcome supervision |
+
+### Intellectual Leadership
+
+- **<R id="2e0c662574087c2a"><EntityLink id="alignment">AI Alignment</EntityLink> Forum</R>**: Primary venue for technical alignment discourse
+- **Mentorship**: Trained researchers now at major labs (<EntityLink id="jan-leike">Jan Leike</EntityLink>, Geoffrey Irving, others)
+- **Problem formulation**: ELK problem now central focus across field
+
+## Current Research Agenda (2024)
+
+At <EntityLink id="arc">ARC</EntityLink>, Christiano's priorities include:
+
+| Research Area | Specific Focus | Timeline |
+|---------------|----------------|----------|
+| Power-seeking evaluation | Understanding how AI systems could gain influence gradually | Ongoing |
+| Scalable oversight | Better techniques for supervising superhuman systems | Core program |
+| Alignment evaluation | Metrics for measuring alignment progress | Near-term |
+| Governance research | Coordination mechanisms between labs | Policy-relevant |
+
+## Key Uncertainties and Cruxes
+
+Christiano identifies several critical uncertainties:
+
+| Uncertainty | Why It Matters | Current Evidence |
+|-------------|----------------|------------------|
+| **Deceptive alignment prevalence** | Determines safety of iterative approach | <EntityLink id="deceptive-alignment">Mixed signals from current systems</EntityLink> |
+| **Capability jump sizes** | Affects whether we get warning | Continuous but accelerating progress |
+| **Coordination feasibility** | Determines governance strategies | <EntityLink id="voluntary-commitments">Some positive signs</EntityLink> |
+| **Alignment tax magnitude** | Economic feasibility of safety | <EntityLink id="alignment-progress">Early evidence suggests low tax</EntityLink> |
+
+## Timeline and Trajectory Assessment
+
+### Near-term (2024-2027)
+- Continued capability advances in <EntityLink id="language-models">language models</EntityLink>
+- Better alignment evaluation methods
+- Industry coordination on safety standards
+
+### Medium-term (2027-2032)  
+- Early <EntityLink id="agentic-ai">agentic AI</EntityLink> systems
+- Critical tests of scalable oversight
+- Potential governance frameworks
+
+### Long-term (2032-2040)
+- Approach to <EntityLink id="factors-ai-capabilities-overview">transformative AI</EntityLink>
+- Make-or-break period for alignment
+- <EntityLink id="international-coordination">International coordination</EntityLink> becomes crucial
+
+## Comparison with Other Researchers
+
+| Researcher | P(doom) | Timeline | Alignment Approach | Coordination View |
+|------------|---------|----------|-------------------|------------------|
+| **Paul Christiano** | ≈15% | 2030s | Prosaic, iterative | Moderately optimistic |
+| <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> | ≈90% | 2020s | Fundamental theory | Pessimistic |
+| <EntityLink id="dario-amodei">Dario Amodei</EntityLink> | ≈10-25% | 2030s | Constitutional AI | Industry-focused |
+| <EntityLink id="stuart-russell">Stuart Russell</EntityLink> | ≈20% | 2030s | Provable safety | Governance-focused |
+
+## Sources & Resources
+
+### Key Publications
+
+| Publication | Year | Venue | Impact |
+|-------------|------|-------|--------|
+| <R id="f0980ca7010a4a44">Supervising strong learners by amplifying weak experts</R> | 2018 | NeurIPS | Foundation for IDA |
+| <R id="61da2f8e311a2bbf">AI safety via debate</R> | 2018 | arXiv | Debate framework |
+| <R id="6807a8a8f2fd23f3">What failure looks like</R> | 2019 | AF | Risk assessment update |
+| <R id="e6ff505f606f86cf">Eliciting Latent Knowledge</R> | 2021 | ARC | Current research focus |
+
+### Organizations and Links
+
+| Category | Links |
+|----------|--------|
+| **Research Organization** | <R id="0562f8c207d8b63f">Alignment Research Center</R> |
+| **Blog/Writing** | <R id="adc7f6d173ebda6b">AI Alignment Forum</R>, <R id="c47be710c3b15e51">Personal blog</R> |
+| **Academic** | <R id="5a7093fe510e8fe2">Google Scholar</R> |
+| **Social** | <R id="7afb5c3691469564">Twitter</R> |
+
+### Related Research Areas
+
+| Area | Connection to Christiano's Work |
+|------|-------------------------------|
+| <EntityLink id="interpretability">Scalable oversight</EntityLink> | Core research focus |
+| <EntityLink id="rlhf">Reward modeling</EntityLink> | Foundation for many proposals |
+| <EntityLink id="ai-governance">AI governance</EntityLink> | Increasing focus area |
+| <EntityLink id="evaluation">Alignment evaluation</EntityLink> | Critical for iterative approach |
+
+<Backlinks client:load entityId="paul-christiano" />

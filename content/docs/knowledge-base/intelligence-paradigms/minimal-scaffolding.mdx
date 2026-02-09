@@ -1,0 +1,338 @@
+---
+title: "Minimal Scaffolding"
+description: "Analysis of direct AI model interaction with basic prompting and no persistent tools or memory. The simplest deployment pattern, exemplified by ChatGPT web interface. Declining as agentic systems demonstrate clear capability gains."
+sidebar:
+  label: "Minimal Scaffolding"
+  order: 1
+quality: 52
+lastEdited: "2026-01-28"
+importance: 42.5
+llmSummary: "Analyzes minimal scaffolding (basic AI chat interfaces) showing 38x performance gap vs agent systems on code tasks (1.96% → 75% on SWE-bench), declining market share from 80% (2023) to 35% (2025), but retaining advantages in cost ($0.001-0.05 vs $0.10-5.00 per query), latency (0.5-3s vs 30-300s), and interpretability for simple tasks."
+ratings:
+  novelty: 3.2
+  rigor: 5.8
+  actionability: 4.5
+  completeness: 6.5
+metrics:
+  wordCount: 1164
+  citations: 49
+  tables: 36
+  diagrams: 1
+clusters: ["ai-safety"]
+---
+import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [justapedia.org](https://justapedia.org/wiki/Scaffold) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Scaffolding) |
+
+<DataExternalLinks pageId="minimal-scaffolding" client:load />
+
+## Overview
+
+Minimal scaffolding refers to the simplest way to deploy AI models: direct interaction through a chat interface with basic prompting, no persistent memory, and minimal or no tool access. This is how most people first experience AI - through ChatGPT's web interface or similar products. The architectural philosophy is straightforward: rather than building complex orchestration layers around a language model, minimal scaffolding relies on the model's inherent capabilities developed through pretraining and fine-tuning.
+
+While this was the dominant paradigm from 2022-2023, it is now **declining** as agentic systems demonstrate clear capability gains. Research from [AgentBench (ICLR 2024)](https://arxiv.org/abs/2308.03688) and the [Stanford HAI AI Index 2025](https://aiindex.stanford.edu/) shows that tool-augmented agents outperform base models by 10-50 percentage points on complex tasks. However, minimal scaffolding retains significant advantages in interpretability, latency, and cost that make it appropriate for many production use cases. Estimated probability of remaining dominant at transformative AI: **5-15%**.
+
+The key characteristic is that **all capability comes from the model itself** - the scaffold adds almost nothing. This creates both a ceiling (limited by in-context learning capacity) and a floor (highly predictable, auditable behavior).
+
+## Architecture
+
+The minimal scaffolding architecture represents the simplest possible deployment pattern for <EntityLink id="language-models">large language models</EntityLink>. All intelligence resides in the foundation model itself, with the surrounding infrastructure handling only basic input/output formatting.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Interface["User Interface Layer"]
+        user["User Input"]
+        display["Response Display"]
+    end
+
+    subgraph Processing["Minimal Processing Layer"]
+        sys["System Prompt"]
+        ctx["Session Context<br/>(ephemeral)"]
+        format["Output Formatting"]
+    end
+
+    subgraph Model["Foundation Model"]
+        llm["LLM<br/>Single Forward Pass"]
+    end
+
+    user --> sys
+    sys --> ctx
+    ctx --> llm
+    llm --> format
+    format --> display
+    display -.-> user
+
+    style llm fill:#e0e7ff
+    style Model fill:#f0f5ff
+`} />
+
+This architecture contrasts sharply with agentic systems, which wrap the foundation model in complex orchestration layers. The [Agentic AI Comprehensive Survey (2025)](https://arxiv.org/abs/2510.25445) identifies two distinct paradigms: symbolic/classical (algorithmic planning with persistent state) and neural/generative (stochastic generation with prompt-driven orchestration). Minimal scaffolding falls entirely within the latter category but uses the simplest possible implementation.
+
+### What's Included
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Text input/output | YES | Core interaction |
+| System prompts | YES | Basic behavior shaping |
+| Conversation history | LIMITED | Within session only |
+| Tool use | NO | No external capabilities |
+| Persistent memory | NO | Resets each session |
+| Multi-step planning | NO | Single turn only |
+
+## Scaffolding Approach Comparison
+
+The choice of scaffolding level represents a fundamental architectural decision with significant implications for capability, safety, and operational characteristics. The following table compares the three major paradigms based on research from [AgentArch (2025)](https://arxiv.org/html/2509.10769v1) and the [Agentic AI Frameworks Survey](https://arxiv.org/html/2508.10146v1).
+
+| Dimension | Minimal Scaffolding | Light Scaffolding | Heavy Scaffolding |
+|-----------|---------------------|-------------------|-------------------|
+| **Architecture** | Single model, single pass | Model + tools, single session | Multi-agent, persistent state |
+| **Context Window** | 4K-200K tokens | 4K-200K + tool results | Unlimited (external memory) |
+| **Latency (p50)** | 0.5-3 seconds | 3-15 seconds | 30-300 seconds |
+| **Cost per Query** | \$0.001-0.05 | \$0.01-0.50 | \$0.10-5.00 |
+| **Failure Modes** | Hallucination, refusal | Tool errors, loops | Cascading failures, runaway |
+| **Interpretability** | HIGH - single trace | MEDIUM - tool logs | LOW - emergent behavior |
+| **Max Task Complexity** | Single-turn reasoning | Multi-step with tools | Autonomous projects |
+| **Example Systems** | ChatGPT free, Claude.ai | ChatGPT Plus, Cursor | Devin, AutoGPT, CrewAI |
+| **Code Footprint** | ≈100-500 LOC | ≈1,000-5,000 LOC | ≈10,000-100,000 LOC |
+| **Enterprise Adoption** | 60-70% of deployments | 25-35% of deployments | 5-10% of deployments |
+
+*Sources: [Stanford HAI AI Index 2025](https://aiindex.stanford.edu/), [Agentic AI Market Analysis](https://www.mdpi.com/1999-5903/17/9/404)*
+
+The [SmolAgents framework](https://github.com/huggingface/smolagents) from Hugging Face demonstrates the minimal approach: its core agent logic fits in approximately 1,000 lines of code, compared to tens of thousands for frameworks like LangChain or AutoGen. This architectural simplicity translates to faster debugging, easier auditing, and more predictable behavior.
+
+## Key Properties
+
+| Property | Rating | Assessment |
+|----------|--------|------------|
+| **White-box Access** | LOW | Model internals completely opaque; only see inputs/outputs |
+| **Trainability** | HIGH | Standard RLHF on base model |
+| **Predictability** | MEDIUM | Single forward pass is somewhat predictable |
+| **Modularity** | LOW | Monolithic model, no components |
+| **Formal Verifiability** | LOW | Cannot verify anything about model behavior |
+
+## Benchmark Performance Data
+
+A critical question for minimal scaffolding is: how much capability do you sacrifice by not using tools? The answer varies dramatically by task type. Research from [AgentBench (ICLR 2024)](https://arxiv.org/abs/2308.03688) provides systematic comparisons.
+
+### Pure Model vs. Agent Performance
+
+| Benchmark | Task Type | Base Model (no tools) | With Agent Scaffolding | Delta |
+|-----------|-----------|----------------------|------------------------|-------|
+| [MMLU](https://crfm.stanford.edu/2024/05/01/helm-mmlu.html) | Knowledge/Reasoning | 88-90% (GPT-4, Claude) | N/A - tools not applicable | 0% |
+| [SWE-bench](https://www.swebench.com/) | Code Editing | 1.96% (Claude 2 RAG) | 75% (2025 agents) | +3,700% |
+| [GAIA](https://huggingface.co/datasets/gaia-benchmark/GAIA) | Real-world Tasks | 15-25% | 55-70% | +180-280% |
+| [WebArena](https://webarena.dev/) | Web Navigation | 5-10% | 25-35% | +250-600% |
+| [HumanEval](https://github.com/openai/human-eval) | Code Generation | 90-92% | 92-95% | +2-5% |
+| [MATH](https://github.com/hendrycks/math) | Mathematical Reasoning | 70-77% | 75-85% | +5-15% |
+
+*Sources: [OpenAI SWE-bench Verified Report](https://openai.com/index/introducing-swe-bench-verified/), [Evidently AI Benchmarks](https://www.evidentlyai.com/blog/ai-agent-benchmarks)*
+
+The data reveals a clear pattern: **tasks requiring interaction with external systems** (code execution, web browsing, file manipulation) show massive gains from scaffolding, while **pure reasoning tasks** show minimal or no improvement. This suggests minimal scaffolding remains optimal for:
+
+- Knowledge retrieval and explanation
+- Single-turn code generation (not debugging/iteration)
+- Creative writing and brainstorming
+- Mathematical problem-solving (though tool-augmented approaches are catching up)
+
+### In-Context Learning Limits
+
+Research on [in-context learning limits](https://arxiv.org/abs/2502.03503) identifies fundamental constraints on what minimal scaffolding can achieve:
+
+| Capability | Current Ceiling | Limiting Factor | Citation |
+|------------|-----------------|-----------------|----------|
+| Few-shot task learning | 85-95% on simple tasks | Distribution shift from training | [Analyzing Limits for ICL (2025)](https://arxiv.org/abs/2502.03503) |
+| Specification-heavy tasks | Less than 50% of SOTA | Inability to parse complex instructions | [When ICL Falls Short (2023)](https://arxiv.org/abs/2311.08993) |
+| Long-context utilization | Diminishing returns >32K | Attention degradation | [Long-Context ICL Study](https://arxiv.org/html/2506.13608v1) |
+| Out-of-distribution generalization | Near-random for novel domains | Training distribution mismatch | [DeepMind Many-Shot ICL](https://www.marktechpost.com/2024/04/28/this-ai-paper-from-google-deepmind-introduces-enhanced-learning-capabilities-with-many-shot-in-context-learning/) |
+
+The [DeepMind Many-Shot ICL paper (2024)](https://www.marktechpost.com/2024/04/28/this-ai-paper-from-google-deepmind-introduces-enhanced-learning-capabilities-with-many-shot-in-context-learning/) showed that scaling to thousands of in-context examples can approach fine-tuning performance, but this shifts computational burden entirely to inference time - making it impractical for most production deployments.
+
+## Safety Profile
+
+### Advantages
+
+| Advantage | Explanation |
+|-----------|-------------|
+| **Simple to analyze** | No complex multi-step behavior to reason about |
+| **Limited harm potential** | No tool access means limited real-world impact |
+| **Easy to monitor** | All interaction is visible |
+| **Predictable scope** | Cannot take autonomous actions |
+
+### Limitations
+
+| Limitation | Explanation |
+|------------|-------------|
+| **Model is still opaque** | Cannot understand why outputs are generated |
+| **Prompt injection** | Users can manipulate behavior through prompts |
+| **Capability ceiling** | Cannot do tasks requiring tools or persistence |
+| **No memory safety** | Cannot maintain safety constraints across sessions |
+
+## Current Examples
+
+| Product | Provider | Key Features |
+|---------|----------|--------------|
+| ChatGPT (free tier) | OpenAI | Basic chat interface |
+| Claude.ai | Anthropic | Chat with file upload |
+| Gemini | Google | Chat with multimodal input |
+| Perplexity | Perplexity AI | Search-augmented chat |
+
+## Why It's Declining
+
+### Quantified Capability Gap
+
+The gap between minimal and tool-augmented systems has widened dramatically since 2023. The [SWE-bench leaderboard](https://www.swebench.com/) provides the clearest illustration: base models achieved only 1.96% resolution rate in 2023, while agent-augmented systems reached 75% by 2025 - a **38x improvement** from the same underlying models.
+
+| Capability | Minimal | Light Scaffolding | Heavy Scaffolding | Source |
+|------------|---------|-------------------|-------------------|--------|
+| Code debugging | 1.96% | 43% | 75% | [SWE-bench](https://www.swebench.com/) |
+| Web research | 10-15% | 45-55% | 65-75% | [WebArena](https://webarena.dev/) |
+| Multi-step reasoning | 60-70% | 75-85% | 85-92% | [GAIA](https://huggingface.co/datasets/gaia-benchmark/GAIA) |
+| Tool use accuracy | N/A | 85-90% | 92-96% | [Berkeley Function-Calling](https://gorilla.cs.berkeley.edu/leaderboard.html) |
+| Autonomous task completion | 5-10% | 35-50% | 60-80% | [AgentBench](https://github.com/THUDM/AgentBench) |
+
+### Market Evolution
+
+The AI agent market has grown from nascent experimentation to mainstream enterprise adoption. According to [industry analysis](https://www.mdpi.com/1999-5903/17/9/404), the AI agent market was valued at approximately \$5.3-5.4 billion in 2024 and is projected to reach \$50-52 billion by 2030 (41-46% CAGR).
+
+| Indicator | 2023 | 2024 | 2025 | Trend |
+|-----------|------|------|------|-------|
+| ChatGPT Plus tool adoption | 15% of users | 45% of users | 70% of users | ↗ Accelerating |
+| Enterprise API function calling | 20% of calls | 55% of calls | 75% of calls | ↗ Accelerating |
+| Agent framework GitHub stars | ≈50K total | ≈250K total | ≈500K total | ↗ Exponential |
+| Minimal-only deployments | 80% | 55% | 35% | ↘ Declining |
+
+*Data compiled from [Stanford HAI AI Index](https://aiindex.stanford.edu/), [GitHub Trending](https://github.com/trending), industry reports*
+
+The shift is driven by concrete product launches: ChatGPT Plus added code interpreter, browsing, and plugins; Claude added Artifacts, Projects, and computer use capabilities; and enterprise customers increasingly demand tool integration as a baseline requirement.
+
+## Comparison with Other Deployment Patterns
+
+| Aspect | Minimal | Light | Heavy |
+|--------|---------|-------|-------|
+| Capability | LOW | MEDIUM | HIGH |
+| Safety complexity | LOW | MEDIUM | HIGH |
+| Interpretability | LOW | MEDIUM | MEDIUM-HIGH |
+| Development cost | LOW | LOW | MEDIUM |
+| Current market share | DECLINING | STABLE | GROWING |
+
+## When Minimal Scaffolding Makes Sense
+
+Despite the trend toward agents, minimal scaffolding remains the optimal choice for a significant portion of AI deployments. The [Agentic AI Frameworks Survey](https://arxiv.org/html/2508.10146v1) notes that enterprises face a fundamental tradeoff: "Most implementations are either too rigid (heavy scaffolding that can't adapt) or too loose (unbounded agency)."
+
+### Optimal Use Cases
+
+| Use Case | Why Minimal Works | Agent Alternative Disadvantage |
+|----------|-------------------|-------------------------------|
+| **Brainstorming/Ideation** | Creative tasks don't benefit from tool verification | Tool overhead adds latency, breaks flow |
+| **Writing Assistance** | Text-in, text-out matches model strengths | Agents may over-engineer simple edits |
+| **Educational Q&A** | Explanation quality depends on model knowledge | Web search can introduce noise |
+| **Sensitive Contexts** | No tool access = no tool-based attacks | Each tool is an attack surface |
+| **High-volume, Low-stakes** | Cost: \$0.001-0.01 vs \$0.10-1.00 per query | Agent costs prohibitive at scale |
+| **Latency-critical Apps** | 0.5-3s vs 30-300s response time | Users abandon after 5-10s |
+| **Audit-required Domains** | Single trace, fully reproducible | Multi-agent traces hard to audit |
+
+### Cost-Benefit Analysis
+
+For organizations choosing between scaffolding levels, the decision often comes down to economics:
+
+| Factor | Minimal | Light | Heavy | Breakeven Point |
+|--------|---------|-------|-------|-----------------|
+| Development cost | \$5K-20K | \$20K-100K | \$100K-500K | N/A |
+| Per-query cost | \$0.005 | \$0.05 | \$0.50 | N/A |
+| Queries to breakeven on dev | 0 | 300K-1.6M | 190K-1M | Heavy scaffolding needs fewer than 1M high-value queries |
+| Maintenance (annual) | \$2K-10K | \$20K-50K | \$100K-300K | Ongoing costs favor minimal |
+| Error investigation time | 5-15 min | 30-60 min | 2-8 hours | Debugging costs compound |
+
+*Estimates based on [CrewAI enterprise data](https://blog.crewai.com/) and industry benchmarks*
+
+The pattern emerging from production deployments is clear: **deterministic backbone with intelligence where it matters**. Many successful systems use minimal scaffolding for 80-90% of queries, escalating to agent systems only for complex tasks that justify the overhead.
+
+## Implications for Safety Research
+
+### Research That Applies
+
+- **Prompt engineering** - Eliciting better responses
+- **RLHF and training** - Improving base model behavior
+- **Jailbreak prevention** - Resisting adversarial prompts
+- **Output filtering** - Catching harmful responses
+
+### Research That's Less Relevant
+
+- **Control/containment** - No tools to contain
+- **Multi-agent safety** - Single agent only
+- **Planning safety** - No multi-step planning
+- **Tool safety** - No tools
+
+## Key Uncertainties
+
+The future of minimal scaffolding depends on several unresolved questions with significant uncertainty ranges.
+
+| Uncertainty | Current Best Estimate | Range | Key Drivers |
+|-------------|----------------------|-------|-------------|
+| Minimal scaffolding market share at TAI | 15-25% | 5-40% | Safety regulation, capability ceilings |
+| In-context learning ceiling (vs. fine-tuning) | 85-95% | 70-99% | Architecture improvements, context scaling |
+| Agent safety incident probability (5 years) | 25-40% | 10-60% | Deployment velocity, safety investment |
+| Regulatory mandate for simpler systems | 15-30% | 5-50% | Major incident occurrence, political will |
+
+### Will minimal persist for some use cases?
+
+Even at transformative AI, certain interaction patterns may favor simplicity. The [Agentic AI Survey](https://arxiv.org/abs/2510.25445) found that symbolic/planning systems dominate safety-critical domains (healthcare, finance) precisely because they offer better auditability. If AI regulation tightens, minimal scaffolding could see a resurgence as the most compliant option.
+
+**Estimate:** 60-75% probability that minimal scaffolding retains >10% market share even post-TAI.
+
+### Is the trend toward agents inevitable?
+
+Several factors could reverse the current trajectory:
+- **Major agent safety incident:** A high-profile failure (financial loss, safety harm) could trigger regulatory backlash
+- **Liability frameworks:** If operators become liable for agent actions, simpler systems become attractive
+- **Cost pressure:** Agent systems are 10-100x more expensive; economic downturns favor efficiency
+
+**Estimate:** 20-35% probability that safety/regulatory concerns significantly slow agent adoption by 2030.
+
+### What's the capability ceiling for pure in-context learning?
+
+Research on [in-context learning limits](https://arxiv.org/abs/2502.03503) suggests fundamental architectural constraints. However, [many-shot ICL](https://www.marktechpost.com/2024/04/28/this-ai-paper-from-google-deepmind-introduces-enhanced-learning-capabilities-with-many-shot-in-context-learning/) with larger context windows has shown performance approaching fine-tuning on some tasks.
+
+**Estimate:** In-context learning will plateau at 80-95% of fine-tuning performance for most tasks, with the gap persisting for specification-heavy and long-horizon tasks.
+
+## Sources and References
+
+### Academic Research
+
+| Source | Focus | Key Findings |
+|--------|-------|--------------|
+| [AgentBench (ICLR 2024)](https://arxiv.org/abs/2308.03688) | LLM-as-agent evaluation | Significant performance gap between commercial and open-source models as agents |
+| [Agentic AI Survey (2025)](https://arxiv.org/abs/2510.25445) | Comprehensive architecture review | Dual-paradigm framework distinguishing symbolic vs. neural approaches |
+| [Analyzing ICL Limits (2025)](https://arxiv.org/abs/2502.03503) | In-context learning constraints | Transformers fail to extrapolate beyond training distribution |
+| [When ICL Falls Short (2023)](https://arxiv.org/abs/2311.08993) | Specification-heavy tasks | ICL achieves less than 50% SOTA on complex task specifications |
+| [AgentArch (2025)](https://arxiv.org/html/2509.10769v1) | Enterprise agent evaluation | Memory and context management as key limiting factors |
+
+### Industry Reports and Benchmarks
+
+| Source | Type | Relevance |
+|--------|------|-----------|
+| [Stanford HAI AI Index 2025](https://aiindex.stanford.edu/) | Annual industry survey | Market sizing, adoption trends, investment data |
+| [SWE-bench](https://www.swebench.com/) | Code editing benchmark | Agent vs. base model performance comparison |
+| [Berkeley Function-Calling Leaderboard](https://gorilla.cs.berkeley.edu/leaderboard.html) | Tool use evaluation | Model accuracy on function calling tasks |
+| [Evidently AI Agent Benchmarks](https://www.evidentlyai.com/blog/ai-agent-benchmarks) | Benchmark overview | Comprehensive list of agent evaluation methods |
+
+### Framework Documentation
+
+| Framework | Philosophy | Documentation |
+|-----------|------------|---------------|
+| [SmolAgents](https://github.com/huggingface/smolagents) | Minimal, code-first | ≈1,000 LOC core, 30% efficiency gain vs. JSON agents |
+| [LangGraph](https://langchain-ai.github.io/langgraph/) | Graph-based orchestration | Successor to LangChain for agent workflows |
+| [CrewAI](https://blog.crewai.com/) | Enterprise multi-agent | 60% Fortune 500 adoption, \$18M Series A |
+
+## Related Pages
+
+- <EntityLink id="light-scaffolding">Light Scaffolding</EntityLink> - Next step up in complexity
+- <EntityLink id="heavy-scaffolding">Heavy Scaffolding</EntityLink> - Full agentic systems
+- <EntityLink id="dense-transformers">Dense Transformers</EntityLink> - The underlying architecture

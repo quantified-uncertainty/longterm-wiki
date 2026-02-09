@@ -1,0 +1,230 @@
+---
+title: "Compute Governance: AI Chips Export Controls Policy"
+description: U.S. policies regulating advanced AI chip exports to manage AI development globally, particularly restrictions targeting China and coordination with allies.
+importance: 75
+lastEdited: "2026-02-01"
+sidebar:
+  order: 50
+ratings:
+  novelty: 3
+  rigor: 6
+  actionability: 7
+  completeness: 7
+quality: 58
+llmSummary: This is a comprehensive overview of U.S. AI chip export controls policy, documenting the evolution from blanket restrictions to case-by-case licensing while highlighting significant enforcement challenges and strategic incoherence. The analysis effectively connects hardware governance to broader AI safety considerations, though the relationship remains somewhat indirect.
+metrics:
+  wordCount: 2644
+  citations: 38
+  tables: 6
+  diagrams: 0
+clusters:
+  - ai-safety
+  - governance
+subcategory: governance
+---
+import {EntityLink, Backlinks, KeyPeople, KeyQuestions, Section} from '@components/wiki';
+
+## Quick Assessment
+
+| Aspect | Status |
+|--------|--------|
+| **Primary Goal** | Restrict adversary access to advanced AI chips while maintaining U.S. technological leadership |
+| **Key Mechanism** | Export controls on high-performance semiconductors (ECCN 3A090, 4A090) |
+| **Main Target** | China, with secondary restrictions on Russia, Iran, North Korea, Cuba, Venezuela, Macau |
+| **Recent Shift** | January 2026: Case-by-case licensing replaces presumption of denial for eligible chips to China |
+| **Enforcement Agency** | Bureau of Industry and Security (BIS), Department of Commerce |
+| **Major Criticism** | Strategically incoherent, legally questionable revenue-sharing, under-resourced enforcement |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [iaps.ai](https://www.iaps.ai/research/tag/Compute+governance) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/United_States_New_Export_Controls_on_Advanced_Computing_and_Semiconductors_to_China) |
+| arXiv | [arxiv.org](https://arxiv.org/abs/2404.18308) |
+
+
+## Overview
+
+Compute governance represents a method for monitoring and regulating AI systems by tracking the hardware required to develop frontier models[^1]. In the context of <EntityLink id="export-controls">AI chip export controls</EntityLink>, it encompasses U.S. government policies aimed at balancing technological leadership with national security by managing access to advanced semiconductors, particularly high-performance GPUs and AI-specific chips used for training large-scale AI systems.
+
+The current policy framework emerged from concerns about China's AI capabilities and potential military applications. AI chips—including NVIDIA A100/H100 series, AMD MI300 series, and Google TPUs—are essential for frontier AI training, which requires tens of thousands of chips operating in parallel[^2]. Because these chips are detectable, excludable, and concentrated in U.S.-allied supply chains, they serve as a potential "chokepoint" for <EntityLink id="ai-governance">AI governance</EntityLink>[^3].
+
+The U.S. has shifted from blanket restrictions to a more calibrated approach. Effective January 15, 2026, the Bureau of Industry and Security published a final rule marking a significant departure from previous policy[^4]. Rather than a presumption of denial for all advanced AI chips to China and Macau, the new framework evaluates license applications on a case-by-case basis, provided exports meet rigorous supply, security, and testing conditions[^4]. This represents the latest development in an evolving policy landscape that began with initial restrictions in 2022.
+
+## History and Policy Evolution
+
+### Conceptual Origins
+
+Compute governance as a framework emerged from AI safety and policy research communities around 2022-2023[^5]. The approach builds on the recognition that physical hardware is more tractable for regulation than intangible assets like data or algorithms. Organizations like BlueDot Impact and <EntityLink id="govai">GovAI</EntityLink> popularized the framework, emphasizing how AI chips' physical characteristics—detectability, excludability, and concentrated supply chains—make them suitable for regulatory intervention[^6].
+
+The intellectual foundation came from research emphasizing that cutting-edge AI requires massive computational resources. A 2023 report from the <EntityLink id="cset">Center for Security and Emerging Technology</EntityLink> (CSET) titled "AI Chips: What They Are and Why They Matter" highlighted export control opportunities via supply chain dominance[^7]. GovAI's analysis "Computing Power and the Governance of AI" outlined the detectability and excludability of chips in data centers as key governance leverage points[^8].
+
+### Timeline of Key Policy Developments
+
+| Date | Event | Details |
+|------|-------|---------|
+| 2022 | Initial chip restrictions | U.S. implements first major controls on high-performance AI chip exports to China |
+| 2023 | Policy refinement | Expansion of controls; Biden administration issues guidance on "nerfed" chips (H800/H200) |
+| July 2025 | AI Action Plan announced | White House releases "America's AI Action Plan" promoting full-stack AI exports to allies while tightening enforcement[^9] |
+| August-December 2025 | Revenue-sharing introduced | Trump administration conditions Nvidia licenses on 15-25% revenue payments[^10] |
+| January 2025 | AI Diffusion Rule | BIS creates ECCN 4E091 to control AI model weights[^11] |
+| January 15, 2026 | Major policy shift | Case-by-case licensing replaces presumption of denial for eligible chips[^12] |
+| January 14, 2026 | Tariff implementation | 25% tariff imposed on advanced chip imports for non-U.S. customers[^13] |
+| Early 2026 | Biden rule rescission | Trump administration rescinds AI Diffusion Rule while strengthening certain controls[^14] |
+
+### Recent Administrative Changes
+
+The Trump administration has implemented substantial revisions to the export control regime. In early 2026, the Department of Commerce rescinded the Biden-era AI Diffusion Rule while simultaneously strengthening certain semiconductor export controls[^14]. The administration issued guidance warning against using Chinese chips like Huawei Ascend and cautioned about consequences for allowing U.S. chips to train Chinese AI models[^15].
+
+A Presidential Proclamation formalized a 25% tariff on advanced AI chip imports intended for customers outside the United States[^13]. This was accompanied by controversial revenue-sharing arrangements requiring companies like Nvidia to pay 15% of H20 chip sales and 25% of H200 chip sales to China to the U.S. government[^10].
+
+## Current Policy Framework
+
+### Core Requirements and Mechanisms
+
+The January 2026 final rule establishes strict certification requirements that exporters and intended recipients must satisfy[^4]:
+
+**Performance Thresholds**: The regulation permits export of chips with total processing performance (TPP) less than 21,000 or total DRAM bandwidth less than 6,500 GB/s—representing chips up to 13 times more powerful than previously allowed[^16].
+
+**Supply and Volume Constraints**: Exports to China and Macau are capped at 50% of the number of chips shipped to U.S. customers for domestic use[^16]. Exporters must provide attestations of sufficient U.S. supply through auditable data demonstrating no diversion from U.S. or allied users[^17].
+
+**Security and Testing**: Advanced AI chips must undergo review by a qualified independent testing laboratory in the United States before each export shipment[^18]. Intended recipients must adopt and demonstrate compliance frameworks to the U.S. government ensuring chips will not undermine U.S. security interests[^18].
+
+**Know Your Customer (KYC)**: Exporters must conduct due diligence to confirm chips will not be used to train AI models for weapons of mass destruction or military intelligence[^19]. Location verification features in chip shipments are being explored to prevent illegal diversion to adversaries[^19].
+
+**Presumption of Denial Maintained**: For China-owned data centers located outside China and for chips exceeding the established thresholds, the presumption of denial remains in effect[^16].
+
+### Legislative Proposals
+
+Congress is considering several bills to strengthen or modify export controls[^20]:
+
+**GAIN AI Act (Guaranteeing Access and Innovation for National Artificial Intelligence)**: Would require chips to be prioritized for U.S. customers before export to certain countries. Includes a 15-day public notice period allowing U.S. buyers to express purchase interest[^21].
+
+**Chip Security Act** (introduced May 2025 by Sen. Tom Cotton, R-AR): Bipartisan legislation mandating "chip security mechanisms" such as export certificates, periodic location verification via server check-ins, and software-based authentication tools. Exporters would be required to report credible evidence of diversion, tampering, or unauthorized use[^22].
+
+**AI Overwatch Act** (introduced December 2025 by Chairman Mast): Would require congressional review of export licenses for advanced AI chips to China, with a 30-day notification period before licenses may be issued—similar to oversight of military sales[^20].
+
+**STRIDE Act** (Semiconductor Technology Resilience, Integrity, and Defense Enhancement): Would require State Department coordination with partner countries on semiconductor export controls[^20].
+
+### Strategic Objectives
+
+The overarching U.S. policy aims to promote American export of "full-stack AI export packages"—hardware, models, software, applications, and standards—to allied nations while simultaneously tightening enforcement on American adversaries[^23]. The approach reflects a shift from the Biden Administration's AI Diffusion Rule toward sustaining and enhancing America's global AI dominance[^24].
+
+## <EntityLink id="international-coordination">International Coordination</EntityLink> and Allied Responses
+
+The U.S. has sought to coordinate export controls with allies, though implementation varies significantly. The AI Action Plan calls for proactive, government-coordinated efforts to promote exports to allied nations while tightening enforcement against adversaries[^21]. Key allies including the EU, Netherlands, Germany, Japan, South Korea, and Taiwan have implemented list-based controls on AI chips and semiconductor manufacturing equipment[^25].
+
+However, allied authorities are generally narrower than U.S. capabilities under the Export Control Reform Act (ECRA) and Export Administration Regulations (EAR)[^25]. The Netherlands and Japan entered a trilateral deal with the U.S., though analysts note it is weaker than the U.S. regime, with ongoing challenges in aligning on technical thresholds like 16/14 nanometer logic chips[^26].
+
+A governance analysis recommends international harmonization of export controls, with the U.S. engaging partners to establish coordinated approaches[^27]. Strengthening institutional capacity requires U.S. attachés deployed to key transshipment hubs and information-sharing mechanisms with allies to disrupt diversion networks[^22].
+
+## Enforcement Challenges and Institutional Capacity
+
+### Resource Constraints
+
+The Bureau of Industry and Security faces significant resource constraints in enforcing export controls[^22]. Analysis reveals that "diversion of cutting-edge AI chips to China has exposed the limits of traditional export controls," with billions of dollars in illicit flows blunting the impact of 2022-2023 restrictions[^22].
+
+BIS is under-resourced for monitoring global supply chains, lacking sufficient staff, tools, and presence in key transshipment hubs[^22]. Recommended improvements include expanding BIS staffing, deploying supply chain analytics capabilities, monitoring end-use patterns across high-risk jurisdictions, and developing new export controls on semiconductor manufacturing sub-systems[^28].
+
+### Implementation Difficulties
+
+The onerous compliance requirements—including certifications regarding U.S. and global supply, end-user conditions, and provable enforceable controls—may be difficult for companies to meet[^29]. A January 14, 2026 letter from Representative Molenaar noted that the current global shortage of DRAM items poses challenges for meeting licensing requirements[^29].
+
+Critics argue that volume caps and the presumption of denial for China-owned data centers abroad are unenforceable without substantially enhanced monitoring capabilities[^30]. Loose implementation fails to achieve security goals, while strict implementation would effectively block most exports[^30].
+
+## Criticisms and Controversies
+
+### Strategic Incoherence
+
+The Council on Foreign Relations characterized the January 2026 regulation as "strategically incoherent," arguing it simultaneously acknowledges that exporting advanced AI chips to China poses serious national security risks while creating pathways to permit their sale[^30]. The policy authorizes "very large numbers of AI chip exports to China without enforceable guardrails that prevent their misuse," potentially allowing China's AI industry to close the gap with the United States and build the largest data centers in the world[^30].
+
+The revised thresholds permit chips 13 times more powerful than previously allowed, with critics contending this enables China's AI advancement and military applications despite weak compliance mechanisms[^31].
+
+### Legal Challenges
+
+Legal scholars argue the revenue-sharing arrangement is illegal under the Export Control Reform Act (ECRA), which explicitly prohibits charging fees for export licenses[^32]. The 25% tariff may also violate the Constitution's Export Clause, which prohibits taxes or duties on exports[^32]. The revenue-sharing demands—requiring companies to pay 15-25% of China sales revenues to the U.S. government—lack congressional authorization and constitute unauthorized taxation[^32].
+
+Companies and states potentially have standing to challenge these measures in court, as they exceed executive authority granted by Congress[^32].
+
+### Industry and Operational Concerns
+
+Know Your Customer requirements demand sensitive information from non-U.S. data centers, potentially disrupting operations and innovation outside the United States[^21]. The compliance burden—including identity assurance, physical access restrictions, remote-access controls, foundry capacity protections, and third-party technical testing—creates significant operational challenges[^33].
+
+Some industry voices express concern that excessive regulation risks stifling nascent AI development, though this must be balanced against national security imperatives[^34]. The historical fear of "killing AI" through over-regulation persists in certain quarters[^34].
+
+### Enforcement and Evasion
+
+Traditional export controls have proven inadequate due to chip diversion via transshipment through third countries[^22]. Infrastructure-as-a-Service (IaaS) providers—cloud computing services—offer a potential workaround to physical chip controls, as they enable indirect access to controlled computational resources[^35]. This suggests the need for diplomatic engagement with allies hosting major cloud providers to coordinate governance approaches[^35].
+
+## Connection to AI Safety and Governance
+
+The relationship between chip export controls and AI safety remains somewhat indirect in available policy analyses. The underlying governance logic relates to capability containment: restricting advanced chip access to potential adversaries aims to limit deployment of large-scale AI systems, which some analysts argue creates a critical window for maintaining technological leadership[^26].
+
+However, this window may be temporary. Research notes that hardware and algorithmic advances continuously reduce the number of chips needed per model capability, providing only a time-limited safety benefit[^36]. The efficacy of chip controls erodes as efficiency gains allow more powerful models to be trained with fewer resources[^36].
+
+Proposed mechanisms include international registries for AI chips, cryptographic enforcement on chips to restrict tasks or verify licenses, reporting requirements for large training runs, and "secure, governable chips" with hardened security modules to block unauthorized use[^37]. These on-chip governance mechanisms could theoretically support AI safety objectives, though implementation faces substantial technical and diplomatic challenges.
+
+The search results frame export controls primarily as geopolitical and economic policy rather than as direct AI safety measures focused on <EntityLink id="misuse-risks">misuse risks</EntityLink> or existential risk mitigation. A more comprehensive connection to <EntityLink id="alignment">AI alignment</EntityLink> research priorities would require examining how compute restrictions affect development timelines for advanced AI systems and the window available for safety research.
+
+## Key Uncertainties
+
+Several critical uncertainties surround the effectiveness and trajectory of AI chip export controls:
+
+**Enforcement Efficacy**: Whether the U.S. can effectively prevent diversion of chips through transshipment networks and cloud computing workarounds remains unclear. The scale of illicit flows documented suggests significant enforcement gaps[^22].
+
+**Allied Coordination**: The degree to which key allies will harmonize their export control regimes with U.S. standards is uncertain, with current implementations showing substantial variation[^25].
+
+**Technological Trajectories**: How rapidly algorithmic efficiency and hardware improvements will erode the effectiveness of chip-based controls is unknown. If efficiency gains are rapid, the governance window may be shorter than anticipated[^36].
+
+**Legal Sustainability**: Whether revenue-sharing arrangements and tariff structures will survive legal challenges remains to be determined[^32].
+
+**Policy Stability**: The significant shifts between administrations (Biden to Trump) raise questions about the long-term stability and coherence of the export control framework[^14].
+
+**Impact on Innovation**: The net effect of controls on U.S. AI innovation and competitiveness is unclear, with competing claims about whether restrictions help or hinder American leadership[^34].
+
+**China's Response**: How effectively China can develop domestic alternatives to U.S. chips, either through indigenous innovation or procurement from non-U.S. sources, will significantly determine policy outcomes[^38].
+
+## Sources
+
+[^1]: [AI Safety Fundamentals - Compute Governance Primer](https://blog.bluedot.org/p/primer-on-ai-chips)
+[^2]: [BlueDot Impact - Primer on AI Chips](https://blog.bluedot.org/p/primer-on-ai-chips)
+[^3]: [GovAI - Computing Power and the Governance of AI](https://www.governance.ai/analysis/computing-power-and-the-governance-of-ai)
+[^4]: [Morgan Lewis - BIS Revises Export Review Policy for Advanced AI Chips to China and Macau](https://www.morganlewis.com/pubs/2026/01/bis-revises-export-review-policy-for-advanced-ai-chips-destined-for-china-and-macau)
+[^5]: [AISafety.info - What is Compute Governance](https://aisafety.info/questions/MSJK/What-is-compute-governance)
+[^6]: [GovAI - Computing Power and the Governance of AI](https://www.governance.ai/analysis/computing-power-and-the-governance-of-ai)
+[^7]: [CSET - AI Chips: What They Are and Why They Matter](https://cset.georgetown.edu/publication/ai-chips-what-they-are-and-why-they-matter/)
+[^8]: [GovAI - Computing Power and the Governance of AI](https://www.governance.ai/analysis/computing-power-and-the-governance-of-ai)
+[^9]: [White House - Promoting the Export of the American AI Technology Stack](https://www.whitehouse.gov/presidential-actions/2025/07/promoting-the-export-of-the-american-ai-technology-stack/)
+[^10]: [Lawfare - Trump's Illegal AI Chip Export Controls](https://www.lawfaremedia.org/article/trump-s-illegal-ai-chip-export-controls--and-who-can-challenge-them)
+[^11]: [CSIS - Understanding U.S. Allies' Current Legal Authority](https://www.csis.org/analysis/understanding-us-allies-current-legal-authority-implement-ai-and-semiconductor-export)
+[^12]: [Morgan Lewis - BIS Revises Export Review Policy](https://www.morganlewis.com/pubs/2026/01/bis-revises-export-review-policy-for-advanced-ai-chips-destined-for-china-and-macau)
+[^13]: [Mayer Brown - Administration Policies on Advanced AI Chips Codified](https://www.mayerbrown.com/en/insights/publications/2026/01/administration-policies-on-advanced-ai-chips-codified)
+[^14]: [BIS - Department of Commerce Announces Rescission of Biden-Era AI Diffusion Rule](https://www.bis.gov/press-release/department-commerce-announces-rescission-biden-era-artificial-intelligence-diffusion-rule-strengthens)
+[^15]: [Congressional Research Service - U.S. Export Controls and China: Advanced Semiconductors](https://www.congress.gov/crs-product/R48642)
+[^16]: [CFR - New AI Chip Export Policy to China: Strategically Incoherent and Unenforceable](https://www.cfr.org/articles/new-ai-chip-export-policy-china-strategically-incoherent-and-unenforceable)
+[^17]: [Alvarez & Marsal - BIS Revises Review Policy for H200 AI Chip Exports](https://www.alvarezandmarsal.com/thought-leadership/bis-revises-review-policy-for-h200-ai-chip-exports-what-changed-what-did-not-and-what-companies-and-investors-should-do-now)
+[^18]: [Morgan Lewis - BIS Revises Export Review Policy](https://www.morganlewis.com/pubs/2026/01/bis-revises-export-review-policy-for-advanced-ai-chips-destined-for-china-and-macau)
+[^19]: [Data Center Knowledge - AI Chip Export Controls: A New Challenge](https://www.datacenterknowledge.com/data-center-chips/ai-chip-export-controls-a-new-challenge-for-data-center-operators)
+[^20]: [Mayer Brown - Administration Policies on Advanced AI Chips Codified](https://www.mayerbrown.com/en/insights/publications/2026/01/administration-policies-on-advanced-ai-chips-codified)
+[^21]: [Data Center Knowledge - AI Chip Export Controls: A New Challenge](https://www.datacenterknowledge.com/data-center-chips/ai-chip-export-controls-a-new-challenge-for-data-center-operators)
+[^22]: [CSIS - Architecture for AI Leadership: Enforcement, Innovation, and Global Trust](https://www.csis.org/analysis/architecture-ai-leadership-enforcement-innovation-and-global-trust)
+[^23]: [GovAI - Export Controls and Export Promotion](https://www.governance.ai/research-paper/export-controls-and-export-promotion)
+[^24]: [GovAI - Export Controls and Export Promotion](https://www.governance.ai/research-paper/export-controls-and-export-promotion)
+[^25]: [CSIS - Understanding U.S. Allies' Current Legal Authority](https://www.csis.org/analysis/understanding-us-allies-current-legal-authority-implement-ai-and-semiconductor-export)
+[^26]: [Law & Economics Center - US Export Controls on AI and Semiconductors: Two Divergent Visions](https://laweconcenter.org/resources/us-export-controls-on-ai-and-semiconductors-two-divergent-visions/)
+[^27]: [GovAI - Accessing Controlled AI Chips via Infrastructure-as-a-Service](https://cdn.governance.ai/Accessing_Controlled_AI_Chips_via_Infrastructure-as-a-Service.pdf)
+[^28]: [Data Center Knowledge - AI Chip Export Controls: A New Challenge](https://www.datacenterknowledge.com/data-center-chips/ai-chip-export-controls-a-new-challenge-for-data-center-operators)
+[^29]: [Pillsbury - Trump Advanced AI Semiconductors Actions](https://www.pillsburylaw.com/en/news-and-insights/trump-advanced-ai-semiconductors-actions.html)
+[^30]: [CFR - New AI Chip Export Policy to China: Strategically Incoherent and Unenforceable](https://www.cfr.org/articles/new-ai-chip-export-policy-china-strategically-incoherent-and-unenforceable)
+[^31]: [Mayer Brown - Administration Policies on Advanced AI Chips Codified](https://www.mayerbrown.com/en/insights/publications/2026/01/administration-policies-on-advanced-ai-chips-codified)
+[^32]: [Lawfare - Trump's Illegal AI Chip Export Controls](https://www.lawfaremedia.org/article/trump-s-illegal-ai-chip-export-controls--and-who-can-challenge-them)
+[^33]: [Alvarez & Marsal - BIS Revises Review Policy for H200 AI Chip Exports](https://www.alvarezandmarsal.com/thought-leadership/bis-revises-review-policy-for-h200-ai-chip-exports-what-changed-what-did-not-and-what-companies-and-investors-should-do-now)
+[^34]: [The Regulatory Review - The United States Regulates Artificial Intelligence with Export Controls](https://www.theregreview.org/2025/09/25/flatley-the-united-states-regulates-artificial-intelligence-with-export-controls/)
+[^35]: [GovAI - Accessing Controlled AI Chips via Infrastructure-as-a-Service](https://cdn.governance.ai/Accessing_Controlled_AI_Chips_via_Infrastructure-as-a-Service.pdf)
+[^36]: [BlueDot Impact - Primer on AI Chips](https://blog.bluedot.org/p/primer-on-ai-chips)
+[^37]: [CNAS - Secure, Governable Chips](https://www.cnas.org/publications/reports/secure-governable-chips)
+[^38]: [Congressional Research Service - U.S. Export Controls and China](https://www.congress.gov/crs-product/R48642)
+
+<Backlinks />

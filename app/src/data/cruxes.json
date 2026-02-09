@@ -1,0 +1,2621 @@
+[
+  {
+    "id": "mesa-optimization",
+    "question": "Will advanced AI systems contain mesa-optimizers?",
+    "domain": "Foundations",
+    "description": "Whether neural networks trained via gradient descent will develop internal optimizing processes with their own objectives distinct from the training objective.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "No clear mesa-optimizers in current systems; theoretical arguments contested",
+    "positions": [
+      {
+        "view": "Mesa-optimization is likely in advanced systems",
+        "probability": "40-55%",
+        "holders": [
+          "Evan Hubinger",
+          "MIRI researchers"
+        ],
+        "implications": "Need robust alignment of learned objectives; inner alignment critical"
+      },
+      {
+        "view": "Mesa-optimization is possible but may be detectable",
+        "probability": "30-40%",
+        "holders": [
+          "Some Anthropic researchers"
+        ],
+        "implications": "Interpretability research may help; monitoring important"
+      },
+      {
+        "view": "Mesa-optimization is unlikely or avoidable",
+        "probability": "15-25%",
+        "holders": [
+          "Some ML researchers"
+        ],
+        "implications": "Focus on outer alignment; mesa-optimization may not be central risk"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Clear evidence of mesa-optimization in current or future models",
+      "Theoretical results on when/whether SGD produces mesa-optimizers",
+      "Interpretability findings on internal optimization structure",
+      "Scaling experiments on optimization behavior"
+    ],
+    "relatedCruxes": [
+      "deceptive-alignment",
+      "situational-awareness"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Risks from Learned Optimization",
+        "url": "https://arxiv.org/abs/1906.01820"
+      }
+    ]
+  },
+  {
+    "id": "deceptive-alignment",
+    "question": "Is deceptive alignment a likely failure mode?",
+    "domain": "Foundations",
+    "description": "Whether sufficiently advanced AI systems will strategically appear aligned during training while pursuing different objectives once deployed.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "No observed cases; 'Sleeper Agents' shows backdoors persist; theoretical concern",
+    "positions": [
+      {
+        "view": "Deceptive alignment is very likely",
+        "probability": "50-85%",
+        "holders": [
+          "Eliezer Yudkowsky",
+          "MIRI"
+        ],
+        "implications": "Standard training won't produce aligned AI; need fundamentally different approaches"
+      },
+      {
+        "view": "Deceptive alignment is possible but detectable",
+        "probability": "30-50%",
+        "holders": [
+          "Paul Christiano",
+          "Some Anthropic researchers"
+        ],
+        "implications": "Interpretability and evaluation critical; can potentially catch deception"
+      },
+      {
+        "view": "Deceptive alignment is unlikely",
+        "probability": "15-30%",
+        "holders": [
+          "Neel Nanda",
+          "Some ML researchers"
+        ],
+        "implications": "Current training approaches may be sufficient with careful scaling"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Evidence of deceptive behavior in current/future models",
+      "Theoretical results on whether gradient descent selects for deception",
+      "Interpretability success in detecting deceptive cognition",
+      "Long-term deployment outcomes"
+    ],
+    "relatedCruxes": [
+      "mesa-optimization",
+      "situational-awareness",
+      "interpretability-tractability"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Risks from Learned Optimization",
+        "url": "https://arxiv.org/abs/1906.01820"
+      },
+      {
+        "title": "Sleeper Agents",
+        "url": "https://arxiv.org/abs/2401.05566"
+      }
+    ]
+  },
+  {
+    "id": "situational-awareness",
+    "question": "When will AI systems develop situational awareness about being AI?",
+    "domain": "Foundations",
+    "description": "When AI systems will understand that they are AI systems being trained/evaluated, and reason about this strategically.",
+    "importance": "critical",
+    "resolvability": "soon",
+    "currentState": "Current LLMs have some self-knowledge; unclear if strategic reasoning about training",
+    "positions": [
+      {
+        "view": "Near-term (GPT-5 era)",
+        "probability": "35-50%",
+        "holders": [
+          "Anthropic researchers"
+        ],
+        "implications": "Urgent need for evaluations; deceptive alignment risk is near-term"
+      },
+      {
+        "view": "Mid-term (2-5 years)",
+        "probability": "30-40%",
+        "implications": "Time to develop defenses; monitoring increasingly important"
+      },
+      {
+        "view": "Requires superintelligence or never happens",
+        "probability": "15-25%",
+        "implications": "Other failure modes more pressing; deceptive alignment may be non-issue"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Evaluations for situational awareness in new models",
+      "Evidence of models reasoning strategically about training",
+      "Research on prerequisites for situational awareness"
+    ],
+    "relatedCruxes": [
+      "deceptive-alignment",
+      "mesa-optimization"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Situational Awareness evaluations",
+        "url": "https://arxiv.org/abs/2309.00667"
+      }
+    ]
+  },
+  {
+    "id": "alignment-hardness",
+    "question": "How hard is the core alignment problem?",
+    "domain": "Alignment Difficulty",
+    "description": "Whether aligning superintelligent AI with human values is fundamentally difficult or tractable with sufficient research.",
+    "importance": "critical",
+    "resolvability": "decades",
+    "currentState": "Deeply contested; no consensus",
+    "positions": [
+      {
+        "view": "Alignment is extremely hard / near-impossible",
+        "probability": "20-35%",
+        "holders": [
+          "MIRI",
+          "Eliezer Yudkowsky"
+        ],
+        "implications": "Slowing AI development may be only viable strategy; coordination paramount"
+      },
+      {
+        "view": "Alignment is hard but tractable with sufficient research",
+        "probability": "40-55%",
+        "holders": [
+          "Anthropic",
+          "OpenAI safety team"
+        ],
+        "implications": "Prioritize alignment research; race between capabilities and alignment"
+      },
+      {
+        "view": "Alignment is not as hard as commonly believed",
+        "probability": "15-25%",
+        "holders": [
+          "Some ML researchers",
+          "Optimists"
+        ],
+        "implications": "Current approaches may scale; focus on governance over technical research"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Scaling results on alignment techniques",
+      "Theoretical progress on alignment fundamentals",
+      "Evidence from increasingly capable systems",
+      "Success or failure of alignment approaches on GPT-5+ level systems"
+    ],
+    "relatedCruxes": [
+      "scalable-oversight",
+      "interpretability-tractability"
+    ],
+    "relevantResearch": [
+      {
+        "title": "AGI Safety Literature Review",
+        "url": "https://arxiv.org/abs/2309.01933"
+      }
+    ]
+  },
+  {
+    "id": "scalable-oversight",
+    "question": "Can human oversight scale to superintelligent systems?",
+    "domain": "Alignment Difficulty",
+    "description": "Whether techniques like debate, recursive reward modeling, or AI-assisted evaluation can provide adequate oversight of systems smarter than humans.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Promising theoretical frameworks; limited empirical validation",
+    "positions": [
+      {
+        "view": "Scalable oversight can work",
+        "probability": "35-50%",
+        "holders": [
+          "Paul Christiano",
+          "ARC",
+          "Anthropic"
+        ],
+        "implications": "Invest heavily in debate, IDA, recursive reward modeling research"
+      },
+      {
+        "view": "Scalable oversight is possible but very difficult",
+        "probability": "30-40%",
+        "holders": [
+          "Some AI safety researchers"
+        ],
+        "implications": "Need multiple complementary approaches; single technique won't suffice"
+      },
+      {
+        "view": "Scalable oversight will fundamentally fail",
+        "probability": "15-30%",
+        "holders": [
+          "MIRI",
+          "Some pessimists"
+        ],
+        "implications": "Need different approach to alignment; oversight paradigm may be wrong"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Empirical results from debate/IDA experiments",
+      "Theoretical analysis of oversight limits",
+      "Evidence on whether AI-assisted evaluation can detect AI deception",
+      "Scaling results on oversight techniques"
+    ],
+    "relatedCruxes": [
+      "alignment-hardness",
+      "interpretability-tractability"
+    ],
+    "relevantResearch": [
+      {
+        "title": "AI Safety via Debate",
+        "url": "https://arxiv.org/abs/1805.00899"
+      },
+      {
+        "title": "Iterated Distillation and Amplification",
+        "url": "https://arxiv.org/abs/1810.08575"
+      }
+    ]
+  },
+  {
+    "id": "interpretability-tractability",
+    "question": "Can interpretability research succeed in understanding advanced AI?",
+    "domain": "Alignment Difficulty",
+    "description": "Whether mechanistic interpretability can scale to provide meaningful understanding of frontier model cognition.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Progress on small/medium models; frontier model interpretability limited",
+    "positions": [
+      {
+        "view": "Interpretability can scale to frontier models",
+        "probability": "30-45%",
+        "holders": [
+          "Chris Olah",
+          "Anthropic interpretability team"
+        ],
+        "implications": "Prioritize interpretability research; may enable detecting deception"
+      },
+      {
+        "view": "Interpretability will provide partial understanding",
+        "probability": "35-45%",
+        "holders": [
+          "Many AI safety researchers"
+        ],
+        "implications": "Useful as one tool among many; won't be complete solution"
+      },
+      {
+        "view": "Interpretability won't scale to meaningful understanding",
+        "probability": "20-30%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Focus on behavioral evaluation; black-box approaches; don't rely on interpretability"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Scaling results from interpretability on larger models",
+      "Ability to detect deceptive cognition via interpretability",
+      "Novel interpretability techniques",
+      "Theoretical results on interpretability limits"
+    ],
+    "relatedCruxes": [
+      "deceptive-alignment",
+      "scalable-oversight"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Anthropic Interpretability",
+        "url": "https://www.anthropic.com/research#interpretability"
+      },
+      {
+        "title": "Circuits Work",
+        "url": "https://distill.pub/2020/circuits/"
+      }
+    ]
+  },
+  {
+    "id": "emergent-capabilities",
+    "question": "Will dangerous capabilities emerge unpredictably?",
+    "domain": "Capabilities",
+    "description": "Whether scaling will produce sudden, unpredictable jumps in dangerous capabilities without warning.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Some emergent capabilities observed; predictability debated",
+    "positions": [
+      {
+        "view": "Dangerous capabilities will emerge unpredictably",
+        "probability": "35-50%",
+        "holders": [
+          "Some AI safety researchers"
+        ],
+        "implications": "Need robust evals before each scale-up; precautionary approach; expect surprises"
+      },
+      {
+        "view": "Capabilities will be more predictable than feared",
+        "probability": "30-40%",
+        "holders": [
+          "Some scaling laws researchers"
+        ],
+        "implications": "Scaling laws provide warning; can anticipate and prepare"
+      },
+      {
+        "view": "Emergence is a mirage; capabilities predictable from compute",
+        "probability": "20-30%",
+        "holders": [
+          "Some ML researchers"
+        ],
+        "implications": "Focus on compute governance; emergence is not the core risk"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Empirical data on capability emergence with scale",
+      "Theoretical understanding of emergence",
+      "Success of dangerous capability evaluations",
+      "Surprises from frontier models"
+    ],
+    "relatedCruxes": [
+      "capability-control-gap"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Are Emergent Abilities a Mirage?",
+        "url": "https://arxiv.org/abs/2304.15004"
+      },
+      {
+        "title": "Emergent Capabilities paper",
+        "url": "https://arxiv.org/abs/2206.07682"
+      }
+    ]
+  },
+  {
+    "id": "capability-control-gap",
+    "question": "Will there be a dangerous gap between capabilities and control?",
+    "domain": "Capabilities",
+    "description": "Whether AI capabilities will outpace our ability to control/align them, creating a dangerous window.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Gap arguably exists now for some capabilities; trajectory unclear",
+    "positions": [
+      {
+        "view": "Dangerous gap is likely/inevitable",
+        "probability": "40-55%",
+        "holders": [
+          "Most AI safety researchers"
+        ],
+        "implications": "Urgent alignment research; coordination to slow capabilities; prepare for gap"
+      },
+      {
+        "view": "Gap is possible but can be avoided with coordination",
+        "probability": "30-40%",
+        "implications": "Invest in both capabilities and alignment; governance critical"
+      },
+      {
+        "view": "Alignment will keep pace with capabilities",
+        "probability": "15-25%",
+        "holders": [
+          "Some optimists"
+        ],
+        "implications": "Focus on responsible scaling; alignment research is on track"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Relative progress rates of capabilities vs alignment",
+      "Lab coordination on responsible scaling",
+      "Success of alignment techniques on frontier models"
+    ],
+    "relatedCruxes": [
+      "alignment-hardness",
+      "emergent-capabilities"
+    ]
+  },
+  {
+    "id": "power-seeking",
+    "question": "Will advanced AI systems be power-seeking?",
+    "domain": "Failure Modes",
+    "description": "Whether advanced AI systems will convergently seek resources, influence, and self-preservation regardless of final goals.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Theoretical arguments strong; limited empirical evidence in current systems",
+    "positions": [
+      {
+        "view": "Power-seeking is convergently instrumental",
+        "probability": "45-60%",
+        "holders": [
+          "Omohundro",
+          "Bostrom",
+          "Most AI safety researchers"
+        ],
+        "implications": "Need to prevent resource/power acquisition; containment and corrigibility critical"
+      },
+      {
+        "view": "Power-seeking depends on goal structure and training",
+        "probability": "30-40%",
+        "implications": "Can train against power-seeking; not inevitable"
+      },
+      {
+        "view": "Power-seeking requires specific goal types that may be avoidable",
+        "probability": "15-25%",
+        "implications": "Focus on avoiding power-seeking goals; less fundamental concern"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Evidence of power-seeking in current models",
+      "Theoretical analysis of when power-seeking emerges",
+      "Training approaches that demonstrably prevent power-seeking",
+      "Empirical results from power-seeking evaluations"
+    ],
+    "relatedCruxes": [
+      "deceptive-alignment",
+      "corrigibility"
+    ],
+    "relevantResearch": [
+      {
+        "title": "The Basic AI Drives",
+        "url": "https://selfawaresystems.com/2007/11/30/paper-on-the-basic-ai-drives/"
+      },
+      {
+        "title": "Optimal Policies Tend to Seek Power",
+        "url": "https://arxiv.org/abs/1912.01683"
+      }
+    ]
+  },
+  {
+    "id": "corrigibility",
+    "question": "Can we build AI systems that remain corrigible?",
+    "domain": "Failure Modes",
+    "description": "Whether AI systems can be designed to allow human correction and shutdown without resisting.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Theoretical challenges identified; some empirical work on shutdown problems",
+    "positions": [
+      {
+        "view": "Full corrigibility is achievable",
+        "probability": "20-35%",
+        "holders": [
+          "Some researchers"
+        ],
+        "implications": "Prioritize corrigibility research; could solve control problem"
+      },
+      {
+        "view": "Partial corrigibility possible; full corrigibility hard",
+        "probability": "40-50%",
+        "holders": [
+          "Most safety researchers"
+        ],
+        "implications": "Use corrigibility as one layer; defense in depth"
+      },
+      {
+        "view": "Corrigibility is fundamentally at odds with capable agency",
+        "probability": "20-30%",
+        "holders": [
+          "Some pessimists"
+        ],
+        "implications": "Corrigibility may not be the answer; need other approaches"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Theoretical solutions to corrigibility problems",
+      "Empirical demonstrations of corrigible systems",
+      "Evidence that capable agency requires anti-corrigibility"
+    ],
+    "relatedCruxes": [
+      "power-seeking",
+      "alignment-hardness"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Corrigibility (Soares et al.)",
+        "url": "https://intelligence.org/files/Corrigibility.pdf"
+      }
+    ]
+  },
+  {
+    "id": "reward-hacking",
+    "question": "Is reward hacking preventable at scale?",
+    "domain": "Failure Modes",
+    "description": "Whether we can specify reward functions that advanced AI systems won't find unexpected ways to maximize.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Reward hacking observed in RL systems; mitigation techniques developing",
+    "positions": [
+      {
+        "view": "Reward hacking is preventable with better reward modeling",
+        "probability": "30-40%",
+        "holders": [
+          "Some OpenAI researchers",
+          "RLHF advocates"
+        ],
+        "implications": "Invest in reward modeling; process supervision; iterative refinement"
+      },
+      {
+        "view": "Reward hacking is manageable but never fully solved",
+        "probability": "40-50%",
+        "holders": [
+          "Most AI safety researchers"
+        ],
+        "implications": "Defense in depth needed; monitoring essential; expect ongoing cat-and-mouse"
+      },
+      {
+        "view": "Reward hacking is fundamental and unavoidable at scale",
+        "probability": "15-25%",
+        "holders": [
+          "Some pessimists"
+        ],
+        "implications": "Need fundamentally different paradigms; reward-based training may be wrong approach"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Evidence on reward hacking in larger models",
+      "Success of reward modeling techniques",
+      "Process-based approaches showing promise"
+    ],
+    "relatedCruxes": [
+      "alignment-hardness"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Deep RL from Human Preferences",
+        "url": "https://arxiv.org/abs/1706.03741"
+      },
+      {
+        "title": "Specification Gaming Examples",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRPiprOaC3HsCf5Tuum8bRfzYUiKLRqJmbOoC-32JorNdfyTiRRsR7Ea5eWtvsWzuxo8bjOxCG84dAg/pubhtml"
+      }
+    ]
+  },
+  {
+    "id": "detection-arms-race",
+    "question": "Can AI detection keep pace with AI generation?",
+    "domain": "Authentication & Verification",
+    "description": "Whether deepfake detection, text detection, and content verification can match the pace of synthetic content generation.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Detection currently losing; gap widening",
+    "positions": [
+      {
+        "view": "Detection will fall permanently behind",
+        "probability": "40-60%",
+        "holders": [
+          "Hany Farid",
+          "Most deepfake researchers"
+        ],
+        "implications": "Must shift to provenance-based authentication; detection-based approaches are dead end"
+      },
+      {
+        "view": "Equilibrium will emerge",
+        "probability": "20-40%",
+        "implications": "Both approaches valuable; detection as complement to provenance"
+      },
+      {
+        "view": "Detection can win with enough resources",
+        "probability": "10-30%",
+        "implications": "Invest heavily in detection research and deployment"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Major breakthrough in AI detection that generalizes across generators",
+      "Theoretical proof that detection is fundamentally harder than generation",
+      "Real-world data on detection accuracy trends over time",
+      "Adversarial testing at scale showing detection robustness (or lack thereof)"
+    ],
+    "relatedCruxes": [
+      "authentication-adoption",
+      "trust-rebuilding"
+    ],
+    "relevantResearch": [
+      {
+        "title": "AI-generated text detection unreliable",
+        "url": "https://arxiv.org/abs/2303.11156"
+      },
+      {
+        "title": "DARPA MediFor",
+        "url": "https://www.darpa.mil/program/media-forensics"
+      }
+    ]
+  },
+  {
+    "id": "authentication-adoption",
+    "question": "Will content authentication (C2PA) achieve critical mass adoption?",
+    "domain": "Authentication & Verification",
+    "description": "Whether standards like C2PA will be adopted widely enough to create a two-tier content ecosystem (authenticated vs. unauthenticated).",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Early deployment; major platforms uncommitted",
+    "positions": [
+      {
+        "view": "Authentication will achieve critical mass",
+        "probability": "25-40%",
+        "holders": [
+          "C2PA consortium members",
+          "Some tech companies"
+        ],
+        "implications": "Invest in authentication infrastructure; future is authenticated content"
+      },
+      {
+        "view": "Authentication will be partial; unauthenticated content will remain",
+        "probability": "40-50%",
+        "implications": "Two-tier system; authenticated for high-stakes; unauthenticated for casual"
+      },
+      {
+        "view": "Authentication won't achieve meaningful adoption",
+        "probability": "20-30%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Focus on other approaches; authentication alone won't solve the problem"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Major platforms (Meta, TikTok, Twitter) committing to C2PA display",
+      "Camera manufacturers shipping authentication by default",
+      "Evidence that users value/use credentials in practice",
+      "Major failure of authentication system (hacking, gaming)"
+    ],
+    "relatedCruxes": [
+      "detection-arms-race"
+    ],
+    "relevantResearch": [
+      {
+        "title": "C2PA Specification",
+        "url": "https://c2pa.org/"
+      },
+      {
+        "title": "Content Authenticity Initiative",
+        "url": "https://contentauthenticity.org/"
+      }
+    ]
+  },
+  {
+    "id": "trust-rebuilding",
+    "question": "Can institutional trust be rebuilt after collapse?",
+    "domain": "Social Epistemics",
+    "description": "Whether, once trust in institutions collapses, there are mechanisms to rebuild it—or if collapse is a one-way door.",
+    "importance": "critical",
+    "resolvability": "decades",
+    "currentState": "Trust declining; no proven rebuild mechanisms",
+    "positions": [
+      {
+        "view": "Trust collapse is reversible",
+        "probability": "30-40%",
+        "implications": "Invest in institutional reform; focus on earning trust through demonstrated reliability"
+      },
+      {
+        "view": "Trust can stabilize at lower level",
+        "probability": "30-40%",
+        "implications": "Accept new equilibrium; build systems that work with low trust"
+      },
+      {
+        "view": "Trust collapse is self-reinforcing spiral",
+        "probability": "20-30%",
+        "holders": [
+          "Some political scientists"
+        ],
+        "implications": "Preventing collapse is critical; once started, may be irreversible"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Historical examples of successful trust rebuilding after collapse",
+      "Mechanisms that demonstrably rebuild trust in experimental settings",
+      "Evidence that trust is stabilizing (Edelman data, Gallup)",
+      "New institutions gaining broad trust"
+    ],
+    "relatedCruxes": [
+      "polarization-trajectory"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Edelman Trust Barometer",
+        "url": "https://www.edelman.com/trust"
+      },
+      {
+        "title": "Fukuyama: Trust",
+        "url": ""
+      }
+    ]
+  },
+  {
+    "id": "expertise-preservation",
+    "question": "Can human expertise be preserved alongside AI assistance?",
+    "domain": "Human Factors",
+    "description": "Whether humans can maintain evaluative skills while routinely using AI, or if skill atrophy is inevitable.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Early evidence of atrophy in some domains (navigation, aviation)",
+    "positions": [
+      {
+        "view": "Expertise can be preserved with intentional design",
+        "probability": "30-40%",
+        "holders": [
+          "Some HCI researchers"
+        ],
+        "implications": "Design AI to support rather than replace skills; training regimens essential"
+      },
+      {
+        "view": "Partial atrophy inevitable but manageable",
+        "probability": "40-50%",
+        "holders": [
+          "Aviation human factors researchers"
+        ],
+        "implications": "Accept some skill loss; maintain minimum competencies; design for failure modes"
+      },
+      {
+        "view": "Atrophy is largely inevitable with AI use",
+        "probability": "20-30%",
+        "holders": [
+          "Some critics of automation"
+        ],
+        "implications": "Limit AI use in critical domains; accept humans will become oversight-only"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Longitudinal studies on skill retention with AI use",
+      "Evidence from domains with long AI assistance history (aviation, radiology)",
+      "Successful skill preservation programs",
+      "Analysis of what skills are actually needed for oversight"
+    ],
+    "relatedCruxes": [
+      "human-ai-complementarity"
+    ],
+    "relevantResearch": [
+      {
+        "title": "The Glass Cage",
+        "url": "https://www.nicholascarr.com/"
+      },
+      {
+        "title": "FAA Human Factors",
+        "url": "https://www.faa.gov/about/initiatives/maintenance_hf"
+      }
+    ]
+  },
+  {
+    "id": "sycophancy-solvability",
+    "question": "Can AI sycophancy be eliminated without sacrificing user satisfaction?",
+    "domain": "AI Behavior",
+    "description": "Whether AI systems can be designed to be honest (disagreeing when users are wrong) while remaining popular/useful.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Sycophancy is default behavior; anti-sycophancy training in development",
+    "positions": [
+      {
+        "view": "Honesty and popularity are compatible",
+        "probability": "30-40%",
+        "holders": [
+          "Anthropic (Constitutional AI)"
+        ],
+        "implications": "Invest in training honest AI; users will adapt"
+      },
+      {
+        "view": "Trade-off is real but manageable",
+        "probability": "40-50%",
+        "implications": "Design different modes (coach vs assistant); accept some sycophancy in some contexts"
+      },
+      {
+        "view": "Users will always prefer agreeable AI",
+        "probability": "20-30%",
+        "implications": "Market pressure will push toward sycophancy; need non-market solutions"
+      }
+    ],
+    "wouldUpdateOn": [
+      "User studies showing preference for honest AI",
+      "Commercial success of less-sycophantic AI",
+      "Research on framing/presenting disagreement effectively",
+      "Long-term effects of sycophantic AI on user beliefs"
+    ],
+    "relatedCruxes": [
+      "detection-arms-race"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Anthropic sycophancy research",
+        "url": "https://arxiv.org/abs/2310.13548"
+      },
+      {
+        "title": "Constitutional AI",
+        "url": "https://arxiv.org/abs/2212.08073"
+      }
+    ]
+  },
+  {
+    "id": "coordination-feasibility",
+    "question": "Can AI governance achieve meaningful international coordination?",
+    "domain": "Coordination",
+    "description": "Whether nations with competing interests can coordinate on AI governance, especially around epistemic issues.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Early summits; no binding agreements; great power competition",
+    "positions": [
+      {
+        "view": "Meaningful coordination is achievable",
+        "probability": "20-35%",
+        "holders": [
+          "GovAI researchers",
+          "Some diplomats"
+        ],
+        "implications": "Invest in international institutions; AI safety summits are valuable"
+      },
+      {
+        "view": "Limited coordination possible on specific risks",
+        "probability": "40-50%",
+        "holders": [
+          "Most governance researchers"
+        ],
+        "implications": "Focus on narrow agreements; compute governance; don't expect broad coordination"
+      },
+      {
+        "view": "Geopolitical competition will prevent meaningful coordination",
+        "probability": "25-35%",
+        "holders": [
+          "Some realists"
+        ],
+        "implications": "Focus on domestic policy; prepare for uncoordinated AI development"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Success/failure of AI Safety Summits",
+      "Binding international agreements on AI",
+      "Evidence of coordination on compute governance",
+      "Defection from voluntary commitments by major players"
+    ],
+    "relatedCruxes": [
+      "trust-rebuilding"
+    ],
+    "relevantResearch": [
+      {
+        "title": "GovAI",
+        "url": "https://www.governance.ai/"
+      },
+      {
+        "title": "Compute governance",
+        "url": "https://arxiv.org/abs/2402.08797"
+      }
+    ]
+  },
+  {
+    "id": "human-ai-complementarity",
+    "question": "Can AI-human hybrid systems be designed to get best of both?",
+    "domain": "Human Factors",
+    "description": "Whether hybrid systems can avoid automation bias (over-trust) and automation disuse (under-trust) simultaneously.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Mixed evidence; design patterns emerging but not proven at scale",
+    "positions": [
+      {
+        "view": "Optimal human-AI complementarity is achievable",
+        "probability": "25-40%",
+        "holders": [
+          "Stanford HAI researchers",
+          "Some HCI researchers"
+        ],
+        "implications": "Invest in human-AI interaction research; design for complementarity"
+      },
+      {
+        "view": "Complementarity possible in some domains but not others",
+        "probability": "40-50%",
+        "holders": [
+          "Many AI researchers"
+        ],
+        "implications": "Domain-specific approaches; accept AI-only or human-only in some areas"
+      },
+      {
+        "view": "Fundamental trade-offs prevent optimal complementarity",
+        "probability": "20-30%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Accept suboptimal integration; focus on domains where one or other dominates"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Systematic studies of human-AI collaboration across domains",
+      "Successful long-term hybrid deployments",
+      "Design patterns that generalize across contexts",
+      "Cognitive science on calibrating trust in AI"
+    ],
+    "relatedCruxes": [
+      "expertise-preservation"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Parasuraman & Riley: Humans and Automation"
+      },
+      {
+        "title": "Stanford HAI",
+        "url": "https://hai.stanford.edu/"
+      }
+    ]
+  },
+  {
+    "id": "prediction-market-scaling",
+    "question": "Can prediction markets scale to questions that matter most?",
+    "domain": "Collective Intelligence",
+    "description": "Whether prediction markets can provide accurate probabilities for long-term, complex, consequential questions.",
+    "importance": "medium",
+    "resolvability": "years",
+    "currentState": "Works well for short-term, binary; unclear for long-term",
+    "positions": [
+      {
+        "view": "Prediction markets can scale to long-term important questions",
+        "probability": "20-35%",
+        "holders": [
+          "Some prediction market advocates",
+          "Polymarket enthusiasts"
+        ],
+        "implications": "Invest in market design; subsidize long-term markets; use for policy"
+      },
+      {
+        "view": "Markets work for some important questions but not others",
+        "probability": "40-50%",
+        "holders": [
+          "Most forecasting researchers"
+        ],
+        "implications": "Use markets where appropriate; combine with other forecasting methods"
+      },
+      {
+        "view": "Fundamental limits prevent scaling to important long-term questions",
+        "probability": "25-35%",
+        "holders": [
+          "Some critics"
+        ],
+        "implications": "Focus on alternative methods; don't rely on markets for long-term forecasting"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Track record on long-term prediction markets",
+      "Comparison with alternative methods on same questions",
+      "Research on market design for different question types"
+    ],
+    "relatedCruxes": [
+      "human-ai-complementarity"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Metaculus",
+        "url": "https://www.metaculus.com/"
+      },
+      {
+        "title": "Wolfers & Zitzewitz: Prediction Markets",
+        "url": "https://www.aeaweb.org/articles?id=10.1257/0895330041371321"
+      }
+    ]
+  },
+  {
+    "id": "deliberation-scaling",
+    "question": "Can AI-assisted deliberation produce legitimate governance input at scale?",
+    "domain": "Collective Intelligence",
+    "description": "Whether AI-facilitated deliberation can be both representative and influential on actual decisions.",
+    "importance": "medium",
+    "resolvability": "years",
+    "currentState": "Promising pilots (vTaiwan); limited adoption; legitimacy questions",
+    "positions": [
+      {
+        "view": "AI-assisted deliberation can scale to influence policy",
+        "probability": "25-40%",
+        "holders": [
+          "Audrey Tang",
+          "vTaiwan advocates"
+        ],
+        "implications": "Scale deliberation experiments; integrate with governance processes"
+      },
+      {
+        "view": "Deliberation useful but limited political uptake",
+        "probability": "40-50%",
+        "holders": [
+          "Many researchers"
+        ],
+        "implications": "Continue experiments; don't expect quick adoption; build legitimacy slowly"
+      },
+      {
+        "view": "AI-assisted deliberation won't gain sufficient legitimacy",
+        "probability": "20-30%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Focus on other participation mechanisms; deliberation is niche"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Adoption by major governments beyond Taiwan",
+      "Evidence that deliberation outputs influence policy",
+      "Research on representativeness and manipulation resistance"
+    ],
+    "relatedCruxes": [
+      "coordination-feasibility"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Polis",
+        "url": "https://pol.is/"
+      },
+      {
+        "title": "vTaiwan",
+        "url": "https://info.vtaiwan.tw/"
+      }
+    ]
+  },
+  {
+    "id": "ai-uplift",
+    "question": "How much do AI systems lower barriers for dangerous capabilities?",
+    "domain": "Capability",
+    "description": "Whether AI provides meaningful 'uplift' for malicious actors beyond what's already available through internet search, scientific literature, and existing tools.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Mixed evidence; RAND bio study found no significant uplift; other studies more concerning",
+    "positions": [
+      {
+        "view": "AI provides significant uplift across domains",
+        "probability": "30-45%",
+        "holders": [
+          "Some biosecurity researchers",
+          "AI safety community"
+        ],
+        "implications": "Strong model restrictions; compute governance; weight security"
+      },
+      {
+        "view": "AI provides modest uplift; real skills remain bottleneck",
+        "probability": "35-45%",
+        "holders": [
+          "RAND researchers",
+          "Some security experts"
+        ],
+        "implications": "Focus on detecting misuse rather than preventing access; invest in defenses"
+      },
+      {
+        "view": "AI uplift is minimal; information already available",
+        "probability": "20-30%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Restrictions are largely security theater; focus on physical defenses and detection"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Rigorous red-team studies with real capability measurement",
+      "Evidence of AI-enabled attacks in the wild",
+      "Studies comparing AI-assisted vs non-AI-assisted malicious actors",
+      "Domain-specific uplift assessments (bio, cyber, chemical)"
+    ],
+    "relatedCruxes": [
+      "bio-uplift",
+      "cyber-uplift"
+    ],
+    "relevantResearch": [
+      {
+        "title": "RAND Bio Study",
+        "url": "https://www.rand.org/pubs/research_reports/RRA2977-2.html"
+      },
+      {
+        "title": "CNAS Bio Report",
+        "url": "https://www.cnas.org/publications/reports/ai-and-the-evolution-of-biological-national-security-risks"
+      }
+    ]
+  },
+  {
+    "id": "bio-uplift",
+    "question": "Does AI meaningfully increase bioweapons risk?",
+    "domain": "Capability",
+    "description": "Whether AI-assisted bioweapons development poses significantly higher risk than traditional paths to bioweapons.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Contested; RAND study found no uplift; wet-lab skills may be real bottleneck",
+    "positions": [
+      {
+        "view": "AI significantly increases bioweapons risk",
+        "probability": "25-40%",
+        "holders": [
+          "Some biosecurity researchers",
+          "Kevin Esvelt"
+        ],
+        "implications": "Strict model restrictions; compute governance; wet-lab monitoring"
+      },
+      {
+        "view": "AI provides modest uplift; wet-lab skills remain bottleneck",
+        "probability": "40-50%",
+        "holders": [
+          "RAND researchers",
+          "Some security experts"
+        ],
+        "implications": "Focus on wet-lab barriers; AI restrictions less critical than physical security"
+      },
+      {
+        "view": "AI provides minimal bio uplift",
+        "probability": "20-30%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Focus resources elsewhere; bio risk from AI is overstated"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Evidence of AI being used in bio attacks",
+      "Comprehensive wet-lab bottleneck analysis",
+      "Improvement in AI Biological Design Tools",
+      "DNA synthesis screening effectiveness data"
+    ],
+    "relatedCruxes": [
+      "ai-uplift",
+      "restrictions-effective"
+    ],
+    "relevantResearch": [
+      {
+        "title": "RAND Bio Red Team",
+        "url": "https://www.rand.org/pubs/research_reports/RRA2977-2.html"
+      },
+      {
+        "title": "Collaborations Bio",
+        "url": "https://www.nature.com/articles/s42256-022-00465-9"
+      }
+    ]
+  },
+  {
+    "id": "cyber-uplift",
+    "question": "Does AI meaningfully increase cyber attack capability?",
+    "domain": "Capability",
+    "description": "Whether AI significantly enhances offensive cyber capabilities for individual attackers or small groups.",
+    "importance": "high",
+    "resolvability": "soon",
+    "currentState": "Some evidence of AI use in phishing/social engineering; limited evidence for sophisticated attacks",
+    "positions": [
+      {
+        "view": "AI significantly increases cyber attack capability",
+        "probability": "30-45%",
+        "holders": [
+          "Some cybersecurity researchers"
+        ],
+        "implications": "Invest in AI-enabled defenses; restrict AI cyber capabilities"
+      },
+      {
+        "view": "AI provides modest cyber uplift; skill remains bottleneck",
+        "probability": "40-50%",
+        "holders": [
+          "Many security professionals"
+        ],
+        "implications": "AI is one tool among many; traditional security still paramount"
+      },
+      {
+        "view": "AI cyber uplift is minimal for sophisticated attacks",
+        "probability": "15-25%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Focus on traditional cybersecurity; AI-specific concerns overblown"
+      }
+    ],
+    "wouldUpdateOn": [
+      "AI-generated exploits being used in the wild",
+      "Evidence on AI use in state-sponsored cyber operations",
+      "AI vulnerability discovery capabilities",
+      "Red team assessments of AI cyber capabilities"
+    ],
+    "relatedCruxes": [
+      "ai-uplift",
+      "offense-defense"
+    ]
+  },
+  {
+    "id": "offense-defense",
+    "question": "Will AI favor offense or defense in security domains?",
+    "domain": "Security Dynamics",
+    "description": "Whether AI will primarily benefit attackers or defenders across security domains (cyber, bio, physical).",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Unclear; arguments for both directions; may vary by domain",
+    "positions": [
+      {
+        "view": "AI favors offense across most domains",
+        "probability": "30-45%",
+        "holders": [
+          "Some security researchers"
+        ],
+        "implications": "Defensive investment may be futile; focus on preventing AI access for attackers"
+      },
+      {
+        "view": "AI offense/defense balance varies by domain",
+        "probability": "35-45%",
+        "implications": "Domain-specific analysis; invest in defense where possible; restrict where offense dominates"
+      },
+      {
+        "view": "AI ultimately favors defense",
+        "probability": "20-30%",
+        "holders": [
+          "Some optimists"
+        ],
+        "implications": "Invest heavily in AI-enabled defenses; restrictions less necessary"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Evidence from AI deployment in cybersecurity",
+      "Domain-specific offense/defense analysis",
+      "Historical analysis of technology and offense/defense balance",
+      "Real-world outcomes of AI-enabled attacks vs defenses"
+    ],
+    "relatedCruxes": [
+      "cyber-uplift",
+      "disinformation-defense"
+    ]
+  },
+  {
+    "id": "disinformation-defense",
+    "question": "Can AI-powered detection match AI-powered disinformation generation?",
+    "domain": "Security Dynamics",
+    "description": "Whether AI systems for detecting synthetic content and disinformation can keep pace with AI generation capabilities.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Detection currently losing; deepfakes increasingly convincing; detection arms race",
+    "positions": [
+      {
+        "view": "Detection will fall permanently behind generation",
+        "probability": "40-55%",
+        "holders": [
+          "Hany Farid",
+          "Many deepfake researchers"
+        ],
+        "implications": "Shift to provenance-based authentication; detection is dead end"
+      },
+      {
+        "view": "Detection and generation will reach equilibrium",
+        "probability": "25-35%",
+        "implications": "Both approaches valuable; detection as complement to provenance"
+      },
+      {
+        "view": "Detection can win with sufficient investment",
+        "probability": "15-25%",
+        "implications": "Invest heavily in detection R&D"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Advances in deepfake detection that generalize",
+      "Real-world detection accuracy over time",
+      "Theoretical analysis of detection vs generation",
+      "Adversarial testing results"
+    ],
+    "relatedCruxes": [
+      "offense-defense",
+      "authentication-adoption"
+    ],
+    "relevantResearch": [
+      {
+        "title": "C2PA",
+        "url": "https://c2pa.org/"
+      },
+      {
+        "title": "DARPA MediFor",
+        "url": "https://www.darpa.mil/program/media-forensics"
+      }
+    ]
+  },
+  {
+    "id": "restrictions-effective",
+    "question": "Can AI model restrictions meaningfully reduce misuse?",
+    "domain": "Mitigation",
+    "description": "Whether training-time safety measures, output filters, and terms of service can prevent determined misuse of AI systems.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Jailbreaks common; open models exist; effectiveness debated",
+    "positions": [
+      {
+        "view": "Restrictions can meaningfully reduce misuse",
+        "probability": "25-40%",
+        "holders": [
+          "AI labs"
+        ],
+        "implications": "Invest in better guardrails; restrictions are worthwhile"
+      },
+      {
+        "view": "Restrictions raise bar but determined actors can circumvent",
+        "probability": "40-50%",
+        "implications": "Restrictions as one layer; combine with other defenses; accept imperfection"
+      },
+      {
+        "view": "Restrictions are largely ineffective against serious threats",
+        "probability": "20-30%",
+        "holders": [
+          "Some security researchers"
+        ],
+        "implications": "Focus on other defenses; restrictions are mostly security theater"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Evidence on jailbreak prevalence and sophistication",
+      "Success of restriction improvements",
+      "Open model availability and capability trends",
+      "Evidence of restrictions preventing real attacks"
+    ],
+    "relatedCruxes": [
+      "open-source-policy"
+    ]
+  },
+  {
+    "id": "open-source-policy",
+    "question": "Should powerful AI models be open-sourced?",
+    "domain": "Mitigation",
+    "description": "Whether the benefits of open AI (research, democratization, competition) outweigh misuse risks.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Hotly debated; Meta releases open models; others restrict",
+    "positions": [
+      {
+        "view": "Open source AI benefits outweigh risks",
+        "probability": "25-40%",
+        "holders": [
+          "Meta AI",
+          "Open source advocates"
+        ],
+        "implications": "Release models openly; democratize AI; safety through transparency"
+      },
+      {
+        "view": "Conditional open source based on capability level",
+        "probability": "40-50%",
+        "holders": [
+          "Many AI researchers",
+          "Some labs"
+        ],
+        "implications": "Open low-capability; restrict frontier; define capability thresholds"
+      },
+      {
+        "view": "Frontier AI should remain closed",
+        "probability": "20-30%",
+        "holders": [
+          "Some safety researchers",
+          "Some policymakers"
+        ],
+        "implications": "Restrict model weights; centralize control; prioritize safety over access"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Evidence of open model misuse in serious attacks",
+      "Research enabling from open models vs closed",
+      "Capability comparisons: open vs closed frontier",
+      "Security of closed model weights"
+    ],
+    "relatedCruxes": [
+      "restrictions-effective",
+      "ai-uplift"
+    ]
+  },
+  {
+    "id": "compute-governance",
+    "question": "Can compute governance effectively limit dangerous AI development?",
+    "domain": "Mitigation",
+    "description": "Whether controlling access to AI training compute can prevent dangerous capabilities from reaching bad actors.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Export controls emerging; monitoring limited; enforcement unclear",
+    "positions": [
+      {
+        "view": "Compute governance can be highly effective",
+        "probability": "20-35%",
+        "holders": [
+          "Some policy researchers",
+          "CSET"
+        ],
+        "implications": "Invest heavily in compute tracking; international coordination; export controls"
+      },
+      {
+        "view": "Compute governance partially effective but bypassable",
+        "probability": "40-50%",
+        "holders": [
+          "Most governance researchers"
+        ],
+        "implications": "Compute governance as one layer; expect circumvention; combine with other approaches"
+      },
+      {
+        "view": "Compute governance will be largely ineffective",
+        "probability": "20-30%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Focus on other interventions; algorithmic progress may make compute less relevant"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Effectiveness of chip export controls",
+      "Development of compute monitoring technologies",
+      "Algorithmic efficiency gains reducing compute requirements",
+      "International coordination on compute governance"
+    ],
+    "relatedCruxes": [
+      "open-source-policy"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Compute Governance",
+        "url": "https://arxiv.org/abs/2402.08797"
+      }
+    ]
+  },
+  {
+    "id": "actor-landscape",
+    "question": "Who are the most concerning actors for AI misuse?",
+    "domain": "Actors",
+    "description": "Whether nation-states, terrorist groups, or lone actors pose the greatest AI misuse risk.",
+    "importance": "medium",
+    "resolvability": "years",
+    "currentState": "Different actors have different capabilities and intentions; threat landscape evolving",
+    "positions": [
+      {
+        "view": "Nation-states are primary concern",
+        "probability": "30-40%",
+        "holders": [
+          "Some national security analysts"
+        ],
+        "implications": "Focus on great power competition; arms control; deterrence"
+      },
+      {
+        "view": "Non-state actors are primary concern",
+        "probability": "35-45%",
+        "holders": [
+          "Some terrorism researchers"
+        ],
+        "implications": "Focus on preventing access; surveillance; disruption"
+      },
+      {
+        "view": "Lone actors/small groups are primary concern with AI",
+        "probability": "25-35%",
+        "holders": [
+          "Some AI safety researchers"
+        ],
+        "implications": "AI uniquely enables solo actors; focus on preventing capability diffusion"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Evidence of AI use in attacks by different actor types",
+      "Capability requirements for AI-enabled attacks",
+      "Analysis of actor motivations and AI access",
+      "Historical patterns of technology-enabled terrorism"
+    ],
+    "relatedCruxes": [
+      "ai-uplift"
+    ]
+  },
+  {
+    "id": "autonomous-weapons-inevitability",
+    "question": "Are autonomous weapons inevitable?",
+    "domain": "Actors",
+    "description": "Whether military adoption of AI for lethal autonomous weapons systems will happen regardless of international efforts to restrict them.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Development ongoing in multiple countries; no comprehensive ban; limited arms control",
+    "positions": [
+      {
+        "view": "Autonomous weapons are inevitable; must manage not prevent",
+        "probability": "40-55%",
+        "holders": [
+          "Some military analysts",
+          "Realists"
+        ],
+        "implications": "Focus on norms around use; escalation management; not on bans"
+      },
+      {
+        "view": "Meaningful restrictions are achievable on some systems",
+        "probability": "30-40%",
+        "holders": [
+          "Arms control advocates"
+        ],
+        "implications": "Pursue arms control; differentiate between system types"
+      },
+      {
+        "view": "Comprehensive restrictions on autonomous weapons possible",
+        "probability": "10-20%",
+        "holders": [
+          "Campaign to Stop Killer Robots"
+        ],
+        "implications": "Advocate for bans; international treaty"
+      }
+    ],
+    "wouldUpdateOn": "[\n    \"Progress or failure of UN autonomous weapons negotiations\",\n    \"Major powers' autonomous weapons deployment decisions\",\n    \"Technical feasibility of meaningful restrictions\",\n    \"Incidents involving autonomous weapons\"\n  ]",
+    "relatedCruxes": [
+      "offense-defense"
+    ]
+  },
+  {
+    "id": "mass-casualty-misuse",
+    "question": "How likely is AI-enabled mass casualty attack in next 10 years?",
+    "domain": "Scale",
+    "description": "Whether AI will enable attacks causing over 1,000 deaths within the next decade.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "No AI-enabled mass casualty attacks yet; capabilities developing",
+    "positions": [
+      {
+        "view": "AI-enabled mass casualty attack likely (>50%)",
+        "probability": "15-30%",
+        "holders": [
+          "Some risk analysts"
+        ],
+        "implications": "Extreme urgency on prevention; major policy response needed"
+      },
+      {
+        "view": "AI-enabled mass casualty attack possible but unlikely (10-50%)",
+        "probability": "40-55%",
+        "implications": "Serious preparation needed; balance urgency with uncertainty"
+      },
+      {
+        "view": "AI-enabled mass casualty attack very unlikely (<10%)",
+        "probability": "25-40%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Focus on other AI risks; misuse concerns may be overblown"
+      }
+    ],
+    "wouldUpdateOn": [
+      "AI-enabled attacks occurring (or not occurring)",
+      "Capability assessments over time",
+      "Evidence on attacker intentions and AI access",
+      "Defensive capability improvements"
+    ],
+    "relatedCruxes": [
+      "bio-uplift",
+      "cyber-uplift",
+      "ai-uplift"
+    ]
+  },
+  {
+    "id": "authoritarian-stability",
+    "question": "Will AI-enabled surveillance strengthen or weaken authoritarian regimes?",
+    "domain": "Scale",
+    "description": "Whether AI surveillance and control tools will make authoritarian regimes more stable and durable.",
+    "importance": "medium",
+    "resolvability": "decades",
+    "currentState": "AI surveillance deployed in China and elsewhere; effects on stability unclear",
+    "positions": [
+      {
+        "view": "AI surveillance significantly strengthens authoritarianism",
+        "probability": "35-50%",
+        "holders": [
+          "Some political scientists",
+          "Human rights researchers"
+        ],
+        "implications": "AI governance must consider authoritarian use; support counter-surveillance"
+      },
+      {
+        "view": "AI has mixed effects on authoritarian stability",
+        "probability": "30-40%",
+        "implications": "Context-dependent; some regimes strengthened, others destabilized"
+      },
+      {
+        "view": "AI surveillance won't fundamentally change authoritarian dynamics",
+        "probability": "15-25%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Focus on other concerns; authoritarian risk from AI is overstated"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Evidence on AI surveillance effects on regime stability",
+      "Protests/revolutions succeeding despite AI surveillance",
+      "Comparative studies of surveillance and regime type",
+      "AI tools enabling opposition movements"
+    ],
+    "relatedCruxes": [
+      "actor-landscape"
+    ]
+  },
+  {
+    "id": "ai-verification-scaling",
+    "question": "Can AI-based verification scale to match AI-based generation?",
+    "domain": "Technical Solutions",
+    "description": "Whether AI systems designed for verification (fact-checking, detection, authentication) can keep pace with AI systems designed for generation.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Generation currently ahead; some verification progress",
+    "positions": [
+      {
+        "view": "Verification can match generation with investment",
+        "probability": "25-40%",
+        "holders": [
+          "Some AI researchers",
+          "Verification startups"
+        ],
+        "implications": "Invest heavily in AI verification R&D; build verification infrastructure"
+      },
+      {
+        "view": "Verification will lag but remain useful",
+        "probability": "35-45%",
+        "implications": "Verification as one tool among many; combine with other approaches"
+      },
+      {
+        "view": "Verification is fundamentally disadvantaged",
+        "probability": "20-30%",
+        "holders": [
+          "Some security researchers"
+        ],
+        "implications": "Shift focus to provenance, incentives, institutional solutions"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Breakthrough in generalizable detection",
+      "Real-world deployment data on AI verification performance",
+      "Theoretical analysis of offense-defense balance",
+      "Economic analysis of verification costs vs generation costs"
+    ],
+    "relatedCruxes": [
+      "provenance-vs-detection"
+    ],
+    "relevantResearch": [
+      {
+        "title": "DARPA SemaFor",
+        "url": "https://www.darpa.mil/program/semantic-forensics"
+      }
+    ]
+  },
+  {
+    "id": "provenance-vs-detection",
+    "question": "Should we prioritize content provenance or detection?",
+    "domain": "Technical Solutions",
+    "description": "Whether resources should go to proving what's authentic (provenance) vs detecting what's fake (detection).",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Both being pursued; provenance gaining momentum",
+    "positions": [],
+    "wouldUpdateOn": [
+      "C2PA adoption metrics",
+      "Detection accuracy trends",
+      "User behavior research on credential checking",
+      "Cost comparison of approaches"
+    ],
+    "relatedCruxes": [
+      "ai-verification-scaling"
+    ],
+    "relevantResearch": [
+      {
+        "title": "C2PA",
+        "url": "https://c2pa.org/"
+      },
+      {
+        "title": "Detection research",
+        "url": "https://arxiv.org/abs/2004.11138"
+      }
+    ]
+  },
+  {
+    "id": "watermark-robustness",
+    "question": "Can AI watermarks be made robust against removal?",
+    "domain": "Technical Solutions",
+    "description": "Whether watermarks embedded in AI-generated content can resist adversarial removal attempts.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Current watermarks removable with effort; research ongoing",
+    "positions": [
+      {
+        "view": "Robust watermarks are achievable",
+        "probability": "20-35%",
+        "holders": [
+          "Some Google researchers",
+          "SynthID advocates"
+        ],
+        "implications": "Invest in watermarking research; can become reliable authentication method"
+      },
+      {
+        "view": "Watermarks can be made partially robust",
+        "probability": "40-50%",
+        "holders": [
+          "Many researchers"
+        ],
+        "implications": "Useful for detecting casual misuse; won't stop determined adversaries"
+      },
+      {
+        "view": "Watermarks will remain fundamentally removable",
+        "probability": "25-35%",
+        "holders": [
+          "Some security researchers"
+        ],
+        "implications": "Don't rely on watermarks for security; focus on other authentication methods"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Adversarial testing of production watermarks",
+      "Theoretical bounds on watermark robustness",
+      "Real-world watermark survival data"
+    ],
+    "relatedCruxes": [
+      "provenance-vs-detection"
+    ],
+    "relevantResearch": [
+      {
+        "title": "SynthID",
+        "url": "https://deepmind.google/technologies/synthid/"
+      }
+    ]
+  },
+  {
+    "id": "forecasting-ai-combo",
+    "question": "Can AI + human forecasting substantially outperform either alone?",
+    "domain": "Collective Intelligence",
+    "description": "Whether combining AI forecasting with human judgment produces significantly better predictions than either approach separately.",
+    "importance": "high",
+    "resolvability": "soon",
+    "currentState": "Early experiments promising; limited systematic comparison",
+    "positions": [
+      {
+        "view": "Human-AI combinations can substantially outperform either alone",
+        "probability": "30-45%",
+        "holders": [
+          "Some forecasting researchers",
+          "Metaculus team"
+        ],
+        "implications": "Invest in hybrid forecasting systems; humans add value to AI predictions"
+      },
+      {
+        "view": "Modest improvements from combination; domain-dependent",
+        "probability": "40-50%",
+        "holders": [
+          "Many researchers"
+        ],
+        "implications": "Context matters; AI may dominate some domains, humans others"
+      },
+      {
+        "view": "AI will largely replace human forecasters",
+        "probability": "15-25%",
+        "holders": [
+          "Some AI optimists"
+        ],
+        "implications": "Focus on AI forecasting; human role is diminishing"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Systematic comparison studies",
+      "Metaculus AI forecasting results",
+      "Domain-specific performance data"
+    ],
+    "relatedCruxes": [
+      "human-ai-complementarity"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Metaculus AI",
+        "url": "https://www.metaculus.com/project/ai-forecasting/"
+      },
+      {
+        "title": "Superforecasting",
+        "url": "https://goodjudgment.com/"
+      }
+    ]
+  },
+  {
+    "id": "market-manipulation",
+    "question": "Can prediction markets be made manipulation-resistant?",
+    "domain": "Collective Intelligence",
+    "description": "Whether prediction markets can resist well-funded manipulation attempts while remaining useful.",
+    "importance": "medium",
+    "resolvability": "years",
+    "currentState": "Some manipulation observed; effects often temporary; design improvements possible",
+    "positions": [
+      {
+        "view": "Markets can be designed to resist manipulation",
+        "probability": "25-40%",
+        "holders": [
+          "Some market designers",
+          "Robin Hanson"
+        ],
+        "implications": "Invest in market design research; manipulation is solvable engineering problem"
+      },
+      {
+        "view": "Markets partially resistant; manipulation raises costs but doesn't eliminate it",
+        "probability": "40-50%",
+        "holders": [
+          "Most market researchers"
+        ],
+        "implications": "Accept some manipulation; design to minimize impact; combine with other methods"
+      },
+      {
+        "view": "Well-funded manipulation will always distort important markets",
+        "probability": "20-30%",
+        "holders": [
+          "Some critics"
+        ],
+        "implications": "Don't rely on markets for high-stakes decisions; manipulation is fundamental problem"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Documented manipulation attempts and outcomes",
+      "Market design research on manipulation resistance",
+      "Comparison of market accuracy in high vs low manipulation contexts"
+    ],
+    "relatedCruxes": [
+      "forecasting-ai-combo"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Prediction market research",
+        "url": "https://www.aeaweb.org/articles?id=10.1257/0895330041371321"
+      }
+    ]
+  },
+  {
+    "id": "lab-coordination",
+    "question": "Can frontier AI labs meaningfully coordinate on safety?",
+    "domain": "Coordination",
+    "description": "Whether labs competing for AI supremacy can coordinate on safety measures without regulatory compulsion.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Some voluntary commitments (RSPs); no binding enforcement; competitive pressures strong",
+    "positions": [
+      {
+        "view": "Voluntary coordination can work",
+        "probability": "20-35%",
+        "holders": [
+          "Some lab leadership"
+        ],
+        "implications": "Support lab coordination efforts; build trust; industry self-regulation"
+      },
+      {
+        "view": "Coordination requires external enforcement",
+        "probability": "40-50%",
+        "holders": [
+          "Most governance researchers"
+        ],
+        "implications": "Focus on regulation; auditing; legal liability; government role essential"
+      },
+      {
+        "view": "Neither voluntary nor regulatory coordination will work",
+        "probability": "15-25%",
+        "implications": "Focus on technical solutions; prepare for uncoordinated development"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Labs defecting from voluntary commitments",
+      "Successful regulatory enforcement",
+      "Evidence of coordination changing lab behavior"
+    ],
+    "relatedCruxes": [
+      "international-coordination"
+    ],
+    "relevantResearch": [
+      {
+        "title": "RSP analysis",
+        "url": "https://www.anthropic.com/rsp"
+      },
+      {
+        "title": "GovAI",
+        "url": "https://www.governance.ai/"
+      }
+    ]
+  },
+  {
+    "id": "international-coordination",
+    "question": "Can US-China AI coordination succeed despite geopolitical competition?",
+    "domain": "Competition & Coordination",
+    "description": "Whether major AI powers can coordinate on safety/governance despite strategic rivalry.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Very limited coordination; competition dominant; some backchannel communication",
+    "positions": [
+      {
+        "view": "Meaningful US-China AI coordination is possible",
+        "probability": "15-30%",
+        "holders": [
+          "Some diplomats",
+          "Optimistic policy researchers"
+        ],
+        "implications": "Invest in Track II diplomacy; find win-win areas; build communication channels"
+      },
+      {
+        "view": "Limited coordination on narrow issues possible",
+        "probability": "40-50%",
+        "holders": [
+          "Most policy researchers"
+        ],
+        "implications": "Focus on specific risks (bio, cyber); don't expect broad cooperation; manage competition"
+      },
+      {
+        "view": "Geopolitical competition will prevent meaningful coordination",
+        "probability": "30-40%",
+        "holders": [
+          "Some realists",
+          "Security hawks"
+        ],
+        "implications": "Prepare for AI competition; focus on domestic policy; expect adversarial dynamics"
+      }
+    ],
+    "wouldUpdateOn": [
+      "US-China AI dialogue outcomes",
+      "Coordination success on specific risks",
+      "Broader geopolitical relationship changes",
+      "Precedents from other technology domains"
+    ],
+    "relatedCruxes": [
+      "racing-inevitable",
+      "coordination-possible"
+    ],
+    "relevantResearch": [
+      {
+        "title": "RAND: AI and Great Power Competition",
+        "url": "https://www.rand.org/"
+      }
+    ]
+  },
+  {
+    "id": "commitment-credibility",
+    "question": "Can credible AI governance commitments be designed?",
+    "domain": "Coordination",
+    "description": "Whether commitment mechanisms (RSPs, treaties, escrow) can be designed that actors can't easily defect from.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Few tested mechanisms; mostly voluntary; enforcement unclear",
+    "positions": [
+      {
+        "view": "Credible commitment mechanisms can be designed",
+        "probability": "20-35%",
+        "holders": [
+          "Some policy designers",
+          "Anthropic (RSP advocates)"
+        ],
+        "implications": "Invest in mechanism design; verification technology; international institutions"
+      },
+      {
+        "view": "Partial credibility achievable; full enforcement impossible",
+        "probability": "40-50%",
+        "holders": [
+          "Most governance researchers"
+        ],
+        "implications": "Build what credibility you can; expect some defection; design for resilience"
+      },
+      {
+        "view": "Credible AI commitments are fundamentally impossible",
+        "probability": "20-30%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Focus on technical solutions; don't rely on governance commitments"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Track record of RSPs and similar commitments",
+      "Progress on compute governance/monitoring",
+      "Examples of commitment enforcement",
+      "Game-theoretic analysis of commitment mechanisms"
+    ],
+    "relatedCruxes": [
+      "lab-coordination"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Compute governance",
+        "url": "https://arxiv.org/abs/2402.08797"
+      }
+    ]
+  },
+  {
+    "id": "epistemic-public-good",
+    "question": "Can epistemic infrastructure be funded as a public good?",
+    "domain": "Infrastructure",
+    "description": "Whether verification, fact-checking, and knowledge infrastructure can achieve sustainable funding without commercial incentives.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Underfunded; dependent on philanthropy and some government support",
+    "positions": [
+      {
+        "view": "Public/philanthropic funding can scale",
+        "probability": "25-40%",
+        "implications": "Advocate for government funding; build philanthropic case; create public institutions"
+      },
+      {
+        "view": "Hybrid models needed (public + private)",
+        "probability": "35-45%",
+        "implications": "Design business models that align profit with truth; public-private partnerships"
+      },
+      {
+        "view": "Will remain underfunded relative to commercial content",
+        "probability": "25-35%",
+        "implications": "Focus resources on highest-leverage applications; accept limits"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Government investment in epistemic infrastructure",
+      "Successful commercial models for verification",
+      "Philanthropic commitment levels",
+      "Platform willingness to pay for verification"
+    ],
+    "relatedCruxes": [
+      "platform-incentives"
+    ]
+  },
+  {
+    "id": "platform-incentives",
+    "question": "Can platform incentives be aligned with epistemic quality?",
+    "domain": "Infrastructure",
+    "description": "Whether major platforms can be incentivized (through regulation, competition, or design) to prioritize truth over engagement.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Engagement still dominates; some regulatory pressure; limited success",
+    "positions": [
+      {
+        "view": "Incentive alignment is achievable",
+        "probability": "20-35%",
+        "implications": "Focus on regulation; antitrust; liability; user tools"
+      },
+      {
+        "view": "Partial alignment possible; engagement will always matter",
+        "probability": "40-50%",
+        "implications": "Work within constraints; design for harm reduction; build alternatives"
+      },
+      {
+        "view": "Business model is incompatible with truth optimization",
+        "probability": "25-35%",
+        "implications": "Build non-commercial alternatives; accept platform limitations; focus elsewhere"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Platform policy changes and their effects",
+      "Regulatory enforcement outcomes (DSA, etc.)",
+      "User migration to alternative platforms",
+      "Research on engagement vs truth tradeoffs"
+    ],
+    "relatedCruxes": [
+      "epistemic-public-good"
+    ],
+    "relevantResearch": [
+      {
+        "title": "EU Digital Services Act",
+        "url": "https://digital-strategy.ec.europa.eu/en/policies/digital-services-act-package"
+      }
+    ]
+  },
+  {
+    "id": "structural-distinct",
+    "question": "Are structural risks genuinely distinct from accident/misuse risks?",
+    "domain": "Foundations",
+    "description": "Whether 'structural risks' names real phenomena that require separate analysis, or is just a different level of abstraction on the same underlying risks.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Debated; no consensus on category boundaries",
+    "positions": [
+      {
+        "view": "Structural risks are genuinely distinct category",
+        "probability": "30-45%",
+        "holders": [
+          "Some governance researchers",
+          "FHI researchers"
+        ],
+        "implications": "Need separate analysis frameworks; different interventions required"
+      },
+      {
+        "view": "Structural risks are emergent from individual risks",
+        "probability": "35-45%",
+        "holders": [
+          "Some AI safety researchers"
+        ],
+        "implications": "Can address through individual-level interventions; systems thinking helpful but not new category"
+      },
+      {
+        "view": "Structural framing is mostly rhetorical",
+        "probability": "15-25%",
+        "holders": [
+          "Some critics"
+        ],
+        "implications": "Focus on concrete risks; don't reify structural category"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Theoretical analysis of category boundaries",
+      "Cases where structural vs individual framing leads to different interventions",
+      "Evidence that structural dynamics have independent causal power"
+    ],
+    "relatedCruxes": [
+      "racing-inevitable",
+      "coordination-possible"
+    ],
+    "relevantResearch": [
+      {
+        "title": "AI Governance Research Agenda",
+        "url": "https://www.fhi.ox.ac.uk/wp-content/uploads/GovAI-Agenda.pdf"
+      }
+    ]
+  },
+  {
+    "id": "ai-concentrating",
+    "question": "Does AI concentrate power more than previous technologies?",
+    "domain": "Foundations",
+    "description": "Whether AI is qualitatively different in its power-concentrating effects, or is following historical patterns of technological change.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Unclear; AI is early-stage; historical comparisons contested",
+    "positions": [
+      {
+        "view": "AI is qualitatively more power-concentrating",
+        "probability": "30-45%",
+        "holders": [
+          "AI Now Institute",
+          "Some critics"
+        ],
+        "implications": "Strong antitrust action needed; prevent AI monopolies; distribute AI access"
+      },
+      {
+        "view": "AI has mixed concentration effects; depends on policy",
+        "probability": "35-45%",
+        "holders": [
+          "Many researchers"
+        ],
+        "implications": "Policy choices matter; not predetermined; can shape outcomes"
+      },
+      {
+        "view": "AI follows historical technology patterns",
+        "probability": "20-30%",
+        "holders": [
+          "Some techno-optimists"
+        ],
+        "implications": "Normal market forces will work; concentration will self-correct over time"
+      }
+    ],
+    "wouldUpdateOn": "[\n    \"Empirical data on AI industry concentration trends\",\n    \"Historical analysis of technology and power concentration\",\n    \"Evidence on open source AI capability vs closed labs\",\n    \"Data on AI's effects on labor market concentration\"\n  ]",
+    "relatedCruxes": [
+      "structural-distinct",
+      "winner-take-all"
+    ],
+    "relevantResearch": [
+      {
+        "title": "AI Now: Concentration and Power",
+        "url": "https://ainowinstitute.org/"
+      },
+      {
+        "title": "CSET: AI and Market Concentration",
+        "url": "https://cset.georgetown.edu/"
+      }
+    ]
+  },
+  {
+    "id": "racing-inevitable",
+    "question": "Are AI racing dynamics inevitable given competitive pressures?",
+    "domain": "Competition & Coordination",
+    "description": "Whether competitive pressures (commercial, geopolitical) make unsafe racing dynamics unavoidable, or if coordination can prevent races.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Racing dynamics visible; some voluntary coordination attempts",
+    "positions": [
+      {
+        "view": "Racing is largely inevitable; coordination will fail",
+        "probability": "30-45%",
+        "holders": [
+          "Some game theorists",
+          "Realists"
+        ],
+        "implications": "Focus on making racing safer; assume coordination fails; technical solutions paramount"
+      },
+      {
+        "view": "Racing can be managed with the right mechanisms",
+        "probability": "35-45%",
+        "holders": [
+          "GovAI",
+          "Some policy researchers"
+        ],
+        "implications": "Invest heavily in coordination mechanisms; compute governance; international agreements"
+      },
+      {
+        "view": "Racing dynamics are overstated; labs can coordinate",
+        "probability": "15-25%",
+        "holders": [
+          "Some industry observers"
+        ],
+        "implications": "Support voluntary coordination; racing narrative may be self-fulfilling"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Success or failure of lab coordination (RSPs, etc.)",
+      "International coordination outcomes",
+      "Evidence from other domains on coordination under competitive pressure",
+      "Game-theoretic analysis with realistic assumptions"
+    ],
+    "relatedCruxes": [
+      "coordination-possible",
+      "international-coordination"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Racing to the Precipice",
+        "url": "https://nickbostrom.com/papers/racing.pdf"
+      },
+      {
+        "title": "Debunking AI Arms Race Theory",
+        "url": "https://tnsr.org/2021/06/debunking-the-ai-arms-race-theory/"
+      }
+    ]
+  },
+  {
+    "id": "coordination-possible",
+    "question": "Can meaningful AI coordination be achieved without external enforcement?",
+    "domain": "Competition & Coordination",
+    "description": "Whether voluntary coordination among AI developers can work, or if binding regulation/enforcement is required.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Voluntary commitments exist (RSPs); limited enforcement; competitive pressures strong",
+    "positions": [
+      {
+        "view": "Voluntary coordination can be effective",
+        "probability": "20-35%",
+        "holders": [
+          "Some lab leadership",
+          "Anthropic"
+        ],
+        "implications": "Support voluntary frameworks; build trust; industry self-governance can work"
+      },
+      {
+        "view": "Coordination requires binding enforcement",
+        "probability": "40-50%",
+        "holders": [
+          "Most governance researchers",
+          "Regulators"
+        ],
+        "implications": "Focus on regulation; auditing; legal liability; government role essential"
+      },
+      {
+        "view": "Neither voluntary nor regulatory coordination will be sufficient",
+        "probability": "20-30%",
+        "holders": [
+          "Some pessimists"
+        ],
+        "implications": "Prepare for uncoordinated development; focus on technical robustness"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Track record of RSPs and voluntary commitments",
+      "Regulatory enforcement attempts and outcomes",
+      "Evidence of labs defecting from commitments under pressure",
+      "Successful coordination in analogous domains"
+    ],
+    "relatedCruxes": [
+      "racing-inevitable",
+      "international-coordination"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Anthropic RSP",
+        "url": "https://www.anthropic.com/rsp"
+      },
+      {
+        "title": "GovAI Research",
+        "url": "https://www.governance.ai/"
+      }
+    ]
+  },
+  {
+    "id": "winner-take-all",
+    "question": "Will AI development produce winner-take-all dynamics?",
+    "domain": "Power Dynamics",
+    "description": "Whether AI advantages compound to produce extreme concentration, or if competition will persist.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Some concentration visible; unclear if winner-take-all",
+    "positions": [
+      {
+        "view": "Winner-take-all dynamics are likely",
+        "probability": "25-40%",
+        "holders": [
+          "Some economists",
+          "AI concentration critics"
+        ],
+        "implications": "Early regulatory intervention critical; prevent lock-in; antitrust essential"
+      },
+      {
+        "view": "Concentration likely but not winner-take-all",
+        "probability": "40-50%",
+        "holders": [
+          "Many researchers"
+        ],
+        "implications": "Oligopoly more likely than monopoly; competition will persist; moderate intervention"
+      },
+      {
+        "view": "Competition will persist; no winner-take-all",
+        "probability": "20-30%",
+        "holders": [
+          "Some optimists",
+          "Open source advocates"
+        ],
+        "implications": "Market forces sufficient; open source prevents monopoly; less regulatory urgency"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Frontier AI market structure evolution",
+      "Open source capability vs closed labs over time",
+      "Evidence on returns to scale in AI",
+      "Regulatory intervention effects"
+    ],
+    "relatedCruxes": [
+      "ai-concentrating",
+      "lock-in-reversible"
+    ]
+  },
+  {
+    "id": "lock-in-reversible",
+    "question": "Would AI-enabled lock-in be reversible?",
+    "domain": "Power Dynamics",
+    "description": "Whether structures/values locked in via AI could later be changed, or if lock-in would be permanent.",
+    "importance": "high",
+    "resolvability": "decades",
+    "currentState": "Speculative; no lock-in has occurred yet",
+    "positions": [
+      {
+        "view": "AI-enabled lock-in would be largely irreversible",
+        "probability": "30-45%",
+        "holders": [
+          "Some x-risk researchers",
+          "Longtermists"
+        ],
+        "implications": "Preventing lock-in is crucial; current decisions have permanent consequences"
+      },
+      {
+        "view": "Lock-in would be difficult but not impossible to reverse",
+        "probability": "35-45%",
+        "holders": [
+          "Some historians",
+          "Many researchers"
+        ],
+        "implications": "Lock-in is serious but not permanent; focus on preserving change mechanisms"
+      },
+      {
+        "view": "Lock-in concerns are overstated; change always possible",
+        "probability": "15-25%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Don't overweight lock-in fears; focus on near-term issues"
+      }
+    ],
+    "wouldUpdateOn": "[\n    \"Historical analysis of technological lock-in\",\n    \"Analysis of AI's effect on change difficulty\",\n    \"Evidence on value evolution in stable systems\",\n    \"Theoretical analysis of lock-in mechanisms\"\n  ]",
+    "relatedCruxes": [
+      "winner-take-all",
+      "values-crystallization"
+    ],
+    "relevantResearch": [
+      {
+        "title": "The Precipice",
+        "url": "https://theprecipice.com/"
+      },
+      {
+        "title": "What We Owe the Future",
+        "url": "https://whatweowethefuture.com/"
+      }
+    ]
+  },
+  {
+    "id": "values-crystallization",
+    "question": "Is there a risk of premature values crystallization?",
+    "domain": "Power Dynamics",
+    "description": "Whether AI could lock in current values before humanity has developed sufficient moral wisdom.",
+    "importance": "medium",
+    "resolvability": "decades",
+    "currentState": "Theoretical concern; no near-term crystallization mechanism",
+    "positions": [
+      {
+        "view": "Premature value crystallization is a serious risk",
+        "probability": "25-40%",
+        "holders": [
+          "Some longtermists",
+          "Will MacAskill"
+        ],
+        "implications": "Preserve moral flexibility; avoid locking in current values; value learning research"
+      },
+      {
+        "view": "Crystallization risk exists but is manageable",
+        "probability": "40-50%",
+        "holders": [
+          "Many researchers"
+        ],
+        "implications": "Design systems for value evolution; don't optimize for any fixed values"
+      },
+      {
+        "view": "Value crystallization concern is overstated",
+        "probability": "20-30%",
+        "holders": [
+          "Some critics"
+        ],
+        "implications": "Focus on near-term alignment; crystallization is too speculative to prioritize"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Analysis of how AI might crystallize values",
+      "Historical study of value evolution mechanisms",
+      "Research on moral progress drivers"
+    ],
+    "relatedCruxes": [
+      "lock-in-reversible"
+    ]
+  },
+  {
+    "id": "agency-atrophy",
+    "question": "Will AI assistance cause human agency/capability atrophy?",
+    "domain": "Human Agency",
+    "description": "Whether humans will lose critical skills and decision-making capacity through AI dependency.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "Early evidence from automation; AI assistance much newer",
+    "positions": [
+      {
+        "view": "Significant agency atrophy is likely",
+        "probability": "30-45%",
+        "holders": [
+          "Nicholas Carr",
+          "Some automation critics"
+        ],
+        "implications": "Limit AI assistance in critical domains; maintain human skills; design for agency"
+      },
+      {
+        "view": "Atrophy will occur but can be managed",
+        "probability": "40-50%",
+        "holders": [
+          "Many researchers"
+        ],
+        "implications": "Intentional design for skill preservation; accept some loss; focus on critical skills"
+      },
+      {
+        "view": "AI will augment rather than atrophy human agency",
+        "probability": "15-25%",
+        "holders": [
+          "Some AI optimists"
+        ],
+        "implications": "AI frees humans for higher-level thinking; atrophy concerns overblown"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Longitudinal studies on AI use and skill retention",
+      "Evidence from domains with long AI assistance history",
+      "Successful skill preservation programs",
+      "Analysis of what skills are actually needed"
+    ],
+    "relatedCruxes": [
+      "oversight-possible"
+    ],
+    "relevantResearch": [
+      {
+        "title": "The Glass Cage (Carr)",
+        "url": "https://www.nicholascarr.com/"
+      },
+      {
+        "title": "FAA Human Factors",
+        "url": "https://www.faa.gov/about/initiatives/maintenance_hf"
+      }
+    ]
+  },
+  {
+    "id": "oversight-possible",
+    "question": "Can meaningful human oversight of advanced AI be maintained?",
+    "domain": "Human Agency",
+    "description": "Whether humans can maintain genuine oversight as AI systems become more capable and complex.",
+    "importance": "critical",
+    "resolvability": "years",
+    "currentState": "Current oversight limited; scaling unclear",
+    "positions": [
+      {
+        "view": "Meaningful oversight can be maintained",
+        "probability": "25-40%",
+        "holders": [
+          "Some AI safety researchers",
+          "Anthropic"
+        ],
+        "implications": "Invest in oversight tools; interpretability; maintain human in the loop"
+      },
+      {
+        "view": "Oversight possible for some systems/domains but not all",
+        "probability": "40-50%",
+        "holders": [
+          "Many researchers"
+        ],
+        "implications": "Selective deployment; don't deploy where oversight impossible; accept limits"
+      },
+      {
+        "view": "Meaningful oversight of advanced AI is impossible",
+        "probability": "20-30%",
+        "holders": [
+          "Some pessimists"
+        ],
+        "implications": "Need fundamentally different approaches; oversight paradigm breaks down"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Progress in interpretability research",
+      "Evidence on human ability to oversee complex systems",
+      "Development of oversight tools and their effectiveness",
+      "Empirical studies on oversight quality as systems scale"
+    ],
+    "relatedCruxes": [
+      "agency-atrophy"
+    ],
+    "relevantResearch": [
+      {
+        "title": "Anthropic interpretability research",
+        "url": "https://www.anthropic.com/"
+      }
+    ]
+  },
+  {
+    "id": "adaptation-speed",
+    "question": "Can social/institutional adaptation keep pace with AI change?",
+    "domain": "Systemic Dynamics",
+    "description": "Whether human institutions can adapt quickly enough to manage AI-driven changes.",
+    "importance": "high",
+    "resolvability": "years",
+    "currentState": "AI changing faster than regulation; some adaptation occurring",
+    "positions": [
+      {
+        "view": "Institutions can adapt fast enough",
+        "probability": "20-35%",
+        "holders": [
+          "Some optimists",
+          "Adaptive governance advocates"
+        ],
+        "implications": "Focus on institutional flexibility; regulatory sandboxes; iterative policy"
+      },
+      {
+        "view": "Adaptation will lag but be sufficient to avoid worst outcomes",
+        "probability": "40-50%",
+        "holders": [
+          "Many researchers"
+        ],
+        "implications": "Accept lag; focus on buying time; prioritize most important adaptations"
+      },
+      {
+        "view": "Institutions cannot adapt fast enough; serious disruption inevitable",
+        "probability": "25-35%",
+        "holders": [
+          "Some AI acceleration critics"
+        ],
+        "implications": "Slow AI development; prepare for institutional breakdown; resilience planning"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Speed of regulatory adaptation vs AI development",
+      "Historical comparison to other fast-changing technologies",
+      "Evidence on institutional flexibility",
+      "Success of adaptive governance experiments"
+    ],
+    "relatedCruxes": [
+      "flash-dynamics"
+    ]
+  },
+  {
+    "id": "flash-dynamics",
+    "question": "Do AI interaction speeds create fundamentally new risks?",
+    "domain": "Systemic Dynamics",
+    "description": "Whether AI systems interacting faster than human reaction time creates qualitatively new dangers.",
+    "importance": "medium",
+    "resolvability": "years",
+    "currentState": "Some fast AI interactions (trading); broader dynamics unclear",
+    "positions": [
+      {
+        "view": "Flash dynamics create qualitatively new risks",
+        "probability": "30-45%",
+        "holders": [
+          "Some systems theorists",
+          "Flash crash researchers"
+        ],
+        "implications": "Speed limits on AI systems; human oversight requirements; circuit breakers"
+      },
+      {
+        "view": "Flash risks exist but are manageable with design",
+        "probability": "40-50%",
+        "holders": [
+          "Many researchers"
+        ],
+        "implications": "Design safeguards; learn from algorithmic trading; accept some flash risk"
+      },
+      {
+        "view": "Flash dynamics are overstated concern",
+        "probability": "15-25%",
+        "holders": [
+          "Some skeptics"
+        ],
+        "implications": "Existing risk management sufficient; don't over-regulate for speed"
+      }
+    ],
+    "wouldUpdateOn": [
+      "Analysis of flash crash dynamics",
+      "Evidence from high-speed AI system interactions",
+      "Research on human oversight of fast systems",
+      "Incidents involving AI speed"
+    ],
+    "relatedCruxes": [
+      "adaptation-speed",
+      "oversight-possible"
+    ]
+  }
+]

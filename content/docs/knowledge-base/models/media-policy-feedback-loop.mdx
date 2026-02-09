@@ -1,0 +1,695 @@
+---
+title: Media-Policy Feedback Loop Model
+description: This model analyzes cycles between media coverage, public opinion, and AI policy. It finds media framing significantly shapes policy windows, with 6-18 month lag between coverage spikes and regulatory response.
+sidebar:
+  order: 43
+quality: 53
+lastEdited: "2025-12-27"
+ratings:
+  focus: 8.5
+  novelty: 4
+  rigor: 5.5
+  completeness: 7
+  concreteness: 6.5
+  actionability: 6
+importance: 54
+llmSummary: System dynamics model analyzing feedback loops between media coverage, public concern, and AI policy using coupled differential equations. Finds 6-18 month lag from coverage spikes to regulatory response, estimates ~6% of coverage translates to durable public concern, and projects 25% probability of crisis-driven policy window by 2028 with current system state at M=0.35, C=0.32, P=0.25.
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+  - Complete 'Limitations' section (6 placeholders)
+metrics:
+  wordCount: 1852
+  citations: 0
+  tables: 20
+  diagrams: 0
+clusters:
+  - ai-safety
+  - governance
+  - epistemics
+subcategory: governance-models
+---
+import {DataInfoBox, Backlinks, KeyQuestions, EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="media-policy-feedback-loop" ratings={frontmatter.ratings} />
+
+## Overview
+
+The relationship between media coverage, public concern, and policy action forms a complex feedback system. This model examines how AI risk is communicated through media, translated into public concern, and eventually shapes policy—with policy decisions then feeding back to influence media coverage and public perception.
+
+**Central Insight:** Media coverage, public opinion, and policy do not operate independently. They form a dynamical system with reinforcing and balancing feedback loops that can produce unexpected outcomes—including policy paralysis, overreaction, or capture by narrow interests.
+
+## The Basic Loop Structure
+
+### Three-Node Feedback System
+
+```
+        Media Coverage (M)
+             ↗        ↘
+            /          \
+           /            ↓
+    Policy (P) ←―― Public Concern (C)
+```
+
+**Causal Links:**
+
+1. **Media to Concern:** Coverage shapes what public knows and cares about
+2. **Concern to Policy:** Public pressure creates political incentive
+3. **Policy to Media:** Policy developments create news; regulations shape industry behavior (news events)
+4. **Policy to Concern:** Policy action can reduce concern (problem "solved") or increase it (legitimizes threat)
+5. **Concern to Media:** Public interest drives editorial decisions
+6. **Media to Policy:** Direct elite influence; framing shapes policy options
+
+### System Dynamics Representation
+
+State variables at time $t$:
+- $M(t)$ = Media attention to AI risks (0-1 scale)
+- $C(t)$ = Public concern about AI (0-1 scale)
+- $P(t)$ = Policy activity/restrictiveness (0-1 scale)
+
+Coupled differential equations:
+
+$$
+\frac{dM}{dt} = \alpha_1 \cdot (C - M) + \alpha_2 \cdot P' + \alpha_3 \cdot E + \epsilon_M
+$$
+
+$$
+\frac{dC}{dt} = \beta_1 \cdot (M - C) + \beta_2 \cdot I - \beta_3 \cdot P + \epsilon_C
+$$
+
+$$
+\frac{dP}{dt} = \gamma_1 \cdot (C - P_{threshold}) + \gamma_2 \cdot E' - \gamma_3 \cdot R + \epsilon_P
+$$
+
+Where:
+- $E$ = External events (AI incidents)
+- $I$ = Direct incidents affecting public
+- $E'$ = Elite pressure independent of public
+- $R$ = Industry/lobbying resistance
+- $P'$ = Policy changes (news events)
+- $\epsilon$ = Random shocks
+- $\alpha, \beta, \gamma$ = Coupling strengths
+
+**Parameter Estimates:**
+
+| Parameter | Estimated Value | Interpretation |
+|-----------|-----------------|----------------|
+| $\alpha_1$ | 0.3 | Media follows public interest |
+| $\alpha_2$ | 0.4 | Policy creates news |
+| $\beta_1$ | 0.5 | Public follows media |
+| $\beta_2$ | 0.6 | Direct incidents have strong effect |
+| $\beta_3$ | 0.2 | Policy action reduces concern |
+| $\gamma_1$ | 0.3 | Public pressure drives policy |
+| $\gamma_2$ | 0.4 | Elite pressure drives policy |
+| $\gamma_3$ | 0.5 | Industry resistance slows policy |
+
+## Media Framing of AI Risk
+
+### Dominant Media Frames
+
+**Frame 1: Technological Wonder**
+- Focus: Impressive capabilities, breakthroughs
+- Tone: Optimistic, awe-inspiring
+- Effect on concern: Decreases
+- Prevalence: 35-40% of coverage
+
+**Frame 2: Economic Disruption**
+- Focus: Job loss, inequality, industry transformation
+- Tone: Anxious, warning
+- Effect on concern: Increases
+- Prevalence: 20-25% of coverage
+
+**Frame 3: Societal Threat**
+- Focus: Discrimination, surveillance, manipulation
+- Tone: Critical, alarmed
+- Effect on concern: Increases
+- Prevalence: 15-20% of coverage
+
+**Frame 4: Existential Risk**
+- Focus: Superintelligence, humanity's survival
+- Tone: Apocalyptic
+- Effect on concern: Mixed (increases among some, dismissed by others)
+- Prevalence: 5-10% of coverage
+
+**Frame 5: Regulatory Battle**
+- Focus: Policy debates, industry vs. government
+- Tone: Political, conflictual
+- Effect on concern: Varies (politicizes issue)
+- Prevalence: 15-20% of coverage
+
+### Frame Dynamics Over Time
+
+**Typical Technology Coverage Cycle:**
+
+```
+Phase 1: Wonder/Hype (0-2 years)
+  └→ "AI achieves breakthrough..."
+  └→ Public interest high, concern low
+
+Phase 2: Problem Discovery (2-4 years)
+  └→ "AI causes harm in..."
+  └→ Concern begins rising
+
+Phase 3: Crisis/Scandal (episodic)
+  └→ "AI disaster reveals..."
+  └→ Concern spikes, policy window opens
+
+Phase 4: Regulation Debate (1-3 years)
+  └→ "Government considers AI rules..."
+  └→ Political polarization possible
+
+Phase 5: Normalization (ongoing)
+  └→ Coverage declines, AI becomes routine
+  └→ Concern stabilizes at new baseline
+```
+
+**Current Position (2024-2025):** Transitioning from Phase 2 to Phase 3/4; awaiting potential crisis event.
+
+### Media Economics and AI Coverage
+
+**What Drives Coverage Decisions:**
+
+| Factor | Effect on AI Risk Coverage | Strength |
+|--------|----------------------------|----------|
+| **Audience interest** | More coverage | High |
+| **Novelty** | Coverage peaks then declines | High |
+| **Drama/Conflict** | More alarming coverage | High |
+| **Elite attention** | More coverage | Medium-High |
+| **Ad revenue/Tech dependency** | Less critical coverage | Medium |
+| **Competitive pressure** | Follow others' coverage | Medium |
+| **Journalistic expertise** | More nuanced coverage | Low (limited AI expertise) |
+
+**Structural Bias:** Media economics favor dramatic, novel, conflict-oriented coverage over nuanced ongoing analysis.
+
+**AI-Specific Challenge:** Covering AI well requires technical expertise most newsrooms lack.
+
+## Translation to Public Concern
+
+### Information Processing Model
+
+**How Media Coverage Becomes Concern:**
+
+```
+Media Coverage → Attention Filter → Comprehension → Emotional Response → Attitude Formation → Concern Level
+```
+
+**Drop-off at Each Stage:**
+
+| Stage | % Passing Through | Cumulative |
+|-------|-------------------|------------|
+| Attention (sees coverage) | 60% | 60% |
+| Comprehension (understands) | 50% | 30% |
+| Emotional response | 70% | 21% |
+| Attitude formation | 60% | 13% |
+| Durable concern | 50% | 6% |
+
+**Implication:** ~6% of AI risk coverage translates to durable public concern formation.
+
+### Factors Affecting Translation
+
+**Amplifying Factors (Coverage to Higher Concern):**
+
+1. **Personal relevance:** "This affects me/my family"
+2. **Emotional imagery:** Visual content of harm
+3. **Source credibility:** Trusted sources
+4. **Repetition:** Multiple exposures
+5. **Elite endorsement:** Respected figures concerned
+6. **Narrative structure:** Story with victims, villains, heroes
+
+**Dampening Factors (Coverage to Lower Concern):**
+
+1. **Abstraction:** "Someday, somewhere" framing
+2. **Technical complexity:** Hard to understand
+3. **Partisan association:** "Other side's issue"
+4. **Solution availability:** "Problem being addressed"
+5. **Competing concerns:** Other issues more salient
+6. **Fatigue:** Repeated warnings without consequences
+
+### Asymmetry in Concern Formation
+
+**Negativity Bias:** Negative coverage has 2-3x the impact of equivalent positive coverage on concern formation.
+
+**Availability Heuristic:** Dramatic, recent events have disproportionate influence on perceived risk.
+
+**Threshold Effects:** Concern increases are non-linear; small coverage increases may have no effect until threshold crossed.
+
+## Policy Response Dynamics
+
+### The Policy Process
+
+**Stages of Policy Formation:**
+
+```
+Issue Emergence → Agenda Setting → Policy Formulation → Decision → Implementation → Evaluation
+      ↑                 ↑                  ↑               ↑             ↑
+   [Media]          [Media]            [Media]        [Media]       [Media]
+   [Public]         [Public]           [Elites]       [Elites]      [Public]
+```
+
+**Media and Public Influence by Stage:**
+
+| Stage | Media Influence | Public Influence | Elite Influence |
+|-------|-----------------|------------------|-----------------|
+| Issue Emergence | Very High | Low | Medium |
+| Agenda Setting | High | Medium | High |
+| Policy Formulation | Medium | Low | Very High |
+| Decision | Medium | Medium | High |
+| Implementation | Low | Low | High |
+| Evaluation | High | Medium | Medium |
+
+### Policy Windows
+
+**Kingdon's Multiple Streams Model Applied to AI:**
+
+Policy change requires alignment of three streams:
+
+1. **Problem Stream:** AI recognized as problem requiring action
+   - Current status: Partially open (awareness increasing)
+
+2. **Policy Stream:** Solutions available and technically feasible
+   - Current status: Partially developed (EU AI Act as template, but US fragmented)
+
+3. **Political Stream:** Political will and opportunity
+   - Current status: Mostly closed (no champion, other priorities)
+
+**Window Opens When:** All three streams align, typically triggered by:
+- Crisis event (incident)
+- Change in administration
+- Political entrepreneur emerges
+- International pressure
+
+**Current Assessment:** Window partially ajar; awaiting triggering event or political champion.
+
+### Feedback from Policy to Media/Concern
+
+**Policy Action Effects:**
+
+**On Media:**
+- New regulations create news stories
+- Policy debates provide ongoing coverage
+- Implementation creates enforcement stories
+- Success/failure provides narrative closure or renewal
+
+**On Public Concern:**
+
+| Policy Response | Short-term Effect on Concern | Long-term Effect |
+|-----------------|------------------------------|------------------|
+| Strong action | Decreases (problem addressed) | Stabilizes at lower level |
+| Weak action | Increases (concern dismissed) | May increase over time |
+| No action | No change initially | Frustration, cynicism |
+| Overreaction | Decreases then increases | Backlash, deregulation pressure |
+
+**"Safety Valve" Effect:** Policy action can reduce concern even if policy is ineffective, removing pressure for further action.
+
+## Complete Feedback Loop Analysis
+
+### Reinforcing Loops
+
+**Loop R1: Crisis Amplification**
+
+```
+AI Incident → Media Coverage ↑ → Public Concern ↑ →
+Political Attention ↑ → More Hearings/Statements →
+More Media Coverage ↑ → [AMPLIFIES]
+```
+
+**Characteristics:**
+- Activated by incidents
+- Can produce rapid concern spikes
+- Creates policy windows
+- Eventually self-limits (attention fatigue)
+
+**Loop R2: Elite Echo Chamber**
+
+```
+Elite Expresses Concern → Media Covers Elite →
+Other Elites Respond → More Coverage →
+Legitimizes Concern → More Elites → [AMPLIFIES]
+```
+
+**Characteristics:**
+- Can operate without public involvement
+- Produces rapid frame shifts
+- Risk of elite capture of issue
+
+**Loop R3: Industry Pushback Cycle**
+
+```
+Regulation Proposed → Industry Opposition →
+Media Covers Conflict → Politicization →
+Concern Polarizes → Policy Deadlock →
+Frustration → Renewed Push → [CYCLES]
+```
+
+**Characteristics:**
+- Creates oscillation rather than resolution
+- Can lock in suboptimal outcomes
+- Exhausts political capital
+
+### Balancing Loops
+
+**Loop B1: Normalization**
+
+```
+AI Becomes Common → Less Novel →
+Less Coverage → Less Concern →
+Less Policy Pressure → Status Quo →
+AI Remains Common → [STABILIZES LOW]
+```
+
+**Characteristics:**
+- Dominant in absence of incidents
+- Works against safety concerns
+- Can be disrupted by crisis events
+
+**Loop B2: Policy Success**
+
+```
+Policy Enacted → Problem Addressed →
+Fewer Incidents → Less Coverage →
+Reduced Concern → Reduced Pressure →
+Policy Maintained → [STABILIZES]
+```
+
+**Characteristics:**
+- Ideal outcome for safety
+- Requires actually effective policy
+- Currently hypothetical for AI
+
+**Loop B3: Crying Wolf**
+
+```
+Warnings Without Disasters → Credibility Loss →
+Concern Decreases → Coverage Shifts →
+Warnings Less Prominent → Concern Caps → [STABILIZES LOW]
+```
+
+**Characteristics:**
+- Risk for AI safety messaging
+- Grows stronger over time without incidents
+- Can be suddenly reversed by actual incident
+
+## System Behavior Analysis
+
+### Equilibrium States
+
+**Equilibrium 1: Low Attention Stable**
+- $M = 0.2, C = 0.2, P = 0.2$
+- Condition: No incidents, no elite attention
+- Stability: Moderately stable (can be disrupted)
+
+**Equilibrium 2: High Attention Stable**
+- $M = 0.6, C = 0.6, P = 0.6$
+- Condition: Sustained concern, active policy
+- Stability: Requires ongoing incidents/attention
+
+**Equilibrium 3: Polarized Oscillation**
+- $M$ and $C$ oscillate around 0.4
+- $P$ oscillates with lag
+- Condition: Partisan capture of issue
+- Stability: Persistent but unproductive
+
+**Current State:** Transitioning from Equilibrium 1 toward uncertain outcome.
+
+### Scenario Trajectories
+
+**Scenario A: Gradual Attention Increase (50% probability)**
+
+```
+Timeline: 2025-2030
+Path: M: 0.25 → 0.35 → 0.45
+      C: 0.30 → 0.38 → 0.48
+      P: 0.20 → 0.28 → 0.40
+Outcome: Incremental regulation, no crisis
+```
+
+**Scenario B: Crisis-Driven Spike (25% probability)**
+
+```
+Timeline: 2025-2028
+Path: Major incident →
+      M: 0.25 → 0.75 (spike)
+      C: 0.30 → 0.65 (spike)
+      P: 0.20 → 0.55 (rapid response)
+Outcome: Significant regulation, possible overreaction
+```
+
+**Scenario C: Polarized Stalemate (15% probability)**
+
+```
+Timeline: 2025-2030
+Path: Issue becomes partisan →
+      M: 0.40 (sustained but split)
+      C: 0.50 left / 0.25 right (divergent)
+      P: 0.25 (gridlock)
+Outcome: Minimal effective policy despite attention
+```
+
+**Scenario D: Normalization (10% probability)**
+
+```
+Timeline: 2025-2028
+Path: No major incidents →
+      M: 0.25 → 0.15 (declining)
+      C: 0.30 → 0.20 (declining)
+      P: 0.20 → 0.15 (deregulation pressure)
+Outcome: Minimal governance, high latent risk
+```
+
+## Intervention Leverage Points
+
+### High-Leverage Interventions
+
+**1. Crisis Preparedness (Media/Policy)**
+
+- Pre-develop response protocols
+- Prepare policy proposals for windows
+- Build coalitions before crisis
+- **Leverage:** Can determine crisis outcome direction
+
+**2. Elite Recruitment (Media/Public)**
+
+- Recruit credible, diverse voices
+- Provide talking points and evidence
+- Create platform for expression
+- **Leverage:** Can shift frame equilibrium
+
+**3. Frame Development (Media)**
+
+- Develop effective, accurate frames
+- Test for resonance and accuracy
+- Disseminate to journalists
+- **Leverage:** Shapes all subsequent coverage
+
+### Medium-Leverage Interventions
+
+**4. Journalist Education (Media)**
+
+- Improve AI literacy among reporters
+- Provide accessible expert sources
+- Create beat reporter specialization
+- **Leverage:** Improves coverage quality
+
+**5. Public Communication (Public)**
+
+- Develop relatable narratives
+- Use concrete examples
+- Provide agency (what to do)
+- **Leverage:** Improves translation from coverage to concern
+
+**6. Policy Development (Policy)**
+
+- Prepare concrete proposals
+- Build technical feasibility case
+- Develop coalition support
+- **Leverage:** Ready for windows when they open
+
+### Low-Leverage (But Important)
+
+**7. Long-term Research (All)**
+
+- Track opinion trends
+- Model system dynamics
+- Evaluate intervention effectiveness
+- **Leverage:** Informs all other interventions
+
+## Risks and Failure Modes
+
+### Attention Failure Modes
+
+**1. Premature Saturation**
+- Problem: Issue becomes "old news" before policy action
+- Mechanism: Normalization loop dominates
+- Risk level: Medium-High
+- Mitigation: Diversify frames, maintain novelty
+
+**2. Elite Capture**
+- Problem: Issue defined by narrow interests
+- Mechanism: Elite echo chamber excludes broader concerns
+- Risk level: Medium
+- Mitigation: Broaden coalition, include diverse voices
+
+**3. Partisan Capture**
+- Problem: Issue becomes partisan battleground
+- Mechanism: Political entrepreneurs politicize
+- Risk level: High
+- Mitigation: Bipartisan framing, early coalition
+
+### Policy Failure Modes
+
+**1. Window Closes Empty-Handed**
+- Problem: Crisis creates window but no policy ready
+- Mechanism: Policy stream not prepared
+- Risk level: High
+- Mitigation: Pre-develop proposals
+
+**2. Overreaction**
+- Problem: Crisis produces excessive policy
+- Mechanism: Public panic, political grandstanding
+- Risk level: Medium
+- Mitigation: Prepare proportionate options, expert input
+
+**3. Symbolic Policy**
+- Problem: Policy looks like action but lacks substance
+- Mechanism: Political incentive for appearance, not effect
+- Risk level: High
+- Mitigation: Clear metrics, enforcement mechanisms
+
+## Current System Assessment (2024-2025)
+
+### State Variables
+
+| Variable | Current Estimate | Trend | 6-Month Forecast |
+|----------|------------------|-------|------------------|
+| Media Attention $M$ | 0.35 | Stable-Increasing | 0.38-0.42 |
+| Public Concern $C$ | 0.32 | Increasing | 0.35-0.40 |
+| Policy Activity $P$ | 0.25 | Slowly Increasing | 0.28-0.32 |
+
+### Loop Status
+
+| Loop | Current Activation | Direction |
+|------|-------------------|-----------|
+| R1: Crisis Amplification | Low (no major incident) | Dormant |
+| R2: Elite Echo Chamber | Medium | Increasing |
+| R3: Pushback Cycle | Low | Emerging |
+| B1: Normalization | Medium-High | Active |
+| B2: Policy Success | Low | N/A (no policy) |
+| B3: Crying Wolf | Low-Medium | Building |
+
+### Window Status
+
+- Problem Stream: Partially open
+- Policy Stream: Underdeveloped
+- Political Stream: Mostly closed
+
+**Overall Assessment:** System in transitional state. Attention building but not yet at policy threshold. Vulnerable to both crisis-driven spike and normalization.
+
+## Strategic Importance
+
+### Magnitude Assessment
+
+| Dimension | Assessment | Quantitative Estimate |
+|-----------|------------|----------------------|
+| **Influence on AI governance** | High - media framing shapes what policies are politically feasible | 60-80% of policy options constrained by media environment |
+| **Policy window probability** | Moderate - windows open episodically following crisis events | 20-30% chance of major window in next 3 years |
+| **Lag time impact** | Significant - 6-18 month delay means policies respond to past not present risks | 6-18 months from coverage spike to regulatory action |
+| **Partisan capture risk** | High - AI could become polarized issue, limiting bipartisan action | 30-40% probability of partisan capture by 2028 |
+| **Current system state** | Transitional - attention building but not yet at policy threshold | M = 0.35, C = 0.32, P = 0.25 on normalized scale |
+
+### Resource Implications
+
+| Intervention | Investment Needed | Expected Impact | Priority |
+|--------------|-------------------|-----------------|----------|
+| **Crisis preparedness planning** | \$5-15 million for policy development | Ensures ready proposals when windows open; 3-5x policy quality improvement | Critical |
+| **Elite coalition building** | \$10-30 million over 3 years | Recruits credible, diverse voices; shifts elite echo chamber dynamics | High |
+| **Journalist AI literacy programs** | \$8-20 million for training and resources | Improves coverage quality; reduces sensationalism by 20-40% | High |
+| **Frame development and testing** | \$3-8 million for research and messaging | Shapes how issue is understood; 30-50% improvement in message resonance | Medium-High |
+| **Public communication campaigns** | \$20-60 million per campaign | Builds long-term legitimacy; 5-15% concern increase per campaign | Medium |
+| **Loop monitoring systems** | \$2-5 million for tracking infrastructure | Early warning of system shifts; enables adaptive response | Medium |
+
+### Key Cruxes
+
+| Crux | If True | If False | Current Assessment |
+|------|---------|----------|-------------------|
+| **Major AI incident will occur before 2028** | Crisis amplification loop activates; policy window opens | Gradual attention scenario; slower policy development | 25-35% probability - timeline for incident uncertain |
+| **AI safety can avoid partisan capture** | Bipartisan coalitions possible; comprehensive policy feasible | Issue becomes polarized battleground; gridlock likely | 50-60% probability - neither party has claimed issue yet |
+| **Elite persuasion is faster than public opinion work** | Prioritize policymaker engagement over mass campaigns | Invest in building broad public support base | 75-85% probability - elite channels more direct |
+| **Normalization loop will dominate without incident** | Attention will decline; policy window may close | Sustained concern growth possible without crisis | 60-70% probability - normalization historically strong |
+| **Media quality on AI will improve** | More nuanced coverage leads to better-informed public | Sensationalism continues; misinformed public opinion | 30-40% probability - economic incentives favor drama |
+
+## Model Limitations
+
+### Known Limitations
+
+1. **Simplification:** Real system has many more actors and feedback paths
+2. **Parameter Uncertainty:** Coupling strengths are estimates
+3. **Context Dependence:** Dynamics vary by country, issue area
+4. **Non-Linearities:** Threshold effects not fully captured
+5. **Agency Neglect:** Strategic actors can manipulate loops
+
+### What the Model Misses
+
+- Individual actor strategies
+- International dynamics
+- Technical AI developments
+- Economic shocks
+- Other policy priorities competing for attention
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "Will a major AI incident occur that triggers crisis amplification loop?",
+    "Can AI safety concern avoid partisan capture?",
+    "Will media coverage improve in quality or remain sensationalized?",
+    "Is the current policy infrastructure sufficient for rapid response to crisis?",
+    "What is the true coupling strength between public concern and policy action?"
+  ]}
+/>
+
+## Policy Recommendations
+
+### For AI Safety Advocates
+
+1. **Monitor loop activation:** Track early warning signs of cycle shifts
+2. **Prepare for windows:** Have proposals ready
+3. **Diversify frames:** Avoid single-frame dependence
+4. **Build broad coalitions:** Resist capture
+5. **Maintain credibility:** Avoid crying wolf
+
+### For Media
+
+1. **Invest in expertise:** Develop AI-literate journalists
+2. **Resist sensationalism:** Balance drama with accuracy
+3. **Provide context:** Help public understand significance
+4. **Follow up:** Cover policy outcomes, not just proposals
+
+### For Policy-Makers
+
+1. **Prepare response plans:** Don't wait for crisis
+2. **Consult experts early:** Improve policy stream
+3. **Resist symbolic action:** Design effective policy
+4. **Build international coordination:** Align with allies
+5. **Monitor public concern:** Use as early warning
+
+## Related Models
+
+- <EntityLink id="public-opinion-evolution" label="Public Opinion Evolution" /> - Drivers of AI risk opinion change
+- <EntityLink id="epistemic-collapse-threshold" label="Epistemic Collapse Threshold" /> - When shared reality breaks down
+- <EntityLink id="disinformation-electoral-impact" label="Disinformation Electoral Impact" /> - AI influence on democratic processes
+- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> - Competitive pressures in AI development
+
+## Sources
+
+- Kingdon, John. "Agendas, Alternatives, and Public Policies" (1984)
+- Baumgartner & Jones. "Agendas and Instability in American Politics" (1993)
+- McCombs & Shaw. "The Agenda-Setting Function of Mass Media" (1972)
+- Entman, Robert. "Framing: Toward Clarification of a Fractured Paradigm" (1993)
+- Sterman, John. "Business Dynamics: Systems Thinking and Modeling" (2000)
+- Meadows, Donella. "Thinking in Systems" (2008)
+- Nisbet, Matthew. "Communicating Climate Change" (2009)
+- Oreskes & Conway. "Merchants of Doubt" (2010)
+
+## Related Pages
+
+<Backlinks client:load entityId="media-policy-feedback-loop" />

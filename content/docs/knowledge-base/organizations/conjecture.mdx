@@ -1,0 +1,296 @@
+---
+title: Conjecture
+description: AI safety research organization focused on cognitive emulation and mechanistic interpretability, pursuing interpretability-first approaches to building safe AI systems
+sidebar:
+  order: 12
+quality: 37
+llmSummary: Conjecture is a 30-40 person London-based AI safety org founded 2021, pursuing Cognitive Emulation (CoEm) - building interpretable AI from ground-up rather than aligning LLMs - with $30M+ Series A funding. Founded by Connor Leahy (EleutherAI), they face high uncertainty about CoEm competitiveness (3-5 year timeline) and commercial pressure risks.
+lastEdited: "2026-01-29"
+importance: 28
+ratings:
+  novelty: 2.5
+  rigor: 4
+  actionability: 2
+  completeness: 5.5
+metrics:
+  wordCount: 466
+  citations: 16
+  tables: 34
+  diagrams: 0
+clusters:
+  - ai-safety
+  - community
+subcategory: safety-orgs
+---
+import {DataInfoBox, KeyPeople, KeyQuestions, Section, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="conjecture" client:load />
+
+<DataInfoBox entityId="conjecture" />
+
+## Overview
+
+Conjecture is an AI safety research organization founded in 2021 by <EntityLink id="connor-leahy">Connor Leahy</EntityLink> and a team of researchers concerned about existential risks from advanced AI. The organization pursues a distinctive technical approach centered on "Cognitive Emulation" (CoEm) - building interpretable AI systems based on human cognition principles rather than aligning existing <EntityLink id="language-models">large language models</EntityLink>.
+
+Based in London with a team of 30-40 researchers, Conjecture raised over \$10M in Series A funding in 2023. Their research agenda emphasizes mechanistic interpretability and understanding neural network internals, representing a fundamental alternative to mainstream <EntityLink id="why-alignment-hard">prosaic alignment approaches</EntityLink> pursued by organizations like <EntityLink id="anthropic">Anthropic</EntityLink> and <EntityLink id="openai">OpenAI</EntityLink>.
+
+| Aspect | Assessment | Evidence | Source |
+|--------|------------|----------|--------|
+| Technical Innovation | High | Novel CoEm research agenda | <R id="b7aa1f2c839b5ee8">Conjecture Blog</R> |
+| Funding Security | Strong | \$30M+ Series A (2023) | <R id="b2f30b8ca0dd850e">TechCrunch Reports</R> |
+| Research Output | Moderate | Selective publication strategy | <R id="296aaf722d89ca8c">Research Publications</R> |
+| Influence | Growing | European AI policy engagement | <R id="817964dfbb0e3b1b">UK AISI</R> |
+
+## Risk Assessment
+
+| Risk Category | Severity | Likelihood | Timeline | Trend |
+|---------------|----------|------------|----------|--------|
+| CoEm Uncompetitive | High | Moderate | 3-5 years | Uncertain |
+| Commercial Pressure Compromise | Medium | High | 2-3 years | Worsening |
+| Research Insularity | Low | Moderate | Ongoing | Stable |
+| Funding Sustainability | Medium | Low | 5+ years | Improving |
+
+## Founding and Evolution
+
+### Origins (2021)
+
+Conjecture emerged from the **EleutherAI** collective, an open-source AI research group that successfully recreated GPT-3 as open-source models (GPT-J, GPT-NeoX). Key founding factors:
+
+| Factor | Impact | Details |
+|--------|--------|---------|
+| EleutherAI Experience | High | Demonstrated capability replication feasibility |
+| Safety Concerns | High | Recognition of risks from capability <EntityLink id="proliferation">proliferation</EntityLink> |
+| European Gap | Medium | Limited AI safety ecosystem outside Bay Area |
+| Funding Availability | Medium | Growing investor interest in AI safety |
+
+**Philosophical Evolution**: The transition from EleutherAI's "democratize AI" mission to Conjecture's safety-focused approach represents a significant shift in thinking about AI development and publication strategies.
+
+### Funding Trajectory
+
+| Year | Funding Stage | Amount | Impact |
+|------|--------------|--------|--------|
+| 2021 | Seed | Undisclosed | Initial team of ≈15 researchers |
+| 2023 | Series A | \$30M+ | Scaled to 30-40 researchers |
+| 2024 | Operating | Ongoing | Sustained research operations |
+
+## Cognitive Emulation (CoEm) Research Agenda
+
+### Core Philosophy
+
+Conjecture's signature approach contrasts sharply with mainstream AI development:
+
+| Approach | Philosophy | Methods | Evaluation |
+|----------|------------|---------|------------|
+| **Prosaic Alignment** | Train powerful LLMs, align post-hoc | <EntityLink id="rlhf">RLHF</EntityLink>, <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> | Behavioral testing |
+| **Cognitive Emulation** | Build interpretable systems from ground up | Human cognition principles | Mechanistic understanding |
+
+### Key Research Components
+
+**Mechanistic Interpretability**
+- Circuit discovery in neural networks
+- Feature attribution and visualization
+- Scaling interpretability to larger models
+- <EntityLink id="interpretability">Interpretability research</EntityLink> collaboration
+
+**Architecture Design**
+- Modular systems for better control
+- Interpretability-first design choices
+- Trading capabilities for understanding
+- Novel training methodologies
+
+**Model Organisms**
+- Smaller, interpretable test systems
+- Alignment property verification
+- Deception detection research
+- Goal representation analysis
+
+## Key Personnel
+
+<Section title="Leadership Team">
+  <KeyPeople people={[
+    { name: "Connor Leahy", role: "CEO and Co-founder", background: "EleutherAI, autodidact ML researcher" },
+    { name: "Sid Black", role: "Co-founder", background: "EleutherAI technical researcher" },
+    { name: "Gabriel Alfour", role: "CTO", background: "Former Tezos CTO, systems engineering" },
+  ]} />
+</Section>
+
+### Connor Leahy Profile
+
+| Aspect | Details |
+|--------|---------|
+| **Background** | EleutherAI collective member, GPT-J contributor |
+| **Evolution** | From open-source advocacy to safety-focused research |
+| **Public Role** | Active AI policy engagement, podcast appearances |
+| **Views** | Short AI timelines, high P(doom), interpretability-necessary |
+
+**Timeline Estimates**: Leahy has consistently expressed <EntityLink id="agi-timeline">short AI timeline</EntityLink> views, suggesting AGI within years rather than decades.
+
+## Research Focus Areas
+
+### Mechanistic Interpretability
+
+| Research Area | Status | Key Questions |
+|---------------|--------|---------------|
+| **Circuit Analysis** | Active | How do transformers implement reasoning? |
+| **Feature Extraction** | Ongoing | What representations emerge in training? |
+| **Scaling Methods** | Development | Can interpretability scale to AGI-level systems? |
+| **Goal Detection** | Early | How can we detect goal-directedness mechanistically? |
+
+### Comparative Advantages
+
+| Organization | Primary Focus | Interpretability Approach |
+|--------------|---------------|---------------------------|
+| **Conjecture** | CoEm, ground-up interpretability | Design-time interpretability |
+| **<EntityLink id="anthropic">Anthropic</EntityLink>** | Frontier models + interpretability | Post-hoc analysis of LLMs |
+| **<EntityLink id="arc">ARC</EntityLink>** | Theoretical alignment | Evaluation and ELK research |
+| **<EntityLink id="redwood-research">Redwood</EntityLink>** | <EntityLink id="ai-control">AI control</EntityLink> | Interpretability for control |
+
+## Strategic Position
+
+### Theory of Change
+
+Conjecture's pathway to AI safety impact:
+
+1. **Develop scalable interpretability techniques** for powerful AI systems
+2. **Demonstrate CoEm viability** as competitive alternative to black-box scaling
+3. **Influence field direction** toward interpretability-first development
+4. **Inform governance** with technical feasibility insights
+5. **Build safe systems** using CoEm principles if successful
+
+### European AI Safety Hub
+
+| Role | Impact | Examples |
+|------|--------|----------|
+| **Geographic Diversity** | High | Alternative to Bay Area concentration |
+| **Policy Engagement** | Growing | <EntityLink id="uk-aisi">UK AISI</EntityLink> consultation |
+| **Talent Development** | Moderate | European researcher recruitment |
+| **Community Building** | Early | Workshops and collaborations |
+
+## Challenges and Criticisms
+
+### Technical Feasibility
+
+| Challenge | Severity | Status |
+|-----------|----------|--------|
+| **CoEm Competitiveness** | High | Unresolved - early stage |
+| **Interpretability Scaling** | High | Active research question |
+| **Human Cognition Complexity** | Medium | Ongoing investigation |
+| **Timeline Alignment** | High | Critical if <EntityLink id="agi-timeline">AGI timelines</EntityLink> short |
+
+### Organizational Tensions
+
+**Commercial Pressure vs Safety Mission**
+- VC funding creates return expectations
+- Potential future deployment pressure
+- Comparison to <EntityLink id="anthropic">Anthropic's commercialization path</EntityLink>
+
+**Publication Strategy Criticism**
+- Shift from EleutherAI's radical openness
+- Selective research sharing decisions
+- Balance between transparency and safety
+
+## Current Research Outputs
+
+### Published Work
+
+| Type | Focus | Impact |
+|------|-------|--------|
+| **Technical Papers** | Interpretability methods | Research community |
+| **Blog Posts** | CoEm explanations | Public understanding |
+| **Policy Contributions** | Technical feasibility | Governance decisions |
+| **Open Source Tools** | Interpretability software | Research ecosystem |
+
+### Research Questions
+
+<KeyQuestions questions={[
+  "Can CoEm produce AI systems competitive with scaled LLMs?",
+  "Is mechanistic interpretability sufficient for AGI safety verification?",
+  "How will commercial pressures affect Conjecture's research direction?",
+  "What role should interpretability play in AI governance frameworks?",
+  "Can cognitive emulation bridge neuroscience and AI safety research?",
+  "How does CoEm relate to other alignment approaches like Constitutional AI?"
+]} />
+
+## Timeline and Risk Estimates
+
+### Leadership Risk Assessments
+
+Conjecture's leadership has articulated clear views on AI timelines and safety approaches, which fundamentally motivate their Cognitive Emulation research agenda and organizational strategy:
+
+| Expert/Source | Estimate | Reasoning |
+|---------------|----------|-----------|
+| Connor Leahy | AGI: 2-10 years | Leahy has consistently expressed short AI timeline views across multiple public statements and podcasts from 2023-2024, suggesting transformative AI systems could emerge within years rather than decades. These short timelines create urgency for developing interpretability-first approaches before AGI arrives. |
+| Connor Leahy | P(doom): High without major changes | Leahy has expressed significant concern about the default trajectory of AI development in 2023 statements, arguing that prosaic alignment approaches pursued by frontier labs are insufficient to ensure safety. This pessimism about conventional alignment motivates Conjecture's alternative CoEm approach. |
+| Conjecture Research | Prosaic alignment: Insufficient | The organization's core research direction reflects a fundamental assessment that post-hoc alignment of large language models through techniques like RLHF and Constitutional AI cannot provide adequate safety guarantees. This view, maintained since founding, drives their pursuit of interpretability-first system design. |
+| Organization | Interpretability: Necessary for safety | Conjecture's founding premise holds that mechanistic interpretability is not merely useful but necessary for AI safety verification. This fundamental research assumption distinguishes them from organizations pursuing behavioral safety approaches and shapes their entire technical agenda. |
+
+## Future Scenarios
+
+### Research Trajectory Projections
+
+| Timeline | Optimistic | Realistic | Pessimistic |
+|----------|------------|-----------|-------------|
+| **2-3 years** | CoEm demonstrations, policy influence | Continued interpretability advances | Commercial pressure compromises |
+| **3-5 years** | Competitive interpretable systems | Mixed results, partial success | Research agenda stagnates |
+| **5+ years** | Field adoption of CoEm principles | Portfolio contribution to safety | Marginalized approach |
+
+### Critical Dependencies
+
+| Factor | Importance | Uncertainty |
+|--------|------------|-------------|
+| **Technical Feasibility** | Critical | High - unproven at scale |
+| **Funding Continuity** | High | Medium - VC expectations |
+| **AGI Timeline** | Critical | High - if very short, insufficient time |
+| **Field Receptivity** | Medium | Medium - depends on results |
+
+## Relationships and Collaborations
+
+### Within AI Safety Ecosystem
+
+| Organization | Relationship | Collaboration Type |
+|--------------|--------------|-------------------|
+| **<EntityLink id="anthropic">Anthropic</EntityLink>** | Friendly competition | Interpretability research sharing |
+| **<EntityLink id="arc">ARC</EntityLink>** | Complementary | Different technical approaches |
+| **<EntityLink id="miri">MIRI</EntityLink>** | Aligned concerns | Skepticism of prosaic alignment |
+| **Academic Labs** | Collaborative | Interpretability technique development |
+
+### Policy and Governance
+
+**UK Engagement**
+- <EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink> consultation
+- Technical feasibility assessments
+- European AI Act discussions
+
+**International Influence**
+- Growing presence in global AI safety discussions
+- Alternative perspective to US-dominated discourse
+- Technical grounding for governance approaches
+
+## Sources & Resources
+
+### Primary Sources
+
+| Type | Source | Description |
+|------|--------|-------------|
+| **Official Website** | <R id="b7aa1f2c839b5ee8">Conjecture.dev</R> | Research updates, team information |
+| **Research Papers** | <R id="1de7c0ba4f50708d">Google Scholar</R> | Technical publications |
+| **Blog Posts** | <R id="47b5960d711ad336">Conjecture Blog</R> | Research explanations, philosophy |
+| **Interviews** | <R id="51e0a77c2b6e8cd4">Connor Leahy Talks</R> | Leadership perspectives |
+
+### Secondary Analysis
+
+| Type | Source | Focus |
+|------|--------|-------|
+| **AI Safety Analysis** | <R id="ccb3e34a982e2528"><EntityLink id="lesswrong">LessWrong</EntityLink> Posts</R> | Community discussion |
+| **Technical Reviews** | <R id="2e0c662574087c2a">Alignment Forum</R> | Research evaluation |
+| **Policy Reports** | <R id="f35c467b353f990f"><EntityLink id="govai">GovAI</EntityLink> Analysis</R> | Governance implications |
+| **Funding News** | <R id="401e5a60f9cd395e">TechCrunch Coverage</R> | Business developments |
+
+### Related Resources
+
+| Topic | Internal Links | External Resources |
+|-------|----------------|-------------------|
+| **Interpretability** | <EntityLink id="interpretability">Technical Interpretability</EntityLink> | <R id="5083d746c2728ff2">Anthropic Interpretability</R> |
+| **Alignment Approaches** | <EntityLink id="why-alignment-hard">Why Alignment is Hard</EntityLink> | <R id="2e0c662574087c2a"><EntityLink id="alignment">AI Alignment</EntityLink> Forum</R> |
+| **European AI Policy** | <EntityLink id="uk-aisi">UK AISI</EntityLink> | <R id="f37ebc766aaa61d7">EU AI Office</R> |
+| **Related Orgs** | Safety Organizations | <R id="876bb3bfc6031642">AI Safety Community</R> |

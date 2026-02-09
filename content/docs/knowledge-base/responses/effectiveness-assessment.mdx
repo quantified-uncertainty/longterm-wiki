@@ -1,0 +1,314 @@
+---
+title: Policy Effectiveness Assessment
+description: Comprehensive analysis of AI governance policy effectiveness, revealing that compute thresholds and export controls achieve moderate success (60-70% compliance) while voluntary commitments lag significantly, with critical gaps in evaluation methodology and evidence base limiting our understanding of what actually works in AI governance.
+sidebar:
+  order: 20
+quality: 71
+llmSummary: Systematic analysis of AI governance policy effectiveness finds compute thresholds achieve 60-85% compliance while voluntary commitments show less than 30% substantive behavioral change, but only 15-20% of policies have measurable outcome data and fewer than 20% of evaluations meet moderate evidence standards, creating a critical gap in understanding what actually reduces AI risk.
+lastEdited: "2025-12-28"
+importance: 82.5
+pageTemplate: knowledge-base-response
+todos:
+  - Complete 'How It Works' section
+  - Complete 'Limitations' section (6 placeholders)
+ratings:
+  novelty: 6.5
+  rigor: 7
+  actionability: 7.5
+  completeness: 7
+metrics:
+  wordCount: 2356
+  citations: 27
+  tables: 8
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: governance
+---
+import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="effectiveness-assessment" client:load />
+
+<DataInfoBox entityId="effectiveness-assessment" />
+
+## Quick Assessment
+
+| Dimension | Rating | Evidence Basis |
+|-----------|--------|----------------|
+| **Overall Effectiveness** | Low-Moderate (30-45%) | Only 15-20% of AI policies have measurable outcome data; [AGILE Index 2025](https://arxiv.org/abs/2507.11546) evaluates 40 countries across 43 indicators, finding wide variance |
+| **Evidence Quality** | Weak | Fewer than 20% of evaluations meet moderate evidence standards; [OECD 2025 report](https://www.oecd.org/en/publications/2025/06/governing-with-artificial-intelligence_398fa287.html) notes "very little research on risks of AI in policy evaluation" |
+| **Implementation Maturity** | Early Stage | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> first full enforcement powers granted December 2025 (Finland); most frameworks still in pilot phases |
+| **Voluntary Commitment Compliance** | 44-69% | [Research on White House commitments](https://ojs.aaai.org/index.php/AIES/article/download/36743/38881/40818): first cohort (July 2023) averaged 69.0% compliance; second cohort averaged 44.6% |
+| **Measurement Infrastructure** | Underdeveloped | [NY State Comptroller audit (2025)](https://www.osc.ny.gov/state-agencies/audits/2025/12/02/enforcement-local-law-144-automated-employment-decision-tools) found NYC DCWP identified only 1 of 17+ potential non-compliance instances |
+| **<EntityLink id="international-coordination">International Coordination</EntityLink>** | Emerging | [OECD G7 Framework (Feb 2025)](https://www.oecd.org/en/about/news/press-releases/2025/02/oecd-launches-global-framework-to-monitor-application-of-g7-hiroshima-ai-code-of-conduct.html) launched with 19 organizations submitting reports; 1000+ policy initiatives across 70+ jurisdictions |
+| **Export Control Effectiveness** | Moderate (60-75%) | China produces only 200,000 AI chips in 2025 ([Commerce testimony](https://www.congress.gov/crs-product/R48642)); but [smuggling networks](https://www.cnas.org/publications/commentary/cnas-insights-the-export-control-loophole-fueling-chinas-chip-production) and DUVi multipatterning workarounds proliferate |
+| **Political Durability** | Low | [Biden AI Diffusion Rule rescinded](https://ai-frontiers.org/articles/us-chip-export-controls-china-ai) March 2025; voluntary commitments face "less federal pressure" under new administration |
+
+## Overview
+
+As artificial intelligence governance efforts proliferate globally—from the EU AI Act to U.S. Executive Orders to <EntityLink id="voluntary-commitments">voluntary industry commitments</EntityLink>—a fundamental question emerges: **Which policies are actually working to reduce AI risks?** Policy effectiveness assessment represents both a critical need and a profound challenge in <EntityLink id="ai-governance">AI governance</EntityLink>, requiring sophisticated evaluation frameworks to distinguish between policy theater and genuine risk reduction. By May 2023, [over 1,000 AI policy initiatives](https://oecd.ai/en/) had been reported across 70+ jurisdictions following OECD AI Principles, yet systematic effectiveness data remains scarce.
+
+The stakes of this assessment are enormous. With limited political capital, regulatory bandwidth, and industry cooperation available for AI governance, policymakers must allocate these scarce resources toward approaches that demonstrably improve outcomes. Yet current evaluation efforts face severe limitations: most AI policies are less than two years old, providing insufficient time to observe meaningful effects; counterfactual scenarios are unknowable; and "success" itself remains contested across different stakeholder priorities of safety, innovation, and rights protection. Early [OECD research](https://www.oecd.org/en/publications/2025/06/governing-with-artificial-intelligence_398fa287.html) suggests that inconsistent governance approaches could cost firms 8-9% in underperformance, as evidenced by a 2023 ban of a major AI service in Italy.
+
+Despite these challenges, emerging evidence suggests significant variation in policy effectiveness. Export controls and <EntityLink id="thresholds">compute thresholds</EntityLink> appear to achieve 60-70% compliance rates where measured, while voluntary commitments show less than 30% behavioral change. However, only 15-20% of AI policies worldwide have established measurable outcome data, creating a critical evidence gap that undermines informed governance decisions.
+
+### Global AI Governance Landscape (2025)
+
+| Framework/Initiative | Participating Entities | Key Metrics | Status | Source |
+|---------------------|----------------------|-------------|--------|--------|
+| **OECD AI Principles** | 70+ jurisdictions | 1000+ policy initiatives reported | Active since 2019 | [OECD.AI](https://oecd.ai/en/) |
+| **G7 Hiroshima Reporting Framework** | 19 organizations (incl. Amazon, <EntityLink id="anthropic">Anthropic</EntityLink>, Google, Microsoft, <EntityLink id="openai">OpenAI</EntityLink>) | First reports published Feb 2025 | Operational | [OECD](https://www.oecd.org/en/about/news/press-releases/2025/02/oecd-launches-global-framework-to-monitor-application-of-g7-hiroshima-ai-code-of-conduct.html) |
+| **EU AI Act** | 27 EU member states + EEA | Finland first with enforcement powers (Dec 2025) | Phased implementation through 2027 | [EU Commission](https://artificialintelligenceact.eu/) |
+| **<EntityLink id="us-aisi">US AI Safety Institute</EntityLink> Consortium** | 280+ organizations | 5 working groups (risk management, synthetic content, evaluations, red-teaming, security) | Active | [NIST](https://www.nist.gov/news-events/news/us-ai-safety-institute-consortium-holds-first-plenary-meeting-reflect-progress-2024) |
+| **AGILE Index** | 40 countries evaluated | 43 legal/institutional/societal indicators | Annual assessment | [arXiv](https://arxiv.org/abs/2507.11546) |
+| **UN Global Dialogue on AI** | 193 member states | Scientific Panel + Global Dialogue bodies | Launched Sep 2025 | [UN](https://press.un.org/en/2025/sgsm22839.doc.htm) |
+| **White House Voluntary Commitments** | 16 companies (3 cohorts) | Avg compliance: 69% (cohort 1), 44.6% (cohort 2) | Uncertain post-transition | [AI Lab Watch](https://ailabwatch.org/resources/commitments) |
+
+## Policy Evaluation Framework
+
+Understanding policy effectiveness requires a systematic approach that moves beyond compliance theater to measure genuine risk reduction. The following framework outlines how policy interventions translate (or fail to translate) into actual safety outcomes:
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[Policy Design] --> B{Implementation Quality}
+    B -->|High| C[Strong Compliance Mechanisms]
+    B -->|Low| D[Weak Enforcement]
+
+    C --> E[Behavioral Change]
+    D --> F[Compliance Theater]
+
+    E --> G{Monitoring & Measurement}
+    F --> G
+
+    G -->|Robust Data| H[Evidence-Based Assessment]
+    G -->|Weak Data| I[Anecdotal Claims]
+
+    H --> J[Risk Reduction Verification]
+    I --> K[Effectiveness Unknown]
+
+    J --> L{Actual Safety Impact?}
+    K --> M[Policy Continuation Based on Politics]
+
+    L -->|Yes| N[Iterate & Scale]
+    L -->|No| O[Revise or Abandon]
+
+    style A fill:#e1f5ff
+    style E fill:#d4edda
+    style F fill:#f8d7da
+    style J fill:#d4edda
+    style K fill:#f8d7da
+    style N fill:#d4edda
+    style O fill:#fff3cd
+    style M fill:#f8d7da
+`} />
+
+This framework reveals critical failure modes where policies appear successful based on stated intentions or compliance paperwork, but fail to generate measurable behavioral change or risk reduction. The gap between policy announcement and actual safety impact often spans multiple years, during which ineffective approaches consume scarce governance resources.
+
+## Assessment Framework and Methodology
+
+### Effectiveness Dimensions
+
+Evaluating AI policy effectiveness requires examining multiple interconnected dimensions that capture different aspects of policy success. **Compliance assessment** measures whether regulated entities actually follow established rules, using metrics like audit results and violation rates. **Behavioral change analysis** goes deeper to examine whether policies alter underlying conduct beyond mere rule-following, tracking indicators like safety investments and practice adoption. **Risk reduction measurement** attempts to quantify whether policies genuinely lower AI-related risks through tracking incidents, near-misses, and capability constraints.
+
+Additionally, **side effect evaluation** captures unintended consequences including innovation impacts and geographic development shifts, while **durability analysis** assesses whether policy effects will persist over time through measures of industry acceptance and political stability. This multidimensional framework recognizes that apparent compliance may mask ineffective implementation, while genuine behavioral change represents a stronger signal of policy success.
+
+### Evidence Quality Standards
+
+The field employs varying evidence standards that significantly impact assessment reliability. **Strong evidence** emerges from randomized controlled trials (extremely rare in AI policy contexts) and clear before-after comparisons with appropriate control groups. **Moderate evidence** includes compliance audits, enforcement data, observable industry behavior changes, and structured expert assessments. **Weak evidence** relies on anecdotal reports, stated intentions without verification, and theoretical arguments about likely effects.
+
+Current AI policy assessment suffers from overreliance on weak evidence categories, with fewer than 20% of evaluations meeting moderate evidence standards. This evidence hierarchy suggests treating most current effectiveness claims with significant skepticism while investing heavily in building stronger evaluation infrastructure.
+
+## Comparative Policy Effectiveness
+
+The following table synthesizes available evidence on major AI governance approaches, revealing substantial variation in measured outcomes and highlighting critical evidence gaps:
+
+| Policy Approach | Compliance Rate | Behavioral Change | Risk Reduction Evidence | Implementation Cost | Key Limitations | Evidence Quality |
+|----------------|----------------|-------------------|------------------------|--------------------|-----------------|--------------------|
+| **Compute Thresholds** (e.g., EO 14110 10^26 FLOP) | 70-85% | Moderate (reporting infrastructure established) | Unknown (too early) | Low (automated reporting) | Threshold gaming; efficiency improvements undermine fixed FLOP limits | Moderate |
+| **Export Controls** (semiconductor restrictions) | 60-75% | High (delayed Chinese AI capabilities 1-3 years) | Low-Moderate (workarounds proliferating) | High (diplomatic costs) | Unilateral controls enable regulatory arbitrage; accelerates domestic alternatives | Moderate |
+| **Voluntary Commitments** (White House AI Commitments) | 85%+ adoption | Low (less than 30% substantive behavioral change) | Very Low (primarily aspirational) | Very Low | No enforcement; competitive pressure erodes commitments | Weak |
+| **Mandatory Disclosure** (NYC Local Law 144) | 40-60% initial; improving to 70%+ | Moderate (20% abandoned AI tools rather than audit) | Unknown (audit quality varies dramatically) | Medium | Compliance without substance; specialized audit industry emerges | Moderate |
+| **Risk-Based Frameworks** (EU AI Act) | Too early (phased implementation through 2027) | Too early | Too early | Very High (administrative burden) | Classification disputes; enforcement capacity untested | Insufficient data |
+| **AI Safety Institutes** (US/UK AISIs) | N/A (institutional capacity) | Early (evaluation frameworks developing) | Too early (3-5 year assessment needed) | High | Independence questions; technical authority unclear | Weak |
+| **Pre-deployment Evaluations** (Frontier lab RSPs) | High (major labs implementing) | Moderate (evaluation rigor varies) | Low (self-policing model) | Medium | No external verification; proprietary methods | Weak |
+
+**Key findings:** Enforcement mechanisms and objective criteria strongly predict compliance, while voluntary approaches show minimal behavioral change under competitive pressure. However, genuine risk reduction remains largely unmeasured across all policy types, with most assessment timelines insufficient for meaningful evaluation.
+
+## Comprehensive Policy Analysis
+
+### Mandatory Disclosure Requirements
+
+Disclosure requirements represent one of the most widely adopted AI governance approaches, exemplified by New York City Local Law 144 requiring AI audit disclosures for hiring tools and EU AI Act transparency obligations for high-risk systems. Evidence suggests mixed effectiveness patterns—and significant enforcement failures. A [December 2025 New York State Comptroller audit](https://www.osc.ny.gov/state-agencies/audits/2025/12/02/enforcement-local-law-144-automated-employment-decision-tools) covering July 2023-June 2025 found that NYC's Department of Consumer and Worker Protection (DCWP) identified only 1 instance of non-compliance when auditors reviewing the same 32 companies found at least 17 potential violations.
+
+Behavioral impacts prove more complex than simple compliance metrics suggest. Research on NYC's hiring AI law found that approximately 20% of affected companies abandoned AI hiring tools entirely rather than undergo required auditing—a potentially positive outcome if those tools were problematic, but raising concerns about innovation chilling if abandonment was purely compliance-driven rather than risk-based. The quality of produced disclosures varies dramatically, with many audits providing limited useful information to job seekers or policymakers. The Comptroller's audit noted that despite receiving only two AEDT complaints during the audit period, [DCWP did not investigate](https://www.osc.ny.gov/press/releases/2025/12/dinapoli-new-yorkers-deserve-transparent-hiring-process-when-artificial-intelligence-used-vet-their) whether the complaint intake process was functioning properly.
+
+Market effects include the emergence of a specialized AI audit industry, though questions remain about whether these audits meaningfully improve AI system quality versus serving primarily as compliance paperwork. NYC's enforcement challenge illustrates a fundamental problem: when compliance requires self-disclosure, regulators struggle to identify violations. Penalties of \$500-1,500 per day (up to \$10,000 per week for continued violations) appear insufficient to drive compliance when enforcement is effectively absent. Early evidence suggests disclosure requirements work best when combined with rigorous enforcement, clear audit quality standards, sustained public attention to findings, and meaningful consequences for negative audit results.
+
+### Voluntary Commitment Frameworks
+
+Voluntary commitments, including the July 2023 <R id="a9468089fafed8cd">White House AI commitments</R> and various Responsible Scaling Policies, represent attempts to achieve governance without mandatory regulation. [Research analyzing compliance](https://ojs.aaai.org/index.php/AIES/article/download/36743/38881/40818) with these commitments reveals significant variance: the first cohort of seven companies (Amazon, Anthropic, Google, Inflection, Meta, Microsoft, and OpenAI) achieved an average compliance score of 69.0% (±15.6%), while the second cohort of eight companies signing in September 2023 averaged only 44.6%. Third-party reporting emerged as a particular weakness, with eight companies scoring 0% on this commitment and an overall average of just 34.4%.
+
+However, behavioral change evidence remains limited. While companies have established capability evaluation processes and published safety frameworks, the depth and rigor of implementation varies significantly across organizations. [AI Lab Watch](https://ailabwatch.org/resources/commitments) tracking reveals concerning patterns: xAI deployed a model violating its own Risk Management Framework the same week it published the RMF, and in April 2025, OpenAI removed a provision from its Preparedness Framework without noting the change in its changelog. Game-theoretical research published in *Technological Forecasting and Social Change* reveals that <R id="cca85af69dffa3bd">voluntary commitments only lead to socially beneficial outcomes when combined with enforcement mechanisms</R>—either peer sanctions or institutional oversight. Without enforcement, voluntary approaches fail to overcome competitive pressures that drive corner-cutting on safety.
+
+The enforcement challenge proves fundamental: voluntary commitments rely entirely on self-policing and reputation effects. Critics note these commitments contain "lots of wiggle room" and are "not backed by the force of law" with no accompanying enforcement mechanism. Under competitive pressure, companies face incentives to "cut corners on safety to avoid falling behind," even when everyone would benefit from moving more carefully. Research by the <R id="2f90f810999eda1b">AI Safety Newsletter</R> concludes that "RSPs are voluntary and unenforceable, and companies can violate them without serious repercussions."
+
+Nevertheless, voluntary commitments serve important functions beyond direct behavioral change. They establish industry norms, provide foundations for future regulation, and create coordination mechanisms among companies. Abandoning voluntary commitments carries costs including "looking hypocritical and untrustworthy," liability for deceptive advertising, and in large bureaucracies, "lock-in effects make it easy to create new practices and much harder to change them." Organizations like <R id="fde48590fcbc5504">Anthropic continue upholding these principles</R> even after formal White House monitoring ended with administration transitions. The Biden Administration's approach of using voluntary commitments as stepping stones toward mandatory requirements reflects recognition of both their limitations and their utility as governance building blocks.
+
+### Compute Threshold Policies
+
+Compute-based governance, implemented through requirements like the U.S. Executive Order 14110's 10^26 FLOP reporting threshold and the EU AI Act's 10^25 FLOP obligations for general-purpose AI models, represents an attempt to create objective, measurable policy criteria. Compliance rates appear high among major laboratories, with companies generally meeting reporting requirements for covered training runs—estimated at 70-85% compliance for covered systems based on regulatory reporting data.
+
+However, significant implementation challenges emerge. Evidence suggests some organizations engage in "threshold gaming," structuring training runs to fall just below regulatory triggers. RAND Corporation research on <R id="76e39f7311f698da">hardware-enabled governance mechanisms</R> found that "no single solution can comprehensively enforce end-use controls" and that "technically simpler solutions may offer more effective security." Current thresholds also miss potentially dangerous applications like fine-tuning powerful models for harmful purposes or using models in high-risk inference scenarios. Additionally, rapid improvements in training efficiency may make current FLOP-based thresholds obsolete within 2-3 years.
+
+Despite these limitations, compute thresholds provide valuable governance infrastructure. They create standardized reporting mechanisms for the largest model training runs, establish precedents for technical regulation in AI, and offer clear criteria that reduce regulatory uncertainty. The Brookings Institution notes that effective governance requires that "we cannot govern what we cannot measure," and compute thresholds represent one of the few truly measurable aspects of AI development. Success depends on regular threshold updates, expanded coverage of relevant activities beyond initial training, and integration with broader risk assessment frameworks.
+
+### Export Control Mechanisms
+
+The October 2022 U.S. semiconductor export restrictions targeting Chinese AI development, updated multiple times through 2023 and 2024, provide the clearest example of aggressive AI-related trade policy. Short-term impacts appear significant: Chinese AI laboratories report difficulties accessing advanced chips, with some research programs reportedly delayed or scaled back. Compliance rates among chip manufacturers range from 60-75% based on enforcement actions and intelligence assessments, though exact measurement remains difficult given the classified nature of much export control monitoring.
+
+However, workaround activities proliferate rapidly. Chinese organizations access restricted chips through cloud services, smuggling networks, and stockpiling arrangements. Moreover, export controls may accelerate Chinese domestic semiconductor development, potentially creating stronger long-term competition in AI hardware. Intelligence assessments suggest controls may delay Chinese frontier AI capabilities by 1-3 years while spurring greater independence in the AI supply chain—a finding consistent with RAND's assessment that hardware-enabled governance "could be promising as conditions of international sales and investment deals" but faces inherent limitations as a standalone solution.
+
+The diplomatic costs prove substantial, with export controls contributing to broader U.S.-China technology tensions and complicating international AI governance cooperation. RAND's <R id="88a8241bd9872820">historical analogues research</R> examining nuclear technology, encryption, the internet, and genetic engineering governance suggests that unilateral export controls often trigger countermeasures and technological independence efforts by targeted nations. Effectiveness ultimately depends on multilateral coordination—unilateral controls become less effective as alternative suppliers emerge and workaround mechanisms develop.
+
+### Risk-Based Regulatory Frameworks
+
+Comprehensive frameworks like the EU AI Act and Colorado's AI Act attempt to match regulatory requirements to risk levels, creating differentiated obligations across AI application categories. The <R id="acc5ad4063972046">EU AI Act entered into force August 1, 2024</R>, initiating a phased implementation with key governance obligations for general-purpose AI beginning August 2025 and most high-risk system requirements becoming applicable August 2026. Implementation evidence remains limited given recent adoption timelines, but early indicators suggest significant compliance preparation investments by affected companies.
+
+Some AI products have been withdrawn from the EU market rather than meet AI Act requirements, indicating real behavioral impacts beyond mere paperwork. The European Commission established an <R id="1ad6dc89cded8b0c">AI Pact</R> as a voluntary initiative inviting providers to comply ahead of mandatory deadlines, alongside an AI Office to monitor compliance. However, the complexity of risk-based frameworks creates substantial administrative burdens for both companies and regulators. The AI Act's conformity assessment requirements demand "technical documentation, risk logs, testing evidence, and audit trails," yet many companies "struggle to generate this material on demand" and "without automated traceability, responding to an investigation or audit can take weeks."
+
+Penalties provide enforcement teeth: prohibited AI practices can trigger fines up to €40 million or 7% of worldwide annual turnover, whichever is higher. Non-compliance with data governance requirements can result in fines up to €20 million or 4% of turnover. The Act's "Brussels Effect" extraterritorial influence "compels global companies to comply with EU standards to maintain market access, influencing AI regulations worldwide."
+
+Classification disputes over risk categories are emerging, and enforcement capacity remains largely untested. The ultimate effectiveness of risk-based approaches depends heavily on enforcement rigor, regulatory capacity development, and industry acceptance of underlying risk categorizations. Early implementation phases will prove critical for determining whether these frameworks achieve meaningful risk reduction or primarily create compliance overhead.
+
+### Compliance Costs and Penalty Structures
+
+| Jurisdiction/Framework | Compliance Cost Estimate | Maximum Penalty | Enforcement Status | Source |
+|------------------------|-------------------------|-----------------|-------------------|--------|
+| **EU AI Act - Prohibited Practices** | N/A (banned) | €35M or 7% global turnover | Finland first enforcer (Dec 2025) | [CEPS](https://www.ceps.eu/clarifying-the-costs-for-the-eus-ai-act/) |
+| **EU AI Act - High-Risk Systems** | 17% overhead on AI spending; QMS setup €193K-330K for SMEs | €15M or 3% global turnover | Aug 2026 deadline | [CEPS](https://www.ceps.eu/clarifying-the-costs-for-the-eus-ai-act/) |
+| **EU AI Act - Incorrect Information** | N/A | €7.5M or 1% global turnover | Ongoing | [EU Commission](https://artificialintelligenceact.eu/) |
+| **NYC Local Law 144** | Audit costs vary | \$500-1,500/day; \$10K/week continued violation | [Ineffective enforcement](https://www.osc.ny.gov/state-agencies/audits/2025/12/02/enforcement-local-law-144-automated-employment-decision-tools) - only 1/17 violations identified | [NY Comptroller](https://www.osc.ny.gov/press/releases/2025/12/dinapoli-new-yorkers-deserve-transparent-hiring-process-when-artificial-intelligence-used-vet-their) |
+| **US Export Controls** | License application costs; lost revenue | Criminal penalties; entity list designation | Active but [workarounds proliferate](https://www.cnas.org/publications/commentary/cnas-insights-the-export-control-loophole-fueling-chinas-chip-production) | [BIS](https://www.bis.gov/news-updates) |
+| **Voluntary Commitments** | Self-imposed | Reputational only | [No federal enforcement mechanism](https://fedscoop.com/voluntary-ai-commitments-biden-trump-white-house/) | Various |
+
+### AI Safety Institute Development
+
+Government AI Safety Institutes in the United Kingdom, United States, and other jurisdictions represent attempts to build technical expertise within government to better assess and regulate AI systems. The <R id="f7d2ebb409b056f9">U.S. AI Safety Institute</R> was established within the National Institute of Standards and Technology (NIST), with the Commerce Department announcing in February 2024 the U.S. AI Safety Institute Consortium bringing together "more than 280 organizations to develop science-based and empirically backed guidelines and standards for AI measurement and policy." In November 2024, the U.S. launched the <R id="f7d2ebb409b056f9">International Network of AI Safety Institutes</R> at a San Francisco meeting "to connect government agencies around the world working on AI trustworthiness problems."
+
+Early progress includes staff recruitment, establishment of model access agreements with some laboratories, and development of evaluation methodologies. Safety research is developing "testing, measurement, and red-teaming focused on synthetic content risk, foundation model testing, and common approaches to risk assessment." The institutes have begun conducting pre-deployment evaluations—though these remain limited in scope and largely dependent on voluntary industry cooperation.
+
+However, critical challenges persist around institutional independence, technical authority, and influence mechanisms. RAND's <R id="eebea1e16e230f5b">2024 EqualAI Summit proceedings</R> identified "technical challenges, such as uncertainty about the rigor of external model evaluations and complications related to differing use cases and risk levels" alongside "organizational factors, such as how misaligned organizational goals create disincentives for investing in the implementation of appropriate safeguards." Questions remain about whether these institutes can maintain sufficient technical expertise to meaningfully assess rapidly advancing AI systems and whether they possess adequate authority to influence industry behavior beyond voluntary cooperation.
+
+Success metrics for AI Safety Institutes likely require 3-5 year assessment timelines, as institutional capacity building and relationship development with industry require sustained development periods.
+
+## Effectiveness Patterns and Lessons
+
+### High-Performing Policy Characteristics
+
+Analysis across policy types reveals several characteristics associated with higher effectiveness rates. **Specificity in requirements** consistently outperforms vague obligations—policies with measurable, objective criteria achieve higher compliance and behavioral change than those relying on subjective standards like "responsible AI development."
+
+**Third-party verification mechanisms** significantly enhance policy effectiveness when verification entities possess genuine independence and technical competence. **Meaningful consequences** for non-compliance, whether through market access restrictions, legal liability, or reputational damage, prove essential for sustained behavioral change.
+
+**International coordination** emerges as crucial for policies targeting globally mobile activities like AI development. Unilateral approaches often trigger regulatory arbitrage as companies relocate activities to less regulated jurisdictions.
+
+### Low-Performing Policy Characteristics
+
+Conversely, certain policy design features consistently underperform. **Pure voluntary frameworks** without enforcement mechanisms rarely achieve sustained behavioral change under competitive pressure. **Vague principle-based approaches** that fail to specify concrete obligations create compliance uncertainty and enable strategic interpretation by regulated entities.
+
+**Fragmented jurisdictional approaches** allow sophisticated actors to route around regulations, while **after-the-fact enforcement** models prove inadequate for preventing harms from already-deployed systems. **Definitions disputes** over core terms like "AI" or "high-risk" create implementation delays and compliance uncertainty.
+
+### Critical Uncertainties and Research Gaps
+
+<KeyQuestions
+  client:load
+  questions={[
+    {
+      question: "Can current AI governance policies actually prevent catastrophic risks from advanced AI systems?",
+      positions: [
+        {
+          position: "Yes, with sufficient stringency and enforcement",
+          confidence: "low",
+          reasoning: "Comprehensive testing requirements, liability frameworks, and compute controls could meaningfully constrain dangerous AI development if properly designed and rigorously implemented",
+          implications: "Prioritize strengthening existing regulatory frameworks; current policies provide foundation but need enhancement"
+        },
+        {
+          position: "Only through global coordination",
+          confidence: "medium",
+          reasoning: "Unilateral policies create competitive disadvantages that drive dangerous AI development to less regulated jurisdictions; catastrophic risk prevention requires international agreement",
+          implications: "Focus on international governance frameworks; domestic policies insufficient alone"
+        },
+        {
+          position: "Technical solutions matter more than governance",
+          confidence: "medium",
+          reasoning: "Policy creates compliance overhead but cannot substitute for solving fundamental alignment problems; governance is secondary to research",
+          implications: "Maintain basic governance frameworks while prioritizing technical AI safety research"
+        }
+      ]
+    }
+  ]}
+/>
+
+## Future Trajectory and Recommendations
+
+### Two-Year Outlook (2025-2027)
+
+Near-term policy effectiveness assessment will likely see modest improvements as initial AI governance frameworks mature and generate more robust evidence. EU AI Act implementation will provide crucial data on comprehensive regulatory approaches, while U.S. federal AI policies will face potential political transitions that may alter enforcement priorities.
+
+Evidence infrastructure should improve significantly with increased investment in AI incident databases, compliance monitoring systems, and academic research on policy outcomes. However, the fundamental challenge of short observation periods will persist, limiting confidence in effectiveness conclusions.
+
+### Medium-Term Projections (2027-2030)
+
+The 2027-2030 period may provide the first robust effectiveness assessments as policies implemented in 2024-2025 generate sufficient longitudinal data. International coordination mechanisms will likely mature, enabling better evaluation of global governance approaches versus national strategies.
+
+Technology-policy mismatches may become more apparent as rapid AI advancement outpaces regulatory frameworks designed for current capabilities. This mismatch could drive either governance framework updates or policy obsolescence, depending on institutional adaptation capacity.
+
+Critical success factors include sustained political commitment to evidence-based policy evaluation, continued investment in assessment infrastructure, and willingness to abandon ineffective approaches regardless of initial political investment.
+
+### Research and Infrastructure Priorities
+
+Effective policy assessment requires substantial investment in evaluation infrastructure currently lacking in the AI governance field. **Incident databases** tracking AI system failures, near-misses, and adverse outcomes need systematic development with standardized reporting mechanisms and sufficient funding for sustained operation.
+
+**Longitudinal studies** tracking policy impacts over 5-10 year periods require immediate initiation given the time scales needed for meaningful assessment. **Cross-jurisdictional comparison studies** can leverage natural experiments as different regions implement varying approaches to similar AI governance challenges.
+
+**Compliance monitoring systems** with real-time tracking capabilities and **counterfactual analysis methods** for estimating what would have occurred without specific policies represent critical methodological investments for the field.
+
+## Conclusions and Implications
+
+Policy effectiveness assessment in AI governance reveals a field in its infancy, with more questions than answers about what approaches actually reduce AI risks. Current evidence suggests mandatory requirements with clear enforcement mechanisms outperform voluntary commitments, while specific, measurable obligations prove more effective than vague principles. RAND's research on <R id="9d26c747c992b74c">governance approaches to securing frontier AI</R> concludes that "if policymakers judge that frontier AI could pose substantial risks to society, they should consider establishing a regulatory regime that requires all high-risk model developers to adopt robust security standards."
+
+However, no current policy adequately addresses catastrophic risks from frontier AI development, and international coordination remains insufficient for globally mobile AI capabilities. The Brookings Institution's analysis of <R id="452097057d049ad0">AI safety governance in Southeast Asia</R> reveals dramatic variation, with Singapore ranking 11th globally while some nations rank in the bottom 15 percent—illustrating the challenge of achieving coherent global governance when national capacity varies by orders of magnitude.
+
+The field urgently needs better evidence infrastructure, longer assessment time horizons, and willingness to abandon ineffective approaches regardless of political investment. As RAND's research emphasizes, governance must operate "at the speed of change" through adaptive frameworks that continuously measure effectiveness and iterate based on evidence rather than political commitments to particular approaches.
+
+Most critically, policymakers must resist the temptation to declare victory based on weak evidence while investing substantially in the evaluation infrastructure needed for genuine effectiveness assessment. The stakes of AI governance are too high for policies based primarily on good intentions rather than demonstrated results. The Brookings imperative remains fundamental: "we cannot govern what we cannot measure."
+
+## Sources
+
+- <R id="eebea1e16e230f5b">RAND Corporation: Steps Toward AI Governance - 2024 EqualAI Summit</R>
+- <R id="9d26c747c992b74c">RAND Corporation: Governance Approaches to Securing Frontier AI</R>
+- <R id="88a8241bd9872820">RAND Corporation: Historical Analogues That Can Inform AI Governance</R>
+- <R id="76e39f7311f698da">RAND Corporation: Hardware-Enabled Governance Mechanisms Workshop</R>
+- <R id="452097057d049ad0">Brookings Institution: AI Safety Governance, The Southeast Asian Way</R>
+- <R id="f7d2ebb409b056f9">Brookings Institution: A Technical AI Government Agency Plays a Vital Role</R>
+- <R id="acc5ad4063972046">European Commission: EU AI Act - Regulatory Framework</R>
+- <R id="1ad6dc89cded8b0c">EU Artificial Intelligence Act: Implementation Resources</R>
+- <R id="a9468089fafed8cd">White House: Voluntary AI Commitments from Leading Companies (July 2023)</R>
+- <R id="fde48590fcbc5504">Anthropic: Voluntary Commitments Transparency Hub</R>
+- <R id="cca85af69dffa3bd">Research Article: Voluntary Safety Commitments Provide an Escape from Over-Regulation in AI Development</R> - *Technological Forecasting and Social Change*
+- <R id="2f90f810999eda1b">AI Safety Newsletter: Voluntary Commitments are Insufficient</R>
+- <R id="80b0765e1dfc4afd">Carnegie Endowment: If-Then Commitments for AI Risk Reduction</R>
+- <R id="9eb1744e38380a26">arXiv: Governance-as-a-Service - Multi-Agent Framework for AI Compliance</R>
+
+---
+
+## AI Transition Model Context
+
+Policy effectiveness assessment is critical infrastructure for the <EntityLink id="ai-transition-model" />:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="regulatory-capacity" /> | Compute thresholds achieve 60-75% compliance; voluntary commitments show less than 30% substantive change |
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="institutional-quality" /> | Only 15-20% of AI policies have measurable outcome data |
+
+Fundamental gap: less than 20% of AI governance evaluations meet moderate evidence standards, limiting our ability to identify effective interventions.

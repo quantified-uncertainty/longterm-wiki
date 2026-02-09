@@ -1,0 +1,65 @@
+---
+title: "Insights Index"
+description: "Ranked collection of discrete insights extracted from project content, rated for AI safety experts."
+sidebar:
+  label: "All Insights"
+  order: 10
+tableOfContents: false
+fullWidth: true
+importance: 15
+quality: 14
+llmSummary: "This is an infrastructure page that displays a filterable table of discrete insights extracted from other content, rated on four dimensions (surprising, important, actionable, neglected) calibrated for AI safety experts. The page itself contains no actual insights - just the interface and data structure documentation."
+ratings:
+  novelty: 3
+  rigor: 2
+  actionability: 1
+  completeness: 1
+metrics:
+  wordCount: 68
+  citations: 0
+  tables: 2
+  diagrams: 0
+---
+import InsightsTable from '@components/wiki/InsightsTable';
+import FullWidthLayout from '@components/FullWidthLayout';
+
+<FullWidthLayout />
+
+This page collects discrete insights from across the project, calibrated for **AI safety researchers/experts**.
+
+| Dimension | Question | Scale |
+|-----------|----------|-------|
+| **Surprising** | Would this update an informed AI safety researcher? | 1-5 |
+| **Important** | Does this affect high-stakes decisions or research priorities? | 1-5 |
+| **Actionable** | Does this suggest concrete work, research, or interventions? | 1-5 |
+| **Neglected** | Is this getting less attention than it deserves? | 1-5 |
+
+**Types**: `claim` (factual), `research-gap`, `counterintuitive`, `quantitative`, `disagreement`, `neglected`
+
+See the [Critical Insights framework](/project/critical-insights/) for the theoretical basis.
+
+---
+
+<InsightsTable client:load />
+
+---
+
+## Adding Insights
+
+Insights are stored in `src/data/insights.yaml`. Be **harsh on surprising** - most well-known AI safety facts should be 1-2 for experts.
+
+```yaml
+- id: "XXX"
+  insight: "Your insight here - a compact, specific claim."
+  source: /path/to/source-page
+  tags: [relevant, tags]
+  type: claim  # or: research-gap, counterintuitive, quantitative, disagreement, neglected
+  surprising: 2.5  # Would update an expert? (most should be 1-3)
+  important: 4.2
+  actionable: 3.5
+  neglected: 3.0
+  compact: 4.0
+  added: "2025-01-21"
+```
+
+**Prioritize finding**: counterintuitive findings, research gaps, specific quantitative claims, and neglected topics.

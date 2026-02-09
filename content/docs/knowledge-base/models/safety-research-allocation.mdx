@@ -1,0 +1,386 @@
+---
+title: Safety Research Allocation Model
+description: Analysis of AI safety research resource distribution across sectors, finding industry dominance (60-70% of $700M annually) creates systematic misallocation, with 3-5x underfunding of critical areas like multi-agent dynamics and corrigibility versus core alignment work.
+sidebar:
+  order: 32
+quality: 65
+ratings:
+  focus: 8.5
+  novelty: 5
+  rigor: 6.5
+  completeness: 7.5
+  concreteness: 8
+  actionability: 7
+lastEdited: "2025-12-27"
+relatedModels:
+  - lab-incentives-model
+  - racing-dynamics-model
+relatedRisks:
+  - concentration-of-power
+  - enfeeblement
+importance: 78.5
+llmSummary: Analysis finds AI safety research suffers 30-50% efficiency losses from industry dominance (60-70% of ~$700M annually), with critical areas like multi-agent dynamics and corrigibility receiving 3-5x less funding than optimal. Provides concrete data on sector distributions, brain drain acceleration (60+ academic transitions annually), and specific intervention costs (e.g., $100M for 20 endowed chairs).
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Conceptual Framework' section
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+  - Complete 'Strategic Importance' section
+  - Complete 'Limitations' section (6 placeholders)
+metrics:
+  wordCount: 984
+  citations: 26
+  tables: 29
+  diagrams: 0
+clusters:
+  - ai-safety
+  - governance
+  - community
+subcategory: intervention-models
+---
+import {DataInfoBox, Backlinks, R, EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="safety-research-allocation" ratings={frontmatter.ratings} />
+
+## Overview
+
+AI safety research allocation determines which existential risks get addressed and which remain neglected. With approximately \$100M annually flowing into safety research across sectors, resource distribution shapes everything from alignment research priorities to governance capacity.
+
+Current allocation shows stark imbalances: industry controls 60-70% of resources while academia receives only 15-20%, creating systematic gaps in independent research. <R id="898065a672b179c6">Expert analysis</R> suggests this distribution leads to 30-50% efficiency losses compared to optimal allocation, with critical areas like <EntityLink id="multi-agent">multi-agent safety</EntityLink> receiving 3-5x less attention than warranted by their risk contribution.
+
+The model reveals three key findings: (1) talent concentration in 5-10 organizations creates dangerous dependencies, (2) commercial incentives systematically underfund long-term theoretical work, and (3) government capacity building lags 5-10 years behind need.
+
+## Resource Distribution Risk Assessment
+
+| Risk Factor | Severity | Likelihood | Timeline | Trend |
+|-------------|----------|------------|----------|-------|
+| Industry capture of safety agenda | High | 80% | Current | Worsening |
+| Academic brain drain acceleration | High | 90% | 2-5 years | Worsening |
+| Neglected area funding gaps | Very High | 95% | Current | Stable |
+| Government capacity shortfall | Medium | 70% | 3-7 years | Improving slowly |
+
+## Current Allocation Landscape
+
+### Sector Resource Distribution (2024)
+
+| Sector | Annual Funding | FTE Researchers | Compute Access | Key Constraints |
+|--------|---------------|-----------------|----------------|-----------------|
+| **AI Labs** | \$400-700M | 800-1,200 | Unlimited | Commercial priorities |
+| **Academia** | \$150-250M | 400-600 | Limited | Brain drain, access |
+| **Government** | \$80-150M | 100-200 | Medium | Technical capacity |
+| **Nonprofits** | \$70-120M | 150-300 | Low | Funding volatility |
+
+*Sources: <R id="2aa20a88a0b0cbcf"><EntityLink id="open-philanthropy">Open Philanthropy</EntityLink></R> funding data, <R id="cf5fd74e8db11565">RAND</R> workforce analysis*
+
+### Geographic Concentration Analysis
+
+| Location | Research FTE | % of Total | Major Organizations |
+|----------|-------------|------------|-------------------|
+| **SF Bay Area** | 700-900 | 45% | <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink> |
+| **London** | 250-350 | 20% | <EntityLink id="deepmind">DeepMind</EntityLink>, <EntityLink id="uk-aisi">UK AISI</EntityLink> |
+| **Boston/NYC** | 200-300 | 15% | MIT, Harvard, NYU |
+| **Other** | 300-400 | 20% | Distributed globally |
+
+*Data from <R id="3e547d6c6511a822">AI Index Report 2024</R>*
+
+## Industry Dominance Analysis
+
+### Talent Acquisition Patterns
+
+**Compensation Differentials:**
+- Academic assistant professor: \$120-180k
+- Industry safety researcher: \$350-600k
+- Senior lab researcher: \$600k-2M+
+
+**Brain Drain Acceleration:**
+- 2020-2022: ~30 academics transitioned annually
+- 2023-2024: ~60+ academics transitioned annually
+- Projected 2025-2027: 80-120 annually at current rates
+
+*Source: <R id="ff4ccf1d5769e99e"><EntityLink id="80000-hours">80,000 Hours</EntityLink></R> career tracking*
+
+### Research Priority Distortions
+
+| Priority Area | Industry Focus | Societal Importance | Gap Ratio |
+|---------------|----------------|-------------------|-----------|
+| Deployment safety | 35% | 25% | 0.7x |
+| Alignment theory | 15% | 30% | 2.0x |
+| Multi-agent dynamics | 5% | 20% | 4.0x |
+| Governance research | 8% | 25% | 3.1x |
+
+*Analysis based on <R id="085feee8a2702182">Anthropic</R> and <R id="838d7a59a02e11a7">OpenAI</R> research portfolios*
+
+## Academic Sector Challenges
+
+### Institutional Capacity
+
+**Leading Academic Programs:**
+- <R id="9c4106b68045dbd6"><EntityLink id="chai">CHAI</EntityLink> Berkeley</R>: 15-20 FTE researchers
+- <R id="c0a5858881a7ac1c">Stanford HAI</R>: 25-30 FTE safety-focused
+- MIT CSAIL: 10-15 FTE relevant researchers
+- Oxford FHI: 8-12 FTE (funding uncertain)
+
+**Key Limitations:**
+- Compute access: 100x less than leading labs
+- Model access: Limited to open-source systems
+- Funding cycles: 1-3 years vs. industry evergreen
+- Publication pressure: Conflicts with long-term research
+
+### Retention Strategies
+
+**Successful Interventions:**
+- Endowed chairs: \$2-5M per position
+- Compute grants: <R id="e7fbabbc3a45759c">NSF NAIRR</R> pilot program
+- Industry partnerships: Anthropic academic collaborations
+- Sabbatical programs: Rotation opportunities
+
+**Measured Outcomes:**
+- Endowed positions reduce departure probability by 40-60%
+- Compute access increases research output by 2-3x
+- Industry rotations improve relevant research quality
+
+## Government Capacity Assessment
+
+### Current Technical Capabilities
+
+| Organization | Staff | Budget | Focus Areas |
+|-------------|-------|--------|-------------|
+| <EntityLink id="us-aisi">US AISI</EntityLink> | 50-80 | \$50-100M | Evaluation, standards |
+| <R id="85ee8e554a07476b">NIST AI</R> | 30-50 | \$30-60M | Risk frameworks |
+| <EntityLink id="uk-aisi">UK AISI</EntityLink> | 40-60 | £30-50M | Frontier evaluation |
+| EU AI Office | 20-40 | €40-80M | Regulation implementation |
+
+*Sources: Government budget documents, public hiring data*
+
+### Technical Expertise Gaps
+
+**Critical Shortfalls:**
+- PhD-level ML researchers: Need 200+, have \&lt;50
+- Safety evaluation expertise: Need 100+, have \&lt;20
+- Technical policy interface: Need 50+, have \&lt;15
+
+**Hiring Constraints:**
+- Salary caps 50-70% below industry
+- Security clearance requirements
+- Bureaucratic hiring processes
+- Limited career advancement
+
+## Funding Mechanism Analysis
+
+### Foundation Landscape
+
+| Funder | Annual AI Safety | Focus Areas | Grantmaking Style |
+|--------|------------------|-------------|-------------------|
+| <R id="dd0cf0ff290cc68e">Open Philanthropy</R> | \$50-80M | All areas | Research-driven |
+| Survival & Flourishing Fund | \$15-25M | Alignment theory | Community-based |
+| Long-Term Future Fund | \$5-15M | Early career | High-risk tolerance |
+| <EntityLink id="fli">Future of Life Institute</EntityLink> | \$5-10M | Governance | Public engagement |
+
+*Data from public grant databases and annual reports*
+
+### Government Funding Mechanisms
+
+**US Programs:**
+- NSF Secure and Trustworthy Cyberspace: \$20-40M annually
+- DARPA various programs: \$30-60M annually
+- DOD AI/ML research: \$100-200M (broader AI)
+
+**International Programs:**
+- EU Horizon Europe: €50-100M relevant funding
+- UK EPSRC: £20-40M annually
+- Canada CIFAR: CAD \$20-40M
+
+## Research Priority Misalignment
+
+### Current vs. Optimal Distribution
+
+| Research Area | Current % | Optimal % | Funding Gap |
+|---------------|-----------|-----------|-------------|
+| **<EntityLink id="rlhf">RLHF</EntityLink>/Training** | 25% | 15% | Over-funded |
+| **Interpretability** | 20% | 20% | Adequate |
+| **Evaluation/Benchmarks** | 15% | 25% | \$70M gap |
+| **Alignment Theory** | 10% | 20% | \$70M gap |
+| **Multi-agent Safety** | 5% | 15% | \$70M gap |
+| **Governance Research** | 8% | 15% | \$50M gap |
+| **Corrigibility** | 3% | 10% | \$50M gap |
+
+*Analysis combining <R id="1593095c92d34ed8">FHI</R> research priorities and expert elicitation*
+
+### Neglected High-Impact Areas
+
+**Multi-agent Dynamics:**
+- Current funding: \<\$20M annually
+- Estimated need: \$60-80M annually
+- Key challenges: Coordination failures, competitive dynamics
+- Research orgs: <EntityLink id="miri">MIRI</EntityLink>, academic game theorists
+
+**<EntityLink id="corrigibility">Corrigibility Research</EntityLink>:**
+- Current funding: \<\$15M annually
+- Estimated need: \$50-70M annually
+- Key challenges: Theoretical foundations, empirical testing
+- Research concentration: \&lt;10 researchers globally
+
+## International Dynamics
+
+### Research Ecosystem Comparison
+
+| Region | Funding | Talent | Government Role | International Cooperation |
+|--------|---------|--------|-----------------|--------------------------|
+| **US** | \$400-600M | 60% global | Limited | Strong with allies |
+| **EU** | \$100-200M | 20% global | Regulation-focused | Multi-lateral |
+| **UK** | \$80-120M | 15% global | Evaluation leadership | US alignment |
+| **China** | \$50-100M? | 10% global | State-directed | Limited transparency |
+
+*Estimates from <R id="f0d95954b449240a">Georgetown <EntityLink id="cset">CSET</EntityLink></R> analysis*
+
+### Coordination Challenges
+
+**Information Sharing:**
+- Classification barriers limit research sharing
+- Commercial IP concerns restrict collaboration
+- Different regulatory frameworks create incompatibilities
+
+**Resource Competition:**
+- Talent mobility creates brain drain dynamics
+- Compute resources concentrated in few countries
+- Research priorities reflect national interests
+
+## Trajectory Analysis
+
+### Current Trends (2024-2027)
+
+**Industry Consolidation:**
+- Top 5 labs control 70% of safety research (up from 60% in 2022)
+- Academic market share declining 2-3% annually
+- Government share stable but relatively shrinking
+
+**Geographic Concentration:**
+- SF Bay Area share increasing to 50%+ by 2026
+- London maintaining 20% share
+- Other regions relatively declining
+
+**Priority Evolution:**
+- Evaluation/benchmarking gaining 3-5% annually
+- Theoretical work share declining
+- Governance research slowly growing
+
+### Scenario Projections
+
+**Business as Usual (60% probability):**
+- Industry dominance reaches 75-80% by 2027
+- Academic sector contracts to 10-15%
+- Critical research areas remain underfunded
+- <EntityLink id="racing-dynamics">Racing dynamics</EntityLink> intensify
+
+**Government Intervention (25% probability):**
+- Major public investment (\$500M+ annually)
+- Research mandates for deployment
+- Academic sector stabilizes at 25-30%
+- Requires crisis catalyst or policy breakthrough
+
+**Philanthropic Scale-Up (15% probability):**
+- Foundation funding reaches \$200M+ annually
+- Academic endowments for safety research
+- Balanced ecosystem emerges
+- Requires billionaire engagement
+
+## Intervention Strategies
+
+### Academic Strengthening
+
+| Intervention | Cost | Impact | Timeline |
+|-------------|------|--------|---------|
+| **Endowed Chairs** | \$100M total | 20 permanent positions | 3-5 years |
+| **Compute Infrastructure** | \$50M annually | 5x academic capability | 1-2 years |
+| **Salary Competitiveness** | \$200M annually | 50% retention increase | Immediate |
+| **Model Access Programs** | \$20M annually | Research quality boost | 1 year |
+
+### Government Capacity Building
+
+**Technical Hiring:**
+- Special authority for AI researchers
+- Competitive pay scales (GS-15+ equivalent)
+- Streamlined security clearance process
+- Industry rotation programs
+
+**Research Infrastructure:**
+- National AI testbed facilities
+- Shared evaluation frameworks
+- Interagency coordination mechanisms
+- International partnership protocols
+
+### Industry Accountability
+
+**Research Independence:**
+- Protected safety research budgets (10% of R&D)
+- Publication requirements for safety findings
+- External advisory board oversight
+- Whistleblower protections
+
+**Resource Sharing:**
+- Academic model access programs
+- Compute donation requirements
+- Graduate student fellowship funding
+- Open-source safety tooling
+
+### Critical Research Questions
+
+1. **Independence vs. Access Tradeoff:** Can academic research remain relevant without frontier model access? If labs control cutting-edge systems, academic safety research may become increasingly disconnected from actual risks.
+
+2. **Government Technical Capacity:** Can government agencies develop sufficient expertise fast enough? Current hiring practices and salary constraints may make this structurally impossible.
+
+3. **Open vs. Closed Research:** Should safety findings be published openly? Transparency accelerates good safety work but may also accelerate dangerous capabilities.
+
+4. **Coordination Mechanisms:** Who should set global safety research priorities? Decentralized approaches may be inefficient; centralized approaches may be wrong or captured.
+
+### Empirical Cruxes
+
+**Talent Elasticity:**
+- How responsive is safety researcher supply to funding?
+- Can academic career paths compete with industry?
+- What retention strategies actually work?
+
+**Research Quality:**
+- How much does model access matter for safety research?
+- Can theoretical work proceed without empirical validation?
+- Which research approaches transfer across systems?
+
+**Timeline Pressures:**
+- How long to build effective government capacity?
+- When do current allocation patterns lock in?
+- Can coordination mechanisms scale with field growth?
+
+## Sources & Resources
+
+### Academic Literature
+
+| Source | Key Findings | Methodology |
+|--------|-------------|-------------|
+| <R id="cc6b17623c06f2d7">Dafoe (2018)</R> | <EntityLink id="ai-governance">AI governance</EntityLink> research agenda | Expert consultation |
+| <R id="4c76d88cc9dd70a0">Zhang et al. (2021)</R> | AI research workforce analysis | Survey data |
+| <R id="f771d4f56ad4dbaa">Anthropic (2023)</R> | Industry safety research priorities | Internal analysis |
+
+### Government Reports
+
+| Organization | Report | Year | Focus |
+|-------------|--------|------|-------|
+| <R id="54dbc15413425997">NIST</R> | AI Risk Management Framework | 2023 | Standards |
+| <R id="d5c147bafcbb2cf1">RAND</R> | AI Workforce Analysis | 2024 | Talent mapping |
+| <R id="0a52c15a31cd8d81">UK Government</R> | Frontier AI Capabilities | 2024 | Research needs |
+
+### Industry Resources
+
+| Organization | Resource | Description |
+|-------------|----------|-------------|
+| <R id="085feee8a2702182">Anthropic</R> | Safety Research | Current priorities |
+| <R id="838d7a59a02e11a7">OpenAI</R> | Safety Overview | Research areas |
+| <R id="813e2062445e680d">DeepMind</R> | Safety Research | Technical approaches |
+
+### Data Sources
+
+| Source | Data Type | Coverage |
+|--------|-----------|----------|
+| <R id="31dad9e35ad0b5d3">AI Index</R> | Funding trends | Global, annual |
+| <R id="ec456e4a78161d43">80,000 Hours</R> | Career tracking | Individual transitions |
+| <R id="076dbb82d053643f">Open Philanthropy</R> | Grant databases | Foundation funding |
+
+<Backlinks client:load entityId="safety-research-allocation" />

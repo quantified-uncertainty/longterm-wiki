@@ -1,0 +1,531 @@
+# Misc Entities
+# Auto-generated from entities.yaml - edit this file directly
+
+- id: effectiveness-assessment
+  type: analysis
+  title: AI Policy Effectiveness
+  customFields:
+    - label: Key Question
+      value: Which policies actually reduce AI risk?
+    - label: Challenge
+      value: Counterfactuals are hard to assess
+    - label: Status
+      value: Early, limited evidence
+  sources:
+    - title: 'AI Governance: A Research Agenda'
+      url: https://www.governance.ai/research-paper/research-agenda
+      author: GovAI
+    - title: Evaluating AI Governance
+      url: https://cset.georgetown.edu/
+      author: CSET Georgetown
+  description: 'As AI governance efforts multiply, a critical question emerges: Which policies are actually working?'
+  lastUpdated: 2025-12
+- id: openai-foundation-governance
+  type: analysis
+  title: OpenAI Foundation Governance Paradox
+  description: >-
+    Analysis of the governance structure where a nonprofit controls a $500B
+    company through Class N shares, but the same 8 people run both entities,
+    creating governance theater rather than real accountability.
+  tags:
+    - openai
+    - governance
+    - nonprofit-structure
+    - class-n-shares
+    - board-oversight
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: openai-foundation
+      type: funder
+    - id: musk-openai-lawsuit
+      type: analysis
+    - id: long-term-benefit-trust
+      type: analysis
+    - id: openai
+      type: lab
+    - id: anthropic
+      type: lab
+  lastUpdated: 2026-02
+
+- id: anthropic-valuation
+  type: analysis
+  title: Anthropic Valuation Analysis
+  description: >-
+    Analysis of Anthropic's $350B valuation. Corrected data shows Anthropic
+    trades at 39x revenue vs OpenAI's 25x. Bull case: 88% enterprise retention,
+    coding benchmark leadership. Bear case: 25% customer concentration, margin
+    pressure, AI bubble warnings.
+  tags:
+    - anthropic
+    - valuation
+    - revenue-multiples
+    - enterprise-metrics
+    - ai-industry-finance
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: anthropic-ipo
+      type: analysis
+    - id: anthropic-investors
+      type: analysis
+    - id: openai
+      type: lab
+  lastUpdated: 2026-02
+
+- id: anthropic-investors
+  type: analysis
+  title: Anthropic (Funder)
+  description: >-
+    Analysis of EA-aligned philanthropic capital at Anthropic. At $350B
+    valuation: $25-70B risk-adjusted EA capital from founder pledges, investor
+    stakes (Tallinn, Moskovitz), and employee matching programs ($20-40B in
+    DAFs).
+  tags:
+    - anthropic
+    - ea-capital
+    - founder-pledges
+    - donor-advised-funds
+    - philanthropic-capital
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: anthropic-valuation
+      type: analysis
+    - id: anthropic
+      type: lab
+    - id: anthropic-ipo
+      type: analysis
+    - id: jaan-tallinn
+      type: researcher
+    - id: dustin-moskovitz
+      type: researcher
+  lastUpdated: 2026-02
+
+- id: long-term-benefit-trust
+  type: analysis
+  title: Long-Term Benefit Trust (Anthropic)
+  description: >-
+    Independent governance mechanism at Anthropic designed to ensure board
+    accountability to humanity's long-term benefit through financially
+    disinterested trustees with growing board appointment power.
+  tags:
+    - anthropic
+    - governance
+    - trust-structure
+    - board-oversight
+    - public-benefit-corporation
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: dario-amodei
+      type: researcher
+    - id: daniela-amodei
+      type: researcher
+    - id: paul-christiano
+      type: researcher
+    - id: centre-for-effective-altruism
+      type: lab
+  lastUpdated: 2026-02
+
+- id: musk-openai-lawsuit
+  type: analysis
+  title: Musk v. OpenAI Lawsuit
+  description: >-
+    Elon Musk's $79-134B lawsuit against OpenAI alleging fraud and breach of
+    charitable trust. Trial scheduled April 2026. If successful, could claim
+    significant portion of the OpenAI Foundation's $130B equity stake.
+  tags:
+    - openai
+    - lawsuit
+    - nonprofit-conversion
+    - charitable-trust
+    - ai-governance-legal
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: openai-foundation-governance
+      type: analysis
+    - id: openai-foundation
+      type: funder
+    - id: elon-musk
+      type: researcher
+    - id: openai
+      type: lab
+    - id: sam-altman
+      type: researcher
+  lastUpdated: 2026-02
+
+- id: anthropic-ipo
+  type: analysis
+  title: Anthropic IPO
+  description: >-
+    Tracking Anthropic's preparation for a potential 2026 initial public
+    offering, including timeline estimates, valuation trajectory, competitive
+    dynamics with OpenAI, and implications for EA funding.
+  tags:
+    - anthropic
+    - ipo
+    - public-offering
+    - valuation
+    - ea-funding-implications
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: anthropic-valuation
+      type: analysis
+    - id: anthropic
+      type: lab
+    - id: anthropic-investors
+      type: analysis
+    - id: dario-amodei
+      type: researcher
+    - id: daniela-amodei
+      type: researcher
+  lastUpdated: 2026-02
+
+- id: elon-musk-philanthropy
+  type: analysis
+  title: Elon Musk (Funder)
+  description: >-
+    Analysis of Elon Musk's charitable giving and future philanthropic
+    potential. Despite ~$400B net worth and a 2012 Giving Pledge commitment,
+    actual giving averages only ~$250M annually. The gap represents the largest
+    untapped philanthropic potential in history.
+  tags:
+    - elon-musk
+    - philanthropy
+    - giving-pledge
+    - foundation-analysis
+    - ai-safety-funding
+  clusters:
+    - community
+    - governance
+  relatedEntries:
+    - id: elon-musk
+      type: researcher
+    - id: giving-pledge
+      type: concept
+    - id: dustin-moskovitz
+      type: researcher
+    - id: openai
+      type: lab
+    - id: jaan-tallinn
+      type: researcher
+  lastUpdated: 2026-02
+
+- id: anthropic-pledge-enforcement
+  type: analysis
+  title: "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
+  description: >-
+    Analysis of interventions to increase the probability that Anthropic
+    co-founders follow through on their 80% equity donation pledges. With
+    $25-70B at stake, distinguishes collaborative interventions founders would
+    welcome from adversarial ones that could backfire.
+  tags:
+    - anthropic
+    - founder-pledges
+    - philanthropic-interventions
+    - cost-effectiveness
+    - donor-advised-funds
+    - pledge-fulfillment
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: anthropic-investors
+      type: analysis
+    - id: anthropic-pre-ipo-daf-transfers
+      type: analysis
+    - id: long-term-benefit-trust
+      type: analysis
+    - id: giving-pledge
+      type: concept
+    - id: dario-amodei
+      type: researcher
+  lastUpdated: 2026-02
+
+- id: anthropic-pre-ipo-daf-transfers
+  type: analysis
+  title: Anthropic Pre-IPO DAF Transfers
+  description: >-
+    Analysis of charitable giving mechanisms at Anthropic, focusing on the
+    employee matching program and potential founder transfers. The matching
+    program (historically 3:1 at 50% of equity) is one of the most generous
+    corporate charitable giving vehicles ever offered, with $20-40B already
+    committed to DAFs.
+  tags:
+    - anthropic
+    - donor-advised-funds
+    - employee-matching
+    - pre-ipo
+    - tax-optimization
+    - philanthropic-capital
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: anthropic-investors
+      type: analysis
+    - id: anthropic-pledge-enforcement
+      type: analysis
+    - id: anthropic-ipo
+      type: analysis
+    - id: giving-pledge
+      type: concept
+    - id: dario-amodei
+      type: researcher
+  lastUpdated: 2026-02
+
+- id: anthropic-impact
+  type: analysis
+  title: Anthropic Impact Assessment Model
+  description: >-
+    Framework for estimating Anthropic's net impact on AI safety outcomes.
+    Models the tension between safety research value ($100-200M/year,
+    industry-leading interpretability) and racing dynamics contribution (6-18
+    month timeline compression).
+  tags:
+    - anthropic
+    - impact-assessment
+    - safety-research
+    - racing-dynamics
+    - net-impact
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: anthropic-valuation
+      type: analysis
+    - id: anthropic-investors
+      type: analysis
+    - id: openai
+      type: lab
+    - id: google-deepmind
+      type: lab
+  lastUpdated: 2026-02
+
+- id: capability-alignment-race
+  type: analysis
+  title: Capability-Alignment Race Model
+  description: >-
+    Model analyzing the critical gap between AI capability progress and
+    safety/governance readiness. Currently capabilities are ~3 years ahead of
+    alignment with the gap increasing at 0.5 years annually, driven by 10^26
+    FLOP scaling vs. 15% interpretability coverage.
+  tags:
+    - capability-gap
+    - alignment-race
+    - compute-scaling
+    - interpretability
+    - governance-readiness
+    - ai-timelines
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: scalable-oversight
+      type: safety-agenda
+    - id: anthropic
+      type: lab
+    - id: paul-christiano
+      type: researcher
+    - id: racing-dynamics
+      type: concept
+    - id: epoch-ai
+      type: lab
+  lastUpdated: 2026-02
+
+- id: short-timeline-policy-implications
+  type: analysis
+  title: Short Timeline Policy Implications
+  description: >-
+    Analysis of what policies and interventions become more or less important if
+    transformative AI arrives in 1-5 years rather than decades. Short timelines
+    dramatically shift cost-benefit calculus toward rapid lab-level safety
+    practices over long-term institution building.
+  tags:
+    - short-timelines
+    - ai-policy
+    - compute-governance
+    - lab-safety
+    - emergency-coordination
+    - intervention-prioritization
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: ai-control
+      type: safety-agenda
+    - id: compute-governance
+      type: concept
+    - id: international-coordination
+      type: concept
+    - id: anthropic
+      type: lab
+    - id: eu-ai-act
+      type: concept
+  lastUpdated: 2026-02
+
+- id: technical-pathways
+  type: analysis
+  title: Technical Pathway Decomposition
+  description: >-
+    Model mapping technical pathways from capability advances to catastrophic
+    risk outcomes. Finds accident risks (deceptive alignment, goal
+    misgeneralization, instrumental convergence) account for 45% of total
+    technical risk, with safety techniques degrading relative to capabilities at
+    frontier scale.
+  tags:
+    - technical-risk
+    - deceptive-alignment
+    - goal-misgeneralization
+    - accident-risk
+    - safety-degradation
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: capability-alignment-race
+      type: analysis
+    - id: scalable-oversight
+      type: safety-agenda
+    - id: anthropic
+      type: lab
+    - id: openai
+      type: lab
+  lastUpdated: 2026-02
+
+- id: feedback-loops
+  type: analysis
+  title: Feedback Loop & Cascade Model
+  description: >-
+    System dynamics model analyzing how AI risks emerge from reinforcing
+    feedback loops. Capabilities compound at 2.5x per year while safety
+    measures improve at only 1.2x per year, with current safety investment at
+    just 0.1% of capability investment.
+  tags:
+    - feedback-loops
+    - system-dynamics
+    - capability-growth
+    - safety-investment
+    - recursive-improvement
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: capability-alignment-race
+      type: analysis
+    - id: racing-dynamics
+      type: concept
+    - id: anthropic
+      type: lab
+  lastUpdated: 2026-02
+
+- id: multi-actor-landscape
+  type: analysis
+  title: Multi-Actor Strategic Landscape
+  description: >-
+    Model analyzing how risk depends on which actors develop TAI. US-China
+    capability gap narrowed from 9.26% to 1.70% (2024-2025), while open-source
+    closed to within 1.70% of frontier. Actor identity may determine 40-60% of
+    total risk variance.
+  tags:
+    - geopolitics
+    - us-china-competition
+    - open-source-ai
+    - actor-analysis
+    - strategic-landscape
+    - proliferation
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: alignment-progress
+      type: concept
+    - id: capability-alignment-race
+      type: analysis
+    - id: openai
+      type: lab
+    - id: anthropic
+      type: lab
+  lastUpdated: 2026-02
+
+- id: model-organisms-of-misalignment
+  type: analysis
+  title: Model Organisms of Misalignment
+  description: >-
+    Research agenda creating controlled AI models that exhibit specific
+    misalignment behaviors to study alignment failures and test interventions.
+    Recent work achieves 99% coherence with 40% misalignment rates using models
+    as small as 0.5B parameters.
+  tags:
+    - misalignment
+    - model-organisms
+    - deceptive-alignment
+    - interpretability
+    - alignment-research
+    - sleeper-agents
+  clusters:
+    - ai-safety
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: evan-hubinger
+      type: researcher
+    - id: paul-christiano
+      type: researcher
+    - id: deceptive-alignment
+      type: risk
+    - id: interpretability
+      type: safety-agenda
+  lastUpdated: 2026-02
+
+- id: ea-biosecurity-scope
+  type: analysis
+  title: Is EA Biosecurity Work Limited to Restricting LLM Biological Use?
+  description: >-
+    Analysis of the full EA/x-risk biosecurity portfolio, examining whether the
+    community's work consists primarily of AI capability restrictions or
+    encompasses a broader set of interventions including DNA synthesis
+    screening, pathogen surveillance, medical countermeasures, and governance
+    reform.
+  tags:
+    - biosecurity
+    - ea-portfolio
+    - dna-synthesis-screening
+    - pandemic-preparedness
+    - delay-detect-defend
+  clusters:
+    - biorisks
+    - ai-safety
+    - governance
+    - community
+  relatedEntries:
+    - id: open-philanthropy
+      type: funder
+    - id: securebio
+      type: lab
+    - id: securedna
+      type: lab
+    - id: anthropic
+      type: lab
+    - id: blueprint-biosecurity
+      type: lab
+  lastUpdated: 2026-02
+

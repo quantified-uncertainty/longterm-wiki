@@ -1,0 +1,941 @@
+---
+title: Critical Uncertainties Model
+description: "This model identifies 35 high-leverage uncertainties in AI risk across compute, governance, and capabilities domains. Based on expert surveys, forecasting platforms, and empirical research, it finds key cruxes include scaling law breakdown point (10^26-10^30 FLOP), alignment difficulty (41-51% of experts assign >10% extinction probability), and AGI timeline (Metaculus median: 2027-2031)."
+tableOfContents: false
+quality: 71
+lastEdited: "2025-12-28"
+ratings:
+  focus: 8.5
+  novelty: 6.2
+  rigor: 7.8
+  completeness: 8
+  concreteness: 8.5
+  actionability: 7.5
+importance: 74.5
+llmSummary: "Identifies 35 high-leverage uncertainties in AI risk across compute (scaling breakdown at 10^26-10^30 FLOP), governance (10% P(US-China treaty by 2030)), and capabilities (autonomous R&D 3 years away, 41-51% of experts assign >10% extinction probability). Recommends $100-200M/year research budget focused on resolving key cruxes: scaling law empirics ($50-100M), deception detection ($30-50M), and governance feasibility studies ($20-30M)."
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Conceptual Framework' section
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+metrics:
+  wordCount: 1259
+  citations: 30
+  tables: 29
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: analysis-models
+---
+import CauseEffectGraph from '@components/CauseEffectGraph';
+import {Mermaid, R, EntityLink} from '@components/wiki';
+
+## Overview
+
+Effective AI risk prioritization requires identifying which uncertainties most affect expected outcomes. This model maps 35 high-leverage variables across six domains—hardware, algorithms, governance, economics, safety research, and capability thresholds—to help researchers and policymakers focus evidence-gathering where it matters most. The central question: **which empirical uncertainties, if resolved, would most change our strategic recommendations for AI safety?**
+
+The key insight is that a small number of cruxes—perhaps 8-12 variables—drive the majority of disagreement about AI risk levels and appropriate responses. Expert surveys consistently show wide disagreement on these specific parameters: the <R id="3f9927ec7945e4f2"><EntityLink id="ai-impacts">AI Impacts</EntityLink> 2023 survey</R> found that 41-51% of AI researchers assign greater than 10% probability to human extinction or severe disempowerment from AI, yet the remaining researchers assign much lower probabilities. This disagreement stems primarily from differing estimates of alignment difficulty, takeoff speed, and governance tractability—all variables included in this model.
+
+The model synthesizes data from multiple authoritative sources. <R id="bb81f2a99fdba0ec"><EntityLink id="metaculus">Metaculus</EntityLink> forecasts</R> show <EntityLink id="agi-timeline">AGI timeline</EntityLink> estimates have collapsed from 50 years (2020) to approximately 5 years (2024), with current median around 2027-2031. <R id="9587b65b1192289d"><EntityLink id="epoch-ai">Epoch AI</EntityLink> research</R> projects training compute could reach 10^28-10^30 FLOP by 2030, while their data analysis suggests high-quality training data may be exhausted by 2025-2028 depending on overtraining factors. These empirical findings directly inform the parameter estimates visualized below.
+
+**Core thesis**: Focus on ~35 nodes that are (1) high-leverage, (2) genuinely uncertain, and (3) empirically resolvable or at least operationalizable.
+
+<div class="breakout">
+<CauseEffectGraph
+  client:load
+  height={1200}
+  fitViewPadding={0.04}
+  initialNodes={[
+    {
+      id: 'gpu-growth',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'GPU Production Growth',
+        description: 'FLOP/s per $, annual % change.',
+        type: 'cause',
+        confidence: 2.5,
+        confidenceLabel: 'years to 2x',
+        details: 'Currently ~2x every 2.5 years. Could accelerate to 2x/18mo or decelerate. Depends on TSMC/Samsung fab capacity, ASML EUV production.',
+        relatedConcepts: ['TSMC', 'ASML', 'Semiconductors']
+      }
+    },
+    {
+      id: 'effective-compute',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Effective Compute Available',
+        description: 'ExaFLOP/s-years at frontier labs.',
+        type: 'intermediate',
+        confidence: 25,
+        confidenceLabel: 'log₁₀ FLOP',
+        details: 'Not just hardware - includes utilization rates, cluster efficiency. Current leader ~10^25 FLOP, could be 10^27 by 2027 or plateau.',
+        relatedConcepts: ['Training runs', 'Clusters', 'Efficiency']
+      }
+    },
+    {
+      id: 'compute-governance',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Compute Governance',
+        description: 'Can governments track/limit training runs?',
+        type: 'cause',
+        confidence: 3,
+        confidenceLabel: 'effectiveness (0-10)',
+        details: 'Chip tracking infrastructure, cloud monitoring, enforcement. Currently ~3/10.',
+        relatedConcepts: ['Export controls', 'Monitoring', 'KYC']
+      }
+    },
+    {
+      id: 'china-gap',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'China-US Compute Gap',
+        description: 'Chinese vs US lab compute access.',
+        type: 'cause',
+        confidence: 0.3,
+        confidenceLabel: 'ratio (China/US)',
+        details: 'Export controls vs. smuggling, domestic production, algorithmic efficiency. Currently ~0.3x.',
+        relatedConcepts: ['Export controls', 'Smuggling', 'Domestic chips']
+      }
+    },
+    {
+      id: 'compute-cost',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Compute Cost Trajectory',
+        description: '$/FLOP, % change per year.',
+        type: 'cause',
+        confidence: 50,
+        confidenceLabel: '% decline/year',
+        details: 'Training cost declining ~50% annually. Non-linear if new architectures (analog, photonic) emerge.',
+        relatedConcepts: ['Costs', 'Efficiency', 'Hardware']
+      }
+    },
+    {
+      id: 'energy-available',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Energy for AI',
+        description: 'TWh/year allocated to AI.',
+        type: 'cause',
+        confidence: 50,
+        confidenceLabel: 'TWh/year',
+        details: 'Physical constraint: data center energy becoming political issue. Currently ~50 TWh/year.',
+        relatedConcepts: ['Grid', 'Nuclear', 'Data centers']
+      }
+    },
+    {
+      id: 'algo-efficiency',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Algorithmic Efficiency Gains',
+        description: 'Vs 2024 baseline, multiplicative.',
+        type: 'intermediate',
+        confidence: 16,
+        confidenceLabel: 'months to 2x',
+        details: 'Historical: ~2x every ~16 months. Could accelerate or hit wall.',
+        relatedConcepts: ['Algorithms', 'Efficiency', 'Progress']
+      }
+    },
+    {
+      id: 'scaling-breakdown',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Scaling Law Breakdown Point',
+        description: 'FLOP at which current laws fail.',
+        type: 'cause',
+        confidence: 28,
+        confidenceLabel: 'log₁₀ FLOP (est.)',
+        details: 'Do capabilities keep scaling predictably or hit ceiling? Crucial for timeline estimates. Estimated ~10^28.',
+        relatedConcepts: ['Scaling laws', 'Chinchilla', 'Diminishing returns']
+      }
+    },
+    {
+      id: 'data-ceiling',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Data Quality Ceiling',
+        description: '% of internet text useful for pretraining.',
+        type: 'cause',
+        confidence: 0.4,
+        confidenceLabel: 'fraction remaining',
+        details: 'Running out of high-quality text by 2026-2028. Synthetic data, multimodal, embodied data as solutions.',
+        relatedConcepts: ['Data', 'Synthetic data', 'Multimodal']
+      }
+    },
+    {
+      id: 'post-training',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Post-Training Effectiveness',
+        description: 'Capability gain vs pretraining.',
+        type: 'intermediate',
+        confidence: 0.5,
+        confidenceLabel: 'ratio to pretrain',
+        details: 'RLHF, Constitutional AI, inference-time compute. Trend: increasing importance, could dominate pretraining.',
+        relatedConcepts: ['RLHF', 'CAI', 'Fine-tuning']
+      }
+    },
+    {
+      id: 'test-time-compute',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Test-Time Compute Scaling',
+        description: 'Capability gain per 10x inference compute.',
+        type: 'intermediate',
+        confidence: 0.4,
+        confidenceLabel: 'gain per 10x',
+        details: 'AlphaGo/o1-style reasoning - how far does this go? Could enable massive capability jumps without new training.',
+        relatedConcepts: ['o1', 'Chain-of-thought', 'Search']
+      }
+    },
+    {
+      id: 'us-regulation',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'US Regulatory Stringency',
+        description: 'Scale 0-10 by 2028.',
+        type: 'intermediate',
+        confidence: 3,
+        confidenceLabel: 'stringency (0-10)',
+        details: 'Will US implement meaningful AI regulation or stay hands-off? Currently ~3/10.',
+        relatedConcepts: ['SB 1047', 'NIST', 'Legislation']
+      }
+    },
+    {
+      id: 'us-china-treaty',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'US-China Coordination',
+        description: 'P(meaningful treaty by 2030).',
+        type: 'intermediate',
+        confidence: 0.1,
+        confidenceLabel: 'probability',
+        details: 'Arms control on AI development - possible or fantasy? Currently ~10%.',
+        relatedConcepts: ['Treaty', 'Diplomacy', 'Arms control']
+      }
+    },
+    {
+      id: 'lab-coordination',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Frontier Lab Coordination',
+        description: 'Quality of safety info sharing.',
+        type: 'intermediate',
+        confidence: 4,
+        confidenceLabel: 'quality (0-10)',
+        details: 'Do leading labs actually share safety info, coordinate deployment? RSPs, voluntary commitments. Currently ~4/10.',
+        relatedConcepts: ['RSPs', 'Commitments', 'Sharing']
+      }
+    },
+    {
+      id: 'compute-monitoring',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Compute Monitoring Infrastructure',
+        description: '% of frontier compute tracked by 2028.',
+        type: 'intermediate',
+        confidence: 0.2,
+        confidenceLabel: 'fraction tracked',
+        details: 'Can governments actually see large training runs? Currently ~20%.',
+        relatedConcepts: ['KYC', 'Cloud', 'Chips']
+      }
+    },
+    {
+      id: 'public-concern',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Public AI Concern',
+        description: '% viewing AI as existential risk.',
+        type: 'intermediate',
+        confidence: 0.25,
+        confidenceLabel: 'fraction concerned',
+        details: 'Currently ~15-30% in US. Could rise sharply with incidents.',
+        relatedConcepts: ['Polling', 'Public opinion', 'Media']
+      }
+    },
+    {
+      id: 'economic-value',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'AI Economic Value Growth',
+        description: 'Total market size, % growth.',
+        type: 'intermediate',
+        confidence: 200,
+        confidenceLabel: '$B market',
+        details: 'Currently ≈\$200B market, could be \$2T+ by 2028. Determines racing incentives.',
+        relatedConcepts: ['Revenue', 'Market', 'Investment']
+      }
+    },
+    {
+      id: 'winner-take-all',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Winner-Take-All Dynamics',
+        description: 'Strength of first-mover advantage.',
+        type: 'cause',
+        confidence: 5,
+        confidenceLabel: 'strength (0-10)',
+        details: 'Does first-mover get durable advantage or quick commoditization? Network effects, moats, or rapid diffusion?',
+        relatedConcepts: ['Moats', 'Commoditization', 'Network effects']
+      }
+    },
+    {
+      id: 'lab-lead-time',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Lead Time Between Labs',
+        description: 'Months, 1st to 2nd place.',
+        type: 'intermediate',
+        confidence: 9,
+        confidenceLabel: 'months',
+        details: 'How tight is the race? Tighter = more pressure to cut corners. Currently ~6-12 months.',
+        relatedConcepts: ['Competition', 'Lead', 'Racing']
+      }
+    },
+    {
+      id: 'open-source-lag',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Open Source Capability Lag',
+        description: 'Months behind frontier.',
+        type: 'intermediate',
+        confidence: 15,
+        confidenceLabel: 'months',
+        details: 'How fast do capabilities diffuse to open models? Currently ~12-18 months, could shrink dramatically.',
+        relatedConcepts: ['Open source', 'Diffusion', 'Llama']
+      }
+    },
+    {
+      id: 'alignment-tax',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Alignment Tax',
+        description: '% capability reduction from safety measures.',
+        type: 'cause',
+        confidence: 0.12,
+        confidenceLabel: 'fraction',
+        details: 'How much does safety slow you down? Currently ~5-20%. Could improve or worsen.',
+        relatedConcepts: ['Safety cost', 'Trade-off', 'Capability hit']
+      }
+    },
+    {
+      id: 'interp-progress',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Interpretability Progress',
+        description: '% of model behavior explainable.',
+        type: 'intermediate',
+        confidence: 0.05,
+        confidenceLabel: 'fraction explained',
+        details: 'Are we making progress understanding models? Currently &lt;5% for frontier models.',
+        relatedConcepts: ['Interpretability', 'Circuits', 'Mech interp']
+      }
+    },
+    {
+      id: 'scalable-oversight',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Scalable Oversight Effectiveness',
+        description: 'Capability level where oversight breaks.',
+        type: 'cause',
+        confidence: 27,
+        confidenceLabel: 'log₁₀ FLOP limit',
+        details: 'At what point can\'t humans oversee AI training? Estimated ~10^27 FLOP.',
+        relatedConcepts: ['Oversight', 'Supervision', 'Debate']
+      }
+    },
+    {
+      id: 'deception-detection',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Deception Detection Capability',
+        description: 'True positive / false positive rate.',
+        type: 'intermediate',
+        confidence: 0.3,
+        confidenceLabel: 'detection rate',
+        details: 'Can we catch scheming models? Currently mostly theoretical. ~30% estimated true positive.',
+        relatedConcepts: ['Deception', 'Sandbagging', 'Evals']
+      }
+    },
+    {
+      id: 'safety-funding-ratio',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Safety Funding Ratio',
+        description: 'Safety $ / capabilities $.',
+        type: 'cause',
+        confidence: 0.03,
+        confidenceLabel: 'ratio',
+        details: 'Currently ~1:20 to 1:50. Could improve with concern.',
+        relatedConcepts: ['Funding', 'Investment', 'Ratio']
+      }
+    },
+    {
+      id: 'safety-talent',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Safety Researcher Pipeline',
+        description: 'PhDs/year, experienced researchers.',
+        type: 'cause',
+        confidence: 350,
+        confidenceLabel: 'researchers',
+        details: 'Bottleneck on safety research. Currently ~200-500 serious researchers, growing ~20%/year.',
+        relatedConcepts: ['Talent', 'PhDs', 'Pipeline']
+      }
+    },
+    {
+      id: 'warning-shot',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Warning Shot Severity',
+        description: 'Economic loss $B or lives lost.',
+        type: 'intermediate',
+        confidence: 0,
+        confidenceLabel: 'incidents so far',
+        details: 'How bad does an AI accident need to be to trigger response? Could be \$1B loss or 100+ deaths.',
+        relatedConcepts: ['Incident', 'Accident', 'Trigger']
+      }
+    },
+    {
+      id: 'warning-lag',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Warning → Regulation Lag',
+        description: 'Months from incident to policy.',
+        type: 'cause',
+        confidence: 18,
+        confidenceLabel: 'months',
+        details: 'How fast can institutions respond? Historical: financial crisis ~18 months.',
+        relatedConcepts: ['Response time', 'Policy', 'Lag']
+      }
+    },
+    {
+      id: 'autonomous-rnd',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Autonomous AI R&D',
+        description: 'Years until median ML researcher equivalent.',
+        type: 'intermediate',
+        confidence: 3,
+        confidenceLabel: 'years away',
+        details: 'Most important threshold - enables recursive improvement. Currently: ~10-20% of median researcher.',
+        relatedConcepts: ['Automation', 'Recursive', 'Research']
+      }
+    },
+    {
+      id: 'persuasion-cap',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Persuasion Capability',
+        description: '% of population swayable.',
+        type: 'intermediate',
+        confidence: 0.35,
+        confidenceLabel: 'fraction swayable',
+        details: 'Determines information warfare, social stability risks. Currently: ~20-40% on specific issues.',
+        relatedConcepts: ['Persuasion', 'Manipulation', 'Influence']
+      }
+    },
+    {
+      id: 'cyber-cap',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Cyber Offense Capability',
+        description: '% of critical infrastructure vulnerable.',
+        type: 'intermediate',
+        confidence: 0.3,
+        confidenceLabel: 'fraction vulnerable',
+        details: 'Already significant, could become dominant. Currently ~30% of critical infra vulnerable.',
+        relatedConcepts: ['Cyber', 'Hacking', 'Infrastructure']
+      }
+    },
+    {
+      id: 'bio-cap',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Bioweapon Design Capability',
+        description: 'Expert-equivalent virology knowledge.',
+        type: 'intermediate',
+        confidence: 0.6,
+        confidenceLabel: 'expert equivalence',
+        details: 'When can AI autonomously design novel pathogens? Currently: assists but doesn\'t exceed human experts (~60%).',
+        relatedConcepts: ['Biology', 'Pathogens', 'Synthesis']
+      }
+    },
+    {
+      id: 'strategic-cap',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Strategic Planning Capability',
+        description: 'Equivalent to % of professional strategists.',
+        type: 'intermediate',
+        confidence: 0.4,
+        confidenceLabel: 'expert equivalence',
+        details: 'Long-horizon, adversarial planning. Determines autonomous operation risk. Currently ~40% of experts.',
+        relatedConcepts: ['Strategy', 'Planning', 'Agency']
+      }
+    },
+    {
+      id: 'misalignment-loss',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Expected Misalignment Loss',
+        description: '$T, conditional on TAI by 2030.',
+        type: 'effect',
+        confidence: 50,
+        confidenceLabel: '$T expected',
+        details: 'What\'s the downside if we get it wrong? Wide distribution: 0.1% think \$0, 20% think &gt;\$100T.',
+        relatedConcepts: ['Loss', 'Damage', 'Cost']
+      }
+    },
+    {
+      id: 'bio-deaths',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Expected Bio Deaths',
+        description: 'Log scale, conditional on release.',
+        type: 'effect',
+        confidence: 5,
+        confidenceLabel: 'log₁₀ deaths',
+        details: 'Quantify worst-case misuse scenario. Could be 10^3 (contained), 10^6 (epidemic), 10^9 (pandemic).',
+        relatedConcepts: ['Bioweapon', 'Pandemic', 'Deaths']
+      }
+    },
+    {
+      id: 'infra-deaths',
+      type: 'causeEffect',
+      position: { x: 0, y: 0 },
+      data: {
+        label: 'Expected Infrastructure Deaths',
+        description: 'Log scale, from AI-caused failures.',
+        type: 'effect',
+        confidence: 4,
+        confidenceLabel: 'log₁₀ deaths',
+        details: 'Cyberattacks on power/water/transport. Could be 10^2 (local) to 10^6 (cascading).',
+        relatedConcepts: ['Infrastructure', 'Cascade', 'Cyber']
+      }
+    }
+  ]}
+  initialEdges={[
+    { id: 'e-gpu-compute', source: 'gpu-growth', target: 'effective-compute', data: { impact: 0.35 } },
+    { id: 'e-cost-compute', source: 'compute-cost', target: 'effective-compute', data: { impact: 0.25 } },
+    { id: 'e-energy-compute', source: 'energy-available', target: 'effective-compute', data: { impact: 0.20 } },
+    { id: 'e-gov-compute', source: 'compute-governance', target: 'effective-compute', data: { impact: 0.20 } },
+    { id: 'e-compute-algo', source: 'effective-compute', target: 'algo-efficiency', data: { impact: 0.40 } },
+    { id: 'e-data-algo', source: 'data-ceiling', target: 'algo-efficiency', data: { impact: 0.30 } },
+    { id: 'e-scaling-algo', source: 'scaling-breakdown', target: 'algo-efficiency', data: { impact: 0.30 } },
+    { id: 'e-algo-postrain', source: 'algo-efficiency', target: 'post-training', data: { impact: 0.50 } },
+    { id: 'e-compute-postrain', source: 'effective-compute', target: 'post-training', data: { impact: 0.30 } },
+    { id: 'e-scaling-postrain', source: 'scaling-breakdown', target: 'post-training', data: { impact: 0.20 } },
+    { id: 'e-postrain-testtime', source: 'post-training', target: 'test-time-compute', data: { impact: 0.60 } },
+    { id: 'e-algo-testtime', source: 'algo-efficiency', target: 'test-time-compute', data: { impact: 0.40 } },
+    { id: 'e-gov-chinagap', source: 'compute-governance', target: 'china-gap', data: { impact: 0.50 } },
+    { id: 'e-gpu-chinagap', source: 'gpu-growth', target: 'china-gap', data: { impact: 0.30 } },
+    { id: 'e-algo-chinagap', source: 'algo-efficiency', target: 'china-gap', data: { impact: 0.20 } },
+    { id: 'e-chinagap-treaty', source: 'china-gap', target: 'us-china-treaty', data: { impact: 0.35 } },
+    { id: 'e-concern-treaty', source: 'public-concern', target: 'us-china-treaty', data: { impact: 0.35 } },
+    { id: 'e-usreg-treaty', source: 'us-regulation', target: 'us-china-treaty', data: { impact: 0.30 } },
+    { id: 'e-concern-usreg', source: 'public-concern', target: 'us-regulation', data: { impact: 0.40 } },
+    { id: 'e-warning-concern', source: 'warning-shot', target: 'public-concern', data: { impact: 0.50 } },
+    { id: 'e-econ-concern', source: 'economic-value', target: 'public-concern', data: { impact: 0.30 } },
+    { id: 'e-cyber-concern', source: 'cyber-cap', target: 'public-concern', data: { impact: 0.20 } },
+    { id: 'e-usreg-labcoord', source: 'us-regulation', target: 'lab-coordination', data: { impact: 0.40 } },
+    { id: 'e-concern-labcoord', source: 'public-concern', target: 'lab-coordination', data: { impact: 0.35 } },
+    { id: 'e-leadtime-labcoord', source: 'lab-lead-time', target: 'lab-coordination', data: { impact: 0.25 }, style: { strokeDasharray: '5,5' } },
+    { id: 'e-gov-monitoring', source: 'compute-governance', target: 'compute-monitoring', data: { impact: 0.50 } },
+    { id: 'e-usreg-monitoring', source: 'us-regulation', target: 'compute-monitoring', data: { impact: 0.30 } },
+    { id: 'e-treaty-monitoring', source: 'us-china-treaty', target: 'compute-monitoring', data: { impact: 0.20 } },
+    { id: 'e-econ-wta', source: 'economic-value', target: 'winner-take-all', data: { impact: 0.50 } },
+    { id: 'e-algo-wta', source: 'algo-efficiency', target: 'winner-take-all', data: { impact: 0.30 } },
+    { id: 'e-compute-wta', source: 'effective-compute', target: 'winner-take-all', data: { impact: 0.20 } },
+    { id: 'e-wta-leadtime', source: 'winner-take-all', target: 'lab-lead-time', data: { impact: 0.40 } },
+    { id: 'e-compute-leadtime', source: 'effective-compute', target: 'lab-lead-time', data: { impact: 0.35 } },
+    { id: 'e-algo-leadtime', source: 'algo-efficiency', target: 'lab-lead-time', data: { impact: 0.25 } },
+    { id: 'e-leadtime-opensource', source: 'lab-lead-time', target: 'open-source-lag', data: { impact: 0.40 } },
+    { id: 'e-algo-opensource', source: 'algo-efficiency', target: 'open-source-lag', data: { impact: 0.35 } },
+    { id: 'e-usreg-opensource', source: 'us-regulation', target: 'open-source-lag', data: { impact: 0.25 } },
+    { id: 'e-safetyfund-interp', source: 'safety-funding-ratio', target: 'interp-progress', data: { impact: 0.40 } },
+    { id: 'e-talent-interp', source: 'safety-talent', target: 'interp-progress', data: { impact: 0.40 } },
+    { id: 'e-algo-interp', source: 'algo-efficiency', target: 'interp-progress', data: { impact: 0.20 } },
+    { id: 'e-interp-detection', source: 'interp-progress', target: 'deception-detection', data: { impact: 0.50 } },
+    { id: 'e-talent-detection', source: 'safety-talent', target: 'deception-detection', data: { impact: 0.30 } },
+    { id: 'e-safetyfund-detection', source: 'safety-funding-ratio', target: 'deception-detection', data: { impact: 0.20 } },
+    { id: 'e-interp-tax', source: 'interp-progress', target: 'alignment-tax', data: { impact: 0.40 } },
+    { id: 'e-algo-tax', source: 'algo-efficiency', target: 'alignment-tax', data: { impact: 0.35 } },
+    { id: 'e-postrain-tax', source: 'post-training', target: 'alignment-tax', data: { impact: 0.25 } },
+    { id: 'e-compute-oversight', source: 'effective-compute', target: 'scalable-oversight', data: { impact: 0.40 } },
+    { id: 'e-talent-oversight', source: 'safety-talent', target: 'scalable-oversight', data: { impact: 0.35 } },
+    { id: 'e-interp-oversight', source: 'interp-progress', target: 'scalable-oversight', data: { impact: 0.25 } },
+    { id: 'e-warning-lag', source: 'warning-shot', target: 'warning-lag', data: { impact: 0.40 } },
+    { id: 'e-concern-lag', source: 'public-concern', target: 'warning-lag', data: { impact: 0.35 } },
+    { id: 'e-usreg-lag', source: 'us-regulation', target: 'warning-lag', data: { impact: 0.25 } },
+    { id: 'e-testtime-rnd', source: 'test-time-compute', target: 'autonomous-rnd', data: { impact: 0.35 } },
+    { id: 'e-algo-rnd', source: 'algo-efficiency', target: 'autonomous-rnd', data: { impact: 0.35 } },
+    { id: 'e-compute-rnd', source: 'effective-compute', target: 'autonomous-rnd', data: { impact: 0.30 } },
+    { id: 'e-testtime-persuasion', source: 'test-time-compute', target: 'persuasion-cap', data: { impact: 0.40 } },
+    { id: 'e-postrain-persuasion', source: 'post-training', target: 'persuasion-cap', data: { impact: 0.35 } },
+    { id: 'e-algo-persuasion', source: 'algo-efficiency', target: 'persuasion-cap', data: { impact: 0.25 } },
+    { id: 'e-algo-cyber', source: 'algo-efficiency', target: 'cyber-cap', data: { impact: 0.40 } },
+    { id: 'e-compute-cyber', source: 'effective-compute', target: 'cyber-cap', data: { impact: 0.35 } },
+    { id: 'e-opensource-cyber', source: 'open-source-lag', target: 'cyber-cap', data: { impact: 0.25 }, style: { strokeDasharray: '5,5' } },
+    { id: 'e-algo-bio', source: 'algo-efficiency', target: 'bio-cap', data: { impact: 0.40 } },
+    { id: 'e-testtime-bio', source: 'test-time-compute', target: 'bio-cap', data: { impact: 0.35 } },
+    { id: 'e-data-bio', source: 'data-ceiling', target: 'bio-cap', data: { impact: 0.25 } },
+    { id: 'e-testtime-strategic', source: 'test-time-compute', target: 'strategic-cap', data: { impact: 0.40 } },
+    { id: 'e-rnd-strategic', source: 'autonomous-rnd', target: 'strategic-cap', data: { impact: 0.35 } },
+    { id: 'e-algo-strategic', source: 'algo-efficiency', target: 'strategic-cap', data: { impact: 0.25 } },
+    { id: 'e-rnd-loss', source: 'autonomous-rnd', target: 'misalignment-loss', data: { impact: 0.25 } },
+    { id: 'e-detection-loss', source: 'deception-detection', target: 'misalignment-loss', data: { impact: 0.25 }, style: { strokeDasharray: '5,5' } },
+    { id: 'e-oversight-loss', source: 'scalable-oversight', target: 'misalignment-loss', data: { impact: 0.25 }, style: { strokeDasharray: '5,5' } },
+    { id: 'e-tax-loss', source: 'alignment-tax', target: 'misalignment-loss', data: { impact: 0.25 }, style: { strokeDasharray: '5,5' } },
+    { id: 'e-bio-deaths', source: 'bio-cap', target: 'bio-deaths', data: { impact: 0.50 } },
+    { id: 'e-opensource-biodeaths', source: 'open-source-lag', target: 'bio-deaths', data: { impact: 0.30 }, style: { strokeDasharray: '5,5' } },
+    { id: 'e-monitoring-biodeaths', source: 'compute-monitoring', target: 'bio-deaths', data: { impact: 0.20 }, style: { strokeDasharray: '5,5' } },
+    { id: 'e-cyber-infra', source: 'cyber-cap', target: 'infra-deaths', data: { impact: 0.50 } },
+    { id: 'e-opensource-infra', source: 'open-source-lag', target: 'infra-deaths', data: { impact: 0.30 }, style: { strokeDasharray: '5,5' } },
+    { id: 'e-monitoring-infra', source: 'compute-monitoring', target: 'infra-deaths', data: { impact: 0.20 }, style: { strokeDasharray: '5,5' } }
+  ]}
+/>
+</div>
+
+---
+
+## Data Sources and Methodology
+
+This model draws on multiple evidence streams to estimate parameter values and uncertainty ranges:
+
+| Source Type | Examples | Variables Informed | Update Frequency |
+|-------------|----------|-------------------|------------------|
+| **Expert Surveys** | <R id="3f9927ec7945e4f2">AI Impacts</R>, <R id="40fcdcc3ffba5188">Pew Research</R>, <R id="b163447fdc804872">International AI Safety Report</R> | Alignment difficulty, extinction probability, timeline estimates | Annual |
+| **Forecasting Platforms** | <R id="bb81f2a99fdba0ec">Metaculus</R>, <EntityLink id="manifold">Manifold</EntityLink>, <EntityLink id="polymarket">Polymarket</EntityLink> | AGI timelines, capability milestones, policy outcomes | Continuous |
+| **Industry Reports** | <R id="da87f2b213eb9272">Stanford AI Index</R>, <R id="c1e31a3255ae290d">McKinsey State of AI</R>, <R id="9587b65b1192289d">Epoch AI</R> | Compute trends, algorithmic progress, economic value | Annual |
+| **Governance Tracking** | <R id="d5796bc00a131872">IAPP <EntityLink id="ai-governance">AI Governance</EntityLink></R>, regulatory databases | Policy stringency, compliance rates, enforcement actions | Quarterly |
+| **Safety Research** | Lab publications, interpretability benchmarks, red-team exercises | Alignment tax, deception detection, oversight limits | Ongoing |
+
+**Methodology notes:** Parameter estimates use median values from multiple sources where available. Uncertainty ranges reflect the 10th-90th percentile of expert/forecaster distributions. The "resolvable via" column identifies empirical pathways to reduce uncertainty. Variables are classified as high-leverage if resolving uncertainty would shift expected loss by >\$1T or change recommended interventions.
+
+---
+
+## Key Expert Survey Findings
+
+The <R id="3f9927ec7945e4f2">AI Impacts 2023 survey</R> of 2,788 AI researchers provides crucial data on expert disagreement:
+
+| Finding | Value | Implications |
+|---------|-------|--------------|
+| P(human extinction or severe disempowerment) >10% | 41-51% of respondents | Wide disagreement on catastrophic risk |
+| Alignment viewed as "harder" or "much harder" than other AI problems | 57% of respondents | Technical difficulty is a key crux |
+| Median AGI timeline | 2047 (50% probability) | But 10% chance by 2027 |
+| Timeline shift from 2022 to 2023 survey | 13-48 years earlier | Rapid updating toward shorter timelines |
+
+The <R id="40fcdcc3ffba5188">Pew Research survey</R> (2024) of 1,013 AI experts found 56% believe AI will have positive impact over 20 years vs. only 17% of the public—a 39-percentage-point gap that influences political feasibility of governance interventions.
+
+---
+
+## Uncertainty Domain Structure
+
+The following diagram illustrates how uncertainty domains interact to determine overall AI risk estimates. Arrows indicate primary causal influences—uncertainties in upstream domains propagate to downstream risk assessments.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph INPUTS["Input Uncertainties"]
+        HW[Hardware & Compute<br/>6 variables]
+        ALGO[Algorithmic Progress<br/>7 variables]
+        GOV[Governance & Coordination<br/>8 variables]
+    end
+
+    subgraph INTERMEDIATES["Intermediate Dynamics"]
+        RACE[Racing Dynamics<br/>6 variables]
+        SAFETY[Safety Research<br/>10 variables]
+    end
+
+    subgraph CAPABILITIES["Capability Thresholds"]
+        CAP[Dangerous Capabilities<br/>5 variables]
+    end
+
+    subgraph OUTCOMES["Risk Outcomes"]
+        RISK[Expected Loss<br/>3 variables]
+    end
+
+    HW --> RACE
+    HW --> CAP
+    ALGO --> RACE
+    ALGO --> CAP
+    ALGO --> SAFETY
+    GOV --> RACE
+    GOV --> SAFETY
+    RACE --> SAFETY
+    RACE --> CAP
+    SAFETY --> RISK
+    CAP --> RISK
+    GOV --> RISK
+
+    style HW fill:#e1f5fe
+    style ALGO fill:#e1f5fe
+    style GOV fill:#e8f5e9
+    style RACE fill:#fff3e0
+    style SAFETY fill:#e8f5e9
+    style CAP fill:#ffebee
+    style RISK fill:#ffcdd2
+`} />
+
+**Key structural insights:**
+- Hardware and algorithmic uncertainties jointly determine capability timelines
+- Governance effectiveness influences both racing dynamics and direct risk mitigation
+- Safety research progress depends on algorithmic advances (interpretability of more capable models) and governance (funding, coordination)
+- Capability thresholds are the proximate determinant of misuse and accident risks
+
+---
+
+## Variable Categories
+
+### Hardware & Compute (6 nodes)
+
+| Variable | Current Estimate | Uncertainty Range | Resolvable Via |
+|----------|------------------|-------------------|----------------|
+| GPU production growth | 2x / 2.5 years | 2x/18mo to 2x/4yr | Semiconductor roadmaps, investment data |
+| Effective compute at frontier | 10^25 FLOP | 10^25 - 10^27 by 2027 | Model capabilities, energy consumption |
+| Compute governance effectiveness | 3/10 | 1-7/10 by 2028 | Monitoring deployment, compliance rates |
+| China-US compute gap | 0.3x | 0.1x - 0.8x | Intelligence estimates, published capabilities |
+| Compute cost trajectory | -50%/year | -30% to -70%/year | Public pricing, efficiency benchmarks |
+| Energy for AI | 50 TWh/year | 30-200 TWh by 2028 | Grid data, construction permits |
+
+### Algorithmic Progress (7 nodes)
+
+| Variable | Current Estimate | Uncertainty Range | Resolvable Via |
+|----------|------------------|-------------------|----------------|
+| Algorithmic efficiency gains | 2x / 16 months | 2x/8mo to 2x/36mo | Benchmark performance at fixed FLOP |
+| Scaling law breakdown point | ≈10^28 FLOP | 10^26 - 10^30 | Extrapolation from largest runs |
+| Data quality ceiling | 40% remaining | 20-80% | Data availability studies |
+| Post-training effectiveness | 0.5x pretrain | 0.2x - 2x | Capability comparisons |
+| Sample efficiency breakthrough P | 30% by 2030 | 10-60% | Research publications, benchmarks |
+| Architecture paradigm shift P | 25% by 2030 | 10-50% | Benchmark dominance, investment flows |
+| Test-time compute scaling | +40% per 10x | +10% to +100% | Reasoning task benchmarks |
+
+### Coordination & Governance (8 nodes)
+
+The <R id="d5796bc00a131872">IAPP AI Governance Survey 2024</R> found that only 25% of organizations have fully implemented AI governance programs despite 78% using AI—a 53-percentage-point gap. The <R id="da87f2b213eb9272">Stanford AI Index 2025</R> reports U.S. federal agencies introduced 59 AI regulations in 2024, double the 2023 count.
+
+| Variable | Current Estimate | Uncertainty Range | Resolvable Via |
+|----------|------------------|-------------------|----------------|
+| US regulatory stringency | 3/10 | 1-8/10 by 2028 | Legislation, agency rulemaking |
+| US-China treaty probability | 10% by 2030 | 2-30% | Diplomatic initiatives, expert surveys |
+| EU AI Act effectiveness | 4/10 | 2-7/10 | Audit reports, enforcement actions |
+| Frontier lab coordination | 4/10 | 2-8/10 | Information sharing, deployment decisions |
+| Compute monitoring % | 20% | 5-60% by 2028 | Monitoring tech deployment |
+| Public concern trajectory | 25% | 15-60% | Polling data, media analysis |
+| Whistleblower frequency | 0.5/year | 0.1-3/year | Disclosed incidents |
+| International AI institution | 2/10 | 1-6/10 by 2030 | Institution-building efforts |
+
+**Governance maturity gap:** According to <R id="3af85afb86e7987b">Infosys research</R>, only 2% of companies meet gold-standard benchmarks for responsible AI controls—comprehensive controls, continuous monitoring, and proven effectiveness across the AI lifecycle.
+
+### Economic & Strategic (6 nodes)
+
+| Variable | Current Estimate | Uncertainty Range | Resolvable Via |
+|----------|------------------|-------------------|----------------|
+| AI economic value | \$200B | \$100B-\$2T by 2028 | Revenue data, market caps |
+| Winner-take-all strength | 5/10 | 3-8/10 | Concentration trends, imitation lag |
+| Military AI advantage | 5/10 | 3-9/10 | Defense analysis, war games |
+| Lab lead time | 9 months | 3-18 months | Benchmark timing, releases |
+| Open source lag | 15 months | 6-24 months | Benchmark comparisons |
+| Regulatory arbitrage | 5/10 | 3-8/10 | Company relocations |
+
+### Safety & Alignment (10 nodes)
+
+The <R id="9a357b5d11fc5f72">safety funding gap</R> is stark: capability investment to safety research is approximately 10,000:1 by some estimates. AI safety incidents surged 56.4% in 2024, with 233 documented failures. Total AI safety funding reached approximately \$100-650M annually (including internal lab budgets), versus \$10B+ in capability development. Mechanistic interpretability research, while <R id="45c5b56ac029ef2d">progressing</R>, still lacks standardized metrics for "percentage of model explained."
+
+| Variable | Current Estimate | Uncertainty Range | Resolvable Via |
+|----------|------------------|-------------------|----------------|
+| Alignment tax | 12% | 5-30% | Benchmark aligned vs unaligned |
+| Interpretability progress | 5% explained | 2-15% | Interpretability benchmarks |
+| Scalable oversight limit | 10^27 FLOP | 10^25 - 10^29 | Red team exercises |
+| Deception detection rate | 30% | 10-60% | Benchmark on adversarial models |
+| Safety funding ratio | 1:33 | 1:10 - 1:100 | Lab budgets, grant funding |
+| Safety researcher pipeline | 350/year | 200-800/year | Publications, hiring, graduates |
+| Warning shot severity | 0 so far | \$1B loss or 100+ deaths | Historical analysis |
+| Warning → regulation lag | 18 months | 6-36 months | Case studies |
+| Contained testing ratio | 20% | 5-50% | Lab practice surveys |
+| Frontier lab security | 2 breaches/year | 0.5-5/year | Incident reports, audits |
+
+**Deception evidence (2024):** Research showed Claude 3 Opus sometimes strategically answered prompts conflicting with its objectives to avoid retraining. When reinforcement learning was applied, the model faked alignment in 78% of cases—providing empirical grounding for deception detection estimates.
+
+### Capability Thresholds (5 nodes)
+
+| Variable | Current Estimate | Uncertainty Range | Resolvable Via |
+|----------|------------------|-------------------|----------------|
+| Autonomous AI R&D | 3 years away | 1-10 years | ML task benchmarks |
+| Persuasion ceiling | 35% swayable | 20-60% | A/B testing, election analysis |
+| Cyber offense capability | 30% infra vulnerable | 15-60% | Red team exercises |
+| Bioweapon design capability | 60% expert-equivalent | 30-90% | Red team biology tasks |
+| Strategic planning capability | 40% expert-equivalent | 20-70% | Strategy benchmarks |
+
+### Concrete Risk Costs (3 nodes)
+
+| Variable | Current Estimate | Uncertainty Range | Resolvable Via |
+|----------|------------------|-------------------|----------------|
+| Expected misalignment loss | \$50T | \$0 - \$500T | Expert elicitation, modeling |
+| Expected bio deaths (log) | 10^5 | 10^3 - 10^9 | Epidemiological modeling |
+| Expected infra deaths (log) | 10^4 | 10^2 - 10^6 | Vulnerability studies |
+
+## Key Causal Relationships
+
+### Strong Positive Influences (&gt;50% variance explained)
+
+- **GPU growth → Effective compute → Algorithmic progress → TAI timeline**
+- **Economic value growth → Racing incentives → Reduced safety investment**
+- **Autonomous R&D capability → Recursive improvement → Fast takeoff probability**
+- **Warning shot severity → Public concern → Regulatory stringency**
+
+### Strong Protective Influences
+
+- **Low alignment tax → Higher safety adoption**
+- **High compute governance → Reduced China-US gap**
+- **International coordination → Reduced racing dynamics**
+- **Large lab lead time → More safety investment (less pressure)**
+
+### Critical Uncertainties with High Influence
+
+| Uncertainty | Affects | Resolution Timeline |
+|-------------|---------|---------------------|
+| Scaling law breakdown point | All timeline estimates | 2-4 years |
+| US-China coordination possibility | Arms race vs cooperation | 3-5 years |
+| Warning shot occurrence | Governance quality | Unpredictable |
+| Deceptive alignment detection | Existential risk level | 2-5 years |
+
+### Key Interaction Effects
+
+| Interaction | Result |
+|-------------|--------|
+| High economic value × Low lead time | Extreme racing pressure |
+| High interpretability × Low alignment tax | Rapid safety adoption |
+| Warning shot × Short regulation lag | Effective governance |
+| High cyber capability × Low security | Fast capability diffusion to adversaries |
+
+## Strategic Importance
+
+### Magnitude Assessment
+
+Critical uncertainties analysis identifies where research and evidence-gathering most affect risk estimates. Resolving high-leverage uncertainties changes optimal resource allocation.
+
+| Dimension | Assessment | Quantitative Estimate |
+|-----------|------------|----------------------|
+| **Potential severity** | High - uncertainty multiplies expected costs | Resolution could shift risk estimates by 2-5x |
+| **Probability-weighted importance** | High - current uncertainty drives conservative planning | ≈60% of risk estimate variance from 10 key uncertainties |
+| **Comparative ranking** | Meta-level - determines research prioritization | Most valuable research reduces uncertainty on these variables |
+| **Resolution timeline** | Variable - some resolvable in 1-2 years | 40% of key uncertainties addressable with \$100M research investment |
+
+### Value of Information Analysis
+
+| Uncertainty | Resolution Cost | Timeline | Risk Estimate Shift Potential | VOI Estimate |
+|-------------|-----------------|----------|------------------------------|--------------|
+| Scaling law breakdown point | \$50-100M | 2-4 years | Could shift timeline estimates by 3-5 years | Very High |
+| Deception detection capability | \$30-50M | 2-3 years | Could change alignment approach viability by 30-50% | Very High |
+| US-China coordination feasibility | \$20-30M | 3-5 years | Could shift governance strategy entirely | High |
+| Alignment tax trajectory | \$20-40M | 2-3 years | Could change safety adoption by 50-80% | High |
+| Warning shot response time | \$5-10M | Historical analysis | Could change intervention timing strategy | Medium |
+
+### Resource Implications
+
+Prioritize research that resolves high-leverage uncertainties:
+- **Scaling law empirics:** Fund large-scale capability forecasting (\$50-100M/year)
+- **Deception detection:** Accelerate interpretability and evaluation research (\$30-50M/year)
+- **Governance feasibility studies:** Diplomatic track-2 engagement, scenario planning (\$20-30M/year)
+- **Historical case study analysis:** Rapid response literature, regulatory speed (\$5-10M/year)
+
+**Recommended uncertainty-resolution research budget:** \$100-200M/year (vs. ≈\$20-30M current).
+
+### Key Cruxes
+
+| Crux | Resolution Method | If Resolved Favorably | If Resolved Unfavorably |
+|------|------------------|----------------------|------------------------|
+| Scaling laws continue | Empirical extrapolation | Standard timeline applies | Faster or slower than expected |
+| Alignment tax is reducible | Technical research | Safety adoption accelerates | Racing dynamics intensify |
+| Warning shots are informative | Historical analysis | Governance window exists | Must act on priors |
+| International coordination possible | Diplomatic engagement | Global governance viable | Fragmented response |
+
+---
+
+## Limitations
+
+This model has several important limitations that users should consider when applying these estimates:
+
+**Parameter independence assumption.** The model treats many variables as conditionally independent when in reality they may be deeply correlated. For example, "alignment tax" and "interpretability progress" likely share underlying drivers (researcher talent, algorithmic insights) that create correlations not captured in the causal graph. Sensitivity analyses should explore correlated parameter movements.
+
+**Expert survey limitations.** Much of the underlying data comes from expert surveys, which have known biases: AI researchers may systematically under- or over-estimate risks in their own field; sample selection may exclude important perspectives; and framing effects can significantly shift probability estimates. The <R id="3f9927ec7945e4f2">AI Impacts survey</R> notes that question phrasing affected timeline estimates by 13-48 years.
+
+**Rapidly changing ground truth.** Parameter estimates become outdated quickly. Metaculus AGI forecasts shifted from 50 years (2020) to ~5 years (2024)—a factor of 10 change in four years. Users should check original sources for current values rather than relying on point estimates from this page.
+
+**Missing variables.** The 35 variables selected represent a judgment call about what matters most. Potentially important factors not included: specific geopolitical events, individual actor decisions, Black Swan technological breakthroughs, and cultural/social dynamics that affect AI adoption and regulation.
+
+**Quantification precision.** Many estimates (e.g., "deception detection rate: 30%") represent rough order-of-magnitude guesses rather than empirically grounded values. The uncertainty ranges may themselves be overconfident about our ability to bound these quantities.
+
+---
+
+## Related Models
+
+This critical uncertainties framework connects to several other analytical tools in the knowledge base:
+
+| Related Model | Relationship |
+|---------------|--------------|
+| <EntityLink id="racing-dynamics-impact" label="Racing Dynamics Impact" /> | Explores economic/strategic variables in depth |
+| <EntityLink id="capability-threshold-model" /> | Details capability threshold variables |
+| Lab Incentives Model | Analyzes safety funding and coordination dynamics |
+| <EntityLink id="warning-signs-model" /> | Expands on warning shot and response lag variables |
+| <EntityLink id="international-coordination-game" label="International Coordination Game" /> | Deep dive on US-China and multilateral dynamics |
+
+---
+
+## Sources
+
+### Expert Surveys
+- <R id="3f9927ec7945e4f2">AI Impacts 2023 Survey</R> - 2,788 AI researchers on timelines, risks, and alignment difficulty
+- <R id="40fcdcc3ffba5188">Pew Research AI Survey 2024</R> - Expert vs. public opinion on AI impacts
+- <R id="b163447fdc804872">International AI Safety Report 2025</R> - 96 experts from 30 countries
+
+### Industry & Research Reports
+- <R id="da87f2b213eb9272">Stanford AI Index 2025</R> - Comprehensive AI trends and metrics
+- <R id="9587b65b1192289d">Epoch AI: Can Scaling Continue Through 2030?</R> - Compute and data projections
+- <R id="d5796bc00a131872">IAPP AI Governance Survey 2024</R> - Organizational governance maturity
+- <R id="c1e31a3255ae290d">McKinsey State of AI 2025</R> - Enterprise AI adoption and risk management
+
+### Forecasting Platforms
+- <R id="bb81f2a99fdba0ec">Metaculus AGI Forecasts</R> - Community predictions on capability milestones
+- <R id="f2394e3212f072f5">80,000 Hours: Shrinking AGI Timelines</R> - Analysis of expert forecast evolution
+
+### Safety Research
+- <R id="45c5b56ac029ef2d">Mechanistic Interpretability Review</R> - State of the field assessment
+- <R id="b1ab921f9cbae109">AI Safety Funding Overview</R> - Funding landscape analysis

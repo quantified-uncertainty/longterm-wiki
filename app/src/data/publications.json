@@ -1,0 +1,806 @@
+[
+  {
+    "id": "nature",
+    "domains": [
+      "nature.com",
+      "nature.com/articles"
+    ],
+    "name": "Nature",
+    "type": "academic_journal",
+    "credibility": 5,
+    "peer_reviewed": true,
+    "description": "Premier multidisciplinary science journal"
+  },
+  {
+    "id": "science",
+    "domains": [
+      "science.org",
+      "sciencemag.org"
+    ],
+    "name": "Science",
+    "type": "academic_journal",
+    "credibility": 5,
+    "peer_reviewed": true,
+    "description": "Top-tier multidisciplinary science journal"
+  },
+  {
+    "id": "arxiv",
+    "domains": [
+      "arxiv.org"
+    ],
+    "name": "arXiv",
+    "type": "preprint_server",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Open-access preprint server for STEM fields"
+  },
+  {
+    "id": "springer",
+    "domains": [
+      "link.springer.com",
+      "springer.com"
+    ],
+    "name": "Springer",
+    "type": "academic_journal",
+    "credibility": 4,
+    "peer_reviewed": true,
+    "description": "Major academic publisher"
+  },
+  {
+    "id": "semantic-scholar",
+    "domains": [
+      "semanticscholar.org"
+    ],
+    "name": "Semantic Scholar",
+    "type": "academic_search",
+    "credibility": 4,
+    "description": "AI-powered academic search engine"
+  },
+  {
+    "id": "google-scholar",
+    "domains": [
+      "scholar.google.com"
+    ],
+    "name": "Google Scholar",
+    "type": "academic_search",
+    "credibility": 4,
+    "description": "Academic literature search engine"
+  },
+  {
+    "id": "anthropic",
+    "domains": [
+      "anthropic.com"
+    ],
+    "name": "Anthropic",
+    "type": "company_blog",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "AI safety company, Claude developer"
+  },
+  {
+    "id": "openai",
+    "domains": [
+      "openai.com"
+    ],
+    "name": "OpenAI",
+    "type": "company_blog",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "GPT developer, leading AI lab"
+  },
+  {
+    "id": "deepmind",
+    "domains": [
+      "deepmind.com",
+      "deepmind.google"
+    ],
+    "name": "Google DeepMind",
+    "type": "company_blog",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "AI research lab under Alphabet"
+  },
+  {
+    "id": "google-ai",
+    "domains": [
+      "ai.google",
+      "blog.google"
+    ],
+    "name": "Google AI",
+    "type": "company_blog",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Google's AI research division"
+  },
+  {
+    "id": "rand",
+    "domains": [
+      "rand.org"
+    ],
+    "name": "RAND Corporation",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Nonpartisan policy research organization"
+  },
+  {
+    "id": "brookings",
+    "domains": [
+      "brookings.edu"
+    ],
+    "name": "Brookings Institution",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Centrist public policy think tank"
+  },
+  {
+    "id": "cset",
+    "domains": [
+      "cset.georgetown.edu"
+    ],
+    "name": "CSET Georgetown",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Center for Security and Emerging Technology"
+  },
+  {
+    "id": "csis",
+    "domains": [
+      "csis.org"
+    ],
+    "name": "CSIS",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Center for Strategic and International Studies"
+  },
+  {
+    "id": "carnegie",
+    "domains": [
+      "carnegieendowment.org"
+    ],
+    "name": "Carnegie Endowment",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "International affairs think tank"
+  },
+  {
+    "id": "cnas",
+    "domains": [
+      "cnas.org"
+    ],
+    "name": "CNAS",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Center for a New American Security"
+  },
+  {
+    "id": "hai-stanford",
+    "domains": [
+      "hai.stanford.edu"
+    ],
+    "name": "Stanford HAI",
+    "type": "academic",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Stanford Human-Centered AI Institute"
+  },
+  {
+    "id": "fhi",
+    "domains": [
+      "fhi.ox.ac.uk"
+    ],
+    "name": "Future of Humanity Institute",
+    "type": "academic",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Oxford research center (closed 2024)"
+  },
+  {
+    "id": "uk-gov",
+    "domains": [
+      "gov.uk"
+    ],
+    "name": "UK Government",
+    "type": "government",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Official UK government publications"
+  },
+  {
+    "id": "nist",
+    "domains": [
+      "nist.gov"
+    ],
+    "name": "NIST",
+    "type": "government",
+    "credibility": 5,
+    "peer_reviewed": false,
+    "description": "National Institute of Standards and Technology"
+  },
+  {
+    "id": "eu",
+    "domains": [
+      "digital-strategy.ec.europa.eu",
+      "europa.eu"
+    ],
+    "name": "European Union",
+    "type": "government",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Official EU publications and strategy"
+  },
+  {
+    "id": "miri",
+    "domains": [
+      "intelligence.org"
+    ],
+    "name": "MIRI",
+    "type": "organization",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Machine Intelligence Research Institute"
+  },
+  {
+    "id": "metr",
+    "domains": [
+      "metr.org"
+    ],
+    "name": "METR",
+    "type": "organization",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Model Evaluation and Threat Research"
+  },
+  {
+    "id": "coefficient-giving",
+    "domains": [
+      "coefficientgiving.org",
+      "openphilanthropy.org"
+    ],
+    "name": "Coefficient Giving",
+    "type": "organization",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "EA grantmaker, AI safety funder (formerly Open Philanthropy)"
+  },
+  {
+    "id": "80k",
+    "domains": [
+      "80000hours.org"
+    ],
+    "name": "80,000 Hours",
+    "type": "organization",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "EA career advice organization"
+  },
+  {
+    "id": "lesswrong",
+    "domains": [
+      "lesswrong.com"
+    ],
+    "name": "LessWrong",
+    "type": "blog_platform",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Rationality and AI safety community blog"
+  },
+  {
+    "id": "alignment-forum",
+    "domains": [
+      "alignmentforum.org"
+    ],
+    "name": "Alignment Forum",
+    "type": "blog_platform",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Curated AI alignment research blog"
+  },
+  {
+    "id": "ea-forum",
+    "domains": [
+      "forum.effectivealtruism.org"
+    ],
+    "name": "EA Forum",
+    "type": "blog_platform",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Effective altruism community forum"
+  },
+  {
+    "id": "wikipedia",
+    "domains": [
+      "en.wikipedia.org",
+      "wikipedia.org"
+    ],
+    "name": "Wikipedia",
+    "type": "encyclopedia",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Collaborative online encyclopedia"
+  },
+  {
+    "id": "github",
+    "domains": [
+      "github.com"
+    ],
+    "name": "GitHub",
+    "type": "code_repository",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Code hosting and collaboration platform"
+  },
+  {
+    "id": "mit-tech-review",
+    "domains": [
+      "technologyreview.com"
+    ],
+    "name": "MIT Technology Review",
+    "type": "news",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Technology news and analysis"
+  },
+  {
+    "id": "pew",
+    "domains": [
+      "pewresearch.org"
+    ],
+    "name": "Pew Research Center",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Nonpartisan polling and research"
+  },
+  {
+    "id": "mckinsey",
+    "domains": [
+      "mckinsey.com"
+    ],
+    "name": "McKinsey & Company",
+    "type": "consulting",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Management consulting firm"
+  },
+  {
+    "id": "pnas",
+    "domains": [
+      "pnas.org"
+    ],
+    "name": "PNAS",
+    "type": "academic_journal",
+    "credibility": 5,
+    "peer_reviewed": true,
+    "description": "Proceedings of the National Academy of Sciences"
+  },
+  {
+    "id": "sciencedirect",
+    "domains": [
+      "sciencedirect.com"
+    ],
+    "name": "ScienceDirect",
+    "type": "academic_journal",
+    "credibility": 4,
+    "peer_reviewed": true,
+    "description": "Elsevier's platform for peer-reviewed literature"
+  },
+  {
+    "id": "sage",
+    "domains": [
+      "journals.sagepub.com"
+    ],
+    "name": "SAGE Journals",
+    "type": "academic_journal",
+    "credibility": 4,
+    "peer_reviewed": true,
+    "description": "SAGE Publications academic journals"
+  },
+  {
+    "id": "cambridge",
+    "domains": [
+      "cambridge.org"
+    ],
+    "name": "Cambridge University Press",
+    "type": "academic_journal",
+    "credibility": 5,
+    "peer_reviewed": true,
+    "description": "Academic publisher, University of Cambridge"
+  },
+  {
+    "id": "ssrn",
+    "domains": [
+      "papers.ssrn.com",
+      "ssrn.com"
+    ],
+    "name": "SSRN",
+    "type": "preprint_server",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Social Science Research Network preprints"
+  },
+  {
+    "id": "microsoft",
+    "domains": [
+      "microsoft.com",
+      "research.microsoft.com"
+    ],
+    "name": "Microsoft",
+    "type": "company_blog",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Microsoft Research and AI"
+  },
+  {
+    "id": "meta-ai",
+    "domains": [
+      "ai.meta.com",
+      "ai.facebook.com"
+    ],
+    "name": "Meta AI",
+    "type": "company_blog",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Meta's AI research division"
+  },
+  {
+    "id": "transformer-circuits",
+    "domains": [
+      "transformer-circuits.pub"
+    ],
+    "name": "Transformer Circuits",
+    "type": "company_blog",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Anthropic's interpretability research"
+  },
+  {
+    "id": "anthropic-alignment",
+    "domains": [
+      "alignment.anthropic.com"
+    ],
+    "name": "Anthropic Alignment",
+    "type": "company_blog",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Anthropic's alignment research portal"
+  },
+  {
+    "id": "epoch",
+    "domains": [
+      "epoch.ai",
+      "epochai.org"
+    ],
+    "name": "Epoch AI",
+    "type": "organization",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "AI forecasting and compute trends research"
+  },
+  {
+    "id": "fli",
+    "domains": [
+      "futureoflife.org"
+    ],
+    "name": "Future of Life Institute",
+    "type": "organization",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Existential risk research organization"
+  },
+  {
+    "id": "ai-impacts",
+    "domains": [
+      "aiimpacts.org"
+    ],
+    "name": "AI Impacts",
+    "type": "organization",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "AI forecasting and impact research"
+  },
+  {
+    "id": "cais",
+    "domains": [
+      "safe.ai"
+    ],
+    "name": "Center for AI Safety",
+    "type": "organization",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "AI safety research and field-building"
+  },
+  {
+    "id": "apollo",
+    "domains": [
+      "apolloresearch.ai"
+    ],
+    "name": "Apollo Research",
+    "type": "organization",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "AI deception and scheming research"
+  },
+  {
+    "id": "govai",
+    "domains": [
+      "governance.ai"
+    ],
+    "name": "Centre for the Governance of AI",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "AI governance research center"
+  },
+  {
+    "id": "metaculus",
+    "domains": [
+      "metaculus.com"
+    ],
+    "name": "Metaculus",
+    "type": "organization",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Forecasting platform and community"
+  },
+  {
+    "id": "owid",
+    "domains": [
+      "ourworldindata.org"
+    ],
+    "name": "Our World in Data",
+    "type": "organization",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Research and data visualizations"
+  },
+  {
+    "id": "uk-aisi",
+    "domains": [
+      "aisi.gov.uk"
+    ],
+    "name": "UK AI Safety Institute",
+    "type": "government",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "UK government AI safety research"
+  },
+  {
+    "id": "un",
+    "domains": [
+      "un.org"
+    ],
+    "name": "United Nations",
+    "type": "government",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "UN official publications"
+  },
+  {
+    "id": "congress",
+    "domains": [
+      "congress.gov"
+    ],
+    "name": "US Congress",
+    "type": "government",
+    "credibility": 5,
+    "peer_reviewed": false,
+    "description": "Official US congressional records"
+  },
+  {
+    "id": "bis",
+    "domains": [
+      "bis.doc.gov"
+    ],
+    "name": "Bureau of Industry and Security",
+    "type": "government",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "US export controls agency"
+  },
+  {
+    "id": "oecd-ai",
+    "domains": [
+      "oecd.ai",
+      "oecd.org"
+    ],
+    "name": "OECD",
+    "type": "government",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Organisation for Economic Co-operation"
+  },
+  {
+    "id": "ftc",
+    "domains": [
+      "ftc.gov"
+    ],
+    "name": "Federal Trade Commission",
+    "type": "government",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "US consumer protection agency"
+  },
+  {
+    "id": "cisa",
+    "domains": [
+      "cisa.gov"
+    ],
+    "name": "CISA",
+    "type": "government",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Cybersecurity and Infrastructure Security Agency"
+  },
+  {
+    "id": "whitehouse",
+    "domains": [
+      "whitehouse.gov"
+    ],
+    "name": "White House",
+    "type": "government",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Official White House publications"
+  },
+  {
+    "id": "imf",
+    "domains": [
+      "imf.org"
+    ],
+    "name": "International Monetary Fund",
+    "type": "government",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "International financial institution"
+  },
+  {
+    "id": "wef",
+    "domains": [
+      "weforum.org"
+    ],
+    "name": "World Economic Forum",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "International economic policy organization"
+  },
+  {
+    "id": "atlantic-council",
+    "domains": [
+      "atlanticcouncil.org"
+    ],
+    "name": "Atlantic Council",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Transatlantic policy think tank"
+  },
+  {
+    "id": "freedom-house",
+    "domains": [
+      "freedomhouse.org"
+    ],
+    "name": "Freedom House",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Democracy and freedom research"
+  },
+  {
+    "id": "techcrunch",
+    "domains": [
+      "techcrunch.com"
+    ],
+    "name": "TechCrunch",
+    "type": "news",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Technology news and startup coverage"
+  },
+  {
+    "id": "fortune",
+    "domains": [
+      "fortune.com"
+    ],
+    "name": "Fortune",
+    "type": "news",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Business news magazine"
+  },
+  {
+    "id": "time",
+    "domains": [
+      "time.com"
+    ],
+    "name": "TIME",
+    "type": "news",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "News magazine"
+  },
+  {
+    "id": "reuters",
+    "domains": [
+      "reuters.com"
+    ],
+    "name": "Reuters",
+    "type": "news",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "International news agency"
+  },
+  {
+    "id": "cnbc",
+    "domains": [
+      "cnbc.com"
+    ],
+    "name": "CNBC",
+    "type": "news",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "Business and financial news"
+  },
+  {
+    "id": "nytimes",
+    "domains": [
+      "nytimes.com"
+    ],
+    "name": "The New York Times",
+    "type": "news",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Major newspaper of record"
+  },
+  {
+    "id": "gallup",
+    "domains": [
+      "news.gallup.com",
+      "gallup.com"
+    ],
+    "name": "Gallup",
+    "type": "think_tank",
+    "credibility": 4,
+    "peer_reviewed": false,
+    "description": "Polling and analytics organization"
+  },
+  {
+    "id": "edelman",
+    "domains": [
+      "edelman.com"
+    ],
+    "name": "Edelman",
+    "type": "consulting",
+    "credibility": 3,
+    "peer_reviewed": false,
+    "description": "PR firm, Trust Barometer publisher"
+  },
+  {
+    "id": "medium",
+    "domains": [
+      "medium.com"
+    ],
+    "name": "Medium",
+    "type": "blog_platform",
+    "credibility": 2,
+    "peer_reviewed": false,
+    "description": "General blogging platform"
+  },
+  {
+    "id": "amazon",
+    "domains": [
+      "amazon.com"
+    ],
+    "name": "Amazon",
+    "type": "marketplace",
+    "credibility": 2,
+    "peer_reviewed": false,
+    "description": "E-commerce (book links)"
+  }
+]

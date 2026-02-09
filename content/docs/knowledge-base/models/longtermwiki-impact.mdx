@@ -1,0 +1,376 @@
+---
+title: LongtermWiki Impact Model
+description: "Fermi estimation of LongtermWiki's potential value, grounded in base rates from GiveWell, 80k Hours, think tanks, and knowledge infrastructure projects. Central estimate: $100-500K/yr effective value with high uncertainty."
+sidebar:
+  order: 40
+quality: 55
+ratings:
+  focus: 7
+  novelty: 6
+  rigor: 7
+  completeness: 5
+  concreteness: 7
+  actionability: 6
+lastEdited: "2026-02-04"
+importance: 50
+llmSummary: "Fermi estimation of LongtermWiki value grounded in base rates. GiveWell shows 3% of donors choose based on effectiveness research; 80k Hours achieves ~107 significant plan changes/year; think tanks rarely demonstrate causal policy impact. Conservative central estimate: $100-500K/yr in effective value through researcher onboarding (primary), funder information improvement (secondary), with high-variance 'inspiration' pathway that's hard to quantify. Much lower than naive estimates due to: limited counterfactual impact of information on decisions, small target audience, and low probability of behavioral change."
+pageTemplate: knowledge-base-model
+metrics:
+  wordCount: 3200
+  citations: 25
+  tables: 18
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: impact-models
+---
+import { DataInfoBox, Backlinks, Mermaid, EntityLink, R } from '@components/wiki';
+
+<DataInfoBox ratings={frontmatter.ratings} />
+
+:::note[Page Scope]
+This page models **LongtermWiki's potential impact** using rigorous Fermi estimation grounded in base rates. For strategic analysis and pathways, see [LongtermWiki Value Proposition](/internal/longtermwiki-value-proposition/).
+
+**Assessment**: Central estimate **\$100-500K/yr effective value**. Much lower than naive estimates due to limited counterfactual impact of information on decisions.
+:::
+
+## Overview
+
+LongtermWiki is an AI-assisted knowledge base covering AI safety, longtermist prioritization, and related topics. This model attempts to estimate its potential value creation using base rates from comparable interventions rather than inside-view reasoning.
+
+**Core Question:** How much value does LongtermWiki create, and how does this compare to alternative uses of resources?
+
+**Key Finding:** Naive estimates that assume "better information → better decisions" dramatically overstate impact. Base rates from GiveWell, 80k Hours, and think tank research suggest information interventions change behavior far less than expected.
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Central Value Estimate** | \$100-500K/yr | Base-rate-grounded Fermi model |
+| **Primary Pathway** | Researcher onboarding | Clearest counterfactual impact |
+| **Secondary Pathway** | Funder information improvement | Low confidence in behavioral change |
+| **High-Variance Pathway** | "Inspiration" for epistemic infrastructure | Too speculative to quantify |
+| **Cost-Effectiveness** | \$0.25-1.25/\$ vs typical interventions | Uncertain but plausibly positive |
+
+## Base Rates: What We Know About Information Interventions
+
+### GiveWell Data on Donor Behavior
+
+GiveWell provides the clearest data on whether effectiveness research changes funder behavior:
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| **Donors who "choose based on effectiveness research"** | 3% | GiveWell surveys |
+| **Donors aware of GiveWell recommendations** | 10.1% | GiveWell awareness studies |
+| **Conversion rate: awareness → action** | ≈30% | Implied |
+| **Total giving influenced by GiveWell** | ≈\$500M/yr | GiveWell reports |
+| **GiveWell operating budget** | ≈\$30M/yr | 990 filings |
+
+**Key insight:** Even the most successful effectiveness research organization achieves only 3% behavioral change among its target audience, and this after 15+ years of operation with significant resources.
+
+**Application to LongtermWiki:** If LongtermWiki achieved GiveWell-level penetration in the AI safety funding space (≈\$300M/yr), it might influence 3% × \$300M = \$9M/yr in decisions. But LongtermWiki is not GiveWell-level quality or reach, so realistic penetration is likely 0.1-1%, suggesting \$300K-3M/yr in *influenced* decisions (not *improved* decisions).
+
+### 80,000 Hours Data on Plan Changes
+
+80,000 Hours tracks "significant plan changes" attributable to their advice:
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| **Significant plan changes/year** | ≈107 | 80k Hours impact reports |
+| **Definition of "significant"** | ≥20% career shift attributable to 80k | Self-reported |
+| **Users engaging with content** | ≈100,000/yr | Traffic estimates |
+| **Conversion rate: engagement → plan change** | ≈0.1% | Implied |
+| **Operating budget** | ≈\$4M/yr | 990 filings |
+| **Cost per plan change** | ≈\$40K | Budget / changes |
+
+**Key insight:** Even excellent career advice changes behavior in only 0.1% of readers. Self-reported attribution is likely inflated.
+
+**Application to LongtermWiki:** If LongtermWiki had 10,000 engaged users/year and achieved 80k-level conversion, that's ~10 "significant" decision changes. At \$50K average impact per decision change, that's \$500K/yr. But LongtermWiki likely has fewer users and lower conversion.
+
+### Think Tank Policy Influence
+
+Research on think tank policy influence is sobering:
+
+| Finding | Source |
+|---------|--------|
+| 77% of think tanks claim policy influence, but causal evidence is weak | McGann (2019) |
+| Policy changes attributed to specific research are rare and hard to verify | Rich (2004) |
+| Think tank influence is mediated by relationships, not publications | Abelson (2009) |
+| Congressional staff report using think tank research for "ammunition" not "education" | Weiss (1991) |
+
+**Key insight:** Think tanks provide legitimacy and talking points, not decision-driving analysis. Policymakers who cite research were usually already inclined toward that position.
+
+**Application to LongtermWiki:** Policy influence pathway should be discounted heavily. LongtermWiki might provide "ammunition" for already-aligned actors but is unlikely to change minds.
+
+### Open Philanthropy Decision-Making
+
+Open Philanthropy, the largest AI safety funder, describes its decision-making process:
+
+| Aspect | Reality |
+|--------|---------|
+| **Primary input** | Program officer judgment and relationships |
+| **Role of external research** | Supplementary, not determinative |
+| **Decision style** | "Hits-based" with heavy reliance on internal worldviews |
+| **Response to external analysis** | May inform but rarely drives decisions |
+
+**Key insight:** Major funders rely on internal expertise and relationships, not external knowledge bases. Even excellent external analysis is filtered through existing worldviews.
+
+**Application to LongtermWiki:** Direct influence on major funder decisions is likely small. Value more likely comes from indirect channels: improving researcher quality, providing shared vocabulary, etc.
+
+## Fermi Model: Conservative Estimates
+
+### Pathway 1: Researcher Onboarding (Primary)
+
+This is likely LongtermWiki's clearest counterfactual impact.
+
+| Parameter | Estimate | Reasoning |
+|-----------|----------|-----------|
+| **New AI safety researchers/year** | ≈200 | Field growth estimates |
+| **Current onboarding time** | 6-12 months to productivity | Researcher interviews |
+| **LongtermWiki's reach** | 20-40% of new researchers | Optimistic given competition with AI Safety Fundamentals, Alignment Forum |
+| **Time reduction if used** | 1-2 months | Modest improvement, not transformation |
+| **Researchers actually affected** | 40-80 | 200 × 30% reach |
+| **Time saved per researcher** | 1.5 months | Midpoint |
+| **Value of researcher time** | \$8K/month | Junior researcher cost |
+| **Total time value** | \$480K-960K/yr | 40-80 × 1.5 × \$8K |
+| **Counterfactual adjustment** | 50% | Would partially upskill anyway |
+| **Net value** | **\$240K-480K/yr** | After counterfactual |
+
+**Confidence:** Medium. This pathway has clearer counterfactual than others.
+
+### Pathway 2: Funder Information Improvement (Secondary)
+
+| Parameter | Estimate | Reasoning |
+|-----------|----------|-----------|
+| **AI safety funding/year** | \$300M | Field estimates |
+| **Funders who might use LongtermWiki** | 10-20% | Optimistic |
+| **Funding "influenced"** | \$30-60M/yr | 300M × 15% |
+| **Base rate: information → behavior change** | 3% | GiveWell data |
+| **Decisions actually changed** | \$1-2M/yr | 30-60M × 3% |
+| **Quality of change** | 20% improvement | Modest, not dramatic |
+| **Net value** | **\$200K-400K/yr** | Decisions changed × improvement |
+
+**Confidence:** Low. The "information → behavior" chain is weak based on base rates.
+
+### Pathway 3: Field Coordination & Vocabulary
+
+| Parameter | Estimate | Reasoning |
+|-----------|----------|-----------|
+| **Value of shared vocabulary** | Hard to quantify | Enables better disagreement |
+| **Reduced duplication** | \$50-100K/yr equivalent | Some analyst time saved |
+| **Better gap identification** | \$50-100K/yr equivalent | Maybe one project better targeted |
+| **Net value** | **\$100-200K/yr** | Highly uncertain |
+
+**Confidence:** Very low. Real but hard to measure.
+
+### Pathway 4: Policy/Government Influence
+
+| Parameter | Estimate | Reasoning |
+|-----------|----------|-----------|
+| **P(LongtermWiki cited in policy)** | 5-15% | Low penetration expected |
+| **P(citation influences decision)** | 5-10% | Base rates suggest low |
+| **P(influenced decision is good)** | 60-70% | Some net improvement if any |
+| **Expected policy value** | \$0-100K/yr | Very low base rates |
+| **Net value** | **\$0-100K/yr** | Essentially speculative |
+
+**Confidence:** Very low. Think tank research suggests minimal causal impact.
+
+### Pathway 5: "Inspiration" for Epistemic Infrastructure
+
+This is the highest-variance pathway but hardest to estimate.
+
+| Parameter | Estimate | Reasoning |
+|-----------|----------|-----------|
+| **P(relevant person sees LongtermWiki)** | 20-40% | If we actively promote |
+| **P(they find it compelling)** | 10-30% | Quality-dependent |
+| **P(it influences their decisions)** | 5-15% | Idea may already exist independently |
+| **P(resulting action is valuable)** | 50-70% | Uncertain what "inspired" action looks like |
+| **Conditional value if chain completes** | \$5-50M+ | Wide range |
+| **Expected value** | **Highly uncertain** | Too many conjunctive probabilities |
+
+**Confidence:** Cannot reliably estimate. Include in sensitivity analysis but not central estimate.
+
+### Aggregate Conservative Estimate
+
+| Pathway | Low | Central | High | Confidence |
+|---------|-----|---------|------|------------|
+| Researcher onboarding | \$100K | \$300K | \$600K | Medium |
+| Funder information | \$50K | \$200K | \$500K | Low |
+| Field coordination | \$25K | \$100K | \$300K | Very Low |
+| Policy influence | \$0 | \$25K | \$100K | Very Low |
+| **Subtotal (quantifiable)** | **\$175K** | **\$625K** | **\$1.5M** | Low-Medium |
+| Inspiration pathway | ??? | ??? | ??? | Unquantifiable |
+
+**Central estimate: \$100-500K/yr** after accounting for uncertainty and optimism bias.
+
+## Impact Pathway Diagram
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph Inputs["LongtermWiki Activities"]
+        CONTENT[Content<br/>Creation]
+        MAINT[Maintenance<br/>& Updates]
+        OUTREACH[Outreach &<br/>Promotion]
+    end
+
+    subgraph Reach["Audience Reached"]
+        R_RESEARCH[Researchers<br/>40-80/yr]
+        R_FUNDER[Funders<br/>10-20% of field]
+        R_POLICY[Policy Staff<br/>5-15% reach]
+        R_INSPIRE[Key Decision-Makers<br/>Unknown]
+    end
+
+    subgraph Conversion["Behavioral Change"]
+        C_RESEARCH[Faster<br/>Onboarding]
+        C_FUNDER[Changed<br/>Decisions<br/>3% base rate]
+        C_POLICY[Policy<br/>Influence<br/>Very Low]
+        C_INSPIRE[Inspired<br/>Action<br/>Unknown]
+    end
+
+    subgraph Impact["Value Created"]
+        I_TIME[Time Saved<br/>200-500K/yr]
+        I_ALLOC[Better Allocation<br/>50-400K/yr]
+        I_POLICY[Policy Value<br/>0-100K/yr]
+        I_INSPIRE[Leverage Value<br/>???]
+    end
+
+    CONTENT --> R_RESEARCH
+    CONTENT --> R_FUNDER
+    OUTREACH --> R_POLICY
+    OUTREACH --> R_INSPIRE
+    MAINT --> R_RESEARCH
+    MAINT --> R_FUNDER
+
+    R_RESEARCH --> C_RESEARCH
+    R_FUNDER --> C_FUNDER
+    R_POLICY --> C_POLICY
+    R_INSPIRE --> C_INSPIRE
+
+    C_RESEARCH --> I_TIME
+    C_FUNDER --> I_ALLOC
+    C_POLICY --> I_POLICY
+    C_INSPIRE --> I_INSPIRE
+
+    style I_TIME fill:#d4edda
+    style I_ALLOC fill:#d4edda
+    style I_POLICY fill:#ffffcc
+    style I_INSPIRE fill:#ffcccc
+    style C_FUNDER fill:#ffffcc
+    style C_POLICY fill:#ffcccc
+    style C_INSPIRE fill:#ffcccc
+`} />
+
+## Why Naive Estimates Are Wrong
+
+The [value proposition document](/internal/longtermwiki-value-proposition/) suggested \$15-40M/yr central estimate. Why is this Fermi model 50-100x lower?
+
+### Error 1: Assuming Information Changes Behavior
+
+| Naive assumption | Reality (base rates) |
+|------------------|---------------------|
+| "If funders have better info, they'll make better decisions" | 3% of donors change behavior based on effectiveness research (GiveWell) |
+| "Policy staff will use our analysis" | Think tanks rarely demonstrate causal policy impact |
+| "Researchers will use our onboarding materials" | 0.1% conversion rate for career advice (80k Hours) |
+
+### Error 2: Ignoring Counterfactuals
+
+| Claim | Counterfactual question |
+|-------|------------------------|
+| "LongtermWiki saves researcher time" | Would they not learn this from other sources? |
+| "LongtermWiki enables better funder decisions" | Are funders actually information-constrained? |
+| "LongtermWiki creates shared vocabulary" | Does the Alignment Forum already serve this function? |
+
+Most benefits are partially counterfactual—the impact would occur through other channels without LongtermWiki.
+
+### Error 3: Optimistic Probability Stacking
+
+| Pathway | Probability chain |
+|---------|------------------|
+| Anthropic "inspiration" | P(sees) × P(compelled) × P(acts) × P(valuable) ≈ 0.5-5% |
+| Policy influence | P(reaches policy) × P(influences decision) × P(good decision) ≈ 0.2-1% |
+
+Multiplying many uncertain probabilities yields very low expected values, even with high conditional values.
+
+### Error 4: Conflating "Influenced" with "Improved"
+
+Even if LongtermWiki influences \$30M in decisions:
+- Most "influenced" decisions were already trending that direction
+- Influence doesn't mean improvement (could be neutral or negative)
+- Measurement is confounded (users seek confirmation, not education)
+
+## Comparison to Alternative Interventions
+
+| Intervention | Annual Cost | E[Impact] | Impact/\$ |
+|--------------|-------------|-----------|-----------|
+| **LongtermWiki (2 FTE)** | \$400K | \$100-500K | \$0.25-1.25 |
+| GiveWell operations | \$30M | \$500M influenced | ≈\$17 |
+| 80,000 Hours | \$4M | ≈\$5M value of plan changes | ≈\$1.25 |
+| Direct AI safety research (per researcher) | \$200K | \$0.5-2M | \$2.50-10 |
+| Grantmaking (per \$ moved) | \$0.05-0.10 | \$1 moved | \$10-20 leverage |
+
+**Interpretation:** LongtermWiki's cost-effectiveness is uncertain but plausibly competitive with other information interventions. It is likely less cost-effective than direct research or grantmaking if those options are available.
+
+## Key Cruxes
+
+| Crux | If True → Impact | If False → Impact | Current Belief |
+|------|------------------|-------------------|----------------|
+| **Information changes funder behavior** | \$500K+/yr from funder pathway | \$100K/yr (mostly onboarding) | 20% true |
+| **LongtermWiki is unique resource** | Higher counterfactual value | Lower (other sources substitute) | 40% true |
+| **"Inspiration" pathway is real** | Could be \$1M+ | Negligible | 10-20% real |
+| **Quality can be maintained** | Sustained value | Value decays over 2-3 years | 50% maintainable |
+| **AI safety is information-constrained** | Information interventions valuable | Resources better spent elsewhere | 30% constrained |
+
+## Model Limitations
+
+1. **Self-assessment bias**: This model is produced by LongtermWiki, creating incentive to underestimate (for credibility) or overestimate (for motivation)
+
+2. **Base rate generalization**: GiveWell/80k Hours may not transfer to AI safety funding context
+
+3. **Unmeasurable pathways**: "Inspiration" and "coordination" benefits are real but hard to quantify
+
+4. **Temporal dynamics**: Value may be front-loaded (early field benefits most) or back-loaded (compounding effects)
+
+5. **Reference class selection**: Different reference classes (encyclopedia, think tank, community wiki) yield different estimates
+
+## What Would Change This Estimate
+
+### Toward Higher Impact
+
+| Evidence | Implication |
+|----------|-------------|
+| Funders report using LongtermWiki in actual decisions | Direct behavioral change |
+| Significant user growth beyond AI safety community | Broader reach |
+| Demonstrated policy citations | Policy pathway becomes real |
+| Anthropic or similar org builds on the concept | "Inspiration" pathway validates |
+
+### Toward Lower Impact
+
+| Evidence | Implication |
+|----------|-------------|
+| User research shows researchers prefer other resources | Onboarding pathway weakens |
+| Funder interviews show no behavior change | Funder pathway essentially zero |
+| Content quality degrades | All pathways weaken |
+| Better alternatives emerge | Counterfactual value drops |
+
+## Recommendations
+
+Given this analysis:
+
+1. **Primary focus should be researcher onboarding** — this has clearest counterfactual impact
+
+2. **Funder influence claims should be modest** — base rates suggest limited behavioral change
+
+3. **Policy pathway should be de-prioritized** — unless strong relationships exist
+
+4. **"Inspiration" pathway is worth trying** — but shouldn't drive resource allocation
+
+5. **Track actual behavior change, not just usage** — pageviews don't equal impact
+
+## See Also
+
+- [LongtermWiki Value Proposition](/internal/longtermwiki-value-proposition/) — Strategic analysis and pathways
+- <EntityLink id="anthropic-impact">Anthropic Impact Assessment</EntityLink> — Similar impact modeling approach
+- <EntityLink id="ai-transition-model">AI Transition Model</EntityLink> — Broader framework
+
+<Backlinks />

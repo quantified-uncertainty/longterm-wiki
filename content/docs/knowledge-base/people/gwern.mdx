@@ -1,0 +1,227 @@
+---
+title: "Gwern Branwen"
+description: "Independent researcher and writer known for long-form essays on AI scaling laws, psychology, statistics, and self-experimentation, maintaining gwern.net as an influential knowledge repository."
+importance: 12
+lastEdited: "2026-02-02"
+sidebar:
+  order: 65
+ratings:
+  focus: 7.5
+  novelty: 2
+  rigor: 5.5
+  completeness: 6.5
+  concreteness: 4
+  actionability: 1
+clusters:
+  - "ai-safety"
+  - "epistemics"
+quality: 52
+llmSummary: "Comprehensive biographical profile of pseudonymous researcher Gwern Branwen, documenting his early advocacy of AI scaling laws (predicting AGI by 2030), extensive self-experimentation work, and influence within rationalist/EA communities. While well-sourced with 47 citations, the page functions as reference material with limited mainstream AI research impact and no actionable takeaways for prioritization work."
+metrics:
+  wordCount: 2842
+  citations: 49
+  tables: 2
+  diagrams: 0
+---
+import {EntityLink, Backlinks, KeyPeople, KeyQuestions, Section} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Primary Role** | Independent researcher, essayist, and knowledge curator |
+| **Main Contributions** | Early predictions of LLM scaling trajectories; long-form analyses on AI, psychology, statistics; gwern.net as comprehensive research archive |
+| **Community Impact** | Significant influence in rationalist/EA circles; limited recognition in mainstream AI/ML research |
+| **Research Style** | Data-driven self-experiments, statistical critiques, meta-analyses emphasizing methodological rigor |
+| **Notable Predictions** | Predicted generalist AI systems by ≈2019, human-level agents by ~2025, AGI by 2030[^1] |
+| **Controversies** | Critiqued for verbose style masking weak reasoning, perceived rudeness in online interactions, overstating AI extinction risks |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [gwern.net](https://gwern.net) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Gwern) |
+
+
+## Overview
+
+**Gwern Branwen** is a pseudonymous independent researcher and writer who maintains gwern.net, a comprehensive website featuring long-form essays on artificial intelligence, psychology, statistics, genetics, and rationality.[^2][^3] Active on English Wikipedia since January 2004 with over 90,000 edits,[^4] Gwern has become a prominent figure in rationalist and <EntityLink id="lesswrong">LessWrong</EntityLink> communities, though his mainstream influence in AI/ML research remains contested.
+
+Gwern is perhaps best known for his early advocacy of the **scaling hypothesis**—the proposition that neural networks improve primarily by absorbing more data and compute, generalizing better on harder problems.[^5] He was among the earliest to predict LLM scaling trajectories, forecasting generalist AI systems by approximately 2019, human-level agents by 2025, and AGI by 2030.[^1] These predictions have influenced AGI builders and shaped discourse around AI timelines, though critics argue his impact is largely confined to effective altruism circles rather than mainstream research.[^6]
+
+Beyond AI, Gwern conducts rigorous self-experiments on topics like sleep, cognition, and nootropics, using statistical analysis in R. His website emphasizes "Long Content"—durable, self-documenting hypertext designed to resist link rot and remain useful for decades.[^7] The site features advanced design elements including semantic zoom, link popups, sidenotes, transclusion (dynamic content embedding), and archives, all implemented with Hakyll from Pandoc Markdown.[^8] Gwern describes his psychological profile as high Openness (87th percentile), medium Conscientiousness (64-69th), low Extraversion (6-7th), and medium-low Agreeableness (3rd percentile).[^4]
+
+## History and Background
+
+### Personal Identity and Early Work
+
+Gwern Branwen operates under a pseudonym—"Gwern" translates to "alder" (tree) in Welsh and Modern Gaulish.[^9][^10] He has maintained privacy through measures like using voiceovers in podcast interviews.[^1] Gwern has been an active Wikipedia contributor since January 2004, accumulating over 90,000 edits across hundreds of articles and serving as a past administrator on both English Wikipedia and the Haskell wiki.[^4]
+
+His software contributions span multiple domains: MediaWiki plugins (RSS, Interwiki, Date, Unicode), archiving tools (Filestore archiver, wp-archivebot), and Haskell improvements including Control.Monad.void and XMonad-style reloads.[^4] Gwern has collaborated with organizations including <EntityLink id="miri">MIRI</EntityLink>/SIAI (2012-2013), <EntityLink id="center-for-applied-rationality">CFAR</EntityLink> (2012), GiveWell (2017), and the FBI (2016).[^4]
+
+### Development of gwern.net
+
+Gwern.net appears to have evolved organically as a personal repository starting in the mid-2000s, with no explicit founding date documented. The site emphasizes aesthetically-pleasing minimalism, accessibility, speed, and semantic zoom for hypertext navigation.[^8] Over its first three years (2010-2013), approximately 130 documents were added, with traffic reaching 50-100k monthly pageviews. By 2020, the first decade had generated 7.98 million total pageviews from 3.8 million unique users.[^11]
+
+The site has been hosted on various platforms: NFSN (2010-2012), then dedicated servers including Hetzner since 2020 at approximately \$62.89/month, chosen for cost efficiency and activist-friendly policies.[^11] The technical infrastructure includes Git revision history (Markdown sources accessible via `.md` URLs) and open-source availability on GitHub.[^8]
+
+Design principles include monochrome aesthetics, sidenotes on wide screens, dropcaps and smallcaps, collapsible sections, inflation-adjusted currency displays, Wikipedia-style infoboxes, custom syntax highlighting, multi-column lists, and advanced poetry support.[^8] Gwern implements transclusion via `transclude.js` to dynamically embed content from other pages or sections, reducing repetition and enabling features like annotations, popups, backlinks, and archives.[^12]
+
+### Evolution of AI Views
+
+Gwern's perspective on AI risk has evolved significantly over time. A 2016 document notes his initial skepticism about <EntityLink id="miri">MIRI</EntityLink> due to lack of expert endorsements, hypothesizing "strong counterarguments" from mainstream computer scientists.[^13] However, by 2014-2016, events like a Superintelligence conference letter falsified his "latent counterarguments" hypothesis, leading to partial acceptance of AI risk arguments.[^13]
+
+Gwern distinguishes his "strong scaling hypothesis" from what he characterizes as DeepMind's "weak scaling hypothesis." According to Gwern, DeepMind believes AGI requires "finding the right algorithms" by replicating brain modules piece-by-piece, with compute aiding discovery but not pure scaling providing little "risk or surprise" until final assembly.[^5] In contrast, Gwern advocates that scaling alone—more data and compute—drives improvement and generalization.
+
+## Research and Intellectual Contributions
+
+### AI Scaling and Predictions
+
+Gwern's most influential contribution has been his early and persistent advocacy of scaling laws for large language models. He predicted that GPT-3, despite being "expensive by conventional DL standards" but "cheap" overall, demonstrated "crazy runtime meta-learning" capabilities.[^5] However, he acknowledged GPT-3 as an "old approach known to be flawed in both minor & major ways," far from an ideal Transformer, trained on "tiny data" (Internet HTML dumps) with "bad prompts & data tokenization problems" affecting arithmetic and commonsense reasoning.[^5]
+
+Gwern proposes concrete benchmarks to detect mode-collapse, AI slop, and "ChatGPTese," arguing these are increasingly important for AI safety to prevent "whimper" or "em hell" existential risks.[^14] He archives and curates extensive directories on model-based reinforcement learning alignment, safe RL, and AI safety papers, including 2024 works on scheming, reward-tampering, sandbagging, and phishing capabilities in LLMs.[^15][^16][^17]
+
+His research ideas include proposals for using convolutional neural networks for GWAS (genome-wide association studies) over linear regressions to better handle SNP clumping and non-linear effects,[^18] evolving meta-prompts to boost log-likelihood of diverse writing samples across genres,[^18] and developing hierarchical generative models using wide, low-parameter MLPs with quadratic attention.[^18]
+
+### Statistical Critiques and Methodology
+
+Gwern maintains rigorous standards for research criticism, documenting extensive lists of statistical pitfalls including p-hacking, non-preregistered analyses, fixed alpha=0.05 thresholds, correlational data misinterpreted as causation, GWAS issues (reporting only genome-wide significant SNPs), measurement errors, and animal experiments without proper blocking.[^19] He argues that significance testing is fundamentally flawed because nonzero effects from correlations and error make null hypotheses a priori false, while directional hypotheses offer approximately 50% guess accuracy.[^20]
+
+In analyzing causality assessments, Gwern critiques quantitative applications of Bradford Hill criteria, noting that one study's discriminant analysis correctly predicted 130/159 (81.8%) agent classifications but circularly predicted expert opinions rather than true causality, ignoring randomization.[^21] He proposes judging research criticisms by their potential impact on results if corrected, with fraud being worst as it changes all decisions, while admitting his own critiques aren't always fully correct.[^22]
+
+### Self-Experimentation and Quantified Self
+
+Gwern conducts blinded self-experiments on sleep, cognition, and health using statistical analysis in R. His experiments include Potassium Sleep Experiments (2012), Vitamin D Sleep Experiments (2012), Lunar Circadian Rhythms (2013), Caffeine Wakeup Experiment (2013), Internet WiFi Improvement (2016), and Treadmill Desk Observations (2012).[^23] He uses R packages including `lmomco`, `MatrixStats`, `memoise`, `Mice`, `RandomForest`, `brms` (Bayesian multilevel models with Stan), and `Survival`.[^23]
+
+His meta-analysis on dual n-back (DNB) training found that post-DNB IQ gains were linked to methodological issues, with small remaining positive effects possibly tied to further training.[^24] This exemplifies his approach of rigorously examining evidence for popular cognitive enhancement claims.
+
+### Writing and Content Strategy
+
+Gwern emphasizes writing for persistence and long-term influence, including into AI training data—what he calls "writing yourself into the future" by influencing LLMs. He notes the potential for a Gwern-like "mentor persona" in models trained on his early GPT-3 analyses.[^25] His style guide enforces "classic style" for prose, Markdown, HTML, citations, and code, supporting both human editors and LLMs (distributed as a `.cursor/rules` file). Goals include resisting link rot, compiling cleanly, and enabling decades-long maintenance.[^12]
+
+Essays are marked with *created* (core idea/first version) and *modified* (last major update) dates.[^26] The site features client-side popups, local archiving, floating toggles (dark-mode, reader-mode, disable popups, search), and bidirectional hyperlinks with in-context popups for frictionless browsing.[^8] AI integrations include AI classification for dark mode image inversion, AI-generated "dropcats" for themed pages, automatic keyword link-ification (LinkAuto.hs), and machine learning for sorting annotations by inferred tags.[^8]
+
+### Recent Developments (2024-2026)
+
+Gwern publishes monthly newsletters curating links, summaries of site changes, and new writings, supported by Patreon donors.[^27][^28][^29] Recent newsletters have covered:
+
+- **Genetics and CRISPR**: Phase 1 trial of CRISPR-Cas9 gene editing targeting ANGPTL3 (Laffin et al 2025); China restarting clinical trials post-CRISPR baby scandal (Cross 2024); design of highly functional genome editors modeling the universe of CRISPR-Cas sequences (Ruffolo et al 2024).[^30]
+- **Longevity**: Sterilization and contraception increasing lifespan across vertebrates (Garratt et al 2025); LSD extending lifespan in C. elegans; lifetime costs of bad health (Nardi et al 2024).[^31]
+- **AI developments**: Writings on compression representing intelligence linearly (2024); emergent planning in model-free RL (2025); MLPs for in-context learning; recommender scaling; trillion-parameter transducers.[^28][^29]
+- **Politics and current events**: Review of *Fears of a Setting Sun* by Dennis C. Rasmussen; Trump pardon of Ross Ulbricht (January 2025); North Korean science.[^27]
+
+## AI Safety Contributions
+
+Gwern serves as an AI safety researcher and archivist, delving into complexities of aligning AI systems with human values while analyzing datasets like The Pile for model behavior impacts.[^32] He hosts and archives papers on model-based RL alignment, including Everitt 2018's work on Bayesian history-based RL (superseded by Everitt & Hutter 2019), addressing value alignment to avoid Goodhart's law failures like reward hacking.[^33]
+
+His curated directories on safe RL and AI safety include papers such as "Safety Alignment Should Be Made More Than Just a Few Tokens Deep" (Qi et al., 2024), "Frontier Models Are Capable of In-Context Scheming" (Meinke et al. & Hobbhahn et al., 2024), and "Super(Ficial)-Alignment: Strong Models May Deceive Weak Models" (Yang et al., 2024).[^15][^16] He emphasizes 2024 papers on emergent misalignment including scheming, sycophancy to subterfuge, and sandbagging.[^15][^16]
+
+In discussions on the Alignment Forum and EA Forum, Gwern has explored whether AI automation speeds capabilities over safety, questioned if automated alignment research precedes takeoff, and discussed China as a "fast follower" in AI races.[^34] His work highlights risks like meta-alignment failures in RL where agents pursue corrupted utility functions, reducing original value.[^33]
+
+## Community Reception and Influence
+
+### Rationalist and EA Communities
+
+Gwern maintains significant influence within rationalist and <EntityLink id="lesswrong">LessWrong</EntityLink> communities, frequently recommended alongside figures like Scott Alexander and <EntityLink id="paul-christiano">Paul Christiano</EntityLink> as essential reading for effective altruists.[^35] An EA Forum post seeking "standalone" LW posts to bridge rationalist ideas to EA cites Gwern's content as high-value amid LW's overwhelming volume.[^35]
+
+Gwern maintains an EA Forum presence via greaterwrong.com, posting detailed commentary on events like the 2023 <EntityLink id="openai">OpenAI</EntityLink> board crisis. He framed Sam Altman's shift from gifting OpenAI non-profits to EA (with initial good intentions) as "giver's remorse," leading to deception and power struggles, noting EA board members had limited leverage.[^36]
+
+His 2013-2014 LessWrong survey analysis defended EA donors against hypocrisy charges, showing self-identified EAs donate more than non-EAs after controlling for youth and low income. Using regressions with log-transformed donations and age/income fixed effects, Gwern demonstrated that median \$0 donations were due to demographics rather than lack of commitment.[^37]
+
+### Limited Mainstream AI/ML Recognition
+
+Critics argue that Gwern's impact is exaggerated and confined to effective altruism circles, with major researchers like Hinton, LeCun, Ng, and Bengio not relying on his work.[^6] A 2024 Hacker News discussion characterized Gwern's AI views (with interviewer Dwarkesh Patel) as "partisan doomerism" focused on extinction risks, seen as "non-technical fantasizing" by critics outside AI/ML.[^6]
+
+Some commenters note that Gwern and similar thinkers erred by prioritizing compute power over algorithmic insights, failing to appreciate pre-existing scaling results like AlphaZero's Bayesian optimization reducing tree search needs.[^38] Gwern's influence appears largely limited to EA-adjacent communities rather than shaping mainstream AI research directions.
+
+## Criticisms and Controversies
+
+### Style and Argumentation
+
+In a 2024 Hacker News thread on a Gwern interview, critics argued his "exotic vocabulary and style" dresses up "dumb snippets" as insightful, making banter seem profound when it's incomplete or incorrect.[^39] Commenters accused him of "appeal to hypocrisy" or tu quoque fallacy by comparing current AI takeover skeptics to historical critics of technologies like cars, ignoring that each technology must be evaluated independently and citing survivorship bias.[^39]
+
+A critical blog post titled "Against Gwern on Stories" argued his essay "Against Reading New Fiction" ignores multiple purposes of fiction beyond explicit goals, exhibiting "Hollywood Rationality."[^40] Critics contend Gwern misinterprets the loss of ancient art (claiming we don't mourn it, implying it doesn't matter), failing to account for fiction availability decay over time and the necessity of new production to replace excellent works lost to filtering effects.[^40] The essay allegedly contains "logical holes" with points disproved by other sections, such as claiming all cinematic techniques are developed—surprising film professionals.[^40]
+
+### Personal Conduct and Community Standards
+
+A 2023 LessWrong post raised questions about Gwern's behavior, which he defended by citing his high karma and long community tenure—a response critics called presumptuous.[^41] Hacker News discussions in 2024 characterized Gwern as potentially "gratuitously dickish" in interactions, though participants remained open to counter-narratives.[^42] One commenter described him as "acerbic or disagreeable," noting his comments on topics like hallucinogens dismissed concerns as inducing unwanted reality distortion.[^43][^44]
+
+### Methodological Concerns
+
+Gwern's own framework on critiquing research highlights flaws like conflicts of interest, lack of power analysis, genetic confounding, and overreliance on interaction terms—standards by which some studies he endorses might fail depending on severity.[^19] His analysis of the backfire effect assumes opponents select their best counterarguments, leading to potential "anti-information" effects, which critics note intersects with weaker average arguments for mainstream ideas and perceptual biases.[^45]
+
+In his A/B testing of gwern.net design, Gwern acknowledged self-identified weaknesses: users reported lines as "too closely spaced," prompting him to set `line-height: 150%` as a "simple hack" based on "rough eyeballing."[^46] He noted unstable traffic made some tests impossible to resolve, with no "clear linear relation" between metrics like conversion and width (p=0.89 linear fit).[^46] He critiqued his own "conversion" metric as dichotomizing continuous data (time on page) into binary form, destroying information, with 82% of readers spending 0-10s leading to severe data loss even with timeouts.[^46]
+
+### Inconsistency in AI Arguments
+
+Critics note that Gwern shifts positions on topics like language models' sample efficiency versus humans, reflecting what they characterize as flip-flopping.[^38] His critique of complexity-based limits on AI acknowledges practical caveats: omitting "constant factors," runtime, worst-case bounds, and alternative algorithms. He notes computers are vulnerable to hardware bugs, remote monitoring, malware in BIOS/USB, and fiber optic taps—"all this in a blink of an eye"—undermining airgapped assumptions.[^47] His analysis glosses over engineering challenges like fluid diffusion in hypothetical "transworm" designs, risking overheating or starvation.[^47]
+
+## Key Uncertainties
+
+Several significant uncertainties surround Gwern's work and influence:
+
+1. **True impact on AGI development**: While Gwern claims to have influenced AGI builders through early scaling predictions, the extent of this influence relative to other factors (computational experiments, corporate incentives, parallel discoveries) remains unclear. His limited citation in mainstream AI/ML literature suggests impact may be overstated outside rationalist circles.
+
+2. **Validity of strong scaling hypothesis**: Gwern acknowledges GPT-3 as "flawed in both minor & major ways" and notes that smaller models like GPT-2-1.5b failed to ensemble sub-models effectively, suggesting size/depth/data thresholds.[^5] Whether pure scaling without algorithmic improvements can achieve AGI remains contested, with critics arguing he undervalues algorithmic insights.
+
+3. **Prediction track record**: While Gwern made early predictions about AI timelines (generalist AI by ~2019, human-level agents by ~2025, AGI by 2030), systematic evaluation of his broader prediction accuracy across domains is lacking. His self-experiments and statistical analyses demonstrate rigor, but cherry-picked successes versus overall calibration remains uncertain.
+
+4. **Long-term value of gwern.net**: Gwern designs his website for decades-long persistence, writing for future AI training data.[^25] Whether this content will remain relevant, properly attributed, and influential in future AI systems depends on evolving training practices, copyright policies, and information decay that cannot be foreseen.
+
+5. **Replicability of self-experiments**: While Gwern uses statistical methods and blinding in self-experiments, single-subject designs with n=1 have inherent limitations for generalizability. The extent to which his findings on sleep, nootropics, and cognition apply to broader populations remains uncertain.
+
+6. **Community influence versus mainstream recognition**: Gwern's recommendations appear frequently in EA/LessWrong contexts but rarely in mainstream AI research. Whether this represents a lagging indicator (with ideas filtering into mainstream later) or fundamental disconnect between rationalist and academic/industry AI communities is unclear.
+
+## Sources
+
+[^1]: [Dwarkesh Podcast with Gwern Branwen](https://www.dwarkesh.com/p/gwern-branwen)
+[^2]: [Gwern.net homepage](https://gwern.net)
+[^3]: [All Dev Blogs: Gwern](https://www.alldevblogs.com/blog/gwern)
+[^4]: [Gwern.net: About Me](https://gwern.net/me)
+[^5]: [Gwern.net: The Scaling Hypothesis](https://gwern.net/scaling-hypothesis)
+[^6]: [Hacker News discussion on Gwern's influence](https://news.ycombinator.com/item?id=42134950)
+[^7]: [Gwern.net: Style Guide](https://gwern.net/style-guide)
+[^8]: [Gwern.net: Design](https://gwern.net/design)
+[^9]: [Translate.com: Welsh-English translation of "gwern"](https://www.translate.com/dictionary/welsh-english/gwern-813180)
+[^10]: [Glosbe: Modern Gaulish-English translation](https://en.glosbe.com/mis_gal/en/gwern)
+[^11]: [Gwern.net: About](https://gwern.net/about)
+[^12]: [Gwern.net: Style Guide - Transclusion](https://gwern.net/style-guide)
+[^13]: [Gwern.net: Karnofsky 2016 PDF on existential risk](https://gwern.net/doc/existential-risk/2016-karnofsky.pdf)
+[^14]: [Alignment Forum: Gwern's Shortform](https://www.alignmentforum.org/posts/PQaZiATafCh7n5Luf/gwern-s-shortform)
+[^15]: [Gwern.net: Model-based RL index](https://gwern.net/doc/reinforcement-learning/model/index)
+[^16]: [Gwern.net: Safe RL index](https://gwern.net/doc/reinforcement-learning/safe/index)
+[^17]: [Gwern.net: Everitt 2018 PDF on model-based RL alignment](https://gwern.net/doc/reinforcement-learning/model/2018-everitt.pdf)
+[^18]: [Gwern.net: Research Ideas](https://gwern.net/idea)
+[^19]: [Gwern.net: Research Criticism](https://gwern.net/research-criticism)
+[^20]: [Gwern.net: Everything Is Correlated](https://gwern.net/everything)
+[^21]: [Gwern.net: Statistical Notes](https://gwern.net/note/statistic)
+[^22]: [Gwern.net: Research Criticism - Standards](https://gwern.net/research-criticism)
+[^23]: [Gwern.net: R Documentation Index](https://gwern.net/doc/cs/r/index)
+[^24]: [Hacker News discussion on dual n-back meta-analysis](https://news.ycombinator.com/item?id=11944753)
+[^25]: [Marginal Revolution: The Wisdom of Gwern](https://marginalrevolution.com/marginalrevolution/2024/08/the-wisdom-of-gwern-why-should-you-write.html)
+[^26]: [Gwern.net homepage](https://gwern.net)
+[^27]: [Gwern.net: January 2025 Newsletter](https://gwern.net/newsletter/2025/01)
+[^28]: [Gwern.net: May 2024 Newsletter](https://gwern.net/newsletter/2024/05)
+[^29]: [Gwern.net: April 2025 Newsletter](https://gwern.net/newsletter/2025/04)
+[^30]: [Gwern.net: Genetics Editing Index](https://gwern.net/doc/genetics/editing/index)
+[^31]: [Gwern.net: Longevity Index](https://gwern.net/doc/longevity/index)
+[^32]: [Antoine Buteau: Lessons from Gwern](https://www.antoinebuteau.com/lessons-from-gwern/)
+[^33]: [Gwern.net: Everitt 2018 PDF on model-based RL alignment](https://gwern.net/doc/reinforcement-learning/model/2018-everitt.pdf)
+[^34]: [EA Forum: Gwern on Creating Your Own AI Race](https://forum.effectivealtruism.org/posts/Kz8WpQkCckN9JNHCN/gwern-on-creating-your-own-ai-race-and-china-s-fast-follower)
+[^35]: [EA Forum: Standalone LessWrong Posts Recommendations](https://forum.effectivealtruism.org/posts/qtDZHBx6LpAR7ejDD/what-standalone-lesswrong-posts-would-you-recommend-to-most)
+[^36]: [EA GreaterWrong: Gwern's User Page](https://ea.greaterwrong.com/users/gwern)
+[^37]: [Gwern.net: EA Donation Analysis](https://gwern.net/ea-donation)
+[^38]: [Dwarkesh Podcast with Gwern Branwen - Compute vs. Algorithms](https://www.dwarkesh.com/p/gwern-branwen)
+[^39]: [Hacker News discussion on Gwern interview fallacies](https://news.ycombinator.com/item?id=42134315)
+[^40]: [Thing of Things: Against Gwern on Stories](https://thingofthings.wordpress.com/2016/06/15/against-gwern-on-stories/)
+[^41]: [LessWrong: Inquiry into Community Standards](https://www.lesswrong.com/posts/ZZFbCN7qQfHBgsiNN/inquiry-into-community-standards-0)
+[^42]: [Hacker News discussion on Gwern's conduct](https://news.ycombinator.com/item?id=44820140)
+[^43]: [Alignment Forum: Gwern's Shortform - Personality](https://www.alignmentforum.org/posts/PQaZiATafCh7n5Luf/gwern-s-shortform)
+[^44]: [GreaterWrong comment on Gwern's style](https://www.greaterwrong.com/posts/6yTShbTdtATxKonY5/how-to-not-lose-an-argument/comment/AkALg9BoFg9GC9PQR)
+[^45]: [Gwern.net: The Backfire Effect](https://gwern.net/backfire-effect)
+[^46]: [Gwern.net: A/B Test Analysis](https://gwern.net/ab-test)
+[^47]: [Gwern.net: Complexity and AI](https://gwern.net/complexity)
+
+<Backlinks />

@@ -1,0 +1,343 @@
+---
+title: "World Models + Planning"
+description: "Analysis of AI architectures with explicit learned world models and search/planning components. MuZero achieved 100% win rate vs AlphaGo Lee; DreamerV3 achieved superhuman performance on 150+ tasks with fixed hyperparameters. Estimated 5-15% probability of dominance at TAI."
+sidebar:
+  label: "World Models"
+  order: 8
+quality: 54
+lastEdited: "2026-01-28"
+importance: 62
+llmSummary: "Comprehensive analysis of world models + planning architectures showing 10-500x sample efficiency gains over model-free RL (EfficientZero: 194% human performance with 100k vs 50M steps), but estimating only 5-15% probability of TAI dominance due to LLM superiority on general tasks. Key systems include MuZero (superhuman on 57 Atari games without rules), DreamerV3 (first to collect Minecraft diamonds from scratch), with unique safety advantages (inspectable beliefs, explicit goals) but risks from reward misgeneralization and mesa-optimization."
+ratings:
+  novelty: 4.5
+  rigor: 6
+  actionability: 4
+  completeness: 7
+metrics:
+  wordCount: 627
+  citations: 36
+  tables: 40
+  diagrams: 1
+clusters: ["ai-safety"]
+---
+import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="world-models" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Current Dominance** | Low (games/robotics only) | MuZero, DreamerV3 superhuman in games; limited general task success |
+| **TAI Probability** | 5-15% | Strong for structured domains; LLMs dominate general tasks |
+| **Sample Efficiency** | 10-500x better than model-free | EfficientZero: 194% human performance with 100k steps (DQN needs 50M) |
+| **Interpretability** | Partial | World model predictions inspectable; learned representations opaque |
+| **Compute at Inference** | High | AlphaZero: 80k positions/sec vs Stockfish's 70M; relies on MCTS search |
+| **Scalability** | Uncertain | Games proven; real-world complexity unproven at scale |
+| **Key Advocate** | <EntityLink id="yann-lecun">Yann LeCun</EntityLink> (Meta) | Argues LLMs are "dead end"; JEPA is path to AGI |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [worldmodels.github.io**](https://worldmodels.github.io**) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Foundation_model) |
+
+
+## Overview
+
+World models + planning represents an AI architecture paradigm fundamentally different from <EntityLink id="language-models">large language models</EntityLink>. Instead of learning to directly produce outputs from inputs, these systems learn an **explicit model of how the world works** and use **search/planning algorithms** to find good actions.
+
+This is the paradigm behind AlphaGo, MuZero, and the approach Yann LeCun advocates with JEPA (Joint-Embedding Predictive Architectures). The key idea: **separate world understanding from decision making**.
+
+Estimated probability of being dominant at transformative AI: **5-15%**. Powerful for structured domains but not yet competitive for general tasks. [MuZero](https://www.nature.com/articles/s41586-020-03051-4) (Nature, 2020) achieved superhuman performance across Go, chess, shogi, and 57 Atari games without knowing game rules. [DreamerV3](https://arxiv.org/abs/2301.04104) (2023) became the first algorithm to collect diamonds in Minecraft from scratch, demonstrating generalization across 150+ diverse tasks with fixed hyperparameters.
+
+## Architecture
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph inputs["Input Processing"]
+        obs["Raw Observation<br/>(pixels, sensors)"]
+        enc["State Encoder<br/>(CNN/Transformer)"]
+    end
+
+    subgraph worldmodel["Learned World Model"]
+        latent["Latent State<br/>z_t"]
+        dynamics["Dynamics Model<br/>z_{t+1} = f(z_t, a_t)"]
+        reward["Reward Predictor<br/>r = g(z_t, a_t)"]
+        recon["Reconstruction<br/>(optional)"]
+    end
+
+    subgraph planning["Planning/Search Module"]
+        mcts["MCTS Search<br/>(80k positions/sec)"]
+        policy["Policy Network<br/>P(a|z)"]
+        value["Value Network<br/>V(z)"]
+    end
+
+    subgraph output["Output"]
+        action["Selected Action"]
+        exec["Environment<br/>Execution"]
+    end
+
+    obs --> enc
+    enc --> latent
+    latent --> dynamics
+    dynamics --> |"imagined rollout"| dynamics
+    dynamics --> reward
+    dynamics --> recon
+    latent --> mcts
+    policy --> |"action priors"| mcts
+    value --> |"state values"| mcts
+    reward --> |"predicted rewards"| mcts
+    mcts --> action
+    action --> exec
+    exec --> |"new observation"| obs
+
+    style worldmodel fill:#e6f3ff
+    style planning fill:#fff3e6
+`} />
+
+### Key Components
+
+| Component | Function | Learnable |
+|-----------|----------|-----------|
+| **State Encoder** | Compress observations to latent state | Yes |
+| **Dynamics Model** | Predict how state changes with actions | Yes |
+| **Reward Model** | Predict rewards/values | Yes |
+| **Policy Network** | Propose likely good actions | Yes |
+| **Value Network** | Estimate long-term value | Yes |
+| **Search/Planning** | Find best action via lookahead | Algorithm (not learned) |
+
+## Key Properties
+
+| Property | Rating | Assessment |
+|----------|--------|------------|
+| **White-box Access** | PARTIAL | World model inspectable but learned representations are opaque |
+| **Trainability** | HIGH | Model-based RL, self-play, gradient descent |
+| **Predictability** | MEDIUM | Explicit planning, but world model errors compound |
+| **Modularity** | MEDIUM | Clear separation of world model, policy, value |
+| **Formal Verifiability** | PARTIAL | Planning algorithm verifiable; world model less so |
+
+## Safety Implications
+
+### Advantages
+
+| Advantage | Explanation |
+|-----------|-------------|
+| **Explicit goals** | Planning objectives are visible |
+| **Inspectable beliefs** | Can examine what the world model predicts |
+| **Separable components** | Can analyze dynamics, rewards, policy separately |
+| **Bounded search** | Planning depth is controllable |
+| **Model-based interpretability** | Can ask "what if" questions of world model |
+
+### Risks
+
+| Risk | Severity | Explanation |
+|------|----------|-------------|
+| **Goal misgeneralization** | HIGH | Reward model may capture wrong objective |
+| **World model errors** | MEDIUM | Errors compound over planning horizon |
+| **Mesa-optimization** | HIGH | Planning is explicitly optimization |
+| **Deceptive world models** | UNKNOWN | Could world model learn to deceive planner? |
+| **Instrumental convergence** | MEDIUM | Planning may discover dangerous strategies |
+
+## Major Implementations
+
+### Game/Simulation Benchmarks
+
+| System | Developer | Year | Domain | Key Achievement | Performance |
+|--------|-----------|------|--------|-----------------|-------------|
+| **[AlphaGo Zero](https://www.nature.com/articles/nature24270)** | DeepMind | 2017 | Go | Tabula rasa superhuman | 100-0 vs AlphaGo Lee |
+| **[AlphaZero](https://www.science.org/doi/10.1126/science.aar6404)** | DeepMind | 2018 | Chess, Shogi, Go | 24hr to superhuman | 155 wins, 6 losses vs Stockfish (1000 games) |
+| **[MuZero](https://www.nature.com/articles/s41586-020-03051-4)** | DeepMind | 2020 | Games (no rules given) | Learned dynamics model | SOTA on 57 Atari games |
+| **[DreamerV3](https://arxiv.org/abs/2301.04104)** | DeepMind/Toronto | 2023 | 150+ diverse tasks | First Minecraft diamonds from scratch | SOTA on 4 benchmarks |
+| **[EfficientZero](https://arxiv.org/abs/2111.00210)** | Tsinghua | 2021 | Atari 100k | 500x more sample-efficient than DQN | 194% mean human performance |
+
+### Robotics and Real-World Applications (2024)
+
+| System | Application | Key Innovation | Status |
+|--------|-------------|----------------|--------|
+| **[MoDem-V2](https://www.researchgate.net/publication/382978834_MoDem-V2_Visuo-Motor_World_Models_for_Real-World_Robot_Manipulation)** | Robot manipulation | Recurrent State-Space Model for collision-free planning | ICRA 2024 |
+| **[DreMa](https://openreview.net/forum?id=3RSLW9YSgk)** | Robotic imitation | Learnable digital twins with Gaussian Splatting | Research |
+| **[4D Latent World Model](https://openreview.net/forum?id=iB9qx28gv4)** | 3D robot planning | Sparse voxel latent space for geometric reasoning | Research |
+| **[UniSim](https://arxiv.org/abs/2310.06114)** | Interactive simulation | Real-world simulators from video | ICLR 2024 Outstanding |
+
+### Broader Architectural Proposals
+
+| System | Developer | Scope | Status | Key Claim |
+|--------|-----------|-------|--------|-----------|
+| **[JEPA](https://ai.meta.com/blog/yann-lecun-ai-model-i-jepa/)** | Meta (LeCun) | General intelligence | I-JEPA, V-JEPA released | Predicts embeddings, not pixels |
+| **[V-JEPA](https://ai.meta.com/blog/v-jepa-yann-lecun-ai-model-video-joint-embedding-predictive-architecture/)** | Meta | Video understanding | Released 2024 | Physical world model |
+| **Genie** | DeepMind | World generation | Research | Interactive worlds from video |
+| **Sora** | OpenAI | Video prediction | Limited release | Implicit world model debate |
+
+## Research Landscape
+
+### Foundational Papers
+
+| Paper | Year | Venue | Contribution | Citations (2025) |
+|-------|------|-------|--------------|------------------|
+| [World Models](https://arxiv.org/abs/1803.10122) (Ha & Schmidhuber) | 2018 | NeurIPS | VAE + RNN architecture; training in "dreams" | 2,500+ |
+| [AlphaGo Zero](https://www.nature.com/articles/nature24270) | 2017 | Nature | Tabula rasa Go mastery | 8,000+ |
+| [AlphaZero](https://www.science.org/doi/10.1126/science.aar6404) | 2018 | Science | General game mastery | 5,000+ |
+| [MuZero](https://www.nature.com/articles/s41586-020-03051-4) | 2020 | Nature | Learned dynamics without rules | 3,000+ |
+| [DreamerV3](https://arxiv.org/abs/2301.04104) | 2023 | JMLR | Fixed hyperparameters across domains | 500+ |
+| [EfficientZero](https://arxiv.org/abs/2111.00210) | 2021 | NeurIPS | 500x sample efficiency improvement | 400+ |
+| [A Path Towards Autonomous Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf) (LeCun) | 2022 | Position | JEPA framework proposal | 1,000+ |
+
+### Key Labs and Researchers
+
+| Entity | Focus | Notable Contributions |
+|--------|-------|----------------------|
+| **DeepMind** | Game AI, planning | AlphaGo/Zero, MuZero, DreamerV3, Genie |
+| **Meta FAIR** | JEPA, self-supervised | I-JEPA, V-JEPA, VL-JEPA |
+| **Yann LeCun** | Architectural advocacy | Argues LLMs lack world understanding |
+| **Danijar Hafner** | Dreamer series | DreamerV1/V2/V3 lead author |
+| **Tsinghua** | Sample efficiency | EfficientZero, EfficientZero V2 |
+| **Berkeley** | Robotics | Model-based control, MPC |
+
+## The LeCun Critique of LLMs
+
+Yann LeCun, Meta's VP and Chief AI Scientist, has been the most vocal advocate for world models as the path to AGI. His [2022 position paper](https://openreview.net/forum?id=BZ5a1r-kVsf) "A Path Towards Autonomous Machine Intelligence" argues:
+
+1. **LLMs are "dead end"** - Autoregressive token prediction does not produce genuine world understanding
+2. **Prediction in embedding space** - JEPA predicts high-level representations, not raw pixels/tokens
+3. **Six-module architecture** - Perception, world model, cost, memory, action, configurator
+4. **Hierarchical planning** - Multiple abstraction levels needed for complex tasks
+
+### The JEPA Framework
+
+JEPA (Joint Embedding Predictive Architecture) differs fundamentally from generative models:
+
+| Aspect | Generative (LLMs, Diffusion) | JEPA |
+|--------|------------------------------|------|
+| **Prediction target** | Raw tokens/pixels | Abstract embeddings |
+| **Uncertainty handling** | Must model all details | Ignores irrelevant variation |
+| **Training signal** | Reconstruction loss | Contrastive/predictive loss |
+| **Information focus** | Surface-level patterns | Semantic structure |
+
+Meta has released three JEPA implementations: [I-JEPA](https://ai.meta.com/blog/yann-lecun-ai-model-i-jepa/) (images, 2023), [V-JEPA](https://ai.meta.com/blog/v-jepa-yann-lecun-ai-model-video-joint-embedding-predictive-architecture/) (video, 2024), and VL-JEPA (vision-language, 2024).
+
+### Counter-Arguments
+
+| LeCun Claim | Counter | Assessment |
+|-------------|---------|------------|
+| LLMs don't understand | They demonstrate understanding on diverse benchmarks | Partially valid: benchmark performance vs. true understanding debated |
+| Autoregressive is limited | GPT-4/o1 shows complex reasoning | Contested: reasoning may still be pattern matching |
+| Need explicit world model | Implicit world model may emerge in LLMs | Open question: [Sora debate](https://openai.com/sora) suggests possible emergence |
+| JEPA is superior | No JEPA system matches GPT-4 capability | Currently true: JEPA hasn't demonstrated general task success |
+
+## Comparison with LLM Approaches
+
+| Aspect | World Models | LLMs | Winner (2025) |
+|--------|--------------|------|---------------|
+| **Planning mechanism** | Explicit MCTS search (80k pos/sec) | Implicit chain-of-thought | Context-dependent |
+| **World knowledge** | Learned dynamics model | Compressed in weights | LLMs (broader) |
+| **Sample efficiency** | 10-500x better (EfficientZero) | Requires billions of tokens | World Models |
+| **Generalization** | Compositional planning | In-context learning | LLMs (more flexible) |
+| **Task diversity** | Requires domain-specific training | Single model, many tasks | LLMs |
+| **Current SOTA** | Games, robotics control | Language, reasoning, code | Domain-dependent |
+| **Compute at inference** | High (search required) | Lower (single forward pass) | LLMs |
+| **Interpretability** | Partial (can query world model) | Low (weights opaque) | World Models |
+
+### Sample Efficiency Comparison
+
+| Algorithm | Steps to Human-Level (Atari) | Relative Efficiency |
+|-----------|------------------------------|---------------------|
+| DQN (2015) | 50,000,000 | 1x (baseline) |
+| Rainbow (2017) | 10,000,000 | 5x |
+| SimPLe (2019) | 100,000 | 500x |
+| EfficientZero (2021) | 100,000 | 500x (194% human) |
+| DreamerV3 (2023) | Variable | Fixed hyperparameters |
+
+Model-based approaches achieve comparable or superior performance with 2 orders of magnitude less data, critical for robotics and real-world applications where data collection is expensive or dangerous.
+
+## Safety Research Implications
+
+### Research That Applies Well
+
+| Research Area | Why It Applies |
+|---------------|----------------|
+| **Reward modeling** | Explicit reward models are central |
+| **Goal specification** | Planning objectives are visible |
+| **Corrigibility** | Can potentially modify goals/world model |
+| **Interpretability of beliefs** | Can query world model predictions |
+
+### Unique Safety Challenges
+
+| Challenge | Description |
+|-----------|-------------|
+| **Reward hacking** | Planning will find unexpected ways to maximize reward |
+| **World model exploitation** | Agent may exploit inaccuracies in world model |
+| **Power-seeking** | Planning may naturally discover instrumental strategies |
+| **Deceptive planning** | Could agent learn to simulate safe behavior while planning harm? |
+
+## Trajectory Assessment
+
+### Arguments For Growth (40-60% probability of increased importance)
+
+| Factor | Evidence | Strength |
+|--------|----------|----------|
+| **Sample efficiency** | 500x improvement demonstrated (EfficientZero) | Strong |
+| **Robotics demand** | Physical tasks need prediction; [2024 survey](https://www.science.org/doi/10.1126/scirobotics.adt1497) shows growing adoption | Strong |
+| **LeCun's advocacy** | Meta investing heavily in JEPA research | Moderate |
+| **Compositionality** | Planning naturally combines learned skills | Moderate |
+| **Scaling evidence** | DreamerV3 shows favorable scaling with model size | Moderate |
+
+### Arguments Against (40-60% probability of continued niche status)
+
+| Factor | Evidence | Strength |
+|--------|----------|----------|
+| **LLMs dominating** | GPT-4, Claude perform well on most general tasks | Strong |
+| **World model accuracy** | Errors compound over planning horizon | Strong |
+| **Computational cost** | MCTS is expensive; AlphaZero searches 80k vs Stockfish's 70M positions/sec | Moderate |
+| **Limited generalization** | No world model system matches LLM task diversity | Strong |
+| **Hybrid approaches emerging** | LLM + world model combinations may dominate both | Moderate |
+
+### Probability Assessment: Paradigm Dominance at TAI
+
+| Scenario | Probability | Reasoning |
+|----------|-------------|-----------|
+| World models dominant | 5-10% | Would require breakthrough in scalable world modeling |
+| Hybrid (LLM + world model) dominant | 25-40% | Combines strengths; active research area |
+| LLMs dominant (current trajectory) | 40-55% | Empirically winning; massive investment |
+| Novel paradigm | 10-20% | Unknown unknowns |
+
+## Key Uncertainties
+
+| Uncertainty | Current Evidence | Resolution Timeline | Impact on Safety |
+|-------------|------------------|---------------------|------------------|
+| **Can world models scale to real-world complexity?** | DreamerV3 handles 150+ tasks; robotics limited | 2-5 years | High: determines applicability |
+| **Will hybrid approaches dominate?** | Active research (LLM + world model); no clear winner | 3-7 years | Moderate: affects which safety research applies |
+| **Is explicit planning necessary for AGI?** | o1/o3 suggests implicit reasoning works; debate ongoing | 2-5 years | High: determines alignment approaches |
+| **Can world model accuracy be verified?** | No robust methods exist; critical safety gap | 5-10 years | Very High: core alignment concern |
+| **Will JEPA fulfill LeCun's vision?** | I-JEPA/V-JEPA released but limited impact | 2-4 years | Moderate: alternative paradigm |
+| **Can planning be made safe?** | Power-seeking, deception emerge naturally from optimization | 5-15 years | Critical: core alignment problem |
+
+## Sources and Further Reading
+
+### Primary Research Papers
+
+- Schrittwieser, J. et al. (2020). "[Mastering Atari, Go, chess and shogi by planning with a learned model](https://www.nature.com/articles/s41586-020-03051-4)." *Nature*.
+- Hafner, D. et al. (2023). "[Mastering Diverse Domains through World Models](https://arxiv.org/abs/2301.04104)." *JMLR*.
+- Ha, D. & Schmidhuber, J. (2018). "[World Models](https://arxiv.org/abs/1803.10122)." *NeurIPS*.
+- Ye, W. et al. (2021). "[Mastering Atari Games with Limited Data](https://arxiv.org/abs/2111.00210)." *NeurIPS*.
+- Silver, D. et al. (2018). "[A general reinforcement learning algorithm that masters chess, shogi, and Go](https://www.science.org/doi/10.1126/science.aar6404)." *Science*.
+
+### Position Papers and Surveys
+
+- LeCun, Y. (2022). "[A Path Towards Autonomous Machine Intelligence](https://openreview.net/forum?id=BZ5a1r-kVsf)." *Position Paper*.
+- "[A review of learning-based dynamics models for robotic manipulation](https://www.science.org/doi/10.1126/scirobotics.adt1497)." *Science Robotics* (2024).
+- "[A Comprehensive Survey on World Models for Embodied AI](https://arxiv.org/abs/2510.16732)." (2024).
+
+### Implementations
+
+- [DreamerV3 GitHub](https://github.com/danijar/dreamerv3) - Official implementation
+- [MuZero Blog Post](https://deepmind.google/blog/muzero-mastering-go-chess-shogi-and-atari-without-rules/) - DeepMind
+- [V-JEPA](https://ai.meta.com/blog/v-jepa-yann-lecun-ai-model-video-joint-embedding-predictive-architecture/) - Meta AI
+
+## Related Pages
+
+- <EntityLink id="dense-transformers">Dense Transformers</EntityLink> - Alternative LLM approach
+- <EntityLink id="neuro-symbolic">Neuro-Symbolic</EntityLink> - Related hybrid approach
+- <EntityLink id="provable-safe">Provable Safe</EntityLink> - World model verification is central

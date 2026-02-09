@@ -1,0 +1,402 @@
+---
+title: "System Architecture"
+description: "Technical architecture of the Longterm Wiki - data flow, pipelines, and design decisions"
+sidebar:
+  order: 0
+  label: "Architecture"
+lastEdited: "2026-02-04"
+pageType: documentation
+importance: 0
+---
+import { Mermaid } from '@components/wiki';
+import { Aside } from '@astrojs/starlight/components';
+
+This document provides a technical overview of how the Longterm Wiki is built, how data flows through the system, and the design rationale behind key architectural decisions.
+
+<Aside type="tip" title="Keeping This Updated">
+This page documents system architecture. When making significant changes to pipelines or data flow, update the relevant sections here. See [Documentation Maintenance](#documentation-maintenance) for guidelines.
+</Aside>
+
+---
+
+## High-Level Architecture
+
+<Mermaid chart={`
+flowchart TB
+    subgraph Sources["Data Sources"]
+        YAML[("YAML Files<br/>experts, orgs, cruxes")]
+        MDX[("MDX Pages<br/>~550 articles")]
+        EXT[("External URLs<br/>citations, resources")]
+    end
+
+    subgraph Processing["Processing Layer"]
+        BUILD["build-data.mjs<br/>Entity compilation"]
+        SCAN["scan-content.mjs<br/>Content indexing"]
+        FETCH["fetch-sources.mjs<br/>Firecrawl fetching"]
+        CREATE["page-creator.mjs<br/>AI page generation"]
+    end
+
+    subgraph Storage["Storage Layer"]
+        JSON[("Generated JSON<br/>database, registry")]
+        SQLITE[("SQLite Cache<br/>.cache/knowledge.db")]
+        CACHE[("Source Cache<br/>.cache/sources/")]
+    end
+
+    subgraph Output["Output"]
+        SITE["Static Site<br/>Astro/Starlight"]
+        CLI["CLI Tools<br/>crux commands"]
+    end
+
+    YAML --> BUILD
+    MDX --> BUILD
+    MDX --> SCAN
+    BUILD --> JSON
+    SCAN --> SQLITE
+    EXT --> FETCH
+    FETCH --> SQLITE
+    FETCH --> CACHE
+    JSON --> SITE
+    SQLITE --> CREATE
+    CACHE --> CREATE
+    CREATE --> MDX
+`} />
+
+---
+
+## Core Systems
+
+### 1. Entity Data System
+
+**Purpose**: Maintain structured data about people, organizations, and concepts that can be referenced across pages.
+
+**Flow**: YAML sources → build-data.mjs → JSON artifacts → React components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| Source YAML | `src/data/*.yaml` | Human-editable entity definitions |
+| Build script | `scripts/build-data.mjs` | Compiles YAML to JSON |
+| Generated JSON | `src/data/*.json` | Browser-ready data |
+| Components | `src/components/wiki/` | Display entity data |
+
+**Key files generated**:
+- `database.json` - All entities merged
+- `pathRegistry.json` - Entity ID → URL path mapping
+- `backlinks.json` - Reverse reference indices
+
+**Design decision**: YAML for human editing, JSON for runtime. This separation allows manual curation while keeping the site fast.
+
+---
+
+### 2. Knowledge Database (SQLite)
+
+**Purpose**: Index content for analysis, cache external sources, and support AI-assisted workflows.
+
+**Location**: `.cache/knowledge.db` (gitignored, regenerated per machine)
+
+<Mermaid chart={`
+erDiagram
+    articles ||--o{ article_sources : "cites"
+    sources ||--o{ article_sources : "cited_by"
+    articles ||--o| summaries : "has"
+    sources ||--o| summaries : "has"
+
+    articles {
+        text id PK
+        text path
+        text title
+        text content
+        int word_count
+        int quality
+        text content_hash
+    }
+
+    sources {
+        text id PK
+        text url
+        text title
+        text content
+        text fetch_status
+        text fetched_at
+    }
+
+    summaries {
+        text entity_id PK
+        text entity_type
+        text one_liner
+        text summary
+        text key_points
+    }
+`} />
+
+**Key capabilities**:
+- Content indexing and search
+- Source fetching via Firecrawl API
+- AI summary generation
+- Change detection via content hashing
+
+**See**: [Content Database](/internal/content-database/) for full schema and API reference.
+
+---
+
+### 3. Page Creation Pipeline
+
+**Purpose**: Generate new wiki pages with proper citations using AI research and synthesis.
+
+**Pipeline phases**:
+
+```
+canonical-links → research-perplexity → register-sources → fetch-sources
+    → research-scry → synthesize → verify-sources → validate-loop → grade
+```
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Research["Research Phase"]
+        CL[Canonical Links]
+        PP[Perplexity Search]
+        RS[Register Sources]
+        FS[Fetch Sources]
+        SC[SCRY Search]
+    end
+
+    subgraph Synthesis["Synthesis Phase"]
+        SY[Claude Synthesis]
+        VS[Verify Sources]
+    end
+
+    subgraph Validation["Validation Phase"]
+        VL[Validate Loop]
+        VF[Full Validation]
+        GR[Grade]
+    end
+
+    CL --> PP --> RS --> FS --> SC --> SY --> VS --> VL --> VF --> GR
+
+    FS -.->|"Firecrawl API"| CACHE[(Source Cache)]
+    CACHE -.->|"Quote verification"| VS
+`} />
+
+**Design decisions**:
+
+| Decision | Rationale |
+|----------|-----------|
+| Perplexity for research | Cheap (\$0.10), good at web search, provides citation URLs |
+| Register + fetch sources | Enables quote verification against actual content |
+| Verify-sources phase | Catches hallucinated quotes before publication |
+| Validation loop | Iterative fixing ensures build-passing output |
+
+**Cost tiers**:
+- Budget: \$2-3 (no source fetching)
+- Standard: \$4-6 (with source fetching + verification)
+- Premium: \$8-12 (deep research + review)
+
+**See**: [Page Creator Pipeline](/internal/reports/page-creator-pipeline/) for experiment results.
+
+---
+
+### 4. Source Fetching System
+
+**Purpose**: Fetch and cache actual webpage content for citation verification.
+
+**Flow**:
+
+```
+Citation URLs (from Perplexity)
+    → Register in SQLite (sources table)
+    → Fetch via Firecrawl API
+    → Store in SQLite + .cache/sources/
+    → Use in quote verification
+```
+
+**Components**:
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| Knowledge DB | `scripts/lib/knowledge-db.mjs` | SQLite wrapper, source tracking |
+| Fetch script | `scripts/utils/fetch-sources.mjs` | Standalone Firecrawl fetcher |
+| Page creator | `scripts/content/page-creator.mjs` | Integrated fetch during page creation |
+
+**Rate limiting**: 7 seconds between requests (Firecrawl free tier limit).
+
+**Design decision**: Fetch during page creation rather than eagerly. This keeps costs predictable and ensures we only fetch sources we actually need.
+
+---
+
+### 5. Validation System
+
+**Purpose**: Ensure content quality and prevent build failures.
+
+**Architecture**: Unified rules engine with 20+ validators.
+
+```bash
+npm run crux -- validate unified --rules=dollar-signs,entitylink-ids
+```
+
+**Rule categories**:
+
+| Category | Examples | Blocking? |
+|----------|----------|-----------|
+| Critical | `dollar-signs`, `entitylink-ids`, `fake-urls` | Yes - breaks build |
+| Quality | `tilde-dollar`, `markdown-lists`, `placeholders` | No - warnings only |
+
+**Design decision**: Two-tier validation allows fast feedback while still catching serious issues. Critical rules run in CI; quality rules are advisory.
+
+---
+
+## Data Flow Diagrams
+
+### Page Creation Data Flow
+
+<Mermaid chart={`
+sequenceDiagram
+    participant User
+    participant PageCreator
+    participant Perplexity
+    participant Firecrawl
+    participant SQLite
+    participant Claude
+
+    User->>PageCreator: Create page "Topic"
+    PageCreator->>Perplexity: Research queries
+    Perplexity-->>PageCreator: Content + citation URLs
+    PageCreator->>SQLite: Register source URLs
+    PageCreator->>Firecrawl: Fetch page content
+    Firecrawl-->>SQLite: Store fetched content
+    PageCreator->>Claude: Synthesize with research
+    Claude-->>PageCreator: Draft MDX
+    PageCreator->>SQLite: Load fetched content
+    PageCreator->>PageCreator: Verify quotes against sources
+    PageCreator->>Claude: Validation loop
+    Claude-->>PageCreator: Fixed MDX
+    PageCreator-->>User: final.mdx
+`} />
+
+### Entity Resolution Flow
+
+<Mermaid chart={`
+sequenceDiagram
+    participant MDX as MDX Page
+    participant Component as EntityLink
+    participant Registry as pathRegistry.json
+    participant Database as database.json
+
+    MDX->>Component: <EntityLink id="open-philanthropy">
+    Component->>Registry: Lookup path for ID
+    Registry-->>Component: /knowledge-base/organizations/funders/open-philanthropy
+    Component->>Database: Get entity metadata
+    Database-->>Component: {title, type, ...}
+    Component-->>MDX: Rendered link with icon
+`} />
+
+---
+
+## Design Principles
+
+### 1. Separation of Source and Generated Data
+
+**Principle**: Human-editable files (YAML, MDX) are separate from generated artifacts (JSON, SQLite).
+
+**Why**:
+- Generated files can be regenerated from source
+- No merge conflicts on generated files (gitignored where appropriate)
+- Clear ownership: humans edit YAML, scripts generate JSON
+
+### 2. Local-First Caching
+
+**Principle**: Cache computationally expensive results locally (SQLite, `.cache/`).
+
+**Why**:
+- AI summaries are expensive; don't regenerate unnecessarily
+- Source fetching has API costs; cache results
+- Content hashing enables incremental updates
+
+**Trade-off**: Cache must be rebuilt on new machines. This is acceptable because:
+- Build is deterministic from source files
+- Cache is optimization, not source of truth
+
+### 3. Progressive Enhancement for AI Features
+
+**Principle**: AI features (summaries, page creation) are optional enhancements.
+
+**Why**:
+- Wiki works without API keys
+- Failures in AI pipeline don't break the site
+- Costs are predictable and opt-in
+
+### 4. Validation at Multiple Levels
+
+**Principle**: Catch errors early and at appropriate granularity.
+
+| Level | Tool | When |
+|-------|------|------|
+| Syntax | MDX compiler | Build time |
+| Schema | Zod validation | Build time |
+| References | EntityLink validator | CI |
+| Quality | Grading pipeline | Manual trigger |
+
+---
+
+## Key Configuration Files
+
+| File | Purpose | When to Edit |
+|------|---------|--------------|
+| `astro.config.mjs` | Sidebar structure, Starlight config | Adding new sections |
+| `src/content.config.ts` | MDX frontmatter schema | Adding frontmatter fields |
+| `src/data/schema.ts` | Entity type definitions (Zod) | Adding entity types |
+| `scripts/lib/knowledge-db.mjs` | SQLite schema | Adding database tables |
+| `scripts/content/page-creator.mjs` | Page creation pipeline | Modifying generation flow |
+
+---
+
+## Environment Variables
+
+| Variable | Purpose | Required For |
+|----------|---------|--------------|
+| `ANTHROPIC_API_KEY` | Claude API access | Summaries, grading, page creation |
+| `OPENROUTER_API_KEY` | Perplexity via OpenRouter | Page creation research |
+| `FIRECRAWL_KEY` | Web page fetching | Source content fetching |
+
+All are optional. Features gracefully degrade when keys are missing.
+
+---
+
+## Documentation Maintenance
+
+### Keeping Docs Updated
+
+This architecture documentation should be updated when:
+
+1. **New pipeline phases added** - Update the pipeline diagram and phase list
+2. **Database schema changes** - Update the ER diagram
+3. **New environment variables** - Add to the environment variables table
+4. **New validation rules** - Document in the validation section
+
+### Freshness Indicators
+
+Each internal doc should include:
+- `lastEdited` in frontmatter (updated when content changes)
+- Verification notes for time-sensitive information
+
+### Automated Checks
+
+Consider adding:
+```bash
+# Check if docs mention deprecated scripts
+npm run crux -- validate docs-freshness
+```
+
+### Cross-References
+
+When code changes affect documentation:
+1. Update the relevant internal doc
+2. Add a comment in the code: `// Docs: /internal/architecture/#section-name`
+3. Run `npm run build` to verify links still work
+
+---
+
+## Related Documentation
+
+- [Content Database](/internal/content-database/) - SQLite schema and API
+- [Automation Tools](/internal/automation-tools/) - CLI reference
+- [Page Creator Pipeline](/internal/reports/page-creator-pipeline/) - Generation experiments
+- [About This Wiki](/internal/about-this-wiki/) - Contributor overview

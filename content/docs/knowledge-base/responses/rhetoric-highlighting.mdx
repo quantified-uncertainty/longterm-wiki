@@ -1,0 +1,301 @@
+---
+title: Rhetoric Highlighting
+description: A proposed automated system for detecting and flagging persuasive-but-misleading rhetoric, including logical fallacies, emotionally loaded language, selective quoting, and citation misrepresentation. Could serve as a reading aid or author-side linting tool.
+sidebar:
+  order: 12
+lastEdited: "2026-02-06"
+quality: 45
+importance: 48
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 6
+  rigor: 4.5
+  actionability: 5
+  completeness: 5
+metrics:
+  wordCount: 2700
+  citations: 18
+  tables: 5
+  diagrams: 1
+clusters:
+  - epistemics
+  - ai-safety
+subcategory: epistemic-tools-approaches
+---
+import {Backlinks, Mermaid, KeyQuestions, EntityLink} from '@components/wiki';
+
+*Part of the [Design Sketches for Collective Epistemics](/knowledge-base/responses/collective-epistemics-design-sketches/) series by Forethought Foundation.*
+
+## Overview
+
+Rhetoric Highlighting is a proposed automated system that identifies potentially manipulative rhetorical moves in text—logical fallacies, emotionally loaded language, selective quoting, misrepresented citations, buried assumptions, and statistical distortions—and flags them to readers or writers. The concept was outlined in Forethought Foundation's 2025 report "[Design Sketches for Collective Epistemics](https://www.forethought.org/research/design-sketches-collective-epistemics)."
+
+Unlike fact-checking, which assesses whether claims are true, rhetoric highlighting assesses *how* claims are presented. A statement can be technically true while being deeply misleading through framing, emphasis, omission, or emotional manipulation. Rhetoric highlighting aims to make these moves visible.
+
+The system could operate in two modes:
+- **Reader mode**: Highlights and annotates published text, helping readers identify where they might be being manipulated
+- **Writer mode**: Functions as a "rhetoric linter" that helps authors strengthen their reasoning and avoid accidental misrepresentation before publishing
+
+## How It Would Work
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Input["1. Text Decomposition"]
+        A[Input text] --> B[Break into sentences and claims]
+        B --> C[Identify explicit and implied claims]
+    end
+
+    subgraph Context["2. Context Retrieval"]
+        C --> D[Retrieve cited passages]
+        D --> E[Gather background context]
+        E --> F[Compare claims against sources]
+    end
+
+    subgraph Analysis["3. Rhetoric Classification"]
+        F --> G[Run classifiers on each sentence]
+        G --> H1[Logical fallacies]
+        G --> H2[Emotionally loaded language]
+        G --> H3[Selective quoting]
+        G --> H4[Citation misrepresentation]
+        G --> H5[Statistical distortions]
+        G --> H6[Buried assumptions]
+    end
+
+    subgraph Scoring["4. Impact Assessment"]
+        H1 & H2 & H3 & H4 & H5 & H6 --> I[Assess severity and impact]
+        I --> J[Rank by usefulness to flag]
+    end
+
+    subgraph Output["5. User Interface"]
+        J --> K[Color-coded text highlights]
+        K --> L1[Hover: brief explanation]
+        K --> L2[Click: detailed analysis]
+        K --> L3[Settings: filter by category]
+    end
+
+    style K fill:#d4edda
+`} />
+
+### Step-by-Step Pipeline
+
+1. **Text decomposition**: Parse the document into sentences and extract explicit and implied claims
+2. **Context retrieval**: Fetch cited passages, background information, and relevant context to evaluate claims against
+3. **Rhetoric classification**: Run trained classifiers on each sentence to detect multiple categories of rhetorical issues
+4. **Impact assessment**: Evaluate severity—a minor hedging issue matters less than a fundamentally misrepresented citation
+5. **User-facing output**: Display results as color-coded highlights with hover explanations, click-through details, and category-based filtering
+
+### Categories of Rhetoric Detected
+
+| Category | Description | Example |
+|----------|-------------|---------|
+| **Logical fallacies** | Arguments that don't logically follow | Ad hominem attacks, false dichotomies, appeal to authority |
+| **Emotionally loaded language** | Words chosen to manipulate feelings rather than inform | "Catastrophic failure" vs. "significant setback" |
+| **Selective quoting** | Quotes taken out of context to change meaning | Cherry-picking a sentence that reverses the author's actual conclusion |
+| **Citation misrepresentation** | Cited sources don't support the claims made | Paper cited as "proving X" when it actually found mixed results |
+| **Statistical distortions** | Misleading use of numbers | Relative vs. absolute risk, base rate neglect, misleading axes |
+| **Buried assumptions** | Key assumptions hidden in phrasing | "Given that X is inevitable..." when X is contested |
+| **False balance** | Presenting fringe views as equally credible | "Some scientists say climate change is real, others disagree" |
+| **Anchoring** | Initial framing that biases interpretation | Leading with an extreme scenario to make moderate claims seem reasonable |
+
+## Technical Feasibility
+
+### Cost Analysis
+
+Forethought provides a detailed cost estimate. For one hour of reading (approximately 30 pages):
+
+| Parameter | Value |
+|-----------|-------|
+| Pages per hour of reading | approximately 30 |
+| Sentences per page | about 20 |
+| LLM calls per sentence | about 5 (decomposition, retrieval, classification, assessment, drafting) |
+| Tokens per call | about 1,000 |
+| **Total tokens per hour** | **about 3 million** |
+
+At current (2025) LLM pricing:
+- **Cheapest models**: about \$1 per hour of reading
+- **Most capable models**: Hundreds of dollars per hour of reading
+- **Expected trajectory**: As inference costs fall roughly 10x/year, costs should reach \$0.10–1.00 per hour within 2-3 years
+
+### Speed Constraints
+
+The multi-step pipeline creates latency challenges:
+- Each sentence requires multiple sequential LLM calls
+- Real-time highlighting while reading may require pre-processing
+- Caching and batching can help for static content
+- Streaming/progressive display could improve perceived responsiveness
+
+### Current Economic Viability
+
+Given 2025 costs, rhetoric highlighting is currently viable only for:
+- **High-stakes content**: Policy documents, legal filings, major publications
+- **Widely-read content**: Articles with millions of readers (cost amortized)
+- **Author-side use**: Writers checking their own work before publication (lower coverage needed)
+- **Educational contexts**: Teaching critical thinking with annotated examples
+
+## Existing Work and Related Tools
+
+### Academic Research on Automated Rhetoric Detection
+
+The field of computational argumentation and rhetoric analysis has been growing significantly:
+
+| Research Area | Key Work | Status |
+|--------------|----------|--------|
+| **Argument mining** | [Centre for Argument Technology (ARG-tech)](https://www.arg.tech/), University of Dundee, led by Professor Chris Reed. Developed the Argument Interchange Format (AIF) standard ontology and [AIFdb](http://aifdb.org), the largest publicly accessible corpus of annotated argumentation. Annual [ArgMining workshops](https://argmining-org.github.io/2025/) at ACL since 2014. | Active research infrastructure |
+| **Logical fallacy detection** | Jin et al. (2022) "[Logical Fallacy Detection](https://arxiv.org/abs/2202.13758)" introduced LOGIC dataset with 2,449 instances across 13 fallacy types plus LogicClimate challenge set. GPT-4 achieves [79-90% accuracy](https://arxiv.org/html/2404.05213v1) depending on conditions (Carstens et al., 2024). | Published benchmark; LLMs improving |
+| **Propaganda detection** | [SemEval-2020 Task 11](https://aclanthology.org/2020.semeval-1.186/): Detection of Propaganda Techniques in News Articles (14 techniques, 250 teams). Extended through SemEval-2023 (23 persuasion techniques across 9 languages) and SemEval-2024 (multilingual meme analysis). | Multi-year shared task series |
+| **Deceptive reasoning** | [RuozhiBench](https://arxiv.org/html/2502.13125v1) (2025): 677 questions testing LLMs against deceptive reasoning. Best model achieved only 62% vs. humans at 90%+. | Active benchmark |
+| **Claim verification** | FEVER (Fact Extraction and VERification) benchmark and subsequent work | Active benchmark |
+| **Citation verification** | SciFact and related datasets for scientific claim verification against cited papers | Active research |
+| **Hedge/weasel word detection** | [Ganter & Strube (2009)](https://aclanthology.org/P09-2044.pdf) used Wikipedia's weasel-word annotations; updated in [2024](https://arxiv.org/html/2405.13319v1). Detects vague language like "some people say," "researchers believe." | Established subfield |
+| **Rhetorical figure detection** | [Systematic survey (2024)](https://arxiv.org/html/2406.16674v1) covering 24 different rhetorical figures and computational detection methods | Active research |
+
+### Existing Tools and Prototypes
+
+| Tool | Description | Approach | Adoption |
+|------|-------------|----------|----------|
+| **[FallacyCheck](https://dl.acm.org/doi/10.1145/3771882.3774253)** | Browser extension using inoculation theory; detects 13 fallacy types (MUM 2024) | LLM; proactive questioning | Research prototype |
+| **[Skeptic Reader](https://www.skepticreader.domesticstreamers.com/)** | Chrome/Firefox extension scoring balance, coherence, objectivity via GPT-4o | LLM; scoring | Early stage |
+| **[FallacyFilter](https://chromewebstore.google.com/detail/fallacyfilter-bias-fallac/eecmbjkpkifngjfchnnpiafopomkpick)** | Chrome extension detecting biases and logical fallacies | LLM; browser extension | Small |
+| **[IBM Project Debater](https://aclanthology.org/2021.emnlp-demo.31.pdf)** | Argument mining across 10B sentences; public APIs for claim/evidence detection | NLP pipeline; APIs | Enterprise; niche |
+| **[Kialo](https://www.kialo-edu.com/)** | Argument mapping with hierarchical pro/con trees across 49 languages | Human-driven | 1M+ users; 400K+ discussions |
+| **[Grammarly](https://www.grammarly.com/)** | Writing assistant flagging tone and clarity issues | Rule-based + ML | 30M+ daily users |
+| **[Ad Fontes Media](https://adfontesmedia.com/)** | Rates news sources on reliability and bias axes | Human rating | Widely cited bias chart |
+| **[Ground News](https://ground.news/)** | Cross-outlet story comparison; "Blindspot" feature for lopsided coverage | Aggregation | Growing mobile app |
+| **[Logically.ai](https://www.logically.ai/)** | AI-powered fact-checking and harmful content detection | Commercial platform | Gov/enterprise clients |
+| **[fallacycheck.com](https://fallacycheck.com/)** | Automated fallacy detection crawling news, editorials, social media | Web crawling | Small; niche |
+
+### LLM-Based Approaches
+
+Recent LLM capabilities make several components of rhetoric highlighting more feasible than they were with traditional NLP:
+
+- **Zero-shot fallacy detection**: GPT-4 achieves 79-90% accuracy on the LOGIC benchmark depending on conditions. Prompt enrichment with counterarguments and explanations ([NAACL 2025](https://arxiv.org/html/2503.23363v1)) improved F1 by up to 0.60 in zero-shot settings.
+- **Citation verification**: LLMs can compare claims against cited sources and identify misrepresentations, though reliability varies
+- **Tone analysis**: Modern models can distinguish between informative and manipulative framing with increasing sophistication
+- **Inoculation approach**: The most successful real-world deployments (Google Jigsaw's [prebunking videos](https://www.science.org/doi/10.1126/sciadv.abo6254), FallacyCheck) use inoculation theory—teaching users to recognize techniques rather than filtering content
+- **Argument reconstruction**: LLMs can extract implicit premises and unstated assumptions from natural language
+
+However, LLMs also introduce new challenges: they can confidently flag non-issues, miss subtle manipulation, and themselves produce rhetoric that would warrant highlighting.
+
+## Target Applications
+
+### Near-Term (High-Value, Low-Scale)
+
+1. **Academic peer review**: Flag citation misrepresentation and logical gaps in manuscript reviews
+2. **Preprint servers**: Annotate papers on arXiv/medRxiv before formal peer review
+3. **Policy analysis**: Highlight rhetorical moves in government reports, legislative proposals
+4. **Journalism tools**: Help reporters identify manipulation in sources' statements
+
+### Medium-Term (Broader Deployment)
+
+5. **Author-side plugins**: Writing tools that warn about ambiguous phrasing, unsupported claims
+6. **Educational platforms**: Teach critical thinking by showing rhetoric patterns in real text
+7. **Fact-checker augmentation**: Speed up professional fact-checkers by pre-identifying issues
+
+### Long-Term (Universal Access)
+
+8. **Browser extensions**: Real-time annotation of any web content
+9. **Social media integration**: Platform-level rhetoric flagging
+10. **Email and messaging**: Highlight manipulation in personal communications
+
+### Suggested Prototypes (from Forethought)
+
+- **Author-side plugin**: Warning about ambiguous phrasing or unsupported claims during writing
+- **Cite-checker**: Verifying that paper quotations accurately represent the source
+- **Marked-up news articles**: Demonstrations of rhetoric patterns highlighted in published news
+
+## Worked Example: AI Lab Blog Post
+
+Consider a hypothetical AI lab blog post announcing a new model:
+
+> *"Our groundbreaking model achieves superhuman performance on every major benchmark, making it the most capable AI system ever created. Independent researchers have confirmed that this represents a fundamental leap in intelligence. While some have raised safety concerns, our rigorous testing shows the model is completely safe for deployment."*
+
+A rhetoric highlighting system would annotate this passage as follows:
+
+| Sentence Fragment | Flag | Explanation |
+|-------------------|------|-------------|
+| "superhuman performance on **every** major benchmark" | **Overgeneralization** | Most models excel on some benchmarks but not others. "Every" is likely false or requires significant qualification. |
+| "most capable AI system **ever created**" | **Superlative claim without qualification** | Capability depends on the metric. This implies universal superiority, which is almost never true. |
+| "Independent researchers **have confirmed**" | **Vague attribution** | Which researchers? What specifically did they confirm? "Have confirmed" implies consensus that may not exist. |
+| "a fundamental **leap** in intelligence" | **Emotionally loaded language** | "Leap" and "intelligence" are both contested terms that imply more than benchmark improvements warrant. |
+| "**While some have raised** safety concerns" | **Dismissive framing** | "While some" minimizes safety concerns and positions them as a minority view to be acknowledged then dismissed. |
+| "**completely** safe for deployment" | **Absolute safety claim** | No system is "completely safe." This is a red flag for missing caveats about limitations and risk mitigation. |
+
+In **writer mode**, these flags would appear as the author drafts the post, encouraging more precise language: "achieves state-of-the-art on 7 of 12 major benchmarks" instead of "every," and "our evaluations found no critical safety issues in tested scenarios" instead of "completely safe."
+
+## Extensions and Open Ideas
+
+**Rhetoric diff**: Compare two versions of a statement—an original and a revision—to visualize how rhetoric changed. Useful for tracking how press releases evolve from internal drafts, or how a claim morphs as it's reported across outlets. "The original paper said 'modest improvement'; the press release said 'breakthrough.'"
+
+**Author rhetoric profiles**: Aggregate rhetoric patterns across an author's or organization's body of work. "This author uses emotional language 3x more than the domain average" or "This organization's press releases consistently use absolute safety claims." This connects rhetoric highlighting to [reliability tracking](/knowledge-base/responses/reliability-tracking/).
+
+**Rhetoric translation**: Automatically rewrite flagged sentences in neutral language and show the comparison side-by-side. Not to replace the original, but to help readers see what the same information looks like without the rhetorical moves. "Here's what this paragraph says if you remove the loaded framing."
+
+**Symmetric debate highlighting**: When analyzing content about a contested topic, highlight rhetoric on *all* sides symmetrically, not just the side the system's training data identifies as "wrong." This addresses the concern that rhetoric highlighting could become a partisan tool.
+
+**Integration with LLM output**: Apply rhetoric highlighting to AI-generated content itself. Users could enable a mode where their AI assistant's responses are simultaneously checked for rhetorical manipulation—a self-auditing feature that builds trust.
+
+**Calibrated confidence for flags**: Rather than binary flag/no-flag, each annotation could come with a confidence score: "85% likely this is selective quoting" vs. "55% likely this is emotionally loaded language." Users set their own threshold for what to display.
+
+**Collaborative annotation refinement**: When the system flags something incorrectly, users can dispute it. Disputed flags are reviewed by other users (similar to the community notes bridging algorithm), creating a feedback loop that improves the system's accuracy over time.
+
+## Challenges and Risks
+
+### False Positives and Chilling Effects
+
+The most significant risk is that rhetoric highlighting could discourage legitimate persuasion. Not all emotional language is manipulative; not all simplification is distortion. A system that flags too aggressively could:
+- Make writing sterile and unengaging
+- Discourage strong advocacy for important causes
+- Create a new form of tone policing
+- Advantage bland corporate communication over passionate individual voices
+
+### Subjectivity of "Misleading"
+
+What counts as manipulative rhetoric is often subjective:
+- Cultural context matters—rhetorical norms differ across communities
+- Some "fallacies" are reasonable heuristics in everyday reasoning
+- The boundary between persuasion and manipulation is genuinely fuzzy
+- Political framing is inherently contestable
+
+### Gaming and Arms Races
+
+Sophisticated communicators could adapt to avoid detection while maintaining manipulation:
+- Use more subtle rhetorical techniques
+- Structure arguments to technically avoid flagged patterns
+- Preemptively address flags in ways that make them seem unreasonable
+- This could create an arms race similar to SEO vs. search algorithms
+
+### Power Dynamics
+
+- **Who controls the definitions?** The choice of what constitutes "misleading rhetoric" embeds values
+- **Asymmetric impact**: Could disproportionately flag certain communication styles, dialects, or cultural norms
+- **Corporate capture**: Could be tuned to favor certain political perspectives or commercial interests
+
+## Connection to AI Safety
+
+Rhetoric highlighting connects to AI safety in multiple ways:
+
+- **AI-generated persuasion**: As AI systems become better at generating persuasive content, tools that help humans detect manipulation become more important for maintaining <EntityLink id="epistemic-health">epistemic health</EntityLink>
+- **Sycophancy detection**: The same techniques could be applied to AI outputs, flagging when AI systems use rhetorically manipulative patterns to tell users what they want to hear
+- **Policy discourse**: Improving the quality of debate about AI governance could lead to better regulatory outcomes
+- **<EntityLink id="civilizational-competence">Civilizational competence</EntityLink>**: Populations that can better identify manipulation are better positioned to make wise collective decisions about transformative AI
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "Can automated rhetoric detection distinguish genuine persuasion from manipulation reliably enough to be useful?",
+    "Will the chilling effect on legitimate speech outweigh the benefits of flagging manipulation?",
+    "How quickly will costs fall enough to make real-time rhetoric highlighting viable for everyday reading?",
+    "Can the system be made robust to adversarial adaptation by sophisticated communicators?",
+    "What governance structure can ensure rhetoric highlighting definitions remain balanced across perspectives?"
+  ]}
+/>
+
+## Further Reading
+
+- **Original Report**: [Design Sketches for Collective Epistemics — Rhetoric Highlighting](https://www.forethought.org/research/design-sketches-collective-epistemics#rhetoric-highlighting) — Forethought Foundation
+- **Related Research**: [Logical Fallacy Detection](https://arxiv.org/abs/2202.13758) — Jin et al. (2022), introducing the LOGIC benchmark
+- **Computational Argumentation**: [Argument Mining](https://aclanthology.org/venues/argmining/) — ACL Workshop series since 2014
+- **Overview**: [Design Sketches for Collective Epistemics](/knowledge-base/responses/collective-epistemics-design-sketches/) — parent page with all five proposed tools
+
+<Backlinks />

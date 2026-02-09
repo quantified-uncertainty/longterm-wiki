@@ -1,0 +1,1109 @@
+# Forums Resources
+# Posts from LessWrong, Alignment Forum, and EA Forum
+# Part of the split resources system - see src/data/resources/
+
+- id: f79d3614ff16a985
+  url: https://www.lesswrong.com/posts/FbEJBdLBSDiBojfF2/
+  title: A Guide to Writing High-Quality LessWrong Posts
+  type: blog
+  cited_by:
+    - long-timelines
+  publication_id: lesswrong
+- id: ebf69d1a871a8145
+  url: https://www.lesswrong.com/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities
+  title: AGI Ruin
+  type: blog
+  cited_by:
+    - deceptive-alignment
+  authors:
+    - Eliezer Yudkowsky
+  published_date: 2022-06-05
+  publication_id: lesswrong
+  tags:
+    - agi
+    - mesa-optimization
+    - inner-alignment
+    - situational-awareness
+- id: 0aea2d39b8284ab1
+  url: https://www.alignmentforum.org/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities
+  title: "AGI Ruin: A List of Lethalities"
+  type: blog
+  cited_by:
+    - sharp-left-turn
+    - doomer
+  authors:
+    - Eliezer Yudkowsky
+  published_date: 2022-06-05
+  publication_id: alignment-forum
+  tags:
+    - agi
+    - capability-generalization
+    - alignment-stability
+    - miri
+- id: d5970e4ef7ed697f
+  url: https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025
+  title: AI Safety Field Growth Analysis 2025
+  type: web
+  local_filename: d5970e4ef7ed697f.txt
+  summary: Comprehensive study tracking the expansion of technical and non-technical AI safety fields
+    from 2010 to 2025. Documents growth from approximately 400 to 1,100 full-time equivalent
+    researchers across both domains.
+  review: This analysis provides a detailed quantitative examination of the AI safety field's
+    evolution, revealing significant growth particularly after 2020. Using a combination of data
+    collection and exponential modeling, the research demonstrates a 21-24% annual growth rate in
+    technical AI safety organizations and full-time equivalents (FTEs). The study covers both
+    technical domains like interpretability, LLM safety, and agent foundations, as well as
+    non-technical areas including governance, policy, and advocacy.
+  key_points:
+    - Technical AI safety field grew exponentially, with 24% annual growth in organizations
+    - Total AI safety FTEs increased from 400 in 2022 to 1,100 in 2025
+    - Top research categories include miscellaneous technical safety, LLM safety, and
+      interpretability
+  cited_by:
+    - field-building
+  fetched_at: 2025-12-28 02:54:34
+  authors:
+    - Stephen McAleese
+  published_date: 2025-09-27
+  publication_id: ea-forum
+  tags:
+    - safety
+    - field-building
+    - training-programs
+    - community
+- id: 437b0d270c82d23b
+  url: https://www.alignmentforum.org/w/alignment-tax
+  title: Alignment Tax (AI Alignment Forum)
+  type: blog
+  fetched_at: 2025-12-28 01:07:29
+  publication_id: alignment-forum
+  tags:
+    - alignment
+- id: b1ab921f9cbae109
+  url: https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation
+  title: An Overview of the AI Safety Funding Situation (LessWrong)
+  type: blog
+  local_filename: b1ab921f9cbae109.txt
+  summary: Analyzes AI safety funding from sources like Open Philanthropy, Survival and Flourishing
+    Fund, and academic institutions. Estimates total global AI safety spending and explores talent
+    versus funding constraints.
+  review: This detailed analysis provides a nuanced examination of AI safety funding landscape,
+    revealing the complex ecosystem of financial support for preventing potential negative AI
+    outcomes. The research meticulously tracks funding from philanthropic organizations, government
+    grants, academic research, and for-profit companies, demonstrating a growing financial
+    commitment to AI safety research. The methodology involves aggregating grant databases, creating
+    Fermi estimates, and analyzing spending across different organizational types. Key findings
+    include an estimated $32 million contribution from for-profit AI companies, approximately $11
+    million from academic research in 2023, and significant contributions from organizations like
+    Open Philanthropy. The analysis goes beyond mere financial tracking, exploring critical
+    questions about whether the field is more constrained by talent or funding, suggesting a complex
+    interdependence between financial resources and human capital.
+  key_points:
+    - Open Philanthropy is the largest AI safety funder, spending about $46 million in 2023
+    - For-profit AI companies contribute an estimated $32 million annually to AI safety research
+    - The field may be simultaneously constrained by funding, talent, and leadership
+  cited_by:
+    - critical-uncertainties
+    - technical-research
+  fetched_at: 2025-12-28 02:54:41
+  authors:
+    - Stephen McAleese
+  published_date: 2023-07-12
+  publication_id: lesswrong
+  tags:
+    - safety
+    - interpretability
+    - scalable-oversight
+    - rlhf
+- id: 23aab799629aa4ce
+  url: https://forum.effectivealtruism.org/posts/M9f4wvKB3CkaKyMgR/aisn-45-center-for-ai-safety-2024-year-in-review
+  title: Center for AI Safety
+  type: web
+  local_filename: 23aab799629aa4ce.txt
+  summary: The Center for AI Safety conducts technical and conceptual research on AI safety, advocates
+    for responsible AI development, and supports the AI safety research community through various
+    initiatives.
+  review: "The Center for AI Safety (CAIS) has made significant contributions to the field of AI
+    safety in 2024, focusing on three primary pillars: research, advocacy, and field-building. Their
+    research spans critical areas including circuit breakers, benchmarking AI safety, and developing
+    safeguards for open-weight models, with notable achievements such as the WMDP Benchmark and
+    HarmBench evaluation framework. CAIS has demonstrated a comprehensive approach to AI safety,
+    combining technical research with policy advocacy and community support. Their efforts include
+    supporting 350 researchers through a compute cluster, publishing the first comprehensive
+    textbook on AI safety, and engaging with policymakers to promote responsible AI development. The
+    organization has shown particular strength in bridging technical research with policy
+    implications, organizing congressional engagement, and supporting legislative efforts like SB
+    1047, while maintaining a forward-looking perspective on mitigating potential risks from
+    advanced AI systems."
+  key_points:
+    - Developed breakthrough research on circuit breakers and AI safety benchmarks
+    - Supported 350 researchers and 77 research papers through compute cluster
+    - Engaged in policy advocacy and published first comprehensive AI safety textbook
+    - Launched initiatives like Humanity's Last Exam and SafeBench Competition
+  fetched_at: 2025-12-28 02:54:36
+  authors:
+    - Center for AI Safety
+    - Corin Katzke
+    - Dan H
+  published_date: 2024-12-19
+  publication_id: ea-forum
+  tags:
+    - safety
+- id: 5f753eba42556d7e
+  url: https://www.alignmentforum.org/posts/3kN79EuT27trGexsq/compute-governance-and-conclusion-in-the-decoupling
+  title: Decoupling Deliberation and Deployment
+  type: blog
+  cited_by:
+    - governance-focused
+  authors:
+    - paulfchristiano
+  published_date: 2018-05-25
+  publication_id: alignment-forum
+- id: 7fe5c5b69f06e765
+  url: https://forum.effectivealtruism.org/posts/qkK5ejystp8GCJ3vC/incident-reporting-for-ai-safety
+  title: "EA Forum: Incident Reporting for AI Safety"
+  type: web
+  local_filename: 7fe5c5b69f06e765.txt
+  summary: The document argues for developing a comprehensive incident reporting system for AI,
+    emphasizing the importance of sharing information about AI system failures, near-misses, and
+    potential risks to improve overall AI safety and accountability.
+  review: This source provides an extensive exploration of incident reporting as a critical mechanism
+    for advancing AI safety. The core argument is that by creating structured, voluntary, and
+    confidential systems for reporting AI incidents, the AI development community can proactively
+    identify, understand, and mitigate potential risks before they escalate. The methodology
+    proposed involves creating databases, encouraging voluntary reporting, protecting reporters, and
+    developing clear standards for incident documentation. Key findings highlight the need for
+    collaborative platforms like the AI Incident Database, government support through regulatory
+    frameworks, and a cultural shift towards open, non-punitive reporting. The proposed approach
+    draws lessons from other domains like aviation and cybersecurity, where systematic incident
+    tracking has dramatically improved safety. While the recommendations are promising, challenges
+    remain in incentivizing reporting, protecting commercial interests, and creating truly
+    comprehensive reporting mechanisms.
+  key_points:
+    - Incident reporting helps expose problematic AI systems and improve safety practices
+    - Voluntary, confidential reporting systems can encourage transparency and learning
+    - Government and industry collaboration is crucial for developing effective incident reporting
+      frameworks
+  cited_by:
+    - structural
+  fetched_at: 2025-12-28 02:54:54
+  authors:
+    - Zach Stein-Perlman
+    - SeLo
+    - stepanlos
+    - MvK🔸
+  published_date: 2023-07-19
+  publication_id: ea-forum
+  tags:
+    - safety
+- id: bbc4bc9c2577c2d0
+  url: https://www.alignmentforum.org/s/Rm6oQRJJmhGCcLvxh
+  title: Embedded Agency
+  type: blog
+  cited_by:
+    - miri
+    - agent-foundations
+    - long-timelines
+  publication_id: alignment-forum
+  tags:
+    - agent-foundations
+    - decision-theory
+    - corrigibility
+- id: 2b5b647a1d82adfc
+  url: https://www.alignmentforum.org/tag/inner-alignment
+  title: Inner Alignment Problem
+  type: blog
+  cited_by:
+    - faq
+  fetched_at: 2025-12-28 01:06:48
+  publication_id: alignment-forum
+  tags:
+    - alignment
+    - mesa-optimization
+- id: 36a29e39dcedcda1
+  url: https://www.alignmentforum.org/posts/HqLxuZ4LhaFhmAHWk/iterated-amplification-welcome-to-the-neighborhood
+  title: Iterated Amplification
+  type: blog
+  cited_by:
+    - optimistic
+  authors:
+    - Ajeya Cotra
+  published_date: 2018-11-30
+  publication_id: alignment-forum
+- id: 340acb96c19c60b3
+  url: https://www.lesswrong.com/posts/bdQhzQsHjNrQp7cNS/estimates-of-gpu-or-equivalent-resources-of-large-ai-players
+  title: LessWrong GPU estimates
+  type: blog
+  local_filename: 340acb96c19c60b3.txt
+  summary: A detailed breakdown of expected GPU and compute availability across major tech companies
+    like Microsoft, Meta, Google, Amazon, and XAI. Estimates are based on publicly available data
+    and Nvidia revenue information.
+  review: The document provides a nuanced exploration of AI computing infrastructure, focusing on GPU
+    availability and compute capacity across leading technology companies. By analyzing Nvidia's
+    revenue, chip production estimates, and company-specific purchases, the author constructs a
+    detailed projection of computational resources for key AI players in 2024 and 2025. The
+    methodology relies on multiple sources including earnings reports, industry estimates, and
+    revenue breakdowns, acknowledging inherent uncertainties in the estimates. The analysis goes
+    beyond simple chip counts, considering factors like custom chips (TPUs, Trainium), training
+    compute requirements, and the evolving landscape of AI infrastructure. Key insights include
+    significant compute expansion plans for companies like Microsoft, Google, and Meta, with
+    emerging players like XAI also making substantial investments in AI computational capacity.
+  key_points:
+    - Microsoft, Meta, and Google expected to have 1-3.1 million H100 equivalent chips by end of 2024
+    - Blackwell chips offer approximately 2.2x training performance compared to H100s
+    - Total AI infrastructure spending is projected to grow significantly in 2024-2025
+  cited_by:
+    - compute-hardware
+  fetched_at: 2025-12-28 01:07:58
+  authors:
+    - CharlesD
+  published_date: 2024-11-28
+  publication_id: lesswrong
+  tags:
+    - compute
+- id: ebb2f8283d5a6014
+  url: https://www.alignmentforum.org/users/paulfchristiano
+  title: Paul Christiano's AI Alignment Research
+  type: blog
+  cited_by:
+    - capability-alignment-race
+    - optimistic
+  publication_id: alignment-forum
+  tags:
+    - alignment
+- id: a2cde6af5436a9fb
+  url: https://www.alignmentforum.org/posts/Jq73GozjsuhdwMLEG/racing-through-a-minefield-the-ai-deployment-problem
+  title: Racing Through a Minefield
+  type: blog
+  cited_by:
+    - doomer
+    - governance-focused
+  authors:
+    - Eliezer Yudkowsky
+  published_date: 2007-03-16
+  publication_id: alignment-forum
+- id: 08379f1f5f05d94a
+  url: https://www.alignmentforum.org/posts/dgcsY8CHcPQiZ5v8P/research-areas-in-interpretability-the-alignment-project-by
+  title: Research Areas in Interpretability (UK AISI)
+  type: blog
+  fetched_at: 2025-12-28 01:07:27
+  authors:
+    - Joseph Bloom
+  published_date: 2025-08-01
+  publication_id: alignment-forum
+  tags:
+    - interpretability
+- id: f386d42a2b5ff4f7
+  url: https://www.alignmentforum.org/posts/hw2tGSsvLLyjFoLFS/scalable-oversight-and-weak-to-strong-generalization
+  title: Scalable Oversight and Weak-to-Strong Generalization
+  type: blog
+  fetched_at: 2025-12-28 01:07:27
+  authors:
+    - Ansh Radhakrishnan
+    - Buck
+    - ryan_greenblatt
+    - Fabien Roger
+  published_date: 2023-12-16
+  publication_id: alignment-forum
+- id: aa06fe94fc4f49a6
+  url: https://www.alignmentforum.org/tag/scalable-oversight
+  title: Scalable Oversight Approaches
+  type: blog
+  cited_by:
+    - optimistic
+  publication_id: alignment-forum
+- id: 9e50e643c2aac33b
+  url: https://www.lesswrong.com/posts/qmxodHBcAHNGF5bPv/the-sycophancy-trap-why-alignment-is-harder-than-deception
+  title: sycophancy is more likely than scheming
+  type: blog
+  publication_id: lesswrong
+  tags:
+    - deception
+- id: 6807a8a8f2fd23f3
+  url: https://www.alignmentforum.org/posts/HBxe6wdjxK239zajf/what-failure-looks-like
+  title: What Failure Looks Like
+  type: blog
+  cited_by:
+    - paul-christiano
+    - doomer
+    - catastrophe
+  authors:
+    - paulfchristiano
+  published_date: 2019-03-17
+  publication_id: alignment-forum
+  tags:
+    - iterated-amplification
+    - scalable-oversight
+    - ai-safety-via-debate
+- id: 473145a0d45c4d48
+  url: https://www.lesswrong.com/posts/QaHN5nS5P5R4JaYkA/why-ai-x-risk-skepticism
+  title: Why AI X-Risk Skepticism?
+  type: blog
+  cited_by:
+    - optimistic
+  publication_id: lesswrong
+  tags:
+    - x-risk
+- id: 699b0e00bd741a5d
+  url: https://www.alignmentforum.org/posts/pRkFkzwKZ2zfa3R6H/without-specific-countermeasures-the-easiest-path-to
+  title: Without specific countermeasures, the easiest path to transformative AI likely leads to AI
+    takeover
+  type: blog
+  cited_by:
+    - doomer
+  authors:
+    - Ajeya Cotra
+  published_date: 2022-07-18
+  publication_id: alignment-forum
+- id: c2babc67e1fad58b
+  url: https://www.lesswrong.com/users/evhub
+  title: Evan Hubinger
+  type: blog
+  cited_by:
+    - accident-risks
+  publication_id: lesswrong
+- id: 241ffc16c6786bd6
+  url: https://forum.effectivealtruism.org/posts/8ErtxW7FRPGMtDqJy/ai-safety-field-growth-analysis-2025
+  title: AI Safety Field Growth Analysis 2025
+  type: blog
+  cited_by:
+    - safety-research
+  authors:
+    - technicalities
+  published_date: 2020-07-30
+  publication_id: ea-forum
+  tags:
+    - safety
+- id: 105eb55d58314718
+  url: https://www.lesswrong.com/posts/overview-ai-safety-funding-situation
+  title: An Overview of the AI Safety Funding Situation (LessWrong)
+  type: blog
+  cited_by:
+    - safety-research
+  publication_id: lesswrong
+  tags:
+    - safety
+- id: 200c40509f20d569
+  url: https://forum.effectivealtruism.org/posts/cais-2024-year-in-review
+  title: Center for AI Safety 2024 Year in Review (EA Forum)
+  type: blog
+  cited_by:
+    - safety-research
+  publication_id: ea-forum
+  tags:
+    - safety
+- id: 2e0c662574087c2a
+  url: https://www.alignmentforum.org/
+  title: AI Alignment Forum
+  type: blog
+  cited_by:
+    - glossary
+    - capabilities-to-safety-pipeline
+    - compounding-risks-analysis
+    - mesa-optimization-analysis
+    - worldview-intervention-mapping
+    - deepmind
+    - arc
+    - conjecture
+    - miri
+    - redwood
+    - dario-amodei
+    - paul-christiano
+  publication_id: alignment-forum
+  tags:
+    - alignment
+    - talent
+    - field-building
+    - career-transitions
+    - risk-interactions
+- id: bff2f5843023e85e
+  url: https://forum.effectivealtruism.org/
+  title: EA Forum Career Posts
+  type: blog
+  cited_by:
+    - capabilities-to-safety-pipeline
+    - worldview-intervention-mapping
+    - redwood
+    - holden-karnofsky
+  publication_id: ea-forum
+  tags:
+    - talent
+    - field-building
+    - career-transitions
+    - prioritization
+    - worldview
+- id: 103df9c9771e2390
+  url: https://www.alignmentforum.org/posts/AyNHoTWWAJ5eb99ji/another-outer-alignment-failure-story
+  title: Cotra (2022)
+  type: blog
+  cited_by:
+    - mesa-optimization-analysis
+  authors:
+    - paulfchristiano
+  published_date: 2021-04-07
+  publication_id: alignment-forum
+  tags:
+    - mesa-optimization
+    - inner-alignment
+    - learned-optimization
+- id: 1672789bfb91a6ca
+  url: https://www.alignmentforum.org/posts/A9NxPTwbw6r6Awuwt/thoughts-on-the-impact-of-rlhf-research
+  title: AI Alignment Forum
+  type: blog
+  cited_by:
+    - scheming-likelihood-model
+  authors:
+    - evhub
+  published_date: 2022-08-30
+  publication_id: alignment-forum
+  tags:
+    - alignment
+    - probability
+    - strategic-deception
+    - situational-awareness
+- id: 69b320e83d92f2a0
+  url: https://www.alignmentforum.org/posts/QvwSr5LsxyDeaPK5s/ai-alignment-2018-2019-review
+  title: AI Alignment Forum survey
+  type: blog
+  cited_by:
+    - worldview-intervention-mapping
+  authors:
+    - Rob Bensinger
+  published_date: 2021-06-01
+  publication_id: alignment-forum
+  tags:
+    - alignment
+    - prioritization
+    - worldview
+    - strategy
+- id: 37f4871113caa2ab
+  url: https://www.lesswrong.com/posts/qHCDysDnvhteW7kRd/arc-s-first-technical-report-eliciting-latent-knowledge
+  title: LessWrong
+  type: blog
+  cited_by:
+    - arc
+  authors:
+    - paulfchristiano
+    - Mark Xu
+    - Ajeya Cotra
+  published_date: 2021-12-14
+  publication_id: lesswrong
+  tags:
+    - eliciting-latent-knowledge
+    - elk
+    - evaluations
+- id: ccb3e34a982e2528
+  url: https://www.lesswrong.com/tag/conjecture
+  title: LessWrong Posts
+  type: blog
+  cited_by:
+    - conjecture
+  publication_id: lesswrong
+  tags:
+    - cognitive-emulation
+    - coem
+    - interpretability
+- id: 34b0f4b24a86eac1
+  url: https://www.lesswrong.com/sequences
+  title: LessWrong Sequences
+  type: blog
+  cited_by:
+    - miri
+  publication_id: lesswrong
+  tags:
+    - agent-foundations
+    - decision-theory
+    - corrigibility
+- id: 815315aec82a6f7f
+  url: https://www.lesswrong.com/
+  title: LessWrong
+  type: blog
+  cited_by:
+    - why-alignment-easy
+    - miri
+  publication_id: lesswrong
+  tags:
+    - agent-foundations
+    - decision-theory
+    - corrigibility
+- id: 3fecff3945cfe5f3
+  url: https://www.alignmentforum.org/posts/j9Q8bRmwCgXRYAgcJ/miri-announces-new-death-with-dignity-strategy
+  title: Public statements
+  type: blog
+  cited_by:
+    - miri
+  authors:
+    - Eliezer Yudkowsky
+  published_date: 2022-04-02
+  publication_id: alignment-forum
+  tags:
+    - agent-foundations
+    - decision-theory
+    - corrigibility
+- id: 80882a02c4f17f9f
+  url: https://www.alignmentforum.org/tag/redwood-research
+  title: Alignment Forum
+  type: blog
+  cited_by:
+    - redwood
+  publication_id: alignment-forum
+  tags:
+    - alignment
+    - interpretability
+    - causal-scrubbing
+    - ai-control
+- id: adc7f6d173ebda6b
+  url: https://www.alignmentforum.org/users/paul-christiano
+  title: AI Alignment Forum
+  type: blog
+  cited_by:
+    - paul-christiano
+  publication_id: alignment-forum
+  tags:
+    - alignment
+    - iterated-amplification
+    - scalable-oversight
+    - ai-safety-via-debate
+- id: 50127ce5fac4e84b
+  url: https://www.lesswrong.com/posts/HBGd34LKvXM9TxvNf/new-safety-research-agenda-scalable-agent-alignment-via
+  title: DeepMind alignment agenda
+  type: blog
+  cited_by:
+    - ai-assisted
+    - scalable-oversight
+  authors:
+    - Vika
+  published_date: 2018-11-20
+  publication_id: lesswrong
+  tags:
+    - alignment
+    - debate
+    - recursive-reward-modeling
+    - process-supervision
+- id: 98cace7dc56632cc
+  url: https://www.lesswrong.com/posts/fAW6RXLKTLHC3WXkS/shallow-review-of-technical-ai-safety-2024
+  title: attempted game hacking 37%
+  type: blog
+  cited_by:
+    - ai-assisted
+  authors:
+    - technicalities
+    - Stag
+    - Stephen McAleese
+    - jordine
+    - Dr. David Mathers
+  published_date: 2024-12-29
+  publication_id: lesswrong
+  tags:
+    - cybersecurity
+- id: c2ee4c6c789ff575
+  url: https://www.alignmentforum.org/w/corrigibility-1
+  title: "AI Alignment Forum: Corrigibility Tag"
+  type: blog
+  cited_by:
+    - corrigibility
+    - corrigibility-failure
+  publication_id: alignment-forum
+  tags:
+    - alignment
+    - shutdown-problem
+    - ai-control
+    - value-learning
+    - corrigibility
+- id: 2f825636f5066205
+  url: https://www.lesswrong.com/posts/MiYkTp6QYKXdJbchu/disentangling-corrigibility-2015-2021
+  title: 'LessWrong: "Disentangling Corrigibility: 2015-2021"'
+  type: blog
+  cited_by:
+    - corrigibility
+  authors:
+    - Koen.Holtman
+  published_date: 2021-02-16
+  publication_id: lesswrong
+  tags:
+    - shutdown-problem
+    - ai-control
+    - value-learning
+- id: 81e4c51313794a1b
+  url: https://www.alignmentforum.org/posts/Ge55vxEmKXunFFwoe/reward-hacking-behavior-can-generalize-across-tasks
+  title: Denison et al. (2024)
+  type: blog
+  cited_by:
+    - case-for-xrisk
+    - rlhf
+  authors:
+    - Kei Nishimura-Gasparian
+    - Isaac Dunn
+    - Henry Sleight
+    - Miles Turpin
+    - evhub
+    - Carson Denison
+    - Ethan Perez
+  published_date: 2024-05-28
+  publication_id: alignment-forum
+  tags:
+    - training
+    - human-feedback
+    - alignment
+- id: a29670f1ec5df0d6
+  url: https://www.lesswrong.com/posts/vWYzSorAEWwoJnnXq/a-sketch-of-an-ai-control-safety-case
+  title: A sketch of an AI control safety case
+  type: blog
+  cited_by:
+    - technical-research
+  authors:
+    - Tomek Korbak
+    - joshc
+    - Benjamin Hilton
+    - Buck
+    - Geoffrey Irving
+  published_date: 2025-01-30
+  publication_id: lesswrong
+  tags:
+    - safety
+    - interpretability
+    - scalable-oversight
+    - rlhf
+- id: 80125fcaf04609b8
+  url: https://forum.effectivealtruism.org/posts/XdhwXppfqrpPL2YDX/an-overview-of-the-ai-safety-funding-situation
+  title: Overview of AI Safety Funding
+  type: blog
+  cited_by:
+    - mainstream-era
+    - field-building
+  authors:
+    - Stephen McAleese
+  published_date: 2023-07-12
+  publication_id: ea-forum
+  tags:
+    - safety
+    - field-building
+    - training-programs
+    - community
+- id: 4a117e76e94af55d
+  url: https://forum.effectivealtruism.org/posts/m5dDrMfHjLtMu293G/ai-safety-s-talent-pipeline-is-over-optimised-for
+  title: EA Forum analysis
+  type: blog
+  cited_by:
+    - field-building
+  authors:
+    - Christopher Clay
+  published_date: 2025-08-30
+  publication_id: ea-forum
+  tags:
+    - field-building
+    - training-programs
+    - community
+- id: b61a4cc5e039e9f3
+  url: https://www.lesswrong.com/posts/XXTanE2GeP5Lchp9G/arena-5-0-impact-report
+  title: ARENA 5.0
+  type: blog
+  cited_by:
+    - field-building
+  authors:
+    - JScriven
+    - JamesH
+    - James Fox
+  published_date: 2025-08-11
+  publication_id: lesswrong
+  tags:
+    - field-building
+    - training-programs
+    - community
+- id: bb571705e9f348a4
+  url: https://forum.effectivealtruism.org/posts/q3rpkJGiMwdRvuZza/catalyze-is-hiring-ai-safety-incubation-program-lead-and
+  title: Catalyze's pilot program
+  type: blog
+  cited_by:
+    - field-building
+  authors:
+    - Catalyze Impact
+    - Alexandra Bos
+    - Mick
+  published_date: 2025-09-16
+  publication_id: ea-forum
+  tags:
+    - field-building
+    - training-programs
+    - community
+- id: 77a3c2d162c0081e
+  url: https://www.lesswrong.com/posts/8QjAnWyuE9fktPRgS/ai-safety-field-growth-analysis-2025
+  title: AI Safety Field Growth Analysis 2025 (LessWrong)
+  type: blog
+  cited_by:
+    - field-building
+  authors:
+    - Stephen McAleese
+  published_date: 2025-09-27
+  publication_id: lesswrong
+  tags:
+    - safety
+    - field-building
+    - training-programs
+    - community
+- id: 0262e924ffb59b27
+  url: https://www.lesswrong.com/posts/JPfJaXTDQKQQocc2f/mats-spring-2024-extension-retrospective
+  title: MATS Spring 2024 Extension Retrospective
+  type: blog
+  cited_by:
+    - field-building
+  authors:
+    - HenningB
+    - Matthew Wearden
+    - Cameron Holmes
+    - Ryan Kidd
+  published_date: 2025-02-12
+  publication_id: lesswrong
+  tags:
+    - field-building
+    - training-programs
+    - community
+- id: 041071de72834aa1
+  url: https://www.lesswrong.com/posts/5t73TZCf5yE69HbFP/arena-4-0-impact-report-1
+  title: ARENA 4.0 Impact Report
+  type: blog
+  cited_by:
+    - field-building
+  authors:
+    - Chloe Li
+    - JamesH
+    - James Fox
+  published_date: 2024-11-27
+  publication_id: lesswrong
+  tags:
+    - field-building
+    - training-programs
+    - community
+- id: fe505379ab7dd580
+  url: https://forum.effectivealtruism.org/posts/p4ekwamhsw6jpKEcu/widening-ai-safety-s-talent-pipeline-by-meeting-people-where
+  title: Widening AI Safety's Talent Pipeline
+  type: blog
+  cited_by:
+    - field-building
+  authors:
+    - RubenCastaing
+    - Nelson_GC
+    - danwil
+  published_date: 2025-09-25
+  publication_id: ea-forum
+  tags:
+    - safety
+    - field-building
+    - training-programs
+    - community
+- id: d564401cd5e38340
+  url: https://forum.effectivealtruism.org/posts/fsxQGjhYecDoHshxX/i-read-every-major-ai-lab-s-safety-plan-so-you-don-t-have-to
+  title: "EA Forum: I read every major AI lab's safety plan so you don't have to"
+  type: blog
+  cited_by:
+    - intervention-timing-windows
+    - responsible-scaling-policies
+  authors:
+    - sarahhw
+  published_date: 2024-12-16
+  publication_id: ea-forum
+  tags:
+    - safety
+- id: be649c61deafe4ea
+  url: https://forum.effectivealtruism.org/posts/gJRgSFmETJ8Eo8eXF/what-are-responsible-scaling-policies-rsps
+  title: "EA Forum: What are Responsible Scaling Policies (RSPs)?"
+  type: blog
+  cited_by:
+    - responsible-scaling-policies
+  authors:
+    - Vishakha Agrawal
+    - Algon
+  published_date: 2025-04-05
+  publication_id: ea-forum
+  tags:
+    - capabilities
+- id: 639669eeb016127d
+  url: https://www.alignmentforum.org/w/utility-indifference
+  title: Armstrong (2010)
+  type: blog
+  cited_by:
+    - corrigibility-failure
+  publication_id: alignment-forum
+  tags:
+    - corrigibility
+    - shutdown-problem
+    - instrumental-convergence
+- id: 1f7b94bbd04e680e
+  url: https://www.lesswrong.com/posts/zt6hRsDE84HeBKh7E/sycophancy-to-subterfuge-investigating-reward-tampering
+  title: Pope (2023)
+  type: blog
+  cited_by:
+    - deceptive-alignment
+  authors:
+    - Nina Panickssery
+  published_date: 2023-07-28
+  publication_id: lesswrong
+  tags:
+    - mesa-optimization
+    - inner-alignment
+    - situational-awareness
+- id: 90e9322ba84baa7a
+  url: https://www.lesswrong.com/w/instrumental-convergence
+  title: LessWrong (2024). "Instrumental Convergence Wiki"
+  type: blog
+  cited_by:
+    - instrumental-convergence
+  publication_id: lesswrong
+  tags:
+    - power-seeking
+    - self-preservation
+    - corrigibility
+- id: 8f738b406e4bfc32
+  url: https://www.alignmentforum.org/w/mesa-optimization
+  title: mesa-optimization
+  type: blog
+  cited_by:
+    - mesa-optimization
+    - sharp-left-turn
+  publication_id: alignment-forum
+  tags:
+    - mesa-optimization
+    - capability-generalization
+    - alignment-stability
+    - miri
+- id: 2c41381bdf2fa681
+  url: https://www.lesswrong.com/posts/kcKrE9mzEHrdqtDpE/the-case-for-ensuring-that-powerful-ais-are-controlled
+  title: AI Control research
+  type: blog
+  cited_by:
+    - sharp-left-turn
+  authors:
+    - ryan_greenblatt
+    - Buck
+  published_date: 2024-01-24
+  publication_id: lesswrong
+  tags:
+    - capability-generalization
+    - alignment-stability
+    - miri
+- id: 79b5b7f6113c8a6c
+  url: https://www.lesswrong.com/posts/j9Q8bRmwCgXRYAgcJ/miri-announces-new-death-with-dignity-strategy
+  title: Some experts like Eliezer Yudkowsky
+  type: blog
+  cited_by:
+    - lock-in
+  authors:
+    - Eliezer Yudkowsky
+  published_date: 2022-04-02
+  publication_id: lesswrong
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: 2f2861a624b5d76f
+  url: https://www.lesswrong.com/posts/5bd2ChzKKr2Ph5fnL/what-is-compute-governance
+  title: Compute governance
+  type: blog
+  cited_by:
+    - pause-and-redirect
+  authors:
+    - Vishakha
+    - Algon
+  published_date: 2024-12-23
+  publication_id: lesswrong
+  tags:
+    - governance
+    - compute
+- id: 7aa89f76287dd2ae
+  url: https://forum.effectivealtruism.org/posts/fKMPa7cxSnBCymuRm/is-pausing-ai-possible
+  title: "EA Forum: Is Pausing AI Possible?"
+  type: blog
+  cited_by:
+    - pause-and-redirect
+  authors:
+    - Richard Annilo
+  published_date: 2024-10-09
+  publication_id: ea-forum
+- id: 895dd2fca2e521c2
+  url: https://www.alignmentforum.org/s/r9tYkB2a8Fp4DN8yB/p/FkgsxrGf3QxhfLWHG
+  title: original mesa-optimization sequence
+  type: blog
+  cited_by:
+    - alignment-difficulty
+  publication_id: alignment-forum
+  tags:
+    - mesa-optimization
+- id: 148d0bf3dde0b4a8
+  url: https://www.lesswrong.com/w/recursive-self-improvement
+  title: '"Situational Awareness"'
+  type: blog
+  cited_by:
+    - self-improvement
+    - capabilities
+  publication_id: lesswrong
+  tags:
+    - intelligence-explosion
+    - recursive-self-improvement
+    - automl
+- id: ed73cbbe5dec0db9
+  url: https://www.lesswrong.com/posts/xWMqsvHapP3nwdSW8/my-views-on-doom
+  title: Paul Christiano
+  type: blog
+  cited_by:
+    - why-alignment-hard
+    - catastrophe
+  authors:
+    - paulfchristiano
+  published_date: 2023-04-27
+  publication_id: lesswrong
+- id: ea2056de17a8ed59
+  url: https://www.alignmentforum.org/posts/AfH2oPHCApdKicM4m/two-year-update-on-my-personal-ai-timelines
+  title: Ajeya Cotra
+  type: blog
+  cited_by:
+    - timelines
+  authors:
+    - Ajeya Cotra
+  published_date: 2022-08-02
+  publication_id: alignment-forum
+- id: 347e0b288361f087
+  url: https://www.alignmentforum.org/posts/pH6tyhEnngqWAXi9i/eis-xiii-reflections-on-anthropic-s-sae-research-circa-may
+  title: some researchers note
+  type: blog
+  cited_by:
+    - why-alignment-easy
+  authors:
+    - scasper
+  published_date: 2024-05-21
+  publication_id: alignment-forum
+- id: 533f1062192748de
+  url: https://www.alignmentforum.org/s/nyEFg3AuJpdAozmoX
+  title: Quintin Pope and collaborators
+  type: blog
+  cited_by:
+    - why-alignment-easy
+  publication_id: alignment-forum
+- id: 510fbddaf17ab0f9
+  url: https://forum.effectivealtruism.org/posts/Ljae6jJEwifD3QCr2/stable-totalitarianism-an-overview
+  title: EA Forum
+  type: web
+  cited_by:
+    - lock-in
+  authors:
+    - 80000_Hours
+    - poppinfresh
+  published_date: 2024-10-29
+  publication_id: ea-forum
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: 14b7d36fb24c1627
+  url: https://forum.effectivealtruism.org/posts/49rzRKh2ZYH2QjPkg/safety-evaluations-and-standards-for-ai-or-beth-barnes-or
+  title: Beth Barnes - Safety evaluations and standards for AI (EA Forum)
+  type: web
+  cited_by:
+    - metr
+  authors:
+    - Beth Barnes
+  published_date: 2023-06-16
+  publication_id: ea-forum
+  tags:
+    - safety
+    - evaluation
+    - evaluations
+    - dangerous-capabilities
+    - autonomous-replication
+- id: 641f3db033e60ae3
+  url: https://www.lesswrong.com/posts/vYkAjpoEeczdRJWFa/systematic-sandbagging-evaluations-on-claude-3-5-sonnet
+  title: Mahaztra 2024
+  type: blog
+  cited_by:
+    - sandbagging
+  authors:
+    - farrelmahaztra
+  published_date: 2025-02-14
+  publication_id: lesswrong
+  tags:
+    - evaluations
+    - deception
+    - situational-awareness
+- id: 361870712c6c16e3
+  url: https://www.lesswrong.com/posts/727sAH7RWsxgg93Xz/why-do-ai-researchers-rate-the-probability-of-doom-so-low
+  title: LessWrong surveys
+  type: blog
+  publication_id: lesswrong
+  cited_by:
+    - why-alignment-hard
+  authors:
+    - Aorou
+  published_date: 2022-09-24
+- id: e1fe34e189cc4c55
+  url: https://forum.effectivealtruism.org/posts/NBgpPaz5vYe3tH4ga/on-deference-and-yudkowsky-s-ai-risk-estimates
+  title: EA Forum surveys
+  type: web
+  publication_id: ea-forum
+  cited_by:
+    - why-alignment-hard
+  authors:
+    - bmg
+  published_date: 2022-06-19
+- id: 0dee84dcc4f4076f
+  url: https://forum.effectivealtruism.org/posts/8CM9vZ2nnQsWJNsHx/existential-risk-from-ai-survey-results
+  title: Existential Risk Survey Results (EA Forum)
+  type: web
+  publication_id: ea-forum
+  tags:
+    - x-risk
+  cited_by:
+    - accident-risks
+  authors:
+    - RobBensinger
+  published_date: 2021-06-01
+- id: db5e810911f924b1
+  url: https://www.alignmentforum.org/posts/FBbHEjkZzdupcjkna/miri-op-exchange-about-decision-theory-1
+  title: MIRI/Open Philanthropy exchange on decision theory
+  type: blog
+  publication_id: alignment-forum
+  cited_by:
+    - agent-foundations
+  authors:
+    - Rob Bensinger
+  published_date: 2021-08-25
+- id: d0d2b99c32eb6001
+  url: https://www.lesswrong.com/posts/v6zZaR7aDD6vkuPmx/science-of-deep-learning-more-tractably-addresses-the-sharp
+  title: LessWrong post
+  type: blog
+  publication_id: lesswrong
+  cited_by:
+    - agent-foundations
+  authors:
+    - NickGabs
+  published_date: 2023-09-19
+- id: 6ebbb63a5bb271f2
+  url: https://www.alignmentforum.org/w/inverse-reinforcement-learning
+  title: AI Alignment Forum wiki
+  type: blog
+  publication_id: alignment-forum
+  tags:
+    - alignment
+  cited_by:
+    - agent-foundations
+- id: 93813a92f14ae259
+  url: https://www.alignmentforum.org/posts/SbC7duHNDHkd3PkgG/alignment-grantmaking-is-funding-limited-right-now
+  title: Alignment grantmaking funding constraints
+  type: blog
+  publication_id: alignment-forum
+  tags:
+    - alignment
+  cited_by:
+    - research-agendas
+  authors:
+    - johnswentworth
+  published_date: 2023-07-19
+- id: 752f82912008599a
+  url: https://www.alignmentforum.org/w/goodhart-s-law
+  title: Goodhart's Law
+  type: blog
+  publication_id: alignment-forum
+  cited_by:
+    - reward-hacking
+  tags:
+    - specification-gaming
+    - goodharts-law
+    - outer-alignment

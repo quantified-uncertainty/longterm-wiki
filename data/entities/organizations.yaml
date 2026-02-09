@@ -1,0 +1,1963 @@
+# Organizations Entities
+# Auto-generated from entities.yaml - edit this file directly
+
+- id: anthropic
+  type: lab
+  title: Anthropic
+  website: https://anthropic.com
+  relatedEntries:
+    - id: dario-amodei
+      type: researcher
+    - id: chris-olah
+      type: researcher
+    - id: jan-leike
+      type: researcher
+    - id: openai
+      type: organization
+    - id: interpretability
+      type: safety-agenda
+    - id: scalable-oversight
+      type: safety-agenda
+    - id: deceptive-alignment
+      type: risk
+    - id: racing-dynamics
+      type: risk
+  sources:
+    - title: Anthropic Company Website
+      url: https://anthropic.com
+    - title: Core Views on AI Safety
+      url: https://anthropic.com/news/core-views-on-ai-safety
+    - title: Responsible Scaling Policy
+      url: https://anthropic.com/news/anthropics-responsible-scaling-policy
+    - title: Constitutional AI Paper
+      url: https://arxiv.org/abs/2212.08073
+    - title: Scaling Monosemanticity
+      url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
+    - title: Sleeper Agents Paper
+      url: https://arxiv.org/abs/2401.05566
+    - title: Many-Shot Jailbreaking Paper
+      url: >-
+        https://www-cdn.anthropic.com/af5633c94ed2beb282f6a53c595eb437e8e7b630/Many_Shot_Jailbreaking__2024_04_02_0936.pdf
+    - title: Machines of Loving Grace (Dario Amodei essay)
+      url: https://darioamodei.com/machines-of-loving-grace
+    - title: Anthropic Funding News (Crunchbase)
+      url: https://www.crunchbase.com/organization/anthropic
+    - title: Amazon Anthropic Partnership
+      url: https://press.aboutamazon.com/2023/9/amazon-and-anthropic-announce-strategic-collaboration
+    - title: Google Anthropic Investment
+      url: https://blog.google/technology/ai/google-anthropic-investment/
+  description: >-
+    Anthropic is an AI safety company founded in January 2021 by former OpenAI researchers, including siblings Dario and
+    Daniela Amodei. The company was created following disagreements with OpenAI's direction, particularly concerns about
+    the pace of commercialization and the shift toward Microsoft partnership.
+  tags:
+    - constitutional-ai
+    - rlhf
+    - interpretability
+    - responsible-scaling
+    - claude
+    - frontier-ai
+    - scalable-oversight
+    - ai-safety
+    - racing-dynamics
+  lastUpdated: 2025-12
+- id: deepmind
+  type: lab
+  title: Google DeepMind
+  website: https://deepmind.google
+  relatedEntries:
+    - id: demis-hassabis
+      type: researcher
+    - id: shane-legg
+      type: researcher
+    - id: openai
+      type: organization
+    - id: anthropic
+      type: organization
+    - id: scalable-oversight
+      type: safety-agenda
+    - id: reward-hacking
+      type: risk
+    - id: racing-dynamics
+      type: risk
+    - id: concentration-of-power
+      type: risk
+  sources:
+    - title: Google DeepMind Website
+      url: https://deepmind.google
+    - title: AlphaGo Documentary
+      url: https://www.youtube.com/watch?v=WXuK6gekU1Y
+    - title: AlphaFold Protein Structure Database
+      url: https://alphafold.ebi.ac.uk
+    - title: AlphaFold Nature Paper
+      url: https://www.nature.com/articles/s41586-021-03819-2
+    - title: Frontier Safety Framework
+      url: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
+    - title: AI Safety Gridworlds
+      url: https://arxiv.org/abs/1711.09883
+    - title: Specification Gaming Examples
+      url: https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/
+    - title: DeepMind Safety Research
+      url: https://deepmind.google/discover/blog/building-safe-artificial-intelligence-insights-from-deepmind/
+    - title: Gemini Technical Report
+      url: https://arxiv.org/abs/2312.11805
+    - title: Google DeepMind Merger Announcement
+      url: https://blog.google/technology/ai/april-ai-update/
+    - title: GraphCast Weather Prediction
+      url: >-
+        https://deepmind.google/discover/blog/graphcast-ai-model-for-faster-and-more-accurate-global-weather-forecasting/
+    - title: Nobel Prize in Chemistry 2024
+      url: https://www.nobelprize.org/prizes/chemistry/2024/press-release/
+  description: >-
+    Google DeepMind was formed in April 2023 from the merger of DeepMind and Google Brain, uniting Google's two major AI
+    research organizations. The combined entity represents one of the world's most formidable AI research labs, with
+    landmark achievements including AlphaGo (defeating world champions at Go), AlphaFold (solving protein folding), and
+    G...
+  tags:
+    - gemini
+    - alphafold
+    - alphago
+    - rlhf
+    - agi
+    - frontier-ai
+    - google
+    - scientific-ai-applications
+    - frontier-safety-framework
+    - reward-modeling
+    - scalable-oversight
+  lastUpdated: 2025-12
+- id: openai
+  type: lab
+  title: OpenAI
+  website: https://openai.com
+  relatedEntries:
+    - id: sam-altman
+      type: researcher
+    - id: ilya-sutskever
+      type: researcher
+    - id: jan-leike
+      type: researcher
+    - id: anthropic
+      type: organization
+    - id: interpretability
+      type: safety-agenda
+    - id: scalable-oversight
+      type: safety-agenda
+    - id: racing-dynamics
+      type: risk
+    - id: deceptive-alignment
+      type: risk
+  sources:
+    - title: OpenAI Website
+      url: https://openai.com
+    - title: OpenAI Charter
+      url: https://openai.com/charter
+    - title: GPT-4 System Card
+      url: https://cdn.openai.com/papers/gpt-4-system-card.pdf
+    - title: InstructGPT Paper
+      url: https://arxiv.org/abs/2203.02155
+    - title: Preparedness Framework
+      url: https://openai.com/safety/preparedness
+    - title: Weak-to-Strong Generalization
+      url: https://arxiv.org/abs/2312.09390
+    - title: Jan Leike Resignation Statement
+      url: https://twitter.com/janleike/status/1791498184887095344
+    - title: November 2023 Governance Crisis (reporting)
+      url: https://www.theverge.com/2023/11/17/23965982/openai-ceo-sam-altman-fired
+    - title: Microsoft OpenAI Partnership
+      url: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenaiextendpartnership/
+    - title: o1 System Card
+      url: https://openai.com/index/openai-o1-system-card/
+    - title: OpenAI Funding History (Crunchbase)
+      url: https://www.crunchbase.com/organization/openai
+  description: >-
+    OpenAI is the AI research company that brought large language models into mainstream consciousness through ChatGPT.
+    Founded in December 2015 as a non-profit with the mission to ensure artificial general intelligence benefits all of
+    humanity, OpenAI has undergone dramatic evolution - from non-profit to "capped-profit," from research lab to
+    produc...
+  tags:
+    - gpt-4
+    - chatgpt
+    - rlhf
+    - preparedness
+    - agi
+    - frontier-ai
+    - o1
+    - reasoning-models
+    - microsoft
+    - governance
+    - racing-dynamics
+    - alignment-research
+  lastUpdated: 2025-12
+- id: xai
+  type: lab
+  title: xAI
+  website: https://x.ai
+  relatedEntries:
+    - id: elon-musk
+      type: researcher
+    - id: openai
+      type: organization
+    - id: anthropic
+      type: organization
+    - id: racing-dynamics
+      type: risk
+    - id: content-moderation
+      type: concepts
+    - id: agi-race
+      type: concepts
+  sources:
+    - title: xAI Website
+      url: https://x.ai
+    - title: Grok Announcements
+      url: https://x.ai/blog
+    - title: Elon Musk on X (Twitter)
+      url: https://twitter.com/elonmusk
+    - title: xAI Funding Announcements
+    - title: Grok Technical Details
+      url: https://x.ai/blog/grok
+  description: >-
+    xAI is an artificial intelligence company founded by Elon Musk in July 2023 with the stated mission to "understand
+    the true nature of the universe" through AI.
+  tags:
+    - grok
+    - elon-musk
+    - x-integration
+    - truth-seeking-ai
+    - content-moderation
+    - free-speech
+    - ai-safety-philosophy
+    - racing-dynamics
+    - frontier-ai
+    - agi-development
+  lastUpdated: 2025-12
+- id: chai
+  type: lab-academic
+  title: CHAI
+  website: https://humancompatible.ai
+  relatedEntries:
+    - id: value-learning
+      type: safety-agenda
+    - id: reward-hacking
+      type: risk
+    - id: corrigibility
+      type: safety-agenda
+  sources:
+    - title: CHAI Website
+      url: https://humancompatible.ai
+    - title: Human Compatible (Book)
+      url: https://www.penguinrandomhouse.com/books/566677/human-compatible-by-stuart-russell/
+    - title: Stuart Russell on AI Risk
+      url: https://www.youtube.com/watch?v=EBK-a94IFHY
+  description: >-
+    The Center for Human-Compatible AI (CHAI) is an academic research center at UC Berkeley focused on ensuring AI
+    systems are beneficial to humans. Founded by Stuart Russell, author of the leading AI textbook, CHAI brings academic
+    rigor to AI safety research.
+  tags:
+    - inverse-reinforcement-learning
+    - value-learning
+    - assistance-games
+    - human-compatible-ai
+    - academic-ai-safety
+  lastUpdated: 2025-12
+- id: apollo-research
+  type: lab-research
+  title: Apollo Research
+  website: https://www.apolloresearch.ai
+  relatedEntries:
+    - id: deceptive-alignment
+      type: risk
+    - id: sandbagging
+      type: risk
+    - id: metr
+      type: organization
+    - id: arc
+      type: organization
+    - id: anthropic
+      type: organization
+    - id: uk-aisi
+      type: organization
+    - id: situational-awareness
+      type: risk
+    - id: capability-evaluations
+      type: safety-agenda
+  sources:
+    - title: Apollo Research Website
+      url: https://www.apolloresearch.ai
+    - title: Apollo Research Publications
+      url: https://www.apolloresearch.ai/research
+    - title: Evaluating Frontier Models for Dangerous Capabilities
+      url: https://www.apolloresearch.ai/research/scheming-evaluations
+    - title: Apollo on Sandbagging
+      url: https://www.apolloresearch.ai/blog/sandbagging
+    - title: Situational Awareness Research
+      url: https://www.apolloresearch.ai/research/situational-awareness
+    - title: Apollo Research Blog
+      url: https://www.apolloresearch.ai/blog
+  description: >-
+    Apollo Research is an AI safety research organization founded in 2022 with a specific focus on one of the most
+    concerning potential failure modes: deceptive alignment and scheming behavior in advanced AI systems.
+  tags:
+    - deception
+    - scheming
+    - sandbagging
+    - evaluations
+    - situational-awareness
+    - strategic-deception
+    - red-teaming
+    - alignment-failures
+    - dangerous-capabilities
+    - model-organisms
+    - adversarial-testing
+  lastUpdated: 2025-12
+- id: cais
+  type: lab-research
+  title: CAIS
+  website: https://safe.ai
+  relatedEntries:
+    - id: existential-risk
+      type: risk
+    - id: power-seeking
+      type: risk
+    - id: anthropic
+      type: lab
+  sources:
+    - title: CAIS Website
+      url: https://safe.ai
+    - title: Statement on AI Risk
+      url: https://www.safe.ai/statement-on-ai-risk
+    - title: Representation Engineering Paper
+      url: https://arxiv.org/abs/2310.01405
+  description: >-
+    The Center for AI Safety (CAIS) is a nonprofit organization that works to reduce societal-scale risks from AI. CAIS
+    combines research, field-building, and public communication to advance AI safety.
+  tags:
+    - ai-safety
+    - x-risk
+    - representation-engineering
+    - field-building
+    - ai-risk-communication
+  lastUpdated: 2025-12
+- id: conjecture
+  type: lab-research
+  title: Conjecture
+  website: https://conjecture.dev
+  relatedEntries:
+    - id: connor-leahy
+      type: researcher
+    - id: interpretability
+      type: safety-agenda
+    - id: anthropic
+      type: organization
+    - id: redwood
+      type: organization
+    - id: prosaic-alignment
+      type: safety-agenda
+    - id: uk-aisi
+      type: organization
+  sources:
+    - title: Conjecture Website
+      url: https://conjecture.dev
+    - title: Connor Leahy Twitter/X
+      url: https://twitter.com/NPCollapse
+    - title: EleutherAI Background
+      url: https://www.eleuther.ai
+    - title: Conjecture Funding Announcement
+      url: https://techcrunch.com/2023/03/28/conjecture-raises-funding-for-ai-safety/
+    - title: Cognitive Emulation Research
+      url: https://conjecture.dev/research
+    - title: Connor Leahy Podcast Appearances
+  description: >-
+    Conjecture is an AI safety research organization founded in 2021 by Connor Leahy and a team of researchers concerned
+    about existential risks from advanced AI.
+  tags:
+    - cognitive-emulation
+    - coem
+    - interpretability
+    - neural-network-internals
+    - circuit-analysis
+    - model-organisms
+    - eleutherai
+    - european-ai-safety
+    - alternative-paradigms
+  lastUpdated: 2025-12
+- id: far-ai
+  type: lab-research
+  title: FAR AI
+  website: https://far.ai
+  relatedEntries:
+    - id: dan-hendrycks
+      type: researcher
+    - id: adversarial-robustness
+      type: safety-agenda
+    - id: natural-abstractions
+      type: concepts
+    - id: benchmarking
+      type: safety-agenda
+    - id: metr
+      type: organization
+    - id: apollo-research
+      type: organization
+  sources:
+    - title: FAR AI Website
+      url: https://far.ai
+    - title: Dan Hendrycks Google Scholar
+      url: https://scholar.google.com/citations?user=VUnTdTkAAAAJ
+    - title: MMLU Paper
+      url: https://arxiv.org/abs/2009.03300
+    - title: Natural Abstractions Research
+      url: https://www.alignmentforum.org/tag/natural-abstraction
+    - title: Dan Hendrycks on X-risk
+      url: https://arxiv.org/abs/2306.12001
+  description: >-
+    FAR AI (Forecasting AI Research) is an AI safety research organization founded in 2023 with a focus on adversarial
+    robustness, model evaluation, and alignment research. The organization was co-founded by Dan Hendrycks, a prominent
+    AI safety researcher known for his work on benchmarks, robustness, and AI risk.
+  tags:
+    - adversarial-robustness
+    - ml-safety
+    - benchmarking
+    - natural-abstractions
+    - evaluation
+    - mmlu
+    - out-of-distribution-detection
+    - safety-evaluations
+    - empirical-research
+    - academic-ai-safety
+  lastUpdated: 2025-12
+- id: govai
+  type: lab-research
+  title: GovAI
+  website: https://governance.ai
+  relatedEntries:
+    - id: compute-governance
+      type: policy
+    - id: international-coordination
+      type: policy
+    - id: deepmind
+      type: lab
+  sources:
+    - title: GovAI Website
+      url: https://governance.ai
+    - title: Computing Power and AI Governance
+      url: https://governance.ai/compute
+    - title: GovAI Research Papers
+      url: https://governance.ai/research
+  description: >-
+    The Centre for the Governance of AI (GovAI) is a research organization focused on AI policy and governance.
+    Originally part of the Future of Humanity Institute at Oxford, GovAI became independent in 2023 when FHI closed.
+  tags:
+    - governance
+    - compute-governance
+    - international
+    - regulation
+  lastUpdated: 2025-12
+- id: metr
+  type: lab-research
+  title: METR
+  website: https://metr.org
+  relatedEntries:
+    - id: beth-barnes
+      type: researcher
+    - id: paul-christiano
+      type: researcher
+    - id: arc
+      type: organization
+    - id: apollo-research
+      type: organization
+    - id: autonomous-replication
+      type: risk
+    - id: cyber-offense
+      type: risk
+    - id: bio-risk
+      type: risk
+    - id: anthropic
+      type: organization
+    - id: openai
+      type: organization
+    - id: uk-aisi
+      type: organization
+  sources:
+    - title: METR Website
+      url: https://metr.org
+    - title: METR Evaluations
+      url: https://metr.org/evaluations
+    - title: GPT-4 System Card (ARC Evals section)
+      url: https://cdn.openai.com/papers/gpt-4-system-card.pdf
+    - title: OpenAI Preparedness Framework
+      url: https://openai.com/safety/preparedness
+    - title: Anthropic Responsible Scaling Policy
+      url: https://anthropic.com/news/anthropics-responsible-scaling-policy
+    - title: Beth Barnes on Twitter/X
+      url: https://twitter.com/beth_from_ba
+    - title: METR Research and Blog
+      url: https://metr.org/blog
+  description: >-
+    METR (Model Evaluation and Threat Research), formerly known as ARC Evals, is an organization dedicated to evaluating
+    frontier AI models for dangerous capabilities before deployment.
+  tags:
+    - evaluations
+    - dangerous-capabilities
+    - autonomous-replication
+    - cybersecurity
+    - cbrn
+    - bio-risk
+    - red-teaming
+    - capability-elicitation
+    - deployment-decisions
+    - pre-deployment-testing
+    - safety-thresholds
+    - responsible-scaling
+    - preparedness-framework
+  lastUpdated: 2025-12
+- id: arc
+  type: organization
+  title: ARC
+  website: https://alignment.org
+  relatedEntries:
+    - id: paul-christiano
+      type: researcher
+    - id: scalable-oversight
+      type: safety-agenda
+    - id: deceptive-alignment
+      type: risk
+    - id: sandbagging
+      type: risk
+    - id: anthropic
+      type: organization
+    - id: openai
+      type: organization
+    - id: miri
+      type: organization
+    - id: uk-aisi
+      type: policies
+  sources:
+    - title: ARC Website
+      url: https://alignment.org
+    - title: ELK Report
+      url: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
+    - title: ARC Evals
+      url: https://evals.alignment.org
+    - title: GPT-4 Evaluation (ARC summary)
+      url: https://evals.alignment.org/blog/2023-03-18-update-on-recent-evals/
+    - title: Paul Christiano's AI Alignment Forum posts
+      url: https://www.alignmentforum.org/users/paulfchristiano
+    - title: Iterated Amplification
+      url: https://ai-alignment.com/iterated-distillation-and-amplification-157debfd1616
+    - title: AI Safety via Debate
+      url: https://arxiv.org/abs/1805.00899
+    - title: Ajeya Cotra's Bio Anchors
+      url: https://www.alignmentforum.org/posts/KrJfoZzpSDpnrv9va/draft-report-on-ai-timelines
+  description: >-
+    The Alignment Research Center (ARC) was founded in 2021 by Paul Christiano after his departure from OpenAI. ARC
+    represents a distinctive approach to AI alignment: combining theoretical research on fundamental problems (like
+    Eliciting Latent Knowledge) with practical evaluations of frontier models for dangerous capabilities.
+  tags:
+    - eliciting-latent-knowledge
+    - elk
+    - evaluations
+    - scalable-oversight
+    - ai-evals
+    - deception
+    - worst-case-alignment
+    - debate
+    - amplification
+    - adversarial-testing
+    - autonomous-replication
+    - sandbagging
+  lastUpdated: 2025-12
+- id: epoch-ai
+  type: organization
+  title: Epoch AI
+  website: https://epochai.org
+  relatedEntries:
+    - id: compute-governance
+      type: policies
+    - id: transformative-ai
+      type: concepts
+    - id: scaling-laws
+      type: concepts
+    - id: ai-timelines
+      type: concepts
+    - id: data-constraints
+      type: concepts
+  sources:
+    - title: Epoch AI Website
+      url: https://epochai.org
+    - title: Epoch Parameter Database
+      url: https://epochai.org/data/epochdb/visualization
+    - title: Compute Trends Paper
+      url: https://epochai.org/blog/compute-trends
+    - title: Will We Run Out of Data?
+      url: https://epochai.org/blog/will-we-run-out-of-data
+    - title: Algorithmic Progress Research
+      url: https://epochai.org/blog/revisiting-algorithmic-progress
+    - title: Epoch Research Blog
+      url: https://epochai.org/blog
+    - title: Epoch on Twitter/X
+      url: https://twitter.com/epoch_ai
+  description: >-
+    Epoch AI is a research organization dedicated to producing rigorous, data-driven forecasts and analysis about
+    artificial intelligence progress, with particular focus on compute trends, training datasets, algorithmic
+    efficiency, and AI timelines.
+  tags:
+    - ai-forecasting
+    - compute-trends
+    - training-datasets
+    - algorithmic-progress
+    - ai-timelines
+    - transformative-ai
+    - compute-governance
+    - parameter-counts
+    - scaling
+    - data-constraints
+    - empirical-analysis
+    - trend-extrapolation
+  lastUpdated: 2025-12
+- id: miri
+  type: organization
+  title: MIRI
+  website: https://intelligence.org
+  relatedEntries:
+    - id: eliezer-yudkowsky
+      type: researcher
+    - id: nate-soares
+      type: researcher
+    - id: paul-christiano
+      type: researcher
+    - id: instrumental-convergence
+      type: risk
+    - id: corrigibility-failure
+      type: risk
+    - id: sharp-left-turn
+      type: risk
+    - id: compute-governance
+      type: policies
+    - id: arc
+      type: organization
+  sources:
+    - title: MIRI Website
+      url: https://intelligence.org
+    - title: MIRI 2023 Strategy Update
+      url: https://intelligence.org/2023/03/09/miri-announces-new-death-with-dignity-strategy/
+    - title: Risks from Learned Optimization (Hubinger et al.)
+      url: https://arxiv.org/abs/1906.01820
+    - title: Logical Induction Paper
+      url: https://arxiv.org/abs/1609.03543
+    - title: Embedded Agency (Demski, Garrabrant)
+      url: https://intelligence.org/2018/10/29/embedded-agency/
+    - title: LessWrong Sequences
+      url: https://www.lesswrong.com/sequences
+    - title: Eliezer Yudkowsky TIME Op-Ed
+      url: https://time.com/6266923/ai-eliezer-yudkowsky-open-letter-not-enough/
+    - title: Agent Foundations Research
+      url: https://intelligence.org/research-guide/
+    - title: Facing the Intelligence Explosion (Muehlhauser)
+      url: https://intelligence.org/files/IE-EI.pdf
+    - title: MIRI on GiveWell
+      url: https://www.givewell.org/charities/machine-intelligence-research-institute
+  description: >-
+    The Machine Intelligence Research Institute (MIRI) is one of the oldest organizations focused on AI existential
+    risk, founded in 2000 as the Singularity Institute for Artificial Intelligence (SIAI).
+  tags:
+    - agent-foundations
+    - decision-theory
+    - corrigibility
+    - instrumental-convergence
+    - embedded-agency
+    - governance
+    - logical-uncertainty
+    - rationalist-community
+    - lesswrong
+    - sharp-left-turn
+    - security-mindset
+    - deconfusion
+  lastUpdated: 2025-12
+- id: redwood
+  type: organization
+  title: Redwood Research
+  website: https://redwoodresearch.org
+  relatedEntries:
+    - id: interpretability
+      type: safety-agenda
+    - id: ai-control
+      type: safety-agenda
+    - id: scheming
+      type: risk
+    - id: sandbagging
+      type: risk
+    - id: anthropic
+      type: organization
+    - id: arc
+      type: organization
+    - id: miri
+      type: organization
+  sources:
+    - title: Redwood Research Website
+      url: https://redwoodresearch.org
+    - title: AI Control Paper
+      url: https://arxiv.org/abs/2312.06942
+    - title: Causal Scrubbing
+      url: https://www.alignmentforum.org/posts/JvZhhzycHu2Yd57RN/causal-scrubbing-a-method-for-rigorously-testing
+    - title: Adversarial Training for High-Stakes Safety
+      url: https://arxiv.org/abs/2205.01663
+    - title: Redwood Research on Alignment Forum
+      url: https://www.alignmentforum.org/users/redwood-research
+    - title: Neel Nanda's Interpretability Work
+      url: https://www.neelnanda.io/mechanistic-interpretability
+  description: >-
+    Redwood Research is an AI safety lab founded in 2021 that has made significant contributions to mechanistic
+    interpretability and, more recently, pioneered the "AI control" research agenda.
+  tags:
+    - interpretability
+    - causal-scrubbing
+    - ai-control
+    - adversarial-robustness
+    - polysemanticity
+    - scheming
+    - deception-detection
+    - red-teaming
+    - monitoring
+    - safety-protocols
+  lastUpdated: 2025-12
+- id: uk-aisi
+  type: organization
+  title: UK AI Safety Institute
+  website: https://www.aisi.gov.uk
+  relatedEntries:
+    - id: ian-hogarth
+      type: researcher
+    - id: us-aisi
+      type: organization
+    - id: metr
+      type: organization
+    - id: apollo-research
+      type: organization
+    - id: ai-safety-summit
+      type: events
+    - id: anthropic
+      type: organization
+    - id: openai
+      type: organization
+    - id: deepmind
+      type: organization
+  sources:
+    - title: UK AI Safety Institute Website
+      url: https://www.aisi.gov.uk
+    - title: Bletchley Declaration
+      url: https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration
+    - title: UK AI Safety Summit
+      url: https://www.aisafetysummit.gov.uk
+    - title: UK DSIT AI Policy
+      url: https://www.gov.uk/government/organisations/department-for-science-innovation-and-technology
+    - title: Ian Hogarth FT Op-Ed
+      url: https://www.ft.com/content/03895dc4-a3b7-481e-95cc-336a524f2ac2
+    - title: UK AI Safety Institute Announcements
+      url: https://www.gov.uk/search/news-and-communications?organisations%5B%5D=ai-safety-institute
+  description: >-
+    The UK AI Safety Institute (UK AISI) is a government organization established in 2023 to advance AI safety through
+    research, evaluation, and international coordination. Created in the wake of the first AI Safety Summit hosted by
+    the UK government, AISI represents the UK's commitment to being a global leader in AI safety and governance.
+  tags:
+    - governance
+    - government-ai-safety
+    - international
+    - evaluations
+    - bletchley-declaration
+    - ai-safety-summits
+    - standard-setting
+    - uk-ai-policy
+    - frontier-model-evaluation
+    - global-ai-safety
+    - regulatory-framework
+  lastUpdated: 2025-12
+- id: us-aisi
+  type: organization
+  title: US AI Safety Institute
+  website: https://www.nist.gov/aisi
+  relatedEntries:
+    - id: uk-aisi
+      type: organization
+    - id: metr
+      type: organization
+    - id: apollo-research
+      type: organization
+    - id: compute-governance
+      type: policies
+    - id: ai-executive-order
+      type: policies
+    - id: anthropic
+      type: organization
+    - id: openai
+      type: organization
+  sources:
+    - title: US AI Safety Institute Website
+      url: https://www.nist.gov/aisi
+    - title: NIST AI Risk Management Framework
+      url: https://www.nist.gov/itl/ai-risk-management-framework
+    - title: Executive Order on AI (October 2023)
+      url: >-
+        https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+    - title: NIST AI Portal
+      url: https://www.nist.gov/artificial-intelligence
+    - title: US AISI Announcements
+      url: >-
+        https://www.commerce.gov/news/press-releases/2023/11/biden-harris-administration-announces-key-ai-actions-following-president
+  description: >-
+    The US AI Safety Institute (US AISI) is a government agency within the National Institute of Standards and
+    Technology (NIST) established in 2023 to develop standards, evaluations, and guidelines for safe and trustworthy
+    artificial intelligence.
+  tags:
+    - governance
+    - government-oversight
+    - ai-standards
+    - evaluations
+    - nist
+    - regulatory-framework
+    - international
+    - ai-safety
+    - public-interest
+    - regulatory-capture
+    - standard-setting
+  lastUpdated: 2025-12
+- id: arc-evals
+  type: organization
+  title: ARC Evaluations
+  description: Organization focused on evaluating AI systems for dangerous capabilities. Now largely absorbed into METR.
+  status: stub
+  relatedEntries:
+    - id: metr
+      type: lab-research
+    - id: capability-evaluations
+      type: concept
+  tags:
+    - evaluations
+    - ai-safety
+  lastUpdated: 2025-12
+- id: fhi
+  type: organization
+  title: Future of Humanity Institute
+  description: Oxford University research center focused on existential risks, founded by Nick Bostrom. Closed in 2024.
+  status: stub
+  relatedEntries:
+    - id: nick-bostrom
+      type: researcher
+    - id: existential-risk
+      type: concept
+  tags:
+    - research-org
+    - existential-risk
+    - oxford
+  lastUpdated: 2025-12
+# Batch 4 - Organization Entity Definitions
+# Generated 2026-02-08
+
+- id: openai-foundation
+  type: organization
+  title: OpenAI Foundation
+  description: >-
+    Nonprofit organization holding 26% equity stake (~$130B) in OpenAI Group PBC,
+    with governance control through board appointment rights and philanthropic
+    commitments focused on health and AI resilience.
+  tags:
+    - nonprofit-governance
+    - ai-philanthropy
+    - corporate-structure
+    - accountability
+    - openai
+  clusters:
+    - governance
+    - community
+  relatedEntries:
+    - id: openai
+      type: organization
+    - id: sam-altman
+      type: researcher
+    - id: long-term-benefit-trust
+      type: organization
+    - id: anthropic
+      type: lab
+    - id: giving-pledge
+      type: concept
+  lastUpdated: 2026-02
+
+- id: leading-the-future
+  type: organization
+  title: Leading the Future super PAC
+  description: >-
+    Pro-AI industry super PAC launched in 2025 to influence federal AI regulation
+    and the 2026 midterm elections, backed by over $125 million from OpenAI,
+    Andreessen Horowitz, and other tech leaders.
+  tags:
+    - political-advocacy
+    - super-pac
+    - ai-regulation
+    - elections
+    - lobbying
+  clusters:
+    - community
+    - governance
+  relatedEntries:
+    - id: openai
+      type: organization
+    - id: marc-andreessen
+      type: researcher
+    - id: ai-governance
+      type: concept
+  lastUpdated: 2026-02
+
+- id: johns-hopkins-center-for-health-security
+  type: organization
+  title: Johns Hopkins Center for Health Security
+  description: >-
+    Independent nonprofit research organization focused on preventing and preparing
+    for epidemics, pandemics, and biological threats, with significant work on
+    biosecurity and AI-biotechnology convergence.
+  tags:
+    - biosecurity
+    - pandemic-preparedness
+    - ai-bio-convergence
+    - health-security
+    - policy-research
+  clusters:
+    - community
+    - governance
+  relatedEntries:
+    - id: open-philanthropy
+      type: organization
+    - id: anthropic
+      type: lab
+  lastUpdated: 2026-02
+
+- id: nist-ai
+  type: organization
+  title: NIST and AI Safety
+  description: >-
+    The National Institute of Standards and Technology's role in developing AI
+    standards, risk management frameworks, and safety guidelines for the United
+    States.
+  tags:
+    - ai-standards
+    - risk-management
+    - government-policy
+    - ai-evaluation
+    - trustworthy-ai
+  clusters:
+    - ai-safety
+    - governance
+    - community
+  relatedEntries:
+    - id: paul-christiano
+      type: researcher
+    - id: openai
+      type: organization
+    - id: ai-governance
+      type: concept
+  lastUpdated: 2026-02
+
+- id: ssi
+  type: lab-research
+  title: Safe Superintelligence Inc (SSI)
+  description: >-
+    AI research startup founded by Ilya Sutskever, Daniel Gross, and Daniel Levy
+    with a singular focus on developing safe superintelligence without commercial
+    distractions.
+  tags:
+    - superintelligence
+    - ai-safety-lab
+    - alignment
+    - frontier-ai
+    - scaling
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: ilya-sutskever
+      type: researcher
+    - id: openai
+      type: organization
+    - id: anthropic
+      type: lab
+    - id: deepmind
+      type: lab
+  lastUpdated: 2026-02
+
+- id: controlai
+  type: organization
+  title: ControlAI
+  description: >-
+    UK-based AI safety advocacy organization focused on preventing artificial
+    superintelligence development through policy campaigns and grassroots outreach
+    to lawmakers.
+  tags:
+    - ai-advocacy
+    - policy-campaigns
+    - uk-policy
+    - binding-regulation
+    - grassroots
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: conjecture
+      type: organization
+    - id: connor-leahy
+      type: researcher
+    - id: eu-ai-act
+      type: concept
+  lastUpdated: 2026-02
+
+- id: frontier-model-forum
+  type: organization
+  title: Frontier Model Forum
+  description: >-
+    Industry-led non-profit organization promoting self-governance in frontier AI
+    safety through collaborative frameworks, research funding, and best practices
+    development.
+  tags:
+    - industry-self-governance
+    - safety-frameworks
+    - frontier-models
+    - ai-standards
+    - risk-evaluation
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: deepmind
+      type: lab
+    - id: openai
+      type: organization
+    - id: jaan-tallinn
+      type: researcher
+  lastUpdated: 2026-02
+
+- id: palisade-research
+  type: lab-research
+  title: Palisade Research
+  description: >-
+    Nonprofit organization investigating offensive AI capabilities and
+    controllability of frontier AI models through empirical research on autonomous
+    hacking, shutdown resistance, and agentic misalignment.
+  tags:
+    - shutdown-resistance
+    - autonomous-hacking
+    - ai-controllability
+    - cyber-security
+    - red-teaming
+  clusters:
+    - ai-safety
+    - community
+    - cyber
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: yoshua-bengio
+      type: researcher
+    - id: dario-amodei
+      type: researcher
+    - id: sff
+      type: organization
+    - id: alignment
+      type: concept
+  lastUpdated: 2026-02
+
+- id: centre-for-long-term-resilience
+  type: organization
+  title: Centre for Long-Term Resilience
+  description: >-
+    UK-based think tank focused on extreme risks from AI, biosecurity, and
+    improving government risk management through policy research and direct
+    advisory work.
+  tags:
+    - uk-policy
+    - extreme-risks
+    - biosecurity
+    - effective-altruism
+    - government-advisory
+  clusters:
+    - governance
+    - community
+    - ai-safety
+  relatedEntries:
+    - id: open-philanthropy
+      type: organization
+    - id: sff
+      type: organization
+  lastUpdated: 2026-02
+
+- id: goodfire
+  type: lab-research
+  title: Goodfire
+  description: >-
+    AI interpretability research lab developing tools to decode and control neural
+    network internals for safer AI systems.
+  tags:
+    - mechanistic-interpretability
+    - sparse-autoencoders
+    - ai-safety-startup
+    - model-transparency
+    - feature-steering
+  clusters:
+    - ai-safety
+    - community
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: dario-amodei
+      type: researcher
+    - id: chris-olah
+      type: researcher
+    - id: openai
+      type: organization
+    - id: deepmind
+      type: lab
+    - id: interpretability
+      type: safety-agenda
+  lastUpdated: 2026-02
+
+
+# === Auto-generated stubs for pages missing entities ===
+- id: 1day-sooner
+  type: organization
+  title: 1Day Sooner
+  description: >-
+    A pandemic preparedness nonprofit originally founded to advocate for
+    COVID-19 human challenge trials, now working on indoor air quality
+    (germicidal UV), advance market commitments for vaccines, hepatitis C
+    challenge studies, and biosecurity policy. Cumulative funding of ~$12.8M
+    from sources includin
+  clusters:
+    - biorisks
+    - community
+    - governance
+  lastUpdated: 2026-02
+- id: 80000-hours
+  type: organization
+  title: 80,000 Hours
+  description: >-
+    80,000 Hours is the largest EA career organization, reaching 10M+ readers
+    and reporting 3,000+ significant career plan changes, with 80% of $10M+
+    funding from Coefficient Giving. Since 2016 they've prioritized AI safety,
+    shifting explicitly to AGI focus in 2025, providing career guidance through
+    the
+  clusters:
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: ai-futures-project
+  type: organization
+  title: AI Futures Project
+  description: >-
+    AI Futures Project is a nonprofit founded in 2024-2025 by former OpenAI
+    researcher Daniel Kokotajlo that produces detailed AI capability forecasts,
+    most notably the AI 2027 scenario depicting rapid progress to
+    superintelligence. The organization has revised timelines significantly (AGI
+    median shifte
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02
+- id: ai-impacts
+  type: organization
+  title: AI Impacts
+  description: >-
+    AI Impacts is a research organization that conducts empirical analysis of AI
+    timelines and risks through surveys and historical trend analysis,
+    contributing valuable data to AI safety discourse. While their work provides
+    useful evidence synthesis and expert opinion surveys, it faces inherent
+    limitat
+  clusters:
+    - ai-safety
+    - community
+    - epistemics
+  lastUpdated: 2026-02
+- id: ai-revenue-sources
+  type: organization
+  title: AI Revenue Sources
+  description: >-
+    Analysis of the AI revenue gap. Hyperscalers are spending ~$700B on AI
+    infrastructure in 2026 while direct AI service revenue is ~$25-50B—a 6-14x
+    mismatch. Sequoia's framework identifies a $500B+ hole between required and
+    actual AI revenue. Largest current revenue streams: Nvidia hardware ($130B),
+    A
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: arb-research
+  type: organization
+  title: Arb Research
+  description: >-
+    Arb Research is a small AI safety consulting firm that produces
+    methodologically rigorous research and evaluations, particularly known for
+    their AI Safety Camp impact assessment and forecasting work. While their
+    contributions are solid and well-documented, they represent incremental
+    progress rather 
+  clusters:
+    - community
+    - ai-safety
+    - epistemics
+  lastUpdated: 2026-02
+- id: blueprint-biosecurity
+  type: organization
+  title: Blueprint Biosecurity
+  description: >-
+    An EA-funded biosecurity nonprofit founded in 2023 by Jake Swett, dedicated
+    to achieving breakthroughs in pandemic prevention through far-UVC germicidal
+    light, next-generation PPE, and glycol vapor air disinfection. Funded
+    primarily by Open Philanthropy (~$1.85M) and recommended by Founders Pledge.
+  clusters:
+    - biorisks
+    - community
+    - governance
+  lastUpdated: 2026-02
+- id: bridgewater-aia-labs
+  type: organization
+  title: Bridgewater AIA Labs
+  description: >-
+    Bridgewater AIA Labs launched a $2B AI-driven macro fund in July 2024 that
+    returned 11.9% in 2025, using proprietary ML models plus LLMs from
+    OpenAI/Anthropic/Perplexity with multi-layer guardrails that reduced error
+    rates from 8% to 1.6%. The division has minimal AI safety relevance,
+    focusing on fi
+  clusters:
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: cea
+  type: organization
+  title: Centre for Effective Altruism
+  description: >-
+    Oxford-based organization that coordinates the effective altruism movement,
+    running EA Global conferences, supporting local groups, and maintaining the
+    EA Forum.
+  clusters:
+    - community
+  lastUpdated: 2026-02
+- id: center-for-applied-rationality
+  type: organization
+  title: Center for Applied Rationality
+  description: >-
+    Berkeley nonprofit founded 2012 teaching applied rationality through
+    workshops ($3,900 for 4.5 days), trained 1,300+ alumni reporting 9.2/10
+    satisfaction and 0.17σ life satisfaction increase at 1-year follow-up.
+    Received $3.5M+ from Open Philanthropy and $5M from FTX (later clawed back);
+    faced major
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: chan-zuckerberg-initiative
+  type: organization
+  title: Chan Zuckerberg Initiative
+  description: >-
+    The Chan Zuckerberg Initiative is a philanthropic LLC that has pivoted
+    dramatically from broad social causes to AI-powered biomedical research,
+    with substantial funding ($10B+ over next decade) but minimal engagement
+    with AI safety concerns despite heavy AI investment. The article provides
+    comprehen
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: coalition-for-epidemic-preparedness-innovations
+  type: organization
+  title: Coalition for Epidemic Preparedness Innovations
+  description: >-
+    CEPI is an international vaccine development partnership founded in 2017
+    that addresses market failures in pandemic preparedness by funding vaccines
+    for diseases with limited commercial viability. While achieving notable
+    success during COVID-19, the organization faces ongoing criticism for
+    weakening
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: coefficient-giving
+  type: organization
+  title: Coefficient Giving
+  description: >-
+    Coefficient Giving (formerly Open Philanthropy) has directed $4B+ in grants
+    since 2014, including $336M to AI safety (~60% of external funding). The
+    organization spent ~$50M on AI safety in 2024, with 68% going to
+    evaluations/benchmarking, and launched a $40M Technical AI Safety RFP in
+    2025 covering
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: council-on-strategic-risks
+  type: organization
+  title: Council on Strategic Risks
+  description: >-
+    The Council on Strategic Risks is a DC-based nonprofit founded in 2017 that
+    focuses on climate-security intersections, strategic weapons, and ecological
+    risks through three research centers. While the organization claims
+    nonpartisan status, its left-leaning funding sources and critical stance
+    toward
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: cser
+  type: organization
+  title: CSER (Centre for the Study of Existential Risk)
+  description: >-
+    CSER is a Cambridge-based existential risk research centre founded in 2012,
+    now funded at ~$1M+ annually from FLI and other sources, producing 24+
+    publications in 2022 across AI safety, biosecurity, climate catastrophes,
+    and nuclear risks. The centre has advised UN, WHO, and multiple governments
+    on 
+  clusters:
+    - community
+    - ai-safety
+    - biorisks
+    - governance
+  lastUpdated: 2026-02
+- id: cset
+  type: organization
+  title: CSET (Center for Security and Emerging Technology)
+  description: >-
+    CSET is a $100M+ Georgetown center with 50+ staff conducting data-driven AI
+    policy research, particularly on U.S.-China competition and export controls.
+    The center conducts hundreds of annual government briefings and operates the
+    Emerging Technology Observatory with 10 public tools and 8 datasets.
+  clusters:
+    - community
+    - governance
+    - ai-safety
+  lastUpdated: 2026-02
+- id: ea-global
+  type: organization
+  title: EA Global
+  description: >-
+    EA Global is a series of selective conferences organized by the Centre for
+    Effective Altruism that connects committed EA practitioners to collaborate
+    on global challenges, with AI safety becoming increasingly prominent (53% of
+    2024 survey respondents identified it as most pressing). The conferences 
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: elicit
+  type: organization
+  title: Elicit
+  description: >-
+    Elicit is an AI research assistant with 2M+ users that searches 138M papers
+    and automates literature reviews, founded by AI alignment researchers from
+    Ought and funded by Open Philanthropy ($31M total). The platform achieved
+    90%+ extraction accuracy and claims 80% time savings for systematic reviews
+  clusters:
+    - ai-safety
+    - community
+    - epistemics
+  lastUpdated: 2026-02
+- id: epistemic-orgs-epoch-ai
+  type: organization
+  title: Epoch AI
+  description: >-
+    Epoch AI maintains comprehensive databases tracking 3,200+ ML models showing
+    4.4x annual compute growth and projects data exhaustion 2026-2032. Their
+    empirical work directly informed EU AI Act's 10^25 FLOP threshold and US EO
+    14110, with their Epoch Capabilities Index showing ~90% acceleration in AI
+  clusters:
+    - community
+    - epistemics
+    - ai-safety
+  lastUpdated: 2026-02
+- id: fli
+  type: organization
+  title: Future of Life Institute (FLI)
+  description: >-
+    Comprehensive profile of FLI documenting $25M+ in grants distributed (2015:
+    $7M to 37 projects, 2021: $25M program), major public campaigns (Asilomar
+    Principles with 5,700+ signatories, 2023 Pause Letter with 33,000+
+    signatories), and $665.8M Buterin donation (2021). Organization operates
+    primarily 
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: founders-fund
+  type: organization
+  title: Founders Fund
+  description: >-
+    Founders Fund is a $17B contrarian VC firm that has backed major AI
+    companies like OpenAI and DeepMind but shows no explicit focus on AI safety
+    or alignment research, instead emphasizing rapid capability development and
+    transformative technologies. The firm has achieved exceptional returns
+    through c
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: futuresearch
+  type: organization
+  title: FutureSearch
+  description: >-
+    FutureSearch is an AI forecasting startup founded by former Metaculus
+    leaders that combines LLM research agents with human judgment, demonstrating
+    some prediction accuracy but facing uncertain commercial viability and
+    limited proven impact on AI safety decisions. While the company contributes
+    to AGI
+  clusters:
+    - epistemics
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: giving-pledge
+  type: organization
+  title: Giving Pledge
+  description: >-
+    The Giving Pledge, while attracting 250+ billionaire signatories since 2010,
+    has a disappointing track record with only 36% of deceased pledgers actually
+    meeting their commitments and living pledgers growing wealth 166% faster
+    than they give it away. The initiative functions more as reputation manag
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: good-judgment
+  type: organization
+  title: Good Judgment
+  description: >-
+    Good Judgment Inc. is a commercial forecasting organization that emerged
+    from successful IARPA research, demonstrating that trained
+    'superforecasters' can outperform intelligence analysts and prediction
+    markets by 30-72%. While not directly focused on AI safety, their
+    methodology for identifying for
+  clusters:
+    - epistemics
+    - community
+  lastUpdated: 2026-02
+- id: gpai
+  type: organization
+  title: Global Partnership on Artificial Intelligence (GPAI)
+  description: >-
+    GPAI represents the first major multilateral AI governance initiative but
+    operates as a non-binding policy laboratory with limited enforcement power
+    and structural coordination challenges. While providing valuable
+    international cooperation frameworks, its voluntary nature and exclusion of
+    key AI-dev
+  clusters:
+    - governance
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: gratified
+  type: organization
+  title: Gratified
+  description: >-
+    Gratified is an early-stage coffee and art community organization in San
+    Francisco that hosts events at EA-adjacent venues like Mox SF, operating at
+    the intersection of coffee culture, artistic practice, and rationalist
+    community infrastructure in the Bay Area.
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: hewlett-foundation
+  type: organization
+  title: William and Flora Hewlett Foundation
+  description: >-
+    The Hewlett Foundation is a $14.8 billion philanthropic organization that
+    focuses primarily on AI cybersecurity rather than AI alignment or
+    existential risk, distinguishing it from AI safety-focused funders like Open
+    Philanthropy. While comprehensive in covering the foundation's history and
+    controve
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: ibbis
+  type: organization
+  title: IBBIS (International Biosecurity and Biosafety Initiative for Science)
+  description: >-
+    An independent Swiss foundation launched in February 2024, spun out of NTI |
+    bio, that develops free open-source tools for DNA synthesis screening and
+    works to strengthen international biosecurity norms. Led by Piers Millett,
+    IBBIS created the Common Mechanism (commec), launched the DNA Screening St
+  clusters:
+    - biorisks
+    - governance
+    - ai-safety
+  lastUpdated: 2026-02
+- id: kalshi
+  type: organization
+  title: Kalshi
+  description: >-
+    This is a comprehensive corporate profile of Kalshi, a US prediction market
+    platform that offers some AI safety-related contracts but is primarily
+    focused on sports, politics, and economics. The AI safety relevance is
+    minimal, limited to a few markets on AI research pauses and regulation that
+    show l
+  clusters:
+    - epistemics
+    - community
+  lastUpdated: 2026-02
+- id: lesswrong
+  type: organization
+  title: LessWrong
+  description: >-
+    LessWrong is a rationality-focused community blog founded in 2009 that has
+    influenced AI safety discourse, receiving $5M+ in funding and serving as the
+    origin point for ~31% of EA survey respondents in 2014. Survey participation
+    peaked at 3,000+ in 2016, declining to 558 by 2023, with the community 
+  clusters:
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: lighthaven
+  type: organization
+  title: Lighthaven
+  description: >-
+    Lighthaven is a Berkeley conference venue operated by Lightcone
+    Infrastructure that serves as physical infrastructure for AI safety,
+    rationality, and EA communities. While well-documented as a facility, it
+    represents supporting infrastructure rather than core AI safety research or
+    strategy.
+  clusters:
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: lightning-rod-labs
+  type: organization
+  title: Lightning Rod Labs
+  description: >-
+    Lightning Rod Labs is an early-stage AI company using temporal data to train
+    prediction models, claiming 10% returns on prediction markets but with
+    limited independent validation. The company has no apparent connection to AI
+    safety concerns and represents standard commercial AI development rather th
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02
+- id: lionheart-ventures
+  type: organization
+  title: Lionheart Ventures
+  description: >-
+    Lionheart Ventures is a small venture capital firm ($25M inaugural fund)
+    focused on AI safety and mental health investments, notable for its
+    investment in Anthropic and integration with the EA community through
+    advisors and personnel. The firm represents an interesting model of
+    for-profit AI safety 
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: longview-philanthropy
+  type: organization
+  title: Longview Philanthropy
+  description: >-
+    Longview Philanthropy is a philanthropic advisory organization founded in
+    2018 that has directed $140M+ to longtermist causes ($89M+ to AI risk),
+    primarily through UHNW donor advising and managed funds (Frontier AI Fund:
+    $13M raised, $11.1M disbursed to 18 orgs). Funded primarily by Coefficient
+    Givi
+  clusters:
+    - community
+    - ai-safety
+    - governance
+    - biorisks
+  lastUpdated: 2026-02
+- id: ltff
+  type: organization
+  title: Long-Term Future Fund (LTFF)
+  description: >-
+    LTFF is a regranting program that has distributed $20M since 2017
+    (approximately $10M to AI safety) with median grants of $25K, filling a
+    critical niche between personal savings and institutional funders like
+    Coefficient Giving (median $257K). In 2023, LTFF granted $6.67M with a 19.3%
+    acceptance rat
+  clusters:
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: macarthur-foundation
+  type: organization
+  title: MacArthur Foundation
+  description: >-
+    Comprehensive profile of the $9 billion MacArthur Foundation documenting its
+    evolution from 1978 to present, with $8.27 billion in total grants across
+    climate, criminal justice, nuclear threats, and journalism. AI governance
+    work totals modest funding ($400K to IST for LLM risk; general support to P
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: manifest
+  type: organization
+  title: Manifest
+  description: >-
+    Manifest is a 2024 forecasting conference that generated significant
+    controversy within EA/rationalist communities due to speaker selection
+    including individuals associated with race science, highlighting tensions
+    between intellectual openness and community standards. While not directly AI
+    safety fo
+  clusters:
+    - community
+  lastUpdated: 2026-02
+- id: manifold
+  type: organization
+  title: Manifold
+  description: >-
+    Manifold is a play-money prediction market with millions of predictions and
+    ~2,000 peak daily users, showing AGI by 2030 at ~60% vs Metaculus ~45%.
+    Platform scored Brier 0.0342 on 2024 election (vs Polymarket's 0.0296),
+    demonstrating play-money markets can approach real-money accuracy but with
+    syste
+  clusters:
+    - epistemics
+    - community
+  lastUpdated: 2026-02
+- id: manifund
+  type: organization
+  title: Manifund
+  description: >-
+    Manifund is a $2M+ annual charitable regranting platform (founded 2022) that
+    provides fast grants (<1 week) to AI safety projects through expert
+    regrantors ($50K-400K budgets), fiscal sponsorship, and experimental impact
+    certificates. The platform distributed $2.06M in 2023 (~40% to AI safety
+    resear
+  clusters:
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: mats
+  type: organization
+  title: MATS ML Alignment Theory Scholars program
+  description: >-
+    MATS is a well-documented 12-week fellowship program that has successfully
+    trained 213 AI safety researchers with strong career outcomes (80% in
+    alignment work) and research impact (160+ publications, 8000+ citations).
+    The program provides comprehensive support ($27k per scholar) and has
+    produced no
+  clusters:
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: meta-ai
+  type: organization
+  title: Meta AI (FAIR)
+  description: >-
+    Meta AI has invested $66-72B in AI infrastructure (2025) with AGI targeted
+    for 2027, pioneering open-source AI through PyTorch (63% market share) and
+    LLaMA (1B+ downloads). However, the organization exhibits weak safety
+    culture with Chief AI Scientist dismissing existential risk, 50%+ researcher
+    att
+  clusters:
+    - ai-safety
+    - community
+    - governance
+  lastUpdated: 2026-02
+- id: microsoft
+  type: organization
+  title: Microsoft AI
+  description: >-
+    Microsoft invested $80B+ in AI infrastructure (FY2025) with a restructured
+    $135B stake (27%) in OpenAI, generating $13B AI revenue run rate (175% YoY
+    growth) and 16 percentage points of Azure's 39% growth. GitHub Copilot
+    reached 20M users generating 46% of code, while responsible AI framework
+    conduc
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: nti-bio
+  type: organization
+  title: "NTI | bio (Nuclear Threat Initiative - Biological Program)"
+  description: >-
+    The biosecurity division of the Nuclear Threat Initiative, NTI | bio works
+    to reduce global catastrophic biological risks through DNA synthesis
+    screening, BWC strengthening, the Global Health Security Index, and
+    international governance initiatives. Recipient of >$29M from Open
+    Philanthropy.
+  clusters:
+    - biorisks
+    - governance
+    - community
+  lastUpdated: 2026-02
+- id: open-philanthropy
+  type: organization
+  title: Open Philanthropy
+  description: >-
+    Open Philanthropy rebranded to Coefficient Giving in November 2025. See the
+    Coefficient Giving page for current information.
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: pause-ai
+  type: organization
+  title: Pause AI
+  description: >-
+    Pause AI is a grassroots advocacy movement founded May 2023 calling for
+    international pause on frontier AI development until safety proven, growing
+    to multi-continental network but achieving zero documented policy victories
+    despite ~70% public support in US polling. Organization operates primarily t
+  clusters:
+    - ai-safety
+    - community
+    - governance
+  lastUpdated: 2026-02
+- id: peter-thiel-philanthropy
+  type: organization
+  title: Peter Thiel (Funder)
+  description: >-
+    Peter Thiel funded MIRI ($1.6M+) in its early years but has stated he
+    believed they were "building an AGI" rather than doing safety research. He
+    became disillusioned around 2015 when they became "more pessimistic,"
+    describing their shift as going "from trans-humanist to Luddite." After the
+    FTX colla
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: polymarket
+  type: organization
+  title: Polymarket
+  description: >-
+    This is a comprehensive overview of Polymarket as a prediction market
+    platform, covering its history, mechanics, and accuracy, but has minimal
+    relevance to AI safety beyond brief mentions in the EA/forecasting section.
+    While well-documented, it primarily serves as general reference material
+    about a 
+  clusters:
+    - epistemics
+    - community
+  lastUpdated: 2026-02
+- id: red-queen-bio
+  type: organization
+  title: Red Queen Bio
+  description: >-
+    An AI biosecurity Public Benefit Corporation founded in 2025 by Nikolai
+    Eroshenko and Hannu Rajaniemi (co-founders of HelixNano), spun out to build
+    defensive biological countermeasures at the pace of frontier AI development.
+    Raised a $15M seed round led by OpenAI based on a 'defensive co-scaling' th
+  clusters:
+    - biorisks
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: redwood-research
+  type: organization
+  title: Redwood Research
+  description: >-
+    A nonprofit AI safety and security research organization founded in 2021,
+    known for pioneering AI Control research, developing causal scrubbing
+    interpretability methods, and conducting landmark alignment faking studies
+    with Anthropic.
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02
+- id: rethink-priorities
+  type: organization
+  title: Rethink Priorities
+  description: >-
+    Rethink Priorities is a research organization founded in 2018 that grew from
+    2 to ~130 people by 2022, conducting evidence-based analysis across animal
+    welfare, global health, and AI governance. The organization reported
+    influencing >$10M in grants by 2023 but acknowledges significant failures in
+    im
+  clusters:
+    - community
+    - ai-safety
+    - governance
+    - epistemics
+  lastUpdated: 2026-02
+- id: safety-orgs-epoch-ai
+  type: organization
+  title: Epoch AI
+  description: >-
+    Epoch AI provides empirical AI progress tracking showing training compute
+    growing 4.4x annually (2010-2024), 300 trillion tokens of high-quality
+    training data with exhaustion projected 2026-2032, and algorithmic
+    efficiency doubling every 6-12 months. Their 3,200+ model database directly
+    informs US E
+  clusters:
+    - ai-safety
+    - community
+    - epistemics
+    - governance
+  lastUpdated: 2026-02
+- id: samotsvety
+  type: organization
+  title: Samotsvety
+  description: >-
+    Elite forecasting group Samotsvety dominated INFER competitions 2020-2022
+    with relative Brier scores twice as good as competitors, providing
+    influential probabilistic forecasts including 28% TAI by 2030, 60% by 2050,
+    and 25% misaligned AI takeover by 2100. Their work is widely cited in
+    EA/rationalis
+  clusters:
+    - epistemics
+    - community
+  lastUpdated: 2026-02
+- id: schmidt-futures
+  type: organization
+  title: Schmidt Futures
+  description: >-
+    Schmidt Futures is a major philanthropic initiative founded by Eric Schmidt
+    that has committed substantial funding to AI safety research ($135M across
+    AI2050 and AI Safety Science programs) while also supporting talent
+    development and scientific research across multiple domains. The
+    organization has
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02
+- id: secure-ai-project
+  type: organization
+  title: Secure AI Project
+  description: >-
+    Policy advocacy organization founded ~2022-2023 by Nick Beckstead focusing
+    on legislative requirements for AI safety protocols, whistleblower
+    protections, and risk mitigation incentives. Rated highly by evaluators with
+    confidential achievements at major AI lab; advocates mandatory
+    safety/security pr
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: securebio
+  type: organization
+  title: SecureBio
+  description: >-
+    A biosecurity nonprofit applying the Delay/Detect/Defend framework to
+    protect against catastrophic pandemics, including AI-enabled biological
+    threats, through wastewater surveillance (Nucleic Acid Observatory) and AI
+    capability evaluations (Virology Capabilities Test). Co-founded by Kevin
+    Esvelt, wh
+  clusters:
+    - biorisks
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: securedna
+  type: organization
+  title: SecureDNA
+  description: >-
+    A Swiss nonprofit foundation providing free, privacy-preserving DNA
+    synthesis screening software using novel cryptographic protocols. Co-founded
+    by Kevin Esvelt and Turing Award winner Andrew Yao, SecureDNA screens
+    sequences down to 30 base pairs—already exceeding 2026 US regulatory
+    requirements—whi
+  clusters:
+    - biorisks
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: seldon-lab
+  type: organization
+  title: Seldon Lab
+  description: >-
+    Seldon Lab is a San Francisco-based AI safety accelerator founded in early
+    2025 that combines research publication with startup investment, claiming
+    early success with portfolio companies raising $10M+ and selling to major AI
+    companies. The article provides comprehensive documentation of a new organ
+  clusters:
+    - ai-safety
+    - community
+    - governance
+  lastUpdated: 2026-02
+- id: sentinel
+  type: organization
+  title: Sentinel
+  description: >-
+    Sentinel is a 2024-founded foresight organization led by Nuño Sempere that
+    processes millions of news items weekly through AI filtering and elite
+    forecaster assessment to identify global catastrophic risks, publishing
+    findings via newsletter and podcast. The page describes their multi-stage
+    detectio
+  clusters:
+    - epistemics
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: sff
+  type: organization
+  title: Survival and Flourishing Fund (SFF)
+  description: >-
+    SFF distributed $141M since 2019 (primarily from Jaan Tallinn's ~$900M
+    fortune), with the 2025 round totaling $34.33M (86% to AI safety). Uses
+    unique S-process mechanism where 6-12 recommenders express utility functions
+    and an algorithm allocates grants favoring projects with enthusiastic
+    champions 
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: situational-awareness-lp
+  type: organization
+  title: Situational Awareness LP
+  description: >-
+    Situational Awareness LP is a hedge fund founded by Leopold Aschenbrenner in
+    2024 that manages ~$2B in AI-focused public equities (semiconductors, energy
+    infrastructure, data centers), delivering 47% gains in H1 2025. The fund's
+    concentrated portfolio (100% in top 10 positions) includes major holdin
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: swift-centre
+  type: organization
+  title: Swift Centre
+  description: >-
+    Swift Centre is a UK forecasting organization that provides conditional
+    forecasting services to various clients including some AI companies, but is
+    not primarily focused on AI safety. While they demonstrate good forecasting
+    methodology and track record, their relevance to AI risk is limited to clien
+  clusters:
+    - epistemics
+    - community
+  lastUpdated: 2026-02
+- id: the-sequences
+  type: organization
+  title: The Sequences by Eliezer Yudkowsky
+  description: >-
+    A foundational collection of blog posts on rationality, cognitive biases,
+    and AI alignment that shaped the rationalist movement and influenced
+    effective altruism
+  clusters:
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: turion
+  type: organization
+  title: Turion
+  description: >-
+    Point72's Turion hedge fund, launched October 2024 with $150M seed capital,
+    manages ~$3B focused on AI hardware/semiconductors and returned ~30% in 2025
+    (14.2% in Q4 2024). The fund represents one of several major AI-focused
+    hedge funds launched 2024-2025, with concentrated exposure to semiconductor
+  clusters:
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: vara
+  type: organization
+  title: Value Aligned Research Advisors
+  description: >-
+    Value Aligned Research Advisors is a Princeton-based hedge fund managing
+    $8.2B in AI infrastructure investments with notable EA community
+    connections. Co-founder Ben Hoskin serves on the ARC board and has Giving
+    What We Can background; investors include Dustin Moskovitz's foundation.
+  clusters:
+    - community
+    - ai-safety
+  lastUpdated: 2026-02
+- id: vitalik-buterin-philanthropy
+  type: organization
+  title: Vitalik Buterin (Funder)
+  description: >-
+    Vitalik Buterin's 2021 donation of $665.8M in cryptocurrency to FLI was one
+    of the largest single donations to AI safety in history. Beyond this
+    landmark gift, he gives ~$50M annually to AI safety (~$15M), longevity
+    research, crypto public goods, and pandemic preparedness through MIRI,
+    Balvi, and di
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02

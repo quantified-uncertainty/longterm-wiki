@@ -1,0 +1,469 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --code-bg: oklch(0.93 0 0);
+
+  /* Starlight CSS variable compatibility shims */
+  --sl-color-gray-2: #9ca3af;
+  --sl-color-gray-3: #6b7280;
+  --sl-color-gray-4: #4b5563;
+  --sl-color-gray-5: #e5e7eb;
+  --sl-color-gray-6: #f9fafb;
+  --sl-color-text: var(--foreground);
+  --sl-color-text-accent: oklch(0.205 0 0);
+  --sl-color-accent: #6366f1;
+  --sl-color-bg: var(--background);
+  --sl-color-white: oklch(0.145 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --code-bg: oklch(0.22 0 0);
+
+  --sl-color-gray-2: #d1d5db;
+  --sl-color-gray-3: #9ca3af;
+  --sl-color-gray-4: #6b7280;
+  --sl-color-gray-5: #374151;
+  --sl-color-gray-6: #1f2937;
+  --sl-color-text: var(--foreground);
+  --sl-color-text-accent: oklch(0.985 0 0);
+  --sl-color-bg: var(--background);
+  --sl-color-white: oklch(0.985 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ============================================================================
+   PAGE META (last updated + GitHub link)
+   ============================================================================ */
+
+.page-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+.page-meta-updated {
+  white-space: nowrap;
+}
+
+.page-meta-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.page-meta-github:hover {
+  color: var(--foreground);
+}
+
+.prose .page-meta a {
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+.prose .page-meta a:hover {
+  color: var(--foreground);
+  opacity: 1;
+}
+
+/* ============================================================================
+   PROSE STYLES for MDX content
+   ============================================================================ */
+
+.prose {
+  line-height: 1.7;
+  max-width: 65rem;
+}
+
+.prose h1 { font-size: 2rem; font-weight: 700; margin: 2rem 0 1rem; line-height: 1.2; }
+.prose h2 { font-size: 1.5rem; font-weight: 600; margin: 1.75rem 0 0.75rem; line-height: 1.3; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+.prose h3 { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.5rem; line-height: 1.4; }
+.prose h4 { font-size: 1.1rem; font-weight: 600; margin: 1.25rem 0 0.5rem; }
+
+.prose p { margin: 1rem 0; }
+
+.prose ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
+.prose ol { list-style-type: decimal; padding-left: 1.5rem; margin: 1rem 0; }
+.prose li { margin: 0.25rem 0; }
+.prose ul ul { list-style-type: circle; }
+.prose ul ul ul { list-style-type: square; }
+
+.prose a { color: var(--accent-foreground); text-decoration: underline; text-underline-offset: 2px; }
+.prose a:hover { opacity: 0.8; }
+
+.prose strong { font-weight: 600; }
+.prose em { font-style: italic; }
+
+.prose blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.prose code {
+  font-size: 0.875em;
+  padding: 0.125rem 0.375rem;
+  background: var(--code-bg);
+  border-radius: 0.25rem;
+  color: var(--foreground);
+}
+
+.prose pre {
+  padding: 1rem;
+  background: var(--code-bg);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: var(--foreground);
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+
+.prose table {
+  max-width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.875rem;
+  overflow: visible;
+}
+
+.prose th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid var(--border);
+  font-weight: 600;
+  background: var(--muted);
+}
+
+.prose td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.prose tr:hover td {
+  background: var(--muted);
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+/* ============================================================================
+   BACKLINKS COMPONENT (CSS classes used by Backlinks.tsx)
+   ============================================================================ */
+
+.backlinks {
+  margin: 2rem 0;
+  padding: 1rem;
+  background: var(--muted);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+}
+
+.backlinks__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+}
+
+.backlinks__icon {
+  color: var(--accent-foreground);
+}
+
+.backlinks__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.backlinks__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.backlinks__item:last-child {
+  border-bottom: none;
+}
+
+.backlinks__link {
+  color: var(--accent-foreground);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.backlinks__link:hover {
+  text-decoration: underline;
+}
+
+.backlinks__type {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.125rem 0.375rem;
+  background: var(--border);
+  border-radius: 0.25rem;
+  color: var(--muted-foreground);
+}
+
+.backlinks__relationship {
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+
+.backlinks__empty {
+  color: var(--muted-foreground);
+  font-style: italic;
+  margin: 0;
+}
+
+.backlinks--compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin: 1rem 0;
+  font-size: 0.875rem;
+}
+
+.backlinks--compact .backlinks__label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--muted-foreground);
+}
+
+/* Ensure tooltip containers don't get clipped */
+.prose table,
+.prose td,
+.prose th {
+  overflow: visible !important;
+}
+
+/* ============================================================================
+   DEV MODE TOGGLE (header button)
+   ============================================================================ */
+
+.dev-mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dev-mode-toggle:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.dev-mode-toggle--active {
+  background: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
+}
+
+.dev-mode-toggle--active:hover {
+  background: rgba(139, 92, 246, 0.25);
+}
+
+/* ============================================================================
+   PAGE STATUS PANEL — dev-mode visibility toggle
+   (all other styles use Tailwind classes in PageStatus.tsx)
+   ============================================================================ */
+
+.page-status.page-status-dev-only { display: none; }
+:root.page-status-dev-mode .page-status.page-status-dev-only { display: block; }
+
+/* ============================================================================
+   FOOTNOTES — generated by remark-gfm, can't inject Tailwind classes directly
+   ============================================================================ */
+
+.prose a[data-footnote-ref] {
+  @apply text-blue-500 font-medium no-underline;
+  font-size: 0.75em;
+  vertical-align: super;
+  line-height: 0;
+  padding: 0 0.1em;
+}
+
+.prose a[data-footnote-ref]:hover {
+  @apply underline opacity-100;
+}
+
+.prose section[data-footnotes] {
+  @apply mt-10 pt-6 border-t border-border text-sm text-muted-foreground;
+}
+
+.prose section[data-footnotes] h2 {
+  @apply text-base font-semibold mb-3 mt-0 pb-0 border-b-0;
+}
+
+.prose section[data-footnotes] ol {
+  @apply pl-7 m-0;
+}
+
+.prose section[data-footnotes] li {
+  @apply my-1.5 leading-relaxed;
+}
+
+.prose section[data-footnotes] li p {
+  @apply my-1 inline;
+}
+
+.prose a[data-footnote-backref] {
+  @apply text-xs text-blue-500 no-underline ml-1;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.prose a[data-footnote-backref]:hover {
+  @apply underline opacity-100;
+}
+
+/* ============================================================================
+   INFOBOX LAYOUT
+   Float-based fallback for browsers without :has() support.
+   The .wiki-infobox has float:right set in component styles, which serves
+   as the baseline layout. The :has()-based grid below enhances it.
+   ============================================================================ */
+
+@media (min-width: 768px) {
+  /* Float fallback: ensure infobox doesn't overlap content */
+  .prose > .wiki-infobox {
+    margin-bottom: 1rem;
+    shape-outside: margin-box;
+  }
+
+  /* Hide duplicate InfoBoxes (auto-injected + MDX inline) — keep only the first */
+  .prose > .wiki-infobox ~ .wiki-infobox {
+    display: none !important;
+  }
+
+  /* Enhanced grid layout for browsers with :has() support */
+  .prose:has(> .wiki-infobox) {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    column-gap: 1.5rem;
+    max-width: none;
+  }
+
+  .prose:has(> .wiki-infobox) > * {
+    grid-column: 1;
+    min-width: 0; /* prevent overflow */
+  }
+
+  .prose:has(> .wiki-infobox) > .wiki-infobox {
+    grid-column: 2;
+    grid-row: 1 / span 100;
+    float: none !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    align-self: start;
+    position: sticky;
+    top: 5rem;
+  }
+}

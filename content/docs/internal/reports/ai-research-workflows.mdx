@@ -1,0 +1,574 @@
+---
+title: "AI-Assisted Research Workflows: Best Practices"
+description: "A guide to using Claude Code, deep research APIs, and multi-agent pipelines for producing high-quality research articles efficiently"
+createdAt: 2026-01-30
+lastUpdated: 2026-01-30
+sidebar:
+  order: 25
+importance: 0
+quality: 46
+llmSummary: "Internal guide recommending a multi-phase AI research pipeline (context assembly → Opus planning → Perplexity research → Sonnet drafting → validation) over single-shot prompts, with cost estimates of $2.65-5.20 per article. Provides comprehensive survey of 2025-2026 research APIs (Perplexity, Exa, Tavily, Elicit, Scry) with pricing and feature comparisons."
+ratings:
+  novelty: 2
+  rigor: 4
+  actionability: 5
+  completeness: 6
+metrics:
+  wordCount: 935
+  citations: 55
+  tables: 36
+  diagrams: 0
+---
+import { EntityLink } from '@components/wiki';
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+## Executive Summary
+
+| Finding | Key Insight | Recommendation |
+|---------|-------------|----------------|
+| **Plan before executing** | Claude tends to jump straight to writing without sufficient research | Use explicit "research → plan → execute" phases |
+| **Opus for strategy, Sonnet for execution** | Model selection matters by phase | Spend budget on thinking (Opus), not typing (Sonnet) |
+| **Deep Research APIs exist** | Perplexity Sonar, <EntityLink id="openai">OpenAI</EntityLink> Deep Research, Gemini Deep Research | Consider OpenRouter for Perplexity API access |
+| **Context assembly is underrated** | LLMs work better with curated context than raw search | Pre-gather resources before AI reasoning |
+| **Multi-agent beats monolithic** | Specialized agents outperform single prompts | Separate researcher, writer, validator roles |
+
+---
+
+## Background
+
+<Aside type="tip" title="The Core Problem">
+Most AI-assisted writing produces shallow articles because the AI jumps straight to writing without sufficient research or strategic thinking. The fix isn't a better prompt—it's a better pipeline.
+</Aside>
+
+This report surveys best practices for AI-assisted research workflows in 2025-2026, drawing from:
+- [Anthropic's Claude Code best practices](https://www.anthropic.com/engineering/claude-code-best-practices)
+- Multi-agent orchestration frameworks (LangChain, CrewAI)
+- Deep research API providers (Perplexity, OpenAI, Google, xAI)
+- Academic work on autonomous research agents ([Agent Laboratory](https://arxiv.org/abs/2501.04227))
+
+---
+
+## The Research Pipeline Problem
+
+### Why Single-Shot Prompts Fail
+
+A typical approach:
+```
+"Write a comprehensive article about compute governance"
+```
+
+This fails because:
+1. **No context gathering** - AI uses only training data, misses recent developments
+2. **No strategic planning** - AI doesn't think about what actually matters
+3. **Premature writing** - Starts generating prose before understanding the topic
+4. **No validation** - Errors compound without feedback loops
+
+### The Better Architecture
+
+<Aside type="note" title="Key Insight from Anthropic">
+"Asking Claude to research and plan first significantly improves performance for problems requiring deeper thinking upfront—without this, Claude tends to jump straight to coding a solution." — [Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
+</Aside>
+
+```
+Context Assembly → Strategic Planning → Targeted Research → Drafting → Validation → Grading
+      (local)          (Opus)            (Perplexity)       (Sonnet)    (scripts)   (Haiku)
+```
+
+---
+
+## Phase 1: Context Assembly
+
+**Goal**: Gather everything relevant *before* invoking expensive AI reasoning.
+
+### What to Gather
+
+| Source | Method | Cost |
+|--------|--------|------|
+| **Related wiki pages** | Glob/Grep for topic mentions | Free |
+| **Existing resources** | Query resources database | Free |
+| **Entity relationships** | Check backlinks, cross-refs | Free |
+| **Summarize context** | Haiku to compress | \$0.01-0.05 |
+
+### Why This Matters
+
+<Aside type="caution" title="Context Window Economics">
+Feeding raw search results to Opus wastes expensive tokens on noise. Pre-curated context lets the expensive model focus on thinking, not filtering.
+</Aside>
+
+### Implementation Pattern
+
+```javascript
+// 1. Find related pages (free)
+const relatedPages = await searchWiki(topic);
+
+// 2. Find existing resources (free)
+const resources = await queryResourcesDB(topic);
+
+// 3. Summarize with Haiku ($0.02)
+const contextBundle = await summarizeContext({
+  model: 'haiku',
+  pages: relatedPages,
+  resources: resources
+});
+```
+
+---
+
+## Phase 2: Strategic Planning (Opus)
+
+**Goal**: Figure out what this article should actually cover and why.
+
+<Aside type="tip" title="This Is Where Quality Comes From">
+The difference between a mediocre and excellent article is usually in the framing, not the prose. Opus excels at strategic thinking—use it here.
+</Aside>
+
+### What Opus Should Decide
+
+| Question | Why It Matters |
+|----------|----------------|
+| What are the key cruxes/debates? | Structures the entire article |
+| What's the right framing? | Determines reader takeaway |
+| What's already well-covered elsewhere? | Avoids duplication |
+| What specific questions need external research? | Directs Phase 3 |
+| What's the relationship to existing pages? | Enables cross-linking |
+
+### Prompt Pattern
+
+```markdown
+Given this context bundle about [TOPIC]:
+
+[CONTEXT_BUNDLE]
+
+You are planning a wiki article. Before any writing, think through:
+
+1. **Cruxes**: What are the 2-3 key debates or uncertainties about this topic?
+2. **Framing**: What's the most useful frame for readers? (risk? opportunity? tradeoff?)
+3. **Gap analysis**: What does existing coverage miss?
+4. **Research questions**: What specific questions need external research?
+5. **Structure**: What sections would best serve readers?
+
+Do NOT write the article. Output a structured plan in JSON.
+```
+
+### Budget
+
+| Complexity | Est. Input | Est. Output | Cost |
+|------------|-----------|-------------|------|
+| Simple topic | 20K tokens | 2K tokens | \$0.50-1.00 |
+| Complex topic | 50K tokens | 5K tokens | \$2.00-4.00 |
+
+---
+
+## Phase 3: Targeted Research
+
+**Goal**: Fill specific gaps identified in the plan—not open-ended browsing.
+
+### Option A: Claude Code WebSearch
+
+Uses Claude's built-in web search. Good integration but limited depth.
+
+```javascript
+// Directed by the plan
+for (const question of plan.researchQuestions) {
+  await webSearch(question);
+}
+```
+
+**Cost**: Included in Claude API pricing
+
+**Depth**: Moderate (single search per query)
+
+### Option B: Perplexity Sonar via OpenRouter
+
+<Badge text="Recommended for depth" variant="tip" />
+
+[Perplexity Sonar Deep Research](https://openrouter.ai/perplexity/sonar-deep-research) is purpose-built for comprehensive research. Available via OpenRouter API.
+
+| Model | Use Case | Pricing |
+|-------|----------|---------|
+| **sonar** | Quick lookups | \$1/1M tokens |
+| **sonar-pro** | Deeper search | \$3/1M tokens + \$5/1K searches |
+| **sonar-deep-research** | Comprehensive reports | \$3/1M tokens + \$5/1K searches |
+
+<Aside type="note" title="How Sonar Deep Research Works">
+"Sonar Deep Research autonomously searches, reads, and evaluates sources, refining its approach as it gathers information. This enables comprehensive report generation across domains." — [OpenRouter](https://openrouter.ai/perplexity/sonar-deep-research)
+</Aside>
+
+**Integration Example**:
+```javascript
+import OpenAI from 'openai';
+
+const openrouter = new OpenAI({
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_API_KEY,
+});
+
+const research = await openrouter.chat.completions.create({
+  model: 'perplexity/sonar-deep-research',
+  messages: [{
+    role: 'user',
+    content: `Research: ${plan.researchQuestions.join('\n')}`
+  }],
+});
+```
+
+### Option C: Other Deep Research APIs
+
+| Provider | API Available? | Notes |
+|----------|---------------|-------|
+| **Perplexity** | ✅ via OpenRouter | Best for research depth |
+| **OpenAI Deep Research** | ⚠️ Limited | Azure AI Foundry only |
+| **Gemini Deep Research** | ❌ | No API (consumer only) |
+| **Grok DeepSearch** | ⚠️ Limited | xAI API, X integration |
+
+### Option D: Open Source
+
+[Open Deep Research](https://github.com/huggingface/open-deep-research) (HuggingFace) provides an open-source implementation with 10K+ GitHub stars.
+
+---
+
+## Phase 4: Drafting (Sonnet)
+
+**Goal**: Execute the plan with research in hand.
+
+<Aside type="caution" title="Common Mistake">
+Don't give Sonnet the raw research dump. Give it: (1) the plan from Opus, (2) curated findings, (3) the style guide.
+</Aside>
+
+### Prompt Pattern
+
+```markdown
+You are writing a wiki article based on this plan:
+
+[OPUS_PLAN]
+
+Using these research findings:
+
+[CURATED_RESEARCH]
+
+Following this style guide:
+
+[STYLE_GUIDE_EXCERPT]
+
+Write the article. Use tables over bullet lists. Include citations.
+Escape all dollar signs (\\$100 not $100).
+```
+
+### Why Sonnet, Not Opus?
+
+Drafting is execution, not strategy. Sonnet:
+- Follows instructions well
+- Costs 1/10th of Opus
+- Produces similar prose quality when given a good plan
+
+**Cost**: \$0.50-1.50 per article
+
+---
+
+## Phase 5: Validation
+
+**Goal**: Catch errors before they compound.
+
+### Automated Checks (Free)
+
+```bash
+npm run crux -- validate compile        # Syntax errors
+npm run crux -- validate unified --rules=dollar-signs,comparison-operators
+npm run crux -- validate entity-links   # Broken links
+```
+
+### Fix Loop (Haiku)
+
+If validation fails, use Haiku to fix mechanical issues:
+
+```javascript
+if (validationErrors.length > 0) {
+  await fixWithHaiku(draft, validationErrors);
+  // Re-validate
+}
+```
+
+**Cost**: \$0.02-0.10 per fix cycle
+
+---
+
+## Phase 6: Grading
+
+**Goal**: Ensure quality meets threshold before accepting.
+
+Use existing grading infrastructure:
+
+```bash
+node scripts/content/grade-by-template.mjs --page new-article
+```
+
+### Quality Gates
+
+| Grade | Action |
+|-------|--------|
+| Q4-Q5 (80+) | Accept |
+| Q3 (60-79) | Targeted improvements |
+| Q1-Q2 (below 60) | Significant rework or reject |
+
+---
+
+## Cost Comparison
+
+### Old Approach: Single-Shot Opus
+
+| Component | Cost |
+|-----------|------|
+| Opus writes entire article | \$3-5 |
+| Often needs rework | +\$2-3 |
+| **Total** | **\$5-8** |
+| **Quality** | Inconsistent |
+
+### New Pipeline Approach
+
+| Phase | Model | Cost |
+|-------|-------|------|
+| Context assembly | Haiku | \$0.05 |
+| Strategic planning | Opus | \$1.50-3.00 |
+| Deep research | Perplexity | \$0.50-1.00 |
+| Drafting | Sonnet | \$0.50-1.00 |
+| Validation | Local | \$0.00 |
+| Fixes | Haiku | \$0.05-0.10 |
+| Grading | Haiku | \$0.05 |
+| **Total** | | **\$2.65-5.20** |
+| **Quality** | More consistent |
+
+<Aside type="tip" title="Key Insight">
+The pipeline approach often costs less AND produces better results because expensive reasoning (Opus) is focused where it matters—strategic planning—not wasted on prose generation.
+</Aside>
+
+---
+
+## Multi-Agent Architectures
+
+For complex articles, consider specialized agents:
+
+### Agent Laboratory Pattern
+
+[Agent Laboratory](https://arxiv.org/abs/2501.04227) (arXiv 2025) achieves 84% cost reduction using three stages:
+1. **Literature review agent** - Gathers sources
+2. **Experimentation agent** - Tests claims
+3. **Report writing agent** - Produces output
+
+### CrewAI Pattern
+
+```python
+from crewai import Agent, Task, Crew
+
+researcher = Agent(role='Researcher', goal='Find authoritative sources')
+analyst = Agent(role='Analyst', goal='Identify key insights')
+writer = Agent(role='Writer', goal='Produce clear prose')
+
+crew = Crew(agents=[researcher, analyst, writer], tasks=[...])
+```
+
+### Master-Planner-Executor-Writer
+
+[Multi-agent search architecture](https://www.deepchecks.com/orchestrating-multi-step-llm-chains-best-practices/):
+- **Master**: Coordinates overall workflow
+- **Planner**: Decomposes tasks into DAG
+- **Executor**: Runs tool calls
+- **Writer**: Synthesizes into prose
+
+---
+
+## Implementation Recommendations
+
+### For LongtermWiki Wiki
+
+| Priority | Recommendation |
+|----------|----------------|
+| **High** | Convert page-improver to SDK (done ✅) |
+| **High** | Add context assembly phase before Opus |
+| **Medium** | Integrate Perplexity via OpenRouter for deep research |
+| **Medium** | Create page-creator with full pipeline |
+| **Low** | Explore multi-agent CrewAI for complex topics |
+
+### Environment Setup
+
+```bash
+# .env additions
+ANTHROPIC_API_KEY=sk-ant-...      # For Claude Code SDK
+OPENROUTER_API_KEY=sk-or-...      # For Perplexity access
+```
+
+### Budget Guidelines
+
+| Article Type | Budget | Model Mix |
+|--------------|--------|-----------|
+| Simple stub expansion | \$1-2 | Haiku + Sonnet |
+| Standard knowledge-base page | \$3-5 | Opus planning + Sonnet execution |
+| Complex research report | \$5-10 | Opus + Perplexity + Sonnet |
+| Flagship article | \$10-15 | Opus + Deep Research + Opus review |
+
+---
+
+## Products & APIs Landscape
+
+This section catalogs tools available for AI-assisted research workflows as of early 2026.
+
+### Web Search / Grounding APIs
+
+These provide real-time web search for grounding LLM responses with citations.
+
+| Product | Pricing | Key Features | Best For |
+|---------|---------|--------------|----------|
+| **[Perplexity Sonar](https://openrouter.ai/perplexity/sonar)** | \$1-5/1K queries | Deep research mode, multi-step reasoning | Comprehensive research |
+| **[Exa AI](https://exa.ai/)** | \$5/1K queries + free tier | Semantic search, embeddings-based, research agents | AI-native search |
+| **[Tavily](https://tavily.com/)** | \$0.008/credit, 1K free/mo | SOC 2 certified, LangChain native, MCP support | Production RAG pipelines |
+| **[You.com API](https://you.com/apis)** | Tiered plans | 93% SimpleQA score, MCP server, Deep Search | High-accuracy grounding |
+| **[Brave Search API](https://brave.com/search/api/)** | \$4/1K + \$5/1M tokens | 94.1% F1 SimpleQA, AI Grounding mode | Privacy-focused, MCP |
+| **[OpenRouter :online](https://openrouter.ai/docs/guides/features/plugins/web-search)** | \$4/1K results | Works with any model, Exa-powered | Model flexibility |
+
+<Aside type="tip" title="Quick Recommendation">
+For LongtermWiki: Start with **Perplexity Sonar via OpenRouter** for deep research, and **Brave or Tavily** for quick grounding. Both have MCP servers for easy Claude Code integration.
+</Aside>
+
+### Academic Literature Search
+
+Specialized tools for searching and analyzing scientific papers.
+
+| Product | Pricing | Database | API? | Best For |
+|---------|---------|----------|------|----------|
+| **[Elicit](https://elicit.com/)** | Freemium + paid plans | Semantic Scholar (200M papers) | ✅ | Systematic reviews, data extraction |
+| **[Consensus](https://consensus.app/)** | Freemium | Semantic Scholar | Limited | Evidence synthesis, yes/no questions |
+| **[Undermind](https://undermind.ai/)** | \$16/mo | Semantic Scholar, PubMed, arXiv | ❌ | Deep niche literature discovery |
+| **[Semantic Scholar API](https://semanticscholar.org/)** | Free | 200M+ papers | ✅ | Building custom research tools |
+| **[ResearchRabbit](https://researchrabbit.ai/)** | Free | Cross-database | ❌ | Citation mapping, discovery |
+
+### Specialized Corpus Search
+
+<Aside type="tip" title="Highly Relevant for AI Safety">
+Scry is particularly interesting for LongtermWiki because it includes curated content from LessWrong, EA Forum, AI safety research, and alignment papers—exactly the sources we cite most.
+</Aside>
+
+| Product | Pricing | Corpus | API? | Best For |
+|---------|---------|--------|------|----------|
+| **[Scry](https://exopriors.com/scry)** | Free / \$9/mo | 72M docs: arXiv, LessWrong, EA Forum, X, Wikipedia | ✅ SQL+vector | AI safety research, reproducible queries |
+
+**Scry Key Features:**
+- **SQL + vector search** with arbitrary query composition
+- **Semantic operations**: mixing concepts, debiasing ("X but not Y"), contrastive axes
+- **Curated sources**: arXiv, bioRxiv, PhilPapers, LessWrong, EA Forum, HN, Twitter/X, Bluesky
+- **Reproducibility**: visible SQL queries, structured metadata, iterative refinement
+- **Custom embeddings**: store named concept vectors for reuse
+
+**Scry vs ChatGPT Deep Research**: Scry emphasizes control and reproducibility (you write SQL, see exactly what matched), while Deep Research is opaque but broader. Scry is better for iterative exploration of a fixed corpus; Deep Research for one-shot web synthesis.
+
+<Aside type="note" title="Academic vs Web Search">
+For AI safety topics, you often need **both**: academic tools (Elicit, Semantic Scholar) for papers + web search (Perplexity, Exa) for reports, blog posts, and recent developments.
+</Aside>
+
+### Scientific Research Agents
+
+Full agentic systems for autonomous research.
+
+| Product | Access | Focus | Key Capability |
+|---------|--------|-------|----------------|
+| **[FutureHouse Falcon](https://futurehouse.org/)** | Web + API | Scientific literature | Deep synthesis across thousands of papers |
+| **[FutureHouse Crow](https://futurehouse.org/)** | Web + API | Quick scientific Q&A | Fast factual answers with citations |
+| **[OpenAI Deep Research](https://openai.com/index/introducing-deep-research/)** | ChatGPT Pro/Plus | General research | Multi-step web research, o3-powered |
+| **[Gemini Deep Research](https://gemini.google.com/)** | Consumer only | General + Google ecosystem | Gmail, Drive, Docs integration |
+| **[Grok DeepSearch](https://x.ai/)** | xAI API | General + X/Twitter | Real-time social + web, very fast |
+
+<Aside type="caution" title="API Availability">
+OpenAI and Gemini Deep Research are **not available via API** for programmatic access. For automated pipelines, use Perplexity Sonar, Exa Research, or FutureHouse.
+</Aside>
+
+### Web Scraping / Content Extraction
+
+For when you need to extract content from specific URLs.
+
+| Product | Pricing | Key Features |
+|---------|---------|--------------|
+| **[Firecrawl](https://firecrawl.dev/)** | \$16-719/mo | LLM-ready markdown, 67% token reduction |
+| **[Jina Reader](https://jina.ai/reader/)** | Free tier available | URL to markdown, simple API |
+| **[Apify](https://apify.com/)** | Usage-based | Web scraping platform, many actors |
+
+### MCP Servers for Claude Code
+
+Model Context Protocol servers enable direct integration with Claude Code.
+
+| MCP Server | Function | Source |
+|------------|----------|--------|
+| **Brave Search** | Web search grounding | Official |
+| **Exa** | Semantic web search | Official |
+| **Tavily** | Search + extract | Official |
+| **You.com** | Web search | Official |
+| **Perplexity** | Deep research | [Community](https://github.com/elct9620/perplexity-ask-openrouter) |
+| **Firecrawl** | URL scraping | Official |
+
+### Cost Comparison Matrix
+
+Estimated costs for a typical research task (finding 20 sources with summaries):
+
+| Approach | Est. Cost | Quality | Speed |
+|----------|-----------|---------|-------|
+| Manual Google + reading | \$0 (your time) | High | Slow |
+| Perplexity Sonar Deep Research | \$0.50-1.00 | High | Fast |
+| Exa Research Pro | \$0.50-1.50 | High | Fast |
+| Claude WebSearch (5 searches) | ≈\$0.10 | Medium | Fast |
+| Elicit (with extraction) | \$0.50-2.00 | High (academic) | Medium |
+| FutureHouse Falcon | Unknown | Very High (scientific) | Medium |
+| OpenAI Deep Research | Included in \$20/mo | High | Slow (minutes) |
+
+---
+
+## Open Questions
+
+| Question | Why It Matters | Current State |
+|----------|----------------|---------------|
+| **Perplexity vs Exa vs Tavily?** | Affects research phase design | Need empirical comparison |
+| **Optimal context window size?** | Too much noise, too little misses info | ≈30-50K tokens seems good |
+| **Human-in-loop checkpoints?** | Quality vs automation tradeoff | After planning phase? |
+| **Caching research results?** | Reuse across similar articles | Not implemented yet |
+| **MCP vs direct API?** | Integration complexity vs flexibility | MCP simpler but less control |
+| **FutureHouse for AI safety?** | Scientific focus may miss grey literature | Worth testing |
+
+---
+
+## Sources
+
+### Best Practices
+- [Claude Code: Best practices for agentic coding](https://www.anthropic.com/engineering/claude-code-best-practices) — Anthropic Engineering
+- [Multi-Step LLM Chains: Best Practices](https://www.deepchecks.com/orchestrating-multi-step-llm-chains-best-practices/) — Deepchecks
+- [20 Agentic AI Workflow Patterns](https://skywork.ai/blog/agentic-ai-examples-workflow-patterns-2025/) — Skywork AI
+
+### Deep Research APIs
+- [Perplexity Sonar Deep Research](https://openrouter.ai/perplexity/sonar-deep-research) — OpenRouter
+- [OpenRouter Web Search](https://openrouter.ai/docs/guides/features/plugins/web-search) — Real-time web grounding for any model
+- [Introducing Deep Research](https://openai.com/index/introducing-deep-research/) — OpenAI
+- [Deep Research AI Tools Comparison](https://brightinventions.pl/blog/ai-deep-research-comparison/) — Bright Inventions
+
+### Search APIs
+- [Exa AI](https://exa.ai/) — Semantic search API for AI applications
+- [Tavily](https://tavily.com/) — Web API for AI agents, \$25M raise
+- [You.com APIs](https://you.com/apis) — 93% SimpleQA, Deep Search API
+- [Brave AI Grounding](https://brave.com/blog/ai-grounding/) — 94.1% F1 score on SimpleQA
+- [Complete Guide to Web Search APIs 2025](https://www.firecrawl.dev/blog/top_web_search_api_2025) — Firecrawl
+
+### Academic Research Tools
+- [Elicit](https://elicit.com/) — AI research assistant, 200M papers
+- [Semantic Scholar](https://semanticscholar.org/) — Free academic search API
+- [Scry](https://exopriors.com/scry) — SQL+vector search over 72M docs (LessWrong, EA Forum, arXiv, etc.)
+- [8 Best AI Research Assistant Tools](https://www.documind.chat/blog/ai-research-assistant) — Documind
+- [Best AI Research Tools for Literature Review](https://medium.com/@gamerschoice/best-ai-research-tools-for-literature-review-i-actually-use-51b1f101c56f) — Medium
+
+### Scientific Research Agents
+- [FutureHouse Platform](https://www.futurehouse.org/research-announcements/launching-futurehouse-platform-ai-agents) — Superintelligent AI agents for science
+- [FutureHouse customer story](https://claude.com/customers/futurehouse) — Claude
+- [Agent Laboratory: Using LLM Agents as Research Assistants](https://arxiv.org/abs/2501.04227) — arXiv 2025
+
+### Research Frameworks
+- [Autonomous Agents papers](https://github.com/tmgthb/Autonomous-Agents) — GitHub (updated daily)
+- [LLM Agents Explained: Complete Guide](https://www.getdynamiq.ai/post/llm-agents-explained-complete-guide-in-2025) — Dynamiq
+- [Top 5 MCP Search Tools 2025](https://www.oreateai.com/blog/indepth-evaluation-of-the-top-5-popular-mcp-search-tools-in-2025-technical-analysis-and-developer-selection-guide-for-exa-brave-tavily-duckduckgo-and-perplexity/3badf1e2e4f4177c0a04d075c34186e3) — Oreate AI
+
+### Model Comparisons
+- [AI Deep Research: Claude vs ChatGPT vs Grok](https://research.aimultiple.com/ai-deep-research/) — AIMultiple
+- [Agentic LLMs in 2025](https://datasciencedojo.com/blog/agentic-llm-in-2025/) — Data Science Dojo
+- [Deep Research Survey](https://huggingface.co/blog/exploding-gradients/deepresearch-survey) — HuggingFace

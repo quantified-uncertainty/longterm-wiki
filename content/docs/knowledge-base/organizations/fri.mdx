@@ -1,0 +1,463 @@
+---
+title: Forecasting Research Institute
+description: The Forecasting Research Institute (FRI) advances forecasting methodology through large-scale tournaments and rigorous experiments. Their Existential Risk Persuasion Tournament (XPT) found superforecasters gave 9.7% average probability to observed AI progress outcomes, while domain experts gave 24.6%. FRI's ForecastBench provides the first contamination-free benchmark for LLM forecasting accuracy.
+sidebar:
+  order: 3
+quality: 55
+llmSummary: FRI's XPT tournament found superforecasters gave 9.7% average probability to AI progress outcomes that occurred vs 24.6% from domain experts, suggesting superforecasters systematically underestimate AI progress. Their research shows median expert AI extinction risk at 3% by 2100 vs 0.38% from superforecasters, with minimal belief convergence despite structured debate.
+lastEdited: "2026-01-29"
+importance: 54
+ratings:
+  novelty: 4.5
+  rigor: 6
+  actionability: 4
+  completeness: 6.5
+metrics:
+  wordCount: 1704
+  citations: 65
+  tables: 44
+  diagrams: 2
+clusters:
+  - epistemics
+  - community
+  - ai-safety
+subcategory: epistemic-orgs
+---
+import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Research Quality** | Exceptional | Peer-reviewed publications in International Journal of Forecasting, ICLR |
+| **Methodology Innovation** | High | XPT persuasion tournament methodology, <EntityLink id="forecastbench">ForecastBench</EntityLink> benchmark |
+| **Influence** | Growing | Cited in policy discussions, academic forecasting research |
+| **Leadership** | World-class | <EntityLink id="philip-tetlock">Philip Tetlock</EntityLink> (Chief Scientist), author of Superforecasting |
+| **Scale** | Moderate | 169 participants in XPT, growing ForecastBench community |
+| **AI Relevance** | Central | AI progress forecasting is major research focus |
+| **Key Finding** | Striking | Superforecasters severely underestimated AI progress |
+
+## Organization Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Full Name** | Forecasting Research Institute |
+| **Founded** | 2021 |
+| **Chief Scientist** | [Philip Tetlock](https://psychology.sas.upenn.edu/people/philip-tetlock) (author of *Superforecasting* and *Expert Political Judgment*) |
+| **CEO** | Josh Rosenberg |
+| **Research Director** | [Ezra Karger](https://ezrakarger.com/) (also Senior Economist, Federal Reserve Bank of Chicago) |
+| **Location** | Philadelphia area / Remote |
+| **Status** | 501(c)(3) research nonprofit |
+| **Website** | [forecastingresearch.org](https://forecastingresearch.org/) |
+| **Funding** | Over <EntityLink id="organizations/funders/coefficient-giving">\$16M from Coefficient Giving</EntityLink> (2021-present) |
+| **Key Outputs** | XPT Tournament, ForecastBench (ICLR 2025), FRI-ONN Nuclear Study |
+| **Focus** | Forecasting methodology for high-stakes decisions and existential risk |
+
+## Overview
+
+The [Forecasting Research Institute](https://forecastingresearch.org/) develops advanced forecasting methods to improve decision-making on high-stakes issues, with particular emphasis on existential risks and AI development. Founded in 2021 with <EntityLink id="organizations/funders/coefficient-giving">initial support from Coefficient Giving</EntityLink> and led by Chief Scientist Philip Tetlock—whose research established the field of superforecasting—FRI represents the next generation of forecasting research, moving from establishing accuracy standards to channeling forecasting into real-world policy relevance.
+
+FRI's flagship project, the [Existential Risk Persuasion Tournament (XPT)](https://forecastingresearch.org/xpt), introduced a multi-stage methodology designed to improve the rigor of debates about catastrophic risks. Unlike traditional forecasting tournaments that simply aggregate independent predictions, the XPT required participants to engage in structured debates, explain their reasoning, and update their forecasts through adversarial collaboration. Running from June through October 2022, the tournament brought together 169 participants who made forecasts about existential threats including AI, biosecurity, climate change, and nuclear war. The results, published in the [*International Journal of Forecasting*](https://www.sciencedirect.com/science/article/abs/pii/S0169207024001250) in 2025, produced striking findings about the limits of current forecasting on AI progress.
+
+The institute has documented a significant gap between superforecaster and domain expert predictions on AI, with superforecasters systematically underestimating the pace of AI progress. On questions about AI achieving gold-level performance on the International Mathematical Olympiad, superforecasters gave only 2.3% probability to outcomes that actually occurred in July 2025, compared to 8.6% from domain experts. Across four AI benchmarks (MATH, MMLU, QuALITY, and IMO Gold), superforecasters assigned an average probability of just 9.7% to outcomes that actually occurred, compared to 24.6% from domain experts. This finding has important implications for how AI timeline forecasts should be interpreted and weighted.
+
+FRI's more recent work includes [ForecastBench](https://www.forecastbench.org/), a dynamic benchmark for evaluating LLM forecasting capabilities published at ICLR 2025, and a collaboration with the [Open Nuclear Network](https://opennuclear.org/) on nuclear catastrophe risk forecasting presented at the 2024 NPT PrepCom in Geneva.
+
+## Philip Tetlock: Research Background
+
+Philip Tetlock's foundational research provides the intellectual basis for FRI's work. Understanding his four decades of forecasting research is essential to understanding FRI's approach.
+
+### Expert Political Judgment (1984-2005)
+
+Tetlock's landmark study, summarized in [*Expert Political Judgment: How Good Is It? How Can We Know?*](https://press.princeton.edu/books/hardcover/9780691178288/expert-political-judgment) (Princeton University Press, 2005), examined 28,000 forecasts from 284 experts across government, academia, and journalism over two decades. The sobering findings established core principles that still guide FRI's methodology:
+
+| Finding | Implication |
+|---------|-------------|
+| Experts were often only slightly more accurate than chance | Traditional expertise is insufficient for forecasting |
+| Simple extrapolation algorithms often beat expert forecasts | Formal methods can outperform intuition |
+| Media-prominent forecasters performed worse than low-profile colleagues | Fame and accuracy are inversely correlated |
+| "Foxes" (eclectic thinkers) outperformed "hedgehogs" (single-theory adherents) | Cognitive style matters more than credentials |
+
+The "[hedgehog vs. fox](https://longnow.org/talks/02007-tetlock/)" framework, adapted from Isaiah Berlin's essay, became a cornerstone of forecasting research. Hedgehogs "know one big thing"—they have a grand theory (Marxist, Libertarian, or otherwise) that they extend into many domains with great confidence. Foxes "know many little things"—they draw from eclectic traditions and improvise in response to changing events. Tetlock found that foxes demonstrated significantly better calibration and discrimination scores, particularly on long-term forecasts.
+
+### The <EntityLink id="good-judgment">Good Judgment</EntityLink> Project (2011-2015)
+
+Building on these findings, Tetlock co-led the [Good Judgment Project (GJP)](https://en.wikipedia.org/wiki/The_Good_Judgment_Project), a multi-year IARPA-funded study of probability judgment accuracy. The project tested whether forecasting accuracy could be systematically improved through selection, training, and team structure.
+
+| Component | Approach | Result |
+|-----------|----------|--------|
+| **Participant Pool** | Thousands of volunteer forecasters | Enabled large-scale experimentation |
+| **Training** | Simple probability training exercises | Improved Brier scores significantly |
+| **Selection** | Personality-trait tests for cognitive bias | Identified consistent top performers |
+| **Superforecasters** | Top 2% across multiple seasons | Maintained accuracy over time and topics |
+| **Team Structure** | Collaborative forecasting groups | Teams outperformed individuals |
+
+Key findings included:
+- Training exercises substantially improved forecast accuracy as measured by [Brier scores](https://en.wikipedia.org/wiki/Brier_score)
+- The best forecasters ("superforecasters") maintained consistent performance across years and question categories
+- A log-odds extremizing aggregation algorithm outperformed competitors
+- GJP forecasts were reportedly 30% better than intelligence officers with access to classified information
+
+The project resulted in *[Superforecasting: The Art and Science of Prediction](https://www.amazon.com/Superforecasting-Science-Prediction-Philip-Tetlock/dp/0804136718)* (2015), co-authored with Dan Gardner, which distilled principles of good forecasting: gather evidence from diverse sources, think probabilistically, work in teams, keep score, and remain willing to admit error.
+
+### From GJP to FRI
+
+FRI represents the third phase of Tetlock's research program. While the first phase established that experts are poorly calibrated and the second identified characteristics of accurate forecasters, FRI's mission focuses on applying these insights to high-stakes policy questions—particularly existential risks where feedback loops are weak or nonexistent.
+
+<Mermaid client:load chart={`
+flowchart LR
+    EPJ[Expert Political<br/>Judgment<br/>1984-2005] --> GJP[Good Judgment<br/>Project<br/>2011-2015]
+    GJP --> FRI[Forecasting Research<br/>Institute<br/>2021-present]
+
+    EPJ --> F1[Finding: Experts<br/>poorly calibrated]
+    GJP --> F2[Finding: Training<br/>improves accuracy]
+    FRI --> F3[Application: High-stakes<br/>policy forecasts]
+
+    style EPJ fill:#e6f3ff
+    style GJP fill:#cce6ff
+    style FRI fill:#99ccff
+`} />
+
+## Key XPT Findings
+
+*For detailed XPT methodology, participant breakdown, and full analysis, see the dedicated <EntityLink id="xpt">XPT (Existential Risk Persuasion Tournament)</EntityLink> page.*
+
+### AI Progress Forecasting Accuracy
+
+A [2025 follow-up analysis](https://forecastingresearch.substack.com/p/what-did-forecasters-get-right-and) by Tetlock, Rosenberg, Kučinskas, Ceppas de Castro, Jacobs, and Karger evaluated how well XPT participants predicted three years of AI progress since summer 2022:
+
+| Benchmark | Superforecasters | Domain Experts | Actual Outcome |
+|-----------|-----------------|----------------|----------------|
+| **IMO Gold by 2025** | 2.3% | 8.6% | **Achieved July 2025** |
+| **MATH benchmark** | 9.3% | 21.4% | **Exceeded** |
+| **MMLU benchmark** | 7.2% | 25.0% | **Exceeded** |
+| **QuALITY benchmark** | 20.1% | 43.5% | **Exceeded** |
+| **Average across benchmarks** | 9.7% | 24.6% | All exceeded predictions |
+
+Both groups systematically underestimated AI progress, but domain experts were closer to reality. Superforecasters initially thought an AI would achieve IMO Gold in 2035—a decade late. The only strategy that reliably worked was aggregating everyone's forecasts: taking the median of all predictions produced substantially more accurate forecasts than any individual or group.
+
+### Existential Risk Estimates
+
+| Risk Category | Superforecasters (Median) | Domain Experts (Median) | Ratio |
+|---------------|---------------------------|-------------------------|-------|
+| **Any catastrophe by 2100** | 9% | 20% | 2.2x |
+| **Any extinction by 2100** | 1% | 6% | 6x |
+| **AI-caused extinction by 2100** | 0.38% | 3% | 7.9x |
+| **Nuclear extinction by 2100** | 0.1% | 0.3% | 3x |
+| **Bio extinction by 2100** | 0.08% | 1% | 12.5x |
+
+The ~8x gap between superforecasters (0.38%) and domain experts (3%) on AI-caused extinction represents one of the largest disagreements in the tournament. Notably, superforecasters gave higher probability to nuclear catastrophe (4%) than AI catastrophe (2.13%) by 2100, but assigned extinction risk from AI as roughly an order of magnitude larger than from nuclear weapons—possibly because AI could "deliberately hunt down survivors."
+
+For comparison, existential risk researcher [Toby Ord](https://www.astralcodexten.com/p/the-extinction-tournament) estimated a 16% total chance of extinction by 2100—16x higher than superforecasters and 2.5x higher than domain experts.
+
+### Conditional vs. Unconditional Risk
+
+The XPT revealed how conditional framing affects risk estimates:
+
+| Framing | Superforecaster Estimate |
+|---------|--------------------------|
+| **Unconditional AI extinction by 2100** | 0.38% |
+| **Conditional on AGI by 2070** | 1% |
+| **Increase factor** | 2.6x |
+
+### Minimal Belief Updating
+
+A striking finding was the [minimal convergence of beliefs](https://www.sciencedirect.com/science/article/abs/pii/S0169207024001250) despite four months of structured debate with monetary incentives:
+
+> "Despite incentives to share their best arguments during four months of discussion, neither side materially moved the other's views."
+
+The paper suggests this would be puzzling if participants were Bayesian agents but is less puzzling if participants were "boundedly rational agents searching for confirmatory evidence as the risks of embarrassing accuracy feedback receded." Strong AI-risk proponents made particularly extreme long- but not short-range forecasts.
+
+## ForecastBench
+
+[ForecastBench](https://www.forecastbench.org/) is FRI's dynamic, contamination-free benchmark for evaluating large language model forecasting capabilities, published at [ICLR 2025](https://openreview.net/forum?id=lfPkGWXSwZQTQJ9xc).
+
+### ForecastBench Design
+
+The benchmark was designed to solve the data contamination problem that plagues static AI benchmarks:
+
+| Feature | Description |
+|---------|-------------|
+| **Dynamic Questions** | 1,000 questions, continuously updated with new future-dated questions |
+| **Contamination-Free** | All questions about events with no known answer at submission time |
+| **Multiple Baselines** | Compares LLMs to superforecasters, public forecasters, and random chance |
+| **Open Submission** | [Public leaderboard](https://www.forecastbench.org/) for model comparison |
+| **Question Sources** | Market questions (Manifold, Metaculus, Polymarket, RAND) and dataset questions (ACLED, DBnomics, FRED, Wikipedia, Yahoo Finance) |
+| **Funding** | Supported by <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> until mid-2027 |
+
+The authors (Ezra Karger, Houtan Bastani, Chen Yueh-Han, Zachary Jacobs, Danny Halawi, Fred Zhang, and Philip E. Tetlock) designed ForecastBench as a "valuable proxy for general intelligence" since forecasting requires integrating diverse knowledge sources and reasoning under uncertainty.
+
+### ForecastBench Results
+
+| Forecaster | Difficulty-Adjusted Brier Score | Notes |
+|------------|--------------------------------|-------|
+| **Superforecasters** | 0.081 | Best overall performance |
+| **GPT-4.5 (Feb 2025)** | 0.101 | Best LLM performance |
+| **GPT-4 (Mar 2023)** | 0.131 | Baseline frontier model |
+| **Public Participants** | ≈0.12 | LLMs now outperform non-experts |
+| **Random Baseline** | 0.25 | Chance performance |
+
+Key findings from ForecastBench:
+
+| Finding | Evidence |
+|---------|----------|
+| **Superforecasters still lead** | The 0.054 Brier score gap between superforecasters and GPT-4o is larger than the 0.026 gap between GPT-4o and GPT-4 |
+| **Rapid LLM improvement** | State-of-the-art LLM performance improves by ≈0.016 difficulty-adjusted Brier points annually |
+| **Projected parity** | Linear extrapolation suggests LLMs will match superforecaster performance in **November 2026** (95% CI: December 2025 – January 2028) |
+| **Initial models underperformed** | Claude-3.5 Sonnet and GPT-4 Turbo initially performed roughly as well as a simple median of public forecasts |
+
+ForecastBench provides important empirical grounding for claims about AI forecasting capabilities, demonstrating measurable progress while showing that complex geopolitical and scientific questions remain challenging for LLMs.
+
+## Key Publications
+
+| Publication | Year | Venue | Key Contribution |
+|-------------|------|-------|------------------|
+| [Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament](https://static1.squarespace.com/static/635693acf15a3e2a14a56a4a/t/64f0a7838ccbf43b6b5ee40c/1693493128111/XPT.pdf) | 2023 | Working paper | XPT methodology and initial findings |
+| [Subjective-probability forecasts of existential risk](https://www.sciencedirect.com/science/article/abs/pii/S0169207024001250) | 2025 | International Journal of Forecasting | Peer-reviewed XPT results (Vol. 41, Issue 2, pp. 499-516) |
+| [ForecastBench: A Dynamic Benchmark of AI Forecasting Capabilities](https://proceedings.iclr.cc/paper_files/paper/2025/hash/ea74e45a229dac70b5b63b28d8934db6-Abstract-Conference.html) | 2025 | ICLR | LLM forecasting benchmark |
+| [Improving Judgments of Existential Risk](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4001628) | 2022 | SSRN Working Paper | Framework for better forecasts, questions, explanations, and policies |
+| [Can Humanity Achieve a Century of Nuclear Peace?](https://opennuclear.org/sites/default/files/2024-10/ForecastingNuclearRisk_241029.pdf) | 2024 | FRI-ONN Report | Nuclear catastrophe probability estimates |
+| [Assessing Near-Term Accuracy in the XPT](https://forecastingresearch.org/near-term-xpt-accuracy) | 2025 | FRI Report | Retrospective accuracy analysis of 2022 forecasts |
+
+## Low-Probability Forecasting Challenges
+
+FRI's research addresses a critical methodological challenge: forecasting low-probability, high-consequence events like existential risks where traditional calibration feedback is unavailable.
+
+### Key Challenges
+
+| Challenge | Issue | Manifestation in XPT |
+|-----------|-------|---------------------|
+| **Base Rate Anchoring** | Forecasters anchor too heavily on historical rates | May explain superforecaster underestimation of novel AI progress |
+| **Probability Compression** | All "unlikely" events collapsed to similar estimates | Extinction estimates cluster near 0-1% despite very different underlying mechanisms |
+| **Feedback Delays** | Can't learn from rare events | No extinction has occurred to calibrate against |
+| **Horizon Effects** | Extreme estimates for distant futures | Strong AI-risk proponents gave extreme long- but not short-range forecasts |
+| **Confirmatory Search** | Seeking evidence that confirms existing views | Neither side updated materially despite structured debate |
+
+### FRI Methodological Responses
+
+| Method | Description | Application |
+|--------|-------------|-------------|
+| **Structured Scenario Analysis** | Break down complex events into component paths | Decompose "AI extinction" into specific mechanisms |
+| **Adversarial Collaboration** | Pair forecasters with opposing views | XPT Stage 3 debate structure |
+| **Cross-domain Calibration** | Use accuracy on resolvable questions to weight long-run forecasts | Compare 2025-resolvable vs 2100 forecasts |
+| **Reciprocal Scoring** | Methods for forecasting questions that may never resolve | Karger (2021) methodology paper |
+
+## FRI-ONN Nuclear Risk Research
+
+FRI collaborated with the [Open Nuclear Network (ONN)](https://opennuclear.org/en/open-nuclear-network/news/onn-announces-partnership-forecasting-research-institute) in association with the University of Pennsylvania on a comprehensive nuclear catastrophe forecasting study.
+
+### Study Design
+
+| Aspect | Details |
+|--------|---------|
+| **Partner Organizations** | FRI, Open Nuclear Network, University of Pennsylvania |
+| **Methodology** | XPT-style structured elicitation with superforecasters and nuclear experts |
+| **Definition of Catastrophe** | Event causing over 10 million deaths |
+| **Time Horizon** | Probability estimates through 2045 |
+| **Presentation** | [2024 NPT PrepCom in Geneva](https://opennuclear.org/open-nuclear-network/news/onn-attends-2024-npt-preparatory-committee) (July 25, 2024) |
+| **Publication** | [Can Humanity Achieve a Century of Nuclear Peace?](https://www.prnewswire.com/news-releases/will-humanity-achieve-a-century-of-nuclear-peace-new-study-forecasts-nuclear-risk-302289024.html) |
+
+### Key Findings
+
+| Finding | Estimate |
+|---------|----------|
+| **Median expert probability of nuclear catastrophe by 2045** | 5% |
+| **Superforecaster probability** | 1% |
+| **Most likely geopolitical source** | Russia-NATO/USA tensions |
+| **Potential risk reduction** | 50% if six key policies fully implemented |
+
+### Recommended Policy Interventions
+
+The study identified six policies that could collectively reduce nuclear catastrophe risk by 50%:
+
+1. Establishing a secure crisis communications network
+2. Conducting comprehensive failsafe reviews of nuclear protocols
+3. Implementing enhanced early warning cooperation
+4. Adopting no-first-use declarations
+5. Reducing nuclear arsenal sizes
+6. Strengthening non-proliferation verification
+
+### Geneva Side Event Takeaways
+
+The July 2024 side event "A Gamble of Our Own Choosing: Forecasting Nuclear Risks" highlighted:
+- Forecasting combined with qualitative analysis is invaluable for understanding nuclear risks
+- Need for more dynamic risk assessment methods
+- Importance of communicating findings effectively to decision-makers
+- Focus on near-term events enhances methodology credibility
+
+## Funding History
+
+FRI's work is primarily funded by <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, which launched forecasting as an independent cause area in 2024.
+
+### Coefficient Giving Grants to FRI
+
+| Grant | Amount | Purpose | Date |
+|-------|--------|---------|------|
+| [Initial Planning Support](https://www.openphilanthropy.org/grants/forecasting-research-institute-science-of-forecasting/) | \$175,000 | Planning work by Tetlock | Oct 2021 |
+| [Science of Forecasting](https://www.openphilanthropy.org/grants/forecasting-research-institute-science-of-forecasting/) | \$1.3M (over 3 years) | Core research program, forecasting platform development | 2022 |
+| [General Support](https://www.openphilanthropy.org/grants/forecasting-research-institute-general-support/) | \$10M (over 3 years) | Expanded research program | 2023 |
+| [AI Progress Forecasting Panel](https://www.openphilanthropy.org/grants/forecasting-research-institute-ai-progress-forecasting-panel/) | \$1.07M (over 2 years) | Panel of AI experts forecasting capabilities, adoption, impacts | 2024 |
+| [Red-line Evaluations](https://www.openphilanthropy.org/grants/forecasting-research-institute-red-line-evaluations/) | \$125,000 | Operationalizing AI red-line evaluations | 2024 |
+| [Tripwire Capability Evaluations](https://www.openphilanthropy.org/grants/forecasting-research-institute-red-line-evaluations/) | \$158,850 | AI capability tripwire forecasting | 2024 |
+| [Forecasting Benchmark](https://www.openphilanthropy.org/grants/forecasting-research-institute-forecasting-benchmark/) | \$100,000 | Collaboration with Steinhardt lab on ForecastBench | 2024 |
+| XPT Recognition Prize | \$15,000 | Recognition for XPT publication | 2023 |
+| Analysis of Historical Forecasts | \$10,000 | Forecasting accuracy analysis | 2024 |
+| AI Risk Discussion Project | \$150,000 | Bringing together forecasters who disagree on AI x-risk | 2024 |
+
+**Total Coefficient Giving funding: Over \$16 million**
+
+## Comparison with Other Organizations
+
+| Organization | Primary Method | Strength | Limitation |
+|--------------|---------------|----------|------------|
+| **FRI** | Methodology research, structured tournaments | Scientific rigor, peer-reviewed publications | Smaller scale, research-focused |
+| <EntityLink id="metaculus">Metaculus</EntityLink> | Prediction aggregation platform | Scale, continuous questions, public access | Less methodological innovation |
+| <EntityLink id="epoch-ai">Epoch AI</EntityLink> | Empirical AI trends analysis | Data quality, quantitative rigor | Less forecasting focus |
+| **Good Judgment Inc.** | Commercial superforecaster panels | Proven accuracy, operational focus | Commercial rather than research mission |
+| **Polymarket** | Prediction markets | Real-money incentives, liquidity | Regulatory constraints, short-term focus |
+
+## Implications for AI Safety
+
+### What the XPT Results Mean
+
+The XPT findings have significant implications for how the AI safety community should interpret forecasts:
+
+| Implication | Evidence | Action |
+|-------------|----------|--------|
+| **Superforecasters may systematically underestimate AI progress** | 2.5x gap on benchmark predictions; thought IMO Gold would occur in 2035 | Weight superforecaster AI timeline estimates with skepticism |
+| **Domain experts may be better calibrated on AI specifically** | Closer to actual outcomes on MATH, MMLU, QuALITY, IMO | Give more weight to AI researcher predictions on AI questions |
+| **Aggregation outperforms individuals** | Combined median was most accurate forecast | Use wisdom-of-crowds rather than individual expert opinions |
+| **Structured debate has limited impact** | Minimal belief updating despite four months of discussion | Don't expect debates to resolve fundamental disagreements |
+| **Long-range forecasts are particularly unreliable** | Extreme positions taken on 2100 but not 2025 questions | Focus policy on near-term measurable outcomes |
+
+### The Calibration Paradox
+
+FRI's research reveals a paradox: superforecasters are selected specifically for their calibration on historical questions, yet they significantly underperformed on AI progress. This suggests that:
+
+1. **Base-rate reasoning fails for unprecedented change**: Superforecasters may anchor on historical rates of technological progress that don't account for potential AI acceleration
+2. **Domain expertise matters for novel domains**: On questions requiring deep understanding of AI capabilities, specialists outperformed generalists
+3. **Neither group is reliable for extinction risk**: With no feedback available, even the best forecasters may be poorly calibrated
+
+### Recommendations from FRI Research
+
+| Recommendation | Rationale |
+|----------------|-----------|
+| **Weight domain expertise higher on AI** | Experts outperformed superforecasters on AI questions |
+| **Use structured elicitation** | Reduces some biases vs. simple aggregation |
+| **Decompose complex questions** | Helps calibrate low-probability estimates |
+| **Track calibration by domain** | Forecaster accuracy varies across topics |
+| **Invest in resolvable benchmarks** | Near-term forecasts provide calibration feedback |
+| **Combine multiple forecaster types** | Aggregation across groups worked best |
+
+## Team and Leadership
+
+### Core Leadership
+
+| Role | Person | Background |
+|------|--------|------------|
+| **Chief Scientist** | [Philip Tetlock](https://psychology.sas.upenn.edu/people/philip-tetlock) | Annenberg University Professor at UPenn, author of *Superforecasting* and *Expert Political Judgment*, Good Judgment Project co-founder, elected to American Philosophical Society (2019) |
+| **CEO** | Josh Rosenberg | Organizational leadership and operations |
+| **Research Director** | [Ezra Karger](https://www.chicagofed.org/people/k/karger-ezra) | Senior Economist at Federal Reserve Bank of Chicago, research in labor economics, public economics, and forecasting |
+
+### Research Team
+
+According to [FRI's team page](https://forecastingresearch.org/team), the organization includes:
+
+| Team Member | Focus Area |
+|-------------|------------|
+| Michael Page | Research operations |
+| Tegan McCaslin | Research |
+| Zachary Jacobs | Research, ForecastBench development |
+| + Various contractors | External collaborators in forecasting |
+
+### Academic Affiliations
+
+| Institution | Affiliation |
+|-------------|-------------|
+| University of Pennsylvania | Tetlock's primary appointment (Wharton School + School of Arts and Sciences) |
+| Federal Reserve Bank of Chicago | Karger's primary appointment |
+| NBER | Karger is NBER affiliate |
+
+## Timeline
+
+| Date | Event |
+|------|-------|
+| **1984-2003** | Tetlock conducts Expert Political Judgment study (284 experts, 28,000 forecasts) |
+| **2005** | *Expert Political Judgment* published by Princeton University Press |
+| **2011** | Good Judgment Project launched with IARPA funding |
+| **2015** | *Superforecasting* published; GJP concludes after beating competition |
+| **October 2021** | FRI founded with \$175K Coefficient Giving planning grant |
+| **June-October 2022** | XPT tournament conducted (169 participants, 4 months) |
+| **2022** | Coefficient Giving provides \$1.3M multi-year grant |
+| **August 2023** | XPT working paper released |
+| **2023** | Coefficient Giving provides \$10M general support grant |
+| **September 2024** | ForecastBench launched |
+| **July 2024** | FRI-ONN nuclear risk study presented at NPT PrepCom in Geneva |
+| **October 2024** | Nuclear risk report published |
+| **January 2025** | ForecastBench paper published at ICLR 2025 |
+| **2025** | XPT results published in *International Journal of Forecasting* |
+| **September 2025** | XPT near-term accuracy follow-up published |
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Methodological rigor** | Peer-reviewed publications in top venues (ICLR, Int. Journal of Forecasting) |
+| **Leadership credentials** | Tetlock's four decades of forecasting research, American Philosophical Society membership |
+| **Innovation** | XPT methodology, ForecastBench, structured elicitation techniques |
+| **Policy relevance** | Nuclear risk work presented at NPT PrepCom, AI policy applications |
+| **Independence** | Research nonprofit with philanthropic rather than commercial funding |
+| **Quantitative findings** | Specific probability estimates with documented methodology |
+
+### Limitations
+
+| Limitation | Context |
+|------------|---------|
+| **Scale** | 169 XPT participants vs. thousands on platforms like Metaculus |
+| **Speed** | Research focus means slower output than real-time forecasting platforms |
+| **Cost** | Intensive methodology requires significant resources per study |
+| **Generalizability** | Tournament findings may not transfer to all forecasting contexts |
+| **Long-range uncertainty** | No ground truth available for existential risk calibration |
+| **Minimal updating** | XPT showed debates had limited impact on beliefs |
+
+### Open Questions
+
+| Question | Relevance |
+|----------|-----------|
+| Should policy weight superforecasters or domain experts on AI? | XPT suggests experts may be better calibrated for AI specifically |
+| Can LLMs eventually match superforecasters? | ForecastBench suggests parity by late 2026 |
+| How should we interpret minimal belief updating? | May reflect genuine irreducible uncertainty or cognitive limitations |
+| What forecasting methods work for unprecedented events? | Neither group was well-calibrated on AI progress |
+
+## External Links
+
+- [FRI Website](https://forecastingresearch.org/)
+- [Research Publications](https://forecastingresearch.org/publications)
+- [XPT Project Page](https://forecastingresearch.org/xpt)
+- [FRI Substack](https://forecastingresearch.substack.com/)
+- [FRI GitHub](https://github.com/forecastingresearch)
+- [ForecastBench](https://www.forecastbench.org/)
+- [FRI Team](https://forecastingresearch.org/team)
+
+## Sources
+
+- [Forecasting Research Institute](https://forecastingresearch.org/) - Official website
+- [Philip Tetlock | Penn Psychology](https://psychology.sas.upenn.edu/people/philip-tetlock) - Academic profile
+- [Ezra Karger](https://ezrakarger.com/) - Research Director profile
+- [Subjective-probability forecasts of existential risk (Int. Journal of Forecasting)](https://www.sciencedirect.com/science/article/abs/pii/S0169207024001250) - Peer-reviewed XPT results
+- [ForecastBench (ICLR 2025)](https://openreview.net/forum?id=lfPkGWXSwZQTQJ9xc) - LLM forecasting benchmark paper
+- [The Extinction Tournament (Astral Codex Ten)](https://www.astralcodexten.com/p/the-extinction-tournament) - Scott Alexander analysis
+- [What did forecasters get right and wrong? (FRI Substack)](https://forecastingresearch.substack.com/p/what-did-forecasters-get-right-and) - 2025 accuracy retrospective
+- [Ezra Karger on existential risk forecasting (80,000 Hours)](https://80000hours.org/podcast/episodes/ezra-karger-forecasting-existential-risks/) - Podcast interview
+- [Coefficient Giving Forecasting Grants](https://www.openphilanthropy.org/focus/forecasting/) - Funding history
+- [FRI-ONN Nuclear Risk Project](https://opennuclear.org/en/open-nuclear-network/news/fri-onn-project-forecasting-nuclear-catastrophe) - Nuclear forecasting collaboration
+- [Can Humanity Achieve a Century of Nuclear Peace?](https://opennuclear.org/sites/default/files/2024-10/ForecastingNuclearRisk_241029.pdf) - Nuclear risk report
+- [Expert Political Judgment (Princeton)](https://press.princeton.edu/books/hardcover/9780691178288/expert-political-judgment) - Tetlock's 2005 book
+- [The Good Judgment Project (Wikipedia)](https://en.wikipedia.org/wiki/The_Good_Judgment_Project) - GJP background
+- [Philip E. Tetlock (Wikipedia)](https://en.wikipedia.org/wiki/Philip_E._Tetlock) - Biography
+- [Announcing FRI (EA Forum)](https://forum.effectivealtruism.org/posts/kEd5qWwg8pZjWAeFS/announcing-the-forecasting-research-institute-we-re-hiring) - Original announcement
+- [XPT Forecasts on AI Risk (EA Forum)](https://forum.effectivealtruism.org/posts/K2xQrrXn5ZSgtntuT/what-do-xpt-forecasts-tell-us-about-ai-risk-1) - Community analysis
+
+<Backlinks />

@@ -1,0 +1,291 @@
+---
+title: China AI Regulations
+description: Comprehensive analysis of China's iterative, sector-specific AI regulatory framework, covering 5+ major regulations affecting 50,000+ companies with enforcement focusing on content control and algorithmic accountability rather than capability restrictions. Examines how China's approach differs from Western models by prioritizing social stability and party control over individual rights, creating challenges for international AI governance coordination on existential risks.
+sidebar:
+  order: 6
+quality: 60
+llmSummary: Comprehensive analysis of China's 5+ major AI regulations affecting 50,000+ companies, showing that China's approach prioritizes content control and social stability over capability restrictions, with 1,400+ algorithms registered but limited focus on catastrophic risks until CnAISDA's February 2025 launch. The fundamental differences in regulatory philosophy (socialist values vs individual rights) create significant barriers to international coordination on existential AI risks, though recent bilateral talks and multilateral participation suggest emerging cooperation possibilities.
+lastEdited: "2025-12-28"
+importance: 68.5
+pageTemplate: knowledge-base-response
+todos:
+  - Complete 'How It Works' section
+  - Complete 'Limitations' section (6 placeholders)
+ratings:
+  novelty: 4.5
+  rigor: 6
+  actionability: 4.5
+  completeness: 7
+metrics:
+  wordCount: 3028
+  citations: 44
+  tables: 12
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: governance-legislation
+---
+import {DataInfoBox, Backlinks, Mermaid, R, EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="china-ai-regulations" />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Regulatory Scope** | Comprehensive, sector-specific | 5+ major AI regulations since 2021; <R id="c07e56848ffe8c54">over 1,400 algorithms registered</R> as of June 2024 |
+| **Enforcement Approach** | Selective, major platforms prioritized | Fines up to 100,000 RMB (≈\$14,000); app suspensions for non-compliance in Q1-Q2 2024 |
+| **Primary Focus** | Content control and social stability | Requirements for "positive energy" content; pre-deployment approval for generative AI |
+| **International Coordination** | Limited on frontier AI risks | <R id="cae11f56a1853f9e">Geneva talks in May 2024</R>; signed <EntityLink id="bletchley-declaration">Bletchley Declaration</EntityLink> but limited follow-through |
+| **Safety Research Focus** | Emerging but underdeveloped | <R id="0f17105b7e24c08a">CnAISDA launched February 2025</R>; 17 companies signed safety commitments December 2024 |
+| **Strategic Orientation** | Development-prioritized | Over \$100 billion government AI investment; AI leadership goal by 2030 |
+| **Global Influence** | Growing in developing nations | 50+ Belt and Road AI cooperation agreements |
+
+## Overview
+
+China has emerged as a global leader in AI regulation through a comprehensive framework of sector-specific rules that govern algorithmic systems, synthetic content generation, and AI-powered services. Unlike the European Union's single comprehensive AI Act or the United States' primarily sectoral approach, China has implemented an iterative regulatory strategy with over five major AI-specific regulations since 2021, affecting an estimated 50,000+ companies operating in the Chinese market. This regulatory architecture represents one of the most extensive attempts to govern AI technologies while simultaneously promoting national AI development goals.
+
+The Chinese approach to <EntityLink id="ai-governance">AI governance</EntityLink> is fundamentally shaped by priorities that differ markedly from Western frameworks. Where European and American regulations primarily focus on individual rights, privacy protection, and preventing discriminatory outcomes, Chinese regulations emphasize social stability, content control, and alignment with government policy objectives. This includes requirements that AI systems promote "positive energy" content, avoid generating information that could "subvert state power," and undergo pre-deployment approval processes administered by the Cyberspace Administration of China (CAC). As of 2024, over 3,000 algorithms have been registered in CAC's database, demonstrating the scale and reach of China's regulatory oversight.
+
+From an AI safety perspective, China's regulatory framework presents both opportunities and challenges for global coordination on existential risks. While China has established robust mechanisms for algorithmic accountability and content governance, there has been limited public focus on catastrophic AI risks or international coordination on frontier AI safety measures. This divergence in priorities, combined with ongoing US-China strategic competition, creates significant obstacles for the multilateral cooperation that many experts consider essential for managing advanced AI systems safely.
+
+### Regulatory Architecture
+
+<Mermaid client:load chart={`
+flowchart TD
+    CCP[CCP Central Committee] --> CAC[Cyberspace Administration of China]
+    CCP --> SC[State Council]
+
+    SC --> MIIT[Ministry of Industry & IT]
+    SC --> MOST[Ministry of Science & Tech]
+    SC --> MPS[Ministry of Public Security]
+
+    CAC --> ALG[Algorithm Registration]
+    CAC --> GEN[Generative AI Approval]
+    CAC --> DS[Deep Synthesis Rules]
+
+    MIIT --> STD[Technical Standards]
+    MOST --> RD[R&D Policy]
+    MPS --> SEC[Security Applications]
+
+    ALG --> COMP[Companies]
+    GEN --> COMP
+    DS --> COMP
+
+    style CCP fill:#ffcccc
+    style CAC fill:#ffddcc
+    style COMP fill:#ccffcc
+`} />
+
+## Regulatory Framework and Key Provisions
+
+### Timeline of Key Regulations
+
+| Regulation | Effective Date | Scope | Key Requirements |
+|------------|---------------|-------|------------------|
+| <R id="6d4a8e0fdd292de2">PIPL (Personal Information Protection Law)</R> | November 2021 | All personal data processing | Automated decision-making transparency; opt-out rights; impact assessments |
+| <R id="d41cebf3e24a9779">Data Security Law</R> | September 2021 | All data handling | Classification system; security obligations; cross-border transfer restrictions |
+| <R id="d48eee7f5735c8ab">Algorithm Recommendation Provisions</R> | March 2022 | Recommendation algorithms | Algorithm registration; user opt-out; "positive energy" requirements |
+| <R id="5a4d26f4d2d9cae9">Deep Synthesis Provisions</R> | January 2023 | Deepfakes and synthetic media | Mandatory labeling; real-name registration; content tracing |
+| <R id="c53ebe85cb13aed2">Generative AI Interim Measures</R> | August 2023 | LLMs and generative AI | Pre-deployment approval; "socialist values" alignment; training data requirements |
+| <R id="fe1b8bbce35aa0cf">AI Content Labeling Rules</R> | September 2025 | All AI-generated content | Implicit and explicit labeling requirements |
+
+### Algorithm Recommendation Management (2022)
+
+China's <R id="d48eee7f5735c8ab">Provisions on the Management of Algorithmic Recommendations</R> in Internet Information Services, which took effect in March 2022, established the foundational framework for regulating recommendation algorithms used by internet platforms. This regulation requires companies to register their algorithms with CAC, provide transparency about how recommendations work, and give users meaningful control over personalized content delivery.
+
+The regulation addresses several key areas of algorithmic governance. Transparency requirements mandate that platforms clearly indicate when algorithms are used and explain their basic functionality to users. User empowerment provisions include rights to delete algorithmic labels, opt out of personalized recommendations entirely, and access non-personalized content versions. The regulation specifically prohibits algorithms designed to create addiction, engage in discriminatory pricing practices, or create information "filter bubbles" that might threaten social stability.
+
+Content control provisions represent a distinctive aspect of China's approach, requiring algorithms to promote "positive energy" content while preventing the spread of "bad information." This includes obligations to ensure that Communist Party messaging reaches users and that recommendations align with government policy priorities. Enforcement mechanisms include fines up to 100,000 RMB (approximately \$14,000), service suspension authority, and potential business license revocation for serious violations.
+
+### Deep Synthesis and Synthetic Media (2023)
+
+The <R id="5a4d26f4d2d9cae9">Provisions on the Management of Deep Synthesis</R> Internet Information Services, effective from January 2023, specifically target AI-generated content including deepfakes, voice synthesis, text generation, and image manipulation. This regulation addresses growing concerns about synthetic media's potential for disinformation and fraud while establishing comprehensive labeling and authentication requirements.
+
+Key provisions include mandatory labeling of all AI-generated content with clear markers indicating synthetic origin, real-name registration requirements for content creators, and pre-publication review mechanisms for certain types of synthetic content. Technical requirements mandate watermarking of synthetic media, implementation of detection capabilities, and maintenance of content tracing systems to ensure accountability.
+
+The regulation prohibits several applications of synthetic media technology, including creation of fake news and disinformation, impersonation for fraudulent purposes, generation of illegal content, and any use that might harm national security or social stability. These restrictions reflect China's broader emphasis on maintaining information control and preventing technologies that could undermine social order or government authority.
+
+### Generative AI Service Management (2023)
+
+China's <R id="c53ebe85cb13aed2">Interim Measures for the Management of Generative Artificial Intelligence Services</R>, implemented in August 2023, represent the government's response to the global proliferation of large language models and generative AI systems. These regulations apply to any service providing text, image, audio, video, or code generation to Chinese users, including both domestic companies and foreign entities serving the Chinese market. According to the <R id="b787cbfa4af4ca4d">Library of Congress analysis</R>, the final version showed "a degree of relaxation" compared to the draft, with "something less than perfection expected of the industry."
+
+The regulation establishes comprehensive content alignment requirements, mandating that AI outputs reflect "core socialist values" and prohibiting generation of content that could subvert state power, harm national interests, disrupt social order, or infringe on others' rights. Data quality provisions require that training datasets be "true and accurate," exclude illegal or harmful content, comply with intellectual property laws, and protect personal information according to Chinese data protection standards.
+
+Pre-deployment approval requirements represent a significant departure from Western approaches, requiring companies to register with CAC before public launch, provide detailed technical documentation, and submit to security assessments. Safety measures include mandatory security evaluations, content filtering implementation, human review mechanisms, and user complaint handling procedures. The regulation also requires clear labeling of AI-generated content and transparency about system capabilities and limitations.
+
+### Data Governance Integration
+
+China's AI regulations are closely integrated with broader data governance frameworks, particularly the Personal Information Protection Law (PIPL) effective from November 2021 and the Data Security Law from September 2021. These laws establish comprehensive requirements for data collection, processing, and cross-border transfer that directly impact AI system development and deployment.
+
+The PIPL includes specific provisions addressing automated decision-making systems, requiring transparency about algorithmic decisions, providing rights to human review, prohibiting discriminatory practices, and allowing users to opt out of automated profiling. Data minimization principles mandate collecting only necessary information, limiting use to specified purposes, and implementing time restrictions on data retention. Cross-border data transfer provisions require security assessments for data exports and impose restrictions on moving critical data outside China.
+
+The Data Security Law establishes a classification system for data based on importance to national security and economic development, with increasingly stringent security obligations for more sensitive categories. This framework directly impacts AI development by governing training data usage, mandating security reviews for certain AI applications, and potentially restricting international collaboration on AI research and development.
+
+## Enforcement Mechanisms and Implementation
+
+### Institutional Architecture
+
+China's AI regulation enforcement is coordinated across multiple government agencies, with the Cyberspace Administration of China (CAC) serving as the primary regulator for AI content and algorithms. CAC maintains authority over algorithm registration, content compliance assessment, and licensing for AI services. The Ministry of Industry and Information Technology (MIIT) focuses on technical standards, industrial development policy, and manufacturing aspects of AI systems.
+
+The Ministry of Science and Technology (MOST) oversees AI research and development policy, including funding priorities and strategic planning, while the Ministry of Public Security handles security-related applications and surveillance technologies. This multi-agency approach allows for specialized expertise but also creates coordination challenges and potential regulatory overlap.
+
+Regional and local governments play important implementation roles, with provincial CAC offices conducting local enforcement and major cities like Beijing and Shanghai developing specific AI governance initiatives. This multi-level structure enables tailored approaches to different market contexts while maintaining central policy coordination.
+
+### Compliance and Registration Systems
+
+The algorithm registration database maintained by CAC has become a central mechanism for monitoring and controlling AI systems in China. According to <R id="3c736ff5b41a4c99">Carnegie Endowment research</R>, <R id="c07e56848ffe8c54">over 1,400 algorithms from 450+ companies</R> had been registered as of June 2024. The <R id="f731a8d667e1705e">first batch of 30 providers</R> was released publicly in August 2022, covering almost all major tech platforms.
+
+### Major Registered Algorithm Providers
+
+| Company | Platforms | Algorithm Type | Registration Date |
+|---------|-----------|----------------|-------------------|
+| ByteDance | Douyin, Toutiao | Recommendation via behavioral data (clicks, likes) | August 2022 |
+| Alibaba | Taobao, Tmall | E-commerce recommendation via search history | August 2022 |
+| Tencent | WeChat, QQ | Social content and video recommendation | August 2022 |
+| Baidu | Search, Maps | Search ranking and content recommendation | August 2022 |
+| Meituan | Delivery app | Restaurant and delivery recommendation | August 2022 |
+| Kuaishou | Short video | Content discovery algorithms | August 2022 |
+
+Registration requirements vary based on algorithm type and application scope. Public-facing recommendation algorithms require full registration with public disclosure of basic information, while other algorithmic systems may require registration without public disclosure. The process includes technical documentation submission, security impact assessments, and demonstration of compliance with content and data protection requirements.
+
+Compliance costs for companies include technical modifications to ensure content filtering, implementation of user control mechanisms, hiring of compliance personnel, and ongoing monitoring and reporting obligations. Large technology companies have established dedicated AI governance teams, while smaller companies often struggle with compliance complexity and costs.
+
+### Enforcement Patterns and Effectiveness
+
+Chinese AI regulation enforcement has followed a selective approach, focusing primarily on major platforms and high-profile violations rather than comprehensive monitoring of all regulated entities. This pattern reflects both resource constraints and strategic priorities, with authorities concentrating on companies with significant social influence and user bases.
+
+Notable enforcement actions have included warnings and fines against major recommendation algorithm operators for content violations, requirements for algorithm modifications to improve transparency and user control, and suspension of AI services that failed to obtain required approvals. However, the relatively modest financial penalties (typically under \$15,000) suggest that reputational impact and regulatory relationship management may be more significant compliance drivers than financial deterrence.
+
+Effectiveness assessments indicate strong compliance with content control requirements among major platforms, with sophisticated content filtering systems now standard across Chinese AI services. Algorithm transparency requirements have seen mixed implementation, with required disclosures often providing limited meaningful information to users despite formal compliance. International companies have generally chosen to modify services for Chinese market compliance rather than exit the market, indicating that regulatory requirements are seen as manageable business constraints.
+
+## International Implications and Coordination Challenges
+
+### Comparing Regulatory Approaches
+
+| Dimension | China | European Union | United States |
+|-----------|-------|----------------|---------------|
+| **Primary Framework** | Sector-specific regulations (5+) | Single comprehensive AI Act | Sectoral + executive orders |
+| **Approval Model** | Pre-deployment CAC approval required | Risk-based, mostly post-deployment | Voluntary commitments + sector rules |
+| **Content Requirements** | "Socialist values" alignment | Fundamental rights protection | First Amendment protections |
+| **Algorithm Transparency** | Government registry (1,400+ registered) | High-risk system documentation | Limited federal requirements |
+| **Enforcement Body** | CAC (centralized) | National authorities (distributed) | FTC, sector regulators (fragmented) |
+| **Frontier AI Focus** | Emerging (CnAISDA 2025) | AI Office established 2024 | AISI established 2023 |
+
+### Divergent Regulatory Philosophies
+
+The fundamental differences between Chinese and Western approaches to AI governance create significant challenges for international coordination on AI safety. While Western frameworks emphasize individual rights, privacy protection, and preventing algorithmic bias, Chinese regulations prioritize collective social stability, government control over information, and alignment with state policy objectives. These different value foundations lead to incompatible regulatory requirements in key areas.
+
+Content governance represents the starkest difference, with Chinese requirements that AI systems promote government-approved messaging and avoid politically sensitive topics directly conflicting with Western commitments to free expression and open information access. Transparency requirements also differ significantly, with Chinese regulations focusing on government oversight and user awareness of AI use, while Western approaches emphasize explainability for accountability and individual decision-making purposes.
+
+The pre-approval model used in China contrasts sharply with Western post-deployment enforcement approaches. Chinese requirements for government approval before AI service launch give authorities direct veto power over AI development, while most Western jurisdictions rely on compliance monitoring and enforcement after deployment, with pre-market requirements limited to specific high-risk applications.
+
+### Strategic Competition and Trust Deficits
+
+US-China strategic competition has created substantial barriers to AI safety cooperation, with both countries treating AI development as a national security priority. Export controls on advanced semiconductors have restricted Chinese access to cutting-edge AI hardware, while Chinese companies face increasing scrutiny and restrictions in Western markets. This competitive dynamic creates incentives for rapid AI development and deployment that may conflict with thorough safety evaluation.
+
+According to <R id="0fec40327f2e7046">RAND analysis</R>, trust deficits between Chinese and Western institutions limit information sharing about AI capabilities, safety research findings, and regulatory enforcement experiences. <R id="4f75d2d6d47e8531">Carnegie Endowment research</R> notes that the lack of transparency about Chinese AI development makes it difficult for international partners to assess risks and coordinate appropriate responses. Similarly, Chinese authorities express concern about Western efforts to constrain Chinese AI development through safety requirements that may serve competitive rather than genuine safety purposes.
+
+Military-civil fusion policies that integrate civilian AI development with defense applications further complicate international cooperation. Western governments are increasingly reluctant to engage in AI research cooperation that might benefit Chinese military capabilities, while Chinese institutions face restrictions on international collaboration that might compromise national security interests.
+
+### Multilateral Governance Efforts
+
+Despite bilateral tensions, China continues to participate in multilateral AI governance forums. Key international engagements include:
+
+- **Bletchley Declaration (November 2023):** China joined 28 other nations in <R id="99faf15f92366b6f">acknowledging</R> "substantial risks may arise from potential intentional misuse or unintended issues of control relating to alignment with human intent"
+- **Geneva Bilateral Talks (May 2024):** The <R id="cae11f56a1853f9e">first-ever US-China AI governance meeting</R> following the November 2023 Xi-Biden summit, with delegations led by NSC and State Department officials
+- **Seoul AI Summit (May 2024):** Chinese company Zhipu AI signed the <R id="e3274b108aac1712">Frontier AI Safety Commitments</R>
+- **Paris AI Action Summit (February 2025):** China signed the Paris AI Declaration alongside 60 nations; announced <R id="daad095f3ead31b5">CnAISDA establishment</R>
+
+China has also begun exporting its regulatory approach through Belt and Road Initiative partnerships and technical assistance programs with developing countries. Over 50 nations have signed AI cooperation agreements with China, often adopting Chinese-influenced approaches to data governance and content control. This pattern suggests that Chinese regulatory models may gain broader international influence, particularly in regions where concerns about Western digital dominance and cultural values create receptiveness to alternative governance frameworks.
+
+The development of parallel international AI governance tracks -- one led by Western democracies emphasizing rights and transparency, and another influenced by Chinese priorities around sovereignty and control -- poses challenges for global AI safety coordination. According to <R id="813491c901111d6a">academic research on US-China AI perspectives</R>, "experts in both the US and China have expressed concern about risks from AGI, risks from intelligence explosions, and risks from AI systems that escape human control." Effective management of catastrophic AI risks likely requires cooperation between major AI powers regardless of broader geopolitical tensions.
+
+## Safety Implications and Future Trajectories
+
+### China's Emerging AI Safety Ecosystem
+
+Recent developments signal growing Chinese engagement with frontier AI safety:
+
+| Development | Date | Significance |
+|-------------|------|--------------|
+| <R id="d28217318559322a">AI Safety Governance Framework</R> released by TC260 | September 2024 | First national framework implementing Global AI Governance Initiative |
+| <R id="e3274b108aac1712">17 companies sign AI Safety Commitments</R> via AIIA | December 2024 | DeepSeek, Alibaba, Baidu, Huawei, Tencent commit to red-teaming and transparency |
+| <R id="daad095f3ead31b5">CnAISDA (AI Safety Institute)</R> launched | February 2025 | Decentralized network including Tsinghua, BAAI, CAICT, SHLAB |
+| CCP Third Plenum calls for "AI safety supervision system" | July 2024 | High-level political signal prioritizing safety governance |
+
+### Current Safety Focus and Limitations
+
+China's existing AI regulations demonstrate sophisticated approaches to certain categories of AI risk, particularly those related to content manipulation, algorithmic bias in recommendation systems, and protection of personal data in AI applications. The requirement for human review of algorithmic decisions, prohibition of discriminatory pricing algorithms, and mandatory labeling of synthetic content address important near-term AI safety concerns that have received less comprehensive attention in some Western jurisdictions.
+
+However, according to <R id="9264a9f04ad5b2a3">AI Frontiers analysis</R>, Chinese regulations show limited public engagement with catastrophic AI risks or existential threats from advanced AI systems. Unlike the United States and United Kingdom, which established dedicated AI Safety Institutes in 2023-2024, China's CnAISDA was only launched in February 2025 and is "designed primarily as China's voice in global AI governance discussions" rather than a supervision system. <R id="fb832513c677b816">TIME reports</R> that "China's evaluation system for frontier AI risks lags behind the United States."
+
+The focus on content control and social stability, while addressing legitimate governance concerns, may also constrain development of AI systems designed to maximize human welfare broadly rather than specific governmental objectives. Requirements that AI outputs reflect "core socialist values" could limit research into AI alignment techniques that prioritize diverse human preferences or autonomous moral reasoning by AI systems.
+
+### Competitive Dynamics and Safety Trade-offs
+
+US-China competition in AI development creates concerning dynamics for global AI safety, with both countries facing pressures to achieve AI leadership that may conflict with thorough safety evaluation. The characterization of AI as a strategic technology essential for national power creates incentives for rapid deployment and capability development that could override safety considerations in critical moments.
+
+China's substantial investment in AI development, including government funding exceeding \$100 billion over the past five years and support for national champion companies, demonstrates commitment to achieving AI leadership by 2030. This ambitious timeline, combined with limited public discussion of existential AI risks, raises questions about whether safety considerations will receive adequate priority as Chinese AI capabilities advance toward human-level artificial general intelligence.
+
+The semiconductor export controls imposed by the United States may paradoxically increase rather than decrease AI safety risks by creating pressure for China to develop advanced AI capabilities using available hardware, potentially leading to less cautious development approaches. Restrictions on international research collaboration also limit opportunities for safety-focused technical cooperation between Chinese and Western AI researchers.
+
+### Trajectory Projections and Uncertainties
+
+Over the next 1-2 years, Chinese AI regulations are expected to expand into additional sectors including autonomous vehicles, medical AI applications, and financial algorithmic trading systems. According to <R id="7f88914fc9839b59">Nature reporting</R>, a comprehensive AI Law has been removed from the 2025 legislative agenda, with China instead "prioritising pilots, standards and targeted rules to manage AI-related risks while keeping compliance costs low."
+
+The 2-5 year trajectory presents greater uncertainties, particularly regarding how Chinese regulations will address frontier AI systems approaching human-level capabilities. Key questions include whether China will adopt compute-based governance thresholds similar to those implemented in the United States and European Union, how military-civil fusion priorities will affect civilian AI safety requirements, and whether international cooperation on catastrophic risk prevention will become possible despite ongoing strategic competition.
+
+Critical uncertainties that will shape outcomes include the pace of Chinese AI capability development relative to Western progress, the evolution of US-China relations and their impact on technology cooperation, the success of Chinese domestic semiconductor development efforts, and potential changes in government prioritization of different types of AI risks. The resolution of these uncertainties will significantly influence global AI governance effectiveness and the prospects for coordinated management of advanced AI systems.
+
+### Recommendations for Engagement
+
+The AI safety community should pursue multiple approaches to engage with Chinese AI development and governance despite political obstacles. Technical cooperation through academic exchanges, participation in international standards organizations, and informal research collaborations can help build understanding and identify areas of shared interest in AI safety research.
+
+Track-II diplomacy efforts bringing together non-governmental experts from both countries could help identify specific areas where cooperation on catastrophic risk prevention serves mutual interests, even amid broader strategic competition. Focus areas might include AI biosafety, prevention of accidental AI conflicts, and development of shared evaluation methods for advanced AI capabilities.
+
+International institutions and multilateral forums provide neutral venues for gradual cooperation building, with organizations like the International Telecommunication Union, ISO standards bodies, and United Nations agencies offering opportunities for technical collaboration that avoids direct bilateral political sensitivities. The AI safety community should actively support and participate in these multilateral efforts while advocating for inclusion of catastrophic risk considerations in international AI governance discussions.
+
+---
+
+## Sources and Further Reading
+
+### Regulatory Texts and Legal Analysis
+- <R id="c53ebe85cb13aed2">Interim Measures for the Management of Generative AI Services</R> - Full English translation (China Law Translate)
+- <R id="d48eee7f5735c8ab">Provisions on the Management of Algorithmic Recommendations</R> - Full English translation (China Law Translate)
+- <R id="5a4d26f4d2d9cae9">Deep Synthesis Provisions</R> - Library of Congress analysis
+- <R id="4a767e9d0b685f34">China AI Regulatory Tracker</R> - White & Case ongoing updates
+
+### Policy Analysis
+- <R id="3c736ff5b41a4c99">What China's Algorithm Registry Reveals about AI Governance</R> - Carnegie Endowment
+- <R id="4f75d2d6d47e8531">How China Views AI Risks and What to Do About Them</R> - Carnegie Endowment
+- <R id="f10b467b2e2a91b8">Tracing the Roots of China's AI Regulations</R> - Carnegie Endowment
+- <R id="9264a9f04ad5b2a3">Is China Serious About AI Safety?</R> - AI Frontiers
+
+### International Cooperation
+- <R id="813491c901111d6a">US-China Perspectives on Extreme AI Risks</R> - Academic research on shared concerns
+- <R id="802e16eaa24bfcf0">Promising Topics for US-China Dialogues on AI Risks</R> - FAccT 2025 proceedings
+- <R id="daad095f3ead31b5">How Some of China's Top AI Thinkers Built Their Own AI Safety Institute</R> - Carnegie on CnAISDA
+- <R id="e3274b108aac1712">DeepSeek and Other Chinese Firms Converge with Western Companies on AI Promises</R> - Carnegie analysis
+
+### News and Current Developments
+- <R id="7f88914fc9839b59">China Wants to Lead the World on AI Regulation</R> - Nature
+- <R id="d24ecc9ecc8baa15">Four Things to Know About China's New AI Rules in 2024</R> - MIT Technology Review
+- <R id="fb832513c677b816">China Is Taking AI Safety Seriously. So Must the U.S.</R> - TIME
+
+---
+
+## AI Transition Model Context
+
+China's AI regulations affect the <EntityLink id="ai-transition-model" /> differently than Western approaches:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="regulatory-capacity" /> | 5+ major regulations affecting 50,000+ companies; 1,400+ algorithms registered |
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="international-coordination" /> | Different priorities (social stability vs individual rights) create barriers to global coordination |
+| <EntityLink id="transition-turbulence" /> | <EntityLink id="racing-intensity" /> | Content control focus leaves capability restrictions underemphasized |
+
+China's iterative approach provides lessons for rapid regulatory adaptation, but limited focus on catastrophic risks poses challenges for international coordination on existential safety.
+
+<Backlinks client:load entityId="china-ai-regulations" />

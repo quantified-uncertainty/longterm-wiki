@@ -1,0 +1,7840 @@
+{
+  "existential-catastrophe": [
+    {
+      "id": "misalignment-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misalignment Potential",
+      "relationship": "drives"
+    },
+    {
+      "id": "misuse-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misuse Potential",
+      "relationship": "drives"
+    },
+    {
+      "id": "ai-takeover",
+      "type": "ai-transition-model-scenario",
+      "title": "AI Takeover",
+      "relationship": "contributes-to"
+    },
+    {
+      "id": "human-catastrophe",
+      "type": "ai-transition-model-scenario",
+      "title": "Human-Caused Catastrophe",
+      "relationship": "contributes-to"
+    },
+    {
+      "id": "governance-focused",
+      "type": "concept",
+      "title": "Governance-Focused Worldview"
+    }
+  ],
+  "ai-takeover": [
+    {
+      "id": "misalignment-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misalignment Potential",
+      "relationship": "enables"
+    },
+    {
+      "id": "existential-catastrophe",
+      "type": "ai-transition-model-scenario",
+      "title": "Existential Catastrophe",
+      "relationship": "sub-scenario"
+    }
+  ],
+  "alignment-robustness": [
+    {
+      "id": "misalignment-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misalignment Potential",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "alignment-progress",
+      "type": "ai-transition-model-metric",
+      "title": "Alignment Progress",
+      "relationship": "measures"
+    },
+    {
+      "id": "safety-capability-gap",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety-Capability Gap",
+      "relationship": "related"
+    },
+    {
+      "id": "existential-catastrophe",
+      "type": "ai-transition-model-scenario",
+      "title": "Existential Catastrophe",
+      "relationship": "mitigates"
+    },
+    {
+      "id": "ai-takeover",
+      "type": "ai-transition-model-scenario",
+      "title": "AI Takeover",
+      "relationship": "mitigated-by"
+    },
+    {
+      "id": "deceptive-alignment-decomposition",
+      "type": "model",
+      "title": "Deceptive Alignment Decomposition Model",
+      "relationship": "models"
+    },
+    {
+      "id": "carlsmith-six-premises",
+      "type": "model",
+      "title": "Carlsmith's Six-Premise Argument",
+      "relationship": "models"
+    },
+    {
+      "id": "corrigibility-failure-pathways",
+      "type": "model",
+      "title": "Corrigibility Failure Pathways",
+      "relationship": "models"
+    },
+    {
+      "id": "safety-capability-tradeoff",
+      "type": "model",
+      "title": "Safety-Capability Tradeoff Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "alignment-robustness-trajectory",
+      "type": "model",
+      "title": "Alignment Robustness Trajectory Model",
+      "relationship": "models"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability",
+      "relationship": "increases"
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight",
+      "relationship": "supports"
+    }
+  ],
+  "interpretability-coverage": [
+    {
+      "id": "misalignment-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misalignment Potential",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "alignment-progress",
+      "type": "ai-transition-model-metric",
+      "title": "Alignment Progress",
+      "relationship": "measures"
+    },
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "related"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability",
+      "relationship": "increases"
+    }
+  ],
+  "human-oversight-quality": [
+    {
+      "id": "misalignment-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misalignment Potential",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "lab-behavior",
+      "type": "ai-transition-model-metric",
+      "title": "Lab Behavior",
+      "relationship": "measures"
+    },
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "related"
+    },
+    {
+      "id": "deceptive-alignment-decomposition",
+      "type": "model",
+      "title": "Deceptive Alignment Decomposition Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "corrigibility-failure-pathways",
+      "type": "model",
+      "title": "Corrigibility Failure Pathways",
+      "relationship": "affects"
+    },
+    {
+      "id": "expertise-atrophy-progression",
+      "type": "model",
+      "title": "Expertise Atrophy Progression Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "automation-bias-cascade",
+      "type": "model",
+      "title": "Automation Bias Cascade Model",
+      "relationship": "models"
+    },
+    {
+      "id": "alignment-robustness-trajectory",
+      "type": "model",
+      "title": "Alignment Robustness Trajectory Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability",
+      "relationship": "increases"
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight",
+      "relationship": "increases"
+    }
+  ],
+  "safety-capability-gap": [
+    {
+      "id": "misalignment-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misalignment Potential",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "ai-capabilities",
+      "type": "ai-transition-model-factor",
+      "title": "AI Capabilities",
+      "relationship": "affects"
+    },
+    {
+      "id": "alignment-progress",
+      "type": "ai-transition-model-metric",
+      "title": "Alignment Progress",
+      "relationship": "measures"
+    },
+    {
+      "id": "safety-research",
+      "type": "ai-transition-model-metric",
+      "title": "Safety Research",
+      "relationship": "measures"
+    },
+    {
+      "id": "capabilities",
+      "type": "ai-transition-model-metric",
+      "title": "AI Capabilities",
+      "relationship": "measures"
+    },
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "related"
+    },
+    {
+      "id": "racing-dynamics-impact",
+      "type": "model",
+      "title": "Racing Dynamics Impact Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "safety-capability-tradeoff",
+      "type": "model",
+      "title": "Safety-Capability Tradeoff Model",
+      "relationship": "models"
+    },
+    {
+      "id": "alignment-robustness-trajectory",
+      "type": "model",
+      "title": "Alignment Robustness Trajectory Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability",
+      "relationship": "supports"
+    }
+  ],
+  "safety-culture-strength": [
+    {
+      "id": "misalignment-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misalignment Potential",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "safety-research",
+      "type": "ai-transition-model-metric",
+      "title": "Safety Research",
+      "relationship": "measures"
+    },
+    {
+      "id": "lab-behavior",
+      "type": "ai-transition-model-metric",
+      "title": "Lab Behavior",
+      "relationship": "measures"
+    },
+    {
+      "id": "safety-capability-gap",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety-Capability Gap",
+      "relationship": "related"
+    },
+    {
+      "id": "racing-dynamics-model",
+      "type": "model",
+      "title": "Racing Dynamics Game Theory Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "lab-incentives-model",
+      "type": "model",
+      "title": "Lab Incentives Model",
+      "relationship": "models"
+    },
+    {
+      "id": "safety-culture-equilibrium",
+      "type": "model",
+      "title": "Safety Culture Equilibrium Model",
+      "relationship": "models"
+    }
+  ],
+  "human-catastrophe": [
+    {
+      "id": "misuse-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misuse Potential",
+      "relationship": "enables"
+    },
+    {
+      "id": "existential-catastrophe",
+      "type": "ai-transition-model-scenario",
+      "title": "Existential Catastrophe",
+      "relationship": "sub-scenario"
+    }
+  ],
+  "biological-threat-exposure": [
+    {
+      "id": "misuse-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misuse Potential",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "human-catastrophe",
+      "type": "ai-transition-model-scenario",
+      "title": "Human-Caused Catastrophe",
+      "relationship": "key-factor"
+    },
+    {
+      "id": "bioweapons-attack-chain",
+      "type": "model",
+      "title": "Bioweapons Attack Chain Model",
+      "relationship": "models"
+    },
+    {
+      "id": "bioweapons-ai-uplift",
+      "type": "model",
+      "title": "AI Uplift Assessment Model",
+      "relationship": "affects"
+    }
+  ],
+  "cyber-threat-exposure": [
+    {
+      "id": "misuse-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misuse Potential",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "human-catastrophe",
+      "type": "ai-transition-model-scenario",
+      "title": "Human-Caused Catastrophe",
+      "relationship": "key-factor"
+    },
+    {
+      "id": "cyberweapons-offense-defense",
+      "type": "model",
+      "title": "Cyber Offense-Defense Balance Model",
+      "relationship": "models"
+    },
+    {
+      "id": "cyberweapons-attack-automation",
+      "type": "model",
+      "title": "Autonomous Cyber Attack Timeline",
+      "relationship": "affects"
+    }
+  ],
+  "racing-intensity": [
+    {
+      "id": "misuse-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misuse Potential",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "safety-research",
+      "type": "ai-transition-model-metric",
+      "title": "Safety Research",
+      "relationship": "measures"
+    },
+    {
+      "id": "lab-behavior",
+      "type": "ai-transition-model-metric",
+      "title": "Lab Behavior",
+      "relationship": "measures"
+    },
+    {
+      "id": "expert-opinion",
+      "type": "ai-transition-model-metric",
+      "title": "Expert Opinion",
+      "relationship": "measures"
+    },
+    {
+      "id": "compute-hardware",
+      "type": "ai-transition-model-metric",
+      "title": "Compute & Hardware",
+      "relationship": "measures"
+    },
+    {
+      "id": "safety-capability-gap",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety-Capability Gap",
+      "relationship": "related"
+    },
+    {
+      "id": "tmc-compute",
+      "type": "ai-transition-model-subitem",
+      "title": "Compute",
+      "relationship": "affects"
+    },
+    {
+      "id": "carlsmith-six-premises",
+      "type": "model",
+      "title": "Carlsmith's Six-Premise Argument",
+      "relationship": "models"
+    },
+    {
+      "id": "racing-dynamics-impact",
+      "type": "model",
+      "title": "Racing Dynamics Impact Model",
+      "relationship": "models"
+    },
+    {
+      "id": "multipolar-trap-dynamics",
+      "type": "model",
+      "title": "Multipolar Trap Dynamics Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "racing-dynamics-model",
+      "type": "model",
+      "title": "Racing Dynamics Game Theory Model",
+      "relationship": "models"
+    },
+    {
+      "id": "lab-incentives-model",
+      "type": "model",
+      "title": "Lab Incentives Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "parameter-interaction-network",
+      "type": "model",
+      "title": "Parameter Interaction Network Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "safety-culture-equilibrium",
+      "type": "model",
+      "title": "Safety Culture Equilibrium Model",
+      "relationship": "models"
+    }
+  ],
+  "ai-control-concentration": [
+    {
+      "id": "misuse-potential",
+      "type": "ai-transition-model-factor",
+      "title": "Misuse Potential",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "ai-ownership",
+      "type": "ai-transition-model-factor",
+      "title": "AI Ownership",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "compute-hardware",
+      "type": "ai-transition-model-metric",
+      "title": "Compute & Hardware",
+      "relationship": "measures"
+    },
+    {
+      "id": "long-term-lockin",
+      "type": "ai-transition-model-scenario",
+      "title": "Long-term Lock-in",
+      "relationship": "key-factor"
+    },
+    {
+      "id": "winner-take-all-concentration",
+      "type": "model",
+      "title": "Winner-Take-All Concentration Model",
+      "relationship": "models"
+    },
+    {
+      "id": "winner-take-all-model",
+      "type": "model",
+      "title": "Winner-Take-All Market Dynamics Model",
+      "relationship": "models"
+    },
+    {
+      "id": "concentration-of-power-model",
+      "type": "model",
+      "title": "Concentration of Power Systems Model",
+      "relationship": "models"
+    },
+    {
+      "id": "international-coordination-game",
+      "type": "model",
+      "title": "International Coordination Game Model",
+      "relationship": "affects"
+    }
+  ],
+  "misalignment-potential": [
+    {
+      "id": "ai-capabilities",
+      "type": "ai-transition-model-factor",
+      "title": "AI Capabilities",
+      "relationship": "amplifies"
+    },
+    {
+      "id": "existential-catastrophe",
+      "type": "ai-transition-model-scenario",
+      "title": "Existential Catastrophe",
+      "relationship": "driver"
+    },
+    {
+      "id": "ai-takeover",
+      "type": "ai-transition-model-scenario",
+      "title": "AI Takeover",
+      "relationship": "driven-by"
+    }
+  ],
+  "misuse-potential": [
+    {
+      "id": "ai-capabilities",
+      "type": "ai-transition-model-factor",
+      "title": "AI Capabilities",
+      "relationship": "amplifies"
+    },
+    {
+      "id": "existential-catastrophe",
+      "type": "ai-transition-model-scenario",
+      "title": "Existential Catastrophe",
+      "relationship": "driver"
+    },
+    {
+      "id": "human-catastrophe",
+      "type": "ai-transition-model-scenario",
+      "title": "Human-Caused Catastrophe",
+      "relationship": "driven-by"
+    }
+  ],
+  "ai-capabilities": [
+    {
+      "id": "ai-uses",
+      "type": "ai-transition-model-factor",
+      "title": "AI Uses",
+      "relationship": "shaped-by"
+    },
+    {
+      "id": "tmc-compute",
+      "type": "ai-transition-model-subitem",
+      "title": "Compute",
+      "relationship": "child-of"
+    },
+    {
+      "id": "tmc-algorithms",
+      "type": "ai-transition-model-subitem",
+      "title": "Algorithms",
+      "relationship": "child-of"
+    }
+  ],
+  "economic-stability": [
+    {
+      "id": "ai-uses",
+      "type": "ai-transition-model-factor",
+      "title": "AI Uses",
+      "relationship": "affects"
+    },
+    {
+      "id": "transition-turbulence",
+      "type": "ai-transition-model-factor",
+      "title": "Transition Turbulence",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "economic-labor",
+      "type": "ai-transition-model-metric",
+      "title": "Economic & Labor",
+      "relationship": "measures"
+    },
+    {
+      "id": "economic-disruption-impact",
+      "type": "model",
+      "title": "Economic Disruption Impact Model",
+      "relationship": "models"
+    },
+    {
+      "id": "winner-take-all-concentration",
+      "type": "model",
+      "title": "Winner-Take-All Concentration Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "winner-take-all-model",
+      "type": "model",
+      "title": "Winner-Take-All Market Dynamics Model",
+      "relationship": "affects"
+    }
+  ],
+  "human-expertise": [
+    {
+      "id": "ai-uses",
+      "type": "ai-transition-model-factor",
+      "title": "AI Uses",
+      "relationship": "affects"
+    },
+    {
+      "id": "transition-turbulence",
+      "type": "ai-transition-model-factor",
+      "title": "Transition Turbulence",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "economic-labor",
+      "type": "ai-transition-model-metric",
+      "title": "Economic & Labor",
+      "relationship": "measures"
+    },
+    {
+      "id": "expertise-atrophy-progression",
+      "type": "model",
+      "title": "Expertise Atrophy Progression Model",
+      "relationship": "models"
+    },
+    {
+      "id": "expertise-atrophy-cascade",
+      "type": "model",
+      "title": "Expertise Atrophy Cascade Model",
+      "relationship": "models"
+    },
+    {
+      "id": "automation-bias-cascade",
+      "type": "model",
+      "title": "Automation Bias Cascade Model",
+      "relationship": "affects"
+    }
+  ],
+  "long-term-trajectory": [
+    {
+      "id": "ai-ownership",
+      "type": "ai-transition-model-factor",
+      "title": "AI Ownership",
+      "relationship": "drives"
+    },
+    {
+      "id": "civilizational-competence",
+      "type": "ai-transition-model-factor",
+      "title": "Civilizational Competence",
+      "relationship": "drives"
+    },
+    {
+      "id": "long-term-lockin",
+      "type": "ai-transition-model-scenario",
+      "title": "Long-term Lock-in",
+      "relationship": "contributes-to"
+    }
+  ],
+  "long-term-lockin": [
+    {
+      "id": "ai-ownership",
+      "type": "ai-transition-model-factor",
+      "title": "AI Ownership",
+      "relationship": "enables"
+    },
+    {
+      "id": "long-term-trajectory",
+      "type": "ai-transition-model-scenario",
+      "title": "Long-term Trajectory",
+      "relationship": "sub-scenario"
+    }
+  ],
+  "transition-turbulence": [
+    {
+      "id": "civilizational-competence",
+      "type": "ai-transition-model-factor",
+      "title": "Civilizational Competence",
+      "relationship": "mitigates"
+    }
+  ],
+  "regulatory-capacity": [
+    {
+      "id": "civilizational-competence",
+      "type": "ai-transition-model-factor",
+      "title": "Civilizational Competence",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "structural",
+      "type": "ai-transition-model-metric",
+      "title": "Structural Indicators",
+      "relationship": "measures"
+    },
+    {
+      "id": "institutional-adaptation-speed",
+      "type": "model",
+      "title": "Institutional Adaptation Speed Model",
+      "relationship": "models"
+    },
+    {
+      "id": "regulatory-capacity-threshold",
+      "type": "model",
+      "title": "Regulatory Capacity Threshold Model",
+      "relationship": "models"
+    }
+  ],
+  "institutional-quality": [
+    {
+      "id": "civilizational-competence",
+      "type": "ai-transition-model-factor",
+      "title": "Civilizational Competence",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "structural",
+      "type": "ai-transition-model-metric",
+      "title": "Structural Indicators",
+      "relationship": "measures"
+    },
+    {
+      "id": "trust-erosion-dynamics",
+      "type": "model",
+      "title": "Trust Erosion Dynamics Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "institutional-adaptation-speed",
+      "type": "model",
+      "title": "Institutional Adaptation Speed Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "parameter-interaction-network",
+      "type": "model",
+      "title": "Parameter Interaction Network Model",
+      "relationship": "models"
+    },
+    {
+      "id": "regulatory-capacity-threshold",
+      "type": "model",
+      "title": "Regulatory Capacity Threshold Model",
+      "relationship": "models"
+    }
+  ],
+  "international-coordination": [
+    {
+      "id": "civilizational-competence",
+      "type": "ai-transition-model-factor",
+      "title": "Civilizational Competence",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "geopolitics",
+      "type": "ai-transition-model-metric",
+      "title": "Geopolitics",
+      "relationship": "measures"
+    },
+    {
+      "id": "coordination-capacity",
+      "type": "ai-transition-model-parameter",
+      "title": "Coordination Capacity",
+      "relationship": "related"
+    },
+    {
+      "id": "solutions",
+      "type": "crux",
+      "title": "Solution Cruxes"
+    },
+    {
+      "id": "structural-risks",
+      "type": "crux",
+      "title": "Structural Risk Cruxes"
+    },
+    {
+      "id": "governance-focused",
+      "type": "concept",
+      "title": "Governance-Focused Worldview"
+    },
+    {
+      "id": "ai-safety-summit",
+      "type": "historical",
+      "title": "AI Safety Summit (Bletchley Park)"
+    },
+    {
+      "id": "short-timeline-policy-implications",
+      "type": "analysis",
+      "title": "Short Timeline Policy Implications"
+    },
+    {
+      "id": "multipolar-trap-dynamics",
+      "type": "model",
+      "title": "Multipolar Trap Dynamics Model",
+      "relationship": "models"
+    },
+    {
+      "id": "racing-dynamics-model",
+      "type": "model",
+      "title": "Racing Dynamics Game Theory Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "international-coordination-game",
+      "type": "model",
+      "title": "International Coordination Game Model",
+      "relationship": "models"
+    },
+    {
+      "id": "govai",
+      "type": "lab-research",
+      "title": "GovAI"
+    },
+    {
+      "id": "international-compute-regimes",
+      "type": "policy",
+      "title": "International Compute Regimes"
+    }
+  ],
+  "societal-resilience": [
+    {
+      "id": "civilizational-competence",
+      "type": "ai-transition-model-factor",
+      "title": "Civilizational Competence",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "structural",
+      "type": "ai-transition-model-metric",
+      "title": "Structural Indicators",
+      "relationship": "measures"
+    },
+    {
+      "id": "defense-in-depth-model",
+      "type": "model",
+      "title": "Defense in Depth Model",
+      "relationship": "models"
+    }
+  ],
+  "epistemic-health": [
+    {
+      "id": "civilizational-competence",
+      "type": "ai-transition-model-factor",
+      "title": "Civilizational Competence",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "expert-opinion",
+      "type": "ai-transition-model-metric",
+      "title": "Expert Opinion",
+      "relationship": "measures"
+    },
+    {
+      "id": "structural",
+      "type": "ai-transition-model-metric",
+      "title": "Structural Indicators",
+      "relationship": "measures"
+    },
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "related"
+    },
+    {
+      "id": "information-authenticity",
+      "type": "ai-transition-model-parameter",
+      "title": "Information Authenticity",
+      "relationship": "related"
+    },
+    {
+      "id": "reality-coherence",
+      "type": "ai-transition-model-parameter",
+      "title": "Reality Coherence",
+      "relationship": "related"
+    },
+    {
+      "id": "trust-cascade-model",
+      "type": "model",
+      "title": "Trust Cascade Failure Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "authentication-collapse-timeline",
+      "type": "model",
+      "title": "Authentication Collapse Timeline Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "epistemic-collapse-threshold",
+      "type": "model",
+      "title": "Epistemic Collapse Threshold Model",
+      "relationship": "models"
+    },
+    {
+      "id": "reality-fragmentation-network",
+      "type": "model",
+      "title": "Reality Fragmentation Network Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "parameter-interaction-network",
+      "type": "model",
+      "title": "Parameter Interaction Network Model",
+      "relationship": "models"
+    }
+  ],
+  "societal-trust": [
+    {
+      "id": "civilizational-competence",
+      "type": "ai-transition-model-factor",
+      "title": "Civilizational Competence",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "public-opinion",
+      "type": "ai-transition-model-metric",
+      "title": "Public Opinion",
+      "relationship": "measures"
+    },
+    {
+      "id": "structural",
+      "type": "ai-transition-model-metric",
+      "title": "Structural Indicators",
+      "relationship": "measures"
+    },
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "related"
+    },
+    {
+      "id": "deepfakes-authentication-crisis",
+      "type": "model",
+      "title": "Deepfakes Authentication Crisis Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "trust-cascade-model",
+      "type": "model",
+      "title": "Trust Cascade Failure Model",
+      "relationship": "models"
+    },
+    {
+      "id": "sycophancy-feedback-loop",
+      "type": "model",
+      "title": "Sycophancy Feedback Loop Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "epistemic-collapse-threshold",
+      "type": "model",
+      "title": "Epistemic Collapse Threshold Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "trust-erosion-dynamics",
+      "type": "model",
+      "title": "Trust Erosion Dynamics Model",
+      "relationship": "models"
+    },
+    {
+      "id": "parameter-interaction-network",
+      "type": "model",
+      "title": "Parameter Interaction Network Model",
+      "relationship": "affects"
+    }
+  ],
+  "civilizational-competence": [
+    {
+      "id": "transition-turbulence",
+      "type": "ai-transition-model-factor",
+      "title": "Transition Turbulence",
+      "relationship": "mitigated-by"
+    },
+    {
+      "id": "long-term-trajectory",
+      "type": "ai-transition-model-scenario",
+      "title": "Long-term Trajectory",
+      "relationship": "driver"
+    }
+  ],
+  "human-agency": [
+    {
+      "id": "transition-turbulence",
+      "type": "ai-transition-model-factor",
+      "title": "Transition Turbulence",
+      "relationship": "composed-of"
+    },
+    {
+      "id": "economic-labor",
+      "type": "ai-transition-model-metric",
+      "title": "Economic & Labor",
+      "relationship": "measures"
+    },
+    {
+      "id": "preference-authenticity",
+      "type": "ai-transition-model-parameter",
+      "title": "Preference Authenticity",
+      "relationship": "related"
+    },
+    {
+      "id": "long-term-trajectory",
+      "type": "ai-transition-model-scenario",
+      "title": "Long-term Trajectory",
+      "relationship": "key-factor"
+    },
+    {
+      "id": "structural-risks",
+      "type": "crux",
+      "title": "Structural Risk Cruxes"
+    },
+    {
+      "id": "economic-disruption-impact",
+      "type": "model",
+      "title": "Economic Disruption Impact Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "expertise-atrophy-cascade",
+      "type": "model",
+      "title": "Expertise Atrophy Cascade Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "concentration-of-power-model",
+      "type": "model",
+      "title": "Concentration of Power Systems Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "preference-manipulation-drift",
+      "type": "model",
+      "title": "Preference Manipulation Drift Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight",
+      "relationship": "supports"
+    }
+  ],
+  "preference-authenticity": [
+    {
+      "id": "public-opinion",
+      "type": "ai-transition-model-metric",
+      "title": "Public Opinion",
+      "relationship": "measures"
+    },
+    {
+      "id": "long-term-trajectory",
+      "type": "ai-transition-model-scenario",
+      "title": "Long-term Trajectory",
+      "relationship": "key-factor"
+    },
+    {
+      "id": "long-term-lockin",
+      "type": "ai-transition-model-scenario",
+      "title": "Long-term Lock-in",
+      "relationship": "key-factor"
+    },
+    {
+      "id": "sycophancy-feedback-loop",
+      "type": "model",
+      "title": "Sycophancy Feedback Loop Model",
+      "relationship": "models"
+    },
+    {
+      "id": "reality-fragmentation-network",
+      "type": "model",
+      "title": "Reality Fragmentation Network Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "preference-manipulation-drift",
+      "type": "model",
+      "title": "Preference Manipulation Drift Model",
+      "relationship": "models"
+    }
+  ],
+  "coordination-capacity": [
+    {
+      "id": "geopolitics",
+      "type": "ai-transition-model-metric",
+      "title": "Geopolitics",
+      "relationship": "measures"
+    },
+    {
+      "id": "racing-dynamics-impact",
+      "type": "model",
+      "title": "Racing Dynamics Impact Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "international-coordination-game",
+      "type": "model",
+      "title": "International Coordination Game Model",
+      "relationship": "affects"
+    }
+  ],
+  "information-authenticity": [
+    {
+      "id": "structural",
+      "type": "ai-transition-model-metric",
+      "title": "Structural Indicators",
+      "relationship": "measures"
+    },
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "related"
+    },
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "related"
+    },
+    {
+      "id": "deepfakes-authentication-crisis",
+      "type": "model",
+      "title": "Deepfakes Authentication Crisis Model",
+      "relationship": "models"
+    },
+    {
+      "id": "trust-cascade-model",
+      "type": "model",
+      "title": "Trust Cascade Failure Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "authentication-collapse-timeline",
+      "type": "model",
+      "title": "Authentication Collapse Timeline Model",
+      "relationship": "models"
+    }
+  ],
+  "international-summits": [
+    {
+      "id": "international-coordination",
+      "type": "ai-transition-model-parameter",
+      "title": "International Coordination",
+      "relationship": "related"
+    },
+    {
+      "id": "china-ai-regulations",
+      "type": "policy",
+      "title": "China AI Regulatory Framework"
+    },
+    {
+      "id": "voluntary-commitments",
+      "type": "policy",
+      "title": "Voluntary AI Safety Commitments"
+    }
+  ],
+  "geopolitics": [
+    {
+      "id": "international-coordination",
+      "type": "ai-transition-model-parameter",
+      "title": "International Coordination",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "coordination-capacity",
+      "type": "ai-transition-model-parameter",
+      "title": "Coordination Capacity",
+      "relationship": "measured-by"
+    }
+  ],
+  "racing-dynamics-model": [
+    {
+      "id": "international-coordination",
+      "type": "ai-transition-model-parameter",
+      "title": "International Coordination",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "racing-intensity",
+      "type": "ai-transition-model-parameter",
+      "title": "Racing Intensity",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "safety-culture-strength",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety Culture Strength",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "safety-culture-equilibrium",
+      "type": "model",
+      "title": "Safety Culture Equilibrium Model",
+      "relationship": "related"
+    }
+  ],
+  "multipolar-trap-dynamics": [
+    {
+      "id": "international-coordination",
+      "type": "ai-transition-model-parameter",
+      "title": "International Coordination",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "racing-intensity",
+      "type": "ai-transition-model-parameter",
+      "title": "Racing Intensity",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "international-coordination-game": [
+    {
+      "id": "international-coordination",
+      "type": "ai-transition-model-parameter",
+      "title": "International Coordination",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "ai-control-concentration",
+      "type": "ai-transition-model-parameter",
+      "title": "AI Control Concentration",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "coordination-capacity",
+      "type": "ai-transition-model-parameter",
+      "title": "Coordination Capacity",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "trust-decline": [
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "decreases"
+    },
+    {
+      "id": "trust-cascade-model",
+      "type": "model",
+      "title": "Trust Cascade Failure Model",
+      "relationship": "related"
+    },
+    {
+      "id": "trust-erosion-dynamics",
+      "type": "model",
+      "title": "Trust Erosion Dynamics Model",
+      "relationship": "related"
+    },
+    {
+      "id": "epistemic-security",
+      "type": "approach",
+      "title": "Epistemic Security"
+    },
+    {
+      "id": "epistemic-infrastructure",
+      "type": "approach",
+      "title": "Epistemic Infrastructure"
+    },
+    {
+      "id": "deepfakes",
+      "type": "risk",
+      "title": "Deepfakes"
+    },
+    {
+      "id": "epistemic-collapse",
+      "type": "risk",
+      "title": "Epistemic Collapse"
+    }
+  ],
+  "disinformation": [
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "decreases"
+    },
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "decreases"
+    },
+    {
+      "id": "misuse-risks",
+      "type": "crux",
+      "title": "Misuse Risk Cruxes"
+    },
+    {
+      "id": "disinformation-detection-race",
+      "type": "model",
+      "title": "Disinformation Detection Arms Race Model",
+      "relationship": "related"
+    },
+    {
+      "id": "disinformation-electoral-impact",
+      "type": "model",
+      "title": "Electoral Impact Assessment Model",
+      "relationship": "related"
+    },
+    {
+      "id": "cyber-psychosis-cascade",
+      "type": "model",
+      "title": "Cyber Psychosis Cascade Model",
+      "relationship": "related"
+    },
+    {
+      "id": "fraud-sophistication-curve",
+      "type": "model",
+      "title": "Fraud Sophistication Curve Model",
+      "relationship": "related"
+    },
+    {
+      "id": "epistemic-security",
+      "type": "approach",
+      "title": "Epistemic Security"
+    },
+    {
+      "id": "content-authentication",
+      "type": "approach",
+      "title": "Content Authentication"
+    },
+    {
+      "id": "deepfakes",
+      "type": "risk",
+      "title": "Deepfakes"
+    },
+    {
+      "id": "epistemic-collapse",
+      "type": "risk",
+      "title": "Epistemic Collapse"
+    },
+    {
+      "id": "fraud",
+      "type": "risk",
+      "title": "AI-Powered Fraud"
+    },
+    {
+      "id": "trust-decline",
+      "type": "risk",
+      "title": "Trust Decline"
+    }
+  ],
+  "deepfakes": [
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "decreases"
+    },
+    {
+      "id": "misuse-risks",
+      "type": "crux",
+      "title": "Misuse Risk Cruxes"
+    },
+    {
+      "id": "epistemic-risks",
+      "type": "crux",
+      "title": "Epistemic Cruxes"
+    },
+    {
+      "id": "deepfakes-authentication-crisis",
+      "type": "model",
+      "title": "Deepfakes Authentication Crisis Model",
+      "relationship": "related"
+    },
+    {
+      "id": "authentication-collapse-timeline",
+      "type": "model",
+      "title": "Authentication Collapse Timeline Model",
+      "relationship": "related"
+    },
+    {
+      "id": "cyber-psychosis-cascade",
+      "type": "model",
+      "title": "Cyber Psychosis Cascade Model",
+      "relationship": "related"
+    },
+    {
+      "id": "fraud-sophistication-curve",
+      "type": "model",
+      "title": "Fraud Sophistication Curve Model",
+      "relationship": "related"
+    },
+    {
+      "id": "marc-andreessen",
+      "type": "researcher",
+      "title": "Marc Andreessen"
+    },
+    {
+      "id": "epistemic-security",
+      "type": "approach",
+      "title": "Epistemic Security"
+    },
+    {
+      "id": "content-authentication",
+      "type": "approach",
+      "title": "Content Authentication"
+    },
+    {
+      "id": "disinformation",
+      "type": "risk",
+      "title": "AI Disinformation"
+    },
+    {
+      "id": "epistemic-collapse",
+      "type": "risk",
+      "title": "Epistemic Collapse"
+    },
+    {
+      "id": "fraud",
+      "type": "risk",
+      "title": "AI-Powered Fraud"
+    },
+    {
+      "id": "trust-decline",
+      "type": "risk",
+      "title": "Trust Decline"
+    }
+  ],
+  "content-authentication": [
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "supports"
+    }
+  ],
+  "public-opinion": [
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "preference-authenticity",
+      "type": "ai-transition-model-parameter",
+      "title": "Preference Authenticity",
+      "relationship": "measured-by"
+    }
+  ],
+  "trust-cascade-model": [
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "information-authenticity",
+      "type": "ai-transition-model-parameter",
+      "title": "Information Authenticity",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "trust-erosion-dynamics",
+      "type": "model",
+      "title": "Trust Erosion Dynamics Model",
+      "relationship": "related"
+    }
+  ],
+  "deepfakes-authentication-crisis": [
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "information-authenticity",
+      "type": "ai-transition-model-parameter",
+      "title": "Information Authenticity",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "sycophancy-feedback-loop": [
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "preference-authenticity",
+      "type": "ai-transition-model-parameter",
+      "title": "Preference Authenticity",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "preference-manipulation-drift",
+      "type": "model",
+      "title": "Preference Manipulation Drift Model",
+      "relationship": "related"
+    }
+  ],
+  "epistemic-collapse-threshold": [
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "reality-coherence",
+      "type": "ai-transition-model-parameter",
+      "title": "Reality Coherence",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "trust-erosion-dynamics": [
+    {
+      "id": "societal-trust",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Trust",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "institutional-quality",
+      "type": "ai-transition-model-parameter",
+      "title": "Institutional Quality",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "epistemic-collapse": [
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "decreases"
+    },
+    {
+      "id": "trust-cascade-model",
+      "type": "model",
+      "title": "Trust Cascade Failure Model",
+      "relationship": "leads-to"
+    },
+    {
+      "id": "expertise-atrophy-cascade",
+      "type": "model",
+      "title": "Expertise Atrophy Cascade Model",
+      "relationship": "contributes-to"
+    },
+    {
+      "id": "epistemic-collapse-threshold",
+      "type": "model",
+      "title": "Epistemic Collapse Threshold Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "reality-fragmentation-network",
+      "type": "model",
+      "title": "Reality Fragmentation Network Model",
+      "relationship": "leads-to"
+    },
+    {
+      "id": "epistemic-security",
+      "type": "approach",
+      "title": "Epistemic Security"
+    },
+    {
+      "id": "epistemic-infrastructure",
+      "type": "approach",
+      "title": "Epistemic Infrastructure"
+    },
+    {
+      "id": "disinformation",
+      "type": "risk",
+      "title": "AI Disinformation"
+    },
+    {
+      "id": "trust-decline",
+      "type": "risk",
+      "title": "Trust Decline"
+    }
+  ],
+  "consensus-manufacturing": [
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "decreases"
+    },
+    {
+      "id": "consensus-manufacturing-dynamics",
+      "type": "model",
+      "title": "Consensus Manufacturing Dynamics Model",
+      "relationship": "related"
+    },
+    {
+      "id": "epistemic-security",
+      "type": "approach",
+      "title": "Epistemic Security"
+    },
+    {
+      "id": "prediction-markets",
+      "type": "approach",
+      "title": "Prediction Markets"
+    }
+  ],
+  "epistemic-security": [
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "supports"
+    }
+  ],
+  "expert-opinion": [
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "racing-intensity",
+      "type": "ai-transition-model-parameter",
+      "title": "Racing Intensity",
+      "relationship": "measured-by"
+    }
+  ],
+  "reality-fragmentation-network": [
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "reality-coherence",
+      "type": "ai-transition-model-parameter",
+      "title": "Reality Coherence",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "preference-authenticity",
+      "type": "ai-transition-model-parameter",
+      "title": "Preference Authenticity",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "authentication-collapse-timeline": [
+    {
+      "id": "epistemic-health",
+      "type": "ai-transition-model-parameter",
+      "title": "Epistemic Health",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "information-authenticity",
+      "type": "ai-transition-model-parameter",
+      "title": "Information Authenticity",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "concentration-of-power": [
+    {
+      "id": "ai-control-concentration",
+      "type": "ai-transition-model-parameter",
+      "title": "AI Control Concentration",
+      "relationship": "related"
+    },
+    {
+      "id": "racing-dynamics-model",
+      "type": "model",
+      "title": "Racing Dynamics Game Theory Model",
+      "relationship": "outcome"
+    },
+    {
+      "id": "multipolar-trap-model",
+      "type": "model",
+      "title": "Multipolar Trap Coordination Model",
+      "relationship": "outcome"
+    },
+    {
+      "id": "winner-take-all-model",
+      "type": "model",
+      "title": "Winner-Take-All Market Dynamics Model",
+      "relationship": "mechanism"
+    },
+    {
+      "id": "concentration-of-power-model",
+      "type": "model",
+      "title": "Concentration of Power Systems Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "lock-in-model",
+      "type": "model",
+      "title": "Lock-in Irreversibility Model",
+      "relationship": "mechanism"
+    },
+    {
+      "id": "economic-disruption-model",
+      "type": "model",
+      "title": "Economic Disruption Structural Model",
+      "relationship": "consequence"
+    },
+    {
+      "id": "deepmind",
+      "type": "lab",
+      "title": "Google DeepMind"
+    },
+    {
+      "id": "compute-governance",
+      "type": "policy",
+      "title": "Compute Governance"
+    },
+    {
+      "id": "authoritarian-tools",
+      "type": "risk",
+      "title": "AI Authoritarian Tools"
+    },
+    {
+      "id": "economic-disruption",
+      "type": "risk",
+      "title": "Economic Disruption"
+    },
+    {
+      "id": "irreversibility",
+      "type": "risk",
+      "title": "Irreversibility"
+    },
+    {
+      "id": "lock-in",
+      "type": "risk",
+      "title": "Lock-in"
+    },
+    {
+      "id": "authoritarian-takeover",
+      "type": "risk",
+      "title": "Authoritarian Takeover"
+    },
+    {
+      "id": "multipolar-trap",
+      "type": "risk",
+      "title": "Multipolar Trap"
+    },
+    {
+      "id": "surveillance",
+      "type": "risk",
+      "title": "AI Mass Surveillance"
+    },
+    {
+      "id": "winner-take-all",
+      "type": "risk",
+      "title": "Winner-Take-All Dynamics"
+    }
+  ],
+  "compute-hardware": [
+    {
+      "id": "ai-control-concentration",
+      "type": "ai-transition-model-parameter",
+      "title": "AI Control Concentration",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "racing-intensity",
+      "type": "ai-transition-model-parameter",
+      "title": "Racing Intensity",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "tmc-compute",
+      "type": "ai-transition-model-subitem",
+      "title": "Compute",
+      "relationship": "measured-by"
+    }
+  ],
+  "winner-take-all-model": [
+    {
+      "id": "ai-control-concentration",
+      "type": "ai-transition-model-parameter",
+      "title": "AI Control Concentration",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "economic-stability",
+      "type": "ai-transition-model-parameter",
+      "title": "Economic Stability",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "winner-take-all-concentration": [
+    {
+      "id": "ai-control-concentration",
+      "type": "ai-transition-model-parameter",
+      "title": "AI Control Concentration",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "economic-stability",
+      "type": "ai-transition-model-parameter",
+      "title": "Economic Stability",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "concentration-of-power-model": [
+    {
+      "id": "ai-control-concentration",
+      "type": "ai-transition-model-parameter",
+      "title": "AI Control Concentration",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "human-agency",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Agency",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "erosion-of-agency": [
+    {
+      "id": "human-agency",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Agency",
+      "relationship": "related"
+    },
+    {
+      "id": "economic-disruption-model",
+      "type": "model",
+      "title": "Economic Disruption Structural Model",
+      "relationship": "related"
+    },
+    {
+      "id": "automation-bias-cascade",
+      "type": "model",
+      "title": "Automation Bias Cascade Model",
+      "relationship": "related"
+    },
+    {
+      "id": "hybrid-systems",
+      "type": "approach",
+      "title": "AI-Human Hybrid Systems"
+    },
+    {
+      "id": "automation-bias",
+      "type": "risk",
+      "title": "Automation Bias"
+    },
+    {
+      "id": "economic-disruption",
+      "type": "risk",
+      "title": "Economic Disruption"
+    },
+    {
+      "id": "enfeeblement",
+      "type": "risk",
+      "title": "Enfeeblement"
+    },
+    {
+      "id": "flash-dynamics",
+      "type": "risk",
+      "title": "Flash Dynamics"
+    }
+  ],
+  "economic-labor": [
+    {
+      "id": "human-agency",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Agency",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "economic-stability",
+      "type": "ai-transition-model-parameter",
+      "title": "Economic Stability",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "human-expertise",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Expertise",
+      "relationship": "measured-by"
+    }
+  ],
+  "economic-disruption-impact": [
+    {
+      "id": "human-agency",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Agency",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "economic-stability",
+      "type": "ai-transition-model-parameter",
+      "title": "Economic Stability",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "expertise-atrophy-cascade": [
+    {
+      "id": "human-agency",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Agency",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "human-expertise",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Expertise",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "preference-manipulation-drift": [
+    {
+      "id": "human-agency",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Agency",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "preference-authenticity",
+      "type": "ai-transition-model-parameter",
+      "title": "Preference Authenticity",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "economic-disruption": [
+    {
+      "id": "economic-stability",
+      "type": "ai-transition-model-parameter",
+      "title": "Economic Stability",
+      "relationship": "related"
+    },
+    {
+      "id": "societal-resilience",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Resilience",
+      "relationship": "related"
+    },
+    {
+      "id": "economic-disruption-impact",
+      "type": "model",
+      "title": "Economic Disruption Impact Model",
+      "relationship": "related"
+    },
+    {
+      "id": "winner-take-all-concentration",
+      "type": "model",
+      "title": "Winner-Take-All Concentration Model",
+      "relationship": "related"
+    },
+    {
+      "id": "winner-take-all-model",
+      "type": "model",
+      "title": "Winner-Take-All Market Dynamics Model",
+      "relationship": "related"
+    },
+    {
+      "id": "economic-disruption-model",
+      "type": "model",
+      "title": "Economic Disruption Structural Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "winner-take-all",
+      "type": "risk",
+      "title": "Winner-Take-All Dynamics"
+    }
+  ],
+  "learned-helplessness": [
+    {
+      "id": "human-expertise",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Expertise",
+      "relationship": "related"
+    },
+    {
+      "id": "sycophancy-feedback-loop",
+      "type": "model",
+      "title": "Sycophancy Feedback Loop Model",
+      "relationship": "leads-to"
+    },
+    {
+      "id": "epistemic-collapse-threshold",
+      "type": "model",
+      "title": "Epistemic Collapse Threshold Model",
+      "relationship": "outcome"
+    },
+    {
+      "id": "hybrid-systems",
+      "type": "approach",
+      "title": "AI-Human Hybrid Systems"
+    }
+  ],
+  "expertise-atrophy-progression": [
+    {
+      "id": "human-expertise",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Expertise",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "human-oversight-quality",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Oversight Quality",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "automation-bias-cascade": [
+    {
+      "id": "human-expertise",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Expertise",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "human-oversight-quality",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Oversight Quality",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "scalable-oversight": [
+    {
+      "id": "human-oversight-quality",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Oversight Quality",
+      "relationship": "related"
+    },
+    {
+      "id": "rlhf",
+      "type": "capability",
+      "title": "RLHF"
+    },
+    {
+      "id": "capability-alignment-race",
+      "type": "analysis",
+      "title": "Capability-Alignment Race Model"
+    },
+    {
+      "id": "technical-pathways",
+      "type": "analysis",
+      "title": "Technical Pathway Decomposition"
+    },
+    {
+      "id": "reward-hacking-taxonomy",
+      "type": "model",
+      "title": "Reward Hacking Taxonomy and Severity Model",
+      "relationship": "mitigation"
+    },
+    {
+      "id": "anthropic",
+      "type": "lab",
+      "title": "Anthropic"
+    },
+    {
+      "id": "deepmind",
+      "type": "lab",
+      "title": "Google DeepMind"
+    },
+    {
+      "id": "openai",
+      "type": "lab",
+      "title": "OpenAI"
+    },
+    {
+      "id": "arc",
+      "type": "organization",
+      "title": "ARC"
+    },
+    {
+      "id": "jan-leike",
+      "type": "researcher",
+      "title": "Jan Leike"
+    },
+    {
+      "id": "paul-christiano",
+      "type": "researcher",
+      "title": "Paul Christiano"
+    },
+    {
+      "id": "anthropic-core-views",
+      "type": "safety-agenda",
+      "title": "Anthropic Core Views"
+    },
+    {
+      "id": "process-supervision",
+      "type": "approach",
+      "title": "Process Supervision"
+    },
+    {
+      "id": "eliciting-latent-knowledge",
+      "type": "approach",
+      "title": "Eliciting Latent Knowledge (ELK)"
+    },
+    {
+      "id": "debate",
+      "type": "approach",
+      "title": "AI Safety via Debate"
+    },
+    {
+      "id": "multi-agent",
+      "type": "approach",
+      "title": "Multi-Agent Safety"
+    },
+    {
+      "id": "deceptive-alignment",
+      "type": "risk",
+      "title": "Deceptive Alignment"
+    },
+    {
+      "id": "reward-hacking",
+      "type": "risk",
+      "title": "Reward Hacking"
+    },
+    {
+      "id": "sycophancy",
+      "type": "risk",
+      "title": "Sycophancy"
+    }
+  ],
+  "lab-behavior": [
+    {
+      "id": "human-oversight-quality",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Oversight Quality",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "racing-intensity",
+      "type": "ai-transition-model-parameter",
+      "title": "Racing Intensity",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "safety-culture-strength",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety Culture Strength",
+      "relationship": "measured-by"
+    }
+  ],
+  "deceptive-alignment-decomposition": [
+    {
+      "id": "human-oversight-quality",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Oversight Quality",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "carlsmith-six-premises",
+      "type": "model",
+      "title": "Carlsmith's Six-Premise Argument",
+      "relationship": "related"
+    },
+    {
+      "id": "alignment-robustness-trajectory",
+      "type": "model",
+      "title": "Alignment Robustness Trajectory Model",
+      "relationship": "related"
+    }
+  ],
+  "corrigibility-failure-pathways": [
+    {
+      "id": "human-oversight-quality",
+      "type": "ai-transition-model-parameter",
+      "title": "Human Oversight Quality",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "reward-hacking": [
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "decreases"
+    },
+    {
+      "id": "rlhf",
+      "type": "capability",
+      "title": "RLHF"
+    },
+    {
+      "id": "goal-misgeneralization-probability",
+      "type": "model",
+      "title": "Goal Misgeneralization Probability Model",
+      "relationship": "related"
+    },
+    {
+      "id": "reward-hacking-taxonomy",
+      "type": "model",
+      "title": "Reward Hacking Taxonomy and Severity Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "deepmind",
+      "type": "lab",
+      "title": "Google DeepMind"
+    },
+    {
+      "id": "chai",
+      "type": "lab-academic",
+      "title": "CHAI"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability"
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight"
+    },
+    {
+      "id": "value-learning",
+      "type": "safety-agenda",
+      "title": "Value Learning"
+    },
+    {
+      "id": "alignment",
+      "type": "approach",
+      "title": "AI Alignment"
+    },
+    {
+      "id": "constitutional-ai",
+      "type": "approach",
+      "title": "Constitutional AI"
+    },
+    {
+      "id": "weak-to-strong",
+      "type": "approach",
+      "title": "Weak-to-Strong Generalization"
+    },
+    {
+      "id": "preference-optimization",
+      "type": "approach",
+      "title": "Preference Optimization Methods"
+    },
+    {
+      "id": "process-supervision",
+      "type": "approach",
+      "title": "Process Supervision"
+    },
+    {
+      "id": "distributional-shift",
+      "type": "risk",
+      "title": "Distributional Shift"
+    },
+    {
+      "id": "goal-misgeneralization",
+      "type": "risk",
+      "title": "Goal Misgeneralization"
+    },
+    {
+      "id": "sycophancy",
+      "type": "risk",
+      "title": "Sycophancy"
+    }
+  ],
+  "mesa-optimization": [
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "decreases"
+    },
+    {
+      "id": "accident-risks",
+      "type": "crux",
+      "title": "Accident Risk Cruxes"
+    },
+    {
+      "id": "deceptive-alignment-decomposition",
+      "type": "model",
+      "title": "Deceptive Alignment Decomposition Model",
+      "relationship": "related"
+    },
+    {
+      "id": "mesa-optimization-analysis",
+      "type": "model",
+      "title": "Mesa-Optimization Risk Analysis",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "ai-control",
+      "type": "safety-agenda",
+      "title": "AI Control"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability"
+    },
+    {
+      "id": "deceptive-alignment",
+      "type": "risk",
+      "title": "Deceptive Alignment"
+    },
+    {
+      "id": "goal-misgeneralization",
+      "type": "risk",
+      "title": "Goal Misgeneralization"
+    },
+    {
+      "id": "scheming",
+      "type": "risk",
+      "title": "Scheming"
+    },
+    {
+      "id": "sharp-left-turn",
+      "type": "risk",
+      "title": "Sharp Left Turn"
+    }
+  ],
+  "goal-misgeneralization": [
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "decreases"
+    },
+    {
+      "id": "mesa-optimization-analysis",
+      "type": "model",
+      "title": "Mesa-Optimization Risk Analysis",
+      "relationship": "related"
+    },
+    {
+      "id": "goal-misgeneralization-probability",
+      "type": "model",
+      "title": "Goal Misgeneralization Probability Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability"
+    },
+    {
+      "id": "distributional-shift",
+      "type": "risk",
+      "title": "Distributional Shift"
+    },
+    {
+      "id": "mesa-optimization",
+      "type": "risk",
+      "title": "Mesa-Optimization"
+    },
+    {
+      "id": "reward-hacking",
+      "type": "risk",
+      "title": "Reward Hacking"
+    },
+    {
+      "id": "sharp-left-turn",
+      "type": "risk",
+      "title": "Sharp Left Turn"
+    }
+  ],
+  "deceptive-alignment": [
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "decreases"
+    },
+    {
+      "id": "persuasion",
+      "type": "capability",
+      "title": "Persuasion and Social Manipulation"
+    },
+    {
+      "id": "situational-awareness",
+      "type": "capability",
+      "title": "Situational Awareness"
+    },
+    {
+      "id": "technical-research",
+      "type": "crux",
+      "title": "Technical AI Safety Research"
+    },
+    {
+      "id": "accident-risks",
+      "type": "crux",
+      "title": "Accident Risk Cruxes"
+    },
+    {
+      "id": "large-language-models",
+      "type": "concept",
+      "title": "Large Language Models"
+    },
+    {
+      "id": "model-organisms-of-misalignment",
+      "type": "analysis",
+      "title": "Model Organisms of Misalignment"
+    },
+    {
+      "id": "deceptive-alignment-decomposition",
+      "type": "model",
+      "title": "Deceptive Alignment Decomposition Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "mesa-optimization-analysis",
+      "type": "model",
+      "title": "Mesa-Optimization Risk Analysis",
+      "relationship": "related"
+    },
+    {
+      "id": "scheming-likelihood-model",
+      "type": "model",
+      "title": "Scheming Likelihood Assessment",
+      "relationship": "related"
+    },
+    {
+      "id": "anthropic",
+      "type": "lab",
+      "title": "Anthropic"
+    },
+    {
+      "id": "openai",
+      "type": "lab",
+      "title": "OpenAI"
+    },
+    {
+      "id": "apollo-research",
+      "type": "lab-research",
+      "title": "Apollo Research"
+    },
+    {
+      "id": "arc",
+      "type": "organization",
+      "title": "ARC"
+    },
+    {
+      "id": "eliezer-yudkowsky",
+      "type": "researcher",
+      "title": "Eliezer Yudkowsky"
+    },
+    {
+      "id": "pause-advocacy",
+      "type": "approach",
+      "title": "Pause Advocacy"
+    },
+    {
+      "id": "ai-control",
+      "type": "safety-agenda",
+      "title": "AI Control"
+    },
+    {
+      "id": "evals",
+      "type": "safety-agenda",
+      "title": "AI Evaluations"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability"
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight"
+    },
+    {
+      "id": "evaluation-awareness",
+      "type": "approach",
+      "title": "Evaluation Awareness"
+    },
+    {
+      "id": "alignment",
+      "type": "approach",
+      "title": "AI Alignment"
+    },
+    {
+      "id": "scheming-detection",
+      "type": "approach",
+      "title": "Scheming & Deception Detection"
+    },
+    {
+      "id": "sleeper-agent-detection",
+      "type": "approach",
+      "title": "Sleeper Agent Detection"
+    },
+    {
+      "id": "evaluation",
+      "type": "approach",
+      "title": "AI Evaluation"
+    },
+    {
+      "id": "alignment-evals",
+      "type": "approach",
+      "title": "Alignment Evaluations"
+    },
+    {
+      "id": "weak-to-strong",
+      "type": "approach",
+      "title": "Weak-to-Strong Generalization"
+    },
+    {
+      "id": "refusal-training",
+      "type": "approach",
+      "title": "Refusal Training"
+    },
+    {
+      "id": "mech-interp",
+      "type": "approach",
+      "title": "Mechanistic Interpretability"
+    },
+    {
+      "id": "sparse-autoencoders",
+      "type": "approach",
+      "title": "Sparse Autoencoders (SAEs)"
+    },
+    {
+      "id": "eliciting-latent-knowledge",
+      "type": "approach",
+      "title": "Eliciting Latent Knowledge (ELK)"
+    },
+    {
+      "id": "debate",
+      "type": "approach",
+      "title": "AI Safety via Debate"
+    },
+    {
+      "id": "formal-verification",
+      "type": "approach",
+      "title": "Formal Verification"
+    },
+    {
+      "id": "goal-misgeneralization",
+      "type": "risk",
+      "title": "Goal Misgeneralization"
+    },
+    {
+      "id": "mesa-optimization",
+      "type": "risk",
+      "title": "Mesa-Optimization"
+    },
+    {
+      "id": "scheming",
+      "type": "risk",
+      "title": "Scheming"
+    },
+    {
+      "id": "rogue-ai-scenarios",
+      "type": "risk",
+      "title": "Rogue AI Scenarios"
+    },
+    {
+      "id": "sleeper-agents",
+      "type": "risk",
+      "title": "Sleeper Agents: Training Deceptive LLMs"
+    }
+  ],
+  "sycophancy": [
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "decreases"
+    },
+    {
+      "id": "rlhf",
+      "type": "capability",
+      "title": "RLHF"
+    },
+    {
+      "id": "ai-welfare",
+      "type": "concept",
+      "title": "AI Welfare and Digital Minds"
+    },
+    {
+      "id": "reward-hacking-taxonomy",
+      "type": "model",
+      "title": "Reward Hacking Taxonomy and Severity Model",
+      "relationship": "example"
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight"
+    },
+    {
+      "id": "automation-bias",
+      "type": "risk",
+      "title": "Automation Bias"
+    },
+    {
+      "id": "erosion-of-agency",
+      "type": "risk",
+      "title": "Erosion of Human Agency"
+    },
+    {
+      "id": "reward-hacking",
+      "type": "risk",
+      "title": "Reward Hacking"
+    }
+  ],
+  "interpretability": [
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "supports"
+    },
+    {
+      "id": "safety-capability-gap",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety-Capability Gap",
+      "relationship": "supports"
+    },
+    {
+      "id": "interpretability-coverage",
+      "type": "ai-transition-model-parameter",
+      "title": "Interpretability Coverage",
+      "relationship": "related"
+    },
+    {
+      "id": "technical-research",
+      "type": "crux",
+      "title": "Technical AI Safety Research"
+    },
+    {
+      "id": "natural-abstractions",
+      "type": "concept",
+      "title": "Natural Abstractions"
+    },
+    {
+      "id": "solutions",
+      "type": "crux",
+      "title": "Solution Cruxes"
+    },
+    {
+      "id": "large-language-models",
+      "type": "concept",
+      "title": "Large Language Models"
+    },
+    {
+      "id": "model-organisms-of-misalignment",
+      "type": "analysis",
+      "title": "Model Organisms of Misalignment"
+    },
+    {
+      "id": "anthropic",
+      "type": "lab",
+      "title": "Anthropic"
+    },
+    {
+      "id": "openai",
+      "type": "lab",
+      "title": "OpenAI"
+    },
+    {
+      "id": "conjecture",
+      "type": "lab-research",
+      "title": "Conjecture"
+    },
+    {
+      "id": "redwood",
+      "type": "organization",
+      "title": "Redwood Research"
+    },
+    {
+      "id": "goodfire",
+      "type": "lab-research",
+      "title": "Goodfire"
+    },
+    {
+      "id": "chris-olah",
+      "type": "researcher",
+      "title": "Chris Olah"
+    },
+    {
+      "id": "connor-leahy",
+      "type": "researcher",
+      "title": "Connor Leahy"
+    },
+    {
+      "id": "neel-nanda",
+      "type": "researcher",
+      "title": "Neel Nanda"
+    },
+    {
+      "id": "yoshua-bengio",
+      "type": "researcher",
+      "title": "Yoshua Bengio"
+    },
+    {
+      "id": "max-tegmark",
+      "type": "researcher",
+      "title": "Max Tegmark"
+    },
+    {
+      "id": "anthropic-core-views",
+      "type": "safety-agenda",
+      "title": "Anthropic Core Views"
+    },
+    {
+      "id": "intervention-portfolio",
+      "type": "approach",
+      "title": "Intervention Portfolio"
+    },
+    {
+      "id": "eliciting-latent-knowledge",
+      "type": "approach",
+      "title": "Eliciting Latent Knowledge (ELK)"
+    },
+    {
+      "id": "formal-verification",
+      "type": "approach",
+      "title": "Formal Verification"
+    },
+    {
+      "id": "provably-safe",
+      "type": "approach",
+      "title": "Provably Safe AI (davidad agenda)"
+    },
+    {
+      "id": "deceptive-alignment",
+      "type": "risk",
+      "title": "Deceptive Alignment"
+    }
+  ],
+  "evals": [
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "supports"
+    },
+    {
+      "id": "situational-awareness",
+      "type": "capability",
+      "title": "Situational Awareness"
+    },
+    {
+      "id": "intervention-portfolio",
+      "type": "approach",
+      "title": "Intervention Portfolio"
+    },
+    {
+      "id": "deceptive-alignment",
+      "type": "risk",
+      "title": "Deceptive Alignment"
+    }
+  ],
+  "ai-control": [
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "supports"
+    },
+    {
+      "id": "agentic-ai",
+      "type": "capability",
+      "title": "Agentic AI"
+    },
+    {
+      "id": "long-horizon",
+      "type": "capability",
+      "title": "Long-Horizon Autonomous Tasks"
+    },
+    {
+      "id": "short-timeline-policy-implications",
+      "type": "analysis",
+      "title": "Short Timeline Policy Implications"
+    },
+    {
+      "id": "corrigibility-failure-pathways",
+      "type": "model",
+      "title": "Corrigibility Failure Pathways",
+      "relationship": "mitigation"
+    },
+    {
+      "id": "redwood",
+      "type": "organization",
+      "title": "Redwood Research"
+    },
+    {
+      "id": "corrigibility",
+      "type": "safety-agenda",
+      "title": "Corrigibility"
+    },
+    {
+      "id": "sleeper-agent-detection",
+      "type": "approach",
+      "title": "Sleeper Agent Detection"
+    },
+    {
+      "id": "representation-engineering",
+      "type": "approach",
+      "title": "Representation Engineering"
+    },
+    {
+      "id": "provably-safe",
+      "type": "approach",
+      "title": "Provably Safe AI (davidad agenda)"
+    },
+    {
+      "id": "corrigibility-failure",
+      "type": "risk",
+      "title": "Corrigibility Failure"
+    },
+    {
+      "id": "deceptive-alignment",
+      "type": "risk",
+      "title": "Deceptive Alignment"
+    }
+  ],
+  "alignment-progress": [
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "safety-capability-gap",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety-Capability Gap",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "interpretability-coverage",
+      "type": "ai-transition-model-parameter",
+      "title": "Interpretability Coverage",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "multi-actor-landscape",
+      "type": "analysis",
+      "title": "Multi-Actor Strategic Landscape"
+    }
+  ],
+  "safety-capability-tradeoff": [
+    {
+      "id": "alignment-robustness",
+      "type": "ai-transition-model-parameter",
+      "title": "Alignment Robustness",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "safety-capability-gap",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety-Capability Gap",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "alignment-robustness-trajectory",
+      "type": "model",
+      "title": "Alignment Robustness Trajectory Model",
+      "relationship": "related"
+    }
+  ],
+  "racing-dynamics": [
+    {
+      "id": "safety-capability-gap",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety-Capability Gap",
+      "relationship": "decreases"
+    },
+    {
+      "id": "racing-intensity",
+      "type": "ai-transition-model-parameter",
+      "title": "Racing Intensity",
+      "relationship": "related"
+    },
+    {
+      "id": "safety-culture-strength",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety Culture Strength",
+      "relationship": "related"
+    },
+    {
+      "id": "coordination-capacity",
+      "type": "ai-transition-model-parameter",
+      "title": "Coordination Capacity",
+      "relationship": "related"
+    },
+    {
+      "id": "corporate-influence",
+      "type": "crux",
+      "title": "Corporate Influence"
+    },
+    {
+      "id": "governance-policy",
+      "type": "crux",
+      "title": "AI Governance and Policy"
+    },
+    {
+      "id": "agi-race",
+      "type": "concept",
+      "title": "AGI Race"
+    },
+    {
+      "id": "structural-risks",
+      "type": "crux",
+      "title": "Structural Risk Cruxes"
+    },
+    {
+      "id": "governance-focused",
+      "type": "concept",
+      "title": "Governance-Focused Worldview"
+    },
+    {
+      "id": "capability-alignment-race",
+      "type": "analysis",
+      "title": "Capability-Alignment Race Model"
+    },
+    {
+      "id": "feedback-loops",
+      "type": "analysis",
+      "title": "Feedback Loop & Cascade Model"
+    },
+    {
+      "id": "worldview-intervention-mapping",
+      "type": "model",
+      "title": "Worldview-Intervention Mapping",
+      "relationship": "related"
+    },
+    {
+      "id": "intervention-timing-windows",
+      "type": "model",
+      "title": "Intervention Timing Windows",
+      "relationship": "related"
+    },
+    {
+      "id": "racing-dynamics-impact",
+      "type": "model",
+      "title": "Racing Dynamics Impact Model",
+      "relationship": "related"
+    },
+    {
+      "id": "multipolar-trap-dynamics",
+      "type": "model",
+      "title": "Multipolar Trap Dynamics Model",
+      "relationship": "related"
+    },
+    {
+      "id": "proliferation-risk-model",
+      "type": "model",
+      "title": "AI Proliferation Risk Model",
+      "relationship": "related"
+    },
+    {
+      "id": "racing-dynamics-model",
+      "type": "model",
+      "title": "Racing Dynamics Game Theory Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "multipolar-trap-model",
+      "type": "model",
+      "title": "Multipolar Trap Coordination Model",
+      "relationship": "manifestation"
+    },
+    {
+      "id": "proliferation-model",
+      "type": "model",
+      "title": "AI Capability Proliferation Model",
+      "relationship": "related"
+    },
+    {
+      "id": "lab-incentives-model",
+      "type": "model",
+      "title": "Lab Incentives Model",
+      "relationship": "related"
+    },
+    {
+      "id": "institutional-adaptation-speed",
+      "type": "model",
+      "title": "Institutional Adaptation Speed Model",
+      "relationship": "related"
+    },
+    {
+      "id": "international-coordination-game",
+      "type": "model",
+      "title": "International Coordination Game Model",
+      "relationship": "related"
+    },
+    {
+      "id": "safety-capability-tradeoff",
+      "type": "model",
+      "title": "Safety-Capability Tradeoff Model",
+      "relationship": "related"
+    },
+    {
+      "id": "anthropic",
+      "type": "lab",
+      "title": "Anthropic"
+    },
+    {
+      "id": "deepmind",
+      "type": "lab",
+      "title": "Google DeepMind"
+    },
+    {
+      "id": "openai",
+      "type": "lab",
+      "title": "OpenAI"
+    },
+    {
+      "id": "xai",
+      "type": "lab",
+      "title": "xAI"
+    },
+    {
+      "id": "compute-governance",
+      "type": "policy",
+      "title": "Compute Governance"
+    },
+    {
+      "id": "pause-advocacy",
+      "type": "approach",
+      "title": "Pause Advocacy"
+    },
+    {
+      "id": "coordination-tech",
+      "type": "approach",
+      "title": "Coordination Technologies"
+    },
+    {
+      "id": "prediction-markets",
+      "type": "approach",
+      "title": "Prediction Markets"
+    },
+    {
+      "id": "pause-moratorium",
+      "type": "policy",
+      "title": "Pause / Moratorium"
+    },
+    {
+      "id": "corporate",
+      "type": "approach",
+      "title": "Corporate Responses"
+    },
+    {
+      "id": "lab-culture",
+      "type": "approach",
+      "title": "Lab Safety Culture"
+    },
+    {
+      "id": "pause",
+      "type": "approach",
+      "title": "Pause Advocacy"
+    },
+    {
+      "id": "coordination-mechanisms",
+      "type": "policy",
+      "title": "International Coordination Mechanisms"
+    },
+    {
+      "id": "open-source",
+      "type": "approach",
+      "title": "Open Source Safety"
+    },
+    {
+      "id": "autonomous-weapons",
+      "type": "risk",
+      "title": "Autonomous Weapons"
+    },
+    {
+      "id": "concentration-of-power",
+      "type": "risk",
+      "title": "Concentration of Power"
+    },
+    {
+      "id": "multipolar-trap",
+      "type": "risk",
+      "title": "Multipolar Trap"
+    }
+  ],
+  "safety-research": [
+    {
+      "id": "safety-capability-gap",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety-Capability Gap",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "racing-intensity",
+      "type": "ai-transition-model-parameter",
+      "title": "Racing Intensity",
+      "relationship": "measured-by"
+    },
+    {
+      "id": "safety-culture-strength",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety Culture Strength",
+      "relationship": "measured-by"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "safety-capability-gap",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety-Capability Gap",
+      "relationship": "measured-by"
+    }
+  ],
+  "racing-dynamics-impact": [
+    {
+      "id": "safety-capability-gap",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety-Capability Gap",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "racing-intensity",
+      "type": "ai-transition-model-parameter",
+      "title": "Racing Intensity",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "coordination-capacity",
+      "type": "ai-transition-model-parameter",
+      "title": "Coordination Capacity",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "nist-ai-rmf": [
+    {
+      "id": "regulatory-capacity",
+      "type": "ai-transition-model-parameter",
+      "title": "Regulatory Capacity",
+      "relationship": "related"
+    }
+  ],
+  "us-executive-order": [
+    {
+      "id": "regulatory-capacity",
+      "type": "ai-transition-model-parameter",
+      "title": "Regulatory Capacity",
+      "relationship": "related"
+    },
+    {
+      "id": "california-sb1047",
+      "type": "policy",
+      "title": "Safe and Secure Innovation for Frontier Artificial Intelligence Models Act"
+    },
+    {
+      "id": "china-ai-regulations",
+      "type": "policy",
+      "title": "China AI Regulatory Framework"
+    },
+    {
+      "id": "international-summits",
+      "type": "policy",
+      "title": "International AI Safety Summit Series"
+    },
+    {
+      "id": "voluntary-commitments",
+      "type": "policy",
+      "title": "Voluntary AI Safety Commitments"
+    }
+  ],
+  "institutional-adaptation-speed": [
+    {
+      "id": "regulatory-capacity",
+      "type": "ai-transition-model-parameter",
+      "title": "Regulatory Capacity",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "institutional-quality",
+      "type": "ai-transition-model-parameter",
+      "title": "Institutional Quality",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "regulatory-capacity-threshold",
+      "type": "model",
+      "title": "Regulatory Capacity Threshold Model",
+      "relationship": "related"
+    }
+  ],
+  "institutional-capture": [
+    {
+      "id": "institutional-quality",
+      "type": "ai-transition-model-parameter",
+      "title": "Institutional Quality",
+      "relationship": "related"
+    }
+  ],
+  "reality-fragmentation": [
+    {
+      "id": "reality-coherence",
+      "type": "ai-transition-model-parameter",
+      "title": "Reality Coherence",
+      "relationship": "related"
+    },
+    {
+      "id": "sycophancy-feedback-loop",
+      "type": "model",
+      "title": "Sycophancy Feedback Loop Model",
+      "relationship": "contributes-to"
+    },
+    {
+      "id": "epistemic-collapse-threshold",
+      "type": "model",
+      "title": "Epistemic Collapse Threshold Model",
+      "relationship": "component"
+    },
+    {
+      "id": "reality-fragmentation-network",
+      "type": "model",
+      "title": "Reality Fragmentation Network Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "epistemic-security",
+      "type": "approach",
+      "title": "Epistemic Security"
+    }
+  ],
+  "preference-manipulation": [
+    {
+      "id": "preference-authenticity",
+      "type": "ai-transition-model-parameter",
+      "title": "Preference Authenticity",
+      "relationship": "related"
+    },
+    {
+      "id": "preference-manipulation-drift",
+      "type": "model",
+      "title": "Preference Manipulation Drift Model",
+      "relationship": "related"
+    }
+  ],
+  "lab-incentives-model": [
+    {
+      "id": "racing-intensity",
+      "type": "ai-transition-model-parameter",
+      "title": "Racing Intensity",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "safety-culture-strength",
+      "type": "ai-transition-model-parameter",
+      "title": "Safety Culture Strength",
+      "relationship": "analyzed-by"
+    },
+    {
+      "id": "whistleblower-dynamics",
+      "type": "model",
+      "title": "Whistleblower Dynamics Model",
+      "relationship": "related"
+    },
+    {
+      "id": "safety-culture-equilibrium",
+      "type": "model",
+      "title": "Safety Culture Equilibrium Model",
+      "relationship": "related"
+    }
+  ],
+  "bioweapons": [
+    {
+      "id": "biological-threat-exposure",
+      "type": "ai-transition-model-parameter",
+      "title": "Biological Threat Exposure",
+      "relationship": "related"
+    },
+    {
+      "id": "misuse-risks",
+      "type": "crux",
+      "title": "Misuse Risk Cruxes"
+    },
+    {
+      "id": "bioweapons-attack-chain",
+      "type": "model",
+      "title": "Bioweapons Attack Chain Model",
+      "relationship": "related"
+    },
+    {
+      "id": "bioweapons-ai-uplift",
+      "type": "model",
+      "title": "AI Uplift Assessment Model",
+      "relationship": "related"
+    },
+    {
+      "id": "bioweapons-timeline",
+      "type": "model",
+      "title": "AI-Bioweapons Timeline Model",
+      "relationship": "related"
+    },
+    {
+      "id": "marc-andreessen",
+      "type": "researcher",
+      "title": "Marc Andreessen"
+    },
+    {
+      "id": "compute-governance",
+      "type": "policy",
+      "title": "Compute Governance"
+    },
+    {
+      "id": "evals",
+      "type": "safety-agenda",
+      "title": "AI Evaluations"
+    },
+    {
+      "id": "cyberweapons",
+      "type": "risk",
+      "title": "Cyberweapons Risk"
+    },
+    {
+      "id": "proliferation",
+      "type": "risk",
+      "title": "AI Proliferation"
+    }
+  ],
+  "bioweapons-attack-chain": [
+    {
+      "id": "biological-threat-exposure",
+      "type": "ai-transition-model-parameter",
+      "title": "Biological Threat Exposure",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "bioweapons-ai-uplift": [
+    {
+      "id": "biological-threat-exposure",
+      "type": "ai-transition-model-parameter",
+      "title": "Biological Threat Exposure",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "cyberweapons": [
+    {
+      "id": "cyber-threat-exposure",
+      "type": "ai-transition-model-parameter",
+      "title": "Cyber Threat Exposure",
+      "relationship": "related"
+    },
+    {
+      "id": "cyberweapons-offense-defense",
+      "type": "model",
+      "title": "Cyber Offense-Defense Balance Model",
+      "relationship": "related"
+    },
+    {
+      "id": "cyberweapons-attack-automation",
+      "type": "model",
+      "title": "Autonomous Cyber Attack Timeline",
+      "relationship": "related"
+    },
+    {
+      "id": "compute-governance",
+      "type": "policy",
+      "title": "Compute Governance"
+    },
+    {
+      "id": "evals",
+      "type": "safety-agenda",
+      "title": "AI Evaluations"
+    },
+    {
+      "id": "autonomous-weapons",
+      "type": "risk",
+      "title": "Autonomous Weapons"
+    },
+    {
+      "id": "bioweapons",
+      "type": "risk",
+      "title": "Bioweapons Risk"
+    },
+    {
+      "id": "proliferation",
+      "type": "risk",
+      "title": "AI Proliferation"
+    }
+  ],
+  "cyberweapons-offense-defense": [
+    {
+      "id": "cyber-threat-exposure",
+      "type": "ai-transition-model-parameter",
+      "title": "Cyber Threat Exposure",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "cyberweapons-attack-automation": [
+    {
+      "id": "cyber-threat-exposure",
+      "type": "ai-transition-model-parameter",
+      "title": "Cyber Threat Exposure",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "defense-in-depth-model": [
+    {
+      "id": "societal-resilience",
+      "type": "ai-transition-model-parameter",
+      "title": "Societal Resilience",
+      "relationship": "analyzed-by"
+    }
+  ],
+  "ai-ownership": [
+    {
+      "id": "long-term-trajectory",
+      "type": "ai-transition-model-scenario",
+      "title": "Long-term Trajectory",
+      "relationship": "driver"
+    },
+    {
+      "id": "long-term-lockin",
+      "type": "ai-transition-model-scenario",
+      "title": "Long-term Lock-in",
+      "relationship": "driven-by"
+    }
+  ],
+  "compute-governance": [
+    {
+      "id": "tmc-compute",
+      "type": "ai-transition-model-subitem",
+      "title": "Compute",
+      "relationship": "addresses"
+    },
+    {
+      "id": "governance-policy",
+      "type": "crux",
+      "title": "AI Governance and Policy"
+    },
+    {
+      "id": "short-timeline-policy-implications",
+      "type": "analysis",
+      "title": "Short Timeline Policy Implications"
+    },
+    {
+      "id": "govai",
+      "type": "lab-research",
+      "title": "GovAI"
+    },
+    {
+      "id": "epoch-ai",
+      "type": "organization",
+      "title": "Epoch AI"
+    },
+    {
+      "id": "miri",
+      "type": "organization",
+      "title": "MIRI"
+    },
+    {
+      "id": "us-aisi",
+      "type": "organization",
+      "title": "US AI Safety Institute"
+    },
+    {
+      "id": "dan-hendrycks",
+      "type": "researcher",
+      "title": "Dan Hendrycks"
+    },
+    {
+      "id": "california-sb1047",
+      "type": "policy",
+      "title": "Safe and Secure Innovation for Frontier Artificial Intelligence Models Act"
+    },
+    {
+      "id": "china-ai-regulations",
+      "type": "policy",
+      "title": "China AI Regulatory Framework"
+    },
+    {
+      "id": "compute-thresholds",
+      "type": "policy",
+      "title": "Compute Thresholds"
+    },
+    {
+      "id": "compute-monitoring",
+      "type": "policy",
+      "title": "Compute Monitoring"
+    },
+    {
+      "id": "international-compute-regimes",
+      "type": "policy",
+      "title": "International Compute Regimes"
+    },
+    {
+      "id": "eu-ai-act",
+      "type": "policy",
+      "title": "EU AI Act"
+    },
+    {
+      "id": "us-executive-order",
+      "type": "policy",
+      "title": "Executive Order on Safe, Secure, and Trustworthy AI"
+    },
+    {
+      "id": "pause-advocacy",
+      "type": "approach",
+      "title": "Pause Advocacy"
+    },
+    {
+      "id": "proliferation",
+      "type": "risk",
+      "title": "AI Proliferation"
+    },
+    {
+      "id": "racing-dynamics",
+      "type": "risk",
+      "title": "Racing Dynamics"
+    }
+  ],
+  "power-seeking": [
+    {
+      "id": "agentic-ai",
+      "type": "capability",
+      "title": "Agentic AI"
+    },
+    {
+      "id": "long-horizon",
+      "type": "capability",
+      "title": "Long-Horizon Autonomous Tasks"
+    },
+    {
+      "id": "power-seeking-conditions",
+      "type": "model",
+      "title": "Power-Seeking Emergence Conditions Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "instrumental-convergence-framework",
+      "type": "model",
+      "title": "Instrumental Convergence Framework",
+      "relationship": "example"
+    },
+    {
+      "id": "corrigibility-failure-pathways",
+      "type": "model",
+      "title": "Corrigibility Failure Pathways",
+      "relationship": "related"
+    },
+    {
+      "id": "cais",
+      "type": "lab-research",
+      "title": "CAIS"
+    },
+    {
+      "id": "ai-control",
+      "type": "safety-agenda",
+      "title": "AI Control"
+    },
+    {
+      "id": "corrigibility",
+      "type": "safety-agenda",
+      "title": "Corrigibility"
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight"
+    },
+    {
+      "id": "corrigibility-failure",
+      "type": "risk",
+      "title": "Corrigibility Failure"
+    },
+    {
+      "id": "instrumental-convergence",
+      "type": "risk",
+      "title": "Instrumental Convergence"
+    },
+    {
+      "id": "rogue-ai-scenarios",
+      "type": "risk",
+      "title": "Rogue AI Scenarios"
+    }
+  ],
+  "anthropic": [
+    {
+      "id": "agentic-ai",
+      "type": "capability",
+      "title": "Agentic AI"
+    },
+    {
+      "id": "situational-awareness",
+      "type": "capability",
+      "title": "Situational Awareness"
+    },
+    {
+      "id": "tool-use",
+      "type": "capability",
+      "title": "Tool Use and Computer Use"
+    },
+    {
+      "id": "corporate-influence",
+      "type": "crux",
+      "title": "Corporate Influence"
+    },
+    {
+      "id": "field-building",
+      "type": "crux",
+      "title": "Field Building and Community"
+    },
+    {
+      "id": "research-agendas",
+      "type": "crux",
+      "title": "Research Agendas"
+    },
+    {
+      "id": "technical-research",
+      "type": "crux",
+      "title": "Technical AI Safety Research"
+    },
+    {
+      "id": "ai-welfare",
+      "type": "concept",
+      "title": "AI Welfare and Digital Minds"
+    },
+    {
+      "id": "accident-risks",
+      "type": "crux",
+      "title": "Accident Risk Cruxes"
+    },
+    {
+      "id": "large-language-models",
+      "type": "concept",
+      "title": "Large Language Models"
+    },
+    {
+      "id": "heavy-scaffolding",
+      "type": "concept",
+      "title": "Heavy Scaffolding / Agentic Systems"
+    },
+    {
+      "id": "dense-transformers",
+      "type": "concept",
+      "title": "Dense Transformers"
+    },
+    {
+      "id": "mainstream-era",
+      "type": "historical",
+      "title": "Mainstream Era"
+    },
+    {
+      "id": "openai-foundation-governance",
+      "type": "analysis",
+      "title": "OpenAI Foundation Governance Paradox"
+    },
+    {
+      "id": "anthropic-valuation",
+      "type": "analysis",
+      "title": "Anthropic Valuation Analysis"
+    },
+    {
+      "id": "anthropic-investors",
+      "type": "analysis",
+      "title": "Anthropic (Funder)"
+    },
+    {
+      "id": "long-term-benefit-trust",
+      "type": "analysis",
+      "title": "Long-Term Benefit Trust (Anthropic)"
+    },
+    {
+      "id": "anthropic-ipo",
+      "type": "analysis",
+      "title": "Anthropic IPO"
+    },
+    {
+      "id": "anthropic-impact",
+      "type": "analysis",
+      "title": "Anthropic Impact Assessment Model"
+    },
+    {
+      "id": "capability-alignment-race",
+      "type": "analysis",
+      "title": "Capability-Alignment Race Model"
+    },
+    {
+      "id": "short-timeline-policy-implications",
+      "type": "analysis",
+      "title": "Short Timeline Policy Implications"
+    },
+    {
+      "id": "technical-pathways",
+      "type": "analysis",
+      "title": "Technical Pathway Decomposition"
+    },
+    {
+      "id": "feedback-loops",
+      "type": "analysis",
+      "title": "Feedback Loop & Cascade Model"
+    },
+    {
+      "id": "multi-actor-landscape",
+      "type": "analysis",
+      "title": "Multi-Actor Strategic Landscape"
+    },
+    {
+      "id": "model-organisms-of-misalignment",
+      "type": "analysis",
+      "title": "Model Organisms of Misalignment"
+    },
+    {
+      "id": "ea-biosecurity-scope",
+      "type": "analysis",
+      "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?"
+    },
+    {
+      "id": "deceptive-alignment-decomposition",
+      "type": "model",
+      "title": "Deceptive Alignment Decomposition Model",
+      "relationship": "research"
+    },
+    {
+      "id": "deepmind",
+      "type": "lab",
+      "title": "Google DeepMind"
+    },
+    {
+      "id": "openai",
+      "type": "lab",
+      "title": "OpenAI"
+    },
+    {
+      "id": "xai",
+      "type": "lab",
+      "title": "xAI"
+    },
+    {
+      "id": "apollo-research",
+      "type": "lab-research",
+      "title": "Apollo Research"
+    },
+    {
+      "id": "cais",
+      "type": "lab-research",
+      "title": "CAIS"
+    },
+    {
+      "id": "conjecture",
+      "type": "lab-research",
+      "title": "Conjecture"
+    },
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR"
+    },
+    {
+      "id": "arc",
+      "type": "organization",
+      "title": "ARC"
+    },
+    {
+      "id": "redwood",
+      "type": "organization",
+      "title": "Redwood Research"
+    },
+    {
+      "id": "uk-aisi",
+      "type": "organization",
+      "title": "UK AI Safety Institute"
+    },
+    {
+      "id": "us-aisi",
+      "type": "organization",
+      "title": "US AI Safety Institute"
+    },
+    {
+      "id": "openai-foundation",
+      "type": "organization",
+      "title": "OpenAI Foundation"
+    },
+    {
+      "id": "johns-hopkins-center-for-health-security",
+      "type": "organization",
+      "title": "Johns Hopkins Center for Health Security"
+    },
+    {
+      "id": "ssi",
+      "type": "lab-research",
+      "title": "Safe Superintelligence Inc (SSI)"
+    },
+    {
+      "id": "frontier-model-forum",
+      "type": "organization",
+      "title": "Frontier Model Forum"
+    },
+    {
+      "id": "palisade-research",
+      "type": "lab-research",
+      "title": "Palisade Research"
+    },
+    {
+      "id": "goodfire",
+      "type": "lab-research",
+      "title": "Goodfire"
+    },
+    {
+      "id": "chris-olah",
+      "type": "researcher",
+      "title": "Chris Olah"
+    },
+    {
+      "id": "dario-amodei",
+      "type": "researcher",
+      "title": "Dario Amodei"
+    },
+    {
+      "id": "holden-karnofsky",
+      "type": "researcher",
+      "title": "Holden Karnofsky"
+    },
+    {
+      "id": "jan-leike",
+      "type": "researcher",
+      "title": "Jan Leike"
+    },
+    {
+      "id": "david-sacks",
+      "type": "researcher",
+      "title": "David Sacks"
+    },
+    {
+      "id": "voluntary-commitments",
+      "type": "policy",
+      "title": "Voluntary AI Safety Commitments"
+    },
+    {
+      "id": "anthropic-core-views",
+      "type": "safety-agenda",
+      "title": "Anthropic Core Views"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability"
+    },
+    {
+      "id": "eval-saturation",
+      "type": "approach",
+      "title": "Eval Saturation & The Evals Gap"
+    },
+    {
+      "id": "evaluation-awareness",
+      "type": "approach",
+      "title": "Evaluation Awareness"
+    },
+    {
+      "id": "alignment",
+      "type": "approach",
+      "title": "AI Alignment"
+    },
+    {
+      "id": "scalable-eval-approaches",
+      "type": "approach",
+      "title": "Scalable Eval Approaches"
+    },
+    {
+      "id": "scheming-detection",
+      "type": "approach",
+      "title": "Scheming & Deception Detection"
+    },
+    {
+      "id": "dangerous-cap-evals",
+      "type": "approach",
+      "title": "Dangerous Capability Evaluations"
+    },
+    {
+      "id": "capability-elicitation",
+      "type": "approach",
+      "title": "Capability Elicitation"
+    },
+    {
+      "id": "safety-cases",
+      "type": "approach",
+      "title": "AI Safety Cases"
+    },
+    {
+      "id": "sleeper-agent-detection",
+      "type": "approach",
+      "title": "Sleeper Agent Detection"
+    },
+    {
+      "id": "ai-assisted",
+      "type": "approach",
+      "title": "AI-Assisted Alignment"
+    },
+    {
+      "id": "evaluation",
+      "type": "approach",
+      "title": "AI Evaluation"
+    },
+    {
+      "id": "alignment-evals",
+      "type": "approach",
+      "title": "Alignment Evaluations"
+    },
+    {
+      "id": "red-teaming",
+      "type": "approach",
+      "title": "Red Teaming"
+    },
+    {
+      "id": "constitutional-ai",
+      "type": "approach",
+      "title": "Constitutional AI"
+    },
+    {
+      "id": "weak-to-strong",
+      "type": "approach",
+      "title": "Weak-to-Strong Generalization"
+    },
+    {
+      "id": "preference-optimization",
+      "type": "approach",
+      "title": "Preference Optimization Methods"
+    },
+    {
+      "id": "refusal-training",
+      "type": "approach",
+      "title": "Refusal Training"
+    },
+    {
+      "id": "california-sb53",
+      "type": "policy",
+      "title": "California SB 53"
+    },
+    {
+      "id": "evals-governance",
+      "type": "policy",
+      "title": "Evals-Based Deployment Gates"
+    },
+    {
+      "id": "rsp",
+      "type": "policy",
+      "title": "Responsible Scaling Policies"
+    },
+    {
+      "id": "corporate",
+      "type": "approach",
+      "title": "Corporate Responses"
+    },
+    {
+      "id": "lab-culture",
+      "type": "approach",
+      "title": "Lab Safety Culture"
+    },
+    {
+      "id": "training-programs",
+      "type": "approach",
+      "title": "AI Safety Training Programs"
+    },
+    {
+      "id": "mech-interp",
+      "type": "approach",
+      "title": "Mechanistic Interpretability"
+    },
+    {
+      "id": "circuit-breakers",
+      "type": "approach",
+      "title": "Circuit Breakers / Inference Interventions"
+    },
+    {
+      "id": "sparse-autoencoders",
+      "type": "approach",
+      "title": "Sparse Autoencoders (SAEs)"
+    },
+    {
+      "id": "debate",
+      "type": "approach",
+      "title": "AI Safety via Debate"
+    },
+    {
+      "id": "sandboxing",
+      "type": "approach",
+      "title": "Sandboxing / Containment"
+    },
+    {
+      "id": "structured-access",
+      "type": "approach",
+      "title": "Structured Access / API-Only"
+    },
+    {
+      "id": "tool-restrictions",
+      "type": "approach",
+      "title": "Tool-Use Restrictions"
+    },
+    {
+      "id": "bioweapons",
+      "type": "risk",
+      "title": "Bioweapons Risk"
+    },
+    {
+      "id": "deceptive-alignment",
+      "type": "risk",
+      "title": "Deceptive Alignment"
+    },
+    {
+      "id": "racing-dynamics",
+      "type": "risk",
+      "title": "Racing Dynamics"
+    },
+    {
+      "id": "sycophancy",
+      "type": "risk",
+      "title": "Sycophancy"
+    },
+    {
+      "id": "sleeper-agents",
+      "type": "risk",
+      "title": "Sleeper Agents: Training Deceptive LLMs"
+    }
+  ],
+  "self-improvement": [
+    {
+      "id": "coding",
+      "type": "capability",
+      "title": "Autonomous Coding"
+    },
+    {
+      "id": "reasoning",
+      "type": "capability",
+      "title": "Reasoning and Planning"
+    },
+    {
+      "id": "scientific-research",
+      "type": "capability",
+      "title": "Scientific Research Capabilities"
+    },
+    {
+      "id": "fast-takeoff",
+      "type": "concept",
+      "title": "Fast Takeoff"
+    },
+    {
+      "id": "superintelligence",
+      "type": "concept",
+      "title": "Superintelligence"
+    }
+  ],
+  "tool-use": [
+    {
+      "id": "coding",
+      "type": "capability",
+      "title": "Autonomous Coding"
+    }
+  ],
+  "openai": [
+    {
+      "id": "coding",
+      "type": "capability",
+      "title": "Autonomous Coding"
+    },
+    {
+      "id": "language-models",
+      "type": "capability",
+      "title": "Large Language Models"
+    },
+    {
+      "id": "reasoning",
+      "type": "capability",
+      "title": "Reasoning and Planning"
+    },
+    {
+      "id": "corporate-influence",
+      "type": "crux",
+      "title": "Corporate Influence"
+    },
+    {
+      "id": "governance-focused",
+      "type": "concept",
+      "title": "Governance-Focused Worldview"
+    },
+    {
+      "id": "heavy-scaffolding",
+      "type": "concept",
+      "title": "Heavy Scaffolding / Agentic Systems"
+    },
+    {
+      "id": "deep-learning-era",
+      "type": "historical",
+      "title": "Deep Learning Revolution Era"
+    },
+    {
+      "id": "mainstream-era",
+      "type": "historical",
+      "title": "Mainstream Era"
+    },
+    {
+      "id": "openai-foundation-governance",
+      "type": "analysis",
+      "title": "OpenAI Foundation Governance Paradox"
+    },
+    {
+      "id": "anthropic-valuation",
+      "type": "analysis",
+      "title": "Anthropic Valuation Analysis"
+    },
+    {
+      "id": "musk-openai-lawsuit",
+      "type": "analysis",
+      "title": "Musk v. OpenAI Lawsuit"
+    },
+    {
+      "id": "elon-musk-philanthropy",
+      "type": "analysis",
+      "title": "Elon Musk (Funder)"
+    },
+    {
+      "id": "anthropic-impact",
+      "type": "analysis",
+      "title": "Anthropic Impact Assessment Model"
+    },
+    {
+      "id": "technical-pathways",
+      "type": "analysis",
+      "title": "Technical Pathway Decomposition"
+    },
+    {
+      "id": "multi-actor-landscape",
+      "type": "analysis",
+      "title": "Multi-Actor Strategic Landscape"
+    },
+    {
+      "id": "anthropic",
+      "type": "lab",
+      "title": "Anthropic"
+    },
+    {
+      "id": "deepmind",
+      "type": "lab",
+      "title": "Google DeepMind"
+    },
+    {
+      "id": "xai",
+      "type": "lab",
+      "title": "xAI"
+    },
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR"
+    },
+    {
+      "id": "arc",
+      "type": "organization",
+      "title": "ARC"
+    },
+    {
+      "id": "uk-aisi",
+      "type": "organization",
+      "title": "UK AI Safety Institute"
+    },
+    {
+      "id": "us-aisi",
+      "type": "organization",
+      "title": "US AI Safety Institute"
+    },
+    {
+      "id": "openai-foundation",
+      "type": "organization",
+      "title": "OpenAI Foundation"
+    },
+    {
+      "id": "leading-the-future",
+      "type": "organization",
+      "title": "Leading the Future super PAC"
+    },
+    {
+      "id": "nist-ai",
+      "type": "organization",
+      "title": "NIST and AI Safety"
+    },
+    {
+      "id": "ssi",
+      "type": "lab-research",
+      "title": "Safe Superintelligence Inc (SSI)"
+    },
+    {
+      "id": "frontier-model-forum",
+      "type": "organization",
+      "title": "Frontier Model Forum"
+    },
+    {
+      "id": "goodfire",
+      "type": "lab-research",
+      "title": "Goodfire"
+    },
+    {
+      "id": "ilya-sutskever",
+      "type": "researcher",
+      "title": "Ilya Sutskever"
+    },
+    {
+      "id": "elon-musk",
+      "type": "researcher",
+      "title": "Elon Musk"
+    },
+    {
+      "id": "david-sacks",
+      "type": "researcher",
+      "title": "David Sacks"
+    },
+    {
+      "id": "voluntary-commitments",
+      "type": "policy",
+      "title": "Voluntary AI Safety Commitments"
+    },
+    {
+      "id": "eval-saturation",
+      "type": "approach",
+      "title": "Eval Saturation & The Evals Gap"
+    },
+    {
+      "id": "alignment",
+      "type": "approach",
+      "title": "AI Alignment"
+    },
+    {
+      "id": "scheming-detection",
+      "type": "approach",
+      "title": "Scheming & Deception Detection"
+    },
+    {
+      "id": "dangerous-cap-evals",
+      "type": "approach",
+      "title": "Dangerous Capability Evaluations"
+    },
+    {
+      "id": "safety-cases",
+      "type": "approach",
+      "title": "AI Safety Cases"
+    },
+    {
+      "id": "ai-assisted",
+      "type": "approach",
+      "title": "AI-Assisted Alignment"
+    },
+    {
+      "id": "alignment-evals",
+      "type": "approach",
+      "title": "Alignment Evaluations"
+    },
+    {
+      "id": "red-teaming",
+      "type": "approach",
+      "title": "Red Teaming"
+    },
+    {
+      "id": "weak-to-strong",
+      "type": "approach",
+      "title": "Weak-to-Strong Generalization"
+    },
+    {
+      "id": "preference-optimization",
+      "type": "approach",
+      "title": "Preference Optimization Methods"
+    },
+    {
+      "id": "process-supervision",
+      "type": "approach",
+      "title": "Process Supervision"
+    },
+    {
+      "id": "refusal-training",
+      "type": "approach",
+      "title": "Refusal Training"
+    },
+    {
+      "id": "rsp",
+      "type": "policy",
+      "title": "Responsible Scaling Policies"
+    },
+    {
+      "id": "corporate",
+      "type": "approach",
+      "title": "Corporate Responses"
+    },
+    {
+      "id": "new-york-raise-act",
+      "type": "policy",
+      "title": "New York RAISE Act"
+    },
+    {
+      "id": "open-source",
+      "type": "approach",
+      "title": "Open Source Safety"
+    },
+    {
+      "id": "whistleblower-protections",
+      "type": "policy",
+      "title": "AI Whistleblower Protections"
+    },
+    {
+      "id": "debate",
+      "type": "approach",
+      "title": "AI Safety via Debate"
+    },
+    {
+      "id": "structured-access",
+      "type": "approach",
+      "title": "Structured Access / API-Only"
+    },
+    {
+      "id": "tool-restrictions",
+      "type": "approach",
+      "title": "Tool-Use Restrictions"
+    }
+  ],
+  "reasoning": [
+    {
+      "id": "language-models",
+      "type": "capability",
+      "title": "Large Language Models"
+    }
+  ],
+  "agentic-ai": [
+    {
+      "id": "language-models",
+      "type": "capability",
+      "title": "Large Language Models"
+    },
+    {
+      "id": "long-horizon",
+      "type": "capability",
+      "title": "Long-Horizon Autonomous Tasks"
+    },
+    {
+      "id": "tool-use",
+      "type": "capability",
+      "title": "Tool Use and Computer Use"
+    },
+    {
+      "id": "ai-control",
+      "type": "safety-agenda",
+      "title": "AI Control"
+    },
+    {
+      "id": "sandboxing",
+      "type": "approach",
+      "title": "Sandboxing / Containment"
+    },
+    {
+      "id": "tool-restrictions",
+      "type": "approach",
+      "title": "Tool-Use Restrictions"
+    },
+    {
+      "id": "multi-agent",
+      "type": "approach",
+      "title": "Multi-Agent Safety"
+    },
+    {
+      "id": "autonomous-replication",
+      "type": "risk",
+      "title": "Autonomous Replication"
+    }
+  ],
+  "language-models": [
+    {
+      "id": "persuasion",
+      "type": "capability",
+      "title": "Persuasion and Social Manipulation"
+    },
+    {
+      "id": "reasoning",
+      "type": "capability",
+      "title": "Reasoning and Planning"
+    }
+  ],
+  "misuse": [
+    {
+      "id": "persuasion",
+      "type": "capability",
+      "title": "Persuasion and Social Manipulation"
+    }
+  ],
+  "dual-use": [
+    {
+      "id": "scientific-research",
+      "type": "capability",
+      "title": "Scientific Research Capabilities"
+    }
+  ],
+  "deepmind": [
+    {
+      "id": "scientific-research",
+      "type": "capability",
+      "title": "Scientific Research Capabilities"
+    },
+    {
+      "id": "corporate-influence",
+      "type": "crux",
+      "title": "Corporate Influence"
+    },
+    {
+      "id": "deep-learning-era",
+      "type": "historical",
+      "title": "Deep Learning Revolution Era"
+    },
+    {
+      "id": "govai",
+      "type": "lab-research",
+      "title": "GovAI"
+    },
+    {
+      "id": "uk-aisi",
+      "type": "organization",
+      "title": "UK AI Safety Institute"
+    },
+    {
+      "id": "ssi",
+      "type": "lab-research",
+      "title": "Safe Superintelligence Inc (SSI)"
+    },
+    {
+      "id": "frontier-model-forum",
+      "type": "organization",
+      "title": "Frontier Model Forum"
+    },
+    {
+      "id": "goodfire",
+      "type": "lab-research",
+      "title": "Goodfire"
+    },
+    {
+      "id": "geoffrey-hinton",
+      "type": "researcher",
+      "title": "Geoffrey Hinton"
+    },
+    {
+      "id": "neel-nanda",
+      "type": "researcher",
+      "title": "Neel Nanda"
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight"
+    },
+    {
+      "id": "safety-cases",
+      "type": "approach",
+      "title": "AI Safety Cases"
+    },
+    {
+      "id": "rsp",
+      "type": "policy",
+      "title": "Responsible Scaling Policies"
+    }
+  ],
+  "fast-takeoff": [
+    {
+      "id": "self-improvement",
+      "type": "capability",
+      "title": "Self-Improvement and Recursive Enhancement"
+    },
+    {
+      "id": "superintelligence",
+      "type": "concept",
+      "title": "Superintelligence"
+    }
+  ],
+  "coding": [
+    {
+      "id": "self-improvement",
+      "type": "capability",
+      "title": "Self-Improvement and Recursive Enhancement"
+    },
+    {
+      "id": "tool-use",
+      "type": "capability",
+      "title": "Tool Use and Computer Use"
+    }
+  ],
+  "superintelligence": [
+    {
+      "id": "self-improvement",
+      "type": "capability",
+      "title": "Self-Improvement and Recursive Enhancement"
+    },
+    {
+      "id": "fast-takeoff",
+      "type": "concept",
+      "title": "Fast Takeoff"
+    },
+    {
+      "id": "existential-risk",
+      "type": "concept",
+      "title": "Existential Risk"
+    },
+    {
+      "id": "transformative-ai",
+      "type": "concept",
+      "title": "Transformative AI"
+    }
+  ],
+  "scheming": [
+    {
+      "id": "situational-awareness",
+      "type": "capability",
+      "title": "Situational Awareness"
+    },
+    {
+      "id": "large-language-models",
+      "type": "concept",
+      "title": "Large Language Models"
+    },
+    {
+      "id": "scheming-likelihood-model",
+      "type": "model",
+      "title": "Scheming Likelihood Assessment",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "redwood",
+      "type": "organization",
+      "title": "Redwood Research"
+    },
+    {
+      "id": "ai-control",
+      "type": "safety-agenda",
+      "title": "AI Control"
+    },
+    {
+      "id": "evals",
+      "type": "safety-agenda",
+      "title": "AI Evaluations"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability"
+    },
+    {
+      "id": "evaluation-awareness",
+      "type": "approach",
+      "title": "Evaluation Awareness"
+    },
+    {
+      "id": "alignment",
+      "type": "approach",
+      "title": "AI Alignment"
+    },
+    {
+      "id": "scheming-detection",
+      "type": "approach",
+      "title": "Scheming & Deception Detection"
+    },
+    {
+      "id": "dangerous-cap-evals",
+      "type": "approach",
+      "title": "Dangerous Capability Evaluations"
+    },
+    {
+      "id": "safety-cases",
+      "type": "approach",
+      "title": "AI Safety Cases"
+    },
+    {
+      "id": "sleeper-agent-detection",
+      "type": "approach",
+      "title": "Sleeper Agent Detection"
+    },
+    {
+      "id": "evaluation",
+      "type": "approach",
+      "title": "AI Evaluation"
+    },
+    {
+      "id": "alignment-evals",
+      "type": "approach",
+      "title": "Alignment Evaluations"
+    },
+    {
+      "id": "model-auditing",
+      "type": "approach",
+      "title": "Third-Party Model Auditing"
+    },
+    {
+      "id": "mech-interp",
+      "type": "approach",
+      "title": "Mechanistic Interpretability"
+    },
+    {
+      "id": "sandbagging",
+      "type": "risk",
+      "title": "Sandbagging"
+    },
+    {
+      "id": "treacherous-turn",
+      "type": "risk",
+      "title": "Treacherous Turn"
+    },
+    {
+      "id": "rogue-ai-scenarios",
+      "type": "risk",
+      "title": "Rogue AI Scenarios"
+    },
+    {
+      "id": "sleeper-agents",
+      "type": "risk",
+      "title": "Sleeper Agents: Training Deceptive LLMs"
+    }
+  ],
+  "arc": [
+    {
+      "id": "situational-awareness",
+      "type": "capability",
+      "title": "Situational Awareness"
+    },
+    {
+      "id": "apollo-research",
+      "type": "lab-research",
+      "title": "Apollo Research"
+    },
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR"
+    },
+    {
+      "id": "miri",
+      "type": "organization",
+      "title": "MIRI"
+    },
+    {
+      "id": "redwood",
+      "type": "organization",
+      "title": "Redwood Research"
+    },
+    {
+      "id": "paul-christiano",
+      "type": "researcher",
+      "title": "Paul Christiano"
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight"
+    },
+    {
+      "id": "sandbagging",
+      "type": "risk",
+      "title": "Sandbagging"
+    }
+  ],
+  "redwood": [
+    {
+      "id": "field-building",
+      "type": "crux",
+      "title": "Field Building and Community"
+    },
+    {
+      "id": "research-agendas",
+      "type": "crux",
+      "title": "Research Agendas"
+    },
+    {
+      "id": "technical-research",
+      "type": "crux",
+      "title": "Technical AI Safety Research"
+    },
+    {
+      "id": "conjecture",
+      "type": "lab-research",
+      "title": "Conjecture"
+    },
+    {
+      "id": "ai-control",
+      "type": "safety-agenda",
+      "title": "AI Control"
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability"
+    }
+  ],
+  "eu-ai-act": [
+    {
+      "id": "governance-policy",
+      "type": "crux",
+      "title": "AI Governance and Policy"
+    },
+    {
+      "id": "governance-focused",
+      "type": "concept",
+      "title": "Governance-Focused Worldview"
+    },
+    {
+      "id": "short-timeline-policy-implications",
+      "type": "analysis",
+      "title": "Short Timeline Policy Implications"
+    },
+    {
+      "id": "controlai",
+      "type": "organization",
+      "title": "ControlAI"
+    },
+    {
+      "id": "california-sb1047",
+      "type": "policy",
+      "title": "Safe and Secure Innovation for Frontier Artificial Intelligence Models Act"
+    },
+    {
+      "id": "china-ai-regulations",
+      "type": "policy",
+      "title": "China AI Regulatory Framework"
+    },
+    {
+      "id": "compute-thresholds",
+      "type": "policy",
+      "title": "Compute Thresholds"
+    },
+    {
+      "id": "us-executive-order",
+      "type": "policy",
+      "title": "Executive Order on Safe, Secure, and Trustworthy AI"
+    },
+    {
+      "id": "model-auditing",
+      "type": "approach",
+      "title": "Third-Party Model Auditing"
+    },
+    {
+      "id": "california-sb53",
+      "type": "policy",
+      "title": "California SB 53"
+    },
+    {
+      "id": "evals-governance",
+      "type": "policy",
+      "title": "Evals-Based Deployment Gates"
+    },
+    {
+      "id": "thresholds",
+      "type": "policy",
+      "title": "Compute Thresholds"
+    },
+    {
+      "id": "bletchley-declaration",
+      "type": "policy",
+      "title": "Bletchley Declaration"
+    },
+    {
+      "id": "coordination-mechanisms",
+      "type": "policy",
+      "title": "International Coordination Mechanisms"
+    },
+    {
+      "id": "model-registries",
+      "type": "policy",
+      "title": "Model Registries"
+    },
+    {
+      "id": "open-source",
+      "type": "approach",
+      "title": "Open Source Safety"
+    },
+    {
+      "id": "whistleblower-protections",
+      "type": "policy",
+      "title": "AI Whistleblower Protections"
+    }
+  ],
+  "govai": [
+    {
+      "id": "governance-policy",
+      "type": "crux",
+      "title": "AI Governance and Policy"
+    },
+    {
+      "id": "compute-governance",
+      "type": "policy",
+      "title": "Compute Governance"
+    },
+    {
+      "id": "compute-monitoring",
+      "type": "policy",
+      "title": "Compute Monitoring"
+    },
+    {
+      "id": "eu-ai-act",
+      "type": "policy",
+      "title": "EU AI Act"
+    },
+    {
+      "id": "racing-dynamics",
+      "type": "risk",
+      "title": "Racing Dynamics"
+    }
+  ],
+  "miri": [
+    {
+      "id": "research-agendas",
+      "type": "crux",
+      "title": "Research Agendas"
+    },
+    {
+      "id": "accident-risks",
+      "type": "crux",
+      "title": "Accident Risk Cruxes"
+    },
+    {
+      "id": "miri-era",
+      "type": "historical",
+      "title": "The MIRI Era"
+    },
+    {
+      "id": "instrumental-convergence-framework",
+      "type": "model",
+      "title": "Instrumental Convergence Framework",
+      "relationship": "research"
+    },
+    {
+      "id": "arc",
+      "type": "organization",
+      "title": "ARC"
+    },
+    {
+      "id": "redwood",
+      "type": "organization",
+      "title": "Redwood Research"
+    },
+    {
+      "id": "eliezer-yudkowsky",
+      "type": "researcher",
+      "title": "Eliezer Yudkowsky"
+    },
+    {
+      "id": "instrumental-convergence",
+      "type": "risk",
+      "title": "Instrumental Convergence"
+    },
+    {
+      "id": "mesa-optimization",
+      "type": "risk",
+      "title": "Mesa-Optimization"
+    },
+    {
+      "id": "sharp-left-turn",
+      "type": "risk",
+      "title": "Sharp Left Turn"
+    }
+  ],
+  "arc-evals": [
+    {
+      "id": "research-agendas",
+      "type": "crux",
+      "title": "Research Agendas"
+    },
+    {
+      "id": "capability-evaluations",
+      "type": "concept",
+      "title": "Capability Evaluations"
+    },
+    {
+      "id": "beth-barnes",
+      "type": "researcher",
+      "title": "Beth Barnes"
+    }
+  ],
+  "metr": [
+    {
+      "id": "capability-evaluations",
+      "type": "concept",
+      "title": "Capability Evaluations"
+    },
+    {
+      "id": "apollo-research",
+      "type": "lab-research",
+      "title": "Apollo Research"
+    },
+    {
+      "id": "far-ai",
+      "type": "lab-research",
+      "title": "FAR AI"
+    },
+    {
+      "id": "uk-aisi",
+      "type": "organization",
+      "title": "UK AI Safety Institute"
+    },
+    {
+      "id": "us-aisi",
+      "type": "organization",
+      "title": "US AI Safety Institute"
+    },
+    {
+      "id": "arc-evals",
+      "type": "organization",
+      "title": "ARC Evaluations"
+    },
+    {
+      "id": "beth-barnes",
+      "type": "researcher",
+      "title": "Beth Barnes"
+    },
+    {
+      "id": "scalable-eval-approaches",
+      "type": "approach",
+      "title": "Scalable Eval Approaches"
+    },
+    {
+      "id": "dangerous-cap-evals",
+      "type": "approach",
+      "title": "Dangerous Capability Evaluations"
+    },
+    {
+      "id": "capability-elicitation",
+      "type": "approach",
+      "title": "Capability Elicitation"
+    },
+    {
+      "id": "evaluation",
+      "type": "approach",
+      "title": "AI Evaluation"
+    },
+    {
+      "id": "red-teaming",
+      "type": "approach",
+      "title": "Red Teaming"
+    },
+    {
+      "id": "model-auditing",
+      "type": "approach",
+      "title": "Third-Party Model Auditing"
+    },
+    {
+      "id": "evals-governance",
+      "type": "policy",
+      "title": "Evals-Based Deployment Gates"
+    },
+    {
+      "id": "rsp",
+      "type": "policy",
+      "title": "Responsible Scaling Policies"
+    },
+    {
+      "id": "training-programs",
+      "type": "approach",
+      "title": "AI Safety Training Programs"
+    },
+    {
+      "id": "sandboxing",
+      "type": "approach",
+      "title": "Sandboxing / Containment"
+    },
+    {
+      "id": "tool-restrictions",
+      "type": "approach",
+      "title": "Tool-Use Restrictions"
+    }
+  ],
+  "epoch-ai": [
+    {
+      "id": "scaling-laws",
+      "type": "concept",
+      "title": "Scaling Laws"
+    },
+    {
+      "id": "ai-timelines",
+      "type": "concept",
+      "title": "AI Timelines"
+    },
+    {
+      "id": "critical-uncertainties",
+      "type": "crux",
+      "title": "Critical Uncertainties Model"
+    },
+    {
+      "id": "capability-alignment-race",
+      "type": "analysis",
+      "title": "Capability-Alignment Race Model"
+    }
+  ],
+  "scaling-laws": [
+    {
+      "id": "data-constraints",
+      "type": "concept",
+      "title": "Data Constraints"
+    },
+    {
+      "id": "epoch-ai",
+      "type": "organization",
+      "title": "Epoch AI"
+    }
+  ],
+  "rethink-priorities": [
+    {
+      "id": "ai-welfare",
+      "type": "concept",
+      "title": "AI Welfare and Digital Minds"
+    }
+  ],
+  "alignment": [
+    {
+      "id": "ai-welfare",
+      "type": "concept",
+      "title": "AI Welfare and Digital Minds"
+    },
+    {
+      "id": "palisade-research",
+      "type": "lab-research",
+      "title": "Palisade Research"
+    },
+    {
+      "id": "marc-andreessen",
+      "type": "researcher",
+      "title": "Marc Andreessen"
+    },
+    {
+      "id": "constitutional-ai",
+      "type": "approach",
+      "title": "Constitutional AI"
+    }
+  ],
+  "autonomous-weapons": [
+    {
+      "id": "misuse-risks",
+      "type": "crux",
+      "title": "Misuse Risk Cruxes"
+    },
+    {
+      "id": "autonomous-weapons-escalation",
+      "type": "model",
+      "title": "Autonomous Weapons Escalation Model",
+      "relationship": "related"
+    },
+    {
+      "id": "autonomous-weapons-proliferation",
+      "type": "model",
+      "title": "LAWS Proliferation Model",
+      "relationship": "related"
+    },
+    {
+      "id": "cyberweapons",
+      "type": "risk",
+      "title": "Cyberweapons Risk"
+    }
+  ],
+  "solutions": [
+    {
+      "id": "misuse-risks",
+      "type": "crux",
+      "title": "Misuse Risk Cruxes"
+    },
+    {
+      "id": "epistemic-risks",
+      "type": "crux",
+      "title": "Epistemic Cruxes"
+    }
+  ],
+  "responsible-scaling-policies": [
+    {
+      "id": "solutions",
+      "type": "crux",
+      "title": "Solution Cruxes"
+    },
+    {
+      "id": "eval-saturation",
+      "type": "approach",
+      "title": "Eval Saturation & The Evals Gap"
+    },
+    {
+      "id": "dangerous-cap-evals",
+      "type": "approach",
+      "title": "Dangerous Capability Evaluations"
+    },
+    {
+      "id": "evaluation",
+      "type": "approach",
+      "title": "AI Evaluation"
+    },
+    {
+      "id": "red-teaming",
+      "type": "approach",
+      "title": "Red Teaming"
+    },
+    {
+      "id": "capability-unlearning",
+      "type": "approach",
+      "title": "Capability Unlearning / Removal"
+    },
+    {
+      "id": "intervention-portfolio",
+      "type": "approach",
+      "title": "Intervention Portfolio"
+    },
+    {
+      "id": "evals-governance",
+      "type": "policy",
+      "title": "Evals-Based Deployment Gates"
+    },
+    {
+      "id": "corporate",
+      "type": "approach",
+      "title": "Corporate Responses"
+    },
+    {
+      "id": "pause",
+      "type": "approach",
+      "title": "Pause Advocacy"
+    },
+    {
+      "id": "model-registries",
+      "type": "policy",
+      "title": "Model Registries"
+    },
+    {
+      "id": "whistleblower-protections",
+      "type": "policy",
+      "title": "AI Whistleblower Protections"
+    }
+  ],
+  "epistemic-infrastructure": [
+    {
+      "id": "solutions",
+      "type": "crux",
+      "title": "Solution Cruxes"
+    }
+  ],
+  "ai-governance": [
+    {
+      "id": "solutions",
+      "type": "crux",
+      "title": "Solution Cruxes"
+    },
+    {
+      "id": "critical-uncertainties",
+      "type": "crux",
+      "title": "Critical Uncertainties Model"
+    },
+    {
+      "id": "leading-the-future",
+      "type": "organization",
+      "title": "Leading the Future super PAC"
+    },
+    {
+      "id": "nist-ai",
+      "type": "organization",
+      "title": "NIST and AI Safety"
+    },
+    {
+      "id": "new-york-raise-act",
+      "type": "policy",
+      "title": "New York RAISE Act"
+    }
+  ],
+  "situational-awareness": [
+    {
+      "id": "accident-risks",
+      "type": "crux",
+      "title": "Accident Risk Cruxes"
+    },
+    {
+      "id": "deceptive-alignment-decomposition",
+      "type": "model",
+      "title": "Deceptive Alignment Decomposition Model",
+      "relationship": "prerequisite"
+    },
+    {
+      "id": "scheming-likelihood-model",
+      "type": "model",
+      "title": "Scheming Likelihood Assessment",
+      "relationship": "prerequisite"
+    },
+    {
+      "id": "apollo-research",
+      "type": "lab-research",
+      "title": "Apollo Research"
+    },
+    {
+      "id": "emergent-capabilities",
+      "type": "risk",
+      "title": "Emergent Capabilities"
+    },
+    {
+      "id": "sandbagging",
+      "type": "risk",
+      "title": "Sandbagging"
+    },
+    {
+      "id": "scheming",
+      "type": "risk",
+      "title": "Scheming"
+    },
+    {
+      "id": "sleeper-agents",
+      "type": "risk",
+      "title": "Sleeper Agents: Training Deceptive LLMs"
+    }
+  ],
+  "lock-in": [
+    {
+      "id": "structural-risks",
+      "type": "crux",
+      "title": "Structural Risk Cruxes"
+    },
+    {
+      "id": "lock-in-mechanisms",
+      "type": "model",
+      "title": "Lock-in Mechanisms Model"
+    },
+    {
+      "id": "concentration-of-power-model",
+      "type": "model",
+      "title": "Concentration of Power Systems Model",
+      "relationship": "consequence"
+    },
+    {
+      "id": "lock-in-model",
+      "type": "model",
+      "title": "Lock-in Irreversibility Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "pause-advocacy",
+      "type": "approach",
+      "title": "Pause Advocacy"
+    },
+    {
+      "id": "authoritarian-tools",
+      "type": "risk",
+      "title": "AI Authoritarian Tools"
+    },
+    {
+      "id": "concentration-of-power",
+      "type": "risk",
+      "title": "Concentration of Power"
+    },
+    {
+      "id": "enfeeblement",
+      "type": "risk",
+      "title": "Enfeeblement"
+    },
+    {
+      "id": "irreversibility",
+      "type": "risk",
+      "title": "Irreversibility"
+    },
+    {
+      "id": "authoritarian-takeover",
+      "type": "risk",
+      "title": "Authoritarian Takeover"
+    }
+  ],
+  "manifest": [
+    {
+      "id": "epistemic-risks",
+      "type": "crux",
+      "title": "Epistemic Cruxes"
+    }
+  ],
+  "misuse-risks": [
+    {
+      "id": "epistemic-risks",
+      "type": "crux",
+      "title": "Epistemic Cruxes"
+    }
+  ],
+  "ai-impacts": [
+    {
+      "id": "critical-uncertainties",
+      "type": "crux",
+      "title": "Critical Uncertainties Model"
+    },
+    {
+      "id": "agi-timeline",
+      "type": "concept",
+      "title": "AGI Timeline"
+    }
+  ],
+  "metaculus": [
+    {
+      "id": "critical-uncertainties",
+      "type": "crux",
+      "title": "Critical Uncertainties Model"
+    },
+    {
+      "id": "agi-timeline",
+      "type": "concept",
+      "title": "AGI Timeline"
+    },
+    {
+      "id": "philip-tetlock",
+      "type": "researcher",
+      "title": "Philip Tetlock"
+    },
+    {
+      "id": "eli-lifland",
+      "type": "researcher",
+      "title": "Eli Lifland"
+    }
+  ],
+  "agi-timeline": [
+    {
+      "id": "critical-uncertainties",
+      "type": "crux",
+      "title": "Critical Uncertainties Model"
+    }
+  ],
+  "prediction-markets": [
+    {
+      "id": "agi-timeline",
+      "type": "concept",
+      "title": "AGI Timeline"
+    },
+    {
+      "id": "max-tegmark",
+      "type": "researcher",
+      "title": "Max Tegmark"
+    }
+  ],
+  "sam-altman": [
+    {
+      "id": "agi-timeline",
+      "type": "concept",
+      "title": "AGI Timeline"
+    },
+    {
+      "id": "musk-openai-lawsuit",
+      "type": "analysis",
+      "title": "Musk v. OpenAI Lawsuit"
+    },
+    {
+      "id": "openai",
+      "type": "lab",
+      "title": "OpenAI"
+    },
+    {
+      "id": "openai-foundation",
+      "type": "organization",
+      "title": "OpenAI Foundation"
+    }
+  ],
+  "dario-amodei": [
+    {
+      "id": "agi-timeline",
+      "type": "concept",
+      "title": "AGI Timeline"
+    },
+    {
+      "id": "long-term-benefit-trust",
+      "type": "analysis",
+      "title": "Long-Term Benefit Trust (Anthropic)"
+    },
+    {
+      "id": "anthropic-ipo",
+      "type": "analysis",
+      "title": "Anthropic IPO"
+    },
+    {
+      "id": "anthropic-pledge-enforcement",
+      "type": "analysis",
+      "title": "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
+    },
+    {
+      "id": "anthropic-pre-ipo-daf-transfers",
+      "type": "analysis",
+      "title": "Anthropic Pre-IPO DAF Transfers"
+    },
+    {
+      "id": "anthropic",
+      "type": "lab",
+      "title": "Anthropic"
+    },
+    {
+      "id": "palisade-research",
+      "type": "lab-research",
+      "title": "Palisade Research"
+    },
+    {
+      "id": "goodfire",
+      "type": "lab-research",
+      "title": "Goodfire"
+    },
+    {
+      "id": "chris-olah",
+      "type": "researcher",
+      "title": "Chris Olah"
+    },
+    {
+      "id": "jan-leike",
+      "type": "researcher",
+      "title": "Jan Leike"
+    },
+    {
+      "id": "david-sacks",
+      "type": "researcher",
+      "title": "David Sacks"
+    }
+  ],
+  "emergent-capabilities": [
+    {
+      "id": "large-language-models",
+      "type": "concept",
+      "title": "Large Language Models"
+    },
+    {
+      "id": "dense-transformers",
+      "type": "concept",
+      "title": "Dense Transformers"
+    },
+    {
+      "id": "evals",
+      "type": "safety-agenda",
+      "title": "AI Evaluations"
+    }
+  ],
+  "dense-transformers": [
+    {
+      "id": "heavy-scaffolding",
+      "type": "concept",
+      "title": "Heavy Scaffolding / Agentic Systems"
+    },
+    {
+      "id": "provable-safe",
+      "type": "concept",
+      "title": "Provable / Guaranteed Safe AI"
+    }
+  ],
+  "light-scaffolding": [
+    {
+      "id": "heavy-scaffolding",
+      "type": "concept",
+      "title": "Heavy Scaffolding / Agentic Systems"
+    }
+  ],
+  "formal-verification": [
+    {
+      "id": "provable-safe",
+      "type": "concept",
+      "title": "Provable / Guaranteed Safe AI"
+    },
+    {
+      "id": "provably-safe",
+      "type": "approach",
+      "title": "Provably Safe AI (davidad agenda)"
+    }
+  ],
+  "neuro-symbolic": [
+    {
+      "id": "provable-safe",
+      "type": "concept",
+      "title": "Provable / Guaranteed Safe AI"
+    }
+  ],
+  "heavy-scaffolding": [
+    {
+      "id": "provable-safe",
+      "type": "concept",
+      "title": "Provable / Guaranteed Safe AI"
+    },
+    {
+      "id": "dense-transformers",
+      "type": "concept",
+      "title": "Dense Transformers"
+    }
+  ],
+  "rlhf": [
+    {
+      "id": "dense-transformers",
+      "type": "concept",
+      "title": "Dense Transformers"
+    },
+    {
+      "id": "reward-hacking-taxonomy",
+      "type": "model",
+      "title": "Reward Hacking Taxonomy and Severity Model",
+      "relationship": "vulnerable-technique"
+    },
+    {
+      "id": "value-learning",
+      "type": "safety-agenda",
+      "title": "Value Learning"
+    },
+    {
+      "id": "constitutional-ai",
+      "type": "approach",
+      "title": "Constitutional AI"
+    },
+    {
+      "id": "weak-to-strong",
+      "type": "approach",
+      "title": "Weak-to-Strong Generalization"
+    },
+    {
+      "id": "preference-optimization",
+      "type": "approach",
+      "title": "Preference Optimization Methods"
+    },
+    {
+      "id": "process-supervision",
+      "type": "approach",
+      "title": "Process Supervision"
+    },
+    {
+      "id": "refusal-training",
+      "type": "approach",
+      "title": "Refusal Training"
+    },
+    {
+      "id": "debate",
+      "type": "approach",
+      "title": "AI Safety via Debate"
+    },
+    {
+      "id": "reward-hacking",
+      "type": "risk",
+      "title": "Reward Hacking"
+    }
+  ],
+  "constitutional-ai": [
+    {
+      "id": "dense-transformers",
+      "type": "concept",
+      "title": "Dense Transformers"
+    },
+    {
+      "id": "ai-assisted",
+      "type": "approach",
+      "title": "AI-Assisted Alignment"
+    },
+    {
+      "id": "representation-engineering",
+      "type": "approach",
+      "title": "Representation Engineering"
+    },
+    {
+      "id": "formal-verification",
+      "type": "approach",
+      "title": "Formal Verification"
+    },
+    {
+      "id": "provably-safe",
+      "type": "approach",
+      "title": "Provably Safe AI (davidad agenda)"
+    }
+  ],
+  "fhi": [
+    {
+      "id": "miri-era",
+      "type": "historical",
+      "title": "The MIRI Era"
+    }
+  ],
+  "uk-aisi": [
+    {
+      "id": "ai-safety-summit",
+      "type": "historical",
+      "title": "AI Safety Summit (Bletchley Park)"
+    },
+    {
+      "id": "apollo-research",
+      "type": "lab-research",
+      "title": "Apollo Research"
+    },
+    {
+      "id": "conjecture",
+      "type": "lab-research",
+      "title": "Conjecture"
+    },
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR"
+    },
+    {
+      "id": "arc",
+      "type": "organization",
+      "title": "ARC"
+    },
+    {
+      "id": "us-aisi",
+      "type": "organization",
+      "title": "US AI Safety Institute"
+    },
+    {
+      "id": "eu-ai-act",
+      "type": "policy",
+      "title": "EU AI Act"
+    },
+    {
+      "id": "international-summits",
+      "type": "policy",
+      "title": "International AI Safety Summit Series"
+    },
+    {
+      "id": "us-executive-order",
+      "type": "policy",
+      "title": "Executive Order on Safe, Secure, and Trustworthy AI"
+    },
+    {
+      "id": "bletchley-declaration",
+      "type": "policy",
+      "title": "Bletchley Declaration"
+    }
+  ],
+  "openai-foundation": [
+    {
+      "id": "openai-foundation-governance",
+      "type": "analysis",
+      "title": "OpenAI Foundation Governance Paradox"
+    },
+    {
+      "id": "musk-openai-lawsuit",
+      "type": "analysis",
+      "title": "Musk v. OpenAI Lawsuit"
+    }
+  ],
+  "musk-openai-lawsuit": [
+    {
+      "id": "openai-foundation-governance",
+      "type": "analysis",
+      "title": "OpenAI Foundation Governance Paradox"
+    }
+  ],
+  "long-term-benefit-trust": [
+    {
+      "id": "openai-foundation-governance",
+      "type": "analysis",
+      "title": "OpenAI Foundation Governance Paradox"
+    },
+    {
+      "id": "anthropic-pledge-enforcement",
+      "type": "analysis",
+      "title": "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
+    },
+    {
+      "id": "openai-foundation",
+      "type": "organization",
+      "title": "OpenAI Foundation"
+    }
+  ],
+  "anthropic-ipo": [
+    {
+      "id": "anthropic-valuation",
+      "type": "analysis",
+      "title": "Anthropic Valuation Analysis"
+    },
+    {
+      "id": "anthropic-investors",
+      "type": "analysis",
+      "title": "Anthropic (Funder)"
+    },
+    {
+      "id": "anthropic-pre-ipo-daf-transfers",
+      "type": "analysis",
+      "title": "Anthropic Pre-IPO DAF Transfers"
+    }
+  ],
+  "anthropic-investors": [
+    {
+      "id": "anthropic-valuation",
+      "type": "analysis",
+      "title": "Anthropic Valuation Analysis"
+    },
+    {
+      "id": "anthropic-ipo",
+      "type": "analysis",
+      "title": "Anthropic IPO"
+    },
+    {
+      "id": "anthropic-pledge-enforcement",
+      "type": "analysis",
+      "title": "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
+    },
+    {
+      "id": "anthropic-pre-ipo-daf-transfers",
+      "type": "analysis",
+      "title": "Anthropic Pre-IPO DAF Transfers"
+    },
+    {
+      "id": "anthropic-impact",
+      "type": "analysis",
+      "title": "Anthropic Impact Assessment Model"
+    }
+  ],
+  "anthropic-valuation": [
+    {
+      "id": "anthropic-investors",
+      "type": "analysis",
+      "title": "Anthropic (Funder)"
+    },
+    {
+      "id": "anthropic-ipo",
+      "type": "analysis",
+      "title": "Anthropic IPO"
+    },
+    {
+      "id": "anthropic-impact",
+      "type": "analysis",
+      "title": "Anthropic Impact Assessment Model"
+    }
+  ],
+  "jaan-tallinn": [
+    {
+      "id": "anthropic-investors",
+      "type": "analysis",
+      "title": "Anthropic (Funder)"
+    },
+    {
+      "id": "elon-musk-philanthropy",
+      "type": "analysis",
+      "title": "Elon Musk (Funder)"
+    },
+    {
+      "id": "frontier-model-forum",
+      "type": "organization",
+      "title": "Frontier Model Forum"
+    },
+    {
+      "id": "dustin-moskovitz",
+      "type": "researcher",
+      "title": "Dustin Moskovitz"
+    }
+  ],
+  "dustin-moskovitz": [
+    {
+      "id": "anthropic-investors",
+      "type": "analysis",
+      "title": "Anthropic (Funder)"
+    },
+    {
+      "id": "elon-musk-philanthropy",
+      "type": "analysis",
+      "title": "Elon Musk (Funder)"
+    }
+  ],
+  "daniela-amodei": [
+    {
+      "id": "long-term-benefit-trust",
+      "type": "analysis",
+      "title": "Long-Term Benefit Trust (Anthropic)"
+    },
+    {
+      "id": "anthropic-ipo",
+      "type": "analysis",
+      "title": "Anthropic IPO"
+    }
+  ],
+  "paul-christiano": [
+    {
+      "id": "long-term-benefit-trust",
+      "type": "analysis",
+      "title": "Long-Term Benefit Trust (Anthropic)"
+    },
+    {
+      "id": "capability-alignment-race",
+      "type": "analysis",
+      "title": "Capability-Alignment Race Model"
+    },
+    {
+      "id": "model-organisms-of-misalignment",
+      "type": "analysis",
+      "title": "Model Organisms of Misalignment"
+    },
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR"
+    },
+    {
+      "id": "arc",
+      "type": "organization",
+      "title": "ARC"
+    },
+    {
+      "id": "miri",
+      "type": "organization",
+      "title": "MIRI"
+    },
+    {
+      "id": "nist-ai",
+      "type": "organization",
+      "title": "NIST and AI Safety"
+    },
+    {
+      "id": "eliezer-yudkowsky",
+      "type": "researcher",
+      "title": "Eliezer Yudkowsky"
+    },
+    {
+      "id": "jan-leike",
+      "type": "researcher",
+      "title": "Jan Leike"
+    },
+    {
+      "id": "stuart-russell",
+      "type": "researcher",
+      "title": "Stuart Russell"
+    }
+  ],
+  "centre-for-effective-altruism": [
+    {
+      "id": "long-term-benefit-trust",
+      "type": "analysis",
+      "title": "Long-Term Benefit Trust (Anthropic)"
+    }
+  ],
+  "openai-foundation-governance": [
+    {
+      "id": "musk-openai-lawsuit",
+      "type": "analysis",
+      "title": "Musk v. OpenAI Lawsuit"
+    }
+  ],
+  "elon-musk": [
+    {
+      "id": "musk-openai-lawsuit",
+      "type": "analysis",
+      "title": "Musk v. OpenAI Lawsuit"
+    },
+    {
+      "id": "elon-musk-philanthropy",
+      "type": "analysis",
+      "title": "Elon Musk (Funder)"
+    },
+    {
+      "id": "xai",
+      "type": "lab",
+      "title": "xAI"
+    },
+    {
+      "id": "david-sacks",
+      "type": "researcher",
+      "title": "David Sacks"
+    },
+    {
+      "id": "marc-andreessen",
+      "type": "researcher",
+      "title": "Marc Andreessen"
+    },
+    {
+      "id": "max-tegmark",
+      "type": "researcher",
+      "title": "Max Tegmark"
+    }
+  ],
+  "giving-pledge": [
+    {
+      "id": "elon-musk-philanthropy",
+      "type": "analysis",
+      "title": "Elon Musk (Funder)"
+    },
+    {
+      "id": "anthropic-pledge-enforcement",
+      "type": "analysis",
+      "title": "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
+    },
+    {
+      "id": "anthropic-pre-ipo-daf-transfers",
+      "type": "analysis",
+      "title": "Anthropic Pre-IPO DAF Transfers"
+    },
+    {
+      "id": "openai-foundation",
+      "type": "organization",
+      "title": "OpenAI Foundation"
+    }
+  ],
+  "anthropic-pre-ipo-daf-transfers": [
+    {
+      "id": "anthropic-pledge-enforcement",
+      "type": "analysis",
+      "title": "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
+    }
+  ],
+  "anthropic-pledge-enforcement": [
+    {
+      "id": "anthropic-pre-ipo-daf-transfers",
+      "type": "analysis",
+      "title": "Anthropic Pre-IPO DAF Transfers"
+    }
+  ],
+  "google-deepmind": [
+    {
+      "id": "anthropic-impact",
+      "type": "analysis",
+      "title": "Anthropic Impact Assessment Model"
+    }
+  ],
+  "capability-alignment-race": [
+    {
+      "id": "technical-pathways",
+      "type": "analysis",
+      "title": "Technical Pathway Decomposition"
+    },
+    {
+      "id": "feedback-loops",
+      "type": "analysis",
+      "title": "Feedback Loop & Cascade Model"
+    },
+    {
+      "id": "multi-actor-landscape",
+      "type": "analysis",
+      "title": "Multi-Actor Strategic Landscape"
+    }
+  ],
+  "evan-hubinger": [
+    {
+      "id": "model-organisms-of-misalignment",
+      "type": "analysis",
+      "title": "Model Organisms of Misalignment"
+    },
+    {
+      "id": "sleeper-agents",
+      "type": "risk",
+      "title": "Sleeper Agents: Training Deceptive LLMs"
+    }
+  ],
+  "open-philanthropy": [
+    {
+      "id": "ea-biosecurity-scope",
+      "type": "analysis",
+      "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?"
+    },
+    {
+      "id": "johns-hopkins-center-for-health-security",
+      "type": "organization",
+      "title": "Johns Hopkins Center for Health Security"
+    },
+    {
+      "id": "centre-for-long-term-resilience",
+      "type": "organization",
+      "title": "Centre for Long-Term Resilience"
+    },
+    {
+      "id": "david-sacks",
+      "type": "researcher",
+      "title": "David Sacks"
+    },
+    {
+      "id": "eli-lifland",
+      "type": "researcher",
+      "title": "Eli Lifland"
+    },
+    {
+      "id": "dustin-moskovitz",
+      "type": "researcher",
+      "title": "Dustin Moskovitz"
+    },
+    {
+      "id": "eliciting-latent-knowledge",
+      "type": "approach",
+      "title": "Eliciting Latent Knowledge (ELK)"
+    }
+  ],
+  "securebio": [
+    {
+      "id": "ea-biosecurity-scope",
+      "type": "analysis",
+      "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?"
+    }
+  ],
+  "securedna": [
+    {
+      "id": "ea-biosecurity-scope",
+      "type": "analysis",
+      "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?"
+    }
+  ],
+  "blueprint-biosecurity": [
+    {
+      "id": "ea-biosecurity-scope",
+      "type": "analysis",
+      "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?"
+    }
+  ],
+  "compounding-risks-analysis": [
+    {
+      "id": "ai-risk-portfolio-analysis",
+      "type": "model",
+      "title": "AI Risk Portfolio Analysis",
+      "relationship": "related"
+    },
+    {
+      "id": "risk-cascade-pathways",
+      "type": "model",
+      "title": "Risk Cascade Pathways Model",
+      "relationship": "related"
+    },
+    {
+      "id": "risk-interaction-network",
+      "type": "model",
+      "title": "Risk Interaction Network Model",
+      "relationship": "related"
+    }
+  ],
+  "flash-dynamics-threshold": [
+    {
+      "id": "ai-risk-portfolio-analysis",
+      "type": "model",
+      "title": "AI Risk Portfolio Analysis",
+      "relationship": "related"
+    }
+  ],
+  "ai-risk-portfolio-analysis": [
+    {
+      "id": "worldview-intervention-mapping",
+      "type": "model",
+      "title": "Worldview-Intervention Mapping",
+      "relationship": "related"
+    },
+    {
+      "id": "intervention-timing-windows",
+      "type": "model",
+      "title": "Intervention Timing Windows",
+      "relationship": "related"
+    }
+  ],
+  "worldview-intervention-mapping": [
+    {
+      "id": "intervention-timing-windows",
+      "type": "model",
+      "title": "Intervention Timing Windows",
+      "relationship": "related"
+    }
+  ],
+  "instrumental-convergence": [
+    {
+      "id": "carlsmith-six-premises",
+      "type": "model",
+      "title": "Carlsmith's Six-Premise Argument",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "power-seeking-conditions",
+      "type": "model",
+      "title": "Power-Seeking Emergence Conditions Model",
+      "relationship": "related"
+    },
+    {
+      "id": "instrumental-convergence-framework",
+      "type": "model",
+      "title": "Instrumental Convergence Framework",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "corrigibility-failure-pathways",
+      "type": "model",
+      "title": "Corrigibility Failure Pathways",
+      "relationship": "cause"
+    },
+    {
+      "id": "miri",
+      "type": "organization",
+      "title": "MIRI"
+    },
+    {
+      "id": "nick-bostrom",
+      "type": "researcher",
+      "title": "Nick Bostrom"
+    },
+    {
+      "id": "corrigibility",
+      "type": "safety-agenda",
+      "title": "Corrigibility"
+    },
+    {
+      "id": "corrigibility-failure",
+      "type": "risk",
+      "title": "Corrigibility Failure"
+    },
+    {
+      "id": "power-seeking",
+      "type": "risk",
+      "title": "Power-Seeking AI"
+    },
+    {
+      "id": "treacherous-turn",
+      "type": "risk",
+      "title": "Treacherous Turn"
+    },
+    {
+      "id": "rogue-ai-scenarios",
+      "type": "risk",
+      "title": "Rogue AI Scenarios"
+    }
+  ],
+  "power-seeking-conditions": [
+    {
+      "id": "carlsmith-six-premises",
+      "type": "model",
+      "title": "Carlsmith's Six-Premise Argument",
+      "relationship": "related"
+    }
+  ],
+  "distributional-shift": [
+    {
+      "id": "goal-misgeneralization-probability",
+      "type": "model",
+      "title": "Goal Misgeneralization Probability Model",
+      "relationship": "related"
+    }
+  ],
+  "corrigibility-failure": [
+    {
+      "id": "power-seeking-conditions",
+      "type": "model",
+      "title": "Power-Seeking Emergence Conditions Model",
+      "relationship": "consequence"
+    },
+    {
+      "id": "instrumental-convergence-framework",
+      "type": "model",
+      "title": "Instrumental Convergence Framework",
+      "relationship": "consequence"
+    },
+    {
+      "id": "corrigibility-failure-pathways",
+      "type": "model",
+      "title": "Corrigibility Failure Pathways",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "miri",
+      "type": "organization",
+      "title": "MIRI"
+    },
+    {
+      "id": "stuart-russell",
+      "type": "researcher",
+      "title": "Stuart Russell"
+    },
+    {
+      "id": "corrigibility",
+      "type": "safety-agenda",
+      "title": "Corrigibility"
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight"
+    },
+    {
+      "id": "lock-in",
+      "type": "risk",
+      "title": "Lock-in"
+    },
+    {
+      "id": "rogue-ai-scenarios",
+      "type": "risk",
+      "title": "Rogue AI Scenarios"
+    }
+  ],
+  "sandbagging": [
+    {
+      "id": "scheming-likelihood-model",
+      "type": "model",
+      "title": "Scheming Likelihood Assessment",
+      "relationship": "manifestation"
+    },
+    {
+      "id": "apollo-research",
+      "type": "lab-research",
+      "title": "Apollo Research"
+    },
+    {
+      "id": "arc",
+      "type": "organization",
+      "title": "ARC"
+    },
+    {
+      "id": "redwood",
+      "type": "organization",
+      "title": "Redwood Research"
+    },
+    {
+      "id": "ai-control",
+      "type": "safety-agenda",
+      "title": "AI Control"
+    },
+    {
+      "id": "evals",
+      "type": "safety-agenda",
+      "title": "AI Evaluations"
+    },
+    {
+      "id": "capability-elicitation",
+      "type": "approach",
+      "title": "Capability Elicitation"
+    },
+    {
+      "id": "emergent-capabilities",
+      "type": "risk",
+      "title": "Emergent Capabilities"
+    }
+  ],
+  "multipolar-trap": [
+    {
+      "id": "racing-dynamics-impact",
+      "type": "model",
+      "title": "Racing Dynamics Impact Model",
+      "relationship": "related"
+    },
+    {
+      "id": "multipolar-trap-dynamics",
+      "type": "model",
+      "title": "Multipolar Trap Dynamics Model",
+      "relationship": "related"
+    },
+    {
+      "id": "racing-dynamics-model",
+      "type": "model",
+      "title": "Racing Dynamics Game Theory Model",
+      "relationship": "related"
+    },
+    {
+      "id": "multipolar-trap-model",
+      "type": "model",
+      "title": "Multipolar Trap Coordination Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "proliferation-model",
+      "type": "model",
+      "title": "AI Capability Proliferation Model",
+      "relationship": "related"
+    },
+    {
+      "id": "lab-incentives-model",
+      "type": "model",
+      "title": "Lab Incentives Model",
+      "relationship": "related"
+    },
+    {
+      "id": "international-coordination-game",
+      "type": "model",
+      "title": "International Coordination Game Model",
+      "relationship": "related"
+    },
+    {
+      "id": "coordination-tech",
+      "type": "approach",
+      "title": "Coordination Technologies"
+    }
+  ],
+  "flash-dynamics": [
+    {
+      "id": "flash-dynamics-threshold",
+      "type": "model",
+      "title": "Flash Dynamics Threshold Model",
+      "relationship": "related"
+    },
+    {
+      "id": "coordination-tech",
+      "type": "approach",
+      "title": "Coordination Technologies"
+    },
+    {
+      "id": "prediction-markets",
+      "type": "approach",
+      "title": "Prediction Markets"
+    },
+    {
+      "id": "irreversibility",
+      "type": "risk",
+      "title": "Irreversibility"
+    }
+  ],
+  "irreversibility": [
+    {
+      "id": "flash-dynamics-threshold",
+      "type": "model",
+      "title": "Flash Dynamics Threshold Model",
+      "relationship": "related"
+    },
+    {
+      "id": "lock-in-model",
+      "type": "model",
+      "title": "Lock-in Irreversibility Model",
+      "relationship": "related"
+    },
+    {
+      "id": "irreversibility-threshold",
+      "type": "model",
+      "title": "Irreversibility Threshold Model",
+      "relationship": "related"
+    },
+    {
+      "id": "flash-dynamics",
+      "type": "risk",
+      "title": "Flash Dynamics"
+    }
+  ],
+  "expertise-atrophy": [
+    {
+      "id": "expertise-atrophy-progression",
+      "type": "model",
+      "title": "Expertise Atrophy Progression Model",
+      "relationship": "related"
+    },
+    {
+      "id": "expertise-atrophy-cascade",
+      "type": "model",
+      "title": "Expertise Atrophy Cascade Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "automation-bias-cascade",
+      "type": "model",
+      "title": "Automation Bias Cascade Model",
+      "relationship": "related"
+    },
+    {
+      "id": "hybrid-systems",
+      "type": "approach",
+      "title": "AI-Human Hybrid Systems"
+    }
+  ],
+  "automation-bias": [
+    {
+      "id": "expertise-atrophy-progression",
+      "type": "model",
+      "title": "Expertise Atrophy Progression Model",
+      "relationship": "related"
+    },
+    {
+      "id": "expertise-atrophy-cascade",
+      "type": "model",
+      "title": "Expertise Atrophy Cascade Model",
+      "relationship": "related"
+    },
+    {
+      "id": "hybrid-systems",
+      "type": "approach",
+      "title": "AI-Human Hybrid Systems"
+    }
+  ],
+  "winner-take-all": [
+    {
+      "id": "economic-disruption-impact",
+      "type": "model",
+      "title": "Economic Disruption Impact Model",
+      "relationship": "related"
+    },
+    {
+      "id": "winner-take-all-concentration",
+      "type": "model",
+      "title": "Winner-Take-All Concentration Model",
+      "relationship": "related"
+    },
+    {
+      "id": "winner-take-all-model",
+      "type": "model",
+      "title": "Winner-Take-All Market Dynamics Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "concentration-of-power-model",
+      "type": "model",
+      "title": "Concentration of Power Systems Model",
+      "relationship": "mechanism"
+    },
+    {
+      "id": "economic-disruption-model",
+      "type": "model",
+      "title": "Economic Disruption Structural Model",
+      "relationship": "mechanism"
+    }
+  ],
+  "proliferation": [
+    {
+      "id": "proliferation-risk-model",
+      "type": "model",
+      "title": "AI Proliferation Risk Model",
+      "relationship": "related"
+    },
+    {
+      "id": "proliferation-model",
+      "type": "model",
+      "title": "AI Capability Proliferation Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "compute-governance",
+      "type": "policy",
+      "title": "Compute Governance"
+    },
+    {
+      "id": "coordination-tech",
+      "type": "approach",
+      "title": "Coordination Technologies"
+    },
+    {
+      "id": "open-source",
+      "type": "approach",
+      "title": "Open Source Safety"
+    },
+    {
+      "id": "structured-access",
+      "type": "approach",
+      "title": "Structured Access / API-Only"
+    }
+  ],
+  "surveillance": [
+    {
+      "id": "surveillance-authoritarian-stability",
+      "type": "model",
+      "title": "AI Surveillance and Regime Durability Model",
+      "relationship": "related"
+    },
+    {
+      "id": "surveillance-chilling-effects",
+      "type": "model",
+      "title": "Surveillance Chilling Effects Model",
+      "relationship": "related"
+    },
+    {
+      "id": "authoritarian-tools",
+      "type": "risk",
+      "title": "AI Authoritarian Tools"
+    },
+    {
+      "id": "erosion-of-agency",
+      "type": "risk",
+      "title": "Erosion of Human Agency"
+    },
+    {
+      "id": "authoritarian-takeover",
+      "type": "risk",
+      "title": "Authoritarian Takeover"
+    }
+  ],
+  "trust-cascade": [
+    {
+      "id": "trust-cascade-model",
+      "type": "model",
+      "title": "Trust Cascade Failure Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "epistemic-collapse-threshold",
+      "type": "model",
+      "title": "Epistemic Collapse Threshold Model",
+      "relationship": "component"
+    }
+  ],
+  "epistemic-sycophancy": [
+    {
+      "id": "sycophancy-feedback-loop",
+      "type": "model",
+      "title": "Sycophancy Feedback Loop Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "reality-fragmentation-network",
+      "type": "model",
+      "title": "Reality Fragmentation Network Model",
+      "relationship": "mechanism"
+    },
+    {
+      "id": "epistemic-security",
+      "type": "approach",
+      "title": "Epistemic Security"
+    }
+  ],
+  "authentication-collapse": [
+    {
+      "id": "authentication-collapse-timeline",
+      "type": "model",
+      "title": "Authentication Collapse Timeline Model",
+      "relationship": "analyzes"
+    },
+    {
+      "id": "content-authentication",
+      "type": "approach",
+      "title": "Content Authentication"
+    }
+  ],
+  "legal-evidence-crisis": [
+    {
+      "id": "authentication-collapse-timeline",
+      "type": "model",
+      "title": "Authentication Collapse Timeline Model",
+      "relationship": "leads-to"
+    }
+  ],
+  "reality-coherence": [
+    {
+      "id": "epistemic-collapse-threshold",
+      "type": "model",
+      "title": "Epistemic Collapse Threshold Model",
+      "relationship": "affects"
+    },
+    {
+      "id": "reality-fragmentation-network",
+      "type": "model",
+      "title": "Reality Fragmentation Network Model",
+      "relationship": "models"
+    }
+  ],
+  "authoritarian-takeover": [
+    {
+      "id": "concentration-of-power-model",
+      "type": "model",
+      "title": "Concentration of Power Systems Model",
+      "relationship": "scenario"
+    },
+    {
+      "id": "lock-in-model",
+      "type": "model",
+      "title": "Lock-in Irreversibility Model",
+      "relationship": "scenario"
+    }
+  ],
+  "capability-threshold-model": [
+    {
+      "id": "risk-activation-timeline",
+      "type": "model",
+      "title": "Risk Activation Timeline Model",
+      "relationship": "related"
+    },
+    {
+      "id": "warning-signs-model",
+      "type": "model",
+      "title": "Warning Signs Model",
+      "relationship": "related"
+    }
+  ],
+  "warning-signs-model": [
+    {
+      "id": "risk-activation-timeline",
+      "type": "model",
+      "title": "Risk Activation Timeline Model",
+      "relationship": "related"
+    },
+    {
+      "id": "capability-threshold-model",
+      "type": "model",
+      "title": "Capability Threshold Model",
+      "relationship": "related"
+    }
+  ],
+  "bioweapons-timeline": [
+    {
+      "id": "risk-activation-timeline",
+      "type": "model",
+      "title": "Risk Activation Timeline Model",
+      "relationship": "related"
+    }
+  ],
+  "risk-activation-timeline": [
+    {
+      "id": "capability-threshold-model",
+      "type": "model",
+      "title": "Capability Threshold Model",
+      "relationship": "related"
+    },
+    {
+      "id": "warning-signs-model",
+      "type": "model",
+      "title": "Warning Signs Model",
+      "relationship": "related"
+    }
+  ],
+  "scheming-likelihood-model": [
+    {
+      "id": "capability-threshold-model",
+      "type": "model",
+      "title": "Capability Threshold Model",
+      "relationship": "related"
+    },
+    {
+      "id": "warning-signs-model",
+      "type": "model",
+      "title": "Warning Signs Model",
+      "relationship": "related"
+    }
+  ],
+  "authoritarian-tools": [
+    {
+      "id": "authoritarian-tools-diffusion",
+      "type": "model",
+      "title": "Authoritarian Tools Diffusion Model",
+      "relationship": "related"
+    },
+    {
+      "id": "concentration-of-power",
+      "type": "risk",
+      "title": "Concentration of Power"
+    },
+    {
+      "id": "lock-in",
+      "type": "risk",
+      "title": "Lock-in"
+    },
+    {
+      "id": "authoritarian-takeover",
+      "type": "risk",
+      "title": "Authoritarian Takeover"
+    },
+    {
+      "id": "surveillance",
+      "type": "risk",
+      "title": "AI Mass Surveillance"
+    }
+  ],
+  "proliferation-risk-model": [
+    {
+      "id": "authoritarian-tools-diffusion",
+      "type": "model",
+      "title": "Authoritarian Tools Diffusion Model",
+      "relationship": "related"
+    }
+  ],
+  "disinformation-detection-race": [
+    {
+      "id": "consensus-manufacturing-dynamics",
+      "type": "model",
+      "title": "Consensus Manufacturing Dynamics Model",
+      "relationship": "related"
+    }
+  ],
+  "lock-in-model": [
+    {
+      "id": "irreversibility-threshold",
+      "type": "model",
+      "title": "Irreversibility Threshold Model",
+      "relationship": "related"
+    }
+  ],
+  "safety-researcher-gap": [
+    {
+      "id": "capabilities-to-safety-pipeline",
+      "type": "model",
+      "title": "Capabilities-to-Safety Pipeline Model",
+      "relationship": "related"
+    }
+  ],
+  "risk-interaction-matrix": [
+    {
+      "id": "compounding-risks-analysis",
+      "type": "model",
+      "title": "Compounding Risks Analysis Model",
+      "relationship": "related"
+    }
+  ],
+  "risk-cascade-pathways": [
+    {
+      "id": "compounding-risks-analysis",
+      "type": "model",
+      "title": "Compounding Risks Analysis Model",
+      "relationship": "related"
+    },
+    {
+      "id": "risk-interaction-network",
+      "type": "model",
+      "title": "Risk Interaction Network Model",
+      "relationship": "related"
+    }
+  ],
+  "media-policy-feedback-loop": [
+    {
+      "id": "public-opinion-evolution",
+      "type": "model",
+      "title": "Public Opinion Evolution Model",
+      "relationship": "related"
+    }
+  ],
+  "risk-interaction-network": [
+    {
+      "id": "risk-cascade-pathways",
+      "type": "model",
+      "title": "Risk Cascade Pathways Model",
+      "relationship": "related"
+    },
+    {
+      "id": "parameter-interaction-network",
+      "type": "model",
+      "title": "Parameter Interaction Network Model",
+      "relationship": "related"
+    }
+  ],
+  "safety-research-value": [
+    {
+      "id": "safety-research-allocation",
+      "type": "model",
+      "title": "Safety Research Allocation Model",
+      "relationship": "related"
+    }
+  ],
+  "intervention-effectiveness-matrix": [
+    {
+      "id": "safety-research-allocation",
+      "type": "model",
+      "title": "Safety Research Allocation Model",
+      "relationship": "related"
+    }
+  ],
+  "capabilities-to-safety-pipeline": [
+    {
+      "id": "safety-researcher-gap",
+      "type": "model",
+      "title": "Safety Researcher Gap Model",
+      "relationship": "related"
+    }
+  ],
+  "chris-olah": [
+    {
+      "id": "anthropic",
+      "type": "lab",
+      "title": "Anthropic"
+    },
+    {
+      "id": "goodfire",
+      "type": "lab-research",
+      "title": "Goodfire"
+    },
+    {
+      "id": "connor-leahy",
+      "type": "researcher",
+      "title": "Connor Leahy"
+    },
+    {
+      "id": "dario-amodei",
+      "type": "researcher",
+      "title": "Dario Amodei"
+    },
+    {
+      "id": "neel-nanda",
+      "type": "researcher",
+      "title": "Neel Nanda"
+    }
+  ],
+  "jan-leike": [
+    {
+      "id": "anthropic",
+      "type": "lab",
+      "title": "Anthropic"
+    },
+    {
+      "id": "openai",
+      "type": "lab",
+      "title": "OpenAI"
+    },
+    {
+      "id": "dario-amodei",
+      "type": "researcher",
+      "title": "Dario Amodei"
+    },
+    {
+      "id": "ilya-sutskever",
+      "type": "researcher",
+      "title": "Ilya Sutskever"
+    },
+    {
+      "id": "paul-christiano",
+      "type": "researcher",
+      "title": "Paul Christiano"
+    }
+  ],
+  "demis-hassabis": [
+    {
+      "id": "deepmind",
+      "type": "lab",
+      "title": "Google DeepMind"
+    }
+  ],
+  "shane-legg": [
+    {
+      "id": "deepmind",
+      "type": "lab",
+      "title": "Google DeepMind"
+    }
+  ],
+  "ilya-sutskever": [
+    {
+      "id": "openai",
+      "type": "lab",
+      "title": "OpenAI"
+    },
+    {
+      "id": "ssi",
+      "type": "lab-research",
+      "title": "Safe Superintelligence Inc (SSI)"
+    }
+  ],
+  "content-moderation": [
+    {
+      "id": "xai",
+      "type": "lab",
+      "title": "xAI"
+    }
+  ],
+  "agi-race": [
+    {
+      "id": "xai",
+      "type": "lab",
+      "title": "xAI"
+    }
+  ],
+  "value-learning": [
+    {
+      "id": "chai",
+      "type": "lab-academic",
+      "title": "CHAI"
+    }
+  ],
+  "corrigibility": [
+    {
+      "id": "chai",
+      "type": "lab-academic",
+      "title": "CHAI"
+    },
+    {
+      "id": "instrumental-convergence",
+      "type": "risk",
+      "title": "Instrumental Convergence"
+    },
+    {
+      "id": "power-seeking",
+      "type": "risk",
+      "title": "Power-Seeking AI"
+    },
+    {
+      "id": "treacherous-turn",
+      "type": "risk",
+      "title": "Treacherous Turn"
+    }
+  ],
+  "capability-evaluations": [
+    {
+      "id": "apollo-research",
+      "type": "lab-research",
+      "title": "Apollo Research"
+    },
+    {
+      "id": "arc-evals",
+      "type": "organization",
+      "title": "ARC Evaluations"
+    }
+  ],
+  "existential-risk": [
+    {
+      "id": "cais",
+      "type": "lab-research",
+      "title": "CAIS"
+    },
+    {
+      "id": "fhi",
+      "type": "organization",
+      "title": "Future of Humanity Institute"
+    }
+  ],
+  "connor-leahy": [
+    {
+      "id": "conjecture",
+      "type": "lab-research",
+      "title": "Conjecture"
+    },
+    {
+      "id": "controlai",
+      "type": "organization",
+      "title": "ControlAI"
+    }
+  ],
+  "prosaic-alignment": [
+    {
+      "id": "conjecture",
+      "type": "lab-research",
+      "title": "Conjecture"
+    }
+  ],
+  "dan-hendrycks": [
+    {
+      "id": "far-ai",
+      "type": "lab-research",
+      "title": "FAR AI"
+    }
+  ],
+  "adversarial-robustness": [
+    {
+      "id": "far-ai",
+      "type": "lab-research",
+      "title": "FAR AI"
+    }
+  ],
+  "natural-abstractions": [
+    {
+      "id": "far-ai",
+      "type": "lab-research",
+      "title": "FAR AI"
+    }
+  ],
+  "benchmarking": [
+    {
+      "id": "far-ai",
+      "type": "lab-research",
+      "title": "FAR AI"
+    }
+  ],
+  "apollo-research": [
+    {
+      "id": "far-ai",
+      "type": "lab-research",
+      "title": "FAR AI"
+    },
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR"
+    },
+    {
+      "id": "uk-aisi",
+      "type": "organization",
+      "title": "UK AI Safety Institute"
+    },
+    {
+      "id": "us-aisi",
+      "type": "organization",
+      "title": "US AI Safety Institute"
+    },
+    {
+      "id": "eval-saturation",
+      "type": "approach",
+      "title": "Eval Saturation & The Evals Gap"
+    },
+    {
+      "id": "evaluation-awareness",
+      "type": "approach",
+      "title": "Evaluation Awareness"
+    },
+    {
+      "id": "scalable-eval-approaches",
+      "type": "approach",
+      "title": "Scalable Eval Approaches"
+    },
+    {
+      "id": "scheming-detection",
+      "type": "approach",
+      "title": "Scheming & Deception Detection"
+    },
+    {
+      "id": "capability-elicitation",
+      "type": "approach",
+      "title": "Capability Elicitation"
+    },
+    {
+      "id": "safety-cases",
+      "type": "approach",
+      "title": "AI Safety Cases"
+    },
+    {
+      "id": "alignment-evals",
+      "type": "approach",
+      "title": "Alignment Evaluations"
+    },
+    {
+      "id": "model-auditing",
+      "type": "approach",
+      "title": "Third-Party Model Auditing"
+    }
+  ],
+  "beth-barnes": [
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR"
+    }
+  ],
+  "autonomous-replication": [
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR"
+    }
+  ],
+  "cyber-offense": [
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR"
+    }
+  ],
+  "bio-risk": [
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR"
+    }
+  ],
+  "transformative-ai": [
+    {
+      "id": "epoch-ai",
+      "type": "organization",
+      "title": "Epoch AI"
+    }
+  ],
+  "ai-timelines": [
+    {
+      "id": "epoch-ai",
+      "type": "organization",
+      "title": "Epoch AI"
+    }
+  ],
+  "data-constraints": [
+    {
+      "id": "epoch-ai",
+      "type": "organization",
+      "title": "Epoch AI"
+    }
+  ],
+  "eliezer-yudkowsky": [
+    {
+      "id": "miri",
+      "type": "organization",
+      "title": "MIRI"
+    },
+    {
+      "id": "paul-christiano",
+      "type": "researcher",
+      "title": "Paul Christiano"
+    }
+  ],
+  "nate-soares": [
+    {
+      "id": "miri",
+      "type": "organization",
+      "title": "MIRI"
+    }
+  ],
+  "sharp-left-turn": [
+    {
+      "id": "miri",
+      "type": "organization",
+      "title": "MIRI"
+    },
+    {
+      "id": "eliezer-yudkowsky",
+      "type": "researcher",
+      "title": "Eliezer Yudkowsky"
+    },
+    {
+      "id": "emergent-capabilities",
+      "type": "risk",
+      "title": "Emergent Capabilities"
+    }
+  ],
+  "ian-hogarth": [
+    {
+      "id": "uk-aisi",
+      "type": "organization",
+      "title": "UK AI Safety Institute"
+    }
+  ],
+  "us-aisi": [
+    {
+      "id": "uk-aisi",
+      "type": "organization",
+      "title": "UK AI Safety Institute"
+    },
+    {
+      "id": "ai-executive-order",
+      "type": "policy",
+      "title": "Biden AI Executive Order"
+    },
+    {
+      "id": "bletchley-declaration",
+      "type": "policy",
+      "title": "Bletchley Declaration"
+    }
+  ],
+  "ai-safety-summit": [
+    {
+      "id": "uk-aisi",
+      "type": "organization",
+      "title": "UK AI Safety Institute"
+    }
+  ],
+  "ai-executive-order": [
+    {
+      "id": "us-aisi",
+      "type": "organization",
+      "title": "US AI Safety Institute"
+    },
+    {
+      "id": "compute-thresholds",
+      "type": "policy",
+      "title": "Compute Thresholds"
+    }
+  ],
+  "nick-bostrom": [
+    {
+      "id": "fhi",
+      "type": "organization",
+      "title": "Future of Humanity Institute"
+    },
+    {
+      "id": "toby-ord",
+      "type": "researcher",
+      "title": "Toby Ord"
+    }
+  ],
+  "marc-andreessen": [
+    {
+      "id": "leading-the-future",
+      "type": "organization",
+      "title": "Leading the Future super PAC"
+    }
+  ],
+  "conjecture": [
+    {
+      "id": "controlai",
+      "type": "organization",
+      "title": "ControlAI"
+    }
+  ],
+  "yoshua-bengio": [
+    {
+      "id": "palisade-research",
+      "type": "lab-research",
+      "title": "Palisade Research"
+    },
+    {
+      "id": "dan-hendrycks",
+      "type": "researcher",
+      "title": "Dan Hendrycks"
+    },
+    {
+      "id": "geoffrey-hinton",
+      "type": "researcher",
+      "title": "Geoffrey Hinton"
+    },
+    {
+      "id": "max-tegmark",
+      "type": "researcher",
+      "title": "Max Tegmark"
+    }
+  ],
+  "sff": [
+    {
+      "id": "palisade-research",
+      "type": "lab-research",
+      "title": "Palisade Research"
+    },
+    {
+      "id": "centre-for-long-term-resilience",
+      "type": "organization",
+      "title": "Centre for Long-Term Resilience"
+    },
+    {
+      "id": "dustin-moskovitz",
+      "type": "researcher",
+      "title": "Dustin Moskovitz"
+    }
+  ],
+  "neel-nanda": [
+    {
+      "id": "connor-leahy",
+      "type": "researcher",
+      "title": "Connor Leahy"
+    }
+  ],
+  "cais": [
+    {
+      "id": "dan-hendrycks",
+      "type": "researcher",
+      "title": "Dan Hendrycks"
+    },
+    {
+      "id": "capability-unlearning",
+      "type": "approach",
+      "title": "Capability Unlearning / Removal"
+    },
+    {
+      "id": "pause",
+      "type": "approach",
+      "title": "Pause Advocacy"
+    },
+    {
+      "id": "representation-engineering",
+      "type": "approach",
+      "title": "Representation Engineering"
+    },
+    {
+      "id": "power-seeking",
+      "type": "risk",
+      "title": "Power-Seeking AI"
+    }
+  ],
+  "anthropic-core-views": [
+    {
+      "id": "dario-amodei",
+      "type": "researcher",
+      "title": "Dario Amodei"
+    }
+  ],
+  "toby-ord": [
+    {
+      "id": "holden-karnofsky",
+      "type": "researcher",
+      "title": "Holden Karnofsky"
+    },
+    {
+      "id": "nick-bostrom",
+      "type": "researcher",
+      "title": "Nick Bostrom"
+    }
+  ],
+  "geoffrey-hinton": [
+    {
+      "id": "ilya-sutskever",
+      "type": "researcher",
+      "title": "Ilya Sutskever"
+    },
+    {
+      "id": "yoshua-bengio",
+      "type": "researcher",
+      "title": "Yoshua Bengio"
+    }
+  ],
+  "treacherous-turn": [
+    {
+      "id": "nick-bostrom",
+      "type": "researcher",
+      "title": "Nick Bostrom"
+    },
+    {
+      "id": "pause-advocacy",
+      "type": "approach",
+      "title": "Pause Advocacy"
+    },
+    {
+      "id": "ai-control",
+      "type": "safety-agenda",
+      "title": "AI Control"
+    },
+    {
+      "id": "corrigibility",
+      "type": "safety-agenda",
+      "title": "Corrigibility"
+    },
+    {
+      "id": "rogue-ai-scenarios",
+      "type": "risk",
+      "title": "Rogue AI Scenarios"
+    }
+  ],
+  "chai": [
+    {
+      "id": "stuart-russell",
+      "type": "researcher",
+      "title": "Stuart Russell"
+    }
+  ],
+  "holden-karnofsky": [
+    {
+      "id": "toby-ord",
+      "type": "researcher",
+      "title": "Toby Ord"
+    }
+  ],
+  "xai": [
+    {
+      "id": "elon-musk",
+      "type": "researcher",
+      "title": "Elon Musk"
+    }
+  ],
+  "fli": [
+    {
+      "id": "max-tegmark",
+      "type": "researcher",
+      "title": "Max Tegmark"
+    },
+    {
+      "id": "pause-moratorium",
+      "type": "policy",
+      "title": "Pause / Moratorium"
+    },
+    {
+      "id": "pause",
+      "type": "approach",
+      "title": "Pause Advocacy"
+    }
+  ],
+  "good-judgment": [
+    {
+      "id": "philip-tetlock",
+      "type": "researcher",
+      "title": "Philip Tetlock"
+    }
+  ],
+  "fri": [
+    {
+      "id": "philip-tetlock",
+      "type": "researcher",
+      "title": "Philip Tetlock"
+    }
+  ],
+  "ai-futures-project": [
+    {
+      "id": "eli-lifland",
+      "type": "researcher",
+      "title": "Eli Lifland"
+    }
+  ],
+  "samotsvety": [
+    {
+      "id": "eli-lifland",
+      "type": "researcher",
+      "title": "Eli Lifland"
+    }
+  ],
+  "lesswrong": [
+    {
+      "id": "eli-lifland",
+      "type": "researcher",
+      "title": "Eli Lifland"
+    }
+  ],
+  "coefficient-giving": [
+    {
+      "id": "dustin-moskovitz",
+      "type": "researcher",
+      "title": "Dustin Moskovitz"
+    },
+    {
+      "id": "intervention-portfolio",
+      "type": "approach",
+      "title": "Intervention Portfolio"
+    },
+    {
+      "id": "training-programs",
+      "type": "approach",
+      "title": "AI Safety Training Programs"
+    },
+    {
+      "id": "field-building-analysis",
+      "type": "approach",
+      "title": "Field Building Analysis"
+    }
+  ],
+  "voluntary-commitments": [
+    {
+      "id": "california-sb1047",
+      "type": "policy",
+      "title": "Safe and Secure Innovation for Frontier Artificial Intelligence Models Act"
+    },
+    {
+      "id": "international-summits",
+      "type": "policy",
+      "title": "International AI Safety Summit Series"
+    },
+    {
+      "id": "us-executive-order",
+      "type": "policy",
+      "title": "Executive Order on Safe, Secure, and Trustworthy AI"
+    }
+  ],
+  "governance-policy": [
+    {
+      "id": "compute-governance",
+      "type": "policy",
+      "title": "Compute Governance"
+    }
+  ],
+  "china-ai-regulations": [
+    {
+      "id": "international-summits",
+      "type": "policy",
+      "title": "International AI Safety Summit Series"
+    }
+  ],
+  "historical-revisionism": [
+    {
+      "id": "epistemic-security",
+      "type": "approach",
+      "title": "Epistemic Security"
+    },
+    {
+      "id": "epistemic-infrastructure",
+      "type": "approach",
+      "title": "Epistemic Infrastructure"
+    }
+  ],
+  "fraud": [
+    {
+      "id": "content-authentication",
+      "type": "approach",
+      "title": "Content Authentication"
+    }
+  ],
+  "knowledge-monopoly": [
+    {
+      "id": "epistemic-infrastructure",
+      "type": "approach",
+      "title": "Epistemic Infrastructure"
+    }
+  ],
+  "scientific-corruption": [
+    {
+      "id": "epistemic-infrastructure",
+      "type": "approach",
+      "title": "Epistemic Infrastructure"
+    }
+  ],
+  "enfeeblement": [
+    {
+      "id": "hybrid-systems",
+      "type": "approach",
+      "title": "AI-Human Hybrid Systems"
+    },
+    {
+      "id": "automation-bias",
+      "type": "risk",
+      "title": "Automation Bias"
+    },
+    {
+      "id": "erosion-of-agency",
+      "type": "risk",
+      "title": "Erosion of Human Agency"
+    }
+  ],
+  "evaluation-awareness": [
+    {
+      "id": "eval-saturation",
+      "type": "approach",
+      "title": "Eval Saturation & The Evals Gap"
+    },
+    {
+      "id": "scalable-eval-approaches",
+      "type": "approach",
+      "title": "Scalable Eval Approaches"
+    }
+  ],
+  "eval-saturation": [
+    {
+      "id": "evaluation-awareness",
+      "type": "approach",
+      "title": "Evaluation Awareness"
+    },
+    {
+      "id": "scalable-eval-approaches",
+      "type": "approach",
+      "title": "Scalable Eval Approaches"
+    }
+  ],
+  "weak-to-strong": [
+    {
+      "id": "ai-assisted",
+      "type": "approach",
+      "title": "AI-Assisted Alignment"
+    }
+  ],
+  "representation-engineering": [
+    {
+      "id": "capability-unlearning",
+      "type": "approach",
+      "title": "Capability Unlearning / Removal"
+    },
+    {
+      "id": "mech-interp",
+      "type": "approach",
+      "title": "Mechanistic Interpretability"
+    },
+    {
+      "id": "sparse-autoencoders",
+      "type": "approach",
+      "title": "Sparse Autoencoders (SAEs)"
+    }
+  ],
+  "california-sb1047": [
+    {
+      "id": "california-sb53",
+      "type": "policy",
+      "title": "California SB 53"
+    }
+  ],
+  "new-york-raise-act": [
+    {
+      "id": "california-sb53",
+      "type": "policy",
+      "title": "California SB 53"
+    }
+  ],
+  "technical-ai-safety": [
+    {
+      "id": "intervention-portfolio",
+      "type": "approach",
+      "title": "Intervention Portfolio"
+    },
+    {
+      "id": "field-building-analysis",
+      "type": "approach",
+      "title": "Field Building Analysis"
+    }
+  ],
+  "stuart-russell": [
+    {
+      "id": "pause-moratorium",
+      "type": "policy",
+      "title": "Pause / Moratorium"
+    }
+  ],
+  "pause": [
+    {
+      "id": "pause-moratorium",
+      "type": "policy",
+      "title": "Pause / Moratorium"
+    }
+  ],
+  "frontier-model-forum": [
+    {
+      "id": "corporate",
+      "type": "approach",
+      "title": "Corporate Responses"
+    },
+    {
+      "id": "lab-culture",
+      "type": "approach",
+      "title": "Lab Safety Culture"
+    }
+  ],
+  "export-controls": [
+    {
+      "id": "hardware-enabled-governance",
+      "type": "policy",
+      "title": "Hardware-Enabled Governance"
+    },
+    {
+      "id": "monitoring",
+      "type": "policy",
+      "title": "Compute Monitoring"
+    },
+    {
+      "id": "thresholds",
+      "type": "policy",
+      "title": "Compute Thresholds"
+    },
+    {
+      "id": "model-registries",
+      "type": "policy",
+      "title": "Model Registries"
+    },
+    {
+      "id": "international-regimes",
+      "type": "policy",
+      "title": "International Compute Regimes"
+    }
+  ],
+  "thresholds": [
+    {
+      "id": "hardware-enabled-governance",
+      "type": "policy",
+      "title": "Hardware-Enabled Governance"
+    },
+    {
+      "id": "monitoring",
+      "type": "policy",
+      "title": "Compute Monitoring"
+    },
+    {
+      "id": "new-york-raise-act",
+      "type": "policy",
+      "title": "New York RAISE Act"
+    },
+    {
+      "id": "international-regimes",
+      "type": "policy",
+      "title": "International Compute Regimes"
+    }
+  ],
+  "monitoring": [
+    {
+      "id": "hardware-enabled-governance",
+      "type": "policy",
+      "title": "Hardware-Enabled Governance"
+    },
+    {
+      "id": "thresholds",
+      "type": "policy",
+      "title": "Compute Thresholds"
+    },
+    {
+      "id": "international-regimes",
+      "type": "policy",
+      "title": "International Compute Regimes"
+    }
+  ],
+  "international-regimes": [
+    {
+      "id": "hardware-enabled-governance",
+      "type": "policy",
+      "title": "Hardware-Enabled Governance"
+    },
+    {
+      "id": "monitoring",
+      "type": "policy",
+      "title": "Compute Monitoring"
+    },
+    {
+      "id": "thresholds",
+      "type": "policy",
+      "title": "Compute Thresholds"
+    }
+  ],
+  "hardware-enabled-governance": [
+    {
+      "id": "monitoring",
+      "type": "policy",
+      "title": "Compute Monitoring"
+    }
+  ],
+  "whistleblower-protections": [
+    {
+      "id": "lab-culture",
+      "type": "approach",
+      "title": "Lab Safety Culture"
+    }
+  ],
+  "ai-safety-institutes": [
+    {
+      "id": "lab-culture",
+      "type": "approach",
+      "title": "Lab Safety Culture"
+    },
+    {
+      "id": "bletchley-declaration",
+      "type": "policy",
+      "title": "Bletchley Declaration"
+    },
+    {
+      "id": "coordination-mechanisms",
+      "type": "policy",
+      "title": "International Coordination Mechanisms"
+    },
+    {
+      "id": "model-registries",
+      "type": "policy",
+      "title": "Model Registries"
+    },
+    {
+      "id": "international-regimes",
+      "type": "policy",
+      "title": "International Compute Regimes"
+    },
+    {
+      "id": "whistleblower-protections",
+      "type": "policy",
+      "title": "AI Whistleblower Protections"
+    }
+  ],
+  "pause-moratorium": [
+    {
+      "id": "pause",
+      "type": "approach",
+      "title": "Pause Advocacy"
+    }
+  ],
+  "field-building-analysis": [
+    {
+      "id": "training-programs",
+      "type": "approach",
+      "title": "AI Safety Training Programs"
+    }
+  ],
+  "coordination-mechanisms": [
+    {
+      "id": "bletchley-declaration",
+      "type": "policy",
+      "title": "Bletchley Declaration"
+    }
+  ],
+  "bletchley-declaration": [
+    {
+      "id": "coordination-mechanisms",
+      "type": "policy",
+      "title": "International Coordination Mechanisms"
+    },
+    {
+      "id": "international-regimes",
+      "type": "policy",
+      "title": "International Compute Regimes"
+    }
+  ],
+  "california-sb53": [
+    {
+      "id": "new-york-raise-act",
+      "type": "policy",
+      "title": "New York RAISE Act"
+    }
+  ],
+  "lab-culture": [
+    {
+      "id": "whistleblower-protections",
+      "type": "policy",
+      "title": "AI Whistleblower Protections"
+    }
+  ],
+  "training-programs": [
+    {
+      "id": "field-building-analysis",
+      "type": "approach",
+      "title": "Field Building Analysis"
+    }
+  ],
+  "intervention-portfolio": [
+    {
+      "id": "field-building-analysis",
+      "type": "approach",
+      "title": "Field Building Analysis"
+    }
+  ],
+  "sparse-autoencoders": [
+    {
+      "id": "mech-interp",
+      "type": "approach",
+      "title": "Mechanistic Interpretability"
+    }
+  ],
+  "output-filtering": [
+    {
+      "id": "circuit-breakers",
+      "type": "approach",
+      "title": "Circuit Breakers / Inference Interventions"
+    }
+  ],
+  "adversarial-training": [
+    {
+      "id": "circuit-breakers",
+      "type": "approach",
+      "title": "Circuit Breakers / Inference Interventions"
+    }
+  ],
+  "refusal-training": [
+    {
+      "id": "circuit-breakers",
+      "type": "approach",
+      "title": "Circuit Breakers / Inference Interventions"
+    }
+  ],
+  "mech-interp": [
+    {
+      "id": "representation-engineering",
+      "type": "approach",
+      "title": "Representation Engineering"
+    },
+    {
+      "id": "sparse-autoencoders",
+      "type": "approach",
+      "title": "Sparse Autoencoders (SAEs)"
+    }
+  ],
+  "goodfire": [
+    {
+      "id": "sparse-autoencoders",
+      "type": "approach",
+      "title": "Sparse Autoencoders (SAEs)"
+    }
+  ],
+  "provably-safe": [
+    {
+      "id": "formal-verification",
+      "type": "approach",
+      "title": "Formal Verification"
+    }
+  ],
+  "tool-restrictions": [
+    {
+      "id": "sandboxing",
+      "type": "approach",
+      "title": "Sandboxing / Containment"
+    }
+  ],
+  "structured-access": [
+    {
+      "id": "sandboxing",
+      "type": "approach",
+      "title": "Sandboxing / Containment"
+    }
+  ],
+  "sandboxing": [
+    {
+      "id": "structured-access",
+      "type": "approach",
+      "title": "Structured Access / API-Only"
+    },
+    {
+      "id": "tool-restrictions",
+      "type": "approach",
+      "title": "Tool-Use Restrictions"
+    },
+    {
+      "id": "rogue-ai-scenarios",
+      "type": "risk",
+      "title": "Rogue AI Scenarios"
+    }
+  ],
+  "red-teaming": [
+    {
+      "id": "multi-agent",
+      "type": "approach",
+      "title": "Multi-Agent Safety"
+    }
+  ],
+  "cooperative-ai": [
+    {
+      "id": "multi-agent",
+      "type": "approach",
+      "title": "Multi-Agent Safety"
+    }
+  ]
+}

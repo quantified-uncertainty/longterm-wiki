@@ -1,0 +1,98 @@
+---
+title: LongtermWiki
+description: Strategic intelligence for AI safety prioritization - a structured resource for understanding AI risks and interventions
+pageTemplate: splash
+hero:
+  tagline: A structured resource for AI safety prioritization
+  actions:
+    - text: Explore All Content
+      link: /explore/
+      icon: seti:notebook
+    - text: AI Transition Model
+      link: /ai-transition-model/
+      icon: right-arrow
+      variant: minimal
+---
+import {R, EntityLink} from '@components/wiki';
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What Is LongtermWiki?
+
+**LongtermWiki** is a structured resource for AI safety. It helps funders, researchers, and policymakers understand the landscape of AI risks and interventions.
+
+The site contains 400+ pages covering risks, technical approaches, governance proposals, key debates, and the organizations and researchers working on these problems.
+
+---
+
+## Main Sections
+
+<CardGrid>
+  <Card title="AI Transition Model" icon="warning">
+    A [causal framework](/ai-transition-model/) mapping how AI development could lead to different outcomes.
+
+    - [Key Factors](/ai-transition-model/) — What shapes AI trajectories
+    - [Scenarios](/ai-transition-model/) — Possible futures
+  </Card>
+
+  <Card title="Knowledge Base" icon="open-book">
+    Encyclopedic coverage of AI safety topics:
+
+    - [Risks](/knowledge-base/risks/) — Accident, misuse, structural, epistemic
+    - [Responses](/knowledge-base/responses/) — Technical and governance approaches
+    - [Models](/knowledge-base/models/) — Analytical frameworks
+  </Card>
+
+  <Card title="Key Debates" icon="comment-alt">
+    Structured arguments on contested questions:
+
+    - <EntityLink id="case-for-xrisk">The Case for AI X-Risk</EntityLink>
+    - <EntityLink id="why-alignment-hard">Why Alignment Might Be Hard</EntityLink>
+    - <EntityLink id="why-alignment-easy">Why Alignment Might Be Easy</EntityLink>
+  </Card>
+
+  <Card title="Field Reference" icon="seti:folder">
+    Who's working on what:
+
+    - [Organizations](/knowledge-base/organizations/) — Labs, research orgs, government
+    - [People](/knowledge-base/people/) — Key researchers and their positions
+  </Card>
+</CardGrid>
+
+---
+
+## Featured Pages
+
+High-quality pages worth reading:
+
+| Topic | Page | Description |
+|-------|------|-------------|
+| Risk | <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | AI systems that appear aligned during training but pursue different goals when deployed |
+| Risk | <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> | How competition between labs may compromise safety |
+| Response | <EntityLink id="ai-control">AI Control</EntityLink> | Using untrusted AI safely through monitoring and restrictions |
+| Response | <EntityLink id="export-controls">Export Controls</EntityLink> | Restricting AI chip exports as a governance lever |
+| Capability | <EntityLink id="language-models">Language Models</EntityLink> | Current capabilities and safety implications of LLMs |
+
+[Browse all content →](/explore/)
+
+---
+
+## Limitations
+
+**This resource reflects an AI safety community perspective.** It takes seriously the possibility of existential risk from AI and maps the arguments, organizations, and research from that viewpoint.
+
+What it does well:
+- Steelmans the case for AI existential risk
+- Maps the landscape of AI safety research and governance
+- Presents the range of views within the AI safety community
+
+What it does less well:
+- Representing perspectives that reject the x-risk framing entirely
+- Engaging deeply with AI ethics/fairness concerns
+- Covering non-Western perspectives on AI development
+
+**Alternative viewpoints:**
+<R id="9b1ab7f63e6b1b35">Gary Marcus's Substack</R> (AI skepticism) •
+<R id="4ca01f329c8b25a4"><EntityLink id="yann-lecun">Yann LeCun</EntityLink>'s posts</R> (AGI skepticism) •
+<R id="81595c2c950080a6">Timnit Gebru et al.</R> (AI ethics)
+
+[Read full transparency statement →](/about/)

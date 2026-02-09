@@ -1,0 +1,378 @@
+---
+title: AI Whistleblower Protections
+description: Legal and institutional frameworks for protecting AI researchers and employees who report safety concerns. The bipartisan AI Whistleblower Protection Act (S.1792) introduced May 2025 addresses critical gaps in current law, while EU AI Act Article 87 provides protections from August 2026. Key cases include Leopold Aschenbrenner's termination from OpenAI and the 2024 "Right to Warn" letter signed by 13 employees from frontier AI labs.
+sidebar:
+  order: 5
+quality: 63
+lastEdited: "2026-01-29"
+importance: 72.5
+llmSummary: Comprehensive analysis of AI whistleblower protections showing severe gaps in current law (no federal protection for AI safety disclosures) with bipartisan AI Whistleblower Protection Act (S.1792) introduced May 2025 providing potential remedy. Documents concrete 2024 cases (Aschenbrenner termination, 13-employee 'Right to Warn' letter) demonstrating information asymmetry where employees possess unique safety data but face NDAs, equity clawback threats, and career risks for disclosure.
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 4.5
+  rigor: 6.5
+  actionability: 7
+  completeness: 7.5
+metrics:
+  wordCount: 760
+  citations: 37
+  tables: 32
+  diagrams: 2
+clusters:
+  - ai-safety
+  - governance
+subcategory: organizational-practices
+---
+import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="whistleblower-protections" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Tractability** | Medium-High | Bipartisan AI Whistleblower Protection Act (S.1792) introduced May 2025 with 6 co-sponsors across parties; companion legislation in House |
+| **Current Protection Gap** | Severe | Existing laws (Sarbanes-Oxley, Dodd-Frank) do not cover AI safety disclosures; no federal protection for reporting alignment or security concerns |
+| **Corporate Barriers** | High | NDAs, non-disparagement clauses, and equity clawback provisions suppress disclosure; 13 employees signed "Right to Warn" letter citing confidentiality agreements |
+| **EU Status** | Advancing | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> Article 87 provides explicit whistleblower protections from August 2026; AI Office launched anonymous reporting tool November 2025 |
+| **If AI Risk High** | Very High Value | Insider information critical—employees possess unique access to safety evaluation results, security vulnerabilities, and internal debates unavailable to external observers |
+| **Timeline to Impact** | 2-4 years | Legislative passage requires 1-2 years; cultural and enforcement changes require additional 2-3 years |
+| **Grade** | B+ | Strong momentum with bipartisan support; high potential impact on information asymmetry; implementation challenges remain |
+
+## Overview
+
+Whistleblower protections for AI safety represent a critical but underdeveloped intervention point. Employees at AI companies often possess unique knowledge about safety risks, security vulnerabilities, or concerning development practices that external observers cannot access. Yet current legal frameworks provide inadequate protection for those who raise concerns, while employment contracts—particularly broad non-disclosure agreements and non-disparagement clauses—actively discourage disclosure. The result is a systematic information asymmetry that impedes effective oversight of AI development.
+
+The stakes became concrete in 2024. [Leopold Aschenbrenner](https://en.wikipedia.org/wiki/Leopold_Aschenbrenner), an <EntityLink id="openai">OpenAI</EntityLink> safety researcher, was [fired after writing an internal memo](https://www.transformernews.ai/p/openai-employee-says-he-was-fired) warning that the company's security protocols were "egregiously insufficient" to protect against foreign adversaries stealing model weights. In June 2024, [thirteen current and former employees](https://righttowarn.ai/) from OpenAI, <EntityLink id="anthropic">Anthropic</EntityLink>, and <EntityLink id="deepmind">Google DeepMind</EntityLink> published ["A Right to Warn about Advanced Artificial Intelligence"](https://time.com/6985504/openai-google-deepmind-employees-letter/), stating that confidentiality agreements and fear of retaliation prevented them from raising legitimate safety concerns. Microsoft engineer [Shane Jones reported to the FTC](https://www.cnbc.com/2024/03/06/microsoft-ai-engineer-says-copilot-designer-creates-disturbing-images.html) that Copilot Designer was producing harmful content including sexualized violence and images of minors—and alleged Microsoft's legal team blocked his attempts to alert the public.
+
+In July 2024, [anonymous whistleblowers filed an SEC complaint](https://techcrunch.com/2024/07/13/whistleblowers-accuse-openai-of-illegally-restrictive-ndas/) alleging OpenAI's NDAs violated federal securities law by requiring employees to waive whistleblower compensation rights—a provision so restrictive that departing employees faced losing vested equity worth potentially millions of dollars if they criticized the company.
+
+These cases illustrate a pattern: AI workers who identify safety problems lack legal protection, face contractual constraints, and risk career consequences for speaking up. Without robust whistleblower protections, the AI industry's internal safety culture depends entirely on voluntary company practices—an inadequate foundation given the potential stakes.
+
+## Current Legal Landscape
+
+### Existing Whistleblower Protections
+
+U.S. whistleblower laws were designed for specific regulated industries and don't adequately cover AI:
+
+| Statute | Coverage | AI Relevance | Gap |
+|---------|----------|--------------|-----|
+| **Sarbanes-Oxley** | Securities fraud | Limited | AI safety ≠ securities violation |
+| **Dodd-Frank** | Financial misconduct | Limited | Only if tied to financial fraud |
+| **False Claims Act** | Government fraud | Medium | Covers government contracts only |
+| **OSHA protections** | Workplace safety | Low | Physical safety, not AI risk |
+| **SEC whistleblower** | Securities violations | Low | Narrow coverage |
+
+The fundamental problem: disclosures about AI safety concerns—even existential risks—often don't fit within protected categories. A researcher warning about inadequate alignment testing or dangerous capability deployment may have no legal protection.
+
+### Employment Law Barriers
+
+| Barrier | Description | Prevalence |
+|---------|-------------|------------|
+| **At-will employment** | Can fire without cause | Standard in US |
+| **NDAs** | Prohibit disclosure of company information | Universal in tech |
+| **Non-disparagement** | Prohibit negative statements | Common in severance |
+| **Non-compete** | Limit alternative employment | Varies by state |
+| **Trade secret claims** | Threat of litigation for disclosure | Increasingly used |
+
+OpenAI notably maintained restrictive provisions preventing departing employees from criticizing the company, [reportedly under threat of forfeiting vested equity](https://www.hrgrapevine.com/us/content/article/2024-05-20-sam-altman-apologizes-after-learning-strict-openai-ndas-threatened-to-claw-back-employee-equity). While OpenAI CEO <EntityLink id="sam-altman">Sam Altman</EntityLink> later stated he was "genuinely embarrassed" and the company would not enforce these provisions, the chilling effect demonstrates how employment terms can suppress disclosure.
+
+### AI-Specific vs. Traditional Whistleblower Protections
+
+| Dimension | Traditional Whistleblower Laws | AI Whistleblower Protection Act (S.1792) |
+|-----------|-------------------------------|------------------------------------------|
+| **Coverage** | Fraud, securities violations, specific regulated activities | AI security vulnerabilities, safety concerns, alignment failures |
+| **Violation Required** | Must report actual or suspected illegal activity | Good-faith belief of safety risk sufficient; no proven violation needed |
+| **Contract Protections** | Limited; NDAs often enforceable | NDAs unenforceable for safety disclosures; anti-waiver provisions |
+| **Reporting Channels** | SEC, DOL, specific agencies | Internal anonymous channels required; right to report to regulators and Congress |
+| **Remedies** | Back pay, reinstatement vary by statute | Job restoration, 2x back pay, compensatory damages, attorney fees |
+| **Arbitration** | Often required by employment contracts | Forced arbitration clauses prohibited for safety disclosures |
+
+### International Comparison
+
+| Jurisdiction | AI-Specific Protections | General Protections | Assessment |
+|--------------|------------------------|--------------------| ------------|
+| **United States** | Proposed only (S.1792, May 2025) | Sector-specific (SOX, Dodd-Frank) | Weak |
+| **European Union** | [AI Act Article 87](https://artificialintelligenceact.eu/article/87/) (from Aug 2026) | [EU Whistleblower Directive 2019/1937](https://artificialintelligenceact.eu/whistleblowing-and-the-eu-ai-act/) | Medium-Strong |
+| **United Kingdom** | None | Public Interest Disclosure Act 1998 | Medium |
+| **China** | None | Minimal state mechanisms | Very Weak |
+
+The EU AI Act includes [explicit provisions for reporting non-compliance](https://artificialintelligenceact.eu/whistleblowing-and-the-eu-ai-act/) and protects those who report violations. The [EU AI Office launched a whistleblower tool](https://digital-strategy.ec.europa.eu/en/policies/ai-act-whistleblower-tool) in November 2025 allowing anonymous reporting in any EU language about harmful practices by AI model providers. Protections extend to employees, contractors, suppliers, and their families who might face retaliation.
+
+## Proposed Legislation
+
+### AI Whistleblower Protection Act (US)
+
+The [AI Whistleblower Protection Act (S.1792)](https://www.congress.gov/bill/119th-congress/senate-bill/1792), introduced in May 2025 by [Senate Judiciary Chair Chuck Grassley](https://www.judiciary.senate.gov/press/rep/releases/grassley-introduces-ai-whistleblower-protection-act) with bipartisan co-sponsors including Senators Chris Coons (D-DE), Marsha Blackburn (R-TN), Amy Klobuchar (D-MN), Josh Hawley (R-MO), and Brian Schatz (D-HI), would establish comprehensive protections. [Companion legislation](https://www.coons.senate.gov/news/press-releases/senators-coons-grassley-introduce-ai-whistleblower-protection-act) was introduced in the House by Reps. Jay Obernolte (R-CA) and Ted Lieu (D-CA).
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph PROTECTIONS["Proposed Protections"]
+        A[Retaliation Ban] --> A1["Firing, demotion, harassment<br/>prohibited"]
+        B[Contract Nullification] --> B1["NDAs unenforceable for<br/>safety disclosures"]
+        C[Anonymous Channels] --> C1["Mandatory internal<br/>reporting mechanism"]
+        D[Regulatory Access] --> D1["Right to report to<br/>government bodies"]
+    end
+
+    subgraph ENFORCEMENT["Enforcement"]
+        E[Civil Penalties] --> E1["Fines for retaliation"]
+        F[Private Right of Action] --> F1["Employees can sue"]
+        G[Reinstatement] --> G1["Right to job restoration"]
+        H[Damages] --> H1["Back pay, compensatory damages"]
+    end
+
+    A --> E
+    B --> F
+    C --> G
+    D --> H
+
+    style PROTECTIONS fill:#e1f5ff
+    style ENFORCEMENT fill:#d4edda
+`} />
+
+Key provisions under the proposed legislation ([National Whistleblower Center analysis](https://www.whistleblowers.org/campaigns/the-urgent-case-for-the-ai-whistleblower-protections-congress-must-pass-the-ai-whistleblower-protection-act/)):
+- **Prohibition of retaliation** for employees reporting AI safety concerns, with protections extending to internal disclosures
+- **Prohibition of waiving whistleblower rights** in employment contracts—NDAs cannot prevent safety disclosures
+- **Requirement for anonymous reporting mechanisms** at covered developers
+- **Coverage of broad safety concerns** including AI security vulnerabilities and "specific threats to public health and safety"
+- **Remedies for retaliation** including job restoration, 2x back pay, compensatory damages, and attorney fees
+- **No proof of violation required**—good-faith belief in safety risk is sufficient for protection
+
+### Other Legislative Developments
+
+| Proposal | Jurisdiction | Key Features | Status (as of Jan 2026) |
+|----------|--------------|--------------|--------|
+| [AI Whistleblower Protection Act (S.1792)](https://www.congress.gov/bill/119th-congress/senate-bill/1792) | US (Federal) | Comprehensive protections; 6 bipartisan co-sponsors | Pending in HELP Committee |
+| [EU AI Act Article 87](https://artificialintelligenceact.eu/article/87/) | European Union | Protection for non-compliance reports | Enacted; effective Aug 2026 |
+| California AI safety legislation | California | State-level protections for tech workers | Under discussion |
+| UK AI Safety Institute | United Kingdom | Potential AISI-related protections | Preliminary planning |
+
+## Why AI Whistleblowers Matter
+
+### Information Asymmetry Problem
+
+AI development creates a structural information gap where critical safety information flows primarily within companies, with limited external visibility:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph INTERNAL["Inside AI Lab"]
+        A[Safety Evaluation<br/>Results]
+        B[Security<br/>Vulnerabilities]
+        C[Capability<br/>Assessments]
+        D[Internal Safety<br/>Debates]
+    end
+
+    subgraph BARRIERS["Current Barriers"]
+        E[NDAs & Non-Disparagement]
+        F[At-Will Employment]
+        G[Equity Clawback Threats]
+        H[Career Risk]
+    end
+
+    subgraph EXTERNAL["External Oversight"]
+        I[Regulators]
+        J[Researchers]
+        K[Civil Society]
+        L[Congress]
+    end
+
+    A --> E
+    B --> E
+    C --> E
+    D --> E
+
+    E -->|Blocked| I
+    F -->|Chilled| J
+    G -->|Suppressed| K
+    H -->|Deterred| L
+
+    style INTERNAL fill:#ffcccc
+    style BARRIERS fill:#ffeecc
+    style EXTERNAL fill:#ccffcc
+`} />
+
+### Unique Information Access
+
+AI employees have information unavailable to external observers:
+
+| Information Type | Who Has Access | External Observability |
+|------------------|---------------|----------------------|
+| Training data composition | Data teams | None |
+| Safety evaluation results | Safety teams | Usually none |
+| Security vulnerabilities | Security teams | None |
+| Capability evaluations | Research teams | Selective disclosure |
+| Internal safety debates | Participants | None |
+| Deployment decisions | Leadership, product | After the fact |
+| Resource allocation | Management | Inferred only |
+
+### Historical Precedents
+
+Whistleblowers have proven essential in other high-stakes industries:
+
+| Industry | Example | Impact | Quantified Outcome |
+|----------|---------|--------|-------------------|
+| **Nuclear** | NRC whistleblower program | Prevented safety violations | 700+ complaints/year lead to facility improvements |
+| **Aviation** | NASA engineers (Challenger) | Exposed O-ring design failures | 7 lives lost when warnings ignored |
+| **Finance** | 2008 crisis whistleblowers | Revealed systemic fraud | SEC whistleblower awards totaled \$1.9B (2011-2024) |
+| **Tech** | Frances Haugen (Facebook) | Exposed platform harms | Leaked 10,000+ internal documents |
+| **Automotive** | Toyota unintended acceleration | Revealed safety cover-up | \$1.2B settlement; 89 deaths attributed |
+
+In each case, insiders possessed critical safety information that external oversight failed to capture. AI development may present analogous dynamics at potentially higher stakes—the [Future of Life Institute's 2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) found that no major AI company has a credible plan for superintelligence safety.
+
+### 2024 "Right to Warn" Statement
+
+In June 2024, [13 current and former employees](https://righttowarn.ai/) of leading AI companies issued a public statement identifying core concerns:
+
+> "AI companies possess substantial non-public information about the capabilities and limitations of their systems, the adequacy of their protective measures, and the risk levels of different kinds of harm. However, they currently have only weak obligations to share some of this information with governments, and none with civil society."
+
+The letter was [endorsed by three of the most prominent AI researchers](https://www.washingtonpost.com/technology/2024/06/04/openai-employees-ai-whistleblowers/): Yoshua Bengio (Turing Award winner), Geoffrey Hinton (Turing Award winner, former Google), and Stuart Russell (UC Berkeley). Signatories included 11 OpenAI employees (6 anonymous) and 2 from Google DeepMind, including:
+- Jacob Hilton, former OpenAI reinforcement learning researcher
+- Ramana Kumar, former AGI safety researcher at Google DeepMind
+- Neel Nanda, DeepMind research engineer (previously Anthropic)
+
+They called for:
+1. Protection against retaliation for raising concerns
+2. Support for anonymous reporting mechanisms
+3. Opposition to confidentiality provisions that prevent disclosure
+4. Right to communicate with external regulators
+
+## Implementation Challenges
+
+### Balancing Legitimate Confidentiality
+
+Not all confidentiality is illegitimate. AI companies have reasonable interests in protecting:
+
+| Category | Legitimacy | Proposed Balance |
+|----------|------------|------------------|
+| Trade secrets | High | Narrow definition; safety overrides |
+| Competitive intelligence | Medium | Allow disclosure to regulators |
+| Security vulnerabilities | High | Responsible disclosure frameworks |
+| Personal data | High | Anonymize where possible |
+| Safety concerns | Low (for confidentiality) | Protected disclosure |
+
+The challenge is distinguishing warranted confidentiality from information suppression. Proposed legislation typically allows disclosure to designated regulators rather than public disclosure.
+
+### Defining Protected Disclosures
+
+What counts as a legitimate safety concern requiring protection?
+
+| Clear Coverage | Gray Zone | Unlikely Coverage |
+|----------------|-----------|-------------------|
+| Evidence of dangerous capability deployment | Disagreements about research priorities | General workplace complaints |
+| Security vulnerabilities | Concerns about competitive pressure | Personal disputes |
+| Falsified safety testing | Opinions about risk levels | Non-safety contract violations |
+| Regulatory violations | Policy disagreements | Trade secret theft unrelated to safety |
+
+Legislation must be specific enough to prevent abuse while broad enough to cover novel AI safety concerns.
+
+### Enforcement Mechanisms
+
+| Mechanism | Effectiveness | Challenge |
+|-----------|--------------|-----------|
+| **Private right of action** | High | Expensive, lengthy |
+| **Regulatory enforcement** | Medium | Resource-limited |
+| **Criminal penalties** | High deterrent | Hard to prove |
+| **Administrative remedies** | Medium | Requires bureaucracy |
+| **Bounty programs** | High incentive | May encourage bad-faith claims |
+
+Effective enforcement likely requires multiple mechanisms. The SEC's whistleblower bounty program (10-30% of sanctions over \$1M) provides a model for incentivizing disclosure.
+
+## Best Practices for AI Labs
+
+Pending legislation, AI companies can voluntarily strengthen internal safety culture. The [AI Lab Watch commitment tracker](https://ailabwatch.org/resources/commitments) monitors company policies.
+
+### Recommended Policies
+
+| Practice | Description | Adoption Status (2025) |
+|----------|-------------|-----------------|
+| **Internal reporting channels** | Anonymous mechanisms to raise concerns | OpenAI: integrity hotline; others partial |
+| **Non-retaliation policies** | Explicit prohibition of retaliation | Common in policy; untested in practice |
+| **Narrow NDAs** | Exclude safety concerns from confidentiality | Rare—only OpenAI has reformed post-2024 |
+| **Safety committee access** | Direct reporting to board-level safety | Anthropic, OpenAI have board-level committees |
+| **Published whistleblowing policy** | Transparent process for raising concerns | Only OpenAI has published full policy |
+| **Clear escalation paths** | Known process for unresolved concerns | Variable; improving |
+
+### Current Lab Practices
+
+According to the [Future of Life Institute's 2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/), lab safety practices vary significantly:
+
+| Company | Whistleblowing Policy | Overall Safety Grade | Notes |
+|---------|----------------------|---------------------|-------|
+| **OpenAI** | Published | C+ | Distinguished for publishing full whistleblowing policy; criticized for ambiguous thresholds |
+| **Anthropic** | Partial | C+ | RSP includes safety reporting; no published whistleblowing policy |
+| **Google DeepMind** | Not published | C | Recommended to match OpenAI transparency |
+| **xAI** | Not published | D | No credible safety documentation |
+| **Meta** | Not published | D- | "Less regulated than sandwiches" per FLI |
+
+Anthropic's [Responsible Scaling Policy](https://www.anthropic.com/index/anthropics-responsible-scaling-policy) includes commitment to halt development if safety standards aren't met, board-level oversight, and internal reporting mechanisms—though external verification of effectiveness remains limited.
+
+## Strategic Assessment
+
+| Dimension | Assessment | Notes |
+|-----------|------------|-------|
+| **Tractability** | Medium-High | Legislative momentum building |
+| **If AI risk high** | High | Internal information critical |
+| **If AI risk low** | Medium | Still valuable for accountability |
+| **Neglectedness** | Medium | Emerging attention post-2024 events |
+| **Timeline to impact** | 2-4 years | Legislative process + culture change |
+| **Grade** | B+ | Important but requires ecosystem change |
+
+## Risks Addressed
+
+| Risk | Mechanism | Effectiveness |
+|------|-----------|---------------|
+| <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> | Employees can expose corner-cutting | Medium |
+| Inadequate Safety Testing | Safety researchers can report failures | High |
+| Security vulnerabilities | Security teams can disclose | High |
+| Regulatory capture | Provides alternative information channel | Medium |
+| Cover-ups | Makes suppression harder | Medium-High |
+
+## Complementary Interventions
+
+- <EntityLink id="lab-culture">Lab Culture</EntityLink> - Internal safety culture foundations
+- <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> - External bodies to receive disclosures
+- Third-Party Auditing - Independent verification
+- <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink> - Commitments that whistleblowers can verify
+
+## Sources
+
+### Primary Documents
+
+- **["A Right to Warn about Advanced Artificial Intelligence"](https://righttowarn.ai/) (June 2024):** Open letter from 13 AI employees calling for whistleblower protections, endorsed by Bengio, Hinton, and Russell
+- **[AI Whistleblower Protection Act (S.1792)](https://www.congress.gov/bill/119th-congress/senate-bill/1792) (May 2025):** Bipartisan federal legislation introduced by Sen. Grassley
+- **[EU AI Act Article 87](https://artificialintelligenceact.eu/article/87/):** Provisions protecting those who report non-compliance
+- **[SEC Whistleblower Complaint against OpenAI](https://techcrunch.com/2024/07/13/whistleblowers-accuse-openai-of-illegally-restrictive-ndas/) (July 2024):** Alleging illegal NDAs
+
+### Legislative Analysis
+
+- **[National Whistleblower Center](https://www.whistleblowers.org/campaigns/the-urgent-case-for-the-ai-whistleblower-protections-congress-must-pass-the-ai-whistleblower-protection-act/) (2025):** Analysis of AIWPA provisions and urgency
+- **[NYU Compliance & Enforcement](https://wp.nyu.edu/compliance_enforcement/2025/07/10/the-ai-whistleblower-protection-act-is-critical-for-enhancing-corporate-compliance/) (2025):** Corporate compliance implications
+- **[Kohn, Kohn & Colapinto](https://kkc.com/ai-whistleblower-protection-act/):** Detailed breakdown of bill provisions
+- **[Senate Judiciary Committee](https://www.judiciary.senate.gov/press/rep/releases/support-grows-for-ai-whistleblower-protection-act):** Congressional support documentation
+
+### Safety Assessments
+
+- **[Future of Life Institute AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) (2025):** Comprehensive lab safety evaluation
+- **[AI Lab Watch Commitment Tracker](https://ailabwatch.org/resources/commitments):** Monitoring lab safety policies
+- **[METR Common Elements Analysis](https://metr.org/blog/2025-12-09-common-elements-of-frontier-ai-safety-policies/) (Dec 2025):** Frontier AI safety policy comparison
+
+### Case Studies
+
+- **[Leopold Aschenbrenner termination](https://www.transformernews.ai/p/openai-employee-says-he-was-fired):** OpenAI safety researcher fired after security memo to board
+- **[Shane Jones FTC letter](https://www.cnbc.com/2024/03/06/microsoft-ai-engineer-says-copilot-designer-creates-disturbing-images.html):** Microsoft engineer's Copilot Designer safety concerns
+- **[OpenAI equity clawback controversy](https://www.hrgrapevine.com/us/content/article/2024-05-20-sam-altman-apologizes-after-learning-strict-openai-ndas-threatened-to-claw-back-employee-equity):** NDA provisions threatening vested equity
+- **Frances Haugen (Facebook):** Precedent from adjacent tech industry
+
+---
+
+## AI Transition Model Context
+
+Whistleblower protections improve the <EntityLink id="ai-transition-model" /> through multiple factors:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="regulatory-capacity" /> | Addresses information asymmetry between companies and external observers |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-culture-strength" /> | Enables safety concerns to surface before catastrophic deployment |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Provides check on internal governance failures |
+
+The 2024 "Right to Warn" statement from 13 AI employees highlights systematic information gaps that impede effective oversight of AI development.

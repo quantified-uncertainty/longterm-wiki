@@ -1,0 +1,179 @@
+---
+title: Expertise Atrophy
+description: Humans losing the ability to evaluate AI outputs or function without AI assistance—creating dangerous dependencies in medicine, aviation, programming, and other critical domains.
+sidebar:
+  order: 22
+maturity: Neglected
+quality: 65
+llmSummary: Expertise atrophy—humans losing skills to AI dependence—poses medium-term risks across critical domains (aviation, medicine, programming), creating oversight failures when AI errs or fails. Evidence includes Air France 447 crash and declining Stack Overflow usage, with full dependency possible within 15-30 years through a five-phase ratchet effect.
+lastEdited: "2026-01-28"
+importance: 58.5
+seeAlso: human-expertise
+causalLevel: pathway
+pageTemplate: knowledge-base-risk
+ratings:
+  novelty: 3.5
+  rigor: 3
+  actionability: 4
+  completeness: 4
+metrics:
+  wordCount: 750
+  citations: 8
+  tables: 10
+  diagrams: 1
+clusters:
+  - ai-safety
+  - epistemics
+subcategory: epistemic
+---
+import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="expertise-atrophy" client:load />
+
+<DataInfoBox entityId="expertise-atrophy" />
+
+## Overview
+
+By 2040, humans in many professions may no longer function effectively without AI assistance. Doctors can't diagnose without AI. Pilots can't navigate without automation. Programmers can't write code without AI completion. The problem isn't that AI helps—it's that **humans lose the underlying skills**.
+
+> **For comprehensive analysis**, see <EntityLink id="human-expertise">Human Expertise</EntityLink>, which covers:
+> - Current expertise levels across domains
+> - Atrophy mechanisms and the "ratchet effect"
+> - Factors that preserve vs. erode expertise
+> - Interventions (skill-building AI design, mandatory manual practice)
+> - Trajectory scenarios through 2040
+
+---
+
+## Risk Assessment
+
+| Dimension | Assessment | Notes |
+|-----------|------------|-------|
+| **Severity** | High | When AI fails, humans can't fill the gap; when AI errs, humans can't detect it |
+| **Likelihood** | High | Already observable in aviation, navigation, calculation |
+| **Timeline** | Medium-term | Full dependency possible within 15-30 years |
+| **Trend** | Accelerating | Each AI advancement increases delegation |
+| **Reversibility** | Low | Skills lost in one generation may not transfer to next |
+
+---
+
+## The Atrophy Mechanism
+
+| Phase | Process | Duration |
+|-------|---------|----------|
+| **1. Augmentation** | AI assists; humans still capable | 2-5 years |
+| **2. Reliance** | Humans delegate; practice decreases | 3-10 years |
+| **3. Atrophy** | Skills degrade from disuse | 5-15 years |
+| **4. Dependency** | Humans can't perform without AI | 10-20 years |
+| **5. Loss** | Knowledge not passed to next generation | 15-30 years |
+
+**The ratchet effect**: Less practice → worse skills → more reliance → less practice. New workers never learn foundational skills. Institutions lose ability to train humans.
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[AI Augmentation Introduced] --> B[Users Delegate Tasks to AI]
+    B --> C[Practice of Core Skills Decreases]
+    C --> D[Skill Proficiency Declines]
+    D --> E{AI Failure or Error}
+    E -->|AI Works| F[Deeper Dependency]
+    F --> B
+    E -->|AI Fails| G[Human Cannot Compensate]
+    G --> H[System Failure / Harm]
+    D --> I[Skills Not Taught to Next Generation]
+    I --> J[Institutional Knowledge Lost]
+    J --> K[Irreversible Dependency]
+`} />
+
+---
+
+## Contributing Factors
+
+| Factor | Effect | Mechanism |
+|--------|--------|-----------|
+| AI reliability | Increases risk | Higher reliability leads to [automation complacency](https://humanfactors101.com/2020/05/24/the-ironies-of-automation/) and reduced vigilance |
+| Task complexity | Increases risk | Complex skills atrophy faster without practice; harder to maintain proficiency |
+| Training emphasis | Decreases risk | Mandatory manual practice periods preserve baseline competency |
+| AI transparency | Mixed | Explainable AI may preserve understanding; opaque systems accelerate skill loss |
+| Generational turnover | Increases risk | New workers trained with AI never develop foundational skills |
+| Domain criticality | Amplifies consequences | High-stakes domains (medicine, aviation) face catastrophic failure modes |
+| Cognitive offloading | Increases risk | [Research shows](https://www.mdpi.com/2075-4698/15/1/6) persistent offloading reduces internal cognitive capacity |
+| User expertise level | Modulates risk | [Studies indicate](https://crowston.syr.edu/sites/crowston.syr.edu/files/GAI_and_skills.pdf) novices are more vulnerable to deskilling than experts |
+
+---
+
+## Already Observed
+
+| Domain | Evidence | Consequence |
+|--------|----------|-------------|
+| **Aviation** | [Air France 447 crash](https://spectrum.ieee.org/air-france-flight-447-crash-caused-by-a-combination-of-factors) (2009): pilots couldn't hand-fly when automation failed; BEA found "generalized loss of common sense and general flying knowledge" | 228 deaths |
+| **Navigation** | Taxi drivers using GPS show hippocampal changes; wayfinding skills decline | Spatial reasoning loss |
+| **Calculation** | Adults struggle with mental arithmetic after calculator dependence | Numeracy decline |
+| **Programming** | Stack Overflow traffic declining as developers use AI assistants | Debugging skills eroding |
+| **Medical diagnosis** | [Studies show](https://link.springer.com/article/10.1007/s10462-025-11352-1) physicians' unassisted detection rates decline after using AI-assisted diagnosis | Pattern recognition atrophying |
+
+---
+
+## Why This Matters for AI Safety
+
+| Concern | Mechanism |
+|---------|-----------|
+| **Oversight failure** | Can't evaluate AI if you lack domain expertise |
+| **Recovery impossible** | When AI fails catastrophically, no fallback |
+| **Lock-in** | Expertise loss makes AI dependency irreversible |
+| **Correction failure** | Can't identify AI errors without independent capability |
+| **Generational transmission** | Skills not used are not taught |
+
+---
+
+## Responses That Address This Risk
+
+| Response | Mechanism | Effectiveness |
+|----------|-----------|---------------|
+| <EntityLink id="training-programs">Training Programs</EntityLink> | Preserve technical expertise | Medium |
+| <EntityLink id="scalable-oversight">Scalable Oversight</EntityLink> | Maintain supervision capability | Medium |
+| Skill-building AI design | AI that teaches rather than replaces | Emerging |
+| Mandatory manual practice | "Unassisted" periods in training | Proven in aviation |
+
+See <EntityLink id="human-expertise">Human Expertise</EntityLink> for detailed analysis.
+
+---
+
+## Related Pages
+
+### Primary Reference
+- **<EntityLink id="human-expertise">Human Expertise</EntityLink>** — Comprehensive parameter page with mechanisms, domains, and interventions
+
+### Related Risks
+- <EntityLink id="learned-helplessness">Learned Helplessness</EntityLink> — Psychological dimension of expertise loss
+- <EntityLink id="enfeeblement">Enfeeblement</EntityLink> — Long-term human capability decline
+- <EntityLink id="lock-in">Lock-in</EntityLink> — Irreversible AI dependencies
+
+### Related Parameters
+- <EntityLink id="human-agency">Human Agency</EntityLink> — Expertise enables meaningful choice
+- <EntityLink id="human-oversight-quality">Human Oversight Quality</EntityLink> — Expertise foundation for oversight
+- <EntityLink id="epistemic-health">Epistemic Health</EntityLink> — Collective knowledge maintenance
+
+---
+
+## Key Uncertainties
+
+1. **Threshold effects**: At what level of AI assistance does skill atrophy become irreversible? Research suggests a "vicious cycle" where awareness of deskilling leads to even heavier reliance on automation.
+2. **Domain variation**: How much do atrophy rates vary across fields? Aviation has decades of data; medicine and programming have less empirical grounding.
+3. **Intervention effectiveness**: Can mandatory manual practice periods fully counteract atrophy, or merely slow it?
+4. **Generational transmission**: How quickly does institutional knowledge disappear when one generation trains exclusively with AI tools?
+5. **AI reliability requirements**: What level of AI reliability is needed to make human backup capability unnecessary versus dangerous to lose?
+
+---
+
+## Sources
+
+- [BEA Final Report on Air France 447](https://www.faa.gov/sites/faa.gov/files/AirFrance447_BEA.pdf) - Official accident investigation documenting automation paradox
+- [IEEE Spectrum Analysis of AF447](https://spectrum.ieee.org/air-france-flight-447-crash-caused-by-a-combination-of-factors) - Detailed breakdown of pilot skill degradation
+- [Crowston & Bolici (2025): Deskilling and Upskilling with Generative AI](https://crowston.syr.edu/sites/crowston.syr.edu/files/GAI_and_skills.pdf) - Expert-novice performance gaps with AI
+- [Gerlich (2025): AI Tools in Society - Cognitive Offloading](https://www.mdpi.com/2075-4698/15/1/6) - Empirical study linking AI use to reduced critical thinking
+- [Natali et al. (2025): AI-induced Deskilling in Medicine](https://link.springer.com/article/10.1007/s10462-025-11352-1) - Mixed-method review of medical skill degradation
+- [Haslbeck & Hoermann: Flying the Needles](https://www.researchgate.net/publication/301290010_Flying_the_Needles_Flight_Deck_Automation_Erodes_Fine-Motor_Flying_Skills_Among_Airline_Pilots) - Empirical study of pilot manual flying skill erosion
+- [The Ironies of Automation - Human Factors 101](https://humanfactors101.com/2020/05/24/the-ironies-of-automation/) - Overview of Bainbridge's classic automation paradox framework
+- [MIT Sloan: When Humans and AI Work Best Together](https://mitsloan.mit.edu/ideas-made-to-matter/when-humans-and-ai-work-best-together-and-when-each-better-alone) - Meta-analysis of human-AI collaboration effectiveness
+
+<Backlinks entityId="expertise-atrophy" />

@@ -1,0 +1,912 @@
+---
+title: Long-Timelines Technical Worldview
+description: The long-timelines worldview (20-40+ years to AGI) argues for foundational research over rushed solutions based on historical AI overoptimism, current systems' limitations, and scaling constraints. While Metaculus forecasters now predict a 50% chance of AGI by 2031—down from 50 years away in 2020—long-timelines proponents point to survey findings that 76% of experts believe current scaling approaches are insufficient for AGI.
+importance: 62.5
+quality: 91
+lastEdited: "2026-01-30"
+llmSummary: Comprehensive overview of the long-timelines worldview (20-40+ years to AGI, 5-20% P(doom)), arguing for foundational research over rushed solutions based on historical AI overoptimism, current systems' limitations, and scaling constraints. Provides concrete career and research prioritization guidance but lacks novel synthesis—primarily organizes existing arguments from Brooks, Marcus, and Mitchell.
+ratings:
+  novelty: 3.5
+  rigor: 4
+  actionability: 5.5
+  completeness: 6.5
+metrics:
+  wordCount: 2972
+  citations: 10
+  tables: 4
+  diagrams: 0
+clusters: ["ai-safety", "epistemics"]
+---
+import {Tags, R, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
+
+<DataExternalLinks pageId="long-timelines" client:load />
+
+### Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Current Consensus** | Minority position among AI researchers | <EntityLink id="metaculus">Metaculus</EntityLink> median AGI prediction: 2031; industry leaders predict 2-5 years |
+| **Expert Support** | 20-30% of surveyed researchers | [76% believe scaling alone insufficient](https://gizmodo.com/ai-experts-say-were-on-the-wrong-path-to-achieving-human-like-ai-2000581717) for AGI |
+| **Historical Track Record** | Strong precedent for skepticism | AI predictions consistently wrong for 60+ years |
+| **Core Crux** | Paradigm sufficiency | Whether deep learning + scaling reaches general intelligence |
+| **Research Priority** | Foundational theory | <EntityLink id="agent-foundations">Agent foundations</EntityLink>, interpretability theory, <EntityLink id="formal-verification">formal verification</EntityLink> |
+| **Risk Assessment (P(doom))** | 5-20% by 2100 | Lower than doomer estimates (25-80%) due to extended timeline |
+| **Funding Alignment** | Supports longer-term research | AI safety research receives only \$110-170M/year vs \$252B corporate AI investment |
+
+**Core belief**: Transformative AI is further away than many think. This gives us time for careful, foundational research rather than rushed solutions.
+
+### Timeline to AGI
+
+The long-timelines worldview predicts significantly longer development horizons than short-timelines perspectives, fundamentally altering strategic priorities for AI safety research and intervention planning. As of December 2024, [Metaculus forecasters](https://www.metaculus.com/questions/3479/date-weakly-general-ai-is-publicly-known/) average a 25% chance of AGI by 2027 and 50% by 2031—down from a median of 50 years away as recently as 2020.
+
+| Source | AGI Estimate | Methodology | Confidence Level |
+|--------|--------------|-------------|------------------|
+| **Long-timelines view** | 2045-2065+ | Historical pattern analysis + paradigm skepticism | Medium-High |
+| [Metaculus forecasters](https://www.metaculus.com/questions/3479/date-weakly-general-ai-is-publicly-known/) (2024) | 2031 (50% median) | Aggregated prediction market | 1,700 forecasters |
+| [AI researcher survey](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) (2023) | 2047-2116 | Academic survey | Median varies 70 years by framing |
+| [Epoch AI Direct Approach](https://epoch.ai/blog/literature-review-of-transformative-artificial-intelligence-timelines) | 2033 (50%) | Compute trend extrapolation | Model-based estimate |
+| Industry leaders (<EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink>) | 2027-2030 | Internal capability assessment | Shortest estimates, potential bias |
+| [Rodney Brooks](https://rodneybrooks.com/predictions-scorecard-2025-january-01/) | Far, far further than claimed | Historical track record analysis | Publicly tracked predictions |
+
+**Key divergence**: The 13-year median shift in AI researcher surveys between 2022-2023 suggests high uncertainty and susceptibility to framing effects. Long-timelines proponents argue this volatility reflects hype cycles rather than genuine technical progress toward AGI.
+
+### P(AI <EntityLink id="existential-catastrophe">existential catastrophe</EntityLink> by 2100)
+
+While taking AI risk seriously, the long-timelines worldview assigns lower probabilities to existential catastrophe due to extended opportunity for alignment research, iterative testing, and institutional adaptation.
+
+| Expert/Source | Estimate | Reasoning |
+|---------------|----------|-----------|
+| Long-timelines view | 5-20% | Extended timelines provide multiple advantages for safety: decades for careful foundational research on agent alignment theory, time to observe warning signs in increasingly capable systems, opportunity for <EntityLink id="international-coordination">international coordination</EntityLink> and governance development, and ability to iterate on alignment techniques across multiple generations of AI systems. The lower bound reflects that alignment remains genuinely difficult even with more time; the upper bound acknowledges we might still fail to solve core technical challenges. |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [commons.wikimedia.org](https://commons.wikimedia.org/wiki/File:A_long-term_timeline_of_technology,_OWID.png) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Technology_life_cycle) |
+
+
+## Overview
+
+The long-timelines technical worldview holds that transformative AI is decades away rather than years. This isn't mere optimism or wishful thinking - it's based on specific views about the difficulty of achieving human-level intelligence, skepticism about current paradigms, and historical patterns in AI progress.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Evidence["Evidence Base"]
+        HIST[Historical Overoptimism]
+        LIMITS[Current System Limitations]
+        SCALE[Scaling Diminishing Returns]
+    end
+
+    subgraph CoreBeliefs["Core Beliefs"]
+        PARADIGM[Paradigm Shift Required]
+        SLOW[Slow Takeoff Expected]
+        TIME[20-40+ Years to AGI]
+    end
+
+    subgraph Priorities["Research Priorities"]
+        FOUND[Agent Foundations]
+        INTERP[Deep Interpretability]
+        THEORY[Theoretical Safety]
+        FIELD[Field Building]
+    end
+
+    subgraph Outcomes["Strategic Outcomes"]
+        LOWER[Lower P doom: 5-20%]
+        ROBUST[Robust Solutions]
+        COORD[Time for Coordination]
+    end
+
+    HIST --> PARADIGM
+    LIMITS --> PARADIGM
+    SCALE --> PARADIGM
+    PARADIGM --> TIME
+    TIME --> SLOW
+    TIME --> FOUND
+    TIME --> INTERP
+    TIME --> THEORY
+    TIME --> FIELD
+    FOUND --> ROBUST
+    INTERP --> ROBUST
+    THEORY --> ROBUST
+    FIELD --> COORD
+    ROBUST --> LOWER
+    COORD --> LOWER
+
+    style HIST fill:#fee
+    style LIMITS fill:#fee
+    style SCALE fill:#fee
+    style TIME fill:#e6f3ff
+    style LOWER fill:#dfd
+    style ROBUST fill:#dfd
+`} />
+
+This extended timeline fundamentally changes strategic priorities. Instead of rushing to patch current systems or advocating for immediate pause, long-timelines researchers can pursue deep, foundational work that might take decades to bear fruit.
+
+**Key distinction**: This is not the same as the optimistic worldview. Long-timelines researchers take alignment seriously and don't trust current techniques to scale. They're not optimistic about alignment being easy - they're pessimistic about timelines being short.
+
+## Characteristic Beliefs
+
+| Crux | Long-Timelines Position | Short-Timelines Position | Key Evidence |
+|------|-------------------------|-------------------------|--------------|
+| **Timelines** | AGI 20-40+ years (2045-2065) | AGI 2-10 years (2027-2035) | Survey framing effects cause 70-year median variance |
+| **Paradigm** | New paradigms required beyond scaling | Scaling + engineering solves remaining gaps | [76% of experts](https://gizmodo.com/ai-experts-say-were-on-the-wrong-path-to-achieving-human-like-ai-2000581717) say scaling alone insufficient |
+| **Takeoff** | Slow, observable over years | Fast or discontinuous possible | Historical technology adoption rates |
+| **Scaling outlook** | Diminishing returns imminent | Continued exponential gains | [Ilya Sutskever](https://techcrunch.com/2024/11/20/ai-scaling-laws-are-showing-diminishing-returns-forcing-ai-labs-to-change-course/): "Age of scaling" may be ending |
+| **Alignment difficulty** | Hard, but sufficient time to solve | Hard, and racing against clock | Depends on timeline beliefs |
+| **Current LLM relevance** | Uncertain if informs future AGI | Direct path to AGI | Architectural discontinuity question |
+| **Deceptive alignment** | Relevant but not imminent threat | Critical near-term concern | Capability threshold dependent |
+| **Coordination feasibility** | More feasible with extended time | Difficult under time pressure | [AI safety funding](https://futureoflife.org/ai-safety-index-summer-2025/): \$150-170M vs \$252B AI investment |
+| **P(doom)** | 5-20% by 2100 | 25-80% by 2100 | Extended time for iteration and response |
+
+### Timeline Arguments
+
+Several independent arguments support longer timelines:
+
+**1. Intelligence is harder than it looks**
+
+Current AI systems are impressive but lack capabilities that [Melanie Mitchell](https://www.science.org/doi/10.1126/science.adm8175) argues are fundamental to general intelligence:
+- **Robust generalization**: Systems fail in novel contexts despite strong benchmark performance
+- **Abstract reasoning**: [Mitchell's 2024 research](https://arxiv.org/abs/2102.10717) shows current AI lacks humanlike abstraction and analogy capabilities
+- **World models**: AI lacks "rich internal models of the world" that reflect causes rather than correlations
+- **Efficient learning**: Humans learn from limited examples; LLMs require massive data
+- **Common sense**: Fundamental gaps in causal and physical reasoning persist
+
+Each of these might require breakthroughs that scaling alone cannot provide.
+
+**2. Historical track record**
+
+AI predictions have consistently been overoptimistic—[Rodney Brooks](https://rodneybrooks.com/predictions-scorecard-2025-january-01/) has publicly tracked failed predictions since 2017:
+
+| Era | Prediction | Reality | Years Off |
+|-----|------------|---------|-----------|
+| 1960s | Human-level AI by 1985 | First AI winter | 40+ years |
+| 1980s | Expert systems would transform economy | Brittleness, second AI winter | 30+ years |
+| 2017 | Full self-driving by 2020 | GM shut Cruise after \$10B investment (2024) | Ongoing |
+| 2023 | LLMs are path to near-term AGI | Scaling showing [diminishing returns](https://techcrunch.com/2024/11/20/ai-scaling-laws-are-showing-diminishing-returns-forcing-ai-labs-to-change-course/) | TBD |
+
+As Brooks notes: "None" of the 2017 near-term predictions have materialized.
+
+**3. Scaling might not be enough**
+
+While scaling has driven recent progress, multiple experts warn of limits:
+
+[Ilya Sutskever](https://officechai.com/ai/scaling-could-now-give-diminishing-returns-were-back-to-the-age-of-research-ilya-sutskever/) (OpenAI co-founder, Safe Superintelligence Inc.): "From 2012 to 2020, it was the age of research. From 2020 to 2025, it was the age of scaling... I don't think that's true anymore."
+
+| Constraint | Current Status | Long-Term Trajectory |
+|------------|----------------|---------------------|
+| **Compute costs** | GPT-4 training: \$100M+; next-gen: \$1B+ | Superlinear cost growth per capability unit |
+| **Data availability** | Already training on most of internet | [Synthetic data quality issues](https://epoch.ai/blog/can-ai-scaling-continue-through-2030) uncertain |
+| **Energy requirements** | Data centers consuming city-scale power | Environmental and infrastructure limits |
+| **Algorithmic efficiency** | 2024 gains primarily in post-training | Pre-training scaling laws potentially breaking down |
+
+[Gary Marcus](https://garymarcus.substack.com/p/a-knockout-blow-for-llms) coined "diminishing returns" in 2022; recent observations suggest "adding more data does not actually solve the core underlying problems."
+
+**4. Economic and institutional barriers**
+
+Even if technically feasible, deployment faces substantial friction:
+- **Compute costs**: Training frontier models now costs \$100M-1B+, limiting who can participate
+- **Energy requirements**: Data centers require gigawatts; infrastructure buildout takes years
+- **Capital requirements**: [Global AI investment reached \$252B in 2024](https://hai.stanford.edu/ai-index/2025-ai-index-report/economy), but concentrated in few actors
+- **Regulatory barriers**: EU AI Act, emerging US state legislation creating compliance costs
+- **Adoption timelines**: Brooks notes even IPv4→IPv6 transition, started in 2001, is still only 50% complete
+
+### Takeoff Speed
+
+Long-timelines researchers typically expect slow takeoff:
+
+**Gradual progress**: Incremental improvements across many years
+- Can observe AI getting more capable
+- Time to respond to warning signs
+- Opportunities to iterate on alignment
+
+**Multiple bottlenecks**: Progress limited by many factors
+- Hardware constraints
+- Data availability
+- Algorithmic insights
+- Integration challenges
+- Social and regulatory adaptation
+
+**Continuous deployment**: AI capabilities integrated gradually
+- Society adapts incrementally
+- Institutions evolve alongside AI
+- Norms and regulations co-develop
+
+This contrasts sharply with fast takeoff scenarios where recursive self-improvement leads to rapid capability explosion.
+
+## Key Proponents and Perspectives
+
+### Academic Researchers
+
+**[Rodney Brooks](https://rodneybrooks.com/)** (former MIT CSAIL director, iRobot/Robust.AI founder)
+
+> "Even if it is possible I personally think we are far, far further away from understanding how to build AGI than many other pundits might say."
+
+| Prediction Area | Brooks' Assessment | Track Record |
+|-----------------|-------------------|--------------|
+| Self-driving cars | Too optimistic by 10+ years | [GM shut Cruise](https://rodneybrooks.com/predictions-scorecard-2025-january-01/) after \$10B investment |
+| LLM-to-AGI path | "Hubris similar to 2017 self-driving" | Publicly tracking since 2017 |
+| Technology adoption | Consistently overestimated speed | IPv4→IPv6: 23+ years, still 50% complete |
+| Current AI research | "Stuck on same issues for 50 years" | Common sense, reasoning gaps persist |
+
+Brooks warns of ["FOBAWTPALSL"](https://spectrum.ieee.org/gary-marcus)—Fear of Being a Wimpy Techno-Pessimist and Looking Stupid Later—driving uncritical AI optimism.
+
+**[Gary Marcus](https://garymarcus.substack.com/)** (NYU emeritus, cognitive scientist)
+
+Published ["Deep Learning: A Critical Appraisal"](https://arxiv.org/abs/1801.00631) (2018) identifying 10 fundamental limitations, and ["Taming Silicon Valley"](https://mitpress.mit.edu/9780262048835/taming-silicon-valley/) (2024) arguing "we are not on the best path right now, either technically or morally."
+
+Key arguments:
+- **Brittleness**: Systems fail unpredictably on slight distribution shifts
+- **Hybrid AI necessity**: Combining neural networks with symbolic reasoning (e.g., AlphaFold2) works better than pure deep learning
+- **Generalization failures**: Pattern matching is not understanding
+- **Financial bubble**: "People are valuing AI companies as if they're going to solve AGI. I don't think we're anywhere near AGI."
+
+**[Melanie Mitchell](https://melaniemitchell.me/)** (Santa Fe Institute)
+
+Author of *Artificial Intelligence: A Guide for Thinking Humans* (2019); published [four major papers in 2024](https://www.science.org/doi/10.1126/science.adm8175) on AI limitations including work in *Science*.
+
+Key research findings:
+- **Abstraction gap**: "No current AI system is anywhere close to a capability of forming humanlike abstractions or analogies"
+- **World model deficit**: AI lacks "rich internal models of the world that reflect the causes of events rather than merely correlations"
+- **Benchmark failure**: "AI systems ace benchmarks yet stumble in the real world"
+- **AGI skepticism**: "Today's AI is far from general intelligence, and I don't believe that machine 'superintelligence' is anywhere on the horizon"
+
+### Survey Evidence
+
+A [2024 survey](https://gizmodo.com/ai-experts-say-were-on-the-wrong-path-to-achieving-human-like-ai-2000581717) chaired by Brooks found:
+- **76% of 475 respondents** said scaling current approaches will not be sufficient for AGI
+- This challenges the dominant industry narrative that "more compute = AGI"
+
+### Alignment Researchers with Longer Timelines
+
+Not all alignment researchers believe in short timelines:
+- Focus on foundational theory requiring 10-20+ year research programs
+- Skeptical current LLM architectures inform future AGI systems
+- Prefer robust solutions over patches that may not transfer
+
+## Priority Approaches
+
+Given long-timelines beliefs, research priorities differ from short-timelines views. The extended horizon allows investment in high-risk, high-reward research that requires decades to mature.
+
+### Research Priority Comparison
+
+| Approach | Long-Timelines Priority | Short-Timelines Priority | Funding Status (2024-25) |
+|----------|------------------------|-------------------------|-------------------------|
+| **Agent foundations** | Very High | Low-Medium | \$5-15M/year via MIRI, academic grants |
+| **Mechanistic interpretability** | High | High | \$30-50M/year via labs + Coefficient Giving |
+| **RLHF/current alignment** | Low-Medium | Very High | \$100M+/year via frontier labs |
+| **Formal verification** | High | Low | \$10-20M/year, primarily academic |
+| **Field building/education** | Very High | Medium | \$20-40M/year via foundations |
+| **Pause/moratorium advocacy** | Low | High | Variable, advocacy-funded |
+| **Compute governance** | Medium | Very High | Government + policy focus |
+| **Rapid deployment safety** | Low | Very High | Lab-funded, urgent framing |
+
+**Funding context**: [AI safety research receives only \$150-170M/year](https://futureoflife.org/ai-safety-index-summer-2025/) total (up 36% from 2024), while [corporate AI investment reached \$252B in 2024](https://hai.stanford.edu/ai-index/2025-ai-index-report/economy). Long-timelines proponents argue foundational work is underfunded relative to its importance if timelines extend.
+
+### 1. Agent Foundations
+
+Deep theoretical work on fundamental questions:
+
+**Decision theory**:
+- How should rational agents behave?
+- Logical uncertainty
+- Updateless decision theory
+- Embedded agency
+
+**Value alignment theory**:
+- What does it mean for an agent to have values?
+- How can values be specified?
+- Corrigibility and interruptibility
+- Utility function construction
+
+**Ontological crises**:
+- How do agents update when their world model changes fundamentally?
+- Preserving values across paradigm shifts
+
+**Advantage of long timelines**: This work might take 10-20 years to mature, which is fine if AGI is 30+ years away.
+
+### 2. Interpretability and Understanding
+
+Deep understanding of how AI systems work:
+
+**Mechanistic interpretability**:
+- Reverse-engineer neural networks
+- Understand individual neurons and circuits
+- Build comprehensive models of model internals
+
+**Theoretical foundations**:
+- Why do neural networks generalize?
+- What are the fundamental limits?
+- Mathematical theory of deep learning
+
+**Conceptual understanding**:
+- What are models actually learning?
+- Representations and abstractions
+- Transfer and generalization
+
+**Advantage of long timelines**: Can build interpretability tools gradually, improving them over decades.
+
+### 3. Foundational Research
+
+First-principles approaches without time pressure:
+
+**Alternative paradigms**:
+- Explore architectures beyond current deep learning
+- Investigate hybrid systems
+- Study biological intelligence for insights
+
+**Robustness and verification**:
+- Formal methods for AI
+- Provable safety properties
+- Mathematical guarantees
+
+**Comprehensive testing**:
+- Extensive empirical research
+- Long-term studies of AI behavior
+- Edge case exploration
+
+**Advantage of long timelines**: Can pursue high-risk, high-reward research without urgency.
+
+### 4. Field Building
+
+Growing the community for long-term impact:
+
+**Academic infrastructure**:
+- University departments and programs
+- Curriculum development
+- Textbooks and educational materials
+
+**Talent pipeline**:
+- Undergraduate and graduate training
+- Interdisciplinary programs
+- Career paths in alignment
+
+**Research ecosystem**:
+- Conferences and workshops
+- Journals and publications
+- Collaboration networks
+
+**Advantage of long timelines**: Field-building pays off over decades.
+
+### 5. Careful Empirical Work
+
+Thorough investigation of current systems:
+
+**Understanding limitations**:
+- Where do current approaches fail?
+- What are fundamental vs. contingent limits?
+- Generalization studies
+
+**Alignment properties**:
+- How do current alignment techniques work?
+- What are their scaling properties?
+- When do they break down?
+
+**Transfer studies**:
+- Will current insights transfer to future AI?
+- What's paradigm-specific vs. general?
+
+**Advantage of long timelines**: Can be thorough rather than rushed.
+
+## Deprioritized Approaches
+
+Given long-timelines beliefs, some approaches are less urgent:
+
+| Approach | Why Less Urgent |
+|----------|----------------|
+| Pause advocacy | Less immediate urgency |
+| RLHF improvements | May not transfer to future paradigms |
+| Current-system safety | Systems may not be path to AGI |
+| Race dynamics | More time reduces racing pressure |
+| Quick fixes | Can pursue robust solutions instead |
+
+**Note**: "Less urgent" doesn't mean "useless" - just different prioritization given beliefs.
+
+## Strongest Arguments
+
+### 1. Historical Overoptimism
+
+AI predictions have been systematically wrong for 60+ years. [80,000 Hours analysis](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) shows median expert estimates have shortened by 13 years between 2022-2023 surveys alone—suggesting high volatility driven by hype rather than genuine progress.
+
+| Period | Prediction | Outcome | Investment Lost/Delayed |
+|--------|------------|---------|------------------------|
+| 1965-1975 | Machine translation "solved in 5 years" | ALPAC report ended funding | \$20M+ wasted |
+| 1980-1987 | Expert systems market \$5B by 1990 | Second AI winter; Lisp machine collapse | \$1B+ industry crash |
+| 2012-2017 | Self-driving by 2020 | [GM shut Cruise](https://rodneybrooks.com/predictions-scorecard-2025-january-01/) after \$10B | \$100B+ industry-wide |
+| 2020-2023 | LLM scaling → AGI in 3-5 years | [Scaling hitting diminishing returns](https://techcrunch.com/2024/11/20/ai-scaling-laws-are-showing-diminishing-returns-forcing-ai-labs-to-change-course/) | TBD |
+
+**Pattern**: Each generation thinks they're on the path to AGI. Each is wrong. Current optimism about LLMs may repeat this pattern—[76% of surveyed experts](https://gizmodo.com/ai-experts-say-were-on-the-wrong-path-to-achieving-human-like-ai-2000581717) believe scaling alone insufficient.
+
+### 2. Current Systems' Fundamental Limitations
+
+Despite impressive performance, current AI lacks:
+
+**Robust generalization**:
+- Adversarial examples fool vision systems
+- Out-of-distribution failures
+- Brittle in novel situations
+
+**True understanding**:
+- Pattern matching vs. comprehension
+- Lack of world models
+- No common sense reasoning
+
+**Efficient learning**:
+- Require massive data (humans learn from few examples)
+- Don't transfer knowledge well across domains
+- Can't explain their reasoning reliably
+
+**Abstract reasoning**:
+- Struggle with novel problems requiring insight
+- Limited analogical reasoning
+- Poor at systematic generalization
+
+**These might require fundamental breakthroughs**, not just scaling.
+
+### 3. Scaling Has Limits
+
+Current progress relies on scaling, but:
+
+**Compute constraints**:
+- Energy costs grow exponentially
+- Chip production has physical limits
+- Economic viability uncertain at extreme scales
+
+**Data constraints**:
+- Already training on most of internet
+- Synthetic data has quality issues
+- Diminishing returns from more data
+
+**Algorithmic efficiency**:
+- Gains are uncertain and irregular
+- May hit fundamental limits
+- Efficiency improvements are hard to predict
+
+**Returns diminishing**:
+- Each order of magnitude improvement costs more
+- Performance gains may be slowing
+- Knee of the curve might be near
+
+### 4. Intelligence Requires More Than Current Approaches
+
+Cognitive science and neuroscience suggest:
+
+**Embodiment**: Intelligence might require physical interaction with world
+
+**Development**: Human intelligence develops through years of experience
+
+**Architecture**: Brain has specialized structures deep learning lacks
+
+**Mechanisms**: Biological learning uses mechanisms we don't understand
+
+**Consciousness**: Role of consciousness in intelligence unclear
+
+**If any of these are necessary**, current approaches are missing key ingredients.
+
+### 5. Slow Takeoff Is Likely
+
+Multiple bottlenecks slow progress:
+
+**Integration challenges**: Deploying AI into real systems takes time
+
+**Social adaptation**: Society needs to adapt to new capabilities
+
+**Institutional barriers**: Regulation, cultural resistance, coordination
+
+**Economic constraints**: Funding and resources are limited
+
+**Technical obstacles**: Each capability advance requires solving multiple problems
+
+**No reason to expect rapid discontinuities** - smooth progress is default.
+
+### 6. Time for Solutions Reduces Risk
+
+Longer timelines mean:
+
+**Iterative improvement**: Can refine alignment techniques over decades
+
+**Warning signs**: Early systems give us data about problems
+
+**Coordination**: More time for international cooperation
+
+**Institution building**: Governance can develop alongside technology
+
+**Research maturation**: Alignment solutions can be thoroughly tested
+
+**P(doom) is lower** because we have time to get it right.
+
+## Main Criticisms and Counterarguments
+
+### "This Is Just Wishful Thinking"
+
+**Critique**: Long-timelines view is motivated by hoping for more time, not actual evidence.
+
+**Response**:
+- Based on specific technical arguments, not hope
+- Historical track record supports skepticism
+- Many long-timelines people still take risk seriously
+- If anything, short timelines might be motivated by excitement/fear
+
+### "Might Miss Critical Window"
+
+**Critique**: If wrong about timelines, current window to shape AI development is missed.
+
+**Response**:
+- Can have uncertainty and hedge bets
+- Foundational work pays off even in shorter timelines
+- Better to have robust solutions late than rushed solutions now
+- Can shift priorities if evidence changes
+
+### "Current Progress Is Different"
+
+**Critique**: Unlike past failed approaches, deep learning and scaling are actually working. This time is different.
+
+**Response**:
+- Every generation thinks "this time is different"
+- Deep learning has made progress but also has clear limits
+- Scaling can't continue indefinitely
+- Path from current systems to AGI remains unclear
+
+### "LLMs Show Emergent Capabilities"
+
+**Critique**: Large language models show unexpected emergent abilities, suggesting scaling might reach AGI.
+
+**Response**:
+- "Emergent" capabilities often just smooth trends that appear suddenly in metrics
+- Still lack robust reasoning, planning, and understanding
+- Emergence in narrow tasks doesn't imply general intelligence
+- May hit ceiling well below human-level
+
+### "Moravec's Paradox Resolved"
+
+**Critique**: Deep learning solved perception problems thought to be hardest (vision, language). The rest will follow.
+
+**Response**:
+- Perception was hard for symbolic AI, not necessarily hardest overall
+- Reasoning and planning might be fundamentally harder
+- "Harder" tasks (like abstract reasoning) remain difficult for current AI
+- Different problems might require different solutions
+
+### "Missing Urgency"
+
+**Critique**: Even if timelines are long, should work urgently to be safe.
+
+**Response**:
+- Urgency doesn't mean rushing to bad solutions
+- Careful work is more valuable than hasty work
+- Can be thorough without being complacent
+- False urgency leads to wasted effort
+
+### "Paradigm Shifts Can Be Rapid"
+
+**Critique**: Even if deep learning isn't enough, sudden breakthroughs could change timelines overnight.
+
+**Response**:
+- Breakthroughs still require years to commercialize
+- Integration takes time even if insight is sudden
+- Most progress is gradual, not revolutionary
+- Can update if breakthrough occurs
+
+## What Evidence Would Change This View?
+
+Long-timelines researchers would update toward shorter timelines given specific, measurable developments:
+
+### Evidence That Would Strongly Update Toward Shorter Timelines
+
+| Evidence Type | Specific Threshold | Current Status (2025) | Update Magnitude |
+|--------------|-------------------|----------------------|------------------|
+| **Scaling continuation** | 2+ more OOMs without diminishing returns | [Returns appear diminishing](https://techcrunch.com/2024/11/20/ai-scaling-laws-are-showing-diminishing-returns-forcing-ai-labs-to-change-course/) | Very strong update |
+| **Robust reasoning** | Pass novel math/science problems consistently | Fails on out-of-distribution | Strong update |
+| **Transfer learning** | Same model excels across 10+ very different domains | Still domain-specific fine-tuning needed | Strong update |
+| **Common sense** | Pass adversarial physical reasoning tests | [Mitchell's research](https://www.science.org/doi/10.1126/science.adm8175) shows consistent failures | Strong update |
+| **Expert consensus shift** | Greater than 70% of surveyed researchers predict AGI within 10 years | Currently approximately 30-40% | Moderate update |
+| **Prediction market movement** | [Metaculus](https://www.metaculus.com/questions/3479/date-weakly-general-ai-is-publicly-known/) median drops below 2028 | Currently 2031 median | Moderate update |
+
+### Theoretical Breakthroughs That Would Update
+
+- **Clear path to generalization**: Formal demonstration that current architectures can achieve human-level abstraction
+- **World model success**: AI systems building accurate causal models (not just correlations)
+- **Efficient learning**: Systems learning as efficiently as humans (100x-1000x data reduction)
+
+### Economic/Investment Indicators
+
+Current investment levels ([2024: \$252B corporate, \$150-170M safety](https://hai.stanford.edu/ai-index/2025-ai-index-report/economy)) already suggest serious commitment. Further indicators:
+
+- **Government Manhattan Project**: \$50B+/year coordinated government program (currently \$3.3B federal)
+- **Energy breakthrough**: Fusion or next-gen nuclear enabling 10x cheaper compute
+- **Chip breakthrough**: 100x efficiency gains beyond current trajectory
+
+### What Has Already Updated Timelines
+
+Several developments have shortened some long-timelines estimates:
+- GPT-4/Claude-level reasoning capabilities (2023-2024)
+- Chain-of-thought and reasoning improvements
+- Multimodal integration success
+- Test-time compute scaling (o1, etc.)
+
+However, these haven't addressed the [core limitations Mitchell identifies](https://www.science.org/doi/10.1126/science.adm8175)—abstraction, world models, efficient learning—that long-timelines proponents consider fundamental.
+
+## Implications for Action and Career
+
+If you hold long-timelines beliefs, strategic implications include:
+
+### Research Career Paths
+
+**Academic research**:
+- PhD programs in AI alignment
+- Theoretical research with long time horizons
+- Building foundational knowledge
+
+**Deep technical work**:
+- Agent foundations
+- Interpretability theory
+- Formal verification
+- Mathematical approaches
+
+**Interdisciplinary work**:
+- Cognitive science and AI
+- Neuroscience-inspired AI
+- Philosophy of mind and AI
+
+**Advantage**: Can pursue questions requiring 5-10 year research programs
+
+### Field Building
+
+**Education and training**:
+- Develop curricula
+- Write textbooks
+- Train next generation
+
+**Community building**:
+- Organize conferences
+- Build research networks
+- Create institutions
+
+**Public scholarship**:
+- Explain AI alignment to broader audiences
+- Attract talent to the field
+- Build prestige and legitimacy
+
+**Advantage**: Field-building investments pay off over decades
+
+### Careful Empirical Work
+
+**Current systems research**:
+- Thorough investigation of limitations
+- Understanding what transfers to future systems
+- Building tools and methodologies
+
+**Comprehensive testing**:
+- Long-term studies
+- Edge case exploration
+- Robustness analysis
+
+**Advantage**: Can be thorough rather than rushed
+
+### Strategic Positioning
+
+**Flexibility**:
+- Build skills that remain valuable across scenarios
+- Create options for different timeline outcomes
+- Hedge uncertainty
+
+**Sustainable pace**:
+- Marathon, not sprint
+- Avoid burnout from false urgency
+- Build career that lasts decades
+
+**Leverage points**:
+- Focus on work with long-term impact
+- Build infrastructure others can use
+- Create knowledge that persists
+
+## Internal Diversity
+
+The long-timelines worldview includes significant variation:
+
+### Timeline Estimates
+
+**Medium** (20-30 years): More cautious, still somewhat urgent
+
+**Long** (30-50 years): Standard long-timelines position
+
+**Very long** (50+ years): Highly skeptical of current approaches
+
+### Risk Assessment
+
+**Moderate risk, long timelines**: Still concerned but have time
+
+**Low risk, long timelines**: Technical problem is tractable with time
+
+**High risk, long timelines**: Hard problem, fortunately have time
+
+### Research Focus
+
+**Pure theory**: Agent foundations, decision theory
+
+**Applied theory**: Interpretability, verification
+
+**Empirical**: Understanding current systems
+
+**Hybrid**: Combination of approaches
+
+### Attitude Toward Current Work
+
+**Skeptical**: Current LLM work likely irrelevant to AGI
+
+**Uncertain**: Might be relevant, worth studying
+
+**Engaged**: Working on current systems while believing AGI is far
+
+## Relationship to Other Worldviews
+
+### vs. Doomer
+
+**Disagreements**:
+- Fundamental disagreement on timelines
+- Different urgency levels
+- Different research priorities
+
+**Agreements**:
+- Alignment is hard
+- Current techniques may not scale
+- Take risk seriously
+
+### vs. Optimistic
+
+**Disagreements**:
+- Long-timelines folks more worried about alignment difficulty
+- Don't trust market to provide safety
+- More skeptical of current approaches
+
+**Agreements**:
+- Have time for solutions
+- Catastrophe is not inevitable
+- Research can make progress
+
+### vs. Governance-Focused
+
+**Disagreements**:
+- Less urgency about policy
+- More focus on technical foundations
+- Different time horizons
+
+**Agreements**:
+- Multiple approaches needed
+- Coordination is valuable
+- Institutions matter
+
+## Practical Considerations
+
+### Career Planning
+
+**Skill development**: Can pursue deep expertise
+
+**Network building**: Relationships develop over years
+
+**Institution building**: Create enduring organizations
+
+**Work-life balance**: Sustainable pace over decades
+
+### Research Strategy
+
+**Patient capital**: Pursue high-risk, long-horizon research
+
+**Foundational work**: Build knowledge infrastructure
+
+**Replication and verification**: Be thorough
+
+**Documentation**: Create resources for future researchers
+
+### Community Norms
+
+**Thorough review**: Take time for peer review
+
+**Replication**: Verify important results
+
+**Education**: Train people properly
+
+**Standards**: Build quality norms
+
+## Representative Quotes
+
+> "Every decade, people think AGI is 20 years away. It's been this way for 60 years. Maybe we should update on that." - Rodney Brooks
+
+> "Current AI is like a high school student who crammed for the test - impressive performance on specific tasks, but lacking deep understanding." - Gary Marcus
+
+> "The gap between narrow AI and general intelligence is not about scale - it's about fundamental architecture and learning mechanisms we don't yet understand." - Melanie Mitchell
+
+> "I'd rather solve alignment properly over 20 years than rush to a solution in 5 years that fails catastrophically." - Long-timelines researcher
+
+> "The best research takes time. If we have that time, we should use it wisely rather than pretending we don't." - Academic alignment researcher
+
+## Common Misconceptions
+
+**"Long-timelines people aren't worried about AI risk"**: False - they take it seriously but believe we have time
+
+**"It's just procrastination"**: No - it's a belief about technology development pace
+
+**"They're not working on alignment"**: Many do foundational alignment work
+
+**"They think alignment is easy"**: No - they think it's hard but we have time to solve it
+
+**"They're out of touch with recent progress"**: Many are deep in the technical details
+
+## Strategic Implications
+
+### If Long Timelines Are Correct
+
+**Good news**:
+- Time for careful research
+- Can build robust solutions
+- Opportunity for coordination
+- Field can mature properly
+
+**Challenges**:
+- Maintaining focus over decades
+- Avoiding complacency
+- Sustaining funding and interest
+- Adapting as technology evolves
+
+### If Wrong (Timelines Are Short)
+
+**Risks**:
+- Missing critical window
+- Foundational work not finished
+- Solutions not ready
+- Institutions not built
+
+**Mitigations**:
+- Maintain some urgency even with long-timelines belief
+- Monitor leading indicators
+- Be prepared to shift priorities
+- Hedge with faster-payoff work
+
+## Recommended Reading
+
+### Arguments for Longer Timelines
+
+- <R id="b7a1a4546bc127ae">AI Impacts: Likelihood of Discontinuous Progress</R>
+- <R id="00614287a7266a33">Gary Marcus: Deep Learning Alone Won't Get Us to AGI</R>
+- <R id="18b8993fb1bc6f99">Melanie Mitchell: Why AI Is Harder Than We Think</R>
+- [Rodney Brooks' Predictions Scorecard (2025)](https://rodneybrooks.com/predictions-scorecard-2025-january-01/) - Tracking failed AI predictions since 2017
+- [Gary Marcus: Taming Silicon Valley (MIT Press, 2024)](https://mitpress.mit.edu/9780262048835/taming-silicon-valley/) - Comprehensive critique of AI hype
+
+### Timeline Forecasts and Analysis
+
+- [80,000 Hours: Shrinking AGI Timelines (2025)](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) - Comprehensive expert forecast review
+- [Epoch AI: Literature Review of Transformative AI Timelines](https://epoch.ai/blog/literature-review-of-transformative-artificial-intelligence-timelines) - Model-based timeline analysis
+- [Metaculus AGI Forecasts](https://www.metaculus.com/questions/3479/date-weakly-general-ai-is-publicly-known/) - Aggregated prediction market
+- [Stanford HAI: 2025 AI Index Report](https://hai.stanford.edu/ai-index/2025-ai-index-report) - Comprehensive AI progress metrics
+
+### Technical Limitations
+
+- <R id="e9af36b12ddcc94c">On the Measure of Intelligence</R> - François Chollet
+- <R id="de2f3e11b7093ba6">Shortcut Learning in Deep Neural Networks</R>
+- <R id="099b1261e607bc66">Underspecification in Machine Learning</R>
+- [Deep Learning: A Critical Appraisal (Marcus, 2018)](https://arxiv.org/abs/1801.00631) - Foundational critique identifying 10 limitations
+- [AI's Challenge of Understanding the World (Mitchell, 2024)](https://www.science.org/doi/10.1126/science.adm8175) - Latest research on abstraction gaps
+
+### Scaling Laws and Diminishing Returns
+
+- [Can AI Scaling Continue Through 2030? (Epoch AI)](https://epoch.ai/blog/can-ai-scaling-continue-through-2030) - Analysis of scaling constraints
+- [TechCrunch: AI Scaling Laws Showing Diminishing Returns (2024)](https://techcrunch.com/2024/11/20/ai-scaling-laws-are-showing-diminishing-returns-forcing-ai-labs-to-change-course/) - Industry reporting on scaling limits
+
+### Cognitive Science Perspectives
+
+- <R id="89bacb66a99d0325">Building Machines That Learn and Think Like People</R>
+- [Melanie Mitchell: Abstraction and Analogy in AI](https://arxiv.org/abs/2102.10717) - ArXiv paper on fundamental gaps
+
+### Foundational Research
+
+- <R id="ee872736d7fbfcd5">Agent Foundations for Aligning Machine Intelligence</R>
+- <R id="bbc4bc9c2577c2d0">Embedded Agency</R>
+- [Future of Life Institute: 2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) - Funding and progress tracking
+
+### Field Building
+
+- <R id="f79d3614ff16a985">A Guide to Writing High-Quality LessWrong Posts</R>
+- [LessWrong: AI Futures Timelines Model (Dec 2025)](https://www.lesswrong.com/posts/YABG5JmztGGPwNFq2/ai-futures-timelines-and-takeoff-model-dec-2025-update) - Comprehensive timeline modeling
+
+<Tags tags={['worldview', 'long-timelines', 'foundational-research', 'agent-foundations']} />

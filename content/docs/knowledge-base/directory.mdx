@@ -1,0 +1,16 @@
+---
+title: Concepts Directory
+description: Browse all knowledge base pages organized by category, sorted by inbound links
+sidebar:
+  label: Directory
+  order: 1
+tableOfContents: false
+pageType: stub
+clusters: []
+---
+
+import { ConceptsDirectory } from '@components/wiki';
+
+All knowledge base pages organized by category, sorted by number of inbound links. Numbers in parentheses show how many other pages link to that page.
+
+<ConceptsDirectory client:load initialItemsPerSection={30} sortBy="backlinks" showDescription={true} />

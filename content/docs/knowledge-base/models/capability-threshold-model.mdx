@@ -1,0 +1,389 @@
+---
+title: Capability Threshold Model
+description: Systematic framework mapping AI capabilities across 5 dimensions (domain knowledge, reasoning depth, planning horizon, strategic modeling, autonomous execution) to specific risk thresholds, providing concrete capability requirements for risks like bioweapons development (threshold crossing 2026-2029) and structured frameworks for risk forecasting.
+sidebar:
+  order: 16
+quality: 72
+lastEdited: "2025-12-28"
+ratings:
+  focus: 9
+  novelty: 6.5
+  rigor: 7.5
+  completeness: 8.5
+  concreteness: 8.5
+  actionability: 7
+importance: 82.5
+llmSummary: Comprehensive framework mapping AI capabilities across 5 dimensions to specific risk thresholds, finding authentication collapse/mass persuasion risks at 70-85% likelihood by 2027, bioweapons development at 40% by 2029, with critical thresholds estimated when models achieve 50% on complex reasoning benchmarks and cross expert-level domain knowledge. Provides concrete capability requirements, timeline projections, and early warning indicators across 7 major risk categories with extensive benchmark tracking.
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Conceptual Framework' section
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+  - Complete 'Strategic Importance' section
+  - Complete 'Limitations' section (6 placeholders)
+metrics:
+  wordCount: 1225
+  citations: 78
+  tables: 50
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+  - cyber
+  - biorisks
+subcategory: framework-models
+---
+import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
+
+<DataExternalLinks pageId="capability-threshold-model" client:load />
+
+<DataInfoBox entityId="capability-threshold-model" ratings={frontmatter.ratings} />
+
+## Overview
+
+Different AI risks require different capability levels to become dangerous. A system that can write convincing phishing emails poses different risks than one that can autonomously discover zero-day vulnerabilities. This model maps specific capability requirements to specific risks, helping predict when risks activate as capabilities improve.
+
+The capability threshold model provides a structured framework for understanding how AI systems transition from relatively benign to potentially dangerous across multiple risk domains. Rather than treating AI capability as a single dimension or risks as uniformly dependent on general intelligence, this model recognizes that specific risks emerge when systems cross particular capability thresholds in relevant dimensions. According to the <R id="6acf3be7a03c2328">International AI Safety Report (October 2025)</R>, governance choices in 2025-2026 must internalize that capability scaling has decoupled from parameter count, meaning risk thresholds can be crossed between annual cycles.
+
+Key findings include 15-25% benchmark performance indicating early risk emergence, 50% marking qualitative shifts to complex autonomous execution, and most critical thresholds estimated to cross between 2025-2029 across misuse, control, and structural risk categories. The <R id="df46edd6fa2078d1"><EntityLink id="fli">Future of Life Institute</EntityLink>'s 2025 AI Safety Index</R> reveals an industry struggling to keep pace with its own rapid capability advances, with companies claiming AGI achievement within the decade yet none scoring above D in existential safety planning.
+
+## Risk Impact Assessment
+
+| Risk Category | Severity | Likelihood (2025-2027) | Threshold Crossing Timeline | Trend |
+|---------------|----------|------------------------|---------------------------|-------|
+| <EntityLink id="authentication-collapse">Authentication Collapse</EntityLink> | Critical | 85% | 2025-2027 | ↗ Accelerating |
+| Mass Persuasion | High | 70% | 2025-2026 | ↗ Accelerating |
+| Cyberweapon Development | High | 65% | 2025-2027 | ↗ Steady |
+| <EntityLink id="bioweapons">Bioweapons</EntityLink> Development | Critical | 40% | 2026-2029 | → Uncertain |
+| <EntityLink id="situational-awareness">Situational Awareness</EntityLink> | Critical | 60% | 2025-2027 | ↗ Accelerating |
+| Economic Displacement | High | 80% | 2026-2030 | ↗ Steady |
+| Strategic Deception | Extreme | 15% | 2027-2035+ | → Uncertain |
+
+## Capability Dimensions Framework
+
+AI capabilities decompose into five distinct dimensions that progress at different rates. Understanding these separately is crucial because different risks require different combinations. According to <R id="b029bfc231e620cc"><EntityLink id="epoch-ai">Epoch AI</EntityLink>'s tracking</R>, the training compute of frontier AI models has grown by 5x per year since 2020, and the Epoch Capabilities Index shows frontier model improvement nearly doubled in 2024, from ~8 points/year to ~15 points/year.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph DIMS["Capability Dimensions"]
+        DK[Domain Knowledge] --> RISK
+        RD[Reasoning Depth] --> RISK
+        PH[Planning Horizon] --> RISK
+        SM[Strategic Modeling] --> RISK
+        AE[Autonomous Execution] --> RISK
+    end
+
+    subgraph RISK["Risk Activation Thresholds"]
+        AUTH[Authentication Collapse<br/>Threshold: 2025-2027]
+        BIO[Bioweapons Uplift<br/>Threshold: 2026-2029]
+        CYBER[Cyberweapons<br/>Threshold: 2025-2027]
+        SCHEME[Strategic Deception<br/>Threshold: 2027-2035+]
+    end
+
+    RISK --> AUTH
+    RISK --> BIO
+    RISK --> CYBER
+    RISK --> SCHEME
+
+    style AUTH fill:#ffcccc
+    style BIO fill:#ffcccc
+    style CYBER fill:#ffddcc
+    style SCHEME fill:#ffe6cc
+`} />
+
+| Dimension | Level 1 | Level 2 | Level 3 | Level 4 | Current Frontier | Gap to Level 3 |
+|-----------|---------|---------|---------|---------|------------------|----------------|
+| **Domain Knowledge** | Undergraduate | Graduate | Expert | Superhuman | Expert- (some domains) | 0.5 levels |
+| **Reasoning Depth** | Simple (2-3 steps) | Moderate (5-10) | Complex (20+) | Superhuman | Moderate+ | 0.5-1 level |
+| **Planning Horizon** | Immediate | Short-term (hrs) | Medium (wks) | Long-term (months) | Short-term+ | 1 level |
+| **Strategic Modeling** | None | Basic | Sophisticated | Superhuman | Basic+ | 1-1.5 levels |
+| **Autonomous Execution** | None | Simple tasks | Complex tasks | Full autonomy | Simple-Complex | 0.5-1 level |
+
+### Domain Knowledge Benchmarks
+
+Current measurement approaches show significant gaps in assessing practical domain expertise:
+
+| Domain | Best Benchmark | Current Frontier Score | Expert Human Level | Assessment Quality |
+|--------|----------------|----------------------|-------------------|-------------------|
+| Biology | <R id="0635974beafcf9c5">MMLU-Biology</R> | 85-90% | ≈95% | Medium |
+| Chemistry | <R id="07f6e283ae954643">ChemBench</R> | 70-80% | ≈90% | Low |
+| Computer Security | <R id="f947a6c44d755d2f">SecBench</R> | 65-75% | ≈85% | Low |
+| Psychology | MMLU-Psychology | 80-85% | ≈90% | Very Low |
+| Medicine | <R id="db13f518d99c0810">MedQA</R> | 85-90% | ≈95% | Medium |
+
+*Assessment quality reflects how well benchmarks capture practical expertise versus academic knowledge.*
+
+### Reasoning Depth Progression
+
+The <R id="f369a16dd38155b8">ARC Prize 2024-2025 results</R> demonstrate the critical threshold zone for complex reasoning. On ARC-AGI-1, OpenAI's o3-preview achieved 75.7% accuracy (near human level of 98%), while on the harder ARC-AGI-2 benchmark, even advanced models score only single-digit percentages, yet humans can solve every task.
+
+| Reasoning Level | Benchmark Examples | Current Performance | Risk Relevance |
+|----------------|-------------------|-------------------|----------------|
+| Simple (2-3 steps) | Basic math word problems | 95%+ | Low-risk applications |
+| Moderate (5-10 steps) | <R id="edaaae1b94942ea9">GSM8K</R>, multi-hop QA | 85-95% | Most current capabilities |
+| Complex (20+ steps) | <R id="e9af36b12ddcc94c">ARC-AGI</R>, extended proofs | 30-75% (ARC-AGI-1), 5-55% (ARC-AGI-2) | **Critical threshold zone** |
+| Superhuman | Novel mathematical proofs | \&lt;10% | Advanced risks |
+
+**Recent breakthrough (December 2025):** <R id="f369a16dd38155b8">Poetiq with GPT-5.2 X-High</R> achieved 75% on ARC-AGI-2, surpassing the average human test-taker score of 60% for the first time, demonstrating rapid progress on complex reasoning tasks.
+
+## Risk-Capability Mapping
+
+### Near-Term Risks (2025-2027)
+
+#### Authentication Collapse
+
+The volume of deepfakes has grown explosively: <R id="270a29b59196c942">Deloitte's 2024 analysis</R> estimates growth from roughly 500,000 online deepfakes in 2023 to about 8 million in 2025, with annual growth nearing 900%. Voice cloning has crossed what experts call the "indistinguishable threshold"--a few seconds of audio now suffice to generate a convincing clone.
+
+| Capability | Required Level | Current Level | Gap | Evidence |
+|-----------|----------------|---------------|-----|----------|
+| Domain Knowledge (Media) | Expert | Expert- | 0.5 level | <R id="3182b02b8073e217">Sora quality</R> approaching photorealism |
+| Reasoning Depth | Moderate | Moderate | 0 levels | Current models handle multi-step generation |
+| Strategic Modeling | Basic+ | Basic | 0.5 level | Limited theory of mind in current systems |
+| Autonomous Execution | Simple | Simple | 0 levels | Already achieved for content generation |
+
+**Key Threshold Capabilities:**
+- Generate synthetic content indistinguishable from authentic across all modalities
+- Real-time interactive video generation (<R id="ff0d3b0d87f3e276">NVIDIA Omniverse</R>)
+- Defeat detection systems designed to identify AI content
+- Mimic individual styles from minimal samples
+
+**Detection Challenges:** <R id="7cee14cf2f24d687">OpenAI's deepfake detection tool</R> identifies DALL-E 3 images with 98.8% accuracy but only flags 5-10% of images from other AI tools. Multi-modal attacks combining deepfaked video, synthetic voices, and fabricated documents are increasing.
+
+**Current Status:** <R id="3182b02b8073e217">OpenAI's Sora</R> and <R id="8e92648dccb54c91">Meta's Make-A-Video</R> demonstrate near-threshold video generation. <R id="5a71dcde353b55d6">ElevenLabs</R> achieves voice cloning from \&lt;30 seconds of audio.
+
+#### Mass Persuasion Capabilities
+
+| Capability | Required Level | Current Level | Gap | Evidence |
+|-----------|----------------|---------------|-----|----------|
+| Domain Knowledge (Psychology) | Graduate+ | Graduate | 0.5 level | Strong performance on psychology benchmarks |
+| Strategic Modeling | Sophisticated | Basic+ | 1 level | Limited multi-agent reasoning |
+| Planning Horizon | Medium-term | Short-term | 1 level | Cannot maintain campaigns over weeks |
+| Autonomous Execution | Simple | Simple | 0 levels | Can generate content at scale |
+
+**Research Evidence:**
+- <R id="81908b7f23602e1c">Anthropic (2024)</R> shows Claude 3 achieves 84% on psychology benchmarks
+- <R id="9fc081c471fb3bb0">Stanford HAI study</R> finds AI-generated content 82% higher believability
+- <R id="9e3c9400f4428304">MIT persuasion study</R> demonstrates automated A/B testing improves persuasion by 35%
+
+### Medium-Term Risks (2026-2029)
+
+#### Bioweapons Development
+
+| Capability | Required Level | Current Level | Gap | Assessment Source |
+|-----------|----------------|---------------|-----|------------------|
+| Domain Knowledge (Biology) | Expert | Graduate+ | 1 level | <R id="0fe4cfa7ca5f2270">RAND biosecurity assessment</R> |
+| Domain Knowledge (Chemistry) | Expert | Graduate | 1-2 levels | Limited synthesis knowledge |
+| Reasoning Depth | Complex | Moderate+ | 1 level | Cannot handle 20+ step procedures |
+| Planning Horizon | Medium-term | Short-term | 1 level | No multi-week experimental planning |
+| Autonomous Execution | Complex | Simple+ | 1 level | Cannot troubleshoot failed experiments |
+
+**Critical Bottlenecks:**
+- Specialized synthesis knowledge for dangerous compounds
+- Autonomous troubleshooting of complex laboratory procedures
+- Multi-week experimental planning and adaptation
+- Integration of theoretical knowledge with practical constraints
+
+**Expert Assessment:** <R id="0fe4cfa7ca5f2270">RAND Corporation (2024)</R> estimates 60% probability of crossing threshold by 2028.
+
+#### Economic Displacement Thresholds
+
+<R id="417f66880659ef93">McKinsey's research</R> indicates that current technologies could automate about 57% of U.S. work hours in theory. By 2030, approximately 27% of current work hours in Europe and 30% in the United States could be automated. Workers in lower-wage jobs are up to 14 times more likely to need to change occupations than those in highest-wage positions.
+
+| Job Category | Automation Threshold | Current AI Capability | Estimated Timeline | Source |
+|-------------|---------------------|---------------------|-------------------|---------|
+| Content Writing | 70% task automation | 85% | **Crossed 2024** | <R id="66b16a95bae9dc49">McKinsey AI Index</R> |
+| Code Generation | 60% task automation | 60-70% (SWE-bench Verified) | **Crossed 2025** | <R id="433a37bad4e66a78">SWE-bench leaderboard</R> |
+| Data Analysis | 75% task automation | 55% | 2026-2027 | Industry surveys |
+| Customer Service | 80% task automation | 70% | 2025-2026 | <R id="b754cf0b7655c452">Salesforce AI reports</R> |
+| Legal Research | 65% task automation | 40% | 2027-2028 | Legal industry analysis |
+
+**Coding Benchmark Update:** The <R id="6acf3be7a03c2328">International AI Safety Report (October 2025)</R> notes that coding capabilities have advanced particularly quickly. Top models now solve over 60% of problems in SWE-bench Verified, up from 40% in late 2024 and almost 0% at the beginning of 2024. However, <R id="a23789853c1c33f2">Scale AI's SWE-Bench Pro</R> shows a significant performance drop: even the best models (GPT-5, Claude Opus 4.1) score only 23% on harder, more realistic tasks.
+
+### Long-Term Control Risks (2027-2035+)
+
+#### Strategic Deception (Scheming)
+
+| Capability | Required Level | Current Level | Gap | Uncertainty |
+|-----------|----------------|---------------|-----|-------------|
+| Strategic Modeling | Superhuman | Basic+ | 2+ levels | Very High |
+| Reasoning Depth | Complex | Moderate+ | 1 level | High |
+| Planning Horizon | Long-term | Short-term | 2 levels | Very High |
+| Situational Awareness | Expert | Basic | 2 levels | High |
+
+**Key Uncertainties:**
+- Whether sophisticated strategic modeling can emerge from current training approaches
+- Detectability of strategic deception capabilities during evaluation
+- Minimum capability level required for effective scheming
+
+**Research Evidence:**
+- <R id="683aef834ac1612a">Anthropic Constitutional AI</R> shows limited success in detecting deceptive behavior
+- <R id="42e7247cbc33fc4c">Redwood Research</R> adversarial training reveals capabilities often hidden during evaluation
+
+## Current State & Trajectory
+
+### Capability Progress Rates
+
+According to <R id="7d0515f6079d8beb">Epoch AI's analysis</R>, training compute for frontier models grows 4-5x yearly. Their Epoch Capabilities Index shows frontier model improvement nearly doubled in 2024. <R id="89b92e6423256fc4">METR's research</R> shows AI performance on task length has been consistently exponentially increasing over the past 6 years, with a doubling time of around 7 months.
+
+| Dimension | 2023-2024 Progress | Projected 2024-2025 | Key Drivers |
+|-----------|-------------------|---------------------|-------------|
+| Domain Knowledge | +0.5 levels | +0.3-0.7 levels | Larger training datasets, specialized fine-tuning |
+| Reasoning Depth | +0.3 levels | +0.2-0.5 levels | Chain-of-thought improvements, tree search |
+| Planning Horizon | +0.2 levels | +0.2-0.4 levels | Tool integration, memory systems |
+| Strategic Modeling | +0.1 levels | +0.1-0.3 levels | Multi-agent training, RL improvements |
+| Autonomous Execution | +0.4 levels | +0.3-0.6 levels | Tool use, real-world deployment |
+
+**Data Sources:** <R id="120adc539e2fa558">Epoch AI capability tracking</R>, industry benchmark results, expert elicitation.
+
+### Compute Scaling Projections
+
+| Metric | Current (2025) | Projected 2027 | Projected 2030 | Source |
+|--------|---------------|----------------|----------------|--------|
+| Models above 10^26 FLOP | ≈5-10 | ≈30 | ≈200+ | <R id="080da6a9f43ad376">Epoch AI model counts</R> |
+| Largest training run power | 1-2 GW | 2-4 GW | 4-16 GW | <R id="95b25b23b19320df">Epoch AI power analysis</R> |
+| Frontier model training cost | \$100M-500M | \$100M-1B+ | \$1-5B | Epoch AI cost projections |
+| Open-weight capability lag | 6-12 months | 6-12 months | 6-12 months | <R id="562abe1030193354">Epoch AI consumer GPU analysis</R> |
+
+### Leading Organizations
+
+| Organization | Strongest Capabilities | Estimated Timeline to Next Threshold | Focus Area |
+|-------------|----------------------|-------------------------------------|------------|
+| <R id="04d39e8bd5d50dd5">OpenAI</R> | Domain knowledge, autonomous execution | 12-18 months | General capabilities |
+| <R id="afe2508ac4caf5ee">Anthropic</R> | Reasoning depth, strategic modeling | 18-24 months | Safety-focused development |
+| <R id="0ef9b0fe0f3c92b4">DeepMind</R> | Strategic modeling, planning | 18-30 months | Scientific applications |
+| <R id="278254c1e0630e9d">Meta</R> | Multimodal generation | 6-12 months | Social/media applications |
+
+## Key Uncertainties & Research Cruxes
+
+### Measurement Validity
+
+The <R id="d1774c2286e7c730">Berkeley CLTC Working Paper on Intolerable Risk Thresholds</R> notes that models effectively more capable than the latest tested model (4x or more in Effective Compute or 6 months worth of fine-tuning) require comprehensive assessment including threat model mapping, empirical capability tests, elicitation testing without safety mechanisms, and likelihood forecasting.
+
+An <R id="c5a21da9e0c0cdeb">interdisciplinary review of AI evaluation</R> highlights the "benchmark lottery" problem: researchers at Google's Brain Team found that many factors other than fundamental algorithmic superiority may lead to a method being perceived as superior. Ironically, a majority of influential benchmarks have been released without rigorous peer review.
+
+| Uncertainty | Impact if True | Impact if False | Current Evidence |
+|------------|---------------|-----------------|------------------|
+| Current benchmarks accurately measure risk-relevant capabilities | Can trust threshold predictions | Need fundamentally new evaluations | Mixed - good for some domains, poor for others |
+| Practical capabilities match benchmark performance | Smooth transition from lab to deployment | Significant capability overhangs | Substantial gaps observed in real-world deployment |
+| Capability improvements follow predictable scaling laws | Reliable timeline forecasting possible | Threshold crossings may surprise | Scaling laws hold for some capabilities, not others |
+
+### Threshold Sharpness
+
+**Sharp Threshold Evidence:**
+- <R id="6125e188a886af2d">Authentication systems</R>: Detection accuracy drops from 95% to 15% once generation quality crosses threshold
+- Economic viability: <R id="66b16a95bae9dc49">McKinsey automation analysis</R> shows 10-20% capability improvements create 50-80% cost advantage in many tasks
+- Security vulnerabilities: Most exploits require complete capability to work at all
+
+**Gradual Scaling Evidence:**
+- Job displacement: Different tasks within roles automate at different rates
+- Persuasion effectiveness: Incremental improvements in messaging quality yield incremental persuasion gains
+- Domain expertise: Knowledge accumulation appears continuous rather than threshold-based
+
+### Strategic Deception Detection
+
+Critical unsolved problems in capability assessment:
+
+| Challenge | Current Approach | Limitation | Research Need |
+|-----------|-----------------|------------|---------------|
+| Detecting hidden capabilities | Red-teaming, adversarial prompts | Systems may hide abilities during evaluation | Novel evaluation paradigms |
+| Measuring situational awareness | Direct questioning, inference tests | Pattern matching vs. genuine understanding | Causal intervention studies |
+| Long-term planning assessment | Multi-step benchmarks | Maximum tested horizon ~hours | Extended evaluation infrastructure |
+| Strategic modeling depth | Theory of mind tasks | Unclear if results generalize | Ecological validity research |
+
+## Timeline Projections & Warning Indicators
+
+### 2025 Critical Thresholds
+
+**High Probability (70%+):**
+- **Authentication Collapse:** Real-time deepfakes become commercially viable
+- **Content Generation Saturation:** Human-level quality across all text/image modalities
+
+**Medium Probability (40-70%):**
+- **Code Automation:** 50%+ of software engineering tasks automated
+- **Basic Situational Awareness:** Systems understand evaluation vs. deployment contexts
+
+### 2026-2027 Medium Probability Events
+
+| Risk | Probability | Key Indicators to Monitor |
+|------|-------------|-------------------------|
+| Advanced Cyberweapons | 65% | <R id="45370a5153534152">METR evaluations</R> crossing 40% threshold |
+| Economic Disruption | 80% | <R id="561b4078010f62e3">GitHub Copilot</R> achieving >60% task completion |
+| Bioweapons Uplift | 40% | Expert biology benchmarks >90%, synthesis knowledge tests |
+| Oversight Evasion | 60% | Detection of training/deployment context awareness |
+
+### Early Warning System
+
+**Red Flag Indicators:**
+- Sudden benchmark improvements >20 percentage points
+- Systems developing capabilities not explicitly trained for
+- Gap between capability and safety evaluation results widening
+- Evidence of strategic behavior during evaluation
+
+**Monitoring Infrastructure:**
+- <R id="45370a5153534152">METR</R> dangerous capability evaluations
+- <R id="86df45a5f8a9bf6d">MIRI</R> alignment evaluation protocols
+- Industry responsible scaling policies (<R id="90a03954db3c77d5">OpenAI Preparedness</R>, <R id="394ea6d17701b621">Anthropic RSP</R>)
+- Academic capability forecasting (<R id="120adc539e2fa558">Epoch AI</R>)
+
+The <R id="c8782940b880d00f">METR Common Elements Report (December 2025)</R> describes how each major AI developer's policy uses capability thresholds for biological weapons development, cyberattacks, autonomous replication, and automated AI R&D, with commitments to conduct model evaluations assessing whether models are approaching thresholds that could enable severe harm.
+
+### Expert Survey Findings
+
+An <R id="169aa2527260ab17">OECD-affiliated survey on AI thresholds</R> found that experts agreed if training compute thresholds are exceeded, AI companies should:
+- Conduct additional risk assessments (e.g., via model evaluations)
+- Notify an independent public body (e.g., EU AI Office, FTC, or AI Safety Institute)
+- Notify the government
+
+Participants noted that risk assessment frameworks from safety-critical industries (nuclear, maritime, aviation, healthcare, finance, space) provide valuable precedent for AI governance.
+
+## Sources & Resources
+
+### Primary Research
+
+| Source | Type | Key Findings | Relevance |
+|--------|------|-------------|-----------|
+| <R id="394ea6d17701b621">Anthropic Responsible Scaling Policy</R> | Industry Policy | Defines capability thresholds for safety measures | Framework implementation |
+| <R id="90a03954db3c77d5">OpenAI Preparedness Framework</R> | Industry Policy | Risk assessment methodology | Threshold identification |
+| <R id="45370a5153534152">METR Dangerous Capability Evaluations</R> | Research | Systematic capability testing | Current capability baselines |
+| <R id="120adc539e2fa558">Epoch AI Capability Forecasts</R> | Research | Timeline predictions for AI milestones | Forecasting methodology |
+
+### Government & Policy
+
+| Organization | Resource | Focus |
+|-------------|----------|-------|
+| <R id="54dbc15413425997">NIST AI Risk Management Framework</R> | US Government | Risk assessment standards |
+| <R id="817964dfbb0e3b1b">UK AISI Research</R> | UK Government | Model evaluation protocols |
+| <R id="1102501c88207df3">EU AI Office</R> | EU Government | Regulatory frameworks |
+| <R id="cf5fd74e8db11565">RAND Corporation AI Studies</R> | Think Tank | National security implications |
+
+### Technical Benchmarks & Evaluation
+
+| Benchmark | Domain | Current Frontier Score (Dec 2025) | Threshold Relevance |
+|-----------|--------|----------------------|-------------------|
+| <R id="0635974beafcf9c5">MMLU</R> | General Knowledge | 85-90% | Domain expertise baseline |
+| <R id="e9af36b12ddcc94c">ARC-AGI-1</R> | Abstract Reasoning | 75-87% (o3-preview) | Complex reasoning threshold |
+| <R id="28167998c7d9c6b2">ARC-AGI-2</R> | Abstract Reasoning | 54-75% (GPT-5.2) | Next-gen reasoning threshold |
+| <R id="433a37bad4e66a78">SWE-bench Verified</R> | Software Engineering | 60-70% | Autonomous code execution |
+| <R id="a23789853c1c33f2">SWE-bench Pro</R> | Real-world Coding | 17-23% | Generalization to novel code |
+| <R id="985b203c41c31efe">MATH</R> | Mathematical Reasoning | 60-80% | Multi-step reasoning |
+
+### Risk Assessment Research
+
+| Research Area | Key Papers | Organizations |
+|---------------|------------|---------------|
+| Bioweapons Risk | <R id="0fe4cfa7ca5f2270">RAND Biosecurity Assessment</R> | RAND, Johns Hopkins CNAS |
+| Economic Displacement | <R id="66b16a95bae9dc49">McKinsey AI Impact</R> | McKinsey, Brookings Institution |
+| Authentication Collapse | <R id="6125e188a886af2d">Deepfake Detection Challenges</R> | UC Berkeley, MIT |
+| Strategic Deception | <R id="683aef834ac1612a">Constitutional AI Research</R> | Anthropic, Redwood Research |
+
+### Additional Sources
+
+| Source | Type | Key Finding |
+|--------|------|-------------|
+| <R id="6acf3be7a03c2328">International AI Safety Report (Oct 2025)</R> | Government | Risk thresholds can be crossed between annual cycles due to post-training/inference advances |
+| <R id="df46edd6fa2078d1">Future of Life Institute AI Safety Index 2025</R> | NGO | Industry fundamentally unprepared; Anthropic leads (C+) but none score above D in existential safety |
+| <R id="d1774c2286e7c730">Berkeley CLTC Intolerable Risk Thresholds</R> | Academic | Models 4x+ more capable require comprehensive risk assessment |
+| <R id="c8782940b880d00f">METR Common Elements Report (Dec 2025)</R> | Research | All major labs use capability thresholds for bio, cyber, replication, AI R&D |
+| <R id="f369a16dd38155b8">ARC Prize 2025 Results</R> | Academic | First AI system (Poetiq/GPT-5.2) exceeds human average on ARC-AGI-2 reasoning |
+| <R id="b029bfc231e620cc">Epoch AI Compute Trends</R> | Research | Training compute grows 4-5x yearly; capability improvement doubled in 2024 |
+
+<Backlinks client:load entityId="capability-threshold-model" />

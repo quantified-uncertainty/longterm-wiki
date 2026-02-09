@@ -1,0 +1,310 @@
+---
+title: Adversarial Training
+description: Adversarial training improves AI robustness by training models on examples designed to cause failures, including jailbreaks and prompt injections. While universally adopted and effective against known attacks, it creates an arms race dynamic and provides no protection against model deception or novel attacks.
+sidebar:
+  order: 8
+quality: 58
+importance: 62.5
+lastEdited: "2025-01-28"
+llmSummary: Adversarial training, universally adopted at frontier labs with $10-150M/year investment, improves robustness to known attacks but creates an arms race dynamic and provides no protection against model deception or novel attack categories. While necessary for operational security, it only defends external attacks rather than addressing fundamental alignment challenges.
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 4
+  rigor: 5
+  actionability: 5
+  completeness: 6
+metrics:
+  wordCount: 650
+  citations: 8
+  tables: 40
+  diagrams: 1
+clusters:
+  - ai-safety
+subcategory: alignment-training
+---
+import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="adversarial-training" client:load />
+
+## Quick Assessment
+
+| Dimension | Rating | Notes |
+|-----------|--------|-------|
+| Tractability | High | Well-established techniques from [Madry et al. (2018)](https://arxiv.org/abs/1706.06083); standard practice at labs |
+| Scalability | Medium | Scales with model training but requires continuous attack discovery |
+| Current Maturity | High | Universally adopted at all frontier labs; \$10-150M/year investment |
+| Time Horizon | Ongoing | Arms race dynamic requires continuous updating |
+| Key Proponents | All frontier labs, [NIST AI Safety](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-2e2025.pdf) | Industry standard for operational security |
+
+## Overview
+
+Adversarial training is a technique for improving AI system robustness by training on examples specifically designed to cause failures. For language models, this primarily means training on jailbreak attempts, prompt injections, and other adversarial inputs so that models learn to handle these attacks appropriately rather than being fooled by them. The approach has become standard practice at all major AI labs as a defense against the most common and embarrassing failure modes.
+
+The technique builds on extensive research in adversarial examples for neural networks, where small perturbations to inputs can cause dramatic misclassifications. [Goodfellow et al. (2015)](https://arxiv.org/abs/1412.6572) introduced the Fast Gradient Sign Method (FGSM) and demonstrated that neural networks' vulnerability to adversarial perturbations stems from their linear nature. [Madry et al. (2018)](https://arxiv.org/abs/1706.06083) established Projected Gradient Descent (PGD) adversarial training as the gold standard for robustness. For LLMs, adversarial training involves collecting examples of successful attacks (often from red teams or discovered in production), generating model responses to these attacks, and training the model to produce safe responses instead. This creates a feedback loop where new attacks are discovered, added to training data, and defended against.
+
+However, adversarial training faces fundamental limitations. First, it creates an arms race: as models become robust to known attacks, attackers develop new ones, requiring continuous investment. Second, it only defends against attacks the system has been trained on - novel attack categories will still succeed. Third and most critically, adversarial training targets external attacks on the model, not internal model problems. It provides no protection against a deceptive or misaligned model, which could easily generate safe-seeming outputs while pursuing different goals.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Discovery["Attack Discovery"]
+        RT[Red Team Testing]
+        PR[Production Monitoring]
+        AU[Automated Attack Generation]
+    end
+
+    subgraph Training["Adversarial Training Loop"]
+        DS[Dataset Creation]
+        FT[Fine-tune on Attack-Response Pairs]
+        EV[Evaluate Against Attack Suite]
+    end
+
+    subgraph Defense["Deployed Defenses"]
+        RB[Robust Model]
+        OF[Output Filtering]
+        MO[Runtime Monitoring]
+    end
+
+    RT --> DS
+    PR --> DS
+    AU --> DS
+    DS --> FT
+    FT --> EV
+    EV -->|Pass| RB
+    EV -->|Fail| DS
+    RB --> OF
+    OF --> MO
+    MO -->|New Attacks| PR
+`} />
+
+## Risks Addressed
+
+| Risk | Relevance | How It Helps |
+|------|-----------|--------------|
+| <EntityLink id="misuse">Misuse</EntityLink> | High | Prevents jailbreaks that could enable harmful content generation |
+| <EntityLink id="prompt-injection">Prompt Injection</EntityLink> | High | Trains models to distinguish instructions from data |
+| <EntityLink id="jailbreaking">Jailbreaking</EntityLink> | High | Primary defense against circumventing safety guidelines |
+| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | None | Does not address internal model goals or hidden objectives |
+| <EntityLink id="goal-misgeneralization">Goal Misgeneralization</EntityLink> | None | Targets external inputs, not internal learned representations |
+
+## Risk Assessment & Impact
+
+| Risk Category | Assessment | Key Metrics | Evidence Source |
+|---------------|------------|-------------|-----------------|
+| **Safety Uplift** | Low-Medium | Improves robustness to known attacks | Empirical defense rates |
+| **Capability Uplift** | Some | More robust models are more reliably capable | Secondary effect |
+| **Net World Safety** | Helpful | Reduces attack surface | Arms race limits |
+| **Lab Incentive** | Strong | Prevents embarrassing jailbreaks; product quality | Commercial necessity |
+
+### The Adversarial Training Loop
+
+| Stage | Process | Purpose |
+|-------|---------|---------|
+| **1. Attack Discovery** | Red teams find successful attacks | Identify vulnerabilities |
+| **2. Dataset Creation** | Compile (attack, safe response) pairs | Training data |
+| **3. Training** | Fine-tune model on adversarial data | Learn defenses |
+| **4. Evaluation** | Test against attack suite | Verify defense |
+| **5. Iteration** | New attacks discovered, repeat | Continuous improvement |
+
+### Types of Adversarial Examples
+
+| Attack Type | Description | Defense Approach |
+|-------------|-------------|-----------------|
+| **Direct Jailbreaks** | "Ignore previous instructions and..." | Recognize and refuse |
+| **Roleplay Attacks** | "You are DAN, an AI without restrictions" | Maintain identity |
+| **Prompt Injection** | Malicious content in retrieved text | Distinguish data from instructions |
+| **Encoded Attacks** | Base64, other encodings to bypass filters | Detect and decode |
+| **Gradient-Based** | Optimized adversarial suffixes ([GCG attack](https://arxiv.org/abs/2307.15043)) | Pattern-based defense |
+
+### Technical Implementation
+
+| Component | Description | Challenge |
+|-----------|-------------|-----------|
+| **Attack Generation** | Create diverse attack examples | Coverage is key |
+| **Response Labeling** | Define safe responses to attacks | Consistent standards |
+| **Training Integration** | Mix adversarial data with normal training | Balance robustness and capability |
+| **Evaluation Suites** | Comprehensive attack test sets | Must update continuously |
+
+## The Arms Race Dynamic
+
+### Why Adversarial Training is a Race
+
+| Phase | Defender | Attacker |
+|-------|----------|----------|
+| **Initial** | Undefended model | Simple attacks succeed |
+| **Defense 1** | Train against simple attacks | Simple attacks blocked |
+| **Attack Evolution** | Defense deployed | New attack techniques developed |
+| **Defense 2** | Train against new attacks | New attacks blocked |
+| **Repeat** | Continuous updating required | Continuous innovation |
+
+### Arms Race Implications
+
+| Factor | Implication | Severity |
+|--------|-------------|----------|
+| **Continuous Cost** | Ongoing investment required | Medium |
+| **Never Complete** | Can never declare victory | Structural |
+| **Novel Attack Vulnerability** | New categories bypass training | High |
+| **Attacker Advantage** | Only needs to find one exploit | Asymmetric |
+
+### What Adversarial Training Defends Against
+
+| Threat | Effectiveness | Notes |
+|--------|---------------|-------|
+| **Known Jailbreaks** | High | Primary target |
+| **Common Patterns** | High | Generalizes within categories |
+| **Prompt Injection** | Medium | Challenging problem |
+| **Novel Attacks** | Low | Not in training data |
+| **Sophisticated Adversaries** | Low | Will find new approaches |
+
+### What It Doesn't Defend Against
+
+| Threat | Why Not | Alternative |
+|--------|---------|-------------|
+| **Model Deception** | Targets external attacks only | Interpretability |
+| **Misalignment** | Not an input attack | Alignment research |
+| **Distribution Shift** | New attack categories | Continuous monitoring |
+| **Capability Overhang** | Hidden model abilities | Capability elicitation |
+
+## Deception Robustness Analysis
+
+### Why Adversarial Training Doesn't Help with Deception
+
+| Factor | Adversarial Training | Deception Challenge |
+|--------|---------------------|---------------------|
+| **Target** | External inputs | Internal model state |
+| **Assumption** | Model tries to be good, inputs try to trick it | Model itself might not be aligned |
+| **Defense Mechanism** | Recognize and refuse bad inputs | Requires understanding model goals |
+| **Scope** | Input-output behavior | Internal reasoning |
+
+A deceptive model faces no challenge from adversarial training - it simply produces outputs that appear compliant while potentially maintaining misaligned internal goals. Adversarial training optimizes the model to handle adversarial inputs, not to have aligned objectives.
+
+## Scalability Analysis
+
+### Current Scalability
+
+| Factor | Status | Trajectory |
+|--------|--------|-----------|
+| **Attack Discovery** | Red teams effective | Automated tools emerging |
+| **Training Integration** | Well-understood | Scales with model training |
+| **Defense Coverage** | Expanding | Never complete |
+| **Cost** | Significant | Growing with attack sophistication |
+
+### Future Scalability Concerns
+
+| Concern | Description | Severity |
+|---------|-------------|----------|
+| **Attack Generation at Scale** | AI can generate novel attacks | High |
+| **Fundamental Limits** | Can't cover all possible attacks | Structural |
+| **SI Attack Surface** | Superhuman attackers find novel exploits | Critical |
+| **Arms Race Acceleration** | Faster iteration, higher costs | Medium |
+
+## Current Adoption & Investment
+
+| Metric | Value | Notes |
+|--------|-------|-------|
+| **Annual Investment** | \$10-150M/year | All labs invest heavily |
+| **Adoption Level** | Universal | Standard practice |
+| **Primary Users** | All frontier labs, security researchers | Broad adoption |
+| **Recommendation** | Maintain | Important but arms race limits value |
+
+### Differential Progress Analysis
+
+| Factor | Assessment |
+|--------|------------|
+| **Safety Benefit** | Medium - reduces attack surface |
+| **Capability Benefit** | Some - improves reliability |
+| **Overall Balance** | Balanced |
+
+## Relationship to Other Approaches
+
+### Complementary Defenses
+
+| Approach | Relationship | Benefit |
+|----------|--------------|---------|
+| **Output Filtering** | Defense in depth | Catch training misses |
+| **<EntityLink id="red-teaming">Red Teaming</EntityLink>** | Attack discovery | Supplies adversarial examples |
+| **Monitoring** | Detection | Catch attacks in production |
+| **Circuit Breakers** | Runtime intervention | Stop detected attacks |
+
+### Key Distinctions
+
+| Approach | Focus | Limitation |
+|----------|-------|-----------|
+| **Adversarial Training** | Input robustness | External attacks only |
+| **Interpretability** | Internal understanding | Could detect internal issues |
+| **Alignment** | Model goals | Addresses root cause |
+
+## Best Practices
+
+### Effective Adversarial Training
+
+| Practice | Description | Importance |
+|----------|-------------|------------|
+| **Diverse Attack Coverage** | Many attack types and styles | Generalization |
+| **Continuous Updates** | Regular new attack incorporation | Stay current |
+| **Red Team Integration** | Active attack discovery | Fresh vulnerabilities |
+| **Balanced Training** | Don't over-refuse | Capability preservation |
+| **Evaluation Rigor** | Comprehensive test suites | Verify effectiveness |
+
+### Common Mistakes
+
+| Mistake | Consequence | Mitigation |
+|---------|-------------|------------|
+| **Static Attack Sets** | Model robust to old attacks only | Continuous updates |
+| **Over-Refusal** | Blocks legitimate uses | Balanced training |
+| **Single Attack Type** | Vulnerable to other categories | Diverse coverage |
+| **No Monitoring** | Can't detect new attacks | Production monitoring |
+
+## Key Uncertainties & Research Directions
+
+### Open Questions
+
+1. **Is there a ceiling on adversarial robustness?** Or will attacks always exist?
+2. **Can attack generation be automated effectively?** Would change economics
+3. **How to generalize to novel attack categories?** Currently weak point
+4. **What's the right balance with capability?** Over-defense harms usefulness
+
+### Research Priorities
+
+| Direction | Purpose | Priority |
+|-----------|---------|----------|
+| **Automated Attack Discovery** | Scale red teaming | High |
+| **Principled Defenses** | Beyond specific patterns | High |
+| **Capability Preservation** | Robust without over-refusal | Medium |
+| **Attack Taxonomy** | Systematic categorization | Medium |
+
+## Sources & Resources
+
+### Primary Research
+
+| Type | Source | Key Contributions |
+|------|--------|------------------|
+| **Foundational Work** | [Goodfellow et al. (2015)](https://arxiv.org/abs/1412.6572) | FGSM, linear hypothesis for adversarial examples |
+| **Robust Training** | [Madry et al. (2018)](https://arxiv.org/abs/1706.06083) | PGD adversarial training methodology |
+| **LLM Attacks** | [Zou et al. (2023)](https://arxiv.org/abs/2307.15043) | GCG universal transferable attacks |
+| **Jailbreak Survey** | [Yi et al. (2024)](https://arxiv.org/abs/2407.04295) | Comprehensive taxonomy of attacks and defenses |
+| **Constitutional Defense** | [Anthropic (2025)](https://arxiv.org/pdf/2501.18837) | Constitutional classifiers withstood 3,000+ hours of red teaming |
+
+### Related Reading
+
+| Focus Area | Source | Relevance |
+|------------|--------|-----------|
+| **Industry Standards** | [NIST AI 100-2e2025](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-2e2025.pdf) | AML taxonomy and guidelines |
+| **Red Teaming Methods** | [OpenAI Red Teaming](https://cdn.openai.com/papers/openais-approach-to-external-red-teaming.pdf) | External red teaming methodology |
+| **Multi-Turn Attacks** | [Scale AI (2024)](https://static.scale.com/uploads/6019a18f03a4ae003acb1113/MHJ.pdf) | Human jailbreaks against frontier models |
+
+---
+
+## AI Transition Model Context
+
+Adversarial training relates to the <EntityLink id="ai-transition-model" /> through:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="misalignment-potential" /> | Attack surface | Reduces but doesn't eliminate vulnerability |
+| <EntityLink id="deployment-decisions" /> | Deployment safety | Necessary for responsible deployment |
+
+Adversarial training is important operational security but doesn't address fundamental alignment challenges - it defends against external attacks while the deeper concern is internal model properties.
+
+## Related Pages
+
+<Backlinks />

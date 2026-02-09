@@ -1,0 +1,225 @@
+---
+title: "Documentation Maintenance"
+description: "Guidelines for keeping internal documentation accurate and up-to-date"
+sidebar:
+  order: 99
+  label: "Doc Maintenance"
+lastEdited: "2026-02-04"
+pageType: documentation
+importance: 0
+---
+import { Aside } from '@astrojs/starlight/components';
+
+Internal documentation becomes stale quickly. This page outlines strategies for keeping `/internal/` pages accurate.
+
+---
+
+## The Staleness Problem
+
+Technical documentation rots because:
+
+1. **Code changes faster than docs** - Developers update scripts, forget to update docs
+2. **No automated enforcement** - Stale docs don't break builds
+3. **Distributed ownership** - Nobody "owns" documentation
+4. **Discovery friction** - Contributors don't know docs exist to update them
+
+---
+
+## Mitigation Strategies
+
+### 1. Code Comments Pointing to Docs
+
+When code implements behavior documented elsewhere, add a comment:
+
+```javascript
+// Docs: /internal/content-database/#source-fetching
+async function fetchSource(url) {
+  // ...
+}
+```
+
+This creates a reminder when the code changes.
+
+### 2. Freshness Indicators
+
+Each internal doc includes `lastEdited` in frontmatter:
+
+```yaml
+lastEdited: "2026-02-04"
+```
+
+**Rule of thumb**: If a doc hasn't been updated in 6+ months, verify before trusting.
+
+### 3. Generated Content Where Possible
+
+Some documentation can be auto-generated from code:
+
+| Content Type | Generation Method |
+|--------------|-------------------|
+| CLI help text | `npm run crux -- --help` |
+| Database schema | Extract from `knowledge-db.mjs` |
+| Validation rules | List from `scripts/validate/` |
+| Cost estimates | Pull from actual API usage |
+
+<Aside type="tip">
+Consider adding a `npm run generate-docs` script that updates generated sections.
+</Aside>
+
+### 4. PR Checklist
+
+When making significant changes, the PR template should ask:
+
+- [ ] Did you update relevant `/internal/` documentation?
+- [ ] Did you update `CLAUDE.md` if CLI commands changed?
+- [ ] Did you add code comments pointing to docs?
+
+### 5. Periodic Review
+
+Schedule quarterly reviews of key docs:
+
+| Doc | Review Focus |
+|-----|--------------|
+| [Architecture](/internal/architecture/) | Are diagrams still accurate? |
+| [Automation Tools](/internal/automation-tools/) | Do all commands still work? |
+| [Content Database](/internal/content-database/) | Is schema current? |
+
+---
+
+## Documentation Categories
+
+### High-Churn (Update Frequently)
+
+These change often and need careful attention:
+
+- **Automation Tools** - CLI commands, scripts
+- **Content Database** - Schema, APIs
+- **Page Creator Pipeline** - Phases, costs
+
+### Stable (Update Rarely)
+
+These change infrequently:
+
+- **Style Guides** - Editorial standards
+- **Rating System** - Scoring dimensions
+- **About This Wiki** - High-level overview
+
+### Auto-Updatable (Consider Generating)
+
+These could be generated from code:
+
+- Command reference (from `--help` output)
+- Validation rule list (from file system)
+- Cost estimates (from API logs)
+
+---
+
+## When to Update Docs
+
+### Must Update
+
+- Adding new pipeline phases
+- Changing database schema
+- Adding/removing CLI commands
+- Changing environment variables
+
+### Should Update
+
+- Significant refactoring
+- Adding new validation rules
+- Changing default behaviors
+
+### Optional
+
+- Bug fixes (unless they change documented behavior)
+- Performance improvements
+- Internal refactoring
+
+---
+
+## Documentation Structure
+
+### Recommended Sections
+
+Each technical doc should include:
+
+1. **Purpose** - What problem does this solve?
+2. **Quick Start** - How to use it in 30 seconds
+3. **Architecture** - How it works internally
+4. **API/Commands** - Reference documentation
+5. **Limitations** - Known issues and constraints
+6. **Related** - Links to connected docs
+
+### Formatting Conventions
+
+| Element | Usage |
+|---------|-------|
+| Code blocks | All commands and code examples |
+| Tables | Reference data, comparisons |
+| Mermaid diagrams | Architecture, data flow |
+| Asides | Tips, warnings, important notes |
+
+---
+
+## Ownership
+
+### Current Approach
+
+No formal ownership - anyone who changes code should update related docs.
+
+### Potential Improvement
+
+Consider adding CODEOWNERS-style assignment:
+
+```
+# .github/DOCOWNERS (hypothetical)
+/src/content/docs/internal/content-database.mdx @maintainer
+/src/content/docs/internal/automation-tools.mdx @maintainer
+```
+
+---
+
+## Validation Ideas
+
+### Potential Automated Checks
+
+```bash
+# Check for docs older than 6 months
+npm run crux -- validate docs-freshness
+
+# Check that documented commands still exist
+npm run crux -- validate docs-commands
+
+# Check that documented files still exist
+npm run crux -- validate docs-paths
+```
+
+These don't exist yet but could be valuable additions.
+
+### Manual Verification
+
+When reviewing a PR that touches `/scripts/`:
+
+1. Check if any `/internal/` docs reference the changed files
+2. Verify documented behavior still matches implementation
+3. Update `lastEdited` if making doc changes
+
+---
+
+## Quick Reference: What Docs to Update
+
+| Changed File | Update These Docs |
+|--------------|-------------------|
+| `scripts/content/page-creator.mjs` | [Architecture](/internal/architecture/), [Automation Tools](/internal/automation-tools/) |
+| `scripts/lib/knowledge-db.mjs` | [Content Database](/internal/content-database/), [Architecture](/internal/architecture/) |
+| `scripts/crux.mjs` or `commands/*` | [Automation Tools](/internal/automation-tools/) |
+| `src/content.config.ts` | [Page Types](/internal/page-types/) |
+| Any validation script | [Automation Tools](/internal/automation-tools/) |
+| `.env` variables | [Architecture](/internal/architecture/#environment-variables) |
+
+---
+
+## Related
+
+- [Architecture](/internal/architecture/) - System overview
+- [Automation Tools](/internal/automation-tools/) - CLI reference
+- [About This Wiki](/internal/about-this-wiki/) - Contributor overview

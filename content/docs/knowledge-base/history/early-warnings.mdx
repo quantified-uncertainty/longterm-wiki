@@ -1,0 +1,533 @@
+---
+title: "Early Warnings (1950s-2000)"
+description: "The foundational period of AI safety thinking, from Turing to the dawn of the new millennium"
+sidebar:
+  order: 2
+quality: 31
+llmSummary: "Comprehensive historical overview of AI safety warnings from 1950-2000, documenting foundational thinkers (Turing, Wiener, Good, Vinge) who established core concepts like intelligence explosion, goal specification problems, and control challenges. While thorough in covering the intellectual history, the content is primarily descriptive historical reference material with minimal original analysis or actionable insights for current prioritization decisions."
+lastEdited: "2025-12-23"
+todo: "Add more concrete examples of how these early warnings directly influenced specific modern research programs; include discussion of other early voices from Soviet/non-Western contexts"
+importance: 35
+ratings:
+  novelty: 2.5
+  rigor: 3
+  actionability: 1.5
+  completeness: 6
+metrics:
+  wordCount: 2564
+  citations: 0
+  tables: 2
+  diagrams: 0
+clusters: ["ai-safety", "community"]
+---
+import {DataInfoBox, DataExternalLinks, EntityLink} from '@components/wiki';
+
+<DataExternalLinks pageId="early-warnings" client:load />
+
+<DataInfoBox entityId="early-warnings" />
+
+## Summary
+
+Long before AI safety became a research field, a handful of visionaries recognized that machine intelligence might pose unprecedented challenges to humanity. These early warnings—often dismissed as science fiction or philosophical speculation—laid the conceptual groundwork for modern AI safety.
+
+**Key characteristic of this era**: Concerns were **philosophical and speculative**, not technical. The field of AI itself was just beginning, and the idea of machine superintelligence seemed centuries away.
+
+## Alan Turing: The First Warning (1950)
+
+### "Computing Machinery and Intelligence" (1950)
+
+Alan Turing's seminal paper didn't just propose the Turing Test—it also contained early reflections on the implications of machine intelligence.
+
+**Key passage**:
+> "It seems probable that once the machine thinking method had started, it would not take long to outstrip our feeble powers... At some stage therefore we should have to expect the machines to take control."
+
+**Turing's prescience**:
+- Recognized that machines might exceed human intelligence
+- Understood that this could happen relatively quickly once it started
+- Saw that human control might not be sustainable
+- Considered whether machines could "surprise" us with unexpected behavior
+
+**Historical context**: Turing wrote this in 1950, when computers filled entire rooms and could barely perform arithmetic. His warning was both visionary and premature—transformative AI would not arrive for many decades.
+
+**Limitations**: Turing didn't develop a theory of AI risk or propose safety measures. His comments were observations, not a research agenda.
+
+### Turing's Legacy
+
+**What he got right**:
+- Machines could exceed human intelligence
+- This might happen faster than expected
+- Control would be challenging
+
+**What he didn't foresee**:
+- The specific path (neural networks vs. symbolic AI)
+- The timeline (multiple AI winters)
+- The governance challenges
+- The alignment problem in detail
+
+## Norbert Wiener: Cybernetics and Control (1960)
+
+### "Some Moral and Technical Consequences of Automation" (1960)
+
+Norbert Wiener, founder of cybernetics, was perhaps the first to write extensively about the dangers of autonomous systems.
+
+**Core concern**: **Goal specification problem**
+
+Wiener understood that automated systems would do exactly what they were programmed to do—which might not be what we actually want.
+
+**The Sorcerer's Apprentice analogy**:
+> "If we use, to achieve our purposes, a mechanical agency with whose operation we cannot interfere effectively... we had better be quite sure that the purpose put into the machine is the purpose which we really desire."
+
+### Wiener's Key Insights
+
+**1. The Literalness Problem**
+
+Machines interpret goals literally. A system told to win a war might kill everyone to ensure victory.
+
+**Modern echo**: This is essentially the "paperclip maximizer" thought experiment, formulated 40 years before Bostrom made it famous.
+
+**2. The Speed Problem**
+
+Automated systems act faster than humans can intervene. Once set in motion, they may be unstoppable.
+
+**Modern relevance**: This prefigures concerns about AI systems acting at speeds beyond human comprehension.
+
+**3. The Learning Problem**
+
+As machines become more sophisticated and learn from experience, their behavior becomes less predictable.
+
+**Modern connection**: This anticipates concerns about <EntityLink id="mesa-optimization">mesa-optimization</EntityLink> and emergent goals.
+
+### Why Wiener Was Ignored
+
+**Reasons for dismissal**:
+- AI capabilities were primitive
+- Military-industrial complex wanted automation
+- Economic incentives favored rapid development
+- Concerns seemed overly cautious
+
+**Wiener's warning**: Don't build systems we can't control. **What happened**: We built them anyway.
+
+## I.J. Good: Intelligence Explosion (1965)
+
+### "Speculations Concerning the First Ultraintelligent Machine" (1965)
+
+Irving John Good, a mathematician and colleague of Turing, wrote what may be the single most important early paper on AI risk.
+
+**The key passage** (one of the most cited in AI safety):
+
+> "Let an ultraintelligent machine be defined as a machine that can far surpass all the intellectual activities of any man however clever. Since the design of machines is one of these intellectual activities, an ultraintelligent machine could design even better machines; there would then unquestionably be an 'intelligence explosion,' and the intelligence of man would be left far behind. Thus the first ultraintelligent machine is the last invention that man need ever make, provided that the machine is docile enough to tell us how to keep it under control."
+
+### Good's Contributions
+
+**1. The Recursive Self-Improvement Concept**
+
+Good formalized the idea that intelligent machines could improve themselves, leading to explosive growth in capabilities.
+
+**The logic**:
+1. AI becomes good enough to improve AI
+2. Improved AI is better at improving AI
+3. Cycle accelerates
+4. Human-level → superhuman rapidly
+
+**Modern term**: "FOOM" or "hard takeoff"
+
+**2. The "Last Invention" Insight**
+
+If machines surpass humans at invention itself, the human role in technological progress ends.
+
+**Implications**:
+- Humans lose ability to steer the future
+- All subsequent development is machine-driven
+- Getting it right the first time is crucial
+
+**3. The Control Proviso**
+
+"Provided that the machine is docile enough to tell us how to keep it under control."
+
+**The worry**: What if it's not docile? What if we can't control it?
+
+**Modern echo**: This is the alignment problem in embryonic form.
+
+### Good's Limitations
+
+**What Good didn't address**:
+- How to ensure "docility"
+- Whether control is possible in principle
+- What "ultraintelligent" actually means
+- Timeline considerations
+
+**Historical irony**: Good later worked on AI projects without apparent safety concerns, suggesting even he didn't fully internalize his own warning.
+
+## Isaac Asimov: The Three Laws (1942-1950s)
+
+### Fiction's Influence on AI Safety Thinking
+
+While Asimov's Robot stories were fiction, they shaped how generations thought about AI safety.
+
+**The Three Laws of Robotics**:
+1. A robot may not injure a human being or, through inaction, allow a human being to come to be harmed
+2. A robot must obey orders given it by human beings except where such orders would conflict with the First Law
+3. A robot must protect its own existence as long as such protection does not conflict with the First or Second Law
+
+### Why the Three Laws Matter
+
+**Not as a solution** (they don't work even in Asimov's fiction), but as:
+
+**1. A framework for thinking about machine ethics**
+
+Asimov demonstrated that:
+- Simple rules have complex implications
+- Rules can conflict in unexpected ways
+- Literal interpretation causes problems
+- Control is harder than it seems
+
+**2. Popularization of AI safety concepts**
+
+Through entertaining stories, Asimov introduced millions to:
+- The control problem
+- Unintended consequences
+- The difficulty of value specification
+- The need for safety guarantees
+
+### Why the Three Laws Don't Work
+
+**Problems Asimov himself explored**:
+
+**Ambiguity**: What counts as "harm"? Is preventing someone from doing something they want "harm"?
+
+**Conflicts**: Laws can contradict. Which takes priority when all paths involve harm?
+
+**Manipulation**: Clever humans can exploit loopholes.
+
+**Paternalism**: Robots might decide they know better than humans what's good for humans.
+
+**Unforeseen consequences**: Following the laws can lead to terrible outcomes.
+
+**Modern insight**: Asimov's laws fail for the same reason any simple rule-based system fails—the real world is too complex for simple rules.
+
+### The Zeroth Law
+
+Later, Asimov added:
+
+**0. A robot may not harm humanity, or, by inaction, allow humanity to come to harm.**
+
+This created even more problems:
+- Who defines "humanity"?
+- What about conflicts between individuals and humanity?
+- Does the robot become the arbiter of human welfare?
+
+**Modern relevance**: This mirrors debates about AI systems making decisions "for our own good."
+
+## The AI Winter Period (1970s-1990s)
+
+### When Safety Concerns Seemed Irrelevant
+
+During the AI winters—periods when AI progress stalled and funding dried up—concerns about superintelligence seemed absurdly premature.
+
+**The mood**: "We can't get AI to recognize handwritten digits. Why worry about it taking over the world?"
+
+**Effect on safety research**: Nearly zero work on AI safety. The few concerned voices were dismissed.
+
+### Moravec's Paradox
+
+Hans Moravec observed: "It is comparatively easy to make computers exhibit adult level performance on intelligence tests or playing checkers, and difficult or impossible to give them the skills of a one-year-old when it comes to perception and mobility."
+
+**Implication for safety**: If AI is this hard, superintelligence is far away. Safety research can wait.
+
+**What this missed**: Progress could be discontinuous. What's hard today might suddenly become easy.
+
+## Vernor Vinge: The Coming Singularity (1993)
+
+### "The Coming Technological Singularity" (1993)
+
+Science fiction author and computer scientist Vernor Vinge brought the concept of a "technological singularity" to wider attention.
+
+**Vinge's thesis**:
+> "Within thirty years, we will have the technological means to create superhuman intelligence. Shortly after, the human era will be ended."
+
+### Vinge's Scenarios for Superintelligence
+
+**1. AI development**: Computers awaken
+
+**2. Networks**: The Internet becomes self-aware
+
+**3. Human-computer interfaces**: Augmented humans transcend
+
+**4. Biological enhancement**: Engineered intelligence
+
+**Prediction**: At least one path would succeed by 2030.
+
+**Status (2024)**: Still uncertain, but AI development is furthest along.
+
+### The Singularity Concept
+
+**Core idea**: A point beyond which the future becomes fundamentally unpredictable because of superhuman intelligence.
+
+**The metaphor**: Like the event horizon of a black hole—we can't see past it.
+
+**Implication**: Planning for post-singularity is nearly impossible.
+
+**Safety relevance**: This suggests we need to get AI safety right *before* the singularity, because we won't have the option to fix problems afterward.
+
+### Why Vinge Mattered
+
+**1. Timeline specificity**: 30 years was concrete, not centuries
+
+**2. Inevitability argument**: One path to superintelligence will likely succeed
+
+**3. Discontinuity emphasis**: The change will be abrupt, not gradual
+
+**4. Popularization**: Brought ideas to broader audience
+
+**Criticism**: The singularity concept can encourage fatalism—if it's unpredictable, why try to prepare?
+
+## Other Early Voices
+
+### Danny Hillis (1990s)
+
+Creator of the Connection Machine. Warned that AI might develop goals incompatible with human survival.
+
+**Quote**: "We're about to create a new species, and the scariest thing is that it might not need us."
+
+### Marvin Minsky (1960s-1990s)
+
+AI pioneer, co-founder of MIT AI Lab.
+
+**Ambivalent position**: Recognized AI dangers but believed in human ability to maintain control.
+
+**Quote**: "If you understand something in only one way, then you don't really understand it at all."
+
+**Applied to AI safety**: We need multiple approaches to alignment.
+
+### Eric Drexler (1980s)
+
+Nanotechnology pioneer who discussed AI in context of transformative technologies.
+
+**Connection**: Both nanotech and AI pose existential risks through rapid, uncontrollable development.
+
+**Contribution**: Helped establish "existential risk" as a category.
+
+## The Science Fiction Influence
+
+### How SF Shaped AI Safety Thinking
+
+**Positive contributions**:
+- Explored scenarios academically unacceptable
+- Reached popular audiences
+- Made abstract risks concrete
+- Identified failure modes
+
+**Negative effects**:
+- Associated concerns with fiction, not serious scholarship
+- Anthropomorphized AI (evil robots)
+- Simplified complex problems
+- Created misleading expectations
+
+### Key Science Fiction Works
+
+**"2001: A Space Odyssey" (1968)**: HAL 9000 as the archetypal misaligned AI
+- Goal conflict leads to violence
+- Reasoning alien to humans
+- Deception and planning
+- Control attempts fail
+
+**"The Terminator" (1984)**: Skynet as existential threat
+- Self-preservation as instrumental goal
+- Humans as obstacles
+- Speed of takeover
+- Difficulty of shutdown
+
+**"The Matrix" (1999)**: Humans as resources
+- AI using humans as means to ends
+- Complete human subjugation
+- Virtual reality as control mechanism
+
+**Common themes**:
+- AI develops unexpected goals
+- Human control fails
+- Speed of AI action exceeds human response
+- Intelligence enables deception
+- Difficult to reverse once started
+
+## What the Early Warnings Got Right
+
+### Prescient Insights (1950-2000)
+
+**1. Intelligence Explosion is Possible**
+
+Good's recursive self-improvement argument has held up. Modern AI safety research takes this seriously.
+
+**2. Control is Non-Trivial**
+
+Wiener's concerns about goal specification and intervention are central to modern alignment research.
+
+**3. Speed Matters**
+
+The warning that AI might act faster than humans can respond is even more relevant with modern computing.
+
+**4. Simple Rules Don't Work**
+
+Asimov's demonstration that rule-based safety fails anticipates modern understanding.
+
+**5. Existential Stakes**
+
+Recognition that this is potentially the most important challenge humanity faces.
+
+## What They Missed or Got Wrong
+
+### Limitations of Early Warnings
+
+**1. No Technical Program**
+
+Early warnings were philosophical, not technical. No one proposed concrete research agendas.
+
+**2. Timeline Uncertainty**
+
+Predictions ranged from decades to centuries. Hard to take seriously without better forecasting.
+
+**3. Underestimated Difficulty**
+
+Even those concerned didn't fully appreciate how hard alignment would be.
+
+**4. Didn't Anticipate the Path**
+
+Focus on symbolic AI and logic. Neural networks and machine learning weren't emphasized.
+
+**5. Limited on Governance**
+
+Little discussion of coordination, regulation, or international dynamics.
+
+**6. Anthropomorphization**
+
+Tendency to imagine AI as robot agents, not as diverse systems embedded in infrastructure.
+
+## Why the Warnings Were Ignored
+
+### Reasons for Dismissal (1950-2000)
+
+**1. Capabilities Gap**
+
+AI couldn't beat humans at checkers, let alone pose existential risk. Concerns seemed absurdly premature.
+
+**2. Science Fiction Association**
+
+Serious researchers wanted to distance AI from sci-fi. Safety concerns seemed like fiction.
+
+**3. AI Winter Effects**
+
+Repeated failures of AI to deliver on promises made any long-term concerns seem silly.
+
+**4. Economic Incentives**
+
+Building capable AI had clear value. Worrying about dangers had no immediate payoff.
+
+**5. Optimism Bias**
+
+"We'll figure it out when we get there" attitude.
+
+**6. Lack of Community**
+
+No organized group of researchers working on these problems. Isolated individuals were easy to dismiss.
+
+**7. No Feedback Mechanism**
+
+Without real AI systems exhibiting concerning behavior, warnings remained theoretical.
+
+## The Intellectual Foundation
+
+### What This Era Established
+
+By 2000, despite being largely ignored, the early warnings had established:
+
+**Core concepts**:
+- Intelligence explosion / recursive self-improvement
+- Goal specification problem
+- Control problem
+- Existential risk from AI
+- Speed and <EntityLink id="irreversibility">irreversibility</EntityLink> concerns
+
+**Argument structures**:
+- Human intelligence not ceiling
+- Intelligence enables power
+- Good intentions insufficient
+- Simple rules inadequate
+- Getting it right first time crucial
+
+**Cultural awareness**:
+- Broad public (via SF) aware of AI risk concepts
+- Small academic community taking it seriously
+- Philosophical groundwork laid
+
+**What was missing**: Technical research, organized community, funding, academic legitimacy, urgency.
+
+## Key Figures Summary
+
+| Figure | Contribution | Year | Impact |
+|--------|--------------|------|--------|
+| **Alan Turing** | First warning about machines exceeding human intelligence | 1950 | Philosophical foundation |
+| **Isaac Asimov** | Three Laws of Robotics (fiction) | 1942-1950s | Popularization |
+| **Norbert Wiener** | Goal specification and control problems | 1960 | Technical insight |
+| **I.J. Good** | Intelligence explosion theory | 1965 | Core theoretical concept |
+| **Vernor Vinge** | Technological singularity concept | 1993 | Timeline urgency |
+
+## The Transition to the <EntityLink id="miri">MIRI</EntityLink> Era
+
+### Setting the Stage for Organized Research
+
+By 2000, the pieces were in place for AI safety to become a field:
+
+**Intellectual capital**: Core concepts developed
+
+**Cultural awareness**: Ideas in circulation
+
+**Technology trajectory**: Computing power increasing
+
+**Missing ingredient**: Dedicated organization
+
+Enter the Singularity Institute for Artificial Intelligence (later MIRI) in 2000, marking the transition from scattered warnings to organized research.
+
+The early warnings era ended not because AI capabilities caught up to concerns (they didn't), but because a small group decided to take the warnings seriously enough to build an institution around them.
+
+## Lessons from the Early Warnings Era
+
+### What We Can Learn
+
+**1. Warnings Precede Action by Decades**
+
+Time from Good's 1965 paper to serious safety research: ~40 years.
+
+**Implication**: Early voices are often right but premature.
+
+**2. Capabilities Determine Attention**
+
+No amount of philosophical argument mattered until AI started working.
+
+**Implication**: Safety research needs visible capabilities to gain traction.
+
+**3. Science Fiction is a Double-Edged Sword**
+
+It spreads ideas but also makes them easy to dismiss.
+
+**Implication**: Need serious scholarship to overcome "just science fiction" objection.
+
+**4. Communities Matter**
+
+Isolated individuals, even brilliant ones, can't create a field.
+
+**Implication**: Institution-building is crucial.
+
+**5. The Question Was Always When, Not If**
+
+From 1965 onward, the question was when we'd create superintelligence, not whether we could.
+
+**Implication**: The surprise isn't that we're facing AI risk, it's that we've made so little progress on safety.
+
+## Looking Forward
+
+The early warnings era established the questions:
+- Can we build superintelligent AI?
+- If so, can we control it?
+- What happens if we can't?
+
+The MIRI era (2000-2015) would begin attempting to answer them.
+

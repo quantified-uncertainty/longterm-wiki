@@ -1,0 +1,215 @@
+---
+title: Transition Turbulence
+description: Root factor measuring disruption during the AI transition. High turbulence increases risk across all scenarios.
+sidebar:
+  label: Overview
+  order: 0
+lastEdited: "2026-01-03"
+pageTemplate: ai-transition-model-factor
+subcategory: factors-transition-turbulence
+---
+import {Mermaid, DataInfoBox, FactorSubItemsList, PageCauseEffectGraph, Backlinks, EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="transition-turbulence" />
+
+Transition Turbulence measures how much disruption occurs as society navigates from current AI to whatever future emerges. Unlike <EntityLink id="scenarios-overview">Ultimate Scenarios</EntityLink> (which describe *what* happens), Transition Turbulence describes *how rough the journey is*—and that roughness affects both whether we survive (<EntityLink id="existential-catastrophe">Existential Catastrophe</EntityLink>) and what world we end up in (<EntityLink id="long-term-trajectory">Long-term Trajectory</EntityLink>).
+
+Even if we ultimately reach a good destination, a turbulent transition causes real suffering along the way. Economic displacement, political instability, and social fragmentation during the transition matter independently of the final outcome.
+
+**Why a Root Factor?** Transition Turbulence is a *background condition* that affects Ultimate Scenarios and Ultimate Outcomes, not an endpoint in itself. High turbulence can trigger acute catastrophes (political collapse → loss of control) and constrain long-term trajectory (path dependence, destroyed institutions).
+
+---
+
+## Polarity
+
+**Inherently negative.** High turbulence is always worse than low turbulence, all else equal. There's no "good" version of extreme disruption—the question is how much turbulence we experience, not whether turbulence is desirable.
+
+| Level | Description |
+|-------|-------------|
+| **Low turbulence** | Smooth adaptation, minimal disruption, institutions keep pace |
+| **Moderate turbulence** | Significant disruption but recoverable, adaptation strained |
+| **High turbulence** | Severe instability, cascading failures, suffering widespread |
+| **Catastrophic turbulence** | System breakdown triggers existential catastrophes or permanent damage |
+
+---
+
+## How This Happens
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Drivers["Turbulence Drivers"]
+        SPEED[Rapid Capability Growth]
+        DISPLACE[Economic Displacement]
+        RACE[Racing Dynamics]
+        COORD_FAIL[Coordination Failures]
+    end
+
+    subgraph Manifestations["How Turbulence Manifests"]
+        ECON[Economic Instability]
+        POLITICAL[Political Instability]
+        SOCIAL[Social Fragmentation]
+        INSTITUTIONAL[Institutional Stress]
+    end
+
+    subgraph Effects["Effects on Ultimate Outcomes"]
+        ACUTE[Existential Catastrophe]
+        LONGRUN[Long-term Trajectory]
+    end
+
+    SPEED --> DISPLACE
+    SPEED --> INSTITUTIONAL
+    DISPLACE --> ECON
+    RACE --> POLITICAL
+    COORD_FAIL --> POLITICAL
+    COORD_FAIL --> SOCIAL
+
+    ECON --> TURBULENCE[Transition Turbulence]
+    POLITICAL --> TURBULENCE
+    SOCIAL --> TURBULENCE
+    INSTITUTIONAL --> TURBULENCE
+
+    TURBULENCE -->|"can trigger"| ACUTE
+    TURBULENCE -->|"path dependence"| LONGRUN
+
+    style TURBULENCE fill:#ffe66d
+    style ACUTE fill:#ff6b6b
+    style LONGRUN fill:#4ecdc4
+`} />
+
+### Turbulence Drivers
+
+**1. Rapid Capability Growth**
+AI capabilities advance faster than institutions, labor markets, and social norms can adapt. The faster the change, the more turbulence.
+
+**2. Economic Displacement**
+AI automation displaces workers faster than new roles emerge. Mass unemployment creates economic and political instability.
+
+**3. Racing Dynamics**
+Competition between labs/nations creates pressure to deploy before adequate safety testing, increasing both capability speed and coordination failures.
+
+**4. Coordination Failures**
+Governments, labs, and international bodies fail to coordinate on standards, safety requirements, and transition support.
+
+### Turbulence Manifestations
+
+| Domain | Low Turbulence | High Turbulence |
+|--------|---------------|-----------------|
+| **Economic** | Gradual workforce transition, safety nets absorb displacement | Mass unemployment, inequality spikes, market instability |
+| **Political** | Democracies adapt, regulation keeps pace | Authoritarian backlash, polarization, institutional collapse |
+| **Social** | Trust maintained, communities adapt | Fragmentation, loss of shared reality, civil unrest |
+| **Institutional** | Regulators understand AI, governance effective | Governance captured or overwhelmed, rule of law erodes |
+
+---
+
+## Key Parameters
+
+<FactorSubItemsList factorId="transition-turbulence" client:load />
+
+---
+
+## Which Ultimate Outcomes It Affects
+
+### Existential Catastrophe (Primary)
+
+High turbulence can *trigger* acute catastrophes:
+- **Political collapse** → Loss of control over AI development
+- **Racing acceleration** → Deployment before adequate safety
+- **Institutional breakdown** → No capacity to respond to emerging threats
+- **Social unrest** → Desperate measures, authoritarian responses
+
+A rough enough transition can cause the catastrophe, even if AI itself isn't misaligned.
+
+### Long-term Trajectory (Primary)
+
+Turbulence shapes what futures are reachable through **path dependence**:
+- Destroyed institutions are hard to rebuild
+- Lost trust takes generations to restore
+- Authoritarian responses to chaos tend to entrench
+- Economic disruption locks in inequality
+- Options foreclosed during crisis rarely reopen
+
+Even if acute catastrophe is avoided, high turbulence constrains the achievable long-term trajectory.
+
+---
+
+## Relationship to Ultimate Scenarios
+
+| Ultimate Scenario | Relationship |
+|---------------------|--------------|
+| <EntityLink id="scenarios-ai-takeover-overview">AI Takeover</EntityLink> | Turbulence increases risk of loss of control |
+| <EntityLink id="scenarios-human-catastrophe-overview">Human-Caused Catastrophe</EntityLink> | Turbulence can trigger state failures and desperate actions |
+| <EntityLink id="scenarios-long-term-lockin-overview">Long-term Lock-in</EntityLink> | Turbulent periods often lock in emergency measures |
+
+---
+
+## Warning Signs
+
+Indicators of increasing turbulence:
+
+1. **Labor market stress**: AI-related unemployment rising faster than retraining
+2. **Political polarization**: AI becoming partisan issue, backlash movements
+3. **Regulatory lag**: Governance clearly behind capability development
+4. **International tension**: AI competition framed as zero-sum
+5. **Trust decline**: Public trust in institutions/tech companies falling
+6. **Social instability**: Protests, strikes, civil unrest related to AI
+
+---
+
+## Interventions That Reduce Turbulence
+
+**Economic:**
+- Universal basic income or robust safety nets
+- Retraining and education programs
+- Gradual deployment policies
+- Worker transition support
+
+**Political:**
+- Democratic deliberation processes for AI policy
+- International coordination mechanisms
+- Regulatory capacity building
+- Preventing authoritarian capture
+
+**Social:**
+- Maintaining epistemic commons (shared facts)
+- Community resilience programs
+- Trust-building between tech and public
+- Preserving human-human social fabric
+
+**Technical:**
+- Paced deployment (slowing capability rollout)
+- Interoperability requirements
+- Human-in-the-loop requirements
+- Transition period safety measures
+
+---
+
+## Probability Estimates
+
+| Turbulence Level | Assessment |
+|------------------|------------|
+| **Some turbulence** | Almost certain—significant disruption is baseline |
+| **High turbulence** | Likely without deliberate intervention |
+| **Catastrophic turbulence** | Possible, depends on speed of capability growth and coordination |
+| **Low turbulence** | Requires active coordination and paced deployment |
+
+**Key uncertainty**: How fast will transformative capabilities arrive? Faster arrival = more turbulence.
+
+---
+
+## Related Content
+
+### Ultimate Outcomes
+- <EntityLink id="existential-catastrophe">Existential Catastrophe</EntityLink> — Turbulence can trigger catastrophes
+- <EntityLink id="long-term-trajectory">Long-term Trajectory</EntityLink> — Turbulence shapes achievable futures
+
+### Ultimate Scenarios
+- <EntityLink id="scenarios-long-term-lockin-overview">Long-term Lock-in</EntityLink> — Crisis periods often lock in values/power structures
+- <EntityLink id="scenarios-ai-takeover-overview">AI Takeover</EntityLink> — Turbulence increases loss of control risk
+
+### Risks
+- <EntityLink id="economic-disruption">Economic Disruption</EntityLink>
+- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink>
+
+<PageCauseEffectGraph slug="transition-turbulence" client:load />
+
+<Backlinks entityId="transition-turbulence" />

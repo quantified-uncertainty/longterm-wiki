@@ -1,0 +1,127 @@
+---
+title: "Risk Trajectory Experiments"
+description: "Experimental visualizations for AI transition risk over time"
+sidebar:
+  order: 51
+importance: 8.5
+quality: 20
+llmSummary: "Experimental data visualization interface for AI Transition Model showing how catastrophe risk and lock-in severity evolve over four timeline phases (2025-2045+) through multiple pathways and root factors. No quantitative values, evidence, or methodological details provided—purely interface documentation."
+ratings:
+  novelty: 3.2
+  rigor: 1.5
+  actionability: 2
+  completeness: 2.8
+metrics:
+  wordCount: 353
+  citations: 0
+  tables: 0
+  diagrams: 0
+---
+import { EntityLink } from '@components/wiki';
+import { RiskTrajectoryExperiments, DualOutcomeChart, FactorAttributionMatrix, FactorGauges, TrajectoryLines, RiskDashboard } from '@components/RiskTrajectoryExperiment';
+
+These experiments visualize **AI Transition Model** risk trajectories—showing how catastrophe risk and <EntityLink id="lock-in">lock-in</EntityLink> severity evolve from present day through TAI and beyond.
+
+---
+
+## All Experiments
+
+<RiskTrajectoryExperiments client:load />
+
+---
+
+## Concept
+
+The core idea: **risk compounds over time**, with different pathways contributing differently at different phases.
+
+The AI Transition Model identifies:
+
+**Catastrophe Pathways:**
+1. AI Takeover (Rapid) - Fast recursive self-improvement leading to misaligned superintelligence
+2. AI Takeover (Gradual) - Slow erosion of human control
+3. Human Catastrophe (State Actor) - Great power conflict enabled by AI
+4. Human Catastrophe (Rogue Actor) - Non-state actors using AI for mass harm
+
+**Lock-in Types:**
+1. Economic - Irreversible wealth/power concentration
+2. Political - Authoritarian control solidified by AI
+3. Epistemic - Information environment permanently degraded
+4. Values - Human values shaped/locked by AI systems
+5. Suffering - Persistent negative states (e.g., digital minds)
+
+**Root Factors** (driving both outcomes):
+- Misalignment Potential
+- Misuse Potential
+- AI Capabilities
+- AI Ownership concentration
+- Civilizational Competence
+- Transition Turbulence
+
+---
+
+## Individual Components
+
+### Dual Outcome Chart
+
+Side-by-side stacked area charts showing catastrophe risk (left) and lock-in severity (right):
+
+<DualOutcomeChart client:load width={850} height={350} />
+
+---
+
+### Factor Attribution Matrix
+
+Shows how each root factor contributes to each outcome type:
+
+<FactorAttributionMatrix client:load width={700} height={160} />
+
+---
+
+### Factor Gauges
+
+Current levels of each root factor with trend indicators:
+
+<FactorGauges client:load />
+
+---
+
+### Trajectory Lines
+
+Individual pathway trajectories with confidence bands:
+
+<TrajectoryLines client:load width={800} height={400} />
+
+---
+
+### Full Dashboard
+
+Combined view with all components:
+
+<RiskDashboard client:load />
+
+---
+
+## Design Notes
+
+**Timeline phases:**
+- Current (2025-2030): Pre-TAI baseline
+- Near-TAI (2031-2036): Approaching transformative AI
+- TAI (2037-2044): Transformative AI arrival
+- Post-TAI (2045+): Stabilization or continued turbulence
+
+**Color encoding:**
+- Warm colors (red/orange) = Catastrophe pathways
+- Cool colors (blue/purple/pink) = Lock-in types
+- Factor-specific colors for attribution
+
+**Key features:**
+- TAI marker line showing expected transition point
+- Hover interactions for detailed values
+- Toggle between pathway and factor views
+- Confidence bands on trajectory lines
+
+**What these visualizations convey:**
+1. Risk accumulates non-linearly, with TAI as an inflection point
+2. Different pathways dominate at different times
+3. Lock-in may be the larger long-term concern even if catastrophe is avoided
+4. Root factors have differential impact on different outcomes

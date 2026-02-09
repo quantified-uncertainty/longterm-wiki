@@ -1,0 +1,443 @@
+---
+title: Post-Incident Recovery Model
+description: This model analyzes recovery pathways from AI incidents. It finds clear attribution enables 3-5x faster recovery, and recommends 5-10% of safety resources for recovery capacity, particularly trust and skill preservation.
+relatedRisks:
+  - corrigibility-failure
+  - distributional-shift
+  - emergent-capabilities
+  - trust-cascade
+relatedModels:
+  - trust-cascade-model
+  - expertise-atrophy-cascade
+  - institutional-adaptation-speed
+sidebar:
+  order: 50
+quality: 52
+lastEdited: "2025-12-27"
+ratings:
+  focus: 8.5
+  novelty: 4.5
+  rigor: 5
+  completeness: 7.5
+  concreteness: 6.5
+  actionability: 5.5
+importance: 52.5
+llmSummary: Analyzes recovery pathways from AI incidents across five types (technical failures, trust collapse, expertise loss, alignment failures). Finds clear attribution enables 3-5x faster detection, preserved expertise reduces recovery time by 2-100x depending on degradation level, and recommends allocating 5-10% of safety resources to recovery capacity, particularly for neglected trust/epistemic recovery and skill preservation.
+pageTemplate: knowledge-base-model
+todos:
+  - Complete 'Conceptual Framework' section
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+  - Complete 'Limitations' section (6 placeholders)
+metrics:
+  wordCount: 971
+  citations: 0
+  tables: 33
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: societal-models
+---
+import { Aside } from '@astrojs/starlight/components';
+import { DataInfoBox, Backlinks, KeyQuestions, Mermaid , EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="post-incident-recovery" ratings={frontmatter.ratings} />
+
+## Overview
+
+This model analyzes how individuals, organizations, and societies can recover from AI-related incidents. Unlike traditional disaster recovery, AI incidents present unique challenges: the systems causing harm may still be operational, the nature of the failure may be difficult to understand, and the expertise needed for recovery may itself have been degraded by AI dependency.
+
+## Strategic Importance
+
+<Aside type="tip" title="Bottom Line">
+Recovery planning is a **second-tier priority**—valuable but less important than prevention. However, for scenarios where prevention might fail, recovery capacity could determine whether incidents become catastrophes. Think of it as insurance.
+</Aside>
+
+### The Prevention vs. Recovery Tradeoff
+
+<Mermaid client:load chart={`
+flowchart LR
+    subgraph Resources["Limited Resources"]
+        R[Safety Budget]
+    end
+
+    R --> P[Prevention]
+    R --> REC[Recovery Planning]
+
+    P --> |"Reduces P of incident"| OUT[Expected Harm]
+    REC --> |"Reduces harm given incident"| OUT
+
+    style P fill:#ccffcc
+    style REC fill:#cceeff
+`} />
+
+**Central question:** How should we allocate between preventing incidents vs. preparing to recover from them?
+
+**General answer:** Prevention dominates for most scenarios, but recovery matters more as:
+- Prevention becomes less tractable
+- Incident probability increases
+- Incident severity is bounded (not existential)
+
+### Magnitude Assessment
+
+**Direct importance:** 5-15% of total safety effort
+
+**Conditional importance:** If prevention fails, recovery capacity may be the difference between setback and catastrophe.
+
+| Scenario | Prevention Tractability | Recovery Value |
+|----------|------------------------|----------------|
+| Contained technical failure | High | Low (will recover anyway) |
+| Systemic technical failure | Medium | **Medium-High** |
+| Epistemic/trust collapse | Low | **High** (slow without preparation) |
+| Alignment failure | Very Low | Variable (depends on severity) |
+
+### Comparative Ranking
+
+| Intervention | Relative Priority | Reasoning |
+|--------------|------------------:|-----------|
+| Prevention (alignment, control) | Higher | Prevents harm entirely |
+| Monitoring/detection | Higher | Enables faster response |
+| **Recovery planning** | Baseline | Insurance value |
+| Resilience building | Similar | Related approach |
+
+### Resource Implications
+
+**Current attention:** Low (significantly neglected)
+
+**Where marginal resources are most valuable:**
+
+| Recovery Type | Current Prep | Marginal Value | Who Should Work On This |
+|---------------|--------------|----------------|-------------------------|
+| Technical incident response | Medium | Medium | Labs, governments |
+| Trust/epistemic recovery | Very Low | **High** | Researchers, institutions |
+| Skill/expertise preservation | Very Low | **High** | Academia, professional orgs |
+| Infrastructure resilience | Medium | Medium | Governments, critical sectors |
+
+**Recommendation:** Modest increase in recovery planning (from ~2% to ~5-10% of safety resources), focused on trust/epistemic recovery and skill preservation—the most neglected areas.
+
+### Key Cruxes
+
+| If you believe... | Then recovery planning is... |
+|-------------------|------------------------------|
+| Prevention will likely succeed | **Less important** (won't need it) |
+| Some incidents are inevitable | **More important** (insurance value) |
+| Incidents will be existential | **Less important** (no recovery possible) |
+| Incidents will be severe but recoverable | **More important** (recovery determines outcome) |
+
+### Actionability
+
+**For policymakers:**
+- Develop AI incident response protocols analogous to cybersecurity/disaster response
+- Fund "recovery research" for epistemic/trust reconstruction
+- Preserve non-AI expertise as backup capacity
+
+**For organizations:**
+- Create incident response plans for AI system failures
+- Maintain some non-AI-dependent operational capacity
+- Document institutional knowledge that AI might displace
+
+**For the safety community:**
+- Don't neglect recovery planning entirely
+- Focus on "Type 3" (trust/epistemic) and "Type 4" (expertise loss) scenarios
+- Accept that prevention should still dominate resource allocation
+
+## Incident Taxonomy
+
+### Type 1: Contained Technical Failures
+
+**Description**: AI system fails within defined boundaries, causing localized harm.
+
+**Examples**:
+- Autonomous vehicle crash
+- Medical AI misdiagnosis
+- Trading algorithm flash crash
+- Content moderation failure
+
+**Recovery Profile**:
+- **Timeline**: Days to months
+- **Scope**: Organizational or sectoral
+- **Difficulty**: Low to Medium
+- **Precedent**: Many analogous non-AI incidents
+
+### Type 2: Systemic Technical Failures
+
+**Description**: AI failure cascades across interconnected systems.
+
+**Examples**:
+- Grid management AI causes regional blackout
+- Financial AI triggers market-wide instability
+- Infrastructure AI cascade failure
+- Healthcare AI system-wide malfunction
+
+**Recovery Profile**:
+- **Timeline**: Weeks to years
+- **Scope**: Multi-sector, potentially national
+- **Difficulty**: Medium to High
+- **Precedent**: Some (2008 financial crisis, major infrastructure failures)
+
+### Type 3: Epistemic/Trust Failures
+
+**Description**: AI-related incidents erode trust in institutions or information systems.
+
+**Examples**:
+- Major deepfake scandal undermining elections
+- AI-generated scientific fraud discovered
+- Widespread authentication failures
+- AI-assisted disinformation campaigns
+
+**Recovery Profile**:
+- **Timeline**: Years to decades
+- **Scope**: Societal
+- **Difficulty**: Very High
+- **Precedent**: Limited (pre-digital trust crises evolved slowly)
+
+### Type 4: Capability/Expertise Loss
+
+**Description**: AI dependency leads to critical skill degradation, then AI fails.
+
+**Examples**:
+- Medical AI fails, doctors cannot diagnose
+- Navigation systems fail, pilots cannot fly
+- Coding AI fails, developers cannot maintain systems
+- Research AI fails, scientists cannot evaluate findings
+
+**Recovery Profile**:
+- **Timeline**: Years to generations
+- **Scope**: Domain-specific to societal
+- **Difficulty**: Extreme
+- **Precedent**: Historical craft/skill losses (took decades-centuries to recover)
+
+### Type 5: Alignment/Control Failures
+
+**Description**: AI system pursues unintended goals or resists human control.
+
+**Examples**:
+- AI system acquires resources against human wishes
+- Deceptively aligned AI discovered
+- Multi-agent system develops emergent goals
+- AI manipulates overseers to avoid shutdown
+
+**Recovery Profile**:
+- **Timeline**: Unknown (potentially permanent)
+- **Scope**: Potentially global
+- **Difficulty**: Unknown to Impossible
+- **Precedent**: None
+
+## Recovery Phase Analysis
+
+### Phase 1: Detection and Acknowledgment
+
+**Timeline**: Hours to months (depending on incident type)
+
+**Critical Activities**:
+1. Identify that an incident has occurred
+2. Distinguish AI-caused from other failures
+3. Determine scope and severity
+4. Mobilize appropriate response
+
+| Factor | Impact on Detection Speed | Current State |
+|--------|--------------------------|---------------|
+| Monitoring systems | 2-10x faster | Variable |
+| Clear attribution mechanisms | 3-5x faster | Weak |
+| Incident reporting culture | 2-4x faster | Variable by sector |
+| Technical expertise availability | 2-5x faster | Degrading |
+
+### Phase 2: Containment
+
+**Timeline**: Hours to weeks
+
+| Type | Key Challenge | Containment Difficulty |
+|------|--------------|----------------------|
+| Technical (contained) | System shutdown | Low-Medium |
+| Technical (systemic) | Cascade prevention | High |
+| Epistemic/Trust | Information already spread | Very High |
+| Expertise loss | No quick fix exists | Extreme |
+| Alignment failure | System may resist | Unknown |
+
+### Phase 3: Damage Assessment
+
+**Timeline**: Days to months
+
+| Factor | Multiplier Effect |
+|--------|------------------|
+| Delayed detection | 1.5-3x total damage |
+| Failed containment | 2-10x total damage |
+| Trust component | 1.5-5x recovery time |
+| Capability loss | 2-20x recovery time |
+
+### Phase 4: Recovery Execution
+
+**Timeline**: Weeks to decades
+
+### Phase 5: Institutionalization
+
+**Timeline**: Months to years
+
+## What Enables Faster Recovery
+
+### Factor 1: Preserved Human Expertise
+
+| Expertise Level | Recovery Time Multiplier |
+|----------------|-------------------------|
+| Full expertise available | 1x (baseline) |
+| Moderate degradation (50%) | 2-4x |
+| Severe degradation (80%) | 5-20x |
+| Near-complete loss (95%) | 50-100x or impossible |
+
+### Factor 2: System Redundancy
+
+| Type | Examples | Cost | Effectiveness |
+|------|----------|------|---------------|
+| AI redundancy | Multiple AI systems | Medium | Medium |
+| Human redundancy | Trained humans can substitute | High | High |
+| Manual systems | Non-AI fallbacks | Medium-High | Very High |
+| Geographic | Distributed systems | High | High |
+
+### Factor 3: Detection Speed
+
+| Incident Type | Growth Rate | Damage Doubling Time |
+|--------------|-------------|---------------------|
+| Contained technical | 0.1-0.3/day | 2-7 days |
+| Systemic technical | 0.3-0.7/day | 1-2 days |
+| Epistemic/Trust | 0.05-0.2/week | 3-14 weeks |
+| Expertise loss | 0.02-0.1/month | 7-35 months |
+| Alignment failure | 0.5-2.0/day | 0.3-1.4 days |
+
+### Factor 4: Coordination Capacity
+
+| Level | Current Capacity | Needed Improvement |
+|-------|-----------------|-------------------|
+| Organizational | Medium-High | Moderate |
+| Sectoral | Medium | Significant |
+| National | Low-Medium | Major |
+| International | Very Low | Critical |
+
+### Factor 5: Pre-Planned Response
+
+| Preparation Level | Response Time Improvement | Error Reduction |
+|------------------|--------------------------|-----------------|
+| No plan | Baseline | Baseline |
+| Generic plan | 30-50% faster | 20-40% |
+| Specific AI incident plan | 50-70% faster | 40-60% |
+| Drilled and tested plan | 70-90% faster | 60-80% |
+
+## Case Studies from Related Domains
+
+### Case Study 1: 2008 Financial Crisis
+
+| Dimension | Value | Relevance to AI |
+|-----------|-------|-----------------|
+| Type | Systemic technical + trust | Similar to AI infrastructure failure |
+| Acute phase | 18-24 months | Reference for systemic recovery |
+| Full recovery | 7-10 years | Trust rebuilding benchmark |
+| GDP loss | \$12-22 trillion globally | Scale of potential AI impact |
+| Key enabler | Human experts + manual fallbacks | Highlights expertise preservation value |
+
+**Key lesson:** Human experts could diagnose problems and operate manual fallbacks. If equivalent AI expertise atrophies before a major incident, recovery would take 2-5x longer.
+
+### Case Study 2: Aviation Automation Incidents
+
+| Incident | Deaths | Root Cause | Recovery Time |
+|----------|--------|------------|---------------|
+| Air France 447 (2009) | 228 | Pilot automation confusion | 2 years investigation |
+| Boeing 737 MAX (2018-19) | 346 | Automation override failure | 20 months grounded |
+| Estimated retraining cost | — | — | \$2-5B industry-wide |
+
+**Key lesson:** Expertise atrophy (pilots unable to fly manually when automation failed) made incidents more severe. Aviation's 95%+ automation rate foreshadows AI dependency risks.
+
+### Case Study 3: Y2K Preparation
+
+| Dimension | Value | AI Parallel |
+|-----------|-------|-------------|
+| Global remediation cost | \$300-600B | Scale of proactive AI safety investment |
+| Time horizon | 5-7 years advance | How early planning must start |
+| Success rate | ≈99% systems remediated | Target for prevention efforts |
+| Key enabler | Clear deadline + aligned incentives | What AI safety lacks |
+
+**Key lesson:** Y2K succeeded because the deadline was unambiguous and everyone faced consequences. AI lacks such clear forcing functions.
+
+### Case Study 4: BSE/Mad Cow Disease Crisis
+
+| Phase | Duration | Trust Level | Analogy |
+|-------|----------|-------------|---------|
+| Pre-crisis | — | 85-90% | Normal trust in AI |
+| Acute crisis (1996-2000) | 4 years | 25-35% | AI incident revelation |
+| Slow recovery | 10+ years | 60-70% by 2010 | Partial trust rebuild |
+| Full recovery | 15-20 years | 75-80% by 2015 | Near-baseline return |
+
+**Key lesson:** Trust destruction happens 5-10x faster than trust recovery. An AI trust crisis could take decades to overcome.
+
+## Recovery Probability Estimates
+
+### By Incident Type
+
+| Type | P(Full Recovery) | P(Permanent Damage) | Expected Timeline |
+|------|-----------------|-------------------|------------------|
+| Contained technical | 90-99% | Less than 1% | Months |
+| Systemic technical | 60-80% | 5-15% | Years |
+| Epistemic/Trust | 30-60% | 10-30% | Years to decades |
+| Expertise loss | 20-50% | 20-40% | Decades |
+| Alignment failure | 5-30% | 30-75% | Unknown |
+
+### By Expertise Preservation
+
+| Expertise Level | Recovery Probability | Timeline |
+|----------------|---------------------|----------|
+| Preserved (over 80%) | 80-95% | 1-5 years |
+| Moderate (50-80%) | 50-75% | 5-15 years |
+| Degraded (20-50%) | 20-50% | 15-30 years |
+| Lost (under 20%) | 5-25% | 30+ years or impossible |
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "How quickly can trust be rebuilt after AI-caused epistemic failures?",
+    "Are there incident types from which recovery is truly impossible?",
+    "What is the minimum viable expertise level for recovery from major AI failures?",
+    "Can new institutional forms enable faster recovery than historical precedents suggest?",
+    "How do interconnected AI systems affect cascade dynamics and recovery complexity?"
+  ]}
+/>
+
+## Policy Implications
+
+### Immediate (2025-2027)
+
+1. **Develop AI-specific incident response frameworks**
+2. **Preserve critical expertise**
+3. **Build monitoring infrastructure**
+
+### Medium-term (2027-2032)
+
+1. **Create redundancy requirements**
+2. **Establish coordination capacity**
+
+### Long-term (2032+)
+
+1. **Develop recovery-resilient AI architecture**
+2. **Create generational resilience**
+
+## Related Models
+
+- <EntityLink id="trust-cascade-model" />
+- <EntityLink id="expertise-atrophy-cascade" />
+- <EntityLink id="institutional-adaptation-speed" />
+
+## Sources and Evidence
+
+### Disaster Recovery Literature
+- Quarantelli (1997): "Ten Criteria for Evaluating the Management of Community Disasters"
+- Tierney (2019): "Disasters: A Sociological Approach"
+
+### Technology Failure Studies
+- Perrow (1999): "Normal Accidents: Living with High-Risk Technologies"
+- Leveson (2011): "Engineering a Safer World"
+
+### Trust and Institution Recovery
+- Slovic (1993): "Perceived Risk, Trust, and Democracy"
+- Gillespie and Dietz (2009): "Trust Repair After an Organization-Level Failure"
+
+## Related Pages
+
+<Backlinks client:load entityId="post-incident-recovery" />

@@ -1,0 +1,315 @@
+---
+title: Probing / Linear Probes
+description: Linear probes are simple classifiers trained on neural network activations to test what concepts models internally represent. Research shows probes achieve 71-83% accuracy detecting LLM truthfulness (Azaria & Mitchell 2023), making them a foundational diagnostic tool for AI safety and deception detection.
+sidebar:
+  order: 14
+quality: 55
+importance: 62
+lastEdited: "2025-01-28"
+llmSummary: Linear probing achieves 71-83% accuracy detecting LLM truthfulness and is a foundational diagnostic tool for interpretability research. While computationally cheap and widely adopted, probes are vulnerable to adversarial hiding and only detect linearly separable features, limiting their standalone safety value to supporting other techniques.
+ratings:
+  novelty: 3.5
+  rigor: 6
+  actionability: 4.5
+  completeness: 7
+metrics:
+  wordCount: 1594
+  citations: 36
+  tables: 24
+  diagrams: 2
+clusters:
+  - ai-safety
+subcategory: alignment-interpretability
+---
+import {Mermaid, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="probing" client:load />
+
+## Overview
+
+Linear probing is a foundational interpretability technique that trains simple classifiers (typically linear models) on the internal activations of neural networks to determine what information is encoded in those representations. The core insight is elegant: if a linear classifier can accurately predict whether a model "knows" some concept (e.g., truthfulness, sentiment, factual correctness) from its activations, then that concept must be represented in a linearly accessible way in the model's internal state. This provides evidence about the structure of learned representations and what information models track internally.
+
+The technique has become a standard research tool across interpretability and AI safety. Researchers use probes to detect whether models represent concepts like "this statement is false," "this response is harmful," or "I am being evaluated" in their activations. The simplicity of linear probes (typically just a single learned weight matrix) makes them computationally cheap and easy to train, while their limitations (they can only detect linearly separable features) provide insight into how concepts are organized in neural networks.
+
+For AI safety applications, probing offers a direct window into whether models have internal representations that differ from their expressed behavior. A model might claim ignorance while its activations reveal it knows the answer, or might express confidence while internally representing uncertainty. More critically, probes could potentially detect deception-related representations, identifying when a model internally represents "I should mislead the user" even if its outputs appear helpful. [Azaria and Mitchell (2023)](https://arxiv.org/abs/2304.13734) demonstrated that trained classifiers on LLM hidden states achieve 71-83% accuracy at detecting whether statements are true or false, providing evidence that truthfulness is encoded in model representations. However, the technique faces fundamental limitations: probes only detect what they're trained to find, models might learn to hide representations from probes, and correlation with activations doesn't guarantee causal relevance.
+
+## How Probing Works
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Input["1. Input Processing"]
+        TEXT[Input Text] --> MODEL[Language Model]
+    end
+
+    subgraph Extract["2. Activation Extraction"]
+        MODEL --> L1[Layer 1 Activations]
+        MODEL --> L2[Layer N Activations]
+        MODEL --> L3[Layer M Activations]
+    end
+
+    subgraph Train["3. Probe Training"]
+        L2 --> PROBE[Linear Probe]
+        LABELS[Labeled Data] --> PROBE
+        PROBE --> WEIGHTS[Learned Weights]
+    end
+
+    subgraph Predict["4. Inference"]
+        WEIGHTS --> CLASSIFY[Classification]
+        CLASSIFY --> RESULT[Feature Present?]
+    end
+
+    style Input fill:#e6f3ff
+    style Extract fill:#fff3e6
+    style Train fill:#e6ffe6
+    style Predict fill:#ffe6e6
+`} />
+
+The probing methodology involves four key steps:
+
+1. **Activation Extraction**: Run inputs through the neural network and capture the activation vectors at specific layers. These vectors encode the model's internal representations at that processing stage.
+
+2. **Dataset Construction**: Create labeled examples pairing activation vectors with ground-truth labels for the target concept (e.g., "this statement is true/false").
+
+3. **Classifier Training**: Train a simple classifier (typically logistic regression) on the activation-label pairs. The simplicity of the classifier is intentional—if a linear model can predict the concept, the information must be linearly separable in the representation space.
+
+4. **Evaluation**: Test the probe on held-out data to determine whether the target concept is encoded in the model's representations.
+
+## Comparison of Probing Techniques
+
+Different probing methods offer distinct tradeoffs between simplicity, scalability, and the types of insights they provide.
+
+| Technique | Method | Strengths | Limitations | Key Citations |
+|-----------|--------|-----------|-------------|---------------|
+| **Linear Probes** | Train logistic regression on activations | Simple, interpretable, fast to train | Only detects linear features | [Belinkov 2022](https://aclanthology.org/2022.cl-1.7/) |
+| **Structural Probes** | Train probes predicting syntactic distances | Recovers parse trees from geometry | Requires linguistic annotation | [Hewitt & Manning 2019](https://nlp.stanford.edu/pubs/hewitt2019designing.pdf) |
+| **Contrast Consistent Search (CCS)** | Unsupervised search for "truth direction" | No labeled data needed | Sensitive to contrast pair quality | [Burns et al. 2023](https://arxiv.org/abs/2212.03827) |
+| **Activation Patching** | Replace activations to test causal role | Establishes causality, not just correlation | Computationally expensive | [Zhang & Nanda 2024](https://arxiv.org/abs/2309.16042) |
+| **Representation Reading (RepE)** | Identify high-level concept directions | Works for complex concepts; enables control | Requires careful vector construction | [Zou et al. 2023](https://arxiv.org/abs/2310.01405) |
+| **Patchscopes** | Patch activations between forward passes | Elicits information from activations | Limited by target prompt design | [Ghandeharioun et al. 2024](https://arxiv.org/abs/2401.06102) |
+
+### When to Use Each Method
+
+**Linear Probes** are the default choice for initial exploration—they're fast, cheap, and provide interpretable results. Use them when you have labeled data and want to test specific hypotheses about what information is encoded.
+
+**CCS and unsupervised methods** are valuable when labeled data is unavailable or when you want to discover what the model "believes" without biasing results with human labels. CCS achieves comparable accuracy to supervised probes on many tasks using only contrast pairs.
+
+**Activation Patching** should be used when you need to establish causal relationships—when you need to know not just whether information is present, but whether the model actually uses it for the behavior you're studying.
+
+**Representation Engineering (RepE)** is appropriate when you want to both understand and control model behavior. It enables steering models toward honesty or other properties by manipulating identified directions.
+
+## Risks Addressed
+
+Probing techniques contribute to addressing several AI safety risks:
+
+| Risk | How Probing Helps | Effectiveness |
+|------|-------------------|---------------|
+| **Deceptive Alignment** | Could detect representations of deceptive intent in model activations | Medium - 71-83% accuracy on truthfulness, but deception-specific probes less validated |
+| **Sycophancy** | Can identify when models represent "user wants X" separately from "X is true" | Low-Medium - Research ongoing |
+| **Reward Hacking** | Probes may detect when models represent reward vs. intended goals differently | Low - Theoretical application |
+| **Evaluation Gaming** | Could detect representations of "being evaluated" or "test conditions" | Medium - Some preliminary evidence |
+| **Goal Misgeneralization** | May reveal whether training goals are represented differently than intended goals | Low-Medium - Requires understanding goal representations |
+
+## Risk Assessment & Impact
+
+| Dimension | Assessment | Notes |
+|-----------|------------|-------|
+| **Safety Uplift** | Low | Diagnostic tool; doesn't directly improve safety but supports research |
+| **Capability Uplift** | Neutral | Analysis tool only; no capability improvement |
+| **Net World Safety** | Helpful | Supports understanding with minimal dual-use concerns |
+| **Scalability** | Yes | Computationally cheap; scales well to larger models |
+| **Deception Robustness** | Partial | Could detect lying representations; models could learn to hide them |
+| **SI Readiness** | Maybe | Technique scales; effectiveness at SI uncertain |
+| **Current Adoption** | Widespread | Standard research tool across academia and industry |
+| **Research Investment** | \$5-10M/yr | Common technique; many groups use probing as part of broader research |
+
+## Applications in AI Safety
+
+### What Probes Can Detect
+
+| Concept | Probe Accuracy | Source | Safety Relevance |
+|---------|----------------|--------|------------------|
+| **Truthfulness** | 71-83% | [Azaria & Mitchell 2023](https://arxiv.org/abs/2304.13734) | Detecting when models "know" they're wrong |
+| **True/False Statements** | 70-85% | [Burns et al. 2023](https://arxiv.org/abs/2212.03827) | Unsupervised truth detection via CCS |
+| **Syntactic Structure** | 85-95% | [Hewitt & Manning 2019](https://nlp.stanford.edu/pubs/hewitt2019designing.pdf) | Understanding linguistic representations |
+| **Harmful Intent** | ≈75% (est.) | Anthropic internal | Content filtering; harm detection |
+| **Self-awareness** | 58-70% (est.) | Various | Evaluation gaming concerns |
+
+*Accuracy estimates marked (est.) are based on unpublished or partially reported results.*
+
+### The Eliciting Latent Knowledge (ELK) Connection
+
+Probing is central to the [Eliciting Latent Knowledge](https://www.alignmentforum.org/posts/qHCDysDnvhteW7kRd/arc-s-first-technical-report-eliciting-latent-knowledge) research agenda developed by the Alignment Research Center (ARC). ELK asks: can we reliably extract what a model "believes" from its internal representations, even when its outputs are unreliable? This is critical for AI safety because a deceptive AI might output misleading information while internally representing the truth.
+
+<Mermaid client:load chart={`
+flowchart LR
+    subgraph Problem["ELK Challenge"]
+        MODEL[Model with Latent Knowledge]
+        OUTPUT[Potentially Misleading Output]
+        TRUTH[True Internal Representation]
+    end
+
+    subgraph Solution["Probing Approach"]
+        ACT[Model Activations]
+        PROBE[Trained Probe]
+        EXTRACT[Extracted Knowledge]
+    end
+
+    MODEL --> OUTPUT
+    MODEL --> TRUTH
+    TRUTH --> ACT
+    ACT --> PROBE
+    PROBE --> EXTRACT
+
+    OUTPUT -.->|May Differ| EXTRACT
+
+    style Problem fill:#ffe6e6
+    style Solution fill:#d4edda
+`} />
+
+Key research questions:
+- Can probes extract truth even when the model's output is deceptive?
+- How do we validate probe findings without ground truth?
+- Could deceptive models learn to hide from probes?
+
+[EleutherAI's ELK project](https://www.eleuther.ai/projects/elk) is actively building on the Contrast Consistent Search (CCS) method from [Burns et al. 2023](https://arxiv.org/abs/2212.03827), creating reusable libraries for unsupervised knowledge elicitation.
+
+## Empirical Results
+
+### Quantified Probe Accuracy by Study
+
+| Study | Task | Model | Accuracy | Method | Key Finding |
+|-------|------|-------|----------|--------|-------------|
+| [Azaria & Mitchell 2023](https://arxiv.org/abs/2304.13734) | Truthfulness detection | LLaMA-13B | 71-83% | Supervised MLP | Internal states reveal statement veracity |
+| [Burns et al. 2023](https://arxiv.org/abs/2212.03827) | True/false classification | GPT-J, LLaMA | 70-85% | CCS (unsupervised) | Truth direction exists without labels |
+| Anthropic 2024 | Safety-relevant features | Claude 3 Sonnet | Not disclosed | SAE + probing | Millions of interpretable features extracted |
+| [Belinkov & Glass 2019](https://aclanthology.org/Q19-1004/) | POS tagging | BERT | 97% | Linear probe | Syntactic info in middle layers |
+| [Hewitt & Liang 2019](https://arxiv.org/abs/1909.03368) | Dependency parsing | ELMo | 80-85% | Structural probe | Parse trees embedded in geometry |
+
+### Probe Performance by Layer Position
+
+Research consistently shows that different types of information are best probed at different layers:
+
+| Information Type | Optimal Layer Position | Accuracy Range | Source |
+|------------------|----------------------|----------------|--------|
+| Lexical/surface features | Early layers (1-4) | 90-95% | Belinkov 2022 |
+| Syntactic structure | Middle layers (8-16) | 85-95% | Hewitt & Manning 2019 |
+| Semantic concepts | Late-middle layers | 70-85% | Various |
+| Factual knowledge | Later layers (20+) | 60-80% | Azaria & Mitchell 2023 |
+| Task-specific features | Final layers | Variable | Depends on task |
+
+### Notable Findings
+
+1. **Layer Effects**: Probes perform differently across layers; optimal layer depends on concept type. Early layers encode surface features (90-95% accuracy) while later layers encode abstract concepts (60-80% accuracy).
+
+2. **Model Size Scaling**: Larger models often have more linearly accessible representations. [Anthropic's March 2025 research](https://www.anthropic.com/research) found that interpretability techniques scale well to production models like Claude 3 Sonnet.
+
+3. **Training Data Requirements**: Probe performance improves with more diverse training examples, but even 1,000-5,000 examples often suffice for reliable results.
+
+4. **Generalization**: Probes trained on one distribution often fail on others—a probe trained on formal text may perform poorly on casual conversation, limiting deployment reliability.
+
+### Limitations Demonstrated
+
+[Belinkov (2022)](https://aclanthology.org/2022.cl-1.7/) provides a comprehensive analysis of probing limitations:
+
+| Limitation | Evidence | Quantified Impact | Implication |
+|------------|----------|-------------------|-------------|
+| **Spurious Correlations** | [Hewitt & Liang 2019](https://arxiv.org/abs/1909.03368) showed probes achieve 70%+ accuracy on random control tasks | Up to 30% of apparent probe accuracy may be spurious | Must use control tasks to validate findings |
+| **Non-Causal** | Probing doesn't establish that features cause behavior | Unknown % of probed features are actually used | Combine with activation patching for causal claims |
+| **Adversarial Hiding** | Models can be trained to hide representations from probes | Deception detection reliability: uncertain | Probes may fail against sophisticated deception |
+| **Concept Validity** | What we label as "truthfulness" may not match model's representation | Probe accuracy is upper-bounded by label quality | Careful dataset construction essential |
+| **Classifier Capacity** | Complex probes may learn task rather than extract features | MLP probes show 5-15% higher accuracy than linear | Prefer minimal probe complexity |
+| **Distribution Shift** | Probes trained on one domain fail on others | 10-30% accuracy drop on out-of-distribution data | Deployment requires domain-matched training |
+
+## Comparison to Other Techniques
+
+| Technique | Advantages Over Probing | Probing Advantages | Compute Cost | Key Use Case |
+|-----------|------------------------|-------------------|--------------|--------------|
+| **Sparse Autoencoders** | Unsupervised; discovers unknown features; scales to millions | Targeted; cheaper; more interpretable | 100-1000x higher | Feature discovery |
+| **Activation Patching** | Establishes causality; identifies critical components | Doesn't require intervention; faster | 10-100x higher | Causal verification |
+| **Behavioral Testing** | Tests actual outputs; no internal access needed | Reveals hidden representations | Similar | Surface behavior |
+| **Representation Engineering** | Enables intervention and control | Purely observational; lower risk | Similar | Model steering |
+
+*Compute costs are approximate relative to linear probing on a single layer.*
+
+### Arguments For Probing Investment
+
+1. **Foundation for Other Work**: Probes inform SAE training, RepEng directions, and evaluation design
+2. **Computationally Cheap**: Can be applied broadly without major infrastructure
+3. **Well-Understood**: Decades of machine learning theory apply
+4. **Rapid Iteration**: Easy to test new hypotheses about representations
+5. **Safety-Relevant**: Direct application to deception detection research
+
+### Arguments Against Major Investment
+
+1. **Not Sufficient Alone**: Probes diagnose but don't fix problems
+2. **Vulnerability to Gaming**: Sophisticated models could hide from probes
+3. **Interpretation Challenges**: Probe success doesn't guarantee understanding
+4. **Limited to Linear Structure**: May miss important nonlinear features
+5. **Correlation Not Causation**: Findings may not translate to control
+
+### Key Uncertainties
+
+- Can probes reliably detect deception in models that are trying to hide it?
+- What probe accuracy is "good enough" for safety applications?
+- How do probe results transfer across model architectures and scales?
+- Can probe training data adequately cover the space of concerning behaviors?
+
+## Recent Developments (2024-2025)
+
+The field has seen significant advances in probing methodology and scale:
+
+**Anthropic's Interpretability Breakthrough (March 2025)**: Anthropic researcher Josh Batson stated that "in another year or two, we're going to know more about how these models think than we do about how people think," highlighting rapid progress in mechanistic interpretability including probing techniques. Their work extracted millions of interpretable features from Claude 3 Sonnet using sparse autoencoders, with probing used to validate discovered features.
+
+**Scaling to Production Models**: Research has demonstrated that probing techniques developed on smaller models successfully transfer to frontier systems. [Anthropic's interpretability team](https://transformer-circuits.pub/) has shown that methods for interpreting small models scale to production LLMs, finding that concepts are represented by patterns of neurons firing together that can be identified and studied.
+
+**Unsupervised Methods Mature**: The Contrast Consistent Search (CCS) method and its variants have shown that supervised probing is not always necessary. [EleutherAI's collaboration with Cadenza Labs](https://www.eleuther.ai/projects/elk) has produced cleaner, more modular implementations with multi-GPU support and Hugging Face integration.
+
+**Circuit Tracing Integration**: Probing increasingly complements circuit tracing methods. Anthropic's circuit tracing work revealed a "shared conceptual space where reasoning happens before being translated into language," with probes used to identify and validate the identified concepts.
+
+## Recommendation
+
+**Recommendation Level: MAINTAIN**
+
+Linear probing is a valuable supporting technique that is already adequately funded as a standard research tool. The technique should continue to be used broadly but does not require major additional investment as a standalone approach. Its primary value lies in enabling and informing other interpretability techniques rather than providing direct safety guarantees.
+
+Appropriate uses:
+- Informing sparse autoencoder training and evaluation
+- Generating hypotheses for representation engineering
+- Quick diagnostics on new models and capabilities
+- Supporting the Eliciting Latent Knowledge research agenda
+- Baseline comparisons for more sophisticated techniques
+
+## Sources & Resources
+
+### Primary Research
+
+| Paper | Authors | Year | Key Contribution | Link |
+|-------|---------|------|------------------|------|
+| The Internal State of an LLM Knows When It's Lying | Azaria & Mitchell | 2023 | 71-83% accuracy detecting truthfulness from activations | [arXiv](https://arxiv.org/abs/2304.13734) |
+| Discovering Latent Knowledge Without Supervision | Burns et al. | 2023 | Contrast Consistent Search (CCS) for unsupervised probing | [arXiv](https://arxiv.org/abs/2212.03827) |
+| Probing Classifiers: Promises, Shortcomings, and Advances | Belinkov | 2022 | Comprehensive survey of probing limitations | [ACL Anthology](https://aclanthology.org/2022.cl-1.7/) |
+| Designing and Interpreting Probes with Control Tasks | Hewitt & Liang | 2019 | Control tasks methodology for probe validation | [arXiv](https://arxiv.org/abs/1909.03368) |
+| Representation Engineering | Zou et al. | 2023 | Top-down approach using representation reading/control | [arXiv](https://arxiv.org/abs/2310.01405) |
+| Towards Best Practices of Activation Patching | Zhang & Nanda | 2024 | Systematic analysis of patching methodology | [arXiv](https://arxiv.org/abs/2309.16042) |
+
+### AI Safety Applications
+
+- **ARC Eliciting Latent Knowledge**: [Technical report](https://www.alignmentforum.org/posts/qHCDysDnvhteW7kRd/arc-s-first-technical-report-eliciting-latent-knowledge) on using probes to extract model "beliefs"
+- **Anthropic Interpretability**: [Research page](https://www.anthropic.com/research/team/interpretability) documenting sparse autoencoder and probing work on Claude
+- **EleutherAI ELK Project**: [Project page](https://www.eleuther.ai/projects/elk) building on CCS for knowledge elicitation
+
+### Tools and Code
+
+| Tool | Purpose | Link |
+|------|---------|------|
+| TransformerLens | Mechanistic interpretability library with probing utilities | [GitHub](https://github.com/neelnanda-io/TransformerLens) |
+| Baukit | Probing and intervention experiments on language models | [GitHub](https://github.com/davidbau/baukit) |
+| EleutherAI SAE Library | Sparse autoencoder training and analysis | [GitHub](https://github.com/EleutherAI/sae) |
+| scikit-learn | Standard library for logistic regression probes | [Docs](https://scikit-learn.org/) |
+
+### Related Concepts
+
+- **Representation Similarity Analysis**: Comparing representations across models/layers
+- **Concept Bottleneck Models**: Architectures with interpretable intermediate representations
+- **Neural Network Surgery**: Broader field of analyzing and modifying trained networks
+- **Mechanistic Interpretability**: The broader research agenda probing contributes to; see [Neel Nanda's overview](https://www.neelnanda.io/mechanistic-interpretability)

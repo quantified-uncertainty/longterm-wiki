@@ -1,0 +1,585 @@
+---
+title: Survival and Flourishing Fund (SFF)
+description: SFF is a donor-advised fund financed primarily by Jaan Tallinn (Skype co-founder, ~\$900M net worth) that uses a unique S-process simulation mechanism to allocate grants. Since 2019, SFF has distributed over \$100 million with the 2025 round totaling \$34.33M (86% to AI safety). The S-process distinguishes SFF from traditional foundations by using multiple recommenders who express preferences as mathematical utility functions, with an algorithm computing allocations that favor projects with at least one enthusiastic champion rather than consensus picks. Key grantees include MIRI, METR (formerly ARC Evals), Center for AI Safety, and various university AI safety programs.
+sidebar:
+  order: 1
+quality: 59
+llmSummary: SFF distributed $141M since 2019 (primarily from Jaan Tallinn's ~$900M fortune), with the 2025 round totaling $34.33M (86% to AI safety). Uses unique S-process mechanism where 6-12 recommenders express utility functions and an algorithm allocates grants favoring projects with enthusiastic champions rather than consensus picks; median grant ~$100K.
+lastEdited: "2026-01-29"
+importance: 44
+ratings:
+  novelty: 3.5
+  rigor: 6
+  actionability: 5.5
+  completeness: 7
+metrics:
+  wordCount: 2694
+  citations: 79
+  tables: 42
+  diagrams: 2
+clusters:
+  - community
+  - ai-safety
+  - governance
+subcategory: funders
+---
+import {DataInfoBox, Backlinks, Mermaid, EntityLink} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Scale** | Major | \$34.33M distributed in 2025; \$100M+ since 2019 |
+| **AI Focus** | Dominant | 86% of 2025 grants to AI-related work (up from ≈50% in 2019) |
+| **Mechanism** | Unique | S-process algorithmic allocation favoring champion-backed projects |
+| **Transparency** | High | Publishes full grant lists with amounts; process documented |
+| **Speed** | Varies | S-process: 3-6 months; Speculation Grants: 1-2 weeks |
+| **Grant Size** | Medium-Large | Median: ≈\$100K; Average: ≈\$274K for AI safety |
+| **Risk Tolerance** | Higher | Funds early-stage and speculative research |
+| **Primary Funder** | [Jaan Tallinn](https://en.wikipedia.org/wiki/Jaan_Tallinn) | Skype/Kazaa co-founder, ≈\$900M net worth |
+
+## Organization Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Full Name** | Survival and Flourishing Fund |
+| **Type** | Virtual Fund / Donor-Advised Fund |
+| **Founded** | 2019 (evolved from BERI's grantmaking) |
+| **Primary Funder** | [Jaan Tallinn](https://en.wikipedia.org/wiki/Jaan_Tallinn) (also funds Lightspeed Grants) |
+| **Additional Funders** | Jed McCaleb, David Marble (Casey and Family Foundation), Survival and Flourishing Corp |
+| **Fiscal Sponsor** | Silicon Valley Community Foundation |
+| **Operator** | Survival and Flourishing Corp (manages S-process) |
+| **Website** | [survivalandflourishing.fund](https://survivalandflourishing.fund/) |
+| **Contact** | sff-contact@googlegroups.com |
+| **Mechanism** | S-process (multi-recommender simulation allocation) |
+| **Funding Programs** | S-Process Grant Rounds (1-2/year), Speculation Grants (rolling), Matching Pledges (2025+) |
+| **Total Historical Giving** | \$100M+ since 2019 |
+| **S-Process Developers** | Andrew Critch, <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink>, Oliver Habryka, Kevin Arlin, Jason Moggridge |
+
+## Overview
+
+The [Survival and Flourishing Fund](https://survivalandflourishing.fund/) (SFF) is the second-largest funder of AI safety research after <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, having distributed over \$100 million since beginning grantmaking in 2019. Financed primarily by [Jaan Tallinn](https://en.wikipedia.org/wiki/Jaan_Tallinn), the Skype and Kazaa co-founder with an estimated net worth of approximately \$900 million, SFF uses a distinctive algorithmic mechanism called the "S-process" to allocate grants based on recommendations from multiple advisors.
+
+SFF originated from the [Berkeley Existential Risk Initiative](https://existence.org/) (BERI) in 2019 as a way to continue BERI's grantmaking activities while allowing BERI to focus on its core mission of operational support. Initially funded with approximately \$2 million from BERI (itself funded by Tallinn), SFF has grown dramatically: from \$2 million distributed in 2019 to \$34.33 million in 2025.
+
+SFF's focus has increasingly centered on AI safety as the field has grown. In 2025, approximately 86% of grants went to AI-related projects, up from roughly 50% in 2019. This reflects both Tallinn's longstanding concern about AI existential risk and the growing urgency perceived in the field. The fund supports a diverse portfolio ranging from technical research organizations (<EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="metr">METR</EntityLink>, <EntityLink id="far-ai">FAR AI</EntityLink>) to policy groups (Center for AI Policy, <EntityLink id="govai">GovAI</EntityLink>) and field-building initiatives (SERI MATS, <EntityLink id="80000-hours">80,000 Hours</EntityLink>).
+
+The S-process mechanism distinguishes SFF from traditional foundations. Rather than having a single decision-maker or voting committee, SFF uses multiple "recommenders" (typically 6-12 per round) who express their funding preferences as mathematical utility functions. An algorithm then computes final allocations that respect funders' meta-preferences about which recommenders to trust on which topics. Critically, the system is designed to favor funding projects that *at least one* recommender is excited about, rather than projects that achieve consensus approval.
+
+## 2025 Grant Round
+
+SFF's 2025 grant round distributed \$34.33 million across dozens of organizations, significantly exceeding the initial \$10-20 million estimate. The round featured three specialized tracks: the Main Track (6 recommenders, \$6-12M), the Freedom Track (3 recommenders, \$2-4M), and the Fairness Track (3 recommenders, \$2-4M). In total, twelve recommenders participated in evaluating applications for funder Jaan Tallinn.
+
+### 2025 Breakdown by Cause Area
+
+| Cause Area | Amount | Share | Key Recipients |
+|------------|--------|-------|----------------|
+| **AI Safety & Governance** | ≈\$29.5M | 86% | MIRI, METR, <EntityLink id="cais">CAIS</EntityLink>, GovAI, Apollo, FAR AI, university programs |
+| **Biosecurity** | ≈\$2.5M | 7% | <EntityLink id="securebio">SecureBio</EntityLink>, Johns Hopkins CHS, NTI |
+| **Other X-Risk** | ≈\$1.5M | 4% | Nuclear risk, forecasting, civilizational resilience |
+| **Meta/Community** | ≈\$0.8M | 3% | EA community building, longevity, fertility research |
+
+### Notable 2025 AI Safety Grantees
+
+| Organization | Focus Area | Notes |
+|--------------|------------|-------|
+| **[MIRI](https://intelligence.org/)** | Technical alignment research | Longstanding SFF grantee; founded by <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> |
+| **[METR](https://metr.org/)** (formerly ARC Evals) | Frontier model evaluations | Leading <EntityLink id="dangerous-cap-evals">dangerous capability evaluations</EntityLink>; budget rapidly growing |
+| **[Center for AI Safety](https://www.safe.ai/)** | Research and advocacy | Total SFF funding: \$6.4M+ historically |
+| **[Apollo Research](https://apolloresearch.ai/)** | Deception detection in AI | Leading European evals group; recent o1 research |
+| **[GovAI](https://www.governance.ai/)** | <EntityLink id="ai-governance">AI governance</EntityLink> research | Oxford-based policy research |
+| **[FAR AI](https://far.ai/)** | Alignment research | Technical safety research |
+| **[SecureBio](https://www.securebio.org/)** | AI + biosecurity intersection | \$250K in 2025; some recommenders felt deserved more |
+| **[Palisade Research](https://palisaderesearch.org/)** | Security research | AI safety security focus |
+
+### 2025 Matching Pledge Program
+
+New to 2025, SFF introduced a [Matching Pledge Program](https://survivalandflourishing.fund/2025/application) designed to diversify the funding landscape and increase grantee independence. Matching Pledges are commitments by funders to match outside donations at specified rates (0.5x, 1x, 2x, or 3x) up to pledged amounts. Organizations that opted into the program received algorithmic boosts to their evaluations, factoring in the expected leverage from external donors.
+
+The goals of the Matching Pledge Program include:
+- Diversifying funding sources beyond SFF
+- Encouraging other donors to give more
+- Increasing fundraising robustness and independence of grantees
+- Reducing single-funder dependency risk
+
+### Non-AI Existential Risk (~14% / ≈\$5M)
+
+| Category | Approximate Amount | Example Organizations |
+|----------|-------------------|----------------------|
+| **Biosecurity** | ≈\$2,500,000 | SecureBio, Johns Hopkins Center for Health Security, NTI Bio |
+| **Nuclear Risk** | ≈\$500,000 | Various organizations working on nuclear security |
+| **Civilizational Resilience** | ≈\$1,000,000 | ALLFED, global catastrophic risk research |
+| **Meta/Other** | ≈\$1,000,000 | Forecasting, fertility research, longevity, memetics research |
+
+## The S-Process Mechanism
+
+The S-process ("S" stands for "Simulation") is SFF's distinctive grant allocation mechanism, [co-developed](https://survivalandflourishing.fund/s-process) by Andrew Critch, Jaan Tallinn, Oliver Habryka, Kevin Arlin, and Jason Moggridge. Unlike traditional grantmaking where a committee votes or a single program officer decides, the S-process uses mathematical preference functions and an optimization algorithm to allocate funding.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Inputs["Inputs"]
+        APPS[Applications<br/>Organizations submit funding requests]
+        RECS[Recommenders<br/>4-12 experts per round]
+        DONORS[Funder Meta-Preferences<br/>Trust weights per recommender]
+    end
+
+    subgraph Process["S-Process Simulation"]
+        EVAL[Marginal Value Functions<br/>Each recommender specifies utility<br/>curves for each application]
+        DISC[Discussion Rounds<br/>Multiple meetings to refine<br/>evaluations and share information]
+        ALGO[Allocation Algorithm<br/>Cycles through recommenders,<br/>each allocates next \$1K to<br/>highest-value application]
+    end
+
+    subgraph Output["Output"]
+        GRANTS[Final Grant Amounts<br/>Published with full transparency]
+        MATCH[Matching Pledges<br/>Optional leverage for grantees]
+    end
+
+    APPS --> EVAL
+    RECS --> EVAL
+    DONORS --> ALGO
+    EVAL --> DISC
+    DISC --> ALGO
+    ALGO --> GRANTS
+    ALGO --> MATCH
+
+    style Inputs fill:#e6f3ff
+    style Process fill:#ccffcc
+    style Output fill:#ffffcc
+`} />
+
+### How It Works: Step by Step
+
+The S-process operates through a structured series of meetings and algorithmic simulations:
+
+**1. Application Submission**: Organizations submit applications via the [SFF Funding Rolling Application](https://survivalandflourishing.fund/2025/application), describing their work, funding needs, and theory of change. Applications are accepted on a rolling basis throughout the year.
+
+**2. Recommender Selection**: For each grant round, funders agree on a set of 4-12 "Recommenders" with relevant expertise. The 2025 round featured 12 recommenders across three tracks (Main, Freedom, Fairness), with 6 recommenders in the Main Track and 3 each in the specialized tracks.
+
+**3. Initial Evaluation**: Recommenders review applications and specify *marginal value functions* for funding each organization. These functions express how much value the recommender places on each additional dollar granted to each applicant.
+
+**4. Discussion Meetings**: Over a series of 4+ hour-long meetings, recommenders discuss applications, share information, and adjust their evaluations. [According to recommender Zvi Mowshowitz](https://thezvi.substack.com/p/zvis-thoughts-on-his-2nd-round-of), this typically involves "several additional discussions with other recommenders individually, many hours spent reading applications, doing research and thinking about what recommendations to make."
+
+**5. Funder Meta-Preferences**: Funders (primarily Jaan Tallinn) specify their own value functions for *deferring to each recommender*. This creates a weighted influence system where funders can express differential trust in recommenders for different cause areas.
+
+**6. Algorithm Computes Allocations**: The S-process algorithm runs a simulation that cycles through recommenders. In each cycle, each recommender allocates their next \$1,000 to whichever application has the highest marginal value according to their function, given what's already been allocated. This continues until budgets are exhausted.
+
+**7. Final Adjustments**: Funders review algorithmic recommendations and may make adjustments. They retain final authority over all grants and can make grants the algorithm didn't endorse based on information learned during the process.
+
+**8. Publication**: Final grant amounts are published on the [SFF website](https://survivalandflourishing.fund/recommendations) with full transparency about recipients and amounts.
+
+### Key Design Principle: Champion-Based Funding
+
+The S-process is explicitly designed to *favor funding things that at least one recommender is excited about, rather than things that every recommender is excited about*. As [SFF explains](https://survivalandflourishing.fund/s-process):
+
+> "The grant recommendations do not especially represent the 'average' opinion of the group in any sense."
+
+This means organizations benefit most from having one or two strong champions among the recommenders, rather than achieving lukewarm consensus support. The cycling allocation mechanism ensures every recommender's top priorities get funded, with marginal decisions depending on finding enthusiastic backers.
+
+### Advantages of the S-Process
+
+| Advantage | Description | Evidence |
+|-----------|-------------|----------|
+| **Champion Discovery** | Surfaces projects with passionate advocates | Cycling algorithm prioritizes each recommender's top picks |
+| **Expertise Matching** | Different recommenders evaluate areas where they have expertise | 2025 round used specialized Freedom and Fairness tracks |
+| **Preference Aggregation** | Mathematically combines diverse views without averaging | Utility function approach preserves intensity of preferences |
+| **Scalability** | Can process hundreds of applications efficiently | Handles \$34M+ rounds with dozens of grantees |
+| **Transparency** | Process is documented; results are published | Full grant lists available on SFF website |
+| **Reduced Single-Point Failure** | No single gatekeeper makes all decisions | Multiple recommenders required for funding |
+| **Funder Autonomy** | Donors retain final decision authority | Can override algorithmic recommendations |
+
+### Criticisms and Limitations
+
+[Zvi Mowshowitz](https://www.lesswrong.com/posts/kuDKtwwbsksAW4BG2/zvi-s-thoughts-on-the-survival-and-flourishing-fund-sff), who served as an SFF recommender, has written extensively about the process's limitations:
+
+| Limitation | Description | Mitigating Factors |
+|------------|-------------|--------------------|
+| **Time Constraints** | Recommenders have limited time (30-60 min per applicant typical) despite scope | Multiple recommenders provide redundancy |
+| **Complexity** | Process harder to understand than traditional grants | Detailed documentation available |
+| **Newcomer Disadvantage** | Organizations unknown to recommenders may be overlooked | Speculation Grants provide entry path |
+| **Large-Ask Incentives** | Process rewards asking for large amounts | Algorithm accounts for diminishing marginal value |
+| **Legibility Bias** | Favors organizations with credible, recognizable stories | Recommender diversity helps |
+| **EA Ecosystem Capture** | EA relationships heavily influence decisions despite no official EA affiliation | Specialized tracks (Freedom, Fairness) broaden perspective |
+| **Limited Feedback** | Rejected applicants may not understand why | Trade-off with recommender time |
+| **Gaming Potential** | Recommenders could strategically misrepresent preferences | Process design and repeated interaction limit this |
+
+## Jaan Tallinn: Primary Funder
+
+[Jaan Tallinn](https://en.wikipedia.org/wiki/Jaan_Tallinn) (born February 14, 1972) is an Estonian programmer, entrepreneur, and one of the most significant individual funders of AI safety research globally. His estimated net worth of approximately \$900 million derives primarily from his founding role in two transformative tech companies: Kazaa (peer-to-peer file sharing) and Skype (sold to eBay in 2005, later to Microsoft for \$8.5 billion in 2011).
+
+### Background and Career
+
+| Period | Role | Significance |
+|--------|------|--------------|
+| 1996 | B.S. Theoretical Physics, University of Tartu | Academic foundation |
+| 1989 | Co-founder, Bluemoon (Estonia) | Created Kosmonaut, first Estonian game sold abroad |
+| ≈2001-2003 | Developer, FastTrack/Kazaa | Built P2P technology later repurposed for Skype |
+| 2003-2005 | Founding engineer, Skype | Core developer; sold to eBay 2005 |
+| 2012 | Co-founder, [CSER](https://www.cser.ac.uk/) | Cambridge Centre for the Study of Existential Risk (with Huw Price, Martin Rees) |
+| 2014 | Co-founder, [FLI](https://futureoflife.org/) | Future of Life Institute (with Max Tegmark, Anthony Aguirre) |
+| 2019 | Primary funder, SFF | Survival and Flourishing Fund |
+| 2022 | Primary funder, Lightspeed Grants | Rapid-turnaround longtermist grantmaking |
+| Present | Board member, [CAIS](https://www.safe.ai/) | Center for AI Safety |
+| Present | Member, [UN AI Advisory Body](https://www.un.org/ai-advisory-body) | International AI governance |
+| Present | Board, Bulletin of the Atomic Scientists | Nuclear/existential risk communication |
+
+Tallinn became concerned about AI existential risk after reading works by Nick Bostrom and Eliezer Yudkowsky. He describes himself as having "yet to meet anyone working at AI labs who thinks the risk of training the next-generation model 'blowing up the planet' is less than 1%." He was among the signatories of both the [Future of Life Institute's 2023 open letter](https://futureoflife.org/open-letter/pause-giant-ai-experiments/) calling for a pause on training AI systems more powerful than GPT-4, and the [Center for AI Safety's 2023 statement](https://www.safe.ai/statement-on-ai-risk) on mitigating extinction risk from AI.
+
+### Tallinn's AI Safety Investments and Philanthropy
+
+Beyond grantmaking through SFF, Tallinn has made significant direct investments in AI safety:
+
+| Investment/Grant | Type | Notes |
+|------------------|------|-------|
+| **[Anthropic](https://www.anthropic.com/)** | Series A lead investor | Board observer; AI safety-focused company |
+| **[DeepMind](https://deepmind.google/)** | Series A investor | Early investor alongside Elon Musk, Peter Thiel (acquired by Google 2014) |
+| **MIRI** | Grants | \$1M+ since 2015 to Machine Intelligence Research Institute |
+| **CSER** | Founding grant | ≈\$200,000 initial donation in 2012 |
+| **Frontier Model Forum AI Safety Fund** | Philanthropic partner | Alongside foundations like Schmidt Sciences, Packard |
+| **100+ startups** | VC investments | \$130M+ invested, profits directed to AI safety nonprofits |
+
+### 2024 Philanthropy Overview
+
+[According to Tallinn's 2024 philanthropy overview](https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview), he allocated approximately \$20 million through his personal foundation in 2024, focusing on long-term alignment research and field-building initiatives. This made him one of the largest individual AI safety donors that year. Key 2024 initiatives included funding the AI Futures Project / AI 2027 initiative.
+
+In the broader context of AI safety funding, Tallinn's contributions through SFF and direct giving represent approximately 15-20% of total philanthropic AI safety funding, second only to Coefficient Giving. [Analysis of the AI safety funding landscape](https://forum.effectivealtruism.org/posts/XdhwXppfqrpPL2YDX/an-overview-of-the-ai-safety-funding-situation) estimates global AI safety research funding reached \$110-130 million in 2024, with Tallinn contributing approximately \$20 million through his personal foundation plus additional amounts through SFF.
+
+## Historical Grant Patterns
+
+### Grant Round Totals by Year
+
+SFF's grantmaking has grown dramatically since its founding:
+
+| Round | Amount | Notes |
+|-------|--------|-------|
+| **2019-Q4** | \$2.01M | First round; at high end of \$1-2M estimate |
+| **2020-H1** | \$1.82M | Above \$0.8-1.5M estimate |
+| **2020-H2** | \$3.63M | Above \$2.5-3M estimate |
+| **2021-H1** | \$9.76M | At high end of \$9-10M estimate |
+| **2021-H2** | \$9.61M | Middle of \$8-12M estimate |
+| **2022-H1** | \$8.06M | Middle of \$5-10M estimate |
+| **2022-H2** | \$10.0M | Above \$8M estimate |
+| **2023-H1** | \$21.0M | Above \$10M estimate |
+| **2023-H2** | \$21.29M | Includes \$9.62M Lightspeed Grants incorporated |
+| **2024** | \$19.86M | Above \$5-15M estimate; includes \$0.85M Speculation Grants |
+| **2025** | \$34.33M | Above \$10-20M estimate; three-track structure |
+| **Total** | **≈\$141M** | Since 2019 |
+
+*Note: 2023-H2 total includes Lightspeed Grants amounts that Jaan Tallinn requested be incorporated into the SFF announcement.*
+
+### Evolution of Focus
+
+| Period | Primary Focus | AI Share | Context |
+|--------|--------------|----------|---------|
+| 2019 | X-risk broadly | ≈50% | Initial funding post-BERI split |
+| 2020-2021 | Growing AI focus | ≈65% | GPT-3 release increases urgency |
+| 2022-2023 | Strong AI emphasis | ≈75% | Post-FTX collapse; SFF becomes more critical |
+| 2024-2025 | Dominant AI focus | ≈86% | ChatGPT/GPT-4 catalyze rapid field growth |
+
+### Notable Cumulative Grantees
+
+Organizations that have received significant SFF funding across multiple rounds:
+
+| Organization | Cumulative Total (Est.) | Focus | Status |
+|--------------|-------------------------|-------|--------|
+| **[MIRI](https://intelligence.org/)** | \$15M+ | Technical alignment research | Ongoing; budget exceeds typical SFF allocation |
+| **[Center for AI Safety](https://www.safe.ai/)** | \$6.4M+ | Research, advocacy, field-building | Ongoing; Tallinn is board member |
+| **[METR](https://metr.org/)** (ARC Evals) | \$5M+ | Frontier model evaluations | Budget growing beyond traditional x-risk funding |
+| **[80,000 Hours](https://80000hours.org/)** | \$3M+ | Career guidance for impact | Ongoing |
+| **[SERI MATS](https://www.serimats.org/)** | \$3M+ | AI safety mentorship program | Ongoing |
+| **[GovAI](https://www.governance.ai/)** | \$2M+ | AI governance research | Oxford-based |
+| **[QURI](https://quantifieduncertainty.org/)** | \$650K+ | Epistemic tools (Squiggle, Metaforecast) | Ongoing |
+| **[Redwood Research](https://www.redwoodresearch.org/)** | \$2M+ | Alignment research | Technical interpretability |
+| **[FAR AI](https://far.ai/)** | \$1.5M+ | Alignment research | Technical safety |
+| **[Conjecture](https://conjecture.dev/)** | \$1M+ | Alignment research | UK-based |
+| **[Future Society](https://thefuturesociety.org/)** | \$627K | AI governance | Also received FLI funding |
+
+## SFF Timeline
+
+| Year | Event | Significance |
+|------|-------|--------------|
+| **2019** | SFF founded from BERI | Evolved from Berkeley Existential Risk Initiative's grantmaking |
+| **2019-Q4** | First grant round (\$2.01M) | Established S-process mechanism |
+| **2020** | GPT-3 release | Increased urgency around AI safety funding |
+| **2021** | Major scale-up (≈\$19M total) | Two rounds totaling nearly \$20M; SFF becomes major funder |
+| **2022** | Lightspeed Grants founded | Tallinn creates complementary rapid-turnaround fund |
+| **2022 Nov** | FTX/Future Fund collapse | SFF becomes more critical as Future Fund disappears |
+| **2023** | Record funding (≈\$42M) | Largest year; includes Lightspeed Grants integration |
+| **2023** | Tallinn signs AI pause letter | FLI open letter calling for pause on GPT-4+ training |
+| **2023** | Tallinn signs CAIS statement | "Mitigating extinction risk from AI should be a global priority" |
+| **2024** | \$19.86M distributed | Continued major funding; three-track structure introduced |
+| **2025** | \$34.33M distributed | Largest single round; Matching Pledge Program launched |
+| **2025** | Speculation Grants expand | ≈35 grantors with ≈\$16M total budget |
+
+## Funding Ecosystem
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Sources["Funding Sources"]
+        JT[Jaan Tallinn<br/>Primary Funder<br/>≈\$100M net worth]
+        JM[Jed McCaleb]
+        DM[David Marble<br/>Casey Family Foundation]
+        SFC[Survival and Flourishing Corp]
+    end
+
+    subgraph Mechanisms["Funding Mechanisms"]
+        SFF[SFF S-Process<br/>\$14M in 2025<br/>Champion-based allocation]
+        SPEC[Speculation Grants<br/>≈\$16M budget<br/>1-2 week decisions]
+        LIGHT[Lightspeed Grants<br/>≈\$1M/round<br/>Days-weeks]
+        MATCH[Matching Pledges<br/>2025+ program<br/>Leverage external donors]
+    end
+
+    subgraph Recipients["Major Recipient Categories"]
+        AI[AI Safety Orgs<br/>86% of funding<br/>MIRI, METR, CAIS, etc.]
+        BIO[Biosecurity<br/>7% of funding<br/>SecureBio, JHU CHS]
+        OTHER[Other X-Risk<br/>7% of funding<br/>Nuclear, civilizational]
+    end
+
+    JT --> SFF
+    JT --> SPEC
+    JT --> LIGHT
+    JM --> SFF
+    DM --> SFF
+    SFC --> SFF
+
+    SFF --> AI
+    SFF --> BIO
+    SFF --> OTHER
+    SPEC --> AI
+    LIGHT --> AI
+    MATCH --> AI
+
+    style Sources fill:#e6f3ff
+    style Mechanisms fill:#ccffcc
+    style Recipients fill:#ffffcc
+`} />
+
+## Speculation Grants Program
+
+In addition to the main S-process rounds, SFF operates a [Speculation Grants program](https://survivalandflourishing.fund/speculation-grants) for expedited funding. This addresses a key limitation of the S-process: its 3-6 month timeline can be too slow for time-sensitive opportunities.
+
+### How Speculation Grants Work
+
+| Attribute | Details |
+|-----------|---------|
+| **Timeline** | Decisions in 1-2 weeks (vs. 3-6 months for S-process) |
+| **Grantors** | ≈35 "Speculation Grantors" with individual budgets |
+| **Total Budget** | ≈\$16M across all grantors (up from \$4M initially) |
+| **Per-Grantor Budget** | Typically ≈\$400K each |
+| **Funding Source** | All Speculation Grants currently funded by Jaan Tallinn |
+| **Application** | Same form as S-process; submitting requests both simultaneously |
+
+### Key Features
+
+**Eligibility Gateway**: Receiving a Speculation Grant of \$10K+ guarantees eligibility for the next S-process round. This provides an entry path for organizations unknown to recommenders.
+
+**Speed vs. Information Trade-off**: [As the program notes](https://forum.effectivealtruism.org/posts/buEazpmcKJhM5KRGx/sff-speculation-grants-as-an-expedited-funding-source), "to get money faster, you have to provide more information, not less." Applicants must submit full applications even for expedited funding.
+
+**S-Process Integration**: If an organization receives a Speculation Grant and later receives an S-process recommendation, they only receive additional funds to the extent the S-process amount exceeds the Speculation Grant (avoiding double-counting).
+
+### 2024 Example
+
+In the 2024 round, \$0.85M in funding was distributed previously through Speculation Grants, integrated into the total \$19.86M round announcement.
+
+## Comparison with Other Funders
+
+SFF operates alongside but independently from other major longtermist funders, each with distinct approaches and comparative advantages:
+
+### Funding Landscape Overview
+
+| Funder | 2024 AI Safety | Grant Style | Speed | Grant Size | Risk Tolerance |
+|--------|----------------|-------------|-------|------------|----------------|
+| **[Coefficient Giving](https://coefficientgiving.org/)** | ≈\$63.6M | Staff-driven | Months | Large (\$1M+) | Moderate |
+| **SFF** | ≈\$20M (via Tallinn) | Recommender-aggregated | Weeks-Months | Medium (\$100K-\$1M) | Higher |
+| **[LTFF](https://funds.effectivealtruism.org/funds/far-future)** | ≈\$4.3M | Committee | Weeks | Small-Medium (\$10K-\$500K) | Higher |
+| **Lightspeed Grants** | ≈\$5M | Individual grantors | Days-Weeks | Small (\$5K-\$100K) | Higher |
+
+*Source: [EA Forum analysis of AI safety funding](https://forum.effectivealtruism.org/posts/XdhwXppfqrpPL2YDX/an-overview-of-the-ai-safety-funding-situation)*
+
+### Comparative Characteristics
+
+| Dimension | SFF | Coefficient Giving | LTFF |
+|-----------|-----|-------------------|------|
+| **Decision Process** | Multi-recommender algorithm | Staff research | Committee deliberation |
+| **Champion Requirement** | One enthusiastic backer | Staff conviction | Multiple committee members |
+| **Feedback to Applicants** | Limited | Moderate | Some public reasoning |
+| **Funding Concentration** | Diversified | Can concentrate heavily | Diversified |
+| **Independence from Coefficient** | Full | N/A | Partial (40% Coefficient funded in 2022) |
+| **Primary Funder Wealth** | ≈\$900M (Tallinn) | ≈\$15B (Good Ventures) | Varied donors |
+
+### Strategic Position
+
+**SFF's Niche**: SFF is often willing to fund organizations that other funders consider higher-risk or more speculative, making it an important source of support for early-stage research groups. The S-process's champion-based design means an organization can receive funding if even one recommender is strongly enthusiastic, whereas consensus-based approaches might reject the same application.
+
+**Post-FTX Importance**: After the collapse of FTX and the Future Fund in late 2022, SFF became even more critical to the longtermist funding ecosystem. The Future Fund had been positioned as a major new funder with similar cause priorities; its disappearance increased reliance on SFF and Coefficient Giving.
+
+**LTFF Relationship**: LTFF has received funding from both SFF and Coefficient Giving, making it partially downstream of these larger funders. [About 40% of LTFF's 2022 funding came from Coefficient (then Open Philanthropy)](https://forum.effectivealtruism.org/posts/zt6MsCCDStm74HFwo/ea-funds-organisational-update-open-philanthropy-matching-and). LTFF typically makes smaller grants (\$10K-\$500K) compared to SFF's median ≈\$100K and often funds individuals or very early-stage projects.
+
+**Lightspeed Grants**: Also primarily funded by Jaan Tallinn, Lightspeed Grants focuses on even faster turnaround than SFF's Speculation Grants. The 2023-H2 round included \$9.62M from Lightspeed Grants incorporated into the SFF announcement.
+
+## Application Process
+
+### How to Apply
+
+Applications are submitted through the [SFF Funding Rolling Application](https://survivalandflourishing.fund/2025/application). A single submission requests consideration for both Speculation Grants (expedited) and the next S-process round.
+
+| Application Element | Details |
+|--------------------|---------|
+| **Submission Form** | SFF Funding Rolling Application (online) |
+| **Rolling Acceptance** | Applications accepted year-round |
+| **Dual Consideration** | Same application for Speculation Grants and S-process |
+| **Questions** | Contact sff-contact@googlegroups.com |
+
+### Timeline
+
+| Stage | Typical Timeline | Notes |
+|-------|------------------|-------|
+| **Speculation Grant Decision** | 1-2 weeks after submission | If time-sensitive; requires \$10K+ grant for S-process eligibility |
+| **S-Process Round** | Announced 2-4 months before deadline | 1-2 rounds per year |
+| **S-Process Evaluation** | 2-3 months | Recommender meetings, discussions, algorithm |
+| **Final Recommendations** | 1-2 months after evaluation | Published on SFF website |
+| **Fund Distribution** | Shortly after announcement | Via fiscal sponsor or direct to org |
+
+### Eligibility Requirements
+
+| Criterion | Requirement | Notes |
+|-----------|-------------|-------|
+| **Mission Alignment** | Work on existential risk, especially AI | Biosecurity, nuclear risk, civilizational resilience also funded |
+| **Legal Status** | 501(c)(3) or equivalent | International equivalents accepted |
+| **Speculation Grant** | \$10K+ award guarantees S-process eligibility | Provides entry path for new organizations |
+| **Funding Need** | Identified use of funds | Concrete budget and milestones |
+
+### Tips for Applicants
+
+Based on public information about successful grants and [recommender commentary](https://www.lesswrong.com/posts/kuDKtwwbsksAW4BG2/zvi-s-thoughts-on-the-survival-and-flourishing-fund-sff):
+
+**What Works**:
+1. **Find a Champion**: The S-process rewards having at least one recommender who is enthusiastic about your work. Being known to recommenders helps significantly.
+2. **Clear Theory of Change**: Explain specifically how your work reduces existential risk, with logical chain from activities to impact.
+3. **Concrete Outputs**: Describe specific deliverables and milestones rather than vague research directions.
+4. **Team Credibility**: Highlight relevant experience, past work, and track record. Reference legible signals where possible.
+5. **Appropriate Ask Size**: The process rewards asking for larger amounts, but ask for what you can actually absorb and deploy effectively.
+6. **Provide More Information**: For faster funding (Speculation Grants), provide more detail, not less.
+
+**Potential Challenges**:
+- **New organizations**: Without existing relationships to recommenders, may need to go through Speculation Grants first
+- **Non-AI focus**: With 86% of funding going to AI, non-AI projects face steeper competition
+- **Consensus-dependent projects**: The champion-based model may disadvantage projects that are "good but not great" to everyone
+- **Limited feedback**: Rejected applicants may not receive detailed explanations
+
+### 2025 Tracks
+
+The 2025 round featured three specialized tracks, and all eligible applications were evaluated in all tracks:
+
+| Track | Recommenders | Budget | Focus |
+|-------|--------------|--------|-------|
+| **Main Track** | 6 | \$6-12M | General x-risk, especially AI |
+| **Freedom Track** | 3 | \$2-4M | Projects supporting human freedom in AI era |
+| **Fairness Track** | 3 | \$2-4M | Projects supporting fairness in AI era |
+
+SFF [explains the specialized tracks](https://survivalandflourishing.fund/2025/application): "Fairness and freedom are values SFF considers crucial to humanity's survival and flourishing in the era of AI technology, especially now that leading experts in AI have acknowledged that AI presents an extinction-level threat to humanity."
+
+## Key Debates and Considerations
+
+### The Champion-Based Model
+
+The S-process's design to fund projects with at least one enthusiastic recommender, rather than consensus picks, is both a strength and a debate point:
+
+**Arguments For**:
+- Surfaces innovative projects that might be filtered out by consensus processes
+- Allows recommenders with specialized knowledge to back projects others don't understand
+- Prevents "design by committee" homogenization of the funding portfolio
+- Rewards organizations that build strong relationships with knowledgeable advocates
+
+**Arguments Against**:
+- May fund projects that are genuinely bad ideas one person happens to like
+- Creates incentives to cultivate individual recommenders rather than build broad support
+- Could lead to funding based on personal relationships rather than merit
+- Makes the recommender selection process highly consequential
+
+### EA Ecosystem Influence
+
+[Zvi Mowshowitz has noted](https://www.lesswrong.com/posts/kuDKtwwbsksAW4BG2/zvi-s-thoughts-on-the-survival-and-flourishing-fund-sff) that despite no official relationship between SFF and Effective Altruism, "at least the SFF process and its funds were largely captured by the EA ecosystem. EA reputations, relationships and framings had a large influence on the decisions made." This raises questions about:
+- Whether SFF provides genuine diversification from EA-aligned funders
+- How organizations outside EA networks can access SFF funding
+- Whether the 2025 Freedom and Fairness tracks genuinely broaden perspectives
+
+### Single-Funder Dependency
+
+SFF is heavily dependent on Jaan Tallinn as its primary funder. While other funders (Jed McCaleb, David Marble) participate, Tallinn's ≈\$900M net worth and commitment to AI safety are central to SFF's scale. This creates:
+- **Sustainability risk**: SFF's future depends significantly on Tallinn's continued wealth and priorities
+- **Governance concentration**: One person's views heavily shape funding direction
+- **Mitigation efforts**: The 2025 Matching Pledge Program explicitly aims to diversify funding sources
+
+### AI Concentration Trade-offs
+
+The shift from ~50% AI focus in 2019 to ~86% in 2025 reflects both genuine urgency and potential trade-offs:
+- **For**: AI risk may genuinely be the most pressing x-risk; funding follows perceived importance
+- **Against**: Biosecurity, nuclear risk, and other x-risks may be relatively underfunded; portfolio diversification has value under uncertainty
+
+## Strengths and Limitations
+
+### Organizational Strengths
+
+| Strength | Description | Evidence |
+|----------|-------------|----------|
+| **Scale** | Second-largest AI safety funder after Coefficient Giving | \$100M+ total; \$34M in 2025 alone |
+| **Innovative Mechanism** | S-process leverages diverse expertise systematically | Mathematical preference aggregation; champion-based design |
+| **Speed Options** | Speculation Grants provide rapid funding path | 1-2 week decisions; ≈\$16M budget |
+| **Risk Tolerance** | Willing to fund speculative research | Funds early-stage orgs others won't |
+| **Transparency** | Publishes complete grant lists | Full recipient and amount disclosure |
+| **Consistency** | Reliable annual grantmaking | 1-2 rounds per year since 2019 |
+| **Funder Commitment** | Tallinn is deeply engaged | Board roles, direct investments, ongoing giving |
+
+### Organizational Limitations
+
+| Limitation | Description | Mitigating Factors |
+|------------|-------------|--------------------|
+| **Single Funder Risk** | Heavily dependent on Jaan Tallinn | Matching Pledge Program; additional funders participating |
+| **Process Complexity** | S-process harder to understand than traditional grants | Detailed documentation available |
+| **Recommender Dependency** | Unknown organizations face barriers | Speculation Grants provide entry path |
+| **Limited Feedback** | Rejected applicants may not understand why | Trade-off with recommender time |
+| **AI Concentration** | 86% AI focus leaves other x-risks underfunded | Reflects genuine prioritization; other funders cover other areas |
+| **EA Ecosystem Influence** | Despite independence, EA relationships matter | Specialized tracks aim to broaden |
+
+## Sources and Citations
+
+### Primary Sources
+- [SFF Official Website](https://survivalandflourishing.fund/)
+- [S-Process Explanation](https://survivalandflourishing.fund/s-process)
+- [2025 Grant Round Application](https://survivalandflourishing.fund/2025/application)
+- [2025 Grant Recommendations](https://survivalandflourishing.fund/2025/recommendations)
+- [2024 Grant Recommendations](https://survivalandflourishing.fund/2024/recommendations)
+- [Speculation Grants Program](https://survivalandflourishing.fund/speculation-grants)
+- [SFF Announcements Archive](https://survivalandflourishing.fund/announcements)
+
+### Recommender Commentary
+- [Zvi's Thoughts on the Survival and Flourishing Fund (SFF)](https://www.lesswrong.com/posts/kuDKtwwbsksAW4BG2/zvi-s-thoughts-on-the-survival-and-flourishing-fund-sff) - Zvi Mowshowitz (LessWrong)
+- [Thoughts on the Survival and Flourishing Fund 2024 Round](https://thezvi.substack.com/p/zvis-thoughts-on-his-2nd-round-of) - Zvi Mowshowitz (Substack)
+- [SFF Speculation Grants as an Expedited Funding Source](https://forum.effectivealtruism.org/posts/buEazpmcKJhM5KRGx/sff-speculation-grants-as-an-expedited-funding-source) - EA Forum
+
+### Funding Analysis
+- [An Overview of the AI Safety Funding Situation](https://forum.effectivealtruism.org/posts/XdhwXppfqrpPL2YDX/an-overview-of-the-ai-safety-funding-situation) - EA Forum
+- [SFF 2025 Funding by Cause Area](https://forum.effectivealtruism.org/posts/vhw6R5P52qJr6opou/sff-2025-funding-by-cause-area-usd34-million-to-ai-86-bio-7) - EA Forum
+- [Survival and Flourishing Fund Donations Made](https://donations.vipulnaik.com/donor.php?donor=Survival+and+Flourishing+Fund) - Vipul Naik
+
+### Jaan Tallinn
+- [Jaan Tallinn - Wikipedia](https://en.wikipedia.org/wiki/Jaan_Tallinn)
+- [Jaan Tallinn - CSER Profile](https://www.cser.ac.uk/team/jaan-tallinn/)
+- [Jaan Tallinn - Future of Life Institute](https://futureoflife.org/person/jaan-tallinn/)
+- [Jaan Tallinn's 2024 Philanthropy Overview](https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview) - LessWrong
+
+### Related Organizations
+- [Survival and Flourishing Corp](https://survivalandflourishing.com/) - Manages S-process operations
+- [Berkeley Existential Risk Initiative (BERI)](https://existence.org/) - SFF's origin organization
+
+## External Links
+
+- [SFF Website](https://survivalandflourishing.fund/)
+- [Grant Recommendations History](https://survivalandflourishing.fund/recommendations)
+- [S-process Explanation](https://survivalandflourishing.fund/s-process)
+- [Speculation Grants](https://survivalandflourishing.fund/speculation-grants)
+- [Rolling Application Form](https://survivalandflourishing.fund/2025/application)
+- [Survival and Flourishing Corp](https://survivalandflourishing.com/)
+- [EA Forum Topic: Survival and Flourishing](https://forum.effectivealtruism.org/topics/survival-and-flourishing)
+
+<Backlinks />

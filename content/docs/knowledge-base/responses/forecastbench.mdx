@@ -1,0 +1,341 @@
+---
+title: ForecastBench
+description: "A dynamic, contamination-free benchmark for evaluating large language model forecasting capabilities, published at ICLR 2025. With 1,000 continuously-updated questions about future events, ForecastBench compares LLMs to superforecasters and finds GPT-4.5 (Feb 2025) achieves 0.101 difficulty-adjusted Brier score vs 0.081 for superforecasters—linear extrapolation suggests LLMs will match human superforecasters by November 2026 (95% CI: December 2025 – January 2028)."
+sidebar:
+  order: 5
+quality: 53
+llmSummary: "ForecastBench is a dynamic, contamination-free benchmark with 1,000 continuously-updated questions comparing LLM forecasting to superforecasters. GPT-4.5 achieves 0.101 Brier score vs 0.081 for superforecasters; linear extrapolation projects LLMs will match human experts by November 2026 (95% CI: Dec 2025 – Jan 2028)."
+lastEdited: "2026-01-29"
+importance: 62.5
+ratings:
+  novelty: 5
+  rigor: 6.5
+  actionability: 4.5
+  completeness: 7
+metrics:
+  wordCount: 603
+  citations: 11
+  tables: 37
+  diagrams: 1
+clusters:
+  - epistemics
+  - ai-safety
+subcategory: epistemic-tools-tools
+---
+import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Innovation** | Exceptional | First dynamic, contamination-free AI forecasting benchmark |
+| **Research Quality** | Peer-reviewed | Published at ICLR 2025 (top-tier ML conference) |
+| **Practical Impact** | High | Provides empirical grounding for claims about AI forecasting progress |
+| **Benchmark Design** | Robust | 1,000 questions, continuous updates, multiple baselines |
+| **Key Finding** | Significant | LLMs improving rapidly but superforecasters still lead; projected parity late 2026 |
+| **Replicability** | High | Open submission leaderboard, documented methodology |
+
+## Project Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Name** | ForecastBench |
+| **Organization** | <EntityLink id="fri">Forecasting Research Institute (FRI)</EntityLink> |
+| **Authors** | Ezra Karger, Houtan Bastani, Chen Yueh-Han, Zachary Jacobs, Danny Halawi, Fred Zhang, Philip E. Tetlock |
+| **Published** | ICLR 2025 |
+| **Launch Date** | September 2024 |
+| **Website** | [forecastbench.org](https://www.forecastbench.org/) |
+| **Paper** | [OpenReview ICLR 2025](https://openreview.net/forum?id=lfPkGWXSwZQTQJ9xc) |
+| **Funding** | <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (supported through mid-2027) |
+| **Question Count** | 1,000 (continuously updated) |
+
+## Overview
+
+[ForecastBench](https://www.forecastbench.org/) is FRI's dynamic benchmark for evaluating large language model forecasting capabilities, designed to solve the **data contamination problem** that plagues static AI benchmarks. Published at [ICLR 2025](https://openreview.net/forum?id=lfPkGWXSwZQTQJ9xc), ForecastBench maintains 1,000 questions continuously updated with new future-dated questions to ensure all queries are about events with **no known answer at submission time**.
+
+The benchmark was created to address a critical methodological issue: as LLMs are trained on vast internet corpora, they may have seen the answers to static benchmark questions in their training data. By focusing exclusively on questions about future events that haven't resolved yet, ForecastBench provides a **contamination-free** measure of genuine forecasting ability.
+
+The authors (led by FRI Research Director Ezra Karger and Chief Scientist <EntityLink id="philip-tetlock">Philip Tetlock</EntityLink>) designed ForecastBench as a "valuable proxy for general intelligence" since forecasting requires integrating diverse knowledge sources and reasoning under uncertainty.
+
+### Current Results
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Performance["Forecasting Performance (Brier Score, lower = better)"]
+        SF["Superforecasters\n0.081"]
+        GPT45["GPT-4.5\n0.101"]
+        PUBLIC["Public Participants\n~0.12"]
+        GPT4["GPT-4 (Mar 2023)\n0.131"]
+        RAND["Random Baseline\n0.25"]
+    end
+
+    SF -->|Gap: 0.020| GPT45
+    GPT45 -->|Gap: ≈0.02| PUBLIC
+    PUBLIC -->|Gap: ≈0.01| GPT4
+    GPT4 -->|Gap: 0.12| RAND
+
+    subgraph Projection["Projected Parity"]
+        PARITY["LLMs match superforecasters\nNov 2026\n(95% CI: Dec 2025 - Jan 2028)"]
+    end
+
+    GPT45 -.->|Linear extrapolation| PARITY
+
+    style SF fill:#d4edda
+    style GPT45 fill:#e8f4fd
+    style PARITY fill:#fff3e0
+`} />
+
+As of February 2025:
+
+| Forecaster | Difficulty-Adjusted Brier Score | Status |
+|------------|--------------------------------|--------|
+| **Superforecasters** | 0.081 | Best overall performance |
+| **GPT-4.5** | 0.101 | Best LLM performance |
+| **GPT-4 (Mar 2023)** | 0.131 | Baseline frontier model |
+| **Public Participants** | ≈0.12 | LLMs now outperform non-experts |
+| **Random Baseline** | 0.25 | Chance performance |
+
+**Critical finding**: The gap between superforecasters and GPT-4.5 (0.020 Brier points) is **larger** than the gap between GPT-4.5 and GPT-4 (0.030 Brier points), suggesting substantial room for improvement remains.
+
+## Design Philosophy
+
+### Solving the Contamination Problem
+
+Static benchmarks have a fatal flaw for evaluating forecasting:
+
+| Problem | Impact | ForecastBench Solution |
+|---------|--------|------------------------|
+| **Training data contamination** | LLMs may have seen answers | Only questions about future events |
+| **Benchmark staleness** | Questions become outdated | Continuous addition of new questions |
+| **No ground truth yet** | Can't verify answers immediately | Questions resolve on schedule (days to months) |
+
+Example contamination scenario:
+- **Static benchmark**: "Will COVID-19 vaccines be approved by end of 2020?" (known answer: yes)
+- **ForecastBench**: "Will a new pandemic pathogen emerge by end of 2026?" (unknown answer)
+
+### Question Sources
+
+ForecastBench draws questions from two categories:
+
+#### Market Questions
+
+Questions sourced from prediction platforms:
+
+| Platform | Type | Example Questions |
+|----------|------|------------------|
+| **<EntityLink id="metaculus">Metaculus</EntityLink>** | Reputation-based | "When will AGI be developed?" |
+| **<EntityLink id="manifold">Manifold</EntityLink>** | Play money market | "Will SpaceX land on Mars by 2030?" |
+| **<EntityLink id="polymarket">Polymarket</EntityLink>** | Real money (crypto) | "Who will win the 2028 US presidential election?" |
+| **RAND** | Expert elicitation | "What's the probability of nuclear conflict by 2035?" |
+
+#### Dataset Questions
+
+Questions about future values in public datasets:
+
+| Dataset | Type | Example Questions |
+|---------|------|------------------|
+| **ACLED** | Conflict events | "How many conflict fatalities in Syria next month?" |
+| **DBnomics** | Economic indicators | "What will Germany's GDP growth rate be in Q3 2026?" |
+| **FRED** | Economic data | "What will US unemployment be in December 2026?" |
+| **Wikipedia** | Pageviews, edits | "How many monthly pageviews for 'AGI' in March 2026?" |
+| **Yahoo Finance** | Stock prices, indices | "What will S&P 500 close at on December 31, 2026?" |
+
+## Key Findings
+
+### Superforecasters Still Lead
+
+| Finding | Evidence |
+|---------|----------|
+| **Superforecasters remain best** | 0.081 Brier score vs 0.101 for GPT-4.5 |
+| **Gap is substantial** | 0.020 Brier points = large performance difference |
+| **Gap larger than LLM improvement rate** | SF-GPT gap (0.020) > GPT improvement (0.016/year) |
+
+### Rapid LLM Improvement
+
+| Metric | Value | Implication |
+|--------|-------|-------------|
+| **Annual improvement rate** | ≈0.016 difficulty-adjusted Brier points | Consistent, measurable progress |
+| **Projected parity date** | November 2026 | Linear extrapolation from current trajectory |
+| **95% Confidence Interval** | December 2025 – January 2028 | Uncertainty in timeline |
+| **Time to parity** | 12-24 months from Feb 2025 | Near-term milestone |
+
+### LLMs Now Outperform Non-Experts
+
+| Group | Brier Score | Interpretation |
+|-------|-------------|----------------|
+| **Superforecasters** | 0.081 | Top human performance |
+| **GPT-4.5** | 0.101 | Best AI performance |
+| **Public forecasters** | ≈0.12 | Casual participants |
+| **GPT-4** | 0.131 | 2-year-old frontier model |
+
+LLMs have crossed the threshold of matching **casual human forecasters** but still trail **expert human forecasters** by a meaningful margin.
+
+### Initial Models Underperformed
+
+Claude-3.5 Sonnet and GPT-4 Turbo initially performed roughly as well as a simple median of public forecasts, suggesting that early frontier LLMs without specialized forecasting training were comparable to crowd aggregation.
+
+## Methodology
+
+### Difficulty Adjustment
+
+ForecastBench uses **difficulty-adjusted Brier scores** to account for question hardness:
+
+| Adjustment | Purpose | Method |
+|------------|---------|--------|
+| **Baseline** | Some questions easier than others | Compare to community median |
+| **Normalization** | Make scores comparable across question sets | Adjust relative to typical forecaster |
+| **Standardization** | Remove sampling artifacts | Control for question distribution |
+
+This ensures that an LLM scoring 0.101 on hard questions is rated fairly compared to a forecaster scoring 0.12 on easier questions.
+
+### Resolution Timelines
+
+Questions resolve on different timescales:
+
+| Timeline | Percentage | Examples |
+|----------|------------|----------|
+| **Days** | ≈10% | Near-term events (elections, product launches) |
+| **Weeks** | ≈30% | Economic indicators, conflict events |
+| **Months** | ≈40% | Technology milestones, policy decisions |
+| **Years** | ≈20% | Long-term trends (AGI timelines, climate) |
+
+This distribution balances rapid feedback for validation with long-term questions relevant to AI safety.
+
+## Leaderboard and Submissions
+
+### Public Leaderboard
+
+The [ForecastBench leaderboard](https://www.forecastbench.org/) allows:
+
+- **Open submission**: Anyone can submit LLM forecasts
+- **Standardized comparison**: All entries scored on same questions
+- **Transparency**: Methodology and scores public
+- **Competition**: Drive improvement through benchmarking
+
+### Baseline Bots
+
+ForecastBench includes baseline forecasting bots:
+
+| Bot | Method | Purpose |
+|-----|--------|---------|
+| **Random** | Uniform distribution | Lower bound |
+| **Community median** | Aggregate human forecasts | Crowd wisdom baseline |
+| **GPT-4** | Vanilla frontier LLM | Historical baseline |
+| **GPT-4.5** | Current frontier LLM | State-of-the-art |
+
+## Comparison with Other Benchmarks
+
+| Benchmark | Domain | Contamination | Dynamic | Question Count |
+|-----------|--------|---------------|---------|----------------|
+| **ForecastBench** | Forecasting | None (future events) | Yes (continuous) | 1,000 |
+| **MMLU** | General knowledge | High | No (static) | 15,908 |
+| **GSM8K** | Math reasoning | Moderate | No (static) | 8,500 |
+| **HumanEval** | Code generation | High | No (static) | 164 |
+| **AI Forecasting Benchmark** | Forecasting | None | Yes (quarterly) | ≈350/quarter |
+
+ForecastBench's **continuous dynamic updates** distinguish it from static benchmarks that become contaminated over time.
+
+## Relationship to Other Projects
+
+### FRI Ecosystem
+
+| Project | Focus | Relationship to ForecastBench |
+|---------|-------|------------------------------|
+| **<EntityLink id="xpt">XPT</EntityLink>** | Adversarial collaboration | Informed methodology; XPT showed SF-expert gaps |
+| **FRI-ONN Nuclear Study** | Nuclear risk forecasting | Applied forecasting methods |
+| **AI Progress Forecasting Panel** | Expert AI predictions | Potential question source |
+
+### Broader Forecasting Ecosystem
+
+| Platform/Project | Type | Complementarity |
+|------------------|------|-----------------|
+| **<EntityLink id="metaculus">Metaculus</EntityLink>** | Forecasting platform | ForecastBench uses Metaculus questions as source |
+| **<EntityLink id="ai-forecasting-benchmark">AI Forecasting Benchmark Tournament</EntityLink>** | Human vs AI competition | Similar goals, quarterly structure |
+| **<EntityLink id="squiggle">Squiggle</EntityLink>** | Probabilistic modeling | Could use ForecastBench data as model inputs |
+| **<EntityLink id="metaforecast">Metaforecast</EntityLink>** | Forecast aggregation | Could aggregate ForecastBench bot predictions |
+
+## Implications for AI Development
+
+### Forecasting as Proxy for Intelligence
+
+The authors argue that forecasting is a **valuable proxy for general intelligence** because it requires:
+
+| Capability | Why It Matters for Forecasting |
+|------------|-------------------------------|
+| **Knowledge integration** | Combine information from multiple domains |
+| **Uncertainty reasoning** | Express confidence probabilistically |
+| **Causal reasoning** | Understand mechanisms driving outcomes |
+| **Temporal reasoning** | Project trends forward in time |
+| **Calibration** | Match confidence to actual accuracy |
+
+Progress on ForecastBench may therefore indicate progress on **general reasoning capabilities**.
+
+### Projected Parity Implications
+
+If LLMs match superforecasters by late 2026, this suggests:
+
+| Implication | Reasoning |
+|-------------|-----------|
+| **AI reasoning progress** | Forecasting requires sophisticated integration of knowledge |
+| **Economic impact** | Automated forecasting could replace human analysts in some contexts |
+| **AI safety concern** | Advanced forecasting = better strategic planning for AI systems |
+| **Validation of scaling** | Continued capability gains from larger models/data |
+
+However, **extrapolation is uncertain**: progress may plateau, or LLMs may hit a ceiling below human expert performance on the hardest questions.
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Contamination-free** | Only questions about future events |
+| **Dynamic updates** | Continuous addition of new questions |
+| **Peer-reviewed** | Published at ICLR 2025 (top-tier venue) |
+| **Multiple baselines** | Superforecasters, public, LLMs, random |
+| **Open submission** | Public leaderboard enables competition |
+| **Quantitative projection** | Clear timeline for potential AI-human parity |
+
+### Limitations
+
+| Limitation | Impact |
+|------------|--------|
+| **Resolution lag** | Must wait for questions to resolve |
+| **Extrapolation uncertainty** | Linear projection may not hold |
+| **Question distribution** | May not cover all important forecasting domains |
+| **Human baseline variability** | Superforecaster performance may vary over time |
+| **Cost of evaluation** | Requires ongoing question curation and resolution |
+| **Narrow scope** | Forecasting ≠ general intelligence (though correlated) |
+
+## Funding and Support
+
+ForecastBench is supported by <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> grants to FRI:
+
+| Grant | Amount | Purpose |
+|-------|--------|---------|
+| [Forecasting Benchmark](https://www.openphilanthropy.org/grants/forecasting-research-institute-forecasting-benchmark/) | \$100K | Collaboration with Steinhardt lab |
+| General FRI support | Part of \$10M+ total | Core operations and research |
+
+Funding is committed **through mid-2027**, ensuring the benchmark remains active and updated.
+
+## Future Directions
+
+Potential enhancements based on the current trajectory:
+
+| Enhancement | Benefit | Challenge |
+|-------------|---------|-----------|
+| **Expand question domains** | More comprehensive coverage | Curation effort |
+| **Add reasoning evaluation** | Assess whether LLMs "understand" forecasts | Subjective judgment |
+| **Multi-turn forecasting** | Test updating based on new information | More complex protocol |
+| **Ensemble methods** | Benchmark aggregation strategies | Requires multiple models |
+| **Adversarial questions** | Test robustness to edge cases | Question design difficulty |
+
+## External Links
+
+- [ForecastBench Website](https://www.forecastbench.org/)
+- [ICLR 2025 Paper](https://openreview.net/forum?id=lfPkGWXSwZQTQJ9xc)
+- [Public Leaderboard](https://www.forecastbench.org/)
+- [FRI Project Page](https://forecastingresearch.org/)
+- [Coefficient Giving Grant](https://www.openphilanthropy.org/grants/forecasting-research-institute-forecasting-benchmark/)
+
+<Backlinks />

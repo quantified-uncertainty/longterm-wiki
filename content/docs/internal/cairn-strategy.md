@@ -1,0 +1,430 @@
+---
+title: "LongtermWiki Strategy Brainstorm"
+description: "Strategic planning and brainstorming for LongtermWiki development"
+pageType: "documentation"
+importance: 0
+quality: 4
+llmSummary: "Internal strategic planning document for LongtermWiki project development, exploring five failure modes (becoming just another wiki, generating non-insights, building unwanted features, maintenance hell, being too unusual) and five strategic options (narrow/deep focus, broad/shallow wiki, opinionated synthesis, crux laboratory, living assessment). Proposes four 2-week validation tests (user interviews, crux prototype, page quality test, insight generation) before committing resources."
+ratings:
+  novelty: 0
+  rigor: 0
+  actionability: 0
+  completeness: 0
+metrics:
+  wordCount: 2042
+  citations: 0
+  tables: 2
+  diagrams: 0
+---
+# LongtermWiki Strategy Brainstorm
+
+**Status:** Working document, not polished
+**Purpose:** Think through what could go wrong and what success looks like
+
+---
+
+## The Core Strategic Question
+
+What is LongtermWiki actually trying to be?
+
+```mermaid
+flowchart TD
+    subgraph Options["Strategic Options"]
+        A[Insight Generator]
+        B[Reference Wiki]
+        C[Decision Support Tool]
+        D[Crux Mapping Platform]
+        E[Synthesis Engine]
+    end
+
+    A --> A1[High variance, might produce nothing useful]
+    B --> B1[Commodity, already exists in various forms]
+    C --> C1[Needs clear users with clear decisions]
+    D --> D1[Novel but unproven value]
+    E --> E1[Labor-intensive, hard to maintain]
+```
+
+These aren't mutually exclusive, but they have very different implications for what we build and how we measure success.
+
+---
+
+## Failure Modes
+
+### Failure Mode 1: "Just Another Wiki"
+
+**The fear:** We build a comprehensive knowledge base that nobody uses because:
+- It's not differentiated from LessWrong, Wikipedia, 80K, etc.
+- Maintenance burden exceeds our capacity
+- Information gets stale and trust erodes
+- No clear "job to be done" that it uniquely serves
+
+**Signs we're heading here:**
+- Low repeat visitors
+- People cite primary sources instead of our pages
+- "Oh yeah I've seen that site" but no behavior change
+- Content quality diverges wildly across pages
+
+**Possible mitigations:**
+- Ruthless focus on a narrow use case
+- Quality over quantity (30 great pages > 300 mediocre ones)
+- Opinionated curation (not neutral, not comprehensive)
+- Clear "this is what LongtermWiki is for" positioning
+
+### Failure Mode 2: "Insights That Aren't"
+
+**The fear:** We try to generate novel strategic insights but:
+- We're not actually smarter than the existing field
+- "Insights" are obvious to experts, only novel to us
+- Analysis is shallow because we're spread too thin
+- We mistake complexity for depth
+
+**Signs we're heading here:**
+- Experts are unimpressed or dismissive
+- Our "insights" don't survive contact with counterarguments
+- We can't point to decisions that changed because of our work
+- Internal feeling of "are we just rearranging deck chairs?"
+
+**Possible mitigations:**
+- Tight feedback loops with sophisticated users
+- Explicit "what would falsify this?" for our claims
+- Hire/consult people who can actually do the analysis
+- Focus on synthesis and structure rather than novel claims
+
+### Failure Mode 3: "Cathedral in the Desert"
+
+**The fear:** We build something beautiful and comprehensive that nobody asked for:
+- Solves a problem that isn't actually a bottleneck
+- Users don't have the "job to be done" we imagined
+- The people who need prioritization help aren't reading documents
+- Decision-makers use networks and calls, not wikis
+
+**Signs we're heading here:**
+- We can't name 10 specific people who would use this weekly
+- User research reveals different pain points than we assumed
+- "This is cool but I wouldn't actually use it"
+- Building for an imagined user rather than real ones
+
+**Possible mitigations:**
+- User research before building
+- Start with a specific user and their specific workflow
+- Build minimum viable versions and test
+- Be willing to pivot or kill the project
+
+### Failure Mode 4: "Maintenance Hell"
+
+**The fear:** Initial build is fine but ongoing maintenance is unsustainable:
+- Content rots faster than we can update it
+- Quality degrades as original authors leave
+- Scope creep makes everything shallow
+- Becomes a zombie project that's "still around" but not useful
+
+**Signs we're heading here:**
+- Growing backlog of "needs review" pages
+- Key pages haven't been touched in 6+ months
+- New content added but old content not maintained
+- Feeling of dread when thinking about updates
+
+**Possible mitigations:**
+- Scope down aggressively from the start
+- Build staleness into the UX (visible "last reviewed" dates)
+- Automated content health monitoring
+- Plan for graceful degradation or archiving
+
+### Failure Mode 5: "Too Weird to Adopt"
+
+**The fear:** The crux-mapping / worldview-mapping approach is too unusual:
+- Users don't understand how to use it
+- Requires too much buy-in to a novel framework
+- Experts don't want to be "mapped" onto worldview archetypes
+- The structure imposes false precision on messy disagreements
+
+**Signs we're heading here:**
+- People engage with the wiki content, ignore the crux structure
+- Pushback on worldview categories ("that's not what I believe")
+- The novel features feel gimmicky
+- Simpler alternatives would serve users better
+
+**Possible mitigations:**
+- Test the framework with real users before building
+- Make novel features optional/progressive disclosure
+- Be willing to drop features that don't work
+- Start simple, add complexity only if earned
+
+---
+
+## What Does "Useful" Mean?
+
+This is the crux. Different definitions lead to very different projects:
+
+### Definition A: Changes Decisions
+
+**Test:** Can we point to funding decisions, research directions, or career choices that changed because of LongtermWiki?
+
+**Implications:**
+- Need to be embedded in actual decision-making workflows
+- Probably need direct relationships with funders/researchers
+- Quality of analysis matters more than breadth
+- Might only need to serve a small number of users well
+
+**Concerns:**
+- Very high bar
+- Attribution is hard
+- Might be serving decisions that would have happened anyway
+
+### Definition B: Improves Understanding
+
+**Test:** Do users report that they understand AI safety landscape better after using LongtermWiki?
+
+**Implications:**
+- Educational value is primary
+- Breadth and accessibility matter
+- Competes with AI Safety Fundamentals, 80K, etc.
+- Success = people recommend it to newcomers
+
+**Concerns:**
+- Lots of competition in this space
+- "Understanding" doesn't necessarily lead to better decisions
+- Risk of being a stepping stone people quickly move past
+
+### Definition C: Structures Discourse
+
+**Test:** Do people use LongtermWiki's categories and cruxes when discussing AI safety strategy?
+
+**Implications:**
+- The framework itself is the product
+- Success = LongtermWiki vocabulary becomes common
+- Focus on crux definitions, worldview archetypes
+- Less about content, more about structure
+
+**Concerns:**
+- Very hard to achieve
+- Might impose bad structure on good discourse
+- Requires significant field buy-in
+
+### Definition D: Surfaces Disagreements
+
+**Test:** Do we help people identify where they disagree and why?
+
+**Implications:**
+- Disagreement mapping is primary
+- Need to represent multiple perspectives fairly
+- Value = reducing "talking past each other"
+- Could be more interactive/tool-like
+
+**Concerns:**
+- Might reify disagreements instead of resolving them
+- Hard to represent views fairly (everyone will object)
+- Unclear who the user is
+
+### Definition E: Generates Insights
+
+**Test:** Do we produce novel strategic insights that weren't obvious before?
+
+**Implications:**
+- We're doing original analysis
+- Quality of thinking matters most
+- Might look more like reports than wiki
+- Success = "I hadn't thought of it that way"
+
+**Concerns:**
+- Are we actually capable of this?
+- Might be better done by existing researchers
+- High variance in outcomes
+
+---
+
+## Strategic Options
+
+### Option 1: Narrow & Deep
+
+Focus on one very specific use case and nail it.
+
+**Example:** "LongtermWiki helps funders compare interventions under different worldviews"
+
+- 30-50 intervention pages, deeply analyzed
+- Clear worldview → priority tool
+- Explicit targeting of Open Phil, SFF, smaller funders
+- Success = funders actually reference it in decision memos
+
+**Pros:** Clear focus, measurable success, defensible niche
+**Cons:** Small user base, high stakes per user, might not be what funders want
+
+### Option 2: Broad & Shallow (Quality Wiki)
+
+Comprehensive reference that's clearly better than alternatives.
+
+**Example:** "LongtermWiki is the best single source for 'what is X in AI safety?'"
+
+- 200+ pages, all at consistent quality
+- Good SEO, clear navigation
+- First stop for researchers, journalists, newcomers
+- Success = high traffic, people link to us
+
+**Pros:** Clear value prop, measurable, scales well
+**Cons:** Maintenance burden, commodity competition, doesn't leverage our unique angle
+
+### Option 3: Opinionated Synthesis
+
+Not neutral, not comprehensive — actively opinionated about what matters.
+
+**Example:** "LongtermWiki is where you go to understand the strategic landscape according to [specific perspective]"
+
+- Explicitly represents a worldview or analytical lens
+- Quality of argument matters more than coverage
+- More like a think tank than a wiki
+- Success = "LongtermWiki's take on X" becomes a reference point
+
+**Pros:** Differentiated, lower maintenance, can be higher quality per page
+**Cons:** Alienates those who disagree, requires us to actually have good takes, might be seen as biased
+
+### Option 4: Crux Laboratory
+
+Focus almost entirely on the crux-mapping innovation.
+
+**Example:** "LongtermWiki maps the key uncertainties in AI safety and what would resolve them"
+
+- Minimal wiki content, max crux structure
+- Interactive disagreement exploration tools
+- Integrate with prediction markets, expert surveys
+- Success = cruxes get referenced, forecasts get made
+
+**Pros:** Novel, potentially high-impact, differentiated
+**Cons:** Unproven value, might be too weird, hard to measure success
+
+### Option 5: Living Strategic Assessment
+
+Regular, updating analysis of AI safety landscape.
+
+**Example:** "LongtermWiki provides quarterly strategic assessments of the AI safety field"
+
+- More report-like than wiki-like
+- Regular update cadence with clear "what changed"
+- Track predictions, update estimates
+- Success = people read the quarterly updates, cite trends
+
+**Pros:** Clear rhythm, natural freshness, can be event-driven
+**Cons:** High ongoing effort, journalism-like, competes with newsletters
+
+---
+
+## Key Uncertainties About Our Own Strategy
+
+### Uncertainty 1: Who is the user?
+
+| Candidate User | Their Need | Our Fit |
+|----------------|-----------|---------|
+| Funders (Open Phil, SFF) | Compare interventions | Maybe? Do they want this? |
+| Researchers choosing topics | Understand landscape | Probably already do this |
+| Newcomers to field | Get oriented | Strong competition exists |
+| Journalists/policymakers | Quick reference | Might be underserved |
+| AI labs making safety decisions | ??? | Probably not us |
+
+**How to resolve:** Actually talk to potential users.
+
+### Uncertainty 2: Are we capable of generating insights?
+
+Honest assessment: Do we have the expertise to say things that aren't obvious to field insiders?
+
+- If yes → lean into analysis and synthesis
+- If no → lean into curation and structure
+
+**How to resolve:** Try it with a few topics and get expert feedback.
+
+### Uncertainty 3: Is the crux-mapping frame valuable?
+
+The LongtermWiki vision heavily features worldviews, cruxes, disagreement mapping. Is this actually useful or is it an intellectual hobby?
+
+- If useful → it's our core differentiator
+- If not → we're just a wiki with extra steps
+
+**How to resolve:** Prototype the crux interface, test with users.
+
+### Uncertainty 4: Can we maintain this?
+
+2 person-years builds it. What maintains it?
+
+- Ongoing funding?
+- Community contribution?
+- AI assistance?
+- Graceful archiving?
+
+**How to resolve:** Plan for maintenance from day 1, or plan for finite lifespan.
+
+---
+
+## Possible Validation Approaches
+
+Before going all-in, we could test key assumptions:
+
+### Test 1: User Interviews (2 weeks)
+
+Talk to 10-15 potential users:
+- Funders, researchers, policy people
+- "How do you currently make prioritization decisions?"
+- "What information do you wish you had?"
+- "Would you use X if it existed?"
+
+### Test 2: Crux Prototype (2 weeks)
+
+Build a minimal crux-mapping interface for 3-5 cruxes:
+- Show to experts, get feedback
+- "Does this capture the disagreement?"
+- "Would you use this?"
+
+### Test 3: Page Quality Test (2 weeks)
+
+Write 5 pages at our target quality level:
+- Show to potential users
+- "Is this useful? Better than alternatives?"
+- "What's missing?"
+
+### Test 4: Insight Generation Test (2 weeks)
+
+Try to generate 3 novel strategic insights:
+- Write them up
+- Share with experts
+- "Is this valuable? Novel? Correct?"
+
+---
+
+## My Current Intuitions (To Be Challenged)
+
+1. **The wiki is necessary but not sufficient.** We need good reference content, but that alone won't differentiate us.
+
+2. **The crux-mapping is our unique angle** but it's also the riskiest part. Need to validate it works.
+
+3. **Narrow is safer than broad.** Better to serve 50 users very well than 500 users poorly.
+
+4. **We should pick a user and work backwards.** Abstract "field building" goals are too vague.
+
+5. **Maintenance is the hard part.** Initial build is straightforward; sustainability is the real challenge.
+
+6. **We might be solving a problem that isn't actually a bottleneck.** Need to validate that prioritization confusion is actually causing suboptimal resource allocation.
+
+---
+
+## Open Questions for Discussion
+
+1. Who are 10 specific people who would use this weekly? Can we name them?
+
+2. What's the simplest version of LongtermWiki that would still be valuable?
+
+3. If we could only do one of (wiki, crux map, worldview tool), which?
+
+4. What would make us confident this is worth 2 person-years vs. not?
+
+5. Are there existing projects we should join/support rather than build?
+
+6. What's the "failure mode" that would make us kill the project?
+
+7. How do we avoid this becoming a self-justifying project that continues because it exists?
+
+---
+
+## Next Steps
+
+- [ ] Schedule user interviews with 5-10 potential users
+- [ ] Define "minimum viable LongtermWiki" that could be tested in 4 weeks
+- [ ] Identify 3 specific cruxes to prototype mapping
+- [ ] Honest assessment: do we have the expertise for Option 3 (Opinionated Synthesis)?
+- [ ] Research what happened to similar past projects

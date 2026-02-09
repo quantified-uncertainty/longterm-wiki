@@ -1,0 +1,67 @@
+---
+title: "Gap Analysis"
+description: "Find pages with high importance but few or no extracted insights"
+sidebar:
+  order: 1
+importance: 5
+quality: 28
+llmSummary: "Documentation for an internal tool that prioritizes wiki pages for insight extraction using a weighted formula (importance × quality - existing insights). Provides scoring ranges and workflow for extracting insights from high-potential pages."
+ratings:
+  novelty: 2
+  rigor: 4
+  actionability: 3
+  completeness: 5
+metrics:
+  wordCount: 133
+  citations: 0
+  tables: 1
+  diagrams: 0
+---
+import { LinkCard } from '@astrojs/starlight/components';
+
+<LinkCard
+  title="Open Gap Analysis Tool"
+  description="Interactive table showing pages sorted by insight potential score"
+  href="/insight-hunting/gap-analysis"
+/>
+
+## How It Works
+
+The Gap Analysis tool cross-references:
+- **Page importance** (0-100 scale from pages.json)
+- **Page quality** (0-100 scale)
+- **Current insight count** (from insights.yaml)
+
+Pages are scored using the formula:
+
+```
+Score = importance × (1 + quality/100) - insightCount × 20
+```
+
+This prioritizes:
+1. High-importance pages (more weight)
+2. High-quality pages (slight boost, since better content = better insights)
+3. Pages with few existing insights (penalty for already-extracted pages)
+
+## Interpreting Results
+
+| Score Range | Meaning |
+|------------|---------|
+| 100+ | **Critical gap** - High importance, probably no insights |
+| 80-99 | **High priority** - Should investigate soon |
+| 60-79 | **Moderate priority** - Worth checking |
+| 40-59 | **Lower priority** - May have diminishing returns |
+
+## Filters
+
+- **Category filter**: Focus on specific content areas (risks, capabilities, responses, etc.)
+- **Min importance slider**: Only show pages above a certain importance threshold
+- **Search**: Find specific pages by title or content
+
+## Next Steps
+
+After identifying a high-potential page:
+1. Read the page carefully
+2. Look for surprising claims, quantitative data, or expert disagreements
+3. Extract 2-5 insights per high-quality page
+4. Add to `src/data/insights.yaml`

@@ -1,0 +1,2237 @@
+# Models Entities
+# Auto-generated from entities.yaml - edit this file directly
+
+- id: lock-in-mechanisms
+  type: model
+  title: Lock-in Mechanisms Model
+  maturity: Growing
+  description: >-
+    Analytical model examining how AI could enable permanent entrenchment of values, systems, or power structures.
+    Distinguishes AI-enabled lock-in from historical examples due to enforcement capabilities and estimates 10-30%
+    probability of significant lock-in by 2050.
+  relatedEntries:
+    - id: lock-in
+      type: risk
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+    - models
+  lastUpdated: 2025-12
+- id: ai-risk-portfolio-analysis
+  type: model
+  title: AI Risk Portfolio Analysis
+  description: >-
+    This framework compares AI risk categories to guide resource allocation. It estimates misalignment accounts for
+    40-70% of x-risk, misuse 15-35%, and structural risks 10-25%, though all estimates carry ±50% uncertainty.
+  customFields:
+    - label: Model Type
+      value: Prioritization Framework
+    - label: Focus
+      value: Resource Allocation
+    - label: Key Output
+      value: Risk magnitude comparisons and allocation recommendations
+  relatedEntries:
+    - id: compounding-risks-analysis
+      type: model
+      relationship: related
+    - id: flash-dynamics-threshold
+      type: model
+      relationship: related
+  tags:
+    - prioritization
+    - resource-allocation
+    - portfolio
+    - strategy
+    - comparative-analysis
+  lastUpdated: 2025-12
+- id: worldview-intervention-mapping
+  type: model
+  title: Worldview-Intervention Mapping
+  description: >-
+    This model maps how beliefs about timelines and difficulty affect intervention priorities. Different worldviews
+    imply 2-10x differences in optimal resource allocation.
+  customFields:
+    - label: Model Type
+      value: Strategic Framework
+    - label: Focus
+      value: Worldview-Action Coherence
+    - label: Key Output
+      value: Intervention priorities given different worldviews
+  relatedEntries:
+    - id: ai-risk-portfolio-analysis
+      type: model
+      relationship: related
+    - id: racing-dynamics
+      type: model
+      relationship: related
+  tags:
+    - prioritization
+    - worldview
+    - strategy
+    - theory-of-change
+    - intervention-effectiveness
+  lastUpdated: 2025-12
+- id: intervention-timing-windows
+  type: model
+  title: Intervention Timing Windows
+  description: >-
+    This model identifies closing vs stable intervention windows. It recommends shifting 20-30% of resources toward
+    closing-window work (compute governance, international coordination) within 2 years.
+  customFields:
+    - label: Model Type
+      value: Timing Framework
+    - label: Focus
+      value: Temporal Urgency
+    - label: Key Output
+      value: Prioritization based on closing vs stable windows
+  relatedEntries:
+    - id: ai-risk-portfolio-analysis
+      type: model
+      relationship: related
+    - id: worldview-intervention-mapping
+      type: model
+      relationship: related
+    - id: racing-dynamics
+      type: model
+      relationship: related
+  tags:
+    - prioritization
+    - timing
+    - strategy
+    - urgency
+    - windows
+  lastUpdated: 2025-12
+- id: deceptive-alignment-decomposition
+  type: model
+  title: Deceptive Alignment Decomposition Model
+  description: >-
+    This model decomposes deceptive alignment probability into five necessary conditions. It estimates 40-80%
+    probability for the outer alignment condition, 20-60% for situational awareness.
+  customFields:
+    - label: Model Type
+      value: Probability Decomposition
+    - label: Target Risk
+      value: Deceptive Alignment
+    - label: Base Rate Estimate
+      value: 5-40% for advanced AI systems
+  relatedEntries:
+    - id: deceptive-alignment
+      type: risk
+      relationship: analyzes
+    - id: mesa-optimization
+      type: risk
+      relationship: related
+    - id: situational-awareness
+      type: capability
+      relationship: prerequisite
+    - id: anthropic
+      type: lab
+      relationship: research
+    - id: alignment-robustness
+      type: parameter
+      relationship: models
+    - id: human-oversight-quality
+      type: parameter
+      relationship: affects
+  tags:
+    - probability
+    - decomposition
+    - inner-alignment
+    - deception
+    - training-dynamics
+  lastUpdated: 2025-12
+- id: carlsmith-six-premises
+  type: model
+  title: Carlsmith's Six-Premise Argument
+  maturity: Growing
+  description: >-
+    Joe Carlsmith's probabilistic decomposition of AI existential risk into six conditional premises. Originally
+    estimated ~5% risk by 2070, updated to >10%. The most rigorous public framework for structured x-risk estimation.
+  customFields:
+    - label: Model Type
+      value: Probability Decomposition
+    - label: Target Risk
+      value: Power-Seeking AI X-Risk
+    - label: Combined Estimate
+      value: '>10% by 2070'
+  relatedEntries:
+    - id: instrumental-convergence
+      type: risk
+      relationship: analyzes
+    - id: power-seeking-conditions
+      type: model
+      relationship: related
+    - id: deceptive-alignment-decomposition
+      type: model
+      relationship: related
+    - id: alignment-robustness
+      type: parameter
+      relationship: models
+    - id: racing-intensity
+      type: parameter
+      relationship: models
+  tags:
+    - probability
+    - decomposition
+    - x-risk
+    - power-seeking
+    - existential-risk
+  lastUpdated: 2026-01
+- id: mesa-optimization-analysis
+  type: model
+  title: Mesa-Optimization Risk Analysis
+  description: >-
+    This model analyzes when mesa-optimizers might emerge during training. It estimates emergence probability increases
+    sharply above certain capability thresholds, with deceptive alignment as a key concern.
+  customFields:
+    - label: Model Type
+      value: Risk Framework
+    - label: Target Risk
+      value: Mesa-Optimization
+    - label: Key Factor
+      value: Training complexity and optimization pressure
+  relatedEntries:
+    - id: mesa-optimization
+      type: risk
+      relationship: analyzes
+    - id: deceptive-alignment
+      type: risk
+      relationship: related
+    - id: goal-misgeneralization
+      type: risk
+      relationship: related
+  tags:
+    - mesa-optimization
+    - inner-alignment
+    - learned-optimization
+    - training-dynamics
+  lastUpdated: 2025-12
+- id: goal-misgeneralization-probability
+  type: model
+  title: Goal Misgeneralization Probability Model
+  description: >-
+    This model estimates likelihood of goal misgeneralization across scenarios. Key factors include distribution shift
+    magnitude and training objective specificity.
+  customFields:
+    - label: Model Type
+      value: Probability Model
+    - label: Target Risk
+      value: Goal Misgeneralization
+    - label: Base Rate
+      value: 20-60% for significant distribution shifts
+  relatedEntries:
+    - id: goal-misgeneralization
+      type: risk
+      relationship: analyzes
+    - id: distributional-shift
+      type: risk
+      relationship: related
+    - id: reward-hacking
+      type: risk
+      relationship: related
+  tags:
+    - probability
+    - generalization
+    - distribution-shift
+    - deployment-safety
+  lastUpdated: 2025-12
+- id: reward-hacking-taxonomy
+  type: model
+  title: Reward Hacking Taxonomy and Severity Model
+  description: Comprehensive taxonomy of reward hacking failure modes with severity estimates and mitigation analysis
+  customFields:
+    - label: Model Type
+      value: Taxonomy + Severity Analysis
+    - label: Target Risk
+      value: Reward Hacking
+    - label: Categories Identified
+      value: 12 major failure modes
+  relatedEntries:
+    - id: reward-hacking
+      type: risk
+      relationship: analyzes
+    - id: sycophancy
+      type: risk
+      relationship: example
+    - id: rlhf
+      type: capability
+      relationship: vulnerable-technique
+    - id: scalable-oversight
+      type: safety-agenda
+      relationship: mitigation
+  tags:
+    - taxonomy
+    - reward-modeling
+    - specification-gaming
+    - rlhf
+  lastUpdated: 2025-12
+- id: power-seeking-conditions
+  type: model
+  title: Power-Seeking Emergence Conditions Model
+  description: >-
+    This model identifies conditions for AI power-seeking behaviors. It estimates 60-90% probability of power-seeking in
+    sufficiently capable optimizers, emerging at 50-70% of optimal task performance.
+  customFields:
+    - label: Model Type
+      value: Formal Analysis
+    - label: Target Risk
+      value: Power-Seeking
+    - label: Key Result
+      value: Optimal policies tend to seek power under broad conditions
+  relatedEntries:
+    - id: power-seeking
+      type: risk
+      relationship: analyzes
+    - id: instrumental-convergence
+      type: risk
+      relationship: related
+    - id: corrigibility-failure
+      type: risk
+      relationship: consequence
+  tags:
+    - formal-analysis
+    - power-seeking
+    - optimal-policies
+    - instrumental-goals
+  lastUpdated: 2025-12
+- id: instrumental-convergence-framework
+  type: model
+  title: Instrumental Convergence Framework
+  description: >-
+    This model analyzes universal subgoals emerging in AI systems. It finds self-preservation converges in 95-99% of
+    goal structures, with shutdown-resistance 70-95% likely for capable optimizers.
+  customFields:
+    - label: Model Type
+      value: Theoretical Framework
+    - label: Target Risk
+      value: Instrumental Convergence
+    - label: Core Insight
+      value: Many final goals share common instrumental subgoals
+  relatedEntries:
+    - id: instrumental-convergence
+      type: risk
+      relationship: analyzes
+    - id: power-seeking
+      type: risk
+      relationship: example
+    - id: corrigibility-failure
+      type: risk
+      relationship: consequence
+    - id: miri
+      type: organization
+      relationship: research
+  tags:
+    - framework
+    - instrumental-goals
+    - convergent-evolution
+    - agent-foundations
+  lastUpdated: 2025-12
+- id: scheming-likelihood-model
+  type: model
+  title: Scheming Likelihood Assessment
+  description: >-
+    This model estimates probability of AI systems engaging in strategic deception. Key factors include situational
+    awareness, goal stability, and training environment transparency.
+  customFields:
+    - label: Model Type
+      value: Probability Assessment
+    - label: Target Risk
+      value: Scheming
+    - label: Conditional Probability
+      value: 10-50% given situational awareness
+  relatedEntries:
+    - id: scheming
+      type: risk
+      relationship: analyzes
+    - id: deceptive-alignment
+      type: risk
+      relationship: related
+    - id: situational-awareness
+      type: capability
+      relationship: prerequisite
+    - id: sandbagging
+      type: risk
+      relationship: manifestation
+  tags:
+    - probability
+    - strategic-deception
+    - situational-awareness
+    - alignment-faking
+  lastUpdated: 2025-12
+- id: corrigibility-failure-pathways
+  type: model
+  title: Corrigibility Failure Pathways
+  description: >-
+    This model maps pathways from AI training to corrigibility failure. It estimates 60-90% failure probability for
+    capable optimizers with unbounded goals, reducible by 40-70% through targeted interventions.
+  customFields:
+    - label: Model Type
+      value: Causal Pathways
+    - label: Target Risk
+      value: Corrigibility Failure
+    - label: Pathways Identified
+      value: 6 major failure modes
+  relatedEntries:
+    - id: corrigibility-failure
+      type: risk
+      relationship: analyzes
+    - id: instrumental-convergence
+      type: risk
+      relationship: cause
+    - id: power-seeking
+      type: risk
+      relationship: related
+    - id: ai-control
+      type: safety-agenda
+      relationship: mitigation
+    - id: alignment-robustness
+      type: parameter
+      relationship: models
+    - id: human-oversight-quality
+      type: parameter
+      relationship: affects
+  tags:
+    - causal-model
+    - corrigibility
+    - shutdown-problem
+    - intervention-design
+  lastUpdated: 2025-12
+- id: bioweapons-attack-chain
+  type: model
+  title: Bioweapons Attack Chain Model
+  description: >-
+    This model decomposes bioweapons attacks into seven sequential steps with independent failure modes. DNA synthesis
+    screening offers 5-15% risk reduction for $7-20M, with estimates carrying 2-5x uncertainty at each step.
+  customFields:
+    - label: Model Type
+      value: Probability Decomposition
+    - label: Target Risk
+      value: Bioweapons
+  relatedEntries:
+    - id: bioweapons
+      type: risk
+      relationship: related
+    - id: biological-threat-exposure
+      type: parameter
+      relationship: models
+  tags:
+    - probability
+    - decomposition
+    - bioweapons
+    - attack-chain
+  lastUpdated: 2025-12
+- id: bioweapons-ai-uplift
+  type: model
+  title: AI Uplift Assessment Model
+  description: >-
+    This model estimates AI's marginal contribution to bioweapons risk over time. It projects uplift increasing from
+    1.3-2.5x (2024) to 3-5x by 2030, with biosecurity evasion capabilities posing the greatest concern as they could
+    undermine existing defenses before triggering policy response.
+  customFields:
+    - label: Model Type
+      value: Comparative Analysis
+    - label: Target Risk
+      value: Bioweapons
+  relatedEntries:
+    - id: bioweapons
+      type: risk
+      relationship: related
+    - id: biological-threat-exposure
+      type: parameter
+      relationship: affects
+  tags:
+    - uplift
+    - comparison
+    - bioweapons
+    - marginal-risk
+  lastUpdated: 2025-12
+- id: bioweapons-timeline
+  type: model
+  title: AI-Bioweapons Timeline Model
+  description: >-
+    This model projects when AI crosses capability thresholds for bioweapons. It estimates knowledge democratization is
+    already crossed, synthesis assistance arrives 2027-2032, and novel agent design by 2030-2040.
+  customFields:
+    - label: Model Type
+      value: Timeline Projection
+    - label: Target Risk
+      value: Bioweapons
+  relatedEntries:
+    - id: bioweapons
+      type: risk
+      relationship: related
+  tags:
+    - timeline
+    - projection
+    - bioweapons
+    - forecasting
+  lastUpdated: 2025-12
+- id: racing-dynamics-impact
+  type: model
+  title: Racing Dynamics Impact Model
+  description: >-
+    This model analyzes how competitive pressure creates race-to-the-bottom dynamics. It estimates racing conditions
+    reduce safety investment by 30-60% compared to coordinated scenarios.
+  customFields:
+    - label: Model Type
+      value: Causal Analysis
+    - label: Target Factor
+      value: Racing Dynamics
+  relatedEntries:
+    - id: racing-dynamics
+      type: risk
+      relationship: related
+    - id: multipolar-trap
+      type: risk
+      relationship: related
+    - id: racing-intensity
+      type: parameter
+      relationship: models
+    - id: safety-capability-gap
+      type: parameter
+      relationship: affects
+    - id: coordination-capacity
+      type: parameter
+      relationship: affects
+  tags:
+    - risk-factor
+    - competition
+    - game-theory
+    - incentives
+  lastUpdated: 2025-12
+- id: multipolar-trap-dynamics
+  type: model
+  title: Multipolar Trap Dynamics Model
+  description: >-
+    This model analyzes game-theoretic dynamics of AI competition traps. It estimates 20-35% probability of partial
+    coordination, 5-10% of catastrophic competitive lock-in, with compute governance offering 20-35% risk reduction.
+  customFields:
+    - label: Model Type
+      value: Game Theory Analysis
+    - label: Target Factor
+      value: Multipolar Trap
+  relatedEntries:
+    - id: multipolar-trap
+      type: risk
+      relationship: related
+    - id: racing-dynamics
+      type: risk
+      relationship: related
+    - id: international-coordination
+      type: parameter
+      relationship: models
+    - id: racing-intensity
+      type: parameter
+      relationship: affects
+  tags:
+    - risk-factor
+    - game-theory
+    - coordination
+    - equilibrium
+  lastUpdated: 2025-12
+- id: flash-dynamics-threshold
+  type: model
+  title: Flash Dynamics Threshold Model
+  description: >-
+    This model identifies thresholds where AI speed exceeds human oversight capacity. Current systems already operate
+    10-10,000x faster than humans in key domains, with oversight thresholds crossed in many areas.
+  customFields:
+    - label: Model Type
+      value: Threshold Analysis
+    - label: Target Factor
+      value: Flash Dynamics
+  relatedEntries:
+    - id: flash-dynamics
+      type: risk
+      relationship: related
+    - id: irreversibility
+      type: risk
+      relationship: related
+  tags:
+    - risk-factor
+    - speed
+    - thresholds
+    - cascades
+  lastUpdated: 2025-12
+- id: expertise-atrophy-progression
+  type: model
+  title: Expertise Atrophy Progression Model
+  description: >-
+    This model traces five phases from AI augmentation to irreversible skill loss. It finds humans decline to 50-70% of
+    baseline capability in Phase 3, with reversibility becoming difficult after 3-10 years of heavy AI use.
+  customFields:
+    - label: Model Type
+      value: Progressive Decay Model
+    - label: Target Factor
+      value: Expertise Atrophy
+  relatedEntries:
+    - id: expertise-atrophy
+      type: risk
+      relationship: related
+    - id: human-expertise
+      type: parameter
+      relationship: models
+    - id: human-oversight-quality
+      type: parameter
+      relationship: affects
+    - id: automation-bias
+      type: risk
+      relationship: related
+  tags:
+    - risk-factor
+    - skills
+    - dependency
+    - irreversibility
+  lastUpdated: 2025-12
+- id: economic-disruption-impact
+  type: model
+  title: Economic Disruption Impact Model
+  description: >-
+    This model analyzes AI labor displacement cascades. It estimates 2-5% workforce displacement over 5 years vs 1-3%
+    adaptation capacity, suggesting disruption will outpace adjustment.
+  customFields:
+    - label: Model Type
+      value: System Dynamics
+    - label: Target Factor
+      value: Economic Disruption
+  relatedEntries:
+    - id: economic-disruption
+      type: risk
+      relationship: related
+    - id: winner-take-all
+      type: risk
+      relationship: related
+    - id: economic-stability
+      type: parameter
+      relationship: models
+    - id: human-agency
+      type: parameter
+      relationship: affects
+  tags:
+    - risk-factor
+    - economics
+    - labor
+    - instability
+  lastUpdated: 2025-12
+- id: proliferation-risk-model
+  type: model
+  title: AI Proliferation Risk Model
+  description: >-
+    This model analyzes AI capability diffusion dynamics. It estimates key capabilities spread within 2-5 years of
+    frontier development, with open-source accelerating timelines.
+  customFields:
+    - label: Model Type
+      value: Diffusion Analysis
+    - label: Target Factor
+      value: AI Proliferation
+  relatedEntries:
+    - id: proliferation
+      type: risk
+      relationship: related
+    - id: racing-dynamics
+      type: risk
+      relationship: related
+  tags:
+    - risk-factor
+    - diffusion
+    - control
+    - dual-use
+  lastUpdated: 2025-12
+- id: winner-take-all-concentration
+  type: model
+  title: Winner-Take-All Concentration Model
+  description: >-
+    This model analyzes network effects driving AI capability concentration. It estimates top 3-5 actors will control
+    70-90% of frontier capabilities within 5 years.
+  customFields:
+    - label: Model Type
+      value: Network Effects Analysis
+    - label: Target Factor
+      value: Winner-Take-All Dynamics
+  relatedEntries:
+    - id: winner-take-all
+      type: risk
+      relationship: related
+    - id: economic-disruption
+      type: risk
+      relationship: related
+    - id: ai-control-concentration
+      type: parameter
+      relationship: models
+    - id: economic-stability
+      type: parameter
+      relationship: affects
+  tags:
+    - risk-factor
+    - concentration
+    - network-effects
+    - power
+  lastUpdated: 2025-12
+- id: cyberweapons-offense-defense
+  type: model
+  title: Cyber Offense-Defense Balance Model
+  description: >-
+    This model analyzes whether AI shifts cyber offense-defense balance. It projects 30-70% net improvement in attack
+    success rates, driven by automation scaling and vulnerability discovery.
+  customFields:
+    - label: Model Type
+      value: Comparative Analysis
+    - label: Target Risk
+      value: Cyberweapons
+  relatedEntries:
+    - id: cyberweapons
+      type: risk
+      relationship: related
+    - id: cyber-threat-exposure
+      type: parameter
+      relationship: models
+  tags:
+    - offense-defense
+    - cybersecurity
+    - balance
+    - comparative
+  lastUpdated: 2025-12
+- id: cyberweapons-attack-automation
+  type: model
+  title: Autonomous Cyber Attack Timeline
+  description: >-
+    This model projects when AI achieves autonomous cyber attack capability. It estimates Level 3 (AI-directed) attacks
+    by 2026-2027 and Level 4 (fully autonomous) campaigns by 2029-2033.
+  customFields:
+    - label: Model Type
+      value: Timeline Projection
+    - label: Target Risk
+      value: Cyberweapons
+  relatedEntries:
+    - id: cyberweapons
+      type: risk
+      relationship: related
+    - id: cyber-threat-exposure
+      type: parameter
+      relationship: affects
+  tags:
+    - timeline
+    - automation
+    - cybersecurity
+    - autonomy
+  lastUpdated: 2025-12
+- id: autonomous-weapons-escalation
+  type: model
+  title: Autonomous Weapons Escalation Model
+  description: >-
+    This model analyzes AI-accelerated conflict escalation risks. It estimates 1-5% annual probability of catastrophic
+    escalation once autonomous systems are deployed, implying 10-40% cumulative risk over a decade.
+  customFields:
+    - label: Model Type
+      value: Risk Decomposition
+    - label: Target Risk
+      value: Autonomous Weapons
+  relatedEntries:
+    - id: autonomous-weapons
+      type: risk
+      relationship: related
+  tags:
+    - escalation
+    - conflict
+    - speed
+    - autonomous-weapons
+  lastUpdated: 2025-12
+- id: autonomous-weapons-proliferation
+  type: model
+  title: LAWS Proliferation Model
+  description: >-
+    This model tracks lethal autonomous weapons proliferation. It projects 50% of militarily capable nations will have
+    LAWS by 2030, proliferating 4-6x faster than nuclear weapons and reaching non-state actors by 2030-2032.
+  customFields:
+    - label: Model Type
+      value: Timeline Projection
+    - label: Target Risk
+      value: Autonomous Weapons
+  relatedEntries:
+    - id: autonomous-weapons
+      type: risk
+      relationship: related
+  tags:
+    - proliferation
+    - timeline
+    - autonomous-weapons
+    - diffusion
+  lastUpdated: 2025-12
+- id: disinformation-detection-race
+  type: model
+  title: Disinformation Detection Arms Race Model
+  description: >-
+    This model analyzes the arms race between AI generation and detection. It projects detection falling to near-random
+    (50%) by 2030 under medium adversarial pressure.
+  customFields:
+    - label: Model Type
+      value: Comparative Analysis
+    - label: Target Risk
+      value: Disinformation
+  relatedEntries:
+    - id: disinformation
+      type: risk
+      relationship: related
+  tags:
+    - detection
+    - arms-race
+    - disinformation
+    - adversarial
+  lastUpdated: 2025-12
+- id: disinformation-electoral-impact
+  type: model
+  title: Electoral Impact Assessment Model
+  description: >-
+    This model estimates AI disinformation's marginal impact on elections. It finds AI increases reach by 1.5-3x over
+    traditional methods, with potential 2-5% vote margin shifts in close elections.
+  customFields:
+    - label: Model Type
+      value: Impact Assessment
+    - label: Target Risk
+      value: Disinformation
+  relatedEntries:
+    - id: disinformation
+      type: risk
+      relationship: related
+  tags:
+    - elections
+    - democracy
+    - disinformation
+    - impact-assessment
+  lastUpdated: 2025-12
+- id: surveillance-authoritarian-stability
+  type: model
+  title: AI Surveillance and Regime Durability Model
+  description: >-
+    This model analyzes how AI surveillance affects authoritarian regime durability. It estimates AI-enabled regimes may
+    be 2-3x more durable than historical autocracies.
+  customFields:
+    - label: Model Type
+      value: Causal Analysis
+    - label: Target Risk
+      value: Surveillance
+  relatedEntries:
+    - id: surveillance
+      type: risk
+      relationship: related
+  tags:
+    - authoritarianism
+    - stability
+    - surveillance
+    - regime-durability
+  lastUpdated: 2025-12
+- id: surveillance-chilling-effects
+  type: model
+  title: Surveillance Chilling Effects Model
+  description: >-
+    This model quantifies AI surveillance impact on expression and behavior. It estimates 50-70% reduction in dissent
+    within months, reaching 80-95% within 1-2 years under comprehensive surveillance.
+  customFields:
+    - label: Model Type
+      value: Impact Assessment
+    - label: Target Risk
+      value: Surveillance
+  relatedEntries:
+    - id: surveillance
+      type: risk
+      relationship: related
+  tags:
+    - chilling-effects
+    - freedom
+    - surveillance
+    - rights
+  lastUpdated: 2025-12
+- id: deepfakes-authentication-crisis
+  type: model
+  title: Deepfakes Authentication Crisis Model
+  description: >-
+    This model projects when synthetic media becomes indistinguishable. Detection accuracy declined from 85-95% (2018)
+    to 55-65% (2025), projecting crisis threshold within 3-5 years.
+  customFields:
+    - label: Model Type
+      value: Timeline Projection
+    - label: Target Risk
+      value: Deepfakes
+  relatedEntries:
+    - id: deepfakes
+      type: risk
+      relationship: related
+    - id: information-authenticity
+      type: parameter
+      relationship: models
+    - id: societal-trust
+      type: parameter
+      relationship: affects
+  tags:
+    - authentication
+    - deepfakes
+    - timeline
+    - trust
+  lastUpdated: 2025-12
+- id: trust-cascade-model
+  type: model
+  title: Trust Cascade Failure Model
+  description: >-
+    This model analyzes how institutional trust collapses cascade. It finds trust failures propagate at 1.5-2x rates in
+    AI-mediated environments vs traditional contexts.
+  customFields:
+    - label: Model Type
+      value: Cascade Analysis
+    - label: Target Risk
+      value: Trust Cascade Failure
+    - label: Key Insight
+      value: Trust cascades exhibit catastrophic regime shifts with hysteresis
+  relatedEntries:
+    - id: trust-cascade
+      type: risk
+      relationship: analyzes
+    - id: trust-decline
+      type: risk
+      relationship: related
+    - id: epistemic-collapse
+      type: risk
+      relationship: leads-to
+    - id: societal-trust
+      type: parameter
+      relationship: models
+    - id: epistemic-health
+      type: parameter
+      relationship: affects
+    - id: information-authenticity
+      type: parameter
+      relationship: affects
+  tags:
+    - epistemic
+    - cascade
+    - trust
+    - institutions
+    - threshold-effects
+  lastUpdated: 2025-12
+- id: sycophancy-feedback-loop
+  type: model
+  title: Sycophancy Feedback Loop Model
+  description: >-
+    This model analyzes how AI validation creates self-reinforcing dynamics. It identifies conditions where user
+    preferences and AI training create stable but problematic equilibria.
+  customFields:
+    - label: Model Type
+      value: Feedback Loop Analysis
+    - label: Target Risk
+      value: Sycophancy at Scale
+    - label: Key Finding
+      value: Multiple reinforcing loops drive belief rigidity increase of 2-10x per year
+  relatedEntries:
+    - id: epistemic-sycophancy
+      type: risk
+      relationship: analyzes
+    - id: reality-fragmentation
+      type: risk
+      relationship: contributes-to
+    - id: learned-helplessness
+      type: risk
+      relationship: leads-to
+    - id: preference-authenticity
+      type: parameter
+      relationship: models
+    - id: societal-trust
+      type: parameter
+      relationship: affects
+  tags:
+    - epistemic
+    - feedback-loops
+    - sycophancy
+    - echo-chambers
+    - validation
+  lastUpdated: 2025-12
+- id: authentication-collapse-timeline
+  type: model
+  title: Authentication Collapse Timeline Model
+  description: >-
+    This model projects when digital verification systems cross critical failure thresholds. It estimates text detection
+    already at random-chance levels, with image/audio following within 3-5 years.
+  customFields:
+    - label: Model Type
+      value: Timeline Projection
+    - label: Target Risk
+      value: Authentication Collapse
+      link: /knowledge-base/risks/epistemic/authentication-collapse/
+    - label: Critical Threshold
+      value: Detection accuracy approaching random chance (50%) by 2027-2030
+  relatedEntries:
+    - id: authentication-collapse
+      type: risk
+      relationship: analyzes
+    - id: legal-evidence-crisis
+      type: risk
+      relationship: leads-to
+    - id: deepfakes
+      type: risk
+      relationship: related
+    - id: information-authenticity
+      type: parameter
+      relationship: models
+    - id: epistemic-health
+      type: parameter
+      relationship: affects
+  tags:
+    - epistemic
+    - timeline
+    - authentication
+    - verification
+    - deepfakes
+  lastUpdated: 2025-12
+- id: expertise-atrophy-cascade
+  type: model
+  title: Expertise Atrophy Cascade Model
+  description: >-
+    This model analyzes cascading skill degradation from AI dependency. It estimates dependency approximately doubles
+    every 2-3 years (1.7x per cycle), with 40-60% capability loss in Gen 1 users.
+  customFields:
+    - label: Model Type
+      value: Cascade Analysis
+    - label: Target Risk
+      value: Expertise Atrophy
+    - label: Key Finding
+      value: Complete knowledge loss within 15-30 years with high AI use
+  relatedEntries:
+    - id: expertise-atrophy
+      type: risk
+      relationship: analyzes
+    - id: automation-bias
+      type: risk
+      relationship: related
+    - id: epistemic-collapse
+      type: risk
+      relationship: contributes-to
+    - id: human-expertise
+      type: parameter
+      relationship: models
+    - id: human-agency
+      type: parameter
+      relationship: affects
+  tags:
+    - epistemic
+    - cascade
+    - expertise
+    - skills
+    - generational
+  lastUpdated: 2025-12
+- id: epistemic-collapse-threshold
+  type: model
+  title: Epistemic Collapse Threshold Model
+  description: >-
+    This model identifies thresholds where society loses ability to establish shared facts. It estimates 35-45%
+    probability of authentication-system-triggered collapse, 25-35% via polarization-driven collapse.
+  customFields:
+    - label: Model Type
+      value: Threshold Model
+    - label: Target Risk
+      value: Epistemic Collapse
+    - label: Critical Threshold
+      value: Epistemic health E < 0.35 leads to irreversible collapse
+  relatedEntries:
+    - id: epistemic-collapse
+      type: risk
+      relationship: analyzes
+    - id: trust-cascade
+      type: risk
+      relationship: component
+    - id: reality-fragmentation
+      type: risk
+      relationship: component
+    - id: learned-helplessness
+      type: risk
+      relationship: outcome
+    - id: epistemic-health
+      type: parameter
+      relationship: models
+    - id: reality-coherence
+      type: parameter
+      relationship: affects
+    - id: societal-trust
+      type: parameter
+      relationship: affects
+  tags:
+    - epistemic
+    - threshold
+    - collapse
+    - regime-shift
+    - tipping-points
+  lastUpdated: 2025-12
+- id: reality-fragmentation-network
+  type: model
+  title: Reality Fragmentation Network Model
+  description: >-
+    This model analyzes how AI personalization creates incompatible reality bubbles. It projects 30-50% divergence in
+    factual beliefs across groups within 5 years of heavy AI use.
+  customFields:
+    - label: Model Type
+      value: Network Effects
+    - label: Target Risk
+      value: Reality Fragmentation
+    - label: Key Metric
+      value: Fragmentation index F projected to reach 0.75-0.85 by 2030
+  relatedEntries:
+    - id: reality-fragmentation
+      type: risk
+      relationship: analyzes
+    - id: reality-coherence
+      type: parameter
+      relationship: models
+    - id: epistemic-health
+      type: parameter
+      relationship: affects
+    - id: preference-authenticity
+      type: parameter
+      relationship: affects
+    - id: epistemic-sycophancy
+      type: risk
+      relationship: mechanism
+    - id: epistemic-collapse
+      type: risk
+      relationship: leads-to
+  tags:
+    - epistemic
+    - network-analysis
+    - fragmentation
+    - polarization
+    - information-silos
+  lastUpdated: 2025-12
+- id: racing-dynamics-model
+  type: model
+  title: Racing Dynamics Game Theory Model
+  description: >-
+    Game-theoretic analysis of competitive pressures in AI development, modeling safety-capability tradeoffs as
+    prisoner's dilemma with asymmetric payoffs.
+  customFields:
+    - label: Model Type
+      value: Game Theory
+    - label: Target Risk
+      value: Racing Dynamics
+    - label: Core Insight
+      value: >-
+        Individual rationality produces collectively suboptimal outcomes when safety investments reduce competitive
+        advantage
+  relatedEntries:
+    - id: racing-dynamics
+      type: risk
+      relationship: analyzes
+    - id: multipolar-trap
+      type: risk
+      relationship: related
+    - id: concentration-of-power
+      type: risk
+      relationship: outcome
+    - id: racing-intensity
+      type: parameter
+      relationship: models
+    - id: safety-culture-strength
+      type: parameter
+      relationship: affects
+    - id: international-coordination
+      type: parameter
+      relationship: affects
+  tags:
+    - game-theory
+    - coordination
+    - prisoner-dilemma
+    - racing
+    - structural-risks
+  lastUpdated: 2025-12
+- id: multipolar-trap-model
+  type: model
+  title: Multipolar Trap Coordination Model
+  description: >-
+    Systems analysis of collective action failures where rational individual action produces collectively catastrophic
+    outcomes in AI development.
+  customFields:
+    - label: Model Type
+      value: Systems Dynamics / Coordination Theory
+    - label: Target Risk
+      value: Multipolar Trap
+    - label: Core Insight
+      value: Local optimization plus competitive pressure creates global suboptimality that no individual actor can escape
+  relatedEntries:
+    - id: multipolar-trap
+      type: risk
+      relationship: analyzes
+    - id: racing-dynamics
+      type: risk
+      relationship: manifestation
+    - id: concentration-of-power
+      type: risk
+      relationship: outcome
+  tags:
+    - coordination-failure
+    - collective-action
+    - moloch
+    - tragedy-of-commons
+    - structural-risks
+  lastUpdated: 2025-12
+- id: winner-take-all-model
+  type: model
+  title: Winner-Take-All Market Dynamics Model
+  description: >-
+    Economic analysis of power law distributions and market concentration in AI, examining superstar economics and
+    increasing returns to scale.
+  customFields:
+    - label: Model Type
+      value: Market Structure Analysis
+    - label: Target Risk
+      value: Winner-Take-All Dynamics
+    - label: Core Insight
+      value: AI exhibits increasing returns and network effects creating extreme concentration
+  relatedEntries:
+    - id: winner-take-all
+      type: risk
+      relationship: analyzes
+    - id: concentration-of-power
+      type: risk
+      relationship: mechanism
+    - id: economic-disruption
+      type: risk
+      relationship: related
+    - id: ai-control-concentration
+      type: parameter
+      relationship: models
+    - id: economic-stability
+      type: parameter
+      relationship: affects
+  tags:
+    - market-structure
+    - power-law
+    - network-effects
+    - inequality
+    - structural-risks
+  lastUpdated: 2025-12
+- id: concentration-of-power-model
+  type: model
+  title: Concentration of Power Systems Model
+  description: >-
+    Systems dynamics analysis of power accumulation mechanisms across economic, political, military, and informational
+    domains through AI.
+  customFields:
+    - label: Model Type
+      value: Systems Dynamics
+    - label: Target Risk
+      value: Concentration of Power
+    - label: Core Insight
+      value: AI's cross-domain applicability enables unprecedented positive feedback loops in power accumulation
+  relatedEntries:
+    - id: concentration-of-power
+      type: risk
+      relationship: analyzes
+    - id: winner-take-all
+      type: risk
+      relationship: mechanism
+    - id: lock-in
+      type: risk
+      relationship: consequence
+    - id: authoritarian-takeover
+      type: risk
+      relationship: scenario
+    - id: ai-control-concentration
+      type: parameter
+      relationship: models
+    - id: human-agency
+      type: parameter
+      relationship: affects
+  tags:
+    - power-dynamics
+    - systems-thinking
+    - feedback-loops
+    - political-economy
+    - structural-risks
+  lastUpdated: 2025-12
+- id: lock-in-model
+  type: model
+  title: Lock-in Irreversibility Model
+  description: >-
+    Analysis of irreversible transitions and path dependencies in AI development, examining value, political, technical,
+    economic, and cognitive lock-in mechanisms.
+  customFields:
+    - label: Model Type
+      value: Path Dependence / Threshold Analysis
+    - label: Target Risk
+      value: Lock-in
+    - label: Core Insight
+      value: Certain AI decisions create irreversible path dependencies faster than society can evaluate them
+  relatedEntries:
+    - id: lock-in
+      type: risk
+      relationship: analyzes
+    - id: concentration-of-power
+      type: risk
+      relationship: mechanism
+    - id: authoritarian-takeover
+      type: risk
+      relationship: scenario
+    - id: irreversibility
+      type: risk
+      relationship: related
+  tags:
+    - irreversibility
+    - path-dependence
+    - value-lock-in
+    - structural-risks
+    - long-term
+  lastUpdated: 2025-12
+- id: economic-disruption-model
+  type: model
+  title: Economic Disruption Structural Model
+  description: >-
+    Macroeconomic analysis of AI-driven labor market transformations, examining displacement dynamics, inequality, and
+    transition challenges.
+  customFields:
+    - label: Model Type
+      value: Labor Economics / Macroeconomic Model
+    - label: Target Risk
+      value: Economic Disruption
+    - label: Core Insight
+      value: AI automation differs from previous transitions in scope, speed, and completeness of displacement
+  relatedEntries:
+    - id: economic-disruption
+      type: risk
+      relationship: analyzes
+    - id: concentration-of-power
+      type: risk
+      relationship: consequence
+    - id: erosion-of-agency
+      type: risk
+      relationship: related
+    - id: winner-take-all
+      type: risk
+      relationship: mechanism
+  tags:
+    - labor-economics
+    - automation
+    - inequality
+    - structural-unemployment
+    - structural-risks
+  lastUpdated: 2025-12
+- id: proliferation-model
+  type: model
+  title: AI Capability Proliferation Model
+  description: >-
+    Diffusion dynamics and control challenges for advanced AI capabilities, analyzing spread mechanisms and governance
+    interventions.
+  customFields:
+    - label: Model Type
+      value: Diffusion Model / Information Economics
+    - label: Target Risk
+      value: Proliferation
+    - label: Core Insight
+      value: AI capabilities as information goods with near-zero marginal copying cost create unique containment challenges
+  relatedEntries:
+    - id: proliferation
+      type: risk
+      relationship: analyzes
+    - id: racing-dynamics
+      type: risk
+      relationship: related
+    - id: multipolar-trap
+      type: risk
+      relationship: related
+  tags:
+    - proliferation
+    - diffusion
+    - compute-governance
+    - open-source
+    - structural-risks
+  lastUpdated: 2025-12
+- id: risk-activation-timeline
+  type: model
+  title: Risk Activation Timeline Model
+  description: >-
+    This model maps when risks become critical based on capability levels. Near-term risks activate at current
+    capabilities; transformative risks require advanced autonomous systems.
+  customFields:
+    - label: Model Type
+      value: Timeline Projection
+    - label: Scope
+      value: Cross-cutting (all risk categories)
+    - label: Key Insight
+      value: Risks activate at different times based on capability thresholds
+  relatedEntries:
+    - id: capability-threshold-model
+      type: model
+      relationship: related
+    - id: warning-signs-model
+      type: model
+      relationship: related
+    - id: bioweapons-timeline
+      type: model
+      relationship: related
+  tags:
+    - timeline
+    - capability
+    - risk-assessment
+    - forecasting
+  lastUpdated: 2025-12
+- id: capability-threshold-model
+  type: model
+  title: Capability Threshold Model
+  description: >-
+    This model maps capability levels to risk activation thresholds. It identifies 15-25% benchmark performance as
+    indicating early risk emergence, with 50% marking qualitative shift to complex autonomous execution.
+  customFields:
+    - label: Model Type
+      value: Threshold Analysis
+    - label: Scope
+      value: Capability-risk mapping
+    - label: Key Insight
+      value: Many risks have threshold dynamics rather than gradual activation
+  relatedEntries:
+    - id: risk-activation-timeline
+      type: model
+      relationship: related
+    - id: warning-signs-model
+      type: model
+      relationship: related
+    - id: scheming-likelihood-model
+      type: model
+      relationship: related
+  tags:
+    - capability
+    - threshold
+    - risk-assessment
+    - forecasting
+  lastUpdated: 2025-12
+- id: warning-signs-model
+  type: model
+  title: Warning Signs Model
+  description: >-
+    This model catalogs early indicators for detecting emerging AI risks. It prioritizes indicators by lead time,
+    reliability, and actionability.
+  customFields:
+    - label: Model Type
+      value: Monitoring Framework
+    - label: Scope
+      value: Early warning indicators
+    - label: Key Insight
+      value: Leading indicators enable proactive response before risks materialize
+  relatedEntries:
+    - id: risk-activation-timeline
+      type: model
+      relationship: related
+    - id: capability-threshold-model
+      type: model
+      relationship: related
+    - id: scheming-likelihood-model
+      type: model
+      relationship: related
+  tags:
+    - monitoring
+    - early-warning
+    - tripwires
+    - risk-assessment
+  lastUpdated: 2025-12
+- id: authoritarian-tools-diffusion
+  type: model
+  title: Authoritarian Tools Diffusion Model
+  description: >-
+    This model analyzes how AI surveillance spreads to authoritarian regimes. It finds semiconductor supply chains are
+    the highest-leverage intervention point, but this advantage will erode within 5-10 years as domestic chip
+    manufacturing develops.
+  customFields:
+    - label: Model Type
+      value: Diffusion Analysis
+    - label: Target Factor
+      value: Authoritarian Tools
+    - label: Key Insight
+      value: Technology diffusion creates dual-use challenges with limited control points
+  relatedEntries:
+    - id: authoritarian-tools
+      type: risk
+      relationship: related
+    - id: proliferation-risk-model
+      type: model
+      relationship: related
+  tags:
+    - diffusion
+    - surveillance
+    - authoritarianism
+    - geopolitics
+  lastUpdated: 2025-12
+- id: consensus-manufacturing-dynamics
+  type: model
+  title: Consensus Manufacturing Dynamics Model
+  description: >-
+    This model analyzes AI-enabled artificial consensus creation. It estimates 15-40% shifts in perceived opinion
+    distribution are achievable, with 5-15% actual opinion shifts from sustained campaigns.
+  customFields:
+    - label: Model Type
+      value: Manipulation Analysis
+    - label: Target Factor
+      value: Consensus Manufacturing
+    - label: Key Insight
+      value: AI scales inauthentic consensus beyond detection capacity
+  relatedEntries:
+    - id: consensus-manufacturing
+      type: risk
+      relationship: related
+    - id: disinformation-detection-race
+      type: model
+      relationship: related
+  tags:
+    - manipulation
+    - disinformation
+    - public-opinion
+    - social-media
+  lastUpdated: 2025-12
+- id: irreversibility-threshold
+  type: model
+  title: Irreversibility Threshold Model
+  description: >-
+    This model analyzes when AI decisions become permanently locked-in. It estimates 25% probability of crossing
+    infeasible-reversal thresholds by 2035, with expected time to major threshold at 4-5 years.
+  customFields:
+    - label: Model Type
+      value: Threshold Analysis
+    - label: Target Factor
+      value: Irreversibility
+    - label: Key Insight
+      value: Reversal costs grow exponentially with time and lock-in depth
+  relatedEntries:
+    - id: irreversibility
+      type: risk
+      relationship: related
+    - id: lock-in-model
+      type: model
+      relationship: related
+  tags:
+    - irreversibility
+    - lock-in
+    - decision-making
+    - thresholds
+  lastUpdated: 2025-12
+- id: preference-manipulation-drift
+  type: model
+  title: Preference Manipulation Drift Model
+  description: >-
+    This model analyzes gradual AI-driven preference shifts. It estimates 5-15% probability of significant harm from
+    drift, with 20-40% reduction in preference diversity after 5 years of heavy use.
+  customFields:
+    - label: Model Type
+      value: Behavioral Dynamics
+    - label: Target Factor
+      value: Preference Manipulation
+    - label: Key Insight
+      value: Preference drift is gradual, cumulative, and often invisible to those experiencing it
+  relatedEntries:
+    - id: preference-manipulation
+      type: risk
+      relationship: related
+    - id: sycophancy-feedback-loop
+      type: model
+      relationship: related
+    - id: preference-authenticity
+      type: parameter
+      relationship: models
+    - id: human-agency
+      type: parameter
+      relationship: affects
+  tags:
+    - autonomy
+    - manipulation
+    - preferences
+    - behavioral-change
+  lastUpdated: 2025-12
+- id: trust-erosion-dynamics
+  type: model
+  title: Trust Erosion Dynamics Model
+  description: >-
+    This model analyzes how AI systems erode institutional trust. It identifies authentication failure and expertise
+    displacement as key mechanisms driving erosion.
+  customFields:
+    - label: Model Type
+      value: Trust Dynamics
+    - label: Target Factor
+      value: Trust Erosion
+    - label: Key Insight
+      value: Trust erodes faster than it builds, with 3-10x asymmetry in speed
+  relatedEntries:
+    - id: trust-decline
+      type: risk
+      relationship: related
+    - id: trust-cascade-model
+      type: model
+      relationship: related
+    - id: societal-trust
+      type: parameter
+      relationship: models
+    - id: institutional-quality
+      type: parameter
+      relationship: affects
+  tags:
+    - trust
+    - institutions
+    - social-cohesion
+    - deepfakes
+  lastUpdated: 2025-12
+- id: automation-bias-cascade
+  type: model
+  title: Automation Bias Cascade Model
+  description: >-
+    This model analyzes how AI over-reliance creates cascading failures. It estimates skill atrophy rates of 10-25%/year
+    and projects that within 5 years, organizations may lose 50%+ of independent verification capability in AI-dependent
+    domains.
+  customFields:
+    - label: Model Type
+      value: Cascade Analysis
+    - label: Target Risk
+      value: Automation Bias
+    - label: Key Insight
+      value: Human-AI calibration failures create self-reinforcing patterns of over-reliance
+  relatedEntries:
+    - id: expertise-atrophy
+      type: risk
+      relationship: related
+    - id: erosion-of-agency
+      type: risk
+      relationship: related
+    - id: human-oversight-quality
+      type: parameter
+      relationship: models
+    - id: human-expertise
+      type: parameter
+      relationship: affects
+  tags:
+    - human-ai-interaction
+    - cognitive-bias
+    - system-dynamics
+  lastUpdated: 2025-12
+- id: cyber-psychosis-cascade
+  type: model
+  title: Cyber Psychosis Cascade Model
+  description: >-
+    This model analyzes AI-generated content triggering psychological harm cascades. It identifies 1-3% of population as
+    highly vulnerable, with 5-10x increased susceptibility during reality-testing deficits.
+  customFields:
+    - label: Model Type
+      value: Population Risk Model
+    - label: Target Risk
+      value: Mental Health Impacts
+    - label: Key Insight
+      value: AI-generated content can trigger cascading psychological effects in vulnerable populations
+  relatedEntries:
+    - id: deepfakes
+      type: risk
+      relationship: related
+    - id: disinformation
+      type: risk
+      relationship: related
+  tags:
+    - mental-health
+    - synthetic-media
+    - population-risk
+  lastUpdated: 2025-12
+- id: fraud-sophistication-curve
+  type: model
+  title: Fraud Sophistication Curve Model
+  description: >-
+    This model analyzes AI-enabled fraud evolution. It finds AI-personalized attacks achieve 20-30% higher success
+    rates, with technique diffusion time of 8-24 months and defense adaptation lagging by 12-36 months.
+  customFields:
+    - label: Model Type
+      value: Capability Progression
+    - label: Target Risk
+      value: AI-Enabled Fraud
+    - label: Key Insight
+      value: AI democratizes sophisticated fraud techniques, shifting the capability curve
+  relatedEntries:
+    - id: deepfakes
+      type: risk
+      relationship: related
+    - id: disinformation
+      type: risk
+      relationship: related
+  tags:
+    - fraud
+    - crime
+    - capability-progression
+  lastUpdated: 2025-12
+- id: intervention-effectiveness-matrix
+  type: model
+  title: Intervention Effectiveness Matrix
+  description: Mapping AI safety interventions to the risks they mitigate, with effectiveness estimates and gap analysis
+  customFields:
+    - label: Model Type
+      value: Prioritization Framework
+    - label: Scope
+      value: All AI Safety Interventions
+    - label: Key Insight
+      value: Interventions vary dramatically in cost-effectiveness across dimensions
+  tags:
+    - interventions
+    - effectiveness
+    - prioritization
+  lastUpdated: 2025-12
+- id: lab-incentives-model
+  type: model
+  title: Lab Incentives Model
+  description: >-
+    This model analyzes competitive and reputational pressures on lab safety decisions. It identifies conditions where
+    market dynamics systematically underweight safety investment.
+  customFields:
+    - label: Model Type
+      value: Incentive Analysis
+    - label: Target Actor
+      value: Frontier AI Labs
+    - label: Key Insight
+      value: Lab incentives systematically diverge from social optimum under competition
+  relatedEntries:
+    - id: racing-dynamics
+      type: risk
+      relationship: related
+    - id: multipolar-trap
+      type: risk
+      relationship: related
+    - id: safety-culture-strength
+      type: parameter
+      relationship: models
+    - id: racing-intensity
+      type: parameter
+      relationship: affects
+  tags:
+    - racing-dynamics
+    - incentives
+    - labs
+  lastUpdated: 2025-12
+- id: risk-interaction-matrix
+  type: model
+  title: Risk Interaction Matrix
+  description: >-
+    This model analyzes how risks amplify, mitigate, or transform each other. It identifies 15-25% of risk pairs as
+    strongly interacting, with compounding effects dominating.
+  customFields:
+    - label: Model Type
+      value: Interaction Framework
+    - label: Scope
+      value: Cross-risk Analysis
+    - label: Key Insight
+      value: Risks rarely occur in isolation; interactions can amplify or mitigate effects
+  tags:
+    - risk-interactions
+    - compounding-risks
+    - systems-thinking
+  lastUpdated: 2025-12
+- id: safety-research-value
+  type: model
+  title: Safety Research Value Model
+  description: >-
+    This model estimates marginal returns on safety research investment. It finds current funding levels significantly
+    below optimal, with 2-5x returns available in neglected areas.
+  customFields:
+    - label: Model Type
+      value: Cost-Effectiveness Analysis
+    - label: Scope
+      value: Safety Research ROI
+    - label: Key Insight
+      value: Safety research value depends critically on timing relative to capability progress
+  tags:
+    - cost-effectiveness
+    - research-priorities
+    - expected-value
+  lastUpdated: 2025-12
+- id: capabilities-to-safety-pipeline
+  type: model
+  title: Capabilities-to-Safety Pipeline Model
+  description: >-
+    This model analyzes researcher transitions from capabilities to safety work. It finds only 10-15% of aware
+    researchers consider switching, with 60-75% blocked by barriers at the consideration-to-action stage.
+  customFields:
+    - label: Model Type
+      value: Talent Pipeline Analysis
+    - label: Target Factor
+      value: Safety Researcher Supply
+    - label: Key Insight
+      value: Capabilities researchers are the primary talent pool for safety work
+  relatedEntries:
+    - id: safety-researcher-gap
+      type: model
+      relationship: related
+  tags:
+    - talent
+    - field-building
+    - career-transitions
+  lastUpdated: 2025-12
+- id: compounding-risks-analysis
+  type: model
+  title: Compounding Risks Analysis Model
+  description: >-
+    This model analyzes how risks compound beyond additive effects. Key combinations include racing+concentration
+    (40-60% coverage needed) and mesa-optimization+scheming (2-6% catastrophic probability).
+  customFields:
+    - label: Model Type
+      value: Systems Analysis
+    - label: Scope
+      value: Multi-Risk Interactions
+    - label: Key Insight
+      value: Combined risks often exceed the sum of individual risks due to non-linear interactions
+  relatedEntries:
+    - id: risk-interaction-matrix
+      type: model
+      relationship: related
+    - id: risk-cascade-pathways
+      type: model
+      relationship: related
+  tags:
+    - risk-interactions
+    - compounding-effects
+    - systems-thinking
+  lastUpdated: 2025-12
+- id: defense-in-depth-model
+  type: model
+  title: Defense in Depth Model
+  description: >-
+    This model analyzes how layered safety measures combine. Individual layers provide 20-60% coverage; independence
+    between layers is critical for compound effectiveness.
+  customFields:
+    - label: Model Type
+      value: Defense Framework
+    - label: Scope
+      value: Layered Safety Architecture
+    - label: Key Insight
+      value: Multiple independent safety layers provide robustness against single-point failures
+  relatedEntries:
+    - id: societal-resilience
+      type: parameter
+      relationship: models
+  tags:
+    - defense
+    - security
+    - layered-approach
+  lastUpdated: 2025-12
+- id: institutional-adaptation-speed
+  type: model
+  title: Institutional Adaptation Speed Model
+  description: >-
+    This model analyzes institutional adaptation rates to AI. It finds institutions change at 10-30% of needed rate per
+    year while AI creates 50-200% annual gaps, with regulatory lag historically spanning 15-70 years.
+  customFields:
+    - label: Model Type
+      value: Adaptation Dynamics
+    - label: Target Factor
+      value: Governance Gap
+    - label: Key Insight
+      value: Institutional adaptation typically lags technology by 5-15 years, creating persistent governance gaps
+  relatedEntries:
+    - id: racing-dynamics
+      type: risk
+      relationship: related
+    - id: regulatory-capacity
+      type: parameter
+      relationship: models
+    - id: institutional-quality
+      type: parameter
+      relationship: affects
+  tags:
+    - institutions
+    - adaptation
+    - governance-gap
+  lastUpdated: 2025-12
+- id: international-coordination-game
+  type: model
+  title: International Coordination Game Model
+  description: >-
+    This model analyzes game-theoretic dynamics of international AI governance. It identifies key equilibria between
+    US-China competition and potential cooperation pathways through safety agreements.
+  customFields:
+    - label: Model Type
+      value: Game Theory
+    - label: Scope
+      value: International Governance
+    - label: Key Insight
+      value: International AI coordination faces prisoner's dilemma dynamics with verification challenges
+  relatedEntries:
+    - id: multipolar-trap
+      type: risk
+      relationship: related
+    - id: racing-dynamics
+      type: risk
+      relationship: related
+    - id: international-coordination
+      type: parameter
+      relationship: models
+    - id: coordination-capacity
+      type: parameter
+      relationship: affects
+    - id: ai-control-concentration
+      type: parameter
+      relationship: affects
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+  lastUpdated: 2025-12
+- id: media-policy-feedback-loop
+  type: model
+  title: Media-Policy Feedback Loop Model
+  description: >-
+    This model analyzes cycles between media coverage, public opinion, and AI policy. It finds media framing
+    significantly shapes policy windows, with 6-18 month lag between coverage spikes and regulatory response.
+  customFields:
+    - label: Model Type
+      value: Feedback Loop Analysis
+    - label: Target Factor
+      value: Media-Policy Dynamics
+    - label: Key Insight
+      value: Media coverage and policy responses create reinforcing cycles that can accelerate or delay governance
+  tags:
+    - media
+    - policy
+    - feedback-loops
+  lastUpdated: 2025-12
+- id: post-incident-recovery
+  type: model
+  title: Post-Incident Recovery Model
+  description: >-
+    This model analyzes recovery pathways from AI incidents. It finds clear attribution enables 3-5x faster recovery,
+    and recommends 5-10% of safety resources for recovery capacity, particularly trust and skill preservation.
+  customFields:
+    - label: Model Type
+      value: Recovery Dynamics
+    - label: Scope
+      value: Incident Response
+    - label: Key Insight
+      value: Recovery time and completeness depend on incident severity, preparedness, and system design
+  tags:
+    - incidents
+    - recovery
+    - resilience
+  lastUpdated: 2025-12
+- id: public-opinion-evolution
+  type: model
+  title: Public Opinion Evolution Model
+  description: >-
+    This model analyzes how public AI risk perception evolves. It finds major incidents shift opinion by 10-25
+    percentage points, decaying with 6-12 month half-life.
+  customFields:
+    - label: Model Type
+      value: Attitude Dynamics
+    - label: Target Factor
+      value: Public Perception
+    - label: Key Insight
+      value: Public opinion on AI risk follows event-driven cycles with gradual baseline shifts
+  relatedEntries:
+    - id: media-policy-feedback-loop
+      type: model
+      relationship: related
+  tags:
+    - public-opinion
+    - attitudes
+    - social-dynamics
+  lastUpdated: 2025-12
+- id: risk-cascade-pathways
+  type: model
+  title: Risk Cascade Pathways Model
+  description: >-
+    This model maps common pathways where one risk triggers others. Key cascades include
+    racing→corner-cutting→incident→regulation-capture and epistemic→trust→coordination-failure.
+  customFields:
+    - label: Model Type
+      value: Cascade Mapping
+    - label: Scope
+      value: Risk Propagation
+    - label: Key Insight
+      value: Risks propagate through system interdependencies, often in non-obvious paths
+  relatedEntries:
+    - id: compounding-risks-analysis
+      type: model
+      relationship: related
+    - id: risk-interaction-network
+      type: model
+      relationship: related
+  tags:
+    - cascades
+    - risk-pathways
+    - systems-thinking
+  lastUpdated: 2025-12
+- id: risk-interaction-network
+  type: model
+  title: Risk Interaction Network Model
+  description: >-
+    This model maps how risks enable and reinforce each other. It identifies racing dynamics and concentration of power
+    as central hub risks affecting most others.
+  customFields:
+    - label: Model Type
+      value: Network Analysis
+    - label: Scope
+      value: Risk Dependencies
+    - label: Key Insight
+      value: Risk network structure reveals critical nodes and amplification pathways
+  relatedEntries:
+    - id: risk-cascade-pathways
+      type: model
+      relationship: related
+    - id: compounding-risks-analysis
+      type: model
+      relationship: related
+  tags:
+    - networks
+    - risk-interactions
+    - systems-thinking
+  lastUpdated: 2025-12
+- id: safety-capability-tradeoff
+  type: model
+  title: Safety-Capability Tradeoff Model
+  description: >-
+    This model analyzes when safety measures conflict with capabilities. It finds most safety interventions impose 5-15%
+    capability cost, with some achieving safety gains at lower cost.
+  customFields:
+    - label: Model Type
+      value: Tradeoff Analysis
+    - label: Scope
+      value: Safety vs Capability
+    - label: Key Insight
+      value: Some safety measures reduce capabilities while others are complementary; distinguishing is crucial
+  relatedEntries:
+    - id: racing-dynamics
+      type: risk
+      relationship: related
+    - id: safety-capability-gap
+      type: parameter
+      relationship: models
+    - id: alignment-robustness
+      type: parameter
+      relationship: affects
+  tags:
+    - tradeoffs
+    - safety
+    - capabilities
+  lastUpdated: 2025-12
+- id: safety-research-allocation
+  type: model
+  title: Safety Research Allocation Model
+  description: >-
+    This model analyzes safety research resource distribution. It identifies neglected areas including multi-agent
+    dynamics and corrigibility, with 3-5x funding gaps vs core alignment.
+  customFields:
+    - label: Model Type
+      value: Resource Optimization
+    - label: Scope
+      value: Research Prioritization
+    - label: Key Insight
+      value: Optimal allocation depends on problem tractability, neglectedness, and time-sensitivity
+  relatedEntries:
+    - id: safety-research-value
+      type: model
+      relationship: related
+    - id: intervention-effectiveness-matrix
+      type: model
+      relationship: related
+  tags:
+    - resource-allocation
+    - research-priorities
+    - optimization
+  lastUpdated: 2025-12
+- id: safety-researcher-gap
+  type: model
+  title: Safety Researcher Gap Model
+  description: >-
+    This model analyzes mismatch between safety researcher supply and demand. It estimates 3-10x gap between needed
+    researchers and current pipeline capacity.
+  customFields:
+    - label: Model Type
+      value: Supply-Demand Analysis
+    - label: Target Factor
+      value: Safety Talent
+    - label: Key Insight
+      value: Safety researcher demand is growing faster than supply, creating widening gaps
+  relatedEntries:
+    - id: capabilities-to-safety-pipeline
+      type: model
+      relationship: related
+  tags:
+    - talent
+    - field-building
+    - supply-demand
+  lastUpdated: 2025-12
+- id: whistleblower-dynamics
+  type: model
+  title: Whistleblower Dynamics Model
+  description: >-
+    This model analyzes information flow from AI insiders to the public. It estimates significant barriers reduce
+    whistleblowing by 70-90% compared to optimal transparency.
+  customFields:
+    - label: Model Type
+      value: Incentive Analysis
+    - label: Target Factor
+      value: Transparency Mechanisms
+    - label: Key Insight
+      value: Current incentive structures strongly discourage whistleblowing, creating information asymmetries
+  relatedEntries:
+    - id: lab-incentives-model
+      type: model
+      relationship: related
+  tags:
+    - whistleblowing
+    - incentives
+    - transparency
+  lastUpdated: 2025-12
+- id: parameter-interaction-network
+  type: model
+  title: Parameter Interaction Network Model
+  description: >-
+    This model maps causal relationships between 22 key AI safety parameters. It identifies 7 feedback loops and 4
+    critical dependency clusters, showing that epistemic-health and institutional-quality are highest-leverage
+    intervention points.
+  customFields:
+    - label: Model Type
+      value: Network Analysis
+    - label: Scope
+      value: Parameter Dependencies
+    - label: Key Insight
+      value: >-
+        Epistemic and institutional parameters have highest downstream influence; interventions should target network
+        hubs
+  relatedEntries:
+    - id: risk-interaction-network
+      type: model
+      relationship: related
+    - id: epistemic-health
+      type: parameter
+      relationship: models
+    - id: institutional-quality
+      type: parameter
+      relationship: models
+    - id: societal-trust
+      type: parameter
+      relationship: affects
+    - id: racing-intensity
+      type: parameter
+      relationship: affects
+  tags:
+    - networks
+    - parameters
+    - systems-thinking
+    - feedback-loops
+  lastUpdated: 2025-12
+- id: safety-culture-equilibrium
+  type: model
+  title: Safety Culture Equilibrium Model
+  description: >-
+    This model analyzes stable states for AI lab safety culture under competitive pressure. It identifies three
+    equilibria and transition conditions requiring coordinated commitment or major incident.
+  customFields:
+    - label: Model Type
+      value: Game-Theoretic Analysis
+    - label: Scope
+      value: Lab Behavior Dynamics
+    - label: Key Insight
+      value: >-
+        Current industry sits in racing-dominant equilibrium; transition to safety-competitive requires coordination or
+        forcing event
+  relatedEntries:
+    - id: lab-incentives-model
+      type: model
+      relationship: related
+    - id: racing-dynamics-model
+      type: model
+      relationship: related
+    - id: safety-culture-strength
+      type: parameter
+      relationship: models
+    - id: racing-intensity
+      type: parameter
+      relationship: models
+  tags:
+    - equilibrium
+    - safety-culture
+    - game-theory
+    - lab-behavior
+  lastUpdated: 2025-12
+- id: regulatory-capacity-threshold
+  type: model
+  title: Regulatory Capacity Threshold Model
+  description: >-
+    This model estimates minimum regulatory capacity for credible AI oversight. It finds current US/UK capacity at
+    0.15-0.25 of the 0.4-0.6 threshold needed, with a 3-5 year window to build capacity.
+  customFields:
+    - label: Model Type
+      value: Threshold Analysis
+    - label: Scope
+      value: Regulatory Effectiveness
+    - label: Key Insight
+      value: Gap between regulatory capacity and industry capability is widening; crisis-level investment needed
+  relatedEntries:
+    - id: institutional-adaptation-speed
+      type: model
+      relationship: related
+    - id: regulatory-capacity
+      type: parameter
+      relationship: models
+    - id: institutional-quality
+      type: parameter
+      relationship: models
+  tags:
+    - governance
+    - regulation
+    - thresholds
+    - capacity-building
+  lastUpdated: 2025-12
+- id: alignment-robustness-trajectory
+  type: model
+  title: Alignment Robustness Trajectory Model
+  description: >-
+    This model analyzes how alignment robustness changes with capability scaling. It estimates current techniques
+    maintain 60-80% robustness at GPT-4 level but projects degradation to 30-50% at 100x capability.
+  customFields:
+    - label: Model Type
+      value: Trajectory Analysis
+    - label: Scope
+      value: Alignment Scaling
+    - label: Key Insight
+      value: Critical zone at 10-30x current capability where techniques become insufficient; alignment valley problem
+  relatedEntries:
+    - id: deceptive-alignment-decomposition
+      type: model
+      relationship: related
+    - id: safety-capability-tradeoff
+      type: model
+      relationship: related
+    - id: alignment-robustness
+      type: parameter
+      relationship: models
+    - id: safety-capability-gap
+      type: parameter
+      relationship: affects
+    - id: human-oversight-quality
+      type: parameter
+      relationship: affects
+  tags:
+    - alignment
+    - scaling
+    - trajectories
+    - robustness
+  lastUpdated: 2025-12
+
+# === Auto-generated stubs for pages missing entities ===
+- id: longtermwiki-impact
+  type: model
+  title: LongtermWiki Impact Model
+  description: >-
+    Fermi estimation of LongtermWiki value grounded in base rates. GiveWell
+    shows 3% of donors choose based on effectiveness research; 80k Hours
+    achieves ~107 significant plan changes/year; think tanks rarely demonstrate
+    causal policy impact. Conservative central estimate: $100-500K/yr in
+    effective valu
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: societal-response
+  type: model
+  title: "Societal Response & Adaptation Model"
+  description: >-
+    Quantitative model finding current societal response capacity at 20-25%
+    adequacy with 3-5 year institutional lag, requiring $550M-1.1B/year
+    investment (5-10x current) across regulatory capacity (20%→60%), legislative
+    speed (24→6 months), safety pipeline (500→2,000/year), and international
+    coordinati
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02

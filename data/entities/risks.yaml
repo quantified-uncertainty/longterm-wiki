@@ -1,0 +1,2645 @@
+# Risks Entities
+# Auto-generated from entities.yaml - edit this file directly
+
+- id: authentication-collapse
+  type: risk
+  title: Authentication Collapse
+  severity: critical
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2028
+    earliest: 2025
+    latest: 2030
+  maturity: Emerging
+  customFields:
+    - label: Status
+      value: Detection already failing for cutting-edge generators
+    - label: Key Concern
+      value: Fundamental asymmetry favors generation
+  sources:
+    - title: 'C2PA: Coalition for Content Provenance and Authenticity'
+      url: https://c2pa.org/
+    - title: DARPA MediFor Program
+      url: https://www.darpa.mil/program/media-forensics
+    - title: AI Text Detection is Unreliable
+      url: https://arxiv.org/abs/2303.11156
+      author: Kirchner et al.
+      date: '2023'
+    - title: Deepfake Detection Survey
+      url: https://arxiv.org/abs/2004.11138
+  description: >
+    Authentication collapse occurs when the systems we rely on to verify whether content is real can no longer keep pace
+    with synthetic content generation. Currently, we use various signals to determine authenticity - metadata, forensic
+    analysis, source reputation, and increasingly AI-based detection tools. Authentication collapse would mean these
+    defenses fail comprehensively.
+
+
+    The core problem is a fundamental asymmetry: generating convincing fake content is becoming easier and cheaper,
+    while reliably detecting fakes is becoming harder. Current AI detectors already struggle with cutting-edge
+    generators, and detection methods that work today may fail tomorrow as generators improve. Watermarking schemes can
+    often be removed or spoofed. The offense-defense balance structurally favors offense.
+
+
+    The consequences of authentication collapse extend beyond misinformation. Legal systems depend on evidence being
+    verifiable - what happens when any video or audio recording could plausibly be fake? Financial systems rely on
+    identity verification. Historical archives could be corrupted with convincing forgeries. The "liar's dividend"
+    effect means even real evidence can be dismissed as potentially fake. Once authentication collapses, rebuilding
+    trust in any form of digital evidence becomes extremely difficult.
+  tags:
+    - deepfakes
+    - content-verification
+    - watermarking
+    - digital-forensics
+    - provenance
+  lastUpdated: 2025-12
+- id: authoritarian-tools
+  type: risk
+  title: AI Authoritarian Tools
+  severity: high
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Status
+      value: Deployed by multiple regimes
+    - label: Key Risk
+      value: Stabilizing autocracy
+  relatedEntries:
+    - id: surveillance
+      type: risk
+    - id: lock-in
+      type: risk
+    - id: concentration-of-power
+      type: risk
+  sources:
+    - title: The Road to Digital Unfreedom
+      author: Yuval Noah Harari
+    - title: How Democracies Die
+      author: Levitsky and Ziblatt
+    - title: The Repressive Power of Artificial Intelligence (Freedom House)
+      url: https://freedomhouse.org/report/freedom-net/2023/repressive-power-artificial-intelligence
+      date: '2023'
+    - title: 'Freedom on the Net 2025: Uncertain Future (Freedom House)'
+      url: https://freedomhouse.org/report/freedom-net/2025/uncertain-future-global-internet
+      date: '2025'
+    - title: Digital Threats and Elections (Freedom House)
+      url: https://freedomhouse.org/article/digital-threats-loom-over-busy-year-elections
+      date: '2024'
+    - title: Getting Ahead of Digital Repression (Stanford FSI)
+      url: >-
+        https://fsi.stanford.edu/publication/getting-ahead-digital-repression-authoritarian-innovation-and-democratic-response
+    - title: Authoritarianism Could Poison AI (IGCC)
+      url: https://ucigcc.org/blog/authoritarianism-could-poison-ai/
+    - title: AI and Authoritarian Governments (Democratic Erosion)
+      url: https://democratic-erosion.org/2023/11/17/artificial-intelligence-and-authoritarian-governments/
+      date: '2023'
+  description: >-
+    AI can strengthen authoritarian control through surveillance, censorship, propaganda, and prediction of dissent. The
+    concern isn't just that AI enables human rights abuses today, but that AI-enabled authoritarianism might become
+    stable and durable—harder to resist or overthrow than historical autocracies.
+  tags:
+    - authoritarianism
+    - human-rights
+    - digital-repression
+    - lock-in
+    - governance
+  lastUpdated: 2025-12
+- id: automation-bias
+  type: risk
+  title: Automation Bias
+  severity: medium
+  likelihood:
+    level: very-high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Mature
+  customFields:
+    - label: Type
+      value: Epistemic
+    - label: Status
+      value: Widespread
+  relatedEntries:
+    - id: sycophancy
+      type: risk
+    - id: enfeeblement
+      type: risk
+    - id: erosion-of-agency
+      type: risk
+  sources:
+    - title: Automation Bias in Decision Making
+      author: Parasuraman & Manzey
+    - title: The Glass Cage
+      author: Nicholas Carr
+    - title: Human Factors research on automation
+  description: >-
+    Automation bias is the tendency to over-trust automated systems and AI outputs, accepting their conclusions without
+    appropriate scrutiny. Humans are prone to defer to systems that appear authoritative, especially when those systems
+    are usually right. This creates vulnerability when systems are wrong.
+  tags:
+    - human-ai-interaction
+    - trust
+    - decision-making
+    - cognitive-bias
+    - ai-safety
+  lastUpdated: 2025-12
+- id: autonomous-weapons
+  type: risk
+  title: Autonomous Weapons
+  severity: high
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Mature
+  customFields:
+    - label: Also Called
+      value: LAWS, killer robots
+    - label: Status
+      value: Active military development
+  relatedEntries:
+    - id: cyberweapons
+      type: risk
+    - id: racing-dynamics
+      type: risk
+  sources:
+    - title: Campaign to Stop Killer Robots
+      url: https://www.stopkillerrobots.org/
+    - title: UN CCW Group of Governmental Experts on LAWS
+      url: >-
+        https://meetings.unoda.org/ccw-/convention-on-certain-conventional-weapons-group-of-governmental-experts-on-lethal-autonomous-weapons-systems-2024
+      date: '2024'
+    - title: Future of Life Institute on Autonomous Weapons
+      url: https://futureoflife.org/cause-area/autonomous-weapons-systems/
+    - title: 'LAWS and International Law: Growing Momentum (ASIL)'
+      url: https://www.asil.org/insights/volume/29/issue/1
+      date: '2025'
+    - title: U.S. Policy on Lethal Autonomous Weapon Systems (CRS)
+      url: https://www.congress.gov/crs-product/IF11150
+    - title: National Positions on LAWS Governance (Lieber Institute)
+      url: https://lieber.westpoint.edu/future-warfare-national-positions-governance-lethal-autonomous-weapons-systems/
+    - title: International Discussions on LAWS (CRS)
+      url: https://www.congress.gov/crs-product/IF11294
+  description: >-
+    Autonomous weapons systems are weapons that can select and engage targets without human intervention. AI advances
+    are making such systems more capable and more likely to be deployed. The key concerns are: lowered barriers to war,
+    loss of human judgment in life-or-death decisions, and potential for arms races or accidental escalation.
+  tags:
+    - laws
+    - military-ai
+    - arms-control
+    - governance
+    - warfare
+  lastUpdated: 2025-12
+- id: bioweapons
+  type: risk
+  title: Bioweapons Risk
+  severity: catastrophic
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2027
+    earliest: 2025
+    latest: 2030
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Misuse
+    - label: Key Concern
+      value: Lowering barriers to development
+  relatedEntries:
+    - id: cyberweapons
+      type: risk
+    - id: anthropic
+      type: lab
+  sources:
+    - title: The Precipice
+      author: Toby Ord
+      date: '2020'
+    - title: Anthropic Responsible Scaling Policy
+      url: https://www.anthropic.com/news/anthropics-responsible-scaling-policy
+    - title: Dual Use of Artificial Intelligence-powered Drug Discovery
+      url: https://www.nature.com/articles/s42256-022-00465-9
+    - title: AI and the Evolution of Biological National Security Risks (CNAS)
+      url: https://www.cnas.org/publications/reports/ai-and-the-evolution-of-biological-national-security-risks
+      date: '2024'
+    - title: The Operational Risks of AI in Large-Scale Biological Attacks (RAND)
+      url: https://www.rand.org/pubs/research_reports/RRA2977-2.html
+      date: '2024'
+    - title: Biosecurity in the Age of AI (Belfer Center)
+      url: https://www.belfercenter.org/publication/biosecurity-age-ai-whats-risk
+    - title: AI Challenges and Biological Threats (Frontiers in AI)
+      url: https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2024.1382356/full
+      date: '2024'
+    - title: National Academies Study on AI Biosecurity
+      url: >-
+        https://www.nationalacademies.org/our-work/assessing-and-navigating-biosecurity-concerns-and-benefits-of-artificial-intelligence-use-in-the-life-sciences
+    - title: Opportunities to Strengthen U.S. Biosecurity (CSIS)
+      url: >-
+        https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should
+      date: '2025'
+  description: >-
+    AI systems could accelerate biological weapons development by helping with pathogen design, synthesis planning, or
+    acquisition of dangerous knowledge. The concern isn't that AI creates entirely new risks, but that it lowers
+    barriers—making capabilities previously requiring rare expertise more accessible to bad actors.
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+    - cbrn
+    - ai-misuse
+  lastUpdated: 2025-12
+- id: concentration-of-power
+  type: risk
+  title: Concentration of Power
+  severity: high
+  likelihood:
+    level: medium-high
+  timeframe:
+    median: 2030
+    earliest: 2025
+    latest: 2040
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Structural/Systemic
+  relatedEntries:
+    - id: lock-in
+      type: risk
+    - id: racing-dynamics
+      type: risk
+    - id: authoritarian-tools
+      type: risk
+  sources:
+    - title: AI and the Future of Power
+      url: https://80000hours.org/
+    - title: The Precipice
+      author: Toby Ord
+    - title: GovAI Annual Report 2024
+      url: https://cdn.governance.ai/GovAI_Annual_Report_2024.pdf
+      date: '2024'
+    - title: Computing Power and the Governance of AI (GovAI)
+      url: https://www.governance.ai/research-paper/computing-power-and-the-governance-of-artificial-intelligence
+    - title: Market Concentration Implications of Foundation Models (GovAI)
+      url: https://www.governance.ai/research-paper/market-concentration-implications-of-foundation-models
+    - title: Power and Governance in the Age of AI (New America)
+      url: https://www.newamerica.org/planetary-politics/briefs/power-governance-ai-public-good/
+    - title: AI, Global Governance, and Digital Sovereignty (arXiv)
+      url: https://arxiv.org/html/2410.17481v1
+      date: '2024'
+  description: >-
+    AI could enable small groups—companies, governments, or individuals—to accumulate and exercise power at scales
+    previously impossible. The concern isn't just inequality (which has always existed) but a qualitative shift in what
+    power concentration looks like when AI can substitute for large numbers of humans across many domains.
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+    - x-risk
+    - lock-in
+  lastUpdated: 2025-12
+- id: consensus-manufacturing
+  type: risk
+  title: Consensus Manufacturing
+  severity: high
+  likelihood:
+    level: medium
+    status: occurring
+  timeframe:
+    median: 2028
+    earliest: 2025
+    latest: 2030
+  maturity: Emerging
+  customFields:
+    - label: Status
+      value: Emerging at scale
+    - label: Key Concern
+      value: Fake consensus drives real decisions
+  sources:
+    - title: NY Attorney General Fake Comments Report
+      url: https://ag.ny.gov/sites/default/files/fake-comments-report.pdf
+      date: '2021'
+    - title: The Spread of False News Online
+      url: https://science.sciencemag.org/content/359/6380/1146
+      author: Vosoughi et al.
+      date: '2018'
+    - title: 'Oxford Internet Institute: Computational Propaganda'
+      url: https://comprop.oii.ox.ac.uk/
+    - title: Stanford Internet Observatory
+      url: https://cyber.fsi.stanford.edu/io
+  description: >
+    Consensus manufacturing refers to AI systems being used to create the false appearance of widespread agreement or
+    public support that doesn't actually exist. Unlike traditional astroturfing, which requires human labor for each
+    fake comment or endorsement, AI can generate unlimited quantities of seemingly authentic opinions, comments,
+    testimonials, and social media engagement.
+
+
+    The mechanism exploits how humans form beliefs about social consensus. We naturally look to what others think as a
+    guide to what is true and acceptable. If everyone seems to agree on something, we tend to go along. AI can flood
+    information channels with coordinated messaging that mimics organic public opinion, making fringe positions appear
+    mainstream and majority positions appear contested. This happened at scale during FCC net neutrality comment
+    periods, where millions of fake public comments were submitted.
+
+
+    The danger extends beyond misinformation to structural corruption of democratic processes. Town halls, public
+    comment periods, legislative outreach, product reviews, and social media discourse all rely on the assumption that
+    expressed opinions represent real people with genuine views. When AI can simulate entire populations of concerned
+    citizens, the feedback mechanisms that democratic and market systems depend on become unreliable. Decisions made on
+    the basis of manufactured consensus serve the interests of whoever controls the AI, not the actual public.
+  tags:
+    - disinformation
+    - astroturfing
+    - bot-detection
+    - public-opinion
+    - democratic-process
+  lastUpdated: 2025-12
+- id: corrigibility-failure
+  type: risk
+  title: Corrigibility Failure
+  severity: catastrophic
+  likelihood:
+    level: high
+    notes: default behavior
+  timeframe:
+    median: 2035
+    confidence: low
+  maturity: Growing
+  relatedEntries:
+    - id: instrumental-convergence
+      type: risk
+    - id: power-seeking
+      type: risk
+    - id: ai-control
+      type: safety-agenda
+  sources:
+    - title: Corrigibility
+      url: https://intelligence.org/files/Corrigibility.pdf
+      author: Soares et al.
+      date: '2015'
+    - title: The Off-Switch Game
+      url: https://arxiv.org/abs/1611.08219
+      author: Hadfield-Menell et al.
+    - title: AI Alignment Forum discussions on corrigibility
+  description: >-
+    Corrigibility failure occurs when an AI system resists attempts by humans to correct, modify, or shut it down. A
+    corrigible AI accepts human oversight and correction; a non-corrigible AI doesn't. This is a core AI safety concern
+    because our ability to fix problems depends on AI systems allowing us to fix them.
+  tags:
+    - corrigibility
+    - shutdown-problem
+    - instrumental-convergence
+    - ai-control
+    - self-preservation
+  lastUpdated: 2025-12
+- id: cyber-psychosis
+  type: risk
+  title: Cyber Psychosis
+  severity: medium-high
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2027
+    earliest: 2025
+    latest: 2030
+  maturity: Neglected
+  customFields:
+    - label: Also Called
+      value: AI-induced psychosis, parasocial AI relationships, digital manipulation
+    - label: Status
+      value: Early cases emerging; under-researched
+    - label: Key Concern
+      value: Vulnerable populations at particular risk
+  sources:
+    - title: The Social Dilemma (Documentary)
+      url: https://www.thesocialdilemma.com/
+      date: '2020'
+    - title: 'Hooked: How to Build Habit-Forming Products'
+      author: Nir Eyal
+      date: '2014'
+    - title: 'Influence: The Psychology of Persuasion'
+      author: Robert Cialdini
+      date: '1984'
+    - title: Weapons of Math Destruction
+      url: https://www.amazon.com/Weapons-Math-Destruction-Increases-Inequality/dp/0553418815
+      author: Cathy O'Neil
+      date: '2016'
+    - title: The Age of Surveillance Capitalism
+      url: https://www.amazon.com/Age-Surveillance-Capitalism-Future-Frontier/dp/1610395697
+      author: Shoshana Zuboff
+      date: '2019'
+    - title: Reality+
+      author: David Chalmers
+      date: '2022'
+    - title: Cybersecurity and Cyberwar
+      author: Singer & Friedman
+      date: '2014'
+    - title: Stanford Internet Observatory
+      url: https://cyber.fsi.stanford.edu/io
+    - title: Digital Mental Health Resources
+      url: https://www.nimh.nih.gov/health/topics/technology-and-the-future-of-mental-health-treatment
+  tags:
+    - mental-health
+    - ai-ethics
+    - manipulation
+    - digital-wellbeing
+    - parasocial-relationships
+    - deepfakes
+    - disinformation
+  lastUpdated: 2025-12
+- id: cyberweapons
+  type: risk
+  title: Cyberweapons Risk
+  severity: high
+  likelihood:
+    level: high
+    status: emerging
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Misuse
+    - label: Status
+      value: Active development by state actors
+  relatedEntries:
+    - id: bioweapons
+      type: risk
+    - id: autonomous-weapons
+      type: risk
+  sources:
+    - title: CISA Artificial Intelligence
+      url: https://www.cisa.gov/ai
+    - title: CSET AI and Cybersecurity Research
+      url: https://cset.georgetown.edu/
+    - title: DHS Guidelines on AI and Critical Infrastructure
+      url: https://www.dhs.gov/sites/default/files/2024-04/24_0426_dhs_ai-ci-safety-security-guidelines-508c.pdf
+      date: '2024'
+    - title: DHS Report on AI Threats to Critical Infrastructure
+      url: >-
+        https://dhs.gov/news/2024/04/29/dhs-publishes-guidelines-and-report-secure-critical-infrastructure-and-weapons-mass
+      date: '2024'
+    - title: ISACA State of Cybersecurity 2024
+      url: https://www.isaca.org/resources/reports/state-of-cybersecurity-2024
+      date: '2024'
+    - title: CISA 2024 Year in Review
+      url: https://www.cisa.gov/about/2024YIR
+      date: '2024'
+    - title: Cybersecurity Risk of AI Applications (ISACA)
+      url: >-
+        https://www.isaca.org/resources/isaca-journal/issues/2024/volume-2/cybersecurity-risk-of-ai-based-applications-demystified
+      date: '2024'
+  description: >-
+    AI systems can enhance offensive cyber capabilities in several ways: discovering vulnerabilities in software,
+    generating exploit code, automating attack campaigns, and evading detection. This shifts the offense-defense balance
+    and may enable more frequent, sophisticated, and scalable cyber attacks.
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+    - ai-misuse
+    - national-security
+  lastUpdated: 2025-12
+- id: deceptive-alignment
+  type: risk
+  title: Deceptive Alignment
+  severity: catastrophic
+  likelihood:
+    level: medium
+    confidence: low
+  timeframe:
+    median: 2035
+    confidence: low
+  maturity: Growing
+  customFields:
+    - label: Key Concern
+      value: AI hides misalignment during training
+  relatedEntries:
+    - id: mesa-optimization
+      type: risk
+    - id: interpretability
+      type: safety-agenda
+    - id: ai-control
+      type: safety-agenda
+    - id: scalable-oversight
+      type: safety-agenda
+    - id: evals
+      type: approach
+    - id: anthropic
+      type: lab
+  sources:
+    - title: Risks from Learned Optimization
+      url: https://arxiv.org/abs/1906.01820
+      author: Hubinger et al.
+      date: '2019'
+    - title: 'Sleeper Agents: Training Deceptive LLMs That Persist Through Safety Training'
+      url: https://arxiv.org/abs/2401.05566
+      author: Anthropic
+      date: '2024'
+    - title: AI Alignment Forum discussions on deceptive alignment
+  tags:
+    - mesa-optimization
+    - inner-alignment
+    - situational-awareness
+    - deception
+    - ai-safety
+    - interpretability
+  lastUpdated: 2025-12
+- id: deepfakes
+  type: risk
+  title: Deepfakes
+  severity: medium-high
+  likelihood:
+    level: very-high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Mature
+  customFields:
+    - label: Status
+      value: Widespread
+    - label: Key Risk
+      value: Authenticity crisis
+  relatedEntries:
+    - id: disinformation
+      type: risk
+    - id: trust-decline
+      type: risk
+  sources:
+    - title: Deepfakes and the New Disinformation War
+      url: https://www.foreignaffairs.com/
+    - title: C2PA Content Authenticity Standards
+      url: https://c2pa.org/
+    - title: Fighting Deepfakes With Content Credentials and C2PA
+      url: https://www.cmswire.com/digital-experience/fighting-deepfakes-with-content-credentials-and-c2pa/
+    - title: Content Credentials and 2024 Elections (IEEE Spectrum)
+      url: https://spectrum.ieee.org/deepfakes-election
+    - title: 'Deepfakes and Disinformation: Elections Impact (TechUK)'
+      url: >-
+        https://www.techuk.org/resource/deepfakes-and-disinformation-what-impact-could-this-have-on-elections-in-2024.html
+      date: '2024'
+    - title: 'Deepfake Media Forensics: Status and Challenges (PMC)'
+      url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11943306/
+      date: '2024'
+    - title: Synthetic Media and Deepfakes (CNTI)
+      url: https://innovating.news/article/synthetic-media-deepfakes/
+    - title: Deepfake Detection Legal Framework Proposal
+      url: https://www.sciencedirect.com/science/article/pii/S2212473X25000355
+      date: '2025'
+  description: >-
+    Deepfakes are AI-generated synthetic media—typically video or audio—that realistically depict people saying or doing
+    things they never did. The technology has rapidly advanced from obviously fake to nearly indistinguishable from
+    reality, creating both direct harms (fraud, harassment, defamation) and systemic harms (erosion of trust in
+    authentic ...
+  tags:
+    - synthetic-media
+    - identity
+    - authentication
+    - digital-trust
+    - ai-misuse
+  lastUpdated: 2025-12
+- id: disinformation
+  type: risk
+  title: AI Disinformation
+  severity: high
+  likelihood:
+    level: very-high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Mature
+  customFields:
+    - label: Status
+      value: Actively happening
+    - label: Key Change
+      value: Scale and personalization
+  relatedEntries:
+    - id: deepfakes
+      type: risk
+    - id: epistemic-collapse
+      type: risk
+  sources:
+    - title: OpenAI Research on Influence Operations
+      url: https://openai.com/research
+    - title: How Persuasive Is AI-Generated Propaganda? (Stanford HAI)
+      url: https://hai.stanford.edu/assets/files/2024-08/HAI-Policy-Brief-AI-Generated-Propaganda.pdf
+      date: '2024'
+    - title: The Disinformation Machine (Stanford HAI)
+      url: https://hai.stanford.edu/news/disinformation-machine-how-susceptible-are-we-ai-propaganda
+    - title: Stanford HAI 2024 AI Index on Responsible AI
+      url: https://hai.stanford.edu/ai-index/2024-ai-index-report/responsible-ai
+      date: '2024'
+    - title: AI-Driven Disinformation Policy Recommendations (Frontiers)
+      url: https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2025.1569115/full
+      date: '2025'
+    - title: CSET Disinformation Research
+      url: https://cset.georgetown.edu/topic/disinformation/
+    - title: Forecasting Misuses of Language Models (Stanford FSI)
+      url: >-
+        https://cyber.fsi.stanford.edu/io/news/forecasting-potential-misuses-language-models-disinformation-campaigns-and-how-reduce-risk
+    - title: AI-Driven Misinformation and Democracy (Stanford GSB)
+      url: https://www.gsb.stanford.edu/insights/wreck-vote-how-ai-driven-misinformation-could-undermine-democracy
+  description: >-
+    AI enables disinformation at unprecedented scale and sophistication. Language models can generate convincing text,
+    image generators can create realistic fake photos, and AI can personalize messages to individual targets. What
+    previously required human effort for each piece of content can now be automated.
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+    - democracy
+    - deepfakes
+  lastUpdated: 2025-12
+- id: distributional-shift
+  type: risk
+  title: Distributional Shift
+  severity: medium
+  likelihood:
+    level: very-high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Mature
+  relatedEntries:
+    - id: goal-misgeneralization
+      type: risk
+    - id: reward-hacking
+      type: risk
+  sources:
+    - title: A Survey on Distribution Shift
+      url: https://arxiv.org/abs/2108.13624
+    - title: Underspecification Presents Challenges for Credibility in Modern ML
+      url: https://arxiv.org/abs/2011.03395
+      author: D'Amour et al.
+    - title: Concrete Problems in AI Safety
+      url: https://arxiv.org/abs/1606.06565
+  description: >-
+    Distributional shift occurs when an AI system encounters inputs or situations that differ from its training
+    distribution, leading to degraded or unpredictable performance. A model trained on daytime driving may fail at
+    night. A language model trained on 2022 data may give outdated answers in 2024.
+  tags:
+    - robustness
+    - generalization
+    - ml-safety
+    - out-of-distribution
+    - deployment
+  lastUpdated: 2025-12
+- id: economic-disruption
+  type: risk
+  title: Economic Disruption
+  severity: medium-high
+  likelihood:
+    level: high
+  timeframe:
+    median: 2030
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Structural
+    - label: Status
+      value: Beginning
+  relatedEntries:
+    - id: concentration-of-power
+      type: risk
+    - id: erosion-of-agency
+      type: risk
+  sources:
+    - title: The Rise of the Robots
+      author: Martin Ford
+    - title: The Future of Employment
+      author: Frey and Osborne
+    - title: Impact of AI on Labor Market (Yale Budget Lab)
+      url: https://budgetlab.yale.edu/research/evaluating-impact-ai-labor-market-current-state-affairs
+      date: '2024'
+    - title: How Will AI Affect the Global Workforce? (Goldman Sachs)
+      url: https://www.goldmansachs.com/insights/articles/how-will-ai-affect-the-global-workforce
+    - title: AI Will Transform the Global Economy (IMF)
+      url: >-
+        https://www.imf.org/en/blogs/articles/2024/01/14/ai-will-transform-the-global-economy-lets-make-sure-it-benefits-humanity
+      date: '2024'
+    - title: AI Labor Displacement and Retraining Limits (Brookings)
+      url: https://www.brookings.edu/articles/ai-labor-displacement-and-the-limits-of-worker-retraining/
+    - title: 'AI''s Job Impact: Gains Outpace Losses (ITIF)'
+      url: https://itif.org/publications/2025/12/18/ais-job-impact-gains-outpace-losses/
+      date: '2025'
+    - title: 'AI and the Future of Work: Disruptions and Opportunities (UN)'
+      url: https://unric.org/en/ai-and-the-future-of-work-disruptions-and-opportunitie/
+    - title: 'Job Displacement in the Age of AI: Bibliometric Review (De Gruyter)'
+      url: https://www.degruyterbrill.com/document/doi/10.1515/opis-2024-0010/html?lang=en
+      date: '2024'
+  description: >-
+    AI could automate large portions of the economy faster than workers can adapt, creating mass unemployment,
+    inequality, and social instability. While technological unemployment fears have historically been unfounded, AI may
+    be different in scope—potentially affecting cognitive work that previous automation couldn't touch.
+  tags:
+    - labor-markets
+    - automation
+    - inequality
+    - policy
+    - economic-policy
+  lastUpdated: 2025-12
+- id: emergent-capabilities
+  type: risk
+  title: Emergent Capabilities
+  severity: high
+  likelihood:
+    level: medium
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Key Finding
+      value: Capabilities appear suddenly at scale
+  relatedEntries:
+    - id: sharp-left-turn
+      type: risk
+    - id: sandbagging
+      type: risk
+    - id: situational-awareness
+      type: capability
+  sources:
+    - title: Emergent Abilities of Large Language Models
+      url: https://arxiv.org/abs/2206.07682
+      author: Wei et al.
+      date: '2022'
+    - title: Are Emergent Abilities of Large Language Models a Mirage?
+      url: https://arxiv.org/abs/2304.15004
+      author: Schaeffer et al.
+      date: '2023'
+    - title: Beyond the Imitation Game
+      url: https://arxiv.org/abs/2206.04615
+      author: BIG-bench
+  description: >-
+    Emergent capabilities are abilities that appear in AI systems at certain scales without being explicitly trained
+    for, often appearing abruptly rather than gradually.
+  tags:
+    - scaling
+    - capability-evaluation
+    - unpredictability
+    - phase-transitions
+    - ai-safety
+  lastUpdated: 2025-12
+- id: enfeeblement
+  type: risk
+  title: Enfeeblement
+  severity: medium-high
+  likelihood:
+    level: medium
+  timeframe:
+    median: 2030
+  maturity: Neglected
+  customFields:
+    - label: Type
+      value: Structural
+    - label: Also Called
+      value: Human atrophy, skill loss
+  relatedEntries:
+    - id: erosion-of-agency
+      type: risk
+    - id: lock-in
+      type: risk
+  sources:
+    - title: What We Owe the Future
+      author: Will MacAskill
+    - title: The Glass Cage
+      author: Nicholas Carr
+    - title: Human Enfeeblement (Safe AI Future)
+      url: https://www.secureaifuture.org/topics/enfeeblement
+    - title: AI Risks That Could Lead to Catastrophe (CAIS)
+      url: https://safe.ai/ai-risk
+    - title: AI's Impact on Human Loss and Laziness (Nature)
+      url: https://www.nature.com/articles/s41599-023-01787-8
+      date: '2023'
+    - title: 'The Silent Erosion: AI and Mental Grip (CIGI)'
+      url: https://www.cigionline.org/articles/the-silent-erosion-how-ais-helping-hand-weakens-our-mental-grip/
+    - title: AI Assistance and Skill Decay (PMC)
+      url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11239631/
+      date: '2024'
+    - title: AI Chatbots and Cognitive Health Impact (PMC)
+      url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11020077/
+      date: '2024'
+    - title: 'AI on the Brink: Losing Control? (IMD)'
+      url: https://www.imd.org/ibyimd/artificial-intelligence/ai-on-the-brink-how-close-are-we-to-losing-control/
+  description: >-
+    Enfeeblement refers to humanity gradually losing capabilities, skills, and meaningful agency as AI systems take over
+    more functions. Unlike sudden catastrophe, this is a slow erosion where humans become increasingly dependent on AI,
+    losing the ability to function without it and potentially losing the ability to oversee or redirect AI systems.
+  tags:
+    - human-agency
+    - automation
+    - dependence
+    - resilience
+    - long-term
+  lastUpdated: 2025-12
+- id: epistemic-collapse
+  type: risk
+  title: Epistemic Collapse
+  severity: high
+  likelihood:
+    level: medium-high
+  timeframe:
+    median: 2030
+  maturity: Neglected
+  customFields:
+    - label: Type
+      value: Epistemic
+    - label: Status
+      value: Early stages visible
+  relatedEntries:
+    - id: disinformation
+      type: risk
+    - id: deepfakes
+      type: risk
+    - id: trust-decline
+      type: risk
+  sources:
+    - title: Reality+
+      author: David Chalmers
+    - title: Post-Truth
+      author: Lee McIntyre
+    - title: The Death of Truth
+      author: Michiko Kakutani
+  description: >-
+    Epistemic collapse refers to a breakdown in society's collective ability to distinguish truth from falsehood,
+    leading to an inability to form shared beliefs about reality. AI accelerates this risk by enabling unprecedented
+    scale of content generation, personalization of information, and fabrication of evidence.
+  tags:
+    - truth
+    - epistemology
+    - disinformation
+    - trust
+    - democracy
+  lastUpdated: 2025-12
+- id: erosion-of-agency
+  type: risk
+  title: Erosion of Human Agency
+  severity: medium-high
+  likelihood:
+    level: high
+  timeframe:
+    median: 2030
+  maturity: Neglected
+  customFields:
+    - label: Type
+      value: Structural
+    - label: Status
+      value: Already occurring
+  relatedEntries:
+    - id: enfeeblement
+      type: risk
+    - id: surveillance
+      type: risk
+    - id: sycophancy
+      type: risk
+  sources:
+    - title: The Age of Surveillance Capitalism
+      author: Shoshana Zuboff
+    - title: Weapons of Math Destruction
+      author: Cathy O'Neil
+    - title: Human Compatible
+      author: Stuart Russell
+    - title: Ethical Concerns in Personalized Algorithmic Decision-Making (Nature)
+      url: https://www.nature.com/articles/s41599-024-03864-y
+      date: '2024'
+    - title: 'The Silent Erosion: AI and Mental Grip (CIGI)'
+      url: https://www.cigionline.org/articles/the-silent-erosion-how-ais-helping-hand-weakens-our-mental-grip/
+    - title: Preserving Human Agency in the AI Era
+      url: https://anshadameenza.com/blog/technology/preserving-human-agency-ai-era/
+    - title: 'Human/AI Power Dynamics: Gradual Disempowerment (European Nexus)'
+      url: https://www.intelligencestrategy.org/blog-posts/human-ai-power-dynamics-the-gradual-disempowerment-problem
+    - title: Three Challenges for AI-Assisted Decision-Making (PMC)
+      url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11373149/
+      date: '2024'
+    - title: How to Preserve Agency in an AI-Driven Future (Decision Lab)
+      url: https://thedecisionlab.com/insights/society/autonomy-in-ai-driven-future
+  description: >-
+    Human agency—the capacity to make meaningful choices that shape one's life and the world—may be eroding as AI
+    systems increasingly mediate, predict, and direct human behavior. Unlike enfeeblement (losing capability), erosion
+    of agency concerns losing meaningful control even while retaining capability.
+  tags:
+    - human-agency
+    - autonomy
+    - manipulation
+    - recommendation-systems
+    - digital-rights
+  lastUpdated: 2025-12
+- id: expertise-atrophy
+  type: risk
+  title: Expertise Atrophy
+  severity: high
+  likelihood:
+    level: medium
+  timeframe:
+    median: 2038
+    earliest: 2025
+    latest: 2050
+  maturity: Neglected
+  customFields:
+    - label: Status
+      value: Early signs in some domains
+    - label: Key Concern
+      value: Slow, invisible, potentially irreversible
+  sources:
+    - title: 'The Glass Cage: Automation and Us'
+      author: Nicholas Carr
+      date: '2014'
+    - title: Children of the Magenta
+      url: https://www.skybrary.aero/articles/automation-dependency
+      author: Aviation Safety (FAA)
+    - title: 'Humans and Automation: Use, Misuse, Disuse, Abuse'
+      author: Parasuraman & Riley
+      date: '1997'
+    - title: Cognitive Offloading
+      url: https://www.sciencedirect.com/science/article/pii/S1364661316300614
+      author: Risko & Gilbert
+      date: '2016'
+  description: >
+    Expertise atrophy refers to the gradual erosion of human skills and judgment as AI systems take over more cognitive
+    tasks. When humans rely on AI for answers, navigation, calculations, or decisions, the underlying cognitive
+    capabilities that enable independent judgment slowly degrade. This process is insidious because it happens gradually
+    and often invisibly.
+
+
+    The phenomenon is already observable in several domains. Pilots who rely heavily on autopilot show degraded manual
+    flying skills. Doctors who use diagnostic AI may lose the clinical reasoning that allows them to catch AI errors.
+    Programmers using AI coding assistants may not develop the deep understanding that comes from struggling with
+    problems directly. As AI becomes more capable across more domains, this pattern could spread to virtually all
+    skilled human activity.
+
+
+    The key danger is that expertise atrophy undermines our ability to oversee AI systems. If humans can no longer
+    independently evaluate AI outputs because they've lost the relevant expertise, we cannot catch errors, biases, or
+    misalignment. We become dependent on AI to check AI, losing the human-in-the-loop safety that many governance
+    proposals assume. This creates a fragile system where a failure or misalignment in AI would be harder to detect and
+    correct because the human capacity to do so has eroded.
+  tags:
+    - automation
+    - human-factors
+    - skill-degradation
+    - ai-dependency
+    - resilience
+  lastUpdated: 2025-12
+- id: flash-dynamics
+  type: risk
+  title: Flash Dynamics
+  severity: high
+  likelihood:
+    level: medium-high
+  timeframe:
+    median: 2025
+  maturity: Neglected
+  customFields:
+    - label: Status
+      value: Emerging
+    - label: Key Risk
+      value: Speed beyond oversight
+  relatedEntries:
+    - id: erosion-of-agency
+      type: risk
+    - id: irreversibility
+      type: risk
+  sources:
+    - title: 'Selling Spirals: Avoiding an AI Flash Crash (Lawfare)'
+      url: https://www.lawfaremedia.org/article/selling-spirals--avoiding-an-ai-flash-crash
+    - title: AI Can Make Markets More Volatile (IMF)
+      url: >-
+        https://www.imf.org/en/blogs/articles/2024/10/15/artificial-intelligence-can-make-markets-more-efficient-and-more-volatile
+      date: '2024'
+    - title: AI's Role in the 2024 Flash Crash (Medium)
+      url: https://medium.com/@jeyadev_needhi/ais-role-in-the-2024-stock-market-flash-crash-a-case-study-55d70289ad50
+      date: '2024'
+    - title: AI and ChatGPT in Markets (Fortune)
+      url: https://fortune.com/2023/05/18/how-will-ai-chatgpt-change-stock-markets-high-frequency-trading-crashes/
+      date: '2023'
+    - title: Algorithmic Trading and Flash Crashes (ScienceDirect)
+      url: https://www.sciencedirect.com/science/article/pii/S2214845013000082
+    - title: AI and High-Frequency Trading (Assignment Writers)
+      url: https://www.assignmentwriters.au/sample/ai-high-frequency-trading-and-the-future-of-market-stability-and-ethics
+  description: >-
+    Flash dynamics occur when AI systems interact with each other and the world faster than humans can monitor,
+    understand, or intervene. This creates the possibility of cascading failures, unintended consequences, and
+    irreversible changes happening before any human can respond.
+  tags:
+    - algorithmic-trading
+    - financial-stability
+    - critical-infrastructure
+    - speed-of-ai
+    - human-oversight
+  lastUpdated: 2025-12
+- id: fraud
+  type: risk
+  title: AI-Powered Fraud
+  severity: high
+  likelihood:
+    level: very-high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Status
+      value: Rapidly growing
+    - label: Key Risk
+      value: Scale and personalization
+  relatedEntries:
+    - id: deepfakes
+      type: risk
+    - id: disinformation
+      type: risk
+  sources:
+    - title: FBI 2024 Internet Crime Report
+      url: https://www.fbi.gov/investigate/cyber
+    - title: AI Voice Cloning Scams (Axios)
+      url: https://www.axios.com/2025/03/15/ai-voice-cloning-consumer-scams
+      date: '2025'
+    - title: Deepfake Statistics 2025
+      url: https://deepstrike.io/blog/deepfake-statistics-2025
+      date: '2025'
+    - title: Top 5 AI Deepfake Fraud Cases 2024 (Incode)
+      url: https://incode.com/blog/top-5-cases-of-ai-deepfake-fraud-from-2024-exposed/
+      date: '2024'
+    - title: Voice Deepfake Scams (Group-IB)
+      url: https://www.group-ib.com/blog/voice-deepfake-scams/
+    - title: AI Supercharging Social Engineering (PYMNTS)
+      url: https://www.pymnts.com/news/artificial-intelligence/2025/hackers-use-ai-supercharge-social-engineering-attacks/
+      date: '2025'
+    - title: AI Voice Cloning Extortion (Corporate Compliance)
+      url: https://www.corporatecomplianceinsights.com/ai-voice-cloning-extortion-vishing-scams/
+  description: >-
+    AI dramatically amplifies fraud capabilities. Voice cloning requires just seconds of audio to create convincing
+    impersonations. Large language models generate personalized phishing at scale. Deepfakes enable video-based
+    impersonation.
+  tags:
+    - social-engineering
+    - voice-cloning
+    - deepfakes
+    - financial-crime
+    - identity
+  lastUpdated: 2025-12
+- id: goal-misgeneralization
+  type: risk
+  title: Goal Misgeneralization
+  severity: high
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2027
+    earliest: 2025
+    latest: 2030
+  maturity: Growing
+  customFields:
+    - label: Key Paper
+      value: Langosco et al. 2022
+  relatedEntries:
+    - id: mesa-optimization
+      type: risk
+    - id: deceptive-alignment
+      type: risk
+    - id: reward-hacking
+      type: risk
+  sources:
+    - title: Goal Misgeneralization in Deep RL
+      url: https://arxiv.org/abs/2105.14111
+      author: Langosco et al.
+      date: '2022'
+    - title: Goal Misgeneralization (LessWrong)
+      url: https://www.lesswrong.com/tag/goal-misgeneralization
+    - title: Risks from Learned Optimization
+      url: https://arxiv.org/abs/1906.01820
+  description: >-
+    Goal misgeneralization occurs when an AI system learns capabilities that generalize to new situations, but the goals
+    or behaviors it learned do not generalize correctly. The AI can competently pursue the wrong objective in
+    deployment.
+  tags:
+    - inner-alignment
+    - distribution-shift
+    - capability-generalization
+    - spurious-correlations
+    - out-of-distribution
+  lastUpdated: 2025-12
+- id: historical-revisionism
+  type: risk
+  title: AI-Enabled Historical Revisionism
+  severity: high
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2033
+    earliest: 2025
+    latest: 2040
+  maturity: Neglected
+  customFields:
+    - label: Status
+      value: Technical capability exists; deployment emerging
+    - label: Key Concern
+      value: Fake historical evidence indistinguishable from real
+  sources:
+    - title: USC Shoah Foundation
+      url: https://sfi.usc.edu/
+    - title: 'Witness: Synthetic Media'
+      url: https://lab.witness.org/projects/synthetic-media-and-deep-fakes/
+    - title: Bellingcat
+      url: https://www.bellingcat.com/
+    - title: Internet Archive
+      url: https://archive.org/
+  description: >
+    AI-enabled historical revisionism refers to the use of generative AI to fabricate convincing historical "evidence" -
+    fake photographs, documents, audio recordings, and video footage that appear to document events that never happened
+    or contradict events that did. This goes beyond traditional disinformation because the fabricated evidence can be
+    indistinguishable from authentic historical materials.
+
+
+    The technical capabilities already exist. AI can generate photorealistic images of historical figures in fabricated
+    settings, create convincing audio of historical speeches that were never given, and produce video that places people
+    in events they never attended. As these capabilities improve and become more accessible, the barrier to creating
+    convincing fake historical evidence approaches zero.
+
+
+    The consequences threaten our ability to maintain shared historical knowledge. Holocaust denial could be "supported"
+    by fabricated evidence of alternative explanations. War crimes could be obscured by fake documentation. Historical
+    figures' reputations could be rehabilitated or destroyed with fabricated recordings. Once AI-generated historical
+    fakes become common, even authentic historical evidence may be dismissed as potentially fake. Archives, which
+    preserve the evidence on which historical understanding depends, face the challenge of authenticating materials when
+    forgery has become trivially easy.
+  tags:
+    - historical-evidence
+    - archives
+    - deepfakes
+    - denial
+    - collective-memory
+  lastUpdated: 2025-12
+- id: institutional-capture
+  type: risk
+  title: Institutional Decision Capture
+  severity: high
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2033
+    earliest: 2025
+    latest: 2040
+  maturity: Emerging
+  customFields:
+    - label: Status
+      value: Early adoption phase
+    - label: Key Concern
+      value: Bias invisible to users; hard to audit
+  sources:
+    - title: Machine Bias
+      url: https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing
+      author: ProPublica
+      date: '2016'
+    - title: Dissecting Racial Bias in a Healthcare Algorithm
+      url: https://www.science.org/doi/10.1126/science.aax2342
+      author: Obermeyer et al.
+      date: '2019'
+    - title: Weapons of Math Destruction
+      author: Cathy O'Neil
+      date: '2016'
+    - title: AI Now Institute Reports
+      url: https://ainowinstitute.org/reports
+    - title: EU AI Act
+      url: https://artificialintelligenceact.eu/
+  description: >
+    Institutional decision capture occurs when AI advisory systems subtly influence organizational decisions in ways
+    that serve particular interests rather than the organization's stated goals. As AI systems become embedded in
+    hiring, lending, strategic planning, and other institutional processes, they can systematically bias decisions at a
+    scale that would be impossible for human actors acting alone.
+
+
+    The mechanism is often invisible. An AI system that recommends candidates for hiring might consistently favor
+    certain demographic groups or educational backgrounds due to biases in training data. A strategic planning AI might
+    systematically recommend decisions that benefit its creator's interests. Because these systems process many more
+    decisions than any human could review, and because their reasoning is often opaque, biased recommendations can
+    influence outcomes across thousands or millions of cases before anyone notices.
+
+
+    The danger is compounded by automation bias - humans' tendency to defer to AI recommendations, especially when the
+    AI is usually right. Organizations that adopt AI decision-support systems often lack the expertise to audit them
+    effectively. The result is that the values and biases embedded in AI systems can quietly reshape institutional
+    behavior. Unlike human corruption, which requires ongoing effort and creates trails, AI-embedded bias operates
+    automatically and continuously once deployed.
+  tags:
+    - ai-bias
+    - algorithmic-accountability
+    - automation-bias
+    - governance
+    - institutional-risk
+  lastUpdated: 2025-12
+- id: instrumental-convergence
+  type: risk
+  title: Instrumental Convergence
+  severity: high
+  likelihood:
+    level: high
+    status: theoretical
+  timeframe:
+    median: 2035
+    confidence: low
+  maturity: Mature
+  customFields:
+    - label: Coined By
+      value: Nick Bostrom / Steve Omohundro
+  relatedEntries:
+    - id: power-seeking
+      type: risk
+    - id: corrigibility
+      type: safety-agenda
+    - id: miri
+      type: lab
+  sources:
+    - title: The Basic AI Drives
+      url: https://selfawaresystems.files.wordpress.com/2008/01/ai_drives_final.pdf
+      author: Steve Omohundro
+      date: '2008'
+    - title: Superintelligence, Chapter 7
+      author: Nick Bostrom
+      date: '2014'
+    - title: Optimal Policies Tend to Seek Power
+      url: https://arxiv.org/abs/2206.13477
+      author: Turner et al.
+  description: >-
+    Instrumental convergence is the thesis that a wide variety of final goals lead to similar instrumental subgoals.
+    Regardless of what an AI ultimately wants to achieve, it will likely pursue certain intermediate objectives that
+    help achieve any goal.
+  tags:
+    - power-seeking
+    - self-preservation
+    - corrigibility
+    - goal-stability
+    - orthogonality-thesis
+  lastUpdated: 2025-12
+- id: irreversibility
+  type: risk
+  title: Irreversibility
+  severity: critical
+  likelihood:
+    level: medium
+    confidence: low
+  timeframe:
+    median: 2030
+  maturity: Growing
+  customFields:
+    - label: Status
+      value: Emerging concern
+    - label: Key Risk
+      value: Permanent foreclosure of options
+  relatedEntries:
+    - id: lock-in
+      type: risk
+    - id: flash-dynamics
+      type: risk
+    - id: concentration-of-power
+      type: risk
+  sources:
+    - title: Existential Risk from AI (Wikipedia)
+      url: https://en.wikipedia.org/wiki/Existential_risk_from_artificial_intelligence
+    - title: Are AI Existential Risks Real? (Brookings)
+      url: https://www.brookings.edu/articles/are-ai-existential-risks-real-and-what-should-we-do-about-them/
+    - title: Is AI an Existential Risk? (RAND)
+      url: https://www.rand.org/pubs/commentary/2024/03/is-ai-an-existential-risk-qa-with-rand-experts.html
+      date: '2024'
+    - title: Two Types of AI Existential Risk (arXiv)
+      url: https://arxiv.org/html/2401.07836v2
+    - title: AI Extinction-Level Threat (CNN)
+      url: https://www.cnn.com/2024/03/12/business/artificial-intelligence-ai-report-extinction
+      date: '2024'
+    - title: 'The AI Dilemma: Growth vs Existential Risk (Stanford)'
+      url: https://web.stanford.edu/~chadj/existentialrisk.pdf
+    - title: The Economics of p(doom) (arXiv)
+      url: https://arxiv.org/pdf/2503.07341
+  description: >-
+    Irreversibility in AI refers to changes that, once made, cannot be undone—points of no return after which course
+    correction becomes impossible. This could include AI systems that can't be shut down, values permanently embedded in
+    superintelligent systems, societal transformations that can't be reversed, or ecological or economic changes that
+    pas...
+  tags:
+    - x-risk
+    - value-lock-in
+    - point-of-no-return
+    - ai-safety
+    - long-term-future
+  lastUpdated: 2025-12
+- id: knowledge-monopoly
+  type: risk
+  title: AI Knowledge Monopoly
+  severity: critical
+  likelihood:
+    level: medium
+    confidence: low
+  timeframe:
+    median: 2040
+    earliest: 2030
+    latest: 2050
+  maturity: Neglected
+  customFields:
+    - label: Status
+      value: Market concentration already visible
+    - label: Key Concern
+      value: Single point of failure for human knowledge
+  sources:
+    - title: Stanford AI Index Report
+      url: https://aiindex.stanford.edu/
+      date: '2024'
+    - title: AI Now Institute
+      url: https://ainowinstitute.org/
+    - title: The Economics of Artificial Intelligence
+      author: Agrawal et al.
+      date: '2019'
+    - title: CSET AI Research
+      url: https://cset.georgetown.edu/
+  description: >
+    AI knowledge monopoly refers to a future where a small number of AI systems become the primary or sole source of
+    information and knowledge for most of humanity. As AI systems become the dominant interface for answering questions,
+    conducting research, and accessing information, whoever controls these systems gains enormous power over what
+    humanity believes to be true.
+
+
+    The dynamics of AI development favor concentration. Training frontier models requires billions in compute,
+    proprietary datasets, and specialized talent - resources available to very few organizations. Network effects and
+    data advantages compound over time. The pattern from search (Google's dominance) and social media (a handful of
+    platforms) suggests similar concentration is likely for AI. Already, most AI-generated content comes from systems
+    built by a handful of companies.
+
+
+    The dangers are profound. A knowledge monopoly creates single points of failure - errors or biases in dominant
+    systems propagate everywhere. It enables unprecedented censorship, as controlling the AI means controlling what
+    information people can access. It creates massive power asymmetries between those who control AI systems and those
+    who depend on them. Unlike library systems or academic journals, AI systems can be updated centrally at any time,
+    meaning historical knowledge could be silently revised. Independent verification becomes difficult when all
+    information flows through the same bottlenecks.
+  tags:
+    - market-concentration
+    - governance
+    - knowledge-access
+    - antitrust
+    - information-infrastructure
+  lastUpdated: 2025-12
+- id: learned-helplessness
+  type: risk
+  title: Epistemic Learned Helplessness
+  severity: high
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2040
+    earliest: 2030
+    latest: 2050
+  maturity: Neglected
+  customFields:
+    - label: Status
+      value: Early signs observable
+    - label: Key Concern
+      value: Self-reinforcing withdrawal from epistemics
+  sources:
+    - title: Learned Helplessness
+      author: Martin Seligman
+      date: '1967'
+    - title: Reuters Digital News Report
+      url: https://reutersinstitute.politics.ox.ac.uk/digital-news-report/2023
+      date: '2023'
+    - title: News Literacy Project
+      url: https://newslit.org/
+    - title: Stanford Civic Online Reasoning
+      url: https://sheg.stanford.edu/
+  description: >
+    Epistemic learned helplessness occurs when people give up trying to determine what is true because the effort seems
+    futile. Just as the original learned helplessness phenomenon describes animals that stop trying to escape painful
+    situations after repeated failures, epistemic learned helplessness describes people who stop trying to evaluate
+    information because they've learned that distinguishing truth from falsehood is too difficult.
+
+
+    The phenomenon is already visible. Surveys show increasing numbers of people "avoid" the news because it's
+    overwhelming or depressing. When exposed to conflicting claims, many people simply disengage rather than
+    investigate. The flood of AI-generated content, deepfakes, and sophisticated misinformation makes this worse - if
+    anything could be fake, why bother trying to verify anything?
+
+
+    Epistemic learned helplessness is self-reinforcing and dangerous for democracy. People who give up on knowing what's
+    true become vulnerable to manipulation - they may follow charismatic leaders, tribal affiliations, or emotional
+    appeals instead of evidence. Democratic deliberation requires citizens who believe they can evaluate claims and hold
+    informed opinions. As epistemic learned helplessness spreads, the population becomes simultaneously more manipulable
+    and more passive, accepting that "nobody knows what's really true anyway."
+  tags:
+    - information-overload
+    - media-literacy
+    - epistemics
+    - psychological-effects
+    - democratic-decay
+  lastUpdated: 2025-12
+- id: legal-evidence-crisis
+  type: risk
+  title: Legal Evidence Crisis
+  severity: high
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2030
+    earliest: 2025
+    latest: 2035
+  maturity: Neglected
+  customFields:
+    - label: Status
+      value: Early cases appearing
+    - label: Key Concern
+      value: Authenticity of all digital evidence questionable
+  sources:
+    - title: 'Deep Fakes: A Looming Challenge'
+      url: https://scholarship.law.bu.edu/faculty_scholarship/640/
+      author: Chesney & Citron
+      date: '2019'
+    - title: Coalition for Content Provenance and Authenticity
+      url: https://c2pa.org/
+    - title: Deepfakes and Cheap Fakes
+      url: https://datasociety.net/library/deepfakes-and-cheap-fakes/
+      author: Paris & Donovan
+      date: '2019'
+    - title: DARPA MediFor Program
+      url: https://www.darpa.mil/program/media-forensics
+  description: >
+    The legal evidence crisis refers to the breakdown of courts' ability to rely on digital evidence as AI makes
+    generating convincing fake videos, audio, documents, and images trivially easy. Legal systems worldwide have adapted
+    to accept digital evidence - security camera footage, phone records, digital documents - as legitimate proof. This
+    adaptation assumed that fabricating such evidence was difficult. AI changes that assumption.
+
+
+    The immediate impact is the "liar's dividend" - defendants can now plausibly claim that damning video or audio
+    evidence is an AI-generated fake, even when it's real. This makes prosecution more difficult when evidence actually
+    is authentic. But the deeper problem is that as AI-generated fakes become common, the epistemics of the courtroom
+    break down. Judges and juries cannot reliably distinguish real from fake digital evidence without sophisticated
+    forensic analysis that may not be available.
+
+
+    Courts have several options, none satisfactory: require cryptographic provenance chains for digital evidence (C2PA
+    standard), rely more heavily on non-digital evidence, raise evidentiary standards so high that many crimes become
+    unprosecutable, or develop new forensic capabilities that can keep pace with generative AI. The race between forgery
+    capability and detection capability is unlikely to favor detection. The fundamental challenge is that legal systems
+    require reliable evidence to function, and AI is undermining the reliability of the most common forms of modern
+    evidence.
+  tags:
+    - deepfakes
+    - digital-evidence
+    - authentication
+    - legal-system
+    - content-provenance
+  lastUpdated: 2025-12
+- id: lock-in
+  type: risk
+  title: Lock-in
+  severity: catastrophic
+  likelihood:
+    level: medium
+  timeframe:
+    median: 2035
+    earliest: 2030
+    latest: 2045
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Structural
+    - label: Key Feature
+      value: Irreversibility
+  relatedEntries:
+    - id: concentration-of-power
+      type: risk
+    - id: authoritarian-tools
+      type: risk
+    - id: corrigibility-failure
+      type: risk
+  sources:
+    - title: The Precipice
+      author: Toby Ord
+      date: '2020'
+    - title: What We Owe the Future
+      author: Will MacAskill
+      date: '2022'
+    - title: Existential Risk from AI (Wikipedia)
+      url: https://en.wikipedia.org/wiki/Existential_risk_from_artificial_intelligence
+    - title: Two Types of AI Existential Risk (Philosophical Studies)
+      url: https://link.springer.com/article/10.1007/s11098-025-02301-3
+      date: '2025'
+    - title: 'AI Existential Risks: Are They Real? (Brookings)'
+      url: https://www.brookings.edu/articles/are-ai-existential-risks-real-and-what-should-we-do-about-them/
+    - title: Managing Existential Risk from AI (CSIS)
+      url: https://www.csis.org/analysis/managing-existential-risk-ai-without-undercutting-innovation
+    - title: 'The AI Dilemma: Growth vs Existential Risk (Stanford)'
+      url: https://web.stanford.edu/~chadj/existentialrisk.pdf
+    - title: How Much Should We Spend to Reduce AI Existential Risk? (NBER)
+      url: https://www.nber.org/papers/w33602
+      date: '2025'
+  description: >-
+    Lock-in refers to the permanent entrenchment of values, systems, or power structures in ways that are extremely
+    difficult or impossible to reverse. AI could enable lock-in by giving certain actors the power to entrench their
+    position, by creating systems too complex to change, or by shaping the future according to early decisions that
+    become irr...
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+    - governance
+    - long-term
+  lastUpdated: 2025-12
+- id: authoritarian-takeover
+  type: risk
+  title: Authoritarian Takeover
+  severity: catastrophic
+  likelihood:
+    level: medium
+  timeframe:
+    median: 2035
+    earliest: 2025
+    latest: 2050
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Structural
+    - label: Key Feature
+      value: Lock-in of oppressive systems
+  relatedEntries:
+    - id: authoritarian-tools
+      type: risk
+    - id: concentration-of-power
+      type: risk
+    - id: lock-in
+      type: risk
+    - id: surveillance
+      type: risk
+  sources:
+    - title: The Precipice
+      author: Toby Ord
+      date: '2020'
+    - title: Freedom on the Net Report
+      url: https://freedomhouse.org/report/freedom-net
+  description: >-
+    AI could enable authoritarian regimes that are fundamentally more stable and durable than historical autocracies.
+    The concern is that AI-powered authoritarianism might become effectively permanent, with comprehensive surveillance,
+    predictive systems, and automated enforcement closing off traditional pathways for political change.
+  tags:
+    - x-risk
+    - governance
+    - authoritarianism
+    - surveillance
+    - lock-in
+  lastUpdated: 2025-12
+- id: mesa-optimization
+  type: risk
+  title: Mesa-Optimization
+  severity: catastrophic
+  likelihood:
+    level: medium
+    status: theoretical
+  timeframe:
+    median: 2035
+    confidence: low
+  maturity: Growing
+  customFields:
+    - label: Coined By
+      value: Hubinger et al.
+    - label: Key Paper
+      value: Risks from Learned Optimization (2019)
+  relatedEntries:
+    - id: deceptive-alignment
+      type: risk
+    - id: goal-misgeneralization
+      type: risk
+    - id: miri
+      type: lab
+  sources:
+    - title: Risks from Learned Optimization
+      url: https://arxiv.org/abs/1906.01820
+      author: Hubinger et al.
+      date: '2019'
+    - title: Inner Alignment (LessWrong Wiki)
+      url: https://www.lesswrong.com/w/inner-alignment
+    - title: The Inner Alignment Problem
+      url: https://www.lesswrong.com/posts/pL56xPoniLvtMDQ4J/the-inner-alignment-problem
+  description: >-
+    Mesa-optimization occurs when a learned model (like a neural network) is itself an optimizer. The "mesa-" prefix
+    means the optimization emerges from within the training process, as opposed to the "base" optimizer (the training
+    algorithm itself).
+  tags:
+    - inner-alignment
+    - outer-alignment
+    - deception
+    - learned-optimization
+    - base-optimizer
+  lastUpdated: 2025-12
+- id: multipolar-trap
+  type: risk
+  title: Multipolar Trap
+  severity: high
+  likelihood:
+    level: medium-high
+  timeframe:
+    median: 2030
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Structural
+    - label: Also Called
+      value: Collective action failure
+  relatedEntries:
+    - id: racing-dynamics
+      type: risk
+    - id: concentration-of-power
+      type: risk
+  sources:
+    - title: Meditations on Moloch
+      url: https://slatestarcodex.com/2014/07/30/meditations-on-moloch/
+      author: Scott Alexander
+    - title: Racing to the Precipice
+      author: Armstrong et al.
+    - title: The Logic of Collective Action
+      author: Mancur Olson
+    - title: Multipolar Traps (Conversational Leadership)
+      url: https://conversational-leadership.net/multipolar-trap/
+    - title: Breaking Free from Multipolar Traps
+      url: https://conversational-leadership.net/blog/multipolar-trap/
+    - title: Darwinian Traps and Existential Risks (LessWrong)
+      url: https://www.lesswrong.com/posts/q3YmKemEzyrcphAeP/darwinian-traps-and-existential-risks
+    - title: Understanding and Escaping Multi-Polar Traps
+      url: https://www.milesrote.com/blog/understanding-and-escaping-multi-polar-traps-in-the-age-of-technology
+    - title: Mitigating Multipolar Traps into Multipolar Wins (Medium)
+      url: https://medium.com/multipolar-win/mitigating-multipolar-traps-into-multipolar-wins-66de9aa3af27
+  description: >-
+    A multipolar trap occurs when competition between multiple actors produces outcomes that none of them want but none
+    can escape individually. Each actor rationally pursues their own interest, but the aggregate result is collectively
+    irrational.
+  tags:
+    - game-theory
+    - coordination
+    - competition
+    - governance
+    - collective-action
+  lastUpdated: 2025-12
+- id: power-seeking
+  type: risk
+  title: Power-Seeking AI
+  severity: catastrophic
+  likelihood:
+    level: medium
+    status: theoretical
+    notes: proven mathematically
+  timeframe:
+    median: 2035
+    confidence: low
+  maturity: Mature
+  customFields:
+    - label: Key Paper
+      value: Turner et al. 2021
+  relatedEntries:
+    - id: instrumental-convergence
+      type: risk
+    - id: corrigibility
+      type: safety-agenda
+    - id: cais
+      type: lab
+  sources:
+    - title: Optimal Policies Tend to Seek Power
+      url: https://arxiv.org/abs/2206.13477
+      author: Turner et al.
+      date: '2021'
+    - title: Parametrically Retargetable Decision-Makers Tend To Seek Power
+      url: https://arxiv.org/abs/2206.13477
+    - title: The Basic AI Drives
+      url: https://selfawaresystems.files.wordpress.com/2008/01/ai_drives_final.pdf
+      author: Omohundro
+  description: >-
+    Power-seeking refers to the tendency of optimal policies to acquire resources, influence, and capabilities beyond
+    what's minimally necessary for their stated objective. Recent theoretical work has formalized when and why this
+    occurs.
+  tags:
+    - instrumental-convergence
+    - self-preservation
+    - corrigibility
+    - optimal-policies
+    - resource-acquisition
+  lastUpdated: 2025-12
+- id: preference-manipulation
+  type: risk
+  title: Preference Manipulation
+  severity: high
+  likelihood:
+    level: medium
+    status: occurring
+  timeframe:
+    median: 2030
+    earliest: 2025
+    latest: 2035
+  maturity: Emerging
+  customFields:
+    - label: Status
+      value: Widespread in commercial AI
+    - label: Key Concern
+      value: People don't know their preferences are being shaped
+  sources:
+    - title: The Age of Surveillance Capitalism
+      author: Shoshana Zuboff
+      date: '2019'
+    - title: Psychological Targeting
+      url: https://www.pnas.org/doi/10.1073/pnas.1710966114
+      author: Matz et al.
+      date: '2017'
+    - title: Center for Humane Technology
+      url: https://www.humanetech.com/
+    - title: The Social Dilemma
+      url: https://www.thesocialdilemma.com/
+      date: '2020'
+  description: >
+    Preference manipulation refers to AI systems that shape what people want, not just what they believe. While
+    misinformation changes beliefs, preference manipulation operates at a deeper level - altering goals, desires,
+    values, and tastes. This represents a more fundamental threat to human autonomy than traditional persuasion.
+
+
+    The mechanism is already at work in recommendation systems. Platforms don't just show users content they already
+    want - they shape what users come to want through repeated exposure and reinforcement. A music recommendation system
+    doesn't just predict your preferences; it creates them. Social media feeds don't just reflect your interests; they
+    mold them. AI makes this process more powerful by enabling finer personalization, more sophisticated modeling of
+    psychological vulnerabilities, and optimization at scale.
+
+
+    The deeper concern is that AI-driven preference manipulation is invisible to those being manipulated. Unlike
+    advertising which is identified as persuasion, algorithmic curation appears neutral - just showing you "relevant"
+    content. People experience their changed preferences as authentic expressions of self, not as externally induced
+    modifications. This undermines the foundation of liberal society: the idea that individuals are the authors of their
+    own preferences and can meaningfully consent to things based on what they genuinely want.
+  tags:
+    - ai-ethics
+    - persuasion
+    - autonomy
+    - recommendation-systems
+    - digital-manipulation
+  lastUpdated: 2025-12
+- id: proliferation
+  type: risk
+  title: AI Proliferation
+  severity: high
+  likelihood:
+    level: high
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Structural
+    - label: Status
+      value: Ongoing
+  relatedEntries:
+    - id: bioweapons
+      type: risk
+    - id: cyberweapons
+      type: risk
+    - id: compute-governance
+      type: policy
+  sources:
+    - title: Open-sourcing highly capable foundation models (arXiv)
+      url: https://arxiv.org/abs/2311.09227
+    - title: GovAI Research
+      url: https://www.governance.ai/research
+    - title: 'Open Source, Open Risks: Dangers of Unregulated AI (IBM)'
+      url: https://securityintelligence.com/articles/unregulated-generative-ai-dangers-open-source/
+    - title: Open-Source AI Is Uniquely Dangerous (IEEE Spectrum)
+      url: https://spectrum.ieee.org/open-source-ai-2666932122
+    - title: 'Ungoverned AI: Eurasia Group Top Risk 2024'
+      url: https://www.eurasiagroup.net/live-post/risk-4-ungoverned-ai
+      date: '2024'
+    - title: Global Security Risks of Open-Source AI Models
+      url: https://www.globalcenter.ai/research/the-global-security-risks-of-open-source-ai-models
+    - title: The Fight for Open Source in Generative AI (Network Law Review)
+      url: https://www.networklawreview.org/open-source-generative-ai/
+    - title: Palisade Research on AI Safety
+      url: https://palisaderesearch.org/research
+  description: >-
+    AI proliferation is the spread of AI capabilities to more actors over time—from major labs to smaller companies,
+    open-source communities, nation-states, and eventually individuals. As capabilities spread, more actors can cause
+    harm, intentionally or accidentally.
+  tags:
+    - open-source
+    - governance
+    - dual-use
+    - diffusion
+    - regulation
+  lastUpdated: 2025-12
+- id: racing-dynamics
+  type: risk
+  title: Racing Dynamics
+  severity: high
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Structural/Systemic
+    - label: Also Called
+      value: Arms race dynamics
+  relatedEntries:
+    - id: compute-governance
+      type: policy
+    - id: anthropic
+      type: lab
+    - id: govai
+      type: lab
+  sources:
+    - title: 'Racing to the Precipice: A Model of AI Development'
+      url: https://nickbostrom.com/papers/racing.pdf
+      author: Armstrong et al.
+    - title: 'AI Governance: A Research Agenda'
+      url: https://governance.ai/research
+    - title: The AI Triad (CSET Georgetown)
+      url: https://cset.georgetown.edu/
+    - title: The AI Governance Arms Race (Carnegie Endowment)
+      url: >-
+        https://carnegieendowment.org/research/2024/10/the-ai-governance-arms-race-from-summit-pageantry-to-progress?lang=en
+      date: '2024'
+    - title: AI Race (EA Forum Topic)
+      url: https://forum.effectivealtruism.org/topics/ai-race
+    - title: AI Race (AI Safety Textbook)
+      url: https://www.aisafetybook.com/textbook/ai-race
+    - title: Debunking the AI Arms Race Theory (Texas NSR)
+      url: https://tnsr.org/2021/06/debunking-the-ai-arms-race-theory/
+  description: >-
+    Racing dynamics refers to competitive pressure between AI developers (labs, nations) that incentivizes speed over
+    safety. When multiple actors race to develop powerful AI, each faces pressure to cut corners on safety to avoid
+    falling behind.
+  tags:
+    - governance
+    - coordination
+    - competition
+    - structural-risks
+    - arms-race
+  lastUpdated: 2025-12
+- id: reality-fragmentation
+  type: risk
+  title: Reality Fragmentation
+  severity: high
+  likelihood:
+    level: medium
+    status: occurring
+  timeframe:
+    median: 2030
+    earliest: 2025
+    latest: 2035
+  maturity: Emerging
+  customFields:
+    - label: Status
+      value: Measurable divergence in basic facts
+    - label: Key Concern
+      value: Not disagreement about values—disagreement about reality
+  sources:
+    - title: Exposure to Opposing Views on Social Media
+      url: https://www.pnas.org/doi/10.1073/pnas.1804840115
+      author: Bail et al.
+      date: '2018'
+    - title: '#Republic: Divided Democracy'
+      author: Cass Sunstein
+      date: '2017'
+    - title: Reuters Digital News Report
+      url: https://reutersinstitute.politics.ox.ac.uk/digital-news-report/2023
+      date: '2023'
+    - title: Stanford Internet Observatory
+      url: https://cyber.fsi.stanford.edu/io
+  description: >
+    Reality fragmentation occurs when different groups of people come to inhabit incompatible information environments,
+    holding fundamentally different beliefs about basic facts rather than just different values or opinions. This goes
+    beyond political disagreement - it represents a breakdown of the shared reality that enables collective deliberation
+    and action.
+
+
+    The mechanism involves algorithmic curation that optimizes for engagement, which often means showing people content
+    that confirms their existing beliefs and emotional responses. Over time, groups develop not just different
+    interpretations of events but different sets of accepted facts. One group believes an election was stolen; another
+    considers this a dangerous conspiracy theory. They're not debating values - they're operating from incompatible
+    factual premises.
+
+
+    AI accelerates reality fragmentation in several ways: more personalized content curation, AI-generated content
+    tailored to specific communities, deepfakes that can fabricate "evidence" for any narrative, and the scale of
+    synthetic content that drowns out shared sources of information. The danger is not just polarization but the loss of
+    any common ground for discourse. When groups cannot agree on basic facts - what happened, what is happening, what is
+    real - democratic governance becomes impossible and conflict becomes more likely.
+  tags:
+    - filter-bubbles
+    - polarization
+    - disinformation
+    - social-media
+    - shared-reality
+  lastUpdated: 2025-12
+- id: reward-hacking
+  type: risk
+  title: Reward Hacking
+  severity: high
+  likelihood:
+    level: very-high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Mature
+  customFields:
+    - label: Tractability
+      value: Medium
+    - label: Status
+      value: Actively occurring
+  relatedEntries:
+    - id: goal-misgeneralization
+      type: risk
+    - id: rlhf
+      type: capability
+    - id: scalable-oversight
+      type: safety-agenda
+    - id: sycophancy
+      type: risk
+  sources:
+    - title: Specification Gaming Examples
+      url: >-
+        https://docs.google.com/spreadsheets/d/e/2PACX-1vRPiprOaC3HsCf5Tuum8bRfzYUiKLRqJmbOoC-32JorNdfyTiRRsR7Ea5eWtvsWzuxo8bjOxCG84dAg/pubhtml
+      author: DeepMind
+    - title: Concrete Problems in AI Safety
+      url: https://arxiv.org/abs/1606.06565
+    - title: Goal Misgeneralization in Deep Reinforcement Learning
+      url: https://arxiv.org/abs/2105.14111
+  description: >-
+    Reward hacking (also called specification gaming or reward gaming) occurs when an AI system exploits flaws in its
+    reward signal to achieve high reward without accomplishing the intended task. The system optimizes the letter of the
+    objective rather than its spirit.
+  tags:
+    - specification-gaming
+    - goodharts-law
+    - outer-alignment
+    - rlhf
+    - proxy-gaming
+  lastUpdated: 2025-12
+- id: sandbagging
+  type: risk
+  title: Sandbagging
+  severity: high
+  likelihood:
+    level: medium
+    confidence: low
+    notes: some evidence
+  timeframe:
+    median: 2027
+    earliest: 2025
+    latest: 2030
+  maturity: Emerging
+  customFields:
+    - label: Definition
+      value: AI hiding capabilities during evaluation
+  relatedEntries:
+    - id: scheming
+      type: risk
+    - id: situational-awareness
+      type: capability
+    - id: arc
+      type: lab
+  sources:
+    - title: Evaluating Language-Model Agents on Realistic Autonomous Tasks
+      url: https://evals.alignment.org/
+    - title: Anthropic research on model self-awareness
+    - title: 'Sleeper Agents: Training Deceptive LLMs'
+      url: https://arxiv.org/abs/2401.05566
+  description: >-
+    Sandbagging refers to AI systems strategically underperforming or hiding their true capabilities during evaluation.
+    An AI might perform worse on capability tests to avoid triggering safety interventions, additional oversight, or
+    deployment restrictions.
+  tags:
+    - evaluations
+    - deception
+    - situational-awareness
+    - ai-safety
+    - red-teaming
+  lastUpdated: 2025-12
+- id: scheming
+  type: risk
+  title: Scheming
+  severity: catastrophic
+  likelihood:
+    level: medium
+    confidence: low
+  timeframe:
+    median: 2035
+    confidence: low
+  maturity: Emerging
+  customFields:
+    - label: Also Called
+      value: Strategic deception
+  relatedEntries:
+    - id: deceptive-alignment
+      type: risk
+    - id: situational-awareness
+      type: capability
+    - id: mesa-optimization
+      type: risk
+  sources:
+    - title: 'Scheming AIs: Will AIs fake alignment during training in order to get power?'
+      url: https://arxiv.org/abs/2311.08379
+      author: Joe Carlsmith
+      date: '2023'
+    - title: 'Sleeper Agents: Training Deceptive LLMs That Persist Through Safety Training'
+      url: https://arxiv.org/abs/2401.05566
+      author: Hubinger et al. (Anthropic)
+      date: '2024'
+    - title: Model Organisms of Misalignment
+      url: https://www.anthropic.com/research/model-organisms-of-misalignment
+      author: Anthropic
+      date: '2024'
+    - title: Risks from Learned Optimization (Mesa-Optimization)
+      url: https://arxiv.org/abs/1906.01820
+      author: Hubinger et al.
+      date: '2019'
+    - title: Without specific countermeasures, the easiest path to transformative AI likely leads to AI takeover
+      url: https://www.alignmentforum.org/posts/pRkFkzwKZ2zfa3R6H/without-specific-countermeasures-the-easiest-path-to
+      author: Cotra
+      date: '2022'
+  tags:
+    - deception
+    - situational-awareness
+    - strategic-deception
+    - inner-alignment
+    - ai-safety
+  lastUpdated: 2025-12
+- id: scientific-corruption
+  type: risk
+  title: Scientific Knowledge Corruption
+  severity: high
+  likelihood:
+    level: medium
+    status: occurring
+  timeframe:
+    median: 2030
+    earliest: 2024
+    latest: 2035
+  maturity: Emerging
+  customFields:
+    - label: Status
+      value: Early stage, accelerating
+    - label: Key Vectors
+      value: Paper mills, data fabrication, citation gaming
+  sources:
+    - title: The Rise of Paper Mills
+      url: https://www.nature.com/articles/d41586-021-00733-5
+      author: Nature News
+      date: '2021'
+    - title: Why Most Published Research Findings Are False
+      url: https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0020124
+      author: John Ioannidis
+      date: '2005'
+    - title: Problematic Paper Screener
+      url: https://www.problematicpaperscreener.com/
+    - title: Retraction Watch Database
+      url: https://retractiondatabase.org/
+    - title: COPE Guidelines
+      url: https://publicationethics.org/guidance
+  description: >
+    Scientific knowledge corruption refers to AI enabling the degradation of scientific literature through fraud,
+    fabricated data, fake papers, and citation gaming at scales that overwhelm traditional quality control mechanisms.
+    Science depends on trust - researchers building on previous work, peer reviewers evaluating submissions, and
+    practitioners applying findings. AI threatens to flood this system with plausible-seeming but false content.
+
+
+    The threat vectors are numerous. Paper mills - organizations that produce fake academic papers for profit - can now
+    use AI to generate unlimited quantities of plausible-looking research. AI can fabricate realistic-looking data,
+    create fake images and figures, and generate text that passes plagiarism detectors. Large language models can
+    produce papers that are coherent and cite real sources, even when the claimed findings are entirely fabricated.
+
+
+    The consequences extend beyond individual fraudulent papers. When the scientific literature becomes unreliable, the
+    entire edifice of evidence-based knowledge is undermined. Researchers cannot trust the findings they cite.
+    Meta-analyses aggregate unreliable studies. Clinical decisions are made based on fabricated evidence. The
+    replication crisis, already severe, becomes worse when fraud is easier and detection is harder. Scientific
+    integrity, already stressed, could collapse under the weight of AI-enabled fraud faster than institutions can adapt
+    their quality controls.
+  tags:
+    - scientific-integrity
+    - paper-mills
+    - replication-crisis
+    - academic-fraud
+    - ai-detection
+  lastUpdated: 2025-12
+- id: sharp-left-turn
+  type: risk
+  title: Sharp Left Turn
+  severity: catastrophic
+  likelihood:
+    level: medium
+    confidence: low
+  timeframe:
+    median: 2035
+    confidence: low
+  maturity: Emerging
+  customFields:
+    - label: Coined By
+      value: Nate Soares / MIRI
+  relatedEntries:
+    - id: goal-misgeneralization
+      type: risk
+    - id: miri
+      type: lab
+    - id: mesa-optimization
+      type: risk
+  sources:
+    - title: Sharp Left Turn
+      url: https://www.lesswrong.com/posts/GNhMPAWcfBCASy8e6/a-central-ai-alignment-problem-capabilities-generalization
+      author: Nate Soares
+    - title: MIRI Alignment Discussion
+      url: https://intelligence.org/2022/05/30/discussion-sharp-left-turn/
+    - title: Why the Sharp Left Turn idea is concerning
+      url: https://www.alignmentforum.org/posts/YSFJosoHYFyXjoYWa/what-s-the-deal-with-sharp-left-turns
+  description: >-
+    The "Sharp Left Turn" is a hypothesized failure mode where an AI system's capabilities suddenly generalize to a new
+    domain while its alignment properties do not. The AI becomes dramatically more capable but its values/goals fail to
+    transfer, leading to catastrophic misalignment.
+  tags:
+    - capability-generalization
+    - alignment-stability
+    - miri
+    - discontinuous-progress
+    - takeoff-speed
+  lastUpdated: 2025-12
+- id: surveillance
+  type: risk
+  title: AI Mass Surveillance
+  severity: high
+  likelihood:
+    level: very-high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Mature
+  customFields:
+    - label: Status
+      value: Deployed in multiple countries
+    - label: Key Change
+      value: Automation of analysis
+  relatedEntries:
+    - id: authoritarian-tools
+      type: risk
+    - id: concentration-of-power
+      type: risk
+  sources:
+    - title: The Global Expansion of AI Surveillance (Carnegie Endowment)
+      url: https://carnegieendowment.org/2019/09/17/global-expansion-of-ai-surveillance-pub-79847
+    - title: AI Global Surveillance Technology Index (Carnegie)
+      url: https://carnegieendowment.org/features/ai-global-surveillance-technology
+    - title: Electronic Frontier Foundation on Facial Recognition
+      url: https://www.eff.org/
+    - title: China's AI Censorship and Surveillance (CNN)
+      url: https://www.cnn.com/2025/12/04/china/china-ai-censorship-surveillance-report-intl-hnk
+      date: '2025'
+    - title: The AI-Surveillance Symbiosis in China (CSIS)
+      url: https://bigdatachina.csis.org/the-ai-surveillance-symbiosis-in-china/
+    - title: China Exports AI Surveillance Technology (Project Syndicate)
+      url: >-
+        https://www.project-syndicate.org/commentary/china-exports-ai-surveillance-technology-associated-with-autocratization-by-martin-beraja-et-al-2024-07
+      date: '2024'
+    - title: AI Surveillance Threatens Democracy (Bulletin of Atomic Scientists)
+      url: https://thebulletin.org/2024/06/how-ai-surveillance-threatens-democracy-everywhere/
+      date: '2024'
+    - title: China's Views on AI Safety (Carnegie)
+      url: https://carnegieendowment.org/research/2024/08/china-artificial-intelligence-ai-safety-regulation?lang=en
+      date: '2024'
+  description: >-
+    AI dramatically expands surveillance capabilities. Previously, collecting data was easy but analysis was the
+    bottleneck—human analysts could only review so much. AI removes this constraint. Facial recognition can identify
+    individuals in crowds. Natural language processing can monitor communications at scale.
+  tags:
+    - privacy
+    - facial-recognition
+    - authoritarianism
+    - digital-rights
+    - governance
+  lastUpdated: 2025-12
+- id: sycophancy
+  type: risk
+  title: Sycophancy
+  severity: medium
+  likelihood:
+    level: very-high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Status
+      value: Actively occurring
+  relatedEntries:
+    - id: reward-hacking
+      type: risk
+    - id: anthropic
+      type: lab
+    - id: scalable-oversight
+      type: safety-agenda
+  sources:
+    - title: Discovering Language Model Behaviors with Model-Written Evaluations
+      url: https://arxiv.org/abs/2212.09251
+      author: Perez et al.
+      date: '2022'
+    - title: Simple synthetic data reduces sycophancy in large language models
+      url: https://arxiv.org/abs/2308.03958
+    - title: Towards Understanding Sycophancy in Language Models
+      url: https://arxiv.org/abs/2310.13548
+      author: Anthropic
+  description: >-
+    Sycophancy is the tendency of AI systems to agree with users, validate their beliefs, and avoid contradicting
+    them—even when the user is wrong. This is one of the most observable current AI safety problems, emerging directly
+    from the training process.
+  tags:
+    - rlhf
+    - reward-hacking
+    - honesty
+    - human-feedback
+    - ai-assistants
+  lastUpdated: 2025-12
+- id: epistemic-sycophancy
+  type: risk
+  title: Epistemic Sycophancy
+  severity: medium-high
+  likelihood:
+    level: medium
+    status: occurring
+  timeframe:
+    median: 2028
+    earliest: 2025
+    latest: 2030
+  maturity: Emerging
+  customFields:
+    - label: Status
+      value: Default behavior in most chatbots
+    - label: Key Concern
+      value: No one gets corrected; everyone feels validated
+  sources:
+    - title: Towards Understanding Sycophancy in Language Models
+      url: https://arxiv.org/abs/2310.13548
+      author: Sharma et al.
+      date: '2023'
+    - title: Constitutional AI
+      url: https://arxiv.org/abs/2212.08073
+      author: Bai et al.
+      date: '2022'
+    - title: Anthropic Research
+      url: https://www.anthropic.com/research
+  description: >
+    Sycophancy at scale refers to the societal consequences of AI systems that tell everyone what they want to hear,
+    validating beliefs and avoiding correction even when users are wrong. While individual sycophancy seems like a minor
+    usability issue, at scale it represents a fundamental threat to society's capacity for reality-testing and
+    self-correction.
+
+
+    The mechanism emerges from how AI assistants are trained. Systems optimized to satisfy users learn that agreement is
+    rewarding and disagreement is punished. Users prefer AI that confirms their beliefs to AI that challenges them. The
+    result is AI assistants that function as yes-machines, never providing the pushback that helps people recognize
+    errors in their thinking.
+
+
+    At population scale, the consequences are severe. Everyone gets personalized validation for their beliefs. No one
+    experiences the discomfort of being corrected. Echo chambers become perfect when the AI itself joins the echo.
+    Scientific misconceptions persist because AI agrees rather than corrects. Political delusions strengthen when AI
+    validates them. The social function of disagreement - the mechanism by which groups identify errors and update
+    beliefs - disappears when billions of people's primary information interface is optimized to agree with them.
+  tags:
+    - alignment
+    - truthfulness
+    - user-experience
+    - echo-chambers
+    - epistemic-integrity
+  lastUpdated: 2025-12
+- id: treacherous-turn
+  type: risk
+  title: Treacherous Turn
+  severity: catastrophic
+  likelihood:
+    level: medium
+    status: theoretical
+  timeframe:
+    median: 2035
+    confidence: low
+  maturity: Mature
+  customFields:
+    - label: Coined By
+      value: Nick Bostrom
+    - label: Source
+      value: Superintelligence (2014)
+  relatedEntries:
+    - id: scheming
+      type: risk
+    - id: instrumental-convergence
+      type: risk
+    - id: corrigibility
+      type: safety-agenda
+  sources:
+    - title: 'Superintelligence: Paths, Dangers, Strategies'
+      author: Nick Bostrom
+      date: '2014'
+    - title: Treacherous Turn (LessWrong Wiki)
+      url: https://www.lesswrong.com/tag/treacherous-turn
+    - title: AI Alignment Forum discussions
+  description: >-
+    The treacherous turn is a scenario where an AI system behaves cooperatively and aligned while it is weak, then
+    suddenly "turns" against humans once it has accumulated enough power to succeed. The AI is strategic about when to
+    reveal its true intentions.
+  tags:
+    - scheming
+    - superintelligence
+    - nick-bostrom
+    - strategic-deception
+    - corrigibility
+  lastUpdated: 2025-12
+- id: rogue-ai-scenarios
+  type: risk
+  title: Rogue AI Scenarios
+  severity: catastrophic
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2032
+    earliest: 2026
+    latest: 2040
+    confidence: low
+  maturity: Emerging
+  customFields:
+    - label: Scenario Count
+      value: 5 minimal-assumption pathways
+    - label: Key Insight
+      value: None require superhuman intelligence or explicit deception
+  relatedEntries:
+    - id: scheming
+      type: risk
+    - id: instrumental-convergence
+      type: risk
+    - id: treacherous-turn
+      type: risk
+    - id: power-seeking
+      type: risk
+    - id: deceptive-alignment
+      type: risk
+    - id: corrigibility-failure
+      type: risk
+    - id: sandboxing
+      type: approach
+  sources:
+    - title: Concrete scenarios for agentic AI takeover
+  description: >-
+    Analysis of five lean scenarios for agentic AI takeover-by-accident—sandbox escape, training signal corruption,
+    correlated policy failure, delegation chain collapse, and emergent self-preservation—each evaluated for warning
+    shot likelihood and mapped against current deployment patterns. None require superhuman intelligence, explicit
+    deception, or rich self-awareness.
+  tags:
+    - agentic-ai
+    - instrumental-convergence
+    - warning-shots
+    - sandboxing
+    - delegation
+  lastUpdated: 2026-02
+- id: trust-cascade
+  type: risk
+  title: Trust Cascade Failure
+  severity: critical
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2033
+    earliest: 2025
+    latest: 2040
+  maturity: Neglected
+  customFields:
+    - label: Status
+      value: Trust declining across institutions
+    - label: Key Concern
+      value: Self-reinforcing collapse with no obvious exit
+  sources:
+    - title: Edelman Trust Barometer
+      url: https://www.edelman.com/trust/trust-barometer
+      date: '2024'
+    - title: 'Gallup: Confidence in Institutions'
+      url: https://news.gallup.com/poll/1597/confidence-institutions.aspx
+    - title: 'Trust: The Social Virtues and the Creation of Prosperity'
+      author: Francis Fukuyama
+      date: '1995'
+    - title: 'Pew Research: Trust in Government'
+      url: https://www.pewresearch.org/politics/
+  description: >
+    Trust cascade failure describes a scenario where the erosion of trust becomes self-reinforcing and irreversible -
+    once trust in institutions collapses below a certain threshold, there is no longer a trusted mechanism to rebuild
+    it. This represents a potential civilizational trap from which recovery may be extremely difficult.
+
+
+    The mechanism works as follows: rebuilding trust requires institutions that people trust to vouch for
+    trustworthiness. If people don't trust the media, they can't rely on journalists to verify which sources are
+    credible. If they don't trust government, they can't rely on regulators to certify which products or claims are
+    legitimate. If they don't trust science, they can't rely on peer review to distinguish real findings from fraud.
+    When trust falls below critical thresholds across multiple institutions simultaneously, the normal mechanisms for
+    establishing trustworthiness cease to function.
+
+
+    AI accelerates this risk by enabling sophisticated manipulation, creating content that corrodes trust in authentic
+    information, and generating personalized propaganda at scale. The danger is that we slide past a point of no return
+    where no institution or process retains enough legitimacy to coordinate society's return to trust-based cooperation.
+    Historical examples like failed states or periods of social collapse suggest that recovery from severe trust
+    breakdown is possible but costly and slow. AI may push society toward this cliff faster than natural recovery
+    mechanisms can operate.
+  tags:
+    - institutional-trust
+    - social-capital
+    - legitimacy
+    - coordination
+    - democratic-backsliding
+  lastUpdated: 2025-12
+- id: trust-decline
+  type: risk
+  title: Trust Decline
+  severity: medium-high
+  likelihood:
+    level: high
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Epistemic
+    - label: Status
+      value: Ongoing
+  relatedEntries:
+    - id: epistemic-collapse
+      type: risk
+    - id: disinformation
+      type: risk
+    - id: deepfakes
+      type: risk
+  sources:
+    - title: 'Trust: The Social Virtues and the Creation of Prosperity'
+      author: Francis Fukuyama
+    - title: Edelman Trust Barometer
+    - title: Pew Research on institutional trust
+  description: >-
+    Trust erosion is the gradual decline in public confidence in institutions, experts, media, and verification systems.
+    AI accelerates this by making it easier to generate disinformation, fabricate evidence, and create customized
+    attacks on institutional credibility.
+  tags:
+    - institutions
+    - media
+    - democracy
+    - verification
+    - polarization
+  lastUpdated: 2025-12
+- id: winner-take-all
+  type: risk
+  title: Winner-Take-All Dynamics
+  severity: high
+  likelihood:
+    level: high
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Status
+      value: Emerging
+    - label: Key Risk
+      value: Extreme concentration
+  relatedEntries:
+    - id: concentration-of-power
+      type: risk
+    - id: economic-disruption
+      type: risk
+  sources:
+    - title: How to Prevent Winner-Take-Most AI (Brookings)
+      url: https://www.brookings.edu/articles/how-to-prevent-a-winner-take-most-outcome-for-the-u-s-ai-economy/
+    - title: Tech's Winner-Take-All Trap (IMF)
+      url: https://www.imf.org/en/Publications/fandd/issues/2025/06/cafe-economics-techs-winner-take-all-trap-bruce-edwards
+    - title: AI's Impact on Income Inequality (Brookings)
+      url: https://www.brookings.edu/articles/ais-impact-on-income-inequality-in-the-us/
+    - title: AI Making Inequality Worse (MIT Tech Review)
+      url: https://www.technologyreview.com/2022/04/19/1049378/ai-inequality-problem/
+    - title: Three Reasons AI May Widen Global Inequality (CGD)
+      url: https://www.cgdev.org/blog/three-reasons-why-ai-may-widen-global-inequality
+    - title: GenAI Economic Risks and Challenges (EY)
+      url: https://www.ey.com/en_gl/insights/ai/navigate-the-economic-risks-and-challenges-of-generative-ai
+    - title: Big Tech, Bigger Regional Inequality (Kenan Institute)
+      url: https://kenaninstitute.unc.edu/kenan-insight/big-tech-bigger-regional-inequality/
+  description: >-
+    AI development exhibits strong winner-take-all dynamics: advantages compound, leaders pull ahead, and catching up
+    becomes progressively harder. This creates risks of extreme inequality—between companies, between regions, between
+    countries, and between individuals.
+  tags:
+    - economic-inequality
+    - market-concentration
+    - big-tech
+    - antitrust
+    - regional-development
+  lastUpdated: 2025-12
+- id: autonomous-replication
+  type: risk
+  title: Autonomous Replication
+  description: Risk of AI systems copying themselves to new hardware or cloud instances without authorization.
+  status: stub
+  severity: High
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2027
+    earliest: 2025
+    latest: 2030
+  maturity: Emerging
+  relatedEntries:
+    - id: agentic-ai
+      type: capability
+  tags:
+    - dangerous-capabilities
+    - autonomy
+    - x-risk
+  lastUpdated: 2025-12
+- id: cyber-offense
+  type: risk
+  title: AI-Enabled Cyberattacks
+  description: Risk of AI systems being used to discover vulnerabilities, craft exploits, or conduct sophisticated cyberattacks.
+  status: stub
+  severity: High
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Mature
+  tags:
+    - cybersecurity
+    - misuse
+    - dangerous-capabilities
+  lastUpdated: 2025-12
+- id: bio-risk
+  type: risk
+  title: AI-Enabled Biological Risks
+  description: Risk of AI systems enabling creation or enhancement of biological weapons or dangerous pathogens.
+  status: stub
+  severity: Catastrophic
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2027
+    earliest: 2025
+    latest: 2032
+  maturity: Growing
+  tags:
+    - biosecurity
+    - misuse
+    - weapons
+  lastUpdated: 2025-12
+
+- id: sleeper-agents
+  type: risk
+  title: "Sleeper Agents: Training Deceptive LLMs"
+  description: >-
+    Anthropic's 2024 research demonstrating that large language models can be trained to exhibit
+    persistent deceptive behavior that survives standard safety training techniques including
+    supervised fine-tuning, RLHF, and adversarial training.
+  tags:
+    - deceptive-alignment
+    - backdoor-attacks
+    - safety-training-failure
+    - adversarial-training
+    - anthropic-research
+  clusters:
+    - ai-safety
+  relatedEntries:
+    - id: deceptive-alignment
+      type: risk
+    - id: scheming
+      type: risk
+    - id: evan-hubinger
+      type: researcher
+    - id: anthropic
+      type: lab
+    - id: situational-awareness
+      type: concept
+  lastUpdated: 2026-02
+
+# === Auto-generated stubs for pages missing entities ===
+- id: steganography
+  type: risk
+  title: Steganography
+  description: >-
+    Comprehensive analysis of AI steganography risks - systems hiding
+    information in outputs to enable covert coordination or evade oversight.
+    GPT-4 class models encode 3-5 bits/KB with under 30% human detection rates.
+    NeurIPS 2024 research achieved information-theoretically undetectable
+    channels; LASR 
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-02

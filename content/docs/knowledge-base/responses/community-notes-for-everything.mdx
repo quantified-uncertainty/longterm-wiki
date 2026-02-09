@@ -1,0 +1,224 @@
+---
+title: Community Notes for Everything
+description: A proposed cross-platform context layer extending X's community notes model across the entire internet, using AI classifiers to serve consensus-vetted context on potentially misleading content. Estimated cost of $0.01–0.10 per post using current AI models.
+sidebar:
+  order: 11
+lastEdited: "2026-02-06"
+quality: 45
+importance: 50
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 5.5
+  rigor: 4.5
+  actionability: 5.5
+  completeness: 5
+metrics:
+  wordCount: 1900
+  citations: 10
+  tables: 3
+  diagrams: 1
+clusters:
+  - epistemics
+  - ai-safety
+subcategory: epistemic-tools-approaches
+---
+import {Backlinks, Mermaid, KeyQuestions, EntityLink} from '@components/wiki';
+
+*Part of the [Design Sketches for Collective Epistemics](/knowledge-base/responses/collective-epistemics-design-sketches/) series by Forethought Foundation.*
+
+## Overview
+
+Community Notes for Everything is a proposed technology that would extend the <EntityLink id="community-notes">X Community Notes</EntityLink> model across the entire internet. The core vision: anywhere online, content that may be misleading comes served with context that a large proportion of readers find helpful. Rather than relying on centralized fact-checkers or platform-specific moderation, AI systems would generate contextual annotations that achieve broad consensus across diverse reader perspectives.
+
+The concept was outlined in Forethought Foundation's 2025 report "[Design Sketches for Collective Epistemics](https://www.forethought.org/research/design-sketches-collective-epistemics)" as one of five technologies that could shift society toward high-honesty equilibria.
+
+## How It Would Work
+
+The proposed system combines AI generation with consensus verification:
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Detection["1. Content Screening"]
+        A[User encounters content online] --> B[AI classifier assesses misleading potential]
+        B --> C{Likely misleading?}
+        C -->|No| D[No annotation]
+        C -->|Yes| E[Proceed to note generation]
+    end
+
+    subgraph Generation["2. Note Generation"]
+        E --> F[AI retrieves relevant context and evidence]
+        F --> G[AI drafts contextual note with sources]
+        G --> H[Note includes caveats, links, key context]
+    end
+
+    subgraph Validation["3. Consensus Filtering"]
+        H --> I[Note tested against diverse reader perspectives]
+        I --> J{Achieves cross-partisan consensus?}
+        J -->|No| K[Note suppressed or revised]
+        J -->|Yes| L[Note displayed to readers]
+    end
+
+    subgraph Display["4. User Experience"]
+        L --> M[Inline card below or beside content]
+        M --> N[Reader can expand for detailed report]
+    end
+
+    style D fill:#f0f0f0
+    style L fill:#d4edda
+`} />
+
+### Key Design Elements
+
+1. **AI-driven screening**: Classifiers predict when content is likely to benefit from added context, filtering the vast volume of online content down to cases where annotation is valuable
+2. **AI-generated notes**: Rather than relying solely on human contributors (as X's system does), AI systems draft contextual notes with linkable detailed reports
+3. **Consensus filtering**: Only notes that would be found helpful by a large, ideologically diverse proportion of readers are displayed—mirroring the bridging algorithm approach of <EntityLink id="community-notes">X Community Notes</EntityLink>
+4. **Browser integration**: Content is highlighted and annotated in real-time through browser extensions or platform integrations
+
+## Building on X Community Notes
+
+This proposal extends an already-proven concept. X's Community Notes system has demonstrated several key principles:
+
+| Proven Principle | X Community Notes Evidence | Extension Needed |
+|-----------------|---------------------------|-----------------|
+| Bridging consensus works | Cross-partisan agreement produces trusted notes | Scale to all platforms, not just X |
+| Impact when displayed | 25-50% retweet reduction; 80% more author deletions | Faster display via AI pre-generation |
+| Transparency builds trust | Fully open-source algorithm; perceived as more trustworthy than fact-check labels | Maintain transparency at cross-platform scale |
+| Crowd quality is high | 98% accuracy on COVID-19 notes | Supplement crowd with AI for speed |
+
+However, X's system also has well-documented limitations that the "for everything" vision would need to address:
+
+| X Community Notes Limitation | Proposed Solution |
+|-----------------------------|-------------------|
+| Only 8.3% of notes achieve helpful status | AI-generated notes can be pre-optimized for helpfulness |
+| Mean 38.5 hours to note visibility | AI generates notes in seconds rather than waiting for human contributors |
+| 96.7% of reposts occur before note displays | Near-real-time AI screening and annotation |
+| Limited to X platform | Cross-platform browser extension or API layer |
+| Contributor sustainability (46% churn in 1 year) | AI handles generation; humans validate |
+
+## Technical Feasibility
+
+Forethought's cost analysis suggests the economics are increasingly viable:
+
+**Per-post cost estimate**: \$0.01–0.10 using current models (as of 2025). This assumes approximately 1,000 output tokens per assessment, covering:
+- Determining whether a note is needed
+- Planning what the note should cover
+- Drafting the contextual note with sources
+
+**Scale considerations**:
+- X alone sees roughly 500 million tweets per day; screening all would cost \$5M–50M daily at current rates
+- However, most content doesn't need screening—targeting only viral or flagged content dramatically reduces costs
+- LLM inference costs have been falling roughly 10x per year, suggesting viable economics within 1-3 years for broader coverage
+
+**Technical requirements**:
+- Low-latency inference for real-time annotation
+- Robust retrieval-augmented generation (RAG) for sourcing evidence
+- Cross-platform content parsing (different formats, multimedia)
+- Consensus simulation or verification mechanisms
+
+## Challenges and Risks
+
+### Social Adoption
+
+The primary bottleneck is not technical but social. The system requires:
+- **Platform cooperation**: Platforms must either integrate annotations natively or allow browser extensions to overlay content
+- **User trust**: Readers must trust that AI-generated notes are balanced rather than biased
+- **Content creator acceptance**: Publishers and social media users must accept that their content may be annotated
+
+### Accuracy and Bias
+
+- **AI hallucination**: AI-generated notes could themselves contain errors or fabricated citations
+- **Systematic bias**: Training data and model biases could produce notes that consistently favor certain perspectives
+- **Context collapse**: Automated systems may miss nuance, sarcasm, or domain-specific context
+- **Adversarial content**: Bad actors could craft content specifically designed to evade or confuse classifiers
+
+### Governance
+
+- **Who decides what's "misleading"?**: The classification threshold has enormous power—setting it too low produces noise, too high misses important cases
+- **Appeals process**: Content creators need mechanisms to contest inaccurate notes
+- **Regulatory friction**: Different jurisdictions have different standards for what constitutes misleading content
+- **Capture risk**: Could the system be captured by political interests or the AI companies running it?
+
+## Existing Work and Starting Points
+
+Several existing projects provide foundations for this vision:
+
+| Project | Relevance | Scale | Status |
+|---------|-----------|-------|--------|
+| <EntityLink id="community-notes">X Community Notes</EntityLink> | Proves bridging consensus model works at scale | 500K+ contributors; 600M+ daily tweet views | Active; open-source algorithm |
+| Meta Community Notes | Facebook/Instagram adopting similar model (announced Jan 2025) | 3B+ users (Facebook + Instagram) | Rolling out in US |
+| Wikipedia Talk Pages | Crowdsourced verification with editorial consensus | 60M+ articles; 1B+ monthly viewers | Mature but labor-intensive |
+| Google Knowledge Panels | AI-generated contextual information alongside search results | Billions of daily searches | Active |
+| ClaimBuster | AI-powered claim detection and fact-check matching | Academic tool; limited public use | Academic project |
+| Full Fact AI tools | Automated fact-checking claim detection | UK-focused; partnerships with platforms | Active non-profit |
+
+### Suggested Prototypes (from Forethought)
+
+1. **Iterate on X's bot-written community notes** with different architectures and AI models
+2. **Partner with platforms** interested in community-notes-like systems
+3. **Prototype efficient workflows** for multimedia content (images, video) where text-based annotation doesn't directly apply
+
+## Worked Example: AI Safety Claim on Social Media
+
+Consider a viral post claiming: *"Anthropic's latest model can autonomously replicate itself across servers, proving we've already lost control of AI."*
+
+A Community Notes for Everything system would process this as follows:
+
+**Step 1 — Screening**: The AI classifier flags this as likely misleading (confident safety claim + viral trajectory + references a specific organization).
+
+**Step 2 — Note generation**: The system retrieves Anthropic's actual model evaluation reports, the METR autonomous replication assessment, and relevant AI safety literature. It drafts:
+
+> **Context**: Anthropic's published model evaluations (May 2025) tested for autonomous replication and found the model "did not demonstrate the ability to autonomously replicate" under standard evaluation conditions. The METR assessment rated autonomous replication risk as low. The claim appears to misrepresent or fabricate evaluation results. ([Source 1](https://example.com), [Source 2](https://example.com))
+
+**Step 3 — Consensus filtering**: The note is tested against diverse reader perspectives. Because it's factual and well-sourced, it achieves cross-partisan agreement.
+
+**Step 4 — Display**: The note appears as an inline card below the original post within minutes, rather than the 7-38 hours typical of X's current human-driven system.
+
+This example illustrates both the value (rapid correction of a viral AI safety claim) and the difficulty (the system must accurately parse technical claims and retrieve the right evaluation reports).
+
+## Extensions and Open Ideas
+
+These ideas go beyond Forethought's original sketches:
+
+**Predictive pre-annotation**: Rather than waiting for content to go viral before annotating, the system could identify recurring claim patterns and pre-generate notes. If "AI can replicate itself" appears in 50 posts per day, a single well-sourced note template could be deployed instantly to new instances.
+
+**Topic-based note libraries**: Build reusable, community-maintained note databases for recurring misinformation categories (vaccine claims, election fraud claims, AI capability claims). Each note would be updated as evidence evolves, rather than generating fresh notes for each instance.
+
+**Credibility-weighted consensus**: Rather than treating all readers equally in the bridging algorithm, weight domain experts more heavily in their area of expertise. A climate scientist's rating on a climate note should count more than a random user's—while still requiring cross-ideological agreement.
+
+**Integration with prediction markets**: For contested future claims ("AI will cause mass unemployment by 2030"), display the current prediction market probability alongside the community note, giving readers a quantified sense of expert disagreement.
+
+**Private messaging layer**: Misinformation spreads heavily through WhatsApp, Telegram, and private group chats where there's no public annotation surface. A privacy-preserving version could hash message content and check against a note database without exposing the message content to any central server.
+
+**"Live notes" that update**: For rapidly evolving stories, notes could be versioned and automatically updated as new evidence emerges, with change history visible to readers.
+
+**Cost-sharing model**: The most expensive part is note generation for niche content. A cooperative model where platforms, publishers, and fact-checkers share a common note infrastructure could amortize costs. If a note is generated for content on Platform A, it automatically applies when the same claim appears on Platform B.
+
+## Connection to AI Safety
+
+Community Notes for Everything is relevant to the <EntityLink id="ai-transition-model">AI transition model</EntityLink> in several ways:
+
+- **<EntityLink id="epistemic-health">Epistemic health</EntityLink>**: A cross-platform context layer directly improves the quality of public information, countering <EntityLink id="epistemic-risks">epistemic risks</EntityLink> from AI-generated misinformation
+- **<EntityLink id="civilizational-competence">Civilizational competence</EntityLink>**: Better-informed publics are better equipped to make wise decisions about AI governance
+- **Accountability infrastructure**: The system creates a record of what claims were flagged and what context was provided, building accountability for public discourse
+
+As AI systems become more capable of generating convincing misinformation at scale, the need for automated counter-misinformation tools becomes more urgent. Community Notes for Everything represents one approach to maintaining <EntityLink id="societal-trust">societal trust</EntityLink> in an era of cheap, high-quality synthetic content.
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "Can AI-generated notes achieve the same trust as human-written community notes?",
+    "Will major platforms cooperate with cross-platform annotation, or will this need to work purely through browser extensions?",
+    "How fast must LLM inference costs fall before universal screening becomes economically viable?",
+    "Can consensus-filtering prevent AI-generated notes from becoming a vector for new forms of bias?",
+    "What governance structure can maintain legitimacy while operating across jurisdictions and platforms?"
+  ]}
+/>
+
+## Further Reading
+
+- **Original Report**: [Design Sketches for Collective Epistemics — Community Notes for Everything](https://www.forethought.org/research/design-sketches-collective-epistemics#community-notes-for-everything) — Forethought Foundation
+- **Existing System**: <EntityLink id="community-notes">X Community Notes</EntityLink> — detailed analysis of the current implementation
+- **Overview**: [Design Sketches for Collective Epistemics](/knowledge-base/responses/collective-epistemics-design-sketches/) — parent page with all five proposed tools
+
+<Backlinks />

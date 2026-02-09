@@ -1,0 +1,54 @@
+entity: anthropic
+facts:
+  valuation:
+    value: "$350 billion"
+    numeric: 350000000000
+    asOf: "2026-01"
+
+  revenue-arr-2025:
+    value: "$9 billion"
+    numeric: 9000000000
+    asOf: "2025-12"
+    note: "Annualized run rate at end of 2025"
+
+  revenue-2026-guidance:
+    value: "$20-26 billion"
+    asOf: "2026-01"
+
+  gross-margin:
+    value: "40%"
+    asOf: "2025"
+
+  enterprise-retention-rate:
+    value: "88%"
+    asOf: "2025"
+
+  industry-avg-retention:
+    value: "76%"
+    asOf: "2025"
+
+  business-customers:
+    value: "300,000+"
+    asOf: "2025"
+
+  customer-concentration:
+    value: "25%"
+    asOf: "2025"
+    note: "Revenue share from top customers (Cursor, GitHub Copilot)"
+
+  interpretability-team-size:
+    value: "40-60"
+    asOf: "2025"
+
+  safety-researchers:
+    value: "200-330"
+    asOf: "2025"
+
+  safety-pct-of-technical:
+    value: "20-30%"
+    asOf: "2025"
+
+  breakeven-target:
+    value: "2028"
+    noCompute: true
+    note: "Projected breakeven year"

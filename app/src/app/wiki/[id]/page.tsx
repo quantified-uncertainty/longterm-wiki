@@ -1,0 +1,271 @@
+import { notFound, redirect } from "next/navigation";
+import {
+  renderMdxPage,
+  getAllNumericIds,
+  numericIdToSlug,
+  slugToNumericId,
+  isMdxError,
+} from "@/lib/mdx";
+import type { MdxPage, MdxError } from "@/lib/mdx";
+import { getEntityById, getPageById, getEntityPath } from "@/data";
+import type { Page } from "@/data";
+import { PageStatus } from "@/components/PageStatus";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { RelatedPages } from "@/components/RelatedPages";
+import { WikiSidebar } from "@/components/wiki/WikiSidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { detectSidebarType, getWikiNav } from "@/lib/wiki-nav";
+import { AlertTriangle, Database, Github } from "lucide-react";
+import type { Metadata } from "next";
+import {
+  InfoBoxVisibilityProvider,
+  InfoBoxToggle,
+} from "@/components/wiki/InfoBoxVisibility";
+import { DataInfoBox } from "@/components/wiki/DataInfoBox";
+
+const GITHUB_HISTORY_BASE =
+  "https://github.com/quantified-uncertainty/cairn/commits/main/apps/longterm/src/content/docs";
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+function isNumericId(id: string): boolean {
+  return /^E\d+$/i.test(id);
+}
+
+export async function generateStaticParams() {
+  return getAllNumericIds().map((id) => ({ id }));
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+
+  let slug: string | null;
+  if (isNumericId(id)) {
+    slug = numericIdToSlug(id.toUpperCase());
+  } else {
+    slug = id;
+  }
+
+  if (!slug) return { title: "Not Found" };
+
+  const entity = getEntityById(slug);
+  const pageData = getPageById(slug);
+  const title = entity?.title || pageData?.title || slug;
+  const description = entity?.description || pageData?.description || undefined;
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      ...(pageData?.lastUpdated && { modifiedTime: pageData.lastUpdated }),
+    },
+  };
+}
+
+function JsonLd({ pageData, title, slug }: { pageData?: Page; title?: string; slug: string }) {
+  const headline = title || pageData?.title || slug;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline,
+    ...(pageData?.description && { description: pageData.description }),
+    ...(pageData?.llmSummary && { abstract: pageData.llmSummary }),
+    ...(pageData?.lastUpdated && { dateModified: pageData.lastUpdated }),
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Cairn Wiki",
+    },
+  };
+
+  // Escape </script> and HTML entities to prevent XSS via dangerouslySetInnerHTML
+  const safeJson = JSON.stringify(jsonLd)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: safeJson }}
+    />
+  );
+}
+
+function MdxErrorView({ error }: { error: MdxError }) {
+  return (
+    <div className="max-w-3xl mx-auto px-6 py-12">
+      <div className="flex items-start gap-3 p-4 rounded-lg border border-destructive/30 bg-destructive/5">
+        <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+        <div>
+          <h2 className="text-lg font-semibold mb-1">Content compilation error</h2>
+          <p className="text-sm text-muted-foreground mb-3">
+            The MDX content for <code className="text-xs px-1.5 py-0.5 bg-muted rounded">{error.slug}</code> failed to compile.
+          </p>
+          <pre className="text-xs bg-muted p-3 rounded overflow-x-auto whitespace-pre-wrap break-words max-h-60">
+            {error.error}
+          </pre>
+          <p className="text-xs text-muted-foreground mt-3">
+            File: <code className="px-1 py-0.5 bg-muted rounded">{error.filePath}</code>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ArticleView({
+  page,
+  pageData,
+  entityPath,
+  slug,
+}: {
+  page: MdxPage;
+  pageData: Page | undefined;
+  entityPath: string;
+  slug: string;
+}) {
+  const lastUpdated = pageData?.lastUpdated;
+  const githubUrl = pageData?.filePath
+    ? `${GITHUB_HISTORY_BASE}/${pageData.filePath}`
+    : null;
+  const entity = getEntityById(slug);
+  const numId = slugToNumericId(slug);
+
+  return (
+    <InfoBoxVisibilityProvider>
+      <JsonLd pageData={pageData} title={page.frontmatter.title} slug={slug} />
+      <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+        <Breadcrumbs
+          category={pageData?.category}
+          title={page.frontmatter.title || entity?.title}
+        />
+        <div className="page-meta">
+          {lastUpdated && (
+            <span className="page-meta-updated">
+              Updated {lastUpdated}
+            </span>
+          )}
+          {githubUrl && (
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="page-meta-github"
+            >
+              <Github size={14} />
+              History
+            </a>
+          )}
+          {/* TODO: re-enable when /wiki/[id]/info route is created
+          {numId && (
+            <a href={`/wiki/${numId}/info`} className="page-meta-github">
+              <Database size={14} />
+              Data
+            </a>
+          )}
+          */}
+          <InfoBoxToggle />
+        </div>
+      </div>
+      <article className="prose min-w-0">
+        <PageStatus
+          quality={pageData?.quality ?? undefined}
+          importance={pageData?.importance ?? undefined}
+          llmSummary={pageData?.llmSummary ?? undefined}
+          lastEdited={pageData?.lastUpdated ?? undefined}
+          todo={page.frontmatter.todo}
+          todos={page.frontmatter.todos}
+          wordCount={pageData?.wordCount}
+          backlinkCount={pageData?.backlinkCount}
+          metrics={pageData?.metrics}
+          suggestedQuality={pageData?.suggestedQuality}
+          issues={{
+            unconvertedLinkCount: pageData?.unconvertedLinkCount,
+            redundancy: pageData?.redundancy,
+          }}
+          pageType={page.frontmatter.pageType}
+          pathname={entityPath}
+        />
+        {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
+        {entity && <DataInfoBox entityId={slug} />}
+        {page.content}
+        <RelatedPages entityId={slug} entity={entity} />
+      </article>
+    </InfoBoxVisibilityProvider>
+  );
+}
+
+function WithSidebar({
+  entityPath,
+  children,
+}: {
+  entityPath: string;
+  children: React.ReactNode;
+}) {
+  const sidebarType = detectSidebarType(entityPath);
+  if (!sidebarType) return <div className="max-w-7xl mx-auto px-6 py-8">{children}</div>;
+
+  const sections = getWikiNav(sidebarType);
+  return (
+    <SidebarProvider>
+      <WikiSidebar sections={sections} />
+      <div className="flex-1 min-w-0">
+        <div className="max-w-[65rem] mx-auto px-8 py-4">{children}</div>
+      </div>
+    </SidebarProvider>
+  );
+}
+
+export default async function WikiPage({ params }: PageProps) {
+  const { id } = await params;
+
+  if (isNumericId(id)) {
+    // Numeric ID like E42 — look up slug and render
+    const slug = numericIdToSlug(id.toUpperCase());
+    if (!slug) notFound();
+
+    const result = await renderMdxPage(slug);
+    if (!result) notFound();
+    if (isMdxError(result)) return <MdxErrorView error={result} />;
+
+    const entityPath = getEntityPath(slug) || "";
+    return (
+      <WithSidebar entityPath={entityPath}>
+        <ArticleView
+          page={result}
+          pageData={getPageById(slug)}
+          entityPath={entityPath}
+          slug={slug}
+        />
+      </WithSidebar>
+    );
+  } else {
+    // String slug like "geoffrey-hinton"
+    // If it has a numeric ID, redirect to canonical URL
+    const numericId = slugToNumericId(id);
+    if (numericId) {
+      redirect(`/wiki/${numericId}`);
+    }
+
+    // No numeric ID — render directly by slug (page-only content without entity)
+    const result = await renderMdxPage(id);
+    if (!result) notFound();
+    if (isMdxError(result)) return <MdxErrorView error={result} />;
+
+    const entityPath = getEntityPath(id) || "";
+    return (
+      <WithSidebar entityPath={entityPath}>
+        <ArticleView
+          page={result}
+          pageData={getPageById(id)}
+          entityPath={entityPath}
+          slug={id}
+        />
+      </WithSidebar>
+    );
+  }
+}

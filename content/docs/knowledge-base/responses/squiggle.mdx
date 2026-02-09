@@ -1,0 +1,381 @@
+---
+title: Squiggle
+description: A domain-specific programming language for probabilistic estimation that enables complex uncertainty modeling through native distribution types, Monte Carlo sampling, and algebraic operations on distributions. Developed by QURI, Squiggle runs in-browser and is used throughout the EA community for cost-effectiveness analyses, Fermi estimates, and forecasting models.
+sidebar:
+  order: 1
+quality: 41
+llmSummary: "Squiggle is a domain-specific probabilistic programming language optimized for intuition-driven estimation rather than data-driven inference, developed by QURI and adopted primarily in the EA community. GiveWell's quantification project using Squiggle found cost to double consumption of $169 (95% CI: $131-$1,185) compared to point estimates, demonstrating value of explicit uncertainty."
+lastEdited: "2026-01-29"
+importance: 38.5
+ratings:
+  novelty: 2.5
+  rigor: 4
+  actionability: 3.5
+  completeness: 6
+metrics:
+  wordCount: 931
+  citations: 14
+  tables: 21
+  diagrams: 0
+clusters:
+  - epistemics
+  - community
+subcategory: epistemic-tools-tools
+---
+import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Innovation** | High | First probabilistic language with native distribution algebra optimized for estimation |
+| **Adoption** | Growing | GiveWell CEA projects (≈300 hours), AI timeline models, EA cause prioritization |
+| **Open Source** | Fully | MIT licensed, [GitHub monorepo](https://github.com/quantified-uncertainty) |
+| **Integration** | Active | SquiggleAI (Claude Sonnet 4.5), Squiggle Hub collaboration platform |
+| **Target Users** | EA/Rationalists | Primarily used in effective altruism community |
+| **Maturity** | Stable | Version 0.10.0 released January 2025 with major architectural improvements |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [en.wiktionary.org](https://en.wiktionary.org/wiki/squiggle) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Mr._Squiggle) |
+
+
+## Project Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Name** | Squiggle |
+| **Organization** | <EntityLink id="quri">QURI</EntityLink> (Quantified Uncertainty Research Institute) |
+| **Lead Developer** | Ozzie Gooen |
+| **First Release** | 2020 (Early Access) |
+| **Current Version** | 0.10.0 (January 2025) |
+| **License** | MIT |
+| **Website** | [squiggle-language.com](https://www.squiggle-language.com/) |
+| **GitHub** | [github.com/quantified-uncertainty/squiggle](https://github.com/quantified-uncertainty/squiggle) |
+| **Platform** | Browser-based (JavaScript) |
+
+## Overview
+
+[Squiggle](https://www.squiggle-language.com/) is a domain-specific programming language designed specifically for probabilistic estimation and uncertainty quantification. Unlike general-purpose probabilistic programming languages (PPLs) like Stan or PyMC that focus on Bayesian inference from data, Squiggle is optimized for situations where there is very little data available and most variables must be intuitively estimated by domain experts.
+
+The language provides first-class support for probability distributions, enabling analysts to express complex uncertainties naturally. Operations that would require dozens of lines in Python + NumPy can be expressed in single lines of Squiggle. For example, multiplying two uncertain quantities is as simple as `normal(10, 2) * uniform(0.8, 1.2)`.
+
+Squiggle is meant for intuitively-driven quantitative estimation rather than data analysis or data-driven statistical techniques. This design focus makes it particularly well-suited for:
+
+- **Fermi estimates**: Breaking down complex questions into component estimates
+- **Cost-effectiveness analyses**: Comparing interventions with explicit uncertainty
+- **Forecasting models**: AI timelines, technology adoption curves
+- **Decision analysis**: Career choices, resource allocation under uncertainty
+
+The language runs entirely in the browser via JavaScript, requiring no installation or backend infrastructure. This accessibility has made it the standard tool for quantitative reasoning in the effective altruism community.
+
+### Design Philosophy
+
+Squiggle's syntax is forked from earlier tools Guesstimate and Foretold, optimized for readable probabilistic expressions. It can be thought of as similar to SQL or Excel: there are simple ways to declare variables and write functions, but don't expect classes, inheritance, or monads. This intentional simplicity keeps the learning curve manageable while providing enough expressiveness for sophisticated models.
+
+The language is designed around the insight that domain experts frequently struggle with basic programming requirements even when they have deep knowledge of the problem domain. Squiggle aims to minimize the programming friction between an expert's mental model and executable code.
+
+## Core Features
+
+### Distribution Types
+
+Squiggle provides native support for common probability distributions:
+
+| Distribution | Use Case | Example |
+|--------------|----------|---------|
+| **Normal** | Symmetric uncertainties | `normal(10, 2)` |
+| **Lognormal** | Positive quantities with multiplicative uncertainty | `lognormal(2, 0.5)` |
+| **Uniform** | Equal probability across range | `uniform(5, 15)` |
+| **Beta** | Probabilities between 0 and 1 | `beta(2, 8)` |
+| **Triangular** | Three-point estimates | `triangular(5, 10, 15)` |
+| **Exponential** | Time between events | `exponential(0.1)` |
+| **Cauchy** | Heavy-tailed distributions | `cauchy(0, 1)` |
+| **Gamma** | Waiting times, rates | `gamma(2, 3)` |
+
+### The "to" Syntax
+
+The most intuitive feature is the `to` operator for creating lognormal distributions:
+
+```ts
+interventionCost = 1M to 10M  // Lognormal with 5th/95th percentiles
+projectDuration = 6 to 24      // Months, with natural uncertainty
+```
+
+This equals `lognormal({p5: 1M, p95: 10M})` but reads like natural language.
+
+### Distribution Algebra
+
+Mathematical operations propagate through distributions automatically via Monte Carlo sampling:
+
+```ts
+costPerUnit = 100 to 500
+numberOfUnits = 1000 to 5000
+totalCost = costPerUnit * numberOfUnits
+// Result: automatically sampled distribution
+```
+
+### Multiple Parameterizations
+
+The same distribution can be created multiple ways:
+
+```ts
+// Normal distribution - all equivalent
+normal(10, 2)                    // mean, stdev
+normal({mean: 10, stdev: 2})     // explicit
+normal({p5: 5, p95: 15})         // percentile-based
+normal({p10: 6, p90: 14})        // different percentiles
+normal({p25: 8, p75: 12})        // quartile-based
+```
+
+### Functions with Domain Constraints
+
+Type-checked parameter ranges catch errors:
+
+```ts
+calculateEV(probability: [0, 1], value) = {
+  probability * value
+}
+// calculateEV(1.5, 100) → Error: probability out of range
+```
+
+### Three Internal Representations
+
+| Representation | When to Use | Tradeoff |
+|----------------|-------------|----------|
+| **Sample Set** | Default | Supports correlations, fast |
+| **Point Set** | Dense numeric operations | Slower, more precise |
+| **Symbolic** | Exact symbolic math | Limited operations |
+
+Example forcing symbolic:
+```ts
+Sym.normal(10, 2) // Symbolic representation
+```
+
+## Version History
+
+| Version | Date | Key Changes |
+|---------|------|-------------|
+| **0.10.0** | January 2025 | SqProject rewrite, Web Workers by default, compile-time type inference, unit type annotations, UI overhaul |
+| **0.9.4-0.9.5** | 2024 | Experimental Web Worker runner, version selection in playground |
+| **0.8.6** | 2024 | Import/export support, multi-model projects |
+| **0.8.x** | 2023 | Performance improvements, Squiggle Hub integration |
+| **0.7.0** | 2023 | SquiggleAI integration foundations |
+| **Early Access** | 2020 | [Initial public release](https://forum.effectivealtruism.org/posts/TfPdb2aMKzgWXFvc3/announcing-squiggle-early-access) |
+
+### Squiggle 0.10.0 Deep Dive
+
+The January 2025 release represented six months of development with significant architectural changes:
+
+**Web Workers**: All Squiggle code now runs in a separate Web Worker thread by default, with results marshaled back asynchronously. This prevents UI freezes during complex calculations and improves the user experience for large models.
+
+**Type System**: New compile-time type inference transforms the AST to a typed AST, enabling earlier error detection. The pipeline now includes semantic analysis for type checks before execution.
+
+**Unit Type Annotations** (experimental, contributed by Michael Dickens): Variables can be annotated with physical units like kilograms, dollars, or compound units like m/s^2. This helps catch dimensional analysis errors.
+
+**UI Changes**: The output viewer now defaults to collapsed variables. Use the `@startOpen` decorator to expand variables by default for important outputs.
+
+## Code Examples
+
+### Basic Cost-Effectiveness Model
+
+```ts
+// Cost-effectiveness model for AI safety intervention
+interventionCost = lognormal(1e6, 1.5) // \$1M median, high uncertainty
+probabilityOfSuccess = beta(2, 8) // ~20% base rate
+valueIfSuccessful = lognormal(1e12, 2) // High but uncertain value
+
+expectedValue = probabilityOfSuccess * valueIfSuccessful
+costEffectiveness = expectedValue / interventionCost
+```
+
+### Function with Domain Constraints
+
+```ts
+// Calculate expected value with bounded probability
+calculateEV(probability: [0, 1], value) = {
+  adjustedProb = probability * normal(1, 0.1) // Add estimation uncertainty
+  truncate(adjustedProb, 0, 1) * value
+}
+
+// Use the function
+projectValue = calculateEV(0.3, lognormal(1e9, 2))
+```
+
+### Multi-Variable Fermi Estimate
+
+```ts
+// Estimate: Number of piano tuners in Chicago
+chicagoPopulation = 2.7M to 2.9M
+householdsPerPerson = 0.35 to 0.45
+pianoOwnershipRate = 0.02 to 0.05
+tuningsPerYear = 0.5 to 2
+hoursPerTuning = 1.5 to 2.5
+workingHoursPerYear = 1800 to 2200
+
+totalTunings = chicagoPopulation * householdsPerPerson *
+               pianoOwnershipRate * tuningsPerYear
+tunerCapacity = workingHoursPerYear / hoursPerTuning
+numberOfTuners = totalTunings / tunerCapacity
+```
+
+## Use Cases
+
+### Cost-Effectiveness Analysis
+
+Organizations use Squiggle for intervention comparisons with explicit uncertainty:
+
+| Use Case | Example | Typical Model Size |
+|----------|---------|-------------------|
+| **Charity evaluation** | GiveDirectly, AMF cost per life saved | 200-500 lines |
+| **AI safety interventions** | Research funding, field-building ROI | 150-400 lines |
+| **Policy cost-benefit** | Regulation impacts, safety standards | 200-600 lines |
+| **Career decisions** | Expected value of different paths | 100-300 lines |
+
+The [GiveWell CEA quantification project](https://forum.effectivealtruism.org/posts/Nb2HnrqG4nkjCqmRg/quantifying-uncertainty-in-givewell-cost-effectiveness) demonstrated that Squiggle can make charity evaluations more transparent by showing full probability distributions rather than point estimates. The project involved approximately 300 hours of work to quantify uncertainty in GiveWell's cost-effectiveness analyses.
+
+**Key Finding**: When adding uncertainty to GiveWell's GiveDirectly analysis, Sam Nolan found a mean cost to double consumption of \$169 (95% CI: \$131-\$1,185), compared to GiveWell's point estimate. This shows how uncertainty quantification affects decision-making.
+
+### Forecasting Models
+
+Squiggle enables structured forecasts with explicit uncertainty:
+
+| Application | Description |
+|-------------|-------------|
+| **AI timeline models** | When will specific capabilities emerge? Probability distributions over dates |
+| **Technology adoption** | S-curves with uncertainty bounds, market penetration rates |
+| **Risk scenario analysis** | Probability-weighted outcome trees for safety decisions |
+| **Market sizing** | Fermi estimates for business planning with confidence intervals |
+
+### Research Communication
+
+Squiggle models embedded in publications enable:
+
+- **Transparent assumptions**: Every input visible and adjustable by readers
+- **Reproducible calculations**: Same code produces same outputs across platforms
+- **Interactive exploration**: Readers can modify parameters to test sensitivity
+- **Sensitivity analysis**: Identify which inputs matter most through visualization
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Simple syntax** | Readable code optimized for probabilistic math |
+| **Fast prototyping** | Quick to write and iterate on models |
+| **Web-based** | No installation, runs in browser |
+| **Distribution algebra** | Natural operations on uncertain quantities |
+| **Free and open** | MIT license, community contributions welcome |
+| **EA adoption** | Standard tool for quantitative reasoning in EA community |
+
+### Limitations
+
+| Limitation | Explanation | Workaround |
+|------------|-------------|------------|
+| **No Bayesian inference** | Cannot do backwards inference from data | Use Stan/PyMC for inference problems |
+| **Slower on large models** | Much slower than Stan or PyMC for complex models | Keep models under ≈500 variables |
+| **Limited ecosystem** | Fewer libraries than Python/R | Focus on core estimation problems |
+| **Beta distribution display** | Poor rendering when alpha or beta < 1.0 | Use alternative distributions |
+| **Learning curve** | New syntax requires investment | Start with simple models, build up |
+
+## Comparison with Alternatives
+
+| Tool | Focus | Strengths | Limitations | Learning Curve |
+|------|-------|-----------|-------------|----------------|
+| **Squiggle** | Probabilistic estimation | Native distributions, web-based, readable syntax | No Bayesian inference, smaller ecosystem | Low-Medium |
+| **Guesstimate** | Spreadsheet Monte Carlo | Familiar spreadsheet UI, 5,000 simulations | Less programmable, limited functions | Low |
+| **Stan** | Bayesian inference | Powerful MCMC, HMC sampling | Steep learning curve, slower iteration | High |
+| **PyMC** | Bayesian Python | Full Python ecosystem, Theano/JAX backend | Requires Python expertise | Medium-High |
+| **WebPPL** | Probabilistic programming | Inference, conditioning | Academic focus, limited tooling | Medium |
+| **Excel** | General spreadsheets | Ubiquitous, familiar | Poor uncertainty support, no distributions | Low |
+
+### When to Use Squiggle
+
+**Use Squiggle when**:
+- You need intuition-driven estimation without much data
+- Rapid prototyping of uncertainty models is priority
+- Web-based sharing and collaboration is important
+- You want readable, auditable probabilistic code
+- Target audience is EA/rationalist community
+
+**Use Stan/PyMC when**:
+- You have data and need Bayesian inference
+- Model complexity requires advanced MCMC methods
+- Performance on large models is critical
+- You need full scientific computing ecosystem
+
+**Use Guesstimate when**:
+- Spreadsheet interface is strongly preferred
+- Quick one-off calculations suffice
+- Non-programmers need to contribute directly
+
+## Integration with QURI Ecosystem
+
+### Squiggle Hub
+
+[Squiggle Hub](https://squigglehub.org/) provides:
+- Model hosting with public/private visibility
+- Git-like version control
+- Multi-model projects with imports/exports
+- Collaboration features
+- Access to 17,000+ Guesstimate models
+
+### SquiggleAI
+
+<EntityLink id="squiggleai">SquiggleAI</EntityLink> integrates LLMs for:
+- Natural language to Squiggle code generation
+- Model debugging and explanation
+- Iterative refinement through conversation
+- Uses Claude Sonnet 4.5 with 20K token context caching
+
+### Metaforecast
+
+While <EntityLink id="metaforecast">Metaforecast</EntityLink> doesn't directly use Squiggle, it complements the ecosystem by aggregating forecasts that can inform Squiggle model inputs.
+
+## Community and Adoption
+
+### Primary User Base
+
+| Community | Usage |
+|-----------|-------|
+| **Effective Altruism** | Cost-effectiveness analyses, cause prioritization |
+| **Rationalist Community** | Fermi estimates, decision analysis |
+| **GiveWell Evaluators** | Charity evaluation uncertainty quantification |
+| **AI Safety Researchers** | Timeline modeling, intervention assessment |
+| **80,000 Hours** | Career decision analysis |
+
+### Community Resources
+
+| Resource | Purpose |
+|----------|---------|
+| **EA Forum** | Model sharing, methodology discussions |
+| **Forecasting & Epistemics Slack** | #squiggle-dev channel for support |
+| **QURI Substack** | Updates and tutorials |
+| **Squiggle Hub** | Model repository and collaboration |
+| **\$100 Fermi Competitions** | Incentivized model creation |
+
+## Funding and Development
+
+| Aspect | Details |
+|--------|---------|
+| **Primary Funder** | Survival and Flourishing Fund (SFF): \$150K+ to QURI |
+| **Additional Funding** | Future Fund: \$100K (2022), LTFF: ongoing |
+| **Team Size** | ≈3-5 core contributors |
+| **Development Model** | Open source with paid core team |
+| **Fiscal Sponsor** | Rethink Priorities |
+
+## External Links
+
+- [Squiggle Language Documentation](https://www.squiggle-language.com/docs)
+- [Squiggle Hub](https://squigglehub.org/)
+- [GitHub Repository](https://github.com/quantified-uncertainty/squiggle)
+- [Squiggle 0.10.0 Release Notes](https://quantifieduncertainty.org/posts/squiggle-0-10-0/)
+- [EA Forum: Announcing Squiggle Early Access](https://forum.effectivealtruism.org/posts/TfPdb2aMKzgWXFvc3/announcing-squiggle-early-access)
+- [EA Forum: Why and How to Use Squiggle](https://forum.effectivealtruism.org/posts/TsaRbCotCaWpcrt8F/squiggle-why-and-how-to-use-it)
+- [GiveWell CEA Quantification Project](https://forum.effectivealtruism.org/posts/Nb2HnrqG4nkjCqmRg/quantifying-uncertainty-in-givewell-cost-effectiveness)
+
+<Backlinks />

@@ -1,0 +1,548 @@
+---
+title: Manifund
+description: "Manifund is a charitable regranting platform founded in 2022 by Austin Chen and Rachel Weinberg as a spinoff of Manifold Markets. The platform distributed \\$2M+ in 2023 across AI safety, effective altruism, and rationalist projects through three mechanisms: regranting (empowering experts like Neel Nanda, Leopold Aschenbrenner, and Dan Hendrycks with \\$50K-400K budgets), impact certificates (experimental retroactive funding), and ACX Grants (Scott Alexander's \\$250K+ annual program). Manifund provides 501(c)(3) fiscal sponsorship enabling tax-deductible donations to unregistered projects and individuals, with grants typically moving from recommendation to disbursement within one week. For 2025, Manifund raised \\$2.25M for 10 regrantors focused primarily on AI safety."
+sidebar:
+  order: 4
+quality: 50
+llmSummary: Manifund is a $2M+ annual charitable regranting platform (founded 2022) that provides fast grants (<1 week) to AI safety projects through expert regrantors ($50K-400K budgets), fiscal sponsorship, and experimental impact certificates. The platform distributed $2.06M in 2023 (~40% to AI safety research) and raised $2.25M for 10 regrantors in 2025, filling a niche between individual donors and major funders like Coefficient Giving.
+lastEdited: "2026-01-29"
+importance: 36
+ratings:
+  novelty: 2.5
+  rigor: 4
+  actionability: 5
+  completeness: 6.5
+metrics:
+  wordCount: 1868
+  citations: 27
+  tables: 47
+  diagrams: 2
+clusters:
+  - community
+  - ai-safety
+subcategory: funders
+---
+import {DataInfoBox, Backlinks, Mermaid, EntityLink} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Scale** | Growing | \$2M+ in 2023; \$2.25M raised for 2025 regrants |
+| **Speed** | Very Fast | Grant recommendation to disbursement in under 1 week |
+| **Mechanism Innovation** | High | Pioneered impact certificates, regranting at scale |
+| **Transparency** | Very High | All grants public with explanations |
+| **Team Size** | Small | ≈3 core staff (Austin Chen, Rachel Weinberg, Saul Munn) |
+| **Fiscal Sponsorship** | Yes | 501(c)(3) status; 5% fee for large donors |
+| **Focus Areas** | AI Safety Primary | ≈80% of grants to x-risk/AI safety |
+| **Related Platform** | Manifold Markets | Shared founders, infrastructure, community |
+
+## Organization Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Full Name** | Manifund (Manifold for Charity) |
+| **Type** | Charitable regranting platform and fiscal sponsor |
+| **Founded** | 2022 |
+| **Founders** | Austin Chen (CEO), Rachel Weinberg (Engineer) |
+| **Parent/Related** | Manifold Markets (prediction market platform) |
+| **Legal Status** | 501(c)(3) nonprofit |
+| **Annual Volume** | \$2M+ (2023); \$2.25M budget (2025) |
+| **Website** | [manifund.org](https://manifund.org/) |
+| **Substack** | [manifund.substack.com](https://manifund.substack.com/) |
+| **Primary Focus** | AI safety, effective altruism, rationalist projects |
+
+## Overview
+
+Manifund is a charitable funding platform that emerged from Manifold Markets in 2022 to address a critical gap in the effective altruism funding ecosystem: the need for fast, flexible grantmaking that can move money to promising projects within days rather than months. Founded by Austin Chen and Rachel Weinberg, Manifund operates as both a regranting platform and a fiscal sponsor, enabling donors to support projects that lack formal nonprofit status while receiving tax benefits.
+
+The platform's origin traces to a concrete pain point: Manifold Markets received a \$500,000 grant from the FTX Future Fund in 2022 for charity prediction markets, but needed a separate 501(c)(3) entity to process the funds. What began as "Manifold for Charity" evolved into a full funding platform after Scott Alexander approached the team in 2022 wanting to run ACX Grants through an impact certificate mechanism. Austin Chen recruited his then-girlfriend (now wife) Rachel Weinberg to build the platform, and she became the primary engineer for manifund.org, launching it within two weeks.
+
+Manifund distinguishes itself from traditional foundations through three mechanisms. First, it empowers individual regrantors with independent budgets of \$50,000-\$400,000 to make grant decisions without committee review, enabling faster and more speculative funding. Second, it experimented extensively with impact certificates, a mechanism where funders can retroactively purchase credit for completed work. Third, it provides infrastructure for programs like ACX Grants, where external funders can run their own grantmaking through the platform.
+
+The platform serves a critical "middle layer" function in the EA funding ecosystem. Large funders like <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> operate at scale but require months of due diligence. EA Funds and Long-Term Future Fund operate at medium scale with multi-week timelines. Manifund fills the niche for \$5,000-\$50,000 grants that can be disbursed within a week, often seeding projects that later receive larger grants from major funders. As one regrantor noted, "quick regrants induce further funding from OpenPhil and others."
+
+## Founding Team
+
+### Austin Chen
+
+Austin Chen co-founded <EntityLink id="manifold">Manifold</EntityLink> Markets in December 2021 alongside brothers Stephen and James Grugett. He served as Chief Product Officer before stepping back from day-to-day Manifold operations to focus on Manifund. Chen's entrepreneurial approach emphasizes rapid experimentation and community-driven development.
+
+| Attribute | Details |
+|-----------|---------|
+| **Role** | CEO and Co-founder, Manifund |
+| **Previous** | CPO and Co-founder, Manifold Markets |
+| **Education** | MIT (Computer Science) |
+| **Notable** | Pioneered play-money <EntityLink id="prediction-markets">prediction markets</EntityLink> at scale |
+
+Chen's philosophy centers on building infrastructure that empowers individual decision-makers rather than committees. When discussing Manifund's regranting model, he emphasized that "regrantors make grants solo and are directly responsible for grant quality, which encourages more speculative grants and avoids problems in review-by-committee."
+
+### Rachel Weinberg
+
+Rachel Weinberg serves as the primary engineer and co-founder of Manifund. She joined after Austin Chen approached her about building the impact certificate platform for Scott Alexander's ACX Grants program.
+
+| Attribute | Details |
+|-----------|---------|
+| **Role** | Co-founder and Lead Engineer, Manifund |
+| **Previous** | President, EA @ Tufts University |
+| **Education** | Tufts University (Mathematics, partial degree) |
+| **Community** | Organized small-to-medium EA events |
+
+Weinberg's background in effective altruism community building informed Manifund's design philosophy. She founded and ran the EA group at Tufts before transitioning to engineering. Her rapid development of manifund.org, launching within two weeks of starting, enabled the platform to process its first grants quickly.
+
+## Funding Mechanisms
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Sources["Funding Sources"]
+        DONOR[Individual Donors]
+        ANON[Anonymous Major Donors]
+        RETRO[Retroactive Funders]
+    end
+
+    subgraph Platform["Manifund Platform"]
+        FISC[Fiscal Sponsorship<br/>501c3 status]
+        POOL[Regrantor Budgets<br/>\$50K-400K each]
+        IMPACT[Impact Certificates<br/>Experimental]
+        ACX[ACX Grants<br/>\$250K+ annually]
+    end
+
+    subgraph Recipients["Grant Recipients"]
+        AISAFETY[AI Safety Research]
+        COMMUNITY[Community Building]
+        TOOLS[Software & Tools]
+        EVENTS[Conferences & Events]
+        RESEARCH[Other Research]
+    end
+
+    DONOR --> FISC
+    ANON --> POOL
+    RETRO --> IMPACT
+    FISC --> POOL
+    FISC --> ACX
+    POOL --> AISAFETY
+    POOL --> COMMUNITY
+    POOL --> TOOLS
+    ACX --> RESEARCH
+    ACX --> EVENTS
+    IMPACT --> Recipients
+
+    style Sources fill:#e6f3ff
+    style Platform fill:#ccffcc
+    style Recipients fill:#ffffcc
+`} />
+
+### Regranting Programs
+
+Regranting is Manifund's primary funding mechanism, pioneered by the FTX Future Fund in 2022. The model empowers individual experts ("regrantors") with independent budgets to make grant decisions without committee approval. Manifund launched its regranting program in May 2023 after being introduced to an anonymous donor "D" who provided \$1.5 million specifically for this purpose.
+
+| Program Year | Total Pool | Number of Regrantors | Budget per Regrantor | Focus |
+|--------------|------------|---------------------|---------------------|-------|
+| 2023 | \$1.4M | 5 | \$50K-400K | AI safety, EA causes |
+| 2024 | ≈\$2M | ≈12 | \$50K-400K | AI safety primary |
+| 2025 | \$2.25M | 10 (announced) | \$100K+ | AI safety primary |
+
+**Notable 2024 Regrantors:**
+- Neel Nanda (Mechanistic interpretability researcher, Anthropic)
+- Leopold Aschenbrenner (Former OpenAI researcher, Situational Awareness author)
+- Dan Hendrycks (Center for AI Safety director)
+- Adam Gleave (FAR AI founder)
+- Ryan Kidd (SERI MATS co-director)
+- Evan Hubinger (Anthropic alignment researcher)
+
+**2025 Regrantors** include several former Manifund grantees who have become grantmakers:
+- Tamay Besiroglu (Epoch AI)
+- Lisa Thiergart (MIRI)
+- Marius Hobbhahn (Apollo Research)
+
+The regranting model offers several structural advantages over traditional grantmaking. Speed is paramount: Manifund can move money from recommendation to grantee bank account in under one week. The model also encourages "hits-based giving" where regrantors can make speculative bets on early-stage projects that committee processes might reject. Each regrantor writes public explanations for their grants, creating accountability and enabling learning across the ecosystem.
+
+### ACX Grants
+
+Scott Alexander's Astral Codex Ten grant program represents one of Manifund's largest partnerships. Alexander committed \$250,000 of personal funds in 2024, with other donors contributing an additional ≈\$1 million through Manifund's infrastructure.
+
+| Year | Scott's Commitment | Total Distributed | Applications | Grants Made |
+|------|-------------------|-------------------|--------------|-------------|
+| 2024 | \$250,000 | ≈\$1.25M | 600+ | ≈40 |
+| 2025 | \$250,000 | TBD | 654 | 42 |
+
+**Notable ACX Grants (2024):**
+
+| Recipient | Amount | Project |
+|-----------|--------|---------|
+| Elaine Perlman | \$50,000 | Lobbying for kidney donation law reform |
+| John Lohier & Hugo Smith | \$13,000 | Lead-acid battery recycling research in Nigeria |
+| Mark Webb | \$5,000 | Direct land reform experimentation |
+| Various | \$5K-50K | Biotech, AI alignment, education, climate projects |
+
+The 2024 ACX Grants introduced an impact market component where applications not receiving direct grants could participate in a secondary market. Retroactive prize funders including ACX Grants 2025, Survival and Flourishing Fund, Long-Term Future Fund, Animal Welfare Fund, and EA Infrastructure Fund (collectively disbursing \$5-33M annually) committed to purchasing successful impact certificates.
+
+### Impact Certificates
+
+Impact certificates represent Manifund's most experimental funding mechanism. The concept functions like "Kickstarter meets the stock market, for charity": founders create proposals with minimum funding goals, accredited investors bid in auctions, and successful projects issue tradeable certificates representing credit for completed work. Retroactive funders can later purchase certificates for projects that demonstrated impact.
+
+| Aspect | Implementation | Results |
+|--------|----------------|---------|
+| **Mechanism** | Auction-based initial funding; tradeable certificates | Facilitated 20+ project fundings |
+| **Investor Interest** | Lower than expected | Struggled to attract speculative investors |
+| **Trading Volume** | Limited | AMMs implemented but underutilized |
+| **Learning Value** | High | Informed future mechanism design |
+
+**Key Learnings from Impact Certificate Experiments:**
+
+Manifund ran three major impact certificate programs through Q1 2024: ACX Grants, Manifold Community Fund, and ChinaTalk essay competition. The team concluded they were "less excited by impact certificates than before" due to several challenges:
+
+1. **Investor acquisition difficulty**: The use case of speculating on charitable projects did not attract sufficient investor interest beyond the EA community.
+
+2. **Evaluation burden**: Assessing project impact proved time-consuming and "wasn't that fun," with participation declining each evaluation round.
+
+3. **Trading mechanism complexity**: Implementing automated market makers facilitated more trading but didn't justify the engineering cost. All AMMs were overpriced because the system supported buying and selling but not shorting.
+
+4. **Brand/prize insufficiency**: When partnering with Open Philanthropy's essay contest, most essayists declined to create impact certificates, including all ultimate winners. This demonstrated that "large dollar prizes plus well-known brands are not sufficient to get a robust certificate ecosystem started."
+
+Despite these challenges, Manifund views the experiments positively for the learning they generated. The platform continues to support impact certificates while focusing more resources on regranting, which has demonstrated clearer product-market fit.
+
+### Donor Lottery
+
+Manifund hosts donor lotteries following the model established by Carl Shulman and Paul Christiano in 2017. The mechanism allows donors to pool contributions, with one randomly-selected winner receiving the entire pool to distribute as grants.
+
+| Feature | Details |
+|---------|---------|
+| **Entry Range** | \$1,000 - \$100,000 |
+| **Typical Pool Size** | \$100,000 - \$500,000 |
+| **Winner Selection** | Random, proportional to contribution |
+| **Allocation Period** | ≈6 months to distribute |
+
+The donor lottery rationale exploits increasing marginal returns to donation research. A \$1,000 donor gains a 1% chance of allocating \$100,000, making extensive research worthwhile. Winners often spend dozens of hours investigating giving opportunities, producing higher-quality grant decisions than thousands of small donors making quick choices.
+
+## Fiscal Sponsorship Model
+
+Manifund operates as a 501(c)(3) fiscal sponsor, providing critical infrastructure for projects that lack formal nonprofit status. This enables tax-deductible donations to individuals, unregistered projects, and even for-profit companies (pending due diligence).
+
+<Mermaid client:load chart={`
+flowchart LR
+    subgraph Donor["Donor Flow"]
+        D1[Tax-Deductible<br/>Donation]
+        D2[Add to<br/>Manifund Account]
+        D3[Allocate to<br/>Regrantors/Projects]
+    end
+
+    subgraph Manifund["Manifund Processing"]
+        M1[Receive Funds<br/>501c3]
+        M2[Review Grant<br/>Legitimacy Check]
+        M3[Approve/Reject<br/>Mission Alignment]
+    end
+
+    subgraph Grantee["Grantee Flow"]
+        G1[Receive to<br/>Manifund Account]
+        G2[Request<br/>Withdrawal]
+        G3[Bank Transfer]
+    end
+
+    D1 --> D2 --> D3
+    D3 --> M1 --> M2 --> M3
+    M3 --> G1 --> G2 --> G3
+
+    style Donor fill:#e6f3ff
+    style Manifund fill:#ccffcc
+    style Grantee fill:#ffffcc
+`} />
+
+| Feature | Details |
+|---------|---------|
+| **Tax Status** | 501(c)(3) nonprofit |
+| **Fee Structure** | 5% for large donors (covers operations) |
+| **Eligible Grantees** | Registered charities, individuals, for-profits (with review) |
+| **Restrictions** | No political campaigns or lobbying |
+| **Processing Time** | Days to one week |
+
+The fiscal sponsorship model solves a key friction point in EA funding: many promising projects are led by individuals or small teams without formal nonprofit status. Traditional foundations cannot easily fund such projects. Manifund bridges this gap by accepting donations, conducting basic due diligence, and disbursing funds while maintaining tax compliance.
+
+## Grant Categories and Distribution
+
+### 2023 Distribution
+
+| Category | Amount | Percentage | Notes |
+|----------|--------|------------|-------|
+| **AI Safety Research** | \$800K+ | ≈40% | Interpretability, alignment, governance |
+| **Community Building** | \$400K | ≈20% | Local groups, events, career transitions |
+| **Software & Tools** | \$300K | ≈15% | Forecasting, epistemics, infrastructure |
+| **Events & Conferences** | \$200K | ≈10% | Manifest, workshops, retreats |
+| **Other EA Causes** | \$300K | ≈15% | Biosecurity, animal welfare, global health |
+| **Impact Certificates** | \$45K | ≈2% | Experimental mechanism |
+| **Total** | **\$2.06M** | 100% | \$2.012M grants + \$45K certificates |
+
+### Typical Grant Sizes
+
+| Size Range | Frequency | Typical Use Cases |
+|------------|-----------|-------------------|
+| \$1K - \$5K | 25% | Microgrants, travel, small events |
+| \$5K - \$25K | 40% | Early-stage projects, tools, part-time work |
+| \$25K - \$75K | 25% | Research projects, organization support |
+| \$75K - \$200K | 8% | Major projects, multi-month work |
+| \$200K+ | 2% | Apollo Research (largest grant) |
+
+## Notable Funded Projects
+
+### AI Safety
+
+| Project | Regrantor(s) | Amount | Impact |
+|---------|-------------|--------|--------|
+| **Apollo Research** | Tristan Hume, Evan Hubinger, Marcus Abramovitch | Largest grant | Founded by Marius Hobbhahn; published research contributing to Anthropic's dictionary learning work |
+| **Developmental Interpretability (Timaeus)** | Multiple | Seed funding | First funding for DevInterp research agenda; accelerated research by months |
+| **Mechanistic Interpretability Community** | Various | ≈\$50K | Grew to 500+ members; 40+ reading sessions; multiple publications |
+| **ChinaTalk AI Coverage** | Various | ≈\$20K | Reported on DeepSeek developments ahead of mainstream coverage |
+
+### Community Building
+
+| Project | Focus | Impact |
+|---------|-------|--------|
+| **Equiano Institute** | AI Alignment Research Lab for Africa | Assisted UN on Global Digital Compact; ran governance and alignment fellowships |
+| **AI Safety Communities** | Online coordination | Maintains AI Safety World, EA Domains, AI Safety Training resources |
+| **Mox SF Coworking** | Physical space | Coworking and events space for AI safety researchers |
+
+### Research and Tools
+
+| Project | Type | Description |
+|---------|------|-------------|
+| **Shallow Review 2024** | Research | Quick review of AI safety papers; induced further OpenPhil funding |
+| **Foresight AI Safety Grants** | Regranting | Supports neurotechnology, cryptography, multi-agent game theory |
+| **Inside View Podcast** | Media | 43+ AI safety explainers featuring Evan Hubinger, Neel Nanda, Victoria Krakovna |
+
+## Connection to Manifold Markets
+
+Manifund maintains close organizational and technical ties to Manifold Markets, the play-money prediction market platform.
+
+| Connection | Details |
+|------------|---------|
+| **Shared Founders** | Austin Chen co-founded both; Stephen and James Grugett lead Manifold |
+| **Team Overlap** | ~3 people on Manifund, ≈6 on Manifold (as of 2024) |
+| **Infrastructure** | Shared codebase elements; connected user accounts |
+| **Community** | Overlapping user base; cross-promotion |
+| **Events** | Manifest conference serves both communities |
+
+### Manifold Markets Overview
+
+| Attribute | Details |
+|-----------|---------|
+| **Founded** | December 2021 |
+| **Founders** | Austin Chen, Stephen Grugett, James Grugett |
+| **Headquarters** | Austin, Texas |
+| **Funding** | \$1.5M (FTX Future Fund), \$340K+ (SFF), ACX Grant (seed) |
+| **Currency** | "Mana" (play money); Sweepcash sunset March 2025 |
+
+Manifold Markets received its original seed funding from Scott Alexander's ACX Grants program, which "kicked off Manifold as a business." The platform later raised \$1.5 million from the FTX Future Fund and over \$340,000 from the Survival and Flourishing Fund.
+
+### Manifest Conference
+
+Manifold hosts Manifest, an annual forecasting and prediction markets festival that brings together the broader rationalist and EA communities.
+
+| Year | Dates | Location | Attendance | Notable Speakers |
+|------|-------|----------|------------|------------------|
+| 2023 | Sep 22-24 | Berkeley, Lighthaven | 250 | Nate Silver, Robin Hanson, Eliezer Yudkowsky |
+| 2024 | Jun 7-9 | Berkeley, Lighthaven | 600 | Nate Silver, Scott Alexander, Dwarkesh Patel, Emmett Shear (Twitch), Ben Mann (Anthropic) |
+
+The 2024 Manifest featured startup pitch competitions, prediction market workshops, and fireside chats. The event ran alongside LessOnline, hosted by Lightcone Infrastructure, creating a 10-day gathering of the rationalist and forecasting communities.
+
+## Application Process
+
+### For Projects Seeking Funding
+
+| Step | Details | Timeline |
+|------|---------|----------|
+| **1. Create Profile** | Sign up on Manifund | Minutes |
+| **2. Submit Project** | Describe work, budget, timeline, deliverables | 30-60 minutes |
+| **3. Identify Funders** | Find relevant regrantors or apply to open calls | Same day |
+| **4. Review Process** | Regrantor evaluates fit with their focus area | Days to 2 weeks |
+| **5. Due Diligence** | Manifund reviews for legitimacy, legality, mission alignment | 1-3 days |
+| **6. Receive Funds** | Transfer to Manifund account; request withdrawal | Days |
+
+### What Makes Strong Applications
+
+| Factor | Strong Signal | Weak Signal |
+|--------|---------------|-------------|
+| **Scope** | Clear deliverables, measurable outcomes | Vague goals, "exploring" without specifics |
+| **Team** | Relevant track record, domain expertise | No demonstrated capability |
+| **Budget** | Justified costs, efficient allocation | Round numbers without breakdown |
+| **Timeline** | Specific milestones, realistic estimates | Open-ended or unrealistic |
+| **Theory of Change** | Clear path from work to impact | Disconnected from outcomes |
+| **Transparency** | Willing to share updates publicly | Resistant to public accountability |
+
+### For Donors and Regrantors
+
+| Feature | Description |
+|---------|-------------|
+| **Regrantor Program** | Apply for budget to run independent grantmaking (\$50K-400K) |
+| **Direct Giving** | Fund specific projects directly through platform |
+| **Donor Lottery** | Pool funds for chance at larger allocation |
+| **Account Funding** | Add money to account for flexible allocation |
+| **Tax Documentation** | Automatic receipts for 501(c)(3) donations |
+
+## Platform Features
+
+### Transparency
+
+Manifund distinguishes itself through radical transparency. All grants are publicly visible with full details:
+
+| Information | Visibility |
+|-------------|-----------|
+| **Grant Amount** | Public |
+| **Project Description** | Public |
+| **Regrantor Identity** | Public |
+| **Grant Rationale** | Public (regrantor writes explanation) |
+| **Project Updates** | Public |
+| **Comments/Discussion** | Public |
+| **Withdrawal Amounts** | Public |
+
+This transparency creates accountability for regrantors (whose track records are visible) and enables ecosystem learning (other funders can see what's being funded and why).
+
+### Technical Infrastructure
+
+| Feature | Implementation |
+|---------|----------------|
+| **Open Source** | Core platform code publicly available |
+| **API Access** | Programmatic access to grant data |
+| **Embeddable Widgets** | Projects can embed funding progress |
+| **Notification System** | Updates on projects, comments, funding |
+| **Mobile Support** | Responsive web design |
+
+## Comparison with Other EA Funders
+
+| Dimension | Manifund | Long-Term Future Fund | Coefficient Giving | SFF |
+|-----------|----------|----------------------|-------------------|-----|
+| **Speed** | Days to 1 week | 4-8 weeks | 3-12 months | Quarterly |
+| **Typical Grant Size** | \$5K-75K | \$20K-200K | \$100K-10M+ | \$50K-500K |
+| **Due Diligence** | Light (regrantor discretion) | Medium | Heavy | Medium |
+| **Decision Process** | Individual regrantors | Committee | Staff + external review | Committee |
+| **Transparency** | All grants public | Grant reports public | Grant reports public | Recommendations public |
+| **Fiscal Sponsorship** | Yes (5% fee) | Through CEA | No | No |
+| **Focus** | AI safety, EA broad | AI safety, longtermism | Strategic causes | X-risk, EA infra |
+
+### When to Apply to Manifund vs. Other Funders
+
+**Apply to Manifund when:**
+- You need funding quickly (weeks, not months)
+- Grant size is \$5K-75K
+- Project is early-stage or speculative
+- You lack nonprofit status
+- You want to test an idea before seeking larger funding
+
+**Apply to LTFF/Coefficient Giving when:**
+- Project requires \$100K+
+- You have time for longer review process
+- Project has clear track record to evaluate
+- You need multi-year funding commitment
+
+## Strengths and Limitations
+
+### Organizational Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Speed** | Grant recommendation to disbursement in under 1 week |
+| **Flexibility** | Multiple funding mechanisms (regrants, impact certs, lotteries) |
+| **Transparency** | All grants public with rationales |
+| **Low Overhead** | Small team, 5% fee covers operations |
+| **Innovation** | Pioneered impact certificates at scale in EA |
+| **Accessibility** | Easy application, fiscal sponsorship available |
+| **Expert Networks** | Top AI safety researchers as regrantors |
+
+### Limitations
+
+| Limitation | Mitigation |
+|------------|------------|
+| **Scale** | \$2M annually vs. \$100M+ at OpenPhil | Focus on early-stage, speculative grants |
+| **Due Diligence** | Less thorough than major foundations | Leverage regrantor expertise; accept higher variance |
+| **Regrantor Availability** | Grant quality depends on regrantor capacity | Maintain 10+ active regrantors |
+| **Sustainability** | Relies on continued donor participation | Diversify funding sources; build track record |
+| **Focus** | Primarily AI safety/EA community | Intentional; serves specific ecosystem need |
+
+### Impact Certificate Challenges
+
+The impact certificate mechanism faced specific challenges that limited its effectiveness:
+
+| Challenge | Observed Result |
+|-----------|-----------------|
+| **Investor Acquisition** | Failed to attract investors outside EA community |
+| **Evaluation Burden** | Team participation declined over time |
+| **Trading Liquidity** | AMMs implemented but underutilized |
+| **Mainstream Adoption** | Coefficient Giving essay contest participants declined certificates |
+
+Manifund continues supporting impact certificates while recognizing that regranting has demonstrated stronger product-market fit.
+
+## Strategic Position in EA Funding Ecosystem
+
+Manifund fills a specific niche in the effective altruism funding landscape: fast, flexible, small-to-medium grants that seed early-stage projects. This complements rather than competes with larger funders.
+
+| Ecosystem Role | Description |
+|----------------|-------------|
+| **Seed Funder** | Provides initial funding that enables projects to later secure larger grants |
+| **Speed Layer** | Moves money in days when other funders take months |
+| **Risk Tolerance** | Regrantors can make speculative bets committees might reject |
+| **Talent Identification** | Regrantors with field expertise spot promising individuals early |
+| **Infrastructure Provider** | Fiscal sponsorship enables funding to non-charities |
+
+Several Manifund-funded projects have subsequently received larger grants from <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> and other major funders, validating the "quick regrants induce further funding" thesis.
+
+## Timeline
+
+| Date | Event |
+|------|-------|
+| **Dec 2021** | Manifold Markets founded by Austin Chen, Stephen Grugett, James Grugett |
+| **2022** | Manifold receives \$500K from FTX Future Fund for charity prediction markets |
+| **2022** | Manifund incorporated as separate 501(c)(3) |
+| **Late 2022** | Scott Alexander approaches team about running ACX Grants via impact certificates |
+| **2022** | Rachel Weinberg joins; builds manifund.org in two weeks |
+| **May 2023** | Anonymous donor "D" provides \$1.5M for regranting program |
+| **2023** | Manifund launches with ≈12 regrantors (\$50K-400K budgets each) |
+| **Sep 2023** | First Manifest conference (250 attendees, Berkeley) |
+| **2023** | \$2.06M distributed (\$2.012M grants + \$45K impact certificates) |
+| **Q1 2024** | Impact certificate experiments conclude with mixed results |
+| **Jun 2024** | Manifest 2024 (600 attendees) |
+| **2024** | ACX Grants 2024 includes impact market for 50+ proposals |
+| **2025** | \$2.25M raised for 10 regrantors |
+| **Jan 2025** | ACX Grants 2025 funds 42 of 654 applications |
+
+## Sources and Citations
+
+### Primary Sources
+- [Manifund About Page](https://manifund.org/about)
+- [Manifund Regranting Overview](https://manifund.org/about/regranting)
+- [Manifund Impact Certificates](https://manifund.org/about/impact-certificates)
+
+### EA Forum Posts
+- [Manifund 2025 Regrants Announcement](https://forum.effectivealtruism.org/posts/fFEkKdoAKchSZm2RA/manifund-2025-regrants)
+- [Manifund: 2023 in Review](https://forum.effectivealtruism.org/posts/aWLXGW99GyhtjydyF/manifund-2023-in-review)
+- [Manifund Q1 Retro: Learnings from Impact Certs](https://www.lesswrong.com/posts/AzoopyYgzNimBJDdY/manifund-q1-retro-learnings-from-impact-certs)
+- [Announcing Manifund Regrants](https://forum.effectivealtruism.org/posts/RMXctNAksBgXgoszY/announcing-manifund-regrants)
+- [Manifund: What We're Funding (Weeks 2-4)](https://forum.effectivealtruism.org/posts/ZsMqioc7BgL2DTJca/manifund-what-we-re-funding-weeks-2-4)
+
+### ACX/Scott Alexander Sources
+- [ACX Grants Results 2024](https://www.astralcodexten.com/p/acx-grants-results-2024)
+- [ACX Grants Results 2025](https://www.astralcodexten.com/p/acx-grants-results-2025)
+- [Apply For An ACX Grant (2024)](https://www.astralcodexten.com/p/apply-for-an-acx-grant-2024)
+- [ACX Grants 2024 Impact Market Announcement](https://manifund.substack.com/p/acx-grants-2024-impact-market-is)
+
+### Media and Interviews
+- [Stephen Grugett and Austin Chen Interview (Theo Jaffee)](https://www.theojaffee.com/p/16-stephen-grugett-and-austin-chen)
+- [Podcast: Elizabeth & Austin on "What Manifold was allowed to do"](https://forum.effectivealtruism.org/posts/e5JXjmAhrihhmEHLx/podcast-elizabeth-and-austin-on-what-manifold-was-allowed-to)
+- [Manifold Markets Wikipedia](https://en.wikipedia.org/wiki/Manifold_(prediction_market))
+
+### Conference Sources
+- [Come to Manifest 2024 (June 7-9 in Berkeley)](https://forum.effectivealtruism.org/posts/jCcgAHoN6MKEce9ph/come-to-manifest-2024-june-7-9-in-berkeley)
+- [Manifest 2023 Announcement](https://forum.effectivealtruism.org/posts/uv88CMAmbRtzjcKb2/announcing-manifest-2023-sep-22-24-in-berkeley-3)
+
+### Donor Lottery Background
+- [Why You Should Give to a Donor Lottery](https://forum.effectivealtruism.org/posts/LNNrqDeAMqHFNKaGa/why-you-should-give-to-a-donor-lottery-this-giving-season)
+- [EA Forum: Donor Lotteries Topic](https://forum.effectivealtruism.org/topics/donor-lotteries)
+
+## External Links
+
+- [Manifund Website](https://manifund.org/)
+- [Manifund Substack](https://manifund.substack.com/)
+- [Active Projects](https://manifund.org/projects)
+- [Regrantors Page](https://manifund.org/rounds/regrants)
+- [Manifold Markets](https://manifold.markets/)
+- [ACX Grants on Manifund](https://manifund.org/acx-grants)
+
+<Backlinks />

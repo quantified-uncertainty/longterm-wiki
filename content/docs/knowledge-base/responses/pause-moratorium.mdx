@@ -1,0 +1,320 @@
+---
+title: Pause / Moratorium
+description: Proposals to pause or slow frontier AI development until safety is better understood, offering potentially high safety benefits if implemented but facing significant coordination challenges and currently lacking adoption by major AI laboratories.
+sidebar:
+  order: 51
+quality: 72
+importance: 78.5
+lastEdited: "2025-01-28"
+llmSummary: Comprehensive analysis of pause/moratorium proposals finding they would provide very high safety benefits if implemented (buying time for safety research to close the growing capability-safety gap) but face critical enforcement and coordination challenges with zero current adoption by major labs. The FLI 2023 open letter garnered 30,000+ signatures but resulted in no actual slowdown, highlighting severe tractability issues despite theoretical effectiveness.
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 4.2
+  rigor: 6.8
+  actionability: 5.5
+  completeness: 7.5
+metrics:
+  wordCount: 850
+  citations: 15
+  tables: 20
+  diagrams: 2
+clusters:
+  - ai-safety
+  - governance
+subcategory: alignment-policy
+---
+import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="pause-moratorium" client:load />
+
+## Overview
+
+Pause and moratorium proposals represent the most direct governance intervention for AI safety: deliberately slowing or halting frontier AI development to allow safety research, governance frameworks, and societal preparation to catch up with rapidly advancing capabilities. These proposals range from targeted pauses on specific capability thresholds to comprehensive moratoria on all advanced AI development, with proponents arguing that the current pace of development may be outstripping humanity's ability to ensure safe deployment.
+
+The most prominent call for a pause came in March 2023, when the <EntityLink id="fli">Future of Life Institute</EntityLink> (FLI) published an [open letter](https://futureoflife.org/open-letter/pause-giant-ai-experiments/) calling for a six-month pause on training AI systems more powerful than GPT-4. Released just one week after GPT-4's launch, the letter garnered over 30,000 signatures, including prominent AI researchers such as [Yoshua Bengio](https://yoshuabengio.org/) and <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, as well as technology leaders like <EntityLink id="elon-musk">Elon Musk</EntityLink> and Steve Wozniak. The letter cited risks including AI-generated propaganda, extreme automation of jobs, and a society-wide loss of control. However, no major AI laboratory implemented a voluntary pause, and the letter's six-month timeline passed without meaningful slowdown in frontier development. As [MIT Technology Review noted](https://www.technologyreview.com/2023/09/26/1080299/six-months-on-from-the-pause-letter/) six months later, AI companies instead directed "vast investments in infrastructure to train ever-more giant AI systems."
+
+The fundamental logic behind pause proposals is straightforward: if AI development is proceeding faster than our ability to make it safe, slowing development provides time for safety work. As Bengio et al. wrote in [Science](https://www.science.org/doi/10.1126/science.adn0117) in May 2024, "downside artificial intelligence risks must be managed effectively and urgently if posited AI benefits are to be realized safely." However, implementation faces severe challenges including competitive dynamics between nations and companies, enforcement difficulties, and concerns that pauses might push development underground or to jurisdictions with fewer safety constraints. These proposals remain controversial even within the AI safety community, with some arguing they are essential for survival and others viewing them as impractical or counterproductive.
+
+## Risk Assessment & Impact
+
+| Dimension | Assessment | Rationale | Confidence |
+|-----------|------------|-----------|------------|
+| **Safety Uplift** | High (if implemented) | Would buy time for safety research | High |
+| **Capability Uplift** | Negative | Explicitly slows capability development | High |
+| **Net World Safety** | Unclear | Could help if coordinated; could backfire if unilateral | Medium |
+| **Lab Incentive** | Negative | Labs strongly opposed; competitive dynamics | High |
+| **Research Investment** | \$1-5M/yr | Advocacy organizations; FLI, PauseAI | Medium |
+| **Current Adoption** | None | Advocacy only; no major labs paused | High |
+
+## Core Arguments
+
+### Case for Pausing
+
+<Mermaid client:load chart={`
+flowchart TD
+    SPEED[AI Development Speed] --> GAP{Safety Gap?}
+    SAFETY[Safety Research Speed] --> GAP
+
+    GAP -->|Growing| RISK[Increasing Risk]
+    GAP -->|Stable| MANAGE[Manageable]
+    GAP -->|Shrinking| GOOD[Safety Catching Up]
+
+    RISK --> OPTION1[Continue Development]
+    RISK --> OPTION2[Pause Development]
+
+    OPTION1 --> RACE[Racing to Danger]
+    OPTION2 --> TIME[Buy Time for Safety]
+
+    TIME --> RESEARCH[More Safety Research]
+    TIME --> GOV[Better Governance]
+    TIME --> PREP[Societal Preparation]
+
+    RESEARCH --> SAFER[Safer Development]
+    GOV --> SAFER
+    PREP --> SAFER
+
+    style RISK fill:#ffcccc
+    style SAFER fill:#d4edda
+    style RACE fill:#ff9999
+`} />
+
+| Argument | Description | Strength |
+|----------|-------------|----------|
+| **Safety-Capability Gap** | Safety research not keeping pace with capabilities | Strong if gap is real |
+| **Irreversibility** | Some AI risks may be impossible to reverse once realized | Strong for existential risks |
+| **Precautionary Principle** | Burden of proof should be on developers to show safety | Philosophically contested |
+| **Coordination Signal** | Demonstrates seriousness; creates space for governance | Moderate |
+| **Research Time** | Enables catch-up on interpretability, alignment | Strong |
+
+### Case Against Pausing
+
+| Argument | Description | Strength |
+|----------|-------------|----------|
+| **Enforcement** | Unenforceable without international agreement | Strong |
+| **Displacement** | Development moves to less cautious actors | Moderate-Strong |
+| **Lost Benefits** | Delays positive AI applications | Moderate |
+| **Talent Dispersion** | Safety researchers may leave paused organizations | Moderate |
+| **False Security** | Pause without progress creates complacency | Moderate |
+| **Definition Problems** | Hard to define what to pause | Strong |
+
+## Pause Proposals Analyzed
+
+### FLI Open Letter (2023)
+
+| Aspect | Detail |
+|--------|--------|
+| **Scope** | Training systems more powerful than GPT-4 |
+| **Duration** | Six months (renewable) |
+| **Signatories** | [30,000+](https://futureoflife.org/open-letter/pause-giant-ai-experiments/) including Yoshua Bengio, Elon Musk, Stuart Russell, Steve Wozniak, Yuval Noah Harari |
+| **Labs' Response** | No major lab paused; development continued |
+| **Outcome** | Raised awareness; generated [renewed urgency within governments](https://www.technologyreview.com/2023/09/26/1080299/six-months-on-from-the-pause-letter/); no implementation |
+
+**Notable critiques**: AI researcher Andrew Ng [argued](https://www.axios.com/2023/03/30/chatgpt-ai-pause-debate-existential-risk) that "there is no realistic way to implement a moratorium" without government intervention, which would be "anti-competitive" and "awful innovation policy." Reid Hoffman criticized the letter as "virtue signaling" that would hurt the cause by alienating the AI developer community needed to achieve safety goals.
+
+### PauseAI Movement
+
+| Aspect | Detail |
+|--------|--------|
+| **Founded** | May 2023 in Utrecht, Netherlands by software entrepreneur Joep Meindertsma |
+| **Goal** | [International moratorium](https://pauseai.info/) on frontier AI development until safety is ensured |
+| **Structure** | Network of local organizations; US chapter led by Holly Elmore, UK by Joseph Miller (Oxford PhD) |
+| **Approach** | Grassroots activism, protests at AI labs (OpenAI Feb 2024, Anthropic Nov 2024), policy advocacy |
+| **Policy Asks** | Global pause enforced through international treaty; democratic control over AI development |
+| **Key Actions** | [International protests](https://pauseai.info/protests) in May 2024 timed to Seoul AI Safety Summit; protests held in San Francisco, New York, Berlin, Rome, Ottawa, London |
+
+### Academic Proposals
+
+| Proposal | Scope | Mechanism |
+|----------|-------|-----------|
+| **Compute Caps** | Limit training compute | Hardware governance |
+| **Capability Gates** | Pause at defined capability thresholds | Eval-based triggers |
+| **Conditional Pause** | Pause if safety benchmarks not met | RSP-like framework |
+| **Research Moratoria** | Pause specific capability research | Targeted restrictions |
+
+## Implementation Challenges
+
+### Coordination Problems
+
+| Challenge | Description | Severity | Potential Solution |
+|-----------|-------------|----------|-------------------|
+| **International Competition** | US-China dynamics; neither wants to pause first | Critical | Treaty with verification |
+| **Corporate Competition** | First-mover advantages; defection incentives | High | Regulatory mandate |
+| **Verification** | How to confirm compliance | High | Compute monitoring |
+| **Definition** | What counts as "frontier" AI | High | Clear technical thresholds |
+
+### Enforcement Mechanisms
+
+| Mechanism | Feasibility | Effectiveness | Notes |
+|-----------|-------------|---------------|-------|
+| **Voluntary Compliance** | Low | Very Low | No incentive to comply |
+| **National Regulation** | Medium | Medium | Jurisdictional limits |
+| **International Treaty** | Low-Medium | High if achieved | Requires major power agreement |
+| **Compute Restrictions** | Medium | Medium-High | Physical infrastructure trackable |
+| **Social Pressure** | Medium | Low | Insufficient against strong incentives |
+
+### Unintended Consequences
+
+| Consequence | Likelihood | Severity | Mitigation |
+|-------------|------------|----------|------------|
+| **Development Displacement** | High | High | International coordination |
+| **Underground Development** | Medium | Very High | Compute monitoring |
+| **Safety Researcher Exodus** | Medium | Medium | Continued safety funding |
+| **Competitive Disadvantage** | High | Variable | Coordinated action |
+| **Delayed Benefits** | High | Medium | Risk-benefit analysis |
+
+## Historical Precedents
+
+| Domain | Intervention | Outcome | Lessons |
+|--------|--------------|---------|---------|
+| **Nuclear Weapons** | Various moratoria and treaties | Partial success; proliferation continued | Verification essential |
+| **Human Cloning** | Research moratoria | Generally effective | Narrow scope helps |
+| **Gain-of-Function** | Research pause (2014-2017) | Temporary; research resumed | Pressure to resume |
+| **Recombinant DNA** | Asilomar conference (1975) | Self-regulation worked initially | Community buy-in crucial |
+| **CFCs** | Montreal Protocol | Highly successful | Clear harm identification |
+
+### Lessons for AI Pauses
+
+- **Narrow scope** is more enforceable than broad moratoria
+- **Verification mechanisms** are essential for compliance
+- **International coordination** requires identifying mutual interests
+- **Community buy-in** from researchers enables voluntary compliance
+- **Clear triggering conditions** help define when restrictions apply
+
+## Scalability Assessment
+
+| Dimension | Assessment | Rationale |
+|-----------|------------|-----------|
+| **International Scalability** | Unknown | Depends on coordination |
+| **Enforcement Scalability** | Partial | Compute monitoring possible |
+| **SI Readiness** | Yes (if works) | Would prevent reaching SI until prepared |
+| **Deception Robustness** | N/A | External policy; doesn't address model behavior |
+
+## Strategic Considerations
+
+### When Pauses Might Work
+
+| Condition | Importance | Current Status |
+|-----------|------------|----------------|
+| **International Agreement** | Critical | Very limited |
+| **Clear Triggers** | High | Undefined |
+| **Verification Methods** | High | Underdeveloped |
+| **Alternative Pathway** | Medium | Safety research ongoing |
+| **Industry Buy-In** | Medium-High | Very low |
+
+### Alternative Approaches
+
+| Alternative | Relationship to Pause | Tradeoffs |
+|-------------|----------------------|-----------|
+| **Differential Progress** | Accelerate safety, not slow capabilities | Competitive with capabilities |
+| **Responsible Scaling Policies** | Conditional pauses at thresholds | Voluntary; lab-controlled |
+| **Compute Governance** | Indirect slowdown through resource control | More enforceable |
+| **International Coordination** | Framework for coordinated pause | Slower to achieve |
+
+## Quick Assessment
+
+| Dimension | Rating | Notes |
+|-----------|--------|-------|
+| **Tractability** | Low | Severe coordination and enforcement challenges; no major lab has voluntarily paused |
+| **Effectiveness** | Very High (if implemented) | Would directly address timeline concerns by buying time for safety research |
+| **Neglectedness** | Medium | Active advocacy (FLI, PauseAI); major gap in implementation and enforcement mechanisms |
+| **Current Maturity** | Early Advocacy | FLI letter catalyzed debate but no binding commitments achieved |
+| **Time Horizon** | Immediate-Long Term | Could theoretically be implemented quickly but requires international coordination |
+| **Key Proponents** | FLI, PauseAI, Yoshua Bengio | Grassroots movements and prominent AI researchers |
+| **Key Opponents** | Major AI Labs, Andrew Ng | Competitive dynamics and concerns about practicality |
+
+## Risks Addressed
+
+If implemented effectively, pause/moratorium would address:
+
+| Risk | Mechanism | Effectiveness |
+|------|-----------|---------------|
+| **<EntityLink id="racing-dynamics" />** | Eliminates competitive pressure | Very High |
+| **Safety-Capability Gap** | Time for safety research | Very High |
+| **Governance Lag** | Time for policy development | High |
+| **Societal Preparation** | Time for adaptation | High |
+| **<EntityLink id="misalignment-potential" />** | Prevents deployment of unaligned systems | Very High (during pause) |
+
+## Limitations
+
+- **Enforcement Infeasibility**: No mechanism to enforce global compliance
+- **Competitive Dynamics**: Unilateral pause disadvantages safety-conscious actors
+- **Displacement Risk**: Development may move to less cautious jurisdictions
+- **Definition Challenges**: Unclear what should be paused
+- **Political Unreality**: Insufficient political will for meaningful implementation
+- **Temporary Nature**: Pauses must eventually end; doesn't solve underlying problem
+
+## International Coordination Efforts
+
+While a full pause has not been achieved, international efforts toward AI governance have accelerated since the 2023 open letter:
+
+<Mermaid client:load chart={`
+flowchart TD
+    LETTER[FLI Open Letter<br/>March 2023] --> BLETCHLEY[UK AI Safety Summit<br/>Bletchley Park Nov 2023]
+    BLETCHLEY --> REPORT[International AI<br/>Safety Report Mandate]
+    BLETCHLEY --> SEOUL[Seoul AI Safety Summit<br/>May 2024]
+
+    REPORT --> BENGIO[Yoshua Bengio<br/>Chairs 30-Nation Panel]
+    BENGIO --> INTERIM[Interim Report<br/>May 2024]
+    INTERIM --> FINAL[Final Report<br/>Paris Feb 2025]
+
+    SEOUL --> COMMITMENTS[Frontier AI Safety<br/>Commitments]
+    SEOUL --> INSTITUTES[International Network<br/>of AI Safety Institutes]
+
+    COMMITMENTS --> VOLUNTARY[16 Companies Sign<br/>Voluntary Commitments]
+    INSTITUTES --> COLLAB[Formalized International<br/>Safety Collaboration]
+
+    style LETTER fill:#e1f5fe
+    style VOLUNTARY fill:#fff3e0
+    style FINAL fill:#e8f5e9
+`} />
+
+| Initiative | Date | Outcome | Limitations |
+|-----------|------|---------|-------------|
+| [UK AI Safety Summit](https://carnegieendowment.org/research/2024/10/the-ai-governance-arms-race-from-summit-pageantry-to-progress) | Nov 2023 | Bletchley Declaration; AI Safety Institute network launched | Non-binding; no enforcement |
+| [International AI Safety Report](https://yoshuabengio.org/2024/06/19/the-international-scientific-report-on-the-safety-of-advanced-ai/) | 2024-2025 | 100 AI experts contributed; comprehensive risk synthesis | Advisory only |
+| [Seoul AI Safety Summit](https://pauseai.info/2024-may) | May 2024 | 16 companies signed voluntary safety commitments | No binding pause agreement |
+| [UN AI Governance](https://press.un.org/en/2025/sgsm22776.doc.htm) | 2024-2025 | International Scientific Panel and Global Dialogue established | Early stage coordination |
+
+## Sources & Resources
+
+### Primary Sources
+
+| Source | Type | Key Contribution |
+|--------|------|------------------|
+| [FLI Open Letter](https://futureoflife.org/open-letter/pause-giant-ai-experiments/) | Open Letter | Original pause proposal with 30,000+ signatories |
+| [MIT Tech Review Analysis](https://www.technologyreview.com/2023/09/26/1080299/six-months-on-from-the-pause-letter/) | Journalism | Six-month retrospective on letter's impact |
+| [Bengio et al. in Science](https://www.science.org/doi/10.1126/science.adn0117) | Academic Paper | "Managing extreme AI risks amid rapid progress" (May 2024) |
+| [International AI Safety Report](https://arxiv.org/abs/2501.17805) | Government Report | 30-nation synthesis of AI safety evidence |
+| [PauseAI](https://pauseai.info/) | Advocacy Org | Grassroots organizing and protest coordination |
+
+### Key Organizations
+
+| Organization | Role | Position |
+|--------------|------|----------|
+| [Future of Life Institute](https://futureoflife.org/) | Advocacy, funding | Strong pause advocate; published open letter |
+| [PauseAI](https://pauseai.info/) | Grassroots activism | International moratorium advocacy |
+| [GovAI](https://www.governance.ai/) | Research | Policy analysis and [internationalization frameworks](https://www.governance.ai/research-paper/what-should-be-internationalised-in-ai-governance) |
+| Major AI Labs | Development | Opposed to pause; signed voluntary commitments only |
+
+### Further Reading
+
+| Resource | Description |
+|----------|-------------|
+| [Yoshua Bengio's Blog](https://yoshuabengio.org/2024/07/09/reasoning-through-arguments-against-taking-ai-safety-seriously/) | "Reasoning through arguments against taking AI safety seriously" |
+| [EA Forum AI Pause Debate](https://forum.effectivealtruism.org/posts/7WfMYzLfcTyDtD6Gn/pause-for-thought-the-ai-pause-debate) | Community discussion of pause arguments |
+| [TIME Interview with Bengio](https://time.com/7339687/yoshua-bengio-ai/) | "We're Not Ready for AI's Risks" |
+| [Carnegie Endowment Analysis](https://carnegieendowment.org/research/2024/10/the-ai-governance-arms-race-from-summit-pageantry-to-progress) | "The AI Governance Arms Race" |
+
+---
+
+## AI Transition Model Context
+
+Pause/moratorium proposals affect the <EntityLink id="ai-transition-model" /> through timeline modification:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="ai-capabilities-trajectory" /> | Development speed | Would directly slow capability advancement |
+| <EntityLink id="safety-capability-gap" /> | Gap width | Buys time for safety research to close gap |
+| <EntityLink id="racing-dynamics" /> | Competitive pressure | Eliminates racing if universally implemented |
+
+A successfully implemented pause would fundamentally alter AI development timelines, providing potentially crucial time for safety research and governance development. However, partial or unilateral implementation may worsen outcomes by shifting development to less safety-conscious actors.

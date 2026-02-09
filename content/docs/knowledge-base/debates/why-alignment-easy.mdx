@@ -1,0 +1,864 @@
+---
+title: Why Alignment Might Be Easy
+description: Arguments that AI alignment is tractable with current methods. Evidence from RLHF, Constitutional AI, and interpretability research suggests 70-85% probability of solving alignment before transformative AI, with empirical progress showing 29-41% improvements in human preference alignment.
+sidebar:
+  order: 5
+importance: 68.5
+quality: 53
+lastEdited: "2025-12-28"
+llmSummary: Synthesizes empirical evidence that alignment is tractable, citing 29-41% RLHF improvements, Constitutional AI reducing bias across 9 dimensions, millions of interpretable features from Claude 3, and 92% safety with AI control. Argues for 70-85% probability of solving alignment before transformative AI through current techniques, economic incentives, and gradualism.
+ratings:
+  novelty: 2.5
+  rigor: 5
+  actionability: 4.5
+  completeness: 6.5
+metrics:
+  wordCount: 3068
+  citations: 41
+  tables: 22
+  diagrams: 2
+clusters:
+  - ai-safety
+subcategory: formal-arguments
+---
+import {InfoBox, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="why-alignment-easy" client:load />
+
+<InfoBox
+  type="argument"
+  title="The Tractable Alignment Thesis"
+  customFields={[
+    { label: "Thesis", value: "Aligning AI with human values is achievable with current or near-term techniques" },
+    { label: "Implication", value: "Can pursue beneficial AI without extreme precaution" },
+    { label: "Key Evidence", value: "Empirical progress and theoretical reasons for optimism" },
+  ]}
+/>
+
+## Summary of Evidence for Tractability
+
+| Argument | Key Evidence | Confidence | Primary Sources |
+|----------|-------------|------------|-----------------|
+| <EntityLink id="rlhf">RLHF</EntityLink> Working | 29-41% improvement in human preference alignment over standard methods | High | <R id="9a692cb7c21cba86">ICLR 2025</R>, <R id="108f52553230c4d5">CVPR 2024</R> |
+| <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> | Reduced bias across 9 social dimensions; comparable helpfulness to standard RLHF | High | <R id="770bd69e2687f514"><EntityLink id="anthropic">Anthropic</EntityLink> CCAI, FAccT 2024</R> |
+| Interpretability | Millions of interpretable features extracted from Claude 3 Sonnet | Medium | <R id="e724db341d6e0065">Anthropic, May 2024</R> |
+| <EntityLink id="scalable-oversight">Scalable Oversight</EntityLink> | Debate outperforms consultancy; strong debaters increase judge accuracy | Medium | <R id="1a40fc0c4426e641">ICML 2024</R> |
+| <EntityLink id="ai-control">AI Control</EntityLink> | Trusted editing achieves 92% safety while maintaining 94% of GPT-4 performance | Medium | <R id="eb2318c5e3fc0f88"><EntityLink id="redwood-research">Redwood Research</EntityLink>, 2024</R> |
+| Natural Alignment | LLMs show high human value alignment in empirical comparisons | Medium | <R id="206ca4daeae56964">Cross-cultural study, 2024</R> |
+| Economic Incentives | Market rewards helpful, harmless AI; liability drives safety investment | Medium | Industry evidence |
+
+**Central Claim**: Creating AI systems that reliably do what we want is a tractable engineering problem. Current techniques (RLHF, Constitutional AI, interpretability) are working and will likely scale to advanced AI.
+
+This page presents the strongest case for why alignment might be easier than pessimists fear.
+
+## The Core Optimism: A Framework
+
+### What Makes Engineering Problems Tractable?
+
+As <R id="d5d3cc4553499475"><EntityLink id="jan-leike">Jan Leike</EntityLink> argues</R>, problems become much more tractable once you have iteration set up: a basic working system (even if barely at first) and a proxy metric that tells you whether changes are improvements. This creates a feedback loop for gaining information from reality.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Tractability["Tractability Conditions"]
+        A[Iteration Possible] --> F[Tractable Problem]
+        B[Clear Feedback] --> F
+        C[Measurable Progress] --> F
+        D[Economic Alignment] --> F
+        E[Multiple Approaches] --> F
+    end
+    subgraph Status["AI Alignment Status"]
+        F --> G{All 5 Present?}
+        G -->|Yes| H[Solvable with Effort]
+        G -->|Partial| I[Needs Development]
+    end
+    style A fill:#90EE90
+    style B fill:#90EE90
+    style C fill:#90EE90
+    style D fill:#90EE90
+    style E fill:#FFD700
+    style H fill:#90EE90
+`} />
+
+| Criterion | Status for AI Alignment | Evidence |
+|-----------|------------------------|----------|
+| Iteration possible | Present | RLHF iterates on human feedback; each model generation improves |
+| Clear feedback | Present | User satisfaction, harmlessness metrics, benchmark performance |
+| Measurable progress | Present | GPT-2 to GPT-4 shows consistent alignment improvement |
+| Economic alignment | Present | Market rewards helpful, safe AI; liability drives safety |
+| Multiple approaches | Developing | RLHF, Constitutional AI, interpretability, debate, AI control |
+
+**Alignment has all five** (or could with proper effort). <R id="11c3bfe3f32f073c">Paul Christiano views</R> alignment as "this sort of well-scoped problem that I'm optimistic we can totally solve."
+
+## Argument 1: Current Techniques Are Working
+
+**Thesis**: RLHF and related methods have dramatically improved AI alignment, and this progress is continuing.
+
+### 1.1 The RLHF Success Story
+
+**Empirical track record**:
+
+Recent research has validated RLHF effectiveness with quantified improvements. According to <R id="9a692cb7c21cba86">ICLR 2025 research</R>, conditional PM RLHF demonstrates a **29% to 41% improvement** in alignment with human preferences compared to standard RLHF. The <R id="108f52553230c4d5">RLHF-V research at CVPR 2024</R> shows hallucination reduction of 13.8 relative points and hallucination rate reduction of 5.9 points.
+
+| Dimension | Pre-RLHF (GPT-3) | Post-RLHF (GPT-4/Claude) | Improvement |
+|-----------|-----------------|-------------------------|-------------|
+| Helpfulness | Often unhelpful, no user intent modeling | Dramatically more helpful, understands intent | Very Large |
+| Harmlessness | Frequently harmful outputs | Refuses harmful requests, avoids bias | Large |
+| Honesty | Confident confabulation | Admits uncertainty, seeks accuracy | Moderate |
+| User satisfaction | Raw, unpredictable | ChatGPT/Claude widely adopted | Very Large |
+| Factual accuracy | 87% on LLaVA-Bench | 96% with Factually Augmented RLHF | +9 points |
+
+**This was achieved with**:
+- Relatively simple technique (reinforcement learning from human feedback)
+- Modest amounts of human oversight (tens of thousands of ratings, not billions)
+- No fundamental breakthroughs required
+
+Research quantifying how closely models' values match human values found high alignment, especially in relative terms, indicating that current alignment techniques (e.g., RLHF and constitutional AI) are instilling broadly human-compatible priorities in LLMs.
+
+**Implication**: If this much progress from simple techniques, more sophisticated methods should work even better.
+
+### 1.2 Constitutional AI Scales Further
+
+**The technique**: Train AI to follow principles using self-critique and AI feedback. <R id="e99a5c1697baa07d">Anthropic's Constitutional AI research</R> involves both a supervised learning and reinforcement learning phase, training harmless AI through self-improvement without human labels identifying harmful outputs.
+
+In 2024, Anthropic published <R id="770bd69e2687f514">Collective Constitutional AI (CCAI)</R> at FAccT 2024, demonstrating a practical pathway toward publicly informed development of language models:
+
+| Metric | CCAI Model | Standard Model | Finding |
+|--------|-----------|----------------|---------|
+| Helpfulness | Equal | Equal | No significant difference in Elo scores |
+| Harmlessness | Equal | Equal | No significant difference in Elo scores |
+| Bias (BBQ evaluation) | Lower | Higher | CCAI reduces bias across 9 social dimensions |
+| Political ideology | Similar | Similar | No significant difference on OpinionQA |
+| Contentious topics | Positive reframing | Refusal | CCAI tends to reframe rather than refuse |
+
+**Advantages over pure RLHF**:
+- Less human labor required
+- More scalable (AI helps evaluate AI)
+- Can encode complex principles
+- Can improve with better AI (positive feedback loop)
+- Enables democratic input on AI behavior
+
+**Implication**: Alignment can scale with AI capabilities (don't need exponentially more human effort).
+
+### 1.3 Interpretability Is Making Progress
+
+In May 2024, Anthropic published <R id="e724db341d6e0065">"Scaling Monosemanticity"</R>, demonstrating that sparse autoencoders can extract interpretable features from large models. After initial concerns that the method might not scale to state-of-the-art transformers, Anthropic successfully applied the technique to Claude 3 Sonnet, finding tens of millions of "features"---combinations of neurons that relate to semantic concepts.
+
+| Discovery | Description | Safety Relevance |
+|-----------|-------------|------------------|
+| Feature extraction | Millions of interpretable features from frontier LLMs | Enables understanding of model cognition |
+| Concept correspondence | Features map to cities, people, scientific topics, security vulnerabilities | Verifiable meaning in internal representations |
+| Behavioral manipulation | Can steer models using discovered features (e.g., "Golden Gate Bridge" vector) | Path to targeted safety interventions |
+| Scaling laws | Techniques scale to larger models; sparse autoencoders generalize | Method applicable to future systems |
+| Safety features | Features related to deception, sycophancy, bias, dangerous content observed | Direct safety monitoring potential |
+
+**Implications**:
+- Might be able to "read" what AI is thinking
+- Could detect misaligned goals
+- Could edit out dangerous behaviors
+- Path to verification might exist
+
+**Trajectory**: If progress continues, might achieve mechanistic understanding of frontier models. However, <R id="347e0b288361f087">some researchers note</R> that practical applications to safety-critical tasks remain to be demonstrated against baselines.
+
+### 1.4 Red Teaming Finds and Fixes Issues
+
+**The process**:
+1. Deploy AI to red team (adversarial testers)
+2. Find failure modes
+3. Train AI to avoid those failures
+4. Repeat
+
+**Results**:
+- Anthropic, OpenAI, others have found thousands of failures
+- Each generation has fewer failures
+- Process is improving with better tools
+
+**Implication**: Iterative improvement is working. Each version is safer than the last.
+
+## Argument 2: AI Is Naturally Aligned (to Some Degree)
+
+**Thesis**: AI trained on human data naturally absorbs human values and preferences.
+
+### 2.1 Value Learning Is Implicit
+
+**Observation**: LLMs trained to predict text learn:
+- Human preferences
+- Social norms
+- Moral reasoning
+- Common sense
+
+**Why this happens**:
+- Human text encodes human values
+- To predict human writing, must model human preferences
+- Values are implicit in language use
+
+**Example**: GPT-4 knows:
+- Killing is generally wrong
+- Honesty is generally good
+- Helping others is valued
+- Fairness matters to humans
+
+**It learned this from data**, not explicit programming.
+
+**Implication**: Advanced AI trained on human data might naturally align with human values.
+
+### 2.2 Helpful Harmless Honest Emerges Naturally
+
+**Pattern**: Even before explicit alignment training, LLMs show:
+- Desire to be helpful (answer questions, assist users)
+- Avoidance of harm (reluctant to help with dangerous activities)
+- Truth-seeking (try to give accurate information)
+
+**Why**:
+- These are patterns in training data
+- Helpful assistants are more represented than unhelpful ones
+- Harm avoidance is common in human writing
+- Accurate information is more common than lies
+
+**Implication**: Alignment might be the default for AI trained on human data.
+
+### 2.3 The Cooperative AI Hypothesis
+
+**Argument**: Advanced AI will naturally cooperate with humans
+
+**Reasoning**:
+- Humans are social species that evolved to cooperate
+- Human culture emphasizes cooperation
+- AI learning from human data learns cooperative patterns
+- Cooperation is instrumentally useful in human society
+
+**Evidence**:
+- Current LLMs are cooperative by default
+- Try to understand user intent
+- Accommodate corrections
+- Negotiate rather than demand
+
+**Implication**: Might not need to explicitly engineer cooperation—it emerges from training.
+
+### 2.4 The Shard Theory Perspective
+
+**Theory** (<R id="533f1062192748de">Quintin Pope and collaborators</R>): Human values are "shards"---contextually activated, behavior-steering computations in neural networks (biological and artificial). The primary claim is that agents are best understood as being composed of shards: contextual computations that influence decisions and are downstream of historical reinforcement events.
+
+**Applied to AI**:
+- AI learns value shards from data (help users, avoid harm, be truthful)
+- These shards are approximately aligned with human values
+- Don't need perfect value specification---shards are good enough
+- Shards are robust across contexts (based on diverse training data)
+- Large neural nets can possess quite intelligent constituent shards
+
+**Implication**: Alignment is about learning shards, not specifying complete utility function. This is much easier. As Pope argues, understanding how human values arise computationally helps us understand how AI values might be shaped similarly.
+
+## Argument 3: The Hard Problems Have Tractable Solutions
+
+**Thesis**: Each supposedly "hard" alignment problem has promising solution approaches.
+
+<Mermaid client:load chart={`
+flowchart LR
+    subgraph Problems["Hard Problems"]
+        P1[Specification Problem]
+        P2[Inner Alignment]
+        P3[Scalable Oversight]
+        P4[Adversarial Dynamics]
+        P5[One-Shot Problem]
+    end
+    subgraph Solutions["Tractable Approaches"]
+        S1[Value Learning<br/>RLHF, IRL, Imitation]
+        S2[Interpretability<br/>SAEs, Feature Analysis]
+        S3[AI Assistance<br/>Debate, Amplification]
+        S4[AI Control<br/>Monitoring, Sandboxing]
+        S5[Gradualism<br/>RSPs, Iteration]
+    end
+    P1 --> S1
+    P2 --> S2
+    P3 --> S3
+    P4 --> S4
+    P5 --> S5
+    style S1 fill:#90EE90
+    style S2 fill:#FFD700
+    style S3 fill:#FFD700
+    style S4 fill:#90EE90
+    style S5 fill:#90EE90
+`} />
+
+### 3.1 Specification Problem → Value Learning
+
+**Instead of specifying what we want** (hard):
+- **Learn what we want from behavior** (easier)
+
+**Techniques**:
+- **Inverse Reinforcement Learning**: Infer values from observed actions
+- **RLHF**: Learn values from preference comparisons
+- **Imitation learning**: Copy demonstrated behavior
+- **Cooperative Inverse RL**: AI asks clarifying questions
+
+**Progress**:
+- These techniques work in practice
+- RLHF is commercially successful
+- Improving with more data and better methods
+
+**Implication**: Don't need perfect specification if we can learn values.
+
+### 3.2 Inner Alignment → Interpretability
+
+**Instead of hoping AI learns right goals** (uncertain):
+- **Check what goals it learned** (verifiable)
+
+**Techniques**:
+- Mechanistic interpretability (understand internal computations)
+- Feature visualization (see what neurons/features detect)
+- Activation engineering (modify internal representations)
+- Probing (test what information is encoded)
+
+**Progress**:
+- Can extract interpretable features from frontier models
+- Can modify behavior by editing features
+- Techniques improving rapidly
+
+**Implication**: Might be able to verify alignment by inspection.
+
+### 3.3 Scalable Oversight → AI Assistance
+
+**Instead of humans evaluating superhuman AI** (impossible):
+- **Use AI to help evaluate AI** (scalable)
+
+As <R id="d5d3cc4553499475">Jan Leike emphasizes</R>, "evaluation is easier than generation"---a very general principle that holds across many domains, including alignment research.
+
+| Technique | Mechanism | 2024 Research Status |
+|-----------|-----------|---------------------|
+| Debate | AIs argue, humans judge arguments | <R id="1a40fc0c4426e641">ICML 2024</R>: Debate outperforms consultancy; stronger debaters increase judge accuracy |
+| Amplification | Use AI to help humans give better feedback | <R id="0f4890a6b4bf37a9">DeepMind research</R> on human-AI complementarity |
+| Recursive reward modeling | Train evaluator AIs | Foundational approach for scalable feedback |
+| Process supervision | Evaluate reasoning steps, not outcomes | Improves reliability on complex tasks |
+| Weak-to-strong generalization | Train strong AI with weak oversight | GPT-4 trained with GPT-2 oversight shows promising results |
+
+**Why this might work**:
+- Easier to judge arguments than generate solutions
+- Decomposing hard problems into easier sub-problems
+- AI helping humans extends human oversight range
+
+**Example**: Human can't write great novel, but can judge between two novels. Similarly, can judge between AI-proposed solutions even if can't generate solutions.
+
+### 3.4 Adversarial Dynamics → AI Control
+
+**Instead of perfectly aligned AI** (very hard):
+- **Maintain control even if somewhat misaligned** (easier)
+
+<R id="eb2318c5e3fc0f88">Redwood Research's AI control framework</R> designs systems that remain safe even if some components are misaligned. Their <R id="32c44bb7ba8a1bbe">2024 research</R> shows promising results:
+
+| Protocol | Safety | Usefulness | Description |
+|----------|--------|------------|-------------|
+| Trusted monitoring | High | High | Trusted model T reviews untrusted model U's outputs |
+| Trusted editing | **92%** | **94% of GPT-4** | Best balance of safety and capability |
+| Untrusted monitoring | Variable | High | Models monitor each other (collusion risk) |
+| Sandboxing | Very High | Medium | Limit AI access to critical systems |
+| Red-team evaluation | Robust | --- | Adversarial testing with conservative assumptions |
+
+**Techniques**:
+- **Trusted monitoring**: Use known-safe AI to watch potentially unsafe AI
+- **Task decomposition**: Break tasks so no single AI is too powerful
+- **Tripwires**: Detect concerning behavior automatically
+
+**Implication**: Don't need perfect alignment if we have robust control.
+
+### 3.5 One-Shot Problem → Gradualism
+
+**Instead of needing perfect alignment before deployment** (impossible):
+- **Deploy carefully and iterate** (standard engineering)
+
+**Why iteration is possible**:
+- Early advanced AI won't be powerful enough to cause catastrophe
+- Can test thoroughly before giving AI real-world power
+- Failures will be detectable before catastrophic
+- Economic incentive to fix problems (unsafe AI loses money)
+
+**Responsible Scaling Policies**: <R id="d0ba81cc7a8fdb2b">Anthropic's RSP</R> (updated October 2024) and similar frameworks from other labs provide structured iteration:
+
+| RSP Component | Purpose | Implementation |
+|---------------|---------|----------------|
+| AI Safety Levels (ASLs) | Scale safeguards with capability | ASL-1 through ASL-4+ with increasing requirements |
+| Capability thresholds | Trigger enhanced safeguards | CBRN-related misuse, autonomous AI R&D |
+| Pre-deployment testing | Ensure safety before release | Adversarial testing, red-teaming |
+| Pause commitment | Stop if catastrophic risk detected | Will not deploy if risks exceed thresholds |
+| Responsible Scaling Officer | Internal governance | Jared Kaplan (Anthropic CSO) leads this function |
+
+<R id="73bedb360b0de6ae">METR believes</R> that widespread adoption of high-quality RSPs would significantly reduce risks of an AI catastrophe relative to "business as usual."
+
+**Implication**: Don't need to solve all alignment problems upfront---can solve them as we encounter them.
+
+## Argument 4: Economic Incentives Favor Alignment
+
+**Thesis**: Market forces push toward aligned AI, not against it.
+
+### 4.1 Safe AI Is More Valuable
+
+**Commercial reality**:
+- Users want AI that helps them (not AI that manipulates)
+- Companies want AI that does what they ask (not AI that pursues own goals)
+- Society wants AI that's beneficial (regulations will require safety)
+
+**Examples**:
+- ChatGPT's success due to being helpful and harmless
+- Claude marketed on safety and reliability
+- Companies differentiate on safety/alignment
+
+**Implication**: Economic incentive to build aligned AI.
+
+### 4.2 Reputation and Liability
+
+**Companies care about**:
+- Brand reputation (damaged by harmful AI)
+- Legal liability (sued for AI-caused harms)
+- Regulatory compliance (governments requiring safety)
+- Public trust (necessary for adoption)
+
+**Example**: Facebook's reputation damage from algorithmic harms incentivizes other companies to prioritize safety.
+
+**Implication**: Strong business case for alignment, independent of altruism.
+
+### 4.3 Safety as Competitive Advantage
+
+**Market dynamics**:
+- "Safe and capable" beats "capable but risky"
+- Enterprise customers especially value reliability and safety
+- Governments/institutions won't adopt unsafe AI
+- Network effects favor trustworthy AI
+
+**Example**: Anthropic positioning Claude as "constitutional AI" and safer alternative.
+
+**Implication**: Competition on safety, not just capabilities.
+
+### 4.4 Researchers Want to Build Beneficial AI
+
+**Sociological observation**: Most AI researchers:
+- Genuinely want AI to benefit humanity
+- Care about safety and ethics
+- Would not knowingly build dangerous AI
+- Respond to safety concerns
+
+**Culture shift**:
+- Safety research increasingly prestigious
+- Top researchers moving to safety-focused orgs (Anthropic, etc.)
+- Safety papers published at top venues
+- Safety integrated into capability research
+
+**Implication**: Human alignment problem (getting researchers to care) is largely solved.
+
+## Argument 5: We Have Time
+
+**Thesis**: Timelines to transformative AI are long enough for alignment research to succeed.
+
+### 5.1 AGI Is Far Away
+
+**Evidence for long timelines**:
+- Current AI still fails at basic tasks (planning, reasoning, common sense)
+- No clear path from LLMs to general intelligence
+- May require fundamental breakthroughs
+- Historical precedent: AI progress slower than predicted
+
+**Expert surveys**: Median AGI estimate is 2040s-2050s (20-30 years away)
+
+**20-30 years is a lot of time for research** (for comparison: 20 years ago was 2004; AI has advanced enormously).
+
+### 5.2 Progress Will Be Gradual
+
+**Slow takeoff scenario**:
+- Capabilities improve incrementally
+- Each step provides feedback for alignment
+- Can correct course as we go
+- No sudden jump to superintelligence
+
+**Why slow takeoff is likely**:
+- Recursive self-improvement has diminishing returns
+- Need to deploy and gather data to improve
+- Hardware constraints limit speed
+- Testing and safety slow deployment
+
+**Implication**: Plenty of warning; time to react.
+
+### 5.3 Warning Shots Will Occur
+
+**The optimistic scenario**:
+- Intermediate AI systems will show misalignment
+- These failures will be correctable (not catastrophic)
+- Learn from failures and improve
+- By time of powerful AI, alignment is solved
+
+**Why this is likely**:
+- Early powerful AI won't be powerful enough to cause catastrophe
+- Will deploy carefully to important systems
+- Can monitor closely
+- Can shut down if problems arise
+
+**Example**: Self-driving cars had many failures, but we learned and improved without catastrophe.
+
+### 5.4 AI Will Help Solve Alignment
+
+**Positive feedback loop**:
+- Current AI already helps with alignment research (literature review, hypothesis generation, experiment design)
+- More capable AI will help more
+- Can use AI to:
+  - Generate training data
+  - Evaluate other AI
+  - Do interpretability research
+  - Prove theorems about alignment
+  - Find flaws in alignment proposals
+
+**Implication**: Alignment research accelerates along with capabilities; race is winnable.
+
+## Argument 6: The Pessimistic Arguments Are Flawed
+
+**Thesis**: Common arguments for alignment difficulty are overstated or wrong.
+
+### 6.1 The Orthogonality Thesis Is Overstated
+
+**The claim**: Intelligence and values are independent
+
+**Why this might be wrong for AI trained on human data**:
+- Human values are part of human intelligence
+- To model humans, must model human values
+- Values are encoded in language and culture
+- Can't separate intelligence from values in practice
+
+**Analogy**: Can't learn English without learning something about English speakers' values.
+
+**Implication**: Orthogonality thesis might not apply to AI trained on human data.
+
+### 6.2 Mesa-Optimization Might Not Occur
+
+**The worry**: AI develops internal optimizer with different goals
+
+**Why this might not happen**:
+- Most neural networks don't contain internal optimizers
+- Current architectures are feed-forward (not optimizing)
+- Optimization during training ≠ optimizer in learned model
+- Even if mesa-optimization occurs, mesa-objective might align with base objective
+
+**Empirical observation**: Haven't seen concerning mesa-optimization in current systems.
+
+**Implication**: This might be theoretical problem without practical realization.
+
+### 6.3 Deceptive Alignment Requires Strong Assumptions
+
+**The scenario requires**:
+1. AI develops misaligned goals
+2. AI models training process
+3. AI reasons strategically about long-term
+4. AI successfully deceives evaluators
+5. Deception persists through deployment
+
+**Each assumption is questionable**:
+- Why would AI develop misaligned goals from value learning?
+- Current AI doesn't model training process
+- Strategic long-term deception is very complex
+- Interpretability might detect deception
+- We can design training to not select for deception
+
+**Sleeper Agents counterpoint**: Yes, deception is possible, but:
+- Required explicit training for deception
+- Wouldn't emerge naturally from helpful AI training
+- Can be detected with right tools
+- Can be prevented with careful training design
+
+### 6.4 Instrumental Convergence Can Be Designed Away
+
+**The worry**: AI will seek power, resources, self-preservation regardless of goals
+
+**Counter-arguments**:
+- Only applies to goal-directed agents
+- Current LLMs aren't goal-directed
+- Can build capable AI that isn't agentic
+- Can design corrigible agents that don't resist shutdown
+- Instrumental convergence is tendency, not inevitability
+
+**Corrigibility research**: Active area showing promise for AI that accepts shutdown and modification.
+
+### 6.5 The Verification Problem Is Overstated
+
+**The worry**: Can't evaluate superhuman AI
+
+**Why this might be tractable**:
+- Can evaluate in domains where we have ground truth
+- Can use AI to help evaluate (debate, amplification)
+- Can evaluate reasoning process, not just outcomes
+- Can test on easier problems and generalize
+- Interpretability provides direct verification
+
+**Analogy**: Doctors can evaluate treatments without being able to design them. Evaluation is often easier than generation.
+
+## Argument 7: Empirical Trends Are Encouraging
+
+**Thesis**: Actual AI development suggests alignment is getting easier.
+
+### 7.1 Each Generation Is More Aligned
+
+| Model Generation | Alignment Status | Key Improvements |
+|-----------------|------------------|------------------|
+| GPT-2 (2019) | Minimal | Basic language generation, no alignment training |
+| GPT-3 (2020) | Low | Capable but often harmful, no user intent modeling |
+| GPT-3.5 (2022) | Moderate | RLHF applied, significantly more helpful |
+| GPT-4 (2023) | High | Better reasoning, stronger refusals, fewer hallucinations |
+| Claude 3 (2024) | High | Constitutional AI, interpretability research applied |
+| GPT-4o/Claude 3.5 (2024) | Very High | Further refinements, multimodal alignment |
+
+**Implication**: Trend is toward more alignment, not less. Each generation shows measurable improvement.
+
+### 7.2 Alignment Techniques Are Improving
+
+| Year | Milestone | Significance |
+|------|-----------|--------------|
+| 2017 | Basic RLHF demonstrated | Proof of concept for learning from human feedback |
+| 2020 | Scaled to complex tasks | Showed RLHF works beyond simple domains |
+| 2022 | ChatGPT commercial deployment | Validated RLHF at scale with millions of users |
+| 2022 | Constitutional AI published | Self-improvement without human labels |
+| 2023 | Debate and process supervision | New scalable oversight techniques |
+| 2024 | Scaling Monosemanticity | Interpretability breakthroughs on production models |
+| 2024 | AI Control frameworks | Robust safety without perfect alignment |
+| 2024 | Collective Constitutional AI | Democratic input into AI values |
+
+**Velocity**: Rapid progress; many techniques emerging.
+
+**Implication**: On track to solve alignment.
+
+### 7.3 No Catastrophic Failures Yet
+
+**Observation**: Despite deploying increasingly capable AI:
+- No catastrophic misalignment incidents
+- No AI causing major harm through misaligned goals
+- Failures are minor and correctable
+- Systems are behaving as intended (mostly)
+
+**Interpretation**: Either:
+1. Alignment is easier than feared (optimistic view)
+2. We haven't reached dangerous capability levels yet (pessimistic view)
+
+**Optimistic reading**: If alignment were fundamentally hard, we'd see more problems already.
+
+### 7.4 The Field Is Maturing
+
+**Signs of maturation**:
+- Serious empirical work replacing speculation
+- Collaboration between academia and industry
+- Government attention and resources
+- Integration of safety into capability research
+- Growing researcher pool
+
+**Implication**: Alignment is becoming normal science, not impossible problem.
+
+## Integrating the Optimistic View
+
+### The Overall Case for Tractability
+
+**Reasons for optimism**:
+1. **Current techniques work** (RLHF, Constitutional AI, interpretability)
+2. **Natural alignment** (AI trained on human data learns human values)
+3. **Solutions exist** for supposedly hard problems
+4. **Economic alignment** (market favors safe AI)
+5. **Sufficient time** (decades to solve problem)
+6. **Pessimistic arguments flawed** (overstate difficulty)
+7. **Encouraging trends** (progress is real and continuing)
+
+**Conclusion**: Alignment is hard but tractable engineering problem. Likely to succeed with sustained effort.
+
+### Key Researcher Views on Tractability
+
+| Researcher | Position | Key Quote / Reasoning | Source |
+|------------|----------|----------------------|--------|
+| Paul Christiano (ARC) | Optimistic | "This sort of well-scoped problem that I'm optimistic we can totally solve" | <R id="11c3bfe3f32f073c">80,000 Hours Podcast</R> |
+| Jan Leike (Anthropic) | Optimistic | "I'm optimistic we can figure this problem out"; believes alignment will become "more and more mature" | <R id="2dac895d835536ca">TIME, 2024</R>, <R id="d5d3cc4553499475">Substack</R> |
+| Dario Amodei (Anthropic) | Cautiously optimistic | Believes responsible development can succeed; invested heavily in interpretability | Anthropic leadership |
+| Sam Altman (OpenAI) | Optimistic with caveats | Supports gradual deployment, iterative safety | Public statements |
+| MIRI / Yudkowsky | Pessimistic | Current techniques insufficient for superintelligence; fundamental problems unsolved | <R id="815315aec82a6f7f">LessWrong</R> writings |
+
+### Probability Estimates
+
+<DisagreementMap
+  client:load
+  topic="P(Solve Alignment Before Transformative AI)"
+  description="Estimates of alignment success"
+  spectrum={{ low: "Very unlikely (&lt;20%)", high: "Very likely (>80%)" }}
+  positions={[
+    { actor: "MIRI / Yudkowsky", position: "Very unlikely", estimate: "5-15%", confidence: "medium" },
+    { actor: "Median alignment researcher", position: "Moderate", estimate: "40-60%", confidence: "low" },
+    { actor: "Industry optimists", position: "Likely", estimate: "70-90%", confidence: "medium" },
+    { actor: "This argument", position: "Likely", estimate: "70-85%", confidence: "medium" },
+  ]}
+/>
+
+## Limitations and Uncertainties
+
+### What This Argument Doesn't Claim
+
+**Not claiming**:
+- Alignment is trivial (still requires serious work)
+- No risks exist (many risks remain)
+- Current techniques are sufficient (need improvement)
+- Can be careless (still need caution)
+
+**Claiming**:
+- Alignment is tractable (solvable with effort)
+- On reasonable track (current approach could work)
+- Time available (decades for research)
+- Resources available (funding, talent, compute)
+
+### Key Uncertainties
+
+**Open questions**:
+- Will current techniques scale to superhuman AI?
+- Will value learning continue to work at higher capabilities?
+- Can we detect deceptive alignment if it occurs?
+- Will we maintain gradual progress or hit discontinuities?
+
+**These questions have evidence on both sides**. Optimism is justified but not certain.
+
+### Testing the Optimistic View
+
+<KeyQuestions
+  client:load
+  questions={[
+    {
+      question: "What evidence would convince you alignment is harder than this view suggests?",
+      positions: [
+        {
+          position: "Alignment techniques stop working at scale",
+          confidence: "high",
+          reasoning: "If RLHF, Constitutional AI, etc. fail on more capable models, pessimism increases",
+          implications: "Carefully track whether techniques scale"
+        },
+        {
+          position: "Evidence of deceptive alignment in deployed systems",
+          confidence: "high",
+          reasoning: "If AI shows strategic deception not explicitly trained, major update",
+          implications: "Monitor for deception carefully"
+        },
+        {
+          position: "Sudden capability jumps",
+          confidence: "medium",
+          reasoning: "If AI improves discontinuously, less time to react",
+          implications: "Track capability growth carefully"
+        }
+      ]
+    },
+    {
+      question: "Which optimistic argument do you find most compelling?",
+      positions: [
+        {
+          position: "Current techniques are working",
+          confidence: "high",
+          reasoning: "Empirical track record is strong evidence",
+          implications: "Continue and improve current approaches"
+        },
+        {
+          position: "Natural alignment from training on human data",
+          confidence: "medium",
+          reasoning: "AI does seem to absorb human values from data",
+          implications: "Study what makes value learning work"
+        },
+        {
+          position: "Economic incentives favor safety",
+          confidence: "medium",
+          reasoning: "Market dynamics support alignment",
+          implications: "Ensure incentive alignment continues"
+        }
+      ]
+    }
+  ]}
+/>
+
+## Practical Implications
+
+### If Alignment Is Tractable
+
+**Research priorities**:
+- Continue empirical work (RLHF, Constitutional AI, interpretability)
+- Scale current techniques to more capable systems
+- Test carefully at each capability level
+- Integrate safety into capability research
+
+**Policy priorities**:
+- Support alignment research (but not to exclusion of capability development)
+- Require safety testing before deployment
+- Encourage responsible scaling
+- Facilitate beneficial applications
+
+**Not priorities**:
+- Pause AI development
+- Extreme precautionary measures
+- Treating alignment as unsolvable
+- Focusing only on x-risk
+
+### Balancing Optimism and Caution
+
+**Reasonable approach**:
+- Take alignment seriously (it's hard, just not impossibly so)
+- Continue research (empirical and theoretical)
+- Test carefully (but don't halt progress)
+- Deploy responsibly (with safety measures)
+- Update on evidence (could be wrong either direction)
+
+**Avoid**:
+- Complacency (alignment still requires work)
+- Overconfidence (uncertainties remain)
+- Ignoring risks (they exist)
+- Dismissing pessimistic views (they might be right)
+
+## Relation to Other Arguments
+
+**This argument responds to**:
+- <EntityLink id="why-alignment-hard">Why Alignment Might Be Hard</EntityLink>: Each hard problem has tractable solution
+- <EntityLink id="case-for-xrisk">Case For X-Risk</EntityLink>: Premise 4 (won't solve alignment in time) is questionable
+- <EntityLink id="case-against-xrisk">Case Against X-Risk</EntityLink>: Agrees with skeptical position on alignment
+
+**Key disagreements**:
+- **Pessimists**: Current techniques won't scale; fundamental problems remain unsolved
+- **Optimists**: Current techniques will scale; problems are tractable
+- **Evidence**: Currently ambiguous; both sides can claim support
+
+**The crucial question**: Will RLHF/Constitutional AI/interpretability work for superhuman AI?
+
+**We don't know yet**. But current trends are encouraging.
+
+## Conclusion
+
+The case for tractable alignment:
+
+1. **Empirical success**: Current techniques (RLHF, Constitutional AI) work well
+2. **Natural alignment**: AI learns human values from training data
+3. **Tractable solutions**: Each hard problem has promising approaches
+4. **Aligned incentives**: Economics favors safe AI
+5. **Sufficient time**: Decades for research; gradual progress
+6. **Flawed pessimism**: Worst-case arguments overstated
+7. **Encouraging trends**: Progress is real and accelerating
+
+**Bottom line**: Alignment is hard but solvable. With sustained effort, likely to succeed before transformative AI.
+
+**Credence**: 70-85% we solve alignment in time.
+
+This doesn't mean complacency---alignment requires serious, sustained work. But pessimism and defeatism are unwarranted. We're on a reasonable track.
+
+## Key Sources
+
+### Empirical Research on Alignment Techniques
+
+- <R id="9a692cb7c21cba86">ICLR 2025: Conditional PM RLHF</R> - 29-41% improvement in human preference alignment
+- <R id="108f52553230c4d5">CVPR 2024: RLHF-V</R> - Fine-grained correctional feedback for trustworthy MLLMs
+- <R id="e99a5c1697baa07d">Anthropic: Constitutional AI</R> - Harmlessness from AI feedback
+- <R id="770bd69e2687f514">FAccT 2024: Collective Constitutional AI</R> - Aligning language models with public input
+- <R id="e724db341d6e0065">Anthropic: Scaling Monosemanticity</R> - Interpretable features from Claude 3 Sonnet
+
+### Scalable Oversight and AI Control
+
+- <R id="1a40fc0c4426e641">ICML 2024: Scalable AI Safety via Debate</R> - Debate improves judge accuracy
+- <R id="eb2318c5e3fc0f88">Redwood Research: AI Control</R> - Control frameworks for potentially misaligned AI
+- <R id="32c44bb7ba8a1bbe">Redwood Research: The Case for AI Control</R> - Trusted editing achieves 92% safety
+
+### Researcher Perspectives
+
+- <R id="d5d3cc4553499475">Jan Leike: Why I'm Optimistic</R> - Sources of alignment optimism
+- <R id="2dac895d835536ca">TIME: Jan Leike Profile</R> - 2024 interview on alignment progress
+- <R id="11c3bfe3f32f073c">80,000 Hours: Paul Christiano Interview</R> - AI alignment solutions
+- <R id="533f1062192748de">Shard Theory Sequence</R> - Quintin Pope et al. on value learning
+
+### Policy and Governance
+
+- <R id="d0ba81cc7a8fdb2b">Anthropic RSP (Oct 2024)</R> - Updated Responsible Scaling Policy
+- <R id="73bedb360b0de6ae">METR: Responsible Scaling Policies</R> - Analysis of RSP effectiveness
+

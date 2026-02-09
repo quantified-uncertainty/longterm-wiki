@@ -1,0 +1,210 @@
+---
+title: "Critical Insights"
+description: "Framework for identifying high-value knowledge contributions: surprising, important, and compact"
+sidebar:
+  order: 5
+importance: 22.5
+quality: 56
+llmSummary: "Proposes a framework for evaluating knowledge contributions as 'critical insights' based on three criteria: surprising (updates informed beliefs), important (affects high-stakes decisions), and compact (transmissible in brief form). Draws on information theory (surprisal = -log₂(p)), decision theory (value of information), and research debt concepts to justify prioritizing novel, decision-relevant, and concise claims."
+ratings:
+  focus: 8.5
+  novelty: 3
+  rigor: 5.5
+  completeness: 7
+  concreteness: 6
+  actionability: 4.5
+metrics:
+  wordCount: 970
+  citations: 18
+  tables: 6
+  diagrams: 0
+---
+import { Aside, Badge } from '@astrojs/starlight/components';
+
+A **Critical Insight** is a piece of knowledge that is **surprising**, **important**, and **compact**. This framework helps identify and prioritize the highest-value contributions to understanding—the kind of insights that genuinely shift how informed people think about a problem.
+
+<Aside type="tip" title="Why This Matters for LongtermWiki">
+LongtermWiki aims to be more than a wiki. The Critical Insight framework helps distinguish between content that merely documents existing knowledge versus content that genuinely moves the needle on how people reason about AI safety priorities.
+</Aside>
+
+---
+
+## The Three Criteria
+
+| Criterion | Definition | Test |
+|-----------|------------|------|
+| **Surprising** | Updates beliefs of informed people | Would an AI safety researcher's credences shift after learning this? |
+| **Important** | Affects high-stakes decisions | Does this change what funders/researchers should prioritize? |
+| **Compact** | Claim + key evidence fits briefly | Can you convey the core insight and its justification in a few sentences? |
+
+### Surprising
+
+An insight is surprising if learning it would cause an informed person to update their beliefs. This isn't about being novel to complete beginners—it's about genuinely new information or synthesis that even domain experts haven't fully internalized.
+
+**Examples:**
+- "AI labs spend more on lobbying than safety research" (if true and documented)
+- "The top 3 interpretability researchers all left academia for industry in 2024"
+- A rigorous estimate that contradicts conventional wisdom
+
+**Non-examples:**
+- "AI capabilities are advancing quickly" (widely known)
+- "Alignment is hard" (already consensus among target audience)
+
+### Important
+
+An insight is important if it affects decisions with significant consequences. In the AI safety context, this means influencing:
+- Where funding should go
+- What research directions to prioritize
+- Which policy interventions to pursue
+- How to assess different risk scenarios
+
+Importance can be estimated roughly by asking: "If key decision-makers believed this, would their actions change?"
+
+### Compact
+
+The compactness criterion is not about brevity for its own sake—it's about **transmissibility and verifiability**. An insight that requires reading thousands of pages to appreciate isn't actionable for most decision-makers.
+
+<Aside type="note" title="Why Compactness Matters">
+This prevents the failure mode of "brilliant insights if you just read my 500-page thesis." If the core claim and its key supporting evidence can't be summarized briefly, either the insight isn't sharp enough yet, or it may not be a single insight but many.
+</Aside>
+
+The claim and its main evidence should fit in a short paragraph. This doesn't mean the full analysis must be brief—supporting details, methodology, and caveats can be extensive—but the core contribution should be extractable.
+
+---
+
+## Theoretical Foundations
+
+The Critical Insight framework draws on concepts from multiple disciplines.
+
+### Information Theory: Surprisal
+
+Claude Shannon's [information theory](https://en.wikipedia.org/wiki/Information_theory) formalized the intuition that **information content is inversely related to probability**. The "surprisal" of an event is measured as:
+
+```
+Information (bits) = -log₂(probability)
+```
+
+A fair coin landing heads carries 1 bit of information. A biased coin (90% heads) landing heads carries only 0.15 bits—because it's less surprising.
+
+**Application to insights:** A claim that most informed people already believe (high prior probability) carries little information. The goal is to find claims that are both true and would update priors significantly.
+
+### Machine Learning: Information Gain
+
+In decision tree algorithms, [information gain](https://en.wikipedia.org/wiki/Information_gain_(decision_tree)) measures how much a feature reduces uncertainty about a target variable. Features are selected based on their ability to **split the data in informative ways**.
+
+**Application to insights:** The most valuable research questions are those whose answers would most reduce uncertainty about important decisions—analogous to selecting the highest-information-gain feature.
+
+### Statistics: Parsimony and Model Selection
+
+The [Akaike Information Criterion (AIC)](https://en.wikipedia.org/wiki/Akaike_information_criterion) and [Bayesian Information Criterion (BIC)](https://en.wikipedia.org/wiki/Bayesian_information_criterion) formalize Occam's razor: models should balance fit against complexity. Both penalize additional parameters.
+
+> "All things equal, we should prefer the simpler model over any more complex alternative. This is known as the 'principle of parsimony.'"
+
+**Application to insights:** Compact insights are preferable because they're easier to verify, communicate, and act upon. A theory that explains the same phenomena with fewer moving parts is more robust.
+
+### Decision Theory: Value of Information
+
+[Value of Information (VOI) analysis](https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1001882) provides a formal framework for research prioritization:
+
+> "VOI quantifies the expected benefit from acquiring additional evidence to inform a decision. The value of a study is the extent to which it reduces uncertainty, thus potentially reducing errors in decision-making."
+
+Key VOI concepts:
+- **Expected Value of Perfect Information (EVPI)**: The maximum you should pay to eliminate all uncertainty
+- **Expected Value of Partial Perfect Information (EVPPI)**: Value of resolving uncertainty on specific parameters
+- **Expected Value of Sample Information (EVSI)**: Value of a specific study with realistic sample sizes
+
+**Application to insights:** The "importance" criterion corresponds to high VOI—insights that would significantly change optimal decisions if known.
+
+### Research Debt and Distillation
+
+Distill.pub's concept of [Research Debt](https://distill.pub/2017/research-debt/) identifies a systematic underinvestment in explanation:
+
+> "Research debt is the accumulation of missing interpretive labor. The maintainable size of a field is controlled by how members trade off energy between communicating and understanding."
+
+The economics favor explanation: in one-to-many communication, the cost of explaining is O(1) while the cost of understanding across N people is O(N). Yet incentives typically reward producing new results over clarifying existing ones.
+
+**Application to insights:** Compact insights reduce research debt. They make knowledge more transmissible, expanding the "carrying capacity" of a field.
+
+---
+
+## Practical Example: Fermi Model Competition
+
+The [Fermi Model Competition](https://www.lesswrong.com/posts/AA8GJ7Qc6ndBtJxv7/usd300-fermi-model-competition) on LessWrong illustrates similar principles. Entries are judged on:
+
+| Criterion | Weight | Description |
+|-----------|--------|-------------|
+| **Surprise** | 40% | How much does learning the answer update your views? |
+| **Topic Relevance** | 20% | Is the question decision-relevant? |
+| **Robustness** | 20% | How confident are we in the result? |
+| **Model Quality** | 20% | Is the analysis well-constructed? |
+
+Note that **surprise carries the highest weight**—twice that of any other criterion. This reflects the insight that novelty (in the information-theoretic sense) is the scarcest ingredient.
+
+<Aside type="tip" title="Competition Link">
+[Fermi Model Competition Details →](https://www.lesswrong.com/posts/AA8GJ7Qc6ndBtJxv7/usd300-fermi-model-competition)
+</Aside>
+
+---
+
+## Application to LongtermWiki
+
+LongtermWiki content can be evaluated against the Critical Insight framework:
+
+| Content Type | How to Apply Framework |
+|--------------|------------------------|
+| **Knowledge Base pages** | Does this synthesize information in ways that would update an AI safety researcher? |
+| **Crux Maps** | Are the identified cruxes genuinely decision-relevant, or just interesting? |
+| **Estimates** | Would this quantification surprise informed readers? |
+| **Research Reports** | Can the key findings be stated compactly? |
+
+### Prioritizing Content Creation
+
+When deciding what to work on:
+
+1. **Surprising + Important + Compact** → Highest priority
+2. **Surprising + Important** → Worth pursuing if compactness can be achieved
+3. **Important but not surprising** → Reference material (useful but not differentiated)
+4. **Surprising but not important** → Interesting trivia (low priority)
+
+### Testing for Critical Insights
+
+**Opinion Fuzzing** can operationalize the "surprising" criterion:
+- Present the insight to LLMs or informed readers
+- Measure whether their stated credences shift
+- Track which claims actually update beliefs vs. which just restate conventional wisdom
+
+---
+
+## Related Concepts
+
+| Concept | Relationship to Critical Insights |
+|---------|-----------------------------------|
+| **Cruxes** | Cruxes are belief differences; critical insights resolve them |
+| **Value of Information** | Formal measure of what "important" means |
+| **Bits of evidence** | Information-theoretic measure of "surprising" |
+| **Minimum Description Length** | Formal approach to "compact" |
+| **Research distillation** | Process of making insights more compact |
+
+---
+
+## Sources
+
+### Information Theory
+- [Information Theory - Wikipedia](https://en.wikipedia.org/wiki/Information_theory)
+- [Information Content - Wikipedia](https://en.wikipedia.org/wiki/Information_content)
+- [Information is Surprise - Plus Magazine](https://plus.maths.org/content/information-surprise)
+
+### Machine Learning
+- [Information Gain - Machine Learning Mastery](https://machinelearningmastery.com/information-gain-and-mutual-information/)
+- [Information Gain (Decision Tree) - Wikipedia](https://en.wikipedia.org/wiki/Information_gain_(decision_tree))
+
+### Model Selection
+- [Parsimonious Model - Statistics How To](https://www.statisticshowto.com/parsimonious-model/)
+- [Model Selection Techniques - Medium](https://medium.com/geekculture/model-selection-techniques-parsimony-goodness-of-fit-fc2f1863ccfd)
+
+### Decision Theory
+- [Value of Information: A Tool to Improve Research Prioritization - PLOS Medicine](https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1001882)
+- [Value of Information Analysis for Research Decisions - Value in Health](https://www.valueinhealthjournal.com/article/S1098-3015(20)30027-9/fulltext)
+
+### Research Communication
+- [Research Debt - Distill.pub](https://distill.pub/2017/research-debt/)

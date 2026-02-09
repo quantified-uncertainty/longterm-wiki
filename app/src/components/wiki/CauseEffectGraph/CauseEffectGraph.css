@@ -1,0 +1,2136 @@
+/* CauseEffectGraph container */
+
+.cause-effect-graph {
+  width: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--background));
+  display: flex;
+  flex-direction: column;
+}
+
+.cause-effect-graph--fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100vh;
+  width: 100vw;
+  z-index: 999999;
+  border-radius: 0;
+  border: none;
+  background: white;
+}
+
+.dark .cause-effect-graph--fullscreen {
+  background: #09090b;
+}
+
+/* Graph content area */
+.cause-effect-graph__content {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  height: 100%;
+  background-color: #fcf9f8 /* Light orangeish gray */;
+}
+
+.dark .cause-effect-graph__content {
+  background-color: #1e293b; /* Tailwind slate-800 */
+}
+
+/* Ensure React Flow fills the container */
+.cause-effect-graph__content .react-flow {
+  width: 100%;
+  height: 100%;
+}
+
+/* Fix for React Flow edge SVGs - prevent Tailwind from resetting dimensions */
+.cause-effect-graph__content .react-flow__edges {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.cause-effect-graph__content .react-flow__edges > svg {
+  position: absolute !important;
+  width: 100% !important;
+  height: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+  overflow: visible !important;
+  pointer-events: none;
+}
+
+.cause-effect-graph__content .react-flow__edge {
+  pointer-events: all;
+}
+
+.cause-effect-graph__content .react-flow__edge-path {
+  stroke-linecap: round;
+  stroke: #d6d3d1; /* stone-300 */
+  transition:
+    opacity 0.2s ease,
+    stroke-width 0.2s ease,
+    stroke 0.15s ease;
+}
+
+.cause-effect-graph__content .react-flow__edge:hover .react-flow__edge-path {
+  stroke: #57534e; /* stone-600 */
+}
+
+/* Dark mode edge colors */
+.dark .cause-effect-graph__content .react-flow__edge-path {
+  stroke: #57534e; /* stone-600 for dark mode default */
+}
+
+.dark .cause-effect-graph__content .react-flow__edge:hover .react-flow__edge-path {
+  stroke: #a8a29e; /* stone-400 for dark mode hover */
+}
+
+/* Node hover transition */
+.cause-effect-graph__content .react-flow__node {
+  transition: opacity 0.2s ease;
+}
+
+/* Loading indicator */
+.cause-effect-graph__loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #9ca3af;
+  font-size: 0.875rem;
+  z-index: 10;
+}
+
+/* Details panel - positioned on the left to avoid overlapping "On this page" nav */
+.cause-effect-graph__panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 320px;
+  height: 100%;
+  background-color: hsl(var(--background));
+  border-right: 1px solid hsl(var(--border));
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow: auto;
+  animation: slideInFromLeft 0.2s ease-out;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.cause-effect-graph__panel-header {
+  padding: 1rem;
+  border-bottom: 1px solid hsl(var(--border));
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.cause-effect-graph__panel-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.cause-effect-graph__panel-badge--cause {
+  background-color: #ef4444;
+  color: #000000;
+}
+
+.cause-effect-graph__panel-badge--effect {
+  background-color: #22c55e;
+  color: #000000;
+}
+
+.cause-effect-graph__panel-badge--intermediate {
+  background-color: #a855f7;
+  color: #000000;
+}
+
+.cause-effect-graph__panel-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+.cause-effect-graph__panel-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 0 0.25rem;
+  line-height: 1;
+}
+
+.cause-effect-graph__panel-close:hover {
+  color: inherit;
+}
+
+.cause-effect-graph__panel-content {
+  padding: 1rem;
+}
+
+.cause-effect-graph__panel-section {
+  margin-bottom: 1rem;
+}
+
+.cause-effect-graph__panel-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-bottom: 0.25rem;
+}
+
+.cause-effect-graph__panel-text {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: inherit;
+}
+
+.cause-effect-graph__panel-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.cause-effect-graph__panel-tag {
+  padding: 0.25rem 0.625rem;
+  background-color: #374151;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  color: #d1d5db;
+}
+
+/* Progress bar for confidence */
+.cause-effect-graph__progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cause-effect-graph__progress-bar {
+  flex: 1;
+  height: 0.5rem;
+  background-color: #374151;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.cause-effect-graph__progress-fill {
+  height: 100%;
+  border-radius: 0.25rem;
+  background-color: hsl(var(--primary));
+}
+
+.cause-effect-graph__progress-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+/* ========================================
+   Node Components
+   ======================================== */
+
+/* Group Node */
+.ceg-group-node {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: visible;
+}
+
+.ceg-group-node__label {
+  position: absolute;
+  top: 50%;
+  left: -35px;
+  transform: rotate(-90deg) translateX(-50%);
+  transform-origin: left center;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* Subgroup Node */
+.ceg-subgroup-node {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.ceg-subgroup-node__label {
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Cause Effect Node */
+.ceg-node {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1.5px solid;
+  min-width: var(--ceg-node-width, 180px);
+  max-width: var(--ceg-node-width, 180px);
+  position: relative;
+  box-shadow: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.ceg-node--with-subitems {
+  padding: 12px 14px;
+  min-width: var(--ceg-node-width, 180px);
+  max-width: calc(var(--ceg-node-width, 180px) + 40px);
+}
+
+.ceg-node--selected {
+  /* box-shadow is set inline based on accent color */
+}
+
+/* Lift node above others when tooltip is visible */
+.ceg-node--tooltip-visible {
+  z-index: 10000 !important;
+}
+
+/* Fixed position tooltip - rendered via portal to escape stacking context */
+.ceg-node__tooltip--fixed {
+  position: fixed !important;
+  /* margin-top not needed for fixed positioning */
+  margin-top: 0 !important;
+  pointer-events: none;
+}
+
+/* Inline tooltip - positioned as child of node, stays in same DOM tree for hover */
+.ceg-node__tooltip--inline {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  z-index: 10000;
+  pointer-events: auto;
+}
+
+.ceg-node__handle {
+  background: transparent;
+  border: none;
+  width: 1px;
+  height: 1px;
+}
+
+.ceg-node__label {
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.ceg-node__confidence {
+  display: none; /* Hidden - confidence shown via edge weights instead */
+}
+
+.ceg-node__snippet {
+  font-size: 10px;
+  margin-top: 4px;
+  text-align: center;
+  line-height: 1.3;
+  opacity: 0.7;
+}
+
+.ceg-node__subitems {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid;
+}
+
+.ceg-node__subitem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  padding: 5px 8px;
+  border: 1px solid;
+  border-radius: 4px;
+  margin-top: -1px; /* Overlap borders to remove visual gap while keeping items touching */
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+
+.ceg-node__subitem:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.ceg-node__subitem:first-child {
+  margin-top: 0;
+}
+
+.ceg-node__subitem-label {
+  font-weight: 500;
+}
+
+.ceg-node__subitem-prob {
+  margin-left: 6px;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 9px;
+}
+
+.ceg-node__tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 12px;
+  padding: 14px 18px;
+  background-color: #1e293b;
+  color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 320px;
+  max-width: 450px;
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  white-space: normal;
+  line-height: 1.6;
+  /* Limit height for long descriptions */
+  max-height: 200px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  -webkit-box-orient: vertical;
+}
+
+.ceg-node__tooltip-arrow {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid #1e293b;
+}
+
+/* Subitem tooltip - positioned to the left of the subitem */
+.ceg-node__tooltip--subitem {
+  top: 50%;
+  left: auto;
+  right: 100%;
+  transform: translateY(-50%);
+  margin-top: 0;
+  margin-right: 12px;
+  min-width: 280px;
+  max-width: 380px;
+  max-height: 180px;
+  -webkit-line-clamp: 7;
+}
+
+.ceg-node__tooltip--subitem .ceg-node__tooltip-arrow {
+  top: 50%;
+  left: auto;
+  right: -6px;
+  transform: translateY(-50%);
+  border-left: 6px solid #1e293b;
+  border-right: none;
+  border-bottom: 6px solid transparent;
+  border-top: 6px solid transparent;
+}
+
+/* ========================================
+   Legend Component
+   ======================================== */
+
+.ceg-legend {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  color: #374151;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 200px;
+  transition: padding 0.2s ease;
+}
+
+.ceg-legend--expanded {
+  padding: 12px 16px;
+}
+
+.ceg-legend__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  gap: 8px;
+}
+
+.ceg-legend__title {
+  font-weight: 600;
+  color: #111827;
+  font-size: 12px;
+}
+
+.ceg-legend__content {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  transition:
+    max-height 0.2s ease,
+    opacity 0.2s ease,
+    margin-top 0.2s ease;
+}
+
+.ceg-legend--expanded .ceg-legend__content {
+  max-height: 300px;
+  opacity: 1;
+  margin-top: 10px;
+}
+
+.ceg-legend__section {
+  margin-bottom: 10px;
+}
+
+.ceg-legend__section--last {
+  margin-bottom: 0;
+}
+
+.ceg-legend__section-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #111827;
+}
+
+.ceg-legend__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.ceg-legend__node-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+.ceg-legend__line-container {
+  width: 24px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.ceg-chevron {
+  transform: rotate(0deg);
+  transition: transform 0.2s ease;
+}
+
+.ceg-chevron--expanded {
+  transform: rotate(180deg);
+}
+
+/* ========================================
+   Data View Component
+   ======================================== */
+
+.ceg-data-view {
+  height: 100%;
+  overflow: auto;
+  background-color: #f8fafc;
+  padding: 16px;
+}
+
+.ceg-data-view__code {
+  font-size: 13px;
+  font-family: ui-monospace, monospace;
+  white-space: pre;
+  margin: 0;
+  color: #1e293b;
+}
+
+/* ========================================
+   Mermaid View Component
+   ======================================== */
+
+.ceg-mermaid-view {
+  height: 100%;
+  overflow: auto;
+  background-color: #f8fafc;
+  padding: 16px;
+}
+
+.ceg-mermaid-view .mermaid-diagram {
+  margin: 0;
+  min-height: 300px;
+}
+
+.dark .ceg-mermaid-view {
+  background-color: #1e293b;
+}
+
+/* ========================================
+   Header and Controls
+   ======================================== */
+
+.ceg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  flex-shrink: 0;
+}
+
+.ceg-segmented-control {
+  display: flex;
+  align-items: center;
+  background-color: #e5e7eb;
+  border-radius: 6px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.ceg-segment-btn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: transparent;
+  color: #6b7280;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ceg-segment-btn--active {
+  background-color: #ffffff;
+  color: #111827;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.ceg-segment-link {
+  text-decoration: none;
+  border-left: 1px solid #d1d5db;
+  margin-left: 4px;
+  padding-left: 14px;
+}
+
+.ceg-segment-link:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.ceg-action-btn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 500;
+  line-height: 1;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #374151;
+}
+
+.ceg-action-btn:hover {
+  background-color: #f9fafb;
+}
+
+.ceg-button-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ceg-content {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+/* Panel sources list */
+.ceg-panel-sources {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+}
+
+/* ========================================
+   Interactive View (Tiered Accordion)
+   ======================================== */
+
+.iv-container {
+  padding: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* Override for embedded version (no fixed height, no scrolling) */
+.iv-container--embedded {
+  height: auto;
+  overflow-y: visible;
+  max-width: none;
+  padding: 0;
+}
+
+/* Tier sections */
+.iv-tier {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.iv-tier__header {
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.iv-tier--cause .iv-tier__header {
+  background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+  color: #1e40af;
+}
+
+.iv-tier--intermediate .iv-tier__header {
+  background: linear-gradient(135deg, #ede9fe 0%, #f3e8ff 100%);
+  color: #7c3aed;
+}
+
+.iv-tier--effect .iv-tier__header {
+  background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+  color: #a16207;
+}
+
+.iv-tier__title {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.iv-tier__content {
+  padding: 12px;
+}
+
+.iv-tier__nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* Subgroups within tiers */
+.iv-subgroup {
+  margin-bottom: 12px;
+}
+
+.iv-subgroup:last-child {
+  margin-bottom: 0;
+}
+
+.iv-subgroup__header {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+.iv-subgroup__nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* Individual nodes */
+.iv-node {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  min-width: 180px;
+  max-width: 280px;
+  flex: 1;
+}
+
+.iv-node--expanded {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: #d1d5db;
+}
+
+.iv-node--highlighted {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.iv-node--dimmed {
+  opacity: 0.4;
+}
+
+.iv-node__header {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  border-radius: 7px;
+  transition: background 0.15s ease;
+}
+
+.iv-node__header:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.iv-node__header:disabled {
+  cursor: default;
+}
+
+.iv-node__title {
+  flex: 1;
+}
+
+.iv-node__chevron {
+  font-size: 12px;
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+  margin-left: 8px;
+}
+
+.iv-node__chevron--open {
+  transform: rotate(180deg);
+}
+
+/* Node expanded content */
+.iv-node__content {
+  padding: 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.iv-node__description {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+/* Tooltip for node descriptions */
+.iv-node__tooltip {
+  position: absolute;
+  z-index: 1000;
+  width: 280px;
+  padding: 12px;
+  background: #1f2937;
+  color: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  font-size: 13px;
+  line-height: 1.5;
+  pointer-events: none;
+  animation: iv-tooltip-fade 0.15s ease;
+}
+
+@keyframes iv-tooltip-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.iv-node__tooltip::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 20px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid #1f2937;
+}
+
+/* Global tooltip (fixed position, avoids overflow clipping) */
+.iv-global-tooltip {
+  max-width: 300px;
+  padding: 10px 14px;
+  background: #1f2937;
+  color: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  font-size: 13px;
+  line-height: 1.5;
+  pointer-events: none;
+  animation: iv-tooltip-fade-right 0.15s ease;
+}
+
+@keyframes iv-tooltip-fade-right {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Hoverable sub-items */
+.iv-node__subitem--hoverable {
+  cursor: help;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: background 0.15s ease;
+}
+
+.iv-node__subitem--hoverable:hover {
+  background: #e5e7eb;
+}
+
+/* Sub-item links */
+.iv-subitem__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.iv-subitem__link:hover {
+  text-decoration: underline;
+  color: #3b82f6;
+}
+
+/* Sub-item tooltip wrapper */
+.iv-subitem-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Sub-item hover tooltip */
+.iv-subitem-tooltip {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 4px;
+  z-index: 50;
+  width: 280px;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 150ms ease, visibility 150ms ease;
+}
+
+/* Only show tooltips on devices that support hover */
+@media (hover: hover) {
+  .iv-subitem-wrapper:hover .iv-subitem-tooltip,
+  .iv-subitem-wrapper:focus-within .iv-subitem-tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.iv-subitem-tooltip__type {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.iv-subitem-tooltip__title {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.iv-subitem-tooltip__summary {
+  display: block;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #4b5563;
+}
+
+.iv-subitem-tooltip__quality {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* Dark mode tooltip styles */
+.dark .iv-subitem-tooltip {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.dark .iv-subitem-tooltip__type {
+  color: #9ca3af;
+}
+
+.dark .iv-subitem-tooltip__title {
+  color: #f3f4f6;
+}
+
+.dark .iv-subitem-tooltip__summary {
+  color: #d1d5db;
+}
+
+.iv-node__subitems {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 12px;
+  margin-left: 4px;
+  border-left: 2px solid #e5e7eb;
+}
+
+.iv-node__subitem {
+  font-size: 13px;
+  color: #4b5563;
+  padding: 2px 0;
+}
+
+/* Connections */
+.iv-node__connections {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.iv-node__connections-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.iv-node__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Connection badges */
+.iv-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid transparent;
+}
+
+.iv-badge:hover {
+  background: #e5e7eb;
+}
+
+.iv-badge--strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.iv-badge--weak {
+  color: #9ca3af;
+}
+
+.iv-badge--upstream {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.iv-badge--upstream:hover {
+  background: #fde68a;
+}
+
+.iv-badge--downstream {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.iv-badge--downstream:hover {
+  background: #bfdbfe;
+}
+
+.iv-badge--highlighted {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* ========================================
+   List View (Full-width cards)
+   ======================================== */
+
+.lv-container {
+  padding: 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* Tier sections */
+.lv-tier {
+  border-radius: 0;
+  overflow: hidden;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.lv-tier__header {
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lv-tier--cause .lv-tier__header {
+  background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+  color: #1e40af;
+}
+
+.lv-tier--intermediate .lv-tier__header {
+  background: linear-gradient(135deg, #ede9fe 0%, #f3e8ff 100%);
+  color: #7c3aed;
+}
+
+.lv-tier--effect .lv-tier__header {
+  background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+  color: #a16207;
+}
+
+.lv-tier__title {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.lv-tier__content {
+  padding: 0;
+}
+
+.lv-tier__nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Subgroups within tiers */
+.lv-subgroup {
+  margin-bottom: 0;
+}
+
+.lv-subgroup:last-child {
+  margin-bottom: 0;
+}
+
+.lv-subgroup__header {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 16px 8px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.lv-subgroup__nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Individual nodes - full width */
+.lv-node {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.lv-node:last-child {
+  border-bottom: none;
+}
+
+.lv-node:hover {
+  background: #f9fafb;
+}
+
+.lv-node--highlighted {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.lv-node--dimmed {
+  opacity: 0.4;
+}
+
+.lv-node__header {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  border-radius: 7px;
+  transition: background 0.15s ease;
+}
+
+.lv-node__header:hover {
+  background: #f3f4f6;
+}
+
+.lv-node__title {
+  flex: 1;
+}
+
+/* Node sub-items */
+.lv-node__subitems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 16px 12px;
+}
+
+.lv-node__subitem {
+  font-size: 13px;
+  color: #4b5563;
+  padding: 4px 10px;
+  background: #e5e7eb;
+  border-radius: 4px;
+}
+
+.lv-node__subitem--hoverable {
+  cursor: help;
+  transition: background 0.15s ease;
+}
+
+.lv-node__subitem--hoverable:hover {
+  background: #d1d5db;
+}
+
+/* Sub-item links */
+.lv-subitem__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lv-subitem__link:hover {
+  text-decoration: underline;
+  color: #3b82f6;
+}
+
+/* Global tooltip */
+.lv-global-tooltip {
+  max-width: 300px;
+  padding: 10px 14px;
+  background: #1f2937;
+  color: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  font-size: 13px;
+  line-height: 1.5;
+  pointer-events: none;
+  animation: lv-tooltip-fade 0.15s ease;
+}
+
+@keyframes lv-tooltip-fade {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========================================
+   Expandable Node Component
+   Options A, B, D combined
+   ======================================== */
+
+.exp-node {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid;
+  min-width: 180px;
+  max-width: 260px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.exp-node--expandable {
+  cursor: pointer;
+}
+
+.exp-node--expanded {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.exp-node--hovered {
+  transform: translateY(-1px);
+}
+
+.exp-node--selected {
+  /* Set inline based on colors */
+}
+
+.exp-node__handle {
+  background: transparent;
+  border: none;
+  width: 1px;
+  height: 1px;
+}
+
+/* Header with label and expand button */
+.exp-node__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.exp-node__label {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.3;
+  flex: 1;
+}
+
+.exp-node__expand-btn {
+  all: unset;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.exp-node__expand-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Description */
+.exp-node__description {
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 6px;
+  opacity: 0.8;
+}
+
+/* Rich data badges (Option B) */
+.exp-node__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.exp-node__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* Risk indicator dot */
+.exp-node__risk {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Cluster tag */
+.exp-node__cluster-tag {
+  font-size: 10px;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Expand preview (shown when collapsed) */
+.exp-node__expand-preview {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid;
+  font-size: 11px;
+  text-align: center;
+}
+
+/* Collapse button for grouped expandable nodes */
+.exp-node__collapse-btn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  border: 1px dashed;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease;
+}
+
+.exp-node__collapse-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.dark .exp-node__collapse-btn {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark .exp-node__collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+   Cluster Container Node (Option D)
+   ======================================== */
+
+.cluster-node {
+  border-radius: 16px;
+  border: 2px dashed;
+  min-width: 300px;
+  position: relative;
+  background: rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+}
+
+.cluster-node--collapsed {
+  padding: 16px 20px;
+  cursor: pointer;
+}
+
+.cluster-node--expanded {
+  padding: 12px;
+}
+
+.cluster-node__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cluster-node__label {
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cluster-node__count {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.cluster-node__expand-btn {
+  all: unset;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.cluster-node__expand-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.cluster-node__preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.cluster-node__preview-item {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.cluster-node__children {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ========================================
+   Dark theme overrides for new components
+   ======================================== */
+
+.dark .exp-node {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark .exp-node__expand-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .cluster-node {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dark .cluster-node__preview-item {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+   Cluster Container Node
+   Visual wrapper for expanded clusters
+   ======================================== */
+
+.cluster-container-node {
+  border-radius: 16px;
+  border: 2px dashed;
+  padding: 10px 14px 10px 14px;
+  position: relative;
+  background: rgba(148, 163, 184, 0.08);
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.cluster-container-node__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.cluster-container-node__label {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.cluster-container-node__count {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.cluster-container-node__collapse-btn {
+  all: unset;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #64748b;
+  background: rgba(148, 163, 184, 0.15);
+  transition: all 0.15s ease;
+  margin-left: auto;
+}
+
+.cluster-container-node__collapse-btn:hover {
+  background: rgba(148, 163, 184, 0.25);
+  color: #475569;
+}
+
+/* ========================================
+   MiniMap Styling
+   ======================================== */
+
+.react-flow__minimap {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dark .react-flow__minimap {
+  background-color: rgba(30, 41, 59, 0.9) !important;
+  border-color: #334155;
+}
+
+/* ========================================
+   Path Highlighting
+   ======================================== */
+
+.react-flow__node--path-highlighted {
+  z-index: 1000 !important;
+}
+
+.react-flow__edge--path-highlighted {
+  z-index: 999 !important;
+}
+
+.react-flow__edge--path-highlighted .react-flow__edge-path {
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
+}
+
+/* ========================================
+   Edge Labels on Hover
+   ======================================== */
+
+.ceg-edge-label {
+  position: absolute;
+  padding: 4px 8px;
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ceg-edge-label--increases {
+  background: #166534;
+}
+
+.ceg-edge-label--decreases {
+  background: #991b1b;
+}
+
+.ceg-edge-label--mixed {
+  background: #854d0e;
+}
+
+/* ========================================
+   Semantic Zoom - CSS-based Level of Detail
+   ========================================
+   Zoom levels:
+   - ceg-zoom-far    (zoom < 0.25): Colored shapes only, no text
+   - ceg-zoom-medium (0.25-0.5):    Labels only
+   - ceg-zoom-close  (0.5-0.9):     Labels + descriptions
+   - ceg-zoom-detail (> 0.9):       Full detail with sub-items
+   ======================================== */
+
+/* --- FAR ZOOM: Hide all text, just show colored shapes --- */
+.ceg-zoom-far .ceg-node__label,
+.ceg-zoom-far .ceg-node__snippet,
+.ceg-zoom-far .ceg-node__subitems,
+.ceg-zoom-far .exp-node__header,
+.ceg-zoom-far .exp-node__description,
+.ceg-zoom-far .exp-node__badges,
+.ceg-zoom-far .exp-node__cluster-tag,
+.ceg-zoom-far .exp-node__expand-preview,
+.ceg-zoom-far .exp-node__collapse-btn,
+.ceg-zoom-far .cluster-node__label,
+.ceg-zoom-far .cluster-node__description,
+.ceg-zoom-far .cluster-node__count,
+.ceg-zoom-far .cluster-node__subitems {
+  display: none !important;
+}
+
+/* Make nodes more compact at far zoom */
+.ceg-zoom-far .ceg-node {
+  min-width: 40px !important;
+  min-height: 24px !important;
+  padding: 4px !important;
+}
+
+.ceg-zoom-far .exp-node {
+  min-width: 50px !important;
+  min-height: 30px !important;
+  padding: 6px !important;
+}
+
+.ceg-zoom-far .cluster-node {
+  min-width: 60px !important;
+  min-height: 36px !important;
+  padding: 8px !important;
+}
+
+/* --- FAR ZOOM: Enhanced visual prominence for nodes --- */
+/* Thicker borders and subtle glow to make colors pop */
+.ceg-zoom-far .ceg-node,
+.ceg-zoom-far .exp-node {
+  border-width: 3px !important;
+  filter: saturate(1.3) brightness(1.05);
+  box-shadow:
+    0 0 8px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
+}
+
+.ceg-zoom-far .cluster-node {
+  border-width: 3px !important;
+  filter: saturate(1.2);
+}
+
+/* Dark mode: add subtle glow effect for better visibility */
+.dark .ceg-zoom-far .ceg-node,
+.dark .ceg-zoom-far .exp-node {
+  filter: saturate(1.4) brightness(1.1);
+  box-shadow:
+    0 0 12px rgba(var(--node-glow-rgb, 100, 150, 255), 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset !important;
+}
+
+/* --- MEDIUM ZOOM: Labels only --- */
+.ceg-zoom-medium .ceg-node__snippet,
+.ceg-zoom-medium .ceg-node__subitems,
+.ceg-zoom-medium .exp-node__description,
+.ceg-zoom-medium .exp-node__badges,
+.ceg-zoom-medium .exp-node__cluster-tag,
+.ceg-zoom-medium .exp-node__expand-preview,
+.ceg-zoom-medium .exp-node__collapse-btn,
+.ceg-zoom-medium .cluster-node__description,
+.ceg-zoom-medium .cluster-node__subitems {
+  display: none !important;
+}
+
+/* Keep count badge visible for clusters at medium zoom */
+.ceg-zoom-medium .cluster-node__count {
+  display: inline-flex !important;
+}
+
+/* Slightly smaller nodes at medium zoom */
+.ceg-zoom-medium .ceg-node {
+  padding: 8px 12px !important;
+}
+
+.ceg-zoom-medium .exp-node {
+  padding: 10px 14px !important;
+}
+
+/* --- MEDIUM ZOOM: Slightly enhanced visual prominence --- */
+.ceg-zoom-medium .ceg-node,
+.ceg-zoom-medium .exp-node {
+  filter: saturate(1.15) brightness(1.02);
+}
+
+.dark .ceg-zoom-medium .ceg-node,
+.dark .ceg-zoom-medium .exp-node {
+  filter: saturate(1.2) brightness(1.05);
+}
+
+/* --- CLOSE ZOOM: Labels + brief descriptions --- */
+.ceg-zoom-close .ceg-node__subitems,
+.ceg-zoom-close .exp-node__badges,
+.ceg-zoom-close .exp-node__cluster-tag,
+.ceg-zoom-close .exp-node__expand-preview,
+.ceg-zoom-close .cluster-node__subitems {
+  display: none !important;
+}
+
+/* Show collapse button at close zoom (for usability) */
+.ceg-zoom-close .exp-node__collapse-btn {
+  display: flex !important;
+}
+
+/* --- DETAIL ZOOM: Everything visible (default) --- */
+/* No overrides needed - this is the default state */
+
+/* ========================================
+   Zoom Level Transitions
+   ======================================== */
+
+/* Smooth transitions when zoom level changes */
+.ceg-node,
+.exp-node,
+.cluster-node {
+  transition:
+    padding 0.15s ease,
+    min-width 0.15s ease,
+    min-height 0.15s ease;
+}
+
+.ceg-node__label,
+.ceg-node__snippet,
+.ceg-node__subitems,
+.exp-node__header,
+.exp-node__description,
+.exp-node__badges,
+.cluster-node__label,
+.cluster-node__description,
+.cluster-node__subitems {
+  transition: opacity 0.15s ease;
+}
+
+/* ========================================
+   Zoom Level Indicator (optional debug)
+   ======================================== */
+
+/* Uncomment to show current zoom level for debugging
+.cause-effect-graph::after {
+  content: 'Zoom: detail';
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 11px;
+  border-radius: 4px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.ceg-zoom-far::after { content: 'Zoom: far'; }
+.ceg-zoom-medium::after { content: 'Zoom: medium'; }
+.ceg-zoom-close::after { content: 'Zoom: close'; }
+.ceg-zoom-detail::after { content: 'Zoom: detail'; }
+*/
+
+/* ========================================
+   Zoom Level Indicator
+   ======================================== */
+
+.ceg-zoom-indicator {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  font-size: 12px;
+  color: #94a3b8;
+  z-index: 5;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.ceg-zoom-indicator__value {
+  font-weight: 600;
+  color: #f1f5f9;
+  font-family: ui-monospace, monospace;
+  min-width: 40px;
+  text-align: right;
+}
+
+.ceg-zoom-indicator__level {
+  text-transform: capitalize;
+  padding: 2px 8px;
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+  font-size: 11px;
+}
+
+/* Color-code the zoom level */
+.ceg-zoom-far .ceg-zoom-indicator__level {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.ceg-zoom-medium .ceg-zoom-indicator__level {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fcd34d;
+}
+
+.ceg-zoom-close .ceg-zoom-indicator__level {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+.ceg-zoom-detail .ceg-zoom-indicator__level {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+/* ========================================
+   Rich Tooltips
+   ======================================== */
+
+.ceg-node__tooltip--rich {
+  max-width: 320px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.ceg-tooltip__description {
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #e2e8f0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.ceg-tooltip__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.ceg-tooltip__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 10px;
+  text-transform: capitalize;
+}
+
+.ceg-tooltip__tag--type {
+  background: rgba(99, 102, 241, 0.25);
+  color: #a5b4fc;
+}
+
+.ceg-tooltip__tag--subgroup {
+  background: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+}
+
+.ceg-tooltip__tag--confidence {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.ceg-tooltip__related {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.ceg-tooltip__related-label {
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-right: 6px;
+}
+
+.ceg-tooltip__action {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #60a5fa;
+  background: rgba(59, 130, 246, 0.1);
+  text-align: center;
+}
+
+.ceg-tooltip__empty {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Adjust arrow position for rich tooltip */
+.ceg-node__tooltip--rich .ceg-node__tooltip-arrow {
+  bottom: -6px;
+}
+
+/* ========================================
+   Hide Descriptions Toggle
+   ======================================== */
+
+.cause-effect-graph--hide-descriptions .ceg-node__snippet {
+  display: none !important;
+}
+
+/* Also hide description in tooltips when descriptions are hidden */
+.cause-effect-graph--hide-descriptions .ceg-tooltip__description {
+  display: none !important;
+}
+
+/* ========================================
+   Node Scores Visualization (Compact)
+   ======================================== */
+
+.ceg-tooltip__scores-compact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.ceg-tooltip__score-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: help;
+}
+
+.ceg-tooltip__score-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ceg-tooltip__score-num {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+/* ========================================
+   Inline Node Scores (on card)
+   ======================================== */
+
+.ceg-node__scores-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 6px 12px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.ceg-node__score-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: default;
+}
+
+.ceg-node__score-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ceg-node__score-num {
+  font-size: 11px;
+  font-weight: 600;
+  color: inherit;
+  opacity: 0.9;
+}

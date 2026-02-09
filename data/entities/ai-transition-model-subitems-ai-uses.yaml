@@ -1,0 +1,664 @@
+- id: "tmc-recursive-ai"
+  type: "ai-transition-model-subitem"
+  title: "Recursive AI Capabilities"
+  parentFactor: "ai-uses"
+  path: "/ai-transition-model/recursive-ai-capabilities/"
+  description: "AI systems used to accelerate AI research itself, creating feedback loops where
+    improvements enable faster improvements. This is the core mechanism of potential intelligence
+    explosion."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "Recursive AI Capabilities: Research Report"
+    risks:
+      - path: "/knowledge-base/risks/sharp-left-turn/"
+        title: "Sharp Left Turn"
+        description: "Sudden capability generalization without alignment transfer"
+      - path: "/knowledge-base/risks/emergent-capabilities/"
+        title: "Emergent Capabilities"
+        description: "Unpredictable capability phase transitions"
+    responses:
+      - path: "/knowledge-base/responses/ai-assisted/"
+        title: "AI-Assisted Alignment"
+        description: "Using AI to help solve alignment"
+    models:
+      - path: "/knowledge-base/models/intervention-timing-windows/"
+        title: "Intervention Timing Windows"
+        description: "When interventions matter most"
+  causeEffectGraph:
+    title: "What Enables Recursive AI Improvement?"
+    description: "Causal factors affecting AI's ability to accelerate its own development. AlphaEvolve
+      achieved 23% speedups; Meta investing $70B in AI labs."
+    primaryNodeId: "recursive-capability"
+    nodes:
+      - id: "coding-capability"
+        label: "AI Coding Capability"
+        type: "leaf"
+        color: "teal"
+        description: "Ability to write, debug, and optimize code. Already substantial assistance."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 3
+          certainty: 7
+      - id: "research-understanding"
+        label: "Research Understanding"
+        type: "leaf"
+        color: "teal"
+        description: "Ability to understand and propose ML research directions."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 3
+          certainty: 4
+      - id: "experiment-automation"
+        label: "Experiment Automation"
+        type: "leaf"
+        description: "Running and evaluating ML experiments autonomously."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 4
+          certainty: 6
+      - id: "lab-investment"
+        label: "Lab AI R&D Investment"
+        type: "leaf"
+        color: "blue"
+        description: "Resources labs allocate to AI-assisted AI research. Meta investing $70B;
+          Google/DeepMind prioritizing this."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 6
+          certainty: 7
+      - id: "interpretability-tools"
+        label: "Interpretability Progress"
+        type: "leaf"
+        color: "emerald"
+        description: "Understanding what models learn enables targeted improvements. Anthropic's dictionary
+          features, sparse probing."
+        scores:
+          novelty: 6
+          sensitivity: 6
+          changeability: 5
+          certainty: 4
+      - id: "architecture-search"
+        label: "Architecture Search"
+        type: "intermediate"
+        color: "rose"
+        description: "AI discovering better neural network designs."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 3
+          certainty: 5
+      - id: "training-optimization"
+        label: "Training Optimization"
+        type: "intermediate"
+        description: "Improving efficiency of training processes."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 3
+          certainty: 6
+      - id: "scaling-ceiling-question"
+        label: "Will scaling hit a ceiling?"
+        type: "leaf"
+        color: "violet"
+        description: "Core uncertainty - are we near diminishing returns or far from fundamental limits?"
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 2
+          certainty: 2
+      - id: "alignment-transfer-question"
+        label: "Does alignment transfer to improved systems?"
+        type: "leaf"
+        color: "violet"
+        description: "Whether safety properties persist as AI improves AI. Key to safe recursive improvement."
+        scores:
+          novelty: 7
+          sensitivity: 10
+          changeability: 5
+          certainty: 2
+      - id: "recursive-capability"
+        label: "Recursive AI Capability"
+        type: "effect"
+        color: "red"
+        description: "Degree to which AI accelerates its own improvement."
+        scores:
+          novelty: 6
+          sensitivity: 10
+          changeability: 4
+          certainty: 3
+    edges:
+      - source: "coding-capability"
+        target: "architecture-search"
+        strength: "strong"
+        effect: "increases"
+      - source: "research-understanding"
+        target: "architecture-search"
+        strength: "strong"
+        effect: "increases"
+      - source: "experiment-automation"
+        target: "training-optimization"
+        strength: "strong"
+        effect: "increases"
+      - source: "lab-investment"
+        target: "experiment-automation"
+        strength: "strong"
+        effect: "increases"
+      - source: "interpretability-tools"
+        target: "architecture-search"
+        strength: "medium"
+        effect: "increases"
+      - source: "architecture-search"
+        target: "recursive-capability"
+        strength: "strong"
+        effect: "increases"
+      - source: "training-optimization"
+        target: "recursive-capability"
+        strength: "strong"
+        effect: "increases"
+      - source: "scaling-ceiling-question"
+        target: "recursive-capability"
+        strength: "medium"
+        effect: "mixed"
+      - source: "alignment-transfer-question"
+        target: "recursive-capability"
+        strength: "medium"
+        effect: "mixed"
+- id: "tmc-industries"
+  type: "ai-transition-model-subitem"
+  title: "AI in Industries"
+  parentFactor: "ai-uses"
+  path: "/ai-transition-model/industries/"
+  description: "AI deployment across economic sectors including healthcare, finance, manufacturing,
+    and services. Industry adoption drives both productivity gains and displacement risks."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "AI Uses - Industries: Research Report"
+    risks:
+      - path: "/knowledge-base/risks/irreversibility/"
+        title: "Irreversibility"
+        description: "The practical impossibility of removing AI dependencies once embedded"
+      - path: "/knowledge-base/risks/flash-dynamics/"
+        title: "Flash Dynamics"
+        description: "AI interactions faster than human oversight can operate"
+  causeEffectGraph:
+    title: "What Drives AI Industry Adoption?"
+    description: "Causal factors affecting AI deployment across economic sectors."
+    primaryNodeId: "industry-adoption"
+    nodes:
+      - id: "automation-potential"
+        label: "Automation Potential"
+        type: "leaf"
+        description: "Technical feasibility of automating industry tasks."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 4
+          certainty: 6
+      - id: "labor-costs"
+        label: "Labor Costs"
+        type: "leaf"
+        color: "blue"
+        description: "Cost of human workers relative to AI systems."
+        scores:
+          novelty: 2
+          sensitivity: 6
+          changeability: 5
+          certainty: 7
+      - id: "data-availability"
+        label: "Data Availability"
+        type: "leaf"
+        description: "Quality and quantity of training data in sector."
+        scores:
+          novelty: 3
+          sensitivity: 6
+          changeability: 5
+          certainty: 6
+      - id: "regulatory-constraints"
+        label: "Regulatory Constraints"
+        type: "leaf"
+        color: "blue"
+        description: "Industry-specific rules limiting AI deployment."
+        scores:
+          novelty: 3
+          sensitivity: 5
+          changeability: 5
+          certainty: 6
+      - id: "integration-complexity"
+        label: "Integration Complexity"
+        type: "leaf"
+        color: "rose"
+        description: "Difficulty of integrating AI into existing workflows and legacy systems. Healthcare,
+          finance face high barriers."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 5
+          certainty: 7
+      - id: "liability-uncertainty"
+        label: "Liability Uncertainty"
+        type: "leaf"
+        color: "rose"
+        description: "Unclear legal responsibility for AI errors. Major barrier in healthcare, autonomous
+          vehicles, legal services."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 6
+          certainty: 5
+      - id: "workforce-displacement"
+        label: "Workforce Displacement"
+        type: "intermediate"
+        color: "red"
+        description: "Job losses from automation. IMF estimates 40% of jobs affected; creates political
+          resistance."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 5
+          certainty: 6
+      - id: "productivity-gains"
+        label: "Productivity Gains"
+        type: "intermediate"
+        color: "emerald"
+        description: "Output improvements from AI integration."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+      - id: "critical-infrastructure-question"
+        label: "How fast should critical sectors adopt?"
+        type: "leaf"
+        color: "violet"
+        description: "Tension between efficiency gains and systemic risk in healthcare, energy, finance. No
+          consensus on safe pace."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 6
+          certainty: 3
+      - id: "industry-adoption"
+        label: "Industry AI Adoption"
+        type: "effect"
+        description: "Breadth and depth of AI use across sectors."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+    edges:
+      - source: "automation-potential"
+        target: "productivity-gains"
+        strength: "strong"
+        effect: "increases"
+      - source: "labor-costs"
+        target: "industry-adoption"
+        strength: "medium"
+        effect: "increases"
+      - source: "data-availability"
+        target: "productivity-gains"
+        strength: "medium"
+        effect: "increases"
+      - source: "regulatory-constraints"
+        target: "industry-adoption"
+        strength: "medium"
+        effect: "decreases"
+      - source: "integration-complexity"
+        target: "industry-adoption"
+        strength: "medium"
+        effect: "decreases"
+      - source: "liability-uncertainty"
+        target: "industry-adoption"
+        strength: "medium"
+        effect: "decreases"
+      - source: "productivity-gains"
+        target: "industry-adoption"
+        strength: "strong"
+        effect: "increases"
+      - source: "productivity-gains"
+        target: "workforce-displacement"
+        strength: "strong"
+        effect: "increases"
+      - source: "workforce-displacement"
+        target: "industry-adoption"
+        strength: "medium"
+        effect: "decreases"
+      - source: "critical-infrastructure-question"
+        target: "industry-adoption"
+        strength: "medium"
+        effect: "mixed"
+- id: "tmc-governments"
+  type: "ai-transition-model-subitem"
+  title: "AI in Governments"
+  parentFactor: "ai-uses"
+  path: "/ai-transition-model/governments/"
+  description: "Government use of AI for administration, services, defense, and surveillance.
+    Government adoption shapes both public sector efficiency and risks of authoritarian misuse."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "AI Uses - Governments: Research Report"
+    risks:
+      - path: "/knowledge-base/risks/surveillance/"
+        title: "Surveillance"
+        description: "Comprehensive analysis of surveillance risks"
+      - path: "/knowledge-base/risks/autonomous-weapons/"
+        title: "Autonomous Weapons"
+        description: "Military AI applications"
+      - path: "/knowledge-base/risks/authoritarian-tools/"
+        title: "Authoritarian Tools"
+        description: "AI enabling authoritarian control"
+    models:
+      - path: "/knowledge-base/models/surveillance-authoritarian-stability/"
+        title: "Surveillance-Authoritarian Stability"
+        description: "How AI surveillance affects regime durability"
+  causeEffectGraph:
+    title: "What Drives Government AI Adoption?"
+    description: "Causal factors affecting AI use in public sector. AI surveillance deployed in 80+ countries."
+    primaryNodeId: "government-adoption"
+    nodes:
+      - id: "efficiency-pressure"
+        label: "Efficiency Pressure"
+        type: "leaf"
+        description: "Pressure to improve public services with limited budgets."
+        scores:
+          novelty: 2
+          sensitivity: 5
+          changeability: 4
+          certainty: 7
+      - id: "security-concerns"
+        label: "Security Concerns"
+        type: "leaf"
+        color: "red"
+        description: "National security motivations for AI capabilities."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 3
+          certainty: 6
+      - id: "privacy-constraints"
+        label: "Privacy Constraints"
+        type: "leaf"
+        color: "emerald"
+        description: "Legal and ethical limits on government AI use."
+        scores:
+          novelty: 3
+          sensitivity: 6
+          changeability: 5
+          certainty: 6
+      - id: "regime-type"
+        label: "Regime Type"
+        type: "leaf"
+        color: "teal"
+        description: "Democratic vs authoritarian governance affects use patterns."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 2
+          certainty: 7
+      - id: "defense-ai-spending"
+        label: "Defense AI Spending"
+        type: "leaf"
+        color: "rose"
+        description: "Military investment in autonomous weapons and intelligence systems."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 4
+          certainty: 6
+      - id: "tech-sovereignty-goals"
+        label: "Tech Sovereignty Goals"
+        type: "leaf"
+        color: "blue"
+        description: "Government desire to reduce dependence on foreign AI systems and chips."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 5
+          certainty: 5
+      - id: "authoritarian-use-question"
+        label: "Will AI Entrench Authoritarianism?"
+        type: "leaf"
+        color: "violet"
+        description: "Key uncertainty whether AI surveillance makes authoritarian regimes more durable."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 3
+          certainty: 4
+      - id: "administrative-ai"
+        label: "Administrative AI"
+        type: "intermediate"
+        description: "AI for benefits, services, document processing."
+        scores:
+          novelty: 3
+          sensitivity: 5
+          changeability: 6
+          certainty: 6
+      - id: "surveillance-ai"
+        label: "Surveillance AI"
+        type: "intermediate"
+        color: "red"
+        description: "AI for monitoring, identification, prediction."
+        scores:
+          novelty: 4
+          sensitivity: 9
+          changeability: 4
+          certainty: 6
+      - id: "government-adoption"
+        label: "Government AI Adoption"
+        type: "effect"
+        description: "Overall government use of AI systems."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+    edges:
+      - source: "efficiency-pressure"
+        target: "administrative-ai"
+        strength: "strong"
+        effect: "increases"
+      - source: "security-concerns"
+        target: "surveillance-ai"
+        strength: "strong"
+        effect: "increases"
+      - source: "privacy-constraints"
+        target: "surveillance-ai"
+        strength: "medium"
+        effect: "decreases"
+      - source: "regime-type"
+        target: "surveillance-ai"
+        strength: "strong"
+        effect: "increases"
+      - source: "defense-ai-spending"
+        target: "surveillance-ai"
+        strength: "strong"
+        effect: "increases"
+      - source: "tech-sovereignty-goals"
+        target: "government-adoption"
+        strength: "medium"
+        effect: "increases"
+      - source: "authoritarian-use-question"
+        target: "government-adoption"
+        strength: "medium"
+        effect: "mixed"
+      - source: "administrative-ai"
+        target: "government-adoption"
+        strength: "medium"
+        effect: "increases"
+      - source: "surveillance-ai"
+        target: "government-adoption"
+        strength: "strong"
+        effect: "increases"
+- id: "tmc-coordination"
+  type: "ai-transition-model-subitem"
+  title: "AI for Coordination"
+  parentFactor: "ai-uses"
+  path: "/ai-transition-model/coordination/"
+  description: "AI systems used to facilitate coordination between actors on AI governance and safety.
+    Could enable better collective action or could be manipulated for strategic advantage."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "AI Uses - Coordination: Research Report"
+    responses:
+      - path: "/knowledge-base/responses/ai-forecasting/"
+        title: "AI Forecasting"
+        description: "Using AI for prediction"
+      - path: "/knowledge-base/responses/coordination-tech/"
+        title: "Coordination Technology"
+        description: "Tools for collective action"
+      - path: "/knowledge-base/responses/deliberation/"
+        title: "AI Deliberation Tools"
+        description: "Platforms for democratic discussion"
+  causeEffectGraph:
+    title: "How AI Affects Coordination?"
+    description: "Causal factors affecting AI's role in facilitating or hindering coordination."
+    primaryNodeId: "coordination-effect"
+    nodes:
+      - id: "translation-capability"
+        label: "Translation Capability"
+        type: "leaf"
+        color: "emerald"
+        description: "AI breaking down language barriers between actors."
+        scores:
+          novelty: 3
+          sensitivity: 4
+          changeability: 7
+          certainty: 8
+      - id: "information-synthesis"
+        label: "Information Synthesis"
+        type: "leaf"
+        color: "emerald"
+        description: "AI combining diverse sources into shared understanding."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 6
+          certainty: 5
+      - id: "manipulation-risk"
+        label: "Manipulation Risk"
+        type: "leaf"
+        color: "red"
+        description: "AI used for strategic deception between parties."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 4
+          certainty: 6
+      - id: "deepfake-proliferation"
+        label: "Deepfake Proliferation"
+        type: "leaf"
+        color: "red"
+        description: "Synthetic media undermining ability to distinguish authentic from fake. Already
+          affecting political discourse."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 4
+          certainty: 7
+      - id: "negotiation-assistance"
+        label: "AI Negotiation Assistance"
+        type: "leaf"
+        color: "teal"
+        description: "AI helping parties find mutually beneficial agreements, identify tradeoffs, draft
+          proposals."
+        scores:
+          novelty: 6
+          sensitivity: 6
+          changeability: 6
+          certainty: 4
+      - id: "information-asymmetry"
+        label: "Information Asymmetry"
+        type: "leaf"
+        color: "rose"
+        description: "Unequal AI capabilities create power imbalances in negotiations. Well-resourced actors
+          advantage."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 5
+          certainty: 6
+      - id: "verification-tools"
+        label: "Verification Tools"
+        type: "intermediate"
+        color: "emerald"
+        description: "AI helping verify compliance with agreements."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 5
+          certainty: 4
+      - id: "trust-effects"
+        label: "Trust Effects"
+        type: "intermediate"
+        description: "How AI affects trust between coordinating parties."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 3
+          certainty: 4
+      - id: "epistemic-commons-question"
+        label: "Can shared truth survive AI manipulation?"
+        type: "leaf"
+        color: "violet"
+        description: "Whether coordinating parties can maintain shared understanding of facts amid synthetic
+          content and manipulation."
+        scores:
+          novelty: 7
+          sensitivity: 9
+          changeability: 5
+          certainty: 2
+      - id: "coordination-effect"
+        label: "Coordination Effectiveness"
+        type: "effect"
+        description: "Net effect of AI on coordination capacity."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 5
+          certainty: 3
+    edges:
+      - source: "translation-capability"
+        target: "coordination-effect"
+        strength: "medium"
+        effect: "increases"
+      - source: "information-synthesis"
+        target: "trust-effects"
+        strength: "medium"
+        effect: "increases"
+      - source: "manipulation-risk"
+        target: "trust-effects"
+        strength: "strong"
+        effect: "decreases"
+      - source: "deepfake-proliferation"
+        target: "trust-effects"
+        strength: "strong"
+        effect: "decreases"
+      - source: "negotiation-assistance"
+        target: "coordination-effect"
+        strength: "medium"
+        effect: "increases"
+      - source: "information-asymmetry"
+        target: "coordination-effect"
+        strength: "medium"
+        effect: "decreases"
+      - source: "verification-tools"
+        target: "trust-effects"
+        strength: "strong"
+        effect: "increases"
+      - source: "trust-effects"
+        target: "coordination-effect"
+        strength: "strong"
+        effect: "increases"
+      - source: "epistemic-commons-question"
+        target: "trust-effects"
+        strength: "medium"
+        effect: "mixed"

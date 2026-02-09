@@ -1,0 +1,416 @@
+---
+title: "Automation Tools"
+description: "Complete reference for all scripts and automation workflows for maintaining wiki content"
+sidebar:
+  order: 1
+importance: 0
+quality: 41
+llmSummary: "Comprehensive technical documentation for wiki maintenance automation, covering page improvement workflows (Q5 standards requiring 10+ citations, 800+ words), content grading via Claude API (~$0.02/page), validation suite, and knowledge base system. Provides detailed command reference, cost estimates, and common workflows for maintaining content quality."
+ratings:
+  novelty: 0
+  rigor: 5
+  actionability: 7
+  completeness: 8
+metrics:
+  wordCount: 434
+  citations: 0
+  tables: 9
+  diagrams: 0
+---
+This page documents all automation tools available for maintaining and improving the knowledge base.
+
+## Quick Reference
+
+| Tool | Purpose | Command |
+|------|---------|---------|
+| **Content Commands** | Improve, grade, create pages | `npm run crux -- content` |
+| **Validators** | Check content quality | `npm run crux -- validate` |
+| **Analyzers** | Analysis and reporting | `npm run crux -- analyze` |
+| **Auto-fixers** | Fix common issues | `npm run crux -- fix` |
+| **Data Builder** | Regenerate entity data | `npm run build:data` |
+| **Resources** | External resource management | `npm run crux -- resources` |
+
+---
+
+## Page Improvement Workflow
+
+The recommended way to improve wiki pages to quality 5.
+
+### Commands
+
+```bash
+# List pages that need improvement (sorted by priority)
+node scripts/page-improver.mjs --list
+
+# Get improvement prompt for a specific page
+node scripts/page-improver.mjs economic-disruption
+
+# Show page info only (no prompt)
+node scripts/page-improver.mjs racing-dynamics --info
+
+# Filter by quality and importance
+node scripts/page-improver.mjs --list --max-qual 3 --min-imp 50
+```
+
+### What Makes a Q5 Page
+
+| Element | Requirement |
+|---------|-------------|
+| Quick Assessment Table | 5+ rows, 3 columns (Dimension, Assessment, Evidence) |
+| Substantive Tables | 2+ additional tables with real data |
+| Mermaid Diagram | 1+ showing key relationships |
+| Citations | 10+ real URLs from authoritative sources |
+| Quantified Claims | Replace "significant" with "25-40%" etc. |
+| Word Count | 800+ words of substantive content |
+
+### Cost Estimates
+
+| Model | Cost per Page |
+|-------|---------------|
+| Opus 4.5 | \$3-5 |
+| Sonnet 4.5 | \$0.50-1.00 |
+
+### Reference Examples
+
+- **Gold standard**: `src/content/docs/knowledge-base/risks/bioweapons.mdx`
+- **Good example**: `src/content/docs/knowledge-base/risks/racing-dynamics.mdx`
+
+---
+
+## Content Grading
+
+Uses Claude Sonnet API to automatically grade pages with importance, quality, and AI-generated summaries.
+
+### Commands
+
+```bash
+# Preview what would be graded (no API calls)
+node scripts/grade-content.mjs --dry-run
+
+# Grade a specific page
+node scripts/grade-content.mjs --page scheming
+
+# Grade pages and apply to frontmatter
+node scripts/grade-content.mjs --limit 10 --apply
+
+# Grade a category with parallel processing
+node scripts/grade-content.mjs --category responses --parallel 3
+
+# Skip already-graded pages
+node scripts/grade-content.mjs --skip-graded --limit 50
+```
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--page ID` | Grade a single page |
+| `--dry-run` | Preview without API calls |
+| `--limit N` | Only process N pages |
+| `--parallel N` | Process N pages concurrently (default: 1) |
+| `--category X` | Only process pages in category |
+| `--skip-graded` | Skip pages with existing importance |
+| `--apply` | Write grades to frontmatter (caution) |
+| `--output FILE` | Write results to JSON file |
+
+### Grading Criteria
+
+**Importance (0-100)**:
+- 90-100: Essential for prioritization (core interventions, key risk mechanisms)
+- 70-89: High value (concrete responses, major risk categories)
+- 50-69: Useful context (supporting analysis, secondary risks)
+- 30-49: Reference material (historical, profiles, niche)
+- 0-29: Peripheral (internal docs, stubs)
+
+**Quality (0-100)**:
+- 80-100: Comprehensive (2+ tables, 1+ diagram, 5+ citations, quantified claims)
+- 60-79: Good (1+ table, 3+ citations, mostly prose)
+- 40-59: Adequate (structure but lacks tables/citations)
+- 20-39: Draft (poorly structured, heavy bullets, no evidence)
+- 0-19: Stub (minimal content)
+
+### Cost Estimate
+
+≈\$0.02 per page, ≈\$6 for all 329 pages
+
+---
+
+## Validation Suite
+
+All validators are accessible via the unified `crux` CLI:
+
+```bash
+npm run validate              # Run all validators
+npm run crux -- validate --help   # List all validators
+```
+
+### Individual Validators
+
+| Command | Description |
+|---------|-------------|
+| `crux validate compile` | MDX compilation check |
+| `crux validate data` | Entity data integrity |
+| `crux validate refs` | Internal reference validation |
+| `crux validate mermaid` | Mermaid diagram syntax |
+| `crux validate sidebar` | Sidebar configuration |
+| `crux validate entity-links` | EntityLink component validation |
+| `crux validate templates` | Template compliance |
+| `crux validate quality` | Content quality metrics |
+| `crux validate unified` | Unified rules engine (escaping, formatting) |
+
+### Advanced Usage
+
+```bash
+# Run specific validators
+npm run crux -- validate compile --quick
+npm run crux -- validate unified --rules=dollar-signs,markdown-lists
+
+# Skip specific checks
+npm run crux -- validate all --skip=component-refs
+
+# CI mode
+npm run validate:ci
+```
+
+---
+
+## Knowledge Base System
+
+SQLite-based system for managing content, sources, and AI summaries.
+
+### Setup
+
+Requires `.env` file:
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+### Commands
+
+```bash
+npm run crux -- analyze scan                   # Scan MDX files, extract sources
+npm run crux -- generate summaries             # Generate AI summaries
+node scripts/scan-content.mjs --stats          # Show database statistics
+```
+
+### Detailed Usage
+
+```bash
+# Scan content (run after editing MDX files)
+node scripts/scan-content.mjs
+node scripts/scan-content.mjs --force    # Rescan all files
+node scripts/scan-content.mjs --verbose  # Show per-file progress
+
+# Generate summaries via crux
+npm run crux -- generate summaries --batch 50
+npm run crux -- generate summaries --model sonnet
+npm run crux -- generate summaries --id deceptive-alignment
+npm run crux -- generate summaries --dry-run
+```
+
+### Database Location
+
+All cached data is in `.cache/` (gitignored):
+- `.cache/knowledge.db` - SQLite database
+- `.cache/sources/` - Fetched source documents
+
+### Cost Estimates
+
+| Task | Model | Cost |
+|------|-------|------|
+| Summarize all 311 articles | Haiku | ≈\$2-3 |
+| Summarize all 793 sources | Haiku | ≈\$10-15 |
+
+---
+
+## Data Layer
+
+### Build Data
+
+**Important**: Data build must run before site build.
+
+```bash
+npm run build:data    # Regenerate all data files
+npm run dev           # Auto-runs build:data first
+npm run build         # Auto-runs build:data first
+```
+
+### Generated Files
+
+After running `build:data`:
+- `src/data/database.json` - Main entity database
+- `src/data/entities.json` - Entity definitions
+- `src/data/backlinks.json` - Cross-references
+- `src/data/tagIndex.json` - Tag index
+- `src/data/pathRegistry.json` - URL path mappings
+- `src/data/pages.json` - Page metadata for scripts
+
+### Other Data Scripts
+
+```bash
+npm run sync:descriptions    # Sync model descriptions from files
+npm run extract              # Extract data from pages
+npm run generate-yaml        # Generate YAML from data
+npm run cleanup-data         # Clean up data files
+```
+
+---
+
+## Content Management CLI
+
+Unified tool for managing and improving content quality via `crux content`.
+
+### Commands
+
+```bash
+# Improve pages
+npm run crux -- content improve <page-id>
+
+# Grade pages using Claude API
+npm run crux -- content grade --page scheming
+npm run crux -- content grade --limit 5 --apply
+
+# Regrade pages
+npm run crux -- content regrade --page scheming
+
+# Create new pages
+npm run crux -- content create --type risk --file input.yaml
+```
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Preview without API calls |
+| `--limit N` | Process only N pages |
+| `--apply` | Apply changes directly to files |
+| `--page ID` | Target specific page |
+
+---
+
+## Resource Linking
+
+### Convert URLs to R Components
+
+```bash
+# Find URLs that can be converted to <R> components
+node scripts/map-urls-to-resources.mjs expertise-atrophy  # Specific file
+node scripts/map-urls-to-resources.mjs                     # All files
+node scripts/map-urls-to-resources.mjs --stats             # Statistics only
+
+# Auto-convert markdown links to R components
+node scripts/convert-links-to-r.mjs --dry-run              # Preview
+node scripts/convert-links-to-r.mjs --apply                # Apply changes
+```
+
+### Export Resources
+
+```bash
+node scripts/utils/export-resources.mjs        # Export resource data
+```
+
+---
+
+## Content Generation
+
+### Generate New Pages
+
+```bash
+# Generate a model page from YAML input
+npm run crux -- generate content --type model --file input.yaml
+
+# Generate a risk page
+npm run crux -- generate content --type risk --file input.yaml
+
+# Generate a response page
+npm run crux -- generate content --type response --file input.yaml
+```
+
+### Batch Summaries
+
+```bash
+npm run crux -- generate summaries --batch 50  # Generate summaries for multiple pages
+```
+
+---
+
+## Testing
+
+```bash
+npm run test            # Run all tests
+npm run test:lib        # Test library functions
+npm run test:validators # Test validator functions
+```
+
+---
+
+## Linting and Formatting
+
+```bash
+npm run lint           # Check for linting issues
+npm run lint:fix       # Fix linting issues
+npm run format         # Format all files
+npm run format:check   # Check formatting without changing
+```
+
+---
+
+## Temporary Files
+
+**Convention**: All temporary/intermediate files go in `.claude/temp/` (gitignored).
+
+Scripts that generate intermediate output (like grading results) write here by default. This keeps the project root clean and prevents accidental commits.
+
+---
+
+## Common Workflows
+
+### Improve a Low-Quality Important Page
+
+1. Find candidates:
+   ```bash
+   node scripts/page-improver.mjs --list --max-qual 3
+   ```
+
+2. Get improvement prompt:
+   ```bash
+   node scripts/page-improver.mjs economic-disruption
+   ```
+
+3. Run in Claude Code with the generated prompt
+
+4. Validate the result:
+   ```bash
+   npm run crux -- validate compile
+   npm run crux -- validate templates
+   ```
+
+### Grade All New Pages
+
+1. Preview:
+   ```bash
+   node scripts/grade-content.mjs --skip-graded --dry-run
+   ```
+
+2. Grade and apply:
+   ```bash
+   node scripts/grade-content.mjs --skip-graded --apply --parallel 3
+   ```
+
+3. Review results:
+   ```bash
+   cat .claude/temp/grades-output.json
+   ```
+
+### Check Content Quality Before PR
+
+```bash
+npm run validate
+```
+
+### Update After Editing entities.yaml
+
+```bash
+npm run build:data
+npm run crux -- validate data
+```

@@ -1,0 +1,40 @@
+entity: sam-altman
+facts:
+  net-worth:
+    value: "$2.8 billion"
+    asOf: "2024"
+
+  openai-salary:
+    value: "$76,001/year"
+    asOf: "2024"
+
+  loopt-sale-price:
+    value: "$43 million"
+    note: "Sold to Green Dot Corporation"
+
+  early-stripe-investment:
+    value: "$15,000 for 2%"
+    asOf: "2009"
+
+  yc-companies-funded:
+    value: "1,900"
+    note: "Companies funded during YC tenure"
+
+  board-crisis-employee-letter:
+    value: "95%"
+    asOf: "2023-11"
+    note: "738 of 770 employees signed letter threatening to quit"
+
+  worldcoin-users:
+    value: "26 million"
+    asOf: "2024"
+    note: "Total users on Worldcoin network"
+
+  worldcoin-verified:
+    value: "12 million"
+    asOf: "2024"
+    note: "Verified Worldcoin users (via orb)"
+
+  helion-personal-investment:
+    value: "$375 million"
+    note: "Personal investment in Helion Energy"

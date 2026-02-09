@@ -1,0 +1,307 @@
+---
+title: "Light Scaffolding"
+description: "Analysis of AI systems with basic tool use, RAG, and simple chains. The current sweet spot between capability and complexity, including GPT with plugins, Claude with tools, and standard RAG architectures."
+sidebar:
+  label: "Light Scaffolding"
+  order: 2
+quality: 53
+lastEdited: "2026-01-28"
+importance: 62
+llmSummary: "Light scaffolding (RAG, function calling, simple chains) represents the current enterprise deployment standard with 92% Fortune 500 adoption, achieving 88-91% function calling accuracy and 18% RAG accuracy improvements, but faces 73% attack success rates without defenses (reduced to 23% with layered guardrails). Systems show capability doubling every 7 months, suggesting likely merger into heavy scaffolding by 2027, with 15-25% probability of remaining dominant at transformative AI."
+ratings:
+  novelty: 3.5
+  rigor: 6
+  actionability: 5.5
+  completeness: 6.5
+metrics:
+  wordCount: 170
+  citations: 19
+  tables: 25
+  diagrams: 1
+clusters: ["ai-safety", "governance"]
+---
+import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="light-scaffolding" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Market Dominance** | Current enterprise standard | 92% of Fortune 500 use ChatGPT; 72% of enterprises work with <EntityLink id="openai">OpenAI</EntityLink> products |
+| **Capability Ceiling** | Medium-High | RAG improves accuracy up to 18% over chain-of-thought; function calling reaches 88% accuracy on BFCL |
+| **Reliability** | High for single-turn, variable for multi-turn | WebArena success rates: 14% (2023) to 60% (2025) |
+| **Development Complexity** | Low-Medium | Standard patterns well-documented; many mature frameworks |
+| **Safety Profile** | Controllable | Tool permissions auditable; 73% attack success without defenses, 23% with layered guardrails |
+| **Trajectory** | Transitional | Likely merging into agentic patterns by 2027; task length doubling every 7 months |
+| **TAI Probability** | 15-25% | Sweet spot may be temporary as heavy scaffolding matures |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [nomanssky.fandom.com](https://nomanssky.fandom.com/wiki/Light_Scaffold) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Scaffolding) |
+
+
+## Overview
+
+Light scaffolding represents the **current sweet spot** in AI deployment: models enhanced with basic tool use, retrieval augmentation (RAG), function calling, and simple orchestration chains. This gives significant capability gains over minimal scaffolding while avoiding the complexity and unpredictability of full agentic systems.
+
+Examples include GPT-4 with plugins, Claude with tools enabled, and standard enterprise RAG deployments. Estimated probability of being dominant at transformative AI: **15-25%**.
+
+The key characteristic is that **the scaffold adds capabilities, but doesn't fundamentally change the interaction pattern** - it's still primarily human-driven, turn-by-turn interaction.
+
+The theoretical foundations trace to the [ReAct paper](https://arxiv.org/abs/2210.03629) (Yao et al., 2022), which demonstrated that interleaving reasoning traces with tool actions improves performance on question-answering tasks by up to 34% compared to chain-of-thought alone. Meta's [Toolformer](https://arxiv.org/abs/2302.04761) (Schick et al., 2023) showed that language models can self-teach tool use in a self-supervised manner, achieving competitive zero-shot performance with much larger models.
+
+## Architecture
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph input["Input Layer"]
+        user["User Query"]
+        context["Session Context"]
+    end
+
+    subgraph orchestration["Orchestration Layer"]
+        router["Intent Router"]
+        planner["Simple Planner"]
+        validator["Output Validator"]
+    end
+
+    subgraph tools["Tool Layer"]
+        retrieval["RAG/Vector Search"]
+        code["Code Interpreter"]
+        api["External APIs"]
+        search["Web Search"]
+    end
+
+    subgraph model["Model Layer"]
+        llm["Foundation Model"]
+        prompt["Prompt Assembly"]
+    end
+
+    user --> router
+    context --> router
+    router --> planner
+    planner --> tools
+    tools --> prompt
+    prompt --> llm
+    llm --> validator
+    validator --> response["Response"]
+
+    style orchestration fill:#e8f4f8
+    style tools fill:#f0f8e8
+    style model fill:#fff8e8
+`} />
+
+The architecture follows a standard pattern: user queries flow through an orchestration layer that decides whether to invoke tools, tool outputs augment the context, and the foundation model generates the final response. Unlike heavy scaffolding, there is no persistent planning state or multi-agent coordination.
+
+### What's Included
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Text input/output | YES | Core interaction |
+| Function calling | YES | Structured tool invocation |
+| RAG/retrieval | YES | External knowledge access |
+| Code execution | OPTIONAL | Sandboxed code interpreter |
+| Web browsing | OPTIONAL | Search and fetch |
+| Single-agent loop | YES | Can retry/refine within turn |
+| Multi-agent | NO | Single model instance |
+| Persistent memory | LIMITED | Session-based or simple |
+| Autonomous operation | NO | Human-initiated turns |
+
+## Key Properties
+
+| Property | Rating | Assessment |
+|----------|--------|------------|
+| **White-box Access** | MEDIUM | Scaffold code is readable; model still opaque |
+| **Trainability** | HIGH | Model trained normally; scaffold is code |
+| **Predictability** | MEDIUM | Tool calls add some unpredictability |
+| **Modularity** | MEDIUM | Clear tool boundaries |
+| **Formal Verifiability** | PARTIAL | Scaffold code can be verified |
+
+## Common Patterns
+
+### Retrieval-Augmented Generation (RAG)
+
+RAG represents the most mature pattern in light scaffolding, with well-established evaluation frameworks and documented performance characteristics. The [Medical RAG benchmark (MIRAGE)](https://teddy-xionggz.github.io/benchmark-medical-rag/) demonstrated that RAG can improve LLM accuracy by up to 18% on medical QA tasks, elevating GPT-3.5 performance to GPT-4 levels.
+
+| Component | Purpose | Accuracy Impact | Interpretability |
+|-----------|---------|-----------------|------------------|
+| Embedding | Convert query to vector | Determines retrieval quality | LOW |
+| Vector DB | Find relevant documents | Precision@5 typically 60-80% | HIGH (can inspect matches) |
+| Reranking | Improve relevance | Adds 5-15% accuracy | MEDIUM |
+| Prompt augmentation | Add context to prompt | Core accuracy driver | HIGH (visible) |
+| LLM response | Generate answer | Final synthesis | LOW |
+
+**Performance benchmarks** from 2024-2025 research:
+- [MedRAG](https://aclanthology.org/2024.findings-acl.372/) improves accuracy of backbone LLMs by up to 18% over chain-of-thought prompting
+- RAG systems can boost factual accuracy by over 30% on domain-specific queries
+- Citation coverage typically reaches 70-85% on well-indexed corpora
+
+### Function Calling
+
+Function calling, standardized by OpenAI and now supported across major providers, enables LLMs to invoke external tools with structured parameters. The [Berkeley Function Calling Leaderboard (BFCL)](https://gorilla.cs.berkeley.edu/leaderboard.html) provides the most comprehensive evaluation, testing 2,000+ question-function pairs across Python, Java, JavaScript, and REST APIs.
+
+| Model | BFCL Score | Hallucination Rate | Multi-turn Accuracy |
+|-------|------------|-------------------|---------------------|
+| GPT-4o | 88-91% | Lowest | 82% |
+| Claude 3.5 Sonnet | 85-88% | Low | 79% |
+| Gemini 1.5 Pro | 84-87% | Low | 77% |
+| Open-source (70B) | 75-82% | Moderate | 68% |
+
+Anthropic's internal testing shows [tool use examples improved accuracy from 72% to 90%](https://www.anthropic.com/engineering/advanced-tool-use) on complex parameter handling. With Tool Search enabled, Claude Opus 4.5 improved from 79.5% to 88.1% on MCP evaluations.
+
+| Step | Interpretability | Risk | Mitigation Effectiveness |
+|------|------------------|------|-------------------------|
+| Tool selection | MEDIUM (logged) | Wrong tool selection in 8-15% of cases | Constrained decoding reduces to 3-5% |
+| Parameter extraction | MEDIUM (logged) | Hallucinated params in 5-10% of cases | Schema validation catches 90%+ |
+| Execution | HIGH (auditable) | Tool failures in 2-5% of calls | Retry logic, fallbacks |
+| Result processing | LOW | Misinterpretation in 10-20% of cases | Output verification |
+
+## Safety Profile
+
+### Advantages
+
+| Advantage | Explanation |
+|-----------|-------------|
+| **Scaffold logic inspectable** | Can read and audit orchestration code |
+| **Tool permissions controllable** | Can restrict which tools are available |
+| **Logs available** | Tool calls are recorded |
+| **Human in loop** | Each turn is human-initiated |
+| **Sandboxing possible** | Code execution can be contained |
+
+### Risks
+
+| Risk | Severity | Attack Success Rate | Mitigation | Residual Risk |
+|------|----------|---------------------|------------|---------------|
+| Prompt injection via tools | HIGH | 73% without defenses | Layered guardrails | 23% with full stack |
+| Hallucinated tool calls | MEDIUM | 5-10% of calls | Schema validation | 1-2% |
+| RAG corpus poisoning | MEDIUM | 90% for targeted queries | Content verification | Variable |
+| Data exfiltration | HIGH | High without controls | Output filtering | Moderate |
+| Tool enables real harm | MEDIUM | N/A | Permission systems, sandboxing | Low |
+
+**Security research findings** from [OWASP](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) and academic sources highlight critical vulnerabilities:
+
+- **Corpus Poisoning (PoisonedRAG):** Adding just 5 malicious documents to a corpus of millions causes 90% of targeted queries to return attacker-controlled answers
+- **Memory Exploitation:** ChatGPT memory vulnerabilities in September 2024 enabled persistent injection attacks surviving across sessions
+- **Zero-click Attacks:** Microsoft 365 Copilot "EchoLeak" demonstrated data exfiltration via specially crafted emails without user action
+- **Defense Effectiveness:** Content filtering alone reduces attack success to 41%; hierarchical guardrails bring it to 23%; response verification catches 60% of remaining attacks
+
+## Current Examples
+
+| System | Provider | Tools Available | Notable Performance |
+|--------|----------|-----------------|---------------------|
+| GPT-4o with plugins | OpenAI | Web browsing, code interpreter, DALL-E, custom plugins | 86.4% MMLU; 90th percentile Bar Exam |
+| Claude with tools | Anthropic | Web search, code execution, computer use, file handling | 88.7% MMLU; 80.9% SWE-bench (Opus 4.5) |
+| Gemini 1.5 Pro | Google | Search, code, multimodal | 54.8% WebArena; 1M token context |
+| Perplexity Pro | Perplexity | Real-time search, citations | Optimized for factual retrieval |
+| Enterprise RAG | Various | Document retrieval, internal APIs | 18% accuracy uplift typical |
+| GitHub Copilot | Microsoft | Code context, documentation search | 77% task acceptance rate |
+
+### Enterprise Adoption Statistics
+
+As of 2025, enterprise adoption of light scaffolding systems has reached significant scale:
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| Fortune 500 using ChatGPT | 92% | OpenAI (2025) |
+| Enterprise subscriptions | 3M+ business users | OpenAI Enterprise (June 2025) |
+| YoY subscription growth | 75% | Industry reports |
+| Azure OpenAI adoption increase | 64% YoY | Microsoft (2025) |
+| Enterprises using AI products | 72% | Industry surveys |
+| Productivity gain (GPT-4o users) | 23% across departments | Enterprise reports |
+
+A [Harvard/MIT study](https://js-interactive.com/chatgpt-trends-report-statistics/) found consultants using GPT-4 completed tasks 12.2% faster and produced 40% higher quality work than those without AI assistance.
+
+## Market Position
+
+### Why It's the Current Sweet Spot
+
+| Factor | Assessment |
+|--------|------------|
+| **Capability gains** | Significant over minimal scaffolding |
+| **Development cost** | Much lower than agentic systems |
+| **Reliability** | Higher than autonomous agents |
+| **Safety** | More controllable than agents |
+| **User familiarity** | Still chat-like interaction |
+
+### Competitive Pressure
+
+Light scaffolding is being squeezed from both sides:
+- **From below**: Minimal scaffolding is cheaper/simpler for some tasks
+- **From above**: Heavy scaffolding delivers more capability for complex tasks
+
+## Comparison with Other Patterns
+
+| Aspect | Minimal | Light | Heavy |
+|--------|---------|-------|-------|
+| Capability ceiling | LOW | MEDIUM | HIGH |
+| Development effort | LOW | MEDIUM | HIGH |
+| Reliability | HIGH | MEDIUM | LOW |
+| Safety complexity | LOW | MEDIUM | HIGH |
+| Scaffold interpretability | N/A | MEDIUM | MEDIUM-HIGH |
+
+## Trajectory
+
+### Current Trends
+
+1. **RAG is mature** - Well-understood patterns; frameworks like LangChain, LlamaIndex have 50K+ GitHub stars
+2. **Function calling standardized** - OpenAI's format adopted by Anthropic, Google, open-source; [BFCL benchmark](https://gorilla.cs.berkeley.edu/leaderboard.html) is now the de facto standard
+3. **Code execution common** - Jupyter-style sandboxes standard across platforms; 43% of tech companies use ChatGPT for core workflows
+4. **Structured outputs maturing** - [Anthropic](https://www.anthropic.com/engineering/advanced-tool-use) and OpenAI now guarantee schema compliance
+
+### Future Evolution
+
+According to [METR research](https://simonwillison.net/2025/Dec/31/the-year-in-llms/), the length of tasks AI can perform autonomously is **doubling every 7 months**. GPT-5 and Claude Opus 4.5 can now perform tasks taking humans multiple hours, compared to sub-30-minute limits in 2024.
+
+| Direction | Likelihood | Timeline | Evidence |
+|-----------|------------|----------|----------|
+| Merge into heavy scaffolding | HIGH (75%) | 2025-2027 | WebArena: 14% to 60% in 2 years |
+| Remain for simple use cases | MEDIUM (60%) | Ongoing | Enterprise preference for reliability |
+| Enhanced with better tools | HIGH (85%) | 2025+ | Structured outputs, computer use beta |
+| Multi-agent coordination | MEDIUM (50%) | 2026+ | Current research focus |
+
+## Implications for Safety Research
+
+### Research That Applies Well
+
+- **Tool safety** - Safe tool design and permissions
+- **RAG safety** - Preventing retrieval attacks
+- **Output verification** - Checking responses against sources
+- **Logging and monitoring** - Audit trails for tool use
+
+### Research Gaps
+
+- **Tool selection reliability** - When does the model pick wrong tools?
+- **Cascading errors** - How do tool errors propagate?
+- **Permission granularity** - What's the right permission model?
+
+## Key Uncertainties
+
+1. **Will light scaffolding persist or merge into agentic?** The boundary is blurry and moving. WebArena benchmarks show agent success rates climbing from 14% to 60% in two years, suggesting the "light" vs "heavy" distinction may become obsolete by 2027.
+
+2. **What's the reliability ceiling?** Current BFCL scores plateau around 88-91% for frontier models. Multi-turn accuracy remains 5-10 percentage points lower than single-turn. Can light scaffolding reach 95%+ reliability needed for fully autonomous operation?
+
+3. **How should tool permissions work?** Attack research shows 73% baseline vulnerability dropping to 23% with layered defenses. The optimal balance between capability and security remains unclear, with different vendors taking different approaches.
+
+4. **Security vs. capability tradeoff:** RAG corpus poisoning can achieve 90% success rates for targeted attacks with minimal payload. How can systems maintain retrieval benefits while preventing adversarial manipulation?
+
+## Sources and Further Reading
+
+- Yao et al. (2022). [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629). ICLR 2023.
+- Schick et al. (2023). [Toolformer: Language Models Can Teach Themselves to Use Tools](https://arxiv.org/abs/2302.04761). NeurIPS 2023.
+- [Berkeley Function Calling Leaderboard (BFCL)](https://gorilla.cs.berkeley.edu/leaderboard.html). UC Berkeley.
+- [Medical RAG Benchmark (MIRAGE)](https://teddy-xionggz.github.io/benchmark-medical-rag/). ACL 2024.
+- [Evaluation of Retrieval-Augmented Generation: A Survey](https://arxiv.org/abs/2405.07437). arXiv 2024.
+- [OWASP LLM Top 10: Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/). OWASP 2025.
+- [Anthropic Advanced Tool Use](https://www.anthropic.com/engineering/advanced-tool-use). Anthropic Engineering.
+- [WebArena Benchmark](https://webarena.dev/). CMU/Allen Institute.
+
+## Related Pages
+
+- <EntityLink id="minimal-scaffolding">Minimal Scaffolding</EntityLink> - Simpler deployment
+- <EntityLink id="heavy-scaffolding">Heavy Scaffolding</EntityLink> - More complex agentic systems
+- <EntityLink id="dense-transformers">Dense Transformers</EntityLink> - Underlying model architecture

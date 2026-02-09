@@ -1,0 +1,927 @@
+- id: "tmc-companies"
+  type: "ai-transition-model-subitem"
+  title: "AI Ownership - Companies"
+  parentFactor: "ai-ownership"
+  path: "/ai-transition-model/companies/"
+  description: "Distribution of AI capability among companies. Currently highly concentrated—four
+    companies control 66.7% of AI market value. Creates both coordination opportunities and monopoly
+    risks."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "AI Ownership - Companies: Research Report"
+    risks:
+      - path: "/knowledge-base/risks/concentration-of-power/"
+        title: "Concentration of Power"
+        description: "Comprehensive analysis of power concentration risks"
+      - path: "/knowledge-base/risks/winner-take-all/"
+        title: "Winner-Take-All Dynamics"
+        description: "Market dynamics driving concentration"
+    responses:
+      - path: "/knowledge-base/responses/open-source/"
+        title: "Open Source AI"
+        description: "Alternative development paradigm"
+      - path: "/knowledge-base/responses/industry/"
+        title: "Industry Governance"
+        description: "Self-regulatory approaches"
+    models:
+      - path: "/knowledge-base/models/winner-take-all-concentration/"
+        title: "Winner-Take-All Concentration"
+        description: "Mathematical modeling of concentration dynamics"
+      - path: "/knowledge-base/models/lab-incentives-model/"
+        title: "Lab Incentives Model"
+        description: "Analysis of AI lab decision-making"
+  causeEffectGraph:
+    title: "What Drives Company AI Concentration?"
+    description: "Causal factors affecting distribution of AI capabilities among firms. Four companies
+      control 66.7% of $1.1T AI market value."
+    primaryNodeId: "company-concentration"
+    nodes:
+      - id: "capital-requirements"
+        label: "Capital Requirements"
+        type: "leaf"
+        color: "blue"
+        description: "Training costs $100M-$1B+. Barriers to entry."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 4
+          certainty: 9
+      - id: "talent-scarcity"
+        label: "Talent Scarcity"
+        type: "leaf"
+        color: "rose"
+        description: "Top researchers concentrated in few labs."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 5
+          certainty: 7
+      - id: "data-moats"
+        label: "Data Moats"
+        type: "leaf"
+        description: "Proprietary data creating competitive advantage."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 5
+          certainty: 6
+      - id: "compute-access"
+        label: "Compute Access"
+        type: "leaf"
+        color: "blue"
+        description: "Access to GPUs and cloud infrastructure. NVIDIA H100 allocation heavily favors big
+          players."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 5
+          certainty: 8
+      - id: "open-source-counterforce"
+        label: "Open Source Counterforce"
+        type: "leaf"
+        color: "emerald"
+        description: "Open weights (Llama, Mistral) challenge closed concentration by distributing
+          capabilities."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 6
+          certainty: 5
+      - id: "antitrust-pressure"
+        label: "Antitrust Pressure"
+        type: "leaf"
+        color: "blue"
+        description: "Regulatory scrutiny of AI market concentration. FTC, DOJ, EU investigations underway."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 7
+          certainty: 4
+      - id: "network-effects"
+        label: "Network Effects"
+        type: "intermediate"
+        color: "rose"
+        description: "Users create data that improves models further."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 4
+          certainty: 7
+      - id: "market-power"
+        label: "Market Power"
+        type: "intermediate"
+        color: "red"
+        description: "Ability to set prices and standards."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 5
+          certainty: 7
+      - id: "concentration-governance-question"
+        label: "Is concentration good or bad for safety?"
+        type: "leaf"
+        color: "violet"
+        description: "Debate whether few controllable actors is safer than diffuse, ungovernable ecosystem."
+        scores:
+          novelty: 7
+          sensitivity: 9
+          changeability: 3
+          certainty: 2
+      - id: "company-concentration"
+        label: "Company Concentration"
+        type: "effect"
+        description: "How concentrated AI capabilities are among firms."
+        scores:
+          novelty: 4
+          sensitivity: 9
+          changeability: 4
+          certainty: 8
+    edges:
+      - source: "capital-requirements"
+        target: "company-concentration"
+        strength: "strong"
+        effect: "increases"
+      - source: "talent-scarcity"
+        target: "company-concentration"
+        strength: "strong"
+        effect: "increases"
+      - source: "data-moats"
+        target: "network-effects"
+        strength: "strong"
+        effect: "increases"
+      - source: "compute-access"
+        target: "company-concentration"
+        strength: "strong"
+        effect: "increases"
+      - source: "open-source-counterforce"
+        target: "company-concentration"
+        strength: "medium"
+        effect: "decreases"
+      - source: "antitrust-pressure"
+        target: "market-power"
+        strength: "medium"
+        effect: "decreases"
+      - source: "network-effects"
+        target: "market-power"
+        strength: "strong"
+        effect: "increases"
+      - source: "market-power"
+        target: "company-concentration"
+        strength: "strong"
+        effect: "increases"
+      - source: "concentration-governance-question"
+        target: "company-concentration"
+        strength: "medium"
+        effect: "mixed"
+  content:
+    intro: "<ATMPage entityId=\"tmc-companies\" client:load>"
+    sections:
+      - heading: "Winner-Take-All Dynamics"
+        mermaid: "flowchart TD
+
+          \    subgraph Loops[\"Reinforcing Feedback Loops\"]
+
+          \        DATA[Data Flywheel]
+
+          \        COMPUTE[Compute Advantage]
+
+          \        TALENT[Talent Concentration]
+
+          \    end
+
+
+          \    DATA --> CONC[Companies - Corporate Concentration]
+
+          \    COMPUTE --> CONC
+
+          \    TALENT --> CONC
+
+
+          \    CONC --> DATA
+
+          \    CONC --> COMPUTE
+
+          \    CONC --> TALENT
+
+
+          \    CONC --> OWNER[AI Ownership]
+
+
+          \    subgraph Scenarios[\"Ultimate Scenarios\"]
+
+          \        LOCKIN[Long-term Lock-in]
+
+          \    end
+
+
+          \    OWNER --> LOCKIN
+
+
+          \    subgraph Outcomes[\"Ultimate Outcomes\"]
+
+          \        TRAJ[Long-term Trajectory]
+
+          \    end
+
+
+          \    LOCKIN --> TRAJ
+
+
+          \    style Loops fill:#f1f5f9,stroke:#94a3b8
+
+          \    style CONC fill:#3b82f6,color:#fff
+
+          \    style OWNER fill:#dbeafe,stroke:#3b82f6
+
+          \    style Scenarios fill:#ede9fe,stroke:#8b5cf6
+
+          \    style LOCKIN fill:#8b5cf6,color:#fff
+
+          \    style TRAJ fill:#f59e0b,color:#fff"
+        body: "The [winner-take-all concentration
+          model](/knowledge-base/models/race-models/winner-take-all-concentration/) identifies five
+          interconnected positive feedback loops:
+
+
+          | Loop | Mechanism | Strength |
+
+          |------|-----------|----------|
+
+          | **Data flywheel** | More users generate better training data | Strong |
+
+          | **Compute advantage** | More revenue funds more compute | Strong |
+
+          | **Talent concentration** | Prestige attracts top researchers | Strong |
+
+          | **Network effects** | Developer ecosystems attract users | Medium |
+
+          | **Barriers to entry** | IP and partnerships create moats | Medium |
+
+
+          Mathematical modeling suggests combined loop gain of **1.2-2.0**, indicating concentration
+          is the stable equilibrium rather than a temporary phenomenon."
+      - heading: "Safety Implications of Concentration"
+        body: "As detailed in the [concentration of
+          power](/knowledge-base/risks/structural/concentration-of-power/) analysis, concentrated
+          development creates:
+
+
+          | Risk | Description | Severity |
+
+          |------|-------------|----------|
+
+          | **Undemocratic decisions** | Small group makes decisions affecting billions | High |
+
+          | **Single points of failure** | Key actors failing causes system-wide problems | High |
+
+          | **Regulatory capture** | Concentrated interests shape rules in their favor | Medium |
+
+          | **Value embedding** | Few decide whose values get encoded | High |
+
+
+          ### Current Safety Assessments
+
+
+          SaferAI 2025 assessments found no major lab scored above \"weak\" (35%) in risk
+          management:
+
+
+          | Lab | Risk Management Score |
+
+          |-----|----------------------|
+
+          | Anthropic | 35% |
+
+          | OpenAI | 33% |
+
+          | xAI | 18% |"
+      - heading: "Competitive Pressure vs. Safety"
+        body: "The tension between corporate safety incentives and competitive pressure represents a key
+          uncertainty.
+
+
+          [Industry self-regulation](/knowledge-base/responses/governance/industry/) through
+          Responsible Scaling Policies and voluntary commitments offers:
+
+          - Flexibility and technical expertise
+
+          - But lacks enforcement mechanisms
+
+          - May be weakened under competitive pressure
+
+
+          The December 2024 release of DeepSeek-R1 demonstrated how quickly safety considerations
+          can be subordinated to competitive dynamics."
+      - heading: "The Open Source Question"
+        body: "The role of [open source AI](/knowledge-base/responses/organizational-practices/open-source/)
+          in corporate concentration remains contested.
+
+
+          | Position | Arguments |
+
+          |----------|-----------|
+
+          | **Democratization** | Meta's Llama releases challenge concentration by distributing
+          capabilities broadly |
+
+          | **Limitations** | Open-source models lag frontier capabilities by 6-12 months |
+
+          | **Safety concerns** | Safety training can be removed with as few as 200 fine-tuning
+          examples |
+
+
+          </ATMPage>"
+  sidebarOrder: 2
+- id: "tmc-countries"
+  type: "ai-transition-model-subitem"
+  title: "AI Ownership - Countries"
+  parentFactor: "ai-ownership"
+  path: "/ai-transition-model/countries/"
+  description: "Distribution of AI capability among nations. Currently US-dominated with China as main
+    competitor. Geographic concentration creates geopolitical tensions and coordination challenges."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "AI Ownership - Countries: Research Report"
+    risks:
+      - path: "/knowledge-base/risks/multipolar-trap/"
+        title: "Multipolar Trap"
+        description: "Racing dynamics from coordination failure"
+    responses:
+      - path: "/knowledge-base/responses/coordination-mechanisms/"
+        title: "International Coordination"
+        description: "Mechanisms for cross-border cooperation"
+      - path: "/knowledge-base/responses/export-controls/"
+        title: "Export Controls"
+        description: "Trade restrictions on AI-relevant hardware"
+    models:
+      - path: "/knowledge-base/models/international-coordination-game/"
+        title: "International Coordination Game"
+        description: "Game-theoretic analysis of cooperation dynamics"
+  causeEffectGraph:
+    title: "What Drives Country AI Distribution?"
+    description: "Causal factors affecting national AI capabilities. 94% of AI funding in US; US-China
+      competition dominates."
+    primaryNodeId: "country-distribution"
+    nodes:
+      - id: "research-ecosystem"
+        label: "Research Ecosystem"
+        type: "leaf"
+        color: "teal"
+        description: "Universities, labs, talent pipelines."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 3
+          certainty: 8
+      - id: "capital-availability"
+        label: "Capital Availability"
+        type: "leaf"
+        color: "blue"
+        description: "Venture funding and government investment."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 6
+          certainty: 8
+      - id: "compute-access"
+        label: "Compute Access"
+        type: "leaf"
+        color: "blue"
+        description: "Access to chips and data centers. Export controls limit some nations."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 6
+          certainty: 8
+      - id: "export-controls"
+        label: "Export Controls"
+        type: "leaf"
+        color: "rose"
+        description: "US semiconductor restrictions on China. ASML EUV limits. Creates friction but spurs
+          indigenous development."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 6
+          certainty: 7
+      - id: "geopolitical-rivalry"
+        label: "US-China Rivalry"
+        type: "leaf"
+        color: "red"
+        description: "Great power competition shapes AI development. \"Turbo-charging development with no
+          guardrails.\""
+        scores:
+          novelty: 4
+          sensitivity: 9
+          changeability: 3
+          certainty: 8
+      - id: "third-pole-development"
+        label: "Third Pole Development"
+        type: "leaf"
+        color: "emerald"
+        description: "EU, UK, Japan, India developing independent capabilities. Could provide alternative
+          governance models."
+        scores:
+          novelty: 6
+          sensitivity: 6
+          changeability: 6
+          certainty: 4
+      - id: "talent-migration"
+        label: "Talent Migration"
+        type: "intermediate"
+        color: "teal"
+        description: "Flow of AI researchers between countries."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 6
+          certainty: 6
+      - id: "industrial-base"
+        label: "Industrial Base"
+        type: "intermediate"
+        description: "Manufacturing and deployment infrastructure."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 3
+          certainty: 7
+      - id: "us-china-cooperation-question"
+        label: "Can US-China cooperate on AI safety?"
+        type: "leaf"
+        color: "violet"
+        description: "Critical question whether rivalry precludes cooperation on catastrophic risks. Some
+          backdoor technical cooperation ongoing."
+        scores:
+          novelty: 7
+          sensitivity: 10
+          changeability: 5
+          certainty: 2
+      - id: "country-distribution"
+        label: "Country AI Distribution"
+        type: "effect"
+        description: "How AI capabilities are distributed among nations."
+        scores:
+          novelty: 4
+          sensitivity: 9
+          changeability: 4
+          certainty: 7
+    edges:
+      - source: "research-ecosystem"
+        target: "talent-migration"
+        strength: "strong"
+        effect: "increases"
+      - source: "capital-availability"
+        target: "country-distribution"
+        strength: "strong"
+        effect: "increases"
+      - source: "compute-access"
+        target: "country-distribution"
+        strength: "strong"
+        effect: "increases"
+      - source: "export-controls"
+        target: "compute-access"
+        strength: "strong"
+        effect: "decreases"
+      - source: "geopolitical-rivalry"
+        target: "country-distribution"
+        strength: "strong"
+        effect: "increases"
+      - source: "third-pole-development"
+        target: "country-distribution"
+        strength: "medium"
+        effect: "mixed"
+      - source: "talent-migration"
+        target: "country-distribution"
+        strength: "strong"
+        effect: "increases"
+      - source: "industrial-base"
+        target: "country-distribution"
+        strength: "medium"
+        effect: "increases"
+      - source: "us-china-cooperation-question"
+        target: "country-distribution"
+        strength: "medium"
+        effect: "mixed"
+  content:
+    intro: "<ATMPage entityId=\"tmc-countries\" client:load>"
+    sections:
+      - heading: "The Coordination Dilemma"
+        body: "The distribution of AI capabilities among nations creates a classic coordination dilemma
+          analyzed in the [international coordination
+          game](/knowledge-base/models/governance-models/international-coordination-game/).
+
+
+          ### Game-Theoretic Dynamics
+
+
+          Game-theoretic modeling shows that defection (racing) mathematically dominates cooperation
+          when actors believe cooperation probability falls below 50%—a threshold currently unmet in
+          US-China relations. This creates [multipolar
+          trap](/knowledge-base/risks/structural/multipolar-trap/) dynamics where rational actors
+          pursuing individual interests produce collectively catastrophic outcomes.
+
+
+          Both superpowers are \"turbo-charging development with almost no guardrails\" because
+          neither wants to slow down first."
+      - heading: "Why Geographic Concentration Matters for Safety"
+        mermaid: "flowchart TD
+
+          \    CONC[Countries - Geographic Concentration]
+
+
+          \    CONC --> FIRST[First-Mover Pressure]
+
+          \    CONC --> COOP[Cooperation Challenges]
+
+
+          \    FIRST --> RACE[Racing Dynamics]
+
+          \    COOP --> TRAP[Multipolar Trap]
+
+
+          \    RACE --> OWNER[AI Ownership]
+
+          \    TRAP --> OWNER
+
+
+          \    subgraph Scenarios[\"Ultimate Scenarios\"]
+
+          \        LOCKIN[Long-term Lock-in]
+
+          \    end
+
+
+          \    OWNER --> LOCKIN
+
+
+          \    subgraph Outcomes[\"Ultimate Outcomes\"]
+
+          \        TRAJ[Long-term Trajectory]
+
+          \    end
+
+
+          \    LOCKIN --> TRAJ
+
+
+          \    style CONC fill:#3b82f6,color:#fff
+
+          \    style OWNER fill:#dbeafe,stroke:#3b82f6
+
+          \    style Scenarios fill:#ede9fe,stroke:#8b5cf6
+
+          \    style LOCKIN fill:#8b5cf6,color:#fff
+
+          \    style TRAJ fill:#f59e0b,color:#fff"
+        body: "### Mechanisms
+
+
+          | Mechanism | Effect | Example |
+
+          |-----------|--------|---------|
+
+          | **First-mover pressure** | Reduces safety investment | Winner-take-all competition |
+
+          | **Export controls** | Strains cooperation | US semiconductor restrictions |
+
+          | **Coordination failure** | Enables racing | No binding agreements |"
+      - heading: "Current International Landscape"
+        body: "### Coordination Mechanisms
+
+
+          | Initiative | Scope | Budget | Effectiveness |
+
+          |------------|-------|--------|---------------|
+
+          | AI Safety Institute network | 11 countries | ~$150M combined | Emerging |
+
+          | Council of Europe AI Treaty | 14 signatories | N/A | First binding agreement |
+
+          | US-China bilateral dialogues | 2 countries | N/A | Limited by competition |
+
+          | Private sector investment | Global | $100B+ annually | Dwarfs public efforts |"
+      - heading: "Key Uncertainties"
+        body: "| Question | Possible Answers |
+
+          |----------|-----------------|
+
+          | Do US-China dynamics inevitably tend toward confrontation? | Confrontation vs.
+          cooperation through mutual catastrophic risk awareness |
+
+          | Do democratic nations maintain structural advantages? | Innovation ecosystem vs.
+          state-directed focus |
+
+          | Can alternative power centers influence trajectory? | EU, UK, emerging economies as
+          third pole vs. bipolar lock-in |
+
+
+          </ATMPage>"
+  sidebarOrder: 1
+- id: "tmc-shareholders"
+  type: "ai-transition-model-subitem"
+  title: "AI Ownership - Shareholders"
+  parentFactor: "ai-ownership"
+  path: "/ai-transition-model/shareholders/"
+  description: "Distribution of AI wealth among individuals and institutions. AI amplifies returns to
+    capital, potentially creating unprecedented wealth concentration among shareholders."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "AI Ownership - Shareholders: Research Report"
+    risks:
+      - path: "/knowledge-base/risks/concentration-of-power/"
+        title: "Concentration of Power"
+        description: "Broader analysis of power concentration dynamics"
+    models:
+      - path: "/knowledge-base/models/economic-disruption-impact/"
+        title: "Economic Disruption Impact"
+        description: "Analysis of AI's economic effects"
+  causeEffectGraph:
+    title: "How AI Affects Shareholder Wealth?"
+    description: "Causal factors affecting wealth distribution from AI. Capital-labor share shifting
+      toward capital owners."
+    primaryNodeId: "shareholder-concentration"
+    nodes:
+      - id: "stock-ownership-patterns"
+        label: "Stock Ownership Patterns"
+        type: "leaf"
+        color: "blue"
+        description: "Who owns equity in AI companies."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 5
+          certainty: 7
+      - id: "capital-labor-shift"
+        label: "Capital-Labor Shift"
+        type: "leaf"
+        color: "rose"
+        description: "AI increases returns to capital vs labor."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 4
+          certainty: 6
+      - id: "winner-take-all"
+        label: "Winner-Take-All Dynamics"
+        type: "leaf"
+        color: "red"
+        description: "Market concentration in AI companies."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 4
+          certainty: 8
+      - id: "founder-control-structures"
+        label: "Founder Control Structures"
+        type: "leaf"
+        color: "teal"
+        description: "Dual-class shares, voting control retained by founders. Google, Meta founders have
+          outsized control."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 3
+          certainty: 8
+      - id: "institutional-ownership"
+        label: "Institutional Ownership"
+        type: "leaf"
+        color: "blue"
+        description: "Pension funds, sovereign wealth funds, index funds as major shareholders. Creates
+          diffuse beneficiaries."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 5
+          certainty: 8
+      - id: "redistribution-mechanisms"
+        label: "Redistribution Mechanisms"
+        type: "leaf"
+        color: "emerald"
+        description: "UBI, wealth taxes, AI dividend proposals. Policy responses to concentration."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 7
+          certainty: 3
+      - id: "ai-company-valuations"
+        label: "AI Company Valuations"
+        type: "intermediate"
+        description: "Market cap of AI companies ($1-3T for leaders)."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 7
+          certainty: 9
+      - id: "wealth-inequality"
+        label: "Wealth Inequality"
+        type: "intermediate"
+        color: "red"
+        description: "Gap between AI shareholders and others."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 5
+          certainty: 7
+      - id: "political-influence"
+        label: "Political Influence"
+        type: "intermediate"
+        color: "rose"
+        description: "Concentrated wealth enables lobbying, campaign contributions, regulatory capture."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 5
+          certainty: 7
+      - id: "beneficial-distribution-question"
+        label: "Who should benefit from AI wealth?"
+        type: "leaf"
+        color: "violet"
+        description: "Normative question about just distribution. Workers, citizens, humanity? No consensus."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 5
+          certainty: 2
+      - id: "shareholder-concentration"
+        label: "Shareholder Wealth Concentration"
+        type: "effect"
+        description: "Degree of AI wealth concentration among shareholders."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 4
+          certainty: 6
+    edges:
+      - source: "stock-ownership-patterns"
+        target: "shareholder-concentration"
+        strength: "strong"
+        effect: "increases"
+      - source: "capital-labor-shift"
+        target: "wealth-inequality"
+        strength: "strong"
+        effect: "increases"
+      - source: "winner-take-all"
+        target: "ai-company-valuations"
+        strength: "strong"
+        effect: "increases"
+      - source: "founder-control-structures"
+        target: "shareholder-concentration"
+        strength: "medium"
+        effect: "increases"
+      - source: "institutional-ownership"
+        target: "shareholder-concentration"
+        strength: "medium"
+        effect: "mixed"
+      - source: "redistribution-mechanisms"
+        target: "wealth-inequality"
+        strength: "medium"
+        effect: "decreases"
+      - source: "ai-company-valuations"
+        target: "shareholder-concentration"
+        strength: "strong"
+        effect: "increases"
+      - source: "wealth-inequality"
+        target: "shareholder-concentration"
+        strength: "medium"
+        effect: "increases"
+      - source: "wealth-inequality"
+        target: "political-influence"
+        strength: "strong"
+        effect: "increases"
+      - source: "political-influence"
+        target: "redistribution-mechanisms"
+        strength: "medium"
+        effect: "decreases"
+      - source: "beneficial-distribution-question"
+        target: "shareholder-concentration"
+        strength: "medium"
+        effect: "mixed"
+  content:
+    intro: "<ATMPage entityId=\"tmc-shareholders\" client:load>"
+    sections:
+      - heading: "Economic Implications"
+        mermaid: "flowchart TD
+
+          \    SHARE[Shareholders - Ownership Distribution]
+
+
+          \    SHARE --> CAPITAL[Benefits Flow to Capital]
+
+          \    CAPITAL --> CONCENTRATE[Wealth Concentrates]
+
+          \    CONCENTRATE --> SHARE
+
+
+          \    SHARE --> OWNER[AI Ownership]
+
+
+          \    subgraph Scenarios[\"Ultimate Scenarios\"]
+
+          \        LOCKIN[Long-term Lock-in]
+
+          \    end
+
+
+          \    OWNER --> LOCKIN
+
+
+          \    subgraph Outcomes[\"Ultimate Outcomes\"]
+
+          \        TRAJ[Long-term Trajectory]
+
+          \    end
+
+
+          \    LOCKIN --> TRAJ
+
+
+          \    style SHARE fill:#3b82f6,color:#fff
+
+          \    style CONCENTRATE fill:#fecaca,stroke:#ef4444
+
+          \    style OWNER fill:#dbeafe,stroke:#3b82f6
+
+          \    style Scenarios fill:#ede9fe,stroke:#8b5cf6
+
+          \    style LOCKIN fill:#8b5cf6,color:#fff
+
+          \    style TRAJ fill:#f59e0b,color:#fff"
+        body: "The [economic disruption impact
+          model](/knowledge-base/models/impact-models/economic-disruption-impact/) analyzes how
+          AI-driven automation interacts with ownership structures to affect wealth distribution.
+
+
+          ### The Inequality Spiral
+
+
+
+
+          If AI displaces 20-30% of jobs over the next decade while productivity gains flow
+          primarily to capital owners, the inequality spiral becomes self-reinforcing.
+
+
+          ### Historical Precedent
+
+
+          MIT research indicates **50-70%** of US wage inequality growth since 1980 stems from
+          automation, before the current AI surge."
+      - heading: "Governance Influence by Company Type"
+        body: "The governance influence of shareholders varies significantly across AI companies:
+
+
+          | Company | Structure | Major Investors | Shareholder Influence |
+
+          |---------|-----------|-----------------|----------------------|
+
+          | **OpenAI** | Capped-profit | Microsoft ($13B+) | Complex governance arrangements |
+
+          | **Anthropic** | C-corp | Google, Amazon ($14B total) | Multiple stakeholder interests |
+
+          | **Google DeepMind** | Division | Alphabet shareholders | Traditional corporate
+          governance |
+
+          | **Meta AI** | Division | Meta shareholders | Public company dynamics |"
+      - heading: "Capital Requirements Drive Concentration"
+        body: "As analyzed in [concentration of
+          power](/knowledge-base/risks/structural/concentration-of-power/), shareholder
+          concentration intersects with broader power concentration dynamics.
+
+
+          | Timeline | Training Cost | Effect on Ownership |
+
+          |----------|--------------|---------------------|
+
+          | Current | $100M+ | Limits to well-funded organizations |
+
+          | 2026 projected | $1-10B | Further concentrates among largest actors |
+
+          | Long-term | Unknown | May require nation-state resources |"
+      - heading: "Public Ownership Proposals"
+        body: "The question of public ownership emerges as a potential response to shareholder
+          concentration:
+
+
+          | Proposal | Mechanism | Challenges |
+
+          |----------|-----------|------------|
+
+          | **Sovereign wealth funds** | Government investment in AI companies | Political capture
+          risk |
+
+          | **Employee ownership** | Equity distribution to workers | Limits to capital availability
+          |
+
+          | **AI dividends** | Distribution of AI productivity gains | Implementation complexity |
+
+          | **Public infrastructure** | Direct government ownership of AI systems | Innovation
+          concerns |
+
+
+          Each approach faces significant implementation challenges.
+
+
+          </ATMPage>"
+  sidebarOrder: 3

@@ -1,0 +1,564 @@
+---
+title: "Meta & Structural Indicators"
+description: "Metrics tracking information environment quality, institutional capacity, and societal resilience to AI disruption"
+sidebar:
+  order: 11
+importance: 52
+quality: 57
+llmSummary: "Comprehensive survey of 10 structural metrics for AI governance capacity, finding: 1-3 year policy lag times, 16-26 point elite-public trust gaps, moderate market concentration (HHI ~2,500), 2,000+ documented incidents but very low near-miss reporting, and weak international coordination. Most metrics are measured annually via established indices (Freedom House, WGI, Edelman) though several key dimensions (coordination success rate, societal resilience) remain conceptual with low data quality."
+ratings:
+  novelty: 4.5
+  rigor: 6
+  actionability: 3.5
+  completeness: 6.5
+metrics:
+  wordCount: 2943
+  citations: 56
+  tables: 2
+  diagrams: 0
+clusters: ["governance"]
+---
+import {R, EntityLink} from '@components/wiki';
+
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Metadata) |
+
+These metrics assess the **structural and meta-level conditions** that determine society's ability to navigate AI development safely. Unlike direct capability or safety metrics, these measure the quality of the broader systems—governance institutions, information environments, coordination mechanisms—that mediate AI's societal impact.
+
+## Overview
+
+Structural indicators help answer: **Is society equipped to handle AI risks?** They track whether institutions can make good decisions, whether information environments support informed debate, and whether coordination mechanisms can address collective action problems.
+
+**Key distinctions:**
+- **Direct metrics** (capabilities, safety research) → What AI can do and how safe it is
+- **Structural metrics** (these) → Whether society can govern AI effectively
+
+Many of these metrics are **conceptual or partially measured**—they represent important dimensions we should track, even if comprehensive data doesn't yet exist.
+
+---
+
+## 1. Information Environment Quality
+
+### Measured Indicators
+
+**Freedom House "Freedom on the Net" Score**
+- **Latest (2025)**: United States remains "Free" but with declining scores
+- Concerns about misinformation ahead of 2024 elections contributing to "unreliable information environment"
+- United Kingdom saw decline due to false information leading to riots in summer 2024
+- **Interpretation**: Score based on internet freedom, content controls, and users' rights
+- **Source**: <R id="78e083150e94721f">Freedom on the Net 2025</R>
+
+**RSF World Press Freedom Index**
+- **2025 Global Average**: Economic indicator at "unprecedented, critical low"
+- Global press freedom now classified as "difficult situation" for first time in Index history
+- **<EntityLink id="disinformation">Disinformation</EntityLink> prevalence**: 138/180 countries report political actors involved in disinformation campaigns
+- 31 countries report "systematic" disinformation involvement
+- **2024 US-specific**: Press freedom violations increased to 49 arrests/charges and 80 assaults on journalists (vs 15 and 45 in 2023)
+- **Source**: <R id="c0ac4cc088b3f376">RSF World Press Freedom Index 2025</R>
+
+**Trust in Institutions (Edelman Trust Barometer 2024)**
+- **Business**: 63% trust (only trusted institution)
+- **Government**: Low trust, 42% trust government leaders
+- **Media**: Actively distrusted
+- **Mass/Elite divide on AI**: 16-point gap in US (43% high-income vs 27% low-income trust AI)
+- **Innovation management**: 2:1 margin believe innovation is poorly managed
+- **Source**: <R id="1312df71e6a1ca40">2024 Edelman Trust Barometer</R>
+
+### Conceptual Indicators (Limited Direct Measurement)
+
+**AI-Specific Misinformation Prevalence**
+- *Conceptual metric*: % of AI-related claims in public discourse that are false or misleading
+- **Proxy data**: 62% of voters primarily concerned (vs 21% excited) about AI (AIPI polling)
+- **Elite/public gap**: "Large disconnect between elite discourse and what American public wants" - AI Policy Institute
+- **Challenge**: No systematic tracking of AI misinformation rates
+- **Source**: <R id="06df7804247cb5ae">AI Policy Institute Polling</R>
+
+---
+
+## 2. Institutional Decision-Making Quality
+
+### Measured Proxies
+
+**World Bank Worldwide Governance Indicators (WGI)**
+- **Government Effectiveness dimension**: Quality of public services, bureaucracy competence, civil service independence, policy credibility
+- **Scale**: -2.5 to +2.5 (normalized with mean ~0), also mapped to 0-100 scale
+- **Latest**: 2024 methodology update covering 214 economies, 1996-2023 data
+- **Data sources**: 35 cross-country sources including household surveys, firm surveys, expert assessments
+- **Limitation**: "Inputs" focused (institutional capacity) rather than "outputs" (decision quality)
+- **Source**: <R id="9dd5b2d29cbec8e5">World Bank WGI 2024</R>
+
+**V-Dem Digital Society Index**
+- **Coverage**: Measures government internet censorship, social media monitoring, online media fractionalization
+- **Note**: 2024 specific data on information environment not retrieved, but framework exists
+- **Source**: V-Dem Institute (v-dem.net)
+
+### Conceptual Indicators
+
+**AI Policy Quality Index**
+- *Conceptual metric*: Expert assessment of whether AI policies address actual risks proportionately
+- **Current status**: No standardized index exists
+- **Proxy**: Mixed signals—<EntityLink id="eu-ai-act">EU AI Act</EntityLink> implemented, US executive order, but critiques of regulatory lag
+
+**Evidence-Based Policy Rate for AI**
+- *Conceptual metric*: % of major AI policy decisions informed by rigorous evidence
+- **Challenge**: Would require systematic policy analysis across jurisdictions
+- **Current**: Anecdotal evidence suggests variable quality
+
+---
+
+## 3. Elite vs Public Opinion Divergence on AI
+
+### Measured Divergence
+
+**Expert vs Public Trust Gap (Pew Research 2024)**
+- **Finding**: "Experts are far more positive and enthusiastic about AI than the public"
+- **Methodology**: 5,410 US adults (Aug 2024) vs 1,013 AI experts (Aug-Oct 2024)
+- **Experts**: Identified via authors/presenters at 21 AI conferences in 2023-2024
+- **Source**: <R id="40fcdcc3ffba5188">Pew Research: Public and AI Experts</R>
+
+**AI Policy Institute Polling (2024)**
+- **Development pace preference**: 72% prefer slowing AI development vs 8% prefer speeding up
+- **Risk vs excitement**: 62% primarily concerned vs 21% primarily excited
+- **Catastrophic risk belief**: 86% believe AI could accidentally cause catastrophic event
+- **Liability**: 73% believe AI companies should be held liable for harm
+- **Regulation preference**: 67% think AI models' power should be restricted
+- **Elite disconnect quote**: "Large disconnect between elite discourse or discourse in labs and what American public wants" - Daniel Colson, AIPI Executive Director
+- **Source**: <R id="06df7804247cb5ae">AIPI Polling</R>
+
+**Trust Gap in AI Companies (Edelman 2024)**
+- **Technology sector vs AI innovation**: 26-point gap (76% trust tech sector vs 50% trust AI)
+- **AI company <EntityLink id="trust-decline">trust decline</EntityLink>**: From 62% (5 years ago) to 54% (2024)
+- **Rejection willingness**: 43% will actively reject AI products if innovation poorly managed
+- **Source**: <R id="16a7a1283bb27ff2">Edelman Trust Barometer 2024 - AI Insights</R>
+
+### Interpretation
+
+**Magnitude**: Large and growing gap between expert optimism and public concern
+
+**Direction**: Public more risk-focused; experts more capability-focused
+
+**Policy implication**: Democratic deficit if AI development primarily shaped by technologists
+
+---
+
+## 4. Time from AI Risk Identification to Policy Response
+
+### Measured Cases
+
+**EU AI Act Timeline (Response to GPT-class models)**
+- **GPT-3 release**: June 2020
+- **EU AI Act proposal**: April 2021 (10 months after GPT-3)
+- **GPT-4 release**: March 2023
+- **EU AI Act agreement**: December 2023 (9 months after GPT-4)
+- **AI Act signed**: June 2024
+- **Entered force**: August 2024
+- **GPAI provisions applicable**: August 2025 (29 months after GPT-4)
+- **Full applicability**: August 2026
+- **Interpretation**: ~2.5 years from GPT-4 to enforceable rules on GPAI models
+- **Source**: <R id="0aa9d7ba294a35d9">EU AI Act Implementation Timeline</R>
+
+**<EntityLink id="us-executive-order">US Executive Order on AI</EntityLink>**
+- **GPT-4 release**: March 2023
+- **Executive Order 14110**: October 30, 2023 (7 months after GPT-4)
+- **Limitation**: Executive order, not legislation; limited enforceability
+- **Source**: Biden Administration AI Executive Order
+
+**<EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink>**
+- **UK AISI announced**: November 2023 (Bletchley Park AI Safety Summit)
+- **US AISI operational**: Early 2024
+- **AISI Network launched**: May 2024 (Seoul AI Summit)
+- **First AISI Network meeting**: November 2024 (San Francisco)
+- **Lag interpretation**: ~8-20 months from GPT-4 to safety institute operations
+- **Source**: <R id="94926d25ba8555ea">AISI International Network</R>
+
+### Conceptual Metric
+
+**Average Policy Lag Time**
+- *Conceptual metric*: Median time from risk becoming evident to enforceable policy
+- **Challenge**: Defining "risk becomes evident" vs "risk exists"
+- **Current estimate**: 1-3 years for major risks based on available cases
+- **Comparison**: Aviation safety regulations often follow major accidents within months
+
+---
+
+## 5. Coordination Failure Rate on <EntityLink id="ai-governance">AI Governance</EntityLink>
+
+### Measured Indicators
+
+**G7 Hiroshima AI Process Code of Conduct**
+- **Status**: Adopted but "provides little guidance" on implementation
+- **Critique**: "Staffed by diplomats who lack depth of in-house technical expertise"
+- **Implementation gap**: Code instructs to "identify, evaluate, mitigate risks" without how-to guidance
+- **Source**: <R id="781fbb3c87403553">CSIS: G7 Hiroshima AI Process</R>
+
+**OECD AI Principles (2019, updated 2024)**
+- **Adherents**: 47 countries including EU
+- **Compliance mechanism**: None (non-binding)
+- **Monitoring**: AI Policy Observatory tracks implementation but no enforcement
+- **Implementation rate**: Variable—no systematic tracking of adherence
+- **Source**: <R id="5dd65d4c6d7be4ab">OECD AI Principles 2024 Update</R>
+
+**International AI Safety Institute Network**
+- **Members (Nov 2024)**: 10 countries/regions (Australia, Canada, EU, France, Japan, Kenya, Korea, Singapore, UK, US)
+- **Challenges identified**:
+  - Confidentiality and security concerns
+  - Legal incompatibilities between national mandates
+  - Varying technical capacities
+  - Global South institutes risk becoming "token members"
+  - Most institutes still hiring/setting priorities as of 2024
+- **Coordination body**: None yet (recommended but not established)
+- **Success metric**: Too early to assess
+- **Source**: <R id="473d3df122573f58">AISI Network Analysis</R>
+
+### Conceptual Indicators
+
+**Coordination Success Rate**
+- *Conceptual metric*: % of identified coordination problems that achieve multilateral solutions
+- **Current status**: Low coordination success on binding agreements
+- **Examples of failure**:
+  - No binding international compute governance
+  - No global model registry
+  - Fragmented incident reporting systems
+  - Limited cross-border enforcement
+- **Examples of partial success**:
+  - AISI Network formation
+  - OECD Principles (soft coordination)
+  - G7/G20 discussions ongoing
+
+**Race-to-the-Bottom Index**
+- *Conceptual metric*: Evidence of jurisdictions weakening standards to attract AI companies
+- **Current**: Anecdotal concerns but no systematic measurement
+- **Source**: <R id="e2d123a136a4c4d4">International Governance of AI</R>
+
+---
+
+## 6. Democratic vs Authoritarian AI Adoption Rates
+
+### Measured Data
+
+**AI Surveillance Adoption**
+- **China's market dominance**: Exports AI surveillance to "nearly twice as many countries as United States"
+- **Chinese surveillance camera market**: Hikvision + Dahua = 34% global market share (2024)
+- **Global reach**: PRC-sourced AI surveillance in 80+ countries (authoritarian and democratic)
+- **China's domestic deployment**: Over half the world's 1 billion surveillance cameras located in China
+- **Source**: <R id="376a24ba14f02ebc">Global Expansion of AI Surveillance</R>
+
+**Export Patterns**
+- **China's bias**: "Significant bias in exporting to autocratic regimes"
+- **Huawei "Safe City" agreements (2009-2018)**: 70%+ involved countries rated "partly free" or "not free" by Freedom House
+- **Nuance**: "China is exporting surveillance tech to liberal democracies as much as targeting authoritarian markets"
+- **Impact finding**: Mature democracies did not experience erosion when importing surveillance AI; weak democracies exhibited backsliding regardless of supplier
+- **Source**: <R id="2d8a3c50a5de5725">Data-Centric Authoritarianism</R>
+
+**Authoritarian Advantage Factors**
+- China's structural advantages for AI surveillance:
+  - Lax data privacy laws
+  - Government involvement in production/research
+  - Large population for training data
+  - Societal acceptance of state surveillance
+  - Strong AI industrial sectors
+- **Source**: <R id="7ed5d3055e645320">AI and Authoritarian Governments</R>
+
+### Conceptual Indicator
+
+**Democratic vs Authoritarian AI Capability Gap**
+- *Conceptual metric*: Relative AI capability development in democracies vs autocracies
+- **Proxy**: US vs China capability race
+  - US: 40 notable AI models (2024) vs China: 15 models
+  - US private investment: \$109.1B vs China: \$9.3B
+  - But China's DeepSeek/Qwen/Kimi "closing the gap on reasoning and coding"
+- **Interpretation**: US maintains edge but China rapidly improving
+- **Source**: <R id="f09a58f2760fb69b">State of AI Report 2025</R>
+
+---
+
+## 7. Concentration of AI Capability (Herfindahl Index)
+
+### Measured Market Concentration
+
+**Enterprise LLM Market Share (2024-2025)**
+- **<EntityLink id="anthropic">Anthropic</EntityLink>**: 32% usage share, 40% revenue share
+- **<EntityLink id="openai">OpenAI</EntityLink>**: 25% usage share, 27% revenue share (down from 50% in 2023)
+- **Google**: 20% usage share
+- **Meta (Llama)**: 9%
+- **DeepSeek**: 1%
+- **Approximate HHI**: ~2,500 (0.32² + 0.25² + 0.20² + 0.09² + 0.01²) × 10,000 ≈ 2,050-2,500
+- **Interpretation**: "Moderate concentration" (HHI 1,500-2,500); top 3 control ~77%
+- **Source**: <R id="d2115dba2489b57e">2025 State of Generative AI in Enterprise - Menlo Ventures</R>
+
+**Frontier Model Development Concentration**
+- **US dominance**: 40 notable models (2024) vs China: 15, Europe: 3
+- **Competition assessment**: "OpenAI retains narrow lead at frontier, but competition intensified"
+- **China status**: "Credible #2" with DeepSeek, Qwen, Kimi
+- **Source**: <R id="da87f2b213eb9272">Stanford AI Index 2025</R>
+
+**Investment/Funding Concentration**
+- **Foundation model funding (2025)**: \$80B (40% of all global AI funding)
+- **OpenAI + Anthropic**: 14% of all global venture investment across all sectors
+- **Big Tech backing**: "Interconnected web of 90+ partnerships" among Google, Apple, Microsoft, Meta, Amazon, Nvidia
+- **Regulatory concern**: UK CMA and US FTC investigating concentration via partnerships/investments
+- **Source**: <R id="3e3f3a527dbfca86">Big Tech's Cloud Oligopoly</R>
+
+### Conceptual Extensions
+
+**Compute Concentration**
+- *Conceptual metric*: HHI for GPU/training compute access
+- **Challenge**: Private compute capacity not publicly reported
+- **Known**: Nvidia dominance in AI chips; hyperscaler concentration (AWS, Azure, GCP)
+- **Implication**: Capability concentration may exceed market share concentration
+
+**Talent Concentration**
+- *Conceptual metric*: % of top AI researchers at small number of organizations
+- **Challenge**: Defining "top researchers" and tracking mobility
+- **Proxy**: Conference authorship concentration, hiring trends
+
+---
+
+## 8. <EntityLink id="societal-resilience">Societal Resilience</EntityLink> to AI Disruption
+
+### Conceptual Framework
+
+**WEF Global Risks Report 2024 - Resilience Assessment**
+- **Key finding**: "Weakened economies and societies may only require smallest shock to edge past tipping point of resilience"
+- **Current crises eroding resilience**: COVID-19 aftermath, Russia-Ukraine war "exposed cracks in societies"
+- **Long-term erosion**: "Decades of investment in human development slowly being chipped away"
+- **Conflict risk**: "Corroding societal resilience risk creating conflict contagion"
+- **Source**: <R id="e9c82189259681df">WEF Global Risks Report 2024</R>
+
+### Measured Proxies
+
+**<EntityLink id="economic-disruption">Economic Disruption</EntityLink> Preparedness**
+- **Social safety nets**: Vary widely by country (unemployment insurance, retraining programs)
+- **Financial instruments**: Insurance, catastrophe bonds, public risk pools
+- **Challenge**: No unified "AI disruption resilience" score exists
+
+**Digital Literacy and Misinformation Resilience**
+- **Recommendation**: "Digital literacy campaigns on misinformation and disinformation"
+- **Current**: No systematic measurement of population-level AI/digital literacy
+- **Proxy**: General digital skills indices exist but not AI-specific
+
+**Institutional Adaptive Capacity**
+- **Indicators**: R&D investment in climate modeling/energy transition (analogous to AI preparedness)
+- **Infrastructure resilience**: Building codes, disaster preparedness
+- **Limitation**: No AI-specific resilience metrics
+
+### Conceptual Indicators
+
+**Labor Market Adaptability Index**
+- *Conceptual metric*: How quickly workers can reskill/transition as AI automates tasks
+- **Proxy data**: Historical adjustment rates to automation, education system responsiveness
+- **Challenge**: AI may disrupt faster than historical automation
+
+**Democratic Resilience to AI-Driven Polarization**
+- *Conceptual metric*: Ability of democratic institutions to function under AI-amplified disinformation
+- **Current concerns**: Misinformation in 2024 elections (US, UK)
+- **No systematic tracking**: Would require longitudinal study
+
+---
+
+## 9. Rate of AI-Caused Incidents/Accidents
+
+### Measured Incident Data
+
+**AI Incident Database (AIID)**
+- **Total incidents**: 2,000+ documented incidents (as of 2024)
+- **Coverage**: "Intelligent systems causing safety, fairness, or other real-world problems"
+- **Growth**: From 1,200+ reports to 2,000+ (rapid increase)
+- **Limitation**: Voluntary reporting, variable severity, unclear baseline
+- **Source**: <R id="baac25fa61cb2244">AI Incident Database</R>
+
+**AIAAIC Repository**
+- **Start date**: June 2019
+- **Coverage**: "Incidents and controversies driven by AI, algorithms, automation"
+- **Goal**: "Systematically documenting incidents where AI systems cause or contribute to harms"
+- **Scope**: Broader than AIID—includes technical failures and social impacts
+- **Source**: <R id="e3eb03bdd9593c2a">AIAAIC Repository</R>
+
+**OECD AI Incidents Monitor (AIM)**
+- **Launch**: Part of OECD AI Policy Observatory
+- **Focus**: Policy-relevant cases aligned with governance interests
+- **Collaboration**: Partnership on AI, Center for Advancement of Trustworthy AI
+- **Limitation**: More selective than AIAAIC (policy focus vs comprehensive coverage)
+- **Source**: <R id="f4e336365b5dfda9">OECD AIM</R>
+
+### Interpretation Challenges
+
+**Incident Rate per AI System**
+- *Conceptual metric*: Incidents per 1,000 or 10,000 deployed AI systems
+- **Challenge**: Unknown denominator—no comprehensive count of deployed systems
+- **Current**: Absolute incident counts rising, but unclear if rate rising
+
+**Severity Distribution**
+- **Available**: Incident databases categorize by harm type (safety, fairness, rights)
+- **Missing**: Standardized severity scales across databases
+- **Incompatibility**: "Both databases have vastly different and incompatible structures"
+- **Source**: <R id="ecc397f8fd6dec44">Standardised Schema for AI Incident Databases</R>
+
+**Baseline Comparison**
+- *Question*: Are AI incident rates high compared to other technologies at similar maturity?
+- **Challenge**: No established baseline or reference class
+- **Aviation analogy**: Aviation incident rates well-tracked, declining over time—AI lacks comparable infrastructure
+
+---
+
+## 10. Near-Miss Reporting Rate
+
+### Industry Position
+
+**AI Lab Support for Near-Miss Reporting**
+- **Strong agreement**: 76% strongly agree, 20% somewhat agree
+- **Statement**: "AGI labs should report accidents and near misses to appropriate state actors and other AGI labs"
+- **Source mechanism**: AI incident database
+- **Source**: <R id="7fe5c5b69f06e765">EA Forum: Incident Reporting for AI Safety</R>
+
+### Regulatory Frameworks Emerging
+
+**US Executive Order 14110**
+- **Provision**: Addressed "safety" and "rights" protections
+- **Limitation**: Not comprehensive near-miss framework
+- **State-level**: New York State bill would require incident reporting to Attorney General (safety incidents only)
+- **Source**: <R id="f57f95f69c4dc040">Designing Incident Reporting Systems</R>
+
+**EU AI Act Incident Reporting**
+- **Requirement**: Single incident reporting requirement
+- **Definition**: Includes both "rights incidents" and "safety incidents"
+- **Limitation**: Does not explicitly distinguish near-misses from harms
+- **Source**: EU AI Act
+
+**Proposed Framework Properties (Shrishak 2023)**
+1. **Voluntary reporting**: Essential for capturing near-misses not covered by mandatory serious incident reporting
+2. **Non-punitive**: Consensus that self-reporting should not lead to punishment since no harm occurred
+3. **Accessible**: Low barriers to submission
+4. **Actionable**: Information useful for other developers
+
+### Current Reporting Rate
+
+**Actual Near-Miss Reporting Rate**
+- *Conceptual metric*: % of near-miss events that get reported to databases or regulators
+- **Current estimate**: Unknown, likely very low
+- **Challenge**: "Current systems fail to capture numerous near-miss incidents that narrowly avoid accidents"
+- **Comparison**: Aviation near-miss reporting well-established; AI has no equivalent system yet
+- **Source**: <R id="734f880eb677edd8">Developing Near-Miss Reporting System</R>
+
+**Culture Gap**
+- **Aviation standard**: Open, non-punitive reporting is norm
+- **AI current state**: "Lack of comprehensive and reliable data regarding frequency and characteristics"
+- **Needed shift**: "Building culture of safety for AI requires understanding failure modes, which starts with reporting past incidents"
+
+---
+
+## Data Quality Summary
+
+| Metric | Status | Data Quality | Update Frequency |
+|--------|--------|--------------|------------------|
+| Information environment quality | **Measured** | High (Freedom House, RSF) | Annual |
+| Institutional decision-making | **Proxy** | Medium (WGI covers general governance, not AI-specific) | Annual |
+| Elite/public opinion divergence | **Measured** | Medium (multiple polls, varying methods) | Quarterly-Annual |
+| Policy response time | **Measured** | High (specific cases documented) | Case-by-case |
+| Coordination failure rate | **Conceptual** | Low (qualitative assessments only) | Ad hoc |
+| Democratic vs authoritarian adoption | **Measured** | Medium (surveillance tech tracked, general AI capabilities less clear) | Annual |
+| AI capability concentration (HHI) | **Measured** | Medium (market share known, compute concentration estimated) | Quarterly-Annual |
+| Societal resilience | **Conceptual** | Low (framework exists, no AI-specific index) | Annual (WEF) |
+| AI incident rate | **Measured** | Medium (absolute counts good, rates unclear due to denominator problem) | Continuous |
+| Near-miss reporting rate | **Conceptual** | Very low (frameworks proposed, actual reporting minimal) | Not measured |
+
+---
+
+## Key Gaps and Limitations
+
+### Measurement Challenges
+
+1. **Denominator problems**: Incident rates require knowing # of deployed systems (unknown)
+2. **Counterfactuals**: Measuring "coordination failure rate" requires knowing what coordination was possible
+3. **Lag indicators**: Most metrics (incidents, trust, governance quality) are lagging, not leading
+4. **Attribution**: Hard to isolate AI's contribution to <EntityLink id="institutional-quality">institutional quality</EntityLink> or societal resilience
+5. **Standardization**: Different databases use incompatible schemas (incidents, governance)
+
+### Conceptual Gaps
+
+1. **No unified resilience metric**: Individual components exist but no composite "AI disruption resilience score"
+2. **Weak coordination metrics**: Qualitative assessments dominate; no quantitative coordination success rate
+3. **Missing baselines**: Few comparisons to other technologies at similar development stages
+4. **Democratic processes**: No metrics for how democratic institutions specifically handle AI (vs general governance)
+
+### Research Priorities
+
+**High-value additions:**
+- Standardized AI incident severity scale
+- Near-miss reporting infrastructure and culture-building
+- Democratic resilience to AI-specific challenges (not just general governance)
+- Coordination success metrics (track multilateral agreements, implementation rates)
+- AI-specific institutional capacity assessment (beyond general WGI)
+
+---
+
+## Interpretation Guidance
+
+### Using These Metrics
+
+**For Risk Assessment:**
+- **Low trust + weak institutions + high elite/public gap** = governance failure more likely
+- **Rising incidents + low near-miss reporting** = learning from failures inadequate
+- **High concentration + weak coordination** = race dynamics and power concentration risks
+
+**For Forecasting:**
+- Policy lag times (1-3 years) inform timeline expectations for future risks
+- Trust trends predict regulatory pressure and public backlash likelihood
+- Coordination challenges suggest multilateral solutions face high barriers
+
+**For Intervention:**
+- Improving near-miss reporting culture = high-leverage, low-cost
+- Building institutional AI literacy = addresses decision-making quality
+- Bridging elite/public gap = essential for democratic legitimacy
+
+### Cautions
+
+1. **Correlation ≠ causation**: Weak governance may cause AI risks OR AI risks may weaken governance
+2. **Selection effects**: Reported incidents overrepresent visible, Western, English-language cases
+3. **Gaming**: Once metrics are targets, they can be manipulated (Goodhart's Law)
+4. **Aggregation**: Composite indices hide important variation across dimensions
+
+---
+
+## Sources
+
+### Primary Data Sources
+
+- <R id="78e083150e94721f">Freedom House - Freedom on the Net</R>
+- <R id="c0ac4cc088b3f376">Reporters Without Borders - World Press Freedom Index 2025</R>
+- <R id="1312df71e6a1ca40">Edelman Trust Barometer 2024</R>
+- <R id="9dd5b2d29cbec8e5">World Bank Worldwide Governance Indicators</R>
+- <R id="06df7804247cb5ae">AI Policy Institute Polling</R>
+- <R id="40fcdcc3ffba5188">Pew Research: Public and AI Experts</R>
+- <R id="0aa9d7ba294a35d9">EU AI Act Implementation Timeline</R>
+- <R id="5dd65d4c6d7be4ab">OECD AI Principles 2024</R>
+- <R id="baac25fa61cb2244">AI Incident Database (AIID)</R>
+- <R id="663f3d04074020bd">Partnership on AI - AI Incident Database</R>
+- <R id="e3eb03bdd9593c2a">AIAAIC Repository</R>
+
+### Analysis and Research
+
+- <R id="da87f2b213eb9272">Stanford AI Index 2025</R>
+- <R id="f09a58f2760fb69b">State of AI Report 2025</R>
+- <R id="d2115dba2489b57e">Menlo Ventures: State of Generative AI in Enterprise 2025</R>
+- <R id="e9c82189259681df">WEF Global Risks Report 2024</R>
+- <R id="376a24ba14f02ebc">Carnegie Endowment: Global Expansion of AI Surveillance</R>
+- <R id="2d8a3c50a5de5725">NED: Data-Centric Authoritarianism</R>
+- <R id="781fbb3c87403553">CSIS: G7 Hiroshima AI Process</R>
+- <R id="473d3df122573f58">IAPS: International Network of AI Safety Institutes</R>
+- <R id="94926d25ba8555ea">OECD: AI Safety Institute Network Role</R>
+- <R id="f7ea8fb78f67f717"><EntityLink id="fli">Future of Life Institute</EntityLink>: AI Safety Index 2024</R>
+- <R id="7fe5c5b69f06e765">EA Forum: Incident Reporting for AI Safety</R>
+- <R id="f57f95f69c4dc040">arXiv: Designing Incident Reporting Systems</R>
+- <R id="ecc397f8fd6dec44">arXiv: Standardised Schema for AI Incident Databases</R>
+
+### Regulatory and Policy Documents
+
+- <R id="59118f0c5d534110">Biden Administration AI Executive Order 14110</R>
+- <R id="acc5ad4063972046">European Commission: EU AI Act</R>
+- <R id="781fbb3c87403553">G7 Hiroshima AI Process Code of Conduct</R>

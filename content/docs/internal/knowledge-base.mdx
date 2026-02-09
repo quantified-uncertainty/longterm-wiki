@@ -1,0 +1,370 @@
+---
+title: "Knowledge Base Style Guide"
+description: "Guidelines for knowledge base pages (risks, responses, etc.)"
+sidebar:
+  order: 1
+lastEdited: "2025-12-26"
+importance: 2
+quality: 34
+llmSummary: "Internal style guide for wiki content creation, emphasizing flexible hierarchical structure over rigid templates, integrated arguments over sparse sections, and selective use of visualizations. Provides concrete examples of good/bad practices for risk and response pages."
+ratings:
+  novelty: 1
+  rigor: 4
+  actionability: 5
+  completeness: 6
+metrics:
+  wordCount: 778
+  citations: 0
+  tables: 11
+  diagrams: 0
+---
+import {EntityLink} from '@components/wiki';
+
+**Style Guide ID: `kb-2.0`** (2025-12-26)
+
+This guide provides principles and patterns for creating knowledge base pages. **These are guidelines, not rigid templates**—adapt structure to fit the content rather than forcing content into a fixed format.
+
+Pages can track which style guide they follow using the `styleGuideVersion` frontmatter field (e.g., `styleGuideVersion: "kb-2.0"`).
+
+---
+
+## Core Principles
+
+### 1. Content Over Format
+
+The goal is clear, substantive writing that helps readers understand risks and responses. A well-organized page with natural flow beats a mechanically-filled template with sparse content.
+
+**Bad**: Separate "Case For" and "Case Against" sections each with one-sentence arguments
+
+**Good**: Integrated discussion that acknowledges different perspectives as part of explaining the topic
+
+### 2. Proper Hierarchy
+
+Use h2 (`##`) for major sections and h3 (`###`) for subsections within them. Don't create 10+ flat h2 sections—group related content.
+
+**Bad structure** (flat):
+```
+## Summary
+## Evaluation
+## Risks Addressed
+## Core Problem
+## Proposed Solutions
+## Key Challenges
+## Current Research
+## Case For
+## Case Against
+## Key Cruxes
+## Who Should Work on This
+## Related Pages
+```
+
+**Good structure** (hierarchical):
+```
+## Overview
+### Quick Assessment
+## How It Works
+### Core Mechanism
+### Key Challenges
+
+## Critical Assessment
+### Limitations
+### Key Uncertainties
+
+## Getting Involved
+```
+
+### 3. Avoid Redundancy
+
+Don't add template sections that duplicate existing content. If a page already discusses critiques in depth, don't add a separate "Case Against" section saying the same things more briefly.
+
+### 4. Cross-Linking
+
+Every risk should link to relevant responses, and vice versa. Use the "Risks Addressed" table for responses and "Responses That Address This Risk" table for risks.
+
+### 5. Use Visualizations Sparingly
+
+Components like `DisagreementMap` can be confusing if the data doesn't clearly communicate something. Only use them when:
+- The visualization adds clarity over prose
+- You have meaningful, distinct positions to show
+- The reader will understand what's being measured
+
+When in doubt, use prose or a simple table instead.
+
+---
+
+## Page Type Patterns
+
+The core principles above apply to all page types. Below are patterns specific to each type.
+
+---
+
+### Risk Pages
+
+A risk page should answer: **Is this risk real? How severe is it? What can be done about it?**
+
+**Recommended structure:**
+```
+## Overview
+[2-3 paragraphs explaining the risk]
+
+### Risk Assessment
+| Dimension | Assessment | Notes |
+|-----------|------------|-------|
+| Severity | High/Medium/Low | [Brief reasoning] |
+| Likelihood | X% range | [Key factors] |
+| Timeline | [When relevant] | [Conditions] |
+
+### Responses That Address This Risk
+| Response | Mechanism | Effectiveness |
+|----------|-----------|---------------|
+| [Example Response](#) | How it helps | High/Medium/Low |
+
+---
+
+## Why This Matters
+[Detailed explanation - mechanism, evidence, examples]
+
+---
+
+## Key Uncertainties
+[What we don't know that would change the assessment]
+
+---
+
+## Related Pages
+<Backlinks />
+```
+
+**Adapting to content:**
+- **Well-studied risks**: More evidence, history, expert positions
+- **Emerging risks**: More theoretical arguments, key uncertainties
+- **Technical risks**: More mechanism explanation
+- **Governance risks**: More policy context
+
+---
+
+### Response Pages
+
+A response page should answer: **What is this? Does it work? What risks does it address? Who should work on it?**
+
+### Recommended Structure
+
+```
+## Overview
+[2-3 paragraphs explaining the intervention]
+
+### Quick Assessment
+| Dimension | Assessment | Notes |
+|-----------|------------|-------|
+| Tractability | High/Medium/Low | [Why] |
+| If alignment hard | Value if alignment is difficult | |
+| If alignment easy | Value if alignment is straightforward | |
+| Neglectedness | Current attention level | |
+| Grade | A-F | [Summary] |
+
+### Risks Addressed
+| Risk | Mechanism | Effectiveness |
+|------|-----------|---------------|
+| [Example Risk](#) | How it helps | High/Medium/Low |
+
+---
+
+## How It Works
+[Detailed explanation of the approach]
+
+### [Subsections as needed]
+[Techniques, methods, current state, etc.]
+
+---
+
+## Critical Assessment
+
+### Limitations
+[What this approach can and cannot do]
+
+### Key Uncertainties
+[What would change the assessment—written as prose, not sparse tables]
+
+### Different Perspectives
+[Where experts disagree and why, integrated into the discussion]
+
+---
+
+## Getting Involved
+[Who might work on this and what the tradeoffs are—written as prose, not just bullet lists]
+
+---
+
+## Related Interventions
+[How this connects to other responses—with brief explanations]
+
+## Related Pages
+<Backlinks />
+```
+
+### Adapting to Content
+
+- **Technical responses** might need more detail on methods and current research
+- **Governance responses** might need more policy context and implementation details
+- **Institutional responses** might focus more on organizational landscape
+
+---
+
+## Writing Guidelines
+
+### Arguments and Perspectives
+
+When discussing disagreements, integrate them into the narrative rather than creating sparse "Case For/Against" sections:
+
+**Sparse (avoid)**:
+```
+## Case For
+### Argument 1: It Works
+It works well.
+
+## Case Against
+### Counterargument 1: It Doesn't Work
+It doesn't work well.
+```
+
+**Integrated (prefer)**:
+```
+## Critical Assessment
+
+The effectiveness of this approach depends on several contested factors.
+
+**Proponents argue** that [substantive explanation with evidence and reasoning].
+The UK AISI's success in securing model access from major labs demonstrates this is achievable.
+
+**Skeptics counter** that [substantive explanation with evidence and reasoning].
+The resource asymmetry is fundamental—dozens of government staff versus thousands at labs.
+
+The key uncertainty is whether [the crux that would resolve the disagreement].
+```
+
+### Key Uncertainties and Cruxes
+
+Present uncertainties as substantive questions with context, not sparse tables:
+
+**Sparse (avoid)**:
+```
+| Position A | Position B |
+|------------|------------|
+| Works | Doesn't work |
+| Good | Bad |
+```
+
+**Substantive (prefer)**:
+```
+**Will they gain real authority?** Currently, most AISIs are advisory—labs
+cooperate voluntarily. If AISIs remain advisory, their influence depends entirely
+on maintaining good relationships. Meaningful oversight may require mandatory
+pre-deployment evaluation through legislation, which faces significant political
+obstacles.
+```
+
+### Visual Separation
+
+Use horizontal rules (`---`) to separate major sections. This helps readers see the page's structure at a glance.
+
+---
+
+## Components Reference
+
+### Tables (Preferred for Structured Data)
+
+Use markdown tables for assessments and cross-references:
+
+```markdown
+| Dimension | Assessment | Notes |
+|-----------|------------|-------|
+| Tractability | Medium | Active research |
+```
+
+### EstimateBox (Use Selectively)
+
+For displaying ranges of expert estimates with clear sources:
+
+```jsx
+<EstimateBox
+  client:load
+  variable="Probability of [Risk]"
+  description="How likely is this?"
+  unit="%"
+  estimates={[
+    { source: "Expert 1", value: "40-60%", notes: "Based on X" },
+    { source: "Expert 2", value: "10-20%", notes: "Based on Y" },
+  ]}
+/>
+```
+
+Only use when you have actual sourced estimates—don't make up positions.
+
+### Backlinks (Always Include)
+
+```jsx
+<Backlinks client:load entityId="entity-id" />
+```
+
+### DisagreementMap (Use Rarely)
+
+This component often doesn't clearly communicate what's being measured. Prefer prose or tables for showing different perspectives. Only use if you have clear, meaningful positions that benefit from visualization.
+
+---
+
+## Examples
+
+Good examples of different page types:
+
+- **<EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink>** - Proper hierarchy, integrated assessment, substantive content
+- **Compute Governance** - Detailed policy response with good structure
+- **<EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink>** - Risk page with assessment tables
+
+---
+
+## Common Mistakes
+
+1. **Flat hierarchy**: 10+ h2 sections instead of grouped h2/h3 structure
+2. **Sparse template-filling**: One-sentence arguments in Case For/Against sections
+3. **Redundant sections**: Adding Case For/Against when the page already discusses pros/cons elsewhere
+4. **Overusing visualizations**: DisagreementMap for every page even when it doesn't add clarity
+5. **Bullet-point everything**: Lists where prose would be clearer and more substantive
+6. **Missing cross-links**: Not connecting risks to responses and vice versa
+
+---
+
+## Version Tracking
+
+Pages should include a `styleGuideVersion` field in their frontmatter:
+
+```yaml
+---
+title: AI Safety Institutes
+styleGuideVersion: "kb-2.0"
+quality: 3
+lastEdited: "2025-12-26"
+---
+```
+
+Benefits:
+- Identify pages that need updates when the guide changes
+- Track quality improvements over time
+- Prioritize pages for review
+
+---
+
+## Changelog
+
+### kb-2.0 (2025-12-26)
+- Consolidated into single "Knowledge Base Style Guide" covering both risks and responses
+- Shifted from rigid templates to flexible guidelines
+- Added emphasis on proper h2/h3 hierarchy
+- Discouraged flat structures with many h2 sections
+- Added guidance on integrating arguments into prose vs sparse Case For/Against
+- Recommended against overusing DisagreementMap
+- Added "Common Mistakes" section
+
+### kb-1.0 (2025-12-24)
+- Initial template-based approach with fixed section structure
+- Introduced EstimateBox, DisagreementMap, KeyQuestions components
+- Established cross-linking patterns between risks and responses

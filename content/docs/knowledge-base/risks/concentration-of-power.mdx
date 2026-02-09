@@ -1,0 +1,220 @@
+---
+title: Concentration of Power
+description: AI enabling unprecedented accumulation of power by small groups—with compute requirements exceeding $100M for frontier models and 5 firms controlling 80%+ of AI cloud infrastructure.
+sidebar:
+  order: 1
+maturity: Growing
+quality: 65
+llmSummary: Documents how AI development is concentrating in ~20 organizations due to $100M+ compute costs, with 5 firms controlling 80%+ of cloud infrastructure and projections reaching $1-10B per model by 2030. Identifies key concentration mechanisms (compute, cloud, chips, capital) and links to governance interventions, though defers comprehensive analysis to a linked parameter page.
+lastEdited: "2026-01-28"
+importance: 72.5
+seeAlso: ai-control-concentration
+causalLevel: outcome
+pageTemplate: knowledge-base-risk
+ratings:
+  novelty: 3.5
+  rigor: 4.5
+  actionability: 5
+  completeness: 4
+metrics:
+  wordCount: 850
+  citations: 10
+  tables: 8
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+subcategory: structural
+---
+import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="concentration-of-power" client:load />
+
+<DataInfoBox entityId="concentration-of-power" />
+
+## Overview
+
+AI is enabling unprecedented concentration of power in the hands of a few organizations, fundamentally altering traditional power structures across economic, political, and military domains. Unlike previous technologies that affected specific sectors, AI's general-purpose nature creates advantages that **compound across all areas of human activity**.
+
+> **For comprehensive analysis**, see <EntityLink id="ai-control-concentration">AI Control Concentration</EntityLink>, which covers:
+> - Current power distribution metrics across actors
+> - Concentration mechanisms (compute, data, talent, capital)
+> - Factors that increase and decrease concentration
+> - Intervention effectiveness and policy options
+> - Trajectory scenarios through 2035
+
+---
+
+## Risk Assessment
+
+| Dimension | Current Status | 5-10 Year Likelihood | Severity |
+|-----------|---------------|---------------------|----------|
+| **Economic concentration** | 5 firms control 80%+ AI cloud | Very High (85%+) | Extreme |
+| **Compute barriers** | \$100M+ for frontier training | Very High (90%+) | High |
+| **Talent concentration** | Top 50 researchers at 6 labs | High (75%) | High |
+| **Regulatory capture risk** | Early lobbying influence | High (70%) | High |
+| **Geopolitical concentration** | US-China duopoly emerging | Very High (90%+) | Extreme |
+
+---
+
+## How It Works
+
+Power concentration in AI follows reinforcing feedback loops where early advantages compound over time. Organizations with access to compute, data, and talent can build better models, which attract more users and revenue, which funds more compute and talent acquisition, further widening the gap.
+
+The [Korinek and Vipra (2024) analysis](https://www.nber.org/papers/w33139) identifies significant economies of scale and scope in AI development that create natural tendencies toward market concentration. Training costs for frontier models have increased from millions to hundreds of millions of dollars, with projections reaching \$1-10B by 2030. This creates entry barriers that only well-capitalized organizations can clear.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph inputs["Resource Concentration"]
+        C[Compute Access]
+        D[Data Advantage]
+        T[Talent Pool]
+        K[Capital]
+    end
+
+    subgraph dynamics["Reinforcing Dynamics"]
+        M[Build Superior Models]
+        U[Attract Users/Revenue]
+        I[Increase Investment Capacity]
+    end
+
+    subgraph outcomes["Concentration Outcomes"]
+        E[Economic Power]
+        P[Political Influence]
+        S[Standard Setting]
+    end
+
+    C --> M
+    D --> M
+    T --> M
+    K --> M
+
+    M --> U
+    U --> I
+    I --> C
+    I --> T
+    I --> K
+
+    M --> E
+    E --> P
+    P --> S
+    S --> M
+
+    style inputs fill:#e6f3ff
+    style outcomes fill:#ffe6e6
+`} />
+
+The [January 2025 FTC report](https://www.ftc.gov/news-events/news/press-releases/2025/01/ftc-issues-staff-report-ai-partnerships-investments-study) documented how partnerships between cloud providers and AI developers create additional concentration mechanisms. Microsoft's \$13.75B investment in OpenAI, Amazon's \$8B commitment to Anthropic, and Google's \$2.55B Anthropic investment collectively exceed \$20 billion, with contractual provisions that restrict AI developers' ability to work with competing cloud providers.
+
+---
+
+## Key Concentration Mechanisms
+
+| Mechanism | Current State | Barrier Effect |
+|-----------|--------------|----------------|
+| **Compute requirements** | <R id="dfeb27439fd01d3e">\$100M+, 25,000+ GPUs for frontier models</R> | Only ≈20 organizations can train frontier models |
+| **Cloud infrastructure** | <R id="ee877771092e5530">AWS, Azure, GCP control 68%</R> | Essential gatekeepers for AI development |
+| **Chip manufacturing** | <R id="31ee49c7212810bb">NVIDIA 95%+ market share</R> | Critical chokepoint |
+| **Capital requirements** | <R id="68ad9c52735cc630">Microsoft \$13B+ into OpenAI</R> | Only largest tech firms can compete |
+| **2030 projection** | <R id="5fa46de681ff9902">\$1-10B per model</R> | Likely fewer than 10 organizations capable |
+
+---
+
+## Why Concentration Matters for AI Safety
+
+| Concern | Mechanism |
+|---------|-----------|
+| **Democratic accountability** | Small groups make decisions affecting billions without representation |
+| **Single points of failure** | Concentration creates systemic risk if key actors fail |
+| **Regulatory capture** | Concentrated interests shape rules in their favor |
+| **Values alignment** | Whose values get embedded when few control development? |
+| **Geopolitical instability** | AI advantage could upset international balance |
+
+---
+
+## Contributing Factors
+
+| Factor | Effect | Mechanism |
+|--------|--------|-----------|
+| **Scaling laws** | Increases risk | Predictable returns to scale incentivize massive compute investments |
+| **Training cost trajectory** | Increases risk | Costs rising from \$10M (2020) to \$100M+ (2024) to projected \$1-10B (2030) |
+| **Cloud infrastructure dominance** | Increases risk | AWS, Azure, GCP control 68% of cloud compute, essential for AI training |
+| **Network effects** | Increases risk | User data improves models, attracting more users |
+| **Open-source models** | Decreases risk | Meta's Llama, Mistral distribute capabilities more broadly |
+| **Regulatory fragmentation** | Mixed | EU AI Act creates compliance costs; US approach favors incumbents |
+| **Antitrust enforcement** | Decreases risk | DOJ investigation into Nvidia; FTC scrutiny of AI partnerships |
+| **Talent mobility** | Decreases risk | Researchers moving between labs spread knowledge |
+
+The [AI Now Institute (2024)](https://ainowinstitute.org/publications/power-and-governance-in-the-age-of-ai) emphasizes that "the economic power amassed by these firms exceeds that of many nations," enabling them to influence policy through lobbying and self-regulatory forums that become de facto industry standards.
+
+---
+
+## Responses That Address This Risk
+
+| Response | Mechanism | Status |
+|----------|-----------|--------|
+| <EntityLink id="compute-governance" /> | Control access to training resources | Emerging |
+| Antitrust enforcement | Break up concentrated power | Limited application |
+| Open-source AI | Distribute capabilities broadly | Active but contested |
+| International coordination | Prevent winner-take-all dynamics | Early stage |
+
+See <EntityLink id="ai-control-concentration">AI Control Concentration</EntityLink> for detailed analysis.
+
+---
+
+## Historical Precedents
+
+| Era | Entity | Market Share | Outcome | Lessons for AI |
+|-----|--------|--------------|---------|----------------|
+| **1870-1911** | Standard Oil | 90% of US refined oil | Supreme Court breakup into 37 companies | Vertical integration + scale creates durable monopolies |
+| **1910s-1984** | AT&T | Near-total US telecom | Consent decree, Bell System divestiture | Regulated monopolies can persist for decades |
+| **1990s-2000s** | Microsoft | 90%+ PC operating systems | Antitrust suit; avoided breakup via consent decree | Platform lock-in extremely difficult to dislodge |
+| **2010s-present** | Google | 90%+ search market | DOJ lawsuit; August 2024 ruling found illegal monopoly | Network effects in digital markets compound rapidly |
+
+The [DOJ's historical analysis](https://justice.gov/atr/technological-innovation-and-monopolization) of technology monopolization cases shows that intervention typically comes 10-20 years after market dominance is established. By contrast, AI market concentration is occurring within 2-3 years of foundation model deployment, suggesting regulatory action may need to occur earlier to be effective.
+
+Unlike Standard Oil's physical infrastructure or AT&T's telephone network, AI capabilities can be replicated and distributed globally through open-source releases. However, the compute and data advantages of frontier labs may prove more durable than software alone, as [noted by the Open Markets Institute](https://www.openmarketsinstitute.org/publications/expert-brief-ai-and-market-concentration-courtney-radsch-max-vonthun): "A handful of dominant tech giants hold the reins over the future of AI... Left unaddressed, this concentration of power will distort innovation, undermine resilience, and weaken our democracies."
+
+---
+
+## Key Uncertainties
+
+1. **Scaling ceiling**: Will AI scaling laws continue to hold, or will diminishing returns reduce the value of massive compute investments? If scaling hits a ceiling, smaller players may catch up.
+
+2. **Open-source competitiveness**: Can open-source models (Llama, Mistral, etc.) remain within striking distance of frontier closed models? The gap between GPT-4 and open alternatives has narrowed, but may widen again with next-generation systems.
+
+3. **Regulatory timing**: Will antitrust action come early enough to prevent lock-in? Historical precedents suggest 10-20 year delays between market dominance and effective intervention.
+
+4. **Geopolitical fragmentation**: Will US-China competition lead to bifurcated AI ecosystems, or will one bloc achieve decisive advantage? The outcome affects whether concentration is global or regional.
+
+5. **Talent distribution**: As AI capabilities become more automated, will human talent remain a meaningful differentiator? If AI can accelerate AI research, talent concentration may matter less than compute access.
+
+6. **Benevolence of concentrators**: Even if concentration is inevitable, does it matter who holds power? A concentrated but safety-conscious ecosystem might be preferable to a diffuse but reckless one.
+
+---
+
+## Related Pages
+
+### Primary Reference
+- **<EntityLink id="ai-control-concentration">AI Control Concentration</EntityLink>** — Comprehensive parameter page with mechanisms, measurement, and interventions
+
+### Related Risks
+- <EntityLink id="lock-in" /> — Path dependencies reinforcing concentration
+- <EntityLink id="racing-dynamics" /> — Competition accelerating unsafe development
+- <EntityLink id="authoritarian-takeover" /> — Concentrated power enabling authoritarianism
+
+### Related Parameters
+- <EntityLink id="regulatory-capacity">Regulatory Capacity</EntityLink> — Government ability to constrain concentration
+- <EntityLink id="coordination-capacity">Coordination Capacity</EntityLink> — Multi-actor cooperation on governance
+- <EntityLink id="institutional-quality">Institutional Quality</EntityLink> — Checks and balances strength
+
+---
+
+## Sources
+
+- <R id="68ad9c52735cc630">Microsoft-OpenAI partnership</R>
+- <R id="dfeb27439fd01d3e">GPT-4 training requirements</R>
+- <R id="4bb2a429153348e5">AI Now Institute: Compute sovereignty</R>
+- <R id="7a7a198f908cb5bf">RAND: AI-enabled authoritarianism</R>
+
+<Backlinks entityId="concentration-of-power" />

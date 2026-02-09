@@ -1,0 +1,837 @@
+---
+title: "Misuse Risk Cruxes"
+description: "Key uncertainties that determine views on AI misuse risks, including capability uplift (30-45% significant vs 35-45% modest), offense-defense balance, and mitigation effectiveness across bioweapons, cyberweapons, and autonomous systems"
+sidebar:
+  order: 2
+quality: 65
+llmSummary: "Comprehensive analysis of 13 AI misuse cruxes with quantified evidence showing mixed uplift (RAND bio study found no significant difference, but cyber CTF scores improved 27%→87% in 4 months), deepfake incidents projected at 8M by 2025 (up from 500K in 2023), and human detection accuracy at only 24.5%. Framework explicitly maps uncertainties to policy responses (restrictions, compute governance, detection systems) with probability ranges for each position."
+lastEdited: "2026-01-30"
+importance: 82.5
+ratings:
+  novelty: 5.8
+  rigor: 6.5
+  actionability: 7.2
+  completeness: 7
+metrics:
+  wordCount: 900
+  citations: 67
+  tables: 41
+  diagrams: 1
+clusters: ["ai-safety", "biorisks", "cyber", "governance"]
+---
+import {Crux, CruxList, DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="misuse-risks" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Overall Severity** | High | AI misuse incidents rose 8x since 2022; <EntityLink id="deepfakes">deepfakes</EntityLink> responsible for 6.5% of all fraud ([AI Incident Database](https://incidentdatabase.ai/)) |
+| **Current Uplift Evidence** | Mixed | RAND 2024 <EntityLink id="bioweapons">bioweapons</EntityLink> study found no significant uplift; <EntityLink id="openai">OpenAI</EntityLink> cyber CTF scores improved 27% to 87% in 4 months ([RAND](https://www.rand.org/pubs/research_reports/RRA2977-2.html), [OpenAI](https://openai.com/index/strengthening-cyber-resilience/)) |
+| **Bioweapons Risk** | Contested | 13/57 AI bio-tools rated "Red" risk; OpenAI o3 at 94th percentile virology; wet-lab bottleneck may dominate |
+| **Cyber Risk** | Escalating | 68% of analysts say AI phishing harder to detect; 703% increase in credential phishing H2 2024 ([Deepstrike](https://deepstrike.io/blog/ai-cybersecurity-threats-2025)) |
+| **<EntityLink id="disinformation">Disinformation</EntityLink> Risk** | High | Deepfake fraud up 2,137% since 2022; human detection accuracy only 24.5% ([UNESCO](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing)) |
+| **Mitigation Effectiveness** | Partial | Guardrails reduce casual misuse; open-source models bypass restrictions; DNA screening at 97% after 2024 patch |
+| **Trend** | Worsening | Q1 2025 deepfake incidents exceeded all of 2024 by 19%; AI cyber capabilities accelerating faster than defenses |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [uscourts.gov](https://www.uscourts.gov/about-federal-courts/educational-resources/annual-observances/asian-pacific-american-heritage-month/korematsu-v-us-balancing-liberties-and-safety/facts-and-case-summary-korematsu-v-us) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Misuse_case) |
+| <EntityLink id="lesswrong">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/DJB82jKwgJE5NsWgT/some-cruxes-on-impactful-alternatives-to-ai-policy-work) |
+
+
+## Overview
+
+Misuse risk cruxes are the fundamental uncertainties that shape how policymakers, researchers, and organizations prioritize AI safety responses. These 13 cruxes determine whether AI provides meaningful "uplift" to malicious actors (30-45% say significant vs 35-45% modest), whether AI will favor offensive or defensive capabilities across security domains, and how effective various mitigation strategies can be. According to [TIME's analysis of AI harm data](https://time.com/7346091/ai-harm-risk/), reports of AI-related incidents rose 50% year-over-year from 2022 to 2024, with malicious uses growing 8-fold since 2022.
+
+Current evidence remains mixed across domains. The <R id="0fe4cfa7ca5f2270">RAND biological uplift study</R> (January 2024) tested 15 red teams with and without LLM access, finding no statistically significant difference in bioweapon attack plan viability. However, RAND's subsequent [Global Risk Index for AI-enabled Biological Tools](https://www.rand.org/randeurope/research/projects/2024/ai-risk-index.html) (2024) evaluated 57 state-of-the-art tools and indexed 13 as "Red" (action required), with one tool reaching the highest level of critical misuse-relevant capabilities. Meanwhile, <R id="2b6675e423040e53">CNAS analyses</R> and [Georgetown CSET research](https://cset.georgetown.edu/publication/how-to-assess-the-likelihood-of-malicious-use-of-advanced-ai-systems/) emphasize that rapid capability improvements require ongoing reassessment.
+
+In cybersecurity, [OpenAI's threat assessment](https://openai.com/index/strengthening-cyber-resilience/) (December 2025) notes that AI cyber capabilities improved from 27% to 87% on capture-the-flag benchmarks between August and December 2025, with [GPT-5.2-Codex](https://openai.com/index/introducing-gpt-5-2-codex/) achieving the highest scores. According to [Deepstrike's 2025 analysis](https://deepstrike.io/blog/ai-cybersecurity-threats-2025), 68% of cyber threat analysts report AI-generated phishing is harder to detect than ever, with a 703% increase in credential phishing attacks in H2 2024. Deepfake incidents grew from 500,000 files in 2023 to a projected 8 million in 2025 ([Keepnet Labs](https://keepnetlabs.com/blog/deepfake-statistics-and-trends)), with businesses losing an average of \$100,000 per deepfake-related fraud incident and the [\$25.6 million Hong Kong deepfake fraud case](https://sqmagazine.co.uk/deepfake-statistics/) serving as a landmark incident.
+
+The stakes are substantial: if AI provides significant capability uplift to malicious actors, urgent restrictions on model access and compute governance become critical. If defenses can keep pace with offensive capabilities, investment priorities shift toward detection and response systems rather than prevention.
+
+### Misuse Risk Decision Framework
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Cruxes["Key Uncertainties"]
+        UPLIFT[AI Capability Uplift<br/>30-45% significant vs 35-45% modest]
+        OFFENSE[Offense-Defense Balance<br/>Varies by domain]
+        MITIGATE[Mitigation Effectiveness<br/>Guardrails vs open-source]
+    end
+
+    subgraph Domains["Risk Domains"]
+        BIO[Bioweapons<br/>RAND: no significant uplift]
+        CYBER[Cyberweapons<br/>CTF: 27% to 87%]
+        DISINFO[Disinformation<br/>8M deepfakes by 2025]
+        AWS[Autonomous Weapons<br/>UN Resolution 166-3]
+    end
+
+    subgraph Responses["Policy Responses"]
+        RESTRICT[Model Restrictions]
+        COMPUTE[Compute Governance]
+        DETECT[Detection & Defense]
+        INTL[International Cooperation]
+    end
+
+    UPLIFT --> BIO
+    UPLIFT --> CYBER
+    UPLIFT --> DISINFO
+    OFFENSE --> DETECT
+    MITIGATE --> RESTRICT
+    MITIGATE --> COMPUTE
+    BIO --> RESTRICT
+    CYBER --> DETECT
+    DISINFO --> DETECT
+    AWS --> INTL
+
+    style UPLIFT fill:#fff3cd
+    style OFFENSE fill:#fff3cd
+    style MITIGATE fill:#fff3cd
+    style BIO fill:#f8d7da
+    style CYBER fill:#f8d7da
+    style DISINFO fill:#f8d7da
+    style AWS fill:#f8d7da
+    style RESTRICT fill:#d4edda
+    style COMPUTE fill:#d4edda
+    style DETECT fill:#d4edda
+    style INTL fill:#d4edda
+`} />
+
+## Risk Assessment Framework
+
+| Risk Category | Severity Assessment | Timeline | Current Trend | Key Uncertainty |
+|---------------|-------------------|----------|---------------|-----------------|
+| **Bioweapons Uplift** | High (if real) | 2-5 years | Mixed evidence | Wet-lab bottlenecks vs information barriers |
+| **Cyber Capability Enhancement** | Medium-High | 1-3 years | Gradual increase | Commodity vs sophisticated attack gap |
+| **Autonomous Weapons** | High | Ongoing | Accelerating | International cooperation effectiveness |
+| **Mass Disinformation** | Medium-High | Current | Detection losing | Authentication adoption rates |
+| **Surveillance Authoritarianism** | Medium | Ongoing | Expanding deployment | Democratic resilience factors |
+| **Chemical Weapons** | Medium | 3-7 years | Early evidence | Synthesis barrier strength |
+| **Infrastructure Disruption** | High | 1-4 years | Escalating complexity | Critical system vulnerabilities |
+
+*Source: Synthesis of expert assessments from <R id="58f6946af0177ca5">CNAS</R>, <R id="0a17f30e99091ebf">RAND Corporation</R>, <R id="f0d95954b449240a">Georgetown CSET</R>, and AI safety research organizations*
+
+### Quantified Evidence Summary (2024-2025)
+
+| Domain | Key Metric | Value | Source | Year |
+|--------|-----------|-------|--------|------|
+| **Bioweapons** | Red teams with/without LLM access | No statistically significant difference | [RAND Red-Team Study](https://www.rand.org/pubs/research_reports/RRA2977-2.html) | 2024 |
+| **Bioweapons** | AI bio-tools indexed as "Red" (high-risk) | 13 of 57 evaluated | [RAND Global Risk Index](https://www.rand.org/randeurope/research/projects/2024/ai-risk-index.html) | 2024 |
+| **Bioweapons** | OpenAI o3 virology ranking | 94th percentile among expert virologists | OpenAI Virology Test | 2025 |
+| **Cyber** | CTF benchmark improvement (GPT-5 to 5.1) | 27% to 76% | [OpenAI Threat Assessment](https://openai.com/index/strengthening-cyber-resilience/) | 2025 |
+| **Cyber** | Critical infrastructure AI attacks | 50% faced attack in past year | [Microsoft Digital Defense Report](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025) | 2025 |
+| **Deepfakes** | Content volume growth | 500K (2023) to 8M (2025) | [Deepstrike Research](https://deepstrike.io/blog/deepfake-statistics-2025) | 2025 |
+| **Deepfakes** | Avg. business loss per incident | ≈\$100,000 | [Deloitte Financial Services](https://www2.deloitte.com/us/en/pages/financial-services/articles/deepfakes-financial-services.html) | 2024 |
+| **Deepfakes** | Fraud incidents involving deepfakes | >6% of all fraud | [European Parliament Research](https://www.europarl.europa.eu/RegData/etudes/BRIE/2025/775855/EPRS_BRI(2025)775855_EN.pdf) | 2025 |
+| **Deepfakes** | Human detection accuracy (video) | 24.5% | Academic studies | 2024 |
+| **Deepfakes** | Tool detection accuracy | ≈75% | [UNESCO Report](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing) | 2024 |
+| **Disinformation** | Political deepfakes documented | 82 cases in 38 countries | Academic research | 2024 |
+| **Fraud** | Projected GenAI fraud losses (US) | \$12.3B (2023) to \$10B (2027) | [Deloitte Forecast](https://www2.deloitte.com/us/en/pages/financial-services/articles/deepfakes-financial-services.html) | 2024 |
+
+## Capability and Uplift Cruxes
+
+<Crux
+  id="ai-uplift"
+  question="How much do AI systems lower barriers for dangerous capabilities?"
+  domain="Capability"
+  description="Whether AI provides meaningful 'uplift' for malicious actors beyond what's already available through internet search, scientific literature, and existing tools."
+  importance="critical"
+  resolvability="years"
+  currentState="Mixed evidence; RAND bio study found no significant uplift; other studies more concerning"
+  positions={[
+    {
+      view: "AI provides significant uplift across domains",
+      probability: "30-45%",
+      holders: ["Some biosecurity researchers", "AI safety community"],
+      implications: "Strong model restrictions; compute governance; weight security"
+    },
+    {
+      view: "AI provides modest uplift; real skills remain bottleneck",
+      probability: "35-45%",
+      holders: ["RAND researchers", "Some security experts"],
+      implications: "Focus on detecting misuse rather than preventing access; invest in defenses"
+    },
+    {
+      view: "AI uplift is minimal; information already available",
+      probability: "20-30%",
+      holders: ["Some skeptics"],
+      implications: "Restrictions are largely security theater; focus on physical defenses and detection"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Rigorous red-team studies with real capability measurement",
+    "Evidence of AI-enabled attacks in the wild",
+    "Studies comparing AI-assisted vs non-AI-assisted malicious actors",
+    "Domain-specific uplift assessments (bio, cyber, chemical)"
+  ]}
+  relatedCruxes={["bio-uplift", "cyber-uplift"]}
+  relevantResearch={[
+    { title: "RAND Bio Study", url: "https://www.rand.org/pubs/research_reports/RRA2977-2.html" },
+    { title: "CNAS Bio Report", url: "https://www.cnas.org/publications/reports/ai-and-the-evolution-of-biological-national-security-risks" }
+  ]}
+/>
+
+### Key Evidence on AI Capability Uplift
+
+| Domain | Evidence For Uplift | Evidence Against Uplift | Quantified Finding | Current Assessment |
+|--------|-------------------|----------------------|-------------------|-------------------|
+| **Bioweapons** | <R id="8d846d942ebf47da">Kevin Esvelt warnings</R>; OpenAI o3 at 94th percentile virology; 13/57 bio-tools at "Red" risk level | <R id="0fe4cfa7ca5f2270">RAND study</R>: no statistically significant difference in attack plan viability with/without LLMs | Wet-lab skills remain bottleneck; information uplift contested | Contested; monitoring escalating |
+| **Cyberweapons** | CTF scores improved 27% to 76% (Aug-Nov 2025); 50% of critical infra faced AI attacks | High-impact attacks still require sophisticated skills and physical access | [Microsoft 2025](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025): nation-states using AI for lateral movement, vuln discovery | Moderate-to-significant uplift demonstrated |
+| **Chemical Weapons** | Literature synthesis, reaction optimization | Physical synthesis and materials access remain bottleneck | Limited empirical studies; lower priority than bio | Limited evidence; lower concern |
+| **Disinformation** | 8M deepfakes projected (2025); 1,740% fraud increase (N. America); voice phishing up 442% | Detection tools at ≈75% accuracy; authentication standards emerging | Human detection only 24.5% for video deepfakes | Significant uplift clearly demonstrated |
+| **Surveillance** | Enhanced facial recognition, behavioral analysis; PLA using AI for 10,000 scenarios in 48 seconds | Privacy protection tech advancing; democratic resilience | [Freedom House](https://freedomhouse.org/report/freedom-net/2021/global-drive-control-big-tech-and-government-surveillance): expanding global deployment | Clear uplift for monitoring |
+
+<Crux
+  id="bio-uplift"
+  question="Does AI meaningfully increase bioweapons risk?"
+  domain="Capability"
+  description="Whether AI-assisted bioweapons development poses significantly higher risk than traditional paths to bioweapons."
+  importance="critical"
+  resolvability="years"
+  currentState="Contested; RAND study found no uplift; wet-lab skills may be real bottleneck"
+  positions={[
+    {
+      view: "AI significantly increases bio risk",
+      probability: "25-40%",
+      holders: ["Some biosecurity researchers", "Kevin Esvelt"],
+      implications: "Urgent model restrictions; biosafety evaluation requirements; synthesis screening"
+    },
+    {
+      view: "AI increases bio risk modestly; other interventions more important",
+      probability: "35-45%",
+      holders: ["RAND researchers"],
+      implications: "Invest in DNA screening, surveillance, medical countermeasures; model restrictions secondary"
+    },
+    {
+      view: "AI doesn't meaningfully change bio risk landscape",
+      probability: "20-30%",
+      implications: "Focus on traditional biosecurity; AI restrictions low priority"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Evidence of AI being used in bio attacks",
+    "Comprehensive wet-lab bottleneck analysis",
+    "Improvement in AI Biological Design Tools",
+    "DNA synthesis screening effectiveness data"
+  ]}
+  relatedCruxes={["ai-uplift", "restrictions-effective"]}
+  relevantResearch={[
+    { title: "RAND Bio Red Team", url: "https://www.rand.org/pubs/research_reports/RRA2977-2.html" },
+    { title: "Collaborations Bio", url: "https://www.nature.com/articles/s42256-022-00465-9" }
+  ]}
+/>
+
+<Crux
+  id="cyber-uplift"
+  question="Does AI meaningfully increase cyber attack capability?"
+  domain="Capability"
+  description="Whether AI significantly enhances offensive cyber capabilities for individual attackers or small groups."
+  importance="high"
+  resolvability="soon"
+  currentState="Some evidence of AI use in phishing/social engineering; limited evidence for sophisticated attacks"
+  positions={[
+    {
+      view: "AI significantly increases cyber offense capability",
+      probability: "40-55%",
+      holders: ["Some cybersecurity researchers"],
+      implications: "Urgently improve cyber defenses; restrict AI coding assistance for attacks"
+    },
+    {
+      view: "AI helps with commodity attacks; sophisticated attacks still require skill",
+      probability: "35-45%",
+      implications: "Focus on defending against scaled-up commodity attacks; elite threats unchanged"
+    },
+    {
+      view: "AI doesn't fundamentally change cyber landscape",
+      probability: "15-25%",
+      implications: "Continue existing cyber strategy; AI is marginal factor"
+    }
+  ]}
+  wouldUpdateOn={[
+    "AI-generated exploits being used in the wild",
+    "Evidence on AI use in state-sponsored cyber operations",
+    "AI vulnerability discovery capabilities",
+    "Red team assessments of AI cyber capabilities"
+  ]}
+  relatedCruxes={["ai-uplift", "offense-defense"]}
+/>
+
+## Offense vs Defense Balance
+
+### Cyber Domain Assessment
+
+| Capability | Offensive Potential | Defensive Potential | Current Balance | Trend | Evidence |
+|------------|-------------------|-------------------|-----------------|-------|----------|
+| **Vulnerability Discovery** | High - CTF scores 27%->76% (3 months) | Medium - AI-assisted patching | Favors offense | Accelerating | [OpenAI 2025](https://openai.com/index/strengthening-cyber-resilience/) |
+| **Social Engineering** | Very High - voice phishing up 442% | Low - human factor remains | Strongly favors offense | Widening gap | 49% of businesses report deepfake fraud |
+| **Incident Response** | Low | High - automated threat hunting | Favors defense | Strengthening | \$1B+ annual AI cybersecurity investment |
+| **Malware Development** | Medium - autonomous malware adapting in real-time | High - behavioral detection | Roughly balanced | Evolving | [Microsoft 2025 DDR](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025) |
+| **Attribution** | Medium - obfuscation tools | High - pattern analysis | Favors defense | Improving | State actors experimenting (CN, RU, IR, NK) |
+
+The cyber landscape is evolving rapidly. According to [Microsoft's 2025 Digital Defense Report](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025), adversaries are increasingly using generative AI for scaling social engineering, automating lateral movement, discovering vulnerabilities, and evading security controls. Chinese, Russian, Iranian, and North Korean cyber actors are already integrating AI to enhance their operations.
+
+*Source: <R id="91138237c53ce8d6">CyberSeek</R> workforce data, <R id="4c2168269b12c393">MITRE ATT&CK</R> framework, and [OpenAI threat assessment](https://openai.com/index/strengthening-cyber-resilience/)*
+
+<Crux
+  id="offense-defense"
+  question="Will AI favor offense or defense in security domains?"
+  domain="Security Dynamics"
+  description="Whether AI will primarily benefit attackers or defenders across security domains (cyber, bio, physical)."
+  importance="critical"
+  resolvability="years"
+  currentState="Unclear; arguments for both directions; may vary by domain"
+  positions={[
+    {
+      view: "AI favors offense across most domains",
+      probability: "30-45%",
+      holders: ["Some security researchers"],
+      implications: "Defensive investment may be futile; focus on preventing AI access for attackers"
+    },
+    {
+      view: "AI offense/defense balance varies by domain",
+      probability: "35-45%",
+      implications: "Domain-specific analysis; invest in defense where possible; restrict where offense dominates"
+    },
+    {
+      view: "AI ultimately favors defense",
+      probability: "20-30%",
+      holders: ["Some optimists"],
+      implications: "Invest heavily in AI-enabled defenses; restrictions less necessary"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Evidence from AI deployment in cybersecurity",
+    "Domain-specific offense/defense analysis",
+    "Historical analysis of technology and offense/defense balance",
+    "Real-world outcomes of AI-enabled attacks vs defenses"
+  ]}
+  relatedCruxes={["cyber-uplift", "disinformation-defense"]}
+/>
+
+<Crux
+  id="disinformation-defense"
+  question="Can AI-powered detection match AI-powered disinformation generation?"
+  domain="Security Dynamics"
+  description="Whether AI systems for detecting synthetic content and disinformation can keep pace with AI generation capabilities."
+  importance="high"
+  resolvability="years"
+  currentState="Detection currently losing; deepfakes increasingly convincing; detection arms race"
+  positions={[
+    {
+      view: "Detection will fall permanently behind generation",
+      probability: "40-55%",
+      holders: ["Hany Farid", "Many deepfake researchers"],
+      implications: "Shift to provenance-based authentication; detection is dead end"
+    },
+    {
+      view: "Detection and generation will reach equilibrium",
+      probability: "25-35%",
+      implications: "Both approaches valuable; detection as complement to provenance"
+    },
+    {
+      view: "Detection can win with sufficient investment",
+      probability: "15-25%",
+      implications: "Invest heavily in detection R&D"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Advances in deepfake detection that generalize",
+    "Real-world detection accuracy over time",
+    "Theoretical analysis of detection vs generation",
+    "Adversarial testing results"
+  ]}
+  relatedCruxes={["offense-defense", "authentication-adoption"]}
+  relevantResearch={[
+    { title: "C2PA Standard", url: "https://c2pa.org/" },
+    { title: "DARPA MediFor", url: "https://www.darpa.mil/program/media-forensics" },
+    { title: "Meta Detection Research", url: "https://ai.meta.com/research/publications/detectron2/" }
+  ]}
+/>
+
+### Deepfake and Disinformation Metrics (2024-2025)
+
+| Metric | Value | Trend | Source |
+|--------|-------|-------|--------|
+| **Deepfake video growth** | 550% increase (2019-2024); 95,820 videos (2023) | Accelerating | [Deepstrike 2025](https://deepstrike.io/blog/deepfake-statistics-2025) |
+| **Projected synthetic content** | 90% of online content by 2026 | Europol estimate | [European Parliament](https://www.europarl.europa.eu/RegData/etudes/BRIE/2025/775855/EPRS_BRI(2025)775855_EN.pdf) |
+| **Human detection accuracy (video)** | 24.5% | Asymmetrically low | Academic studies |
+| **Human detection accuracy (images)** | 62% | Moderate | Academic studies |
+| **Tool detection accuracy** | ≈75% | Arms race dynamic | [UNESCO](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing) |
+| **Confident in detection ability** | Only 9% of adults | Public awareness gap | Surveys |
+| **Political deepfakes documented** | 82 cases across 38 countries (mid-2023 to mid-2024) | Increasing | Academic research |
+| **North America fraud increase** | 1,740% | Dramatic acceleration | Industry reports |
+| **Voice phishing increase** | 442% (late 2024) | Driven by voice cloning | [ZeroThreat](https://zerothreat.ai/blog/deepfake-and-ai-phishing-statistics) |
+
+The detection gap is widening: while deepfake generation has become dramatically easier, human ability to detect synthetic content remains critically low. Only 0.1% of participants across modalities could reliably spot fakes in mixed tests, according to [UNESCO research](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing). This asymmetry strongly supports investing in provenance-based authentication systems like [C2PA](https://c2pa.org/) rather than relying on detection alone.
+
+## Mitigation Effectiveness 
+
+### Model Restriction Approaches
+
+| Restriction Type | Implementation Difficulty | Circumvention Difficulty | Effectiveness Assessment | Current Deployment |
+|------------------|--------------------------|------------------------|-------------------------|-------------------|
+| **Training-time Safety** | Medium | High | Moderate - affects base capabilities | <R id="e99a5c1697baa07d">Constitutional AI</R> |
+| **Output Filtering** | Low | Low | Low - easily bypassed | Most commercial APIs |
+| **Fine-tuning Prevention** | High | Medium | High - but open models complicate | Limited implementation |
+| **Access Controls** | Medium | Medium | Moderate - depends on enforcement | <R id="e64764924758e86b">OpenAI</R> terms |
+| **Weight Security** | High | High | Very High - if enforceable | Early development |
+
+*Source: Analysis of current AI lab practices and jailbreak research*
+
+<Crux
+  id="restrictions-effective"
+  question="Can AI model restrictions meaningfully reduce misuse?"
+  domain="Mitigation"
+  description="Whether training-time safety measures, output filters, and terms of service can prevent determined misuse of AI systems."
+  importance="high"
+  resolvability="years"
+  currentState="Jailbreaks common; open models exist; effectiveness debated"
+  positions={[
+    {
+      view: "Restrictions can meaningfully reduce misuse",
+      probability: "25-40%",
+      holders: ["AI labs", "Some safety researchers"],
+      implications: "Invest in better guardrails; restrictions are worthwhile"
+    },
+    {
+      view: "Restrictions raise bar but determined actors can circumvent",
+      probability: "40-50%",
+      implications: "Restrictions as one layer; combine with other defenses; accept imperfection"
+    },
+    {
+      view: "Restrictions are largely ineffective against serious threats",
+      probability: "20-30%",
+      holders: ["Some security researchers"],
+      implications: "Focus on other defenses; restrictions are mostly security theater"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Evidence on jailbreak prevalence and sophistication",
+    "Success of restriction improvements",
+    "Open model availability and capability trends",
+    "Evidence of restrictions preventing real attacks"
+  ]}
+  relatedCruxes={["open-source-policy"]}
+  relevantResearch={[
+    { title: "Anthropic Constitutional AI", url: "https://www.anthropic.com/research/constitutional-ai-harmlessness-from-ai-feedback" },
+    { title: "OpenAI GPT-4 System Card", url: "https://cdn.openai.com/papers/gpt-4-system-card.pdf" }
+  ]}
+/>
+
+<Crux
+  id="open-source-policy"
+  question="Should powerful AI models be open-sourced?"
+  domain="Mitigation"
+  description="Whether the benefits of open AI (research, democratization, competition) outweigh misuse risks."
+  importance="high"
+  resolvability="years"
+  currentState="Hotly debated; Meta releases open models; others restrict"
+  positions={[
+    {
+      view: "Open source benefits outweigh misuse risks",
+      probability: "25-40%",
+      holders: ["Meta", "Open source advocates", "Some researchers"],
+      implications: "Support open development; focus on defenses; restrictions futile anyway"
+    },
+    {
+      view: "Depends on capability level; dangerous capabilities shouldn't be open",
+      probability: "40-50%",
+      holders: ["Anthropic", "Most governance researchers"],
+      implications: "Capability thresholds for openness; evaluate risks per model"
+    },
+    {
+      view: "Most AI development should remain closed for safety",
+      probability: "15-25%",
+      holders: ["Some safety researchers"],
+      implications: "Restrict open release; compute governance; model weight security"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Evidence of open model misuse in serious attacks",
+    "Research enabling from open models vs closed",
+    "Capability comparisons: open vs closed frontier",
+    "Security of closed model weights"
+  ]}
+  relatedCruxes={["restrictions-effective", "ai-uplift"]}
+  relevantResearch={[
+    { title: "Meta Llama 2 Release", url: "https://ai.meta.com/llama/" },
+    { title: "Stanford HAI Open Model Report", url: "https://hai.stanford.edu/news/introducing-foundation-model-transparency-index" }
+  ]}
+/>
+
+<Crux
+  id="compute-governance"
+  question="Can compute governance effectively limit dangerous AI development?"
+  domain="Mitigation"
+  description="Whether controlling access to AI training compute can prevent dangerous capabilities from reaching bad actors."
+  importance="high"
+  resolvability="years"
+  currentState="Export controls emerging; monitoring limited; enforcement unclear"
+  positions={[
+    {
+      view: "Compute governance can be effective chokepoint",
+      probability: "30-45%",
+      holders: ["RAND", "Some governance researchers"],
+      implications: "Invest heavily in compute monitoring, export controls, and international coordination"
+    },
+    {
+      view: "Compute governance helps but has significant limits",
+      probability: "35-45%",
+      implications: "Use compute governance as one tool; don't rely on it alone"
+    },
+    {
+      view: "Compute governance will be circumvented; not effective",
+      probability: "20-30%",
+      holders: ["Some skeptics"],
+      implications: "Focus on other interventions; compute governance has diminishing returns"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Effectiveness of chip export controls",
+    "Development of compute monitoring technologies",
+    "Algorithmic efficiency gains reducing compute requirements",
+    "International coordination on compute governance"
+  ]}
+  relatedCruxes={["open-source-policy"]}
+  relevantResearch={[
+    { title: "Compute Governance Report", url: "https://arxiv.org/abs/2402.08797" },
+    { title: "CSET Chip Export Analysis", url: "https://cset.georgetown.edu/" }
+  ]}
+/>
+
+<Crux
+  id="authentication-adoption"
+  question="Will content authentication standards achieve adoption?"
+  domain="Security Dynamics"
+  description="Whether provenance standards like C2PA will be adopted widely enough to create a trusted content ecosystem."
+  importance="high"
+  resolvability="years"
+  currentState="Early deployment; major platforms uncommitted to full adoption"
+  positions={[
+    {
+      view: "Authentication will achieve widespread adoption",
+      probability: "30-45%",
+      holders: ["C2PA coalition", "Adobe", "Microsoft"],
+      implications: "Invest in provenance infrastructure; detection becomes less critical"
+    },
+    {
+      view: "Adoption will be partial and fragmented",
+      probability: "35-45%",
+      implications: "Need hybrid strategy; authentication + detection + literacy"
+    },
+    {
+      view: "Authentication will fail to achieve critical mass",
+      probability: "20-30%",
+      implications: "Need regulatory mandates; pure market solution won't work"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Major platform (Meta, TikTok, X) full adoption",
+    "Camera manufacturer widespread integration",
+    "Evidence users value/check credentials",
+    "Authentication system compromises or gaming"
+  ]}
+  relatedCruxes={["disinformation-defense"]}
+  relevantResearch={[
+    { title: "C2PA Specification", url: "https://c2pa.org/specifications/" },
+    { title: "Adobe Content Authenticity", url: "https://contentauthenticity.org/" }
+  ]}
+/>
+
+## Actor and Intent Analysis
+
+### Threat Actor Capabilities
+
+| Actor Type | AI Access Level | Sophistication | Primary Threat Vector | Risk Assessment | Deterability |
+|------------|----------------|----------------|---------------------|-----------------|--------------|
+| **Nation-States** | High | Very High | Cyber, surveillance, weapons | Highest capability | High - diplomatic consequences |
+| **Terror Groups** | Medium | Medium | Mass casualty, propaganda | Moderate capability | Low - ideological motivation |
+| **Criminals** | High | Medium | Fraud, ransomware | High volume | Medium - profit motive |
+| **Lone Actors** | High | Variable | Depends on AI uplift | Most unpredictable | Very Low - no clear target |
+| **Corporate Espionage** | High | High | IP theft, competitive intelligence | Moderate-High | Medium - business interests |
+
+*Source: <R id="5f1b50c36bbedab1">FBI Cyber Division</R> threat assessments and <R id="80d7b04be0e63710">CSIS Critical Questions</R>*
+
+<Crux
+  id="actor-landscape"
+  question="Who are the most concerning actors for AI misuse?"
+  domain="Actors"
+  description="Whether nation-states, terrorist groups, or lone actors pose the greatest AI misuse risk."
+  importance="medium"
+  resolvability="years"
+  currentState="Different actors have different capabilities and intentions; threat landscape evolving"
+  positions={[
+    {
+      view: "Nation-states are primary concern",
+      probability: "30-40%",
+      holders: ["Some national security analysts"],
+      implications: "Focus on great power competition; arms control; deterrence"
+    },
+    {
+      view: "Non-state actors are primary concern",
+      probability: "35-45%",
+      holders: ["Some terrorism researchers"],
+      implications: "Focus on preventing access; surveillance; disruption"
+    },
+    {
+      view: "Lone actors/small groups are primary concern with AI",
+      probability: "25-35%",
+      holders: ["Some AI safety researchers"],
+      implications: "AI uniquely enables solo actors; focus on preventing capability diffusion"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Evidence of AI use in attacks by different actor types",
+    "Capability requirements for AI-enabled attacks",
+    "Analysis of actor motivations and AI access",
+    "Historical patterns of technology-enabled terrorism"
+  ]}
+  relatedCruxes={["ai-uplift"]}
+/>
+
+<Crux
+  id="autonomous-weapons-inevitability"
+  question="Are autonomous weapons inevitable?"
+  domain="Actors"
+  description="Whether military adoption of AI for lethal autonomous weapons systems will happen regardless of international efforts to restrict them."
+  importance="high"
+  resolvability="years"
+  currentState="UN Resolution passed Dec 2024 (166-3); CCW GGE sessions Mar/Sep 2025; treaty goal by 2026"
+  positions={[
+    {
+      view: "Autonomous weapons are inevitable; must manage not prevent",
+      probability: "40-55%",
+      holders: ["Some military analysts", "Realists", "US DoD position"],
+      implications: "Focus on norms around use; escalation management; not on bans"
+    },
+    {
+      view: "Meaningful restrictions are achievable on some systems",
+      probability: "30-40%",
+      holders: ["Arms control advocates", "ICRC", "UN Secretary-General"],
+      implications: "Pursue arms control; differentiate between system types; target treaty by 2026"
+    },
+    {
+      view: "Comprehensive restrictions on autonomous weapons possible",
+      probability: "10-20%",
+      holders: ["Campaign to Stop Killer Robots"],
+      implications: "Advocate for bans; international treaty"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Progress or failure of UN autonomous weapons negotiations",
+    "Major powers' autonomous weapons deployment decisions",
+    "Technical feasibility of meaningful restrictions",
+    "Incidents involving autonomous weapons"
+  ]}
+  relatedCruxes={["offense-defense"]}
+  relevantResearch={[
+    { title: "UN CCW Autonomous Weapons", url: "https://www.unog.ch/80256EE600585943/(httpPages)/8FA3C2562A60FF81C1257CE600393DF6" },
+    { title: "ICRC Autonomous Weapons", url: "https://www.icrc.org/en/war-and-law/weapons/autonomous-weapons" }
+  ]}
+/>
+
+### International Autonomous Weapons Governance Status (2024-2025)
+
+| Development | Status | Key Actors | Implications |
+|-------------|--------|------------|--------------|
+| **UN General Assembly Resolution** | Passed Dec 2024 (166-3; Russia, North Korea, Belarus opposed) | UN member states | Strong international momentum; not legally binding |
+| **CCW Group of Governmental Experts** | 10 days of sessions (Mar 3-7, Sep 1-5, 2025) | High Contracting Parties | Rolling text from Nov 2024 outlines regulatory measures |
+| **Treaty Goal** | Target completion by end of 2026 | UN Sec-Gen Guterres, ICRC President Spoljaric | Ambitious timeline; window narrowing |
+| **US Position** | Governance framework via DoD 2020 Ethical Principles; no ban | US DoD | Responsible, traceable, governable AI within human command |
+| **China Position** | Ban on "unacceptable" LAWS (lethal, autonomous, unterminating, indiscriminate, self-learning) | China delegation | Partial ban approach; "acceptable" LAWS permitted |
+| **Existing Systems** | Phalanx CIWS (1970s), Iron Dome, Trophy, sentry guns (S. Korea, Israel) | Various militaries | Precedent of autonomous targeting for decades |
+
+According to [Congressional Research Service analysis](https://www.congress.gov/crs-product/IF11150), the U.S. does not prohibit LAWS development or employment, and some senior defense leaders have stated the U.S. may be compelled to develop such systems. The [ASIL Insights](https://www.asil.org/insights/volume/29/issue/1) notes growing momentum toward a new international treaty, though concerns remain about the rapidly narrowing window for effective regulation.
+
+## Impact and Scale Assessment
+
+### Mass Casualty Attack Scenarios
+
+| Attack Vector | AI Contribution | Casualty Potential | Probability (10 years) | Key Bottlenecks | Historical Precedents |
+|---------------|----------------|------------------|---------------------|-----------------|---------------------|
+| **Bioweapons** | Pathogen design, synthesis guidance | Very High (>10k) | 5-15% | Wet-lab skills, materials access | Aum Shinrikyo (failed), state programs |
+| **Cyberweapons** | Infrastructure targeting, coordination | High (>1k) | 15-25% | Physical access, critical systems | Stuxnet, Ukraine grid attacks |
+| **Chemical Weapons** | Synthesis optimization | Medium (>100) | 10-20% | Materials access, deployment | Tokyo subway, Syria |
+| **Conventional** | Target selection, coordination | Medium (>100) | 20-30% | Physical access, materials | Oklahoma City, 9/11 |
+| **Nuclear** | Security system exploitation | Extreme (>100k) | 1-3% | Fissile material access | None successful (non-state) |
+
+*Probability estimates based on <R id="aa76b3fce4c8fe8e">Global Terrorism Database</R> analysis and expert elicitation*
+
+<Crux
+  id="mass-casualty-misuse"
+  question="How likely is AI-enabled mass casualty attack in next 10 years?"
+  domain="Scale"
+  description="Whether AI will enable attacks causing over 1,000 deaths within the next decade."
+  importance="critical"
+  resolvability="years"
+  currentState="No AI-enabled mass casualty attacks yet; capabilities developing"
+  positions={[
+    {
+      view: "AI-enabled mass casualty attack likely (>50%)",
+      probability: "15-30%",
+      holders: ["Some risk analysts"],
+      implications: "Extreme urgency on prevention; major policy response needed"
+    },
+    {
+      view: "AI-enabled mass casualty attack possible but unlikely (10-50%)",
+      probability: "40-55%",
+      implications: "Serious preparation needed; balance urgency with uncertainty"
+    },
+    {
+      view: "AI-enabled mass casualty attack very unlikely (&lt;10%)",
+      probability: "25-40%",
+      holders: ["Some skeptics"],
+      implications: "Focus on other AI risks; misuse concerns may be overblown"
+    }
+  ]}
+  wouldUpdateOn={[
+    "AI-enabled attacks occurring (or not occurring)",
+    "Capability assessments over time",
+    "Evidence on attacker intentions and AI access",
+    "Defensive capability improvements"
+  ]}
+  relatedCruxes={["bio-uplift", "cyber-uplift", "ai-uplift"]}
+/>
+
+<Crux
+  id="authoritarian-stability"
+  question="Will AI-enabled surveillance strengthen or weaken authoritarian regimes?"
+  domain="Scale"
+  description="Whether AI surveillance and control tools will make authoritarian regimes more stable and durable."
+  importance="medium"
+  resolvability="decades"
+  currentState="AI surveillance deployed in China and elsewhere; effects on stability unclear"
+  positions={[
+    {
+      view: "AI will significantly strengthen authoritarian control",
+      probability: "35-50%",
+      holders: ["Some surveillance researchers", "Freedom House"],
+      implications: "AI may lock in authoritarianism; democracy promotion harder"
+    },
+    {
+      view: "AI is double-edged; can help both control and resistance",
+      probability: "30-40%",
+      implications: "Focus on who gets AI first and how it's deployed"
+    },
+    {
+      view: "Fundamental factors matter more than surveillance technology",
+      probability: "20-30%",
+      holders: ["Some political scientists"],
+      implications: "Focus on traditional democracy support; surveillance is marginal factor"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Evidence on AI surveillance effects on regime stability",
+    "Protests/revolutions succeeding despite AI surveillance",
+    "Comparative studies of surveillance and regime type",
+    "AI tools enabling opposition movements"
+  ]}
+  relatedCruxes={["actor-landscape"]}
+  relevantResearch={[
+    { title: "Freedom House AI Surveillance", url: "https://freedomhouse.org/report/freedom-net/2021/global-drive-control-big-tech-and-government-surveillance" },
+    { title: "CSIS Technology Authoritarianism", url: "https://www.csis.org/programs/strategic-technologies-program/technology-policy-program" }
+  ]}
+/>
+
+## Current State & Trajectory
+
+### Near-term Developments (2025-2027)
+
+| Development Area | Current Status (Dec 2025) | Expected Trajectory | Key Factors |
+|------------------|---------------------------|---------------------|-------------|
+| **Model Capabilities** | GPT-5 level; o3 at 94th percentile virology; CTF 76% | Human-level in multiple specialized domains | Scaling laws, algorithmic improvements |
+| **Defense Investment** | \$2B+ annual cybersecurity AI; 3-5x growth occurring | Major enterprise adoption | 50% of critical infra already attacked |
+| **Regulatory Response** | <R id="1ad6dc89cded8b0c">EU AI Act</R> in force; LAWS treaty negotiations | Treaty target by 2026; federal US legislation likely | Political pressure, incident triggers |
+| **Open Source Models** | Llama 3, DeepSeek-R1 (Jan 2025) | Continued but contested growth | Cost breakthroughs, safety concerns |
+| **Compute Governance** | Export controls tightening; monitoring emerging | International coordination increasing | US-China dynamics, evasion attempts |
+| **Deepfake Response** | 8M projected files; C2PA adoption growing | Provenance-based authentication scaling | Platform adoption critical |
+| **AI Misuse Detection** | OpenAI, Microsoft publishing threat reports | Real-time monitoring becoming standard | Provider cooperation essential |
+
+### Medium-term Projections (2026-2030)
+
+- **Capability Thresholds**: Models approaching human performance in specialized domains like biochemistry and cybersecurity
+- **Defensive Maturity**: AI-powered detection and response systems become standard across critical infrastructure  
+- **Governance Infrastructure**: <EntityLink id="monitoring">Compute monitoring</EntityLink> systems deployed, international agreements on <EntityLink id="autonomous-weapons">autonomous weapons</EntityLink> 
+- **Attack Sophistication**: First sophisticated AI-enabled attacks likely demonstrated, shifting threat perceptions significantly
+
+### Long-term Uncertainty (2030+)
+
+Key trajectories that remain highly uncertain:
+
+| Trend | Optimistic Scenario | Pessimistic Scenario | Key Determinants |
+|-------|-------------------|---------------------|------------------|
+| **Capability Diffusion** | Controlled through governance | Widespread proliferation | International cooperation success |
+| **Offense-Defense Balance** | Defense keeps pace | Offense advantage widens | R&D investment allocation |
+| **Authentication Adoption** | Universal verification | Fragmented ecosystem | Platform cooperation |
+| **International Cooperation** | Effective regimes emerge | Fragmentation and competition | Geopolitical stability |
+
+## Key Uncertainties & Expert Disagreements
+
+### Technical Uncertainties
+
+| Uncertainty | Range of Views | Current Evidence | Resolution Timeline |
+|-------------|----------------|------------------|---------------------|
+| **LLM biological uplift** | No uplift (RAND 2024) vs. concerning (CSET, Esvelt) | Mixed; wet-lab bottleneck may dominate | 2-5 years as capabilities improve |
+| **AI cyber capability ceiling** | Commodity attacks only vs. sophisticated intrusions | CTF benchmarks improving rapidly (27%->76%) | 1-3 years; being resolved now |
+| **Deepfake detection viability** | Arms race favoring offense vs. provenance solutions | Human detection at 24.5%; tools at 75% | 2-4 years; depends on C2PA adoption |
+| **Open model misuse potential** | Democratization benefits vs. misuse risks | DeepSeek-R1 cost breakthrough; no catastrophic misuse yet | Ongoing; each release re-evaluated |
+
+### Policy Uncertainties
+
+| Uncertainty | Range of Views | Current Evidence | Resolution Timeline |
+|-------------|----------------|------------------|---------------------|
+| **Compute governance effectiveness** | Strong chokepoint vs. easily circumvented | Export controls having effect; evasion ongoing | 3-5 years as enforcement matures |
+| **LAWS treaty feasibility** | Treaty achievable by 2026 vs. inevitable proliferation | UN resolution 166-3; CCW negotiations ongoing | 2026 target deadline |
+| **Model restriction value** | Meaningful reduction vs. security theater | Jailbreaks common; open models exist | Ongoing empirical question |
+| **Authentication adoption** | Universal adoption vs. fragmented ecosystem | C2PA growing; major platforms uncommitted | 3-5 years for critical mass |
+
+### Expert Disagreement Summary
+
+The AI safety and security community remains divided on several fundamental questions. According to [Georgetown CSET's assessment framework](https://cset.georgetown.edu/publication/how-to-assess-the-likelihood-of-malicious-use-of-advanced-ai-systems/), these disagreements stem from genuine uncertainty about rapidly evolving capabilities, differing risk tolerances, and varying assumptions about attacker sophistication and motivation.
+
+Key areas of active debate include:
+
+1. **Bioweapons uplift magnitude**: RAND's 2024 red-team study found no significant uplift, but their Global Risk Index identified 13 high-risk biological AI tools. OpenAI's o3 model scoring at the 94th percentile among virologists suggests capabilities are advancing.
+
+2. **Offense-defense balance**: [OpenAI's threat assessment](https://openai.com/index/strengthening-cyber-resilience/) acknowledges planning for models reaching "High" cyber capability levels that could develop zero-day exploits or assist with complex intrusions. Meanwhile, defensive AI investment is growing rapidly.
+
+3. **Regulatory approach**: The U.S. DoD favors governance frameworks over bans for LAWS, while 166 UN member states voted for a resolution calling for action. China distinguishes "acceptable" from "unacceptable" autonomous weapons.
+
+## Key Sources and References
+
+### Primary Research Sources
+
+| Source | Organization | Key Publications | Focus Area |
+|--------|--------------|------------------|------------|
+| [RAND Corporation](https://www.rand.org/topics/artificial-intelligence.html) | Independent research | Biological Red-Team Study (2024); Global Risk Index (2024) | Bioweapons, defense |
+| [Georgetown CSET](https://cset.georgetown.edu/) | University research center | Malicious Use Assessment Framework; Mechanisms of AI Harm (2025) | Policy, misuse assessment |
+| [OpenAI](https://openai.com/index/strengthening-cyber-resilience/) | AI lab | Cyber Resilience Report (2025); Threat Assessment | Cyber, capabilities |
+| [Microsoft](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025) | Technology company | Digital Defense Report (2025) | Cyber threats, state actors |
+| [CNAS](https://www.cnas.org/) | Think tank | AI and National Security Reports | Military, policy |
+
+### International Governance Sources
+
+| Source | Focus | Key Documents |
+|--------|-------|---------------|
+| [UN CCW GGE on LAWS](https://meetings.unoda.org/ccw/convention-on-certain-conventional-weapons-group-of-governmental-experts-on-lethal-autonomous-weapons-systems-2025) | Autonomous weapons | Rolling text (Nov 2024); 2025 session schedules |
+| [ICRC](https://www.icrc.org/en/war-and-law/weapons/autonomous-weapons) | International humanitarian law | Autonomous Weapons Position Papers |
+| [Congressional Research Service](https://www.congress.gov/crs-product/IF11150) | US policy | LAWS Policy Primer |
+| [ASIL](https://www.asil.org/insights/volume/29/issue/1) | International law | Treaty Momentum Analysis (2025) |
+
+### Deepfake and Disinformation Sources
+
+| Source | Focus | Key Findings |
+|--------|-------|--------------|
+| [Deepstrike Research](https://deepstrike.io/blog/deepfake-statistics-2025) | Statistics | 8M deepfakes projected (2025); 550% growth (2019-2024) |
+| [UNESCO](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing) | Detection | 24.5% human detection accuracy; 0.1% reliable identification |
+| [European Parliament](https://www.europarl.europa.eu/RegData/etudes/BRIE/2025/775855/EPRS_BRI(2025)775855_EN.pdf) | Policy | Europol 90% synthetic content projection by 2026 |
+| [C2PA Coalition](https://c2pa.org/) | Provenance | Content authenticity standards |
+| [Deloitte Financial Services](https://www2.deloitte.com/us/en/pages/financial-services/articles/deepfakes-financial-services.html) | Financial impact | \$12.3B to \$10B fraud projection (2023-2027) |
+
+<Backlinks />

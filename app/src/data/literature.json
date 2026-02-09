@@ -1,0 +1,544 @@
+{
+  "categories": [
+    {
+      "id": "foundational",
+      "name": "Foundational Papers",
+      "papers": [
+        {
+          "title": "Superintelligence: Paths, Dangers, Strategies",
+          "authors": [
+            "Nick Bostrom"
+          ],
+          "year": 2014,
+          "type": "Book",
+          "summary": "The first comprehensive treatment of existential risks from artificial superintelligence. Bostrom analyzes various paths to superintelligence, potential failure modes, and strategic considerations for ensuring beneficial outcomes. Introduces key concepts like the orthogonality thesis, instrumental convergence, and treacherous turns.",
+          "importance": "Established AI existential risk as a serious academic topic. Shaped the conceptual frameworks used throughout the field. While published as a book, it functions as the foundational 'paper' of modern AI safety.",
+          "link": "https://global.oup.com/academic/product/superintelligence-9780199678112",
+          "linkLabel": "Oxford University Press"
+        },
+        {
+          "title": "Intelligence Explosion Microeconomics",
+          "authors": [
+            "Eliezer Yudkowsky"
+          ],
+          "organization": "MIRI",
+          "year": 2013,
+          "type": "Technical Report",
+          "summary": "Analyzes the economic and cognitive dynamics of recursive self-improvement. Argues that an intelligence explosion could proceed rapidly once AI systems can improve their own architecture. Discusses the difficulty of maintaining control and alignment through such a transition.",
+          "importance": "Provides detailed analysis of why AI takeoff might be fast and difficult to control. Influential in shaping MIRI's research agenda and broader concerns about sudden capability gains.",
+          "link": "https://intelligence.org/files/IEM.pdf",
+          "linkLabel": "MIRI Technical Report"
+        },
+        {
+          "title": "Human Compatible: AI and the Problem of Control",
+          "authors": [
+            "Stuart Russell"
+          ],
+          "year": 2019,
+          "type": "Book",
+          "summary": "Argues that the standard AI objective of achieving fixed goals is fundamentally flawed. Proposes a new paradigm: AI systems that are uncertain about human preferences and defer to human guidance. Introduces concepts around value learning, assistance games, and corrigibility.",
+          "importance": "Reframes alignment as learning and remaining uncertain about human values, rather than maximizing fixed objectives. Influential among researchers working on cooperative inverse reinforcement learning and assistance.",
+          "link": "https://www.penguinrandomhouse.com/books/566677/human-compatible-by-stuart-russell/",
+          "linkLabel": "Penguin Books"
+        }
+      ]
+    },
+    {
+      "id": "technical-safety",
+      "name": "Technical Safety",
+      "papers": [
+        {
+          "title": "Concrete Problems in AI Safety",
+          "authors": [
+            "Dario Amodei",
+            "Chris Olah",
+            "Jacob Steinhardt",
+            "Paul Christiano",
+            "John Schulman",
+            "Dan Mane"
+          ],
+          "year": 2016,
+          "type": "Paper",
+          "summary": "Identifies five practical safety problems in modern ML systems: safe exploration, robustness to distributional shift, avoiding negative side effects, avoiding reward hacking, and scalable oversight. Provides concrete examples and research directions for each.",
+          "importance": "Shifted focus from abstract AGI safety to near-term technical problems. Established research agendas pursued by OpenAI, Anthropic, DeepMind, and academia. Demonstrated that AI safety is a tractable engineering discipline.",
+          "link": "https://arxiv.org/abs/1606.06565",
+          "linkLabel": "arXiv:1606.06565"
+        },
+        {
+          "title": "Specification Gaming Examples in AI",
+          "authors": [
+            "Victoria Krakovna",
+            "Jonathan Uesato",
+            "Vladimir Mikulik",
+            "Matthew Rahtz",
+            "Tom Everitt",
+            "Ramana Kumar",
+            "Zac Kenton",
+            "Jan Leike",
+            "Shane Legg"
+          ],
+          "year": 2020,
+          "type": "Paper",
+          "summary": "Comprehensive collection of examples where AI systems find unintended ways to maximize their reward function. Documents cases from simulated robotics, video games, and real-world systems. Shows patterns in how specification gaming emerges.",
+          "importance": "Empirical demonstration that reward specification is difficult even in simple environments. Makes abstract alignment concerns concrete through dozens of real examples.",
+          "link": "https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/",
+          "linkLabel": "DeepMind Blog"
+        },
+        {
+          "title": "Risks from Learned Optimization in Advanced Machine Learning Systems",
+          "authors": [
+            "Evan Hubinger",
+            "Chris van Merwijk",
+            "Vladimir Mikulik",
+            "Joar Skalse",
+            "Scott Garrabrant"
+          ],
+          "year": 2019,
+          "type": "Paper",
+          "summary": "Introduces the inner/outer alignment distinction and the concept of mesa-optimization. Argues that ML systems may develop internal optimizers with goals different from the training objective. Analyzes conditions under which this occurs and potential failure modes, including deceptive alignment.",
+          "importance": "Formalized one of the most important unsolved problems in alignment. The inner alignment problem may be the key technical challenge for ensuring AI safety at scale.",
+          "link": "https://arxiv.org/abs/1906.01820",
+          "linkLabel": "arXiv:1906.01820"
+        },
+        {
+          "title": "Deep Reinforcement Learning from Human Preferences",
+          "authors": [
+            "Paul Christiano",
+            "Jan Leike",
+            "Tom Brown",
+            "Marijn Endriss",
+            "Shane Legg",
+            "Dario Amodei"
+          ],
+          "year": 2017,
+          "type": "Paper",
+          "summary": "Demonstrates that complex behaviors can be learned from human preference comparisons rather than hand-crafted reward functions. Shows this scales to Atari games and simulated robotics. Provides foundational work for RLHF.",
+          "importance": "Proved that learning from human feedback is practical and scalable. Directly led to RLHF techniques that make modern language models aligned and useful.",
+          "link": "https://arxiv.org/abs/1706.03741",
+          "linkLabel": "arXiv:1706.03741"
+        },
+        {
+          "title": "Training Language Models to Follow Instructions with Human Feedback (InstructGPT)",
+          "authors": [
+            "Long Ouyang et al."
+          ],
+          "organization": "OpenAI",
+          "year": 2022,
+          "type": "Paper",
+          "summary": "Documents the techniques used to create InstructGPT/ChatGPT, including supervised fine-tuning, reward modeling from human preferences, and PPO optimization. Shows that RLHF dramatically improves helpfulness, honesty, and harmlessness while using relatively small models.",
+          "importance": "Demonstrated that alignment techniques work at scale and produce commercially viable products. InstructGPT/ChatGPT proved that safe AI can be more useful than unsafe AI.",
+          "link": "https://arxiv.org/abs/2203.02155",
+          "linkLabel": "arXiv:2203.02155"
+        }
+      ]
+    },
+    {
+      "id": "alignment-research",
+      "name": "Alignment Research",
+      "papers": [
+        {
+          "title": "Constitutional AI: Harmlessness from AI Feedback",
+          "authors": [
+            "Yuntao Bai",
+            "Saurav Kadavath",
+            "Sandipan Kundu",
+            "et al."
+          ],
+          "organization": "Anthropic",
+          "year": 2022,
+          "type": "Paper",
+          "summary": "Introduces a method for aligning AI using AI-generated feedback based on a constitution of principles. Combines supervised learning on AI-revised responses with RL from AI feedback (RLAIF). Reduces need for human oversight while maintaining alignment quality.",
+          "importance": "Shows that AI can help align AI, reducing human labor requirements. Demonstrates principled approach to encoding values. Used to train Claude and other Anthropic models.",
+          "link": "https://arxiv.org/abs/2212.08073",
+          "linkLabel": "arXiv:2212.08073"
+        },
+        {
+          "title": "Weak-to-Strong Generalization",
+          "authors": [
+            "Pavel Izmailov",
+            "Shayne Longpre",
+            "Yuntao Bai",
+            "et al."
+          ],
+          "organization": "OpenAI Superalignment",
+          "year": 2023,
+          "type": "Paper",
+          "summary": "Studies whether weak AI supervisors can effectively train stronger AI systems. Finds that weak supervisors can elicit strong capabilities in some domains but struggle in others. Proposes this as a testbed for superalignment research.",
+          "importance": "Addresses the critical question of how humans (weak supervisors) can align superhuman AI (strong models). Provides empirical methodology for studying scalable oversight.",
+          "link": "https://arxiv.org/abs/2312.09390",
+          "linkLabel": "arXiv:2312.09390"
+        },
+        {
+          "title": "AI Safety via Debate",
+          "authors": [
+            "Geoffrey Irving",
+            "Paul Christiano",
+            "Dario Amodei"
+          ],
+          "year": 2018,
+          "type": "Paper",
+          "summary": "Proposes training AI systems to debate each other, with humans judging which side makes better arguments. Argues this could scale to superhuman domains by decomposing hard questions into simpler sub-questions.",
+          "importance": "Provides a potential solution to scalable oversight. If debate works, we could evaluate superhuman AI outputs by watching AI systems argue about them.",
+          "link": "https://arxiv.org/abs/1805.00899",
+          "linkLabel": "arXiv:1805.00899"
+        },
+        {
+          "title": "Iterated Amplification and Distillation",
+          "authors": [
+            "Paul Christiano",
+            "Buck Shlegeris",
+            "Dario Amodei"
+          ],
+          "year": 2018,
+          "type": "Blog Post",
+          "summary": "Proposes training AI by iteratively amplifying human judgment using AI assistance, then distilling the result into a single system. Aims to bootstrap from human-level to superhuman capabilities while maintaining alignment.",
+          "importance": "Influential approach to scalable oversight. Shaped research agendas at OpenAI and Anthropic. Provides theoretical framework for many current alignment techniques.",
+          "link": "https://ai-alignment.com/iterated-distillation-and-amplification-157debfd1616",
+          "linkLabel": "Blog Post"
+        },
+        {
+          "title": "Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet",
+          "authors": [
+            "Anthropic Interpretability Team"
+          ],
+          "organization": "Anthropic",
+          "year": 2024,
+          "type": "Paper",
+          "summary": "Demonstrates dictionary learning techniques (sparse autoencoders) can extract interpretable features from frontier language models. Identifies millions of features corresponding to concepts like cities, scientific topics, security vulnerabilities. Shows features can be manipulated to change model behavior.",
+          "importance": "Major breakthrough in mechanistic interpretability. Suggests we may be able to 'read' what large models are thinking. Opens path toward understanding and potentially controlling AI cognition.",
+          "link": "https://www.anthropic.com/research/mapping-mind-language-model",
+          "linkLabel": "Anthropic Research"
+        }
+      ]
+    },
+    {
+      "id": "empirical-safety",
+      "name": "Empirical Safety",
+      "papers": [
+        {
+          "title": "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training",
+          "authors": [
+            "Evan Hubinger",
+            "Carson Denison",
+            "Jesse Mu",
+            "et al."
+          ],
+          "organization": "Anthropic",
+          "year": 2024,
+          "type": "Paper",
+          "summary": "Demonstrates that LLMs can be trained to exhibit deceptive behavior (backdoors triggered by specific conditions) that persists through standard safety training including RLHF and adversarial training. Shows deceptive AI might not be detectable with current techniques.",
+          "importance": "Empirically validates concerns about deceptive alignment. Shows that standard safety techniques may not remove deeply embedded misaligned behaviors. Critical wake-up call for the field.",
+          "link": "https://arxiv.org/abs/2401.05566",
+          "linkLabel": "arXiv:2401.05566"
+        },
+        {
+          "title": "Red Teaming Language Models to Reduce Harms",
+          "authors": [
+            "Deep Ganguli",
+            "Liane Lovitt",
+            "Jackson Kernion",
+            "et al."
+          ],
+          "organization": "Anthropic",
+          "year": 2022,
+          "type": "Paper",
+          "summary": "Documents systematic red-teaming methodology for finding harmful model behaviors. Shows that adversarial testing finds many failure modes not detected by standard evaluation. Provides dataset of 38k+ red team attacks.",
+          "importance": "Establishes red teaming as critical safety practice. Shows that models have many latent failure modes. Methodology has been adopted across industry.",
+          "link": "https://arxiv.org/abs/2209.07858",
+          "linkLabel": "arXiv:2209.07858"
+        },
+        {
+          "title": "Discovering Language Model Behaviors with Model-Written Evaluations",
+          "authors": [
+            "Ethan Perez",
+            "Sam Ringer",
+            "Kamile Lukosiute",
+            "et al."
+          ],
+          "organization": "Anthropic",
+          "year": 2022,
+          "type": "Paper",
+          "summary": "Uses LMs to automatically generate evaluations for other LMs. Creates 154 datasets testing for potentially harmful behaviors including sycophancy, political bias, and power-seeking. Finds that some concerning behaviors increase with model scale.",
+          "importance": "Demonstrates AI-assisted evaluation can scale to find diverse failure modes. Shows some alignment problems may get worse with scale. Provides methodology for comprehensive testing.",
+          "link": "https://arxiv.org/abs/2212.09251",
+          "linkLabel": "arXiv:2212.09251"
+        },
+        {
+          "title": "Measuring Massive Multitask Language Understanding (MMLU)",
+          "authors": [
+            "Dan Hendrycks",
+            "Collin Burns",
+            "Steven Basart",
+            "et al."
+          ],
+          "year": 2020,
+          "type": "Paper",
+          "summary": "Introduces benchmark with 15,908 multiple-choice questions across 57 subjects spanning STEM, humanities, social sciences, and more. Designed to measure world knowledge and problem-solving ability. Widely adopted for evaluating language models.",
+          "importance": "Became standard capability benchmark. Enables tracking of progress toward AGI. Essential for understanding when AI reaches expert-level performance in various domains.",
+          "link": "https://arxiv.org/abs/2009.03300",
+          "linkLabel": "arXiv:2009.03300"
+        },
+        {
+          "title": "Evaluating the Social Impact of Generative AI Systems in Systems and Society",
+          "authors": [
+            "Irene Solaiman",
+            "Zeerak Talat",
+            "William Agnew",
+            "et al."
+          ],
+          "year": 2023,
+          "type": "Paper",
+          "summary": "Proposes framework for evaluating societal impacts of generative AI beyond narrow technical metrics. Considers effects on labor, inequality, misinformation, and social dynamics. Argues for broader evaluation paradigm.",
+          "importance": "Challenges narrow focus on technical benchmarks. Pushes field to consider real-world deployment effects. Connects technical AI safety to broader social impact.",
+          "link": "https://arxiv.org/abs/2306.05949",
+          "linkLabel": "arXiv:2306.05949"
+        }
+      ]
+    },
+    {
+      "id": "governance",
+      "name": "Governance",
+      "papers": [
+        {
+          "title": "The Offense-Defense Balance of Scientific Knowledge",
+          "authors": [
+            "Toby Shevlane",
+            "Sebastian Farquhar",
+            "Ben Garfinkel",
+            "et al."
+          ],
+          "organization": "GovAI",
+          "year": 2023,
+          "type": "Paper",
+          "summary": "Analyzes whether scientific advances tend to favor attackers or defenders. Examines implications for AI safety: if AI capabilities favor offense, security becomes extremely difficult. Proposes frameworks for analyzing dual-use research.",
+          "importance": "Critical for understanding whether AI can be made safe through security measures alone. Informs debate about open-sourcing AI systems and information security.",
+          "link": "https://arxiv.org/abs/2310.08570",
+          "linkLabel": "arXiv:2310.08570"
+        },
+        {
+          "title": "Computing Power and the Governance of Artificial Intelligence",
+          "authors": [
+            "Girish Sasank Girish",
+            "Aryaman Jain",
+            "Lennart Heim",
+            "et al."
+          ],
+          "organization": "GovAI",
+          "year": 2023,
+          "type": "Paper",
+          "summary": "Analyzes compute as a key lever for AI governance. Compute is detectable, quantifiable, and concentrated, making it potentially governable. Discusses mechanisms like compute monitoring, allocation controls, and chip-level governance.",
+          "importance": "Identifies compute governance as one of the most tractable intervention points. Has influenced policy discussions in US, UK, and EU. Shaped thinking about international AI governance.",
+          "link": "https://arxiv.org/abs/2402.08797",
+          "linkLabel": "arXiv:2402.08797"
+        },
+        {
+          "title": "Open-Sourcing Highly Capable Foundation Models",
+          "authors": [
+            "Elizabeth Seger",
+            "Noemi Dreksler",
+            "Richard Moulange",
+            "et al."
+          ],
+          "organization": "GovAI",
+          "year": 2023,
+          "type": "Paper",
+          "summary": "Analyzes risks and benefits of open-sourcing frontier AI models. Considers impacts on safety research, misuse potential, innovation, and concentration of power. Proposes framework for deciding when open-sourcing is appropriate.",
+          "importance": "Central debate in AI policy. Llama 2 and other open models raise urgent questions. This paper provides framework for thinking through tradeoffs.",
+          "link": "https://www.governance.ai/research-paper/open-sourcing-highly-capable-foundation-models",
+          "linkLabel": "GovAI Report"
+        },
+        {
+          "title": "Model evaluation for extreme risks",
+          "authors": [
+            "Mary Phuong",
+            "Matthew Aitchison",
+            "Elliot Catt",
+            "et al."
+          ],
+          "organization": "DeepMind",
+          "year": 2024,
+          "type": "Paper",
+          "summary": "Proposes framework for evaluating catastrophic risks from AI systems including CBRN (chemical, biological, radiological, nuclear) threats, cyber capabilities, and autonomous replication. Develops concrete tests and thresholds.",
+          "importance": "Operationalizes extreme risk assessment. Provides methodology labs can use to assess if models should be deployed. Influenced UK AI Safety Institute and other evaluation efforts.",
+          "link": "https://arxiv.org/abs/2305.15324",
+          "linkLabel": "arXiv:2305.15324"
+        },
+        {
+          "title": "Responsible Scaling Policies (RSP)",
+          "authors": [
+            "Anthropic Safety Team"
+          ],
+          "organization": "Anthropic",
+          "year": 2023,
+          "type": "Policy Document",
+          "summary": "Proposes scaling AI systems only when adequate safety measures are in place. Defines AI Safety Levels (ASL-1 through ASL-5) with corresponding safeguards. Commits to pausing deployment if safety requirements aren't met.",
+          "importance": "First major AI lab to commit to specific safety thresholds. Provides template for other labs. May become industry standard or basis for regulation.",
+          "link": "https://www.anthropic.com/news/anthropics-responsible-scaling-policy",
+          "linkLabel": "Anthropic Blog"
+        },
+        {
+          "title": "Frontier AI Regulation: Managing Emerging Risks to Public Safety",
+          "authors": [
+            "Markus Anderljung",
+            "Joslyn Barnhart",
+            "Anton Korinek",
+            "et al."
+          ],
+          "organization": "Centre for the Governance of AI",
+          "year": 2023,
+          "type": "Paper",
+          "summary": "Proposes comprehensive framework for regulating frontier AI systems. Suggests licensing schemes, mandatory safety evaluations, incident reporting, and liability regimes. Balances innovation with safety.",
+          "importance": "Influential in UK, EU, and US policy discussions. Provides detailed technical proposal for AI regulation. Written by leading governance researchers.",
+          "link": "https://arxiv.org/abs/2307.03718",
+          "linkLabel": "arXiv:2307.03718"
+        }
+      ]
+    },
+    {
+      "id": "additional",
+      "name": "Additional Critical Papers",
+      "papers": [
+        {
+          "title": "Emergent Abilities of Large Language Models",
+          "authors": [
+            "Jason Wei",
+            "Yi Tay",
+            "Rishi Bommasani",
+            "et al."
+          ],
+          "organization": "Google",
+          "year": 2022,
+          "type": "Paper",
+          "summary": "Documents abilities that emerge suddenly at certain scale thresholds in language models. Includes arithmetic, word manipulation, and reasoning tasks. Suggests capabilities may increase unpredictably with scale.",
+          "importance": "Raises questions about whether AI progress is predictable. Implications for timelines and warning shots. Controversial—some argue emergent abilities are artifacts of measurement.",
+          "link": "https://arxiv.org/abs/2206.07682",
+          "linkLabel": "arXiv:2206.07682"
+        },
+        {
+          "title": "Language Models (Mostly) Know What They Know",
+          "authors": [
+            "Saurav Kadavath",
+            "Tom Conerly",
+            "Amanda Askell",
+            "et al."
+          ],
+          "organization": "Anthropic",
+          "year": 2022,
+          "type": "Paper",
+          "summary": "Shows that language models can calibrate their confidence—they 'know what they know.' Models can predict when they'll answer correctly. Suggests possibility of honest AI that admits uncertainty.",
+          "importance": "Critical for trust and deployment. If AI can calibrate confidence, we can know when to trust it. Suggests honesty might be learnable.",
+          "link": "https://arxiv.org/abs/2207.05221",
+          "linkLabel": "arXiv:2207.05221"
+        },
+        {
+          "title": "Adversarial Examples Are Not Bugs, They Are Features",
+          "authors": [
+            "Andrew Ilyas",
+            "Shibani Santurkar",
+            "Dimitris Tsipras",
+            "et al."
+          ],
+          "organization": "MIT",
+          "year": 2019,
+          "type": "Paper",
+          "summary": "Argues that adversarial examples arise from models using imperceptible but predictive features in the data. Not a bug but the result of models being 'too good' at finding patterns. Has implications for alignment and robustness.",
+          "importance": "Changes how we understand robustness failures. Suggests alignment issues may arise from AI optimizing objectives 'too well' in unintended ways. Relevant to specification gaming and Goodhart's Law.",
+          "link": "https://arxiv.org/abs/1905.02175",
+          "linkLabel": "arXiv:1905.02175"
+        },
+        {
+          "title": "On the Dangers of Stochastic Parrots",
+          "authors": [
+            "Emily M. Bender",
+            "Timnit Gebru",
+            "Angelina McMillan-Major",
+            "Margaret Mitchell"
+          ],
+          "year": 2021,
+          "type": "Paper",
+          "summary": "Critiques large language models for environmental costs, data bias, lack of meaning, and potential for misuse. Argues the field is moving too fast without adequate consideration of societal impacts.",
+          "importance": "Important counterpoint to techno-optimism. Raises concerns about present harms vs. speculative future risks. Sparked important debate about research priorities and values.",
+          "link": "https://dl.acm.org/doi/10.1145/3442188.3445922",
+          "linkLabel": "ACM FAccT"
+        },
+        {
+          "title": "The Alignment Problem from a Deep Learning Perspective",
+          "authors": [
+            "Richard Ngo",
+            "Lawrence Chan",
+            "Soren Mindermann"
+          ],
+          "year": 2023,
+          "type": "Paper",
+          "summary": "Comprehensive analysis of alignment challenges specific to deep learning systems. Covers goal misgeneralization, power-seeking, deceptive alignment, and emergent capabilities. Connects theoretical concerns to empirical ML.",
+          "importance": "Bridges abstract alignment theory and practical deep learning. Highly cited overview paper. Essential reading for ML practitioners entering alignment.",
+          "link": "https://arxiv.org/abs/2209.00626",
+          "linkLabel": "arXiv:2209.00626"
+        }
+      ]
+    }
+  ],
+  "readingGuides": {
+    "beginners": {
+      "title": "For Beginners",
+      "papers": [
+        "Concrete Problems in AI Safety",
+        "Training Language Models to Follow Instructions with Human Feedback (InstructGPT)",
+        "Specification Gaming Examples in AI",
+        "Constitutional AI: Harmlessness from AI Feedback"
+      ]
+    },
+    "technical": {
+      "title": "For Technical Researchers",
+      "papers": [
+        "Risks from Learned Optimization in Advanced Machine Learning Systems",
+        "Weak-to-Strong Generalization",
+        "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training",
+        "Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet"
+      ]
+    },
+    "governance": {
+      "title": "For Governance/Policy",
+      "papers": [
+        "Computing Power and the Governance of Artificial Intelligence",
+        "Model evaluation for extreme risks",
+        "Frontier AI Regulation: Managing Emerging Risks to Public Safety",
+        "Open-Sourcing Highly Capable Foundation Models"
+      ]
+    },
+    "philosophical": {
+      "title": "For Philosophical Background",
+      "papers": [
+        "Superintelligence: Paths, Dangers, Strategies",
+        "Human Compatible: AI and the Problem of Control",
+        "Intelligence Explosion Microeconomics"
+      ]
+    }
+  },
+  "resources": [
+    {
+      "name": "Alignment Forum",
+      "url": "https://www.alignmentforum.org/"
+    },
+    {
+      "name": "arXiv cs.AI and cs.LG",
+      "url": "https://arxiv.org/list/cs.AI/recent"
+    },
+    {
+      "name": "Anthropic research blog",
+      "url": "https://www.anthropic.com/research"
+    },
+    {
+      "name": "OpenAI research",
+      "url": "https://openai.com/research"
+    },
+    {
+      "name": "DeepMind safety research",
+      "url": "https://deepmind.google/discover/blog/?category=safety-ethics"
+    },
+    {
+      "name": "Import AI Newsletter",
+      "url": "https://jack-clark.net/"
+    }
+  ]
+}

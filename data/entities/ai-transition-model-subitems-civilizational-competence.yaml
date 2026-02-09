@@ -1,0 +1,453 @@
+- id: "tmc-civcomp-adaptability"
+  type: "ai-transition-model-subitem"
+  title: "Adaptability"
+  parentFactor: "civilizational-competence"
+  path: "/ai-transition-model/adaptability/"
+  description: "Society's capacity to adjust to AI-driven changes, including institutional
+    flexibility, workforce retraining, and cultural adaptation. High adaptability enables smoother
+    transitions."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "Adaptability: Research Report"
+  causeEffectGraph:
+    title: "What Affects Societal Adaptability?"
+    description: "Causal factors affecting society's capacity to adjust to AI-driven changes."
+    primaryNodeId: "adaptability"
+    nodes:
+      - id: "institutional-flexibility"
+        label: "Institutional Flexibility"
+        type: "leaf"
+        color: "blue"
+        description: "Ability of institutions to change rules and practices."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 4
+          certainty: 6
+      - id: "education-systems"
+        label: "Education Systems"
+        type: "leaf"
+        color: "emerald"
+        description: "Capacity for retraining and skill development."
+        scores:
+          novelty: 3
+          sensitivity: 7
+          changeability: 5
+          certainty: 7
+      - id: "social-safety-nets"
+        label: "Social Safety Nets"
+        type: "leaf"
+        color: "emerald"
+        description: "Support systems for those displaced by AI."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 6
+          certainty: 7
+      - id: "cultural-openness"
+        label: "Cultural Openness"
+        type: "leaf"
+        description: "Society's willingness to embrace change."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 3
+          certainty: 5
+      - id: "displacement-scale"
+        label: "Displacement Scale"
+        type: "leaf"
+        color: "rose"
+        description: "Magnitude of job displacement from AI automation across sectors."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 3
+          certainty: 4
+      - id: "transition-speed-mismatch"
+        label: "Transition Speed Mismatch"
+        type: "leaf"
+        color: "rose"
+        description: "Gap between AI disruption pace and retraining capacity."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 4
+          certainty: 4
+      - id: "can-society-adapt-question"
+        label: "Can Society Adapt Fast Enough?"
+        type: "leaf"
+        color: "violet"
+        description: "Key uncertainty whether human adaptation can keep pace with AI-driven change."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 4
+          certainty: 3
+      - id: "transition-capacity"
+        label: "Transition Capacity"
+        type: "intermediate"
+        description: "Ability to manage workforce transitions."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 5
+          certainty: 5
+      - id: "adaptation-speed"
+        label: "Adaptation Speed"
+        type: "intermediate"
+        color: "slate"
+        description: "How quickly society can respond to changes."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 4
+          certainty: 4
+      - id: "adaptability"
+        label: "Societal Adaptability"
+        type: "effect"
+        description: "Overall capacity to adjust to AI changes."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 4
+          certainty: 4
+    edges:
+      - source: "institutional-flexibility"
+        target: "adaptation-speed"
+        strength: "strong"
+        effect: "increases"
+      - source: "education-systems"
+        target: "transition-capacity"
+        strength: "strong"
+        effect: "increases"
+      - source: "social-safety-nets"
+        target: "transition-capacity"
+        strength: "medium"
+        effect: "increases"
+      - source: "cultural-openness"
+        target: "adaptation-speed"
+        strength: "medium"
+        effect: "increases"
+      - source: "displacement-scale"
+        target: "transition-capacity"
+        strength: "strong"
+        effect: "decreases"
+      - source: "transition-speed-mismatch"
+        target: "adaptability"
+        strength: "strong"
+        effect: "decreases"
+      - source: "can-society-adapt-question"
+        target: "adaptability"
+        strength: "medium"
+        effect: "mixed"
+      - source: "transition-capacity"
+        target: "adaptability"
+        strength: "strong"
+        effect: "increases"
+      - source: "adaptation-speed"
+        target: "adaptability"
+        strength: "strong"
+        effect: "increases"
+- id: "tmc-civ-epistemics"
+  type: "ai-transition-model-subitem"
+  title: "Civilizational Epistemics"
+  parentFactor: "civilizational-competence"
+  path: "/ai-transition-model/epistemics/"
+  description: "Society's collective capacity to form accurate beliefs, evaluate evidence, and reach
+    consensus on factual matters. Critical for effective governance and coordination."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "Civilizational Epistemics: Research Report"
+  causeEffectGraph:
+    title: "What Affects Civilizational Epistemics?"
+    description: "Causal factors affecting society's collective capacity for truth-finding. Trust in
+      news at 40% globally."
+    primaryNodeId: "civ-epistemics"
+    nodes:
+      - id: "information-quality"
+        label: "Information Quality"
+        type: "leaf"
+        description: "Accuracy and reliability of available information."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 5
+          certainty: 6
+      - id: "media-ecosystem"
+        label: "Media Ecosystem"
+        type: "leaf"
+        color: "slate"
+        description: "Structure and incentives of information distribution."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 5
+          certainty: 6
+      - id: "critical-thinking"
+        label: "Critical Thinking"
+        type: "leaf"
+        color: "emerald"
+        description: "Population's ability to evaluate claims."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 4
+          certainty: 6
+      - id: "institutional-credibility"
+        label: "Institutional Credibility"
+        type: "leaf"
+        color: "teal"
+        description: "Trust in knowledge-producing institutions."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 3
+          certainty: 7
+      - id: "ai-generated-disinformation"
+        label: "AI-Generated Disinformation"
+        type: "leaf"
+        color: "red"
+        description: "Deepfakes, synthetic media, and AI-generated misleading content at scale."
+        scores:
+          novelty: 7
+          sensitivity: 9
+          changeability: 4
+          certainty: 5
+      - id: "polarization-dynamics"
+        label: "Polarization Dynamics"
+        type: "leaf"
+        color: "rose"
+        description: "Social and political polarization undermining shared epistemic ground."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 3
+          certainty: 6
+      - id: "truth-collapse-question"
+        label: "Will Shared Truth Collapse?"
+        type: "leaf"
+        color: "violet"
+        description: "Key uncertainty whether AI-era epistemics will preserve any shared reality."
+        scores:
+          novelty: 7
+          sensitivity: 9
+          changeability: 4
+          certainty: 3
+      - id: "consensus-formation"
+        label: "Consensus Formation"
+        type: "intermediate"
+        description: "Ability to reach shared understanding."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 4
+          certainty: 5
+      - id: "belief-accuracy"
+        label: "Belief Accuracy"
+        type: "intermediate"
+        color: "emerald"
+        description: "Correspondence between beliefs and reality."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 5
+          certainty: 5
+      - id: "civ-epistemics"
+        label: "Civilizational Epistemics"
+        type: "effect"
+        description: "Overall epistemic health of society."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 4
+          certainty: 4
+    edges:
+      - source: "information-quality"
+        target: "belief-accuracy"
+        strength: "strong"
+        effect: "increases"
+      - source: "media-ecosystem"
+        target: "information-quality"
+        strength: "strong"
+        effect: "increases"
+      - source: "critical-thinking"
+        target: "belief-accuracy"
+        strength: "medium"
+        effect: "increases"
+      - source: "institutional-credibility"
+        target: "consensus-formation"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-generated-disinformation"
+        target: "information-quality"
+        strength: "strong"
+        effect: "decreases"
+      - source: "polarization-dynamics"
+        target: "consensus-formation"
+        strength: "strong"
+        effect: "decreases"
+      - source: "truth-collapse-question"
+        target: "civ-epistemics"
+        strength: "medium"
+        effect: "mixed"
+      - source: "consensus-formation"
+        target: "civ-epistemics"
+        strength: "strong"
+        effect: "increases"
+      - source: "belief-accuracy"
+        target: "civ-epistemics"
+        strength: "strong"
+        effect: "increases"
+- id: "tmc-civ-governance"
+  type: "ai-transition-model-subitem"
+  title: "Civilizational Governance"
+  parentFactor: "civilizational-competence"
+  path: "/ai-transition-model/governance/"
+  description: "Effectiveness of governance systems in navigating AI transition, including regulatory
+    capacity, policy adaptation, and international coordination mechanisms."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "Civilizational Governance: Research Report"
+  causeEffectGraph:
+    title: "What Affects Governance Effectiveness?"
+    description: "Causal factors affecting governance capacity for AI transition. AISI budgets ~$10-50M
+      vs $100B+ industry spending."
+    primaryNodeId: "civ-governance"
+    nodes:
+      - id: "technical-expertise"
+        label: "Technical Expertise"
+        type: "leaf"
+        color: "teal"
+        description: "Government understanding of AI systems."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 6
+          certainty: 7
+      - id: "regulatory-resources"
+        label: "Regulatory Resources"
+        type: "leaf"
+        color: "rose"
+        description: "Budget and staff for AI oversight."
+        scores:
+          novelty: 4
+          sensitivity: 7
+          changeability: 6
+          certainty: 8
+      - id: "policy-speed"
+        label: "Policy Speed"
+        type: "leaf"
+        description: "How quickly governance can adapt to changes."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 4
+          certainty: 7
+      - id: "international-cooperation"
+        label: "International Cooperation"
+        type: "leaf"
+        color: "blue"
+        description: "Cross-border governance coordination."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 4
+          certainty: 5
+      - id: "resource-asymmetry"
+        label: "Resource Asymmetry"
+        type: "leaf"
+        color: "rose"
+        description: "Vast gap between industry spending ($100B+) and regulator budgets (~$10-50M)."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 5
+          certainty: 7
+      - id: "political-will"
+        label: "Political Will"
+        type: "leaf"
+        color: "teal"
+        description: "Leadership commitment to effective AI governance despite industry pressure."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 6
+          certainty: 5
+      - id: "governance-race-question"
+        label: "Can Governance Keep Up?"
+        type: "leaf"
+        color: "violet"
+        description: "Key uncertainty whether governance can match AI development speed."
+        scores:
+          novelty: 6
+          sensitivity: 9
+          changeability: 4
+          certainty: 3
+      - id: "enforcement-capacity"
+        label: "Enforcement Capacity"
+        type: "intermediate"
+        color: "emerald"
+        description: "Ability to monitor and enforce rules."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 5
+          certainty: 6
+      - id: "adaptive-governance"
+        label: "Adaptive Governance"
+        type: "intermediate"
+        description: "Rules that evolve with technology."
+        scores:
+          novelty: 6
+          sensitivity: 8
+          changeability: 5
+          certainty: 5
+      - id: "civ-governance"
+        label: "Governance Effectiveness"
+        type: "effect"
+        description: "Overall governance capacity for AI transition."
+        scores:
+          novelty: 5
+          sensitivity: 9
+          changeability: 5
+          certainty: 4
+    edges:
+      - source: "technical-expertise"
+        target: "enforcement-capacity"
+        strength: "strong"
+        effect: "increases"
+      - source: "regulatory-resources"
+        target: "enforcement-capacity"
+        strength: "strong"
+        effect: "increases"
+      - source: "policy-speed"
+        target: "adaptive-governance"
+        strength: "strong"
+        effect: "increases"
+      - source: "international-cooperation"
+        target: "civ-governance"
+        strength: "medium"
+        effect: "increases"
+      - source: "resource-asymmetry"
+        target: "enforcement-capacity"
+        strength: "strong"
+        effect: "decreases"
+      - source: "political-will"
+        target: "civ-governance"
+        strength: "strong"
+        effect: "increases"
+      - source: "governance-race-question"
+        target: "civ-governance"
+        strength: "medium"
+        effect: "mixed"
+      - source: "enforcement-capacity"
+        target: "civ-governance"
+        strength: "strong"
+        effect: "increases"
+      - source: "adaptive-governance"
+        target: "civ-governance"
+        strength: "strong"
+        effect: "increases"

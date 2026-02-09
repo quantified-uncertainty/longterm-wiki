@@ -1,0 +1,681 @@
+---
+title: "Model Style Guide"
+description: "Format requirements and methodological considerations for analytical models"
+sidebar:
+  order: 2
+importance: 5
+quality: 32
+llmSummary: "This internal style guide establishes format requirements and methodological principles for analytical models in the knowledge base, emphasizing executive summaries that state both methodology and conclusions, strategic prioritization content, and diagram selection criteria. It provides comprehensive formatting standards but represents internal infrastructure rather than substantive analysis."
+ratings:
+  novelty: 2
+  rigor: 4
+  actionability: 3
+  completeness: 6
+metrics:
+  wordCount: 1003
+  citations: 0
+  tables: 35
+  diagrams: 12
+---
+import { Aside } from '@astrojs/starlight/components';
+import {Mermaid, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="models" client:load />
+
+This guide covers **core purpose**, **summary requirements**, **format requirements**, **diagram types**, **methodological principles**, and **rating criteria** for analytical models in this knowledge base.
+
+---
+
+## Executive Summary Requirement
+
+<Aside type="danger" title="Most Critical Requirement">
+Every model MUST have an **executive summary** that states both **what the model does** and **what it concludes**. This summary appears in the `description` frontmatter and is shown in previews across the site.
+</Aside>
+
+### The Summary Formula
+
+A good model summary follows this pattern:
+
+> **"This model [methodology/approach]. It [key finding - trajectory, critical variables, or uncertainty assessment]."**
+
+### Types of Valid Findings
+
+Summaries should emphasize **where things are going** and **what matters most**:
+
+| Finding Type | Example |
+|--------------|---------|
+| **Trajectory/Projection** | "...projects uplift increasing from 1.5x to 3-5x by 2030" |
+| **Critical Variables** | "...identifies X and Y as the key variables determining outcomes" |
+| **Risk Magnitude** | "...estimates this represents 5-15% of total AI risk" |
+| **Uncertainty Assessment** | "...finds high variance across scenarios; results depend heavily on [assumption]" |
+| **Negative Finding** | "...finds no significant effect under current conditions, but this changes if [X]" |
+
+### Examples
+
+**Good summaries:**
+
+| Topic | Summary |
+|-------|---------|
+| Bioweapons uplift | "This model estimates AI's contribution to bioweapons risk over time. It projects uplift increasing from 1.5x to 3-5x by 2030, with biosecurity evasion posing the greatest concern." |
+| Racing dynamics | "This model analyzes competitive pressures among frontier labs. It finds the key variable is whether any single lab can maintain >6 month lead; if not, racing dynamics dominate." |
+| Lock-in probability | "This model assesses paths to irreversible outcomes. Results are highly uncertain (10-60% range) depending on governance assumptions." |
+| Sycophancy | "This model maps feedback loops in AI training. It finds no clear evidence of runaway dynamics under current training regimes, but identifies reward hacking as the critical variable to monitor." |
+
+**Bad summaries:**
+
+| Summary | Problem |
+|---------|---------|
+| "Analysis of AI bioweapons risk" | No methodology, no conclusion |
+| "This model examines how racing dynamics affect safety" | No finding at all |
+| "Current LLMs provide 1.3x uplift" | Current state only, no trajectory or implications |
+
+### Frontmatter Format
+
+```yaml
+---
+title: "Racing Dynamics Impact Model"
+description: "This model analyzes competitive pressures among frontier labs. It estimates a 60-80% probability that racing dynamics reduce safety investment by 30-50% compared to non-competitive scenarios."
+quality: 3
+lastEdited: "2025-12-26"
+ratings:
+  novelty: 4
+  rigor: 3
+  actionability: 4
+  completeness: 3
+---
+```
+
+The `description` field:
+- **Must** state what the model does (methodology/approach)
+- **Must** include key conclusions with quantified estimates where possible
+- Should be 1-3 sentences (max ~250 characters for good preview display)
+- Is shown in entity cards, backlinks, and search results
+
+### Displaying the Summary on the Page
+
+Add a `## Summary` section at the top of every model page that references the frontmatter:
+
+```mdx
+{/* Replace with actual entity ID from entities.yaml */}
+<DataInfoBox entityId="bioweapons-ai-uplift" ratings={frontmatter.ratings} />
+
+## Summary
+
+{frontmatter.description}
+
+## Overview
+
+[Detailed context and background...]
+```
+
+This way the summary text lives **only in frontmatter** and is rendered on the page via `{frontmatter.description}`.
+
+<Aside type="note" title="Sync with entities.yaml">
+For now, model descriptions also need to be updated in `src/data/entities.yaml`. Keep them in sync manually. (TODO: automate this via build script)
+</Aside>
+
+---
+
+## Core Purpose: Strategic Prioritization
+
+<Aside type="danger" title="Most Important Principle">
+Models exist to help with **prioritization and strategy decisions**, not just to explain mechanisms. Every model should answer: "How important is this and what should we do about it?"
+</Aside>
+
+### The Goal
+
+The knowledge base serves people making strategic decisions about AI safety:
+- Researchers deciding what to work on
+- Funders deciding where to allocate resources
+- Policymakers deciding what to regulate
+- Organizations deciding their focus areas
+
+Models should help them decide **what matters most** and **what to do about it**.
+
+### Required Strategic Content
+
+Every model must include:
+
+| Element | Question Answered | Example |
+|---------|-------------------|---------|
+| **Magnitude Assessment** | How big is this problem? | "This affects 10-30% of total AI risk" |
+| **Comparative Importance** | How does this rank vs. other risks? | "Less important than misalignment, more than job displacement" |
+| **Resource Implications** | What does this mean for prioritization? | "Warrants 5-10% of safety resources" |
+| **Key Cruxes** | What beliefs would change the conclusion? | "If X is true, this becomes top priority" |
+| **Actionability** | What should actors actually do? | "Labs should implement Y, funders should fund Z" |
+
+### Common Mistake: Mechanism Without Magnitude
+
+<Aside type="caution" title="Anti-Pattern">
+A model that thoroughly explains *how* something works but never addresses *how important* it is fails its core purpose.
+</Aside>
+
+**Bad example** (from a hypothetical sycophancy model):
+> "The feedback loop operates through 4 phases over 10 years, with differential equations governing each variable..."
+>
+> *(300 lines on mechanism, 0 lines on strategic importance)*
+
+**What's missing:**
+- Is sycophancy a top-5 AI risk or a minor concern?
+- Should safety orgs prioritize this over alignment research?
+- How does this compare to racing dynamics or concentration risks?
+- What beliefs would change whether this matters?
+
+**Better approach:**
+> "Sycophancy represents approximately 5-15% of near-term AI risk, ranking below core alignment but above most misuse risks. For most safety organizations, this is a secondary priority unless they have specific comparative advantage. The key crux is whether market competition makes sycophancy inevitable—if so, regulatory intervention becomes critical."
+
+### Strategic Importance Section Template
+
+Include a section like this in every model:
+
+```markdown
+## Strategic Importance
+
+### Magnitude
+- **Share of total AI risk:** [X-Y%]
+- **Affected population:** [scope]
+- **Timeline:** [when effects materialize]
+
+### Comparative Ranking
+| Risk Category | Relative Importance | Reasoning |
+|---------------|--------------------:|-----------|
+| Core alignment | Higher | [why] |
+| This risk | Baseline | - |
+| [Other risk] | Lower | [why] |
+
+### Resource Implications
+- **Who should work on this:** [actor types]
+- **Suggested allocation:** [% of resources]
+- **Comparative advantage:** [who is best positioned]
+
+### Key Cruxes
+1. If [X], this becomes more important because [Y]
+2. If [A], this becomes less important because [B]
+```
+
+---
+
+## Part 1: Structure Requirements
+
+### Overview Section
+
+Write 2-3 paragraphs of **flowing prose** (no bullet points). The overview should:
+- Explain the model's central insight in the first paragraph
+- Describe why understanding this matters in the second paragraph
+- Preview key findings or framework structure in the third paragraph
+
+### Required Sections
+
+| Section | Purpose | Format |
+|---------|---------|--------|
+| **Overview** | Central insight and importance | 2-3 paragraphs of prose |
+| **Conceptual Framework** | Visual structure of the model | Mermaid diagram + explanation |
+| **Quantitative Analysis** | Numbers, estimates, projections | Tables with uncertainty ranges |
+| **Scenario Analysis** | Probability-weighted futures | 3-5 scenarios with probabilities |
+| **Limitations** | What the model cannot do | Flowing prose, specific caveats |
+| **Related Models** | Connections to other models | Linked list |
+
+### Tables
+
+Include tables with **3+ columns and 4+ rows**. Tables should add structured information beyond what prose conveys.
+
+**Good table characteristics:**
+- Uncertainty ranges (low/central/high estimates)
+- Comparison across multiple dimensions
+- Clear headers that explain what each column means
+- Sources or confidence levels where relevant
+
+---
+
+## Part 2: Diagram Types
+
+Models should include at least one diagram. Choose the type that best represents your model's structure.
+
+### Flowcharts (Process/Causation)
+
+Use for: Showing how things lead to other things, causal chains, decision processes.
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[Initial Condition] --> B[Intermediate State]
+    B --> C[Outcome 1]
+    B --> D[Outcome 2]
+    C --> E[Final State]
+    D --> E
+`} />
+
+```
+flowchart TD
+    A[Initial Condition] --> B[Intermediate State]
+    B --> C[Outcome 1]
+    B --> D[Outcome 2]
+```
+
+### Network Diagrams (Relationships)
+
+Use for: Showing how multiple factors influence each other, feedback loops, complex interdependencies.
+
+<Mermaid client:load chart={`
+flowchart LR
+    A[Factor A] -->|"strengthens"| B[Factor B]
+    B -->|"weakens"| C[Factor C]
+    C -->|"influences"| A
+    B -->|"amplifies"| D[Factor D]
+    D -->|"reduces"| A
+`} />
+
+### State Diagrams (Transitions)
+
+Use for: Showing how systems move between discrete states, regime changes, phase transitions.
+
+<Mermaid client:load chart={`
+stateDiagram-v2
+    [*] --> Stable
+    Stable --> Degraded: stress increases
+    Degraded --> Stable: intervention succeeds
+    Degraded --> Critical: stress continues
+    Critical --> Failed: threshold crossed
+    Critical --> Degraded: emergency response
+    Failed --> [*]
+`} />
+
+### Interactions Over Time
+
+For showing how different actors or systems interact in sequence, attack chains, or response protocols, **use a table** rather than a sequence diagram (which has rendering issues):
+
+| Step | Actor | Action | Target |
+|------|-------|--------|--------|
+| 1 | Actor A | Initial action | System |
+| 2 | System | Alert triggered | Defender |
+| 3 | Defender | Response deployed | System |
+| 4 | System | Action blocked | Actor A |
+
+For simple flows, a basic flowchart works well:
+
+<Mermaid client:load chart={`
+flowchart LR
+    A[Actor A] -->|attacks| S[System]
+    S -->|alerts| D[Defender]
+    D -->|responds| S
+    S -->|blocks| A
+`} />
+
+### Entity Relationship Diagrams (Schemas)
+
+Use for: Showing structural relationships between concepts, taxonomies, classification systems.
+
+<Mermaid client:load chart={`
+erDiagram
+    RISK ||--o{ RISK_FACTOR : "has"
+    RISK ||--o{ INTERVENTION : "addressed by"
+    RISK_FACTOR ||--o{ INDICATOR : "measured by"
+    INTERVENTION ||--o{ ACTOR : "implemented by"
+    ACTOR ||--o{ RESOURCE : "requires"
+`} />
+
+### Quadrant Diagrams (2x2 Matrices)
+
+Use for: Classifying items along two dimensions, prioritization frameworks, strategic positioning.
+
+<Mermaid client:load chart={`
+quadrantChart
+    title Intervention Priority Matrix
+    x-axis Low Feasibility --> High Feasibility
+    y-axis Low Impact --> High Impact
+    quadrant-1 Pursue Aggressively
+    quadrant-2 Strategic Investment
+    quadrant-3 Deprioritize
+    quadrant-4 Quick Wins
+    Speed limits: [0.8, 0.7]
+    Circuit breakers: [0.7, 0.6]
+    International treaty: [0.3, 0.9]
+    Research funding: [0.6, 0.5]
+`} />
+
+### Timeline Diagrams
+
+Use for: Showing progression over time, milestone projections, historical development.
+
+<Mermaid client:load chart={`
+timeline
+    title Capability Development Timeline
+    section Near-term
+        2024 : Current state
+        2025 : Threshold 1 approached
+        2026 : Threshold 1 likely crossed
+    section Medium-term
+        2027-2028 : Threshold 2 risk
+        2029-2030 : Critical period
+    section Long-term
+        2030+ : High uncertainty
+`} />
+
+### Subgraph Groupings
+
+Use for: Showing categories of related items, system boundaries, domain separation.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph Technical["Technical Factors"]
+        T1[Capability Level]
+        T2[Alignment Quality]
+    end
+    subgraph Social["Social Factors"]
+        S1[Racing Dynamics]
+        S2[Governance Readiness]
+    end
+    subgraph Outcomes["Outcomes"]
+        O1[Safe Deployment]
+        O2[Accident Risk]
+    end
+    T1 --> O1
+    T1 --> O2
+    T2 --> O1
+    S1 --> O2
+    S2 --> O1
+`} />
+
+---
+
+## Part 3: Schema Structures
+
+For models describing structural relationships, use schema-style representations.
+
+### When to Use Schemas
+
+- Defining taxonomy of related concepts
+- Showing how entities relate to each other
+- Describing data structures or classification systems
+- Mapping stakeholder relationships
+
+### Schema Example: Risk Factor Taxonomy
+
+<Mermaid client:load chart={`
+classDiagram
+    class Risk {
+        +name: string
+        +severity: 1-5
+        +probability: 0-1
+        +timeframe: string
+    }
+    class RiskFactor {
+        +name: string
+        +type: technical|social|structural
+        +measurable: boolean
+    }
+    class Intervention {
+        +name: string
+        +effectiveness: 0-1
+        +cost: low|medium|high
+        +feasibility: 0-1
+    }
+    class Indicator {
+        +name: string
+        +current_value: number
+        +threshold: number
+        +trend: improving|stable|worsening
+    }
+    Risk "1" --> "*" RiskFactor : influenced by
+    Risk "1" --> "*" Intervention : addressed by
+    RiskFactor "1" --> "*" Indicator : measured by
+    Intervention "*" --> "*" RiskFactor : targets
+`} />
+
+### Schema Example: Actor Relationships
+
+<Mermaid client:load chart={`
+erDiagram
+    AI_LAB ||--o{ AI_SYSTEM : develops
+    AI_LAB ||--o{ SAFETY_RESEARCH : conducts
+    REGULATOR ||--o{ POLICY : creates
+    POLICY ||--o{ AI_LAB : constrains
+    SAFETY_ORG ||--o{ SAFETY_RESEARCH : produces
+    SAFETY_RESEARCH ||--o{ AI_SYSTEM : improves
+    AI_SYSTEM ||--o{ DEPLOYMENT : enables
+    DEPLOYMENT ||--o{ IMPACT : causes
+`} />
+
+---
+
+## Part 4: Methodological Principles
+
+### Distinguish Stocks vs. Flows
+
+<Aside type="tip">
+**Stocks** are quantities that accumulate (trust level, capability, resources). **Flows** are rates of change (trust erosion rate, capability growth rate). Models should be clear about which they're describing.
+</Aside>
+
+| Concept | Stock (Level) | Flow (Rate) |
+|---------|---------------|-------------|
+| Trust | Current trust level (0-100%) | Trust erosion rate (%/year) |
+| Capability | Current capability score | Capability growth rate |
+| Safety margin | Current margin size | Margin compression rate |
+
+### Identify Feedback Loops
+
+Many risks involve feedback loops where effects become causes. Make these explicit.
+
+<Mermaid client:load chart={`
+flowchart LR
+    A[Capability Increase] --> B[Deployment Pressure]
+    B --> C[Rushed Safety Testing]
+    C --> D[Incidents]
+    D --> E[Reduced Trust]
+    E --> F[Regulatory Response]
+    F -->|"negative feedback"| B
+    D -->|"positive feedback"| A
+    style D fill:#ff9999
+`} />
+
+**Positive feedback loops** (amplifying): The effect reinforces the cause.
+**Negative feedback loops** (stabilizing): The effect counteracts the cause.
+
+### Consider Base Rates
+
+Before modeling specific mechanisms, consider: what's the base rate for this type of event?
+
+| Event Type | Historical Base Rate | AI-Specific Adjustment |
+|------------|---------------------|----------------------|
+| Major infrastructure failure | ≈0.5/year globally | Unknown multiplier |
+| Technology-driven job displacement | ≈2-5%/decade | Potentially 10x faster |
+| Great power conflict | ≈0.5%/year | Unknown effect |
+
+### Distinguish Correlation vs. Causation
+
+When factors co-occur, be explicit about the causal structure:
+
+| Relationship | Description | Implication |
+|--------------|-------------|-------------|
+| A causes B | Intervening on A changes B | Target A to affect B |
+| B causes A | Intervening on A doesn't change B | Target B instead |
+| C causes both | A and B are correlated but independent | Target C to affect both |
+| A and B cause each other | Feedback loop | Consider system dynamics |
+
+### Avoid False Binary Thresholds
+
+<Aside type="caution" title="Common Problem">
+Models often imply sharp cutoffs ("if X > 80%, collapse occurs") when reality involves continuous degradation.
+</Aside>
+
+**Better approach:**
+- Use gradient language: "largely past," "degrading," "limited risk"
+- Acknowledge that most systems degrade continuously
+- If using threshold framing, add explicit caveats
+
+### Avoid Naive Multiplicative Formulas
+
+<Aside type="caution" title="Common Problem">
+Formulas like `P(cascade) = P(A) × P(B) × P(C) × P(D)` assume independence when factors are often correlated.
+</Aside>
+
+**Better approach:**
+1. Acknowledge correlations explicitly in a table
+2. Use influence diagrams instead of formulas
+3. If using formulas, add caveats about correlation assumptions
+
+### Consider Counterfactuals
+
+Good models should address: "Compared to what?"
+
+| Comparison | What it reveals |
+|------------|-----------------|
+| vs. no AI development | Total effect of AI |
+| vs. slower development | Effect of racing |
+| vs. different governance | Effect of policy choices |
+| vs. different actors | Effect of who controls AI |
+
+---
+
+## Part 5: Rating System
+
+Each model is rated on four dimensions (1-5 scale). These ratings appear in the model's info box.
+
+### Novelty (1-5)
+
+How much does this model add beyond existing frameworks?
+
+| Score | Description | Example |
+|-------|-------------|---------|
+| 1 | Restates common knowledge | "AI could be dangerous" |
+| 2 | Minor variation on existing model | Adding one factor to known framework |
+| 3 | Useful synthesis or new framing | Combining two existing models in novel way |
+| 4 | Significant new insight | New mechanism or relationship not previously articulated |
+| 5 | Paradigm-shifting framework | Fundamentally new way of understanding the problem |
+
+### Rigor (1-5)
+
+How well-supported and internally consistent is the model?
+
+| Score | Description | Characteristics |
+|-------|-------------|-----------------|
+| 1 | Speculation | No sources, hand-wavy reasoning |
+| 2 | Plausible | Some logical basis, few sources |
+| 3 | Well-reasoned | Clear logic, some empirical grounding |
+| 4 | Strong evidence base | Multiple sources, quantified where possible |
+| 5 | Rigorous analysis | Comprehensive evidence, sensitivity analysis, peer review |
+
+### Actionability (1-5)
+
+How useful is this model for decision-making?
+
+| Score | Description | Example outputs |
+|-------|-------------|-----------------|
+| 1 | Abstract only | "Things are complex" |
+| 2 | General direction | "We should be careful" |
+| 3 | Specific considerations | "These 3 factors matter most" |
+| 4 | Concrete recommendations | "Prioritize X intervention over Y because Z" |
+| 5 | Decision-ready | Clear decision criteria, thresholds, action triggers |
+
+### Completeness (1-5)
+
+How thoroughly does the model cover its domain?
+
+| Score | Description | Missing elements |
+|-------|-------------|------------------|
+| 1 | Sketch | Most components missing |
+| 2 | Partial | Key components missing |
+| 3 | Adequate | Core model complete, some gaps |
+| 4 | Comprehensive | Thorough coverage, minor gaps |
+| 5 | Exhaustive | All relevant factors, edge cases, interactions |
+
+### How to Assign Ratings
+
+When reviewing a model, ask:
+
+1. **Novelty**: "Have I seen this idea before? Does it change how I think?"
+2. **Rigor**: "Would I bet money on these claims? What's the evidence quality?"
+3. **Actionability**: "Could I make a decision based on this? What would I do differently?"
+4. **Completeness**: "What's missing? Would adding more change the conclusions?"
+
+---
+
+## Part 6: Advanced Visualization Ideas
+
+### Sensitivity Analysis Tables
+
+Show how conclusions change with different assumptions:
+
+| Parameter | Low Estimate | Central | High Estimate | Conclusion Changes? |
+|-----------|--------------|---------|---------------|---------------------|
+| Capability growth rate | 10%/yr | 30%/yr | 50%/yr | Yes - timeline shifts 3-5 years |
+| Alignment difficulty | Easy | Medium | Hard | Yes - risk estimate changes 2-3x |
+| Coordination probability | 10% | 30% | 50% | No - conclusion robust |
+
+### Comparison Matrices
+
+Compare interventions, scenarios, or approaches:
+
+| Intervention | Effectiveness | Cost | Feasibility | Time to Impact | Overall |
+|--------------|---------------|------|-------------|----------------|---------|
+| Speed limits | High | Low | Medium | Immediate | ⭐⭐⭐⭐ |
+| International treaty | Very High | Medium | Low | 3-5 years | ⭐⭐⭐ |
+| Research funding | Medium | Medium | High | 5-10 years | ⭐⭐⭐ |
+
+### Before/After Comparisons
+
+Show how a change affects multiple dimensions:
+
+| Dimension | Before Intervention | After Intervention | Change |
+|-----------|--------------------|--------------------|--------|
+| Risk level | High (0.7) | Medium (0.4) | -43% |
+| Detection time | 2 weeks | 2 days | -86% |
+| Recovery cost | \$10B | \$2B | -80% |
+
+### Decision Trees
+
+For models with sequential choices:
+
+<Mermaid client:load chart={`
+flowchart TD
+    A{Deploy AI system?} -->|Yes| B{Safety testing complete?}
+    A -->|No| C[No immediate risk]
+    B -->|Yes| D{Monitoring in place?}
+    B -->|No| E[High accident risk]
+    D -->|Yes| F[Managed deployment]
+    D -->|No| G[Medium accident risk]
+    style E fill:#ff6666
+    style G fill:#ffcc66
+    style F fill:#66ff66
+`} />
+
+---
+
+## Part 7: Review Checklist
+
+### Format
+- [ ] Overview is 2-3 paragraphs of flowing prose (no bullets)
+- [ ] At least one Mermaid diagram with caption
+- [ ] Quantitative tables with 3+ columns and uncertainty ranges
+- [ ] Scenario analysis with probability weights
+- [ ] Limitations section in prose format
+- [ ] Related models linked
+
+### Diagrams
+- [ ] Diagram type matches content (flowchart for causation, network for relationships, etc.)
+- [ ] Diagram has explanatory caption
+- [ ] Complex diagrams use subgraphs for grouping
+- [ ] Color coding is meaningful and explained
+
+### Methodology
+- [ ] No false binary thresholds (or explicitly caveated)
+- [ ] Multiplicative formulas acknowledge correlations
+- [ ] Feedback loops identified where relevant
+- [ ] Stocks vs. flows distinguished
+- [ ] Base rates considered
+- [ ] Counterfactual comparisons made
+
+### Ratings
+- [ ] All four ratings assigned (novelty, rigor, actionability, completeness)
+- [ ] Ratings are justified by content quality
+- [ ] Ratings are consistent with similar models
+
+### Common Issues to Fix
+
+| Issue | Fix |
+|-------|-----|
+| Binary threshold language | Use gradient language ("degrading," "largely past") |
+| Multiplicative formula without caveat | Add correlation acknowledgment |
+| Missing uncertainty ranges | Add low/central/high estimates |
+| Flowchart for structural relationships | Use entity-relationship or class diagram |
+| No feedback loops shown | Add arrows showing circular dependencies |
+| Ratings don't match quality | Adjust ratings or improve content |

@@ -1,0 +1,1070 @@
+- pageId: accident-risks
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-risk
+- pageId: adaptability
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/resilience
+    eightyK: https://80000hours.org/problem-profiles/civilisation-resilience/
+- pageId: adoption
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-diffusion
+- pageId: adversarial-training
+  links:
+    lesswrong: https://www.lesswrong.com/tag/adversarial-training
+- pageId: agent-foundations
+  links:
+    lesswrong: https://www.lesswrong.com/tag/agent-foundations
+    stampy: https://aisafety.info/questions/8Iup/What-is-agent-foundations
+    alignmentForum: https://www.alignmentforum.org/tag/agent-foundations
+- pageId: agentic-ai
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/agentic-ai
+- pageId: agi
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Artificial_general_intelligence
+    lesswrong: https://www.lesswrong.com/tag/general-intelligence
+    stampy: https://aisafety.info/questions/5651/What-is-artificial-general-intelligence-AGI
+    arbital: https://arbital.greaterwrong.com/p/agi
+    wikidata: https://www.wikidata.org/wiki/Q2264109
+- pageId: agi-development
+  links:
+    lesswrong: https://www.lesswrong.com/tag/agi
+- pageId: agi-timeline
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-timelines
+    eaForum: https://forum.effectivealtruism.org/topics/ai-forecasting
+- pageId: agi-timeline-debate
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-timelines
+    eaForum: https://forum.effectivealtruism.org/topics/ai-forecasting
+- pageId: ai-alignment
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q24882728
+    eightyK: https://80000hours.org/problem-profiles/artificial-intelligence/
+- pageId: ai-assisted
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-assisted-alignment
+- pageId: ai-boxing
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-boxing-containment
+    wikipedia: https://en.wikipedia.org/wiki/AI_capability_control
+    stampy: https://aisafety.info/questions/6175/What-is-AI-boxing
+- pageId: ai-control
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-control
+    wikipedia: https://en.wikipedia.org/wiki/AI_capability_control
+    alignmentForum: https://www.alignmentforum.org/tag/ai-control
+- pageId: ai-evaluations
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-evaluations
+    eaForum: https://forum.effectivealtruism.org/topics/ai-evaluations-and-standards
+- pageId: ai-forecasting
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-forecasting
+- pageId: ai-governance
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-governance
+    eaForum: https://forum.effectivealtruism.org/topics/ai-governance
+    eightyK: https://80000hours.org/career-reviews/ai-policy-and-strategy/
+- pageId: ai-safety
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/AI_safety
+    lesswrong: https://www.lesswrong.com/tag/ai
+    eaForum: https://forum.effectivealtruism.org/topics/ai-safety
+    wikidata: https://www.wikidata.org/wiki/Q116291231
+    eightyK: https://80000hours.org/problem-profiles/artificial-intelligence/
+- pageId: ai-safety-institutes
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-safety-institutes
+- pageId: ai-takeoff
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-takeoff
+    eaForum: https://forum.effectivealtruism.org/topics/ai-takeoff
+    stampy: https://aisafety.info/questions/6268/What-is-an-intelligence-explosion
+- pageId: ai-takeover
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/AI_takeover
+    wikidata: https://www.wikidata.org/wiki/Q2254427
+    eightyK: https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/
+- pageId: ai-timelines
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-timelines
+    eaForum: https://forum.effectivealtruism.org/topics/ai-forecasting
+- pageId: algorithms
+  links:
+    lesswrong: https://www.lesswrong.com/tag/algorithms
+    wikipedia: https://en.wikipedia.org/wiki/Machine_learning
+- pageId: aligned-good
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/transformative-ai
+- pageId: alignment
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/AI_alignment
+    lesswrong: https://www.lesswrong.com/tag/ai
+    eaForum: https://forum.effectivealtruism.org/topics/ai-alignment
+    stampy: https://aisafety.info/questions/9Tii/What-is-AI-alignment
+    arbital: https://arbital.greaterwrong.com/p/ai_alignment
+    wikidata: https://www.wikidata.org/wiki/Q24882728
+    eightyK: https://80000hours.org/problem-profiles/artificial-intelligence/
+- pageId: alignment-evals
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-evaluations
+- pageId: alignment-progress
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-alignment
+- pageId: alignment-robustness
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-alignment
+- pageId: anthropic
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Anthropic
+    lesswrong: https://www.lesswrong.com/tag/anthropic-org
+    wikidata: https://www.wikidata.org/wiki/Q116758847
+- pageId: apollo-research
+  links:
+    lesswrong: https://www.lesswrong.com/tag/apollo-research-org
+- pageId: arc
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/alignment-research-center
+- pageId: artificial-general-intelligence
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q2264109
+- pageId: authoritarian-takeover
+  links:
+    eightyK: https://80000hours.org/problem-profiles/extreme-power-concentration/
+- pageId: authoritarian-tools
+  links:
+    eightyK: https://80000hours.org/problem-profiles/risks-of-stable-totalitarianism/
+- pageId: automation
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Automation
+    lesswrong: https://www.lesswrong.com/tag/automation
+- pageId: automation-bias
+  links:
+    lesswrong: https://www.lesswrong.com/tag/automation
+    eaForum: https://forum.effectivealtruism.org/topics/automation
+- pageId: automation-tools
+  links:
+    lesswrong: https://www.lesswrong.com/tag/automation
+    eaForum: https://forum.effectivealtruism.org/topics/automation
+- pageId: autonomous-weapons
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Lethal_autonomous_weapon
+    wikidata: https://www.wikidata.org/wiki/Q25378861
+- pageId: biological-threat-exposure
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/global-catastrophic-biological-risk
+    wikipedia: https://en.wikipedia.org/wiki/Biological_warfare
+    eightyK: https://80000hours.org/problem-profiles/preventing-catastrophic-pandemics/
+- pageId: biosecurity
+  links:
+    eightyK: https://80000hours.org/problem-profiles/preventing-catastrophic-pandemics/
+- pageId: bioweapons
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Biological_warfare
+    eaForum: https://forum.effectivealtruism.org/topics/global-catastrophic-biological-risk
+    eightyK: https://80000hours.org/problem-profiles/preventing-catastrophic-pandemics/
+- pageId: brain-computer-interfaces
+  links:
+    lesswrong: https://www.lesswrong.com/tag/brain-computer-interfaces
+    wikipedia: https://en.wikipedia.org/wiki/Brain%E2%80%93computer_interface
+    wikidata: https://www.wikidata.org/wiki/Q897410
+- pageId: cais
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/center-for-ai-safety
+    wikidata: https://www.wikidata.org/wiki/Q119084607
+- pageId: california-sb1047
+  links:
+    lesswrong: https://www.lesswrong.com/tag/sb-1047
+    eaForum: https://forum.effectivealtruism.org/topics/sb-1047
+- pageId: capabilities
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-capabilities
+- pageId: capability-elicitation
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-evaluations
+- pageId: capability-threshold-model
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-capabilities
+- pageId: capability-unlearning
+  links:
+    lesswrong: https://www.lesswrong.com/tag/machine-unlearning
+- pageId: case-for-xrisk
+  links:
+    lesswrong: https://www.lesswrong.com/tag/existential-risk
+    eaForum: https://forum.effectivealtruism.org/topics/existential-risk
+- pageId: catastrophic-risk
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/global-catastrophic-risk
+    stampy: https://aisafety.info/questions/8mTg/What-is-existential-risk
+    wikidata: https://www.wikidata.org/wiki/Q1531622
+    eightyK: https://80000hours.org/articles/existential-risks/
+- pageId: chai
+  links:
+    lesswrong: https://www.lesswrong.com/tag/center-for-human-compatible-ai-chai
+    eaForum: https://forum.effectivealtruism.org/topics/center-for-human-compatible-ai
+    wikidata: https://www.wikidata.org/wiki/Q85751153
+- pageId: chain-of-thought
+  links:
+    lesswrong: https://www.lesswrong.com/tag/chain-of-thought-alignment
+    wikipedia: https://en.wikipedia.org/wiki/Prompt_engineering#Chain-of-thought
+- pageId: civilizational-resilience
+  links:
+    eightyK: https://80000hours.org/problem-profiles/civilisation-resilience/
+- pageId: collective-intelligence
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Collective_intelligence
+    wikidata: https://www.wikidata.org/wiki/Q432197
+- pageId: companies
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-labs
+- pageId: compute
+  links:
+    lesswrong: https://www.lesswrong.com/tag/compute
+    eaForum: https://forum.effectivealtruism.org/topics/compute-governance
+    eightyK: https://80000hours.org/career-reviews/become-an-expert-in-ai-hardware/
+- pageId: compute-governance
+  links:
+    lesswrong: https://www.lesswrong.com/tag/compute-governance
+    eaForum: https://forum.effectivealtruism.org/topics/compute-governance
+    eightyK: https://80000hours.org/career-reviews/become-an-expert-in-ai-hardware/
+- pageId: compute-hardware
+  links:
+    lesswrong: https://www.lesswrong.com/tag/compute
+- pageId: concentration-of-power
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/concentration-of-power
+    eightyK: https://80000hours.org/problem-profiles/extreme-power-concentration/
+- pageId: conjecture
+  links:
+    lesswrong: https://www.lesswrong.com/tag/conjecture-org
+    eaForum: https://forum.effectivealtruism.org/topics/conjecture
+- pageId: constitutional-ai
+  links:
+    lesswrong: https://www.lesswrong.com/tag/constitutional-ai
+    wikipedia: https://en.wikipedia.org/wiki/Constitutional_AI
+- pageId: cooperative-ai
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/cooperative-ai-1
+- pageId: coordination
+  links:
+    lesswrong: https://www.lesswrong.com/tag/coordination-cooperation
+    eaForum: https://forum.effectivealtruism.org/topics/philanthropic-coordination
+    eightyK: https://80000hours.org/articles/coordination/
+- pageId: coordination-capacity
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/international-ai-governance
+- pageId: coordination-tech
+  links:
+    lesswrong: https://www.lesswrong.com/tag/coordination-cooperation
+- pageId: corporate
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/corporate-animal-welfare-campaigns
+- pageId: corporate-influence
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/working-at-ai-labs
+- pageId: corrigibility
+  links:
+    lesswrong: https://www.lesswrong.com/tag/corrigibility
+    stampy: https://aisafety.info/questions/7750/What-is-corrigibility
+    arbital: https://arbital.greaterwrong.com/p/corrigibility
+    alignmentForum: https://www.alignmentforum.org/tag/corrigibility
+- pageId: corrigibility-failure
+  links:
+    lesswrong: https://www.lesswrong.com/tag/corrigibility-1
+- pageId: countries
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/low-and-middle-income-countries
+- pageId: cyber-psychosis
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-psychology
+- pageId: cyber-threat-exposure
+  links:
+    lesswrong: https://www.lesswrong.com/tag/computer-security-and-cryptography
+    wikipedia: https://en.wikipedia.org/wiki/Cyberwarfare
+    eaForum: https://forum.effectivealtruism.org/topics/cybersecurity
+    eightyK: https://80000hours.org/career-reviews/information-security/
+- pageId: cybersecurity
+  links:
+    eightyK: https://80000hours.org/career-reviews/information-security/
+- pageId: cyberweapons
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Cyberwarfare
+    lesswrong: https://www.lesswrong.com/tag/computer-security-and-cryptography
+- pageId: daniela-amodei
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/anthropic
+- pageId: dario-amodei
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Dario_Amodei
+    eaForum: https://forum.effectivealtruism.org/topics/dario-amodei
+    wikidata: https://www.wikidata.org/wiki/Q103335665
+- pageId: debate
+  links:
+    lesswrong: https://www.lesswrong.com/tag/debate-ai-safety-technique-1
+    stampy: https://aisafety.info/questions/8Jgr/What-is-AI-safety-via-debate
+    alignmentForum: https://www.alignmentforum.org/tag/debate-ai-safety-technique-1
+- pageId: deceptive-alignment
+  links:
+    lesswrong: https://www.lesswrong.com/tag/deceptive-alignment
+    stampy: https://aisafety.info/questions/6170/What-is-deceptive-alignment
+    alignmentForum: https://www.alignmentforum.org/tag/deceptive-alignment
+- pageId: deceptive-alignment-decomposition
+  links:
+    lesswrong: https://www.lesswrong.com/tag/deceptive-alignment
+- pageId: decision-theory
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Decision_theory
+    lesswrong: https://www.lesswrong.com/tag/decision-theory
+    eaForum: https://forum.effectivealtruism.org/topics/decision-theory
+    stampy: https://aisafety.info/questions/5LJp/What-is-decision-theory
+    wikidata: https://www.wikidata.org/wiki/Q177571
+    eightyK: https://80000hours.org/problem-profiles/ai-enhanced-decision-making/
+- pageId: deep-learning
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q197536
+- pageId: deep-learning-era
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Deep_learning
+- pageId: deepfake-detection
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Deepfake#Detection
+- pageId: deepfakes
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Deepfake
+    wikidata: https://www.wikidata.org/wiki/Q49473179
+- pageId: deepmind
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/DeepMind
+    wikidata: https://www.wikidata.org/wiki/Q15733006
+- pageId: demis-hassabis
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Demis_Hassabis
+    eaForum: https://forum.effectivealtruism.org/topics/demis-hassabis
+    wikidata: https://www.wikidata.org/wiki/Q3022141
+- pageId: dense-transformers
+  links:
+    lesswrong: https://www.lesswrong.com/tag/transformers
+    wikipedia: https://en.wikipedia.org/wiki/Transformer_(deep_learning_architecture)
+- pageId: digital-minds
+  links:
+    eightyK: https://80000hours.org/problem-profiles/moral-status-digital-minds/
+- pageId: disinformation
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Disinformation
+    eaForum: https://forum.effectivealtruism.org/topics/misinformation-and-disinformation
+    wikidata: https://www.wikidata.org/wiki/Q189656
+- pageId: economic-disruption
+  links:
+    lesswrong: https://www.lesswrong.com/tag/economic-consequences-of-agi
+- pageId: economic-labor
+  links:
+    lesswrong: https://www.lesswrong.com/tag/economic-consequences-of-agi
+- pageId: economic-power
+  links:
+    lesswrong: https://www.lesswrong.com/tag/economic-consequences-of-agi
+- pageId: economic-stability
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/economic-growth
+- pageId: effective-altruism
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Effective_altruism
+    lesswrong: https://www.lesswrong.com/tag/effective-altruism
+    eaForum: https://forum.effectivealtruism.org/topics/building-effective-altruism
+    wikidata: https://www.wikidata.org/wiki/Q13489381
+- pageId: effectiveness-assessment
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/impact-assessment
+- pageId: eliciting-latent-knowledge
+  links:
+    lesswrong: https://www.lesswrong.com/tag/eliciting-latent-knowledge
+    stampy: https://aisafety.info/questions/8Lfr/What-is-Eliciting-Latent-Knowledge-ELK
+    alignmentForum: https://www.alignmentforum.org/tag/eliciting-latent-knowledge
+- pageId: eliezer-yudkowsky
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
+    lesswrong: https://www.lesswrong.com/tag/eliezer-yudkowsky
+    wikidata: https://www.wikidata.org/wiki/Q704195
+- pageId: emergent-capabilities
+  links:
+    lesswrong: https://www.lesswrong.com/tag/emergent-behavior-emergence
+    wikipedia: https://en.wikipedia.org/wiki/Emergent_abilities_of_large_language_models
+- pageId: enfeeblement
+  links:
+    eightyK: https://80000hours.org/problem-profiles/gradual-disempowerment/
+- pageId: epistemic-health
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/community-epistemic-health
+- pageId: epistemic-sycophancy
+  links:
+    lesswrong: https://www.lesswrong.com/tag/sycophancy
+- pageId: epistemics
+  links:
+    lesswrong: https://www.lesswrong.com/tag/rationality
+    eaForum: https://forum.effectivealtruism.org/topics/epistemics
+    eightyK: https://80000hours.org/2020/09/good-judgement/
+- pageId: epoch-ai
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/epoch-ai
+- pageId: erosion-of-agency
+  links:
+    lesswrong: https://www.lesswrong.com/tag/agency
+- pageId: eu-ai-act
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Artificial_Intelligence_Act
+    eaForum: https://forum.effectivealtruism.org/topics/eu-ai-act
+    wikidata: https://www.wikidata.org/wiki/Q108456694
+- pageId: evals
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-evaluations
+    eaForum: https://forum.effectivealtruism.org/topics/ai-evaluations-and-standards
+- pageId: evals-governance
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-evaluations
+- pageId: evaluation
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-evaluations
+    eaForum: https://forum.effectivealtruism.org/topics/ai-evaluations-and-standards
+- pageId: existential-catastrophe
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/existential-catastrophe-1
+    wikipedia: https://en.wikipedia.org/wiki/Global_catastrophic_risk
+    eightyK: https://80000hours.org/articles/existential-risks/
+- pageId: existential-risk
+  links:
+    lesswrong: https://www.lesswrong.com/tag/existential-risk
+    eaForum: https://forum.effectivealtruism.org/topics/existential-risk
+    stampy: https://aisafety.info/questions/8mTg/What-is-existential-risk
+    wikidata: https://www.wikidata.org/wiki/Q16830153
+    eightyK: https://80000hours.org/articles/existential-risks/
+- pageId: expert-opinion
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/expert-opinion
+- pageId: expertise-atrophy
+  links:
+    eightyK: https://80000hours.org/problem-profiles/gradual-disempowerment/
+- pageId: export-controls
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/export-controls
+- pageId: far-ai
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/far-ai
+- pageId: fhi
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q5510826
+- pageId: field-building
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-alignment-fieldbuilding
+    eaForum: https://forum.effectivealtruism.org/topics/building-the-field-of-ai-safety
+- pageId: field-building-analysis
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/field-building
+- pageId: flash-dynamics
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-takeoff
+- pageId: fraud
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-misuse
+- pageId: game-theory
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Game_theory
+    wikidata: https://www.wikidata.org/wiki/Q44455
+- pageId: genetic-enhancement
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Human_genetic_enhancement
+- pageId: geoffrey-hinton
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Geoffrey_Hinton
+    wikidata: https://www.wikidata.org/wiki/Q92894
+- pageId: geopolitics
+  links:
+    eightyK: https://80000hours.org/problem-profiles/great-power-conflict/
+- pageId: goal-misgeneralization
+  links:
+    stampy: https://aisafety.info/questions/8TJ7/What-is-goal-misgeneralization
+    alignmentForum: https://www.alignmentforum.org/tag/goal-misgeneralization
+- pageId: goodharts-law
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Goodhart%27s_law
+    lesswrong: https://www.lesswrong.com/tag/goodhart-s-law
+    stampy: https://aisafety.info/questions/5943/What-is-Goodharts-Law
+- pageId: govai
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/centre-for-the-governance-of-ai
+- pageId: governance
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-governance
+    eaForum: https://forum.effectivealtruism.org/topics/ai-governance
+- pageId: governance
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-governance
+    eaForum: https://forum.effectivealtruism.org/topics/ai-governance
+    eightyK: https://80000hours.org/career-reviews/ai-policy-and-strategy/
+- pageId: governance-focused
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-governance
+    eaForum: https://forum.effectivealtruism.org/topics/ai-governance
+- pageId: governance-policy
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-governance
+    eaForum: https://forum.effectivealtruism.org/topics/ai-governance
+- pageId: governments
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-governance
+- pageId: great-power-conflict
+  links:
+    eightyK: https://80000hours.org/problem-profiles/great-power-conflict/
+- pageId: holden-karnofsky
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/holden-karnofsky
+- pageId: human-agency
+  links:
+    lesswrong: https://www.lesswrong.com/tag/agency
+- pageId: human-compatible
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q85767699
+- pageId: human-expertise
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/expertise
+    eightyK: https://80000hours.org/problem-profiles/gradual-disempowerment/
+- pageId: human-oversight-quality
+  links:
+    lesswrong: https://www.lesswrong.com/tag/scalable-oversight
+- pageId: human-values
+  links:
+    lesswrong: https://www.lesswrong.com/tag/human-values
+- pageId: ilya-sutskever
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Ilya_Sutskever
+    wikidata: https://www.wikidata.org/wiki/Q21712134
+- pageId: industries
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Applications_of_artificial_intelligence
+- pageId: inner-alignment
+  links:
+    lesswrong: https://www.lesswrong.com/tag/inner-alignment
+    stampy: https://aisafety.info/questions/8V5k/What-is-mesa-optimization
+    alignmentForum: https://www.alignmentforum.org/tag/inner-alignment
+- pageId: institutional-quality
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/institutions
+- pageId: instrumental-convergence
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Instrumental_convergence
+    lesswrong: https://www.lesswrong.com/tag/instrumental-convergence
+    stampy: https://aisafety.info/questions/5FhD/What-is-instrumental-convergence
+    arbital: https://arbital.greaterwrong.com/p/instrumental_convergence
+    eightyK: https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/
+- pageId: instrumental-convergence-framework
+  links:
+    lesswrong: https://www.lesswrong.com/tag/instrumental-convergence
+- pageId: intelligence-explosion
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q237525
+- pageId: international-coordination
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/international-relations
+    eightyK: https://80000hours.org/articles/coordination/
+- pageId: international-summits
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-safety-summit
+- pageId: interpretability
+  links:
+    lesswrong: https://www.lesswrong.com/tag/interpretability-ml-and-ai
+    eaForum: https://forum.effectivealtruism.org/topics/ai-interpretability
+    wikipedia: https://en.wikipedia.org/wiki/Explainable_artificial_intelligence
+    stampy: https://aisafety.info/questions/9SIA/What-is-interpretability
+    wikidata: https://www.wikidata.org/wiki/Q17027399
+    alignmentForum: https://www.alignmentforum.org/tag/interpretability-ml-and-ai
+- pageId: interpretability-coverage
+  links:
+    lesswrong: https://www.lesswrong.com/tag/interpretability-ml-and-ai
+- pageId: interpretability-sufficient
+  links:
+    lesswrong: https://www.lesswrong.com/tag/interpretability-ml-and-ai
+- pageId: is-ai-xrisk-real
+  links:
+    lesswrong: https://www.lesswrong.com/tag/existential-risk
+    eaForum: https://forum.effectivealtruism.org/topics/existential-risk
+- pageId: jan-leike
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q123130693
+- pageId: lab-behavior
+  links:
+    eightyK: https://80000hours.org/career-reviews/working-at-an-ai-lab/
+- pageId: lab-culture
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-labs
+    eightyK: https://80000hours.org/career-reviews/working-at-an-ai-lab/
+- pageId: lab-safety-practices
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-lab-safety
+- pageId: labor-transition
+  links:
+    lesswrong: https://www.lesswrong.com/tag/economic-consequences-of-agi
+    eaForum: https://forum.effectivealtruism.org/topics/labor-and-automation
+- pageId: language-models
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Large_language_model
+    lesswrong: https://www.lesswrong.com/tag/language-models-llms
+    eaForum: https://forum.effectivealtruism.org/topics/large-language-models
+- pageId: large-language-models
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/large-language-models
+- pageId: learned-helplessness
+  links:
+    eightyK: https://80000hours.org/problem-profiles/gradual-disempowerment/
+- pageId: lock-in
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/lock-in
+    eightyK: https://80000hours.org/problem-profiles/extreme-power-concentration/
+- pageId: long-term-trajectory
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/longtermism
+    eightyK: https://80000hours.org/articles/future-generations/
+- pageId: long-timelines
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-timelines
+- pageId: longtermism
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Longtermism
+    lesswrong: https://www.lesswrong.com/tag/longtermism
+    eaForum: https://forum.effectivealtruism.org/topics/longtermism
+    wikidata: https://www.wikidata.org/wiki/Q109311813
+    eightyK: https://80000hours.org/articles/future-generations/
+- pageId: machine-learning
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q2539
+- pageId: malevolent-actors
+  links:
+    eightyK: https://80000hours.org/problem-profiles/risks-from-malevolent-actors/
+- pageId: mass-surveillance
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q1425056
+- pageId: max-tegmark
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q2076321
+- pageId: mech-interp
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/mechanistic-interpretability
+    wikipedia: https://en.wikipedia.org/wiki/Mechanistic_interpretability
+- pageId: mechanistic-interpretability
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Mechanistic_interpretability
+    wikidata: https://www.wikidata.org/wiki/Q134503305
+- pageId: mesa-optimization
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/AI_alignment#Mesa-optimization
+    lesswrong: https://www.lesswrong.com/tag/mesa-optimization
+    stampy: https://aisafety.info/questions/8V5k/What-is-mesa-optimization
+    alignmentForum: https://www.alignmentforum.org/tag/mesa-optimization
+- pageId: mesa-optimization-analysis
+  links:
+    lesswrong: https://www.lesswrong.com/tag/mesa-optimization
+- pageId: metr
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/metr
+- pageId: mind-uploading
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q2267982
+    eightyK: https://80000hours.org/problem-profiles/whole-brain-emulation/
+- pageId: miri
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Machine_Intelligence_Research_Institute
+    lesswrong: https://www.lesswrong.com/tag/machine-intelligence-research-institute-miri
+    wikidata: https://www.wikidata.org/wiki/Q2040269
+- pageId: miri-era
+  links:
+    lesswrong: https://www.lesswrong.com/tag/machine-intelligence-research-institute-miri
+- pageId: misaligned-catastrophe
+  links:
+    eightyK: https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/
+- pageId: misaligned-takeover
+  links:
+    stampy: https://aisafety.info/questions/8mTg/What-is-existential-risk
+    eightyK: https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/
+- pageId: misuse
+  links:
+    eightyK: https://80000hours.org/problem-profiles/catastrophic-ai-misuse/
+- pageId: misuse-risks
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-misuse
+    eightyK: https://80000hours.org/problem-profiles/catastrophic-ai-misuse/
+- pageId: model-auditing
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-evaluations
+- pageId: model-registries
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-governance
+- pageId: models
+  links:
+    lesswrong: https://www.lesswrong.com/tag/language-models-llms
+    eaForum: https://forum.effectivealtruism.org/topics/large-language-models
+- pageId: monitoring
+  links:
+    lesswrong: https://www.lesswrong.com/tag/compute-governance
+- pageId: moral-patienthood
+  links:
+    eightyK: https://80000hours.org/problem-profiles/moral-status-digital-minds/
+- pageId: multi-agent
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Multi-agent_system
+    wikidata: https://www.wikidata.org/wiki/Q85786957
+- pageId: multipolar-competition
+  links:
+    lesswrong: https://www.lesswrong.com/tag/multipolar-scenarios
+- pageId: multipolar-trap
+  links:
+    lesswrong: https://www.lesswrong.com/tag/multipolar-scenarios
+- pageId: neural-networks
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q192776
+- pageId: neuro-symbolic
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Neuro-symbolic_AI
+- pageId: neuromorphic
+  links:
+    lesswrong: https://www.lesswrong.com/tag/neuromorphic-ai
+- pageId: nick-bostrom
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Nick_Bostrom
+    lesswrong: https://www.lesswrong.com/tag/nick-bostrom
+    wikidata: https://www.wikidata.org/wiki/Q460475
+- pageId: nuclear-risk
+  links:
+    eightyK: https://80000hours.org/problem-profiles/nuclear-security/
+- pageId: open-source
+  links:
+    lesswrong: https://www.lesswrong.com/tag/open-source-ai
+- pageId: open-vs-closed
+  links:
+    lesswrong: https://www.lesswrong.com/tag/open-source-ai
+- pageId: openai
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/OpenAI
+    lesswrong: https://www.lesswrong.com/tag/openai
+    wikidata: https://www.wikidata.org/wiki/Q21708200
+- pageId: oracle-ai
+  links:
+    lesswrong: https://www.lesswrong.com/tag/oracle-ai
+    stampy: https://aisafety.info/questions/6271/What-is-an-Oracle-AI
+- pageId: orthogonality-thesis
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Orthogonality_thesis
+    lesswrong: https://www.lesswrong.com/tag/orthogonality-thesis
+    stampy: https://aisafety.info/questions/6315/What-is-the-orthogonality-thesis
+    arbital: https://arbital.greaterwrong.com/p/orthogonality
+- pageId: outer-alignment
+  links:
+    lesswrong: https://www.lesswrong.com/tag/outer-alignment
+    alignmentForum: https://www.alignmentforum.org/tag/outer-alignment
+- pageId: paul-christiano
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/paul-christiano
+    wikidata: https://www.wikidata.org/wiki/Q64769299
+- pageId: pause
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-pause-debate-2023
+- pageId: pause-debate
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-pause-debate-2023
+- pageId: pause-moratorium
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-pause-debate-2023
+- pageId: persuasion
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-persuasion
+- pageId: political-power
+  links:
+    eightyK: https://80000hours.org/problem-profiles/extreme-power-concentration/
+- pageId: power-concentration
+  links:
+    lesswrong: https://www.lesswrong.com/tag/instrumental-convergence
+    eaForum: https://forum.effectivealtruism.org/topics/concentration-of-power
+- pageId: power-seeking
+  links:
+    lesswrong: https://www.lesswrong.com/tag/power-seeking-ai
+    stampy: https://aisafety.info/questions/5FhD/What-is-instrumental-convergence
+    eightyK: https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/
+- pageId: prediction-markets
+  links:
+    lesswrong: https://www.lesswrong.com/tag/prediction-markets
+    eaForum: https://forum.effectivealtruism.org/topics/prediction-markets
+    wikipedia: https://en.wikipedia.org/wiki/Prediction_market
+    wikidata: https://www.wikidata.org/wiki/Q55903482
+- pageId: preference-authenticity
+  links:
+    lesswrong: https://www.lesswrong.com/tag/human-values
+- pageId: preference-manipulation
+  links:
+    lesswrong: https://www.lesswrong.com/tag/human-values
+- pageId: preference-optimization
+  links:
+    lesswrong: https://www.lesswrong.com/tag/optimization
+- pageId: proliferation
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/proliferation
+- pageId: proliferation-risk-model
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/proliferation
+- pageId: public-education
+  links:
+    lesswrong: https://www.lesswrong.com/tag/education
+    eaForum: https://forum.effectivealtruism.org/topics/education
+- pageId: racing-dynamics
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-arms-race
+    eaForum: https://forum.effectivealtruism.org/topics/racing-to-the-precipice
+- pageId: racing-intensity
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-arms-race
+    eaForum: https://forum.effectivealtruism.org/topics/ai-arms-race
+- pageId: rapid
+  links:
+    stampy: https://aisafety.info/questions/6268/What-is-an-intelligence-explosion
+- pageId: recursive-ai-capabilities
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-capabilities
+    stampy: https://aisafety.info/questions/6268/What-is-an-intelligence-explosion
+- pageId: redwood
+  links:
+    lesswrong: https://www.lesswrong.com/tag/redwood-research
+    eaForum: https://forum.effectivealtruism.org/topics/redwood-research
+- pageId: regulation
+  links:
+    lesswrong: https://www.lesswrong.com/tag/regulation-and-ai-risk
+    eaForum: https://forum.effectivealtruism.org/topics/policy
+- pageId: regulation-debate
+  links:
+    lesswrong: https://www.lesswrong.com/tag/regulation-and-ai-risk
+- pageId: regulatory-capacity
+  links:
+    lesswrong: https://www.lesswrong.com/tag/regulation-and-ai-risk
+- pageId: reinforcement-learning
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Reinforcement_learning
+    lesswrong: https://www.lesswrong.com/tag/reinforcement-learning
+- pageId: research-agendas
+  links:
+    lesswrong: https://www.lesswrong.com/tag/research-agendas
+    eaForum: https://forum.effectivealtruism.org/topics/research-agendas-questions-and-project-lists
+- pageId: resources
+  links:
+    lesswrong: https://www.lesswrong.com/tag/collections-and-resources
+    eaForum: https://forum.effectivealtruism.org/topics/collections-and-resources
+- pageId: responsible-scaling-policies
+  links:
+    lesswrong: https://www.lesswrong.com/tag/responsible-scaling-policies
+- pageId: reward-hacking
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Reward_hacking
+    stampy: https://aisafety.info/questions/8HJI/What-is-reward-hacking
+    alignmentForum: https://www.alignmentforum.org/tag/reward-hacking
+- pageId: rlhf
+  links:
+    lesswrong: https://www.lesswrong.com/tag/rlhf
+    wikipedia: https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback
+    stampy: https://aisafety.info/questions/8RIL/What-is-RLHF
+    wikidata: https://www.wikidata.org/wiki/Q115570683
+- pageId: robot-threat-exposure
+  links:
+    lesswrong: https://www.lesswrong.com/tag/robotics
+- pageId: rogue-actor
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/global-catastrophic-risk
+    eightyK: https://80000hours.org/problem-profiles/catastrophic-ai-misuse/
+- pageId: rsp
+  links:
+    lesswrong: https://www.lesswrong.com/tag/responsible-scaling-policies
+- pageId: s-risk
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/s-risk
+    stampy: https://aisafety.info/questions/8VKx/What-is-s-risk
+    eightyK: https://80000hours.org/problem-profiles/s-risks/
+- pageId: safety-capability-gap
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/differential-progress
+- pageId: safety-cases
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-safety-cases
+- pageId: safety-culture-strength
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-lab-safety
+- pageId: sam-altman
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Sam_Altman
+    wikidata: https://www.wikidata.org/wiki/Q7407093
+- pageId: sandbagging
+  links:
+    lesswrong: https://www.lesswrong.com/tag/sandbagging
+- pageId: sandboxing
+  links:
+    lesswrong: https://www.lesswrong.com/tag/ai-boxing-containment
+    wikipedia: https://en.wikipedia.org/wiki/AI_capability_control
+- pageId: sb-1047
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q127393140
+- pageId: scalable-oversight
+  links:
+    lesswrong: https://www.lesswrong.com/tag/scalable-oversight
+    stampy: https://aisafety.info/questions/8IHH/What-is-scalable-oversight
+    alignmentForum: https://www.alignmentforum.org/tag/scalable-oversight
+- pageId: scaling-debate
+  links:
+    lesswrong: https://www.lesswrong.com/tag/scaling-laws
+- pageId: scaling-laws
+  links:
+    lesswrong: https://www.lesswrong.com/tag/scaling-laws
+    wikipedia: https://en.wikipedia.org/wiki/Neural_scaling_law
+- pageId: scientific-corruption
+  links:
+    lesswrong: https://www.lesswrong.com/tag/science
+- pageId: self-improvement
+  links:
+    lesswrong: https://www.lesswrong.com/tag/recursive-self-improvement
+- pageId: seoul-declaration
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-safety-summit
+- pageId: sharp-left-turn
+  links:
+    lesswrong: https://www.lesswrong.com/tag/sharp-left-turn
+    stampy: https://aisafety.info/questions/9KE6/What-is-the-sharp-left-turn
+- pageId: societal-resilience
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/resilience
+- pageId: societal-trust
+  links:
+    lesswrong: https://www.lesswrong.com/tag/trust
+- pageId: space-governance
+  links:
+    eightyK: https://80000hours.org/problem-profiles/space-governance/
+- pageId: sparse-autoencoders
+  links:
+    lesswrong: https://www.lesswrong.com/tag/sparse-autoencoders-saes
+- pageId: specification-gaming
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Reward_hacking
+    stampy: https://aisafety.info/questions/8HJI/What-is-reward-hacking
+- pageId: state-actor
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/great-power-conflict
+    eightyK: https://80000hours.org/problem-profiles/great-power-conflict/
+- pageId: stuart-russell
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Stuart_J._Russell
+    wikidata: https://www.wikidata.org/wiki/Q7627055
+- pageId: suffering-lock-in
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/s-risk
+    eightyK: https://80000hours.org/problem-profiles/s-risks/
+- pageId: superintelligence
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Superintelligence
+    lesswrong: https://www.lesswrong.com/tag/superintelligence
+    stampy: https://aisafety.info/questions/5880/What-is-superintelligence
+    wikidata: https://www.wikidata.org/wiki/Q1566000
+- pageId: superintelligence-book
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q18386449
+- pageId: surprise-threat-exposure
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/global-catastrophic-risk
+- pageId: surveillance
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/surveillance
+    wikipedia: https://en.wikipedia.org/wiki/Mass_surveillance
+    wikidata: https://www.wikidata.org/wiki/Q334401
+    eightyK: https://80000hours.org/problem-profiles/risks-of-stable-totalitarianism/
+- pageId: sycophancy
+  links:
+    lesswrong: https://www.lesswrong.com/tag/sycophancy
+- pageId: technical-ai-safety
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/ai-safety
+    stampy: https://aisafety.info/questions/9Tii/What-is-AI-alignment
+    eightyK: https://80000hours.org/career-reviews/ai-safety-researcher/
+- pageId: technical-research
+  links:
+    eightyK: https://80000hours.org/career-reviews/ai-safety-researcher/
+- pageId: technological-singularity
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q237525
+- pageId: the-precipice
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q4329937
+- pageId: thresholds
+  links:
+    lesswrong: https://www.lesswrong.com/tag/compute-governance
+- pageId: toby-ord
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/toby-ord
+    wikidata: https://www.wikidata.org/wiki/Q7811863
+- pageId: tool-ai
+  links:
+    lesswrong: https://www.lesswrong.com/tag/tool-ai
+    stampy: https://aisafety.info/questions/6277/What-is-a-Tool-AI
+- pageId: training-programs
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/research-training-programs
+- pageId: transformative-ai
+  links:
+    lesswrong: https://www.lesswrong.com/tag/transformative-ai
+    eaForum: https://forum.effectivealtruism.org/topics/transformative-artificial-intelligence
+- pageId: transformers
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Transformer_(deep_learning_architecture)
+    wikidata: https://www.wikidata.org/wiki/Q85810444
+- pageId: treacherous-turn
+  links:
+    lesswrong: https://www.lesswrong.com/tag/treacherous-turn
+    stampy: https://aisafety.info/questions/6396/What-is-the-treacherous-turn
+- pageId: trust-cascade
+  links:
+    lesswrong: https://www.lesswrong.com/tag/trust
+- pageId: trust-decline
+  links:
+    lesswrong: https://www.lesswrong.com/tag/trust
+- pageId: uk-aisi
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/uk-ai-safety-institute
+- pageId: us-aisi
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/us-ai-safety-institute
+- pageId: us-executive-order
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/us-ai-executive-order
+- pageId: utility-functions
+  links:
+    lesswrong: https://www.lesswrong.com/tag/utility-functions
+    stampy: https://aisafety.info/questions/5xAh/What-is-a-utility-function
+    arbital: https://arbital.greaterwrong.com/p/utility_function
+- pageId: value-learning
+  links:
+    lesswrong: https://www.lesswrong.com/tag/value-learning
+    stampy: https://aisafety.info/questions/8IzO/What-is-value-learning
+    alignmentForum: https://www.alignmentforum.org/tag/value-learning
+- pageId: values
+  links:
+    lesswrong: https://www.lesswrong.com/tag/human-values
+    eaForum: https://forum.effectivealtruism.org/topics/value-lock-in
+- pageId: whistleblower-protections
+  links:
+    eaForum: https://forum.effectivealtruism.org/topics/whistleblowing
+- pageId: whole-brain-emulation
+  links:
+    lesswrong: https://www.lesswrong.com/tag/whole-brain-emulation
+    eaForum: https://forum.effectivealtruism.org/topics/whole-brain-emulation
+    wikipedia: https://en.wikipedia.org/wiki/Mind_uploading
+    wikidata: https://www.wikidata.org/wiki/Q2267982
+    eightyK: https://80000hours.org/problem-profiles/whole-brain-emulation/
+- pageId: x-risk
+  links:
+    wikidata: https://www.wikidata.org/wiki/Q21715237
+    eightyK: https://80000hours.org/articles/existential-risks/
+- pageId: xai
+  links:
+    lesswrong: https://www.lesswrong.com/tag/xai
+- pageId: yoshua-bengio
+  links:
+    wikipedia: https://en.wikipedia.org/wiki/Yoshua_Bengio
+    wikidata: https://www.wikidata.org/wiki/Q3572699

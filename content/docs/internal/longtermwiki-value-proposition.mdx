@@ -1,0 +1,1017 @@
+---
+title: "LongtermWiki Value Proposition"
+description: "Strategic analysis of how LongtermWiki could create substantial value for AI safety and longtermist prioritization"
+pageType: "documentation"
+importance: 0
+quality: 4
+llmSummary: "Internal strategy document exploring ambitious value pathways for LongtermWiki, including improving longtermist prioritization (Coefficient integration, cross-funder coordination), attracting new capital (billionaires, governments), demonstrating epistemic infrastructure to Anthropic, enabling field coordination, and accelerating researcher onboarding. Includes causal diagrams mapping value creation mechanisms."
+ratings:
+  novelty: 0
+  rigor: 0
+  actionability: 0
+  completeness: 0
+metrics:
+  wordCount: 7500
+  citations: 0
+  tables: 14
+  diagrams: 5
+---
+import {Mermaid, EntityLink} from '@components/wiki';
+
+# LongtermWiki Value Proposition
+
+**Status:** Working document, not polished
+**Purpose:** Explore ambitious pathways through which LongtermWiki could create substantial value
+**Last Updated:** 2026-02-04
+
+:::caution[Impact Estimates Updated]
+The impact estimates in Appendix B below are **naive estimates** that don't account for base rates. For rigorous Fermi estimation grounded in GiveWell, 80k Hours, and think tank data, see the [LongtermWiki Impact Model](/knowledge-base/models/longtermwiki-impact/).
+
+**Summary:** Central estimate drops from \$15-40M/yr to **\$100-500K/yr** after accounting for:
+- Only 3% of funders change behavior based on effectiveness research (GiveWell data)
+- 0.1% conversion rate from content engagement to action (80k Hours data)
+- Weak causal evidence for think tank policy influence
+:::
+
+---
+
+## Executive Summary
+
+LongtermWiki has the potential to be far more than a reference wiki. At its most ambitious, it could:
+
+1. **Transform longtermist prioritization** by giving funders a shared, structured framework for comparing interventions under different worldviews
+2. **Unlock new capital** by providing the institutional credibility that attracts billionaires and governments who won't engage with blog posts and forum threads
+3. **Demonstrate epistemic infrastructure** to <EntityLink id="anthropic">Anthropic</EntityLink>, potentially catalyzing significant investment in similar tools for civilization-critical decisions
+4. **Coordinate a fragmented field** by mapping disagreements explicitly and generating actionable research agendas
+5. **Accelerate talent development** by serving as the "living textbook" that doesn't exist, reducing researcher onboarding time by months
+
+This document explores each pathway in detail, maps the causal mechanisms, and identifies the key uncertainties that would determine success.
+
+---
+
+## Causal Diagram: How LongtermWiki Creates Value
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph Inputs["LongtermWiki Core Assets"]
+        KB[Knowledge Base<br/>400+ pages]
+        CG[Crux Graph<br/>Key uncertainties mapped]
+        CM[Causal Models<br/>AI Transition Model]
+        WM[Worldview Mapping<br/>Assumptions to priorities]
+        LD[Living Document<br/>Staleness tracking]
+    end
+
+    subgraph Intermediate["What These Enable"]
+        SU[Structured<br/>Understanding]
+        SD[Surfaced<br/>Disagreements]
+        PC[Prioritization<br/>Clarity]
+        CR[Institutional<br/>Credibility]
+        KD[Knowledge<br/>Distillation]
+    end
+
+    subgraph DirectOutcomes["Direct Outcomes"]
+        FD[Better Funder<br/>Decisions]
+        RO[Faster Researcher<br/>Onboarding]
+        PI[Policy<br/>Integration]
+        LC[Lab<br/>Coordination]
+        FE[Field<br/>Epistemics]
+    end
+
+    subgraph UltimateImpact["Ultimate Impact"]
+        ES[More Effective<br/>AI Safety Spending]
+        NC[New Capital<br/>Unlocked]
+        EI[Epistemic<br/>Infrastructure Norm]
+        RA[Better Research<br/>Agenda]
+    end
+
+    KB --> SU
+    KB --> KD
+    CG --> SD
+    CG --> PC
+    CM --> PC
+    CM --> SD
+    WM --> PC
+    WM --> FD
+    LD --> CR
+    LD --> FE
+
+    SU --> RO
+    SU --> PI
+    SD --> FE
+    SD --> RA
+    PC --> FD
+    PC --> LC
+    CR --> PI
+    CR --> NC
+    KD --> RO
+    KD --> EI
+
+    FD --> ES
+    RO --> ES
+    PI --> NC
+    PI --> EI
+    LC --> ES
+    FE --> RA
+    FE --> ES
+
+    style ES fill:#d4edda
+    style NC fill:#d4edda
+    style EI fill:#d4edda
+    style RA fill:#d4edda
+`} />
+
+---
+
+## Value Pathways: Detailed Analysis
+
+### Pathway A: Improved Longtermist Prioritization
+
+**The core thesis:** The AI safety field suffers from poor prioritization legibility. Funders make decisions based on incomplete information, network effects, and intuitions that are hard to communicate or examine. LongtermWiki could make the reasoning transparent and improve marginal allocation decisions.
+
+#### A1: Coefficient Giving Integration
+
+<EntityLink id="coefficient-giving">Coefficient</EntityLink> is building infrastructure for better grantmaking. LongtermWiki could integrate with this in several ways:
+
+- **Pre-populated grant evaluation templates**: When evaluating a grant for, say, <EntityLink id="interpretability">interpretability</EntityLink> research, pull relevant context from LongtermWiki's interpretability pages, including key uncertainties and how different worldviews value the area
+- **Intervention comparison views**: Side-by-side comparison of interventions under different crux assumptions
+- **Track record integration**: Connect researcher pages to Coefficient's track record assessments
+
+**What this requires:**
+- API access to LongtermWiki data
+- Collaboration with Coefficient team
+- Consistent data structure across intervention pages
+
+**Expected value if successful:** High. Could directly improve allocation of tens of millions of dollars annually.
+
+#### A2: Cross-Funder Coordination
+
+Currently, <EntityLink id="open-philanthropy">Open Phil</EntityLink>, <EntityLink id="sff">SFF</EntityLink>, Founders Pledge, EA Funds, and smaller funders each do their own prioritization analysis. This is duplicated work and leads to coordination failures (some areas over-funded, others neglected).
+
+LongtermWiki could serve as a shared knowledge base that:
+- Reduces duplicated analysis work by 50%+
+- Makes it visible which areas are "crowded" vs. "neglected"
+- Enables explicit coordination: "We'll cover X if you cover Y" (see also: <EntityLink id="racing-dynamics">racing dynamics</EntityLink> in the funding landscape)
+
+**What this requires:**
+- Active engagement from 2-3 major funders
+- Trust that the resource is high quality and kept current
+- Some mechanism for tracking funder activity
+
+**Expected value if successful:** Very high. Could be one of the highest-leverage coordination mechanisms in EA.
+
+#### Funder Ecosystem: Concrete Relationships
+
+*Node size/shading indicates annual AI safety spending (darker = more). Edge thickness indicates potential LongtermWiki integration value.*
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph LW["LongtermWiki"]
+        KB[Knowledge<br/>Base]
+        API[Data<br/>API]
+        WV[Worldview<br/>Tool]
+    end
+
+    subgraph MajorFunders["Major Funders ~200M/yr"]
+        OP[Open Phil<br/>~150M/yr]
+        SFF[SFF<br/>~30M/yr]
+    end
+
+    subgraph MidFunders["Mid-tier Funders ~20M/yr"]
+        FP[Founders<br/>Pledge]
+        EAF[EA Funds<br/>LTFF]
+        CO[Coefficient]
+        SF[Survival<br/>Fund]
+    end
+
+    subgraph SmallFunders["Smaller/Emerging"]
+        LT[Lightspeed]
+        IND[Individual<br/>Donors]
+        NEW[New Billionaire<br/>Donors]
+    end
+
+    subgraph Outcomes["Value Created"]
+        COORD[Better<br/>Coordination]
+        DUP[Reduced<br/>Duplication]
+        GAP[Gap<br/>Identification]
+        QUAL[Higher Quality<br/>Decisions]
+    end
+
+    KB --> OP
+    KB --> SFF
+    KB --> FP
+    KB --> EAF
+    API --> CO
+    WV --> OP
+    WV --> SFF
+    WV --> NEW
+
+    OP --> COORD
+    SFF --> COORD
+    CO --> DUP
+    FP --> GAP
+    EAF --> GAP
+
+    COORD --> QUAL
+    DUP --> QUAL
+    GAP --> QUAL
+
+    NEW --> QUAL
+
+    style OP fill:#1a5f7a,color:#fff
+    style SFF fill:#2d6a4f,color:#fff
+    style QUAL fill:#d4edda,stroke:#28a745
+    style CO fill:#fca311
+    style API fill:#fca311
+    style WV fill:#e9c46a
+    style KB fill:#e9c46a
+    style NEW fill:#ff6b6b
+    style FP fill:#6c757d
+    style EAF fill:#6c757d
+    style SF fill:#adb5bd
+    style LT fill:#adb5bd
+    style IND fill:#adb5bd
+    style COORD fill:#b8e0d2
+    style DUP fill:#b8e0d2
+    style GAP fill:#b8e0d2
+`} />
+
+**Legend:**
+- 🔵 Dark blue/green: Major funders (highest leverage targets)
+- 🟠 Orange: LongtermWiki integration points
+- 🔴 Red: New money opportunities
+- ⚫ Gray: Supporting funders
+- 🟢 Green: Value outcomes
+
+**Key insight:** Open Phil and SFF control ~90% of longtermist AI safety funding. Direct integration with their workflows would have outsized impact. Coefficient is the natural API integration partner. New billionaire donors represent the highest-variance opportunity.
+
+#### A3: <EntityLink id="worldview-intervention-mapping">Worldview-to-Priority Mapping</EntityLink>
+
+The most ambitious version: build an interactive tool where funders can input their credences on key cruxes (timelines, <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink> risk, <EntityLink id="ai-governance">governance</EntityLink> tractability, etc.) and get a personalized priority ranking.
+
+This makes implicit reasoning explicit and:
+- Helps funders understand *why* they disagree with others
+- Surfaces which cruxes matter most for their decisions
+- Enables "what if" analysis: "If I changed my view on X, how would my priorities shift?"
+
+**What this requires:**
+- Well-defined crux taxonomy
+- Quantitative models linking cruxes to intervention value
+- User-friendly interface
+- Validation that the tool matches expert intuitions
+
+**Expected value if successful:** Transformative for the field. But high execution risk—may be too complex to build well.
+
+---
+
+### Pathway B: Attracting New Capital
+
+**The core thesis:** There is substantially more capital that could flow to AI safety but doesn't because the field lacks institutional credibility. Billionaires and governments need to see "real" infrastructure, not blog posts and Twitter threads.
+
+#### B1: Billionaire/HNWI Credibility Play
+
+Consider the pitch to a billionaire considering AI safety:
+
+- **Current state:** "Here, read these LessWrong posts and 80,000 Hours articles"
+- **With LongtermWiki:** "Here's a comprehensive strategic intelligence platform with 400+ pages, causal models, and explicit uncertainty tracking. Spend 4 hours with this before we talk."
+
+LongtermWiki signals:
+- Institutional seriousness
+- Intellectual rigor
+- Transparency about limitations
+- A field that can build real infrastructure
+
+**Potential targets:**
+- Tech billionaires not yet engaged (or partially engaged)
+- Family offices looking for cause areas
+- HNWIs who've given to climate but not AI safety
+
+**What this requires:**
+- High-quality landing pages for newcomers
+- Clear "executive summary" content
+- Referrals from trusted intermediaries (e.g., Giving What We Can, advisors)
+
+**Expected value if successful:** Could unlock \$10M-\$100M+ over time. Even one additional major donor would be transformative.
+
+#### B2: Government/Institutional Funding
+
+Governments are increasingly interested in AI safety but need credible reference materials:
+
+- EU AI Office needs rapid briefings on technical concepts
+- UK AI Safety Institute needs shared vocabulary with US counterparts
+- Congressional staffers need accessible yet rigorous resources
+
+LongtermWiki could become:
+- A cited reference in government reports (like IPCC citations in climate)
+- A shared baseline for international coordination discussions
+- The "official" starting point for policy staff
+
+**Pathway to adoption:**
+1. Partner with established policy orgs (CSET, GovAI successors, Gladstone)
+2. Get cited in 2-3 influential reports
+3. Build credibility feedback loop
+
+**What this requires:**
+- Policy-accessible versions of technical content
+- Relationships with policy organizations
+- Possibly government contracts for maintenance
+
+**Expected value if successful:** Huge. Government funding for AI safety infrastructure could be in the tens of millions. Plus influence on actual policy.
+
+#### Policy Credibility Pathway: Concrete Organizations
+
+*Node shading indicates influence/importance. Arrows show credibility flow.*
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph LW["LongtermWiki"]
+        CONTENT[Policy-Accessible<br/>Content]
+        CITE[Citeable<br/>References]
+    end
+
+    subgraph ThinkTanks["Think Tanks / Research"]
+        CSET[CSET<br/>Georgetown]
+        RAND[RAND<br/>Corporation]
+        GLAD[Gladstone<br/>AI]
+        FHI[FHI/GovAI<br/>Successors]
+    end
+
+    subgraph GovBodies["Government Bodies"]
+        AISI_UK[UK AI Safety<br/>Institute]
+        AISI_US[US AI Safety<br/>Institute]
+        EU_AI[EU AI<br/>Office]
+        CONG[Congressional<br/>Staffers]
+        NSC[National Security<br/>Council]
+    end
+
+    subgraph Outcomes["Outcomes"]
+        CITES[Citations in<br/>Reports]
+        FUND[Government<br/>Contracts]
+        POLICY[Policy<br/>Influence]
+    end
+
+    CONTENT --> CSET
+    CONTENT --> RAND
+    CONTENT --> GLAD
+    CITE --> FHI
+
+    CSET --> AISI_US
+    CSET --> CONG
+    RAND --> NSC
+    RAND --> AISI_US
+    GLAD --> AISI_UK
+    FHI --> AISI_UK
+    FHI --> EU_AI
+
+    AISI_UK --> CITES
+    AISI_US --> CITES
+    EU_AI --> CITES
+    CONG --> POLICY
+
+    CITES --> FUND
+    CITES --> POLICY
+
+    style AISI_UK fill:#1a5f7a,color:#fff
+    style AISI_US fill:#1a5f7a,color:#fff
+    style EU_AI fill:#2d6a4f,color:#fff
+    style POLICY fill:#d4edda,stroke:#28a745
+    style FUND fill:#95d5b2
+    style CSET fill:#457b9d
+    style RAND fill:#457b9d
+    style CONTENT fill:#fca311
+    style CITE fill:#e9c46a
+    style GLAD fill:#6c757d
+    style FHI fill:#6c757d
+    style CONG fill:#adb5bd
+    style NSC fill:#adb5bd
+    style CITES fill:#b8e0d2
+`} />
+
+**Legend:**
+- 🔵 Dark blue: Key government AI safety bodies (highest priority)
+- 🟠 Orange: LongtermWiki inputs
+- 🔵 Medium blue: High-credibility think tanks (entry points)
+- 🟢 Green: Desired outcomes
+
+**Key insight:** The path to government adoption runs through established think tanks (CSET, RAND, Gladstone). Getting cited in their reports creates credibility that flows to government bodies. UK AISI and US AISI are the most AI-safety-focused government entities.
+
+#### B3: Why a Wiki Signals Seriousness
+
+There's something specific about an encyclopedic wiki that signals credibility:
+
+- **Comprehensiveness**: "They've thought about everything"
+- **Structure**: "This isn't just opinions, it's organized knowledge"
+- **Transparency**: Explicit about limitations and biases
+- **Persistence**: Not ephemeral like social media
+- **Neutrality-adjacent**: Even if opinionated, wiki format suggests fairness
+
+This is distinct from:
+- Blog posts (personal opinions)
+- Academic papers (narrow scope, inaccessible)
+- Think tank reports (often advocacy)
+
+---
+
+### Pathway C: Anthropic Epistemic Infrastructure
+
+**The core thesis:** <EntityLink id="anthropic">Anthropic</EntityLink> is building AGI. They should also be building the epistemic infrastructure humanity needs to navigate AGI. LongtermWiki demonstrates what's possible.
+
+#### C1: LongtermWiki as Proof-of-Concept
+
+LongtermWiki demonstrates that Claude can:
+- Build sophisticated, interconnected knowledge bases
+- Synthesize across hundreds of sources
+- Maintain consistency and quality at scale
+- Create transparent, well-structured analysis
+
+This is valuable to Anthropic because (see also our <EntityLink id="anthropic-impact">Anthropic impact model</EntityLink>):
+- It's a compelling use case for Claude
+- It shows a path to "AI-assisted strategic intelligence"
+- It addresses the critique: "You're building powerful AI but not the tools to use it wisely"
+
+#### C2: The Pitch to Anthropic
+
+**Narrative:**
+
+"You're building AGI. The most important question isn't 'can we build it?' but 'can we navigate the transition wisely?' LongtermWiki is a proof-of-concept for the epistemic infrastructure humanity needs:
+
+- Structured knowledge bases for civilization-critical decisions
+- Explicit uncertainty and disagreement mapping
+- Worldview-sensitive analysis
+- Living documents that stay current
+
+If this approach is valuable for AI safety, it's valuable for biosecurity, nuclear risk, climate, pandemic preparedness, and governance writ large.
+
+Anthropic should:
+1. Fund expansion of LongtermWiki as a flagship demo
+2. Build LongtermWiki-style tools into Claude's capabilities
+3. Create 'epistemic infrastructure' products for major institutions"
+
+#### C3: Potential Anthropic Actions
+
+**Tier 1: Funding support** (see <EntityLink id="anthropic-investors">Anthropic investors</EntityLink> and <EntityLink id="anthropic-valuation">valuation</EntityLink> context)
+- Grant to maintain and expand LongtermWiki
+- \$500K-\$2M would be transformative for the project
+
+**Tier 2: Technical integration**
+- LongtermWiki as grounding data for Claude's AI safety reasoning
+- Custom features in Claude for wiki-style knowledge management
+- Partnership on keeping content current
+
+**Tier 3: Strategic priority**
+- Epistemic infrastructure as a core Anthropic mission
+- LongtermWiki-style tools for governments and institutions
+- Major investment in "AI for collective intelligence"
+
+**Expected value if Tier 3:** Potentially the single highest-impact pathway. Could reshape how civilization handles complex decisions.
+
+#### Anthropic Pathway: Concrete Nodes
+
+*Node shading indicates estimated importance (darker = higher). Edge thickness indicates connection strength.*
+
+<Mermaid client:load chart={`
+flowchart LR
+    subgraph LongtermWiki["LongtermWiki Assets"]
+        LW[LongtermWiki<br/>as Demo]
+        CC[Claude Code<br/>Integration]
+        AIS[AI Safety<br/>Content Quality]
+    end
+
+    subgraph AnthropicPeople["Anthropic Stakeholders"]
+        DA[Dario Amodei<br/>CEO]
+        JC[Jared Kaplan<br/>Research]
+        CA[Chris Olah<br/>Interpretability]
+        JL[Jan Leike<br/>Alignment]
+        AM[Amanda Askell<br/>Policy]
+        BM[Ben Mann<br/>Product]
+    end
+
+    subgraph AnthropicOrg["Anthropic Interests"]
+        AF[Anthropic<br/>Foundation]
+        PR[Product<br/>Use Cases]
+        MC[Mission<br/>Credibility]
+        PS[Policy<br/>Influence]
+    end
+
+    subgraph Outcomes["Potential Outcomes"]
+        T1[Tier 1: Grant<br/>500K-2M]
+        T2[Tier 2: Technical<br/>Partnership]
+        T3[Tier 3: Strategic<br/>Priority]
+    end
+
+    LW --> DA
+    LW --> MC
+    CC --> BM
+    CC --> PR
+    AIS --> JL
+    AIS --> CA
+
+    DA --> AF
+    DA --> T3
+    JC --> T2
+    CA --> T2
+    JL --> T1
+    JL --> T2
+    AM --> PS
+    BM --> PR
+
+    AF --> T1
+    MC --> T3
+    PR --> T2
+    PS --> T3
+
+    T1 --> T2
+    T2 --> T3
+
+    style DA fill:#1a5f7a,color:#fff
+    style T3 fill:#2d6a4f,color:#fff
+    style MC fill:#457b9d
+    style JL fill:#457b9d
+    style T1 fill:#95d5b2
+    style T2 fill:#52b788
+    style LW fill:#fca311
+    style AIS fill:#fca311
+    style CC fill:#e9c46a
+    style AF fill:#6c757d
+    style CA fill:#adb5bd
+    style BM fill:#adb5bd
+    style AM fill:#adb5bd
+    style JC fill:#adb5bd
+    style PR fill:#adb5bd
+    style PS fill:#adb5bd
+`} />
+
+**Legend:**
+- 🟠 Orange nodes: LongtermWiki assets (what we control)
+- 🔵 Blue nodes: High-importance Anthropic stakeholders/interests
+- 🟢 Green nodes: Outcomes (darker = higher value)
+- ⚫ Gray nodes: Supporting elements
+
+**Key insight:** The path to Tier 3 likely runs through demonstrating mission credibility (MC) to Dario, which requires the AI safety content quality and the demo being compelling. Jan Leike (alignment lead) is the most natural entry point for Tier 1/2.
+
+---
+
+### Pathway D: Field Coordination & Consensus
+
+**The core thesis:** The AI safety field has many smart people who disagree with each other. Much of this disagreement is unproductive—people talking past each other, unclear about cruxes, repeating debates. LongtermWiki could structure this productively.
+
+#### D1: Structured Disagreement Resolution
+
+The Crux Graph could become the canonical map of "where AI safety researchers actually disagree."
+
+**Current state:** Disagreements are scattered across papers, Twitter threads, conference conversations. It's hard to know what the key debates are or what would resolve them.
+
+**With LongtermWiki:**
+- "We've identified 30 key cruxes"
+- Each has explicit operationalization
+- Each has "what would change my mind"
+- Evidence is catalogued for each side
+
+**Potential innovation:** Crux bounties. "\$50K for research that resolves Crux #7."
+
+#### D2: Expert Elicitation Platform
+
+Integrate with forecasting platforms to:
+- Track researcher predictions on key parameters
+- Surface where predictions diverge most
+- Update as evidence comes in
+
+This creates a "collective intelligence" layer on top of the wiki.
+
+#### D3: Research Agenda Generation
+
+The wiki's structure naturally reveals gaps:
+- Topics with low-quality pages
+- Cruxes with little evidence either way
+- Relationships with high uncertainty
+
+Automated research agenda: "Here are the 20 most important questions where we have the least information."
+
+**Expected value if successful:** Could significantly accelerate the field's epistemic progress. High uncertainty on tractability.
+
+---
+
+### Pathway E: Training & Onboarding
+
+**The core thesis:** Getting up to speed in AI safety takes too long. New researchers spend months reading scattered sources. A good onboarding resource could multiply the field's effective capacity.
+
+#### E1: Researcher Time-to-Productivity
+
+Currently, new AI safety researchers need to:
+- Read 50+ papers and blog posts
+- Understand which sources are authoritative
+- Build mental models of the field's structure
+- Learn which debates matter
+
+This takes 6-18 months to do well.
+
+LongtermWiki could cut this to 2-4 months by providing:
+- Curated paths through the material
+- Clear explanations of what's contested vs. settled
+- Connections between concepts
+- "If you believe X, read Y next"
+
+**Expected value:** If AI safety is talent-constrained (it is), accelerating onboarding is high-leverage.
+
+#### E2: Knowledge Distillation for AI Systems
+
+LongtermWiki could be training data for AI systems that need to reason about AI safety:
+- Well-structured, cited, transparent
+- Clear separation of claims and evidence
+- Explicit uncertainty
+
+**Potential Anthropic interest:** Use LongtermWiki to improve Claude's AI safety reasoning.
+
+#### E3: Living Textbook
+
+There's no good AI safety textbook. LongtermWiki could become this:
+- More comprehensive than any book
+- Always current
+- Hyperlinked and explorable
+- Free
+
+**Pathway:** Partner with AI Safety Fundamentals and other training programs to recommend LongtermWiki as supplementary reading.
+
+---
+
+### Pathway F: Lab & Policy Integration
+
+**The core thesis:** AI labs and policymakers need decision support. LongtermWiki could serve this directly.
+
+#### F1: Decision Support for AI Labs
+
+Labs face constant prioritization decisions:
+- Should we invest more in <EntityLink id="interpretability">interpretability</EntityLink> or <EntityLink id="ai-control">control</EntityLink>?
+- How much red-teaming is enough?
+- Which capabilities should we not release?
+
+LongtermWiki-style analysis could help:
+- "Given your threat model, here's what the evidence suggests about intervention priorities"
+- Neutral analysis that labs can use internally
+
+**What this requires:**
+- Trust from labs (hard)
+- Customized views for different threat models
+- Possibly confidential versions
+
+#### F2: Government Partnership
+
+Beyond credibility, direct partnership:
+- Contracted to maintain policy-relevant sections
+- Produce briefings on request
+- Train policy staff
+
+**Models:** RAND, Brookings, CSIS relationships with government.
+
+#### F3: Think Tank Integration
+
+Partner with established policy organizations:
+- CSET, GovAI successors, Gladstone, RAND
+- LongtermWiki provides research infrastructure
+- They provide credibility and distribution
+
+Mutual benefit: they get a better knowledge base; we get legitimacy and reach.
+
+---
+
+## Causal Model: Value Creation Mechanisms
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph Core["Core Mechanisms"]
+        direction TB
+        Q[High-Quality<br/>Content]
+        S[Structured<br/>Data]
+        U[Explicit<br/>Uncertainty]
+        C[Crux<br/>Mapping]
+        W[Worldview<br/>Linking]
+    end
+
+    subgraph Credibility["Credibility Building"]
+        IC[Institutional<br/>Credibility]
+        EC[Expert<br/>Endorsement]
+        CC[Citation<br/>Count]
+    end
+
+    subgraph Adoption["User Adoption"]
+        FU[Funder<br/>Usage]
+        RU[Researcher<br/>Usage]
+        PU[Policy<br/>Usage]
+    end
+
+    subgraph Impact["Value Creation"]
+        BD[Better<br/>Decisions]
+        NA[New<br/>Alignment]
+        NF[New<br/>Funding]
+        FP[Field<br/>Progress]
+    end
+
+    Q --> IC
+    Q --> FU
+    Q --> RU
+    S --> IC
+    S --> FU
+    U --> IC
+    U --> EC
+    C --> EC
+    C --> FP
+    W --> FU
+    W --> BD
+
+    IC --> CC
+    IC --> PU
+    EC --> CC
+    EC --> FU
+    CC --> NA
+    CC --> NF
+
+    FU --> BD
+    RU --> FP
+    PU --> BD
+    PU --> NF
+
+    BD --> NA
+    BD --> FP
+    NA --> NF
+    FP --> NA
+
+    style BD fill:#d4edda
+    style NA fill:#d4edda
+    style NF fill:#d4edda
+    style FP fill:#d4edda
+`} />
+
+---
+
+## Prioritization of Pathways
+
+| Pathway | Expected Impact | Tractability | Dependencies | Recommended Priority |
+|---------|-----------------|--------------|--------------|---------------------|
+| A: Prioritization | Very High | Medium | Quality content, funder buy-in | **High** |
+| B: New Capital | Very High | Medium-Low | Credibility, relationships | **Medium** |
+| C: Anthropic | Potentially Transformative | Low-Medium | Anthropic interest | **High** (asymmetric upside) |
+| D: Field Coordination | High | Medium | Expert engagement | **Medium** |
+| E: Onboarding | Medium-High | High | Good content exists | **High** (low-hanging fruit) |
+| F: Lab/Policy | High | Low | Trust, relationships | **Low** (long-term) |
+
+**Recommended focus:**
+1. **Short-term:** Pathway E (onboarding) — most tractable, builds foundation for others
+2. **Medium-term:** Pathway A (prioritization) — highest certain-impact pathway
+3. **Long-shot:** Pathway C (Anthropic) — pursue actively given asymmetric upside
+
+---
+
+## Key Uncertainties & Cruxes
+
+### Crux 1: Do funders actually want this?
+
+**Optimistic view:** Funders are drowning in information and would love structured analysis.
+
+**Pessimistic view:** Funders make decisions based on relationships and gut feel; structured tools don't fit their workflow.
+
+**How to resolve:** Talk to 10 funders. Ask about their actual decision process.
+
+### Crux 2: Can we achieve sufficient quality?
+
+**Optimistic view:** AI-assisted writing plus strong editorial oversight can match or exceed existing resources.
+
+**Pessimistic view:** Without deep domain expertise, we'll produce shallow content that experts dismiss.
+
+**How to resolve:** Expert review of sample pages. Are they useful to people who know the topic?
+
+### Crux 3: Is <EntityLink id="anthropic">Anthropic</EntityLink> interested in epistemic infrastructure?
+
+**Optimistic view:** This aligns with <EntityLink id="anthropic-core-views">Anthropic's mission</EntityLink> and Claude's capabilities.
+
+**Pessimistic view:** Anthropic has many priorities; this is too niche.
+
+**How to resolve:** Direct conversation with relevant Anthropic stakeholders.
+
+### Crux 4: Can we maintain this sustainably?
+
+**Optimistic view:** Good structure + AI assistance + limited scope = manageable.
+
+**Pessimistic view:** Content rot is inevitable; wiki maintenance is a losing battle.
+
+**How to resolve:** Build staleness tracking from day one. Plan for finite lifespan if needed.
+
+### Crux 5: Will anyone actually use it?
+
+**Optimistic view:** Build it well, and usage follows. Good content is rare.
+
+**Pessimistic view:** Information abundance means even good resources get ignored.
+
+**How to resolve:** User research. Who would use this weekly? Can we name 20 specific people?
+
+---
+
+## Next Steps
+
+### Validation Actions (Next 4 Weeks)
+
+1. **User research:** Interview 10-15 potential users (funders, researchers, policy people)
+   - What information do you wish you had?
+   - Would you use X if it existed?
+   - How do you make prioritization decisions today?
+
+2. **Funder outreach:** Talk to <EntityLink id="coefficient-giving">Coefficient</EntityLink>, <EntityLink id="open-philanthropy">Open Phil</EntityLink> program officers, <EntityLink id="sff">SFF</EntityLink>
+   - Is there interest in integration?
+   - What would make this useful for them?
+
+3. **<EntityLink id="anthropic">Anthropic</EntityLink> exploration:** Reach out to relevant contacts
+   - Is there interest in epistemic infrastructure?
+   - What would a partnership look like?
+
+4. **Quality validation:** Get expert review of 5 high-priority pages
+   - Are these useful to people who know the topic?
+   - What's missing?
+
+### Build Actions (If Validated)
+
+1. **Prioritization tool MVP:** Build a minimal worldview-to-priority mapping
+2. **Onboarding pathway:** Curated reading path for new researchers
+3. **Funder dashboard:** Custom views for grantmaker needs
+4. **Policy brief template:** Accessible versions of key topics
+
+### Success Indicators (6-Month Horizon)
+
+- 3+ funders actively using LongtermWiki in decision-making
+- 5+ expert endorsements/testimonials
+- Referenced in 2+ policy documents or reports
+- 1,000+ monthly active users
+- Active conversation with Anthropic about partnership
+
+---
+
+## Appendix: Why This Matters
+
+If AI safety spending is currently suboptimal (likely true), then improving allocation is high-leverage. The field spends roughly \$100-300M annually. If LongtermWiki improves allocation by even 5%, that's \$5-15M of additional effective spending per year—likely more valuable than most direct work.
+
+If LongtermWiki unlocks new capital (billionaires, governments), the impact compounds. \$100M of new funding, even if less efficiently allocated, could double the field's resources.
+
+If Anthropic (or similar actors) build epistemic infrastructure as a priority, the impact extends far beyond AI safety. Better tools for civilization-critical decisions could matter for every existential risk.
+
+The expected value case for investing in LongtermWiki is strong, even under significant uncertainty about which pathway succeeds.
+
+---
+
+## Appendix B: Impact Estimates
+
+*Assuming LongtermWiki is well-executed, how much value could it create for the world? Focus is on counterfactual impact, not value captured.*
+
+### Theory of Change: Epistemic Infrastructure → Better Outcomes
+
+| Stage | Mechanism | Example |
+|-------|-----------|---------|
+| 1. **Knowledge synthesis** | Scattered info → structured, queryable | "What's the state of interpretability research?" answerable in minutes, not hours |
+| 2. **Uncertainty mapping** | Implicit disagreements → explicit cruxes | "We disagree because you think X and I think Y" becomes visible |
+| 3. **Prioritization clarity** | Gut feelings → transparent reasoning | Funders can see why different worldviews lead to different priorities |
+| 4. **Coordination enabling** | Siloed analysis → shared knowledge base | Reduces duplication, enables "I'll cover X if you cover Y" |
+| 5. **Legitimacy building** | Blog posts → institutional infrastructure | Opens doors to governments, new donors, skeptical observers |
+
+### Impact Category 1: Better Allocation of Existing AI Safety Funding
+
+**Baseline:** ≈\$300M/yr flows to AI safety. Current allocation is based on networks, intuitions, and fragmented analysis.
+
+| Improvement Mechanism | How LW Helps | Estimated % Improvement | Value (on \$300M) |
+|----------------------|--------------|------------------------|-------------------|
+| Reduced analytical duplication | Shared reference eliminates redundant research | 20-40% analyst time saved | \$1-3M/yr equivalent |
+| Gap identification | Visible "crowded" vs "neglected" areas | 2-5% funds moved to better uses | \$6-15M/yr effective |
+| Explicit worldview-priority mapping | "If you believe X, fund Y" becomes tractable | 1-3% better targeting | \$3-9M/yr effective |
+| Faster grant evaluation | Pre-existing context for each topic | 30-50% time reduction | \$0.5-1M/yr equivalent |
+| Cross-funder coordination | "We'll cover interpretability, you cover governance" | 1-2% reduced overlap | \$3-6M/yr effective |
+
+**Total for existing funders:** If LongtermWiki improves allocation quality by 3-10%, that's **\$9-30M/yr in "effective dollars"** (money achieving more impact).
+
+### Impact Category 2: New Capital for AI Safety
+
+**Baseline:** Many potential funders are not engaged because the field lacks legible, credible infrastructure.
+
+| Source | Barrier LW Addresses | Potential New \$/yr | P(Engagement) | E[Value] |
+|--------|---------------------|---------------------|---------------|----------|
+| Tech billionaires (new) | "Show me something serious, not blog posts" | \$10-50M | 5-15% | \$0.5-7.5M |
+| Family offices | Need institutional-grade analysis | \$2-10M | 10-20% | \$0.2-2M |
+| Government AI safety budgets | Need citable, credible references | \$10-50M | 10-20% | \$1-10M |
+| Corporate giving (beyond labs) | Need clear landscape view | \$2-10M | 5-10% | \$0.1-1M |
+
+**Total new capital:** **\$2-20M/yr** in new funding entering the field, with high uncertainty.
+
+### Impact Category 3: Research Acceleration
+
+| Mechanism | Current Problem | LW Solution | Impact Estimate |
+|-----------|-----------------|-------------|-----------------|
+| Onboarding time | 6-18 months to get productive | Curated paths, 2-4 months | 50-100 researcher-months/yr saved |
+| Literature navigation | Hours finding relevant work | Cross-linked, comprehensive | 20-30% time saved on lit review |
+| Avoiding duplication | Unknowingly repeat others' work | Visible prior work | 5-10 projects/yr not wasted |
+| Gap identification | Hard to see what's missing | Explicit gap analysis | Better research targeting |
+| Disagreement clarity | Talking past each other | Explicit cruxes | More productive debates |
+
+**Researcher-equivalent value:** 50-100 months saved × \$20K/month = **\$1-2M/yr equivalent**
+
+**Research quality:** If better information leads to even 1-2% faster alignment progress, this could be worth **\$10-100M+** depending on timeline beliefs.
+
+### Impact Category 4: Policy & Governance Improvement
+
+| Mechanism | Current Problem | LW Solution | Impact Estimate |
+|-----------|-----------------|-------------|-----------------|
+| Rapid briefings | Staffers piece together from scattered sources | Comprehensive reference | Hours → minutes per topic |
+| Shared vocabulary | Terms differ across jurisdictions | Common definitions | Better international coordination |
+| Technical accuracy | Often rely on industry-biased sources | Independent analysis | More informed regulation |
+| Anticipatory policy | Hard to see emerging issues | Forward-looking models | Better timed interventions |
+
+**Policy value:** Highly uncertain. If LongtermWiki contributes to one significantly better policy decision (regulation, international agreement, lab practice), value could be **\$10M-\$1B+**. Assign **\$1-10M E[V]** given low probability of direct influence.
+
+### Impact Category 5: Inspiring Broader Epistemic Infrastructure
+
+**The Anthropic Angle:** The most ambitious value isn't Anthropic using LongtermWiki directly—it's LongtermWiki demonstrating what's possible and inspiring Anthropic (or similar actors) to build epistemic infrastructure at scale.
+
+**What LongtermWiki demonstrates:**
+- AI can build sophisticated, interconnected knowledge bases
+- Uncertainty and disagreement can be mapped explicitly
+- "Living documents" can stay current and improve over time
+- Transparent methodology builds trust
+
+**If this inspires Anthropic to build epistemic tools:**
+
+| Potential Anthropic Action | Value if Happens | P(Happens) | E[Value] |
+|---------------------------|------------------|------------|----------|
+| Builds "epistemic Claude" features (uncertainty tracking, structured knowledge) | \$50-200M product value + societal benefit | 5-15% | \$2.5-30M |
+| Creates epistemic infrastructure for governments | Better decisions on \$T of spending | 2-5% | \$5-50M+ |
+| Makes this a standard Claude capability | Civilizational upgrade in decision-making | 1-3% | Unbounded |
+| Other labs copy the approach | Multiplied across AI ecosystem | 5-10% | \$5-20M |
+
+**Total "inspiration" value:** Very uncertain, but potentially **\$5-50M+ E[V]** if LongtermWiki successfully demonstrates the concept.
+
+**What would make this work:**
+- LongtermWiki needs to be genuinely impressive—a clear demonstration, not a mediocre wiki
+- Someone at Anthropic needs to see it and think "we should build something like this"
+- The timing needs to align with Anthropic's product/mission priorities
+
+### Aggregate Impact Summary
+
+| Impact Category | Conservative | Central | Optimistic | Confidence |
+|-----------------|--------------|---------|------------|------------|
+| Better allocation (existing \$300M) | \$9M/yr | \$15M/yr | \$30M/yr | Medium |
+| New capital attracted | \$2M/yr | \$8M/yr | \$20M/yr | Low |
+| Research acceleration | \$1M/yr | \$5M/yr | \$15M/yr | Medium |
+| Policy improvement | \$1M/yr | \$3M/yr | \$10M/yr | Very Low |
+| Inspiring epistemic infrastructure | \$2M/yr | \$10M/yr | \$50M+/yr | Very Low |
+| **Total** | **\$15M/yr** | **\$41M/yr** | **\$125M+/yr** | Low-Medium |
+
+*Note: Categories are not fully independent—success in one often enables others.*
+
+### Sensitivity Analysis: What Drives Impact?
+
+| Factor | If Weak | If Strong | Importance |
+|--------|---------|-----------|------------|
+| Content quality | \$5M/yr | \$50M/yr | **Critical** |
+| Funder adoption | \$3M/yr | \$30M/yr | **Critical** |
+| Anthropic/lab interest in concept | \$10M/yr | \$100M+/yr | High variance |
+| Policy adoption | \$10M/yr | \$50M+/yr | High variance |
+| Maintenance/freshness | \$5M/yr (decaying) | \$30M/yr | High |
+| Research community adoption | \$5M/yr | \$15M/yr | Medium |
+
+**Key insight:** The critical drivers are **content quality** and **funder adoption**. Without high-quality content, nothing else works. The high-variance drivers (Anthropic inspiration, policy) could multiply impact 10x but are harder to predict or control.
+
+### Comparison: Value per Dollar Spent
+
+| Approach | Annual Cost | E[Impact/yr] | Impact per \$1 Spent |
+|----------|-------------|--------------|---------------------|
+| LongtermWiki (2 FTE) | \$400K | \$15-40M | \$37-100 |
+| Typical AI safety research org | \$2M | \$5-20M | \$2.5-10 |
+| Typical grantmaking overhead | \$1M | Enables \$20M grants | \$20 leverage |
+| Direct AI safety research | \$200K/researcher | \$0.5-5M | \$2.5-25 |
+
+**If these estimates are roughly right, epistemic infrastructure is highly cost-effective.** The main risk is that the estimates are wrong—specifically, that better information doesn't actually lead to better decisions.
+
+### Impact by Pathway: Summary Table
+
+| Pathway | Primary Impact | Value Created | Confidence | Key Dependency |
+|---------|----------------|---------------|------------|----------------|
+| A: Funder prioritization | Better \$ allocation | \$10-30M/yr effective | Medium | Funder engagement |
+| B: New capital | More total resources | \$2-20M/yr new \$ | Low | Credibility demonstration |
+| C: Anthropic inspiration | Epistemic tools at scale | \$5-50M+ potential | Very Low | Someone sees it, acts |
+| D: Field coordination | Less duplication, clearer debates | \$2-10M/yr | Medium | Expert buy-in |
+| E: Research acceleration | Faster progress | \$1-15M/yr equivalent | Medium | Content quality |
+| F: Policy influence | Better decisions | \$1-50M+ | Very Low | Adoption pathway |
+
+### Key Uncertainties
+
+1. **Does better information actually change behavior?** Funders might continue making decisions based on relationships regardless of available analysis.
+
+2. **Can quality be maintained at scale?** Initial quality is achievable; sustaining it is the real test.
+
+3. **Is the "inspiration" pathway real?** Anthropic might never notice, or might notice but not act.
+
+4. **How counterfactual is this?** Would similar resources emerge anyway through other means?
+
+5. **What's the timeline?** Value accrues over years; might not see results for 2-5 years.
+
+### Bottom Line
+
+**Central estimate:** A well-executed LongtermWiki creates **\$15-40M/yr in value** for AI safety, primarily through better allocation of existing funding and research acceleration.
+
+**Upside scenario:** If it successfully demonstrates the value of epistemic infrastructure and inspires broader adoption (Anthropic, governments, other fields), value could be **\$100M+/yr** or more.
+
+**Downside scenario:** If content quality degrades, funders don't engage, or the "better information → better decisions" theory of change is wrong, value could be **\$2-5M/yr**—still positive but not transformative.
+
+**The bet:** Epistemic infrastructure is undersupplied because it's a public good. If we can demonstrate it works, others will copy and scale it. The value isn't just LongtermWiki—it's proving the concept.

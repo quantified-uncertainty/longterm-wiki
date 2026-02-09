@@ -1,0 +1,265 @@
+---
+title: Chris Olah
+description: Co-founder of Anthropic, pioneer in neural network interpretability
+sidebar:
+  order: 12
+quality: 27
+llmSummary: Biographical overview of Chris Olah's career trajectory from Google Brain to co-founding Anthropic, focusing on his pioneering work in mechanistic interpretability including feature visualization, circuit analysis, and recent sparse autoencoder breakthroughs (Scaling Monosemanticity 2024). Documents his unique combination of technical depth and exceptional science communication through Distill journal and influential blog posts.
+lastEdited: "2025-12-24"
+importance: 20
+ratings:
+  novelty: 2
+  rigor: 3.5
+  actionability: 2
+  completeness: 5
+metrics:
+  wordCount: 1080
+  citations: 0
+  tables: 0
+  diagrams: 0
+clusters: ["ai-safety"]
+---
+import {DataInfoBox, Backlinks, DataExternalLinks, EntityLink} from '@components/wiki';
+
+<DataExternalLinks pageId="chris-olah" client:load />
+
+<DataInfoBox entityId="chris-olah" />
+
+## Background
+
+Chris Olah is a pioneering researcher in neural network interpretability and a co-founder of <EntityLink id="anthropic">Anthropic</EntityLink>. He is widely known for making complex deep learning concepts accessible through exceptional visualizations and clear explanations.
+
+Career path:
+- Dropped out of University of Toronto (where he studied under <EntityLink id="geoffrey-hinton">Geoffrey Hinton</EntityLink>)
+- Research scientist at Google Brain (2015-2021)
+- Co-founded Anthropic (2021)
+- Leads interpretability research at Anthropic
+
+Olah represents a unique combination: deep technical expertise in understanding neural networks combined with extraordinary ability to communicate that understanding.
+
+## Major Contributions
+
+### <EntityLink id="interpretability">Mechanistic Interpretability</EntityLink> Pioneer
+
+Olah essentially created the field of mechanistic interpretability - understanding neural networks by reverse-engineering their internal computations:
+
+**Key insights:**
+- Neural networks learn interpretable features and circuits
+- Can visualize what individual neurons respond to
+- Can trace information flow through networks
+- Understanding is possible, not just empirical observation
+
+### Clarity Research Communications
+
+Olah's blog (colah.github.io) and Distill journal publications set new standards for:
+- Interactive visualizations
+- Clear explanations of complex topics
+- Making research accessible without dumbing down
+- Beautiful presentation of technical work
+
+**Famous posts:**
+- "Understanding LSTM Networks" - Definitive explanation
+- "Visualizing Representations" - Deep learning internals
+- "Feature Visualization" - How to see what networks learn
+- "Attention and Augmented Recurrent Neural Networks" - Attention mechanisms
+
+### Distill Journal (2016-2021)
+
+Co-founded Distill, a scientific journal devoted to clear explanations of machine learning with:
+- Interactive visualizations
+- High production values
+- Peer review for clarity as well as correctness
+- New medium for scientific communication
+
+Though Distill paused in 2021, it influenced how researchers communicate.
+
+## Work on Interpretability
+
+### The Vision
+
+Olah's interpretability work aims to:
+- Understand neural networks at mechanical level (like reverse-engineering a codebase)
+- Make AI systems transparent and debuggable
+- Enable verification of alignment properties
+- Catch dangerous behaviors before deployment
+
+### Key Research Threads
+
+**Feature Visualization:**
+- What do individual neurons detect?
+- Can synthesize images that maximally activate neurons
+- Reveals learned features and concepts
+
+**Circuit Analysis:**
+- How do features connect to form algorithms?
+- Tracing information flow through networks
+- Understanding how networks implement functions
+
+**Scaling Interpretability:**
+- Can we understand very large networks?
+- Automated interpretability using AI to help understand AI
+- Making interpretability scale to GPT-4+ sized models
+
+### Major Anthropic Interpretability Papers
+
+**"Toy Models of Superposition"** (2022):
+- Neural networks can represent more features than dimensions
+- Explains why interpretability is hard
+- Provides mathematical framework
+
+**"Scaling Monosemanticity"** (2024):
+- Used sparse autoencoders to extract interpretable features from Claude
+- Found interpretable features even in <EntityLink id="language-models">large language models</EntityLink>
+- Major breakthrough in scaling interpretability
+
+**"Towards Monosemanticity"** series:
+- Working toward each neuron representing one thing
+- Making networks fundamentally more interpretable
+- Path to verifiable alignment properties
+
+## Why Anthropic?
+
+Olah left Google Brain to co-found Anthropic because:
+- Wanted interpretability work directly connected to alignment
+- Believed understanding was crucial for safety
+- Needed to work on frontier models to make progress
+- Aligned with Anthropic's safety-first mission
+
+At Anthropic, interpretability isn't just research - it's part of safety strategy.
+
+## Approach to AI Safety
+
+### Core Beliefs
+
+1. **Understanding is necessary**: Can't safely deploy systems we don't understand
+2. **Interpretability is tractable**: Neural networks can be understood mechanistically
+3. **Need frontier access**: Must work with most capable systems
+4. **Automated interpretability**: Use AI to help understand AI
+5. **Long-term investment**: Understanding takes sustained effort
+
+### Interpretability for Alignment
+
+Olah sees interpretability enabling:
+- **Verification**: Check if model has dangerous capabilities
+- **Debugging**: Find and fix problematic behaviors
+- **Honesty**: Ensure model is reporting true beliefs
+- **Early detection**: Catch <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink> before deployment
+
+### Optimism and Concerns
+
+**Optimistic about:**
+- Technical tractability of interpretability
+- Recent progress (sparse autoencoders working)
+- Automated interpretability scaling
+
+**Concerned about:**
+- Race dynamics rushing deployment
+- Interpretability not keeping pace with capabilities
+- Understanding coming too late
+
+## Research Philosophy
+
+### Clarity as Core Value
+
+Olah believes:
+- Understanding should be clear, not just claimed
+- Visualizations reveal understanding
+- Good explanations are part of science
+- Communication enables collaboration
+
+### Scientific Taste
+
+Known for:
+- Pursuing questions others think too hard
+- Insisting on deep understanding
+- Beautiful presentation of work
+- Making research reproducible and accessible
+
+### Long-term Approach
+
+Willing to:
+- Work on fundamental problems for years
+- Build foundations before applications
+- Invest in infrastructure (visualization tools, etc.)
+- Delay publication for quality
+
+## Impact and Influence
+
+### Field Building
+
+Created mechanistic interpretability as a field:
+- Defined research direction
+- Trained other researchers
+- Made interpretability seem tractable
+- Influenced multiple labs' research programs
+
+### Communication Standards
+
+Changed how researchers communicate:
+- Interactive visualizations now more common
+- Higher expectations for clarity
+- Distill influenced science communication broadly
+- Made ML research more accessible
+
+### Safety Research
+
+Interpretability is now central to alignment:
+- Every major lab has interpretability teams
+- Recognized as crucial for safety
+- Influenced regulatory thinking (need to understand systems)
+- Connected to verification and auditing
+
+## Current Work at Anthropic
+
+Leading interpretability research on:
+
+1. **Scaling to production models**: Understanding Claude-scale models
+2. **Automated interpretability**: Using AI to help
+3. **Safety applications**: Connecting interpretability to alignment
+4. **Research infrastructure**: Tools for interpretability research
+
+Recent breakthroughs suggest interpretability is working at scale.
+
+## Unique Position in Field
+
+Olah is unique because:
+- **Technical depth + communication**: Rare combination
+- **Researcher + co-founder**: Both doing research and shaping organization
+- **Long-term vision**: Been pursuing interpretability for decade
+- **Optimism + rigor**: Believes in progress while being technically careful
+
+## Key Publications
+
+- **"Understanding LSTM Networks"** (2015) - Classic explainer
+- **"Feature Visualization"** (2017) - How to visualize what networks learn
+- **"The Building Blocks of Interpretability"** (2018) - Research vision
+- **"Toy Models of Superposition"** (2022) - Theoretical framework
+- **"Towards Monosemanticity"** (2023) - Path to interpretable networks
+- **"Scaling Monosemanticity"** (2024) - Major empirical breakthrough
+
+## Criticism and Challenges
+
+**Skeptics argue:**
+- Interpretability might not be sufficient for safety
+- Could give false confidence
+- Might not work for truly dangerous capabilities
+- Could be defeated by deceptive models
+
+**Olah's approach:**
+- Interpretability is necessary but not sufficient
+- Better than black boxes
+- Continuously improving methods
+- Complementary to other safety approaches
+
+## Vision for the Future
+
+Olah envisions:
+- Fully interpretable neural networks
+- AI systems we deeply understand
+- Verification of alignment properties
+- Interpretability as standard practice
+- Understanding enabling safe deployment
+
+## Related Pages
+
+<Backlinks client:load entityId="chris-olah" />

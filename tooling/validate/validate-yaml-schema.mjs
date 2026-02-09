@@ -1,0 +1,178 @@
+#!/usr/bin/env npx tsx
+
+/**
+ * YAML Schema Validation Script
+ *
+ * Validates YAML data files against Zod schemas from src/data/schema.ts.
+ * Ensures entity, resource, and publication data conforms to expected structure.
+ *
+ * Usage: npx tsx scripts/validate-yaml-schema.mjs [--ci]
+ */
+
+import { readFileSync, readdirSync, existsSync } from 'fs';
+import { join, basename } from 'path';
+import { parse as parseYaml } from 'yaml';
+import { getColors, isCI, formatPath } from '../lib/output.mjs';
+import { Entity, Resource, Publication } from '../../data/schema.ts';
+
+const DATA_DIR = 'data';
+const CI_MODE = isCI();
+const colors = getColors();
+
+/**
+ * Load and parse a YAML file
+ */
+function loadYaml(filepath) {
+  if (!existsSync(filepath)) {
+    return null;
+  }
+  const content = readFileSync(filepath, 'utf-8');
+  return parseYaml(content);
+}
+
+/**
+ * Load all YAML files from a directory and merge arrays
+ */
+function loadYamlDir(dirname) {
+  const dirpath = join(DATA_DIR, dirname);
+  if (!existsSync(dirpath)) {
+    return [];
+  }
+
+  const files = readdirSync(dirpath).filter(f => f.endsWith('.yaml'));
+  const results = [];
+
+  for (const file of files) {
+    const filepath = join(dirpath, file);
+    const data = loadYaml(filepath);
+    if (Array.isArray(data)) {
+      // Tag each item with source file
+      for (const item of data) {
+        item._sourceFile = filepath;
+      }
+      results.push(...data);
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Format Zod errors into readable messages
+ */
+function formatZodErrors(error) {
+  return error.issues.map(issue => {
+    const path = issue.path.length > 0 ? issue.path.join('.') : '(root)';
+    return `${path}: ${issue.message}`;
+  });
+}
+
+/**
+ * Validate an array of items against a Zod schema
+ */
+function validateItems(items, schema, typeName) {
+  const errors = [];
+
+  for (const item of items) {
+    const sourceFile = item._sourceFile;
+    // Remove internal field before validation
+    const { _sourceFile, ...cleanItem } = item;
+
+    const result = schema.safeParse(cleanItem);
+    if (!result.success) {
+      const itemId = cleanItem.id || cleanItem.title || '(unknown)';
+      errors.push({
+        file: sourceFile,
+        id: itemId,
+        type: typeName,
+        issues: formatZodErrors(result.error),
+      });
+    }
+  }
+
+  return errors;
+}
+
+function main() {
+  console.log(`${colors.blue}Validating YAML schemas...${colors.reset}\n`);
+
+  const allErrors = [];
+  let totalValidated = 0;
+
+  // ==========================================================================
+  // 1. Validate entities/*.yaml against Entity schema
+  // ==========================================================================
+  console.log(`${colors.dim}Checking entities...${colors.reset}`);
+  const entities = loadYamlDir('entities');
+  totalValidated += entities.length;
+  const entityErrors = validateItems(entities, Entity, 'Entity');
+  allErrors.push(...entityErrors);
+  console.log(`  ${entities.length} entities loaded`);
+
+  // ==========================================================================
+  // 2. Validate resources/*.yaml against Resource schema
+  // ==========================================================================
+  console.log(`${colors.dim}Checking resources...${colors.reset}`);
+  const resources = loadYamlDir('resources');
+  totalValidated += resources.length;
+  const resourceErrors = validateItems(resources, Resource, 'Resource');
+  allErrors.push(...resourceErrors);
+  console.log(`  ${resources.length} resources loaded`);
+
+  // ==========================================================================
+  // 3. Validate publications.yaml against Publication schema
+  // ==========================================================================
+  console.log(`${colors.dim}Checking publications...${colors.reset}`);
+  const pubPath = join(DATA_DIR, 'publications.yaml');
+  const publications = loadYaml(pubPath) || [];
+  // Tag with source file
+  for (const pub of publications) {
+    pub._sourceFile = pubPath;
+  }
+  totalValidated += publications.length;
+  const pubErrors = validateItems(publications, Publication, 'Publication');
+  allErrors.push(...pubErrors);
+  console.log(`  ${publications.length} publications loaded`);
+
+  // ==========================================================================
+  // Output Results
+  // ==========================================================================
+  console.log();
+
+  if (CI_MODE) {
+    console.log(JSON.stringify({
+      validated: totalValidated,
+      errors: allErrors.length,
+      details: allErrors,
+    }, null, 2));
+  } else {
+    if (allErrors.length === 0) {
+      console.log(`${colors.green}✓ All ${totalValidated} items pass schema validation${colors.reset}\n`);
+    } else {
+      // Group errors by file
+      const byFile = {};
+      for (const err of allErrors) {
+        const key = formatPath(err.file);
+        if (!byFile[key]) byFile[key] = [];
+        byFile[key].push(err);
+      }
+
+      for (const [file, errors] of Object.entries(byFile)) {
+        console.log(`${colors.bold}${file}${colors.reset}`);
+        for (const err of errors) {
+          console.log(`  ${colors.red}✗${colors.reset} ${err.id} (${err.type})`);
+          for (const issue of err.issues) {
+            console.log(`    ${colors.dim}${issue}${colors.reset}`);
+          }
+        }
+        console.log();
+      }
+
+      console.log(`${colors.red}✗ ${allErrors.length} schema error(s) in ${totalValidated} items${colors.reset}\n`);
+    }
+  }
+
+  process.exit(allErrors.length > 0 ? 1 : 0);
+}
+
+main();

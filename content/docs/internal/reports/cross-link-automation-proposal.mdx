@@ -1,0 +1,347 @@
+---
+title: "Cross-Link Automation Proposal"
+description: "Technical proposal for automated cross-linking improvements using vector embeddings and LLM verification"
+pageType: "documentation"
+lastEdited: "2026-02-03"
+importance: 0
+quality: 54
+llmSummary: "Technical proposal for three-phase wiki cross-linking automation: Phase 1 (deterministic matching, implemented) found 546 matches across 236 files; Phase 2 proposes vector embeddings (LanceDB recommended, ~$0.002 cost for 500 entities); Phase 3 adds LLM verification (~$0.06 for 2,500 verifications using Haiku). Total implementation estimated at 10 hours with monthly costs under $0.02."
+ratings:
+  focus: 8.5
+  novelty: 2
+  rigor: 6.5
+  completeness: 7
+  concreteness: 8
+  actionability: 7.5
+metrics:
+  wordCount: 452
+  citations: 0
+  tables: 7
+  diagrams: 0
+---
+# Cross-Link Automation Proposal
+
+**Status:** Proposal
+**Author:** Claude Code
+**Date:** February 2026
+
+## Executive Summary
+
+This proposal outlines a multi-phase approach to improving cross-linking across the wiki. Phase 1 (deterministic matching) is implemented. Phases 2 and 3 propose vector embeddings and LLM verification to catch semantic relationships the deterministic approach misses.
+
+## Current State
+
+### Phase 1: Deterministic Matching (Implemented ✓)
+
+```bash
+npm run crux -- fix cross-links              # Preview
+npm run crux -- fix cross-links --apply      # Apply
+npm run crux -- fix cross-links --fuzzy      # Include fuzzy suggestions
+```
+
+**Results:**
+- 546 exact matches across 236 files
+- Uses case-insensitive exact name matching with word boundaries
+- Includes basic fuzzy matching via Levenshtein distance on proper nouns
+
+**Limitations:**
+- Only catches exact name matches (e.g., "Anthropic" but not "Anthropic's research team")
+- Misses semantic relationships (e.g., "RLHF paper" should link to RLHF page)
+- Can't detect when a paragraph discusses a topic without naming it explicitly
+
+---
+
+## Phase 2: Vector Embedding Index
+
+### Goal
+
+Build a semantic search index that can:
+1. Find entities related to any text passage
+2. Suggest links based on meaning, not just name matching
+3. Enable "find similar entities" queries
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Entity Embedding Index                    │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐   │
+│  │   Entity    │     │  Embedding  │     │   Vector    │   │
+│  │   Loader    │────▶│   Model     │────▶│    Store    │   │
+│  │             │     │ (local/API) │     │  (LanceDB)  │   │
+│  └─────────────┘     └─────────────┘     └─────────────┘   │
+│         │                                       │           │
+│         ▼                                       ▼           │
+│  ┌─────────────┐                        ┌─────────────┐    │
+│  │ - Title     │                        │  Similarity │    │
+│  │ - Summary   │                        │   Search    │    │
+│  │ - LLMSummary│                        │   Query     │    │
+│  │ - Body      │                        └─────────────┘    │
+│  └─────────────┘                                           │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Implementation Options
+
+#### Option A: LanceDB (Recommended)
+
+**Pros:**
+- Native JavaScript/TypeScript
+- Local-first, no external dependencies
+- Fast (Rust-based)
+- Supports incremental updates
+
+**Setup:**
+```bash
+npm install @lancedb/lancedb
+```
+
+**Usage:**
+```javascript
+import * as lancedb from '@lancedb/lancedb';
+
+// Create/load database
+const db = await lancedb.connect('./.vector-db');
+
+// Create embeddings table
+const entities = await loadEntities();
+const embeddings = await embedTexts(entities.map(e => e.summary));
+
+await db.createTable('entities', entities.map((e, i) => ({
+  id: e.id,
+  title: e.title,
+  embedding: embeddings[i],
+})));
+
+// Query similar entities
+const query = await embed("reinforcement learning from human feedback");
+const results = await db.search(query).limit(5).execute();
+```
+
+#### Option B: SQLite + sqlite-vss
+
+**Pros:**
+- Uses existing SQLite infrastructure
+- Single file database
+- No new dependencies
+
+**Cons:**
+- Requires sqlite-vss extension compilation
+- Limited vector operations
+
+#### Option C: Turbopuffer (Serverless)
+
+**Pros:**
+- No local setup
+- Managed infrastructure
+- Good for larger scale
+
+**Cons:**
+- External dependency
+- Network latency
+- Cost (\$0.10/1M vectors/month)
+
+### Embedding Model Options
+
+| Model | Dimensions | Speed | Quality | Cost |
+|-------|------------|-------|---------|------|
+| **Nomic Embed** (local) | 768 | Fast | Good | Free |
+| **text-embedding-3-small** | 1536 | API | Good | \$0.02/1M tokens |
+| **text-embedding-3-large** | 3072 | API | Best | \$0.13/1M tokens |
+| **GTE-base** (local) | 768 | Fast | Good | Free |
+
+**Recommendation:** Start with OpenAI `text-embedding-3-small` for quality, migrate to local model (Nomic) once validated.
+
+### Data to Embed
+
+For each entity, embed concatenation of:
+```javascript
+const textToEmbed = [
+  entity.title,
+  entity.description,
+  entity.llmSummary,
+  // Optionally: first 500 chars of body
+].filter(Boolean).join('\n');
+```
+
+**Estimated tokens:** ~500 entities × ~200 tokens = 100K tokens
+**Embedding cost:** \$0.002 (one-time)
+
+### CLI Commands
+
+```bash
+# Build/rebuild embedding index
+npm run crux -- embeddings build
+
+# Search for similar entities
+npm run crux -- embeddings search "deceptive AI behavior"
+
+# Suggest links for a page
+npm run crux -- embeddings suggest-links knowledge-base/risks/accident/scheming.mdx
+```
+
+### Integration with Cross-Link Fixer
+
+```javascript
+// In fix-cross-links.mjs
+async function findSemanticSuggestions(pageContent, existingLinks) {
+  const db = await loadVectorDB();
+
+  // Embed page paragraphs
+  const paragraphs = splitIntoParagraphs(pageContent);
+
+  const suggestions = [];
+  for (const para of paragraphs) {
+    const embedding = await embed(para.text);
+    const similar = await db.search(embedding).limit(5).execute();
+
+    for (const result of similar) {
+      if (!existingLinks.has(result.id) && result.score > 0.75) {
+        suggestions.push({
+          entityId: result.id,
+          entityTitle: result.title,
+          context: para.text.slice(0, 100),
+          score: result.score,
+        });
+      }
+    }
+  }
+
+  return suggestions;
+}
+```
+
+---
+
+## Phase 3: LLM Verification Layer
+
+### Goal
+
+Use a cheap LLM (Haiku/Flash) to verify suggestions before applying, catching:
+- False positives from semantic search
+- Context-inappropriate links
+- Redundant links
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     LLM Verification                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Input:                                                      │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │ Page: "The alignment problem involves..."           │    │
+│  │ Suggestion: Link "alignment" to alignment.mdx       │    │
+│  │ Context: "...solving the alignment problem for..."  │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                          │                                   │
+│                          ▼                                   │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │              Haiku / Gemini Flash                    │    │
+│  │                                                      │    │
+│  │  Prompt: "Should this text link to this entity?     │    │
+│  │           Reply YES/NO with brief reason."          │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                          │                                   │
+│                          ▼                                   │
+│  Output: { approve: true, reason: "Direct discussion" }     │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Batch Processing
+
+```javascript
+// Process all pages in batches
+async function verifyAllSuggestions() {
+  const pages = await loadAllPages();
+  const vectorDB = await loadVectorDB();
+
+  for (const page of pages) {
+    // Get semantic suggestions
+    const suggestions = await findSemanticSuggestions(page.content);
+
+    // Batch verify with LLM
+    const verified = await verifyWithLLM(suggestions, {
+      model: 'claude-3-haiku',
+      batchSize: 20,
+    });
+
+    // Apply approved changes
+    if (verified.length > 0) {
+      await applyLinks(page.path, verified);
+    }
+  }
+}
+```
+
+### Cost Estimate
+
+- ~500 pages × ~5 suggestions each = 2,500 verifications
+- ~100 tokens per verification
+- 250K tokens total
+- **Haiku cost:** ≈\$0.06
+- **Gemini Flash cost:** ≈\$0.02
+
+### Prompt Template
+
+```
+You are reviewing suggested cross-links for a wiki about AI safety.
+
+Page excerpt:
+"{context}"
+
+Suggested link: "{entityTitle}" (page about {entityDescription})
+Suggested text to link: "{matchedText}"
+
+Should this text be linked to the suggested page?
+Consider:
+1. Is the text actually discussing this specific entity/concept?
+2. Would a reader benefit from this link?
+3. Is it the first mention (wiki convention)?
+
+Reply with JSON: {"approve": true/false, "reason": "brief explanation"}
+```
+
+---
+
+## Implementation Timeline
+
+| Phase | Effort | Dependencies | Status |
+|-------|--------|--------------|--------|
+| Phase 1: Deterministic | 4h | None | ✅ Complete |
+| Phase 2a: Vector DB setup | 2h | LanceDB | Proposed |
+| Phase 2b: Embedding pipeline | 3h | OpenAI API | Proposed |
+| Phase 2c: CLI integration | 2h | Phase 2a, 2b | Proposed |
+| Phase 3: LLM verification | 3h | Haiku API | Proposed |
+
+**Total remaining:** ~10 hours
+
+## Cost Summary
+
+| Component | One-time | Monthly |
+|-----------|----------|---------|
+| Embedding 500 entities | \$0.002 | - |
+| Re-embedding on changes | - | ≈\$0.001 |
+| LLM verification (batch) | \$0.06 | - |
+| LLM verification (incremental) | - | ≈\$0.01 |
+| **Total** | **≈\$0.10** | **≈\$0.01** |
+
+## Decision Points
+
+1. **Vector DB choice:** LanceDB vs SQLite-vss vs Turbopuffer?
+2. **Embedding model:** API (OpenAI) vs local (Nomic)?
+3. **LLM verification:** Haiku vs Gemini Flash?
+4. **Scope:** All pages vs high-importance only?
+
+## Next Steps
+
+1. Approve this proposal
+2. Set up LanceDB in project
+3. Create embedding pipeline script
+4. Test on 10 sample pages
+5. Full rollout if quality is acceptable

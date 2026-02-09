@@ -1,0 +1,190 @@
+- id: alignment-progress
+  type: ai-transition-model-metric
+  title: Alignment Progress
+  description: Metrics tracking AI alignment research progress including interpretability coverage,
+    RLHF effectiveness, jailbreak resistance, and deception detection capabilities.
+  relatedEntries:
+    - id: alignment-robustness
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: safety-capability-gap
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: interpretability-coverage
+      type: ai-transition-model-parameter
+      relationship: measures
+  tags:
+    - alignment
+    - safety
+    - research
+  lastUpdated: 2025-12
+- id: safety-research
+  type: ai-transition-model-metric
+  title: Safety Research
+  description: Metrics tracking AI safety research including researcher headcount, funding levels,
+    publication rates, and research agenda progress.
+  relatedEntries:
+    - id: safety-capability-gap
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: racing-intensity
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: safety-culture-strength
+      type: ai-transition-model-parameter
+      relationship: measures
+  tags:
+    - safety
+    - research
+    - funding
+  lastUpdated: 2025-12
+- id: lab-behavior
+  type: ai-transition-model-metric
+  title: Lab Behavior
+  description: Metrics tracking frontier AI lab practices including RSP compliance, safety
+    commitments, transparency, and deployment decisions.
+  relatedEntries:
+    - id: safety-culture-strength
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: racing-intensity
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: human-oversight-quality
+      type: ai-transition-model-parameter
+      relationship: measures
+  tags:
+    - governance
+    - labs
+    - safety
+  lastUpdated: 2025-12
+- id: public-opinion
+  type: ai-transition-model-metric
+  title: Public Opinion
+  description: Metrics tracking public awareness, concern levels, and trust regarding AI systems and AI safety.
+  relatedEntries:
+    - id: societal-trust
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: preference-authenticity
+      type: ai-transition-model-parameter
+      relationship: measures
+  tags:
+    - public
+    - surveys
+    - trust
+  lastUpdated: 2025-12
+- id: expert-opinion
+  type: ai-transition-model-metric
+  title: Expert Opinion
+  description: Metrics from AI researcher surveys including P(doom) estimates, timeline predictions,
+    and research priorities.
+  relatedEntries:
+    - id: epistemic-health
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: racing-intensity
+      type: ai-transition-model-parameter
+      relationship: measures
+  tags:
+    - experts
+    - surveys
+    - forecasts
+  lastUpdated: 2025-12
+- id: economic-labor
+  type: ai-transition-model-metric
+  title: Economic & Labor
+  description: Metrics tracking AI's economic impact including investment levels, automation rates,
+    job displacement, and productivity effects.
+  relatedEntries:
+    - id: economic-stability
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: human-expertise
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: human-agency
+      type: ai-transition-model-parameter
+      relationship: measures
+  tags:
+    - economics
+    - labor
+    - automation
+  lastUpdated: 2025-12
+- id: capabilities
+  type: ai-transition-model-metric
+  title: AI Capabilities
+  description: Metrics tracking AI capability development including benchmark performance, task
+    completion, and capability trajectories.
+  relatedEntries:
+    - id: safety-capability-gap
+      type: ai-transition-model-parameter
+      relationship: measures
+  tags:
+    - capabilities
+    - benchmarks
+    - progress
+  lastUpdated: 2025-12
+- id: compute-hardware
+  type: ai-transition-model-metric
+  title: Compute & Hardware
+  description: Metrics tracking compute trends including GPU production, training compute, efficiency
+    improvements, and compute access distribution.
+  relatedEntries:
+    - id: ai-control-concentration
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: racing-intensity
+      type: ai-transition-model-parameter
+      relationship: measures
+  tags:
+    - compute
+    - hardware
+    - infrastructure
+  lastUpdated: 2025-12
+- id: geopolitics
+  type: ai-transition-model-metric
+  title: Geopolitics
+  description: Metrics tracking international AI dynamics including US-China relations, talent flows,
+    export controls, and coordination efforts.
+  relatedEntries:
+    - id: international-coordination
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: coordination-capacity
+      type: ai-transition-model-parameter
+      relationship: measures
+  tags:
+    - international
+    - geopolitics
+    - coordination
+  lastUpdated: 2025-12
+- id: structural
+  type: ai-transition-model-metric
+  title: Structural Indicators
+  description: Metrics tracking structural societal factors including information quality,
+    institutional capacity, and system resilience.
+  relatedEntries:
+    - id: epistemic-health
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: societal-trust
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: institutional-quality
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: societal-resilience
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: regulatory-capacity
+      type: ai-transition-model-parameter
+      relationship: measures
+    - id: information-authenticity
+      type: ai-transition-model-parameter
+      relationship: measures
+  tags:
+    - structural
+    - institutions
+    - resilience
+  lastUpdated: 2025-12

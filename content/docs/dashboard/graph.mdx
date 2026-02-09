@@ -1,0 +1,93 @@
+---
+title: "Entity Relationship Graph"
+description: "Interactive visualization of entity connections in the knowledge base"
+sidebar:
+  label: "Entity Graph"
+  order: 101
+importance: 5
+quality: 18
+llmSummary: "Interactive network visualization tool showing entity relationships in the knowledge base, with basic graph analysis (cluster detection, connection counts, orphan identification). Purely infrastructure for navigation - no substantive content on AI safety."
+tableOfContents: false
+fullWidth: true
+ratings:
+  novelty: 1
+  rigor: 2
+  actionability: 2
+  completeness: 4
+metrics:
+  wordCount: 188
+  citations: 0
+  tables: 1
+  diagrams: 0
+---
+import { EntityGraph } from '@components/wiki';
+import { findOrphans, detectClusters, getMostConnected } from '@lib/graph-analysis';
+import FullWidthLayout from '@components/FullWidthLayout';
+
+<FullWidthLayout />
+
+export const orphans = findOrphans();
+export const clusters = detectClusters();
+export const topConnected = getMostConnected(10);
+
+This interactive graph shows the relationships between entities in the knowledge base. Nodes are color-coded by entity type, and edges represent relationships defined in the entity data.
+
+## How to Use
+
+- **Pan**: Click and drag on the background
+- **Zoom**: Scroll or pinch
+- **Select**: Click on a node to see details
+- **Move nodes**: Drag individual nodes to rearrange
+
+<EntityGraph client:load height="700px" maxNodes={150} />
+
+---
+
+## Graph Analysis
+
+### Most Connected Entities
+
+These entities have the most relationships:
+
+| Entity | Connections |
+|--------|-------------|
+{topConnected.map(e => `| ${e.title} | ${e.connections} |`).join('\n')}
+
+### Clusters Detected
+
+The graph has {clusters.length} clusters (groups of interconnected entities):
+
+{clusters.slice(0, 8).map(c => (
+  <div key={c.id} className="mb-2">
+    <strong>Cluster around {c.centralNode}</strong>: {c.size} entities
+  </div>
+))}
+
+### Orphaned Entities
+
+{orphans.length === 0 ? (
+  <p className="text-green-600">✓ No orphaned entities</p>
+) : (
+  <details>
+    <summary>{orphans.length} entities have no connections</summary>
+    <ul className="mt-2">
+      {orphans.slice(0, 20).map(id => (
+        <li key={id}>{id}</li>
+      ))}
+      {orphans.length > 20 && <li>...and {orphans.length - 20} more</li>}
+    </ul>
+  </details>
+)}
+
+---
+
+## About This Visualization
+
+The graph uses **label propagation** for cluster detection, which groups entities that have strong interconnections. The **centrality** metric (number of connections) helps identify key hub entities.
+
+Entity types use consistent colors:
+- 🔴 **Red**: Risks (outcomes, pathways, amplifiers)
+- 🟢 **Green**: Safety agendas and interventions
+- 🔵 **Blue**: Policies and organizations
+- 🟣 **Purple**: Capabilities and concepts
+- 🟠 **Amber**: Models

@@ -1,0 +1,338 @@
+---
+title: Kalshi
+description: First CFTC-regulated US prediction market exchange for trading event contracts on politics, economics, sports, and other real-world outcomes
+importance: 15
+lastEdited: "2026-02-01"
+sidebar:
+  order: 50
+ratings:
+  novelty: 2
+  rigor: 4
+  actionability: 1
+  completeness: 3
+quality: 25
+llmSummary: This is a comprehensive corporate profile of Kalshi, a US prediction market platform that offers some AI safety-related contracts but is primarily focused on sports, politics, and economics. The AI safety relevance is minimal, limited to a few markets on AI research pauses and regulation that show low probability assignments.
+metrics:
+  wordCount: 3302
+  citations: 87
+  tables: 3
+  diagrams: 0
+clusters:
+  - epistemics
+  - community
+subcategory: epistemic-orgs
+---
+import {EntityLink, Backlinks, KeyPeople, KeyQuestions, Section} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|-----------|
+| **Type** | Regulated prediction market exchange |
+| **Founded** | 2018 |
+| **Regulatory Status** | First CFTC-licensed designated contract market (DCM) for event contracts (approved November 2020) |
+| **Trading Volume** | \$40-50 billion annualized (as of late 2025); \$6.38 billion in December 2025 alone |
+| **Valuation** | \$11 billion (Series E, December 2025) |
+| **Key Markets** | Politics, sports, economics, climate, finance, culture, technology |
+| **Revenue Model** | Transaction fees on expected contract earnings (0.07%-7% on takers only) |
+| **Major Investors** | Paradigm, Sequoia, Andreessen Horowitz, CapitalG, Y Combinator |
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [kalshi.com](https://kalshi.com) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Kalshi) |
+| Wikidata | [wikidata.org](https://www.wikidata.org/wiki/Q114586938) |
+
+
+## Overview
+
+Kalshi is the first federally regulated prediction market exchange in the United States, allowing users to trade binary yes/no contracts on real-world event outcomes.[^1] Founded in 2018 by MIT graduates Tarek Mansour (CEO) and Luana Lopes Lara (COO), Kalshi operates as a peer-to-peer marketplace using a central limit order book (CLOB), distinguishing itself from traditional sportsbooks by enabling users to trade against each other rather than against the house.[^2]
+
+The platform's mission is to democratize finance by enabling everyday users to capitalize on their opinions, hedge personal risks, and trade on events that matter to them.[^3] Kalshi positions itself as a neutral platform generating predictive data without staking on outcomes, aiming to create accurate, efficient markets for a wide range of event categories including inflation, Federal Reserve decisions, unemployment, elections, sports outcomes, climate events, and cultural trends.[^4]
+
+After obtaining CFTC approval in November 2020, Kalshi officially launched trading in July 2021.[^5] The platform experienced explosive growth in 2024-2025, particularly after a landmark federal court victory in September 2024 that allowed it to offer election contracts, overcoming CFTC objections.[^6] By late 2025, Kalshi had achieved a \$11 billion valuation following a \$1 billion Series E funding round, with trading volumes exceeding \$1 billion weekly and millions of users across 140+ countries.[^7]
+
+## History and Development
+
+### Founding Story
+
+Tarek Mansour and Luana Lopes Lara met as international undergraduate students at MIT, where they studied computer science, mathematics, and electrical engineering.[^8] Their shared interest in financial markets history led them to collaborate on classes, papers, and projects, and they completed internships together at firms including Goldman Sachs, Palantir, Five Rings Capital, and Citadel.[^9] Mansour had a brief stint as a quantitative trader at Citadel after graduation (May 2018 to May 2019) before leaving to co-found Kalshi.[^10]
+
+The founders were motivated by gaps they identified in financial markets for hedging event outcomes like elections or policy decisions, particularly after observing market shocks following events like Brexit.[^11] Unlike typical startups, Kalshi's early years focused intensively on regulatory compliance, requiring the team to build exchange, broker, and surveillance systems before acquiring any users.[^12]
+
+### Key Milestones
+
+- **2018**: Company founded (initially under the name "Kownig"); Mansour leaves Citadel after five months to co-found[^13]
+- **2019**: Joined Y Combinator Winter batch; began multi-year regulatory push with CFTC[^14]
+- **November 2020**: CFTC approves Kalshi as first designated contract market (DCM) for event contracts[^15]
+- **July 2021**: Official platform launch enabling trades on economic events[^16]
+- **August 2022**: CFTC begins examining political event contracts proposal[^17]
+- **September 2023**: CFTC rejects political contracts, citing gambling risks[^18]
+- **November 2023**: Kalshi sues CFTC for regulatory overreach[^19]
+- **September 2024**: Federal court rules unanimously in Kalshi's favor, allowing election contracts to resume[^20]
+- **November 2024**: Robinhood launches prediction hub on Kalshi infrastructure[^21]
+- **2025**: Rapid expansion with sports betting launch generating over \$1 billion traded in first five months[^22]
+
+### Funding and Growth
+
+Kalshi has raised over \$1.5 billion across nine funding rounds, achieving remarkable valuation growth in a short period:[^23]
+
+- **March 2020**: \$6.1 million seed round[^24]
+- **December 2020**: \$30 million Series A at \$120 million valuation[^25]
+- **June 2025**: \$60 million Series B[^26]
+- **June 2025**: \$125 million Series C[^27]
+- **October 2025**: \$300 million Series D at \$5 billion valuation, led by Sequoia Capital and Andreessen Horowitz[^28]
+- **December 2025**: \$1 billion Series E at \$11 billion valuation, led by Paradigm with participation from Sequoia, Andreessen Horowitz, Meritech Capital, IVP, ARK Invest, Anthos Capital, CapitalG, and Y Combinator[^29]
+
+This represents a remarkable 5.5x valuation increase in just six months from Series D to Series E.[^30]
+
+## Platform Operations
+
+### How Event Contracts Work
+
+Kalshi offers binary yes/no contracts on verifiable real-world events.[^31] Contract prices reflect market-determined probabilities: a "Yes" contract trading at \$0.30 represents a 30% implied probability, and pays out \$1 if the event occurs.[^32] Users can take either side of any contract, enabling both speculation on beliefs and hedging against risks.
+
+The platform operates using a central limit order book (CLOB) where users place limit and market orders, with market makers providing liquidity.[^33] Unlike traditional <EntityLink id="prediction-markets">prediction markets</EntityLink> or sportsbooks, Kalshi doesn't take positions against users but facilitates peer-to-peer trading.[^34]
+
+### Fee Structure and Revenue Model
+
+Kalshi generates revenue through transaction fees charged on the expected earnings of contracts.[^35] The platform uses a maker-taker fee structure where makers (those posting orders to the book) pay no fees, while takers (those accepting existing orders) pay fees ranging from 0.07% to 7% depending on the contract.[^36] This structure is designed to incentivize liquidity provision while remaining competitive with traditional sportsbook vigorish.
+
+The company also has significant potential for data monetization, with real-time sentiment data valued at over \$50,000 annually by institutional clients, who view prediction market prices as superior to traditional polling for forecasting.[^37]
+
+### Market Categories and Scale
+
+As of late 2025, Kalshi offers one of the largest USD trading catalogs across multiple categories:[^38]
+
+- **Politics**: Election outcomes, legislative actions, policy decisions
+- **Sports**: NFL, NBA, MLB, NHL, college sports, including prop bets and parlays ("combos")
+- **Economics**: Inflation rates, Federal Reserve decisions, unemployment figures, GDP growth
+- **Climate**: Temperature records, extreme weather events, climate policy
+- **Finance & Crypto**: Market indices, cryptocurrency prices, financial regulations
+- **Culture**: Entertainment awards, pop culture events, Time Person of the Year
+- **Technology & Science**: Research breakthroughs, product launches, AI developments
+
+The platform processes millions of transactions weekly across thousands of active markets.[^39] Sports betting emerged as the dominant category in 2024-2025, accounting for approximately 90% of trading volume by December 2025.[^40]
+
+## Strategic Partnerships
+
+Kalshi has developed partnerships across sports, data, finance, and media sectors to expand its reach and enhance data quality:
+
+### Sports Partnerships
+
+**NHL Agreement**: In 2025, Kalshi announced a multiyear partnership with the National Hockey League, providing access to official NHL proprietary data and rights to use NHL marks and logos.[^41] The agreement includes brand exposure via Digitally Enhanced Dasherboards and virtual signage during national broadcasts, including regular season games, Stanley Cup Playoffs, NHL Winter Classic, and NHL Stadium Series.[^42]
+
+**Chicago Blackhawks**: Kalshi secured a groundbreaking partnership with the Chicago Blackhawks, marking the first brand partnership between a North American sports team and a prediction market.[^43] The agreement, beginning during the Blackhawks' Centennial season, includes IP and marks sharing for co-marketing, social media engagement, Kalshi signage at United Center, and integration into Blackhawks broadcasts in the Chicago market.[^44]
+
+### Data and Technology Partnerships
+
+**STATSCORE**: A three-year strategic partnership provides Kalshi with premium sports data integration, enhancing sports contracts with high-resolution live data and analytics for football, tennis, basketball, ice hockey, baseball, Formula 1, and American football.[^45]
+
+**StockX**: Announced in November 2025, this partnership enables Kalshi to power event contracts using aggregated, anonymized StockX market data for high-demand sneakers, apparel, accessories, and collectibles from brands like Jordan, Nike, Supreme, and LEGO.[^46]
+
+**Barchart**: Formally announced in November 2025, this partnership integrates Kalshi prediction market data feeds into Barchart's platform, providing 32 million investors and traders and 1,000+ institutional clients with access to electoral outcomes and economic indicator forecasts.[^47]
+
+**Coinbase Custody**: Partnership for USDC-powered event trading, providing institutional-grade protection and stability.[^48]
+
+### Financial Platform Integrations
+
+**Robinhood Integration**: Launched in November 2024, the Robinhood prediction hub built on Kalshi infrastructure proved highly advantageous, reportedly accounting for over half of Kalshi's betting volume and granting access to millions of retail traders.[^49]
+
+**Additional Integrations**: In late 2025, Kalshi announced integration with the TRON network, the Phantom crypto wallet, and will serve as the in-house prediction market for Coinbase.[^50]
+
+### Media Partnerships
+
+**CNN**: Launched integration of Kalshi data across programming with a real-time news ticker in late 2025.[^51]
+
+**CNBC**: Announced a 2026 partnership to incorporate real-time prediction data into editorial coverage across TV, digital, and subscription channels.[^52]
+
+## AI Safety Markets
+
+While Kalshi is primarily a general prediction market platform, it hosts several markets directly related to AI safety, alignment, and existential risk. These markets allow traders to express views on AI research pauses and regulation:[^53]
+
+- **AI Research Pause Market (KXAI PAUSE-27)**: Resolves YES if xAI, DeepMind, <EntityLink id="anthropic">Anthropic</EntityLink>, or <EntityLink id="openai">OpenAI</EntityLink> pauses AI research training/development for safety reasons before January 1, 2027. As of the latest data, the market assigns a 12% probability to any major AI company pausing research for safety before 2027.[^54]
+
+- **AI Regulation Markets**: Kalshi offers contracts on whether AI regulation will become federal law, including KXAI LEGISLATION-27, which resolves YES if a bill regulating AI becomes law by January 1, 2027, verified via the Library of Congress, imposing restrictions like compute limits, transparency requirements, or mandatory safety testing.[^55]
+
+The relatively low probability (12%) assigned to AI safety pauses suggests trader skepticism about imminent research halts by major AI labs.[^56]
+
+## Market Competition
+
+Kalshi and <EntityLink id="polymarket">Polymarket</EntityLink> have created what analysts describe as a duopoly in the prediction market space, collectively amassing over \$44 billion in trading volume during 2025.[^57] While Polymarket operates using cryptocurrency and has faced restrictions on US users, Kalshi distinguishes itself through federal regulatory approval and direct USD trading.[^58]
+
+By mid-January 2026, combined volumes for the two platforms totaled nearly \$4 billion, with Saturday, January 17 marking a new daily record of \$799 million across both platforms.[^59] Kalshi's competitive advantages include its legal clarity for US users, segregated customer funds with deposit insurance, and institutional partnerships enabling greater mainstream adoption.[^60]
+
+## Regulatory Challenges and Legal Disputes
+
+Despite achieving CFTC approval, Kalshi faces significant regulatory challenges from state gaming authorities and tribal gaming commissions who argue that event contracts, particularly sports betting markets, fall under state gambling jurisdiction rather than federal commodity futures regulation.
+
+### State Gaming Authority Challenges
+
+The New York State Gaming Commission issued Kalshi a cease and desist letter, claiming the company offers sports betting without a state license.[^61] Similarly, a federal judge ruled that Kalshi must stop offering prediction contracts in Nevada, with the Nevada Gaming Control Board stating the company was operating "unlawfully."[^62] Nearly two dozen states and tribal gaming authorities have filed federal lawsuits seeking to block Kalshi from offering sports wagering contracts in their jurisdictions.[^63]
+
+### Jurisdictional Arguments
+
+Kalshi maintains it is a federally regulated trading platform under exclusive CFTC jurisdiction, not a gambling operation subject to state regulation.[^64] However, US District Judge Andrew Gordon ruled that event contracts based on sporting outcomes "do not fall within the CFTC's exclusive jurisdiction."[^65] This creates ongoing legal uncertainty about which events Kalshi can offer contracts on and in which jurisdictions.
+
+### Tribal Gaming Opposition
+
+Native American gaming tribes have filed legal briefs opposing Kalshi, characterizing its activities as "brazenly illegal" and arguing that gaming is "not merely a 'commercial' endeavor, but an existential one" for tribes who rely on gaming revenue for economic survival.[^66]
+
+### Class Action Litigation
+
+In 2025, Kalshi faced a class action lawsuit claiming that the platform's market makers place customers at a disadvantage, though Kalshi contends these charges are meritless.[^67] A separate New York class action lawsuit alleges illegal sports betting and deceptive practices, which Kalshi's COO Luana Lopes Lara called "baseless."[^68]
+
+## Operational and Safety Concerns
+
+### Market Grading Errors
+
+Kalshi has faced criticism for operational failures in market resolution. The platform incorrectly graded multiple NFL win totals markets, affecting numerous traders.[^69] The company's response—refunding original trade amounts without paying out winnings to winners—drew criticism as both an operational failure and a public relations misstep.[^70]
+
+### Consumer Protection Issues
+
+Critics have raised several safety and consumer protection concerns:[^71]
+
+**Inadequate Age Verification**: While Kalshi advertises as legal for users 18+, consumer reports indicate the platform has minimal age verification mechanisms, potentially allowing underage users to access the platform through family members or friends.[^72]
+
+**Insufficient Responsible Gambling Measures**: The platform has been characterized as showing "disregard for responsible gambling," with no prominent messaging or resources for users experiencing gambling problems.[^73] The peer-to-peer trading format and complex derivatives-style contract rules can create disadvantages for beginners unfamiliar with this type of trading.[^74]
+
+**Habit-Forming Design**: Critics argue Kalshi is designed as a habit-forming product that triggers dopamine release, similar to traditional gambling apps, raising concerns about potential addiction.[^75]
+
+**Deceptive Marketing**: Some consumer advocates argue Kalshi employs deceptive marketing slogans that misrepresent the platform's nature and safety profile.[^76]
+
+### Insider Trading Concerns
+
+Prediction markets generally have faced scrutiny following instances where traders profited significantly using confidential information.[^77] A notable example involved a \$30,000 bet on Venezuelan leader Nicolás Maduro's capture on Polymarket that yielded \$436,760 in profits, with the account holders remaining unidentified.[^78] While Kalshi's CEO claims the company bans insider trading, such violations do not currently carry criminal penalties on regulated platforms, raising questions about enforcement effectiveness.[^79]
+
+## Reception in EA and Forecasting Communities
+
+Kalshi receives generally positive but cautious discussion in Effective Altruism (EA) Forum communities, with recognition of its legal milestones and forecasting potential, though concerns exist about attention costs, market maturity, and limited coverage of social impact questions.[^80]
+
+### Positive Reception
+
+EA Forum users acknowledge Kalshi's superior forecasting accuracy compared to traditional polling, noting that markets like CPI futures outperform other forecasting methods.[^81] The platform's legal status following its October 2024 victory against CFTC regulators is seen as opening new possibilities for real-money forecasting on important questions.[^82]
+
+EA Forum members have chatted with Kalshi founders and considered launching similar platforms for impactful forecasting, though they paused these efforts after Kalshi secured CFTC approval.[^83]
+
+### Concerns and Limitations
+
+**Attention Externalities**: In charity-oriented prediction markets, active trading demands constant vigilance, which is problematic for altruistically minded traders in the EA community who would prefer to allocate attention elsewhere.[^84]
+
+**Immature Technology**: Users note clunky UX and chicken-and-egg adoption issues, with the platform not yet streamlined for corporate or organizational workflows.[^85]
+
+**Limited Scope for EA Priorities**: Kalshi may not cover many social impact questions relevant to EA priorities, reducing its utility for the community despite enabling legal real-money forecasts.[^86]
+
+**Black Swan Events**: Referencing work by Nassim Taleb and <EntityLink id="philip-tetlock">Philip Tetlock</EntityLink>, EA Forum discussions note that prediction markets systematically fail on fat-tailed, improbable events like revolutions or other discontinuous changes.[^87]
+
+## Key Uncertainties
+
+Several major uncertainties surround Kalshi's future trajectory:
+
+1. **Regulatory Resolution**: Will courts ultimately side with Kalshi's position that it operates under exclusive CFTC jurisdiction, or will states successfully assert gambling law authority over event contracts? The outcome will determine which markets Kalshi can offer and in which jurisdictions.
+
+2. **Sports Market Sustainability**: With sports betting accounting for 90% of volume by late 2025, can Kalshi maintain growth if state lawsuits successfully restrict sports contracts? What alternative high-volume markets could fill this gap?
+
+3. **Market Manipulation and Integrity**: As volumes grow, can Kalshi effectively prevent insider trading and market manipulation without criminal penalties for violators? Will new legislation or regulation address these concerns?
+
+4. **Institutional Adoption**: Can Kalshi successfully transition from a retail-dominated platform to significant institutional usage for data and hedging, creating sustainable revenue beyond transaction fees?
+
+5. **International Expansion**: With access in 140+ countries but US legal challenges ongoing, should Kalshi prioritize international growth over resolving domestic regulatory issues?
+
+6. **Competition from Traditional Finance**: Will established exchanges or financial institutions launch competing CFTC-regulated event contract platforms, eroding Kalshi's first-mover advantage?
+
+7. **Public Perception**: As prediction markets become more mainstream, will they be broadly accepted as legitimate forecasting tools, or will gambling associations limit adoption and invite stricter regulation?
+
+## Sources
+
+[^1]: [About Kalshi](https://kalshi.com/about)
+[^2]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^3]: [About Kalshi](https://kalshi.com/about)
+[^4]: [What is Kalshi? - Kalshi 101](https://help.kalshi.com/kalshi-101/what-is-kalshi)
+[^5]: [Sigma World: From Launch to Lawsuits - Kalshi's Tumultuous Timeline](https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/)
+[^6]: [Sigma World: From Launch to Lawsuits - Kalshi's Tumultuous Timeline](https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/)
+[^7]: [Kalshi Announces \$11 Billion Valuation and Series E Funding](https://news.kalshi.com/p/kalshi-11-billion-valuation-series-e)
+[^8]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^9]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^10]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^11]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^12]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^13]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^14]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^15]: [Sigma World: From Launch to Lawsuits - Kalshi's Tumultuous Timeline](https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/)
+[^16]: [Sigma World: From Launch to Lawsuits - Kalshi's Tumultuous Timeline](https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/)
+[^17]: [Sigma World: From Launch to Lawsuits - Kalshi's Tumultuous Timeline](https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/)
+[^18]: [Sigma World: From Launch to Lawsuits - Kalshi's Tumultuous Timeline](https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/)
+[^19]: [Sigma World: From Launch to Lawsuits - Kalshi's Tumultuous Timeline](https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/)
+[^20]: [Sigma World: From Launch to Lawsuits - Kalshi's Tumultuous Timeline](https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/)
+[^21]: [Sigma World: From Launch to Lawsuits - Kalshi's Tumultuous Timeline](https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/)
+[^22]: [ESPN: Kalshi and Prediction Markets in Sports Betting](https://www.espn.com/espn/betting/story/_/id/45377686/kalshi-prediction-markets-disrupt-sports-betting)
+[^23]: [CB Insights: Kalshi Financials](https://www.cbinsights.com/company/kalshi/financials)
+[^24]: [Nasdaq Private Market: Kalshi](https://www.nasdaqprivatemarket.com/company/kalshi/)
+[^25]: [CB Insights: Kalshi Financials](https://www.cbinsights.com/company/kalshi/financials)
+[^26]: [Nasdaq Private Market: Kalshi](https://www.nasdaqprivatemarket.com/company/kalshi/)
+[^27]: [Nasdaq Private Market: Kalshi](https://www.nasdaqprivatemarket.com/company/kalshi/)
+[^28]: [EquityZen: Kalshi](https://equityzen.com/company/kalshi/)
+[^29]: [Kalshi Announces \$11 Billion Valuation and Series E Funding](https://news.kalshi.com/p/kalshi-11-billion-valuation-series-e)
+[^30]: [SignalHub: Turning \$150K into \$700M in 6 Years](https://signalhub.substack.com/p/turning-150k-into-700m-in-6-years)
+[^31]: [How Prediction Markets Work](https://news.kalshi.com/p/how-prediction-markets-work)
+[^32]: [How Prediction Markets Work](https://news.kalshi.com/p/how-prediction-markets-work)
+[^33]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^34]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^35]: [How Does Kalshi Make Money?](https://help.kalshi.com/kalshi-101/how-does-kalshi-make-money)
+[^36]: [Sacra: Kalshi Analysis](https://sacra.com/c/kalshi/)
+[^37]: [Sacra: Kalshi Analysis](https://sacra.com/c/kalshi/)
+[^38]: [Kalshi Homepage](https://kalshi.com)
+[^39]: [Kalshi Announces \$11 Billion Valuation and Series E Funding](https://news.kalshi.com/p/kalshi-11-billion-valuation-series-e)
+[^40]: [National Law Review: Kalshi Posts Record Volumes](https://natlawreview.com/article/kalshi-posts-record-volumes-surging-online-sports-betting-world-enters-new-year)
+[^41]: [NHL Announces Landmark Partnership with Kalshi](https://www.nhl.com/news/nhl-announces-landmark-multiyear-partnerships-with-kalshi-polymarket)
+[^42]: [NHL Announces Landmark Partnership with Kalshi](https://www.nhl.com/news/nhl-announces-landmark-multiyear-partnerships-with-kalshi-polymarket)
+[^43]: [Kalshi and Chicago Blackhawks Partnership](https://news.kalshi.com/p/kalshi-chicago-blackhawks-partnership)
+[^44]: [Kalshi and Chicago Blackhawks Partnership](https://news.kalshi.com/p/kalshi-chicago-blackhawks-partnership)
+[^45]: [STATSCORE and Kalshi Strategic Partnership](https://www.statscore.com/news-center/statscore-news/statscore-and-kalshi-forge-strategic-three-year-partnership-to-elevate-sports-trading/)
+[^46]: [Kalshi and StockX Partnership](https://news.kalshi.com/p/kalshi-stockx-partnership-event-contracts)
+[^47]: [Kalshi and Barchart Partnership](https://news.kalshi.com/p/kalshi-barchart-prediction-market-data-partnership)
+[^48]: [Kalshi Partners with Coinbase Custody](https://news.kalshi.com/p/kalshi-partners-coinbase-custody-usdc)
+[^49]: [Cryptopolitan: Kalshi Starts 2026 Hot After Record 2025](https://www.cryptopolitan.com/kalshi-starts-2026-hot-after-record-2025/)
+[^50]: [National Law Review: Kalshi Posts Record Volumes](https://natlawreview.com/article/kalshi-posts-record-volumes-surging-online-sports-betting-world-enters-new-year)
+[^51]: [Popular.info: The Casino-fication of News](https://popular.info/p/the-casino-fication-of-news)
+[^52]: [Popular.info: The Casino-fication of News](https://popular.info/p/the-casino-fication-of-news)
+[^53]: [Kalshi AI Research Pause Market](https://kalshi.com/markets/kxaipause/ai-research-pause/kxaipause-27)
+[^54]: [Kalshi Science Category](https://kalshi.com/category/science)
+[^55]: [Kalshi AI Regulation Market 2027](https://kalshi.com/markets/kxailegislation/ai-regulation/kxailegislation-27)
+[^56]: [Kalshi Science Category](https://kalshi.com/category/science)
+[^57]: [Cryptopolitan: Kalshi Starts 2026 Hot After Record 2025](https://www.cryptopolitan.com/kalshi-starts-2026-hot-after-record-2025/)
+[^58]: [Contrary Research: Kalshi](https://research.contrary.com/company/kalshi)
+[^59]: [The Street: Prediction Markets Like Kalshi Are Monetizing Reality](https://www.thestreet.com/economy/prediction-markets-like-kalshi-are-monetizing-reality-the-gaming-industry-is-pushing-back)
+[^60]: [About Kalshi](https://kalshi.com/about)
+[^61]: [CBS News: Prediction Markets Kalshi and Polymarket Face Regulation](https://www.cbsnews.com/newyork/news/prediction-markets-kalshi-polymarket-regulation/)
+[^62]: [The Nevada Independent: Federal Judge Rules Kalshi Must Stop in Nevada](https://thenevadaindependent.com/article/federal-judge-rules-that-kalshi-must-stop-offering-prediction-contracts-in-nevada)
+[^63]: [The Nevada Independent: Federal Judge Rules Kalshi Must Stop in Nevada](https://thenevadaindependent.com/article/federal-judge-rules-that-kalshi-must-stop-offering-prediction-contracts-in-nevada)
+[^64]: [CBS News: Prediction Markets Kalshi and Polymarket Face Regulation](https://www.cbsnews.com/newyork/news/prediction-markets-kalshi-polymarket-regulation/)
+[^65]: [The Nevada Independent: Federal Judge Rules Kalshi Must Stop in Nevada](https://thenevadaindependent.com/article/federal-judge-rules-that-kalshi-must-stop-offering-prediction-contracts-in-nevada)
+[^66]: [Next Event Horizon: Why Wasn't Kalshi Paying Traders That Won NFL Futures](https://nexteventhorizon.substack.com/p/why-wasnt-kalshi-paying-traders-that-won-nfl-futures)
+[^67]: [iGaming Business: Class Action Suit Against Kalshi Market Makers](https://igamingbusiness.com/sports-betting/class-action-suit-against-kalshi-market-makers/)
+[^68]: [Wikipedia: Kalshi](https://en.wikipedia.org/wiki/Kalshi)
+[^69]: [Next Event Horizon: Why Wasn't Kalshi Paying Traders That Won NFL Futures](https://nexteventhorizon.substack.com/p/why-wasnt-kalshi-paying-traders-that-won-nfl-futures)
+[^70]: [Next Event Horizon: Why Wasn't Kalshi Paying Traders That Won NFL Futures](https://nexteventhorizon.substack.com/p/why-wasnt-kalshi-paying-traders-that-won-nfl-futures)
+[^71]: [Gambling Harm: Is Kalshi Just Gambling? Risks, Legality and Safety Explained](https://gamblingharm.org/is-kalshi-just-gambling-risks-legality-and-safety-explained/)
+[^72]: [Gambling Harm: Is Kalshi Just Gambling? Risks, Legality and Safety Explained](https://gamblingharm.org/is-kalshi-just-gambling-risks-legality-and-safety-explained/)
+[^73]: [Gambling Harm: Is Kalshi Just Gambling? Risks, Legality and Safety Explained](https://gamblingharm.org/is-kalshi-just-gambling-risks-legality-and-safety-explained/)
+[^74]: [Gambling Harm: Is Kalshi Just Gambling? Risks, Legality and Safety Explained](https://gamblingharm.org/is-kalshi-just-gambling-risks-legality-and-safety-explained/)
+[^75]: [Gambling Harm: Is Kalshi Just Gambling? Risks, Legality and Safety Explained](https://gamblingharm.org/is-kalshi-just-gambling-risks-legality-and-safety-explained/)
+[^76]: [Gambling Harm: Is Kalshi Just Gambling? Risks, Legality and Safety Explained](https://gamblingharm.org/is-kalshi-just-gambling-risks-legality-and-safety-explained/)
+[^77]: [Axios: Kalshi and Inside Trading](https://www.axios.com/2026/01/07/kalshi-inside-trading-tarek-mansour)
+[^78]: [Axios: Kalshi and Inside Trading](https://www.axios.com/2026/01/07/kalshi-inside-trading-tarek-mansour)
+[^79]: [Axios: Kalshi and Inside Trading](https://www.axios.com/2026/01/07/kalshi-inside-trading-tarek-mansour)
+[^80]: [EA Forum: Prediction Markets in the Corporate Setting](https://forum.effectivealtruism.org/posts/dQhjwHA7LhfE8YpYF/prediction-markets-in-the-corporate-setting)
+[^81]: [Kalshi News: Harnessing the Power of Prediction Markets](https://news.kalshi.com/p/harnessing-the-power-of-prediction-markets)
+[^82]: [How Prediction Markets Work](https://news.kalshi.com/p/how-prediction-markets-work)
+[^83]: [EA Forum: Prediction Markets in the Corporate Setting](https://forum.effectivealtruism.org/posts/dQhjwHA7LhfE8YpYF/prediction-markets-in-the-corporate-setting)
+[^84]: [EA Forum: Predicting for Good - Charity Prediction Markets](https://forum.effectivealtruism.org/posts/mbBfFHKEDBTwTSSJX/predicting-for-good-charity-prediction-markets)
+[^85]: [EA Forum: Prediction Markets in the Corporate Setting](https://forum.effectivealtruism.org/posts/dQhjwHA7LhfE8YpYF/prediction-markets-in-the-corporate-setting)
+[^86]: [EA Forum: Prediction Markets in the Corporate Setting](https://forum.effectivealtruism.org/posts/dQhjwHA7LhfE8YpYF/prediction-markets-in-the-corporate-setting)
+[^87]: [Kalshi News: Harnessing the Power of Prediction Markets](https://news.kalshi.com/p/harnessing-the-power-of-prediction-markets)
+
+<Backlinks />

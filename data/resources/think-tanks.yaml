@@ -1,0 +1,2172 @@
+# Think Tanks
+# Policy research and think tank publications
+# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
+
+- id: 9b47bf8077fd8b05
+  url: https://www.atlanticcouncil.org/programs/digital-forensic-research-lab/
+  title: Atlantic Council DFRLab
+  type: web
+  local_filename: 9b47bf8077fd8b05.txt
+  summary: The Atlantic Council's DFRLab is a research organization focused on exposing digital
+    threats, disinformation, and protecting democratic institutions through open-source
+    investigations.
+  review: The Digital Forensic Research Lab represents an innovative approach to combating digital
+    misinformation and protecting democratic processes in an increasingly complex information
+    landscape. By leveraging technical expertise and regional knowledge, the organization has
+    conducted over 1,000 investigations targeting influence operations and emerging digital threats
+    worldwide. The lab's key strength lies in its multifaceted approach, combining technical
+    analysis, policy expertise, and cross-regional perspectives to track and expose disinformation
+    campaigns. Their work spans various domains including geopolitical conflicts, technological
+    manipulation, and digital rights, with notable projects like the Pravda Network investigation
+    and the Foreign Interference Attribution Tracker demonstrating their commitment to transparency
+    and objective truth in digital spaces.
+  key_points:
+    - Conducts open-source investigations to expose disinformation and digital threats
+    - Promotes digital resilience and defends democratic institutions
+    - Focuses on tracking influence operations across global digital platforms
+  cited_by:
+    - authoritarian-tools
+    - disinformation
+  fetched_at: 2025-12-28 02:55:50
+  tags:
+    - open-source
+    - authoritarianism
+    - human-rights
+    - digital-repression
+    - disinformation
+  publication_id: atlantic-council
+- id: 6bc173150aa95d83
+  url: https://www.brookings.edu/topic/artificial-intelligence/
+  title: "Brookings: AI Competition"
+  type: web
+  cited_by:
+    - international-coordination-game
+    - cyber-psychosis
+  publication_id: brookings
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+    - mental-health
+    - ai-ethics
+- id: 5c432b614a62a18c
+  url: https://www.brookings.edu/articles/how-to-prevent-a-winner-take-most-outcome-for-the-u-s-ai-economy/
+  title: "Brookings: Winner-Take-Most AI Economy"
+  type: web
+  local_filename: 5c432b614a62a18c.txt
+  fetched_at: 2025-12-28 03:45:17
+  publication_id: brookings
+- id: 19dfec2f79bfade6
+  url: https://www.brookings.edu/topic/technology/
+  title: brookings.edu
+  type: web
+  local_filename: 19dfec2f79bfade6.txt
+  summary: Brookings Institution provides commentary on AI policy, international cooperation, and
+    global economic development. Explores potential challenges and implications of technological and
+    geopolitical shifts.
+  review: The source appears to be a collection of institutional perspectives on emerging global
+    trends, with particular focus on artificial intelligence policy and international cooperation.
+    The content suggests an ongoing exploration of how technological developments, especially AI,
+    are reshaping global economic and diplomatic landscapes. The Brookings Institution, a respected
+    think tank, provides nuanced analysis through multiple lenses, including articles by experts
+    like John Villasenor examining proposed AI legislation such as the GAIN AI Act. The material
+    indicates a critical approach to understanding potential policy implications, suggesting that
+    current legislative proposals might inadvertently compromise US technological leadership rather
+    than enhance it.
+  key_points:
+    - Examining international cooperation and multilateralism in a changing global order
+    - Critical analysis of proposed AI legislation and its potential economic impacts
+    - Interdisciplinary approach to understanding technological and geopolitical shifts
+  fetched_at: 2025-12-28 02:56:02
+  publication_id: brookings
+  tags:
+    - governance
+    - economic
+- id: 087288a8d8338b97
+  url: https://carnegieendowment.org/research/2024/12/can-democracy-survive-the-disruptive-power-of-ai?lang=en
+  title: Carnegie Endowment - Can Democracy Survive the Disruptive Power of AI?
+  type: web
+  local_filename: 087288a8d8338b97.txt
+  summary: The article explores how advanced AI technologies can destabilize democratic systems by
+    enabling rapid creation of synthetic content and foreign interference. It examines the risks of
+    AI-generated misinformation and proposes multi-stakeholder strategies to mitigate these
+    challenges.
+  review: Carnegie Endowment's analysis provides a comprehensive examination of the emerging threats
+    posed by generative AI to democratic institutions. The core argument centers on how AI
+    technologies, particularly large language models and image generation tools, can be weaponized
+    to create sophisticated misinformation, manipulate electoral processes, and undermine public
+    trust. By enabling malicious actors to produce highly convincing synthetic content at
+    unprecedented speed and scale, these technologies challenge the fundamental information
+    integrity that democracies rely upon. The report highlights multiple dimensions of this
+    challenge, from AI-generated deepfakes in political campaigns to the potential for foreign
+    interference and digital authoritarianism. While acknowledging the innovative potential of AI,
+    the authors emphasize the urgent need for a multi-faceted response involving technological
+    solutions, regulatory frameworks, and public education. Key recommendations include content
+    watermarking, platform accountability, digital literacy programs, and international cooperation
+    to develop harmonized standards for detecting and mitigating AI-generated disinformation. The
+    analysis serves as a critical wake-up call for policymakers, tech companies, and citizens about
+    the profound epistemic risks emerging technologies pose to democratic discourse.
+  key_points:
+    - Generative AI enables rapid creation of convincing synthetic content that can manipulate
+      public perception
+    - Political campaigns and foreign actors are already using AI to generate deepfakes and spread
+      misinformation
+    - Comprehensive strategies involving technology, regulation, and education are crucial to
+      mitigate risks
+  cited_by:
+    - geopolitics
+    - deliberation
+  fetched_at: 2025-12-28 02:03:31
+  publication_id: carnegie
+  tags:
+    - democratic-innovation
+    - collective-intelligence
+    - governance
+- id: a47fc1f55a980a29
+  url: https://carnegieendowment.org/
+  title: "Carnegie Endowment: AI Governance Arms Race"
+  type: web
+  fetched_at: 2025-12-28 03:44:24
+  publication_id: carnegie
+  tags:
+    - governance
+- id: 494902be4f16a999
+  url: https://www.rand.org/pubs/perspectives/PEA3851-1.html
+  title: Cloud laboratories
+  type: web
+  cited_by:
+    - bioweapons
+  publication_id: rand
+  tags:
+    - economic
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: 2b6675e423040e53
+  url: https://www.cnas.org/publications/reports/ai-and-the-evolution-of-biological-national-security-risks
+  title: CNAS report
+  type: web
+  cited_by:
+    - misuse-risks
+    - bioweapons
+  publication_id: cnas
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: 52a5d83da76f42db
+  url: https://cset.georgetown.edu/article/the-ai-competition-with-china/
+  title: CSET Georgetown - The AI Competition with China
+  type: web
+  local_filename: 52a5d83da76f42db.txt
+  summary: Examines the AI technological and strategic competition between the United States and
+    China, focusing on diplomatic strategies and potential risks in AI development.
+  review: >-
+    Sam Bresnick from CSET provides a nuanced exploration of the AI competition between the United
+    States and China, highlighting the complex geopolitical dynamics surrounding technological
+    advancement. The work emphasizes how both nations are positioning themselves to develop and
+    leverage AI capabilities, particularly in military and strategic domains, while also considering
+    the potential diplomatic strategies to mitigate dangerous outcomes.
+
+
+    The research contributes to understanding the intricate relationship between technological
+    innovation, national security, and international relations. By analyzing the financial and
+    economic linkages between tech companies and examining their potential roles in conflict
+    scenarios, Bresnick provides insights into how AI development intersects with broader
+    geopolitical strategies. The analysis suggests that the AI competition is not merely about
+    technological superiority, but also about complex interdependencies and potential diplomatic
+    challenges that could emerge as both nations advance their AI capabilities.
+  key_points:
+    - US and China are engaged in a strategic AI development competition
+    - Technology companies play crucial roles in potential conflict scenarios
+    - Diplomatic strategies are essential to manage potential AI-related risks
+  cited_by:
+    - geopolitics
+  fetched_at: 2025-12-28 02:03:25
+  publication_id: cset
+- id: f0d95954b449240a
+  url: https://cset.georgetown.edu/
+  title: "CSET: AI Market Dynamics"
+  type: web
+  local_filename: f0d95954b449240a.txt
+  summary: >-
+    I apologize, but the provided content appears to be a fragmentary collection of references or
+    headlines rather than a substantive document that can be comprehensively analyzed. Without a
+    complete, coherent source text, I cannot generate a meaningful summary or review.
+
+
+    To properly complete the task, I would need:
+
+    1. A full research document or article
+
+    2. Clear contextual content explaining the research's scope, methodology, findings
+
+    3. Sufficient detail to extract meaningful insights
+
+
+    If you have the complete source document, please share it and I'll be happy to provide a
+    thorough analysis following the specified JSON format.
+
+
+    Would you like to:
+
+    - Provide the full source document
+
+    - Clarify the source material
+
+    - Select a different document for analysis
+  cited_by:
+    - misuse-risks
+    - agi-development
+    - ai-risk-portfolio-analysis
+    - autonomous-weapons-escalation
+    - international-coordination-game
+    - intervention-effectiveness-matrix
+    - risk-interaction-matrix
+    - risk-interaction-network
+    - safety-research-allocation
+    - worldview-intervention-mapping
+    - holden-karnofsky
+    - ai-control
+    - coordination-tech
+    - governance-policy
+    - public-education
+    - knowledge-monopoly
+    - disinformation
+    - proliferation
+    - multipolar-competition
+  fetched_at: 2025-12-28 01:06:53
+  publication_id: cset
+  tags:
+    - prioritization
+    - resource-allocation
+    - portfolio
+    - escalation
+    - conflict
+- id: 781fbb3c87403553
+  url: https://www.csis.org/analysis/shaping-global-ai-governance-enhancements-and-next-steps-g7-hiroshima-ai-process
+  title: "CSIS: G7 Hiroshima AI Process"
+  type: web
+  local_filename: 781fbb3c87403553.txt
+  summary: The report examines the G7's emerging approach to AI governance, highlighting potential
+    enhancements for international cooperation on AI development and regulation.
+  review: The CSIS report analyzes the G7 Hiroshima AI Process as a critical mechanism for
+    establishing global AI governance standards. By emphasizing collaborative international
+    frameworks, the study explores how leading democratic nations can coordinate AI policy,
+    technological development, and risk mitigation strategies. The research provides a comprehensive
+    assessment of current AI governance challenges, proposing nuanced recommendations for
+    strengthening multilateral approaches. Key recommendations likely include creating flexible
+    governance mechanisms that can adapt to rapidly evolving AI technologies, ensuring robust risk
+    assessment protocols, and developing shared ethical standards across participating nations. The
+    report's significance lies in its potential to shape future international AI policy by promoting
+    proactive, collaborative regulatory approaches that balance innovation with responsible
+    development.
+  key_points:
+    - G7 nations collaborating on comprehensive AI governance framework
+    - Emphasizes adaptive, multilateral approach to technological regulation
+    - Focuses on balancing innovation with responsible AI development
+  cited_by:
+    - structural
+  fetched_at: 2025-12-28 02:54:46
+  publication_id: csis
+  tags:
+    - governance
+- id: 29ac309acdbb54b4
+  url: https://www.csis.org/analysis/understanding-biden-administrations-updated-export-controls
+  title: "CSIS: Understanding Biden Administration Export Controls"
+  type: web
+  local_filename: 29ac309acdbb54b4.txt
+  summary: >-
+    I apologize, but the provided source does not appear to be a comprehensive document about AI
+    safety. While it seems to reference export controls related to the Biden administration, the
+    text appears to be incomplete or a header/introduction rather than a full research document.
+    Without the full content, I cannot responsibly generate a comprehensive summary.
+
+
+    To properly complete this task, I would need:
+
+    1. The full text of the document
+
+    2. Clear sections discussing the research findings
+
+    3. Methodological details
+
+    4. Conclusions and implications
+
+
+    If you have the complete document, I'm happy to analyze it using the requested JSON format.
+    Otherwise, I cannot fabricate details about a partial or missing source.
+
+
+    Would you like to provide the complete document text?
+  cited_by:
+    - export-controls
+  fetched_at: 2025-12-28 02:03:42
+  publication_id: csis
+  tags:
+    - safety
+- id: 376a24ba14f02ebc
+  url: https://carnegieendowment.org/2019/09/17/global-expansion-of-ai-surveillance-pub-79847
+  title: Global Expansion of AI Surveillance
+  type: web
+  local_filename: 376a24ba14f02ebc.txt
+  summary: A comprehensive study reveals the widespread adoption of AI surveillance technologies
+    worldwide, with Chinese companies playing a major role in supplying these systems to governments
+    across different political regimes.
+  review: "The report presents a groundbreaking analysis of global AI surveillance through the AI
+    Global Surveillance (AIGS) Index, documenting the proliferation of surveillance technologies
+    across 75 countries. The research reveals a complex landscape where both authoritarian and
+    democratic governments are increasingly adopting advanced monitoring tools, with significant
+    implications for privacy and civil liberties. The study's methodology is particularly
+    noteworthy, systematically examining AI surveillance technologies across three key domains:
+    smart city/safe city platforms, facial recognition systems, and smart policing. While the
+    research does not judge the legitimacy of each surveillance deployment, it provides crucial
+    insights into the global spread of these technologies, highlighting the role of companies like
+    Huawei in driving this expansion. The findings challenge simplistic narratives about AI
+    surveillance being exclusively an authoritarian tool, demonstrating that liberal democracies are
+    equally active in deploying these technologies."
+  key_points:
+    - 75 countries are using AI surveillance technologies, representing 43% of countries assessed
+    - Chinese companies, especially Huawei, are leading suppliers of AI surveillance worldwide
+    - Liberal democracies are major users of AI surveillance, with 51% deploying such systems
+  cited_by:
+    - structural
+    - surveillance-authoritarian-stability
+    - authoritarian-tools
+  fetched_at: 2025-12-28 02:54:51
+  publication_id: carnegie
+  tags:
+    - authoritarianism
+    - human-rights
+    - digital-repression
+- id: 5cd1ea7dbc8d0b23
+  url: https://www.rand.org/pubs/commentary/2024/11/robust-biosecurity-measures-should-be-standardized.html
+  title: RAND
+  type: web
+  cited_by:
+    - bioweapons
+  publication_id: rand
+  tags:
+    - biosecurity
+    - dual-use-research
+    - x-risk
+- id: 0a17f30e99091ebf
+  url: https://www.rand.org/
+  title: RAND
+  type: web
+  local_filename: 0a17f30e99091ebf.txt
+  summary: RAND conducts policy research analyzing AI's societal impacts, including potential
+    psychological and national security risks. Their work focuses on understanding AI's complex
+    implications for decision-makers.
+  review: RAND's research highlights the emerging challenges and potential risks associated with
+    artificial intelligence, particularly focusing on its psychological and security dimensions.
+    Their recent work, such as the study on AI-induced psychosis, demonstrates a proactive approach
+    to understanding the complex interactions between advanced AI systems and human cognition. The
+    organization's methodology appears to be centered on comprehensive, objective policy analysis
+    that bridges technological understanding with practical implications for governance and
+    security. By examining issues like AI's potential to induce or amplify psychological
+    disturbances, RAND contributes valuable insights to the broader AI safety discourse, helping
+    policymakers anticipate and mitigate potential risks before they become critical threats.
+  key_points:
+    - RAND conducts research on AI's psychological and security implications
+    - Focuses on providing objective, policy-relevant insights for decision-makers
+    - Explores emerging risks and challenges posed by advanced AI technologies
+  cited_by:
+    - misuse-risks
+    - solutions
+    - agi-development
+    - large-language-models
+    - ai-risk-portfolio-analysis
+    - capabilities-to-safety-pipeline
+    - compounding-risks-analysis
+    - risk-interaction-matrix
+    - risk-interaction-network
+    - warning-signs-model
+    - openai
+    - arc
+    - holden-karnofsky
+    - toby-ord
+    - ai-control
+    - coordination-tech
+    - governance-policy
+    - learned-helplessness
+  fetched_at: 2025-12-28 02:55:11
+  publication_id: rand
+  tags:
+    - governance
+    - cybersecurity
+    - prioritization
+    - resource-allocation
+    - portfolio
+- id: ab22aa0df9b1be7b
+  url: https://www.rand.org/pubs/perspectives/PEA4189-1.html
+  title: RAND - Incentives for U.S.-China Conflict, Competition, and Cooperation
+  type: web
+  local_filename: ab22aa0df9b1be7b.txt
+  summary: The report examines potential U.S.-China dynamics around artificial general intelligence
+    (AGI), highlighting both competitive tensions and cooperative opportunities across five key
+    national security problems.
+  review: >-
+    This RAND Corporation analysis offers a nuanced exploration of how the United States and China
+    might navigate the emerging landscape of artificial general intelligence (AGI). The authors
+    argue that while strategic rivalry creates strong incentives for competition, there are also
+    critical areas where cooperation could be mutually beneficial and even necessary to mitigate
+    existential risks.
+
+
+    The study systematically examines five 'hard national security problems' related to AGI: wonder
+    weapons, systemic power shifts, WMD proliferation, artificial agency, and potential instability.
+    By mapping out potential scenarios of conflict, competition, and cooperation, the research
+    provides a sophisticated framework for understanding the geopolitical challenges of
+    transformative AI. The authors emphasize that deliberate diplomatic efforts will be essential to
+    manage potential risks, suggesting Track 1.5 dialogues, expert working groups, and incremental
+    confidence-building measures as potential pathways to productive engagement.
+  key_points:
+    - AGI could dramatically reshape global power dynamics, creating both competitive and
+      cooperative incentives
+    - Mutual risks like WMD proliferation and uncontrolled AI systems create potential areas for
+      U.S.-China cooperation
+    - Diplomatic mechanisms and communication channels are crucial to preventing accidental
+      escalation
+  cited_by:
+    - geopolitics
+    - intervention-timing-windows
+    - international
+    - pause-and-redirect
+    - governance-focused
+    - coordination
+  fetched_at: 2025-12-28 02:03:31
+  publication_id: rand
+  tags:
+    - cybersecurity
+    - agi
+- id: c0308d1d959c2e67
+  url: https://www.rand.org/pubs/research_reports/RRA3295-1.html
+  title: RAND - Strategic competition in the age of AI
+  type: web
+  local_filename: c0308d1d959c2e67.txt
+  summary: A RAND study commissioned by UK MOD examines potential strategic implications of military
+    AI, identifying priority issues and uncertainties in technological competition.
+  review: The RAND research represents a critical examination of how artificial intelligence might
+    transform military strategy and geopolitical competition. By focusing on strategic-level impacts
+    rather than tactical applications, the study addresses a significant gap in existing AI
+    research, particularly in defense contexts. The methodology emphasizes the profound uncertainty
+    surrounding AI's potential impacts, recommending an adaptive approach to understanding emerging
+    risks and opportunities. The research highlights the importance of rapid, effective state
+    responses to intensifying AI competition, suggesting that the manifestation of risks or
+    opportunities will largely depend on how nations strategically position themselves and develop
+    AI capabilities.
+  key_points:
+    - Deep uncertainty exists around military AI's strategic impacts
+    - Urgent action is needed to understand and adapt to AI competition
+    - Strategic-level analysis is crucial beyond existing tactical research
+  cited_by:
+    - geopolitics
+  fetched_at: 2025-12-28 02:03:31
+  publication_id: rand
+- id: 0fe4cfa7ca5f2270
+  url: https://www.rand.org/pubs/research_reports/RRA2977-2.html
+  title: RAND Corporation study
+  type: web
+  cited_by:
+    - misuse-risks
+    - bioweapons-attack-chain
+    - capability-threshold-model
+    - technical-pathways
+    - open-source
+    - bioweapons
+  publication_id: rand
+  tags:
+    - probability
+    - decomposition
+    - bioweapons
+    - capability
+    - threshold
+- id: cf5fd74e8db11565
+  url: https://www.rand.org/topics/artificial-intelligence.html
+  title: "RAND: AI and National Security"
+  type: web
+  cited_by:
+    - glossary
+    - long-horizon
+    - solutions
+    - ai-risk-portfolio-analysis
+    - autonomous-weapons-escalation
+    - capability-threshold-model
+    - cyberweapons-attack-automation
+    - defense-in-depth-model
+    - multipolar-trap-dynamics
+    - risk-activation-timeline
+    - safety-research-allocation
+    - safety-research-value
+    - cais
+    - coordination-tech
+    - public-education
+    - knowledge-monopoly
+    - enfeeblement
+    - proliferation
+  publication_id: rand
+  tags:
+    - cybersecurity
+    - agentic
+    - planning
+    - goal-stability
+    - prioritization
+- id: 9f6765d3c4333014
+  url: https://www.rand.org/pubs/commentary/2024/03/is-ai-an-existential-risk-qa-with-rand-experts.html
+  title: "RAND: Is AI an Existential Risk?"
+  type: web
+  fetched_at: 2025-12-28 03:42:48
+  publication_id: rand
+  tags:
+    - x-risk
+- id: e7604d07af64a2ea
+  url: https://www.rand.org/topics/disinformation.html
+  title: rand.org
+  type: web
+  fetched_at: 2025-12-28 02:56:01
+  publication_id: rand
+- id: 73c1b835c41bcbdb
+  url: https://www.rand.org/pubs/research_reports/RRA2977-1.html
+  title: The AI and Biological Weapons Threat
+  type: web
+  cited_by:
+    - agi-development
+    - international-coordination-game
+    - risk-interaction-matrix
+    - bioweapons
+  publication_id: rand
+  tags:
+    - biosecurity
+    - game-theory
+    - international-coordination
+    - governance
+    - risk-interactions
+- id: 58f6946af0177ca5
+  url: https://www.cnas.org
+  title: CNAS
+  type: web
+  cited_by:
+    - glossary
+    - long-horizon
+    - misuse-risks
+    - solutions
+    - agi-development
+    - ai-risk-portfolio-analysis
+    - capabilities-to-safety-pipeline
+    - cyberweapons-attack-automation
+    - power-seeking-conditions
+    - racing-dynamics-impact
+    - risk-cascade-pathways
+    - risk-interaction-matrix
+    - risk-interaction-network
+    - governance-policy
+  publication_id: cnas
+  tags:
+    - agentic
+    - planning
+    - goal-stability
+    - prioritization
+    - resource-allocation
+- id: cba4665f19006145
+  url: https://www.rand.org/pubs/research_reports/RRA2977.html
+  title: RAND
+  type: web
+  cited_by:
+    - persuasion
+  publication_id: rand
+  tags:
+    - social-engineering
+    - manipulation
+    - deception
+- id: 3926c1b487d69995
+  url: https://www.cnas.org/publications/reports/ai-and-democracy
+  title: CNAS
+  type: web
+  cited_by:
+    - persuasion
+  publication_id: cnas
+  tags:
+    - social-engineering
+    - manipulation
+    - deception
+- id: 428fe8abbfea5149
+  url: https://www.brookings.edu/research/ai-persuasion-regulation/
+  title: Brookings
+  type: web
+  cited_by:
+    - persuasion
+  publication_id: brookings
+  tags:
+    - social-engineering
+    - manipulation
+    - deception
+- id: 80d7b04be0e63710
+  url: https://www.csis.org/programs/strategic-technologies-program
+  title: CSIS Critical Questions
+  type: web
+  cited_by:
+    - misuse-risks
+    - international-coordination-game
+    - authoritarian-tools
+  publication_id: csis
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+    - authoritarianism
+    - human-rights
+- id: fbd5f171b9a891f3
+  url: https://www.cnas.org/research/technology-and-national-security/artificial-intelligence-and-global-competition
+  title: AI security reports
+  type: web
+  cited_by:
+    - solutions
+  publication_id: cnas
+  tags:
+    - cybersecurity
+- id: 89488427521d83ea
+  url: https://carnegieendowment.org/research/2024/10/the-ai-governance-arms-race-from-summit-pageantry-to-progress?lang=en
+  title: "Carnegie Endowment: The AI Governance Arms Race"
+  type: web
+  cited_by:
+    - structural-risks
+  publication_id: carnegie
+  tags:
+    - governance
+- id: 3afc8d3cef185a83
+  url: https://www.cnas.org/research/technology-and-national-security
+  title: CNAS
+  type: web
+  cited_by:
+    - ai-risk-portfolio-analysis
+  publication_id: cnas
+  tags:
+    - prioritization
+    - resource-allocation
+    - portfolio
+- id: 84d91a095bbc439e
+  url: https://www.csis.org/analysis/military-applications-artificial-intelligence
+  title: China's military AI development
+  type: web
+  cited_by:
+    - autonomous-weapons-escalation
+  publication_id: csis
+  tags:
+    - escalation
+    - conflict
+    - speed
+- id: 03c995f7743c75a8
+  url: https://www.csis.org/
+  title: Center for Strategic Studies
+  type: web
+  cited_by:
+    - autonomous-weapons-escalation
+    - coordination-tech
+    - governance-policy
+  publication_id: csis
+  tags:
+    - escalation
+    - conflict
+    - speed
+    - game-theory
+    - governance
+- id: 0532c540957038e6
+  url: https://www.rand.org/pubs/research_reports/RRA2680-1.html
+  title: RAND
+  type: web
+  cited_by:
+    - capability-alignment-race
+    - corporate
+  publication_id: rand
+- id: 5cde1bae73096dd7
+  url: https://www.cnas.org/publications/reports/regulating-artificial-intelligence
+  title: CNAS analysis
+  type: web
+  cited_by:
+    - capability-alignment-race
+  publication_id: cnas
+- id: eecd7c0e9ebb9cbe
+  url: https://www.rand.org/pubs/research_reports/RRA2747-1.html
+  title: RAND Corporation
+  type: web
+  cited_by:
+    - compounding-risks-analysis
+  publication_id: rand
+  tags:
+    - risk-interactions
+    - compounding-effects
+    - systems-thinking
+- id: d5c147bafcbb2cf1
+  url: https://www.rand.org/pubs/research_reports/RRA2273-1.html
+  title: Managing AI Risks
+  type: web
+  cited_by:
+    - corrigibility-failure-pathways
+    - safety-research-allocation
+  publication_id: rand
+  tags:
+    - causal-model
+    - corrigibility
+    - shutdown-problem
+    - resource-allocation
+    - research-priorities
+- id: 8bb14c053ab9ae0a
+  url: https://cset.georgetown.edu/publication/ai-competition-and-geopolitics/
+  title: Game-theoretic modeling by Georgetown's Center for Security and Emerging Technology
+  type: web
+  cited_by:
+    - international-coordination-game
+  publication_id: cset
+  tags:
+    - cybersecurity
+    - game-theory
+    - international-coordination
+    - governance
+- id: 4cc99d704fe5513b
+  url: https://www.atlanticcouncil.org/in-depth-research-reports/report/the-algorithmics-of-power/
+  title: Analysis by the Atlantic Council
+  type: web
+  cited_by:
+    - international-coordination-game
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+  publication_id: atlantic-council
+- id: dbca19772988b36c
+  url: https://www.rand.org/topics/verification.html
+  title: RAND verification studies
+  type: web
+  cited_by:
+    - international-coordination-game
+  publication_id: rand
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+- id: 1e2400a59268155c
+  url: https://carnegieendowment.org/specialprojects/ai-security/
+  title: Research by the Carnegie Endowment
+  type: web
+  cited_by:
+    - international-coordination-game
+  publication_id: carnegie
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+- id: 6f6a764568dfe89d
+  url: https://www.csis.org/programs/economics-program
+  title: CSIS economic security analysis
+  type: web
+  cited_by:
+    - international-coordination-game
+  publication_id: csis
+  tags:
+    - economic
+    - cybersecurity
+    - game-theory
+    - international-coordination
+    - governance
+- id: d98e807a4feb4016
+  url: https://www.brookings.edu/topic/international-affairs/
+  title: Brookings Institution research
+  type: web
+  cited_by:
+    - international-coordination-game
+  publication_id: brookings
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+- id: 36a43cebe11986f6
+  url: https://www.atlanticcouncil.org/programs/scowcroft-center/
+  title: Atlantic Council
+  type: web
+  cited_by:
+    - international-coordination-game
+  tags:
+    - game-theory
+    - international-coordination
+    - governance
+  publication_id: atlantic-council
+- id: 223b829c30beaca2
+  url: https://www.rand.org/pubs/perspectives/PEA2977-1.html
+  title: RAND Corporation
+  type: web
+  cited_by:
+    - intervention-effectiveness-matrix
+  publication_id: rand
+  tags:
+    - interventions
+    - effectiveness
+    - prioritization
+- id: 3e8fecd4ef53888e
+  url: https://cset.georgetown.edu/publication/ai-governance-database/
+  title: Center for Security and Emerging Technology
+  type: web
+  cited_by:
+    - intervention-effectiveness-matrix
+  publication_id: cset
+  tags:
+    - cybersecurity
+    - interventions
+    - effectiveness
+    - prioritization
+- id: 89d77122c55f3155
+  url: https://www.brookings.edu/
+  title: Brookings AI governance tracker
+  type: web
+  cited_by:
+    - intervention-effectiveness-matrix
+    - governance-policy
+    - public-education
+  publication_id: brookings
+  tags:
+    - governance
+    - interventions
+    - effectiveness
+    - prioritization
+    - international
+- id: cab86dcab3f6c2e2
+  url: https://www.rand.org/pubs/research_reports/RRA2904-1.html
+  title: RAND Corporation
+  type: web
+  cited_by:
+    - intervention-timing-windows
+  publication_id: rand
+  tags:
+    - prioritization
+    - timing
+    - strategy
+- id: f905605a70b2b53d
+  url: https://www.csis.org/analysis/strategic-competition-age-artificial-intelligence
+  title: Center for Strategic and International Studies
+  type: web
+  cited_by:
+    - coordination-tech
+  publication_id: csis
+  tags:
+    - prioritization
+    - timing
+    - strategy
+    - game-theory
+    - governance
+- id: 1bf8fbb615c05339
+  url: https://www.brookings.edu/articles/the-geopolitics-of-artificial-intelligence/
+  title: Brookings Institution
+  type: web
+  cited_by:
+    - intervention-timing-windows
+  publication_id: brookings
+  tags:
+    - prioritization
+    - timing
+    - strategy
+- id: 05d723646ac6c9bc
+  url: https://www.cnas.org/publications/reports/strategic-competition-in-ai
+  title: "CNAS: Technology Competition"
+  type: web
+  cited_by:
+    - intervention-timing-windows
+  publication_id: cnas
+  tags:
+    - prioritization
+    - timing
+    - strategy
+- id: f103dfcc68f5d4de
+  url: https://cset.georgetown.edu/publication/ai-chips-and-geopolitics/
+  title: Heim et al. (2023)
+  type: web
+  cited_by:
+    - proliferation-risk-model
+  publication_id: cset
+  tags:
+    - risk-factor
+    - diffusion
+    - control
+- id: 10f716f6853c487a
+  url: https://www.cnas.org/publications/reports/maintaining-the-ai-chip-competitive-advantage
+  title: CNAS
+  type: web
+  cited_by:
+    - racing-dynamics-impact
+  publication_id: cnas
+  tags:
+    - risk-factor
+    - competition
+    - game-theory
+- id: f5e827d2d86f0b9c
+  url: https://cset.georgetown.edu/publication/ai-and-cybersecurity/
+  title: Cybersecurity implications of AI
+  type: web
+  cited_by:
+    - risk-activation-timeline
+  publication_id: cset
+  tags:
+    - cybersecurity
+    - timeline
+    - capability
+    - risk-assessment
+- id: 728653ee4e988aa1
+  url: https://www.rand.org/content/dam/rand/pubs/research_reports/RR2600/RR2619/RAND_RR2619.pdf
+  title: RAND Corporation research
+  type: web
+  cited_by:
+    - risk-cascade-pathways
+  publication_id: rand
+  tags:
+    - cascades
+    - risk-pathways
+    - systems-thinking
+- id: 06e5617aee1302ff
+  url: https://www.rand.org/pubs/research_reports/RR2619.html
+  title: RAND Corporation - Systemic Risk Assessment
+  type: web
+  cited_by:
+    - risk-cascade-pathways
+    - governance-policy
+  publication_id: rand
+  tags:
+    - cascades
+    - risk-pathways
+    - systems-thinking
+    - international
+    - compute-governance
+- id: 2a495e79d3ff2428
+  url: https://www.cnas.org/research/technology-and-national-security/artificial-intelligence
+  title: CNAS AI Policy
+  type: web
+  cited_by:
+    - risk-interaction-network
+    - concentration-of-power
+    - enfeeblement
+  publication_id: cnas
+  tags:
+    - governance
+    - networks
+    - risk-interactions
+    - systems-thinking
+    - power-dynamics
+- id: 0b85365d787dfe9a
+  url: https://www.rand.org/pubs/research_reports/RRA2974-1.html
+  title: RAND reports
+  type: web
+  cited_by:
+    - worldview-intervention-mapping
+  publication_id: rand
+  tags:
+    - prioritization
+    - worldview
+    - strategy
+- id: 4e428338d4b3dad7
+  url: https://www.rand.org/pubs/perspectives/PEA2849-1.html
+  title: RAND analysis
+  type: web
+  cited_by:
+    - redwood
+  publication_id: rand
+  tags:
+    - interpretability
+    - causal-scrubbing
+    - ai-control
+- id: 09ff01d9e87280a9
+  url: https://cset.georgetown.edu/article/how-improve-ai-red-teaming-challenges-and-recommendations/
+  title: "How to Improve AI Red-Teaming: Challenges and Recommendations"
+  type: web
+  cited_by:
+    - evals
+  publication_id: cset
+  tags:
+    - benchmarks
+    - red-teaming
+    - capability-assessment
+- id: 064a34101a962326
+  url: https://www.rand.org/pubs/research_reports/RRA2679-1.html
+  title: Compute Governance Report
+  type: web
+  cited_by:
+    - coordination-tech
+    - disinformation
+  publication_id: rand
+  tags:
+    - governance
+    - compute
+    - game-theory
+    - international-cooperation
+    - disinformation
+- id: d25a731963a5a372
+  url: https://carnegieendowment.org/research/2024/01/countering-disinformation-effectively-an-evidence-based-policy-guide
+  title: 2024 WEF Global Risk Report
+  type: web
+  cited_by:
+    - epistemic-infrastructure
+  publication_id: carnegie
+  tags:
+    - knowledge-management
+    - public-goods
+    - information-infrastructure
+- id: c22de86eabd0fc37
+  url: https://www.cnas.org/publications/reports/countering-ai-chip-smuggling-has-become-a-national-security-priority
+  title: CNAS
+  type: web
+  cited_by:
+    - export-controls
+  publication_id: cnas
+- id: c0a950eadfd8fcec
+  url: https://www.csis.org/analysis/where-chips-fall-us-export-controls-under-biden-administration-2022-2024
+  title: CSIS reported
+  type: web
+  cited_by:
+    - export-controls
+  publication_id: csis
+- id: dfda5c53f10364b3
+  url: https://www.csis.org/analysis/limits-chip-export-controls-meeting-china-challenge
+  title: CSIS analysis
+  type: web
+  cited_by:
+    - export-controls
+  publication_id: csis
+- id: 18895f59591774a5
+  url: https://www.brookings.edu/articles/deepseek-shows-the-limits-of-us-export-controls-on-ai-chips/
+  title: Brookings
+  type: web
+  cited_by:
+    - export-controls
+  publication_id: brookings
+- id: d4b21e7c09bed367
+  url: https://www.cnas.org/publications/commentary/cnas-insights-the-export-control-loophole-fueling-chinas-chip-production
+  title: CNAS
+  type: web
+  cited_by:
+    - export-controls
+  publication_id: cnas
+- id: f36b479499caf062
+  url: https://www.csis.org/analysis/mismatch-strategy-and-budgets-ai-chip-export-controls
+  title: CSIS Mismatch report
+  type: web
+  cited_by:
+    - export-controls
+  publication_id: csis
+- id: 6d999627fe0848e6
+  url: https://www.cnas.org/publications/reports/technology-to-secure-the-ai-chip-supply-chain-a-primer
+  title: Technology to Secure the AI Chip Supply Chain
+  type: web
+  cited_by:
+    - export-controls
+    - monitoring
+  publication_id: cnas
+  tags:
+    - compute
+- id: 87e132ccb0722909
+  url: https://www.csis.org/analysis/deepseek-huawei-export-controls-and-future-us-china-ai-race
+  title: DeepSeek, Huawei, Export Controls, and the Future of the U.S.-China AI Race
+  type: web
+  cited_by:
+    - multi-actor-landscape
+    - export-controls
+  publication_id: csis
+- id: b193d0cfd04f2b86
+  url: https://www.rand.org/pubs/commentary/2025/01/the-rise-of-deepseek-what-the-headlines-miss.html
+  title: "The Rise of DeepSeek: What the Headlines Miss"
+  type: web
+  cited_by:
+    - export-controls
+  publication_id: rand
+- id: 76e39f7311f698da
+  url: https://www.rand.org/pubs/conf_proceedings/CFA3056-1.html
+  title: hardware-enabled governance mechanisms
+  type: web
+  cited_by:
+    - intervention-timing-windows
+    - effectiveness-assessment
+  publication_id: rand
+  tags:
+    - governance
+    - compute
+- id: 88a8241bd9872820
+  url: https://www.rand.org/pubs/research_reports/RRA3408-1.html
+  title: historical analogues research
+  type: web
+  cited_by:
+    - effectiveness-assessment
+  publication_id: rand
+- id: f7d2ebb409b056f9
+  url: https://www.brookings.edu/articles/a-technical-ai-government-agency-plays-a-vital-role-in-advancing-ai-innovation-and-trustworthiness/
+  title: U.S. AI Safety Institute
+  type: web
+  cited_by:
+    - effectiveness-assessment
+  publication_id: brookings
+  tags:
+    - safety
+- id: eebea1e16e230f5b
+  url: https://www.rand.org/pubs/conf_proceedings/CFA3799-1.html
+  title: 2024 EqualAI Summit proceedings
+  type: web
+  cited_by:
+    - effectiveness-assessment
+  publication_id: rand
+- id: 9d26c747c992b74c
+  url: https://www.rand.org/pubs/research_reports/RRA4159-1.html
+  title: governance approaches to securing frontier AI
+  type: web
+  cited_by:
+    - effectiveness-assessment
+  publication_id: rand
+  tags:
+    - governance
+- id: 452097057d049ad0
+  url: https://www.brookings.edu/wp-content/uploads/2025/08/GS_08252025_AISA_report.pdf
+  title: AI safety governance in Southeast Asia
+  type: web
+  cited_by:
+    - effectiveness-assessment
+  publication_id: brookings
+  tags:
+    - governance
+    - safety
+- id: 80b0765e1dfc4afd
+  url: https://carnegieendowment.org/research/2024/09/if-then-commitments-for-ai-risk-reduction
+  title: "Carnegie Endowment: If-Then Commitments for AI Risk Reduction"
+  type: web
+  cited_by:
+    - effectiveness-assessment
+  publication_id: carnegie
+- id: 45fe93d03095cb35
+  url: https://cset.georgetown.edu/article/the-semiconductor-supply-chain/
+  title: CSET analysis
+  type: web
+  cited_by:
+    - governance-policy
+  publication_id: cset
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: 4fe2090b75b0490f
+  url: https://cset.georgetown.edu/careers/
+  title: CSET Research
+  type: web
+  cited_by:
+    - governance-policy
+  publication_id: cset
+  tags:
+    - international
+    - compute-governance
+    - regulation
+- id: 25ca111eea083021
+  url: https://www.brookings.edu/articles/a-roadmap-for-a-us-china-ai-dialogue/
+  title: '"humans, not AI" should control nuclear weapons'
+  type: web
+  cited_by:
+    - intervention-timing-windows
+    - international
+    - coordination
+  publication_id: brookings
+  tags:
+    - prioritization
+    - timing
+    - strategy
+- id: 0fec40327f2e7046
+  url: https://www.rand.org/pubs/commentary/2025/01/how-might-the-united-states-engage-with-china-on-ai.html
+  title: RAND researchers
+  type: web
+  cited_by:
+    - intervention-timing-windows
+    - international
+    - china-ai-regulations
+  publication_id: rand
+  tags:
+    - regulation
+    - china
+    - content-control
+- id: a1d99da51e0ae19d
+  url: https://www.rand.org/pubs/perspectives/PEA3652-1.html
+  title: RAND analysis on nuclear history and AI governance
+  type: web
+  cited_by:
+    - international
+  publication_id: rand
+  tags:
+    - governance
+- id: 0572f91896f52377
+  url: https://www.csis.org/analysis/ai-safety-institute-international-network-next-steps-and-recommendations
+  title: "The AI Safety Institute International Network: Next Steps"
+  type: web
+  cited_by:
+    - uk-aisi
+    - us-aisi
+    - international
+    - seoul-declaration
+    - ai-safety-institutes
+    - coordination
+  publication_id: csis
+  tags:
+    - safety
+- id: d0e36601100c356d
+  url: https://carnegieendowment.org/research/2024/08/china-artificial-intelligence-ai-safety-regulation
+  title: Carnegie Endowment analysis
+  type: web
+  cited_by:
+    - seoul-declaration
+  publication_id: carnegie
+- id: 01cc39a7a5fc8531
+  url: https://www.cnas.org/publications/reports/the-future-of-ai-governance
+  title: CNAS AI governance survey
+  type: web
+  cited_by:
+    - eu-ai-act
+  publication_id: cnas
+  tags:
+    - governance
+    - regulation
+    - gpai
+    - foundation-models
+- id: 887c0e40caa39cf4
+  url: https://www.csis.org/analysis/us-vision-ai-safety-conversation-elizabeth-kelly-director-us-ai-safety-institute
+  title: "CSIS: US Vision for AI Safety"
+  type: web
+  cited_by:
+    - us-aisi
+    - ai-safety-institutes
+  publication_id: csis
+  tags:
+    - safety
+- id: 8300b324baea38ca
+  url: https://www.rand.org/news/press/2024/05/30.html
+  title: RAND 2024
+  type: web
+  cited_by:
+    - open-source
+  publication_id: rand
+- id: 4f75d2d6d47e8531
+  url: https://carnegieendowment.org/research/2025/10/how-china-views-ai-risks-and-what-to-do-about-them
+  title: AI governance framework
+  type: web
+  cited_by:
+    - china-ai-regulations
+    - pause
+    - pause-and-redirect
+  publication_id: carnegie
+  tags:
+    - governance
+    - regulation
+    - china
+    - content-control
+- id: 7ff1affc755b2d24
+  url: https://cset.georgetown.edu/publication/ai-and-congress/
+  title: Congressional AI briefings
+  type: web
+  cited_by:
+    - public-education
+  publication_id: cset
+- id: e68bcc79e17f42df
+  url: https://www.brookings.edu/articles/misunderstood-mechanics-how-ai-tiktok-and-the-liars-dividend-might-affect-the-2024-elections/
+  title: Brookings researchers call the "liar's dividend"
+  type: web
+  cited_by:
+    - epistemic-security
+    - trust-decline
+  publication_id: brookings
+  tags:
+    - disinformation
+    - deepfakes
+    - trust
+- id: 346f676914d549d4
+  url: https://www.brookings.edu/articles/how-disinformation-defined-the-2024-election-narrative/
+  title: OpenAI disrupted
+  type: web
+  cited_by:
+    - epistemic-security
+  publication_id: brookings
+  tags:
+    - disinformation
+    - deepfakes
+    - trust
+- id: 9926d26da9a3d761
+  url: https://cset.georgetown.edu/article/emergent-abilities-in-large-language-models-an-explainer/
+  title: CSET Georgetown
+  type: web
+  cited_by:
+    - emergent-capabilities
+    - takeoff
+  publication_id: cset
+  tags:
+    - scaling
+    - capability-evaluation
+    - unpredictability
+- id: 88345e2d9a66b978
+  url: https://www.brookings.edu/articles/governance-of-ai/
+  title: brookings.edu/research/governance-ai
+  type: web
+  cited_by:
+    - historical-revisionism
+  publication_id: brookings
+  tags:
+    - governance
+    - historical-evidence
+    - archives
+    - deepfakes
+- id: aa9bd39c247651f0
+  url: https://www.brookings.edu/articles/gender-race-and-intersectional-bias-in-ai-resume-screening-via-language-model-retrieval/
+  title: 2024 UNESCO study
+  type: web
+  cited_by:
+    - institutional-capture
+  publication_id: brookings
+  tags:
+    - ai-bias
+    - algorithmic-accountability
+    - automation-bias
+- id: 6ac91c364421707b
+  url: https://www.brookings.edu/articles/reducing-bias-in-ai-based-financial-services/
+  title: Consumer Financial Protection Bureau estimates
+  type: web
+  cited_by:
+    - institutional-capture
+  publication_id: brookings
+  tags:
+    - ai-bias
+    - algorithmic-accountability
+    - automation-bias
+- id: 2d4cab8540b83906
+  url: https://brookings.edu/ai/
+  title: Brookings AI Governance
+  type: web
+  cited_by:
+    - knowledge-monopoly
+  publication_id: brookings
+  tags:
+    - governance
+    - market-concentration
+    - knowledge-access
+- id: 6aba5cb6e3d1e36c
+  url: https://www.rand.org/pubs/research_reports/RRA1043-1.html
+  title: RAND Corporation (2023)
+  type: web
+  cited_by:
+    - learned-helplessness
+    - enfeeblement
+  publication_id: rand
+  tags:
+    - information-overload
+    - media-literacy
+    - epistemics
+    - human-agency
+    - automation
+- id: 47d3aba057032f71
+  url: https://www.brookings.edu/center/center-for-technology-innovation/
+  title: Brookings Center for Technology Innovation
+  type: web
+  cited_by:
+    - reality-fragmentation
+  publication_id: brookings
+  tags:
+    - filter-bubbles
+    - polarization
+    - disinformation
+- id: 02be6ac539efd89d
+  url: https://www.atlanticcouncil.org/blogs/new-atlanticist/china-internet-control-censorship-social-credit/
+  title: Great Firewall 2.0
+  type: web
+  cited_by:
+    - authoritarian-tools
+  tags:
+    - authoritarianism
+    - human-rights
+    - digital-repression
+  publication_id: atlantic-council
+- id: 1d5dbaf032a3da89
+  url: https://www.rand.org/pubs/research_reports/RR3063.html
+  title: RAND Corporation analysis
+  type: web
+  cited_by:
+    - authoritarian-tools
+    - racing-dynamics
+  publication_id: rand
+  tags:
+    - authoritarianism
+    - human-rights
+    - digital-repression
+    - governance
+    - coordination
+- id: 87aff738595fef46
+  url: https://www.csis.org/analysis/strategic-technologies-and-national-power
+  title: Center for Strategic and International Studies
+  type: web
+  cited_by:
+    - authoritarian-tools
+  publication_id: csis
+  tags:
+    - authoritarianism
+    - human-rights
+    - digital-repression
+- id: 536c30d36bbbdc40
+  url: https://www.rand.org/topics/information-warfare.html
+  title: RAND Corporation - Information Warfare Studies
+  type: web
+  cited_by:
+    - authoritarian-tools
+  publication_id: rand
+  tags:
+    - authoritarianism
+    - human-rights
+    - digital-repression
+- id: de8c545e0886bf90
+  url: https://www.csis.org/analysis/artificial-intelligence-and-future-warfare
+  title: The Center for Strategic and International Studies
+  type: web
+  cited_by:
+    - disinformation
+  publication_id: csis
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: d85cef0217af0145
+  url: https://www.atlanticcouncil.org/in-depth-research-reports/report/breaking-bots-how-artificial-intelligence-is-changing-information-warfare/
+  title: The Atlantic Council's tracking
+  type: web
+  cited_by:
+    - disinformation
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+  publication_id: atlantic-council
+- id: 3497c8b34d717c7d
+  url: https://carnegieendowment.org/research/technology-and-international-affairs/artificial-intelligence/
+  title: The Carnegie Endowment for International Peace
+  type: web
+  cited_by:
+    - disinformation
+  publication_id: carnegie
+  tags:
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: f3ebe061344c85b1
+  url: https://cset.georgetown.edu/publication/open-source-ai-models-benefits-risks-and-policy/
+  title: Analysis by the Center for Security and Emerging Technology
+  type: web
+  cited_by:
+    - disinformation
+  publication_id: cset
+  tags:
+    - cybersecurity
+    - disinformation
+    - influence-operations
+    - information-warfare
+- id: 66252ed58a4d871f
+  url: https://www.brookings.edu/articles/geopolitical-implications-of-ai-and-digital-surveillance-adoption/
+  title: Brookings research
+  type: web
+  cited_by:
+    - authoritarian-takeover
+  publication_id: brookings
+  tags:
+    - x-risk
+    - governance
+    - authoritarianism
+- id: add4f54080d0bfc5
+  url: https://carnegieendowment.org/research/2024/12/can-democracy-survive-the-disruptive-power-of-ai
+  title: Carnegie Endowment for International Peace
+  type: web
+  cited_by:
+    - authoritarian-takeover
+    - lock-in
+  publication_id: carnegie
+  tags:
+    - x-risk
+    - governance
+    - authoritarianism
+    - irreversibility
+    - path-dependence
+- id: 02c731a9def3c3e1
+  url: https://www.atlanticcouncil.org/blogs/geotech-cues/the-west-china-and-ai-surveillance/
+  title: Atlantic Council
+  type: web
+  cited_by:
+    - authoritarian-takeover
+  tags:
+    - x-risk
+    - governance
+    - authoritarianism
+  publication_id: atlantic-council
+- id: 79e8eaf2d9108898
+  url: https://www.cnas.org/publications/congressional-testimony/the-dangers-of-the-global-spread-of-chinas-digital-authoritarianism
+  title: The Dangers of the Global Spread of China's Digital Authoritarianism
+  type: web
+  cited_by:
+    - surveillance-authoritarian-stability
+    - authoritarian-takeover
+  publication_id: cnas
+  tags:
+    - x-risk
+    - governance
+    - authoritarianism
+- id: 7a7a198f908cb5bf
+  url: https://www.rand.org/pubs/perspectives/PEA2679-1.html
+  title: RAND Corporation
+  type: web
+  cited_by:
+    - concentration-of-power
+  publication_id: rand
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+- id: 16914f3b14803a87
+  url: https://www.cnas.org/publications/reports/maintaining-the-ai-chip-competitive-advantage-of-the-united-states-and-allies
+  title: CNAS research
+  type: web
+  cited_by:
+    - concentration-of-power
+  publication_id: cnas
+  tags:
+    - governance
+    - power-dynamics
+    - inequality
+- id: debe9e9eed9b715c
+  url: https://www.rand.org/topics/workforce-development.html
+  title: RAND research
+  type: web
+  cited_by:
+    - enfeeblement
+  publication_id: rand
+  tags:
+    - human-agency
+    - automation
+    - dependence
+- id: 6d2a9aac6117b683
+  url: https://www.brookings.edu/research/artificial-intelligence/
+  title: Brookings AI Governance
+  type: web
+  cited_by:
+    - enfeeblement
+  publication_id: brookings
+  tags:
+    - governance
+    - human-agency
+    - automation
+    - dependence
+- id: 4377a026555775b2
+  url: https://cset.georgetown.edu/publication/ai-governance-in-2024/
+  title: Research by Helen Toner
+  type: web
+  cited_by:
+    - erosion-of-agency
+  publication_id: cset
+  tags:
+    - human-agency
+    - autonomy
+    - manipulation
+- id: da5d287f4596d038
+  url: https://www.rand.org/pubs/research_reports/RR2935.html
+  title: Comprehensive surveillance systems
+  type: web
+  cited_by:
+    - lock-in
+  publication_id: rand
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: 209711d31b910a3c
+  url: https://carnegieendowment.org/2018/09/17/global-expansion-of-ai-surveillance-pub-77241
+  title: Between 2009 and 2018
+  type: web
+  cited_by:
+    - lock-in
+  publication_id: carnegie
+  tags:
+    - x-risk
+    - irreversibility
+    - path-dependence
+- id: 6758d3f04ab94673
+  url: https://www.rand.org/pubs/research_reports/RR2273.html
+  title: Research from RAND Corporation
+  type: web
+  cited_by:
+    - proliferation
+  publication_id: rand
+  tags:
+    - open-source
+    - governance
+    - dual-use
+- id: ff196d26f839ac24
+  url: https://cset.georgetown.edu/publication/ai-and-the-future-of-warfare/
+  title: Center for Security and Emerging Technology analysis
+  type: web
+  cited_by:
+    - proliferation
+  publication_id: cset
+  tags:
+    - cybersecurity
+    - open-source
+    - governance
+    - dual-use
+- id: 9e3f749057a4c80c
+  url: https://cset.georgetown.edu/publication/chinas-ai-strategy-2024/
+  title: CSET analysis
+  type: web
+  cited_by:
+    - proliferation
+  publication_id: cset
+  tags:
+    - open-source
+    - governance
+    - dual-use
+- id: 65625d0e165471fb
+  url: https://www.rand.org/pubs/research_reports/RRA2344-1.html
+  title: RAND's assessment
+  type: web
+  cited_by:
+    - proliferation
+  publication_id: rand
+  tags:
+    - open-source
+    - governance
+    - dual-use
+- id: 49086e118f06af39
+  url: https://www.cnas.org/publications/reports/the-role-of-compute-in-ai-governance
+  title: CNAS analysis
+  type: web
+  cited_by:
+    - proliferation
+  publication_id: cnas
+  tags:
+    - open-source
+    - governance
+    - dual-use
+- id: 06cd2ce7fdd5fd6a
+  url: https://www.rand.org/pubs/perspectives/PE198.html
+  title: nuclear proliferation analogy
+  type: web
+  cited_by:
+    - proliferation
+  publication_id: rand
+  tags:
+    - open-source
+    - governance
+    - dual-use
+- id: 26ce4b4f8f03e04a
+  url: https://www.rand.org/content/dam/rand/pubs/perspectives/PE300/PE396/RAND_PE396.pdf
+  title: prisoner's dilemma
+  type: web
+  cited_by:
+    - racing-dynamics
+  publication_id: rand
+  tags:
+    - governance
+    - coordination
+    - competition
+- id: 1512c97d3ef8a9a1
+  url: https://www.csis.org/analysis/deepseek-breakthrough-reshaping-ai-competition
+  title: Center for Strategic and International Studies
+  type: web
+  cited_by:
+    - racing-dynamics
+  publication_id: csis
+  tags:
+    - governance
+    - coordination
+    - competition
+- id: 71c4a89aa2d79970
+  url: https://www.atlanticcouncil.org/blogs/new-atlanticist/deepseek-ai-breakthrough-us-china-competition/
+  title: Atlantic Council
+  type: web
+  cited_by:
+    - racing-dynamics
+  tags:
+    - governance
+    - coordination
+    - competition
+  publication_id: atlantic-council
+- id: d6a4106dcfd989b0
+  url: https://www.brookings.edu/articles/the-geography-of-ai-hubs-concentration-and-competition/
+  title: $67.2 billion in AI investment
+  type: web
+  cited_by:
+    - winner-take-all
+  publication_id: brookings
+  tags:
+    - economic-inequality
+    - market-concentration
+    - big-tech
+- id: 1f6dd70a92c96677
+  url: https://www.brookings.edu/articles/automation-and-the-future-of-work/
+  title: Brookings
+  type: web
+  cited_by:
+    - winner-take-all
+  publication_id: brookings
+  tags:
+    - economic-inequality
+    - market-concentration
+    - big-tech
+- id: 1e392ce476b43c8f
+  url: https://www.rand.org/pubs/research_reports/RRA3686-1.html
+  title: Executive Order 14110
+  type: web
+  cited_by:
+    - monitoring
+    - pause-and-redirect
+  publication_id: rand
+- id: 68769a80d4b544c4
+  url: https://www.csis.org/analysis/what-un-global-dialogue-ai-governance-reveals-about-global-power-shifts
+  title: "CSIS: UN Global Dialogue on AI Governance"
+  type: web
+  cited_by:
+    - failed-stalled-proposals
+    - pause-and-redirect
+  publication_id: csis
+  tags:
+    - governance
+- id: ac694cfb5ffc2a60
+  url: https://www.rand.org/pubs/research_briefs/RBA3679-1.html
+  title: RAND research on AI regulatory capture
+  type: web
+  cited_by:
+    - governance-focused
+  publication_id: rand
+  tags:
+    - governance
+- id: a3e39f7b4281936a
+  url: https://www.rand.org/pubs/perspectives/PEA3776-1.html
+  title: RAND research
+  type: web
+  cited_by:
+    - governance-focused
+    - coordination
+  publication_id: rand
+- id: 0d4f74bded5bb7bc
+  url: https://www.brookings.edu/articles/strengthening-international-cooperation-on-artificial-intelligence/
+  title: Brookings
+  type: web
+  cited_by:
+    - governance-focused
+  publication_id: brookings
+- id: d6f6ed46d5645127
+  url: https://www.csis.org/analysis/understanding-us-allies-current-legal-authority-implement-ai-and-semiconductor-export
+  title: Understanding US Allies' Legal Authority on Export Controls
+  type: web
+  cited_by:
+    - intervention-timing-windows
+    - governance-focused
+  publication_id: csis
+  tags:
+    - prioritization
+    - timing
+    - strategy
+- id: 245c3ece62be1e94
+  url: https://www.rand.org/randeurope/research/projects/2025/examining-risks-and-response-for-ai-loss-of-control-incidents-cm.html
+  title: RAND (2025)
+  type: web
+  cited_by:
+    - catastrophe
+  publication_id: rand
+- id: 7629a035e7e22ee1
+  url: https://www.atlanticcouncil.org/blogs/new-atlanticist/reading-between-the-lines-of-the-dueling-us-and-chinese-ai-action-plans/
+  title: Paris AI Summit divergence
+  type: web
+  cited_by:
+    - coordination
+  publication_id: atlantic-council
+- id: 79f2157d0aa55bdd
+  url: https://www.brookings.edu/articles/the-bletchley-park-process-could-be-a-building-block-for-global-cooperation-on-ai-safety/
+  title: Bletchley Declaration
+  type: web
+  cited_by:
+    - international-regimes
+    - slow-takeoff-muddle
+  publication_id: brookings
+- id: a7f69bbad6cd82c0
+  url: https://carnegieendowment.org/research/2024/10/the-ai-governance-arms-race-from-summit-pageantry-to-progress
+  title: Carnegie analysis warns
+  type: web
+  cited_by:
+    - international-regimes
+    - multipolar-trap
+  publication_id: carnegie
+  tags:
+    - game-theory
+    - coordination
+    - competition
+- id: dfe76e1ad41f9bf6
+  url: https://www.brookings.edu/articles/it-is-time-to-negotiate-global-treaties-on-artificial-intelligence/
+  title: Brookings emphasizes
+  type: web
+  cited_by:
+    - international-regimes
+  publication_id: brookings
+- id: 4162ca16170ea7c1
+  url: https://www.brookings.edu/articles/network-architecture-for-global-ai-policy/
+  title: Brookings on Networks
+  type: web
+  cited_by:
+    - international-regimes
+    - multipolar-competition
+  publication_id: brookings
+- id: 0f17105b7e24c08a
+  url: https://carnegieendowment.org/research/2025/06/how-some-of-chinas-top-ai-thinkers-built-their-own-ai-safety-institute?lang=en
+  title: CnAISDA launched February 2025
+  type: web
+  cited_by:
+    - china-ai-regulations
+  publication_id: carnegie
+  tags:
+    - regulation
+    - china
+    - content-control
+- id: 3c736ff5b41a4c99
+  url: https://carnegieendowment.org/posts/2022/12/what-chinas-algorithm-registry-reveals-about-ai-governance
+  title: Carnegie Endowment research
+  type: web
+  cited_by:
+    - china-ai-regulations
+  publication_id: carnegie
+  tags:
+    - regulation
+    - china
+    - content-control
+- id: e3274b108aac1712
+  url: https://carnegieendowment.org/research/2025/01/deepseek-and-other-chinese-firms-converge-with-western-companies-on-ai-promises
+  title: Frontier AI Safety Commitments
+  type: web
+  cited_by:
+    - china-ai-regulations
+  publication_id: carnegie
+  tags:
+    - safety
+    - regulation
+    - china
+    - content-control
+- id: daad095f3ead31b5
+  url: https://carnegieendowment.org/research/2025/06/how-some-of-chinas-top-ai-thinkers-built-their-own-ai-safety-institute
+  title: CnAISDA establishment
+  type: web
+  cited_by:
+    - china-ai-regulations
+  publication_id: carnegie
+  tags:
+    - regulation
+    - china
+    - content-control
+- id: f10b467b2e2a91b8
+  url: https://carnegieendowment.org/research/2024/02/tracing-the-roots-of-chinas-ai-regulations
+  title: Tracing the Roots of China's AI Regulations
+  type: web
+  cited_by:
+    - china-ai-regulations
+  publication_id: carnegie
+  tags:
+    - governance
+    - regulation
+    - china
+    - content-control
+- id: f5ad1c4adccb2a25
+  url: https://carnegieendowment.org/posts/2024/09/california-sb1047-ai-safety-regulation?lang=en
+  title: "Carnegie Endowment: All Eyes on Sacramento: SB 1047 and the AI Safety Debate"
+  type: web
+  cited_by:
+    - california-sb1047
+  publication_id: carnegie
+  tags:
+    - safety
+    - regulation
+    - state-policy
+    - frontier-models
+- id: b1a64f1c92cb5f01
+  url: https://www.brookings.edu/articles/misrepresentations-of-californias-ai-safety-bill/
+  title: "Brookings: Misrepresentations of California's AI safety bill"
+  type: web
+  cited_by:
+    - california-sb1047
+  publication_id: brookings
+  tags:
+    - safety
+    - regulation
+    - state-policy
+    - frontier-models
+- id: 86a54758bf3728bd
+  url: https://www.rand.org/pubs/commentary/2024/10/how-ai-can-automate-ai-research-and-development.html
+  title: RAND analysis
+  type: web
+  cited_by:
+    - self-improvement
+  publication_id: rand
+  tags:
+    - intelligence-explosion
+    - recursive-self-improvement
+    - automl
+- id: ab7f0c2b472816cf
+  url: https://www.rand.org/pubs/working_papers/WRA3056-1.html
+  title: RAND's research on Hardware-Enabled Governance Mechanisms
+  type: web
+  cited_by:
+    - monitoring
+  publication_id: rand
+  tags:
+    - governance
+    - compute
+- id: 44a63fa0e7875bb8
+  url: https://www.cnas.org/publications/reports/secure-governable-chips
+  title: CNAS's "Secure, Governable Chips" report
+  type: web
+  cited_by:
+    - monitoring
+  publication_id: cnas
+  tags:
+    - compute
+- id: 2408076a24b70f71
+  url: https://cset.georgetown.edu/article/governor-newsom-vetoes-sweeping-ai-regulation-sb-1047/
+  title: Meta, OpenAI, and House Speaker Nancy Pelosi opposed the bill
+  type: web
+  cited_by:
+    - failed-stalled-proposals
+  publication_id: cset
+- id: 8ef2d19987d8cfcb
+  url: https://www.brookings.edu/articles/states-are-legislating-ai-but-a-moratorium-could-stall-their-progress/
+  title: nearly 700 AI-related state bills were introduced in 2024
+  type: web
+  cited_by:
+    - failed-stalled-proposals
+  publication_id: brookings
+- id: 61d484269e6dbd8c
+  url: https://carnegieendowment.org/posts/2024/10/california-sb1047-ai-safety-bill-veto-lessons?lang=en
+  title: Carnegie Endowment
+  type: web
+  cited_by:
+    - us-state-legislation
+  publication_id: carnegie
+- id: 30e029a68b457ec8
+  url: https://www.brookings.edu/research/trust-in-government/
+  title: "Brookings: Trust in Government"
+  type: web
+  cited_by:
+    - trust-cascade
+  publication_id: brookings
+  tags:
+    - institutional-trust
+    - social-capital
+    - legitimacy
+- id: a763218ec95ee18b
+  url: https://www.atlanticcouncil.org/
+  title: "Atlantic Council: Digital Trust"
+  type: web
+  cited_by:
+    - trust-cascade
+  tags:
+    - institutional-trust
+    - social-capital
+    - legitimacy
+  publication_id: atlantic-council
+- id: d8ce13de19e0c10b
+  url: https://www.rand.org/topics/trust.html
+  title: "RAND: Institutional Trust"
+  type: web
+  cited_by:
+    - trust-cascade
+  publication_id: rand
+  tags:
+    - institutional-trust
+    - social-capital
+    - legitimacy
+- id: 742b75e39cf43b71
+  url: https://www.csis.org/analysis/ukraines-future-vision-and-current-capabilities-waging-ai-enabled-autonomous-warfare
+  title: CSIS analysts
+  type: web
+  cited_by:
+    - autonomous-weapons
+  publication_id: csis
+  tags:
+    - laws
+    - military-ai
+    - arms-control
+- id: 0e8b1a842459e5f9
+  url: https://www.atlanticcouncil.org/blogs/ukrainealert/missiles-ai-and-drone-swarms-ukraines-2025-defense-tech-priorities/
+  title: December 2024 first fully unmanned operation near Lyptsi
+  type: web
+  cited_by:
+    - autonomous-weapons
+  tags:
+    - laws
+    - military-ai
+    - arms-control
+  publication_id: atlantic-council
+- id: 187d75d58e1185d3
+  url: https://www.cnas.org/press/press-release/new-cnas-report-examines-how-emerging-ai-capabilities-could-disrupt-the-cyber-offense-defense-balance
+  title: Tipping the Scales
+  type: web
+  cited_by:
+    - cyberweapons
+  publication_id: cnas
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+- id: ced517a1cfe84c8b
+  url: https://cset.georgetown.edu/publication/anticipating-ais-impact-on-the-cyber-offense-defense-balance/
+  title: Anticipating AI's Impact
+  type: web
+  cited_by:
+    - cyberweapons
+  publication_id: cset
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+- id: 4fc88a56eee2c2e2
+  url: https://cset.georgetown.edu/wp-content/uploads/CSET-Anticipating-AIs-Impact-on-the-Cyber-Offense-Defense-Balance.pdf
+  title: Georgetown CSET report
+  type: web
+  cited_by:
+    - cyberweapons
+  publication_id: cset
+  tags:
+    - cybersecurity
+    - information-warfare
+    - critical-infrastructure
+- id: 2a1c7e0e24dc524b
+  url: https://www.csis.org/analysis/ai-grid-opportunities-risks-and-safeguards
+  title: CSIS analysis
+  type: web
+  cited_by:
+    - flash-dynamics
+  publication_id: csis
+  tags:
+    - algorithmic-trading
+    - financial-stability
+    - critical-infrastructure
+- id: 6c5808053763eb45
+  url: https://www.rand.org/blog/2020/06/the-risks-of-autonomous-weapons-systems-for-crisis.html
+  title: RAND Corporation research
+  type: web
+  cited_by:
+    - flash-dynamics
+  publication_id: rand
+  tags:
+    - algorithmic-trading
+    - financial-stability
+    - critical-infrastructure
+- id: 076fea2a9efa2206
+  url: https://cset.georgetown.edu/article/nuclear-non-proliferation-is-the-wrong-framework-for-ai-governance/
+  title: CSET Georgetown research
+  type: web
+  cited_by:
+    - multipolar-competition
+  publication_id: cset
+- id: 07c1b24db0ec5298
+  url: https://www.rand.org/content/dam/rand/pubs/perspectives/PEA4100/PEA4155-1/RAND_PEA4155-1.pdf
+  title: RAND research
+  type: web
+  cited_by:
+    - multipolar-competition
+  publication_id: rand
+- id: 71bea223ae620e94
+  url: https://cset.georgetown.edu/publication/ai-and-the-future-of-disinformation-campaigns-2/
+  title: CSET research
+  type: web
+  cited_by:
+    - multipolar-competition
+  publication_id: cset
+- id: 23322ce23eea116e
+  url: https://cset.georgetown.edu/article/beyond-corporate-promises/
+  title: Georgetown CSET
+  type: web
+  cited_by:
+    - multipolar-competition
+  publication_id: cset
+- id: 065c88f0533ab2b3
+  url: https://www.csis.org/analysis/algorithmic-stability-how-ai-could-shape-future-deterrence
+  title: CSIS analysis
+  type: web
+  cited_by:
+    - multipolar-competition
+  publication_id: csis
+- id: 5b3c5035b24e72b6
+  url: https://www.rand.org/pubs/articles/2018/how-artificial-intelligence-could-increase-the-risk.html
+  title: RAND researchers
+  type: web
+  cited_by:
+    - multipolar-competition
+  publication_id: rand
+- id: 28c6c8779dff28f4
+  url: https://www.cnas.org/press/press-release/new-cnas-report-on-the-world-altering-stakes-of-u-s-china-ai-competition
+  title: CNAS research
+  type: web
+  cited_by:
+    - multipolar-competition
+  publication_id: cnas
+- id: d1b2551ff03edf18
+  url: https://www.rand.org/topics/geopolitical-strategic-competition.html
+  title: RAND Corporation
+  type: web
+  cited_by:
+    - multipolar-competition
+  publication_id: rand
+- id: 6d91412978fac878
+  url: https://www.brookings.edu/articles/what-does-the-2024-election-mean-for-the-future-of-ai-governance/
+  title: Brookings Institution
+  type: web
+  publication_id: brookings
+  cited_by:
+    - intervention-timing-windows
+  tags:
+    - prioritization
+    - timing
+    - strategy
+- id: 389433dce3720ea6
+  url: https://www.rand.org/pubs/commentary/2025/05/chinas-ai-models-are-closing-the-gap-but-americas-real.html
+  title: largest single advantage
+  type: web
+  publication_id: rand
+  cited_by:
+    - multi-actor-landscape
+- id: c2d3c5e8ef0a4b0b
+  url: https://carnegieendowment.org/features/ai-global-surveillance-technology
+  title: Carnegie Endowment AI Global Surveillance Index
+  type: web
+  publication_id: carnegie
+  cited_by:
+    - surveillance-authoritarian-stability
+  tags:
+    - authoritarianism
+    - stability
+    - surveillance
+- id: e460c4d156cdbf68
+  url: https://www.csis.org/analysis/ai-seoul-summit
+  title: The AI Seoul Summit
+  type: web
+  publication_id: csis
+  cited_by:
+    - international-summits
+  tags:
+    - international
+    - governance
+    - multilateral-diplomacy
+- id: 2e2909eca40b41e2
+  url: https://www.csis.org/analysis/frances-ai-action-summit
+  title: France's AI Action Summit
+  type: web
+  publication_id: csis
+  cited_by:
+    - international-summits
+  tags:
+    - international
+    - governance
+    - multilateral-diplomacy
+- id: ef4839e9409fc12f
+  url: https://cset.georgetown.edu/article/the-executive-order-on-removing-barriers-to-american-leadership-in-artificial-intelligence/
+  title: Georgetown CSET Analysis
+  type: web
+  publication_id: cset
+  cited_by:
+    - us-executive-order
+  tags:
+    - compute-thresholds
+    - governance
+    - us-aisi

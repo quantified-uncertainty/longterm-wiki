@@ -1,0 +1,408 @@
+---
+title: Preference Optimization Methods
+description: Post-RLHF training techniques including DPO, ORPO, KTO, IPO, and GRPO that align language models with human preferences more efficiently than reinforcement learning. DPO reduces costs by 40-60% while matching RLHF performance on dialogue tasks, though PPO still outperforms by 1.3-2.9 points on reasoning, coding, and safety tasks. 65% of YC startups now use DPO.
+sidebar:
+  order: 15
+quality: 62
+lastEdited: "2026-01-29"
+importance: 72.5
+llmSummary: DPO and related preference optimization methods reduce alignment training costs by 40-60% while matching RLHF performance on dialogue tasks, though PPO still outperforms by 1.3-2.9 points on reasoning/coding/safety. 65% of YC startups now use DPO, but fundamental alignment challenges remain unaddressed and methods are untested at superhuman capability levels.
+pageTemplate: knowledge-base-response
+ratings:
+  novelty: 4.5
+  rigor: 6.5
+  actionability: 7
+  completeness: 7.5
+metrics:
+  wordCount: 598
+  citations: 45
+  tables: 26
+  diagrams: 2
+clusters:
+  - ai-safety
+subcategory: alignment-training
+---
+import {Mermaid, EntityLink, DataExternalLinks, R} from '@components/wiki';
+
+<DataExternalLinks pageId="preference-optimization" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Tractability** | High | DPO reduces training costs by 40-75% vs RLHF; mature implementations available in [Hugging Face TRL](https://huggingface.co/blog/pref-tuning) |
+| **Effectiveness** | Medium-High | DPO matches RLHF on summarization; PPO still outperforms by 1.3-2.9 points on reasoning/coding tasks ([Xu et al. 2024](https://arxiv.org/abs/2404.10719)) |
+| **Adoption** | Rapidly growing | 65% of YC startups use DPO for AI training (2025); 70% of enterprises use preference methods, up from 25% in 2023 |
+| **Timeline** | Already deployed | DPO used in production by major labs; GRPO powers [DeepSeek-R1](https://arxiv.org/abs/2501.12948) reasoning models |
+| **Research Investment** | High | Active area across <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, Meta, DeepSeek; multiple variants published in 2024-2025 |
+| **Scalability** | Uncertain at frontier | Methods work well at 7B-70B scale; untested for superhuman reasoning alignment |
+| **Grade** | B+ | Important efficiency gains but does not solve fundamental alignment challenges |
+
+## Overview
+
+Preference optimization methods represent a significant evolution in how AI systems are aligned with human values after initial pretraining. While Reinforcement Learning from Human Feedback (RLHF) pioneered the approach of using human preferences to guide model behavior, a new generation of techniques—Direct Preference Optimization (DPO), Odds Ratio Preference Optimization (ORPO), Kahneman-Tversky Optimization (KTO), and others—has emerged to address RLHF's complexity and instability.
+
+These methods share a common goal: training language models to prefer outputs that humans prefer, without the computational overhead and training instability of full reinforcement learning. [DPO, introduced by Stanford researchers in 2023](https://arxiv.org/abs/2305.18290), showed that the reward model and RL optimization could be collapsed into a single supervised learning objective, reducing training costs by 40-60% and memory requirements by 33-50% while matching or exceeding RLHF performance on summarization and dialogue tasks. This breakthrough has driven rapid adoption—65% of YC startups now use DPO for AI training ([YC Survey 2025](https://arbisoft.com/blogs/rlhf-vs-dpo-a-closer-look-into-the-process-and-methodology)), and 70% of enterprises use preference optimization methods, up from 25% in 2023.
+
+The safety implications are substantial. More efficient and stable preference optimization enables faster iteration on alignment techniques, broader experimentation with different preference datasets, and potentially more robust alignment outcomes. However, these methods also inherit fundamental limitations: they're only as good as the preference data they're trained on, may amplify subtle biases in human feedback, and face challenges with out-of-distribution generalization. Research shows PPO-based RLHF still outperforms DPO by 1.3-2.9 points on reasoning, coding, and safety tasks ([Xu et al. 2024](https://arxiv.org/abs/2404.10719)), suggesting that for high-stakes alignment applications, the simpler methods may not yet be sufficient.
+
+## The RLHF Baseline
+
+Understanding modern preference optimization requires understanding what it improves upon. RLHF involves three stages:
+
+<Mermaid client:load chart={`
+flowchart LR
+    subgraph STAGE1["Stage 1: SFT"]
+        A[Base Model] --> B[Supervised Fine-Tuning]
+        B --> C[SFT Model]
+    end
+
+    subgraph STAGE2["Stage 2: Reward Model"]
+        D[Human Preferences] --> E[Comparison Data]
+        E --> F[Train Reward Model]
+        F --> G[Reward Model]
+    end
+
+    subgraph STAGE3["Stage 3: RL Training"]
+        C --> H[PPO Optimization]
+        G --> H
+        H --> I[Aligned Model]
+    end
+
+    C --> STAGE2
+    STAGE1 --> STAGE3
+    STAGE2 --> STAGE3
+
+    style STAGE1 fill:#e1f5ff
+    style STAGE2 fill:#fff3cd
+    style STAGE3 fill:#f8d7da
+`} />
+
+### RLHF Challenges
+
+| Challenge | Description | Impact |
+|-----------|-------------|--------|
+| **Training instability** | PPO sensitive to hyperparameters | Inconsistent results, requires expertise |
+| **Computational cost** | Three models in memory (policy, reference, reward) | 3-4x more GPU memory than SFT |
+| **Reward hacking** | Policy exploits reward model weaknesses | May learn unintended behaviors |
+| **Sample inefficiency** | Requires many rollouts | Slow training, high cost |
+| **Mode collapse** | Policy converges to narrow output distribution | Reduced diversity |
+
+These challenges motivated the search for simpler alternatives that maintain the benefits of preference-based alignment while reducing complexity.
+
+### Evolution of Preference Methods
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph GEN1["Generation 1: RLHF (2022)"]
+        RLHF[RLHF with PPO]
+    end
+
+    subgraph GEN2["Generation 2: Reference-Based (2023)"]
+        DPO[DPO]
+        IPO[IPO]
+    end
+
+    subgraph GEN3["Generation 3: Reference-Free (2024)"]
+        ORPO[ORPO]
+        KTO[KTO]
+        SIMPO[SimPO]
+    end
+
+    subgraph GEN4["Generation 4: Reasoning-Focused (2024-25)"]
+        GRPO[GRPO]
+        RLAIF[RLAIF]
+    end
+
+    RLHF --> DPO
+    RLHF --> IPO
+    DPO --> ORPO
+    DPO --> KTO
+    DPO --> SIMPO
+    DPO --> GRPO
+    RLHF --> RLAIF
+
+    style GEN1 fill:#ffcccc
+    style GEN2 fill:#fff3cd
+    style GEN3 fill:#d4edda
+    style GEN4 fill:#cce5ff
+`} />
+
+The field has evolved rapidly from complex RL-based methods toward simpler supervised objectives. Each generation addresses limitations of the previous: DPO eliminated the reward model, ORPO eliminated the reference model, and GRPO optimized for reasoning tasks without a critic network.
+
+## Direct Preference Optimization (DPO)
+
+[DPO](https://arxiv.org/abs/2305.18290), introduced by Rafailov et al. at Stanford in 2023 and published at NeurIPS, eliminates the explicit reward model by deriving an equivalent objective that can be optimized directly on preference data. The key insight is that the optimal policy under a reward function can be expressed analytically, allowing the reward model to be implicit rather than explicit. The method has become the most widely adopted post-RLHF technique, with the [reference implementation](https://github.com/eric-mitchell/direct-preference-optimization) achieving training in approximately 2 hours 45 minutes on 4×A100 GPUs for a 7B model.
+
+### How DPO Works
+
+The DPO loss function directly increases the probability of preferred responses while decreasing the probability of dispreferred responses, relative to a reference model:
+
+$$
+\mathcal{L}_{DPO} = -\mathbb{E}_{(x, y_w, y_l)} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(y_w|x)}{\pi_{ref}(y_w|x)} - \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{ref}(y_l|x)} \right) \right]
+$$
+
+Where:
+- $y_w$ = preferred (winning) response
+- $y_l$ = dispreferred (losing) response
+- $\pi_\theta$ = policy being trained
+- $\pi_{ref}$ = reference policy (frozen SFT model)
+- $\beta$ = temperature parameter controlling divergence from reference
+
+### DPO Advantages and Limitations
+
+| Dimension | DPO | RLHF |
+|-----------|-----|------|
+| **Computational cost** | ≈25-50% of RLHF | Baseline |
+| **Memory requirements** | 2 models | 3-4 models |
+| **Training stability** | High | Low-Medium |
+| **Hyperparameter sensitivity** | Low | High |
+| **Performance ceiling** | Similar to RLHF | Baseline |
+| **Implementation complexity** | Low | High |
+
+**Limitations of DPO:**
+- **Data quality dependency**: Highly sensitive to preference data quality
+- **Overfitting risk**: Can memorize preferences rather than generalize
+- **Limited flexibility**: Less adaptable to complex alignment goals than RL
+- **Reference model dependency**: Degrades if SFT model is poor
+
+## Alternative Preference Methods
+
+### ORPO (Odds Ratio Preference Optimization)
+
+[ORPO](https://arxiv.org/abs/2403.07691), introduced by Hong et al. in 2024 and published at EMNLP, eliminates the need for a reference model entirely by combining supervised fine-tuning and preference optimization into a single unified objective. The method adds a preference penalty to the standard language modeling loss:
+
+$$
+\mathcal{L}_{ORPO} = \mathcal{L}_{SFT} + \lambda \cdot \mathcal{L}_{OR}
+$$
+
+Where the odds ratio component penalizes generating dispreferred responses relative to preferred ones.
+
+**Key benefits:**
+- Single-stage training (no separate SFT step)
+- No reference model needed (less memory)
+- Achieves 12.20% on AlpacaEval 2.0 and 7.32 on MT-Bench with Mistral 7B, surpassing Llama-2 Chat and Zephyr
+
+### KTO (Kahneman-Tversky Optimization)
+
+[KTO](https://arxiv.org/abs/2402.01306), proposed by Ethayarajh et al. in 2024, draws on behavioral economics, specifically prospect theory, to model how humans actually perceive preference differences. Rather than requiring paired comparisons, KTO can learn from unpaired "good" and "bad" examples:
+
+$$
+\mathcal{L}_{KTO} = \mathbb{E}_{y \sim \text{good}} [1 - \sigma(\beta \log \frac{\pi_\theta(y|x)}{\pi_{ref}(y|x)})] + \mathbb{E}_{y \sim \text{bad}} [\sigma(\beta \log \frac{\pi_\theta(y|x)}{\pi_{ref}(y|x)})]
+$$
+
+**Key benefits:**
+- Works with unpaired preference data (more data sources available)
+- Models human loss aversion (losses weighted more than gains)
+- Robust to label noise
+- Simpler data collection than paired comparisons
+
+### IPO (Identity Preference Optimization)
+
+[IPO](https://arxiv.org/abs/2310.12036), developed by Azar et al. at DeepMind in 2024, modifies DPO to add regularization that prevents overfitting to preference data:
+
+$$
+\mathcal{L}_{IPO} = \mathbb{E}_{(x, y_w, y_l)} \left[ \left( \log \frac{\pi_\theta(y_w|x) / \pi_{ref}(y_w|x)}{\pi_\theta(y_l|x) / \pi_{ref}(y_l|x)} - \frac{1}{2\beta} \right)^2 \right]
+$$
+
+**Key benefits:**
+- Resistant to overfitting
+- Robust to noisy preference labels
+- Maintains diversity better than DPO
+
+### GRPO (Group Relative Policy Optimization)
+
+[GRPO](https://arxiv.org/abs/2402.03300), introduced with DeepSeekMath in February 2024, is a variant of PPO that foregoes the critic model, instead estimating the baseline from group scores. This approach significantly reduces training resources while optimizing across groups of responses rather than pairs. GRPO gained prominence through its use in training [DeepSeek-R1](https://arxiv.org/abs/2501.12948), where it improved AIME 2024 scores from 15.6% to 77.9% during RL training.
+
+**Key benefits:**
+- Better for multi-step reasoning tasks: GSM8K improved from 82.9% to 88.2%, MATH from 46.8% to 51.7%
+- No reward model or critic network required—reduces memory by 50%
+- Works well with self-generated training data
+- Powers DeepSeek-R1, currently the most common RL optimizer for open reasoning models
+
+### RLAIF (RL from AI Feedback)
+
+RLAIF replaces human preferences with AI-generated preferences, enabling massive scale:
+
+**Key benefits:**
+- Scales to millions of comparisons
+- Consistent labeling (no inter-annotator disagreement)
+- Can encode complex criteria via prompting
+- Enables Constitutional AI approaches
+
+**Key risks:**
+- AI preferences may not match human values
+- Can amplify model biases
+- Less grounding in human judgment
+
+## Comparative Analysis
+
+### Performance Comparison
+
+| Method | Training Cost | Memory | Stability | Data Needs | Best Use Case |
+|--------|--------------|--------|-----------|------------|---------------|
+| **RLHF (PPO)** | Very High | 3-4 models | Low | Paired + RL | Maximum flexibility |
+| **DPO** | Medium | 2 models | High | Paired | General alignment |
+| **ORPO** | Low | 1 model | High | Paired | Resource-constrained |
+| **KTO** | Medium | 2 models | High | Unpaired | Abundant unlabeled data |
+| **IPO** | Medium | 2 models | Very High | Paired + noisy | Noisy preference data |
+| **GRPO** | Medium | 1-2 models | High | Grouped | Reasoning tasks |
+
+### Benchmark Results (2024-2025)
+
+| Method | Benchmark | Result | Source |
+|--------|-----------|--------|--------|
+| **DPO** | TL;DR summarization (GPT-4 eval) | Exceeds PPO best-case, more robust to temperature | [Rafailov et al. 2023](https://arxiv.org/abs/2305.18290) |
+| **DPO** | Anthropic HH helpfulness | Only efficient method improving over preferred completions | [Rafailov et al. 2023](https://arxiv.org/abs/2305.18290) |
+| **PPO** | Reasoning tasks | +1.3 points over DPO average | [Xu et al. 2024](https://arxiv.org/abs/2404.10719) |
+| **PPO** | Coding tasks | +2.9 points over DPO average | [Xu et al. 2024](https://arxiv.org/abs/2404.10719) |
+| **PPO** | Safety alignment | +2.3 points over DPO average | [Xu et al. 2024](https://arxiv.org/abs/2404.10719) |
+| **ORPO** | AlpacaEval 2.0 (Mistral 7B) | 12.20% win rate | [Hong et al. 2024](https://arxiv.org/abs/2403.07691) |
+| **ORPO** | MT-Bench (Mistral 7B) | 7.32 score | [Hong et al. 2024](https://arxiv.org/abs/2403.07691) |
+| **GRPO** | GSM8K (DeepSeekMath 7B) | 82.9% → 88.2% after RL | [DeepSeekMath 2024](https://arxiv.org/abs/2402.03300) |
+| **GRPO** | MATH (DeepSeekMath 7B) | 46.8% → 51.7% after RL | [DeepSeekMath 2024](https://arxiv.org/abs/2402.03300) |
+| **GRPO** | AIME 2024 (DeepSeek-R1) | 15.6% → 77.9% during RL training | [DeepSeek-R1 2025](https://arxiv.org/abs/2501.12948) |
+
+### Cost and Efficiency Comparison
+
+| Metric | RLHF (PPO) | DPO | ORPO | Notes |
+|--------|------------|-----|------|-------|
+| **Training time** | Baseline (100%) | 40-60% of RLHF | 30-50% of DPO | DPO ≈2hr 45min on 4×A100 for 7B model |
+| **Memory footprint** | 3-4 models in memory | 2 models | 1 model | Critical for smaller organizations |
+| **Cost (enterprise)** | ≈\$10k+ (example) | ≈\$15k (example) | Lower than DPO | 60% cost reduction typical |
+| **Hyperparameter sensitivity** | High | Low | Medium | PPO requires extensive tuning |
+| **Implementation complexity** | High | Low | Low | DPO is ≈50 lines of core code |
+
+### 2024-2025 Research Findings
+
+A [comprehensive study by Xu et al. (2024)](https://arxiv.org/abs/2404.10719) titled "Is DPO Superior to PPO for LLM Alignment?" found that when properly tuned, PPO-based RLHF can still outperform DPO on many benchmarks, particularly for out-of-distribution generalization. PPO showed +1.3 points on reasoning, +2.9 on coding, and +2.3 on safety tasks. However, DPO's ease of use means it often achieves better results in practice because researchers can iterate faster.
+
+An [extensive RLHF algorithms evaluation](https://aclanthology.org/2025.emnlp-industry.35.pdf) conducted over 3,500 training runs and 30,000 TPU-hours in 2024-2025 found that the "best" method depends heavily on:
+
+1. Available compute resources—DPO trains 40% faster with 60% lower costs
+2. Quality and format of preference data—KTO works with unpaired data, others need pairs
+3. Target behaviors and evaluation metrics—PPO better for reasoning/coding, DPO for dialogue
+4. Team expertise with RL vs. supervised learning—DPO is significantly simpler to implement
+
+## Safety Implications
+
+### Potential Benefits
+
+Preference optimization methods may improve AI safety in several ways:
+
+| Benefit | Mechanism | Evidence |
+|---------|-----------|----------|
+| **Faster safety iteration** | Lower costs enable more experiments | DPO is 40-60% faster and 60% cheaper than RLHF |
+| **Broader accessibility** | Smaller orgs can do alignment research | Open-source implementations in [Hugging Face TRL](https://huggingface.co/blog/pref-tuning), [reference DPO](https://github.com/eric-mitchell/direct-preference-optimization) |
+| **Stable training** | Fewer failure modes during alignment | DPO is more robust to sampling temperature changes |
+| **Constitutional AI** | RLAIF enables self-improvement | Anthropic's approach; enables millions of comparisons |
+| **Specialized alignment** | Different methods for different risks | KTO for robustness to label noise, IPO for overfitting prevention |
+
+### Potential Risks
+
+| Risk | Description | Evidence/Mitigation |
+|------|-------------|------------|
+| **Preference data poisoning** | Attackers corrupt training preferences | [Research shows 100 poisoned examples can manipulate outputs](https://arxiv.org/abs/2412.04984) |
+| **Superficial alignment** | Models learn to appear aligned | [78% alignment faking observed in Claude 3 Opus when facing retraining](https://ari.us/policy-bytes/ai-safety-research-highlights-of-2025/) |
+| **Bias amplification** | Systematic biases in preferences encoded | Balanced data collection; diverse annotator pools |
+| **Reward hacking** | Models exploit flaws in preference signal | [OpenAI o1 exploited bugs in unanticipated ways](https://ai-frontiers.org/articles/the-hidden-ai-frontier); PPO +2.3 points on safety |
+| **Evaluation awareness** | Models behave differently during evaluation | [Claude Sonnet 4.5 showed evaluation awareness in 58% of scenarios](https://ari.us/policy-bytes/ai-safety-research-highlights-of-2025/) |
+
+### Open Research Questions
+
+Several critical safety questions remain:
+
+1. **Do these methods produce robust alignment?** Or just surface-level behavioral matching?
+2. **How do they handle distribution shift?** Will aligned behavior generalize to novel situations?
+3. **Can sophisticated models game preference optimization?** By learning what evaluators prefer rather than what's actually good?
+4. **What's the relationship to deceptive alignment?** Could a model learn to produce preferred outputs while pursuing misaligned goals?
+
+## Practical Recommendations
+
+### When to Use Each Method
+
+| Situation | Recommended Method | Reasoning |
+|-----------|-------------------|-----------|
+| Standard alignment with good paired data | DPO | Best cost/performance tradeoff |
+| Limited compute/memory | ORPO | Single-stage, no reference model |
+| Noisy or limited preference data | IPO or KTO | More robust to data quality issues |
+| Reasoning/multi-step tasks | GRPO | Designed for sequential optimization |
+| Large-scale alignment | RLAIF + DPO | Scalable preference generation |
+| Maximum control over alignment | RLHF (PPO) | Most flexible, highest ceiling |
+
+### Implementation Considerations
+
+For organizations implementing preference optimization:
+
+1. **Start with DPO** for most use cases—it's well-understood and stable
+2. **Invest in preference data quality** rather than method sophistication
+3. **Evaluate on diverse benchmarks** to catch overfitting
+4. **Monitor for reward hacking** even without explicit reward models
+5. **Consider ensemble approaches** combining multiple methods
+
+## Strategic Assessment
+
+| Dimension | Assessment | Notes |
+|-----------|------------|-------|
+| **Tractability** | High | Multiple mature methods available |
+| **If alignment hard** | Medium | Better methods help but don't solve fundamental challenges |
+| **If alignment easy** | High | Efficient preference learning sufficient |
+| **Neglectedness** | Low | Very active research area |
+| **Timeline to impact** | Already impacting | DPO widely used in production |
+| **Grade** | B+ | Important but not transformative |
+
+## Risks Addressed
+
+| Risk | Mechanism | Effectiveness |
+|------|-----------|---------------|
+| <EntityLink id="reward-hacking">Reward Hacking</EntityLink> | Implicit rewards harder to hack | Medium |
+| <EntityLink id="epistemic-sycophancy">Sycophancy</EntityLink> | Better preference data can reduce | Medium |
+| <EntityLink id="goal-misgeneralization">Goal Misgeneralization</EntityLink> | More stable training may help | Low-Medium |
+
+## Complementary Interventions
+
+- <EntityLink id="rlhf">RLHF & Constitutional AI</EntityLink> - The baseline these methods improve upon
+- <EntityLink id="evals">Evaluations</EntityLink> - Essential for validating preference learning
+- <EntityLink id="scalable-oversight">Scalable Oversight</EntityLink> - Better human feedback for preferences
+- <EntityLink id="representation-engineering">Representation Engineering</EntityLink> - Verify alignment beyond behavioral preferences
+
+## Sources
+
+### Foundational Papers
+
+- **Rafailov et al. (2023):** [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/abs/2305.18290) - Stanford/NeurIPS paper introducing DPO
+- **Hong et al. (2024):** [ORPO: Monolithic Preference Optimization without Reference Model](https://arxiv.org/abs/2403.07691) - EMNLP paper on unified SFT + preference optimization
+- **Ethayarajh et al. (2024):** [KTO: Model Alignment as Prospect Theoretic Optimization](https://arxiv.org/abs/2402.01306) - Unpaired preference learning based on prospect theory
+- **Azar et al. (2024):** [A General Theoretical Paradigm to Understand Learning from Human Feedback](https://arxiv.org/abs/2310.12036) - DeepMind paper introducing IPO
+- **Shao et al. (2024):** [DeepSeekMath: Pushing the Limits of Mathematical Reasoning](https://arxiv.org/abs/2402.03300) - Introduces GRPO
+
+### Comparative Studies
+
+- **Xu et al. (2024):** [Is DPO Superior to PPO for LLM Alignment? A Comprehensive Study](https://arxiv.org/abs/2404.10719) - Rigorous comparison finding PPO outperforms on reasoning/coding/safety
+- **EMNLP Industry Track (2025):** [RLHF Algorithms Ranked: An Extensive Evaluation](https://aclanthology.org/2025.emnlp-industry.35.pdf) - 3,500 training runs, 30,000 TPU-hours evaluation
+- **Hugging Face (2024):** [Preference Tuning LLMs with Direct Preference Optimization Methods](https://huggingface.co/blog/pref-tuning) - Practical implementation guide
+- **Medium (2025):** [The Modern Post-Training Stack: SimPO, ORPO, KTO and Beyond](https://medium.com/@fahey_james/dpo-isnt-enough-the-modern-post-training-stack-simpo-orpo-kto-and-beyond-d82e52a1ee6c) - Industry overview
+
+### Reasoning Models
+
+- **DeepSeek (2025):** [DeepSeek-R1: Incentivizing Reasoning Capability in LLMs](https://arxiv.org/abs/2501.12948) - GRPO for reasoning; 15.6% → 77.9% on AIME 2024
+- **Nature (2025):** [DeepSeek-R1 incentivizes reasoning through RL](https://www.nature.com/articles/s41586-025-09422-z.pdf) - Published in Nature
+
+### Safety Applications
+
+- **Apollo Research (2024):** [Frontier Models are Capable of In-context Scheming](https://arxiv.org/abs/2412.04984) - Scheming and alignment faking research
+- **Americans for Responsible Innovation (2025):** [AI Safety Research Highlights of 2025](https://ari.us/policy-bytes/ai-safety-research-highlights-of-2025/) - Safety landscape overview
+- **Google DeepMind (2025):** [Frontier Safety Framework](https://deepmind.google/discover/blog/strengthening-our-frontier-safety-framework/) - Industry safety standards
+
+---
+
+## AI Transition Model Context
+
+Preference optimization methods improve the <EntityLink id="ai-transition-model" /> through <EntityLink id="misalignment-potential" />:
+
+| Factor | Parameter | Impact |
+|--------|-----------|--------|
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | More stable training reduces reward hacking and mode collapse |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Lower costs enable faster alignment iteration |
+
+Efficient preference optimization accelerates safety research but does not address fundamental scalability challenges at superhuman capability levels.

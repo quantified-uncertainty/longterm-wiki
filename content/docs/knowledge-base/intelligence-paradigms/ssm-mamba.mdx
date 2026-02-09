@@ -1,0 +1,428 @@
+---
+title: "State-Space Models / Mamba"
+description: "Analysis of Mamba and other state-space model architectures as alternatives to transformers. SSMs achieve 5x higher inference throughput with linear O(n) complexity versus quadratic O(n^2) attention. Mamba-3B matches Transformer-6B perplexity while Jamba 1.5 outperforms Llama-3.1-70B on Arena Hard. However, pure SSMs lag on in-context learning tasks, making hybrids increasingly dominant."
+sidebar:
+  label: "SSM/Mamba"
+  order: 7
+quality: 54
+lastEdited: "2026-01-28"
+importance: 54.5
+llmSummary: "Comprehensive analysis of state-space models (SSMs) like Mamba as transformer alternatives, documenting that Mamba-3B matches Transformer-6B perplexity with 5x throughput but lags on in-context learning (MMLU: 46.3% vs 51.2% at 8B scale). Hybrid architectures combining 43% SSM + 7% attention outperform pure transformers (+1.3 points) while maintaining efficiency gains, with estimated 45% probability of hybrids becoming dominant vs 35% for pure transformers."
+ratings:
+  novelty: 4.2
+  rigor: 6.8
+  actionability: 3.5
+  completeness: 7.1
+metrics:
+  wordCount: 259
+  citations: 65
+  tables: 50
+  diagrams: 1
+clusters: ["ai-safety"]
+---
+import {Mermaid, EntityLink, DataExternalLinks, R} from '@components/wiki';
+
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [tinkerd.net](https://tinkerd.net/blog/machine-learning/state-space-models/) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Mamba_(deep_learning_architecture) |
+| arXiv | [arxiv.org](https://arxiv.org/abs/2312.00752) |
+
+<DataExternalLinks pageId="ssm-mamba" client:load />
+
+## Overview
+
+State-Space Models (SSMs), particularly the **Mamba** architecture developed by [Albert Gu (CMU) and Tri Dao (Princeton)](https://arxiv.org/abs/2312.00752), represent a fundamentally different approach to sequence modeling than transformers. Instead of the pairwise attention mechanism (quadratic O(n^2) complexity), SSMs use structured state-space dynamics derived from continuous-time systems theory, achieving linear O(n) complexity in sequence length.
+
+The efficiency gains are substantial: Mamba achieves **5x higher inference throughput** than comparably-sized transformers and the **Mamba-3B model matches Transformer-6B perplexity** while being 40% cheaper to run. On the [Long Range Arena benchmark](https://arxiv.org/abs/2111.00396), the foundational S4 model achieved 80.48% average accuracy—the first architecture to solve the Path-X task requiring reasoning over 16,384 tokens—compared to less than 60% for all transformer baselines.
+
+However, pure SSMs exhibit consistent weaknesses on tasks requiring strong **in-context learning** or **copying from context**. [NVIDIA research (2024)](https://arxiv.org/html/2406.07887v1) found that while Mamba and Mamba-2 match transformers on many benchmarks at 8B scale, they lag on five-shot MMLU and phonebook lookup tasks. This has driven increasing adoption of **hybrid architectures**: AI21's [Jamba 1.5 Large scored 65.4 on Arena Hard](https://www.ai21.com/blog/announcing-jamba-model-family/), outperforming Llama-3.1-70B and 405B, using a 43% Mamba-2, 7% attention, 50% MLP architecture.
+
+Estimated probability of pure SSMs being dominant at transformative AI: **5-15%**. Probability of SSM-transformer hybrids playing significant role: **25-40%**.
+
+## Architecture Comparison
+
+The fundamental difference between transformers and SSMs lies in how they handle sequence dependencies. Transformers compute pairwise relationships between all tokens (quadratic), while SSMs compress history into a fixed-size state that evolves with each new token (linear).
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph transformer["Transformer: Quadratic Attention"]
+        direction TB
+        t1["Token 1"] --> attn["Global Attention<br/>All pairs computed<br/>O(n squared) complexity"]
+        t2["Token 2"] --> attn
+        t3["Token 3"] --> attn
+        tn["Token n"] --> attn
+        attn --> tout["Output<br/>Full context access"]
+    end
+
+    subgraph mamba["Mamba: Selective State Space"]
+        direction TB
+        m1["Token 1"] --> sel1["Selection<br/>What to remember?"]
+        sel1 --> state1["State h1"]
+        state1 --> m2["Token 2"]
+        m2 --> sel2["Selection<br/>Update or forget?"]
+        sel2 --> state2["State h2"]
+        state2 --> mn["Token n"]
+        mn --> seln["Selection"]
+        seln --> mout["Output<br/>O(n) linear"]
+    end
+
+    style attn fill:#ffcccc
+    style mout fill:#ccffcc
+`} />
+
+The **selection mechanism** is Mamba's key innovation. Unlike prior SSMs where state dynamics (A, B, C matrices) were fixed, Mamba makes them **input-dependent**. This allows the model to:
+- **Remember** important tokens by increasing their influence on state (large delta)
+- **Forget** irrelevant tokens by letting state decay quickly (small delta)
+- **Focus** on content-relevant patterns rather than just positional patterns
+
+### Key Differences
+
+| Aspect | Transformer | SSM/Mamba |
+|--------|-------------|-----------|
+| **Attention** | Full pairwise attention | None (implicit in state) |
+| **Complexity** | O(n^2) in sequence length | O(n) linear |
+| **Memory (inference)** | O(n) KV cache | O(1) constant state |
+| **Parallelism** | High (attention parallelizes) | Different (scan operations) |
+| **Long context** | Expensive (memory/compute) | Efficient (linear scaling) |
+| **In-context learning** | Strong | Weaker (stateful compression) |
+| **Proven scale** | Yes (GPT-4, Claude level) | Emerging (14B max pure SSM) |
+
+### SSM Architecture Comparison
+
+The SSM family has diversified rapidly since 2021. The following table compares major architectures:
+
+| Architecture | Year | Developer | Key Innovation | Best Benchmark Result | Max Scale Trained |
+|--------------|------|-----------|----------------|----------------------|-------------------|
+| **[S4](https://arxiv.org/abs/2111.00396)** | 2021 | Stanford (Gu, Goel, Ré) | Structured state space parameterization | 80.48% LRA (first to solve Path-X) | 1B parameters |
+| **[H3](https://arxiv.org/abs/2212.14052)** | 2022 | Stanford | SSM + short convolutions hybrid | Matched GPT-Neo on OpenWebText | 2.7B parameters |
+| **[Hyena](https://arxiv.org/abs/2302.10866)** | 2023 | Stanford/Together AI | Implicit long convolutions + gating | Matched Transformer at 20% less compute | 1.4B parameters |
+| **[RWKV](https://arxiv.org/abs/2305.13048)** | 2023 | Community (RWKV Foundation) | Linear attention + RNN hybrid | Eagle 7B: 3.36 Lambada perplexity | 14B parameters |
+| **[Mamba](https://arxiv.org/abs/2312.00752)** | 2023 | CMU/Princeton (Gu & Dao) | Selective SSM (input-dependent dynamics) | Mamba-3B matches Transformer-6B | 2.8B parameters |
+| **[Griffin](https://arxiv.org/abs/2402.19427)** | 2024 | Google DeepMind | Gated linear recurrence + local attention | Matches Llama-2 at 6x fewer tokens | 14B parameters |
+| **[Mamba-2](https://arxiv.org/abs/2405.21060)** | 2024 | CMU/Princeton (Gu & Dao) | State space duality (SSD) framework | 2-8x faster than Mamba-1, same quality | 8B parameters |
+| **[Jamba](https://arxiv.org/abs/2403.19887)** | 2024 | AI21 Labs | SSM + Attention + MoE hybrid | Jamba 1.5 Large: 65.4 Arena Hard | 52B (12B active) |
+| **[StripedHyena](https://www.together.ai/blog/stripedhyena-7b)** | 2023 | Together AI | Optimized Hyena + attention hybrid | Matches Llama-2-7B on OpenLLM | 7B parameters |
+| **[RecurrentGemma](https://ai.google.dev/gemma/docs/recurrentgemma)** | 2024 | Google DeepMind | Griffin-based production model | Matches Gemma with lower memory | 9B parameters |
+
+## Technical Details
+
+### Mamba Architecture
+
+Mamba (Gu & Dao, 2023) introduced key innovations:
+
+| Innovation | Description | Benefit |
+|------------|-------------|---------|
+| **Selective SSM** | Input-dependent state dynamics | Better modeling of dependencies |
+| **Hardware-aware** | Optimized for GPU memory hierarchy | Fast inference |
+| **Gated architecture** | Similar to GRU/LSTM gating | Training stability |
+
+### State-Space Formulation
+
+```
+h'(t) = Ah(t) + Bx(t)    # State evolution
+y(t) = Ch(t) + Dx(t)     # Output
+```
+
+The key insight is that this continuous system can be discretized and computed efficiently using parallel scans. The matrices have interpretable roles: **A** (transition) controls how state information persists or decays, **B** (input) maps new tokens into state, **C** (output) maps state to predictions, and **D** provides skip connections. Mamba's innovation is making these parameters **input-dependent** (selective), allowing the model to decide what to remember or forget based on content.
+
+## Benchmark Performance Comparison
+
+The following tables compile benchmark results from peer-reviewed papers comparing SSMs against transformers at similar scales.
+
+### Language Modeling Perplexity
+
+| Model | Parameters | Training Tokens | Pile Perplexity | WikiText-103 PPL | Source |
+|-------|------------|-----------------|-----------------|------------------|--------|
+| GPT-3 (Transformer) | 2.7B | 300B | 7.50 | — | [Brown et al. 2020](https://arxiv.org/abs/2005.14165) |
+| Mamba | 2.8B | 300B | 6.22 | — | [Gu & Dao 2023](https://arxiv.org/abs/2312.00752) |
+| Mamba-2 | 2.7B | 300B | 6.09 | — | [Dao & Gu 2024](https://arxiv.org/abs/2405.21060) |
+| Pythia (Transformer) | 2.8B | 300B | 7.92 | — | [Biderman et al. 2023](https://arxiv.org/abs/2304.01373) |
+| RWKV-6 | 3B | 1.12T | — | 5.24 | [Peng et al. 2024](https://arxiv.org/abs/2305.13048) |
+| Llama-2 (Transformer) | 7B | 2T | — | 5.47 | [Touvron et al. 2023](https://arxiv.org/abs/2307.09288) |
+| Griffin | 7B | 300B | — | 5.83 | [De et al. 2024](https://arxiv.org/abs/2402.19427) |
+
+*Lower perplexity is better. Mamba achieves superior perplexity at equivalent scale.*
+
+### Downstream Task Performance (8B Scale)
+
+[NVIDIA's empirical study (2024)](https://arxiv.org/html/2406.07887v1) provides the most comprehensive head-to-head comparison at production scale:
+
+| Model | Architecture | MMLU (5-shot) | HellaSwag | ARC-C | WinoGrande | Average |
+|-------|-------------|---------------|-----------|-------|------------|---------|
+| Transformer | Pure attention | **51.2%** | 79.1% | 53.8% | 74.2% | 64.6% |
+| Mamba | Pure SSM | 45.8% | 78.4% | 52.1% | 73.8% | 62.5% |
+| Mamba-2 | Pure SSD | 46.3% | 78.9% | 52.6% | 74.0% | 62.9% |
+| Mamba-2-Hybrid | 43% SSM + 7% Attn + 50% MLP | 52.4% | **80.2%** | **55.1%** | **75.8%** | **65.9%** |
+
+*Hybrid architecture outperforms pure transformer by +1.3 points average while offering 8x faster inference.*
+
+### Long Context Performance
+
+| Model | Context Length | Passkey Retrieval | SCROLLS | QuALITY | Source |
+|-------|----------------|-------------------|---------|---------|--------|
+| GPT-3.5-Turbo | 16K | 100% | 78.2% | 61.3% | OpenAI |
+| Mamba | 16K | 99.8% | 76.4% | 58.9% | [Gu & Dao 2023](https://arxiv.org/abs/2312.00752) |
+| Jamba 1.5 | 256K | 100% | **82.1%** | **68.4%** | [AI21 2024](https://www.ai21.com/blog/announcing-jamba-model-family/) |
+| Griffin | 32K | 99.5% | 77.8% | 62.1% | [De et al. 2024](https://arxiv.org/abs/2402.19427) |
+| RWKV-7 | 28K | 100% | 74.2% | 55.8% | [RWKV Foundation](https://wiki.rwkv.com/) |
+
+*SSMs excel at long context due to constant memory usage. RWKV-7 performance degrades rapidly beyond 28K.*
+
+### Inference Efficiency
+
+| Model | Params | Throughput (tokens/sec) | Memory @ 8K ctx | Memory @ 64K ctx | Latency (ms/token) |
+|-------|--------|------------------------|-----------------|------------------|-------------------|
+| Transformer-7B | 7B | 1,200 | 16 GB | 128 GB | 12.5 |
+| Mamba-7B | 7B | **6,000** | 8 GB | **8 GB** | **2.5** |
+| Hybrid (Jamba) | 52B (12B active) | 4,800 | 10 GB | 14 GB | 3.1 |
+
+*Mamba achieves 5x throughput and constant memory regardless of context length.*
+
+## Key Properties
+
+| Property | Rating | Assessment |
+|----------|--------|------------|
+| **White-box Access** | MEDIUM | Different internals than transformers, less studied |
+| **Trainability** | HIGH | Still gradient-based training |
+| **Predictability** | MEDIUM | Recurrence adds some complexity |
+| **Modularity** | LOW | Similar to transformers |
+| **Formal Verifiability** | UNKNOWN | Recurrent structure might help or hurt |
+
+## Safety Implications
+
+The shift from attention to state-space dynamics has significant implications for AI safety research. SSMs present both opportunities and challenges that differ fundamentally from transformer-based systems.
+
+### Potential Safety Advantages
+
+| Advantage | Mechanism | Quantified Benefit |
+|-----------|-----------|-------------------|
+| **Efficiency enables more testing** | 5x throughput means 5x more red-teaming for same cost | 5x evaluation coverage at constant budget |
+| **Constant memory enables longer evals** | No KV cache growth | Can test 100K+ token scenarios cheaply |
+| **Different failure modes** | No attention-based adversarial attacks | May resist prompt injection techniques |
+| **Deterministic state evolution** | Recurrent structure more predictable | Easier to trace information flow |
+| **Reduced context hijacking** | State compression limits perfect recall | Harder to inject malicious instructions late in context |
+
+### Safety Risks and Unknowns
+
+| Risk Category | Severity | Evidence | Mitigation Status |
+|---------------|----------|----------|-------------------|
+| **Interpretability gap** | HIGH | Attention visualizations don't apply; state probing tools immature | Active research at [Anthropic](https://www.anthropic.com/research), [Redwood](https://www.redwoodresearch.org/) |
+| **Unknown emergent behaviors** | MEDIUM | No SSM at GPT-4 scale exists; scaling laws less understood | Jamba 1.6 (52B hybrid) is largest production model |
+| **State opacity** | MEDIUM | Hidden state encodes compressed history; less interpretable than attention | [Mamba Explained](https://thegradient.pub/mamba-explained/) notes interpretability challenges |
+| **Safety research transfer** | MEDIUM | RLHF works, but mechanistic interpretability doesn't transfer | Need new SSM-specific probing methods |
+| **Selective mechanism manipulation** | LOW-MEDIUM | Selection weights could be adversarially targeted | Not yet demonstrated in practice |
+
+### Interpretability Comparison
+
+[The Gradient's analysis](https://thegradient.pub/mamba-explained/) notes that while attention patterns in transformers provide intuitive visualizations of "what the model is looking at," SSM interpretability is fundamentally different:
+
+> "The precise selection mechanism's interpretability is less than that of attention visualizations, though selection weights can be probed."
+
+| Interpretability Method | Transformers | SSMs |
+|------------------------|--------------|------|
+| Attention visualization | Direct, intuitive | N/A (no attention) |
+| Activation patching | Well-developed | Requires adaptation |
+| Circuit analysis | Mature tooling | Nascent |
+| Probing classifiers | Works | Works (similar) |
+| State analysis | N/A | Emerging method |
+| Selection weight analysis | N/A | Possible but less interpretable |
+
+## Current Landscape
+
+### Production and Research Models (2024-2025)
+
+| Model | Developer | Architecture | Parameters | Status | Key Achievement |
+|-------|-----------|-------------|------------|--------|-----------------|
+| **[Mamba](https://github.com/state-spaces/mamba)** | Gu & Dao | Pure SSM | 130M - 2.8B | Research | First SSM competitive with Transformers |
+| **[Mamba-2](https://arxiv.org/abs/2405.21060)** | Gu & Dao | SSD | Up to 8B | Research | 2-8x faster training than Mamba-1 |
+| **[Jamba 1.6](https://www.ai21.com/jamba/)** | AI21 Labs | SSM + Attention + MoE | 52B (12B active) | Production | Outperforms Llama-3.1-405B on RAG tasks |
+| **[RecurrentGemma](https://ai.google.dev/gemma/docs/recurrentgemma)** | Google DeepMind | Griffin-based | 2B, 9B | Production | Official Google SSM deployment |
+| **[RWKV-7](https://wiki.rwkv.com/)** | RWKV Foundation | RNN + Linear Attention | Up to 14B | Open Source | Strongest open-source pure SSM |
+| **[Codestral Mamba](https://mistral.ai/news/codestral-mamba)** | Mistral AI | Pure Mamba | 7B | Production | First commercial pure-Mamba for code |
+| **[Granite 4.0](https://www.ibm.com/granite)** | IBM Research | Mamba-2 hybrid | Various | Production | Enterprise SSM deployment |
+| **[StripedHyena](https://www.together.ai/blog/stripedhyena-7b)** | Together AI | Hyena + Attention | 7B | Research | Matches Llama-2-7B with 50% less memory |
+
+### Hybrid Architecture Design Patterns
+
+The emergence of hybrid models reflects a growing consensus that **pure SSMs and pure transformers each have fundamental limitations**. Hybrids aim to capture the efficiency of SSMs with the in-context learning strength of attention.
+
+| Hybrid Pattern | SSM Ratio | Attention Ratio | Example | Rationale |
+|----------------|-----------|-----------------|---------|-----------|
+| **Interleaved** | 87.5% | 12.5% | Jamba (1 attn per 8 layers) | Minimal attention for retrieval tasks |
+| **Block-based** | 43% | 7% + 50% MLP | Mamba-2-Hybrid | Optimal ratio from scaling laws |
+| **Head-mixed** | 50% | 50% | H3 | Early hybrid exploration |
+| **Local + Global** | 75% | 25% local only | Griffin | Local attention for nearby context |
+
+[NVIDIA's empirical study](https://arxiv.org/html/2406.07887v1) found the **43% SSM + 7% attention + 50% MLP** configuration optimal at 8B scale, outperforming pure transformers by +2.65 points average while projecting 8x faster generation.
+
+## Research Landscape
+
+### Foundational Papers
+
+| Paper | Authors | Venue | Key Contribution | Citations |
+|-------|---------|-------|------------------|-----------|
+| [S4: Structured State Spaces for Sequence Modeling](https://arxiv.org/abs/2111.00396) | Gu, Goel, Ré | ICLR 2022 | First efficient SSM parameterization | 1,500+ |
+| [Mamba: Linear-Time Sequence Modeling with Selective State Spaces](https://arxiv.org/abs/2312.00752) | Gu, Dao | ICLR 2024 | Input-dependent (selective) SSMs | 2,000+ |
+| [Transformers are SSMs (Mamba-2)](https://arxiv.org/abs/2405.21060) | Dao, Gu | ICML 2024 | State Space Duality unifying SSMs and attention | 400+ |
+| [Hyena Hierarchy](https://arxiv.org/abs/2302.10866) | Poli et al. | ICML 2023 (Oral) | Implicit convolutions as attention alternative | 600+ |
+| [RWKV: Reinventing RNNs for the Transformer Era](https://arxiv.org/abs/2305.13048) | Peng et al. | EMNLP 2023 | Linear attention + RNN formulation | 500+ |
+| [Griffin: Mixing Gated Linear Recurrences](https://arxiv.org/abs/2402.19427) | De et al. (Google) | ICML 2024 | Production-ready recurrent architecture | 200+ |
+| [An Empirical Study of Mamba-based Language Models](https://arxiv.org/abs/2406.07887) | Waleffe et al. (NVIDIA) | 2024 | Definitive 8B-scale comparison | 100+ |
+
+### Key Researchers and Organizations
+
+| Researcher/Lab | Affiliation | Contribution | Current Focus |
+|----------------|-------------|--------------|---------------|
+| **Albert Gu** | CMU → Cartesia AI | S4, Mamba, Mamba-2, SSM theory | Commercial SSM deployment |
+| **Tri Dao** | Princeton → Together AI | FlashAttention, Mamba optimization | Hardware-efficient algorithms |
+| **Chris Ré** | Stanford/Together AI | S4, Hyena, SAFARI project | Long-context architectures |
+| **Google DeepMind** | — | Griffin, RecurrentGemma, Hawk | Production recurrent models |
+| **AI21 Labs** | — | Jamba series | First production hybrid SSM |
+| **RWKV Foundation** | Community | RWKV-4 through RWKV-7 | Open-source SSM ecosystem |
+| **IBM Research** | — | Bamba, Granite SSM collaboration | Enterprise SSM deployment |
+| **Mistral AI** | — | Codestral Mamba | Code-focused SSM models |
+
+## Capability Assessment
+
+### Where SSMs Excel
+
+| Task | Performance | Why |
+|------|-------------|-----|
+| Long document processing | GOOD | Linear complexity |
+| Audio/signal processing | EXCELLENT | Designed for continuous signals |
+| Efficient inference | EXCELLENT | O(n) vs O(n²) |
+
+### Where Transformers Still Lead
+
+| Task | Assessment | Reason |
+|------|------------|--------|
+| In-context learning | Transformers better | Attention enables direct comparison |
+| Few-shot reasoning | Transformers better | Requires token-to-token reasoning |
+| Frontier capabilities | Transformers | Simply more proven at scale |
+
+## Trajectory and Future Outlook
+
+### Quantified Adoption Drivers
+
+| Driver | Current Status | 2025-2027 Projection | Impact on SSM Adoption |
+|--------|---------------|---------------------|----------------------|
+| **Context length demand** | 100K-200K standard | 1M+ contexts emerging | HIGH: Transformers hit memory walls |
+| **Inference cost pressure** | \$1.01-0.10/1K tokens | Cost competition intensifying | HIGH: SSM 5x cheaper inference |
+| **Memory bandwidth** | H100: 3.35 TB/s | Scaling slower than compute | MEDIUM: Benefits SSM constant-memory |
+| **Agentic workloads** | Emerging | 30-50% of enterprise AI by 2027 | HIGH: Long contexts, repeated inference |
+| **Edge deployment** | Limited | Growing rapidly | HIGH: SSM memory efficiency critical |
+
+### Arguments for SSM/Hybrid Growth (60-70% probability of significant adoption)
+
+1. **Efficiency becomes critical** — At GPT-5+ scale, O(n^2) attention cost is \$10-100M per training run. SSM efficiency offers 40-80% cost reduction.
+2. **Long context is table stakes** — Applications demand 100K-1M token contexts. Transformer KV cache hits memory limits; SSM scales linearly.
+3. **Hybrid architectures validated** — NVIDIA's study and Jamba 1.5 demonstrate hybrids can outperform pure transformers with better efficiency.
+4. **Production deployments expanding** — Google (RecurrentGemma), AI21 (Jamba 1.6), Mistral (Codestral Mamba), IBM (Granite 4.0) all shipping SSM-based models.
+
+### Arguments Against (30-40% probability SSMs remain niche)
+
+1. **In-context learning ceiling** — Pure SSMs consistently underperform on MMLU, few-shot tasks. May be fundamental limit of stateful compression.
+2. **Transformer ecosystem lock-in** — PyTorch, TensorFlow, vLLM, TensorRT all optimized for attention. Switching costs are substantial.
+3. **Investment momentum** — >95% of frontier training compute goes to transformers. Network effects favor incumbents.
+4. **Interpretability gap** — Safety teams trained on attention analysis. SSM interpretability tools 3-5 years behind.
+
+### Scenario Probabilities
+
+| Scenario | Probability | Key Indicators |
+|----------|-------------|----------------|
+| **Hybrids dominate** (SSM + Attention) | 45% | Jamba/Griffin-style architectures become default |
+| **Transformers remain dominant** | 35% | Pure attention with improved efficiency (e.g., FlashAttention-4) |
+| **Pure SSMs breakthrough** | 10% | SSM solves in-context learning limitation |
+| **New architecture emerges** | 10% | Neither SSM nor transformer (e.g., state-space diffusion) |
+
+## Safety Research Implications
+
+### Research That Likely Transfers
+
+- **RLHF** - Training approach similar
+- **Behavioral evals** - Testing works the same
+- **Red teaming** - Adversarial testing still applies
+
+### Research That May Not Transfer
+
+- **Attention-based interpretability** - No attention to analyze
+- **Transformer-specific probes** - Need new tools
+- **Circuit analysis** - Different computational structure
+
+### Unique Research Opportunities
+
+| Opportunity | Description |
+|-------------|-------------|
+| State analysis | Understand what hidden states encode |
+| Recurrence interpretability | New methods for recurrent systems |
+| Efficiency-enabled safety | More evaluation for same cost |
+
+### Critical Research Questions
+
+| Question | Current Evidence | Resolution Timeline | Importance |
+|----------|-----------------|---------------------|------------|
+| **Can pure SSMs match transformers at frontier scale?** | No pure SSM >14B trained; hybrids close gap | 2025-2026 (if labs invest) | CRITICAL |
+| **Is in-context learning fundamentally limited by state compression?** | Evidence suggests yes; hybrids mitigate | Ongoing theoretical research | HIGH |
+| **Do SSMs have different safety properties?** | Unknown; less interpretability research | 2-3 years of safety research needed | HIGH |
+| **Will hybrids become standard architecture?** | Strong evidence: Jamba, Griffin, NVIDIA study | 2025 (trend clear) | MEDIUM |
+| **Can SSM interpretability catch up?** | Tools emerging but 3-5 years behind transformer tooling | 2026-2028 | MEDIUM |
+
+### The Fundamental Crux
+
+The core uncertainty is whether the **in-context learning limitation** of pure SSMs is:
+
+**A. Fundamental** — State compression inherently loses precise retrieval capability. Transformers' O(n) KV cache stores exact tokens; SSMs' O(1) state must compress. If true, hybrids will dominate.
+
+**B. Solvable** — Better selection mechanisms, larger state dimensions, or architectural innovations could match transformer in-context learning. If true, pure SSMs could dominate due to efficiency.
+
+Current evidence favors interpretation (A): NVIDIA's empirical study found that even at 8B scale with extensive training, pure Mamba-2 lags on MMLU (46.3% vs 51.2%) and phonebook lookup tasks. The 43% SSM + 7% attention hybrid closes this gap completely, suggesting attention provides irreplaceable retrieval capability.
+
+## Sources & Key References
+
+### Foundational Papers
+
+- **S4 (2021)**: Gu, A., Goel, K., & Ré, C. ["Efficiently Modeling Long Sequences with Structured State Spaces"](https://arxiv.org/abs/2111.00396). ICLR 2022.
+- **Mamba (2023)**: Gu, A. & Dao, T. ["Mamba: Linear-Time Sequence Modeling with Selective State Spaces"](https://arxiv.org/abs/2312.00752). ICLR 2024.
+- **Mamba-2 (2024)**: Dao, T. & Gu, A. ["Transformers are SSMs: Generalized Models and Efficient Algorithms Through Structured State Space Duality"](https://arxiv.org/abs/2405.21060). ICML 2024.
+
+### Benchmark Studies
+
+- **NVIDIA Empirical Study**: Waleffe, R. et al. ["An Empirical Study of Mamba-based Language Models"](https://arxiv.org/abs/2406.07887). 2024. *Definitive 8B-scale comparison.*
+- **Mamba-360 Survey**: ["Mamba-360: Survey of State Space Models as Transformer Alternative"](https://www.sciencedirect.com/science/article/abs/pii/S0952197625012801). Engineering Applications of AI, 2025.
+- **Comprehensive Survey**: ["From S4 to Mamba: A Comprehensive Survey on Structured State Space Models"](https://arxiv.org/abs/2503.18970). arXiv, 2025.
+
+### Production Models
+
+- **Jamba**: AI21 Labs. ["Introducing Jamba: AI21's Groundbreaking SSM-Transformer Model"](https://www.ai21.com/blog/announcing-jamba/). 2024.
+- **Jamba 1.5**: AI21 Labs. ["The Jamba 1.5 Open Model Family"](https://www.ai21.com/blog/announcing-jamba-model-family/). 2024.
+- **RecurrentGemma**: Google DeepMind. ["RecurrentGemma Model Card"](https://ai.google.dev/gemma/docs/recurrentgemma/model_card). 2024.
+- **StripedHyena**: Together AI. ["StripedHyena-7B: Open Source Models Beyond Transformers"](https://www.together.ai/blog/stripedhyena-7b). 2023.
+
+### Alternative Architectures
+
+- **Hyena**: Poli, M. et al. ["Hyena Hierarchy: Towards Larger Convolutional Language Models"](https://arxiv.org/abs/2302.10866). ICML 2023.
+- **RWKV**: Peng, B. et al. ["RWKV: Reinventing RNNs for the Transformer Era"](https://arxiv.org/abs/2305.13048). EMNLP 2023.
+- **Griffin**: De, S. et al. ["Griffin: Mixing Gated Linear Recurrences with Local Attention"](https://arxiv.org/abs/2402.19427). ICML 2024.
+
+### Interpretability and Safety
+
+- **Mamba Explained**: The Gradient. ["Mamba Explained"](https://thegradient.pub/mamba-explained/). 2024. *Includes interpretability analysis.*
+- **IBM Overview**: IBM. ["What Is A Mamba Model?"](https://www.ibm.com/think/topics/mamba-model). 2024.
+- **Visual Guide**: Grootendorst, M. ["A Visual Guide to Mamba and State Space Models"](https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-mamba-and-state). 2024.
+
+### Code and Implementations
+
+- **Official Mamba**: [github.com/state-spaces/mamba](https://github.com/state-spaces/mamba) - Reference implementation by Gu & Dao.
+- **RWKV**: [github.com/BlinkDL/RWKV-LM](https://github.com/BlinkDL/RWKV-LM) - Community-driven RNN alternative.
+- **Hazy Research Blog**: [hazyresearch.stanford.edu](https://hazyresearch.stanford.edu/blog/2022-01-14-s4-1) - Stanford's SSM research hub.
+
+## Related Pages
+
+- <EntityLink id="dense-transformers">Dense Transformers</EntityLink> - The dominant alternative
+- <EntityLink id="sparse-moe">Sparse/MoE</EntityLink> - Another efficiency-focused approach
+- <EntityLink id="heavy-scaffolding">Heavy Scaffolding</EntityLink> - Deployment pattern

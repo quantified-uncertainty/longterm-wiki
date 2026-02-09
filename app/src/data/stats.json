@@ -1,0 +1,251 @@
+{
+  "totalEntities": 631,
+  "byType": {
+    "ai-transition-model-subitem": 57,
+    "ai-transition-model-factor": 7,
+    "ai-transition-model-metric": 10,
+    "ai-transition-model-parameter": 22,
+    "ai-transition-model-scenario": 10,
+    "capability": 24,
+    "crux": 18,
+    "concept": 25,
+    "argument": 4,
+    "organization": 83,
+    "project": 17,
+    "historical": 5,
+    "analysis": 18,
+    "model": 80,
+    "lab": 4,
+    "lab-academic": 1,
+    "lab-research": 9,
+    "researcher": 43,
+    "policy": 37,
+    "approach": 65,
+    "safety-agenda": 8,
+    "risk": 57,
+    "event": 1,
+    "parameter": 26
+  },
+  "bySeverity": {
+    "critical": 4,
+    "high": 27,
+    "medium": 3,
+    "catastrophic": 11,
+    "medium-high": 7,
+    "High": 2,
+    "Catastrophic": 1
+  },
+  "byStatus": {
+    "unknown": 605,
+    "stub": 26
+  },
+  "recentlyUpdated": [
+    {
+      "id": "biological-organoid",
+      "type": "capability",
+      "title": "Biological / Organoid Computing",
+      "lastUpdated": "2026-02"
+    },
+    {
+      "id": "brain-computer-interfaces",
+      "type": "capability",
+      "title": "Brain-Computer Interfaces",
+      "lastUpdated": "2026-02"
+    },
+    {
+      "id": "collective-intelligence",
+      "type": "capability",
+      "title": "Collective Intelligence / Coordination",
+      "lastUpdated": "2026-02"
+    },
+    {
+      "id": "genetic-enhancement",
+      "type": "capability",
+      "title": "Genetic Enhancement / Selection",
+      "lastUpdated": "2026-02"
+    },
+    {
+      "id": "light-scaffolding",
+      "type": "capability",
+      "title": "Light Scaffolding",
+      "lastUpdated": "2026-02"
+    },
+    {
+      "id": "minimal-scaffolding",
+      "type": "capability",
+      "title": "Minimal Scaffolding",
+      "lastUpdated": "2026-02"
+    },
+    {
+      "id": "neuro-symbolic",
+      "type": "capability",
+      "title": "Neuro-Symbolic Hybrid Systems",
+      "lastUpdated": "2026-02"
+    },
+    {
+      "id": "neuromorphic",
+      "type": "capability",
+      "title": "Neuromorphic Hardware",
+      "lastUpdated": "2026-02"
+    },
+    {
+      "id": "novel-unknown",
+      "type": "capability",
+      "title": "Novel / Unknown Approaches",
+      "lastUpdated": "2026-02"
+    },
+    {
+      "id": "sparse-moe",
+      "type": "capability",
+      "title": "Sparse / MoE Transformers",
+      "lastUpdated": "2026-02"
+    }
+  ],
+  "mostLinked": [
+    {
+      "id": "anthropic",
+      "type": "lab",
+      "title": "Anthropic",
+      "backlinkCount": 87
+    },
+    {
+      "id": "openai",
+      "type": "lab",
+      "title": "OpenAI",
+      "backlinkCount": 52
+    },
+    {
+      "id": "racing-dynamics",
+      "type": "risk",
+      "title": "Racing Dynamics",
+      "backlinkCount": 40
+    },
+    {
+      "id": "deceptive-alignment",
+      "type": "risk",
+      "title": "Deceptive Alignment",
+      "backlinkCount": 38
+    },
+    {
+      "id": "interpretability",
+      "type": "safety-agenda",
+      "title": "Interpretability",
+      "backlinkCount": 24
+    },
+    {
+      "id": "scheming",
+      "type": "risk",
+      "title": "Scheming",
+      "backlinkCount": 21
+    },
+    {
+      "id": "scalable-oversight",
+      "type": "safety-agenda",
+      "title": "Scalable Oversight",
+      "backlinkCount": 19
+    },
+    {
+      "id": "compute-governance",
+      "type": "policy",
+      "title": "Compute Governance",
+      "backlinkCount": 18
+    },
+    {
+      "id": "metr",
+      "type": "lab-research",
+      "title": "METR",
+      "backlinkCount": 18
+    },
+    {
+      "id": "concentration-of-power",
+      "type": "risk",
+      "title": "Concentration of Power",
+      "backlinkCount": 17
+    }
+  ],
+  "topTags": [
+    {
+      "tag": "governance",
+      "count": 53
+    },
+    {
+      "tag": "interpretability",
+      "count": 26
+    },
+    {
+      "tag": "ai-safety",
+      "count": 23
+    },
+    {
+      "tag": "x-risk",
+      "count": 23
+    },
+    {
+      "tag": "regulation",
+      "count": 17
+    },
+    {
+      "tag": "compute-governance",
+      "count": 15
+    },
+    {
+      "tag": "alignment",
+      "count": 14
+    },
+    {
+      "tag": "coordination",
+      "count": 14
+    },
+    {
+      "tag": "rlhf",
+      "count": 14
+    },
+    {
+      "tag": "deception",
+      "count": 13
+    },
+    {
+      "tag": "deepfakes",
+      "count": 13
+    },
+    {
+      "tag": "evaluations",
+      "count": 13
+    },
+    {
+      "tag": "international",
+      "count": 13
+    },
+    {
+      "tag": "safety",
+      "count": 13
+    },
+    {
+      "tag": "ai-transition-model",
+      "count": 12
+    },
+    {
+      "tag": "epistemic",
+      "count": 12
+    },
+    {
+      "tag": "scalable-oversight",
+      "count": 12
+    },
+    {
+      "tag": "disinformation",
+      "count": 11
+    },
+    {
+      "tag": "forecasting",
+      "count": 11
+    },
+    {
+      "tag": "racing-dynamics",
+      "count": 11
+    }
+  ],
+  "totalTags": 925,
+  "withDescription": 549,
+  "lastBuilt": "2026-02-09T19:47:35.534Z"
+}

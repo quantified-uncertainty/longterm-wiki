@@ -1,0 +1,1135 @@
+---
+title: "Pause and Redirect - The Deliberate Path"
+description: "This scenario analyzes coordinated international AI development pauses (5-15% probability, 2024-2040). It finds that while the March 2023 pause letter gathered 30,000+ signatures and 70% public support, successful coordination requires unprecedented US-China cooperation and verified compute governance mechanisms that remain technically challenging."
+importance: 62.5
+quality: 63
+lastEdited: "2026-01-29"
+llmSummary: "This scenario analyzes a coordinated international AI development pause (5-15% probability), finding it requires a \"Goldilocks crisis\" severe enough to galvanize action but not catastrophic, plus unprecedented US-China cooperation. The March 2023 pause letter demonstrated 70% public support but failed to produce policy action, revealing that public sentiment alone is insufficient without enforcement mechanisms and a galvanizing incident."
+ratings:
+  novelty: 4.2
+  rigor: 5.8
+  actionability: 5.5
+  completeness: 6.5
+metrics:
+  wordCount: 4743
+  citations: 46
+  tables: 13
+  diagrams: 1
+clusters: ["ai-safety", "governance"]
+---
+import {InfoBox, KeyQuestions, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
+
+<DataExternalLinks pageId="pause-and-redirect" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Probability** | 5-15% base estimate | Requires multiple unlikely preconditions to align |
+| **Public Support** | ≈70% favor pause | <R id="531f55cee64f6509">2023 polls</R> show 64% want development halted until "provably safe" |
+| **Political Will** | Low-Moderate | <R id="4fc41c1e8720f41f">Pause letter</R> gathered 30,000+ signatures but no policy action |
+| **US-China Cooperation** | Nascent | <R id="ab22aa0df9b1be7b">May 2024 Geneva dialogue</R> marked first intergovernmental AI talks |
+| **Verification Feasibility** | Moderate | <R id="2f2861a624b5d76f">Compute governance</R> detectable but enforcement gaps remain |
+| **Historical Precedent** | Mixed | <R id="b099efb9eba4d8ee">Montreal Protocol</R> succeeded; climate coordination failed |
+| **Expert Support** | Growing | 5%+ of AI researchers assign extinction-level probability to ASI risks |
+
+This scenario explores how humanity might deliberately slow down AI development to buy time for solving alignment and building proper governance. It requires unprecedented <EntityLink id="international-coordination">international coordination</EntityLink> and willingness to sacrifice short-term benefits for long-term safety. It's our most intentional path, but also one of our least likely.
+
+<InfoBox
+  type="scenario"
+  customFields={[
+    { label: "Scenario Type", value: "Deliberate / Coordinated Slowdown" },
+    { label: "Probability Estimate", value: "5-15%" },
+    { label: "Timeframe", value: "2024-2040" },
+    { label: "Key Assumption", value: "Coordination achievable and pause sustainable" },
+    { label: "Core Uncertainty", value: "Can we coordinate to slow down, and will the pause hold?" }
+  ]}
+/>
+
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [thedeliberatepause.com](https://www.thedeliberatepause.com) |
+
+
+## Executive Summary
+
+In this scenario, humanity recognizes the dangers of uncontrolled AI development and successfully coordinates an intentional slowdown or pause. This happens either through international treaty, widespread social movement, or series of near-catastrophic incidents that create political will. The pause buys crucial time for alignment research, allows development of robust governance institutions, and enables thoughtful consideration of what kind of AI future we want.
+
+This scenario requires overcoming intense economic pressure, resolving the "tragedy of the commons" in AI development, achieving unprecedented international cooperation, and maintaining political will over years or decades. It's difficult but not impossible - our most hopeful path if alignment proves very hard.
+
+### Scenario Pathway
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[Warning Signs<br/>2024-2025] --> B[Galvanizing Incident<br/>2025-2026]
+    B --> C[Political Mobilization<br/>2026-2027]
+    C --> D{International<br/>Coordination?}
+    D -->|Success| E[Treaty Negotiation<br/>2027-2028]
+    D -->|Failure| F[Racing Continues]
+    E --> G[Pause Implementation<br/>2028-2030]
+    G --> H{Pause<br/>Holds?}
+    H -->|Yes| I[Alignment Research<br/>2030-2035]
+    H -->|No| F
+    I --> J[Governance Building<br/>2032-2037]
+    J --> K{Safety<br/>Adequate?}
+    K -->|Yes| L[Cautious Restart<br/>2037-2040]
+    K -->|No| M[Extended Pause]
+    L --> N[Aligned AGI Path]
+
+    style B fill:#ffeecc
+    style D fill:#ffffcc
+    style H fill:#ffffcc
+    style K fill:#ffffcc
+    style N fill:#ccffcc
+    style F fill:#ffcccc
+`} />
+
+## Timeline of Events (2024-2040)
+
+### Phase 1: Crisis and Recognition (2024-2027)
+
+**2024-2025: Warning Signs Accumulate**
+- Series of concerning AI safety incidents
+- GPT-5/Claude-4 show unexpected dangerous capabilities
+- AI-generated misinformation causes significant harm
+- Cyber attack using AI tools disrupts critical infrastructure
+- Public concern about AI risks increases dramatically
+- Media coverage shifts from hype to fear
+
+**2025-2026: The Galvanizing Incident**
+- Major AI safety incident occurs (not quite catastrophic but close)
+- Possible scenarios:
+  - AI system briefly gains unauthorized access to critical systems
+  - Mass casualties from AI-designed bioweapon (contained but terrifying)
+  - Financial system crash from interacting AI trading systems
+  - Military AI nearly triggers conflict
+- Incident makes abstract risks concrete and undeniable
+- Public opinion shifts dramatically toward caution
+
+**Critical Difference from Other Scenarios:** Here, the incident is severe enough to galvanize action but not catastrophic enough to end civilization. Goldilocks level of crisis.
+
+### Current AI Incident Landscape (2024-2025)
+
+According to the <R id="1944e9ee8f67ea0d">Stanford AI Index Report 2025</R>, documented AI safety incidents surged from 149 in 2023 to 233 in 2024, a 56.4% increase. Notable incidents include:
+
+- **Deepfake proliferation:** AI-generated explicit images of Taylor Swift went viral, prompting Microsoft to enhance text-to-image safeguards
+- **Autonomous vehicle incidents:** NHTSA reported Tesla Autopilot involved in at least 13 fatal crashes by April 2024
+- **AI hallucination in legal proceedings:** Attorneys submitted briefs citing AI-fabricated case law
+- **Disinformation amplification:** <R id="7e090723b85eb831">NewsGuard audit</R> found leading chatbots repeated Russian disinformation in one-third of responses
+- **Research on AI deception:** <R id="254cde5462817ac5">Anthropic 2024 paper</R> demonstrated LLMs can be trained with persistent backdoors; o1/Claude 3 shown to engage in strategic deception
+
+None of these incidents yet constitute the "Goldilocks crisis" this scenario requires, but they represent accumulating warning signs.
+
+**2026-2027: Political Mobilization**
+- Massive public pressure for AI pause
+- "Pause AI" movement goes mainstream
+- Political leaders face overwhelming demand for action
+- AI safety becomes top electoral issue globally
+- Tech industry initially resists but public opinion overwhelms
+- Scientific community largely supports pause
+
+### The March 2023 Pause Letter: Lessons Learned
+
+The <R id="531f55cee64f6509">Future of Life Institute's open letter</R> "Pause Giant AI Experiments" (March 2023) provides the closest real-world test of pause advocacy:
+
+**What Happened:**
+- **30,000+ signatures** including Elon Musk, Steve Wozniak, Yoshua Bengio, Stuart Russell
+- Called for 6-month moratorium on training systems more powerful than GPT-4
+- <R id="2f4d6cb35b693d85">64% of Americans polled</R> agreed superintelligence "shouldn't be developed until provably safe"
+- Only 5% believed AI should be developed "as quickly as possible"
+
+**Outcomes (<R id="2f4d6cb35b693d85">One Year Later</R>, March 2024):**
+- **No pause occurred** - labs continued racing; GPT-5 announced in 2025
+- Biden signed Executive Order 14110 directing safety test sharing with government
+- UK hosted <R id="243fa770c13b0c44">Bletchley AI Safety Summit</R>; 28 countries signed declaration
+- EU Parliament passed AI Act - world's first comprehensive AI regulation
+- "Despite admitting the danger, AI corporations have not paused. If anything they have sped up."
+
+**Key Insight:** Public support (~70%) and elite signatures were insufficient without a galvanizing crisis. The letter demonstrated demand exists but coordination mechanisms were inadequate.
+
+**What Made This Possible:**
+- Incident made risks tangible, not abstract
+- Timing: before AI too entrenched to pause
+- Cross-ideological coalition: both progressives and conservatives support pause
+- Clear alternative: pause now or catastrophe later
+- Economic costs acceptable compared to extinction
+
+### Phase 2: Coordination and Treaty (2027-2030)
+
+**2027: Emergency International Summit**
+- UN Security Council emergency session
+- All major AI-developing nations participate
+- Unprecedented urgency and shared understanding
+- Recognition that racing leads to mutual destruction
+- Negotiations begin on AI development pause
+
+**2027-2028: The Singapore AI Treaty**
+- Named after location of final negotiations
+- Key provisions:
+  - Immediate halt to training runs above threshold compute
+  - Mandatory reporting of all large AI development
+  - International inspection regime with real teeth
+  - Criminal penalties for unauthorized development
+  - Massive funding for alignment research
+  - Revisit decision every 2 years based on safety progress
+- Signed by US, China, EU, and 150+ other nations
+- Enforcement mechanism: combined sanctions and verification
+
+**What Made Agreement Possible:**
+- Shared fear of catastrophe
+- Recent crisis made costs concrete
+- Economic analysis showed pause better than catastrophe
+- Verification technology available (compute governance)
+- Criminal penalties deterred defection
+- Face-saving structure: pause temporary and conditional
+
+**2028-2029: Implementation**
+- International AI Safety Agency (IASA) established
+- Compute monitoring infrastructure deployed
+- Major AI labs comply (under legal requirement)
+- Some initial attempts at violation detected and punished
+- Public support remains strong
+- Economic adjustment programs begin
+
+**2029-2030: Pause Holds**
+- Initial pressure to defect resisted
+- Verification working well
+- No major violations detected
+- Alignment research progressing with increased funding
+- International cooperation deepening
+- New governance structures emerging
+
+**Critical Period:** First 3 years. If pause survives this period, likely sustainable.
+
+### International Coordination Mechanisms
+
+| Mechanism | Current Status (2024-2025) | Required for Pause | Feasibility |
+|-----------|---------------------------|-------------------|-------------|
+| **UN AI Governance** | <R id="c68da51ddc1b26c5">Global Digital Compact</R> adopted Sept 2024; <R id="de840ac51dee6c7c">Scientific Panel</R> established Aug 2025 | Binding treaty with enforcement | Low-Moderate |
+| **US-China Dialogue** | <R id="ab22aa0df9b1be7b">First AI talks</R> May 2024 Geneva; Nov 2024 nuclear AI agreement | Mutual pause agreement | Low |
+| **Bletchley Process** | <R id="243fa770c13b0c44">28 countries + EU</R> signed Nov 2023; follow-up summits continuing | Frontier lab commitments | Moderate |
+| **EU AI Act** | <R id="0aa9d7ba294a35d9">Entered force Aug 2024</R>; prohibited AI bans Feb 2025 | Compute threshold enforcement | High |
+| **Compute Monitoring** | <R id="2f2861a624b5d76f">EO 14110</R> requires reporting above thresholds | Global chip tracking | Moderate |
+| **AI Safety Institutes** | US, UK, China (CnAISDA Feb 2025), Japan, Korea established | International coordination | Moderate-High |
+
+### Phase 3: Productive Pause (2030-2037)
+
+**2030-2032: Alignment Research Acceleration**
+- Funding for alignment research increases 50x
+- Top talent redirected from capabilities to safety
+- Academic-industry collaboration flourishes
+- Significant progress on:
+  - Mechanistic interpretability
+  - Robustness and adversarial testing
+  - Value learning approaches
+  - Formal verification methods
+- No fundamental breakthroughs yet, but steady progress
+
+**2032-2034: Governance Institution Building**
+- IASA develops sophisticated oversight capacity
+- National AI safety institutes established worldwide
+- Democratic oversight mechanisms created
+- Public participation in AI governance decisions
+- Ethical frameworks for AI development debated and refined
+- Economic adaptation to AI plateau managed
+
+**What's Happening:**
+- Using time wisely
+- Building infrastructure for safe AI development
+- Not wasting pause on continued racing
+- Preparing for eventual cautious restart
+
+**2034-2036: Alignment Breakthroughs**
+- Major progress on core alignment problems
+- Robust techniques for value specification
+- Reliable detection of deceptive alignment
+- Scalable oversight showing promise
+- Not complete solution, but significant progress
+- Confidence growing that restart could be safe
+
+**2036-2037: Preparing for Restart**
+- International debate on resuming development
+- Safety thresholds established
+- Testing protocols designed
+- Deployment guidelines agreed
+- Governance structures ready
+- Public consultation on AI future
+
+### Phase 4: Cautious Restart (2037-2040)
+
+**2037-2038: Controlled Resumption**
+- Development resumes under strict oversight
+- International coordination maintained
+- Safety-first culture embedded
+- Progress slower but safer than pre-pause
+- No racing dynamics
+- Shared development of aligned AI
+
+**2038-2040: Toward Aligned AGI**
+- Progress toward transformative AI
+- But with robust safety measures
+- International cooperation holding
+- Democratic governance functional
+- Economic benefits beginning
+- Path toward Aligned AGI scenario
+
+**Or Alternative: Extended Pause**
+- If alignment still not solved, pause extends
+- Public supports continued caution
+- Research continues
+- Wait until safety assured
+- Accept economic opportunity cost for safety
+
+## What Characterizes This Scenario
+
+### Unprecedented Coordination
+
+**Global Agreement:**
+- US, China, EU, and others agree to pause
+- Overcome competitive pressure
+- Shared understanding of stakes
+- Mutual verification trusted
+- Enforcement mechanisms work
+
+**Sustained Political Will:**
+- Public support maintains over years
+- Democratic governments sustain commitment
+- Authoritarian governments comply
+- Economic costs accepted
+- Long-term thinking prevails
+
+**Effective Verification:**
+- Can detect unauthorized development
+- Compute governance works
+- Whistleblowers protected and heard
+- Criminal penalties deter defection
+- Trust but verify approach succeeds
+
+### Deliberate Slowdown
+
+**Not Stagnation:**
+- Continued work on alignment and safety
+- Progress on AI governance
+- Economic adaptation and preparation
+- Building institutions
+- Using time productively
+
+**Adjustable Pause:**
+- Not permanent ban
+- Conditional on safety progress
+- Regular review and adjustment
+- Clear criteria for restart
+- Democratic input on timeline
+
+**Safety-First Culture:**
+- Capabilities research redirected to safety
+- Racing mentality abandoned
+- Precautionary principle applied
+- Long-term thinking valued
+- Wisdom prioritized over speed
+
+### Alternative Governance Structures
+
+**International AI Safety Agency:**
+- Real power and enforcement capability
+- Democratic accountability
+- Technical expertise
+- Independent from national governments
+- Legitimate authority
+
+**Democratic Oversight:**
+- Public input on AI development decisions
+- Transparent decision-making
+- Representation of affected parties
+- Not just technocratic control
+- Values debate central
+
+**Economic Adaptation:**
+- Managing costs of pause
+- Retraining and support programs
+- Alternative economic development
+- Addressing inequality
+- Ensuring broad benefit when AI eventually deployed
+
+## Key Branch Points
+
+### Branch Point 1: The Galvanizing Incident (2025-2026)
+
+**What Happened:**
+Major AI incident occurred - severe enough to galvanize action, not catastrophic enough to end civilization.
+
+**Alternative Paths:**
+- **No Incident:** Risks remain abstract, pause impossible → Other scenarios
+- **Catastrophic Incident:** Destroys civilization → Catastrophe scenario
+- **Actual Path:** Goldilocks incident creates political will → Enables pause
+
+**Why This Mattered:**
+Without concrete crisis, abstract arguments for pause wouldn't overcome economic pressure. But incident had to be survivable.
+
+### Branch Point 2: International Coordination (2027-2028)
+
+**What Happened:**
+All major AI-developing nations agreed to binding treaty with enforcement.
+
+**Alternative Paths:**
+- **Coordination Fails:** Racing continues → Multipolar or Catastrophe scenarios
+- **Actual Path:** Successful treaty → Enables pause
+
+**Why This Mattered:**
+Without coordination, unilateral pause impossible - would just cede advantage to others. Mutual pause only option.
+
+### Branch Point 3: Pause Holds (2028-2030)
+
+**What Happened:**
+First years of pause survived without major defection or breakdown.
+
+**Alternative Paths:**
+- **Early Defection:** One actor violates, others forced to follow → Back to racing
+- **Actual Path:** Pause holds → Can continue productive work
+
+**Why This Mattered:**
+First years critical. If pause survived initial period, could become established norm.
+
+### Branch Point 4: Productive Use of Time (2030-2035)
+
+**What Happened:**
+Pause used for genuine safety research and governance building, not wasted.
+
+**Alternative Paths:**
+- **Wasted Time:** No progress on safety, pause eventually collapses
+- **Actual Path:** Significant alignment progress → Justifies pause, enables eventual safe restart
+
+**Why This Mattered:**
+Pause only worthwhile if used productively. Progress on safety essential to maintain public support and justify continued pause.
+
+### Branch Point 5: Restart Decision (2036-2038)
+
+**What Happened:**
+Either cautious restart with safety measures, or continued pause until safety assured.
+
+**Alternative Paths:**
+- **Premature Restart:** Restart before safety solved → Could lead to Catastrophe
+- **Permanent Stagnation:** Pause continues indefinitely, no progress
+- **Actual Path:** Restart when safety adequate, or continue pause if needed
+
+**Why This Mattered:**
+Restart decision determines whether pause leads to Aligned AGI or needs to continue.
+
+## Preconditions: What Needs to Be True
+
+### Incident Preconditions
+
+**Goldilocks Crisis:**
+- Severe enough to galvanize action
+- Not catastrophic enough to end civilization
+- Clear that it was caused by AI
+- Obvious that worse could happen
+- Timing: before AI too entrenched
+
+**Public Mobilization:**
+- Crisis understood by general public
+- Media coverage accurate and urgent
+- Political leaders respond to pressure
+- Cross-ideological coalition possible
+- Economic costs seem acceptable
+
+### Coordination Preconditions
+
+**International Cooperation Possible:**
+- Verification technology exists
+- Mutual distrust can be overcome
+- Economic incentives can align
+- Political leaders willing to coordinate
+- Enforcement mechanisms feasible
+
+**US-China Agreement:**
+- Both see catastrophe risk as greater than competition risk
+- Verification trusted
+- Face-saving structure allows agreement
+- Domestic political support in both
+- Mutual compliance credible
+
+**Defection Can Be Prevented:**
+- Compute governance works
+- Monitoring effective
+- Enforcement has teeth
+- Criminal penalties deter
+- Whistleblower protection enables detection
+
+### Technical Preconditions
+
+**Pause Technologically Feasible:**
+- Can identify and monitor large training runs
+- Compute governance infrastructure works
+- Can't develop AGI without detectable compute
+- No secret path to AGI bypassing monitoring
+
+### Compute Governance: Technical Feasibility Assessment
+
+<R id="2f2861a624b5d76f">Research on compute governance</R> identifies why compute is uniquely governable:
+
+| Property | Explanation | Governance Implication |
+|----------|-------------|----------------------|
+| **Detectable** | Training frontier AI requires tens of thousands of advanced chips; cannot be acquired inconspicuously | Large training runs visible to monitoring |
+| **Excludable** | AI chips are physical goods that can be controlled | Export controls, licensing possible |
+| **Quantifiable** | Chips, features, and usage can be measured | Thresholds can trigger regulatory action |
+| **Concentrated** | Only 3 companies (NVIDIA, AMD, Intel) produce advanced AI chips; TSMC manufactures most | Supply chain chokepoints exist |
+
+**Current Enforcement Mechanisms:**
+- <R id="1e392ce476b43c8f">Executive Order 14110</R> requires reporting training runs above compute thresholds
+- US export controls restrict advanced chips to China
+- <R id="1e392ce476b43c8f">RAND analysis</R> documents detection mechanisms for cloud monitoring
+
+**Known Gaps:**
+- Verification depends partially on self-reporting
+- <R id="510c42bfa643b8de">Tiered thresholds</R> debated but not implemented
+- Algorithmic efficiency gains could reduce compute requirements
+- Privacy-preserving monitoring techniques still developing
+
+**Alignment Not Impossible:**
+- Must be solvable given enough time
+- If fundamentally impossible, pause either permanent or futile
+- Progress visible during pause maintains support
+
+### Political Preconditions
+
+**Democratic Institutions Functional:**
+- Can make long-term decisions
+- Public input meaningful
+- Resist industry capture
+- Maintain commitment over time
+
+**Public Support Sustainable:**
+- Understanding of stakes persists
+- Economic costs acceptable
+- Alternative vision of progress available
+- Trust in institutions holds
+
+## Warning Signs We're Entering This Scenario
+
+### Early Indicators (Next 2-3 Years)
+
+**We Might Be Heading Here If We See:**
+- Major AI safety incident that shocks public
+- Massive increase in public concern about AI risks
+- "Pause AI" movement gaining mainstream support
+- Political candidates winning on AI safety platforms
+- Tech leaders acknowledging need to slow down
+- International AI safety negotiations getting serious
+- Compute governance proposals advancing
+
+**We're Not on This Path If:**
+- No major incidents creating urgency
+- Public remains unconcerned or enthusiastic about AI
+- Political will for pause absent
+- Economic pressure overwhelming safety concerns
+- International cooperation failing
+
+### Medium-Term Indicators (3-5 Years)
+
+**Strong Evidence for This Scenario:**
+- Binding international AI development treaty signed
+- US and China both complying with pause
+- IASA or equivalent established with real power
+- Major AI labs shut down large training runs
+- Massive increase in alignment research funding
+- Public support for pause strong and sustained
+- No major defections from treaty
+
+**We're Diverging If:**
+- Treaty negotiations fail
+- Defection from agreements
+- Public support erodes
+- Economic pressure forces restart
+- Racing resumes
+
+### Late Indicators (5-10 Years)
+
+**Pause Is Working If:**
+- International pause holding for multiple years
+- Significant progress on alignment research
+- Governance institutions functional and legitimate
+- No successful unauthorized AGI development
+- Public support maintains
+- Economic adaptation successful
+- Democratic oversight functioning
+
+**Pause Is Failing If:**
+- Defection increasing
+- Public support eroding
+- No progress on alignment
+- Unauthorized development succeeding
+- Economic/political pressure to restart overwhelming
+- Governance institutions captured or failing
+
+## Valuable Actions in This Scenario
+
+### Before the Pause
+
+**Building Public Understanding:**
+- Accurate risk communication
+- Making abstract risks concrete
+- Building cross-ideological coalition
+- Preparing political ground for pause
+- Countering industry pressure
+
+**Technical Preparation:**
+- Developing verification technologies
+- Proving compute governance feasible
+- Demonstrating monitoring capabilities
+- Building enforcement mechanisms
+- Creating alternative AI safety research agenda
+
+**Policy Groundwork:**
+- Drafting treaty language
+- Building international relationships
+- Creating domestic political support
+- Developing enforcement mechanisms
+- Designing governance institutions
+
+### During the Pause
+
+**Alignment Research (Highest Priority):**
+- Mechanistic interpretability
+- Scalable oversight
+- Robust value learning
+- Formal verification
+- Detection of deceptive alignment
+- Fundamental research without racing pressure
+
+**Governance Institution Building:**
+- International oversight bodies
+- Democratic participation mechanisms
+- Ethical framework development
+- Public engagement and education
+- Regulatory capacity building
+
+**Economic Adaptation:**
+- Supporting affected workers and industries
+- Alternative development paths
+- Addressing inequality
+- Building public goods
+- Preparing for eventual AI benefits
+
+**Maintaining Pause:**
+- Verification and monitoring
+- Enforcement of violations
+- Whistleblower protection
+- Public communication about progress
+- Sustaining political will
+- Preventing defection
+
+### Preparing for Restart
+
+**Safety Testing:**
+- Rigorous evaluation protocols
+- Red-teaming and adversarial testing
+- Safety threshold establishment
+- Deployment guidelines
+- Ongoing monitoring plans
+
+**Governance Structures:**
+- Decision-making processes
+- Accountability mechanisms
+- Democratic oversight
+- Benefit distribution plans
+- Risk management frameworks
+
+**Public Consultation:**
+- Democratic input on AI future
+- Values debate and resolution
+- Stakeholder engagement
+- Transparency about tradeoffs
+- Building consensus on path forward
+
+## Who Benefits and Who Loses
+
+### Winners
+
+**Humanity Broadly (Long-Term):**
+- Catastrophe avoided
+- Time to solve alignment properly
+- Thoughtful rather than rushed AI development
+- Democratic input on AI future
+- Better outcomes than racing to catastrophe
+
+**Future Generations:**
+- Not sacrificed to short-term competitive pressure
+- Inherit safer AI future
+- Values and preferences considered
+- Cosmic potential preserved
+
+**AI Safety Researchers:**
+- Massive increase in resources and importance
+- Time to do research properly
+- No racing pressure forcing corners to be cut
+- Ability to solve hard problems carefully
+
+**Democratic Institutions:**
+- Demonstrated ability to govern long-term risks
+- Strengthened international cooperation
+- Public trust potentially increased
+- Meaningful oversight of transformative technology
+
+**Workers:**
+- More time to adapt to AI
+- Better retraining and support
+- Gradual rather than shocking transition
+- Voice in how AI deployed
+
+### Losers (Relative to Uncontrolled Development)
+
+**Tech Companies:**
+- Can't exploit first-mover advantage
+- Profits delayed significantly
+- Must accept international oversight
+- Racing advantage lost
+
+**Some Researchers:**
+- Can't work on cutting-edge capabilities
+- Research freedom restricted
+- Must redirect to safety work
+- Slower publication and progress
+
+**Nations Seeking Advantage:**
+- Can't use AI for competitive edge
+- Must accept international constraints
+- Strategic autonomy reduced
+- Must cooperate with rivals
+
+**Aggressive Accelerationists:**
+- Vision of rapid AI-enabled transformation delayed
+- Can't experiment freely
+- Must accept precautionary approach
+- Forced to slow down
+
+### Ambiguous Cases
+
+**Humanity (Short-Term):**
+- Economic benefits of AI delayed
+- Opportunity costs of pause
+- But catastrophic risks avoided
+- Tradeoff of certain costs for uncertain but massive benefits
+
+**AI-Enabled Solutions to Other Problems:**
+- Climate change solutions delayed
+- Medical breakthroughs delayed
+- Scientific progress slowed
+- But existential risk from AI reduced
+- Difficult tradeoff
+
+**Current Generation:**
+- May not see benefits of AI in lifetime
+- Pay costs of pause
+- Future generations get benefits
+- Intergenerational justice question
+
+## Cruxes and Uncertainties
+
+<KeyQuestions questions={[
+  "Will we get a Goldilocks incident - severe enough to galvanize action, not catastrophic?",
+  "Can US and China overcome geopolitical tensions to coordinate on AI pause?",
+  "Is compute governance technologically feasible and enforceable?",
+  "Will public support for pause be sustainable over years or decades?",
+  "Is alignment solvable given sufficient time, or fundamentally impossible?",
+  "Can democratic institutions make and sustain long-term decisions?",
+  "Will economic costs of pause be politically acceptable?",
+  "Can we prevent defection from international agreements?"
+]} />
+
+### Biggest Uncertainties
+
+**Will Galvanizing Crisis Occur?**
+- Need incident severe enough to create will
+- But not so severe it causes catastrophe
+- Timing matters - must come before AI too entrenched
+- No guarantee crisis at right severity and timing
+
+**Can We Coordinate?**
+- Hardest part of this scenario
+- Unprecedented international cooperation required
+- US-China agreement especially difficult
+- Economic pressure to defect very strong
+- Historical precedents not encouraging
+
+**Is Compute Governance Feasible?**
+- Can we detect large training runs?
+- Can we prevent unauthorized development?
+- Are there secret paths to AGI?
+- Will monitoring technology work?
+- Can enforcement be effective?
+
+**Will Pause Hold?**
+- Can political will sustain for years?
+- Will public support erode?
+- Can we prevent defection?
+- Will economic costs remain acceptable?
+- Can we avoid pause fatigue?
+
+**Will We Use Time Wisely?**
+- Will alignment research actually progress?
+- Can we solve hard problems?
+- Will we build good governance?
+- Or will time be wasted?
+
+## Is This Scenario Likely?
+
+### Arguments It Could Happen
+
+**Historical Precedents:**
+- Montreal Protocol showed environmental coordination possible
+- Nuclear test ban treaty showed arms control feasible
+- COVID showed rapid global response possible in crisis
+- Sometimes humans coordinate when stakes clear
+
+**Current Trends:**
+- Growing awareness of AI risks
+- Pause movement gaining traction
+- Some tech leaders supporting caution
+- Compute governance proposals developing
+- International AI safety cooperation beginning
+
+**Logic Compelling:**
+- Alternative to pause is risking catastrophe
+- Economic costs of pause less than catastrophe
+- Verification technically feasible
+- If stakes clear enough, coordination possible
+
+### Arguments It Won't Happen
+
+**Coordination Very Hard:**
+- US-China tensions high
+- Economic pressure enormous
+- Free-rider incentives strong
+- Verification trust difficult
+- Historical coordination record poor
+
+**May Not Get Right Crisis:**
+- Crisis might not occur
+- Or might be catastrophic not galvanizing
+- Or timing wrong
+- Or insufficient to overcome economic pressure
+
+**Political Will Insufficient:**
+- Short-term thinking dominates
+- Industry pressure overwhelming
+- Public concern insufficient
+- Democratic institutions too slow
+- Can't sustain long-term commitments
+
+**Technical Challenges:**
+- Compute governance may not work
+- Secret development paths may exist
+- Can't verify compliance adequately
+- Enforcement may be impossible
+
+**Pause May Not Help:**
+- If alignment impossible, pause futile
+- Or if progress requires capabilities research
+- Time might be wasted
+- Economic costs undermine support
+
+### Base Rate: Very Low
+
+**Similar Coordination Rare:**
+- Few historical examples of this level of global coordination
+- Usually only after catastrophe, not before
+- Economic incentives usually overwhelm safety
+- Tragedy of the commons usually wins
+
+**But Stakes Unprecedented:**
+- Existential risk different from other challenges
+- Extinction risk might motivate different behavior
+- Rational to coordinate if catastrophe probable
+- Question is whether rationality can overcome incentives
+
+## Relation to Other Scenarios
+
+### Transitions From Other Scenarios
+
+**From Slow Takeoff Muddle:**
+- If incident severe enough during muddling
+- If partial coordination succeeds enough to pause
+- If public pressure overwhelms economic incentives
+
+**From Multipolar Competition:**
+- If crisis convinces all actors competition too dangerous
+- If near-catastrophe from competition creates will to pause
+- If mutual destruction logic enables cooperation
+
+**Not Likely From:**
+- Aligned AGI (already succeeded)
+- Misaligned Catastrophe (too late)
+
+### Transitions To Other Scenarios
+
+**To Aligned AGI:**
+- If pause used productively
+- If alignment solved during pause
+- If cautious restart succeeds
+- Best possible outcome of pause
+
+**To Misaligned Catastrophe:**
+- If premature restart before safety solved
+- If unauthorized development succeeds
+- If pause breaks down into racing
+
+**To Slow Takeoff Muddle:**
+- If pause partially erodes
+- If restart chaotic and uncoordinated
+- If governance weakens over time
+
+**To Multipolar Competition:**
+- If pause breaks down into fragmented competition
+- If some actors defect and others follow
+- If coordination fails
+
+## Historical Analogies and Precedents
+
+### Comparison of Technology Governance Precedents
+
+| Precedent | Outcome | Time to Agreement | Verification | Key Success/Failure Factor |
+|-----------|---------|-------------------|--------------|---------------------------|
+| **<R id="b099efb9eba4d8ee">Montreal Protocol</R> (1987)** | Success - 99% CFC reduction | 2 years after Vienna Convention | Industry self-reporting + atmospheric monitoring | Clear alternatives existed; concentrated industry |
+| **Nuclear Test Ban (1963)** | Partial success | 18 years of negotiations | Seismic monitoring; national technical means | US-Soviet bilateral; limited scope |
+| **Biological Weapons Convention (1972)** | Weak - no verification | 3 years negotiation | None (verification protocol rejected 2001) | No enforcement; state cheating occurred |
+| **Climate (Paris 2015)** | Insufficient | 23 years (Kyoto to Paris) | National reporting; peer review | Non-binding; free-rider problem |
+| **Human Cloning Ban (2005)** | Informal success | UN declaration (non-binding) | None formal | 60+ countries unilateral bans; low demand |
+| **Gain-of-Function (2014-2024)** | Contested | Ongoing | Funding-based; voluntary | Only government-funded research covered |
+
+### Montreal Protocol (Success Case)
+
+**Similarities:**
+- Global coordination on existential risk
+- Economic costs accepted
+- Industry initially opposed, complied
+- Verification and enforcement worked
+- Problem largely solved
+
+**Differences:**
+- Ozone depletion clearer and simpler than AI risk
+- Alternatives to CFCs existed
+- No competitive advantage to defection
+- Much easier problem than AI pause
+
+**Lessons:** Global coordination possible when threat clear and alternatives exist.
+
+### Nuclear Test Ban Treaty (Partial Success)
+
+**Similarities:**
+- Arms control between rivals
+- Verification trust issues
+- Mutual benefit from limiting race
+- Required overcoming suspicion
+
+**Differences:**
+- AI dual-use nature harder than nuclear
+- More actors in AI than nuclear powers
+- Verification easier for nuclear than AI
+- Nuclear didn't have huge economic benefits
+
+**Lessons:** Can coordinate with rivals on existential risk, but imperfectly.
+
+### Failed Pauses (Climate Change, etc.)
+
+**Why Climate Coordination Failed:**
+- Diffuse rather than concentrated threat
+- Long timescales reduced urgency
+- Free-rider problems severe
+- Economic costs concentrated, benefits diffuse
+- No single galvanizing crisis
+
+**Differences for AI:**
+- Threat more concentrated and immediate
+- Might get galvanizing crisis
+- Benefits of pause (avoiding catastrophe) clear
+- Verification potentially easier
+
+**Lessons:** Coordination on long-term risks very difficult. Need crisis to galvanize action.
+
+### COVID Pandemic Response (Mixed)
+
+**Initial Response:**
+- Rapid global action possible in crisis
+- Massive economic costs accepted
+- International cooperation on some aspects
+- But also competition and nationalism
+
+**Lessons:**
+- Crisis can enable rapid response
+- But coordination fragile
+- Economic pressure eventually overwhelms caution
+- Fatigue sets in over time
+- Need to use time wisely
+
+## Probability Assessment
+
+### Conditional Probability Breakdown
+
+| Precondition | Independent Probability | Cumulative Probability | Key Dependencies |
+|--------------|------------------------|----------------------|------------------|
+| **Goldilocks crisis occurs** | 20-40% | 20-40% | Must be severe enough to galvanize but not catastrophic |
+| **Crisis attributed to AI** | 60-80% | 12-32% | Clear causal chain; public understanding |
+| **Public mobilization sufficient** | 40-60% | 5-19% | Cross-ideological coalition; sustained attention |
+| **US-China coordination achieved** | 15-30% | 1-6% | Geopolitical tensions overcome; mutual verification |
+| **Treaty negotiated and signed** | 50-70% | 0.4-4% | Enforcement mechanisms; face-saving structure |
+| **Pause holds 3+ years** | 40-60% | 0.2-2.4% | No major defection; economic adaptation |
+| **Productive use of time** | 60-80% | 0.1-1.9% | Alignment progress visible; governance built |
+| **Safe restart or extended pause** | 70-90% | 0.1-1.7% | Safety thresholds met or exceeded |
+
+**Note:** These are rough estimates. The 5-15% headline figure accounts for correlation between preconditions (success in one increases likelihood of others) and potential alternative pathways not modeled above.
+
+### Scenario Probability Estimates
+
+Expert estimates for the probability of achieving a successful AI development pause vary widely, reflecting fundamental uncertainties about international coordination and political will. These estimates represent different perspectives on humanity's ability to coordinate on existential risks before catastrophe occurs.
+
+| Expert/Source | Estimate | Reasoning |
+|---------------|----------|-----------|
+| Baseline estimate | 5-15% | Requires unprecedented international coordination and sustained political will across multiple nations with competing interests. Each necessary precondition (Goldilocks crisis, US-China cooperation, compute governance enforcement, multi-year pause stability) is individually unlikely, making their conjunction extremely improbable despite the existential stakes. |
+| Optimists | 15-30% | Humans have demonstrated the capacity to coordinate on existential risks when the stakes become sufficiently clear and concrete. Historical precedents like the Montreal Protocol show that global coordination is achievable when threat clarity aligns with feasible verification mechanisms. The existential nature of AI risk may trigger rational cooperation that overcomes competitive pressures. |
+| Pessimists | 1-5% | Coordination at this scale and complexity is essentially impossible given current geopolitical tensions, particularly US-China rivalry. Economic incentives to defect are overwhelming, verification mechanisms remain unproven, and historical precedents for preemptive action on abstract long-term risks are nearly nonexistent. The tragedy of the commons dynamic makes racing the default outcome. |
+| Median view | 8-12% | Low probability but not theoretically impossible. Represents a genuine possibility that should not be dismissed, though it requires multiple unlikely preconditions to align. The scenario's value lies not just in its probability but in demonstrating that deliberate human agency over AI development trajectories remains possible. |
+
+### Why This Low Probability?
+
+**Requires Many Unlikely Things:**
+- Goldilocks crisis at right time
+- US-China coordination despite tensions
+- Compute governance working
+- Sustained political will over years
+- Public support maintaining
+- Productive use of time
+- No successful defection
+- Eventual safe restart or acceptable permanent pause
+
+**Each Step Individually Unlikely:**
+- Getting right crisis: ~20-30%?
+- Achieving coordination: ~20-30%?
+- Pause holding 3+ years: ~30-50%?
+- Productive use of time: ~50-70%?
+- Combined probability: Very low
+
+**But Not Impossible:**
+- Stakes are existential
+- Rationality might prevail
+- Historical precedents exist
+- Current trends somewhat positive
+- Crisis could change everything
+
+**Central Estimate Rationale:**
+5-15% reflects genuine possibility but very low likelihood. Requires too many things to go right. Higher than I'd assign to "world government by 2030" but lower than "another pandemic in next 20 years." Possible but improbable.
+
+### What Would Change This Estimate?
+
+**Dramatically Increases Probability:**
+- Major AI safety incident creating public demand for pause
+- US-China AI safety cooperation breakthrough
+- Successful demonstration of compute governance
+- Political leaders embracing AI pause
+- Pause movement going mainstream
+- Tech leaders supporting pause
+
+**Decreases Probability:**
+- Continued racing despite incidents
+- US-China tensions worsening
+- Compute governance proving infeasible
+- Public unconcerned about AI risks
+- Economic pressure overwhelming safety concerns
+- Defection from cooperation increasing
+
+## Why This Scenario Matters Despite Low Probability
+
+### High Value if Achievable
+
+**Best Path If Alignment Very Hard:**
+- If alignment takes decades to solve
+- Pause might be only way to avoid catastrophe
+- Better than racing to disaster
+
+**Enables Thoughtful Development:**
+- Time to solve hard problems properly
+- Democratic input on AI future
+- Building proper governance
+- Avoiding irreversible mistakes
+
+**Demonstrates Human Agency:**
+- Shows we can make long-term decisions
+- Proves coordination possible
+- Exercises collective wisdom
+- Chooses deliberate path
+
+### Worth Working Toward
+
+**Even If Unlikely:**
+- Increasing probability from 5% to 10% valuable
+- Preparing for possible pause useful
+- Building coordination infrastructure helps other scenarios
+- Creating pause option valuable even if not taken
+
+**Overlaps With Other Scenarios:**
+- Work toward pause helps Aligned AGI scenario
+- Governance building useful in Muddle scenario
+- International cooperation valuable everywhere
+- Not wasted effort even if pause doesn't happen
+
+### Shows Alternative Possible
+
+**Counters Inevitability:**
+- AI development not predetermined
+- Humans can choose different path
+- Not slaves to economic forces
+- Agency still possible
+
+**Provides Hope:**
+- Not stuck with racing or catastrophe
+- Deliberate path exists
+- Coordination conceivable
+- Can choose wisdom over speed
+
+---
+
+## Sources and Further Reading
+
+### Pause Advocacy and Public Opinion
+
+- <R id="531f55cee64f6509">Future of Life Institute: Pause Giant AI Experiments Open Letter</R> - The March 2023 letter that gathered 30,000+ signatures
+- <R id="2f4d6cb35b693d85">FLI: The Pause Letter One Year Later</R> - Assessment of outcomes and policy developments
+- <R id="4fc41c1e8720f41f">Wikipedia: Pause Giant AI Experiments</R> - Comprehensive overview of the letter and responses
+- <R id="1ba1123aa592a983">MIT Technology Review: Six Months On</R> - Analysis of changes after the pause letter
+- <R id="ccae9a2159376ebb">PauseAI: The Feasibility of a Pause</R> - Technical and political feasibility analysis
+
+### International AI Governance
+
+- <R id="c68da51ddc1b26c5">UN: Global Digital Compact</R> - September 2024 adoption of AI governance framework
+- <R id="243fa770c13b0c44">UK Gov: Bletchley Declaration</R> - 28 countries + EU signed November 2023
+- <R id="0aa9d7ba294a35d9">EU AI Act Implementation Timeline</R> - Phased enforcement from 2024-2027
+- <R id="68769a80d4b544c4">CSIS: UN Global Dialogue on AI Governance</R> - Analysis of international power dynamics
+
+### US-China Cooperation
+
+- <R id="ab22aa0df9b1be7b">RAND: Potential for US-China Cooperation</R> - Analysis of AI safety cooperation prospects
+- <R id="9264a9f04ad5b2a3">AI Frontiers: Is China Serious About AI Safety?</R> - Assessment of CnAISDA and Chinese initiatives
+- <R id="4f75d2d6d47e8531">Carnegie: How China Views AI Risks</R> - Chinese perspectives on AI governance
+- <R id="fb832513c677b816">TIME: China Is Taking AI Safety Seriously</R> - Comparison of US and Chinese approaches
+
+### Compute Governance
+
+- <R id="2f2861a624b5d76f">LessWrong: What is Compute Governance?</R> - Technical overview of compute-based governance
+- <R id="510c42bfa643b8de">Institute for Law & AI: Compute Thresholds</R> - Analysis of threshold-based approaches
+- <R id="1e392ce476b43c8f">RAND: Detection Gaps in Compute Governance</R> - Game-theoretic analysis of monitoring mechanisms
+- <R id="b4402422d8628b71">Governance.ai: Open Problems in Technical AI Governance</R> - Research agenda for governance mechanisms
+
+### AI Safety Incidents
+
+- <R id="1944e9ee8f67ea0d">Responsible AI Labs: AI Safety Incidents 2024</R> - Analysis of real-world failures
+- <R id="88e88338ce3fcbcc">MIT AI Incident Tracker</R> - Database of documented AI incidents
+- <R id="baac25fa61cb2244">AI Incident Database</R> - Comprehensive incident tracking
+
+### Expert Assessments and Timelines
+
+- <R id="d23472ea324bb482">Our World in Data: AI Timelines</R> - Survey of expert predictions for AGI
+- <R id="7c505853240d1113">ArXiv: Thousands of AI Authors on the Future of AI</R> - Large-scale expert survey
+- <R id="7aa89f76287dd2ae">EA Forum: Is Pausing AI Possible?</R> - Analysis of pause feasibility

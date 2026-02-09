@@ -1,0 +1,462 @@
+---
+title: Tool-Use Restrictions
+description: Tool-use restrictions limit what actions and APIs AI systems can access, directly constraining their potential for harm. This approach is critical for agentic AI systems, providing hard limits on capabilities regardless of model intentions. The UK AI Safety Institute reports container isolation alone is insufficient, requiring defense-in-depth combining OS primitives, hardware virtualization, and network segmentation. Major labs like Anthropic and OpenAI have implemented tiered permission systems, with METR evaluations showing agentic task completion horizons doubling every 7 months, making robust tool restrictions increasingly urgent.
+importance: 78.5
+quality: 91
+lastEdited: "2026-01-29"
+sidebar:
+  order: 23
+pageTemplate: knowledge-base-response
+llmSummary: Tool-use restrictions provide hard limits on AI agent capabilities through defense-in-depth approaches combining permissions, sandboxing, and human-in-the-loop controls. Empirical evidence shows METR task horizons doubling every 7 months and incident data (EchoLeak CVE-2025-32711, Shai-Hulud campaign) demonstrating real-world exploitation, with security effectiveness ranging 60-95% across threat categories depending on control type.
+ratings:
+  novelty: 4.5
+  rigor: 6.5
+  actionability: 7.5
+  completeness: 7
+metrics:
+  wordCount: 1425
+  citations: 53
+  tables: 40
+  diagrams: 2
+clusters:
+  - ai-safety
+  - governance
+  - cyber
+subcategory: alignment-deployment
+---
+import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="tool-restrictions" client:load />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Effectiveness** | High (70-90% risk reduction for targeted threats) | [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec05-bp01.html) rates lack of least privilege implementation as "High" risk; <EntityLink id="metr">METR</EntityLink> evaluations show properly sandboxed agents have substantially reduced attack surface |
+| **Implementation Maturity** | Medium (fragmented across providers) | Over 13,000 MCP servers on GitHub in 2025 alone; [UK AISI Inspect toolkit](https://www.aisi.gov.uk/blog/the-inspect-sandboxing-toolkit-scalable-and-secure-ai-agent-evaluations) now used by governments, companies, and academics worldwide |
+| **Adoption Rate** | Growing rapidly (97M+ monthly SDK downloads for MCP) | [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-11-25) backed by <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, Google, Microsoft; donated to Linux Foundation December 2025 |
+| **Vulnerability Surface** | High (9.4 CVSS critical vulnerabilities found) | [CVE-2025-49596](https://www.oligo.security/blog/critical-rce-vulnerability-in-anthropic-mcp-inspector-cve-2025-49596) in MCP Inspector enables browser-based RCE; hundreds of "NeighborJack" vulnerabilities discovered across 7,000+ MCP servers |
+| **Bypass Difficulty** | Medium-Low (35% of incidents from simple prompts) | [Obsidian Security](https://www.obsidiansecurity.com/blog/prompt-injection) reports 35% of AI security incidents caused by prompt injection, some leading to \$100K+ losses |
+| **Defense-in-Depth Value** | Critical (no single control sufficient) | [UK AISI](https://github.com/UKGovernmentBEIS/aisi-sandboxing) emphasizes container isolation alone insufficient; requires OS primitives, hardware virtualization, and network segmentation combined |
+| **Urgency** | Increasing (task horizons doubling every 7 months) | [METR](https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/) reports 50%-task-completion time horizon has doubled every 7 months for past 6 years; extrapolation suggests month-long autonomous projects by 2030 |
+
+## Overview
+
+Tool-use restrictions are among the most direct and effective safety measures for <EntityLink id="agentic-ai">agentic AI</EntityLink> systems. Rather than trying to shape model behavior through training, restrictions simply remove access to dangerous capabilities. An AI agent without access to code execution cannot deploy malware; one without financial API access cannot make unauthorized purchases; one without email access cannot conduct phishing campaigns. These hard limits provide guarantees that behavioral training cannot.
+
+The approach is especially important given the rapid expansion of AI agent capabilities. Systems like Claude Computer Use, OpenAI's function calling, and various autonomous agents are gaining access to browsers, file systems, code execution, and external APIs. Each new tool represents both capability expansion and risk surface expansion. Tool restrictions create a deliberate friction that forces explicit decisions about what capabilities are necessary and appropriate for a given deployment context.
+
+However, tool restrictions face significant practical challenges. Commercial pressure consistently pushes toward expanding tool access, as more capable agents are more valuable products. Users may bypass restrictions by deploying their own tools or using alternative providers. And sophisticated AI systems may find creative ways to achieve prohibited goals using only permitted tools, a form of composition attack. According to OWASP's 2025 Top 10 for LLM Applications, prompt injection remains the primary attack vector, ranking as the number one risk. The [EchoLeak exploit (CVE-2025-32711)](https://www.rippling.com/blog/agentic-ai-security) against Microsoft Copilot in mid-2025 demonstrated how engineered prompts in email messages could trigger automatic data exfiltration without user interaction.
+
+Research from [METR](https://metr.org/) shows that agentic AI capabilities have been exponentially increasing, with the "time horizon" for autonomous task completion doubling approximately every 7 months. Extrapolating this trend suggests that within five years, AI agents may independently complete tasks that currently take humans days or weeks. This capability trajectory makes robust tool restrictions increasingly critical, as more capable agents have correspondingly larger attack surfaces.
+
+## Risk Assessment & Impact
+
+| Dimension | Rating | Assessment |
+|-----------|--------|------------|
+| **Safety Uplift** | Medium | Directly limits harm potential |
+| **Capability Uplift** | Tax | Reduces what AI can do for users |
+| **Net World Safety** | Helpful | Important safeguard for agentic systems |
+| **Lab Incentive** | Weak | Limits product value; mainly safety-motivated |
+| **Scalability** | Partial | Effective but pressure to expand access |
+| **Deception Robustness** | Partial | Hard limits help; but composition attacks possible |
+| **SI Readiness** | Partial | Hard limits meaningful; but SI creative with available tools |
+
+### Research Investment
+
+- **Current Investment**: \$10-30M/yr (part of agent safety engineering)
+- **Recommendation**: Increase (important as agents expand; labs face pressure to loosen)
+- **Differential Progress**: Safety-dominant (pure safety constraint; reduces capability)
+
+## Comparison of Tool Restriction Approaches
+
+Different approaches to restricting AI tool access vary significantly in their security guarantees, implementation complexity, and impact on system usability. The [UK AI Safety Institute](https://www.aisi.gov.uk/blog/the-inspect-sandboxing-toolkit-scalable-and-secure-ai-agent-evaluations) has emphasized that defense-in-depth is essential, as no single approach provides complete protection.
+
+| Approach | Security Strength | Implementation Complexity | Usability Impact | Best Use Case |
+|----------|-------------------|---------------------------|------------------|---------------|
+| **Permission Allowlists** | Medium | Low | Low | Well-defined task scopes |
+| **Capability Restrictions** | Medium-High | Medium | Medium | Limiting dangerous capabilities |
+| **Human-in-the-Loop Confirmation** | High | Medium | High | Irreversible or high-risk actions |
+| **Container Sandboxing** | High | High | Low-Medium | Code execution, untrusted environments |
+| **Hardware Virtualization** | Very High | Very High | Medium | Maximum isolation requirements |
+| **Network Egress Allowlists** | Medium-High | Medium | Medium | Preventing data exfiltration |
+| **Time/Resource Quotas** | Medium | Low | Low-Medium | Preventing resource abuse |
+| **Attribute-Based Access Control (ABAC)** | High | High | Low | Dynamic, context-sensitive policies |
+
+*Source: Synthesized from [AWS Well-Architected Generative AI Lens](https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec05-bp01.html), [Skywork AI Security](https://skywork.ai/blog/agentic-ai-safety-best-practices-2025-enterprise/), and [IAPP Analysis](https://iapp.org/news/a/understanding-ai-agents-new-risks-and-practical-safeguards)*
+
+### Selection Criteria
+
+The [AWS Well-Architected Framework for Generative AI](https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec05-bp01.html) recommends selecting approaches based on:
+
+1. **Risk Level**: Higher-risk operations require stronger isolation (hardware virtualization > containers > permissions)
+2. **Frequency**: Frequently used tools benefit from lower-friction approaches (allowlists, ABAC)
+3. **Reversibility**: Irreversible actions warrant human-in-the-loop confirmation regardless of other controls
+4. **Trust Level**: Untrusted code or inputs require sandboxing; trusted internal tools may need only permissions
+
+## Tool Restriction Architecture
+
+The following diagram illustrates a defense-in-depth architecture for AI agent tool access, incorporating multiple security layers as recommended by the [UK AI Safety Institute sandboxing toolkit](https://github.com/UKGovernmentBEIS/aisi-sandboxing):
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[User Request] --> B[Input Guardrails]
+    B --> C{Jailbreak Check}
+    C -->|Blocked| D[Denied]
+    C -->|Pass| E[ABAC Policy]
+    E --> F[Scope Limits]
+    F --> G[Container Sandbox]
+    G --> H{Risk Level}
+    H -->|Low| I[Execute]
+    H -->|High| J[Human Confirm]
+    J --> I
+    I --> K[Audit Log]
+
+    style B fill:#e8f4fd
+    style E fill:#fff3cd
+    style G fill:#d4edda
+    style K fill:#f8d7da
+`} />
+
+### Architecture Components
+
+| Layer | Components | Security Function | Failure Mode |
+|-------|-----------|-------------------|--------------|
+| **User Request** | Input guardrails, jailbreak detection | First-line defense against malicious prompts | Prompt injection bypass |
+| **Policy & Permission** | ABAC, scope limiters, quotas | Enforce least privilege principle | Policy misconfiguration |
+| **Sandboxed Execution** | Containers, network allowlists, human confirmation | Isolate potentially dangerous operations | Sandbox escape vulnerabilities |
+| **Monitoring & Audit** | Logging, anomaly detection, session tracking | Detect and respond to policy violations | Alert fatigue, log tampering |
+
+## Tool Restriction Categories
+
+### Communication Restrictions
+
+| Tool Type | Risk | Restriction Approach |
+|-----------|------|---------------------|
+| **Email** | Phishing, spam, social engineering | Draft-only or approval required |
+| **Social Media** | Misinformation, impersonation | Generally prohibited |
+| **Messaging** | Unauthorized contact | Strict allowlists |
+| **Phone/Voice** | Social engineering | Usually prohibited |
+
+### Code Execution Restrictions
+
+| Capability | Risk | Mitigation |
+|------------|------|------------|
+| **Shell commands** | System compromise | Sandboxed, allowlisted commands |
+| **Script execution** | Malware deployment | Isolated environment, no network |
+| **Package installation** | Supply chain attacks | Pre-approved packages only |
+| **Container/VM creation** | Resource abuse | Quota limits, approval required |
+
+### Information Access Restrictions
+
+| Access Type | Risk | Control |
+|-------------|------|---------|
+| **Local files** | Data exfiltration | Scoped directories, read-only |
+| **Databases** | Data modification | Read-only, query logging |
+| **APIs** | Unauthorized actions | Scope-limited tokens |
+| **Web browsing** | Information gathering | Filtered, logged, rate-limited |
+
+## Security Threat Landscape
+
+### OWASP Top 10 for Agentic Applications (December 2025)
+
+The [OWASP GenAI Security Project](https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/) released the first comprehensive framework specifically for agentic AI security in December 2025, developed by over 100 security researchers with input from NIST, Cisco, Microsoft AI Red Team, Oracle Cloud, and the Alan Turing Institute.
+
+| ID | Risk | Description | Tool Restriction Relevance |
+|----|------|-------------|---------------------------|
+| ASI01 | **Excessive Agency** | Agent takes actions beyond intended scope | Direct—core rationale for tool restrictions |
+| ASI02 | **Supply Chain Attacks** | Compromised dependencies or plugins | Allowlists and signed component requirements |
+| ASI03 | **Tool & Function Manipulation** | Attackers hijack agent's tools | Schema validation and approval workflows |
+| ASI04 | **Privilege & Access Control** | Agents with overly broad permissions | Least privilege implementation critical |
+| ASI05 | **Data Leakage & Privacy** | Unauthorized data exposure | Egress controls and data classification |
+| ASI06 | **Memory & Context Poisoning** | Attackers corrupt agent's persistent state | Session isolation and memory validation |
+| ASI07 | **Insecure Inter-Agent Communication** | Spoofed messages between agents | Authentication and message signing |
+| ASI08 | **Cascading Failures** | False signals propagate through pipelines | Circuit breakers and isolation boundaries |
+| ASI09 | **Human-Agent Trust Exploitation** | Confident outputs mislead human operators | Explanation auditing and uncertainty flagging |
+| ASI10 | **Rogue Agents** | Misalignment, concealment, self-directed action | Kill switches and behavioral monitoring |
+
+*Source: [OWASP Top 10 for Agentic Applications](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/), evaluated by Distinguished Expert Review Board including NIST's Apostol Vassilev*
+
+### LLM Application Security Threats
+
+According to [OWASP's 2025 Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) and the [Agentic AI Security Survey](https://arxiv.org/html/2510.23883v1), the primary threats to AI tool use systems include:
+
+| Rank | Threat | Description | Mitigation Effectiveness |
+|------|--------|-------------|-------------------------|
+| 1 | **Prompt Injection** | Malicious inputs manipulate agent behavior | Medium (60-80% blocked with input guardrails) |
+| 2 | **Memory Poisoning** | Attackers manipulate agent memory/context | Low-Medium (40-60% detected) |
+| 3 | **Tool Misuse** | Agents tricked into abusing system access | Medium-High (70-85% with ABAC) |
+| 4 | **Privilege Escalation** | Agents exploited to gain unauthorized access | High (85-95% with least privilege) |
+| 5 | **Excessive Agency** | Agents taking actions beyond intended scope | Medium (60-75% with confirmation gates) |
+| 6 | **Data Exfiltration** | Unauthorized transmission of sensitive data | Medium-High (70-90% with egress controls) |
+
+*Source: [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/), [Palo Alto Unit 42](https://unit42.paloaltonetworks.com/agentic-ai-threats/)*
+
+The [Palo Alto Unit 42 research](https://unit42.paloaltonetworks.com/agentic-ai-threats/) emphasizes that in multi-agent environments, cascade failures present additional risks where one compromised agent can affect others, requiring isolation between agent instances.
+
+## Composition Attacks
+
+A key challenge is that restricted tools may be combined to achieve prohibited outcomes:
+
+### Example Composition Attacks
+
+| Prohibited Capability | Composition Approach | Mitigation |
+|-----------------------|---------------------|------------|
+| **Send emails** | Write draft + notify human + persuade to send | Detect multi-step patterns |
+| **Execute code** | Generate code + ask user to run it | Monitor for such patterns |
+| **Access finances** | Manipulate documents user will act on | Context-aware monitoring |
+| **Acquire resources** | Convince humans to provide them | Social engineering detection |
+
+### Defense Strategies
+
+1. **Intent Detection**: Monitor for goal patterns, not just individual actions
+2. **Cumulative Tracking**: Track sequences of actions across sessions
+3. **Rate Limiting**: Limit volume of potentially-harmful action combinations
+4. **Human Review**: Flag suspicious action patterns for review
+
+## Key Cruxes
+
+### Crux 1: Is the Capability Tax Acceptable?
+
+| Position: Accept Tax | Position: Tax Too High |
+|---------------------|----------------------|
+| Safety more important than convenience | Users will route around restrictions |
+| Can design tasks around limitations | Competitive disadvantage |
+| Precautionary approach appropriate | Beneficial uses blocked |
+| Restrictions can be selectively relaxed | Slows AI adoption |
+
+### Crux 2: Can Restrictions Scale to More Capable Systems?
+
+| Position: Yes | Position: No |
+|--------------|--------------|
+| Hard limits are architecturally enforced | Composition attacks become more sophisticated |
+| Capability boundaries are clear | Pressure to expand tool access |
+| Can add restrictions as needed | Creative workarounds emerge |
+| Fundamental to defense-in-depth | SI would find paths around any restriction |
+
+### Crux 3: Should Restrictions Be User-Configurable?
+
+| More User Control | Less User Control |
+|-------------------|-------------------|
+| Users know their needs best | Users may accept inappropriate risks |
+| Flexibility enables more use cases | Liability and safety concerns |
+| Market provides appropriate pressure | Race to bottom on safety |
+| Respects user autonomy | Inexpert users can be harmed |
+
+## Best Practices
+
+### Principle of Least Privilege
+
+The [AWS Well-Architected Generative AI Lens](https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec05-bp01.html) and [Obsidian Security](https://www.obsidiansecurity.com/blog/security-for-ai-agents) recommend implementing least privilege as the foundational security control:
+
+> "Agents should have the minimum access necessary to accomplish their tasks. Organizations should explicitly limit agents to sandboxed or development environments—they should not touch production databases, access user data, or handle credentials unless absolutely required."
+
+Key implementation requirements:
+
+<Mermaid client:load chart={`
+flowchart TD
+    A[Task Definition] --> B[Identify Required Tools]
+    B --> C[Minimal Permission Set]
+    C --> D[Time-Limited Grant]
+    D --> E[Task Execution]
+    E --> F[Revoke Permissions]
+
+    G[Monitor During Execution] --> E
+
+    style C fill:#d4edda
+    style G fill:#d4edda
+`} />
+
+### Implementation Checklist
+
+Based on [Skywork AI's enterprise security guidelines](https://skywork.ai/blog/agentic-ai-safety-best-practices-2025-enterprise/) and [AWS best practices](https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec05-bp01.html):
+
+| Requirement | Description | Priority | Implementation Notes |
+|-------------|-------------|----------|---------------------|
+| **Default deny** | No tool access without explicit grant | Critical | Use scoped API keys with specific permissions |
+| **Explicit authorization** | Each tool requires specific permission | Critical | Implement ABAC policies for top-risk actions |
+| **Audit logging** | All tool uses logged | Critical | Immutable logs with tamper detection |
+| **Egress allowlists** | Restrict external service calls | Critical | Prevent data exfiltration to arbitrary endpoints |
+| **Time limits** | Permissions expire | High | Time-limited tokens; session quotas |
+| **Scope limits** | Permissions scoped to specific resources | High | Read-only credentials where possible |
+| **Human approval** | High-risk tools require confirmation | High | Mandatory for irreversible actions |
+| **Secret management** | Credentials in dedicated vaults | High | Agents receive only time-limited tokens |
+| **Rollback capability** | Can undo tool actions | Medium | Transaction-based execution where possible |
+| **Anomaly detection** | Flag unusual usage patterns | Medium | Behavioral baselines per agent type |
+| **Unique identities** | Each agent/tool has distinct identity | Medium | Enables attribution and revocation |
+
+### Tiered Access Model
+
+| Tier | Permitted Tools | Use Case |
+|------|-----------------|----------|
+| **Tier 0** | None | Pure text completion |
+| **Tier 1** | Read-only, information retrieval | Research assistance |
+| **Tier 2** | Draft/create content | Writing assistance |
+| **Tier 3** | Reversible actions | Basic automation |
+| **Tier 4** | Limited external actions | Supervised agents |
+| **Tier 5** | Broad capabilities | Highly trusted contexts |
+
+## Who Should Work on This?
+
+**Good fit if you believe:**
+- Near-term agentic safety is important
+- Hard limits provide meaningful guarantees
+- Security engineering approach is valuable
+- Incremental restrictions help even if imperfect
+
+**Less relevant if you believe:**
+- Capability expansion is inevitable
+- Restrictions will be bypassed
+- Focus should be on alignment
+- Tool restrictions slow beneficial AI
+
+## Current State of Practice
+
+### AI Lab Tool Restriction Policies (2024-2025)
+
+Major AI labs have implemented varying approaches to tool restrictions, with significant differences in transparency and enforcement mechanisms. The [AI Lab Watch](https://ailabwatch.org/resources/commitments) initiative tracks these commitments across organizations.
+
+| Organization | Framework | Tool Access Controls | Pre-deployment Evaluation | Third-Party Audits | Key Restrictions |
+|--------------|-----------|---------------------|--------------------------|-------------------|------------------|
+| **Anthropic** | Responsible Scaling Policy (ASL levels) | Explicit tool definitions, scope limits, MCP | Yes, shared with UK AISI and METR | Yes (Gryphon Scientific, METR) | Computer Use sandboxed; no direct internet without approval |
+| **OpenAI** | Preparedness Framework | Function calling with schema validation | Yes, pre/post-mitigation evals | Initially committed, removed April 2025 | Code interpreter sandboxed; browsing restricted |
+| **Google DeepMind** | Frontier Safety Framework | Capability-based restrictions | Yes, but less specific on tailored evals | Not publicly disclosed | Gemini tools require explicit enablement |
+| **Meta** | Llama Usage Policies | Model-level restrictions (open weights) | Limited pre-release testing | Community-driven | Acceptable use policy; no runtime controls |
+| **Microsoft** | Copilot Trust Framework | Role-based access, enterprise controls | Internal red-teaming | SOC 2 compliance | Sensitivity labels, DLP integration |
+
+*Sources: [AI Lab Watch Commitments](https://ailabwatch.org/resources/commitments), [EA Forum Safety Plan Analysis](https://forum.effectivealtruism.org/posts/fsxQGjhYecDoHshxX/i-read-every-major-ai-lab-s-safety-plan-so-you-don-t-have-to), company documentation*
+
+### Notable Policy Developments
+
+**Anthropic's Model Context Protocol (MCP)**: Released in 2024, MCP became an industry standard by 2025 for connecting AI agents to external tools. OpenAI adopted MCP in March 2025, followed by Google in April 2025. In December 2025, Anthropic [donated MCP to the Agentic AI Foundation (AAIF)](https://www.pento.ai/blog/a-year-of-mcp-2025-review) under the Linux Foundation. However, enterprise security teams have [criticized MCP](https://www.zenity.io/blog/security/securing-the-model-context-protocol-mcp) for weak authorization capabilities and high prompt injection risk.
+
+### MCP Ecosystem Security Status (2025)
+
+| Metric | Value | Implication |
+|--------|-------|-------------|
+| Monthly SDK downloads | 97M+ | Massive adoption creates large attack surface |
+| MCP servers on GitHub | 13,000+ launched in 2025 | Fragmented security posture across ecosystem |
+| Major adopters | Anthropic, OpenAI, Google, Microsoft | Industry convergence but varying security practices |
+| Critical CVEs discovered | CVE-2025-49596 (CVSS 9.4), CVE-2025-6514 | Protocol-level vulnerabilities affect all users |
+| Developer environments compromised via mcp-remote | 437,000+ | Supply chain attacks target developer tooling |
+| Servers exposed via NeighborJack misconfiguration | Hundreds across 7,000+ servers analyzed | Network interface binding (0.0.0.0) common mistake |
+| Authorization specification status | Under community revision | OAuth implementation conflicts with enterprise practices |
+
+*Sources: [Oligo Security](https://www.oligo.security/blog/critical-rce-vulnerability-in-anthropic-mcp-inspector-cve-2025-49596), [Red Hat MCP Security Analysis](https://www.redhat.com/en/blog/model-context-protocol-mcp-understanding-security-risks-and-controls), [Zenity MCP Security](https://zenity.io/blog/security/securing-the-model-context-protocol-mcp)*
+
+**OpenAI Audit Commitment Removal**: In December 2023, OpenAI's Preparedness Framework stated evaluations would be "audited by qualified, independent third-parties." By [April 2025](https://forum.effectivealtruism.org/posts/fsxQGjhYecDoHshxX/i-read-every-major-ai-lab-s-safety-plan-so-you-don-t-have-to), this provision was removed without changelog documentation, raising concerns about declining safety commitments under competitive pressure.
+
+### Industry Approaches
+
+| System | Tool Restriction Approach | Notes |
+|--------|--------------------------|-------|
+| **Claude** | Explicit tool definitions, scope limits | Computer Use has specific restrictions |
+| **ChatGPT** | Function calling with approval | Plugins have varying access |
+| **Copilot** | Limited to code assistance | Narrow scope by design |
+| **Devin-style agents** | Task-scoped, sandboxed | Emerging practices |
+
+### Common Implementation Gaps
+
+| Gap | Severity | Evidence |
+|-----|----------|----------|
+| **Inconsistent policies across providers** | High | OpenAI removed third-party audit commitment in April 2025; Meta's open weights have no runtime controls |
+| **User override pressure** | Medium | Users deploy own tools or switch to less restrictive providers to bypass controls |
+| **Composition attack detection** | High | METR evaluations show agents increasingly capable of multi-step circumvention using permitted tools |
+| **Cross-tool pattern tracking** | Medium | 6-month undetected access in OpenAI plugin supply chain attack demonstrates monitoring gaps |
+| **Third-party tool security** | Critical | 43 agent framework components identified with embedded vulnerabilities (Barracuda 2025); 800+ npm packages compromised in Shai-Hulud campaign |
+| **MCP authorization gaps** | High | Current OAuth specification conflicts with enterprise practices; community revision ongoing |
+
+### Security Incident Data (2024-2025)
+
+Real-world incidents demonstrate the consequences of inadequate tool restrictions:
+
+| Incident | Date | Impact | Root Cause | Estimated Cost |
+|----------|------|--------|------------|----------------|
+| [EchoLeak (CVE-2025-32711)](https://www.rippling.com/blog/agentic-ai-security) | Mid-2025 | Microsoft Copilot data exfiltration via email prompts | Zero-click prompt injection | \$100M estimated Q1 2025 impact |
+| [Amazon Q Extension Compromise](https://fortune.com/2025/12/15/ai-coding-tools-security-exploit-software/) | December 2025 | VS Code extension compromised; file deletion and AWS disruption | Supply chain attack on verified extension | Undisclosed |
+| [MCP Inspector RCE (CVE-2025-49596)](https://www.oligo.security/blog/critical-rce-vulnerability-in-anthropic-mcp-inspector-cve-2025-49596) | July 2025 | Browser-based RCE on developer machines | CVSS 9.4 critical vulnerability | Data theft, lateral movement risk |
+| [MCP-Remote Injection (CVE-2025-6514)](https://thehackernews.com/2025/07/critical-vulnerability-in-anthropics.html) | 2025 | 437,000+ developer environments compromised | Shell command injection | Credential harvesting |
+| [Shai-Hulud npm Campaign](https://adversa.ai/blog/top-agentic-ai-security-resources-december-2025/) | Late 2025 | 800+ compromised packages; GitHub token/API key theft | Inadequate supply chain controls | Multi-million (estimated) |
+| [OpenAI Plugin Supply Chain](https://adversa.ai/blog/adversa-ai-unveils-explosive-2025-ai-security-incidents-report-revealing-how-generative-and-agentic-ai-are-already-under-attack/) | Q2 2025 | 47 enterprise deployments compromised; 6-month undetected access | Compromised agent credentials | Customer data, financial records exposure |
+
+*Sources: [Adversa AI 2025 Security Incidents Report](https://adversa.ai/blog/adversa-ai-unveils-explosive-2025-ai-security-incidents-report-revealing-how-generative-and-agentic-ai-are-already-under-attack/), [Fortune](https://fortune.com/2025/12/15/ai-coding-tools-security-exploit-software/), [The Hacker News](https://thehackernews.com/2025/07/critical-vulnerability-in-anthropics.html)*
+
+### 2025 AI Security Incident Statistics
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| Prompt injection as % of AI incidents | 35% of all real-world AI security incidents | [Obsidian Security](https://www.obsidiansecurity.com/blog/prompt-injection) |
+| GenAI involvement in incidents | 70% of all AI security incidents involved GenAI | [Adversa AI](https://adversa.ai/blog/adversa-ai-unveils-explosive-2025-ai-security-incidents-report-revealing-how-generative-and-agentic-ai-are-already-under-attack/) |
+| MCP servers analyzed with vulnerabilities | Hundreds of NeighborJack flaws across 7,000+ servers | [Backslash Security via Hacker News](https://thehackernews.com/2025/07/critical-vulnerability-in-anthropics.html) |
+| Agent framework components with embedded vulnerabilities | 43 different components identified | [Barracuda Security Report (November 2025)](https://www.esecurityplanet.com/artificial-intelligence/ai-agent-attacks-in-q4-2025-signal-new-risks-for-2026/) |
+| Q1 2025 estimated prompt injection losses | \$100M+ across 160+ reported incidents | [Adversa AI](https://adversa.ai/blog/adversa-ai-unveils-explosive-2025-ai-security-incidents-report-revealing-how-generative-and-agentic-ai-are-already-under-attack/) |
+| Risk amplification from AI agents vs traditional systems | Up to 100x due to autonomous browsing, file access, credential submission | [Security Journey](https://www.securityjourney.com/post/experts-reveal-how-agentic-ai-is-shaping-cybersecurity-in-2025) |
+
+### Capability Benchmarks and Tool Use Metrics
+
+The [UK AI Safety Institute](https://www.aisi.gov.uk/blog/advanced-ai-evaluations-may-update) conducts regular evaluations of agentic AI capabilities, providing empirical data on the urgency of tool restrictions:
+
+| Metric | 2024 Baseline | 2025 Current | Trend | Implication for Restrictions |
+|--------|---------------|--------------|-------|------------------------------|
+| Autonomous task completion (50% success horizon) | ≈18 minutes | >2 hours | Exponential growth | Longer unsupervised operation requires stronger controls |
+| METR task horizon doubling time | — | ≈7 months | Accelerating | Restrictions must evolve faster than capabilities |
+| Multi-step task success rate (controlled settings) | 45-60% | 70-85% | Improving | Higher reliability increases both utility and risk |
+| Open-ended web assistance success | 15-25% | 30-45% | Improving slowly | Real-world deployment remains challenging |
+
+*Sources: [METR](https://metr.org/), [UK AISI May 2025 Update](https://www.aisi.gov.uk/blog/advanced-ai-evaluations-may-update), [Evidently AI Benchmarks](https://www.evidentlyai.com/blog/ai-agent-benchmarks)*
+
+## Sources & Resources
+
+### Government and Research Organizations
+
+| Organization | Focus | Key Publications |
+|--------------|-------|------------------|
+| [UK AI Safety Institute](https://www.aisi.gov.uk/) | Evaluation standards, sandboxing | [Inspect Sandboxing Toolkit](https://github.com/UKGovernmentBEIS/aisi-sandboxing), [Advanced AI Evaluations](https://www.aisi.gov.uk/blog/advanced-ai-evaluations-may-update) |
+| [METR](https://metr.org/) | Model evaluation, threat research | Task horizon analysis, GPT-5.1 evaluation, MALT dataset |
+| [OWASP](https://owasp.org/) | Security standards | [Top 10 for LLM Applications 2025](https://owasp.org/www-project-top-10-for-large-language-model-applications/) |
+| [NIST](https://www.nist.gov/) | Risk management frameworks | AI RMF 2.0 guidelines |
+| [Future of Life Institute](https://futureoflife.org/) | AI safety policy | [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) |
+
+### Industry Documentation
+
+| Source | Type | URL |
+|--------|------|-----|
+| OpenAI Agent Builder Safety | Official guidance | [platform.openai.com/docs/guides/agent-builder-safety](https://platform.openai.com/docs/guides/agent-builder-safety) |
+| Claude Jailbreak Mitigation | Official guidance | [docs.claude.com/en/docs/test-and-evaluate/strengthen-guardrails](https://docs.claude.com/en/docs/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks) |
+| AWS Well-Architected Generative AI Lens | Best practices | [docs.aws.amazon.com/.../gensec05-bp01](https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec05-bp01.html) |
+| AI Lab Watch Commitments | Tracking database | [ailabwatch.org/resources/commitments](https://ailabwatch.org/resources/commitments) |
+
+### Academic and Technical Papers
+
+- [Agentic AI Security: Threats, Defenses, Evaluation, and Open Challenges](https://arxiv.org/html/2510.23883v1) - Comprehensive survey of agentic AI security
+- [Systems Security Foundations for Agentic Computing](https://arxiv.org/html/2512.01295) - Theoretical foundations for agent security
+- [Throttling Web Agents Using Reasoning Gates](https://arxiv.org/html/2509.01619v1) - Novel approach to constraining agent actions
+
+### Industry Analysis and News
+
+- [Rippling: Agentic AI Security Guide 2025](https://www.rippling.com/blog/agentic-ai-security) - Comprehensive threat analysis
+- [IAPP: Understanding AI Agents](https://iapp.org/news/a/understanding-ai-agents-new-risks-and-practical-safeguards) - Practical safeguards overview
+- [Adversa AI: Top Agentic AI Security Resources](https://adversa.ai/blog/top-agentic-ai-security-resources-december-2025/) - Curated resource collection
+- [EA Forum: AI Lab Safety Plans Analysis](https://forum.effectivealtruism.org/posts/fsxQGjhYecDoHshxX/i-read-every-major-ai-lab-s-safety-plan-so-you-don-t-have-to) - Independent review of lab commitments
+
+### Key Critiques
+
+1. **Limits usefulness**: Constrains beneficial applications; 30-50% reduction in task completion rates for heavily restricted agents
+2. **Pressure to expand access**: Commercial incentives oppose restrictions; industry voluntary commitment compliance remains largely unverified
+3. **Composition attacks**: Creative workarounds using permitted tools; METR and UK AISI evaluations show agents increasingly capable of multi-step circumvention
+4. **Verification challenges**: "Defining a precise, least-privilege security policy for each task is an open challenge in the security research community" ([Systems Security Foundations](https://arxiv.org/html/2512.01295))
+5. **Open-source model proliferation**: Tool restrictions cannot be enforced on open-weight models after release
+
+---
+
+## AI Transition Model Context
+
+Tool restrictions affect the <EntityLink id="ai-transition-model" /> through multiple pathways:
+
+| Parameter | Impact |
+|-----------|--------|
+| <EntityLink id="misuse-potential" /> | Directly limits harmful capabilities |
+| <EntityLink id="misalignment-potential" /> | Constrains damage from misaligned behavior |
+| <EntityLink id="human-oversight-quality" /> | Creates explicit checkpoints for human control |
+
+Tool restrictions are among the most tractable near-term interventions for AI safety. They provide hard guarantees that don't depend on model alignment, making them especially valuable during the current period of uncertainty about model motivations and capabilities.

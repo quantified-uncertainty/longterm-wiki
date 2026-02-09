@@ -1,0 +1,97 @@
+import { getFact } from "@/data";
+import { cn } from "@/lib/utils";
+
+interface FProps {
+  /** Entity ID (e.g., "openai", "anthropic") */
+  e: string;
+  /** Fact ID within the entity (e.g., "valuation-2024") */
+  f: string;
+  /** Optional display override */
+  children?: React.ReactNode;
+  className?: string;
+}
+
+/**
+ * F — Inline canonical fact component.
+ *
+ * Renders a fact value from the canonical facts store with a hover tooltip
+ * showing metadata (asOf, source, note, computed status).
+ */
+export function F({ e, f, children, className }: FProps) {
+  const fact = getFact(e, f);
+
+  if (!fact) {
+    return (
+      <span
+        className={cn(
+          "inline px-1 py-0.5 bg-destructive/10 text-destructive text-sm rounded",
+          className
+        )}
+        title={`Missing fact: ${e}.${f}`}
+      >
+        {children || `[missing: ${e}.${f}]`}
+      </span>
+    );
+  }
+
+  const displayValue = children || fact.value || `[no value: ${e}.${f}]`;
+  const isComputed = Boolean(fact.computed);
+  const hasMetadata = fact.asOf || fact.source || fact.note || isComputed;
+
+  if (!hasMetadata) {
+    return (
+      <span
+        className={cn("inline font-medium", className)}
+        data-fact={`${e}.${f}`}
+      >
+        {displayValue}
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative inline group/fact">
+      <span
+        className={cn(
+          "inline border-b border-dotted border-muted-foreground/40 cursor-help",
+          className
+        )}
+        data-fact={`${e}.${f}`}
+        tabIndex={0}
+      >
+        {displayValue}
+      </span>
+      <span
+        className="absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible group-hover/fact:opacity-100 group-hover/fact:visible transition-opacity text-xs"
+        role="tooltip"
+      >
+        <span className="block font-semibold text-foreground mb-1">
+          {fact.value || displayValue}
+        </span>
+        {isComputed && (
+          <span className="block text-blue-500 text-[10px] font-medium mb-0.5">
+            Computed
+          </span>
+        )}
+        {fact.asOf && (
+          <span className="block text-muted-foreground">
+            As of: {fact.asOf}
+          </span>
+        )}
+        {fact.note && (
+          <span className="block text-muted-foreground mt-1">
+            {fact.note}
+          </span>
+        )}
+        {fact.source && (
+          <span className="block text-muted-foreground mt-1 truncate">
+            Source: {fact.source}
+          </span>
+        )}
+        <span className="block text-muted-foreground/60 mt-1.5 font-mono text-[10px]">
+          {e}.{f}
+        </span>
+      </span>
+    </span>
+  );
+}

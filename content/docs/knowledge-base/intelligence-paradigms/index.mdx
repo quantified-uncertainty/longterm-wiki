@@ -1,0 +1,77 @@
+---
+title: Intelligence Paradigms
+description: Different architectures and approaches to building intelligent systems
+sidebar:
+  label: Overview
+  order: 0
+---
+import {EntityLink} from '@components/wiki';
+
+
+## Overview
+
+This section explores different paradigms for building intelligent systems. Understanding architectural diversity helps anticipate which safety approaches may be needed and which risks are most relevant.
+
+## Current Paradigms
+
+### <EntityLink id="intelligence-paradigms/dense-transformers">Dense Transformers</EntityLink>
+The dominant current architecture:
+- Massive parameter counts, uniform activation
+- Strong general capabilities
+- Well-studied safety properties
+- Examples: GPT-4, Claude, Gemini
+
+### <EntityLink id="intelligence-paradigms/sparse-moe">Sparse MoE</EntityLink>
+Mixture of Experts architectures:
+- Conditional computation for efficiency
+- Routing mechanisms select experts
+- Potentially different failure modes
+- Examples: Mixtral, Switch Transformer
+
+### <EntityLink id="intelligence-paradigms/ssm-mamba">SSM/Mamba</EntityLink>
+State Space Models:
+- Alternative to attention mechanism
+- Linear scaling with sequence length
+- Emerging research area
+
+### <EntityLink id="intelligence-paradigms/neuro-symbolic">Neuro-Symbolic</EntityLink>
+Hybrid neural-symbolic systems:
+- Combine learning with logical reasoning
+- Potentially more interpretable
+- Research stage
+
+## Scaffolding Approaches
+
+### <EntityLink id="intelligence-paradigms/minimal-scaffolding">Minimal Scaffolding</EntityLink>
+Foundation models with basic prompting
+
+### <EntityLink id="intelligence-paradigms/light-scaffolding">Light Scaffolding</EntityLink>
+Chain-of-thought, few-shot learning
+
+### <EntityLink id="intelligence-paradigms/heavy-scaffolding">Heavy Scaffolding</EntityLink>
+Extensive tool use, agentic frameworks
+
+## Alternative Pathways
+
+### <EntityLink id="intelligence-paradigms/world-models">World Models</EntityLink>
+Learning predictive world representations
+
+### <EntityLink id="intelligence-paradigms/provable-safe">Provably Safe</EntityLink>
+Architectures with formal safety guarantees
+
+### Biological Approaches
+- <EntityLink id="intelligence-paradigms/brain-computer-interfaces">Brain-Computer Interfaces</EntityLink>
+- <EntityLink id="intelligence-paradigms/biological-organoid">Biological Organoid</EntityLink>
+- <EntityLink id="intelligence-paradigms/genetic-enhancement">Genetic Enhancement</EntityLink>
+- <EntityLink id="intelligence-paradigms/whole-brain-emulation">Whole-Brain Emulation</EntityLink>
+
+### <EntityLink id="intelligence-paradigms/novel-unknown">Novel/Unknown</EntityLink>
+Architectures not yet conceived
+
+## Why Paradigms Matter for Safety
+
+Different paradigms may have:
+- Different failure modes and risk profiles
+- Different amenability to interpretability
+- Different alignment properties
+- Different governance implications

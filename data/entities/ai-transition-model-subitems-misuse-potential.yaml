@@ -1,0 +1,290 @@
+- id: "tmc-robot-threat"
+  type: "ai-transition-model-subitem"
+  title: "Robot Threat Exposure"
+  parentFactor: "misuse-potential"
+  path: "/ai-transition-model/robot-threat-exposure/"
+  description: "Vulnerability to threats from AI-enabled robotic systems including autonomous weapons,
+    drones, and other physical AI systems that can cause harm."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "Robot Threat Exposure: Research Report"
+    risks:
+      - path: "/knowledge-base/risks/autonomous-weapons/"
+        title: "Autonomous Weapons"
+    models:
+      - path: "/knowledge-base/models/autonomous-weapons-proliferation/"
+        title: "Autonomous Weapons Proliferation"
+      - path: "/knowledge-base/models/autonomous-weapons-escalation/"
+        title: "Autonomous Weapons Escalation"
+  causeEffectGraph:
+    title: "What Affects Robot Threat Exposure?"
+    description: "Causal factors affecting vulnerability to AI-enabled robotic threats."
+    primaryNodeId: "robot-exposure"
+    nodes:
+      - id: "autonomous-weapons-development"
+        label: "Autonomous Weapons Development"
+        type: "leaf"
+        color: "red"
+        description: "Military investment in lethal autonomous weapons."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 3
+          certainty: 6
+      - id: "drone-proliferation"
+        label: "Drone Proliferation"
+        type: "leaf"
+        color: "rose"
+        description: "Spread of capable drone platforms."
+        scores:
+          novelty: 2
+          sensitivity: 7
+          changeability: 3
+          certainty: 8
+      - id: "ai-robot-integration"
+        label: "AI-Robot Integration"
+        type: "leaf"
+        description: "Sophistication of AI control of physical systems."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 4
+          certainty: 4
+      - id: "defense-systems"
+        label: "Defense Systems"
+        type: "leaf"
+        color: "emerald"
+        description: "Counter-drone and defensive capabilities."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 5
+          certainty: 5
+      - id: "attack-capability"
+        label: "Attack Capability"
+        type: "intermediate"
+        color: "red"
+        description: "What robotic systems can do offensively."
+        scores:
+          novelty: 3
+          sensitivity: 8
+          changeability: 3
+          certainty: 6
+      - id: "defense-capability"
+        label: "Defense Capability"
+        type: "intermediate"
+        color: "emerald"
+        description: "Ability to defend against robotic threats."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 5
+          certainty: 4
+      - id: "swarm-coordination"
+        label: "Swarm Coordination"
+        type: "leaf"
+        color: "violet"
+        description: "Can coordinated autonomous swarms overwhelm defenses at scale?"
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 4
+          certainty: 3
+      - id: "arms-control-treaties"
+        label: "Arms Control Treaties"
+        type: "leaf"
+        color: "blue"
+        description: "International agreements limiting autonomous weapons development."
+        scores:
+          novelty: 4
+          sensitivity: 6
+          changeability: 4
+          certainty: 4
+      - id: "robot-exposure"
+        label: "Robot Threat Exposure"
+        type: "effect"
+        description: "Net vulnerability to AI-enabled robotic threats."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 4
+          certainty: 4
+    edges:
+      - source: "autonomous-weapons-development"
+        target: "attack-capability"
+        strength: "strong"
+        effect: "increases"
+      - source: "drone-proliferation"
+        target: "attack-capability"
+        strength: "strong"
+        effect: "increases"
+      - source: "ai-robot-integration"
+        target: "attack-capability"
+        strength: "medium"
+        effect: "increases"
+      - source: "defense-systems"
+        target: "defense-capability"
+        strength: "strong"
+        effect: "increases"
+      - source: "attack-capability"
+        target: "robot-exposure"
+        strength: "strong"
+        effect: "increases"
+      - source: "defense-capability"
+        target: "robot-exposure"
+        strength: "strong"
+        effect: "decreases"
+      - source: "swarm-coordination"
+        target: "attack-capability"
+        strength: "medium"
+        effect: "increases"
+      - source: "arms-control-treaties"
+        target: "autonomous-weapons-development"
+        strength: "medium"
+        effect: "decreases"
+- id: "tmc-surprise-threat"
+  type: "ai-transition-model-subitem"
+  title: "Surprise Threat Exposure"
+  parentFactor: "misuse-potential"
+  path: "/ai-transition-model/surprise-threat-exposure/"
+  description: "Vulnerability to novel, unforeseen threats enabled by AI—attack vectors we haven't
+    anticipated. Represents the \"unknown unknowns\" of AI risk."
+  lastUpdated: "2026-01"
+  relatedContent:
+    researchReports:
+        title: "Surprise Threat Exposure: Research Report"
+    models:
+      - path: "/knowledge-base/models/warning-signs-model/"
+        title: "Warning Signs Model"
+      - path: "/knowledge-base/models/critical-uncertainties/"
+        title: "Critical Uncertainties"
+    responses:
+      - path: "/knowledge-base/responses/resilience/"
+        title: "Resilience Building"
+  causeEffectGraph:
+    title: "What Affects Surprise Threat Exposure?"
+    description: "Causal factors affecting vulnerability to unanticipated AI-enabled threats."
+    primaryNodeId: "surprise-exposure"
+    nodes:
+      - id: "ai-capability-growth"
+        label: "AI Capability Growth"
+        type: "leaf"
+        color: "rose"
+        description: "Rate of AI capability improvement. More capable = more novel threats."
+        scores:
+          novelty: 2
+          sensitivity: 9
+          changeability: 3
+          certainty: 5
+      - id: "emergent-capabilities"
+        label: "Emergent Capabilities"
+        type: "leaf"
+        color: "violet"
+        description: "Unpredictable capabilities appearing at scale."
+        scores:
+          novelty: 5
+          sensitivity: 8
+          changeability: 2
+          certainty: 3
+      - id: "adversarial-creativity"
+        label: "Adversarial Creativity"
+        type: "leaf"
+        color: "red"
+        description: "Attackers using AI to discover novel attack vectors."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 3
+          certainty: 4
+      - id: "defense-adaptability"
+        label: "Defense Adaptability"
+        type: "leaf"
+        color: "emerald"
+        description: "Ability to respond to novel threats quickly."
+        scores:
+          novelty: 5
+          sensitivity: 7
+          changeability: 6
+          certainty: 4
+      - id: "threat-surface-expansion"
+        label: "Threat Surface Expansion"
+        type: "intermediate"
+        color: "rose"
+        description: "Growth in potential attack vectors."
+        scores:
+          novelty: 4
+          sensitivity: 8
+          changeability: 3
+          certainty: 5
+      - id: "detection-lag"
+        label: "Detection Lag"
+        type: "intermediate"
+        description: "Time between threat emergence and recognition."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 5
+          certainty: 4
+      - id: "cross-domain-transfer"
+        label: "Cross-Domain Transfer"
+        type: "leaf"
+        color: "violet"
+        description: "AI capabilities transferring to unexpected domains (e.g., persuasion to manipulation)."
+        scores:
+          novelty: 6
+          sensitivity: 7
+          changeability: 3
+          certainty: 3
+      - id: "monitoring-systems"
+        label: "Monitoring Systems"
+        type: "leaf"
+        color: "emerald"
+        description: "Investment in early warning systems for novel AI-enabled threats."
+        scores:
+          novelty: 5
+          sensitivity: 6
+          changeability: 6
+          certainty: 4
+      - id: "surprise-exposure"
+        label: "Surprise Threat Exposure"
+        type: "effect"
+        description: "Vulnerability to unanticipated AI threats."
+        scores:
+          novelty: 7
+          sensitivity: 8
+          changeability: 4
+          certainty: 2
+    edges:
+      - source: "ai-capability-growth"
+        target: "threat-surface-expansion"
+        strength: "strong"
+        effect: "increases"
+      - source: "emergent-capabilities"
+        target: "threat-surface-expansion"
+        strength: "strong"
+        effect: "increases"
+      - source: "adversarial-creativity"
+        target: "detection-lag"
+        strength: "medium"
+        effect: "increases"
+      - source: "defense-adaptability"
+        target: "detection-lag"
+        strength: "medium"
+        effect: "decreases"
+      - source: "threat-surface-expansion"
+        target: "surprise-exposure"
+        strength: "strong"
+        effect: "increases"
+      - source: "detection-lag"
+        target: "surprise-exposure"
+        strength: "strong"
+        effect: "increases"
+      - source: "cross-domain-transfer"
+        target: "threat-surface-expansion"
+        strength: "medium"
+        effect: "increases"
+      - source: "monitoring-systems"
+        target: "detection-lag"
+        strength: "medium"
+        effect: "decreases"

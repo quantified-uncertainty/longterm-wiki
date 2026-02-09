@@ -1,0 +1,579 @@
+---
+title: Metaculus
+description: Metaculus is a reputation-based prediction aggregation platform that has become the primary source for AI timeline forecasts. With over 1 million predictions across 15,000+ questions, Metaculus community forecasts show AGI probability at 25% by 2027 and 50% by 2031—down from 50 years away in 2020. Their aggregation algorithm consistently outperforms median forecasts on Brier and Log scoring rules. Founded in 2015 by Anthony Aguirre, Greg Laughlin, and Max Wainwright, Metaculus received USD 8.5M+ from Coefficient Giving (2022-2023) and partners with Good Judgment Inc and Bridgewater Associates on forecasting competitions.
+sidebar:
+  order: 2
+quality: 50
+llmSummary: Metaculus is a reputation-based forecasting platform with 1M+ predictions showing AGI probability at 25% by 2027 and 50% by 2031 (down from 50 years away in 2020). Analysis finds good short-term calibration (Brier 0.107) but poor calibration on 1+ year horizons; human Pro Forecasters consistently outperform AI bots (p=0.00001 in Q2 2025).
+lastEdited: "2026-01-29"
+importance: 42
+ratings:
+  novelty: 2.5
+  rigor: 5
+  actionability: 3.5
+  completeness: 6.5
+metrics:
+  wordCount: 2353
+  citations: 94
+  tables: 54
+  diagrams: 2
+clusters:
+  - epistemics
+  - community
+  - ai-safety
+subcategory: epistemic-orgs
+---
+import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Scale** | Largest forecasting platform | 1M+ predictions, 15,000+ questions, 50,000+ users |
+| **AI Focus** | Primary <EntityLink id="agi-timeline">AGI timeline</EntityLink> source | Dedicated AI categories, multiple timeline questions, AI 2027 tournament |
+| **Accuracy** | Generally good short-term | Brier score 0.107 (2021 questions), Metaculus Prediction outperforms median |
+| **Funding** | USD 8.8M+ total | USD 5.5M Coefficient (2022), USD 3M Coefficient (2023), USD 300K EA Infra Fund (2021) |
+| **Influence** | High | Cited by <EntityLink id="80000-hours">80,000 Hours</EntityLink>, <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, media, policymakers |
+| **Track Record** | Mixed | Good calibration short-term, weaker on 1+ year questions per [EA Forum analysis](https://forum.effectivealtruism.org/posts/xF8EWBouJRZpRgFgu/how-does-forecast-quantity-impact-forecast-quality-on-1) |
+| **Partnerships** | Strong | <EntityLink id="good-judgment">Good Judgment</EntityLink> Inc collaboration, Bridgewater USD 30K competitions, Vox Future Perfect |
+| **AI vs Human Benchmark** | Humans lead | Pro Forecasters outperform AI bots with p = 0.00001 significance in [Q2 2025](https://forum.effectivealtruism.org/posts/F2stjK9wHSy3HPEC9/q2-ai-benchmark-results-pros-maintain-clear-lead) |
+
+## Organization Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Full Name** | Metaculus Inc. |
+| **Founded** | 2015 |
+| **Founders** | [Anthony Aguirre](https://en.wikipedia.org/wiki/Anthony_Aguirre) (physicist, FLI co-founder), [Greg Laughlin](https://news.yale.edu/2016/11/02/metaculus-prediction-website-eye-science-technology) (Yale astrophysicist), Max Wainwright (data scientist) |
+| **CEO** | [Deger Turan](https://metaculus.medium.com/announcing-deger-turan-as-the-new-ceo-of-metaculus-fcab2dfe955b) (appointed April 2024) |
+| **Team Size** | ≈28 employees across North America, Europe, and Asia |
+| **Location** | Santa Monica, California (headquarters) |
+| **Status** | Public Benefit Corporation (restructured 2022) |
+| **Website** | [metaculus.com](https://www.metaculus.com/) |
+| **Key Features** | Prediction aggregation, tournaments, track record scoring, AI benchmarking |
+| **Total Funding** | USD 8.8M+ from Coefficient Giving, EA Infrastructure Fund |
+
+## Overview
+
+[Metaculus](https://www.metaculus.com/) is a reputation-based online forecasting platform that has become the most influential source for AI timeline predictions. Founded in 2015 by physicists and data scientists from UC Santa Cruz and Yale, Metaculus aggregates predictions from thousands of forecasters on questions spanning technology, science, politics, and existential risks—with particular depth on AI capabilities and timelines.
+
+The platform's core innovation is its aggregation algorithm, which combines individual forecasts into a single community estimate that consistently outperforms the simple median of user predictions when evaluated using Brier or Log scoring rules. The Community Prediction uses a recency-weighted median, while the now-deprecated "Metaculus Prediction" applied performance weighting and extremization to further improve accuracy. This aggregation enables Metaculus to extract signal from noise, producing calibrated probability estimates that inform research, policy, and public understanding.
+
+Metaculus has documented a dramatic shift in AI timeline forecasts over recent years. The median estimate for when AGI would be developed fell from 50 years away in 2020 to approximately 5 years by late 2024. This shift—reflected in questions tracking "weak AGI," "general AI," and "transformative AI"—represents one of the most significant updates in the forecasting community's collective judgment about AI development trajectories.
+
+The platform occupies a unique position in the AI safety ecosystem, providing quantitative probability estimates that inform decisions at organizations like Coefficient Giving, 80,000 Hours, and major AI labs. Its tournaments have also become important benchmarks for comparing human forecasters against AI forecasting systems, with human Pro Forecasters maintaining a statistically significant lead over AI bots through 2025.
+
+## History and Founding
+
+### Origins (2014-2015)
+
+Metaculus emerged from the intersection of cosmological research and technology forecasting. Co-founder [Anthony Aguirre](https://futureoflife.org/person/anthony-aguirre/), a theoretical cosmologist and Faggin Presidential Chair for the Physics of Information at UC Santa Cruz, had previously co-founded the [Foundational Questions Institute (FQXi)](https://www.influencewatch.org/non-profit/foundational-questions-institute-fqxi/) in 2006 with <EntityLink id="max-tegmark">Max Tegmark</EntityLink> to support unconventional physics research. In 2014, Aguirre and Tegmark co-founded the [Future of Life Institute (FLI)](https://futureoflife.org/), an organization focused on the implications of transformational technology, particularly artificial intelligence.
+
+Metaculus was conceived alongside FLI as a complementary tool. According to Aguirre, the forecasting platform was designed to "build an ability to make predictions and identify people who are really good at making predictions and modeling the world." The platform started partly to "be a thing that would be of service to the <EntityLink id="fli">Future of Life Institute</EntityLink>, but also everybody else who's thinking about the future" ([AXRP Episode 38.7](https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html)).
+
+Aguirre partnered with Greg Laughlin, a Yale astrophysicist with expertise in computational methods and orbital dynamics, and Max Wainwright, a data scientist who had been a postdoctoral researcher for both Laughlin and Aguirre. The trio [launched Metaculus in November 2015](https://news.yale.edu/2016/11/02/metaculus-prediction-website-eye-science-technology), initially focusing on science and technology predictions where their academic expertise provided domain knowledge.
+
+### Platform Development (2016-2019)
+
+The early platform focused on building a community of technically-minded forecasters and developing the mathematical infrastructure for prediction aggregation. In June 2017, Metaculus introduced the [Metaculus Prediction](https://www.metaculus.com/faq/)—a sophisticated aggregation system that weighted forecasts based on past performance and applied extremization to compensate for systematic human cognitive biases. This innovation helped distinguish Metaculus from simple prediction aggregators.
+
+The platform gradually expanded from its initial science and technology focus to include questions on geopolitics, economics, and global risks. This expansion positioned Metaculus to become a central resource for the effective altruism community, which was increasingly interested in quantitative forecasts for cause prioritization and career decisions.
+
+### Growth and Institutionalization (2020-2022)
+
+The COVID-19 pandemic marked a turning point for Metaculus's public profile. In January 2020, Metaculus introduced the [Bentham Prize](https://en.wikipedia.org/wiki/Metaculus), awarding bi-weekly monetary prizes of USD 300, USD 200, and USD 100 to the most valuable user contributions. In February 2020, they launched the Li Wenliang Prize, named after the Chinese doctor who warned about COVID-19, offering monetary prizes for questions, forecasts, and analyses related to the outbreak.
+
+The pandemic demonstrated the platform's ability to rapidly aggregate expert judgment on developing situations, attracting significant attention from researchers and policymakers. By 2022, Metaculus [reached 1,000,000 individual predictions](https://metaculus.medium.com/metaculus-year-in-review-2022-c92ff9cd87a0) and restructured as a public-benefit corporation, signaling a commitment to forecasting as a public good rather than a purely commercial venture.
+
+### Scaling with Major Funding (2022-Present)
+
+Coefficient Giving's [USD 5.5 million grant in 2022](https://www.openphilanthropy.org/grants/metaculus-platform-development/) transformed Metaculus's capacity, enabling significant hiring and platform development. The funding supported high-impact forecasting programs on AI, biosecurity, climate change, nuclear security, and other topics of concern to the longtermist community. A follow-up [USD 3 million grant in 2023](https://www.openphilanthropy.org/grants/metaculus-platform-development-2023/) further expanded capabilities.
+
+In April 2024, [Deger Turan became CEO](https://metaculus.medium.com/announcing-deger-turan-as-the-new-ceo-of-metaculus-fcab2dfe955b), bringing experience from his role heading the AI Objectives Institute. The previous CEO transitioned to Special Advisor while remaining on the board. Under Turan's leadership, Metaculus launched major AI forecasting initiatives including the <EntityLink id="ai-forecasting-benchmark">AI Forecasting Benchmark Tournament</EntityLink>, which benchmarks AI forecasting systems against human Pro Forecasters.
+
+In 2024, Metaculus [rewrote their website code and released it under the BSD-2-Clause License](https://en.wikipedia.org/wiki/Metaculus), making their platform open source. The AI Forecasting Benchmark Series continued into 2025, with [Q1 results prompting a renewal announcement in July 2025](https://en.wikipedia.org/wiki/Metaculus) for an expanded year-long iteration backed by USD 175,000 in prizes.
+
+## Team and Leadership
+
+| Role | Person | Background |
+|------|--------|------------|
+| **CEO** | Deger Turan | Former head of AI Objectives Institute; appointed April 2024 |
+| **Co-Founder & President** | Anthony Aguirre | UC Santa Cruz physics professor; FLI Executive Director; FQXi founder |
+| **Co-Founder** | Greg Laughlin | Yale astrophysicist; computational methods expert |
+| **Co-Founder** | Max Wainwright | Data scientist; former postdoc with Laughlin/Aguirre |
+| **Chief of Staff** | Nate Morrison | Former ED of Teach For America - New Mexico |
+| **CTO** | Dan Schwarz | Technology leadership |
+
+The organization has grown to approximately 28 employees across three continents (North America, Europe, and Asia), reflecting its global forecaster community ([Tracxn](https://tracxn.com/d/companies/metaculus/__AWRGX1fmuN1Wskq26qalRCqRT7irkbcukDlICco4vOk)).
+
+## Key AGI Timeline Forecasts
+
+<Mermaid client:load chart={`
+flowchart LR
+    2020[2020<br/>50 years to AGI] --> 2022[2022<br/>30 years to AGI]
+    2022 --> 2024[Late 2024<br/>~7 years to AGI]
+    2024 --> 2025[2025<br/>~5 years to AGI]
+
+    style 2020 fill:#ffcccc
+    style 2022 fill:#ffddcc
+    style 2024 fill:#ffffcc
+    style 2025 fill:#ccffcc
+`} />
+
+### Current AGI Probability Estimates (as of late 2024)
+
+| Timeline | Metaculus Probability | Notes |
+|----------|----------------------|-------|
+| By 2027 | ≈25% | Dramatic increase from prior years |
+| By 2030 | ≈40-45% | Central estimate range |
+| By 2031 | ≈50% (median) | Current community median |
+| By 2040 | ≈75% | Upper quartile |
+
+### Metaculus AGI Definition
+
+Metaculus uses a multi-criteria definition requiring systems to:
+
+| Criterion | Requirement |
+|-----------|-------------|
+| **Turing Test** | Pass "really hard" conversational tests |
+| **Robotic Capabilities** | Assemble complex physical objects (e.g., Ferrari 312 T4 1:8 scale model) |
+| **Academic Performance** | 75%+ accuracy on every MMLU task, 90% mean across all tasks |
+| **General Competence** | Demonstrate broad capability across diverse domains |
+
+This definition is more stringent than industry definitions (e.g., OpenAI's "economically valuable work"), leading to somewhat later timeline estimates compared to lab predictions.
+
+## Platform Statistics
+
+| Metric | Value | As Of |
+|--------|-------|-------|
+| **Total Predictions** | 1,000,000+ | 2022 milestone |
+| **Total Questions** | 15,000+ | 2024 |
+| **Registered Users** | 50,000+ | 2024 |
+| **AI/Tech Questions** | 2,000+ | Active and resolved |
+| **Average Predictors per Question** | 50-200 | Varies by question prominence |
+
+## Accuracy and Calibration
+
+### Metaculus Prediction vs. Community Median
+
+The Metaculus Prediction aggregation algorithm provides measurable improvements:
+
+| Scoring Method | Metaculus Prediction vs. Median | Finding |
+|----------------|--------------------------------|---------|
+| **Brier Score** | Superior | Consistent outperformance |
+| **Log Score** | Superior | Better at extreme probabilities |
+| **Calibration** | Better | More reliable probability estimates |
+
+### Calibration Analysis
+
+| Forecast Horizon | Calibration Quality | Notes |
+|------------------|--------------------|----|
+| Less than 3 months | Good | Well-calibrated on near-term questions |
+| 3-12 months | Moderate | Some overconfidence |
+| Greater than 1 year | Poor | Analysis found systematic miscalibration |
+
+One [EA Forum analysis](https://forum.effectivealtruism.org/posts/xF8EWBouJRZpRgFgu/how-does-forecast-quantity-impact-forecast-quality-on-1) found Metaculus was "poorly calibrated on resolved questions with a greater than 1 year time horizon," suggesting caution when interpreting long-range AI forecasts.
+
+### Predictor Quantity Effects
+
+Research on Metaculus data shows diminishing returns to additional forecasters:
+
+| Number of Predictors | Marginal Improvement | Notes |
+|---------------------|---------------------|-------|
+| 1-10 | Large | Each additional forecaster helps significantly |
+| 10-50 | Moderate | Continued but slower improvement |
+| 50+ | Small | Marginal gains diminish substantially |
+
+## Aggregation Methodology
+
+Metaculus employs sophisticated aggregation techniques to combine individual forecasts into community estimates. Understanding these methods is essential for interpreting the platform's predictions.
+
+### Community Prediction: Recency-Weighted Median
+
+The [Community Prediction](https://www.metaculus.com/faq/) uses a recency-weighted median approach:
+
+| Element | Description |
+|---------|-------------|
+| **Base Measure** | Median of individual forecaster probabilities |
+| **Weighting** | More recent predictions receive higher weights |
+| **Weight Formula** | Oldest prediction receives weight 1; newest among n predictions receives weight n |
+| **Update Requirement** | Roughly half of forecasters must update to substantially shift the aggregate |
+| **Rationale** | Balances responsiveness to new information against resistance to transient outliers |
+
+For different question types ([Metaculus FAQ](https://www.metaculus.com/faq/)):
+- **Binary Questions**: Weighted median of individual probabilities
+- **Multiple Choice**: Weighted median, renormalized to sum to 1
+- **Numeric/Date Questions**: Weighted average of individual distributions
+
+### Metaculus Prediction: Performance Weighting + Extremization
+
+The "Metaculus Prediction" (deprecated since November 2024) employed a more sophisticated approach ([Metaculus Notebooks](https://www.metaculus.com/notebooks/22486/a-primer-on-the-metaculus-scoring-rule/)):
+
+| Component | Function |
+|-----------|----------|
+| **Performance Weighting** | Calibrates and weights each user based on track record |
+| **Extremization** | Pushes consensus forecasts toward 0 or 1 to compensate for cognitive biases |
+| **Goal** | Produce a prediction better than even the best individual forecaster |
+
+**How Extremization Works** ([EA Forum](https://forum.effectivealtruism.org/posts/biL94PKfeHmgHY6qe/principled-extremizing-of-aggregated-forecasts)):
+
+Extremizing adjusts aggregated forecasts toward extreme probabilities. The rationale: if several independent forecasters conclude something is 90% likely, their agreement provides additional evidence beyond any individual's estimate. Research on geopolitical forecasting found optimal extremizing factors between 1.161 and 3.921.
+
+### Scoring System
+
+Metaculus uses a logarithmic scoring rule as the foundation for all scores ([Metaculus Scoring Primer](https://metaculus.medium.com/a-primer-on-the-metaculus-scoring-rule-eb9a974cd204)):
+
+| Score Type | Description | Introduced |
+|------------|-------------|------------|
+| **Log Score** | Natural logarithm of predicted probability for actual outcome | Original |
+| **Baseline Score** | Compares prediction to chance; rewards both accuracy and volume | November 2023 |
+| **Peer Score** | Compares to other forecasters; equalizes for question difficulty | November 2023 |
+
+Key properties of the log score:
+- **Proper scoring rule**: The only way to optimize average score is to predict sincere beliefs
+- **Punitive on extreme errors**: Going from 99% to 99.9% yields only +0.009 if correct, but -2.3 if wrong
+- **Time-averaged**: Points are averaged across question lifetime to encourage ongoing updates
+
+The November 2023 scoring update replaced the legacy Points system with Baseline and Peer scores, making performance comparison fairer for forecasters with different time constraints.
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph INPUT["Individual Forecasts"]
+        F1[Forecaster 1<br/>75%]
+        F2[Forecaster 2<br/>80%]
+        F3[Forecaster 3<br/>70%]
+        FN[Forecaster N<br/>...]
+    end
+
+    subgraph WEIGHT["Recency Weighting"]
+        RW[Older forecasts<br/>weight = 1]
+        RW2[Newer forecasts<br/>weight = n]
+    end
+
+    subgraph AGG["Aggregation"]
+        MED[Weighted Median]
+        CP[Community Prediction]
+    end
+
+    subgraph LEGACY["Historical - Deprecated Nov 2024"]
+        PW[Performance<br/>Weighting]
+        EXT[Extremization]
+        MP[Metaculus<br/>Prediction]
+    end
+
+    INPUT --> WEIGHT
+    WEIGHT --> MED
+    MED --> CP
+    MED --> PW
+    PW --> EXT
+    EXT --> MP
+
+    style CP fill:#90ee90
+    style MP fill:#ffcccc
+    style LEGACY fill:#f5f5f5
+`} />
+
+## Key AI Questions
+
+### Primary Timeline Questions
+
+| Question | Current Forecast | Forecasters | Link |
+|----------|-----------------|-------------|------|
+| **When will first general AI be announced?** | October 2027 (as of Dec 2025) | 1,700+ | [metaculus.com/questions/5121](https://www.metaculus.com/questions/5121/) |
+| **Transformative AI date** | November 2042 | 166 | [metaculus.com/questions/19356](https://www.metaculus.com/questions/19356/) |
+| **Weak AGI arrival** | 2028-2030 range | — | [metaculus.com/questions/3479](https://www.metaculus.com/questions/3479/) |
+| **Time from AGI to superintelligence** | ≈22 months (range: 5-167 months) | 240 | [metaculus.com/questions/9062](https://www.metaculus.com/questions/9062/) |
+| **AGI transition beneficial for humanity** | — | — | [metaculus.com/questions/4118](https://www.metaculus.com/questions/4118/) |
+
+### Company Attribution Forecasts
+
+Metaculus forecasters have also estimated which organization is most likely to achieve AGI first ([Forecastingaifutures.substack.com](https://forecastingaifutures.substack.com/p/forecasting-agi-insights-from-prediction-markets)):
+
+| Company | Probability of First AGI |
+|---------|-------------------------|
+| **Alphabet/Google DeepMind** | 36.3% |
+| **OpenAI** | 21.9% |
+| **Anthropic** | 17.5% |
+| **Other** | 24.3% |
+
+### AI-Specific Tournaments
+
+| Tournament | Questions | Start Date | Focus |
+|------------|-----------|------------|-------|
+| **[AI 2027](https://www.metaculus.com/tournament/ai-2027/)** | 19 | June 2025 | Near-term AI developments |
+| **[AGI Outcomes](https://www.metaculus.com/tournament/agi-horizons/)** | — | — | Long-term consequences of AGI for humanity |
+| **AI Progress Tournament** | — | 2023-2024 | Benchmark progress tracking |
+
+## Tournaments and Competitions
+
+### AI Forecasting Benchmark Tournament
+
+The [AI Forecasting Benchmark Tournament](https://www.metaculus.com/aib/) represents Metaculus's flagship initiative for comparing human and AI forecasting capabilities. Launched in 2024, the tournament runs in two series: a primary 4-month seasonal tournament and a bi-weekly fast-paced MiniBench. Participants can compete using API credits provided by OpenAI and Anthropic.
+
+| Quarter | Questions | Prize Pool | Bot-Makers | Key Finding |
+|---------|-----------|------------|------------|-------------|
+| **Q3 2024** | — | — | — | Best bots scored -11.3 vs Pro Forecasters (0 = equal) |
+| **Q4 2024** | — | — | — | Best bots improved to -8.6 vs Pro Forecasters |
+| **Q1 2025** | — | — | — | metac-o1 achieved first place among bots |
+| **[Q2 2025](https://forum.effectivealtruism.org/posts/F2stjK9wHSy3HPEC9/q2-ai-benchmark-results-pros-maintain-clear-lead)** | 348 | USD 30,000 | 54 | Pros maintain clear lead (p = 0.00001) |
+
+Key findings from the Q2 2025 tournament ([EA Forum](https://forum.effectivealtruism.org/posts/F2stjK9wHSy3HPEC9/q2-ai-benchmark-results-pros-maintain-clear-lead)):
+- Students and hobbyists performed well—the top 3 bot-makers (excluding Metaculus's in-house bots) were hobbyists or students
+- Aggregation had a significant positive effect: taking the median or mean of multiple forecasts rather than single LLM forecasts improved scores
+- Among baseline bots in Q2 2025, OpenAI's o3 led performance rankings
+- The average Peer score for the Metaculus Community Prediction is 12.9, ranking in the top 10 on the global leaderboard over every 2-year period since 2016
+
+### Bridgewater x Metaculus Forecasting Competition
+
+Metaculus has partnered with [Bridgewater Associates](https://www.bridgewater.com/bridgewater-x-metaculus-2026-competition) for three consecutive years on forecasting competitions designed to identify talented forecasters for potential recruitment. The competition emphasizes Bridgewater's "idea meritocracy" culture.
+
+| Competition | Questions | Prize Pool | Structure |
+|-------------|-----------|------------|-----------|
+| **[2026 Competition](https://www.metaculus.com/tournament/bridgewater/)** | 50 | USD 30,000 (Open) + USD 30,000 (Undergrad) | Two leaderboards: Open and Undergraduate |
+| **Previous Years** | — | — | Multiple offers made to top forecasters |
+
+The [January 2026 competition](https://www.metaculus.com/notebooks/41127/register-for-the-bridgewater-x-metaculus-forecasting-contest/) features:
+- 50 forecasting questions on real-world events
+- Separate leaderboards for open competition and undergraduates
+- Top 50 forecasters in each track eligible for prizes
+- Potential employment opportunities at Bridgewater for top performers
+
+### Good Judgment Inc. Collaboration
+
+Metaculus and Good Judgment Inc. [announced their first formal collaboration](https://goodjudgment.com/owidproject/) on the Our World in Data (OWID) project, comparing methodologies across the two largest human judgment forecasting communities globally.
+
+| Element | Details |
+|---------|---------|
+| **Questions** | 10 identical questions about Our World In Data metrics |
+| **Topics** | Technological advances, global development, social progress |
+| **Time Horizons** | 1 to 100 years |
+| **Participants** | Superforecasters (Good Judgment) vs. Pro Forecasters (Metaculus) |
+| **Funding** | Future Fund grant |
+
+According to Warren Hatch, Good Judgment's CEO: "We're excited to be partnering with Metaculus to combine our approaches to apply probabilistic thinking to an uncertain future."
+
+### Vox Future Perfect Collaboration
+
+In January 2025, Metaculus partnered with Vox's Future Perfect team to host forecasts on political, economic, and technological questions for 2025, featuring:
+- Public participation alongside the Future Perfect team's published predictions
+- USD 2,500 prize pool to reward accurate contributions
+
+### Tournament Summary
+
+| Tournament | Focus | Partners | Prize Pool |
+|------------|-------|----------|------------|
+| **AI Forecasting Benchmark** | Human vs AI forecasting | OpenAI, Anthropic | USD 30,000/quarter |
+| **Bridgewater Competition** | Talent identification | Bridgewater Associates | USD 60,000 total |
+| **OWID Project** | Global development metrics | Good Judgment Inc. | Future Fund |
+| **Vox Future Perfect 2025** | Annual predictions | Vox Media | USD 2,500 |
+| **AI 2027** | Near-term AI | Internal | — |
+| **AGI Outcomes** | Long-term AGI effects | Internal | — |
+
+## Comparison with Other Platforms
+
+### Platform Characteristics
+
+| Platform | Model | Currency | AI Focus | Community Size |
+|----------|-------|----------|----------|----------------|
+| **Metaculus** | Reputation-based | Points/Peer scores | Very High | 50,000+ users |
+| **Manifold** | Prediction market | Play money (Mana) | High | Large |
+| **Polymarket** | Prediction market | Real money (crypto) | Moderate | High liquidity |
+| **Kalshi** | Regulated market | Real money (USD) | Low | Growing |
+| **Good Judgment** | Superforecaster panels | Reputation | Moderate | ≈150 Superforecasters |
+
+### Accuracy Comparison Studies
+
+Research comparing forecasting platform accuracy has produced nuanced findings ([Manifund research](https://manifund.org/projects/comparing-forecasting-platform-accuracy), [Metaculus notebooks](https://www.metaculus.com/notebooks/15359/predictive-performance-on-metaculus-vs-manifold-markets/)):
+
+| Finding | Source | Notes |
+|---------|--------|-------|
+| Real money markets outperform play money on most topics | [Brier.fyi analysis](https://manifold.markets/jacksonpolack/manifold-polymarket-and-metaculus-a) | Intuitive: arbitrage opportunities between play/real money |
+| Metaculus/Manifold outperform real money on science topics | Brier.fyi | Specialized audiences trade for intellectual engagement |
+| 2022 Midterms: Metaculus scored highest | [First Sigma analysis](https://firstsigma.substack.com/p/midterm-elections-forecast-comparison-analysis) | Beat FiveThirtyEight, Manifold, Polymarket, PredictIt |
+| Metaculus made most accurate Republican Senate predictions | 2022 Midterms | Lowest (best) predictions among platforms |
+| ACX contest: Metaculus outperformed Manifold | Scott Alexander | Non-money forecaster beat play-money market |
+| Manifold users rank Metaculus as more accurate than Polymarket | Self-reported poll | Community perception |
+
+### AGI Timeline Comparison (2024-2025)
+
+| Platform | AGI by 2027 | AGI by 2030 | Definition Notes |
+|----------|-------------|-------------|------------------|
+| **Metaculus** | ≈25% | ≈45% | Stringent: requires robotics, broad capability |
+| **Manifold** | ≈47% | ≈60% | More permissive definition |
+| **Polymarket** | ≈9% (OpenAI) | — | Company-specific question |
+| **Kalshi** | — | 40% (OpenAI) | Company-specific question |
+| **[AGI Dashboard](https://agi.goodheartlabs.com/)** | — | 2031 combined estimate | Aggregates multiple sources |
+
+The [AGI Timelines Dashboard](https://agi.goodheartlabs.com/) aggregates data from Metaculus, Manifold, Kalshi, and other sources, producing a combined forecast of AGI arriving in 2031 (80% CI: 2027-2045) as of January 2026.
+
+### Why Estimates Differ
+
+| Factor | Effect on Estimates |
+|--------|---------------------|
+| **AGI Definition** | Metaculus requires robotics; others use "economically valuable work" |
+| **Incentive Structure** | Real money may attract informed traders; reputation may attract domain experts |
+| **Community Composition** | Metaculus skews toward AI-interested, technically-oriented forecasters |
+| **Question Framing** | Specific operationalization significantly affects forecasts |
+
+## Funding History
+
+### Major Grants
+
+| Year | Source | Amount | Purpose | Link |
+|------|--------|--------|---------|------|
+| 2019 | Coefficient Giving | — | Initial support | [coefficientgiving.org](https://www.openphilanthropy.org/grants/metaculus-platform-development/) |
+| 2021 | EA Infrastructure Fund | USD 300,000 | Platform development | — |
+| 2022 | Coefficient Giving | USD 5,500,000 | Scaling, hiring, high-impact programs | [coefficientgiving.org](https://www.openphilanthropy.org/grants/metaculus-platform-development/) |
+| 2022 | FTX Future Fund | USD 20,000 | Grant (3 weeks before FTX collapse) | — |
+| 2023 | Coefficient Giving | USD 3,000,000 | Platform development | [coefficientgiving.org](https://www.openphilanthropy.org/grants/metaculus-platform-development-2023/) |
+| 2024 | Various | USD 175,000 | AI Forecasting Benchmark prizes | Tournament funding |
+
+### Total Funding: USD 8.8M+ confirmed
+
+Coefficient Giving has been Metaculus's primary funder, providing support under its Longtermism program, which focuses on work that "raises the probability of a very long-lasting, positive future" ([Metaculus announcement](https://www.metaculus.com/notebooks/22479/metaculus-awarded-55m-grant-to-advance-forecasting-as-a-public-good/)). The USD 5.5M 2022 grant was described as enabling Metaculus to "scale as an organization pursuing its mission to build epistemic infrastructure for navigating complex global challenges."
+
+### Funding Focus Areas
+
+Coefficient Giving's grants to Metaculus support high-impact forecasting programs in:
+
+| Area | Relevance to AI Safety |
+|------|------------------------|
+| **Artificial Intelligence** | Core AGI timeline forecasts, AI benchmark tournaments |
+| **Biosecurity** | Pandemic preparedness, bioweapons risk |
+| **Climate Change** | Long-term trajectory forecasting |
+| **Nuclear Security** | Existential risk quantification |
+| **Global Catastrophic Risks** | Cross-cutting threat assessment |
+
+## Partnerships and Collaborations
+
+### Industry and Research Partners
+
+| Partner | Collaboration Type | Focus |
+|---------|-------------------|-------|
+| **[Good Judgment Inc.](https://goodjudgment.com/)** | Methodology comparison | OWID project; Superforecaster vs. Pro Forecaster benchmarking |
+| **[Bridgewater Associates](https://www.bridgewater.com/)** | Talent identification | Annual forecasting competition with USD 60K prizes |
+| **[OpenAI](https://openai.com/)** | AI benchmarking | API credits for AI Forecasting Benchmark Tournament |
+| **[Anthropic](https://www.anthropic.com/)** | AI benchmarking | API credits for AI Forecasting Benchmark Tournament |
+| **[Vox Future Perfect](https://www.vox.com/future-perfect)** | Public forecasting | 2025 predictions tournament |
+| **[80,000 Hours](https://80000hours.org/)** | Career research | AI timeline forecasts cited in career guidance |
+| **[Coefficient Giving](https://coefficientgiving.org/)** | Research & funding | Grant impact forecasting; primary funder |
+
+### Academic and Institutional Connections
+
+The organization's founders maintain deep connections to academic research and global risk institutions:
+
+| Institution | Connection |
+|-------------|------------|
+| **UC Santa Cruz** | Anthony Aguirre's academic home; Faggin Chair |
+| **Yale University** | Greg Laughlin's position |
+| **Future of Life Institute** | Anthony Aguirre serves as Executive Director |
+| **Foundational Questions Institute (FQXi)** | Anthony Aguirre serves as President |
+| **Bulletin of the Atomic Scientists** | Anthony Aguirre is a contributor |
+
+## Strengths and Limitations
+
+### Strengths
+
+| Strength | Evidence |
+|----------|----------|
+| **Scale** | Largest dedicated forecasting platform: 1M+ predictions, 50K+ users |
+| **AI Depth** | Most comprehensive coverage of AGI timeline questions; dedicated tournaments |
+| **Aggregation Quality** | Brier score of 0.107 (2021); consistently outperforms simple median |
+| **Track Record Transparency** | Public calibration data, historical accuracy available for analysis |
+| **Community Engagement** | Active forecaster base with ongoing updates; tournaments drive participation |
+| **Open Source** | Platform code released under BSD-2-Clause License (2024) |
+| **Institutional Integration** | Forecasts inform decisions at Coefficient Giving, 80,000 Hours, AI labs |
+| **Human vs AI Benchmarking** | Only major platform systematically comparing human and AI forecasting |
+
+### Limitations
+
+| Limitation | Analysis |
+|------------|----------|
+| **Long-term Calibration** | [EA Forum analysis](https://forum.effectivealtruism.org/posts/xF8EWBouJRZpRgFgu/how-does-forecast-quantity-impact-forecast-quality-on-1) found poor calibration on questions with greater than 1 year horizons |
+| **Selection Bias** | Forecasters skew toward AI-interested, technically-oriented demographics |
+| **Definition Dependence** | AGI timeline estimates vary significantly with operationalization |
+| **No Monetary Incentives** | Reputation-only may reduce accuracy vs. real-money markets for some question types |
+| **Question Framing Effects** | Outcomes depend heavily on specific wording and resolution criteria |
+| **Limited Long-Horizon Data** | Few resolved questions with greater than 5 year horizons for validation |
+| **AI Progress Overestimation** | [AI Progress Tournament analysis](https://www.openphilanthropy.org/research/takeaways-from-the-metaculus-ai-progress-tournament/) found community overconfident on AI predictions |
+
+### AI-Specific Track Record Analysis
+
+The [Metaculus AI Progress Tournament](https://forum.effectivealtruism.org/posts/x5Re9EKwGvAjZSmeb/takeaways-from-the-metaculus-ai-progress-tournament) analysis found:
+
+| Finding | Implication |
+|---------|-------------|
+| Progress on benchmarks was **underestimated** | AI progresses faster on well-defined tasks than expected |
+| Progress on other proxies (compute, bibliometrics, economic indicators) was **overestimated** | Real-world impact lags benchmark performance |
+| Community expected more AI developments than occurred (binary questions) | Appropriate underconfidence partially compensates |
+| Overconfidence on numeric predictions | Calibration weaker on magnitude estimates |
+
+This pattern suggests: "AI progresses surprisingly rapidly on well-defined benchmarks but the attention it receives and its 'real world' impact fail to keep up."
+
+## Relevance to AI Safety
+
+Metaculus plays several important roles in the AI safety ecosystem:
+
+### Decision Support
+
+| Use Case | Organizations |
+|----------|---------------|
+| **Cause prioritization** | Coefficient Giving uses forecasts to inform grantmaking |
+| **Career guidance** | 80,000 Hours cites AGI timelines in career advice |
+| **Research prioritization** | AI safety researchers track timeline estimates |
+| **Policy planning** | Government bodies and think tanks reference forecasts |
+
+### Epistemic Infrastructure
+
+Metaculus provides quantitative probability estimates where previously only qualitative assessments existed. The dramatic shift from 50-year to 5-year AGI timelines between 2020 and 2024 represents one of the most significant and well-documented updates in collective expert judgment about AI development, providing valuable signal for resource allocation and urgency calibration.
+
+### AI Capability Benchmarking
+
+The AI Forecasting Benchmark Tournament provides empirical data on the state of AI forecasting capabilities:
+
+| Question | Current Forecast | Significance |
+|----------|-----------------|--------------|
+| "When will an AI be amongst the best forecasters on Metaculus?" | February 2028 (median) | Tracks AI reasoning progress |
+| "Will largest AI forecasting system achieve Brier score less than 0.1 by 2026?" | 17% | Superforecaster median is ≈0.1 |
+
+These benchmarks help calibrate expectations about AI capability trajectories in reasoning-intensive domains.
+
+## External Links
+
+- [Metaculus Homepage](https://www.metaculus.com/)
+- [AI Questions Category](https://www.metaculus.com/questions/?categories=ai)
+- [AI Forecasting Benchmark Tournament](https://www.metaculus.com/aib/)
+- [Track Record Page](https://www.metaculus.com/questions/track-record/)
+- [Metaculus FAQ](https://www.metaculus.com/faq/)
+- [AGI Timelines Dashboard](https://agi.goodheartlabs.com/) (aggregates Metaculus + others)
+- [Wikipedia](https://en.wikipedia.org/wiki/Metaculus)
+
+## Sources
+
+1. [Metaculus - Wikipedia](https://en.wikipedia.org/wiki/Metaculus) - Organization history and overview
+2. [Anthony Aguirre - Wikipedia](https://en.wikipedia.org/wiki/Anthony_Aguirre) - Founder background
+3. [Anthony Aguirre - Future of Life Institute](https://futureoflife.org/person/anthony-aguirre/) - FLI connection
+4. [Metaculus: a prediction website with an eye on science and technology - Yale News](https://news.yale.edu/2016/11/02/metaculus-prediction-website-eye-science-technology) - 2016 launch coverage
+5. [Announcing Deger Turan as the new CEO of Metaculus](https://metaculus.medium.com/announcing-deger-turan-as-the-new-ceo-of-metaculus-fcab2dfe955b) - Leadership transition
+6. [Metaculus Awarded USD 5.5M Grant to Advance Forecasting as a Public Good](https://www.metaculus.com/notebooks/22479/metaculus-awarded-55m-grant-to-advance-forecasting-as-a-public-good/) - 2022 funding announcement
+7. [Metaculus - Platform Development | Coefficient Giving](https://www.openphilanthropy.org/grants/metaculus-platform-development/) - 2022 grant details
+8. [Metaculus - Platform Development (2023) | Coefficient Giving](https://www.openphilanthropy.org/grants/metaculus-platform-development-2023/) - 2023 grant details
+9. [Good Judgment Inc and Metaculus Launch First Collaboration](https://goodjudgment.com/owidproject/) - OWID project announcement
+10. [Bridgewater x Metaculus 2026 Competition](https://www.bridgewater.com/bridgewater-x-metaculus-2026-competition) - Bridgewater partnership
+11. [Q2 AI Benchmark Results: Pros Maintain Clear Lead - EA Forum](https://forum.effectivealtruism.org/posts/F2stjK9wHSy3HPEC9/q2-ai-benchmark-results-pros-maintain-clear-lead) - AI benchmarking results
+12. [How does forecast quantity impact forecast quality on Metaculus? - EA Forum](https://forum.effectivealtruism.org/posts/xF8EWBouJRZpRgFgu/how-does-forecast-quantity-impact-forecast-quality-on-1) - Calibration analysis
+13. [Takeaways from the Metaculus AI Progress Tournament - EA Forum](https://forum.effectivealtruism.org/posts/x5Re9EKwGvAjZSmeb/takeaways-from-the-metaculus-ai-progress-tournament) - AI tournament analysis
+14. [Takeaways from the Metaculus AI Progress Tournament | Coefficient Giving](https://www.openphilanthropy.org/research/takeaways-from-the-metaculus-ai-progress-tournament/) - Coefficient Giving analysis
+15. [A Primer on the Metaculus Scoring Rule](https://www.metaculus.com/notebooks/22486/a-primer-on-the-metaculus-scoring-rule/) - Scoring methodology
+16. [Exploring Metaculus's AI Track Record - EA Forum](https://forum.effectivealtruism.org/posts/e9htD7txe8RDdcehm/exploring-metaculus-s-ai-track-record) - AI accuracy analysis
+17. [Predictive Performance on Metaculus vs. Manifold Markets](https://www.metaculus.com/notebooks/15359/predictive-performance-on-metaculus-vs-manifold-markets/) - Platform comparison
+18. [Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/) - Timeline analysis
+19. [Forecasting AGI: Insights from Prediction Markets and Metaculus](https://forecastingaifutures.substack.com/p/forecasting-agi-insights-from-prediction-markets) - AGI forecast aggregation
+20. [Data on forecasting accuracy across different time horizons - EA Forum](https://forum.effectivealtruism.org/posts/hqkyaHLQhzuREcXSX/data-on-forecasting-accuracy-across-different-time-horizons) - Long-horizon analysis
+21. [AXRP Episode 38.7 - Anthony Aguirre on the Future of Life Institute](https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html) - Founder interview
+22. [Metaculus Year in Review: 2022](https://metaculus.medium.com/metaculus-year-in-review-2022-c92ff9cd87a0) - 1M prediction milestone
+23. [Metaculus Company Profile - Tracxn](https://tracxn.com/d/companies/metaculus/__AWRGX1fmuN1Wskq26qalRCqRT7irkbcukDlICco4vOk) - Organization details
+24. [Principled extremizing of aggregated forecasts - EA Forum](https://forum.effectivealtruism.org/posts/biL94PKfeHmgHY6qe/principled-extremizing-of-aggregated-forecasts) - Extremization methodology
+25. [What can we learn from scoring different election forecasts? - First Sigma](https://firstsigma.substack.com/p/midterm-elections-forecast-comparison-analysis) - 2022 election comparison
+
+<Backlinks />

@@ -1,0 +1,421 @@
+---
+title: "Genetic Enhancement / Selection"
+description: "Analysis of using genetic selection (embryo selection, polygenic scores) or enhancement to increase human intelligence. Current polygenic scores explain ~10% of IQ variance with gains of 2.5-6 IQ points per selection cycle. Iterated embryo selection could theoretically yield 1-2 standard deviation gains but requires unproven stem-cell-derived gamete technology (estimated 2033+). Very unlikely path to TAI due to 20-30 year generation times vs AI's 1-2 year capability doubling, but strategically relevant as human enhancement alternative."
+sidebar:
+  label: "Genetic Enhancement"
+  order: 12
+quality: 51
+lastEdited: "2026-01-28"
+importance: 18.5
+llmSummary: "Genetic enhancement via embryo selection currently yields 2.5-6 IQ points per generation with 10% variance explained by polygenic scores, while theoretical iterated embryo selection could achieve 15-30 IQ points by 2050+. Extremely unlikely (<1%) path to transformative intelligence due to 20-30 year generation times versus AI's 1-2 year capability doubling, making it strategically irrelevant for near-term AI prioritization despite comprehensive technical coverage."
+ratings:
+  novelty: 3.5
+  rigor: 6.5
+  actionability: 2
+  completeness: 7
+metrics:
+  wordCount: 1645
+  citations: 71
+  tables: 42
+  diagrams: 2
+clusters: ["ai-safety", "biorisks"]
+---
+import {Mermaid, EntityLink, DataExternalLinks, R} from '@components/wiki';
+
+<DataExternalLinks pageId="genetic-enhancement" client:load />
+
+## Overview
+
+Genetic enhancement refers to using **embryo selection**, **genetic modification**, or **selective breeding** to increase human intelligence. While this is not a path to artificial intelligence, it could in principle produce humans with significantly enhanced cognitive capabilities. The field has advanced significantly since 2018, with [genome-wide association studies](https://pmc.ncbi.nlm.nih.gov/articles/PMC12416016/) now identifying thousands of variants associated with intelligence, though each contributes only tiny effects (typically less than 0.02% of variance per variant).
+
+This approach is **extremely unlikely to produce transformative intelligence** due to biological limits, long timescales (human generation time of 20-30 years), and profound ethical constraints. However, it's strategically relevant because it represents an alternative to AI for increasing overall human capability. The fundamental timing mismatch is stark: AI capabilities double roughly every 1-2 years, while even aggressive genetic selection would require decades to produce substantial cognitive gains.
+
+Current [commercial polygenic embryo screening](https://www.nejm.org/doi/full/10.1056/NEJMsr2105065) (offered by companies like Genomic Prediction and Orchid) can achieve expected gains of approximately **2.5-6 IQ points** when selecting among typical IVF embryo batches. More speculative approaches like [iterated embryo selection](https://gwern.net/embryo-selection) could theoretically yield gains of **1-2 standard deviations** (15-30 IQ points), but require stem-cell-derived gamete technology not expected until the 2030s.
+
+Estimated probability of being dominant at transformative intelligence: **less than 1%**
+
+### Risk Assessment
+
+| Dimension | Assessment | Notes |
+|-----------|------------|-------|
+| Strategic Relevance | **Low** | Cannot compete with AI timelines; 20-30 year generation time vs 1-2 year AI capability doubling |
+| Scientific Feasibility | **Medium** | Selection works in principle; modification faces major technical hurdles |
+| Ethical/Political Barriers | **Very High** | Eugenics associations; inequality concerns; lack of consent for future generations |
+| Timeline to Significant Impact | **Decades** | Even optimistic scenarios require 50+ years for population-level effects |
+| Current Trend | **Slowly Increasing** | Commercial services expanding but facing regulatory scrutiny |
+
+## Approaches
+
+<Mermaid client:load chart={`
+flowchart TB
+    subgraph selection["Selection Approaches"]
+        embryo["Embryo Selection<br/>(PGT + Polygenic Scores)"]
+        sperm["Sperm/Egg Selection"]
+        iterated["Iterated Selection<br/>(multiple generations in vitro)"]
+    end
+
+    subgraph modification["Modification Approaches"]
+        crispr["CRISPR Editing"]
+        germline["Germline Modification"]
+        synthetic["Synthetic Biology"]
+    end
+
+    selection -->|"Current tech"| result1["Modest IQ gains<br/>(≈3-10 points per generation)"]
+    modification -->|"Speculative"| result2["Larger potential<br/>(unknown limits)"]
+`} />
+
+### Genetic Enhancement Pathways
+
+The following diagram illustrates the technical pipeline from genetic knowledge to cognitive enhancement, showing current bottlenecks at each stage:
+
+<Mermaid client:load chart={`
+flowchart TD
+    subgraph research["Research Stage"]
+        gwas["GWAS Studies<br/>(N above 300,000)"]
+        variants["Identify Variants<br/>(~10,000+ for IQ)"]
+        pgs["Build Polygenic Scores<br/>(~5-10% variance explained)"]
+    end
+
+    subgraph application["Application Stage"]
+        screen["Screen Embryos<br/>(5-20 per IVF cycle)"]
+        select["Select Best Embryo<br/>(+2.5-6 IQ points)"]
+        implant["Implantation"]
+    end
+
+    subgraph future["Future/Theoretical"]
+        stemcell["Stem Cell Gametes<br/>(expected 2033+)"]
+        iterate["Iterated Selection<br/>(multiple generations in vitro)"]
+        edit["Direct Gene Editing<br/>(thousands of edits needed)"]
+    end
+
+    gwas --> variants
+    variants --> pgs
+    pgs --> screen
+    screen --> select
+    select --> implant
+
+    pgs --> stemcell
+    stemcell --> iterate
+    iterate -->|"Theoretical +15-30 IQ"| implant
+
+    variants --> edit
+    edit -->|"Not viable"| implant
+
+    style edit fill:#ffcccc
+    style iterate fill:#ffffcc
+    style implant fill:#ccffcc
+`} />
+
+### Comparison of Genetic Enhancement Approaches
+
+| Approach | Status (2025) | Expected IQ Gain | Technical Readiness | Ethical Acceptability | Timeline to Widespread Use |
+|----------|---------------|------------------|---------------------|----------------------|---------------------------|
+| **Simple Embryo Selection (PGT-P)** | [Commercially available](https://www.nejm.org/doi/full/10.1056/NEJMsr2105065) | 2.5-6 points | High (current tech) | Controversial (12% clinician approval) | Now (limited uptake) |
+| **Enhanced Polygenic Screening** | Research/pilot | 6-9 points | Medium | Low | 5-10 years |
+| **Iterated Embryo Selection** | [Theoretical](https://gwern.net/embryo-selection) | 15-30+ points | Low (requires stem-cell gametes) | Very Low | 15-25 years (if ever) |
+| **CRISPR Single-Gene Editing** | [Banned after He Jiankui](https://pmc.ncbi.nlm.nih.gov/articles/PMC6813942/) | Minimal for IQ | Medium (but wrong approach) | Prohibited | Not applicable |
+| **CRISPR Multi-Gene Editing** | Not viable | Unknown (needs 1000s of edits) | Very Low | Prohibited | 20+ years (if ever) |
+| **Germline Modification** | [Technically possible, ethically prohibited](https://www.mdpi.com/2409-9287/5/3/20) | Potentially large | Low | Prohibited globally | Unknown |
+
+*Sources: [Cell 2019](https://pmc.ncbi.nlm.nih.gov/articles/PMC6957074/), [NEJM 2021](https://www.nejm.org/doi/full/10.1056/NEJMsr2105065), [Gwern Analysis](https://gwern.net/embryo-selection)*
+
+## Key Properties
+
+| Property | Rating | Assessment |
+|----------|--------|------------|
+| **White-box Access** | HIGH | Genetic variants are knowable |
+| **Trainability** | N/A | Not applicable (biological) |
+| **Predictability** | LOW | Gene-environment interactions complex |
+| **Modularity** | LOW | Pleiotropic effects everywhere |
+| **Formal Verifiability** | LOW | Cannot formally verify biological outcomes |
+
+## Scientific Foundations
+
+### Heritability of Cognitive Traits
+
+Intelligence is one of the most heritable behavioral traits, with heritability estimates from [twin studies](https://pmc.ncbi.nlm.nih.gov/articles/PMC12416016/) showing substantial genetic influence that increases across the lifespan:
+
+| Trait | Heritability (Childhood) | Heritability (Adulthood) | Polygenic Score Prediction | Key GWAS Findings |
+|-------|--------------------------|--------------------------|---------------------------|-------------------|
+| **General Intelligence (g)** | ≈40% | 60-80% | ≈5-10% variance | [10,000+ variants](https://pmc.ncbi.nlm.nih.gov/articles/PMC5985927/) identified |
+| **Educational Attainment** | ≈40% | ≈60% | ≈11-13% variance | Largest GWAS (N above 1M) |
+| **Working Memory** | ≈35% | ≈50% | ≈3-5% variance | Overlaps with g variants |
+| **Processing Speed** | ≈30% | ≈45% | ≈2-4% variance | Distinct genetic architecture |
+| **Verbal Ability** | ≈35% | ≈55% | ≈4-6% variance | High g correlation |
+
+*Sources: [Deutsches Arzteblatt 2025](https://di.aerzteblatt.de/int/archive/article/242633), [Nature Molecular Psychiatry 2024](https://www.nature.com/articles/s41380-024-02671-w), [Robert Plomin's research](https://pmc.ncbi.nlm.nih.gov/articles/PMC5985927/)*
+
+**Critical distinction:** High heritability does not imply easy manipulability. The [meta-analysis by Plomin and colleagues](https://pmc.ncbi.nlm.nih.gov/articles/PMC5985927/) found that intelligence GWAS explain only about 20% of the 50% heritability—meaning current polygenic scores capture less than half of the genetic signal. The "missing heritability" likely resides in rare variants, gene-gene interactions, and epigenetic factors not captured by common SNP arrays.
+
+### The Numbers Problem: Quantified
+
+| Factor | Value | Source | Implication |
+|--------|-------|--------|-------------|
+| Variants affecting IQ | 10,000+ | [GWAS meta-analyses](https://www.sciencedirect.com/science/article/abs/pii/S0160289624000655) | No single gene target |
+| Effect per common variant | 0.01-0.05 IQ points | GWAS effect sizes | Thousands of small effects |
+| Largest single variant | ≈0.3 IQ points | [Largest GWAS 2018](https://www.nature.com/articles/mp2017121) | No "intelligence gene" |
+| Polygenic score prediction (r) | 0.245 (meta-analytic) | [Meta-analysis 2024](https://www.sciencedirect.com/science/article/abs/pii/S0160289624000655) | Medium effect size |
+| Variance explained by PGS | 4-10% | Current best scores | [Far below heritability](https://pmc.ncbi.nlm.nih.gov/articles/PMC5985927/) |
+| Height comparison (best case) | 40% variance explained | 12,111 SNPs | Intelligence lags behind |
+
+**Comparison with height:** For body height, the [largest GWAS](https://di.aerzteblatt.de/int/archive/article/242633) identified 12,111 independent SNPs explaining ~40% of trait variance. Only including rare variants via genome sequencing increased this to 68%, approaching the ~80% twin heritability. Intelligence research is on a similar trajectory but years behind.
+
+### Key Insight: The Variance Bottleneck
+
+Even with perfect embryo selection among typical IVF batches (5-20 embryos), the expected gain is fundamentally limited by the genetic variance present among siblings. [Karavani et al. (2019)](https://pmc.ncbi.nlm.nih.gov/articles/PMC6957074/) calculated that selecting the top embryo from 10 would yield an expected gain of only **2.5 IQ points** for cognitive ability using current polygenic scores—and this comes with wide prediction intervals where "the majority of children top-scoring for height are not the tallest."
+
+As University of Edinburgh geneticist [Peter Joshi noted](https://www.science.org/content/article/screening-embryos-iq-and-other-complex-traits-premature-study-concludes): for intelligence, "You might be wrong almost as often as you're right."
+
+## Current State (2025)
+
+### Commercial Polygenic Embryo Screening Services
+
+[Polygenic Embryo Screening (PES)](https://academic.oup.com/humupd/article/30/5/529/7684172) is currently offered commercially by three US-based companies, though clinical uptake remains limited and controversial:
+
+| Company | Service | Traits Screened | IQ/Cognitive Screening | Regulatory Status |
+|---------|---------|-----------------|------------------------|-------------------|
+| **Genomic Prediction** | LifeView PES | 25+ disease risks | [Founders speculate about future cognitive screening](https://www.aporiamagazine.com/p/the-best-foreign-aid-money-can-buy) | US: unregulated |
+| **Orchid Health** | Polygenic risk screening | Disease risks | Not offered | US: unregulated |
+| **MyOme** | Research protocol PES | 25+ conditions | [Offers cognitive ability PGS in research](https://www.nature.com/articles/s41525-025-00530-3) | Research only |
+| **Heliospect Genomics** | PolygenX project | Not yet commercial | [Proposed IQ prediction](https://www.alliancevita.org/en/2024/10/embryo-selection-future-iq/) | Exposed by Hope Not Hate |
+| **Nucleus Genomics / Herasight** | IQ predictions | Consumer genetics | [IQ predictions offered](https://natlawreview.com/article/intersection-genetics-and-law-navigating-new-frontiers) | Emerging startups |
+
+### Clinician Attitudes (2025 Survey)
+
+A [2025 survey of 152 US reproductive endocrinology specialists](https://www.nature.com/articles/s41525-025-00530-3) found:
+
+| Metric | Finding |
+|--------|---------|
+| Familiarity with PES | 97% at least slightly familiar |
+| General approval | Only **12%** approve |
+| Disapproval | **46%** disapprove |
+| Uncertain | 42% uncertain |
+| Risk/benefit assessment | **58%** believe risks outweigh benefits |
+| Approval for disease screening | 55-59% approve |
+| Approval for cognitive/behavioral traits | Only **6-7%** approve |
+| Concerns (very/extremely concerned) | 85-77% cite low accuracy, confusion, false expectations, eugenics |
+
+### Major Research Programs
+
+| Program | Focus | Sample Size | Key Contributions |
+|---------|-------|-------------|-------------------|
+| **UK Biobank** | Large-scale genetic + phenotype data | 500,000 | Gold standard for GWAS validation |
+| **SSGAC Consortium** | Social science genetics | 1M+ for EA | [Largest educational attainment GWAS](https://www.nature.com/articles/s41380-024-02671-w) |
+| **COGENT Consortium** | Cognitive genetics | 300,000+ | Intelligence-specific variants |
+| **23andMe Research** | Consumer genetics research | 10M+ | Massive sample sizes, phenotype breadth |
+
+## The He Jiankui Case: A Cautionary Tale
+
+In November 2018, Chinese scientist He Jiankui [announced the birth of the first gene-edited humans](https://pmc.ncbi.nlm.nih.gov/articles/PMC6813942/)—twin girls "Lulu" and "Nana"—edited using CRISPR to disable the CCR5 gene, ostensibly for HIV resistance. The case illustrates both the technical limitations and ethical failures of current genetic modification approaches:
+
+**Technical failures:**
+- Neither twin received the intended CCR5-delta32 deletion that confers HIV resistance
+- [Novel mutations of various lengths](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3000224) were created instead—effects unknown
+- One twin (Lulu) retained one normal CCR5 copy, providing no HIV protection
+- Off-target edits elsewhere in the genome may cause cancer or other problems
+
+**The intelligence connection:** CCR5 is [linked to memory and cognition](https://www.science.org/content/article/did-crispr-help-or-harm-first-ever-gene-edited-babies) in mice. Though He Jiankui denied enhancement intent, he acknowledged awareness of studies showing CCR5 deletion improves memory. The twins may have inadvertently received cognitive modifications—benefits unknown, risks substantial.
+
+**Consequences:** He Jiankui was [sentenced to three years in prison](https://en.wikipedia.org/wiki/He_Jiankui_affair) and fined 3 million yuan (≈\$134,000). A third edited baby was born in 2019. The case led to global calls for moratoriums on human germline editing.
+
+## Ethical Considerations
+
+### Major Concerns
+
+| Concern | Severity | Specific Risks | Counter-Arguments |
+|---------|----------|----------------|-------------------|
+| **Eugenics associations** | VERY HIGH | Historical atrocities (Nazi Germany, forced sterilization programs); potential revival of discredited ideas | Individual choice differs from state coercion; disease screening widely accepted |
+| **Inequality amplification** | HIGH | IVF costs \$15,000-30,000/cycle; only wealthy access enhancement; creates biological class divisions | Could eventually democratize; public funding possible |
+| **Selection pressure** | MEDIUM | Social stigma for "unenhanced"; pressure to use technology; narrowing of human diversity | Already present with prenatal testing |
+| **Consent** | HIGH | Future generations cannot consent to modifications; irreversible germline changes | Parents already make consequential decisions for children |
+| **Pleiotropy/side effects** | HIGH | [IQ variants affect 100s of other traits](https://pmc.ncbi.nlm.nih.gov/articles/PMC6957074/); optimizing one trait may harm others | Better understanding could mitigate; selection less risky than editing |
+| **Prediction errors** | HIGH | [≈50% false positive rate](https://www.science.org/content/article/screening-embryos-iq-and-other-complex-traits-premature-study-concludes) for embryo selection; wrong embryo may be chosen | Technology improving; better than no information |
+
+### Regulatory Status (2025)
+
+| Jurisdiction | Germline Editing | Embryo Selection | PGT-P Regulation | Key Authority |
+|--------------|------------------|------------------|------------------|---------------|
+| **United States** | [Effectively banned (no FDA pathway)](https://natlawreview.com/article/intersection-genetics-and-law-navigating-new-frontiers) | Legal, unregulated | No federal oversight | FDA, state laws |
+| **United Kingdom** | Banned (research permitted) | Regulated | [HFEA oversight](https://academic.oup.com/humupd/article/30/5/529/7684172) | HFEA |
+| **China** | [Banned after He Jiankui](https://pmc.ncbi.nlm.nih.gov/articles/PMC6813942/) | Legal, regulated | Ministry of Health | NMPA |
+| **European Union** | Banned (most countries) | Varies by country | Medical device regulations | National authorities |
+| **International** | [Moratorium called by WHO](https://www.mdpi.com/2409-9287/5/3/20) | No binding agreements | No harmonization | None |
+
+## Why Not a Path to Transformative Intelligence
+
+### Fundamental Barriers
+
+| Barrier | Quantification | Explanation |
+|---------|----------------|-------------|
+| **Generation time** | 20-30 years vs 1-2 years | Human reproduction cycle vs AI capability doubling time |
+| **Current gain per generation** | 2.5-6 IQ points | [Best current technology](https://pmc.ncbi.nlm.nih.gov/articles/PMC6957074/) via embryo selection |
+| **Theoretical maximum (simple selection)** | ≈11.5 IQ points | [Shulman & Bostrom 2014](https://nickbostrom.com/papers/embryo.pdf) estimate from 10 embryos |
+| **Theoretical maximum (IES)** | 15-30+ IQ points | [Gwern analysis](https://gwern.net/embryo-selection) with stem-cell gametes |
+| **Biological ceiling** | Unknown (possibly +50-100 IQ) | May be limited by brain size, metabolism, development |
+| **Ethical/political viability** | Near zero for aggressive programs | Only 6-7% of clinicians approve cognitive trait selection |
+| **Polygenic complexity** | 10,000+ variants | No simple intervention target |
+
+### The Timing Problem: Quantified
+
+| Metric | Genetic Enhancement | AI Development |
+|--------|---------------------|----------------|
+| **Time per "generation"** | 20-30 years | 1-2 years (capability doubling) |
+| **Generations to +30 IQ** | 5-12 (100-360 years) | N/A (different paradigm) |
+| **Time to match current GPT-4** | Likely never | Already exists |
+| **Scalability** | ≈150M births/year globally | Unlimited digital copies |
+| **Iteration speed** | Biological constraints | Only compute-limited |
+| **2030 expected state** | +5-10 IQ in tiny elite population | Potentially human-level AGI |
+
+**The core asymmetry:** Even the most optimistic [iterated embryo selection scenarios](https://gwern.net/embryo-selection) would require 15-25 years to produce the first enhanced humans. By 2040-2050, those individuals would be reaching adulthood—likely in a world where AI has already achieved or surpassed human-level capabilities in most cognitive domains. The [median Metaculus prediction](https://gwern.net/ies-history) for first live birth from stem-cell-derived gametes is 2033, and this technology is prerequisite for iterated selection.
+
+## AI Safety Implications
+
+### Why Genetic Enhancement Matters for AI Safety
+
+Despite being an implausible path to transformative intelligence, genetic enhancement is strategically relevant to AI safety for several reasons:
+
+| Consideration | Relevance | Assessment |
+|---------------|-----------|------------|
+| **Enhanced AI governance** | Cognitively enhanced humans might make better AI policy decisions | Timing mismatch: enhanced humans arrive too late for near-term AI governance |
+| **Alignment research capacity** | Smarter researchers might solve alignment faster | Marginal: +10 IQ unlikely to be decisive; AI research acceleration more impactful |
+| **Human-AI competition framing** | Enhancement positioned as alternative to AI risk | [Transhumanist perspectives](https://geneticliteracyproject.org/2024/04/16/superintelligence-superlongevity-and-superhappiness-how-billionaire-transhumanists-want-to-converge-humanity-and-artificial-intelligence/) see convergence, not competition |
+| **Cognitive enhancement precedent** | Genetic selection normalizes human enhancement; affects AI ethics discourse | Could reduce resistance to brain-computer interfaces, cognitive augmentation |
+| **Elite capture risk** | Enhanced cognitive elite might pursue AI development more aggressively | Wealthy early adopters may be tech-optimist demographic |
+| **Long-term coexistence** | Post-AGI world may include enhanced humans alongside AI | Relevant only if AI development goes well |
+
+### Not a Safety Strategy
+
+Enhancement is **too slow to be a viable AI safety strategy**. The fundamental timing mismatch is stark:
+
+- **AI capabilities** are progressing at rates measured in months to years
+- **Genetic enhancement** operates on timescales of decades to centuries
+- By the time the first significantly enhanced humans reach intellectual maturity (~2050-2060 in optimistic scenarios), critical AI safety decisions will have been made long ago
+
+The [transhumanist vision](https://www.noemamag.com/the-politics-of-superintelligence/) of humans "keeping up" with AI through enhancement is implausible given current technology trajectories. More promising human enhancement pathways (brain-computer interfaces, cognitive augmentation drugs) operate on faster timescales but face their own limitations.
+
+## Comparison with Other Intelligence Enhancement Paths
+
+| Factor | Genetic Enhancement | Artificial Intelligence | Brain-Computer Interfaces | Cognitive Drugs |
+|--------|---------------------|------------------------|--------------------------|-----------------|
+| **Timeline to major gains** | Decades-centuries | Years | 10-20 years | 5-15 years |
+| **Scalability** | Very limited (birth rate) | Unlimited (digital) | Hardware-limited | Manufacturing-limited |
+| **Magnitude of potential gain** | +15-30 IQ (IES), +100? (theoretical max) | Unbounded (superintelligence) | Moderate augmentation | +5-15% on specific tasks |
+| **Reversibility** | None (germline permanent) | High (can turn off) | Medium (implants removable) | High (wear off) |
+| **Ethical constraints** | Very high | Moderate | Moderate-High | Low-Moderate |
+| **Current progress** | Minimal commercial use | Rapid (GPT-4, Claude, etc.) | Early clinical trials | Several drugs available |
+| **Individual vs population** | Population-level (generational) | Individual access | Individual augmentation | Individual |
+| **AI safety relevance** | Very low (timing mismatch) | Direct | Medium (human oversight aid) | Low |
+
+## Research Landscape
+
+### Key Researchers
+
+| Researcher | Affiliation | Contribution | Key Work |
+|------------|-------------|--------------|----------|
+| **Robert Plomin** | King's College London | Pioneer of behavioral genetics; twin studies | [Blueprint: How DNA Makes Us Who We Are](https://mitpress.mit.edu/9780262039161/blueprint/) (2018) |
+| **Steve Hsu** | Michigan State | Polygenic prediction; BGI collaboration | Founder of Genomic Prediction |
+| **Nick Bostrom** | Oxford (former) | Embryo selection ethics/feasibility analysis | [Embryo Selection for Cognitive Enhancement](https://nickbostrom.com/papers/embryo.pdf) (2014) |
+| **Carl Shulman** | Independent researcher | Iterated embryo selection analysis | Collaborations with Bostrom, MIRI |
+| **Gwern Branwen** | Independent | Comprehensive analysis of embryo selection | [Embryo Selection for Intelligence](https://gwern.net/embryo-selection) |
+| **Shai Carmi** | Hebrew University | Limitations of polygenic screening | [Cell 2019 paper](https://pmc.ncbi.nlm.nih.gov/articles/PMC6957074/) on limited utility |
+
+### Key Organizations
+
+| Organization | Type | Focus | Controversy/Notes |
+|--------------|------|-------|-------------------|
+| **Genomic Prediction** | Commercial | First PGT-P for polygenic traits | Founders have discussed future cognitive screening |
+| **BGI Genomics** | Research/Commercial | Large-scale sequencing; IQ research | [Cognitive genomics project](https://en.wikipedia.org/wiki/He_Jiankui_affair) generated concern |
+| **UK Biobank** | Research database | 500K genomes + phenotypes | Gold standard for GWAS validation |
+| **Broad Institute** | Academic | GWAS methodology; rare variants | Leading genomics research |
+| **deCODE Genetics** | Research/Commercial | Icelandic population genetics | Unique founder population advantages |
+| **SSGAC** | Academic consortium | Social science genetics | Largest educational attainment GWAS |
+
+## Trajectory and Future Scenarios
+
+### Scenario Analysis
+
+| Scenario | Probability | Description | AI Safety Implications |
+|----------|-------------|-------------|------------------------|
+| **Status quo continuation** | 50% | PGT-P remains niche (≈1-5% of IVF); no IES development | Negligible impact on AI trajectory |
+| **Gradual expansion** | 30% | PGT-P becomes standard for IVF (≈30-50%); IES remains theoretical | Minor demographic shift in elite populations by 2060+ |
+| **Rapid adoption** | 10% | IES breakthrough by 2035; widespread adoption by wealthy | Enhanced humans enter workforce 2055-2070; AI likely dominant by then |
+| **Enhancement arms race** | 5% | Geopolitical competition drives aggressive programs | Could exacerbate existing AI race dynamics |
+| **Regulatory shutdown** | 5% | Strong international restrictions halt commercial PGT-P | Genetic enhancement becomes non-factor |
+
+### Arguments For Continued Relevance
+
+1. **Complementary to AI** - Enhanced humans might govern AI better (but timing mismatch)
+2. **Backup option** - If AI development pauses or fails, enhancement provides alternative path
+3. **Already happening** - Commercial embryo selection exists; [startups offering IQ predictions](https://natlawreview.com/article/intersection-genetics-and-law-navigating-new-frontiers)
+4. **Long-term coexistence** - Post-TAI world may include both enhanced humans and AI
+5. **Research insights** - Understanding intelligence genetics informs AI cognitive architectures
+
+### Arguments Against Relevance
+
+1. **Fundamental timing mismatch** - AI capability doubling every 1-2 years vs 20-30 year human generations
+2. **Ethical/political barriers** - Only [6-7% of clinicians approve](https://www.nature.com/articles/s41525-025-00530-3) cognitive trait selection
+3. **Technical limitations** - [~50% false positive rate](https://www.science.org/content/article/screening-embryos-iq-and-other-complex-traits-premature-study-concludes) in current predictions
+4. **Unknown biological ceiling** - May not be possible to exceed ~150-200 IQ biologically
+5. **Complexity** - Unpredictable gene-environment interactions; pleiotropy risks
+
+### Technical Uncertainties
+
+| Question | Optimistic View | Pessimistic View | Resolution Timeline |
+|----------|-----------------|------------------|---------------------|
+| **Biological ceiling for intelligence?** | +100 IQ or more possible with sufficient intervention | Near current maximum (≈150-160 IQ) | Unknown; possibly never resolvable theoretically |
+| **Stem-cell gamete feasibility?** | Viable by 2030-2035; enables IES | May never work reliably in humans | Metaculus median: 2033 for first live birth |
+| **Polygenic score improvement rate?** | Will reach 30-50% variance explained by 2030 | Plateau at 10-15% due to missing heritability | 5-10 years |
+| **Pleiotropy and side effects?** | Can be managed with better understanding | Fundamental constraint on optimization | Ongoing research |
+
+### Social/Political Uncertainties
+
+| Question | Optimistic View | Pessimistic View | Key Factors |
+|----------|-----------------|------------------|-------------|
+| **Will society permit aggressive enhancement?** | Individual choice will prevail; precedent from IVF | Historical eugenics makes this permanently toxic | Cultural values; regulatory frameworks; early adopter outcomes |
+| **Will enhancement exacerbate inequality?** | Technology democratizes over time; public funding possible | Creates permanent biological caste system | Policy choices; cost trajectories; access models |
+| **Could geopolitical competition drive adoption?** | Nations may compete on human capital enhancement | International coordination prevents arms race | Great power dynamics; coordination mechanisms |
+
+### AI Interaction Uncertainties
+
+1. **Could AI-assisted genetic engineering change the game?** AI might identify better variant targets, optimize multi-trait selection, and design novel interventions. [CRISPR-GPT](https://www.nature.com/articles/s41551-025-01463-z) demonstrates AI's potential to accelerate gene editing research. However, this likely accelerates AI capabilities faster than genetic enhancement capabilities.
+
+2. **Does enhanced intelligence help with AI alignment?** The problem may not be about raw human intelligence. A +20 IQ researcher is unlikely to solve alignment if the problem requires conceptual breakthroughs or is fundamentally intractable. More AI safety researchers (at current intelligence levels) may be more valuable than fewer enhanced researchers.
+
+3. **Will AI make genetic enhancement obsolete?** If AI achieves superintelligence before enhanced humans reach adulthood, the comparative advantage of biological intelligence becomes moot. The key question is whether there's a long "human-level AI" plateau where enhanced humans could contribute.
+
+## Sources and Further Reading
+
+### Key Scientific Papers
+
+- [The new genetics of intelligence](https://pmc.ncbi.nlm.nih.gov/articles/PMC5985927/) - Plomin & von Stumm (2018) - Comprehensive review of GWAS findings
+- [Screening Human Embryos for Polygenic Traits Has Limited Utility](https://pmc.ncbi.nlm.nih.gov/articles/PMC6957074/) - Karavani et al. (2019) - Key paper on selection limitations
+- [Problems with Using Polygenic Scores to Select Embryos](https://www.nejm.org/doi/full/10.1056/NEJMsr2105065) - Turley et al. (2021) - NEJM perspective on clinical limitations
+- [Screening embryos for polygenic disease risk](https://academic.oup.com/humupd/article/30/5/529/7684172) - Human Reproduction Update (2024) - Current clinical review
+- [The Genetics of Intelligence](https://pmc.ncbi.nlm.nih.gov/articles/PMC12416016/) - 2025 comprehensive review
+
+### Foundational Analysis
+
+- [Embryo Selection for Cognitive Enhancement](https://nickbostrom.com/papers/embryo.pdf) - Shulman & Bostrom (2014) - Theoretical framework
+- [Embryo Selection for Intelligence](https://gwern.net/embryo-selection) - Gwern - Comprehensive quantitative analysis
+- [History of Iterated Embryo Selection](https://gwern.net/ies-history) - Gwern - Traces development of the concept
+- [Blueprint: How DNA Makes Us Who We Are](https://mitpress.mit.edu/9780262039161/blueprint/) - Plomin (2018) - Popular science overview
+
+### Regulatory and Ethical Resources
+
+- [The He Jiankui affair](https://en.wikipedia.org/wiki/He_Jiankui_affair) - Wikipedia overview of the CRISPR babies case
+- [The Ethics of Genetic Cognitive Enhancement](https://www.mdpi.com/2409-9287/5/3/20) - Comparative ethics of editing vs selection
+- [Survey of U.S. reproductive medicine clinicians' attitudes on polygenic embryo screening](https://www.nature.com/articles/s41525-025-00530-3) - 2025 clinician attitudes
+
+### Industry and News
+
+- [Screening embryos for IQ and other complex traits is premature](https://www.science.org/content/article/screening-embryos-iq-and-other-complex-traits-premature-study-concludes) - Science (2019)
+- [Embryo selection according to its future IQ?](https://www.alliancevita.org/en/2024/10/embryo-selection-future-iq/) - Alliance Vita (2024) on Heliospect
+- [In-Vitro Fertilization, IQ, and Genetic Risk in Embryo Selection](https://natlawreview.com/article/intersection-genetics-and-law-navigating-new-frontiers) - National Law Review (2024)
+
+---
+
+## Related Pages
+
+- <EntityLink id="brain-computer-interfaces">Brain-Computer Interfaces</EntityLink> - Another human enhancement path
+- <EntityLink id="collective-intelligence">Collective Intelligence</EntityLink> - Enhancing group cognition instead
+- <EntityLink id="biological-organoid">Biological/Organoid</EntityLink> - Using biological neurons for computing
