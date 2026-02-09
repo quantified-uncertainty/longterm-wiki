@@ -13,7 +13,6 @@ ratings:
   actionability: 7
 importance: 72.5
 llmSummary: This model estimates alignment robustness degrades from 60-80% at GPT-4 level to 30-50% at 100x capability, with a critical 'alignment valley' at 10-30x where systems are dangerous but can't help solve alignment. Prioritizes scalable oversight and interpretability research deployable within 2-5 years before entering the critical zone.
-pageTemplate: knowledge-base-model
 metrics:
   wordCount: 844
   citations: 28
@@ -24,7 +23,6 @@ clusters:
   - governance
 subcategory: safety-models
 ---
-import { Aside } from '@astrojs/starlight/components';
 import { DataInfoBox, Backlinks, Mermaid , EntityLink} from '@components/wiki';
 
 <DataInfoBox entityId="alignment-robustness-trajectory" ratings={frontmatter.ratings} />

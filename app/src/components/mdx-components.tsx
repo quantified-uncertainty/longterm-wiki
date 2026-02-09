@@ -20,7 +20,7 @@ import { FactorSubItemsList, AllFactorsSubItems } from "@/components/wiki/Factor
 import CauseEffectGraph from "@/components/wiki/CauseEffectGraph";
 import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 
-// Aside → Callout adapter (Starlight uses `type`, our Callout uses `variant`)
+// Legacy compat shim: Starlight's <Aside> mapped to our <Callout> component
 type CalloutVariant = "note" | "tip" | "caution" | "warning" | "danger";
 function Aside({ type, title, children }: { type?: string; title?: string; children?: React.ReactNode }) {
   const variant = (type && ["note", "tip", "caution", "warning", "danger"].includes(type))
@@ -29,12 +29,12 @@ function Aside({ type, title, children }: { type?: string; title?: string; child
   return <Callout variant={variant} title={title}>{children}</Callout>;
 }
 
-// Placeholder for Astro-only or not-yet-ported components
+// Stub for legacy Astro/Starlight components still referenced in MDX content
 function Stub({ children }: { children?: React.ReactNode }) {
   return <div className="p-2 bg-muted/50 rounded text-sm text-muted-foreground">{children}</div>;
 }
 
-// All component names found in MDX content that aren't yet ported
+// Legacy component names still referenced in MDX content, rendered as stubs
 const stubNames = [
   "AnthropicFact", "ArticleSources",
   "Badge",
@@ -51,7 +51,6 @@ const stubNames = [
   "TabItem", "Table", "TableBody", "TableCell", "TableHead", "TableHeader",
   "TableRow", "Tabs", "TagBrowser", "Tags", "TimelineViz", "TopicQuestionGrid",
   "TrajectoryLines",
-  "Code", "Steps", "Icon", "FileTree",
 ] as const;
 
 const stubs = Object.fromEntries(stubNames.map((name) => [name, Stub]));
