@@ -3,151 +3,151 @@
   "totalLinks": 172,
   "brokenLinks": [
     {
-      "file": "/home/user/longterm-wiki/content/docs/ai-transition-model/factors-ai-ownership-overview.mdx",
+      "file": "ai-transition-model/factors-ai-ownership-overview.mdx",
       "line": 16,
       "href": "/ai-transition-model-views/graph/",
       "text": "AI Transition Model Graph"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/ai-transition-model/factors-ai-ownership-overview.mdx",
+      "file": "ai-transition-model/factors-ai-ownership-overview.mdx",
       "line": 47,
       "href": "/ai-transition-model-views/graph/",
       "text": "AI Transition Model"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/ai-transition-model/factors-ai-uses-overview.mdx",
+      "file": "ai-transition-model/factors-ai-uses-overview.mdx",
       "line": 16,
       "href": "/ai-transition-model-views/graph/",
       "text": "AI Transition Model Graph"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/ai-transition-model/factors-ai-uses-overview.mdx",
+      "file": "ai-transition-model/factors-ai-uses-overview.mdx",
       "line": 47,
       "href": "/ai-transition-model-views/graph/",
       "text": "AI Transition Model"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/ai-transition-model/index.mdx",
+      "file": "ai-transition-model/index.mdx",
       "line": 33,
       "href": "/ai-transition-model-views/graph/",
       "text": "Graph View"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/ai-transition-model/index.mdx",
+      "file": "ai-transition-model/index.mdx",
       "line": 34,
       "href": "/ai-transition-model-views/data/",
       "text": "Data View"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "file": "guides/interactive-views.mdx",
       "line": 26,
       "href": "/tables/",
       "text": "Tables Gallery"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "file": "guides/interactive-views.mdx",
       "line": 26,
       "href": "/diagrams/",
       "text": "Cause-Effect Diagrams"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "file": "guides/interactive-views.mdx",
       "line": 33,
       "href": "/knowledge-base/architecture-scenarios/table/",
       "text": "Architecture Scenarios Table"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "file": "guides/interactive-views.mdx",
       "line": 34,
       "href": "/knowledge-base/deployment-architectures/table/",
       "text": "Deployment Architectures Table"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "file": "guides/interactive-views.mdx",
       "line": 40,
       "href": "/knowledge-base/responses/safety-generalizability/table/",
       "text": "Safety Generalizability Table"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "file": "guides/interactive-views.mdx",
       "line": 41,
       "href": "/knowledge-base/responses/safety-generalizability/matrix/",
       "text": "Safety × Architecture Matrix"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "file": "guides/interactive-views.mdx",
       "line": 42,
       "href": "/knowledge-base/responses/safety-generalizability/graph/",
       "text": "Safety Generalizability Graph"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "file": "guides/interactive-views.mdx",
       "line": 54,
       "href": "/knowledge-base/models/eval-types/table/",
       "text": "Eval Types Table"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "file": "guides/interactive-views.mdx",
       "line": 60,
       "href": "/diagrams/master-graph/",
       "text": "Master Graph"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/guides/interactive-views.mdx",
+      "file": "guides/interactive-views.mdx",
       "line": 61,
       "href": "/ai-transition-model-views/",
       "text": "AI Transition Model Views"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/index.mdx",
+      "file": "index.mdx",
       "line": 63,
       "href": "/explore/",
       "text": "Browse all content →"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/internal/cause-effect-diagrams.mdx",
+      "file": "internal/cause-effect-diagrams.mdx",
       "line": 45,
       "href": "/diagrams/",
       "text": "/diagrams"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/internal/reports/causal-diagram-visualization.mdx",
+      "file": "internal/reports/causal-diagram-visualization.mdx",
       "line": 316,
       "href": "/diagrams/master-graph/",
       "text": "Master Graph Viewer"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/internal/reports/causal-diagram-visualization.mdx",
+      "file": "internal/reports/causal-diagram-visualization.mdx",
       "line": 330,
       "href": "/diagrams/master-graph/",
       "text": "/diagrams/master-graph"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/internal/reports/causal-diagram-visualization.mdx",
+      "file": "internal/reports/causal-diagram-visualization.mdx",
       "line": 331,
       "href": "/diagrams/master-graph?level=interactive",
       "text": "/diagrams/master-graph?level=interactive"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/internal/reports/causal-diagram-visualization.mdx",
+      "file": "internal/reports/causal-diagram-visualization.mdx",
       "line": 332,
       "href": "/diagrams/master-graph?level=expanded",
       "text": "/diagrams/master-graph?level=expanded"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/internal/reports/causal-diagram-visualization.mdx",
+      "file": "internal/reports/causal-diagram-visualization.mdx",
       "line": 333,
       "href": "/diagrams/master-graph?level=detailed",
       "text": "/diagrams/master-graph?level=detailed"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/knowledge-base/index.mdx",
+      "file": "knowledge-base/index.mdx",
       "line": 61,
       "href": "/explore/",
       "text": "Explore page"
     },
     {
-      "file": "/home/user/longterm-wiki/content/docs/knowledge-base/responses/biosecurity-overview.mdx",
+      "file": "knowledge-base/responses/biosecurity-overview.mdx",
       "line": 98,
       "href": "/knowledge-base/reports/ea-biosecurity-scope/",
       "text": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?"
