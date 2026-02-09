@@ -31,7 +31,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const args = process.argv.slice(2);
-const CI_MODE = args.includes('--ci');
+const CI_MODE = args.includes('--ci') || process.env.CI === 'true';
 const FAIL_FAST = args.includes('--fail-fast');
 const FIX_MODE = args.includes('--fix');
 
