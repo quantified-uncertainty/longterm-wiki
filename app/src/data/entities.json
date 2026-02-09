@@ -32866,6 +32866,23 @@
     "numericId": "E390"
   },
   {
+    "id": "goal-misgeneralization-research",
+    "type": "approach",
+    "title": "Goal Misgeneralization Research",
+    "description": "Research into how learned goals fail to generalize correctly to new situations, a core alignment problem where AI systems pursue proxy objectives that diverge from intended goals when deployed outside their training distribution.",
+    "relatedEntries": [
+      {
+        "id": "goal-misgeneralization",
+        "type": "risk"
+      }
+    ],
+    "clusters": [
+      "alignment"
+    ],
+    "lastUpdated": "2026-02",
+    "numericId": "E633"
+  },
+  {
     "id": "authentication-collapse",
     "type": "risk",
     "title": "Authentication Collapse",

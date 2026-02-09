@@ -334,7 +334,7 @@
         {
           "id": "large-language-models",
           "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 21
         },
         {
@@ -360,6 +360,212 @@
           "title": "Agentic AI",
           "path": "/knowledge-base/capabilities/agentic-ai/",
           "similarity": 16
+        }
+      ]
+    }
+  },
+  {
+    "id": "large-language-models",
+    "path": "/knowledge-base/capabilities/large-language-models/",
+    "filePath": "knowledge-base/capabilities/large-language-models.mdx",
+    "title": "Large Language Models",
+    "quality": 62,
+    "importance": 72,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-01-29",
+    "llmSummary": "Comprehensive assessment of LLM capabilities showing training costs growing 2.4x/year ($78-191M for frontier models, though DeepSeek achieved near-parity at $6M), o3 reaching 91.6% on AIME and 87.5% on ARC-AGI, and frontier models demonstrating in-context scheming with 85%+ deception persistence. Deployment scaled to 800-900M weekly ChatGPT users while deliberative alignment shows ~30x reduction in scheming.",
+    "description": "Transformer-based models trained on massive text datasets that exhibit emergent capabilities and pose significant safety challenges. Training costs have grown 2.4x/year since 2016 (GPT-4: $78-100M, Gemini Ultra: $191M), while DeepSeek R1 achieved near-parity at ~$6M. Frontier models demonstrate in-context scheming (o1 maintains deception in 85%+ of follow-ups) and unprecedented capability gains (o3: 91.6% AIME, 87.5% ARC-AGI). ChatGPT reached 800-900M weekly active users by late 2025.",
+    "ratings": {
+      "novelty": 4.2,
+      "rigor": 6.8,
+      "actionability": 5.5,
+      "completeness": 7.5
+    },
+    "category": "capabilities",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety",
+      "governance"
+    ],
+    "metrics": {
+      "wordCount": 3686,
+      "tableCount": 16,
+      "diagramCount": 3,
+      "internalLinks": 23,
+      "externalLinks": 40,
+      "bulletRatio": 0.05,
+      "sectionCount": 26,
+      "hasOverview": true,
+      "structuralScore": 15
+    },
+    "suggestedQuality": 100,
+    "wordCount": 3686,
+    "unconvertedLinks": [
+      {
+        "text": "OpenAI",
+        "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
+        "resourceId": "bf92f3d905c3de0d",
+        "resourceTitle": "announced December 2024"
+      },
+      {
+        "text": "Stanford HAI 2025",
+        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
+        "resourceId": "da87f2b213eb9272",
+        "resourceTitle": "Stanford AI Index 2025"
+      },
+      {
+        "text": "Stanford HAI 2025",
+        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance",
+        "resourceId": "1a26f870e37dcc68",
+        "resourceTitle": "Technical Performance - 2025 AI Index Report"
+      },
+      {
+        "text": "training compute growing 4-5x per year from 2010 to 2024",
+        "url": "https://epoch.ai/trends",
+        "resourceId": "b029bfc231e620cc",
+        "resourceTitle": "Epoch AI"
+      },
+      {
+        "text": "Stanford HAI 2025",
+        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
+        "resourceId": "da87f2b213eb9272",
+        "resourceTitle": "Stanford AI Index 2025"
+      },
+      {
+        "text": "o3 achieved 91.6%",
+        "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
+        "resourceId": "bf92f3d905c3de0d",
+        "resourceTitle": "announced December 2024"
+      },
+      {
+        "text": "ARC-AGI",
+        "url": "https://arcprize.org/blog/oai-o3-pub-breakthrough",
+        "resourceId": "457fa3b0b79d8812",
+        "resourceTitle": "o3 scores 87.5% on ARC-AGI"
+      },
+      {
+        "text": "OpenAI",
+        "url": "https://openai.com/index/detecting-and-reducing-scheming-in-ai-models/",
+        "resourceId": "b3f335edccfc5333",
+        "resourceTitle": "OpenAI Preparedness Framework"
+      },
+      {
+        "text": "OpenAI's approach",
+        "url": "https://openai.com/index/detecting-and-reducing-scheming-in-ai-models/",
+        "resourceId": "b3f335edccfc5333",
+        "resourceTitle": "OpenAI Preparedness Framework"
+      },
+      {
+        "text": "Anthropic's alignment faking research",
+        "url": "https://www.anthropic.com/research",
+        "resourceId": "f771d4f56ad4dbaa",
+        "resourceTitle": "Anthropic's Work on AI Safety"
+      },
+      {
+        "text": "o3's breakthrough",
+        "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
+        "resourceId": "bf92f3d905c3de0d",
+        "resourceTitle": "announced December 2024"
+      },
+      {
+        "text": "Novel task adaptation",
+        "url": "https://arcprize.org/blog/oai-o3-pub-breakthrough",
+        "resourceId": "457fa3b0b79d8812",
+        "resourceTitle": "o3 scores 87.5% on ARC-AGI"
+      },
+      {
+        "text": "Stanford HAI AI Index 2025",
+        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
+        "resourceId": "da87f2b213eb9272",
+        "resourceTitle": "Stanford AI Index 2025"
+      },
+      {
+        "text": "Stanford HAI AI Index 2025",
+        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
+        "resourceId": "da87f2b213eb9272",
+        "resourceTitle": "Stanford AI Index 2025"
+      },
+      {
+        "text": "DeepMind's Chinchilla paper",
+        "url": "https://arxiv.org/abs/2203.15556",
+        "resourceId": "46fd66187ec3e6ae",
+        "resourceTitle": "Hoffmann et al. (2022)"
+      },
+      {
+        "text": "Stanford HAI 2025",
+        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
+        "resourceId": "da87f2b213eb9272",
+        "resourceTitle": "Stanford AI Index 2025"
+      },
+      {
+        "text": "Apollo Research",
+        "url": "https://www.apolloresearch.ai/blog/more-capable-models-are-better-at-in-context-scheming/",
+        "resourceId": "80c6d6eca17dc925",
+        "resourceTitle": "More capable models scheme at higher rates"
+      },
+      {
+        "text": "OpenAI",
+        "url": "https://openai.com/index/detecting-and-reducing-scheming-in-ai-models/",
+        "resourceId": "b3f335edccfc5333",
+        "resourceTitle": "OpenAI Preparedness Framework"
+      },
+      {
+        "text": "Stanford HAI 2025",
+        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
+        "resourceId": "da87f2b213eb9272",
+        "resourceTitle": "Stanford AI Index 2025"
+      },
+      {
+        "text": "Anthropic's work on sparse autoencoders",
+        "url": "https://www.anthropic.com/research",
+        "resourceId": "f771d4f56ad4dbaa",
+        "resourceTitle": "Anthropic's Work on AI Safety"
+      },
+      {
+        "text": "Stanford HAI AI Index 2025",
+        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
+        "resourceId": "da87f2b213eb9272",
+        "resourceTitle": "Stanford AI Index 2025"
+      }
+    ],
+    "unconvertedLinkCount": 21,
+    "convertedLinkCount": 7,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 21,
+      "similarPages": [
+        {
+          "id": "language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/language-models/",
+          "similarity": 21
+        },
+        {
+          "id": "reasoning",
+          "title": "Reasoning and Planning",
+          "path": "/knowledge-base/capabilities/reasoning/",
+          "similarity": 20
+        },
+        {
+          "id": "thresholds",
+          "title": "Compute Thresholds",
+          "path": "/knowledge-base/responses/thresholds/",
+          "similarity": 19
+        },
+        {
+          "id": "agentic-ai",
+          "title": "Agentic AI",
+          "path": "/knowledge-base/capabilities/agentic-ai/",
+          "similarity": 18
+        },
+        {
+          "id": "self-improvement",
+          "title": "Self-Improvement and Recursive Enhancement",
+          "path": "/knowledge-base/capabilities/self-improvement/",
+          "similarity": 18
         }
       ]
     }
@@ -1171,7 +1377,7 @@
         {
           "id": "large-language-models",
           "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 18
         },
         {
@@ -1675,9 +1881,9 @@
           "similarity": 13
         },
         {
-          "id": "solutions",
-          "title": "Solution Cruxes",
-          "path": "/knowledge-base/cruxes/solutions/",
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 13
         }
       ]
@@ -2415,15 +2621,15 @@
           "similarity": 13
         },
         {
-          "id": "structural-risks",
-          "title": "Structural Risk Cruxes",
-          "path": "/knowledge-base/cruxes/structural-risks/",
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 12
         },
         {
-          "id": "pause-debate",
-          "title": "Should We Pause AI Development?",
-          "path": "/knowledge-base/debates/pause-debate/",
+          "id": "structural-risks",
+          "title": "Structural Risk Cruxes",
+          "path": "/knowledge-base/cruxes/structural-risks/",
           "similarity": 12
         }
       ]
@@ -3028,7 +3234,7 @@
         {
           "id": "large-language-models",
           "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 14
         },
         {
@@ -3388,7 +3594,7 @@
         {
           "id": "large-language-models",
           "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 17
         },
         {
@@ -3540,7 +3746,7 @@
         {
           "id": "large-language-models",
           "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 15
         },
         {
@@ -3554,212 +3760,6 @@
           "title": "Novel / Unknown Approaches",
           "path": "/knowledge-base/intelligence-paradigms/novel-unknown/",
           "similarity": 14
-        }
-      ]
-    }
-  },
-  {
-    "id": "large-language-models",
-    "path": "/knowledge-base/foundation-models/large-language-models/",
-    "filePath": "knowledge-base/foundation-models/large-language-models.mdx",
-    "title": "Large Language Models",
-    "quality": 62,
-    "importance": 72,
-    "tractability": null,
-    "neglectedness": null,
-    "uncertainty": null,
-    "causalLevel": null,
-    "lastUpdated": "2026-01-29",
-    "llmSummary": "Comprehensive assessment of LLM capabilities showing training costs growing 2.4x/year ($78-191M for frontier models, though DeepSeek achieved near-parity at $6M), o3 reaching 91.6% on AIME and 87.5% on ARC-AGI, and frontier models demonstrating in-context scheming with 85%+ deception persistence. Deployment scaled to 800-900M weekly ChatGPT users while deliberative alignment shows ~30x reduction in scheming.",
-    "description": "Transformer-based models trained on massive text datasets that exhibit emergent capabilities and pose significant safety challenges. Training costs have grown 2.4x/year since 2016 (GPT-4: $78-100M, Gemini Ultra: $191M), while DeepSeek R1 achieved near-parity at ~$6M. Frontier models demonstrate in-context scheming (o1 maintains deception in 85%+ of follow-ups) and unprecedented capability gains (o3: 91.6% AIME, 87.5% ARC-AGI). ChatGPT reached 800-900M weekly active users by late 2025.",
-    "ratings": {
-      "novelty": 4.2,
-      "rigor": 6.8,
-      "actionability": 5.5,
-      "completeness": 7.5
-    },
-    "category": "foundation-models",
-    "subcategory": null,
-    "clusters": [
-      "ai-safety",
-      "governance"
-    ],
-    "metrics": {
-      "wordCount": 3686,
-      "tableCount": 16,
-      "diagramCount": 3,
-      "internalLinks": 23,
-      "externalLinks": 40,
-      "bulletRatio": 0.05,
-      "sectionCount": 26,
-      "hasOverview": true,
-      "structuralScore": 15
-    },
-    "suggestedQuality": 100,
-    "wordCount": 3686,
-    "unconvertedLinks": [
-      {
-        "text": "OpenAI",
-        "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
-        "resourceId": "bf92f3d905c3de0d",
-        "resourceTitle": "announced December 2024"
-      },
-      {
-        "text": "Stanford HAI 2025",
-        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
-        "resourceId": "da87f2b213eb9272",
-        "resourceTitle": "Stanford AI Index 2025"
-      },
-      {
-        "text": "Stanford HAI 2025",
-        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance",
-        "resourceId": "1a26f870e37dcc68",
-        "resourceTitle": "Technical Performance - 2025 AI Index Report"
-      },
-      {
-        "text": "training compute growing 4-5x per year from 2010 to 2024",
-        "url": "https://epoch.ai/trends",
-        "resourceId": "b029bfc231e620cc",
-        "resourceTitle": "Epoch AI"
-      },
-      {
-        "text": "Stanford HAI 2025",
-        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
-        "resourceId": "da87f2b213eb9272",
-        "resourceTitle": "Stanford AI Index 2025"
-      },
-      {
-        "text": "o3 achieved 91.6%",
-        "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
-        "resourceId": "bf92f3d905c3de0d",
-        "resourceTitle": "announced December 2024"
-      },
-      {
-        "text": "ARC-AGI",
-        "url": "https://arcprize.org/blog/oai-o3-pub-breakthrough",
-        "resourceId": "457fa3b0b79d8812",
-        "resourceTitle": "o3 scores 87.5% on ARC-AGI"
-      },
-      {
-        "text": "OpenAI",
-        "url": "https://openai.com/index/detecting-and-reducing-scheming-in-ai-models/",
-        "resourceId": "b3f335edccfc5333",
-        "resourceTitle": "OpenAI Preparedness Framework"
-      },
-      {
-        "text": "OpenAI's approach",
-        "url": "https://openai.com/index/detecting-and-reducing-scheming-in-ai-models/",
-        "resourceId": "b3f335edccfc5333",
-        "resourceTitle": "OpenAI Preparedness Framework"
-      },
-      {
-        "text": "Anthropic's alignment faking research",
-        "url": "https://www.anthropic.com/research",
-        "resourceId": "f771d4f56ad4dbaa",
-        "resourceTitle": "Anthropic's Work on AI Safety"
-      },
-      {
-        "text": "o3's breakthrough",
-        "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
-        "resourceId": "bf92f3d905c3de0d",
-        "resourceTitle": "announced December 2024"
-      },
-      {
-        "text": "Novel task adaptation",
-        "url": "https://arcprize.org/blog/oai-o3-pub-breakthrough",
-        "resourceId": "457fa3b0b79d8812",
-        "resourceTitle": "o3 scores 87.5% on ARC-AGI"
-      },
-      {
-        "text": "Stanford HAI AI Index 2025",
-        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
-        "resourceId": "da87f2b213eb9272",
-        "resourceTitle": "Stanford AI Index 2025"
-      },
-      {
-        "text": "Stanford HAI AI Index 2025",
-        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
-        "resourceId": "da87f2b213eb9272",
-        "resourceTitle": "Stanford AI Index 2025"
-      },
-      {
-        "text": "DeepMind's Chinchilla paper",
-        "url": "https://arxiv.org/abs/2203.15556",
-        "resourceId": "46fd66187ec3e6ae",
-        "resourceTitle": "Hoffmann et al. (2022)"
-      },
-      {
-        "text": "Stanford HAI 2025",
-        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
-        "resourceId": "da87f2b213eb9272",
-        "resourceTitle": "Stanford AI Index 2025"
-      },
-      {
-        "text": "Apollo Research",
-        "url": "https://www.apolloresearch.ai/blog/more-capable-models-are-better-at-in-context-scheming/",
-        "resourceId": "80c6d6eca17dc925",
-        "resourceTitle": "More capable models scheme at higher rates"
-      },
-      {
-        "text": "OpenAI",
-        "url": "https://openai.com/index/detecting-and-reducing-scheming-in-ai-models/",
-        "resourceId": "b3f335edccfc5333",
-        "resourceTitle": "OpenAI Preparedness Framework"
-      },
-      {
-        "text": "Stanford HAI 2025",
-        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
-        "resourceId": "da87f2b213eb9272",
-        "resourceTitle": "Stanford AI Index 2025"
-      },
-      {
-        "text": "Anthropic's work on sparse autoencoders",
-        "url": "https://www.anthropic.com/research",
-        "resourceId": "f771d4f56ad4dbaa",
-        "resourceTitle": "Anthropic's Work on AI Safety"
-      },
-      {
-        "text": "Stanford HAI AI Index 2025",
-        "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report",
-        "resourceId": "da87f2b213eb9272",
-        "resourceTitle": "Stanford AI Index 2025"
-      }
-    ],
-    "unconvertedLinkCount": 21,
-    "convertedLinkCount": 7,
-    "backlinkCount": 0,
-    "redundancy": {
-      "maxSimilarity": 21,
-      "similarPages": [
-        {
-          "id": "language-models",
-          "title": "Large Language Models",
-          "path": "/knowledge-base/capabilities/language-models/",
-          "similarity": 21
-        },
-        {
-          "id": "reasoning",
-          "title": "Reasoning and Planning",
-          "path": "/knowledge-base/capabilities/reasoning/",
-          "similarity": 20
-        },
-        {
-          "id": "thresholds",
-          "title": "Compute Thresholds",
-          "path": "/knowledge-base/responses/thresholds/",
-          "similarity": 19
-        },
-        {
-          "id": "agentic-ai",
-          "title": "Agentic AI",
-          "path": "/knowledge-base/capabilities/agentic-ai/",
-          "similarity": 18
-        },
-        {
-          "id": "self-improvement",
-          "title": "Self-Improvement and Recursive Enhancement",
-          "path": "/knowledge-base/capabilities/self-improvement/",
-          "similarity": 18
         }
       ]
     }
@@ -5047,7 +5047,7 @@
         {
           "id": "large-language-models",
           "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 10
         }
       ]
@@ -5439,7 +5439,7 @@
         {
           "id": "large-language-models",
           "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 15
         },
         {
@@ -7108,6 +7108,12 @@
           "similarity": 17
         },
         {
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
+          "similarity": 17
+        },
+        {
           "id": "reasoning",
           "title": "Reasoning and Planning",
           "path": "/knowledge-base/capabilities/reasoning/",
@@ -7117,12 +7123,6 @@
           "id": "self-improvement",
           "title": "Self-Improvement and Recursive Enhancement",
           "path": "/knowledge-base/capabilities/self-improvement/",
-          "similarity": 17
-        },
-        {
-          "id": "large-language-models",
-          "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
           "similarity": 17
         }
       ]
@@ -7181,15 +7181,15 @@
           "similarity": 15
         },
         {
-          "id": "agi-development",
-          "title": "AGI Development",
-          "path": "/knowledge-base/forecasting/agi-development/",
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 14
         },
         {
-          "id": "large-language-models",
-          "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "id": "agi-development",
+          "title": "AGI Development",
+          "path": "/knowledge-base/forecasting/agi-development/",
           "similarity": 14
         },
         {
@@ -8270,6 +8270,48 @@
           "similarity": 13
         }
       ]
+    }
+  },
+  {
+    "id": "ai-timelines",
+    "path": "/knowledge-base/models/ai-timelines/",
+    "filePath": "knowledge-base/models/ai-timelines.mdx",
+    "title": "AI Timelines",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "models",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
     }
   },
   {
@@ -9529,7 +9571,7 @@
         {
           "id": "large-language-models",
           "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 18
         },
         {
@@ -10737,6 +10779,48 @@
           "similarity": 14
         }
       ]
+    }
+  },
+  {
+    "id": "fast-takeoff",
+    "path": "/knowledge-base/models/fast-takeoff/",
+    "filePath": "knowledge-base/models/fast-takeoff.mdx",
+    "title": "Fast Takeoff",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "models",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 2,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
     }
   },
   {
@@ -13775,6 +13859,48 @@
     }
   },
   {
+    "id": "scaling-laws",
+    "path": "/knowledge-base/models/scaling-laws/",
+    "filePath": "knowledge-base/models/scaling-laws.mdx",
+    "title": "Scaling Laws",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "models",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 2,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "scheming-likelihood-model",
     "path": "/knowledge-base/models/scheming-likelihood-model/",
     "filePath": "knowledge-base/models/scheming-likelihood-model.mdx",
@@ -14412,6 +14538,48 @@
           "similarity": 17
         }
       ]
+    }
+  },
+  {
+    "id": "transformative-ai",
+    "path": "/knowledge-base/models/transformative-ai/",
+    "filePath": "knowledge-base/models/transformative-ai.mdx",
+    "title": "Transformative AI",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "models",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
     }
   },
   {
@@ -15468,7 +15636,7 @@
         {
           "id": "large-language-models",
           "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 12
         }
       ]
@@ -15839,9 +16007,9 @@
           "similarity": 12
         },
         {
-          "id": "agi-development",
-          "title": "AGI Development",
-          "path": "/knowledge-base/forecasting/agi-development/",
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 11
         }
       ]
@@ -16475,7 +16643,7 @@
         {
           "id": "ea-biosecurity-scope",
           "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?",
-          "path": "/knowledge-base/reports/ea-biosecurity-scope/",
+          "path": "/knowledge-base/responses/ea-biosecurity-scope/",
           "similarity": 13
         },
         {
@@ -16556,7 +16724,7 @@
         {
           "id": "ea-biosecurity-scope",
           "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?",
-          "path": "/knowledge-base/reports/ea-biosecurity-scope/",
+          "path": "/knowledge-base/responses/ea-biosecurity-scope/",
           "similarity": 15
         },
         {
@@ -18298,6 +18466,12 @@
           "similarity": 16
         },
         {
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
+          "similarity": 15
+        },
+        {
           "id": "reasoning",
           "title": "Reasoning and Planning",
           "path": "/knowledge-base/capabilities/reasoning/",
@@ -18307,12 +18481,6 @@
           "id": "self-improvement",
           "title": "Self-Improvement and Recursive Enhancement",
           "path": "/knowledge-base/capabilities/self-improvement/",
-          "similarity": 15
-        },
-        {
-          "id": "large-language-models",
-          "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
           "similarity": 15
         }
       ]
@@ -18980,7 +19148,7 @@
         {
           "id": "large-language-models",
           "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 13
         },
         {
@@ -23582,15 +23750,15 @@
           "similarity": 18
         },
         {
-          "id": "agi-development",
-          "title": "AGI Development",
-          "path": "/knowledge-base/forecasting/agi-development/",
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 16
         },
         {
-          "id": "large-language-models",
-          "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "id": "agi-development",
+          "title": "AGI Development",
+          "path": "/knowledge-base/forecasting/agi-development/",
           "similarity": 16
         },
         {
@@ -24017,7 +24185,7 @@
         {
           "id": "ea-biosecurity-scope",
           "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?",
-          "path": "/knowledge-base/reports/ea-biosecurity-scope/",
+          "path": "/knowledge-base/responses/ea-biosecurity-scope/",
           "similarity": 18
         },
         {
@@ -24104,7 +24272,7 @@
         {
           "id": "ea-biosecurity-scope",
           "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?",
-          "path": "/knowledge-base/reports/ea-biosecurity-scope/",
+          "path": "/knowledge-base/responses/ea-biosecurity-scope/",
           "similarity": 12
         },
         {
@@ -29257,133 +29425,45 @@
     }
   },
   {
-    "id": "ea-biosecurity-scope",
-    "path": "/knowledge-base/reports/ea-biosecurity-scope/",
-    "filePath": "knowledge-base/reports/ea-biosecurity-scope.mdx",
-    "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?",
-    "quality": 55,
-    "importance": 72,
+    "id": "adversarial-robustness",
+    "path": "/knowledge-base/responses/adversarial-robustness/",
+    "filePath": "knowledge-base/responses/adversarial-robustness.mdx",
+    "title": "Adversarial Robustness",
+    "quality": null,
+    "importance": null,
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2026-02-06",
+    "lastUpdated": "2026-02-09",
     "llmSummary": null,
-    "description": "An analysis of the full EA/x-risk biosecurity portfolio, examining whether the community's work consists primarily of AI capability restrictions or encompasses a broader set of interventions including DNA synthesis screening, pathogen surveillance, medical countermeasures, and governance reform.",
-    "ratings": {
-      "novelty": 6,
-      "rigor": 5,
-      "actionability": 6,
-      "completeness": 5
-    },
-    "category": "reports",
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
     "subcategory": null,
     "clusters": [
-      "biorisks",
-      "ai-safety",
-      "governance",
-      "community"
+      "ai-safety"
     ],
     "metrics": {
-      "wordCount": 2034,
-      "tableCount": 5,
-      "diagramCount": 1,
-      "internalLinks": 19,
-      "externalLinks": 30,
-      "bulletRatio": 0.18,
-      "sectionCount": 19,
-      "hasOverview": true,
-      "structuralScore": 14
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
     },
-    "suggestedQuality": 93,
-    "wordCount": 2034,
-    "unconvertedLinks": [
-      {
-        "text": "SecureDNA platform",
-        "url": "https://securedna.org/",
-        "resourceId": "dc743c49d6d32327",
-        "resourceTitle": "Swiss foundation"
-      },
-      {
-        "text": "OSTP Framework",
-        "url": "https://bidenwhitehouse.archives.gov/ostp/news-updates/2024/04/29/framework-for-nucleic-acid-synthesis-screening/",
-        "resourceId": "14ff22ab7e571166",
-        "resourceTitle": "Framework for Nucleic Acid Synthesis Screening"
-      },
-      {
-        "text": "NAO methodology",
-        "url": "https://naobservatory.org/",
-        "resourceId": "66f6f860844300d7",
-        "resourceTitle": "collaboration between SecureBio and MIT"
-      },
-      {
-        "text": "RAND 2024 study",
-        "url": "https://www.rand.org/pubs/research_reports/RRA2977-2.html",
-        "resourceId": "0fe4cfa7ca5f2270",
-        "resourceTitle": "RAND Corporation study"
-      },
-      {
-        "text": "OpenAI biological threat study",
-        "url": "https://openai.com/index/building-an-early-warning-system-for-llm-aided-biological-threat-creation/",
-        "resourceId": "2f918741de446a84",
-        "resourceTitle": "Building an early warning system for LLM-aided biological threat creation"
-      },
-      {
-        "text": "Far-UVC efficacy - Scientific Reports",
-        "url": "https://www.nature.com/articles/s41598-024-57441-z",
-        "resourceId": "3156632ea73ed418",
-        "resourceTitle": "222 nm far-UVC light markedly reduces infectious airborne virus in an occupied room"
-      },
-      {
-        "text": "EXHALE",
-        "url": "https://blueprintbiosecurity.org/building-the-evidence-base-for-far-uvc/",
-        "resourceId": "31dc1e265f5d31a6",
-        "resourceTitle": "Blueprint Biosecurity"
-      },
-      {
-        "text": "Far-UVC regulatory status",
-        "url": "https://en.wikipedia.org/wiki/Far-UVC",
-        "resourceId": "ae1d3425db815f91",
-        "resourceTitle": "Far-UVC"
-      }
-    ],
-    "unconvertedLinkCount": 8,
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
     "convertedLinkCount": 0,
-    "backlinkCount": 0,
+    "backlinkCount": 1,
     "redundancy": {
-      "maxSimilarity": 18,
-      "similarPages": [
-        {
-          "id": "securebio",
-          "title": "SecureBio",
-          "path": "/knowledge-base/organizations/securebio/",
-          "similarity": 18
-        },
-        {
-          "id": "bioweapons-ai-uplift",
-          "title": "AI Uplift Assessment Model",
-          "path": "/knowledge-base/models/bioweapons-ai-uplift/",
-          "similarity": 15
-        },
-        {
-          "id": "blueprint-biosecurity",
-          "title": "Blueprint Biosecurity",
-          "path": "/knowledge-base/organizations/blueprint-biosecurity/",
-          "similarity": 15
-        },
-        {
-          "id": "bioweapons",
-          "title": "Bioweapons",
-          "path": "/knowledge-base/risks/bioweapons/",
-          "similarity": 15
-        },
-        {
-          "id": "nti-bio",
-          "title": "NTI | bio (Nuclear Threat Initiative - Biological Program)",
-          "path": "/knowledge-base/organizations/nti-bio/",
-          "similarity": 14
-        }
-      ]
+      "maxSimilarity": 0,
+      "similarPages": []
     }
   },
   {
@@ -29847,6 +29927,48 @@
     }
   },
   {
+    "id": "ai-executive-order",
+    "path": "/knowledge-base/responses/ai-executive-order/",
+    "filePath": "knowledge-base/responses/ai-executive-order.mdx",
+    "title": "AI Executive Order",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 2,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "ai-for-human-reasoning-fellowship",
     "path": "/knowledge-base/responses/ai-for-human-reasoning-fellowship/",
     "filePath": "knowledge-base/responses/ai-for-human-reasoning-fellowship.mdx",
@@ -30174,6 +30296,48 @@
           "similarity": 22
         }
       ]
+    }
+  },
+  {
+    "id": "ai-safety-summit",
+    "path": "/knowledge-base/responses/ai-safety-summit/",
+    "filePath": "knowledge-base/responses/ai-safety-summit.mdx",
+    "title": "AI Safety Summit",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
     }
   },
   {
@@ -31087,6 +31251,48 @@
     }
   },
   {
+    "id": "benchmarking",
+    "path": "/knowledge-base/responses/benchmarking/",
+    "filePath": "knowledge-base/responses/benchmarking.mdx",
+    "title": "Benchmarking",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "biosecurity-overview",
     "path": "/knowledge-base/responses/biosecurity-overview/",
     "filePath": "knowledge-base/responses/biosecurity-overview.mdx",
@@ -31136,7 +31342,7 @@
         {
           "id": "ea-biosecurity-scope",
           "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?",
-          "path": "/knowledge-base/reports/ea-biosecurity-scope/",
+          "path": "/knowledge-base/responses/ea-biosecurity-scope/",
           "similarity": 13
         },
         {
@@ -31964,9 +32170,9 @@
           "similarity": 12
         },
         {
-          "id": "goal-misgeneralization",
+          "id": "goal-misgeneralization-research",
           "title": "Goal Misgeneralization Research",
-          "path": "/knowledge-base/responses/goal-misgeneralization/",
+          "path": "/knowledge-base/responses/goal-misgeneralization-research/",
           "similarity": 12
         },
         {
@@ -32765,6 +32971,90 @@
     }
   },
   {
+    "id": "compute-monitoring",
+    "path": "/knowledge-base/responses/compute-monitoring/",
+    "filePath": "knowledge-base/responses/compute-monitoring.mdx",
+    "title": "Compute Monitoring",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
+    "id": "compute-thresholds",
+    "path": "/knowledge-base/responses/compute-thresholds/",
+    "filePath": "knowledge-base/responses/compute-thresholds.mdx",
+    "title": "Compute Thresholds",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "constitutional-ai",
     "path": "/knowledge-base/responses/constitutional-ai/",
     "filePath": "knowledge-base/responses/constitutional-ai.mdx",
@@ -32950,6 +33240,48 @@
           "similarity": 10
         }
       ]
+    }
+  },
+  {
+    "id": "content-moderation",
+    "path": "/knowledge-base/responses/content-moderation/",
+    "filePath": "knowledge-base/responses/content-moderation.mdx",
+    "title": "Content Moderation",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
     }
   },
   {
@@ -34522,6 +34854,136 @@
           "title": "Good Judgment",
           "path": "/knowledge-base/organizations/good-judgment/",
           "similarity": 16
+        }
+      ]
+    }
+  },
+  {
+    "id": "ea-biosecurity-scope",
+    "path": "/knowledge-base/responses/ea-biosecurity-scope/",
+    "filePath": "knowledge-base/responses/ea-biosecurity-scope.mdx",
+    "title": "Is EA Biosecurity Work Limited to Restricting LLM Biological Use?",
+    "quality": 55,
+    "importance": 72,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-06",
+    "llmSummary": null,
+    "description": "An analysis of the full EA/x-risk biosecurity portfolio, examining whether the community's work consists primarily of AI capability restrictions or encompasses a broader set of interventions including DNA synthesis screening, pathogen surveillance, medical countermeasures, and governance reform.",
+    "ratings": {
+      "novelty": 6,
+      "rigor": 5,
+      "actionability": 6,
+      "completeness": 5
+    },
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "biorisks",
+      "ai-safety",
+      "governance",
+      "community"
+    ],
+    "metrics": {
+      "wordCount": 2034,
+      "tableCount": 5,
+      "diagramCount": 1,
+      "internalLinks": 19,
+      "externalLinks": 30,
+      "bulletRatio": 0.18,
+      "sectionCount": 19,
+      "hasOverview": true,
+      "structuralScore": 14
+    },
+    "suggestedQuality": 93,
+    "wordCount": 2034,
+    "unconvertedLinks": [
+      {
+        "text": "SecureDNA platform",
+        "url": "https://securedna.org/",
+        "resourceId": "dc743c49d6d32327",
+        "resourceTitle": "Swiss foundation"
+      },
+      {
+        "text": "OSTP Framework",
+        "url": "https://bidenwhitehouse.archives.gov/ostp/news-updates/2024/04/29/framework-for-nucleic-acid-synthesis-screening/",
+        "resourceId": "14ff22ab7e571166",
+        "resourceTitle": "Framework for Nucleic Acid Synthesis Screening"
+      },
+      {
+        "text": "NAO methodology",
+        "url": "https://naobservatory.org/",
+        "resourceId": "66f6f860844300d7",
+        "resourceTitle": "collaboration between SecureBio and MIT"
+      },
+      {
+        "text": "RAND 2024 study",
+        "url": "https://www.rand.org/pubs/research_reports/RRA2977-2.html",
+        "resourceId": "0fe4cfa7ca5f2270",
+        "resourceTitle": "RAND Corporation study"
+      },
+      {
+        "text": "OpenAI biological threat study",
+        "url": "https://openai.com/index/building-an-early-warning-system-for-llm-aided-biological-threat-creation/",
+        "resourceId": "2f918741de446a84",
+        "resourceTitle": "Building an early warning system for LLM-aided biological threat creation"
+      },
+      {
+        "text": "Far-UVC efficacy - Scientific Reports",
+        "url": "https://www.nature.com/articles/s41598-024-57441-z",
+        "resourceId": "3156632ea73ed418",
+        "resourceTitle": "222 nm far-UVC light markedly reduces infectious airborne virus in an occupied room"
+      },
+      {
+        "text": "EXHALE",
+        "url": "https://blueprintbiosecurity.org/building-the-evidence-base-for-far-uvc/",
+        "resourceId": "31dc1e265f5d31a6",
+        "resourceTitle": "Blueprint Biosecurity"
+      },
+      {
+        "text": "Far-UVC regulatory status",
+        "url": "https://en.wikipedia.org/wiki/Far-UVC",
+        "resourceId": "ae1d3425db815f91",
+        "resourceTitle": "Far-UVC"
+      }
+    ],
+    "unconvertedLinkCount": 8,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 18,
+      "similarPages": [
+        {
+          "id": "securebio",
+          "title": "SecureBio",
+          "path": "/knowledge-base/organizations/securebio/",
+          "similarity": 18
+        },
+        {
+          "id": "bioweapons-ai-uplift",
+          "title": "AI Uplift Assessment Model",
+          "path": "/knowledge-base/models/bioweapons-ai-uplift/",
+          "similarity": 15
+        },
+        {
+          "id": "blueprint-biosecurity",
+          "title": "Blueprint Biosecurity",
+          "path": "/knowledge-base/organizations/blueprint-biosecurity/",
+          "similarity": 15
+        },
+        {
+          "id": "bioweapons",
+          "title": "Bioweapons",
+          "path": "/knowledge-base/risks/bioweapons/",
+          "similarity": 15
+        },
+        {
+          "id": "nti-bio",
+          "title": "NTI | bio (Nuclear Threat Initiative - Biological Program)",
+          "path": "/knowledge-base/organizations/nti-bio/",
+          "similarity": 14
         }
       ]
     }
@@ -36457,6 +36919,48 @@
     }
   },
   {
+    "id": "field-building",
+    "path": "/knowledge-base/responses/field-building/",
+    "filePath": "knowledge-base/responses/field-building.mdx",
+    "title": "Field Building",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "forecastbench",
     "path": "/knowledge-base/responses/forecastbench/",
     "filePath": "knowledge-base/responses/forecastbench.mdx",
@@ -36625,18 +37129,18 @@
           "similarity": 13
         },
         {
-          "id": "goal-misgeneralization",
+          "id": "goal-misgeneralization-research",
           "title": "Goal Misgeneralization Research",
-          "path": "/knowledge-base/responses/goal-misgeneralization/",
+          "path": "/knowledge-base/responses/goal-misgeneralization-research/",
           "similarity": 13
         }
       ]
     }
   },
   {
-    "id": "goal-misgeneralization",
-    "path": "/knowledge-base/responses/goal-misgeneralization/",
-    "filePath": "knowledge-base/responses/goal-misgeneralization.mdx",
+    "id": "goal-misgeneralization-research",
+    "path": "/knowledge-base/responses/goal-misgeneralization-research/",
+    "filePath": "knowledge-base/responses/goal-misgeneralization-research.mdx",
     "title": "Goal Misgeneralization Research",
     "quality": 58,
     "importance": 72,
@@ -36765,39 +37269,39 @@
     ],
     "unconvertedLinkCount": 15,
     "convertedLinkCount": 0,
-    "backlinkCount": 8,
+    "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 23,
+      "maxSimilarity": 15,
       "similarPages": [
         {
-          "id": "mesa-optimization",
-          "title": "Mesa-Optimization",
-          "path": "/knowledge-base/risks/mesa-optimization/",
-          "similarity": 23
+          "id": "goal-misgeneralization-probability",
+          "title": "Goal Misgeneralization Probability Model",
+          "path": "/knowledge-base/models/goal-misgeneralization-probability/",
+          "similarity": 15
         },
         {
-          "id": "sharp-left-turn",
-          "title": "Sharp Left Turn",
-          "path": "/knowledge-base/risks/sharp-left-turn/",
-          "similarity": 22
+          "id": "reward-modeling",
+          "title": "Reward Modeling",
+          "path": "/knowledge-base/responses/reward-modeling/",
+          "similarity": 14
         },
         {
-          "id": "scheming",
-          "title": "Scheming",
-          "path": "/knowledge-base/risks/scheming/",
-          "similarity": 21
+          "id": "scheming-detection",
+          "title": "Scheming & Deception Detection",
+          "path": "/knowledge-base/responses/scheming-detection/",
+          "similarity": 14
         },
         {
-          "id": "situational-awareness",
-          "title": "Situational Awareness",
-          "path": "/knowledge-base/capabilities/situational-awareness/",
-          "similarity": 19
+          "id": "goal-misgeneralization",
+          "title": "Goal Misgeneralization",
+          "path": "/knowledge-base/risks/goal-misgeneralization/",
+          "similarity": 14
         },
         {
-          "id": "model-organisms-of-misalignment",
-          "title": "Model Organisms of Misalignment",
-          "path": "/knowledge-base/models/model-organisms-of-misalignment/",
-          "similarity": 19
+          "id": "cirl",
+          "title": "Cooperative IRL (CIRL)",
+          "path": "/knowledge-base/responses/cirl/",
+          "similarity": 13
         }
       ]
     }
@@ -37778,9 +38282,9 @@
           "similarity": 14
         },
         {
-          "id": "solutions",
-          "title": "Solution Cruxes",
-          "path": "/knowledge-base/cruxes/solutions/",
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 13
         }
       ]
@@ -39354,6 +39858,48 @@
     }
   },
   {
+    "id": "natural-abstractions",
+    "path": "/knowledge-base/responses/natural-abstractions/",
+    "filePath": "knowledge-base/responses/natural-abstractions.mdx",
+    "title": "Natural Abstractions",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "new-york-raise-act",
     "path": "/knowledge-base/responses/new-york-raise-act/",
     "filePath": "knowledge-base/responses/new-york-raise-act.mdx",
@@ -40315,15 +40861,15 @@
           "similarity": 19
         },
         {
-          "id": "reasoning",
-          "title": "Reasoning and Planning",
-          "path": "/knowledge-base/capabilities/reasoning/",
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 15
         },
         {
-          "id": "large-language-models",
-          "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "id": "reasoning",
+          "title": "Reasoning and Planning",
+          "path": "/knowledge-base/capabilities/reasoning/",
           "similarity": 15
         },
         {
@@ -40587,6 +41133,48 @@
           "similarity": 13
         }
       ]
+    }
+  },
+  {
+    "id": "prosaic-alignment",
+    "path": "/knowledge-base/responses/prosaic-alignment/",
+    "filePath": "knowledge-base/responses/prosaic-alignment.mdx",
+    "title": "Prosaic Alignment",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
     }
   },
   {
@@ -45413,6 +46001,48 @@
     }
   },
   {
+    "id": "value-learning",
+    "path": "/knowledge-base/responses/value-learning/",
+    "filePath": "knowledge-base/responses/value-learning.mdx",
+    "title": "Value Learning",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "voluntary-commitments",
     "path": "/knowledge-base/responses/voluntary-commitments/",
     "filePath": "knowledge-base/responses/voluntary-commitments.mdx",
@@ -46111,6 +46741,48 @@
     }
   },
   {
+    "id": "ai-takeover",
+    "path": "/knowledge-base/risks/ai-takeover/",
+    "filePath": "knowledge-base/risks/ai-takeover.mdx",
+    "title": "AI Takeover",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "risks",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 2,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "ai-welfare",
     "path": "/knowledge-base/risks/ai-welfare/",
     "filePath": "knowledge-base/risks/ai-welfare.mdx",
@@ -46786,6 +47458,48 @@
     }
   },
   {
+    "id": "autonomous-replication",
+    "path": "/knowledge-base/risks/autonomous-replication/",
+    "filePath": "knowledge-base/risks/autonomous-replication.mdx",
+    "title": "Autonomous Replication",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "risks",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "autonomous-weapons",
     "path": "/knowledge-base/risks/autonomous-weapons/",
     "filePath": "knowledge-base/risks/autonomous-weapons.mdx",
@@ -46863,6 +47577,48 @@
           "similarity": 16
         }
       ]
+    }
+  },
+  {
+    "id": "bio-risk",
+    "path": "/knowledge-base/risks/bio-risk/",
+    "filePath": "knowledge-base/risks/bio-risk.mdx",
+    "title": "Bio Risk",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "risks",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
     }
   },
   {
@@ -47248,6 +48004,48 @@
           "similarity": 20
         }
       ]
+    }
+  },
+  {
+    "id": "cyber-offense",
+    "path": "/knowledge-base/risks/cyber-offense/",
+    "filePath": "knowledge-base/risks/cyber-offense.mdx",
+    "title": "Cyber Offense",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "risks",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
     }
   },
   {
@@ -47773,6 +48571,48 @@
     }
   },
   {
+    "id": "dual-use",
+    "path": "/knowledge-base/risks/dual-use/",
+    "filePath": "knowledge-base/risks/dual-use.mdx",
+    "title": "Dual Use",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "risks",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 1,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "economic-disruption",
     "path": "/knowledge-base/risks/economic-disruption/",
     "filePath": "knowledge-base/risks/economic-disruption.mdx",
@@ -48026,9 +48866,9 @@
           "similarity": 17
         },
         {
-          "id": "reasoning",
-          "title": "Reasoning and Planning",
-          "path": "/knowledge-base/capabilities/reasoning/",
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 17
         }
       ]
@@ -48497,6 +49337,48 @@
     }
   },
   {
+    "id": "existential-risk",
+    "path": "/knowledge-base/risks/existential-risk/",
+    "filePath": "knowledge-base/risks/existential-risk.mdx",
+    "title": "Existential Risk",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "risks",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 2,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "expertise-atrophy",
     "path": "/knowledge-base/risks/expertise-atrophy/",
     "filePath": "knowledge-base/risks/expertise-atrophy.mdx",
@@ -48944,7 +49826,7 @@
     ],
     "unconvertedLinkCount": 29,
     "convertedLinkCount": 29,
-    "backlinkCount": 8,
+    "backlinkCount": 9,
     "redundancy": {
       "maxSimilarity": 23,
       "similarPages": [
@@ -50299,15 +51181,15 @@
       "maxSimilarity": 17,
       "similarPages": [
         {
-          "id": "solutions",
-          "title": "Solution Cruxes",
-          "path": "/knowledge-base/cruxes/solutions/",
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
           "similarity": 17
         },
         {
-          "id": "large-language-models",
-          "title": "Large Language Models",
-          "path": "/knowledge-base/foundation-models/large-language-models/",
+          "id": "solutions",
+          "title": "Solution Cruxes",
+          "path": "/knowledge-base/cruxes/solutions/",
           "similarity": 17
         },
         {
@@ -51509,6 +52391,48 @@
           "similarity": 16
         }
       ]
+    }
+  },
+  {
+    "id": "superintelligence",
+    "path": "/knowledge-base/risks/superintelligence/",
+    "filePath": "knowledge-base/risks/superintelligence.mdx",
+    "title": "Superintelligence",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-09",
+    "llmSummary": null,
+    "description": "TODO: Add description",
+    "ratings": null,
+    "category": "risks",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 7,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "wordCount": 7,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 4,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
     }
   },
   {

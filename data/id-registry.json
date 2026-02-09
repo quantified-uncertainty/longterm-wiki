@@ -1,5 +1,5 @@
 {
-  "_nextId": 633,
+  "_nextId": 634,
   "entities": {
     "E1": "adversarial-robustness",
     "E2": "agentic-ai",
@@ -632,6 +632,7 @@
     "E629": "suffering-lock-in",
     "E630": "surprise-threat-exposure",
     "E631": "technical-ai-safety",
-    "E632": "values"
+    "E632": "values",
+    "E633": "goal-misgeneralization-research"
   }
 }
