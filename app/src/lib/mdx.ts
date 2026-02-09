@@ -12,7 +12,6 @@ import remarkCallouts from "./remark-callouts";
 
 const CONTENT_DIR = path.resolve(process.cwd(), "../content/docs");
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
-const LONGTERM_DATA_DIR = path.resolve(process.cwd(), "../data");
 
 /**
  * Preprocess MDX source to strip import statements and Astro directives
@@ -38,9 +37,7 @@ export function preprocessMdx(source: string): string {
 let _pathRegistry: Record<string, string> | null = null;
 function getPathRegistry(): Record<string, string> {
   if (_pathRegistry) return _pathRegistry;
-  const localDbPath = path.join(LOCAL_DATA_DIR, "database.json");
-  const longtermDbPath = path.join(LONGTERM_DATA_DIR, "database.json");
-  const dbPath = fs.existsSync(localDbPath) ? localDbPath : longtermDbPath;
+  const dbPath = path.join(LOCAL_DATA_DIR, "database.json");
   try {
     const raw = fs.readFileSync(dbPath, "utf-8");
     const db = JSON.parse(raw);

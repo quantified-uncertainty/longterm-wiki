@@ -7,8 +7,13 @@
     "dev": "pnpm --filter longterm-next dev",
     "build": "pnpm --filter longterm-next build",
     "test": "pnpm --filter longterm-next test",
-    "validate": "cd . && node tooling/crux.mjs validate",
+    "validate": "node tooling/crux.mjs validate",
     "crux": "node tooling/crux.mjs"
+  },
+  "dependencies": {
+    "yaml": "^2.7.0",
+    "zod": "^3.24.2",
+    "js-yaml": "^4.1.0"
   },
   "engines": {
     "node": ">=20.0.0",

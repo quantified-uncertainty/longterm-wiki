@@ -30,6 +30,7 @@ import {
   Activity,
   Compass,
   Package,
+  Calendar,
 } from "lucide-react";
 
 type LucideIcon = React.ForwardRefExoticComponent<
@@ -220,6 +221,13 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
     iconColor: "text-blue-600 dark:text-blue-400",
     badgeColor: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
     headerColor: "#3b82f6",
+  },
+  event: {
+    label: "Event",
+    icon: Calendar,
+    iconColor: "text-rose-600 dark:text-rose-400",
+    badgeColor: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
+    headerColor: "#e11d48",
   },
 };
 

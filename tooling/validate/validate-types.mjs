@@ -9,7 +9,7 @@
  * Usage: node scripts/validate-types.mjs
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { getColors } from '../lib/output.mjs';
 
 const colors = getColors();
@@ -57,6 +57,12 @@ function getInfoBoxTypeLabels() {
 }
 
 function main() {
+  // Skip if running from the repo root (Next.js app uses entity-ontology.ts, not InfoBox typeLabels)
+  if (!existsSync('src/components/wiki/InfoBox.tsx')) {
+    console.log(`${colors.dim}Skipping type consistency check: not applicable for Next.js app (uses entity-ontology.ts)${colors.reset}`);
+    process.exit(0);
+  }
+
   console.log(`${colors.blue}🔍 Validating type consistency...${colors.reset}\n`);
 
   let errors = 0;

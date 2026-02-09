@@ -10,17 +10,15 @@ import path from "path";
 import { ENTITY_TYPES } from "../entity-ontology";
 
 // ---------------------------------------------------------------------------
-// Load real database.json
+// Load real data from build output
 // ---------------------------------------------------------------------------
 
 const DB_PATH = path.resolve(__dirname, "../database.json");
-const LONGTERM_DB_PATH = path.resolve(
-  __dirname,
-  "../../../../data/database.json",
-);
-const dbPath = fs.existsSync(DB_PATH) ? DB_PATH : LONGTERM_DB_PATH;
-const db = JSON.parse(fs.readFileSync(dbPath, "utf-8"));
+const db = JSON.parse(fs.readFileSync(DB_PATH, "utf-8"));
 
+// Entities are stripped from database.json (only typedEntities remains).
+// Read from the separate entities.json written by build-data.mjs.
+const ENTITIES_PATH = path.resolve(__dirname, "../entities.json");
 interface RawEntity {
   id: string;
   type: string;
@@ -29,7 +27,9 @@ interface RawEntity {
   relatedEntries?: { id: string; type: string; relationship?: string }[];
 }
 
-const entities: RawEntity[] = db.entities || [];
+const entities: RawEntity[] = fs.existsSync(ENTITIES_PATH)
+  ? JSON.parse(fs.readFileSync(ENTITIES_PATH, "utf-8"))
+  : [];
 
 // ---------------------------------------------------------------------------
 // Valid types

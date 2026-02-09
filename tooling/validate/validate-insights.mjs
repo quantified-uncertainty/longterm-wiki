@@ -25,10 +25,10 @@ const __dirname = dirname(__filename);
 
 const CI_MODE = process.argv.includes('--ci');
 
-// Resolve paths - scripts are now in scripts/validate/ subdirectory
-const APP_ROOT = join(__dirname, '../..');
-const INSIGHTS_PATH = join(APP_ROOT, 'src', 'data', 'insights');
-const CONTENT_DIR = join(APP_ROOT, 'src', 'content', 'docs');
+// Resolve paths relative to the repo root
+const REPO_ROOT = join(__dirname, '../..');
+const INSIGHTS_PATH = join(REPO_ROOT, 'data', 'insights');
+const CONTENT_DIR = join(REPO_ROOT, 'content', 'docs');
 
 async function main() {
   const log = createLogger(CI_MODE);

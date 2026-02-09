@@ -553,9 +553,10 @@ function main() {
     mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
-  // Write combined JSON
-  writeFileSync(OUTPUT_FILE, JSON.stringify(database, null, 2));
-  console.log(`\n✓ Written: ${OUTPUT_FILE}`);
+  // Write combined JSON (strip raw entities — only typedEntities needed at runtime)
+  const { entities: _rawEntities, ...databaseForOutput } = database;
+  writeFileSync(OUTPUT_FILE, JSON.stringify(databaseForOutput, null, 2));
+  console.log(`\n✓ Written: ${OUTPUT_FILE} (raw entities stripped, typedEntities only)`);
 
   // Also write individual JSON files for selective imports
   for (const { key, file, dir } of DATA_FILES) {

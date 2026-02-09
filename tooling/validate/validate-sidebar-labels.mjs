@@ -88,8 +88,9 @@ function main() {
   try {
     content = readFileSync(CONFIG_FILE, 'utf-8');
   } catch (e) {
-    console.error(`${colors.red}Error: Could not read ${CONFIG_FILE}${colors.reset}`);
-    process.exit(1);
+    // astro.config.mjs doesn't exist in the Next.js-based wiki — skip gracefully
+    console.log(`${colors.dim}Skipping sidebar label check: ${CONFIG_FILE} not found (not applicable for Next.js app)${colors.reset}`);
+    process.exit(0);
   }
 
   const labels = extractLabels(content);

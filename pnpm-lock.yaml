@@ -6,7 +6,17 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    dependencies:
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.1
+      yaml:
+        specifier: ^2.7.0
+        version: 2.8.2
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
 
   app:
     dependencies:

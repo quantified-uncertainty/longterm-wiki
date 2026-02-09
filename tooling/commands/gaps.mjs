@@ -15,9 +15,9 @@ import { createLogger } from '../lib/output.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const APP_ROOT = join(__dirname, '..', '..');
-const PAGES_PATH = join(APP_ROOT, 'src', 'data', 'pages.json');
-const INSIGHTS_DIR = join(APP_ROOT, 'src', 'data', 'insights');
+const REPO_ROOT = join(__dirname, '..', '..');
+const PAGES_PATH = join(REPO_ROOT, 'app', 'src', 'data', 'pages.json');
+const INSIGHTS_DIR = join(REPO_ROOT, 'data', 'insights');
 
 /**
  * Load pages data

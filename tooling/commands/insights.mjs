@@ -16,10 +16,10 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Resolve paths relative to the longterm app
-const APP_ROOT = join(__dirname, '..', '..');
-const INSIGHTS_PATH = join(APP_ROOT, 'src', 'data', 'insights.yaml');
-const CONTENT_DIR = join(APP_ROOT, 'src', 'content', 'docs');
+// Resolve paths relative to the repo root
+const REPO_ROOT = join(__dirname, '..', '..');
+const INSIGHTS_PATH = join(REPO_ROOT, 'data', 'insights.yaml');
+const CONTENT_DIR = join(REPO_ROOT, 'content', 'docs');
 
 /**
  * Default command - run all checks
