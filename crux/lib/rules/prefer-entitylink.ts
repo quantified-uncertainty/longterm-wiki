@@ -11,7 +11,7 @@
  */
 
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.js';
-import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
+import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
 
 // Internal paths that should use EntityLink
 const INTERNAL_PATH_PATTERNS = [

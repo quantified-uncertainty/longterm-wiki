@@ -15,8 +15,8 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, relative } from 'path';
-import { findMdxFiles } from '../lib/file-utils.mjs';
-import { getColors } from '../lib/output.mjs';
+import { findMdxFiles } from '../lib/file-utils.ts';
+import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);

@@ -14,7 +14,7 @@ import {
   countInternalLinks,
   countExternalLinks,
   suggestQuality,
-} from './metrics-extractor.mjs';
+} from './metrics-extractor.ts';
 
 let passed = 0;
 let failed = 0;

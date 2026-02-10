@@ -27,10 +27,10 @@ import {
   contentHash,
   hashId,
   getStats,
-} from './lib/knowledge-db.mjs';
-import { findMdxFiles } from './lib/file-utils.mjs';
-import { parseFrontmatter, getContentBody } from './lib/mdx-utils.mjs';
-import { getColors } from './lib/output.mjs';
+} from './lib/knowledge-db.ts';
+import { findMdxFiles } from './lib/file-utils.ts';
+import { parseFrontmatter, getContentBody } from './lib/mdx-utils.ts';
+import { getColors } from './lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './lib/content-types.js';
 
 const ENTITIES_DIR = join(DATA_DIR, 'entities');

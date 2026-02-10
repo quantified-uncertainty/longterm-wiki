@@ -26,14 +26,14 @@
  * Cost estimate: ~$0.06 per page (full pipeline), ~$0.01 per page (warnings-only)
  */
 
-import { createClient, callClaude, parseJsonResponse, MODELS } from '../lib/anthropic.mjs';
+import { createClient, callClaude, parseJsonResponse, MODELS } from '../lib/anthropic.ts';
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSync } from 'fs';
 import { join, relative, basename, dirname } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { CONTENT_DIR } from '../lib/content-types.js';
 import { ValidationEngine, ContentFile } from '../lib/validation-engine.js';
-import { parseFrontmatter } from '../lib/mdx-utils.mjs';
-import { findMdxFiles } from '../lib/file-utils.mjs';
+import { parseFrontmatter } from '../lib/mdx-utils.ts';
+import { findMdxFiles } from '../lib/file-utils.ts';
 import {
   insiderJargonRule,
   falseCertaintyRule,

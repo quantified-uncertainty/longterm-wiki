@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { batchResearch, generateResearchQueries } from '../../lib/openrouter.mjs';
+import { batchResearch, generateResearchQueries } from '../../lib/openrouter.ts';
 
 const SCRY_PUBLIC_KEY = process.env.SCRY_API_KEY || 'exopriors_public_readonly_v1_2025';
 

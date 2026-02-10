@@ -17,27 +17,11 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, relative, dirname, basename } from 'path';
 import { parse as parseYaml } from 'yaml';
-import { findMdxFiles } from './file-utils.mjs';
-import { getColors } from './output.mjs';
-import { parseFrontmatterAndBody } from './mdx-utils.mjs';
+import { findMdxFiles } from './file-utils.ts';
+import { getColors, type Colors } from './output.ts';
+import { parseFrontmatterAndBody } from './mdx-utils.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './content-types.js';
-import { parseSidebarConfig } from './sidebar-utils.mjs';
-
-// ---------------------------------------------------------------------------
-// Inline types for untyped .mjs dependencies (avoid blocking on full migration)
-// ---------------------------------------------------------------------------
-
-interface Colors {
-  red: string;
-  yellow: string;
-  green: string;
-  blue: string;
-  cyan: string;
-  dim: string;
-  bold: string;
-  reset: string;
-  [key: string]: string;
-}
+import { parseSidebarConfig, type SidebarParseResult } from './sidebar-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -56,10 +40,7 @@ export interface FixSpec {
   [key: string]: unknown;
 }
 
-export interface SidebarConfig {
-  entries: string[];
-  directories: Set<string>;
-}
+export type SidebarConfig = SidebarParseResult;
 
 export interface IssueOptions {
   rule: string;
@@ -475,7 +456,7 @@ export class ValidationEngine {
   /** Format issues for console output */
   formatOutput(issues: Issue[], options: FormatOptions = {}): string {
     const { ci = false } = options;
-    const colors = getColors(ci) as Colors;
+    const colors = getColors(ci);
 
     if (ci) {
       return JSON.stringify({

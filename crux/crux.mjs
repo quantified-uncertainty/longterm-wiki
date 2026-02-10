@@ -33,7 +33,7 @@
  */
 
 import { parseArgs } from 'node:util';
-import { createLogger } from './lib/output.mjs';
+import { createLogger } from './lib/output.ts';
 
 // Domain handlers
 import * as validateCommands from './commands/validate.mjs';

@@ -7,8 +7,8 @@
  * - Formats output for display
  */
 
-import * as lib from '../lib/insights.mjs';
-import { createLogger, formatCount } from '../lib/output.mjs';
+import * as lib from '../lib/insights.ts';
+import { createLogger, formatCount } from '../lib/output.ts';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';

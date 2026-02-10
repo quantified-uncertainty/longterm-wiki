@@ -5,94 +5,94 @@
  * Delegates to existing scripts via subprocess execution.
  */
 
-import { buildCommands } from '../lib/cli.mjs';
+import { buildCommands } from '../lib/cli.ts';
 
 /**
  * Script definitions: maps command names to script paths and metadata
  */
 const SCRIPTS = {
   all: {
-    script: 'validate/validate-all.mjs',
+    script: 'validate/validate-all.ts',
     description: 'Run all validation checks',
     passthrough: ['ci', 'failFast', 'skip', 'fix'],
   },
   unified: {
-    script: 'validate/validate-unified.mjs',
+    script: 'validate/validate-unified.ts',
     description: 'Run unified rule engine',
     passthrough: ['ci', 'rules', 'fix', 'list', 'errorsOnly', 'fixable'],
   },
   compile: {
-    script: 'validate/validate-mdx-compile.mjs',
+    script: 'validate/validate-mdx-compile.ts',
     description: 'Check MDX compilation',
     passthrough: ['ci', 'quick'],
   },
   links: {
-    script: 'validate/validate-internal-links.mjs',
+    script: 'validate/validate-internal-links.ts',
     description: 'Check internal link resolution',
     passthrough: ['ci'],
   },
   'entity-links': {
-    script: 'validate/validate-entity-links.mjs',
+    script: 'validate/validate-entity-links.ts',
     description: 'Check EntityLink usage and conversion candidates',
     passthrough: ['ci', 'fix'],
   },
   'cross-links': {
-    script: 'validate/validate-cross-links.mjs',
+    script: 'validate/validate-cross-links.ts',
     description: 'Check for missing cross-links between related pages',
     passthrough: ['ci', 'threshold', 'json'],
   },
   mermaid: {
-    script: 'validate/validate-mermaid.mjs',
+    script: 'validate/validate-mermaid.ts',
     description: 'Validate Mermaid diagram syntax',
     passthrough: ['ci', 'render'],
   },
   style: {
-    script: 'validate/validate-style-guide.mjs',
+    script: 'validate/validate-style-guide.ts',
     description: 'Check style guide compliance',
     passthrough: ['ci'],
   },
   consistency: {
-    script: 'validate/validate-consistency.mjs',
+    script: 'validate/validate-consistency.ts',
     description: 'Cross-page consistency checks',
     passthrough: ['ci'],
   },
   data: {
-    script: 'validate/validate-data.mjs',
+    script: 'validate/validate-data.ts',
     description: 'Entity data integrity',
     passthrough: ['ci'],
   },
   refs: {
-    script: 'validate/validate-component-refs.mjs',
+    script: 'validate/validate-component-refs.ts',
     description: 'EntityLink and DataInfoBox references',
     passthrough: ['ci'],
   },
   sidebar: {
-    script: 'validate/validate-sidebar.mjs',
+    script: 'validate/validate-sidebar.ts',
     description: 'Sidebar configuration',
     passthrough: ['ci'],
   },
   orphans: {
-    script: 'validate/validate-orphaned-files.mjs',
+    script: 'validate/validate-orphaned-files.ts',
     description: 'Find orphaned/temp files',
     passthrough: ['ci'],
   },
   quality: {
-    script: 'validate/validate-quality.mjs',
+    script: 'validate/validate-quality.ts',
     description: 'Content quality ratings (advisory)',
     passthrough: ['ci'],
   },
   insights: {
-    script: 'validate/validate-insights.mjs',
+    script: 'validate/validate-insights.ts',
     description: 'Insight schema and ratings',
     passthrough: ['ci'],
   },
   schema: {
-    script: 'validate/validate-yaml-schema.mjs',
+    script: 'validate/validate-yaml-schema.ts',
     description: 'YAML schema validation',
     passthrough: ['ci'],
   },
   financials: {
-    script: 'validate/validate-financials.mjs',
+    script: 'validate/validate-financials.ts',
     description: 'Financial data staleness and consistency',
     passthrough: ['ci'],
   },

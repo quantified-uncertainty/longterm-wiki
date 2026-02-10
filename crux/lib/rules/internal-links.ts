@@ -10,7 +10,7 @@
 import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.js';
-import { isInCodeBlock } from '../mdx-utils.mjs';
+import { isInCodeBlock } from '../mdx-utils.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.js';
 
 const APP_DIR = join(process.cwd(), 'app/src/app');

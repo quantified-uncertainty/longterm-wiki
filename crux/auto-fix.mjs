@@ -5,7 +5,7 @@
  */
 
 import { execSync } from 'child_process';
-import { getColors } from './lib/output.mjs';
+import { getColors } from './lib/output.ts';
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
@@ -26,17 +26,17 @@ const fixers = [
   {
     name: 'EntityLink Conversion',
     description: 'Convert markdown links to EntityLink components',
-    command: 'node crux/validate/validate-entity-links.mjs --fix',
+    command: 'node --import tsx/esm crux/validate/validate-entity-links.ts --fix',
   },
   {
     name: 'Escaping (dollars, comparisons, tildes)',
     description: 'Escape special characters for LaTeX/JSX',
-    command: 'node crux/validate/validate-unified.mjs --rules=dollar-signs,comparison-operators,tilde-dollar --fix',
+    command: 'node --import tsx/esm crux/validate/validate-unified.ts --rules=dollar-signs,comparison-operators,tilde-dollar --fix',
   },
   {
     name: 'Markdown Formatting',
     description: 'Fix markdown lists and bold labels',
-    command: 'node crux/validate/validate-unified.mjs --rules=markdown-lists,consecutive-bold-labels --fix',
+    command: 'node --import tsx/esm crux/validate/validate-unified.ts --rules=markdown-lists,consecutive-bold-labels --fix',
   },
 ];
 

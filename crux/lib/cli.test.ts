@@ -19,7 +19,7 @@ import {
   optionsToArgs,
   createScriptHandler,
   buildCommands,
-} from './cli.mjs';
+} from './cli.ts';
 
 import {
   loadGeneratedJson,

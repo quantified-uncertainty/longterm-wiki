@@ -9,7 +9,7 @@
  */
 
 import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation-engine.js';
-import { isInCodeBlock } from '../mdx-utils.mjs';
+import { isInCodeBlock } from '../mdx-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Interfaces

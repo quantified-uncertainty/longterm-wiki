@@ -21,7 +21,7 @@
  */
 
 import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.js';
-import { isInCodeBlock } from '../mdx-utils.mjs';
+import { isInCodeBlock } from '../mdx-utils.ts';
 
 // Pattern: line starting with **SomeLabel**: or **SomeLabel**:
 // Matches: **Concern**: text, **Response**: text, etc.

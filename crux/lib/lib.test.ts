@@ -5,7 +5,7 @@
  * Run: node scripts/lib/lib.test.ts
  */
 
-import { findMdxFiles, findFiles, getDirectories } from './file-utils.mjs';
+import { findMdxFiles, findFiles, getDirectories } from './file-utils.ts';
 import {
   parseFrontmatter,
   getContentBody,
@@ -14,8 +14,8 @@ import {
   extractHeadings,
   countWords,
   extractLinks,
-} from './mdx-utils.mjs';
-import { getColors, createLogger, formatPath, formatCount } from './output.mjs';
+} from './mdx-utils.ts';
+import { getColors, createLogger, formatPath, formatCount } from './output.ts';
 import {
   CONTENT_TYPES,
   getContentType,
