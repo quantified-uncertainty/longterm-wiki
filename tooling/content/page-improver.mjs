@@ -30,6 +30,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
+import { CRITICAL_RULES, QUALITY_RULES } from '../lib/content-types.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '../..');
@@ -59,28 +60,6 @@ const TIERS = {
     description: 'Full SCRY + web research, validation, multi-phase improvement'
   }
 };
-
-// Build-breaking validation rules (must all pass)
-const CRITICAL_RULES = [
-  'dollar-signs',
-  'comparison-operators',
-  'frontmatter-schema',
-  'entitylink-ids',
-  'internal-links',
-  'fake-urls',
-  'component-props',
-  'citation-urls'
-];
-
-// Quality rules (should pass, but won't block)
-const QUALITY_RULES = [
-  'tilde-dollar',
-  'markdown-lists',
-  'consecutive-bold-labels',
-  'placeholders',
-  'vague-citations',
-  'temporal-artifacts'
-];
 
 // Initialize Anthropic client
 const anthropic = new Anthropic();

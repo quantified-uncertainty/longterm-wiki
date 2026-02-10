@@ -27,6 +27,7 @@ import dotenv from 'dotenv';
 import { batchResearch, generateResearchQueries, callOpenRouter, MODELS } from '../lib/openrouter.mjs';
 import { checkSidebarCoverage } from '../lib/sidebar-utils.mjs';
 import { sources, hashId, SOURCES_DIR } from '../lib/knowledge-db.mjs';
+import { CRITICAL_RULES, QUALITY_RULES } from '../lib/content-types.mjs';
 
 dotenv.config();
 
@@ -56,28 +57,6 @@ const TIERS = {
     description: 'Deep research + source fetching + quality synthesis + review'
   }
 };
-
-// Build-breaking validation rules (must all pass)
-const CRITICAL_RULES = [
-  'dollar-signs',
-  'comparison-operators',
-  'frontmatter-schema',
-  'entitylink-ids',
-  'internal-links',
-  'fake-urls',
-  'component-props',
-  'citation-urls'
-];
-
-// Quality rules (should pass, but won't block)
-const QUALITY_RULES = [
-  'tilde-dollar',
-  'markdown-lists',
-  'consecutive-bold-labels',
-  'placeholders',
-  'vague-citations',
-  'temporal-artifacts'
-];
 
 // ============ Duplicate Detection ============
 
