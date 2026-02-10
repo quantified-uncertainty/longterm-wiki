@@ -58,6 +58,7 @@ const frontmatterSchema = z.object({
   }).optional(),
   maturity: z.string().optional(),
   fullWidth: z.boolean().optional(),
+  update_frequency: z.number().positive().optional(),
   entityId: z.string().optional(),
   roles: z.array(z.string()).optional(),
   pageTemplate: z.string().optional(),
@@ -131,6 +132,17 @@ export const frontmatterSchemaRule = {
           severity: Severity.ERROR,
         }));
       }
+    }
+
+    // Cross-field: update_frequency requires lastEdited or lastUpdated
+    if (frontmatter.update_frequency && !frontmatter.lastEdited && !frontmatter.lastUpdated) {
+      issues.push(new Issue({
+        rule: 'frontmatter-schema',
+        file: contentFile.path,
+        line: 1,
+        message: `Pages with update_frequency must have lastEdited (e.g. lastEdited: "${new Date().toISOString().slice(0, 10)}")`,
+        severity: Severity.ERROR,
+      }));
     }
 
     // Validate against Zod schema
