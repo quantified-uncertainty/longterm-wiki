@@ -20,18 +20,68 @@
  */
 
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
-import { getContentType, getStalenessThreshold, CONTENT_DIR, DEFAULT_STALENESS_THRESHOLD } from '../lib/content-types.js';
+import { getContentType, getStalenessThreshold, CONTENT_DIR, DEFAULT_STALENESS_THRESHOLD } from '../lib/content-types.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
+import type { Colors } from '../lib/output.ts';
 
-const CI_MODE = process.argv.includes('--ci') || process.argv.includes('--json');
-const colors = getColors(CI_MODE);
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface StalenessIssue {
+  id: string;
+  severity: 'warning' | 'info';
+  description: string;
+  daysPast?: number;
+  reviewBy?: string;
+  daysSinceEdit?: number;
+  lastEdited?: string;
+  threshold?: number;
+  suggestion?: string;
+  dependencyId?: string;
+  daysBehind?: number;
+  dependencyDate?: string;
+  thisDate?: string;
+}
+
+interface FileWithIssues {
+  file: string;
+  issues: StalenessIssue[];
+  contentType: string;
+}
+
+type EntityDateMap = Record<string, Date | null>;
+
+interface StalenessStats {
+  totalFiles: number;
+  withReviewBy: number;
+  withLastEdited: number;
+  withDependencies: number;
+}
+
+interface Frontmatter {
+  reviewBy?: string;
+  lastEdited?: string;
+  contentDependencies?: string[];
+  [key: string]: unknown;
+}
+
+interface StalenessCheckOptions extends ValidatorOptions {
+  ci?: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 /**
  * Parse a date string (YYYY-MM-DD or YYYY-MM) to Date object
  */
-function parseDate(dateStr) {
+function parseDate(dateStr: string | undefined | null): Date | null {
   if (!dateStr) return null;
   // Handle both YYYY-MM-DD and YYYY-MM formats
   const parts = dateStr.split('-');
@@ -44,22 +94,22 @@ function parseDate(dateStr) {
 /**
  * Calculate days between two dates
  */
-function daysBetween(date1, date2) {
+function daysBetween(date1: Date, date2: Date): number {
   const msPerDay = 1000 * 60 * 60 * 24;
-  return Math.floor((date2 - date1) / msPerDay);
+  return Math.floor((date2.getTime() - date1.getTime()) / msPerDay);
 }
 
 /**
  * Build a map of entity IDs to their lastEdited dates
  */
-function buildEntityDateMap(files) {
-  const map = {};
+function buildEntityDateMap(files: string[]): EntityDateMap {
+  const map: EntityDateMap = {};
   for (const file of files) {
     try {
-      const content = readFileSync(file, 'utf-8');
-      const fm = parseFrontmatter(content);
+      const content: string = readFileSync(file, 'utf-8');
+      const fm = parseFrontmatter(content) as Frontmatter;
       // Extract entity ID from filename
-      const filename = file.split('/').pop().replace(/\.(mdx?|md)$/, '');
+      const filename: string = file.split('/').pop()!.replace(/\.(mdx?|md)$/, '');
       if (fm.lastEdited) {
         map[filename] = parseDate(fm.lastEdited);
       }
@@ -73,14 +123,20 @@ function buildEntityDateMap(files) {
 /**
  * Check a single file for staleness
  */
-function checkStaleness(filePath, frontmatter, contentType, entityDateMap, today) {
-  const issues = [];
+function checkStaleness(
+  filePath: string,
+  frontmatter: Frontmatter,
+  contentType: string,
+  entityDateMap: EntityDateMap,
+  today: Date,
+): StalenessIssue[] {
+  const issues: StalenessIssue[] = [];
 
   // Check 1: Past reviewBy date
   if (frontmatter.reviewBy) {
-    const reviewDate = parseDate(frontmatter.reviewBy);
+    const reviewDate: Date | null = parseDate(frontmatter.reviewBy);
     if (reviewDate && reviewDate < today) {
-      const daysPast = daysBetween(reviewDate, today);
+      const daysPast: number = daysBetween(reviewDate, today);
       issues.push({
         id: 'past-review-date',
         severity: daysPast > 30 ? 'warning' : 'info',
@@ -93,11 +149,11 @@ function checkStaleness(filePath, frontmatter, contentType, entityDateMap, today
 
   // Check 2: No reviewBy but old lastEdited
   if (!frontmatter.reviewBy && frontmatter.lastEdited) {
-    const lastEdit = parseDate(frontmatter.lastEdited);
-    const threshold = getStalenessThreshold(contentType);
+    const lastEdit: Date | null = parseDate(frontmatter.lastEdited);
+    const threshold: number = getStalenessThreshold(contentType);
 
     if (lastEdit) {
-      const daysSinceEdit = daysBetween(lastEdit, today);
+      const daysSinceEdit: number = daysBetween(lastEdit, today);
 
       if (daysSinceEdit > threshold) {
         issues.push({
@@ -115,21 +171,21 @@ function checkStaleness(filePath, frontmatter, contentType, entityDateMap, today
 
   // Check 3: Dependencies updated more recently
   if (frontmatter.contentDependencies && frontmatter.lastEdited) {
-    const thisDate = parseDate(frontmatter.lastEdited);
+    const thisDate: Date | null = parseDate(frontmatter.lastEdited);
 
     for (const depId of frontmatter.contentDependencies) {
-      const depDate = entityDateMap[depId];
+      const depDate: Date | null | undefined = entityDateMap[depId];
 
       if (depDate && thisDate && depDate > thisDate) {
-        const daysBehind = daysBetween(thisDate, depDate);
+        const daysBehindVal: number = daysBetween(thisDate, depDate);
         issues.push({
           id: 'dependency-updated',
           severity: 'warning',
           dependencyId: depId,
-          daysBehind,
+          daysBehind: daysBehindVal,
           dependencyDate: formatDate(depDate),
           thisDate: frontmatter.lastEdited,
-          description: `Dependency "${depId}" was updated ${daysBehind} days after this page`,
+          description: `Dependency "${depId}" was updated ${daysBehindVal} days after this page`,
         });
       }
     }
@@ -141,35 +197,39 @@ function checkStaleness(filePath, frontmatter, contentType, entityDateMap, today
 /**
  * Format a date as YYYY-MM-DD
  */
-function formatDate(date) {
+function formatDate(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
 /**
  * Format a suggested review date
  */
-function formatSuggestedReviewDate(today, daysFromNow) {
+function formatSuggestedReviewDate(today: Date, daysFromNow: number): string {
   const reviewDate = new Date(today);
   reviewDate.setDate(reviewDate.getDate() + daysFromNow);
   return `reviewBy: "${formatDate(reviewDate)}"`;
 }
 
 /**
- * Main function
+ * Run the staleness check.
+ * Returns a ValidatorResult for use by the orchestrator.
  */
-function main() {
+export function runCheck(options?: StalenessCheckOptions): ValidatorResult {
+  const CI_MODE = options?.ci ?? false;
+  const colors: Colors = getColors(CI_MODE);
+
   const today = new Date();
-  const files = findMdxFiles(CONTENT_DIR);
+  const files: string[] = findMdxFiles(CONTENT_DIR);
 
   // Build entity date map for dependency checking
-  const entityDateMap = buildEntityDateMap(files);
+  const entityDateMap: EntityDateMap = buildEntityDateMap(files);
 
-  const allIssues = [];
+  const allIssues: FileWithIssues[] = [];
   let urgentCount = 0;  // Past review by >30 days or dependency updated
   let infoCount = 0;
 
   // Track stats
-  const stats = {
+  const stats: StalenessStats = {
     totalFiles: files.length,
     withReviewBy: 0,
     withLastEdited: 0,
@@ -187,16 +247,16 @@ function main() {
     }
 
     try {
-      const content = readFileSync(file, 'utf-8');
-      const frontmatter = parseFrontmatter(content);
-      const contentType = getContentType(file) || 'default';
+      const content: string = readFileSync(file, 'utf-8');
+      const frontmatter = parseFrontmatter(content) as Frontmatter;
+      const contentType: string = getContentType(file) || 'default';
 
       // Update stats
       if (frontmatter.reviewBy) stats.withReviewBy++;
       if (frontmatter.lastEdited) stats.withLastEdited++;
-      if (frontmatter.contentDependencies?.length > 0) stats.withDependencies++;
+      if ((frontmatter.contentDependencies as string[] | undefined)?.length ?? 0 > 0) stats.withDependencies++;
 
-      const issues = checkStaleness(file, frontmatter, contentType, entityDateMap, today);
+      const issues: StalenessIssue[] = checkStaleness(file, frontmatter, contentType, entityDateMap, today);
 
       if (issues.length > 0) {
         allIssues.push({ file, issues, contentType });
@@ -212,11 +272,11 @@ function main() {
   }
 
   // Sort by urgency (warnings first, then by days past)
-  allIssues.sort((a, b) => {
-    const aMax = Math.max(...a.issues.map(i => i.daysPast || i.daysBehind || 0));
-    const bMax = Math.max(...b.issues.map(i => i.daysPast || i.daysBehind || 0));
-    const aHasWarning = a.issues.some(i => i.severity === 'warning');
-    const bHasWarning = b.issues.some(i => i.severity === 'warning');
+  allIssues.sort((a: FileWithIssues, b: FileWithIssues) => {
+    const aMax: number = Math.max(...a.issues.map((i: StalenessIssue) => i.daysPast || i.daysBehind || 0));
+    const bMax: number = Math.max(...b.issues.map((i: StalenessIssue) => i.daysPast || i.daysBehind || 0));
+    const aHasWarning: boolean = a.issues.some((i: StalenessIssue) => i.severity === 'warning');
+    const bHasWarning: boolean = b.issues.some((i: StalenessIssue) => i.severity === 'warning');
     if (aHasWarning !== bHasWarning) return bHasWarning ? 1 : -1;
     return bMax - aMax;
   });
@@ -245,18 +305,18 @@ function main() {
       console.log(`${'─'.repeat(40)}\n`);
 
       // Show urgent issues first
-      const urgent = allIssues.filter(a => a.issues.some(i => i.severity === 'warning'));
-      const other = allIssues.filter(a => !a.issues.some(i => i.severity === 'warning'));
+      const urgent: FileWithIssues[] = allIssues.filter((a: FileWithIssues) => a.issues.some((i: StalenessIssue) => i.severity === 'warning'));
+      const other: FileWithIssues[] = allIssues.filter((a: FileWithIssues) => !a.issues.some((i: StalenessIssue) => i.severity === 'warning'));
 
       if (urgent.length > 0) {
         console.log(`${colors.yellow}${colors.bold}⚠️  Needs Attention (${urgent.length} pages)${colors.reset}\n`);
 
         for (const { file, issues } of urgent.slice(0, 20)) {
-          const relPath = formatPath(file);
+          const relPath: string = formatPath(file);
           console.log(`${colors.bold}${relPath}${colors.reset}`);
 
           for (const issue of issues) {
-            const icon = issue.severity === 'warning' ? `${colors.yellow}⚠` : `${colors.blue}ℹ`;
+            const icon: string = issue.severity === 'warning' ? `${colors.yellow}⚠` : `${colors.blue}ℹ`;
             console.log(`  ${icon} ${issue.description}${colors.reset}`);
             if (issue.suggestion) {
               console.log(`    ${colors.dim}Add: ${issue.suggestion}${colors.reset}`);
@@ -274,7 +334,7 @@ function main() {
         console.log(`${colors.blue}ℹ️  Suggestions (${other.length} pages)${colors.reset}\n`);
 
         for (const { file, issues } of other.slice(0, 10)) {
-          const relPath = formatPath(file);
+          const relPath: string = formatPath(file);
           console.log(`  ${colors.dim}${relPath}${colors.reset}`);
           for (const issue of issues) {
             console.log(`    ${colors.dim}${issue.description}${colors.reset}`);
@@ -300,11 +360,27 @@ function main() {
   }
 
   // Exit with error only if there are urgent issues (>30 days past review)
-  const criticalCount = allIssues.filter(a =>
-    a.issues.some(i => i.id === 'past-review-date' && i.daysPast > 30)
+  const criticalCount: number = allIssues.filter((a: FileWithIssues) =>
+    a.issues.some((i: StalenessIssue) => i.id === 'past-review-date' && (i.daysPast ?? 0) > 30)
   ).length;
 
-  process.exit(criticalCount > 0 ? 1 : 0);
+  return {
+    passed: criticalCount === 0,
+    errors: criticalCount,
+    warnings: urgentCount - criticalCount,
+    infos: infoCount,
+  };
 }
 
-main();
+/**
+ * Main function
+ */
+function main(): void {
+  const CI_MODE: boolean = process.argv.includes('--ci') || process.argv.includes('--json');
+  const result = runCheck({ ci: CI_MODE });
+  process.exit(result.passed ? 0 : 1);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

@@ -16,7 +16,7 @@ const SCRIPTS = {
     passthrough: ['json', 'brief'],
   },
   mentions: {
-    script: 'validate/validate-unified.mjs',
+    script: 'validate/validate-unified.ts',
     description: 'Find unlinked entity mentions',
     passthrough: ['ci'],
     extraArgs: ['--rules=entity-mentions'],
@@ -33,7 +33,7 @@ const SCRIPTS = {
     positional: true,
   },
   quality: {
-    script: 'validate/validate-quality.mjs',
+    script: 'validate/validate-quality.ts',
     description: 'Content quality ratings',
     passthrough: ['ci'],
   },

@@ -21,31 +21,87 @@
 
 import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join, dirname } from 'path';
-import { spawnSync } from 'child_process';
+import { spawnSync, execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CONTENT_DIR = join(__dirname, '../..', 'content/docs');
 const TEMP_DIR = join(__dirname, '../..', '.mermaid-validate-temp');
 
-const RENDER_MODE = process.argv.includes('--render');
-const FIX_MODE = process.argv.includes('--fix');
+// ============================================================================
+// TYPES
+// ============================================================================
 
-const colors = getColors();
+interface CheckIssue {
+  line: number;
+  message: string;
+  context: string;
+}
+
+interface StaticCheck {
+  id: string;
+  description: string;
+  severity: 'error' | 'warning';
+  check: (chart: string) => CheckIssue[];
+  fix: string;
+}
+
+interface InvalidArrowPattern {
+  pattern: RegExp;
+  message: string;
+}
+
+interface ExtractedChart {
+  content: string;
+  line: number;
+  raw: string;
+}
+
+interface CliValidationResult {
+  valid: boolean;
+  error?: string;
+}
+
+interface ChartIssue {
+  id: string;
+  description: string;
+  severity: 'error' | 'warning';
+  fix: string;
+  line: number;
+  message: string;
+  context: string;
+}
+
+interface FileIssueGroup {
+  file: string;
+  issues: ChartIssue[];
+  chartCount: number;
+}
+
+interface CIOutput {
+  files: number;
+  charts: number;
+  errors: number;
+  warnings: number;
+  issues: FileIssueGroup[];
+  duration: number;
+  renderMode: boolean;
+}
 
 // ============================================================================
 // STATIC ANALYSIS CHECKS
 // ============================================================================
 
-const STATIC_CHECKS = [
+const STATIC_CHECKS: StaticCheck[] = [
   {
     id: 'unclosed-bracket',
     description: 'Unclosed square bracket in node definition',
     severity: 'error',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       // Count brackets, accounting for escaped ones
       let depth = 0;
       let lineNum = 1;
@@ -86,8 +142,8 @@ const STATIC_CHECKS = [
     id: 'unclosed-paren',
     description: 'Unclosed parenthesis in node definition',
     severity: 'error',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       const lines = chart.split('\n');
 
       for (let i = 0; i < lines.length; i++) {
@@ -118,8 +174,8 @@ const STATIC_CHECKS = [
     id: 'unbalanced-quotes',
     description: 'Unbalanced quotes in diagram',
     severity: 'error',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       const lines = chart.split('\n');
 
       for (let i = 0; i < lines.length; i++) {
@@ -144,12 +200,12 @@ const STATIC_CHECKS = [
     id: 'invalid-arrow',
     description: 'Invalid arrow syntax',
     severity: 'error',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       const lines = chart.split('\n');
 
       // Common invalid arrow patterns - must be careful not to match valid arrows
-      const invalidPatterns = [
+      const invalidPatterns: InvalidArrowPattern[] = [
         // Single arrow -> should be --> (but not inside |...|, and not if part of ->>)
         { pattern: /\w\s*->(?!>|-)(?!\|)\s*\w/, message: 'Use --> instead of -> for flowchart arrows' },
         // Space in arrow: -- > or < --
@@ -182,11 +238,11 @@ const STATIC_CHECKS = [
     id: 'missing-diagram-type',
     description: 'Missing or invalid diagram type declaration',
     severity: 'error',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       const trimmed = chart.trim();
 
-      const validTypes = [
+      const validTypes: string[] = [
         'flowchart', 'graph', 'sequenceDiagram', 'classDiagram',
         'stateDiagram', 'stateDiagram-v2', 'erDiagram', 'journey',
         'gantt', 'pie', 'quadrantChart', 'requirementDiagram',
@@ -235,8 +291,8 @@ const STATIC_CHECKS = [
     id: 'undefined-node-reference',
     description: 'Arrow references undefined node',
     severity: 'warning',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       const lines = chart.split('\n');
 
       // Only check flowcharts/graphs
@@ -246,7 +302,7 @@ const STATIC_CHECKS = [
       }
 
       // Extract defined nodes
-      const definedNodes = new Set();
+      const definedNodes = new Set<string>();
       const nodeDefPattern = /^\s*(\w+)[\[\(\{<]/;
       const nodeRefPattern = /(\w+)\s*(?:-->|---|\.-\.->|==>|--)/g;
       const arrowTargetPattern = /(?:-->|---|\.-\.->|==>|--)\s*(?:\|[^|]*\|)?\s*(\w+)/g;
@@ -261,7 +317,7 @@ const STATIC_CHECKS = [
         }
 
         // Also add nodes that appear on either side of arrows (implicit definition)
-        let arrowMatch;
+        let arrowMatch: RegExpExecArray | null;
         while ((arrowMatch = nodeRefPattern.exec(line)) !== null) {
           definedNodes.add(arrowMatch[1]);
         }
@@ -285,8 +341,8 @@ const STATIC_CHECKS = [
     id: 'subgraph-syntax',
     description: 'Invalid subgraph syntax',
     severity: 'warning',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       const lines = chart.split('\n');
 
       let subgraphDepth = 0;
@@ -338,8 +394,8 @@ const STATIC_CHECKS = [
     id: 'style-syntax',
     description: 'Invalid style statement syntax',
     severity: 'warning',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       const lines = chart.split('\n');
 
       for (let i = 0; i < lines.length; i++) {
@@ -379,8 +435,8 @@ const STATIC_CHECKS = [
     id: 'pie-chart-syntax',
     description: 'Invalid pie chart syntax',
     severity: 'error',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       const trimmed = chart.trim();
 
       if (!trimmed.toLowerCase().startsWith('pie')) return issues;
@@ -411,8 +467,8 @@ const STATIC_CHECKS = [
     id: 'quadrant-syntax',
     description: 'Invalid quadrant chart syntax',
     severity: 'error',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       const trimmed = chart.trim();
 
       if (!trimmed.toLowerCase().startsWith('quadrantchart')) return issues;
@@ -457,8 +513,8 @@ const STATIC_CHECKS = [
     id: 'special-chars-in-labels',
     description: 'Problematic special characters in labels',
     severity: 'warning',
-    check: (chart) => {
-      const issues = [];
+    check: (chart: string): CheckIssue[] => {
+      const issues: CheckIssue[] = [];
       const lines = chart.split('\n');
 
       for (let i = 0; i < lines.length; i++) {
@@ -502,14 +558,14 @@ const STATIC_CHECKS = [
 // CHART EXTRACTION
 // ============================================================================
 
-function extractMermaidCharts(filePath) {
+function extractMermaidCharts(filePath: string): ExtractedChart[] {
   const content = readFileSync(filePath, 'utf-8');
-  const charts = [];
+  const charts: ExtractedChart[] = [];
 
   // Match <Mermaid client:load chart={`...`} />
   const mermaidRegex = /<Mermaid[^>]*chart=\{`([\s\S]*?)`\}[^>]*\/>/g;
 
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = mermaidRegex.exec(content)) !== null) {
     const chart = match[1];
     const lineNum = content.substring(0, match.index).split('\n').length;
@@ -527,7 +583,7 @@ function extractMermaidCharts(filePath) {
 // MERMAID CLI VALIDATION
 // ============================================================================
 
-function checkMermaidCli() {
+function checkMermaidCli(): boolean {
   try {
     execSync('npx mmdc --version', { stdio: 'pipe' });
     return true;
@@ -536,7 +592,7 @@ function checkMermaidCli() {
   }
 }
 
-function validateWithCli(chart, index) {
+function validateWithCli(chart: string, index: number): CliValidationResult {
   const tempFile = join(TEMP_DIR, `chart-${index}.mmd`);
   const outFile = join(TEMP_DIR, `chart-${index}.svg`);
 
@@ -559,7 +615,7 @@ function validateWithCli(chart, index) {
   } catch (err) {
     return {
       valid: false,
-      error: err.message,
+      error: (err as Error).message,
     };
   }
 }
@@ -568,8 +624,8 @@ function validateWithCli(chart, index) {
 // MAIN VALIDATION
 // ============================================================================
 
-function validateChart(chart, filePath, chartLine) {
-  const issues = [];
+function validateChart(chart: ExtractedChart, filePath: string, chartLine: number): ChartIssue[] {
+  const issues: ChartIssue[] = [];
 
   // Run all static checks
   for (const check of STATIC_CHECKS) {
@@ -594,14 +650,47 @@ function validateChart(chart, filePath, chartLine) {
   return issues;
 }
 
-function main() {
+/**
+ * Run the Mermaid validation check and return a ValidatorResult.
+ * Can be called in-process by the orchestrator.
+ */
+export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
+  const files = findMdxFiles(CONTENT_DIR);
+  let errorCount = 0;
+  let warningCount = 0;
+
+  for (const file of files) {
+    const charts = extractMermaidCharts(file);
+    if (charts.length === 0) continue;
+
+    for (const chart of charts) {
+      const issues = validateChart(chart, file, chart.line);
+      for (const issue of issues) {
+        if (issue.severity === 'error') errorCount++;
+        else if (issue.severity === 'warning') warningCount++;
+      }
+    }
+  }
+
+  return {
+    passed: errorCount === 0,
+    errors: errorCount,
+    warnings: warningCount,
+  };
+}
+
+function main(): void {
+  const RENDER_MODE = process.argv.includes('--render');
+  const FIX_MODE = process.argv.includes('--fix');
+  const colors = getColors();
+
   const startTime = Date.now();
   const files = findMdxFiles(CONTENT_DIR);
 
   let totalCharts = 0;
   let errorCount = 0;
   let warningCount = 0;
-  const allIssues = [];
+  const allIssues: FileIssueGroup[] = [];
 
   // Check for mermaid CLI if render mode requested
   const hasCli = RENDER_MODE && checkMermaidCli();
@@ -628,7 +717,7 @@ function main() {
     if (charts.length === 0) continue;
 
     totalCharts += charts.length;
-    const fileIssues = [];
+    const fileIssues: ChartIssue[] = [];
 
     for (const chart of charts) {
       // Static analysis
@@ -645,7 +734,7 @@ function main() {
             severity: 'error',
             fix: 'Check the Mermaid syntax - the diagram cannot be rendered',
             line: chart.line,
-            message: cliResult.error,
+            message: cliResult.error!,
             context: chart.content.split('\n')[0],
           });
         }
@@ -672,7 +761,7 @@ function main() {
 
   // Output results
   if (isCI()) {
-    console.log(JSON.stringify({
+    const output: CIOutput = {
       files: files.length,
       charts: totalCharts,
       errors: errorCount,
@@ -680,7 +769,8 @@ function main() {
       issues: allIssues,
       duration,
       renderMode: RENDER_MODE && hasCli,
-    }, null, 2));
+    };
+    console.log(JSON.stringify(output, null, 2));
   } else {
     if (allIssues.length === 0) {
       console.log(`${colors.green}✓ All ${totalCharts} Mermaid diagrams passed validation${colors.reset}`);
@@ -725,4 +815,6 @@ function main() {
   process.exit(errorCount > 0 ? 1 : 0);
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

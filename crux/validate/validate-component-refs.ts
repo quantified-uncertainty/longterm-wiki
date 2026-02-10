@@ -19,13 +19,83 @@ import { readFileSync } from 'fs';
 // Use shared libraries
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { createLogger, formatPath } from '../lib/output.ts';
-import { CONTENT_DIR, DATA_DIR, loadDatabase as loadDatabaseJson } from '../lib/content-types.js';
+import { CONTENT_DIR, DATA_DIR, loadDatabase as loadDatabaseJson } from '../lib/content-types.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
 const log = createLogger();
 const c = log.colors;
 
+/**
+ * An import statement parsed from MDX content.
+ */
+interface ParsedImport {
+  components: string[];
+  source: string;
+  fullMatch: string;
+  index: number;
+}
+
+/**
+ * An unused import found in a file.
+ */
+interface UnusedImport {
+  component: string;
+  source: string;
+}
+
+/**
+ * A component reference found in MDX content.
+ */
+interface ComponentRef {
+  component: string;
+  prop: string;
+  value: string;
+  line: number;
+}
+
+/**
+ * A missing reference issue.
+ */
+interface MissingRef {
+  file: string;
+  line: number;
+  component: string;
+  prop: string;
+  value: string;
+  dataSource: string;
+}
+
+/**
+ * A component that references data that doesn't exist.
+ */
+interface NoDataComponent {
+  file: string;
+  line: number;
+  component: string;
+  value: string;
+  dataSource: string;
+}
+
+/**
+ * An unused import issue entry.
+ */
+interface UnusedImportIssue {
+  file: string;
+  component: string;
+  source: string;
+}
+
+/**
+ * Aggregated issues found during validation.
+ */
+interface ValidationIssues {
+  missingRefs: MissingRef[];
+  unusedImports: UnusedImportIssue[];
+  noDataForComponent: NoDataComponent[];
+}
+
 // Load data sources
-function loadEntities() {
+function loadEntities(): Set<string> {
   try {
     const database = loadDatabaseJson();
     return new Set(Object.keys(database.entities || {}));
@@ -35,10 +105,10 @@ function loadEntities() {
   }
 }
 
-function loadExternalLinks() {
+function loadExternalLinks(): Set<string> {
   try {
-    const content = readFileSync(`${DATA_DIR}/external-links.yaml`, 'utf-8');
-    const pageIds = new Set();
+    const content: string = readFileSync(`${DATA_DIR}/external-links.yaml`, 'utf-8');
+    const pageIds = new Set<string>();
     const matches = content.matchAll(/^- pageId: (.+)$/gm);
     for (const match of matches) {
       pageIds.add(match[1].trim());
@@ -49,10 +119,10 @@ function loadExternalLinks() {
   }
 }
 
-function loadSafetyApproaches() {
+function loadSafetyApproaches(): Set<string> {
   try {
-    const content = readFileSync(`${DATA_DIR}/safety-approaches-data.ts`, 'utf-8');
-    const ids = new Set();
+    const content: string = readFileSync(`${DATA_DIR}/safety-approaches-data.ts`, 'utf-8');
+    const ids = new Set<string>();
     const matches = content.matchAll(/id: ['"]([^'"]+)['"]/g);
     for (const match of matches) {
       ids.add(match[1]);
@@ -64,13 +134,13 @@ function loadSafetyApproaches() {
 }
 
 // Parse imports from MDX file
-function parseImports(content) {
-  const imports = [];
+function parseImports(content: string): ParsedImport[] {
+  const imports: ParsedImport[] = [];
   const importRegex = /import\s+\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g;
 
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = importRegex.exec(content)) !== null) {
-    const components = match[1].split(',').map(c => c.trim()).filter(Boolean);
+    const components: string[] = match[1].split(',').map((c: string) => c.trim()).filter(Boolean);
     imports.push({
       components,
       source: match[2],
@@ -83,12 +153,12 @@ function parseImports(content) {
 }
 
 // Check which imported components are actually used
-function findUnusedImports(content, imports) {
-  const unused = [];
+function findUnusedImports(content: string, imports: ParsedImport[]): UnusedImport[] {
+  const unused: UnusedImport[] = [];
 
   for (const imp of imports) {
     for (const component of imp.components) {
-      const afterImport = content.slice(imp.index + imp.fullMatch.length);
+      const afterImport: string = content.slice(imp.index + imp.fullMatch.length);
       const usagePattern = new RegExp(`<${component}[\\s/>]|${component}\\(`);
 
       if (!usagePattern.test(afterImport)) {
@@ -101,12 +171,12 @@ function findUnusedImports(content, imports) {
 }
 
 // Find component usages and validate references
-function findComponentRefs(content) {
-  const refs = [];
+function findComponentRefs(content: string): ComponentRef[] {
+  const refs: ComponentRef[] = [];
 
   // EntityLink id="..."
   const entityLinkRegex = /<EntityLink\s+id=["']([^"']+)["']/g;
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = entityLinkRegex.exec(content)) !== null) {
     refs.push({
       component: 'EntityLink',
@@ -141,46 +211,127 @@ function findComponentRefs(content) {
   return refs;
 }
 
-// Main validation
-async function main() {
-  log.heading('Component Reference Validator');
-  console.log();
+/**
+ * Run the component reference check and return a ValidatorResult.
+ */
+export async function runCheck(options: ValidatorOptions = {}): Promise<ValidatorResult> {
+  const entities: Set<string> = loadEntities();
+  const externalLinks: Set<string> = loadExternalLinks();
+  const safetyApproaches: Set<string> = loadSafetyApproaches();
 
-  // Load all data sources
-  log.dim('Loading data sources...');
-  const entities = loadEntities();
-  const externalLinks = loadExternalLinks();
-  const safetyApproaches = loadSafetyApproaches();
+  const files: string[] = findMdxFiles(CONTENT_DIR);
 
-  log.dim(`  Entities: ${entities.size}`);
-  log.dim(`  External Links: ${externalLinks.size}`);
-  log.dim(`  Safety Approaches: ${safetyApproaches.size}`);
-  console.log();
-
-  const files = findMdxFiles(CONTENT_DIR);
-  log.dim(`Checking ${files.length} MDX files...`);
-  console.log();
-
-  const issues = {
+  const issues: ValidationIssues = {
     missingRefs: [],
     unusedImports: [],
     noDataForComponent: [],
   };
 
   for (const file of files) {
-    const relPath = formatPath(file);
-    const content = readFileSync(file, 'utf-8');
+    const relPath: string = formatPath(file);
+    const content: string = readFileSync(file, 'utf-8');
+
+    const imports: ParsedImport[] = parseImports(content);
+    const unused: UnusedImport[] = findUnusedImports(content, imports);
+
+    for (const u of unused) {
+      issues.unusedImports.push({ file: relPath, component: u.component, source: u.source });
+    }
+
+    const refs: ComponentRef[] = findComponentRefs(content);
+
+    for (const ref of refs) {
+      let isValid = true;
+      let dataSource = 'unknown';
+
+      switch (ref.component) {
+        case 'EntityLink':
+          isValid = entities.has(ref.value) ||
+                    safetyApproaches.has(ref.value) ||
+                    ref.value.startsWith('__index__/');
+          dataSource = 'entities/safety-approaches';
+          break;
+
+        case 'DataInfoBox':
+          isValid = entities.has(ref.value);
+          dataSource = 'entities';
+          break;
+
+        case 'DataExternalLinks':
+          isValid = externalLinks.has(ref.value);
+          dataSource = 'external-links.yaml';
+          if (!isValid) {
+            issues.noDataForComponent.push({
+              file: relPath,
+              line: ref.line,
+              component: ref.component,
+              value: ref.value,
+              dataSource,
+            });
+          }
+          continue;
+      }
+
+      if (!isValid) {
+        issues.missingRefs.push({
+          file: relPath,
+          line: ref.line,
+          component: ref.component,
+          prop: ref.prop,
+          value: ref.value,
+          dataSource,
+        });
+      }
+    }
+  }
+
+  return {
+    passed: issues.missingRefs.length === 0,
+    errors: issues.missingRefs.length,
+    warnings: issues.noDataForComponent.length + issues.unusedImports.length,
+  };
+}
+
+// Main validation
+async function main(): Promise<void> {
+  log.heading('Component Reference Validator');
+  console.log();
+
+  // Load all data sources
+  log.dim('Loading data sources...');
+  const entities: Set<string> = loadEntities();
+  const externalLinks: Set<string> = loadExternalLinks();
+  const safetyApproaches: Set<string> = loadSafetyApproaches();
+
+  log.dim(`  Entities: ${entities.size}`);
+  log.dim(`  External Links: ${externalLinks.size}`);
+  log.dim(`  Safety Approaches: ${safetyApproaches.size}`);
+  console.log();
+
+  const files: string[] = findMdxFiles(CONTENT_DIR);
+  log.dim(`Checking ${files.length} MDX files...`);
+  console.log();
+
+  const issues: ValidationIssues = {
+    missingRefs: [],
+    unusedImports: [],
+    noDataForComponent: [],
+  };
+
+  for (const file of files) {
+    const relPath: string = formatPath(file);
+    const content: string = readFileSync(file, 'utf-8');
 
     // Check imports
-    const imports = parseImports(content);
-    const unused = findUnusedImports(content, imports);
+    const imports: ParsedImport[] = parseImports(content);
+    const unused: UnusedImport[] = findUnusedImports(content, imports);
 
     for (const u of unused) {
       issues.unusedImports.push({ file: relPath, component: u.component, source: u.source });
     }
 
     // Check component references
-    const refs = findComponentRefs(content);
+    const refs: ComponentRef[] = findComponentRefs(content);
 
     for (const ref of refs) {
       let isValid = true;
@@ -262,7 +413,7 @@ async function main() {
     log.dim('These components are imported but never used');
     console.log();
 
-    const byFile = {};
+    const byFile: Record<string, string[]> = {};
     for (const u of issues.unusedImports) {
       if (!byFile[u.file]) byFile[u.file] = [];
       byFile[u.file].push(u.component);
@@ -294,7 +445,7 @@ async function main() {
   }
 }
 
-main().catch(err => {
+main().catch((err: unknown) => {
   console.error('Validator error:', err);
   process.exit(1);
 });

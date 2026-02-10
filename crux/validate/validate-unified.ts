@@ -20,27 +20,40 @@
  *   1 = One or more errors found
  */
 
-import { ValidationEngine, Severity } from '../lib/validation-engine.js';
-import { allRules } from '../lib/rules/index.js';
+import { ValidationEngine, Severity, type Issue } from '../lib/validation-engine.ts';
+import { allRules } from '../lib/rules/index.ts';
 import { getColors } from '../lib/output.ts';
 
-const args = process.argv.slice(2);
-const CI_MODE = args.includes('--ci');
-const LIST_MODE = args.includes('--list');
-const ERRORS_ONLY = args.includes('--errors-only');
-const VERBOSE = args.includes('--verbose') || args.includes('-v');
-const FIX_MODE = args.includes('--fix');
-const FIXABLE_ONLY = args.includes('--fixable');
+interface ParsedArgs {
+  ci: boolean;
+  list: boolean;
+  errorsOnly: boolean;
+  verbose: boolean;
+  fix: boolean;
+  fixableOnly: boolean;
+  selectedRules: string[] | null;
+}
 
-// Parse --rules argument
-const rulesArg = args.find(a => a.startsWith('--rules='));
-const selectedRules = rulesArg ? rulesArg.replace('--rules=', '').split(',') : null;
+function parseArgs(argv: string[]): ParsedArgs {
+  const args = argv.slice(2);
+  const rulesArg = args.find((a: string) => a.startsWith('--rules='));
+  return {
+    ci: args.includes('--ci'),
+    list: args.includes('--list'),
+    errorsOnly: args.includes('--errors-only'),
+    verbose: args.includes('--verbose') || args.includes('-v'),
+    fix: args.includes('--fix'),
+    fixableOnly: args.includes('--fixable'),
+    selectedRules: rulesArg ? rulesArg.replace('--rules=', '').split(',') : null,
+  };
+}
 
-const colors = getColors(CI_MODE);
+const parsedArgs: ParsedArgs = parseArgs(process.argv);
+const colors = getColors(parsedArgs.ci);
 
-async function main() {
+async function main(): Promise<void> {
   // List mode
-  if (LIST_MODE) {
+  if (parsedArgs.list) {
     console.log(`${colors.bold}Available validation rules:${colors.reset}\n`);
     for (const rule of allRules) {
       console.log(`  ${colors.cyan}${rule.id}${colors.reset}`);
@@ -50,12 +63,12 @@ async function main() {
     process.exit(0);
   }
 
-  const startTime = Date.now();
+  const startTime: number = Date.now();
 
   // Create engine and register rules
   const engine = new ValidationEngine();
 
-  if (!CI_MODE) {
+  if (!parsedArgs.ci) {
     console.log(`${colors.bold}${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
     console.log(`${colors.bold}  Unified Content Validation${colors.reset}`);
     console.log(`${colors.bold}${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}\n`);
@@ -63,42 +76,42 @@ async function main() {
 
   // Register rules
   for (const rule of allRules) {
-    if (!selectedRules || selectedRules.includes(rule.id)) {
+    if (!parsedArgs.selectedRules || parsedArgs.selectedRules.includes(rule.id)) {
       engine.addRule(rule);
     }
   }
 
-  if (!CI_MODE) {
+  if (!parsedArgs.ci) {
     console.log(`${colors.dim}Loading content...${colors.reset}`);
   }
 
   // Load content
   await engine.load();
 
-  if (!CI_MODE) {
+  if (!parsedArgs.ci) {
     console.log(`${colors.dim}Loaded ${engine.content.size} files${colors.reset}`);
     console.log(`${colors.dim}Running ${engine.rules.size} rules...${colors.reset}\n`);
   }
 
   // Run validation
-  let issues = await engine.validate({
-    ruleIds: selectedRules,
+  let issues: Issue[] = await engine.validate({
+    ruleIds: parsedArgs.selectedRules,
   });
 
   // Filter if errors only
-  if (ERRORS_ONLY) {
-    issues = issues.filter(i => i.severity === Severity.ERROR);
+  if (parsedArgs.errorsOnly) {
+    issues = issues.filter((i: Issue) => i.severity === Severity.ERROR);
   }
 
   // Filter to fixable only if requested
-  if (FIXABLE_ONLY) {
-    issues = issues.filter(i => i.isFixable);
+  if (parsedArgs.fixableOnly) {
+    issues = issues.filter((i: Issue) => i.isFixable);
   }
 
   // Fix mode: apply fixes and exit
-  if (FIX_MODE) {
-    const fixableIssues = issues.filter(i => i.isFixable);
-    const unfixableIssues = issues.filter(i => !i.isFixable);
+  if (parsedArgs.fix) {
+    const fixableIssues: Issue[] = issues.filter((i: Issue) => i.isFixable);
+    const unfixableIssues: Issue[] = issues.filter((i: Issue) => !i.isFixable);
 
     if (fixableIssues.length === 0) {
       console.log(`${colors.green}✓ No fixable issues found${colors.reset}`);
@@ -116,16 +129,16 @@ async function main() {
   }
 
   // Output results
-  if (CI_MODE) {
+  if (parsedArgs.ci) {
     console.log(engine.formatOutput(issues, { ci: true }));
   } else {
     if (issues.length > 0) {
-      console.log(engine.formatOutput(issues, { verbose: VERBOSE }));
+      console.log(engine.formatOutput(issues, { verbose: parsedArgs.verbose }));
     }
 
     const summary = engine.getSummary(issues);
-    const fixableSummary = issues.filter(i => i.isFixable).length;
-    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+    const fixableSummary: number = issues.filter((i: Issue) => i.isFixable).length;
+    const duration: string = ((Date.now() - startTime) / 1000).toFixed(2);
 
     console.log(`\n${colors.bold}${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
 
@@ -143,7 +156,7 @@ async function main() {
     console.log(`${colors.dim}Duration: ${duration}s${colors.reset}\n`);
 
     // Show breakdown by rule
-    if (issues.length > 0 && VERBOSE) {
+    if (issues.length > 0 && parsedArgs.verbose) {
       console.log(`${colors.bold}Issues by rule:${colors.reset}`);
       for (const [rule, count] of Object.entries(summary.byRule)) {
         console.log(`  ${rule}: ${count}`);
@@ -157,7 +170,7 @@ async function main() {
   process.exit(summary.hasErrors ? 1 : 0);
 }
 
-main().catch(err => {
+main().catch((err: unknown) => {
   console.error('Validation failed:', err);
   process.exit(1);
 });

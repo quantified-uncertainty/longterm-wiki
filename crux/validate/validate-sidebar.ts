@@ -7,7 +7,7 @@
  * - sidebar.label should be "Overview"
  * - sidebar.order should be 0
  *
- * Usage: node scripts/validate-sidebar.mjs [--ci]
+ * Usage: node scripts/validate-sidebar.ts [--ci]
  *
  * Exit codes:
  *   0 = All checks passed
@@ -16,23 +16,40 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
+import { fileURLToPath } from 'url';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-const CONTENT_DIR = 'content/docs/knowledge-base';
-const CI_MODE = process.argv.includes('--ci');
-const colors = getColors(CI_MODE);
+const CONTENT_DIR: string = 'content/docs/knowledge-base';
+
+interface SidebarIssue {
+  id: string;
+  severity: 'error' | 'warning' | 'info';
+  description: string;
+  fix: string;
+}
+
+interface FileWithIssues {
+  file: string;
+  issues: SidebarIssue[];
+}
+
+interface IndexFileCheckResult {
+  file: string;
+  issues: SidebarIssue[];
+}
 
 /**
  * Find all index.mdx files recursively
  */
-function findIndexFiles(dir, results = []) {
+function findIndexFiles(dir: string, results: string[] = []): string[] {
   if (!existsSync(dir)) return results;
 
   try {
-    const files = readdirSync(dir);
+    const files: string[] = readdirSync(dir);
     for (const file of files) {
-      const filePath = join(dir, file);
+      const filePath: string = join(dir, file);
       const stat = statSync(filePath);
       if (stat.isDirectory()) {
         findIndexFiles(filePath, results);
@@ -40,7 +57,7 @@ function findIndexFiles(dir, results = []) {
         results.push(filePath);
       }
     }
-  } catch (e) {
+  } catch (e: unknown) {
     // Directory doesn't exist or permission error
   }
   return results;
@@ -49,14 +66,14 @@ function findIndexFiles(dir, results = []) {
 /**
  * Check a single index file for sidebar configuration
  */
-function checkIndexFile(filePath) {
-  const content = readFileSync(filePath, 'utf-8');
-  const frontmatter = parseFrontmatter(content);
-  const issues = [];
+function checkIndexFile(filePath: string): SidebarIssue[] {
+  const content: string = readFileSync(filePath, 'utf-8');
+  const frontmatter: Record<string, unknown> = parseFrontmatter(content);
+  const issues: SidebarIssue[] = [];
 
-  const sidebar = frontmatter.sidebar || {};
-  const label = sidebar.label;
-  const order = sidebar.order;
+  const sidebar = (frontmatter.sidebar || {}) as Record<string, unknown>;
+  const label = sidebar.label as string | undefined;
+  const order = sidebar.order as number | undefined;
 
   // Check label
   if (label !== 'Overview') {
@@ -85,20 +102,20 @@ function checkIndexFile(filePath) {
   return issues;
 }
 
-/**
- * Main function
- */
-function main() {
-  const files = findIndexFiles(CONTENT_DIR);
-  const allIssues = [];
-  let errorCount = 0;
+export function runCheck(options?: ValidatorOptions): ValidatorResult {
+  const CI_MODE: boolean = options?.ci ?? process.argv.includes('--ci');
+  const colors = getColors(CI_MODE);
+
+  const files: string[] = findIndexFiles(CONTENT_DIR);
+  const allIssues: FileWithIssues[] = [];
+  let errorCount: number = 0;
 
   if (!CI_MODE) {
     console.log(`${colors.blue}Checking ${files.length} index files for sidebar configuration...${colors.reset}\n`);
   }
 
   for (const file of files) {
-    const issues = checkIndexFile(file);
+    const issues: SidebarIssue[] = checkIndexFile(file);
     if (issues.length > 0) {
       allIssues.push({ file, issues });
       errorCount += issues.length;
@@ -119,7 +136,7 @@ function main() {
       console.log(`${colors.red}Found ${errorCount} sidebar configuration issue(s):${colors.reset}\n`);
 
       for (const { file, issues } of allIssues) {
-        const relPath = file.replace(process.cwd() + '/', '');
+        const relPath: string = file.replace(process.cwd() + '/', '');
         console.log(`${colors.bold}${relPath}${colors.reset}`);
 
         for (const issue of issues) {
@@ -141,7 +158,17 @@ function main() {
     }
   }
 
-  process.exit(errorCount > 0 ? 1 : 0);
+  return { passed: errorCount === 0, errors: errorCount, warnings: 0 };
 }
 
-main();
+/**
+ * Main function
+ */
+function main(): void {
+  const result = runCheck();
+  process.exit(result.passed ? 0 : 1);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

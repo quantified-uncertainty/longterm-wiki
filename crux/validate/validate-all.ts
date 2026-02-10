@@ -20,32 +20,39 @@
  *   1 = One or more checks failed
  */
 
-import { spawn } from 'child_process';
+import { spawn, type ChildProcess } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { ValidationEngine, Severity } from '../lib/validation-engine.js';
-import { allRules } from '../lib/rules/index.js';
+import { ValidationEngine, Severity, type Issue } from '../lib/validation-engine.ts';
+import { allRules } from '../lib/rules/index.ts';
 import { getColors } from '../lib/output.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename: string = fileURLToPath(import.meta.url);
+const __dirname: string = dirname(__filename);
 
-const args = process.argv.slice(2);
-const CI_MODE = args.includes('--ci') || process.env.CI === 'true';
-const FAIL_FAST = args.includes('--fail-fast');
-const FIX_MODE = args.includes('--fix');
+const args: string[] = process.argv.slice(2);
+const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
+const FAIL_FAST: boolean = args.includes('--fail-fast');
+const FIX_MODE: boolean = args.includes('--fix');
 
 // Parse --skip argument
-const skipArg = args.find(a => a.startsWith('--skip='));
-const skipChecks = skipArg ? skipArg.replace('--skip=', '').split(',') : [];
+const skipArg: string | undefined = args.find((a: string) => a.startsWith('--skip='));
+const skipChecks: string[] = skipArg ? skipArg.replace('--skip=', '').split(',') : [];
 
 const colors = getColors(CI_MODE);
+
+/**
+ * Maps check ID to one or more rule IDs used by the unified validation engine.
+ */
+interface UnifiedChecksMap {
+  [checkId: string]: string[];
+}
 
 /**
  * Checks that use the unified validation engine (fast, single-pass)
  * Maps check ID to rule ID(s)
  */
-const UNIFIED_CHECKS = {
+const UNIFIED_CHECKS: UnifiedChecksMap = {
   'frontmatter': ['frontmatter-schema'],
   'dollars': ['dollar-signs'],
   'comparisons': ['comparison-operators'],
@@ -62,97 +69,102 @@ const UNIFIED_CHECKS = {
 };
 
 /**
+ * Descriptor for a legacy validation script that runs as a subprocess.
+ */
+interface SubprocessCheckDescriptor {
+  id: string;
+  name: string;
+  script: string;
+  description: string;
+  args?: string[];
+}
+
+/**
  * Checks that require subprocess execution (legacy scripts)
  */
-const SUBPROCESS_CHECKS = [
+const SUBPROCESS_CHECKS: SubprocessCheckDescriptor[] = [
   {
     id: 'data',
     name: 'Data Integrity',
-    script: 'validate-data.mjs',
+    script: 'validate-data.ts',
     description: 'Entity references, required fields, DataInfoBox props',
   },
   {
     id: 'entity-links',
     name: 'EntityLink Conversion',
-    script: 'validate-entity-links.mjs',
+    script: 'validate-entity-links.ts',
     description: 'Markdown links that could use EntityLink components',
   },
   {
     id: 'orphans',
     name: 'Orphaned Files',
-    script: 'validate-orphaned-files.mjs',
+    script: 'validate-orphaned-files.ts',
     description: 'Backup files, temp files, empty directories',
   },
   {
     id: 'mdx',
     name: 'MDX Syntax',
-    script: 'validate-mdx-syntax.mjs',
+    script: 'validate-mdx-syntax.ts',
     description: 'Mermaid components, escaped characters, common errors',
   },
   {
     id: 'mdx-compile',
     name: 'MDX Compilation',
-    script: 'validate-mdx-compile.mjs',
+    script: 'validate-mdx-compile.ts',
     description: 'Actually compile MDX to catch JSX parsing errors before build',
   },
   {
     id: 'mermaid',
     name: 'Mermaid Diagrams',
-    script: 'validate-mermaid.mjs',
+    script: 'validate-mermaid.ts',
     description: 'Diagram syntax, subgraph IDs, comparison operators',
   },
   {
     id: 'style',
     name: 'Style Guide Compliance',
-    script: 'validate-style-guide.mjs',
+    script: 'validate-style-guide.ts',
     description: 'Section structure, magnitude assessment, diagram conventions',
   },
   {
     id: 'staleness',
     name: 'Content Freshness',
-    script: 'check-staleness.mjs',
+    script: 'check-staleness.ts',
     description: 'Review dates, dependency updates, age thresholds',
   },
   {
     id: 'consistency',
     name: 'Cross-Page Consistency',
-    script: 'validate-consistency.mjs',
+    script: 'validate-consistency.ts',
     description: 'Probability estimates, causal claims, terminology',
   },
   {
     id: 'sidebar',
     name: 'Sidebar Configuration',
-    script: 'validate-sidebar.mjs',
+    script: 'validate-sidebar.ts',
     description: 'Index pages have label: Overview and order: 0',
-  },
-  {
-    id: 'sidebar-labels',
-    name: 'Sidebar Label Names',
-    script: 'validate-sidebar-labels.mjs',
-    description: 'Sidebar labels use proper English names, not kebab-case',
   },
   {
     id: 'types',
     name: 'Type Consistency',
-    script: 'validate-types.mjs',
+    script: 'validate-types.ts',
     description: 'UI components handle all entity types from schema',
   },
   {
     id: 'schema',
     name: 'YAML Schema Validation',
-    script: 'validate-yaml-schema.mjs',
+    script: 'validate-yaml-schema.ts',
     description: 'Entity/resource YAML files match Zod schemas',
   },
   {
     id: 'graph-sync',
     name: 'Graph Node Sync',
-    script: 'validate-graph-sync.mjs',
+    script: 'validate-graph-sync.ts',
     description: 'Individual diagram nodes exist in master graph',
   },
   {
     id: 'insights',
     name: 'Insights Quality',
-    script: 'validate-insights.mjs',
+    script: 'validate-insights.ts',
     description: 'Insight schema, ratings, and source paths',
   },
   // Note: 'quality' check excluded from CI - it's advisory only
@@ -160,18 +172,62 @@ const SUBPROCESS_CHECKS = [
 ];
 
 /**
+ * Result from running a subprocess validation check.
+ */
+interface SubprocessResult {
+  check: string;
+  name: string;
+  passed: boolean;
+  exitCode: number | null;
+  stdout: string;
+  stderr: string;
+  error?: string;
+}
+
+/**
+ * Result entry for each check in the aggregated results.
+ */
+interface CheckResult {
+  check: string;
+  name: string;
+  passed?: boolean;
+  skipped?: boolean;
+  issues?: number;
+  errors?: number;
+  exitCode?: number | null;
+  stdout?: string;
+  stderr?: string;
+  error?: string;
+}
+
+/**
+ * Aggregated results from all validation checks.
+ */
+interface AggregatedResults {
+  timestamp: string;
+  checks: CheckResult[];
+  summary: {
+    total: number;
+    passed: number;
+    failed: number;
+    skipped: number;
+  };
+  duration?: string;
+}
+
+/**
  * Run a validation script via subprocess
  */
-function runSubprocessCheck(check) {
+function runSubprocessCheck(check: SubprocessCheckDescriptor): Promise<SubprocessResult> {
   return new Promise((resolve) => {
-    const scriptPath = join(__dirname, check.script);
-    const checkArgs = check.args || [];
-    const childArgs = CI_MODE ? ['--ci', ...checkArgs] : checkArgs;
+    const scriptPath: string = join(__dirname, check.script);
+    const checkArgs: string[] = check.args || [];
+    const childArgs: string[] = CI_MODE ? ['--ci', ...checkArgs] : checkArgs;
 
     // Always register tsx/esm so scripts can import .ts modules
-    const runnerArgs = ['--import', 'tsx/esm', '--no-warnings', scriptPath, ...childArgs];
+    const runnerArgs: string[] = ['--import', 'tsx/esm', '--no-warnings', scriptPath, ...childArgs];
 
-    const child = spawn('node', runnerArgs, {
+    const child: ChildProcess = spawn('node', runnerArgs, {
       cwd: process.cwd(),
       stdio: ['inherit', 'pipe', 'pipe'],
     });
@@ -179,21 +235,21 @@ function runSubprocessCheck(check) {
     let stdout = '';
     let stderr = '';
 
-    child.stdout.on('data', (data) => {
+    child.stdout!.on('data', (data: Buffer) => {
       stdout += data.toString();
       if (!CI_MODE) {
         process.stdout.write(data);
       }
     });
 
-    child.stderr.on('data', (data) => {
+    child.stderr!.on('data', (data: Buffer) => {
       stderr += data.toString();
       if (!CI_MODE) {
         process.stderr.write(data);
       }
     });
 
-    child.on('close', (code) => {
+    child.on('close', (code: number | null) => {
       resolve({
         check: check.id,
         name: check.name,
@@ -204,7 +260,7 @@ function runSubprocessCheck(check) {
       });
     });
 
-    child.on('error', (err) => {
+    child.on('error', (err: Error) => {
       resolve({
         check: check.id,
         name: check.name,
@@ -218,9 +274,9 @@ function runSubprocessCheck(check) {
   });
 }
 
-async function main() {
-  const startTime = Date.now();
-  const results = {
+async function main(): Promise<void> {
+  const startTime: number = Date.now();
+  const results: AggregatedResults = {
     timestamp: new Date().toISOString(),
     checks: [],
     summary: {
@@ -242,9 +298,9 @@ async function main() {
   // ─────────────────────────────────────────────────────────────────────────
 
   // Determine which unified checks to run
-  const unifiedChecksToRun = Object.entries(UNIFIED_CHECKS)
-    .filter(([id]) => !skipChecks.includes(id))
-    .map(([id, ruleIds]) => ({ id, ruleIds }));
+  const unifiedChecksToRun: Array<{ id: string; ruleIds: string[] }> = Object.entries(UNIFIED_CHECKS)
+    .filter(([id]: [string, string[]]) => !skipChecks.includes(id))
+    .map(([id, ruleIds]: [string, string[]]) => ({ id, ruleIds }));
 
   if (unifiedChecksToRun.length > 0) {
     if (!CI_MODE) {
@@ -256,7 +312,7 @@ async function main() {
     const engine = new ValidationEngine();
 
     // Register only the rules for checks we're running
-    const ruleIdsToRun = unifiedChecksToRun.flatMap(c => c.ruleIds);
+    const ruleIdsToRun: string[] = unifiedChecksToRun.flatMap((c) => c.ruleIds);
     for (const rule of allRules) {
       if (ruleIdsToRun.includes(rule.id)) {
         engine.addRule(rule);
@@ -266,11 +322,11 @@ async function main() {
     await engine.load();
 
     // Run validation
-    const issues = await engine.validate();
+    const issues: Issue[] = await engine.validate();
 
     // Apply fixes if requested
     if (FIX_MODE) {
-      const fixableIssues = issues.filter(i => i.isFixable);
+      const fixableIssues: Issue[] = issues.filter((i: Issue) => i.isFixable);
       if (fixableIssues.length > 0) {
         const { filesFixed, issuesFixed } = engine.applyFixes(fixableIssues);
         if (!CI_MODE) {
@@ -280,7 +336,7 @@ async function main() {
     }
 
     // Group issues by rule and determine pass/fail for each check
-    const issuesByRule = {};
+    const issuesByRule: Record<string, Issue[]> = {};
     for (const issue of issues) {
       if (!issuesByRule[issue.rule]) {
         issuesByRule[issue.rule] = [];
@@ -292,9 +348,9 @@ async function main() {
     for (const { id, ruleIds } of unifiedChecksToRun) {
       results.summary.total++;
 
-      const checkIssues = ruleIds.flatMap(ruleId => issuesByRule[ruleId] || []);
-      const errorCount = checkIssues.filter(i => i.severity === Severity.ERROR).length;
-      const passed = errorCount === 0;
+      const checkIssues: Issue[] = ruleIds.flatMap((ruleId: string) => issuesByRule[ruleId] || []);
+      const errorCount: number = checkIssues.filter((i: Issue) => i.severity === Severity.ERROR).length;
+      const passed: boolean = errorCount === 0;
 
       if (passed) {
         results.summary.passed++;
@@ -373,7 +429,7 @@ async function main() {
       console.log(`${colors.dim}  ${check.description}${colors.reset}\n`);
     }
 
-    const result = await runSubprocessCheck(check);
+    const result: SubprocessResult = await runSubprocessCheck(check);
     results.checks.push(result);
 
     if (result.passed) {
@@ -404,8 +460,8 @@ async function main() {
   process.exit(results.summary.failed > 0 ? 1 : 0);
 }
 
-function outputResults(results, startTime) {
-  const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+function outputResults(results: AggregatedResults, startTime: number): void {
+  const duration: string = ((Date.now() - startTime) / 1000).toFixed(2);
   results.duration = `${duration}s`;
 
   if (CI_MODE) {

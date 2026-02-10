@@ -18,28 +18,68 @@
  *   1 = Large discrepancies found (quality claimed >= 20 points higher than structure suggests)
  */
 
-import { loadPages as loadPagesData } from '../lib/content-types.js';
+import { fileURLToPath } from 'url';
+import { loadPages as loadPagesData } from '../lib/content-types.ts';
+import type { PageEntry } from '../lib/content-types.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-// Parse args
-const args = process.argv.slice(2);
-const CI_MODE = args.includes('--ci');
-const LARGE_ONLY = args.includes('--large');
-const PAGE_FILTER = args.includes('--page')
-  ? args[args.indexOf('--page') + 1]
-  : null;
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
-// ANSI colors
-const colors = CI_MODE ? {
-  reset: '', bold: '', dim: '',
-  red: '', yellow: '', green: '', blue: '', cyan: ''
-} : {
-  reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m',
-  red: '\x1b[31m', yellow: '\x1b[33m', green: '\x1b[32m',
-  blue: '\x1b[34m', cyan: '\x1b[36m'
-};
+type DiscrepancyLevel = 'overrated' | 'slight-over' | 'ok' | 'slight-under' | 'underrated';
 
-function loadPages() {
-  const pages = loadPagesData();
+interface PageMetrics {
+  wordCount: number;
+  tableCount: number;
+  diagramCount: number;
+  internalLinks: number;
+  externalLinks: number;
+  bulletRatio: number;
+  sectionCount: number;
+  hasOverview: boolean;
+  structuralScore: number;
+}
+
+interface PageWithDiscrepancy extends PageEntry {
+  discrepancy: number;
+  level: DiscrepancyLevel;
+}
+
+interface AnsiColors {
+  reset: string;
+  bold: string;
+  dim: string;
+  red: string;
+  yellow: string;
+  green: string;
+  blue: string;
+  cyan: string;
+}
+
+interface QualityValidatorOptions extends ValidatorOptions {
+  ci?: boolean;
+  large?: boolean;
+  page?: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function makeColors(ciMode: boolean): AnsiColors {
+  return ciMode ? {
+    reset: '', bold: '', dim: '',
+    red: '', yellow: '', green: '', blue: '', cyan: ''
+  } : {
+    reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m',
+    red: '\x1b[31m', yellow: '\x1b[33m', green: '\x1b[32m',
+    blue: '\x1b[34m', cyan: '\x1b[36m'
+  };
+}
+
+function loadPages(): PageEntry[] {
+  const pages: PageEntry[] = loadPagesData();
   if (pages.length === 0) {
     console.error('Error: pages.json not found or empty. Run `pnpm build` first.');
     process.exit(1);
@@ -47,8 +87,8 @@ function loadPages() {
   return pages;
 }
 
-function getDiscrepancyLevel(quality, suggested) {
-  const diff = quality - suggested;
+function getDiscrepancyLevel(quality: number, suggested: number): DiscrepancyLevel {
+  const diff: number = quality - suggested;
   // 0-100 scale: 20+ points is a major discrepancy (one full tier)
   if (diff >= 20) return 'overrated';      // Claimed much higher than structure
   if (diff >= 10) return 'slight-over';    // Slightly overrated
@@ -57,10 +97,10 @@ function getDiscrepancyLevel(quality, suggested) {
   return 'underrated';                      // Could be rated higher
 }
 
-function formatMetrics(metrics) {
+function formatMetrics(metrics: PageMetrics | undefined): string {
   if (!metrics) return 'No metrics';
 
-  const parts = [];
+  const parts: string[] = [];
   parts.push(`📊 ${metrics.tableCount} tables`);
   parts.push(`📈 ${metrics.diagramCount} diagrams`);
   parts.push(`🔗 ${metrics.internalLinks} internal`);
@@ -71,11 +111,15 @@ function formatMetrics(metrics) {
   return parts.join(' | ');
 }
 
-function getImprovementSuggestions(metrics, currentQuality, targetQuality) {
+function getImprovementSuggestions(
+  metrics: PageMetrics | undefined,
+  currentQuality: number,
+  targetQuality: number,
+): string[] {
   if (!metrics) return [];
 
-  const suggestions = [];
-  const neededPoints = (targetQuality - 1) * 3; // Rough mapping
+  const suggestions: string[] = [];
+  const neededPoints: number = (targetQuality - 1) * 3; // Rough mapping
 
   // Tables (0-3 pts)
   if (metrics.tableCount < 2) {
@@ -110,17 +154,26 @@ function getImprovementSuggestions(metrics, currentQuality, targetQuality) {
   return suggestions;
 }
 
-function main() {
-  const pages = loadPages();
+/**
+ * Run the quality discrepancy check.
+ * Returns a ValidatorResult for use by the orchestrator.
+ */
+export function runCheck(options?: QualityValidatorOptions): ValidatorResult {
+  const CI_MODE = options?.ci ?? false;
+  const LARGE_ONLY = options?.large ?? false;
+  const PAGE_FILTER: string | null = options?.page ?? null;
+  const colors: AnsiColors = makeColors(CI_MODE);
+
+  const pages: PageEntry[] = loadPages();
 
   // Filter and analyze
-  let candidates = pages.filter(p =>
+  let candidates: PageEntry[] = pages.filter((p: PageEntry) =>
     p.quality !== null &&
     p.suggestedQuality !== null
   );
 
   if (PAGE_FILTER) {
-    candidates = candidates.filter(p =>
+    candidates = candidates.filter((p: PageEntry) =>
       p.id.includes(PAGE_FILTER) ||
       p.path.includes(PAGE_FILTER) ||
       p.title.toLowerCase().includes(PAGE_FILTER.toLowerCase())
@@ -128,17 +181,17 @@ function main() {
   }
 
   // Categorize by discrepancy
-  const overrated = [];     // quality > suggested by 2+
-  const slightOver = [];    // quality > suggested by 1
-  const ok = [];            // quality == suggested
-  const slightUnder = [];   // quality < suggested by 1
-  const underrated = [];    // quality < suggested by 2+
+  const overrated: PageWithDiscrepancy[] = [];
+  const slightOver: PageWithDiscrepancy[] = [];
+  const ok: PageWithDiscrepancy[] = [];
+  const slightUnder: PageWithDiscrepancy[] = [];
+  const underrated: PageWithDiscrepancy[] = [];
 
   for (const page of candidates) {
-    const level = getDiscrepancyLevel(page.quality, page.suggestedQuality);
-    const entry = {
+    const level: DiscrepancyLevel = getDiscrepancyLevel(page.quality!, page.suggestedQuality!);
+    const entry: PageWithDiscrepancy = {
       ...page,
-      discrepancy: page.quality - page.suggestedQuality,
+      discrepancy: page.quality! - page.suggestedQuality!,
       level,
     };
 
@@ -150,10 +203,10 @@ function main() {
   }
 
   // Sort by discrepancy magnitude
-  overrated.sort((a, b) => b.discrepancy - a.discrepancy);
-  slightOver.sort((a, b) => b.discrepancy - a.discrepancy);
-  underrated.sort((a, b) => a.discrepancy - b.discrepancy);
-  slightUnder.sort((a, b) => a.discrepancy - b.discrepancy);
+  overrated.sort((a: PageWithDiscrepancy, b: PageWithDiscrepancy) => b.discrepancy - a.discrepancy);
+  slightOver.sort((a: PageWithDiscrepancy, b: PageWithDiscrepancy) => b.discrepancy - a.discrepancy);
+  underrated.sort((a: PageWithDiscrepancy, b: PageWithDiscrepancy) => a.discrepancy - b.discrepancy);
+  slightUnder.sort((a: PageWithDiscrepancy, b: PageWithDiscrepancy) => a.discrepancy - b.discrepancy);
 
   if (CI_MODE) {
     console.log(JSON.stringify({
@@ -165,7 +218,12 @@ function main() {
       underrated: underrated.length,
       issues: [...overrated, ...slightOver],
     }, null, 2));
-    process.exit(overrated.length > 0 ? 1 : 0);
+
+    return {
+      passed: overrated.length === 0,
+      errors: overrated.length,
+      warnings: slightOver.length,
+    };
   }
 
   // Human-readable output
@@ -173,7 +231,7 @@ function main() {
   console.log(`Checked ${candidates.length} pages with quality ratings\n`);
 
   // Summary bar
-  const total = candidates.length;
+  const total: number = candidates.length;
   console.log(`${colors.green}✓ ${ok.length} OK${colors.reset} | ` +
     `${colors.yellow}⚠ ${slightOver.length + slightUnder.length} minor${colors.reset} | ` +
     `${colors.red}✗ ${overrated.length + underrated.length} major${colors.reset}\n`);
@@ -187,12 +245,12 @@ function main() {
       console.log(`${colors.bold}${page.title}${colors.reset}`);
       console.log(`  Path: ${page.path}`);
       console.log(`  ${colors.red}Quality: ${page.quality}${colors.reset} vs ${colors.green}Suggested: ${page.suggestedQuality}${colors.reset} (structural score: ${page.metrics?.structuralScore}/15)`);
-      console.log(`  ${formatMetrics(page.metrics)}`);
+      console.log(`  ${formatMetrics(page.metrics as PageMetrics | undefined)}`);
 
-      const suggestions = getImprovementSuggestions(page.metrics, page.quality, page.quality);
+      const suggestions: string[] = getImprovementSuggestions(page.metrics as PageMetrics | undefined, page.quality!, page.quality!);
       if (suggestions.length > 0) {
         console.log(`  ${colors.cyan}To justify Q${page.quality}:${colors.reset}`);
-        suggestions.forEach(s => console.log(`    → ${s}`));
+        suggestions.forEach((s: string) => console.log(`    → ${s}`));
       }
       console.log();
     }
@@ -235,31 +293,51 @@ function main() {
 
     // Single page commands
     console.log(`${colors.cyan}Re-grade one page:${colors.reset}`);
-    const firstPage = overrated[0];
+    const firstPage: PageWithDiscrepancy = overrated[0];
     console.log(`  npm run regrade -- ${firstPage.id}\n`);
 
     // Batch command for all overrated
     if (overrated.length > 1) {
       console.log(`${colors.cyan}Re-grade all ${overrated.length} overrated pages:${colors.reset}`);
-      const ids = overrated.map(p => p.id).join(' ');
+      const ids: string = overrated.map((p: PageWithDiscrepancy) => p.id).join(' ');
       console.log(`  npm run regrade -- ${ids}\n`);
     }
 
     // Or manual fix for stubs
-    const stubs = overrated.filter(p => p.path.includes('stub') || (p.metrics?.wordCount || 0) < 200);
+    const stubs: PageWithDiscrepancy[] = overrated.filter((p: PageWithDiscrepancy) => p.path.includes('stub') || (p.metrics?.wordCount || 0) < 200);
     if (stubs.length > 0) {
       console.log(`${colors.cyan}Or manually lower quality for stub/short pages:${colors.reset}`);
-      stubs.forEach(p => {
-        console.log(`  ${p.id}: quality ${p.quality} → ~${Math.min(35, p.suggestedQuality)}`);
+      stubs.forEach((p: PageWithDiscrepancy) => {
+        console.log(`  ${p.id}: quality ${p.quality} → ~${Math.min(35, p.suggestedQuality!)}`);
       });
       console.log();
     }
-
-    process.exit(1);
   } else {
     console.log(`${colors.green}No significantly overrated pages found.${colors.reset}\n`);
-    process.exit(0);
   }
+
+  return {
+    passed: overrated.length === 0,
+    errors: overrated.length,
+    warnings: slightOver.length,
+  };
 }
 
-main();
+function main(): void {
+  const args: string[] = process.argv.slice(2);
+  const PAGE_FILTER: string | null = args.includes('--page')
+    ? args[args.indexOf('--page') + 1]
+    : null;
+
+  const result = runCheck({
+    ci: args.includes('--ci'),
+    large: args.includes('--large'),
+    page: PAGE_FILTER,
+  });
+
+  process.exit(result.passed ? 0 : 1);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

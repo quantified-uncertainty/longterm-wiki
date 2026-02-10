@@ -19,39 +19,80 @@
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
+import { join } from 'path';
+import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { CONTENT_DIR, loadPathRegistry } from '../lib/content-types.js';
+import { CONTENT_DIR, loadPathRegistry } from '../lib/content-types.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
+import type { Colors } from '../lib/output.ts';
+import type { PathRegistry } from '../lib/content-types.ts';
 
-const args = process.argv.slice(2);
-const CI_MODE = args.includes('--ci');
-const FIX_MODE = args.includes('--fix');
-const BROKEN_ONLY = args.includes('--broken');
-const STRICT_MODE = args.includes('--strict');
-const colors = getColors(CI_MODE);
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
-// Load path registry (entity ID -> path mapping)
-let pathRegistry = loadPathRegistry();
-let reverseRegistry = {}; // path -> entity ID
-
-// Build reverse mapping (path -> entity ID)
-for (const [id, path] of Object.entries(pathRegistry)) {
-  // Normalize path (ensure trailing slash)
-  const normalizedPath = path.endsWith('/') ? path : path + '/';
-  reverseRegistry[normalizedPath] = id;
-  // Also store without trailing slash
-  reverseRegistry[path.replace(/\/$/, '')] = id;
+interface ExtractedLink {
+  href: string;
+  text: string;
+  line: number;
+  column: number;
+  fullMatch: string;
+  file: string;
 }
 
+interface BrokenLink {
+  file: string;
+  line: number;
+  href: string;
+  text: string;
+}
+
+interface ConvertibleLink {
+  file: string;
+  line: number;
+  href: string;
+  text: string;
+  entityId: string;
+  fullMatch: string;
+}
+
+interface LinkFix {
+  fullMatch: string;
+  text: string;
+  entityId: string;
+}
+
+interface LinkResults {
+  totalFiles: number;
+  totalLinks: number;
+  convertible: ConvertibleLink[];
+  broken: BrokenLink[];
+  alreadyEntityLink: number;
+  notInRegistry: number;
+}
+
+interface EntityLinkValidatorOptions extends ValidatorOptions {
+  fix?: boolean;
+  ci?: boolean;
+  strict?: boolean;
+  broken?: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Reverse registry type
+// ---------------------------------------------------------------------------
+
+type ReverseRegistry = Record<string, string>;
+
 // Next.js app directory for standalone pages
-const APP_DIR = join(process.cwd(), 'app/src/app');
+const APP_DIR: string = join(process.cwd(), 'app/src/app');
 
 /**
  * Extract all markdown links from file content
  */
-function extractLinks(content, filePath) {
-  const links = [];
+function extractLinks(content: string, filePath: string): ExtractedLink[] {
+  const links: ExtractedLink[] = [];
   const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
 
   let lineNum = 0;
@@ -70,7 +111,7 @@ function extractLinks(content, filePath) {
     if (inCodeBlock) continue;
 
     linkRegex.lastIndex = 0;
-    let match;
+    let match: RegExpExecArray | null;
 
     while ((match = linkRegex.exec(line)) !== null) {
       const [fullMatch, text, href] = match;
@@ -102,7 +143,7 @@ function extractLinks(content, filePath) {
 /**
  * Normalize a link path for matching against registry
  */
-function normalizePath(href) {
+function normalizePath(href: string): string {
   // Remove anchor and query string
   let path = href.split('#')[0].split('?')[0];
 
@@ -122,7 +163,7 @@ function normalizePath(href) {
 /**
  * Check if a link target exists (file or page)
  */
-function linkExists(href) {
+function linkExists(href: string): boolean {
   let path = href.split('#')[0].split('?')[0];
 
   // Skip placeholder links
@@ -136,7 +177,7 @@ function linkExists(href) {
     path = path.slice(1);
   }
 
-  const possiblePaths = [
+  const possiblePaths: string[] = [
     join(CONTENT_DIR, path + '.mdx'),
     join(CONTENT_DIR, path + '.md'),
     join(CONTENT_DIR, path, 'index.mdx'),
@@ -145,20 +186,20 @@ function linkExists(href) {
     join(APP_DIR, path, 'page.jsx'),
   ];
 
-  return possiblePaths.some(p => existsSync(p));
+  return possiblePaths.some((p: string) => existsSync(p));
 }
 
 /**
  * Check if a file already imports EntityLink
  */
-function hasEntityLinkImport(content) {
+function hasEntityLinkImport(content: string): boolean {
   return content.includes('EntityLink') && content.includes('import');
 }
 
 /**
  * Add EntityLink import to file content
  */
-function addEntityLinkImport(content) {
+function addEntityLinkImport(content: string): string {
   // Check if there's already a wiki import
   const wikiImportRegex = /import\s*{([^}]+)}\s*from\s*['"]([^'"]*components\/wiki)['"]/;
   const match = content.match(wikiImportRegex);
@@ -187,14 +228,37 @@ function addEntityLinkImport(content) {
 /**
  * Convert a markdown link to EntityLink
  */
-function convertToEntityLink(fullMatch, text, entityId) {
+function convertToEntityLink(fullMatch: string, text: string, entityId: string): string {
   // If text matches the entity title (common case), use simple form
   // Otherwise, use label prop
   return `<EntityLink id="${entityId}">${text}</EntityLink>`;
 }
 
-function main() {
-  const results = {
+/**
+ * Run the entity link validation check.
+ * Returns a ValidatorResult for use by the orchestrator.
+ */
+export function runCheck(options?: EntityLinkValidatorOptions): ValidatorResult {
+  const CI_MODE = options?.ci ?? false;
+  const FIX_MODE = options?.fix ?? false;
+  const BROKEN_ONLY = options?.broken ?? false;
+  const STRICT_MODE = options?.strict ?? false;
+  const colors: Colors = getColors(CI_MODE);
+
+  // Load path registry (entity ID -> path mapping)
+  const pathRegistry: PathRegistry = loadPathRegistry();
+  const reverseRegistry: ReverseRegistry = {};
+
+  // Build reverse mapping (path -> entity ID)
+  for (const [id, path] of Object.entries(pathRegistry)) {
+    // Normalize path (ensure trailing slash)
+    const normalizedPath = path.endsWith('/') ? path : path + '/';
+    reverseRegistry[normalizedPath] = id;
+    // Also store without trailing slash
+    reverseRegistry[path.replace(/\/$/, '')] = id;
+  }
+
+  const results: LinkResults = {
     totalFiles: 0,
     totalLinks: 0,
     convertible: [],
@@ -208,20 +272,20 @@ function main() {
     console.log(`${colors.dim}Loaded ${Object.keys(pathRegistry).length} entities from pathRegistry.json${colors.reset}\n`);
   }
 
-  const files = findMdxFiles(CONTENT_DIR);
+  const files: string[] = findMdxFiles(CONTENT_DIR);
   results.totalFiles = files.length;
 
-  const filesToFix = new Map(); // file -> array of fixes
+  const filesToFix = new Map<string, LinkFix[]>(); // file -> array of fixes
 
   for (const file of files) {
-    const content = readFileSync(file, 'utf-8');
-    const links = extractLinks(content, file);
+    const content: string = readFileSync(file, 'utf-8');
+    const links: ExtractedLink[] = extractLinks(content, file);
 
     for (const link of links) {
       results.totalLinks++;
 
-      const normalizedPath = normalizePath(link.href);
-      const entityId = reverseRegistry[normalizedPath] || reverseRegistry[normalizedPath.replace(/\/$/, '')];
+      const normalizedPath: string = normalizePath(link.href);
+      const entityId: string | undefined = reverseRegistry[normalizedPath] || reverseRegistry[normalizedPath.replace(/\/$/, '')];
 
       // Check if link is broken
       if (!linkExists(link.href)) {
@@ -252,7 +316,7 @@ function main() {
           if (!filesToFix.has(file)) {
             filesToFix.set(file, []);
           }
-          filesToFix.get(file).push({
+          filesToFix.get(file)!.push({
             fullMatch: link.fullMatch,
             text: link.text,
             entityId,
@@ -270,7 +334,7 @@ function main() {
     let fixedLinks = 0;
 
     for (const [file, fixes] of filesToFix) {
-      let content = readFileSync(file, 'utf-8');
+      let content: string = readFileSync(file, 'utf-8');
       let modified = false;
 
       // Add import if needed
@@ -281,7 +345,7 @@ function main() {
 
       // Apply link conversions (in reverse order to preserve positions)
       for (const fix of fixes.reverse()) {
-        const newLink = convertToEntityLink(fix.fullMatch, fix.text, fix.entityId);
+        const newLink: string = convertToEntityLink(fix.fullMatch, fix.text, fix.entityId);
         content = content.replace(fix.fullMatch, newLink);
         fixedLinks++;
         modified = true;
@@ -306,7 +370,7 @@ function main() {
     if (results.broken.length > 0) {
       console.log(`${colors.red}❌ Broken links (${results.broken.length}):${colors.reset}\n`);
       for (const link of results.broken.slice(0, 20)) {
-        const relFile = link.file.replace(CONTENT_DIR + '/', '');
+        const relFile: string = link.file.replace(CONTENT_DIR + '/', '');
         console.log(`  ${colors.yellow}${relFile}:${link.line}${colors.reset}`);
         console.log(`    → ${link.href}`);
       }
@@ -321,13 +385,13 @@ function main() {
       console.log(`${colors.yellow}⚠️  Convertible to EntityLink (${results.convertible.length}):${colors.reset}\n`);
 
       // Group by file for cleaner output
-      const byFile = new Map();
+      const byFile = new Map<string, ConvertibleLink[]>();
       for (const link of results.convertible) {
-        const relFile = link.file.replace(CONTENT_DIR + '/', '');
+        const relFile: string = link.file.replace(CONTENT_DIR + '/', '');
         if (!byFile.has(relFile)) {
           byFile.set(relFile, []);
         }
-        byFile.get(relFile).push(link);
+        byFile.get(relFile)!.push(link);
       }
 
       let shown = 0;
@@ -365,14 +429,30 @@ function main() {
     console.log(`${colors.dim}Not in registry:     ${results.notInRegistry}${colors.reset}`);
   }
 
-  // Exit with error if broken links found (always) or convertible links (with --strict)
-  if (results.broken.length > 0) {
-    process.exit(1);
-  }
-  if (!FIX_MODE && results.convertible.length > 0 && STRICT_MODE) {
-    process.exit(1);
-  }
-  process.exit(0);
+  // Determine pass/fail
+  const hasErrors = results.broken.length > 0;
+  const hasStrictWarnings = !FIX_MODE && results.convertible.length > 0 && STRICT_MODE;
+
+  return {
+    passed: !hasErrors && !hasStrictWarnings,
+    errors: results.broken.length,
+    warnings: results.convertible.length,
+  };
 }
 
-main();
+function main(): void {
+  const args: string[] = process.argv.slice(2);
+  const result = runCheck({
+    ci: args.includes('--ci'),
+    fix: args.includes('--fix'),
+    broken: args.includes('--broken'),
+    strict: args.includes('--strict'),
+  });
+
+  // Exit with error if broken links found (always) or convertible links (with --strict)
+  process.exit(result.passed ? 0 : 1);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

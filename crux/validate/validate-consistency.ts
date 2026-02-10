@@ -18,17 +18,112 @@
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
+import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getContentBody } from '../lib/mdx-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
-import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.js';
+import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-const CI_MODE = process.argv.includes('--ci');
-const colors = getColors(CI_MODE);
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface ProbabilityClaim {
+  filePath: string;
+  line: number;
+  value: string;
+  low: number;
+  high: number;
+  topic: string;
+  lineContent: string;
+}
+
+interface ProbabilityIssueLocation {
+  file: string;
+  line: number;
+  value: string;
+}
+
+interface ProbabilityIssue {
+  id: string;
+  severity: 'warning' | 'info';
+  topic: string;
+  description: string;
+  gap: string;
+  locations: ProbabilityIssueLocation[];
+}
+
+interface TermVariantUsage {
+  variant: string;
+  files: number;
+  totalUses: number;
+}
+
+interface TerminologyIssue {
+  id: string;
+  severity: 'info';
+  term: string;
+  description: string;
+  variants: TermVariantUsage[];
+  suggestion: string;
+}
+
+interface CausalIssue {
+  id: string;
+  severity: 'info';
+  description: string;
+  sourceId: string;
+  targetId: string;
+  claimType: string;
+  file: string;
+  suggestion: string;
+}
+
+interface FileContent {
+  content: string;
+  filePath: string;
+}
+
+interface Entity {
+  id: string;
+  title: string;
+  aliases?: string[];
+  relatedEntries?: RelatedEntry[];
+}
+
+interface RelatedEntry {
+  id: string;
+  relationship?: string;
+}
+
+interface CausalPattern {
+  regex: RegExp;
+  type: string;
+}
+
+interface TopicKeywords {
+  [topic: string]: string[];
+}
+
+interface TermVariants {
+  [canonical: string]: string[];
+}
+
+interface FileUsage {
+  filePath: string;
+  count: number;
+}
+
+type ConsistencyIssue = ProbabilityIssue | TerminologyIssue | CausalIssue;
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
 
 // Pages that intentionally document ranges of views (should be skipped for consistency checks)
 // These pages quote different experts/sources with varying estimates by design
-const MULTI_VIEW_PAGES = [
+const MULTI_VIEW_PAGES: string[] = [
   '/metrics/',
   '/getting-started/',
   '/arguments/',
@@ -44,7 +139,7 @@ const MULTI_VIEW_PAGES = [
 // Topics where varying estimates across pages are expected and should not be flagged as warnings
 // These are inherently multi-view topics where experts disagree - most probability claims
 // in this knowledge base document the range of expert opinion, not contradictions
-const EXPECTED_VARIANCE_TOPICS = [
+const EXPECTED_VARIANCE_TOPICS: string[] = [
   'p-doom',
   'timelines',
   'alignment-difficulty',
@@ -55,7 +150,7 @@ const EXPECTED_VARIANCE_TOPICS = [
 ];
 
 // Keywords that help identify which topic a probability claim relates to
-const TOPIC_KEYWORDS = {
+const TOPIC_KEYWORDS: TopicKeywords = {
   'p-doom': ['doom', 'extinction', 'existential', 'x-risk', 'catastroph', 'human extinction'],
   'alignment-difficulty': ['alignment', 'difficult', 'hard', 'solve', 'tractab'],
   'timelines': ['timeline', 'agi', 'tai', '203', '204', 'years', 'decade'],
@@ -66,7 +161,7 @@ const TOPIC_KEYWORDS = {
 };
 
 // Terms that should be used consistently
-const TERM_VARIANTS = {
+const TERM_VARIANTS: TermVariants = {
   'AGI': ['AGI', 'Artificial General Intelligence', 'general AI', 'human-level AI'],
   'ASI': ['ASI', 'Artificial Superintelligence', 'superintelligent AI', 'superintelligence'],
   'TAI': ['TAI', 'Transformative AI', 'transformative artificial intelligence'],
@@ -74,10 +169,14 @@ const TERM_VARIANTS = {
   'x-risk': ['x-risk', 'X-risk', 'existential risk', 'xrisk'],
 };
 
+// ============================================================================
+// FUNCTIONS
+// ============================================================================
+
 /**
  * Load entities from YAML
  */
-function loadEntities() {
+function loadEntities(): Entity[] {
   const entitiesPath = join(DATA_DIR, 'entities.yaml');
   if (!existsSync(entitiesPath)) return [];
   try {
@@ -91,8 +190,8 @@ function loadEntities() {
 /**
  * Extract probability claims from content
  */
-function extractProbabilityClaims(content, filePath) {
-  const claims = [];
+function extractProbabilityClaims(content: string, filePath: string): ProbabilityClaim[] {
+  const claims: ProbabilityClaim[] = [];
   const lines = content.split('\n');
 
   // Pattern: "X-Y%" or "X%" with surrounding context
@@ -100,7 +199,7 @@ function extractProbabilityClaims(content, filePath) {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    let match;
+    let match: RegExpExecArray | null;
 
     while ((match = percentPattern.exec(line)) !== null) {
       // Get surrounding context (100 chars each side for topic detection)
@@ -111,7 +210,7 @@ function extractProbabilityClaims(content, filePath) {
       // Determine topic from context
       let topic = 'unknown';
       for (const [t, keywords] of Object.entries(TOPIC_KEYWORDS)) {
-        if (keywords.some(k => context.includes(k.toLowerCase()))) {
+        if (keywords.some((k: string) => context.includes(k.toLowerCase()))) {
           topic = t;
           break;
         }
@@ -141,21 +240,21 @@ function extractProbabilityClaims(content, filePath) {
 /**
  * Check if a file path matches any multi-view page pattern
  */
-function isMultiViewPage(filePath) {
-  return MULTI_VIEW_PAGES.some(pattern => filePath.includes(pattern));
+function isMultiViewPage(filePath: string): boolean {
+  return MULTI_VIEW_PAGES.some((pattern: string) => filePath.includes(pattern));
 }
 
 /**
  * Check for inconsistent probability estimates across pages
  */
-function checkProbabilityConsistency(allClaims) {
-  const issues = [];
+function checkProbabilityConsistency(allClaims: ProbabilityClaim[]): ProbabilityIssue[] {
+  const issues: ProbabilityIssue[] = [];
 
   // Filter out claims from multi-view pages (they intentionally document diverse estimates)
-  const filteredClaims = allClaims.filter(claim => !isMultiViewPage(claim.filePath));
+  const filteredClaims = allClaims.filter((claim: ProbabilityClaim) => !isMultiViewPage(claim.filePath));
 
   // Group claims by topic
-  const byTopic = {};
+  const byTopic: { [topic: string]: ProbabilityClaim[] } = {};
   for (const claim of filteredClaims) {
     if (!byTopic[claim.topic]) byTopic[claim.topic] = [];
     byTopic[claim.topic].push(claim);
@@ -181,7 +280,7 @@ function checkProbabilityConsistency(allClaims) {
           if (gap > 15) {
             // Topics with expected variance (p-doom, timelines) are info, not warnings
             // since documenting diverse expert views is intentional
-            const severity = EXPECTED_VARIANCE_TOPICS.includes(topic) ? 'info' : 'warning';
+            const severity: 'warning' | 'info' = EXPECTED_VARIANCE_TOPICS.includes(topic) ? 'info' : 'warning';
 
             issues.push({
               id: 'probability-inconsistency',
@@ -201,9 +300,9 @@ function checkProbabilityConsistency(allClaims) {
   }
 
   // Deduplicate (same pair might be found multiple times)
-  const seen = new Set();
-  return issues.filter(issue => {
-    const key = issue.locations.map(l => `${l.file}:${l.line}`).sort().join('|');
+  const seen = new Set<string>();
+  return issues.filter((issue: ProbabilityIssue) => {
+    const key = issue.locations.map((l: ProbabilityIssueLocation) => `${l.file}:${l.line}`).sort().join('|');
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -213,11 +312,11 @@ function checkProbabilityConsistency(allClaims) {
 /**
  * Check for terminology consistency
  */
-function checkTerminologyConsistency(allContent) {
-  const issues = [];
+function checkTerminologyConsistency(allContent: FileContent[]): TerminologyIssue[] {
+  const issues: TerminologyIssue[] = [];
 
   for (const [canonical, variants] of Object.entries(TERM_VARIANTS)) {
-    const usage = {};
+    const usage: { [variant: string]: FileUsage[] } = {};
 
     for (const { content, filePath } of allContent) {
       for (const variant of variants) {
@@ -243,10 +342,10 @@ function checkTerminologyConsistency(allContent) {
         severity: 'info',
         term: canonical,
         description: `Multiple variants used for "${canonical}"`,
-        variants: usedVariants.map(v => ({
+        variants: usedVariants.map((v: string) => ({
           variant: v,
           files: usage[v].length,
-          totalUses: usage[v].reduce((sum, u) => sum + u.count, 0),
+          totalUses: usage[v].reduce((sum: number, u: FileUsage) => sum + u.count, 0),
         })),
         suggestion: `Consider standardizing to "${canonical}" or the most common variant`,
       });
@@ -259,11 +358,11 @@ function checkTerminologyConsistency(allContent) {
 /**
  * Check if causal claims in prose match entity relationships
  */
-function checkCausalConsistency(allContent, entities) {
-  const issues = [];
+function checkCausalConsistency(allContent: FileContent[], entities: Entity[]): CausalIssue[] {
+  const issues: CausalIssue[] = [];
 
   // Build a map of entity relationships
-  const relationships = new Map();
+  const relationships = new Map<string, string>();
   for (const entity of entities) {
     if (entity.relatedEntries) {
       for (const rel of entity.relatedEntries) {
@@ -274,7 +373,7 @@ function checkCausalConsistency(allContent, entities) {
   }
 
   // Build a map of entity titles to IDs for matching
-  const titleToId = new Map();
+  const titleToId = new Map<string, string>();
   for (const entity of entities) {
     titleToId.set(entity.title.toLowerCase(), entity.id);
     if (entity.aliases) {
@@ -285,7 +384,7 @@ function checkCausalConsistency(allContent, entities) {
   }
 
   // Causal claim patterns
-  const causalPatterns = [
+  const causalPatterns: CausalPattern[] = [
     { regex: /(\w[\w\s]{2,30}?)\s+(?:causes?|leads?\s+to|results?\s+in)\s+(\w[\w\s]{2,30})/gi, type: 'causes' },
     { regex: /(\w[\w\s]{2,30}?)\s+(?:mitigates?|prevents?|reduces?)\s+(\w[\w\s]{2,30})/gi, type: 'mitigates' },
     { regex: /(\w[\w\s]{2,30}?)\s+(?:enables?|allows?)\s+(\w[\w\s]{2,30})/gi, type: 'enables' },
@@ -295,7 +394,7 @@ function checkCausalConsistency(allContent, entities) {
     const body = getContentBody(content);
 
     for (const { regex, type } of causalPatterns) {
-      let match;
+      let match: RegExpExecArray | null;
       regex.lastIndex = 0;
 
       while ((match = regex.exec(body)) !== null) {
@@ -328,8 +427,8 @@ function checkCausalConsistency(allContent, entities) {
   }
 
   // Deduplicate
-  const seen = new Set();
-  return issues.filter(issue => {
+  const seen = new Set<string>();
+  return issues.filter((issue: CausalIssue) => {
     const key = `${issue.sourceId}:${issue.targetId}:${issue.claimType}`;
     if (seen.has(key)) return false;
     seen.add(key);
@@ -337,10 +436,58 @@ function checkCausalConsistency(allContent, entities) {
   });
 }
 
+// ============================================================================
+// RUNCHECK + MAIN
+// ============================================================================
+
+/**
+ * Run the consistency check and return a ValidatorResult.
+ * Can be called in-process by the orchestrator.
+ */
+export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
+  const files = findMdxFiles(CONTENT_DIR);
+  const entities = loadEntities();
+
+  const allContent: FileContent[] = [];
+  const allClaims: ProbabilityClaim[] = [];
+
+  for (const file of files) {
+    if (file.includes('/style-guides/') || file.endsWith('index.mdx') || file.endsWith('index.md')) {
+      continue;
+    }
+    try {
+      const content = readFileSync(file, 'utf-8');
+      allContent.push({ content, filePath: file });
+      const claims = extractProbabilityClaims(content, file);
+      allClaims.push(...claims);
+    } catch {
+      // Skip files that can't be read
+    }
+  }
+
+  const probabilityIssues = checkProbabilityConsistency(allClaims);
+  const terminologyIssues = checkTerminologyConsistency(allContent);
+  const causalIssues = checkCausalConsistency(allContent, entities);
+
+  const allIssues: ConsistencyIssue[] = [...probabilityIssues, ...terminologyIssues, ...causalIssues];
+  const warningCount = allIssues.filter((i: ConsistencyIssue) => i.severity === 'warning').length;
+  const infoCount = allIssues.filter((i: ConsistencyIssue) => i.severity === 'info').length;
+
+  return {
+    passed: warningCount === 0,
+    errors: 0,
+    warnings: warningCount,
+    infos: infoCount,
+  };
+}
+
 /**
  * Main function
  */
-function main() {
+function main(): void {
+  const CI_MODE = process.argv.includes('--ci');
+  const colors = getColors(CI_MODE);
+
   const files = findMdxFiles(CONTENT_DIR);
   const entities = loadEntities();
 
@@ -349,8 +496,8 @@ function main() {
   }
 
   // Load all content
-  const allContent = [];
-  const allClaims = [];
+  const allContent: FileContent[] = [];
+  const allClaims: ProbabilityClaim[] = [];
 
   for (const file of files) {
     // Skip style guides and index pages
@@ -374,10 +521,10 @@ function main() {
   const terminologyIssues = checkTerminologyConsistency(allContent);
   const causalIssues = checkCausalConsistency(allContent, entities);
 
-  const allIssues = [...probabilityIssues, ...terminologyIssues, ...causalIssues];
+  const allIssues: ConsistencyIssue[] = [...probabilityIssues, ...terminologyIssues, ...causalIssues];
 
-  let warningCount = allIssues.filter(i => i.severity === 'warning').length;
-  let infoCount = allIssues.filter(i => i.severity === 'info').length;
+  let warningCount = allIssues.filter((i: ConsistencyIssue) => i.severity === 'warning').length;
+  let infoCount = allIssues.filter((i: ConsistencyIssue) => i.severity === 'info').length;
 
   if (CI_MODE) {
     console.log(JSON.stringify({
@@ -394,7 +541,7 @@ function main() {
       console.log(`${colors.dim}  Checked ${allClaims.length} probability claims across ${files.length} files${colors.reset}\n`);
     } else {
       // Group by type - only show actual warnings, not info-level items
-      const probabilityWarnings = probabilityIssues.filter(i => i.severity === 'warning');
+      const probabilityWarnings = probabilityIssues.filter((i: ProbabilityIssue) => i.severity === 'warning');
       if (probabilityWarnings.length > 0) {
         console.log(`${colors.bold}${colors.yellow}⚠️  Probability Estimate Inconsistencies${colors.reset}\n`);
 
@@ -453,4 +600,6 @@ function main() {
   process.exit(warningCount > 0 ? 1 : 0);
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

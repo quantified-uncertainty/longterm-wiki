@@ -18,16 +18,73 @@
  */
 
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
-import { CONTENT_DIR } from '../lib/content-types.js';
+import { CONTENT_DIR } from '../lib/content-types.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-const CI_MODE = process.argv.includes('--ci');
-const colors = getColors(CI_MODE);
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface SectionPattern {
+  pattern: RegExp;
+  name: string;
+}
+
+interface ContentTypeConfig {
+  pathPattern: RegExp;
+  requiredSections: SectionPattern[];
+  recommendedSections: SectionPattern[];
+  requireMagnitude?: boolean;
+  requireResponseLinks?: boolean;
+  requireRiskLinks?: boolean;
+}
+
+interface ContentTypes {
+  [type: string]: ContentTypeConfig;
+}
+
+interface StyleIssue {
+  id: string;
+  severity: 'error' | 'warning' | 'info';
+  description: string;
+  fix: string;
+  line?: number;
+}
+
+interface H2Section {
+  title: string;
+  line: number;
+}
+
+interface FileIssueGroup {
+  file: string;
+  issues: StyleIssue[];
+}
+
+interface Frontmatter {
+  description?: string;
+  ratings?: Record<string, number>;
+  [key: string]: unknown;
+}
+
+interface ByType {
+  [type: string]: number;
+}
+
+interface IssuesByType {
+  [type: string]: FileIssueGroup[];
+}
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
 
 // Content type definitions with their requirements (validator-specific, more detailed than shared)
-const CONTENT_TYPES = {
+const CONTENT_TYPES: ContentTypes = {
   model: {
     pathPattern: /\/models\//,
     requiredSections: [
@@ -68,7 +125,7 @@ const CONTENT_TYPES = {
 };
 
 // Patterns for detecting magnitude/strategic importance
-const MAGNITUDE_PATTERNS = [
+const MAGNITUDE_PATTERNS: RegExp[] = [
   /\d+\s*-\s*\d+\s*%/,                     // "10-30%"
   /share\s+of\s+.*risk/i,                   // "share of total AI risk"
   /rank(s|ing|ed)?.*priority/i,             // "priority ranking"
@@ -79,7 +136,7 @@ const MAGNITUDE_PATTERNS = [
 ];
 
 // Patterns for detecting conclusions in model descriptions
-const CONCLUSION_PATTERNS = [
+const CONCLUSION_PATTERNS: RegExp[] = [
   // Verbs followed by any content (indicating the model does something substantive)
   /\bThis model\s+(estimates?|finds?|concludes?|projects?|suggests?|indicates?|shows?|identifies|provides|analyzes|maps|tracks|catalogs|examines|assesses|evaluates|models|quantifies|measures|predicts|forecasts)\s+\w/i,
   // Also match without "This model" prefix but with specific following words
@@ -93,10 +150,14 @@ const CONCLUSION_PATTERNS = [
   /by\s+20\d{2}/i,                         // "by 2030"
 ];
 
+// ============================================================================
+// FUNCTIONS
+// ============================================================================
+
 /**
  * Determine content type based on file path (local version with validator-specific types)
  */
-function getContentType(filePath) {
+function getContentType(filePath: string): string | null {
   for (const [type, config] of Object.entries(CONTENT_TYPES)) {
     if (config.pathPattern.test(filePath)) {
       return type;
@@ -108,10 +169,10 @@ function getContentType(filePath) {
 /**
  * Extract all h2 sections from content
  */
-function extractH2Sections(content) {
-  const sections = [];
+function extractH2Sections(content: string): H2Section[] {
+  const sections: H2Section[] = [];
   const regex = /^##\s+(.+)$/gm;
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = regex.exec(content)) !== null) {
     const lineNum = content.substring(0, match.index).split('\n').length;
     sections.push({
@@ -125,12 +186,12 @@ function extractH2Sections(content) {
 /**
  * Check for "mechanism without magnitude" anti-pattern
  */
-function checkMechanismWithoutMagnitude(content, body) {
+function checkMechanismWithoutMagnitude(content: string, body: string): StyleIssue | null {
   // Check for strategic importance section
   const hasStrategicSection = /^##\s+strategic\s+importance/im.test(body);
 
   // Check for magnitude indicators in content
-  const hasMagnitudeContent = MAGNITUDE_PATTERNS.some(p => p.test(body));
+  const hasMagnitudeContent = MAGNITUDE_PATTERNS.some((p: RegExp) => p.test(body));
 
   // If neither, this is the anti-pattern
   if (!hasStrategicSection && !hasMagnitudeContent) {
@@ -147,8 +208,8 @@ function checkMechanismWithoutMagnitude(content, body) {
 /**
  * Check for cross-links between risks and responses
  */
-function checkCrossLinks(body, contentType) {
-  const issues = [];
+function checkCrossLinks(body: string, contentType: string): StyleIssue[] {
+  const issues: StyleIssue[] = [];
 
   if (contentType === 'risk') {
     // Check for links to responses
@@ -186,7 +247,7 @@ function checkCrossLinks(body, contentType) {
 /**
  * Check for flat h2 structure (too many h2s without h3s)
  */
-function checkHierarchy(body) {
+function checkHierarchy(body: string): StyleIssue | null {
   const h2Count = (body.match(/^##\s+/gm) || []).length;
   const h3Count = (body.match(/^###\s+/gm) || []).length;
 
@@ -205,11 +266,11 @@ function checkHierarchy(body) {
 /**
  * Check Mermaid diagrams for style issues
  */
-function checkMermaidDiagrams(content) {
-  const issues = [];
+function checkMermaidDiagrams(content: string): StyleIssue[] {
+  const issues: StyleIssue[] = [];
   const mermaidRegex = /<Mermaid[^>]*chart=\{`([^`]+)`\}/gs;
 
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = mermaidRegex.exec(content)) !== null) {
     const chart = match[1];
     const lineNum = content.substring(0, match.index).split('\n').length;
@@ -259,17 +320,17 @@ function checkMermaidDiagrams(content) {
 /**
  * Check for sparse Case For/Against sections
  */
-function checkSparseArguments(body) {
-  const issues = [];
+function checkSparseArguments(body: string): StyleIssue[] {
+  const issues: StyleIssue[] = [];
 
   // Look for Case For/Against sections
   const caseForMatch = body.match(/^##\s+case\s+for\s*\n([\s\S]*?)(?=^##\s|$)/im);
   const caseAgainstMatch = body.match(/^##\s+case\s+against\s*\n([\s\S]*?)(?=^##\s|$)/im);
 
-  const checkSection = (match, name) => {
+  const checkSection = (match: RegExpMatchArray | null, name: string): void => {
     if (!match) return;
     const sectionContent = match[1];
-    const wordCount = sectionContent.split(/\s+/).filter(w => w.length > 0).length;
+    const wordCount = sectionContent.split(/\s+/).filter((w: string) => w.length > 0).length;
     const h3Count = (sectionContent.match(/^###\s+/gm) || []).length;
 
     // Warn if sparse (few words per subsection or very short overall)
@@ -292,12 +353,12 @@ function checkSparseArguments(body) {
 /**
  * Check a single file
  */
-function checkFile(filePath) {
+function checkFile(filePath: string): StyleIssue[] {
   const content = readFileSync(filePath, 'utf-8');
-  const frontmatter = parseFrontmatter(content);
+  const frontmatter = parseFrontmatter(content) as Frontmatter;
   const body = getContentBody(content);
   const contentType = getContentType(filePath);
-  const issues = [];
+  const issues: StyleIssue[] = [];
 
   // Skip style guide pages themselves
   if (filePath.includes('/style-guides/')) {
@@ -326,7 +387,7 @@ function checkFile(filePath) {
     }
 
     // Check recommended sections (info level)
-    let missingRecommended = [];
+    let missingRecommended: string[] = [];
     for (const section of config.recommendedSections) {
       if (!section.pattern.test(body)) {
         missingRecommended.push(section.name);
@@ -351,7 +412,7 @@ function checkFile(filePath) {
 
     // Check cross-links
     if (config.requireResponseLinks || config.requireRiskLinks) {
-      issues.push(...checkCrossLinks(body, contentType));
+      issues.push(...checkCrossLinks(body, contentType!));
     }
   }
 
@@ -380,7 +441,7 @@ function checkFile(filePath) {
 
     // Check for executive summary with conclusions in description
     const description = frontmatter.description || '';
-    const hasConclusion = CONCLUSION_PATTERNS.some(p => p.test(description));
+    const hasConclusion = CONCLUSION_PATTERNS.some((p: RegExp) => p.test(description));
 
     if (!description) {
       issues.push({
@@ -402,20 +463,53 @@ function checkFile(filePath) {
   return issues;
 }
 
+// ============================================================================
+// RUNCHECK + MAIN
+// ============================================================================
+
+/**
+ * Run the style guide check and return a ValidatorResult.
+ * Can be called in-process by the orchestrator.
+ */
+export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
+  const files = findMdxFiles(CONTENT_DIR);
+  let errorCount = 0;
+  let warningCount = 0;
+  let infoCount = 0;
+
+  for (const file of files) {
+    const issues = checkFile(file);
+    for (const issue of issues) {
+      if (issue.severity === 'error') errorCount++;
+      else if (issue.severity === 'warning') warningCount++;
+      else infoCount++;
+    }
+  }
+
+  return {
+    passed: errorCount === 0,
+    errors: errorCount,
+    warnings: warningCount,
+    infos: infoCount,
+  };
+}
 
 /**
  * Main function
  */
-function main() {
+function main(): void {
+  const CI_MODE = process.argv.includes('--ci');
+  const colors = getColors(CI_MODE);
+
   const files = findMdxFiles(CONTENT_DIR);
-  const allIssues = [];
+  const allIssues: FileIssueGroup[] = [];
   let errorCount = 0;
   let warningCount = 0;
   let infoCount = 0;
 
   // Track by content type for summary
-  const byType = { model: 0, risk: 0, response: 0, other: 0 };
-  const issuesByType = { model: [], risk: [], response: [], other: [] };
+  const byType: ByType = { model: 0, risk: 0, response: 0, other: 0 };
+  const issuesByType: IssuesByType = { model: [], risk: [], response: [], other: [] };
 
   if (!CI_MODE) {
     console.log(`${colors.blue}Checking ${files.length} files against style guides...${colors.reset}\n`);
@@ -462,7 +556,7 @@ function main() {
           console.log(`${colors.bold}${relPath}${colors.reset}`);
 
           for (const issue of issues) {
-            let icon;
+            let icon: string;
             if (issue.severity === 'error') icon = `${colors.red}✗`;
             else if (issue.severity === 'warning') icon = `${colors.yellow}⚠`;
             else icon = `${colors.blue}ℹ`;
@@ -494,4 +588,6 @@ function main() {
   process.exit(errorCount > 0 ? 1 : 0);
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

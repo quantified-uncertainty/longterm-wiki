@@ -11,7 +11,66 @@
  *   node scripts/validate-redundancy.mjs --threshold 0.3  # Custom similarity threshold
  */
 
+import { fileURLToPath } from 'url';
 import { db, articles } from '../lib/knowledge-db.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
+
+// =============================================================================
+// TYPES
+// =============================================================================
+
+interface Article {
+  id: string;
+  path: string;
+  title: string;
+  content: string;
+}
+
+interface ProcessedArticle {
+  id: string;
+  path: string;
+  title: string;
+  paragraphs: string[];
+  shingles: Set<string>;
+  words: Set<string>;
+  paragraphShingles: Set<string>[];
+}
+
+interface RedundancyPair {
+  articleA: ProcessedArticle;
+  articleB: ProcessedArticle;
+  similarity: number;
+  wordSimilarity: number;
+  overlappingShingles: number;
+  totalShingles: number;
+}
+
+interface WordPair {
+  articleA: ProcessedArticle;
+  articleB: ProcessedArticle;
+  similarity: number;
+  wordSimilarity: number;
+}
+
+interface ParagraphOccurrence {
+  articleId: string;
+  path: string;
+  paragraphIndex: number;
+  preview: string;
+}
+
+interface RepeatedParagraph {
+  preview: string;
+  count: number;
+  occurrences: ParagraphOccurrence[];
+}
+
+interface AnalysisResults {
+  pairs: RedundancyPair[];
+  wordPairs: WordPair[];
+  repeatedParagraphs: RepeatedParagraph[];
+  totalArticles: number;
+}
 
 // =============================================================================
 // CONFIGURATION
@@ -24,7 +83,7 @@ const MIN_WORD_LENGTH = 5;       // Minimum word length for word-level analysis
 
 // Template headers and phrases that are intentionally consistent across pages
 // These should NOT count as duplication since they're part of the page structure
-const TEMPLATE_PHRASES = [
+const TEMPLATE_PHRASES: string[] = [
   // Common section headers (normalized - lowercase, no punctuation)
   'quick assessment',
   'organization details',
@@ -104,7 +163,7 @@ const TEMPLATE_PHRASES = [
 /**
  * Normalize text for comparison
  */
-function normalize(text) {
+function normalize(text: string): string {
   return text
     .toLowerCase()
     .replace(/[^\w\s]/g, ' ')  // Remove punctuation
@@ -116,7 +175,7 @@ function normalize(text) {
  * Remove template phrases from normalized text
  * This prevents intentionally consistent structure from counting as duplication
  */
-function removeTemplatePhrases(normalizedText) {
+function removeTemplatePhrases(normalizedText: string): string {
   let result = normalizedText;
 
   for (const phrase of TEMPLATE_PHRASES) {
@@ -134,7 +193,7 @@ function removeTemplatePhrases(normalizedText) {
 /**
  * Split content into paragraphs
  */
-function getParagraphs(content) {
+function getParagraphs(content: string): string[] {
   if (!content) return [];
 
   // Remove MDX imports, frontmatter, code blocks
@@ -152,19 +211,19 @@ function getParagraphs(content) {
   // Split on double newlines
   return cleaned
     .split(/\n\s*\n/)
-    .map(p => normalize(p))
-    .map(p => removeTemplatePhrases(p))  // Filter out template phrases
-    .filter(p => p.split(/\s+/).length >= MIN_PARAGRAPH_WORDS);
+    .map((p: string) => normalize(p))
+    .map((p: string) => removeTemplatePhrases(p))  // Filter out template phrases
+    .filter((p: string) => p.split(/\s+/).length >= MIN_PARAGRAPH_WORDS);
 }
 
 /**
  * Generate n-gram shingles from text
  */
-function getShingles(text, n = SHINGLE_SIZE) {
+function getShingles(text: string, n: number = SHINGLE_SIZE): Set<string> {
   const words = text.split(/\s+/);
   if (words.length < n) return new Set();
 
-  const shingles = new Set();
+  const shingles = new Set<string>();
   for (let i = 0; i <= words.length - n; i++) {
     shingles.add(words.slice(i, i + n).join(' '));
   }
@@ -174,15 +233,15 @@ function getShingles(text, n = SHINGLE_SIZE) {
 /**
  * Get significant words (for conceptual similarity)
  */
-function getWords(text) {
+function getWords(text: string): Set<string> {
   const words = text.match(/\b\w+\b/g) || [];
-  return new Set(words.filter(w => w.length >= MIN_WORD_LENGTH));
+  return new Set(words.filter((w: string) => w.length >= MIN_WORD_LENGTH));
 }
 
 /**
  * Calculate Jaccard similarity between two sets
  */
-function jaccardSimilarity(setA, setB) {
+function jaccardSimilarity(setA: Set<string>, setB: Set<string>): number {
   if (setA.size === 0 || setB.size === 0) return 0;
 
   let intersection = 0;
@@ -197,8 +256,8 @@ function jaccardSimilarity(setA, setB) {
 /**
  * Find overlapping shingles between two documents
  */
-function findOverlappingShingles(shinglesA, shinglesB) {
-  const overlap = [];
+function findOverlappingShingles(shinglesA: Set<string>, shinglesB: Set<string>): string[] {
+  const overlap: string[] = [];
   for (const shingle of shinglesA) {
     if (shinglesB.has(shingle)) {
       overlap.push(shingle);
@@ -214,13 +273,13 @@ function findOverlappingShingles(shinglesA, shinglesB) {
 /**
  * Analyze all articles for redundancy
  */
-function analyzeRedundancy(threshold = DEFAULT_THRESHOLD) {
+function analyzeRedundancy(threshold: number = DEFAULT_THRESHOLD): AnalysisResults {
   // Get all articles
-  const allArticles = articles.getAll();
+  const allArticles: Article[] = articles.getAll();
   console.log(`\nAnalyzing ${allArticles.length} articles for redundancy...\n`);
 
   // Process each article
-  const processed = allArticles.map(article => {
+  const processed: ProcessedArticle[] = allArticles.map((article: Article) => {
     const paragraphs = getParagraphs(article.content);
     const allText = paragraphs.join(' ');
     const shingles = getShingles(allText);
@@ -233,13 +292,13 @@ function analyzeRedundancy(threshold = DEFAULT_THRESHOLD) {
       paragraphs,
       shingles,
       words,
-      paragraphShingles: paragraphs.map(p => getShingles(p))
+      paragraphShingles: paragraphs.map((p: string) => getShingles(p))
     };
-  }).filter(a => a.shingles.size > 0);
+  }).filter((a: ProcessedArticle) => a.shingles.size > 0);
 
   // Compare all pairs
-  const pairs = [];
-  const wordPairs = [];  // For conceptual similarity
+  const pairs: RedundancyPair[] = [];
+  const wordPairs: WordPair[] = [];  // For conceptual similarity
   const WORD_THRESHOLD = 0.25;  // Higher threshold for word overlap
 
   for (let i = 0; i < processed.length; i++) {
@@ -275,11 +334,11 @@ function analyzeRedundancy(threshold = DEFAULT_THRESHOLD) {
   }
 
   // Sort by similarity
-  pairs.sort((a, b) => b.similarity - a.similarity);
-  wordPairs.sort((a, b) => b.wordSimilarity - a.wordSimilarity);
+  pairs.sort((a: RedundancyPair, b: RedundancyPair) => b.similarity - a.similarity);
+  wordPairs.sort((a: WordPair, b: WordPair) => b.wordSimilarity - a.wordSimilarity);
 
   // Find repeated paragraphs across multiple documents
-  const paragraphIndex = new Map(); // shingle hash -> [article, paragraph]
+  const paragraphIndex = new Map<string, ParagraphOccurrence[]>(); // shingle hash -> [article, paragraph]
   for (const article of processed) {
     for (let i = 0; i < article.paragraphs.length; i++) {
       const pShingles = article.paragraphShingles[i];
@@ -291,7 +350,7 @@ function analyzeRedundancy(threshold = DEFAULT_THRESHOLD) {
       if (!paragraphIndex.has(sortedShingles)) {
         paragraphIndex.set(sortedShingles, []);
       }
-      paragraphIndex.get(sortedShingles).push({
+      paragraphIndex.get(sortedShingles)!.push({
         articleId: article.id,
         path: article.path,
         paragraphIndex: i,
@@ -301,14 +360,14 @@ function analyzeRedundancy(threshold = DEFAULT_THRESHOLD) {
   }
 
   // Find paragraphs that appear in multiple articles
-  const repeatedParagraphs = [...paragraphIndex.entries()]
+  const repeatedParagraphs: RepeatedParagraph[] = [...paragraphIndex.entries()]
     .filter(([_, occurrences]) => occurrences.length > 1)
     .map(([hash, occurrences]) => ({
       preview: occurrences[0].preview,
       count: occurrences.length,
       occurrences
     }))
-    .sort((a, b) => b.count - a.count);
+    .sort((a: RepeatedParagraph, b: RepeatedParagraph) => b.count - a.count);
 
   return { pairs, wordPairs, repeatedParagraphs, totalArticles: processed.length };
 }
@@ -317,12 +376,12 @@ function analyzeRedundancy(threshold = DEFAULT_THRESHOLD) {
 // REPORTING
 // =============================================================================
 
-function formatPath(path) {
+function formatPath(path: string): string {
   // Shorten path for display
   return path.replace('content/docs/knowledge-base/', '').replace('.mdx', '');
 }
 
-function printReport(results, topN = null) {
+function printReport(results: AnalysisResults, topN: number | null = null): number {
   const { pairs, wordPairs, repeatedParagraphs, totalArticles } = results;
 
   console.log('═'.repeat(70));
@@ -397,7 +456,7 @@ function printReport(results, topN = null) {
 
   if (pairs.length > 0) {
     // Find articles that appear in multiple high-similarity pairs
-    const articleFrequency = new Map();
+    const articleFrequency = new Map<string, number>();
     for (const pair of pairs) {
       const idA = pair.articleA.id;
       const idB = pair.articleB.id;
@@ -414,7 +473,7 @@ function printReport(results, topN = null) {
       console.log('\n  Articles with most overlap (consider consolidating or extracting shared content):');
       for (const [id, count] of frequentArticles) {
         const article = pairs.find(p => p.articleA.id === id || p.articleB.id === id);
-        const path = article.articleA.id === id ? article.articleA.path : article.articleB.path;
+        const path = article!.articleA.id === id ? article!.articleA.path : article!.articleB.path;
         console.log(`    • ${formatPath(path)} (overlaps with ${count} articles)`);
       }
     }
@@ -436,15 +495,31 @@ function printReport(results, topN = null) {
 }
 
 // =============================================================================
-// MAIN
+// RUNCHECK + MAIN
 // =============================================================================
 
-function main() {
+/**
+ * Run the redundancy check and return a ValidatorResult.
+ * Can be called in-process by the orchestrator.
+ */
+export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
+  const threshold = DEFAULT_THRESHOLD;
+  const results = analyzeRedundancy(threshold);
+
+  return {
+    passed: results.pairs.length === 0 && results.wordPairs.length === 0,
+    errors: 0,
+    warnings: results.pairs.length + results.wordPairs.length,
+    infos: results.repeatedParagraphs.length,
+  };
+}
+
+function main(): void {
   const args = process.argv.slice(2);
 
   // Parse arguments
   let threshold = DEFAULT_THRESHOLD;
-  let topN = null;
+  let topN: number | null = null;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--threshold' && args[i + 1]) {
@@ -476,9 +551,11 @@ Examples:
     const exitCode = printReport(results, topN);
     process.exit(exitCode);
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error('Error:', (error as Error).message);
     process.exit(2);
   }
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

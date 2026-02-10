@@ -19,20 +19,31 @@ import { join, relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPathRegistry, loadDatabase } from '../lib/content-types.js';
+import {
+  PROJECT_ROOT,
+  CONTENT_DIR_ABS as CONTENT_DIR,
+  DATA_DIR_ABS as DATA_DIR,
+  loadPathRegistry,
+  loadDatabase,
+  type PathRegistry,
+  type DatabaseSchema,
+  type OrganizationEntry,
+  type ExpertEntry,
+} from '../lib/content-types.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-const args = process.argv.slice(2);
-const CI_MODE = args.includes('--ci');
-const JSON_MODE = args.includes('--json');
-const HELP_MODE = args.includes('--help');
+const args: string[] = process.argv.slice(2);
+const CI_MODE: boolean = args.includes('--ci');
+const JSON_MODE: boolean = args.includes('--json');
+const HELP_MODE: boolean = args.includes('--help');
 
 // Default: warn if any page has more than 3 unlinked high-importance entity mentions
-const thresholdArg = args.find(a => a.startsWith('--threshold'));
-const THRESHOLD = thresholdArg ? parseInt(thresholdArg.split('=')[1]) || 3 : 3;
+const thresholdArg: string | undefined = args.find((a: string) => a.startsWith('--threshold'));
+const THRESHOLD: number = thresholdArg ? parseInt(thresholdArg.split('=')[1]) || 3 : 3;
 
 const colors = getColors(JSON_MODE);
 
-function showHelp() {
+function showHelp(): void {
   console.log(`
 ${colors.bold}Cross-Link Validator${colors.reset}
 
@@ -58,11 +69,48 @@ ${colors.bold}Fixing issues:${colors.reset}
 }
 
 /**
+ * Entity lookup entry mapping a term to its entity ID and display name.
+ */
+interface EntityLookupEntry {
+  id: string;
+  name: string;
+}
+
+/**
+ * An unlinked mention of an entity in page content.
+ */
+interface UnlinkedMention {
+  id: string;
+  name: string;
+  count: number;
+  context: string;
+}
+
+/**
+ * Result for a single page's cross-link analysis.
+ */
+interface PageCrossLinkResult {
+  path: string;
+  title: string;
+  importance: number;
+  unlinkedCount: number;
+  unlinked: UnlinkedMention[];
+}
+
+/**
+ * Loaded data from path registry and database.
+ */
+interface LoadedData {
+  pathRegistry: PathRegistry;
+  database: DatabaseSchema;
+}
+
+/**
  * Load path registry and database
  */
-function loadData() {
-  const pathRegistry = loadPathRegistry();
-  const database = loadDatabase();
+function loadData(): LoadedData {
+  const pathRegistry: PathRegistry = loadPathRegistry();
+  const database: DatabaseSchema = loadDatabase();
 
   // Ensure expected shape for downstream consumers
   if (!database.entities) database.entities = [];
@@ -75,11 +123,11 @@ function loadData() {
 /**
  * Build entity lookup from database
  */
-function buildEntityLookup(database, pathRegistry) {
-  const lookup = new Map();
+function buildEntityLookup(database: DatabaseSchema, pathRegistry: PathRegistry): Map<string, EntityLookupEntry> {
+  const lookup = new Map<string, EntityLookupEntry>();
 
   // Add organizations
-  for (const org of (database.organizations || [])) {
+  for (const org of (database.organizations || []) as Array<OrganizationEntry & { shortName?: string }>) {
     if (org.name && org.id && pathRegistry[org.id]) {
       lookup.set(org.name.toLowerCase(), { id: org.id, name: org.name });
       if (org.shortName) {
@@ -101,10 +149,10 @@ function buildEntityLookup(database, pathRegistry) {
 /**
  * Find EntityLinks in content
  */
-function findEntityLinks(content) {
+function findEntityLinks(content: string): Set<string> {
   const regex = /<EntityLink\s+id="([^"]+)"/g;
-  const links = new Set();
-  let match;
+  const links = new Set<string>();
+  let match: RegExpExecArray | null;
   while ((match = regex.exec(content)) !== null) {
     links.add(match[1]);
   }
@@ -114,8 +162,13 @@ function findEntityLinks(content) {
 /**
  * Find unlinked entity mentions
  */
-function findUnlinkedMentions(content, entityLookup, existingLinks, pageEntityId) {
-  const unlinked = new Map(); // entityId -> { count, firstContext }
+function findUnlinkedMentions(
+  content: string,
+  entityLookup: Map<string, EntityLookupEntry>,
+  existingLinks: Set<string>,
+  pageEntityId: string | undefined
+): UnlinkedMention[] {
+  const unlinked = new Map<string, UnlinkedMention>(); // entityId -> { count, firstContext }
 
   for (const [term, entity] of entityLookup) {
     // Skip if this is the page's own entity
@@ -128,24 +181,24 @@ function findUnlinkedMentions(content, entityLookup, existingLinks, pageEntityId
     if (term.length < 4) continue;
 
     // Search for mentions (case-insensitive, word boundaries)
-    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escaped: string = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(`\\b${escaped}\\b`, 'gi');
 
-    let match;
+    let match: RegExpExecArray | null;
     let count = 0;
     let firstContext = '';
 
     while ((match = regex.exec(content)) !== null) {
       // Skip if in code block or JSX tag
-      const before = content.slice(Math.max(0, match.index - 50), match.index);
+      const before: string = content.slice(Math.max(0, match.index - 50), match.index);
       if (before.includes('<EntityLink') || before.includes('```') || before.includes('`')) {
         continue;
       }
 
       count++;
       if (!firstContext) {
-        const start = Math.max(0, match.index - 30);
-        const end = Math.min(content.length, match.index + term.length + 30);
+        const start: number = Math.max(0, match.index - 30);
+        const end: number = Math.min(content.length, match.index + term.length + 30);
         firstContext = content.slice(start, end).replace(/\n/g, ' ').trim();
       }
     }
@@ -166,8 +219,8 @@ function findUnlinkedMentions(content, entityLookup, existingLinks, pageEntityId
 /**
  * Get page entity ID from file path
  */
-function getPageEntityId(filePath) {
-  const rel = relative(CONTENT_DIR, filePath);
+function getPageEntityId(filePath: string): string | undefined {
+  const rel: string = relative(CONTENT_DIR, filePath);
   return rel
     .replace(/\.mdx?$/, '')
     .replace(/\/index$/, '')
@@ -175,7 +228,56 @@ function getPageEntityId(filePath) {
     .pop();
 }
 
-async function main() {
+/**
+ * Run the cross-link check and return a ValidatorResult.
+ */
+export async function runCheck(options: ValidatorOptions = {}): Promise<ValidatorResult> {
+  const { pathRegistry, database } = loadData();
+  const entityLookup = buildEntityLookup(database, pathRegistry);
+  const files: string[] = findMdxFiles(CONTENT_DIR);
+  const results: PageCrossLinkResult[] = [];
+
+  for (const file of files) {
+    try {
+      const content: string = readFileSync(file, 'utf-8');
+      const frontmatter = parseFrontmatter(content);
+      const body: string = getContentBody(content);
+
+      if (frontmatter.pageType === 'stub' || frontmatter.pageType === 'documentation') {
+        continue;
+      }
+
+      const pageEntityId: string | undefined = getPageEntityId(file);
+      const existingLinks: Set<string> = findEntityLinks(body);
+      const unlinked: UnlinkedMention[] = findUnlinkedMentions(body, entityLookup, existingLinks, pageEntityId);
+
+      if (unlinked.length > 0) {
+        results.push({
+          path: relative(CONTENT_DIR, file),
+          title: (frontmatter.title as string) || pageEntityId || '',
+          importance: (frontmatter.importance as number) || 0,
+          unlinkedCount: unlinked.length,
+          unlinked: unlinked.slice(0, 5),
+        });
+      }
+    } catch {
+      // Skip files that can't be analyzed
+    }
+  }
+
+  results.sort((a: PageCrossLinkResult, b: PageCrossLinkResult) => b.unlinkedCount - a.unlinkedCount);
+
+  const overThreshold: PageCrossLinkResult[] = results.filter((r: PageCrossLinkResult) => r.unlinkedCount > THRESHOLD);
+  const totalWarnings: number = results.length;
+
+  return {
+    passed: overThreshold.length === 0,
+    errors: overThreshold.length,
+    warnings: totalWarnings - overThreshold.length,
+  };
+}
+
+async function main(): Promise<void> {
   if (HELP_MODE) {
     showHelp();
     process.exit(0);
@@ -188,40 +290,40 @@ async function main() {
 
   console.log(`${colors.dim}Loaded ${entityLookup.size} entity terms to check${colors.reset}\n`);
 
-  const files = findMdxFiles(CONTENT_DIR);
-  const results = [];
+  const files: string[] = findMdxFiles(CONTENT_DIR);
+  const results: PageCrossLinkResult[] = [];
 
   for (const file of files) {
     try {
-      const content = readFileSync(file, 'utf-8');
+      const content: string = readFileSync(file, 'utf-8');
       const frontmatter = parseFrontmatter(content);
-      const body = getContentBody(content);
+      const body: string = getContentBody(content);
 
       // Skip stubs and documentation
       if (frontmatter.pageType === 'stub' || frontmatter.pageType === 'documentation') {
         continue;
       }
 
-      const pageEntityId = getPageEntityId(file);
-      const existingLinks = findEntityLinks(body);
-      const unlinked = findUnlinkedMentions(body, entityLookup, existingLinks, pageEntityId);
+      const pageEntityId: string | undefined = getPageEntityId(file);
+      const existingLinks: Set<string> = findEntityLinks(body);
+      const unlinked: UnlinkedMention[] = findUnlinkedMentions(body, entityLookup, existingLinks, pageEntityId);
 
       if (unlinked.length > 0) {
         results.push({
           path: relative(CONTENT_DIR, file),
-          title: frontmatter.title || pageEntityId,
-          importance: frontmatter.importance || 0,
+          title: (frontmatter.title as string) || pageEntityId || '',
+          importance: (frontmatter.importance as number) || 0,
           unlinkedCount: unlinked.length,
           unlinked: unlinked.slice(0, 5), // Top 5
         });
       }
-    } catch (err) {
+    } catch {
       // Skip files that can't be analyzed
     }
   }
 
   // Sort by number of unlinked mentions
-  results.sort((a, b) => b.unlinkedCount - a.unlinkedCount);
+  results.sort((a: PageCrossLinkResult, b: PageCrossLinkResult) => b.unlinkedCount - a.unlinkedCount);
 
   if (JSON_MODE) {
     console.log(JSON.stringify({ results, threshold: THRESHOLD }, null, 2));
@@ -229,8 +331,8 @@ async function main() {
   }
 
   // Report results
-  const overThreshold = results.filter(r => r.unlinkedCount > THRESHOLD);
-  const total = results.reduce((sum, r) => sum + r.unlinkedCount, 0);
+  const overThreshold: PageCrossLinkResult[] = results.filter((r: PageCrossLinkResult) => r.unlinkedCount > THRESHOLD);
+  const total: number = results.reduce((sum: number, r: PageCrossLinkResult) => sum + r.unlinkedCount, 0);
 
   if (results.length === 0) {
     console.log(`${colors.green}✓ All pages have adequate cross-linking${colors.reset}`);
@@ -242,7 +344,7 @@ async function main() {
   // Show top offenders
   console.log(`${colors.bold}Pages with most missing cross-links:${colors.reset}`);
   for (const page of results.slice(0, 15)) {
-    const marker = page.unlinkedCount > THRESHOLD ? colors.red + '!' : colors.yellow + '○';
+    const marker: string = page.unlinkedCount > THRESHOLD ? colors.red + '!' : colors.yellow + '○';
     console.log(`  ${marker}${colors.reset} ${page.title} (${page.unlinkedCount} missing)`);
     for (const entity of page.unlinked.slice(0, 3)) {
       console.log(`    ${colors.dim}- ${entity.name}${colors.reset}`);
@@ -269,7 +371,7 @@ async function main() {
   process.exit(0);
 }
 
-main().catch(err => {
+main().catch((err: unknown) => {
   console.error(err);
   process.exit(1);
 });

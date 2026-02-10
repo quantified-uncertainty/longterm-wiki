@@ -7,7 +7,7 @@
  * Runs schema and source path checks on insights.yaml.
  *
  * Usage:
- *   node scripts/validate-insights.mjs [--ci]
+ *   node scripts/validate-insights.ts [--ci]
  *
  * Exit codes:
  *   0 = All checks passed
@@ -15,23 +15,25 @@
  */
 
 import * as insights from '../lib/insights.ts';
+import type { AllChecksResult, CheckIssue } from '../lib/insights.ts';
 import { createLogger } from '../lib/output.ts';
+import type { Logger } from '../lib/output.ts';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const CI_MODE = process.argv.includes('--ci');
+const __filename: string = fileURLToPath(import.meta.url);
+const __dirname: string = dirname(__filename);
 
 // Resolve paths relative to the repo root
-const REPO_ROOT = join(__dirname, '../..');
-const INSIGHTS_PATH = join(REPO_ROOT, 'data', 'insights');
-const CONTENT_DIR = join(REPO_ROOT, 'content', 'docs');
+const REPO_ROOT: string = join(__dirname, '../..');
+const INSIGHTS_PATH: string = join(REPO_ROOT, 'data', 'insights');
+const CONTENT_DIR: string = join(REPO_ROOT, 'content', 'docs');
 
-async function main() {
-  const log = createLogger(CI_MODE);
+export async function runCheck(options?: ValidatorOptions): Promise<ValidatorResult> {
+  const CI_MODE: boolean = options?.ci ?? process.argv.includes('--ci');
+  const log: Logger = createLogger(CI_MODE);
 
   try {
     // Load insights
@@ -39,7 +41,7 @@ async function main() {
     const insightsList = data.insights || [];
 
     // Run validation checks (schema and sources are most important for CI)
-    const result = insights.runAllChecks(insightsList, CONTENT_DIR, {
+    const result: AllChecksResult = insights.runAllChecks(insightsList, CONTENT_DIR, {
       only: ['schema', 'sources', 'ratings'],
     });
 
@@ -52,7 +54,7 @@ async function main() {
         checksRun: result.checksRun,
         totalIssues: result.totalIssues,
         issues: Object.entries(result.results).flatMap(([check, r]) =>
-          r.issues.filter(i => i.severity === 'error').map(i => ({
+          r.issues.filter((i: CheckIssue) => i.severity === 'error').map((i: CheckIssue) => ({
             check,
             ...i,
           }))
@@ -66,7 +68,7 @@ async function main() {
         console.log(`${c.red}${c.bold}Insights validation failed${c.reset}\n`);
 
         for (const [checkName, checkResult] of Object.entries(result.results)) {
-          const errors = checkResult.issues.filter(i => i.severity === 'error');
+          const errors = checkResult.issues.filter((i: CheckIssue) => i.severity === 'error');
           if (errors.length > 0) {
             console.log(`${c.red}✗ ${checkName}${c.reset}`);
             for (const issue of errors) {
@@ -80,8 +82,8 @@ async function main() {
         console.log(`  ${c.dim}${result.total} insights, ${result.checksRun} checks${c.reset}`);
 
         // Show warnings
-        const warnings = Object.entries(result.results).flatMap(([_, r]) =>
-          r.issues.filter(i => i.severity === 'warning')
+        const warnings: CheckIssue[] = Object.entries(result.results).flatMap(([_, r]) =>
+          r.issues.filter((i: CheckIssue) => i.severity === 'warning')
         );
         if (warnings.length > 0) {
           console.log(`  ${c.yellow}${warnings.length} warnings${c.reset}`);
@@ -89,19 +91,34 @@ async function main() {
       }
     }
 
-    process.exit(result.passed ? 0 : 1);
-  } catch (err) {
+    const totalErrors: number = Object.values(result.results).reduce(
+      (sum, r) => sum + r.issues.filter((i: CheckIssue) => i.severity === 'error').length, 0
+    );
+    const totalWarnings: number = Object.values(result.results).reduce(
+      (sum, r) => sum + r.issues.filter((i: CheckIssue) => i.severity === 'warning').length, 0
+    );
+
+    return { passed: result.passed, errors: totalErrors, warnings: totalWarnings };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
     if (CI_MODE) {
       console.log(JSON.stringify({
         validator: 'insights',
         passed: false,
-        error: err.message,
+        error: message,
       }, null, 2));
     } else {
-      log.error(`Error: ${err.message}`);
+      log.error(`Error: ${message}`);
     }
-    process.exit(1);
+    return { passed: false, errors: 1, warnings: 0 };
   }
 }
 
-main();
+async function main(): Promise<void> {
+  const result = await runCheck();
+  process.exit(result.passed ? 0 : 1);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

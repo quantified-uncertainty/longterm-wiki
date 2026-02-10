@@ -22,24 +22,59 @@ import { compile } from '@mdx-js/mdx';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
 import remarkMath from 'remark-math';
+import { fileURLToPath } from 'url';
 
 // Use shared libraries
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { createLogger, formatPath, createProgress } from '../lib/output.ts';
-import { CONTENT_DIR } from '../lib/content-types.js';
+import { CONTENT_DIR } from '../lib/content-types.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-const args = process.argv.slice(2);
-const QUICK_MODE = args.includes('--quick');
-const fileArg = args.find(a => a.startsWith('--file='));
-const SPECIFIC_FILE = fileArg ? fileArg.replace('--file=', '') : null;
+// ============================================================================
+// TYPES
+// ============================================================================
 
-const log = createLogger();
-const c = log.colors;
+interface ErrorPosition {
+  line: number;
+  column: number;
+}
+
+interface ErrorSnippet {
+  context: string;
+}
+
+interface ErrorSuggestion {
+  issue: string;
+  fix: string;
+  example: string;
+}
+
+interface ValidationFileResult {
+  success: boolean;
+  error?: {
+    message: string;
+    position: ErrorPosition | null;
+    snippet: ErrorSnippet | null;
+    suggestion: ErrorSuggestion | null;
+  };
+}
+
+interface CompilationError {
+  file: string;
+  message: string;
+  position: ErrorPosition | null;
+  snippet: ErrorSnippet | null;
+  suggestion: ErrorSuggestion | null;
+}
+
+// ============================================================================
+// FUNCTIONS
+// ============================================================================
 
 /**
  * Get changed MDX files from git (for quick mode)
  */
-function getChangedMdxFiles() {
+function getChangedMdxFiles(): string[] {
   try {
     // Get files changed vs main branch OR staged/unstaged changes
     const diffOutput = execSync(
@@ -52,10 +87,10 @@ function getChangedMdxFiles() {
     // Git returns paths relative to repo root — content lives at content/docs/
     return diffOutput
       .split('\n')
-      .filter(f => f && f.endsWith('.mdx'))
-      .map(f => f.trim())
-      .filter(f => f.startsWith('content/'))  // Only content MDX files
-      .filter(f => {
+      .filter((f: string) => f && f.endsWith('.mdx'))
+      .map((f: string) => f.trim())
+      .filter((f: string) => f.startsWith('content/'))  // Only content MDX files
+      .filter((f: string) => {
         try {
           statSync(f);
           return true;
@@ -72,7 +107,7 @@ function getChangedMdxFiles() {
 /**
  * Extract a helpful snippet around an error position
  */
-function getErrorSnippet(content, line, column) {
+function getErrorSnippet(content: string, line: number, column: number): ErrorSnippet | null {
   const lines = content.split('\n');
   const lineIndex = line - 1;
 
@@ -88,7 +123,7 @@ function getErrorSnippet(content, line, column) {
 /**
  * Parse error message to extract position info
  */
-function parseErrorPosition(error) {
+function parseErrorPosition(error: Error & { line?: number; column?: number }): ErrorPosition | null {
   const posMatch = error.message?.match(/(?:at |position |\()?(\d+):(\d+)/i);
   if (posMatch) {
     return { line: parseInt(posMatch[1], 10), column: parseInt(posMatch[2], 10) };
@@ -102,7 +137,7 @@ function parseErrorPosition(error) {
 /**
  * Provide helpful fix suggestions based on error type
  */
-function getSuggestion(error, content, pos) {
+function getSuggestion(error: Error, content: string, pos: ErrorPosition | null): ErrorSuggestion | null {
   const msg = error.message?.toLowerCase() || '';
 
   if (msg.includes('unexpected character') && pos) {
@@ -141,7 +176,7 @@ function getSuggestion(error, content, pos) {
 /**
  * Compile a single MDX file and catch errors
  */
-async function validateFile(filePath) {
+async function validateFile(filePath: string): Promise<ValidationFileResult> {
   const content = readFileSync(filePath, 'utf-8');
 
   try {
@@ -152,26 +187,56 @@ async function validateFile(filePath) {
     });
     return { success: true };
   } catch (error) {
-    const pos = parseErrorPosition(error);
+    const pos = parseErrorPosition(error as Error & { line?: number; column?: number });
     const snippet = pos ? getErrorSnippet(content, pos.line, pos.column) : null;
-    const suggestion = getSuggestion(error, content, pos);
+    const suggestion = getSuggestion(error as Error, content, pos);
 
     return {
       success: false,
-      error: { message: error.message, position: pos, snippet, suggestion },
+      error: { message: (error as Error).message, position: pos, snippet, suggestion },
     };
   }
 }
 
 /**
+ * Run the MDX compilation check and return a ValidatorResult.
+ * Can be called in-process by the orchestrator.
+ */
+export async function runCheck(options: ValidatorOptions = {}): Promise<ValidatorResult> {
+  const files = findMdxFiles(CONTENT_DIR);
+  let errorCount = 0;
+
+  for (const file of files) {
+    const result = await validateFile(file);
+    if (!result.success) {
+      errorCount++;
+    }
+  }
+
+  return {
+    passed: errorCount === 0,
+    errors: errorCount,
+    warnings: 0,
+  };
+}
+
+/**
  * Main execution
  */
-async function main() {
+async function main(): Promise<void> {
+  const args = process.argv.slice(2);
+  const QUICK_MODE = args.includes('--quick');
+  const fileArg = args.find((a: string) => a.startsWith('--file='));
+  const SPECIFIC_FILE = fileArg ? fileArg.replace('--file=', '') : null;
+
+  const log = createLogger();
+  const c = log.colors;
+
   log.heading('MDX Compilation Validator');
   console.log();
 
   // Determine which files to check
-  let files;
+  let files: string[];
 
   if (SPECIFIC_FILE) {
     files = [SPECIFIC_FILE];
@@ -189,7 +254,7 @@ async function main() {
   }
   console.log();
 
-  const errors = [];
+  const errors: CompilationError[] = [];
   const progress = createProgress(files.length, 'Compiling');
 
   for (const file of files) {
@@ -197,7 +262,7 @@ async function main() {
     const result = await validateFile(file);
 
     if (!result.success) {
-      errors.push({ file: formatPath(file), ...result.error });
+      errors.push({ file: formatPath(file), ...result.error! });
     }
   }
   progress.done();
@@ -219,7 +284,7 @@ async function main() {
 
     if (err.snippet) {
       log.dim('\n  Context:');
-      console.log(`  ${c.dim}${err.snippet.context.split('\n').map(l => '  ' + l).join('\n')}${c.reset}`);
+      console.log(`  ${c.dim}${err.snippet.context.split('\n').map((l: string) => '  ' + l).join('\n')}${c.reset}`);
     }
 
     if (err.suggestion) {
@@ -237,7 +302,9 @@ async function main() {
   process.exit(1);
 }
 
-main().catch(err => {
-  console.error('Validator error:', err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: Error) => {
+    console.error('Validator error:', err);
+    process.exit(1);
+  });
+}

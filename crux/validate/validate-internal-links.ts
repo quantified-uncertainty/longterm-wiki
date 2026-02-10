@@ -26,26 +26,78 @@ import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join, dirname, basename } from 'path';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
-import { CONTENT_DIR } from '../lib/content-types.js';
+import { CONTENT_DIR } from '../lib/content-types.ts';
+import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-const args = process.argv.slice(2);
-const CI_MODE = args.includes('--ci');
-const OUTPUT_FILE = args.find(arg => arg.startsWith('--output='))?.split('=')[1];
+const args: string[] = process.argv.slice(2);
+const CI_MODE: boolean = args.includes('--ci');
+const OUTPUT_FILE: string | undefined = args.find((arg: string) => arg.startsWith('--output='))?.split('=')[1];
 const colors = getColors(CI_MODE);
+
+/**
+ * An extracted internal link from a content file.
+ */
+interface InternalLink {
+  href: string;
+  text: string;
+  line: number;
+  file: string;
+}
+
+/**
+ * Result of resolving an internal link to a file.
+ */
+interface LinkResolution {
+  exists: boolean;
+  isPlaceholder?: boolean;
+  resolvedPath?: string;
+  tried?: string[];
+}
+
+/**
+ * A broken link found during validation.
+ */
+interface BrokenLink {
+  file: string;
+  line: number;
+  href: string;
+  text: string;
+}
+
+/**
+ * A convention issue found during validation.
+ */
+interface ConventionIssue {
+  file: string;
+  line: number;
+  href: string;
+  issues: string[];
+}
+
+/**
+ * Aggregated validation results for internal links.
+ */
+interface LinkValidationResults {
+  totalFiles: number;
+  totalLinks: number;
+  brokenLinks: BrokenLink[];
+  conventionIssues: ConventionIssue[];
+  valid: number;
+}
 
 /**
  * Extract all internal links from file content
  */
-function extractInternalLinks(content, filePath) {
-  const links = [];
+function extractInternalLinks(content: string, filePath: string): InternalLink[] {
+  const links: InternalLink[] = [];
 
   // Match markdown links: [text](path)
   const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
-  let match;
+  let match: RegExpExecArray | null;
 
   let lineNum = 0;
   let inCodeBlock = false;
-  const lines = content.split('\n');
+  const lines: string[] = content.split('\n');
 
   for (const line of lines) {
     lineNum++;
@@ -89,16 +141,14 @@ function extractInternalLinks(content, filePath) {
 }
 
 // Next.js app directory for standalone pages
-const APP_DIR = join(process.cwd(), 'app/src/app');
+const APP_DIR: string = join(process.cwd(), 'app/src/app');
 
 /**
  * Check if an internal link resolves to an existing file
- * @param {string} href - The link href
- * @param {string} sourceFile - The file containing the link (for resolving relative paths)
  */
-function resolveLink(href, sourceFile) {
+function resolveLink(href: string, sourceFile: string): LinkResolution {
   // Remove anchor (e.g., #section-name) - we only check file existence
-  let path = href.split('#')[0];
+  let path: string = href.split('#')[0];
 
   // Remove query string (e.g., ?level=interactive)
   path = path.split('?')[0];
@@ -114,7 +164,7 @@ function resolveLink(href, sourceFile) {
   // Handle relative paths (./something or ../something)
   if (path.startsWith('./') || path.startsWith('../')) {
     // Get directory of source file
-    const sourceDir = dirname(sourceFile);
+    const sourceDir: string = dirname(sourceFile);
     // Resolve the relative path
     path = join(sourceDir, path);
     // Convert back to relative path from CONTENT_DIR
@@ -127,7 +177,7 @@ function resolveLink(href, sourceFile) {
   }
 
   // Check various possible file locations
-  const possiblePaths = [
+  const possiblePaths: string[] = [
     // Content files (MDX/MD in content/docs)
     join(CONTENT_DIR, path + '.mdx'),
     join(CONTENT_DIR, path + '.md'),
@@ -150,8 +200,8 @@ function resolveLink(href, sourceFile) {
 /**
  * Check if link follows conventions (trailing slash)
  */
-function checkConventions(href) {
-  const issues = [];
+function checkConventions(href: string): string[] {
+  const issues: string[] = [];
 
   // Should have trailing slash for directory-style URLs
   // Skip URLs with query strings (trailing slash comes before ?)
@@ -167,8 +217,51 @@ function checkConventions(href) {
   return issues;
 }
 
-function main() {
-  const results = {
+/**
+ * Run the internal link check and return a ValidatorResult.
+ */
+export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
+  const files: string[] = findMdxFiles(CONTENT_DIR);
+  let brokenCount = 0;
+  let warningCount = 0;
+
+  for (const file of files) {
+    const content: string = readFileSync(file, 'utf-8');
+    const links: InternalLink[] = extractInternalLinks(content, file);
+
+    for (const link of links) {
+      const resolution: LinkResolution = resolveLink(link.href, link.file);
+
+      if (!resolution.exists) {
+        if (link.href.includes('${')) continue;
+        if (link.href.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i)) continue;
+
+        const isModelFile: boolean = link.file.includes('/models/');
+        const isModelLink: boolean = link.href.includes('/models/');
+
+        if (isModelFile && isModelLink) {
+          warningCount++;
+        } else {
+          brokenCount++;
+        }
+      }
+
+      const conventionIssues: string[] = checkConventions(link.href);
+      if (conventionIssues.length > 0) {
+        warningCount++;
+      }
+    }
+  }
+
+  return {
+    passed: brokenCount === 0,
+    errors: brokenCount,
+    warnings: warningCount,
+  };
+}
+
+function main(): void {
+  const results: LinkValidationResults = {
     totalFiles: 0,
     totalLinks: 0,
     brokenLinks: [],
@@ -181,7 +274,7 @@ function main() {
   }
 
   // Find all content files
-  const files = findMdxFiles(CONTENT_DIR);
+  const files: string[] = findMdxFiles(CONTENT_DIR);
   results.totalFiles = files.length;
 
   if (!CI_MODE) {
@@ -190,14 +283,14 @@ function main() {
 
   // Check each file
   for (const file of files) {
-    const content = readFileSync(file, 'utf-8');
-    const links = extractInternalLinks(content, file);
+    const content: string = readFileSync(file, 'utf-8');
+    const links: InternalLink[] = extractInternalLinks(content, file);
 
     for (const link of links) {
       results.totalLinks++;
 
       // Check if link resolves
-      const resolution = resolveLink(link.href, link.file);
+      const resolution: LinkResolution = resolveLink(link.href, link.file);
 
       if (!resolution.exists) {
         // Skip template variables (JSX expressions like ${e.id})
@@ -212,8 +305,8 @@ function main() {
         }
 
         // Treat model-to-model broken links as warnings (future work)
-        const isModelFile = link.file.includes('/models/');
-        const isModelLink = link.href.includes('/models/');
+        const isModelFile: boolean = link.file.includes('/models/');
+        const isModelLink: boolean = link.href.includes('/models/');
 
         if (isModelFile && isModelLink) {
           // Add to convention issues (warnings) instead of broken links
@@ -236,7 +329,7 @@ function main() {
       }
 
       // Check conventions
-      const conventionIssues = checkConventions(link.href);
+      const conventionIssues: string[] = checkConventions(link.href);
       if (conventionIssues.length > 0) {
         results.conventionIssues.push({
           file: link.file,
@@ -250,7 +343,7 @@ function main() {
 
   // Output results
   if (CI_MODE) {
-    const jsonOutput = JSON.stringify(results, null, 2);
+    const jsonOutput: string = JSON.stringify(results, null, 2);
 
     if (OUTPUT_FILE) {
       writeFileSync(OUTPUT_FILE, jsonOutput, 'utf-8');
@@ -263,7 +356,7 @@ function main() {
     if (results.brokenLinks.length > 0) {
       console.log(`${colors.red}❌ Broken links found:${colors.reset}\n`);
       for (const link of results.brokenLinks) {
-        const relFile = link.file.replace(CONTENT_DIR + '/', '');
+        const relFile: string = link.file.replace(CONTENT_DIR + '/', '');
         console.log(`  ${colors.yellow}${relFile}:${link.line}${colors.reset}`);
         console.log(`    → ${link.href}`);
         console.log(`    ${colors.dim}text: "${link.text}"${colors.reset}\n`);
@@ -274,7 +367,7 @@ function main() {
     if (results.conventionIssues.length > 0) {
       console.log(`${colors.yellow}⚠️  Convention issues:${colors.reset}\n`);
       for (const issue of results.conventionIssues.slice(0, 10)) {
-        const relFile = issue.file.replace(CONTENT_DIR + '/', '');
+        const relFile: string = issue.file.replace(CONTENT_DIR + '/', '');
         console.log(`  ${relFile}:${issue.line}`);
         console.log(`    → ${issue.href} (${issue.issues.join(', ')})`);
       }
