@@ -8,6 +8,9 @@ tsconfig.tsbuildinfo
 src/data/database.json
 src/data/search-index.json
 src/data/search-docs.json
+src/data/id-registry.json
+src/data/pathRegistry.json
+src/data/schema.ts
 
 # Search index served at runtime (copied from src/data by prebuild)
 public/search-index.json
