@@ -366,44 +366,58 @@ export type EntityContent = z.infer<typeof EntityContent>;
 // ENTITIES (Generic knowledge base entries with InfoBox data)
 // =============================================================================
 
+// NOTE: This file is copied verbatim to app/src/data/schema.ts during build,
+// so it cannot use relative imports to files outside data/.
+// The canonical list of entity type names lives in app/src/data/entity-type-names.ts.
+// If you add a type here, also add it there (and vice versa).
+// The validate-entities test checks for drift.
 export const EntityType = z.enum([
+  // --- Canonical types ---
   'risk',
   'risk-factor',
   'capability',
   'safety-agenda',
-  'safety-approaches', // Safety research approaches/agendas
-  'approach',      // Broad strategies/categories of response (e.g., prediction markets, epistemic security)
-  'project',       // Specific named implementations/tools (e.g., Metaculus, Squiggle)
+  'approach',
+  'project',
   'policy',
-  'policies',      // Policy categories (alias for grouping)
-  'organization',  // Generic organization
-  'lab',           // AI lab (generic)
-  'lab-frontier',
-  'lab-research',
-  'lab-startup',
-  'lab-academic',
+  'organization',
   'crux',
-  'concept',       // Abstract concepts, ideas, or theoretical constructs
-  'concepts',      // Plural alias
+  'concept',
   'case-study',
-  'researcher',
+  'person',
   'scenario',
   'resource',
   'funder',
-  'historical',    // Historical era or timeline event
-  'events',        // Events or milestones
-  'analysis',      // Analysis or comparison pages
-  'model',         // Analytical model for risks/scenarios (has MDX content)
-  'models',        // Plural alias
-  'parameter',     // Key societal/structural variable (generic)
-  'metric',        // Measurable indicator (generic)
-  'argument',      // Arguments for/against a position
-  // AI Transition Model specific types (prefixed for clarity)
-  'ai-transition-model-parameter',  // Parameters in the AI transition model
-  'ai-transition-model-metric',     // Metrics tracking AI transition parameters
-  'ai-transition-model-scenario',   // Scenarios/outcomes in the transition model
-  'ai-transition-model-factor',     // Root factors (was risk-factor in ATM context)
-  'ai-transition-model-subitem',    // Sub-items within factors (e.g., compute, algorithms)
+  'historical',
+  'analysis',
+  'model',
+  'parameter',
+  'metric',
+  'argument',
+  'table',
+  'diagram',
+  'insight',
+  'event',
+  'debate',
+  'intelligence-paradigm',
+  // AI Transition Model specific types
+  'ai-transition-model-parameter',
+  'ai-transition-model-metric',
+  'ai-transition-model-scenario',
+  'ai-transition-model-factor',
+  'ai-transition-model-subitem',
+  // --- Aliases (legacy/plural forms kept for backward compat) ---
+  'researcher',        // → person
+  'lab',               // → organization
+  'lab-frontier',      // → organization
+  'lab-research',      // → organization
+  'lab-startup',       // → organization
+  'lab-academic',      // → organization
+  'safety-approaches', // → safety-agenda
+  'policies',          // → policy
+  'concepts',          // → concept
+  'events',            // → event
+  'models',            // → model
 ]);
 export type EntityType = z.infer<typeof EntityType>;
 

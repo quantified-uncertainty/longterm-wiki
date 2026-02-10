@@ -6,6 +6,10 @@
  * customFields are mapped to typed per-entity fields.
  */
 import { z } from "zod";
+import {
+  OLD_TYPE_MAP as _OLD_TYPE_MAP,
+  OLD_LAB_TYPE_TO_ORG_TYPE as _OLD_LAB_TYPE_TO_ORG_TYPE,
+} from "./entity-type-names";
 
 // ============================================================================
 // BASE SCHEMA (shared by all entity types)
@@ -266,30 +270,12 @@ export function isPolicy(e: TypedEntity | GenericEntity): e is PolicyEntity {
 
 // ============================================================================
 // TYPE MAPPING FROM OLD DATABASE TYPES
+// (Canonical definitions live in entity-type-names.ts; re-exported here for
+// backward compatibility with existing consumers.)
 // ============================================================================
 
-/**
- * Maps old database.json `type` values to canonical `entityType` values.
- * Types not listed here map to themselves.
- */
-export const OLD_TYPE_MAP: Record<string, string> = {
-  // Lab types → organization
-  lab: "organization",
-  "lab-frontier": "organization",
-  "lab-research": "organization",
-  "lab-academic": "organization",
-  "lab-startup": "organization",
-  // Researcher → person
-  researcher: "person",
-};
+/** @see entity-type-names.ts for the canonical definition */
+export const OLD_TYPE_MAP = _OLD_TYPE_MAP;
 
-/**
- * Maps old lab types to orgType values.
- */
-export const OLD_LAB_TYPE_TO_ORG_TYPE: Record<string, string> = {
-  lab: "generic",
-  "lab-frontier": "frontier-lab",
-  "lab-research": "safety-org",
-  "lab-academic": "academic",
-  "lab-startup": "startup",
-};
+/** @see entity-type-names.ts for the canonical definition */
+export const OLD_LAB_TYPE_TO_ORG_TYPE = _OLD_LAB_TYPE_TO_ORG_TYPE;

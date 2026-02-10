@@ -1,40 +1,14 @@
 import { ENTITY_TYPES, getEntityType } from "@/data/entity-ontology";
 import type { EntityTypeDefinition } from "@/data/entity-ontology";
+import type { AnyEntityTypeName } from "@/data/entity-type-names";
 import { cn } from "@lib/utils";
 
 type LucideIcon = React.ForwardRefExoticComponent<
   React.SVGProps<SVGSVGElement> & { size?: number | string }
 >;
 
-export type EntityType =
-  | "risk"
-  | "risk-factor"
-  | "capability"
-  | "safety-agenda"
-  | "approach"
-  | "project"
-  | "policy"
-  | "organization"
-  | "crux"
-  | "concept"
-  | "case-study"
-  | "person"
-  | "scenario"
-  | "resource"
-  | "funder"
-  | "historical"
-  | "analysis"
-  | "model"
-  | "parameter"
-  | "metric"
-  | "argument"
-  // Backward compat aliases (resolved via ENTITY_TYPES lookup)
-  | "researcher"
-  | "lab"
-  | "lab-frontier"
-  | "lab-research"
-  | "lab-startup"
-  | "lab-academic";
+/** Entity type — derived from the canonical entity-type-names.ts list */
+export type EntityType = AnyEntityTypeName;
 
 interface EntityTypeConfig {
   icon: LucideIcon;
