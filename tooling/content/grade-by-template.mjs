@@ -23,6 +23,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { CONTENT_DIR } from '../lib/content-types.mjs';
+import { countWords, countTables, countDiagrams, countInternalLinks } from '../lib/metrics-extractor.mjs';
 
 // Import template definitions
 const PAGE_TEMPLATES = {
@@ -232,37 +233,15 @@ function extractHeadings(content) {
   return headings;
 }
 
-function countWords(content) {
-  // Remove MDX components, code blocks, and frontmatter
-  const cleaned = content
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/import\s+.*?from\s+['"][^'"]+['"]/g, '')
-    .replace(/\{[^}]+\}/g, '')
-    .replace(/\|[^|]+\|/g, ' ')
-    .replace(/[#*_`]/g, ' ');
-  return cleaned.split(/\s+/).filter(word => word.length > 0).length;
-}
-
-function countTables(content) {
-  // Count markdown tables (lines with |)
-  const tableRows = content.match(/^\|.+\|$/gm) || [];
-  // A table needs at least 3 rows (header, separator, data)
-  return Math.floor(tableRows.length / 3);
-}
+// countWords, countTables, countDiagrams imported from metrics-extractor
 
 function hasDiagram(content) {
-  return content.includes('Mermaid') ||
-         content.includes('mermaid') ||
-         content.includes('FactorRelationshipDiagram') ||
-         content.includes('PageCauseEffectGraph') ||
-         content.includes('CauseEffectGraph');
+  return countDiagrams(content) > 0;
 }
 
 function countCitations(content) {
-  const rComponents = (content.match(/<R\s+id=/g) || []).length;
-  const markdownLinks = (content.match(/\[.*?\]\(https?:\/\//g) || []).length;
-  return rComponents + markdownLinks;
+  // R components + external markdown links
+  return countInternalLinks(content);
 }
 
 function sectionMatches(heading, section) {

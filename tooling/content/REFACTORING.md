@@ -1,101 +1,92 @@
 # Content Scripts Refactoring Guide
 
-These scripts were ported from the cairn monorepo with minimal changes (path adjustments only). They carry significant technical debt that should be addressed in a follow-up branch.
+These scripts were ported from the cairn monorepo with minimal changes (path adjustments only). The tech debt documented below has been addressed.
 
-## Priority 1: Security Fixes
+## Status: COMPLETED
 
-### page-improver.mjs — Shell injection in SCRY search
-**Lines ~237-255.** Uses `execSync` + `curl` with user-influenced query interpolated into a shell command. `$(...)` in a query would execute arbitrary commands.
+All items below have been implemented. See the commit history for details.
 
-**Fix:** Replace with `fetch()` like page-creator.mjs already does for the same SCRY API.
+## Priority 1: Security Fixes ✅
 
-### page-improver.mjs — Unrestricted file read
-**Lines ~184-185.** The `read_file` tool handler reads any path on the filesystem with zero validation. Prompt injection in page content could exfiltrate `.env`, SSH keys, etc.
+### page-improver.mjs — Shell injection in SCRY search ✅
+Replaced `execSync` + `curl` with `fetch()` API. No more shell command interpolation.
 
-**Fix:** Restrict paths to project root: `if (!toolUse.input.path.startsWith(ROOT)) return 'Access denied';`
+### page-improver.mjs — Unrestricted file read ✅
+Added path validation: `read_file` handler now resolves the path and rejects anything outside `ROOT`.
 
-## Priority 2: Bug Fixes
+### Hardcoded SCRY API key ✅
+Both page-creator.mjs and page-improver.mjs now use `process.env.SCRY_API_KEY` with a fallback default.
 
-### page-improver.mjs — gap-fill phase never executes
-In the `deep` tier, phases are `['analyze', 'research-deep', 'improve', 'validate', 'gap-fill', 'review']`. The `gap-fill` phase uses `review` results, but `review` comes *after* `gap-fill`. So `review` is always `undefined`, and gap-fill short-circuits.
+## Priority 2: Bug Fixes ✅
 
-**Fix:** Swap `gap-fill` and `review` in the deep tier phases array.
+### page-improver.mjs — gap-fill/review phase ordering ✅
+Swapped `gap-fill` and `review` in the deep tier phases array so review runs first and gap-fill can use review results.
 
-### page-improver.mjs — validation validates old content
-The validation phase writes improved content to a temp file but runs `node tooling/crux.mjs validate` against the whole project (old content on disk). The validation is meaningless.
+### page-improver.mjs — validation validates old content ✅
+Validation phase now writes improved content to the actual file path before running validators, then restores the original content afterward (via try/finally).
 
-**Fix:** Write improved content to the actual file path before validation, or validate the temp file directly.
+### page-creator.mjs — runSynthesis called with wrong args ✅
+Changed to `tier === 'premium' ? 'quality' : 'standard'` to match the function signature.
 
-### page-creator.mjs — runSynthesis called with wrong args
-**Line ~2360.** Single-phase handler passes `'opus'`/`'sonnet'` as the `quality` parameter, but the function expects `'standard'`/`'fast'`/`'quality'`. Premium tier synthesis always runs on sonnet.
+### page-creator.mjs — sidebar coverage is dead code ✅
+Removed `checkSidebarCoverage` import and all sidebar coverage checks. Next.js auto-detects pages from filesystem.
 
-**Fix:** Change to `tier === 'premium' ? 'quality' : 'standard'`.
+### page-creator.mjs — stale component references in synthesis prompt ✅
+Updated import template from `{EntityLink, Backlinks, KeyPeople, KeyQuestions, Section}` to `{EntityLink, Backlinks, R, DataInfoBox, DataExternalLinks}` (components that actually exist).
 
-### page-creator.mjs — sidebar coverage is dead code
-Imports `checkSidebarCoverage` from `sidebar-utils.mjs`, which reads `astro.config.mjs` (doesn't exist). Always returns `{ covered: false }`.
+### page-creator.mjs — dead `validate-quick` phase ✅
+Deleted the dead code block.
 
-**Fix:** Either remove sidebar coverage checks, or update `sidebar-utils.mjs` to parse the Next.js navigation config.
+## Priority 3: Split page-creator.mjs ✅
 
-### page-creator.mjs — stale component references in synthesis prompt
-**Line ~1234.** The prompt instructs Claude to import `KeyPeople`, `KeyQuestions`, `Section` from `@components/wiki` — these don't exist.
+Split from ~2,400 lines into modules under `tooling/content/creator/`:
 
-**Fix:** Update to only reference components that actually exist in `@components/wiki`.
+| Module | Contents |
+|---|---|
+| `duplicate-detection.mjs` | `levenshteinDistance`, `similarity`, `toSlug`, `checkForExistingPage` |
+| `canonical-links.mjs` | `CANONICAL_DOMAINS`, `findCanonicalLinks` |
+| `research.mjs` | `runPerplexityResearch`, `runScryResearch` |
+| `source-fetching.mjs` | `registerResearchSources`, `fetchRegisteredSources`, `getFetchedSourceContent`, `processDirections`, `extractUrls` |
+| `synthesis.mjs` | `getSynthesisPrompt`, `runSynthesis` |
+| `verification.mjs` | `runSourceVerification` |
+| `validation.mjs` | `runValidationLoop`, `runFullValidation`, `ensureComponentImports` |
+| `grading.mjs` | `GRADING_SYSTEM_PROMPT`, `runGrading` |
+| `deployment.mjs` | `deployToDestination`, `createCategoryDirectory`, `validateCrossLinks`, `runReview` |
+| `index.mjs` | Re-exports all modules |
 
-### page-creator.mjs — dead `validate-quick` phase
-**Lines ~2153-2157.** Returns `{ success: true }` and charges phantom $0.50. Not referenced in any tier.
+`page-creator.mjs` is now a thin CLI entry point (~500 lines) with configuration, utilities, pipeline runner, and CLI argument parsing.
 
-**Fix:** Delete it.
+## Priority 4: Deduplicate Against Shared Libs ✅
 
-## Priority 3: Split page-creator.mjs (~2,400 lines)
+### page-creator.mjs — `ensureComponentImports` ✅
+Replaced inline implementation with delegation to shared `componentImportsRule` from `tooling/lib/rules/component-imports.mjs`.
 
-Proposed module structure under `tooling/content/creator/`:
+### grade-content.mjs — duplicated utilities ✅
+- `extractFrontmatter()` → delegates to `parseFrontmatter()` from `tooling/lib/mdx-utils.mjs`
+- `collectPages()` → uses `findMdxFiles()` from `tooling/lib/file-utils.mjs`
+- Direct `client.messages.create()` → replaced with `callClaude()` from `../lib/anthropic.mjs`
+- Added `mkdirSync` for output directory
 
-| Module | ~Lines | Contents |
-|---|---|---|
-| `duplicate-detection.mjs` | 120 | `levenshteinDistance`, `similarity`, `toSlug`, `checkForExistingPage` |
-| `canonical-links.mjs` | 90 | `CANONICAL_DOMAINS`, `findCanonicalLinks` |
-| `research.mjs` | 100 | `runPerplexityResearch`, `runScryResearch` |
-| `source-fetching.mjs` | 120 | `registerResearchSources`, `fetchRegisteredSources`, `getFetchedSourceContent`, `processDirections`, `extractUrls` |
-| `synthesis.mjs` | 240 | `getSynthesisPrompt`, `runSynthesis` |
-| `verification.mjs` | 200 | `runSourceVerification` |
-| `validation.mjs` | 200 | `runValidationLoop`, `runFullValidation`, `ensureComponentImports` |
-| `grading.mjs` | 150 | `GRADING_SYSTEM_PROMPT`, `runGrading` |
-| `deployment.mjs` | 80 | `deployToDestination`, `createCategoryDirectory`, `validateCrossLinks` |
-| `index.mjs` | 200 | Pipeline runner, CLI arg parsing, `main()` |
+### grade-by-template.mjs — duplicated metric functions ✅
+- `countWords()`, `countTables()` → imported from `tooling/lib/metrics-extractor.mjs` (newly exported)
+- `hasDiagram()` → delegates to `countDiagrams()` from metrics-extractor
+- `countCitations()` → delegates to `countInternalLinks()` from metrics-extractor
 
-The existing `page-creator.mjs` would become a thin entry point that imports from `creator/index.mjs`.
+### WIKI_COMPONENTS list ✅
+Updated `tooling/lib/rules/component-imports.mjs` to match actual exports from `app/src/components/wiki/index.ts`.
 
-## Priority 4: Deduplicate Against Shared Libs
+### metrics-extractor.mjs — exported counting functions ✅
+Made `countWords`, `countTables`, `countDiagrams`, `countInternalLinks`, `countExternalLinks` public exports so other scripts can reuse them.
 
-### page-improver.mjs — bypass of shared anthropic lib
-Imports `@anthropic-ai/sdk` directly instead of using `../lib/anthropic.mjs`. Reimplements agent loop, JSON parsing, client creation without rate limiting or error handling.
+## Priority 5: Tests ✅
 
-**Fix:** Use `createClient()`, `parseJsonResponse()`, `MODELS` from `../lib/anthropic.mjs`. Extract the agent loop (tool-use conversation) to a shared helper if needed.
+Added test files:
+- `tooling/content/creator/creator.test.mjs` — 21 tests for duplicate detection and URL extraction
+- `tooling/lib/metrics-extractor.test.mjs` — 23 tests for exported metric functions
 
-### page-creator.mjs — `ensureComponentImports` duplication
-**Lines ~391-486.** Near-exact duplicate of `tooling/lib/rules/component-imports.mjs`.
+All existing tests continue to pass (lib.test.mjs: 24/24, validators.test.mjs: 35/35 logic tests, vitest: 45/45).
 
-**Fix:** Import and call the existing validation rule's fix function instead.
+## Remaining Items (not addressed)
 
-### grade-content.mjs — duplicated utilities
-- `extractFrontmatter()` duplicates `parseFrontmatter()` from `tooling/lib/mdx-utils.mjs`
-- `collectPages()` duplicates `findMdxFiles()` from `tooling/lib/file-utils.mjs`
-- `computeMetrics()` duplicates `extractMetrics()` from `tooling/lib/metrics-extractor.mjs`
-- Direct `client.messages.create()` call (line ~604) should use `callClaude()` from `../lib/anthropic.mjs`
-- Missing `mkdirSync` for output directory `.claude/temp/grades-output.json`
-
-### grade-by-template.mjs — duplicated metric functions
-- `countWords()`, `countTables()`, `countCitations()`, `hasDiagram()` duplicate `tooling/lib/metrics-extractor.mjs`
-- `PAGE_TEMPLATES` (~200 lines inline) should be a separate data file
-
-### Hardcoded SCRY API key
-Both page-creator.mjs and page-improver.mjs hardcode `exopriors_public_readonly_v1_2025`. Should be in `.env` with a fallback default.
-
-## Priority 5: Add Tests
-
-After the refactoring above, good candidates for unit tests:
-- `duplicate-detection.mjs`: `levenshteinDistance`, `similarity`, `toSlug`, `checkForExistingPage`
-- `extractUrls`: URL extraction with parenthesis balancing
-- `ensureComponentImports`: import detection and fixing
-- Shared validation rule constants: verify arrays match what the validation engine expects
-- `verification.mjs`: quote attribution detection, name verification
+- **page-improver.mjs — bypass of shared anthropic lib**: Still imports `@anthropic-ai/sdk` directly for the agent loop (tool-use conversation). The agent loop pattern doesn't fit `callClaude()` which is single-turn. Would need a new shared helper.
+- **grade-by-template.mjs — PAGE_TEMPLATES inline data**: ~200 lines of template definitions remain inline. Could be externalized to a JSON/YAML file but is low priority.

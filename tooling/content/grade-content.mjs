@@ -27,11 +27,13 @@
  */
 
 import { createClient, callClaude, parseJsonResponse, MODELS } from '../lib/anthropic.mjs';
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'fs';
-import { join, relative, basename } from 'path';
+import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSync } from 'fs';
+import { join, relative, basename, dirname } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { CONTENT_DIR } from '../lib/content-types.mjs';
 import { ValidationEngine, ContentFile } from '../lib/validation-engine.mjs';
+import { parseFrontmatter } from '../lib/mdx-utils.mjs';
+import { findMdxFiles } from '../lib/file-utils.mjs';
 import {
   insiderJargonRule,
   falseCertaintyRule,
@@ -209,73 +211,58 @@ function detectPageType(id, frontmatter) {
 }
 
 /**
- * Scan content directory and collect all pages
+ * Scan content directory and collect all pages.
+ * Uses shared findMdxFiles for file discovery.
  */
 function collectPages() {
+  const files = findMdxFiles(CONTENT_DIR);
   const pages = [];
 
-  function scanDir(dir, urlPrefix = '') {
-    if (!existsSync(dir)) return;
-    const entries = readdirSync(dir);
+  for (const fullPath of files) {
+    const content = readFileSync(fullPath, 'utf-8');
+    const fm = extractFrontmatter(content);
+    const entry = basename(fullPath);
+    const id = basename(entry, entry.endsWith('.mdx') ? '.mdx' : '.md');
 
-    for (const entry of entries) {
-      const fullPath = join(dir, entry);
-      const stat = statSync(fullPath);
+    // Determine category from relative path
+    const relPath = relative(CONTENT_DIR, fullPath);
+    const pathParts = dirname(relPath).split('/').filter(p => p && p !== '.');
+    const category = pathParts[0] || 'other';
+    const subcategory = pathParts[1] || null;
+    const urlPrefix = '/' + pathParts.join('/');
 
-      if (stat.isDirectory()) {
-        scanDir(fullPath, `${urlPrefix}/${entry}`);
-      } else if (entry.endsWith('.mdx') || entry.endsWith('.md')) {
-        const content = readFileSync(fullPath, 'utf-8');
-        const fm = extractFrontmatter(content);
-        const id = basename(entry, entry.endsWith('.mdx') ? '.mdx' : '.md');
+    // Check if it's a model page
+    const isModel = relPath.includes('/models') || fm.ratings !== undefined;
 
-        // Determine category from path
-        const pathParts = urlPrefix.split('/').filter(Boolean);
-        const category = pathParts[0] || 'other';
-        const subcategory = pathParts[1] || null;
+    // Detect page type
+    const pageType = detectPageType(id, fm);
 
-        // Check if it's a model page
-        const isModel = urlPrefix.includes('/models') || fm.ratings !== undefined;
-
-        // Detect page type
-        const pageType = detectPageType(id, fm);
-
-        pages.push({
-          id,
-          filePath: fullPath,
-          relativePath: relative(CONTENT_DIR, fullPath),
-          urlPath: id === 'index' ? `${urlPrefix}/` : `${urlPrefix}/${id}/`,
-          title: fm.title || id.replace(/-/g, ' '),
-          category,
-          subcategory,
-          isModel,
-          pageType,
-          currentImportance: fm.importance ?? null,
-          currentQuality: fm.quality ?? null,
-          currentRatings: fm.ratings ?? null,
-          content,
-          frontmatter: fm,
-        });
-      }
-    }
+    pages.push({
+      id,
+      filePath: fullPath,
+      relativePath: relPath,
+      urlPath: id === 'index' ? `${urlPrefix}/` : `${urlPrefix}/${id}/`,
+      title: fm.title || id.replace(/-/g, ' '),
+      category,
+      subcategory,
+      isModel,
+      pageType,
+      currentImportance: fm.importance ?? null,
+      currentQuality: fm.quality ?? null,
+      currentRatings: fm.ratings ?? null,
+      content,
+      frontmatter: fm,
+    });
   }
 
-  scanDir(CONTENT_DIR);
   return pages;
 }
 
 /**
- * Extract frontmatter from content
+ * Extract frontmatter from content.
+ * Delegates to shared parseFrontmatter from mdx-utils.
  */
-function extractFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return {};
-  try {
-    return parseYaml(match[1]) || {};
-  } catch (e) {
-    return {};
-  }
-}
+const extractFrontmatter = parseFrontmatter;
 
 /**
  * Get content without frontmatter, optionally truncated
@@ -600,32 +587,17 @@ async function gradePage(client, page, warningsSummary = null) {
     userPrompt += `\n\n---\nPRE-SCREENING WARNINGS (from automated rules and checklist review — factor these into your ratings, especially objectivity, rigor, and concreteness):\n${warningsSummary}\n---`;
   }
 
-  const response = await client.messages.create({
-    model: 'claude-sonnet-4-5-20250929',
-    max_tokens: 800,
-    messages: [
-      { role: 'user', content: userPrompt }
-    ],
-    system: SYSTEM_PROMPT,
+  const response = await callClaude(client, {
+    model: 'sonnet',
+    systemPrompt: SYSTEM_PROMPT,
+    userPrompt,
+    maxTokens: 800,
   });
 
-  const text = response.content[0].text;
-
-  // Parse JSON response
   try {
-    // Handle potential markdown code blocks (more robust regex)
-    let jsonText = text.trim();
-    // Match ```json, ```JSON, ``` with optional whitespace/newlines
-    const codeBlockMatch = jsonText.match(/^```(?:json|JSON)?\s*\n([\s\S]*?)\n```\s*$/);
-    if (codeBlockMatch) {
-      jsonText = codeBlockMatch[1];
-    } else if (jsonText.startsWith('```')) {
-      // Fallback: strip opening/closing manually
-      jsonText = jsonText.replace(/^```(?:json|JSON)?\s*\n?/, '').replace(/\n?```\s*$/, '');
-    }
-    return JSON.parse(jsonText);
+    return parseJsonResponse(response.text);
   } catch (e) {
-    console.error(`Failed to parse response for ${page.id}:`, text);
+    console.error(`Failed to parse response for ${page.id}:`, response.text);
     return null;
   }
 }
@@ -931,7 +903,11 @@ async function main() {
     await new Promise(r => setTimeout(r, 200));
   }
 
-  // Write results
+  // Write results (ensure output directory exists)
+  const outputDir = dirname(options.output);
+  if (!existsSync(outputDir)) {
+    mkdirSync(outputDir, { recursive: true });
+  }
   writeFileSync(options.output, JSON.stringify(results, null, 2));
   console.log(`\nResults written to ${options.output}`);
   console.log(`Processed: ${processed}, Errors: ${errors}`);

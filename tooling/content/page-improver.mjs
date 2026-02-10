@@ -37,7 +37,7 @@ const ROOT = path.join(__dirname, '../..');
 const TEMP_DIR = path.join(ROOT, '.claude/temp/page-improver');
 
 // SCRY API config
-const SCRY_PUBLIC_KEY = 'exopriors_public_readonly_v1_2025';
+const SCRY_PUBLIC_KEY = process.env.SCRY_API_KEY || 'exopriors_public_readonly_v1_2025';
 
 // Tier configurations
 const TIERS = {
@@ -56,7 +56,7 @@ const TIERS = {
   deep: {
     name: 'Deep Research',
     cost: '$10-15',
-    phases: ['analyze', 'research-deep', 'improve', 'validate', 'gap-fill', 'review'],
+    phases: ['analyze', 'research-deep', 'improve', 'validate', 'review', 'gap-fill'],
     description: 'Full SCRY + web research, validation, multi-phase improvement'
   }
 };
@@ -161,7 +161,12 @@ async function runAgent(prompt, options = {}) {
         } else if (toolUse.name === 'scry_search') {
           result = await executeScrySearch(toolUse.input.query, toolUse.input.table);
         } else if (toolUse.name === 'read_file') {
-          result = fs.readFileSync(toolUse.input.path, 'utf-8');
+          const resolvedPath = path.resolve(toolUse.input.path);
+          if (!resolvedPath.startsWith(ROOT)) {
+            result = 'Access denied: path must be within project root';
+          } else {
+            result = fs.readFileSync(resolvedPath, 'utf-8');
+          }
         } else {
           result = `Unknown tool: ${toolUse.name}`;
         }
@@ -220,14 +225,16 @@ async function executeScrySearch(query, table = 'mv_eaforum_posts') {
     LIMIT 10`;
 
   try {
-    const result = execSync(`curl -s -X POST "https://api.exopriors.com/v1/scry/query" \
-      -H "Authorization: Bearer ${SCRY_PUBLIC_KEY}" \
-      -H "Content-Type: text/plain" \
-      -d "${sql.replace(/"/g, '\\"')}"`, {
-      encoding: 'utf-8',
-      timeout: 30000
+    const response = await fetch('https://api.exopriors.com/v1/scry/query', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${SCRY_PUBLIC_KEY}`,
+        'Content-Type': 'text/plain',
+      },
+      body: sql,
+      signal: AbortSignal.timeout(30000),
     });
-    return result;
+    return await response.text();
   } catch (e) {
     return `SCRY search error: ${e.message}`;
   }
@@ -542,63 +549,72 @@ Output ONLY valid JSON.`;
 async function validatePhase(page, improvedContent, options) {
   log('validate', 'Running validation checks...');
 
-  const tempPath = writeTemp(page.id, 'to-validate.mdx', improvedContent);
+  const filePath = getFilePath(page.path);
+  const originalContent = fs.readFileSync(filePath, 'utf-8');
+
+  // Write improved content to the actual file so validators check the new version
+  fs.writeFileSync(filePath, improvedContent);
 
   const issues = {
     critical: [],
     quality: []
   };
 
-  // Run critical rules
-  for (const rule of CRITICAL_RULES) {
-    try {
-      const result = execSync(
-        `node tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
-        { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
-      );
-      const errorCount = (result.match(/error/gi) || []).length;
-      if (errorCount > 0) {
-        issues.critical.push({ rule, count: errorCount, output: result.trim() });
-        log('validate', `  ✗ ${rule}: ${errorCount} error(s)`);
-      } else {
-        log('validate', `  ✓ ${rule}`);
-      }
-    } catch (e) {
-      log('validate', `  ? ${rule}: check failed`);
-    }
-  }
-
-  // Run quality rules
-  for (const rule of QUALITY_RULES) {
-    try {
-      const result = execSync(
-        `node tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
-        { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
-      );
-      const warningCount = (result.match(/warning/gi) || []).length;
-      if (warningCount > 0) {
-        issues.quality.push({ rule, count: warningCount, output: result.trim() });
-        log('validate', `  ⚠ ${rule}: ${warningCount} warning(s)`);
-      } else {
-        log('validate', `  ✓ ${rule}`);
-      }
-    } catch (e) {
-      // Quality rules don't block
-    }
-  }
-
-  // Check MDX compilation
-  log('validate', 'Checking MDX compilation...');
   try {
-    execSync('node tooling/crux.mjs validate compile --quick', {
-      cwd: ROOT,
-      stdio: 'pipe',
-      timeout: 60000
-    });
-    log('validate', '  ✓ MDX compiles');
-  } catch (e) {
-    issues.critical.push({ rule: 'compile', error: 'MDX compilation failed' });
-    log('validate', '  ✗ MDX compilation failed');
+    // Run critical rules
+    for (const rule of CRITICAL_RULES) {
+      try {
+        const result = execSync(
+          `node tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
+          { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
+        );
+        const errorCount = (result.match(/error/gi) || []).length;
+        if (errorCount > 0) {
+          issues.critical.push({ rule, count: errorCount, output: result.trim() });
+          log('validate', `  ✗ ${rule}: ${errorCount} error(s)`);
+        } else {
+          log('validate', `  ✓ ${rule}`);
+        }
+      } catch (e) {
+        log('validate', `  ? ${rule}: check failed`);
+      }
+    }
+
+    // Run quality rules
+    for (const rule of QUALITY_RULES) {
+      try {
+        const result = execSync(
+          `node tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
+          { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
+        );
+        const warningCount = (result.match(/warning/gi) || []).length;
+        if (warningCount > 0) {
+          issues.quality.push({ rule, count: warningCount, output: result.trim() });
+          log('validate', `  ⚠ ${rule}: ${warningCount} warning(s)`);
+        } else {
+          log('validate', `  ✓ ${rule}`);
+        }
+      } catch (e) {
+        // Quality rules don't block
+      }
+    }
+
+    // Check MDX compilation
+    log('validate', 'Checking MDX compilation...');
+    try {
+      execSync('node tooling/crux.mjs validate compile --quick', {
+        cwd: ROOT,
+        stdio: 'pipe',
+        timeout: 60000
+      });
+      log('validate', '  ✓ MDX compiles');
+    } catch (e) {
+      issues.critical.push({ rule: 'compile', error: 'MDX compilation failed' });
+      log('validate', '  ✗ MDX compilation failed');
+    }
+  } finally {
+    // Restore original content — the pipeline applies changes later if approved
+    fs.writeFileSync(filePath, originalContent);
   }
 
   writeTemp(page.id, 'validation-results.json', issues);
