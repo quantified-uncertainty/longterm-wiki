@@ -266,7 +266,7 @@ async function runPipeline(topic, tier = 'standard', directions = null, sourceFi
       log(phase, `Failed: ${error.message}`);
       results.phases[phase] = { success: false, error: error.message };
 
-      if (phase.includes('research') || phase.includes('synthesize')) {
+      if (phase.includes('research') || phase.includes('synthesize') || phase === 'load-source-file') {
         break;
       }
     }
