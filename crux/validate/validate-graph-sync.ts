@@ -134,7 +134,7 @@ export function runCheck(_options?: ValidatorOptions): ValidatorResult {
       }
     }
 
-    console.error(`\nTo fix: run 'node scripts/add-missing-nodes-to-master.mjs --apply'`);
+    console.error(`\nTo fix: manually add the missing nodes to ${MASTER_GRAPH_PATH}`);
     return { passed: false, errors: missingNodes.length, warnings: 0 };
   }
 }

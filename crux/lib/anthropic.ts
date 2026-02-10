@@ -95,7 +95,7 @@ export interface CallClaudeOptions {
 
 export interface CallClaudeResult {
   text: string;
-  usage: Record<string, unknown>;
+  usage: { input_tokens: number; output_tokens: number };
   model: string;
 }
 
@@ -132,7 +132,7 @@ export async function callClaude(client: Anthropic, {
 
     return {
       text,
-      usage: response.usage as unknown as Record<string, unknown>,
+      usage: response.usage,
       model: modelId,
     };
   } catch (error: unknown) {

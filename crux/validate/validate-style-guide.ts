@@ -10,7 +10,7 @@
  * - Mermaid diagrams follow conventions (max 15 nodes, prefer TD, max 3 subgraphs)
  * - Proper h2/h3 hierarchy (warns on 10+ flat h2 sections)
  *
- * Usage: node scripts/validate-style-guide.mjs [--ci]
+ * Usage: npx tsx crux/validate/validate-style-guide.ts [--ci]
  *
  * Exit codes:
  *   0 = All checks passed (warnings don't block)

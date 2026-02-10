@@ -8,7 +8,7 @@
  * - contentDependencies that have been updated more recently
  * - Time since lastEdited (threshold varies by content type)
  *
- * Usage: node scripts/check-staleness.mjs [--ci] [--json]
+ * Usage: npx tsx crux/validate/check-staleness.ts [--ci] [--json]
  *
  * Options:
  *   --ci      Output JSON for CI pipelines
@@ -254,7 +254,7 @@ export function runCheck(options?: StalenessCheckOptions): ValidatorResult {
       // Update stats
       if (frontmatter.reviewBy) stats.withReviewBy++;
       if (frontmatter.lastEdited) stats.withLastEdited++;
-      if ((frontmatter.contentDependencies as string[] | undefined)?.length ?? 0 > 0) stats.withDependencies++;
+      if (((frontmatter.contentDependencies as string[] | undefined)?.length ?? 0) > 0) stats.withDependencies++;
 
       const issues: StalenessIssue[] = checkStaleness(file, frontmatter, contentType, entityDateMap, today);
 

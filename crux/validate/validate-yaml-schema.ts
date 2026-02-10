@@ -158,103 +158,8 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   if (!ciMode) console.log(`  ${publications.length} publications loaded`);
 
   // Output Results
-  if (!ciMode) {
-    console.log();
-    if (ciMode) {
-      console.log(JSON.stringify({
-        validated: totalValidated,
-        errors: allErrors.length,
-        details: allErrors,
-      }, null, 2));
-    } else {
-      if (allErrors.length === 0) {
-        console.log(`${colors.green}✓ All ${totalValidated} items pass schema validation${colors.reset}\n`);
-      } else {
-        // Group errors by file
-        const byFile: Record<string, SchemaError[]> = {};
-        for (const err of allErrors) {
-          const key = formatPath(err.file);
-          if (!byFile[key]) byFile[key] = [];
-          byFile[key].push(err);
-        }
-
-        for (const [file, errors] of Object.entries(byFile)) {
-          console.log(`${colors.bold}${file}${colors.reset}`);
-          for (const err of errors) {
-            console.log(`  ${colors.red}✗${colors.reset} ${err.id} (${err.type})`);
-            for (const issue of err.issues) {
-              console.log(`    ${colors.dim}${issue}${colors.reset}`);
-            }
-          }
-          console.log();
-        }
-
-        console.log(`${colors.red}✗ ${allErrors.length} schema error(s) in ${totalValidated} items${colors.reset}\n`);
-      }
-    }
-  }
-
-  return {
-    passed: allErrors.length === 0,
-    errors: allErrors.length,
-    warnings: 0,
-  };
-}
-
-// ---------------------------------------------------------------------------
-// Standalone main
-// ---------------------------------------------------------------------------
-
-function main(): void {
-  console.log(`${getColors().blue}Validating YAML schemas...${getColors().reset}\n`);
-
-  const allErrors: SchemaError[] = [];
-  let totalValidated = 0;
-
-  const CI_MODE = isCI();
-  const colors: Colors = getColors();
-
-  // ==========================================================================
-  // 1. Validate entities/*.yaml against Entity schema
-  // ==========================================================================
-  console.log(`${colors.dim}Checking entities...${colors.reset}`);
-  const entities = loadYamlDir('entities');
-  totalValidated += entities.length;
-  const entityErrors = validateItems(entities, Entity, 'Entity');
-  allErrors.push(...entityErrors);
-  console.log(`  ${entities.length} entities loaded`);
-
-  // ==========================================================================
-  // 2. Validate resources/*.yaml against Resource schema
-  // ==========================================================================
-  console.log(`${colors.dim}Checking resources...${colors.reset}`);
-  const resources = loadYamlDir('resources');
-  totalValidated += resources.length;
-  const resourceErrors = validateItems(resources, Resource, 'Resource');
-  allErrors.push(...resourceErrors);
-  console.log(`  ${resources.length} resources loaded`);
-
-  // ==========================================================================
-  // 3. Validate publications.yaml against Publication schema
-  // ==========================================================================
-  console.log(`${colors.dim}Checking publications...${colors.reset}`);
-  const pubPath = join(DATA_DIR, 'publications.yaml');
-  const publications: YamlItemWithSource[] = (loadYaml(pubPath) as YamlItemWithSource[] | null) || [];
-  // Tag with source file
-  for (const pub of publications) {
-    pub._sourceFile = pubPath;
-  }
-  totalValidated += publications.length;
-  const pubErrors = validateItems(publications, Publication, 'Publication');
-  allErrors.push(...pubErrors);
-  console.log(`  ${publications.length} publications loaded`);
-
-  // ==========================================================================
-  // Output Results
-  // ==========================================================================
   console.log();
-
-  if (CI_MODE) {
+  if (ciMode) {
     console.log(JSON.stringify({
       validated: totalValidated,
       errors: allErrors.length,
@@ -287,7 +192,20 @@ function main(): void {
     }
   }
 
-  process.exit(allErrors.length > 0 ? 1 : 0);
+  return {
+    passed: allErrors.length === 0,
+    errors: allErrors.length,
+    warnings: 0,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Standalone main
+// ---------------------------------------------------------------------------
+
+function main(): void {
+  const result = runCheck({ ci: isCI() });
+  process.exit(result.passed ? 0 : 1);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

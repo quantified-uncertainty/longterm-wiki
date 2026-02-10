@@ -6,9 +6,9 @@
  * Uses n-gram shingling to find overlapping paragraphs.
  *
  * Usage:
- *   node scripts/validate-redundancy.mjs              # Full report
- *   node scripts/validate-redundancy.mjs --top 10    # Top 10 most redundant pairs
- *   node scripts/validate-redundancy.mjs --threshold 0.3  # Custom similarity threshold
+ *   npx tsx crux/validate/validate-redundancy.ts              # Full report
+ *   npx tsx crux/validate/validate-redundancy.ts --top 10    # Top 10 most redundant pairs
+ *   npx tsx crux/validate/validate-redundancy.ts --threshold 0.3  # Custom similarity threshold
  */
 
 import { fileURLToPath } from 'url';
@@ -530,7 +530,7 @@ function main(): void {
       i++;
     } else if (args[i] === '--help') {
       console.log(`
-Usage: node scripts/validate-redundancy.mjs [options]
+Usage: npx tsx crux/validate/validate-redundancy.ts [options]
 
 Options:
   --threshold <n>  Minimum Jaccard similarity to report (default: ${DEFAULT_THRESHOLD})
@@ -538,9 +538,9 @@ Options:
   --help           Show this help message
 
 Examples:
-  node scripts/validate-redundancy.mjs                    # Full report
-  node scripts/validate-redundancy.mjs --top 10          # Top 10 pairs
-  node scripts/validate-redundancy.mjs --threshold 0.4   # Higher threshold
+  npx tsx crux/validate/validate-redundancy.ts                    # Full report
+  npx tsx crux/validate/validate-redundancy.ts --top 10          # Top 10 pairs
+  npx tsx crux/validate/validate-redundancy.ts --threshold 0.4   # Higher threshold
       `);
       process.exit(0);
     }

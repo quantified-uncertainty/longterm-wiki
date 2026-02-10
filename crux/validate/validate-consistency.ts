@@ -8,7 +8,7 @@
  * - Causal claims: checks if prose claims match entity relationships
  * - Terminology: identifies inconsistent term usage
  *
- * Usage: node scripts/validate-consistency.mjs [--ci]
+ * Usage: npx tsx crux/validate/validate-consistency.ts [--ci]
  *
  * Exit codes:
  *   0 = No consistency issues (info items don't block)

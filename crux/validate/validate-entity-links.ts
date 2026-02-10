@@ -7,11 +7,11 @@
  * EntityLink uses entity IDs instead of paths, making links resilient to page moves.
  *
  * Usage:
- *   node scripts/validate/validate-entity-links.mjs           # Report convertible links
- *   node scripts/validate/validate-entity-links.mjs --fix     # Auto-convert links
- *   node scripts/validate/validate-entity-links.mjs --ci      # JSON output for CI
- *   node scripts/validate/validate-entity-links.mjs --broken  # Only show broken links
- *   node scripts/validate/validate-entity-links.mjs --strict  # Fail on convertible links too
+ *   npx tsx crux/validate/validate-entity-links.ts           # Report convertible links
+ *   npx tsx crux/validate/validate-entity-links.ts --fix     # Auto-convert links
+ *   npx tsx crux/validate/validate-entity-links.ts --ci      # JSON output for CI
+ *   npx tsx crux/validate/validate-entity-links.ts --broken  # Only show broken links
+ *   npx tsx crux/validate/validate-entity-links.ts --strict  # Fail on convertible links too
  *
  * Exit codes:
  *   0 = No broken links (convertible links are warnings unless --strict)

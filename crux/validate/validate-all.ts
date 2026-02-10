@@ -7,7 +7,7 @@
  * Uses the unified validation engine for efficiency where possible.
  *
  * Usage:
- *   node scripts/validate-all.mjs [options]
+ *   npx tsx crux/validate/validate-all.ts [options]
  *
  * Options:
  *   --ci              Output JSON for CI pipelines
@@ -496,4 +496,6 @@ function outputResults(results: AggregatedResults, startTime: number): void {
   }
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

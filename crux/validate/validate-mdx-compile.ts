@@ -9,10 +9,10 @@
  * - Malformed component usage
  *
  * Usage:
- *   node scripts/validate/validate-mdx-compile.mjs           # Check all MDX files
- *   node scripts/validate/validate-mdx-compile.mjs --quick   # Check only changed files (git)
- *   node scripts/validate/validate-mdx-compile.mjs --file path/to/file.mdx  # Check specific file
- *   node scripts/validate/validate-mdx-compile.mjs --ci      # CI mode (exit 1 on error)
+ *   npx tsx crux/validate/validate-mdx-compile.ts           # Check all MDX files
+ *   npx tsx crux/validate/validate-mdx-compile.ts --quick   # Check only changed files (git)
+ *   npx tsx crux/validate/validate-mdx-compile.ts --file path/to/file.mdx  # Check specific file
+ *   npx tsx crux/validate/validate-mdx-compile.ts --ci      # CI mode (exit 1 on error)
  */
 
 import { readFileSync, statSync } from 'fs';

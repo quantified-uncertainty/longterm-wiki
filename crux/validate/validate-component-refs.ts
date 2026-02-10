@@ -10,11 +10,12 @@
  * Also checks for unused imports.
  *
  * Usage:
- *   node scripts/validate/validate-component-refs.mjs
- *   node scripts/validate/validate-component-refs.mjs --ci
+ *   npx tsx crux/validate/validate-component-refs.ts
+ *   npx tsx crux/validate/validate-component-refs.ts --ci
  */
 
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 
 // Use shared libraries
 import { findMdxFiles } from '../lib/file-utils.ts';
@@ -445,7 +446,9 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err: unknown) => {
-  console.error('Validator error:', err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: unknown) => {
+    console.error('Validator error:', err);
+    process.exit(1);
+  });
+}

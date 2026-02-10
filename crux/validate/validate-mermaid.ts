@@ -8,10 +8,10 @@
  * 2. Mermaid CLI validation - uses @mermaid-js/mermaid-cli to actually render and validate
  *
  * Usage:
- *   node scripts/validate-mermaid.mjs              # Static analysis only
- *   node scripts/validate-mermaid.mjs --render     # Also validate with mermaid-cli (requires install)
- *   node scripts/validate-mermaid.mjs --ci         # CI mode (JSON output)
- *   node scripts/validate-mermaid.mjs --fix        # Show detailed fix suggestions
+ *   npx tsx crux/validate/validate-mermaid.ts              # Static analysis only
+ *   npx tsx crux/validate/validate-mermaid.ts --render     # Also validate with mermaid-cli (requires install)
+ *   npx tsx crux/validate/validate-mermaid.ts --ci         # CI mode (JSON output)
+ *   npx tsx crux/validate/validate-mermaid.ts --fix        # Show detailed fix suggestions
  *
  * To enable render validation:
  *   npm install -g @mermaid-js/mermaid-cli

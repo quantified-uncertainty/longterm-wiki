@@ -7,19 +7,20 @@
  * validation rules efficiently. This is the recommended way to run validations.
  *
  * Usage:
- *   node scripts/validate/validate-unified.mjs              # Run all rules
- *   node scripts/validate/validate-unified.mjs --rules=entitylink-ids,jsx-in-md
- *   node scripts/validate/validate-unified.mjs --ci         # JSON output
- *   node scripts/validate/validate-unified.mjs --list       # List available rules
- *   node scripts/validate/validate-unified.mjs --errors-only # Only show errors
- *   node scripts/validate/validate-unified.mjs --fix        # Auto-fix fixable issues
- *   node scripts/validate/validate-unified.mjs --fixable    # Only show fixable issues
+ *   npx tsx crux/validate/validate-unified.ts              # Run all rules
+ *   npx tsx crux/validate/validate-unified.ts --rules=entitylink-ids,jsx-in-md
+ *   npx tsx crux/validate/validate-unified.ts --ci         # JSON output
+ *   npx tsx crux/validate/validate-unified.ts --list       # List available rules
+ *   npx tsx crux/validate/validate-unified.ts --errors-only # Only show errors
+ *   npx tsx crux/validate/validate-unified.ts --fix        # Auto-fix fixable issues
+ *   npx tsx crux/validate/validate-unified.ts --fixable    # Only show fixable issues
  *
  * Exit codes:
  *   0 = No errors (warnings don't fail by default)
  *   1 = One or more errors found
  */
 
+import { fileURLToPath } from 'url';
 import { ValidationEngine, Severity, type Issue } from '../lib/validation-engine.ts';
 import { allRules } from '../lib/rules/index.ts';
 import { getColors } from '../lib/output.ts';
@@ -170,7 +171,9 @@ async function main(): Promise<void> {
   process.exit(summary.hasErrors ? 1 : 0);
 }
 
-main().catch((err: unknown) => {
-  console.error('Validation failed:', err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: unknown) => {
+    console.error('Validation failed:', err);
+    process.exit(1);
+  });
+}

@@ -10,7 +10,7 @@
  * - Verifies target files exist
  *
  * Usage:
- *   node scripts/validate-internal-links.mjs [options]
+ *   npx tsx crux/validate/validate-internal-links.ts [options]
  *
  * Options:
  *   --ci      Output JSON for CI pipelines
@@ -24,6 +24,7 @@
 
 import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join, dirname, basename } from 'path';
+import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
 import { CONTENT_DIR } from '../lib/content-types.ts';
@@ -394,4 +395,6 @@ function main(): void {
   process.exit(results.brokenLinks.length > 0 ? 1 : 0);
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

@@ -8,10 +8,10 @@
  * Quality scale: 0-100 (80+ comprehensive, 60-79 good, 40-59 adequate, 20-39 draft, <20 stub)
  *
  * Usage:
- *   node scripts/validate-quality.mjs              # Show all discrepancies
- *   node scripts/validate-quality.mjs --large     # Only large discrepancies (>=20 pts)
- *   node scripts/validate-quality.mjs --page X    # Check specific page
- *   node scripts/validate-quality.mjs --ci        # JSON output for CI
+ *   npx tsx crux/validate/validate-quality.ts              # Show all discrepancies
+ *   npx tsx crux/validate/validate-quality.ts --large     # Only large discrepancies (>=20 pts)
+ *   npx tsx crux/validate/validate-quality.ts --page X    # Check specific page
+ *   npx tsx crux/validate/validate-quality.ts --ci        # JSON output for CI
  *
  * Exit codes:
  *   0 = No large discrepancies found

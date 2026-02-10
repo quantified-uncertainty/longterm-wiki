@@ -246,94 +246,11 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
 
 function main(): void {
   const args = process.argv.slice(2);
-  const CI_MODE = args.includes('--ci');
-  const FIX_MODE = args.includes('--fix');
-  const colors: Colors = getColors(CI_MODE);
-
-  const results: OrphanedResults = {
-    orphanedFiles: [],
-    emptyDirs: [],
-    fixed: { deleted: 0, failed: 0 },
-  };
-
-  if (!CI_MODE) {
-    console.log(`${colors.blue}🗑️  Finding orphaned files...${colors.reset}\n`);
-  }
-
-  // Scan content directory
-  const contentOrphans = findOrphanedFiles(CONTENT_DIR);
-  results.orphanedFiles.push(...contentOrphans.files);
-  results.emptyDirs.push(...contentOrphans.emptyDirs);
-
-  // Also scan data directory
-  const dataOrphans = findOrphanedFiles(DATA_DIR);
-  results.orphanedFiles.push(...dataOrphans.files);
-  results.emptyDirs.push(...dataOrphans.emptyDirs);
-
-  // Handle --fix mode
-  if (FIX_MODE && results.orphanedFiles.length > 0) {
-    if (!CI_MODE) {
-      console.log(`${colors.yellow}Deleting orphaned files...${colors.reset}\n`);
-    }
-    results.fixed = deleteOrphanedFiles(results.orphanedFiles, CI_MODE, colors);
-  }
-
-  // Output results
-  if (CI_MODE) {
-    console.log(JSON.stringify(results, null, 2));
-  } else {
-    if (results.orphanedFiles.length > 0) {
-      console.log(`${colors.yellow}⚠️  Orphaned files found:${colors.reset}\n`);
-
-      // Group by directory for cleaner output
-      const byDir: Record<string, OrphanedFileEntry[]> = {};
-      for (const file of results.orphanedFiles) {
-        const dir = file.path.split('/').slice(0, -1).join('/');
-        if (!byDir[dir]) byDir[dir] = [];
-        byDir[dir].push(file);
-      }
-
-      for (const [dir, files] of Object.entries(byDir)) {
-        console.log(`  ${colors.dim}${dir}/${colors.reset}`);
-        for (const f of files) {
-          const name = basename(f.path);
-          const size = f.size < 1024 ? `${f.size}B` : `${(f.size / 1024).toFixed(1)}KB`;
-          console.log(`    ${colors.yellow}${name}${colors.reset} ${colors.dim}(${size})${colors.reset}`);
-        }
-      }
-      console.log();
-    }
-
-    if (results.emptyDirs.length > 0) {
-      console.log(`${colors.yellow}⚠️  Empty directories:${colors.reset}\n`);
-      for (const dir of results.emptyDirs) {
-        console.log(`  ${dir}`);
-      }
-      console.log();
-    }
-
-    // Summary
-    console.log(`${'─'.repeat(50)}`);
-    if (results.orphanedFiles.length === 0 && results.emptyDirs.length === 0) {
-      console.log(`${colors.green}✅ No orphaned files found${colors.reset}`);
-    } else {
-      console.log(`Orphaned files: ${results.orphanedFiles.length}`);
-      console.log(`Empty dirs:     ${results.emptyDirs.length}`);
-
-      if (FIX_MODE) {
-        console.log(`\n${colors.green}Deleted: ${results.fixed.deleted}${colors.reset}`);
-        if (results.fixed.failed > 0) {
-          console.log(`${colors.red}Failed:  ${results.fixed.failed}${colors.reset}`);
-        }
-      } else if (results.orphanedFiles.length > 0) {
-        console.log(`\n${colors.dim}Run with --fix to delete orphaned files${colors.reset}`);
-      }
-    }
-  }
-
-  // Exit with error if orphaned files found (and not fixed)
-  const hasIssues = results.orphanedFiles.length > 0 && !FIX_MODE;
-  process.exit(hasIssues ? 1 : 0);
+  const result = runCheck({
+    ci: args.includes('--ci'),
+    fix: args.includes('--fix'),
+  });
+  process.exit(result.passed ? 0 : 1);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

@@ -25,7 +25,6 @@ export interface Insight {
   added?: string;
   lastVerified?: string;
   tableRef?: string;
-  [key: string]: unknown;
 }
 
 export interface CheckIssue {

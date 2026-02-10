@@ -3,7 +3,7 @@
 /**
  * Insights Validator
  *
- * Thin wrapper for validate-all.mjs integration.
+ * Thin wrapper for validate-all.ts integration.
  * Runs schema and source path checks on insights.yaml.
  *
  * Usage:
