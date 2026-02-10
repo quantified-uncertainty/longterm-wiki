@@ -11,7 +11,7 @@
  */
 
 import { createRule, Issue, Severity } from '../validation-engine.js';
-import { isInCodeBlock, getLineNumber } from '../mdx-utils.mjs';
+import { isInCodeBlock, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
 
 // Fake URL patterns to detect
 const FAKE_URL_PATTERNS = [
@@ -73,9 +73,9 @@ export const fakeUrlsRule = createRule({
     const issues = [];
     const body = content.body;
 
-    // Skip internal docs and documentation pages
+    // Skip internal docs and documentation/stub pages
     if (content.relativePath.includes('/internal/') ||
-        content.frontmatter.pageType === 'documentation') {
+        shouldSkipValidation(content.frontmatter)) {
       return issues;
     }
 

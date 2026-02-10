@@ -9,7 +9,7 @@
  */
 
 import { createRule, Issue, Severity } from '../validation-engine.js';
-import { isInCodeBlock, isInMermaid, isInComment, getLineNumber } from '../mdx-utils.mjs';
+import { isInCodeBlock, isInMermaid, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
 
 // Placeholder patterns to detect
 const PLACEHOLDER_PATTERNS = [
@@ -49,23 +49,18 @@ export const placeholdersRule = createRule({
     const issues = [];
     const body = content.body;
 
-    // Skip validation for certain page types
-    if (content.frontmatter.pageType === 'stub' ||
-        content.frontmatter.pageType === 'documentation') {
-      return issues;
-    }
-
-    // Skip internal docs
-    if (content.relativePath.includes('/internal/')) {
+    // Skip validation for stubs, documentation, and internal pages
+    if (shouldSkipValidation(content.frontmatter) ||
+        content.relativePath.includes('/internal/')) {
       return issues;
     }
 
     // Check each placeholder pattern
     for (const { pattern, name, severity } of PLACEHOLDER_PATTERNS) {
-      const regex = new RegExp(pattern.source, pattern.flags);
+      pattern.lastIndex = 0;
       let match;
 
-      while ((match = regex.exec(body)) !== null) {
+      while ((match = pattern.exec(body)) !== null) {
         const position = match.index;
 
         // Skip if in code block, comment, or Mermaid diagram

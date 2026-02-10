@@ -39,7 +39,7 @@ import dotenv from 'dotenv';
 import { checkForExistingPage } from './creator/duplicate-detection.mjs';
 import { findCanonicalLinks } from './creator/canonical-links.mjs';
 import { runPerplexityResearch, runScryResearch } from './creator/research.mjs';
-import { registerResearchSources, fetchRegisteredSources, processDirections } from './creator/source-fetching.mjs';
+import { registerResearchSources, fetchRegisteredSources, processDirections, loadSourceFile } from './creator/source-fetching.mjs';
 import { runSynthesis } from './creator/synthesis.mjs';
 import { runSourceVerification } from './creator/verification.mjs';
 import { ensureComponentImports, runValidationLoop, runFullValidation } from './creator/validation.mjs';
@@ -115,29 +115,40 @@ function createContext() {
 
 // ============ Pipeline Runner ============
 
-async function runPipeline(topic, tier = 'standard', directions = null) {
+async function runPipeline(topic, tier = 'standard', directions = null, sourceFilePath = null) {
   const config = TIERS[tier];
   if (!config) {
     console.error(`Unknown tier: ${tier}`);
     process.exit(1);
   }
 
-  const phases = directions
+  let phases = directions
     ? ['process-directions', ...config.phases]
-    : config.phases;
+    : [...config.phases];
+
+  // When --source-file is used, skip research phases and inject load-source-file
+  if (sourceFilePath) {
+    const researchPhases = ['research-perplexity', 'research-perplexity-deep', 'research-scry', 'register-sources', 'fetch-sources'];
+    phases = phases.filter(p => !researchPhases.includes(p));
+    const canonicalIdx = phases.indexOf('canonical-links');
+    phases.splice(canonicalIdx + 1, 0, 'load-source-file');
+  }
 
   console.log(`\n${'='.repeat(60)}`);
   console.log(`Page Creator - Cost Optimized`);
   console.log(`${'='.repeat(60)}`);
   console.log(`Topic: "${topic}"`);
   console.log(`Tier: ${config.name} (${config.estimatedCost})`);
+  if (sourceFilePath) {
+    console.log(`Source file: ${sourceFilePath}`);
+  }
   if (directions) {
     console.log(`Directions: ${directions.slice(0, 80)}${directions.length > 80 ? '...' : ''}`);
   }
   console.log(`Phases: ${phases.join(' → ')}`);
   console.log(`${'='.repeat(60)}\n`);
 
-  const pipelineContext = { directions };
+  const pipelineContext = { directions, sourceFilePath };
   const ctx = createContext();
 
   const results = {
@@ -158,6 +169,10 @@ async function runPipeline(topic, tier = 'standard', directions = null) {
       switch (phase) {
         case 'process-directions':
           result = await processDirections(topic, pipelineContext.directions, ctx);
+          break;
+
+        case 'load-source-file':
+          result = await loadSourceFile(topic, pipelineContext.sourceFilePath, ctx);
           break;
 
         case 'canonical-links':
@@ -251,7 +266,7 @@ async function runPipeline(topic, tier = 'standard', directions = null) {
       log(phase, `Failed: ${error.message}`);
       results.phases[phase] = { success: false, error: error.message };
 
-      if (phase.includes('research') || phase.includes('synthesize')) {
+      if (phase.includes('research') || phase.includes('synthesize') || phase === 'load-source-file') {
         break;
       }
     }
@@ -292,6 +307,7 @@ Usage:
 
 Options:
   --tier <tier>            Quality tier: budget, standard, premium (default: standard)
+  --source-file <path>     Use a local file as research input (skips web research phases)
   --dest <path>            Deploy to content path (e.g., knowledge-base/people)
   --create-category <name> Create new category with index.mdx
   --directions <text>      Context, source URLs, and editorial guidance (see below)
@@ -317,6 +333,7 @@ Destination Examples:
 
 Phases:
   canonical-links       Find Wikipedia, LessWrong, EA Forum, official sites
+  load-source-file      Load local file as research input (used with --source-file)
   research-perplexity   Perplexity web research
   register-sources      Register citation URLs in knowledge database
   fetch-sources         Fetch actual page content via Firecrawl
@@ -337,6 +354,8 @@ Examples:
   node tooling/content/page-creator.mjs "Anthropic" --tier premium
   node tooling/content/page-creator.mjs "Lighthaven" --phase grade
   node tooling/content/page-creator.mjs "Some Event" --dest knowledge-base/incidents --create-category "Incidents"
+  node tooling/content/page-creator.mjs "SecureBio" --source-file ./reports/securebio-analysis.md
+  node tooling/content/page-creator.mjs "SecureBio" --source-file ./notes.txt --directions "Focus on policy"
 `);
 }
 
@@ -357,9 +376,16 @@ async function main() {
   const destPath = destIndex !== -1 ? args[destIndex + 1] : null;
   const directionsIndex = args.indexOf('--directions');
   const directions = directionsIndex !== -1 ? args[directionsIndex + 1] : null;
+  const sourceFileIndex = args.indexOf('--source-file');
+  const sourceFilePath = sourceFileIndex !== -1 ? path.resolve(args[sourceFileIndex + 1]) : null;
   const createCategoryIndex = args.indexOf('--create-category');
   const createCategoryLabel = createCategoryIndex !== -1 ? args[createCategoryIndex + 1] : null;
   const forceCreate = args.includes('--force');
+
+  if (sourceFilePath && !fs.existsSync(sourceFilePath)) {
+    console.error(`Error: Source file not found: ${sourceFilePath}`);
+    process.exit(1);
+  }
 
   if (!topic) {
     console.error('Error: Topic required');
@@ -408,6 +434,13 @@ async function main() {
         }
         result = await processDirections(topic, directions, ctx);
         break;
+      case 'load-source-file':
+        if (!sourceFilePath) {
+          console.error('Error: --source-file required for load-source-file phase');
+          process.exit(1);
+        }
+        result = await loadSourceFile(topic, sourceFilePath, ctx);
+        break;
       case 'canonical-links':
         result = await findCanonicalLinks(topic, ctx);
         break;
@@ -454,7 +487,7 @@ async function main() {
     return;
   }
 
-  await runPipeline(topic, tier, directions);
+  await runPipeline(topic, tier, directions, sourceFilePath);
 
   // Deploy to destination if --dest provided
   if (destPath) {
