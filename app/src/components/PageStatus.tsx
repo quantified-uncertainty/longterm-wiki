@@ -367,15 +367,8 @@ function QualityDisplay({
         <span className="block font-semibold text-foreground text-sm mb-1">
           Quality: {quality}/100
         </span>
-        <span className="block text-muted-foreground text-xs leading-snug mb-2">
+        <span className="block text-muted-foreground text-xs leading-snug">
           Human-assigned rating of overall page quality, considering depth, accuracy, and completeness.
-        </span>
-        <span className="block text-xs text-muted-foreground">
-          <span className="font-medium">80+</span> Comprehensive{" "}
-          <span className="font-medium ml-1">60+</span> Good{" "}
-          <span className="font-medium ml-1">40+</span> Adequate{" "}
-          <span className="font-medium ml-1">20+</span> Draft{" "}
-          <span className="font-medium ml-1">&lt;20</span> Stub
         </span>
         {hasDiscrepancy && (
           <span className="block mt-2 text-xs text-amber-500">
@@ -418,15 +411,8 @@ function ImportanceDisplay({ importance }: { importance: number }) {
         <span className="block font-semibold text-foreground text-sm mb-1">
           Importance: {importance}/100
         </span>
-        <span className="block text-muted-foreground text-xs leading-snug mb-2">
+        <span className="block text-muted-foreground text-xs leading-snug">
           How central this topic is to AI safety. Higher scores mean greater relevance to understanding or mitigating AI risk.
-        </span>
-        <span className="block text-xs text-muted-foreground">
-          <span className="font-medium">90+</span> Essential{" "}
-          <span className="font-medium ml-1">70+</span> High{" "}
-          <span className="font-medium ml-1">50+</span> Useful{" "}
-          <span className="font-medium ml-1">30+</span> Reference{" "}
-          <span className="font-medium ml-1">&lt;30</span> Peripheral
         </span>
       </span>
     </span>
@@ -525,17 +511,20 @@ function MetricChip({
   description?: string;
 }) {
   return (
-    <span className="relative group inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground whitespace-nowrap cursor-help">
+    <span className={cn(styles.wrapper, "inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground whitespace-nowrap cursor-help")}>
       <span className="flex items-center opacity-60">{icon}</span>
       <span className="font-semibold tabular-nums text-foreground">{value}</span>
-      <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:flex flex-col items-center z-50">
-        <span className="rounded-md bg-foreground text-background px-2.5 py-1.5 text-[11px] leading-snug whitespace-normal text-center w-max max-w-[200px] shadow-lg">
-          <span className="font-semibold">{label}</span>
-          {description && (
-            <span className="block font-normal text-background/80 mt-0.5">{description}</span>
-          )}
-        </span>
-        <span className="border-4 border-transparent border-t-foreground -mt-px" />
+      <span
+        className={cn(
+          styles.tooltip,
+          "absolute right-0 top-full mt-1 z-50 w-[200px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+        )}
+        role="tooltip"
+      >
+        <span className="block font-semibold text-foreground text-xs mb-0.5">{label}</span>
+        {description && (
+          <span className="block text-muted-foreground text-[11px] leading-snug">{description}</span>
+        )}
       </span>
     </span>
   );
