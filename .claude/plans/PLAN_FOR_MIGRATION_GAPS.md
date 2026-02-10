@@ -147,13 +147,13 @@ All YAML data now lives locally in `data/`:
 - `graphs/` — 4 YAML files
 - `id-registry.json` — persistent ID mapping
 
-### 3b. Table Data Generators — NOT PORTED (8 files)
+### 3b. Table Data Generators — PORTED (7 files)
 
-Still missing: accident-risks-data, architecture-scenarios-data, architectures-table-data, scenarios-table-data, safety-approaches-data, deployment-architectures-data, eval-types-table-data, safety-generalizability-graph-data. Required before any table pages can be ported.
+All table data files ported to `app/src/data/tables/`: safety-approaches, safety-generalizability, architecture-scenarios, ai-architectures, deployment-architectures, accident-risks, eval-types. Column definitions in `app/src/components/tables/`. Insights-data also ported. Still need dedicated page routes with interactive table views.
 
-### 3c. Other Data Modules — NOT PORTED (6 files)
+### 3c. Other Data Modules — NOT PORTED (4 files)
 
-Still missing: content-schemas, database-types, risk-categories, external-links-data, insights-data, page-templates.
+Still missing: content-schemas, database-types, risk-categories, external-links-data.
 
 ---
 
