@@ -48,7 +48,7 @@ export const consecutiveBoldLabelsRule = createRule({
         const linePosition = position + prevLine.length + 1;
 
         if (!isInCodeBlock(content.body, linePosition)) {
-          const labelMatch = line.match(/^\*\*([^*]+)\*\*:/);
+          const labelMatch: RegExpMatchArray | null = line.match(/^\*\*([^*]+)\*\*:/);
           const label = labelMatch ? labelMatch[1] : 'Label';
 
           issues.push(new Issue({

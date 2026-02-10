@@ -12,7 +12,7 @@ import { createRule, Issue, Severity } from '../validation-engine.js';
 import type { ContentFile, ValidationEngine } from '../validation-engine.js';
 
 // Common JSX component patterns
-const JSX_PATTERNS = [
+const JSX_PATTERNS: RegExp[] = [
   /<[A-Z][a-zA-Z]*[\s/>]/,           // <ComponentName or <ComponentName>
   /import\s+\{[^}]+\}\s+from\s+['"]/,  // import { X } from '...'
   /import\s+[A-Z][a-zA-Z]*\s+from/,   // import Component from

@@ -38,9 +38,9 @@ export const sidebarIndexRule = createRule({
       return issues;
     }
 
-    const sidebar = content.frontmatter.sidebar || {};
-    const label = sidebar.label;
-    const order = sidebar.order;
+    const sidebar: Record<string, unknown> = content.frontmatter.sidebar || {};
+    const label: unknown = sidebar.label;
+    const order: unknown = sidebar.order;
 
     // Check label
     if (label !== 'Overview') {

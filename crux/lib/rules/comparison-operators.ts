@@ -43,7 +43,7 @@ export const comparisonOperatorsRule = createRule({
   check(content: ContentFile, engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
 
-    matchLinesOutsideCode(content.body, LESS_THAN_PATTERN, ({ match, line, lineNum, absolutePos }) => {
+    matchLinesOutsideCode(content.body, LESS_THAN_PATTERN, ({ match, line, lineNum, absolutePos }: { match: RegExpExecArray; line: string; lineNum: number; absolutePos: number }) => {
       // Skip if in safe context
       if (isInJsxAttribute(content.body, absolutePos)) return;
       if (isAlreadyEscaped(content.body, absolutePos)) return;

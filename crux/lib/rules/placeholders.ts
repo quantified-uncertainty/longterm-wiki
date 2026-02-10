@@ -13,7 +13,7 @@ import type { ContentFile, ValidationEngine } from '../validation-engine.js';
 import { isInCodeBlock, isInMermaid, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
 
 // Placeholder patterns to detect
-const PLACEHOLDER_PATTERNS = [
+const PLACEHOLDER_PATTERNS: { pattern: RegExp; name: string; severity: string }[] = [
   // Explicit markers
   { pattern: /\bTODO\b/gi, name: 'TODO marker', severity: Severity.WARNING },
   { pattern: /\bTBD\b/gi, name: 'TBD marker', severity: Severity.WARNING },
@@ -59,10 +59,10 @@ export const placeholdersRule = createRule({
     // Check each placeholder pattern
     for (const { pattern, name, severity } of PLACEHOLDER_PATTERNS) {
       pattern.lastIndex = 0;
-      let match;
+      let match: RegExpExecArray | null;
 
       while ((match = pattern.exec(body)) !== null) {
-        const position = match.index;
+        const position: number = match.index;
 
         // Skip if in code block, comment, or Mermaid diagram
         if (isInCodeBlock(body, position) ||

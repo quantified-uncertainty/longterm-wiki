@@ -33,7 +33,7 @@ export const tildeDollarRule = createRule({
     const issues: Issue[] = [];
 
     // Check for ~\$ pattern (tilde + escaped dollar)
-    matchLinesOutsideCode(content.body, TILDE_DOLLAR_PATTERN, ({ match, line, lineNum }) => {
+    matchLinesOutsideCode(content.body, TILDE_DOLLAR_PATTERN, ({ match, line, lineNum }: { match: RegExpExecArray; line: string; lineNum: number }) => {
       const context = line.slice(Math.max(0, match.index - 15), match.index + 20);
       issues.push(new Issue({
         rule: this.id,
@@ -50,10 +50,10 @@ export const tildeDollarRule = createRule({
     });
 
     // Check for tilde before numbers in table cells
-    matchLinesOutsideCode(content.body, TILDE_NUMBER_IN_TABLE_PATTERN, ({ match, line, lineNum }) => {
+    matchLinesOutsideCode(content.body, TILDE_NUMBER_IN_TABLE_PATTERN, ({ match, line, lineNum }: { match: RegExpExecArray; line: string; lineNum: number }) => {
       // Only flag if the cell contains a tilde that's not the approximately symbol
       if (!match[0].includes('≈')) {
-        const tildeMatch = match[0].match(/~(\d+)/);
+        const tildeMatch: RegExpMatchArray | null = match[0].match(/~(\d+)/);
         if (tildeMatch) {
           issues.push(new Issue({
             rule: this.id,

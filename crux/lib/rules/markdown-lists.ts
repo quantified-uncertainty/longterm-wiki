@@ -39,7 +39,7 @@ export const markdownListsRule = createRule({
       const prevLine = i > 0 ? lines[i - 1] : '';
 
       // Check if this line starts a numbered list with number > 1
-      const match = line.match(NUMBERED_LIST_PATTERN);
+      const match: RegExpMatchArray | null = line.match(NUMBERED_LIST_PATTERN);
       if (match) {
         const listNumber = parseInt(match[1], 10);
 

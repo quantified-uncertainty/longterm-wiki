@@ -12,7 +12,7 @@
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
 
-const TONE_MARKER_PATTERNS = [
+const TONE_MARKER_PATTERNS: { pattern: RegExp; message: string }[] = [
   // "actually" as emphasis/correction (not "actually implemented" or in quotes)
   {
     pattern: /\bactually\b(?!\s+(?:implemented|built|created|developed|deployed|launched|published|released))/gi,
@@ -95,7 +95,7 @@ export const toneMarkersRule = {
       for (const { pattern, message } of TONE_MARKER_PATTERNS) {
         pattern.lastIndex = 0;
 
-        let match;
+        let match: RegExpExecArray | null;
         while ((match = pattern.exec(line)) !== null) {
           issues.push(new Issue({
             rule: 'tone-markers',

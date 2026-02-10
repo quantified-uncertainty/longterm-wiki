@@ -12,7 +12,7 @@
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
 
-const FALSE_CERTAINTY_PATTERNS = [
+const FALSE_CERTAINTY_PATTERNS: { pattern: RegExp; message: string }[] = [
   // "True Cost:" / "True Value:" / "Realistic EV:" — false precision labels
   {
     pattern: /\b(?:True|Actual|Real|Realistic)\s+(?:Cost|Value|EV|Expected Value|Impact|Benefit):/gi,
@@ -85,7 +85,7 @@ export const falseCertaintyRule = {
       for (const { pattern, message } of FALSE_CERTAINTY_PATTERNS) {
         pattern.lastIndex = 0;
 
-        let match;
+        let match: RegExpExecArray | null;
         while ((match = pattern.exec(line)) !== null) {
           issues.push(new Issue({
             rule: 'false-certainty',

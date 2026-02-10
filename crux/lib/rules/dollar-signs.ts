@@ -27,7 +27,7 @@ export const dollarSignsRule = createRule({
     const issues: Issue[] = [];
 
     // Check for unescaped $ before numbers
-    matchLinesOutsideCode(content.body, UNESCAPED_DOLLAR_PATTERN, ({ match, line, lineNum }) => {
+    matchLinesOutsideCode(content.body, UNESCAPED_DOLLAR_PATTERN, ({ match, line, lineNum }: { match: RegExpExecArray; line: string; lineNum: number }) => {
       const context = line.slice(Math.max(0, match.index - 10), match.index + 15);
       issues.push(new Issue({
         rule: this.id,
@@ -44,7 +44,7 @@ export const dollarSignsRule = createRule({
     });
 
     // Check for double-escaped \\$ (over-escaping)
-    matchLinesOutsideCode(content.body, DOUBLE_ESCAPED_PATTERN, ({ match, line, lineNum }) => {
+    matchLinesOutsideCode(content.body, DOUBLE_ESCAPED_PATTERN, ({ match, line, lineNum }: { match: RegExpExecArray; line: string; lineNum: number }) => {
       const context = line.slice(Math.max(0, match.index - 10), match.index + 15);
       issues.push(new Issue({
         rule: this.id,

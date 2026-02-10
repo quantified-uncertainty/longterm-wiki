@@ -52,7 +52,7 @@ interface MentionWithEntity extends MentionInfo {
  */
 function loadDatabaseEntities(): Map<string, DatabaseEntity> {
   try {
-    const db = loadDatabase() as Record<string, any>;
+    const db = loadDatabase();
     const entities = new Map<string, DatabaseEntity>();
 
     // Load experts (people)

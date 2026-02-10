@@ -48,6 +48,17 @@ export interface FixSpec {
   content?: string;
   oldText?: string;
   newText?: string;
+  /** Custom fix properties used by rules with type: 'custom' */
+  action?: string;
+  components?: string[];
+  existingImports?: Array<{ source: string; components: string[] }>;
+  quoteChar?: string;
+  [key: string]: unknown;
+}
+
+export interface SidebarConfig {
+  entries: string[];
+  directories: Set<string>;
 }
 
 export interface IssueOptions {
@@ -218,7 +229,7 @@ export class ValidationEngine {
   pathRegistry: Record<string, string>;
   reversePathRegistry: Record<string, string>;
   entities: unknown;
-  sidebarConfig: unknown;
+  sidebarConfig: SidebarConfig;
 
   constructor(options: EngineOptions = {}) {
     this.options = {
@@ -234,7 +245,7 @@ export class ValidationEngine {
     this.pathRegistry = {};
     this.reversePathRegistry = {};
     this.entities = null;
-    this.sidebarConfig = null;
+    this.sidebarConfig = { entries: [], directories: new Set() };
   }
 
   /** Load all content and shared data */
@@ -272,7 +283,7 @@ export class ValidationEngine {
    * Parse sidebar configuration.
    * Returns empty data in Next.js — sidebar is managed by wiki-nav.ts.
    */
-  private _parseSidebarConfig(): unknown {
+  private _parseSidebarConfig(): SidebarConfig {
     return parseSidebarConfig();
   }
 

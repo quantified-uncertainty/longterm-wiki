@@ -25,7 +25,7 @@ export const estimateBoxesRule = createRule({
     const lines = content.body.split('\n');
 
     // Check for EstimateBox usage
-    lines.forEach((line, idx) => {
+    lines.forEach((line: string, idx: number) => {
       if (line.includes('<EstimateBox')) {
         issues.push(new Issue({
           rule: this.id,
@@ -38,7 +38,7 @@ export const estimateBoxesRule = createRule({
     });
 
     // Check for unused EstimateBox import
-    const hasImport = content.raw.match(/import\s*\{[^}]*EstimateBox[^}]*\}/);
+    const hasImport: RegExpMatchArray | null = content.raw.match(/import\s*\{[^}]*EstimateBox[^}]*\}/);
     const hasUsage = content.raw.includes('<EstimateBox');
     if (hasImport && !hasUsage) {
       issues.push(new Issue({

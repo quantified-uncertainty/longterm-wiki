@@ -155,7 +155,7 @@ export const frontmatterSchemaRule = {
           rule: 'frontmatter-schema',
           file: contentFile.path,
           line: 1,
-          message: `${field}: ${error.message}${(error as any).received !== undefined ? ` (got: ${(error as any).received})` : ''}`,
+          message: `${field}: ${error.message}${'received' in error && error.received !== undefined ? ` (got: ${error.received})` : ''}`,
           severity: Severity.ERROR,
         }));
       }

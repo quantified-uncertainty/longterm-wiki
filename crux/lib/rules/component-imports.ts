@@ -120,7 +120,7 @@ export const componentImportsRule = createRule({
           components: missingComponents,
           existingImports,
           quoteChar,
-        } as any,
+        },
       }));
     } else {
       // Create new import
@@ -134,7 +134,7 @@ export const componentImportsRule = createRule({
           type: 'custom',
           action: 'create-new-import',
           components: missingComponents,
-        } as any,
+        },
       }));
     }
 
@@ -150,11 +150,11 @@ export const componentImportsRule = createRule({
       return null;
     }
 
-    const { action, components } = issue.fix as any;
+    const { action, components } = issue.fix;
 
     if (action === 'add-to-existing-import') {
       // Add components to existing @components/wiki import
-      const { quoteChar } = issue.fix as any;
+      const { quoteChar } = issue.fix;
       return content.replace(
         WIKI_IMPORT_PATTERN,
         (match: string, imports: string) => {

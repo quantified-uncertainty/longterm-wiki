@@ -65,14 +65,14 @@ function loadCanonicalFacts(): CanonicalFact[] {
   for (const file of files) {
     const filepath = join(FACTS_DIR, file);
     const content = readFileSync(filepath, 'utf-8');
-    const parsed = parseYaml(content) as Record<string, any> | null;
+    const parsed = parseYaml(content) as { entity?: string; facts?: Record<string, Record<string, unknown>> } | null;
     if (parsed && parsed.entity && parsed.facts) {
       for (const [factId, factData] of Object.entries(parsed.facts)) {
         facts.push({
           entity: parsed.entity,
           factId,
           key: `${parsed.entity}.${factId}`,
-          ...(factData as Record<string, unknown>),
+          ...factData,
         });
       }
     }
@@ -81,7 +81,7 @@ function loadCanonicalFacts(): CanonicalFact[] {
   // Overlay resolved computed values from database.json
   // Computed facts have no value in YAML but get one after build-data resolves them
   try {
-    const db = loadDatabase() as Record<string, any>;
+    const db = loadDatabase();
     if (db.facts) {
       for (const fact of facts) {
         const dbFact = db.facts[fact.key];

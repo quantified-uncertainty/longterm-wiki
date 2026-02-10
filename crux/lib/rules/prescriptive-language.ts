@@ -12,7 +12,7 @@
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
 
-const PRESCRIPTIVE_PATTERNS = [
+const PRESCRIPTIVE_PATTERNS: { pattern: RegExp; message: string }[] = [
   // "should" / "must" / "need to" in analytical voice (not in quotes or attributions)
   {
     pattern: /(?:^|\.\s+)(?:We|Organizations?|Policymakers?|Governments?|Researchers?|The (?:field|sector|industry))\s+(?:should|must|need to|ought to)\b/gm,
@@ -86,7 +86,7 @@ export const prescriptiveLanguageRule = {
       for (const { pattern, message } of PRESCRIPTIVE_PATTERNS) {
         pattern.lastIndex = 0;
 
-        let match;
+        let match: RegExpExecArray | null;
         while ((match = pattern.exec(line)) !== null) {
           issues.push(new Issue({
             rule: 'prescriptive-language',

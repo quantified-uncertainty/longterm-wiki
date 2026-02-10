@@ -16,7 +16,7 @@ import { Severity, Issue, type ContentFile, type ValidationEngine } from '../val
 
 // Patterns that indicate a vague citation when standing alone in a table cell
 // These are fine in prose but problematic as sole source references
-const VAGUE_PATTERNS = [
+const VAGUE_PATTERNS: RegExp[] = [
   // Interviews without specifics
   /^\s*Interview\s*$/i,
   /^\s*Interviews\s*$/i,
@@ -94,8 +94,8 @@ export const vagueCitationsRule = {
       if (line.includes('|') && line.toLowerCase().includes('source')) {
         inTable = true;
         // Find which column is "Source"
-        const cells = line.split('|').map(c => c.trim()).filter(c => c);
-        sourceColumnIndex = cells.findIndex(c =>
+        const cells: string[] = line.split('|').map((c: string) => c.trim()).filter((c: string) => c);
+        sourceColumnIndex = cells.findIndex((c: string) =>
           c.toLowerCase() === 'source' ||
           c.toLowerCase() === 'sources' ||
           c.toLowerCase() === 'reference' ||
@@ -118,8 +118,8 @@ export const vagueCitationsRule = {
 
       // If we're in a table with a source column, check that column
       if (inTable && sourceColumnIndex >= 0 && line.includes('|')) {
-        const cells = line.split('|').map(c => c.trim()).filter(c => c);
-        const sourceCell = cells[sourceColumnIndex];
+        const cells: string[] = line.split('|').map((c: string) => c.trim()).filter((c: string) => c);
+        const sourceCell: string | undefined = cells[sourceColumnIndex];
 
         if (sourceCell) {
           // Check if the source cell matches any vague pattern

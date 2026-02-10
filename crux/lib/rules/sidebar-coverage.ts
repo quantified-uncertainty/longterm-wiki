@@ -36,8 +36,8 @@ export const sidebarCoverageRule = createRule({
     }
 
     // Check which directories are in sidebar
-    const sidebarDirs = (engine.sidebarConfig as any)?.directories || new Set();
-    const sidebarEntries: string[] = (engine.sidebarConfig as any)?.entries || [];
+    const sidebarDirs = engine.sidebarConfig.directories;
+    const sidebarEntries = engine.sidebarConfig.entries;
 
     // Convert entries to directories for comparison
     const sidebarPaths = new Set<string>([

@@ -273,8 +273,25 @@ export function loadExperts(): ExpertEntry[] {
   return loadGeneratedJson<ExpertEntry[]>('experts.json', []);
 }
 
-export function loadDatabase(): Record<string, unknown> {
-  return loadGeneratedJson<Record<string, unknown>>('database.json', {});
+/**
+ * Shape of database.json as produced by build-data.mjs.
+ * Only the fields actually consumed by crux rules are listed here;
+ * the real file may contain additional keys.
+ */
+export interface DatabaseSchema {
+  entities?: Entity[];
+  experts?: ExpertEntry[];
+  organizations?: OrganizationEntry[];
+  facts?: Record<string, {
+    value?: string;
+    computed?: boolean;
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
+}
+
+export function loadDatabase(): DatabaseSchema {
+  return loadGeneratedJson<DatabaseSchema>('database.json', {});
 }
 
 // ---------------------------------------------------------------------------

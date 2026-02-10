@@ -13,7 +13,7 @@ import { basename } from 'path';
 
 // Patterns that indicate cruft files
 // Note: Some patterns have path conditions to avoid false positives
-const CRUFT_PATTERNS = [
+const CRUFT_PATTERNS: { pattern: RegExp; message: string }[] = [
   { pattern: /^_[^_]/, message: 'Underscore-prefixed file (internal/hidden convention)' },
   { pattern: /^TODO\./i, message: 'TODO file exposed in public content' },
   { pattern: /_TODO\./i, message: 'TODO file exposed in public content' },

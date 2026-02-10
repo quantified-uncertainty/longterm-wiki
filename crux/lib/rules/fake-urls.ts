@@ -15,7 +15,7 @@ import type { ContentFile, ValidationEngine } from '../validation-engine.js';
 import { isInCodeBlock, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
 
 // Fake URL patterns to detect
-const FAKE_URL_PATTERNS = [
+const FAKE_URL_PATTERNS: { pattern: RegExp; name: string; severity: string }[] = [
   // example.com family
   {
     pattern: /https?:\/\/(?:www\.)?example\.(?:com|org|net)(?:\/[^\s\)"\]]*)?/gi,
@@ -96,7 +96,7 @@ export const fakeUrlsRule = createRule({
         // Reset regex state
         pattern.lastIndex = 0;
 
-        let match;
+        let match: RegExpExecArray | null;
         while ((match = pattern.exec(line)) !== null) {
           const url = match[0];
 

@@ -12,7 +12,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.js';
-import { loadDatabase, loadPathRegistry, DATA_DIR_ABS } from '../content-types.js';
+import { loadDatabase, loadPathRegistry, DATA_DIR_ABS, type Entity } from '../content-types.js';
 
 const DATA_DIR = DATA_DIR_ABS;
 
@@ -37,7 +37,7 @@ function loadEntities(): Set<string> {
       }
     } else {
       // Fallback for object format
-      for (const entity of Object.values(entities as Record<string, any>)) {
+      for (const entity of Object.values(entities as Record<string, Entity>)) {
         if (entity && entity.id) {
           entitiesCache.add(entity.id);
         }

@@ -17,7 +17,7 @@
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
 
-const EDITORIAL_ARTIFACT_PATTERNS = [
+const EDITORIAL_ARTIFACT_PATTERNS: { pattern: RegExp; message: string }[] = [
   // Self-referencing revision history — "this analysis", "this page", etc.
   {
     pattern: /(?:an? )?(?:earlier|previous|prior) version of this (?:analysis|page|section|document|model|framework|table)/gi,
@@ -78,7 +78,7 @@ export const editorialArtifactsRule = {
         // Reset regex state
         pattern.lastIndex = 0;
 
-        let match;
+        let match: RegExpExecArray | null;
         while ((match = pattern.exec(line)) !== null) {
           issues.push(new Issue({
             rule: 'editorial-artifacts',
