@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const frontmatter = getInternalPageFrontmatter(slugPath);
   const title = frontmatter?.title || "Internal";
   return {
-    title: `${title} | Cairn Internal`,
+    title: `${title} | Longterm Wiki Internal`,
   };
 }
 
