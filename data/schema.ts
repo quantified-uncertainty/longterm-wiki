@@ -366,45 +366,10 @@ export type EntityContent = z.infer<typeof EntityContent>;
 // ENTITIES (Generic knowledge base entries with InfoBox data)
 // =============================================================================
 
-export const EntityType = z.enum([
-  'risk',
-  'risk-factor',
-  'capability',
-  'safety-agenda',
-  'safety-approaches', // Safety research approaches/agendas
-  'approach',      // Broad strategies/categories of response (e.g., prediction markets, epistemic security)
-  'project',       // Specific named implementations/tools (e.g., Metaculus, Squiggle)
-  'policy',
-  'policies',      // Policy categories (alias for grouping)
-  'organization',  // Generic organization
-  'lab',           // AI lab (generic)
-  'lab-frontier',
-  'lab-research',
-  'lab-startup',
-  'lab-academic',
-  'crux',
-  'concept',       // Abstract concepts, ideas, or theoretical constructs
-  'concepts',      // Plural alias
-  'case-study',
-  'researcher',
-  'scenario',
-  'resource',
-  'funder',
-  'historical',    // Historical era or timeline event
-  'events',        // Events or milestones
-  'analysis',      // Analysis or comparison pages
-  'model',         // Analytical model for risks/scenarios (has MDX content)
-  'models',        // Plural alias
-  'parameter',     // Key societal/structural variable (generic)
-  'metric',        // Measurable indicator (generic)
-  'argument',      // Arguments for/against a position
-  // AI Transition Model specific types (prefixed for clarity)
-  'ai-transition-model-parameter',  // Parameters in the AI transition model
-  'ai-transition-model-metric',     // Metrics tracking AI transition parameters
-  'ai-transition-model-scenario',   // Scenarios/outcomes in the transition model
-  'ai-transition-model-factor',     // Root factors (was risk-factor in ATM context)
-  'ai-transition-model-subitem',    // Sub-items within factors (e.g., compute, algorithms)
-]);
+// EntityType enum is derived from the canonical list in entity-type-names.ts
+// (single source of truth — no more manual sync needed).
+import { ALL_ENTITY_TYPE_NAMES } from '../app/src/data/entity-type-names';
+export const EntityType = z.enum(ALL_ENTITY_TYPE_NAMES as unknown as [string, ...string[]]);
 export type EntityType = z.infer<typeof EntityType>;
 
 export const RelationshipType = z.enum([

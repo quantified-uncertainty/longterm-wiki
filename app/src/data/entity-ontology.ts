@@ -1,10 +1,14 @@
 /**
  * Canonical entity type ontology.
- * Single source of truth for type labels, icons, colors, and groupings.
+ * Display metadata (labels, icons, colors) for entity types.
+ *
+ * The canonical list of all valid entity type names lives in
+ * ./entity-type-names.ts — this file provides the display layer on top.
  *
  * Lab-* types have been flattened into "organization" with orgType subtypes.
  * "researcher" has been renamed to "person".
  */
+import { ENTITY_TYPE_ALIASES } from "./entity-type-names";
 import {
   Bug,
   User,
@@ -270,21 +274,12 @@ export const ORG_TYPE_DISPLAY: Record<string, OrgTypeDefinition> = {
   government: { label: "Government", icon: Building2, iconColor: "text-slate-600 dark:text-slate-400", headerColor: "#475569" },
 };
 
-// Backward compat: keep old names as aliases so existing code referencing
-// "researcher" or "lab-frontier" still finds a definition
-const _COMPAT_ALIASES: Record<string, EntityTypeDefinition> = {
-  researcher: ENTITY_TYPES.person,
-  lab: ENTITY_TYPES.organization,
-  "lab-frontier": ENTITY_TYPES.organization,
-  "lab-research": ENTITY_TYPES.organization,
-  "lab-startup": ENTITY_TYPES.organization,
-  "lab-academic": ENTITY_TYPES.organization,
-};
-
-// Merge aliases into the lookup (aliases don't overwrite canonical entries)
-for (const [key, def] of Object.entries(_COMPAT_ALIASES)) {
-  if (!ENTITY_TYPES[key]) {
-    ENTITY_TYPES[key] = def;
+// Backward compat: merge alias entries so lookups like ENTITY_TYPES["researcher"]
+// resolve to the canonical type's display definition.
+// Alias → canonical mappings are defined in entity-type-names.ts.
+for (const [alias, canonical] of Object.entries(ENTITY_TYPE_ALIASES)) {
+  if (!ENTITY_TYPES[alias] && ENTITY_TYPES[canonical]) {
+    ENTITY_TYPES[alias] = ENTITY_TYPES[canonical];
   }
 }
 
