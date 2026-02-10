@@ -1,0 +1,407 @@
+---
+title: "Entity Type Reference"
+description: "Complete field-level reference for every entity type, standalone data type, and their enums"
+sidebar:
+  order: 1
+---
+
+import {Mermaid} from '@components/wiki';
+
+Field-level reference for all data types defined in `data/schema.ts`. Required fields are marked with **bold**. Types with `?` are optional.
+
+---
+
+## Entity (Base Type)
+
+All entities share these fields. Type-specific fields (documented below) are merged on top.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | Slug identifier (e.g., `deceptive-alignment`) |
+| **type** | `EntityType` | Yes | One of 24 canonical types + aliases |
+| **title** | `string` | Yes | Display name |
+| description | `string` | No | 1-3 sentence summary |
+| aliases | `string[]` | No | Alternative names for search |
+| content | `EntityContent` | No | Rich YAML-first content (see below) |
+| status | `EntityStatus` | No | `stub` \| `draft` \| `published` \| `verified` |
+| lastUpdated | `string` | No | ISO date, `YYYY-MM` format |
+| tags | `string[]` | No | Standardized tags for filtering |
+| clusters | `Cluster[]` | No | Topic clusters: `ai-safety`, `biorisks`, `cyber`, `epistemics`, `governance`, `community` |
+| severity | `Severity` | No | Risk severity: `low` through `catastrophic` |
+| likelihood | `string \| StructuredLikelihood` | No | Risk likelihood (string or structured) |
+| timeframe | `string \| StructuredTimeframe` | No | Risk timeframe (string or structured) |
+| maturity | `ResearchMaturity` | No | `Neglected` \| `Emerging` \| `Growing` \| `Mature` |
+| website | `string (url)` | No | External website |
+| customFields | `CustomField[]` | No | Arbitrary key-value pairs for InfoBox |
+| relatedTopics | `string[]` | No | Topic tag references |
+| relatedEntries | `RelatedEntry[]` | No | Typed relationships to other entities |
+| sources | `EntitySource[]` | No | Legacy inline citations |
+| resources | `string[]` | No | Resource IDs from `data/resources/` |
+| parameterDistinctions | `ParameterDistinctions` | No | For parameter entities: clarify vs. similar parameters |
+
+### EntityContent
+
+Structured content stored in YAML. Allows pages to be defined entirely in YAML without MDX files.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| intro | `string` | No | Opening paragraph(s) before sections |
+| sections | `ContentSection[]` | No | Main content sections |
+| footer | `string` | No | Closing content after sections |
+
+### ContentSection
+
+A single section within entity content. Supports multiple content types per section.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **heading** | `string` | Yes | Section heading |
+| body | `string` | No | Markdown prose content |
+| mermaid | `string` | No | Mermaid diagram source code |
+| table | `ContentTable` | No | Structured table: `{ headers, rows, caption? }` |
+| component | `string` | No | Custom React component name (e.g., `PageCauseEffectGraph`) |
+| componentProps | `Record` | No | Props to pass to the custom component |
+
+### RelatedEntry
+
+A typed reference from one entity to another.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | Target entity slug |
+| **type** | `EntityType` | Yes | Target entity type |
+| relationship | `RelationshipType` | No | One of 45 relationship types |
+| strength | `string` | No | `weak` \| `moderate` \| `strong` |
+
+### StructuredLikelihood
+
+Rich likelihood assessment for risk entities.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **level** | `LikelihoodLevel` | Yes | `low` \| `medium` \| `medium-high` \| `high` \| `very-high` \| `near-certain` |
+| status | `LikelihoodStatus` | No | `theoretical` \| `emerging` \| `occurring` \| `established` |
+| confidence | `Confidence` | No | `low` \| `medium` \| `high` |
+| notes | `string` | No | Explanation |
+
+### StructuredTimeframe
+
+Rich timeframe estimate for risk entities.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **median** | `number` | Yes | Year number (e.g., 2030) |
+| earliest | `number` | No | Earliest plausible year |
+| latest | `number` | No | Latest plausible year |
+| confidence | `Confidence` | No | `low` \| `medium` \| `high` |
+| notes | `string` | No | Explanation |
+
+### ParameterDistinctions
+
+Clarifies how a parameter entity differs from similar parameters.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **focus** | `string` | Yes | Short phrase: what this parameter measures |
+| summary | `string` | No | One sentence summary |
+| **distinctFrom** | `ParameterDistinction[]` | Yes | Related but distinct parameters |
+
+Each `ParameterDistinction`:
+| Field | Type | Description |
+|-------|------|-------------|
+| **id** | `string` | Target parameter ID |
+| **theirFocus** | `string` | What they measure |
+| **relationship** | `string` | How they relate |
+
+---
+
+## Expert (Person)
+
+Defined in `data/experts.yaml`. Represents researchers, policymakers, and other notable people.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | Slug (e.g., `paul-christiano`) |
+| **name** | `string` | Yes | Full name |
+| affiliation | `string` | No | Organization ID reference |
+| role | `string` | No | Job title or role |
+| website | `string (url)` | No | Personal website |
+| twitter | `string` | No | Twitter handle |
+| knownFor | `string[]` | No | Notable contributions |
+| background | `string` | No | Brief bio |
+| positions | `ExpertPosition[]` | No | Stated views on key topics |
+
+### ExpertPosition
+
+A recorded position or estimate from an expert.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **topic** | `string` | Yes | e.g., `p-doom`, `alignment-difficulty`, `timelines` |
+| **view** | `string` | Yes | Their position in words |
+| estimate | `string` | No | Quantified value (e.g., `10-20%`, `2030s`) |
+| confidence | `Confidence` | No | How confident they are |
+| date | `string` | No | When they stated this |
+| source | `string` | No | Source title |
+| sourceUrl | `string (url)` | No | Source link |
+| notes | `string` | No | Additional context |
+
+---
+
+## Organization
+
+Defined in `data/organizations.yaml`. Labs, research orgs, funders, government bodies.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | Slug (e.g., `anthropic`) |
+| **name** | `string` | Yes | Display name |
+| **type** | `OrgType` | Yes | `frontier-lab` \| `safety-org` \| `academic` \| `government` \| `funder` \| `policy` |
+| founded | `string` | No | Year founded |
+| headquarters | `string` | No | Location |
+| website | `string (url)` | No | Official website |
+| description | `string` | No | Brief description |
+| keyPeople | `string[]` | No | Expert ID references |
+| funding | `string` | No | e.g., `$7B+` |
+| employees | `string` | No | e.g., `~1000` |
+| safetyFocus | `string` | No | Description of safety work |
+| parentOrg | `string` | No | Org ID for subsidiaries |
+
+---
+
+## Estimate
+
+Defined in `data/estimates.yaml`. Aggregated expert estimates on key variables.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | e.g., `p-tai-2030` |
+| **variable** | `string` | Yes | What's being estimated |
+| description | `string` | No | Context for the estimate |
+| unit | `string` | No | e.g., `%`, `years` |
+| aggregateRange | `string` | No | Summary range across sources |
+| category | `string` | No | e.g., `timelines`, `risk`, `alignment` |
+| **estimates** | `EstimateSource[]` | Yes | Individual source estimates |
+| lastUpdated | `string` | No | ISO date |
+
+### EstimateSource
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **source** | `string` | Yes | Who made the estimate (expert ID or org name) |
+| **value** | `string` | Yes | The estimate value |
+| date | `string` | No | When stated |
+| url | `string (url)` | No | Source link |
+| notes | `string` | No | Context |
+| confidence | `Confidence` | No | Confidence level |
+
+---
+
+## Crux (Key Uncertainty)
+
+Defined in `data/cruxes.yaml`. Disagreements and uncertainties that drive different conclusions.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | e.g., `alignment-difficulty` |
+| **question** | `string` | Yes | The key question |
+| domain | `string` | No | `Technical`, `Governance`, etc. |
+| description | `string` | No | Context |
+| **importance** | `Importance` | Yes | `low` \| `medium` \| `high` \| `critical` |
+| resolvability | `string` | No | `soon` \| `years` \| `decades` \| `never` |
+| currentState | `string` | No | Current state of evidence |
+| **positions** | `CruxPosition[]` | Yes | Different views on this crux |
+| wouldUpdateOn | `string[]` | No | Evidence that would change positions |
+| relatedCruxes | `string[]` | No | Crux ID references |
+| relevantResearch | `{ title, url? }[]` | No | Key papers |
+
+### CruxPosition
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **view** | `string` | Yes | The position |
+| probability | `string` | No | e.g., `40-60%` |
+| holders | `string[]` | No | Expert IDs or org names |
+| implications | `string` | No | What follows from this view |
+
+---
+
+## Risk
+
+Defined in `data/` entity files. Failure modes and hazards.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | e.g., `deceptive-alignment` |
+| **name** | `string` | Yes | Display name |
+| **category** | `RiskCategory` | Yes | `accident` \| `misuse` \| `structural` \| `epistemic` |
+| description | `string` | No | What the risk is |
+| severity | `Importance` | No | How bad if it happens |
+| likelihood | `string` | No | How likely |
+| mechanisms | `string[]` | No | How it could happen |
+| prerequisites | `string[]` | No | Risk IDs that must occur first |
+| mitigatedBy | `string[]` | No | Intervention IDs |
+| relatedRisks | `string[]` | No | Related risk IDs |
+| keyPapers | `string[]` | No | Source IDs |
+
+---
+
+## Intervention
+
+Responses to risks: technical, governance, or institutional.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | e.g., `interpretability-research` |
+| **name** | `string` | Yes | Display name |
+| **category** | `string` | Yes | `technical` \| `governance` \| `institutional` \| `field-building` \| `resilience` |
+| subcategory | `string` | No | More specific category |
+| description | `string` | No | What this intervention does |
+| addressesRisks | `string[]` | No | Risk IDs this addresses |
+| organizations | `string[]` | No | Org IDs working on this |
+| tractability | `Importance` | No | How tractable |
+| neglectedness | `Importance` | No | How neglected |
+| importance | `Importance` | No | How important |
+| timeHorizon | `string` | No | e.g., `1-3 years`, `5+ years` |
+
+---
+
+## Resource
+
+Defined in `data/resources/*.yaml`. External references with AI-generated summaries.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | Human-readable slug or hash |
+| **url** | `string (url)` | Yes | Source URL |
+| **title** | `string` | Yes | Display title |
+| type | `ResourceType` | Yes | `paper` \| `blog` \| `report` \| `book` \| `talk` \| `podcast` \| `government` \| `reference` \| `web` |
+| authors | `string[]` | No | Author names |
+| published_date | `string` | No | `YYYY` or `YYYY-MM-DD` |
+| local_filename | `string` | No | Path in `.cache/sources/` |
+| importance | `number (0-100)` | No | Determines review depth |
+| abstract | `string` | No | Original abstract |
+| summary | `string` | No | AI-generated 1-2 sentence summary |
+| review | `string` | No | AI-generated 1-4 paragraph review |
+| key_points | `string[]` | No | AI-generated key points |
+| cited_by | `string[]` | No | Entity IDs that cite this |
+| fetched_at | `string` | No | When content was fetched |
+| publication_id | `string` | No | Reference to `publications.yaml` |
+| tags | `string[]` | No | Topic tags |
+| credibility_override | `number (1-5)` | No | Override publication default |
+
+---
+
+## Publication
+
+Defined in `data/publications.yaml`. Maps domains to credibility ratings.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | e.g., `nature`, `arxiv` |
+| **domains** | `string[]` | Yes | Domains that map to this publication |
+| **name** | `string` | Yes | Display name |
+| **type** | `PublicationType` | Yes | See enum table below |
+| **credibility** | `number (1-5)` | Yes | 1 = unvetted, 5 = gold standard |
+| peer_reviewed | `boolean` | No | Whether peer-reviewed |
+| description | `string` | No | Description |
+
+---
+
+## GlossaryTerm
+
+Defined in `data/glossary.yaml`. Definitions of key terms.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | e.g., `agi` |
+| **term** | `string` | Yes | Display name |
+| **definition** | `string` | Yes | The definition |
+| aliases | `string[]` | No | Other names |
+| related | `string[]` | No | Other term IDs |
+| seeAlso | `string[]` | No | Page slugs |
+
+---
+
+## TimelineEvent
+
+Defined in `data/timeline.yaml`. Key events in AI safety history.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | Event identifier |
+| **date** | `string` | Yes | ISO date, `YYYY`, or `YYYY-MM` |
+| **title** | `string` | Yes | Event title |
+| description | `string` | No | What happened |
+| category | `string` | No | `capability` \| `safety` \| `governance` \| `incident` \| `organization` |
+| importance | `Importance` | No | How significant |
+| actors | `string[]` | No | Expert or org IDs |
+| url | `string (url)` | No | Reference link |
+
+---
+
+## Source (Publication/Paper)
+
+Legacy citation format (being migrated to Resources).
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| **id** | `string` | Yes | e.g., `superintelligence-2014` |
+| **title** | `string` | Yes | Paper/book title |
+| authors | `string[]` | No | Expert IDs or names |
+| year | `string` | No | Publication year |
+| type | `string` | No | `book` \| `paper` \| `blog` \| `report` \| `talk` \| `podcast` |
+| url | `string (url)` | No | Link |
+| abstract | `string` | No | Summary |
+| significance | `string` | No | Why it matters |
+
+---
+
+## Fact
+
+Defined in `data/facts/*.yaml`. Canonical referenceable values per entity.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| value | `string` | No | Display value (auto-generated for computed facts) |
+| numeric | `number` | No | Machine-readable numeric value |
+| asOf | `string` | No | Date the value was current |
+| source | `string` | No | Citation |
+| note | `string` | No | Additional context |
+| noCompute | `boolean` | No | If true, numeric value cannot be referenced in compute expressions |
+| compute | `string` | No | Expression: `{entity.factId} * {other.factId}` |
+| format | `string` | No | Display format: `$%.1f billion` |
+| formatDivisor | `number` | No | Divide result before formatting (e.g., `1e9` for billions) |
+
+---
+
+## Database (Top-level)
+
+The complete database schema aggregating all types. Generated as `database.json` at build time.
+
+```typescript
+{
+  experts: Expert[];
+  organizations: Organization[];
+  estimates: Estimate[];
+  cruxes: Crux[];
+  risks: Risk[];
+  interventions: Intervention[];
+  glossary: GlossaryTerm[];
+  timeline: TimelineEvent[];
+  sources: Source[];
+  graphs: Graph[];
+  entities: Entity[];
+  resources: Resource[];
+  publications: Publication[];
+}
+```
+
+Plus build-time additions:
+- `typedEntities[]` — entities with resolved types and numeric IDs
+- `backlinks` — reverse reference index
+- `tagIndex` — tag → entity mapping
+- `pathRegistry` — entity ID → URL path mapping
+- `facts` — resolved canonical facts
+- `insights[]` — extracted cross-page insights
+- `pages[]` — page-level metadata (quality scores, importance, last updated)

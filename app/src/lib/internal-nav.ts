@@ -67,8 +67,9 @@ export const INTERNAL_NAV: NavSection[] = [
       { label: "Cross-Link Automation", href: "/internal/reports/cross-link-automation-proposal" },
       { label: "Diagram Naming", href: "/internal/reports/diagram-naming-research" },
       { label: "Page Creator Pipeline", href: "/internal/reports/page-creator-pipeline" },
-      { label: "Schema Docs", href: "/internal/schema" },
-      { label: "Diagrams Schema", href: "/internal/schema/diagrams" },
+      { label: "Schema Overview", href: "/internal/schema" },
+      { label: "Entity Reference", href: "/internal/schema/entities" },
+      { label: "Schema Diagrams", href: "/internal/schema/diagrams" },
     ],
   },
 ];

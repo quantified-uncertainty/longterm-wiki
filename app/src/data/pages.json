@@ -38589,9 +38589,9 @@
           "similarity": 22
         },
         {
-          "id": "cairn-vision",
+          "id": "longterm-vision",
           "title": "LongtermWiki Vision",
-          "path": "/internal/cairn-vision/",
+          "path": "/internal/longterm-vision/",
           "similarity": 17
         },
         {
@@ -38965,9 +38965,9 @@
           "similarity": 10
         },
         {
-          "id": "cairn-vision",
+          "id": "longterm-vision",
           "title": "LongtermWiki Vision",
-          "path": "/internal/cairn-vision/",
+          "path": "/internal/longterm-vision/",
           "similarity": 10
         }
       ]
@@ -57237,9 +57237,9 @@
           "similarity": 14
         },
         {
-          "id": "cairn-vision",
+          "id": "longterm-vision",
           "title": "LongtermWiki Vision",
-          "path": "/internal/cairn-vision/",
+          "path": "/internal/longterm-vision/",
           "similarity": 13
         }
       ]
@@ -57500,162 +57500,6 @@
           "title": "Page Type System",
           "path": "/internal/page-types/",
           "similarity": 10
-        }
-      ]
-    }
-  },
-  {
-    "id": "cairn-strategy",
-    "path": "/internal/cairn-strategy/",
-    "filePath": "internal/cairn-strategy.md",
-    "title": "LongtermWiki Strategy Brainstorm",
-    "quality": 4,
-    "importance": null,
-    "tractability": null,
-    "neglectedness": null,
-    "uncertainty": null,
-    "causalLevel": null,
-    "lastUpdated": null,
-    "llmSummary": "Internal strategic planning document for LongtermWiki project development, exploring five failure modes (becoming just another wiki, generating non-insights, building unwanted features, maintenance hell, being too unusual) and five strategic options (narrow/deep focus, broad/shallow wiki, opinionated synthesis, crux laboratory, living assessment). Proposes four 2-week validation tests (user interviews, crux prototype, page quality test, insight generation) before committing resources.",
-    "description": "Strategic planning and brainstorming for LongtermWiki development",
-    "ratings": {
-      "novelty": 0,
-      "rigor": 0,
-      "actionability": 0,
-      "completeness": 0
-    },
-    "category": "other",
-    "subcategory": null,
-    "clusters": [
-      "ai-safety"
-    ],
-    "metrics": {
-      "wordCount": 2116,
-      "tableCount": 1,
-      "diagramCount": 1,
-      "internalLinks": 0,
-      "externalLinks": 0,
-      "bulletRatio": 0.57,
-      "sectionCount": 32,
-      "hasOverview": false,
-      "structuralScore": 4
-    },
-    "suggestedQuality": 27,
-    "wordCount": 2116,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 0,
-    "backlinkCount": 0,
-    "redundancy": {
-      "maxSimilarity": 15,
-      "similarPages": [
-        {
-          "id": "longtermwiki-value-proposition",
-          "title": "LongtermWiki Value Proposition",
-          "path": "/internal/longtermwiki-value-proposition/",
-          "similarity": 15
-        },
-        {
-          "id": "cairn-vision",
-          "title": "LongtermWiki Vision",
-          "path": "/internal/cairn-vision/",
-          "similarity": 13
-        },
-        {
-          "id": "issa-rice",
-          "title": "Issa Rice",
-          "path": "/knowledge-base/people/issa-rice/",
-          "similarity": 12
-        },
-        {
-          "id": "carlsmith-six-premises",
-          "title": "Carlsmith's Six-Premise Argument",
-          "path": "/knowledge-base/models/carlsmith-six-premises/",
-          "similarity": 11
-        },
-        {
-          "id": "short-timeline-policy-implications",
-          "title": "Short Timeline Policy Implications",
-          "path": "/knowledge-base/models/short-timeline-policy-implications/",
-          "similarity": 11
-        }
-      ]
-    }
-  },
-  {
-    "id": "cairn-vision",
-    "path": "/internal/cairn-vision/",
-    "filePath": "internal/cairn-vision.md",
-    "title": "LongtermWiki Vision",
-    "quality": 2,
-    "importance": null,
-    "tractability": null,
-    "neglectedness": null,
-    "uncertainty": null,
-    "causalLevel": null,
-    "lastUpdated": null,
-    "llmSummary": "Internal strategic planning document for the LongtermWiki project itself, outlining a 2-person-year scope to build a knowledge platform focused on AI safety prioritization cruxes. Proposes ~250 pages across risks, interventions, and causal models with worldview-based priority mapping.",
-    "description": "Strategic vision and scope for the LongtermWiki project",
-    "ratings": {
-      "novelty": 0,
-      "rigor": 0,
-      "actionability": 0,
-      "completeness": 0
-    },
-    "category": "other",
-    "subcategory": null,
-    "clusters": [
-      "ai-safety"
-    ],
-    "metrics": {
-      "wordCount": 938,
-      "tableCount": 5,
-      "diagramCount": 5,
-      "internalLinks": 0,
-      "externalLinks": 0,
-      "bulletRatio": 0.41,
-      "sectionCount": 27,
-      "hasOverview": false,
-      "structuralScore": 8
-    },
-    "suggestedQuality": 53,
-    "wordCount": 938,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 0,
-    "backlinkCount": 0,
-    "redundancy": {
-      "maxSimilarity": 17,
-      "similarPages": [
-        {
-          "id": "longterm-wiki",
-          "title": "Longterm Wiki",
-          "path": "/knowledge-base/responses/longterm-wiki/",
-          "similarity": 17
-        },
-        {
-          "id": "about-this-wiki",
-          "title": "About This Wiki",
-          "path": "/internal/about-this-wiki/",
-          "similarity": 13
-        },
-        {
-          "id": "cairn-strategy",
-          "title": "LongtermWiki Strategy Brainstorm",
-          "path": "/internal/cairn-strategy/",
-          "similarity": 13
-        },
-        {
-          "id": "longtermwiki-value-proposition",
-          "title": "LongtermWiki Value Proposition",
-          "path": "/internal/longtermwiki-value-proposition/",
-          "similarity": 12
-        },
-        {
-          "id": "ai-watch",
-          "title": "AI Watch",
-          "path": "/knowledge-base/responses/ai-watch/",
-          "similarity": 11
         }
       ]
     }
@@ -58030,15 +57874,15 @@
           "similarity": 12
         },
         {
-          "id": "cairn-vision",
-          "title": "LongtermWiki Vision",
-          "path": "/internal/cairn-vision/",
-          "similarity": 11
-        },
-        {
           "id": "enhancement-queue",
           "title": "Enhancement Queue",
           "path": "/internal/enhancement-queue/",
+          "similarity": 11
+        },
+        {
+          "id": "longterm-vision",
+          "title": "LongtermWiki Vision",
+          "path": "/internal/longterm-vision/",
           "similarity": 11
         },
         {
@@ -58046,6 +57890,162 @@
           "title": "Model Style Guide",
           "path": "/internal/models/",
           "similarity": 10
+        }
+      ]
+    }
+  },
+  {
+    "id": "longterm-strategy",
+    "path": "/internal/longterm-strategy/",
+    "filePath": "internal/longterm-strategy.md",
+    "title": "LongtermWiki Strategy Brainstorm",
+    "quality": 4,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Internal strategic planning document for LongtermWiki project development, exploring five failure modes (becoming just another wiki, generating non-insights, building unwanted features, maintenance hell, being too unusual) and five strategic options (narrow/deep focus, broad/shallow wiki, opinionated synthesis, crux laboratory, living assessment). Proposes four 2-week validation tests (user interviews, crux prototype, page quality test, insight generation) before committing resources.",
+    "description": "Strategic planning and brainstorming for LongtermWiki development",
+    "ratings": {
+      "novelty": 0,
+      "rigor": 0,
+      "actionability": 0,
+      "completeness": 0
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 2116,
+      "tableCount": 1,
+      "diagramCount": 1,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0.57,
+      "sectionCount": 32,
+      "hasOverview": false,
+      "structuralScore": 4
+    },
+    "suggestedQuality": 27,
+    "wordCount": 2116,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 15,
+      "similarPages": [
+        {
+          "id": "longtermwiki-value-proposition",
+          "title": "LongtermWiki Value Proposition",
+          "path": "/internal/longtermwiki-value-proposition/",
+          "similarity": 15
+        },
+        {
+          "id": "longterm-vision",
+          "title": "LongtermWiki Vision",
+          "path": "/internal/longterm-vision/",
+          "similarity": 13
+        },
+        {
+          "id": "issa-rice",
+          "title": "Issa Rice",
+          "path": "/knowledge-base/people/issa-rice/",
+          "similarity": 12
+        },
+        {
+          "id": "carlsmith-six-premises",
+          "title": "Carlsmith's Six-Premise Argument",
+          "path": "/knowledge-base/models/carlsmith-six-premises/",
+          "similarity": 11
+        },
+        {
+          "id": "short-timeline-policy-implications",
+          "title": "Short Timeline Policy Implications",
+          "path": "/knowledge-base/models/short-timeline-policy-implications/",
+          "similarity": 11
+        }
+      ]
+    }
+  },
+  {
+    "id": "longterm-vision",
+    "path": "/internal/longterm-vision/",
+    "filePath": "internal/longterm-vision.md",
+    "title": "LongtermWiki Vision",
+    "quality": 2,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Internal strategic planning document for the LongtermWiki project itself, outlining a 2-person-year scope to build a knowledge platform focused on AI safety prioritization cruxes. Proposes ~250 pages across risks, interventions, and causal models with worldview-based priority mapping.",
+    "description": "Strategic vision and scope for the LongtermWiki project",
+    "ratings": {
+      "novelty": 0,
+      "rigor": 0,
+      "actionability": 0,
+      "completeness": 0
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 938,
+      "tableCount": 5,
+      "diagramCount": 5,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0.41,
+      "sectionCount": 27,
+      "hasOverview": false,
+      "structuralScore": 8
+    },
+    "suggestedQuality": 53,
+    "wordCount": 938,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 17,
+      "similarPages": [
+        {
+          "id": "longterm-wiki",
+          "title": "Longterm Wiki",
+          "path": "/knowledge-base/responses/longterm-wiki/",
+          "similarity": 17
+        },
+        {
+          "id": "about-this-wiki",
+          "title": "About This Wiki",
+          "path": "/internal/about-this-wiki/",
+          "similarity": 13
+        },
+        {
+          "id": "longterm-strategy",
+          "title": "LongtermWiki Strategy Brainstorm",
+          "path": "/internal/longterm-strategy/",
+          "similarity": 13
+        },
+        {
+          "id": "longtermwiki-value-proposition",
+          "title": "LongtermWiki Value Proposition",
+          "path": "/internal/longtermwiki-value-proposition/",
+          "similarity": 12
+        },
+        {
+          "id": "ai-watch",
+          "title": "AI Watch",
+          "path": "/knowledge-base/responses/ai-watch/",
+          "similarity": 11
         }
       ]
     }
@@ -58102,9 +58102,9 @@
           "similarity": 15
         },
         {
-          "id": "cairn-strategy",
+          "id": "longterm-strategy",
           "title": "LongtermWiki Strategy Brainstorm",
-          "path": "/internal/cairn-strategy/",
+          "path": "/internal/longterm-strategy/",
           "similarity": 15
         },
         {
@@ -59219,49 +59219,98 @@
     "id": "diagrams",
     "path": "/internal/schema/diagrams/",
     "filePath": "internal/schema/diagrams.mdx",
-    "title": "Schema Reference",
-    "quality": 52,
-    "importance": 2,
+    "title": "Schema Diagrams",
+    "quality": null,
+    "importance": null,
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
     "lastUpdated": null,
-    "llmSummary": "Auto-generated technical documentation cataloging 35 entity types (risks, capabilities, interventions, organizations) and 41 relationship types (causes, mitigates, enables) used in the wiki's internal data structure. Provides complete schema reference with validation pipeline and UI component integration.",
-    "description": "Auto-generated documentation of entity types and relationships",
-    "ratings": {
-      "focus": 9,
-      "novelty": 0,
-      "rigor": 7,
-      "completeness": 8,
-      "concreteness": 9,
-      "actionability": 1
-    },
+    "llmSummary": null,
+    "description": "Visual documentation of entity types, relationships, data flow, and the full entity-relationship model",
+    "ratings": null,
     "category": "schema",
     "subcategory": null,
     "clusters": [
       "ai-safety"
     ],
     "metrics": {
-      "wordCount": 605,
-      "tableCount": 2,
-      "diagramCount": 3,
+      "wordCount": 401,
+      "tableCount": 1,
+      "diagramCount": 11,
       "internalLinks": 0,
       "externalLinks": 0,
-      "bulletRatio": 0.01,
-      "sectionCount": 6,
+      "bulletRatio": 0,
+      "sectionCount": 15,
       "hasOverview": false,
-      "structuralScore": 7
+      "structuralScore": 6
     },
-    "suggestedQuality": 47,
-    "wordCount": 605,
+    "suggestedQuality": 40,
+    "wordCount": 401,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 0,
-      "similarPages": []
+      "maxSimilarity": 10,
+      "similarPages": [
+        {
+          "id": "entities",
+          "title": "Entity Type Reference",
+          "path": "/internal/schema/entities/",
+          "similarity": 10
+        }
+      ]
+    }
+  },
+  {
+    "id": "entities",
+    "path": "/internal/schema/entities/",
+    "filePath": "internal/schema/entities.mdx",
+    "title": "Entity Type Reference",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": null,
+    "description": "Complete field-level reference for every entity type, standalone data type, and their enums",
+    "ratings": null,
+    "category": "schema",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 2418,
+      "tableCount": 23,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0.02,
+      "sectionCount": 23,
+      "hasOverview": false,
+      "structuralScore": 7
+    },
+    "suggestedQuality": 47,
+    "wordCount": 2418,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 10,
+      "similarPages": [
+        {
+          "id": "diagrams",
+          "title": "Schema Diagrams",
+          "path": "/internal/schema/diagrams/",
+          "similarity": 10
+        }
+      ]
     }
   },
   {

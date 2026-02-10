@@ -1,6 +1,6 @@
 {
-  "totalFiles": 645,
-  "totalLinks": 163,
+  "totalFiles": 646,
+  "totalLinks": 167,
   "brokenLinks": [
     {
       "file": "ai-transition-model/factors-ai-ownership-overview.mdx",
@@ -99,6 +99,12 @@
       "text": "/diagrams/master-graph?level=detailed"
     },
     {
+      "file": "internal/schema/index.md",
+      "line": 99,
+      "href": "/internal/facts",
+      "text": "Fact Dashboard"
+    },
+    {
       "file": "knowledge-base/index.mdx",
       "line": 61,
       "href": "/explore/",
@@ -135,7 +141,47 @@
       "issues": [
         "missing-trailing-slash"
       ]
+    },
+    {
+      "file": "internal/schema/index.md",
+      "line": 70,
+      "href": "/internal/schema/entities",
+      "issues": [
+        "missing-trailing-slash"
+      ]
+    },
+    {
+      "file": "internal/schema/index.md",
+      "line": 97,
+      "href": "/internal/schema/entities",
+      "issues": [
+        "missing-trailing-slash"
+      ]
+    },
+    {
+      "file": "internal/schema/index.md",
+      "line": 98,
+      "href": "/internal/schema/diagrams",
+      "issues": [
+        "missing-trailing-slash"
+      ]
+    },
+    {
+      "file": "internal/schema/index.md",
+      "line": 99,
+      "href": "/internal/facts",
+      "issues": [
+        "missing-trailing-slash"
+      ]
+    },
+    {
+      "file": "internal/schema/index.md",
+      "line": 141,
+      "href": "/internal/schema/entities",
+      "issues": [
+        "missing-trailing-slash"
+      ]
     }
   ],
-  "valid": 141
+  "valid": 144
 }
