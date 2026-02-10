@@ -352,3 +352,40 @@ export function shouldSkipPosition(content, position) {
     isInComment(content, position)
   );
 }
+
+/**
+ * Iterate regex matches over lines in body text, skipping code blocks.
+ *
+ * For each match that is NOT inside a code block (or other excluded context),
+ * calls `callback({ match, line, lineNum, absolutePos })`.
+ *
+ * @param {string} body - Content body (without frontmatter)
+ * @param {RegExp} regex - Pattern to search for (must have the 'g' flag set
+ *   on the *source*; a fresh RegExp is created per line internally).
+ * @param {function} callback - Called for each non-code-block match
+ * @param {object} [options]
+ * @param {function} [options.skip] - Extra skip predicate `(body, absolutePos) => boolean`
+ */
+export function matchLinesOutsideCode(body, regex, callback, options = {}) {
+  const lines = body.split('\n');
+  let position = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const lineNum = i + 1;
+
+    // Create a fresh regex per line so lastIndex resets naturally
+    const lineRegex = new RegExp(regex.source, regex.flags.includes('g') ? regex.flags : regex.flags + 'g');
+    let match;
+    while ((match = lineRegex.exec(line)) !== null) {
+      const absolutePos = position + match.index;
+
+      if (isInCodeBlock(body, absolutePos)) continue;
+      if (options.skip && options.skip(body, absolutePos)) continue;
+
+      callback({ match, line, lineNum, absolutePos });
+    }
+
+    position += line.length + 1;
+  }
+}

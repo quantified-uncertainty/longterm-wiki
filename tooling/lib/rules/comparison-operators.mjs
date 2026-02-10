@@ -11,7 +11,7 @@
  */
 
 import { createRule, Issue, Severity, FixType } from '../validation-engine.js';
-import { isInCodeBlock, isInJsxAttribute, getFrontmatterEndLine } from '../mdx-utils.mjs';
+import { matchLinesOutsideCode, isInJsxAttribute } from '../mdx-utils.mjs';
 
 // Pattern: < followed by a digit or \$ (escaped dollar sign)
 const LESS_THAN_PATTERN = /<(\d|\\?\$)/g;
@@ -41,43 +41,27 @@ export const comparisonOperatorsRule = createRule({
 
   check(content, engine) {
     const issues = [];
-    const lines = content.body.split('\n');
-    let position = 0;
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const lineNum = i + 1;
+    matchLinesOutsideCode(content.body, LESS_THAN_PATTERN, ({ match, line, lineNum, absolutePos }) => {
+      // Skip if in safe context
+      if (isInJsxAttribute(content.body, absolutePos)) return;
+      if (isAlreadyEscaped(content.body, absolutePos)) return;
+      if (isValidHtmlTag(content.body, absolutePos)) return;
 
-      // Find less-than matches
-      let match;
-      const ltRegex = new RegExp(LESS_THAN_PATTERN.source, 'g');
-
-      while ((match = ltRegex.exec(line)) !== null) {
-        const absolutePos = position + match.index;
-
-        // Skip if in safe context
-        if (isInCodeBlock(content.body, absolutePos)) continue;
-        if (isInJsxAttribute(content.body, absolutePos)) continue;
-        if (isAlreadyEscaped(content.body, absolutePos)) continue;
-        if (isValidHtmlTag(content.body, absolutePos)) continue;
-
-        const context = line.slice(Math.max(0, match.index - 10), match.index + 15);
-        issues.push(new Issue({
-          rule: this.id,
-          file: content.path,
-          line: lineNum,
-          message: `Unescaped "<" before number: "${match[0]}" should be "&lt;${match[1]}" (context: ...${context}...)`,
-          severity: Severity.ERROR,
-          fix: {
-            type: FixType.REPLACE_TEXT,
-            oldText: match[0],
-            newText: `&lt;${match[1]}`,
-          },
-        }));
-      }
-
-      position += line.length + 1;
-    }
+      const context = line.slice(Math.max(0, match.index - 10), match.index + 15);
+      issues.push(new Issue({
+        rule: this.id,
+        file: content.path,
+        line: lineNum,
+        message: `Unescaped "<" before number: "${match[0]}" should be "&lt;${match[1]}" (context: ...${context}...)`,
+        severity: Severity.ERROR,
+        fix: {
+          type: FixType.REPLACE_TEXT,
+          oldText: match[0],
+          newText: `&lt;${match[1]}`,
+        },
+      }));
+    });
 
     return issues;
   },

@@ -9,6 +9,7 @@
  */
 
 import { Severity, Issue } from '../validation-engine.js';
+import { shouldSkipValidation } from '../mdx-utils.mjs';
 
 export const qualitySourceRule = {
   id: 'quality-source',
@@ -20,8 +21,8 @@ export const qualitySourceRule = {
     const issues = [];
     const fm = contentFile.frontmatter;
 
-    // Skip overview pages (index.mdx) and stubs
-    if (contentFile.isIndex || fm.pageType === 'stub' || fm.pageType === 'documentation') {
+    // Skip overview pages (index.mdx) and stubs/documentation
+    if (contentFile.isIndex || shouldSkipValidation(fm)) {
       return issues;
     }
 

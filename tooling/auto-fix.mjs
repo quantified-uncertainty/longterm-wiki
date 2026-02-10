@@ -5,17 +5,12 @@
  */
 
 import { execSync } from 'child_process';
+import { getColors } from './lib/output.mjs';
+
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 
-const colors = {
-  reset: '\x1b[0m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  dim: '\x1b[2m',
-  bold: '\x1b[1m',
-};
+const colors = getColors();
 
 console.log(`${colors.bold}${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
 console.log(`${colors.bold}${colors.blue}  Auto-Fix Script${colors.reset}`);

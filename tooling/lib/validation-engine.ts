@@ -520,7 +520,4 @@ export function createRule({ id, name, description, scope = 'file', check }: Rul
   return { id, name, description, scope, check };
 }
 
-/** Singleton engine for convenience */
-export const engine = new ValidationEngine();
-
 export default ValidationEngine;
