@@ -2,7 +2,7 @@
 
 **Goal**: Transform Crux from a collection of ~120 standalone scripts into a typed, composable TypeScript library with a thin CLI layer.
 
-**Current state**: 120 `.mjs` files, 2 `.ts` files. The CLI dispatches commands by spawning child processes. Each script re-parses argv, re-reads files, re-implements colors and error handling. The codebase works but is hard to maintain, test, or compose.
+**Current state**: 120 `.mjs` files, 2 `.ts` files, 6 test files. The CLI dispatches most commands by spawning child processes. Each script re-parses argv, re-reads files, re-implements colors and error handling. The codebase works but is hard to maintain, test, or compose.
 
 **Target state**: A typed library (`crux/lib/`) exporting composable functions. The CLI is a thin wrapper that parses args once and calls library functions directly. One process, one data load, shared types throughout.
 
@@ -348,24 +348,31 @@ Before planning changes, it's worth noting what's already good:
 
 ---
 
+## Import path convention
+
+The codebase uses `tsx` (via the shebang `#!/usr/bin/env -S node --import tsx/esm --no-warnings` in `crux.mjs`) to run TypeScript. Existing `.mjs` files import from `.ts` files using either the `.ts` extension directly or the `.js` extension (which `tsx` resolves to `.ts`).
+
+When renaming a file from `.mjs` to `.ts`, **every file that imports it must update its import path**. Before converting any file, grep for all import references to it. This is mechanical but easy to miss — track it per batch.
+
+---
+
 ## Phase 0: Foundation (Prerequisites)
 
-**Estimated effort**: 2–4 hours
+**Size**: Small-Medium
 **Risk**: Very low — no behavior changes
 
-These are mechanical cleanups that reduce noise before the real migration.
+These are mechanical cleanups that reduce noise and establish the test safety net before the real migration.
 
-### 0a. Fix rules/index.mjs double-import
+### 0a. Fix rules/index.mjs triple-listing
 
-Every rule is imported twice — once for re-export, once for the `allRules` array.
+Every rule name appears three times in this file — once in the import, once in the named re-export, and once in the `allRules` array:
 
 ```javascript
-// Before (151 lines, 2 imports per rule)
+// Before (137 lines, 3 listings per rule)
 import { dollarSignsRule } from './dollar-signs.mjs';
-export { dollarSignsRule };
-// ... 33 more
-import { dollarSignsRule as _ds } from './dollar-signs.mjs';
-export const allRules = [_ds, ...];
+// ... 33 more imports
+export { dollarSignsRule, /* ... */ };
+export const allRules = [dollarSignsRule, /* ... */];
 ```
 
 ```javascript
@@ -378,10 +385,10 @@ export const allRules = [dollarSignsRule, markdownListsRule, /* ... */];
 
 ### 0b. Standardize data loading
 
-Many scripts do raw `JSON.parse(readFileSync(...))` instead of using the typed loaders in `content-types.ts`. Find and replace all instances:
+~16 scripts do raw `JSON.parse(readFileSync(...))` instead of using the typed loaders in `content-types.ts`. Find and replace all instances:
 
 ```javascript
-// Before (scattered across ~15 scripts)
+// Before (scattered across ~16 scripts)
 const pages = JSON.parse(readFileSync('app/src/data/pages.json', 'utf-8'));
 
 // After
@@ -389,46 +396,33 @@ import { loadPages } from '../lib/content-types.ts';
 const pages = loadPages();
 ```
 
-Scripts to update: `validate-quality.mjs`, `validate-data.mjs`, `validate-internal-links.mjs`, `validate-cross-links.mjs`, `validate-entity-links.mjs`, `analyze-all.mjs`, `analyze-link-coverage.mjs`, and others that load `pages.json`, `entities.json`, or `backlinks.json`.
+Known scripts to update (reading `pages.json`, `database.json`, `pathRegistry.json`, or `entities.json`):
 
-### 0c. Extract shared arg parsing
+- `validate/`: `validate-quality.mjs`, `validate-cross-links.mjs`, `validate-entity-links.mjs`, `validate-component-refs.mjs`
+- `lib/rules/`: `component-refs.mjs`, `entity-mentions.mjs`, `fact-consistency.mjs`
+- `lib/`: `search.mjs`
+- `authoring/`: `regrade.mjs`, `page-improver.mjs`, `creator/duplicate-detection.mjs`
 
-Create a simple shared arg parser to replace the ~20 files that manually parse `process.argv`:
+### 0c. Convert test files to TypeScript
 
-```typescript
-// lib/args.ts
-export interface ParsedArgs {
-  positional: string[];
-  flags: Record<string, boolean>;
-  options: Record<string, string>;
-}
+The 6 test files should be converted **before** the main migration begins, not after. Tests are the safety net for every subsequent phase — if a `.mjs` → `.ts` rename breaks an import path, the tests should catch it. Converting tests first ensures the safety net itself is solid before relying on it.
 
-export function parseScriptArgs(argv = process.argv.slice(2)): ParsedArgs {
-  const positional: string[] = [];
-  const flags: Record<string, boolean> = {};
-  const options: Record<string, string> = {};
+| File | Lines |
+|------|-------|
+| `lib/cli.test.mjs` | 767 |
+| `lib/validators.test.mjs` | 499 |
+| `lib/rules/rules.test.mjs` | 415 |
+| `lib/metrics-extractor.test.mjs` | — |
+| `lib/lib.test.mjs` | — |
+| `authoring/creator/creator.test.mjs` | — |
 
-  for (const arg of argv) {
-    if (arg.startsWith('--')) {
-      const [key, value] = arg.slice(2).split('=');
-      if (value === undefined) flags[key] = true;
-      else options[key] = value;
-    } else {
-      positional.push(arg);
-    }
-  }
-
-  return { positional, flags, options };
-}
-```
-
-This doesn't need to be adopted everywhere immediately — it's available for scripts as they get migrated.
+These use a custom TAP-like test runner (hand-rolled `test(name, fn)` with try/catch), not vitest. Converting to `.ts` is still low-risk since `tsx` handles the execution. The conversion is mechanical: rename, add type annotations to test data and assertions.
 
 ---
 
 ## Phase 1: Convert validation rules to TypeScript
 
-**Estimated effort**: 6–8 hours
+**Size**: Medium
 **Risk**: Low — each rule is independent, tests catch regressions
 **Value**: High — 34 files get type safety, rules become self-documenting
 
@@ -470,15 +464,19 @@ export const dollarSignsRule = createRule({
 });
 ```
 
-### Approach
+### Per-batch checklist
 
-1. Convert rules in batches of 5–8, from simplest to most complex
-2. After each batch, run `pnpm crux validate` to verify identical output
-3. Update `rules/index.mjs` → `rules/index.ts` after all rules are converted
+For each batch:
+1. Rename `.mjs` → `.ts`, add type annotations
+2. Update all import paths referencing the renamed files (grep for the old filename)
+3. Run `pnpm crux validate` to verify identical output
+4. Run `tsc --noEmit -p crux/tsconfig.json` to verify types
+
+After all batches: convert `rules/index.mjs` → `rules/index.ts` and update its importers.
 
 ### Batch order (by complexity)
 
-**Batch 1** (simplest, ~30 min each):
+**Batch 1** (simplest):
 - `dollar-signs`, `comparison-operators`, `tilde-dollar`, `placeholders`, `fake-urls`, `jsx-in-md`
 
 **Batch 2** (moderate):
@@ -497,37 +495,45 @@ export const dollarSignsRule = createRule({
 
 ## Phase 2: Convert remaining lib/ files to TypeScript
 
-**Estimated effort**: 8–12 hours
+**Size**: Medium-Large
 **Risk**: Low-Medium — functions don't change, just get typed
 **Value**: High — the shared library becomes the typed backbone
 
 ### Priority order
 
-| File | Lines | Effort | Value | Notes |
-|------|-------|--------|-------|-------|
-| `lib/mdx-utils.mjs` | 391 | 3h | High | Return types prevent frontmatter bugs. Functions like `parseFrontmatter`, `extractLinks`, `isInCodeBlock` are used everywhere. |
-| `lib/output.mjs` | 137 | 1h | Medium | Quick win. `createLogger`, `getColors`, `formatPath`. |
-| `lib/file-utils.mjs` | 103 | 1h | Medium | Quick win. `findMdxFiles`, `walkDirectory`. |
-| `lib/metrics-extractor.mjs` | 266 | 2h | Medium | `extractMetrics` return type is complex but valuable. |
-| `lib/cli.mjs` | 176 | 2h | Medium | `createScriptHandler`, `buildCommands` — types help command authors. |
-| `lib/insights.mjs` | 587 | 3h | Medium | Complex data structures benefit from types. |
-| `lib/anthropic.mjs` | 253 | 2h | Medium | API client types, model definitions. |
-| `lib/knowledge-db.mjs` | 706 | 4h | Low | SQLite wrapper. Needs `@types/better-sqlite3`. Lower priority — only used by research pipeline. |
-| `lib/page-templates.mjs` | ~200 | 1h | Medium | Template definitions used by grading. |
+| File | Lines | Value | Notes |
+|------|-------|-------|-------|
+| `lib/mdx-utils.mjs` | 391 | High | Return types prevent frontmatter bugs. `parseFrontmatter`, `extractLinks`, `isInCodeBlock` are used everywhere. |
+| `lib/output.mjs` | 137 | Medium | Quick win. `createLogger`, `getColors`, `formatPath`. |
+| `lib/file-utils.mjs` | 103 | Medium | Quick win. `findMdxFiles`, `walkDirectory`. |
+| `lib/sidebar-utils.mjs` | 57 | Medium | Quick win. Small file, used by sidebar validators. |
+| `lib/search.mjs` | 89 | Medium | Quick win. Small file. |
+| `lib/metrics-extractor.mjs` | 266 | Medium | `extractMetrics` return type is complex but valuable. |
+| `lib/cli.mjs` | 176 | Medium | `createScriptHandler`, `buildCommands` — types help command authors. |
+| `lib/redundancy.mjs` | 216 | Medium | Used by `validate-redundancy.mjs` and referenced in Phase 3. |
+| `lib/insights.mjs` | 587 | Medium | Complex data structures benefit from types. |
+| `lib/anthropic.mjs` | 253 | Medium | API client types, model definitions. |
+| `lib/openrouter.mjs` | 313 | Medium | Alternative AI provider client, same pattern as anthropic. |
+| `lib/page-templates.mjs` | ~200 | Medium | Template definitions used by grading. |
+| `lib/knowledge-db.mjs` | 706 | Low | SQLite wrapper. Needs `@types/better-sqlite3`. Only used by research pipeline. |
+
+### tsconfig.json update
+
+The current `crux/tsconfig.json` only includes `lib/**/*.ts`. This is sufficient for Phases 1–2, but **must be expanded before Phase 3** to cover newly converted directories. See the verification section for details.
 
 ### What this unlocks
 
-After Phase 2, the entire `lib/` directory is TypeScript. Any script importing from `lib/` gets full type checking, autocomplete, and refactoring support. This is the foundation for Phase 3.
+After Phase 2, the entire `lib/` directory is TypeScript (13 non-test files + 34 rules + 2 already-TS files = 49 typed modules). Any script importing from `lib/` gets full type checking, autocomplete, and refactoring support. This is the foundation for Phases 3–5.
 
 ---
 
 ## Phase 3: Eliminate subprocess pattern for validators
 
-**Estimated effort**: 12–16 hours
+**Size**: Large
 **Risk**: Medium — changes execution model, but validators are well-tested
 **Value**: Very high — eliminates the biggest architectural problem
 
-This is the core of the migration. The 23 standalone validators in `validate/` are the biggest source of boilerplate and the clearest case for the subprocess-to-library conversion.
+This is the core of the migration. The 23 standalone scripts in `validate/` are the biggest source of boilerplate and the clearest case for the subprocess-to-library conversion.
 
 ### The problem in detail
 
@@ -540,6 +546,16 @@ Each validator in `validate/` is an independent script (~100–700 lines) that:
 6. Exits with a code
 
 Steps 1–3 and 5–6 are duplicated across all 23 scripts. Only step 4 differs.
+
+### tsconfig.json update
+
+Before starting Phase 3, expand `crux/tsconfig.json` `include` to cover the new directories:
+
+```json
+"include": ["lib/**/*.ts", "validate/**/*.ts", "commands/**/*.ts"]
+```
+
+This ensures `tsc --noEmit` actually checks the converted files. Without this, type errors in `validate/` would be silently ignored.
 
 ### The migration pattern
 
@@ -555,6 +571,8 @@ Some standalone validators do simple pattern matching that's already handled by 
 | `validate-orphaned-files.mjs` | ~120 | Already a `cruft-files` rule — may be redundant |
 | `validate-mdx-syntax.mjs` | ~150 | New `mdx-syntax` rule or extend existing rules |
 | `validate-consistency.mjs` | ~200 | Already a `fact-consistency` rule — may be redundant |
+| `validate-types.mjs` | 122 | New `entity-types` rule or merge into existing type checks |
+| `validate-sidebar.mjs` | 147 | Merge with `sidebar-labels` or new `sidebar-structure` rule |
 
 #### Category B: Extract logic into lib/ functions
 
@@ -567,11 +585,16 @@ Validators with complex logic that doesn't fit the per-file rule model:
 | `validate-internal-links.mjs` | 304 | `lib/link-validation.ts` → `validateInternalLinks(files)` |
 | `validate-cross-links.mjs` | ~200 | `lib/link-validation.ts` → `validateCrossLinks(files)` |
 | `validate-entity-links.mjs` | ~250 | `lib/link-validation.ts` → `validateEntityLinks(files)` |
+| `validate-component-refs.mjs` | 300 | `lib/link-validation.ts` → `validateComponentRefs(files)` |
 | `validate-mermaid.mjs` | 728 | `lib/mermaid-validation.ts` → `validateMermaidDiagrams(files)` |
 | `validate-redundancy.mjs` | 484 | `lib/redundancy.ts` (already exists, extend) |
 | `validate-style-guide.mjs` | 497 | `lib/style-validation.ts` → `validateStyleGuide(files)` |
 | `validate-insights.mjs` | ~150 | Already uses `lib/insights.mjs` — thin wrapper |
-| `validate-financial.mjs` | ~100 | `lib/data-validation.ts` → `validateFinancials()` |
+| `validate-financials.mjs` | ~100 | `lib/data-validation.ts` → `validateFinancials()` |
+| `validate-graph-sync.mjs` | 98 | `lib/data-validation.ts` → `validateGraphSync()` |
+| `validate-yaml-schema.mjs` | 178 | `lib/data-validation.ts` → `validateYamlSchema()` |
+| `check-staleness.mjs` | 310 | `lib/staleness.ts` → `checkStaleness(pages)` |
+| `validate-unified.mjs` | 163 | Becomes the in-process unified runner (core of new `commands/validate.ts`) |
 
 #### Category C: Keep as scripts (subprocess is fine)
 
@@ -657,15 +680,23 @@ The key insight: extracted validators can share the `engine.content` map (alread
 
 ---
 
-## Phase 4: Convert analysis and fix scripts
+## Phase 4: Convert analysis, fix, and generate scripts
 
-**Estimated effort**: 6–10 hours
+**Size**: Medium-Large
 **Risk**: Medium
 **Value**: Medium — completes the pattern for non-content domains
 
-Same pattern as Phase 3 but for `analyze/` and `fix/` scripts.
+Same pattern as Phase 3 but for `analyze/`, `fix/`, and `generate/` scripts, plus root-level scripts.
 
-### Analysis scripts
+### tsconfig.json update
+
+Expand includes for newly converted directories:
+
+```json
+"include": ["lib/**/*.ts", "validate/**/*.ts", "commands/**/*.ts", "analyze/**/*.ts", "fix/**/*.ts", "generate/**/*.ts", "*.ts"]
+```
+
+### Analysis scripts (3 files)
 
 | Script | Lines | Target |
 |--------|-------|--------|
@@ -673,16 +704,44 @@ Same pattern as Phase 3 but for `analyze/` and `fix/` scripts.
 | `analyze-link-coverage.mjs` | ~300 | `lib/analysis.ts` → `analyzeLinkCoverage()` |
 | `analyze-entity-links.mjs` | ~270 | `lib/analysis.ts` → `analyzeEntityLinks(id)` |
 
-### Fix scripts
+### Fix scripts (4 files — 2 in `fix/`, 2 at crux root)
+
+| Script | Location | Lines | Target |
+|--------|----------|-------|--------|
+| `fix/fix-cross-links.mjs` | `fix/` | 610 | `lib/fixes.ts` → `fixCrossLinks(options)` |
+| `fix/fix-component-imports.mjs` | `fix/` | ~270 | `lib/fixes.ts` → `fixComponentImports(options)` |
+| `fix-broken-links.mjs` | crux root | 490 | `lib/fixes.ts` → `fixBrokenLinks(options)` (relocate to `fix/` during migration) |
+| `auto-fix.mjs` | crux root | 98 | Inline into `commands/fix.ts` |
+
+### Generate scripts (6 files — entirely missing from the original plan)
+
+The `generate/` directory contains 6 scripts for producing diagrams, reports, and derived data:
 
 | Script | Lines | Target |
 |--------|-------|--------|
-| `fix-cross-links.mjs` | 610 | `lib/fixes.ts` → `fixCrossLinks(options)` |
-| `fix-broken-links.mjs` | 490 | `lib/fixes.ts` → `fixBrokenLinks(options)` |
-| `fix-component-imports.mjs` | ~270 | `lib/fixes.ts` → `fixComponentImports(options)` |
-| `auto-fix.mjs` | ~50 | Inline into `commands/fix.ts` |
+| `generate-schema-diagrams.mjs` | 437 | `lib/generation.ts` → `generateSchemaDiagrams()` |
+| `generate-summaries.mjs` | 394 | `lib/generation.ts` → `generateSummaries()` |
+| `generate-data-diagrams.mjs` | 282 | `lib/generation.ts` → `generateDataDiagrams()` |
+| `generate-research-reports.mjs` | 281 | `lib/generation.ts` → `generateResearchReports()` |
+| `generate-yaml.mjs` | 273 | `lib/generation.ts` → `generateYaml()` |
+| `generate-schema-docs.mjs` | 231 | `lib/generation.ts` → `generateSchemaDocs()` |
 
-### Command handlers become direct
+### Other root-level scripts
+
+| Script | Lines | Target |
+|--------|-------|--------|
+| `scan-content.mjs` | 336 | `lib/analysis.ts` → `scanContent()` or keep as standalone |
+
+### Command handlers
+
+Convert subprocess-dispatching command handlers to Pattern B (direct):
+
+| Command handler | Lines | Notes |
+|-----------------|-------|-------|
+| `commands/analyze.mjs` | — | Convert to direct calls into `lib/analysis.ts` |
+| `commands/fix.mjs` | — | Convert to direct calls into `lib/fixes.ts` |
+| `commands/generate.mjs` | 82 | Convert to direct calls into `lib/generation.ts` |
+| `commands/updates.mjs` | 428 | Already partially Pattern B (`list`/`stats` are direct); convert `run` subcommand |
 
 ```typescript
 // commands/analyze.ts (target)
@@ -701,18 +760,25 @@ export async function links(args, options) {
 
 ## Phase 5: Refactor authoring scripts
 
-**Estimated effort**: 15–25 hours
+**Size**: Large
 **Risk**: Higher — these are large, AI-heavy scripts
 **Value**: Medium — biggest scripts but complexity is in prompts, not structure
 
-The authoring scripts are the largest files in the codebase:
+The authoring scripts are the largest files in the codebase.
 
-| Script | Lines | Complexity |
-|--------|-------|------------|
-| `resource-manager.mjs` | 1945 | SQLite + 10 subcommands |
-| `grade-content.mjs` | 960 | 3-step AI grading pipeline |
-| `page-improver.mjs` | 935 | Multi-phase AI improvement |
-| `page-creator.mjs` | 534 | Already well-decomposed via `creator/` |
+### tsconfig.json update
+
+Expand includes:
+
+```json
+"include": ["**/*.ts"]
+```
+
+At this point everything is TypeScript, so a broad include is appropriate. Exclude test files if desired:
+
+```json
+"exclude": ["**/*.test.ts"]
+```
 
 ### Strategy: Extract, don't rewrite
 
@@ -722,11 +788,34 @@ These scripts are working, tested, and their complexity is primarily in prompt e
 2. **Keep the orchestration** in the scripts (they're complex pipelines)
 3. **Type the interfaces** between orchestration and library
 
-### page-creator.mjs (already good)
+### Core authoring scripts
+
+| Script | Lines | Complexity |
+|--------|-------|------------|
+| `resource-manager.mjs` | 1945 | SQLite + 10 subcommands |
+| `grade-content.mjs` | 960 | 3-step AI grading pipeline |
+| `page-improver.mjs` | 935 | Multi-phase AI improvement |
+| `page-creator.mjs` | 534 | Already well-decomposed via `creator/` |
+
+### Additional authoring scripts
+
+These were missing from the original plan and need migration too:
+
+| Script | Lines | Strategy |
+|--------|-------|----------|
+| `reassign-update-frequency.mjs` | 499 | Extract frequency logic → `lib/update-frequency.ts` |
+| `grade-by-template.mjs` | 302 | Thin wrapper around grading pipeline — convert to `.ts` |
+| `bootstrap-update-frequency.mjs` | 221 | Extract frequency logic → `lib/update-frequency.ts` |
+| `regrade.mjs` | 139 | Thin wrapper — convert to `.ts`, uses `loadPages()` |
+| `post-improve.mjs` | 133 | Post-processing pipeline — convert to `.ts` |
+
+### Creator sub-modules (10 files)
 
 The `creator/` sub-modules are already well-decomposed. The migration is:
 1. Convert `creator/*.mjs` → `creator/*.ts` (add types to function signatures)
 2. Convert `page-creator.mjs` → `page-creator.ts` (orchestration stays)
+
+### page-creator.mjs (already good)
 
 ### grade-content.mjs (960 lines)
 
@@ -765,7 +854,7 @@ This one can wait until later — it works fine and isn't blocking other work.
 
 ## Phase 6: Package structure and exports
 
-**Estimated effort**: 4–6 hours
+**Size**: Small
 **Risk**: Low
 **Value**: Medium — enables external consumption, cleaner imports
 
@@ -802,6 +891,8 @@ If Crux should be independently installable or used as a workspace package:
 }
 ```
 
+**Note**: If adding `crux/package.json`, also add `"crux"` to `pnpm-workspace.yaml` (which currently only lists `"app"`). Otherwise pnpm won't recognize it as a workspace package.
+
 This is optional — the main value is having clean barrel exports for internal use.
 
 ---
@@ -810,51 +901,52 @@ This is optional — the main value is having clean barrel exports for internal 
 
 ```
 Phase 0: Foundation
-  ├─ 0a: Fix rules/index.mjs double-import
+  ├─ 0a: Fix rules/index.mjs triple-listing
   ├─ 0b: Standardize data loading
-  └─ 0c: Extract shared arg parsing
+  └─ 0c: Convert test files to TypeScript
          │
 Phase 1: Rules → TypeScript (depends on 0a)
          │
-Phase 2: lib/ → TypeScript (independent of Phase 1)
+Phase 2: lib/ → TypeScript (can run in parallel with Phase 1)
          │
-Phase 3: Validators → library functions (depends on 1 + 2)
-         │
-Phase 4: Analysis + Fix → library functions (depends on 2)
-         │
-Phase 5: Authoring scripts refactor (depends on 2)
-         │
-Phase 6: Package structure (depends on 3 + 4)
+         ├─ Phase 3: Validators → library functions (depends on 1 + 2)
+         ├─ Phase 4: Analysis + Fix + Generate → library functions (depends on 2)
+         └─ Phase 5: Authoring scripts refactor (depends on 2)
+                │
+Phase 6: Package structure (depends on 3 + 4 + 5)
 ```
 
-Phases 1 and 2 can run in parallel. Phases 3, 4, and 5 can run in parallel after their dependencies are met.
+Phases 1 and 2 can run in parallel. Phases 3, 4, and 5 can run in parallel after Phase 2 completes (Phase 3 also needs Phase 1). Phase 4 has no dependency on Phase 1 or 3, so it can start as soon as Phase 2 is done.
+
+### Each phase = one PR
+
+Keep each phase (or sub-phase for large ones) as a single PR. This gives a clean revert path if something goes wrong mid-migration, and makes review manageable. For large phases (3, 4, 5), consider splitting into sub-PRs by category (e.g., Phase 3A for Category A rules, 3B for Category B extractions).
 
 ---
 
 ## Effort summary
 
-| Phase | Effort | Risk | Value |
-|-------|--------|------|-------|
-| 0: Foundation | 2–4h | Very low | Enables everything |
-| 1: Rules → TS | 6–8h | Low | 34 typed rules |
-| 2: lib/ → TS | 8–12h | Low | Typed backbone |
-| 3: Validators → lib | 12–16h | Medium | Eliminates subprocess pattern |
-| 4: Analysis + Fix → lib | 6–10h | Medium | Completes pattern |
-| 5: Authoring refactor | 15–25h | Higher | Typed AI pipelines |
-| 6: Package structure | 4–6h | Low | Clean exports |
-| **Total** | **53–81h** | | |
+| Phase | Size | Risk | Value |
+|-------|------|------|-------|
+| 0: Foundation | S-M | Very low | Enables everything, establishes test safety net |
+| 1: Rules → TS | M | Low | 34 typed rules |
+| 2: lib/ → TS | M-L | Low | Typed backbone (13 files) |
+| 3: Validators → lib | L | Medium | Eliminates subprocess pattern (23 scripts) |
+| 4: Analysis + Fix + Generate | L | Medium | Completes pattern (14 scripts + 4 command handlers) |
+| 5: Authoring refactor | L | Higher | Typed AI pipelines (9 scripts + 10 creator modules) |
+| 6: Package structure | S | Low | Clean exports |
 
 ### Recommended stopping points
 
 If you want to do only part of this:
 
-**Minimal (Phases 0–1)**: ~10 hours. Gets 34 typed rules, clean data loading. The rules are the most-touched files and benefit most from types. Good ROI.
+**Minimal (Phases 0–1)**: Gets 34 typed rules, clean data loading. The rules are the most-touched files and benefit most from types. Good ROI.
 
-**Solid (Phases 0–2)**: ~20 hours. Entire `lib/` is TypeScript. Every script that imports from lib gets type safety. Major quality improvement.
+**Solid (Phases 0–2)**: Entire `lib/` is TypeScript. Every script that imports from lib gets type safety. Major quality improvement.
 
-**Full library (Phases 0–4)**: ~40 hours. Subprocess pattern eliminated for validators, analysis, and fixes. Only authoring scripts still run as subprocesses (which is acceptable — they're long-running AI pipelines).
+**Full library (Phases 0–4)**: Subprocess pattern eliminated for validators, analysis, fixes, and generation. Only authoring scripts still run as subprocesses (which is acceptable — they're long-running AI pipelines).
 
-**Complete (all phases)**: ~60 hours. Everything typed and composable. This is the "proper package" endgame.
+**Complete (all phases)**: Everything typed and composable. This is the "proper package" endgame.
 
 ---
 
@@ -863,7 +955,7 @@ If you want to do only part of this:
 Each phase should pass these checks before moving to the next:
 
 ```bash
-# Type checking
+# Type checking (IMPORTANT: only meaningful if tsconfig.json includes the right dirs)
 tsc --noEmit -p crux/tsconfig.json
 
 # Functional verification
@@ -880,16 +972,59 @@ pnpm crux validate 2>&1 | tee /tmp/after.txt
 diff /tmp/before.txt /tmp/after.txt
 ```
 
+### tsconfig.json include progression
+
+The `include` field in `crux/tsconfig.json` must be expanded as new directories gain `.ts` files. If it isn't, `tsc --noEmit` will silently pass even with type errors in unconverted directories — giving false confidence.
+
+| After Phase | `include` should be |
+|-------------|---------------------|
+| 0–2 | `["lib/**/*.ts"]` (current, sufficient) |
+| 3 | `["lib/**/*.ts", "validate/**/*.ts", "commands/**/*.ts"]` |
+| 4 | Add `"analyze/**/*.ts"`, `"fix/**/*.ts"`, `"generate/**/*.ts"`, `"*.ts"` |
+| 5 | `["**/*.ts"]` (everything is now TypeScript) |
+
+---
+
+## File coverage verification
+
+Rather than maintaining a static inventory that goes stale whenever scripts are added or removed, use this check to find any `.mjs` files not yet covered by the migration:
+
+```bash
+# List all .mjs files not yet converted to .ts
+find crux/ -name '*.mjs' -not -name '*.test.mjs' -not -name 'crux.mjs' | sort
+```
+
+At the start of migration this returns 113 files (120 total minus 6 test files minus `crux.mjs`). After each phase, this count should drop. When it reaches 0, the migration is complete.
+
+### Phase-to-directory mapping
+
+| Phase | Directories / files covered |
+|-------|---------------------------|
+| 0 | `**/*.test.mjs` (6 test files) |
+| 1 | `lib/rules/*.mjs` (34 rules + `index.mjs`) |
+| 2 | `lib/*.mjs` (13 non-test, non-rules files) |
+| 3 | `validate/*.mjs` (23 scripts) + `commands/validate.mjs` |
+| 4 | `analyze/*.mjs` (3), `fix/*.mjs` (2), `generate/*.mjs` (6), root scripts (`fix-broken-links.mjs`, `auto-fix.mjs`, `scan-content.mjs`), `commands/{analyze,fix,generate,updates,insights,gaps}.mjs` |
+| 5 | `authoring/*.mjs` (9), `authoring/creator/*.mjs` (10), `commands/{content,resources}.mjs` |
+
+`crux.mjs` stays as-is (see "What NOT to change").
+
+**Total: 120 `.mjs` files accounted for** (113 migrated + 6 tests converted + 1 kept).
+
 ---
 
 ## What NOT to change
 
-1. **`crux.mjs` filename** — Already discussed. `crux/crux.mjs` is slightly redundant but changing to `cli.mjs` or `index.mjs` is unnecessary churn.
+1. **`crux.mjs` filename and extension** — Entry point, shebang-based. Changing to `.ts` or renaming to `cli.mjs`/`index.mjs` is unnecessary churn.
 
 2. **CLI domain names** — `validate`, `content`, `analyze`, etc. are user-facing API. Don't rename.
 
 3. **MDX compilation isolation** — `validate-mdx-compile.mjs` should stay as a subprocess. MDX compilation is memory-intensive and can crash; process isolation is correct here.
 
-4. **Authoring script entry points** — `page-creator.mjs`, `page-improver.mjs`, `grade-content.mjs` are invoked directly by Claude Code via `.claude/settings.local.json` permissions. The filenames are part of the external interface. Keep them as CLI entry points that call into library functions.
+4. **Authoring script entry points** — `page-creator.mjs`, `page-improver.mjs`, `grade-content.mjs` are invoked directly by Claude Code via `.claude/settings.local.json` permissions. The filenames are part of the external interface. Keep them as CLI entry points that call into library functions. When renaming to `.ts`, update `.claude/settings.local.json` paths in the same commit.
 
 5. **Resource manager** — At 1945 lines, this is effectively its own mini-app. It works. Refactoring it has low ROI relative to effort. Leave it for last or skip it.
+
+6. **Test framework** — vitest works. Don't change it.
+
+7. **Runtime mechanism** — `tsx` handles TypeScript execution. Don't introduce a build step (tsc compilation, bundling). The value of this migration is types and structure, not a different runtime.

@@ -19,7 +19,7 @@ import { join, relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.mjs';
 import { getColors } from '../lib/output.mjs';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from '../lib/content-types.js';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPathRegistry, loadDatabase } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);
 const CI_MODE = args.includes('--ci');
@@ -61,16 +61,13 @@ ${colors.bold}Fixing issues:${colors.reset}
  * Load path registry and database
  */
 function loadData() {
-  const registryPath = join(DATA_DIR, 'pathRegistry.json');
-  const dbPath = join(DATA_DIR, 'database.json');
+  const pathRegistry = loadPathRegistry();
+  const database = loadDatabase();
 
-  const pathRegistry = existsSync(registryPath)
-    ? JSON.parse(readFileSync(registryPath, 'utf-8'))
-    : {};
-
-  const database = existsSync(dbPath)
-    ? JSON.parse(readFileSync(dbPath, 'utf-8'))
-    : { entities: [], experts: [], organizations: [] };
+  // Ensure expected shape for downstream consumers
+  if (!database.entities) database.entities = [];
+  if (!database.experts) database.experts = [];
+  if (!database.organizations) database.organizations = [];
 
   return { pathRegistry, database };
 }

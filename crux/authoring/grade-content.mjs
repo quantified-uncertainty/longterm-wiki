@@ -40,7 +40,7 @@ import {
   prescriptiveLanguageRule,
   toneMarkersRule,
   structuralQualityRule,
-} from '../lib/rules/index.mjs';
+} from '../lib/rules/index.js';
 
 const OUTPUT_FILE = '.claude/temp/grades-output.json';
 

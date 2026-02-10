@@ -22,7 +22,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { getColors } from '../lib/output.mjs';
-import { CONTENT_DIR } from '../lib/content-types.js';
+import { CONTENT_DIR, loadPathRegistry } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);
 const CI_MODE = args.includes('--ci');
@@ -32,20 +32,16 @@ const STRICT_MODE = args.includes('--strict');
 const colors = getColors(CI_MODE);
 
 // Load path registry (entity ID -> path mapping)
-const PATH_REGISTRY_FILE = join(process.cwd(), 'data/pathRegistry.json');
-let pathRegistry = {};
+let pathRegistry = loadPathRegistry();
 let reverseRegistry = {}; // path -> entity ID
 
-if (existsSync(PATH_REGISTRY_FILE)) {
-  pathRegistry = JSON.parse(readFileSync(PATH_REGISTRY_FILE, 'utf-8'));
-  // Build reverse mapping (path -> entity ID)
-  for (const [id, path] of Object.entries(pathRegistry)) {
-    // Normalize path (ensure trailing slash)
-    const normalizedPath = path.endsWith('/') ? path : path + '/';
-    reverseRegistry[normalizedPath] = id;
-    // Also store without trailing slash
-    reverseRegistry[path.replace(/\/$/, '')] = id;
-  }
+// Build reverse mapping (path -> entity ID)
+for (const [id, path] of Object.entries(pathRegistry)) {
+  // Normalize path (ensure trailing slash)
+  const normalizedPath = path.endsWith('/') ? path : path + '/';
+  reverseRegistry[normalizedPath] = id;
+  // Also store without trailing slash
+  reverseRegistry[path.replace(/\/$/, '')] = id;
 }
 
 // Next.js app directory for standalone pages
