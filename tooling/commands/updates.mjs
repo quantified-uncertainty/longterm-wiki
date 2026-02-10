@@ -11,7 +11,7 @@
 
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, relative } from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { createLogger } from '../lib/output.mjs';
 import { parseFrontmatter } from '../lib/mdx-utils.mjs';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.js';
@@ -220,14 +220,19 @@ export async function run(args, options) {
     }
 
     try {
-      const cmd = `node tooling/content/page-improver.mjs -- ${page.id} --tier ${tier} --apply --grade`;
-      output += `  ${c.dim}Running: ${cmd}${c.reset}\n`;
+      const cmdArgs = ['tooling/content/page-improver.mjs', '--', page.id, '--tier', tier, '--apply', '--grade'];
+      output += `  ${c.dim}Running: node ${cmdArgs.join(' ')}${c.reset}\n`;
 
-      const result = execSync(cmd, {
+      // Print accumulated output before starting long-running process
+      if (output) {
+        console.log(output);
+        output = '';
+      }
+
+      execFileSync('node', cmdArgs, {
         cwd: PROJECT_ROOT,
         timeout: 30 * 60 * 1000, // 30 minute timeout per page
-        encoding: 'utf-8',
-        stdio: ['pipe', 'pipe', 'pipe'],
+        stdio: 'inherit', // Stream output live to terminal
       });
 
       output += `  ${c.green}Done${c.reset}\n\n`;
@@ -251,31 +256,50 @@ export async function run(args, options) {
 export async function stats(args, options) {
   const log = createLogger(options.ci);
 
-  // Count all MDX files and those with update_frequency
+  // Single pass: read all files once, computing both total-page stats and candidate stats
   const allFiles = findMdxFiles(CONTENT_DIR_ABS);
-  const candidates = loadUpdateCandidates();
   const now = new Date();
 
-  // Count all pages (including those without update_frequency)
   let totalPages = 0;
   let pagesWithFrequency = 0;
   let pagesWithImportance = 0;
   const frequencyDistribution = {};
+  const candidates = []; // Build candidates inline to avoid double-read
 
   for (const filePath of allFiles) {
     const content = readFileSync(filePath, 'utf-8');
     const fm = parseFrontmatter(content);
     if (fm.pageType === 'stub' || fm.pageType === 'documentation') continue;
-    // Skip index pages
     if (filePath.endsWith('index.mdx') || filePath.endsWith('index.md')) continue;
 
     totalPages++;
     if (fm.importance != null) pagesWithImportance++;
+
     if (fm.update_frequency != null) {
-      pagesWithFrequency++;
-      const freq = Number(fm.update_frequency);
-      const bucket = freq <= 3 ? '1-3d' : freq <= 7 ? '4-7d' : freq <= 14 ? '8-14d' : freq <= 30 ? '15-30d' : freq <= 60 ? '31-60d' : '60d+';
-      frequencyDistribution[bucket] = (frequencyDistribution[bucket] || 0) + 1;
+      const updateFrequency = Number(fm.update_frequency);
+      if (updateFrequency > 0 && !isNaN(updateFrequency)) {
+        pagesWithFrequency++;
+        const bucket = updateFrequency <= 3 ? '1-3d' : updateFrequency <= 7 ? '4-7d' : updateFrequency <= 14 ? '8-14d' : updateFrequency <= 30 ? '15-30d' : updateFrequency <= 60 ? '31-60d' : '60d+';
+        frequencyDistribution[bucket] = (frequencyDistribution[bucket] || 0) + 1;
+
+        // Build candidate entry for priority stats
+        const lastEditedStr = fm.lastEdited || fm.lastUpdated;
+        let daysSinceEdit = 0;
+        if (lastEditedStr) {
+          daysSinceEdit = Math.floor((now - new Date(lastEditedStr)) / (1000 * 60 * 60 * 24));
+        }
+        const staleness = daysSinceEdit / updateFrequency;
+        const importance = Number(fm.importance) || 50;
+        const priority = staleness * (importance / 100);
+        const relPath = relative(CONTENT_DIR_ABS, filePath);
+
+        candidates.push({
+          staleness: Math.round(staleness * 100) / 100,
+          priority: Math.round(priority * 100) / 100,
+          overdue: staleness >= 1.0,
+          category: fm.subcategory || relPath.split('/')[0] || 'unknown',
+        });
+      }
     }
   }
 
@@ -332,10 +356,12 @@ export async function stats(args, options) {
 
   output += `${c.bold}Frequency Distribution:${c.reset}\n`;
   const bucketOrder = ['1-3d', '4-7d', '8-14d', '15-30d', '31-60d', '60d+'];
+  const maxCount = Math.max(...bucketOrder.map(b => frequencyDistribution[b] || 0), 1);
   for (const bucket of bucketOrder) {
     const count = frequencyDistribution[bucket] || 0;
     if (count > 0) {
-      const bar = '█'.repeat(Math.min(count, 40));
+      const barLen = Math.max(1, Math.round((count / maxCount) * 30));
+      const bar = '█'.repeat(barLen);
       output += `  ${bucket.padEnd(8)} ${bar} ${count}\n`;
     }
   }
@@ -354,6 +380,7 @@ export async function stats(args, options) {
 // ---------------------------------------------------------------------------
 
 export const commands = {
+  default: list,
   list,
   run,
   stats,
