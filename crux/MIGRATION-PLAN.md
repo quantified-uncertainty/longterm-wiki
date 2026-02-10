@@ -95,10 +95,10 @@ When renaming a file from `.mjs` to `.ts`, **every file that imports it must upd
 
 ## Phase 0: Foundation (Prerequisites)
 
-**Size**: Small
+**Size**: Small-Medium
 **Risk**: Very low — no behavior changes
 
-These are mechanical cleanups that reduce noise before the real migration.
+These are mechanical cleanups that reduce noise and establish the test safety net before the real migration.
 
 ### 0a. Fix rules/index.mjs triple-listing
 
@@ -139,6 +139,21 @@ Known scripts to update (reading `pages.json`, `database.json`, `pathRegistry.js
 - `lib/rules/`: `component-refs.mjs`, `entity-mentions.mjs`, `fact-consistency.mjs`
 - `lib/`: `search.mjs`
 - `authoring/`: `regrade.mjs`, `page-improver.mjs`, `creator/duplicate-detection.mjs`
+
+### 0c. Convert test files to TypeScript
+
+The 6 test files should be converted **before** the main migration begins, not after. Tests are the safety net for every subsequent phase — if a `.mjs` → `.ts` rename breaks an import path, the tests should catch it. Converting tests first ensures the safety net itself is solid before relying on it.
+
+| File | Lines |
+|------|-------|
+| `lib/cli.test.mjs` | 767 |
+| `lib/validators.test.mjs` | 499 |
+| `lib/rules/rules.test.mjs` | 415 |
+| `lib/metrics-extractor.test.mjs` | — |
+| `lib/lib.test.mjs` | — |
+| `authoring/creator/creator.test.mjs` | — |
+
+These use a custom TAP-like test runner (hand-rolled `test(name, fn)` with try/catch), not vitest. Converting to `.ts` is still low-risk since `tsx` handles the execution. The conversion is mechanical: rename, add type annotations to test data and assertions.
 
 ---
 
@@ -531,7 +546,7 @@ These were missing from the original plan and need migration too:
 | `regrade.mjs` | 139 | Thin wrapper — convert to `.ts`, uses `loadPages()` |
 | `post-improve.mjs` | 133 | Post-processing pipeline — convert to `.ts` |
 
-### Creator sub-modules (11 files)
+### Creator sub-modules (10 files)
 
 The `creator/` sub-modules are already well-decomposed. The migration is:
 1. Convert `creator/*.mjs` → `creator/*.ts` (add types to function signatures)
@@ -574,13 +589,13 @@ This one can wait until later — it works fine and isn't blocking other work.
 
 ---
 
-## Phase 6: Package structure, exports, and test migration
+## Phase 6: Package structure and exports
 
-**Size**: Small-Medium
+**Size**: Small
 **Risk**: Low
 **Value**: Medium — enables external consumption, cleaner imports
 
-After Phases 1–5, the `crux/` directory has a clean library layer. This phase adds the package interface and converts tests.
+After Phases 1–5, the `crux/` directory has a clean library layer. This phase adds the package interface.
 
 ### Add crux/index.ts
 
@@ -617,21 +632,6 @@ If Crux should be independently installable or used as a workspace package:
 
 This is optional — the main value is having clean barrel exports for internal use.
 
-### Convert test files to TypeScript
-
-6 test files should be converted as a final cleanup:
-
-| File | Lines |
-|------|-------|
-| `lib/cli.test.mjs` | 767 |
-| `lib/validators.test.mjs` | 499 |
-| `lib/rules/rules.test.mjs` | 415 |
-| `lib/metrics-extractor.test.mjs` | — |
-| `lib/lib.test.mjs` | — |
-| `authoring/creator/creator.test.mjs` | — |
-
-These are low-risk (vitest supports `.ts` natively) and benefit from typed assertions and test data.
-
 ---
 
 ## Migration order and dependencies
@@ -639,7 +639,8 @@ These are low-risk (vitest supports `.ts` natively) and benefit from typed asser
 ```
 Phase 0: Foundation
   ├─ 0a: Fix rules/index.mjs triple-listing
-  └─ 0b: Standardize data loading
+  ├─ 0b: Standardize data loading
+  └─ 0c: Convert test files to TypeScript
          │
 Phase 1: Rules → TypeScript (depends on 0a)
          │
@@ -649,7 +650,7 @@ Phase 2: lib/ → TypeScript (can run in parallel with Phase 1)
          ├─ Phase 4: Analysis + Fix + Generate → library functions (depends on 2)
          └─ Phase 5: Authoring scripts refactor (depends on 2)
                 │
-Phase 6: Package structure + tests (depends on 3 + 4 + 5)
+Phase 6: Package structure (depends on 3 + 4 + 5)
 ```
 
 Phases 1 and 2 can run in parallel. Phases 3, 4, and 5 can run in parallel after Phase 2 completes (Phase 3 also needs Phase 1). Phase 4 has no dependency on Phase 1 or 3, so it can start as soon as Phase 2 is done.
@@ -664,13 +665,13 @@ Keep each phase (or sub-phase for large ones) as a single PR. This gives a clean
 
 | Phase | Size | Risk | Value |
 |-------|------|------|-------|
-| 0: Foundation | S | Very low | Enables everything |
+| 0: Foundation | S-M | Very low | Enables everything, establishes test safety net |
 | 1: Rules → TS | M | Low | 34 typed rules |
 | 2: lib/ → TS | M-L | Low | Typed backbone (13 files) |
 | 3: Validators → lib | L | Medium | Eliminates subprocess pattern (23 scripts) |
-| 4: Analysis + Fix + Generate | M-L | Medium | Completes pattern (14 scripts) |
-| 5: Authoring refactor | L | Higher | Typed AI pipelines (16 scripts + 11 creator modules) |
-| 6: Package + tests | S-M | Low | Clean exports, typed tests |
+| 4: Analysis + Fix + Generate | L | Medium | Completes pattern (14 scripts + 4 command handlers) |
+| 5: Authoring refactor | L | Higher | Typed AI pipelines (9 scripts + 10 creator modules) |
+| 6: Package structure | S | Low | Clean exports |
 
 ### Recommended stopping points
 
@@ -721,53 +722,31 @@ The `include` field in `crux/tsconfig.json` must be expanded as new directories 
 
 ---
 
-## Complete file inventory
+## File coverage verification
 
-For accountability, here is every `.mjs` file in the codebase mapped to its migration phase. Nothing should be unaccounted for.
+Rather than maintaining a static inventory that goes stale whenever scripts are added or removed, use this check to find any `.mjs` files not yet covered by the migration:
 
-### lib/rules/ (34 files → Phase 1)
+```bash
+# List all .mjs files not yet converted to .ts
+find crux/ -name '*.mjs' -not -name '*.test.mjs' -not -name 'crux.mjs' | sort
+```
 
-`dollar-signs`, `comparison-operators`, `tilde-dollar`, `placeholders`, `fake-urls`, `jsx-in-md`, `markdown-lists`, `consecutive-bold-labels`, `editorial-artifacts`, `tone-markers`, `prescriptive-language`, `false-certainty`, `vague-citations`, `frontmatter-schema`, `estimate-boxes`, `structural-quality`, `quality-source`, `cruft-files`, `sidebar-index`, `sidebar-coverage`, `entitylink-ids`, `internal-links`, `external-links`, `citation-urls`, `component-refs`, `component-props`, `component-imports`, `prefer-entitylink`, `entity-mentions`, `fact-consistency`, `squiggle-quality`, `temporal-artifacts`, `insider-jargon`, `outdated-names`
+At the start of migration this returns 113 files (120 total minus 6 test files minus `crux.mjs`). After each phase, this count should drop. When it reaches 0, the migration is complete.
 
-Plus: `rules/index.mjs` (Phase 1, final batch)
+### Phase-to-directory mapping
 
-### lib/ non-rules (13 files → Phase 2)
+| Phase | Directories / files covered |
+|-------|---------------------------|
+| 0 | `**/*.test.mjs` (6 test files) |
+| 1 | `lib/rules/*.mjs` (34 rules + `index.mjs`) |
+| 2 | `lib/*.mjs` (13 non-test, non-rules files) |
+| 3 | `validate/*.mjs` (23 scripts) + `commands/validate.mjs` |
+| 4 | `analyze/*.mjs` (3), `fix/*.mjs` (2), `generate/*.mjs` (6), root scripts (`fix-broken-links.mjs`, `auto-fix.mjs`, `scan-content.mjs`), `commands/{analyze,fix,generate,updates,insights,gaps}.mjs` |
+| 5 | `authoring/*.mjs` (9), `authoring/creator/*.mjs` (10), `commands/{content,resources}.mjs` |
 
-`mdx-utils`, `output`, `file-utils`, `sidebar-utils`, `search`, `metrics-extractor`, `cli`, `redundancy`, `insights`, `anthropic`, `openrouter`, `page-templates`, `knowledge-db`
+`crux.mjs` stays as-is (see "What NOT to change").
 
-### validate/ (23 files → Phase 3)
-
-**Category A** (6): `validate-sidebar-labels`, `validate-orphaned-files`, `validate-mdx-syntax`, `validate-consistency`, `validate-types`, `validate-sidebar`
-
-**Category B** (15): `validate-quality`, `validate-data`, `validate-internal-links`, `validate-cross-links`, `validate-entity-links`, `validate-component-refs`, `validate-mermaid`, `validate-redundancy`, `validate-style-guide`, `validate-insights`, `validate-financials`, `validate-graph-sync`, `validate-yaml-schema`, `check-staleness`, `validate-unified`
-
-**Category C** (2): `validate-mdx-compile`, `validate-all`
-
-### analyze/ + fix/ + generate/ + root scripts (14 files → Phase 4)
-
-`analyze-all`, `analyze-link-coverage`, `analyze-entity-links`, `fix-cross-links`, `fix-component-imports`, `fix-broken-links`, `auto-fix`, `generate-data-diagrams`, `generate-research-reports`, `generate-schema-diagrams`, `generate-schema-docs`, `generate-summaries`, `generate-yaml`, `scan-content`
-
-### authoring/ (19 files → Phase 5)
-
-**Core**: `page-creator`, `page-improver`, `grade-content`, `resource-manager`
-
-**Additional**: `reassign-update-frequency`, `grade-by-template`, `bootstrap-update-frequency`, `regrade`, `post-improve`
-
-**Creator sub-modules** (10): `index`, `canonical-links`, `deployment`, `duplicate-detection`, `grading`, `research`, `source-fetching`, `synthesis`, `validation`, `verification`
-
-### commands/ (9 files → Phases 3–5)
-
-`validate` (Phase 3), `analyze` (Phase 4), `fix` (Phase 4), `generate` (Phase 4), `updates` (Phase 4), `content` (Phase 5), `resources` (Phase 5), `insights` (already Pattern B — convert to `.ts` in Phase 4), `gaps` (already Pattern B — convert to `.ts` in Phase 4)
-
-### Test files (6 files → Phase 6)
-
-`cli.test`, `validators.test`, `rules.test`, `metrics-extractor.test`, `lib.test`, `creator.test`
-
-### crux.mjs (1 file → do not change)
-
-Entry point. Stays as `.mjs`. See "What NOT to change" below.
-
-**Total: 120 `.mjs` files accounted for.**
+**Total: 120 `.mjs` files accounted for** (113 migrated + 6 tests converted + 1 kept).
 
 ---
 
