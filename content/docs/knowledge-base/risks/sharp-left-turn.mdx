@@ -26,7 +26,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="sharp-left-turn" client:load />
+<DataExternalLinks pageId="sharp-left-turn" />
 
 <DataInfoBox entityId="sharp-left-turn" />
 
@@ -119,7 +119,7 @@ Evidence for this asymmetry can be seen in current AI systems, where capabilitie
 
 ### Generalization Dynamics
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Environment"]
         TC[Task Capabilities]
@@ -161,7 +161,7 @@ flowchart TD
 
 ### Sharp Left Turn Scenario Pathways
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     START[AI Training Continues] --> Q1{Capabilities<br/>generalize far?}
     Q1 -->|No| SAFE1[Gradual scaling<br/>allows iterative safety]
@@ -384,4 +384,4 @@ Even if a Sharp Left Turn occurs, humans may retain sufficient control to detect
 
 ## Related Pages
 
-<Backlinks client:load entityId="sharp-left-turn" />
+<Backlinks entityId="sharp-left-turn" />

@@ -25,7 +25,7 @@ subcategory: alignment-deployment
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="tool-restrictions" client:load />
+<DataExternalLinks pageId="tool-restrictions" />
 
 ## Quick Assessment
 
@@ -97,7 +97,7 @@ The [AWS Well-Architected Framework for Generative AI](https://docs.aws.amazon.c
 
 The following diagram illustrates a defense-in-depth architecture for AI agent tool access, incorporating multiple security layers as recommended by the [UK AI Safety Institute sandboxing toolkit](https://github.com/UKGovernmentBEIS/aisi-sandboxing):
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[User Request] --> B[Input Guardrails]
     B --> C{Jailbreak Check}
@@ -252,7 +252,7 @@ The [AWS Well-Architected Generative AI Lens](https://docs.aws.amazon.com/wellar
 
 Key implementation requirements:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Task Definition] --> B[Identify Required Tools]
     B --> C[Minimal Permission Set]

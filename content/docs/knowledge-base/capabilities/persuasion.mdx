@@ -21,7 +21,7 @@ clusters: ["ai-safety"]
 ---
 import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="persuasion" client:load />
+<DataExternalLinks pageId="persuasion" />
 
 <DataInfoBox entityId="persuasion" />
 
@@ -99,7 +99,7 @@ Current AI persuasion systems operate across multiple domains:
 
 ## How AI Persuasion Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph INPUT["AI Persuasion Inputs"]
         DATA[User Data & History]

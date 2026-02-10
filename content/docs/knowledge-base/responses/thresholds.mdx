@@ -21,7 +21,7 @@ subcategory: governance-compute-governance
 ---
 import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="thresholds" client:load />
+<DataExternalLinks pageId="thresholds" />
 
 <DataInfoBox entityId="compute-thresholds" />
 
@@ -128,7 +128,7 @@ The UK has taken a more cautious approach, with the Frontier AI Taskforce (now A
 
 Compute thresholds operate through a multi-stage regulatory pipeline that begins before training commences. The typical sequence involves threshold definition by regulators, pre-training notification by AI developers, threshold crossing triggering specific requirements, mandatory evaluation and testing phases, implementation of required safeguards, and finally authorized deployment under ongoing monitoring.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Planning["Planning Phase"]
         A[Training Run Planned] --> B{Compute > Threshold?}
@@ -203,7 +203,7 @@ International arbitrage allows organizations to conduct high-compute training in
 
 ### Evasion Pathways and Countermeasures
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Evasion["Evasion Strategies"]
         E1[Model Distillation]

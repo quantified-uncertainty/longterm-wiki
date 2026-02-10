@@ -390,6 +390,10 @@ function main() {
     console.log(`  idRegistry: all ${Object.keys(idRegistry.entities).length} entities have IDs`);
   }
 
+  // Copy id-registry.json to app output directory for consistency
+  copyFileSync(ID_REGISTRY_FILE, join(OUTPUT_DIR, 'id-registry.json'));
+  console.log(`  idRegistry: copied to ${join(OUTPUT_DIR, 'id-registry.json')}`);
+
   // Build lookup maps for database output
   const idRegistryOutput = {
     byNumericId: { ...idRegistry.entities },
@@ -620,6 +624,13 @@ function main() {
   console.log(`With descriptions: ${stats.withDescription}`);
   console.log(`Unique tags: ${stats.totalTags}`);
   console.log(`Top types: ${Object.entries(stats.byType).slice(0, 5).map(([t, c]) => `${t}(${c})`).join(', ')}`);
+
+  // ==========================================================================
+  // Copy canonical schema.ts to app output directory
+  // ==========================================================================
+  const SCHEMA_SRC = join(DATA_DIR, 'schema.ts');
+  copyFileSync(SCHEMA_SRC, join(OUTPUT_DIR, 'schema.ts'));
+  console.log('✓ Copied data/schema.ts → app/src/data/schema.ts');
 
   // ==========================================================================
   // LLM Accessibility Files

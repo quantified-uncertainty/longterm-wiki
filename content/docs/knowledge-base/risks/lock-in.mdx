@@ -28,7 +28,7 @@ subcategory: structural
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="lock-in" client:load />
+<DataExternalLinks pageId="lock-in" />
 
 <DataInfoBox entityId="lock-in" />
 
@@ -64,7 +64,7 @@ The stakes are unprecedented. Unlike historical empires or ideologies that event
 
 ## Mechanisms of AI-Enabled Lock-in
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph DRIVERS[Lock-in Drivers]
         ENFORCE[Enforcement Capabilities]
@@ -409,4 +409,4 @@ Lock-in is the defining feature of the <EntityLink id="long-term-lockin" /> scen
 
 ## Related Pages
 
-<Backlinks client:load entityId="lock-in" />
+<Backlinks entityId="lock-in" />

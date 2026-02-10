@@ -19,7 +19,7 @@ clusters: ["epistemics", "governance", "ai-safety"]
 ---
 import {Tags, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="governance-focused" client:load />
+<DataExternalLinks pageId="governance-focused" />
 
 ## Quick Assessment
 
@@ -62,7 +62,7 @@ Unlike pure technical optimism, governance-focused thinkers recognize that labs 
 
 ### The Governance Gap
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     TECH[Technical Safety Research] --> GAP{Adoption Gap}
     GAP --> DEPLOY[Deployed Systems]

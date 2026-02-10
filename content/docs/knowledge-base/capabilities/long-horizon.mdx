@@ -21,7 +21,7 @@ clusters: ["ai-safety"]
 ---
 import {DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="long-horizon" client:load />
+<DataExternalLinks pageId="long-horizon" />
 
 <DataInfoBox entityId="long-horizon" />
 
@@ -115,7 +115,7 @@ This represents one of the most safety-critical capability thresholds because it
 
 ## Safety Implications Analysis
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph CAPABILITY["Capability Development"]
         MEMORY[Extended Memory<br/>1-2M token contexts]

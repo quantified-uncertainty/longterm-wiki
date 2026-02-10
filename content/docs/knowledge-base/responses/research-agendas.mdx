@@ -27,7 +27,7 @@ subcategory: alignment
 ---
 import {ComparisonTable, DataInfoBox, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="research-agendas" client:load />
+<DataExternalLinks pageId="research-agendas" />
 
 <DataInfoBox entityId="research-agendas" />
 
@@ -81,7 +81,7 @@ A critical constraint emerged in late 2024: alignment grantmaking became mostly 
 
 ### Research Agenda Relationships
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Near-Term[Near-Term Safety 2-5 years]
         CAI[Constitutional AI<br/>Anthropic ≈\$100M+]
@@ -287,7 +287,6 @@ The comparison reveals that rather than competing approaches, we likely need a p
 - <R id="d97571571d129855">DeepMind salary data</R> - Compensation benchmarks
 
 <ComparisonTable
-  client:load
   title="Research Agenda Overview"
   columns={["Primary Focus", "Key Assumption", "Timeline View", "Theory of Change"]}
   rows={[
@@ -367,7 +366,6 @@ The comparison reveals that rather than competing approaches, we likely need a p
 />
 
 <ComparisonTable
-  client:load
   title="Agenda Comparison by Dimension"
   columns={["Solves Inner Alignment?", "Scales to Superhuman?", "Works Without Full Alignment?", "Empirically Testable Now?"]}
   highlightColumn="Scales to Superhuman?"
@@ -439,7 +437,6 @@ The comparison reveals that rather than competing approaches, we likely need a p
 />
 
 <DisagreementMap
-  client:load
   topic="Which Research Agenda Will Succeed?"
   description="Views on which approach is most likely to prevent AI catastrophe"
   spectrum={{ low: "Need novel breakthroughs", high: "Current approaches scale" }}
@@ -454,7 +451,6 @@ The comparison reveals that rather than competing approaches, we likely need a p
 />
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "Will current paradigm (LLMs + RLHF) lead to transformative AI?",

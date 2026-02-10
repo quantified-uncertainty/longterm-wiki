@@ -22,7 +22,7 @@ clusters: ["ai-safety"]
 import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 import {DataInfoBox, Backlinks} from '@components/wiki';
 
-<DataExternalLinks pageId="capabilities" client:load />
+<DataExternalLinks pageId="capabilities" />
 
 ## Quick Assessment
 
@@ -57,7 +57,7 @@ The <R id="54fcb72b74acfae9">recent o3 release</R> achieved 87.5% on ARC-AGI, re
 
 ### Capability Trajectory Overview
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph INPUTS["Capability Drivers"]
         COMPUTE[Compute Scale]
@@ -555,4 +555,4 @@ AI capabilities metrics directly inform the <EntityLink id="ai-transition-model"
 
 ## Related Pages
 
-<Backlinks client:load entityId="capabilities" />
+<Backlinks entityId="capabilities" />

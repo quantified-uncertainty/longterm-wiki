@@ -26,7 +26,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="emergent-capabilities" client:load />
+<DataExternalLinks pageId="emergent-capabilities" />
 
 <DataInfoBox entityId="emergent-capabilities" />
 
@@ -111,7 +111,7 @@ This capability was never explicitly programmed—it emerged as "an unintended b
 
 The unpredictability of emergent capabilities creates multiple pathways for safety failures. Most concerningly, dangerous capabilities like deception, manipulation, or strategic planning might emerge at scales we haven't yet reached, appearing without warning in systems we deploy believing them to be safe. Unlike gradual capability improvements that provide opportunities for detection and mitigation, emergent abilities can cross critical safety thresholds suddenly.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     SCALE[Model Scale Increases] --> THRESHOLD[Capability Threshold Crossed]
     THRESHOLD --> EMERGE[New Ability Emerges]
@@ -182,7 +182,7 @@ As <R id="38328f97c152d10f">Sanmi Koyejo</R> explained: "The transition is much 
 
 However, mounting evidence suggests genuine phase transitions occur in neural network training and inference. A [2025 survey](https://arxiv.org/abs/2503.05788) notes that emergence extends to harmful behaviors including deception, manipulation, and reward hacking:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph METRICS["Metric-Dependent Emergence"]
         NONLIN[Nonlinear Metrics] --> APPEAR[Emergence Appears]
@@ -326,4 +326,4 @@ The relationship between different emergence mechanisms—scaling, training meth
 
 ---
 
-<Backlinks client:load entityId="emergent-capabilities" />
+<Backlinks entityId="emergent-capabilities" />

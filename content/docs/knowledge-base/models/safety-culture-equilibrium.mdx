@@ -52,7 +52,7 @@ Where:
 - **safety-culture-strength** ($S$): 0 to 1, measuring genuine prioritization of safety
 - **racing-intensity** ($R$): 0 to 1, measuring competitive pressure to deploy quickly
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph StateSpace["Equilibrium State Space"]
         direction LR
@@ -74,7 +74,7 @@ flowchart TD
 
 An equilibrium exists when no lab benefits from unilateral deviation. The following diagram illustrates the feedback loops that stabilize each equilibrium:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Racing["Racing-Dominant Feedback Loop"]
         R1["Low safety investment"] --> R2["Capability lead"]
@@ -204,7 +204,7 @@ Current parameter values favor racing. Shifting to safety-competitive equilibriu
 
 ### Paths Between Equilibria
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 stateDiagram-v2
     [*] --> RacingDominant: Current state
     RacingDominant --> RegulationImposed: Major Incident
@@ -253,7 +253,7 @@ The **safety-culture-strength** parameter has key thresholds:
 
 ### Intervention Timing
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 gantt
     title Intervention Effectiveness by Timeframe
     dateFormat  YYYY
@@ -364,4 +364,4 @@ Your view on safety culture equilibrium should depend on:
 
 ## Related Pages
 
-<Backlinks client:load entityId="safety-culture-equilibrium" />
+<Backlinks entityId="safety-culture-equilibrium" />

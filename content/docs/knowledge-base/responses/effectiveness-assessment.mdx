@@ -27,7 +27,7 @@ subcategory: governance
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="effectiveness-assessment" client:load />
+<DataExternalLinks pageId="effectiveness-assessment" />
 
 <DataInfoBox entityId="effectiveness-assessment" />
 
@@ -68,7 +68,7 @@ Despite these challenges, emerging evidence suggests significant variation in po
 
 Understanding policy effectiveness requires a systematic approach that moves beyond compliance theater to measure genuine risk reduction. The following framework outlines how policy interventions translate (or fail to translate) into actual safety outcomes:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Policy Design] --> B{Implementation Quality}
     B -->|High| C[Strong Compliance Mechanisms]
@@ -220,7 +220,6 @@ Conversely, certain policy design features consistently underperform. **Pure vol
 ### Critical Uncertainties and Research Gaps
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "Can current AI governance policies actually prevent catastrophic risks from advanced AI systems?",

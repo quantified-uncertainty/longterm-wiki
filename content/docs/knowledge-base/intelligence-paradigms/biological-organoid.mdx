@@ -22,7 +22,7 @@ clusters: ["ai-safety", "biorisks"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="biological-organoid" client:load />
+<DataExternalLinks pageId="biological-organoid" />
 
 ## Overview
 
@@ -36,7 +36,7 @@ Estimated probability of being dominant at transformative AI: **&lt;1%**
 
 ## Current Capabilities
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph input["Input Layer"]
         sensors["Sensors/Electrodes"]

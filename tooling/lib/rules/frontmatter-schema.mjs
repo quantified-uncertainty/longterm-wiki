@@ -86,7 +86,7 @@ export const frontmatterSchemaRule = {
     const issues = [];
     const frontmatter = contentFile.frontmatter;
 
-    // Check for quoted dates (common mistake that Astro rejects)
+    // Check for quoted dates (common mistake that causes schema validation failures)
     // We need to check the raw content for this since YAML parser already parses dates
     const rawContent = contentFile.raw;
 
@@ -115,7 +115,7 @@ export const frontmatterSchemaRule = {
     }
 
     // Check for UNquoted lastEdited dates - these must be quoted strings
-    // YAML parses bare 2026-02-01 as a Date object, but Astro schema expects string
+    // YAML parses bare 2026-02-01 as a Date object, but frontmatter schema expects string
     const unquotedLastEditedMatch = rawContent.match(/lastEdited:\s*(\d{4}-\d{2}-\d{2})(?:\s*$|\s*\n)/m);
     if (unquotedLastEditedMatch) {
       // Verify it's not quoted by checking if there's a quote before the date

@@ -24,7 +24,7 @@ subcategory: alignment-deployment
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks, Backlinks} from '@components/wiki';
 
-<DataExternalLinks pageId="sandboxing" client:load />
+<DataExternalLinks pageId="sandboxing" />
 
 ## Quick Assessment
 
@@ -112,7 +112,7 @@ The ["IDEsaster" disclosure](https://thehackernews.com/2025/12/researchers-uncov
 
 The [UK AI Safety Institute's Inspect Sandboxing Toolkit](https://www.aisi.gov.uk/blog/the-inspect-sandboxing-toolkit-scalable-and-secure-ai-agent-evaluations) classifies isolation along three axes that should be layered together:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph TI["Tooling Isolation"]
         T1[Tool Allowlisting]
@@ -150,7 +150,7 @@ flowchart TD
 
 Sandboxing creates isolated environments with restricted capabilities:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Sandbox["Sandboxed Environment"]
         A[AI Agent] --> B[Limited File System]
@@ -283,7 +283,7 @@ As AI capabilities increase:
 
 METR's evaluation suite tests **77 tasks** assessing how far models are from autonomous replication and cyberattack capabilities:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph THREAT["Rogue Replication Threat Model"]
         A[Model Proliferated] --> B[Agent Escapes Supervision]
@@ -336,7 +336,7 @@ METR observes that the [50% task completion time horizon has been growing expone
 
 [CVE-Bench](https://arxiv.org/html/2503.17332v4) (ICML 2025 Spotlight) provides a real-world benchmark measuring AI agents' ability to exploit critical-severity vulnerabilities:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph EVAL["CVE-Bench Evaluation"]
         A[LLM Agent] --> B[Vulnerable Web App]
@@ -416,7 +416,7 @@ OpenAI facilitated [ARC's (Alignment Research Center) preliminary evaluation](ht
 
 ### Defense in Depth Architecture
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[AI Agent] --> B[Application Sandbox]
     B --> C[Container]
@@ -635,4 +635,4 @@ Sandboxing is a critical component of defense-in-depth but should not be relied 
 
 ## Related Pages
 
-<Backlinks client:load entityId="sandboxing" />
+<Backlinks entityId="sandboxing" />

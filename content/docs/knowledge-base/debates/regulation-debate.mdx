@@ -21,7 +21,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {ComparisonTable, DisagreementMap, InfoBox, KeyQuestions, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="regulation-debate" client:load />
+<DataExternalLinks pageId="regulation-debate" />
 
 <InfoBox
   type="crux"
@@ -58,7 +58,7 @@ As AI capabilities advance, a critical question emerges: Who should control how 
 
 ## The Landscape
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph GOV["Government Regulation"]
         G1[Mandatory Testing]
@@ -113,7 +113,6 @@ flowchart TD
 ## Regulatory Models Under Discussion
 
 <ComparisonTable
-  client:load
   title="Proposed Regulatory Approaches"
   items={[
     {
@@ -218,7 +217,6 @@ China has implemented the world's most extensive AI content regulations:
 ## Key Positions
 
 <DisagreementMap
-  client:load
   title="Positions on AI Regulation"
   description="Where different stakeholders stand"
   positions={[
@@ -276,7 +274,6 @@ China has implemented the world's most extensive AI content regulations:
 ## Key Cruxes
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "Can industry self-regulate effectively given race dynamics?",

@@ -23,7 +23,7 @@ subcategory: alignment-interpretability
 ---
 import {Mermaid, DataExternalLinks, DataInfoBox, R, EntityLink, Backlinks} from '@components/wiki';
 
-<DataExternalLinks pageId="sparse-autoencoders" client:load />
+<DataExternalLinks pageId="sparse-autoencoders" />
 
 
 ## Overview
@@ -98,7 +98,7 @@ The following table compares key research efforts in sparse autoencoder developm
 
 SAEs are encoder-decoder neural networks trained to reconstruct activation vectors through a sparse intermediate representation:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     ACT[Model Activations] --> ENC[Encoder]
     ENC --> SPARSE[Sparse Features]
@@ -126,7 +126,7 @@ The key innovation is the sparsity constraint: during training, the encoder is p
 
 The following diagram illustrates the complete pipeline from training SAEs to safety applications:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Phase"]
         LM[Language Model] --> ACT[Collect Activations]
@@ -301,7 +301,7 @@ Even with successful SAE development, fundamental challenges remain:
 
 ### Research Ecosystem
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Labs["Frontier Labs"]
         ANTH[Anthropic]
@@ -436,4 +436,4 @@ Priority areas for additional investment:
 
 ---
 
-<Backlinks client:load entityId="sparse-autoencoders" />
+<Backlinks entityId="sparse-autoencoders" />

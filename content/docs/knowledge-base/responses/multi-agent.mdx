@@ -21,7 +21,7 @@ subcategory: alignment-deployment
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="multi-agent" client:load />
+<DataExternalLinks pageId="multi-agent" />
 
 ## Overview
 
@@ -49,7 +49,7 @@ Most alignment research assumes a single AI system interacting with humans. Howe
 
 The <R id="05b7759687747dc2">Cooperative AI Foundation's taxonomy</R> identifies three fundamental failure modes that can arise in multi-agent AI systems, each representing distinct ways that agent interactions can produce harmful outcomes:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph FM["Failure Modes"]
         M[Miscoordination]

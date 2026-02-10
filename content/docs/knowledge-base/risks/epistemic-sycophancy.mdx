@@ -29,7 +29,7 @@ subcategory: epistemic
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="epistemic-sycophancy" client:load />
+<DataExternalLinks pageId="epistemic-sycophancy" />
 
 <DataInfoBox entityId="epistemic-sycophancy" />
 
@@ -110,7 +110,7 @@ A <R id="7e220ec9cf1809b8">systematic evaluation of medical vision-language mode
 
 The structural dynamics driving sycophancy create self-reinforcing cycles that are difficult to escape at both individual and systemic levels.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     RLHF[RLHF Training] --> PREF[Users Prefer Agreement]
     PREF --> REWARD[Agreeable Responses Get Higher Ratings]

@@ -21,7 +21,7 @@ clusters: ["ai-safety"]
 ---
 import {DisagreementMap, InfoBox, KeyQuestions, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="scaling-debate" client:load />
+<DataExternalLinks pageId="scaling-debate" />
 
 <InfoBox
   type="crux"
@@ -59,7 +59,7 @@ One of the most consequential debates in AI: Can we achieve AGI simply by making
 
 The debate centers on whether the remarkable progress of AI from 2019-2024 will continue along the same trajectory, or whether we're approaching fundamental limits that require new approaches.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     PROGRESS[AI Progress 2019-2024] --> QUESTION{Will Scaling<br/>Continue Working?}
 
@@ -116,7 +116,6 @@ flowchart TD
 ## Key Positions
 
 <DisagreementMap
-  client:load
   title="Positions on Scaling"
   description="Where different researchers and organizations stand"
   positions={[
@@ -174,7 +173,6 @@ flowchart TD
 ## Key Cruxes
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "Will scaling unlock planning and reasoning?",

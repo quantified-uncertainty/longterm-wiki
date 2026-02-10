@@ -117,7 +117,7 @@ The empirical evidence suggests RLHF is effective for reducing overt harmful out
 
 The following diagram illustrates how different intervention types interact and which risk categories they address. Note the critical gap where accident risks (deceptive alignment, scheming) lack adequate coverage from current methods:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph TECHNICAL["Technical Interventions"]
         RLHF[RLHF/Constitutional AI]
@@ -171,7 +171,7 @@ Technical interventions show strong coverage of misuse risks but weak coverage o
 
 ### Critical Gaps Analysis
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 quadrantChart
     title Gap Prioritization Matrix
     x-axis Low Tractability --> High Tractability
@@ -257,7 +257,7 @@ The <R id="112221760b143b57">Center for AI Safety SafeBench competition</R> repr
 
 [AI Control](https://arxiv.org/pdf/2312.06942) represents a fundamentally different approach to managing risks from potentially misaligned AI systems. Rather than assuming alignment can be verified, AI Control assumes models may be intentionally subverting safety measures and designs systems to remain safe regardless.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph ALIGNMENT["Alignment Approach"]
         A1[Train model to be aligned] --> A2[Verify alignment]
@@ -589,4 +589,4 @@ According to [METR's December 2025 analysis](https://metr.org/blog/2025-12-09-co
 - Safety Research Organizations - Key players and capacity
 - <EntityLink id="evaluation">Evaluation Frameworks</EntityLink> - Assessment methodologies
 
-<Backlinks client:load entityId="intervention-effectiveness-matrix" />
+<Backlinks entityId="intervention-effectiveness-matrix" />

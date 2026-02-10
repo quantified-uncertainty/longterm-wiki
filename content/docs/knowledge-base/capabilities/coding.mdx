@@ -21,7 +21,7 @@ clusters: ["ai-safety", "cyber"]
 ---
 import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="coding" client:load />
+<DataExternalLinks pageId="coding" />
 
 <DataInfoBox entityId="coding" />
 
@@ -115,7 +115,7 @@ The dual-use nature of coding capabilities presents significant risks. While AI 
 
 ### AI Coding Risk Pathways
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     AI_CODE[AI Coding Capabilities] --> ACCEL[Development Acceleration]
     AI_CODE --> DUAL[Dual-Use Applications]
@@ -365,4 +365,4 @@ Major AI labs have implemented <EntityLink id="responsible-scaling-policies">res
 | <EntityLink id="uk-aisi">UK AISI</EntityLink> | Model evaluation | Safety testing protocols |
 | <EntityLink id="us-aisi">US AISI</EntityLink> | Safety research | Government coordination |
 
-<Backlinks client:load entityId="coding" />
+<Backlinks entityId="coding" />

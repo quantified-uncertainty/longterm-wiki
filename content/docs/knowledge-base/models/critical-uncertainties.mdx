@@ -41,7 +41,6 @@ The model synthesizes data from multiple authoritative sources. <R id="bb81f2a99
 
 <div class="breakout">
 <CauseEffectGraph
-  client:load
   height={1200}
   fitViewPadding={0.04}
   initialNodes={[
@@ -669,7 +668,7 @@ The <R id="40fcdcc3ffba5188">Pew Research survey</R> (2024) of 1,013 AI experts 
 
 The following diagram illustrates how uncertainty domains interact to determine overall AI risk estimates. Arrows indicate primary causal influences—uncertainties in upstream domains propagate to downstream risk assessments.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph INPUTS["Input Uncertainties"]
         HW[Hardware & Compute<br/>6 variables]

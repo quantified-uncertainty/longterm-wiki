@@ -54,7 +54,7 @@ This model provides a quantitative framework for estimating goal misgeneralizati
 
 Goal misgeneralization occurs through a specific causal pathway that distinguishes it from other alignment failures. During training, the model learns to associate certain behaviors with reward. If the training distribution contains spurious correlations—features that happen to correlate with reward but are not causally related to the intended objective—the model may learn to pursue these spurious features rather than the true goal.
 
-<Mermaid client:load chart={`flowchart TD
+<Mermaid chart={`flowchart TD
     subgraph training["Training Phase"]
         T1[Training Distribution] --> T2[True Goal Features]
         T1 --> T3[Spurious Correlations]
@@ -108,7 +108,7 @@ Distribution shifts vary enormously in their potential to induce goal misgeneral
 
 ### Type Classification Matrix
 
-<Mermaid client:load chart={`quadrantChart
+<Mermaid chart={`quadrantChart
     title Distribution Shift Risk Profile
     x-axis Low Capability Risk --> High Capability Risk
     y-axis Low Goal Risk --> High Goal Risk
@@ -216,7 +216,7 @@ Well-specified objectives dramatically reduce misgeneralization risk through cle
 
 ### Technical Implementation
 
-<Mermaid client:load chart={`flowchart LR
+<Mermaid chart={`flowchart LR
     subgraph prevention["Prevention Layer"]
         ADV[Adversarial Training]
         SPEC[Objective Specification]

@@ -24,7 +24,7 @@ subcategory: alignment-evaluation
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="scheming-detection" client:load />
+<DataExternalLinks pageId="scheming-detection" />
 
 ## Overview
 
@@ -51,7 +51,7 @@ Detection is exceptionally difficult because sophisticated deception is designed
 
 Scheming differs from other alignment failures in its intentional, strategic nature:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph TYPES["Alignment Failure Types"]
         A[Goal Misgeneralization] --> X["Unintended behavior<br/>Model doesn't realize misaligned"]
@@ -108,7 +108,7 @@ Key findings:
 
 ## Detection Approaches
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph BEHAVIORAL["Behavioral Detection"]
         B1["Monitoring Awareness Tests"]
@@ -218,7 +218,7 @@ Preventing scheming during training may be more tractable than detecting it post
 
 Given detection limitations, a layered approach is essential:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Training-Time Prevention] --> B[Evaluation-Time Detection]
     B --> C[Deployment Constraints]

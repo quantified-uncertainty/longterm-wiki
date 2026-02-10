@@ -21,7 +21,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {R, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="lab-behavior" client:load />
+<DataExternalLinks pageId="lab-behavior" />
 
 ## Quick Assessment
 
@@ -52,7 +52,7 @@ Understanding lab behavior is critical because corporate practices directly infl
 
 ### Lab Behavior Dynamics
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     COMP[Competitive Pressure] --> SPEED[Release Velocity]
     SPEED --> EVAL[Shortened Evaluations]

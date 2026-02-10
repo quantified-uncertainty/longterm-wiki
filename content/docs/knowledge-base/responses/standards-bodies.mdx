@@ -27,7 +27,7 @@ subcategory: institutions
 ---
 import {DataInfoBox, R, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="standards-bodies" client:load />
+<DataExternalLinks pageId="standards-bodies" />
 
 <DataInfoBox entityId="standards-bodies" />
 
@@ -133,7 +133,7 @@ Standards Australia has developed a comprehensive AI governance framework that a
 
 The following diagram illustrates how international and regional standards bodies interact with regulatory frameworks to create compliance pathways:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph International["International Standards"]
         ISO["ISO/IEC JTC 1/SC 42"]

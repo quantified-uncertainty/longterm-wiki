@@ -23,7 +23,7 @@ subcategory: alignment-theoretical
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="cirl" client:load />
+<DataExternalLinks pageId="cirl" />
 
 ## Quick Assessment
 
@@ -46,7 +46,7 @@ CIRL represents some of the most rigorous theoretical work in AI alignment, with
 
 ## How It Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Human["Human (H)"]
         HP[Knows preferences θ]

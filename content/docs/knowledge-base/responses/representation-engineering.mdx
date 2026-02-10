@@ -23,7 +23,7 @@ subcategory: alignment-interpretability
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="representation-engineering" client:load />
+<DataExternalLinks pageId="representation-engineering" />
 
 ## Overview
 
@@ -47,7 +47,7 @@ Current research suggests representation engineering occupies a middle ground be
 
 Representation engineering operates on the linear representation hypothesis: neural networks encode concepts as directions in activation space, and these directions are approximately linear and consistent across contexts. This means that "honesty" or "harmfulness" can be represented as vectors that activate predictably when relevant content is processed.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph EXTRACT["1. Extract Steering Vector"]
         A["Honest prompt pairs"] --> B["Forward pass"]

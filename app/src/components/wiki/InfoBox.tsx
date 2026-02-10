@@ -6,11 +6,13 @@ import { Lightbulb, FlaskConical, Target, CheckCircle2, ExternalLink, BookOpen, 
 import { EntityTypeIcon, entityTypeConfig } from "./EntityTypeIcon";
 import { severityColors, maturityColors, riskCategoryColors } from "./shared/style-config";
 import { getEntityTypeHeader, getEntityTypeLabel, getOrgTypeLabel } from "@/data/entity-ontology";
+import type { AnyEntityTypeName } from "@/data/entity-type-names";
 import type { ExternalLinksData } from "@/data";
 
 type LucideIcon = React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement> & { size?: number | string }>;
 
-export type EntityType = string;
+/** Entity type string — constrained to known canonical + alias type names */
+export type EntityType = AnyEntityTypeName;
 
 export interface ModelRatingsData {
   novelty?: number;

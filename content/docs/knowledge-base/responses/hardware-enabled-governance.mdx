@@ -24,7 +24,7 @@ subcategory: governance-compute-governance
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="hardware-enabled-governance" client:load />
+<DataExternalLinks pageId="hardware-enabled-governance" />
 
 ## Quick Assessment
 
@@ -82,7 +82,7 @@ Current export controls face significant enforcement challenges:
 
 Hardware-enabled governance encompasses several distinct technical approaches with different capabilities, costs, and risks:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph DETECTION["Detection Mechanisms"]
         A[Remote Attestation] --> A1["Verify chip is running<br/>expected software"]
@@ -240,7 +240,7 @@ Extending these mechanisms for governance involves primarily scope and purpose c
 
 Effective HEM deployment would require:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph CHIP["Chip-Level"]
         A[Hardware Security Module]
@@ -363,7 +363,7 @@ Given the risk/benefit tradeoffs, [RAND analysis](https://www.rand.org/pubs/work
 
 The following diagram shows how HEMs fit within the broader AI governance landscape:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph POLICY["Policy Layer"]
         A[Export Controls<br/>3A090/4A090] --> B[Compute Thresholds<br/>10^26 FLOP]

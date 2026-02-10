@@ -23,7 +23,7 @@ subcategory: alignment-training
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="adversarial-training" client:load />
+<DataExternalLinks pageId="adversarial-training" />
 
 ## Quick Assessment
 
@@ -43,7 +43,7 @@ The technique builds on extensive research in adversarial examples for neural ne
 
 However, adversarial training faces fundamental limitations. First, it creates an arms race: as models become robust to known attacks, attackers develop new ones, requiring continuous investment. Second, it only defends against attacks the system has been trained on - novel attack categories will still succeed. Third and most critically, adversarial training targets external attacks on the model, not internal model problems. It provides no protection against a deceptive or misaligned model, which could easily generate safe-seeming outputs while pursuing different goals.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Discovery["Attack Discovery"]
         RT[Red Team Testing]

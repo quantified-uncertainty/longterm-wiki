@@ -23,7 +23,7 @@ subcategory: framework-models
 ---
 import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="carlsmith-six-premises" client:load />
+<DataExternalLinks pageId="carlsmith-six-premises" />
 
 <DataInfoBox entityId="carlsmith-six-premises" ratings={frontmatter.ratings} />
 
@@ -39,7 +39,7 @@ The framework focuses on **APS systems** (Advanced capabilities, agentic Plannin
 
 ## The Six Premises
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     P1[P1: Advanced AI Developed<br/>by 2070] --> P2[P2: Strong Incentives<br/>to Deploy]
     P2 --> P3[P3: Alignment Harder<br/>than Misalignment]
@@ -209,7 +209,7 @@ Carlsmith focuses specifically on **APS systems**—not all AI:
 
 In 2023, Carlsmith worked with [Good Judgment's superforecasters](https://goodjudgment.com/superforecasting-ai/) to test his estimates. The project ran from August to October 2022, with a follow-up round in spring 2023, funded by <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>. Key findings from <R id="8d9f2fea7c1b4e3a">the comparison study</R>:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 xychart-beta
     title "Probability Estimates: Carlsmith vs Superforecasters"
     x-axis ["P1 Timelines", "P2 Incentives", "P3 Alignment", "P4 Power", "P5 Scale", "P6 Catastrophe"]
@@ -259,7 +259,7 @@ Different interventions target different premises:
 | <EntityLink id="ai-control">AI control</EntityLink> | P5 | Contain power-seeking before full disempowerment |
 | <EntityLink id="responsible-scaling-policies">RSPs</EntityLink> | P2, P4, P5 | Gate deployment on safety |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph Interventions
         CG[Compute Governance]

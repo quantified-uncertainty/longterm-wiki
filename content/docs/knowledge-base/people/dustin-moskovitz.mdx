@@ -52,7 +52,7 @@ import {DataInfoBox, Backlinks, Mermaid, EntityLink} from '@components/wiki';
 
 Moskovitz's net worth has been remarkably flat over the past 6+ years despite holding stakes in two major technology companies. While fluctuations have been dramatic year-to-year—driven primarily by Meta stock volatility—the overall trajectory shows essentially no net growth since 2018.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 %%{init: {'theme':'default', 'themeVariables': {'xyChart': {'plotColorPalette': '#2563eb'}}}}%%
 xychart-beta
     title "Net Worth Over Time (Billions USD)"
@@ -174,7 +174,7 @@ In March 2011, Forbes reported Moskovitz as the world's youngest self-made billi
 
 ## Philanthropic Activities
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     DM[Dustin Moskovitz] --> GV[Good Ventures<br/>Foundation, 2011]
     CT[Cari Tuna] --> GV
@@ -267,7 +267,7 @@ The rebrand to "Coefficient Giving" signals a strategic shift from serving prima
 
 ## AI Safety Philanthropy
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph TECHNICAL["Technical Research"]
         MIRI[MIRI<br/>\$20M+]

@@ -19,7 +19,7 @@ metrics:
 ---
 import {Mermaid, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="models" client:load />
+<DataExternalLinks pageId="models" />
 
 This guide covers **core purpose**, **summary requirements**, **format requirements**, **diagram types**, **methodological principles**, and **rating criteria** for analytical models in this knowledge base.
 
@@ -234,7 +234,7 @@ Models should include at least one diagram. Choose the type that best represents
 
 Use for: Showing how things lead to other things, causal chains, decision processes.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Initial Condition] --> B[Intermediate State]
     B --> C[Outcome 1]
@@ -254,7 +254,7 @@ flowchart TD
 
 Use for: Showing how multiple factors influence each other, feedback loops, complex interdependencies.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     A[Factor A] -->|"strengthens"| B[Factor B]
     B -->|"weakens"| C[Factor C]
@@ -267,7 +267,7 @@ flowchart LR
 
 Use for: Showing how systems move between discrete states, regime changes, phase transitions.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 stateDiagram-v2
     [*] --> Stable
     Stable --> Degraded: stress increases
@@ -291,7 +291,7 @@ For showing how different actors or systems interact in sequence, attack chains,
 
 For simple flows, a basic flowchart works well:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     A[Actor A] -->|attacks| S[System]
     S -->|alerts| D[Defender]
@@ -303,7 +303,7 @@ flowchart LR
 
 Use for: Showing structural relationships between concepts, taxonomies, classification systems.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 erDiagram
     RISK ||--o{ RISK_FACTOR : "has"
     RISK ||--o{ INTERVENTION : "addressed by"
@@ -316,7 +316,7 @@ erDiagram
 
 Use for: Classifying items along two dimensions, prioritization frameworks, strategic positioning.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 quadrantChart
     title Intervention Priority Matrix
     x-axis Low Feasibility --> High Feasibility
@@ -335,7 +335,7 @@ quadrantChart
 
 Use for: Showing progression over time, milestone projections, historical development.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 timeline
     title Capability Development Timeline
     section Near-term
@@ -353,7 +353,7 @@ timeline
 
 Use for: Showing categories of related items, system boundaries, domain separation.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Technical["Technical Factors"]
         T1[Capability Level]
@@ -389,7 +389,7 @@ For models describing structural relationships, use schema-style representations
 
 ### Schema Example: Risk Factor Taxonomy
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 classDiagram
     class Risk {
         +name: string
@@ -422,7 +422,7 @@ classDiagram
 
 ### Schema Example: Actor Relationships
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 erDiagram
     AI_LAB ||--o{ AI_SYSTEM : develops
     AI_LAB ||--o{ SAFETY_RESEARCH : conducts
@@ -454,7 +454,7 @@ erDiagram
 
 Many risks involve feedback loops where effects become causes. Make these explicit.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     A[Capability Increase] --> B[Deployment Pressure]
     B --> C[Rushed Safety Testing]
@@ -624,7 +624,7 @@ Show how a change affects multiple dimensions:
 
 For models with sequential choices:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A{Deploy AI system?} -->|Yes| B{Safety testing complete?}
     A -->|No| C[No immediate risk]

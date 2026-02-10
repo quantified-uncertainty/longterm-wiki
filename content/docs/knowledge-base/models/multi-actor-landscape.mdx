@@ -33,7 +33,6 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
 
 <div class="breakout">
 <CauseEffectGraph
-  client:load
   height={950}
   fitViewPadding={0.05}
   initialNodes={[
@@ -411,7 +410,7 @@ The following table synthesizes publicly available data on relative AI capabilit
 
 The following diagram illustrates how actor competition dynamics flow through to risk outcomes:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Actors["Actor Competition"]
         USL[US Frontier Labs]

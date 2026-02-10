@@ -22,7 +22,7 @@ clusters: ["ai-safety"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="brain-computer-interfaces" client:load />
+<DataExternalLinks pageId="brain-computer-interfaces" />
 
 ## Overview
 
@@ -34,7 +34,7 @@ While BCIs have made significant medical advances, they are **very unlikely to b
 
 ## Current Capabilities
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph medical["Medical BCIs (Proven)"]
         cochlear["Cochlear Implants<br/>~1M users"]
@@ -75,7 +75,7 @@ Sources: [Neuralink Updates](https://neuralink.com/updates/), [Synchron COMMAND 
 
 ### BCI Technology Architecture
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph BRAIN["Brain Interface Layer"]
         neurons["Neurons<br/>~86 billion cells"]

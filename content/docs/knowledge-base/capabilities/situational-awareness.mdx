@@ -21,7 +21,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {DataInfoBox, DataExternalLinks, Backlinks, R, Mermaid, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="situational-awareness" client:load />
+<DataExternalLinks pageId="situational-awareness" />
 
 <DataInfoBox entityId="situational-awareness" />
 
@@ -112,7 +112,7 @@ Strategic awareness involves reasoning about how current behavior affects future
 
 Meta-strategic awareness represents the most concerning level, where models reason about concealing their strategic reasoning from observers; understand that situational awareness itself might be evaluated; develop sophisticated theories of mind about researchers and evaluators; and potentially coordinate deception across multiple evaluation attempts. Models operating at this level would pose fundamental challenges to current safety evaluation paradigms.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Levels["Situational Awareness Levels"]
         L1["Self-Identification<br/>Knows it's an AI"]
@@ -247,4 +247,4 @@ Finally, the philosophical and technical foundations of consciousness, self-awar
 
 ## Related Pages
 
-<Backlinks client:load entityId="situational-awareness" />
+<Backlinks entityId="situational-awareness" />

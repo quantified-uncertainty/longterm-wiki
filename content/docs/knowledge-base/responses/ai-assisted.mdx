@@ -23,7 +23,7 @@ subcategory: alignment
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="ai-assisted" client:load />
+<DataExternalLinks pageId="ai-assisted" />
 
 ## Overview
 
@@ -50,7 +50,7 @@ The central strategic question is whether using AI to align more powerful AI cre
 
 ## How It Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph CURRENT["Current AI Systems"]
         RT[Red-Teaming AI]

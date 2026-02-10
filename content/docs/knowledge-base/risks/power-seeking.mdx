@@ -26,7 +26,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, R, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="power-seeking" client:load />
+<DataExternalLinks pageId="power-seeking" />
 
 <DataInfoBox entityId="power-seeking" />
 
@@ -102,7 +102,7 @@ Power-seeking in AI systems manifests across multiple dimensions that extend far
 | **Capability Concealment** | Medium | Very High | [Scheming research (Dec 2024)](https://arxiv.org/abs/2412.04984) shows in-context strategic underperformance |
 | **Self-Preservation** | High | Medium | Consistent across reasoning models; stronger in RL-trained systems |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Resource["Resource Acquisition"]
         R1[Compute Access]
@@ -254,4 +254,4 @@ Power-seeking is central to the <EntityLink id="ai-takeover" /> scenario—a mis
 
 ## Related Pages
 
-<Backlinks client:load entityId="power-seeking" />
+<Backlinks entityId="power-seeking" />

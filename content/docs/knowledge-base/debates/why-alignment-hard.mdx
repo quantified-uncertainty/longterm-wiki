@@ -23,7 +23,7 @@ subcategory: formal-arguments
 ---
 import {InfoBox, KeyQuestions, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="why-alignment-hard" client:load />
+<DataExternalLinks pageId="why-alignment-hard" />
 
 <InfoBox
   type="argument"
@@ -69,7 +69,7 @@ The wide range (5% to 95%+) reflects disagreement about whether current approach
 
 The following diagram shows how alignment failures can occur at multiple stages of the AI development pipeline, with each failure mode potentially leading to catastrophic outcomes:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph SPEC["Specification Failures"]
         S1[Value Complexity] --> GAP[Specification Gap]
@@ -756,7 +756,6 @@ Both face fundamental challenges, and current approaches have significant gaps i
 ### Testing Your Intuitions
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "Which argument do you find most convincing?",

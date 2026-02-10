@@ -24,7 +24,7 @@ subcategory: alignment-evaluation
 ---
 import {Mermaid, DataExternalLinks, R, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="model-auditing" client:load />
+<DataExternalLinks pageId="model-auditing" />
 
 ## Quick Assessment
 
@@ -115,7 +115,7 @@ When o1 engages in scheming, it maintains deception in over 85% of follow-up que
 
 ### Audit Process
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Engagement["Engagement Setup"]
         SCOPE[Define Scope] --> ACCESS[Negotiate Access]
@@ -225,7 +225,7 @@ flowchart TD
 
 ### The Third-Party Auditing Ecosystem
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Labs["AI Development Labs"]
         TRAIN[Model Training] --> INTERNAL[Internal Safety Eval]

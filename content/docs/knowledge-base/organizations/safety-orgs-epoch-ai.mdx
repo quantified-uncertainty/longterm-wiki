@@ -26,7 +26,7 @@ subcategory: safety-orgs
 ---
 import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="epoch-ai" client:load />
+<DataExternalLinks pageId="epoch-ai" />
 
 <DataInfoBox entityId="epoch-ai" />
 
@@ -51,7 +51,7 @@ Their research documents three key scaling dynamics: training compute growing at
 
 Unlike organizations developing AI capabilities or safety techniques directly, Epoch provides the empirical foundation that informs strategic decisions across the AI ecosystem. Their databases and forecasts are cited by policymakers designing compute governance frameworks, safety researchers planning research timelines, and AI labs benchmarking their progress against industry trends. In 2024, they were featured on The New York Times' "2024 Good Tech Awards" list.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph INPUTS["Data Collection"]
         MODELS[AI Model Database<br/>3,200+ models]
@@ -259,7 +259,6 @@ Epoch's [FrontierMath benchmark](https://epoch.ai/frontiermath) represents a sig
 
 <Section title="Forecasting Reliability Debate">
   <DisagreementMap
-    client:load
     topic="Value of Empirical AI Forecasting"
     positions={[
       {

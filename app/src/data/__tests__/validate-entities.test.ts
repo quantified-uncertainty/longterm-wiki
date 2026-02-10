@@ -8,6 +8,7 @@ import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
 import { ENTITY_TYPES } from "../entity-ontology";
+import { ALL_ENTITY_TYPE_NAMES } from "../entity-type-names";
 
 // ---------------------------------------------------------------------------
 // Load real data from build output
@@ -32,49 +33,15 @@ const entities: RawEntity[] = fs.existsSync(ENTITIES_PATH)
   : [];
 
 // ---------------------------------------------------------------------------
-// Valid types
+// Valid types (derived from the canonical entity-type-names.ts)
 // ---------------------------------------------------------------------------
 
-// Canonical types from entity-ontology.ts (includes compat aliases added at runtime)
-const VALID_CANONICAL_TYPES = new Set(Object.keys(ENTITY_TYPES));
+// ALL_ENTITY_TYPE_NAMES includes canonical types + aliases (legacy, plural, etc.)
+// This is the single source of truth — no manual lists needed.
+const VALID_ENTITY_TYPES = new Set<string>(ALL_ENTITY_TYPE_NAMES);
 
-// Legacy types allowed in relatedEntries (raw YAML uses old names)
-// Also includes plural-form typos that exist in current data (should be cleaned up)
-const LEGACY_TYPES = new Set([
-  "lab",
-  "lab-frontier",
-  "lab-research",
-  "lab-academic",
-  "lab-startup",
-  "researcher",
-  // Plural-form variants found in organizations.yaml relatedEntries
-  "concepts",
-  "events",
-  "policies",
-]);
-
-// AI transition model types — handled by the default case in transformEntity
-const AI_TRANSITION_MODEL_TYPES = new Set(
-  entities
-    .map((e) => e.entityType || e.type)
-    .filter((t) => t.startsWith("ai-transition-model-")),
-);
-
-// All types allowed on the entity itself
-// Includes legacy types because raw YAML entities keep old type names
-// until transformEntity() remaps them at runtime (Phase B pending)
-const VALID_ENTITY_TYPES = new Set([
-  ...VALID_CANONICAL_TYPES,
-  ...LEGACY_TYPES,
-  ...AI_TRANSITION_MODEL_TYPES,
-]);
-
-// All types allowed in relatedEntries references
-const VALID_RELATED_ENTRY_TYPES = new Set([
-  ...VALID_CANONICAL_TYPES,
-  ...LEGACY_TYPES,
-  ...AI_TRANSITION_MODEL_TYPES,
-]);
+// All types allowed in relatedEntries references (same set)
+const VALID_RELATED_ENTRY_TYPES = VALID_ENTITY_TYPES;
 
 // ---------------------------------------------------------------------------
 // Tests

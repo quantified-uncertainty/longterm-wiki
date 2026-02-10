@@ -30,7 +30,7 @@ subcategory: analysis-models
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="proliferation-risk-model" client:load />
+<DataExternalLinks pageId="proliferation-risk-model" />
 
 <DataInfoBox entityId="proliferation-risk-model" ratings={frontmatter.ratings} />
 
@@ -65,7 +65,7 @@ The proliferation cascade operates through five distinct actor tiers, each with 
 | **4** | Open Source | Millions | Public weights | 18-36 months | Very Low |
 | **5** | Individuals | Billions | Consumer apps | 24-48 months | None |
 
-<Mermaid client:load chart={`flowchart TD
+<Mermaid chart={`flowchart TD
     T1[Tier 1: Frontier Labs<br/>OpenAI, Anthropic, Google, etc.<br/>~10 actors] --> T2[Tier 2: Major Tech<br/>Microsoft, Amazon, Meta<br/>~100 actors]
     T2 --> T3[Tier 3: Well-Resourced Orgs<br/>Large corps, governments<br/>~10,000 actors]
     T3 --> T4[Tier 4: Open Source<br/>Public model weights<br/>Millions of actors]
@@ -156,7 +156,7 @@ Critical proliferation thresholds mark qualitative shifts in control feasibility
 | **Individual** | Tier 4/5 access | Monitoring overwhelmed | Days |
 | **Irreversible** | Open source + common knowledge | Control impossible | N/A |
 
-<Mermaid client:load chart={`graph LR
+<Mermaid chart={`graph LR
     A[Contained<br/>Tier 1-2] --> B[Organizational<br/>Tier 3]
     B --> C[Individual<br/>Tier 4-5]
     C --> D[Irreversible<br/>Open Source]

@@ -402,7 +402,7 @@ function cmdProcess(opts) {
   }
 
   // Note: In Next.js, <R> is registered globally via mdx-components.tsx,
-  // so no import injection is needed (unlike the old Astro setup).
+  // so no import injection is needed.
 
   // Save changes
   if (!dryRun) {

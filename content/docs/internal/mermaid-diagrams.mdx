@@ -22,7 +22,7 @@ import { Mermaid } from '@components/wiki';
 ## Quick Reference
 
 ```jsx
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Node A] --> B[Node B]
 `} />
@@ -92,7 +92,7 @@ style NodeName fill:#e1f5ff   /* Pale blue - root/overview */
 
 ### Example with Colors
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Risk Assessment] --> B[High Risk]
     A --> C[Medium Risk]
@@ -128,7 +128,7 @@ flowchart TD
 
 ### Influence Diagram (Causal)
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Factor A] -->|"increases"| B[Outcome]
     C[Factor C] -->|"decreases"| B
@@ -141,7 +141,7 @@ flowchart TD
 
 ### Priority Quadrant
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 quadrantChart
     title Priority Matrix
     x-axis Low Effort --> High Effort
@@ -157,7 +157,7 @@ quadrantChart
 
 ### Simple Proportion
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 pie title Resource Allocation
     "Category A" : 45
     "Category B" : 30
@@ -217,7 +217,7 @@ A[Short Label]
 
 Use subgraphs to create vertical sections in complex diagrams:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Inputs["Inputs"]
         I1[Data]

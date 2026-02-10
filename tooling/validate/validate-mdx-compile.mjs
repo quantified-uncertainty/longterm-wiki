@@ -2,7 +2,7 @@
 /**
  * MDX Compilation Validator
  *
- * Actually compiles MDX files to catch JSX syntax errors BEFORE the full Astro build.
+ * Actually compiles MDX files to catch JSX syntax errors BEFORE the full Next.js build.
  * This catches errors that regex-based validators miss:
  * - Unescaped < in tables/prose (JSX parsing errors)
  * - Invalid JSX syntax

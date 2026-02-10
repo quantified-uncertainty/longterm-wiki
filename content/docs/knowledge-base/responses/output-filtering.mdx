@@ -95,7 +95,7 @@ Empirical research reveals significant variation in filter effectiveness across 
 
 Output filtering systems operate at inference time, examining model outputs before delivery. Modern systems employ multiple filtering layers with different tradeoffs between latency, accuracy, and compute cost:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Input["Input Processing"]
         A[User Query] --> B{Input Filter}
