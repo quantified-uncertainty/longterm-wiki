@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DevModeToggle } from "@/components/DevModeToggle";
+import { SearchButton, SearchDialog } from "@/components/SearchDialog";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -49,10 +50,14 @@ export default function RootLayout({
               >
                 Internal
               </Link>
+              <SearchButton />
               <DevModeToggle />
             </nav>
           </div>
         </header>
+
+        {/* Global search dialog (Cmd+K) */}
+        <SearchDialog />
 
         {/* Main content */}
         <main>
