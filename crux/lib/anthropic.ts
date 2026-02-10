@@ -5,7 +5,7 @@
  * Consolidates API key handling, model selection, error handling, and rate limiting.
  *
  * Usage:
- *   import { createClient, MODELS, callClaude } from './lib/anthropic.mjs';
+ *   import { createClient, MODELS, callClaude } from './lib/anthropic.ts';
  *
  *   const client = createClient(); // Uses ANTHROPIC_API_KEY from env
  *   const response = await callClaude(client, {
@@ -25,7 +25,7 @@ config({ path: '.env.local' });
 /**
  * Available Claude models with standardized names
  */
-export const MODELS = {
+export const MODELS: Record<string, string> = {
   // Fast and cheap - good for high-volume tasks
   haiku: 'claude-3-5-haiku-latest',
   // Balanced - good for most tasks
@@ -37,7 +37,7 @@ export const MODELS = {
 /**
  * Model aliases for backward compatibility
  */
-const MODEL_ALIASES = {
+const MODEL_ALIASES: Record<string, string> = {
   'haiku': MODELS.haiku,
   'sonnet': MODELS.sonnet,
   'opus': MODELS.opus,
@@ -52,10 +52,8 @@ const MODEL_ALIASES = {
 
 /**
  * Resolve a model name to the canonical model ID
- * @param {string} modelName - Model name or alias
- * @returns {string} Canonical model ID
  */
-export function resolveModel(modelName) {
+export function resolveModel(modelName: string): string {
   const resolved = MODEL_ALIASES[modelName] || MODEL_ALIASES[modelName?.toLowerCase()];
   if (!resolved) {
     console.warn(`Unknown model "${modelName}", defaulting to haiku`);
@@ -64,14 +62,15 @@ export function resolveModel(modelName) {
   return resolved;
 }
 
+export interface CreateClientOptions {
+  apiKey?: string;
+  required?: boolean;
+}
+
 /**
  * Create an Anthropic client instance
- * @param {Object} options
- * @param {string} [options.apiKey] - API key (defaults to ANTHROPIC_API_KEY env var)
- * @param {boolean} [options.required=true] - If true, throws if no API key found
- * @returns {Anthropic|null} Anthropic client or null if no key and not required
  */
-export function createClient({ apiKey, required = true } = {}) {
+export function createClient({ apiKey, required = true }: CreateClientOptions = {}): Anthropic | null {
   const key = apiKey || process.env.ANTHROPIC_API_KEY;
 
   if (!key) {
@@ -86,24 +85,30 @@ export function createClient({ apiKey, required = true } = {}) {
   return new Anthropic({ apiKey: key });
 }
 
+export interface CallClaudeOptions {
+  model: string;
+  systemPrompt: string;
+  userPrompt: string;
+  maxTokens?: number;
+  temperature?: number;
+}
+
+export interface CallClaudeResult {
+  text: string;
+  usage: Record<string, unknown>;
+  model: string;
+}
+
 /**
  * Call Claude API with standardized error handling
- * @param {Anthropic} client - Anthropic client instance
- * @param {Object} options
- * @param {string} options.model - Model name (haiku, sonnet, opus, or full model ID)
- * @param {string} options.systemPrompt - System prompt
- * @param {string} options.userPrompt - User prompt
- * @param {number} [options.maxTokens=2000] - Max tokens in response
- * @param {number} [options.temperature=0] - Temperature (0-1)
- * @returns {Promise<{text: string, usage: Object}>} Response text and usage stats
  */
-export async function callClaude(client, {
+export async function callClaude(client: Anthropic, {
   model,
   systemPrompt,
   userPrompt,
   maxTokens = 2000,
   temperature = 0,
-}) {
+}: CallClaudeOptions): Promise<CallClaudeResult> {
   const modelId = resolveModel(model);
 
   try {
@@ -118,21 +123,25 @@ export async function callClaude(client, {
     });
 
     const text = response.content
-      .filter(block => block.type === 'text')
-      .map(block => block.text)
+      .filter((block: { type: string }) => block.type === 'text')
+      .map((block: { type: string; text?: string }) => {
+        if (block.type === 'text') return block.text || '';
+        return '';
+      })
       .join('\n');
 
     return {
       text,
-      usage: response.usage,
+      usage: response.usage as unknown as Record<string, unknown>,
       model: modelId,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     // Handle rate limiting
-    if (error.status === 429) {
-      const retryAfter = error.headers?.['retry-after'] || 30;
+    const apiError = error as { status?: number; headers?: Record<string, string> };
+    if (apiError.status === 429) {
+      const retryAfter = apiError.headers?.['retry-after'] || '30';
       console.warn(`Rate limited. Retry after ${retryAfter}s`);
-      throw new RateLimitError(retryAfter);
+      throw new RateLimitError(Number(retryAfter));
     }
 
     // Handle other API errors
@@ -144,7 +153,9 @@ export async function callClaude(client, {
  * Custom error for rate limiting
  */
 export class RateLimitError extends Error {
-  constructor(retryAfter) {
+  retryAfter: number;
+
+  constructor(retryAfter: number) {
     super(`Rate limited. Retry after ${retryAfter}s`);
     this.name = 'RateLimitError';
     this.retryAfter = retryAfter;
@@ -153,47 +164,56 @@ export class RateLimitError extends Error {
 
 /**
  * Sleep for a given number of milliseconds
- * @param {number} ms - Milliseconds to sleep
  */
-export function sleep(ms) {
+export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export interface BatchResult<T, I> {
+  success: boolean;
+  item: I;
+  result?: T;
+  error?: unknown;
+}
+
+export interface ProcessBatchOptions<I> {
+  concurrency?: number;
+  delayBetweenBatches?: number;
+  onProgress?: ((info: { completed: number; total: number; item: I; result?: unknown; error?: unknown }) => void) | null;
 }
 
 /**
  * Process items in batches with rate limiting
- * @param {Array} items - Items to process
- * @param {Function} processor - Async function to process each item
- * @param {Object} options
- * @param {number} [options.concurrency=3] - Max concurrent requests
- * @param {number} [options.delayBetweenBatches=200] - Delay between batches in ms
- * @param {Function} [options.onProgress] - Callback for progress updates
- * @returns {Promise<Array>} Results for each item
  */
-export async function processBatch(items, processor, {
-  concurrency = 3,
-  delayBetweenBatches = 200,
-  onProgress = null,
-} = {}) {
-  const results = [];
+export async function processBatch<T, I>(
+  items: I[],
+  processor: (item: I) => Promise<T>,
+  {
+    concurrency = 3,
+    delayBetweenBatches = 200,
+    onProgress = null,
+  }: ProcessBatchOptions<I> = {},
+): Promise<BatchResult<T, I>[]> {
+  const results: BatchResult<T, I>[] = [];
   let completed = 0;
 
   for (let i = 0; i < items.length; i += concurrency) {
     const batch = items.slice(i, i + concurrency);
     const batchResults = await Promise.all(
-      batch.map(async (item, idx) => {
+      batch.map(async (item) => {
         try {
           const result = await processor(item);
           completed++;
           if (onProgress) {
             onProgress({ completed, total: items.length, item, result });
           }
-          return { success: true, item, result };
+          return { success: true, item, result } as BatchResult<T, I>;
         } catch (error) {
           completed++;
           if (onProgress) {
             onProgress({ completed, total: items.length, item, error });
           }
-          return { success: false, item, error };
+          return { success: false, item, error } as BatchResult<T, I>;
         }
       })
     );
@@ -210,10 +230,8 @@ export async function processBatch(items, processor, {
 
 /**
  * Parse JSON from Claude response, handling markdown code blocks
- * @param {string} text - Response text
- * @returns {Object} Parsed JSON
  */
-export function parseJsonResponse(text) {
+export function parseJsonResponse(text: string): unknown {
   // Remove markdown code blocks if present
   let cleaned = text.trim();
   if (cleaned.startsWith('```json')) {
@@ -231,11 +249,8 @@ export function parseJsonResponse(text) {
 
 /**
  * Parse YAML from Claude response, handling markdown code blocks
- * @param {string} text - Response text
- * @param {Function} parseYaml - YAML parser function
- * @returns {Object} Parsed YAML
  */
-export function parseYamlResponse(text, parseYaml) {
+export function parseYamlResponse(text: string, parseYaml: (input: string) => unknown): unknown {
   // Remove markdown code blocks if present
   let cleaned = text.trim();
   if (cleaned.startsWith('```yaml')) {

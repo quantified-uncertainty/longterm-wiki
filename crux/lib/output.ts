@@ -5,20 +5,52 @@
  * Supports CI mode (no colors) via --ci flag or CI=true environment variable.
  */
 
+export interface Colors {
+  red: string;
+  green: string;
+  yellow: string;
+  blue: string;
+  cyan: string;
+  magenta: string;
+  dim: string;
+  bold: string;
+  reset: string;
+}
+
+export interface Logger {
+  colors: Colors;
+  ciMode: boolean;
+  log: (...args: unknown[]) => void;
+  error: (msg: string) => void;
+  warn: (msg: string) => void;
+  info: (msg: string) => void;
+  success: (msg: string) => void;
+  dim: (msg: string) => void;
+  errorIcon: string;
+  warnIcon: string;
+  infoIcon: string;
+  successIcon: string;
+  heading: (msg: string) => void;
+  subheading: (msg: string) => void;
+  formatIssue: (severity: string, description: string, line?: number | null) => string;
+}
+
+export interface ProgressTracker {
+  update: (increment?: number) => void;
+  done: () => void;
+}
+
 /**
  * Detect if running in CI mode
- * @returns {boolean} True if in CI mode
  */
-export function isCI() {
+export function isCI(): boolean {
   return process.argv.includes('--ci') || process.env.CI === 'true';
 }
 
 /**
  * Get color codes (empty strings in CI mode)
- * @param {boolean} ciMode - Force CI mode (no colors)
- * @returns {object} Color code object
  */
-export function getColors(ciMode = isCI()) {
+export function getColors(ciMode: boolean = isCI()): Colors {
   if (ciMode) {
     return {
       red: '',
@@ -48,10 +80,8 @@ export function getColors(ciMode = isCI()) {
 
 /**
  * Create a logger with color support
- * @param {boolean} ciMode - Force CI mode
- * @returns {object} Logger object with colored output methods
  */
-export function createLogger(ciMode = isCI()) {
+export function createLogger(ciMode: boolean = isCI()): Logger {
   const c = getColors(ciMode);
 
   return {
@@ -59,12 +89,12 @@ export function createLogger(ciMode = isCI()) {
     ciMode,
 
     // Basic logging
-    log: (...args) => console.log(...args),
-    error: (msg) => console.log(`${c.red}${msg}${c.reset}`),
-    warn: (msg) => console.log(`${c.yellow}${msg}${c.reset}`),
-    info: (msg) => console.log(`${c.blue}${msg}${c.reset}`),
-    success: (msg) => console.log(`${c.green}${msg}${c.reset}`),
-    dim: (msg) => console.log(`${c.dim}${msg}${c.reset}`),
+    log: (...args: unknown[]) => console.log(...args),
+    error: (msg: string) => console.log(`${c.red}${msg}${c.reset}`),
+    warn: (msg: string) => console.log(`${c.yellow}${msg}${c.reset}`),
+    info: (msg: string) => console.log(`${c.blue}${msg}${c.reset}`),
+    success: (msg: string) => console.log(`${c.green}${msg}${c.reset}`),
+    dim: (msg: string) => console.log(`${c.dim}${msg}${c.reset}`),
 
     // Status icons
     errorIcon: `${c.red}✗${c.reset}`,
@@ -73,12 +103,12 @@ export function createLogger(ciMode = isCI()) {
     successIcon: `${c.green}✓${c.reset}`,
 
     // Formatted output
-    heading: (msg) => console.log(`${c.bold}${c.blue}${msg}${c.reset}`),
-    subheading: (msg) => console.log(`${c.bold}${msg}${c.reset}`),
+    heading: (msg: string) => console.log(`${c.bold}${c.blue}${msg}${c.reset}`),
+    subheading: (msg: string) => console.log(`${c.bold}${msg}${c.reset}`),
 
     // Issue formatting
-    formatIssue: (severity, description, line = null) => {
-      let icon;
+    formatIssue: (severity: string, description: string, line: number | null = null): string => {
+      let icon: string;
       if (severity === 'error') icon = `${c.red}✗`;
       else if (severity === 'warning') icon = `${c.yellow}⚠`;
       else icon = `${c.blue}ℹ`;
@@ -91,37 +121,28 @@ export function createLogger(ciMode = isCI()) {
 
 /**
  * Format a file path relative to cwd
- * @param {string} filePath - Absolute or relative path
- * @returns {string} Path relative to cwd
  */
-export function formatPath(filePath) {
+export function formatPath(filePath: string): string {
   return filePath.replace(process.cwd() + '/', '');
 }
 
 /**
  * Format a count with proper pluralization
- * @param {number} count - The count
- * @param {string} singular - Singular form
- * @param {string} plural - Plural form (optional, defaults to singular + 's')
- * @returns {string} Formatted string
  */
-export function formatCount(count, singular, plural = null) {
+export function formatCount(count: number, singular: string, plural: string | null = null): string {
   const form = count === 1 ? singular : (plural || singular + 's');
   return `${count} ${form}`;
 }
 
 /**
  * Create a progress indicator for long operations
- * @param {number} total - Total items
- * @param {string} label - Label for the operation
- * @returns {object} Progress tracker with update() and done() methods
  */
-export function createProgress(total, label = 'Processing') {
+export function createProgress(total: number, label: string = 'Processing'): ProgressTracker {
   const ciMode = isCI();
   let current = 0;
 
   return {
-    update: (increment = 1) => {
+    update: (increment: number = 1) => {
       current += increment;
       if (!ciMode) {
         process.stdout.write(`\r${label}: ${current}/${total}`);

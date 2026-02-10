@@ -9,7 +9,7 @@
  */
 
 import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.js';
-import { isInCodeBlock } from '../mdx-utils.mjs';
+import { isInCodeBlock } from '../mdx-utils.ts';
 
 // Components from @components/wiki that are commonly used.
 // Must match actual exports from app/src/components/wiki/index.ts

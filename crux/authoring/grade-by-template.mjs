@@ -21,10 +21,10 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { findMdxFiles } from '../lib/file-utils.mjs';
+import { findMdxFiles } from '../lib/file-utils.ts';
 import { CONTENT_DIR } from '../lib/content-types.js';
-import { countWords, countTables, countDiagrams, countInternalLinks } from '../lib/metrics-extractor.mjs';
-import { PAGE_TEMPLATES } from '../lib/page-templates.mjs';
+import { countWords, countTables, countDiagrams, countInternalLinks } from '../lib/metrics-extractor.ts';
+import { PAGE_TEMPLATES } from '../lib/page-templates.ts';
 
 function extractHeadings(content) {
   const headingRegex = /^##\s+(.+)$/gm;

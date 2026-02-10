@@ -340,7 +340,7 @@ test('only flags source columns, not other columns', () => {
 
 console.log('\n🔧 matchLinesOutsideCode utility');
 
-import { matchLinesOutsideCode } from '../mdx-utils.mjs';
+import { matchLinesOutsideCode } from '../mdx-utils.ts';
 
 test('matches patterns on regular lines', () => {
   const matches: Array<{ text: string; line: number }> = [];
@@ -382,7 +382,7 @@ test('handles multiple matches per line', () => {
 
 console.log('\n🔧 shouldSkipValidation utility');
 
-import { shouldSkipValidation } from '../mdx-utils.mjs';
+import { shouldSkipValidation } from '../mdx-utils.ts';
 
 test('skips stub pages', () => {
   assert(shouldSkipValidation({ pageType: 'stub' }));

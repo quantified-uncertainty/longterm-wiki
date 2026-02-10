@@ -11,17 +11,28 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const SCRIPTS_DIR = join(__dirname, '..');
+export const SCRIPTS_DIR: string = join(__dirname, '..');
+
+export interface RunScriptResult {
+  stdout: string;
+  stderr: string;
+  code: number;
+  error?: string;
+}
+
+export interface RunScriptOptions {
+  streamOutput?: boolean;
+  cwd?: string;
+}
 
 /**
  * Run a script as a subprocess and capture output
- *
- * @param {string} scriptPath - Path to script relative to scripts/
- * @param {string[]} args - Arguments to pass
- * @param {object} options - Execution options
- * @returns {Promise<{stdout: string, stderr: string, code: number}>}
  */
-export async function runScript(scriptPath, args = [], options = {}) {
+export async function runScript(
+  scriptPath: string,
+  args: string[] = [],
+  options: RunScriptOptions = {},
+): Promise<RunScriptResult> {
   const fullPath = join(SCRIPTS_DIR, scriptPath);
   const { streamOutput = false, cwd = process.cwd() } = options;
 
@@ -37,25 +48,25 @@ export async function runScript(scriptPath, args = [], options = {}) {
     let stdout = '';
     let stderr = '';
 
-    proc.stdout.on('data', (data) => {
+    proc.stdout.on('data', (data: Buffer) => {
       stdout += data.toString();
       if (streamOutput) {
         process.stdout.write(data);
       }
     });
 
-    proc.stderr.on('data', (data) => {
+    proc.stderr.on('data', (data: Buffer) => {
       stderr += data.toString();
       if (streamOutput) {
         process.stderr.write(data);
       }
     });
 
-    proc.on('close', (code) => {
+    proc.on('close', (code: number | null) => {
       resolve({ stdout, stderr, code: code ?? 1 });
     });
 
-    proc.on('error', (err) => {
+    proc.on('error', (err: Error) => {
       resolve({ stdout, stderr, code: 1, error: err.message });
     });
   });
@@ -63,13 +74,9 @@ export async function runScript(scriptPath, args = [], options = {}) {
 
 /**
  * Convert an options object to CLI arguments
- *
- * @param {object} options - Options object (camelCase keys)
- * @param {string[]} exclude - Keys to exclude
- * @returns {string[]}
  */
-export function optionsToArgs(options, exclude = []) {
-  const args = [];
+export function optionsToArgs(options: Record<string, unknown>, exclude: string[] = []): string[] {
+  const args: string[] = [];
   const excludeSet = new Set(exclude);
 
   for (const [key, value] of Object.entries(options)) {
@@ -90,23 +97,35 @@ export function optionsToArgs(options, exclude = []) {
 /**
  * Convert camelCase to kebab-case
  */
-export function camelToKebab(str) {
+export function camelToKebab(str: string): string {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
 /**
  * Convert kebab-case to camelCase
  */
-export function kebabToCamel(str) {
-  return str.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+export function kebabToCamel(str: string): string {
+  return str.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
 }
 
 /**
  * Format duration in human-readable form
  */
-export function formatDuration(ms) {
+export function formatDuration(ms: number): string {
   if (ms < 1000) return `${ms}ms`;
   return `${(ms / 1000).toFixed(2)}s`;
+}
+
+export interface ScriptConfig {
+  script: string;
+  passthrough: string[];
+  extraArgs?: string[];
+  positional?: boolean;
+}
+
+export interface CommandResult {
+  output: string;
+  exitCode: number;
 }
 
 /**
@@ -117,19 +136,19 @@ export function formatDuration(ms) {
  *   passthrough  - Option keys to forward to the subprocess
  *   extraArgs    - Extra CLI args to always append (e.g. ['--fix'])
  *   positional   - If true, forward positional args from the user
- *
- * @param {string} name - Command name (for diagnostics)
- * @param {object} config - Script config
  */
-export function createScriptHandler(name, config) {
-  return async function (args, options) {
+export function createScriptHandler(
+  name: string,
+  config: ScriptConfig,
+): (args: string[], options: Record<string, unknown>) => Promise<CommandResult> {
+  return async function (args: string[], options: Record<string, unknown>): Promise<CommandResult> {
     const quiet = options.ci || options.json;
 
     // Build args from allowed passthrough options
     const scriptArgs = optionsToArgs(options, ['help']);
     const filteredArgs = scriptArgs.filter((arg) => {
       const key = arg.replace(/^--/, '').split('=')[0];
-      const camelKey = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+      const camelKey = key.replace(/-([a-z])/g, (_: string, c: string) => c.toUpperCase());
       return config.passthrough.includes(camelKey) || config.passthrough.includes(key);
     });
 
@@ -158,13 +177,12 @@ export function createScriptHandler(name, config) {
 
 /**
  * Build a commands object from a SCRIPTS config map.
- *
- * @param {Record<string, object>} scripts - Map of command names to script configs
- * @param {string} [defaultCommand] - Name of the default command
- * @returns {Record<string, Function>}
  */
-export function buildCommands(scripts, defaultCommand) {
-  const commands = {};
+export function buildCommands(
+  scripts: Record<string, ScriptConfig>,
+  defaultCommand?: string,
+): Record<string, (args: string[], options: Record<string, unknown>) => Promise<CommandResult>> {
+  const commands: Record<string, (args: string[], options: Record<string, unknown>) => Promise<CommandResult>> = {};
   for (const [name, config] of Object.entries(scripts)) {
     commands[name] = createScriptHandler(name, config);
   }

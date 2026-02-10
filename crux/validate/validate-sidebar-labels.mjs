@@ -13,7 +13,7 @@
  *   0 = Always (not applicable for Next.js)
  */
 
-import { getColors } from '../lib/output.mjs';
+import { getColors } from '../lib/output.ts';
 
 const CI_MODE = process.argv.includes('--ci');
 const colors = getColors(CI_MODE);

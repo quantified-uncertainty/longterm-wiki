@@ -24,7 +24,7 @@
 
 import { existsSync, readdirSync, statSync, unlinkSync, rmdirSync } from 'fs';
 import { join, basename } from 'path';
-import { getColors, formatPath } from '../lib/output.mjs';
+import { getColors, formatPath } from '../lib/output.ts';
 import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);

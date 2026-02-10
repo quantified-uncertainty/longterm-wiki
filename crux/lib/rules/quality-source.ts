@@ -9,7 +9,7 @@
  */
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
-import { shouldSkipValidation } from '../mdx-utils.mjs';
+import { shouldSkipValidation } from '../mdx-utils.ts';
 
 export const qualitySourceRule = {
   id: 'quality-source',

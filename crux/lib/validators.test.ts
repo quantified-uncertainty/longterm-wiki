@@ -7,7 +7,7 @@
  */
 
 import { existsSync } from 'fs';
-import { extractMetrics, suggestQuality, getQualityDiscrepancy } from './metrics-extractor.mjs';
+import { extractMetrics, suggestQuality, getQualityDiscrepancy } from './metrics-extractor.ts';
 
 let passed = 0;
 let failed = 0;
@@ -47,14 +47,14 @@ function assertInRange(value: number, min: number, max: number, message?: string
 console.log('\n📁 Validator scripts exist');
 
 const validatorScripts: string[] = [
-  'scripts/validate/validate-all.mjs',
-  'scripts/validate/validate-data.mjs',
-  'scripts/validate/validate-internal-links.mjs',
-  'scripts/validate/validate-mdx-syntax.mjs',
-  'scripts/validate/validate-style-guide.mjs',
-  'scripts/validate/validate-consistency.mjs',
-  'scripts/validate/check-staleness.mjs',
-  'scripts/validate/validate-sidebar.mjs',
+  'crux/validate/validate-all.mjs',
+  'crux/validate/validate-data.mjs',
+  'crux/validate/validate-internal-links.mjs',
+  'crux/validate/validate-mdx-syntax.mjs',
+  'crux/validate/validate-style-guide.mjs',
+  'crux/validate/validate-consistency.mjs',
+  'crux/validate/check-staleness.mjs',
+  'crux/validate/validate-sidebar.mjs',
 ];
 
 for (const script of validatorScripts) {

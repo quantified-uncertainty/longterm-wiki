@@ -14,7 +14,7 @@
  */
 
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.js';
-import { isInCodeBlock } from '../mdx-utils.mjs';
+import { isInCodeBlock } from '../mdx-utils.ts';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import https from 'https';

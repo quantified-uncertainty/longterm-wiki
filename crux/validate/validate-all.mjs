@@ -25,7 +25,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { ValidationEngine, Severity } from '../lib/validation-engine.js';
 import { allRules } from '../lib/rules/index.js';
-import { getColors } from '../lib/output.mjs';
+import { getColors } from '../lib/output.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { createClient, parseJsonResponse } from '../../lib/anthropic.mjs';
+import { createClient, parseJsonResponse } from '../../lib/anthropic.ts';
 
 const GRADING_SYSTEM_PROMPT = `You are an expert evaluator of AI safety content. Score this page on:
 

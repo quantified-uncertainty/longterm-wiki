@@ -14,7 +14,7 @@
  */
 
 import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation-engine.js';
-import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
+import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
 import { loadDatabase } from '../content-types.js';
 
 // ---------------------------------------------------------------------------

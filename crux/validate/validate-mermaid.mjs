@@ -23,8 +23,8 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join, dirname } from 'path';
 import { spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
-import { findMdxFiles } from '../lib/file-utils.mjs';
-import { getColors, isCI } from '../lib/output.mjs';
+import { findMdxFiles } from '../lib/file-utils.ts';
+import { getColors, isCI } from '../lib/output.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CONTENT_DIR = join(__dirname, '../..', 'content/docs');

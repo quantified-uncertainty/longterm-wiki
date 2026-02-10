@@ -15,7 +15,7 @@
 
 import { ValidationEngine } from '../lib/validation-engine.js';
 import { entityMentionsRule } from '../lib/rules/entity-mentions.js';
-import { getColors } from '../lib/output.mjs';
+import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT, loadBacklinks, loadEntities } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);

@@ -4,8 +4,8 @@
  * Unified interface for resource management (wraps resource-manager.mjs).
  */
 
-import { createLogger } from '../lib/output.mjs';
-import { runScript, optionsToArgs } from '../lib/cli.mjs';
+import { createLogger } from '../lib/output.ts';
+import { runScript, optionsToArgs } from '../lib/cli.ts';
 
 /**
  * Command definitions (maps to resource-manager.mjs subcommands)

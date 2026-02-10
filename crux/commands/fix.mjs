@@ -4,7 +4,7 @@
  * Unified interface for auto-fix operations.
  */
 
-import { buildCommands } from '../lib/cli.mjs';
+import { buildCommands } from '../lib/cli.ts';
 
 /**
  * Script definitions

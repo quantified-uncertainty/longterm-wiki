@@ -15,13 +15,54 @@ const MIN_WORD_LENGTH = 5;       // Minimum word length for word-level analysis
 const SIMILARITY_THRESHOLD = 0.10; // Report pairs above this threshold (10%)
 
 // =============================================================================
+// TYPES
+// =============================================================================
+
+export interface PageInput {
+  id: string;
+  path: string;
+  title: string;
+  rawContent?: string;
+}
+
+export interface SimilarPage {
+  id: string;
+  title: string;
+  path: string;
+  similarity: number;
+}
+
+export interface PageRedundancyData {
+  maxSimilarity: number;
+  avgSimilarity: number;
+  similarPages: SimilarPage[];
+}
+
+export interface RedundancyPair {
+  pageA: string;
+  pageB: string;
+  pathA: string;
+  pathB: string;
+  titleA: string;
+  titleB: string;
+  similarity: number;
+  shingleSimilarity: number;
+  wordSimilarity: number;
+}
+
+export interface RedundancyResult {
+  pageRedundancy: Map<string, PageRedundancyData>;
+  pairs: RedundancyPair[];
+}
+
+// =============================================================================
 // TEXT PROCESSING
 // =============================================================================
 
 /**
  * Normalize text for comparison
  */
-function normalize(text) {
+function normalize(text: string): string {
   return text
     .toLowerCase()
     .replace(/[^\w\s]/g, ' ')  // Remove punctuation
@@ -32,7 +73,7 @@ function normalize(text) {
 /**
  * Extract content from MDX, removing frontmatter, imports, code, etc.
  */
-function extractContent(content) {
+function extractContent(content: string): string {
   if (!content) return '';
 
   // Remove MDX imports, frontmatter, code blocks
@@ -53,11 +94,11 @@ function extractContent(content) {
 /**
  * Generate n-gram shingles from text
  */
-function getShingles(text, n = SHINGLE_SIZE) {
+function getShingles(text: string, n: number = SHINGLE_SIZE): Set<string> {
   const words = text.split(/\s+/).filter(w => w.length > 0);
   if (words.length < n) return new Set();
 
-  const shingles = new Set();
+  const shingles = new Set<string>();
   for (let i = 0; i <= words.length - n; i++) {
     shingles.add(words.slice(i, i + n).join(' '));
   }
@@ -67,7 +108,7 @@ function getShingles(text, n = SHINGLE_SIZE) {
 /**
  * Get significant words (for conceptual similarity)
  */
-function getWords(text) {
+function getWords(text: string): Set<string> {
   const words = text.match(/\b\w+\b/g) || [];
   return new Set(words.filter(w => w.length >= MIN_WORD_LENGTH));
 }
@@ -75,7 +116,7 @@ function getWords(text) {
 /**
  * Calculate Jaccard similarity between two sets
  */
-function jaccardSimilarity(setA, setB) {
+function jaccardSimilarity(setA: Set<string>, setB: Set<string>): number {
   if (setA.size === 0 || setB.size === 0) return 0;
 
   let intersection = 0;
@@ -97,7 +138,7 @@ function jaccardSimilarity(setA, setB) {
  *   - pageRedundancy: Map<pageId, { maxSimilarity, similarPages[] }>
  *   - pairs: Array of { pageA, pageB, similarity, wordSimilarity }
  */
-export function computeRedundancy(pages) {
+export function computeRedundancy(pages: PageInput[]): RedundancyResult {
   // Process each page
   const processed = pages.map(page => {
     const text = extractContent(page.rawContent || '');
@@ -112,8 +153,8 @@ export function computeRedundancy(pages) {
   }).filter(p => p.words.size > 10); // Skip very short pages
 
   // Compare all pairs
-  const pairs = [];
-  const pageRedundancy = new Map();
+  const pairs: RedundancyPair[] = [];
+  const pageRedundancy = new Map<string, PageRedundancyData>();
 
   // Initialize all pages with zero redundancy
   for (const page of processed) {
@@ -200,7 +241,7 @@ export function computeRedundancy(pages) {
 /**
  * Get redundancy score for a single page (0-100, higher = more redundant)
  */
-export function getRedundancyScore(pageId, pageRedundancy) {
+export function getRedundancyScore(pageId: string, pageRedundancy: Map<string, PageRedundancyData>): number {
   const data = pageRedundancy.get(pageId);
   if (!data) return 0;
   return data.maxSimilarity;
@@ -209,7 +250,7 @@ export function getRedundancyScore(pageId, pageRedundancy) {
 /**
  * Get similar pages for a single page
  */
-export function getSimilarPages(pageId, pageRedundancy) {
+export function getSimilarPages(pageId: string, pageRedundancy: Map<string, PageRedundancyData>): SimilarPage[] {
   const data = pageRedundancy.get(pageId);
   if (!data) return [];
   return data.similarPages;

@@ -5,7 +5,7 @@
  * Delegates to existing scripts via subprocess execution.
  */
 
-import { buildCommands } from '../lib/cli.mjs';
+import { buildCommands } from '../lib/cli.ts';
 
 /**
  * Script definitions: maps command names to script paths and metadata

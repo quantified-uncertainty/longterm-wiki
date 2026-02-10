@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { sources, hashId, SOURCES_DIR } from '../../lib/knowledge-db.mjs';
+import { sources, hashId, SOURCES_DIR } from '../../lib/knowledge-db.ts';
 
 /**
  * Extract URLs from text with cleanup for trailing punctuation

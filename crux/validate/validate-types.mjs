@@ -10,7 +10,7 @@
  */
 
 import { readFileSync, existsSync } from 'fs';
-import { getColors } from '../lib/output.mjs';
+import { getColors } from '../lib/output.ts';
 
 const colors = getColors();
 

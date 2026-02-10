@@ -10,7 +10,7 @@
 
 import { createRule, Issue, Severity } from '../validation-engine.js';
 import type { ContentFile, ValidationEngine } from '../validation-engine.js';
-import { isInCodeBlock, isInMermaid, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
+import { isInCodeBlock, isInMermaid, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
 
 // Placeholder patterns to detect
 const PLACEHOLDER_PATTERNS: { pattern: RegExp; name: string; severity: string }[] = [

@@ -12,7 +12,7 @@
 
 import { createRule, Issue, Severity, FixType } from '../validation-engine.js';
 import type { ContentFile, ValidationEngine } from '../validation-engine.js';
-import { matchLinesOutsideCode, isInJsxAttribute } from '../mdx-utils.mjs';
+import { matchLinesOutsideCode, isInJsxAttribute } from '../mdx-utils.ts';
 
 // Pattern: < followed by a digit or \$ (escaped dollar sign)
 const LESS_THAN_PATTERN = /<(\d|\\?\$)/g;

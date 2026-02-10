@@ -19,9 +19,9 @@
 
 import { readFileSync } from 'fs';
 import { relative } from 'path';
-import { findMdxFiles } from '../lib/file-utils.mjs';
-import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.mjs';
-import { getColors } from '../lib/output.mjs';
+import { findMdxFiles } from '../lib/file-utils.ts';
+import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
+import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadBacklinks, loadPathRegistry } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);

@@ -15,7 +15,7 @@
 
 import { createRule, Issue, Severity, FixType } from '../validation-engine.js';
 import type { ContentFile, ValidationEngine } from '../validation-engine.js';
-import { matchLinesOutsideCode } from '../mdx-utils.mjs';
+import { matchLinesOutsideCode } from '../mdx-utils.ts';
 
 // Pattern: tilde followed by escaped dollar sign (problematic LaTeX interaction)
 const TILDE_DOLLAR_PATTERN = /~\\\$/g;

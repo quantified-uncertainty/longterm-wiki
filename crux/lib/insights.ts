@@ -9,46 +9,85 @@ import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from '
 import { join } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 
-// === Types (JSDoc) ===
+// === Types ===
 
-/**
- * @typedef {Object} Insight
- * @property {string} id
- * @property {string} insight
- * @property {string} source
- * @property {string[]} [tags]
- * @property {string} type
- * @property {number} surprising
- * @property {number} important
- * @property {number} actionable
- * @property {number} neglected
- * @property {number} compact
- * @property {string} [added]
- * @property {string} [lastVerified]
- * @property {string} [tableRef]
- */
+export interface Insight {
+  id: string;
+  insight: string;
+  source: string;
+  tags?: string[];
+  type: string;
+  surprising: number;
+  important: number;
+  actionable: number;
+  neglected: number;
+  compact: number;
+  added?: string;
+  lastVerified?: string;
+  tableRef?: string;
+  [key: string]: unknown;
+}
 
-/**
- * @typedef {Object} CheckResult
- * @property {boolean} passed
- * @property {number} total
- * @property {Object[]} issues
- * @property {Object} [stats]
- */
+export interface CheckIssue {
+  severity: 'error' | 'warning' | 'info';
+  message: string;
+  details: Record<string, unknown>;
+}
 
-/**
- * @typedef {Object} InsightsData
- * @property {Insight[]} insights
- */
+export interface CheckResult {
+  passed: boolean;
+  total: number;
+  issues: CheckIssue[];
+  stats?: Record<string, unknown>;
+  pairs?: DuplicatePair[];
+}
+
+export interface DuplicatePair {
+  id1: string;
+  id2: string;
+  similarity: number;
+  text1: string;
+  text2: string;
+}
+
+export interface InsightsData {
+  insights: Insight[];
+}
+
+export interface RatingDistribution {
+  min: number;
+  max: number;
+  mean: number;
+  median: number;
+}
+
+export interface InsightStats {
+  total: number;
+  byType: Record<string, number>;
+  topTags: Array<{ tag: string; count: number }>;
+  ratings: Record<string, RatingDistribution>;
+  topByComposite: Array<{ id: string; composite: number; text: string }>;
+  verification: {
+    verified: number;
+    unverified: number;
+    percentVerified: number;
+  };
+}
+
+export interface AllChecksResult {
+  passed: boolean;
+  total: number;
+  checksRun: number;
+  totalIssues: number;
+  results: Record<string, CheckResult>;
+}
 
 // === Data Loading ===
 
 /**
  * Load insights from YAML file or directory
- * @param {string} pathOrDir - Path to insights.yaml or insights/ directory
- * @returns {InsightsData} Parsed insights data
  */
-export function loadInsights(pathOrDir) {
+export function loadInsights(pathOrDir: string): InsightsData {
   if (!existsSync(pathOrDir)) {
     throw new Error(`Insights file not found: ${pathOrDir}`);
   }
@@ -59,22 +98,20 @@ export function loadInsights(pathOrDir) {
   }
 
   const content = readFileSync(pathOrDir, 'utf-8');
-  return parseYaml(content);
+  return parseYaml(content) as InsightsData;
 }
 
 /**
  * Load insights from a directory of YAML files
- * @param {string} dirPath - Path to insights directory
- * @returns {InsightsData} Merged insights data
  */
-export function loadInsightsDir(dirPath) {
-  const files = readdirSync(dirPath).filter(f => f.endsWith('.yaml'));
-  const allInsights = [];
+export function loadInsightsDir(dirPath: string): InsightsData {
+  const files = readdirSync(dirPath).filter((f: string) => f.endsWith('.yaml'));
+  const allInsights: Insight[] = [];
 
   for (const file of files) {
     const filePath = join(dirPath, file);
     const content = readFileSync(filePath, 'utf-8');
-    const data = parseYaml(content);
+    const data = parseYaml(content) as InsightsData | null;
     if (data?.insights) {
       allInsights.push(...data.insights);
     }
@@ -85,10 +122,8 @@ export function loadInsightsDir(dirPath) {
 
 /**
  * Save insights to YAML file
- * @param {string} filePath - Path to insights.yaml
- * @param {InsightsData} data - Insights data to save
  */
-export function saveInsights(filePath, data) {
+export function saveInsights(filePath: string, data: InsightsData): void {
   const content = stringifyYaml(data, {
     lineWidth: 120,
     defaultStringType: 'QUOTE_DOUBLE',
@@ -98,17 +133,17 @@ export function saveInsights(filePath, data) {
 
 // === Validation Checks ===
 
+export interface DuplicateCheckOptions {
+  threshold?: number;
+}
+
 /**
  * Check for duplicate or near-duplicate insights
- * @param {Insight[]} insights - Array of insights
- * @param {Object} options - Options
- * @param {number} [options.threshold=0.7] - Similarity threshold (0-1)
- * @returns {CheckResult}
  */
-export function checkDuplicates(insights, options = {}) {
+export function checkDuplicates(insights: Insight[], options: DuplicateCheckOptions = {}): CheckResult {
   const threshold = options.threshold ?? 0.7;
-  const issues = [];
-  const pairs = [];
+  const issues: CheckIssue[] = [];
+  const pairs: DuplicatePair[] = [];
 
   for (let i = 0; i < insights.length; i++) {
     for (let j = i + 1; j < insights.length; j++) {
@@ -145,13 +180,10 @@ export function checkDuplicates(insights, options = {}) {
 
 /**
  * Check rating calibration and consistency
- * @param {Insight[]} insights - Array of insights
- * @param {Object} options - Options
- * @returns {CheckResult}
  */
-export function checkRatings(insights, options = {}) {
-  const issues = [];
-  const ratingFields = ['surprising', 'important', 'actionable', 'neglected', 'compact'];
+export function checkRatings(insights: Insight[], _options: Record<string, unknown> = {}): CheckResult {
+  const issues: CheckIssue[] = [];
+  const ratingFields: (keyof Insight)[] = ['surprising', 'important', 'actionable', 'neglected', 'compact'];
 
   for (const insight of insights) {
     // Check for missing ratings
@@ -159,26 +191,26 @@ export function checkRatings(insights, options = {}) {
       if (insight[field] === undefined || insight[field] === null) {
         issues.push({
           severity: 'error',
-          message: `Missing rating '${field}' for insight ${insight.id}`,
-          details: { id: insight.id, field },
+          message: `Missing rating '${String(field)}' for insight ${insight.id}`,
+          details: { id: insight.id, field: String(field) },
         });
       } else if (typeof insight[field] !== 'number') {
         issues.push({
           severity: 'error',
-          message: `Invalid rating type for '${field}' in insight ${insight.id}: expected number, got ${typeof insight[field]}`,
-          details: { id: insight.id, field, value: insight[field] },
+          message: `Invalid rating type for '${String(field)}' in insight ${insight.id}: expected number, got ${typeof insight[field]}`,
+          details: { id: insight.id, field: String(field), value: insight[field] },
         });
-      } else if (insight[field] < 1 || insight[field] > 5) {
+      } else if ((insight[field] as number) < 1 || (insight[field] as number) > 5) {
         issues.push({
           severity: 'warning',
-          message: `Rating '${field}' out of range [1-5] for insight ${insight.id}: ${insight[field]}`,
-          details: { id: insight.id, field, value: insight[field] },
+          message: `Rating '${String(field)}' out of range [1-5] for insight ${insight.id}: ${insight[field]}`,
+          details: { id: insight.id, field: String(field), value: insight[field] },
         });
       }
     }
 
     // Check for suspiciously uniform ratings
-    const ratings = ratingFields.map(f => insight[f]).filter(v => typeof v === 'number');
+    const ratings = ratingFields.map(f => insight[f]).filter(v => typeof v === 'number') as number[];
     if (ratings.length === ratingFields.length) {
       const allSame = ratings.every(r => r === ratings[0]);
       if (allSame) {
@@ -192,10 +224,10 @@ export function checkRatings(insights, options = {}) {
   }
 
   // Compute rating distributions
-  const distributions = {};
+  const distributions: Record<string, RatingDistribution> = {};
   for (const field of ratingFields) {
-    const values = insights.map(i => i[field]).filter(v => typeof v === 'number');
-    distributions[field] = {
+    const values = insights.map(i => i[field]).filter(v => typeof v === 'number') as number[];
+    distributions[String(field)] = {
       min: Math.min(...values),
       max: Math.max(...values),
       mean: values.reduce((a, b) => a + b, 0) / values.length,
@@ -213,14 +245,11 @@ export function checkRatings(insights, options = {}) {
 
 /**
  * Check that source paths exist
- * @param {Insight[]} insights - Array of insights
- * @param {string} contentDir - Path to content directory
- * @returns {CheckResult}
  */
-export function checkSources(insights, contentDir) {
-  const issues = [];
-  const validSources = [];
-  const invalidSources = [];
+export function checkSources(insights: Insight[], contentDir: string): CheckResult {
+  const issues: CheckIssue[] = [];
+  const validSources: string[] = [];
+  const invalidSources: string[] = [];
 
   for (const insight of insights) {
     if (!insight.source) {
@@ -267,22 +296,22 @@ export function checkSources(insights, contentDir) {
   };
 }
 
+export interface StalenessCheckOptions {
+  staleDays?: number;
+}
+
 /**
  * Check for stale/unverified insights
- * @param {Insight[]} insights - Array of insights
- * @param {Object} options - Options
- * @param {number} [options.staleDays=90] - Days before insight is considered stale
- * @returns {CheckResult}
  */
-export function checkStaleness(insights, options = {}) {
+export function checkStaleness(insights: Insight[], options: StalenessCheckOptions = {}): CheckResult {
   const staleDays = options.staleDays ?? 90;
-  const issues = [];
+  const issues: CheckIssue[] = [];
   const now = new Date();
   const staleThreshold = new Date(now.getTime() - staleDays * 24 * 60 * 60 * 1000);
 
-  const stale = [];
-  const unverified = [];
-  const recent = [];
+  const stale: string[] = [];
+  const unverified: string[] = [];
+  const recent: string[] = [];
 
   for (const insight of insights) {
     if (!insight.lastVerified) {
@@ -322,18 +351,16 @@ export function checkStaleness(insights, options = {}) {
 
 /**
  * Check schema compliance
- * @param {Insight[]} insights - Array of insights
- * @returns {CheckResult}
  */
-export function checkSchema(insights) {
-  const issues = [];
+export function checkSchema(insights: Insight[]): CheckResult {
+  const issues: CheckIssue[] = [];
   const requiredFields = ['id', 'insight', 'source', 'type', 'surprising', 'important', 'actionable'];
   const validTypes = ['claim', 'research-gap', 'counterintuitive', 'quantitative', 'disagreement', 'neglected'];
 
   for (const insight of insights) {
     // Check required fields
     for (const field of requiredFields) {
-      if (insight[field] === undefined || insight[field] === null) {
+      if ((insight as Record<string, unknown>)[field] === undefined || (insight as Record<string, unknown>)[field] === null) {
         issues.push({
           severity: 'error',
           message: `Missing required field '${field}' for insight ${insight.id || '(unknown)'}`,
@@ -392,25 +419,26 @@ export function checkSchema(insights) {
   };
 }
 
+export interface RunAllChecksOptions {
+  only?: string[];
+  skip?: string[];
+  threshold?: number;
+  staleDays?: number;
+}
+
 /**
  * Run all checks on insights
- * @param {Insight[]} insights - Array of insights
- * @param {string} contentDir - Path to content directory
- * @param {Object} options - Options
- * @param {string[]} [options.only] - Run only these checks
- * @param {string[]} [options.skip] - Skip these checks
- * @returns {Object} Combined results from all checks
  */
-export function runAllChecks(insights, contentDir, options = {}) {
-  const checks = {
+export function runAllChecks(insights: Insight[], contentDir: string, options: RunAllChecksOptions = {}): AllChecksResult {
+  const checks: Record<string, () => CheckResult> = {
     schema: () => checkSchema(insights),
     duplicates: () => checkDuplicates(insights, options),
-    ratings: () => checkRatings(insights, options),
+    ratings: () => checkRatings(insights),
     sources: () => checkSources(insights, contentDir),
     staleness: () => checkStaleness(insights, options),
   };
 
-  const results = {};
+  const results: Record<string, CheckResult> = {};
   let allPassed = true;
   let totalIssues = 0;
 
@@ -438,20 +466,18 @@ export function runAllChecks(insights, contentDir, options = {}) {
 
 /**
  * Compute statistics about insights
- * @param {Insight[]} insights - Array of insights
- * @returns {Object} Statistics
  */
-export function computeStats(insights) {
-  const ratingFields = ['surprising', 'important', 'actionable', 'neglected', 'compact'];
+export function computeStats(insights: Insight[]): InsightStats {
+  const ratingFields: (keyof Insight)[] = ['surprising', 'important', 'actionable', 'neglected', 'compact'];
 
   // Type distribution
-  const byType = {};
+  const byType: Record<string, number> = {};
   for (const insight of insights) {
     byType[insight.type] = (byType[insight.type] || 0) + 1;
   }
 
   // Tag frequency
-  const tagCounts = {};
+  const tagCounts: Record<string, number> = {};
   for (const insight of insights) {
     if (insight.tags) {
       for (const tag of insight.tags) {
@@ -467,12 +493,12 @@ export function computeStats(insights) {
     .map(([tag, count]) => ({ tag, count }));
 
   // Rating distributions
-  const ratings = {};
+  const ratings: Record<string, RatingDistribution> = {};
   for (const field of ratingFields) {
-    const values = insights.map(i => i[field]).filter(v => typeof v === 'number');
+    const values = insights.map(i => i[field]).filter(v => typeof v === 'number') as number[];
     if (values.length > 0) {
       const sorted = [...values].sort((a, b) => a - b);
-      ratings[field] = {
+      ratings[String(field)] = {
         min: sorted[0],
         max: sorted[sorted.length - 1],
         mean: Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 100) / 100,
@@ -517,11 +543,8 @@ export function computeStats(insights) {
 
 /**
  * Add verification dates to insights
- * @param {Insight[]} insights - Array of insights
- * @param {string} [date] - Date to use (defaults to today)
- * @returns {Insight[]} Modified insights
  */
-export function addVerificationDates(insights, date = null) {
+export function addVerificationDates(insights: Insight[], date: string | null = null): Insight[] {
   const verifyDate = date || new Date().toISOString().split('T')[0];
   return insights.map(insight => ({
     ...insight,
@@ -531,17 +554,15 @@ export function addVerificationDates(insights, date = null) {
 
 /**
  * Normalize ratings to be within valid range
- * @param {Insight[]} insights - Array of insights
- * @returns {Insight[]} Modified insights with clamped ratings
  */
-export function normalizeRatings(insights) {
-  const ratingFields = ['surprising', 'important', 'actionable', 'neglected', 'compact'];
+export function normalizeRatings(insights: Insight[]): Insight[] {
+  const ratingFields: (keyof Insight)[] = ['surprising', 'important', 'actionable', 'neglected', 'compact'];
 
   return insights.map(insight => {
     const normalized = { ...insight };
     for (const field of ratingFields) {
       if (typeof normalized[field] === 'number') {
-        normalized[field] = Math.max(1, Math.min(5, normalized[field]));
+        (normalized as Record<string, unknown>)[field as string] = Math.max(1, Math.min(5, normalized[field] as number));
       }
     }
     return normalized;
@@ -553,18 +574,15 @@ export function normalizeRatings(insights) {
 /**
  * Compute text similarity between two insights
  * Uses Jaccard similarity on word n-grams
- * @param {Insight} insight1 - First insight
- * @param {Insight} insight2 - Second insight
- * @returns {number} Similarity score (0-1)
  */
-export function computeSimilarity(insight1, insight2) {
+export function computeSimilarity(insight1: Insight, insight2: Insight): number {
   const text1 = insight1.insight.toLowerCase();
   const text2 = insight2.insight.toLowerCase();
 
   // Get word bigrams
-  const getBigrams = (text) => {
+  const getBigrams = (text: string): Set<string> => {
     const words = text.split(/\s+/).filter(w => w.length > 2);
-    const bigrams = new Set();
+    const bigrams = new Set<string>();
     for (let i = 0; i < words.length - 1; i++) {
       bigrams.add(`${words[i]} ${words[i + 1]}`);
     }

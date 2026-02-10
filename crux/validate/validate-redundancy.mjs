@@ -11,7 +11,7 @@
  *   node scripts/validate-redundancy.mjs --threshold 0.3  # Custom similarity threshold
  */
 
-import { db, articles } from '../lib/knowledge-db.mjs';
+import { db, articles } from '../lib/knowledge-db.ts';
 
 // =============================================================================
 // CONFIGURATION

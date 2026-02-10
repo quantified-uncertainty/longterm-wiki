@@ -10,7 +10,39 @@
  * - Quality criteria (tables, diagrams, citations, word count, etc.)
  */
 
-export const PAGE_TEMPLATES = {
+export interface FrontmatterField {
+  name: string;
+  required: boolean;
+  weight: number;
+}
+
+export interface SectionDef {
+  id: string;
+  label: string;
+  alternateLabels: string[];
+  required: boolean;
+  weight: number;
+}
+
+export interface QualityCriterion {
+  id: string;
+  label: string;
+  weight: number;
+  detection: string;
+  pattern?: string;
+}
+
+export interface PageTemplate {
+  id: string;
+  name: string;
+  minWordCount?: number;
+  usesATMPage?: boolean;
+  frontmatter: FrontmatterField[];
+  sections: SectionDef[];
+  qualityCriteria: QualityCriterion[];
+}
+
+export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
   'ai-transition-model-factor': {
     id: 'ai-transition-model-factor',
     name: 'AI Transition Model - Root Factor',

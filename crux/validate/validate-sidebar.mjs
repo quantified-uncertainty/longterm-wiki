@@ -16,8 +16,8 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
-import { parseFrontmatter } from '../lib/mdx-utils.mjs';
-import { getColors, formatPath } from '../lib/output.mjs';
+import { parseFrontmatter } from '../lib/mdx-utils.ts';
+import { getColors, formatPath } from '../lib/output.ts';
 
 const CONTENT_DIR = 'content/docs/knowledge-base';
 const CI_MODE = process.argv.includes('--ci');

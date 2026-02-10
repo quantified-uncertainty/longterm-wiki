@@ -12,7 +12,7 @@
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, basename } from 'path';
 import { parse as parseYaml } from 'yaml';
-import { getColors, isCI, formatPath } from '../lib/output.mjs';
+import { getColors, isCI, formatPath } from '../lib/output.ts';
 import { Entity, Resource, Publication } from '../../data/schema.ts';
 
 const DATA_DIR = 'data';

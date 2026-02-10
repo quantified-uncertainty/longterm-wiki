@@ -18,10 +18,10 @@
  */
 
 import { readFileSync } from 'fs';
-import { findMdxFiles } from '../lib/file-utils.mjs';
-import { getColors, formatPath } from '../lib/output.mjs';
+import { findMdxFiles } from '../lib/file-utils.ts';
+import { getColors, formatPath } from '../lib/output.ts';
 import { CONTENT_DIR } from '../lib/content-types.js';
-import { parseFrontmatter, shouldSkipValidation } from '../lib/mdx-utils.mjs';
+import { parseFrontmatter, shouldSkipValidation } from '../lib/mdx-utils.ts';
 
 const CI_MODE = process.argv.includes('--ci');
 const colors = getColors(CI_MODE);

@@ -10,7 +10,7 @@
 
 import { createRule, Issue, Severity, FixType } from '../validation-engine.js';
 import type { ContentFile, ValidationEngine } from '../validation-engine.js';
-import { matchLinesOutsideCode } from '../mdx-utils.mjs';
+import { matchLinesOutsideCode } from '../mdx-utils.ts';
 
 // Pattern: unescaped $ followed by a number (not already escaped with \)
 const UNESCAPED_DOLLAR_PATTERN = /(?<!\\)\$(\d)/g;

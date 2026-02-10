@@ -22,7 +22,7 @@
 
 import { ValidationEngine, Severity } from '../lib/validation-engine.js';
 import { allRules } from '../lib/rules/index.js';
-import { getColors } from '../lib/output.mjs';
+import { getColors } from '../lib/output.ts';
 
 const args = process.argv.slice(2);
 const CI_MODE = args.includes('--ci');

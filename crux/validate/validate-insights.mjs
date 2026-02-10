@@ -14,8 +14,8 @@
  *   1 = Validation failed
  */
 
-import * as insights from '../lib/insights.mjs';
-import { createLogger } from '../lib/output.mjs';
+import * as insights from '../lib/insights.ts';
+import { createLogger } from '../lib/output.ts';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';

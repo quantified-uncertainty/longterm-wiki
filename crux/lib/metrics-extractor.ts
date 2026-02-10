@@ -5,20 +5,45 @@
  * Used by build-data.mjs to compute page quality scores.
  */
 
+export interface SectionCount {
+  h2: number;
+  h3: number;
+  total: number;
+}
+
+export interface ContentMetrics {
+  wordCount: number;
+  tableCount: number;
+  diagramCount: number;
+  internalLinks: number;
+  externalLinks: number;
+  sectionCount: SectionCount;
+  codeBlockCount: number;
+  bulletRatio: number;
+  hasOverview: boolean;
+  hasConclusion: boolean;
+  structuralScore: number;
+  structuralScoreNormalized: number;
+}
+
+export interface QualityDiscrepancy {
+  current: number;
+  suggested: number;
+  discrepancy: number;
+  flag: 'large' | 'minor' | 'ok';
+}
+
 /**
  * Extract all structural metrics from MDX content
- * @param {string} content - Raw MDX file content
- * @param {string} filePath - File path for content-type detection
- * @returns {object} Metrics object
  */
-export function extractMetrics(content, filePath = '') {
+export function extractMetrics(content: string, filePath: string = ''): ContentMetrics {
   // Remove frontmatter for analysis
   const bodyContent = content.replace(/^---\n[\s\S]*?\n---\n?/, '');
 
   // Remove import statements
   const contentNoImports = bodyContent.replace(/^import\s+.*$/gm, '');
 
-  const metrics = {
+  const metrics: ContentMetrics = {
     // Raw counts
     wordCount: countWords(contentNoImports),
     tableCount: countTables(contentNoImports),
@@ -52,7 +77,7 @@ export function extractMetrics(content, filePath = '') {
 /**
  * Count words in content (excluding code blocks and JSX)
  */
-export function countWords(content) {
+export function countWords(content: string): number {
   let text = content;
   // Remove code blocks
   text = text.replace(/```[\s\S]*?```/g, '');
@@ -80,11 +105,7 @@ export function countWords(content) {
 /**
  * Count markdown tables
  */
-export function countTables(content) {
-  // Match table rows (lines with | at start and end)
-  const tableRowPattern = /^\|.+\|$/gm;
-  const rows = content.match(tableRowPattern) || [];
-
+export function countTables(content: string): number {
   // Count separator rows to determine table count
   const separatorPattern = /^\|[\s-:|]+\|$/gm;
   const separators = content.match(separatorPattern) || [];
@@ -95,7 +116,7 @@ export function countTables(content) {
 /**
  * Count Mermaid diagrams
  */
-export function countDiagrams(content) {
+export function countDiagrams(content: string): number {
   // Match Mermaid component usage
   const mermaidComponent = /<Mermaid[^>]*>/g;
   const componentMatches = content.match(mermaidComponent) || [];
@@ -110,7 +131,7 @@ export function countDiagrams(content) {
 /**
  * Count internal links (links to other pages in the knowledge base)
  */
-export function countInternalLinks(content) {
+export function countInternalLinks(content: string): number {
   // Match markdown links to internal paths
   const internalLinkPattern = /\]\(\/[^)]+\)/g;
   const mdLinks = content.match(internalLinkPattern) || [];
@@ -129,7 +150,7 @@ export function countInternalLinks(content) {
 /**
  * Count external links (links to outside sources)
  */
-export function countExternalLinks(content) {
+export function countExternalLinks(content: string): number {
   // Match markdown links to external URLs
   const externalLinkPattern = /\]\(https?:\/\/[^)]+\)/g;
   const matches = content.match(externalLinkPattern) || [];
@@ -139,7 +160,7 @@ export function countExternalLinks(content) {
 /**
  * Count h2 and h3 sections
  */
-function countSections(content) {
+function countSections(content: string): SectionCount {
   const h2Pattern = /^##\s+/gm;
   const h3Pattern = /^###\s+/gm;
   const h2s = content.match(h2Pattern) || [];
@@ -150,7 +171,7 @@ function countSections(content) {
 /**
  * Count code blocks
  */
-function countCodeBlocks(content) {
+function countCodeBlocks(content: string): number {
   const codeBlockPattern = /```[\s\S]*?```/g;
   const matches = content.match(codeBlockPattern) || [];
   return matches.length;
@@ -159,7 +180,7 @@ function countCodeBlocks(content) {
 /**
  * Calculate ratio of content in bullet points (0-1)
  */
-function calculateBulletRatio(content) {
+function calculateBulletRatio(content: string): number {
   // Remove code blocks first
   let text = content.replace(/```[\s\S]*?```/g, '');
 
@@ -176,7 +197,7 @@ function calculateBulletRatio(content) {
 /**
  * Check if content has a specific section
  */
-function hasSection(content, pattern) {
+function hasSection(content: string, pattern: RegExp): boolean {
   return pattern.test(content);
 }
 
@@ -184,7 +205,7 @@ function hasSection(content, pattern) {
  * Calculate structural score (0-15)
  * Based on countable/measurable aspects of content
  */
-function calculateStructuralScore(metrics) {
+function calculateStructuralScore(metrics: ContentMetrics): number {
   let score = 0;
 
   // Word count: 0-2 pts
@@ -221,21 +242,8 @@ function calculateStructuralScore(metrics) {
 
 /**
  * Suggest quality rating based on structural score and frontmatter
- * @param {number} structuralScore - Raw structural score (0-15)
- * @param {object} frontmatter - Page frontmatter (optional)
- * @returns {number} Suggested quality rating (0-100)
- *
- * Mapping: structural score 0-15 → quality 0-100
- * - 12+ → 80+ (comprehensive)
- * - 9-11 → 60-79 (good)
- * - 6-8 → 40-59 (adequate)
- * - 3-5 → 20-39 (draft)
- * - 0-2 → 0-19 (stub)
- *
- * Adjustments:
- * - Stub pages: capped at 35 (explicitly marked as minimal)
  */
-export function suggestQuality(structuralScore, frontmatter = {}) {
+export function suggestQuality(structuralScore: number, frontmatter: Record<string, unknown> = {}): number {
   // Linear mapping: score 0 → quality 0, score 15 → quality 100
   let quality = Math.round((structuralScore / 15) * 100);
 
@@ -250,9 +258,8 @@ export function suggestQuality(structuralScore, frontmatter = {}) {
 
 /**
  * Get quality discrepancy between current and suggested
- * @returns {object} { current, suggested, discrepancy, flag }
  */
-export function getQualityDiscrepancy(currentQuality, structuralScore) {
+export function getQualityDiscrepancy(currentQuality: number, structuralScore: number): QualityDiscrepancy {
   const suggested = suggestQuality(structuralScore);
   const discrepancy = currentQuality - suggested;
 

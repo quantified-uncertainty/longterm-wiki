@@ -12,8 +12,8 @@
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, relative } from 'path';
 import { execFileSync } from 'child_process';
-import { createLogger } from '../lib/output.mjs';
-import { parseFrontmatter } from '../lib/mdx-utils.mjs';
+import { createLogger } from '../lib/output.ts';
+import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.js';
 
 // ---------------------------------------------------------------------------

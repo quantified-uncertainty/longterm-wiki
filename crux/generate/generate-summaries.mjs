@@ -27,9 +27,9 @@
  *   ANTHROPIC_API_KEY - Required API key (from .env file)
  */
 
-import { articles, sources, summaries } from '../lib/knowledge-db.mjs';
-import { getColors } from '../lib/output.mjs';
-import { createClient, resolveModel, sleep } from '../lib/anthropic.mjs';
+import { articles, sources, summaries } from '../lib/knowledge-db.ts';
+import { getColors } from '../lib/output.ts';
+import { createClient, resolveModel, sleep } from '../lib/anthropic.ts';
 
 const args = process.argv.slice(2);
 

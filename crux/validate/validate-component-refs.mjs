@@ -17,8 +17,8 @@
 import { readFileSync } from 'fs';
 
 // Use shared libraries
-import { findMdxFiles } from '../lib/file-utils.mjs';
-import { createLogger, formatPath } from '../lib/output.mjs';
+import { findMdxFiles } from '../lib/file-utils.ts';
+import { createLogger, formatPath } from '../lib/output.ts';
 import { CONTENT_DIR, DATA_DIR, loadDatabase as loadDatabaseJson } from '../lib/content-types.js';
 
 const log = createLogger();

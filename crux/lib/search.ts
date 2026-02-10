@@ -5,7 +5,7 @@
  * for CLI tooling and server-side operations.
  *
  * Usage:
- *   import { search } from './lib/search.mjs';
+ *   import { search } from './lib/search.ts';
  *   const results = search('alignment tax');
  */
 
@@ -15,13 +15,31 @@ import MiniSearch from 'minisearch';
 
 const APP_DATA_DIR = join(process.cwd(), 'app/src/data');
 
-let _miniSearch = null;
-let _docs = null;
+export interface SearchResult {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  numericId: string;
+  score: number;
+}
+
+interface SearchDoc {
+  id: string;
+  title?: string;
+  description?: string;
+  type?: string;
+  numericId?: string;
+  importance?: number;
+}
+
+let _miniSearch: MiniSearch | null = null;
+let _docs: Map<string, SearchDoc> | null = null;
 
 /**
  * Load or return the cached MiniSearch instance and docs.
  */
-function getSearchEngine() {
+function getSearchEngine(): { miniSearch: MiniSearch; docs: Map<string, SearchDoc> } {
   if (_miniSearch && _docs) return { miniSearch: _miniSearch, docs: _docs };
 
   const indexPath = join(APP_DATA_DIR, 'search-index.json');
@@ -34,7 +52,7 @@ function getSearchEngine() {
   }
 
   const indexText = readFileSync(indexPath, 'utf-8');
-  const docsJSON = JSON.parse(readFileSync(docsPath, 'utf-8'));
+  const docsJSON: SearchDoc[] = JSON.parse(readFileSync(docsPath, 'utf-8'));
 
   _miniSearch = MiniSearch.loadJSON(indexText, {
     fields: ['title', 'description', 'tags', 'entityType', 'id'],
@@ -47,13 +65,8 @@ function getSearchEngine() {
 
 /**
  * Search the index and return enriched results.
- *
- * @param {string} query - Search query string
- * @param {object} [options] - MiniSearch search options override
- * @param {number} [limit=20] - Maximum results to return
- * @returns {Array<{ id: string, title: string, description: string, type: string, numericId: string, score: number }>}
  */
-export function search(query, options = {}, limit = 20) {
+export function search(query: string, options: Record<string, unknown> = {}, limit: number = 20): SearchResult[] {
   const { miniSearch, docs } = getSearchEngine();
 
   const raw = miniSearch.search(query, {
@@ -66,8 +79,8 @@ export function search(query, options = {}, limit = 20) {
   const q = query.trim().toLowerCase();
 
   // Re-rank: exact title match bonus + mild importance tiebreaker
-  const scored = raw.map(hit => {
-    const doc = docs.get(hit.id) || {};
+  const scored = raw.map((hit: { id: string; score: number }) => {
+    const doc = docs.get(hit.id) || {} as SearchDoc;
     const title = (doc.title || '').toLowerCase();
 
     let boost = 1.0;
@@ -84,6 +97,6 @@ export function search(query, options = {}, limit = 20) {
     };
   });
 
-  scored.sort((a, b) => b.score - a.score);
+  scored.sort((a: SearchResult, b: SearchResult) => b.score - a.score);
   return scored.slice(0, limit);
 }

@@ -21,8 +21,8 @@
 
 import { readFileSync, writeFileSync } from 'fs';
 import { createInterface } from 'readline';
-import { findMdxFiles } from './lib/file-utils.mjs';
-import { getColors } from './lib/output.mjs';
+import { findMdxFiles } from './lib/file-utils.ts';
+import { getColors } from './lib/output.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities } from './lib/content-types.js';
 
 // Load path registry for EntityLink conversion

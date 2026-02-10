@@ -5,7 +5,7 @@
  */
 
 import { execSync } from 'child_process';
-import { getColors } from './lib/output.mjs';
+import { getColors } from './lib/output.ts';
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');

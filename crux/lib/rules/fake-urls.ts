@@ -12,7 +12,7 @@
 
 import { createRule, Issue, Severity } from '../validation-engine.js';
 import type { ContentFile, ValidationEngine } from '../validation-engine.js';
-import { isInCodeBlock, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
+import { isInCodeBlock, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
 
 // Fake URL patterns to detect
 const FAKE_URL_PATTERNS: { pattern: RegExp; name: string; severity: string }[] = [

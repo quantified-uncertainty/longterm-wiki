@@ -15,10 +15,10 @@
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join, basename } from 'path';
 import { parse as parseYaml } from 'yaml';
-import { findMdxFiles } from '../lib/file-utils.mjs';
-import { getColors } from '../lib/output.mjs';
+import { findMdxFiles } from '../lib/file-utils.ts';
+import { getColors } from '../lib/output.ts';
 import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.js';
-import { parseFrontmatter, shouldSkipValidation } from '../lib/mdx-utils.mjs';
+import { parseFrontmatter, shouldSkipValidation } from '../lib/mdx-utils.ts';
 
 const colors = getColors();
 

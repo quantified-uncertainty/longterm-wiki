@@ -4,16 +4,13 @@
  * Common file discovery and traversal functions used across validators and generators.
  */
 
-import { existsSync, readdirSync, statSync } from 'fs';
+import { existsSync, readdirSync, statSync, type Stats } from 'fs';
 import { join } from 'path';
 
 /**
  * Find all MDX/MD files recursively in a directory
- * @param {string} dir - Directory to search
- * @param {string[]} results - Accumulator for results (internal use)
- * @returns {string[]} Array of file paths
  */
-export function findMdxFiles(dir, results = []) {
+export function findMdxFiles(dir: string, results: string[] = []): string[] {
   if (!existsSync(dir)) return results;
 
   try {
@@ -35,12 +32,8 @@ export function findMdxFiles(dir, results = []) {
 
 /**
  * Find files matching specific extensions recursively
- * @param {string} dir - Directory to search
- * @param {string[]} extensions - Array of extensions to match (e.g., ['.yaml', '.yml'])
- * @param {string[]} results - Accumulator for results (internal use)
- * @returns {string[]} Array of file paths
  */
-export function findFiles(dir, extensions, results = []) {
+export function findFiles(dir: string, extensions: string[], results: string[] = []): string[] {
   if (!existsSync(dir)) return results;
 
   try {
@@ -62,10 +55,8 @@ export function findFiles(dir, extensions, results = []) {
 
 /**
  * Walk a directory tree, calling a callback for each file
- * @param {string} dir - Directory to walk
- * @param {function} callback - Called with (filePath, stat) for each file
  */
-export function walkDirectory(dir, callback) {
+export function walkDirectory(dir: string, callback: (filePath: string, stat: Stats) => void): void {
   if (!existsSync(dir)) return;
 
   try {
@@ -86,16 +77,14 @@ export function walkDirectory(dir, callback) {
 
 /**
  * Get all directories in a path (non-recursive)
- * @param {string} dir - Directory to list
- * @returns {string[]} Array of directory paths
  */
-export function getDirectories(dir) {
+export function getDirectories(dir: string): string[] {
   if (!existsSync(dir)) return [];
 
   try {
     return readdirSync(dir)
-      .map(file => join(dir, file))
-      .filter(path => statSync(path).isDirectory());
+      .map((file: string) => join(dir, file))
+      .filter((dirPath: string) => statSync(dirPath).isDirectory());
   } catch {
     return [];
   }

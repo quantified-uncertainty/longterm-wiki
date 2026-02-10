@@ -18,7 +18,7 @@
  */
 
 import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.js';
-import { isInCodeBlock } from '../mdx-utils.mjs';
+import { isInCodeBlock } from '../mdx-utils.ts';
 
 // Pattern: line starting with a number > 1 followed by period and space
 const NUMBERED_LIST_PATTERN = /^(\d+)\.\s+/;

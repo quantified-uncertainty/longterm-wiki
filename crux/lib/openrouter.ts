@@ -19,7 +19,7 @@ const BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
 /**
  * Available models for different use cases
  */
-export const MODELS = {
+export const MODELS: Record<string, string> = {
   // Research (with web search built-in)
   PERPLEXITY_SONAR: 'perplexity/sonar',
   PERPLEXITY_SONAR_PRO: 'perplexity/sonar-pro',
@@ -33,10 +33,25 @@ export const MODELS = {
   GPT4O_MINI: 'openai/gpt-4o-mini',
 };
 
+export interface OpenRouterOptions {
+  model?: string;
+  maxTokens?: number;
+  temperature?: number;
+  systemPrompt?: string | null;
+}
+
+export interface OpenRouterResult {
+  content: string;
+  citations: string[];
+  model: string;
+  usage: Record<string, unknown>;
+  cost: number;
+}
+
 /**
  * Call OpenRouter API
  */
-export async function callOpenRouter(prompt, options = {}) {
+export async function callOpenRouter(prompt: string, options: OpenRouterOptions = {}): Promise<OpenRouterResult> {
   const {
     model = MODELS.PERPLEXITY_SONAR,
     maxTokens = 2000,
@@ -48,7 +63,7 @@ export async function callOpenRouter(prompt, options = {}) {
     throw new Error('OPENROUTER_API_KEY not set in environment');
   }
 
-  const messages = [];
+  const messages: Array<{ role: string; content: string }> = [];
   if (systemPrompt) {
     messages.push({ role: 'system', content: systemPrompt });
   }
@@ -70,7 +85,13 @@ export async function callOpenRouter(prompt, options = {}) {
     })
   });
 
-  const data = await response.json();
+  const data = await response.json() as {
+    error?: { message?: string };
+    citations?: string[];
+    choices: Array<{ message: { content: string; citations?: string[] } }>;
+    model: string;
+    usage: Record<string, unknown> & { cost?: number };
+  };
 
   if (data.error) {
     throw new Error(`OpenRouter error: ${data.error.message || JSON.stringify(data.error)}`);
@@ -88,10 +109,15 @@ export async function callOpenRouter(prompt, options = {}) {
   };
 }
 
+export interface PerplexityResearchOptions {
+  maxTokens?: number;
+  detailed?: boolean;
+}
+
 /**
  * Perplexity research query - returns structured research with citations
  */
-export async function perplexityResearch(query, options = {}) {
+export async function perplexityResearch(query: string, options: PerplexityResearchOptions = {}): Promise<OpenRouterResult> {
   const {
     maxTokens = 2000,
     detailed = false,
@@ -117,16 +143,32 @@ Format your response with clear sections and bullet points.`;
   });
 }
 
+export interface BatchQuery {
+  query: string;
+  category: string;
+  detailed?: boolean;
+}
+
+export interface BatchResearchResult extends OpenRouterResult {
+  query: string;
+  category: string;
+}
+
+export interface BatchResearchOptions {
+  concurrency?: number;
+  delayMs?: number;
+}
+
 /**
  * Batch research - run multiple queries in parallel
  */
-export async function batchResearch(queries, options = {}) {
+export async function batchResearch(queries: BatchQuery[], options: BatchResearchOptions = {}): Promise<BatchResearchResult[]> {
   const {
     concurrency = 3,
     delayMs = 500,
   } = options;
 
-  const results = [];
+  const results: BatchResearchResult[] = [];
 
   // Process in batches to avoid rate limits
   for (let i = 0; i < queries.length; i += concurrency) {
@@ -143,17 +185,19 @@ export async function batchResearch(queries, options = {}) {
 
     // Small delay between batches
     if (i + concurrency < queries.length) {
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      await new Promise<void>(resolve => setTimeout(resolve, delayMs));
     }
   }
 
   return results;
 }
 
+type TopicType = 'organization' | 'person' | 'event' | 'concept';
+
 /**
  * Detect topic type using heuristics
  */
-function detectTopicType(topic) {
+function detectTopicType(topic: string): TopicType {
   const lowerTopic = topic.toLowerCase();
 
   // Known AI organizations (hardcoded for accuracy)
@@ -203,10 +247,15 @@ function detectTopicType(topic) {
   return 'concept';
 }
 
+export interface ResearchQuery {
+  query: string;
+  category: string;
+}
+
 /**
  * Generate adversarial queries tailored to topic type
  */
-function generateAdversarialQueries(topic, topicType) {
+function generateAdversarialQueries(topic: string, topicType: TopicType): ResearchQuery[] {
   switch (topicType) {
     case 'organization':
       return [
@@ -243,12 +292,12 @@ function generateAdversarialQueries(topic, topicType) {
 /**
  * Generate research queries for a topic
  */
-export function generateResearchQueries(topic) {
+export function generateResearchQueries(topic: string): ResearchQuery[] {
   const topicType = detectTopicType(topic);
   const adversarialQueries = generateAdversarialQueries(topic, topicType);
 
   // Base queries (some vary by type)
-  const baseQueries = [
+  const baseQueries: ResearchQuery[] = [
     { query: `What is ${topic}? Overview, mission, and key facts`, category: 'overview' },
     { query: `${topic} history founding story timeline key events`, category: 'history' },
   ];
@@ -286,7 +335,7 @@ export function generateResearchQueries(topic) {
   }
 
   // Common queries for all types
-  const commonQueries = [
+  const commonQueries: ResearchQuery[] = [
     { query: `${topic} news articles recent developments 2024 2025`, category: 'news' },
     { query: `${topic} AI safety alignment existential risk connection`, category: 'ai-safety' },
     { query: `${topic} EA Forum LessWrong discussion community opinion`, category: 'community' },
@@ -298,7 +347,7 @@ export function generateResearchQueries(topic) {
 /**
  * Quick single research call (for testing)
  */
-export async function quickResearch(topic) {
+export async function quickResearch(topic: string): Promise<OpenRouterResult> {
   const query = `Give me a comprehensive overview of "${topic}" including:
 - What it is and its mission
 - Key people and leadership
