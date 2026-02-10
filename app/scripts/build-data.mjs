@@ -308,7 +308,7 @@ function buildPathRegistry() {
   scanDirectory(join(CONTENT_DIR, 'knowledge-base'), '/knowledge-base');
 
   // Also scan other top-level content directories
-  const topLevelDirs = ['ai-transition-model', 'analysis', 'getting-started'];
+  const topLevelDirs = ['ai-transition-model', 'analysis', 'getting-started', 'browse', 'internal', 'style-guides'];
   for (const topDir of topLevelDirs) {
     const dirPath = join(CONTENT_DIR, topDir);
     if (existsSync(dirPath)) {

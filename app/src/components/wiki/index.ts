@@ -10,4 +10,4 @@ export { CredibilityBadge } from "./CredibilityBadge";
 export { ResourceTags } from "./ResourceTags";
 export { F } from "./F";
 export { SquiggleEstimate } from "./SquiggleEstimate";
-export { Mermaid } from "./Mermaid";
+
