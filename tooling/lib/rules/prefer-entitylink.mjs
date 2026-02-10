@@ -11,7 +11,7 @@
  */
 
 import { createRule, Issue, Severity } from '../validation-engine.js';
-import { isInCodeBlock, isInComment, getLineNumber } from '../mdx-utils.mjs';
+import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
 
 // Internal paths that should use EntityLink
 const INTERNAL_PATH_PATTERNS = [
@@ -67,14 +67,9 @@ export const preferEntityLinkRule = createRule({
     const issues = [];
     const body = content.body;
 
-    // Skip documentation and stub pages
-    if (content.frontmatter.pageType === 'documentation' ||
-        content.frontmatter.pageType === 'stub') {
-      return issues;
-    }
-
-    // Skip internal docs
-    if (content.relativePath.includes('/internal/')) {
+    // Skip documentation, stub, and internal pages
+    if (shouldSkipValidation(content.frontmatter) ||
+        content.relativePath.includes('/internal/')) {
       return issues;
     }
 

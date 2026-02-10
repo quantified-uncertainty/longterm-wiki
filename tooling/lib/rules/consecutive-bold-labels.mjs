@@ -35,41 +35,37 @@ export const consecutiveBoldLabelsRule = createRule({
   check(content, engine) {
     const issues = [];
     const lines = content.body.split('\n');
+    // position tracks the byte offset of lines[i-1] in the body
     let position = 0;
 
+    // This rule checks pairs of consecutive lines, so matchLinesOutsideCode doesn't apply
     for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
       const prevLine = lines[i - 1];
+      const line = lines[i];
       const lineNum = i + 1;
 
-      // Check if current line starts with a bold label
-      if (BOLD_LABEL_PATTERN.test(line)) {
-        // Check if previous line also starts with a bold label (consecutive)
-        if (BOLD_LABEL_PATTERN.test(prevLine)) {
-          // Calculate position of current line for code block check
-          const linePosition = position + prevLine.length + 1;
+      if (BOLD_LABEL_PATTERN.test(line) && BOLD_LABEL_PATTERN.test(prevLine)) {
+        const linePosition = position + prevLine.length + 1;
 
-          // Check we're not in a code block
-          if (!isInCodeBlock(content.body, linePosition)) {
-            const labelMatch = line.match(/^\*\*([^*]+)\*\*:/);
-            const label = labelMatch ? labelMatch[1] : 'Label';
+        if (!isInCodeBlock(content.body, linePosition)) {
+          const labelMatch = line.match(/^\*\*([^*]+)\*\*:/);
+          const label = labelMatch ? labelMatch[1] : 'Label';
 
-            issues.push(new Issue({
-              rule: this.id,
-              file: content.path,
-              line: lineNum,
-              message: `Consecutive bold label "**${label}**:" needs a blank line before it (otherwise all labels render on one line). Previous line also has a bold label.`,
-              severity: Severity.ERROR,
-              fix: {
-                type: FixType.INSERT_LINE_BEFORE,
-                content: '',
-              },
-            }));
-          }
+          issues.push(new Issue({
+            rule: this.id,
+            file: content.path,
+            line: lineNum,
+            message: `Consecutive bold label "**${label}**:" needs a blank line before it (otherwise all labels render on one line). Previous line also has a bold label.`,
+            severity: Severity.ERROR,
+            fix: {
+              type: FixType.INSERT_LINE_BEFORE,
+              content: '',
+            },
+          }));
         }
       }
 
-      position += line.length + 1;
+      position += prevLine.length + 1;
     }
 
     return issues;

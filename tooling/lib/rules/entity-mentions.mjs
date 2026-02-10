@@ -14,7 +14,7 @@
  */
 
 import { createRule, Issue, Severity } from '../validation-engine.js';
-import { isInCodeBlock, isInComment, getLineNumber } from '../mdx-utils.mjs';
+import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
@@ -379,11 +379,8 @@ export const entityMentionsRule = createRule({
 
     for (const content of contentFiles) {
       // Skip documentation, stubs, and internal pages
-      if (
-        content.frontmatter.pageType === 'documentation' ||
-        content.frontmatter.pageType === 'stub' ||
-        content.relativePath.includes('/internal/')
-      ) {
+      if (shouldSkipValidation(content.frontmatter) ||
+          content.relativePath.includes('/internal/')) {
         continue;
       }
 
