@@ -1,0 +1,26 @@
+name: "UI / frontend bug"
+description: "Report a rendering issue, broken layout, or other UI problem"
+labels: ["bug", "ui"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page URL
+      description: "Where did you encounter the issue?"
+      placeholder: "e.g. /wiki/E441 or /wiki"
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: "Describe the issue. Screenshots are very helpful — drag and drop them here"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: "e.g. Chrome 120 on macOS, Safari on iPhone 15"

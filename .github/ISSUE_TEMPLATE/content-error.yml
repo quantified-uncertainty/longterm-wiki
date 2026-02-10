@@ -1,0 +1,36 @@
+name: "Content error"
+description: "Report an error, inaccuracy, or outdated information on a wiki page"
+labels: ["content-error"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: "Which page has the error? (URL or title)"
+      placeholder: "e.g. /wiki/E441 or Scheming & Deception Detection"
+    validations:
+      required: true
+  - type: dropdown
+    id: error-type
+    attributes:
+      label: Type of error
+      options:
+        - Factual inaccuracy
+        - Outdated information
+        - Broken link or missing reference
+        - Typo or grammar
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What's wrong?
+      description: "Describe the error and where on the page it appears"
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: Suggested correction
+      description: "If you know the correct information, include it here along with any sources"
