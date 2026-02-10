@@ -9,6 +9,16 @@ export interface NavSection {
   items: NavItem[];
 }
 
+/**
+ * Internal sidebar navigation.
+ * Section semantics:
+ *  - Overview: project-level pages (vision, strategy, roadmap)
+ *  - Dashboards & Tools: interactive tools and dashboards
+ *  - Architecture & Schema: technical docs (data schema, architecture, data flow)
+ *  - Style Guides: writing and content style guides
+ *  - Experiments: experimental features and prototypes
+ *  - Research: research reports and proposals (theoretical, not technical docs)
+ */
 export const INTERNAL_NAV: NavSection[] = [
   {
     title: "Overview",
@@ -16,7 +26,6 @@ export const INTERNAL_NAV: NavSection[] = [
     items: [
       { label: "Internal Home", href: "/internal" },
       { label: "About This Wiki", href: "/internal/about-this-wiki" },
-      { label: "Architecture", href: "/internal/architecture" },
       { label: "Vision", href: "/internal/longterm-vision" },
       { label: "Strategy", href: "/internal/longterm-strategy" },
       { label: "Roadmap", href: "/internal/project-roadmap" },
@@ -67,6 +76,12 @@ export const INTERNAL_NAV: NavSection[] = [
       { label: "Cross-Link Automation", href: "/internal/reports/cross-link-automation-proposal" },
       { label: "Diagram Naming", href: "/internal/reports/diagram-naming-research" },
       { label: "Page Creator Pipeline", href: "/internal/reports/page-creator-pipeline" },
+    ],
+  },
+  {
+    title: "Architecture & Schema",
+    items: [
+      { label: "Architecture", href: "/internal/architecture" },
       { label: "Schema Overview", href: "/internal/schema" },
       { label: "Entity Reference", href: "/internal/schema/entities" },
       { label: "Schema Diagrams", href: "/internal/schema/diagrams" },

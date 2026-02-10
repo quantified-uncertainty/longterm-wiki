@@ -59236,30 +59236,30 @@
       "ai-safety"
     ],
     "metrics": {
-      "wordCount": 401,
-      "tableCount": 1,
+      "wordCount": 677,
+      "tableCount": 5,
       "diagramCount": 11,
       "internalLinks": 0,
       "externalLinks": 0,
       "bulletRatio": 0,
-      "sectionCount": 15,
+      "sectionCount": 17,
       "hasOverview": false,
-      "structuralScore": 6
+      "structuralScore": 8
     },
-    "suggestedQuality": 40,
-    "wordCount": 401,
+    "suggestedQuality": 53,
+    "wordCount": 677,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 10,
+      "maxSimilarity": 12,
       "similarPages": [
         {
           "id": "entities",
           "title": "Entity Type Reference",
           "path": "/internal/schema/entities/",
-          "similarity": 10
+          "similarity": 12
         }
       ]
     }
@@ -59302,13 +59302,13 @@
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 10,
+      "maxSimilarity": 12,
       "similarPages": [
         {
           "id": "diagrams",
           "title": "Schema Diagrams",
           "path": "/internal/schema/diagrams/",
-          "similarity": 10
+          "similarity": 12
         }
       ]
     }

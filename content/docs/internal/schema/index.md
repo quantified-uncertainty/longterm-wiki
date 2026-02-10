@@ -13,43 +13,35 @@ This wiki is backed by a typed data layer defined in `data/schema.ts` using [Zod
 ## Architecture at a Glance
 
 <Mermaid chart={`
-flowchart LR
-    subgraph DataLayer["📁 Data Layer (YAML)"]
-        direction TB
-        Entities["entities/*.yaml<br/><i>~25 files</i>"]
-        Resources["resources/*.yaml"]
-        Facts["facts/*.yaml"]
-        Graphs["graphs/*.yaml"]
-        Experts["experts.yaml"]
-        Orgs["organizations.yaml"]
-        Pubs["publications.yaml"]
-        Other["estimates, cruxes,<br/>glossary, timeline"]
+flowchart TD
+    subgraph DataLayer["Data Layer"]
+        YAML["YAML files"]
+        MDX["MDX pages"]
     end
 
-    subgraph Schema["📐 Schema (Zod)"]
-        direction TB
-        ZodTypes["data/schema.ts<br/><i>834 lines, 20+ types</i>"]
-        Validators["tooling/validate/<br/><i>integrity checks</i>"]
+    subgraph Schema["Validation"]
+        Zod["Zod schemas"]
+        Val["Integrity checks"]
     end
 
-    subgraph Build["🔧 Build Pipeline"]
-        direction TB
-        BuildScript["build-data.mjs"]
+    subgraph Build["Build"]
+        Script["build-data.mjs"]
         DB["database.json"]
-        IDReg["id-registry.json"]
-        SearchIdx["search index"]
     end
 
-    subgraph Frontend["🖥️ Next.js App"]
-        direction TB
-        DataAPI["data/index.ts<br/><i>getTypedEntityById()</i>"]
-        Pages["wiki/[id]/page.tsx"]
-        Components["InfoBox, Graph,<br/>EntityLink, etc."]
+    subgraph App["Next.js App"]
+        API["Data API"]
+        Pages["Wiki pages"]
     end
 
     DataLayer --> Schema
     Schema --> Build
-    Build --> Frontend
+    Build --> App
+
+    style DataLayer fill:#fff4e1
+    style Schema fill:#cceeff
+    style Build fill:#e1f5ff
+    style App fill:#ccffcc
 `} />
 
 ## Core Concepts

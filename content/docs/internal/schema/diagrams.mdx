@@ -170,6 +170,8 @@ classDiagram
 
 These types have their own YAML files and are separate from the entity system.
 
+### Expert & Organization
+
 <Mermaid chart={`
 classDiagram
     class Expert {
@@ -178,9 +180,6 @@ classDiagram
         String affiliation
         String role
         String website
-        String twitter
-        String[] knownFor
-        String background
         ExpertPosition[] positions
     }
 
@@ -190,8 +189,6 @@ classDiagram
         String estimate
         Confidence confidence
         String date
-        String source
-        String sourceUrl
     }
 
     class Organization {
@@ -200,21 +197,23 @@ classDiagram
         +OrgType type
         String founded
         String headquarters
-        String website
-        String description
         String[] keyPeople
         String funding
-        String employees
-        String safetyFocus
-        String parentOrg
     }
 
+    Expert *-- ExpertPosition
+    Expert --> Organization : affiliation
+    Organization --> Expert : keyPeople
+`} />
+
+### Estimate & Crux
+
+<Mermaid chart={`
+classDiagram
     class Estimate {
         +String id
         +String variable
-        String description
         String unit
-        String aggregateRange
         String category
         EstimateSource[] estimates
     }
@@ -223,37 +222,46 @@ classDiagram
         +String source
         +String value
         String date
-        String url
         Confidence confidence
     }
 
     class Crux {
         +String id
         +String question
-        String domain
         +Importance importance
         String resolvability
         CruxPosition[] positions
         String[] relatedCruxes
     }
 
+    Estimate *-- EstimateSource
+`} />
+
+### Resource & Publication
+
+<Mermaid chart={`
+classDiagram
     class Resource {
         +String id
         +String url
         +String title
         ResourceType type
         String[] authors
-        String published_date
         Number importance
         String summary
         String review
-        String[] key_points
         String publication_id
-        String[] tags
     }
 
-    Expert *-- ExpertPosition
-    Estimate *-- EstimateSource
+    class Publication {
+        +String id
+        +String name
+        +PublicationType type
+        +Number credibility
+        Boolean peer_reviewed
+    }
+
+    Resource --> Publication : publication_id
 `} />
 
 ---
@@ -390,65 +398,27 @@ classDiagram
 
 ---
 
-## Relationship Types Map
+## Relationship Types (45 total)
 
-All 45 relationship types, grouped by semantic category. Arrows show directionality (A → B means "A [relationship] B").
+All relationship types grouped by semantic category. "A → B" means "A [relationship] B".
+
+| Category | Types | Semantics |
+|----------|-------|-----------|
+| **Causal** | `causes`, `cause`, `drives`, `driven-by`, `driver`, `affects`, `amplifies`, `leads-to`, `contributes-to`, `shaped-by` | A influences or produces B |
+| **Mitigation** | `mitigates`, `mitigated-by`, `mitigation`, `blocks`, `addresses` | A reduces or prevents B |
+| **Dependency** | `requires`, `enables`, `prerequisite`, `child-of`, `composed-of`, `component`, `supersedes` | A structurally depends on or contains B |
+| **Measurement** | `measures`, `measured-by`, `analyzes`, `analyzed-by`, `models`, `increases`, `decreases`, `supports` | A quantifies or tracks B |
+| **Classification** | `related`, `example`, `mechanism`, `outcome`, `consequence`, `manifestation`, `key-factor`, `scenario`, `sub-scenario`, `research`, `vulnerable-technique` | A is categorically related to B |
+
+How relationships flow through the system:
 
 <Mermaid chart={`
-flowchart TB
-    subgraph Causal["Causal / Influence"]
-        direction LR
-        causes["causes<br/><i>A causes B</i>"]
-        drives["drives / driven-by"]
-        affects["affects"]
-        amplifies["amplifies"]
-        leads_to["leads-to"]
-        contributes_to["contributes-to"]
-        shaped_by["shaped-by"]
-    end
+flowchart TD
+    A[Entity A] -->|"relatedEntries"| B[Entity B]
+    B -.->|"backlink<br/>(auto-computed)"| A
 
-    subgraph Mitigation["Mitigation / Prevention"]
-        direction LR
-        mitigates["mitigates / mitigated-by"]
-        mitigation["mitigation"]
-        blocks["blocks"]
-        addresses["addresses"]
-    end
-
-    subgraph Dependency["Dependency / Structure"]
-        direction LR
-        requires["requires"]
-        enables["enables"]
-        prerequisite["prerequisite"]
-        child_of["child-of"]
-        composed_of["composed-of"]
-        component["component"]
-        supersedes["supersedes"]
-    end
-
-    subgraph Measurement["Measurement / Analysis"]
-        direction LR
-        measures["measures / measured-by"]
-        analyzes["analyzes / analyzed-by"]
-        models_r["models"]
-        increases["increases"]
-        decreases["decreases"]
-        supports["supports"]
-    end
-
-    subgraph Classification["Classification / Taxonomy"]
-        direction LR
-        related["related"]
-        example["example"]
-        mechanism["mechanism"]
-        outcome["outcome"]
-        consequence["consequence"]
-        manifestation["manifestation"]
-        key_factor["key-factor"]
-        scenario_r["scenario / sub-scenario"]
-        research["research"]
-        vulnerable["vulnerable-technique"]
-    end
+    style A fill:#cceeff
+    style B fill:#cceeff
 `} />
 
 ---
@@ -457,45 +427,28 @@ flowchart TB
 
 ### EntityType (24 canonical + 11 aliases)
 
-<Mermaid chart={`
-flowchart TD
-    subgraph Canonical["Canonical Types (24)"]
-        direction TB
-        subgraph Content["Content"]
-            risk & risk_factor["risk-factor"] & capability & concept & crux & argument & case_study["case-study"]
-        end
-        subgraph Safety["Safety"]
-            safety_agenda["safety-agenda"] & approach & project & policy
-        end
-        subgraph PeopleOrg["People and Organizations"]
-            person & organization & funder
-        end
-        subgraph AnalysisG["Analysis"]
-            model & parameter & metric & analysis & scenario
-        end
-        subgraph ATM["AI Transition Model"]
-            atm_param["...-parameter"] & atm_metric["...-metric"] & atm_scenario["...-scenario"] & atm_factor["...-factor"] & atm_subitem["...-subitem"]
-        end
-        subgraph OtherG["Other"]
-            resource & historical & event & debate & table_t["table"] & diagram & insight & intel_paradigm["intelligence-paradigm"]
-        end
-    end
+**Canonical types by group:**
 
-    subgraph Aliases["Legacy Aliases (11)"]
-        direction TB
-        researcher["researcher → person"]
-        lab["lab → organization"]
-        lab_f["lab-frontier → organization"]
-        lab_r["lab-research → organization"]
-        lab_s["lab-startup → organization"]
-        lab_a["lab-academic → organization"]
-        sa["safety-approaches → safety-agenda"]
-        pol["policies → policy"]
-        con["concepts → concept"]
-        ev["events → event"]
-        mod["models → model"]
-    end
-`} />
+| Group | Types |
+|-------|-------|
+| **Content** | `risk`, `risk-factor`, `capability`, `concept`, `crux`, `argument`, `case-study` |
+| **Safety** | `safety-agenda`, `approach`, `project`, `policy` |
+| **People/Orgs** | `person`, `organization`, `funder` |
+| **Analysis** | `model`, `parameter`, `metric`, `analysis`, `scenario` |
+| **AI Transition** | `ai-transition-model-parameter`, `...metric`, `...scenario`, `...factor`, `...subitem` |
+| **Other** | `resource`, `historical`, `event`, `debate`, `table`, `diagram`, `insight`, `intelligence-paradigm` |
+
+**Legacy aliases** (kept for backward compatibility):
+
+| Alias | Resolves to |
+|-------|-------------|
+| `researcher` | `person` |
+| `lab`, `lab-frontier`, `lab-research`, `lab-startup`, `lab-academic` | `organization` |
+| `safety-approaches` | `safety-agenda` |
+| `policies` | `policy` |
+| `concepts` | `concept` |
+| `events` | `event` |
+| `models` | `model` |
 
 ### Key Enum Values
 
@@ -521,52 +474,58 @@ flowchart TD
 
 ## Data Flow: Build Pipeline
 
-Detailed view of how raw YAML is transformed into the runtime database.
+How `build-data.mjs` transforms raw data into the runtime database.
 
 <Mermaid chart={`
 flowchart TD
     subgraph Input["Source Files"]
-        YAML["entities/*.yaml<br/>resources/*.yaml<br/>facts/*.yaml"]
-        MDX["content/docs/**/*.mdx<br/><i>~625 pages</i>"]
-        StandalonYAML["experts.yaml<br/>organizations.yaml<br/>estimates.yaml<br/>cruxes.yaml<br/>glossary.yaml<br/>publications.yaml"]
+        YAML["YAML data"]
+        MDX["MDX pages"]
     end
 
-    subgraph BuildSteps["build-data.mjs Steps"]
-        direction TB
-        step1["1. Parse all YAML files"]
-        step2["2. Scan MDX frontmatter"]
-        step3["3. Auto-create entities<br/>from MDX without YAML"]
-        step4["4. Assign numeric IDs<br/>(id-registry.json)"]
-        step5["5. Type & validate entities"]
-        step6["6. Compute backlinks<br/>(invert relatedEntries)"]
-        step7["7. Build tag index"]
-        step8["8. Build path registry"]
-        step9["9. Resolve computed facts<br/>(topological sort)"]
-        step10["10. Generate search index"]
-        step11["11. Generate MDX from<br/>YAML ContentSections"]
+    subgraph Parse["1. Parse & Merge"]
+        P1["Parse YAML"]
+        P2["Scan frontmatter"]
+        P3["Auto-create entities"]
     end
 
-    subgraph Output["Generated Files"]
-        DB["database.json<br/><i>entities, backlinks,<br/>tagIndex, facts, insights</i>"]
-        IDReg["id-registry.json"]
-        Search["search index"]
-        GenMDX["generated .mdx stubs"]
+    subgraph Transform["2. Transform"]
+        T1["Assign numeric IDs"]
+        T2["Validate with Zod"]
+        T3["Compute backlinks"]
     end
 
-    Input --> step1
-    MDX --> step2
-    step1 --> step2
-    step2 --> step3
-    step3 --> step4
-    step4 --> step5
-    step5 --> step6
-    step6 --> step7
-    step7 --> step8
-    step8 --> step9
-    step9 --> step10
-    step10 --> step11
-    step11 --> Output
+    subgraph Enrich["3. Enrich"]
+        E1["Resolve facts"]
+        E2["Build indices"]
+        E3["Generate search"]
+    end
+
+    subgraph Output["Output"]
+        DB["database.json"]
+        Reg["id-registry.json"]
+    end
+
+    Input --> Parse
+    Parse --> Transform
+    Transform --> Enrich
+    Enrich --> Output
+
+    style Input fill:#fff4e1
+    style Parse fill:#cceeff
+    style Transform fill:#e1f5ff
+    style Enrich fill:#cceeff
+    style Output fill:#ccffcc
 `} />
+
+**Detailed steps within `build-data.mjs`:**
+
+| Phase | Steps |
+|-------|-------|
+| **Parse** | Parse all YAML files, scan MDX frontmatter, auto-create entities for MDX pages without YAML |
+| **Transform** | Assign stable numeric IDs (E1, E2...), type and validate against Zod, compute backlinks (invert relatedEntries) |
+| **Enrich** | Build tag index, build path registry, resolve computed facts (topological sort), generate search index, generate MDX stubs from YAML ContentSections |
+| **Output** | Write `database.json`, `id-registry.json`, individual JSON files, search index |
 
 ---
 
@@ -627,36 +586,6 @@ lastReviewed: "2025-12-26"
 reviewedBy: "ozzie"
 stalenessRisk: "low"             # low | medium | high
 ```
-
----
-
-## Publication & Credibility System
-
-Resources are linked to publications for credibility scoring.
-
-<Mermaid chart={`
-classDiagram
-    class Publication {
-        +String id
-        +String[] domains
-        +String name
-        +PublicationType type
-        +Number credibility
-        Boolean peer_reviewed
-        String description
-    }
-
-    class Resource {
-        +String id
-        +String url
-        String publication_id
-        Number credibility_override
-    }
-
-    Resource --> Publication : publication_id
-
-    note for Publication "credibility: 1-5 scale\n5 = gold standard (Nature, Science)\n1 = unvetted source"
-`} />
 
 ---
 

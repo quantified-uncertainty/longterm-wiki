@@ -100,7 +100,7 @@
     },
     {
       "file": "internal/schema/index.md",
-      "line": 99,
+      "line": 91,
       "href": "/internal/facts",
       "text": "Fact Dashboard"
     },
@@ -144,7 +144,7 @@
     },
     {
       "file": "internal/schema/index.md",
-      "line": 70,
+      "line": 62,
       "href": "/internal/schema/entities",
       "issues": [
         "missing-trailing-slash"
@@ -152,7 +152,7 @@
     },
     {
       "file": "internal/schema/index.md",
-      "line": 97,
+      "line": 89,
       "href": "/internal/schema/entities",
       "issues": [
         "missing-trailing-slash"
@@ -160,7 +160,7 @@
     },
     {
       "file": "internal/schema/index.md",
-      "line": 98,
+      "line": 90,
       "href": "/internal/schema/diagrams",
       "issues": [
         "missing-trailing-slash"
@@ -168,7 +168,7 @@
     },
     {
       "file": "internal/schema/index.md",
-      "line": 99,
+      "line": 91,
       "href": "/internal/facts",
       "issues": [
         "missing-trailing-slash"
@@ -176,7 +176,7 @@
     },
     {
       "file": "internal/schema/index.md",
-      "line": 141,
+      "line": 133,
       "href": "/internal/schema/entities",
       "issues": [
         "missing-trailing-slash"
