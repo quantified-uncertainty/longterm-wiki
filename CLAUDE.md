@@ -54,3 +54,34 @@ longterm-wiki/
 - **Entity types**: risk, person, organization, approach, model, concept, etc.
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
+
+## Squiggle Model Style Guide
+
+When creating or editing `<SquiggleEstimate>` models in MDX pages, follow these conventions:
+
+### Distribution Design
+- **Never use point values in mixtures.** `mixture(500e9, 350e9, ...)` creates jagged multimodal spikes. Use continuous distributions: `mixture(400e9 to 650e9, 250e9 to 450e9, ...)`.
+- **Use `X to Y` (log-normal) syntax** for quantities with natural uncertainty ranges. Reserve `normal()` for symmetric quantities near zero.
+- **Prefer broad, overlapping scenario ranges** that reflect genuine uncertainty rather than narrow point estimates. Scenarios should capture the *range* of each case, not a single number.
+
+### Model Structure
+- **Keep models 5–30 lines.** Break larger analyses into multiple `<SquiggleEstimate>` blocks with descriptive titles.
+- **Comment key assumptions** inline (e.g., `// 80% pledged based on GWWC data`).
+- **Name intermediate variables clearly**: `founderEquity`, `pledgedAmount` — not `x`, `temp`.
+- **Always title the estimate**: `<SquiggleEstimate title="Descriptive Title" code={...} />`.
+
+### Performance
+- The default `sampleCount` is 5000. This is sufficient for most models. For models with many nested operations or very wide distributions, consider whether the output distribution is smooth enough.
+
+### Usage Pattern
+```mdx
+<SquiggleEstimate title="Expected Revenue (2026)" code={`
+// Revenue scenarios with probability weights
+high = 8e9 to 15e9
+base = 4e9 to 9e9
+low = 1e9 to 4e9
+
+revenue = mixture(high, base, low, [0.2, 0.5, 0.3])
+revenue
+`} />
+```

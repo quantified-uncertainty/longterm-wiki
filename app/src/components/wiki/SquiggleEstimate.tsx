@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 
 const defaultEnvironment = {
   seed: "cairn",
-  sampleCount: 1000,
+  sampleCount: 5000,
   xyPointLength: 1000,
 };
 
