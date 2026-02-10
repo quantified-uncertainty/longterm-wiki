@@ -9,9 +9,9 @@
  * 3. Re-grade improved pages
  *
  * Usage:
- *   node tooling/content/post-improve.mjs              # Run all fixes
- *   node tooling/content/post-improve.mjs --fix-only   # Only fix, don't re-grade
- *   node tooling/content/post-improve.mjs --grade-only # Only re-grade
+ *   node tooling/authoring/post-improve.mjs              # Run all fixes
+ *   node tooling/authoring/post-improve.mjs --fix-only   # Only fix, don't re-grade
+ *   node tooling/authoring/post-improve.mjs --grade-only # Only re-grade
  */
 
 import { execSync, spawn } from 'child_process';
@@ -52,7 +52,7 @@ async function runGrading(limit) {
 
   return new Promise((resolve) => {
     const proc = spawn('node', [
-      'tooling/content/grade-content.mjs',
+      'tooling/authoring/grade-content.mjs',
       '--category', 'knowledge-base',
       '--limit', String(limit),
       '--apply'

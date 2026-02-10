@@ -3,7 +3,7 @@
  * Unit Tests for Page Creator Sub-Modules
  *
  * Tests pure-logic functions extracted during the refactoring.
- * Run: node tooling/content/creator/creator.test.mjs
+ * Run: node tooling/authoring/creator/creator.test.mjs
  */
 
 import { levenshteinDistance, similarity, toSlug } from './duplicate-detection.mjs';

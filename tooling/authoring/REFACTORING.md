@@ -1,4 +1,4 @@
-# Content Scripts Refactoring Guide
+# Authoring Scripts Refactoring Guide
 
 These scripts were ported from the cairn monorepo with minimal changes (path adjustments only). The tech debt documented below has been addressed.
 
@@ -39,7 +39,7 @@ Deleted the dead code block.
 
 ## Priority 3: Split page-creator.mjs ✅
 
-Split from ~2,400 lines into modules under `tooling/content/creator/`:
+Split from ~2,400 lines into modules under `tooling/authoring/creator/`:
 
 | Module | Contents |
 |---|---|
@@ -81,7 +81,7 @@ Made `countWords`, `countTables`, `countDiagrams`, `countInternalLinks`, `countE
 ## Priority 5: Tests ✅
 
 Added test files:
-- `tooling/content/creator/creator.test.mjs` — 21 tests for duplicate detection and URL extraction
+- `tooling/authoring/creator/creator.test.mjs` — 21 tests for duplicate detection and URL extraction
 - `tooling/lib/metrics-extractor.test.mjs` — 23 tests for exported metric functions
 
 All existing tests continue to pass (lib.test.mjs: 24/24, validators.test.mjs: 35/35 logic tests, vitest: 45/45).
@@ -89,4 +89,4 @@ All existing tests continue to pass (lib.test.mjs: 24/24, validators.test.mjs: 3
 ## Remaining Items (not addressed)
 
 - **page-improver.mjs — bypass of shared anthropic lib**: Still imports `@anthropic-ai/sdk` directly for the agent loop (tool-use conversation). The agent loop pattern doesn't fit `callClaude()` which is single-turn. Would need a new shared helper.
-- **grade-by-template.mjs — PAGE_TEMPLATES inline data**: ~200 lines of template definitions remain inline. Could be externalized to a JSON/YAML file but is low priority.
+- **grade-by-template.mjs — PAGE_TEMPLATES inline data**: Extracted to `tooling/lib/page-templates.mjs` so both grading and authoring tools can share them.

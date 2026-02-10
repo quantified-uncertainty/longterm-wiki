@@ -7,10 +7,10 @@
  * specific pages identified by validate:quality.
  *
  * Usage:
- *   node tooling/content/regrade.mjs <page-id>              # Re-grade single page
- *   node tooling/content/regrade.mjs page1 page2 page3      # Re-grade multiple pages
- *   node tooling/content/regrade.mjs --overrated            # Re-grade all overrated pages
- *   node tooling/content/regrade.mjs --dry-run <page-id>    # Preview without applying
+ *   node tooling/authoring/regrade.mjs <page-id>              # Re-grade single page
+ *   node tooling/authoring/regrade.mjs page1 page2 page3      # Re-grade multiple pages
+ *   node tooling/authoring/regrade.mjs --overrated            # Re-grade all overrated pages
+ *   node tooling/authoring/regrade.mjs --dry-run <page-id>    # Preview without applying
  *
  * Requires ANTHROPIC_API_KEY in .env or environment.
  */
@@ -103,10 +103,10 @@ async function main() {
 Re-grade Page Quality
 
 Usage:
-  node tooling/content/regrade.mjs <page-id>         Re-grade a single page
-  node tooling/content/regrade.mjs id1 id2 id3       Re-grade multiple pages
-  node tooling/content/regrade.mjs --overrated       Re-grade all overrated pages
-  node tooling/content/regrade.mjs --dry-run <id>    Preview without applying
+  node tooling/authoring/regrade.mjs <page-id>         Re-grade a single page
+  node tooling/authoring/regrade.mjs id1 id2 id3       Re-grade multiple pages
+  node tooling/authoring/regrade.mjs --overrated       Re-grade all overrated pages
+  node tooling/authoring/regrade.mjs --dry-run <id>    Preview without applying
 
 First, find pages that need re-grading:
   node tooling/crux.mjs validate quality

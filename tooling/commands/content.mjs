@@ -11,34 +11,34 @@ import { buildCommands } from '../lib/cli.mjs';
  */
 const SCRIPTS = {
   improve: {
-    script: 'content/page-improver.mjs',
+    script: 'authoring/page-improver.mjs',
     description: 'Improve an existing page with AI assistance',
     passthrough: ['tier', 'directions', 'dryRun'],
     positional: true,
   },
   create: {
-    script: 'content/page-creator.mjs',
+    script: 'authoring/page-creator.mjs',
     description: 'Create a new page with research pipeline',
     passthrough: ['tier', 'phase', 'output', 'help'],
     positional: true,
   },
   regrade: {
-    script: 'content/regrade.mjs',
+    script: 'authoring/regrade.mjs',
     description: 'Re-grade content quality ratings',
     passthrough: ['batch', 'dryRun'],
   },
   grade: {
-    script: 'content/grade-by-template.mjs',
+    script: 'authoring/grade-by-template.mjs',
     description: 'Grade pages by template compliance',
     passthrough: ['verbose'],
   },
   'grade-content': {
-    script: 'content/grade-content.mjs',
+    script: 'authoring/grade-content.mjs',
     description: 'Grade content quality with AI (3-step pipeline)',
     passthrough: ['batch', 'model', 'dryRun', 'skipWarnings', 'warningsOnly'],
   },
   polish: {
-    script: 'content/post-improve.mjs',
+    script: 'authoring/post-improve.mjs',
     description: 'Post-improvement cleanup and polish',
     passthrough: [],
   },

@@ -14,9 +14,9 @@
  *   importance < 20   → not set (too low priority for scheduled updates)
  *
  * Usage:
- *   node tooling/content/bootstrap-update-frequency.mjs              # Dry run
- *   node tooling/content/bootstrap-update-frequency.mjs --apply      # Apply changes
- *   node tooling/content/bootstrap-update-frequency.mjs --verbose    # Show all pages
+ *   node tooling/authoring/bootstrap-update-frequency.mjs              # Dry run
+ *   node tooling/authoring/bootstrap-update-frequency.mjs --apply      # Apply changes
+ *   node tooling/authoring/bootstrap-update-frequency.mjs --verbose    # Show all pages
  */
 
 import { readFileSync, writeFileSync, readdirSync } from 'fs';

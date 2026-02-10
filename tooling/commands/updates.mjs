@@ -220,7 +220,7 @@ export async function run(args, options) {
     }
 
     try {
-      const cmdArgs = ['tooling/content/page-improver.mjs', '--', page.id, '--tier', tier, '--apply', '--grade'];
+      const cmdArgs = ['tooling/authoring/page-improver.mjs', '--', page.id, '--tier', tier, '--apply', '--grade'];
       output += `  ${c.dim}Running: node ${cmdArgs.join(' ')}${c.reset}\n`;
 
       // Print accumulated output before starting long-running process

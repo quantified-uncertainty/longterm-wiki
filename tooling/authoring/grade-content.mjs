@@ -9,7 +9,7 @@
  *   Step 3: Rating scales — Sonnet scores 7 dimensions, informed by Steps 1-2
  *
  * Usage:
- *   ANTHROPIC_API_KEY=sk-... node tooling/content/grade-content.mjs [options]
+ *   ANTHROPIC_API_KEY=sk-... node tooling/authoring/grade-content.mjs [options]
  *
  * Options:
  *   --page ID          Grade a single page by ID or partial match
@@ -693,7 +693,7 @@ async function main() {
   // Check for API key
   if (!process.env.ANTHROPIC_API_KEY && !options.dryRun) {
     console.error('Error: ANTHROPIC_API_KEY environment variable is required');
-    console.error('Usage: ANTHROPIC_API_KEY=sk-... node tooling/content/grade-content.mjs');
+    console.error('Usage: ANTHROPIC_API_KEY=sk-... node tooling/authoring/grade-content.mjs');
     process.exit(1);
   }
 

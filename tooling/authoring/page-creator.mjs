@@ -15,8 +15,8 @@
  * Total: ~$4-5 vs $10+ with all-Claude approach
  *
  * Usage:
- *   node tooling/content/page-creator.mjs "SecureBio" --tier standard
- *   node tooling/content/page-creator.mjs "Community Notes" --tier premium
+ *   node tooling/authoring/page-creator.mjs "SecureBio" --tier standard
+ *   node tooling/authoring/page-creator.mjs "Community Notes" --tier premium
  *
  * Module structure (under creator/):
  *   duplicate-detection.mjs  — fuzzy page matching
@@ -303,7 +303,7 @@ Uses Perplexity for research ($0.10) + Claude for synthesis ($2-3)
 Total: $4-6 vs $10+ with all-Claude approach
 
 Usage:
-  node tooling/content/page-creator.mjs "<topic>" [options]
+  node tooling/authoring/page-creator.mjs "<topic>" [options]
 
 Options:
   --tier <tier>            Quality tier: budget, standard, premium (default: standard)
@@ -350,12 +350,12 @@ ${Object.entries(TIERS).map(([key, config]) =>
   ).join('\n')}
 
 Examples:
-  node tooling/content/page-creator.mjs "MIRI" --tier standard
-  node tooling/content/page-creator.mjs "Anthropic" --tier premium
-  node tooling/content/page-creator.mjs "Lighthaven" --phase grade
-  node tooling/content/page-creator.mjs "Some Event" --dest knowledge-base/incidents --create-category "Incidents"
-  node tooling/content/page-creator.mjs "SecureBio" --source-file ./reports/securebio-analysis.md
-  node tooling/content/page-creator.mjs "SecureBio" --source-file ./notes.txt --directions "Focus on policy"
+  node tooling/authoring/page-creator.mjs "MIRI" --tier standard
+  node tooling/authoring/page-creator.mjs "Anthropic" --tier premium
+  node tooling/authoring/page-creator.mjs "Lighthaven" --phase grade
+  node tooling/authoring/page-creator.mjs "Some Event" --dest knowledge-base/incidents --create-category "Incidents"
+  node tooling/authoring/page-creator.mjs "SecureBio" --source-file ./reports/securebio-analysis.md
+  node tooling/authoring/page-creator.mjs "SecureBio" --source-file ./notes.txt --directions "Focus on policy"
 `);
 }
 

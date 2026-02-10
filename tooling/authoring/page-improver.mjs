@@ -8,13 +8,13 @@
  *
  * Usage:
  *   # Basic improvement with directions
- *   node tooling/content/page-improver.mjs -- open-philanthropy --directions "add 2024 funding data"
+ *   node tooling/authoring/page-improver.mjs -- open-philanthropy --directions "add 2024 funding data"
  *
  *   # Research-heavy improvement
- *   node tooling/content/page-improver.mjs -- far-ai --tier deep --directions "add recent publications"
+ *   node tooling/authoring/page-improver.mjs -- far-ai --tier deep --directions "add recent publications"
  *
  *   # Quick polish only
- *   node tooling/content/page-improver.mjs -- cea --tier polish
+ *   node tooling/authoring/page-improver.mjs -- cea --tier polish
  *
  * Tiers:
  *   - polish ($2): Single-pass improvement, no research
@@ -706,7 +706,7 @@ async function runPipeline(pageId, options = {}) {
   const page = findPage(pages, pageId);
   if (!page) {
     console.error(`Page not found: ${pageId}`);
-    console.log('Try: node tooling/content/page-improver.mjs -- --list');
+    console.log('Try: node tooling/authoring/page-improver.mjs -- --list');
     process.exit(1);
   }
 
@@ -800,7 +800,7 @@ async function runPipeline(pageId, options = {}) {
     if (options.grade) {
       console.log('\n📊 Running grade-content.mjs...');
       try {
-        execSync(`${NODE_TSX} tooling/content/grade-content.mjs --page "${page.id}" --apply`, {
+        execSync(`${NODE_TSX} tooling/authoring/grade-content.mjs --page "${page.id}" --apply`, {
           cwd: ROOT,
           stdio: 'inherit'
         });
@@ -850,7 +850,7 @@ function listPages(pages, options = {}) {
   candidates.forEach((p, i) => {
     console.log(`| ${i + 1} | ${p.quality} | ${p.importance} | ${p.gap > 0 ? '+' : ''}${p.gap} | ${p.title} (${p.id}) |`);
   });
-  console.log(`\nRun: node tooling/content/page-improver.mjs -- <page-id> --directions "your directions"`);
+  console.log(`\nRun: node tooling/authoring/page-improver.mjs -- <page-id> --directions "your directions"`);
 }
 
 // Parse arguments (bare '--' is skipped so flags still work after it)
@@ -886,8 +886,8 @@ Page Improvement Pipeline v2
 Multi-phase improvement with SCRY research and specific directions.
 
 Usage:
-  node tooling/content/page-improver.mjs -- <page-id> [options]
-  node tooling/content/page-improver.mjs -- --list
+  node tooling/authoring/page-improver.mjs -- <page-id> [options]
+  node tooling/authoring/page-improver.mjs -- --list
 
 Options:
   --directions "..."   Specific improvement directions
@@ -903,10 +903,10 @@ Tiers:
   deep      Full SCRY + web research, gap filling
 
 Examples:
-  node tooling/content/page-improver.mjs -- open-philanthropy --directions "add 2024 grants"
-  node tooling/content/page-improver.mjs -- far-ai --tier deep --directions "add publications"
-  node tooling/content/page-improver.mjs -- cea --tier polish
-  node tooling/content/page-improver.mjs -- --list --limit 30
+  node tooling/authoring/page-improver.mjs -- open-philanthropy --directions "add 2024 grants"
+  node tooling/authoring/page-improver.mjs -- far-ai --tier deep --directions "add publications"
+  node tooling/authoring/page-improver.mjs -- cea --tier polish
+  node tooling/authoring/page-improver.mjs -- --list --limit 30
 `);
     return;
   }
@@ -920,7 +920,7 @@ Examples:
   const pageId = opts._positional[0];
   if (!pageId) {
     console.error('Error: No page ID provided');
-    console.error('Try: node tooling/content/page-improver.mjs -- --list');
+    console.error('Try: node tooling/authoring/page-improver.mjs -- --list');
     process.exit(1);
   }
 

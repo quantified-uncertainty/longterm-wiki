@@ -16,9 +16,9 @@
  *   90d: ~80-100  (theoretical frameworks, models, settled arguments)
  *
  * Usage:
- *   node tooling/content/reassign-update-frequency.mjs              # Dry run
- *   node tooling/content/reassign-update-frequency.mjs --apply      # Apply changes
- *   node tooling/content/reassign-update-frequency.mjs --verbose    # Show all decisions
+ *   node tooling/authoring/reassign-update-frequency.mjs              # Dry run
+ *   node tooling/authoring/reassign-update-frequency.mjs --apply      # Apply changes
+ *   node tooling/authoring/reassign-update-frequency.mjs --verbose    # Show all decisions
  */
 
 import { readFileSync, writeFileSync, readdirSync } from 'fs';
