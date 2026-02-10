@@ -3,26 +3,19 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
 import { SortableHeader } from "@/components/ui/sortable-header";
+import { getBadgeClass, getLevelSortValue } from "./shared/table-view-styles";
 import type { SafetyApproach, ApproachDependency } from "@data/tables/safety-generalizability";
 
 // Re-export types
 export type { SafetyApproach, ApproachDependency } from "@data/tables/safety-generalizability";
 
-// Generalization level badge
+// Generalization level badge (pill style)
 function GeneralizationBadge({ level }: { level: SafetyApproach["generalizationLevel"] }) {
-  const colors: Record<SafetyApproach["generalizationLevel"], string> = {
-    LOW: "bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200",
-    MEDIUM: "bg-amber-200 text-amber-800 dark:bg-amber-800 dark:text-amber-200",
-    "MEDIUM-HIGH": "bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200",
-    HIGH: "bg-teal-200 text-teal-800 dark:bg-teal-800 dark:text-teal-200",
-    HIGHEST: "bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200",
-  };
-
   return (
     <span
       className={cn(
         "inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase",
-        colors[level]
+        getBadgeClass(level, "generalization"),
       )}
     >
       {level}
@@ -32,14 +25,7 @@ function GeneralizationBadge({ level }: { level: SafetyApproach["generalizationL
 
 // Sort value for generalization levels
 function getGeneralizationSortValue(level: SafetyApproach["generalizationLevel"]): number {
-  const order: Record<SafetyApproach["generalizationLevel"], number> = {
-    LOW: 1,
-    MEDIUM: 2,
-    "MEDIUM-HIGH": 3,
-    HIGH: 4,
-    HIGHEST: 5,
-  };
-  return order[level] || 0;
+  return getLevelSortValue(level);
 }
 
 // Dependencies/Threats list cell
@@ -70,7 +56,7 @@ function DependencyList({
                 : "bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200"
             )}
           >
-            {type === "requires" ? "✓" : "✗"}
+            {type === "requires" ? "\u2713" : "\u2717"}
           </span>
           <span className="text-foreground">{item.label}</span>
         </li>

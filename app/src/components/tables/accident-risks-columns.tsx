@@ -8,36 +8,18 @@ import {
   getLevelSortValue,
   riskCategoryColors,
 } from "./shared/table-view-styles";
+import { simpleLevelColumn } from "./shared/column-helpers";
 import type {
   AccidentRisk,
-  AbstractionLevel,
   RiskRelationship,
 } from "@data/tables/accident-risks";
 
-// Badge component for various levels
-function LevelBadge({
-  level,
-  category,
-}: {
-  level: string;
-  category?: string;
-}) {
-  const formattedLevel = level
+// Title Case formatting for accident risk levels
+const toTitleCase = (level: string) =>
+  level
     .replace(/_/g, " ")
     .toLowerCase()
     .replace(/\b\w/g, (c) => c.toUpperCase());
-
-  return (
-    <span
-      className={cn(
-        "inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold whitespace-nowrap",
-        getBadgeClass(level, category)
-      )}
-    >
-      {formattedLevel}
-    </span>
-  );
-}
 
 // Relationship badge
 function RelationshipBadge({ type }: { type: string }) {
@@ -106,28 +88,23 @@ function RelationsCell({
 
 // Sorting helpers
 const LEVEL_ORDER: Record<string, number> = {
-  // Abstraction Level
   THEORETICAL: 1,
   MECHANISM: 2,
   BEHAVIOR: 3,
   OUTCOME: 4,
-  // Evidence Level
   SPECULATIVE: 1,
   DEMONSTRATED_LAB: 3,
   OBSERVED_CURRENT: 4,
-  // Timeline
   LONG_TERM: 1,
   MEDIUM_TERM: 2,
   NEAR_TERM: 3,
   CURRENT: 4,
   UNCERTAIN: 0,
-  // Severity
   LOW: 1,
   MEDIUM: 2,
   HIGH: 3,
   CATASTROPHIC: 4,
   EXISTENTIAL: 5,
-  // Detectability (reversed - easy is better)
   EASY: 4,
   MODERATE: 3,
   DIFFICULT: 2,
@@ -176,7 +153,6 @@ export const createAccidentRisksColumns = (
     header: ({ column }) => <SortableHeader column={column}>Category</SortableHeader>,
     cell: ({ row }) => <CategoryCell category={row.getValue("category")} />,
     sortingFn: (rowA, rowB) => {
-      // Sort by category order (imported from data)
       const categories = [
         "Theoretical Frameworks",
         "Alignment Failures",
@@ -192,99 +168,59 @@ export const createAccidentRisksColumns = (
       return a - b;
     },
   },
-  {
+  simpleLevelColumn<AccidentRisk>({
     id: "level",
     accessorKey: "abstractionLevel",
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Theoretical/Mechanism/Behavior/Outcome">
-        Level
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <LevelBadge level={row.original.abstractionLevel} category="abstraction" />
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLocalLevelValue(rowA.original.abstractionLevel);
-      const b = getLocalLevelValue(rowB.original.abstractionLevel);
-      return a - b;
-    },
-  },
-  {
+    label: "Level",
+    tooltip: "Theoretical/Mechanism/Behavior/Outcome",
+    badgeCategory: "abstraction",
+    formatLevel: toTitleCase,
+    sortValue: (r) => getLocalLevelValue(r.abstractionLevel),
+  }),
+  simpleLevelColumn<AccidentRisk>({
     id: "evidence",
     accessorKey: "evidenceLevel",
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Evidence supporting this risk">
-        Evidence
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div title={row.original.evidenceNote}>
-        <LevelBadge level={row.original.evidenceLevel} category="evidence" />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLocalLevelValue(rowA.original.evidenceLevel);
-      const b = getLocalLevelValue(rowB.original.evidenceLevel);
-      return a - b;
-    },
-  },
-  {
+    label: "Evidence",
+    tooltip: "Evidence supporting this risk",
+    badgeCategory: "evidence",
+    noteAccessor: (r) => r.evidenceNote,
+    noteStyle: "tooltip",
+    formatLevel: toTitleCase,
+    sortValue: (r) => getLocalLevelValue(r.evidenceLevel),
+  }),
+  simpleLevelColumn<AccidentRisk>({
     id: "timeline",
     accessorKey: "timeline",
-    header: ({ column }) => (
-      <SortableHeader column={column} title="When this risk becomes relevant">
-        Timeline
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div title={row.original.timelineNote}>
-        <LevelBadge level={row.original.timeline} category="timeline" />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLocalLevelValue(rowA.original.timeline);
-      const b = getLocalLevelValue(rowB.original.timeline);
-      return a - b;
-    },
-  },
-  {
+    label: "Timeline",
+    tooltip: "When this risk becomes relevant",
+    badgeCategory: "timeline",
+    noteAccessor: (r) => r.timelineNote,
+    noteStyle: "tooltip",
+    formatLevel: toTitleCase,
+    sortValue: (r) => getLocalLevelValue(r.timeline),
+  }),
+  simpleLevelColumn<AccidentRisk>({
     id: "severity",
     accessorKey: "severity",
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Potential severity if realized">
-        Severity
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div title={row.original.severityNote}>
-        <LevelBadge level={row.original.severity} category="severity" />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLocalLevelValue(rowA.original.severity);
-      const b = getLocalLevelValue(rowB.original.severity);
-      return a - b;
-    },
-  },
-  {
+    label: "Severity",
+    tooltip: "Potential severity if realized",
+    badgeCategory: "severity",
+    noteAccessor: (r) => r.severityNote,
+    noteStyle: "tooltip",
+    formatLevel: toTitleCase,
+    sortValue: (r) => getLocalLevelValue(r.severity),
+  }),
+  simpleLevelColumn<AccidentRisk>({
     id: "detectability",
     accessorKey: "detectability",
-    header: ({ column }) => (
-      <SortableHeader column={column} title="How easy to detect">
-        Detectability
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div title={row.original.detectabilityNote}>
-        <LevelBadge level={row.original.detectability} category="detectability" />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLocalLevelValue(rowA.original.detectability);
-      const b = getLocalLevelValue(rowB.original.detectability);
-      return a - b;
-    },
-  },
+    label: "Detectability",
+    tooltip: "How easy to detect",
+    badgeCategory: "detectability",
+    noteAccessor: (r) => r.detectabilityNote,
+    noteStyle: "tooltip",
+    formatLevel: toTitleCase,
+    sortValue: (r) => getLocalLevelValue(r.detectability),
+  }),
   {
     id: "relatedRisks",
     accessorKey: "relatedRisks",

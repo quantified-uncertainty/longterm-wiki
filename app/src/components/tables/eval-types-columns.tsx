@@ -3,40 +3,19 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
 import { SortableHeader } from "@/components/ui/sortable-header";
-import { getBadgeClass, getLevelSortValue } from "./shared/table-view-styles";
+import { getLevelSortValue } from "./shared/table-view-styles";
+import { LevelBadge, CellNote } from "./shared/cell-components";
+import { levelNoteColumn, prosConsColumns } from "./shared/column-helpers";
 
 // Re-export types from data file
 export type { RiskCoverage, EvalType, EvalCategory } from "@data/tables/eval-types";
 import type { RiskCoverage, EvalType } from "@data/tables/eval-types";
-
-// Badge component
-function LevelBadge({ level, category }: { level: string; category?: string }) {
-  return (
-    <span
-      className={cn(
-        "inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap",
-        getBadgeClass(level, category)
-      )}
-    >
-      {level}
-    </span>
-  );
-}
 
 function TimingBadge({ when }: { when: string }) {
   return (
     <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200">
       {when}
     </span>
-  );
-}
-
-function CellNote({ note }: { note?: string }) {
-  if (!note) return null;
-  return (
-    <div className="text-[9px] text-muted-foreground mt-1 line-clamp-2">
-      {note}
-    </div>
   );
 }
 
@@ -55,7 +34,7 @@ function RiskCoverageCell({ risks }: { risks: RiskCoverage[] }) {
                 : "text-red-600 dark:text-red-400"
             )}
           >
-            {r.strength === "strong" ? "●" : r.strength === "partial" ? "◐" : "○"}
+            {r.strength === "strong" ? "\u25CF" : r.strength === "partial" ? "\u25D0" : "\u25CB"}
           </span>
           <span>
             <strong className="text-foreground">{r.risk}</strong>
@@ -102,24 +81,6 @@ function KeyPapersCell({ papers, examples }: { papers: string[]; examples: strin
   );
 }
 
-function ProsCons({ items, type }: { items: string[]; type: "pro" | "con" }) {
-  const prefix = type === "pro" ? "+" : "−";
-  const colorClass =
-    type === "pro"
-      ? "text-green-700 dark:text-green-400"
-      : "text-red-700 dark:text-red-400";
-
-  return (
-    <div className="text-[11px] space-y-0.5">
-      {items.map((item) => (
-        <div key={item} className={colorClass}>
-          {prefix} {item}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // Column definitions
 export const createEvalTypesColumns = (): ColumnDef<EvalType>[] => [
   {
@@ -149,66 +110,9 @@ export const createEvalTypesColumns = (): ColumnDef<EvalType>[] => [
       </span>
     ),
   },
-  {
-    id: "signalReliability",
-    accessorFn: (row) => row.signalReliability.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="How reliable is the signal?">
-        Signal
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.signalReliability.level} />
-        <CellNote note={row.original.signalReliability.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.signalReliability.level);
-      const b = getLevelSortValue(rowB.original.signalReliability.level);
-      return a - b;
-    },
-  },
-  {
-    id: "coverageDepth",
-    accessorFn: (row) => row.coverageDepth.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="How much does it cover?">
-        Coverage
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.coverageDepth.level} />
-        <CellNote note={row.original.coverageDepth.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.coverageDepth.level);
-      const b = getLevelSortValue(rowB.original.coverageDepth.level);
-      return a - b;
-    },
-  },
-  {
-    id: "goodhartRisk",
-    accessorFn: (row) => row.goodhartRisk.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Risk of gaming the metric">
-        Goodhart Risk
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.goodhartRisk.level} />
-        <CellNote note={row.original.goodhartRisk.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.goodhartRisk.level);
-      const b = getLevelSortValue(rowB.original.goodhartRisk.level);
-      return a - b;
-    },
-  },
+  levelNoteColumn<EvalType>({ id: "signalReliability", accessor: (r) => r.signalReliability, label: "Signal", tooltip: "How reliable is the signal?" }),
+  levelNoteColumn<EvalType>({ id: "coverageDepth", accessor: (r) => r.coverageDepth, label: "Coverage", tooltip: "How much does it cover?" }),
+  levelNoteColumn<EvalType>({ id: "goodhartRisk", accessor: (r) => r.goodhartRisk, label: "Goodhart Risk", tooltip: "Risk of gaming the metric" }),
   {
     id: "riskCoverage",
     accessorKey: "riskCoverage",
@@ -227,46 +131,8 @@ export const createEvalTypesColumns = (): ColumnDef<EvalType>[] => [
       </div>
     ),
   },
-  {
-    id: "archDependence",
-    accessorFn: (row) => row.archDependence.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Architecture dependence">
-        Arch. Dep.
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.archDependence.level} />
-        <CellNote note={row.original.archDependence.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.archDependence.level);
-      const b = getLevelSortValue(rowB.original.archDependence.level);
-      return a - b;
-    },
-  },
-  {
-    id: "actionability",
-    accessorFn: (row) => row.actionability.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="How actionable are findings?">
-        Actionability
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.actionability.level} />
-        <CellNote note={row.original.actionability.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.actionability.level);
-      const b = getLevelSortValue(rowB.original.actionability.level);
-      return a - b;
-    },
-  },
+  levelNoteColumn<EvalType>({ id: "archDependence", accessor: (r) => r.archDependence, label: "Arch. Dep.", tooltip: "Architecture dependence" }),
+  levelNoteColumn<EvalType>({ id: "actionability", accessor: (r) => r.actionability, label: "Actionability", tooltip: "How actionable are findings?" }),
   {
     id: "scalability",
     accessorFn: (row) => row.scalability.level,
@@ -298,20 +164,14 @@ export const createEvalTypesColumns = (): ColumnDef<EvalType>[] => [
     ),
     enableSorting: false,
   },
-  {
-    id: "strategicPros",
-    accessorKey: "strategicPros",
-    header: () => <span className="text-xs">Strategic Pros</span>,
-    cell: ({ row }) => <ProsCons items={row.original.strategicPros} type="pro" />,
-    enableSorting: false,
-  },
-  {
-    id: "strategicCons",
-    accessorKey: "strategicCons",
-    header: () => <span className="text-xs">Strategic Cons</span>,
-    cell: ({ row }) => <ProsCons items={row.original.strategicCons} type="con" />,
-    enableSorting: false,
-  },
+  ...prosConsColumns<EvalType>({
+    prosId: "strategicPros",
+    consId: "strategicCons",
+    prosField: (r) => r.strategicPros,
+    consField: (r) => r.strategicCons,
+    prosLabel: "Strategic Pros",
+    consLabel: "Strategic Cons",
+  }),
 ];
 
 // Column config for visibility toggles
