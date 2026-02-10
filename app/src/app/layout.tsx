@@ -5,13 +5,13 @@ import { SearchButton, SearchDialog } from "@/components/SearchDialog";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Cairn Wiki",
+  title: "Longterm Wiki",
   description: "AI Safety Knowledge Base",
   openGraph: {
-    title: "Cairn Wiki",
+    title: "Longterm Wiki",
     description: "AI Safety Knowledge Base",
     type: "website",
-    siteName: "Cairn Wiki",
+    siteName: "Longterm Wiki",
   },
 };
 
@@ -35,7 +35,7 @@ export default function RootLayout({
         <header className="sticky top-0 z-40 border-b border-border bg-card">
           <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
             <Link href="/" className="text-lg font-bold no-underline text-foreground">
-              Cairn Wiki
+              Longterm Wiki
             </Link>
             <nav className="flex items-center gap-4">
               <Link

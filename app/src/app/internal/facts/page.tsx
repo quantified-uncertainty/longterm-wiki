@@ -3,7 +3,7 @@ import { FactDashboard } from "@/components/internal/FactDashboard";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Fact Dashboard | Cairn Internal",
+  title: "Fact Dashboard | Longterm Wiki Internal",
 };
 
 export default function FactsPage() {

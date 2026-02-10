@@ -77,7 +77,7 @@ function JsonLd({ pageData, title, slug }: { pageData?: Page; title?: string; sl
     ...(pageData?.lastUpdated && { dateModified: pageData.lastUpdated }),
     isPartOf: {
       "@type": "WebSite",
-      name: "Cairn Wiki",
+      name: "Longterm Wiki",
     },
   };
 
