@@ -12,8 +12,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createRule, Issue, Severity } from '../validation-engine.js';
+import { loadDatabase, loadPathRegistry, DATA_DIR_ABS } from '../content-types.js';
 
-const DATA_DIR = join(process.cwd(), 'data');
+const DATA_DIR = DATA_DIR_ABS;
 
 // Cache for loaded data
 let entitiesCache = null;
@@ -23,7 +24,7 @@ let safetyApproachesCache = null;
 function loadEntities() {
   if (entitiesCache) return entitiesCache;
   try {
-    const database = JSON.parse(readFileSync(`${DATA_DIR}/database.json`, 'utf-8'));
+    const database = loadDatabase();
     entitiesCache = new Set();
 
     // Entities are stored as an array, extract IDs
@@ -44,12 +45,10 @@ function loadEntities() {
     }
 
     // Also add IDs from pathRegistry (more comprehensive)
-    try {
-      const pathRegistry = JSON.parse(readFileSync(`${DATA_DIR}/pathRegistry.json`, 'utf-8'));
-      for (const id of Object.keys(pathRegistry)) {
-        entitiesCache.add(id);
-      }
-    } catch {}
+    const pathRegistry = loadPathRegistry();
+    for (const id of Object.keys(pathRegistry)) {
+      entitiesCache.add(id);
+    }
 
     return entitiesCache;
   } catch {

@@ -2,7 +2,7 @@
 /**
  * Unit Tests for Shared Library Modules
  *
- * Run: node scripts/lib/lib.test.mjs
+ * Run: node scripts/lib/lib.test.ts
  */
 
 import { findMdxFiles, findFiles, getDirectories } from './file-utils.mjs';
@@ -28,23 +28,23 @@ import {
 let passed = 0;
 let failed = 0;
 
-function test(name, fn) {
+function test(name: string, fn: () => void): void {
   try {
     fn();
     console.log(`✓ ${name}`);
     passed++;
-  } catch (e) {
+  } catch (e: any) {
     console.log(`✗ ${name}`);
     console.log(`  ${e.message}`);
     failed++;
   }
 }
 
-function assert(condition, message) {
+function assert(condition: boolean, message?: string): void {
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual: unknown, expected: unknown, message?: string): void {
   if (actual !== expected) {
     throw new Error(message || `Expected ${expected}, got ${actual}`);
   }
@@ -60,7 +60,7 @@ test('findMdxFiles returns array', () => {
   const result = findMdxFiles('content/docs/knowledge-base/models');
   assert(Array.isArray(result), 'Should return array');
   assert(result.length > 0, 'Should find files');
-  assert(result.every(f => f.endsWith('.mdx') || f.endsWith('.md')), 'Should only find MDX/MD files');
+  assert(result.every((f: string) => f.endsWith('.mdx') || f.endsWith('.md')), 'Should only find MDX/MD files');
 });
 
 test('findMdxFiles handles non-existent directory', () => {
@@ -73,7 +73,7 @@ test('findFiles with extensions filter', () => {
   const result = findFiles('data', ['.yaml', '.yml']);
   assert(Array.isArray(result), 'Should return array');
   assert(result.length > 0, 'Should find YAML files');
-  assert(result.every(f => f.endsWith('.yaml') || f.endsWith('.yml')), 'Should only find YAML files');
+  assert(result.every((f: string) => f.endsWith('.yaml') || f.endsWith('.yml')), 'Should only find YAML files');
 });
 
 test('getDirectories returns directories', () => {
@@ -143,8 +143,8 @@ test('extractHeadings finds all headings', () => {
   const body = getContentBody(sampleMdx);
   const headings = extractHeadings(body);
   assertEqual(headings.length, 3, 'Should find 3 headings');
-  assert(headings.some(h => h.level === 2 && h.title === 'Overview'));
-  assert(headings.some(h => h.level === 3 && h.title === 'Subsection'));
+  assert(headings.some((h: any) => h.level === 2 && h.title === 'Overview'));
+  assert(headings.some((h: any) => h.level === 3 && h.title === 'Subsection'));
 });
 
 test('countWords counts correctly', () => {

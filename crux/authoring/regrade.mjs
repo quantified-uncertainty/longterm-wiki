@@ -19,12 +19,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { spawn } from 'child_process';
-import { readFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
+import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { loadPages } from '../lib/content-types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PAGES_FILE = 'app/src/data/pages.json';
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
@@ -44,12 +43,12 @@ if (!process.env.ANTHROPIC_API_KEY) {
  * Find overrated pages from pages.json
  */
 function findOverratedPages() {
-  if (!existsSync(PAGES_FILE)) {
-    console.error('Error: pages.json not found. Run `pnpm build` first.');
+  const pages = loadPages();
+  if (pages.length === 0) {
+    console.error('Error: pages.json not found or empty. Run `pnpm build` first.');
     process.exit(1);
   }
 
-  const pages = JSON.parse(readFileSync(PAGES_FILE, 'utf-8'));
   return pages
     .filter(p => p.quality && p.suggestedQuality)
     .filter(p => p.quality - p.suggestedQuality >= 20)

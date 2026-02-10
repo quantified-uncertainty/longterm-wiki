@@ -15,10 +15,9 @@ import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { createRule, Issue, Severity } from '../validation-engine.js';
-import { PROJECT_ROOT } from '../content-types.js';
+import { PROJECT_ROOT, loadDatabase } from '../content-types.js';
 
 const FACTS_DIR = join(PROJECT_ROOT, 'data/facts');
-const DATABASE_JSON = join(PROJECT_ROOT, 'data/database.json');
 
 /**
  * Load all canonical facts from YAML files, then overlay resolved
@@ -48,20 +47,18 @@ function loadCanonicalFacts() {
 
   // Overlay resolved computed values from database.json
   // Computed facts have no value in YAML but get one after build-data resolves them
-  if (existsSync(DATABASE_JSON)) {
-    try {
-      const db = JSON.parse(readFileSync(DATABASE_JSON, 'utf-8'));
-      if (db.facts) {
-        for (const fact of facts) {
-          const dbFact = db.facts[fact.key];
-          if (dbFact && dbFact.computed && dbFact.value && !fact.value) {
-            fact.value = dbFact.value;
-          }
+  try {
+    const db = loadDatabase();
+    if (db.facts) {
+      for (const fact of facts) {
+        const dbFact = db.facts[fact.key];
+        if (dbFact && dbFact.computed && dbFact.value && !fact.value) {
+          fact.value = dbFact.value;
         }
       }
-    } catch {
-      // database.json may not exist yet or be invalid — skip overlay
     }
+  } catch {
+    // database.json may not exist yet or be invalid — skip overlay
   }
 
   return facts;

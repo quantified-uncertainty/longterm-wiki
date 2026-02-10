@@ -9,7 +9,7 @@
  *   - validation-engine.ts: Issue, ContentFile, ValidationEngine, createRule,
  *                           Severity, FixType
  *
- * Run: node --import tsx/esm crux/lib/cli.test.mjs
+ * Run: node --import tsx/esm crux/lib/cli.test.ts
  */
 
 import {
@@ -51,36 +51,36 @@ import {
 let passed = 0;
 let failed = 0;
 
-function test(name, fn) {
+function test(name: string, fn: () => void | Promise<void>): void | Promise<void> {
   try {
     const result = fn();
     // Support async tests
-    if (result && typeof result.then === 'function') {
-      return result.then(
+    if (result && typeof (result as Promise<void>).then === 'function') {
+      return (result as Promise<void>).then(
         () => { console.log(`✓ ${name}`); passed++; },
-        (e) => { console.log(`✗ ${name}`); console.log(`  ${e.message}`); failed++; }
+        (e: any) => { console.log(`✗ ${name}`); console.log(`  ${e.message}`); failed++; }
       );
     }
     console.log(`✓ ${name}`);
     passed++;
-  } catch (e) {
+  } catch (e: any) {
     console.log(`✗ ${name}`);
     console.log(`  ${e.message}`);
     failed++;
   }
 }
 
-function assert(condition, message) {
+function assert(condition: boolean, message?: string): void {
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual: unknown, expected: unknown, message?: string): void {
   if (actual !== expected) {
     throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
   }
 }
 
-function assertDeepEqual(actual, expected, message) {
+function assertDeepEqual(actual: unknown, expected: unknown, message?: string): void {
   const a = JSON.stringify(actual);
   const e = JSON.stringify(expected);
   if (a !== e) {
@@ -300,18 +300,18 @@ test('CONTENT_TYPES has model, risk, response', () => {
 
 test('each CONTENT_TYPE has required fields', () => {
   for (const [name, config] of Object.entries(CONTENT_TYPES)) {
-    assert(config.pathPattern instanceof RegExp, `${name} should have pathPattern RegExp`);
-    assert(typeof config.directory === 'string', `${name} should have directory string`);
-    assert(Array.isArray(config.requiredSections), `${name} should have requiredSections array`);
-    assert(Array.isArray(config.recommendedSections), `${name} should have recommendedSections array`);
-    assert(typeof config.stalenessThreshold === 'number', `${name} should have stalenessThreshold number`);
+    assert((config as any).pathPattern instanceof RegExp, `${name} should have pathPattern RegExp`);
+    assert(typeof (config as any).directory === 'string', `${name} should have directory string`);
+    assert(Array.isArray((config as any).requiredSections), `${name} should have requiredSections array`);
+    assert(Array.isArray((config as any).recommendedSections), `${name} should have recommendedSections array`);
+    assert(typeof (config as any).stalenessThreshold === 'number', `${name} should have stalenessThreshold number`);
   }
 });
 
 test('CRITICAL_RULES is a non-empty array of strings', () => {
   assert(Array.isArray(CRITICAL_RULES), 'Should be array');
   assert(CRITICAL_RULES.length > 0, 'Should not be empty');
-  assert(CRITICAL_RULES.every(r => typeof r === 'string'), 'All entries should be strings');
+  assert(CRITICAL_RULES.every((r: unknown) => typeof r === 'string'), 'All entries should be strings');
   assert(CRITICAL_RULES.includes('dollar-signs'), 'Should include dollar-signs');
   assert(CRITICAL_RULES.includes('frontmatter-schema'), 'Should include frontmatter-schema');
 });
@@ -319,7 +319,7 @@ test('CRITICAL_RULES is a non-empty array of strings', () => {
 test('QUALITY_RULES is a non-empty array of strings', () => {
   assert(Array.isArray(QUALITY_RULES), 'Should be array');
   assert(QUALITY_RULES.length > 0, 'Should not be empty');
-  assert(QUALITY_RULES.every(r => typeof r === 'string'), 'All entries should be strings');
+  assert(QUALITY_RULES.every((r: unknown) => typeof r === 'string'), 'All entries should be strings');
 });
 
 test('CRITICAL_RULES and QUALITY_RULES do not overlap', () => {
@@ -549,7 +549,7 @@ test('ValidationEngine.addRule rejects rule without id', () => {
   const engine = new ValidationEngine({ contentDir: '/tmp/nonexistent', dataDir: '/tmp/nonexistent' });
   let threw = false;
   try {
-    engine.addRule({ name: 'No ID', description: 'x', check: () => [] });
+    engine.addRule({ name: 'No ID', description: 'x', check: () => [] } as any);
   } catch {
     threw = true;
   }
@@ -560,7 +560,7 @@ test('ValidationEngine.addRule rejects rule without check', () => {
   const engine = new ValidationEngine({ contentDir: '/tmp/nonexistent', dataDir: '/tmp/nonexistent' });
   let threw = false;
   try {
-    engine.addRule({ id: 'no-check', name: 'No Check', description: 'x' });
+    engine.addRule({ id: 'no-check', name: 'No Check', description: 'x' } as any);
   } catch {
     threw = true;
   }
@@ -667,7 +667,7 @@ await test('ValidationEngine.validate runs file-scope rules', async () => {
     id: 'always-warn',
     name: 'Always Warn',
     description: 'Always produces a warning',
-    check: (file) => [
+    check: (file: any) => [
       new Issue({
         rule: 'always-warn',
         file: file.path,
@@ -688,15 +688,15 @@ await test('ValidationEngine.validate runs global-scope rules', async () => {
   const engine = new ValidationEngine({ contentDir: '/tmp/nonexistent-dir-12345', dataDir: '/tmp/nonexistent-dir-12345' });
   engine.loaded = true;
 
-  engine.content.set('/tmp/a.mdx', { path: '/tmp/a.mdx' });
-  engine.content.set('/tmp/b.mdx', { path: '/tmp/b.mdx' });
+  engine.content.set('/tmp/a.mdx', { path: '/tmp/a.mdx' } as any);
+  engine.content.set('/tmp/b.mdx', { path: '/tmp/b.mdx' } as any);
 
   const rule = createRule({
     id: 'count-files',
     name: 'Count Files',
     description: 'Reports file count',
     scope: 'global',
-    check: (files) => [
+    check: (files: any) => [
       new Issue({
         rule: 'count-files',
         file: 'global',
@@ -715,7 +715,7 @@ await test('ValidationEngine.validate runs global-scope rules', async () => {
 await test('ValidationEngine.validate filters by ruleIds', async () => {
   const engine = new ValidationEngine({ contentDir: '/tmp/nonexistent-dir-12345', dataDir: '/tmp/nonexistent-dir-12345' });
   engine.loaded = true;
-  engine.content.set('/tmp/test.mdx', { path: '/tmp/test.mdx' });
+  engine.content.set('/tmp/test.mdx', { path: '/tmp/test.mdx' } as any);
 
   engine.addRule(createRule({
     id: 'rule-a',
@@ -738,7 +738,7 @@ await test('ValidationEngine.validate filters by ruleIds', async () => {
 await test('ValidationEngine.validate catches rule errors gracefully', async () => {
   const engine = new ValidationEngine({ contentDir: '/tmp/nonexistent-dir-12345', dataDir: '/tmp/nonexistent-dir-12345' });
   engine.loaded = true;
-  engine.content.set('/tmp/test.mdx', { path: '/tmp/test.mdx' });
+  engine.content.set('/tmp/test.mdx', { path: '/tmp/test.mdx' } as any);
 
   engine.addRule(createRule({
     id: 'throws',

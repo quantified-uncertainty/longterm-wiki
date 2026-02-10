@@ -3,7 +3,7 @@
  * Unit Tests for Metrics Extractor
  *
  * Tests the newly-exported counting functions.
- * Run: node crux/lib/metrics-extractor.test.mjs
+ * Run: node crux/lib/metrics-extractor.test.ts
  */
 
 import {
@@ -19,23 +19,23 @@ import {
 let passed = 0;
 let failed = 0;
 
-function test(name, fn) {
+function test(name: string, fn: () => void): void {
   try {
     fn();
     console.log(`✓ ${name}`);
     passed++;
-  } catch (e) {
+  } catch (e: any) {
     console.log(`✗ ${name}`);
     console.log(`  ${e.message}`);
     failed++;
   }
 }
 
-function assert(condition, message) {
+function assert(condition: boolean, message?: string): void {
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual: unknown, expected: unknown, message?: string): void {
   if (actual !== expected) {
     throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
   }

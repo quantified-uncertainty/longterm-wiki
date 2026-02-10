@@ -3,7 +3,7 @@
  * Unit Tests for Validators
  *
  * Tests the core validation logic used by the validator scripts.
- * Run: node scripts/lib/validators.test.mjs
+ * Run: node scripts/lib/validators.test.ts
  */
 
 import { existsSync } from 'fs';
@@ -12,29 +12,29 @@ import { extractMetrics, suggestQuality, getQualityDiscrepancy } from './metrics
 let passed = 0;
 let failed = 0;
 
-function test(name, fn) {
+function test(name: string, fn: () => void): void {
   try {
     fn();
     console.log(`✓ ${name}`);
     passed++;
-  } catch (e) {
+  } catch (e: any) {
     console.log(`✗ ${name}`);
     console.log(`  ${e.message}`);
     failed++;
   }
 }
 
-function assert(condition, message) {
+function assert(condition: boolean, message?: string): void {
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual: unknown, expected: unknown, message?: string): void {
   if (actual !== expected) {
     throw new Error(message || `Expected ${expected}, got ${actual}`);
   }
 }
 
-function assertInRange(value, min, max, message) {
+function assertInRange(value: number, min: number, max: number, message?: string): void {
   if (value < min || value > max) {
     throw new Error(message || `Expected ${value} to be in range [${min}, ${max}]`);
   }
@@ -46,7 +46,7 @@ function assertInRange(value, min, max, message) {
 
 console.log('\n📁 Validator scripts exist');
 
-const validatorScripts = [
+const validatorScripts: string[] = [
   'scripts/validate/validate-all.mjs',
   'scripts/validate/validate-data.mjs',
   'scripts/validate/validate-internal-links.mjs',
@@ -245,7 +245,7 @@ test('getQualityDiscrepancy flags large discrepancies', () => {
 
 console.log('\n🔍 MDX syntax validation patterns');
 
-function testMdxPattern(pattern, content) {
+function testMdxPattern(pattern: RegExp, content: string): boolean {
   return pattern.test(content);
 }
 
@@ -267,10 +267,10 @@ test('detects unescaped < in tables', () => {
 
 console.log('\n🔗 Link validation patterns');
 
-function extractInternalLinks(content) {
-  const links = [];
+function extractInternalLinks(content: string): Array<{ text: string; href: string }> {
+  const links: Array<{ text: string; href: string }> = [];
   const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = linkRegex.exec(content)) !== null) {
     const [, text, href] = match;
     if (!href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:')) {
@@ -307,7 +307,7 @@ test('extractInternalLinks ignores anchors', () => {
 console.log('\n📝 Placeholder validator helpers');
 
 // Inline implementations for testing
-function getSectionContent(body, sectionName) {
+function getSectionContent(body: string, sectionName: string): string | null {
   const headerPattern = sectionName === 'Limitations'
     ? /^##\s+Limitations?\s*$/mi
     : new RegExp(`^##\\s+${sectionName}\\s*$`, 'mi');
@@ -315,21 +315,21 @@ function getSectionContent(body, sectionName) {
   const headerMatch = body.match(headerPattern);
   if (!headerMatch) return null;
 
-  const startIndex = headerMatch.index + headerMatch[0].length;
+  const startIndex = headerMatch.index! + headerMatch[0].length;
   const afterHeader = body.slice(startIndex);
   const nextH2Match = afterHeader.match(/\n##\s+[^#]/);
-  const endIndex = nextH2Match ? nextH2Match.index : afterHeader.length;
+  const endIndex = nextH2Match ? nextH2Match.index! : afterHeader.length;
 
   return afterHeader.slice(0, endIndex);
 }
 
-function isInCodeBlock(content, position) {
+function isInCodeBlock(content: string, position: number): boolean {
   const before = content.slice(0, position);
   const tripleBackticks = (before.match(/```/g) || []).length;
   return tripleBackticks % 2 === 1;
 }
 
-function isInMermaid(content, position) {
+function isInMermaid(content: string, position: number): boolean {
   const before = content.slice(0, position);
   const lastMermaidOpen = before.lastIndexOf('<Mermaid');
   if (lastMermaidOpen === -1) return false;
@@ -340,14 +340,14 @@ function isInMermaid(content, position) {
   return !closingMatch;
 }
 
-function isInComment(content, position) {
+function isInComment(content: string, position: number): boolean {
   const before = content.slice(0, position);
   const opens = (before.match(/<!--/g) || []).length;
   const closes = (before.match(/-->/g) || []).length;
   return opens > closes;
 }
 
-function getLineNumber(content, position) {
+function getLineNumber(content: string, position: number): number {
   return content.slice(0, position).split('\n').length;
 }
 
@@ -362,8 +362,8 @@ This is the overview section.
 Different content.`;
   const content = getSectionContent(body, 'Overview');
   assert(content !== null, 'Should find section');
-  assert(content.includes('This is the overview section'), 'Should include content');
-  assert(!content.includes('Different content'), 'Should not include next section');
+  assert(content!.includes('This is the overview section'), 'Should include content');
+  assert(!content!.includes('Different content'), 'Should not include next section');
 });
 
 test('getSectionContent handles section at end of document', () => {
@@ -376,7 +376,7 @@ Some.
 Last section with no following header.`;
   const content = getSectionContent(body, 'Overview');
   assert(content !== null, 'Should find section');
-  assert(content.includes('Last section'), 'Should include content');
+  assert(content!.includes('Last section'), 'Should include content');
 });
 
 test('getSectionContent returns null for missing section', () => {
@@ -397,8 +397,8 @@ Subsection content.
 
 Next content.`;
   const content = getSectionContent(body, 'Overview');
-  assert(content.includes('Subsection content'), 'Should include h3 content');
-  assert(!content.includes('Next content'), 'Should stop at h2');
+  assert(content!.includes('Subsection content'), 'Should include h3 content');
+  assert(!content!.includes('Next content'), 'Should stop at h2');
 });
 
 test('getSectionContent handles Limitation/Limitations variant', () => {

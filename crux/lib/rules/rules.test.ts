@@ -3,7 +3,7 @@
  * Unit Tests for Validation Rules
  *
  * Tests the CRITICAL and key QUALITY validation rules.
- * Run: node --import tsx/esm crux/lib/rules/rules.test.mjs
+ * Run: node --import tsx/esm crux/lib/rules/rules.test.ts
  */
 
 import { Issue, Severity, FixType, createRule } from '../validation-engine.js';
@@ -19,23 +19,23 @@ import { vagueCitationsRule } from './vague-citations.mjs';
 let passed = 0;
 let failed = 0;
 
-function test(name, fn) {
+function test(name: string, fn: () => void): void {
   try {
     fn();
     console.log(`✓ ${name}`);
     passed++;
-  } catch (e) {
+  } catch (e: any) {
     console.log(`✗ ${name}`);
     console.log(`  ${e.message}`);
     failed++;
   }
 }
 
-function assert(condition, message) {
+function assert(condition: boolean, message?: string): void {
   if (!condition) throw new Error(message || 'Assertion failed');
 }
 
-function assertEqual(actual, expected, message) {
+function assertEqual(actual: unknown, expected: unknown, message?: string): void {
   if (actual !== expected) {
     throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
   }
@@ -44,7 +44,7 @@ function assertEqual(actual, expected, message) {
 /**
  * Create a mock content file for testing rules
  */
-function mockContent(body, opts = {}) {
+function mockContent(body: string, opts: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     path: opts.path || 'content/docs/test-page.mdx',
     relativePath: opts.relativePath || 'test-page.mdx',
@@ -78,7 +78,7 @@ test('detects double-escaped \\\\$ in body', () => {
   const content = mockContent('The cost is \\\\$100.');
   const issues = dollarSignsRule.check(content, {});
   // Should detect double-escaped (the regex is /\\\\\$/g which matches literal \\$)
-  assert(issues.some(i => i.message.includes('Double-escaped')));
+  assert(issues.some((i: any) => i.message.includes('Double-escaped')));
 });
 
 test('skips $ in code blocks', () => {
@@ -143,7 +143,7 @@ test('allows ≈\\$ pattern', () => {
   const content = mockContent('approximately ≈\\$29M in funding.');
   const issues = tildeDollarRule.check(content, {});
   // Should not flag the ≈ version
-  const tildeDollarIssues = issues.filter(i => i.message.includes('Tilde before escaped'));
+  const tildeDollarIssues = issues.filter((i: any) => i.message.includes('Tilde before escaped'));
   assertEqual(tildeDollarIssues.length, 0);
 });
 
@@ -151,7 +151,7 @@ test('detects tilde before number in table cell', () => {
   const content = mockContent('| Name | Value |\n|---|---|\n| Test | ~86% |');
   const issues = tildeDollarRule.check(content, {});
   assert(issues.length >= 1);
-  assert(issues.some(i => i.message.includes('Tilde in table cell')));
+  assert(issues.some((i: any) => i.message.includes('Tilde in table cell')));
 });
 
 // =============================================================================
@@ -220,7 +220,7 @@ test('detects TODO markers', () => {
   const content = mockContent('This section needs TODO: fill in details.');
   const issues = placeholdersRule.check(content, {});
   assert(issues.length >= 1);
-  assert(issues.some(i => i.message.includes('TODO')));
+  assert(issues.some((i: any) => i.message.includes('TODO')));
 });
 
 test('detects Lorem ipsum', () => {
@@ -330,7 +330,7 @@ test('only flags source columns, not other columns', () => {
   // "Interview Guide" is in the Name column, not Source - should not be flagged as vague
   const vagueIssues = content.body ? vagueCitationsRule.check(content, {}) : [];
   // Filter to only vague-citations issues (not other rules)
-  const vagueCitationIssues = vagueIssues.filter(i => i.rule === 'vague-citations');
+  const vagueCitationIssues = vagueIssues.filter((i: any) => i.rule === 'vague-citations');
   assertEqual(vagueCitationIssues.length, 0);
 });
 
@@ -343,8 +343,8 @@ console.log('\n🔧 matchLinesOutsideCode utility');
 import { matchLinesOutsideCode } from '../mdx-utils.mjs';
 
 test('matches patterns on regular lines', () => {
-  const matches = [];
-  matchLinesOutsideCode('hello world\nfoo bar', /foo/g, ({ match, lineNum }) => {
+  const matches: Array<{ text: string; line: number }> = [];
+  matchLinesOutsideCode('hello world\nfoo bar', /foo/g, ({ match, lineNum }: { match: RegExpMatchArray; lineNum: number }) => {
     matches.push({ text: match[0], line: lineNum });
   });
   assertEqual(matches.length, 1);
@@ -353,24 +353,24 @@ test('matches patterns on regular lines', () => {
 });
 
 test('skips matches inside code blocks', () => {
-  const matches = [];
-  matchLinesOutsideCode('```\nfoo\n```\nfoo', /foo/g, ({ match }) => {
+  const matches: string[] = [];
+  matchLinesOutsideCode('```\nfoo\n```\nfoo', /foo/g, ({ match }: { match: RegExpMatchArray }) => {
     matches.push(match[0]);
   });
   assertEqual(matches.length, 1);
 });
 
 test('supports custom skip function', () => {
-  const matches = [];
-  matchLinesOutsideCode('foo bar foo', /foo/g, ({ match }) => {
+  const matches: string[] = [];
+  matchLinesOutsideCode('foo bar foo', /foo/g, ({ match }: { match: RegExpMatchArray }) => {
     matches.push(match[0]);
-  }, { skip: (body, pos) => pos > 5 });
+  }, { skip: (body: string, pos: number) => pos > 5 });
   assertEqual(matches.length, 1);
 });
 
 test('handles multiple matches per line', () => {
-  const matches = [];
-  matchLinesOutsideCode('$1 and $2 and $3', /\$(\d)/g, ({ match }) => {
+  const matches: string[] = [];
+  matchLinesOutsideCode('$1 and $2 and $3', /\$(\d)/g, ({ match }: { match: RegExpMatchArray }) => {
     matches.push(match[0]);
   });
   assertEqual(matches.length, 3);

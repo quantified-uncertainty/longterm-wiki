@@ -15,20 +15,14 @@
 
 import { createRule, Issue, Severity } from '../validation-engine.js';
 import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.mjs';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
-
-const PROJECT_ROOT = process.cwd();
+import { loadDatabase } from '../content-types.js';
 
 /**
  * Load entity titles from database.json
  */
 function loadDatabaseEntities() {
-  const dbPath = join(PROJECT_ROOT, 'data/database.json');
-  if (!existsSync(dbPath)) return new Map();
-
   try {
-    const db = JSON.parse(readFileSync(dbPath, 'utf-8'));
+    const db = loadDatabase();
     const entities = new Map();
 
     // Load experts (people)
