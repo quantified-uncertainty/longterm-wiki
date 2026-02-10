@@ -51,6 +51,9 @@ import { outdatedNamesRule } from './outdated-names.mjs';
 // Fact consistency
 import { factConsistencyRule } from './fact-consistency.mjs';
 
+// Squiggle model quality
+import { squiggleQualityRule } from './squiggle-quality.mjs';
+
 // Content quality warning rules (3-step grading pipeline)
 import { insiderJargonRule } from './insider-jargon.mjs';
 import { falseCertaintyRule } from './false-certainty.mjs';
@@ -93,6 +96,7 @@ export {
   prescriptiveLanguageRule,
   toneMarkersRule,
   structuralQualityRule,
+  squiggleQualityRule,
 };
 
 export const allRules = [
@@ -129,6 +133,7 @@ export const allRules = [
   prescriptiveLanguageRule,
   toneMarkersRule,
   structuralQualityRule,
+  squiggleQualityRule,
 ];
 
 export default allRules;
