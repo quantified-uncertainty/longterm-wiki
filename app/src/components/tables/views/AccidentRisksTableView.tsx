@@ -1,33 +1,19 @@
 "use client"
 
 // Accident Risks Comparison Table
-import { useState, useMemo, useCallback } from "react"
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  type SortingState,
-  type VisibilityState,
-  type ColumnDef,
-} from "@tanstack/react-table"
-import { DataTable } from "@/components/ui/data-table"
-import { TableViewHeader } from "../shared/TableViewHeader"
-import { ColumnToggleControls } from "../shared/ColumnToggleControls"
-import { ViewModeToggle, type ViewMode } from "../shared/ViewModeToggle"
+import { useCallback } from "react"
+import { cn } from "@/lib/utils"
 import {
   createAccidentRisksColumns,
   ACCIDENT_RISKS_COLUMNS,
   ACCIDENT_RISKS_PRESETS,
-  type AccidentRisksColumnKey,
 } from "../accident-risks-columns"
-import { useColumnVisibility } from "../shared/useColumnVisibility"
 import { riskCategoryColors, getBadgeClass } from "../shared/table-view-styles"
 import {
   accidentRisks,
   riskCategories,
-  type AccidentRisk,
 } from "@data/tables/accident-risks"
-import { cn } from "@/lib/utils"
+import { TableViewPage } from "../shared/TableViewPage"
 
 function LegendBadge({ level, category }: { level: string; category?: string }) {
   const displayLevel = level
@@ -168,63 +154,7 @@ function Legend() {
   )
 }
 
-function GroupedCategoryTable({
-  category,
-  color,
-  data,
-  columns,
-  columnVisibility,
-}: {
-  category: string
-  color: string
-  data: AccidentRisk[]
-  columns: ColumnDef<AccidentRisk>[]
-  columnVisibility: VisibilityState
-}) {
-  const table = useReactTable({
-    data,
-    columns,
-    state: { columnVisibility },
-    getCoreRowModel: getCoreRowModel(),
-  })
-
-  if (data.length === 0) return null
-
-  return (
-    <div className="space-y-2 mb-8">
-      <div className="flex items-center gap-3 pb-2 border-b-2 border-border">
-        <div
-          className="w-3 h-3 rounded-full shrink-0"
-          style={{ backgroundColor: color }}
-        />
-        <div className="text-base font-semibold text-foreground">{category}</div>
-      </div>
-      <div className="overflow-x-auto">
-        <DataTable table={table} />
-      </div>
-    </div>
-  )
-}
-
 export default function AccidentRisksTableView() {
-  const [viewMode, setViewMode] = useState<ViewMode>("unified")
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "category", desc: false },
-  ])
-
-  const { visibleColumns, toggleColumn, applyPreset } = useColumnVisibility({
-    columns: ACCIDENT_RISKS_COLUMNS,
-    presets: ACCIDENT_RISKS_PRESETS,
-  })
-
-  const columnVisibility = useMemo(() => {
-    const visibility: VisibilityState = { name: true }
-    Object.keys(ACCIDENT_RISKS_COLUMNS).forEach((key) => {
-      visibility[key] = visibleColumns.has(key as AccidentRisksColumnKey)
-    })
-    return visibility
-  }, [visibleColumns])
-
   const scrollToRisk = useCallback((riskId: string) => {
     const element = document.getElementById(`risk-${riskId}`)
     if (element) {
@@ -236,50 +166,34 @@ export default function AccidentRisksTableView() {
     }
   }, [])
 
-  const columns = useMemo(
+  const createColumns = useCallback(
     () => createAccidentRisksColumns(scrollToRisk),
     [scrollToRisk]
   )
 
-  const table = useReactTable({
-    data: accidentRisks,
-    columns,
-    state: {
-      sorting,
-      columnVisibility,
-    },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  })
-
-  const groupedData = useMemo(() => {
-    return riskCategories.map((cat) => ({
-      category: cat,
-      color: riskCategoryColors[cat] || "#6b7280",
-      data: accidentRisks.filter((r) => r.category === cat),
-    }))
-  }, [])
-
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <TableViewHeader
-        title="AI Accident Risks: Overlap Analysis"
-        breadcrumbs={[
-          { label: "Accident Risks", href: "/wiki/accident-risks/" },
-          { label: "All Tables", href: "/wiki/interactive-views/" },
-        ]}
-      />
-
-      <div className="p-4 space-y-4">
-        <ColumnToggleControls
-          columns={ACCIDENT_RISKS_COLUMNS}
-          visibleColumns={visibleColumns}
-          toggleColumn={toggleColumn}
-          presets={ACCIDENT_RISKS_PRESETS}
-          applyPreset={applyPreset}
-        />
-
+    <TableViewPage
+      title="AI Accident Risks: Overlap Analysis"
+      breadcrumbs={[
+        { label: "Accident Risks", href: "/wiki/accident-risks/" },
+        { label: "All Tables", href: "/wiki/interactive-views/" },
+      ]}
+      data={accidentRisks}
+      createColumns={createColumns}
+      columnConfig={ACCIDENT_RISKS_COLUMNS}
+      columnPresets={ACCIDENT_RISKS_PRESETS}
+      pinnedColumn="name"
+      defaultSorting={[{ id: "category", desc: false }]}
+      grouping={{
+        groupByField: "category",
+        groupOrder: [...riskCategories],
+        groupLabels: Object.fromEntries(riskCategories.map((c) => [c, c])),
+        headerStyle: "inline-color",
+        groupDotColors: Object.fromEntries(
+          riskCategories.map((c) => [c, riskCategoryColors[c] || "#6b7280"])
+        ),
+      }}
+      description={
         <div className="max-w-4xl space-y-4">
           <p className="text-sm text-muted-foreground">
             Comparative analysis of AI accident risks with explicit handling of
@@ -317,39 +231,13 @@ export default function AccidentRisksTableView() {
             </span>
           </div>
         </div>
-
-        <ViewModeToggle
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          unifiedLabel="Unified Table"
-          groupedLabel="Grouped by Category"
-        />
-
-        <Legend />
-
-        {viewMode === "unified" ? (
-          <div className="overflow-x-auto">
-            <DataTable table={table} />
-          </div>
-        ) : (
-          <div>
-            {groupedData.map(({ category, color, data }) => (
-              <GroupedCategoryTable
-                key={category}
-                category={category}
-                color={color}
-                data={data}
-                columns={columns}
-                columnVisibility={columnVisibility}
-              />
-            ))}
-          </div>
-        )}
-
+      }
+      legend={<Legend />}
+      footer={
         <div className="text-xs text-muted-foreground mt-4">
           {accidentRisks.length} risks across {riskCategories.length} categories
         </div>
-      </div>
-    </div>
+      }
+    />
   )
 }
