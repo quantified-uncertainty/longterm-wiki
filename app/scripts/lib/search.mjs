@@ -10,10 +10,12 @@
 import MiniSearch from 'minisearch';
 
 /**
- * Fields indexed by MiniSearch and their boost weights.
+ * Fields indexed by MiniSearch.
+ * Boost weights are configured at search time in the consumers
+ * (app/src/lib/search.ts and tooling/lib/search.mjs), not here —
+ * constructor-level searchOptions don't survive toJSON/loadJSON.
  */
 const SEARCH_FIELDS = ['title', 'description', 'tags', 'entityType', 'id'];
-const FIELD_BOOSTS = { title: 3.0, description: 2.0, tags: 1.5, entityType: 1.0, id: 1.0 };
 
 /**
  * Build search documents from typed entities, pages, and the ID registry.
@@ -74,11 +76,6 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
   const miniSearch = new MiniSearch({
     fields: SEARCH_FIELDS,
     storeFields: [], // We store docs separately for smaller index
-    searchOptions: {
-      boost: FIELD_BOOSTS,
-      fuzzy: 0.2,
-      prefix: true,
-    },
   });
 
   miniSearch.addAll(documents);
