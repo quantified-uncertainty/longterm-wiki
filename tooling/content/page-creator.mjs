@@ -1502,7 +1502,7 @@ Read the draft article at: ${draftPath}
 ### Critical Issues (MUST fix - these break the build):
 
 1. **Run precommit validation**:
-   \`npm run precommit\`
+   \`node tooling/crux.mjs validate\`
 
 2. **Fix escaping issues**:
    - Escape unescaped $ signs as \\$
@@ -1528,11 +1528,11 @@ Read the draft article at: ${draftPath}
 
 5. **Fix markdown list formatting**:
    - Numbered lists starting at N>1 need blank line before
-   - Check with: \`npm run crux -- validate unified --rules=markdown-lists\`
+   - Check with: \`node tooling/crux.mjs validate unified --rules=markdown-lists\`
 
 6. **Fix consecutive bold labels**:
    - Bold lines like "**Label:** text" need blank line between them
-   - Check with: \`npm run crux -- validate unified --rules=consecutive-bold-labels\`
+   - Check with: \`node tooling/crux.mjs validate unified --rules=consecutive-bold-labels\`
 
 7. **Remove placeholders**:
    - No TODO markers or placeholder text like "[insert X here]"
@@ -1549,7 +1549,7 @@ Read the draft article at: ${draftPath}
 
 10. **Report** what was fixed.
 
-Keep iterating until ALL checks pass. Run precommit again after each fix.`;
+Keep iterating until ALL checks pass. Run validation again after each fix.`;
 
   return new Promise((resolve, reject) => {
     const claude = spawn('npx', [
@@ -1608,7 +1608,7 @@ async function runFullValidation(topic) {
   try {
     const { execSync } = await import('child_process');
     // Use compile --quick which only checks changed files
-    execSync('npm run crux -- validate compile --quick', {
+    execSync('node tooling/crux.mjs validate compile --quick', {
       cwd: ROOT,
       stdio: 'pipe',
       timeout: 60000
@@ -1669,7 +1669,7 @@ async function runFullValidation(topic) {
 
       try {
         output = execSync(
-          `npm run crux -- validate unified --rules=${rule} --ci 2>&1`,
+          `node tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1`,
           { cwd: ROOT, stdio: 'pipe', timeout: 30000, maxBuffer: 10 * 1024 * 1024 }
         ).toString();
       } catch (execError) {
@@ -1707,7 +1707,7 @@ async function runFullValidation(topic) {
         // Run again in non-CI mode and grep for our file
         try {
           const grepOutput = execSync(
-            `npm run crux -- validate unified --rules=${rule} 2>&1 | grep -i "${topicSlug}" || true`,
+            `node tooling/crux.mjs validate unified --rules=${rule} 2>&1 | grep -i "${topicSlug}" || true`,
             { cwd: ROOT, stdio: 'pipe', timeout: 30000, maxBuffer: 10 * 1024 * 1024 }
           ).toString();
 
@@ -1743,7 +1743,7 @@ async function runFullValidation(topic) {
     try {
       const { execSync } = await import('child_process');
       const output = execSync(
-        `npm run crux -- validate unified --rules=${rule} --ci 2>&1`,
+        `node tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1`,
         { cwd: ROOT, stdio: 'pipe', timeout: 30000 }
       ).toString();
 
@@ -2433,8 +2433,8 @@ async function main() {
       }
 
       console.log(`\n${'\x1b[33m'}📌 Cross-linking reminder:${'\x1b[0m'}`);
-      console.log(`   After running 'npm run build:data', check cross-links:`);
-      console.log(`   ${'\x1b[36m'}npm run crux -- analyze entity-links ${entitySlug}${'\x1b[0m'}`);
+      console.log(`   After running 'pnpm build', check cross-links:`);
+      console.log(`   ${'\x1b[36m'}node tooling/crux.mjs analyze entity-links ${entitySlug}${'\x1b[0m'}`);
       console.log(`\n   This shows pages that mention this entity but don't link to it.`);
       console.log(`   Consider adding EntityLinks to improve wiki connectivity.`);
     } else {

@@ -8,13 +8,13 @@
  *
  * Usage:
  *   # Basic improvement with directions
- *   npm run improve-page -- open-philanthropy --directions "add 2024 funding data"
+ *   node tooling/content/page-improver.mjs -- open-philanthropy --directions "add 2024 funding data"
  *
  *   # Research-heavy improvement
- *   npm run improve-page -- far-ai --tier deep --directions "add recent publications"
+ *   node tooling/content/page-improver.mjs -- far-ai --tier deep --directions "add recent publications"
  *
  *   # Quick polish only
- *   npm run improve-page -- cea --tier polish
+ *   node tooling/content/page-improver.mjs -- cea --tier polish
  *
  * Tiers:
  *   - polish ($2): Single-pass improvement, no research
@@ -120,7 +120,7 @@ function readTemp(pageId, filename) {
 function loadPages() {
   const pagesPath = path.join(ROOT, 'app/src/data/pages.json');
   if (!fs.existsSync(pagesPath)) {
-    console.error('Error: pages.json not found. Run `npm run build:data` first.');
+    console.error('Error: pages.json not found. Run `pnpm build` first.');
     process.exit(1);
   }
   return JSON.parse(fs.readFileSync(pagesPath, 'utf-8'));
@@ -574,7 +574,7 @@ async function validatePhase(page, improvedContent, options) {
   for (const rule of CRITICAL_RULES) {
     try {
       const result = execSync(
-        `npm run crux -- validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
+        `node tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
         { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
       );
       const errorCount = (result.match(/error/gi) || []).length;
@@ -593,7 +593,7 @@ async function validatePhase(page, improvedContent, options) {
   for (const rule of QUALITY_RULES) {
     try {
       const result = execSync(
-        `npm run crux -- validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
+        `node tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
         { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
       );
       const warningCount = (result.match(/warning/gi) || []).length;
@@ -611,7 +611,7 @@ async function validatePhase(page, improvedContent, options) {
   // Check MDX compilation
   log('validate', 'Checking MDX compilation...');
   try {
-    execSync('npm run crux -- validate compile --quick', {
+    execSync('node tooling/crux.mjs validate compile --quick', {
       cwd: ROOT,
       stdio: 'pipe',
       timeout: 60000
@@ -689,7 +689,7 @@ async function runPipeline(pageId, options = {}) {
   const page = findPage(pages, pageId);
   if (!page) {
     console.error(`Page not found: ${pageId}`);
-    console.log('Try: npm run improve-page -- --list');
+    console.log('Try: node tooling/content/page-improver.mjs -- --list');
     process.exit(1);
   }
 
@@ -833,7 +833,7 @@ function listPages(pages, options = {}) {
   candidates.forEach((p, i) => {
     console.log(`| ${i + 1} | ${p.quality} | ${p.importance} | ${p.gap > 0 ? '+' : ''}${p.gap} | ${p.title} (${p.id}) |`);
   });
-  console.log(`\nRun: npm run improve-page -- <page-id> --directions "your directions"`);
+  console.log(`\nRun: node tooling/content/page-improver.mjs -- <page-id> --directions "your directions"`);
 }
 
 // Parse arguments
@@ -868,8 +868,8 @@ Page Improvement Pipeline v2
 Multi-phase improvement with SCRY research and specific directions.
 
 Usage:
-  npm run improve-page -- <page-id> [options]
-  npm run improve-page -- --list
+  node tooling/content/page-improver.mjs -- <page-id> [options]
+  node tooling/content/page-improver.mjs -- --list
 
 Options:
   --directions "..."   Specific improvement directions
@@ -885,10 +885,10 @@ Tiers:
   deep      Full SCRY + web research, gap filling
 
 Examples:
-  npm run improve-page -- open-philanthropy --directions "add 2024 grants"
-  npm run improve-page -- far-ai --tier deep --directions "add publications"
-  npm run improve-page -- cea --tier polish
-  npm run improve-page -- --list --limit 30
+  node tooling/content/page-improver.mjs -- open-philanthropy --directions "add 2024 grants"
+  node tooling/content/page-improver.mjs -- far-ai --tier deep --directions "add publications"
+  node tooling/content/page-improver.mjs -- cea --tier polish
+  node tooling/content/page-improver.mjs -- --list --limit 30
 `);
     return;
   }
@@ -902,7 +902,7 @@ Examples:
   const pageId = opts._positional[0];
   if (!pageId) {
     console.error('Error: No page ID provided');
-    console.error('Try: npm run improve-page -- --list');
+    console.error('Try: node tooling/content/page-improver.mjs -- --list');
     process.exit(1);
   }
 

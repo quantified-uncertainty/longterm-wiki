@@ -7,10 +7,10 @@
  * specific pages identified by validate:quality.
  *
  * Usage:
- *   npm run regrade -- <page-id>              # Re-grade single page
- *   npm run regrade -- page1 page2 page3      # Re-grade multiple pages
- *   npm run regrade -- --overrated            # Re-grade all overrated pages
- *   npm run regrade -- --dry-run <page-id>    # Preview without applying
+ *   node tooling/content/regrade.mjs <page-id>              # Re-grade single page
+ *   node tooling/content/regrade.mjs page1 page2 page3      # Re-grade multiple pages
+ *   node tooling/content/regrade.mjs --overrated            # Re-grade all overrated pages
+ *   node tooling/content/regrade.mjs --dry-run <page-id>    # Preview without applying
  *
  * Requires ANTHROPIC_API_KEY in .env or environment.
  */
@@ -45,7 +45,7 @@ if (!process.env.ANTHROPIC_API_KEY) {
  */
 function findOverratedPages() {
   if (!existsSync(PAGES_FILE)) {
-    console.error('Error: pages.json not found. Run `npm run build:data` first.');
+    console.error('Error: pages.json not found. Run `pnpm build` first.');
     process.exit(1);
   }
 
@@ -103,13 +103,13 @@ async function main() {
 Re-grade Page Quality
 
 Usage:
-  npm run regrade -- <page-id>         Re-grade a single page
-  npm run regrade -- id1 id2 id3       Re-grade multiple pages
-  npm run regrade -- --overrated       Re-grade all overrated pages
-  npm run regrade -- --dry-run <id>    Preview without applying
+  node tooling/content/regrade.mjs <page-id>         Re-grade a single page
+  node tooling/content/regrade.mjs id1 id2 id3       Re-grade multiple pages
+  node tooling/content/regrade.mjs --overrated       Re-grade all overrated pages
+  node tooling/content/regrade.mjs --dry-run <id>    Preview without applying
 
 First, find pages that need re-grading:
-  npm run validate:quality
+  node tooling/crux.mjs validate quality
 `);
     return;
   }
@@ -132,7 +132,7 @@ First, find pages that need re-grading:
   console.log(`Complete: ${succeeded} succeeded, ${failed} failed`);
 
   if (!DRY_RUN && succeeded > 0) {
-    console.log(`\nRun \`npm run build:data\` to update pages.json with new ratings.`);
+    console.log(`\nRun \`pnpm build\` to update pages.json with new ratings.`);
   }
 }
 

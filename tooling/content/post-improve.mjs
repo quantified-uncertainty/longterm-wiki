@@ -96,13 +96,13 @@ async function main() {
   if (!gradeOnly) {
     // Fix dollar signs
     results.dollarFix = run(
-      'npm run validate:dollars -- --fix',
+      'node tooling/crux.mjs validate unified --rules=dollar-signs --fix',
       'Fixing dollar sign escaping'
     );
 
     // Fix comparison operators
     results.comparisonFix = run(
-      'npm run validate:comparisons -- --fix 2>/dev/null || echo "No comparison issues"',
+      'node tooling/crux.mjs validate unified --rules=comparison-operators --fix',
       'Fixing comparison operators'
     );
   }
