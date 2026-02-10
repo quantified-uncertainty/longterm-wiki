@@ -605,7 +605,6 @@
   "documentation-maintenance": "/internal/documentation-maintenance/",
   "enhancement-queue": "/internal/enhancement-queue/",
   "__index__/internal": "/internal/",
-  "insight-grid-experiments": "/internal/insight-grid-experiments/",
   "knowledge-base": "/internal/knowledge-base/",
   "longtermwiki-value-proposition": "/internal/longtermwiki-value-proposition/",
   "mermaid-diagrams": "/internal/mermaid-diagrams/",
@@ -625,7 +624,6 @@
   "research-reports": "/internal/research-reports/",
   "response-style-guide": "/internal/response-style-guide/",
   "risk-style-guide": "/internal/risk-style-guide/",
-  "risk-trajectory-experiments": "/internal/risk-trajectory-experiments/",
   "diagrams": "/internal/schema/diagrams/",
   "__index__/internal/schema": "/internal/schema/",
   "stub-style-guide": "/internal/stub-style-guide/"
