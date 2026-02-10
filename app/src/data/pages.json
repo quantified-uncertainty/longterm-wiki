@@ -56645,12 +56645,6 @@
           "title": "Scheming Likelihood Assessment",
           "path": "/knowledge-base/models/scheming-likelihood-model/",
           "similarity": 10
-        },
-        {
-          "id": "risk-trajectory-experiments",
-          "title": "Risk Trajectory Experiments",
-          "path": "/internal/risk-trajectory-experiments/",
-          "similarity": 10
         }
       ]
     }
@@ -57979,53 +57973,6 @@
     }
   },
   {
-    "id": "insight-grid-experiments",
-    "path": "/internal/insight-grid-experiments/",
-    "filePath": "internal/insight-grid-experiments.mdx",
-    "title": "Insight Grid Experiments",
-    "quality": 14,
-    "importance": 2,
-    "tractability": null,
-    "neglectedness": null,
-    "uncertainty": null,
-    "causalLevel": null,
-    "lastUpdated": null,
-    "llmSummary": "Internal experimental page testing various visualization approaches (sparse grids, treemaps, pixel maps) to represent knowledge gaps in AI safety research, showing ~2-4% coverage of conceptual space. Purely infrastructure/UI experimentation with no substantive research content.",
-    "description": "Experimental visualizations for showing knowledge density and gaps",
-    "ratings": {
-      "novelty": 2,
-      "rigor": 1,
-      "actionability": 0.5,
-      "completeness": 3
-    },
-    "category": "other",
-    "subcategory": null,
-    "clusters": [
-      "ai-safety"
-    ],
-    "metrics": {
-      "wordCount": 302,
-      "tableCount": 0,
-      "diagramCount": 0,
-      "internalLinks": 0,
-      "externalLinks": 0,
-      "bulletRatio": 0.23,
-      "sectionCount": 11,
-      "hasOverview": false,
-      "structuralScore": 3
-    },
-    "suggestedQuality": 20,
-    "wordCount": 302,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 0,
-    "backlinkCount": 0,
-    "redundancy": {
-      "maxSimilarity": 0,
-      "similarPages": []
-    }
-  },
-  {
     "id": "knowledge-base",
     "path": "/internal/knowledge-base/",
     "filePath": "internal/knowledge-base.mdx",
@@ -59264,60 +59211,6 @@
           "title": "Models Style Guide",
           "path": "/internal/models-style-guide/",
           "similarity": 14
-        }
-      ]
-    }
-  },
-  {
-    "id": "risk-trajectory-experiments",
-    "path": "/internal/risk-trajectory-experiments/",
-    "filePath": "internal/risk-trajectory-experiments.mdx",
-    "title": "Risk Trajectory Experiments",
-    "quality": 20,
-    "importance": 8,
-    "tractability": null,
-    "neglectedness": null,
-    "uncertainty": null,
-    "causalLevel": null,
-    "lastUpdated": null,
-    "llmSummary": "Experimental data visualization interface for AI Transition Model showing how catastrophe risk and lock-in severity evolve over four timeline phases (2025-2045+) through multiple pathways and root factors. No quantitative values, evidence, or methodological details provided—purely interface documentation.",
-    "description": "Experimental visualizations for AI transition risk over time",
-    "ratings": {
-      "novelty": 3.2,
-      "rigor": 1.5,
-      "actionability": 2,
-      "completeness": 2.8
-    },
-    "category": "other",
-    "subcategory": null,
-    "clusters": [
-      "ai-safety"
-    ],
-    "metrics": {
-      "wordCount": 352,
-      "tableCount": 0,
-      "diagramCount": 0,
-      "internalLinks": 1,
-      "externalLinks": 0,
-      "bulletRatio": 0.44,
-      "sectionCount": 9,
-      "hasOverview": false,
-      "structuralScore": 3
-    },
-    "suggestedQuality": 20,
-    "wordCount": 352,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 0,
-    "backlinkCount": 0,
-    "redundancy": {
-      "maxSimilarity": 10,
-      "similarPages": [
-        {
-          "id": "scenarios-overview",
-          "title": "Ultimate Scenarios",
-          "path": "/ai-transition-model/scenarios-overview/",
-          "similarity": 10
         }
       ]
     }
