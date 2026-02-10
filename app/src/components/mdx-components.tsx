@@ -20,6 +20,22 @@ import { FactorSubItemsList, AllFactorsSubItems } from "@/components/wiki/Factor
 import CauseEffectGraph from "@/components/wiki/CauseEffectGraph";
 import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 
+// Ported stub components — high priority
+import { Section } from "@/components/wiki/Section";
+import { KeyQuestions } from "@/components/wiki/KeyQuestions";
+import { KeyPeople } from "@/components/wiki/KeyPeople";
+import { DisagreementMap } from "@/components/wiki/DisagreementMap";
+import { Crux } from "@/components/wiki/Crux";
+
+// Ported stub components — medium priority
+import { Tags } from "@/components/wiki/Tags";
+import { FullWidthLayout } from "@/components/wiki/FullWidthLayout";
+import { ModelsList } from "@/components/wiki/ModelsList";
+import { FactorRelationshipDiagram } from "@/components/wiki/FactorRelationshipDiagram";
+import { ImpactList } from "@/components/wiki/ImpactList";
+import { MdxTabs, MdxTabItem } from "@/components/wiki/MdxTabs";
+import { Badge } from "@/components/ui/badge";
+
 // Legacy compat shim: Starlight's <Aside> mapped to our <Callout> component
 type CalloutVariant = "note" | "tip" | "caution" | "warning" | "danger";
 function Aside({ type, title, children }: { type?: string; title?: string; children?: React.ReactNode }) {
@@ -34,22 +50,25 @@ function Stub({ children }: { children?: React.ReactNode }) {
   return <div className="p-2 bg-muted/50 rounded text-sm text-muted-foreground">{children}</div>;
 }
 
-// Legacy component names still referenced in MDX content, rendered as stubs
+// Legacy component names still referenced in MDX content, rendered as stubs.
+// Dead stubs removed: Crux, Code, Steps, Icon, FileTree
+// Ported stubs removed: Badge, DisagreementMap, FactorRelationshipDiagram,
+//   FullWidthLayout, ImpactList, KeyPeople, KeyQuestions, ModelsList,
+//   Section, TabItem, Tabs, Tags
 const stubNames = [
   "AnthropicFact", "ArticleSources",
-  "Badge",
-  "ConceptsDirectory", "Crux", "CruxList", "DataCrux", "DataEstimateBox",
-  "DisagreementMap", "DualOutcomeChart", "EntityGraph", "EstimateBox",
-  "FactorAttributionMatrix", "FactorGauges", "FactorRelationshipDiagram",
-  "FullModelDiagram", "FullWidthLayout", "ImpactGrid",
-  "ImpactList", "InsightGridExperiments", "InsightScoreMatrix", "InsightsTable",
-  "KeyPeople", "KeyQuestions", "KnowledgeTreemap", "ModelsList",
+  "ConceptsDirectory", "CruxList", "DataCrux", "DataEstimateBox",
+  "DualOutcomeChart", "EntityGraph", "EstimateBox",
+  "FactorAttributionMatrix", "FactorGauges",
+  "FullModelDiagram", "ImpactGrid",
+  "InsightGridExperiments", "InsightScoreMatrix", "InsightsTable",
+  "KnowledgeTreemap",
   "OutcomesTable", "PageIndex", "PixelDensityMap",
   "PriorityMatrix", "QualityDashboard", "ResearchFrontier", "ResourceCite",
   "ResourceList", "ResourcesIndex", "RiskDashboard", "RiskTrajectoryExperiments",
-  "RootFactorsTable", "ScenariosTable", "Section", "SparseKnowledgeGrid",
-  "TabItem", "Table", "TableBody", "TableCell", "TableHead", "TableHeader",
-  "TableRow", "Tabs", "TagBrowser", "Tags", "TimelineViz", "TopicQuestionGrid",
+  "RootFactorsTable", "ScenariosTable", "SparseKnowledgeGrid",
+  "Table", "TableBody", "TableCell", "TableHead", "TableHeader",
+  "TableRow", "TagBrowser", "TimelineViz", "TopicQuestionGrid",
   "TrajectoryLines",
 ] as const;
 
@@ -104,6 +123,23 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   CardGrid,
   LinkCard,
 
+  // Ported stub components — high priority (used across many pages)
+  Section,
+  KeyQuestions,
+  KeyPeople,
+  DisagreementMap,
+  Crux,
+
+  // Ported stub components — medium priority
+  Tags,
+  Badge,
+  FullWidthLayout,
+  ModelsList,
+  FactorRelationshipDiagram,
+  ImpactList,
+  Tabs: MdxTabs,
+  TabItem: MdxTabItem,
+
   // Override pre/code to detect ```mermaid fenced code blocks
   pre: ({ children, ...props }: React.ComponentProps<"pre">) => {
     // Check if this is a mermaid code block
@@ -136,6 +172,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
     );
   },
 
-  // All other Astro/custom components as stubs
+  // Remaining legacy stubs — low priority, kept to prevent MDX compilation errors
   ...stubs,
 };
