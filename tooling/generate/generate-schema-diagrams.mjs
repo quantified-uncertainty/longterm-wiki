@@ -20,9 +20,14 @@ import {
   RelatedEntry,
   CustomField,
   EntitySource,
-} from '../../app/app/src/data/schema.ts';
+} from '../../app/src/data/schema.ts';
 
-const OUTPUT_DIR = 'internal';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const ROOT = join(__dirname, '..', '..');
+const OUTPUT_DIR = join(ROOT, 'internal');
 
 // Ensure output directory exists
 mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -383,7 +388,7 @@ for (const { name, fn, title } of diagrams) {
 // Generate a combined markdown file with all diagrams
 let combinedMd = `# Schema Visualizations
 
-Auto-generated from \`app/src/data/schema.ts\` using \`scripts/generate-schema-diagrams.mjs\`
+Auto-generated from \`app/src/data/schema.ts\` using \`tooling/generate/generate-schema-diagrams.mjs\`
 
 Generated: ${new Date().toISOString()}
 

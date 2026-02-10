@@ -26,7 +26,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.mjs';
-import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.mjs';
+import { parseFrontmatter } from '../lib/mdx-utils.mjs';
 import { getColors } from '../lib/output.mjs';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, GENERATED_DATA_DIR_ABS as DATA_DIR } from '../lib/content-types.mjs';
 
@@ -37,7 +37,7 @@ const HELP = args.includes('--help');
 const FUZZY_MODE = args.includes('--fuzzy');
 const SINGLE_FILE = args.find(a => a.startsWith('--file='))?.split('=')[1];
 
-const colors = getColors(false);
+const colors = getColors();
 
 /**
  * Levenshtein distance for fuzzy matching
@@ -183,19 +183,28 @@ ${colors.bold}Safety:${colors.reset}
 }
 
 /**
- * Load entities from database and path registry
+ * Load a JSON file from the generated data directory, returning fallback if missing
+ */
+function loadGeneratedJson(filename, fallback = []) {
+  const filepath = join(DATA_DIR, filename);
+  if (!existsSync(filepath)) return fallback;
+  return JSON.parse(readFileSync(filepath, 'utf-8'));
+}
+
+/**
+ * Load entities from generated JSON files and path registry
  */
 function loadEntities() {
   const registryPath = join(DATA_DIR, 'pathRegistry.json');
-  const dbPath = join(DATA_DIR, 'database.json');
 
-  if (!existsSync(registryPath) || !existsSync(dbPath)) {
-    console.error('Error: Run pnpm build first');
+  if (!existsSync(registryPath)) {
+    console.error('Error: Run pnpm build first (pathRegistry.json not found)');
     process.exit(1);
   }
 
   const pathRegistry = JSON.parse(readFileSync(registryPath, 'utf-8'));
-  const database = JSON.parse(readFileSync(dbPath, 'utf-8'));
+  const organizations = loadGeneratedJson('organizations.json');
+  const experts = loadGeneratedJson('experts.json');
 
   // Build entity lookup: searchTerm -> { id, displayName, priority }
   const entities = new Map();
@@ -213,7 +222,7 @@ function loadEntities() {
   };
 
   // Add organizations (highest priority)
-  for (const org of (database.organizations || [])) {
+  for (const org of organizations) {
     if (org.name && org.id) {
       addEntity(org.name, org.id, org.name, 100 + org.name.length);
       if (org.shortName && org.shortName.length >= 4) {
@@ -223,7 +232,7 @@ function loadEntities() {
   }
 
   // Add people
-  for (const expert of (database.experts || [])) {
+  for (const expert of experts) {
     if (expert.name && expert.id) {
       addEntity(expert.name, expert.id, expert.name, 80 + expert.name.length);
     }
@@ -496,15 +505,6 @@ function processFile(filePath, entities, pageEntityId) {
   return { changes, modifiedContent, originalContent: content, fuzzySuggestions };
 }
 
-/**
- * Validate that modified content compiles
- */
-function validateCompiles(filePath, content) {
-  // Skip compilation check — Astro check not available in Next.js project.
-  // The content is validated structurally by the cross-link insertion logic.
-  return true;
-}
-
 async function main() {
   if (HELP) {
     showHelp();
@@ -519,7 +519,7 @@ async function main() {
 
   let files;
   if (SINGLE_FILE) {
-    const fullPath = join(PROJECT_ROOT, SINGLE_FILE);
+    const fullPath = SINGLE_FILE.startsWith('/') ? SINGLE_FILE : join(PROJECT_ROOT, SINGLE_FILE);
     if (!existsSync(fullPath)) {
       console.error(`File not found: ${SINGLE_FILE}`);
       process.exit(1);

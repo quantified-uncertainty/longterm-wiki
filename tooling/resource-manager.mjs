@@ -42,17 +42,29 @@ function hashId(str) {
 }
 
 /**
- * Determine which file a resource belongs to based on type/publication
+ * Determine which file a new resource belongs to based on type/publication.
+ * Only used for NEW resources that don't have a source file yet.
  */
 function getResourceCategory(resource) {
   if (resource.type === 'paper') return 'papers';
   if (resource.type === 'government') return 'government';
+  if (resource.type === 'reference') return 'reference';
   if (resource.publication_id && FORUM_PUBLICATION_IDS.has(resource.publication_id)) return 'forums';
-  return 'general';
+  // Check URL domain for better categorization
+  if (resource.url) {
+    try {
+      const domain = new URL(resource.url).hostname.replace('www.', '');
+      if (['nature.com', 'science.org', 'springer.com', 'wiley.com', 'sciencedirect.com'].some(d => domain.includes(d))) return 'academic';
+      if (['openai.com', 'anthropic.com', 'deepmind.com', 'google.com/deepmind'].some(d => domain.includes(d))) return 'ai-labs';
+      if (['nytimes.com', 'washingtonpost.com', 'bbc.com', 'reuters.com', 'theguardian.com'].some(d => domain.includes(d))) return 'news-media';
+    } catch {}
+  }
+  return 'web-other';
 }
 
 /**
- * Load all resources from the split directory
+ * Load all resources from the split directory.
+ * Tags each resource with _sourceFile so we can write back to the same file.
  */
 function loadResources() {
   const resources = [];
@@ -65,40 +77,35 @@ function loadResources() {
     const filepath = join(RESOURCES_DIR, file);
     const content = readFileSync(filepath, 'utf-8');
     const data = parseYaml(content) || [];
+    const category = file.replace('.yaml', '');
+    for (const resource of data) {
+      resource._sourceFile = category;
+    }
     resources.push(...data);
   }
   return resources;
 }
 
 /**
- * Save resources to the appropriate split files based on type
+ * Save resources back to their source files, preserving the existing directory structure.
+ * New resources (without _sourceFile) are categorized by getResourceCategory().
  */
 function saveResources(resources) {
-  // Categorize resources
-  const categorized = {
-    papers: [],
-    government: [],
-    forums: [],
-    general: [],
-  };
+  // Group by source file, preserving the original structure
+  const byFile = {};
 
   for (const resource of resources) {
-    const category = getResourceCategory(resource);
-    categorized[category].push(resource);
+    const category = resource._sourceFile || getResourceCategory(resource);
+    if (!byFile[category]) byFile[category] = [];
+    // Remove internal tracking field before writing
+    const { _sourceFile, ...cleanResource } = resource;
+    byFile[category].push(cleanResource);
   }
 
-  // Headers for each file
-  const headers = {
-    papers: '# Papers Resources\n# Academic papers, preprints, and research publications\n\n',
-    government: '# Government Resources\n# Government documents, policy reports, and regulatory materials\n\n',
-    forums: '# Forums Resources\n# Posts from LessWrong, Alignment Forum, and EA Forum\n\n',
-    general: '# General Resources\n# Web articles, blog posts, and other resources\n\n',
-  };
-
-  // Write each category to its file
-  for (const [category, items] of Object.entries(categorized)) {
+  // Write each file that has resources
+  for (const [category, items] of Object.entries(byFile)) {
     const filepath = join(RESOURCES_DIR, `${category}.yaml`);
-    const content = headers[category] + stringifyYaml(items, { lineWidth: 100 });
+    const content = stringifyYaml(items, { lineWidth: 100 });
     writeFileSync(filepath, content);
   }
 }
@@ -177,13 +184,6 @@ function findFileByName(name) {
   // Try partial match
   match = allFiles.find(f => f.includes(name));
   return match || null;
-}
-
-function getImportDepth(filePath) {
-  const fromDir = dirname(filePath);
-  const srcDir = 'src';
-  const rel = relative(fromDir, srcDir);
-  return rel.split('/').join('/') + '/';
 }
 
 function guessResourceType(url) {
@@ -402,29 +402,8 @@ function cmdProcess(opts) {
     content = content.replace(c.original, c.replacement);
   }
 
-  // Add R import if needed
-  const hasRImport = /import\s*{[^}]*\bR\b[^}]*}\s*from/.test(content);
-  if (!hasRImport) {
-    const wikiImportRegex = /import\s*{([^}]+)}\s*from\s*['"]([^'"]*components\/wiki)['"]/;
-    const wikiMatch = content.match(wikiImportRegex);
-    if (wikiMatch) {
-      const existingImports = wikiMatch[1];
-      const newImports = existingImports.trim() + ', R';
-      content = content.replace(wikiImportRegex, `import {${newImports}} from '${wikiMatch[2]}'`);
-    } else {
-      // Add new import after frontmatter
-      const importDepth = getImportDepth(filePath);
-      const importStatement = `\nimport {R} from '${importDepth}components/wiki';\n`;
-      if (content.startsWith('---')) {
-        const afterFirst = content.indexOf('\n') + 1;
-        const closingMatch = content.slice(afterFirst).match(/\n---(?=\n|[^-]|$)/);
-        if (closingMatch) {
-          const insertPos = afterFirst + closingMatch.index + 4;
-          content = content.slice(0, insertPos) + importStatement + content.slice(insertPos);
-        }
-      }
-    }
-  }
+  // Note: In Next.js, <R> is registered globally via mdx-components.tsx,
+  // so no import injection is needed (unlike the old Astro setup).
 
   // Save changes
   if (!dryRun) {
@@ -1242,7 +1221,7 @@ async function cmdEnrich(opts) {
   // Load entities for tag inference (read all YAML files from data/entities/)
   let entities = [];
   try {
-    const entitiesDir = 'data/entities';
+    const entitiesDir = join(DATA_DIR, 'entities');
     if (existsSync(entitiesDir)) {
       for (const file of readdirSync(entitiesDir).filter(f => f.endsWith('.yaml'))) {
         const content = readFileSync(join(entitiesDir, file), 'utf-8');
