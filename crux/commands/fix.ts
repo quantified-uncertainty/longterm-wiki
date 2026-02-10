@@ -11,7 +11,7 @@ import { buildCommands } from '../lib/cli.ts';
  */
 const SCRIPTS = {
   all: {
-    script: 'auto-fix.mjs',
+    script: 'auto-fix.ts',
     description: 'Run all auto-fixers',
     passthrough: ['dryRun'],
   },
@@ -22,12 +22,12 @@ const SCRIPTS = {
     extraArgs: ['--fix'],
   },
   'cross-links': {
-    script: 'fix/fix-cross-links.mjs',
+    script: 'fix/fix-cross-links.ts',
     description: 'Add EntityLinks to plain text entity mentions',
     passthrough: ['apply', 'verbose', 'file'],
   },
   'broken-links': {
-    script: 'fix-broken-links.mjs',
+    script: 'fix-broken-links.ts',
     description: 'Fix broken internal links',
     passthrough: ['dryRun'],
     extraArgs: ['--fix'],
@@ -63,7 +63,7 @@ const SCRIPTS = {
     extraArgs: ['--rules=frontmatter-schema', '--fix'],
   },
   imports: {
-    script: 'fix/fix-component-imports.mjs',
+    script: 'fix/fix-component-imports.ts',
     description: 'Add missing component imports to MDX files',
     passthrough: ['apply', 'verbose', 'file'],
   },

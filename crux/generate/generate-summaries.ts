@@ -7,7 +7,7 @@
  * Stores results in the knowledge database.
  *
  * Usage:
- *   node crux/generate/generate-summaries.mjs [options]
+ *   node crux/generate/generate-summaries.ts [options]
  *
  * Options:
  *   --type <type>        Entity type to summarize: 'articles' or 'sources' (default: articles)
@@ -20,29 +20,69 @@
  *   --verbose            Show detailed output
  *
  * Examples:
- *   node crux/generate/generate-summaries.mjs --batch 100 --concurrency 5
- *   node crux/generate/generate-summaries.mjs --type sources --batch 50 --concurrency 10
+ *   node crux/generate/generate-summaries.ts --batch 100 --concurrency 5
+ *   node crux/generate/generate-summaries.ts --type sources --batch 50 --concurrency 10
  *
  * Environment:
  *   ANTHROPIC_API_KEY - Required API key (from .env file)
  */
 
+import { fileURLToPath } from 'url';
 import { articles, sources, summaries } from '../lib/knowledge-db.ts';
 import { getColors } from '../lib/output.ts';
 import { createClient, resolveModel, sleep } from '../lib/anthropic.ts';
 
+interface SummaryResult {
+  oneLiner: string;
+  summary: string;
+  review?: string;
+  keyPoints: string[];
+  keyClaims: Array<{ claim: string; value: string }>;
+  tokensUsed: number;
+}
+
+interface Article {
+  id: string;
+  title?: string;
+  content: string;
+}
+
+interface Source {
+  id: string;
+  title?: string;
+  content?: string;
+  source_type?: string;
+  authors?: string | string[];
+  year?: number;
+  importance?: number;
+}
+
+interface ProcessResult {
+  status: 'fulfilled' | 'rejected';
+  item: Article | Source;
+  result?: SummaryResult;
+  error?: Error;
+}
+
+interface ProcessStats {
+  results: ProcessResult[];
+  completed: number;
+  failed: number;
+  totalTokens: number;
+}
+
 const args = process.argv.slice(2);
 
-function getArg(name, defaultValue) {
+function getArg(name: string, defaultValue: string | null): string | null {
   const index = args.indexOf(`--${name}`);
   if (index === -1) return defaultValue;
   return args[index + 1] || defaultValue;
 }
 
-const TYPE = getArg('type', 'articles');
-const BATCH_SIZE = parseInt(getArg('batch', '10'));
-const MODEL_NAME = getArg('model', 'haiku');
-const CONCURRENCY = parseInt(getArg('concurrency', '3'));
+const TYPE = getArg('type', 'articles')!;
+const BATCH_SIZE = parseInt(getArg('batch', '10')!);
+const MODEL_NAME = getArg('model', 'haiku')!;
+const CONCURRENCY = parseInt(getArg('concurrency', '3')!);
 const RESUMMARY = args.includes('--resummary');
 const SPECIFIC_ID = getArg('id', null);
 const DRY_RUN = args.includes('--dry-run');
@@ -122,7 +162,7 @@ CONTENT:
 /**
  * Get review length instruction based on importance
  */
-function getReviewLengthInstruction(importance) {
+function getReviewLengthInstruction(importance: number): string {
   if (importance >= 70) {
     return '3-4 paragraph (400-600 words)';
   } else if (importance >= 40) {
@@ -139,7 +179,7 @@ function getReviewLengthInstruction(importance) {
 /**
  * Call Anthropic API to generate summary
  */
-async function generateSummary(prompt) {
+async function generateSummary(prompt: string): Promise<SummaryResult> {
   if (!anthropic) {
     throw new Error('Anthropic client not initialized');
   }
@@ -153,7 +193,11 @@ async function generateSummary(prompt) {
     }]
   });
 
-  const text = response.content[0].text;
+  const block = response.content[0];
+  if (!block || block.type !== 'text') {
+    throw new Error('Expected text content block from API response');
+  }
+  const text = block.text;
   const tokensUsed = response.usage.input_tokens + response.usage.output_tokens;
 
   // Parse JSON response
@@ -165,7 +209,7 @@ async function generateSummary(prompt) {
     }
     const parsed = JSON.parse(jsonMatch[0]);
     return { ...parsed, tokensUsed };
-  } catch (err) {
+  } catch (err: unknown) {
     console.error(`${colors.yellow}Warning: Could not parse response as JSON${colors.reset}`);
     if (VERBOSE) {
       console.error('Response:', text);
@@ -184,7 +228,7 @@ async function generateSummary(prompt) {
 /**
  * Summarize an article
  */
-async function summarizeArticle(article) {
+async function summarizeArticle(article: Article): Promise<SummaryResult> {
   // Truncate content if too long (roughly 100K chars = ~25K tokens)
   const maxContentLength = 100000;
   const content = article.content.length > maxContentLength
@@ -208,7 +252,7 @@ async function summarizeArticle(article) {
 /**
  * Summarize a source
  */
-async function summarizeSource(source) {
+async function summarizeSource(source: Source): Promise<SummaryResult> {
   if (!source.content) {
     throw new Error('Source has no content');
   }
@@ -227,7 +271,7 @@ async function summarizeSource(source) {
     .replace('{{TITLE}}', source.title || 'Unknown')
     .replace('{{TYPE}}', source.source_type || 'unknown')
     .replace('{{AUTHORS}}', Array.isArray(source.authors) ? source.authors.join(', ') : (source.authors || 'Unknown'))
-    .replace('{{YEAR}}', source.year || 'Unknown')
+    .replace('{{YEAR}}', String(source.year || 'Unknown'))
     .replace('{{REVIEW_LENGTH}}', reviewLength)
     .replace('{{CONTENT}}', content);
 
@@ -248,8 +292,13 @@ async function summarizeSource(source) {
 /**
  * Process items in parallel batches with rate limiting
  */
-async function processInParallel(items, processor, concurrency, onProgress) {
-  const results = [];
+async function processInParallel(
+  items: Array<Article | Source>,
+  processor: (item: Article | Source) => Promise<SummaryResult>,
+  concurrency: number,
+  onProgress?: (index: number, item: Article | Source, result: SummaryResult | null, error: Error | null) => void
+): Promise<ProcessStats> {
+  const results: ProcessResult[] = [];
   let completed = 0;
   let failed = 0;
   let totalTokens = 0;
@@ -263,11 +312,12 @@ async function processInParallel(items, processor, concurrency, onProgress) {
         completed++;
         totalTokens += result.tokensUsed || 0;
         onProgress?.(globalIndex, item, result, null);
-        return { status: 'fulfilled', item, result };
-      } catch (err) {
+        return { status: 'fulfilled' as const, item, result };
+      } catch (err: unknown) {
         failed++;
-        onProgress?.(globalIndex, item, null, err);
-        return { status: 'rejected', item, error: err };
+        const error = err instanceof Error ? err : new Error(String(err));
+        onProgress?.(globalIndex, item, null, error);
+        return { status: 'rejected' as const, item, error };
       }
     });
 
@@ -287,7 +337,7 @@ async function processInParallel(items, processor, concurrency, onProgress) {
 // MAIN
 // =============================================================================
 
-async function main() {
+async function main(): Promise<void> {
   console.log(`${colors.blue}📝 Summary Generator${colors.reset}`);
   console.log(`   Model: ${MODEL_NAME} (${MODEL_ID})`);
   console.log(`   Type: ${TYPE}`);
@@ -296,7 +346,7 @@ async function main() {
   if (DRY_RUN) console.log(`   ${colors.yellow}DRY RUN - no API calls${colors.reset}`);
   console.log();
 
-  let items = [];
+  let items: Array<Article | Source> = [];
 
   if (SPECIFIC_ID) {
     // Get specific item
@@ -344,7 +394,7 @@ async function main() {
   }
 
   // Progress callback
-  const onProgress = (index, item, result, error) => {
+  const onProgress = (index: number, item: Article | Source, result: SummaryResult | null, error: Error | null): void => {
     const progress = `[${index + 1}/${items.length}]`;
     if (error) {
       console.log(`${colors.cyan}${progress}${colors.reset} ${item.title || item.id}`);
@@ -388,7 +438,10 @@ async function main() {
   console.log(`  Sources without summaries: ${remainingSources}`);
 }
 
-main().catch(err => {
-  console.error(`${colors.red}Fatal error: ${err.message}${colors.reset}`);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: unknown) => {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error(`${colors.red}Fatal error: ${error.message}${colors.reset}`);
+    process.exit(1);
+  });
+}

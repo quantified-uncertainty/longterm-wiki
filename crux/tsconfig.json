@@ -12,5 +12,5 @@
     "allowJs": true,
     "checkJs": false
   },
-  "include": ["lib/**/*.ts", "validate/**/*.ts"]
+  "include": ["lib/**/*.ts", "validate/**/*.ts", "commands/**/*.ts", "analyze/**/*.ts", "fix/**/*.ts", "generate/**/*.ts", "*.ts"]
 }

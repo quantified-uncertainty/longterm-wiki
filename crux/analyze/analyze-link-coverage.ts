@@ -10,19 +10,20 @@
  * - Generates reports on overall wiki connectivity
  *
  * Usage:
- *   node crux/analyze/analyze-link-coverage.mjs                    # Full report
- *   node crux/analyze/analyze-link-coverage.mjs --orphans          # Show poorly-linked pages
- *   node crux/analyze/analyze-link-coverage.mjs --top-linked       # Show most linked pages
- *   node crux/analyze/analyze-link-coverage.mjs --json             # JSON output
- *   node crux/analyze/analyze-link-coverage.mjs --page scheming    # Analyze specific page
+ *   node crux/analyze/analyze-link-coverage.ts                    # Full report
+ *   node crux/analyze/analyze-link-coverage.ts --orphans          # Show poorly-linked pages
+ *   node crux/analyze/analyze-link-coverage.ts --top-linked       # Show most linked pages
+ *   node crux/analyze/analyze-link-coverage.ts --json             # JSON output
+ *   node crux/analyze/analyze-link-coverage.ts --page scheming    # Analyze specific page
  */
 
+import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
 import { relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadBacklinks, loadPathRegistry } from '../lib/content-types.js';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadBacklinks, loadPathRegistry, type BacklinksMap, type PathRegistry } from '../lib/content-types.ts';
 
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json');
@@ -32,14 +33,48 @@ const colors = getColors(JSON_MODE);
 
 // Find --page argument
 const pageArgIndex = args.indexOf('--page');
-const SPECIFIC_PAGE = pageArgIndex !== -1 ? args[pageArgIndex + 1] : null;
+const SPECIFIC_PAGE: string | null = pageArgIndex !== -1 ? args[pageArgIndex + 1] : null;
+
+// ---------------------------------------------------------------------------
+// Interfaces
+// ---------------------------------------------------------------------------
+
+interface PageAnalysis {
+  path: string;
+  slug: string;
+  title: string;
+  importance: number;
+  quality: number;
+  pageType: string;
+  wordCount: number;
+  outgoingEntityLinks: number;
+  outgoingMarkdownLinks: number;
+  totalOutgoing: number;
+  incomingLinks: number;
+  incomingFrom: unknown[];
+  linkDensity: string;
+  entityLinkTargets: string[];
+}
+
+interface Summary {
+  totalPages: number;
+  totalEntityLinks: number;
+  avgOutgoingLinks: string;
+  avgIncomingLinks: string;
+  orphanCount: number;
+  underlinkedCount: number;
+  orphans: PageAnalysis[];
+  underlinked: PageAnalysis[];
+  topLinked: PageAnalysis[];
+  leastLinked: PageAnalysis[];
+}
 
 /**
  * Count EntityLink components in content
  */
-function countEntityLinks(content) {
+function countEntityLinks(content: string): string[] {
   const regex = /<EntityLink\s+id="([^"]+)"/g;
-  const links = [];
+  const links: string[] = [];
   let match;
   while ((match = regex.exec(content)) !== null) {
     links.push(match[1]);
@@ -50,9 +85,9 @@ function countEntityLinks(content) {
 /**
  * Count markdown links (internal only)
  */
-function countMarkdownLinks(content) {
+function countMarkdownLinks(content: string): string[] {
   const regex = /\[([^\]]*)\]\(\/([^)]+)\)/g;
-  const links = [];
+  const links: string[] = [];
   let match;
   while ((match = regex.exec(content)) !== null) {
     links.push(match[2]);
@@ -63,19 +98,19 @@ function countMarkdownLinks(content) {
 /**
  * Extract page slug from file path
  */
-function getPageSlug(filePath) {
+function getPageSlug(filePath: string): string {
   const rel = relative(CONTENT_DIR, filePath);
   return rel
     .replace(/\.mdx?$/, '')
     .replace(/\/index$/, '')
     .split('/')
-    .pop();
+    .pop() || '';
 }
 
 /**
  * Analyze a single page
  */
-function analyzePage(filePath, backlinks, pathRegistry) {
+function analyzePage(filePath: string, backlinks: BacklinksMap, _pathRegistry: PathRegistry): PageAnalysis {
   const content = readFileSync(filePath, 'utf-8');
   const frontmatter = parseFrontmatter(content);
   const body = getContentBody(content);
@@ -96,10 +131,10 @@ function analyzePage(filePath, backlinks, pathRegistry) {
   return {
     path: relPath,
     slug,
-    title: frontmatter.title || slug,
-    importance: frontmatter.importance || 0,
-    quality: frontmatter.quality || 0,
-    pageType: frontmatter.pageType || 'content',
+    title: (frontmatter.title as string) || slug,
+    importance: (frontmatter.importance as number) || 0,
+    quality: (frontmatter.quality as number) || 0,
+    pageType: (frontmatter.pageType as string) || 'content',
     wordCount,
     outgoingEntityLinks: entityLinks.length,
     outgoingMarkdownLinks: markdownLinks.length,
@@ -114,7 +149,7 @@ function analyzePage(filePath, backlinks, pathRegistry) {
 /**
  * Generate summary statistics
  */
-function generateSummary(pages) {
+function generateSummary(pages: PageAnalysis[]): Summary {
   const contentPages = pages.filter(
     (p) => p.pageType === 'content' && !p.path.includes('/internal/')
   );
@@ -158,18 +193,18 @@ function generateSummary(pages) {
   };
 }
 
-function main() {
+function main(): void {
   const backlinks = loadBacklinks();
   const pathRegistry = loadPathRegistry();
   const files = findMdxFiles(CONTENT_DIR);
 
   // Analyze all pages
-  const pages = [];
+  const pages: PageAnalysis[] = [];
   for (const file of files) {
     try {
       const analysis = analyzePage(file, backlinks, pathRegistry);
       pages.push(analysis);
-    } catch (err) {
+    } catch (err: unknown) {
       // Skip files that can't be analyzed
     }
   }
@@ -201,7 +236,7 @@ function main() {
       if (page.incomingFrom.length > 0) {
         // Handle both string and object formats from backlinks.json
         const fromLabels = page.incomingFrom.map(item =>
-          typeof item === 'string' ? item : (item.title || item.id || 'unknown')
+          typeof item === 'string' ? item : ((item as Record<string, string>).title || (item as Record<string, string>).id || 'unknown')
         );
         console.log(`  From: ${fromLabels.slice(0, 10).join(', ')}${fromLabels.length > 10 ? '...' : ''}`);
       }
@@ -309,4 +344,6 @@ function main() {
   console.log(`${colors.dim}Run node crux/crux.mjs analyze mentions to find unlinked entity mentions${colors.reset}`);
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

@@ -11,33 +11,33 @@ import { buildCommands } from '../lib/cli.ts';
  */
 const SCRIPTS = {
   yaml: {
-    script: 'generate/generate-yaml.mjs',
+    script: 'generate/generate-yaml.ts',
     description: 'Generate YAML from MDX files',
     passthrough: ['verbose', 'dryRun'],
     positional: true,
   },
   summaries: {
-    script: 'generate/generate-summaries.mjs',
+    script: 'generate/generate-summaries.ts',
     description: 'Generate summaries with AI',
     passthrough: ['type', 'batch', 'concurrency', 'model', 'resummary', 'id', 'dryRun', 'verbose'],
   },
   diagrams: {
-    script: 'generate/generate-data-diagrams.mjs',
+    script: 'generate/generate-data-diagrams.ts',
     description: 'Generate diagrams from entity data',
     passthrough: ['verbose'],
   },
   'schema-diagrams': {
-    script: 'generate/generate-schema-diagrams.mjs',
+    script: 'generate/generate-schema-diagrams.ts',
     description: 'Generate schema diagrams',
     passthrough: [],
   },
   'schema-docs': {
-    script: 'generate/generate-schema-docs.mjs',
+    script: 'generate/generate-schema-docs.ts',
     description: 'Generate documentation from schema',
     passthrough: [],
   },
   reports: {
-    script: 'generate/generate-research-reports.mjs',
+    script: 'generate/generate-research-reports.ts',
     description: 'Generate research reports',
     passthrough: ['topic', 'output', 'verbose'],
     positional: true,

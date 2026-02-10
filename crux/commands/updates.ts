@@ -14,7 +14,52 @@ import { join, relative } from 'path';
 import { execFileSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
-import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.js';
+import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
+import type { CommandResult } from '../lib/cli.ts';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface UpdateCandidate {
+  id: string;
+  title: string;
+  filePath: string;
+  fullPath: string;
+  updateFrequency: number;
+  lastEdited: string;
+  daysSinceEdit: number;
+  staleness: number;
+  importance: number;
+  quality: number;
+  priority: number;
+  overdue: boolean;
+  category: string;
+}
+
+interface StatsCandidate {
+  staleness: number;
+  priority: number;
+  overdue: boolean;
+  category: string;
+}
+
+interface CategoryStats {
+  total: number;
+  overdue: number;
+  avgPriority: number;
+}
+
+interface CommandOptions {
+  ci?: boolean;
+  json?: boolean;
+  limit?: string;
+  overdue?: boolean;
+  count?: string;
+  tier?: string;
+  dryRun?: boolean;
+  [key: string]: unknown;
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -23,8 +68,8 @@ import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.js';
 /**
  * Recursively find all MDX/MD files in a directory
  */
-function findMdxFiles(dir) {
-  const results = [];
+function findMdxFiles(dir: string): string[] {
+  const results: string[] = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -39,7 +84,7 @@ function findMdxFiles(dir) {
 /**
  * Derive page ID from file path (filename without extension, or directory name for index files)
  */
-function derivePageId(filePath) {
+function derivePageId(filePath: string): string {
   const rel = relative(CONTENT_DIR_ABS, filePath);
   const parts = rel.split('/');
   const filename = parts[parts.length - 1].replace(/\.(mdx?|md)$/, '');
@@ -52,10 +97,10 @@ function derivePageId(filePath) {
 /**
  * Load all pages with their frontmatter, computing update priority
  */
-function loadUpdateCandidates() {
+function loadUpdateCandidates(): UpdateCandidate[] {
   const files = findMdxFiles(CONTENT_DIR_ABS);
   const now = new Date();
-  const candidates = [];
+  const candidates: UpdateCandidate[] = [];
 
   for (const filePath of files) {
     const content = readFileSync(filePath, 'utf-8');
@@ -75,16 +120,16 @@ function loadUpdateCandidates() {
 
     // Parse last edited date
     const lastEditedStr = fm.lastEdited || fm.lastUpdated;
-    let daysSinceEdit = null;
-    let lastEditedDate = null;
+    let daysSinceEdit = 0;
+    let lastEditedDate: Date;
     if (lastEditedStr) {
-      lastEditedDate = new Date(lastEditedStr);
-      daysSinceEdit = Math.floor((now - lastEditedDate) / (1000 * 60 * 60 * 24));
+      lastEditedDate = new Date(lastEditedStr as string);
+      daysSinceEdit = Math.floor((now.getTime() - lastEditedDate.getTime()) / (1000 * 60 * 60 * 24));
     } else {
       // Fall back to file modification time
       const stat = statSync(filePath);
       lastEditedDate = stat.mtime;
-      daysSinceEdit = Math.floor((now - lastEditedDate) / (1000 * 60 * 60 * 24));
+      daysSinceEdit = Math.floor((now.getTime() - lastEditedDate.getTime()) / (1000 * 60 * 60 * 24));
     }
 
     const staleness = daysSinceEdit / updateFrequency;
@@ -124,7 +169,7 @@ function loadUpdateCandidates() {
 /**
  * List pages due for update, ranked by priority
  */
-export async function list(args, options) {
+export async function list(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const candidates = loadUpdateCandidates();
   const limit = parseInt(options.limit || '10', 10);
@@ -187,7 +232,7 @@ export async function list(args, options) {
 /**
  * Run content improve on top-priority pages
  */
-export async function run(args, options) {
+export async function run(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const candidates = loadUpdateCandidates();
   const count = parseInt(options.count || '1', 10);
@@ -236,8 +281,9 @@ export async function run(args, options) {
       });
 
       output += `  ${c.green}Done${c.reset}\n\n`;
-    } catch (err) {
-      output += `  ${c.red}Failed: ${err.message?.slice(0, 200)}${c.reset}\n\n`;
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      output += `  ${c.red}Failed: ${error.message?.slice(0, 200)}${c.reset}\n\n`;
     }
   }
 
@@ -253,7 +299,7 @@ export async function run(args, options) {
 /**
  * Show update frequency coverage statistics
  */
-export async function stats(args, options) {
+export async function stats(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
 
   // Single pass: read all files once, computing both total-page stats and candidate stats
@@ -263,8 +309,8 @@ export async function stats(args, options) {
   let totalPages = 0;
   let pagesWithFrequency = 0;
   let pagesWithImportance = 0;
-  const frequencyDistribution = {};
-  const candidates = []; // Build candidates inline to avoid double-read
+  const frequencyDistribution: Record<string, number> = {};
+  const candidates: StatsCandidate[] = []; // Build candidates inline to avoid double-read
 
   for (const filePath of allFiles) {
     const content = readFileSync(filePath, 'utf-8');
@@ -286,7 +332,7 @@ export async function stats(args, options) {
         const lastEditedStr = fm.lastEdited || fm.lastUpdated;
         let daysSinceEdit = 0;
         if (lastEditedStr) {
-          daysSinceEdit = Math.floor((now - new Date(lastEditedStr)) / (1000 * 60 * 60 * 24));
+          daysSinceEdit = Math.floor((now.getTime() - new Date(lastEditedStr as string).getTime()) / (1000 * 60 * 60 * 24));
         }
         const staleness = daysSinceEdit / updateFrequency;
         const importance = Number(fm.importance) || 50;
@@ -312,7 +358,7 @@ export async function stats(args, options) {
     : '0';
 
   // Category breakdown
-  const byCategory = {};
+  const byCategory: Record<string, CategoryStats> = {};
   for (const p of candidates) {
     if (!byCategory[p.category]) {
       byCategory[p.category] = { total: 0, overdue: 0, avgPriority: 0 };
@@ -389,7 +435,7 @@ export const commands = {
 /**
  * Get help text
  */
-export function getHelp() {
+export function getHelp(): string {
   return `
 Updates Domain - Schedule-aware wiki page update system
 

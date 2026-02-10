@@ -29,31 +29,43 @@ const __dirname = dirname(__filename);
 const ROOT = join(__dirname, '..', '..');
 const OUTPUT_DIR = join(ROOT, 'internal');
 
-// Ensure output directory exists
-mkdirSync(OUTPUT_DIR, { recursive: true });
+interface FieldInfo {
+  name: string;
+  type: string;
+  optional: boolean;
+  isArray: boolean;
+  isEnum: boolean;
+  enumValues: string[];
+}
+
+interface DiagramDef {
+  name: string;
+  fn: () => string;
+  title: string;
+}
 
 /**
  * Extract enum values from a Zod enum
  */
-function getEnumValues(zodEnum) {
+function getEnumValues(zodEnum: { options: string[] }): string[] {
   return zodEnum.options;
 }
 
 /**
  * Extract field info from a Zod object schema
  */
-function getObjectFields(zodObject) {
+function getObjectFields(zodObject: { shape: Record<string, any> }): FieldInfo[] {
   const shape = zodObject.shape;
-  const fields = [];
+  const fields: FieldInfo[] = [];
 
   for (const [key, value] of Object.entries(shape)) {
     let type = 'unknown';
     let optional = false;
     let isArray = false;
     let isEnum = false;
-    let enumValues = [];
+    let enumValues: string[] = [];
 
-    let current = value;
+    let current: any = value;
 
     // Unwrap optional
     if (current._def?.typeName === 'ZodOptional') {
@@ -112,11 +124,11 @@ function getObjectFields(zodObject) {
 // DIAGRAM 1: Entity Type Hierarchy
 // =============================================================================
 
-function generateEntityTypesDiagram() {
+function generateEntityTypesDiagram(): string {
   const types = getEnumValues(EntityType);
 
   // Group by category
-  const groups = {
+  const groups: Record<string, string[]> = {
     'Core Content': ['risk', 'risk-factor', 'capability', 'concept', 'concepts', 'crux', 'argument'],
     'Safety & Responses': ['safety-agenda', 'safety-approaches', 'intervention', 'policy', 'policies'],
     'Organizations': ['organization', 'lab', 'lab-frontier', 'lab-research', 'lab-startup', 'lab-academic', 'funder'],
@@ -156,11 +168,11 @@ flowchart TD
 // DIAGRAM 2: Relationship Types Taxonomy
 // =============================================================================
 
-function generateRelationshipTypesDiagram() {
+function generateRelationshipTypesDiagram(): string {
   const types = getEnumValues(RelationshipType);
 
   // Group by semantic category
-  const groups = {
+  const groups: Record<string, string[]> = {
     'Causal': ['causes', 'cause', 'leads-to', 'drives', 'driver', 'driven-by', 'contributes-to', 'affects', 'amplifies', 'shaped-by'],
     'Mitigation': ['mitigates', 'mitigated-by', 'mitigation', 'blocks', 'addresses'],
     'Structural': ['requires', 'enables', 'child-of', 'composed-of', 'component'],
@@ -195,7 +207,7 @@ flowchart LR
 // DIAGRAM 3: Entity Schema Structure (ER Diagram)
 // =============================================================================
 
-function generateEntitySchemaDiagram() {
+function generateEntitySchemaDiagram(): string {
   const entityFields = getObjectFields(Entity);
   const resourceFields = getObjectFields(Resource);
   const publicationFields = getObjectFields(Publication);
@@ -208,7 +220,6 @@ erDiagram
 `;
 
   for (const field of entityFields.slice(0, 15)) { // Limit to key fields
-    const typeStr = field.isArray ? `${field.type}[]` : field.type;
     const optStr = field.optional ? 'optional' : 'required';
     diagram += `        ${field.type} ${field.name} "${optStr}"\n`;
   }
@@ -247,7 +258,7 @@ erDiagram
 // DIAGRAM 4: Class Diagram of Main Types
 // =============================================================================
 
-function generateClassDiagram() {
+function generateClassDiagram(): string {
   const entityFields = getObjectFields(Entity);
   const relatedEntryFields = getObjectFields(RelatedEntry);
 
@@ -300,7 +311,7 @@ classDiagram
 // DIAGRAM 5: Data Flow Overview
 // =============================================================================
 
-function generateDataFlowDiagram() {
+function generateDataFlowDiagram(): string {
   return `%% Auto-generated overview of data architecture
 %% Shows how YAML data flows through the system
 
@@ -324,9 +335,9 @@ flowchart TD
     end
 
     subgraph Validation["Validation Suite"]
-        V1[validate-yaml-schema.mjs]
-        V2[validate-data.mjs]
-        V3[validate-all.mjs]
+        V1[validate-yaml-schema.ts]
+        V2[validate-data.ts]
+        V3[validate-all.ts]
     end
 
     subgraph UI["UI Components"]
@@ -368,27 +379,31 @@ flowchart TD
 // Generate all diagrams
 // =============================================================================
 
-const diagrams = [
-  { name: 'entity-types', fn: generateEntityTypesDiagram, title: 'Entity Types Hierarchy' },
-  { name: 'relationship-types', fn: generateRelationshipTypesDiagram, title: 'Relationship Types Taxonomy' },
-  { name: 'schema-er', fn: generateEntitySchemaDiagram, title: 'Schema ER Diagram' },
-  { name: 'schema-class', fn: generateClassDiagram, title: 'Schema Class Diagram' },
-  { name: 'data-flow', fn: generateDataFlowDiagram, title: 'Data Flow Architecture' },
-];
+function main(): void {
+  // Ensure output directory exists
+  mkdirSync(OUTPUT_DIR, { recursive: true });
 
-console.log('Generating schema diagrams...\n');
+  const diagrams: DiagramDef[] = [
+    { name: 'entity-types', fn: generateEntityTypesDiagram, title: 'Entity Types Hierarchy' },
+    { name: 'relationship-types', fn: generateRelationshipTypesDiagram, title: 'Relationship Types Taxonomy' },
+    { name: 'schema-er', fn: generateEntitySchemaDiagram, title: 'Schema ER Diagram' },
+    { name: 'schema-class', fn: generateClassDiagram, title: 'Schema Class Diagram' },
+    { name: 'data-flow', fn: generateDataFlowDiagram, title: 'Data Flow Architecture' },
+  ];
 
-for (const { name, fn, title } of diagrams) {
-  const diagram = fn();
-  const filename = join(OUTPUT_DIR, `${name}.mmd`);
-  writeFileSync(filename, diagram);
-  console.log(`✓ ${title} -> ${filename}`);
-}
+  console.log('Generating schema diagrams...\n');
 
-// Generate a combined markdown file with all diagrams
-let combinedMd = `# Schema Visualizations
+  for (const { name, fn, title } of diagrams) {
+    const diagram = fn();
+    const filename = join(OUTPUT_DIR, `${name}.mmd`);
+    writeFileSync(filename, diagram);
+    console.log(`✓ ${title} -> ${filename}`);
+  }
 
-Auto-generated from \`app/src/data/schema.ts\` using \`crux/generate/generate-schema-diagrams.mjs\`
+  // Generate a combined markdown file with all diagrams
+  let combinedMd = `# Schema Visualizations
+
+Auto-generated from \`app/src/data/schema.ts\` using \`crux/generate/generate-schema-diagrams.ts\`
 
 Generated: ${new Date().toISOString()}
 
@@ -396,9 +411,9 @@ Generated: ${new Date().toISOString()}
 
 `;
 
-for (const { name, fn, title } of diagrams) {
-  const diagram = fn();
-  combinedMd += `## ${title}
+  for (const { name, fn, title } of diagrams) {
+    const diagram = fn();
+    combinedMd += `## ${title}
 
 \`\`\`mermaid
 ${diagram}
@@ -407,13 +422,13 @@ ${diagram}
 ---
 
 `;
-}
+  }
 
-// Add statistics
-const entityTypes = getEnumValues(EntityType);
-const relationshipTypes = getEnumValues(RelationshipType);
+  // Add statistics
+  const entityTypes = getEnumValues(EntityType);
+  const relationshipTypes = getEnumValues(RelationshipType);
 
-combinedMd += `## Statistics
+  combinedMd += `## Statistics
 
 | Metric | Count |
 |--------|-------|
@@ -431,7 +446,12 @@ ${entityTypes.map(t => `- \`${t}\``).join('\n')}
 ${relationshipTypes.map(t => `- \`${t}\``).join('\n')}
 `;
 
-writeFileSync(join(OUTPUT_DIR, 'schema-diagrams.md'), combinedMd);
-console.log(`\n✓ Combined documentation -> ${join(OUTPUT_DIR, 'schema-diagrams.md')}`);
+  writeFileSync(join(OUTPUT_DIR, 'schema-diagrams.md'), combinedMd);
+  console.log(`\n✓ Combined documentation -> ${join(OUTPUT_DIR, 'schema-diagrams.md')}`);
 
-console.log('\nDone!');
+  console.log('\nDone!');
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

@@ -7,9 +7,9 @@
  * prompts for Claude Code Task agents.
  *
  * Usage:
- *   node crux/generate/generate-research-reports.mjs --list              # List candidates
- *   node crux/generate/generate-research-reports.mjs <entity-id>         # Show prompt for one
- *   node crux/generate/generate-research-reports.mjs --batch 3           # Generate batch prompts
+ *   node crux/generate/generate-research-reports.ts --list              # List candidates
+ *   node crux/generate/generate-research-reports.ts <entity-id>         # Show prompt for one
+ *   node crux/generate/generate-research-reports.ts --batch 3           # Generate batch prompts
  *
  * To run in parallel with Claude Code:
  *   1. Run this script to get prompts
@@ -24,32 +24,49 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import yaml from 'js-yaml';
+import { parse as parseYaml } from 'yaml';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '../..');
 
+interface TransitionModelEntity {
+  id: string;
+  title: string;
+  type: string;
+  path: string;
+  parentFactor?: string;
+  relatedEntries?: Array<{ id: string; relationship?: string }>;
+}
+
+interface Candidate {
+  id: string;
+  title: string;
+  path: string;
+  parentFactor?: string;
+  hasReport: boolean;
+}
+
 // Parse args
 const args = process.argv.slice(2);
-function getArg(name, defaultValue) {
+function getArg(name: string, defaultValue: string | null): string | null {
   const index = args.indexOf(`--${name}`);
   if (index === -1) return defaultValue;
   return args[index + 1] || defaultValue;
 }
 
 const LIST_MODE = args.includes('--list');
-const BATCH_SIZE = parseInt(getArg('batch', '0'));
+const BATCH_SIZE = parseInt(getArg('batch', '0') || '0');
 const SPECIFIC_ID = args.find(a => !a.startsWith('--'));
 
 // Load AI Transition Model data (merged from multiple YAML files)
-function loadTransitionModelData() {
+function loadTransitionModelData(): TransitionModelEntity[] {
   const entitiesDir = path.join(ROOT, 'data/entities');
   const atmFiles = fs.readdirSync(entitiesDir)
     .filter(f => f.startsWith('ai-transition-model') && f.endsWith('.yaml'));
-  let entities = [];
+  let entities: TransitionModelEntity[] = [];
   for (const file of atmFiles) {
     const content = fs.readFileSync(path.join(entitiesDir, file), 'utf-8');
-    const parsed = yaml.load(content);
+    const parsed = parseYaml(content) as TransitionModelEntity | TransitionModelEntity[];
     if (Array.isArray(parsed)) entities.push(...parsed);
     else if (parsed) entities.push(parsed);
   }
@@ -57,9 +74,9 @@ function loadTransitionModelData() {
 }
 
 // Build a set of entity IDs that have research reports (by checking frontmatter topic field)
-function getEntitiesWithReports() {
+function getEntitiesWithReports(): Set<string> {
   const reportsDir = path.join(ROOT, 'content/docs/knowledge-base/research-reports');
-  const entityIds = new Set();
+  const entityIds = new Set<string>();
 
   if (!fs.existsSync(reportsDir)) return entityIds;
 
@@ -78,12 +95,12 @@ function getEntitiesWithReports() {
 
 // Check if research report exists for an entity
 const entitiesWithReports = getEntitiesWithReports();
-function hasResearchReport(entityId) {
+function hasResearchReport(entityId: string): boolean {
   return entitiesWithReports.has(entityId);
 }
 
 // Get candidates for research reports (subitems without reports)
-function getCandidates(entities) {
+function getCandidates(entities: TransitionModelEntity[]): Candidate[] {
   return entities
     .filter(e => e.type === 'ai-transition-model-subitem')
     .filter(e => !hasResearchReport(e.id))
@@ -97,7 +114,7 @@ function getCandidates(entities) {
 }
 
 // Generate the prompt for a research report
-function generatePrompt(entity) {
+function generatePrompt(entity: Candidate | TransitionModelEntity): string {
   const slug = entity.id.replace('tmc-', '');
 
   return `Create a research report for the AI Transition Model page: ${entity.title}
@@ -160,7 +177,7 @@ This is a RESEARCH task - use WebSearch extensively to find real citations.`;
 }
 
 // List candidates
-function listCandidates(candidates) {
+function listCandidates(candidates: Candidate[]): void {
   console.log('\n📊 AI Transition Model pages without research reports:\n');
   console.log('| # | Entity ID | Title | Parent |');
   console.log('|---|-----------|-------|--------|');
@@ -169,13 +186,13 @@ function listCandidates(candidates) {
   });
   console.log(`\nTotal: ${candidates.length} pages need research reports`);
   console.log('\nTo generate a report:');
-  console.log('  node crux/generate/generate-research-reports.mjs <entity-id>');
+  console.log('  node crux/generate/generate-research-reports.ts <entity-id>');
   console.log('\nTo generate batch prompts:');
-  console.log('  node crux/generate/generate-research-reports.mjs --batch 3');
+  console.log('  node crux/generate/generate-research-reports.ts --batch 3');
 }
 
 // Show prompt for one entity
-function showPrompt(entity) {
+function showPrompt(entity: Candidate | TransitionModelEntity): void {
   console.log('\n' + '='.repeat(70));
   console.log(`📝 RESEARCH REPORT PROMPT: ${entity.title}`);
   console.log('='.repeat(70) + '\n');
@@ -186,7 +203,7 @@ function showPrompt(entity) {
 }
 
 // Generate batch prompts for parallel execution
-function generateBatch(candidates, batchSize) {
+function generateBatch(candidates: Candidate[], batchSize: number): void {
   const batch = candidates.slice(0, batchSize);
 
   console.log('\n' + '='.repeat(70));
@@ -214,12 +231,12 @@ Task({
   console.log('\n' + '='.repeat(70));
   console.log('\nAlternatively, run sequentially with:');
   batch.forEach((entity, i) => {
-    console.log(`  ${i + 1}. node crux/generate/generate-research-reports.mjs ${entity.id}`);
+    console.log(`  ${i + 1}. node crux/generate/generate-research-reports.ts ${entity.id}`);
   });
 }
 
 // Main
-function main() {
+function main(): void {
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
 Research Report Generator
@@ -227,9 +244,9 @@ Research Report Generator
 Identifies AI Transition Model pages that need research reports.
 
 Usage:
-  node crux/generate/generate-research-reports.mjs --list              List all candidates
-  node crux/generate/generate-research-reports.mjs <entity-id>         Show prompt for one
-  node crux/generate/generate-research-reports.mjs --batch 3           Generate batch prompts
+  node crux/generate/generate-research-reports.ts --list              List all candidates
+  node crux/generate/generate-research-reports.ts <entity-id>         Show prompt for one
+  node crux/generate/generate-research-reports.ts --batch 3           Generate batch prompts
 
 Options:
   --list          List pages without research reports
@@ -242,8 +259,8 @@ Cost Estimates (per report):
   Haiku:  ~$0.10-0.20 (fast but lower quality)
 
 Example Workflow:
-  1. List candidates:  node crux/generate/generate-research-reports.mjs --list
-  2. Generate batch:   node crux/generate/generate-research-reports.mjs --batch 5
+  1. List candidates:  node crux/generate/generate-research-reports.ts --list
+  2. Generate batch:   node crux/generate/generate-research-reports.ts --batch 5
   3. Run in Claude Code with parallel Task agents
 `);
     return;
@@ -266,7 +283,7 @@ Example Workflow:
     const entity = entities.find(e => e.id === SPECIFIC_ID || e.id === `tmc-${SPECIFIC_ID}`);
     if (!entity) {
       console.error(`Error: Entity not found: ${SPECIFIC_ID}`);
-      console.log('Try: node crux/generate/generate-research-reports.mjs --list');
+      console.log('Try: node crux/generate/generate-research-reports.ts --list');
       process.exit(1);
     }
     showPrompt(entity);
@@ -278,4 +295,6 @@ Example Workflow:
   console.log('Run with --list to see candidates');
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

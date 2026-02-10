@@ -25,25 +25,63 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, relative } from 'path';
+import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadOrganizations, loadExperts } from '../lib/content-types.js';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadOrganizations, loadExperts } from '../lib/content-types.ts';
 
-const args = process.argv.slice(2);
-const APPLY_MODE = args.includes('--apply');
-const VERBOSE = args.includes('--verbose');
-const HELP = args.includes('--help');
-const FUZZY_MODE = args.includes('--fuzzy');
-const SINGLE_FILE = args.find(a => a.startsWith('--file='))?.split('=')[1];
+const args: string[] = process.argv.slice(2);
+const APPLY_MODE: boolean = args.includes('--apply');
+const VERBOSE: boolean = args.includes('--verbose');
+const HELP: boolean = args.includes('--help');
+const FUZZY_MODE: boolean = args.includes('--fuzzy');
+const SINGLE_FILE: string | undefined = args.find(a => a.startsWith('--file='))?.split('=')[1];
 
 const colors = getColors();
+
+interface EntityEntry {
+  id: string;
+  displayName: string;
+  priority: number;
+  termLength: number;
+}
+
+interface ProperNoun {
+  text: string;
+  originalText: string;
+  position: number;
+}
+
+interface FuzzyMatch {
+  noun: string;
+  originalText: string;
+  position: number;
+  suggestedEntity: EntityEntry;
+  matchedTerm: string;
+  score: number;
+}
+
+interface ExactChange {
+  entityId: string;
+  originalText: string;
+  line: number;
+  context: string;
+}
+
+interface ProcessResult {
+  changes: ExactChange[];
+  modifiedContent?: string;
+  originalContent?: string;
+  fuzzySuggestions?: FuzzyMatch[];
+  skipped?: string;
+}
 
 /**
  * Levenshtein distance for fuzzy matching
  */
-function levenshteinDistance(a, b) {
-  const matrix = [];
+function levenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
   for (let i = 0; i <= b.length; i++) {
     matrix[i] = [i];
   }
@@ -69,7 +107,7 @@ function levenshteinDistance(a, b) {
 /**
  * Calculate similarity ratio (0-1)
  */
-function similarity(a, b) {
+function similarity(a: string, b: string): number {
   const aLower = a.toLowerCase();
   const bLower = b.toLowerCase();
   const distance = levenshteinDistance(aLower, bLower);
@@ -81,14 +119,14 @@ function similarity(a, b) {
  * Extract proper nouns (capitalized words/phrases) from text
  * Returns array of { text, position }
  */
-function extractProperNouns(content) {
-  const nouns = [];
+function extractProperNouns(content: string): ProperNoun[] {
+  const nouns: ProperNoun[] = [];
 
   // Match sequences of capitalized words (potential proper nouns)
   // Includes possessives like "Anthropic's"
   const regex = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*(?:'s)?)\b/g;
 
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = regex.exec(content)) !== null) {
     const text = match[1].replace(/'s$/, ''); // Strip possessive
     if (text.length >= 4) {
@@ -116,14 +154,14 @@ function extractProperNouns(content) {
 /**
  * Find fuzzy matches for proper nouns against entity names
  */
-function findFuzzyMatches(nouns, entities, threshold = 0.8) {
-  const matches = [];
-  const seen = new Set();
+function findFuzzyMatches(nouns: ProperNoun[], entities: Map<string, EntityEntry>, threshold: number = 0.8): FuzzyMatch[] {
+  const matches: FuzzyMatch[] = [];
+  const seen = new Set<string>();
 
   for (const noun of nouns) {
     if (seen.has(noun.text.toLowerCase())) continue;
 
-    let bestMatch = null;
+    let bestMatch: { entity: EntityEntry; term: string; score: number } | null = null;
     let bestScore = 0;
 
     for (const [term, entity] of entities) {
@@ -151,7 +189,7 @@ function findFuzzyMatches(nouns, entities, threshold = 0.8) {
   return matches;
 }
 
-function showHelp() {
+function showHelp(): void {
   console.log(`
 ${colors.bold}Cross-Link Auto-Fixer${colors.reset}
 
@@ -185,7 +223,7 @@ ${colors.bold}Safety:${colors.reset}
 /**
  * Load entities from generated JSON files and path registry
  */
-function loadEntityLookup() {
+function loadEntityLookup(): Map<string, EntityEntry> {
   const pathRegistry = loadPathRegistry();
 
   if (Object.keys(pathRegistry).length === 0) {
@@ -197,10 +235,10 @@ function loadEntityLookup() {
   const experts = loadExperts();
 
   // Build entity lookup: searchTerm -> { id, displayName, priority }
-  const entities = new Map();
+  const entities = new Map<string, EntityEntry>();
 
   // Priority: longer names first (to match "Google DeepMind" before "DeepMind")
-  const addEntity = (term, id, displayName, priority = 0) => {
+  const addEntity = (term: string, id: string, displayName: string, priority: number = 0): void => {
     if (!term || term.length < 4) return; // Skip very short terms
     if (!pathRegistry[id]) return; // Must have a page
 
@@ -229,7 +267,7 @@ function loadEntityLookup() {
   }
 
   // Add common aliases (full names and acronyms)
-  const aliases = {
+  const aliases: Record<string, string> = {
     // Organizations - full names
     'Machine Intelligence Research Institute': 'miri',
     'Center for AI Safety': 'cais',
@@ -296,7 +334,6 @@ function loadEntityLookup() {
     if (id.startsWith('__index__')) continue;
 
     // Skip if already added from YAML data
-    const idSlug = id.toLowerCase();
     if ([...entities.values()].some(e => e.id === id)) continue;
 
     // Find the MDX file for this entity
@@ -306,13 +343,13 @@ function loadEntityLookup() {
     try {
       const content = readFileSync(mdxPath, 'utf-8');
       const frontmatter = parseFrontmatter(content);
-      const title = frontmatter?.title;
+      const title = frontmatter?.title as string | undefined;
 
       if (title && title.length >= 4) {
         // Add by title (medium priority - after YAML orgs/people but before aliases)
         addEntity(title, id, title, 60 + title.length);
       }
-    } catch (e) {
+    } catch (_e) {
       // Skip files that can't be parsed
     }
   }
@@ -325,9 +362,8 @@ function loadEntityLookup() {
 /**
  * Check if position is in a context where we shouldn't add links
  */
-function isInProtectedContext(content, position) {
+function isInProtectedContext(content: string, position: number): boolean {
   const before = content.slice(0, position);
-  const after = content.slice(position);
 
   // In code block
   const codeBlocksBefore = (before.match(/```/g) || []).length;
@@ -386,7 +422,7 @@ function isInProtectedContext(content, position) {
 /**
  * Find and fix entity mentions in a file
  */
-function processFile(filePath, entities, pageEntityId) {
+function processFile(filePath: string, entities: Map<string, EntityEntry>, pageEntityId: string): ProcessResult {
   const content = readFileSync(filePath, 'utf-8');
   const frontmatter = parseFrontmatter(content);
 
@@ -406,15 +442,15 @@ function processFile(filePath, entities, pageEntityId) {
     bodyStart = frontmatterEnd + importMatch[0].length;
   }
 
-  const changes = [];
-  const linkedEntities = new Set();
+  const changes: ExactChange[] = [];
+  const linkedEntities = new Set<string>();
   let modifiedContent = content;
   let offset = 0;
 
   // Find existing EntityLinks to avoid duplicates
-  const existingLinks = new Set();
+  const existingLinks = new Set<string>();
   const linkRegex = /<EntityLink\s+id="([^"]+)"/g;
-  let linkMatch;
+  let linkMatch: RegExpExecArray | null;
   while ((linkMatch = linkRegex.exec(content)) !== null) {
     existingLinks.add(linkMatch[1]);
   }
@@ -430,7 +466,7 @@ function processFile(filePath, entities, pageEntityId) {
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(`\\b(${escaped})\\b`, 'gi');
 
-    let match;
+    let match: RegExpExecArray | null;
     while ((match = regex.exec(modifiedContent)) !== null) {
       const position = match.index;
 
@@ -461,7 +497,7 @@ function processFile(filePath, entities, pageEntityId) {
   }
 
   // Find fuzzy suggestions (if enabled)
-  let fuzzySuggestions = [];
+  let fuzzySuggestions: FuzzyMatch[] = [];
   if (FUZZY_MODE) {
     const body = modifiedContent.slice(bodyStart);
     const nouns = extractProperNouns(body);
@@ -495,7 +531,7 @@ function processFile(filePath, entities, pageEntityId) {
   return { changes, modifiedContent, originalContent: content, fuzzySuggestions };
 }
 
-async function main() {
+async function main(): Promise<void> {
   if (HELP) {
     showHelp();
     process.exit(0);
@@ -507,7 +543,7 @@ async function main() {
   const entities = loadEntityLookup();
   console.log(`${colors.dim}Loaded ${entities.size} entity terms${colors.reset}\n`);
 
-  let files;
+  let files: string[];
   if (SINGLE_FILE) {
     const fullPath = SINGLE_FILE.startsWith('/') ? SINGLE_FILE : join(PROJECT_ROOT, SINGLE_FILE);
     if (!existsSync(fullPath)) {
@@ -522,12 +558,10 @@ async function main() {
   let totalChanges = 0;
   let filesChanged = 0;
   let totalFuzzySuggestions = 0;
-  const allChanges = [];
-  const allFuzzySuggestions = [];
 
   for (const file of files) {
     const relPath = relative(CONTENT_DIR, file);
-    const pageEntityId = relPath.replace(/\.mdx?$/, '').replace(/\/index$/, '').split('/').pop();
+    const pageEntityId = relPath.replace(/\.mdx?$/, '').replace(/\/index$/, '').split('/').pop()!;
 
     const result = processFile(file, entities, pageEntityId);
 
@@ -544,7 +578,7 @@ async function main() {
     }
 
     if (hasFuzzy) {
-      totalFuzzySuggestions += result.fuzzySuggestions.length;
+      totalFuzzySuggestions += result.fuzzySuggestions!.length;
     }
 
     if (VERBOSE || !APPLY_MODE) {
@@ -563,7 +597,7 @@ async function main() {
           console.log(`${colors.cyan}${relPath}${colors.reset}`);
         }
         console.log(`  ${colors.yellow}Fuzzy suggestions:${colors.reset}`);
-        for (const suggestion of result.fuzzySuggestions) {
+        for (const suggestion of result.fuzzySuggestions!) {
           const pct = Math.round(suggestion.score * 100);
           console.log(`    ${colors.yellow}?${colors.reset} "${suggestion.noun}" → ${suggestion.suggestedEntity.displayName} (${pct}% match)`);
         }
@@ -571,13 +605,8 @@ async function main() {
     }
 
     if (APPLY_MODE && hasChanges) {
-      writeFileSync(file, result.modifiedContent);
+      writeFileSync(file, result.modifiedContent!);
       console.log(`  ${colors.green}✓${colors.reset} Saved ${relPath}`);
-    }
-
-    allChanges.push({ file: relPath, changes: result.changes });
-    if (hasFuzzy) {
-      allFuzzySuggestions.push({ file: relPath, suggestions: result.fuzzySuggestions });
     }
   }
 
@@ -604,7 +633,9 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: unknown) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

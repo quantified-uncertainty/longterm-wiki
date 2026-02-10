@@ -15,20 +15,21 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, relative } from 'path';
+import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.js';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
 
-const args = process.argv.slice(2);
-const APPLY_MODE = args.includes('--apply');
-const VERBOSE = args.includes('--verbose');
-const HELP = args.includes('--help');
-const SINGLE_FILE = args.find(a => a.startsWith('--file='))?.split('=')[1];
+const args: string[] = process.argv.slice(2);
+const APPLY_MODE: boolean = args.includes('--apply');
+const _VERBOSE: boolean = args.includes('--verbose');
+const HELP: boolean = args.includes('--help');
+const SINGLE_FILE: string | undefined = args.find(a => a.startsWith('--file='))?.split('=')[1];
 
 const colors = getColors();
 
 // Components from @components/wiki that are commonly used
-const WIKI_COMPONENTS = [
+const WIKI_COMPONENTS: string[] = [
   'EntityLink',
   'DataInfoBox',
   'InfoBox',
@@ -43,15 +44,27 @@ const WIKI_COMPONENTS = [
 ];
 
 // Pattern to find JSX component usage: <ComponentName or <ComponentName>
-const COMPONENT_USAGE_PATTERN = /<([A-Z][a-zA-Z0-9]*)/g;
+const COMPONENT_USAGE_PATTERN: RegExp = /<([A-Z][a-zA-Z0-9]*)/g;
 
 // Pattern to find imports from @components/wiki
-const WIKI_IMPORT_PATTERN = /import\s*\{([^}]+)\}\s*from\s*['"]@components\/wiki['"]/;
+const WIKI_IMPORT_PATTERN: RegExp = /import\s*\{([^}]+)\}\s*from\s*['"]@components\/wiki['"]/;
 
 // Pattern to find any import that includes a component name
-const anyImportPattern = (component) => new RegExp(`import.*\\b${component}\\b.*from`);
+const anyImportPattern = (component: string): RegExp => new RegExp(`import.*\\b${component}\\b.*from`);
 
-function showHelp() {
+interface ImportChange {
+  component: string;
+  action: 'added-to-existing' | 'created-new-import';
+}
+
+interface ProcessResult {
+  changes: ImportChange[];
+  content: string;
+  originalContent?: string;
+  hasExistingImport?: boolean;
+}
+
+function showHelp(): void {
   console.log(`
 ${colors.bold}Component Import Auto-Fixer${colors.reset}
 
@@ -77,7 +90,7 @@ ${colors.bold}What it does:${colors.reset}
 /**
  * Check if position is inside a code block
  */
-function isInCodeBlock(content, position) {
+function isInCodeBlock(content: string, position: number): boolean {
   const before = content.slice(0, position);
   const codeBlocksBefore = (before.match(/```/g) || []).length;
   if (codeBlocksBefore % 2 === 1) return true;
@@ -96,9 +109,9 @@ function isInCodeBlock(content, position) {
 /**
  * Find used wiki components in content
  */
-function findUsedComponents(content) {
-  const used = new Set();
-  let match;
+function findUsedComponents(content: string): Set<string> {
+  const used = new Set<string>();
+  let match: RegExpExecArray | null;
   const regex = new RegExp(COMPONENT_USAGE_PATTERN.source, 'g');
 
   while ((match = regex.exec(content)) !== null) {
@@ -116,8 +129,8 @@ function findUsedComponents(content) {
 /**
  * Find imported components from @components/wiki
  */
-function findImportedComponents(content) {
-  const imported = new Set();
+function findImportedComponents(content: string): Set<string> {
+  const imported = new Set<string>();
 
   // Check @components/wiki import
   const wikiImportMatch = content.match(WIKI_IMPORT_PATTERN);
@@ -140,7 +153,7 @@ function findImportedComponents(content) {
 /**
  * Process a single file
  */
-function processFile(filePath) {
+function processFile(filePath: string): ProcessResult {
   const content = readFileSync(filePath, 'utf-8');
 
   // Find frontmatter end
@@ -204,7 +217,7 @@ function processFile(filePath) {
   };
 }
 
-async function main() {
+async function main(): Promise<void> {
   if (HELP) {
     showHelp();
     process.exit(0);
@@ -213,7 +226,7 @@ async function main() {
   console.log(`${colors.bold}${colors.blue}Component Import Auto-Fixer${colors.reset}`);
   console.log(`${colors.dim}Mode: ${APPLY_MODE ? 'APPLY CHANGES' : 'Preview (dry run)'}${colors.reset}\n`);
 
-  let files;
+  let files: string[];
   if (SINGLE_FILE) {
     const fullPath = SINGLE_FILE.startsWith('/') ? SINGLE_FILE : join(PROJECT_ROOT, SINGLE_FILE);
     if (!existsSync(fullPath)) {
@@ -273,7 +286,9 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: unknown) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

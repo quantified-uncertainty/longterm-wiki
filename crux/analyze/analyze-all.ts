@@ -8,25 +8,80 @@
  * - Link coverage (orphans, underlinked pages)
  *
  * Usage:
- *   node crux/analyze/analyze-all.mjs           # Full health report
- *   node crux/analyze/analyze-all.mjs --json    # JSON output
- *   node crux/analyze/analyze-all.mjs --brief   # Summary only
+ *   node crux/analyze/analyze-all.ts           # Full health report
+ *   node crux/analyze/analyze-all.ts --json    # JSON output
+ *   node crux/analyze/analyze-all.ts --brief   # Summary only
  */
 
-import { ValidationEngine } from '../lib/validation-engine.js';
-import { entityMentionsRule } from '../lib/rules/entity-mentions.js';
+import { fileURLToPath } from 'url';
+import { ValidationEngine, type Issue } from '../lib/validation-engine.ts';
+import { entityMentionsRule } from '../lib/rules/entity-mentions.ts';
 import { getColors } from '../lib/output.ts';
-import { PROJECT_ROOT, loadBacklinks, loadEntities } from '../lib/content-types.js';
+import { PROJECT_ROOT, loadBacklinks, loadEntities, type Entity, type BacklinksMap } from '../lib/content-types.ts';
 
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json');
 const BRIEF_MODE = args.includes('--brief');
 const colors = getColors(JSON_MODE);
 
+// ---------------------------------------------------------------------------
+// Interfaces
+// ---------------------------------------------------------------------------
+
+interface TopFile {
+  file: string;
+  count: number;
+}
+
+interface EntityMentionsResult {
+  name: string;
+  description: string;
+  totalIssues: number;
+  filesAffected: number;
+  topFiles: TopFile[];
+  issues: Issue[];
+}
+
+interface LinkCoverageStats {
+  totalPages: number;
+  averageIncomingLinks: string;
+  orphanPages: number;
+  orphanPercent: string;
+}
+
+interface OrphanPage {
+  id: string;
+  title: string;
+  incomingLinks: number;
+  type: string | undefined;
+}
+
+interface LinkCoverageResult {
+  name: string;
+  description: string;
+  error?: string;
+  totalIssues?: number;
+  stats: LinkCoverageStats | null;
+  orphanPages: OrphanPage[];
+}
+
+interface ReportSummary {
+  totalIssues: number;
+  orphanPages: number;
+  healthScore: number;
+}
+
+interface Report {
+  timestamp: string;
+  duration: string;
+  analyses: [EntityMentionsResult, LinkCoverageResult];
+  summary: ReportSummary;
+}
+
 /**
  * Run entity mentions analysis
  */
-async function analyzeEntityMentions() {
+async function analyzeEntityMentions(): Promise<EntityMentionsResult> {
   const engine = new ValidationEngine();
   engine.addRule(entityMentionsRule);
   await engine.load();
@@ -34,7 +89,7 @@ async function analyzeEntityMentions() {
   const issues = await engine.validate({ ruleIds: ['entity-mentions'] });
 
   // Group by file
-  const byFile = {};
+  const byFile: Record<string, Issue[]> = {};
   for (const issue of issues) {
     if (!byFile[issue.file]) byFile[issue.file] = [];
     byFile[issue.file].push(issue);
@@ -56,9 +111,9 @@ async function analyzeEntityMentions() {
 /**
  * Run link coverage analysis
  */
-async function analyzeLinkCoverage() {
-  const backlinks = loadBacklinks();
-  const entities = loadEntities();
+async function analyzeLinkCoverage(): Promise<LinkCoverageResult> {
+  const backlinks: BacklinksMap = loadBacklinks();
+  const entities: Entity[] = loadEntities();
 
   if (entities.length === 0) {
     return {
@@ -72,8 +127,8 @@ async function analyzeLinkCoverage() {
   }
 
   // Calculate orphan pages (≤1 incoming link)
-  const orphans = [];
-  const linkCounts = [];
+  const orphans: OrphanPage[] = [];
+  const linkCounts: number[] = [];
 
   for (const entity of entities) {
     const incomingLinks = backlinks[entity.id] || [];
@@ -113,7 +168,7 @@ async function analyzeLinkCoverage() {
 /**
  * Main analysis runner
  */
-async function main() {
+async function main(): Promise<void> {
   const startTime = Date.now();
 
   if (!JSON_MODE && !BRIEF_MODE) {
@@ -130,7 +185,7 @@ async function main() {
 
   const duration = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
 
-  const report = {
+  const report: Report = {
     timestamp: new Date().toISOString(),
     duration,
     analyses: [entityMentions, linkCoverage],
@@ -191,7 +246,7 @@ async function main() {
 /**
  * Calculate a simple health score based on analysis results
  */
-function calculateHealthScore(entityMentions, linkCoverage) {
+function calculateHealthScore(entityMentions: EntityMentionsResult, linkCoverage: LinkCoverageResult): number {
   let score = 100;
 
   // Deduct for unlinked mentions (up to 30 points)
@@ -208,7 +263,9 @@ function calculateHealthScore(entityMentions, linkCoverage) {
   return Math.max(0, Math.round(score));
 }
 
-main().catch((err) => {
-  console.error('Analysis failed:', err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: unknown) => {
+    console.error('Analysis failed:', err);
+    process.exit(1);
+  });
+}

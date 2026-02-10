@@ -92,6 +92,7 @@ export interface PageEntry {
 export interface OrganizationEntry {
   id: string;
   name: string;
+  shortName?: string;
   type?: string;
   founded?: string;
   headquarters?: string;

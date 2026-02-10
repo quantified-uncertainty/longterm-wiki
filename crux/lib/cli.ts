@@ -37,7 +37,7 @@ export async function runScript(
   const { streamOutput = false, cwd = process.cwd() } = options;
 
   return new Promise((resolve) => {
-    // Always register tsx/esm so .mjs files can import .ts modules
+    // Always register tsx/esm so scripts can use .ts imports
     const runnerArgs = ['--import', 'tsx/esm', '--no-warnings', fullPath, ...args];
 
     const proc = spawn('node', runnerArgs, {
@@ -118,6 +118,7 @@ export function formatDuration(ms: number): string {
 
 export interface ScriptConfig {
   script: string;
+  description?: string;
   passthrough: string[];
   extraArgs?: string[];
   positional?: boolean;

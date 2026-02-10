@@ -4,7 +4,7 @@
  * Converts extracted JSON data to YAML files.
  * Run this after reviewing/deduplicating the extracted JSON.
  *
- * Usage: node crux/generate/generate-yaml.mjs
+ * Usage: node crux/generate/generate-yaml.ts
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
@@ -17,11 +17,101 @@ const ROOT = join(__dirname, '..', '..');
 const EXTRACTED_DIR = join(ROOT, 'crux/extracted');
 const OUTPUT_DIR = join(ROOT, 'data');
 
+interface Mention {
+  context: string;
+  position?: string;
+  estimate?: string;
+  confidence?: string;
+  source?: string;
+  url?: string;
+  affiliation?: string;
+  role?: string;
+  website?: string;
+  knownFor?: string | string[];
+}
+
+interface RawExpert {
+  id: string;
+  name: string;
+  mentions: Mention[];
+}
+
+interface ExpertPosition {
+  topic: string;
+  view?: string;
+  estimate?: string;
+  confidence?: string;
+  source?: string;
+  sourceUrl?: string;
+}
+
+interface TransformedExpert {
+  id: string;
+  name: string;
+  affiliation?: string;
+  role?: string;
+  website?: string;
+  knownFor?: string[];
+  positions?: ExpertPosition[];
+}
+
+interface RawEstimate {
+  variable: string;
+  source: string;
+  value: string;
+  date?: string;
+  url?: string;
+  notes?: string;
+}
+
+interface EstimateEntry {
+  source: string;
+  value: string;
+  date?: string;
+  url?: string;
+  notes?: string;
+}
+
+interface TransformedEstimate {
+  id: string;
+  variable: string;
+  category: string;
+  estimates: EstimateEntry[];
+}
+
+interface RawCrux {
+  id?: string;
+  question: string;
+  domain?: string;
+  description?: string;
+  importance?: number;
+  resolvability?: string;
+  currentState?: string;
+  positions?: unknown[];
+  wouldUpdateOn?: unknown[];
+  relatedCruxes?: unknown[];
+  relevantResearch?: unknown[];
+}
+
+interface TransformedCrux {
+  id: string;
+  question: string;
+  domain?: string;
+  description?: string;
+  importance?: number;
+  resolvability?: string;
+  currentState?: string;
+  positions?: unknown[];
+  wouldUpdateOn?: unknown[];
+  relatedCruxes?: unknown[];
+  relevantResearch?: unknown[];
+}
+
 // =============================================================================
 // LOAD EXTRACTED DATA
 // =============================================================================
 
-function loadJson(filename) {
+function loadJson<T>(filename: string): T[] {
   const filepath = join(EXTRACTED_DIR, filename);
   if (!existsSync(filepath)) {
     console.warn(`File not found: ${filepath}`);
@@ -34,13 +124,13 @@ function loadJson(filename) {
 // TRANSFORM EXPERTS
 // =============================================================================
 
-function transformExperts(rawExperts) {
+function transformExperts(rawExperts: RawExpert[]): TransformedExpert[] {
   return rawExperts.map((expert) => {
     // Find InfoBox mention for biographical data
     const infoBoxMention = expert.mentions.find((m) => m.context === 'InfoBox');
 
     // Collect all positions from DisagreementMap mentions
-    const positions = expert.mentions
+    const positions: ExpertPosition[] = expert.mentions
       .filter((m) => m.context.startsWith('DisagreementMap:'))
       .map((m) => {
         const topic = m.context.replace('DisagreementMap: ', '');
@@ -54,7 +144,7 @@ function transformExperts(rawExperts) {
         };
       })
       // Deduplicate by topic (keep most detailed)
-      .reduce((acc, pos) => {
+      .reduce<ExpertPosition[]>((acc, pos) => {
         const existing = acc.find((p) => p.topic === pos.topic);
         if (!existing) {
           acc.push(pos);
@@ -77,9 +167,9 @@ function transformExperts(rawExperts) {
   });
 }
 
-function normalizeTopic(topic) {
+function normalizeTopic(topic: string): string {
   // Normalize topic names for consistency
-  const mappings = {
+  const mappings: Record<string, string> = {
     'When will AGI/TAI arrive?': 'timelines',
     'When Will Transformative AI Arrive?': 'timelines',
     'Probability of AI Catastrophe': 'p-doom',
@@ -90,9 +180,9 @@ function normalizeTopic(topic) {
   return mappings[topic] || topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
-function normalizeOrgName(name) {
+function normalizeOrgName(name: string | undefined): string | undefined {
   if (!name) return undefined;
-  const mappings = {
+  const mappings: Record<string, string> = {
     'Anthropic': 'anthropic',
     'OpenAI': 'openai',
     'Google DeepMind': 'deepmind',
@@ -105,7 +195,7 @@ function normalizeOrgName(name) {
   return mappings[name] || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
-function parseKnownFor(knownFor) {
+function parseKnownFor(knownFor: string | string[] | undefined): string[] | undefined {
   if (!knownFor) return undefined;
   if (Array.isArray(knownFor)) return knownFor;
   if (typeof knownFor === 'string') {
@@ -118,9 +208,9 @@ function parseKnownFor(knownFor) {
 // TRANSFORM ESTIMATES
 // =============================================================================
 
-function transformEstimates(rawEstimates) {
+function transformEstimates(rawEstimates: RawEstimate[]): TransformedEstimate[] {
   // Group by variable
-  const grouped = new Map();
+  const grouped = new Map<string, TransformedEstimate>();
 
   for (const est of rawEstimates) {
     const varId = normalizeEstimateVariable(est.variable);
@@ -133,7 +223,7 @@ function transformEstimates(rawEstimates) {
       });
     }
 
-    grouped.get(varId).estimates.push({
+    grouped.get(varId)!.estimates.push({
       source: est.source,
       value: est.value,
       date: est.date,
@@ -149,7 +239,7 @@ function transformEstimates(rawEstimates) {
   }));
 }
 
-function normalizeEstimateVariable(variable) {
+function normalizeEstimateVariable(variable: string): string {
   return variable
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -157,7 +247,7 @@ function normalizeEstimateVariable(variable) {
     .slice(0, 50);
 }
 
-function inferCategory(variable) {
+function inferCategory(variable: string): string {
   const v = variable.toLowerCase();
   if (v.includes('timeline') || v.includes('agi') || v.includes('2030') || v.includes('2040')) {
     return 'timelines';
@@ -171,11 +261,11 @@ function inferCategory(variable) {
   return 'other';
 }
 
-function deduplicateEstimates(estimates) {
-  const seen = new Map();
+function deduplicateEstimates(estimates: EstimateEntry[]): EstimateEntry[] {
+  const seen = new Map<string, EstimateEntry>();
   for (const est of estimates) {
     const key = `${est.source}::${est.value}`;
-    if (!seen.has(key) || (est.date && !seen.get(key).date)) {
+    if (!seen.has(key) || (est.date && !seen.get(key)!.date)) {
       seen.set(key, est);
     }
   }
@@ -186,13 +276,13 @@ function deduplicateEstimates(estimates) {
 // TRANSFORM CRUXES
 // =============================================================================
 
-function transformCruxes(rawCruxes) {
+function transformCruxes(rawCruxes: RawCrux[]): TransformedCrux[] {
   // Deduplicate by ID or question
-  const seen = new Map();
+  const seen = new Map<string, TransformedCrux>();
 
   for (const crux of rawCruxes) {
     const id = crux.id || normalizeEstimateVariable(crux.question);
-    if (!seen.has(id) || crux.positions?.length > seen.get(id).positions?.length) {
+    if (!seen.has(id) || (crux.positions?.length ?? 0) > (seen.get(id)!.positions?.length ?? 0)) {
       seen.set(id, {
         id,
         question: crux.question,
@@ -202,9 +292,9 @@ function transformCruxes(rawCruxes) {
         resolvability: crux.resolvability,
         currentState: crux.currentState,
         positions: crux.positions,
-        wouldUpdateOn: crux.wouldUpdateOn?.length > 0 ? crux.wouldUpdateOn : undefined,
-        relatedCruxes: crux.relatedCruxes?.length > 0 ? crux.relatedCruxes : undefined,
-        relevantResearch: crux.relevantResearch?.length > 0 ? crux.relevantResearch : undefined,
+        wouldUpdateOn: crux.wouldUpdateOn?.length ? crux.wouldUpdateOn : undefined,
+        relatedCruxes: crux.relatedCruxes?.length ? crux.relatedCruxes : undefined,
+        relevantResearch: crux.relevantResearch?.length ? crux.relevantResearch : undefined,
       });
     }
   }
@@ -216,7 +306,7 @@ function transformCruxes(rawCruxes) {
 // WRITE YAML
 // =============================================================================
 
-function writeYaml(filename, data, comment) {
+function writeYaml(filename: string, data: unknown[], comment?: string): void {
   if (!existsSync(OUTPUT_DIR)) {
     mkdirSync(OUTPUT_DIR, { recursive: true });
   }
@@ -236,14 +326,14 @@ function writeYaml(filename, data, comment) {
 // MAIN
 // =============================================================================
 
-function main() {
+function main(): void {
   console.log('Loading extracted data...\n');
 
   // Load extracted data
-  const rawExperts = loadJson('experts-extracted.json');
-  const rawEstimates = loadJson('estimates-extracted.json');
-  const rawCruxes = loadJson('cruxes-extracted.json');
-  const rawPositions = loadJson('positions-extracted.json');
+  const rawExperts = loadJson<RawExpert>('experts-extracted.json');
+  const rawEstimates = loadJson<RawEstimate>('estimates-extracted.json');
+  const rawCruxes = loadJson<RawCrux>('cruxes-extracted.json');
+  const rawPositions = loadJson<unknown>('positions-extracted.json');
 
   console.log(`Loaded: ${rawExperts.length} experts, ${rawEstimates.length} estimates, ${rawCruxes.length} cruxes\n`);
 
@@ -270,4 +360,6 @@ function main() {
   console.log('4. Update components to use data loader');
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}
