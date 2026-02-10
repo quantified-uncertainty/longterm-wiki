@@ -56,41 +56,36 @@ const fixers: Fixer[] = [
   },
 ];
 
-async function runFixer(fixer: Fixer): Promise<FixerResult> {
+function runFixer(fixer: Fixer): FixerResult {
+  if (DRY_RUN) {
+    console.log(`${colors.dim}[DRY RUN] Would run: ${fixer.command}${colors.reset}`);
+    return { name: fixer.name, success: true, dryRun: true };
+  }
+
   const startTime = Date.now();
+  try {
+    const output = execSync(fixer.command, {
+      encoding: 'utf8',
+      cwd: process.cwd(),
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
 
-  return new Promise((resolve) => {
-    if (DRY_RUN) {
-      console.log(`${colors.dim}[DRY RUN] Would run: ${fixer.command}${colors.reset}`);
-      resolve({ name: fixer.name, success: true, dryRun: true });
-      return;
-    }
-
-    try {
-      const output = execSync(fixer.command, {
-        encoding: 'utf8',
-        cwd: process.cwd(),
-        stdio: ['pipe', 'pipe', 'pipe']
-      });
-
-      const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-      console.log(`${colors.green}✓${colors.reset} ${fixer.name} ${colors.dim}(${duration}s)${colors.reset}`);
-      resolve({ name: fixer.name, success: true, output });
-    } catch (err: unknown) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      console.log(`${colors.yellow}⚠${colors.reset} ${fixer.name}: ${error.message.split('\n')[0]}`);
-      resolve({ name: fixer.name, success: false, error: error.message });
-    }
-  });
+    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+    console.log(`${colors.green}✓${colors.reset} ${fixer.name} ${colors.dim}(${duration}s)${colors.reset}`);
+    return { name: fixer.name, success: true, output };
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.log(`${colors.yellow}⚠${colors.reset} ${fixer.name}: ${error.message.split('\n')[0]}`);
+    return { name: fixer.name, success: false, error: error.message };
+  }
 }
 
-async function main(): Promise<void> {
+function main(): void {
   console.log(`Running ${fixers.length} auto-fixers...\n`);
 
-  // Run fixers sequentially (execSync blocks the event loop)
   const results: FixerResult[] = [];
   for (const fixer of fixers) {
-    results.push(await runFixer(fixer));
+    results.push(runFixer(fixer));
   }
 
   console.log();

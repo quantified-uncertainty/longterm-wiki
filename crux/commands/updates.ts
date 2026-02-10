@@ -15,6 +15,7 @@ import { execFileSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
+import type { CommandResult } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -58,11 +59,6 @@ interface CommandOptions {
   tier?: string;
   dryRun?: boolean;
   [key: string]: unknown;
-}
-
-interface CommandResult {
-  output: string;
-  exitCode: number;
 }
 
 // ---------------------------------------------------------------------------

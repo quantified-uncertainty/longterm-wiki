@@ -24,7 +24,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import yaml from 'js-yaml';
+import { parse as parseYaml } from 'yaml';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '../..');
@@ -66,7 +66,7 @@ function loadTransitionModelData(): TransitionModelEntity[] {
   let entities: TransitionModelEntity[] = [];
   for (const file of atmFiles) {
     const content = fs.readFileSync(path.join(entitiesDir, file), 'utf-8');
-    const parsed = yaml.load(content) as TransitionModelEntity | TransitionModelEntity[];
+    const parsed = parseYaml(content) as TransitionModelEntity | TransitionModelEntity[];
     if (Array.isArray(parsed)) entities.push(...parsed);
     else if (parsed) entities.push(parsed);
   }
