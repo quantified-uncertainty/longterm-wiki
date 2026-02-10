@@ -123,6 +123,40 @@ export async function searchWiki(
 }
 
 /**
+ * Search returning a Map of id → score for all matching documents.
+ * Used by the Explore page to filter and rank items via MiniSearch.
+ */
+export async function searchWikiScores(
+  query: string
+): Promise<Map<string, number>> {
+  await ensureLoaded();
+
+  if (!_miniSearch || !_docs || !query.trim()) return new Map();
+
+  const raw = _miniSearch.search(query, {
+    boost: FIELD_BOOSTS,
+    fuzzy: 0.2,
+    prefix: true,
+  });
+
+  const q = query.trim().toLowerCase();
+  const scores = new Map<string, number>();
+
+  for (const hit of raw) {
+    const doc = _docs.get(hit.id);
+    const title = (doc?.title ?? "").toLowerCase();
+
+    let boost = 1.0;
+    if (title === q) boost *= 3.0;
+    boost *= 1 + (doc?.importance ?? 0) / 300;
+
+    scores.set(hit.id, hit.score * boost);
+  }
+
+  return scores;
+}
+
+/**
  * Preload the search index in the background.
  * Call this early (e.g., on hover over the search button) for instant results.
  */

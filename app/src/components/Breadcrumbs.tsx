@@ -25,7 +25,7 @@ export function Breadcrumbs({
   if (category) {
     items.push({
       label: formatCategory(category),
-      href: `/wiki?tag=${encodeURIComponent(category)}`,
+      href: `/wiki?entity=${encodeURIComponent(category)}`,
     });
   }
 
