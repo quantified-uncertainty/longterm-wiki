@@ -11,7 +11,7 @@ import { buildCommands } from '../lib/cli.ts';
  */
 const SCRIPTS = {
   all: {
-    script: 'analyze/analyze-all.mjs',
+    script: 'analyze/analyze-all.ts',
     description: 'Run all analysis checks (health report)',
     passthrough: ['json', 'brief'],
   },
@@ -22,12 +22,12 @@ const SCRIPTS = {
     extraArgs: ['--rules=entity-mentions'],
   },
   links: {
-    script: 'analyze/analyze-link-coverage.mjs',
+    script: 'analyze/analyze-link-coverage.ts',
     description: 'Analyze cross-reference coverage',
     passthrough: ['json', 'orphans', 'topLinked', 'page'],
   },
   'entity-links': {
-    script: 'analyze/analyze-entity-links.mjs',
+    script: 'analyze/analyze-entity-links.ts',
     description: 'Analyze linking for a specific entity',
     passthrough: ['json', 'help'],
     positional: true,
@@ -38,7 +38,7 @@ const SCRIPTS = {
     passthrough: ['ci'],
   },
   scan: {
-    script: 'scan-content.mjs',
+    script: 'scan-content.ts',
     description: 'Scan content for statistics',
     passthrough: ['stats'],
   },

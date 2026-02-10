@@ -7,11 +7,11 @@
  * Converts to EntityLink components when possible, falls back to plain text.
  *
  * Usage:
- *   node crux/fix-broken-links.mjs                    # Report broken links
- *   node crux/fix-broken-links.mjs --dry-run          # Show what would be fixed
- *   node crux/fix-broken-links.mjs --fix              # Auto-fix (prefer EntityLink)
- *   node crux/fix-broken-links.mjs --fix --remove     # Remove broken links entirely
- *   node crux/fix-broken-links.mjs --interactive      # Ask about each file
+ *   node crux/fix-broken-links.ts                    # Report broken links
+ *   node crux/fix-broken-links.ts --dry-run          # Show what would be fixed
+ *   node crux/fix-broken-links.ts --fix              # Auto-fix (prefer EntityLink)
+ *   node crux/fix-broken-links.ts --fix --remove     # Remove broken links entirely
+ *   node crux/fix-broken-links.ts --interactive      # Ask about each file
  *
  * Strategies:
  *   Default: Convert to <EntityLink> if entity ID exists, else plain text
@@ -19,15 +19,18 @@
  *   --remove      Remove broken links entirely
  */
 
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join } from 'path';
 import { createInterface } from 'readline';
+import { fileURLToPath } from 'url';
 import { findMdxFiles } from './lib/file-utils.ts';
 import { getColors } from './lib/output.ts';
-import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities } from './lib/content-types.js';
+import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities } from './lib/content-types.ts';
+import type { PathRegistry } from './lib/content-types.ts';
 
 // Load path registry for EntityLink conversion
-const pathRegistry = loadPathRegistry();
-const reverseRegistry = {}; // path -> entity ID
+const pathRegistry: PathRegistry = loadPathRegistry();
+const reverseRegistry: Record<string, string> = {}; // path -> entity ID
 for (const [id, path] of Object.entries(pathRegistry)) {
   const normalized = path.replace(/\/$/, '');
   reverseRegistry[normalized] = id;
@@ -36,17 +39,54 @@ for (const [id, path] of Object.entries(pathRegistry)) {
 }
 
 // Load entity titles for smart label detection
-const entityTitles = {};
+const entityTitles: Record<string, string> = {};
 for (const entity of loadEntities()) {
   if (entity.id && entity.title) {
     entityTitles[entity.id] = entity.title;
   }
 }
 
+interface BrokenLink {
+  fullMatch: string;
+  text: string;
+  href: string;
+  line: number;
+  column: number;
+}
+
+interface LinkCategory {
+  action: 'to-entity-link' | 'to-text' | 'remove' | 'update-path';
+  entityId?: string;
+  newPath?: string;
+  reason: string;
+}
+
+interface FixResult {
+  content: string;
+  fixCount: number;
+}
+
+interface ScanResults {
+  filesScanned: number;
+  filesWithBroken: number;
+  totalBroken: number;
+  fixed: number;
+  toEntityLink: number;
+  toText: number;
+  removed: number;
+  byCategory: Record<string, number>;
+}
+
+interface FileToFix {
+  file: string;
+  content: string;
+  broken: BrokenLink[];
+}
+
 /**
  * Format an ID as a readable title (matches EntityLink.tsx)
  */
-function formatIdAsTitle(id) {
+function formatIdAsTitle(id: string): string {
   return id
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -56,31 +96,31 @@ function formatIdAsTitle(id) {
 /**
  * Check if link text matches the entity's title (or formatted ID)
  */
-function textMatchesEntityTitle(text, entityId) {
+function textMatchesEntityTitle(text: string, entityId: string): boolean {
   const title = entityTitles[entityId] || formatIdAsTitle(entityId);
   // Case-insensitive comparison, trim whitespace
   return text.trim().toLowerCase() === title.toLowerCase();
 }
 
-const args = process.argv.slice(2);
-const DRY_RUN = args.includes('--dry-run');
-const FIX_MODE = args.includes('--fix');
-const INTERACTIVE = args.includes('--interactive');
-const REMOVE_MODE = args.includes('--remove');
-const TO_TEXT_MODE = args.includes('--to-text');
+const args: string[] = process.argv.slice(2);
+const DRY_RUN: boolean = args.includes('--dry-run');
+const FIX_MODE: boolean = args.includes('--fix');
+const INTERACTIVE: boolean = args.includes('--interactive');
+const REMOVE_MODE: boolean = args.includes('--remove');
+const TO_TEXT_MODE: boolean = args.includes('--to-text');
 const colors = getColors();
 
 /**
  * Check if a link target exists
  */
-function linkExists(href) {
+function linkExists(href: string): boolean {
   let path = href.split('#')[0].split('?')[0];
   if (path.includes('...') || path.includes('${')) return true;
   path = path.replace(/\/$/, '');
   if (path.startsWith('/')) path = path.slice(1);
 
   // Check content files and path registry
-  const possiblePaths = [
+  const possiblePaths: string[] = [
     join(CONTENT_DIR, path + '.mdx'),
     join(CONTENT_DIR, path + '.md'),
     join(CONTENT_DIR, path, 'index.mdx'),
@@ -97,8 +137,8 @@ function linkExists(href) {
 /**
  * Extract broken links from content
  */
-function findBrokenLinks(content, filePath) {
-  const broken = [];
+function findBrokenLinks(content: string, _filePath: string): BrokenLink[] {
+  const broken: BrokenLink[] = [];
   const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
 
   let lineNum = 0;
@@ -116,7 +156,7 @@ function findBrokenLinks(content, filePath) {
     if (inCodeBlock) continue;
 
     linkRegex.lastIndex = 0;
-    let match;
+    let match: RegExpExecArray | null;
 
     while ((match = linkRegex.exec(line)) !== null) {
       const [fullMatch, text, href] = match;
@@ -149,7 +189,7 @@ function findBrokenLinks(content, filePath) {
 /**
  * Normalize a link path for matching against registry
  */
-function normalizePath(href) {
+function normalizePath(href: string): string {
   let path = href.split('#')[0].split('?')[0];
   if (!path.startsWith('/')) path = '/' + path;
   path = path.replace(/\/$/, '');
@@ -159,7 +199,7 @@ function normalizePath(href) {
 /**
  * Find entity ID for a given href
  */
-function findEntityId(href) {
+function findEntityId(href: string): string | null {
   const normalized = normalizePath(href);
 
   // Direct lookup
@@ -198,7 +238,7 @@ function findEntityId(href) {
 /**
  * Categorize a broken link for auto-fix decisions
  */
-function categorizeLink(href) {
+function categorizeLink(href: string): LinkCategory {
   // First, check if we can convert to EntityLink
   const entityId = findEntityId(href);
   if (entityId && !TO_TEXT_MODE) {
@@ -236,14 +276,14 @@ function categorizeLink(href) {
 /**
  * Check if a file already imports EntityLink
  */
-function hasEntityLinkImport(content) {
+function hasEntityLinkImport(content: string): boolean {
   return content.includes('EntityLink') && content.includes('import');
 }
 
 /**
  * Add EntityLink import to file content
  */
-function addEntityLinkImport(content, filePath) {
+function addEntityLinkImport(content: string, _filePath: string): string {
   // Check if there's already a wiki import
   const wikiImportRegex = /import\s*{([^}]+)}\s*from\s*['"]([^'"]*components\/wiki)['"]/;
   const match = content.match(wikiImportRegex);
@@ -272,7 +312,7 @@ function addEntityLinkImport(content, filePath) {
 /**
  * Fix broken links in content
  */
-function fixBrokenLinks(content, brokenLinks, strategy = 'to-text', filePath = '') {
+function fixBrokenLinks(content: string, brokenLinks: BrokenLink[], strategy: string = 'to-text', filePath: string = ''): FixResult {
   let fixed = content;
   let fixCount = 0;
   let needsEntityLinkImport = false;
@@ -287,7 +327,7 @@ function fixBrokenLinks(content, brokenLinks, strategy = 'to-text', filePath = '
 
   for (const link of sorted) {
     const category = categorizeLink(link.href);
-    let replacement;
+    let replacement: string;
 
     if (strategy === 'remove' || category.action === 'remove') {
       // Remove the link entirely
@@ -295,7 +335,7 @@ function fixBrokenLinks(content, brokenLinks, strategy = 'to-text', filePath = '
     } else if (category.action === 'to-entity-link') {
       // Convert to EntityLink component
       // Use short form if text matches entity title, otherwise use label prop
-      if (textMatchesEntityTitle(link.text, category.entityId)) {
+      if (textMatchesEntityTitle(link.text, category.entityId!)) {
         replacement = `<EntityLink id="${category.entityId}" />`;
       } else {
         replacement = `<EntityLink id="${category.entityId}" label="${link.text}" />`;
@@ -324,7 +364,7 @@ function fixBrokenLinks(content, brokenLinks, strategy = 'to-text', filePath = '
 /**
  * Ask user about a file
  */
-async function askUser(question) {
+async function askUser(question: string): Promise<string> {
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -338,13 +378,13 @@ async function askUser(question) {
   });
 }
 
-async function main() {
+async function main(): Promise<void> {
   console.log(`${colors.blue}🔗 Broken Link Fixer${colors.reset}\n`);
   console.log(`${colors.dim}Loaded ${Object.keys(pathRegistry).length} entities from pathRegistry.json${colors.reset}`);
   console.log(`${colors.dim}Loaded ${Object.keys(entityTitles).length} entity titles from database.json${colors.reset}\n`);
 
-  const files = findMdxFiles(CONTENT_DIR);
-  const results = {
+  const files: string[] = findMdxFiles(CONTENT_DIR);
+  const results: ScanResults = {
     filesScanned: files.length,
     filesWithBroken: 0,
     totalBroken: 0,
@@ -355,7 +395,7 @@ async function main() {
     byCategory: {},
   };
 
-  const filesToFix = [];
+  const filesToFix: FileToFix[] = [];
 
   // First pass: find all broken links
   for (const file of files) {
@@ -422,7 +462,7 @@ async function main() {
   }
 
   // Fix mode
-  const strategy = REMOVE_MODE ? 'remove' : 'to-text';
+  const strategy: string = REMOVE_MODE ? 'remove' : 'to-text';
 
   for (const { file, content, broken } of filesToFix) {
     const relFile = file.replace(CONTENT_DIR + '/', '');
@@ -456,11 +496,11 @@ async function main() {
       // Show a sample diff
       for (const link of broken.slice(0, 3)) {
         const cat = categorizeLink(link.href);
-        let replacement = link.text;
+        let replacement: string = link.text;
         if (strategy === 'remove' || cat.action === 'remove') {
           replacement = '(removed)';
         } else if (cat.action === 'to-entity-link') {
-          if (textMatchesEntityTitle(link.text, cat.entityId)) {
+          if (textMatchesEntityTitle(link.text, cat.entityId!)) {
             replacement = `<EntityLink id="${cat.entityId}" />`;
           } else {
             replacement = `<EntityLink id="${cat.entityId}" label="${link.text}" />`;
@@ -487,4 +527,9 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: unknown) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

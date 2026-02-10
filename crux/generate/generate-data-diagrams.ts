@@ -7,7 +7,7 @@
  * how entities are actually connected.
  */
 
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 
@@ -19,15 +19,43 @@ const ROOT = join(__dirname, '..', '..');
 const DATA_DIR = join(ROOT, 'data');
 const OUTPUT_DIR = join(ROOT, 'internal');
 
-mkdirSync(OUTPUT_DIR, { recursive: true });
+interface Entity {
+  id: string;
+  title?: string;
+  type: string;
+  relatedEntries?: RelatedEntry[];
+}
+
+interface RelatedEntry {
+  id: string;
+  type: string;
+  relationship?: string;
+}
+
+interface GraphNode {
+  id: string;
+  label: string;
+  type: string;
+}
+
+interface GraphEdge {
+  from: string;
+  to: string;
+  label: string;
+}
+
+interface DiagramDef {
+  name: string;
+  fn: () => string;
+}
 
 /**
  * Load all entities from YAML files
  */
-function loadEntities() {
+function loadEntities(): Entity[] {
   const entitiesDir = join(DATA_DIR, 'entities');
   const files = readdirSync(entitiesDir).filter(f => f.endsWith('.yaml'));
-  const entities = [];
+  const entities: Entity[] = [];
 
   for (const file of files) {
     const content = readFileSync(join(entitiesDir, file), 'utf-8');
@@ -43,8 +71,8 @@ function loadEntities() {
 /**
  * Generate a diagram of entity relationships by type
  */
-function generateTypeDistributionDiagram(entities) {
-  const typeCounts = {};
+function generateTypeDistributionDiagram(entities: Entity[]): string {
+  const typeCounts: Record<string, number> = {};
   for (const e of entities) {
     typeCounts[e.type] = (typeCounts[e.type] || 0) + 1;
   }
@@ -70,10 +98,10 @@ pie showData
 /**
  * Generate a relationship graph for a specific entity type
  */
-function generateRelationshipGraph(entities, focusType, maxNodes = 30) {
+function generateRelationshipGraph(entities: Entity[], focusType: string, maxNodes = 30): string {
   // Get entities of the focus type that have relationships
   const focusEntities = entities
-    .filter(e => e.type === focusType && e.relatedEntries?.length > 0)
+    .filter(e => e.type === focusType && e.relatedEntries?.length)
     .slice(0, maxNodes);
 
   if (focusEntities.length === 0) {
@@ -81,8 +109,8 @@ function generateRelationshipGraph(entities, focusType, maxNodes = 30) {
   }
 
   const entityMap = new Map(entities.map(e => [e.id, e]));
-  const nodes = new Map();
-  const edges = [];
+  const nodes = new Map<string, GraphNode>();
+  const edges: GraphEdge[] = [];
 
   for (const entity of focusEntities) {
     const safeId = entity.id.replace(/-/g, '_');
@@ -110,7 +138,7 @@ flowchart LR
 `;
 
   // Add nodes by type
-  const nodesByType = {};
+  const nodesByType: Record<string, GraphNode[]> = {};
   for (const node of nodes.values()) {
     if (!nodesByType[node.type]) nodesByType[node.type] = [];
     nodesByType[node.type].push(node);
@@ -139,8 +167,8 @@ flowchart LR
 /**
  * Generate a summary of relationship types in use
  */
-function generateRelationshipUsageDiagram(entities) {
-  const relCounts = {};
+function generateRelationshipUsageDiagram(entities: Entity[]): string {
+  const relCounts: Record<string, number> = {};
 
   for (const entity of entities) {
     for (const rel of (entity.relatedEntries || [])) {
@@ -169,9 +197,9 @@ xychart-beta
 /**
  * Generate cross-type relationship diagram
  */
-function generateCrossTypeRelationships(entities) {
+function generateCrossTypeRelationships(entities: Entity[]): string {
   // Count relationships between entity types
-  const typePairs = {};
+  const typePairs: Record<string, number> = {};
   const entityMap = new Map(entities.map(e => [e.id, e]));
 
   for (const entity of entities) {
@@ -196,7 +224,7 @@ function generateCrossTypeRelationships(entities) {
 flowchart LR
 `;
 
-  const nodeTypes = new Set();
+  const nodeTypes = new Set<string>();
   for (const [pair] of sorted) {
     const [from, to] = pair.split('|');
     nodeTypes.add(from);
@@ -228,30 +256,33 @@ flowchart LR
 // Main
 // =============================================================================
 
-console.log('Generating data-driven diagrams...\n');
+function main(): void {
+  mkdirSync(OUTPUT_DIR, { recursive: true });
 
-const entities = loadEntities();
-console.log(`Loaded ${entities.length} entities`);
+  console.log('Generating data-driven diagrams...\n');
 
-const diagrams = [
-  { name: 'type-distribution', fn: () => generateTypeDistributionDiagram(entities) },
-  { name: 'risk-relationships', fn: () => generateRelationshipGraph(entities, 'risk', 15) },
-  { name: 'policy-relationships', fn: () => generateRelationshipGraph(entities, 'policy', 15) },
-  { name: 'organization-relationships', fn: () => generateRelationshipGraph(entities, 'organization', 15) },
-  { name: 'relationship-usage', fn: () => generateRelationshipUsageDiagram(entities) },
-  { name: 'cross-type-connections', fn: () => generateCrossTypeRelationships(entities) },
-];
+  const entities = loadEntities();
+  console.log(`Loaded ${entities.length} entities`);
 
-// Generate individual files
-for (const { name, fn } of diagrams) {
-  const diagram = fn();
-  const filename = join(OUTPUT_DIR, `data-${name}.mmd`);
-  writeFileSync(filename, diagram);
-  console.log(`✓ ${name} -> ${filename}`);
-}
+  const diagrams: DiagramDef[] = [
+    { name: 'type-distribution', fn: () => generateTypeDistributionDiagram(entities) },
+    { name: 'risk-relationships', fn: () => generateRelationshipGraph(entities, 'risk', 15) },
+    { name: 'policy-relationships', fn: () => generateRelationshipGraph(entities, 'policy', 15) },
+    { name: 'organization-relationships', fn: () => generateRelationshipGraph(entities, 'organization', 15) },
+    { name: 'relationship-usage', fn: () => generateRelationshipUsageDiagram(entities) },
+    { name: 'cross-type-connections', fn: () => generateCrossTypeRelationships(entities) },
+  ];
 
-// Generate combined markdown
-let combined = `# Data-Driven Schema Diagrams
+  // Generate individual files
+  for (const { name, fn } of diagrams) {
+    const diagram = fn();
+    const filename = join(OUTPUT_DIR, `data-${name}.mmd`);
+    writeFileSync(filename, diagram);
+    console.log(`✓ ${name} -> ${filename}`);
+  }
+
+  // Generate combined markdown
+  let combined = `# Data-Driven Schema Diagrams
 
 Auto-generated from actual YAML entity data.
 
@@ -263,9 +294,9 @@ Total entities: ${entities.length}
 
 `;
 
-for (const { name, fn } of diagrams) {
-  const title = name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  combined += `## ${title}
+  for (const { name, fn } of diagrams) {
+    const title = name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    combined += `## ${title}
 
 \`\`\`mermaid
 ${fn()}
@@ -274,9 +305,14 @@ ${fn()}
 ---
 
 `;
+  }
+
+  writeFileSync(join(OUTPUT_DIR, 'data-diagrams.md'), combined);
+  console.log(`\n✓ Combined -> ${join(OUTPUT_DIR, 'data-diagrams.md')}`);
+
+  console.log('\nDone!');
 }
 
-writeFileSync(join(OUTPUT_DIR, 'data-diagrams.md'), combined);
-console.log(`\n✓ Combined -> ${join(OUTPUT_DIR, 'data-diagrams.md')}`);
-
-console.log('\nDone!');
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

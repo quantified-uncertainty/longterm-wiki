@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 /**
  * Auto-fix script - runs all available --fix operations in parallel
- * Usage: node crux/auto-fix.mjs [--dry-run]
+ * Usage: node crux/auto-fix.ts [--dry-run]
  */
 
 import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
 import { getColors } from './lib/output.ts';
 
-const args = process.argv.slice(2);
-const DRY_RUN = args.includes('--dry-run');
+const args: string[] = process.argv.slice(2);
+const DRY_RUN: boolean = args.includes('--dry-run');
 
 const colors = getColors();
 
@@ -21,8 +22,23 @@ if (DRY_RUN) {
   console.log(`${colors.yellow}DRY RUN MODE - no changes will be made${colors.reset}\n`);
 }
 
+interface Fixer {
+  name: string;
+  description: string;
+  command: string;
+}
+
+interface FixerResult {
+  name: string;
+  success: boolean;
+  output?: string;
+  error?: string;
+  dryRun?: boolean;
+  skipped?: boolean;
+}
+
 // Define fixable validators with their commands
-const fixers = [
+const fixers: Fixer[] = [
   {
     name: 'EntityLink Conversion',
     description: 'Convert markdown links to EntityLink components',
@@ -40,7 +56,7 @@ const fixers = [
   },
 ];
 
-async function runFixer(fixer) {
+async function runFixer(fixer: Fixer): Promise<FixerResult> {
   const startTime = Date.now();
 
   return new Promise((resolve) => {
@@ -60,18 +76,19 @@ async function runFixer(fixer) {
       const duration = ((Date.now() - startTime) / 1000).toFixed(2);
       console.log(`${colors.green}✓${colors.reset} ${fixer.name} ${colors.dim}(${duration}s)${colors.reset}`);
       resolve({ name: fixer.name, success: true, output });
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err as Error;
       console.log(`${colors.yellow}⚠${colors.reset} ${fixer.name}: ${error.message.split('\n')[0]}`);
       resolve({ name: fixer.name, success: false, error: error.message });
     }
   });
 }
 
-async function main() {
+async function main(): Promise<void> {
   console.log(`Running ${fixers.length} auto-fixers...\n`);
 
   // Run fixers sequentially (execSync blocks the event loop)
-  const results = [];
+  const results: FixerResult[] = [];
   for (const fixer of fixers) {
     results.push(await runFixer(fixer));
   }
@@ -95,4 +112,6 @@ async function main() {
   process.exit(failed > 0 ? 1 : 0);
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

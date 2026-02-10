@@ -36,15 +36,15 @@ import { parseArgs } from 'node:util';
 import { createLogger } from './lib/output.ts';
 
 // Domain handlers
-import * as validateCommands from './commands/validate.mjs';
-import * as analyzeCommands from './commands/analyze.mjs';
-import * as fixCommands from './commands/fix.mjs';
+import * as validateCommands from './commands/validate.ts';
+import * as analyzeCommands from './commands/analyze.ts';
+import * as fixCommands from './commands/fix.ts';
 import * as contentCommands from './commands/content.mjs';
-import * as generateCommands from './commands/generate.mjs';
+import * as generateCommands from './commands/generate.ts';
 import * as resourcesCommands from './commands/resources.mjs';
 import * as insightsCommands from './commands/insights.mjs';
 import * as gapsCommands from './commands/gaps.mjs';
-import * as updatesCommands from './commands/updates.mjs';
+import * as updatesCommands from './commands/updates.ts';
 
 const domains = {
   validate: validateCommands,

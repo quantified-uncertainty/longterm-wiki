@@ -15,12 +15,16 @@ import { dirname, join } from 'path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
 
+interface EnumValue {
+  value: string;
+  comment: string | null;
+}
+
 // Read schema.ts and extract enums
 const schemaPath = join(ROOT, 'data/schema.ts');
-const schemaContent = readFileSync(schemaPath, 'utf-8');
 
 // Extract EntityType enum values
-function extractEnum(content, enumName) {
+function extractEnum(content: string, enumName: string): EnumValue[] {
   const regex = new RegExp(`export const ${enumName}\\s*=\\s*z\\.enum\\(\\[([\\s\\S]*?)\\]\\)`, 'm');
   const match = content.match(regex);
   if (!match) {
@@ -29,7 +33,7 @@ function extractEnum(content, enumName) {
   }
 
   const enumBlock = match[1];
-  const values = [];
+  const values: EnumValue[] = [];
 
   // Match each string value with optional comment
   const valueRegex = /'([^']+)'(?:,?\s*\/\/\s*(.*))?/g;
@@ -44,11 +48,8 @@ function extractEnum(content, enumName) {
   return values;
 }
 
-const entityTypes = extractEnum(schemaContent, 'EntityType');
-const relationshipTypes = extractEnum(schemaContent, 'RelationshipType');
-
 // Categorize entity types
-const entityCategories = {
+const entityCategories: Record<string, string[]> = {
   'Core Content': ['risk', 'risk-factor', 'capability', 'concept', 'concepts', 'crux', 'argument', 'case-study'],
   'Safety & Responses': ['safety-agenda', 'safety-approaches', 'intervention', 'policy', 'policies'],
   'Organizations': ['organization', 'lab', 'lab-frontier', 'lab-research', 'lab-startup', 'lab-academic', 'funder'],
@@ -58,7 +59,7 @@ const entityCategories = {
 };
 
 // Categorize relationship types
-const relationshipCategories = {
+const relationshipCategories: Record<string, string[]> = {
   'Causal': ['causes', 'cause', 'drives', 'driver', 'driven-by', 'affects', 'amplifies', 'leads-to', 'contributes-to', 'shaped-by'],
   'Mitigation': ['mitigates', 'mitigated-by', 'mitigation', 'blocks', 'addresses'],
   'Structural': ['requires', 'enables', 'child-of', 'composed-of', 'component', 'prerequisite'],
@@ -67,7 +68,7 @@ const relationshipCategories = {
 };
 
 // Generate Mermaid chart for entity types
-function generateEntityMermaid() {
+function generateEntityMermaid(entityTypes: EnumValue[]): string {
   let chart = 'flowchart TD\n';
 
   for (const [category, types] of Object.entries(entityCategories)) {
@@ -89,7 +90,7 @@ function generateEntityMermaid() {
 }
 
 // Generate Mermaid chart for relationship types
-function generateRelationshipMermaid() {
+function generateRelationshipMermaid(relationshipTypes: EnumValue[]): string {
   let chart = 'flowchart LR\n';
 
   for (const [category, types] of Object.entries(relationshipCategories)) {
@@ -110,7 +111,7 @@ function generateRelationshipMermaid() {
 }
 
 // Generate entity type table
-function generateEntityTable() {
+function generateEntityTable(entityTypes: EnumValue[]): string {
   let table = '| Type | Description |\n|------|-------------|\n';
 
   for (const entity of entityTypes) {
@@ -122,7 +123,7 @@ function generateEntityTable() {
 }
 
 // Generate relationship type table
-function generateRelationshipTable() {
+function generateRelationshipTable(relationshipTypes: EnumValue[]): string {
   let table = '| Type | Description |\n|------|-------------|\n';
 
   for (const rel of relationshipTypes) {
@@ -133,8 +134,14 @@ function generateRelationshipTable() {
   return table;
 }
 
-// Generate the full MDX content
-const mdxContent = `---
+function main(): void {
+  const schemaContent = readFileSync(schemaPath, 'utf-8');
+
+  const entityTypes = extractEnum(schemaContent, 'EntityType');
+  const relationshipTypes = extractEnum(schemaContent, 'RelationshipType');
+
+  // Generate the full MDX content
+  const mdxContent = `---
 title: Schema Reference
 description: Auto-generated documentation of entity types and relationships
 sidebar:
@@ -151,22 +158,22 @@ This documentation is auto-generated from \`app/src/data/schema.ts\`.
 ## Entity Types Overview
 
 <Mermaid chart={\`
-${generateEntityMermaid()}
+${generateEntityMermaid(entityTypes)}
 \`} />
 
 ## Relationship Types Overview
 
 <Mermaid chart={\`
-${generateRelationshipMermaid()}
+${generateRelationshipMermaid(relationshipTypes)}
 \`} />
 
 ## Entity Types (${entityTypes.length} total)
 
-${generateEntityTable()}
+${generateEntityTable(entityTypes)}
 
 ## Relationship Types (${relationshipTypes.length} total)
 
-${generateRelationshipTable()}
+${generateRelationshipTable(relationshipTypes)}
 
 ## Data Flow
 
@@ -222,10 +229,15 @@ This script reads \`app/src/data/schema.ts\` and extracts:
 The categories shown in the diagrams are defined in the script itself.
 `;
 
-// Write to file
-const outputPath = join(ROOT, 'content/docs/internal/schema/diagrams.mdx');
-writeFileSync(outputPath, mdxContent);
+  // Write to file
+  const outputPath = join(ROOT, 'content/docs/internal/schema/diagrams.mdx');
+  writeFileSync(outputPath, mdxContent);
 
-console.log(`✓ Generated schema docs at ${outputPath}`);
-console.log(`  - ${entityTypes.length} entity types`);
-console.log(`  - ${relationshipTypes.length} relationship types`);
+  console.log(`✓ Generated schema docs at ${outputPath}`);
+  console.log(`  - ${entityTypes.length} entity types`);
+  console.log(`  - ${relationshipTypes.length} relationship types`);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

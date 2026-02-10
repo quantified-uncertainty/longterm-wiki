@@ -9,19 +9,20 @@
  * - Entities mentioned ON this entity's page that aren't linked (missing outbound)
  *
  * Usage:
- *   node crux/analyze/analyze-entity-links.mjs sam-altman          # Analyze sam-altman
- *   node crux/analyze/analyze-entity-links.mjs sam-altman --json   # JSON output
- *   node crux/analyze/analyze-entity-links.mjs --help              # Show help
+ *   node crux/analyze/analyze-entity-links.ts sam-altman          # Analyze sam-altman
+ *   node crux/analyze/analyze-entity-links.ts sam-altman --json   # JSON output
+ *   node crux/analyze/analyze-entity-links.ts --help              # Show help
  *
  * Use this after creating or significantly editing a page to ensure proper cross-linking.
  */
 
+import { fileURLToPath } from 'url';
 import { readFileSync, existsSync } from 'fs';
 import { join, relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities, loadBacklinks } from '../lib/content-types.js';
+import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities, loadBacklinks, type Entity, type PathRegistry } from '../lib/content-types.ts';
 
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json');
@@ -31,7 +32,47 @@ const colors = getColors(JSON_MODE);
 // Get entity ID from args (first non-flag argument)
 const entityId = args.find(arg => !arg.startsWith('-'));
 
-function showHelp() {
+// ---------------------------------------------------------------------------
+// Interfaces
+// ---------------------------------------------------------------------------
+
+interface InboundLink {
+  path: string;
+  title: string;
+  importance: number;
+}
+
+interface MissingInboundLink {
+  path: string;
+  title: string;
+  importance: number;
+  context: string;
+  matchedTerm: string;
+}
+
+interface OutboundLink {
+  id: string;
+  name: string;
+}
+
+interface AnalysisResult {
+  entityId: string;
+  displayName: string;
+  searchTerms: string[];
+  entityFilePath: string | null;
+  inbound: InboundLink[];
+  missingInbound: MissingInboundLink[];
+  outbound: OutboundLink[];
+  missingOutbound: never[];
+}
+
+interface MentionResult {
+  found: boolean;
+  context: string;
+  term: string;
+}
+
+function showHelp(): void {
   console.log(`
 ${colors.bold}Entity Link Analyzer${colors.reset}
 
@@ -62,7 +103,7 @@ ${colors.bold}When to use:${colors.reset}
 /**
  * Find the MDX file for an entity
  */
-function findEntityFile(entityId, pathRegistry) {
+function findEntityFile(entityId: string, pathRegistry: PathRegistry): string | null {
   const path = pathRegistry[entityId];
   if (!path) return null;
 
@@ -82,7 +123,7 @@ function findEntityFile(entityId, pathRegistry) {
 /**
  * Get display name for an entity
  */
-function getEntityDisplayName(entityId, entities) {
+function getEntityDisplayName(entityId: string, entities: Entity[]): string {
   const entity = entities.find(e => e.id === entityId);
   return entity?.title || entityId;
 }
@@ -90,9 +131,9 @@ function getEntityDisplayName(entityId, entities) {
 /**
  * Get search terms for an entity (name + aliases)
  */
-function getEntitySearchTerms(entityId, entities) {
+function getEntitySearchTerms(entityId: string, entities: Entity[]): string[] {
   const entity = entities.find(e => e.id === entityId);
-  const terms = [entityId];
+  const terms: string[] = [entityId];
 
   if (entity?.title) {
     terms.push(entity.title);
@@ -113,9 +154,9 @@ function getEntitySearchTerms(entityId, entities) {
 /**
  * Find EntityLink usages in content
  */
-function findEntityLinks(content) {
+function findEntityLinks(content: string): string[] {
   const regex = /<EntityLink\s+id="([^"]+)"/g;
-  const links = [];
+  const links: string[] = [];
   let match;
   while ((match = regex.exec(content)) !== null) {
     links.push(match[1]);
@@ -128,7 +169,7 @@ function findEntityLinks(content) {
  * Returns { found: boolean, context: string } with a snippet of context
  * Filters out matches that appear to be in URLs or markdown link URLs
  */
-function contentMentionsTerms(content, terms) {
+function contentMentionsTerms(content: string, terms: string[]): MentionResult {
   const lowerContent = content.toLowerCase();
   for (const term of terms) {
     const lowerTerm = term.toLowerCase();
@@ -168,24 +209,24 @@ function contentMentionsTerms(content, terms) {
 /**
  * Get page slug from file path
  */
-function getPageSlug(filePath) {
+function getPageSlug(filePath: string): string {
   const rel = relative(CONTENT_DIR, filePath);
   return rel
     .replace(/\.mdx?$/, '')
     .replace(/\/index$/, '')
     .split('/')
-    .pop();
+    .pop() || '';
 }
 
 /**
  * Analyze entity links
  */
-function analyzeEntity(entityId, pathRegistry, entities) {
+function analyzeEntity(entityId: string, pathRegistry: PathRegistry, entities: Entity[]): AnalysisResult {
   const files = findMdxFiles(CONTENT_DIR);
   const searchTerms = getEntitySearchTerms(entityId, entities);
   const entityFile = findEntityFile(entityId, pathRegistry);
 
-  const result = {
+  const result: AnalysisResult = {
     entityId,
     displayName: getEntityDisplayName(entityId, entities),
     searchTerms,
@@ -218,14 +259,14 @@ function analyzeEntity(entityId, pathRegistry, entities) {
         if (linksToEntity) {
           result.inbound.push({
             path: relPath,
-            title: frontmatter.title || slug,
-            importance: frontmatter.importance || 0,
+            title: (frontmatter.title as string) || slug,
+            importance: (frontmatter.importance as number) || 0,
           });
         } else if (mentionResult.found) {
           result.missingInbound.push({
             path: relPath,
-            title: frontmatter.title || slug,
-            importance: frontmatter.importance || 0,
+            title: (frontmatter.title as string) || slug,
+            importance: (frontmatter.importance as number) || 0,
             context: mentionResult.context,
             matchedTerm: mentionResult.term,
           });
@@ -239,7 +280,7 @@ function analyzeEntity(entityId, pathRegistry, entities) {
           name: getEntityDisplayName(id, entities),
         }));
       }
-    } catch (err) {
+    } catch (err: unknown) {
       // Skip files that can't be analyzed
     }
   }
@@ -251,7 +292,7 @@ function analyzeEntity(entityId, pathRegistry, entities) {
   return result;
 }
 
-function main() {
+function main(): void {
   if (HELP_MODE || !entityId) {
     showHelp();
     process.exit(HELP_MODE ? 0 : 1);
@@ -346,4 +387,6 @@ function main() {
   }
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

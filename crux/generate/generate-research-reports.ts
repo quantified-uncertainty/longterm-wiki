@@ -29,27 +29,44 @@ import yaml from 'js-yaml';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '../..');
 
+interface TransitionModelEntity {
+  id: string;
+  title: string;
+  type: string;
+  path: string;
+  parentFactor?: string;
+  relatedEntries?: Array<{ id: string; relationship?: string }>;
+}
+
+interface Candidate {
+  id: string;
+  title: string;
+  path: string;
+  parentFactor?: string;
+  hasReport: boolean;
+}
+
 // Parse args
 const args = process.argv.slice(2);
-function getArg(name, defaultValue) {
+function getArg(name: string, defaultValue: string | null): string | null {
   const index = args.indexOf(`--${name}`);
   if (index === -1) return defaultValue;
   return args[index + 1] || defaultValue;
 }
 
 const LIST_MODE = args.includes('--list');
-const BATCH_SIZE = parseInt(getArg('batch', '0'));
+const BATCH_SIZE = parseInt(getArg('batch', '0') || '0');
 const SPECIFIC_ID = args.find(a => !a.startsWith('--'));
 
 // Load AI Transition Model data (merged from multiple YAML files)
-function loadTransitionModelData() {
+function loadTransitionModelData(): TransitionModelEntity[] {
   const entitiesDir = path.join(ROOT, 'data/entities');
   const atmFiles = fs.readdirSync(entitiesDir)
     .filter(f => f.startsWith('ai-transition-model') && f.endsWith('.yaml'));
-  let entities = [];
+  let entities: TransitionModelEntity[] = [];
   for (const file of atmFiles) {
     const content = fs.readFileSync(path.join(entitiesDir, file), 'utf-8');
-    const parsed = yaml.load(content);
+    const parsed = yaml.load(content) as TransitionModelEntity | TransitionModelEntity[];
     if (Array.isArray(parsed)) entities.push(...parsed);
     else if (parsed) entities.push(parsed);
   }
@@ -57,9 +74,9 @@ function loadTransitionModelData() {
 }
 
 // Build a set of entity IDs that have research reports (by checking frontmatter topic field)
-function getEntitiesWithReports() {
+function getEntitiesWithReports(): Set<string> {
   const reportsDir = path.join(ROOT, 'content/docs/knowledge-base/research-reports');
-  const entityIds = new Set();
+  const entityIds = new Set<string>();
 
   if (!fs.existsSync(reportsDir)) return entityIds;
 
@@ -78,12 +95,12 @@ function getEntitiesWithReports() {
 
 // Check if research report exists for an entity
 const entitiesWithReports = getEntitiesWithReports();
-function hasResearchReport(entityId) {
+function hasResearchReport(entityId: string): boolean {
   return entitiesWithReports.has(entityId);
 }
 
 // Get candidates for research reports (subitems without reports)
-function getCandidates(entities) {
+function getCandidates(entities: TransitionModelEntity[]): Candidate[] {
   return entities
     .filter(e => e.type === 'ai-transition-model-subitem')
     .filter(e => !hasResearchReport(e.id))
@@ -97,7 +114,7 @@ function getCandidates(entities) {
 }
 
 // Generate the prompt for a research report
-function generatePrompt(entity) {
+function generatePrompt(entity: Candidate | TransitionModelEntity): string {
   const slug = entity.id.replace('tmc-', '');
 
   return `Create a research report for the AI Transition Model page: ${entity.title}
@@ -160,7 +177,7 @@ This is a RESEARCH task - use WebSearch extensively to find real citations.`;
 }
 
 // List candidates
-function listCandidates(candidates) {
+function listCandidates(candidates: Candidate[]): void {
   console.log('\n📊 AI Transition Model pages without research reports:\n');
   console.log('| # | Entity ID | Title | Parent |');
   console.log('|---|-----------|-------|--------|');
@@ -175,7 +192,7 @@ function listCandidates(candidates) {
 }
 
 // Show prompt for one entity
-function showPrompt(entity) {
+function showPrompt(entity: Candidate | TransitionModelEntity): void {
   console.log('\n' + '='.repeat(70));
   console.log(`📝 RESEARCH REPORT PROMPT: ${entity.title}`);
   console.log('='.repeat(70) + '\n');
@@ -186,7 +203,7 @@ function showPrompt(entity) {
 }
 
 // Generate batch prompts for parallel execution
-function generateBatch(candidates, batchSize) {
+function generateBatch(candidates: Candidate[], batchSize: number): void {
   const batch = candidates.slice(0, batchSize);
 
   console.log('\n' + '='.repeat(70));
@@ -219,7 +236,7 @@ Task({
 }
 
 // Main
-function main() {
+function main(): void {
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
 Research Report Generator
@@ -278,4 +295,6 @@ Example Workflow:
   console.log('Run with --list to see candidates');
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

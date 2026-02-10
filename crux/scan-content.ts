@@ -19,6 +19,7 @@
 
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join, basename, relative } from 'path';
+import { fileURLToPath } from 'url';
 import { parse as parseYaml } from 'yaml';
 import {
   articles,
@@ -31,7 +32,7 @@ import {
 import { findMdxFiles } from './lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from './lib/mdx-utils.ts';
 import { getColors } from './lib/output.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './lib/content-types.js';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './lib/content-types.ts';
 
 const ENTITIES_DIR = join(DATA_DIR, 'entities');
 
@@ -42,6 +43,44 @@ const VERBOSE = args.includes('--verbose');
 
 const colors = getColors();
 
+interface Frontmatter {
+  title?: string;
+  description?: string;
+  quality?: number;
+  ratings?: { completeness?: number };
+  sources?: Array<{
+    url?: string;
+    title?: string;
+    author?: string;
+    date?: string;
+  }>;
+}
+
+interface SourceRef {
+  url?: string;
+  doi?: string;
+  title?: string;
+  authors?: string[];
+  year?: number | null;
+  sourceType: string;
+}
+
+interface ProcessFileResult {
+  entityId: string;
+  title?: string;
+  wordCount?: number;
+  sourcesFound?: number;
+  skipped: boolean;
+}
+
+interface YamlEntity {
+  id: string;
+  relatedEntries?: Array<{
+    id: string;
+    relationship?: string;
+  }>;
+}
+
 // =============================================================================
 // MDX PROCESSING
 // =============================================================================
@@ -49,7 +88,7 @@ const colors = getColors();
 /**
  * Extract entity ID from file path
  */
-function getEntityIdFromPath(filePath) {
+function getEntityIdFromPath(filePath: string): string {
   const name = basename(filePath).replace(/\.(mdx|md)$/, '');
   // index files use parent directory name
   if (name === 'index') {
@@ -62,7 +101,7 @@ function getEntityIdFromPath(filePath) {
 /**
  * Extract plain text content from MDX, removing imports and JSX
  */
-function extractTextContent(mdxContent) {
+function extractTextContent(mdxContent: string): string {
   return mdxContent
     // Remove import statements
     .replace(/^import\s+.*$/gm, '')
@@ -81,8 +120,8 @@ function extractTextContent(mdxContent) {
 /**
  * Extract URLs and DOIs from content
  */
-function extractSourceReferences(content, frontmatter) {
-  const refs = [];
+function extractSourceReferences(content: string, frontmatter: Frontmatter): SourceRef[] {
+  const refs: SourceRef[] = [];
 
   // Extract from frontmatter sources array (if exists)
   if (frontmatter.sources && Array.isArray(frontmatter.sources)) {
@@ -127,10 +166,10 @@ function extractSourceReferences(content, frontmatter) {
   }
 
   // Deduplicate by URL/DOI
-  const seen = new Set();
+  const seen = new Set<string>();
   return refs.filter(ref => {
     const key = ref.url || ref.doi;
-    if (seen.has(key)) return false;
+    if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
   });
@@ -139,7 +178,7 @@ function extractSourceReferences(content, frontmatter) {
 /**
  * Infer source type from URL
  */
-function inferSourceType(url) {
+function inferSourceType(url: string | undefined): string {
   if (!url) return 'unknown';
   const lower = url.toLowerCase();
 
@@ -171,9 +210,9 @@ function inferSourceType(url) {
 /**
  * Process a single MDX file
  */
-function processFile(filePath) {
+function processFile(filePath: string): ProcessFileResult {
   const raw = readFileSync(filePath, 'utf-8');
-  const frontmatter = parseFrontmatter(raw);
+  const frontmatter = parseFrontmatter(raw) as Frontmatter;
   const content = getContentBody(raw);
 
   const entityId = getEntityIdFromPath(filePath);
@@ -203,7 +242,7 @@ function processFile(filePath) {
 
   // Process source references
   for (const ref of sourceRefs) {
-    const sourceId = hashId(ref.url || ref.doi || ref.title);
+    const sourceId = hashId(ref.url || ref.doi || ref.title || '');
     sources.upsert({
       id: sourceId,
       ...ref
@@ -227,14 +266,14 @@ function processFile(filePath) {
 /**
  * Load and process entity relationships from entities.yaml
  */
-function processEntityRelations() {
+function processEntityRelations(): number {
   if (!existsSync(ENTITIES_DIR)) {
     console.log(`${colors.yellow}⚠️  entities directory not found${colors.reset}`);
     return 0;
   }
 
   // Load all entity YAML files from the entities directory
-  let entities = [];
+  let entities: YamlEntity[] = [];
   for (const file of readdirSync(ENTITIES_DIR).filter(f => f.endsWith('.yaml'))) {
     const content = readFileSync(join(ENTITIES_DIR, file), 'utf-8');
     const parsed = parseYaml(content);
@@ -245,7 +284,7 @@ function processEntityRelations() {
   relations.clear();
 
   // Build relations array
-  const allRelations = [];
+  const allRelations: Array<{ fromId: string; toId: string; relationship: string }> = [];
   for (const entity of entities) {
     if (entity.relatedEntries && Array.isArray(entity.relatedEntries)) {
       for (const related of entity.relatedEntries) {
@@ -268,7 +307,7 @@ function processEntityRelations() {
 // MAIN
 // =============================================================================
 
-function main() {
+function main(): void {
   console.log(`${colors.blue}📚 Content Scanner${colors.reset}\n`);
 
   if (STATS_ONLY) {
@@ -308,8 +347,8 @@ function main() {
           console.log(`${colors.green}✓${colors.reset} ${result.entityId} (${result.wordCount} words, ${result.sourcesFound} sources)`);
         }
       }
-    } catch (err) {
-      console.log(`${colors.red}✗ Error processing ${filePath}: ${err.message}${colors.reset}`);
+    } catch (err: unknown) {
+      console.log(`${colors.red}✗ Error processing ${filePath}: ${(err as Error).message}${colors.reset}`);
     }
   }
 
@@ -333,4 +372,6 @@ function main() {
   console.log(`  Sources: ${stats.sources.total} (${stats.sources.fetched} fetched, ${stats.sources.pending} pending)`);
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}
