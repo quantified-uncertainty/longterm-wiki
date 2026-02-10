@@ -26,11 +26,10 @@ import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from '
 import { join, basename, dirname, relative } from 'path';
 import { createHash } from 'crypto';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import { CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, GENERATED_DATA_DIR_ABS } from './lib/content-types.mjs';
+import { CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPages as loadPagesJson } from './lib/content-types.mjs';
 
 const RESOURCES_DIR = join(DATA_DIR, 'resources');
 const PUBLICATIONS_FILE = join(DATA_DIR, 'publications.yaml');
-const PAGES_FILE = join(GENERATED_DATA_DIR_ABS, 'pages.json');
 
 // Forum publication IDs that go in forums.yaml
 const FORUM_PUBLICATION_IDS = new Set(['lesswrong', 'alignment-forum', 'ea-forum']);
@@ -111,7 +110,7 @@ function saveResources(resources) {
 }
 
 function loadPages() {
-  return JSON.parse(readFileSync(PAGES_FILE, 'utf-8'));
+  return loadPagesJson();
 }
 
 function normalizeUrl(url) {

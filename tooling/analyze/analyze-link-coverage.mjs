@@ -17,12 +17,12 @@
  *   node tooling/analyze/analyze-link-coverage.mjs --page scheming    # Analyze specific page
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { join, relative } from 'path';
+import { readFileSync } from 'fs';
+import { relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.mjs';
 import { getColors } from '../lib/output.mjs';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, GENERATED_DATA_DIR_ABS as DATA_DIR } from '../lib/content-types.mjs';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadBacklinks, loadPathRegistry } from '../lib/content-types.mjs';
 
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json');
@@ -33,30 +33,6 @@ const colors = getColors(JSON_MODE);
 // Find --page argument
 const pageArgIndex = args.indexOf('--page');
 const SPECIFIC_PAGE = pageArgIndex !== -1 ? args[pageArgIndex + 1] : null;
-
-/**
- * Load backlinks data
- */
-function loadBacklinks() {
-  const backlinksPath = join(DATA_DIR, 'backlinks.json');
-  if (!existsSync(backlinksPath)) {
-    console.warn('Warning: backlinks.json not found. Run pnpm build first.');
-    return {};
-  }
-  return JSON.parse(readFileSync(backlinksPath, 'utf-8'));
-}
-
-/**
- * Load path registry
- */
-function loadPathRegistry() {
-  const registryPath = join(DATA_DIR, 'pathRegistry.json');
-  if (!existsSync(registryPath)) {
-    console.warn('Warning: pathRegistry.json not found. Run pnpm build first.');
-    return {};
-  }
-  return JSON.parse(readFileSync(registryPath, 'utf-8'));
-}
 
 /**
  * Count EntityLink components in content

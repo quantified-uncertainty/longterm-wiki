@@ -21,7 +21,7 @@ import { join, relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.mjs';
 import { getColors } from '../lib/output.mjs';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, GENERATED_DATA_DIR_ABS as DATA_DIR } from '../lib/content-types.mjs';
+import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities, loadBacklinks } from '../lib/content-types.mjs';
 
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json');
@@ -60,42 +60,6 @@ ${colors.bold}When to use:${colors.reset}
 }
 
 /**
- * Load path registry to map entity IDs to paths
- */
-function loadPathRegistry() {
-  const registryPath = join(DATA_DIR, 'pathRegistry.json');
-  if (!existsSync(registryPath)) {
-    console.warn('Warning: pathRegistry.json not found. Run pnpm build first.');
-    return {};
-  }
-  return JSON.parse(readFileSync(registryPath, 'utf-8'));
-}
-
-/**
- * Load entities from generated data
- */
-function loadDatabase() {
-  const entitiesPath = join(DATA_DIR, 'entities.json');
-  if (!existsSync(entitiesPath)) {
-    console.warn('Warning: entities.json not found. Run pnpm build first.');
-    return { typedEntities: [] };
-  }
-  const typedEntities = JSON.parse(readFileSync(entitiesPath, 'utf-8'));
-  return { typedEntities };
-}
-
-/**
- * Load backlinks data
- */
-function loadBacklinks() {
-  const backlinksPath = join(DATA_DIR, 'backlinks.json');
-  if (!existsSync(backlinksPath)) {
-    return {};
-  }
-  return JSON.parse(readFileSync(backlinksPath, 'utf-8'));
-}
-
-/**
  * Find the MDX file for an entity
  */
 function findEntityFile(entityId, pathRegistry) {
@@ -118,16 +82,16 @@ function findEntityFile(entityId, pathRegistry) {
 /**
  * Get display name for an entity
  */
-function getEntityDisplayName(entityId, database) {
-  const entity = database.typedEntities?.find(e => e.id === entityId);
+function getEntityDisplayName(entityId, entities) {
+  const entity = entities.find(e => e.id === entityId);
   return entity?.title || entityId;
 }
 
 /**
  * Get search terms for an entity (name + aliases)
  */
-function getEntitySearchTerms(entityId, database) {
-  const entity = database.typedEntities?.find(e => e.id === entityId);
+function getEntitySearchTerms(entityId, entities) {
+  const entity = entities.find(e => e.id === entityId);
   const terms = [entityId];
 
   if (entity?.title) {
@@ -216,14 +180,14 @@ function getPageSlug(filePath) {
 /**
  * Analyze entity links
  */
-function analyzeEntity(entityId, pathRegistry, database) {
+function analyzeEntity(entityId, pathRegistry, entities) {
   const files = findMdxFiles(CONTENT_DIR);
-  const searchTerms = getEntitySearchTerms(entityId, database);
+  const searchTerms = getEntitySearchTerms(entityId, entities);
   const entityFile = findEntityFile(entityId, pathRegistry);
 
   const result = {
     entityId,
-    displayName: getEntityDisplayName(entityId, database),
+    displayName: getEntityDisplayName(entityId, entities),
     searchTerms,
     entityFilePath: entityFile ? relative(CONTENT_DIR, entityFile) : null,
     inbound: [],          // Pages that link to this entity
@@ -272,7 +236,7 @@ function analyzeEntity(entityId, pathRegistry, database) {
       if (isOwnPage) {
         result.outbound = entityLinks.map(id => ({
           id,
-          name: getEntityDisplayName(id, database),
+          name: getEntityDisplayName(id, entities),
         }));
       }
     } catch (err) {
@@ -294,7 +258,7 @@ function main() {
   }
 
   const pathRegistry = loadPathRegistry();
-  const database = loadDatabase();
+  const entities = loadEntities();
 
   // Check if entity exists
   if (!pathRegistry[entityId]) {
@@ -303,7 +267,7 @@ function main() {
     process.exit(1);
   }
 
-  const result = analyzeEntity(entityId, pathRegistry, database);
+  const result = analyzeEntity(entityId, pathRegistry, entities);
 
   if (JSON_MODE) {
     console.log(JSON.stringify(result, null, 2));

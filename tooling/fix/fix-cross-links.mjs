@@ -28,7 +28,7 @@ import { join, relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { parseFrontmatter } from '../lib/mdx-utils.mjs';
 import { getColors } from '../lib/output.mjs';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, GENERATED_DATA_DIR_ABS as DATA_DIR } from '../lib/content-types.mjs';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadOrganizations, loadExperts } from '../lib/content-types.mjs';
 
 const args = process.argv.slice(2);
 const APPLY_MODE = args.includes('--apply');
@@ -183,28 +183,18 @@ ${colors.bold}Safety:${colors.reset}
 }
 
 /**
- * Load a JSON file from the generated data directory, returning fallback if missing
- */
-function loadGeneratedJson(filename, fallback = []) {
-  const filepath = join(DATA_DIR, filename);
-  if (!existsSync(filepath)) return fallback;
-  return JSON.parse(readFileSync(filepath, 'utf-8'));
-}
-
-/**
  * Load entities from generated JSON files and path registry
  */
-function loadEntities() {
-  const registryPath = join(DATA_DIR, 'pathRegistry.json');
+function loadEntityLookup() {
+  const pathRegistry = loadPathRegistry();
 
-  if (!existsSync(registryPath)) {
+  if (Object.keys(pathRegistry).length === 0) {
     console.error('Error: Run pnpm build first (pathRegistry.json not found)');
     process.exit(1);
   }
 
-  const pathRegistry = JSON.parse(readFileSync(registryPath, 'utf-8'));
-  const organizations = loadGeneratedJson('organizations.json');
-  const experts = loadGeneratedJson('experts.json');
+  const organizations = loadOrganizations();
+  const experts = loadExperts();
 
   // Build entity lookup: searchTerm -> { id, displayName, priority }
   const entities = new Map();
@@ -514,7 +504,7 @@ async function main() {
   console.log(`${colors.bold}${colors.blue}Cross-Link Auto-Fixer${colors.reset}`);
   console.log(`${colors.dim}Mode: ${APPLY_MODE ? 'APPLY CHANGES' : 'Preview (dry run)'}${colors.reset}\n`);
 
-  const entities = loadEntities();
+  const entities = loadEntityLookup();
   console.log(`${colors.dim}Loaded ${entities.size} entity terms${colors.reset}\n`);
 
   let files;

@@ -8,26 +8,10 @@
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { parse as parseYaml } from 'yaml';
 import { join } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import { createLogger } from '../lib/output.mjs';
+import { loadPages, DATA_DIR_ABS } from '../lib/content-types.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const REPO_ROOT = join(__dirname, '..', '..');
-const PAGES_PATH = join(REPO_ROOT, 'app', 'src', 'data', 'pages.json');
-const INSIGHTS_DIR = join(REPO_ROOT, 'data', 'insights');
-
-/**
- * Load pages data
- */
-function loadPages() {
-  if (!existsSync(PAGES_PATH)) {
-    throw new Error(`Pages data not found. Run 'npm run build:data' first.`);
-  }
-  return JSON.parse(readFileSync(PAGES_PATH, 'utf-8'));
-}
+const INSIGHTS_DIR = join(DATA_DIR_ABS, 'insights');
 
 /**
  * Load insights data from directory of YAML files

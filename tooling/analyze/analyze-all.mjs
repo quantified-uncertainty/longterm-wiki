@@ -13,12 +13,10 @@
  *   node tooling/analyze/analyze-all.mjs --brief   # Summary only
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
 import { ValidationEngine } from '../lib/validation-engine.mjs';
 import { entityMentionsRule } from '../lib/rules/entity-mentions.mjs';
 import { getColors } from '../lib/output.mjs';
-import { PROJECT_ROOT, GENERATED_DATA_DIR_ABS as DATA_DIR } from '../lib/content-types.mjs';
+import { PROJECT_ROOT, loadBacklinks, loadEntities } from '../lib/content-types.mjs';
 
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json');
@@ -59,10 +57,10 @@ async function analyzeEntityMentions() {
  * Run link coverage analysis
  */
 async function analyzeLinkCoverage() {
-  const backlinksPath = join(DATA_DIR, 'backlinks.json');
-  const entitiesPath = join(DATA_DIR, 'entities.json');
+  const backlinks = loadBacklinks();
+  const entities = loadEntities();
 
-  if (!existsSync(backlinksPath) || !existsSync(entitiesPath)) {
+  if (entities.length === 0) {
     return {
       name: 'Link Coverage',
       description: 'Cross-reference density analysis',
@@ -72,9 +70,6 @@ async function analyzeLinkCoverage() {
       stats: null
     };
   }
-
-  const backlinks = JSON.parse(readFileSync(backlinksPath, 'utf-8'));
-  const entities = JSON.parse(readFileSync(entitiesPath, 'utf-8'));
 
   // Calculate orphan pages (≤1 incoming link)
   const orphans = [];

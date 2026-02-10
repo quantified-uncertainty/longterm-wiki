@@ -19,41 +19,27 @@
  *   --remove      Remove broken links entirely
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
 import { createInterface } from 'readline';
 import { findMdxFiles } from './lib/file-utils.mjs';
 import { getColors } from './lib/output.mjs';
-import { CONTENT_DIR_ABS as CONTENT_DIR, GENERATED_DATA_DIR_ABS } from './lib/content-types.mjs';
+import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities } from './lib/content-types.mjs';
 
 // Load path registry for EntityLink conversion
-const PATH_REGISTRY_FILE = join(GENERATED_DATA_DIR_ABS, 'pathRegistry.json');
-const ENTITIES_FILE = join(GENERATED_DATA_DIR_ABS, 'entities.json');
-let pathRegistry = {};
-let reverseRegistry = {}; // path -> entity ID
-let entityTitles = {}; // entity ID -> title
-
-if (existsSync(PATH_REGISTRY_FILE)) {
-  pathRegistry = JSON.parse(readFileSync(PATH_REGISTRY_FILE, 'utf-8'));
-  // Build reverse mapping (path -> entity ID)
-  for (const [id, path] of Object.entries(pathRegistry)) {
-    // Normalize and store multiple variants
-    const normalized = path.replace(/\/$/, '');
-    reverseRegistry[normalized] = id;
-    reverseRegistry[normalized + '/'] = id;
-    reverseRegistry[path] = id;
-  }
+const pathRegistry = loadPathRegistry();
+const reverseRegistry = {}; // path -> entity ID
+for (const [id, path] of Object.entries(pathRegistry)) {
+  const normalized = path.replace(/\/$/, '');
+  reverseRegistry[normalized] = id;
+  reverseRegistry[normalized + '/'] = id;
+  reverseRegistry[path] = id;
 }
 
 // Load entity titles for smart label detection
-if (existsSync(ENTITIES_FILE)) {
-  const entities = JSON.parse(readFileSync(ENTITIES_FILE, 'utf-8'));
-  if (Array.isArray(entities)) {
-    for (const entity of entities) {
-      if (entity.id && entity.title) {
-        entityTitles[entity.id] = entity.title;
-      }
-    }
+const entityTitles = {};
+for (const entity of loadEntities()) {
+  if (entity.id && entity.title) {
+    entityTitles[entity.id] = entity.title;
   }
 }
 

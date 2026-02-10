@@ -5,6 +5,7 @@
  */
 
 import { join } from 'path';
+import { readFileSync, existsSync } from 'fs';
 
 /**
  * Project root directory (current working directory)
@@ -141,6 +142,48 @@ export const GENERATED_DATA_DIR = 'app/src/data';
  * Absolute path to generated data directory
  */
 export const GENERATED_DATA_DIR_ABS = join(PROJECT_ROOT, GENERATED_DATA_DIR);
+
+// ---------------------------------------------------------------------------
+// Generated JSON loaders (app/src/data/*.json)
+// ---------------------------------------------------------------------------
+
+/**
+ * Load a JSON file from the generated data directory.
+ * Returns the fallback value if the file doesn't exist.
+ */
+export function loadGeneratedJson(filename, fallback) {
+  const filepath = join(GENERATED_DATA_DIR_ABS, filename);
+  if (!existsSync(filepath)) return fallback;
+  return JSON.parse(readFileSync(filepath, 'utf-8'));
+}
+
+export function loadEntities() {
+  return loadGeneratedJson('entities.json', []);
+}
+
+export function loadBacklinks() {
+  return loadGeneratedJson('backlinks.json', {});
+}
+
+export function loadPathRegistry() {
+  return loadGeneratedJson('pathRegistry.json', {});
+}
+
+export function loadPages() {
+  return loadGeneratedJson('pages.json', []);
+}
+
+export function loadOrganizations() {
+  return loadGeneratedJson('organizations.json', []);
+}
+
+export function loadExperts() {
+  return loadGeneratedJson('experts.json', []);
+}
+
+export function loadDatabase() {
+  return loadGeneratedJson('database.json', {});
+}
 
 /**
  * Build-breaking validation rules (must all pass before deployment)
