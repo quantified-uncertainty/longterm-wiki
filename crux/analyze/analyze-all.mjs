@@ -14,7 +14,7 @@
  */
 
 import { ValidationEngine } from '../lib/validation-engine.js';
-import { entityMentionsRule } from '../lib/rules/entity-mentions.mjs';
+import { entityMentionsRule } from '../lib/rules/entity-mentions.js';
 import { getColors } from '../lib/output.mjs';
 import { PROJECT_ROOT, loadBacklinks, loadEntities } from '../lib/content-types.js';
 

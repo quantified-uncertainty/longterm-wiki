@@ -19,7 +19,7 @@ import { readFileSync } from 'fs';
 // Use shared libraries
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { createLogger, formatPath } from '../lib/output.mjs';
-import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.js';
+import { CONTENT_DIR, DATA_DIR, loadDatabase as loadDatabaseJson } from '../lib/content-types.js';
 
 const log = createLogger();
 const c = log.colors;
@@ -27,10 +27,10 @@ const c = log.colors;
 // Load data sources
 function loadEntities() {
   try {
-    const database = JSON.parse(readFileSync(`${DATA_DIR}/database.json`, 'utf-8'));
+    const database = loadDatabaseJson();
     return new Set(Object.keys(database.entities || {}));
   } catch {
-    log.warn('Warning: Could not load entities database. Run npm run build:data first.');
+    log.warn('Warning: Could not load entities database. Run pnpm build first.');
     return new Set();
   }
 }

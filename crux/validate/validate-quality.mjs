@@ -18,10 +18,7 @@
  *   1 = Large discrepancies found (quality claimed >= 20 points higher than structure suggests)
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
-
-const PAGES_FILE = 'data/pages.json';
+import { loadPages as loadPagesData } from '../lib/content-types.js';
 
 // Parse args
 const args = process.argv.slice(2);
@@ -42,11 +39,12 @@ const colors = CI_MODE ? {
 };
 
 function loadPages() {
-  if (!existsSync(PAGES_FILE)) {
-    console.error('Error: pages.json not found. Run `npm run build:data` first.');
+  const pages = loadPagesData();
+  if (pages.length === 0) {
+    console.error('Error: pages.json not found or empty. Run `pnpm build` first.');
     process.exit(1);
   }
-  return JSON.parse(readFileSync(PAGES_FILE, 'utf-8'));
+  return pages;
 }
 
 function getDiscrepancyLevel(quality, suggested) {
