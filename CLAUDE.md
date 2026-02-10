@@ -12,9 +12,10 @@ pnpm build                      # Production build (runs build-data automaticall
 # Testing
 pnpm test                        # Run vitest tests
 
-# Tooling
-node tooling/crux.mjs validate   # Run all validation checks
-node tooling/crux.mjs --help     # Show all CLI domains
+# Tooling (Crux CLI)
+pnpm crux validate               # Run all validation checks
+pnpm crux --help                 # Show all CLI domains
+pnpm crux content improve <id>   # Improve a wiki page
 ```
 
 ## Repository Structure
@@ -33,10 +34,11 @@ longterm-wiki/
 │   ├── src/                    # App source code
 │   ├── scripts/                # Build scripts (build-data.mjs)
 │   └── package.json            # App dependencies
-├── tooling/                    # Crux CLI + validation
+├── crux/                       # Crux CLI + validation (see crux/README.md)
 │   ├── crux.mjs                # CLI entry point
 │   ├── commands/               # CLI domain handlers
-│   ├── lib/                    # Shared utilities + validation rules
+│   ├── authoring/              # Page authoring scripts (create, improve, grade)
+│   ├── lib/                    # Shared utilities, validation rules, page templates
 │   └── validate/               # Validation scripts
 └── package.json                # Workspace root
 ```
@@ -55,3 +57,4 @@ longterm-wiki/
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
 - **Squiggle models**: See `app/CLAUDE.md` for SquiggleEstimate style guide
+- **Page templates**: Defined in `crux/lib/page-templates.mjs`, style guides in `content/docs/internal/`

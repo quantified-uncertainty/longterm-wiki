@@ -7,9 +7,9 @@
     "dev": "pnpm --filter longterm-next dev",
     "build": "pnpm --filter longterm-next build",
     "test": "pnpm --filter longterm-next test",
-    "validate": "node --import tsx/esm tooling/crux.mjs validate",
-    "crux": "node --import tsx/esm tooling/crux.mjs",
-    "typecheck:tooling": "tsc --noEmit -p tooling/tsconfig.json"
+    "validate": "node --import tsx/esm crux/crux.mjs validate",
+    "crux": "node --import tsx/esm crux/crux.mjs",
+    "typecheck:tooling": "tsc --noEmit -p crux/tsconfig.json"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",

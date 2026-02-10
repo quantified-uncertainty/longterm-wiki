@@ -43,7 +43,7 @@ longterm-wiki/
 │   │   └── lib/                # Build script modules
 │   ├── package.json
 │   └── vercel.json
-├── tooling/                    # Crux CLI + validation (was apps/longterm/scripts/)
+├── crux/                    # Crux CLI + validation (was apps/longterm/scripts/)
 │   ├── crux.mjs
 │   ├── commands/
 │   ├── lib/rules/
@@ -125,7 +125,7 @@ These are potential follow-up tasks, not committed phases:
 - [x] Strip raw `entities` array from database.json (only `typedEntities` needed) — database.json reduced, entities.json kept for validation
 
 ### Tooling
-- [x] Fix Astro-specific validators in `tooling/` — sidebar/type validators skip gracefully when Astro config not found
+- [x] Fix Astro-specific validators in `crux/` — sidebar/type validators skip gracefully when Astro config not found
 - [x] Update tooling to run from repo root — added `yaml`, `zod`, `js-yaml` to root package.json; fixed remaining `src/data/` path refs in insights/gaps commands (23/28 validators pass)
 - [x] Pre-existing test failure: `claude-code-espionage-2025` has type `event` — added `event` to entity ontology (53/53 tests pass)
 
@@ -134,7 +134,7 @@ These are potential follow-up tasks, not committed phases:
 - [ ] LLM files generation could move to tooling — deferred, tightly coupled to app build (reads database.json, writes to app/public/)
 
 ### Repo cleanup (post-split)
-- [x] Fix pre-commit hook — was referencing `apps/longterm`, now runs `tooling/crux.mjs validate --quick` from repo root
+- [x] Fix pre-commit hook — was referencing `apps/longterm`, now runs `crux/crux.mjs validate --quick` from repo root
 - [x] Fix validate-mdx-compile.mjs — `apps/longterm/` PREFIX broke --quick mode, now uses `content/` prefix
 - [x] Update app/CLAUDE.md — rewritten for standalone repo structure (removed all cairn monorepo references)
 - [x] Fix GitHub history URL — `page.tsx` GITHUB_HISTORY_BASE now points to `longterm-wiki` repo
@@ -178,5 +178,5 @@ pnpm dev                                  # Dev server on port 3001
 # From repo root:
 pnpm build                               # Build via workspace
 pnpm test                                # Test via workspace
-node tooling/crux.mjs validate           # Run validation suite
+node crux/crux.mjs validate           # Run validation suite
 ```

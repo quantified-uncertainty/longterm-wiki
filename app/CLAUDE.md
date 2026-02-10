@@ -15,7 +15,7 @@ pnpm test                    # Run vitest tests
 pnpm test:watch              # Watch mode
 
 # Tooling (from repo root)
-node tooling/crux.mjs validate   # Run validation suite
+node crux/crux.mjs validate      # Run validation suite
 ```
 
 ## Essential Conventions
@@ -72,7 +72,7 @@ longterm-wiki/
 │   │   └── lib/               # Utilities (MDX, nav, etc.)
 │   ├── scripts/               # Build scripts (build-data.mjs)
 │   └── public/                # Static assets + LLM files
-├── tooling/                   # Crux CLI + validation
+├── crux/                      # Crux CLI + validation
 │   ├── crux.mjs               # CLI entry point
 │   ├── commands/              # Command domains
 │   ├── lib/                   # Shared utilities + rules
