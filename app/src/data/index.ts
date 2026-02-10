@@ -411,6 +411,63 @@ export function getAllPages(): Page[] {
   return getDatabase().pages || [];
 }
 
+export interface UpdateScheduleItem {
+  id: string;
+  numericId: string;
+  title: string;
+  quality: number | null;
+  importance: number | null;
+  lastUpdated: string | null;
+  updateFrequency: number;
+  daysSinceUpdate: number;
+  daysUntilDue: number;
+  staleness: number;
+  priority: number;
+  category: string;
+}
+
+export function getUpdateSchedule(): UpdateScheduleItem[] {
+  const db = getDatabase();
+  const pages = db.pages || [];
+  const now = Date.now();
+
+  const items: UpdateScheduleItem[] = [];
+
+  for (const page of pages) {
+    if (!page.updateFrequency) continue;
+
+    const lastUpdated = page.lastUpdated;
+    const daysSince = lastUpdated
+      ? Math.floor((now - new Date(lastUpdated).getTime()) / (1000 * 60 * 60 * 24))
+      : 999;
+    const daysUntil = page.updateFrequency - daysSince;
+    const staleness = daysSince / page.updateFrequency;
+    const importance = page.importance ?? 50;
+    const priority = staleness * (importance / 100);
+
+    const numericId = db.idRegistry?.bySlug[page.id] || page.id;
+
+    items.push({
+      id: page.id,
+      numericId,
+      title: page.title,
+      quality: page.quality,
+      importance: page.importance,
+      lastUpdated,
+      updateFrequency: page.updateFrequency,
+      daysSinceUpdate: daysSince,
+      daysUntilDue: daysUntil,
+      staleness: Math.round(staleness * 100) / 100,
+      priority: Math.round(priority * 100) / 100,
+      category: page.category,
+    });
+  }
+
+  // Sort by priority descending (most urgent first)
+  items.sort((a, b) => b.priority - a.priority);
+  return items;
+}
+
 export function getResourceCredibility(
   resource: Resource
 ): number | undefined {
