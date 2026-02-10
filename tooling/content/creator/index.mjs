@@ -7,7 +7,7 @@
 export { checkForExistingPage } from './duplicate-detection.mjs';
 export { findCanonicalLinks } from './canonical-links.mjs';
 export { runPerplexityResearch, runScryResearch } from './research.mjs';
-export { registerResearchSources, fetchRegisteredSources, processDirections } from './source-fetching.mjs';
+export { registerResearchSources, fetchRegisteredSources, processDirections, loadSourceFile } from './source-fetching.mjs';
 export { runSynthesis } from './synthesis.mjs';
 export { runSourceVerification } from './verification.mjs';
 export { ensureComponentImports, runValidationLoop, runFullValidation } from './validation.mjs';

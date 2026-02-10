@@ -13,6 +13,7 @@ export function getSynthesisPrompt(topic, quality, { loadResult }) {
   const scryData = loadResult(topic, 'scry-research.json');
   const directionsData = loadResult(topic, 'directions.json');
   const canonicalLinksData = loadResult(topic, 'canonical-links.json');
+  const sourceFileData = loadResult(topic, 'source-file-content.json');
 
   // Format canonical links for display
   let canonicalLinksSection = '';
@@ -33,25 +34,33 @@ ${linksTable}
 
   // Count total available citation URLs
   let totalCitations = 0;
+  let researchContent;
+  let citationWarning;
+  const isSourceFileMode = !!sourceFileData;
 
-  const researchContent = researchData?.sources?.map(s => {
-    let section = `### ${s.category.toUpperCase()}\n${s.content}`;
-    if (s.citations && s.citations.length > 0) {
-      totalCitations += s.citations.length;
-      section += `\n\n**Source URLs for [1], [2], etc. citations above:**\n${s.citations.map((url, i) => `[${i + 1}]: ${url}`).join('\n')}`;
-    } else {
-      section += `\n\n**WARNING: No source URLs available for this section. Do not invent URLs.**`;
-    }
-    return section;
-  }).join('\n\n') || 'No Perplexity research available';
+  if (isSourceFileMode) {
+    researchContent = sourceFileData.content;
+    citationWarning = `⚠️ Research is from a user-provided file (${sourceFileData.fileName}). Use descriptive citations only — do not invent URLs unless they appear in the source text.`;
+  } else {
+    researchContent = researchData?.sources?.map(s => {
+      let section = `### ${s.category.toUpperCase()}\n${s.content}`;
+      if (s.citations && s.citations.length > 0) {
+        totalCitations += s.citations.length;
+        section += `\n\n**Source URLs for [1], [2], etc. citations above:**\n${s.citations.map((url, i) => `[${i + 1}]: ${url}`).join('\n')}`;
+      } else {
+        section += `\n\n**WARNING: No source URLs available for this section. Do not invent URLs.**`;
+      }
+      return section;
+    }).join('\n\n') || 'No Perplexity research available';
+
+    citationWarning = totalCitations > 0
+      ? `✅ ${totalCitations} source URLs available in research data - USE THESE for citations`
+      : `⚠️ NO SOURCE URLs available in research data - use descriptive citations only, NO FAKE URLs`;
+  }
 
   const scryContent = scryData?.results?.slice(0, 10).map(r =>
     `- [${r.title}](${r.uri}) by ${r.original_author} (${r.platform})\n  ${r.snippet?.slice(0, 200) || ''}`
   ).join('\n') || 'No SCRY results available';
-
-  const citationWarning = totalCitations > 0
-    ? `✅ ${totalCitations} source URLs available in research data - USE THESE for citations`
-    : `⚠️ NO SOURCE URLs available in research data - use descriptive citations only, NO FAKE URLs`;
 
   let directionsSection = '';
   if (directionsData) {
@@ -73,13 +82,17 @@ ${linksTable}
     }
   }
 
+  const researchHeader = isSourceFileMode
+    ? `### PRIMARY SOURCE DOCUMENT (user-provided file: ${sourceFileData.fileName})`
+    : '### WEB RESEARCH (from Perplexity)';
+
   return `# Write Wiki Article: ${topic}
 
 You are writing a wiki article for LongtermWiki, an AI safety knowledge base.
 
 ## Research Data
 
-### WEB RESEARCH (from Perplexity)
+${researchHeader}
 ${researchContent}
 
 ### COMMUNITY DISCUSSIONS (from EA Forum/LessWrong)

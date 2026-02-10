@@ -240,6 +240,55 @@ export function getFetchedSourceContent(topic, { getTopicDir }) {
 }
 
 /**
+ * Load a local file as the primary research input, skipping web research phases.
+ * Saves both source-file-content.json and a compatibility perplexity-research.json.
+ */
+export async function loadSourceFile(topic, sourceFilePath, { log, saveResult }) {
+  log('load-source-file', `Reading source file: ${sourceFilePath}`);
+
+  if (!fs.existsSync(sourceFilePath)) {
+    throw new Error(`Source file not found: ${sourceFilePath}`);
+  }
+
+  let content = fs.readFileSync(sourceFilePath, 'utf-8');
+  const originalLength = content.length;
+
+  const MAX_CHARS = 80_000;
+  if (content.length > MAX_CHARS) {
+    log('load-source-file', `WARNING: File is ${content.length.toLocaleString()} chars, truncating to ${MAX_CHARS.toLocaleString()}`);
+    content = content.slice(0, MAX_CHARS);
+  }
+
+  log('load-source-file', `Loaded ${content.length.toLocaleString()} chars from ${path.basename(sourceFilePath)}`);
+
+  // Save the raw source file content + metadata
+  saveResult(topic, 'source-file-content.json', {
+    topic,
+    filePath: sourceFilePath,
+    fileName: path.basename(sourceFilePath),
+    originalLength,
+    content,
+    timestamp: new Date().toISOString(),
+  });
+
+  // Save a compatibility perplexity-research.json so verification.mjs works
+  saveResult(topic, 'perplexity-research.json', {
+    topic,
+    depth: 'source-file',
+    sources: [{
+      category: 'user-provided source file',
+      content,
+      citations: [],
+    }],
+    timestamp: new Date().toISOString(),
+  });
+
+  log('load-source-file', 'Saved source-file-content.json and compatibility perplexity-research.json');
+
+  return { success: true, charCount: content.length, truncated: originalLength > MAX_CHARS };
+}
+
+/**
  * Process user directions — extract URLs and fetch their content
  */
 export async function processDirections(topic, directions, { log, saveResult }) {
