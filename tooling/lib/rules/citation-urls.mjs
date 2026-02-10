@@ -5,7 +5,7 @@
  * Catches synthesis failures where URLs weren't properly extracted from research.
  */
 
-import { Severity, Issue } from '../validation-engine.mjs';
+import { Severity, Issue } from '../validation-engine.js';
 
 // Pattern: footnote definition with undefined or empty URL
 // Matches: [^1]: [Title](undefined) or [^1]: [Title]()

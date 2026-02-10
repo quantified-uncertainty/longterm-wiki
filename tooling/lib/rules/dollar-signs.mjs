@@ -8,7 +8,7 @@
  * Note: \\$ is valid in YAML frontmatter but not in MDX body content.
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.mjs';
+import { createRule, Issue, Severity, FixType } from '../validation-engine.js';
 import { isInCodeBlock } from '../mdx-utils.mjs';
 
 // Pattern: unescaped $ followed by a number (not already escaped with \)

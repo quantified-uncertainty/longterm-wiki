@@ -23,7 +23,7 @@ import {
   isIndexPage,
   extractEntityId,
   CONTENT_DIR,
-} from './content-types.mjs';
+} from './content-types.js';
 
 let passed = 0;
 let failed = 0;
@@ -206,10 +206,10 @@ test('formatCount pluralizes correctly', () => {
 });
 
 // =============================================================================
-// content-types.mjs tests
+// content-types.js tests
 // =============================================================================
 
-console.log('\n📋 content-types.mjs');
+console.log('\n📋 content-types.js');
 
 test('CONTENT_TYPES has expected types', () => {
   assert('model' in CONTENT_TYPES);

@@ -30,7 +30,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
-import { CRITICAL_RULES, QUALITY_RULES } from '../lib/content-types.mjs';
+import { CRITICAL_RULES, QUALITY_RULES } from '../lib/content-types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '../..');

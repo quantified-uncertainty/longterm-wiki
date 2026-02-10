@@ -22,7 +22,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { findMdxFiles } from '../lib/file-utils.mjs';
-import { CONTENT_DIR } from '../lib/content-types.mjs';
+import { CONTENT_DIR } from '../lib/content-types.js';
 import { countWords, countTables, countDiagrams, countInternalLinks } from '../lib/metrics-extractor.mjs';
 
 // Import template definitions

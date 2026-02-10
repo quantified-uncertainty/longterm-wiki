@@ -8,7 +8,7 @@
  * outside the proper grading pipeline.
  */
 
-import { Severity, Issue } from '../validation-engine.mjs';
+import { Severity, Issue } from '../validation-engine.js';
 
 export const qualitySourceRule = {
   id: 'quality-source',

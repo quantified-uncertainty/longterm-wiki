@@ -26,7 +26,7 @@ import remarkMath from 'remark-math';
 // Use shared libraries
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { createLogger, formatPath, createProgress } from '../lib/output.mjs';
-import { CONTENT_DIR } from '../lib/content-types.mjs';
+import { CONTENT_DIR } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);
 const QUICK_MODE = args.includes('--quick');

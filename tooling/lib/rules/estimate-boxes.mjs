@@ -7,7 +7,7 @@
  * Policy: New content should use markdown tables with detailed reasoning columns.
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 
 export const estimateBoxesRule = createRule({
   id: 'estimate-boxes',

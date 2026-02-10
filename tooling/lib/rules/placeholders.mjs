@@ -8,7 +8,7 @@
  * - Lorem ipsum text
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 import { isInCodeBlock, isInMermaid, isInComment, getLineNumber } from '../mdx-utils.mjs';
 
 // Placeholder patterns to detect

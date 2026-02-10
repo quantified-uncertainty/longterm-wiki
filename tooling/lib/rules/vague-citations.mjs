@@ -12,7 +12,7 @@
  * This helps ensure track record pages and similar content have verifiable citations.
  */
 
-import { Severity, Issue } from '../validation-engine.mjs';
+import { Severity, Issue } from '../validation-engine.js';
 
 // Patterns that indicate a vague citation when standing alone in a table cell
 // These are fine in prose but problematic as sole source references

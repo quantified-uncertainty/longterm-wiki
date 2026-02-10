@@ -10,7 +10,7 @@
  * These are worse than no URL - they're actively misleading.
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 import { isInCodeBlock, getLineNumber } from '../mdx-utils.mjs';
 
 // Fake URL patterns to detect

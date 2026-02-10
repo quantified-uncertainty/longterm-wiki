@@ -13,7 +13,7 @@
  * - `≈86%` renders correctly as `≈86%`
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.mjs';
+import { createRule, Issue, Severity, FixType } from '../validation-engine.js';
 import { isInCodeBlock } from '../mdx-utils.mjs';
 
 // Pattern: tilde followed by escaped dollar sign (problematic LaTeX interaction)

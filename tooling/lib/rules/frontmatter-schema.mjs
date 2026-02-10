@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { Severity, Issue } from '../validation-engine.mjs';
+import { Severity, Issue } from '../validation-engine.js';
 
 // Mirror the schema from content.config.ts
 const frontmatterSchema = z.object({

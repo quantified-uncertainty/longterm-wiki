@@ -23,7 +23,7 @@
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { ValidationEngine, Severity } from '../lib/validation-engine.mjs';
+import { ValidationEngine, Severity } from '../lib/validation-engine.js';
 import { allRules } from '../lib/rules/index.mjs';
 import { getColors } from '../lib/output.mjs';
 
@@ -142,7 +142,6 @@ const SUBPROCESS_CHECKS = [
     name: 'YAML Schema Validation',
     script: 'validate-yaml-schema.mjs',
     description: 'Entity/resource YAML files match Zod schemas',
-    runner: 'tsx',
   },
   {
     id: 'graph-sync',
@@ -169,12 +168,10 @@ function runSubprocessCheck(check) {
     const checkArgs = check.args || [];
     const childArgs = CI_MODE ? ['--ci', ...checkArgs] : checkArgs;
 
-    const runner = 'node';
-    const runnerArgs = check.runner === 'tsx'
-      ? ['--import', 'tsx/esm', '--no-warnings', scriptPath, ...childArgs]
-      : [scriptPath, ...childArgs];
+    // Always register tsx/esm so scripts can import .ts modules
+    const runnerArgs = ['--import', 'tsx/esm', '--no-warnings', scriptPath, ...childArgs];
 
-    const child = spawn(runner, runnerArgs, {
+    const child = spawn('node', runnerArgs, {
       cwd: process.cwd(),
       stdio: ['inherit', 'pipe', 'pipe'],
     });

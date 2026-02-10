@@ -13,7 +13,7 @@
  * may be intentional (e.g., when an entity is mentioned many times on one page).
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 import { isInCodeBlock, isInComment, getLineNumber } from '../mdx-utils.mjs';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';

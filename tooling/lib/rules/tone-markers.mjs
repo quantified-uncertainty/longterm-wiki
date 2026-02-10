@@ -10,7 +10,7 @@
  * These patterns are intentionally narrow to reduce false positives.
  */
 
-import { Severity, Issue } from '../validation-engine.mjs';
+import { Severity, Issue } from '../validation-engine.js';
 
 const TONE_MARKER_PATTERNS = [
   // "actually" as emphasis/correction (not "actually implemented" or in quotes)

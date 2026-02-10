@@ -10,7 +10,7 @@
  * These patterns target prescriptive framing in analytical content.
  */
 
-import { Severity, Issue } from '../validation-engine.mjs';
+import { Severity, Issue } from '../validation-engine.js';
 
 const PRESCRIPTIVE_PATTERNS = [
   // "should" / "must" / "need to" in analytical voice (not in quotes or attributions)

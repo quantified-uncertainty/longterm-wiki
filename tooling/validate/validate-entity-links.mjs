@@ -22,7 +22,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { getColors } from '../lib/output.mjs';
-import { CONTENT_DIR } from '../lib/content-types.mjs';
+import { CONTENT_DIR } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);
 const CI_MODE = args.includes('--ci');

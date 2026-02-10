@@ -11,7 +11,7 @@
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 
 const DATA_DIR = join(process.cwd(), 'data');
 

@@ -23,7 +23,7 @@ import { readFileSync } from 'fs';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { parseFrontmatter } from '../lib/mdx-utils.mjs';
 import { getColors, formatPath } from '../lib/output.mjs';
-import { getContentType, getStalenessThreshold, CONTENT_DIR, DEFAULT_STALENESS_THRESHOLD } from '../lib/content-types.mjs';
+import { getContentType, getStalenessThreshold, CONTENT_DIR, DEFAULT_STALENESS_THRESHOLD } from '../lib/content-types.js';
 
 const CI_MODE = process.argv.includes('--ci') || process.argv.includes('--json');
 const colors = getColors(CI_MODE);

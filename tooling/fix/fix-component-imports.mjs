@@ -17,7 +17,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { getColors } from '../lib/output.mjs';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.mjs';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);
 const APPLY_MODE = args.includes('--apply');
