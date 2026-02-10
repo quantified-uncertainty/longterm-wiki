@@ -21,7 +21,7 @@
  */
 
 import { ValidationEngine, Severity } from '../lib/validation-engine.js';
-import { allRules } from '../lib/rules/index.mjs';
+import { allRules } from '../lib/rules/index.js';
 import { getColors } from '../lib/output.mjs';
 
 const args = process.argv.slice(2);

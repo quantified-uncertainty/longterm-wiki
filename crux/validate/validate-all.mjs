@@ -24,7 +24,7 @@ import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { ValidationEngine, Severity } from '../lib/validation-engine.js';
-import { allRules } from '../lib/rules/index.mjs';
+import { allRules } from '../lib/rules/index.js';
 import { getColors } from '../lib/output.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
