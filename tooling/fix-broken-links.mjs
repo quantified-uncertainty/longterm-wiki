@@ -28,7 +28,7 @@ import { CONTENT_DIR_ABS as CONTENT_DIR, GENERATED_DATA_DIR_ABS } from './lib/co
 
 // Load path registry for EntityLink conversion
 const PATH_REGISTRY_FILE = join(GENERATED_DATA_DIR_ABS, 'pathRegistry.json');
-const DATABASE_FILE = join(GENERATED_DATA_DIR_ABS, 'database.json');
+const ENTITIES_FILE = join(GENERATED_DATA_DIR_ABS, 'entities.json');
 let pathRegistry = {};
 let reverseRegistry = {}; // path -> entity ID
 let entityTitles = {}; // entity ID -> title
@@ -46,10 +46,10 @@ if (existsSync(PATH_REGISTRY_FILE)) {
 }
 
 // Load entity titles for smart label detection
-if (existsSync(DATABASE_FILE)) {
-  const database = JSON.parse(readFileSync(DATABASE_FILE, 'utf-8'));
-  if (database.entities) {
-    for (const entity of database.entities) {
+if (existsSync(ENTITIES_FILE)) {
+  const entities = JSON.parse(readFileSync(ENTITIES_FILE, 'utf-8'));
+  if (Array.isArray(entities)) {
+    for (const entity of entities) {
       if (entity.id && entity.title) {
         entityTitles[entity.id] = entity.title;
       }
@@ -82,9 +82,7 @@ const FIX_MODE = args.includes('--fix');
 const INTERACTIVE = args.includes('--interactive');
 const REMOVE_MODE = args.includes('--remove');
 const TO_TEXT_MODE = args.includes('--to-text');
-const colors = getColors(false);
-
-const PAGES_DIR = join(process.cwd(), 'app/src/app');
+const colors = getColors();
 
 /**
  * Check if a link target exists
@@ -95,16 +93,19 @@ function linkExists(href) {
   path = path.replace(/\/$/, '');
   if (path.startsWith('/')) path = path.slice(1);
 
+  // Check content files and path registry
   const possiblePaths = [
     join(CONTENT_DIR, path + '.mdx'),
     join(CONTENT_DIR, path + '.md'),
     join(CONTENT_DIR, path, 'index.mdx'),
     join(CONTENT_DIR, path, 'index.md'),
-    join(PAGES_DIR, path + '.tsx'),
-    join(PAGES_DIR, path, 'page.tsx'),
   ];
 
-  return possiblePaths.some(p => existsSync(p));
+  if (possiblePaths.some(p => existsSync(p))) return true;
+
+  // Also check path registry (covers dynamic routes)
+  const normalizedPath = '/' + path.replace(/\/$/, '') + '/';
+  return Object.values(pathRegistry).includes(normalizedPath);
 }
 
 /**

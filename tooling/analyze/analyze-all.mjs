@@ -60,9 +60,9 @@ async function analyzeEntityMentions() {
  */
 async function analyzeLinkCoverage() {
   const backlinksPath = join(DATA_DIR, 'backlinks.json');
-  const databasePath = join(DATA_DIR, 'database.json');
+  const entitiesPath = join(DATA_DIR, 'entities.json');
 
-  if (!existsSync(backlinksPath) || !existsSync(databasePath)) {
+  if (!existsSync(backlinksPath) || !existsSync(entitiesPath)) {
     return {
       name: 'Link Coverage',
       description: 'Cross-reference density analysis',
@@ -74,30 +74,30 @@ async function analyzeLinkCoverage() {
   }
 
   const backlinks = JSON.parse(readFileSync(backlinksPath, 'utf-8'));
-  const database = JSON.parse(readFileSync(databasePath, 'utf-8'));
+  const entities = JSON.parse(readFileSync(entitiesPath, 'utf-8'));
 
   // Calculate orphan pages (≤1 incoming link)
   const orphans = [];
   const linkCounts = [];
 
-  for (const [entityId, entity] of Object.entries(database)) {
-    const incomingLinks = backlinks[entityId] || [];
+  for (const entity of entities) {
+    const incomingLinks = backlinks[entity.id] || [];
     const count = incomingLinks.length;
     linkCounts.push(count);
 
-    if (count <= 1 && entity.type !== 'overview') {
+    if (count <= 1) {
       orphans.push({
-        id: entityId,
-        title: entity.title || entityId,
+        id: entity.id,
+        title: entity.title || entity.id,
         incomingLinks: count,
-        type: entity.type
+        type: entity.entityType || entity.type
       });
     }
   }
 
   // Calculate stats
   const totalPages = linkCounts.length;
-  const avgLinks = linkCounts.reduce((a, b) => a + b, 0) / totalPages;
+  const avgLinks = totalPages > 0 ? linkCounts.reduce((a, b) => a + b, 0) / totalPages : 0;
   const orphanCount = orphans.length;
 
   return {
@@ -107,7 +107,7 @@ async function analyzeLinkCoverage() {
       totalPages,
       averageIncomingLinks: avgLinks.toFixed(1),
       orphanPages: orphanCount,
-      orphanPercent: ((orphanCount / totalPages) * 100).toFixed(1) + '%'
+      orphanPercent: totalPages > 0 ? ((orphanCount / totalPages) * 100).toFixed(1) + '%' : '0%'
     },
     orphanPages: orphans
       .sort((a, b) => a.incomingLinks - b.incomingLinks)

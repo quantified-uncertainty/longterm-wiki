@@ -2,12 +2,12 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@lib/utils";
 
-const credibilityConfig: Record<number, { label: string; color: string; bgColor: string; description: string }> = {
-  5: { label: "Gold", color: "#b8860b", bgColor: "rgba(184, 134, 11, 0.15)", description: "Peer-reviewed, gold standard source" },
-  4: { label: "High", color: "#2e7d32", bgColor: "rgba(46, 125, 50, 0.12)", description: "High quality, established institution" },
-  3: { label: "Good", color: "#1976d2", bgColor: "rgba(25, 118, 210, 0.12)", description: "Good quality, reputable source" },
-  2: { label: "Mixed", color: "#f57c00", bgColor: "rgba(245, 124, 0, 0.12)", description: "Mixed quality, verify claims" },
-  1: { label: "Low", color: "#d32f2f", bgColor: "rgba(211, 47, 47, 0.12)", description: "Low credibility, use with caution" },
+const credibilityConfig: Record<number, { label: string; classes: string; description: string }> = {
+  5: { label: "Gold", classes: "bg-amber-600/15 text-amber-700", description: "Peer-reviewed, gold standard source" },
+  4: { label: "High", classes: "bg-green-700/12 text-green-800", description: "High quality, established institution" },
+  3: { label: "Good", classes: "bg-blue-600/12 text-blue-700", description: "Good quality, reputable source" },
+  2: { label: "Mixed", classes: "bg-orange-500/12 text-orange-700", description: "Mixed quality, verify claims" },
+  1: { label: "Low", classes: "bg-red-600/12 text-red-700", description: "Low credibility, use with caution" },
 };
 
 export function CredibilityBadge({
@@ -33,9 +33,8 @@ export function CredibilityBadge({
   return (
     <Badge
       variant="outline"
-      className={cn("rounded-sm font-medium border-transparent", sizeClasses[size], className)}
+      className={cn("rounded-sm font-medium border-transparent", sizeClasses[size], config.classes, className)}
       title={`Credibility: ${config.label} (${clampedLevel}/5) - ${config.description}`}
-      style={{ backgroundColor: config.bgColor, color: config.color }}
     >
       {showLabel ? (
         <>

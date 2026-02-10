@@ -11,8 +11,13 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 
-const DATA_DIR = 'data';
-const OUTPUT_DIR = 'internal';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const ROOT = join(__dirname, '..', '..');
+const DATA_DIR = join(ROOT, 'data');
+const OUTPUT_DIR = join(ROOT, 'internal');
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
 
@@ -76,19 +81,19 @@ function generateRelationshipGraph(entities, focusType, maxNodes = 30) {
   }
 
   const entityMap = new Map(entities.map(e => [e.id, e]));
-  const nodes = new Set();
+  const nodes = new Map();
   const edges = [];
 
   for (const entity of focusEntities) {
     const safeId = entity.id.replace(/-/g, '_');
-    nodes.add({ id: safeId, label: entity.title || entity.id, type: entity.type });
+    nodes.set(safeId, { id: safeId, label: entity.title || entity.id, type: entity.type });
 
     for (const rel of (entity.relatedEntries || []).slice(0, 5)) {
       const target = entityMap.get(rel.id);
       const targetSafeId = rel.id.replace(/-/g, '_');
 
       if (target) {
-        nodes.add({ id: targetSafeId, label: target.title || rel.id, type: rel.type });
+        nodes.set(targetSafeId, { id: targetSafeId, label: target.title || rel.id, type: rel.type });
         edges.push({
           from: safeId,
           to: targetSafeId,
@@ -106,7 +111,7 @@ flowchart LR
 
   // Add nodes by type
   const nodesByType = {};
-  for (const node of nodes) {
+  for (const node of nodes.values()) {
     if (!nodesByType[node.type]) nodesByType[node.type] = [];
     nodesByType[node.type].push(node);
   }

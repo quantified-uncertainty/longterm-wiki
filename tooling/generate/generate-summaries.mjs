@@ -7,7 +7,7 @@
  * Stores results in the knowledge database.
  *
  * Usage:
- *   node tooling/generate-summaries.mjs [options]
+ *   node tooling/generate/generate-summaries.mjs [options]
  *
  * Options:
  *   --type <type>        Entity type to summarize: 'articles' or 'sources' (default: articles)
@@ -20,8 +20,8 @@
  *   --verbose            Show detailed output
  *
  * Examples:
- *   node tooling/generate-summaries.mjs --batch 100 --concurrency 5
- *   node tooling/generate-summaries.mjs --type sources --batch 50 --concurrency 10
+ *   node tooling/generate/generate-summaries.mjs --batch 100 --concurrency 5
+ *   node tooling/generate/generate-summaries.mjs --type sources --batch 50 --concurrency 10
  *
  * Environment:
  *   ANTHROPIC_API_KEY - Required API key (from .env file)
@@ -29,7 +29,7 @@
 
 import { articles, sources, summaries } from '../lib/knowledge-db.mjs';
 import { getColors } from '../lib/output.mjs';
-import { createClient, resolveModel, parseJsonResponse, sleep } from '../lib/anthropic.mjs';
+import { createClient, resolveModel, sleep } from '../lib/anthropic.mjs';
 
 const args = process.argv.slice(2);
 
@@ -276,7 +276,7 @@ async function processInParallel(items, processor, concurrency, onProgress) {
 
     // Small delay between batches to avoid rate limits
     if (i + concurrency < items.length) {
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await sleep(200);
     }
   }
 

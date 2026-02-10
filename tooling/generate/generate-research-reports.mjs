@@ -7,9 +7,9 @@
  * prompts for Claude Code Task agents.
  *
  * Usage:
- *   node tooling/generate-research-reports.mjs --list              # List candidates
- *   node tooling/generate-research-reports.mjs <entity-id>         # Show prompt for one
- *   node tooling/generate-research-reports.mjs --batch 3           # Generate batch prompts
+ *   node tooling/generate/generate-research-reports.mjs --list              # List candidates
+ *   node tooling/generate/generate-research-reports.mjs <entity-id>         # Show prompt for one
+ *   node tooling/generate/generate-research-reports.mjs --batch 3           # Generate batch prompts
  *
  * To run in parallel with Claude Code:
  *   1. Run this script to get prompts
@@ -113,7 +113,7 @@ Follow the research-report skill (.claude/skills/research-report/SKILL.md):
 
 1. **Load Context First**
    - Read the existing page at content/docs/ai-transition-model/${entity.path.replace('/ai-transition-model/', '')}.mdx
-   - Read the style guide at content/docs/knowledge-base/research-reports.mdx
+   - Follow the existing wiki page conventions and formatting
    - Read an example report at content/docs/knowledge-base/research-reports/gradual-ai-takeover.mdx
 
 2. **Web Research** (5-10 searches)
@@ -169,9 +169,9 @@ function listCandidates(candidates) {
   });
   console.log(`\nTotal: ${candidates.length} pages need research reports`);
   console.log('\nTo generate a report:');
-  console.log('  node tooling/generate-research-reports.mjs <entity-id>');
+  console.log('  node tooling/generate/generate-research-reports.mjs <entity-id>');
   console.log('\nTo generate batch prompts:');
-  console.log('  node tooling/generate-research-reports.mjs --batch 3');
+  console.log('  node tooling/generate/generate-research-reports.mjs --batch 3');
 }
 
 // Show prompt for one entity
@@ -214,7 +214,7 @@ Task({
   console.log('\n' + '='.repeat(70));
   console.log('\nAlternatively, run sequentially with:');
   batch.forEach((entity, i) => {
-    console.log(`  ${i + 1}. node tooling/generate-research-reports.mjs ${entity.id}`);
+    console.log(`  ${i + 1}. node tooling/generate/generate-research-reports.mjs ${entity.id}`);
   });
 }
 
@@ -227,9 +227,9 @@ Research Report Generator
 Identifies AI Transition Model pages that need research reports.
 
 Usage:
-  node tooling/generate-research-reports.mjs --list              List all candidates
-  node tooling/generate-research-reports.mjs <entity-id>         Show prompt for one
-  node tooling/generate-research-reports.mjs --batch 3           Generate batch prompts
+  node tooling/generate/generate-research-reports.mjs --list              List all candidates
+  node tooling/generate/generate-research-reports.mjs <entity-id>         Show prompt for one
+  node tooling/generate/generate-research-reports.mjs --batch 3           Generate batch prompts
 
 Options:
   --list          List pages without research reports
@@ -242,8 +242,8 @@ Cost Estimates (per report):
   Haiku:  ~$0.10-0.20 (fast but lower quality)
 
 Example Workflow:
-  1. List candidates:  node tooling/generate-research-reports.mjs --list
-  2. Generate batch:   node tooling/generate-research-reports.mjs --batch 5
+  1. List candidates:  node tooling/generate/generate-research-reports.mjs --list
+  2. Generate batch:   node tooling/generate/generate-research-reports.mjs --batch 5
   3. Run in Claude Code with parallel Task agents
 `);
     return;
@@ -266,7 +266,7 @@ Example Workflow:
     const entity = entities.find(e => e.id === SPECIFIC_ID || e.id === `tmc-${SPECIFIC_ID}`);
     if (!entity) {
       console.error(`Error: Entity not found: ${SPECIFIC_ID}`);
-      console.log('Try: node tooling/generate-research-reports.mjs --list');
+      console.log('Try: node tooling/generate/generate-research-reports.mjs --list');
       process.exit(1);
     }
     showPrompt(entity);

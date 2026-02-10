@@ -5,7 +5,7 @@
  * Reads the EntityType and RelationshipType enums from schema.ts
  * and generates a Mermaid-based MDX documentation page.
  *
- * Usage: node tooling/generate-schema-docs.mjs
+ * Usage: node tooling/generate/generate-schema-docs.mjs
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -142,7 +142,7 @@ sidebar:
 ---
 
 {/* AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY */}
-{/* Regenerate with: node tooling/generate-schema-docs.mjs */}
+{/* Regenerate with: node tooling/generate/generate-schema-docs.mjs */}
 
 This documentation is auto-generated from \`app/src/data/schema.ts\`.
 
@@ -212,7 +212,7 @@ flowchart TD
 ## Regenerating This Page
 
 \`\`\`bash
-node tooling/generate-schema-docs.mjs
+node tooling/generate/generate-schema-docs.mjs
 \`\`\`
 
 This script reads \`app/src/data/schema.ts\` and extracts:
