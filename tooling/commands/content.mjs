@@ -4,8 +4,7 @@
  * Unified interface for content management scripts.
  */
 
-import { createLogger } from '../lib/output.mjs';
-import { runScript, optionsToArgs } from '../lib/cli.mjs';
+import { buildCommands } from '../lib/cli.mjs';
 
 /**
  * Script definitions
@@ -45,48 +44,7 @@ const SCRIPTS = {
   },
 };
 
-/**
- * Create a command handler for a script
- */
-function createScriptHandler(name, config) {
-  return async function (args, options) {
-    const log = createLogger(options.ci);
-
-    // Build args from allowed passthrough options
-    const scriptArgs = optionsToArgs(options, ['help']);
-    const filteredArgs = scriptArgs.filter((arg) => {
-      const key = arg.replace(/^--/, '').split('=')[0];
-      const camelKey = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-      return config.passthrough.includes(camelKey) || config.passthrough.includes(key);
-    });
-
-    // Add positional args (like page path or topic)
-    if (config.positional) {
-      const positionals = args.filter((a) => !a.startsWith('-'));
-      filteredArgs.unshift(...positionals);
-    }
-
-    const streamOutput = !options.ci;
-
-    const result = await runScript(config.script, filteredArgs, {
-      streamOutput,
-    });
-
-    if (options.ci) {
-      return { output: result.stdout, exitCode: result.code };
-    }
-
-    return { output: '', exitCode: result.code };
-  };
-}
-
-/**
- * Generate command handlers dynamically
- */
-export const commands = {};
-for (const [name, config] of Object.entries(SCRIPTS)) {
-  commands[name] = createScriptHandler(name, config);
-}
+export const commands = buildCommands(SCRIPTS);
 
 /**
  * Get help text

@@ -110,3 +110,70 @@ export function formatDuration(ms) {
   if (ms < 1000) return `${ms}ms`;
   return `${(ms / 1000).toFixed(2)}s`;
 }
+
+/**
+ * Create a command handler that runs a script as a subprocess.
+ *
+ * Config fields:
+ *   script       - Path to script relative to tooling/
+ *   passthrough  - Option keys to forward to the subprocess
+ *   runner       - 'node' (default) or 'tsx'
+ *   extraArgs    - Extra CLI args to always append (e.g. ['--fix'])
+ *   positional   - If true, forward positional args from the user
+ *
+ * @param {string} name - Command name (for diagnostics)
+ * @param {object} config - Script config
+ */
+export function createScriptHandler(name, config) {
+  return async function (args, options) {
+    const quiet = options.ci || options.json;
+
+    // Build args from allowed passthrough options
+    const scriptArgs = optionsToArgs(options, ['help']);
+    const filteredArgs = scriptArgs.filter((arg) => {
+      const key = arg.replace(/^--/, '').split('=')[0];
+      const camelKey = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+      return config.passthrough.includes(camelKey) || config.passthrough.includes(key);
+    });
+
+    if (config.extraArgs) {
+      filteredArgs.push(...config.extraArgs);
+    }
+
+    if (config.positional) {
+      const positionals = args.filter((a) => !a.startsWith('-'));
+      filteredArgs.unshift(...positionals);
+    }
+
+    const streamOutput = !quiet;
+
+    const result = await runScript(config.script, filteredArgs, {
+      runner: config.runner || 'node',
+      streamOutput,
+    });
+
+    if (quiet) {
+      return { output: result.stdout, exitCode: result.code };
+    }
+
+    return { output: '', exitCode: result.code };
+  };
+}
+
+/**
+ * Build a commands object from a SCRIPTS config map.
+ *
+ * @param {Record<string, object>} scripts - Map of command names to script configs
+ * @param {string} [defaultCommand] - Name of the default command
+ * @returns {Record<string, Function>}
+ */
+export function buildCommands(scripts, defaultCommand) {
+  const commands = {};
+  for (const [name, config] of Object.entries(scripts)) {
+    commands[name] = createScriptHandler(name, config);
+  }
+  if (defaultCommand && commands[defaultCommand]) {
+    commands.default = commands[defaultCommand];
+  }
+  return commands;
+}

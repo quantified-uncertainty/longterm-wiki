@@ -5,8 +5,7 @@
  * Delegates to existing scripts via subprocess execution.
  */
 
-import { createLogger } from '../lib/output.mjs';
-import { runScript, optionsToArgs } from '../lib/cli.mjs';
+import { buildCommands } from '../lib/cli.mjs';
 
 /**
  * Script definitions: maps command names to script paths and metadata
@@ -100,51 +99,7 @@ const SCRIPTS = {
   },
 };
 
-/**
- * Create a command handler for a script
- */
-function createScriptHandler(name, config) {
-  return async function (args, options) {
-    const log = createLogger(options.ci);
-
-    // Build args from options, only passing through allowed options
-    const scriptArgs = optionsToArgs(options, ['help']);
-
-    // Filter to only passthrough options
-    const filteredArgs = scriptArgs.filter((arg) => {
-      const key = arg.replace(/^--/, '').split('=')[0];
-      const camelKey = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-      return config.passthrough.includes(camelKey) || config.passthrough.includes(key);
-    });
-
-    // Stream output for human-readable mode, capture for CI
-    const streamOutput = !options.ci;
-
-    const result = await runScript(config.script, filteredArgs, {
-      runner: config.runner || 'node',
-      streamOutput,
-    });
-
-    // In CI mode, return the captured output
-    if (options.ci) {
-      return { output: result.stdout, exitCode: result.code };
-    }
-
-    // In human mode, output was already streamed
-    return { output: '', exitCode: result.code };
-  };
-}
-
-/**
- * Generate command handlers dynamically from SCRIPTS config
- */
-export const commands = {};
-for (const [name, config] of Object.entries(SCRIPTS)) {
-  commands[name] = createScriptHandler(name, config);
-}
-
-// Set 'all' as default when no command specified
-commands.default = commands.all;
+export const commands = buildCommands(SCRIPTS, 'all');
 
 /**
  * List available rules (for unified engine)
