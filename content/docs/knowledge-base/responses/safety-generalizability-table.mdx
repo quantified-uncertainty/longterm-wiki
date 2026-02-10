@@ -1,0 +1,28 @@
+---
+title: "Safety Generalizability Table"
+description: "Interactive table showing which AI safety research approaches generalize across architectures."
+tableOfContents: false
+fullWidth: true
+importance: 30
+update_frequency: 30
+lastEdited: "2026-02-10"
+quality: 20
+llmSummary: "An interactive sortable table summarizing which AI safety approaches are likely to generalize to future architectures. Shows generalization level, dependencies, and threats for each approach."
+ratings:
+  novelty: 3
+  rigor: 3
+  actionability: 3
+  completeness: 3
+metrics:
+  wordCount: 15
+  citations: 0
+  tables: 1
+  diagrams: 0
+clusters: ["ai-safety"]
+---
+import SafetyGeneralizabilityTableView from '@components/tables/views/SafetyGeneralizabilityTableView';
+import FullWidthLayout from '@components/FullWidthLayout';
+
+<FullWidthLayout />
+
+<SafetyGeneralizabilityTableView />

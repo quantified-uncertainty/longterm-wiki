@@ -1,6 +1,6 @@
 {
-  "totalFiles": 646,
-  "totalLinks": 167,
+  "totalFiles": 652,
+  "totalLinks": 174,
   "brokenLinks": [
     {
       "file": "ai-transition-model/factors-ai-ownership-overview.mdx",
@@ -52,7 +52,49 @@
     },
     {
       "file": "guides/interactive-views.mdx",
+      "line": 30,
+      "href": "/wiki/safety-approaches-table",
+      "text": "Safety Approaches"
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 31,
+      "href": "/wiki/safety-generalizability-table",
+      "text": "Safety Generalizability"
+    },
+    {
+      "file": "guides/interactive-views.mdx",
       "line": 33,
+      "href": "/wiki/architecture-scenarios-table",
+      "text": "Architecture Scenarios"
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 34,
+      "href": "/wiki/deployment-architectures-table",
+      "text": "Deployment Architectures"
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 35,
+      "href": "/wiki/accident-risks-table",
+      "text": "Accident Risks"
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 36,
+      "href": "/wiki/eval-types-table",
+      "text": "Evaluation Types"
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 40,
+      "href": "/wiki?entity=diagram",
+      "text": "Explore page filtered by Diagrams"
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 40,
       "href": "/wiki/cause-effect-demo",
       "text": "Cause-Effect Demo"
     },
@@ -136,7 +178,55 @@
     },
     {
       "file": "guides/interactive-views.mdx",
+      "line": 30,
+      "href": "/wiki/safety-approaches-table",
+      "issues": [
+        "missing-trailing-slash"
+      ]
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 31,
+      "href": "/wiki/safety-generalizability-table",
+      "issues": [
+        "missing-trailing-slash"
+      ]
+    },
+    {
+      "file": "guides/interactive-views.mdx",
       "line": 33,
+      "href": "/wiki/architecture-scenarios-table",
+      "issues": [
+        "missing-trailing-slash"
+      ]
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 34,
+      "href": "/wiki/deployment-architectures-table",
+      "issues": [
+        "missing-trailing-slash"
+      ]
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 35,
+      "href": "/wiki/accident-risks-table",
+      "issues": [
+        "missing-trailing-slash"
+      ]
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 36,
+      "href": "/wiki/eval-types-table",
+      "issues": [
+        "missing-trailing-slash"
+      ]
+    },
+    {
+      "file": "guides/interactive-views.mdx",
+      "line": 40,
       "href": "/wiki/cause-effect-demo",
       "issues": [
         "missing-trailing-slash"

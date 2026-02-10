@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 
-export type ColumnGroup = "overview" | "safety" | "landscape" | "assessment" | "level" | "evidence" | "relations";
+export type ColumnGroup = "overview" | "safety" | "landscape" | "assessment" | "level" | "evidence" | "relations" | "signal" | "risk" | "strategy";
 
 export interface ColumnConfig {
   key: string;

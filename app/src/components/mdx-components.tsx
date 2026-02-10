@@ -20,6 +20,14 @@ import { FactorSubItemsList, AllFactorsSubItems } from "@/components/wiki/Factor
 import CauseEffectGraph from "@/components/wiki/CauseEffectGraph";
 import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 
+// Table view components
+import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
+import AccidentRisksTableView from "@/components/tables/views/AccidentRisksTableView";
+import EvalTypesTableView from "@/components/tables/views/EvalTypesTableView";
+import ArchitectureScenariosTableView from "@/components/tables/views/ArchitectureScenariosTableView";
+import DeploymentArchitecturesTableView from "@/components/tables/views/DeploymentArchitecturesTableView";
+import SafetyGeneralizabilityTableView from "@/components/tables/views/SafetyGeneralizabilityTableView";
+
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
 import { KeyQuestions } from "@/components/wiki/KeyQuestions";
@@ -118,6 +126,14 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Cause-Effect Graph components
   CauseEffectGraph,
   PageCauseEffectGraph,
+
+  // Table view components
+  SafetyApproachesTableView,
+  AccidentRisksTableView,
+  EvalTypesTableView,
+  ArchitectureScenariosTableView,
+  DeploymentArchitecturesTableView,
+  SafetyGeneralizabilityTableView,
 
   // Starlight card components
   Card: StarlightCard,

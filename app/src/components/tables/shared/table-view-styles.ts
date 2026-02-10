@@ -160,6 +160,18 @@ export const columnGroupColors: Record<string, { inactive: string; active: strin
     inactive: "border-purple-400 text-purple-700 dark:border-purple-600 dark:text-purple-400",
     active: "bg-purple-500 text-white border-purple-500 dark:bg-purple-600 dark:border-purple-600",
   },
+  signal: {
+    inactive: "border-cyan-400 text-cyan-700 dark:border-cyan-600 dark:text-cyan-400",
+    active: "bg-cyan-500 text-white border-cyan-500 dark:bg-cyan-600 dark:border-cyan-600",
+  },
+  risk: {
+    inactive: "border-red-400 text-red-700 dark:border-red-600 dark:text-red-400",
+    active: "bg-red-500 text-white border-red-500 dark:bg-red-600 dark:border-red-600",
+  },
+  strategy: {
+    inactive: "border-violet-400 text-violet-700 dark:border-violet-600 dark:text-violet-400",
+    active: "bg-violet-500 text-white border-violet-500 dark:bg-violet-600 dark:border-violet-600",
+  },
 };
 
 /**
@@ -244,11 +256,16 @@ export const levelSortOrder: Record<string, number> = {
   outcome: 4,
   // Evidence level
   speculative: 1,
+  "demonstrated-lab": 3,
   demonstrated_lab: 3,
+  "observed-current": 4,
   observed_current: 4,
   // Timeline
+  "long-term": 1,
   long_term: 1,
+  "medium-term": 2,
   medium_term: 2,
+  "near-term": 3,
   near_term: 3,
   current: 4,
   uncertain: 0,
@@ -259,6 +276,7 @@ export const levelSortOrder: Record<string, number> = {
   easy: 4,
   moderate: 3,
   difficult: 2,
+  "very-difficult": 1,
   very_difficult: 1,
   // Safety outlook
   favorable: 4,
