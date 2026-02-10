@@ -163,6 +163,11 @@ describe("Entity data validation", () => {
       "elon-musk-predictions",
       "sam-altman-predictions",
       "yann-lecun-predictions",
+      // Interactive table view pages (not entities)
+      "safety-approaches-table",
+      "safety-generalizability-table",
+      "accident-risks-table",
+      "eval-types-table",
     ]);
 
     const pages: Array<{ id: string; category: string; title: string; path: string }> =

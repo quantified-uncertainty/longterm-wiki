@@ -795,9 +795,71 @@ const CATEGORY_TO_TYPE: Record<string, string> = {
 
 // MANUAL MAINTENANCE: This table list is hardcoded because table metadata
 // (row/col counts, descriptions) is not included in database.json.
-// Update these values when tables change in the Astro app's ContentHub.
 // TODO: Include table metadata in build-data.mjs output to automate this.
 const TABLES = [
+  {
+    id: "safety-approaches",
+    title: "Safety Approaches",
+    description: "Safety research effectiveness vs capability uplift.",
+    href: "/wiki/safety-approaches-table",
+    path: "/knowledge-base/responses/safety-approaches",
+    rows: 42,
+    cols: 9,
+  },
+  {
+    id: "safety-generalizability",
+    title: "Safety Generalizability",
+    description: "Safety approaches across AI architectures.",
+    href: "/wiki/safety-generalizability-table",
+    path: "/knowledge-base/responses/safety-generalizability",
+    rows: 42,
+    cols: 8,
+  },
+  {
+    id: "safety-matrix",
+    title: "Safety × Architecture Matrix",
+    description: "Safety approaches vs architecture scenarios.",
+    href: "/wiki/safety-generalizability-table",
+    path: "/knowledge-base/responses/safety-generalizability",
+    rows: 42,
+    cols: 12,
+  },
+  {
+    id: "architecture-scenarios",
+    title: "Architecture Scenarios",
+    description: "Deployment patterns and base architectures.",
+    href: "/wiki/architecture-scenarios-table",
+    path: "/knowledge-base/architecture-scenarios",
+    rows: 12,
+    cols: 7,
+  },
+  {
+    id: "deployment-architectures",
+    title: "Deployment Architectures",
+    description: "How AI systems are deployed.",
+    href: "/wiki/deployment-architectures-table",
+    path: "/knowledge-base/deployment-architectures",
+    rows: 8,
+    cols: 6,
+  },
+  {
+    id: "accident-risks",
+    title: "Accident Risks",
+    description: "Accident and misalignment risks.",
+    href: "/wiki/accident-risks-table",
+    path: "/knowledge-base/risks/accident",
+    rows: 16,
+    cols: 7,
+  },
+  {
+    id: "eval-types",
+    title: "Evaluation Types",
+    description: "Evaluation methodologies comparison.",
+    href: "/wiki/eval-types-table",
+    path: "/knowledge-base/models/eval-types",
+    rows: 18,
+    cols: 8,
+  },
   {
     id: "transition-model",
     title: "AI Transition Model Parameters",
@@ -903,11 +965,38 @@ export function getExploreItems(): ExploreItem[] {
   }));
 
   // Diagram items — entities with causeEffectGraph data
-  // Generic entities preserve all raw fields including causeEffectGraph
+  // Generic entities preserve all raw fields including causeEffectGraph.
+  // Entity IDs may differ from page IDs (e.g. entity "tmc-compute" → page "compute",
+  // entity "misalignment-potential" → page "factors-misalignment-potential-overview"),
+  // so we resolve the correct page for each diagram entity.
+  function resolveDiagramHref(e: AnyEntity): string | null {
+    const raw = e as unknown as RawEntity;
+    // 1. Direct match: entity ID is the page ID
+    if (pageMap.has(e.id)) return getEntityHref(e.id);
+    // 2. Entity has explicit path field → derive page ID from path
+    if (raw.path) {
+      const segments = raw.path.replace(/\/$/, "").split("/");
+      const pageId = segments[segments.length - 1];
+      if (pageId && pageMap.has(pageId)) {
+        const numId = db.idRegistry?.bySlug[pageId];
+        return numId ? `/wiki/${numId}` : `/wiki/${pageId}`;
+      }
+    }
+    // 3. Factor entities: try "factors-{id}-overview" pattern
+    const overviewId = `factors-${e.id}-overview`;
+    if (pageMap.has(overviewId)) {
+      const numId = db.idRegistry?.bySlug[overviewId];
+      return numId ? `/wiki/${numId}` : `/wiki/${overviewId}`;
+    }
+    return null;
+  }
+
   const diagramItems: ExploreItem[] = typedEntities
     .filter((e) => {
       const ceg = (e as unknown as RawEntity).causeEffectGraph;
-      return (ceg?.nodes?.length ?? 0) > 0;
+      if (!ceg?.nodes?.length) return false;
+      // Only include diagrams that resolve to a valid page
+      return resolveDiagramHref(e) !== null;
     })
     .map((e) => {
       const ceg = (e as unknown as RawEntity).causeEffectGraph!;
@@ -918,7 +1007,7 @@ export function getExploreItems(): ExploreItem[] {
         title: ceg.title || e.title,
         type: "diagram",
         description: ceg.description || `Cause-effect diagram for ${e.title}`,
-        tags: [],
+        tags: [] as string[],
         clusters: ["ai-safety"],
         wordCount: null,
         quality: null,
@@ -926,7 +1015,7 @@ export function getExploreItems(): ExploreItem[] {
         category: null,
         riskCategory: null,
         lastUpdated: e.lastUpdated || null,
-        href: getEntityHref(e.id),
+        href: resolveDiagramHref(e)!,
         meta: `${nodeCount} nodes`,
       };
     });

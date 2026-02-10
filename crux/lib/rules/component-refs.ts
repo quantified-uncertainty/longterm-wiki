@@ -75,7 +75,7 @@ function loadExternalLinks(): Set<string> {
 function loadSafetyApproaches(): Set<string> {
   if (safetyApproachesCache) return safetyApproachesCache;
   try {
-    const content = readFileSync(`${DATA_DIR}/safety-approaches-data.ts`, 'utf-8');
+    const content = readFileSync(`${DATA_DIR}/tables/safety-approaches.ts`, 'utf-8');
     const ids = new Set<string>();
     const matches = content.matchAll(/id: ['"]([^'"]+)['"]/g);
     for (const match of matches) {
