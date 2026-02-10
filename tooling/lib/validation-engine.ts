@@ -17,7 +17,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, relative, dirname, basename } from 'path';
 import { parse as parseYaml } from 'yaml';
-import { findMdxFiles, findFiles } from './file-utils.mjs';
+import { findMdxFiles } from './file-utils.mjs';
 import { getColors } from './output.mjs';
 import { parseFrontmatterAndBody } from './mdx-utils.mjs';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './content-types.js';

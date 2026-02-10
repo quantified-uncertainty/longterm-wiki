@@ -15,6 +15,7 @@ import { readFileSync, existsSync } from 'fs';
 export interface Entity {
   id: string;
   type: string;
+  entityType?: string;  // Legacy alias for type, used by some scripts
   title: string;
   numericId?: string;
   description?: string;

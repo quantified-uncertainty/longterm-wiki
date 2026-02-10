@@ -30,7 +30,6 @@ const SCRIPTS = {
     script: 'generate/generate-schema-diagrams.mjs',
     description: 'Generate schema diagrams',
     passthrough: [],
-    runner: 'tsx',
   },
   'schema-docs': {
     script: 'generate/generate-schema-docs.mjs',

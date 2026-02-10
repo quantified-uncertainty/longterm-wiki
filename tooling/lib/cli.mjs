@@ -115,7 +115,6 @@ export function formatDuration(ms) {
  * Config fields:
  *   script       - Path to script relative to tooling/
  *   passthrough  - Option keys to forward to the subprocess
- *   runner       - 'node' (default) or 'tsx'
  *   extraArgs    - Extra CLI args to always append (e.g. ['--fix'])
  *   positional   - If true, forward positional args from the user
  *

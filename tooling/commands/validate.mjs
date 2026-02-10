@@ -90,7 +90,6 @@ const SCRIPTS = {
     script: 'validate/validate-yaml-schema.mjs',
     description: 'YAML schema validation',
     passthrough: ['ci'],
-    runner: 'tsx',
   },
   financials: {
     script: 'validate/validate-financials.mjs',
