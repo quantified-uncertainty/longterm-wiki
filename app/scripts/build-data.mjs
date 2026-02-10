@@ -257,7 +257,7 @@ function buildPagesRegistry(urlToResource) {
   // Scan all content directories
   scanDirectory(join(CONTENT_DIR, 'knowledge-base'), '/knowledge-base');
 
-  const otherDirs = ['ai-transition-model', 'analysis', 'getting-started', 'browse', 'internal', 'style-guides'];
+  const otherDirs = ['ai-transition-model', 'analysis', 'getting-started', 'browse', 'internal', 'style-guides', 'guides', 'insight-hunting', 'dashboard', 'project'];
   for (const topDir of otherDirs) {
     const dirPath = join(CONTENT_DIR, topDir);
     if (existsSync(dirPath)) {
@@ -270,7 +270,9 @@ function buildPagesRegistry(urlToResource) {
 
 /**
  * Build path registry by scanning all MDX/MD files
- * Maps entity IDs (from filenames) to their URL paths
+ * Maps entity IDs (from filenames) to their URL paths.
+ * Also adds entity-ID-to-path mappings from YAML data for entities
+ * whose IDs differ from their page filenames (e.g. "tmc-compute" → "/ai-transition-model/compute/").
  */
 function buildPathRegistry() {
   const registry = {};
@@ -308,11 +310,39 @@ function buildPathRegistry() {
   scanDirectory(join(CONTENT_DIR, 'knowledge-base'), '/knowledge-base');
 
   // Also scan other top-level content directories
-  const topLevelDirs = ['ai-transition-model', 'analysis', 'getting-started', 'browse', 'internal', 'style-guides'];
+  const topLevelDirs = ['ai-transition-model', 'analysis', 'getting-started', 'browse', 'internal', 'style-guides', 'guides', 'insight-hunting', 'dashboard', 'project'];
   for (const topDir of topLevelDirs) {
     const dirPath = join(CONTENT_DIR, topDir);
     if (existsSync(dirPath)) {
       scanDirectory(dirPath, `/${topDir}`);
+    }
+  }
+
+  // Add entity-to-path mappings from YAML entity data.
+  // Many entities have IDs that differ from their page filenames
+  // (e.g. entity "tmc-compute" has path "/ai-transition-model/compute/").
+  // Also handle factor entities that follow "factors-{id}-overview" naming.
+  const entityDir = join(DATA_DIR, 'entities');
+  if (existsSync(entityDir)) {
+    for (const file of readdirSync(entityDir)) {
+      if (!file.endsWith('.yaml')) continue;
+      const content = readFileSync(join(entityDir, file), 'utf-8');
+      const entities = parse(content);
+      if (!Array.isArray(entities)) continue;
+      for (const entity of entities) {
+        if (!entity.id || registry[entity.id]) continue;
+        // Use explicit path field if present
+        if (entity.path) {
+          const normalized = entity.path.replace(/\/$/, '') + '/';
+          registry[entity.id] = normalized;
+        } else {
+          // Try "factors-{id}-overview" pattern for factor entities
+          const overviewId = `factors-${entity.id}-overview`;
+          if (registry[overviewId]) {
+            registry[entity.id] = registry[overviewId];
+          }
+        }
+      }
     }
   }
 
