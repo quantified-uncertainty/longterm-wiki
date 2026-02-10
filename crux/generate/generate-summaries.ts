@@ -7,7 +7,7 @@
  * Stores results in the knowledge database.
  *
  * Usage:
- *   node crux/generate/generate-summaries.mjs [options]
+ *   node crux/generate/generate-summaries.ts [options]
  *
  * Options:
  *   --type <type>        Entity type to summarize: 'articles' or 'sources' (default: articles)
@@ -20,8 +20,8 @@
  *   --verbose            Show detailed output
  *
  * Examples:
- *   node crux/generate/generate-summaries.mjs --batch 100 --concurrency 5
- *   node crux/generate/generate-summaries.mjs --type sources --batch 50 --concurrency 10
+ *   node crux/generate/generate-summaries.ts --batch 100 --concurrency 5
+ *   node crux/generate/generate-summaries.ts --type sources --batch 50 --concurrency 10
  *
  * Environment:
  *   ANTHROPIC_API_KEY - Required API key (from .env file)
@@ -193,7 +193,11 @@ async function generateSummary(prompt: string): Promise<SummaryResult> {
     }]
   });
 
-  const text = response.content[0].text;
+  const block = response.content[0];
+  if (!block || block.type !== 'text') {
+    throw new Error('Expected text content block from API response');
+  }
+  const text = block.text;
   const tokensUsed = response.usage.input_tokens + response.usage.output_tokens;
 
   // Parse JSON response
@@ -290,7 +294,7 @@ async function summarizeSource(source: Source): Promise<SummaryResult> {
  */
 async function processInParallel(
   items: Array<Article | Source>,
-  processor: (item: any) => Promise<SummaryResult>,
+  processor: (item: Article | Source) => Promise<SummaryResult>,
   concurrency: number,
   onProgress?: (index: number, item: Article | Source, result: SummaryResult | null, error: Error | null) => void
 ): Promise<ProcessStats> {
@@ -311,8 +315,9 @@ async function processInParallel(
         return { status: 'fulfilled' as const, item, result };
       } catch (err: unknown) {
         failed++;
-        onProgress?.(globalIndex, item, null, err as Error);
-        return { status: 'rejected' as const, item, error: err as Error };
+        const error = err instanceof Error ? err : new Error(String(err));
+        onProgress?.(globalIndex, item, null, error);
+        return { status: 'rejected' as const, item, error };
       }
     });
 
@@ -383,7 +388,7 @@ async function main(): Promise<void> {
   if (DRY_RUN) {
     console.log('Would summarize:');
     for (const item of items) {
-      console.log(`  - ${(item as any).title || item.id}`);
+      console.log(`  - ${item.title || item.id}`);
     }
     process.exit(0);
   }
@@ -392,10 +397,10 @@ async function main(): Promise<void> {
   const onProgress = (index: number, item: Article | Source, result: SummaryResult | null, error: Error | null): void => {
     const progress = `[${index + 1}/${items.length}]`;
     if (error) {
-      console.log(`${colors.cyan}${progress}${colors.reset} ${(item as any).title || item.id}`);
+      console.log(`${colors.cyan}${progress}${colors.reset} ${item.title || item.id}`);
       console.log(`   ${colors.red}✗ Error: ${error.message}${colors.reset}`);
     } else {
-      console.log(`${colors.cyan}${progress}${colors.reset} ${(item as any).title || item.id}`);
+      console.log(`${colors.cyan}${progress}${colors.reset} ${item.title || item.id}`);
       if (VERBOSE && result) {
         console.log(`   ${colors.dim}One-liner: ${result.oneLiner}${colors.reset}`);
         console.log(`   ${colors.dim}Tokens: ${result.tokensUsed}${colors.reset}`);
@@ -435,7 +440,8 @@ async function main(): Promise<void> {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main().catch((err: unknown) => {
-    console.error(`${colors.red}Fatal error: ${(err as Error).message}${colors.reset}`);
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error(`${colors.red}Fatal error: ${error.message}${colors.reset}`);
     process.exit(1);
   });
 }

@@ -9,7 +9,7 @@
  * - Entity relationships (from entities.yaml)
  *
  * Usage:
- *   node crux/scan-content.mjs [options]
+ *   node crux/scan-content.ts [options]
  *
  * Options:
  *   --force       Rescan all files even if unchanged
@@ -348,7 +348,8 @@ function main(): void {
         }
       }
     } catch (err: unknown) {
-      console.log(`${colors.red}✗ Error processing ${filePath}: ${(err as Error).message}${colors.reset}`);
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.log(`${colors.red}✗ Error processing ${filePath}: ${error.message}${colors.reset}`);
     }
   }
 

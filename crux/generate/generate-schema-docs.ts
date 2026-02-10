@@ -5,7 +5,7 @@
  * Reads the EntityType and RelationshipType enums from schema.ts
  * and generates a Mermaid-based MDX documentation page.
  *
- * Usage: node crux/generate/generate-schema-docs.mjs
+ * Usage: node crux/generate/generate-schema-docs.ts
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -149,7 +149,7 @@ sidebar:
 ---
 
 {/* AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY */}
-{/* Regenerate with: node crux/generate/generate-schema-docs.mjs */}
+{/* Regenerate with: node crux/generate/generate-schema-docs.ts */}
 
 This documentation is auto-generated from \`app/src/data/schema.ts\`.
 
@@ -188,7 +188,7 @@ flowchart TD
 
     subgraph Validation["Schema Validation"]
         V1[Zod Schemas]
-        V2[validate-yaml-schema.mjs]
+        V2[validate-yaml-schema.ts]
     end
 
     subgraph Build["Build Pipeline"]
@@ -219,7 +219,7 @@ flowchart TD
 ## Regenerating This Page
 
 \`\`\`bash
-node crux/generate/generate-schema-docs.mjs
+node crux/generate/generate-schema-docs.ts
 \`\`\`
 
 This script reads \`app/src/data/schema.ts\` and extracts:

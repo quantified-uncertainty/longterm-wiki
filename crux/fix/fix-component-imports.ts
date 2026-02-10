@@ -22,7 +22,7 @@ import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-typ
 
 const args: string[] = process.argv.slice(2);
 const APPLY_MODE: boolean = args.includes('--apply');
-const VERBOSE: boolean = args.includes('--verbose');
+const _VERBOSE: boolean = args.includes('--verbose');
 const HELP: boolean = args.includes('--help');
 const SINGLE_FILE: string | undefined = args.find(a => a.startsWith('--file='))?.split('=')[1];
 

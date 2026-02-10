@@ -22,7 +22,7 @@ import { join, relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities, loadBacklinks, type Entity, type PathRegistry } from '../lib/content-types.ts';
+import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities, type Entity, type PathRegistry } from '../lib/content-types.ts';
 
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json');

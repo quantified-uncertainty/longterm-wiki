@@ -77,7 +77,7 @@ async function runFixer(fixer: Fixer): Promise<FixerResult> {
       console.log(`${colors.green}✓${colors.reset} ${fixer.name} ${colors.dim}(${duration}s)${colors.reset}`);
       resolve({ name: fixer.name, success: true, output });
     } catch (err: unknown) {
-      const error = err as Error;
+      const error = err instanceof Error ? err : new Error(String(err));
       console.log(`${colors.yellow}⚠${colors.reset} ${fixer.name}: ${error.message.split('\n')[0]}`);
       resolve({ name: fixer.name, success: false, error: error.message });
     }

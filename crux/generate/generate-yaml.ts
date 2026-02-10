@@ -4,7 +4,7 @@
  * Converts extracted JSON data to YAML files.
  * Run this after reviewing/deduplicating the extracted JSON.
  *
- * Usage: node crux/generate/generate-yaml.mjs
+ * Usage: node crux/generate/generate-yaml.ts
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';

@@ -335,9 +335,9 @@ flowchart TD
     end
 
     subgraph Validation["Validation Suite"]
-        V1[validate-yaml-schema.mjs]
-        V2[validate-data.mjs]
-        V3[validate-all.mjs]
+        V1[validate-yaml-schema.ts]
+        V2[validate-data.ts]
+        V3[validate-all.ts]
     end
 
     subgraph UI["UI Components"]
@@ -403,7 +403,7 @@ function main(): void {
   // Generate a combined markdown file with all diagrams
   let combinedMd = `# Schema Visualizations
 
-Auto-generated from \`app/src/data/schema.ts\` using \`crux/generate/generate-schema-diagrams.mjs\`
+Auto-generated from \`app/src/data/schema.ts\` using \`crux/generate/generate-schema-diagrams.ts\`
 
 Generated: ${new Date().toISOString()}
 

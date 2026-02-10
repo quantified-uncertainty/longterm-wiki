@@ -286,7 +286,8 @@ export async function run(args: string[], options: CommandOptions): Promise<Comm
 
       output += `  ${c.green}Done${c.reset}\n\n`;
     } catch (err: unknown) {
-      output += `  ${c.red}Failed: ${(err as Error).message?.slice(0, 200)}${c.reset}\n\n`;
+      const error = err instanceof Error ? err : new Error(String(err));
+      output += `  ${c.red}Failed: ${error.message?.slice(0, 200)}${c.reset}\n\n`;
     }
   }
 
