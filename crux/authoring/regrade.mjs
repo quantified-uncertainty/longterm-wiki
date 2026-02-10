@@ -19,7 +19,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { spawn } from 'child_process';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { loadPages } from '../lib/content-types.js';
 
