@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { ExploreItem } from "@/data";
 import { ENTITY_GROUPS } from "@/data/entity-ontology";
+import { searchWikiScores } from "@/lib/search";
 import { InsightCard } from "./InsightCard";
 import { ContentCard } from "./ContentCard";
 
@@ -28,6 +29,39 @@ const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
 ];
 
 type SortKey = "relevance" | "title" | "importance" | "quality" | "wordCount" | "recentlyEdited";
+
+/**
+ * Resolve a URL param value (e.g. "organizations", "organization", "People")
+ * to the matching ENTITY_GROUPS index. Returns 0 (All) if no match.
+ */
+function resolveEntityGroupIndex(param: string): number {
+  const lower = param.toLowerCase();
+
+  // Direct label match (e.g. "risks" -> "Risks", "people" -> "People")
+  let idx = ENTITY_GROUPS.findIndex((g) => g.label.toLowerCase() === lower);
+  if (idx >= 0) return idx;
+
+  // Entity type match (e.g. "organization" found in group types)
+  idx = ENTITY_GROUPS.findIndex((g) => g.types.includes(lower));
+  if (idx >= 0) return idx;
+
+  // Singularize path-based categories (e.g. "organizations" -> "organization")
+  if (lower.endsWith("ies")) {
+    const singular = lower.slice(0, -3) + "y";
+    idx = ENTITY_GROUPS.findIndex((g) => g.types.includes(singular));
+    if (idx >= 0) return idx;
+  } else if (lower.endsWith("es")) {
+    idx = ENTITY_GROUPS.findIndex((g) => g.types.includes(lower.slice(0, -2)));
+    if (idx >= 0) return idx;
+    idx = ENTITY_GROUPS.findIndex((g) => g.types.includes(lower.slice(0, -1)));
+    if (idx >= 0) return idx;
+  } else if (lower.endsWith("s")) {
+    idx = ENTITY_GROUPS.findIndex((g) => g.types.includes(lower.slice(0, -1)));
+    if (idx >= 0) return idx;
+  }
+
+  return 0;
+}
 
 function FilterRow({
   label,
@@ -69,6 +103,18 @@ function FilterRow({
   );
 }
 
+/** Simple text-based filter used as a fallback before MiniSearch loads. */
+function textFilter(items: ExploreItem[], query: string): ExploreItem[] {
+  const q = query.toLowerCase();
+  return items.filter(
+    (item) =>
+      item.title.toLowerCase().includes(q) ||
+      item.id.toLowerCase().includes(q) ||
+      item.description?.toLowerCase().includes(q) ||
+      item.tags.some((t) => t.toLowerCase().includes(q))
+  );
+}
+
 export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -76,29 +122,63 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
 
   // Read initial state from URL params
   const initialTag = searchParams.get("tag") || "";
+  const initialEntity = searchParams.get("entity") || "";
   const initialRiskCat = searchParams.get("riskCategory") || null;
   const initialRiskCatIndex = initialRiskCat
     ? Math.max(0, RISK_CATEGORY_GROUPS.findIndex((g) => g.value === initialRiskCat))
     : 0;
+  const initialEntityIndex = initialEntity ? resolveEntityGroupIndex(initialEntity) : 0;
 
   const [search, setSearch] = useState(initialTag);
   const [activeField, setActiveField] = useState(0);
   const [activeEntity, setActiveEntity] = useState(
-    // Auto-select "Risks" entity filter when arriving with a riskCategory param
-    initialRiskCat ? 1 : 0
+    initialRiskCat ? 1 : initialEntityIndex
   );
   const [activeRiskCat, setActiveRiskCat] = useState(initialRiskCatIndex);
   const [sortKey, setSortKey] = useState<SortKey>("relevance");
   const [visibleCount, setVisibleCount] = useState(60);
 
+  // MiniSearch scores: id → relevance score (null = no active search or not yet loaded)
+  const [searchScores, setSearchScores] = useState<Map<string, number> | null>(null);
+
   // Debounced URL update for search
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Debounced MiniSearch query
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
     };
   }, []);
+
+  // Run MiniSearch when search text changes
+  useEffect(() => {
+    const query = search.trim();
+    if (!query) {
+      setSearchScores(null);
+      return;
+    }
+
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      let cancelled = false;
+      searchWikiScores(query)
+        .then((scores) => {
+          if (!cancelled) setSearchScores(scores);
+        })
+        .catch(() => {
+          // MiniSearch failed to load — keep null so fallback text filter is used
+        });
+      // Store cancel function for cleanup
+      searchDebounceRef.current = null;
+    }, 150);
+
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, [search]);
 
   const updateUrlParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -148,22 +228,34 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     [items]
   );
 
-  // Compute field filter counts (against articleItems only)
+  // Items after search filter (MiniSearch when available, text fallback otherwise)
+  const searchFiltered = useMemo(() => {
+    if (!search.trim()) return articleItems;
+
+    if (searchScores && searchScores.size > 0) {
+      return articleItems.filter((item) => searchScores.has(item.id));
+    }
+
+    // Fallback: simple text filter while MiniSearch is loading or unavailable
+    return textFilter(articleItems, search);
+  }, [articleItems, search, searchScores]);
+
+  // Compute field filter counts (against search-filtered items)
   const fieldCounts = useMemo(() => {
     return FIELD_GROUPS.map((group) => {
-      if (!group.cluster) return articleItems.length;
-      return articleItems.filter((item) => item.clusters.includes(group.cluster!)).length;
+      if (!group.cluster) return searchFiltered.length;
+      return searchFiltered.filter((item) => item.clusters.includes(group.cluster!)).length;
     });
-  }, [articleItems]);
+  }, [searchFiltered]);
 
-  // Items after field filter
+  // Items after search + field filter
   const fieldFiltered = useMemo(() => {
     const group = FIELD_GROUPS[activeField];
-    if (!group.cluster) return articleItems;
-    return articleItems.filter((item) => item.clusters.includes(group.cluster!));
-  }, [articleItems, activeField]);
+    if (!group.cluster) return searchFiltered;
+    return searchFiltered.filter((item) => item.clusters.includes(group.cluster!));
+  }, [searchFiltered, activeField]);
 
-  // Compute entity type counts (against field-filtered items)
+  // Compute entity type counts (against search + field-filtered items)
   const entityCounts = useMemo(() => {
     return ENTITY_GROUPS.map((group) => {
       if (group.types.length === 0) return fieldFiltered.length;
@@ -174,7 +266,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   // Show risk category filter only when viewing Risks
   const showRiskCatFilter = activeEntity === 1;
 
-  // Compute risk category counts (against field-filtered risk items)
+  // Compute risk category counts (against search + field-filtered risk items)
   const riskCatCounts = useMemo(() => {
     const riskItems = fieldFiltered.filter((item) => item.type === "risk");
     return RISK_CATEGORY_GROUPS.map((group) => {
@@ -198,18 +290,6 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       result = result.filter((item) => item.riskCategory === riskCatGroup.value);
     }
 
-    // Search filter
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (item) =>
-          item.title.toLowerCase().includes(q) ||
-          item.id.toLowerCase().includes(q) ||
-          item.description?.toLowerCase().includes(q) ||
-          item.tags.some((t) => t.toLowerCase().includes(q))
-      );
-    }
-
     // Sort
     result = [...result].sort((a, b) => {
       switch (sortKey) {
@@ -225,6 +305,13 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
           return (b.lastUpdated || "").localeCompare(a.lastUpdated || "");
         case "relevance":
         default: {
+          // When searching with MiniSearch, sort by search relevance score
+          if (searchScores) {
+            const scoreA = searchScores.get(a.id) || 0;
+            const scoreB = searchScores.get(b.id) || 0;
+            return scoreB - scoreA;
+          }
+          // Default: importance-weighted relevance
           const scoreA = (a.importance || 0) * 2 + (a.quality || 0);
           const scoreB = (b.importance || 0) * 2 + (b.quality || 0);
           return scoreB - scoreA;
@@ -233,7 +320,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     });
 
     return result;
-  }, [fieldFiltered, activeEntity, activeRiskCat, search, sortKey]);
+  }, [fieldFiltered, activeEntity, activeRiskCat, searchScores, sortKey]);
 
   return (
     <div>
