@@ -30,6 +30,7 @@ interface DataTableWithTableProps<TData> {
   table: TanStackTable<TData>
   renderExpandedRow?: (row: Row<TData>) => React.ReactNode
   getRowClassName?: (row: Row<TData>) => string
+  stickyFirstColumn?: boolean
 }
 
 // Legacy API: accepts data and columns (creates table internally)
@@ -55,8 +56,8 @@ function isTableProps<TData>(
 export function DataTable<TData, TValue = unknown>(
   props: DataTableProps<TData, TValue>
 ) {
-  if ("table" in props && props.table !== undefined) {
-    return <DataTableWithTable table={props.table} renderExpandedRow={props.renderExpandedRow} getRowClassName={props.getRowClassName} />
+  if (isTableProps(props)) {
+    return <DataTableWithTable table={props.table} renderExpandedRow={props.renderExpandedRow} getRowClassName={props.getRowClassName} stickyFirstColumn={props.stickyFirstColumn} />
   }
   return <DataTableWithData {...(props as DataTableWithDataProps<TData, TValue>)} />
 }
@@ -66,6 +67,7 @@ function DataTableWithTable<TData>({
   table,
   renderExpandedRow,
   getRowClassName,
+  stickyFirstColumn,
 }: DataTableWithTableProps<TData>) {
   const columns = table.getAllColumns()
 
@@ -75,8 +77,15 @@ function DataTableWithTable<TData>({
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
+              {headerGroup.headers.map((header, idx) => (
+                <TableHead
+                  key={header.id}
+                  className={
+                    stickyFirstColumn && idx === 0
+                      ? "sticky left-0 z-10 bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200 min-w-[180px]"
+                      : undefined
+                  }
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -101,8 +110,15 @@ function DataTableWithTable<TData>({
                     data-state={row.getIsSelected() && "selected"}
                     className={rowClassName}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                    {row.getVisibleCells().map((cell, idx) => (
+                      <TableCell
+                        key={cell.id}
+                        className={
+                          stickyFirstColumn && idx === 0
+                            ? "sticky left-0 z-[5] bg-amber-50 dark:bg-amber-950/30 border-r border-amber-200 dark:border-amber-800"
+                            : undefined
+                        }
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()

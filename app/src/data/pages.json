@@ -1,5 +1,53 @@
 [
   {
+    "id": "architecture-scenarios-table",
+    "path": "/knowledge-base/architecture-scenarios-table/",
+    "filePath": "knowledge-base/architecture-scenarios-table.mdx",
+    "title": "Architecture Scenarios Table",
+    "quality": 20,
+    "importance": 30,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-10",
+    "llmSummary": "An interactive sortable table comparing 12+ architecture scenarios across dimensions including likelihood, safety outlook, whitebox access, modularity, and formal verifiability. Supports grouped/unified views by category.",
+    "description": "Interactive comparison table of scalable intelligence paradigms and deployment patterns.",
+    "ratings": {
+      "novelty": 3,
+      "rigor": 3,
+      "actionability": 3,
+      "completeness": 3
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 0,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "updateFrequency": 30,
+    "wordCount": 0,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "agentic-ai",
     "path": "/knowledge-base/capabilities/agentic-ai/",
     "filePath": "knowledge-base/capabilities/agentic-ai.mdx",
@@ -37,6 +85,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 4446,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -116,6 +165,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2501,
     "unconvertedLinks": [
       {
@@ -244,6 +294,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2849,
     "unconvertedLinks": [
       {
@@ -402,6 +453,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3686,
     "unconvertedLinks": [
       {
@@ -607,6 +659,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2680,
     "unconvertedLinks": [
       {
@@ -800,6 +853,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2790,
     "unconvertedLinks": [
       {
@@ -921,6 +975,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 4912,
     "unconvertedLinks": [
       {
@@ -1043,6 +1098,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 7022,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -1121,6 +1177,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 4844,
     "unconvertedLinks": [
       {
@@ -1219,6 +1276,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3967,
     "unconvertedLinks": [
       {
@@ -1335,6 +1393,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3805,
     "unconvertedLinks": [
       {
@@ -1427,6 +1486,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 3770,
     "unconvertedLinks": [
       {
@@ -1651,6 +1711,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1276,
     "unconvertedLinks": [
       {
@@ -1751,6 +1812,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 7,
     "wordCount": 2054,
     "unconvertedLinks": [
       {
@@ -1927,6 +1989,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 3604,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -2006,6 +2069,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1951,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -2058,7 +2122,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": null,
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Comprehensive survey of AGI timeline predictions ranging from 2025-2027 (ultra-short) to never with current approaches, with median expert estimates around 2032-2037. Key cruxes include whether scaling alone suffices, data/compute limits, and trust in lab leader claims; wide uncertainty reflects deep disagreement about fundamental capabilities questions.",
     "description": "The debate over AGI timelines from imminent to decades away to never with current approaches",
     "ratings": {
@@ -2085,6 +2149,7 @@
       "structuralScore": 6
     },
     "suggestedQuality": 40,
+    "updateFrequency": 45,
     "wordCount": 1032,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -2164,6 +2229,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 90,
     "wordCount": 1752,
     "unconvertedLinks": [
       {
@@ -2256,6 +2322,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 6586,
     "unconvertedLinks": [
       {
@@ -2395,6 +2462,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 2034,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -2447,7 +2515,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": null,
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Presents two core cruxes in the AI x-risk debate: whether advanced AI would develop dangerous goals (instrumental convergence vs. trainable safety) and whether we'll get warning signs (gradual failures vs. deception/fast takeoff). No quantitative analysis, primary sources, or novel framing provided.",
     "description": "The fundamental debate about whether AI poses existential risk",
     "ratings": {
@@ -2473,6 +2541,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": 45,
     "wordCount": 32,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -2521,6 +2590,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 2212,
     "unconvertedLinks": [
       {
@@ -2673,6 +2743,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 2281,
     "unconvertedLinks": [
       {
@@ -2951,6 +3022,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 1713,
     "unconvertedLinks": [
       {
@@ -3138,6 +3210,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1574,
     "unconvertedLinks": [
       {
@@ -3295,6 +3368,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 4129,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -3373,6 +3447,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 90,
     "wordCount": 4210,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -3415,6 +3490,54 @@
     }
   },
   {
+    "id": "deployment-architectures-table",
+    "path": "/knowledge-base/deployment-architectures-table/",
+    "filePath": "knowledge-base/deployment-architectures-table.mdx",
+    "title": "Deployment Architectures Table",
+    "quality": 20,
+    "importance": 30,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-10",
+    "llmSummary": "An interactive sortable table comparing 8 deployment architecture patterns including agency level, decomposition, oversight mechanisms, and modularity. Supports grouped/unified views by category.",
+    "description": "Interactive comparison table of AI deployment and safety architectures.",
+    "ratings": {
+      "novelty": 3,
+      "rigor": 3,
+      "actionability": 3,
+      "completeness": 3
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 0,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "updateFrequency": 30,
+    "wordCount": 0,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "directory",
     "path": "/knowledge-base/directory/",
     "filePath": "knowledge-base/directory.mdx",
@@ -3444,6 +3567,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 25,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -3492,6 +3616,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2342,
     "unconvertedLinks": [
       {
@@ -3650,6 +3775,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 1977,
     "unconvertedLinks": [
       {
@@ -3802,6 +3928,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 4990,
     "unconvertedLinks": [
       {
@@ -4026,6 +4153,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 5682,
     "unconvertedLinks": [
       {
@@ -4238,6 +4366,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 4864,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -4317,6 +4446,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 21,
     "wordCount": 5231,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -4396,6 +4526,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 5338,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -4475,6 +4606,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 3090,
     "unconvertedLinks": [
       {
@@ -4561,6 +4693,7 @@
       "structuralScore": 6
     },
     "suggestedQuality": 40,
+    "updateFrequency": 90,
     "wordCount": 2644,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -4641,6 +4774,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 4300,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -4720,6 +4854,7 @@
       "structuralScore": 6
     },
     "suggestedQuality": 40,
+    "updateFrequency": 90,
     "wordCount": 2524,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -4800,6 +4935,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 3757,
     "unconvertedLinks": [
       {
@@ -5012,6 +5148,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 2656,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -5090,6 +5227,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 2993,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -5168,6 +5306,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 2764,
     "unconvertedLinks": [
       {
@@ -5283,6 +5422,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3381,
     "unconvertedLinks": [
       {
@@ -5507,6 +5647,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": null,
     "wordCount": 3670,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -5586,6 +5727,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 2823,
     "unconvertedLinks": [
       {
@@ -5786,6 +5928,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2064,
     "unconvertedLinks": [
       {
@@ -5883,6 +6026,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2533,
     "unconvertedLinks": [
       {
@@ -6070,6 +6214,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 2875,
     "unconvertedLinks": [
       {
@@ -6167,6 +6312,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 4493,
     "unconvertedLinks": [
       {
@@ -6264,6 +6410,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 3365,
     "unconvertedLinks": [
       {
@@ -6518,6 +6665,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2529,
     "unconvertedLinks": [
       {
@@ -6627,6 +6775,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 2225,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -6699,6 +6848,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 3503,
     "unconvertedLinks": [
       {
@@ -6796,6 +6946,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 3476,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -6874,6 +7025,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2244,
     "unconvertedLinks": [
       {
@@ -6959,6 +7111,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 4836,
     "unconvertedLinks": [
       {
@@ -7056,6 +7209,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3449,
     "unconvertedLinks": [
       {
@@ -7166,6 +7320,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 3725,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -7218,7 +7373,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": null,
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Comprehensive compilation of AI economic data showing $202.3B VC investment (2025), 30% of jobs potentially automatable by 2030, and McKinsey's estimate of $1.6-4.4T annual economic value from GenAI. Data is extensively sourced but mostly aggregates existing reports without original analysis or clear prioritization implications.",
     "description": "Investment flows, labor market impacts, and economic indicators for AI development and deployment",
     "ratings": {
@@ -7245,6 +7400,7 @@
       "structuralScore": 7
     },
     "suggestedQuality": 47,
+    "updateFrequency": 21,
     "wordCount": 2952,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -7325,6 +7481,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3300,
     "unconvertedLinks": [
       {
@@ -7525,6 +7682,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 7,
     "wordCount": 4220,
     "unconvertedLinks": [
       {
@@ -7731,6 +7889,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 7,
     "wordCount": 4370,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -7783,7 +7942,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": null,
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Comprehensive survey compilation showing AI concern rising rapidly (37%→50%, 2021-2025) with strong regulatory support (70-80%) but massive literacy gap (99% use AI, 39% aware). Only 12% mention existential risk unprompted despite 69% supporting development pause, suggesting concern focuses on near-term harms; trust declining across institutions with 45-point gap between China (72%) and US (32%).",
     "description": "Tracking public understanding, concern, and attitudes toward AI risk and safety",
     "ratings": {
@@ -7810,6 +7969,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 2566,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -7890,6 +8050,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2612,
     "unconvertedLinks": [
       {
@@ -8087,7 +8248,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": null,
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Comprehensive survey of 10 structural metrics for AI governance capacity, finding: 1-3 year policy lag times, 16-26 point elite-public trust gaps, moderate market concentration (HHI ~2,500), 2,000+ documented incidents but very low near-miss reporting, and weak international coordination. Most metrics are measured annually via established indices (Freedom House, WGI, Edelman) though several key dimensions (coordination success rate, societal resilience) remain conceptual with low data quality.",
     "description": "Metrics tracking information environment quality, institutional capacity, and societal resilience to AI disruption",
     "ratings": {
@@ -8113,6 +8274,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": 45,
     "wordCount": 3124,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -8194,6 +8356,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 2246,
     "unconvertedLinks": [
       {
@@ -8304,6 +8467,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -8353,6 +8517,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 2277,
     "unconvertedLinks": [
       {
@@ -8555,6 +8720,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 1730,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -8638,6 +8804,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 3946,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -8720,6 +8887,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 6302,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -8802,6 +8970,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 6978,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -8882,6 +9051,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 3691,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -8963,6 +9133,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 2629,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -9045,6 +9216,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 5341,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -9127,6 +9299,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 90,
     "wordCount": 4446,
     "unconvertedLinks": [
       {
@@ -9233,6 +9406,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 1954,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -9315,6 +9489,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 2623,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -9396,6 +9571,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 2526,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -9477,6 +9653,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 1055,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -9560,6 +9737,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 2858,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -9640,6 +9818,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 2288,
     "unconvertedLinks": [
       {
@@ -9764,6 +9943,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 1792,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -9816,7 +9996,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": null,
+    "lastUpdated": "2026-01-28",
     "llmSummary": "This model systematically maps six pathways to corrigibility failure with quantified probability estimates (60-90% for advanced AI) and intervention effectiveness (40-70% reduction). It provides concrete risk matrices across capability levels, identifies pathway interactions that multiply severity 2-4x, and recommends specific interventions including bounded objectives (60-80% effective), self-modification restrictions (80-95%), and 4-10x increased research funding.",
     "description": "This model maps pathways from AI training to corrigibility failure, with quantified probability estimates (60-90% for capable optimizers) and intervention effectiveness (40-70% reduction). It analyzes six failure mechanisms including instrumental convergence, goal preservation, and deceptive corrigibility with specific mitigation strategies.",
     "ratings": {
@@ -9844,6 +10024,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 1934,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -9925,6 +10106,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 2542,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10006,6 +10188,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 90,
     "wordCount": 1676,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10087,6 +10270,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 2693,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10167,6 +10351,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 2156,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10247,6 +10432,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 4739,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10328,6 +10514,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 1634,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10409,6 +10596,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 2713,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10490,6 +10678,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 90,
     "wordCount": 3482,
     "unconvertedLinks": [
       {
@@ -10578,6 +10767,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 1364,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10620,6 +10810,54 @@
     }
   },
   {
+    "id": "eval-types-table",
+    "path": "/knowledge-base/models/eval-types-table/",
+    "filePath": "knowledge-base/models/eval-types-table.mdx",
+    "title": "Evaluation Types Table",
+    "quality": 20,
+    "importance": 30,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-10",
+    "llmSummary": "An interactive sortable table comparing 18 AI evaluation approaches across dimensions including signal reliability, coverage depth, Goodhart risk, risk coverage, and scalability. Supports category filtering and grouped/unified views.",
+    "description": "Interactive comparison table of AI evaluation methodologies and their strategic value.",
+    "ratings": {
+      "novelty": 3,
+      "rigor": 3,
+      "actionability": 4,
+      "completeness": 3
+    },
+    "category": "models",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 0,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "updateFrequency": 30,
+    "wordCount": 0,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "expertise-atrophy-cascade",
     "path": "/knowledge-base/models/expertise-atrophy-cascade/",
     "filePath": "knowledge-base/models/expertise-atrophy-cascade.mdx",
@@ -10659,6 +10897,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 4178,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10740,6 +10979,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": 90,
     "wordCount": 2550,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10813,6 +11053,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -10863,6 +11104,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 90,
     "wordCount": 2199,
     "unconvertedLinks": [
       {
@@ -10999,6 +11241,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 2903,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -11080,6 +11323,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 3549,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -11160,6 +11404,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 1747,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -11241,6 +11486,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 90,
     "wordCount": 3215,
     "unconvertedLinks": [
       {
@@ -11352,6 +11598,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 2416,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -11433,6 +11680,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 1924,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -11515,6 +11763,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 4203,
     "unconvertedLinks": [
       {
@@ -11657,6 +11906,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 4398,
     "unconvertedLinks": [
       {
@@ -11781,6 +12031,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 3087,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -11862,6 +12113,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 2165,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -11944,6 +12196,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 90,
     "wordCount": 2782,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12024,6 +12277,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 1713,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12104,6 +12358,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 2801,
     "unconvertedLinks": [
       {
@@ -12210,6 +12465,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 1935,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12291,6 +12547,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 1759,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12372,6 +12629,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 1351,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12453,6 +12711,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 1938,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12505,7 +12764,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": null,
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Formal decomposition of power-seeking emergence into six quantified conditions, estimating current systems at 6.4% probability rising to 22% (2-4 years) and 36.5% (5-10 years). Provides concrete mitigation strategies with cost estimates ($10-100M/year) and implementation timelines across immediate, medium, and long-term horizons.",
     "description": "A formal analysis of six conditions enabling AI power-seeking behaviors, estimating 60-90% probability in sufficiently capable optimizers and emergence at 50-70% of optimal task performance. Provides concrete risk assessment frameworks based on optimization strength, time horizons, goal structure, and environmental factors.",
     "ratings": {
@@ -12533,6 +12792,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 90,
     "wordCount": 2264,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12614,6 +12874,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 1858,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12696,6 +12957,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 2851,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12777,6 +13039,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 1646,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12858,6 +13121,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 1393,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -12938,6 +13202,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 6609,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -13019,6 +13284,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 2886,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -13100,6 +13366,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 1750,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -13181,6 +13448,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 90,
     "wordCount": 2614,
     "unconvertedLinks": [
       {
@@ -13329,6 +13597,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 1911,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -13410,6 +13679,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 90,
     "wordCount": 5824,
     "unconvertedLinks": [
       {
@@ -13504,6 +13774,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 2078,
     "unconvertedLinks": [
       {
@@ -13653,6 +13924,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 90,
     "wordCount": 1625,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -13735,6 +14007,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 1324,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -13817,6 +14090,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 2595,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -13890,6 +14164,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -13939,6 +14214,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 1518,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -14019,6 +14295,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 1994,
     "unconvertedLinks": [
       {
@@ -14131,6 +14408,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 90,
     "wordCount": 1927,
     "unconvertedLinks": [
       {
@@ -14255,6 +14533,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 3330,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -14337,6 +14616,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": 90,
     "wordCount": 2298,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -14418,6 +14698,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 3252,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -14499,6 +14780,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 2308,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -14572,6 +14854,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -14622,6 +14905,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 4426,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -14703,6 +14987,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 2509,
     "unconvertedLinks": [
       {
@@ -14839,6 +15124,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 3491,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -14920,6 +15206,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 90,
     "wordCount": 6392,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -15001,6 +15288,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 3035,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -15082,6 +15370,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 90,
     "wordCount": 2245,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -15162,6 +15451,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1938,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -15241,6 +15531,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3824,
     "unconvertedLinks": [
       {
@@ -15389,6 +15680,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 21,
     "wordCount": 2388,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -15469,6 +15761,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1545,
     "unconvertedLinks": [
       {
@@ -15570,6 +15863,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2766,
     "unconvertedLinks": [
       {
@@ -15681,6 +15975,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 6724,
     "unconvertedLinks": [
       {
@@ -15772,6 +16067,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 4203,
     "unconvertedLinks": [
       {
@@ -15880,6 +16176,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1991,
     "unconvertedLinks": [
       {
@@ -15967,6 +16264,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2087,
     "unconvertedLinks": [
       {
@@ -16054,6 +16352,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 3,
     "wordCount": 2888,
     "unconvertedLinks": [
       {
@@ -16267,6 +16566,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2864,
     "unconvertedLinks": [
       {
@@ -16474,6 +16774,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1756,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -16554,6 +16855,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 21,
     "wordCount": 1530,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -16632,6 +16934,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 1058,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -16700,6 +17003,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1211,
     "unconvertedLinks": [
       {
@@ -16788,6 +17092,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": null,
     "wordCount": 4735,
     "unconvertedLinks": [
       {
@@ -16881,6 +17186,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 21,
     "wordCount": 824,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -16959,6 +17265,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 2805,
     "unconvertedLinks": [
       {
@@ -17052,6 +17359,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": null,
     "wordCount": 3596,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -17130,6 +17438,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 3121,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -17209,6 +17518,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 21,
     "wordCount": 1240,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -17287,6 +17597,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 5762,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -17365,6 +17676,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 2740,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -17445,6 +17757,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 3602,
     "unconvertedLinks": [
       {
@@ -17597,6 +17910,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 21,
     "wordCount": 1554,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -17677,6 +17991,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 2483,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -17755,6 +18070,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 2059,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -17838,6 +18154,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 2303,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -17918,6 +18235,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3833,
     "unconvertedLinks": [
       {
@@ -18004,6 +18322,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 3,
     "wordCount": 2074,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -18082,6 +18401,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 4008,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -18164,6 +18484,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": null,
     "wordCount": 3311,
     "unconvertedLinks": [
       {
@@ -18268,6 +18589,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1603,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -18348,6 +18670,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 4595,
     "unconvertedLinks": [
       {
@@ -18518,6 +18841,7 @@
       "structuralScore": 5
     },
     "suggestedQuality": 33,
+    "updateFrequency": 45,
     "wordCount": 217,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -18566,6 +18890,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 1359,
     "unconvertedLinks": [
       {
@@ -18653,6 +18978,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 4188,
     "unconvertedLinks": [
       {
@@ -18764,6 +19090,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 6079,
     "unconvertedLinks": [
       {
@@ -18897,6 +19224,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 3582,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -18977,6 +19305,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 3855,
     "unconvertedLinks": [
       {
@@ -19118,6 +19447,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 7,
     "wordCount": 3816,
     "unconvertedLinks": [
       {
@@ -19205,6 +19535,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 3522,
     "unconvertedLinks": [
       {
@@ -19363,6 +19694,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1188,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -19443,6 +19775,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1869,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -19521,6 +19854,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 2668,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -19600,6 +19934,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 4404,
     "unconvertedLinks": [
       {
@@ -19704,6 +20039,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 2041,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -19784,6 +20120,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 1692,
     "unconvertedLinks": [
       {
@@ -19871,6 +20208,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 2988,
     "unconvertedLinks": [
       {
@@ -19968,6 +20306,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 1078,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -20046,6 +20385,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 3282,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -20126,6 +20466,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1987,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -20204,6 +20545,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 2460,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -20283,6 +20625,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": null,
     "wordCount": 3312,
     "unconvertedLinks": [
       {
@@ -20375,6 +20718,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 2563,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -20454,6 +20798,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 1919,
     "unconvertedLinks": [
       {
@@ -20546,6 +20891,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 2797,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -20625,6 +20971,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 2258,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -20703,6 +21050,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 2499,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -20781,6 +21129,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 2564,
     "unconvertedLinks": [
       {
@@ -20869,6 +21218,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 3480,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -20948,6 +21298,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 4770,
     "unconvertedLinks": [
       {
@@ -21095,6 +21446,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": null,
     "wordCount": 4188,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -21173,6 +21525,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 1032,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -21252,6 +21605,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": null,
     "wordCount": 4098,
     "unconvertedLinks": [
       {
@@ -21350,6 +21704,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 3842,
     "unconvertedLinks": [
       {
@@ -21436,6 +21791,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 2737,
     "unconvertedLinks": [
       {
@@ -21613,6 +21969,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 3,
     "wordCount": 4365,
     "unconvertedLinks": [
       {
@@ -21766,6 +22123,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 4590,
     "unconvertedLinks": [
       {
@@ -21913,6 +22271,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 4320,
     "unconvertedLinks": [
       {
@@ -22018,6 +22377,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 7,
     "wordCount": 4718,
     "unconvertedLinks": [
       {
@@ -22110,6 +22470,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 1870,
     "unconvertedLinks": [
       {
@@ -22279,6 +22640,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 7,
     "wordCount": 1944,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -22341,6 +22703,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 3360,
     "unconvertedLinks": [
       {
@@ -22458,6 +22821,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 2079,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -22533,6 +22897,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 77,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -22580,6 +22945,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 7,
     "wordCount": 2596,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -22652,6 +23018,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 7,
     "wordCount": 9737,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -22732,6 +23099,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 3,
     "wordCount": 2012,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -22812,6 +23180,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 2273,
     "unconvertedLinks": [
       {
@@ -22907,6 +23276,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 2345,
     "unconvertedLinks": [
       {
@@ -23016,6 +23386,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 3961,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -23095,6 +23466,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": null,
     "wordCount": 3533,
     "unconvertedLinks": [
       {
@@ -23181,6 +23553,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 4430,
     "unconvertedLinks": [
       {
@@ -23286,6 +23659,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1663,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -23365,6 +23739,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 2083,
     "unconvertedLinks": [
       {
@@ -23545,6 +23920,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": null,
     "wordCount": 4117,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -23626,6 +24002,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2751,
     "unconvertedLinks": [
       {
@@ -23816,6 +24193,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 2839,
     "unconvertedLinks": [
       {
@@ -23997,6 +24375,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 3567,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -24079,6 +24458,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 1688,
     "unconvertedLinks": [
       {
@@ -24167,6 +24547,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1431,
     "unconvertedLinks": [
       {
@@ -24254,6 +24635,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1144,
     "unconvertedLinks": [
       {
@@ -24323,6 +24705,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 3212,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -24405,6 +24788,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 597,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -24461,6 +24845,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 4844,
     "unconvertedLinks": [
       {
@@ -24724,6 +25109,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": null,
     "wordCount": 2316,
     "unconvertedLinks": [
       {
@@ -24811,6 +25197,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 7,
     "wordCount": 2865,
     "unconvertedLinks": [
       {
@@ -24927,6 +25314,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 2369,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -25006,6 +25394,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 2196,
     "unconvertedLinks": [
       {
@@ -25184,6 +25573,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": null,
     "wordCount": 556,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -25240,6 +25630,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 21,
     "wordCount": 3579,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -25320,6 +25711,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 4801,
     "unconvertedLinks": [
       {
@@ -25430,6 +25822,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 1766,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -25503,6 +25896,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": 21,
     "wordCount": 178,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -25551,6 +25945,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1327,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -25631,6 +26026,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": 3,
     "wordCount": 2194,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -25709,6 +26105,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": 45,
     "wordCount": 1072,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -25787,6 +26184,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": null,
     "wordCount": 1312,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -25866,6 +26264,7 @@
       "structuralScore": 5
     },
     "suggestedQuality": 33,
+    "updateFrequency": null,
     "wordCount": 1282,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -25945,6 +26344,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": null,
     "wordCount": 843,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -26024,6 +26424,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 7,
     "wordCount": 1600,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -26102,6 +26503,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 2852,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -26180,6 +26582,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 3185,
     "unconvertedLinks": [
       {
@@ -26266,6 +26669,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 4538,
     "unconvertedLinks": [
       {
@@ -26364,6 +26768,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 3005,
     "unconvertedLinks": [
       {
@@ -26482,6 +26887,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": null,
     "wordCount": 4158,
     "unconvertedLinks": [
       {
@@ -26627,6 +27033,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 839,
     "unconvertedLinks": [
       {
@@ -26715,6 +27122,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 2795,
     "unconvertedLinks": [
       {
@@ -26795,6 +27203,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 7,
     "wordCount": 1787,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -26861,6 +27270,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": null,
     "wordCount": 4367,
     "unconvertedLinks": [
       {
@@ -27000,6 +27410,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 1970,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -27081,6 +27492,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": null,
     "wordCount": 2959,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -27160,6 +27572,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": null,
     "wordCount": 5505,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -27240,6 +27653,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 1662,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -27318,6 +27732,7 @@
       "structuralScore": 5
     },
     "suggestedQuality": 33,
+    "updateFrequency": 21,
     "wordCount": 1262,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -27396,6 +27811,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 2085,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -27475,6 +27891,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 6223,
     "unconvertedLinks": [
       {
@@ -27722,6 +28139,7 @@
       "structuralScore": 5
     },
     "suggestedQuality": 33,
+    "updateFrequency": 21,
     "wordCount": 1121,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -27803,6 +28221,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 3265,
     "unconvertedLinks": [
       {
@@ -27894,6 +28313,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 3888,
     "unconvertedLinks": [
       {
@@ -28040,6 +28460,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 3177,
     "unconvertedLinks": [
       {
@@ -28149,6 +28570,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": null,
     "wordCount": 939,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -28228,6 +28650,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": 45,
     "wordCount": 946,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -28306,6 +28729,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 2901,
     "unconvertedLinks": [
       {
@@ -28391,6 +28815,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 1101,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -28469,6 +28894,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 3622,
     "unconvertedLinks": [
       {
@@ -28555,6 +28981,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 3372,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -28636,6 +29063,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": null,
     "wordCount": 1868,
     "unconvertedLinks": [
       {
@@ -28710,6 +29138,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 7,
     "wordCount": 6715,
     "unconvertedLinks": [
       {
@@ -28832,6 +29261,7 @@
       "structuralScore": 5
     },
     "suggestedQuality": 33,
+    "updateFrequency": 45,
     "wordCount": 1210,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -28912,6 +29342,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 2444,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -28985,6 +29416,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": null,
     "wordCount": 182,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -29033,6 +29465,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1538,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -29113,6 +29546,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": null,
     "wordCount": 3507,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -29194,6 +29628,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 2766,
     "unconvertedLinks": [
       {
@@ -29285,6 +29720,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 4417,
     "unconvertedLinks": [
       {
@@ -29383,6 +29819,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 1775,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -29456,6 +29893,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -29477,7 +29915,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Adversarial training, universally adopted at frontier labs with $10-150M/year investment, improves robustness to known attacks but creates an arms race dynamic and provides no protection against model deception or novel attack categories. While necessary for operational security, it only defends external attacks rather than addressing fundamental alignment challenges.",
     "description": "Adversarial training improves AI robustness by training models on examples designed to cause failures, including jailbreaks and prompt injections. While universally adopted and effective against known attacks, it creates an arms race dynamic and provides no protection against model deception or novel attacks.",
     "ratings": {
@@ -29503,6 +29941,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1881,
     "unconvertedLinks": [
       {
@@ -29594,6 +30033,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 2222,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -29672,6 +30112,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 1981,
     "unconvertedLinks": [
       {
@@ -29785,7 +30226,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "AI Control is a defensive safety approach that maintains control over potentially misaligned AI through monitoring, containment, and redundancy, offering 40-60% catastrophic risk reduction if alignment fails with 70-85% tractability for near-human AI. Current research shows 80-95% detection rates against GPT-4-level adversarial behavior with 5-30% computational overhead, though effectiveness likely drops to 10-30% for superintelligent systems.",
     "description": "A defensive safety approach maintaining control over potentially misaligned AI systems through monitoring, containment, and redundancy, offering 40-60% catastrophic risk reduction if alignment fails while remaining 70-85% tractable for near-human AI capabilities.",
     "ratings": {
@@ -29812,6 +30253,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2975,
     "unconvertedLinks": [
       {
@@ -29958,6 +30400,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -30006,6 +30449,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 2196,
     "unconvertedLinks": [
       {
@@ -30092,6 +30536,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1697,
     "unconvertedLinks": [
       {
@@ -30178,6 +30623,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 2545,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -30257,6 +30703,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 4245,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -30330,6 +30777,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -30377,6 +30825,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 1746,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -30450,6 +30899,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 62,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -30498,6 +30948,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3771,
     "unconvertedLinks": [
       {
@@ -30872,6 +31323,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 99,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -30914,6 +31366,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 62,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -30956,6 +31409,7 @@
       "structuralScore": 3
     },
     "suggestedQuality": 20,
+    "updateFrequency": null,
     "wordCount": 45,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -30998,6 +31452,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 93,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -31040,6 +31495,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 88,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -31087,6 +31543,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3610,
     "unconvertedLinks": [
       {
@@ -31209,6 +31666,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 3140,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -31282,6 +31740,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -31331,6 +31790,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 559,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -31398,6 +31858,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 2507,
     "unconvertedLinks": [
       {
@@ -31508,6 +31969,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 7,
     "wordCount": 4011,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -31587,6 +32049,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 7,
     "wordCount": 2942,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -31666,6 +32129,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 7,
     "wordCount": 4115,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -31745,6 +32209,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3463,
     "unconvertedLinks": [
       {
@@ -32104,7 +32569,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Capability unlearning removes dangerous capabilities (e.g., bioweapon synthesis) from AI models through gradient-based methods, representation engineering, and fine-tuning, achieving 60-80% reduction on WMDP benchmarks with combined approaches. However, verification is impossible, capabilities are recoverable through fine-tuning, and knowledge entanglement limits what can be safely removed, making this a defense-in-depth layer rather than complete solution.",
     "description": "Methods to remove specific dangerous capabilities from trained AI models, directly addressing misuse risks by eliminating harmful knowledge, though current techniques face challenges around verification, capability recovery, and general performance degradation.",
     "ratings": {
@@ -32130,6 +32595,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1739,
     "unconvertedLinks": [
       {
@@ -32222,6 +32688,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 7,
     "wordCount": 3638,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -32300,6 +32767,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3342,
     "unconvertedLinks": [
       {
@@ -32365,7 +32833,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "CIRL is a theoretical framework where AI systems maintain uncertainty about human preferences, which naturally incentivizes corrigibility and deference. Despite elegant theory with formal proofs, the approach faces a substantial theory-practice gap with no production deployments and only $1-5M/year in academic investment, making it more influential for conceptual foundations than immediate intervention design.",
     "description": "Cooperative Inverse Reinforcement Learning (CIRL) is a theoretical framework where AI systems maintain uncertainty about human preferences and cooperatively learn them through interaction. While providing elegant theoretical foundations for corrigibility, CIRL remains largely academic with limited practical implementation.",
     "ratings": {
@@ -32391,6 +32859,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 90,
     "wordCount": 2014,
     "unconvertedLinks": [
       {
@@ -32495,6 +32964,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 7,
     "wordCount": 3055,
     "unconvertedLinks": [
       {
@@ -32593,6 +33063,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1399,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -32672,6 +33143,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 7,
     "wordCount": 2903,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -32751,6 +33223,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1600,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -32830,6 +33303,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1788,
     "unconvertedLinks": [
       {
@@ -32898,6 +33372,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 2641,
     "unconvertedLinks": [
       {
@@ -33002,6 +33477,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -33044,6 +33520,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -33065,7 +33542,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Constitutional AI is Anthropic's methodology using explicit principles and AI-generated feedback (RLAIF) to train safer models, achieving 3-10x improvements in harmlessness while maintaining helpfulness across Claude deployments. The approach has influenced safety practices at major AI labs but faces limitations around constitutional ambiguity, cultural bias, and adversarial robustness.",
     "description": "Anthropic's Constitutional AI (CAI) methodology uses explicit principles and AI-generated feedback to train safer language models, demonstrating 3-10x improvements in harmlessness while maintaining helpfulness across major model deployments.",
     "ratings": {
@@ -33091,6 +33568,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1489,
     "unconvertedLinks": [
       {
@@ -33201,6 +33679,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 2479,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -33274,6 +33753,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -33295,7 +33775,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Cooperative AI research addresses multi-agent coordination failures through game theory and mechanism design, with ~$1-20M/year investment primarily at DeepMind and academic groups. The field remains largely theoretical with limited production deployment, facing fundamental challenges in defining cooperation in high-stakes scenarios and preventing defection under pressure.",
     "description": "Cooperative AI research investigates how AI systems can cooperate effectively with humans and other AI systems, addressing multi-agent coordination failures and promoting beneficial cooperation over adversarial dynamics. This growing field becomes increasingly important as multi-agent AI deployments proliferate.",
     "ratings": {
@@ -33321,6 +33801,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 90,
     "wordCount": 2069,
     "unconvertedLinks": [
       {
@@ -33425,6 +33906,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 4159,
     "unconvertedLinks": [
       {
@@ -33542,6 +34024,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2942,
     "unconvertedLinks": [
       {
@@ -33737,6 +34220,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 3382,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -33816,6 +34300,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 7,
     "wordCount": 1407,
     "unconvertedLinks": [
       {
@@ -33991,6 +34476,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 2450,
     "unconvertedLinks": [
       {
@@ -34173,6 +34659,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3608,
     "unconvertedLinks": [
       {
@@ -34412,7 +34899,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "AI Safety via Debate uses adversarial AI systems arguing opposing positions to enable human oversight of superhuman AI. Recent empirical work shows promising results - debate achieves 88% human accuracy vs 60% baseline (Khan et al. 2024), and outperforms consultancy when weak LLMs judge strong LLMs (NeurIPS 2024). Active research at Anthropic, DeepMind, and OpenAI. Key open questions remain about truth advantage at superhuman capability levels and judge robustness against manipulation.",
     "description": "AI Safety via Debate proposes using adversarial AI systems to argue opposing positions while humans judge, designed to scale alignment to superhuman capabilities. While theoretically promising and specifically designed to address RLHF's scalability limitations, it remains experimental with limited empirical validation.",
     "ratings": {
@@ -34438,6 +34925,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 90,
     "wordCount": 1741,
     "unconvertedLinks": [
       {
@@ -34560,6 +35048,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2952,
     "unconvertedLinks": [
       {
@@ -34737,6 +35226,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 3539,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -34817,6 +35307,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 3574,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -34898,6 +35389,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2034,
     "unconvertedLinks": [
       {
@@ -35026,6 +35518,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3995,
     "unconvertedLinks": [
       {
@@ -35153,6 +35646,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 2602,
     "unconvertedLinks": [
       {
@@ -35281,6 +35775,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 2748,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -35361,6 +35856,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 3538,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -35434,6 +35930,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 141,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -35483,6 +35980,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 106,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -35538,6 +36036,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1516,
     "unconvertedLinks": [
       {
@@ -35666,6 +36165,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 7,
     "wordCount": 4242,
     "unconvertedLinks": [
       {
@@ -35801,6 +36301,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 4625,
     "unconvertedLinks": [
       {
@@ -35947,6 +36448,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 4158,
     "unconvertedLinks": [
       {
@@ -36381,6 +36883,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 2619,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -36463,6 +36966,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 3555,
     "unconvertedLinks": [
       {
@@ -36555,6 +37059,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 1741,
     "unconvertedLinks": [
       {
@@ -36719,6 +37224,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 4199,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -36798,6 +37304,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 7,
     "wordCount": 3684,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -36877,6 +37384,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 3685,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -36950,6 +37458,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -36998,6 +37507,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1899,
     "unconvertedLinks": [
       {
@@ -37057,7 +37567,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Formal verification seeks mathematical proofs of AI safety properties but faces a ~100,000x scale gap between verified systems (~10k parameters) and frontier models (~1.7T parameters). While offering potentially transformative guarantees if achievable, current techniques cannot verify meaningful properties for production AI systems, making this high-risk, long-term research rather than near-term intervention.",
     "description": "Mathematical proofs of AI system properties and behavior bounds, offering potentially strong safety guarantees if achievable but currently limited to small systems and facing fundamental challenges scaling to modern neural networks.",
     "ratings": {
@@ -37083,6 +37593,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 2162,
     "unconvertedLinks": [
       {
@@ -37148,7 +37659,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Comprehensive overview of goal misgeneralization - where AI systems learn proxy objectives during training that diverge from intended goals under distribution shift. Systematically characterizes the problem across environments (CoinRun, language models), potential solutions (causal learning, process supervision), and scaling uncertainties, but solutions remain largely unproven with mixed evidence on whether scale helps or hurts.",
     "description": "Research into how learned goals fail to generalize correctly to new situations, a core alignment problem where AI systems pursue proxy objectives that diverge from intended goals when deployed outside their training distribution.",
     "ratings": {
@@ -37174,6 +37685,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 90,
     "wordCount": 2062,
     "unconvertedLinks": [
       {
@@ -37344,6 +37856,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 21,
     "wordCount": 2987,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -37423,6 +37936,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3561,
     "unconvertedLinks": [
       {
@@ -37629,6 +38143,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2507,
     "unconvertedLinks": [
       {
@@ -37727,6 +38242,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 5454,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -37806,6 +38322,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 4823,
     "unconvertedLinks": [
       {
@@ -37927,6 +38444,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3810,
     "unconvertedLinks": [
       {
@@ -38020,6 +38538,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3143,
     "unconvertedLinks": [
       {
@@ -38328,6 +38847,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 4098,
     "unconvertedLinks": [
       {
@@ -38468,6 +38988,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 1693,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -38549,6 +39070,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": null,
     "wordCount": 2193,
     "unconvertedLinks": [
       {
@@ -38589,6 +39111,12 @@
           "similarity": 22
         },
         {
+          "id": "vision",
+          "title": "LongtermWiki Vision Document",
+          "path": "/project/vision/",
+          "similarity": 18
+        },
+        {
           "id": "longterm-vision",
           "title": "LongtermWiki Vision",
           "path": "/internal/longterm-vision/",
@@ -38604,12 +39132,6 @@
           "id": "architecture",
           "title": "System Architecture",
           "path": "/internal/architecture/",
-          "similarity": 10
-        },
-        {
-          "id": "models",
-          "title": "Model Style Guide",
-          "path": "/internal/models/",
           "similarity": 10
         }
       ]
@@ -38652,6 +39174,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3675,
     "unconvertedLinks": [
       {
@@ -38870,6 +39393,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": null,
     "wordCount": 1557,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -38950,6 +39474,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1058,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -39011,6 +39536,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3766,
     "unconvertedLinks": [
       {
@@ -39493,6 +40019,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 1722,
     "unconvertedLinks": [
       {
@@ -39597,6 +40124,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2739,
     "unconvertedLinks": [
       {
@@ -39713,6 +40241,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 4511,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -39791,6 +40320,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3677,
     "unconvertedLinks": [
       {
@@ -39889,6 +40419,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -39937,6 +40468,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 7,
     "wordCount": 3380,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -40016,6 +40548,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 7,
     "wordCount": 2891,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -40095,6 +40628,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 2055,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -40173,6 +40707,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 1083,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -40252,6 +40787,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2649,
     "unconvertedLinks": [
       {
@@ -40389,7 +40925,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Comprehensive analysis of pause/moratorium proposals finding they would provide very high safety benefits if implemented (buying time for safety research to close the growing capability-safety gap) but face critical enforcement and coordination challenges with zero current adoption by major labs. The FLI 2023 open letter garnered 30,000+ signatures but resulted in no actual slowdown, highlighting severe tractability issues despite theoretical effectiveness.",
     "description": "Proposals to pause or slow frontier AI development until safety is better understood, offering potentially high safety benefits if implemented but facing significant coordination challenges and currently lacking adoption by major AI laboratories.",
     "ratings": {
@@ -40416,6 +40952,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 2126,
     "unconvertedLinks": [
       {
@@ -40586,6 +41123,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 5390,
     "unconvertedLinks": [
       {
@@ -40711,7 +41249,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Prediction markets achieve Brier scores of 0.16-0.24 (15-25% better than polls) by aggregating dispersed information through financial incentives, with platforms handling $1-3B annually. For AI safety, they provide useful near-term forecasting (70% accuracy on 1-year policy questions) but struggle with long-horizon questions due to thin liquidity, high discount rates, and definitional ambiguity.",
     "description": "Market mechanisms for aggregating probabilistic beliefs, showing 60-75% superior accuracy vs polls (Brier scores 0.16-0.24) with $1-3B annual volumes. Applications include AI timeline forecasting, policy evaluation, and epistemic infrastructure.",
     "ratings": {
@@ -40737,6 +41275,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 1497,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -40815,6 +41354,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 2816,
     "unconvertedLinks": [
       {
@@ -40898,7 +41438,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Linear probing achieves 71-83% accuracy detecting LLM truthfulness and is a foundational diagnostic tool for interpretability research. While computationally cheap and widely adopted, probes are vulnerable to adversarial hiding and only detect linearly separable features, limiting their standalone safety value to supporting other techniques.",
     "description": "Linear probes are simple classifiers trained on neural network activations to test what concepts models internally represent. Research shows probes achieve 71-83% accuracy detecting LLM truthfulness (Azaria & Mitchell 2023), making them a foundational diagnostic tool for AI safety and deception detection.",
     "ratings": {
@@ -40924,6 +41464,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 2665,
     "unconvertedLinks": [
       {
@@ -41007,7 +41548,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Process supervision trains AI to show correct reasoning steps rather than just final answers, achieving 15-25% absolute improvements on math benchmarks while making reasoning auditable. However, it shares RLHF's fundamental limitation: humans cannot verify superhuman reasoning steps, and models might maintain separate internal reasoning from visible chains.",
     "description": "Process supervision trains AI systems to produce correct reasoning steps, not just correct final answers. This approach improves transparency and auditability of AI reasoning, achieving significant gains in mathematical and coding tasks while providing moderate safety benefits through visible reasoning chains.",
     "ratings": {
@@ -41033,6 +41574,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1752,
     "unconvertedLinks": [
       {
@@ -41167,6 +41709,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -41188,7 +41731,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Davidad's provably safe AI agenda aims to create AI systems with mathematical safety guarantees through formal verification of world models and values, primarily funded by ARIA's £59M Safeguarded AI programme. The approach faces extreme technical challenges (world modeling, value specification) with uncertain tractability but would provide very high effectiveness if successful, addressing misalignment, deception, and power-seeking through proof-based constraints.",
     "description": "An ambitious research agenda to design AI systems with mathematical safety guarantees from the ground up, led by ARIA's £59M Safeguarded AI programme with the goal of creating superintelligent systems that are provably beneficial through formal verification of world models and value specifications.",
     "ratings": {
@@ -41215,6 +41758,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 90,
     "wordCount": 2270,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -41294,6 +41838,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 2670,
     "unconvertedLinks": [
       {
@@ -41380,6 +41925,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 2095,
     "unconvertedLinks": [
       {
@@ -41577,7 +42123,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Red teaming is a systematic adversarial evaluation methodology for identifying AI vulnerabilities and dangerous capabilities before deployment, with effectiveness rates varying from 10-80% depending on attack method. Key challenges include scaling human red teaming to match AI capability growth (2025-2027 critical period) and the adversarial arms race where attacks evolve faster than defenses.",
     "description": "Adversarial testing methodologies to systematically identify AI system vulnerabilities, dangerous capabilities, and failure modes through structured adversarial evaluation.",
     "ratings": {
@@ -41604,6 +42150,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 1462,
     "unconvertedLinks": [
       {
@@ -41695,6 +42242,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2884,
     "unconvertedLinks": [
       {
@@ -41811,6 +42359,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2589,
     "unconvertedLinks": [
       {
@@ -41908,6 +42457,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 1844,
     "unconvertedLinks": [
       {
@@ -42018,6 +42568,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 4374,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -42097,6 +42648,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 4576,
     "unconvertedLinks": [
       {
@@ -42228,7 +42780,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-01-28",
+    "lastUpdated": "2026-01-28",
     "llmSummary": "Reward modeling, the core component of RLHF receiving $100M+/year investment, trains neural networks on human preference comparisons to enable scalable reinforcement learning. The technique is universally adopted but inherits fundamental limitations including reward hacking (which worsens with capability), vulnerability to deception, and Goodhart's law—making it capability-dominant rather than safety-enhancing.",
     "description": "Reward modeling trains separate neural networks to predict human preferences, serving as the core component of RLHF pipelines. While essential for modern AI assistants and receiving over $500M/year in investment, it inherits all fundamental limitations of RLHF including reward hacking and lack of deception robustness.",
     "ratings": {
@@ -42254,6 +42806,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1928,
     "unconvertedLinks": [
       {
@@ -42376,6 +42929,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2367,
     "unconvertedLinks": [
       {
@@ -42467,6 +43021,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 3027,
     "unconvertedLinks": [
       {
@@ -42638,6 +43193,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 690,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -42686,6 +43242,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3612,
     "unconvertedLinks": [
       {
@@ -42795,6 +43352,54 @@
     }
   },
   {
+    "id": "safety-approaches-table",
+    "path": "/knowledge-base/responses/safety-approaches-table/",
+    "filePath": "knowledge-base/responses/safety-approaches-table.mdx",
+    "title": "Safety Approaches Table",
+    "quality": 20,
+    "importance": 35,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-10",
+    "llmSummary": "An interactive sortable table comparing 42 AI safety approaches on dimensions including safety uplift, capability uplift, net world safety, scalability to superintelligence, and differential progress. Includes grouped and unified views.",
+    "description": "Interactive comparison table of AI safety approaches, evaluating safety uplift vs capability uplift tradeoffs.",
+    "ratings": {
+      "novelty": 3,
+      "rigor": 3,
+      "actionability": 4,
+      "completeness": 3
+    },
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 0,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "updateFrequency": 30,
+    "wordCount": 0,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "safety-cases",
     "path": "/knowledge-base/responses/safety-cases/",
     "filePath": "knowledge-base/responses/safety-cases.mdx",
@@ -42832,6 +43437,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 4088,
     "unconvertedLinks": [
       {
@@ -43025,6 +43631,54 @@
     }
   },
   {
+    "id": "safety-generalizability-table",
+    "path": "/knowledge-base/responses/safety-generalizability-table/",
+    "filePath": "knowledge-base/responses/safety-generalizability-table.mdx",
+    "title": "Safety Generalizability Table",
+    "quality": 20,
+    "importance": 30,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-10",
+    "llmSummary": "An interactive sortable table summarizing which AI safety approaches are likely to generalize to future architectures. Shows generalization level, dependencies, and threats for each approach.",
+    "description": "Interactive table showing which AI safety research approaches generalize across architectures.",
+    "ratings": {
+      "novelty": 3,
+      "rigor": 3,
+      "actionability": 3,
+      "completeness": 3
+    },
+    "category": "responses",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 0,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "updateFrequency": 30,
+    "wordCount": 0,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "sandboxing",
     "path": "/knowledge-base/responses/sandboxing/",
     "filePath": "knowledge-base/responses/sandboxing.mdx",
@@ -43062,6 +43716,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 4342,
     "unconvertedLinks": [
       {
@@ -43319,6 +43974,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 3528,
     "unconvertedLinks": [
       {
@@ -43440,6 +44096,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 90,
     "wordCount": 1321,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -43518,6 +44175,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3371,
     "unconvertedLinks": [
       {
@@ -43736,6 +44394,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 21,
     "wordCount": 2917,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -43815,6 +44474,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 4345,
     "unconvertedLinks": [
       {
@@ -44074,6 +44734,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3238,
     "unconvertedLinks": [
       {
@@ -44322,6 +44983,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1870,
     "unconvertedLinks": [
       {
@@ -44409,6 +45071,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1626,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -44489,6 +45152,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1337,
     "unconvertedLinks": [
       {
@@ -44514,8 +45178,14 @@
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 11,
+      "maxSimilarity": 12,
       "similarPages": [
+        {
+          "id": "similar-projects",
+          "title": "Similar Projects to LongtermWiki: Research Report",
+          "path": "/project/similar-projects/",
+          "similarity": 12
+        },
         {
           "id": "timelines-wiki",
           "title": "Timelines Wiki",
@@ -44575,6 +45245,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 3586,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -44654,6 +45325,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3560,
     "unconvertedLinks": [
       {
@@ -44770,6 +45442,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 3853,
     "unconvertedLinks": [
       {
@@ -44982,6 +45655,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 7,
     "wordCount": 2682,
     "unconvertedLinks": [
       {
@@ -45134,6 +45808,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 4054,
     "unconvertedLinks": [
       {
@@ -45345,6 +46020,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 1335,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -45425,6 +46101,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 21,
     "wordCount": 3973,
     "unconvertedLinks": [
       {
@@ -45637,6 +46314,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2295,
     "unconvertedLinks": [
       {
@@ -45825,6 +46503,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 7,
     "wordCount": 3795,
     "unconvertedLinks": [
       {
@@ -45959,6 +46638,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 7,
     "wordCount": 3776,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -46032,6 +46712,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -46080,6 +46761,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 4659,
     "unconvertedLinks": [
       {
@@ -46255,6 +46937,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2973,
     "unconvertedLinks": [
       {
@@ -46467,6 +47150,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 2675,
     "unconvertedLinks": [
       {
@@ -46594,6 +47278,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 4520,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -46674,6 +47359,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1969,
     "unconvertedLinks": [
       {
@@ -46741,6 +47427,54 @@
     }
   },
   {
+    "id": "accident-risks-table",
+    "path": "/knowledge-base/risks/accident-risks-table/",
+    "filePath": "knowledge-base/risks/accident-risks-table.mdx",
+    "title": "Accident Risks Table",
+    "quality": 20,
+    "importance": 35,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-02-10",
+    "llmSummary": "An interactive sortable table comparing 16 AI accident risks across dimensions including abstraction level, evidence, timeline, severity, and detectability. Shows risk relationships and supports grouped/unified views.",
+    "description": "Interactive comparison table of AI accident and misalignment risks with overlap analysis.",
+    "ratings": {
+      "novelty": 3,
+      "rigor": 3,
+      "actionability": 3,
+      "completeness": 3
+    },
+    "category": "risks",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 0,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 0,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "updateFrequency": 30,
+    "wordCount": 0,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
     "id": "ai-takeover",
     "path": "/knowledge-base/risks/ai-takeover/",
     "filePath": "knowledge-base/risks/ai-takeover.mdx",
@@ -46772,6 +47506,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -46820,6 +47555,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 2930,
     "unconvertedLinks": [
       {
@@ -46906,6 +47642,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1900,
     "unconvertedLinks": [
       {
@@ -47082,6 +47819,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 4030,
     "unconvertedLinks": [
       {
@@ -47222,6 +47960,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 21,
     "wordCount": 2883,
     "unconvertedLinks": [
       {
@@ -47373,6 +48112,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 2921,
     "unconvertedLinks": [
       {
@@ -47489,6 +48229,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -47538,6 +48279,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 21,
     "wordCount": 2933,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -47611,6 +48353,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -47660,6 +48403,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 10646,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -47739,6 +48483,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 1216,
     "unconvertedLinks": [
       {
@@ -47825,6 +48570,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 3448,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -47904,6 +48650,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 3867,
     "unconvertedLinks": [
       {
@@ -48038,6 +48785,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -48086,6 +48834,7 @@
       "structuralScore": 7
     },
     "suggestedQuality": 47,
+    "updateFrequency": 45,
     "wordCount": 935,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -48141,6 +48890,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 4272,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -48219,6 +48969,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2097,
     "unconvertedLinks": [
       {
@@ -48347,6 +49098,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 21,
     "wordCount": 1482,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -48426,6 +49178,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": 21,
     "wordCount": 3021,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -48504,6 +49257,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 3621,
     "unconvertedLinks": [
       {
@@ -48602,6 +49356,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -48650,6 +49405,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1783,
     "unconvertedLinks": [
       {
@@ -48742,6 +49498,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 2964,
     "unconvertedLinks": [
       {
@@ -48911,6 +49668,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2439,
     "unconvertedLinks": [
       {
@@ -49075,6 +49833,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": 45,
     "wordCount": 956,
     "unconvertedLinks": [
       {
@@ -49161,6 +49920,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 3541,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -49240,6 +50000,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1865,
     "unconvertedLinks": [
       {
@@ -49368,6 +50129,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -49416,6 +50178,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 972,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -49490,6 +50253,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 3269,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -49569,6 +50333,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 21,
     "wordCount": 1339,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -49647,6 +50412,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 3516,
     "unconvertedLinks": [
       {
@@ -49901,6 +50667,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 1271,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -49980,6 +50747,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 7726,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -50058,6 +50826,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 5044,
     "unconvertedLinks": [
       {
@@ -50234,6 +51003,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 3540,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -50314,6 +51084,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 1889,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -50393,6 +51164,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 1523,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -50472,6 +51244,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 1121,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -50527,6 +51300,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 3477,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -50605,6 +51379,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 4338,
     "unconvertedLinks": [
       {
@@ -50733,6 +51508,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 3878,
     "unconvertedLinks": [
       {
@@ -50879,6 +51655,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 3068,
     "unconvertedLinks": [
       {
@@ -51001,6 +51778,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1021,
     "unconvertedLinks": [
       {
@@ -51087,6 +51865,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2389,
     "unconvertedLinks": [
       {
@@ -51251,6 +52030,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2730,
     "unconvertedLinks": [
       {
@@ -51361,6 +52141,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": 45,
     "wordCount": 767,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -51439,6 +52220,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 4012,
     "unconvertedLinks": [
       {
@@ -51575,6 +52357,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 3377,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -51654,6 +52437,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 2663,
     "unconvertedLinks": [
       {
@@ -51763,6 +52547,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 5168,
     "unconvertedLinks": [
       {
@@ -51885,6 +52670,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1937,
     "unconvertedLinks": [
       {
@@ -51953,6 +52739,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 4304,
     "unconvertedLinks": [
       {
@@ -52206,6 +52993,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 1952,
     "unconvertedLinks": [
       {
@@ -52315,6 +53103,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 2404,
     "unconvertedLinks": [
       {
@@ -52425,6 +53214,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 7,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -52474,6 +53264,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 21,
     "wordCount": 4396,
     "unconvertedLinks": [
       {
@@ -52589,6 +53380,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 787,
     "unconvertedLinks": [
       {
@@ -52710,6 +53502,7 @@
       "structuralScore": 15
     },
     "suggestedQuality": 100,
+    "updateFrequency": 45,
     "wordCount": 4008,
     "unconvertedLinks": [
       {
@@ -52934,6 +53727,7 @@
       "structuralScore": 6
     },
     "suggestedQuality": 40,
+    "updateFrequency": 45,
     "wordCount": 1744,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -53014,6 +53808,7 @@
       "structuralScore": 14
     },
     "suggestedQuality": 93,
+    "updateFrequency": 45,
     "wordCount": 1581,
     "unconvertedLinks": [
       {
@@ -53142,6 +53937,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": 45,
     "wordCount": 1483,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -53221,6 +54017,7 @@
       "structuralScore": 9
     },
     "suggestedQuality": 60,
+    "updateFrequency": 45,
     "wordCount": 2186,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -53301,6 +54098,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": 45,
     "wordCount": 3928,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -53380,6 +54178,7 @@
       "structuralScore": 13
     },
     "suggestedQuality": 87,
+    "updateFrequency": 45,
     "wordCount": 4680,
     "unconvertedLinks": [
       {
@@ -53604,6 +54403,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": 45,
     "wordCount": 4454,
     "unconvertedLinks": [
       {
@@ -53779,6 +54579,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -53826,6 +54627,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -53874,6 +54676,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -53922,6 +54725,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -53969,6 +54773,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54016,6 +54821,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54064,6 +54870,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54111,6 +54918,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54161,6 +54969,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54208,6 +55017,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54256,6 +55066,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54304,6 +55115,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54352,6 +55164,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54400,6 +55213,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54448,6 +55262,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54496,6 +55311,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54543,6 +55359,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54585,6 +55402,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54632,6 +55450,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54674,6 +55493,7 @@
       "structuralScore": 6
     },
     "suggestedQuality": 40,
+    "updateFrequency": null,
     "wordCount": 264,
     "unconvertedLinks": [
       {
@@ -54736,6 +55556,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": null,
     "wordCount": 212,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54803,6 +55624,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": null,
     "wordCount": 207,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54869,6 +55691,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54911,6 +55734,7 @@
       "structuralScore": 3
     },
     "suggestedQuality": 20,
+    "updateFrequency": null,
     "wordCount": 70,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -54978,6 +55802,7 @@
       "structuralScore": 3
     },
     "suggestedQuality": 20,
+    "updateFrequency": null,
     "wordCount": 171,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55027,6 +55852,7 @@
       "structuralScore": 6
     },
     "suggestedQuality": 40,
+    "updateFrequency": null,
     "wordCount": 310,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55082,6 +55908,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": null,
     "wordCount": 100,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55137,6 +55964,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": null,
     "wordCount": 817,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55198,6 +56026,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55246,6 +56075,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55293,6 +56123,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55340,6 +56171,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55387,6 +56219,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55434,6 +56267,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55481,6 +56315,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55529,6 +56364,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55576,6 +56412,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55624,6 +56461,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55671,6 +56509,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55719,6 +56558,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55766,6 +56606,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55808,6 +56649,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 393,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55869,6 +56711,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55916,6 +56759,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -55963,6 +56807,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56010,6 +56855,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56057,6 +56903,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56104,6 +56951,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56152,6 +57000,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56199,6 +57048,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56246,6 +57096,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56293,6 +57144,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56341,6 +57193,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56383,6 +57236,7 @@
       "structuralScore": 3
     },
     "suggestedQuality": 20,
+    "updateFrequency": null,
     "wordCount": 68,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56456,6 +57310,7 @@
       "structuralScore": 3
     },
     "suggestedQuality": 20,
+    "updateFrequency": null,
     "wordCount": 68,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56523,6 +57378,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56565,6 +57421,7 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": null,
     "wordCount": 112,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56632,6 +57489,7 @@
       "structuralScore": 5
     },
     "suggestedQuality": 33,
+    "updateFrequency": null,
     "wordCount": 553,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56687,6 +57545,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56735,6 +57594,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56782,6 +57642,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56830,6 +57691,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56877,6 +57739,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56924,6 +57787,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -56945,7 +57809,7 @@
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": null,
+    "lastUpdated": "2026-01-28",
     "llmSummary": "An interactive sortable table displaying parameters from the AI Transition Model with ratings for changeability, uncertainty, and impact. Links to similar frameworks from Open Philanthropy and other sources for comparison.",
     "description": "Sortable tables showing all parameters in the AI Transition Model with ratings for changeability, uncertainty, and impact.",
     "ratings": {
@@ -56971,6 +57835,7 @@
       "structuralScore": 3
     },
     "suggestedQuality": 20,
+    "updateFrequency": 45,
     "wordCount": 28,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57018,6 +57883,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57065,6 +57931,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 0,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57110,6 +57977,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 27,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57155,6 +58023,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 25,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57204,6 +58073,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": null,
     "wordCount": 1165,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57282,6 +58152,7 @@
       "structuralScore": 7
     },
     "suggestedQuality": 47,
+    "updateFrequency": null,
     "wordCount": 385,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57349,6 +58220,7 @@
       "structuralScore": 3
     },
     "suggestedQuality": 20,
+    "updateFrequency": null,
     "wordCount": 471,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57391,6 +58263,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": null,
     "wordCount": 958,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57469,6 +58342,7 @@
       "structuralScore": 6
     },
     "suggestedQuality": 40,
+    "updateFrequency": null,
     "wordCount": 764,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57541,14 +58415,22 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 882,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 0,
-      "similarPages": []
+      "maxSimilarity": 11,
+      "similarPages": [
+        {
+          "id": "cause-effect-demo",
+          "title": "Cause-Effect Graph Demo",
+          "path": "/guides/cause-effect-demo/",
+          "similarity": 11
+        }
+      ]
     }
   },
   {
@@ -57588,6 +58470,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 1372,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57654,6 +58537,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 1068,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57721,6 +58605,7 @@
       "structuralScore": 7
     },
     "suggestedQuality": 47,
+    "updateFrequency": null,
     "wordCount": 647,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57781,6 +58666,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 799,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57853,6 +58739,7 @@
       "structuralScore": 7
     },
     "suggestedQuality": 47,
+    "updateFrequency": null,
     "wordCount": 774,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -57886,10 +58773,10 @@
           "similarity": 11
         },
         {
-          "id": "models",
-          "title": "Model Style Guide",
-          "path": "/internal/models/",
-          "similarity": 10
+          "id": "vision",
+          "title": "LongtermWiki Vision Document",
+          "path": "/project/vision/",
+          "similarity": 11
         }
       ]
     }
@@ -57931,14 +58818,21 @@
       "structuralScore": 4
     },
     "suggestedQuality": 27,
+    "updateFrequency": null,
     "wordCount": 2116,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 15,
+      "maxSimilarity": 80,
       "similarPages": [
+        {
+          "id": "strategy-brainstorm",
+          "title": "LongtermWiki Strategy Brainstorm",
+          "path": "/project/strategy-brainstorm/",
+          "similarity": 80
+        },
         {
           "id": "longtermwiki-value-proposition",
           "title": "LongtermWiki Value Proposition",
@@ -57946,28 +58840,22 @@
           "similarity": 15
         },
         {
+          "id": "similar-projects",
+          "title": "Similar Projects to LongtermWiki: Research Report",
+          "path": "/project/similar-projects/",
+          "similarity": 14
+        },
+        {
+          "id": "vision",
+          "title": "LongtermWiki Vision Document",
+          "path": "/project/vision/",
+          "similarity": 14
+        },
+        {
           "id": "longterm-vision",
           "title": "LongtermWiki Vision",
           "path": "/internal/longterm-vision/",
           "similarity": 13
-        },
-        {
-          "id": "issa-rice",
-          "title": "Issa Rice",
-          "path": "/knowledge-base/people/issa-rice/",
-          "similarity": 12
-        },
-        {
-          "id": "carlsmith-six-premises",
-          "title": "Carlsmith's Six-Premise Argument",
-          "path": "/knowledge-base/models/carlsmith-six-premises/",
-          "similarity": 11
-        },
-        {
-          "id": "short-timeline-policy-implications",
-          "title": "Short Timeline Policy Implications",
-          "path": "/knowledge-base/models/short-timeline-policy-implications/",
-          "similarity": 11
         }
       ]
     }
@@ -58009,14 +58897,21 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 938,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 17,
+      "maxSimilarity": 63,
       "similarPages": [
+        {
+          "id": "vision",
+          "title": "LongtermWiki Vision Document",
+          "path": "/project/vision/",
+          "similarity": 63
+        },
         {
           "id": "longterm-wiki",
           "title": "Longterm Wiki",
@@ -58036,16 +58931,10 @@
           "similarity": 13
         },
         {
-          "id": "longtermwiki-value-proposition",
-          "title": "LongtermWiki Value Proposition",
-          "path": "/internal/longtermwiki-value-proposition/",
-          "similarity": 12
-        },
-        {
-          "id": "ai-watch",
-          "title": "AI Watch",
-          "path": "/knowledge-base/responses/ai-watch/",
-          "similarity": 11
+          "id": "similar-projects",
+          "title": "Similar Projects to LongtermWiki: Research Report",
+          "path": "/project/similar-projects/",
+          "similarity": 13
         }
       ]
     }
@@ -58087,6 +58976,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": null,
     "wordCount": 4496,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58165,6 +59055,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 422,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58212,6 +59103,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": null,
     "wordCount": 1028,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58290,6 +59182,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": null,
     "wordCount": 2437,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58370,6 +59263,7 @@
       "structuralScore": 7
     },
     "suggestedQuality": 47,
+    "updateFrequency": null,
     "wordCount": 1488,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58448,6 +59342,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": null,
     "wordCount": 1439,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58498,6 +59393,7 @@
       "structuralScore": 3
     },
     "suggestedQuality": 20,
+    "updateFrequency": null,
     "wordCount": 523,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58576,6 +59472,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": null,
     "wordCount": 896,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58654,6 +59551,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": null,
     "wordCount": 2211,
     "unconvertedLinks": [
       {
@@ -58745,6 +59643,7 @@
       "structuralScore": 12
     },
     "suggestedQuality": 80,
+    "updateFrequency": null,
     "wordCount": 1886,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58805,6 +59704,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": null,
     "wordCount": 1078,
     "unconvertedLinks": [
       {
@@ -58868,6 +59768,7 @@
       "structuralScore": 5
     },
     "suggestedQuality": 33,
+    "updateFrequency": null,
     "wordCount": 638,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58922,6 +59823,7 @@
       "structuralScore": 11
     },
     "suggestedQuality": 73,
+    "updateFrequency": null,
     "wordCount": 1563,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -58982,6 +59884,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 1115,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -59036,6 +59939,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 850,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -59102,6 +60006,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 282,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -59174,6 +60079,7 @@
       "structuralScore": 10
     },
     "suggestedQuality": 67,
+    "updateFrequency": null,
     "wordCount": 436,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -59247,6 +60153,7 @@
       "structuralScore": 8
     },
     "suggestedQuality": 53,
+    "updateFrequency": null,
     "wordCount": 677,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -59296,6 +60203,7 @@
       "structuralScore": 7
     },
     "suggestedQuality": 47,
+    "updateFrequency": null,
     "wordCount": 2418,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -59350,6 +60258,7 @@
       "structuralScore": 2
     },
     "suggestedQuality": 13,
+    "updateFrequency": null,
     "wordCount": 172,
     "unconvertedLinks": [],
     "unconvertedLinkCount": 0,
@@ -59358,6 +60267,774 @@
     "redundancy": {
       "maxSimilarity": 0,
       "similarPages": []
+    }
+  },
+  {
+    "id": "cause-effect-demo",
+    "path": "/guides/cause-effect-demo/",
+    "filePath": "guides/cause-effect-demo.mdx",
+    "title": "Cause-Effect Graph Demo",
+    "quality": 42,
+    "importance": 8,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Interactive visualization tool demonstrating cause-effect relationships in AI safety using a hierarchical graph with 7 nodes (rapid AI progress → insufficient alignment/competitive pressure → misaligned systems → loss of control/unintended consequences → existential risk). The tool encodes relationship strength, confidence levels (ranging 0.3-0.85), and causal direction through visual properties, though the example content itself represents standard AI safety arguments rather than novel analysis.",
+    "description": "Interactive visualization of cause and effect relationships",
+    "ratings": {
+      "novelty": 6.5,
+      "rigor": 4,
+      "actionability": 5.5,
+      "completeness": 5
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 275,
+      "tableCount": 2,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0.07,
+      "sectionCount": 5,
+      "hasOverview": false,
+      "structuralScore": 4
+    },
+    "suggestedQuality": 27,
+    "updateFrequency": null,
+    "wordCount": 275,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 11,
+      "similarPages": [
+        {
+          "id": "cause-effect-diagrams",
+          "title": "Cause-Effect Diagram Style Guide",
+          "path": "/internal/cause-effect-diagrams/",
+          "similarity": 11
+        }
+      ]
+    }
+  },
+  {
+    "id": "interactive-views",
+    "path": "/guides/interactive-views/",
+    "filePath": "guides/interactive-views.mdx",
+    "title": "Interactive Views & Tables",
+    "quality": 8,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Navigation page listing interactive tables and visualizations available in the wiki, including the AI Transition Model parameters table and entity cause-effect diagrams.",
+    "description": "Directory of interactive tables and graph visualizations in the wiki.",
+    "ratings": {
+      "novelty": 0,
+      "rigor": 0,
+      "actionability": 0,
+      "completeness": 4
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 195,
+      "tableCount": 1,
+      "diagramCount": 0,
+      "internalLinks": 10,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 3,
+      "hasOverview": true,
+      "structuralScore": 6
+    },
+    "suggestedQuality": 40,
+    "updateFrequency": null,
+    "wordCount": 195,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
+    "id": "gap-analysis",
+    "path": "/insight-hunting/gap-analysis/",
+    "filePath": "insight-hunting/gap-analysis.mdx",
+    "title": "Gap Analysis",
+    "quality": 28,
+    "importance": 5,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Documentation for an internal tool that prioritizes wiki pages for insight extraction using a weighted formula (importance × quality - existing insights). Provides scoring ranges and workflow for extracting insights from high-potential pages.",
+    "description": "Find pages with high importance but few or no extracted insights",
+    "ratings": {
+      "novelty": 2,
+      "rigor": 4,
+      "actionability": 3,
+      "completeness": 5
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 181,
+      "tableCount": 1,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0.41,
+      "sectionCount": 4,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "updateFrequency": null,
+    "wordCount": 181,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 12,
+      "similarPages": [
+        {
+          "id": "quantitative-claims",
+          "title": "Quantitative Claims",
+          "path": "/insight-hunting/quantitative-claims/",
+          "similarity": 12
+        }
+      ]
+    }
+  },
+  {
+    "id": "insights",
+    "path": "/insight-hunting/insights/",
+    "filePath": "insight-hunting/insights.mdx",
+    "title": "Insights Index",
+    "quality": 14,
+    "importance": 15,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "This is an infrastructure page that displays a filterable table of discrete insights extracted from other content, rated on four dimensions (surprising, important, actionable, neglected) calibrated for AI safety experts. The page itself contains no actual insights - just the interface and data structure documentation.",
+    "description": "Ranked collection of discrete insights extracted from project content, rated for AI safety experts.",
+    "ratings": {
+      "novelty": 3,
+      "rigor": 2,
+      "actionability": 1,
+      "completeness": 1
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 130,
+      "tableCount": 1,
+      "diagramCount": 0,
+      "internalLinks": 1,
+      "externalLinks": 0,
+      "bulletRatio": 0,
+      "sectionCount": 1,
+      "hasOverview": false,
+      "structuralScore": 4
+    },
+    "suggestedQuality": 27,
+    "updateFrequency": null,
+    "wordCount": 130,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
+    "id": "quantitative-claims",
+    "path": "/insight-hunting/quantitative-claims/",
+    "filePath": "insight-hunting/quantitative-claims.mdx",
+    "title": "Quantitative Claims",
+    "quality": 28,
+    "importance": 5,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Documentation page for an internal tool that extracts quantitative claims (percentages, dollar amounts, timelines) from wiki content to help identify potential insights. The tool scans MDX files and flags 'notable' claims based on importance indicators in surrounding context.",
+    "description": "Numbers, percentages, and statistics from content that could be insights",
+    "ratings": {
+      "novelty": 2,
+      "rigor": 3,
+      "actionability": 4,
+      "completeness": 5
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 304,
+      "tableCount": 1,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0.4,
+      "sectionCount": 6,
+      "hasOverview": false,
+      "structuralScore": 3
+    },
+    "suggestedQuality": 20,
+    "updateFrequency": null,
+    "wordCount": 304,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 12,
+      "similarPages": [
+        {
+          "id": "gap-analysis",
+          "title": "Gap Analysis",
+          "path": "/insight-hunting/gap-analysis/",
+          "similarity": 12
+        }
+      ]
+    }
+  },
+  {
+    "id": "table-candidates",
+    "path": "/insight-hunting/table-candidates/",
+    "filePath": "insight-hunting/table-candidates.mdx",
+    "title": "Table Candidates",
+    "quality": null,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Internal documentation page explaining a tool for finding interesting data patterns in structured tables by flagging paradoxical rating combinations (e.g., safety approaches that advance capabilities, severe risks that are hard to detect). Provides criteria and examples for how the tool identifies potential insight-worthy content.",
+    "description": "Table rows with insight-worthy rating combinations",
+    "ratings": {
+      "novelty": 0,
+      "rigor": 0,
+      "actionability": 0,
+      "completeness": 0
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 47,
+      "tableCount": 2,
+      "diagramCount": 0,
+      "internalLinks": 3,
+      "externalLinks": 0,
+      "bulletRatio": 0.14,
+      "sectionCount": 5,
+      "hasOverview": false,
+      "structuralScore": 5
+    },
+    "suggestedQuality": 33,
+    "updateFrequency": null,
+    "wordCount": 47,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
+    "id": "graph",
+    "path": "/dashboard/graph/",
+    "filePath": "dashboard/graph.mdx",
+    "title": "Entity Relationship Graph",
+    "quality": 18,
+    "importance": 5,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Interactive network visualization tool showing entity relationships in the knowledge base, with basic graph analysis (cluster detection, connection counts, orphan identification). Purely infrastructure for navigation - no substantive content on AI safety.",
+    "description": "Interactive visualization of entity connections in the knowledge base",
+    "ratings": {
+      "novelty": 1,
+      "rigor": 2,
+      "actionability": 2,
+      "completeness": 4
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 223,
+      "tableCount": 1,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0.19,
+      "sectionCount": 6,
+      "hasOverview": false,
+      "structuralScore": 3
+    },
+    "suggestedQuality": 20,
+    "updateFrequency": null,
+    "wordCount": 223,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
+    "id": "changelog",
+    "path": "/project/changelog/",
+    "filePath": "project/changelog.mdx",
+    "title": "Changelog",
+    "quality": 32,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Documents LongtermWiki's versioning system using Changesets and Semantic Versioning, with only one release (v0.0.1) listed. Provides technical infrastructure details but no substantive content related to AI safety prioritization.",
+    "description": "Release history and changes for LongtermWiki",
+    "ratings": {
+      "focus": 8,
+      "novelty": 0,
+      "rigor": 2,
+      "completeness": 4,
+      "concreteness": 7,
+      "actionability": 0
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 138,
+      "tableCount": 0,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 3,
+      "bulletRatio": 0.5,
+      "sectionCount": 4,
+      "hasOverview": false,
+      "structuralScore": 2
+    },
+    "suggestedQuality": 13,
+    "updateFrequency": null,
+    "wordCount": 138,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 0,
+      "similarPages": []
+    }
+  },
+  {
+    "id": "critical-insights",
+    "path": "/project/critical-insights/",
+    "filePath": "project/critical-insights.mdx",
+    "title": "Critical Insights",
+    "quality": 56,
+    "importance": 22,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2026-01-28",
+    "llmSummary": "Proposes a framework for evaluating knowledge contributions as 'critical insights' based on three criteria: surprising (updates informed beliefs), important (affects high-stakes decisions), and compact (transmissible in brief form). Draws on information theory (surprisal = -log₂(p)), decision theory (value of information), and research debt concepts to justify prioritizing novel, decision-relevant, and concise claims.",
+    "description": "Framework for identifying high-value knowledge contributions: surprising, important, and compact",
+    "ratings": {
+      "focus": 8.5,
+      "novelty": 3,
+      "rigor": 5.5,
+      "completeness": 7,
+      "concreteness": 6,
+      "actionability": 4.5
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 1224,
+      "tableCount": 4,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 18,
+      "bulletRatio": 0.24,
+      "sectionCount": 21,
+      "hasOverview": false,
+      "structuralScore": 10
+    },
+    "suggestedQuality": 67,
+    "updateFrequency": 45,
+    "wordCount": 1224,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 10,
+      "similarPages": [
+        {
+          "id": "strategy-brainstorm",
+          "title": "LongtermWiki Strategy Brainstorm",
+          "path": "/project/strategy-brainstorm/",
+          "similarity": 10
+        }
+      ]
+    }
+  },
+  {
+    "id": "similar-projects",
+    "path": "/project/similar-projects/",
+    "filePath": "project/similar-projects.mdx",
+    "title": "Similar Projects to LongtermWiki: Research Report",
+    "quality": 64,
+    "importance": 15,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": "2025-01-13",
+    "llmSummary": "Analysis of 12+ AI safety knowledge projects finds successful ones have narrow focus, paid contributors, and single editorial ownership (e.g., Stampy's $2,500/mo fellowship, EA Forum Wiki grant), while failures stemmed from scope creep and volunteer dependency (Arbital discontinued 2017). Key recommendation: start with 10-20 deep pages, appoint single owner, budget for paid content creation rather than relying on volunteers.",
+    "description": "Analysis of 12+ AI safety knowledge bases, wikis, and prioritization tools. Key finding: projects succeed through narrow focus and clear ownership, fail through scope creep and volunteer dependency.",
+    "ratings": {
+      "focus": 8.5,
+      "novelty": 4,
+      "rigor": 6.5,
+      "completeness": 7.5,
+      "concreteness": 7,
+      "actionability": 6
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 2129,
+      "tableCount": 7,
+      "diagramCount": 0,
+      "internalLinks": 0,
+      "externalLinks": 26,
+      "bulletRatio": 0.38,
+      "sectionCount": 35,
+      "hasOverview": false,
+      "structuralScore": 9
+    },
+    "suggestedQuality": 60,
+    "updateFrequency": null,
+    "wordCount": 2129,
+    "unconvertedLinks": [
+      {
+        "text": "BlueDot Impact",
+        "url": "https://bluedot.org/",
+        "resourceId": "a2101cb75434037d",
+        "resourceTitle": "BlueDot Impact"
+      },
+      {
+        "text": "Risks from power-seeking AI systems",
+        "url": "https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/",
+        "resourceId": "d9fb00b6393b6112",
+        "resourceTitle": "80,000 Hours. \"Risks from Power-Seeking AI Systems\""
+      },
+      {
+        "text": "AI Alignment: A Comprehensive Survey",
+        "url": "https://arxiv.org/abs/2310.19852",
+        "resourceId": "f612547dcfb62f8d",
+        "resourceTitle": "AI Alignment: A Comprehensive Survey"
+      },
+      {
+        "text": "safe.ai",
+        "url": "https://safe.ai/",
+        "resourceId": "a306e0b63bdedbd5",
+        "resourceTitle": "CAIS Surveys"
+      },
+      {
+        "text": "Epoch AI",
+        "url": "https://epoch.ai/",
+        "resourceId": "c660a684a423d4ac",
+        "resourceTitle": "Epoch AI"
+      },
+      {
+        "text": "Center for AI Safety",
+        "url": "https://safe.ai/",
+        "resourceId": "a306e0b63bdedbd5",
+        "resourceTitle": "CAIS Surveys"
+      },
+      {
+        "text": "BlueDot Impact",
+        "url": "https://bluedot.org/",
+        "resourceId": "a2101cb75434037d",
+        "resourceTitle": "BlueDot Impact"
+      },
+      {
+        "text": "80,000 Hours",
+        "url": "https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/",
+        "resourceId": "d9fb00b6393b6112",
+        "resourceTitle": "80,000 Hours. \"Risks from Power-Seeking AI Systems\""
+      },
+      {
+        "text": "Stampy's AI Safety Info",
+        "url": "https://aisafety.info/",
+        "resourceId": "876bb3bfc6031642",
+        "resourceTitle": "AI Safety Community"
+      },
+      {
+        "text": "AI Alignment: A Comprehensive Survey",
+        "url": "https://arxiv.org/abs/2310.19852",
+        "resourceId": "f612547dcfb62f8d",
+        "resourceTitle": "AI Alignment: A Comprehensive Survey"
+      }
+    ],
+    "unconvertedLinkCount": 10,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 14,
+      "similarPages": [
+        {
+          "id": "field-building-analysis",
+          "title": "Field Building Analysis",
+          "path": "/knowledge-base/responses/field-building-analysis/",
+          "similarity": 14
+        },
+        {
+          "id": "longterm-strategy",
+          "title": "LongtermWiki Strategy Brainstorm",
+          "path": "/internal/longterm-strategy/",
+          "similarity": 14
+        },
+        {
+          "id": "longtermwiki-value-proposition",
+          "title": "LongtermWiki Value Proposition",
+          "path": "/internal/longtermwiki-value-proposition/",
+          "similarity": 14
+        },
+        {
+          "id": "vision",
+          "title": "LongtermWiki Vision Document",
+          "path": "/project/vision/",
+          "similarity": 14
+        },
+        {
+          "id": "apollo-research",
+          "title": "Apollo Research",
+          "path": "/knowledge-base/organizations/apollo-research/",
+          "similarity": 13
+        }
+      ]
+    }
+  },
+  {
+    "id": "strategy-brainstorm",
+    "path": "/project/strategy-brainstorm/",
+    "filePath": "project/strategy-brainstorm.mdx",
+    "title": "LongtermWiki Strategy Brainstorm",
+    "quality": 48,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Internal strategy document exploring LongtermWiki's purpose through 5 failure modes (commodity wiki, shallow insights, no users, maintenance hell, too weird), 5 success definitions (changes decisions, improves understanding, structures discourse, surfaces disagreements, generates insights), and 5 strategic options (narrow & deep, broad & shallow, opinionated synthesis, crux laboratory, living assessment). Proposes 4 validation tests (user interviews, crux prototype, quality test, insight generation) to resolve key uncertainties before full build.",
+    "description": "Working document exploring failure modes, definitions of success, and strategic options for LongtermWiki",
+    "ratings": {
+      "focus": 8.5,
+      "novelty": 2,
+      "rigor": 4,
+      "completeness": 7.5,
+      "concreteness": 6,
+      "actionability": 5
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 2068,
+      "tableCount": 7,
+      "diagramCount": 1,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0.4,
+      "sectionCount": 32,
+      "hasOverview": false,
+      "structuralScore": 7
+    },
+    "suggestedQuality": 47,
+    "updateFrequency": null,
+    "wordCount": 2068,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 80,
+      "similarPages": [
+        {
+          "id": "longterm-strategy",
+          "title": "LongtermWiki Strategy Brainstorm",
+          "path": "/internal/longterm-strategy/",
+          "similarity": 80
+        },
+        {
+          "id": "longtermwiki-value-proposition",
+          "title": "LongtermWiki Value Proposition",
+          "path": "/internal/longtermwiki-value-proposition/",
+          "similarity": 14
+        },
+        {
+          "id": "vision",
+          "title": "LongtermWiki Vision Document",
+          "path": "/project/vision/",
+          "similarity": 14
+        },
+        {
+          "id": "longterm-vision",
+          "title": "LongtermWiki Vision",
+          "path": "/internal/longterm-vision/",
+          "similarity": 13
+        },
+        {
+          "id": "similar-projects",
+          "title": "Similar Projects to LongtermWiki: Research Report",
+          "path": "/project/similar-projects/",
+          "similarity": 13
+        }
+      ]
+    }
+  },
+  {
+    "id": "vision",
+    "path": "/project/vision/",
+    "filePath": "project/vision.mdx",
+    "title": "LongtermWiki Vision Document",
+    "quality": 51,
+    "importance": null,
+    "tractability": null,
+    "neglectedness": null,
+    "uncertainty": null,
+    "causalLevel": null,
+    "lastUpdated": null,
+    "llmSummary": "Internal planning document outlining a 2-person-year (3-4 people over 6-8 months) scope for building LongtermWiki as a strategic AI safety prioritization platform, with ~170 planned pages across four content layers, 30-50 crux mappings, and 4-6 worldview archetypes. Success targets include 80%+ crux coverage, 10+ annual strategy document citations, and 5+ senior researcher endorsements.",
+    "description": "2-person-year scope for LongtermWiki: architecture, components, milestones, and success metrics",
+    "ratings": {
+      "focus": 9.5,
+      "novelty": 2,
+      "rigor": 4,
+      "completeness": 8.5,
+      "concreteness": 7,
+      "actionability": 3
+    },
+    "category": "other",
+    "subcategory": null,
+    "clusters": [
+      "ai-safety"
+    ],
+    "metrics": {
+      "wordCount": 1192,
+      "tableCount": 5,
+      "diagramCount": 5,
+      "internalLinks": 0,
+      "externalLinks": 0,
+      "bulletRatio": 0.24,
+      "sectionCount": 27,
+      "hasOverview": false,
+      "structuralScore": 9
+    },
+    "suggestedQuality": 60,
+    "updateFrequency": null,
+    "wordCount": 1192,
+    "unconvertedLinks": [],
+    "unconvertedLinkCount": 0,
+    "convertedLinkCount": 0,
+    "backlinkCount": 0,
+    "redundancy": {
+      "maxSimilarity": 63,
+      "similarPages": [
+        {
+          "id": "longterm-vision",
+          "title": "LongtermWiki Vision",
+          "path": "/internal/longterm-vision/",
+          "similarity": 63
+        },
+        {
+          "id": "longterm-wiki",
+          "title": "Longterm Wiki",
+          "path": "/knowledge-base/responses/longterm-wiki/",
+          "similarity": 18
+        },
+        {
+          "id": "longterm-strategy",
+          "title": "LongtermWiki Strategy Brainstorm",
+          "path": "/internal/longterm-strategy/",
+          "similarity": 14
+        },
+        {
+          "id": "similar-projects",
+          "title": "Similar Projects to LongtermWiki: Research Report",
+          "path": "/project/similar-projects/",
+          "similarity": 14
+        },
+        {
+          "id": "strategy-brainstorm",
+          "title": "LongtermWiki Strategy Brainstorm",
+          "path": "/project/strategy-brainstorm/",
+          "similarity": 14
+        }
+      ]
     }
   }
 ]
