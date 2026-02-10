@@ -1,5 +1,5 @@
 {
-  "totalEntities": 632,
+  "totalEntities": 631,
   "byType": {
     "ai-transition-model-subitem": 57,
     "ai-transition-model-factor": 7,
@@ -20,7 +20,7 @@
     "lab-research": 9,
     "researcher": 43,
     "policy": 37,
-    "approach": 66,
+    "approach": 65,
     "safety-agenda": 8,
     "risk": 57,
     "event": 1,
@@ -36,7 +36,7 @@
     "Catastrophic": 1
   },
   "byStatus": {
-    "unknown": 606,
+    "unknown": 605,
     "stub": 26
   },
   "recentlyUpdated": [
@@ -246,6 +246,6 @@
     }
   ],
   "totalTags": 925,
-  "withDescription": 550,
-  "lastBuilt": "2026-02-09T23:51:24.677Z"
+  "withDescription": 549,
+  "lastBuilt": "2026-02-09T23:35:41.309Z"
 }
