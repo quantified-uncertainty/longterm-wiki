@@ -18,6 +18,7 @@
  *   resources   External resource management
  *   insights    Insight quality management
  *   gaps        Insight gap analysis
+ *   updates     Schedule-aware page update system
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -43,6 +44,7 @@ import * as generateCommands from './commands/generate.mjs';
 import * as resourcesCommands from './commands/resources.mjs';
 import * as insightsCommands from './commands/insights.mjs';
 import * as gapsCommands from './commands/gaps.mjs';
+import * as updatesCommands from './commands/updates.mjs';
 
 const domains = {
   validate: validateCommands,
@@ -53,6 +55,7 @@ const domains = {
   resources: resourcesCommands,
   insights: insightsCommands,
   gaps: gapsCommands,
+  updates: updatesCommands,
 };
 
 /**
@@ -116,6 +119,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   resources   External resource management
   insights    Insight quality management
   gaps        Insight gap analysis
+  updates     Schedule-aware page update system
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
