@@ -53,4 +53,4 @@ jobs:
 
       - name: Run validation suite
         run: |
-          node tooling/crux.mjs validate || echo "::warning::Validation has pre-existing failures (non-blocking)"
+          node crux/crux.mjs validate || echo "::warning::Validation has pre-existing failures (non-blocking)"

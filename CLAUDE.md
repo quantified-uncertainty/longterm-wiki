@@ -34,7 +34,7 @@ longterm-wiki/
 │   ├── src/                    # App source code
 │   ├── scripts/                # Build scripts (build-data.mjs)
 │   └── package.json            # App dependencies
-├── tooling/                    # Crux CLI + validation (see tooling/README.md)
+├── crux/                       # Crux CLI + validation (see crux/README.md)
 │   ├── crux.mjs                # CLI entry point
 │   ├── commands/               # CLI domain handlers
 │   ├── authoring/              # Page authoring scripts (create, improve, grade)
@@ -57,4 +57,4 @@ longterm-wiki/
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
 - **Squiggle models**: See `app/CLAUDE.md` for SquiggleEstimate style guide
-- **Page templates**: Defined in `tooling/lib/page-templates.mjs`, style guides in `content/docs/internal/`
+- **Page templates**: Defined in `crux/lib/page-templates.mjs`, style guides in `content/docs/internal/`

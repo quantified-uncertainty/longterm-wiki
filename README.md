@@ -22,7 +22,7 @@ longterm-wiki/
 │   ├── src/               # React components, data layer, pages
 │   ├── scripts/           # Build scripts (build-data.mjs)
 │   └── public/            # Static assets + LLM files
-└── tooling/               # Crux CLI — validation, analysis, content tools
+└── crux/                  # Crux CLI — validation, analysis, content tools
     ├── crux.mjs           # CLI entry point
     ├── commands/          # 8 command domains
     ├── lib/               # Shared utilities + 34 validation rules
@@ -47,30 +47,30 @@ The `crux` CLI provides validation, analysis, content management, and more.
 
 ```bash
 # Validation
-node tooling/crux.mjs validate                  # Run all 28 validators
-node tooling/crux.mjs validate unified --fix    # Auto-fix with 34 rule engine
+node crux/crux.mjs validate                  # Run all 28 validators
+node crux/crux.mjs validate unified --fix    # Auto-fix with 34 rule engine
 
 # Content
-node tooling/crux.mjs content create "topic"    # Create a new wiki page
-node tooling/crux.mjs content improve <page>    # AI-assisted page improvement
-node tooling/crux.mjs content regrade           # Re-grade quality ratings
+node crux/crux.mjs content create "topic"    # Create a new wiki page
+node crux/crux.mjs content improve <page>    # AI-assisted page improvement
+node crux/crux.mjs content regrade           # Re-grade quality ratings
 
 # Analysis
-node tooling/crux.mjs analyze                   # Full health report
-node tooling/crux.mjs gaps list                 # Find pages needing more content
-node tooling/crux.mjs insights check            # Insight quality checks
+node crux/crux.mjs analyze                   # Full health report
+node crux/crux.mjs gaps list                 # Find pages needing more content
+node crux/crux.mjs insights check            # Insight quality checks
 
 # Auto-fixes
-node tooling/crux.mjs fix entity-links          # Convert markdown links to EntityLink
-node tooling/crux.mjs fix markdown              # Fix markdown formatting
-node tooling/crux.mjs fix escaping              # Fix LaTeX/JSX escaping issues
+node crux/crux.mjs fix entity-links          # Convert markdown links to EntityLink
+node crux/crux.mjs fix markdown              # Fix markdown formatting
+node crux/crux.mjs fix escaping              # Fix LaTeX/JSX escaping issues
 
 # Resources
-node tooling/crux.mjs resources list            # Pages with unconverted links
-node tooling/crux.mjs resources process <file>  # Convert links to <R> components
+node crux/crux.mjs resources list            # Pages with unconverted links
+node crux/crux.mjs resources process <file>  # Convert links to <R> components
 ```
 
-Run `node tooling/crux.mjs --help` for the full command list.
+Run `node crux/crux.mjs --help` for the full command list.
 
 ## Data Flow
 

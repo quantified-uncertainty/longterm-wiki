@@ -6,7 +6,7 @@
 
 ## Problem
 
-The 34 validation rules in `tooling/lib/rules/` have significant code duplication, no test coverage, and a few minor bugs. The validation engine works well but could be more maintainable.
+The 34 validation rules in `crux/lib/rules/` have significant code duplication, no test coverage, and a few minor bugs. The validation engine works well but could be more maintainable.
 
 ## Proposed improvements
 
@@ -26,7 +26,7 @@ for (let i = 0; i < lines.length; i++) {
 }
 ```
 
-**Fix:** Extract to a utility function in `tooling/lib/mdx-utils.mjs`:
+**Fix:** Extract to a utility function in `crux/lib/mdx-utils.mjs`:
 ```js
 export function matchLinesOutsideCode(body, regex, callback) { ... }
 ```
@@ -41,7 +41,7 @@ Three rules (`dollar-signs.mjs`, `comparison-operators.mjs`, `tilde-dollar.mjs`)
 
 ### C. Remove unused singleton export (~5 min)
 
-`tooling/lib/validation-engine.mjs:473` exports a pre-instantiated `engine = new ValidationEngine()` singleton that nothing imports. Every script creates its own instance.
+`crux/lib/validation-engine.mjs:473` exports a pre-instantiated `engine = new ValidationEngine()` singleton that nothing imports. Every script creates its own instance.
 
 **Fix:** Remove the unused export.
 
@@ -53,15 +53,15 @@ The pattern "skip validation for stub or internal documentation pages" is reimpl
 
 ### E. DRY up color output in auto-fix.mjs (~10 min)
 
-`tooling/auto-fix.mjs` defines ANSI colors inline instead of using the shared `getColors()` from `tooling/lib/output.mjs`.
+`crux/auto-fix.mjs` defines ANSI colors inline instead of using the shared `getColors()` from `crux/lib/output.mjs`.
 
 **Fix:** Import and use the shared utility.
 
 ### F. Consolidate duplicate content-types path constants (~15 min)
 
-Both `tooling/lib/content-types.mjs` and `app/scripts/lib/content-types.mjs` maintain parallel constant definitions.
+Both `crux/lib/content-types.mjs` and `app/scripts/lib/content-types.mjs` maintain parallel constant definitions.
 
-**Fix:** Have `app/scripts/lib/content-types.mjs` import from `tooling/lib/content-types.mjs` (or a shared location).
+**Fix:** Have `app/scripts/lib/content-types.mjs` import from `crux/lib/content-types.mjs` (or a shared location).
 
 ### G. Add test coverage for validation rules (longer-term, ~60+ min)
 
@@ -77,6 +77,6 @@ Both `tooling/lib/content-types.mjs` and `app/scripts/lib/content-types.mjs` mai
 
 ## Verification
 
-1. `node tooling/crux.mjs validate` produces same results before and after refactoring
+1. `node crux/crux.mjs validate` produces same results before and after refactoring
 2. Any new tests pass
 3. No regressions in validation output
