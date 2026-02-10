@@ -128,9 +128,19 @@ export const DATA_DIR = 'data';
 export const CONTENT_DIR_ABS = join(PROJECT_ROOT, CONTENT_DIR);
 
 /**
- * Absolute path to data directory
+ * Absolute path to data directory (YAML sources)
  */
 export const DATA_DIR_ABS = join(PROJECT_ROOT, DATA_DIR);
+
+/**
+ * Generated data directory (JSON build artifacts: database.json, pages.json, etc.)
+ */
+export const GENERATED_DATA_DIR = 'app/src/data';
+
+/**
+ * Absolute path to generated data directory
+ */
+export const GENERATED_DATA_DIR_ABS = join(PROJECT_ROOT, GENERATED_DATA_DIR);
 
 /**
  * Build-breaking validation rules (must all pass before deployment)

@@ -6,6 +6,12 @@ tsconfig.tsbuildinfo
 
 # Generated data (rebuilt by prebuild script)
 src/data/database.json
+src/data/search-index.json
+src/data/search-docs.json
+
+# Search index served at runtime (copied from src/data by prebuild)
+public/search-index.json
+public/search-docs.json
 
 # Vercel
 .vercel

@@ -8,13 +8,13 @@
  * Usage: node scripts/build-data.mjs
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
+import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
 import { spawnSync } from 'child_process';
 import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
 import { extractMetrics, suggestQuality, getQualityDiscrepancy } from './lib/metrics-extractor.mjs';
 import { computeRedundancy } from './lib/redundancy.mjs';
-import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR } from './lib/content-types.mjs';
+import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
 import { buildUrlToResourceMap, findUnconvertedLinks, countConvertedLinks } from './lib/unconverted-links.mjs';
 import { generateMdxFromYaml } from './lib/mdx-generator.mjs';
@@ -22,6 +22,7 @@ import { computeStats } from './lib/statistics.mjs';
 import { parseNumericValue, resolveComputedFacts } from './lib/computed-facts.mjs';
 import { transformEntities } from './lib/entity-transform.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
+import { buildSearchIndex } from './lib/search.mjs';
 
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
 
@@ -552,6 +553,27 @@ function main() {
   if (!existsSync(OUTPUT_DIR)) {
     mkdirSync(OUTPUT_DIR, { recursive: true });
   }
+
+  // ==========================================================================
+  // SEARCH INDEX — build MiniSearch index for client-side search
+  // ==========================================================================
+  console.log('\nBuilding search index...');
+  const { index: searchIndex, docs: searchDocs } = buildSearchIndex(
+    typedEntities,
+    pages,
+    idRegistryOutput
+  );
+  const searchIndexPath = join(OUTPUT_DIR, 'search-index.json');
+  const searchDocsPath = join(OUTPUT_DIR, 'search-docs.json');
+  writeFileSync(searchIndexPath, JSON.stringify(searchIndex));
+  writeFileSync(searchDocsPath, JSON.stringify(searchDocs));
+
+  // Copy search files to public/ so they're fetchable at runtime
+  const publicDir = join(PROJECT_ROOT, 'public');
+  if (!existsSync(publicDir)) mkdirSync(publicDir, { recursive: true });
+  copyFileSync(searchIndexPath, join(publicDir, 'search-index.json'));
+  copyFileSync(searchDocsPath, join(publicDir, 'search-docs.json'));
+  console.log(`  searchIndex: ${searchDocs.length} documents indexed`);
 
   // Write combined JSON (strip raw entities — only typedEntities needed at runtime)
   const { entities: _rawEntities, ...databaseForOutput } = database;
