@@ -28,7 +28,7 @@ subcategory: field-building
 ---
 import {DataInfoBox, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="corporate-influence" client:load />
+<DataExternalLinks pageId="corporate-influence" />
 
 <DataInfoBox entityId="corporate-influence" />
 
@@ -93,7 +93,7 @@ Evidence for insider influence comes from several documented cases. Safety teams
 
 #### Corporate Influence Pathways
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Internal["Internal Influence"]
         SAFETY[Safety Team] --> DEPLOY[Deployment Decisions]

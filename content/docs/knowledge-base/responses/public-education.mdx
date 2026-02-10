@@ -25,7 +25,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="public-education" client:load />
+<DataExternalLinks pageId="public-education" />
 
 ## Quick Assessment
 
@@ -56,7 +56,7 @@ Research shows severe knowledge gaps in AI understanding among key stakeholders.
 
 The urgency of public education has intensified as AI adoption accelerates. According to [Stanford HAI's 2025 AI Index](https://hai.stanford.edu/ai-index/2025-ai-index-report), U.S. federal agencies introduced 59 AI-related regulations in 2024—more than double the 2023 count—yet [62% of Americans believe the government is not doing enough to regulate AI](https://www.pewresearch.org/internet/2025/04/03/views-of-risks-opportunities-and-regulation-of-ai/). This regulatory activity occurs amid declining public confidence: the share of Americans viewing AI's societal effects as negative rose from 34% in December 2024 to 47% by June 2025 ([YouGov 2025](https://today.yougov.com/politics/articles/52615-americans-increasingly-likely-say-ai-artificial-intelligence-negatively-affect-society-poll)).
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph CHALLENGE["Public Understanding Challenge"]
         GAP[Knowledge Gap<br/>67% limited understanding]

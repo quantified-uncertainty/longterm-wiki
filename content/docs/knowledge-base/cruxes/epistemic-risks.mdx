@@ -32,7 +32,7 @@ import {Crux, CruxList, DataExternalLinks, Mermaid, EntityLink} from '@component
 | <EntityLink id="lesswrong">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/WLQspe83ZkiwBc2SR/double-crux) |
 | EA Forum | [forum.effectivealtruism.org](https://forum.effectivealtruism.org/posts/bbtvDJtb6YwwWtJm7/epistemic-status-an-explainer-and-some-thoughts) |
 
-<DataExternalLinks pageId="epistemic-risks" client:load />
+<DataExternalLinks pageId="epistemic-risks" />
 
 ## Risk Assessment
 
@@ -52,7 +52,7 @@ Sources: [Edelman Trust Barometer 2024](https://www.edelman.com/trust/2024/trust
 
 Epistemic risks from AI operate through multiple interconnected pathways. Synthetic content generation overwhelms verification capacity, eroding the baseline assumption that evidence corresponds to reality. This creates a "liar's dividend" where even authentic content can be dismissed as potentially fake. Simultaneously, AI assistance can atrophy human evaluative skills, reducing capacity for independent verification when it matters most.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph generation["Content Generation"]
         A[Advanced GenAI Models] --> B[Synthetic Text, Audio, Video]

@@ -53,7 +53,7 @@ The model evaluates four scenarios for how this race might unfold: detection fai
 | | — | Lack access to latest generators |
 | | — | False positive/negative tradeoff |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     GEN[Generation Advantages] --> ASYM[Asymmetric Advantage]
     DET[Detection Challenges] --> ASYM
@@ -70,7 +70,7 @@ This structural asymmetry—where generators hold persistent advantages over det
 
 ### Asymmetric Optimization
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph GeneratorTraining["Generator Training Loop"]
         GT1["Generate Content"] --> GT2["Test Against Detector"]
@@ -172,7 +172,7 @@ Where:
 
 ### Capability Projections
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Timeline["Detection Success Rate Trajectory"]
         Y2020["2020: DSR = 75%<br/>Detection viable"]
@@ -219,7 +219,7 @@ flowchart TD
 
 ### Provenance System Analysis
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Creation["Content Creation"]
         C1["Camera/Device Captures Content"]
@@ -429,4 +429,4 @@ This model has significant limitations that affect confidence in its projections
 
 ## Related Pages
 
-<Backlinks client:load entityId="disinformation-detection-race" />
+<Backlinks entityId="disinformation-detection-race" />

@@ -21,7 +21,7 @@ clusters: ["ai-safety", "epistemics", "governance"]
 ---
 import {DataInfoBox, DisagreementMap, KeyQuestions, Backlinks, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="expert-opinion" client:load />
+<DataExternalLinks pageId="expert-opinion" />
 
 ## Quick Assessment
 
@@ -90,7 +90,7 @@ The implications of this disagreement are profound for both research and policy.
 
 ## Timeline Compression and Forecasting Accuracy
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph INPUTS["Inputs to Expert Opinion"]
         CAPS[Capability Demonstrations<br/>e.g., ChatGPT, GPT-4, o1]

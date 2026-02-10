@@ -24,7 +24,7 @@ subcategory: alignment-policy
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks, DataInfoBox} from '@components/wiki';
 
-<DataExternalLinks pageId="evals-governance" client:load />
+<DataExternalLinks pageId="evals-governance" />
 
 ## Quick Assessment
 
@@ -93,7 +93,7 @@ The landscape of <EntityLink id="evaluation">AI evaluation</EntityLink> governan
 
 Evaluation gates create checkpoints in the AI development and deployment pipeline:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Model Development] --> B[Pre-Deployment Evaluation]
 
@@ -237,7 +237,7 @@ The [UK AISI Frontier AI Trends Report](https://www.aisi.gov.uk/frontier-ai-tren
 
 ### Evaluation Governance Ecosystem
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Regulators["Regulatory Bodies"]
         EUAI[EU AI Office]
@@ -379,7 +379,7 @@ Evaluation gates create incentives to game rather than genuinely satisfy:
 
 ### Gate Implementation
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Model Ready for Evaluation] --> B[Internal Evaluation]
     B --> C[Third-Party Evaluation]

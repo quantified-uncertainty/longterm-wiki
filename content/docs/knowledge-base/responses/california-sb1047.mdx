@@ -24,7 +24,7 @@ subcategory: governance-legislation
 ---
 import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="california-sb1047" client:load />
+<DataExternalLinks pageId="california-sb1047" />
 
 <DataInfoBox entityId="california-sb1047" />
 
@@ -97,7 +97,7 @@ The bill would have applied to AI models meeting **any** of these criteria:
 
 The following diagram illustrates how SB 1047 would have regulated frontier AI development, from initial determination through deployment and enforcement:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[AI Developer Plans Model Training] --> B{Will model meet<br/>covered thresholds?}
     B -->|Yes:<br/>>10^26 FLOP OR<br/>>\$100M cost| C[Covered Model Path]

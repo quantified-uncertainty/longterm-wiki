@@ -22,7 +22,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="heavy-scaffolding" client:load />
+<DataExternalLinks pageId="heavy-scaffolding" />
 
 ## Quick Assessment
 
@@ -59,7 +59,7 @@ This paradigm has an estimated **25-40% probability** of being dominant at trans
 
 The following diagram illustrates the common architectural patterns found in modern agentic systems, showing how different components interact across the planning, execution, and feedback loops:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph input["User Input"]
         task["Task/Goal"]
@@ -117,7 +117,7 @@ flowchart TD
 
 ## Conceptual Architecture
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph scaffold["Scaffold Layer (Readable Code)"]
         orchestrator["Orchestrator"]

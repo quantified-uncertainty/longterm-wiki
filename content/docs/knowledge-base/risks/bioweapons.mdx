@@ -28,7 +28,7 @@ subcategory: misuse
 ---
 import {DataInfoBox, Backlinks, ModelsList, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="bioweapons" client:load />
+<DataExternalLinks pageId="bioweapons" />
 
 <DataInfoBox entityId="bioweapons" />
 
@@ -147,7 +147,7 @@ The argument is that we should prepare for future capabilities, not just current
 
 AI alone may provide limited uplift, but the combination of multiple technologies could be transformative:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     LLM[Large Language Models] --> COMBO[Compound Capability]
     PROTEIN[Protein Design AI] --> COMBO
@@ -610,7 +610,7 @@ AI could assist at multiple stages of bioweapon development:
 
 A successful biological attack requires success across multiple stages, each with independent failure modes:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Motivation] --> B[AI/Information Access]
     B --> C[Knowledge Uplift]
@@ -1209,7 +1209,7 @@ The debate often reduces to different assessments of:
 
 ## Analytical Models
 
-<ModelsList client:load entityId="bioweapons" />
+<ModelsList entityId="bioweapons" />
 
 ---
 
@@ -1228,4 +1228,4 @@ The bioweapons pathway can lead to <EntityLink id="human-catastrophe" />—catas
 
 ## Related Pages
 
-<Backlinks client:load entityId="bioweapons" />
+<Backlinks entityId="bioweapons" />

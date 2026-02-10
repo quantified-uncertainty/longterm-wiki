@@ -28,7 +28,7 @@ subcategory: field-building
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="field-building-analysis" client:load />
+<DataExternalLinks pageId="field-building-analysis" />
 
 <DataInfoBox entityId="field-building" />
 
@@ -54,7 +54,7 @@ The field has grown substantially: from approximately 400 full-time equivalents 
 
 ## Theory of Change
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     FB[Field-Building Programs] --> TP[Talent Pipeline]
     FB --> KD[Knowledge Dissemination]
@@ -618,7 +618,6 @@ Field-building enables and amplifies:
 ## Open Questions
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "Is AI safety talent-constrained or idea-constrained?",

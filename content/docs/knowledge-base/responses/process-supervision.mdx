@@ -23,7 +23,7 @@ subcategory: alignment-training
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="process-supervision" client:load />
+<DataExternalLinks pageId="process-supervision" />
 
 ## Quick Assessment
 
@@ -45,7 +45,7 @@ However, process supervision shares a fundamental limitation with <EntityLink id
 
 ## How It Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Pipeline"]
         A[Problem] --> B[Model generates solution steps]

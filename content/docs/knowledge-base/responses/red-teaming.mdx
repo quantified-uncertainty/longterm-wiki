@@ -24,7 +24,7 @@ subcategory: alignment-evaluation
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="red-teaming" client:load />
+<DataExternalLinks pageId="red-teaming" />
 
 ## Overview
 
@@ -45,7 +45,7 @@ Red teaming serves as both a capability evaluation tool and a safety measure, he
 
 ## How It Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Discovery["Discovery Phase"]
         A[Define Threat Model] --> B[Assemble Red Team]

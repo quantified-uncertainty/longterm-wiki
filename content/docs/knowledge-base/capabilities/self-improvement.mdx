@@ -21,7 +21,7 @@ clusters: ["ai-safety"]
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="self-improvement" client:load />
+<DataExternalLinks pageId="self-improvement" />
 
 <DataInfoBox entityId="self-improvement" />
 
@@ -92,7 +92,7 @@ The stakes are existential because self-improvement could enable AI systems to r
 
 Today's AI systems exhibit multiple forms of self-improvement within human-defined boundaries. Automated machine learning (AutoML) represents the most mature category, with systems like Google's AutoML-Zero evolving machine learning algorithms from scratch and achieving 90-95% of human-designed architecture performance. Neural architecture search (NAS) has produced models like EfficientNet that outperform manually designed networks by 2-5% on ImageNet while requiring 5-10x less computational overhead. The AutoML market reached approximately \$1.5B in 2024 with projected 25-30% annual growth through 2030.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph Constrained["Constrained Self-Improvement (Current)"]
         A1[AutoML/NAS] --> A2[Fixed search space]
@@ -143,7 +143,7 @@ Perhaps most significantly, current large language models like GPT-4 already par
 
 The intelligence explosion scenario represents the most extreme form of self-improvement, where AI systems become capable of rapidly and autonomously designing significantly more capable successors. This hypothesis, formalized by I.J. Good in 1965 and popularized by researchers like <R id="02dc187c15139435">Nick Bostrom</R> and Eliezer Yudkowsky, posits that once AI systems become sufficiently capable at AI research, they could trigger a recursive cycle of improvement that accelerates exponentially.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Current AI System] --> B[Improves Own Code/Architecture]
     B --> C[Enhanced AI System]
@@ -265,7 +265,7 @@ This research used data from OpenAI, DeepMind, Anthropic, and DeepSeek (2014-202
 
 The following diagram illustrates the progression of AI self-improvement capabilities from current systems to potential intelligence explosion scenarios, with key decision points and constraints:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Current["Current State (2024-2025)"]
         A1[AutoML/NAS] --> A2[Code Generation]
@@ -445,4 +445,4 @@ Self-improvement represents the potential nexus where current AI development tra
 - **Stanford AI Index**, <R id="3e547d6c6511a822">AI Index Report 2024</R> - Comprehensive AI capability tracking
 - **Leopold Aschenbrenner**, <R id="1befe71d79c4d102">Situational Awareness</R> - Detailed projection of AI-driven intelligence explosion by 2027-2030
 
-<Backlinks client:load entityId="self-improvement" />
+<Backlinks entityId="self-improvement" />

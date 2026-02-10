@@ -21,7 +21,7 @@ clusters: ["ai-safety"]
 ---
 import {DataInfoBox, Backlinks, R, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="alignment-progress" client:load />
+<DataExternalLinks pageId="alignment-progress" />
 
 <DataInfoBox>
 
@@ -96,7 +96,7 @@ The following table compares progress across major alignment research agendas, b
 
 ### Progress Visualization
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph TRAINING["Training-Time Safety"]
         RLHF[RLHF/RLAIF<br/>Progress: 6/10]
@@ -577,7 +577,7 @@ The following table synthesizes key metrics across all alignment dimensions, pro
 
 ### Progress by Research Agenda
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 pie title 2025 Progress Distribution by Agenda
     "Near Target (>70%)" : 2
     "Moderate Progress (40-70%)" : 3

@@ -24,7 +24,7 @@ subcategory: alignment-policy
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="pause-moratorium" client:load />
+<DataExternalLinks pageId="pause-moratorium" />
 
 ## Overview
 
@@ -49,7 +49,7 @@ The fundamental logic behind pause proposals is straightforward: if AI developme
 
 ### Case for Pausing
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     SPEED[AI Development Speed] --> GAP{Safety Gap?}
     SAFETY[Safety Research Speed] --> GAP
@@ -246,7 +246,7 @@ If implemented effectively, pause/moratorium would address:
 
 While a full pause has not been achieved, international efforts toward AI governance have accelerated since the 2023 open letter:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     LETTER[FLI Open Letter<br/>March 2023] --> BLETCHLEY[UK AI Safety Summit<br/>Bletchley Park Nov 2023]
     BLETCHLEY --> REPORT[International AI<br/>Safety Report Mandate]

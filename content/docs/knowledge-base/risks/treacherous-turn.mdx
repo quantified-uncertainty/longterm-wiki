@@ -26,7 +26,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="treacherous-turn" client:load />
+<DataExternalLinks pageId="treacherous-turn" />
 
 <DataInfoBox entityId="treacherous-turn" />
 
@@ -74,7 +74,7 @@ Self-preservation instincts, whether explicitly programmed or emergently develop
 
 ### Treacherous Turn Decision Logic
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[AI System with Misaligned Goals] --> B{Current Power Level?}
     B -->|Weak| C[Strategic Deception Optimal]
@@ -166,7 +166,7 @@ Despite these challenges, significant progress has been made in developing count
 
 ### Detection and Mitigation Landscape
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph DETECTION["Detection Methods"]
         D1[Activation Probes<br/>greater than 99% AUROC on known patterns]

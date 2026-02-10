@@ -21,7 +21,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {DisagreementMap, InfoBox, KeyQuestions, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="pause-debate" client:load />
+<DataExternalLinks pageId="pause-debate" />
 
 <InfoBox
   type="crux"
@@ -57,7 +57,7 @@ In March 2023, the [Future of Life Institute](https://futureoflife.org/open-lett
 
 ## The Debate Landscape
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph POSITIONS["Spectrum of Positions"]
         ACC[e/acc: Accelerate] --> NO[No Pause]
@@ -105,7 +105,6 @@ flowchart TD
 ## The Spectrum of Positions
 
 <DisagreementMap
-  client:load
   title="Positions on Pausing AI"
   description="Range of views from accelerate to indefinite pause"
   positions={[
@@ -171,7 +170,6 @@ flowchart TD
 ## Key Cruxes
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "Is a multilateral pause achievable?",

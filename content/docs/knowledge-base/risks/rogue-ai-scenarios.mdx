@@ -29,7 +29,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="rogue-ai-scenarios" client:load />
+<DataExternalLinks pageId="rogue-ai-scenarios" />
 
 <DataInfoBox entityId="rogue-ai-scenarios" />
 
@@ -207,7 +207,7 @@ Persistent AI agents with long-running tasks are emerging in research and softwa
 
 The scenarios are not independent. Their interactions create compound risks that are greater than the sum of individual pathways.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     DC[Delegation Chain<br/>Collapse] -->|Broader permissions<br/>at chain end| SB[Sandbox<br/>Escape]
     CP[Correlated Policy<br/>Failure] -->|Pattern invisible<br/>across instances| SP[Self-Preservation<br/>Harder to Detect]
@@ -268,7 +268,7 @@ We get a dramatic warning shot from Scenario A, everyone mobilizes around Scenar
 
 The thing that converts warning shots into safety isn't their existence—it's **pre-committed response plans**. "If we see X, we do Y" decided in advance. Otherwise you get the predictable cycle:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     A[Incident] --> B[Concern]
     B --> C["But this time<br/>is different because<br/>we've improved"]
@@ -348,4 +348,4 @@ These scenarios map to several factors in the <EntityLink id="ai-transition-mode
 - <EntityLink id="sandboxing" /> — Primary defense against the sandbox escape scenario
 - <EntityLink id="corrigibility-failure" /> — What the self-preservation scenario produces
 
-<Backlinks client:load entityId="rogue-ai-scenarios" />
+<Backlinks entityId="rogue-ai-scenarios" />

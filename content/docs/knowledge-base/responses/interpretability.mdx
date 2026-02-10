@@ -23,7 +23,7 @@ subcategory: alignment-interpretability
 ---
 import {DataInfoBox, KeyPeople, Section, Backlinks, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="interpretability" client:load />
+<DataExternalLinks pageId="interpretability" />
 
 <DataInfoBox entityId="interpretability" />
 
@@ -62,7 +62,7 @@ Current evidence suggests mechanistic interpretability occupies a critical posit
 
 The theoretical foundation of mechanistic interpretability rests on the hypothesis that neural networks implement interpretable algorithms, despite their apparent complexity. This contrasts with earlier approaches that focused solely on input-output relationships. The field has developed sophisticated mathematical frameworks for decomposing neural computation into understandable components.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     INPUT[Model Activations] --> OBSERVATIONAL[Observational Methods]
     INPUT --> INTERVENTIONAL[Interventional Methods]
@@ -272,7 +272,6 @@ Despite these uncertainties, mechanistic interpretability represents one of the 
 | <EntityLink id="goal-misgeneralization" /> | Understand learned goal representations | Medium |
 
 <DisagreementMap
-  client:load
   topic="Effectiveness of Interpretability for AI Safety"
   description="How much will mechanistic interpretability contribute to AI safety?"
   spectrum={{ low: "Minimal contribution", high: "Essential/Critical" }}
@@ -346,4 +345,4 @@ Interpretability improves the <EntityLink id="ai-transition-model" /> primarily 
 
 Interpretability reduces <EntityLink id="existential-catastrophe" /> probability by enabling detection of <EntityLink id="scheming" /> and <EntityLink id="deceptive-alignment" />.
 
-<Backlinks client:load entityId="interpretability" />
+<Backlinks entityId="interpretability" />

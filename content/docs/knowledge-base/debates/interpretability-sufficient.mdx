@@ -29,7 +29,7 @@ import {DisagreementMap, InfoBox, KeyQuestions, Mermaid, R, EntityLink, DataExte
 |--------|------|
 | Official Website | [ea-crux-project.vercel.app](https://ea-crux-project.vercel.app/knowledge-base/responses/epistemic-tools/) |
 
-<DataExternalLinks pageId="interpretability-sufficient" client:load />
+<DataExternalLinks pageId="interpretability-sufficient" />
 
 <InfoBox
   type="crux"
@@ -88,7 +88,7 @@ Current sparse autoencoder methods face a fundamental trade-off: passing GPT-4's
 
 As of April 2024, mechanistic interpretability remains a small field with approximately **50 full-time positions** globally. Anthropic's interpretability team had 17 people at the time, representing about a third of global capacity. The team grew by 10 people in 2023 and continued expanding into 2024-2025.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph CURRENT["Current Capabilities (2024-2025)"]
         A[Sparse Autoencoders] --> B[Feature Extraction]
@@ -131,7 +131,6 @@ This demonstrates that safety-relevant concepts are discoverable through interpr
 ## The Interpretability Landscape
 
 <DisagreementMap
-  client:load
   title="Positions on Interpretability for Safety"
   description="Range of views on interpretability's role in AI safety"
   positions={[
@@ -223,7 +222,6 @@ For interpretability to be sufficient for safety, we'd need to:
 ## Key Cruxes
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "Can we interpret cognition more intelligent than our own?",

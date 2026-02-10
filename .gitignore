@@ -26,6 +26,9 @@ app/tsconfig.tsbuildinfo
 
 # Generated data (rebuilt by prebuild script)
 app/src/data/database.json
+app/src/data/id-registry.json
+app/src/data/pathRegistry.json
+app/src/data/schema.ts
 
 # Auto-generated LLM accessibility files
 app/public/llms*.txt

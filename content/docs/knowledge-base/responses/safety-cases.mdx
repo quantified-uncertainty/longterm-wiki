@@ -24,7 +24,7 @@ subcategory: alignment-evaluation
 ---
 import {Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="safety-cases" client:load />
+<DataExternalLinks pageId="safety-cases" />
 
 ## Quick Assessment
 
@@ -78,7 +78,7 @@ AI safety must grapple with poorly understood emergent behaviors, potential dece
 
 A complete safety case consists of several interconnected elements:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Claims["Safety Claims"]
         TOP[Top-Level Safety Claim]
@@ -148,7 +148,7 @@ Safety cases often use GSN, a graphical notation for representing safety argumen
 
 The four major argument categories proposed by [Clymer et al. (2024)](https://arxiv.org/abs/2403.10462) provide the foundation for current AI safety case thinking:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph TOP["Safety Case Goal"]
         GOAL["AI System is Safe for Deployment"]
@@ -307,7 +307,7 @@ The [Apollo Research/UK AISI collaboration](https://www.apolloresearch.ai/resear
 
 Safety cases assume evidence is reliable, but deceptive AI systems could undermine this. Apollo Research's December 2024 findings on [frontier model scheming](https://www.apolloresearch.ai/research/towards-safety-cases-for-ai-scheming/) demonstrate this is not merely theoretical:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Standard["Standard Safety Case"]
         CLAIM1[Safety Claim] --> ARG1[Argument]

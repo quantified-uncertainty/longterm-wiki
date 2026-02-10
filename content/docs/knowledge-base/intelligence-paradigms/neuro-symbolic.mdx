@@ -31,7 +31,7 @@ import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 | Official Website | [research.ibm.com](https://research.ibm.com/topics/neuro-symbolic-ai) |
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Neuro-symbolic_AI) |
 
-<DataExternalLinks pageId="neuro-symbolic" client:load />
+<DataExternalLinks pageId="neuro-symbolic" />
 
 ## Overview
 
@@ -47,7 +47,7 @@ Estimated probability of being dominant at transformative AI: **3-10%**. Limited
 
 The following diagram illustrates the key architecture patterns in neuro-symbolic AI, showing how neural and symbolic components interact through various integration mechanisms:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph neural["Neural Component"]
         llm["Language Model<br/>(Gemini, GPT)"]

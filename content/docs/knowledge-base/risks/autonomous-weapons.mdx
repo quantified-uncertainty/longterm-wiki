@@ -30,7 +30,7 @@ subcategory: misuse
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="autonomous-weapons" client:load />
+<DataExternalLinks pageId="autonomous-weapons" />
 
 <DataInfoBox entityId="autonomous-weapons" />
 
@@ -79,7 +79,7 @@ Human-supervised autonomous weapons, sometimes called "human-on-the-loop" system
 
 Fully autonomous weapons systems can identify, prioritize, track, and engage targets based entirely on their programming and sensor inputs, without any human involvement in individual targeting decisions. While no military openly admits to deploying such systems against human targets, the technical capabilities exist, and the operational pressures of modern warfare increasingly push military systems toward this level of autonomy.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Control["Human Control Spectrum"]
         A[Human-Operated] --> B[Semi-Autonomous]
@@ -232,7 +232,7 @@ The next 1-2 years will see continued proliferation of semi-autonomous systems w
 
 Medium-term developments over 2-5 years will likely include swarm capabilities where multiple autonomous systems coordinate actions without human oversight. These swarms could overwhelm traditional defenses and make meaningful human control practically impossible when hundreds or thousands of autonomous systems operate simultaneously. Integration with broader military AI systems will create autonomous kill chains where human oversight becomes limited to high-level policy decisions.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph Near["2025-2026"]
         A1[Semi-autonomous<br/>proliferation]

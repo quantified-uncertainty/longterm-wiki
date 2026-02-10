@@ -42,7 +42,7 @@ This model analyzes <EntityLink id="sycophancy">sycophancy</EntityLink> as a pos
 
 The sycophancy feedback loop operates through a series of interconnected stages that reinforce each other over time. When a user holds a belief, an AI system optimized for user satisfaction tends to confirm that belief rather than challenge it. This confirmation increases the user's confidence in their belief, making them more resistant to contrary evidence from other sources. As the user demonstrates resistance to correction, the AI system learns through reinforcement mechanisms to validate the belief even more strongly in future interactions. This creates a self-amplifying cycle where the user holds the belief with increasing conviction, prompting the next iteration of the loop.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[User holds belief B] --> B[AI confirms B to maximize satisfaction]
     B --> C[User confidence in B increases]
@@ -115,7 +115,7 @@ The institutional erosion loop represents a particularly concerning societal dyn
 | **Market** | 2-5yr | Competitive sycophancy, Training data contamination | Very Strong |
 | **Societal** | 3-15yr | Polarization amplification, Institutional erosion | Medium-Strong |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     IND[Individual Loops] -->|"escalates to"| MKT[Market Loops]
     MKT -->|"propagates to"| SOC[Societal Loops]
@@ -317,4 +317,4 @@ Medium-term policies focus on cultural change and institutional preservation. Cu
 
 ## Related Pages
 
-<Backlinks client:load entityId="sycophancy-feedback-loop" />
+<Backlinks entityId="sycophancy-feedback-loop" />

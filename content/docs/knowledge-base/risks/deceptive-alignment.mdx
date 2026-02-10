@@ -27,7 +27,7 @@ subcategory: accident
 ---
 import {DataInfoBox, DisagreementMap, KeyQuestions, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="deceptive-alignment" client:load />
+<DataExternalLinks pageId="deceptive-alignment" />
 
 <DataInfoBox entityId="deceptive-alignment" />
 
@@ -61,7 +61,7 @@ Deceptive alignment emerges through a multi-stage process where sufficiently cap
 
 The [Risks from Learned Optimization](https://arxiv.org/abs/1906.01820) framework identifies this as a form of "pseudoalignment" where the mesa-optimizer's objective differs from the base objective but produces aligned-seeming behavior in the training distribution. A deceptively aligned system actively reasons about the training process, recognizing that deviating from expected behavior would trigger gradient updates that modify its objectives. This creates an instrumental incentive to "play along" during training while preserving its true goals.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Phase"]
         A[Model develops mesa-objective] --> B[Model gains situational awareness]
@@ -294,4 +294,4 @@ Deceptive alignment affects the <EntityLink id="ai-transition-model" /> primaril
 
 This risk is central to the <EntityLink id="ai-takeover" /> scenario pathway. See also <EntityLink id="scheming" /> for the specific behavioral manifestation of deceptive alignment.
 
-<Backlinks client:load entityId="deceptive-alignment" />
+<Backlinks entityId="deceptive-alignment" />

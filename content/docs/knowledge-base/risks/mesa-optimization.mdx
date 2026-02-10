@@ -25,7 +25,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="mesa-optimization" client:load />
+<DataExternalLinks pageId="mesa-optimization" />
 
 <DataInfoBox entityId="mesa-optimization" />
 
@@ -86,7 +86,7 @@ The likelihood of mesa-optimization increases with task complexity, model capaci
 
 The relationship between base optimization and mesa-optimization creates a nested structure where alignment failures can occur at multiple levels:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph TRAINING["Training Process"]
         BO[Base Optimizer<br/>e.g., SGD] --> |Modifies weights to<br/>minimize loss| MODEL
@@ -331,4 +331,4 @@ The detectability of mesa-optimization represents another crucial uncertainty. I
 - **Zvi Mowshowitz**: "<R id="d26339aff542a573">On Anthropic's Sleeper Agents Paper</R>" - Analysis of implications and limitations
 - **Scott Alexander**: "<R id="59ab12c5ded98b79">Deceptively Aligned Mesa-Optimizers</R>" - Accessible explanation of the concept
 
-<Backlinks client:load entityId="mesa-optimization" />
+<Backlinks entityId="mesa-optimization" />

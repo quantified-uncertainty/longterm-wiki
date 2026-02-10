@@ -21,7 +21,7 @@ clusters: ["ai-safety", "epistemics"]
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="agi-timeline" client:load />
+<DataExternalLinks pageId="agi-timeline" />
 
 ## Quick Assessment
 
@@ -52,7 +52,7 @@ Recent surveys show accelerating timelines compared to historical predictions. T
 
 ### AGI Timeline Factors
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph DRIVERS["Accelerating Factors"]
         COMPUTE[Compute Scaling<br/>10x per 18 months]

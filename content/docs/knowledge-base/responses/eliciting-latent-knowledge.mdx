@@ -23,7 +23,7 @@ subcategory: alignment-theoretical
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks, DataInfoBox} from '@components/wiki';
 
-<DataExternalLinks pageId="eliciting-latent-knowledge" client:load />
+<DataExternalLinks pageId="eliciting-latent-knowledge" />
 
 
 ## Quick Assessment
@@ -60,7 +60,7 @@ ELK is particularly important for AI safety because it would, if solved, provide
 
 ## The ELK Problem
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     AI[AI System] --> WORLD[World Model]
     WORLD --> BELIEF[True Beliefs]
@@ -143,7 +143,7 @@ The [first round](https://www.alignment.org/blog/elk-first-round-contest-winners
 
 ARC's research methodology functions as a game between a "builder" and a "breaker":
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph BUILDER["Builder"]
         B1[Propose training strategy]
@@ -176,7 +176,7 @@ This adversarial methodology ensures proposed solutions are robust, but also exp
 
 ## Proposed Approaches
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph APPROACHES["Solution Approaches"]
         CONSIST[Consistency Methods]

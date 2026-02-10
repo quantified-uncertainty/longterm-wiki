@@ -29,7 +29,7 @@ subcategory: epistemic
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, Backlinks, ModelsList, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="consensus-manufacturing" client:load />
+<DataExternalLinks pageId="consensus-manufacturing" />
 
 <DataInfoBox entityId="consensus-manufacturing" />
 
@@ -90,7 +90,7 @@ Detection systems are failing to keep pace with generation capabilities. Platfor
 
 ### Consensus Manufacturing Attack Chain
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Motivated Actor] --> B[AI Text Generation]
     B --> C{Attack Vector}
@@ -269,4 +269,4 @@ A <R id="25241884e8ba5b8e">Chinese-backed influence campaign</R> referred to by 
 
 ## Related Pages
 
-<Backlinks client:load entityId="consensus-manufacturing" />
+<Backlinks entityId="consensus-manufacturing" />

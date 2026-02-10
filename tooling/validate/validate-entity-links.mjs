@@ -48,8 +48,8 @@ if (existsSync(PATH_REGISTRY_FILE)) {
   }
 }
 
-// Pages directory for standalone Astro pages
-const PAGES_DIR = join(process.cwd(), 'src/pages');
+// Next.js app directory for standalone pages
+const APP_DIR = join(process.cwd(), 'app/src/app');
 
 /**
  * Extract all markdown links from file content
@@ -145,8 +145,8 @@ function linkExists(href) {
     join(CONTENT_DIR, path + '.md'),
     join(CONTENT_DIR, path, 'index.mdx'),
     join(CONTENT_DIR, path, 'index.md'),
-    join(PAGES_DIR, path + '.astro'),
-    join(PAGES_DIR, path, 'index.astro'),
+    join(APP_DIR, path, 'page.tsx'),
+    join(APP_DIR, path, 'page.jsx'),
   ];
 
   return possiblePaths.some(p => existsSync(p));

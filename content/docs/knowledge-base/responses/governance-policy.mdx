@@ -24,7 +24,7 @@ subcategory: governance
 ---
 import {DataInfoBox, DisagreementMap, KeyQuestions, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="governance-policy" client:load />
+<DataExternalLinks pageId="governance-policy" />
 
 <DataInfoBox entityId="governance-policy" />
 
@@ -53,7 +53,7 @@ Recent developments demonstrate increasing political momentum: the <R id="1ad6dc
 
 ### AI Governance Ecosystem
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph International["International Coordination"]
         SUMMITS[AI Safety Summits<br/>Bletchley, Seoul, Paris]
@@ -240,7 +240,6 @@ Post-Seoul Summit <R id="6b19ea80881fa488">commitments</R> from 16 leading AI co
 <R id="2f79f30986ba6b99">Safety-washing concerns</R> highlight the risk of superficial compliance without substantive safety improvements.
 
 <DisagreementMap
-  client:load
   topic="Can industry self-regulation be sufficient for catastrophic risk?"
   description="Views on whether voluntary commitments can prevent AI catastrophe"
   spectrum={{ low: "Regulation essential", high: "Self-regulation sufficient" }}
@@ -333,7 +332,6 @@ Legal liability mechanisms aim to internalize AI risks and create accountability
 ### Technical Feasibility Cruxes
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "Can AI capabilities be reliably measured and verified for governance purposes?",

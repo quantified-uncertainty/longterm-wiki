@@ -30,7 +30,7 @@ subcategory: governance-compute-governance
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="monitoring" client:load />
+<DataExternalLinks pageId="monitoring" />
 
 <DataInfoBox entityId="compute-monitoring" />
 
@@ -55,7 +55,7 @@ Effective compute monitoring serves as the enforcement backbone for other govern
 
 ## Monitoring Architecture
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Cloud["Cloud-Based Monitoring"]
         KYC[Customer Verification<br/>KYC Requirements]
@@ -288,4 +288,4 @@ Compute monitoring improves the <EntityLink id="ai-transition-model" /> through 
 
 Monitoring is foundational infrastructure; its value depends on subsequent governance actions taken based on the information collected.
 
-<Backlinks client:load entityId="compute-monitoring" />
+<Backlinks entityId="compute-monitoring" />

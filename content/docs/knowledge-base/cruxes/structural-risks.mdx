@@ -21,7 +21,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {Crux, CruxList, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="structural-risks" client:load />
+<DataExternalLinks pageId="structural-risks" />
 
 ## Quick Assessment
 
@@ -58,7 +58,7 @@ Given the conceptual fuzziness inherent in structural risk analysis, these cruxe
 
 ### Crux Decision Framework
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     START[Structural Risk Assessment] --> FOUND[Foundational Cruxes]
     FOUND --> Q1{Are structural risks<br/>distinct from accident/misuse?}

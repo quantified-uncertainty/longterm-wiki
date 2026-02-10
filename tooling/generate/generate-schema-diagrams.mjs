@@ -20,7 +20,7 @@ import {
   RelatedEntry,
   CustomField,
   EntitySource,
-} from '../../app/src/data/schema.ts';
+} from '../../data/schema.ts';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';

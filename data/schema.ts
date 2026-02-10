@@ -2,7 +2,7 @@
  * Data Schema for LongtermWiki
  *
  * This file defines TypeScript types and Zod schemas for all structured data.
- * Data lives in YAML files in src/data/ and is validated at build time.
+ * Data lives in YAML files in data/ and is validated at build time.
  */
 
 import { z } from 'zod';
@@ -366,10 +366,59 @@ export type EntityContent = z.infer<typeof EntityContent>;
 // ENTITIES (Generic knowledge base entries with InfoBox data)
 // =============================================================================
 
-// EntityType enum is derived from the canonical list in entity-type-names.ts
-// (single source of truth — no more manual sync needed).
-import { ALL_ENTITY_TYPE_NAMES } from '../app/src/data/entity-type-names';
-export const EntityType = z.enum(ALL_ENTITY_TYPE_NAMES as unknown as [string, ...string[]]);
+// NOTE: This file is copied verbatim to app/src/data/schema.ts during build,
+// so it cannot use relative imports to files outside data/.
+// The canonical list of entity type names lives in app/src/data/entity-type-names.ts.
+// If you add a type here, also add it there (and vice versa).
+// The validate-entities test checks for drift.
+export const EntityType = z.enum([
+  // --- Canonical types ---
+  'risk',
+  'risk-factor',
+  'capability',
+  'safety-agenda',
+  'approach',
+  'project',
+  'policy',
+  'organization',
+  'crux',
+  'concept',
+  'case-study',
+  'person',
+  'scenario',
+  'resource',
+  'funder',
+  'historical',
+  'analysis',
+  'model',
+  'parameter',
+  'metric',
+  'argument',
+  'table',
+  'diagram',
+  'insight',
+  'event',
+  'debate',
+  'intelligence-paradigm',
+  // AI Transition Model specific types
+  'ai-transition-model-parameter',
+  'ai-transition-model-metric',
+  'ai-transition-model-scenario',
+  'ai-transition-model-factor',
+  'ai-transition-model-subitem',
+  // --- Aliases (legacy/plural forms kept for backward compat) ---
+  'researcher',        // → person
+  'lab',               // → organization
+  'lab-frontier',      // → organization
+  'lab-research',      // → organization
+  'lab-startup',       // → organization
+  'lab-academic',      // → organization
+  'safety-approaches', // → safety-agenda
+  'policies',          // → policy
+  'concepts',          // → concept
+  'events',            // → event
+  'models',            // → model
+]);
 export type EntityType = z.infer<typeof EntityType>;
 
 export const RelationshipType = z.enum([
@@ -636,7 +685,7 @@ export const Entity = z.object({
   // Sources (legacy inline format)
   sources: z.array(EntitySource).optional(),
   // Resources (semantic references by ID)
-  resources: z.array(z.string()).optional(),      // Resource IDs from src/data/resources/
+  resources: z.array(z.string()).optional(),      // Resource IDs from data/resources/
   // Parameter distinctions (for parameter-type entities)
   parameterDistinctions: ParameterDistinctions.optional(),
 });

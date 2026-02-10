@@ -26,7 +26,7 @@ subcategory: structural
 ---
 import {DataInfoBox, R, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="multipolar-trap" client:load />
+<DataExternalLinks pageId="multipolar-trap" />
 
 <DataInfoBox entityId="multipolar-trap" />
 
@@ -64,7 +64,7 @@ The stakes in AI development may make these coordination failures uniquely dange
 
 The AI race represents what game theorists consider one of the most dangerous competitive dynamics humanity has faced. Unlike classic prisoner's dilemmas with binary choices, AI development involves a continuous strategy space where actors can choose any level of investment and development speed, making coordination vastly harder than traditional arms control scenarios.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph individual["Individual Actor Logic"]
         A[Capability Investment] --> B{Competitor<br/>Reciprocates<br/>Safety?}

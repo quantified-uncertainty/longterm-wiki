@@ -23,7 +23,7 @@ subcategory: alignment-theoretical
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="goal-misgeneralization" client:load />
+<DataExternalLinks pageId="goal-misgeneralization" />
 
 ## Overview
 
@@ -35,7 +35,7 @@ Goal misgeneralization is particularly concerning for AI safety because it can p
 
 ## How Goal Misgeneralization Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Phase"]
         T1[Environment with<br/>Spurious Correlations]
@@ -91,7 +91,7 @@ The core mechanism involves three stages:
 
 ## The Misgeneralization Problem
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     TRAIN[Training Environment] --> REWARD[Reward Signal]
     REWARD --> LEARN[Learning Process]

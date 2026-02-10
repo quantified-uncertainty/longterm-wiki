@@ -27,7 +27,7 @@ subcategory: structural
 ---
 import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="concentration-of-power" client:load />
+<DataExternalLinks pageId="concentration-of-power" />
 
 <DataInfoBox entityId="concentration-of-power" />
 
@@ -62,7 +62,7 @@ Power concentration in AI follows reinforcing feedback loops where early advanta
 
 The [Korinek and Vipra (2024) analysis](https://www.nber.org/papers/w33139) identifies significant economies of scale and scope in AI development that create natural tendencies toward market concentration. Training costs for frontier models have increased from millions to hundreds of millions of dollars, with projections reaching \$1-10B by 2030. This creates entry barriers that only well-capitalized organizations can clear.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph inputs["Resource Concentration"]
         C[Compute Access]

@@ -27,7 +27,7 @@ subcategory: institutions
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="ai-safety-institutes" client:load />
+<DataExternalLinks pageId="ai-safety-institutes" />
 
 <DataInfoBox entityId="ai-safety-institutes" />
 
@@ -55,7 +55,7 @@ At their core, AISIs address a critical information asymmetry problem. AI labs p
 
 Traditional regulatory frameworks face fundamental challenges when applied to advanced AI systems. Regulatory agencies typically rely on industry self-reporting, external consultants, or academic research to understand new technologies. For AI, this approach proves inadequate due to several factors: the extreme technical complexity of modern AI systems requires deep machine learning expertise to properly evaluate; capabilities evolve on timescales of months rather than years, far faster than traditional policy development cycles; meaningful safety assessment requires direct access to model weights, training processes, and internal evaluations that labs consider proprietary; and the potential risks from advanced AI systems—from bioweapons assistance to autonomous cyber operations—demand urgent, technically-informed oversight.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     LABS[AI Labs] -->|Model Access| AISI[AI Safety Institutes]
     AISI -->|Evaluations| EVAL[Pre-deployment Testing]
@@ -318,4 +318,4 @@ AI Safety Institutes improve the <EntityLink id="ai-transition-model" /> through
 
 AISIs address critical information asymmetry but face severe resource constraints (100+ staff vs thousands at labs) and advisory-only authority.
 
-<Backlinks client:load entityId="ai-safety-institutes" />
+<Backlinks entityId="ai-safety-institutes" />

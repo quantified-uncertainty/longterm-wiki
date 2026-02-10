@@ -24,7 +24,7 @@ subcategory: alignment-evaluation
 ---
 import {Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="dangerous-cap-evals" client:load />
+<DataExternalLinks pageId="dangerous-cap-evals" />
 
 ## Quick Assessment
 
@@ -74,7 +74,7 @@ Despite this progress, DCEs face fundamental limitations. They can only test for
 
 ### Capability Progression Framework
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Bio["Biological Domain"]
         B1[General Bio Knowledge] --> B2[Synthesis Guidance]
@@ -113,7 +113,7 @@ flowchart TD
 
 The modern dangerous capability evaluation ecosystem involves multiple layers of internal and external assessment, with findings feeding into both deployment decisions and policy frameworks.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Development["Model Development"]
         TRAIN[Training Complete] --> CHECK[Checkpoint Evaluation]

@@ -26,7 +26,7 @@ subcategory: epistemic-tools-approaches
 ---
 import {DataInfoBox, KeyQuestions, R, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="content-authentication" client:load />
+<DataExternalLinks pageId="content-authentication" />
 
 <DataInfoBox entityId="content-authentication" />
 
@@ -50,7 +50,7 @@ Content authentication systems create verifiable chains of custody for digital c
 
 **Core idea**: Instead of detecting fakes (which is losing the arms race), prove what's real.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     CAPTURE[Layer 1: Capture Authentication] --> CREDENTIALS[Layer 2: Content Credentials]
     CREDENTIALS --> IDENTITY[Layer 3: Identity Verification]

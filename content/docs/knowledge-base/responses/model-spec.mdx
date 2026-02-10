@@ -24,7 +24,7 @@ subcategory: alignment-policy
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="model-spec" client:load />
+<DataExternalLinks pageId="model-spec" />
 
 ## Quick Assessment
 
@@ -51,7 +51,7 @@ However, a fundamental limitation remains: specifications define what behavior i
 
 ### How Model Specs Integrate with Training
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     SPEC[Model Specification<br/>Written Document] --> CAI[Constitutional AI<br/>Training]
     SPEC --> RLHF[RLHF Guidelines<br/>Rater Instructions]

@@ -26,7 +26,7 @@ subcategory: misuse
 ---
 import {DataInfoBox, Backlinks, ModelsList, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="cyberweapons" client:load />
+<DataExternalLinks pageId="cyberweapons" />
 
 <DataInfoBox entityId="cyberweapons" />
 
@@ -87,7 +87,7 @@ AI enhances cyber threats through three primary mechanisms:
 
 A critical concern is the potential for AI-enabled attacks to create negative feedback loops:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     AI_OFFENSE[AI-Enhanced Offense] --> MORE_ATTACKS[More Frequent Attacks]
     MORE_ATTACKS --> DEFENDER_STRAIN[Defender Strain]
@@ -126,7 +126,7 @@ AI transforms each stage of the cyber attack chain differently:
 
 AI enhances cyber offense across the entire attack lifecycle, from initial reconnaissance through exploitation to data exfiltration.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     RECON[Reconnaissance] --> VULN[Vulnerability Discovery]
     VULN --> EXPLOIT[Exploit Generation]
@@ -521,7 +521,7 @@ The generative AI in cybersecurity market is expected to grow **almost tenfold b
 
 ## Analytical Models
 
-<ModelsList client:load entityId="cyberweapons" />
+<ModelsList entityId="cyberweapons" />
 
 ---
 
@@ -540,4 +540,4 @@ The cyberweapons pathway can lead to <EntityLink id="human-catastrophe" /> throu
 
 ## Related Pages
 
-<Backlinks client:load entityId="cyberweapons" />
+<Backlinks entityId="cyberweapons" />

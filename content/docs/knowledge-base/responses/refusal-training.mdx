@@ -23,7 +23,7 @@ subcategory: alignment-training
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="refusal-training" client:load />
+<DataExternalLinks pageId="refusal-training" />
 
 ## Overview
 
@@ -68,7 +68,7 @@ More fundamentally, refusal training addresses behavior, not underlying goals or
 
 Refusal training is integrated into the RLHF pipeline through multiple stages:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Phase"]
         A[Base Pretrained Model] --> B[Safety Dataset Creation]
