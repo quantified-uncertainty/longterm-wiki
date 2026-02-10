@@ -37,6 +37,7 @@ export interface PageStatusProps {
   importance?: number;
   llmSummary?: string;
   lastEdited?: string;
+  updateFrequency?: number;
   todo?: string;
   todos?: string[];
   wordCount?: number;
@@ -118,6 +119,52 @@ function formatAge(lastEdited: string): string {
   return `${Math.round(days / 30)} months ago`;
 }
 
+function formatFrequency(days: number): string {
+  if (days <= 7) return "weekly";
+  if (days <= 14) return "biweekly";
+  if (days <= 21) return "every 3 weeks";
+  if (days <= 30) return "monthly";
+  if (days <= 45) return "every 6 weeks";
+  if (days <= 60) return "bimonthly";
+  if (days <= 90) return "quarterly";
+  return `every ${Math.round(days / 30)} months`;
+}
+
+function getUpdateStatus(
+  lastEdited: string,
+  updateFrequency: number
+): { label: string; isOverdue: boolean; daysUntil: number } {
+  const today = new Date();
+  const edited = new Date(lastEdited);
+  const daysSince = Math.floor(
+    (today.getTime() - edited.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const daysUntil = updateFrequency - daysSince;
+
+  if (daysUntil < 0) {
+    return {
+      label: `Overdue by ${Math.abs(daysUntil)} days`,
+      isOverdue: true,
+      daysUntil,
+    };
+  }
+  if (daysUntil === 0) {
+    return { label: "Due today", isOverdue: true, daysUntil: 0 };
+  }
+  if (daysUntil <= 7) {
+    return {
+      label: `Due in ${daysUntil} day${daysUntil === 1 ? "" : "s"}`,
+      isOverdue: false,
+      daysUntil,
+    };
+  }
+  return {
+    label: `Due in ${Math.round(daysUntil / 7)} weeks`,
+    isOverdue: false,
+    daysUntil,
+  };
+}
+
 // ============================================================================
 // SVG ICONS
 // ============================================================================
@@ -153,6 +200,17 @@ function IconBook({ className }: { className?: string }) {
   return (
     <svg className={className} width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
       <path d="M2 3h4.5a2 2 0 012 2v8.5a1.5 1.5 0 00-1.5-1.5H2V3zM14 3H9.5a2 2 0 00-2 2v8.5a1.5 1.5 0 011.5-1.5H14V3z" />
+    </svg>
+  );
+}
+
+function IconCalendar({ className }: { className?: string }) {
+  return (
+    <svg className={className} width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="2" y="3" width="12" height="11" rx="1.5" />
+      <line x1="5" y1="1.5" x2="5" y2="4.5" strokeLinecap="round" />
+      <line x1="11" y1="1.5" x2="11" y2="4.5" strokeLinecap="round" />
+      <line x1="2" y1="7" x2="14" y2="7" />
     </svg>
   );
 }
@@ -358,18 +416,26 @@ function MetricChip({
   icon,
   value,
   label,
+  description,
 }: {
   icon: React.ReactNode;
   value: number | string;
   label: string;
+  description?: string;
 }) {
   return (
-    <span
-      className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground whitespace-nowrap"
-      title={label}
-    >
+    <span className="relative group inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground whitespace-nowrap cursor-help">
       <span className="flex items-center opacity-60">{icon}</span>
       <span className="font-semibold tabular-nums text-foreground">{value}</span>
+      <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:flex flex-col items-center z-50">
+        <span className="rounded-md bg-foreground text-background px-2.5 py-1.5 text-[11px] leading-snug whitespace-nowrap shadow-lg">
+          <span className="font-semibold">{label}</span>
+          {description && (
+            <span className="block font-normal text-background/80 mt-0.5">{description}</span>
+          )}
+        </span>
+        <span className="border-4 border-transparent border-t-foreground -mt-px" />
+      </span>
     </span>
   );
 }
@@ -520,6 +586,7 @@ export function PageStatus({
   importance,
   llmSummary,
   lastEdited,
+  updateFrequency,
   todo,
   todos,
   wordCount,
@@ -549,6 +616,11 @@ export function PageStatus({
   if (wordCount && wordCount > 0) metaItems.push(`${formatWordCount(wordCount)} words`);
   if (backlinkCount && backlinkCount > 0) metaItems.push(`${backlinkCount} backlinks`);
 
+  const updateStatus =
+    lastEdited && updateFrequency
+      ? getUpdateStatus(lastEdited, updateFrequency)
+      : null;
+
   return (
     <div className="page-status page-status-dev-only mb-6 overflow-hidden rounded-xl border border-border bg-card text-[13px] shadow-sm">
       {/* Top bar */}
@@ -559,18 +631,16 @@ export function PageStatus({
           </span>
           <PageTypeBadge pageType={pageType} pathname={pathname} />
         </div>
-        {metaItems.length > 0 && (
-          <div className="flex items-center gap-0 text-xs text-muted-foreground">
-            {metaItems.map((item, i) => (
-              <span key={i} className="flex items-center">
-                {i > 0 && (
-                  <span className="mx-2 inline-block size-[3px] rounded-full bg-border" />
-                )}
-                {item}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="flex items-center gap-0 text-xs text-muted-foreground">
+          {metaItems.map((item, i) => (
+            <span key={i} className="flex items-center">
+              {i > 0 && (
+                <span className="mx-2 inline-block size-[3px] rounded-full bg-border" />
+              )}
+              {item}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* Score rings + metric chips */}
@@ -587,18 +657,45 @@ export function PageStatus({
 
         {metrics && (
           <div className="flex flex-wrap gap-1.5">
-            <MetricChip icon={<IconTable />} value={metrics.tableCount} label="Tables" />
-            <MetricChip icon={<IconDiagram />} value={metrics.diagramCount} label="Diagrams" />
-            <MetricChip icon={<IconLink />} value={metrics.internalLinks} label="Internal links" />
-            <MetricChip icon={<IconBook />} value={metrics.externalLinks} label="External citations" />
+            <MetricChip icon={<IconTable />} value={metrics.tableCount} label="Tables" description="Data tables in the page" />
+            <MetricChip icon={<IconDiagram />} value={metrics.diagramCount} label="Diagrams" description="Charts and visual diagrams" />
+            <MetricChip icon={<IconLink />} value={metrics.internalLinks} label="Internal Links" description="Links to other wiki pages" />
+            <MetricChip icon={<IconBook />} value={metrics.externalLinks} label="External Citations" description="References to outside sources" />
             <MetricChip
               icon={<span className="text-[10px] font-bold">%</span>}
               value={`${Math.round(metrics.bulletRatio * 100)}%`}
-              label="Bullet ratio"
+              label="Bullet Ratio"
+              description="Percentage of content in bullet lists"
             />
           </div>
         )}
       </div>
+
+      {/* Update Schedule */}
+      {updateFrequency && (
+        <div className="flex items-center gap-2 border-t border-border px-3.5 py-2 text-xs text-muted-foreground">
+          <IconCalendar className="shrink-0 opacity-60" />
+          <span>
+            Updated <span className="font-medium text-foreground">{formatFrequency(updateFrequency)}</span>
+          </span>
+          {updateStatus && (
+            <>
+              <span className="inline-block size-[3px] rounded-full bg-border" />
+              <span
+                className={
+                  updateStatus.isOverdue
+                    ? "font-medium text-amber-500"
+                    : updateStatus.daysUntil <= 7
+                      ? "text-muted-foreground"
+                      : "text-muted-foreground"
+                }
+              >
+                {updateStatus.label}
+              </span>
+            </>
+          )}
+        </div>
+      )}
 
       {/* LLM Summary */}
       {llmSummary && (

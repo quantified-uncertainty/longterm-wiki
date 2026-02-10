@@ -265,6 +265,7 @@ export interface Page {
   subcategory?: string | null;
   tags?: string[];
   clusters?: string[];
+  updateFrequency?: number | null;
   wordCount?: number;
   backlinkCount?: number;
   metrics?: {
