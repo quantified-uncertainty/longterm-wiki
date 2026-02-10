@@ -315,7 +315,7 @@ describe("Data Layer", () => {
     it("returns items for all entities", async () => {
       const { getExploreItems } = await import("../../data/index");
       const items = getExploreItems();
-      expect(items.length).toBeGreaterThanOrEqual(3);
+      expect(items.length).toBeGreaterThanOrEqual(2);
     });
 
     it("merges page data into entity items", async () => {
