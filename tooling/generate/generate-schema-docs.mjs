@@ -141,24 +141,22 @@ sidebar:
   order: 1
 ---
 
-import {Mermaid} from '@components/wiki';
-
 {/* AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY */}
 {/* Regenerate with: node tooling/generate-schema-docs.mjs */}
 
-This documentation is auto-generated from \`src/data/schema.ts\`.
+This documentation is auto-generated from \`app/src/data/schema.ts\`.
 
 **Last generated:** ${new Date().toISOString().split('T')[0]}
 
 ## Entity Types Overview
 
-<Mermaid client:load chart={\`
+<Mermaid chart={\`
 ${generateEntityMermaid()}
 \`} />
 
 ## Relationship Types Overview
 
-<Mermaid client:load chart={\`
+<Mermaid chart={\`
 ${generateRelationshipMermaid()}
 \`} />
 
@@ -172,7 +170,7 @@ ${generateRelationshipTable()}
 
 ## Data Flow
 
-<Mermaid client:load chart={\`
+<Mermaid chart={\`
 flowchart TD
     subgraph Sources["YAML Data Sources"]
         E1[entities/*.yaml]
@@ -217,7 +215,7 @@ flowchart TD
 node tooling/generate-schema-docs.mjs
 \`\`\`
 
-This script reads \`src/data/schema.ts\` and extracts:
+This script reads \`app/src/data/schema.ts\` and extracts:
 - \`EntityType\` enum values and comments
 - \`RelationshipType\` enum values and comments
 

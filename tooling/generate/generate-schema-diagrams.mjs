@@ -3,7 +3,7 @@
 /**
  * Generate Mermaid diagrams from Zod schemas
  *
- * Reads src/data/schema.ts and produces visual diagrams of:
+ * Reads app/src/data/schema.ts and produces visual diagrams of:
  * - Entity types and their relationships
  * - Schema structure (fields, types)
  * - Relationship type taxonomy
@@ -20,7 +20,7 @@ import {
   RelatedEntry,
   CustomField,
   EntitySource,
-} from '../../app/src/data/schema.ts';
+} from '../../app/app/src/data/schema.ts';
 
 const OUTPUT_DIR = 'internal';
 
@@ -120,7 +120,7 @@ function generateEntityTypesDiagram() {
     'Other': ['resource', 'historical', 'events'],
   };
 
-  let diagram = `%% Auto-generated from src/data/schema.ts
+  let diagram = `%% Auto-generated from app/src/data/schema.ts
 %% Entity Types grouped by category
 
 flowchart TD
@@ -164,7 +164,7 @@ function generateRelationshipTypesDiagram() {
     'Meta': ['supersedes', 'supports', 'increases', 'decreases', 'research', 'vulnerable-technique'],
   };
 
-  let diagram = `%% Auto-generated from src/data/schema.ts
+  let diagram = `%% Auto-generated from app/src/data/schema.ts
 %% Relationship Types grouped by semantic category
 
 flowchart LR
@@ -195,7 +195,7 @@ function generateEntitySchemaDiagram() {
   const resourceFields = getObjectFields(Resource);
   const publicationFields = getObjectFields(Publication);
 
-  let diagram = `%% Auto-generated from src/data/schema.ts
+  let diagram = `%% Auto-generated from app/src/data/schema.ts
 %% Schema structure as ER diagram
 
 erDiagram
@@ -246,7 +246,7 @@ function generateClassDiagram() {
   const entityFields = getObjectFields(Entity);
   const relatedEntryFields = getObjectFields(RelatedEntry);
 
-  let diagram = `%% Auto-generated from src/data/schema.ts
+  let diagram = `%% Auto-generated from app/src/data/schema.ts
 %% Class diagram showing main schema types
 
 classDiagram
@@ -383,7 +383,7 @@ for (const { name, fn, title } of diagrams) {
 // Generate a combined markdown file with all diagrams
 let combinedMd = `# Schema Visualizations
 
-Auto-generated from \`src/data/schema.ts\` using \`scripts/generate-schema-diagrams.mjs\`
+Auto-generated from \`app/src/data/schema.ts\` using \`scripts/generate-schema-diagrams.mjs\`
 
 Generated: ${new Date().toISOString()}
 

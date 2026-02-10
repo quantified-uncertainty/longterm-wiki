@@ -25,7 +25,6 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, relative } from 'path';
-import { execSync } from 'child_process';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.mjs';
 import { getColors } from '../lib/output.mjs';

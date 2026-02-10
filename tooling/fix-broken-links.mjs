@@ -24,11 +24,11 @@ import { join } from 'path';
 import { createInterface } from 'readline';
 import { findMdxFiles } from './lib/file-utils.mjs';
 import { getColors } from './lib/output.mjs';
-import { CONTENT_DIR } from './lib/content-types.mjs';
+import { CONTENT_DIR_ABS as CONTENT_DIR, GENERATED_DATA_DIR_ABS } from './lib/content-types.mjs';
 
 // Load path registry for EntityLink conversion
-const PATH_REGISTRY_FILE = join(process.cwd(), 'app/src/data/pathRegistry.json');
-const DATABASE_FILE = join(process.cwd(), 'app/src/data/database.json');
+const PATH_REGISTRY_FILE = join(GENERATED_DATA_DIR_ABS, 'pathRegistry.json');
+const DATABASE_FILE = join(GENERATED_DATA_DIR_ABS, 'database.json');
 let pathRegistry = {};
 let reverseRegistry = {}; // path -> entity ID
 let entityTitles = {}; // entity ID -> title
@@ -100,8 +100,8 @@ function linkExists(href) {
     join(CONTENT_DIR, path + '.md'),
     join(CONTENT_DIR, path, 'index.mdx'),
     join(CONTENT_DIR, path, 'index.md'),
-    join(PAGES_DIR, path + '.astro'),
-    join(PAGES_DIR, path, 'index.astro'),
+    join(PAGES_DIR, path + '.tsx'),
+    join(PAGES_DIR, path, 'page.tsx'),
   ];
 
   return possiblePaths.some(p => existsSync(p));
