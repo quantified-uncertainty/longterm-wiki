@@ -1,0 +1,33 @@
+name: "Content suggestion"
+description: "Suggest an addition to an existing page, or propose a new page"
+labels: ["content-suggestion"]
+body:
+  - type: dropdown
+    id: suggestion-type
+    attributes:
+      label: What kind of suggestion?
+      options:
+        - Addition to an existing page
+        - New page idea
+        - Restructuring or reorganization
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Related page
+      description: "Which existing page is this about? (leave blank for new page ideas)"
+      placeholder: "e.g. /wiki/E441 or Scheming & Deception Detection"
+  - type: textarea
+    id: description
+    attributes:
+      label: What should be added or changed?
+      description: "Describe your suggestion in detail"
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Why this matters
+      description: "Why is this addition important? Include any sources or references"

@@ -16,6 +16,7 @@ import { WikiSidebar } from "@/components/wiki/WikiSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { detectSidebarType, getWikiNav } from "@/lib/wiki-nav";
 import { AlertTriangle, Database, Github } from "lucide-react";
+import { PageFeedback } from "@/components/wiki/PageFeedback";
 import type { Metadata } from "next";
 import {
   InfoBoxVisibilityProvider,
@@ -25,6 +26,7 @@ import { DataInfoBox } from "@/components/wiki/DataInfoBox";
 
 const GITHUB_HISTORY_BASE =
   "https://github.com/quantified-uncertainty/longterm-wiki/commits/main/content/docs";
+
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -134,6 +136,7 @@ function ArticleView({
     : null;
   const entity = getEntityById(slug);
   const numId = slugToNumericId(slug);
+  const pageTitle = page.frontmatter.title || entity?.title || slug;
 
   return (
     <InfoBoxVisibilityProvider>
@@ -166,6 +169,7 @@ function ArticleView({
               Data
             </a>
           )}
+          <PageFeedback pageTitle={pageTitle} pageSlug={slug} />
           <InfoBoxToggle />
         </div>
       </div>
