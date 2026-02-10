@@ -12,7 +12,7 @@ import MiniSearch from 'minisearch';
 /**
  * Fields indexed by MiniSearch.
  * Boost weights are configured at search time in the consumers
- * (app/src/lib/search.ts and tooling/lib/search.mjs), not here —
+ * (app/src/lib/search.ts and crux/lib/search.mjs), not here —
  * constructor-level searchOptions don't survive toJSON/loadJSON.
  */
 const SEARCH_FIELDS = ['title', 'description', 'tags', 'entityType', 'id'];

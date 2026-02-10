@@ -1,295 +1,592 @@
 ---
-title: "Schema Reference"
-description: "Auto-generated documentation of entity types and relationships"
+title: "Schema Diagrams"
+description: "Visual documentation of entity types, relationships, data flow, and the full entity-relationship model"
 sidebar:
-  order: 1
-importance: 2
-quality: 52
-llmSummary: "Auto-generated technical documentation cataloging 35 entity types (risks, capabilities, interventions, organizations) and 41 relationship types (causes, mitigates, enables) used in the wiki's internal data structure. Provides complete schema reference with validation pipeline and UI component integration."
-ratings:
-  focus: 9
-  novelty: 0
-  rigor: 7
-  completeness: 8
-  concreteness: 9
-  actionability: 1
-metrics:
-  wordCount: 149
-  citations: 0
-  tables: 2
-  diagrams: 3
+  order: 2
 ---
+
 import {Mermaid} from '@components/wiki';
 
-{/* AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY */}
-{/* Regenerate with: node scripts/generate-schema-docs.mjs */}
+Visual reference for how the data schema fits together. All diagrams are derived from `data/schema.ts`.
 
-This documentation is auto-generated from `src/data/schema.ts`.
+---
 
-**Last generated:** 2026-02-01
+## Entity-Relationship Overview
 
-## Entity Types Overview
+This ER diagram shows the core data types and how they reference each other. Primary keys are marked; foreign key references show how entities cross-link.
+
+<Mermaid chart={`
+erDiagram
+    Entity ||--o{ RelatedEntry : "relatedEntries"
+    Entity ||--o{ EntitySource : "sources"
+    Entity ||--o{ ContentSection : "content.sections"
+    Entity ||--o| EntityContent : "content"
+    Entity ||--o| ParameterDistinctions : "parameterDistinctions"
+    Entity }o--o{ Resource : "resources (by ID)"
+    Entity }o--o| CauseEffectGraph : "embedded graph"
+
+    Expert ||--o{ ExpertPosition : "positions"
+    Expert }o--o| Organization : "affiliation"
+    Organization ||--o{ Expert : "keyPeople"
+
+    Estimate ||--o{ EstimateSource : "estimates"
+    Crux ||--o{ CruxPosition : "positions"
+
+    Graph ||--o{ GraphNode : "nodes"
+    Graph ||--o{ GraphEdge : "edges"
+
+    MasterGraph ||--o{ MasterGraphNode : "nodes"
+    MasterGraph ||--o{ MasterGraphEdge : "edges"
+    MasterGraph ||--o{ SubgraphSpec : "subgraphs"
+
+    CauseEffectGraph ||--o{ CauseEffectNode : "nodes"
+    CauseEffectGraph ||--o{ CauseEffectEdge : "edges"
+
+    FactsFile ||--o{ Fact : "facts"
+
+    Entity {
+        string id PK
+        EntityType type
+        string title
+        string description
+        string status
+        string numericId UK
+    }
+
+    RelatedEntry {
+        string id FK
+        EntityType type
+        RelationshipType relationship
+        string strength
+    }
+
+    Expert {
+        string id PK
+        string name
+        string affiliation FK
+        string role
+    }
+
+    Organization {
+        string id PK
+        string name
+        OrgType type
+        string founded
+    }
+
+    Resource {
+        string id PK
+        string url
+        string title
+        ResourceType type
+        number importance
+    }
+
+    Fact {
+        string entity FK
+        string factId PK
+        string value
+        number numeric
+        string compute
+    }
+`} />
+
+---
+
+## Entity Base Fields (Class Diagram)
+
+Every entity shares these fields. Type-specific fields (like `severity` for risks or `orgType` for organizations) are layered on top.
+
+<Mermaid chart={`
+classDiagram
+    class Entity {
+        +String id
+        +EntityType type
+        +String title
+        String description
+        String[] aliases
+        EntityContent content
+        EntityStatus status
+        String lastUpdated
+        String[] tags
+        Cluster[] clusters
+        String severity
+        Likelihood likelihood
+        Timeframe timeframe
+        ResearchMaturity maturity
+        String website
+        CustomField[] customFields
+        String[] relatedTopics
+        RelatedEntry[] relatedEntries
+        EntitySource[] sources
+        String[] resources
+        ParameterDistinctions parameterDistinctions
+    }
+
+    class EntityContent {
+        String intro
+        ContentSection[] sections
+        String footer
+    }
+
+    class ContentSection {
+        +String heading
+        String body
+        String mermaid
+        ContentTable table
+        String component
+        Record componentProps
+    }
+
+    class RelatedEntry {
+        +String id
+        +EntityType type
+        RelationshipType relationship
+        String strength
+    }
+
+    class CustomField {
+        +String label
+        +String value
+    }
+
+    class EntitySource {
+        +String title
+        String url
+        String author
+        String date
+    }
+
+    Entity *-- EntityContent
+    Entity *-- RelatedEntry
+    Entity *-- CustomField
+    Entity *-- EntitySource
+    EntityContent *-- ContentSection
+`} />
+
+---
+
+## Standalone Data Types
+
+These types have their own YAML files and are separate from the entity system.
+
+### Expert & Organization
+
+<Mermaid chart={`
+classDiagram
+    class Expert {
+        +String id
+        +String name
+        String affiliation
+        String role
+        String website
+        ExpertPosition[] positions
+    }
+
+    class ExpertPosition {
+        +String topic
+        +String view
+        String estimate
+        Confidence confidence
+        String date
+    }
+
+    class Organization {
+        +String id
+        +String name
+        +OrgType type
+        String founded
+        String headquarters
+        String[] keyPeople
+        String funding
+    }
+
+    Expert *-- ExpertPosition
+    Expert --> Organization : affiliation
+    Organization --> Expert : keyPeople
+`} />
+
+### Estimate & Crux
+
+<Mermaid chart={`
+classDiagram
+    class Estimate {
+        +String id
+        +String variable
+        String unit
+        String category
+        EstimateSource[] estimates
+    }
+
+    class EstimateSource {
+        +String source
+        +String value
+        String date
+        Confidence confidence
+    }
+
+    class Crux {
+        +String id
+        +String question
+        +Importance importance
+        String resolvability
+        CruxPosition[] positions
+        String[] relatedCruxes
+    }
+
+    Estimate *-- EstimateSource
+`} />
+
+### Resource & Publication
+
+<Mermaid chart={`
+classDiagram
+    class Resource {
+        +String id
+        +String url
+        +String title
+        ResourceType type
+        String[] authors
+        Number importance
+        String summary
+        String review
+        String publication_id
+    }
+
+    class Publication {
+        +String id
+        +String name
+        +PublicationType type
+        +Number credibility
+        Boolean peer_reviewed
+    }
+
+    Resource --> Publication : publication_id
+`} />
+
+---
+
+## Graph Systems
+
+The wiki has three distinct graph systems for different purposes.
+
+### 1. Cause-Effect Graphs (Entity-embedded)
+
+Used on individual entity pages to show causal factors. Rendered with React Flow.
+
+<Mermaid chart={`
+classDiagram
+    class CauseEffectGraph {
+        String title
+        String description
+        String primaryNodeId
+        CauseEffectNode[] nodes
+        CauseEffectEdge[] edges
+    }
+
+    class CauseEffectNode {
+        +String id
+        +String label
+        String description
+        NodeType type
+        Number confidence
+        String details
+        String entityRef
+        NodeScores scores
+        String color
+    }
+
+    class CauseEffectEdge {
+        String id
+        +String source
+        +String target
+        Strength strength
+        Confidence confidence
+        Effect effect
+        String label
+    }
+
+    class NodeScores {
+        Number novelty
+        Number sensitivity
+        Number changeability
+        Number certainty
+    }
+
+    CauseEffectGraph *-- CauseEffectNode
+    CauseEffectGraph *-- CauseEffectEdge
+    CauseEffectNode *-- NodeScores
+
+    note for CauseEffectNode "type: leaf | cause | intermediate | effect"
+    note for CauseEffectEdge "effect: increases | decreases | mixed"
+`} />
+
+### 2. Risk Dependency Graphs (Standalone)
+
+Used for modeling risk dependencies across the system.
+
+<Mermaid chart={`
+classDiagram
+    class Graph {
+        +String id
+        +String title
+        String description
+        GraphNode[] nodes
+        GraphEdge[] edges
+    }
+
+    class GraphNode {
+        +String id
+        +String label
+        +Category category
+        String description
+        String entityRef
+    }
+
+    class GraphEdge {
+        +String from
+        +String to
+        +EdgeType type
+        String label
+        Importance strength
+    }
+
+    Graph *-- GraphNode
+    Graph *-- GraphEdge
+
+    note for GraphNode "category: crux | risk | outcome | capability | intervention"
+    note for GraphEdge "type: causes | mitigates | requires | enables | blocks"
+`} />
+
+### 3. Master Graph (Unified causal model)
+
+A single large graph that entity pages extract subgraphs from. Supports multi-page views with per-entity highlighting.
+
+<Mermaid chart={`
+classDiagram
+    class MasterGraph {
+        +String id
+        +String title
+        String version
+        MasterGraphNode[] nodes
+        MasterGraphEdge[] edges
+        SubgraphSpec[] subgraphs
+        Group[] groups
+    }
+
+    class MasterGraphNode {
+        +String id
+        +String label
+        +NodeType type
+        String ownerEntityId
+        String entityRef
+        String group
+        Number confidence
+    }
+
+    class SubgraphSpec {
+        +String entityId
+        +String centerNode
+        Number depth
+        String[] includeNodes
+        String[] excludeNodes
+    }
+
+    MasterGraph *-- MasterGraphNode
+    MasterGraph *-- SubgraphSpec
+`} />
+
+---
+
+## Relationship Types (45 total)
+
+All relationship types grouped by semantic category. "A → B" means "A [relationship] B".
+
+| Category | Types | Semantics |
+|----------|-------|-----------|
+| **Causal** | `causes`, `cause`, `drives`, `driven-by`, `driver`, `affects`, `amplifies`, `leads-to`, `contributes-to`, `shaped-by` | A influences or produces B |
+| **Mitigation** | `mitigates`, `mitigated-by`, `mitigation`, `blocks`, `addresses` | A reduces or prevents B |
+| **Dependency** | `requires`, `enables`, `prerequisite`, `child-of`, `composed-of`, `component`, `supersedes` | A structurally depends on or contains B |
+| **Measurement** | `measures`, `measured-by`, `analyzes`, `analyzed-by`, `models`, `increases`, `decreases`, `supports` | A quantifies or tracks B |
+| **Classification** | `related`, `example`, `mechanism`, `outcome`, `consequence`, `manifestation`, `key-factor`, `scenario`, `sub-scenario`, `research`, `vulnerable-technique` | A is categorically related to B |
+
+How relationships flow through the system:
 
 <Mermaid chart={`
 flowchart TD
-    subgraph CoreContent["Core Content"]
-        direction TB
-        risk["risk"]
-        risk_factor["risk-factor"]
-        capability["capability"]
-        concept["concept"]
-        concepts["concepts"]
-        crux["crux"]
-        argument["argument"]
-        case_study["case-study"]
-    end
+    A[Entity A] -->|"relatedEntries"| B[Entity B]
+    B -.->|"backlink<br/>(auto-computed)"| A
 
-    subgraph SafetyResponses["Safety & Responses"]
-        direction TB
-        safety_agenda["safety-agenda"]
-        safety_approaches["safety-approaches"]
-        intervention["intervention"]
-        policy["policy"]
-        policies["policies"]
-    end
-
-    subgraph Organizations["Organizations"]
-        direction TB
-        organization["organization"]
-        lab["lab"]
-        lab_frontier["lab-frontier"]
-        lab_research["lab-research"]
-        lab_startup["lab-startup"]
-        lab_academic["lab-academic"]
-        funder["funder"]
-    end
-
-    subgraph Analysis["Analysis"]
-        direction TB
-        model["model"]
-        models["models"]
-        scenario["scenario"]
-        parameter["parameter"]
-        metric["metric"]
-        analysis["analysis"]
-    end
-
-    subgraph AITransitionModel["AI Transition Model"]
-        direction TB
-        ai_transition_model_factor["ai-transition-model-factor"]
-        ai_transition_model_subitem["ai-transition-model-subitem"]
-        ai_transition_model_parameter["ai-transition-model-parameter"]
-        ai_transition_model_metric["ai-transition-model-metric"]
-        ai_transition_model_scenario["ai-transition-model-scenario"]
-    end
-
-    subgraph Other["Other"]
-        direction TB
-        researcher["researcher"]
-        resource["resource"]
-        historical["historical"]
-        events["events"]
-    end
+    style A fill:#cceeff
+    style B fill:#cceeff
 `} />
 
-## Relationship Types Overview
+---
 
-<Mermaid chart={`
-flowchart LR
-    subgraph Causal["Causal"]
-        causes["causes"]
-        cause["cause"]
-        drives["drives"]
-        driver["driver"]
-        driven_by["driven-by"]
-        affects["affects"]
-        amplifies["amplifies"]
-        leads_to["leads-to"]
-        contributes_to["contributes-to"]
-        shaped_by["shaped-by"]
-    end
+## Enum Reference
 
-    subgraph Mitigation["Mitigation"]
-        mitigates["mitigates"]
-        mitigated_by["mitigated-by"]
-        mitigation["mitigation"]
-        blocks["blocks"]
-        addresses["addresses"]
-    end
+### EntityType (24 canonical + 11 aliases)
 
-    subgraph Structural["Structural"]
-        requires["requires"]
-        enables["enables"]
-        child_of["child-of"]
-        composed_of["composed-of"]
-        component["component"]
-        prerequisite["prerequisite"]
-    end
+**Canonical types by group:**
 
-    subgraph Measurement["Measurement"]
-        measures["measures"]
-        measured_by["measured-by"]
-        analyzes["analyzes"]
-        analyzed_by["analyzed-by"]
-        models["models"]
-        increases["increases"]
-        decreases["decreases"]
-        supports["supports"]
-    end
+| Group | Types |
+|-------|-------|
+| **Content** | `risk`, `risk-factor`, `capability`, `concept`, `crux`, `argument`, `case-study` |
+| **Safety** | `safety-agenda`, `approach`, `project`, `policy` |
+| **People/Orgs** | `person`, `organization`, `funder` |
+| **Analysis** | `model`, `parameter`, `metric`, `analysis`, `scenario` |
+| **AI Transition** | `ai-transition-model-parameter`, `...metric`, `...scenario`, `...factor`, `...subitem` |
+| **Other** | `resource`, `historical`, `event`, `debate`, `table`, `diagram`, `insight`, `intelligence-paradigm` |
 
-    subgraph Classification["Classification"]
-        related["related"]
-        example["example"]
-        mechanism["mechanism"]
-        outcome["outcome"]
-        consequence["consequence"]
-        manifestation["manifestation"]
-        key_factor["key-factor"]
-        scenario["scenario"]
-        sub_scenario["sub-scenario"]
-        supersedes["supersedes"]
-        research["research"]
-        vulnerable_technique["vulnerable-technique"]
-    end
-`} />
+**Legacy aliases** (kept for backward compatibility):
 
-## Entity Types (35 total)
+| Alias | Resolves to |
+|-------|-------------|
+| `researcher` | `person` |
+| `lab`, `lab-frontier`, `lab-research`, `lab-startup`, `lab-academic` | `organization` |
+| `safety-approaches` | `safety-agenda` |
+| `policies` | `policy` |
+| `concepts` | `concept` |
+| `events` | `event` |
+| `models` | `model` |
 
-| Type | Description |
-|------|-------------|
-| `risk` | - |
-| `risk-factor` | - |
-| `capability` | - |
-| `safety-agenda` | - |
-| `safety-approaches` | Safety research approaches/agendas |
-| `intervention` | Technical or policy interventions |
-| `policy` | - |
-| `policies` | Policy categories (alias for grouping) |
-| `organization` | Generic organization |
-| `lab` | AI lab (generic) |
-| `lab-frontier` | - |
-| `lab-research` | - |
-| `lab-startup` | - |
-| `lab-academic` | - |
-| `crux` | - |
-| `concept` | Abstract concepts, ideas, or theoretical constructs |
-| `concepts` | Plural alias |
-| `case-study` | - |
-| `researcher` | - |
-| `scenario` | - |
-| `resource` | - |
-| `funder` | - |
-| `historical` | Historical era or timeline event |
-| `events` | Events or milestones |
-| `analysis` | Analysis or comparison pages |
-| `model` | Analytical model for risks/scenarios (has MDX content) |
-| `models` | Plural alias |
-| `parameter` | Key societal/structural variable (generic) |
-| `metric` | Measurable indicator (generic) |
-| `argument` | Arguments for/against a position |
-| `ai-transition-model-parameter` | Parameters in the AI transition model |
-| `ai-transition-model-metric` | Metrics tracking AI transition parameters |
-| `ai-transition-model-scenario` | Scenarios/outcomes in the transition model |
-| `ai-transition-model-factor` | Root factors (was risk-factor in ATM context) |
-| `ai-transition-model-subitem` | Sub-items within factors (e.g., compute, algorithms) |
+### Key Enum Values
 
+| Enum | Values |
+|------|--------|
+| **Confidence** | `low`, `medium`, `high` |
+| **Importance** | `low`, `medium`, `high`, `critical` |
+| **EntityStatus** | `stub`, `draft`, `published`, `verified` |
+| **ResearchMaturity** | `Neglected`, `Emerging`, `Growing`, `Mature` |
+| **OrgType** | `frontier-lab`, `safety-org`, `academic`, `government`, `funder`, `policy` |
+| **RiskCategory** | `accident`, `misuse`, `structural`, `epistemic` |
+| **Severity** | `low`, `medium`, `medium-high`, `high`, `critical`, `catastrophic` |
+| **LikelihoodLevel** | `low`, `medium`, `medium-high`, `high`, `very-high`, `near-certain` |
+| **LikelihoodStatus** | `theoretical`, `emerging`, `occurring`, `established` |
+| **ResourceType** | `paper`, `blog`, `report`, `book`, `talk`, `podcast`, `government`, `reference`, `web` |
+| **PublicationType** | `academic_journal`, `preprint_server`, `think_tank`, `company_blog`, `government`, `blog_platform`, `news`, `organization`, `academic`, `code_repository`, + more |
+| **Cluster** | `ai-safety`, `biorisks`, `cyber`, `epistemics`, `governance`, `community` |
+| **Relationship Strength** | `weak`, `moderate`, `strong` |
+| **CauseEffect Strength** | `weak`, `medium`, `strong` |
+| **CauseEffect Effect** | `increases`, `decreases`, `mixed` |
 
-## Relationship Types (41 total)
+---
 
-| Type | Description |
-|------|-------------|
-| `related` | Generic relationship |
-| `causes` | A causes B |
-| `cause` | Alias for causes |
-| `mitigates` | A reduces/prevents B |
-| `mitigated-by` | Inverse: A is mitigated by B |
-| `mitigation` | A is a mitigation for B |
-| `requires` | A needs B to work |
-| `enables` | A makes B possible |
-| `blocks` | A prevents B |
-| `supersedes` | A replaces B (for deprecated entries) |
-| `increases` | Intervention increases parameter |
-| `decreases` | Risk decreases parameter |
-| `supports` | Intervention supports/stabilizes parameter |
-| `measures` | Metric measures parameter |
-| `measured-by` | Inverse of measures |
-| `analyzed-by` | Entity is analyzed by a model/analysis |
-| `analyzes` | Entity analyzes another |
-| `child-of` | A is a child/sub-item of B |
-| `composed-of` | A is composed of B |
-| `component` | A is a component of B |
-| `addresses` | A addresses/deals with B |
-| `affects` | A affects B |
-| `amplifies` | A amplifies B |
-| `contributes-to` | A contributes to B |
-| `driven-by` | A is driven by B |
-| `driver` | A is a driver of B |
-| `drives` | A drives B |
-| `leads-to` | A leads to B |
-| `shaped-by` | A is shaped by B |
-| `consequence` | A is a consequence of B |
-| `example` | A is an example of B |
-| `key-factor` | A is a key factor in B |
-| `manifestation` | A is a manifestation of B |
-| `mechanism` | A is a mechanism for B |
-| `outcome` | A is an outcome of B |
-| `prerequisite` | A is a prerequisite for B |
-| `research` | A is research related to B |
-| `scenario` | A is a scenario type |
-| `sub-scenario` | A is a sub-scenario of B |
-| `vulnerable-technique` | A is vulnerable to technique B |
-| `models` | A models B |
+## Data Flow: Build Pipeline
 
-
-## Data Flow
+How `build-data.mjs` transforms raw data into the runtime database.
 
 <Mermaid chart={`
 flowchart TD
-    subgraph Sources["YAML Data Sources"]
-        E1[entities/*.yaml]
-        E2[resources/*.yaml]
-        E3[publications.yaml]
-        E4[graphs/*.yaml]
+    subgraph Input["Source Files"]
+        YAML["YAML data"]
+        MDX["MDX pages"]
     end
 
-    subgraph Validation["Schema Validation"]
-        V1[Zod Schemas]
-        V2[validate-yaml-schema.mjs]
+    subgraph Parse["1. Parse & Merge"]
+        P1["Parse YAML"]
+        P2["Scan frontmatter"]
+        P3["Auto-create entities"]
     end
 
-    subgraph Build["Build Pipeline"]
-        B1[build-data.mjs]
-        B2[database.json]
-        B3[pathRegistry.json]
+    subgraph Transform["2. Transform"]
+        T1["Assign numeric IDs"]
+        T2["Validate with Zod"]
+        T3["Compute backlinks"]
     end
 
-    subgraph UI["UI Components"]
-        U1[EntityLink]
-        U2[DataInfoBox]
-        U3[CauseEffectGraph]
+    subgraph Enrich["3. Enrich"]
+        E1["Resolve facts"]
+        E2["Build indices"]
+        E3["Generate search"]
     end
 
-    E1 --> V2
-    E2 --> V2
-    E3 --> V2
-    E4 --> V2
-    V2 --> V1
-    V1 --> B1
-    B1 --> B2
-    B1 --> B3
-    B2 --> U1
-    B2 --> U2
-    B2 --> U3
+    subgraph Output["Output"]
+        DB["database.json"]
+        Reg["id-registry.json"]
+    end
+
+    Input --> Parse
+    Parse --> Transform
+    Transform --> Enrich
+    Enrich --> Output
+
+    style Input fill:#fff4e1
+    style Parse fill:#cceeff
+    style Transform fill:#e1f5ff
+    style Enrich fill:#cceeff
+    style Output fill:#ccffcc
 `} />
 
-## Regenerating This Page
+**Detailed steps within `build-data.mjs`:**
 
-```bash
-node scripts/generate-schema-docs.mjs
+| Phase | Steps |
+|-------|-------|
+| **Parse** | Parse all YAML files, scan MDX frontmatter, auto-create entities for MDX pages without YAML |
+| **Transform** | Assign stable numeric IDs (E1, E2...), type and validate against Zod, compute backlinks (invert relatedEntries) |
+| **Enrich** | Build tag index, build path registry, resolve computed facts (topological sort), generate search index, generate MDX stubs from YAML ContentSections |
+| **Output** | Write `database.json`, `id-registry.json`, individual JSON files, search index |
+
+---
+
+## Facts System
+
+Facts are canonical, referenceable values that can be computed from expressions referencing other facts.
+
+<Mermaid chart={`
+classDiagram
+    class FactsFile {
+        +String entity
+        +Record facts
+    }
+
+    class Fact {
+        String value
+        Number numeric
+        String asOf
+        String source
+        String note
+        Boolean noCompute
+        String compute
+        String format
+        Number formatDivisor
+    }
+
+    FactsFile *-- Fact
+
+    note for Fact "compute: expression referencing other facts\ne.g. {anthropic.valuation} * {rate}\nResolved via topological sort at build time"
+`} />
+
+**Example fact file** (`data/facts/anthropic.yaml`):
+```yaml
+entity: anthropic
+facts:
+  founding-year:
+    value: "2021"
+    numeric: 2021
+    source: "Wikipedia"
+  valuation:
+    compute: "{anthropic.funding} * 1.5"
+    format: "$%.1f billion"
+    formatDivisor: 1e9
 ```
 
-This script reads `src/data/schema.ts` and extracts:
-- `EntityType` enum values and comments
-- `RelationshipType` enum values and comments
+---
 
-The categories shown in the diagrams are defined in the script itself.
+## Content Freshness Tracking
+
+MDX frontmatter can include freshness metadata to track content staleness:
+
+```yaml
+reviewBy: "2026-06-26"           # When content should be reviewed
+contentDependencies:              # Entity IDs that affect this content
+  - deceptive-alignment
+  - mesa-optimization
+lastReviewed: "2025-12-26"
+reviewedBy: "ozzie"
+stalenessRisk: "low"             # low | medium | high
+```
+
+---
+
+*Source of truth: `data/schema.ts` (834 lines)*
