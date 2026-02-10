@@ -767,7 +767,7 @@ export function PageStatus({
           <IconCalendar className="shrink-0 opacity-60" />
           <span>
             Updated{" "}
-            <Link href="/wiki/updates" className="font-medium text-foreground hover:underline no-underline">
+            <Link href="/internal/updates" className="font-medium text-foreground hover:underline no-underline">
               {formatFrequency(updateFrequency)}
             </Link>
           </span>
