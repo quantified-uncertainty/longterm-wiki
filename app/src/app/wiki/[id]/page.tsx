@@ -124,11 +124,13 @@ function ArticleView({
   pageData,
   entityPath,
   slug,
+  fullWidth,
 }: {
   page: MdxPage;
   pageData: Page | undefined;
   entityPath: string;
   slug: string;
+  fullWidth?: boolean;
 }) {
   const lastUpdated = pageData?.lastUpdated;
   const githubUrl = pageData?.filePath
@@ -173,7 +175,7 @@ function ArticleView({
           <InfoBoxToggle />
         </div>
       </div>
-      <article className="prose min-w-0">
+      <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}`}>
         <PageStatus
           quality={pageData?.quality ?? undefined}
           importance={pageData?.importance ?? undefined}
@@ -204,20 +206,35 @@ function ArticleView({
 
 function WithSidebar({
   entityPath,
+  fullWidth,
   children,
 }: {
   entityPath: string;
+  fullWidth?: boolean;
   children: React.ReactNode;
 }) {
   const sidebarType = detectSidebarType(entityPath);
-  if (!sidebarType) return <div className="max-w-7xl mx-auto px-6 py-8">{children}</div>;
+
+  // Compute content container class once:
+  // - fullWidth: edge-to-edge (for table pages)
+  // - with sidebar: narrower max to leave room for sidebar
+  // - no sidebar: wider max for standalone articles
+  const contentClass = fullWidth
+    ? "w-full px-3 py-4"
+    : sidebarType
+      ? "max-w-[65rem] mx-auto px-8 py-4"
+      : "max-w-7xl mx-auto px-6 py-8";
+
+  if (!sidebarType) {
+    return <div className={contentClass}>{children}</div>;
+  }
 
   const sections = getWikiNav(sidebarType);
   return (
     <SidebarProvider>
       <WikiSidebar sections={sections} />
       <div className="flex-1 min-w-0">
-        <div className="max-w-[65rem] mx-auto px-8 py-4">{children}</div>
+        <div className={contentClass}>{children}</div>
       </div>
     </SidebarProvider>
   );
@@ -236,13 +253,15 @@ export default async function WikiPage({ params }: PageProps) {
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
     const entityPath = getEntityPath(slug) || "";
+    const fullWidth = result.frontmatter.fullWidth === true;
     return (
-      <WithSidebar entityPath={entityPath}>
+      <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
         <ArticleView
           page={result}
           pageData={getPageById(slug)}
           entityPath={entityPath}
           slug={slug}
+          fullWidth={fullWidth}
         />
       </WithSidebar>
     );
@@ -260,13 +279,15 @@ export default async function WikiPage({ params }: PageProps) {
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
     const entityPath = getEntityPath(id) || "";
+    const fullWidth = result.frontmatter.fullWidth === true;
     return (
-      <WithSidebar entityPath={entityPath}>
+      <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
         <ArticleView
           page={result}
           pageData={getPageById(id)}
           entityPath={entityPath}
           slug={id}
+          fullWidth={fullWidth}
         />
       </WithSidebar>
     );

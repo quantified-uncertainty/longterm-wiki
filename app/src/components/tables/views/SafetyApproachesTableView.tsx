@@ -15,8 +15,8 @@ import {
 } from "../safety-approaches-columns"
 import {
   getBadgeColorClass,
-  categoryColors as safetyCategoryColors,
-} from "../shared/safety-table-styles"
+  safetyCategoryColors,
+} from "../shared/table-view-styles"
 import { TableViewPage } from "../shared/TableViewPage"
 
 function LegendBadge({ level }: { level: string }) {
@@ -37,11 +37,6 @@ export default function SafetyApproachesTableView() {
 
   return (
     <TableViewPage
-      title="AI Safety Approaches: Safety vs Capability Tradeoffs"
-      breadcrumbs={[
-        { label: "Knowledge Base", href: "/wiki/knowledge-base/" },
-        { label: "All Tables", href: "/wiki/interactive-views/" },
-      ]}
       data={SAFETY_APPROACHES}
       createColumns={createColumns}
       columnConfig={SAFETY_APPROACHES_COLUMNS}

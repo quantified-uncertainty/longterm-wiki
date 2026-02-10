@@ -16,11 +16,6 @@ export default function DeploymentArchitecturesTableView() {
 
   return (
     <TableViewPage
-      title="Deployment / Safety Architectures"
-      breadcrumbs={[
-        { label: "Knowledge Base", href: "/wiki/knowledge-base/" },
-        { label: "All Tables", href: "/wiki/interactive-views/" },
-      ]}
       navLinks={[
         {
           label: "Model Architectures",

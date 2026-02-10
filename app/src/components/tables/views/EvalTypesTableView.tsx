@@ -23,11 +23,6 @@ export default function EvalTypesTableView() {
 
   return (
     <TableViewPage
-      title="AI Evaluation Types - Strategic Analysis"
-      breadcrumbs={[
-        { label: "Knowledge Base", href: "/wiki/knowledge-base/" },
-        { label: "All Tables", href: "/wiki/interactive-views/" },
-      ]}
       navLinks={[
         {
           label: "Eval Types",

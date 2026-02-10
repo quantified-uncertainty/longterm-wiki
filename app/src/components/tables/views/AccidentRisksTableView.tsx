@@ -173,11 +173,6 @@ export default function AccidentRisksTableView() {
 
   return (
     <TableViewPage
-      title="AI Accident Risks: Overlap Analysis"
-      breadcrumbs={[
-        { label: "Accident Risks", href: "/wiki/accident-risks/" },
-        { label: "All Tables", href: "/wiki/interactive-views/" },
-      ]}
       data={accidentRisks}
       createColumns={createColumns}
       columnConfig={ACCIDENT_RISKS_COLUMNS}
