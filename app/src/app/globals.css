@@ -47,18 +47,6 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --code-bg: oklch(0.93 0 0);
-
-  /* Starlight CSS variable compatibility shims */
-  --sl-color-gray-2: #9ca3af;
-  --sl-color-gray-3: #6b7280;
-  --sl-color-gray-4: #4b5563;
-  --sl-color-gray-5: #e5e7eb;
-  --sl-color-gray-6: #f9fafb;
-  --sl-color-text: var(--foreground);
-  --sl-color-text-accent: oklch(0.205 0 0);
-  --sl-color-accent: #6366f1;
-  --sl-color-bg: var(--background);
-  --sl-color-white: oklch(0.145 0 0);
 }
 
 .dark {
@@ -81,16 +69,6 @@
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
   --code-bg: oklch(0.22 0 0);
-
-  --sl-color-gray-2: #d1d5db;
-  --sl-color-gray-3: #9ca3af;
-  --sl-color-gray-4: #6b7280;
-  --sl-color-gray-5: #374151;
-  --sl-color-gray-6: #1f2937;
-  --sl-color-text: var(--foreground);
-  --sl-color-text-accent: oklch(0.985 0 0);
-  --sl-color-bg: var(--background);
-  --sl-color-white: oklch(0.985 0 0);
 }
 
 @layer base {
