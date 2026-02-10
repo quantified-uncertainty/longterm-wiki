@@ -133,3 +133,14 @@ Each page's `subcategory` field (e.g., `risk-models`, `factors-ai-capabilities`)
 - **Build-time remapping**: `build-data.mjs` remaps raw YAML types (e.g., `response` → `approach`)
 - **Runtime enrichment**: `src/data/index.ts` `transformEntity()` merges expert data (role, affiliation), assigns org subtypes (lab-* → organization + orgType), and assigns risk categories
 - Legacy types still in database.json: `lab`, `lab-academic`, `lab-research`, `researcher` (remapped at runtime)
+
+## Squiggle Model Style Guide
+
+When creating or editing `<SquiggleEstimate>` models in MDX pages:
+
+- **Never use point values in mixtures.** `mixture(500e9, 350e9, ...)` creates jagged spikes. Use distributions: `mixture(400e9 to 650e9, 250e9 to 450e9, ...)`.
+- **Use `X to Y` syntax** for quantities with uncertainty. Reserve `normal()` for symmetric quantities near zero.
+- **Keep models 5–30 lines.** Break larger analyses into multiple blocks.
+- **Always add a title**: `<SquiggleEstimate title="Descriptive Title" code={...} />`.
+- **Name variables clearly**: `founderEquity`, not `x` or `temp`.
+- Default `sampleCount` is 5000. The `squiggle-quality` validation rule enforces these conventions.
