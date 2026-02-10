@@ -23,7 +23,6 @@ ratings:
   actionability: 5.5
 importance: 52.5
 llmSummary: Analyzes recovery pathways from AI incidents across five types (technical failures, trust collapse, expertise loss, alignment failures). Finds clear attribution enables 3-5x faster detection, preserved expertise reduces recovery time by 2-100x depending on degradation level, and recommends allocating 5-10% of safety resources to recovery capacity, particularly for neglected trust/epistemic recovery and skill preservation.
-pageTemplate: knowledge-base-model
 todos:
   - Complete 'Conceptual Framework' section
   - Complete 'Quantitative Analysis' section (8 placeholders)
@@ -38,7 +37,6 @@ clusters:
   - governance
 subcategory: societal-models
 ---
-import { Aside } from '@astrojs/starlight/components';
 import { DataInfoBox, Backlinks, KeyQuestions, Mermaid , EntityLink} from '@components/wiki';
 
 <DataInfoBox entityId="post-incident-recovery" ratings={frontmatter.ratings} />

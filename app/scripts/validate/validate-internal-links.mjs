@@ -248,7 +248,14 @@ function main() {
     }
   }
 
-  // Output results
+  // Output results — relativize file paths so JSON isn't machine-specific
+  const relativize = (obj) => {
+    if (obj.file) obj.file = obj.file.replace(CONTENT_DIR + '/', '');
+    return obj;
+  };
+  results.brokenLinks = results.brokenLinks.map(relativize);
+  results.conventionIssues = results.conventionIssues.map(relativize);
+
   if (CI_MODE) {
     const jsonOutput = JSON.stringify(results, null, 2);
 

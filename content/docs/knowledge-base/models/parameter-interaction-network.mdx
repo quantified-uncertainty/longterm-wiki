@@ -14,7 +14,6 @@ ratings:
   actionability: 6
 importance: 72.5
 llmSummary: Maps causal relationships between 22 AI safety parameters, identifying 7 feedback loops and 4 clusters. Finds epistemic-health and institutional-quality as highest-leverage intervention points with net influence scores of +5 and +3 respectively.
-pageTemplate: knowledge-base-model
 todos:
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Strategic Importance' section
@@ -28,7 +27,6 @@ clusters:
   - governance
 subcategory: dynamics-models
 ---
-import { Aside } from '@astrojs/starlight/components';
 import { DataInfoBox, Backlinks, Mermaid , EntityLink} from '@components/wiki';
 
 <DataInfoBox entityId="parameter-interaction-network" ratings={frontmatter.ratings} />

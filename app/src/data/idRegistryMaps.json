@@ -631,7 +631,8 @@
     "E629": "suffering-lock-in",
     "E630": "surprise-threat-exposure",
     "E631": "technical-ai-safety",
-    "E632": "values"
+    "E632": "values",
+    "E633": "goal-misgeneralization-research"
   },
   "bySlug": {
     "adversarial-robustness": "E1",
@@ -1265,6 +1266,7 @@
     "suffering-lock-in": "E629",
     "surprise-threat-exposure": "E630",
     "technical-ai-safety": "E631",
-    "values": "E632"
+    "values": "E632",
+    "goal-misgeneralization-research": "E633"
   }
 }

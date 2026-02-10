@@ -31,6 +31,8 @@ import {
   Compass,
   Package,
   Calendar,
+  MessageSquare,
+  Brain,
 } from "lucide-react";
 
 type LucideIcon = React.ForwardRefExoticComponent<
@@ -228,6 +230,20 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
     iconColor: "text-rose-600 dark:text-rose-400",
     badgeColor: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
     headerColor: "#e11d48",
+  },
+  debate: {
+    label: "Debate",
+    icon: MessageSquare,
+    iconColor: "text-orange-600 dark:text-orange-400",
+    badgeColor: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+    headerColor: "#ea580c",
+  },
+  "intelligence-paradigm": {
+    label: "Intelligence Paradigm",
+    icon: Brain,
+    iconColor: "text-violet-600 dark:text-violet-400",
+    badgeColor: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
+    headerColor: "#7c3aed",
   },
 };
 

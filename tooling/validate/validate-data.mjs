@@ -72,11 +72,17 @@ function getExpectedPaths(type) {
     'lab-academic': ['knowledge-base/organizations'],
     'researcher': ['knowledge-base/people'],
     'crux': ['knowledge-base/cruxes'],
-    'scenario': ['analysis/scenarios'],
+    'scenario': ['analysis/scenarios', 'knowledge-base/future-projections'],
     'resource': ['resources'],
     'funder': ['knowledge-base/funders'],
     'intervention': ['knowledge-base/responses'],
     'case-study': ['knowledge-base/case-studies'],
+    'debate': ['knowledge-base/debates'],
+    'intelligence-paradigm': ['knowledge-base/intelligence-paradigms'],
+    'metric': ['knowledge-base/metrics'],
+    'historical': ['knowledge-base/history'],
+    'concept': ['knowledge-base/worldviews', 'knowledge-base/forecasting'],
+    'event': ['knowledge-base/incidents'],
   };
 
   return pathMapping[type] || ['knowledge-base'];

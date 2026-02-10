@@ -2374,6 +2374,11 @@
       "title": "Interpretability"
     },
     {
+      "id": "goal-misgeneralization-research",
+      "type": "approach",
+      "title": "Goal Misgeneralization Research"
+    },
+    {
       "id": "distributional-shift",
       "type": "risk",
       "title": "Distributional Shift"
