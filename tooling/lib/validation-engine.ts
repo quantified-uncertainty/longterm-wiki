@@ -6,7 +6,7 @@
  * separate validator scripts that each re-read all files.
  *
  * Usage:
- *   import { ValidationEngine } from './validation-engine.mjs';
+ *   import { ValidationEngine } from './validation-engine.js';
  *
  *   const engine = new ValidationEngine();
  *   await engine.load();
@@ -23,10 +23,73 @@ import { parseFrontmatterAndBody } from './mdx-utils.mjs';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './content-types.js';
 import { parseSidebarConfig } from './sidebar-utils.mjs';
 
-/**
- * Load JSON file safely
- */
-function loadJSON(path) {
+// ---------------------------------------------------------------------------
+// Inline types for untyped .mjs dependencies (avoid blocking on full migration)
+// ---------------------------------------------------------------------------
+
+interface Colors {
+  red: string;
+  yellow: string;
+  green: string;
+  blue: string;
+  cyan: string;
+  dim: string;
+  bold: string;
+  reset: string;
+  [key: string]: string;
+}
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export interface FixSpec {
+  type: string;
+  content?: string;
+  oldText?: string;
+  newText?: string;
+}
+
+export interface IssueOptions {
+  rule: string;
+  file: string;
+  line?: number;
+  message: string;
+  severity?: string;
+  fix?: FixSpec | null;
+}
+
+export interface Rule {
+  id: string;
+  name: string;
+  description: string;
+  scope?: 'file' | 'global';
+  check(
+    input: ContentFile | ContentFile[],
+    engine: ValidationEngine,
+  ): Issue[] | Promise<Issue[]>;
+}
+
+export interface ValidateOptions {
+  ruleIds?: string[] | null;
+  files?: string[] | null;
+}
+
+export interface FormatOptions {
+  ci?: boolean;
+  verbose?: boolean;
+}
+
+export interface EngineOptions {
+  contentDir?: string;
+  dataDir?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function loadJSON(path: string): unknown | null {
   const fullPath = join(PROJECT_ROOT, path);
   if (!existsSync(fullPath)) return null;
   try {
@@ -36,10 +99,7 @@ function loadJSON(path) {
   }
 }
 
-/**
- * Load YAML file safely
- */
-function loadYAML(path) {
+function loadYAML(path: string): unknown | null {
   const fullPath = join(PROJECT_ROOT, path);
   if (!existsSync(fullPath)) return null;
   try {
@@ -49,43 +109,39 @@ function loadYAML(path) {
   }
 }
 
-/**
- * Issue severity levels
- */
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+/** Issue severity levels */
 export const Severity = {
-  ERROR: 'error',     // Must fix - will fail CI
-  WARNING: 'warning', // Should fix - won't fail CI by default
-  INFO: 'info',       // Informational - suggestions
-};
+  ERROR: 'error',
+  WARNING: 'warning',
+  INFO: 'info',
+} as const;
 
-/**
- * Fix types for declarative fixes
- */
+/** Fix types for declarative fixes */
 export const FixType = {
-  INSERT_LINE_BEFORE: 'insert-line-before',  // Insert a line before the specified line
-  INSERT_LINE_AFTER: 'insert-line-after',    // Insert a line after the specified line
-  REPLACE_LINE: 'replace-line',              // Replace the entire line
-  REPLACE_TEXT: 'replace-text',              // Replace specific text in the line
-};
+  INSERT_LINE_BEFORE: 'insert-line-before',
+  INSERT_LINE_AFTER: 'insert-line-after',
+  REPLACE_LINE: 'replace-line',
+  REPLACE_TEXT: 'replace-text',
+} as const;
 
-/**
- * Validation issue structure
- */
+// ---------------------------------------------------------------------------
+// Issue
+// ---------------------------------------------------------------------------
+
+/** Validation issue */
 export class Issue {
-  /**
-   * @param {Object} options
-   * @param {string} options.rule - Rule ID that generated this issue
-   * @param {string} options.file - File path
-   * @param {number} options.line - Line number (1-indexed, relative to body)
-   * @param {string} options.message - Human-readable message
-   * @param {string} options.severity - Severity level
-   * @param {Object} options.fix - Optional fix specification
-   * @param {string} options.fix.type - Fix type from FixType enum
-   * @param {string} options.fix.content - Content to insert/replace
-   * @param {string} options.fix.oldText - For REPLACE_TEXT: text to find
-   * @param {string} options.fix.newText - For REPLACE_TEXT: replacement text
-   */
-  constructor({ rule, file, line, message, severity = Severity.ERROR, fix = null }) {
+  rule: string;
+  file: string;
+  line: number | undefined;
+  message: string;
+  severity: string;
+  fix: FixSpec | null;
+
+  constructor({ rule, file, line, message, severity = Severity.ERROR, fix = null }: IssueOptions) {
     this.rule = rule;
     this.file = file;
     this.line = line;
@@ -94,51 +150,77 @@ export class Issue {
     this.fix = fix;
   }
 
-  toString() {
+  toString(): string {
     const loc = this.line ? `:${this.line}` : '';
     return `[${this.severity.toUpperCase()}] ${this.rule}: ${this.file}${loc} - ${this.message}`;
   }
 
-  get isFixable() {
+  get isFixable(): boolean {
     return this.fix != null && this.fix.type != null;
   }
 }
 
-/**
- * Content file representation
- */
+// ---------------------------------------------------------------------------
+// ContentFile
+// ---------------------------------------------------------------------------
+
+/** Content file representation */
 export class ContentFile {
-  constructor(filePath, raw) {
+  path: string;
+  relativePath: string;
+  raw: string;
+  frontmatter: Record<string, any>;
+  body: string;
+  extension: string;
+  isIndex: boolean;
+  directory: string;
+  slug: string;
+
+  constructor(filePath: string, raw: string) {
     this.path = filePath;
     this.relativePath = relative(CONTENT_DIR, filePath);
     this.raw = raw;
 
-    const { frontmatter, body } = parseFrontmatterAndBody(raw);
-    this.frontmatter = frontmatter;
-    this.body = body;
+    const parsed = parseFrontmatterAndBody(raw);
+    this.frontmatter = parsed.frontmatter as Record<string, any>;
+    this.body = parsed.body;
 
-    // Derived properties
-    this.extension = filePath.split('.').pop();
+    this.extension = filePath.split('.').pop() || '';
     this.isIndex = basename(filePath).startsWith('index.');
     this.directory = dirname(this.relativePath);
     this.slug = this.relativePath.replace(/\.(mdx?|md)$/, '').replace(/\/index$/, '');
   }
 
-  /**
-   * Get URL path for this content
-   */
-  get urlPath() {
+  get urlPath(): string {
     let path = '/' + this.slug + '/';
     if (path === '//') path = '/';
     return path;
   }
 }
 
-/**
- * Main validation engine
- */
+// ---------------------------------------------------------------------------
+// ValidationEngine
+// ---------------------------------------------------------------------------
+
+interface IssueSummary {
+  total: number;
+  byRule: Record<string, number>;
+  bySeverity: { error: number; warning: number; info: number };
+  hasErrors: boolean;
+}
+
+/** Main validation engine */
 export class ValidationEngine {
-  constructor(options = {}) {
+  options: Required<EngineOptions>;
+  rules: Map<string, Rule>;
+  content: Map<string, ContentFile>;
+  loaded: boolean;
+  pathRegistry: Record<string, string>;
+  reversePathRegistry: Record<string, string>;
+  entities: unknown;
+  sidebarConfig: unknown;
+
+  constructor(options: EngineOptions = {}) {
     this.options = {
       contentDir: CONTENT_DIR,
       dataDir: DATA_DIR,
@@ -149,35 +231,31 @@ export class ValidationEngine {
     this.content = new Map();
     this.loaded = false;
 
-    // Shared data (loaded once)
-    this.pathRegistry = null;
+    this.pathRegistry = {};
+    this.reversePathRegistry = {};
     this.entities = null;
     this.sidebarConfig = null;
   }
 
-  /**
-   * Load all content and shared data
-   */
-  async load() {
+  /** Load all content and shared data */
+  async load(): Promise<void> {
     if (this.loaded) return;
 
-    // Load all MDX/MD files
     const files = findMdxFiles(this.options.contentDir);
     for (const filePath of files) {
       try {
         const raw = readFileSync(filePath, 'utf-8');
         const contentFile = new ContentFile(filePath, raw);
         this.content.set(filePath, contentFile);
-      } catch (err) {
-        console.error(`Failed to load ${filePath}: ${err.message}`);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(`Failed to load ${filePath}: ${message}`);
       }
     }
 
-    // Load shared data
-    this.pathRegistry = loadJSON('data/pathRegistry.json') || {};
+    this.pathRegistry = (loadJSON('data/pathRegistry.json') as Record<string, string>) || {};
     this.entities = loadYAML('data/entities.yaml') || {};
 
-    // Build reverse path registry (path -> id)
     this.reversePathRegistry = {};
     for (const [id, path] of Object.entries(this.pathRegistry)) {
       const normalized = path.endsWith('/') ? path : path + '/';
@@ -185,93 +263,75 @@ export class ValidationEngine {
       this.reversePathRegistry[path.replace(/\/$/, '')] = id;
     }
 
-    // Parse sidebar from astro.config.mjs
     this.sidebarConfig = this._parseSidebarConfig();
-
     this.loaded = true;
   }
 
-  /**
-   * Parse sidebar configuration from astro.config.mjs
-   * Uses shared utility from sidebar-utils.mjs
-   */
-  _parseSidebarConfig() {
+  /** Parse sidebar configuration */
+  private _parseSidebarConfig(): unknown {
     return parseSidebarConfig();
   }
 
-  /**
-   * Register a validation rule
-   */
-  addRule(rule) {
+  /** Register a validation rule */
+  addRule(rule: Rule): void {
     if (!rule.id || !rule.check) {
       throw new Error('Rule must have id and check function');
     }
     this.rules.set(rule.id, rule);
   }
 
-  /**
-   * Register multiple rules
-   */
-  addRules(rules) {
+  /** Register multiple rules */
+  addRules(rules: Rule[]): void {
     for (const rule of rules) {
       this.addRule(rule);
     }
   }
 
-  /**
-   * Get a registered rule by ID
-   */
-  getRule(id) {
+  /** Get a registered rule by ID */
+  getRule(id: string): Rule | undefined {
     return this.rules.get(id);
   }
 
-  /**
-   * Run validation
-   * @param {Object} options - Validation options
-   * @param {string[]} options.ruleIds - Specific rules to run (null = all)
-   * @param {string[]} options.files - Specific files to check (null = all)
-   * @returns {Issue[]} Array of issues found
-   */
-  async validate(options = {}) {
+  /** Run validation */
+  async validate(options: ValidateOptions = {}): Promise<Issue[]> {
     if (!this.loaded) {
       await this.load();
     }
 
     const { ruleIds = null, files = null } = options;
-    const issues = [];
+    const issues: Issue[] = [];
 
-    // Determine which rules to run
     const rulesToRun = ruleIds
-      ? ruleIds.map(id => this.rules.get(id)).filter(Boolean)
+      ? ruleIds.map(id => this.rules.get(id)).filter((r): r is Rule => r != null)
       : [...this.rules.values()];
 
-    // Determine which files to check
     const filesToCheck = files
-      ? files.map(f => this.content.get(f)).filter(Boolean)
+      ? files.map(f => this.content.get(f)).filter((c): c is ContentFile => c != null)
       : [...this.content.values()];
 
     // Run file-level rules
     for (const contentFile of filesToCheck) {
       for (const rule of rulesToRun) {
-        if (rule.scope === 'global') continue; // Skip global rules in file loop
+        if (rule.scope === 'global') continue;
 
         try {
           const ruleIssues = await rule.check(contentFile, this);
           if (Array.isArray(ruleIssues)) {
             issues.push(...ruleIssues);
           }
-        } catch (err) {
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : String(err);
           issues.push(new Issue({
             rule: rule.id,
             file: contentFile.path,
-            message: `Rule threw error: ${err.message}`,
+            message: `Rule threw error: ${message}`,
             severity: Severity.ERROR,
           }));
         }
       }
     }
 
-    // Run global rules (operate on all content at once)
+    // Run global rules
     for (const rule of rulesToRun) {
       if (rule.scope !== 'global') continue;
 
@@ -280,11 +340,12 @@ export class ValidationEngine {
         if (Array.isArray(ruleIssues)) {
           issues.push(...ruleIssues);
         }
-      } catch (err) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
         issues.push(new Issue({
           rule: rule.id,
           file: 'global',
-          message: `Rule threw error: ${err.message}`,
+          message: `Rule threw error: ${message}`,
           severity: Severity.ERROR,
         }));
       }
@@ -293,21 +354,16 @@ export class ValidationEngine {
     return issues;
   }
 
-  /**
-   * Apply fixes to files
-   * @param {Issue[]} issues - Issues with fix specifications
-   * @returns {Object} Fix results { filesFixed, issuesFixed }
-   */
-  applyFixes(issues) {
+  /** Apply fixes to files */
+  applyFixes(issues: Issue[]): { filesFixed: number; issuesFixed: number } {
     const fixableIssues = issues.filter(i => i.isFixable);
-    const byFile = new Map();
+    const byFile = new Map<string, Issue[]>();
 
-    // Group by file
     for (const issue of fixableIssues) {
       if (!byFile.has(issue.file)) {
         byFile.set(issue.file, []);
       }
-      byFile.get(issue.file).push(issue);
+      byFile.get(issue.file)!.push(issue);
     }
 
     let filesFixed = 0;
@@ -327,21 +383,17 @@ export class ValidationEngine {
     return { filesFixed, issuesFixed };
   }
 
-  /**
-   * Apply fixes to content string
-   * @private
-   */
-  _applyFixesToContent(content, issues) {
-    // Get frontmatter offset
+  /** Apply fixes to content string */
+  private _applyFixesToContent(content: string, issues: Issue[]): string {
     const frontmatterEndLine = this._getFrontmatterEndLine(content);
     const lines = content.split('\n');
 
-    // Sort issues by line number descending (fix from bottom up)
-    const sorted = [...issues].sort((a, b) => b.line - a.line);
+    const sorted = [...issues].sort((a, b) => (b.line || 0) - (a.line || 0));
 
     for (const issue of sorted) {
       const { fix, line } = issue;
-      // Convert body line number to absolute line number
+      if (!fix || !line) continue;
+
       const absLine = line + frontmatterEndLine;
       const lineIndex = absLine - 1;
 
@@ -355,7 +407,7 @@ export class ValidationEngine {
           break;
 
         case FixType.REPLACE_LINE:
-          lines[lineIndex] = fix.content;
+          lines[lineIndex] = fix.content!;
           break;
 
         case FixType.REPLACE_TEXT:
@@ -369,11 +421,8 @@ export class ValidationEngine {
     return lines.join('\n');
   }
 
-  /**
-   * Get the line index where frontmatter ends
-   * @private
-   */
-  _getFrontmatterEndLine(content) {
+  /** Get the line index where frontmatter ends */
+  private _getFrontmatterEndLine(content: string): number {
     const lines = content.split('\n');
     if (lines[0] !== '---') return 0;
 
@@ -387,16 +436,17 @@ export class ValidationEngine {
     return 0;
   }
 
-  /**
-   * Get summary statistics
-   */
-  getSummary(issues) {
-    const byRule = {};
+  /** Get summary statistics */
+  getSummary(issues: Issue[]): IssueSummary {
+    const byRule: Record<string, number> = {};
     const bySeverity = { error: 0, warning: 0, info: 0 };
 
     for (const issue of issues) {
       byRule[issue.rule] = (byRule[issue.rule] || 0) + 1;
-      bySeverity[issue.severity] = (bySeverity[issue.severity] || 0) + 1;
+      const sev = issue.severity as keyof typeof bySeverity;
+      if (sev in bySeverity) {
+        bySeverity[sev] = (bySeverity[sev] || 0) + 1;
+      }
     }
 
     return {
@@ -407,12 +457,10 @@ export class ValidationEngine {
     };
   }
 
-  /**
-   * Format issues for console output
-   */
-  formatOutput(issues, options = {}) {
-    const { ci = false, verbose = false } = options;
-    const colors = getColors(ci);
+  /** Format issues for console output */
+  formatOutput(issues: Issue[], options: FormatOptions = {}): string {
+    const { ci = false } = options;
+    const colors = getColors(ci) as Colors;
 
     if (ci) {
       return JSON.stringify({
@@ -427,17 +475,15 @@ export class ValidationEngine {
       }, null, 2);
     }
 
-    const lines = [];
-    const grouped = {};
+    const lines: string[] = [];
+    const grouped: Record<string, Issue[]> = {};
 
-    // Group by file
     for (const issue of issues) {
       const key = issue.file;
       if (!grouped[key]) grouped[key] = [];
       grouped[key].push(issue);
     }
 
-    // Output by file
     for (const [file, fileIssues] of Object.entries(grouped)) {
       const relPath = relative(PROJECT_ROOT, file);
       lines.push(`\n${colors.cyan}${relPath}${colors.reset}`);
@@ -451,7 +497,6 @@ export class ValidationEngine {
       }
     }
 
-    // Summary
     const summary = this.getSummary(issues);
     lines.push(`\n${colors.bold}Summary:${colors.reset}`);
     lines.push(`  Errors: ${colors.red}${summary.bySeverity.error}${colors.reset}`);
@@ -462,14 +507,16 @@ export class ValidationEngine {
   }
 }
 
-/**
- * Create a simple rule helper
- */
-export function createRule({ id, name, description, scope = 'file', check }) {
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Create a simple rule */
+export function createRule({ id, name, description, scope = 'file', check }: Rule): Rule {
   return { id, name, description, scope, check };
 }
 
-// Export singletons for convenience
+/** Singleton engine for convenience */
 export const engine = new ValidationEngine();
 
 export default ValidationEngine;

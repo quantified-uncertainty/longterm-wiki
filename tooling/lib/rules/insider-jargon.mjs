@@ -11,7 +11,7 @@
  * These patterns target insider shorthand, not legitimate descriptive uses.
  */
 
-import { Severity, Issue } from '../validation-engine.mjs';
+import { Severity, Issue } from '../validation-engine.js';
 
 const INSIDER_JARGON_PATTERNS = [
   // "EA money", "EA funding", "EA donors" — insider shorthand

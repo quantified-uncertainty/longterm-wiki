@@ -14,7 +14,7 @@
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 import { PROJECT_ROOT } from '../content-types.js';
 
 const FACTS_DIR = join(PROJECT_ROOT, 'data/facts');

@@ -10,7 +10,7 @@
  * maintainability for internal cross-references.
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 import { isInCodeBlock, isInComment, getLineNumber } from '../mdx-utils.mjs';
 
 // Internal paths that should use EntityLink

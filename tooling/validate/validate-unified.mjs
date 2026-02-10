@@ -20,7 +20,7 @@
  *   1 = One or more errors found
  */
 
-import { ValidationEngine, Severity } from '../lib/validation-engine.mjs';
+import { ValidationEngine, Severity } from '../lib/validation-engine.js';
 import { allRules } from '../lib/rules/index.mjs';
 import { getColors } from '../lib/output.mjs';
 

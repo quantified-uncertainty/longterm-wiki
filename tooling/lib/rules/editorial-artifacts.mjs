@@ -15,7 +15,7 @@
  * See content-quality.md "The Editorial Artifacts Trap" for full guidance.
  */
 
-import { Severity, Issue } from '../validation-engine.mjs';
+import { Severity, Issue } from '../validation-engine.js';
 
 const EDITORIAL_ARTIFACT_PATTERNS = [
   // Self-referencing revision history — "this analysis", "this page", etc.

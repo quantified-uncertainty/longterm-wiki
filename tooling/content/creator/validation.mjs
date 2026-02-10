@@ -9,7 +9,7 @@ import path from 'path';
 import { spawn } from 'child_process';
 import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.js';
 import { componentImportsRule } from '../../lib/rules/component-imports.mjs';
-import { ContentFile } from '../../lib/validation-engine.mjs';
+import { ContentFile } from '../../lib/validation-engine.js';
 
 /**
  * Ensure all used wiki components are properly imported.

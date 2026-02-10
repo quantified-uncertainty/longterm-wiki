@@ -10,7 +10,7 @@
  *   <1 year timeframe      -> parsed as JSX
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.mjs';
+import { createRule, Issue, Severity, FixType } from '../validation-engine.js';
 import { isInCodeBlock, isInJsxAttribute, getFrontmatterEndLine } from '../mdx-utils.mjs';
 
 // Pattern: < followed by a digit or \$ (escaped dollar sign)

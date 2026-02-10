@@ -8,7 +8,7 @@
  * to use <EntityLink> components but displayed them as raw text.
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 
 // Common JSX component patterns
 const JSX_PATTERNS = [

@@ -31,7 +31,7 @@ import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSy
 import { join, relative, basename, dirname } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { CONTENT_DIR } from '../lib/content-types.js';
-import { ValidationEngine, ContentFile } from '../lib/validation-engine.mjs';
+import { ValidationEngine, ContentFile } from '../lib/validation-engine.js';
 import { parseFrontmatter } from '../lib/mdx-utils.mjs';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import {

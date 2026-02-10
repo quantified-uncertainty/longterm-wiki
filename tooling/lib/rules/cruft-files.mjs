@@ -8,7 +8,7 @@
  * - Empty or near-empty files
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 import { basename } from 'path';
 
 // Patterns that indicate cruft files

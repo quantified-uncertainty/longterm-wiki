@@ -9,7 +9,7 @@
 
 import { existsSync } from 'fs';
 import { join, dirname } from 'path';
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 import { isInCodeBlock } from '../mdx-utils.mjs';
 
 const CONTENT_DIR = join(process.cwd(), 'content/docs');

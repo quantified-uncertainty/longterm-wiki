@@ -8,7 +8,7 @@
  * This is a global rule that operates on all content at once.
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.mjs';
+import { createRule, Issue, Severity } from '../validation-engine.js';
 import { dirname } from 'path';
 
 export const sidebarCoverageRule = createRule({

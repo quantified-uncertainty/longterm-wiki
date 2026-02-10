@@ -8,7 +8,7 @@
  * Good: "As of early 2026..." or "The convention remains in..."
  */
 
-import { Severity, Issue } from '../validation-engine.mjs';
+import { Severity, Issue } from '../validation-engine.js';
 
 // Patterns that indicate synthesis artifacts exposing research timing
 const TEMPORAL_ARTIFACT_PATTERNS = [

@@ -8,7 +8,7 @@
  * - EntityLink, DataInfoBox, InfoBox, Backlinks, Mermaid, R, DataExternalLinks
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.mjs';
+import { createRule, Issue, Severity, FixType } from '../validation-engine.js';
 import { isInCodeBlock } from '../mdx-utils.mjs';
 
 // Components from @components/wiki that are commonly used.

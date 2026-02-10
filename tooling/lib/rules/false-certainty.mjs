@@ -10,7 +10,7 @@
  * These patterns target false certainty in analytical content.
  */
 
-import { Severity, Issue } from '../validation-engine.mjs';
+import { Severity, Issue } from '../validation-engine.js';
 
 const FALSE_CERTAINTY_PATTERNS = [
   // "True Cost:" / "True Value:" / "Realistic EV:" — false precision labels
