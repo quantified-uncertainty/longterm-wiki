@@ -52,7 +52,7 @@ export function extractMetrics(content, filePath = '') {
 /**
  * Count words in content (excluding code blocks and JSX)
  */
-function countWords(content) {
+export function countWords(content) {
   let text = content;
   // Remove code blocks
   text = text.replace(/```[\s\S]*?```/g, '');
@@ -80,7 +80,7 @@ function countWords(content) {
 /**
  * Count markdown tables
  */
-function countTables(content) {
+export function countTables(content) {
   // Match table rows (lines with | at start and end)
   const tableRowPattern = /^\|.+\|$/gm;
   const rows = content.match(tableRowPattern) || [];
@@ -95,7 +95,7 @@ function countTables(content) {
 /**
  * Count Mermaid diagrams
  */
-function countDiagrams(content) {
+export function countDiagrams(content) {
   // Match Mermaid component usage
   const mermaidComponent = /<Mermaid[^>]*>/g;
   const componentMatches = content.match(mermaidComponent) || [];
@@ -110,7 +110,7 @@ function countDiagrams(content) {
 /**
  * Count internal links (links to other pages in the knowledge base)
  */
-function countInternalLinks(content) {
+export function countInternalLinks(content) {
   // Match markdown links to internal paths
   const internalLinkPattern = /\]\(\/[^)]+\)/g;
   const mdLinks = content.match(internalLinkPattern) || [];
@@ -129,7 +129,7 @@ function countInternalLinks(content) {
 /**
  * Count external links (links to outside sources)
  */
-function countExternalLinks(content) {
+export function countExternalLinks(content) {
   // Match markdown links to external URLs
   const externalLinkPattern = /\]\(https?:\/\/[^)]+\)/g;
   const matches = content.match(externalLinkPattern) || [];

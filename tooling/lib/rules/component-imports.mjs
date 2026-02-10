@@ -11,19 +11,22 @@
 import { createRule, Issue, Severity, FixType } from '../validation-engine.mjs';
 import { isInCodeBlock } from '../mdx-utils.mjs';
 
-// Components from @components/wiki that are commonly used
+// Components from @components/wiki that are commonly used.
+// Must match actual exports from app/src/components/wiki/index.ts
 const WIKI_COMPONENTS = [
   'EntityLink',
-  'DataInfoBox',
-  'InfoBox',
-  'Backlinks',
-  'Mermaid',
+  'MultiEntityLinks',
   'R',
+  'InfoBox',
+  'DataInfoBox',
+  'Backlinks',
   'DataExternalLinks',
-  'EstimateBox',
-  'QuoteBox',
-  'Timeline',
-  'ComparisonTable',
+  'ExternalLinks',
+  'Mermaid',
+  'CredibilityBadge',
+  'ResourceTags',
+  'F',
+  'SquiggleEstimate',
 ];
 
 // Pattern to find JSX component usage: <ComponentName or <ComponentName>
