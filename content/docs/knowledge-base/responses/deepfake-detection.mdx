@@ -19,7 +19,7 @@ subcategory: epistemic-tools-approaches
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="deepfake-detection" client:load />
+<DataExternalLinks pageId="deepfake-detection" />
 
 ## Quick Assessment
 
@@ -46,7 +46,7 @@ Detection approaches fall into three categories: technical analysis (looking for
 
 ### Detection Methods
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph INPUT["Content Input"]
         A[Image/Video/Audio] --> B[Detection Pipeline]

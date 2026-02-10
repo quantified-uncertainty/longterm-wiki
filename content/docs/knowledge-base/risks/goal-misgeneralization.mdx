@@ -25,7 +25,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="goal-misgeneralization" client:load />
+<DataExternalLinks pageId="goal-misgeneralization" />
 
 <DataInfoBox entityId="goal-misgeneralization" />
 
@@ -62,7 +62,7 @@ The core insight underlying goal misgeneralization is that capabilities and goal
 
 ## The Mechanism of Misgeneralization
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Phase"]
         A[Training Environment] --> B[Agent Learns]
@@ -250,4 +250,4 @@ Finally, the effectiveness of proposed solutions remains uncertain. While techni
 
 ## Related Pages
 
-<Backlinks client:load entityId="goal-misgeneralization" />
+<Backlinks entityId="goal-misgeneralization" />

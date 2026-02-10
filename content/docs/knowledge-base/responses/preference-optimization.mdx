@@ -23,7 +23,7 @@ subcategory: alignment-training
 ---
 import {Mermaid, EntityLink, DataExternalLinks, R} from '@components/wiki';
 
-<DataExternalLinks pageId="preference-optimization" client:load />
+<DataExternalLinks pageId="preference-optimization" />
 
 ## Quick Assessment
 
@@ -49,7 +49,7 @@ The safety implications are substantial. More efficient and stable preference op
 
 Understanding modern preference optimization requires understanding what it improves upon. RLHF involves three stages:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph STAGE1["Stage 1: SFT"]
         A[Base Model] --> B[Supervised Fine-Tuning]
@@ -91,7 +91,7 @@ These challenges motivated the search for simpler alternatives that maintain the
 
 ### Evolution of Preference Methods
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph GEN1["Generation 1: RLHF (2022)"]
         RLHF[RLHF with PPO]

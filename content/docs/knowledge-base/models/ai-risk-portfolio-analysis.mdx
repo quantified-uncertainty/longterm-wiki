@@ -78,7 +78,7 @@ Resource allocation should vary significantly based on <EntityLink id="agi-timel
 | Medium (5-15 years) | 50-60% | 25-30% | 15-20% | Balanced portfolio approach |
 | Long (15+ years) | 40-50% | 20-25% | 25-30% | Time for institutional solutions |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 pie title Current Resource Allocation vs Optimal (Medium Timeline)
     "Misalignment (Current 50%)" : 50
     "Misalignment (Optimal 55%)" : 55
@@ -131,7 +131,7 @@ The breakdown by research area reveals significant concentration in interpretabi
 
 Rather than independent categories, risks exhibit complex interactions affecting prioritization:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     CAP[AI Capabilities] -->|amplifies| MIS[Misalignment Risk]
     CAP -->|enables| USE[Misuse Risk]
@@ -228,7 +228,7 @@ The AI safety funding landscape shows significant geographic concentration, with
 Government initiatives are expanding geographic coverage: Canada's \$12M AI Safety Research Initiative, Australia's \$8.4M Responsible AI Program, and Singapore's \$5.6M AI Ethics Research Fund launched in 2024-2025. These represent opportunities for funding diversification beyond the US/UK axis.
 </Aside>
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph US["United States (54%)"]
         SF[SF Bay Area<br/>37%]
@@ -404,4 +404,4 @@ This framework connects with several other analytical models:
 
 ## Related Pages
 
-<Backlinks client:load entityId="ai-risk-portfolio-analysis" />
+<Backlinks entityId="ai-risk-portfolio-analysis" />

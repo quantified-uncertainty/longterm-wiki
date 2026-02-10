@@ -20,7 +20,7 @@ clusters: ["ai-safety"]
 ---
 import {InfoBox, KeyQuestions, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="is-ai-xrisk-real" client:load />
+<DataExternalLinks pageId="is-ai-xrisk-real" />
 
 <InfoBox
   type="crux"
@@ -39,7 +39,6 @@ This is the foundational question in AI safety. Everything else depends on wheth
 What would change your mind on this debate?
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "If we built human-level AI, would it naturally develop dangerous goals?",

@@ -54,7 +54,7 @@ The following diagram illustrates the trust cascade mechanism, showing how initi
 | **Threshold Check** | System evaluates if trust > 35% | All interconnected institutions |
 | **Outcome** | Recovery (if above threshold) or collapse (if below) | Entire institutional network |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     SHOCK[Initial Shock] --> PRIMARY[Media Trust Collapse]
     PRIMARY --> PROP[Cascade Propagation]
@@ -234,7 +234,7 @@ $$
 
 The following diagram illustrates the asymmetric dynamics between AI-enhanced attacks and degraded institutional defenses:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph attack["Attack Amplification"]
         SCALE[Scale: 10-100x] --> IMPACT[Attack Impact]
@@ -348,7 +348,7 @@ Cascades exhibit **catastrophic regime shifts** rather than gradual linear decli
 | **Collapsed** | 0.15-0.35 | Cannot validate others, rebuilding seen as manipulation | Weeks to months (shock) |
 | **Complete Collapse** | T < 0.15 | Institution non-functional, recovery may be impossible | Months to years (continued attacks) |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     HIGH[Stable High Trust] -->|"erosion"| VULN[Vulnerable]
     VULN -->|"intervention"| HIGH
@@ -587,4 +587,4 @@ Longer-term investments should focus on fundamental trust infrastructure transfo
 
 ## Related Pages
 
-<Backlinks client:load entityId="trust-cascade-model" />
+<Backlinks entityId="trust-cascade-model" />

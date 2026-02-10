@@ -31,7 +31,7 @@ import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 | Official Website | [justapedia.org](https://justapedia.org/wiki/Scaffold) |
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Scaffolding) |
 
-<DataExternalLinks pageId="minimal-scaffolding" client:load />
+<DataExternalLinks pageId="minimal-scaffolding" />
 
 ## Overview
 
@@ -45,7 +45,7 @@ The key characteristic is that **all capability comes from the model itself** - 
 
 The minimal scaffolding architecture represents the simplest possible deployment pattern for <EntityLink id="language-models">large language models</EntityLink>. All intelligence resides in the foundation model itself, with the surrounding infrastructure handling only basic input/output formatting.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Interface["User Interface Layer"]
         user["User Input"]

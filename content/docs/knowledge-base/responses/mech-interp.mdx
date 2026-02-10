@@ -23,7 +23,7 @@ subcategory: alignment-interpretability
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="mech-interp" client:load />
+<DataExternalLinks pageId="mech-interp" />
 
 ## Quick Assessment
 
@@ -47,7 +47,7 @@ Mechanistic interpretability is particularly important for AI safety because it 
 
 ### How Mechanistic Interpretability Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph INPUT["Input Processing"]
         A[Neural Network] --> B[Extract Activations]

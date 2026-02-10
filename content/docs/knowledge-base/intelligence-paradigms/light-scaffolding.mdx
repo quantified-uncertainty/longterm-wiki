@@ -22,7 +22,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="light-scaffolding" client:load />
+<DataExternalLinks pageId="light-scaffolding" />
 
 ## Quick Assessment
 
@@ -57,7 +57,7 @@ The theoretical foundations trace to the [ReAct paper](https://arxiv.org/abs/221
 
 ## Architecture
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph input["Input Layer"]
         user["User Query"]

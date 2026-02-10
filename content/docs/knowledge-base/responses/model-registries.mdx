@@ -24,7 +24,7 @@ subcategory: governance
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="model-registries" client:load />
+<DataExternalLinks pageId="model-registries" />
 
 ## Overview
 
@@ -113,7 +113,7 @@ China has implemented registration requirements since 2023 under the Interim Mea
 
 Model registries are necessary but not sufficient for AI governance. They enable but don't replace:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     A[Model Registry] --> B[Pre-Deployment Review]
     A --> C[Safety Certification]

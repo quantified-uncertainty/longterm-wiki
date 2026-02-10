@@ -21,7 +21,7 @@ subcategory: alignment-theoretical
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="corrigibility" client:load />
+<DataExternalLinks pageId="corrigibility" />
 
 ## Overview
 
@@ -65,7 +65,7 @@ A corrigible AI would:
 
 These requirements extend beyond simple compliance. A corrigible agent must not attempt to manipulate or deceive its programmers, should have a tendency to repair safety measures (such as shutdown buttons) if they break, or at least notify programmers when breakage occurs. It must also ensure that any subagents or successor systems it creates are themselves corrigible—a property called "corrigibility inheritance."
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     START[Goal-Directed AI] --> INST[Instrumental Convergence]
     INST --> SP[Self-Preservation]
@@ -158,7 +158,7 @@ The MIRI paper demonstrates the difficulty with formal theorems. Consider a util
 
 This trilemma illustrates why naive approaches fail. The utility indifference approach represented progress but remains incomplete—it's not reflectively consistent (if the off-switch breaks, the agent wouldn't fix it), and the problem remains open more than 10 years after formalization.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph THEORY["Theoretical Phase (2014-2020)"]
         MIRI2015["MIRI Corrigibility Paper (2015)"]

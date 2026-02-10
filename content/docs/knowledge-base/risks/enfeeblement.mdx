@@ -25,7 +25,7 @@ subcategory: structural
 ---
 import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="enfeeblement" client:load />
+<DataExternalLinks pageId="enfeeblement" />
 
 <DataInfoBox entityId="enfeeblement" />
 
@@ -47,7 +47,7 @@ Enfeeblement refers to humanity's gradual loss of capabilities, skills, and mean
 
 This risk is particularly concerning because it could emerge from beneficial, well-aligned AI systems. Even perfectly helpful AI that makes optimal decisions could leave humanity in a fundamentally weakened position, unable to course-correct if circumstances change or AI systems eventually fail. The core concern is not malicious AI, but the structural dependency that emerges when humans consistently defer to superior AI capabilities across critical domains.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph DRIVERS["Drivers of Enfeeblement"]
         CAP[Superior AI Capabilities]
@@ -328,4 +328,4 @@ Enfeeblement affects the <EntityLink id="ai-transition-model" /> through <Entity
 
 Enfeeblement contributes to <EntityLink id="long-term-lockin" /> by making humans increasingly unable to course-correct even if they recognize problems.
 
-<Backlinks client:load entityId="enfeeblement" />
+<Backlinks entityId="enfeeblement" />

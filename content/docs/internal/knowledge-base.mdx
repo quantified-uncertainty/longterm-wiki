@@ -287,7 +287,6 @@ For displaying ranges of expert estimates with clear sources:
 
 ```jsx
 <EstimateBox
-  client:load
   variable="Probability of [Risk]"
   description="How likely is this?"
   unit="%"
@@ -303,7 +302,7 @@ Only use when you have actual sourced estimates—don't make up positions.
 ### Backlinks (Always Include)
 
 ```jsx
-<Backlinks client:load entityId="entity-id" />
+<Backlinks entityId="entity-id" />
 ```
 
 ### DisagreementMap (Use Rarely)

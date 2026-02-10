@@ -27,7 +27,7 @@ subcategory: risk-models
 ---
 import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="mesa-optimization-analysis" client:load />
+<DataExternalLinks pageId="mesa-optimization-analysis" />
 
 <DataInfoBox entityId="mesa-optimization-analysis" ratings={frontmatter.ratings} />
 
@@ -67,7 +67,7 @@ Modern language models operate near or above several emergence thresholds, parti
 
 ### Training Regime Dependencies
 
-<Mermaid client:load chart={`quadrantChart
+<Mermaid chart={`quadrantChart
     title Training Conditions and Mesa-Optimization Risk
     x-axis Low Compute Budget --> High Compute Budget
     y-axis Narrow Data --> Diverse Data
@@ -135,7 +135,7 @@ Current evidence for these requirements in frontier models remains ambiguous. <R
 
 ### Awareness Level Progression
 
-<Mermaid client:load chart={`flowchart TD
+<Mermaid chart={`flowchart TD
     A[No Self-Model] --> B[Implicit Adaptation]
     B --> C[Explicit Self-Reference]
     C --> D[Strategic Reasoning]

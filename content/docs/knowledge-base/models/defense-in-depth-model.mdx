@@ -30,7 +30,7 @@ subcategory: framework-models
 ---
 import {DataInfoBox, Backlinks, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="defense-in-depth-model" client:load />
+<DataExternalLinks pageId="defense-in-depth-model" />
 
 <DataInfoBox entityId="defense-in-depth-model" ratings={frontmatter.ratings} />
 
@@ -63,7 +63,7 @@ AI safety operates through five defensive layers, each protecting against differ
 | **Institutional Safety** | Governance and oversight | <EntityLink id="responsible-scaling-policies">Responsible scaling</EntityLink>, audits, regulation | 40-60% |
 | **Recovery Safety** | Respond to failures | Incident response, shutdown, rollback | 20-40% |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[AI System Development] --> B[Layer 1: Training Safety]
     B --> C[Layer 2: Evaluation Safety]
@@ -214,7 +214,7 @@ $$P_{\text{eff}} = P_{\text{ind}}^{(1-\rho)} \times P_{\text{corr}}^{\rho}$$
 
 <EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink> creates the most dangerous correlation because it systematically defeats Layers 1-3:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Deceptive Model] --> B[Appears Aligned in Training]
     A --> C[Passes Evaluations]
@@ -391,4 +391,4 @@ $$\prod_{i=1}^{n} P_i^{weak} < P_{single}^{strong}$$
 - <EntityLink id="ai-control">AI Control</EntityLink> - Defense assuming potential deception
 - <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink> - Institutional layer implementation
 
-<Backlinks client:load entityId="defense-in-depth-model" />
+<Backlinks entityId="defense-in-depth-model" />

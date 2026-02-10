@@ -28,7 +28,7 @@ subcategory: risk-models
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="deceptive-alignment-decomposition" client:load />
+<DataExternalLinks pageId="deceptive-alignment-decomposition" />
 
 <DataInfoBox entityId="deceptive-alignment-decomposition" ratings={frontmatter.ratings} />
 
@@ -71,7 +71,7 @@ $$P(\text{DA}) \approx P(M) \times P(G) \times P(S) \times P(D) \times P(V)$$
 
 ### Causal Pathway
 
-<Mermaid client:load chart={`flowchart TD
+<Mermaid chart={`flowchart TD
     A[Standard Training] --> B{Mesa-Optimization<br/>Emerges?}
     B -->|No 30-70%| C1[Safe: No Internal Optimizer]
     B -->|Yes| D{Mesa-Objective<br/>Misaligned?}

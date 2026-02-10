@@ -23,7 +23,7 @@ subcategory: alignment-training
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="weak-to-strong" client:load />
+<DataExternalLinks pageId="weak-to-strong" />
 
 ## Overview
 
@@ -49,7 +49,7 @@ The fundamental uncertainty is whether these early results transfer to the most 
 
 ## How It Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Phase"]
         WM[Weak Model] -->|generates labels| WL[Weak Labels]

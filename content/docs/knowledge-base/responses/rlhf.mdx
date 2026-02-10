@@ -21,7 +21,7 @@ subcategory: alignment-training
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="rlhf" client:load />
+<DataExternalLinks pageId="rlhf" />
 
 ## Overview
 
@@ -59,7 +59,7 @@ However, these techniques face fundamental challenges as AI systems approach and
 
 RLHF uses a three-step training process, pioneered by OpenAI's <R id="1098fc60be7ca2b0">InstructGPT paper</R> in 2022:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Pretrained LLM] --> B[Step 1: Supervised Fine-Tuning]
     B --> C[SFT Model]

@@ -21,7 +21,7 @@ clusters: ["ai-safety"]
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="reasoning" client:load />
+<DataExternalLinks pageId="reasoning" />
 
 <DataInfoBox entityId="reasoning" />
 
@@ -166,7 +166,7 @@ Progress in planning capabilities is being driven by several research directions
 
 The development of advanced reasoning capabilities presents a complex dual-use challenge for AI safety. Enhanced reasoning abilities enable AI systems to find novel solutions to problems, including potentially discovering new attack vectors, circumventing safety measures, or developing sophisticated deceptive strategies. A reasoning-capable AI system could potentially plan multi-step approaches to achieving goals that involve deception, manipulation, or other harmful behaviors while maintaining plausible deniability.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     REASON[Advanced Reasoning] --> BENEFIT[Safety Benefits]
     REASON --> RISK[Safety Risks]
@@ -384,4 +384,4 @@ The timeline for achieving human-level and superhuman reasoning across all domai
 - **Artificial Analysis:** [GPT-5 Benchmarks](https://artificialanalysis.ai/articles/gpt-5-benchmarks-and-analysis) - Independent benchmark analysis
 - **Artificial Analysis:** [Claude Opus 4.5 Benchmarks](https://artificialanalysis.ai/articles/claude-opus-4-5-benchmarks-and-analysis) - Independent benchmark analysis
 
-<Backlinks client:load entityId="reasoning" />
+<Backlinks entityId="reasoning" />

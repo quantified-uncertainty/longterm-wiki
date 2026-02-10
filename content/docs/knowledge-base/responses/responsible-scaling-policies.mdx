@@ -24,7 +24,7 @@ subcategory: governance-industry
 ---
 import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="responsible-scaling-policies" client:load />
+<DataExternalLinks pageId="responsible-scaling-policies" />
 
 <DataInfoBox entityId="responsible-scaling-policies" />
 
@@ -96,7 +96,7 @@ The evaluation process focuses on specific capability domains including biologic
 
 The following diagram illustrates the systematic evaluation and decision-making process that RSPs implement across the development lifecycle:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     START[Planning Major Training Run] --> COMPUTE{Compute Threshold<br/>Exceeded?}
     COMPUTE -->|No| TRAIN[Proceed with Training]

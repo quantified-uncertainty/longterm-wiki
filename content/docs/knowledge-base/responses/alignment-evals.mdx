@@ -24,7 +24,7 @@ subcategory: alignment-evaluation
 ---
 import {Mermaid, DataExternalLinks, R, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="alignment-evals" client:load />
+<DataExternalLinks pageId="alignment-evals" />
 
 ## Quick Assessment
 
@@ -77,7 +77,7 @@ Alignment evaluations face a fundamental challenge: [Apollo Research found](http
 
 ### Evaluation Taxonomy
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph PROPS["Target Properties"]
         direction TB
@@ -165,7 +165,7 @@ Apollo Research developed the most comprehensive scheming evaluation methodology
 
 ### Interpreting Results
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     EVAL[Alignment Evaluation] --> PASS{Result?}
 

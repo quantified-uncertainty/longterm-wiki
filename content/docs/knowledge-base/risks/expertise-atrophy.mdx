@@ -27,7 +27,7 @@ subcategory: epistemic
 ---
 import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="expertise-atrophy" client:load />
+<DataExternalLinks pageId="expertise-atrophy" />
 
 <DataInfoBox entityId="expertise-atrophy" />
 
@@ -68,7 +68,7 @@ By 2040, humans in many professions may no longer function effectively without A
 
 **The ratchet effect**: Less practice → worse skills → more reliance → less practice. New workers never learn foundational skills. Institutions lose ability to train humans.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[AI Augmentation Introduced] --> B[Users Delegate Tasks to AI]
     B --> C[Practice of Core Skills Decreases]

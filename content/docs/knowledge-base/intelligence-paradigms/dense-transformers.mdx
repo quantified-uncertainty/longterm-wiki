@@ -22,7 +22,7 @@ clusters: ["ai-safety"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="dense-transformers" client:load />
+<DataExternalLinks pageId="dense-transformers" />
 
 ## Quick Assessment
 
@@ -56,7 +56,7 @@ Despite having "open weights" for some models (Llama, Mistral), **interpretabili
 
 The following diagram illustrates how dense transformers process information, from the foundational 2017 architecture through modern training pipelines:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph input_layer["Input Processing"]
         tokens["Token IDs"]

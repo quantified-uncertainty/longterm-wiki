@@ -26,7 +26,7 @@ subcategory: alignment-theoretical
 ---
 import {DataInfoBox, KeyPeople, Section, Backlinks, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="scalable-oversight" client:load />
+<DataExternalLinks pageId="scalable-oversight" />
 
 <DataInfoBox entityId="scalable-oversight" />
 
@@ -62,7 +62,7 @@ The scaling challenge extends beyond individual evaluation decisions to the enti
 
 ## Core Approaches and Mechanisms
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     COMPLEX[Complex Task<br/>Beyond Human Evaluation] --> APPROACH{Oversight<br/>Approach}
 
@@ -271,7 +271,6 @@ The generalization question addresses whether oversight methods that work in nar
 The scaling question examines whether oversight methods maintain their effectiveness as both AI capabilities and task complexity increase dramatically. Current experiments test oversight methods near the current frontier of AI capabilities, but their behavior under truly superhuman conditions remains unknown. This uncertainty creates challenges for research prioritization and investment decisions in the absence of clear performance predictors.
 
 <KeyQuestions
-  client:load
   questions={[
     "Can debate reliably detect sophisticated deception by superhuman AI systems?",
     "Do complex real-world tasks decompose sufficiently well for recursive reward modeling?", 
@@ -307,7 +306,6 @@ AI control strategies offer important fallback protections when scalable oversig
 Constitutional AI and other value-learning approaches offer alternative perspectives on aligning AI behavior with human values that may complement or compete with scalable oversight. These methods attempt to instill appropriate values directly into AI systems rather than relying on external evaluation, potentially reducing oversight requirements. However, the robustness of internal value alignment may itself require scalable oversight methods to verify and maintain.
 
 <DisagreementMap
-  client:load
   topic="Effectiveness of Scalable Oversight for Superhuman AI"
   description="How well will scalable oversight methods work for supervising AI systems that exceed human capabilities?"
   spectrum={{ low: "Fundamentally inadequate", high: "Robust solution" }}
@@ -384,4 +382,4 @@ Scalable oversight improves the <EntityLink id="ai-transition-model" /> through 
 
 Scalable oversight becomes increasingly critical as AI systems approach and exceed human cognitive capabilities, enabling continued verification of alignment.
 
-<Backlinks client:load entityId="scalable-oversight" />
+<Backlinks entityId="scalable-oversight" />

@@ -22,7 +22,7 @@ clusters: ["ai-safety", "biorisks"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks, R} from '@components/wiki';
 
-<DataExternalLinks pageId="genetic-enhancement" client:load />
+<DataExternalLinks pageId="genetic-enhancement" />
 
 ## Overview
 
@@ -46,7 +46,7 @@ Estimated probability of being dominant at transformative intelligence: **less t
 
 ## Approaches
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph selection["Selection Approaches"]
         embryo["Embryo Selection<br/>(PGT + Polygenic Scores)"]
@@ -68,7 +68,7 @@ flowchart TB
 
 The following diagram illustrates the technical pipeline from genetic knowledge to cognitive enhancement, showing current bottlenecks at each stage:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph research["Research Stage"]
         gwas["GWAS Studies<br/>(N above 300,000)"]

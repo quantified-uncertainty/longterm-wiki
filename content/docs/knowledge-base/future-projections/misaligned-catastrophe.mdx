@@ -19,7 +19,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {InfoBox, KeyQuestions, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="misaligned-catastrophe" client:load />
+<DataExternalLinks pageId="misaligned-catastrophe" />
 
 ## Quick Assessment
 
@@ -91,7 +91,7 @@ A [2025 survey of AI experts](https://arxiv.org/abs/2502.14870) found two distin
 
 ### Factors Influencing Scenario Probability
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Technical["Technical Factors"]
         A[Alignment Difficulty] --> P[P_catastrophe]
@@ -122,7 +122,7 @@ flowchart TD
 
 ### Scenario Pathway Diagram
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Advanced AI Development] --> B{Alignment Solved?}
     B -->|Yes| C[Aligned AGI Scenario]
@@ -392,7 +392,7 @@ A [June 2025 study](https://arxiv.org/abs/2209.00626) showed that in some circum
 
 ### Intervention Window Diagram
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 gantt
     title Intervention Windows in Slow Takeover Scenario
     dateFormat YYYY

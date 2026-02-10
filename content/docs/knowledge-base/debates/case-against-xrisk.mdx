@@ -24,7 +24,7 @@ subcategory: formal-arguments
 ---
 import {InfoBox, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="case-against-xrisk" client:load />
+<DataExternalLinks pageId="case-against-xrisk" />
 
 <InfoBox
   type="argument"
@@ -72,7 +72,7 @@ Understanding which type of skepticism is being expressed is crucial for product
 
 The following diagram illustrates how different skeptical positions relate to each other and to the premises they challenge:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph types["Types of Skepticism"]
         CAP[Capability Skeptics<br/>Brooks, Marcus]
@@ -137,7 +137,7 @@ Recall the pro-x-risk argument:
 
 The following diagram illustrates how skeptics challenge each premise of the x-risk argument:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph xrisk["X-Risk Argument"]
         P1[P1: Extreme Capabilities]

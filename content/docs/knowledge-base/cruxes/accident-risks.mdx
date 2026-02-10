@@ -22,7 +22,7 @@ clusters: ["ai-safety", "governance"]
 import {Crux, CruxList, R, EntityLink, DataExternalLinks} from '@components/wiki';
 import {DataInfoBox, Backlinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="accident-risks" client:load />
+<DataExternalLinks pageId="accident-risks" />
 
 ## Quick Assessment
 
@@ -68,7 +68,7 @@ The cruxes crystallized around key theoretical works like <R id="c4858d4ef280d8e
 
 The following diagram illustrates how foundational cruxes cascade into research priorities and governance strategies:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Foundational["Foundational Cruxes"]
         MESA[Mesa-Optimization<br/>Emerges?]

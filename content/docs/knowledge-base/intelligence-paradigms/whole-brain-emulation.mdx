@@ -22,7 +22,7 @@ clusters: ["ai-safety"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="whole-brain-emulation" client:load />
+<DataExternalLinks pageId="whole-brain-emulation" />
 
 ## Overview
 
@@ -36,7 +36,7 @@ Estimated probability of being the dominant path to transformative intelligence:
 
 The WBE pipeline involves three major phases, each with distinct technical challenges and bottlenecks. The following diagram illustrates the complete pathway from biological brain to running emulation:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph acquire["Acquisition"]
         brain["Biological Brain"]

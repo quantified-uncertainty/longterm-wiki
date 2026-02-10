@@ -21,7 +21,7 @@ clusters: ["ai-safety"]
 ---
 import {DataInfoBox, DisagreementMap, Backlinks, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="paul-christiano" client:load />
+<DataExternalLinks pageId="paul-christiano" />
 
 <DataInfoBox entityId="paul-christiano" />
 
@@ -97,7 +97,6 @@ Christiano's broader research program on supervising superhuman AI:
 ## Strategic Disagreements in the Field
 
 <DisagreementMap
-  client:load
   topic="Can we learn alignment iteratively?"
   positions={[
     {
@@ -224,4 +223,4 @@ Christiano identifies several critical uncertainties:
 | <EntityLink id="ai-governance">AI governance</EntityLink> | Increasing focus area |
 | <EntityLink id="evaluation">Alignment evaluation</EntityLink> | Critical for iterative approach |
 
-<Backlinks client:load entityId="paul-christiano" />
+<Backlinks entityId="paul-christiano" />

@@ -25,7 +25,7 @@ subcategory: government
 ---
 import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="us-aisi" client:load />
+<DataExternalLinks pageId="us-aisi" />
 
 <DataInfoBox entityId="us-aisi" />
 
@@ -115,7 +115,7 @@ The consortium received over 600 letters of interest from organizations seeking 
 
 ## Organizational Structure and Authority
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     COMMERCE[Department of Commerce] --> NIST[NIST]
     NIST --> AISI[US AI Safety Institute / CAISI]
@@ -325,7 +325,6 @@ Perhaps most fundamentally, there remain deep uncertainties about the nature and
 
 <Section title="Perspectives on Government AI Safety">
   <DisagreementMap
-    client:load
     topic="Role of Government in AI Safety"
     positions={[
       {
@@ -389,4 +388,4 @@ Elizabeth Kelly was named to [TIME's 100 Most Influential People in AI](https://
 - <R id="0572f91896f52377">CSIS: AI Safety Institute International Network Recommendations</R>
 - <R id="89860462901f56f7">Wikipedia: AI Safety Institute</R>
 
-<Backlinks client:load entityId="us-aisi" />
+<Backlinks entityId="us-aisi" />

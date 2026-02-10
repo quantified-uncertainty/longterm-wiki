@@ -24,7 +24,7 @@ subcategory: formal-arguments
 ---
 import {InfoBox, DisagreementMap, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="case-for-xrisk" client:load />
+<DataExternalLinks pageId="case-for-xrisk" />
 
 ## Quick Assessment
 
@@ -83,7 +83,7 @@ This page presents the strongest version of the argument for AI existential risk
 
 **C**: Therefore, there is a significant probability of AI-caused <EntityLink id="existential-catastrophe">existential catastrophe</EntityLink>
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     P1[P1: AI will become<br/>extremely capable] --> COMBO
     P2[P2: AI may have<br/>misaligned goals] --> COMBO
@@ -779,7 +779,6 @@ This 9-minute advance in one year reflects increasing expert concern about the p
 ### Probability Estimates
 
 <DisagreementMap
-  client:load
   topic="P(AI X-Risk This Century)"
   description="Expert estimates of existential risk from AI"
   spectrum={{ low: "Negligible (under 1%)", high: "Very High (>50%)" }}

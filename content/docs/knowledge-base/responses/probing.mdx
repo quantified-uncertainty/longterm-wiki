@@ -23,7 +23,7 @@ subcategory: alignment-interpretability
 ---
 import {Mermaid, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="probing" client:load />
+<DataExternalLinks pageId="probing" />
 
 ## Overview
 
@@ -35,7 +35,7 @@ For AI safety applications, probing offers a direct window into whether models h
 
 ## How Probing Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Input["1. Input Processing"]
         TEXT[Input Text] --> MODEL[Language Model]
@@ -140,7 +140,7 @@ Probing techniques contribute to addressing several AI safety risks:
 
 Probing is central to the [Eliciting Latent Knowledge](https://www.alignmentforum.org/posts/qHCDysDnvhteW7kRd/arc-s-first-technical-report-eliciting-latent-knowledge) research agenda developed by the Alignment Research Center (ARC). ELK asks: can we reliably extract what a model "believes" from its internal representations, even when its outputs are unreliable? This is critical for AI safety because a deceptive AI might output misleading information while internally representing the truth.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph Problem["ELK Challenge"]
         MODEL[Model with Latent Knowledge]

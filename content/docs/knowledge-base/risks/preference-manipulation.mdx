@@ -27,7 +27,7 @@ subcategory: epistemic
 ---
 import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="preference-manipulation" client:load />
+<DataExternalLinks pageId="preference-manipulation" />
 
 <DataInfoBox entityId="preference-manipulation" />
 
@@ -70,7 +70,7 @@ Recent research quantifies these risks: a [2025 meta-analysis](https://www.natur
 
 The key vulnerability: **preferences feel self-generated**. We don't experience them as external, gradual change goes unnoticed, and there's no "ground truth" for what you "should" want.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Data["Data Collection"]
         A[User Behavior Data] --> B[Psychological Profile]

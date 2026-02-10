@@ -24,7 +24,7 @@ subcategory: alignment-evaluation
 ---
 import {EntityLink, R, Mermaid, DataExternalLinks, Backlinks} from '@components/wiki';
 
-<DataExternalLinks pageId="eval-saturation" client:load />
+<DataExternalLinks pageId="eval-saturation" />
 
 ## Overview
 
@@ -156,7 +156,7 @@ This compounds the evaluation awareness problem: even if models do not explicitl
 
 ## Capability vs. Eval Development Rates
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     CAP[AI Capabilities Growth] -->|"Doubling every 4-7 months"| SAT[Benchmark Saturation]
     SAT --> SAFETY[Safety Eval Signal Loss]

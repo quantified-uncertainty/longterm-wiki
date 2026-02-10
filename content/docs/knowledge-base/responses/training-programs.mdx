@@ -24,7 +24,7 @@ subcategory: field-building
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="training-programs" client:load />
+<DataExternalLinks pageId="training-programs" />
 
 ## Quick Assessment
 
@@ -197,7 +197,7 @@ For those not yet ready for formal programs or preferring self-directed learning
 
 ### Self-Study Path
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph FOUNDATIONS["Foundations (2-4 months)"]
         A[ML Fundamentals] --> B[Deep Learning]

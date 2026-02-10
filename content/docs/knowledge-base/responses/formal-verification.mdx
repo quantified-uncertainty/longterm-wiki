@@ -23,7 +23,7 @@ subcategory: alignment-theoretical
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="formal-verification" client:load />
+<DataExternalLinks pageId="formal-verification" />
 
 ## Overview
 
@@ -48,7 +48,7 @@ Recent work has attempted to systematize this approach. The [Guaranteed Safe AI 
 
 ## How It Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     A[AI System + Specification] --> B[Verification Engine]
     B --> C{Check All Paths}
@@ -65,7 +65,7 @@ Formal verification works by exhaustively checking whether an AI system satisfie
 
 ## Formal Verification Fundamentals
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     SYSTEM[AI System] --> SPEC[Formal Specification]
     SPEC --> PROPERTY[Safety Properties]

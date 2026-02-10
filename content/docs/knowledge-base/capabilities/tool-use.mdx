@@ -21,7 +21,7 @@ clusters: ["ai-safety", "cyber"]
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="tool-use" client:load />
+<DataExternalLinks pageId="tool-use" />
 
 <DataInfoBox entityId="tool-use" />
 
@@ -130,7 +130,7 @@ Real-world incidents have demonstrated these risks. The <R id="d6f4face14780e85"
 
 OpenAI developed an "LLM-based automated attacker"—a bot trained using reinforcement learning to discover prompt injection vulnerabilities. Unlike traditional red-teaming, this system can "steer an agent into executing sophisticated, long-horizon harmful workflows that unfold over tens (or even hundreds) of steps." In one demonstration, the automated attacker inserted a malicious email into a test inbox; when the AI agent scanned emails, it followed hidden instructions and sent a resignation message instead of the intended out-of-office reply.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     INPUT[User Input] --> AGENT[AI Agent]
     TOOLS[Tool Access] --> AGENT
@@ -298,4 +298,4 @@ The technical question of whether safe, beneficial tool use is possible at scale
 
 ## Related Pages
 
-<Backlinks client:load entityId="tool-use" />
+<Backlinks entityId="tool-use" />

@@ -26,7 +26,7 @@ subcategory: structural
 ---
 import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="racing-dynamics" client:load />
+<DataExternalLinks pageId="racing-dynamics" />
 
 <DataInfoBox entityId="racing-dynamics" />
 
@@ -63,7 +63,7 @@ The implications extend far beyond individual companies. As AI capabilities appr
 
 Racing dynamics follow a self-reinforcing cycle that [Armstrong, Bostrom, and Shulman (2016)](https://link.springer.com/article/10.1007/s00146-015-0590-y) formalized as a Nash equilibrium problem: each team rationally reduces safety precautions when competitors appear close to breakthrough. The paper found that having more development teams and more information about competitors' capabilities paradoxically increases danger, as it intensifies pressure to cut corners.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Triggers["Triggering Events"]
         A[Competitor Breakthrough]
@@ -423,4 +423,4 @@ Racing dynamics directly affects several parameters in the <EntityLink id="ai-tr
 
 Racing dynamics increases both <EntityLink id="existential-catastrophe" /> probability (by rushing deployment of unsafe systems) and degrades <EntityLink id="long-term-trajectory" /> (by locking in suboptimal governance structures).
 
-<Backlinks client:load entityId="racing-dynamics" />
+<Backlinks entityId="racing-dynamics" />

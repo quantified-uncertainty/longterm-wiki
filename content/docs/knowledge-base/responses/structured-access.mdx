@@ -24,7 +24,7 @@ subcategory: alignment-deployment
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks, DataInfoBox} from '@components/wiki';
 
-<DataExternalLinks pageId="structured-access" client:load />
+<DataExternalLinks pageId="structured-access" />
 
 
 ## Quick Assessment
@@ -261,7 +261,7 @@ Major AI providers implement tiered access systems that balance accessibility wi
 
 The following diagram illustrates how structured access creates control points throughout the AI deployment pipeline.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     USER[User Request] --> AUTH[Authentication & Rate Limiting]
     AUTH --> GATEWAY[API Gateway]
@@ -299,7 +299,7 @@ Anthropic's [August 2025 threat intelligence report](https://www.anthropic.com/n
 
 Anthropic's monitoring system uses a [tiered approach](https://www.anthropic.com/transparency): simpler models like Claude 3 Haiku quickly scan content and trigger detailed analysis with advanced models like Claude 3.5 Sonnet when anything suspicious is found. The company maintains "jailbreak rapid response procedures" to identify and mitigate bypass attempts, with immediate patching or prompt adjustments to reinforce safety constraints.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[API Request] --> B[Log Request]
     B --> C[Pattern Analysis]

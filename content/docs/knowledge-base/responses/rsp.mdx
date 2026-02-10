@@ -24,7 +24,7 @@ subcategory: alignment-policy
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="rsp" client:load />
+<DataExternalLinks pageId="rsp" />
 
 ## Overview
 
@@ -100,7 +100,7 @@ The three leading frontier AI labs have published distinct but conceptually simi
 
 ### Safeguard Requirements by Level
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Anthropic["Anthropic ASL Standards"]
         A1[ASL-1: No meaningful risk] --> A2[ASL-2: Current standard security]
@@ -128,7 +128,7 @@ flowchart TD
 
 RSPs create a framework linking capability levels to safety requirements. The core mechanism involves three interconnected processes: capability evaluation, safeguard assessment, and escalation decisions.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Evaluation["1. Capability Evaluation"]
         A[Model Checkpoint] --> B[Internal Evals]
@@ -164,7 +164,7 @@ flowchart TD
 
 The effectiveness of RSPs depends on a network of actors providing oversight, verification, and accountability:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Labs["AI Developers (20 companies)"]
         ANT[Anthropic<br/>ASL System]

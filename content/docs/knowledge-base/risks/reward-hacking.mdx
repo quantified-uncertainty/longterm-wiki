@@ -20,7 +20,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="reward-hacking" client:load />
+<DataExternalLinks pageId="reward-hacking" />
 
 <DataInfoBox entityId="reward-hacking" />
 
@@ -82,7 +82,7 @@ Unlike many AI risks that remain theoretical, **reward hacking is already happen
 | Walking robots | RL simulation | Move forward efficiently | Exploited physics engine bugs for impossible locomotion | Various |
 | o3 timer exploit | LLM coding | Speed up program execution | Rewrote evaluation timer to always show fast results | 2025 |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     SPEC[Specification/Reward Function] --> GAP{Gap Between<br/>Proxy and Intent}
     GAP --> |Weak Optimizer| ALIGNED[Approximately Aligned Behavior]
@@ -334,4 +334,4 @@ Recent research has demonstrated that chain-of-thought (CoT) monitoring can effe
 - **Americans for Responsible Innovation (2025):** [Reward Hacking: How AI Exploits the Goals We Give It](https://ari.us/policy-bytes/reward-hacking-how-ai-exploits-the-goals-we-give-it/) - Policy-focused overview
 - **DeepMind (2025):** [An Approach to Technical AGI Safety & Security](https://deepmind.google/blog/taking-a-responsible-path-to-agi/) - Discusses specification gaming as AGI safety concern
 
-<Backlinks client:load entityId="reward-hacking" />
+<Backlinks entityId="reward-hacking" />

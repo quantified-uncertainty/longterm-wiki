@@ -23,7 +23,7 @@ subcategory: alignment-training
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="reward-modeling" client:load />
+<DataExternalLinks pageId="reward-modeling" />
 
 ## Overview
 
@@ -46,7 +46,7 @@ However, reward modeling inherits and potentially amplifies all limitations of R
 
 ## How It Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Collection["1. Data Collection"]
         P[Prompts] --> O1[Output A]

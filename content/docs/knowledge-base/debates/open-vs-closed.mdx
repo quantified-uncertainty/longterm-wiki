@@ -21,7 +21,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {ComparisonTable, DisagreementMap, InfoBox, KeyQuestions, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="open-vs-closed" client:load />
+<DataExternalLinks pageId="open-vs-closed" />
 
 ## Quick Assessment
 
@@ -69,7 +69,7 @@ One of the most heated debates in AI: Should powerful AI models be released as o
 
 ## Trade-offs Overview
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     RELEASE[Model Weight Release Decision] --> OPEN[Open Weights]
     RELEASE --> CLOSED[Closed Weights]
@@ -141,7 +141,6 @@ The landscape shifted dramatically with DeepSeek's January 2025 release of R1, d
 | **Fortune 500 Llama adoption** | 50%+ experimenting | [Meta](https://ai.meta.com/blog/future-of-ai-built-with-llama/) | Including Spotify, AT&T, DoorDash |
 
 <ComparisonTable
-  client:load
   title="Open vs Closed Models"
   items={[
     {
@@ -205,7 +204,6 @@ The landscape shifted dramatically with DeepSeek's January 2025 release of R1, d
 ## Key Positions
 
 <DisagreementMap
-  client:load
   title="Positions on Open Source AI"
   description="Where different actors stand on releasing model weights"
   positions={[
@@ -276,7 +274,6 @@ Research on open model safety reveals significant challenges in maintaining guar
 ## Key Cruxes
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "Can safety guardrails be made robust to fine-tuning?",

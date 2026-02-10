@@ -25,7 +25,7 @@ subcategory: accident
 ---
 import {DataInfoBox, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="automation-bias" client:load />
+<DataExternalLinks pageId="automation-bias" />
 
 <DataInfoBox entityId="automation-bias" />
 
@@ -72,7 +72,7 @@ The implications extend far beyond individual errors to systemic risks including
 
 ### Automation Bias Mechanism
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph TRIGGERS["Triggers"]
         AI[AI System Appears Competent]
