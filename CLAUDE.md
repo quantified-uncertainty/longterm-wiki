@@ -54,3 +54,4 @@ longterm-wiki/
 - **Entity types**: risk, person, organization, approach, model, concept, etc.
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
+- **Squiggle models**: See `app/CLAUDE.md` for SquiggleEstimate style guide

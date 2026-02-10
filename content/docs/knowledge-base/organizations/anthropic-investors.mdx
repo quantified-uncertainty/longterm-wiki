@@ -545,16 +545,16 @@ At 10x current valuation (\$3.5T), total EA-aligned capital could exceed \$1 tri
 ### Interactive Estimate Models
 
 <SquiggleEstimate title="Anthropic Valuation Scenarios (probability-weighted)" code={`
-// Valuation scenarios with probability weights
-bull = 500e9
-base = 350e9
-conservative = 150e9
-bear = 50e9
+// Valuation scenarios as continuous distributions
+bull = 400e9 to 650e9           // wide bull case
+base = 250e9 to 450e9           // broad base case
+conservative = 100e9 to 220e9   // conservative range
+bear = 20e9 to 80e9             // bear / down-round range
 
 valuationDist = mixture(
   bull, base, conservative, bear,
   [0.15, 0.40, 0.25, 0.15]
-) * (0.95 to 1.05) // small noise for market uncertainty
+)
 
 valuationDist
 `} />
@@ -564,7 +564,11 @@ valuationDist
 founderStakePct = 0.02 to 0.03
 numFounders = 7
 pledgeRate = 0.8
-valuation = mixture(500e9, 350e9, 150e9, 50e9, [0.15, 0.4, 0.25, 0.15])
+valuation = mixture(
+  400e9 to 650e9, 250e9 to 450e9,
+  100e9 to 220e9, 20e9 to 80e9,
+  [0.15, 0.4, 0.25, 0.15]
+)
 
 totalFounderEquity = valuation * founderStakePct * numFounders
 pledgedAmount = totalFounderEquity * pledgeRate
@@ -578,8 +582,12 @@ eaDirectedCapital
 `} />
 
 <SquiggleEstimate title="Total EA-Aligned Capital (all sources)" code={`
-// Valuation distribution
-valuation = mixture(500e9, 350e9, 150e9, 50e9, [0.15, 0.4, 0.25, 0.15])
+// Valuation distribution (continuous scenarios)
+valuation = mixture(
+  400e9 to 650e9, 250e9 to 450e9,
+  100e9 to 220e9, 20e9 to 80e9,
+  [0.15, 0.4, 0.25, 0.15]
+)
 
 // Founder capital (7 founders, 2-3% each, 80% pledged)
 founderEquity = valuation * (0.02 to 0.03) * 7 * 0.8
@@ -587,19 +595,19 @@ founderEquity = valuation * (0.02 to 0.03) * 7 * 0.8
 founderEA = founderEquity * beta(5, 5)
 
 // EA Investor capital (Tallinn + Moskovitz)
-tallinnStake = valuation * (0.006 to 0.017) * (0.7 to 0.9) // conservative, high fulfillment
-moskovitzStake = valuation * (0.008 to 0.025) * (0.9 to 1.0) // very high fulfillment
+tallinnStake = valuation * (0.006 to 0.017) * (0.7 to 0.9)
+moskovitzStake = valuation * (0.008 to 0.025) * (0.9 to 1.0)
 investorEA = tallinnStake + moskovitzStake
 
-// Employee pledges + 3:1 matching (legally bound in DAFs)
+// Employee pledges + matching (legally bound in DAFs)
 employeePool = valuation * (0.12 to 0.18)
 eaEmployeeFraction = 0.15 to 0.40
 participationRate = 0.3 to 0.7
 avgPledgePct = 0.3 to 0.5
 directPledges = employeePool * eaEmployeeFraction * participationRate * avgPledgePct
 // Matching: mix of old 3:1 and new 1:1 programs
-matchMultiplier = 1.5 to 3.0 // weighted average of old and new
-employeeEA = directPledges * (1 + matchMultiplier) * (0.8 to 0.95) // legally bound
+matchMultiplier = 1.5 to 3.0
+employeeEA = directPledges * (1 + matchMultiplier) * (0.8 to 0.95)
 
 totalEA = founderEA + investorEA + employeeEA
 totalEA

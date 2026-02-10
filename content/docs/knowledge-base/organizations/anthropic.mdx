@@ -99,11 +99,11 @@ revenue2026 = 20 to 26  // \$B guidance
 revenueMultiple = 10 to 45  // range of forward multiples for AI companies
 impliedValuation = revenue2026 * revenueMultiple * 1e9
 
-// Scenario-weighted valuation
-bull = 500e9
-base = 350e9
-conservative = 150e9
-bear = 50e9
+// Scenario-weighted valuation (continuous ranges)
+bull = 400e9 to 650e9
+base = 250e9 to 450e9
+conservative = 100e9 to 220e9
+bear = 20e9 to 80e9
 
 scenarioWeighted = mixture(
   bull, base, conservative, bear,
