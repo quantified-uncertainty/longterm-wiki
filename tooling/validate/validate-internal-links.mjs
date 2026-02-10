@@ -6,7 +6,7 @@
  * Scans MDX/MD files for internal links and verifies they resolve to existing content.
  * Checks:
  * - Markdown links: [text](/knowledge-base/path/)
- * - Ensures trailing slashes are present (Astro/Starlight convention)
+ * - Ensures trailing slashes are present
  * - Verifies target files exist
  *
  * Usage:
@@ -88,8 +88,8 @@ function extractInternalLinks(content, filePath) {
   return links;
 }
 
-// Pages directory for standalone Astro pages
-const PAGES_DIR = join(process.cwd(), 'src/pages');
+// Next.js app directory for standalone pages
+const APP_DIR = join(process.cwd(), 'app/src/app');
 
 /**
  * Check if an internal link resolves to an existing file
@@ -133,9 +133,9 @@ function resolveLink(href, sourceFile) {
     join(CONTENT_DIR, path + '.md'),
     join(CONTENT_DIR, path, 'index.mdx'),
     join(CONTENT_DIR, path, 'index.md'),
-    // Standalone Astro pages (src/pages)
-    join(PAGES_DIR, path + '.astro'),
-    join(PAGES_DIR, path, 'index.astro'),
+    // Next.js app routes (app/src/app)
+    join(APP_DIR, path, 'page.tsx'),
+    join(APP_DIR, path, 'page.jsx'),
   ];
 
   for (const p of possiblePaths) {
