@@ -131,3 +131,29 @@ export const CONTENT_DIR_ABS = join(PROJECT_ROOT, CONTENT_DIR);
  * Absolute path to data directory
  */
 export const DATA_DIR_ABS = join(PROJECT_ROOT, DATA_DIR);
+
+/**
+ * Build-breaking validation rules (must all pass before deployment)
+ */
+export const CRITICAL_RULES = [
+  'dollar-signs',
+  'comparison-operators',
+  'frontmatter-schema',
+  'entitylink-ids',
+  'internal-links',
+  'fake-urls',
+  'component-props',
+  'citation-urls'
+];
+
+/**
+ * Quality validation rules (should pass, but won't block deployment)
+ */
+export const QUALITY_RULES = [
+  'tilde-dollar',
+  'markdown-lists',
+  'consecutive-bold-labels',
+  'placeholders',
+  'vague-citations',
+  'temporal-artifacts'
+];
