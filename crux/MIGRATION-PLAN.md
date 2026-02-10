@@ -8,6 +8,269 @@
 
 ---
 
+## Red Team: Risks, Failure Modes, and Alternative Approaches
+
+Before diving into the phased plan, here's an honest critique of the entire migration strategy — what could go wrong, what the plan gets wrong, and what alternatives exist.
+
+### 1. The half-migrated state is the real danger
+
+The plan describes a clean endgame, but the codebase will spend months in a half-migrated state. This is arguably **worse** than either endpoint:
+
+- Some files are `.ts`, some are `.mjs`. Import paths become confusing (do you write `.ts`, `.js`, or no extension?).
+- Some commands use Pattern A (subprocess), some use Pattern B (direct). Contributors need to understand both.
+- Some scripts use `loadPages()` from content-types.ts, others still do `JSON.parse(readFileSync(...))`. Both patterns coexist.
+- The tsconfig `include` pattern has to keep expanding. Type errors in newly-converted files may cascade into unconverted ones.
+
+**Mitigation**: Each phase must be completable in 1–2 sessions and leave the codebase in a consistent state. Never convert half of the validators — convert all or none. The plan's "batch" approach for rules is fine; the phased approach for validators is riskier.
+
+### 2. The effort estimates are probably 2–3x too low
+
+The plan estimates 53–81 hours total. This is almost certainly optimistic:
+
+- **"Mechanical" conversions are never mechanical.** Converting `dollar-signs.mjs` to `.ts` will surface implicit `any` types, untyped regex match results, `null` vs `undefined` mismatches, and edge cases in the `check()` function signature. Each rule may take 30 min on paper but 60–90 min in practice.
+- **Phase 3 (validators → library) is underestimated at 12–16h.** Each validator does more than the plan suggests. `validate-mermaid.mjs` is 728 lines of Mermaid parsing logic, not 50 lines of boilerplate + 50 lines of logic. Extracting it into a library function means designing an API, handling error cases, testing the new API, and updating the command handler.
+- **Integration testing gaps.** The plan assumes `pnpm crux validate` output can be diffed before/after. But validators produce non-deterministic output (timestamps, file ordering, performance metrics). You'll need snapshot-style tests, not just diff.
+
+**Realistic estimate**: 100–150 hours for the full migration, or 40–60 hours for Phases 0–2 (the "solid" stopping point).
+
+### 3. Who benefits from this migration?
+
+The plan assumes composable library functions are valuable. But who would actually call `improvePage()` programmatically?
+
+- **Claude Code** calls scripts via `node crux/authoring/page-improver.mjs` with CLI args. It doesn't import TypeScript functions. Even after the migration, Claude Code would still invoke the CLI — it wouldn't call library functions directly.
+- **CI** runs `pnpm crux validate`. It uses the CLI.
+- **Developers** run `pnpm crux content improve <id>`. They use the CLI.
+- **No external consumers.** This is an internal tool, not a published npm package. Nobody will `import { validateFiles } from '@longterm-wiki/crux'`.
+
+The "composable library" vision in the target architecture section may be solving a problem that doesn't exist. The real benefits of the migration are:
+1. **Type safety** catches bugs before runtime (especially in data-loading and frontmatter manipulation).
+2. **Reduced boilerplate** makes validators easier to write and maintain.
+3. **Single-process execution** is faster.
+
+But "anyone can import these functions" is not a real use case today. Don't over-design the library API for hypothetical external consumers.
+
+### 4. The subprocess pattern has real advantages the plan dismisses
+
+The plan frames subprocesses as purely bad. But they provide:
+
+- **Crash isolation.** If `validate-mermaid.mjs` hits an out-of-memory error parsing a 5000-line diagram, it crashes its own process and `validate-all.mjs` continues. In a single-process model, that crash kills everything.
+- **Memory isolation.** The 15 validators run sequentially, and each process exits after completing. In a single-process model, all validators share one heap. The data loaded by `validate-mermaid.mjs` (Mermaid ASTs, etc.) stays in memory while `validate-style-guide.mjs` runs. For 625 MDX files, this could matter.
+- **Independent executability.** Any developer can run `node crux/validate/validate-quality.mjs` to debug a single validator. After migration, they'd need to understand the library API, figure out how to call `checkQualityRatings()`, and handle the return type.
+- **Incremental adoption.** A new developer can add a standalone validator script in 30 minutes by copying an existing one. Adding a library function + command handler + types is a steeper learning curve.
+
+**The plan should distinguish between "eliminate all subprocesses" and "eliminate unnecessary subprocesses."** The validate-all orchestrator spawning 15 validators is fine architecturally — it's the boilerplate within each validator that's the problem.
+
+### 5. Alternative approach: Keep scripts, share the runtime
+
+Instead of converting scripts to library functions, provide a shared runtime context that each script can opt into:
+
+```typescript
+// lib/script-context.ts
+export interface ScriptContext {
+  args: ParsedArgs;
+  colors: Colors;
+  pages: PageEntry[];
+  entities: Entity[];
+  engine?: ValidationEngine;
+  log: Logger;
+}
+
+export async function withContext(fn: (ctx: ScriptContext) => Promise<number>): Promise<void> {
+  const args = parseScriptArgs();
+  const colors = getColors(args.flags.ci);
+  const log = createLogger(args.flags.ci);
+
+  // Lazy-load data only when accessed
+  const ctx: ScriptContext = {
+    args,
+    colors,
+    log,
+    get pages() { return loadPages(); },
+    get entities() { return loadEntities(); },
+  };
+
+  const exitCode = await fn(ctx);
+  process.exit(exitCode);
+}
+```
+
+Each validator becomes:
+
+```typescript
+// validate/validate-quality.ts
+import { withContext } from '../lib/script-context.ts';
+
+withContext(async (ctx) => {
+  // No boilerplate! ctx has args, colors, data, logging.
+  const discrepancies = findQualityDiscrepancies(ctx.pages, ctx.args.options);
+
+  for (const d of discrepancies) {
+    ctx.log.warn(`${d.pageId}: quality=${d.current}, suggested=${d.suggested}`);
+  }
+
+  return discrepancies.length > 0 ? 1 : 0;
+});
+```
+
+**Advantages over the full migration:**
+- 10x less effort (just write `withContext` and migrate scripts incrementally)
+- Scripts stay independently runnable
+- Subprocess pattern preserved where useful
+- No need to design library APIs or command handler rewrites
+- Can be adopted file-by-file with zero coordination
+
+**Disadvantages:**
+- Doesn't give you type-safe return values between components
+- Doesn't eliminate subprocess overhead
+- Doesn't create composable functions
+
+This might be the 80/20 solution: eliminate the boilerplate pain without the architectural overhaul.
+
+### 6. Alternative approach: JSDoc types instead of .mjs → .ts conversion
+
+TypeScript isn't the only way to add types. JSDoc annotations in `.mjs` files work with `checkJs: true`:
+
+```javascript
+// validate/validate-quality.mjs (stays .mjs, gets type checking)
+
+/** @typedef {import('../lib/content-types.ts').PageEntry} PageEntry */
+
+/**
+ * @param {PageEntry[]} pages
+ * @param {{threshold?: number, category?: string}} options
+ * @returns {{pageId: string, current: number, suggested: number}[]}
+ */
+function findQualityDiscrepancies(pages, options) {
+  // ... unchanged logic, now type-checked
+}
+```
+
+**Advantages:**
+- Zero file renames, zero import path changes, zero risk of breaking things
+- Incremental — add JSDoc to one function at a time
+- Works with the existing tsconfig (`allowJs: true`, just flip `checkJs: true`)
+- No tsx runtime changes needed
+
+**Disadvantages:**
+- JSDoc types are verbose and ugly compared to TypeScript
+- Complex types (generics, discriminated unions) are painful in JSDoc
+- Some type constructs aren't expressible in JSDoc
+- Developers tend to not maintain JSDoc types over time
+
+This is worth considering for files that don't warrant full conversion — especially the authoring scripts where 43% of the code is prompt strings that don't benefit from types at all.
+
+### 7. The prompts-in-code problem is unaddressed
+
+43% of the authoring code (page-improver, grade-content) is prompt text embedded as template literals. The migration plan converts these files to TypeScript, which means:
+
+- TypeScript will type-check the string interpolation in prompts (marginally useful)
+- But it won't validate that the prompts are correct, coherent, or up-to-date
+- Prompt changes are the most common changes to these files, and they'll now require TypeScript compilation to verify
+
+**Consideration**: Should prompts be extracted into separate files (`.prompt`, `.md`, or `.yaml`) rather than embedded in TypeScript? This would:
+- Make prompt editing easier (no need to understand TS)
+- Enable prompt versioning and A/B testing
+- Reduce the TypeScript migration scope significantly (page-improver drops from 935 to ~385 lines of actual logic)
+- Allow non-developers to edit prompts
+
+The plan doesn't mention this option at all.
+
+### 8. The test infrastructure should be addressed before the migration, not after
+
+The current test runner is a homegrown TAP-like system (`test(name, fn)` with try/catch). There's no test configuration, no watch mode, no coverage, and crux tests aren't run in CI (`pnpm test` only runs app vitest tests).
+
+**This is a blocker for a safe migration.** Converting 34 rules to TypeScript without running the rule tests in CI means regressions can slip through. The plan's "verification" section says to diff `pnpm crux validate` output, but that's manual and fragile.
+
+**What should happen first:**
+1. Add a `test:crux` script to package.json
+2. Run it in CI
+3. Consider migrating to vitest (it's already used for app tests)
+4. Add snapshot tests for validator output
+
+This should be Phase 0d, not an afterthought.
+
+### 9. Eager imports: a startup tax the plan ignores
+
+`crux.mjs` eagerly imports all 9 domain modules:
+
+```javascript
+import * as validateCommands from './commands/validate.mjs';
+import * as analyzeCommands from './commands/analyze.mjs';
+// ... 7 more
+```
+
+When you run `pnpm crux validate`, you pay the import cost for insights, gaps, resources, generate, etc. After the migration, when validators are direct imports instead of subprocess dispatches, this gets worse — the validate command handler will import the entire validation engine, all 34 rules, all data loaders, etc. just to run `crux gaps list`.
+
+**The plan should consider lazy imports:**
+
+```typescript
+const domains: Record<string, () => Promise<Domain>> = {
+  validate: () => import('./commands/validate.ts'),
+  analyze: () => import('./commands/analyze.ts'),
+  // ...
+};
+
+const handler = await domains[domain]();
+```
+
+This is a small change but matters for CLI responsiveness.
+
+### 10. The "recommended stopping points" may be traps
+
+The plan says "Phases 0–1 is a good stopping point (~10 hours)." But after Phase 1, you have:
+- 34 typed rules in `lib/rules/*.ts`
+- 23 untyped standalone validators in `validate/*.mjs`
+- 10 untyped lib files in `lib/*.mjs`
+- A validation engine that loads typed rules but is called by untyped scripts
+
+This is a coherent but odd state. The rules are typed but their callers aren't. The benefit is limited because the untyped scripts pass untyped data into the typed rules.
+
+The more natural stopping point might be **Phase 0 only** (standardize data loading + arg parsing) or **Phases 0+2** (typed lib/ backbone). Phase 1 in isolation provides less value than it appears because the rules are already correct — they pass the existing tests.
+
+### 11. What if the real problem isn't TypeScript or subprocesses?
+
+Step back and ask: what actually causes pain in the current codebase?
+
+- **Adding a new validation rule** is easy (copy an existing rule, modify the check function). The boilerplate is in the standalone validators, not the rules.
+- **Debugging a failing validator** is easy because each script is standalone.
+- **Modifying prompts** in authoring scripts is the most common change, and TypeScript won't help with that.
+- **The actual bugs** (from MEMORY.md) are pre-existing validation failures in content, not in the tooling code.
+
+The real pain points might be:
+1. **No persistent state** — every invocation re-scans 625 files from disk
+2. **No parallelization** — `validate-all.mjs` runs 15 validators sequentially
+3. **No error recovery** — if `page-improver` fails mid-run, there's no retry/resume
+4. **No observability** — logs go to stdout only, no audit trail
+5. **Stale content-types** — `app/scripts/lib/content-types.mjs` and `crux/lib/content-types.ts` are manually kept in sync
+
+A migration plan focused on these operational issues might deliver more value per hour than a TypeScript conversion.
+
+### 12. Risk matrix
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| Half-migrated state confuses contributors | High | Medium | Complete each phase atomically; never leave partial conversions |
+| Effort overruns stall the migration at an awkward point | High | High | Do Phase 0 first; evaluate whether to continue based on actual vs. estimated time |
+| Type errors in newly-converted files cascade into untyped callers | Medium | Low | Keep `checkJs: false`; only type-check converted files |
+| Single-process model creates memory pressure with 625 files | Medium | Medium | Benchmark before and after; keep subprocess for MDX compile |
+| Migration breaks `.claude/settings.local.json` permission patterns | Low | High | Entry point filenames must not change |
+| Prompt editing becomes harder when embedded in TypeScript | Medium | Low | Consider extracting prompts to separate files |
+| `tsx/esm` loader has edge cases with mixed .ts/.mjs imports | Medium | Medium | Test thoroughly; the existing 2 .ts files already prove this works |
+
+### Summary: Revised recommendation
+
+1. **Do Phase 0 first** (2–4h). It's pure upside — standardized data loading, shared arg parsing, de-duplicated imports. Zero risk.
+
+2. **Then do the `withContext` alternative** (described in section 5 above) instead of the full Phase 3. This eliminates validator boilerplate in ~4 hours without changing the architecture.
+
+3. **Add `test:crux` to CI** before any TypeScript conversion.
+
+4. **Then evaluate**: is the remaining pain worth 40–60 more hours of TypeScript conversion? Or is the codebase already good enough?
+
+The full 6-phase migration is the right plan *if you're committed to seeing it through*. The danger is starting it and stopping at Phase 2, leaving the codebase in a worse state than today.
+
+---
+
 ## Architecture: Current vs Target
 
 ### Current
