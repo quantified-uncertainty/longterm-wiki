@@ -169,7 +169,6 @@ export function InfoBox({
   const typeInfo = getEntityTypeHeader(type, orgType);
 
   const fields: { label: string; value: string; link?: string }[] = [];
-  if (importance !== undefined) fields.push({ label: "Importance", value: Math.round(importance).toString() });
   if (orgType) {
     fields.push({ label: "Type", value: getOrgTypeLabel(orgType) });
   }
@@ -400,12 +399,6 @@ export function InfoBox({
         <div className="px-4 py-3 border-t border-border">
           <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Prioritization</div>
           <div className="py-2">
-            {importance !== undefined && (
-              <div className="flex py-1.5 border-b border-border last:border-b-0">
-                <span className="flex-shrink-0 w-[100px] text-muted-foreground font-medium pr-2">Importance</span>
-                <span className="flex-1 text-foreground font-semibold">{importance}</span>
-              </div>
-            )}
             {tractability !== undefined && (
               <div className="flex py-1.5 border-b border-border last:border-b-0">
                 <span className="flex-shrink-0 w-[100px] text-muted-foreground font-medium pr-2">Tractability</span>
