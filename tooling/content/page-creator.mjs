@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --import tsx/esm --no-warnings
 
 /**
  * Page Creator - Cost-Optimized Pipeline (CLI Entry Point)

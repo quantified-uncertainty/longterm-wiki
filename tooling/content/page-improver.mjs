@@ -30,10 +30,32 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
-import { CRITICAL_RULES, QUALITY_RULES } from '../lib/content-types.js';
+// Inlined from content-types.ts to avoid tsx/esm dependency in .mjs files
+const CRITICAL_RULES = [
+  'dollar-signs',
+  'comparison-operators',
+  'frontmatter-schema',
+  'entitylink-ids',
+  'internal-links',
+  'fake-urls',
+  'component-props',
+  'citation-urls',
+];
+
+const QUALITY_RULES = [
+  'tilde-dollar',
+  'markdown-lists',
+  'consecutive-bold-labels',
+  'placeholders',
+  'vague-citations',
+  'temporal-artifacts',
+];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '../..');
+
+// Node command with tsx loader — required because tooling .mjs files import from .ts files
+const NODE_TSX = 'node --import tsx/esm --no-warnings';
 const TEMP_DIR = path.join(ROOT, '.claude/temp/page-improver');
 
 // SCRY API config
@@ -565,7 +587,7 @@ async function validatePhase(page, improvedContent, options) {
     for (const rule of CRITICAL_RULES) {
       try {
         const result = execSync(
-          `node tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
+          `${NODE_TSX} tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
           { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
         );
         const errorCount = (result.match(/error/gi) || []).length;
@@ -576,7 +598,7 @@ async function validatePhase(page, improvedContent, options) {
           log('validate', `  ✓ ${rule}`);
         }
       } catch (e) {
-        log('validate', `  ? ${rule}: check failed`);
+        log('validate', `  ? ${rule}: check failed — ${e.message?.slice(0, 100)}`);
       }
     }
 
@@ -584,7 +606,7 @@ async function validatePhase(page, improvedContent, options) {
     for (const rule of QUALITY_RULES) {
       try {
         const result = execSync(
-          `node tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
+          `${NODE_TSX} tooling/crux.mjs validate unified --rules=${rule} --ci 2>&1 | grep -i "${page.id}" || true`,
           { cwd: ROOT, encoding: 'utf-8', timeout: 30000 }
         );
         const warningCount = (result.match(/warning/gi) || []).length;
@@ -595,22 +617,22 @@ async function validatePhase(page, improvedContent, options) {
           log('validate', `  ✓ ${rule}`);
         }
       } catch (e) {
-        // Quality rules don't block
+        log('validate', `  ? ${rule}: quality check failed — ${e.message?.slice(0, 100)}`);
       }
     }
 
     // Check MDX compilation
     log('validate', 'Checking MDX compilation...');
     try {
-      execSync('node tooling/crux.mjs validate compile --quick', {
+      execSync(`${NODE_TSX} tooling/crux.mjs validate compile --quick`, {
         cwd: ROOT,
         stdio: 'pipe',
         timeout: 60000
       });
       log('validate', '  ✓ MDX compiles');
     } catch (e) {
-      issues.critical.push({ rule: 'compile', error: 'MDX compilation failed' });
-      log('validate', '  ✗ MDX compilation failed');
+      issues.critical.push({ rule: 'compile', error: `MDX compilation failed: ${e.message?.slice(0, 200)}` });
+      log('validate', `  ✗ MDX compilation failed: ${e.message?.slice(0, 100)}`);
     }
   } finally {
     // Restore original content — the pipeline applies changes later if approved
@@ -778,7 +800,7 @@ async function runPipeline(pageId, options = {}) {
     if (options.grade) {
       console.log('\n📊 Running grade-content.mjs...');
       try {
-        execSync(`node tooling/content/grade-content.mjs --page "${page.id}" --apply`, {
+        execSync(`${NODE_TSX} tooling/content/grade-content.mjs --page "${page.id}" --apply`, {
           cwd: ROOT,
           stdio: 'inherit'
         });
@@ -831,10 +853,11 @@ function listPages(pages, options = {}) {
   console.log(`\nRun: node tooling/content/page-improver.mjs -- <page-id> --directions "your directions"`);
 }
 
-// Parse arguments
+// Parse arguments (bare '--' is skipped so flags still work after it)
 function parseArgs(args) {
   const opts = { _positional: [] };
   for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--') continue;
     if (args[i].startsWith('--')) {
       const key = args[i].slice(2);
       const next = args[i + 1];

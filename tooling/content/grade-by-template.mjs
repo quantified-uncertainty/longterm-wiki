@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --import tsx/esm --no-warnings
 /**
  * Grade pages based on their template requirements
  *
