@@ -14,7 +14,9 @@ export function SearchDialog() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [selected, setSelected] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [pendingQuery, setPendingQuery] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const router = useRouter();
 
   // Open/close with Cmd+K / Ctrl+K
@@ -32,16 +34,22 @@ export function SearchDialog() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  // Focus input when dialog opens
+  // Focus input and lock body scroll when dialog opens
   useEffect(() => {
     if (open) {
       inputRef.current?.focus();
       preloadSearchIndex();
+      document.body.style.overflow = "hidden";
     } else {
       setQuery("");
       setResults([]);
       setSelected(0);
+      setPendingQuery(false);
+      document.body.style.overflow = "";
     }
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   // Debounced search
@@ -49,11 +57,14 @@ export function SearchDialog() {
     if (!query.trim()) {
       setResults([]);
       setSelected(0);
+      setPendingQuery(false);
       return;
     }
 
+    setPendingQuery(true);
     const timer = setTimeout(async () => {
       setLoading(true);
+      setPendingQuery(false);
       try {
         const r = await searchWiki(query, 12);
         setResults(r);
@@ -73,6 +84,13 @@ export function SearchDialog() {
     },
     [router]
   );
+
+  // Scroll selected item into view
+  useEffect(() => {
+    if (!listRef.current) return;
+    const item = listRef.current.children[selected] as HTMLElement | undefined;
+    item?.scrollIntoView({ block: "nearest" });
+  }, [selected]);
 
   // Keyboard navigation
   function onInputKeyDown(e: React.KeyboardEvent) {
@@ -100,6 +118,9 @@ export function SearchDialog() {
 
       {/* Dialog */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search wiki"
         className="relative w-full max-w-lg mx-4 bg-card border border-border rounded-xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
@@ -124,22 +145,22 @@ export function SearchDialog() {
 
         {/* Results */}
         <div className="max-h-[50vh] overflow-y-auto">
-          {loading && results.length === 0 && (
+          {(loading || pendingQuery) && results.length === 0 && (
             <div className="px-4 py-6 text-sm text-muted-foreground text-center">
               Searching...
             </div>
           )}
 
-          {!loading && query.trim() && results.length === 0 && (
+          {!loading && !pendingQuery && query.trim() && results.length === 0 && (
             <div className="px-4 py-6 text-sm text-muted-foreground text-center">
               No results for &ldquo;{query}&rdquo;
             </div>
           )}
 
           {results.length > 0 && (
-            <ul className="py-1">
+            <ul ref={listRef} className="py-1" role="listbox">
               {results.map((r, i) => (
-                <li key={r.id}>
+                <li key={r.id} role="option" aria-selected={i === selected}>
                   <button
                     className={`w-full text-left px-4 py-2.5 flex items-start gap-3 transition-colors ${
                       i === selected

@@ -45,25 +45,31 @@ async function ensureLoaded(): Promise<void> {
   if (_loadPromise) return _loadPromise;
 
   _loadPromise = (async () => {
-    const [indexRes, docsRes] = await Promise.all([
-      fetch("/search-index.json"),
-      fetch("/search-docs.json"),
-    ]);
+    try {
+      const [indexRes, docsRes] = await Promise.all([
+        fetch("/search-index.json"),
+        fetch("/search-docs.json"),
+      ]);
 
-    if (!indexRes.ok || !docsRes.ok) {
-      throw new Error("Failed to load search index");
+      if (!indexRes.ok || !docsRes.ok) {
+        throw new Error("Failed to load search index");
+      }
+
+      const [indexText, docsJSON] = await Promise.all([
+        indexRes.text(),
+        docsRes.json() as Promise<SearchDoc[]>,
+      ]);
+
+      _miniSearch = MiniSearch.loadJSON(indexText, {
+        fields: SEARCH_FIELDS,
+      });
+
+      _docs = new Map(docsJSON.map((d) => [d.id, d]));
+    } catch (err) {
+      // Reset so the next call retries instead of returning a stale rejected promise
+      _loadPromise = null;
+      throw err;
     }
-
-    const [indexJSON, docsJSON] = await Promise.all([
-      indexRes.json(),
-      docsRes.json() as Promise<SearchDoc[]>,
-    ]);
-
-    _miniSearch = MiniSearch.loadJSON(JSON.stringify(indexJSON), {
-      fields: SEARCH_FIELDS,
-    });
-
-    _docs = new Map(docsJSON.map((d) => [d.id, d]));
   })();
 
   return _loadPromise;

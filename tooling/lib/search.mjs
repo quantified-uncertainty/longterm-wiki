@@ -33,10 +33,10 @@ function getSearchEngine() {
     );
   }
 
-  const indexJSON = JSON.parse(readFileSync(indexPath, 'utf-8'));
+  const indexText = readFileSync(indexPath, 'utf-8');
   const docsJSON = JSON.parse(readFileSync(docsPath, 'utf-8'));
 
-  _miniSearch = MiniSearch.loadJSON(JSON.stringify(indexJSON), {
+  _miniSearch = MiniSearch.loadJSON(indexText, {
     fields: ['title', 'description', 'tags', 'entityType', 'id'],
   });
 

@@ -549,6 +549,11 @@ function main() {
   database.typedEntities = typedEntities;
   console.log(`  typedEntities: ${typedEntities.length} transformed`);
 
+  // Ensure output directory exists
+  if (!existsSync(OUTPUT_DIR)) {
+    mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
+
   // ==========================================================================
   // SEARCH INDEX — build MiniSearch index for client-side search
   // ==========================================================================
@@ -569,11 +574,6 @@ function main() {
   copyFileSync(searchIndexPath, join(publicDir, 'search-index.json'));
   copyFileSync(searchDocsPath, join(publicDir, 'search-docs.json'));
   console.log(`  searchIndex: ${searchDocs.length} documents indexed`);
-
-  // Ensure output directory exists
-  if (!existsSync(OUTPUT_DIR)) {
-    mkdirSync(OUTPUT_DIR, { recursive: true });
-  }
 
   // Write combined JSON (strip raw entities — only typedEntities needed at runtime)
   const { entities: _rawEntities, ...databaseForOutput } = database;
