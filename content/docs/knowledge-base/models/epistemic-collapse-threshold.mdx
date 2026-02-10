@@ -48,7 +48,7 @@ A functioning epistemic system maintains four interconnected capacities that rei
 
 **The four capacities form a reinforcing cycle:**
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     V[Verification] -->|enables| C[Consensus]
     C -->|supports| U[Update]
@@ -69,7 +69,7 @@ flowchart LR
 | **Critical Zone** | 0.35-0.5 | Degrading | Capacities undermine each other |
 | **Collapsed** | < 0.35 | Non-functional | Capacities cannot recover without external intervention |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     H[Healthy<br/>E above 0.5] -->|"Gradual stress"| C[Critical Zone<br/>0.35-0.5]
     C -->|"Sudden collapse"| R[Collapsed<br/>E below 0.35]
@@ -186,7 +186,7 @@ Decision capacity degrades last because it is downstream of other capacities, bu
 
 ## Integrated Collapse Scenarios
 
-<Mermaid client:load chart={`stateDiagram-v2
+<Mermaid chart={`stateDiagram-v2
     [*] --> Healthy: E > 0.7
     Healthy --> Stressed: E = 0.5-0.7
     Stressed --> Dysfunctional: E = 0.35-0.5

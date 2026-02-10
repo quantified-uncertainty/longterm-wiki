@@ -21,7 +21,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {R, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="compute-hardware" client:load />
+<DataExternalLinks pageId="compute-hardware" />
 
 ## Quick Assessment
 
@@ -50,7 +50,7 @@ Compute and hardware metrics are fundamental to understanding AI progress. The a
 
 ### AI Hardware Supply Chain
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph DESIGN["Chip Design"]
         NVIDIA[NVIDIA<br/>80-90% AI market]

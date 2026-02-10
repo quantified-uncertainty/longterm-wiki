@@ -21,7 +21,7 @@ clusters: ["ai-safety"]
 ---
 import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="yann-lecun" client:load />
+<DataExternalLinks pageId="yann-lecun" />
 
 ## Overview
 
@@ -114,7 +114,7 @@ In 2022, LeCun proposed JEPA as an alternative to autoregressive language models
 **Core Concept:**
 Unlike generative models that predict raw pixels or tokens, JEPA predicts representations in an abstract embedding space. This allows the model to focus on high-level semantics rather than surface-level details.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Input["Input Processing"]
         C[Context View]
@@ -547,4 +547,4 @@ LeCun maintains an unusually active social media presence for a researcher of hi
 - [Yann LeCun's Publications](https://yann.lecun.com/exdb/publis/index.html) - Personal website
 - [Yann LeCun - AI at Meta](https://ai.meta.com/people/396469589677838/yann-lecun/)
 
-<Backlinks client:load entityId="yann-lecun" />
+<Backlinks entityId="yann-lecun" />

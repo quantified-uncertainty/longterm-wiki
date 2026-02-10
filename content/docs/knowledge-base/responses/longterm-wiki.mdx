@@ -53,7 +53,7 @@ import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@c
 
 The Longterm Wiki is a strategic intelligence platform for AI safety prioritization. Unlike general encyclopedias or community wikis, it serves as a **decision-support tool** for funders, researchers, and policymakers asking: *"Where should the next marginal dollar or researcher-hour go?"*
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Problem["Current State of AI Safety Field"]
         A[Scattered Knowledge<br/>Papers, blogs, forum threads] --> D[Poor Prioritization]
@@ -94,7 +94,7 @@ Content is editorially curated rather than community-contributed, ensuring consi
 
 The wiki has four interconnected layers of content:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     L1[Factual Foundation<br/>Risks, interventions, orgs] --> L2[Causal Models<br/>How risks unfold]
     L2 --> L3[Uncertainty Structure<br/>Cruxes, expert positions]
@@ -138,7 +138,7 @@ flowchart TD
 
 The wiki explicitly tracks key uncertainties that drive disagreement and prioritization:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     C[Key Cruxes] -->|"inform"| W[Worldviews]
     W -->|"imply"| P[Priority Rankings]
@@ -184,7 +184,7 @@ The <EntityLink id="scheming">scheming</EntityLink> risk relates to
 
 ReactFlow-based cause-effect graphs for complex causal models:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     Y[YAML Definition] -->|"Dagre/ELK"| L[Layout Engine]
     L --> I[Interactive Graph]
@@ -201,7 +201,7 @@ flowchart LR
 
 ### Quality Scoring System
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     M[MDX Page] -->|"Claude API"| G[Grading Pipeline]
     G --> Q[Quality 0-100]
@@ -226,7 +226,7 @@ Quality is set only through automated grading pipeline using Claude, never manua
 
 ### Data Layer
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     Y[YAML Sources] -->|"build-data.mjs"| J[JSON Outputs]
     J -->|"imported by"| C[React Components]
@@ -374,7 +374,7 @@ The [Similar Projects Analysis](/project/similar-projects/) identified key succe
 
 ## Relationship to QURI Ecosystem
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     LW[Longterm Wiki] <-->|"concepts"| SQ[Squiggle]
     LW <-->|"forecasts"| MF[Metaforecast]

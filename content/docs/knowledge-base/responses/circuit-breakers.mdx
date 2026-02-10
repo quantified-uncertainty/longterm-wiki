@@ -23,7 +23,7 @@ subcategory: alignment-interpretability
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="circuit-breakers" client:load />
+<DataExternalLinks pageId="circuit-breakers" />
 
 ## Overview
 
@@ -85,7 +85,7 @@ The following table shows measured attack success rates (lower is better for def
 
 Circuit breakers operate at inference time, monitoring and potentially intervening during model generation:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[User Input] --> B[Model Inference]
     B --> C{Circuit Breaker Check}
@@ -156,7 +156,7 @@ The circuit breaker method operates through four key steps:
 
 4. **Maintain capability**: The orthogonal rerouting preserves distances and angles between non-harmful representations, enabling ~99% capability retention on benchmarks like MT-Bench and MMLU
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Phase"]
         A[Collect Harmful/Safe Prompt Pairs] --> B[Extract Contrastive Activations]
@@ -190,7 +190,7 @@ More sophisticated circuit breakers operate at the activation level:
 
 ### How Activation Intervention Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[Input Processing] --> B[Generate Activations]
     B --> C{Monitor Activations}
@@ -327,7 +327,7 @@ This represents one of the most extensive public evaluations of an AI safety def
 
 ### Implementation Architecture
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Detection["Detection Layer"]
         A[Token Scanner]
@@ -378,7 +378,7 @@ flowchart TD
 
 Modern AI safety systems increasingly combine multiple circuit breaker approaches in a layered defense architecture. The following diagram illustrates how different mechanisms can work together.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Input["Input Layer"]
         A[User Query] --> B[Constitutional Input Classifier]

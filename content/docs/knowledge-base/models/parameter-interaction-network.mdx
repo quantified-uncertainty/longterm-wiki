@@ -51,7 +51,7 @@ The 22 parameters form a directed graph where edges represent causal influence. 
 | **Dampening** (-) | Increase in A → Decrease in B | Higher regulatory-capacity → Lower racing-intensity |
 | **Conditional** (?) | Effect depends on context | Information-authenticity's effect on societal-trust depends on baseline trust |
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Epistemic["Epistemic Cluster"]
         EH[Epistemic Health]
@@ -159,7 +159,7 @@ The network contains 7 major feedback loops:
 
 ### Loop Dynamics
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph ViciousLoop["Racing-Safety Spiral"]
         RI2[Racing Intensity ↑] --> |reduces| SCS[Safety Culture ↓]
@@ -272,4 +272,4 @@ Different parameters have different optimal intervention windows:
 
 ## Related Pages
 
-<Backlinks client:load entityId="parameter-interaction-network" />
+<Backlinks entityId="parameter-interaction-network" />

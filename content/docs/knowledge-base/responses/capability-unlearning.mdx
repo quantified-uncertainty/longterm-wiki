@@ -23,7 +23,7 @@ subcategory: alignment-training
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="capability-unlearning" client:load />
+<DataExternalLinks pageId="capability-unlearning" />
 
 ## Overview
 
@@ -46,7 +46,7 @@ However, the field faces fundamental challenges that may limit its effectiveness
 
 ## Unlearning Approaches
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     MODEL[Trained Model] --> IDENTIFY[Identify Dangerous Capabilities]
     IDENTIFY --> LOCATE[Locate in Model]

@@ -23,7 +23,7 @@ subcategory: alignment
 ---
 import {Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="alignment" client:load />
+<DataExternalLinks pageId="alignment" />
 
 ## Overview
 
@@ -73,7 +73,7 @@ Current alignment approaches show promise for existing systems but face critical
 
 The field of AI alignment can be organized around four core principles identified by the <R id="f612547dcfb62f8d">RICE framework</R>: Robustness, Interpretability, Controllability, and Ethicality. These principles map to two complementary research directions: **forward alignment** (training systems to be aligned) and **backward alignment** (verifying alignment and governing appropriately).
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph ForwardAlign["Forward Alignment: Training"]
         direction TB
@@ -124,7 +124,7 @@ flowchart TD
 
 The fundamental challenge of aligning superhuman AI is that humans become "weak supervisors" unable to directly evaluate advanced capabilities. AI-assisted alignment techniques attempt to solve this by using AI systems themselves to help with the oversight process. This creates a recursive architecture where weaker models assist in supervising stronger ones.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     HUMAN[Human Oversight<br/>Limited Bandwidth] --> WEAK[Weak AI Assistant]
     WEAK --> EVAL[Evaluation Process]

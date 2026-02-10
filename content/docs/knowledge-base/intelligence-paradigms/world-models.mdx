@@ -22,7 +22,7 @@ clusters: ["ai-safety"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="world-models" client:load />
+<DataExternalLinks pageId="world-models" />
 
 ## Quick Assessment
 
@@ -55,7 +55,7 @@ Estimated probability of being dominant at transformative AI: **5-15%**. Powerfu
 
 ## Architecture
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph inputs["Input Processing"]
         obs["Raw Observation<br/>(pixels, sensors)"]

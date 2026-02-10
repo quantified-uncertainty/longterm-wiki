@@ -22,7 +22,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="agi-development" client:load />
+<DataExternalLinks pageId="agi-development" />
 
 ## Quick Assessment
 
@@ -53,7 +53,7 @@ Development is concentrated among 3-4 major labs investing \$10-100B+ annually. 
 
 ### AGI Development Dynamics
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Drivers["Key Drivers"]
         COMPUTE[Compute Scaling<br/>10^26-28 FLOPs]

@@ -25,7 +25,7 @@ subcategory: safety-orgs
 ---
 import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="apollo-research" client:load />
+<DataExternalLinks pageId="apollo-research" />
 
 <DataInfoBox entityId="apollo-research" />
 
@@ -53,7 +53,7 @@ The organization maintains formal partnerships with the [UK AI Safety Institute]
 
 ## Apollo's Research Focus
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     APOLLO[Apollo Research<br/>Founded 2022] --> EVALS[Model Evaluations]
     APOLLO --> SAFETY[Safety Cases]
@@ -447,7 +447,6 @@ Apollo aims to be the independent technical authority providing trusted evaluati
 
 <Section title="Perspectives on Evaluation Effectiveness">
   <DisagreementMap
-    client:load
     topic="Reliability of Deception Evaluation"
     positions={[
       {
@@ -478,4 +477,4 @@ Apollo aims to be the independent technical authority providing trusted evaluati
   />
 </Section>
 
-<Backlinks client:load entityId="apollo-research" />
+<Backlinks entityId="apollo-research" />

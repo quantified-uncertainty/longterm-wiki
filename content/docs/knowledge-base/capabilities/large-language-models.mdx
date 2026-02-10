@@ -22,7 +22,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {Backlinks, R, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="large-language-models" client:load />
+<DataExternalLinks pageId="large-language-models" />
 
 ## Quick Assessment
 
@@ -93,7 +93,7 @@ Recent research has identified several concerning emergent capabilities that sca
 
 ## Safety Challenges and Alignment Techniques
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph CAPABILITIES["Capability Development"]
         SCALE[Scaling Compute<br/>2.4x/year cost growth] --> FRONTIER[Frontier Models]
@@ -218,7 +218,7 @@ Source: [Stanford HAI AI Index 2025](https://hai.stanford.edu/ai-index/2025-ai-i
 
 At the hardware level, costs have declined 30% annually while energy efficiency improved 40% per year—but these gains are offset by the 2.4x annual increase in compute usage for frontier training.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     COMPUTE[Training Compute] --> CAPABILITY[Model Capability]
     DATA[Training Data] --> CAPABILITY
@@ -251,7 +251,7 @@ The relationship between compute, data, and model capability follows predictable
 
 Recent practice has moved beyond Chinchilla-optimality toward "overtraining"—training smaller models on far more data to reduce inference costs. Meta's Llama 3 8B model trained on 15 trillion tokens (1,875 tokens per parameter), while Alibaba's Qwen3-0.6B pushed this ratio to an unprecedented 60,000:1. This approach trades training efficiency for inference efficiency, which dominates costs at deployment scale.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph TRAIN["Training Phase"]
         C[Compute Budget] --> OPT{Chinchilla<br/>Optimal?}

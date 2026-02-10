@@ -21,7 +21,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="language-models" client:load />
+<DataExternalLinks pageId="language-models" />
 
 <DataInfoBox entityId="language-models" />
 
@@ -57,7 +57,7 @@ Current state-of-the-art models like GPT-4, Claude 3.5 Sonnet, and <EntityLink i
 
 ## Capability Architecture
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph TRAINING["Training Phase"]
         DATA[Text Corpora] --> PRETRAIN[Pretraining]
@@ -352,4 +352,4 @@ The o3 results on ARC-AGI (87.5%, approaching human baseline of ~85%) have inten
 | Responsible AI Practices | <R id="0e7aef26385afeed">Partnership on AI</R> | Industry coordination | Best practices documentation |
 | International Cooperation | <EntityLink id="uk-aisi">UK AISI</EntityLink> | Global safety standards | International coordination |
 
-<Backlinks client:load entityId="language-models" />
+<Backlinks entityId="language-models" />

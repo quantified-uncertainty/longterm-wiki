@@ -25,7 +25,7 @@ subcategory: labs
 ---
 import {Backlinks, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="meta-ai" client:load />
+<DataExternalLinks pageId="meta-ai" />
 
 ## Quick Assessment
 
@@ -75,7 +75,7 @@ Meta's AI safety approach remains notably weaker than competitors. The company's
 
 ## History and Evolution
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     FOUND[December 2013: FAIR Founded] --> LECUN[Yann LeCun Named Director]
     LECUN --> PARIS[2015: Paris Lab Opens]
@@ -148,7 +148,7 @@ The [PyTorch Foundation](https://pytorch.org/blog/pytorchfoundation/) operates w
 
 ### Computer Vision Breakthroughs
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph Detection["Object Detection"]
         DETECTRON[Detectron2]
@@ -575,4 +575,4 @@ Meta's open-source strategy has significantly shaped industry expectations:
 - [NPR - Meta Replacing Human Risk Reviewers](https://www.npr.org/2025/05/31/nx-s1-5407870/meta-ai-facebook-instagram-risks)
 - [LessWrong - Meta Frontier AI Framework Analysis](https://www.lesswrong.com/posts/TkmqiX9ccysrqvGe2/meta-frontier-ai-framework)
 
-<Backlinks client:load entityId="meta-ai" />
+<Backlinks entityId="meta-ai" />

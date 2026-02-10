@@ -22,7 +22,7 @@ subcategory: alignment-evaluation
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="evals" client:load />
+<DataExternalLinks pageId="evals" />
 
 ## Overview
 
@@ -75,7 +75,7 @@ AI safety evaluations test models across multiple dimensions before deployment. 
 
 ### Evaluation Pipeline
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     DEV[Model Development] --> PRE[Pre-deployment Evals]
     PRE --> CAP[Capability Evals]

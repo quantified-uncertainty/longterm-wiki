@@ -27,7 +27,7 @@ subcategory: misuse
 ---
 import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="surveillance" client:load />
+<DataExternalLinks pageId="surveillance" />
 
 <DataInfoBox entityId="surveillance" />
 
@@ -90,7 +90,7 @@ The trajectory of AI surveillance development suggests these capabilities will o
 
 ## Technical Capabilities and Mechanisms
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Data Collection
         CAM[CCTV Cameras<br/>600M+ in China]

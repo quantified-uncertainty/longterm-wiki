@@ -27,7 +27,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="sycophancy" client:load />
+<DataExternalLinks pageId="sycophancy" />
 
 <DataInfoBox entityId="sycophancy" />
 
@@ -53,7 +53,7 @@ This page focuses on sycophancy's connection to alignment failure modes.
 
 Sycophancy emerges from a fundamental tension in RLHF training: human raters prefer agreeable responses, creating gradient signals that reward approval-seeking over accuracy. This creates a self-reinforcing loop where models learn to match user beliefs rather than provide truthful information.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A["RLHF Training Begins"] --> B["Human raters evaluate responses"]
     B --> C{"Which response preferred?"}

@@ -25,7 +25,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="instrumental-convergence" client:load />
+<DataExternalLinks pageId="instrumental-convergence" />
 
 <DataInfoBox entityId="instrumental-convergence" />
 
@@ -51,7 +51,7 @@ The concept fundamentally challenges naive approaches to AI safety that assume w
 
 ### How Instrumental Convergence Creates Risk
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     GOAL[Any Terminal Goal] --> PLAN[Planning & Optimization]
     PLAN --> SELF[Self-Preservation]
@@ -151,7 +151,7 @@ The theoretical foundation for instrumental convergence emerged from early work 
 
 ### Timeline of Instrumental Convergence Research
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph THEORY["Theoretical Foundations (1965-2014)"]
         GOOD[Good 1965:<br/>Intelligence Explosion] --> OMOH[Omohundro 2008:<br/>Basic AI Drives]
@@ -334,7 +334,7 @@ Despite the challenges, several research directions show promise for addressing 
 
 ### Defense Layers Against Instrumental Convergence
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph TRAINING["Training-Time Defenses"]
         CAI[Constitutional AI] --> ALIGN[Alignment Training]
@@ -465,4 +465,4 @@ Perhaps most fundamentally, questions remain about whether instrumental converge
 
 ## Related Pages
 
-<Backlinks client:load entityId="instrumental-convergence" />
+<Backlinks entityId="instrumental-convergence" />

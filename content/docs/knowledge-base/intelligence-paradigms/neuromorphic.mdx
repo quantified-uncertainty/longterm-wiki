@@ -31,7 +31,7 @@ import {Mermaid, EntityLink, DataExternalLinks, R} from '@components/wiki';
 | Official Website | [ibm.com](https://www.ibm.com/think/topics/neuromorphic-computing) |
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Neuromorphic_computing) |
 
-<DataExternalLinks pageId="neuromorphic" client:load />
+<DataExternalLinks pageId="neuromorphic" />
 
 ## Overview
 
@@ -47,7 +47,7 @@ However, neuromorphic systems face a fundamental capability gap with modern AI. 
 
 Neuromorphic chips fundamentally differ from conventional processors by co-locating memory and computation within each processing element, eliminating the von Neumann bottleneck where data must shuttle between separate memory and processing units. This architectural choice enables dramatic efficiency gains for workloads that can exploit spatial locality and event-driven computation.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph neuromorphic["Neuromorphic Chip Architecture"]
         direction TB

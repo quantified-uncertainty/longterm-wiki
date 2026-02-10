@@ -24,7 +24,7 @@ subcategory: alignment-evaluation
 ---
 import {Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="capability-elicitation" client:load />
+<DataExternalLinks pageId="capability-elicitation" />
 
 ## Quick Assessment
 
@@ -73,7 +73,7 @@ For AI safety, capability elicitation serves two critical functions. First, it h
 
 The core problem in AI safety evaluation is that we systematically underestimate what models can do. This "elicitation gap" has widened as models become more capable, and closing it requires understanding both what drives the gap and how to measure true capability.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Gap["The Elicitation Gap"]
         NAIVE[Naive Benchmark Score] --> GAP{{"2-10x Gap"}}
@@ -145,7 +145,7 @@ Standard evaluations consistently underestimate true model capabilities:
 
 ### Elicitation Methods
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Prompting["Prompting Techniques"]
         ZERO[Zero-Shot] --> FEW[Few-Shot]
@@ -282,7 +282,7 @@ Even with strong guarantees against model exfiltration, it is "hard to upper-bou
 
 The UK AI Security Institute published a [structured protocol for elicitation experiments](https://www.aisi.gov.uk/blog/our-approach-to-ai-capability-elicitation) in 2025, establishing best practices for systematic capability discovery:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Setup["1. Experiment Setup"]
         BASELINE[Define Baseline Performance] --> HYPOTHESIS[Form Elicitation Hypothesis]
@@ -319,7 +319,7 @@ This protocol emphasizes that elicitation can yield performance improvements com
 
 ### Elicitation for Safety Assessment
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Assessment["Safety Assessment Process"]
         NAIVE[Naive Capability Test] --> SCAFFOLD[Add Scaffolding]

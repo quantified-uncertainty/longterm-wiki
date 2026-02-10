@@ -41,7 +41,7 @@ The model matters because the transition from helpful assistance to dangerous de
 
 The automation bias cascade operates through a self-reinforcing feedback loop where initial efficiency gains from AI assistance progressively degrade human oversight capacity. Each successful delegation of judgment to AI systems makes subsequent delegations more attractive, creating a ratchet effect that gradually eliminates organizational capability for independent verification.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     A[AI Provides Advice] --> B[Human Evaluates]
     B -->|Evaluation costly| C[Human defaults to accepting]
@@ -157,7 +157,7 @@ The risk of cascade dynamics in legal contexts is particularly concerning becaus
 
 Automation bias cascades progress through distinct stages characterized by different dominant mechanisms and intervention opportunities. Understanding these phases is critical for designing appropriate safeguards and detecting warning signs before lock-in becomes irreversible.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 stateDiagram-v2
     [*] --> Introduction
     Introduction --> Familiarization: 1-3 years

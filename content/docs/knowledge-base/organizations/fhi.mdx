@@ -25,7 +25,7 @@ subcategory: safety-orgs
 ---
 import {Backlinks, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="fhi" client:load />
+<DataExternalLinks pageId="fhi" />
 
 ## Quick Assessment
 
@@ -66,7 +66,7 @@ FHI's influence extends far beyond its publications. The institute trained a gen
 
 ## Historical Evolution
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Foundation["Foundation Period (2005-2008)"]
         F1[November 2005: FHI Founded]
@@ -380,7 +380,7 @@ FHI researchers contributed to policy discussions on AI governance that informed
 
 ## Spin-offs and Related Organizations
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     FHI[Future of Humanity Institute<br/>2005-2024] --> GovAI[Centre for the<br/>Governance of AI<br/>2018/2021]
     FHI --> GPI[Global Priorities<br/>Institute<br/>2017]

@@ -24,7 +24,7 @@ subcategory: alignment-evaluation
 ---
 import {Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="sleeper-agent-detection" client:load />
+<DataExternalLinks pageId="sleeper-agent-detection" />
 
 ## Research Investment & Detection Landscape
 
@@ -40,7 +40,7 @@ import {Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
 **Total estimated annual investment: \$15-35M globally**, with 60-70% concentrated in three organizations (<EntityLink id="anthropic">Anthropic</EntityLink>, Redwood, ARC). This compares unfavorably to estimated \$50-100B annual AI capability investment (0.02-0.07% ratio).
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Funding["Research Investment (≈\$15-35M/yr)"]
         ANTHROPIC[Anthropic: \$1-8M/yr]
@@ -119,7 +119,7 @@ The field of sleeper agent detection remains in early stages, with total global 
 
 ### How Sleeper Agents Work
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Phase"]
         TRAIN[Training Data] --> MODEL[Model Development]
@@ -236,7 +236,7 @@ The researchers discovered these behaviors by providing models with a "scratchpa
 
 ## Detection Approaches
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Behavioral["Behavioral Methods"]
         TRIGGER[Trigger Search]
@@ -317,7 +317,7 @@ Attempt to find triggers or conditions that reveal hidden behavior:
 
 Use internal analysis to find deception-related features:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Methods["Interpretability Methods"]
         SAE[Sparse Autoencoders] --> FEATURES[Feature Analysis]

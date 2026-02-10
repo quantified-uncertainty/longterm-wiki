@@ -2079,7 +2079,7 @@
       "diagramCount": 0,
       "internalLinks": 2,
       "externalLinks": 2,
-      "bulletRatio": 0.32,
+      "bulletRatio": 0.33,
       "sectionCount": 14,
       "hasOverview": false,
       "structuralScore": 6
@@ -2515,7 +2515,7 @@
       "diagramCount": 1,
       "internalLinks": 1,
       "externalLinks": 43,
-      "bulletRatio": 0.08,
+      "bulletRatio": 0.09,
       "sectionCount": 17,
       "hasOverview": false,
       "structuralScore": 12
@@ -3367,7 +3367,7 @@
       "diagramCount": 1,
       "internalLinks": 30,
       "externalLinks": 0,
-      "bulletRatio": 0.44,
+      "bulletRatio": 0.45,
       "sectionCount": 56,
       "hasOverview": false,
       "structuralScore": 9

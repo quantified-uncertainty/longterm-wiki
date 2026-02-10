@@ -56,7 +56,7 @@ import {TransitionModelContent} from '@components/wiki';
 
 ---
 
-<TransitionModelContent slug="factor-slug" client:load />
+<TransitionModelContent slug="factor-slug" />
 ```
 
 ## Entity Types

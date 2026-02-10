@@ -50,7 +50,7 @@ Where:
 - $R_{\text{deploy}}$ = Deployment robustness (does alignment hold in new situations?)
 - $R_{\text{intent}}$ = Intent preservation (does the system pursue intended goals?)
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Training["Training Alignment"]
         OBJ[Objective Specification]
@@ -152,7 +152,7 @@ The parameter estimates below synthesize available empirical data with theoretic
 
 ### Trajectory Visualization
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 xychart-beta
     title "Alignment Robustness vs Capability"
     x-axis "Capability (× GPT-4)" [1, 3, 10, 30, 100, 300, 1000]
@@ -176,7 +176,7 @@ xychart-beta
 
 ### The "Alignment Valley"
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph Zone1["Safe Zone<br/>1-3x current"]
         S1[Current techniques<br/>mostly adequate]
@@ -311,7 +311,7 @@ Scaling hits diminishing returns:
 
 Based on trajectory analysis, prioritize research that can produce deployable techniques before the critical 10-30x capability zone. The timeline urgency varies by approach:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Timeline["Research Timeline to Impact"]
         direction TB
@@ -427,4 +427,4 @@ Understanding the alignment robustness trajectory is critical for several reason
 
 ## Related Pages
 
-<Backlinks client:load entityId="alignment-robustness-trajectory" />
+<Backlinks entityId="alignment-robustness-trajectory" />

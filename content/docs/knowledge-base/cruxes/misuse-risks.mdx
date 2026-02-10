@@ -21,7 +21,7 @@ clusters: ["ai-safety", "biorisks", "cyber", "governance"]
 ---
 import {Crux, CruxList, DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="misuse-risks" client:load />
+<DataExternalLinks pageId="misuse-risks" />
 
 ## Quick Assessment
 
@@ -57,7 +57,7 @@ The stakes are substantial: if AI provides significant capability uplift to mali
 
 ### Misuse Risk Decision Framework
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Cruxes["Key Uncertainties"]
         UPLIFT[AI Capability Uplift<br/>30-45% significant vs 35-45% modest]

@@ -24,7 +24,7 @@ subcategory: alignment-theoretical
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="provably-safe" client:load />
+<DataExternalLinks pageId="provably-safe" />
 
 ## Overview
 
@@ -51,7 +51,7 @@ The agenda faces extraordinary technical challenges. It requires solving multipl
 
 The Guaranteed Safe AI framework operates through a verification pipeline that checks every action before execution:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Input["Core Inputs"]
         WM[World Model]

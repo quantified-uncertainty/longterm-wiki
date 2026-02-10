@@ -32,7 +32,7 @@ import {Mermaid, EntityLink, DataExternalLinks, R} from '@components/wiki';
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Mamba_(deep_learning_architecture) |
 | arXiv | [arxiv.org](https://arxiv.org/abs/2312.00752) |
 
-<DataExternalLinks pageId="ssm-mamba" client:load />
+<DataExternalLinks pageId="ssm-mamba" />
 
 ## Overview
 
@@ -48,7 +48,7 @@ Estimated probability of pure SSMs being dominant at transformative AI: **5-15%*
 
 The fundamental difference between transformers and SSMs lies in how they handle sequence dependencies. Transformers compute pairwise relationships between all tokens (quadratic), while SSMs compress history into a fixed-size state that evolves with each new token (linear).
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph transformer["Transformer: Quadratic Attention"]
         direction TB

@@ -22,7 +22,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="provable-safe" client:load />
+<DataExternalLinks pageId="provable-safe" />
 
 ## Quick Assessment
 
@@ -59,7 +59,7 @@ Estimated probability of being dominant at transformative AI: **1-5%**. This is 
 
 The field of guaranteed safe AI encompasses multiple verification methodologies, each with different tradeoffs between expressiveness, scalability, and the strength of guarantees provided.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph approaches["Guaranteed Safe AI Approaches"]
         direction TB
@@ -123,7 +123,7 @@ The [5th International Verification of Neural Networks Competition (VNN-COMP 202
 
 ## Conceptual Framework
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph world["World Model (Verified)"]
         physics["Physics Simulator"]

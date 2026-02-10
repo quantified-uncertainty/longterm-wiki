@@ -23,7 +23,7 @@ subcategory: alignment-training
 ---
 import {Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
-<DataExternalLinks pageId="constitutional-ai" client:load />
+<DataExternalLinks pageId="constitutional-ai" />
 
 ## Quick Assessment
 
@@ -72,7 +72,7 @@ CAI operates on a written constitution containing principles like:
 
 ### How It Works
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph SL["Stage 1: Supervised Learning"]
         A[Initial Model] --> B[Generate Response]

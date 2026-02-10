@@ -32,7 +32,6 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
 
 <div class="breakout">
 <CauseEffectGraph
-  client:load
   height={950}
   fitViewPadding={0.05}
   initialNodes={[
@@ -461,7 +460,7 @@ Research from <R id="7ae6b3be2d2043c1"><EntityLink id="anthropic">Anthropic</Ent
 
 The technical pathway decomposition organizes AI development factors into a directed graph where nodes represent capabilities, safety techniques, or risk outcomes, and edges represent causal relationships with estimated impact weights. This structure reveals how investments in specific safety techniques propagate through the system to reduce particular risk categories.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Foundation["Foundation Capabilities"]
         A[LLM Scaling] --> B[Reasoning]

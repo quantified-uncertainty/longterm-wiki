@@ -23,7 +23,7 @@ subcategory: formal-arguments
 ---
 import {InfoBox, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="why-alignment-easy" client:load />
+<DataExternalLinks pageId="why-alignment-easy" />
 
 <InfoBox
   type="argument"
@@ -57,7 +57,7 @@ This page presents the strongest case for why alignment might be easier than pes
 
 As <R id="d5d3cc4553499475"><EntityLink id="jan-leike">Jan Leike</EntityLink> argues</R>, problems become much more tractable once you have iteration set up: a basic working system (even if barely at first) and a proxy metric that tells you whether changes are improvements. This creates a feedback loop for gaining information from reality.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Tractability["Tractability Conditions"]
         A[Iteration Possible] --> F[Tractable Problem]
@@ -251,7 +251,7 @@ In May 2024, Anthropic published <R id="e724db341d6e0065">"Scaling Monosemantici
 
 **Thesis**: Each supposedly "hard" alignment problem has promising solution approaches.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart LR
     subgraph Problems["Hard Problems"]
         P1[Specification Problem]
@@ -671,7 +671,6 @@ As <R id="d5d3cc4553499475">Jan Leike emphasizes</R>, "evaluation is easier than
 ### Probability Estimates
 
 <DisagreementMap
-  client:load
   topic="P(Solve Alignment Before Transformative AI)"
   description="Estimates of alignment success"
   spectrum={{ low: "Very unlikely (&lt;20%)", high: "Very likely (>80%)" }}
@@ -712,7 +711,6 @@ As <R id="d5d3cc4553499475">Jan Leike emphasizes</R>, "evaluation is easier than
 ### Testing the Optimistic View
 
 <KeyQuestions
-  client:load
   questions={[
     {
       question: "What evidence would convince you alignment is harder than this view suggests?",

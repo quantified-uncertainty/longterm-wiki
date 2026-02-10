@@ -25,7 +25,7 @@ subcategory: government
 ---
 import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="uk-aisi" client:load />
+<DataExternalLinks pageId="uk-aisi" />
 
 <DataInfoBox entityId="uk-aisi" />
 
@@ -160,7 +160,7 @@ AISI conducts both in-house and collaborative research across several priority a
 
 The UK has positioned itself as a convener for international AI safety efforts, hosting the first AI Safety Summit and co-founding the International Network of AI Safety Institutes.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     UK[UK AI Security Institute] --> NETWORK[International Network of<br/>AI Safety Institutes]
     US[US AI Safety Institute] --> NETWORK
@@ -535,7 +535,6 @@ With an annual budget of approximately 50 million GBP, AISI remains smaller than
 
 <Section title="Perspectives on UK AISI">
   <DisagreementMap
-    client:load
     topic="UK AISI's Role and Effectiveness"
     positions={[
       {
@@ -661,4 +660,4 @@ With an annual budget of approximately 50 million GBP, AISI remains smaller than
 
 ## Related Pages
 
-<Backlinks client:load entityId="uk-aisi" />
+<Backlinks entityId="uk-aisi" />

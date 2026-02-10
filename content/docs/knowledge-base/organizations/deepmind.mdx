@@ -24,7 +24,7 @@ subcategory: labs
 ---
 import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, Backlinks, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="deepmind" client:load />
+<DataExternalLinks pageId="deepmind" />
 
 <DataInfoBox entityId="deepmind" />
 
@@ -252,7 +252,6 @@ This distribution advantage provides massive data collection and feedback loops 
 
 <Section title="Safety Culture Debate">
   <DisagreementMap
-    client:load
     topic="Impact of Merger on Safety"
     positions={[
       {
@@ -376,4 +375,4 @@ Both organizations claim safety leadership but face similar commercial pressures
 | **Safety Community** | Risk analysis | <R id="2e0c662574087c2a">Alignment Forum</R> |
 | **Policy Analysis** | Governance implications | <R id="a306e0b63bdedbd5"><EntityLink id="cais">Center for AI Safety</EntityLink></R> |
 
-<Backlinks client:load entityId="deepmind" />
+<Backlinks entityId="deepmind" />

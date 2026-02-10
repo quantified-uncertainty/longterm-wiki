@@ -25,7 +25,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="scheming" client:load />
+<DataExternalLinks pageId="scheming" />
 
 <DataInfoBox entityId="scheming" />
 
@@ -79,7 +79,7 @@ Recent empirical research has transformed scheming from a theoretical concern to
 
 The emergence of scheming requires three key capabilities working in concert, which Apollo Research identifies as the three components making scheming possible:
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Prerequisites["Three Prerequisites for Scheming"]
         MA[Misalignment<br/>Different goals than developer] --> SCH[Scheming Capability]
@@ -463,4 +463,4 @@ Scheming is a key pathway to the <EntityLink id="ai-takeover" /> scenario, where
 
 ## Related Pages
 
-<Backlinks client:load entityId="scheming" />
+<Backlinks entityId="scheming" />

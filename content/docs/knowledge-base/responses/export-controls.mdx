@@ -28,7 +28,7 @@ subcategory: governance-compute-governance
 ---
 import {DataInfoBox, KeyQuestions, Backlinks, DisagreementMap, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="export-controls" client:load />
+<DataExternalLinks pageId="export-controls" />
 
 <DataInfoBox entityId="export-controls" />
 
@@ -58,7 +58,7 @@ However, the effectiveness and safety implications of these controls remain hotl
 
 ### Export Control Flow and Enforcement
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     BIS[Bureau of Industry and Security] --> EAR[Export Administration Regulations]
     EAR --> CHIPS[Advanced Logic Chips]
@@ -295,7 +295,6 @@ The relationship between export controls and other AI governance approaches rema
 The potential for negotiated alternatives to export controls, such as international AI development agreements or monitoring regimes, deserves more analysis. Understanding the conditions under which China and other countries might accept such alternatives could inform both near-term policy and long-term strategic planning.
 
 <DisagreementMap
-  client:load
   topic="Effectiveness of Export Controls for AI Safety"
   description="How much do export controls contribute to AI safety?"
   spectrum={{ low: "Counterproductive", high: "Essential" }}
@@ -364,4 +363,4 @@ Export controls affect the <EntityLink id="ai-transition-model" /> through multi
 
 Export controls primarily serve geopolitical objectives; their AI safety implications are contested and depend on whether time delays are used productively for safety research.
 
-<Backlinks client:load entityId="export-controls" />
+<Backlinks entityId="export-controls" />

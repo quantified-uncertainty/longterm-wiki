@@ -33,7 +33,7 @@ subcategory: framework-models
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="capability-threshold-model" client:load />
+<DataExternalLinks pageId="capability-threshold-model" />
 
 <DataInfoBox entityId="capability-threshold-model" ratings={frontmatter.ratings} />
 
@@ -61,7 +61,7 @@ Key findings include 15-25% benchmark performance indicating early risk emergenc
 
 AI capabilities decompose into five distinct dimensions that progress at different rates. Understanding these separately is crucial because different risks require different combinations. According to <R id="b029bfc231e620cc"><EntityLink id="epoch-ai">Epoch AI</EntityLink>'s tracking</R>, the training compute of frontier AI models has grown by 5x per year since 2020, and the Epoch Capabilities Index shows frontier model improvement nearly doubled in 2024, from ~8 points/year to ~15 points/year.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph DIMS["Capability Dimensions"]
         DK[Domain Knowledge] --> RISK
@@ -385,4 +385,4 @@ Participants noted that risk assessment frameworks from safety-critical industri
 | <R id="f369a16dd38155b8">ARC Prize 2025 Results</R> | Academic | First AI system (Poetiq/GPT-5.2) exceeds human average on ARC-AGI-2 reasoning |
 | <R id="b029bfc231e620cc">Epoch AI Compute Trends</R> | Research | Training compute grows 4-5x yearly; capability improvement doubled in 2024 |
 
-<Backlinks client:load entityId="capability-threshold-model" />
+<Backlinks entityId="capability-threshold-model" />

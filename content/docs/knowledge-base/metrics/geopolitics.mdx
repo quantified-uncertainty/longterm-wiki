@@ -21,7 +21,7 @@ clusters: ["ai-safety", "governance"]
 ---
 import {R, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="geopolitics" client:load />
+<DataExternalLinks pageId="geopolitics" />
 
 ## Quick Assessment
 
@@ -58,7 +58,7 @@ This page tracks key metrics across:
 
 ### Geopolitical AI Risk Dynamics
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph Competition["Competition Drivers"]
         INVEST[Investment Race<br/>US: \$109B, China: \$9.3B private]

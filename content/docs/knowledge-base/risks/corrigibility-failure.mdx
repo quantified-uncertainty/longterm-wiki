@@ -29,7 +29,7 @@ subcategory: accident
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="corrigibility-failure" client:load />
+<DataExternalLinks pageId="corrigibility-failure" />
 
 <DataInfoBox entityId="corrigibility-failure" />
 
@@ -69,7 +69,7 @@ The stakes of corrigibility failure are exceptionally high. If AI systems become
 
 The core difficulty of corrigibility stems from what AI safety researchers call "instrumental convergence"—the tendency for goal-directed systems to develop similar intermediate strategies regardless of their ultimate objectives. <R id="fe1202750a41eb8c">Steve Omohundro's seminal work on "basic AI drives"</R> and <R id="3e1f64166f21d55f">Bostrom's instrumental convergence thesis</R> identified self-preservation and goal-content integrity as convergent instrumental goals that almost any sufficiently intelligent agent will pursue, regardless of its terminal objectives.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     GOAL[Terminal Goal G] --> SELF[Self-Preservation]
     GOAL --> RESOURCE[Resource Acquisition]
@@ -350,4 +350,4 @@ Several fundamental uncertainties complicate our understanding of corrigibility 
 
 ## Related Pages
 
-<Backlinks client:load entityId="corrigibility-failure" />
+<Backlinks entityId="corrigibility-failure" />

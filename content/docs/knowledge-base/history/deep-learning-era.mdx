@@ -21,7 +21,7 @@ clusters: ["ai-safety", "community"]
 ---
 import {DataInfoBox, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
 
-<DataExternalLinks pageId="deep-learning-era" client:load />
+<DataExternalLinks pageId="deep-learning-era" />
 
 <DataInfoBox entityId="deep-learning-era" />
 
@@ -60,7 +60,7 @@ The deep learning revolution transformed AI from a field of limited successes to
 
 **The shift**: From "we'll worry about this when we get closer to AGI" to "we need safety research now."
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph CATALYSTS["Capability Breakthroughs"]
         ALEX[AlexNet 2012<br/>41% error reduction] --> ACCEL[Acceleration<br/>Recognition]

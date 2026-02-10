@@ -24,7 +24,7 @@ subcategory: governance-legislation
 ---
 import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="us-executive-order" client:load />
+<DataExternalLinks pageId="us-executive-order" />
 
 <DataInfoBox entityId="us-executive-order" />
 
@@ -125,7 +125,7 @@ The order introduced "Know Your Customer" (KYC) requirements for Infrastructure-
 
 These requirements reflected recognition that compute infrastructure represents a chokepoint in AI development that the US can potentially control. By leveraging American companies' dominance in cloud computing, the order extended US regulatory reach to foreign AI developers who rely on American infrastructure—complementing export controls on AI chips.
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TD
     subgraph EO14110["Executive Order 14110 Framework"]
         COMPUTE[Compute Thresholds<br/>10^26 FLOP general<br/>10^23 FLOP biological] --> REPORT[Mandatory Reporting<br/>to Commerce Dept]
@@ -251,7 +251,7 @@ Legal analysts note the executive order cannot itself preempt state law—only C
 
 ### US AI Governance Timeline (2023-2025)
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 timeline
     title Evolution of US Federal AI Policy
     section Biden Era
@@ -381,4 +381,4 @@ The US Executive Order (while in effect) affected the <EntityLink id="ai-transit
 
 The order's revocation after 15 months demonstrates the fragility of executive action for AI governance; congressional legislation would provide more durable institutional capacity.
 
-<Backlinks client:load entityId="us-executive-order" />
+<Backlinks entityId="us-executive-order" />

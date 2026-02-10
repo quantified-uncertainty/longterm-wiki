@@ -22,7 +22,7 @@ clusters: ["ai-safety"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataExternalLinks pageId="sparse-moe" client:load />
+<DataExternalLinks pageId="sparse-moe" />
 
 ## Overview
 
@@ -56,7 +56,7 @@ MoE is likely already used in GPT-4 (based on leaks) and may become the default 
 
 ## Architecture
 
-<Mermaid client:load chart={`
+<Mermaid chart={`
 flowchart TB
     subgraph INPUT["Input Processing"]
         token["Input Token Embedding"]
