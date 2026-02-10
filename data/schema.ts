@@ -2,7 +2,7 @@
  * Data Schema for LongtermWiki
  *
  * This file defines TypeScript types and Zod schemas for all structured data.
- * Data lives in YAML files in src/data/ and is validated at build time.
+ * Data lives in YAML files in data/ and is validated at build time.
  */
 
 import { z } from 'zod';
@@ -671,7 +671,7 @@ export const Entity = z.object({
   // Sources (legacy inline format)
   sources: z.array(EntitySource).optional(),
   // Resources (semantic references by ID)
-  resources: z.array(z.string()).optional(),      // Resource IDs from src/data/resources/
+  resources: z.array(z.string()).optional(),      // Resource IDs from data/resources/
   // Parameter distinctions (for parameter-type entities)
   parameterDistinctions: ParameterDistinctions.optional(),
 });

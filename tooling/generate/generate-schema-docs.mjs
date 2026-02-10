@@ -16,7 +16,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
 
 // Read schema.ts and extract enums
-const schemaPath = join(ROOT, 'app/src/data/schema.ts');
+const schemaPath = join(ROOT, 'data/schema.ts');
 const schemaContent = readFileSync(schemaPath, 'utf-8');
 
 // Extract EntityType enum values
