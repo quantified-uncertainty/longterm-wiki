@@ -27,7 +27,7 @@ export function ColumnToggleControls<T extends string>({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-2 p-3 bg-muted/30 rounded-lg border",
+        "flex flex-wrap items-center gap-1.5 px-2.5 py-2 bg-muted/20 rounded-md border border-border/50",
         className
       )}
     >
@@ -45,7 +45,7 @@ export function ColumnToggleControls<T extends string>({
             key={key}
             onClick={() => toggleColumn(key as T)}
             className={cn(
-              "px-2.5 py-1 text-[11px] font-medium rounded border transition-colors",
+              "px-2 py-0.5 text-[10px] font-medium rounded border transition-colors",
               isActive ? groupColors.active : groupColors.inactive,
               "hover:opacity-90"
             )}
@@ -55,18 +55,16 @@ export function ColumnToggleControls<T extends string>({
         );
       })}
 
-      <span className="text-xs font-medium text-muted-foreground ml-3 mr-1">
-        Presets:
-      </span>
+      <span className="text-[10px] text-muted-foreground/60 ml-2 mr-0.5">|</span>
 
       {Object.keys(presets).map((preset) => (
         <button
           key={preset}
           onClick={() => applyPreset(preset)}
           className={cn(
-            "px-2.5 py-1 text-[11px] font-medium rounded border transition-colors",
-            "border-indigo-500 text-indigo-600 hover:bg-indigo-50",
-            "dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-950"
+            "px-2 py-0.5 text-[10px] font-medium rounded border transition-colors",
+            "border-indigo-400/60 text-indigo-600 hover:bg-indigo-50",
+            "dark:border-indigo-500/60 dark:text-indigo-400 dark:hover:bg-indigo-950"
           )}
         >
           {formatPresetLabel(preset)}

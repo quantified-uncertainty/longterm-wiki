@@ -3,35 +3,13 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { SortableHeader } from "@/components/ui/sortable-header"
 import { cn } from "@/lib/utils"
-import type { SafetyApproach, RatedProperty } from "@data/tables/safety-approaches"
+import type { SafetyApproach } from "@data/tables/safety-approaches"
 import {
-  getBadgeColorClass,
   getArchRelevanceClass,
-  getLevelSortValue,
-  categorySortOrder,
-  categoryColors,
-} from "./shared/safety-table-styles"
-
-// Render a badge with appropriate color
-function LevelBadge({ level }: { level: string }) {
-  return (
-    <span className={cn(
-      "inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap",
-      getBadgeColorClass(level)
-    )}>
-      {level}
-    </span>
-  )
-}
-
-// Render a rated property (badge + note on hover)
-function RatingCell({ rating }: { rating: RatedProperty }) {
-  return (
-    <div className="group relative" title={rating.note || undefined}>
-      <LevelBadge level={rating.level} />
-    </div>
-  )
-}
+  safetyCategorySortOrder,
+  safetyCategoryColors,
+} from "./shared/table-view-styles"
+import { levelNoteColumn } from "./shared/column-helpers"
 
 // Architecture relevance badge (abbreviated)
 function ArchBadge({ level }: { level: string }) {
@@ -92,7 +70,7 @@ export function createSafetyApproachesColumns(): ColumnDef<SafetyApproach>[] {
       header: ({ column }) => <SortableHeader column={column}>Category</SortableHeader>,
       cell: ({ row }) => {
         const category = row.getValue<string>("category")
-        const colors = categoryColors[category] || categoryColors.training
+        const colors = safetyCategoryColors[category] || safetyCategoryColors.training
         return (
           <div className="flex items-center gap-1.5">
             <div className={cn("w-2 h-2 rounded-full shrink-0", colors.dot)} />
@@ -103,8 +81,8 @@ export function createSafetyApproachesColumns(): ColumnDef<SafetyApproach>[] {
         )
       },
       sortingFn: (rowA, rowB) => {
-        const a = categorySortOrder[rowA.getValue("category") as string] ?? 99
-        const b = categorySortOrder[rowB.getValue("category") as string] ?? 99
+        const a = safetyCategorySortOrder[rowA.getValue("category") as string] ?? 99
+        const b = safetyCategorySortOrder[rowB.getValue("category") as string] ?? 99
         return a - b
       },
     },
@@ -125,141 +103,15 @@ export function createSafetyApproachesColumns(): ColumnDef<SafetyApproach>[] {
         )
       },
     },
-    {
-      id: "differential",
-      accessorFn: (row) => row.differentialProgress.level,
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Safety vs capability progress ratio">
-          Differential
-        </SortableHeader>
-      ),
-      cell: ({ row }) => <RatingCell rating={row.original.differentialProgress} />,
-      sortingFn: (rowA, rowB) => {
-        const a = getLevelSortValue(rowA.original.differentialProgress.level)
-        const b = getLevelSortValue(rowB.original.differentialProgress.level)
-        return a - b
-      },
-    },
-    {
-      id: "recommendation",
-      accessorFn: (row) => row.recommendation.level,
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Recommended funding change">
-          Recommend
-        </SortableHeader>
-      ),
-      cell: ({ row }) => <RatingCell rating={row.original.recommendation} />,
-      sortingFn: (rowA, rowB) => {
-        const a = getLevelSortValue(rowA.original.recommendation.level)
-        const b = getLevelSortValue(rowB.original.recommendation.level)
-        return a - b
-      },
-    },
-    {
-      id: "safetyUplift",
-      accessorFn: (row) => row.safetyUplift.level,
-      header: ({ column }) => (
-        <SortableHeader column={column} title="How much does this reduce catastrophic risk?">
-          Safety Uplift
-        </SortableHeader>
-      ),
-      cell: ({ row }) => <RatingCell rating={row.original.safetyUplift} />,
-      sortingFn: (rowA, rowB) => {
-        const a = getLevelSortValue(rowA.original.safetyUplift.level)
-        const b = getLevelSortValue(rowB.original.safetyUplift.level)
-        return a - b
-      },
-    },
-    {
-      id: "capabilityUplift",
-      accessorFn: (row) => row.capabilityUplift.level,
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Does it make AI more capable?">
-          Cap Uplift
-        </SortableHeader>
-      ),
-      cell: ({ row }) => <RatingCell rating={row.original.capabilityUplift} />,
-      sortingFn: (rowA, rowB) => {
-        const a = getLevelSortValue(rowA.original.capabilityUplift.level)
-        const b = getLevelSortValue(rowB.original.capabilityUplift.level)
-        return a - b
-      },
-    },
-    {
-      id: "netSafety",
-      accessorFn: (row) => row.netWorldSafety.level,
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Is the world safer with this?">
-          Net Safety
-        </SortableHeader>
-      ),
-      cell: ({ row }) => <RatingCell rating={row.original.netWorldSafety} />,
-      sortingFn: (rowA, rowB) => {
-        const a = getLevelSortValue(rowA.original.netWorldSafety.level)
-        const b = getLevelSortValue(rowB.original.netWorldSafety.level)
-        return a - b
-      },
-    },
-    {
-      id: "scalability",
-      accessorFn: (row) => row.scalability.level,
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Does it work as AI gets smarter?">
-          Scalability
-        </SortableHeader>
-      ),
-      cell: ({ row }) => <RatingCell rating={row.original.scalability} />,
-      sortingFn: (rowA, rowB) => {
-        const a = getLevelSortValue(rowA.original.scalability.level)
-        const b = getLevelSortValue(rowB.original.scalability.level)
-        return a - b
-      },
-    },
-    {
-      id: "deception",
-      accessorFn: (row) => row.deceptionRobust.level,
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Does it work against deceptive AI?">
-          Deception
-        </SortableHeader>
-      ),
-      cell: ({ row }) => <RatingCell rating={row.original.deceptionRobust} />,
-      sortingFn: (rowA, rowB) => {
-        const a = getLevelSortValue(rowA.original.deceptionRobust.level)
-        const b = getLevelSortValue(rowB.original.deceptionRobust.level)
-        return a - b
-      },
-    },
-    {
-      id: "siReady",
-      accessorFn: (row) => row.siReady.level,
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Works for superintelligent AI?">
-          SI Ready
-        </SortableHeader>
-      ),
-      cell: ({ row }) => <RatingCell rating={row.original.siReady} />,
-      sortingFn: (rowA, rowB) => {
-        const a = getLevelSortValue(rowA.original.siReady.level)
-        const b = getLevelSortValue(rowB.original.siReady.level)
-        return a - b
-      },
-    },
-    {
-      id: "adoption",
-      accessorFn: (row) => row.currentAdoption.level,
-      header: ({ column }) => (
-        <SortableHeader column={column} title="Current adoption level">
-          Adoption
-        </SortableHeader>
-      ),
-      cell: ({ row }) => <RatingCell rating={row.original.currentAdoption} />,
-      sortingFn: (rowA, rowB) => {
-        const a = getLevelSortValue(rowA.original.currentAdoption.level)
-        const b = getLevelSortValue(rowB.original.currentAdoption.level)
-        return a - b
-      },
-    },
+    levelNoteColumn<SafetyApproach>({ id: "differential", accessor: (r) => r.differentialProgress, label: "Differential", tooltip: "Safety vs capability progress ratio", noteStyle: "tooltip" }),
+    levelNoteColumn<SafetyApproach>({ id: "recommendation", accessor: (r) => r.recommendation, label: "Recommend", tooltip: "Recommended funding change", noteStyle: "tooltip" }),
+    levelNoteColumn<SafetyApproach>({ id: "safetyUplift", accessor: (r) => r.safetyUplift, label: "Safety Uplift", tooltip: "How much does this reduce catastrophic risk?", noteStyle: "tooltip" }),
+    levelNoteColumn<SafetyApproach>({ id: "capabilityUplift", accessor: (r) => r.capabilityUplift, label: "Cap Uplift", tooltip: "Does it make AI more capable?", noteStyle: "tooltip" }),
+    levelNoteColumn<SafetyApproach>({ id: "netSafety", accessor: (r) => r.netWorldSafety, label: "Net Safety", tooltip: "Is the world safer with this?", noteStyle: "tooltip" }),
+    levelNoteColumn<SafetyApproach>({ id: "scalability", accessor: (r) => r.scalability, label: "Scalability", tooltip: "Does it work as AI gets smarter?", noteStyle: "tooltip" }),
+    levelNoteColumn<SafetyApproach>({ id: "deception", accessor: (r) => r.deceptionRobust, label: "Deception", tooltip: "Does it work against deceptive AI?", noteStyle: "tooltip" }),
+    levelNoteColumn<SafetyApproach>({ id: "siReady", accessor: (r) => r.siReady, label: "SI Ready", tooltip: "Works for superintelligent AI?", noteStyle: "tooltip" }),
+    levelNoteColumn<SafetyApproach>({ id: "adoption", accessor: (r) => r.currentAdoption, label: "Adoption", tooltip: "Current adoption level", noteStyle: "tooltip" }),
     {
       accessorKey: "keyLabs",
       header: () => <span className="text-xs">Labs</span>,
@@ -285,13 +137,12 @@ export function createSafetyApproachesColumns(): ColumnDef<SafetyApproach>[] {
       header: () => <span className="text-xs">Critiques</span>,
       cell: ({ row }) => {
         const critiques = row.getValue<string[]>("mainCritiques")
+        if (critiques.length === 0) return null
         return (
-          <div
-            className="text-[9px] text-red-700 dark:text-red-400 max-w-[100px] truncate"
-            title={critiques.join('\n• ')}
-          >
-            {critiques.length > 0 && `• ${critiques[0]}`}
-            {critiques.length > 1 && <span className="text-muted-foreground ml-1">(+{critiques.length - 1})</span>}
+          <div className="text-[10px] text-red-700 dark:text-red-400 min-w-[160px] space-y-0.5">
+            {critiques.map((c, i) => (
+              <div key={i} className="leading-tight">{"\u2022"} {c}</div>
+            ))}
           </div>
         )
       },
@@ -310,7 +161,7 @@ export function createSafetyApproachesColumns(): ColumnDef<SafetyApproach>[] {
       cell: ({ row }) => {
         const archRel = row.original.architectureRelevance
         if (!archRel || archRel.length === 0) {
-          return <span className="text-[9px] text-muted-foreground">—</span>
+          return <span className="text-[9px] text-muted-foreground">&mdash;</span>
         }
         return (
           <div className="flex flex-col gap-0.5">

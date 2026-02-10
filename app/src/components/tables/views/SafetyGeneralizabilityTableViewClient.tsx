@@ -21,11 +21,6 @@ export default function SafetyGeneralizabilityTableViewClient({
 
   return (
     <TableViewPage
-      title="Safety Research Generalizability"
-      breadcrumbs={[
-        { label: "Knowledge Base", href: "/wiki/knowledge-base/" },
-        { label: "All Tables", href: "/wiki/interactive-views/" },
-      ]}
       navLinks={[
         {
           label: "Table",

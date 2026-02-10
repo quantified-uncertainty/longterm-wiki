@@ -10,8 +10,8 @@ import {
   type ColumnDef,
   type Row,
 } from "@tanstack/react-table"
+import { cn } from "@/lib/utils"
 import { DataTable } from "@/components/ui/data-table"
-import { TableViewHeader } from "./TableViewHeader"
 import { ColumnToggleControls } from "./ColumnToggleControls"
 import { ViewModeToggle, type ViewMode } from "./ViewModeToggle"
 import { useColumnVisibility, type ColumnConfig } from "./useColumnVisibility"
@@ -19,11 +19,6 @@ import {
   GroupedCategorySection,
   type GroupHeaderStyle,
 } from "./GroupedCategorySection"
-
-interface Breadcrumb {
-  label: string
-  href: string
-}
 
 interface NavLink {
   label: string
@@ -37,26 +32,22 @@ interface GroupingConfig<TData> {
   groupLabels: Record<string, string>
   groupDescriptions?: Record<string, string>
   headerStyle: GroupHeaderStyle
-  /** Tailwind class for dots keyed by group key (colored-dot style) */
   groupDotClasses?: Record<string, string>
-  /** CSS hex colors for dots keyed by group key (inline-color style) */
   groupDotColors?: Record<string, string>
   hideCategoryColumnInGroupedMode?: boolean
   categoryColumnId?: string
 }
 
 export interface TableViewConfig<TData, TColumnKey extends string> {
-  // Page layout
-  title: string
-  breadcrumbs: Breadcrumb[]
-  navLinks?: NavLink[]
-
   // Data + columns
   data: TData[]
   createColumns: () => ColumnDef<TData>[]
   columnConfig: Record<TColumnKey, ColumnConfig>
   columnPresets: Record<string, TColumnKey[]>
   pinnedColumn?: string
+
+  // Navigation between related tables
+  navLinks?: NavLink[]
 
   // Grouping (optional)
   grouping?: GroupingConfig<TData>
@@ -78,14 +69,12 @@ export interface TableViewConfig<TData, TColumnKey extends string> {
 }
 
 export function TableViewPage<TData, TColumnKey extends string>({
-  title,
-  breadcrumbs,
-  navLinks,
   data,
   createColumns,
   columnConfig,
   columnPresets,
   pinnedColumn,
+  navLinks,
   grouping,
   defaultViewMode = "unified",
   defaultSorting = [],
@@ -110,11 +99,9 @@ export function TableViewPage<TData, TColumnKey extends string>({
     Object.keys(columnConfig).forEach((key) => {
       visibility[key] = visibleColumns.has(key as TColumnKey)
     })
-    // Pinned column is always visible (set after loop so it can't be overwritten)
     if (pinnedColumn) {
       visibility[pinnedColumn] = true
     }
-    // Hide category column in grouped mode if configured
     if (
       viewMode === "grouped" &&
       grouping?.hideCategoryColumnInGroupedMode &&
@@ -156,14 +143,28 @@ export function TableViewPage<TData, TColumnKey extends string>({
   }, [data, grouping])
 
   return (
-    <div className={className ?? "min-h-screen flex flex-col bg-background"}>
-      <TableViewHeader
-        title={title}
-        breadcrumbs={breadcrumbs}
-        navLinks={navLinks}
-      />
+    <div className={className ?? "flex flex-col"}>
+      {/* Nav links for switching between related tables */}
+      {navLinks && navLinks.length > 0 && (
+        <nav className="flex items-center gap-1.5 mb-2">
+          {navLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "px-2.5 py-1 text-xs rounded-md transition-colors",
+                link.active
+                  ? "bg-foreground text-background font-medium"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      )}
 
-      <div className="p-4 space-y-4">
+      <div className="space-y-2">
         {aboveControls}
 
         <ColumnToggleControls
@@ -174,19 +175,39 @@ export function TableViewPage<TData, TColumnKey extends string>({
           applyPreset={applyPreset}
         />
 
-        {description}
+        {/* Collapsible info row */}
+        <div className="flex flex-wrap items-center gap-3">
+          {grouping && (
+            <ViewModeToggle
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              unifiedLabel="Unified Table"
+              groupedLabel="Grouped by Category"
+            />
+          )}
 
-        {grouping && (
-          <ViewModeToggle
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            unifiedLabel="Unified Table"
-            groupedLabel="Grouped by Category"
-          />
-        )}
+          {description && (
+            <details className="group">
+              <summary className="text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground select-none inline-flex items-center gap-1">
+                <span className="transition-transform group-open:rotate-90">&#x25B6;</span>
+                About this table
+              </summary>
+              <div className="mt-2">{description}</div>
+            </details>
+          )}
 
-        {legend}
+          {legend && (
+            <details className="group">
+              <summary className="text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground select-none inline-flex items-center gap-1">
+                <span className="transition-transform group-open:rotate-90">&#x25B6;</span>
+                Legend
+              </summary>
+              <div className="mt-2">{legend}</div>
+            </details>
+          )}
+        </div>
 
+        {/* Table */}
         {viewMode === "unified" || !grouping ? (
           <div className="overflow-x-auto">
             <DataTable

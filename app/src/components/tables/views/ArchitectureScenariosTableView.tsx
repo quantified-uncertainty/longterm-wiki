@@ -20,11 +20,6 @@ export default function ArchitectureScenariosTableView() {
 
   return (
     <TableViewPage
-      title="Scalable Intelligence Paradigms"
-      breadcrumbs={[
-        { label: "Knowledge Base", href: "/wiki/knowledge-base/" },
-        { label: "All Tables", href: "/wiki/interactive-views/" },
-      ]}
       navLinks={[
         {
           label: "Model Architectures",
