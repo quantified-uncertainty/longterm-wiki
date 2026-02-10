@@ -4,15 +4,18 @@
  * Converts extracted JSON data to YAML files.
  * Run this after reviewing/deduplicating the extracted JSON.
  *
- * Usage: node tooling/generate-yaml.mjs
+ * Usage: node tooling/generate/generate-yaml.mjs
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { stringify } from 'yaml';
 
-const EXTRACTED_DIR = 'tooling/extracted';
-const OUTPUT_DIR = 'data';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(__dirname, '..', '..');
+const EXTRACTED_DIR = join(ROOT, 'tooling/extracted');
+const OUTPUT_DIR = join(ROOT, 'data');
 
 // =============================================================================
 // LOAD EXTRACTED DATA

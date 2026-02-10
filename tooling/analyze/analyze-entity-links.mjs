@@ -72,15 +72,16 @@ function loadPathRegistry() {
 }
 
 /**
- * Load database to get entity names/aliases
+ * Load entities from generated data
  */
 function loadDatabase() {
-  const dbPath = join(DATA_DIR, 'database.json');
-  if (!existsSync(dbPath)) {
-    console.warn('Warning: database.json not found. Run pnpm build first.');
-    return { entities: [] };
+  const entitiesPath = join(DATA_DIR, 'entities.json');
+  if (!existsSync(entitiesPath)) {
+    console.warn('Warning: entities.json not found. Run pnpm build first.');
+    return { typedEntities: [] };
   }
-  return JSON.parse(readFileSync(dbPath, 'utf-8'));
+  const typedEntities = JSON.parse(readFileSync(entitiesPath, 'utf-8'));
+  return { typedEntities };
 }
 
 /**
@@ -118,26 +119,26 @@ function findEntityFile(entityId, pathRegistry) {
  * Get display name for an entity
  */
 function getEntityDisplayName(entityId, database) {
-  const entity = database.entities?.find(e => e.id === entityId);
-  return entity?.name || entityId;
+  const entity = database.typedEntities?.find(e => e.id === entityId);
+  return entity?.title || entityId;
 }
 
 /**
  * Get search terms for an entity (name + aliases)
  */
 function getEntitySearchTerms(entityId, database) {
-  const entity = database.entities?.find(e => e.id === entityId);
+  const entity = database.typedEntities?.find(e => e.id === entityId);
   const terms = [entityId];
 
-  if (entity?.name) {
-    terms.push(entity.name);
+  if (entity?.title) {
+    terms.push(entity.title);
   }
   if (entity?.aliases) {
     terms.push(...entity.aliases);
   }
 
   // Also add common variations
-  const name = entity?.name || entityId;
+  const name = entity?.title || entityId;
   if (name.includes('-')) {
     terms.push(name.replace(/-/g, ' '));
   }

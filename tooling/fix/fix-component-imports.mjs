@@ -25,7 +25,7 @@ const VERBOSE = args.includes('--verbose');
 const HELP = args.includes('--help');
 const SINGLE_FILE = args.find(a => a.startsWith('--file='))?.split('=')[1];
 
-const colors = getColors(false);
+const colors = getColors();
 
 // Components from @components/wiki that are commonly used
 const WIKI_COMPONENTS = [

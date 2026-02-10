@@ -4,11 +4,7 @@
  * Usage: node tooling/auto-fix.mjs [--dry-run]
  */
 
-import { execSync, spawn } from 'child_process';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { execSync } from 'child_process';
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 
@@ -70,13 +66,8 @@ async function runFixer(fixer) {
       console.log(`${colors.green}✓${colors.reset} ${fixer.name} ${colors.dim}(${duration}s)${colors.reset}`);
       resolve({ name: fixer.name, success: true, output });
     } catch (error) {
-      if (fixer.skipIfNoFix && error.message.includes('--fix')) {
-        console.log(`${colors.dim}⊘${colors.reset} ${fixer.name} ${colors.dim}(no --fix support)${colors.reset}`);
-        resolve({ name: fixer.name, success: true, skipped: true });
-      } else {
-        console.log(`${colors.yellow}⚠${colors.reset} ${fixer.name}: ${error.message.split('\n')[0]}`);
-        resolve({ name: fixer.name, success: false, error: error.message });
-      }
+      console.log(`${colors.yellow}⚠${colors.reset} ${fixer.name}: ${error.message.split('\n')[0]}`);
+      resolve({ name: fixer.name, success: false, error: error.message });
     }
   });
 }
@@ -84,8 +75,11 @@ async function runFixer(fixer) {
 async function main() {
   console.log(`Running ${fixers.length} auto-fixers...\n`);
 
-  // Run all fixers in parallel
-  const results = await Promise.all(fixers.map(runFixer));
+  // Run fixers sequentially (execSync blocks the event loop)
+  const results = [];
+  for (const fixer of fixers) {
+    results.push(await runFixer(fixer));
+  }
 
   console.log();
   console.log(`${colors.bold}Summary:${colors.reset}`);
