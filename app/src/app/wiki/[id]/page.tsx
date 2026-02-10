@@ -15,7 +15,7 @@ import { RelatedPages } from "@/components/RelatedPages";
 import { WikiSidebar } from "@/components/wiki/WikiSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { detectSidebarType, getWikiNav } from "@/lib/wiki-nav";
-import { AlertTriangle, Database, Github } from "lucide-react";
+import { AlertTriangle, Database, Github, MessageSquare } from "lucide-react";
 import type { Metadata } from "next";
 import {
   InfoBoxVisibilityProvider,
@@ -25,6 +25,9 @@ import { DataInfoBox } from "@/components/wiki/DataInfoBox";
 
 const GITHUB_HISTORY_BASE =
   "https://github.com/quantified-uncertainty/longterm-wiki/commits/main/content/docs";
+
+const GITHUB_NEW_ISSUE =
+  "https://github.com/quantified-uncertainty/longterm-wiki/issues/new";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -134,6 +137,8 @@ function ArticleView({
     : null;
   const entity = getEntityById(slug);
   const numId = slugToNumericId(slug);
+  const pageTitle = page.frontmatter.title || entity?.title || slug;
+  const issueUrl = `${GITHUB_NEW_ISSUE}?template=content-error.md&title=${encodeURIComponent(`[${pageTitle}] `)}&body=${encodeURIComponent(`**Page:** /wiki/${slug}\n\n**What's wrong:**\n\n`)}&labels=content-error`;
 
   return (
     <InfoBoxVisibilityProvider>
@@ -166,6 +171,15 @@ function ArticleView({
               Data
             </a>
           )}
+          <a
+            href={issueUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="page-meta-github"
+          >
+            <MessageSquare size={14} />
+            Report Issue
+          </a>
           <InfoBoxToggle />
         </div>
       </div>
