@@ -185,15 +185,15 @@ export class ValidationEngine {
       this.reversePathRegistry[path.replace(/\/$/, '')] = id;
     }
 
-    // Parse sidebar from astro.config.mjs
+    // Parse sidebar config (returns empty data in Next.js — sidebar is in wiki-nav.ts)
     this.sidebarConfig = this._parseSidebarConfig();
 
     this.loaded = true;
   }
 
   /**
-   * Parse sidebar configuration from astro.config.mjs
-   * Uses shared utility from sidebar-utils.mjs
+   * Parse sidebar configuration.
+   * Returns empty data in Next.js — sidebar is managed by wiki-nav.ts.
    */
   _parseSidebarConfig() {
     return parseSidebarConfig();

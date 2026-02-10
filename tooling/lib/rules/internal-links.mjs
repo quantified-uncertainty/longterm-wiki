@@ -3,7 +3,7 @@
  *
  * Validates that internal markdown links resolve to existing content:
  * - [text](/knowledge-base/path/) links point to real files
- * - Links have trailing slashes (Astro/Starlight convention)
+ * - Links have trailing slashes
  * - Links don't include file extensions
  */
 
@@ -11,9 +11,9 @@ import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { createRule, Issue, Severity } from '../validation-engine.mjs';
 import { isInCodeBlock } from '../mdx-utils.mjs';
+import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.mjs';
 
-const CONTENT_DIR = join(process.cwd(), 'content/docs');
-const PAGES_DIR = join(process.cwd(), 'src/pages');
+const APP_DIR = join(process.cwd(), 'app/src/app');
 
 /**
  * Check if an internal link resolves to an existing file
@@ -45,8 +45,8 @@ function resolveLink(href, sourceFile) {
     join(CONTENT_DIR, path + '.md'),
     join(CONTENT_DIR, path, 'index.mdx'),
     join(CONTENT_DIR, path, 'index.md'),
-    join(PAGES_DIR, path + '.astro'),
-    join(PAGES_DIR, path, 'index.astro'),
+    join(APP_DIR, path, 'page.tsx'),
+    join(APP_DIR, path, 'page.jsx'),
   ];
 
   for (const p of possiblePaths) {
