@@ -3,9 +3,9 @@
  *
  * Centralized definitions for content types, their paths, and configurations.
  *
- * NOTE: These definitions are intentionally duplicated from tooling/lib/content-types.ts
+ * NOTE: These definitions are intentionally duplicated from crux/lib/content-types.ts
  * because app build scripts run with plain `node` (no tsx), so they cannot import
- * TypeScript files. If you update CONTENT_TYPES here, update tooling/ as well.
+ * TypeScript files. If you update CONTENT_TYPES here, update crux/ as well.
  */
 
 import { join } from 'path';

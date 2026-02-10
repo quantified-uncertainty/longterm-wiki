@@ -272,7 +272,7 @@ Change `// Placeholder for Astro-only or not-yet-ported components` to reflect r
 
 ## Task 7: Add Non-Standard Directories to Entity Type Mapping
 
-**Problem:** The following `knowledge-base/` subdirectories exist but are NOT in the entity type → directory mapping in `tooling/validate/validate-data.mjs`:
+**Problem:** The following `knowledge-base/` subdirectories exist but are NOT in the entity type → directory mapping in `crux/validate/validate-data.mjs`:
 
 | Directory | # Files | Recommendation |
 |-----------|---------|----------------|
@@ -286,7 +286,7 @@ Change `// Placeholder for Astro-only or not-yet-ported components` to reflect r
 | `incidents/` | 2 | Add as entity type `event` |
 
 **Action:** For each directory, either:
-- (A) Add a new entry to the `pathMapping` object in `tooling/validate/validate-data.mjs`, OR
+- (A) Add a new entry to the `pathMapping` object in `crux/validate/validate-data.mjs`, OR
 - (B) If the directory truly doesn't fit, move the files into an existing standard directory and use `subcategory` frontmatter for grouping
 
 **Recommended approach:** Option (A) — add them to the mapping. These directories are well-organized and their content makes sense where it is. The entity type system in `app/src/data/entity-ontology.ts` should also be updated to include any new types.
@@ -370,7 +370,7 @@ This page is a stub. Content needed.
 
 After completing all the above:
 
-1. Run `node tooling/crux.mjs validate` — all pre-existing checks should still pass
+1. Run `node crux/crux.mjs validate` — all pre-existing checks should still pass
 2. Run `pnpm build` from the `app/` directory — should build successfully
 3. Run `pnpm test` — all tests should pass
 4. Spot-check that `/wiki/E1` through a few random entity URLs still resolve correctly

@@ -12,7 +12,7 @@ The wiki was ported from Astro/Starlight (`cairn/apps/longterm/`) to a standalon
 The repo split (Feb 2025) resolved the biggest architectural questions:
 - **longterm-wiki is the sole app.** Content (MDX), data (YAML), and tooling all live here now.
 - **YAML data is local.** All entity, fact, resource, insight, and graph YAML lives in `data/`. No longer dependent on the Astro app.
-- **Tooling was ported.** The Crux CLI, validation engine (35 rules), content grading, and analysis tools all live in `tooling/`.
+- **Tooling was ported.** The Crux CLI, validation engine (35 rules), content grading, and analysis tools all live in `crux/`.
 - **Build pipeline is complete.** `build-data.mjs` transforms YAML + MDX → `database.json` with 15 library modules.
 
 ---
@@ -171,15 +171,15 @@ This was the biggest gap in the original document. It is now substantially close
 
 ### 5a. Validation System — DONE
 
-The unified validation engine (`tooling/lib/validation-engine.mjs`) now has **35 pluggable rules** (exceeding the original 34), 18+ dedicated validation scripts, and runs via `node tooling/crux.mjs validate`. Rules cover escaping, markdown, linking, frontmatter, quality, tone, citations, components, entities, and more.
+The unified validation engine (`crux/lib/validation-engine.mjs`) now has **35 pluggable rules** (exceeding the original 34), 18+ dedicated validation scripts, and runs via `node crux/crux.mjs validate`. Rules cover escaping, markdown, linking, frontmatter, quality, tone, citations, components, entities, and more.
 
 ### 5b. Crux CLI — DONE
 
-`tooling/crux.mjs` provides 8 domains: validate, analyze, fix, content, generate, resources, insights, gaps.
+`crux/crux.mjs` provides 8 domains: validate, analyze, fix, content, generate, resources, insights, gaps.
 
 ### 5c. Content Management — PARTIALLY PORTED
 
-`tooling/content/` has: page-improver.mjs, grade-content.mjs, regrade.mjs, grade-by-template.mjs, post-improve.mjs.
+`crux/content/` has: page-improver.mjs, grade-content.mjs, regrade.mjs, grade-by-template.mjs, post-improve.mjs.
 
 **Still missing:** page-creator.mjs, add-key-links.mjs (may be in `fix` domain now).
 
@@ -189,7 +189,7 @@ The unified validation engine (`tooling/lib/validation-engine.mjs`) now has **35
 
 ### 5e. Pre-commit Hooks — EXISTS BUT NOT INSTALLED
 
-Hook file at `tooling/hooks/pre-commit` runs `node tooling/crux.mjs validate --quick`. But it is **not symlinked** into `.git/hooks/` — needs manual installation.
+Hook file at `crux/hooks/pre-commit` runs `node crux/crux.mjs validate --quick`. But it is **not symlinked** into `.git/hooks/` — needs manual installation.
 
 ### 5f. Analysis Tools — LIKELY IN CLI
 
@@ -282,7 +282,7 @@ Port ForecastCard, PageForecasts, and metaforecast scripts.
 ### Tier 5: Loose Ends
 
 **5.1 — Install pre-commit hooks** (Tiny effort)
-Symlink `tooling/hooks/pre-commit` into `.git/hooks/`.
+Symlink `crux/hooks/pre-commit` into `.git/hooks/`.
 
 **5.2 — Audit and clean stub components** (Small effort)
 Check which of the 58 stubs are actually referenced in MDX. Remove unreferenced ones, prioritize porting referenced ones.
@@ -300,7 +300,7 @@ These were open questions in the original document. All are now resolved:
 
 2. **Should table data live in database.json?** → Still open, but the build pipeline (`build-data.mjs`) could accommodate this. Currently table data generators don't exist yet.
 
-3. **Should validation be shared?** → **Moot.** Validation lives entirely in this repo now (35 rules in `tooling/lib/rules/`).
+3. **Should validation be shared?** → **Moot.** Validation lives entirely in this repo now (35 rules in `crux/lib/rules/`).
 
 4. **How should special pages be routed?** → Still open. Options remain: dedicated routes, layout switching on `[id]` route, or query parameters.
 

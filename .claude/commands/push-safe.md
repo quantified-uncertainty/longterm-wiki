@@ -13,7 +13,7 @@ Run ALL of the following checks. Run them in parallel where possible:
 
 - `pnpm build` (includes build-data)
 - `pnpm test`
-- `node tooling/crux.mjs validate`
+- `node crux/crux.mjs validate`
 - `pnpm lint` (if it exists)
 - TypeScript type checking via `cd app && pnpm tsc --noEmit` (if tsconfig exists)
 

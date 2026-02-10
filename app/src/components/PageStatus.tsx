@@ -1,7 +1,10 @@
+import Link from "next/link";
+import { cn } from "@lib/utils";
 import {
   detectPageType,
   PAGE_TYPE_INFO,
 } from "@/lib/page-types";
+import styles from "@/components/wiki/tooltip.module.css";
 
 // ============================================================================
 // TYPES
@@ -37,6 +40,7 @@ export interface PageStatusProps {
   importance?: number;
   llmSummary?: string;
   lastEdited?: string;
+  updateFrequency?: number;
   todo?: string;
   todos?: string[];
   wordCount?: number;
@@ -118,6 +122,52 @@ function formatAge(lastEdited: string): string {
   return `${Math.round(days / 30)} months ago`;
 }
 
+function formatFrequency(days: number): string {
+  if (days <= 7) return "weekly";
+  if (days <= 14) return "biweekly";
+  if (days <= 21) return "every 3 weeks";
+  if (days <= 30) return "monthly";
+  if (days <= 45) return "every 6 weeks";
+  if (days <= 60) return "bimonthly";
+  if (days <= 90) return "quarterly";
+  return `every ${Math.round(days / 30)} months`;
+}
+
+function getUpdateStatus(
+  lastEdited: string,
+  updateFrequency: number
+): { label: string; isOverdue: boolean; daysUntil: number } {
+  const today = new Date();
+  const edited = new Date(lastEdited);
+  const daysSince = Math.floor(
+    (today.getTime() - edited.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const daysUntil = updateFrequency - daysSince;
+
+  if (daysUntil < 0) {
+    return {
+      label: `Overdue by ${Math.abs(daysUntil)} days`,
+      isOverdue: true,
+      daysUntil,
+    };
+  }
+  if (daysUntil === 0) {
+    return { label: "Due today", isOverdue: true, daysUntil: 0 };
+  }
+  if (daysUntil <= 7) {
+    return {
+      label: `Due in ${daysUntil} day${daysUntil === 1 ? "" : "s"}`,
+      isOverdue: false,
+      daysUntil,
+    };
+  }
+  return {
+    label: `Due in ${Math.round(daysUntil / 7)} weeks`,
+    isOverdue: false,
+    daysUntil,
+  };
+}
+
 // ============================================================================
 // SVG ICONS
 // ============================================================================
@@ -153,6 +203,17 @@ function IconBook({ className }: { className?: string }) {
   return (
     <svg className={className} width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
       <path d="M2 3h4.5a2 2 0 012 2v8.5a1.5 1.5 0 00-1.5-1.5H2V3zM14 3H9.5a2 2 0 00-2 2v8.5a1.5 1.5 0 011.5-1.5H14V3z" />
+    </svg>
+  );
+}
+
+function IconCalendar({ className }: { className?: string }) {
+  return (
+    <svg className={className} width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="2" y="3" width="12" height="11" rx="1.5" />
+      <line x1="5" y1="1.5" x2="5" y2="4.5" strokeLinecap="round" />
+      <line x1="11" y1="1.5" x2="11" y2="4.5" strokeLinecap="round" />
+      <line x1="2" y1="7" x2="14" y2="7" />
     </svg>
   );
 }
@@ -277,27 +338,45 @@ function QualityDisplay({
     Math.abs(quality - suggestedQuality) >= 20;
 
   return (
-    <div className="flex items-center gap-2">
-      <ScoreRing value={quality} max={100} color={colors.ring}>
-        <span className="text-[13px] font-bold tabular-nums text-foreground">
-          {quality}
+    <span className={cn(styles.wrapper, "cursor-help")}>
+      <span className="inline-flex items-center gap-2">
+        <ScoreRing value={quality} max={100} color={colors.ring}>
+          <span className="text-[13px] font-bold tabular-nums text-foreground">
+            {quality}
+          </span>
+        </ScoreRing>
+        <span className="flex flex-col">
+          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
+            Quality
+          </span>
+          <span className={`text-[13px] font-semibold leading-snug inline-flex items-center gap-1.5 ${colors.text}`}>
+            {qualityLabels[level]}
+            {hasDiscrepancy && (
+              <span className="inline-block size-1.5 rounded-full bg-amber-500" />
+            )}
+          </span>
         </span>
-      </ScoreRing>
-      <div className="flex flex-col">
-        <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-          Quality
+      </span>
+      <span
+        className={cn(
+          styles.tooltip,
+          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+        )}
+        role="tooltip"
+      >
+        <span className="block font-semibold text-foreground text-sm mb-1">
+          Quality: {quality}/100
         </span>
-        <span className={`text-[13px] font-semibold leading-snug inline-flex items-center gap-1.5 ${colors.text}`}>
-          {qualityLabels[level]}
-          {hasDiscrepancy && (
-            <span
-              className="inline-block size-1.5 rounded-full bg-amber-500 cursor-help"
-              title={`Structure suggests ${suggestedQuality}`}
-            />
-          )}
+        <span className="block text-muted-foreground text-xs leading-snug">
+          Human-assigned rating of overall page quality, considering depth, accuracy, and completeness.
         </span>
-      </div>
-    </div>
+        {hasDiscrepancy && (
+          <span className="block mt-2 text-xs text-amber-500">
+            Structure suggests {suggestedQuality}
+          </span>
+        )}
+      </span>
+    </span>
   );
 }
 
@@ -306,22 +385,48 @@ function ImportanceDisplay({ importance }: { importance: number }) {
   const colors = importanceColors[level];
 
   return (
-    <div className="flex items-center gap-2">
-      <ScoreRing value={importance} max={100} color={colors.ring}>
-        <span className="text-[13px] font-bold tabular-nums text-foreground">
-          {importance}
+    <span className={cn(styles.wrapper, "cursor-help")}>
+      <span className="inline-flex items-center gap-2">
+        <ScoreRing value={importance} max={100} color={colors.ring}>
+          <span className="text-[13px] font-bold tabular-nums text-foreground">
+            {importance}
+          </span>
+        </ScoreRing>
+        <span className="flex flex-col">
+          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
+            Importance
+          </span>
+          <span className={`text-[13px] font-semibold leading-snug ${colors.text}`}>
+            {importanceLabels[level]}
+          </span>
         </span>
-      </ScoreRing>
-      <div className="flex flex-col">
-        <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-          Importance
+      </span>
+      <span
+        className={cn(
+          styles.tooltip,
+          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+        )}
+        role="tooltip"
+      >
+        <span className="block font-semibold text-foreground text-sm mb-1">
+          Importance: {importance}/100
         </span>
-        <span className={`text-[13px] font-semibold leading-snug ${colors.text}`}>
-          {importanceLabels[level]}
+        <span className="block text-muted-foreground text-xs leading-snug">
+          How central this topic is to AI safety. Higher scores mean greater relevance to understanding or mitigating AI risk.
         </span>
-      </div>
-    </div>
+      </span>
+    </span>
   );
+}
+
+function structureItemScore(
+  value: number,
+  thresholds: [number, number][] // [[threshold, points], ...]
+): number {
+  for (const [threshold, points] of thresholds) {
+    if (value >= threshold) return points;
+  }
+  return 0;
 }
 
 function StructureDisplay({ metrics }: { metrics: PageMetrics }) {
@@ -335,22 +440,62 @@ function StructureDisplay({ metrics }: { metrics: PageMetrics }) {
         ? "text-amber-500"
         : "text-red-500";
 
+  // Reconstruct the per-item scores for the breakdown
+  const breakdown = [
+    { label: "Word count", max: 2, earned: structureItemScore(metrics.wordCount, [[800, 2], [300, 1]]) },
+    { label: "Tables", max: 3, earned: structureItemScore(metrics.tableCount, [[3, 3], [2, 2], [1, 1]]) },
+    { label: "Diagrams", max: 2, earned: structureItemScore(metrics.diagramCount, [[2, 2], [1, 1]]) },
+    { label: "Internal links", max: 2, earned: structureItemScore(metrics.internalLinks, [[4, 2], [1, 1]]) },
+    { label: "External citations", max: 3, earned: structureItemScore(metrics.externalLinks, [[6, 3], [3, 2], [1, 1]]) },
+    { label: "Prose ratio", max: 2, earned: metrics.bulletRatio < 0.3 ? 2 : metrics.bulletRatio < 0.5 ? 1 : 0 },
+    { label: "Overview section", max: 1, earned: metrics.hasOverview ? 1 : 0 },
+  ];
+
   return (
-    <div className="flex items-center gap-2">
-      <ScoreRing value={score} max={15} color={scoreColor}>
-        <span className="text-[11px] font-bold tabular-nums text-foreground">
-          {score}
+    <span className={cn(styles.wrapper, "cursor-help")}>
+      <span className="inline-flex items-center gap-2">
+        <ScoreRing value={score} max={15} color={scoreColor}>
+          <span className="text-[11px] font-bold tabular-nums text-foreground">
+            {score}
+          </span>
+        </ScoreRing>
+        <span className="flex flex-col">
+          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
+            Structure
+          </span>
+          <span className={`text-[13px] font-semibold leading-snug ${scoreTextClass}`}>
+            {score}/15
+          </span>
         </span>
-      </ScoreRing>
-      <div className="flex flex-col">
-        <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-          Structure
+      </span>
+      <span
+        className={cn(
+          styles.tooltip,
+          "absolute left-0 top-full mt-1 z-50 w-[220px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+        )}
+        role="tooltip"
+      >
+        <span className="block font-semibold text-foreground text-sm mb-1">
+          Structure: {score}/15
         </span>
-        <span className={`text-[13px] font-semibold leading-snug ${scoreTextClass}`}>
-          {score}/15
+        <span className="block text-muted-foreground text-xs leading-snug mb-2">
+          Automated score based on measurable content features.
         </span>
-      </div>
-    </div>
+        <span className="block flex flex-col gap-0.5">
+          {breakdown.map((item) => (
+            <span key={item.label} className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">{item.label}</span>
+              <span className={cn(
+                "tabular-nums font-medium",
+                item.earned === item.max ? "text-emerald-500" : item.earned > 0 ? "text-foreground" : "text-muted-foreground/50"
+              )}>
+                {item.earned}/{item.max}
+              </span>
+            </span>
+          ))}
+        </span>
+      </span>
+    </span>
   );
 }
 
@@ -358,18 +503,29 @@ function MetricChip({
   icon,
   value,
   label,
+  description,
 }: {
   icon: React.ReactNode;
   value: number | string;
   label: string;
+  description?: string;
 }) {
   return (
-    <span
-      className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground whitespace-nowrap"
-      title={label}
-    >
+    <span className={cn(styles.wrapper, "inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground whitespace-nowrap cursor-help")}>
       <span className="flex items-center opacity-60">{icon}</span>
       <span className="font-semibold tabular-nums text-foreground">{value}</span>
+      <span
+        className={cn(
+          styles.tooltip,
+          "absolute right-0 top-full mt-1 z-50 w-[200px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+        )}
+        role="tooltip"
+      >
+        <span className="block font-semibold text-foreground text-xs mb-0.5">{label}</span>
+        {description && (
+          <span className="block text-muted-foreground text-[11px] leading-snug">{description}</span>
+        )}
+      </span>
     </span>
   );
 }
@@ -520,6 +676,7 @@ export function PageStatus({
   importance,
   llmSummary,
   lastEdited,
+  updateFrequency,
   todo,
   todos,
   wordCount,
@@ -549,6 +706,11 @@ export function PageStatus({
   if (wordCount && wordCount > 0) metaItems.push(`${formatWordCount(wordCount)} words`);
   if (backlinkCount && backlinkCount > 0) metaItems.push(`${backlinkCount} backlinks`);
 
+  const updateStatus =
+    lastEdited && updateFrequency
+      ? getUpdateStatus(lastEdited, updateFrequency)
+      : null;
+
   return (
     <div className="page-status page-status-dev-only mb-6 overflow-hidden rounded-xl border border-border bg-card text-[13px] shadow-sm">
       {/* Top bar */}
@@ -559,18 +721,16 @@ export function PageStatus({
           </span>
           <PageTypeBadge pageType={pageType} pathname={pathname} />
         </div>
-        {metaItems.length > 0 && (
-          <div className="flex items-center gap-0 text-xs text-muted-foreground">
-            {metaItems.map((item, i) => (
-              <span key={i} className="flex items-center">
-                {i > 0 && (
-                  <span className="mx-2 inline-block size-[3px] rounded-full bg-border" />
-                )}
-                {item}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="flex items-center gap-0 text-xs text-muted-foreground">
+          {metaItems.map((item, i) => (
+            <span key={i} className="flex items-center">
+              {i > 0 && (
+                <span className="mx-2 inline-block size-[3px] rounded-full bg-border" />
+              )}
+              {item}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* Score rings + metric chips */}
@@ -587,18 +747,46 @@ export function PageStatus({
 
         {metrics && (
           <div className="flex flex-wrap gap-1.5">
-            <MetricChip icon={<IconTable />} value={metrics.tableCount} label="Tables" />
-            <MetricChip icon={<IconDiagram />} value={metrics.diagramCount} label="Diagrams" />
-            <MetricChip icon={<IconLink />} value={metrics.internalLinks} label="Internal links" />
-            <MetricChip icon={<IconBook />} value={metrics.externalLinks} label="External citations" />
+            <MetricChip icon={<IconTable />} value={metrics.tableCount} label="Tables" description="Data tables in the page" />
+            <MetricChip icon={<IconDiagram />} value={metrics.diagramCount} label="Diagrams" description="Charts and visual diagrams" />
+            <MetricChip icon={<IconLink />} value={metrics.internalLinks} label="Internal Links" description="Links to other wiki pages" />
+            <MetricChip icon={<IconBook />} value={metrics.externalLinks} label="External Citations" description="References to outside sources" />
             <MetricChip
               icon={<span className="text-[10px] font-bold">%</span>}
               value={`${Math.round(metrics.bulletRatio * 100)}%`}
-              label="Bullet ratio"
+              label="Bullet Ratio"
+              description="Percentage of content in bullet lists"
             />
           </div>
         )}
       </div>
+
+      {/* Update Schedule */}
+      {updateFrequency && (
+        <div className="flex items-center gap-2 border-t border-border px-3.5 py-2 text-xs text-muted-foreground">
+          <IconCalendar className="shrink-0 opacity-60" />
+          <span>
+            Updated{" "}
+            <Link href="/internal/updates" className="font-medium text-foreground hover:underline no-underline">
+              {formatFrequency(updateFrequency)}
+            </Link>
+          </span>
+          {updateStatus && (
+            <>
+              <span className="inline-block size-[3px] rounded-full bg-border" />
+              <span
+                className={
+                  updateStatus.isOverdue
+                    ? "font-medium text-amber-500"
+                    : "text-muted-foreground"
+                }
+              >
+                {updateStatus.label}
+              </span>
+            </>
+          )}
+        </div>
+      )}
 
       {/* LLM Summary */}
       {llmSummary && (

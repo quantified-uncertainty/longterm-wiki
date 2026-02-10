@@ -179,6 +179,7 @@ function ArticleView({
           importance={pageData?.importance ?? undefined}
           llmSummary={pageData?.llmSummary ?? undefined}
           lastEdited={pageData?.lastUpdated ?? undefined}
+          updateFrequency={pageData?.updateFrequency ?? undefined}
           todo={page.frontmatter.todo}
           todos={page.frontmatter.todos}
           wordCount={pageData?.wordCount}
