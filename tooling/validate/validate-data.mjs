@@ -17,7 +17,7 @@ import { join, basename } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { getColors } from '../lib/output.mjs';
-import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.mjs';
+import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.js';
 import { parseFrontmatter, shouldSkipValidation } from '../lib/mdx-utils.mjs';
 
 const colors = getColors();

@@ -9,7 +9,7 @@ import { readFileSync, existsSync, readdirSync } from 'fs';
 import { parse as parseYaml } from 'yaml';
 import { join } from 'path';
 import { createLogger } from '../lib/output.mjs';
-import { loadPages, DATA_DIR_ABS } from '../lib/content-types.mjs';
+import { loadPages, DATA_DIR_ABS } from '../lib/content-types.js';
 
 const INSIGHTS_DIR = join(DATA_DIR_ABS, 'insights');
 

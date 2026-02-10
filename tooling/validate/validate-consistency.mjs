@@ -21,7 +21,7 @@ import { parse as parseYaml } from 'yaml';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { getContentBody } from '../lib/mdx-utils.mjs';
 import { getColors, formatPath } from '../lib/output.mjs';
-import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.mjs';
+import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.js';
 
 const CI_MODE = process.argv.includes('--ci');
 const colors = getColors(CI_MODE);

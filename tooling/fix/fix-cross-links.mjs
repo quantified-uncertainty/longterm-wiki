@@ -28,7 +28,7 @@ import { join, relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { parseFrontmatter } from '../lib/mdx-utils.mjs';
 import { getColors } from '../lib/output.mjs';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadOrganizations, loadExperts } from '../lib/content-types.mjs';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadOrganizations, loadExperts } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);
 const APPLY_MODE = args.includes('--apply');

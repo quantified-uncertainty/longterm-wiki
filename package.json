@@ -7,8 +7,9 @@
     "dev": "pnpm --filter longterm-next dev",
     "build": "pnpm --filter longterm-next build",
     "test": "pnpm --filter longterm-next test",
-    "validate": "node tooling/crux.mjs validate",
-    "crux": "node tooling/crux.mjs"
+    "validate": "node --import tsx/esm tooling/crux.mjs validate",
+    "crux": "node --import tsx/esm tooling/crux.mjs",
+    "typecheck:tooling": "tsc --noEmit -p tooling/tsconfig.json"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@mdx-js/mdx": "^3.1.0",
+    "@types/node": "^22.0.0",
     "remark-frontmatter": "^5.0.0",
     "remark-math": "^6.0.0",
     "remark-mdx-frontmatter": "^5.0.0",

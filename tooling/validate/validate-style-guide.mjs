@@ -21,7 +21,7 @@ import { readFileSync } from 'fs';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.mjs';
 import { getColors, formatPath } from '../lib/output.mjs';
-import { CONTENT_DIR } from '../lib/content-types.mjs';
+import { CONTENT_DIR } from '../lib/content-types.js';
 
 const CI_MODE = process.argv.includes('--ci');
 const colors = getColors(CI_MODE);

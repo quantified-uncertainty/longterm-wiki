@@ -16,7 +16,7 @@
 import { ValidationEngine } from '../lib/validation-engine.mjs';
 import { entityMentionsRule } from '../lib/rules/entity-mentions.mjs';
 import { getColors } from '../lib/output.mjs';
-import { PROJECT_ROOT, loadBacklinks, loadEntities } from '../lib/content-types.mjs';
+import { PROJECT_ROOT, loadBacklinks, loadEntities } from '../lib/content-types.js';
 
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json');

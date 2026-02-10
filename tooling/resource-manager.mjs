@@ -26,7 +26,7 @@ import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from '
 import { join, basename, dirname, relative } from 'path';
 import { createHash } from 'crypto';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import { CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPages as loadPagesJson } from './lib/content-types.mjs';
+import { CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPages as loadPagesJson } from './lib/content-types.js';
 
 const RESOURCES_DIR = join(DATA_DIR, 'resources');
 const PUBLICATIONS_FILE = join(DATA_DIR, 'publications.yaml');

@@ -23,15 +23,13 @@ export const SCRIPTS_DIR = join(__dirname, '..');
  */
 export async function runScript(scriptPath, args = [], options = {}) {
   const fullPath = join(SCRIPTS_DIR, scriptPath);
-  const { runner = 'node', streamOutput = false, cwd = process.cwd() } = options;
+  const { streamOutput = false, cwd = process.cwd() } = options;
 
   return new Promise((resolve) => {
-    const runnerArgs =
-      runner === 'tsx'
-        ? ['--import', 'tsx/esm', '--no-warnings', fullPath, ...args]
-        : [fullPath, ...args];
+    // Always register tsx/esm so .mjs files can import .ts modules
+    const runnerArgs = ['--import', 'tsx/esm', '--no-warnings', fullPath, ...args];
 
-    const proc = spawn(runner === 'tsx' ? 'node' : runner, runnerArgs, {
+    const proc = spawn('node', runnerArgs, {
       cwd,
       stdio: ['inherit', 'pipe', 'pipe'],
     });
@@ -148,7 +146,6 @@ export function createScriptHandler(name, config) {
     const streamOutput = !quiet;
 
     const result = await runScript(config.script, filteredArgs, {
-      runner: config.runner || 'node',
       streamOutput,
     });
 

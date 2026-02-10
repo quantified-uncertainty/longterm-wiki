@@ -33,6 +33,9 @@ importers:
       '@mdx-js/mdx':
         specifier: ^3.1.0
         version: 3.1.1
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.10
       remark-frontmatter:
         specifier: ^5.0.0
         version: 5.0.0

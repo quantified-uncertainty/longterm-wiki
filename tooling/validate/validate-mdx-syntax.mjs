@@ -20,7 +20,7 @@
 import { readFileSync } from 'fs';
 import { findMdxFiles } from '../lib/file-utils.mjs';
 import { getColors, formatPath } from '../lib/output.mjs';
-import { CONTENT_DIR } from '../lib/content-types.mjs';
+import { CONTENT_DIR } from '../lib/content-types.js';
 import { parseFrontmatter, shouldSkipValidation } from '../lib/mdx-utils.mjs';
 
 const CI_MODE = process.argv.includes('--ci');
