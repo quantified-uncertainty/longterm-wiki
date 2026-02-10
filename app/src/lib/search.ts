@@ -93,8 +93,19 @@ export async function searchWiki(
     prefix: true,
   });
 
-  return raw.slice(0, limit).map((hit) => {
+  const q = query.trim().toLowerCase();
+
+  // Re-rank: exact title match bonus + mild importance tiebreaker
+  const scored = raw.map((hit) => {
     const doc = _docs!.get(hit.id);
+    const title = (doc?.title ?? "").toLowerCase();
+
+    let boost = 1.0;
+    // Exact title match — strongest signal that this is THE page
+    if (title === q) boost *= 3.0;
+    // Mild importance tiebreaker (0–33% boost)
+    boost *= 1 + (doc?.importance ?? 0) / 300;
+
     return {
       id: doc?.id ?? hit.id,
       title: doc?.title ?? hit.id,
@@ -103,9 +114,12 @@ export async function searchWiki(
       type: doc?.type ?? "",
       importance: doc?.importance ?? null,
       quality: doc?.quality ?? null,
-      score: hit.score,
+      score: hit.score * boost,
     };
   });
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit);
 }
 
 /**

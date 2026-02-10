@@ -63,15 +63,27 @@ export function search(query, options = {}, limit = 20) {
     ...options,
   });
 
-  return raw.slice(0, limit).map(hit => {
+  const q = query.trim().toLowerCase();
+
+  // Re-rank: exact title match bonus + mild importance tiebreaker
+  const scored = raw.map(hit => {
     const doc = docs.get(hit.id) || {};
+    const title = (doc.title || '').toLowerCase();
+
+    let boost = 1.0;
+    if (title === q) boost *= 3.0;
+    boost *= 1 + (doc.importance || 0) / 300;
+
     return {
       id: hit.id,
       title: doc.title || hit.id,
       description: doc.description || '',
       type: doc.type || '',
       numericId: doc.numericId || hit.id,
-      score: hit.score,
+      score: hit.score * boost,
     };
   });
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit);
 }
