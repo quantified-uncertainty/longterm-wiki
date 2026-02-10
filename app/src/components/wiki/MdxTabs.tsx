@@ -15,6 +15,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface MdxTabItemProps {
   label: string;
+  icon?: string;
   children?: React.ReactNode;
 }
 
