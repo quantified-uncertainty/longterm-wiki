@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 interface FactEntry {
   key: string;
@@ -15,7 +16,13 @@ interface FactEntry {
   compute?: string;
 }
 
-export function FactDashboard({ facts }: { facts: FactEntry[] }) {
+export function FactDashboard({
+  facts,
+  entityHrefs,
+}: {
+  facts: FactEntry[];
+  entityHrefs: Record<string, string>;
+}) {
   const [filter, setFilter] = useState("");
   const [showComputed, setShowComputed] = useState(true);
 
@@ -67,7 +74,11 @@ export function FactDashboard({ facts }: { facts: FactEntry[] }) {
       <div className="space-y-6">
         {sortedEntities.map(([entity, entityFacts]) => (
           <div key={entity}>
-            <h3 className="text-base font-semibold mb-2 text-foreground">{entity}</h3>
+            <h3 className="text-base font-semibold mb-2 text-foreground">
+              <Link href={entityHrefs[entity] || `/wiki/${entity}`} className="hover:underline">
+                {entity}
+              </Link>
+            </h3>
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="text-left text-muted-foreground">

@@ -1,4 +1,4 @@
-import { getAllFacts } from "@/data";
+import { getAllFacts, getEntityHref } from "@/data";
 import { FactDashboard } from "@/components/internal/FactDashboard";
 import type { Metadata } from "next";
 
@@ -20,6 +20,14 @@ export default function FactsPage() {
     compute: f.compute,
   }));
 
+  // Compute entity hrefs server-side (requires id-registry)
+  const entityHrefs: Record<string, string> = {};
+  for (const f of facts) {
+    if (!entityHrefs[f.entity]) {
+      entityHrefs[f.entity] = getEntityHref(f.entity);
+    }
+  }
+
   return (
     <article className="prose max-w-none">
       <h1>Canonical Facts Dashboard</h1>
@@ -27,7 +35,7 @@ export default function FactsPage() {
         All canonical facts from the YAML fact store, used by the <code>&lt;F&gt;</code> component.
         Facts are defined in <code>data/facts/*.yaml</code>.
       </p>
-      <FactDashboard facts={facts} />
+      <FactDashboard facts={facts} entityHrefs={entityHrefs} />
     </article>
   );
 }
