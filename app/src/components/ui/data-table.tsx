@@ -72,9 +72,9 @@ function DataTableWithTable<TData>({
   const columns = table.getAllColumns()
 
   return (
-    <div className="rounded-lg border border-border/60 shadow-sm">
+    <div className="rounded-lg border border-border/60 shadow-sm max-h-[80vh] overflow-auto">
       <Table>
-        <TableHeader>
+        <TableHeader className="sticky top-0 z-20">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="hover:bg-transparent border-b-2 border-border/60">
               {headerGroup.headers.map((header, idx) => (
@@ -82,7 +82,7 @@ function DataTableWithTable<TData>({
                   key={header.id}
                   className={
                     stickyFirstColumn && idx === 0
-                      ? "sticky left-0 z-10 bg-slate-100 dark:bg-slate-800 min-w-[180px] border-r border-border/40"
+                      ? "sticky left-0 z-30 bg-slate-100 dark:bg-slate-800 min-w-[180px] border-r border-border/40"
                       : undefined
                   }
                 >

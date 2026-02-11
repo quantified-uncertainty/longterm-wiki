@@ -139,7 +139,7 @@ export function createSafetyApproachesColumns(): ColumnDef<SafetyApproach>[] {
         const critiques = row.getValue<string[]>("mainCritiques")
         if (critiques.length === 0) return null
         return (
-          <div className="text-[10px] text-red-700 dark:text-red-400 min-w-[160px] space-y-0.5">
+          <div className="text-[10px] text-muted-foreground min-w-[160px] space-y-0.5">
             {critiques.map((c, i) => (
               <div key={i} className="leading-tight">{"\u2022"} {c}</div>
             ))}

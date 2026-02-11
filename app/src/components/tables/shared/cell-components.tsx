@@ -23,7 +23,7 @@ export function LevelBadge({
   return (
     <span
       className={cn(
-        "inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap",
+        "inline-block px-1.5 py-0.5 rounded text-[11px] font-medium whitespace-nowrap",
         getBadgeClass(level, category),
         className,
       )}
@@ -93,7 +93,7 @@ export function SafetyOutlookBadge({
       )}
       <span
         className={cn(
-          "inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap",
+          "inline-block px-1.5 py-0.5 rounded text-[11px] font-medium whitespace-nowrap",
           getSafetyOutlookClass(rating),
         )}
       >

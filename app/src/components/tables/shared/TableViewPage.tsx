@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, type ReactNode } from "react"
+import { useState, useMemo, useRef, useEffect, type ReactNode } from "react"
 import {
   useReactTable,
   getCoreRowModel,
@@ -11,6 +11,7 @@ import {
   type Row,
 } from "@tanstack/react-table"
 import { cn } from "@/lib/utils"
+import { X } from "lucide-react"
 import { DataTable } from "@/components/ui/data-table"
 import { ColumnToggleControls } from "./ColumnToggleControls"
 import { ViewModeToggle, type ViewMode } from "./ViewModeToggle"
@@ -175,7 +176,7 @@ export function TableViewPage<TData, TColumnKey extends string>({
           applyPreset={applyPreset}
         />
 
-        {/* Collapsible info row */}
+        {/* Controls row: view mode toggle + info toggles */}
         <div className="flex flex-wrap items-center gap-3">
           {grouping && (
             <ViewModeToggle
@@ -187,23 +188,15 @@ export function TableViewPage<TData, TColumnKey extends string>({
           )}
 
           {description && (
-            <details className="group">
-              <summary className="text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground select-none inline-flex items-center gap-1">
-                <span className="transition-transform group-open:rotate-90">&#x25B6;</span>
-                About this table
-              </summary>
-              <div className="mt-2">{description}</div>
-            </details>
+            <ExpandableInfo label="About this table">
+              {description}
+            </ExpandableInfo>
           )}
 
           {legend && (
-            <details className="group">
-              <summary className="text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground select-none inline-flex items-center gap-1">
-                <span className="transition-transform group-open:rotate-90">&#x25B6;</span>
-                Legend
-              </summary>
-              <div className="mt-2">{legend}</div>
-            </details>
+            <ExpandableInfo label="Legend">
+              {legend}
+            </ExpandableInfo>
           )}
         </div>
 
@@ -238,6 +231,51 @@ export function TableViewPage<TData, TColumnKey extends string>({
 
         {footer}
       </div>
+    </div>
+  )
+}
+
+/** Inline toggle that reveals content in a dropdown panel below the trigger row */
+function ExpandableInfo({ label, children }: { label: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e: MouseEvent) {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [open])
+
+  return (
+    <div className="relative" ref={panelRef}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          "text-xs font-medium cursor-pointer select-none inline-flex items-center gap-1 px-2 py-1 rounded-md transition-colors",
+          open
+            ? "bg-muted text-foreground"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+        )}
+      >
+        <span className={cn("text-[10px] transition-transform", open && "rotate-90")}>&#x25B6;</span>
+        {label}
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 w-[min(600px,90vw)] rounded-lg border border-border bg-background shadow-lg p-4">
+          <button
+            onClick={() => setOpen(false)}
+            className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <div className="text-sm pr-6">{children}</div>
+        </div>
+      )}
     </div>
   )
 }

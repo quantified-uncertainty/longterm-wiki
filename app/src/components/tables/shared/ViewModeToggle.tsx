@@ -9,28 +9,27 @@ interface ViewModeToggleProps {
   setViewMode: (mode: ViewMode) => void;
   unifiedLabel?: string;
   groupedLabel?: string;
-  className?: string;
 }
 
 /**
- * Toggle between unified table view and grouped by category view
+ * Toggle between unified table view and grouped by category view.
+ * Uses shadcn Tabs visual styling (pill toggle).
  */
 export function ViewModeToggle({
   viewMode,
   setViewMode,
   unifiedLabel = "Unified Table",
   groupedLabel = "Grouped by Category",
-  className,
 }: ViewModeToggleProps) {
   return (
-    <div className={cn("flex gap-2", className)}>
+    <div className="inline-flex h-8 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
       <button
         onClick={() => setViewMode("unified")}
         className={cn(
-          "px-3 py-1.5 text-sm rounded-md border transition-colors",
+          "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium transition-all",
           viewMode === "unified"
-            ? "bg-primary text-primary-foreground border-primary"
-            : "bg-background text-muted-foreground border-border hover:bg-muted"
+            ? "bg-background text-foreground shadow"
+            : "hover:text-foreground"
         )}
       >
         {unifiedLabel}
@@ -38,10 +37,10 @@ export function ViewModeToggle({
       <button
         onClick={() => setViewMode("grouped")}
         className={cn(
-          "px-3 py-1.5 text-sm rounded-md border transition-colors",
+          "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium transition-all",
           viewMode === "grouped"
-            ? "bg-primary text-primary-foreground border-primary"
-            : "bg-background text-muted-foreground border-border hover:bg-muted"
+            ? "bg-background text-foreground shadow"
+            : "hover:text-foreground"
         )}
       >
         {groupedLabel}
