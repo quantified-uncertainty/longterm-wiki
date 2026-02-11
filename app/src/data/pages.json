@@ -2015,12 +2015,6 @@
       "maxSimilarity": 20,
       "similarPages": [
         {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
-          "similarity": 20
-        },
-        {
           "id": "international-regimes",
           "title": "International Compute Regimes",
           "path": "/knowledge-base/responses/international-regimes/",
@@ -2043,6 +2037,12 @@
           "title": "Voluntary Industry Commitments",
           "path": "/knowledge-base/responses/voluntary-commitments/",
           "similarity": 20
+        },
+        {
+          "id": "structural-risks",
+          "title": "Structural Risk Cruxes",
+          "path": "/knowledge-base/cruxes/structural-risks/",
+          "similarity": 19
         }
       ]
     }
@@ -3172,12 +3172,6 @@
           "similarity": 16
         },
         {
-          "id": "failed-stalled-proposals",
-          "title": "Failed and Stalled AI Policy Proposals",
-          "path": "/knowledge-base/responses/failed-stalled-proposals/",
-          "similarity": 15
-        },
-        {
           "id": "governance-policy",
           "title": "AI Governance and Policy",
           "path": "/knowledge-base/responses/governance-policy/",
@@ -3193,6 +3187,12 @@
           "id": "institutional-adaptation-speed",
           "title": "Institutional Adaptation Speed Model",
           "path": "/knowledge-base/models/institutional-adaptation-speed/",
+          "similarity": 14
+        },
+        {
+          "id": "california-sb1047",
+          "title": "California SB 1047",
+          "path": "/knowledge-base/responses/california-sb1047/",
           "similarity": 14
         }
       ]
@@ -7880,14 +7880,8 @@
     "convertedLinkCount": 27,
     "backlinkCount": 2,
     "redundancy": {
-      "maxSimilarity": 19,
+      "maxSimilarity": 18,
       "similarPages": [
-        {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 19
-        },
         {
           "id": "structural",
           "title": "Meta & Structural Indicators",
@@ -7911,6 +7905,12 @@
           "title": "International AI Safety Summits",
           "path": "/knowledge-base/responses/international-summits/",
           "similarity": 18
+        },
+        {
+          "id": "solutions",
+          "title": "Solution Cruxes",
+          "path": "/knowledge-base/cruxes/solutions/",
+          "similarity": 17
         }
       ]
     }
@@ -7920,21 +7920,24 @@
     "path": "/knowledge-base/metrics/lab-behavior/",
     "filePath": "knowledge-base/metrics/lab-behavior.mdx",
     "title": "Lab Behavior & Industry",
-    "quality": 65,
+    "quality": 55,
     "importance": 72,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-12-28",
-    "llmSummary": "Comprehensive tracking of 10 lab behavior metrics finds concerning trends: 53% average compliance with voluntary commitments, evaluation timelines compressed from months to days at OpenAI, 25+ senior safety departures in 2024, and open-source capability gap narrowing from 16 to 3 months. First ASL-3 activation (Claude Opus 4) represents the only publicly confirmed capability threshold crossing.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Comprehensive tracking of AI lab safety practices finds 53% average compliance with voluntary commitments, dramatic compression of safety evaluation timelines from months to days at OpenAI, and 25+ senior safety researcher departures in 2024. The open-source capability gap has collapsed from 16 months to 3-6 months with DeepSeek R1 achieving performance parity at 1/27th the cost.",
     "description": "This page tracks measurable indicators of AI laboratory safety practices, finding 53% average compliance with voluntary commitments, shortened safety evaluation windows (from months to days at OpenAI), and 25+ senior safety researcher departures from leading labs in 2024 alone.",
     "ratings": {
-      "novelty": 4.5,
-      "rigor": 6.5,
-      "actionability": 6,
-      "completeness": 7
+      "focus": 6.8,
+      "novelty": 3.2,
+      "rigor": 4.1,
+      "completeness": 7.2,
+      "concreteness": 6.9,
+      "actionability": 5.4,
+      "objectivity": 3.8
     },
     "category": "metrics",
     "subcategory": null,
@@ -7943,22 +7946,137 @@
       "governance"
     ],
     "metrics": {
-      "wordCount": 4370,
-      "tableCount": 14,
-      "diagramCount": 1,
-      "internalLinks": 53,
-      "externalLinks": 3,
-      "bulletRatio": 0.31,
+      "wordCount": 3782,
+      "tableCount": 25,
+      "diagramCount": 2,
+      "internalLinks": 30,
+      "externalLinks": 52,
+      "bulletRatio": 0.17,
       "sectionCount": 69,
       "hasOverview": true,
-      "structuralScore": 12
+      "structuralScore": 15
     },
-    "suggestedQuality": 80,
+    "suggestedQuality": 100,
     "updateFrequency": 7,
-    "wordCount": 4370,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 50,
+    "wordCount": 3782,
+    "unconvertedLinks": [
+      {
+        "text": "Future of Life Institute study",
+        "url": "https://futureoflife.org/ai-safety-index-summer-2025/",
+        "resourceId": "df46edd6fa2078d1",
+        "resourceTitle": "FLI AI Safety Index Summer 2025"
+      },
+      {
+        "text": "comprehensive study from August 2025",
+        "url": "https://futureoflife.org/ai-safety-index-summer-2025/",
+        "resourceId": "df46edd6fa2078d1",
+        "resourceTitle": "FLI AI Safety Index Summer 2025"
+      },
+      {
+        "text": "G7 Hiroshima AI Process (HAIP) Reporting Framework",
+        "url": "https://futureoflife.org/ai-safety-index-summer-2025/",
+        "resourceId": "df46edd6fa2078d1",
+        "resourceTitle": "FLI AI Safety Index Summer 2025"
+      },
+      {
+        "text": "December 2025, twelve companies have published frontier AI safety policies",
+        "url": "https://metr.org/blog/2025-12-09-common-elements-of-frontier-ai-safety-policies/",
+        "resourceId": "c8782940b880d00f",
+        "resourceTitle": "METR's analysis of 12 companies"
+      },
+      {
+        "text": "Future of Life Institute study",
+        "url": "https://futureoflife.org/ai-safety-index-summer-2025/",
+        "resourceId": "df46edd6fa2078d1",
+        "resourceTitle": "FLI AI Safety Index Summer 2025"
+      },
+      {
+        "text": "announced the first publicly confirmed ASL-3 activation",
+        "url": "https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy",
+        "resourceId": "d0ba81cc7a8fdb2b",
+        "resourceTitle": "Anthropic: Announcing our updated Responsible Scaling Policy"
+      },
+      {
+        "text": "SaferAI's analysis",
+        "url": "https://www.safer-ai.org/anthropics-responsible-scaling-policy-update-makes-a-step-backwards",
+        "resourceId": "a5e4c7b49f5d3e1b",
+        "resourceTitle": "SaferAI has argued"
+      },
+      {
+        "text": "OpenAI system card",
+        "url": "https://openai.com/research/gpt-4-system-card",
+        "resourceId": "e09fc9ef04adca70",
+        "resourceTitle": "OpenAI System Card"
+      },
+      {
+        "text": "2025 AI Safety Index",
+        "url": "https://futureoflife.org/ai-safety-index-summer-2025/",
+        "resourceId": "df46edd6fa2078d1",
+        "resourceTitle": "FLI AI Safety Index Summer 2025"
+      },
+      {
+        "text": "Preparedness Framework",
+        "url": "https://openai.com/preparedness/",
+        "resourceId": "90a03954db3c77d5",
+        "resourceTitle": "OpenAI Preparedness"
+      },
+      {
+        "text": "<EntityLink id=\"responsible-scaling-policies\">Responsible Scaling Policy</EntityLink>",
+        "url": "https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy",
+        "resourceId": "d0ba81cc7a8fdb2b",
+        "resourceTitle": "Anthropic: Announcing our updated Responsible Scaling Policy"
+      },
+      {
+        "text": "METR's analysis of 12 companies",
+        "url": "https://metr.org/blog/2025-12-09-common-elements-of-frontier-ai-safety-policies/",
+        "resourceId": "c8782940b880d00f",
+        "resourceTitle": "METR's analysis of 12 companies"
+      },
+      {
+        "text": "2025 AI Safety Index",
+        "url": "https://futureoflife.org/ai-safety-index-summer-2025/",
+        "resourceId": "df46edd6fa2078d1",
+        "resourceTitle": "FLI AI Safety Index Summer 2025"
+      },
+      {
+        "text": "four major companies launching their most powerful models in just 25 days",
+        "url": "https://vertu.com/lifestyle/the-ai-model-race-reaches-singularity-speed/",
+        "resourceId": "0ceda90616009daa",
+        "resourceTitle": "25 days, four major AI companies launched their most powerful models"
+      },
+      {
+        "text": "\"Safety culture took a backseat\"",
+        "url": "https://www.axios.com/2024/05/20/openai-safety-jan-leike-sam-altman",
+        "resourceId": "925c130ddc8d2dc7",
+        "resourceTitle": "OpenAI's recent departures force leaders to reaffirm safety commitment"
+      },
+      {
+        "text": "AI Safety Field Growth Analysis from 2025",
+        "url": "https://www.lesswrong.com/posts/8QjAnWyuE9fktPRgS/ai-safety-field-growth-analysis-2025",
+        "resourceId": "77a3c2d162c0081e",
+        "resourceTitle": "AI Safety Field Growth Analysis 2025 (LessWrong)"
+      },
+      {
+        "text": "departure statement",
+        "url": "https://www.axios.com/2024/05/20/openai-safety-jan-leike-sam-altman",
+        "resourceId": "925c130ddc8d2dc7",
+        "resourceTitle": "OpenAI's recent departures force leaders to reaffirm safety commitment"
+      },
+      {
+        "text": "Safety \"took a back seat to shiny products\"",
+        "url": "https://www.axios.com/2024/05/20/openai-safety-jan-leike-sam-altman",
+        "resourceId": "925c130ddc8d2dc7",
+        "resourceTitle": "OpenAI's recent departures force leaders to reaffirm safety commitment"
+      },
+      {
+        "text": "2025 AI Safety Index",
+        "url": "https://futureoflife.org/ai-safety-index-summer-2025/",
+        "resourceId": "df46edd6fa2078d1",
+        "resourceTitle": "FLI AI Safety Index Summer 2025"
+      }
+    ],
+    "unconvertedLinkCount": 19,
+    "convertedLinkCount": 0,
     "backlinkCount": 3,
     "redundancy": {
       "maxSimilarity": 19,
@@ -7970,28 +8088,28 @@
           "similarity": 19
         },
         {
+          "id": "corporate-influence",
+          "title": "Influencing AI Labs Directly",
+          "path": "/knowledge-base/responses/corporate-influence/",
+          "similarity": 18
+        },
+        {
+          "id": "international-summits",
+          "title": "International AI Safety Summits",
+          "path": "/knowledge-base/responses/international-summits/",
+          "similarity": 18
+        },
+        {
           "id": "responsible-scaling-policies",
           "title": "Responsible Scaling Policies",
           "path": "/knowledge-base/responses/responsible-scaling-policies/",
-          "similarity": 19
+          "similarity": 17
         },
         {
-          "id": "ai-safety-institutes",
-          "title": "AI Safety Institutes",
-          "path": "/knowledge-base/responses/ai-safety-institutes/",
-          "similarity": 18
-        },
-        {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
-          "similarity": 18
-        },
-        {
-          "id": "voluntary-commitments",
-          "title": "Voluntary Industry Commitments",
-          "path": "/knowledge-base/responses/voluntary-commitments/",
-          "similarity": 18
+          "id": "us-executive-order",
+          "title": "US Executive Order on AI",
+          "path": "/knowledge-base/responses/us-executive-order/",
+          "similarity": 17
         }
       ]
     }
@@ -8376,10 +8494,10 @@
           "similarity": 17
         },
         {
-          "id": "structural-risks",
-          "title": "Structural Risk Cruxes",
-          "path": "/knowledge-base/cruxes/structural-risks/",
-          "similarity": 16
+          "id": "nist-ai-rmf",
+          "title": "NIST AI Risk Management Framework",
+          "path": "/knowledge-base/responses/nist-ai-rmf/",
+          "similarity": 17
         }
       ]
     }
@@ -12080,21 +12198,21 @@
           "similarity": 17
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 17
-        },
-        {
           "id": "coordination-mechanisms",
           "title": "International Coordination Mechanisms",
           "path": "/knowledge-base/responses/coordination-mechanisms/",
           "similarity": 17
         },
         {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
+          "id": "export-controls",
+          "title": "AI Chip Export Controls",
+          "path": "/knowledge-base/responses/export-controls/",
+          "similarity": 17
+        },
+        {
+          "id": "governance-policy",
+          "title": "AI Governance and Policy",
+          "path": "/knowledge-base/responses/governance-policy/",
           "similarity": 17
         }
       ]
@@ -15276,8 +15394,14 @@
     "convertedLinkCount": 60,
     "backlinkCount": 2,
     "redundancy": {
-      "maxSimilarity": 17,
+      "maxSimilarity": 18,
       "similarPages": [
+        {
+          "id": "effectiveness-assessment",
+          "title": "Policy Effectiveness Assessment",
+          "path": "/knowledge-base/responses/effectiveness-assessment/",
+          "similarity": 18
+        },
         {
           "id": "corrigibility-failure-pathways",
           "title": "Corrigibility Failure Pathways",
@@ -15301,12 +15425,6 @@
           "title": "Responsible Scaling Policies",
           "path": "/knowledge-base/responses/responsible-scaling-policies/",
           "similarity": 17
-        },
-        {
-          "id": "intervention-timing-windows",
-          "title": "Intervention Timing Windows",
-          "path": "/knowledge-base/models/intervention-timing-windows/",
-          "similarity": 16
         }
       ]
     }
@@ -16462,10 +16580,10 @@
           "similarity": 12
         },
         {
-          "id": "large-language-models",
-          "title": "Large Language Models",
-          "path": "/knowledge-base/capabilities/large-language-models/",
-          "similarity": 11
+          "id": "openai",
+          "title": "OpenAI",
+          "path": "/knowledge-base/organizations/openai/",
+          "similarity": 12
         }
       ]
     }
@@ -16677,9 +16795,9 @@
           "similarity": 16
         },
         {
-          "id": "lab-behavior",
-          "title": "Lab Behavior & Industry",
-          "path": "/knowledge-base/metrics/lab-behavior/",
+          "id": "anthropic-ipo",
+          "title": "Anthropic IPO",
+          "path": "/knowledge-base/organizations/anthropic-ipo/",
           "similarity": 15
         }
       ]
@@ -18507,13 +18625,13 @@
     "convertedLinkCount": 14,
     "backlinkCount": 13,
     "redundancy": {
-      "maxSimilarity": 16,
+      "maxSimilarity": 15,
       "similarPages": [
         {
           "id": "openai",
           "title": "OpenAI",
           "path": "/knowledge-base/organizations/openai/",
-          "similarity": 16
+          "similarity": 15
         },
         {
           "id": "agi-development",
@@ -19650,8 +19768,14 @@
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 14,
+      "maxSimilarity": 15,
       "similarPages": [
+        {
+          "id": "openai",
+          "title": "OpenAI",
+          "path": "/knowledge-base/organizations/openai/",
+          "similarity": 15
+        },
         {
           "id": "agi-development",
           "title": "AGI Development",
@@ -19668,12 +19792,6 @@
           "id": "large-language-models",
           "title": "Large Language Models",
           "path": "/knowledge-base/capabilities/large-language-models/",
-          "similarity": 13
-        },
-        {
-          "id": "lab-behavior",
-          "title": "Lab Behavior & Industry",
-          "path": "/knowledge-base/metrics/lab-behavior/",
           "similarity": 13
         },
         {
@@ -20928,14 +21046,8 @@
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 16,
+      "maxSimilarity": 15,
       "similarPages": [
-        {
-          "id": "failed-stalled-proposals",
-          "title": "Failed and Stalled AI Policy Proposals",
-          "path": "/knowledge-base/responses/failed-stalled-proposals/",
-          "similarity": 16
-        },
         {
           "id": "controlai",
           "title": "ControlAI",
@@ -20958,6 +21070,12 @@
           "id": "david-sacks",
           "title": "David Sacks",
           "path": "/knowledge-base/people/david-sacks/",
+          "similarity": 15
+        },
+        {
+          "id": "california-sb1047",
+          "title": "California SB 1047",
+          "path": "/knowledge-base/responses/california-sb1047/",
           "similarity": 15
         }
       ]
@@ -22150,21 +22268,24 @@
     "path": "/knowledge-base/organizations/meta-ai/",
     "filePath": "knowledge-base/organizations/meta-ai.mdx",
     "title": "Meta AI (FAIR)",
-    "quality": 47,
-    "importance": 49,
+    "quality": 51,
+    "importance": 65,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2026-01-29",
-    "llmSummary": "Meta AI has invested $66-72B in AI infrastructure (2025) with AGI targeted for 2027, pioneering open-source AI through PyTorch (63% market share) and LLaMA (1B+ downloads). However, the organization exhibits weak safety culture with Chief AI Scientist dismissing existential risk, 50%+ researcher attrition, and a Frontier AI Framework criticized for lacking robust evaluation—representing a significant racing dynamics contributor with insufficient safety measures.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Comprehensive organizational profile of Meta AI covering $66-72B infrastructure investment (2025), LLaMA model family (1B+ downloads), and transition from FAIR research lab to product-focused GenAI team. Documents significant talent exodus (50%+ of LLaMA authors departed), weak safety culture, and aggressive open-source strategy amid racing dynamics toward 2027 AGI timeline.",
     "description": "Meta's AI research division founded in 2013, pioneering open-source AI with PyTorch (63% of training models) and LLaMA (1B+ downloads). Parent company invested $66-72B in AI infrastructure (2025) with AGI timeline of 2027. Chief AI Scientist Yann LeCun departed November 2025 to found AMI. Frontier AI Framework addresses CBRN risks but critics note lack of robust safety culture amid product prioritization.",
     "ratings": {
+      "focus": 6.5,
       "novelty": 3.2,
-      "rigor": 4.5,
-      "actionability": 2.8,
-      "completeness": 6
+      "rigor": 4.1,
+      "completeness": 7.8,
+      "concreteness": 6.2,
+      "actionability": 3.8,
+      "objectivity": 3.5
     },
     "category": "organizations",
     "subcategory": "labs",
@@ -22174,19 +22295,19 @@
       "governance"
     ],
     "metrics": {
-      "wordCount": 4365,
-      "tableCount": 31,
+      "wordCount": 3204,
+      "tableCount": 14,
       "diagramCount": 2,
-      "internalLinks": 6,
-      "externalLinks": 54,
-      "bulletRatio": 0.13,
-      "sectionCount": 57,
+      "internalLinks": 19,
+      "externalLinks": 89,
+      "bulletRatio": 0.05,
+      "sectionCount": 42,
       "hasOverview": true,
       "structuralScore": 15
     },
     "suggestedQuality": 100,
     "updateFrequency": 3,
-    "wordCount": 4365,
+    "wordCount": 3204,
     "unconvertedLinks": [
       {
         "text": "Yann LeCun",
@@ -22213,16 +22334,28 @@
         "resourceTitle": "Meta Llama 2 open-source"
       },
       {
-        "text": "Epoch AI",
-        "url": "https://time.com/7171962/open-closed-ai-models-epoch/",
-        "resourceId": "f6ef5cf1061a740e",
-        "resourceTitle": "The Gap Between Open and Closed AI Models Might Be Shrinking"
+        "text": "LLaMA 2 release",
+        "url": "https://ai.meta.com/llama/",
+        "resourceId": "69c685f410104791",
+        "resourceTitle": "Meta Llama 2 open-source"
       },
       {
-        "text": "October 2024 interview with The Wall Street Journal",
-        "url": "https://techcrunch.com/2024/10/12/metas-yann-lecun-says-worries-about-a-i-s-existential-threat-are-complete-b-s/",
-        "resourceId": "61b8ab42c6b32b27",
-        "resourceTitle": "TechCrunch, 2024"
+        "text": "LLaMA 3 release",
+        "url": "https://ai.meta.com/blog/meta-llama-3/",
+        "resourceId": "f9616f30e8f51cb0",
+        "resourceTitle": "Llama 3"
+      },
+      {
+        "text": "Future of Life Institute's 2025 Winter AI Safety Index",
+        "url": "https://futureoflife.org/ai-safety-index-winter-2025/",
+        "resourceId": "97185b28d68545b4",
+        "resourceTitle": "AI Safety Index Winter 2025"
+      },
+      {
+        "text": "red-teaming in areas of public safety and critical infrastructure",
+        "url": "https://ai.meta.com/blog/meta-llama-3-1-ai-responsibility/",
+        "resourceId": "a4f0e262dd30ec02",
+        "resourceTitle": "Llama Guard 3"
       },
       {
         "text": "effectively zero",
@@ -22243,59 +22376,53 @@
         "resourceTitle": "TechCrunch, 2024"
       },
       {
-        "text": "LLaMA Model Card",
-        "url": "https://llama.meta.com/",
-        "resourceId": "f0a602414a4a2667",
-        "resourceTitle": "Meta's LLaMA releases"
+        "text": "Future of Life Institute Winter 2025 Index",
+        "url": "https://futureoflife.org/ai-safety-index-winter-2025/",
+        "resourceId": "97185b28d68545b4",
+        "resourceTitle": "AI Safety Index Winter 2025"
       },
       {
-        "text": "Wikipedia - Yann LeCun",
-        "url": "https://en.wikipedia.org/wiki/Yann_LeCun",
-        "resourceId": "914e07c146555ae9",
-        "resourceTitle": "Yann LeCun"
-      },
-      {
-        "text": "METR - Common Elements of Frontier AI Safety Policies",
-        "url": "https://metr.org/common-elements",
-        "resourceId": "30b9f5e826260d9d",
-        "resourceTitle": "METR: Common Elements of Frontier AI Safety Policies"
+        "text": "Meta AI Responsibility Blog",
+        "url": "https://ai.meta.com/blog/meta-llama-3-1-ai-responsibility/",
+        "resourceId": "a4f0e262dd30ec02",
+        "resourceTitle": "Llama Guard 3"
       }
     ],
-    "unconvertedLinkCount": 12,
+    "unconvertedLinkCount": 13,
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
       "maxSimilarity": 16,
       "similarPages": [
         {
-          "id": "ssi",
-          "title": "Safe Superintelligence Inc (SSI)",
-          "path": "/knowledge-base/organizations/ssi/",
+          "id": "openai",
+          "title": "OpenAI",
+          "path": "/knowledge-base/organizations/openai/",
           "similarity": 16
         },
         {
-          "id": "us-aisi",
-          "title": "US AI Safety Institute",
-          "path": "/knowledge-base/organizations/us-aisi/",
+          "id": "xai",
+          "title": "xAI",
+          "path": "/knowledge-base/organizations/xai/",
           "similarity": 16
+        },
+        {
+          "id": "ssi",
+          "title": "Safe Superintelligence Inc (SSI)",
+          "path": "/knowledge-base/organizations/ssi/",
+          "similarity": 15
         },
         {
           "id": "anthropic-core-views",
           "title": "Anthropic Core Views",
           "path": "/knowledge-base/responses/anthropic-core-views/",
-          "similarity": 16
+          "similarity": 15
         },
         {
           "id": "mainstream-era",
           "title": "Mainstream Era (2020-Present)",
           "path": "/knowledge-base/history/mainstream-era/",
-          "similarity": 15
-        },
-        {
-          "id": "lab-behavior",
-          "title": "Lab Behavior & Industry",
-          "path": "/knowledge-base/metrics/lab-behavior/",
-          "similarity": 15
+          "similarity": 14
         }
       ]
     }
@@ -22616,19 +22743,19 @@
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 14,
+      "maxSimilarity": 15,
       "similarPages": [
+        {
+          "id": "openai",
+          "title": "OpenAI",
+          "path": "/knowledge-base/organizations/openai/",
+          "similarity": 15
+        },
         {
           "id": "meta-ai",
           "title": "Meta AI (FAIR)",
           "path": "/knowledge-base/organizations/meta-ai/",
           "similarity": 14
-        },
-        {
-          "id": "openai",
-          "title": "OpenAI",
-          "path": "/knowledge-base/organizations/openai/",
-          "similarity": 13
         },
         {
           "id": "standards-bodies",
@@ -22978,12 +23105,6 @@
           "similarity": 20
         },
         {
-          "id": "nist-ai-rmf",
-          "title": "NIST AI Risk Management Framework",
-          "path": "/knowledge-base/responses/nist-ai-rmf/",
-          "similarity": 20
-        },
-        {
           "id": "standards-bodies",
           "title": "AI Standards Bodies",
           "path": "/knowledge-base/responses/standards-bodies/",
@@ -22993,6 +23114,12 @@
           "id": "frontier-model-forum",
           "title": "Frontier Model Forum",
           "path": "/knowledge-base/organizations/frontier-model-forum/",
+          "similarity": 19
+        },
+        {
+          "id": "nist-ai-rmf",
+          "title": "NIST AI Risk Management Framework",
+          "path": "/knowledge-base/responses/nist-ai-rmf/",
           "similarity": 19
         },
         {
@@ -23278,10 +23405,10 @@
           "similarity": 18
         },
         {
-          "id": "whistleblower-dynamics",
-          "title": "Whistleblower Dynamics Model",
-          "path": "/knowledge-base/models/whistleblower-dynamics/",
-          "similarity": 17
+          "id": "failed-stalled-proposals",
+          "title": "Failed and Stalled AI Policy Proposals",
+          "path": "/knowledge-base/responses/failed-stalled-proposals/",
+          "similarity": 18
         }
       ]
     }
@@ -23291,21 +23418,21 @@
     "path": "/knowledge-base/organizations/openai/",
     "filePath": "knowledge-base/organizations/openai.mdx",
     "title": "OpenAI",
-    "quality": 46,
-    "importance": 55,
+    "quality": null,
+    "importance": 65,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-12-24",
-    "llmSummary": "Comprehensive organizational profile of OpenAI documenting evolution from 2015 non-profit to commercial AGI developer, with detailed analysis of governance crisis, safety researcher exodus (75% of co-founders departed), and capability advancement (o1/o3 reasoning models). Concludes high capability-safety misalignment risk with worsening trend, driven by $13B Microsoft partnership creating commercial pressure and weakened safety oversight.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Comprehensive organizational profile of OpenAI documenting evolution from 2015 non-profit to commercial AGI developer, with detailed analysis of governance crisis, safety researcher exodus (75% of co-founders departed), and capability advancement (o1/o3 reasoning models). Updated with 2025 developments including o3-mini release, 800M weekly active users, and Altman's confident AGI timeline predictions.",
     "description": "Leading AI lab that developed GPT models and ChatGPT, analyzing organizational evolution from non-profit research to commercial AGI development amid safety-commercialization tensions",
     "ratings": {
-      "novelty": 3.5,
-      "rigor": 5,
-      "actionability": 4,
-      "completeness": 6.5
+      "novelty": 4.5,
+      "rigor": 6,
+      "actionability": 5,
+      "completeness": 8
     },
     "category": "organizations",
     "subcategory": "labs",
@@ -23315,55 +23442,104 @@
       "governance"
     ],
     "metrics": {
-      "wordCount": 2012,
-      "tableCount": 14,
+      "wordCount": 3142,
+      "tableCount": 15,
       "diagramCount": 0,
-      "internalLinks": 41,
-      "externalLinks": 0,
-      "bulletRatio": 0.28,
-      "sectionCount": 29,
+      "internalLinks": 32,
+      "externalLinks": 49,
+      "bulletRatio": 0.32,
+      "sectionCount": 45,
       "hasOverview": true,
-      "structuralScore": 10
+      "structuralScore": 12
     },
-    "suggestedQuality": 67,
+    "suggestedQuality": 80,
     "updateFrequency": 3,
-    "wordCount": 2012,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 12,
+    "wordCount": 3142,
+    "unconvertedLinks": [
+      {
+        "text": "OpenAI GPT-4 System Card",
+        "url": "https://cdn.openai.com/papers/gpt-4-system-card.pdf",
+        "resourceId": "ebab6e05661645c5",
+        "resourceTitle": "OpenAI"
+      },
+      {
+        "text": "arXiv:2005.14165",
+        "url": "https://arxiv.org/abs/2005.14165",
+        "resourceId": "2cab3ea10b8b7ae2",
+        "resourceTitle": "Brown et al. (2020)"
+      },
+      {
+        "text": "arXiv:2203.02155",
+        "url": "https://arxiv.org/abs/2203.02155",
+        "resourceId": "1098fc60be7ca2b0",
+        "resourceTitle": "Training Language Models to Follow Instructions with Human Feedback"
+      },
+      {
+        "text": "arXiv:2312.09390",
+        "url": "https://arxiv.org/abs/2312.09390",
+        "resourceId": "0ba98ae3a8a72270",
+        "resourceTitle": "arXiv"
+      },
+      {
+        "text": "arXiv:2303.08774",
+        "url": "https://arxiv.org/abs/2303.08774",
+        "resourceId": "29a0882390ee7063",
+        "resourceTitle": "OpenAI's GPT-4"
+      },
+      {
+        "text": "ChatGPT Users Statistics (February 2026) – Growth & Usage Data",
+        "url": "https://www.demandsage.com/chatgpt-statistics/",
+        "resourceId": "6561a4b13801be50",
+        "resourceTitle": "unprecedented growth"
+      },
+      {
+        "text": "ChatGPT Users Statistics (February 2026) – Growth & Usage Data",
+        "url": "https://www.demandsage.com/chatgpt-statistics/",
+        "resourceId": "6561a4b13801be50",
+        "resourceTitle": "unprecedented growth"
+      },
+      {
+        "text": "ChatGPT Users Statistics (February 2026) – Growth & Usage Data",
+        "url": "https://www.demandsage.com/chatgpt-statistics/",
+        "resourceId": "6561a4b13801be50",
+        "resourceTitle": "unprecedented growth"
+      }
+    ],
+    "unconvertedLinkCount": 8,
+    "convertedLinkCount": 0,
     "backlinkCount": 52,
     "redundancy": {
-      "maxSimilarity": 16,
+      "maxSimilarity": 17,
       "similarPages": [
         {
-          "id": "deepmind",
-          "title": "Google DeepMind",
-          "path": "/knowledge-base/organizations/deepmind/",
-          "similarity": 16
-        },
-        {
-          "id": "corporate",
-          "title": "Corporate Responses",
-          "path": "/knowledge-base/responses/corporate/",
-          "similarity": 15
-        },
-        {
-          "id": "mainstream-era",
-          "title": "Mainstream Era (2020-Present)",
-          "path": "/knowledge-base/history/mainstream-era/",
-          "similarity": 14
-        },
-        {
-          "id": "arc",
-          "title": "ARC (Alignment Research Center)",
-          "path": "/knowledge-base/organizations/arc/",
-          "similarity": 14
+          "id": "xai",
+          "title": "xAI",
+          "path": "/knowledge-base/organizations/xai/",
+          "similarity": 17
         },
         {
           "id": "meta-ai",
           "title": "Meta AI (FAIR)",
           "path": "/knowledge-base/organizations/meta-ai/",
-          "similarity": 14
+          "similarity": 16
+        },
+        {
+          "id": "ssi",
+          "title": "Safe Superintelligence Inc (SSI)",
+          "path": "/knowledge-base/organizations/ssi/",
+          "similarity": 16
+        },
+        {
+          "id": "uk-aisi",
+          "title": "UK AI Safety Institute",
+          "path": "/knowledge-base/organizations/uk-aisi/",
+          "similarity": 16
+        },
+        {
+          "id": "anthropic-core-views",
+          "title": "Anthropic Core Views",
+          "path": "/knowledge-base/responses/anthropic-core-views/",
+          "similarity": 16
         }
       ]
     }
@@ -23564,16 +23740,16 @@
           "similarity": 17
         },
         {
-          "id": "failed-stalled-proposals",
-          "title": "Failed and Stalled AI Policy Proposals",
-          "path": "/knowledge-base/responses/failed-stalled-proposals/",
-          "similarity": 17
-        },
-        {
           "id": "international-summits",
           "title": "International AI Safety Summits",
           "path": "/knowledge-base/responses/international-summits/",
           "similarity": 17
+        },
+        {
+          "id": "fli",
+          "title": "Future of Life Institute (FLI)",
+          "path": "/knowledge-base/organizations/fli/",
+          "similarity": 16
         }
       ]
     }
@@ -24092,12 +24268,6 @@
           "similarity": 12
         },
         {
-          "id": "meta-ai",
-          "title": "Meta AI (FAIR)",
-          "path": "/knowledge-base/organizations/meta-ai/",
-          "similarity": 12
-        },
-        {
           "id": "miri",
           "title": "MIRI (Machine Intelligence Research Institute)",
           "path": "/knowledge-base/organizations/miri/",
@@ -24107,6 +24277,12 @@
           "id": "secure-ai-project",
           "title": "Secure AI Project",
           "path": "/knowledge-base/organizations/secure-ai-project/",
+          "similarity": 12
+        },
+        {
+          "id": "ssi",
+          "title": "Safe Superintelligence Inc (SSI)",
+          "path": "/knowledge-base/organizations/ssi/",
           "similarity": 12
         }
       ]
@@ -26015,12 +26191,6 @@
           "similarity": 24
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 23
-        },
-        {
           "id": "international-summits",
           "title": "International AI Safety Summits",
           "path": "/knowledge-base/responses/international-summits/",
@@ -26031,6 +26201,12 @@
           "title": "Responsible Scaling Policies",
           "path": "/knowledge-base/responses/responsible-scaling-policies/",
           "similarity": 23
+        },
+        {
+          "id": "metr",
+          "title": "METR",
+          "path": "/knowledge-base/organizations/metr/",
+          "similarity": 22
         }
       ]
     }
@@ -26246,21 +26422,24 @@
     "path": "/knowledge-base/organizations/xai/",
     "filePath": "knowledge-base/organizations/xai.mdx",
     "title": "xAI",
-    "quality": 28,
-    "importance": 22,
+    "quality": 48,
+    "importance": 45,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-12-24",
-    "llmSummary": "xAI, founded by Elon Musk in July 2023, develops Grok LLMs with minimal content restrictions under a 'truth-seeking' philosophy, reaching competitive capabilities (Grok 2 comparable to GPT-4) within ~1 year while building 100K+ GPU infrastructure. The organization presents uncertain safety implications—claiming to address AI risk while pursuing rapid scaling with reduced guardrails compared to competitors.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Comprehensive profile of xAI covering its founding by Elon Musk in 2023, rapid growth to $230B valuation and $3.8B revenue, development of Grok models, and controversial 'truth-seeking' safety approach that has led to incidents like 'MechaHitler' and shutdown resistance behavior.",
     "description": "Elon Musk's AI company developing Grok and pursuing \"maximum truth-seeking AI\"",
     "ratings": {
-      "novelty": 2.5,
-      "rigor": 3,
-      "actionability": 2,
-      "completeness": 4.5
+      "focus": 6.5,
+      "novelty": 3,
+      "rigor": 4,
+      "completeness": 7,
+      "concreteness": 6,
+      "actionability": 2.5,
+      "objectivity": 3.5
     },
     "category": "organizations",
     "subcategory": "labs",
@@ -26270,55 +26449,62 @@
       "governance"
     ],
     "metrics": {
-      "wordCount": 2194,
-      "tableCount": 0,
+      "wordCount": 2249,
+      "tableCount": 2,
       "diagramCount": 0,
-      "internalLinks": 8,
-      "externalLinks": 0,
-      "bulletRatio": 0.67,
-      "sectionCount": 35,
+      "internalLinks": 15,
+      "externalLinks": 13,
+      "bulletRatio": 0.49,
+      "sectionCount": 33,
       "hasOverview": false,
-      "structuralScore": 4
+      "structuralScore": 10
     },
-    "suggestedQuality": 27,
+    "suggestedQuality": 67,
     "updateFrequency": 3,
-    "wordCount": 2194,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
+    "wordCount": 2249,
+    "unconvertedLinks": [
+      {
+        "text": "AI Models Comparison 2025: Claude, Grok, GPT & More",
+        "url": "https://collabnix.com/comparing-top-ai-models-in-2025-claude-grok-gpt-llama-gemini-and-deepseek-the-ultimate-guide/",
+        "resourceId": "7cfc164f6347dd0c",
+        "resourceTitle": "AI Models Comparison 2025: Claude, Grok, GPT & More"
+      }
+    ],
+    "unconvertedLinkCount": 1,
     "convertedLinkCount": 0,
     "backlinkCount": 1,
     "redundancy": {
-      "maxSimilarity": 14,
+      "maxSimilarity": 17,
       "similarPages": [
-        {
-          "id": "anthropic-ipo",
-          "title": "Anthropic IPO",
-          "path": "/knowledge-base/organizations/anthropic-ipo/",
-          "similarity": 14
-        },
         {
           "id": "openai",
           "title": "OpenAI",
           "path": "/knowledge-base/organizations/openai/",
-          "similarity": 14
+          "similarity": 17
         },
         {
           "id": "ssi",
           "title": "Safe Superintelligence Inc (SSI)",
           "path": "/knowledge-base/organizations/ssi/",
-          "similarity": 14
+          "similarity": 17
         },
         {
-          "id": "uk-aisi",
-          "title": "UK AI Safety Institute",
-          "path": "/knowledge-base/organizations/uk-aisi/",
-          "similarity": 14
+          "id": "meta-ai",
+          "title": "Meta AI (FAIR)",
+          "path": "/knowledge-base/organizations/meta-ai/",
+          "similarity": 16
         },
         {
-          "id": "agentic-ai",
-          "title": "Agentic AI",
-          "path": "/knowledge-base/capabilities/agentic-ai/",
-          "similarity": 13
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
+          "similarity": 15
+        },
+        {
+          "id": "anthropic-ipo",
+          "title": "Anthropic IPO",
+          "path": "/knowledge-base/organizations/anthropic-ipo/",
+          "similarity": 15
         }
       ]
     }
@@ -26885,10 +27071,10 @@
           "similarity": 13
         },
         {
-          "id": "meta-ai",
-          "title": "Meta AI (FAIR)",
-          "path": "/knowledge-base/organizations/meta-ai/",
-          "similarity": 13
+          "id": "large-language-models",
+          "title": "Large Language Models",
+          "path": "/knowledge-base/capabilities/large-language-models/",
+          "similarity": 12
         }
       ]
     }
@@ -27702,6 +27888,12 @@
           "similarity": 13
         },
         {
+          "id": "openai",
+          "title": "OpenAI",
+          "path": "/knowledge-base/organizations/openai/",
+          "similarity": 13
+        },
+        {
           "id": "connor-leahy",
           "title": "Connor Leahy",
           "path": "/knowledge-base/people/connor-leahy/",
@@ -27711,12 +27903,6 @@
           "id": "dario-amodei",
           "title": "Dario Amodei",
           "path": "/knowledge-base/people/dario-amodei/",
-          "similarity": 13
-        },
-        {
-          "id": "holden-karnofsky",
-          "title": "Holden Karnofsky",
-          "path": "/knowledge-base/people/holden-karnofsky/",
           "similarity": 13
         }
       ]
@@ -29497,15 +29683,15 @@
           "similarity": 16
         },
         {
-          "id": "lab-behavior",
-          "title": "Lab Behavior & Industry",
-          "path": "/knowledge-base/metrics/lab-behavior/",
-          "similarity": 15
-        },
-        {
           "id": "anthropic-ipo",
           "title": "Anthropic IPO",
           "path": "/knowledge-base/organizations/anthropic-ipo/",
+          "similarity": 15
+        },
+        {
+          "id": "chan-zuckerberg-initiative",
+          "title": "Chan Zuckerberg Initiative",
+          "path": "/knowledge-base/organizations/chan-zuckerberg-initiative/",
           "similarity": 15
         }
       ]
@@ -32315,19 +32501,19 @@
           "id": "failed-stalled-proposals",
           "title": "Failed and Stalled AI Policy Proposals",
           "path": "/knowledge-base/responses/failed-stalled-proposals/",
-          "similarity": 19
+          "similarity": 18
         },
         {
-          "id": "canada-aida",
-          "title": "Canada AIDA",
-          "path": "/knowledge-base/responses/canada-aida/",
+          "id": "us-state-legislation",
+          "title": "US State AI Legislation",
+          "path": "/knowledge-base/responses/us-state-legislation/",
           "similarity": 18
         },
         {
           "id": "colorado-ai-act",
           "title": "Colorado AI Act (SB 205)",
           "path": "/knowledge-base/responses/colorado-ai-act/",
-          "similarity": 18
+          "similarity": 17
         }
       ]
     }
@@ -32418,21 +32604,23 @@
     "path": "/knowledge-base/responses/canada-aida/",
     "filePath": "knowledge-base/responses/canada-aida.mdx",
     "title": "Canada AIDA",
-    "quality": 72,
-    "importance": 68,
+    "quality": 46,
+    "importance": 42,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-12-28",
-    "llmSummary": "Canada's Artificial Intelligence and Data Act (AIDA), introduced June 2022, died in Parliament January 2025 without passage, offering critical lessons on AI governance failure. Key problems included framework legislation deferring definitions to regulations, omnibus bill structure bundling AI with privacy reform, exclusionary consultation (9 of 300+ meetings with civil society), and inability to satisfy either industry (wanted clarity) or civil society (wanted stronger protections), with maximum proposed penalties of CAD $15M/5% revenue and up to 5 years imprisonment.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Comprehensive analysis of Canada's failed Artificial Intelligence and Data Act (AIDA), which died in Parliament in January 2025 after three years of development. Documents specific failure modes including framework legislation problems, exclusionary consultation (9 of 300+ meetings with civil society), and provides scenario analysis with probability estimates for future Canadian AI regulation approaches.",
     "description": "Canada's proposed Artificial Intelligence and Data Act, a comprehensive federal AI regulation that died in Parliament in 2025, offering critical lessons about the challenges of AI governance and the risks of framework legislation approaches.",
     "ratings": {
-      "novelty": 6.2,
-      "rigor": 6.8,
-      "actionability": 7.1,
-      "completeness": 7.5
+      "focus": 4.5,
+      "novelty": 3.2,
+      "rigor": 4.1,
+      "concreteness": 5.8,
+      "actionability": 4.3,
+      "objectivity": 3.8
     },
     "category": "responses",
     "subcategory": "governance-legislation",
@@ -32441,55 +32629,134 @@
       "ai-safety"
     ],
     "metrics": {
-      "wordCount": 4115,
-      "tableCount": 7,
-      "diagramCount": 1,
-      "internalLinks": 26,
-      "externalLinks": 0,
-      "bulletRatio": 0.03,
-      "sectionCount": 32,
+      "wordCount": 3407,
+      "tableCount": 8,
+      "diagramCount": 2,
+      "internalLinks": 15,
+      "externalLinks": 18,
+      "bulletRatio": 0.11,
+      "sectionCount": 35,
       "hasOverview": true,
-      "structuralScore": 11
+      "structuralScore": 15
     },
-    "suggestedQuality": 73,
+    "suggestedQuality": 100,
     "updateFrequency": 7,
-    "wordCount": 4115,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 19,
+    "wordCount": 3407,
+    "unconvertedLinks": [
+      {
+        "text": "Cambridge Data & Policy: Missed Opportunities Analysis",
+        "url": "https://www.cambridge.org/core/journals/data-and-policy/article/missed-opportunities-in-ai-regulation-lessons-from-canadas-ai-and-data-act/5178DE82B270CD41FA3B7ECFC94BF810",
+        "resourceId": "2a2365be0b3f496c",
+        "resourceTitle": "Cambridge Data & Policy Study"
+      },
+      {
+        "text": "McInnes Cooper AIDA Analysis",
+        "url": "https://www.mcinnescooper.com/publications/the-demise-of-the-artificial-intelligence-and-data-act-aida-5-key-lessons/",
+        "resourceId": "d44db02ed7d5d717",
+        "resourceTitle": "McInnes Cooper Key Lessons"
+      },
+      {
+        "text": "Montreal AI Ethics Institute analysis",
+        "url": "https://montrealethics.ai/the-death-of-canadas-artificial-intelligence-and-data-act-what-happened-and-whats-next-for-ai-regulation-in-canada/",
+        "resourceId": "4513a259cfc847a8",
+        "resourceTitle": "Montreal AI Ethics Institute Analysis"
+      },
+      {
+        "text": "Cambridge University study",
+        "url": "https://www.cambridge.org/core/journals/data-and-policy/article/missed-opportunities-in-ai-regulation-lessons-from-canadas-ai-and-data-act/5178DE82B270CD41FA3B7ECFC94BF810",
+        "resourceId": "2a2365be0b3f496c",
+        "resourceTitle": "Cambridge Data & Policy Study"
+      },
+      {
+        "text": "Schwartz Reisman Institute: What's Next After AIDA?",
+        "url": "https://srinstitute.utoronto.ca/news/whats-next-for-aida",
+        "resourceId": "b3259737aa13e1c4",
+        "resourceTitle": "Schwartz Reisman Institute"
+      },
+      {
+        "text": "Schwartz Reisman Institute analysis",
+        "url": "https://srinstitute.utoronto.ca/news/whats-next-for-aida",
+        "resourceId": "b3259737aa13e1c4",
+        "resourceTitle": "Schwartz Reisman Institute"
+      },
+      {
+        "text": "Montreal AI Ethics Institute",
+        "url": "https://montrealethics.ai/the-death-of-canadas-artificial-intelligence-and-data-act-what-happened-and-whats-next-for-ai-regulation-in-canada/",
+        "resourceId": "4513a259cfc847a8",
+        "resourceTitle": "Montreal AI Ethics Institute Analysis"
+      },
+      {
+        "text": "Schwartz Reisman Institute",
+        "url": "https://srinstitute.utoronto.ca/news/whats-next-for-aida",
+        "resourceId": "b3259737aa13e1c4",
+        "resourceTitle": "Schwartz Reisman Institute"
+      },
+      {
+        "text": "McInnes Cooper's analysis",
+        "url": "https://www.mcinnescooper.com/publications/the-demise-of-the-artificial-intelligence-and-data-act-aida-5-key-lessons/",
+        "resourceId": "d44db02ed7d5d717",
+        "resourceTitle": "McInnes Cooper Key Lessons"
+      },
+      {
+        "text": "Cambridge study",
+        "url": "https://www.cambridge.org/core/journals/data-and-policy/article/missed-opportunities-in-ai-regulation-lessons-from-canadas-ai-and-data-act/5178DE82B270CD41FA3B7ECFC94BF810",
+        "resourceId": "2a2365be0b3f496c",
+        "resourceTitle": "Cambridge Data & Policy Study"
+      },
+      {
+        "text": "Montreal AI Ethics Institute",
+        "url": "https://montrealethics.ai/the-death-of-canadas-artificial-intelligence-and-data-act-what-happened-and-whats-next-for-ai-regulation-in-canada/",
+        "resourceId": "4513a259cfc847a8",
+        "resourceTitle": "Montreal AI Ethics Institute Analysis"
+      },
+      {
+        "text": "Cambridge Data & Policy Analysis",
+        "url": "https://www.cambridge.org/core/journals/data-and-policy/article/missed-opportunities-in-ai-regulation-lessons-from-canadas-ai-and-data-act/5178DE82B270CD41FA3B7ECFC94BF810",
+        "resourceId": "2a2365be0b3f496c",
+        "resourceTitle": "Cambridge Data & Policy Study"
+      },
+      {
+        "text": "McInnes Cooper Lessons Analysis",
+        "url": "https://www.mcinnescooper.com/publications/the-demise-of-the-artificial-intelligence-and-data-act-aida-5-key-lessons/",
+        "resourceId": "d44db02ed7d5d717",
+        "resourceTitle": "McInnes Cooper Key Lessons"
+      }
+    ],
+    "unconvertedLinkCount": 13,
+    "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 20,
+      "maxSimilarity": 19,
       "similarPages": [
         {
-          "id": "failed-stalled-proposals",
-          "title": "Failed and Stalled AI Policy Proposals",
-          "path": "/knowledge-base/responses/failed-stalled-proposals/",
-          "similarity": 20
+          "id": "colorado-ai-act",
+          "title": "Colorado AI Act (SB 205)",
+          "path": "/knowledge-base/responses/colorado-ai-act/",
+          "similarity": 19
+        },
+        {
+          "id": "nist-ai-rmf",
+          "title": "NIST AI Risk Management Framework",
+          "path": "/knowledge-base/responses/nist-ai-rmf/",
+          "similarity": 19
         },
         {
           "id": "standards-bodies",
           "title": "AI Standards Bodies",
           "path": "/knowledge-base/responses/standards-bodies/",
-          "similarity": 20
-        },
-        {
-          "id": "coe-ai-convention",
-          "title": "Council of Europe Framework Convention on Artificial Intelligence",
-          "path": "/knowledge-base/responses/coe-ai-convention/",
           "similarity": 19
         },
         {
-          "id": "eu-ai-act",
-          "title": "EU AI Act",
-          "path": "/knowledge-base/responses/eu-ai-act/",
+          "id": "us-state-legislation",
+          "title": "US State AI Legislation",
+          "path": "/knowledge-base/responses/us-state-legislation/",
           "similarity": 19
         },
         {
-          "id": "monitoring",
-          "title": "Compute Monitoring",
-          "path": "/knowledge-base/responses/monitoring/",
-          "similarity": 19
+          "id": "us-aisi",
+          "title": "US AI Safety Institute",
+          "path": "/knowledge-base/organizations/us-aisi/",
+          "similarity": 18
         }
       ]
     }
@@ -32980,21 +33247,24 @@
     "path": "/knowledge-base/responses/china-ai-regulations/",
     "filePath": "knowledge-base/responses/china-ai-regulations.mdx",
     "title": "China AI Regulations",
-    "quality": 60,
-    "importance": 68,
+    "quality": 57,
+    "importance": 72,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-12-28",
-    "llmSummary": "Comprehensive analysis of China's 5+ major AI regulations affecting 50,000+ companies, showing that China's approach prioritizes content control and social stability over capability restrictions, with 1,400+ algorithms registered but limited focus on catastrophic risks until CnAISDA's February 2025 launch. The fundamental differences in regulatory philosophy (socialist values vs individual rights) create significant barriers to international coordination on existential AI risks, though recent bilateral talks and multilateral participation suggest emerging cooperation possibilities.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Comprehensive analysis of China's AI regulatory framework covering 5+ major regulations affecting 50,000+ companies, with enforcement focusing on content control and social stability rather than capability restrictions. Documents China's emerging AI safety engagement through CnAISDA launch in February 2025 and growing international cooperation despite strategic competition barriers.",
     "description": "Comprehensive analysis of China's iterative, sector-specific AI regulatory framework, covering 5+ major regulations affecting 50,000+ companies with enforcement focusing on content control and algorithmic accountability rather than capability restrictions. Examines how China's approach differs from Western models by prioritizing social stability and party control over individual rights, creating challenges for international AI governance coordination on existential risks.",
     "ratings": {
-      "novelty": 4.5,
-      "rigor": 6,
+      "focus": 7.5,
+      "novelty": 4.2,
+      "rigor": 5.8,
+      "completeness": 8,
+      "concreteness": 6.5,
       "actionability": 4.5,
-      "completeness": 7
+      "objectivity": 4
     },
     "category": "responses",
     "subcategory": "governance-legislation",
@@ -33003,55 +33273,176 @@
       "governance"
     ],
     "metrics": {
-      "wordCount": 3638,
-      "tableCount": 6,
+      "wordCount": 3363,
+      "tableCount": 7,
       "diagramCount": 1,
-      "internalLinks": 53,
-      "externalLinks": 0,
-      "bulletRatio": 0.11,
-      "sectionCount": 31,
+      "internalLinks": 11,
+      "externalLinks": 61,
+      "bulletRatio": 0.09,
+      "sectionCount": 37,
       "hasOverview": true,
-      "structuralScore": 11
+      "structuralScore": 14
     },
-    "suggestedQuality": 73,
+    "suggestedQuality": 93,
     "updateFrequency": 7,
-    "wordCount": 3638,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 44,
+    "wordCount": 3363,
+    "unconvertedLinks": [
+      {
+        "text": "Geneva talks in May 2024",
+        "url": "https://carnegieendowment.org/research/2024/08/china-artificial-intelligence-ai-safety-regulation",
+        "resourceId": "d0e36601100c356d",
+        "resourceTitle": "Carnegie Endowment analysis"
+      },
+      {
+        "text": "CnAISDA launched February 2025",
+        "url": "https://carnegieendowment.org/research/2025/06/how-some-of-chinas-top-ai-thinkers-built-their-own-ai-safety-institute?lang=en",
+        "resourceId": "0f17105b7e24c08a",
+        "resourceTitle": "CnAISDA launched February 2025"
+      },
+      {
+        "text": "China's self-described counterpart to AI safety institutes",
+        "url": "https://carnegieendowment.org/research/2025/06/how-some-of-chinas-top-ai-thinkers-built-their-own-ai-safety-institute?lang=en",
+        "resourceId": "0f17105b7e24c08a",
+        "resourceTitle": "CnAISDA launched February 2025"
+      },
+      {
+        "text": "limited public engagement with catastrophic AI risks or existential threats",
+        "url": "https://carnegieendowment.org/research/2024/08/china-artificial-intelligence-ai-safety-regulation",
+        "resourceId": "d0e36601100c356d",
+        "resourceTitle": "Carnegie Endowment analysis"
+      },
+      {
+        "text": "significant barriers to international coordination",
+        "url": "https://carnegieendowment.org/research/2024/08/china-artificial-intelligence-ai-safety-regulation",
+        "resourceId": "d0e36601100c356d",
+        "resourceTitle": "Carnegie Endowment analysis"
+      },
+      {
+        "text": "Strategic competition and trust deficits",
+        "url": "https://www.rand.org/pubs/research_reports/RRA2680-1.html",
+        "resourceId": "0532c540957038e6",
+        "resourceTitle": "RAND"
+      },
+      {
+        "text": "Emerging (CnAISDA 2025)",
+        "url": "https://carnegieendowment.org/research/2025/06/how-some-of-chinas-top-ai-thinkers-built-their-own-ai-safety-institute?lang=en",
+        "resourceId": "0f17105b7e24c08a",
+        "resourceTitle": "CnAISDA launched February 2025"
+      },
+      {
+        "text": "November 2024 Biden-Xi agreement",
+        "url": "https://www.sandia.gov/app/uploads/sites/148/2025/04/Challenges-and-Opportunities-for-US-China-Collaboration-on-Artificial-Intelligence-Governance.pdf",
+        "resourceId": "331246d11298126e",
+        "resourceTitle": "Sandia National Labs: US-China AI Collaboration Challenges"
+      },
+      {
+        "text": "UN General Assembly resolution 'Enhancing International Cooperation on Capacity-building of Artificial Intelligence'",
+        "url": "https://www.techpolicy.press/from-competition-to-cooperation-can-uschina-engagement-overcome-geopolitical-barriers-in-ai-governance/",
+        "resourceId": "8de95bad7d533f03",
+        "resourceTitle": "called for explicit US-China collaboration"
+      },
+      {
+        "text": "Ramping up rapidly",
+        "url": "https://carnegieendowment.org/research/2024/08/china-artificial-intelligence-ai-safety-regulation",
+        "resourceId": "d0e36601100c356d",
+        "resourceTitle": "Carnegie Endowment analysis"
+      },
+      {
+        "text": "Chinese scientists have been ramping up technical research",
+        "url": "https://carnegieendowment.org/research/2024/08/china-artificial-intelligence-ai-safety-regulation",
+        "resourceId": "d0e36601100c356d",
+        "resourceTitle": "Carnegie Endowment analysis"
+      },
+      {
+        "text": "relatively little safety work has been published by China's leading AI companies",
+        "url": "https://carnegieendowment.org/research/2024/08/china-artificial-intelligence-ai-safety-regulation",
+        "resourceId": "d0e36601100c356d",
+        "resourceTitle": "Carnegie Endowment analysis"
+      },
+      {
+        "text": "decentralized network",
+        "url": "https://carnegieendowment.org/research/2025/06/how-some-of-chinas-top-ai-thinkers-built-their-own-ai-safety-institute?lang=en",
+        "resourceId": "0f17105b7e24c08a",
+        "resourceTitle": "CnAISDA launched February 2025"
+      },
+      {
+        "text": "TC260 National Information Security Standardization",
+        "url": "https://carnegieendowment.org/research/2024/08/china-artificial-intelligence-ai-safety-regulation",
+        "resourceId": "d0e36601100c356d",
+        "resourceTitle": "Carnegie Endowment analysis"
+      },
+      {
+        "text": "17 companies sign AI Safety Commitments",
+        "url": "https://carnegieendowment.org/research/2025/06/how-some-of-chinas-top-ai-thinkers-built-their-own-ai-safety-institute?lang=en",
+        "resourceId": "0f17105b7e24c08a",
+        "resourceTitle": "CnAISDA launched February 2025"
+      },
+      {
+        "text": "CnAISDA launched",
+        "url": "https://carnegieendowment.org/research/2025/06/how-some-of-chinas-top-ai-thinkers-built-their-own-ai-safety-institute?lang=en",
+        "resourceId": "0f17105b7e24c08a",
+        "resourceTitle": "CnAISDA launched February 2025"
+      },
+      {
+        "text": "Trump administration's uncertain position",
+        "url": "https://www.sandia.gov/app/uploads/sites/148/2025/04/Challenges-and-Opportunities-for-US-China-Collaboration-on-Artificial-Intelligence-Governance.pdf",
+        "resourceId": "331246d11298126e",
+        "resourceTitle": "Sandia National Labs: US-China AI Collaboration Challenges"
+      },
+      {
+        "text": "How Some of China's Top AI Thinkers Built Their Own AI Safety Institute",
+        "url": "https://carnegieendowment.org/research/2025/06/how-some-of-chinas-top-ai-thinkers-built-their-own-ai-safety-institute?lang=en",
+        "resourceId": "0f17105b7e24c08a",
+        "resourceTitle": "CnAISDA launched February 2025"
+      },
+      {
+        "text": "Challenges and Opportunities for US-China AI Collaboration",
+        "url": "https://www.sandia.gov/app/uploads/sites/148/2025/04/Challenges-and-Opportunities-for-US-China-Collaboration-on-Artificial-Intelligence-Governance.pdf",
+        "resourceId": "331246d11298126e",
+        "resourceTitle": "Sandia National Labs: US-China AI Collaboration Challenges"
+      },
+      {
+        "text": "From Competition to Cooperation: US-China AI Governance",
+        "url": "https://www.techpolicy.press/from-competition-to-cooperation-can-uschina-engagement-overcome-geopolitical-barriers-in-ai-governance/",
+        "resourceId": "8de95bad7d533f03",
+        "resourceTitle": "called for explicit US-China collaboration"
+      }
+    ],
+    "unconvertedLinkCount": 20,
+    "convertedLinkCount": 0,
     "backlinkCount": 1,
     "redundancy": {
-      "maxSimilarity": 23,
+      "maxSimilarity": 18,
       "similarPages": [
         {
           "id": "us-aisi",
           "title": "US AI Safety Institute",
           "path": "/knowledge-base/organizations/us-aisi/",
-          "similarity": 23
+          "similarity": 18
         },
         {
-          "id": "international-regimes",
-          "title": "International Compute Regimes",
-          "path": "/knowledge-base/responses/international-regimes/",
-          "similarity": 22
+          "id": "canada-aida",
+          "title": "Canada AIDA",
+          "path": "/knowledge-base/responses/canada-aida/",
+          "similarity": 18
+        },
+        {
+          "id": "colorado-ai-act",
+          "title": "Colorado AI Act (SB 205)",
+          "path": "/knowledge-base/responses/colorado-ai-act/",
+          "similarity": 18
         },
         {
           "id": "coordination-mechanisms",
           "title": "International Coordination Mechanisms",
           "path": "/knowledge-base/responses/coordination-mechanisms/",
-          "similarity": 21
+          "similarity": 18
         },
         {
-          "id": "failed-stalled-proposals",
-          "title": "Failed and Stalled AI Policy Proposals",
-          "path": "/knowledge-base/responses/failed-stalled-proposals/",
-          "similarity": 21
-        },
-        {
-          "id": "monitoring",
-          "title": "Compute Monitoring",
-          "path": "/knowledge-base/responses/monitoring/",
-          "similarity": 21
+          "id": "international-regimes",
+          "title": "International Compute Regimes",
+          "path": "/knowledge-base/responses/international-regimes/",
+          "similarity": 18
         }
       ]
     }
@@ -33328,18 +33719,6 @@
           "similarity": 19
         },
         {
-          "id": "canada-aida",
-          "title": "Canada AIDA",
-          "path": "/knowledge-base/responses/canada-aida/",
-          "similarity": 19
-        },
-        {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 19
-        },
-        {
           "id": "colorado-ai-act",
           "title": "Colorado AI Act (SB 205)",
           "path": "/knowledge-base/responses/colorado-ai-act/",
@@ -33350,6 +33729,18 @@
           "title": "EU AI Act",
           "path": "/knowledge-base/responses/eu-ai-act/",
           "similarity": 19
+        },
+        {
+          "id": "standards-bodies",
+          "title": "AI Standards Bodies",
+          "path": "/knowledge-base/responses/standards-bodies/",
+          "similarity": 19
+        },
+        {
+          "id": "frontier-model-forum",
+          "title": "Frontier Model Forum",
+          "path": "/knowledge-base/organizations/frontier-model-forum/",
+          "similarity": 18
         }
       ]
     }
@@ -33440,21 +33831,24 @@
     "path": "/knowledge-base/responses/colorado-ai-act/",
     "filePath": "knowledge-base/responses/colorado-ai-act.mdx",
     "title": "Colorado AI Act (SB 205)",
-    "quality": 70,
-    "importance": 72,
+    "quality": 53,
+    "importance": 62,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-12-28",
-    "llmSummary": "Colorado's SB 205, effective June 2026, is the first comprehensive US state AI regulation targeting high-risk systems in 8 consequential decision domains (employment, housing, healthcare, etc.), with penalties up to $20,000 per violation per affected consumer. The law requires annual impact assessments, NIST AI RMF alignment for affirmative defense, and serves as a template for 5-10 other states, though faces federal challenge via December 2025 Trump executive order.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Colorado's AI Act (SB 205) is the first comprehensive US state AI regulation targeting algorithmic discrimination in employment, housing, and other consequential decisions, with enforcement beginning June 2026 and penalties up to $20,000 per violation. The law faces federal challenge via Trump's December 2025 executive order directing DOJ litigation, while serving as a template for 5-10 other states considering similar legislation.",
     "description": "First comprehensive US state AI regulation focused on high-risk systems in consequential decisions like employment and housing. Enforcement begins June 2026 with penalties up to $20,000 per violation. The law covers 12+ protected characteristics and requires annual impact assessments, serving as a template for 5-10 other states considering similar legislation.",
     "ratings": {
-      "novelty": 5.5,
-      "rigor": 7,
-      "actionability": 7.5,
-      "completeness": 8
+      "focus": 6.5,
+      "novelty": 3.5,
+      "rigor": 4,
+      "completeness": 7,
+      "concreteness": 6,
+      "actionability": 5.5,
+      "objectivity": 3.5
     },
     "category": "responses",
     "subcategory": "governance-legislation",
@@ -33463,30 +33857,103 @@
       "ai-safety"
     ],
     "metrics": {
-      "wordCount": 2903,
-      "tableCount": 9,
-      "diagramCount": 0,
-      "internalLinks": 56,
-      "externalLinks": 0,
-      "bulletRatio": 0.14,
-      "sectionCount": 31,
+      "wordCount": 3873,
+      "tableCount": 13,
+      "diagramCount": 2,
+      "internalLinks": 14,
+      "externalLinks": 65,
+      "bulletRatio": 0.1,
+      "sectionCount": 40,
       "hasOverview": true,
-      "structuralScore": 10
+      "structuralScore": 15
     },
-    "suggestedQuality": 67,
+    "suggestedQuality": 100,
     "updateFrequency": 7,
-    "wordCount": 2903,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 44,
+    "wordCount": 3873,
+    "unconvertedLinks": [
+      {
+        "text": "Colorado Attorney General",
+        "url": "https://coag.gov/ai/",
+        "resourceId": "35aa12c9e0592b30",
+        "resourceTitle": "Colorado Attorney General"
+      },
+      {
+        "text": "Colorado AI Act (SB 24-205)",
+        "url": "https://leg.colorado.gov/bills/sb24-205",
+        "resourceId": "886f3fed50ae776d",
+        "resourceTitle": "Colorado AI Act (SB 24-205)"
+      },
+      {
+        "text": "Colorado protects 12+ characteristics",
+        "url": "https://www.naag.org/attorney-general-journal/a-deep-dive-into-colorados-artificial-intelligence-act/",
+        "resourceId": "b88e8e908d1d81a3",
+        "resourceTitle": "Affirmative defense"
+      },
+      {
+        "text": "Annual transparency reports",
+        "url": "https://iapp.org/news/a/the-colorado-ai-act-what-you-need-to-know",
+        "resourceId": "8043aa268070571b",
+        "resourceTitle": "comprehensive documentation and transparency requirements"
+      },
+      {
+        "text": "Deployers with fewer than 50 full-time employees",
+        "url": "https://iapp.org/news/a/the-colorado-ai-act-what-you-need-to-know",
+        "resourceId": "8043aa268070571b",
+        "resourceTitle": "comprehensive documentation and transparency requirements"
+      },
+      {
+        "text": "Colorado Attorney General holds exclusive enforcement authority",
+        "url": "https://coag.gov/ai/",
+        "resourceId": "35aa12c9e0592b30",
+        "resourceTitle": "Colorado Attorney General"
+      },
+      {
+        "text": "EU AI Act",
+        "url": "https://artificialintelligenceact.eu/",
+        "resourceId": "1ad6dc89cded8b0c",
+        "resourceTitle": "EU AI Act"
+      },
+      {
+        "text": "Colorado AG Office",
+        "url": "https://coag.gov/ai/",
+        "resourceId": "35aa12c9e0592b30",
+        "resourceTitle": "Colorado Attorney General"
+      },
+      {
+        "text": "Colorado Anti-Discrimination in AI Law (ADAI) Rulemaking",
+        "url": "https://coag.gov/ai/",
+        "resourceId": "35aa12c9e0592b30",
+        "resourceTitle": "Colorado Attorney General"
+      },
+      {
+        "text": "A Deep Dive into Colorado's Artificial Intelligence Act",
+        "url": "https://www.naag.org/attorney-general-journal/a-deep-dive-into-colorados-artificial-intelligence-act/",
+        "resourceId": "b88e8e908d1d81a3",
+        "resourceTitle": "Affirmative defense"
+      },
+      {
+        "text": "The Colorado AI Act: What You Need to Know",
+        "url": "https://iapp.org/news/a/the-colorado-ai-act-what-you-need-to-know",
+        "resourceId": "8043aa268070571b",
+        "resourceTitle": "comprehensive documentation and transparency requirements"
+      }
+    ],
+    "unconvertedLinkCount": 11,
+    "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 21,
+      "maxSimilarity": 23,
       "similarPages": [
         {
           "id": "us-state-legislation",
           "title": "US State AI Legislation",
           "path": "/knowledge-base/responses/us-state-legislation/",
+          "similarity": 23
+        },
+        {
+          "id": "texas-traiga",
+          "title": "Texas TRAIGA Responsible AI Governance Act",
+          "path": "/knowledge-base/responses/texas-traiga/",
           "similarity": 21
         },
         {
@@ -33496,21 +33963,15 @@
           "similarity": 20
         },
         {
-          "id": "failed-stalled-proposals",
-          "title": "Failed and Stalled AI Policy Proposals",
-          "path": "/knowledge-base/responses/failed-stalled-proposals/",
+          "id": "effectiveness-assessment",
+          "title": "Policy Effectiveness Assessment",
+          "path": "/knowledge-base/responses/effectiveness-assessment/",
           "similarity": 20
         },
         {
           "id": "new-york-raise-act",
           "title": "New York RAISE Act",
           "path": "/knowledge-base/responses/new-york-raise-act/",
-          "similarity": 20
-        },
-        {
-          "id": "nist-ai-rmf",
-          "title": "NIST AI Risk Management Framework",
-          "path": "/knowledge-base/responses/nist-ai-rmf/",
           "similarity": 20
         }
       ]
@@ -33759,12 +34220,6 @@
           "similarity": 19
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 17
-        },
-        {
           "id": "us-executive-order",
           "title": "US Executive Order on AI",
           "path": "/knowledge-base/responses/us-executive-order/",
@@ -33774,6 +34229,12 @@
           "id": "authoritarian-tools-diffusion",
           "title": "Authoritarian Tools Diffusion Model",
           "path": "/knowledge-base/models/authoritarian-tools-diffusion/",
+          "similarity": 16
+        },
+        {
+          "id": "us-aisi",
+          "title": "US AI Safety Institute",
+          "path": "/knowledge-base/organizations/us-aisi/",
           "similarity": 16
         }
       ]
@@ -34318,10 +34779,10 @@
           "similarity": 21
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 21
+          "id": "pause",
+          "title": "Pause Advocacy",
+          "path": "/knowledge-base/responses/pause/",
+          "similarity": 20
         }
       ]
     }
@@ -34597,9 +35058,9 @@
           "similarity": 19
         },
         {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
+          "id": "voluntary-commitments",
+          "title": "Voluntary Industry Commitments",
+          "path": "/knowledge-base/responses/voluntary-commitments/",
           "similarity": 19
         }
       ]
@@ -34757,12 +35218,6 @@
           "similarity": 17
         },
         {
-          "id": "openai",
-          "title": "OpenAI",
-          "path": "/knowledge-base/organizations/openai/",
-          "similarity": 15
-        },
-        {
           "id": "rsp",
           "title": "Responsible Scaling Policies",
           "path": "/knowledge-base/responses/rsp/",
@@ -34778,6 +35233,12 @@
           "id": "agi-development",
           "title": "AGI Development",
           "path": "/knowledge-base/forecasting/agi-development/",
+          "similarity": 14
+        },
+        {
+          "id": "warning-signs-model",
+          "title": "Warning Signs Model",
+          "path": "/knowledge-base/models/warning-signs-model/",
           "similarity": 14
         }
       ]
@@ -35582,14 +36043,8 @@
     "convertedLinkCount": 67,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 19,
+      "maxSimilarity": 18,
       "similarPages": [
-        {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 19
-        },
         {
           "id": "epistemic-infrastructure",
           "title": "Epistemic Infrastructure",
@@ -35606,6 +36061,12 @@
           "id": "failed-stalled-proposals",
           "title": "Failed and Stalled AI Policy Proposals",
           "path": "/knowledge-base/responses/failed-stalled-proposals/",
+          "similarity": 18
+        },
+        {
+          "id": "nist-ai-rmf",
+          "title": "NIST AI Risk Management Framework",
+          "path": "/knowledge-base/responses/nist-ai-rmf/",
           "similarity": 18
         },
         {
@@ -35836,21 +36297,24 @@
     "path": "/knowledge-base/responses/effectiveness-assessment/",
     "filePath": "knowledge-base/responses/effectiveness-assessment.mdx",
     "title": "Policy Effectiveness Assessment",
-    "quality": 71,
-    "importance": 82,
+    "quality": 64,
+    "importance": 78,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-12-28",
-    "llmSummary": "Systematic analysis of AI governance policy effectiveness finds compute thresholds achieve 60-85% compliance while voluntary commitments show less than 30% substantive behavioral change, but only 15-20% of policies have measurable outcome data and fewer than 20% of evaluations meet moderate evidence standards, creating a critical gap in understanding what actually reduces AI risk.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Comprehensive analysis of AI governance policy effectiveness finds compute thresholds and export controls achieve 60-75% compliance while voluntary commitments show <30% behavioral change, but only 15-20% of AI policies have measurable outcome data. Critical evidence gaps limit understanding of what actually works in AI governance.",
     "description": "Comprehensive analysis of AI governance policy effectiveness, revealing that compute thresholds and export controls achieve moderate success (60-70% compliance) while voluntary commitments lag significantly, with critical gaps in evaluation methodology and evidence base limiting our understanding of what actually works in AI governance.",
     "ratings": {
-      "novelty": 6.5,
-      "rigor": 7,
-      "actionability": 7.5,
-      "completeness": 7
+      "focus": 7.2,
+      "novelty": 5.8,
+      "rigor": 6.1,
+      "completeness": 7.5,
+      "concreteness": 6.9,
+      "actionability": 6.3,
+      "objectivity": 5.4
     },
     "category": "responses",
     "subcategory": "governance",
@@ -35859,19 +36323,19 @@
       "governance"
     ],
     "metrics": {
-      "wordCount": 3995,
-      "tableCount": 5,
+      "wordCount": 4001,
+      "tableCount": 9,
       "diagramCount": 1,
-      "internalLinks": 40,
-      "externalLinks": 29,
-      "bulletRatio": 0.07,
-      "sectionCount": 27,
+      "internalLinks": 31,
+      "externalLinks": 42,
+      "bulletRatio": 0.04,
+      "sectionCount": 34,
       "hasOverview": true,
       "structuralScore": 14
     },
     "suggestedQuality": 93,
     "updateFrequency": 21,
-    "wordCount": 3995,
+    "wordCount": 4001,
     "unconvertedLinks": [
       {
         "text": "Commerce testimony",
@@ -35904,59 +36368,59 @@
         "resourceTitle": "AI Lab Watch: Commitments Tracker"
       },
       {
-        "text": "AI Lab Watch",
-        "url": "https://ailabwatch.org/resources/commitments",
-        "resourceId": "91ca6b1425554e9a",
-        "resourceTitle": "AI Lab Watch: Commitments Tracker"
+        "text": "Future of Life Institute's 2025 AI Safety Index",
+        "url": "https://futureoflife.org/ai-safety-index-summer-2025/",
+        "resourceId": "df46edd6fa2078d1",
+        "resourceTitle": "FLI AI Safety Index Summer 2025"
       },
       {
-        "text": "EU Commission",
+        "text": "European Commission",
         "url": "https://artificialintelligenceact.eu/",
         "resourceId": "1ad6dc89cded8b0c",
         "resourceTitle": "EU AI Act"
       },
       {
-        "text": "workarounds proliferate",
-        "url": "https://www.cnas.org/publications/commentary/cnas-insights-the-export-control-loophole-fueling-chinas-chip-production",
-        "resourceId": "d4b21e7c09bed367",
-        "resourceTitle": "CNAS"
+        "text": "Oxford Academic research (2024)",
+        "url": "https://academic.oup.com/ia/article/101/4/1483/8141294",
+        "resourceId": "bb6ddef6704acd21",
+        "resourceTitle": "Proposal for international AI agency"
       }
     ],
     "unconvertedLinkCount": 8,
-    "convertedLinkCount": 27,
+    "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 23,
+      "maxSimilarity": 21,
       "similarPages": [
         {
           "id": "voluntary-commitments",
           "title": "Voluntary Industry Commitments",
           "path": "/knowledge-base/responses/voluntary-commitments/",
-          "similarity": 23
+          "similarity": 21
         },
         {
           "id": "ai-safety-institutes",
           "title": "AI Safety Institutes",
           "path": "/knowledge-base/responses/ai-safety-institutes/",
-          "similarity": 22
+          "similarity": 20
         },
         {
-          "id": "export-controls",
-          "title": "AI Chip Export Controls",
-          "path": "/knowledge-base/responses/export-controls/",
-          "similarity": 22
+          "id": "colorado-ai-act",
+          "title": "Colorado AI Act (SB 205)",
+          "path": "/knowledge-base/responses/colorado-ai-act/",
+          "similarity": 20
         },
         {
           "id": "failed-stalled-proposals",
           "title": "Failed and Stalled AI Policy Proposals",
           "path": "/knowledge-base/responses/failed-stalled-proposals/",
-          "similarity": 22
+          "similarity": 20
         },
         {
-          "id": "thresholds",
-          "title": "Compute Thresholds",
-          "path": "/knowledge-base/responses/thresholds/",
-          "similarity": 22
+          "id": "nist-ai-rmf",
+          "title": "NIST AI Risk Management Framework",
+          "path": "/knowledge-base/responses/nist-ai-rmf/",
+          "similarity": 20
         }
       ]
     }
@@ -36595,27 +37059,27 @@
           "similarity": 19
         },
         {
-          "id": "canada-aida",
-          "title": "Canada AIDA",
-          "path": "/knowledge-base/responses/canada-aida/",
-          "similarity": 19
-        },
-        {
           "id": "coe-ai-convention",
           "title": "Council of Europe Framework Convention on Artificial Intelligence",
           "path": "/knowledge-base/responses/coe-ai-convention/",
           "similarity": 19
         },
         {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
-          "similarity": 19
-        },
-        {
           "id": "california-sb53",
           "title": "California SB 53",
           "path": "/knowledge-base/responses/california-sb53/",
+          "similarity": 18
+        },
+        {
+          "id": "failed-stalled-proposals",
+          "title": "Failed and Stalled AI Policy Proposals",
+          "path": "/knowledge-base/responses/failed-stalled-proposals/",
+          "similarity": 18
+        },
+        {
+          "id": "international-regimes",
+          "title": "International Compute Regimes",
+          "path": "/knowledge-base/responses/international-regimes/",
           "similarity": 18
         }
       ]
@@ -37611,21 +38075,21 @@
           "similarity": 22
         },
         {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
-          "similarity": 22
-        },
-        {
           "id": "international-regimes",
           "title": "International Compute Regimes",
           "path": "/knowledge-base/responses/international-regimes/",
           "similarity": 21
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
+          "id": "international-summits",
+          "title": "International AI Safety Summits",
+          "path": "/knowledge-base/responses/international-summits/",
+          "similarity": 20
+        },
+        {
+          "id": "thresholds",
+          "title": "Compute Thresholds",
+          "path": "/knowledge-base/responses/thresholds/",
           "similarity": 20
         }
       ]
@@ -37636,21 +38100,24 @@
     "path": "/knowledge-base/responses/failed-stalled-proposals/",
     "filePath": "knowledge-base/responses/failed-stalled-proposals.mdx",
     "title": "Failed and Stalled AI Policy Proposals",
-    "quality": 70,
-    "importance": 74,
+    "quality": 63,
+    "importance": 72,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-12-28",
-    "llmSummary": "Analysis of failed AI legislation reveals systematic patterns: 150+ bills introduced in 118th Congress with zero passing, while industry lobbying increased 141% YoY (648 companies, $11.5M Big Tech spending). Comprehensive frameworks consistently fail while incremental, sectoral approaches show 30-60% passage rates; voluntary frameworks serve as stepping stones but require catalyzing events for mandatory regulation.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Analysis of AI policy failures reveals systematic patterns: 150+ federal bills with 0% passage rate, industry lobbying up 141% YoY to 648 companies, and 97% public support for AI safety rules versus minimal binding regulation. Comprehensive frameworks fail at ~5% rate while incremental transparency approaches succeed at 35-60% rates.",
     "description": "Analysis of failed AI governance initiatives reveals systematic patterns including industry opposition spending $61.5M from Big Tech alone in 2024 (up 13% YoY), definitional challenges, jurisdictional complexity, and fundamental mismatches between technology development speed and legislative cycles. The 118th Congress introduced over 150 AI bills with zero becoming law. While comprehensive frameworks like California's SB 1047 face vetoes, incremental approaches with industry support show higher success rates.",
     "ratings": {
-      "novelty": 6.2,
-      "rigor": 7.1,
-      "actionability": 6.8,
-      "completeness": 6.5
+      "focus": 7.2,
+      "novelty": 4.1,
+      "rigor": 5.8,
+      "completeness": 7.5,
+      "concreteness": 6.9,
+      "actionability": 5.4,
+      "objectivity": 4.2
     },
     "category": "responses",
     "subcategory": "governance-legislation",
@@ -37659,55 +38126,230 @@
       "governance"
     ],
     "metrics": {
-      "wordCount": 3684,
-      "tableCount": 4,
-      "diagramCount": 1,
-      "internalLinks": 45,
-      "externalLinks": 0,
+      "wordCount": 4912,
+      "tableCount": 5,
+      "diagramCount": 2,
+      "internalLinks": 24,
+      "externalLinks": 114,
       "bulletRatio": 0,
-      "sectionCount": 20,
+      "sectionCount": 30,
       "hasOverview": true,
-      "structuralScore": 11
+      "structuralScore": 15
     },
-    "suggestedQuality": 73,
+    "suggestedQuality": 100,
     "updateFrequency": 7,
-    "wordCount": 3684,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 28,
+    "wordCount": 4912,
+    "unconvertedLinks": [
+      {
+        "text": "AI companies collectively spent \\$2.71 million on lobbying in 2024, four times their 2023 spending",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "Gallup polling from May 2025 found 97% of Americans agree AI safety should be subject to rules and regulations",
+        "url": "https://news.gallup.com/poll/694685/americans-prioritize-safety-data-security.aspx",
+        "resourceId": "f8ef272a6749158b",
+        "resourceTitle": "Gallup AI Safety Poll"
+      },
+      {
+        "text": "577% increase in OpenAI's lobbying spend to \\$1.76 million in 2024",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "Anthropic more than doubled its spending to \\$720,000",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "State versus federal tensions proved particularly problematic for SB 1047",
+        "url": "https://www.gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf",
+        "resourceId": "604c3963cf77f0fe",
+        "resourceTitle": "veto statement"
+      },
+      {
+        "text": "Governor Newsom vetoed the bill on September 29, 2024",
+        "url": "https://www.gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf",
+        "resourceId": "604c3963cf77f0fe",
+        "resourceTitle": "veto statement"
+      },
+      {
+        "text": "veto message highlighted several critical vulnerabilities",
+        "url": "https://www.gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf",
+        "resourceId": "604c3963cf77f0fe",
+        "resourceTitle": "veto statement"
+      },
+      {
+        "text": "Combined AI company lobbying reached \\$2.71 million in 2024, four times their 2023 spending",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "\\$260K",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "\\$1.76M",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "\\$280K",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "\\$720K",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "\\$40K",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "\\$130K",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "four times their 2023 levels by 2024",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "Academic research on AI safety and regulatory capture published in 2025",
+        "url": "https://link.springer.com/article/10.1007/s00146-025-02534-0",
+        "resourceId": "6879cecd935a2b0c",
+        "resourceTitle": "analysis in AI & Society"
+      },
+      {
+        "text": "Gallup polling from May 2025 found 97% of Americans agree AI safety should be subject to rules and regulations",
+        "url": "https://news.gallup.com/poll/694685/americans-prioritize-safety-data-security.aspx",
+        "resourceId": "f8ef272a6749158b",
+        "resourceTitle": "Gallup AI Safety Poll"
+      },
+      {
+        "text": "majority-level support across all key subgroups including 88% of Democrats and 79% of Republicans and independents",
+        "url": "https://news.gallup.com/poll/694685/americans-prioritize-safety-data-security.aspx",
+        "resourceId": "f8ef272a6749158b",
+        "resourceTitle": "Gallup AI Safety Poll"
+      },
+      {
+        "text": "SB 1047",
+        "url": "https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202320240SB1047",
+        "resourceId": "9f90a50d63c2f1eb",
+        "resourceTitle": "Senate Bill 1047"
+      },
+      {
+        "text": "Colorado AI Act",
+        "url": "https://leg.colorado.gov/bills/sb24-205",
+        "resourceId": "886f3fed50ae776d",
+        "resourceTitle": "Colorado AI Act (SB 24-205)"
+      },
+      {
+        "text": "Biden AI EO",
+        "url": "https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/",
+        "resourceId": "59118f0c5d534110",
+        "resourceTitle": "Biden Administration AI Executive Order 14110"
+      },
+      {
+        "text": "NIST AI RMF",
+        "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+        "resourceId": "54dbc15413425997",
+        "resourceTitle": "NIST AI Risk Management Framework"
+      },
+      {
+        "text": "Biden AI Executive Order of October 2023",
+        "url": "https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/",
+        "resourceId": "59118f0c5d534110",
+        "resourceTitle": "Biden Administration AI Executive Order 14110"
+      },
+      {
+        "text": "97% public support for AI safety rules",
+        "url": "https://news.gallup.com/poll/694685/americans-prioritize-safety-data-security.aspx",
+        "resourceId": "f8ef272a6749158b",
+        "resourceTitle": "Gallup AI Safety Poll"
+      },
+      {
+        "text": "AI companies upped their federal lobbying spend in 2024",
+        "url": "https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/",
+        "resourceId": "744679038d159602",
+        "resourceTitle": "Anthropic more than doubled its spending from $280,000 to $720,000"
+      },
+      {
+        "text": "Americans Prioritize AI Safety and Data Security",
+        "url": "https://news.gallup.com/poll/694685/americans-prioritize-safety-data-security.aspx",
+        "resourceId": "f8ef272a6749158b",
+        "resourceTitle": "Gallup AI Safety Poll"
+      },
+      {
+        "text": "SB 1047 Veto Message",
+        "url": "https://www.gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf",
+        "resourceId": "604c3963cf77f0fe",
+        "resourceTitle": "veto statement"
+      },
+      {
+        "text": "AI safety and regulatory capture",
+        "url": "https://link.springer.com/article/10.1007/s00146-025-02534-0",
+        "resourceId": "6879cecd935a2b0c",
+        "resourceTitle": "analysis in AI & Society"
+      },
+      {
+        "text": "Executive Order on AI",
+        "url": "https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/",
+        "resourceId": "59118f0c5d534110",
+        "resourceTitle": "Biden Administration AI Executive Order 14110"
+      }
+    ],
+    "unconvertedLinkCount": 29,
+    "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 23,
+      "maxSimilarity": 22,
       "similarPages": [
+        {
+          "id": "us-state-legislation",
+          "title": "US State AI Legislation",
+          "path": "/knowledge-base/responses/us-state-legislation/",
+          "similarity": 22
+        },
+        {
+          "id": "international-regimes",
+          "title": "International Compute Regimes",
+          "path": "/knowledge-base/responses/international-regimes/",
+          "similarity": 21
+        },
         {
           "id": "international-summits",
           "title": "International AI Safety Summits",
           "path": "/knowledge-base/responses/international-summits/",
-          "similarity": 23
-        },
-        {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
-          "similarity": 22
-        },
-        {
-          "id": "voluntary-commitments",
-          "title": "Voluntary Industry Commitments",
-          "path": "/knowledge-base/responses/voluntary-commitments/",
-          "similarity": 22
-        },
-        {
-          "id": "us-aisi",
-          "title": "US AI Safety Institute",
-          "path": "/knowledge-base/organizations/us-aisi/",
           "similarity": 21
         },
         {
-          "id": "ai-safety-institutes",
-          "title": "AI Safety Institutes",
-          "path": "/knowledge-base/responses/ai-safety-institutes/",
-          "similarity": 21
+          "id": "structural-risks",
+          "title": "Structural Risk Cruxes",
+          "path": "/knowledge-base/cruxes/structural-risks/",
+          "similarity": 20
+        },
+        {
+          "id": "authoritarian-tools-diffusion",
+          "title": "Authoritarian Tools Diffusion Model",
+          "path": "/knowledge-base/models/authoritarian-tools-diffusion/",
+          "similarity": 20
         }
       ]
     }
@@ -38464,15 +39106,15 @@
           "similarity": 15
         },
         {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
-          "similarity": 15
-        },
-        {
           "id": "export-controls",
           "title": "AI Chip Export Controls",
           "path": "/knowledge-base/responses/export-controls/",
+          "similarity": 15
+        },
+        {
+          "id": "thresholds",
+          "title": "Compute Thresholds",
+          "path": "/knowledge-base/responses/thresholds/",
           "similarity": 15
         }
       ]
@@ -38558,12 +39200,6 @@
           "similarity": 16
         },
         {
-          "id": "nist-ai-rmf",
-          "title": "NIST AI Risk Management Framework",
-          "path": "/knowledge-base/responses/nist-ai-rmf/",
-          "similarity": 16
-        },
-        {
           "id": "scalable-oversight",
           "title": "Scalable Oversight",
           "path": "/knowledge-base/responses/scalable-oversight/",
@@ -38574,6 +39210,12 @@
           "title": "Automation Bias",
           "path": "/knowledge-base/risks/automation-bias/",
           "similarity": 16
+        },
+        {
+          "id": "power-seeking-conditions",
+          "title": "Power-Seeking Emergence Conditions Model",
+          "path": "/knowledge-base/models/power-seeking-conditions/",
+          "similarity": 15
         }
       ]
     }
@@ -38633,12 +39275,6 @@
           "similarity": 24
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 22
-        },
-        {
           "id": "coordination-mechanisms",
           "title": "International Coordination Mechanisms",
           "path": "/knowledge-base/responses/coordination-mechanisms/",
@@ -38654,6 +39290,12 @@
           "id": "authoritarian-tools-diffusion",
           "title": "Authoritarian Tools Diffusion Model",
           "path": "/knowledge-base/models/authoritarian-tools-diffusion/",
+          "similarity": 21
+        },
+        {
+          "id": "us-aisi",
+          "title": "US AI Safety Institute",
+          "path": "/knowledge-base/organizations/us-aisi/",
           "similarity": 21
         }
       ]
@@ -40657,15 +41299,15 @@
           "similarity": 21
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
+          "id": "thresholds",
+          "title": "Compute Thresholds",
+          "path": "/knowledge-base/responses/thresholds/",
           "similarity": 21
         },
         {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
+          "id": "voluntary-commitments",
+          "title": "Voluntary Industry Commitments",
+          "path": "/knowledge-base/responses/voluntary-commitments/",
           "similarity": 21
         }
       ]
@@ -40906,21 +41548,24 @@
     "path": "/knowledge-base/responses/nist-ai-rmf/",
     "filePath": "knowledge-base/responses/nist-ai-rmf.mdx",
     "title": "NIST AI Risk Management Framework",
-    "quality": 54,
+    "quality": 60,
     "importance": 62,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-12-28",
-    "llmSummary": "The NIST AI RMF achieves 40-60% Fortune 500 adoption and mandatory federal use through EO 14110, but lacks enforcement mechanisms and quantitative evidence of risk reduction. Implementation costs range from $50K-$1M+ annually, with financial services showing highest adoption (75%), though the framework provides inadequate coverage of frontier AI risks despite July 2024 GenAI Profile updates.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Comprehensive analysis of NIST AI RMF showing 40-60% Fortune 500 adoption with implementation costs of $50K-$1M+ annually, but lacking quantitative evidence of actual risk reduction and inadequate coverage of frontier AI risks despite 2024-2025 updates.",
     "description": "US federal voluntary framework for managing AI risks, with 40-60% Fortune 500 adoption and influence on federal policy through Executive Orders, but lacking enforcement mechanisms or quantitative evidence of risk reduction",
     "ratings": {
-      "novelty": 4.2,
-      "rigor": 6.1,
-      "actionability": 5.8,
-      "completeness": 7
+      "focus": 7.5,
+      "novelty": 3.2,
+      "rigor": 4.8,
+      "completeness": 8,
+      "concreteness": 6.5,
+      "actionability": 6,
+      "objectivity": 4.5
     },
     "category": "responses",
     "subcategory": "governance-legislation",
@@ -40929,22 +41574,41 @@
       "governance"
     ],
     "metrics": {
-      "wordCount": 2891,
-      "tableCount": 7,
-      "diagramCount": 1,
-      "internalLinks": 19,
-      "externalLinks": 0,
-      "bulletRatio": 0,
-      "sectionCount": 16,
+      "wordCount": 5193,
+      "tableCount": 18,
+      "diagramCount": 2,
+      "internalLinks": 9,
+      "externalLinks": 35,
+      "bulletRatio": 0.08,
+      "sectionCount": 45,
       "hasOverview": false,
-      "structuralScore": 10
+      "structuralScore": 14
     },
-    "suggestedQuality": 67,
+    "suggestedQuality": 93,
     "updateFrequency": 7,
-    "wordCount": 2891,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 10,
+    "wordCount": 5193,
+    "unconvertedLinks": [
+      {
+        "text": "NIST workshops",
+        "url": "https://www.ispartnersllc.com/blog/nist-ai-rmf-2025-updates-what-you-need-to-know-about-the-latest-framework-changes/",
+        "resourceId": "9cee6973d2600801",
+        "resourceTitle": "IS Partners: NIST AI RMF 2025 Updates"
+      },
+      {
+        "text": "NIST AI 600-1 Generative AI Profile",
+        "url": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf",
+        "resourceId": "b8df5c37607d20c3",
+        "resourceTitle": "Generative AI Profile (AI 600-1)"
+      },
+      {
+        "text": "IS Partners - NIST AI RMF 2025 Updates",
+        "url": "https://www.ispartnersllc.com/blog/nist-ai-rmf-2025-updates-what-you-need-to-know-about-the-latest-framework-changes/",
+        "resourceId": "9cee6973d2600801",
+        "resourceTitle": "IS Partners: NIST AI RMF 2025 Updates"
+      }
+    ],
+    "unconvertedLinkCount": 3,
+    "convertedLinkCount": 0,
     "backlinkCount": 1,
     "redundancy": {
       "maxSimilarity": 24,
@@ -40956,10 +41620,10 @@
           "similarity": 24
         },
         {
-          "id": "voluntary-commitments",
-          "title": "Voluntary Industry Commitments",
-          "path": "/knowledge-base/responses/voluntary-commitments/",
-          "similarity": 21
+          "id": "frontier-model-forum",
+          "title": "Frontier Model Forum",
+          "path": "/knowledge-base/organizations/frontier-model-forum/",
+          "similarity": 20
         },
         {
           "id": "metr",
@@ -40968,15 +41632,15 @@
           "similarity": 20
         },
         {
-          "id": "nist-ai",
-          "title": "NIST and AI Safety",
-          "path": "/knowledge-base/organizations/nist-ai/",
+          "id": "effectiveness-assessment",
+          "title": "Policy Effectiveness Assessment",
+          "path": "/knowledge-base/responses/effectiveness-assessment/",
           "similarity": 20
         },
         {
-          "id": "us-aisi",
-          "title": "US AI Safety Institute",
-          "path": "/knowledge-base/organizations/us-aisi/",
+          "id": "responsible-scaling-policies",
+          "title": "Responsible Scaling Policies",
+          "path": "/knowledge-base/responses/responsible-scaling-policies/",
           "similarity": 20
         }
       ]
@@ -41473,9 +42137,9 @@
           "similarity": 11
         },
         {
-          "id": "evals-governance",
-          "title": "Evals-Based Deployment Gates",
-          "path": "/knowledge-base/responses/evals-governance/",
+          "id": "china-ai-regulations",
+          "title": "China AI Regulations",
+          "path": "/knowledge-base/responses/china-ai-regulations/",
           "similarity": 11
         }
       ]
@@ -41701,16 +42365,16 @@
           "similarity": 14
         },
         {
+          "id": "effectiveness-assessment",
+          "title": "Policy Effectiveness Assessment",
+          "path": "/knowledge-base/responses/effectiveness-assessment/",
+          "similarity": 14
+        },
+        {
           "id": "thresholds",
           "title": "Compute Thresholds",
           "path": "/knowledge-base/responses/thresholds/",
           "similarity": 14
-        },
-        {
-          "id": "self-improvement",
-          "title": "Self-Improvement and Recursive Enhancement",
-          "path": "/knowledge-base/capabilities/self-improvement/",
-          "similarity": 13
         }
       ]
     }
@@ -45703,16 +46367,16 @@
           "similarity": 22
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 21
-        },
-        {
           "id": "responsible-scaling-policies",
           "title": "Responsible Scaling Policies",
           "path": "/knowledge-base/responses/responsible-scaling-policies/",
           "similarity": 21
+        },
+        {
+          "id": "frontier-model-forum",
+          "title": "Frontier Model Forum",
+          "path": "/knowledge-base/organizations/frontier-model-forum/",
+          "similarity": 20
         }
       ]
     }
@@ -46168,18 +46832,18 @@
     "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 20,
+      "maxSimilarity": 21,
       "similarPages": [
-        {
-          "id": "california-sb53",
-          "title": "California SB 53",
-          "path": "/knowledge-base/responses/california-sb53/",
-          "similarity": 20
-        },
         {
           "id": "colorado-ai-act",
           "title": "Colorado AI Act (SB 205)",
           "path": "/knowledge-base/responses/colorado-ai-act/",
+          "similarity": 21
+        },
+        {
+          "id": "california-sb53",
+          "title": "California SB 53",
+          "path": "/knowledge-base/responses/california-sb53/",
           "similarity": 20
         },
         {
@@ -46189,16 +46853,16 @@
           "similarity": 20
         },
         {
-          "id": "us-state-legislation",
-          "title": "US State AI Legislation",
-          "path": "/knowledge-base/responses/us-state-legislation/",
-          "similarity": 20
+          "id": "coe-ai-convention",
+          "title": "Council of Europe Framework Convention on Artificial Intelligence",
+          "path": "/knowledge-base/responses/coe-ai-convention/",
+          "similarity": 18
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 19
+          "id": "standards-bodies",
+          "title": "AI Standards Bodies",
+          "path": "/knowledge-base/responses/standards-bodies/",
+          "similarity": 18
         }
       ]
     }
@@ -46391,12 +47055,6 @@
           "similarity": 23
         },
         {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
-          "similarity": 22
-        },
-        {
           "id": "voluntary-commitments",
           "title": "Voluntary Industry Commitments",
           "path": "/knowledge-base/responses/voluntary-commitments/",
@@ -46412,6 +47070,12 @@
           "id": "international-summits",
           "title": "International AI Safety Summits",
           "path": "/knowledge-base/responses/international-summits/",
+          "similarity": 21
+        },
+        {
+          "id": "monitoring",
+          "title": "Compute Monitoring",
+          "path": "/knowledge-base/responses/monitoring/",
           "similarity": 21
         }
       ]
@@ -47012,12 +47676,6 @@
           "similarity": 21
         },
         {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
-          "similarity": 20
-        },
-        {
           "id": "international-summits",
           "title": "International AI Safety Summits",
           "path": "/knowledge-base/responses/international-summits/",
@@ -47034,6 +47692,12 @@
           "title": "International Coordination Mechanisms",
           "path": "/knowledge-base/responses/coordination-mechanisms/",
           "similarity": 19
+        },
+        {
+          "id": "monitoring",
+          "title": "Compute Monitoring",
+          "path": "/knowledge-base/responses/monitoring/",
+          "similarity": 19
         }
       ]
     }
@@ -47043,21 +47707,24 @@
     "path": "/knowledge-base/responses/us-state-legislation/",
     "filePath": "knowledge-base/responses/us-state-legislation.mdx",
     "title": "US State AI Legislation",
-    "quality": 62,
-    "importance": 62,
+    "quality": 70,
+    "importance": 72,
     "contentFormat": "article",
     "tractability": null,
     "neglectedness": null,
     "uncertainty": null,
     "causalLevel": null,
-    "lastUpdated": "2025-12-28",
-    "llmSummary": "Comprehensive tracking of US state AI legislation from 40 bills (2019) to 1,080+ (2025), with detailed analysis of enacted laws in Colorado (risk-based framework), Texas (government-focused), Illinois (employment), Tennessee (voice protection), and California (deepfakes). Only 11% of bills pass; deepfakes have highest success rate (68/301 enacted); states serve as policy laboratories that may drive federal action through compliance burden.",
+    "lastUpdated": "2026-02-11",
+    "llmSummary": "Comprehensive tracking of US state AI legislation shows explosive growth from ~40 bills in 2019 to 1,080+ in 2025, with only 11% passage rate but real enforcement beginning (Texas AG settlement, Colorado SB-205 effective June 2026). Creates compliance costs of $16K-$344K+ per project for small businesses while establishing patchwork of deepfake, employment, and algorithmic bias regulations that may drive federal uniformity.",
     "description": "Comprehensive analysis of AI regulation across US states, tracking the evolution from ~40 bills in 2019 to 1,000+ in 2025. States are serving as policy laboratories with enacted laws in Colorado, Texas, Illinois, California, and Tennessee covering employment, deepfakes, and consumer protection, creating a complex patchwork that may ultimately drive federal uniformity.",
     "ratings": {
-      "novelty": 4.5,
-      "rigor": 6,
-      "actionability": 5.5,
-      "completeness": 7
+      "focus": 8.2,
+      "novelty": 4.1,
+      "rigor": 6.8,
+      "completeness": 8.5,
+      "concreteness": 7.3,
+      "actionability": 6.2,
+      "objectivity": 5.8
     },
     "category": "responses",
     "subcategory": "governance-legislation",
@@ -47066,54 +47733,67 @@
       "governance"
     ],
     "metrics": {
-      "wordCount": 3776,
+      "wordCount": 5485,
       "tableCount": 11,
       "diagramCount": 1,
-      "internalLinks": 37,
-      "externalLinks": 0,
+      "internalLinks": 41,
+      "externalLinks": 76,
       "bulletRatio": 0,
-      "sectionCount": 28,
+      "sectionCount": 49,
       "hasOverview": true,
-      "structuralScore": 11
+      "structuralScore": 14
     },
-    "suggestedQuality": 73,
+    "suggestedQuality": 93,
     "updateFrequency": 7,
-    "wordCount": 3776,
-    "unconvertedLinks": [],
-    "unconvertedLinkCount": 0,
-    "convertedLinkCount": 21,
+    "wordCount": 5485,
+    "unconvertedLinks": [
+      {
+        "text": "Governor Gavin Newsom vetoed the bill on September 29, 2024",
+        "url": "https://gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf",
+        "resourceId": "604c3963cf77f0fe",
+        "resourceTitle": "veto statement"
+      },
+      {
+        "text": "California Governor - SB 1047 Veto Message",
+        "url": "https://gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf",
+        "resourceId": "604c3963cf77f0fe",
+        "resourceTitle": "veto statement"
+      }
+    ],
+    "unconvertedLinkCount": 2,
+    "convertedLinkCount": 0,
     "backlinkCount": 0,
     "redundancy": {
-      "maxSimilarity": 21,
+      "maxSimilarity": 23,
       "similarPages": [
         {
           "id": "colorado-ai-act",
           "title": "Colorado AI Act (SB 205)",
           "path": "/knowledge-base/responses/colorado-ai-act/",
-          "similarity": 21
+          "similarity": 23
         },
         {
           "id": "failed-stalled-proposals",
           "title": "Failed and Stalled AI Policy Proposals",
           "path": "/knowledge-base/responses/failed-stalled-proposals/",
-          "similarity": 21
+          "similarity": 22
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
-          "similarity": 20
+          "id": "us-aisi",
+          "title": "US AI Safety Institute",
+          "path": "/knowledge-base/organizations/us-aisi/",
+          "similarity": 19
         },
         {
-          "id": "texas-traiga",
-          "title": "Texas TRAIGA Responsible AI Governance Act",
-          "path": "/knowledge-base/responses/texas-traiga/",
-          "similarity": 20
+          "id": "canada-aida",
+          "title": "Canada AIDA",
+          "path": "/knowledge-base/responses/canada-aida/",
+          "similarity": 19
         },
         {
-          "id": "california-sb53",
-          "title": "California SB 53",
-          "path": "/knowledge-base/responses/california-sb53/",
+          "id": "international-summits",
+          "title": "International AI Safety Summits",
+          "path": "/knowledge-base/responses/international-summits/",
           "similarity": 19
         }
       ]
@@ -47321,12 +48001,6 @@
           "similarity": 24
         },
         {
-          "id": "effectiveness-assessment",
-          "title": "Policy Effectiveness Assessment",
-          "path": "/knowledge-base/responses/effectiveness-assessment/",
-          "similarity": 23
-        },
-        {
           "id": "metr",
           "title": "METR",
           "path": "/knowledge-base/organizations/metr/",
@@ -47336,6 +48010,12 @@
           "id": "ai-safety-institutes",
           "title": "AI Safety Institutes",
           "path": "/knowledge-base/responses/ai-safety-institutes/",
+          "similarity": 22
+        },
+        {
+          "id": "standards-bodies",
+          "title": "AI Standards Bodies",
+          "path": "/knowledge-base/responses/standards-bodies/",
           "similarity": 22
         }
       ]
@@ -47664,6 +48344,12 @@
           "similarity": 16
         },
         {
+          "id": "lab-behavior",
+          "title": "Lab Behavior & Industry",
+          "path": "/knowledge-base/metrics/lab-behavior/",
+          "similarity": 14
+        },
+        {
           "id": "california-sb53",
           "title": "California SB 53",
           "path": "/knowledge-base/responses/california-sb53/",
@@ -47674,12 +48360,6 @@
           "title": "AI Governance and Policy",
           "path": "/knowledge-base/responses/governance-policy/",
           "similarity": 14
-        },
-        {
-          "id": "solutions",
-          "title": "Solution Cruxes",
-          "path": "/knowledge-base/cruxes/solutions/",
-          "similarity": 13
         }
       ]
     }
@@ -49677,9 +50357,9 @@
           "similarity": 18
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
+          "id": "deliberation",
+          "title": "AI-Assisted Deliberation Platforms",
+          "path": "/knowledge-base/responses/deliberation/",
           "similarity": 18
         }
       ]
@@ -51589,6 +52269,12 @@
           "similarity": 13
         },
         {
+          "id": "openai",
+          "title": "OpenAI",
+          "path": "/knowledge-base/organizations/openai/",
+          "similarity": 13
+        },
+        {
           "id": "concentration-of-power",
           "title": "Concentration of Power",
           "path": "/knowledge-base/risks/concentration-of-power/",
@@ -51598,12 +52284,6 @@
           "id": "agi-development",
           "title": "AGI Development",
           "path": "/knowledge-base/forecasting/agi-development/",
-          "similarity": 12
-        },
-        {
-          "id": "capability-alignment-race",
-          "title": "Capability-Alignment Race Model",
-          "path": "/knowledge-base/models/capability-alignment-race/",
           "similarity": 12
         }
       ]
@@ -52091,15 +52771,15 @@
           "similarity": 20
         },
         {
-          "id": "failed-stalled-proposals",
-          "title": "Failed and Stalled AI Policy Proposals",
-          "path": "/knowledge-base/responses/failed-stalled-proposals/",
-          "similarity": 20
-        },
-        {
           "id": "pause",
           "title": "Pause Advocacy",
           "path": "/knowledge-base/responses/pause/",
+          "similarity": 20
+        },
+        {
+          "id": "responsible-scaling-policies",
+          "title": "Responsible Scaling Policies",
+          "path": "/knowledge-base/responses/responsible-scaling-policies/",
           "similarity": 20
         }
       ]
@@ -53832,9 +54512,9 @@
           "similarity": 19
         },
         {
-          "id": "china-ai-regulations",
-          "title": "China AI Regulations",
-          "path": "/knowledge-base/responses/china-ai-regulations/",
+          "id": "us-state-legislation",
+          "title": "US State AI Legislation",
+          "path": "/knowledge-base/responses/us-state-legislation/",
           "similarity": 18
         },
         {
