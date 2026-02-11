@@ -223,8 +223,8 @@ function buildPagesRegistry(urlToResource) {
           description: fm.description || null,
           // Extract ratings for model pages
           ratings: fm.ratings || null,
-          // Extract category from path
-          category: urlPrefix.split('/').filter(Boolean)[1] || 'other',
+          // Extract category from path (prefer subdirectory, fallback to top-level dir)
+          category: urlPrefix.split('/').filter(Boolean)[1] || urlPrefix.split('/').filter(Boolean)[0] || 'other',
           // Subcategory from frontmatter (set by flatten-content migration)
           subcategory: fm.subcategory || null,
           // Topic clusters for filtering
@@ -547,6 +547,39 @@ function main() {
   console.log(`  redundancy: ${redundancyPairs.length} similar pairs found`);
 
   database.pages = pages;
+
+  // =========================================================================
+  // EXTEND ID REGISTRY — assign numeric IDs to page-only content (no entity)
+  // This ensures table/diagram/index pages get E-prefixed IDs like all entities.
+  // =========================================================================
+  const entityIds = new Set(entities.map(e => e.id));
+  // Skip infrastructure/internal categories — only assign IDs to real content pages
+  const skipCategories = new Set([
+    'internal', 'style-guides', 'schema', 'browse',
+    'dashboard', 'project', 'reports', 'guides',
+  ]);
+  let pageIdAssignments = 0;
+  for (const page of pages) {
+    if (entityIds.has(page.id)) continue;        // Already has an entity (and thus an ID)
+    if (slugToNumericId[page.id]) continue;       // Already in registry
+    if (skipCategories.has(page.category)) continue; // Infrastructure pages
+    if (page.contentFormat === 'dashboard') continue; // Dashboard pages are infrastructure
+    const numId = `E${idRegistry._nextId}`;
+    idRegistry.entities[numId] = page.id;
+    slugToNumericId[page.id] = numId;
+    idRegistry._nextId++;
+    pageIdAssignments++;
+  }
+  if (pageIdAssignments > 0) {
+    writeFileSync(ID_REGISTRY_FILE, JSON.stringify(idRegistry, null, 2));
+    copyFileSync(ID_REGISTRY_FILE, join(OUTPUT_DIR, 'id-registry.json'));
+    // Update the registry output maps
+    idRegistryOutput.byNumericId = { ...idRegistry.entities };
+    idRegistryOutput.bySlug = { ...slugToNumericId };
+    database.idRegistry = idRegistryOutput;
+    console.log(`  idRegistry: assigned ${pageIdAssignments} new page IDs (total: ${Object.keys(idRegistry.entities).length})`);
+  }
+
   const pagesWithQuality = pages.filter(p => p.quality !== null).length;
   const pagesWithUnconvertedLinks = pages.filter(p => p.unconvertedLinkCount > 0).length;
   const totalUnconvertedLinks = pages.reduce((sum, p) => sum + p.unconvertedLinkCount, 0);

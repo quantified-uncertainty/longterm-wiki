@@ -13,21 +13,12 @@ function formatCategory(category: string): string {
     .join(" ");
 }
 
-const FORMAT_LABELS: Record<string, string> = {
-  table: "Table",
-  diagram: "Diagram",
-  index: "Index",
-  dashboard: "Dashboard",
-};
-
 export function Breadcrumbs({
   category,
   title,
-  contentFormat,
 }: {
   category?: string | null;
   title?: string;
-  contentFormat?: string;
 }) {
   const items: BreadcrumbItem[] = [{ label: "Wiki", href: "/wiki" }];
 
@@ -36,10 +27,6 @@ export function Breadcrumbs({
       label: formatCategory(category),
       href: `/wiki?entity=${encodeURIComponent(category)}`,
     });
-  }
-
-  if (contentFormat && FORMAT_LABELS[contentFormat]) {
-    items.push({ label: FORMAT_LABELS[contentFormat] });
   }
 
   if (title) {

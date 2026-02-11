@@ -138,7 +138,6 @@ function ContentMeta({
       <Breadcrumbs
         category={pageData?.category}
         title={page.frontmatter.title || entity?.title}
-        contentFormat={contentFormat !== "article" ? contentFormat : undefined}
       />
       <div className="page-meta">
         {lastUpdated && (
