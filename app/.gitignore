@@ -16,5 +16,10 @@ src/data/schema.ts
 public/search-index.json
 public/search-docs.json
 
+# Auto-generated LLM accessibility files (rebuilt by prebuild script)
+public/llms.txt
+public/llms-core.txt
+public/llms-full.txt
+
 # Vercel
 .vercel
