@@ -68,6 +68,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: ogType,
       ...(pageData?.lastUpdated && { modifiedTime: pageData.lastUpdated }),
     },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 

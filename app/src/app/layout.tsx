@@ -5,13 +5,23 @@ import { SearchButton, SearchDialog } from "@/components/SearchDialog";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Longterm Wiki",
+  metadataBase: new URL("https://longtermwiki.org"),
+  title: {
+    default: "Longterm Wiki",
+    template: "%s | Longterm Wiki",
+  },
   description: "AI Safety Knowledge Base",
   openGraph: {
     title: "Longterm Wiki",
     description: "AI Safety Knowledge Base",
     type: "website",
     siteName: "Longterm Wiki",
+    url: "https://longtermwiki.org",
+  },
+  twitter: {
+    card: "summary",
+    title: "Longterm Wiki",
+    description: "AI Safety Knowledge Base",
   },
 };
 
