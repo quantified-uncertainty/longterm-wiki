@@ -8,16 +8,67 @@ import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
 
-export function getSynthesisPrompt(topic, quality, { loadResult }) {
-  const researchData = loadResult(topic, 'perplexity-research.json');
-  const scryData = loadResult(topic, 'scry-research.json');
-  const directionsData = loadResult(topic, 'directions.json');
-  const canonicalLinksData = loadResult(topic, 'canonical-links.json');
-  const sourceFileData = loadResult(topic, 'source-file-content.json');
+interface LoadResultContext {
+  loadResult: (topic: string, filename: string) => Record<string, unknown> | null;
+}
+
+interface SynthesisContext {
+  log: (phase: string, message: string) => void;
+  ROOT: string;
+}
+
+interface CanonicalLink {
+  name: string;
+  domain?: string;
+  url: string;
+}
+
+interface CanonicalLinksData {
+  links?: CanonicalLink[];
+}
+
+interface ResearchSource {
+  category: string;
+  content: string;
+  citations?: string[];
+}
+
+interface ResearchData {
+  sources?: ResearchSource[];
+}
+
+interface ScryResult {
+  title: string;
+  uri: string;
+  original_author: string;
+  platform: string;
+  snippet?: string;
+}
+
+interface ScryData {
+  results?: ScryResult[];
+}
+
+interface DirectionsData {
+  originalDirections?: string;
+  fetchedContent?: Array<{ url: string; content: string }>;
+}
+
+interface SourceFileData {
+  fileName: string;
+  content: string;
+}
+
+export function getSynthesisPrompt(topic: string, quality: string, { loadResult }: LoadResultContext): string {
+  const researchData = loadResult(topic, 'perplexity-research.json') as ResearchData | null;
+  const scryData = loadResult(topic, 'scry-research.json') as ScryData | null;
+  const directionsData = loadResult(topic, 'directions.json') as DirectionsData | null;
+  const canonicalLinksData = loadResult(topic, 'canonical-links.json') as CanonicalLinksData | null;
+  const sourceFileData = loadResult(topic, 'source-file-content.json') as SourceFileData | null;
 
   // Format canonical links for display
   let canonicalLinksSection = '';
-  if (canonicalLinksData?.links?.length > 0) {
+  if (canonicalLinksData?.links?.length && canonicalLinksData.links.length > 0) {
     const linksTable = canonicalLinksData.links
       .map(link => `| ${link.name} | [${link.domain || 'Link'}](${link.url}) |`)
       .join('\n');
@@ -34,8 +85,8 @@ ${linksTable}
 
   // Count total available citation URLs
   let totalCitations = 0;
-  let researchContent;
-  let citationWarning;
+  let researchContent: string;
+  let citationWarning: string;
   const isSourceFileMode = !!sourceFileData;
 
   if (isSourceFileMode) {
@@ -64,7 +115,7 @@ ${linksTable}
 
   let directionsSection = '';
   if (directionsData) {
-    const parts = [];
+    const parts: string[] = [];
 
     if (directionsData.originalDirections) {
       parts.push(`### User Instructions\n${directionsData.originalDirections}`);
@@ -197,7 +248,7 @@ import {EntityLink, Backlinks, R, DataInfoBox, DataExternalLinks} from '@compone
 - <Backlinks />`;
 }
 
-export async function runSynthesis(topic, quality, { log, ROOT }) {
+export async function runSynthesis(topic: string, quality: string, { log, ROOT }: SynthesisContext): Promise<{ success: boolean; model: string; budget: number }> {
   log('synthesis', `Generating article (${quality})...`);
 
   return new Promise((resolve, reject) => {
@@ -217,7 +268,7 @@ export async function runSynthesis(topic, quality, { log, ROOT }) {
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
-    const prompt = getSynthesisPrompt(topic, quality, { loadResult: (t, f) => {
+    const prompt = getSynthesisPrompt(topic, quality, { loadResult: (t: string, f: string) => {
       const filePath = path.join(ROOT, '.claude/temp/page-creator', t.toLowerCase().replace(/[^a-z0-9]+/g, '-'), f);
       if (!fs.existsSync(filePath)) return null;
       const content = fs.readFileSync(filePath, 'utf-8');
@@ -228,12 +279,12 @@ export async function runSynthesis(topic, quality, { log, ROOT }) {
     claude.stdin.end();
 
     let stdout = '';
-    claude.stdout.on('data', data => {
+    claude.stdout.on('data', (data: Buffer) => {
       stdout += data.toString();
       process.stdout.write(data);
     });
 
-    claude.on('close', code => {
+    claude.on('close', (code: number | null) => {
       if (code === 0) {
         resolve({ success: true, model, budget });
       } else {

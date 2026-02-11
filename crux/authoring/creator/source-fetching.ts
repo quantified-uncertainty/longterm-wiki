@@ -8,10 +8,64 @@ import fs from 'fs';
 import path from 'path';
 import { sources, hashId, SOURCES_DIR } from '../../lib/knowledge-db.ts';
 
+interface RegisterContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: unknown) => string;
+  getTopicDir: (topic: string) => string;
+}
+
+interface FetchContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: unknown) => string;
+  getTopicDir: (topic: string) => string;
+}
+
+interface FetchOptions {
+  maxSources?: number;
+  skipExisting?: boolean;
+}
+
+interface LoadSourceContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: unknown) => string;
+}
+
+interface DirectionsContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: unknown) => string;
+}
+
+interface GetTopicDirContext {
+  getTopicDir: (topic: string) => string;
+}
+
+interface FetchedSourceContent {
+  sourceCount: number;
+  combinedContent: string;
+  sources: Array<{ url: string; length: number }>;
+}
+
+interface ResearchData {
+  sources?: Array<{
+    citations?: string[];
+    content?: string;
+  }>;
+}
+
+interface RegistrationData {
+  urls: string[];
+}
+
+interface FetchedUrlContent {
+  url: string;
+  content: string;
+  charCount: number;
+}
+
 /**
  * Extract URLs from text with cleanup for trailing punctuation
  */
-export function extractUrls(text) {
+export function extractUrls(text: string): string[] {
   const urlRegex = /https?:\/\/[^\s<>"{}|\\^`\[\]]+/g;
   const rawMatches = text.match(urlRegex) || [];
 
@@ -38,7 +92,7 @@ export function extractUrls(text) {
 /**
  * Extract citation URLs from Perplexity research and register them in the knowledge DB
  */
-export async function registerResearchSources(topic, { log, saveResult, getTopicDir }) {
+export async function registerResearchSources(topic: string, { log, saveResult, getTopicDir }: RegisterContext): Promise<{ success: boolean; error?: string; registered?: number; existing?: number; total?: number }> {
   log('register-sources', 'Extracting and registering citation URLs...');
 
   const researchPath = path.join(getTopicDir(topic), 'perplexity-research.json');
@@ -47,8 +101,8 @@ export async function registerResearchSources(topic, { log, saveResult, getTopic
     return { success: false, error: 'No research data' };
   }
 
-  const research = JSON.parse(fs.readFileSync(researchPath, 'utf-8'));
-  const allUrls = new Set();
+  const research: ResearchData = JSON.parse(fs.readFileSync(researchPath, 'utf-8'));
+  const allUrls = new Set<string>();
 
   for (const source of (research.sources || [])) {
     if (source.citations && Array.isArray(source.citations)) {
@@ -62,8 +116,8 @@ export async function registerResearchSources(topic, { log, saveResult, getTopic
 
   log('register-sources', `Found ${allUrls.size} unique citation URLs`);
 
-  const registered = [];
-  const existing = [];
+  const registered: string[] = [];
+  const existing: string[] = [];
 
   for (const url of allUrls) {
     try {
@@ -90,7 +144,8 @@ export async function registerResearchSources(topic, { log, saveResult, getTopic
       });
 
       registered.push(url);
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       log('register-sources', `  Failed to register ${url}: ${error.message}`);
     }
   }
@@ -112,7 +167,7 @@ export async function registerResearchSources(topic, { log, saveResult, getTopic
 /**
  * Fetch content from registered sources using Firecrawl
  */
-export async function fetchRegisteredSources(topic, options, { log, saveResult, getTopicDir }) {
+export async function fetchRegisteredSources(topic: string, options: FetchOptions, { log, saveResult, getTopicDir }: FetchContext): Promise<{ success: boolean; error?: string; fetched: number; failed?: number; skipped?: number }> {
   const { maxSources = 10, skipExisting = true } = options;
 
   log('fetch-sources', 'Fetching source content with Firecrawl...');
@@ -126,11 +181,11 @@ export async function fetchRegisteredSources(topic, options, { log, saveResult, 
   const registeredPath = path.join(getTopicDir(topic), 'registered-sources.json');
   if (!fs.existsSync(registeredPath)) {
     log('fetch-sources', 'No registered sources found');
-    return { success: false, error: 'No registered sources' };
+    return { success: false, error: 'No registered sources', fetched: 0 };
   }
 
-  const registration = JSON.parse(fs.readFileSync(registeredPath, 'utf-8'));
-  const urlsToFetch = [];
+  const registration: RegistrationData = JSON.parse(fs.readFileSync(registeredPath, 'utf-8'));
+  const urlsToFetch: Array<{ id: string; url: string }> = [];
 
   for (const url of registration.urls) {
     const source = sources.getByUrl(url);
@@ -185,14 +240,15 @@ export async function fetchRegisteredSources(topic, options, { log, saveResult, 
       } else {
         throw new Error('No markdown content returned');
       }
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       log('fetch-sources', `     ✗ ${error.message}`);
       sources.markFailed(id, error.message);
       failed++;
     }
 
     if (i < urlsToFetch.length - 1) {
-      await new Promise(resolve => setTimeout(resolve, DELAY_MS));
+      await new Promise<void>(resolve => setTimeout(resolve, DELAY_MS));
     }
   }
 
@@ -212,14 +268,14 @@ export async function fetchRegisteredSources(topic, options, { log, saveResult, 
 /**
  * Get fetched content for quote verification
  */
-export function getFetchedSourceContent(topic, { getTopicDir }) {
+export function getFetchedSourceContent(topic: string, { getTopicDir }: GetTopicDirContext): FetchedSourceContent | null {
   const registeredPath = path.join(getTopicDir(topic), 'registered-sources.json');
   if (!fs.existsSync(registeredPath)) {
     return null;
   }
 
-  const registration = JSON.parse(fs.readFileSync(registeredPath, 'utf-8'));
-  const contents = [];
+  const registration: RegistrationData = JSON.parse(fs.readFileSync(registeredPath, 'utf-8'));
+  const contents: Array<{ url: string; content: string }> = [];
 
   for (const url of registration.urls) {
     const source = sources.getByUrl(url);
@@ -243,7 +299,7 @@ export function getFetchedSourceContent(topic, { getTopicDir }) {
  * Load a local file as the primary research input, skipping web research phases.
  * Saves both source-file-content.json and a compatibility perplexity-research.json.
  */
-export async function loadSourceFile(topic, sourceFilePath, { log, saveResult }) {
+export async function loadSourceFile(topic: string, sourceFilePath: string, { log, saveResult }: LoadSourceContext): Promise<{ success: boolean; charCount: number; truncated: boolean }> {
   log('load-source-file', `Reading source file: ${sourceFilePath}`);
 
   if (!fs.existsSync(sourceFilePath)) {
@@ -271,7 +327,7 @@ export async function loadSourceFile(topic, sourceFilePath, { log, saveResult })
     timestamp: new Date().toISOString(),
   });
 
-  // Save a compatibility perplexity-research.json so verification.mjs works
+  // Save a compatibility perplexity-research.json so verification works
   saveResult(topic, 'perplexity-research.json', {
     topic,
     depth: 'source-file',
@@ -291,7 +347,7 @@ export async function loadSourceFile(topic, sourceFilePath, { log, saveResult })
 /**
  * Process user directions — extract URLs and fetch their content
  */
-export async function processDirections(topic, directions, { log, saveResult }) {
+export async function processDirections(topic: string, directions: string | null, { log, saveResult }: DirectionsContext): Promise<{ success: boolean; hasDirections: boolean; urlCount?: number; fetchedCount?: number }> {
   if (!directions) return { success: true, hasDirections: false };
 
   log('directions', 'Processing user directions...');
@@ -299,7 +355,7 @@ export async function processDirections(topic, directions, { log, saveResult }) 
   const urls = extractUrls(directions);
   log('directions', `Found ${urls.length} URL(s) in directions`);
 
-  const fetchedContent = [];
+  const fetchedContent: FetchedUrlContent[] = [];
 
   for (const url of urls) {
     try {
@@ -321,7 +377,8 @@ export async function processDirections(topic, directions, { log, saveResult }) 
           const pdfData = await pdfParse(Buffer.from(buffer));
           content = pdfData.text.replace(/\s+/g, ' ').trim().slice(0, 15000);
           log('directions', `  Parsed PDF: ${content.length} chars`);
-        } catch (pdfError) {
+        } catch (err: unknown) {
+          const pdfError = err instanceof Error ? err : new Error(String(err));
           log('directions', `  PDF parse failed: ${pdfError.message}`);
           continue;
         }
@@ -345,7 +402,8 @@ export async function processDirections(topic, directions, { log, saveResult }) 
         fetchedContent.push({ url, content, charCount: content.length });
         log('directions', `  Fetched ${content.length} chars`);
       }
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       log('directions', `  Error fetching ${url}: ${error.message}`);
     }
   }

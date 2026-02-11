@@ -119,11 +119,12 @@ function loadUpdateCandidates(): UpdateCandidate[] {
     const relPath = relative(CONTENT_DIR_ABS, filePath);
 
     // Parse last edited date
-    const lastEditedStr = fm.lastEdited || fm.lastUpdated;
+    const lastEditedRaw = fm.lastEdited || fm.lastUpdated;
+    const lastEditedStr = typeof lastEditedRaw === 'string' ? lastEditedRaw : lastEditedRaw instanceof Date ? lastEditedRaw.toISOString().slice(0, 10) : null;
     let daysSinceEdit = 0;
     let lastEditedDate: Date;
     if (lastEditedStr) {
-      lastEditedDate = new Date(lastEditedStr as string);
+      lastEditedDate = new Date(lastEditedStr);
       daysSinceEdit = Math.floor((now.getTime() - lastEditedDate.getTime()) / (1000 * 60 * 60 * 24));
     } else {
       // Fall back to file modification time
@@ -142,7 +143,7 @@ function loadUpdateCandidates(): UpdateCandidate[] {
 
     candidates.push({
       id: pageId,
-      title: fm.title || pageId,
+      title: typeof fm.title === 'string' ? fm.title : pageId,
       filePath: relPath,
       fullPath: filePath,
       updateFrequency,
@@ -153,7 +154,7 @@ function loadUpdateCandidates(): UpdateCandidate[] {
       quality,
       priority: Math.round(priority * 100) / 100,
       overdue: staleness >= 1.0,
-      category: fm.subcategory || relPath.split('/')[0] || 'unknown',
+      category: (typeof fm.subcategory === 'string' ? fm.subcategory : null) || relPath.split('/')[0] || 'unknown',
     });
   }
 
@@ -260,12 +261,12 @@ export async function run(args: string[], options: CommandOptions): Promise<Comm
     output += `  Priority: ${page.priority} | ${page.daysSinceEdit}d since edit | freq: ${page.updateFrequency}d\n`;
 
     if (dryRun) {
-      output += `  ${c.dim}(dry run — would run: page-improver.mjs -- ${page.id} --tier ${tier} --apply --grade)${c.reset}\n\n`;
+      output += `  ${c.dim}(dry run — would run: page-improver.ts -- ${page.id} --tier ${tier} --apply --grade)${c.reset}\n\n`;
       continue;
     }
 
     try {
-      const cmdArgs = ['crux/authoring/page-improver.mjs', '--', page.id, '--tier', tier, '--apply', '--grade'];
+      const cmdArgs = ['--import', 'tsx/esm', '--no-warnings', 'crux/authoring/page-improver.ts', '--', page.id, '--tier', tier, '--apply', '--grade'];
       output += `  ${c.dim}Running: node ${cmdArgs.join(' ')}${c.reset}\n`;
 
       // Print accumulated output before starting long-running process
@@ -329,10 +330,11 @@ export async function stats(args: string[], options: CommandOptions): Promise<Co
         frequencyDistribution[bucket] = (frequencyDistribution[bucket] || 0) + 1;
 
         // Build candidate entry for priority stats
-        const lastEditedStr = fm.lastEdited || fm.lastUpdated;
+        const lastEditedRaw = fm.lastEdited || fm.lastUpdated;
+        const lastEditedStr = typeof lastEditedRaw === 'string' ? lastEditedRaw : lastEditedRaw instanceof Date ? lastEditedRaw.toISOString().slice(0, 10) : null;
         let daysSinceEdit = 0;
         if (lastEditedStr) {
-          daysSinceEdit = Math.floor((now.getTime() - new Date(lastEditedStr as string).getTime()) / (1000 * 60 * 60 * 24));
+          daysSinceEdit = Math.floor((now.getTime() - new Date(lastEditedStr).getTime()) / (1000 * 60 * 60 * 24));
         }
         const staleness = daysSinceEdit / updateFrequency;
         const importance = Number(fm.importance) || 50;
@@ -343,7 +345,7 @@ export async function stats(args: string[], options: CommandOptions): Promise<Co
           staleness: Math.round(staleness * 100) / 100,
           priority: Math.round(priority * 100) / 100,
           overdue: staleness >= 1.0,
-          category: fm.subcategory || relPath.split('/')[0] || 'unknown',
+          category: (typeof fm.subcategory === 'string' ? fm.subcategory : null) || relPath.split('/')[0] || 'unknown',
         });
       }
     }
@@ -375,7 +377,7 @@ export async function stats(args: string[], options: CommandOptions): Promise<Co
     totalPages,
     pagesWithFrequency,
     pagesWithImportance,
-    coveragePercent: Math.round((pagesWithFrequency / totalPages) * 100),
+    coveragePercent: totalPages > 0 ? Math.round((pagesWithFrequency / totalPages) * 100) : 0,
     overdueCount,
     avgPriority,
     avgStaleness,

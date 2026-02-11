@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --import tsx/esm --no-warnings
 
 /**
  * Page Improvement Pipeline
@@ -8,13 +8,13 @@
  *
  * Usage:
  *   # Basic improvement with directions
- *   node crux/authoring/page-improver.mjs -- open-philanthropy --directions "add 2024 funding data"
+ *   node crux/authoring/page-improver.ts -- open-philanthropy --directions "add 2024 funding data"
  *
  *   # Research-heavy improvement
- *   node crux/authoring/page-improver.mjs -- far-ai --tier deep --directions "add recent publications"
+ *   node crux/authoring/page-improver.ts -- far-ai --tier deep --directions "add recent publications"
  *
  *   # Quick polish only
- *   node crux/authoring/page-improver.mjs -- cea --tier polish
+ *   node crux/authoring/page-improver.ts -- cea --tier polish
  *
  * Tiers:
  *   - polish ($2): Single-pass improvement, no research
@@ -26,12 +26,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import Anthropic from '@anthropic-ai/sdk';
+import type { MessageParam, ContentBlock, ToolUseBlock, ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
-// Inlined from content-types.ts to avoid tsx/esm dependency in .mjs files
-const CRITICAL_RULES = [
+// Inlined from content-types.ts to keep this file self-contained
+const CRITICAL_RULES: string[] = [
   'dollar-signs',
   'comparison-operators',
   'frontmatter-schema',
@@ -42,7 +43,7 @@ const CRITICAL_RULES = [
   'citation-urls',
 ];
 
-const QUALITY_RULES = [
+const QUALITY_RULES: string[] = [
   'tilde-dollar',
   'markdown-lists',
   'consecutive-bold-labels',
@@ -52,17 +53,24 @@ const QUALITY_RULES = [
 ];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(__dirname, '../..');
+const ROOT: string = path.join(__dirname, '../..');
 
-// Node command with tsx loader — required because tooling .mjs files import from .ts files
-const NODE_TSX = 'node --import tsx/esm --no-warnings';
-const TEMP_DIR = path.join(ROOT, '.claude/temp/page-improver');
+// Node command with tsx loader — required for running .ts scripts as subprocesses
+const NODE_TSX: string = 'node --import tsx/esm --no-warnings';
+const TEMP_DIR: string = path.join(ROOT, '.claude/temp/page-improver');
 
 // SCRY API config
-const SCRY_PUBLIC_KEY = process.env.SCRY_API_KEY || 'exopriors_public_readonly_v1_2025';
+const SCRY_PUBLIC_KEY: string = process.env.SCRY_API_KEY || 'exopriors_public_readonly_v1_2025';
+
+interface TierConfig {
+  name: string;
+  cost: string;
+  phases: string[];
+  description: string;
+}
 
 // Tier configurations
-const TIERS = {
+const TIERS: Record<string, TierConfig> = {
   polish: {
     name: 'Polish',
     cost: '$2-3',
@@ -86,23 +94,126 @@ const TIERS = {
 // Initialize Anthropic client
 const anthropic = new Anthropic();
 
+interface PageData {
+  id: string;
+  title: string;
+  path: string;
+  quality?: number;
+  importance?: number;
+}
+
+interface AnalysisResult {
+  currentState?: string;
+  gaps?: string[];
+  researchNeeded?: string[];
+  improvements?: string[];
+  entityLinks?: string[];
+  citations?: unknown;
+  raw?: string;
+  error?: string;
+}
+
+interface ResearchResult {
+  sources: Array<{
+    topic: string;
+    title: string;
+    url: string;
+    author?: string;
+    date?: string;
+    facts: string[];
+    relevance: string;
+  }>;
+  summary?: string;
+  raw?: string;
+  error?: string;
+}
+
+interface ReviewResult {
+  valid: boolean;
+  issues: string[];
+  suggestions?: string[];
+  qualityScore?: number;
+  raw?: string;
+}
+
+interface ValidationIssue {
+  rule: string;
+  count?: number;
+  output?: string;
+  error?: string;
+}
+
+interface ValidationResult {
+  issues: {
+    critical: ValidationIssue[];
+    quality: ValidationIssue[];
+  };
+  hasCritical: boolean;
+  improvedContent: string;
+}
+
+interface RunAgentOptions {
+  model?: string;
+  maxTokens?: number;
+  tools?: Array<{
+    name: string;
+    description: string;
+    input_schema: Record<string, unknown>;
+  }>;
+  systemPrompt?: string;
+}
+
+interface PipelineOptions {
+  tier?: string;
+  directions?: string;
+  dryRun?: boolean;
+  grade?: boolean;
+  analysisModel?: string;
+  researchModel?: string;
+  improveModel?: string;
+  reviewModel?: string;
+  deep?: boolean;
+}
+
+interface PipelineResults {
+  pageId: string;
+  title: string;
+  tier: string;
+  directions: string;
+  duration: string;
+  phases: string[];
+  review: ReviewResult | undefined;
+  outputPath: string;
+}
+
+interface ListOptions {
+  limit?: number;
+  maxQuality?: number;
+  minImportance?: number;
+}
+
+interface ParsedArgs {
+  _positional: string[];
+  [key: string]: string | boolean | string[];
+}
+
 // Formatting helpers
-function formatTime(date = new Date()) {
+function formatTime(date: Date = new Date()): string {
   return date.toTimeString().slice(0, 8);
 }
 
-function log(phase, message) {
+function log(phase: string, message: string): void {
   console.log(`[${formatTime()}] [${phase}] ${message}`);
 }
 
 // File operations
-function ensureDir(dir) {
+function ensureDir(dir: string): void {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 }
 
-function writeTemp(pageId, filename, content) {
+function writeTemp(pageId: string, filename: string, content: string | object): string {
   const dir = path.join(TEMP_DIR, pageId);
   ensureDir(dir);
   const filePath = path.join(dir, filename);
@@ -110,15 +221,8 @@ function writeTemp(pageId, filename, content) {
   return filePath;
 }
 
-function readTemp(pageId, filename) {
-  const filePath = path.join(TEMP_DIR, pageId, filename);
-  if (!fs.existsSync(filePath)) return null;
-  const content = fs.readFileSync(filePath, 'utf-8');
-  return filename.endsWith('.json') ? JSON.parse(content) : content;
-}
-
 // Load page data
-function loadPages() {
+function loadPages(): PageData[] {
   const pagesPath = path.join(ROOT, 'app/src/data/pages.json');
   if (!fs.existsSync(pagesPath)) {
     console.error('Error: pages.json not found. Run `pnpm build` first.');
@@ -127,7 +231,7 @@ function loadPages() {
   return JSON.parse(fs.readFileSync(pagesPath, 'utf-8'));
 }
 
-function findPage(pages, query) {
+function findPage(pages: PageData[], query: string): PageData | null {
   let page = pages.find(p => p.id === query);
   if (page) return page;
 
@@ -143,17 +247,17 @@ function findPage(pages, query) {
   return null;
 }
 
-function getFilePath(pagePath) {
+function getFilePath(pagePath: string): string {
   const cleanPath = pagePath.replace(/^\/|\/$/g, '');
   return path.join(ROOT, 'content/docs', cleanPath + '.mdx');
 }
 
-function getImportPath() {
+function getImportPath(): string {
   return '@components/wiki';
 }
 
 // Run Claude with tools
-async function runAgent(prompt, options = {}) {
+async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<string> {
   const {
     model = 'claude-sonnet-4-20250514',
     maxTokens = 16000,
@@ -161,29 +265,30 @@ async function runAgent(prompt, options = {}) {
     systemPrompt = ''
   } = options;
 
-  const messages = [{ role: 'user', content: prompt }];
+  const messages: MessageParam[] = [{ role: 'user', content: prompt }];
   let response = await anthropic.messages.create({
     model,
     max_tokens: maxTokens,
     system: systemPrompt,
-    tools,
+    tools: tools as Anthropic.Messages.Tool[],
     messages
   });
 
   // Handle tool use loop
   while (response.stop_reason === 'tool_use') {
-    const toolUseBlocks = response.content.filter(b => b.type === 'tool_use');
-    const toolResults = [];
+    const toolUseBlocks = response.content.filter((b): b is ToolUseBlock => b.type === 'tool_use');
+    const toolResults: ToolResultBlockParam[] = [];
 
     for (const toolUse of toolUseBlocks) {
-      let result;
+      let result: string;
       try {
+        const input = (toolUse.input ?? {}) as Record<string, string>;
         if (toolUse.name === 'web_search') {
-          result = await executeWebSearch(toolUse.input.query);
+          result = await executeWebSearch(input.query);
         } else if (toolUse.name === 'scry_search') {
-          result = await executeScrySearch(toolUse.input.query, toolUse.input.table);
+          result = await executeScrySearch(input.query, input.table);
         } else if (toolUse.name === 'read_file') {
-          const resolvedPath = path.resolve(toolUse.input.path);
+          const resolvedPath = path.resolve(input.path);
           if (!resolvedPath.startsWith(ROOT)) {
             result = 'Access denied: path must be within project root';
           } else {
@@ -192,8 +297,9 @@ async function runAgent(prompt, options = {}) {
         } else {
           result = `Unknown tool: ${toolUse.name}`;
         }
-      } catch (e) {
-        result = `Error: ${e.message}`;
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        result = `Error: ${error.message}`;
       }
       toolResults.push({
         type: 'tool_result',
@@ -209,18 +315,18 @@ async function runAgent(prompt, options = {}) {
       model,
       max_tokens: maxTokens,
       system: systemPrompt,
-      tools,
+      tools: tools as Anthropic.Messages.Tool[],
       messages
     });
   }
 
   // Extract text from response
-  const textBlocks = response.content.filter(b => b.type === 'text');
+  const textBlocks = response.content.filter((b): b is Anthropic.Messages.TextBlock => b.type === 'text');
   return textBlocks.map(b => b.text).join('\n');
 }
 
 // Tool implementations
-async function executeWebSearch(query) {
+async function executeWebSearch(query: string): Promise<string> {
   // Use Anthropic's web search via a simple agent call
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
@@ -236,11 +342,11 @@ async function executeWebSearch(query) {
     }]
   });
 
-  const textBlocks = response.content.filter(b => b.type === 'text');
+  const textBlocks = response.content.filter((b): b is Anthropic.Messages.TextBlock => b.type === 'text');
   return textBlocks.map(b => b.text).join('\n');
 }
 
-async function executeScrySearch(query, table = 'mv_eaforum_posts') {
+async function executeScrySearch(query: string, table: string = 'mv_eaforum_posts'): Promise<string> {
   const sql = `SELECT title, uri, snippet, original_author, original_timestamp::date as date
     FROM scry.search('${query.replace(/'/g, "''")}', '${table}')
     WHERE title IS NOT NULL AND kind = 'post'
@@ -257,13 +363,14 @@ async function executeScrySearch(query, table = 'mv_eaforum_posts') {
       signal: AbortSignal.timeout(30000),
     });
     return await response.text();
-  } catch (e) {
-    return `SCRY search error: ${e.message}`;
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    return `SCRY search error: ${error.message}`;
   }
 }
 
 // Phase: Analyze
-async function analyzePhase(page, directions, options) {
+async function analyzePhase(page: PageData, directions: string, options: PipelineOptions): Promise<AnalysisResult> {
   log('analyze', 'Starting analysis');
 
   const filePath = getFilePath(page.path);
@@ -307,26 +414,27 @@ Output ONLY valid JSON, no markdown code blocks.`;
   });
 
   // Parse JSON from result
-  let analysis;
+  let analysis: AnalysisResult;
   try {
     // Try to extract JSON from the response
     const jsonMatch = result.match(/\{[\s\S]*\}/);
     analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(result);
-  } catch (e) {
-    log('analyze', `Warning: Could not parse analysis as JSON: ${e.message}`);
-    analysis = { raw: result, error: e.message };
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('analyze', `Warning: Could not parse analysis as JSON: ${error.message}`);
+    analysis = { raw: result, error: error.message };
   }
 
   writeTemp(page.id, 'analysis.json', analysis);
-  log('analyze', '✅ Complete');
+  log('analyze', 'Complete');
   return analysis;
 }
 
 // Phase: Research
-async function researchPhase(page, analysis, options) {
+async function researchPhase(page: PageData, analysis: AnalysisResult, options: PipelineOptions): Promise<ResearchResult> {
   log('research', 'Starting research');
 
-  const topics = analysis.researchNeeded || [];
+  const topics: string[] = analysis.researchNeeded || [];
   if (topics.length === 0) {
     log('research', 'No research topics identified, skipping');
     return { sources: [] };
@@ -412,22 +520,23 @@ Output ONLY valid JSON at the end.`;
     tools
   });
 
-  let research;
+  let research: ResearchResult;
   try {
     const jsonMatch = result.match(/\{[\s\S]*\}/);
     research = jsonMatch ? JSON.parse(jsonMatch[0]) : { sources: [], raw: result };
-  } catch (e) {
-    log('research', `Warning: Could not parse research as JSON: ${e.message}`);
-    research = { sources: [], raw: result, error: e.message };
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('research', `Warning: Could not parse research as JSON: ${error.message}`);
+    research = { sources: [], raw: result, error: error.message };
   }
 
   writeTemp(page.id, 'research.json', research);
-  log('research', `✅ Complete (${research.sources?.length || 0} sources found)`);
+  log('research', `Complete (${research.sources?.length || 0} sources found)`);
   return research;
 }
 
 // Phase: Improve
-async function improvePhase(page, analysis, research, directions, options) {
+async function improvePhase(page: PageData, analysis: AnalysisResult, research: ResearchResult, directions: string, options: PipelineOptions): Promise<string> {
   log('improve', 'Starting improvements');
 
   const filePath = getFilePath(page.path);
@@ -487,7 +596,7 @@ Start your response with "---" (the frontmatter delimiter).`;
   });
 
   // Extract the MDX content
-  let improvedContent = result;
+  let improvedContent: string = result;
   if (!improvedContent.startsWith('---')) {
     // Try to extract MDX from markdown code block
     const mdxMatch = result.match(/```(?:mdx)?\n([\s\S]*?)```/);
@@ -503,19 +612,19 @@ Start your response with "---" (the frontmatter delimiter).`;
     `lastEdited: "${today}"`
   );
 
-  // Remove quality field - must be set by grade-content.mjs only
+  // Remove quality field - must be set by grade-content.ts only
   improvedContent = improvedContent.replace(
     /^quality:\s*\d+\s*\n/m,
     ''
   );
 
   writeTemp(page.id, 'improved.mdx', improvedContent);
-  log('improve', '✅ Complete');
+  log('improve', 'Complete');
   return improvedContent;
 }
 
 // Phase: Review
-async function reviewPhase(page, improvedContent, options) {
+async function reviewPhase(page: PageData, improvedContent: string, options: PipelineOptions): Promise<ReviewResult> {
   log('review', 'Starting review');
 
   const prompt = `Review this improved wiki page for quality and wiki conventions.
@@ -553,22 +662,23 @@ Output ONLY valid JSON.`;
     maxTokens: 4000
   });
 
-  let review;
+  let review: ReviewResult;
   try {
     const jsonMatch = result.match(/\{[\s\S]*\}/);
     review = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(result);
-  } catch (e) {
-    log('review', `Warning: Could not parse review as JSON: ${e.message}`);
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('review', `Warning: Could not parse review as JSON: ${error.message}`);
     review = { valid: true, issues: [], raw: result };
   }
 
   writeTemp(page.id, 'review.json', review);
-  log('review', `✅ Complete (valid: ${review.valid}, issues: ${review.issues?.length || 0})`);
+  log('review', `Complete (valid: ${review.valid}, issues: ${review.issues?.length || 0})`);
   return review;
 }
 
 // Phase: Validate
-async function validatePhase(page, improvedContent, options) {
+async function validatePhase(page: PageData, improvedContent: string, options: PipelineOptions): Promise<ValidationResult> {
   log('validate', 'Running validation checks...');
 
   const filePath = getFilePath(page.path);
@@ -577,7 +687,7 @@ async function validatePhase(page, improvedContent, options) {
   // Write improved content to the actual file so validators check the new version
   fs.writeFileSync(filePath, improvedContent);
 
-  const issues = {
+  const issues: { critical: ValidationIssue[]; quality: ValidationIssue[] } = {
     critical: [],
     quality: []
   };
@@ -593,12 +703,13 @@ async function validatePhase(page, improvedContent, options) {
         const errorCount = (result.match(/error/gi) || []).length;
         if (errorCount > 0) {
           issues.critical.push({ rule, count: errorCount, output: result.trim() });
-          log('validate', `  ✗ ${rule}: ${errorCount} error(s)`);
+          log('validate', `  x ${rule}: ${errorCount} error(s)`);
         } else {
-          log('validate', `  ✓ ${rule}`);
+          log('validate', `  ok ${rule}`);
         }
-      } catch (e) {
-        log('validate', `  ? ${rule}: check failed — ${e.message?.slice(0, 100)}`);
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        log('validate', `  ? ${rule}: check failed — ${error.message?.slice(0, 100)}`);
       }
     }
 
@@ -612,12 +723,13 @@ async function validatePhase(page, improvedContent, options) {
         const warningCount = (result.match(/warning/gi) || []).length;
         if (warningCount > 0) {
           issues.quality.push({ rule, count: warningCount, output: result.trim() });
-          log('validate', `  ⚠ ${rule}: ${warningCount} warning(s)`);
+          log('validate', `  warn ${rule}: ${warningCount} warning(s)`);
         } else {
-          log('validate', `  ✓ ${rule}`);
+          log('validate', `  ok ${rule}`);
         }
-      } catch (e) {
-        log('validate', `  ? ${rule}: quality check failed — ${e.message?.slice(0, 100)}`);
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        log('validate', `  ? ${rule}: quality check failed — ${error.message?.slice(0, 100)}`);
       }
     }
 
@@ -629,10 +741,11 @@ async function validatePhase(page, improvedContent, options) {
         stdio: 'pipe',
         timeout: 60000
       });
-      log('validate', '  ✓ MDX compiles');
-    } catch (e) {
-      issues.critical.push({ rule: 'compile', error: `MDX compilation failed: ${e.message?.slice(0, 200)}` });
-      log('validate', `  ✗ MDX compilation failed: ${e.message?.slice(0, 100)}`);
+      log('validate', '  ok MDX compiles');
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      issues.critical.push({ rule: 'compile', error: `MDX compilation failed: ${error.message?.slice(0, 200)}` });
+      log('validate', `  x MDX compilation failed: ${error.message?.slice(0, 100)}`);
     }
   } finally {
     // Restore original content — the pipeline applies changes later if approved
@@ -641,14 +754,14 @@ async function validatePhase(page, improvedContent, options) {
 
   writeTemp(page.id, 'validation-results.json', issues);
 
-  const hasCritical = issues.critical.length > 0;
-  log('validate', `✅ Complete (critical: ${issues.critical.length}, quality: ${issues.quality.length})`);
+  const hasCritical: boolean = issues.critical.length > 0;
+  log('validate', `Complete (critical: ${issues.critical.length}, quality: ${issues.quality.length})`);
 
   return { issues, hasCritical, improvedContent };
 }
 
 // Phase: Gap Fill (deep tier only)
-async function gapFillPhase(page, improvedContent, review, options) {
+async function gapFillPhase(page: PageData, improvedContent: string, review: ReviewResult, options: PipelineOptions): Promise<string> {
   log('gap-fill', 'Checking for remaining gaps');
 
   if (!review.issues || review.issues.length === 0) {
@@ -676,7 +789,7 @@ Start your response with "---" (the frontmatter delimiter).`;
     maxTokens: 16000
   });
 
-  let fixedContent = result;
+  let fixedContent: string = result;
   if (!fixedContent.startsWith('---')) {
     const mdxMatch = result.match(/```(?:mdx)?\n([\s\S]*?)```/);
     if (mdxMatch) {
@@ -687,12 +800,12 @@ Start your response with "---" (the frontmatter delimiter).`;
   }
 
   writeTemp(page.id, 'final.mdx', fixedContent);
-  log('gap-fill', '✅ Complete');
+  log('gap-fill', 'Complete');
   return fixedContent;
 }
 
 // Main pipeline
-async function runPipeline(pageId, options = {}) {
+async function runPipeline(pageId: string, options: PipelineOptions = {}): Promise<PipelineResults> {
   const { tier = 'standard', directions = '', dryRun = false } = options;
   const tierConfig = TIERS[tier];
 
@@ -706,7 +819,7 @@ async function runPipeline(pageId, options = {}) {
   const page = findPage(pages, pageId);
   if (!page) {
     console.error(`Page not found: ${pageId}`);
-    console.log('Try: node crux/authoring/page-improver.mjs -- --list');
+    console.log('Try: node crux/authoring/page-improver.ts -- --list');
     process.exit(1);
   }
 
@@ -723,12 +836,12 @@ async function runPipeline(pageId, options = {}) {
   if (directions) console.log(`Directions: ${directions}`);
   console.log('='.repeat(60) + '\n');
 
-  const startTime = Date.now();
-  let analysis, research, improvedContent, review;
+  const startTime: number = Date.now();
+  let analysis: AnalysisResult | undefined, research: ResearchResult | undefined, improvedContent: string | undefined, review: ReviewResult | undefined;
 
   // Run phases based on tier
   for (const phase of tierConfig.phases) {
-    const phaseStart = Date.now();
+    const phaseStart: number = Date.now();
 
     switch (phase) {
       case 'analyze':
@@ -736,41 +849,41 @@ async function runPipeline(pageId, options = {}) {
         break;
 
       case 'research':
-        research = await researchPhase(page, analysis, { ...options, deep: false });
+        research = await researchPhase(page, analysis!, { ...options, deep: false });
         break;
 
       case 'research-deep':
-        research = await researchPhase(page, analysis, { ...options, deep: true });
+        research = await researchPhase(page, analysis!, { ...options, deep: true });
         break;
 
       case 'improve':
-        improvedContent = await improvePhase(page, analysis, research || { sources: [] }, directions, options);
+        improvedContent = await improvePhase(page, analysis!, research || { sources: [] }, directions, options);
         break;
 
       case 'validate':
-        const validation = await validatePhase(page, improvedContent, options);
+        const validation = await validatePhase(page, improvedContent!, options);
         if (validation.hasCritical) {
-          log('validate', '⚠️  Critical validation issues found - may need manual fixes');
+          log('validate', 'Critical validation issues found - may need manual fixes');
         }
         break;
 
       case 'gap-fill':
-        improvedContent = await gapFillPhase(page, improvedContent, review || { issues: [] }, options);
+        improvedContent = await gapFillPhase(page, improvedContent!, review || { valid: true, issues: [] }, options);
         break;
 
       case 'review':
-        review = await reviewPhase(page, improvedContent, options);
+        review = await reviewPhase(page, improvedContent!, options);
         break;
     }
 
-    const phaseDuration = ((Date.now() - phaseStart) / 1000).toFixed(1);
+    const phaseDuration: string = ((Date.now() - phaseStart) / 1000).toFixed(1);
     log(phase, `Duration: ${phaseDuration}s`);
   }
 
-  const totalDuration = ((Date.now() - startTime) / 1000).toFixed(1);
+  const totalDuration: string = ((Date.now() - startTime) / 1000).toFixed(1);
 
   // Write final output
-  const finalPath = writeTemp(page.id, 'final.mdx', improvedContent);
+  const finalPath = writeTemp(page.id, 'final.mdx', improvedContent!);
 
   console.log('\n' + '='.repeat(60));
   console.log('Pipeline Complete');
@@ -794,24 +907,25 @@ async function runPipeline(pageId, options = {}) {
   } else {
     // Apply changes directly
     fs.copyFileSync(finalPath, filePath);
-    console.log(`\n✅ Changes applied to ${filePath}`);
+    console.log(`\nChanges applied to ${filePath}`);
 
     // Run grading if requested
     if (options.grade) {
-      console.log('\n📊 Running grade-content.mjs...');
+      console.log('\nRunning grade-content.ts...');
       try {
-        execSync(`${NODE_TSX} crux/authoring/grade-content.mjs --page "${page.id}" --apply`, {
+        execSync(`${NODE_TSX} crux/authoring/grade-content.ts --page "${page.id}" --apply`, {
           cwd: ROOT,
           stdio: 'inherit'
         });
-      } catch (e) {
-        console.error('Grading failed:', e.message);
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        console.error('Grading failed:', error.message);
       }
     }
   }
 
   // Save pipeline results
-  const results = {
+  const results: PipelineResults = {
     pageId: page.id,
     title: page.title,
     tier,
@@ -827,7 +941,7 @@ async function runPipeline(pageId, options = {}) {
 }
 
 // List pages needing improvement
-function listPages(pages, options = {}) {
+function listPages(pages: PageData[], options: ListOptions = {}): void {
   const { limit = 20, maxQuality = 80, minImportance = 30 } = options;
 
   const candidates = pages
@@ -837,25 +951,25 @@ function listPages(pages, options = {}) {
     .map(p => ({
       id: p.id,
       title: p.title,
-      quality: p.quality,
-      importance: p.importance,
-      gap: p.importance - p.quality
+      quality: p.quality!,
+      importance: p.importance!,
+      gap: p.importance! - p.quality!
     }))
     .sort((a, b) => b.gap - a.gap)
     .slice(0, limit);
 
-  console.log(`\n📊 Pages needing improvement (Q≤${maxQuality}, Imp≥${minImportance}):\n`);
+  console.log(`\nPages needing improvement (Q<=${maxQuality}, Imp>=${minImportance}):\n`);
   console.log('| # | Q | Imp | Gap | Page |');
   console.log('|---|---|-----|-----|------|');
   candidates.forEach((p, i) => {
     console.log(`| ${i + 1} | ${p.quality} | ${p.importance} | ${p.gap > 0 ? '+' : ''}${p.gap} | ${p.title} (${p.id}) |`);
   });
-  console.log(`\nRun: node crux/authoring/page-improver.mjs -- <page-id> --directions "your directions"`);
+  console.log(`\nRun: node crux/authoring/page-improver.ts -- <page-id> --directions "your directions"`);
 }
 
 // Parse arguments (bare '--' is skipped so flags still work after it)
-function parseArgs(args) {
-  const opts = { _positional: [] };
+function parseArgs(args: string[]): ParsedArgs {
+  const opts: ParsedArgs = { _positional: [] };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--') continue;
     if (args[i].startsWith('--')) {
@@ -868,14 +982,14 @@ function parseArgs(args) {
         opts[key] = true;
       }
     } else {
-      opts._positional.push(args[i]);
+      (opts._positional as string[]).push(args[i]);
     }
   }
   return opts;
 }
 
 // Main
-async function main() {
+async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const opts = parseArgs(args);
 
@@ -886,14 +1000,14 @@ Page Improvement Pipeline v2
 Multi-phase improvement with SCRY research and specific directions.
 
 Usage:
-  node crux/authoring/page-improver.mjs -- <page-id> [options]
-  node crux/authoring/page-improver.mjs -- --list
+  node crux/authoring/page-improver.ts -- <page-id> [options]
+  node crux/authoring/page-improver.ts -- --list
 
 Options:
   --directions "..."   Specific improvement directions
   --tier <tier>        polish ($2-3), standard ($5-8), deep ($10-15)
   --apply              Apply changes directly (don't just preview)
-  --grade              Run grade-content.mjs after applying (requires --apply)
+  --grade              Run grade-content.ts after applying (requires --apply)
   --list               List pages needing improvement
   --limit N            Limit list results (default: 20)
 
@@ -903,33 +1017,35 @@ Tiers:
   deep      Full SCRY + web research, gap filling
 
 Examples:
-  node crux/authoring/page-improver.mjs -- open-philanthropy --directions "add 2024 grants"
-  node crux/authoring/page-improver.mjs -- far-ai --tier deep --directions "add publications"
-  node crux/authoring/page-improver.mjs -- cea --tier polish
-  node crux/authoring/page-improver.mjs -- --list --limit 30
+  node crux/authoring/page-improver.ts -- open-philanthropy --directions "add 2024 grants"
+  node crux/authoring/page-improver.ts -- far-ai --tier deep --directions "add publications"
+  node crux/authoring/page-improver.ts -- cea --tier polish
+  node crux/authoring/page-improver.ts -- --list --limit 30
 `);
     return;
   }
 
   if (opts.list) {
     const pages = loadPages();
-    listPages(pages, { limit: parseInt(opts.limit) || 20 });
+    listPages(pages, { limit: parseInt(opts.limit as string) || 20 });
     return;
   }
 
-  const pageId = opts._positional[0];
+  const pageId = (opts._positional as string[])[0];
   if (!pageId) {
     console.error('Error: No page ID provided');
-    console.error('Try: node crux/authoring/page-improver.mjs -- --list');
+    console.error('Try: node crux/authoring/page-improver.ts -- --list');
     process.exit(1);
   }
 
   await runPipeline(pageId, {
-    tier: opts.tier || 'standard',
-    directions: opts.directions || '',
+    tier: (opts.tier as string) || 'standard',
+    directions: (opts.directions as string) || '',
     dryRun: !opts.apply,
-    grade: opts.grade && opts.apply  // Only grade if --apply is also set
+    grade: !!(opts.grade && opts.apply)  // Only grade if --apply is also set
   });
 }
 
-main().catch(console.error);
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch(console.error);
+}

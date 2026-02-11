@@ -7,10 +7,28 @@
 import fs from 'fs';
 import path from 'path';
 
+interface DeployContext {
+  ROOT: string;
+  getTopicDir: (topic: string) => string;
+  ensureDir: (dirPath: string) => void;
+}
+
+interface ReviewContext {
+  ROOT: string;
+  getTopicDir: (topic: string) => string;
+  log: (phase: string, message: string) => void;
+}
+
+interface CrossLinkResult {
+  warnings: string[];
+  outboundCount: number;
+  outboundIds: string[];
+}
+
 /**
  * Create a new category directory with index.mdx
  */
-export function createCategoryDirectory(destPath, categoryName, ROOT) {
+export function createCategoryDirectory(destPath: string, categoryName: string, ROOT: string): void {
   const fullDir = path.join(ROOT, 'content/docs', destPath);
 
   if (!fs.existsSync(fullDir)) {
@@ -35,7 +53,7 @@ Pages in this category:
 /**
  * Deploy final article to content directory
  */
-export function deployToDestination(topic, destPath, { ROOT, getTopicDir, ensureDir }) {
+export function deployToDestination(topic: string, destPath: string, { ROOT, getTopicDir, ensureDir }: DeployContext): { success: boolean; error?: string; deployedTo?: string } {
   const topicDir = getTopicDir(topic);
   const finalPath = path.join(topicDir, 'final.mdx');
 
@@ -60,8 +78,8 @@ export function deployToDestination(topic, destPath, { ROOT, getTopicDir, ensure
 /**
  * Validate cross-links in deployed content
  */
-export function validateCrossLinks(filePath) {
-  const warnings = [];
+export function validateCrossLinks(filePath: string): CrossLinkResult {
+  const warnings: string[] = [];
 
   if (!fs.existsSync(filePath)) {
     return { warnings: ['File not found'], outboundCount: 0, outboundIds: [] };
@@ -71,8 +89,8 @@ export function validateCrossLinks(filePath) {
 
   // Count EntityLinks
   const entityLinkPattern = /<EntityLink\s+id="([^"]+)"/g;
-  const outboundIds = [];
-  let match;
+  const outboundIds: string[] = [];
+  let match: RegExpExecArray | null;
   while ((match = entityLinkPattern.exec(content)) !== null) {
     outboundIds.push(match[1]);
   }
@@ -87,8 +105,8 @@ export function validateCrossLinks(filePath) {
   // Check for broken footnote references
   const footnoteRefs = content.match(/\[\^\d+\]/g) || [];
   const footnoteDefinitions = content.match(/^\[\^\d+\]:/gm) || [];
-  const refCount = new Set(footnoteRefs.map(r => r.match(/\d+/)[0])).size;
-  const defCount = new Set(footnoteDefinitions.map(d => d.match(/\d+/)[0])).size;
+  const refCount = new Set(footnoteRefs.map(r => r.match(/\d+/)![0])).size;
+  const defCount = new Set(footnoteDefinitions.map(d => d.match(/\d+/)![0])).size;
 
   if (refCount > defCount) {
     warnings.push(`${refCount - defCount} footnote reference(s) without definitions`);
@@ -104,7 +122,7 @@ export function validateCrossLinks(filePath) {
 /**
  * Review phase — spawns Claude Code to do a critical review
  */
-export async function runReview(topic, { ROOT, getTopicDir, log }) {
+export async function runReview(topic: string, { ROOT, getTopicDir, log }: ReviewContext): Promise<{ success: boolean }> {
   log('review', 'Running critical review...');
 
   const draftPath = path.join(getTopicDir(topic), 'draft.mdx');
@@ -152,7 +170,7 @@ If you find any logicalIssues or temporalArtifacts, also fix them directly in th
     claude.stdin.write(reviewPrompt);
     claude.stdin.end();
 
-    claude.on('close', code => {
+    claude.on('close', (code: number | null) => {
       resolve({ success: code === 0 });
     });
   });

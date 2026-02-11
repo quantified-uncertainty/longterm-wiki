@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --import tsx/esm --no-warnings
 
 /**
  * Bootstrap Update Frequency
@@ -14,22 +14,28 @@
  *   importance < 20   → not set (too low priority for scheduled updates)
  *
  * Usage:
- *   node crux/authoring/bootstrap-update-frequency.mjs              # Dry run
- *   node crux/authoring/bootstrap-update-frequency.mjs --apply      # Apply changes
- *   node crux/authoring/bootstrap-update-frequency.mjs --verbose    # Show all pages
+ *   node crux/authoring/bootstrap-update-frequency.ts              # Dry run
+ *   node crux/authoring/bootstrap-update-frequency.ts --apply      # Apply changes
+ *   node crux/authoring/bootstrap-update-frequency.ts --verbose    # Show all pages
  */
 
 import { readFileSync, writeFileSync, readdirSync } from 'fs';
 import { join, relative } from 'path';
+import { fileURLToPath } from 'url';
 
-const PROJECT_ROOT = process.cwd();
-const CONTENT_DIR = join(PROJECT_ROOT, 'content/docs');
+const PROJECT_ROOT: string = process.cwd();
+const CONTENT_DIR: string = join(PROJECT_ROOT, 'content/docs');
 
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
-const FREQUENCY_RULES = [
+interface FrequencyRule {
+  minImportance: number;
+  frequency: number;
+}
+
+const FREQUENCY_RULES: FrequencyRule[] = [
   { minImportance: 80, frequency: 7 },
   { minImportance: 60, frequency: 21 },
   { minImportance: 40, frequency: 45 },
@@ -40,10 +46,10 @@ const FREQUENCY_RULES = [
 // Helpers
 // ---------------------------------------------------------------------------
 
-function findMdxFiles(dir) {
-  const results = [];
+function findMdxFiles(dir: string): string[] {
+  const results: string[] = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const fullPath = join(dir, entry.name);
+    const fullPath: string = join(dir, entry.name);
     if (entry.isDirectory()) {
       results.push(...findMdxFiles(fullPath));
     } else if (/\.(mdx?|md)$/.test(entry.name)) {
@@ -59,15 +65,15 @@ function findMdxFiles(dir) {
  * Insert update_frequency into frontmatter YAML string without rewriting the whole thing.
  * Places it after lastEdited or importance, whichever comes last.
  */
-function insertUpdateFrequency(content, frequency) {
-  const fmMatch = content.match(/^(---\n)([\s\S]*?)(\n---)/);
+function insertUpdateFrequency(content: string, frequency: number): string {
+  const fmMatch: RegExpMatchArray | null = content.match(/^(---\n)([\s\S]*?)(\n---)/);
   if (!fmMatch) return content;
 
-  const yaml = fmMatch[2];
-  const lines = yaml.split('\n');
+  const yaml: string = fmMatch[2];
+  const lines: string[] = yaml.split('\n');
 
   // Find best insertion point: after lastEdited, importance, or at end of top-level fields
-  let insertAfter = -1;
+  let insertAfter: number = -1;
   for (let i = 0; i < lines.length; i++) {
     if (/^(lastEdited|importance):/.test(lines[i])) {
       insertAfter = i;
@@ -83,7 +89,7 @@ function insertUpdateFrequency(content, frequency) {
   return `${fmMatch[1]}${lines.join('\n')}${fmMatch[3]}${content.slice(fmMatch[0].length)}`;
 }
 
-function getFrequencyForImportance(importance) {
+function getFrequencyForImportance(importance: number): number | null {
   for (const rule of FREQUENCY_RULES) {
     if (importance >= rule.minImportance) {
       return rule.frequency;
@@ -96,36 +102,44 @@ function getFrequencyForImportance(importance) {
 // Main
 // ---------------------------------------------------------------------------
 
-async function main() {
+interface Change {
+  filePath: string;
+  rel: string;
+  title: string;
+  importance: number;
+  frequency: number;
+}
+
+async function main(): Promise<void> {
   const { parse: parseYaml } = await import('yaml');
-  const args = process.argv.slice(2);
-  const apply = args.includes('--apply');
-  const verbose = args.includes('--verbose');
+  const args: string[] = process.argv.slice(2);
+  const apply: boolean = args.includes('--apply');
+  const verbose: boolean = args.includes('--verbose');
 
   // Override parseFrontmatter with proper yaml import
-  function parseFm(content) {
-    const match = content.match(/^---\n([\s\S]*?)\n---/);
+  function parseFm(content: string): Record<string, unknown> {
+    const match: RegExpMatchArray | null = content.match(/^---\n([\s\S]*?)\n---/);
     if (!match) return {};
     try {
-      return parseYaml(match[1]) || {};
+      return (parseYaml(match[1]) as Record<string, unknown>) || {};
     } catch {
       return {};
     }
   }
 
-  const files = findMdxFiles(CONTENT_DIR);
+  const files: string[] = findMdxFiles(CONTENT_DIR);
 
-  let updated = 0;
-  let skipped = 0;
-  let alreadySet = 0;
-  let noImportance = 0;
-  let belowThreshold = 0;
-  const changes = [];
+  let updated: number = 0;
+  let skipped: number = 0;
+  let alreadySet: number = 0;
+  let noImportance: number = 0;
+  let belowThreshold: number = 0;
+  const changes: Change[] = [];
 
   for (const filePath of files) {
-    const content = readFileSync(filePath, 'utf-8');
-    const fm = parseFm(content);
-    const rel = relative(CONTENT_DIR, filePath);
+    const content: string = readFileSync(filePath, 'utf-8');
+    const fm: Record<string, unknown> = parseFm(content);
+    const rel: string = relative(CONTENT_DIR, filePath);
 
     // Skip index pages
     if (filePath.endsWith('index.mdx') || filePath.endsWith('index.md')) {
@@ -151,8 +165,8 @@ async function main() {
       continue;
     }
 
-    const importance = Number(fm.importance);
-    const frequency = getFrequencyForImportance(importance);
+    const importance: number = Number(fm.importance);
+    const frequency: number | null = getFrequencyForImportance(importance);
 
     if (frequency === null) {
       belowThreshold++;
@@ -165,13 +179,13 @@ async function main() {
     changes.push({
       filePath,
       rel,
-      title: fm.title || rel,
+      title: (fm.title as string) || rel,
       importance,
       frequency,
     });
 
     if (apply) {
-      const newContent = insertUpdateFrequency(content, frequency);
+      const newContent: string = insertUpdateFrequency(content, frequency);
       writeFileSync(filePath, newContent, 'utf-8');
     }
 
@@ -180,7 +194,7 @@ async function main() {
 
   // Output summary
   console.log('\nBootstrap Update Frequency');
-  console.log('─'.repeat(50));
+  console.log('\u2500'.repeat(50));
   console.log(`  Total files scanned:    ${files.length}`);
   console.log(`  Already have frequency: ${alreadySet}`);
   console.log(`  No importance score:    ${noImportance}`);
@@ -190,9 +204,9 @@ async function main() {
   console.log('');
 
   // Show frequency distribution of changes
-  const freqCounts = {};
+  const freqCounts: Record<string, number> = {};
   for (const ch of changes) {
-    const label = `${ch.frequency}d`;
+    const label: string = `${ch.frequency}d`;
     freqCounts[label] = (freqCounts[label] || 0) + 1;
   }
   console.log('Frequency distribution of changes:');
@@ -202,7 +216,7 @@ async function main() {
   console.log('');
 
   // Show individual changes (first 30 or all if verbose)
-  const toShow = verbose ? changes : changes.slice(0, 30);
+  const toShow: Change[] = verbose ? changes : changes.slice(0, 30);
   if (toShow.length > 0) {
     console.log(`${apply ? 'Updated' : 'Would update'} pages:`);
     for (const ch of toShow) {
@@ -218,4 +232,6 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch(console.error);
+}

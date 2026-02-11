@@ -6,9 +6,39 @@
 
 import fs from 'fs';
 import path from 'path';
-import { getFetchedSourceContent } from './source-fetching.mjs';
+import { getFetchedSourceContent } from './source-fetching.ts';
 
-export async function runSourceVerification(topic, { log, saveResult, getTopicDir }) {
+interface VerificationContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: unknown) => string;
+  getTopicDir: (topic: string) => string;
+}
+
+interface Warning {
+  type: string;
+  name?: string;
+  person?: string;
+  quote?: string;
+  count?: number;
+  message: string;
+}
+
+interface QuoteAttribution {
+  person: string;
+  context: string;
+}
+
+interface AttributedQuote {
+  person: string;
+  quote: string;
+  fullMatch: string;
+}
+
+interface ResearchData {
+  sources?: Array<{ content?: string }>;
+}
+
+export async function runSourceVerification(topic: string, { log, saveResult, getTopicDir }: VerificationContext): Promise<{ success: boolean; warnings: Warning[] }> {
   log('verify-sources', 'Checking content against research sources...');
 
   const topicDir = getTopicDir(topic);
@@ -20,7 +50,7 @@ export async function runSourceVerification(topic, { log, saveResult, getTopicDi
     return { success: true, warnings: [] };
   }
 
-  const research = JSON.parse(fs.readFileSync(researchPath, 'utf-8'));
+  const research: ResearchData = JSON.parse(fs.readFileSync(researchPath, 'utf-8'));
   const draft = fs.readFileSync(draftPath, 'utf-8');
 
   // Combine all research text for searching
@@ -41,7 +71,7 @@ export async function runSourceVerification(topic, { log, saveResult, getTopicDi
 
   const researchText = allSourceContent.toLowerCase();
 
-  const warnings = [];
+  const warnings: Warning[] = [];
 
   // Check 1: Verify names exist in research
   const authorPatterns = [
@@ -51,9 +81,9 @@ export async function runSourceVerification(topic, { log, saveResult, getTopicDi
     /including\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*(?:,\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)*(?:,?\s+and\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)?)/g,
   ];
 
-  const mentionedNames = new Set();
+  const mentionedNames = new Set<string>();
   for (const pattern of authorPatterns) {
-    let match;
+    let match: RegExpExecArray | null;
     while ((match = pattern.exec(draft)) !== null) {
       const nameStr = match[1];
       const names = nameStr
@@ -94,9 +124,9 @@ export async function runSourceVerification(topic, { log, saveResult, getTopicDi
     /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\s+criticized\s+[^"\u201c]+\s+as\s+["\u201c]([^"\u201d]+)["\u201d]/gi,
   ];
 
-  const attributedQuotes = [];
+  const attributedQuotes: AttributedQuote[] = [];
   for (const pattern of attributedQuotePatterns) {
-    let match;
+    let match: RegExpExecArray | null;
     while ((match = pattern.exec(draft)) !== null) {
       const person = match[1].trim();
       const quote = match[2].trim();
@@ -128,9 +158,9 @@ export async function runSourceVerification(topic, { log, saveResult, getTopicDi
   }
 
   // Check 3: Flag all Person + quote patterns for review
-  const allQuoteAttributions = [];
+  const allQuoteAttributions: QuoteAttribution[] = [];
   const simpleAttributionPattern = /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\s+(?:said|wrote|argued|stated|noted|called it|described it as)\s*[:\s]*["\u201c][^"\u201d]{10,}["\u201d]/gi;
-  let simpleMatch;
+  let simpleMatch: RegExpExecArray | null;
   while ((simpleMatch = simpleAttributionPattern.exec(draft)) !== null) {
     allQuoteAttributions.push({
       person: simpleMatch[1],

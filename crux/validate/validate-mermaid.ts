@@ -612,10 +612,11 @@ function validateWithCli(chart: string, index: number): CliValidationResult {
     }
 
     return { valid: true };
-  } catch (err) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     return {
       valid: false,
-      error: (err as Error).message,
+      error: error.message,
     };
   }
 }

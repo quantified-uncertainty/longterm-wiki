@@ -4,52 +4,53 @@
  * Unified interface for content management scripts.
  */
 
+import type { ScriptConfig, CommandResult } from '../lib/cli.ts';
 import { buildCommands } from '../lib/cli.ts';
 
 /**
  * Script definitions
  */
-const SCRIPTS = {
+const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
-    script: 'authoring/page-improver.mjs',
+    script: 'authoring/page-improver.ts',
     description: 'Improve an existing page with AI assistance',
     passthrough: ['tier', 'directions', 'dryRun'],
     positional: true,
   },
   create: {
-    script: 'authoring/page-creator.mjs',
+    script: 'authoring/page-creator.ts',
     description: 'Create a new page with research pipeline',
     passthrough: ['tier', 'phase', 'output', 'help'],
     positional: true,
   },
   regrade: {
-    script: 'authoring/regrade.mjs',
+    script: 'authoring/regrade.ts',
     description: 'Re-grade content quality ratings',
     passthrough: ['batch', 'dryRun'],
   },
   grade: {
-    script: 'authoring/grade-by-template.mjs',
+    script: 'authoring/grade-by-template.ts',
     description: 'Grade pages by template compliance',
     passthrough: ['verbose'],
   },
   'grade-content': {
-    script: 'authoring/grade-content.mjs',
+    script: 'authoring/grade-content.ts',
     description: 'Grade content quality with AI (3-step pipeline)',
     passthrough: ['batch', 'model', 'dryRun', 'skipWarnings', 'warningsOnly'],
   },
   polish: {
-    script: 'authoring/post-improve.mjs',
+    script: 'authoring/post-improve.ts',
     description: 'Post-improvement cleanup and polish',
     passthrough: [],
   },
 };
 
-export const commands = buildCommands(SCRIPTS);
+export const commands: Record<string, (args: string[], options: Record<string, unknown>) => Promise<CommandResult>> = buildCommands(SCRIPTS);
 
 /**
  * Get help text
  */
-export function getHelp() {
+export function getHelp(): string {
   const commandList = Object.entries(SCRIPTS)
     .map(([name, config]) => `  ${name.padEnd(14)} ${config.description}`)
     .join('\n');

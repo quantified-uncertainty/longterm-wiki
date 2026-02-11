@@ -4,7 +4,31 @@
  * Finds official reference links (Wikipedia, LessWrong, EA Forum, etc.) for a topic.
  */
 
-export const CANONICAL_DOMAINS = [
+interface CanonicalDomain {
+  domain: string;
+  name: string;
+  priority: number;
+}
+
+interface CanonicalLink {
+  name: string;
+  url: string;
+  priority: number;
+  domain: string;
+}
+
+interface CanonicalLinksContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: unknown) => string;
+}
+
+interface PerplexityResult {
+  content: string;
+  citations?: string[];
+  cost?: number;
+}
+
+export const CANONICAL_DOMAINS: CanonicalDomain[] = [
   { domain: 'en.wikipedia.org', name: 'Wikipedia', priority: 1 },
   { domain: 'www.wikidata.org', name: 'Wikidata', priority: 2 },
   { domain: 'lesswrong.com', name: 'LessWrong', priority: 3 },
@@ -18,10 +42,10 @@ export const CANONICAL_DOMAINS = [
   { domain: 'linkedin.com', name: 'LinkedIn', priority: 7 },
 ];
 
-export async function findCanonicalLinks(topic, { log, saveResult }) {
+export async function findCanonicalLinks(topic: string, { log, saveResult }: CanonicalLinksContext): Promise<{ success: boolean; error?: string; links: CanonicalLink[]; cost?: number }> {
   log('canonical', 'Searching for canonical reference links...');
 
-  const { perplexityResearch } = await import('../../lib/openrouter.mjs');
+  const { perplexityResearch } = await import('../../lib/openrouter.ts');
 
   const searchQuery = `Find official and reference pages for "${topic}". Include:
 - Wikipedia page URL (if exists)
@@ -35,7 +59,7 @@ export async function findCanonicalLinks(topic, { log, saveResult }) {
 For each, provide the exact URL. Only include links that actually exist.`;
 
   try {
-    const result = await perplexityResearch(searchQuery, { maxTokens: 1500 });
+    const result: PerplexityResult = await perplexityResearch(searchQuery, { maxTokens: 1500 });
 
     // Extract URLs from response
     const urlRegex = /https?:\/\/[^\s<>"{}|\\^`\[\]]+/g;
@@ -46,8 +70,8 @@ For each, provide the exact URL. Only include links that actually exist.`;
     const allUrls = [...new Set([...foundUrls, ...(result.citations || [])])];
 
     // Categorize by domain
-    const canonicalLinks = [];
-    const seenDomains = new Set();
+    const canonicalLinks: CanonicalLink[] = [];
+    const seenDomains = new Set<string>();
 
     for (const url of allUrls) {
       try {
@@ -73,7 +97,7 @@ For each, provide the exact URL. Only include links that actually exist.`;
             seenDomains.add('Official Website');
           }
         }
-      } catch (e) {
+      } catch (e: unknown) {
         // Invalid URL, skip
       }
     }
@@ -95,7 +119,8 @@ For each, provide the exact URL. Only include links that actually exist.`;
     saveResult(topic, 'canonical-links.json', data);
 
     return { success: true, links: canonicalLinks, cost: result.cost || 0 };
-  } catch (error) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     log('canonical', `Error finding canonical links: ${error.message}`);
     return { success: false, error: error.message, links: [] };
   }

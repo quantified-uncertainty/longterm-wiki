@@ -8,6 +8,44 @@ import fs from 'fs';
 import path from 'path';
 import { createClient, parseJsonResponse } from '../../lib/anthropic.ts';
 
+interface GradingContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: unknown) => string;
+  getTopicDir: (topic: string) => string;
+}
+
+interface GradingRatings {
+  novelty: number;
+  rigor: number;
+  actionability: number;
+  completeness: number;
+}
+
+interface GradingResult {
+  importance: number;
+  ratings: GradingRatings;
+  llmSummary?: string;
+  balanceFlags?: string[];
+  reasoning?: string;
+}
+
+interface Frontmatter {
+  title?: string;
+  description?: string;
+  importance?: number;
+  ratings?: GradingRatings;
+  quality?: number;
+  llmSummary?: string;
+  balanceFlags?: string[];
+  metrics?: {
+    wordCount: number;
+    citations: number;
+    tables: number;
+    diagrams: number;
+  };
+  [key: string]: unknown;
+}
+
 const GRADING_SYSTEM_PROMPT = `You are an expert evaluator of AI safety content. Score this page on:
 
 - importance (0-100): How significant for understanding AI risk
@@ -35,7 +73,7 @@ IMPORTANCE guidelines:
 
 Respond with valid JSON only.`;
 
-export async function runGrading(topic, { log, saveResult, getTopicDir }) {
+export async function runGrading(topic: string, { log, saveResult, getTopicDir }: GradingContext): Promise<{ success: boolean; error?: string; importance?: number; quality?: number; ratings?: GradingRatings; llmSummary?: string }> {
   log('grade', 'Running quality grading on temp file...');
 
   const finalPath = path.join(getTopicDir(topic), 'final.mdx');
@@ -54,11 +92,12 @@ export async function runGrading(topic, { log, saveResult, getTopicDir }) {
 
   const [, fmYaml, body] = fmMatch;
 
-  let frontmatter;
+  let frontmatter: Frontmatter;
   try {
     const { parse: parseYaml } = await import('yaml');
-    frontmatter = parseYaml(fmYaml);
-  } catch (e) {
+    frontmatter = parseYaml(fmYaml) as Frontmatter;
+  } catch (err: unknown) {
+    const e = err instanceof Error ? err : new Error(String(err));
     log('grade', `Frontmatter parse error: ${e.message}`);
     return { success: false, error: 'Frontmatter parse error' };
   }
@@ -70,6 +109,9 @@ export async function runGrading(topic, { log, saveResult, getTopicDir }) {
 
   try {
     const client = createClient();
+    if (!client) {
+      return { success: false, error: 'Anthropic API key not configured' };
+    }
 
     const userPrompt = `Grade this content page:
 
@@ -102,8 +144,12 @@ Respond with JSON:
       messages: [{ role: 'user', content: userPrompt }]
     });
 
-    const text = response.content[0].text;
-    const grades = parseJsonResponse(text);
+    const block = response.content[0];
+    if (!block || block.type !== 'text') {
+      return { success: false, error: 'Expected text response from API' };
+    }
+    const text = block.text;
+    const grades = parseJsonResponse(text) as GradingResult | null;
 
     if (!grades || !grades.importance) {
       log('grade', 'Invalid grading response');
@@ -167,7 +213,8 @@ Respond with JSON:
       llmSummary: grades.llmSummary
     };
 
-  } catch (error) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     log('grade', `Grading API error: ${error.message}`);
     return { success: false, error: error.message };
   }

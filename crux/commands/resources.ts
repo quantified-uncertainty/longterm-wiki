@@ -1,16 +1,22 @@
 /**
  * Resources Command Handlers
  *
- * Unified interface for resource management (wraps resource-manager.mjs).
+ * Unified interface for resource management (wraps resource-manager.ts).
  */
 
-import { createLogger } from '../lib/output.ts';
+import type { CommandResult } from '../lib/cli.ts';
 import { runScript, optionsToArgs } from '../lib/cli.ts';
 
+interface ResourceCommandConfig {
+  description: string;
+  passthrough: string[];
+  positional?: boolean;
+}
+
 /**
- * Command definitions (maps to resource-manager.mjs subcommands)
+ * Command definitions (maps to resource-manager.ts subcommands)
  */
-const COMMANDS = {
+const COMMANDS: Record<string, ResourceCommandConfig> = {
   list: {
     description: 'List pages with unconverted links',
     passthrough: ['limit', 'json'],
@@ -49,31 +55,32 @@ const COMMANDS = {
 /**
  * Create a command handler
  */
-function createCommandHandler(name, config) {
-  return async function (args, options) {
-    const log = createLogger(options.ci || options.json);
-
+function createCommandHandler(
+  name: string,
+  config: ResourceCommandConfig,
+): (args: string[], options: Record<string, unknown>) => Promise<CommandResult> {
+  return async function (args: string[], options: Record<string, unknown>): Promise<CommandResult> {
     // Build the command args
-    const cmdArgs = [name];
+    const cmdArgs: string[] = [name];
 
     // Add positional args
     if (config.positional) {
-      const positionals = args.filter((a) => !a.startsWith('-'));
+      const positionals = args.filter((a: string) => !a.startsWith('-'));
       cmdArgs.push(...positionals);
     }
 
     // Add passthrough options
     const optionArgs = optionsToArgs(options, ['help']);
-    const filteredArgs = optionArgs.filter((arg) => {
+    const filteredArgs = optionArgs.filter((arg: string) => {
       const key = arg.replace(/^--/, '').split('=')[0];
-      const camelKey = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+      const camelKey = key.replace(/-([a-z])/g, (_: string, c: string) => c.toUpperCase());
       return config.passthrough.includes(camelKey) || config.passthrough.includes(key);
     });
     cmdArgs.push(...filteredArgs);
 
     const streamOutput = !options.ci && !options.json;
 
-    const result = await runScript('resource-manager.mjs', cmdArgs, {
+    const result = await runScript('resource-manager.ts', cmdArgs, {
       streamOutput,
     });
 
@@ -88,7 +95,7 @@ function createCommandHandler(name, config) {
 /**
  * Generate command handlers dynamically
  */
-export const commands = {};
+export const commands: Record<string, (args: string[], options: Record<string, unknown>) => Promise<CommandResult>> = {};
 for (const [name, config] of Object.entries(COMMANDS)) {
   commands[name] = createCommandHandler(name, config);
 }
@@ -99,7 +106,7 @@ commands.default = commands.list;
 /**
  * Get help text
  */
-export function getHelp() {
+export function getHelp(): string {
   const commandList = Object.entries(COMMANDS)
     .map(([name, config]) => `  ${name.padEnd(18)} ${config.description}`)
     .join('\n');

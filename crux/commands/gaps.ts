@@ -8,23 +8,47 @@
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { parse as parseYaml } from 'yaml';
 import { join } from 'path';
+import type { CommandResult } from '../lib/cli.ts';
+import type { PageEntry } from '../lib/content-types.ts';
 import { createLogger } from '../lib/output.ts';
-import { loadPages, DATA_DIR_ABS } from '../lib/content-types.js';
+import { loadPages, DATA_DIR_ABS } from '../lib/content-types.ts';
 
-const INSIGHTS_DIR = join(DATA_DIR_ABS, 'insights');
+const INSIGHTS_DIR: string = join(DATA_DIR_ABS, 'insights');
+
+interface InsightEntry {
+  source: string;
+  [key: string]: unknown;
+}
+
+interface InsightsFileData {
+  insights?: InsightEntry[];
+}
+
+interface GapEntry {
+  title: string;
+  path: string;
+  filePath: string;
+  importance: number;
+  quality: number;
+  insightCount: number;
+  potentialScore: number;
+  wordCount: number;
+  gapReason: string;
+  category: string;
+}
 
 /**
  * Load insights data from directory of YAML files
  */
-function loadInsights() {
+function loadInsights(): { insights: InsightEntry[] } {
   if (!existsSync(INSIGHTS_DIR)) {
     return { insights: [] };
   }
-  const files = readdirSync(INSIGHTS_DIR).filter(f => f.endsWith('.yaml'));
-  const allInsights = [];
+  const files = readdirSync(INSIGHTS_DIR).filter((f: string) => f.endsWith('.yaml'));
+  const allInsights: InsightEntry[] = [];
   for (const file of files) {
     const content = readFileSync(join(INSIGHTS_DIR, file), 'utf-8');
-    const data = parseYaml(content);
+    const data = parseYaml(content) as InsightsFileData | null;
     if (data?.insights) {
       allInsights.push(...data.insights);
     }
@@ -35,9 +59,9 @@ function loadInsights() {
 /**
  * Calculate insight gaps
  */
-function calculateGaps(pages, insights) {
+function calculateGaps(pages: PageEntry[], insights: InsightEntry[]): GapEntry[] {
   // Count insights per source
-  const insightCounts = new Map();
+  const insightCounts = new Map<string, number>();
   for (const insight of insights) {
     const current = insightCounts.get(insight.source) || 0;
     insightCounts.set(insight.source, current + 1);
@@ -45,8 +69,8 @@ function calculateGaps(pages, insights) {
 
   // Calculate gaps for each page
   return pages
-    .filter(page => page.importance != null && page.importance > 0)
-    .map(page => {
+    .filter((page: PageEntry) => page.importance != null && page.importance > 0)
+    .map((page: PageEntry): GapEntry => {
       const insightCount = insightCounts.get(page.path) || 0;
       const importance = page.importance || 0;
       const quality = page.quality || 50;
@@ -64,7 +88,7 @@ function calculateGaps(pages, insights) {
       return {
         title: page.title,
         path: page.path,
-        filePath: page.filePath,
+        filePath: page.filePath ?? page.path,
         importance,
         quality,
         insightCount,
@@ -74,26 +98,26 @@ function calculateGaps(pages, insights) {
         category: page.category || 'unknown',
       };
     })
-    .filter(g => g.potentialScore > 50)
-    .sort((a, b) => b.potentialScore - a.potentialScore);
+    .filter((g: GapEntry) => g.potentialScore > 50)
+    .sort((a: GapEntry, b: GapEntry) => b.potentialScore - a.potentialScore);
 }
 
 /**
  * List gap candidates
  */
-export async function list(args, options) {
-  const log = createLogger(options.ci);
+export async function list(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
   const pages = loadPages();
   const { insights } = loadInsights();
   const gaps = calculateGaps(pages, insights);
 
-  const limit = parseInt(options.limit || '20', 10);
-  const minScore = parseInt(options.minScore || '60', 10);
+  const limit = parseInt((options.limit as string) || '20', 10);
+  const minScore = parseInt((options.minScore as string) || '60', 10);
   const noInsightsOnly = options.noInsights || options.empty;
 
-  let filtered = gaps.filter(g => g.potentialScore >= minScore);
+  let filtered = gaps.filter((g: GapEntry) => g.potentialScore >= minScore);
   if (noInsightsOnly) {
-    filtered = filtered.filter(g => g.insightCount === 0);
+    filtered = filtered.filter((g: GapEntry) => g.insightCount === 0);
   }
   filtered = filtered.slice(0, limit);
 
@@ -108,8 +132,8 @@ export async function list(args, options) {
   output += `${c.dim}Pages needing more insights${c.reset}\n\n`;
 
   // Stats
-  const noInsights = gaps.filter(g => g.insightCount === 0).length;
-  const highPriority = gaps.filter(g => g.potentialScore >= 100).length;
+  const noInsights = gaps.filter((g: GapEntry) => g.insightCount === 0).length;
+  const highPriority = gaps.filter((g: GapEntry) => g.potentialScore >= 100).length;
   output += `${c.dim}Total gaps: ${gaps.length} | No insights: ${noInsights} | High priority: ${highPriority}${c.reset}\n\n`;
 
   // Table header
@@ -141,16 +165,16 @@ export async function list(args, options) {
 /**
  * Show top candidates for automated extraction
  */
-export async function targets(args, options) {
-  const log = createLogger(options.ci);
+export async function targets(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
   const pages = loadPages();
   const { insights } = loadInsights();
   const gaps = calculateGaps(pages, insights);
 
   // Get best targets: high score, no insights, good word count
   const targets = gaps
-    .filter(g => g.insightCount === 0 && g.wordCount >= 500)
-    .slice(0, parseInt(options.limit || '10', 10));
+    .filter((g: GapEntry) => g.insightCount === 0 && g.wordCount >= 500)
+    .slice(0, parseInt((options.limit as string) || '10', 10));
 
   if (options.ci || options.json) {
     return { output: JSON.stringify(targets, null, 2), exitCode: 0 };
@@ -182,26 +206,26 @@ export async function targets(args, options) {
 /**
  * Show statistics about insight coverage
  */
-export async function stats(args, options) {
-  const log = createLogger(options.ci);
+export async function stats(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
   const pages = loadPages();
   const { insights } = loadInsights();
 
   // Count insights per source
-  const insightCounts = new Map();
+  const insightCounts = new Map<string, number>();
   for (const insight of insights) {
     const current = insightCounts.get(insight.source) || 0;
     insightCounts.set(insight.source, current + 1);
   }
 
   // Calculate stats
-  const pagesWithImportance = pages.filter(p => p.importance != null && p.importance > 0);
-  const pagesWithInsights = pagesWithImportance.filter(p => insightCounts.has(p.path));
-  const pagesWithNoInsights = pagesWithImportance.filter(p => !insightCounts.has(p.path));
-  const highImpNoInsights = pagesWithNoInsights.filter(p => p.importance >= 70);
+  const pagesWithImportance = pages.filter((p: PageEntry) => p.importance != null && p.importance > 0);
+  const pagesWithInsights = pagesWithImportance.filter((p: PageEntry) => insightCounts.has(p.path));
+  const pagesWithNoInsights = pagesWithImportance.filter((p: PageEntry) => !insightCounts.has(p.path));
+  const highImpNoInsights = pagesWithNoInsights.filter((p: PageEntry) => (p.importance ?? 0) >= 70);
 
   // Category breakdown
-  const byCategory = {};
+  const byCategory: Record<string, { total: number; withInsights: number; insightCount: number }> = {};
   for (const page of pagesWithImportance) {
     const cat = page.category || 'unknown';
     if (!byCategory[cat]) {
@@ -213,19 +237,19 @@ export async function stats(args, options) {
     if (count > 0) byCategory[cat].withInsights++;
   }
 
-  const stats = {
+  const coverageStats = {
     totalInsights: insights.length,
     totalPages: pagesWithImportance.length,
     pagesWithInsights: pagesWithInsights.length,
     pagesWithNoInsights: pagesWithNoInsights.length,
     highImportanceNoInsights: highImpNoInsights.length,
-    coverage: Math.round((pagesWithInsights.length / pagesWithImportance.length) * 100),
-    avgInsightsPerPage: (insights.length / pagesWithInsights.length).toFixed(1),
+    coverage: pagesWithImportance.length > 0 ? Math.round((pagesWithInsights.length / pagesWithImportance.length) * 100) : 0,
+    avgInsightsPerPage: pagesWithInsights.length > 0 ? (insights.length / pagesWithInsights.length).toFixed(1) : '0.0',
     byCategory,
   };
 
   if (options.ci || options.json) {
-    return { output: JSON.stringify(stats, null, 2), exitCode: 0 };
+    return { output: JSON.stringify(coverageStats, null, 2), exitCode: 0 };
   }
 
   const c = log.colors;
@@ -234,16 +258,16 @@ export async function stats(args, options) {
   output += `${c.bold}${c.blue}Insight Coverage Statistics${c.reset}\n\n`;
 
   output += `${c.bold}Overview:${c.reset}\n`;
-  output += `  Total insights: ${stats.totalInsights}\n`;
-  output += `  Total pages: ${stats.totalPages}\n`;
-  output += `  Pages with insights: ${stats.pagesWithInsights} (${stats.coverage}%)\n`;
-  output += `  Pages without insights: ${c.yellow}${stats.pagesWithNoInsights}${c.reset}\n`;
-  output += `  High importance, no insights: ${c.red}${stats.highImportanceNoInsights}${c.reset}\n`;
-  output += `  Avg insights per page: ${stats.avgInsightsPerPage}\n\n`;
+  output += `  Total insights: ${coverageStats.totalInsights}\n`;
+  output += `  Total pages: ${coverageStats.totalPages}\n`;
+  output += `  Pages with insights: ${coverageStats.pagesWithInsights} (${coverageStats.coverage}%)\n`;
+  output += `  Pages without insights: ${c.yellow}${coverageStats.pagesWithNoInsights}${c.reset}\n`;
+  output += `  High importance, no insights: ${c.red}${coverageStats.highImportanceNoInsights}${c.reset}\n`;
+  output += `  Avg insights per page: ${coverageStats.avgInsightsPerPage}\n\n`;
 
   output += `${c.bold}By Category:${c.reset}\n`;
   for (const [cat, data] of Object.entries(byCategory).sort((a, b) => b[1].total - a[1].total)) {
-    const pct = Math.round((data.withInsights / data.total) * 100);
+    const pct = data.total > 0 ? Math.round((data.withInsights / data.total) * 100) : 0;
     output += `  ${cat}: ${data.withInsights}/${data.total} pages (${pct}%), ${data.insightCount} insights\n`;
   }
 
@@ -253,7 +277,7 @@ export async function stats(args, options) {
 /**
  * Command registry
  */
-export const commands = {
+export const commands: Record<string, (args: string[], options: Record<string, unknown>) => Promise<CommandResult>> = {
   list,
   targets,
   stats,
@@ -262,7 +286,7 @@ export const commands = {
 /**
  * Get help text
  */
-export function getHelp() {
+export function getHelp(): string {
   return `
 Gaps Domain - Find pages needing more insights
 

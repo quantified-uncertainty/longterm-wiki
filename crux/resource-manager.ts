@@ -15,28 +15,120 @@ import 'dotenv/config';
  *   rebuild-citations Rebuild cited_by relationships from MDX files
  *
  * Examples:
- *   node crux/resource-manager.mjs list --limit 20
- *   node crux/resource-manager.mjs show bioweapons
- *   node crux/resource-manager.mjs process bioweapons --apply
- *   node crux/resource-manager.mjs metadata arxiv --batch 50
- *   node crux/resource-manager.mjs metadata all
+ *   node crux/resource-manager.ts list --limit 20
+ *   node crux/resource-manager.ts show bioweapons
+ *   node crux/resource-manager.ts process bioweapons --apply
+ *   node crux/resource-manager.ts metadata arxiv --batch 50
+ *   node crux/resource-manager.ts metadata all
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, basename, dirname, relative } from 'path';
 import { createHash } from 'crypto';
+import { fileURLToPath } from 'url';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import { CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPages as loadPagesJson } from './lib/content-types.js';
+import { CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPages as loadPagesJson, type PageEntry } from './lib/content-types.ts';
 
-const RESOURCES_DIR = join(DATA_DIR, 'resources');
-const PUBLICATIONS_FILE = join(DATA_DIR, 'publications.yaml');
+const RESOURCES_DIR: string = join(DATA_DIR, 'resources');
+const PUBLICATIONS_FILE: string = join(DATA_DIR, 'publications.yaml');
 
 // Forum publication IDs that go in forums.yaml
-const FORUM_PUBLICATION_IDS = new Set(['lesswrong', 'alignment-forum', 'ea-forum']);
+const FORUM_PUBLICATION_IDS: Set<string> = new Set(['lesswrong', 'alignment-forum', 'ea-forum']);
+
+// ============ Interfaces ============
+
+interface Resource {
+  id: string;
+  url: string;
+  title: string;
+  type: string;
+  authors?: string[];
+  published_date?: string;
+  abstract?: string;
+  summary?: string;
+  publication_id?: string;
+  tags?: string[];
+  cited_by?: string[];
+  doi?: string;
+  date?: string;
+  _sourceFile?: string;
+}
+
+interface MarkdownLink {
+  text: string;
+  url: string;
+  full: string;
+  index: number;
+}
+
+interface ParsedOpts {
+  [key: string]: unknown;
+  _cmd?: string;
+  _args?: string[];
+  _resources?: Resource[];
+  _skipSave?: boolean;
+  limit?: number;
+  batch?: number;
+  'min-unconv'?: number;
+  'dry-run'?: boolean;
+  'skip-create'?: boolean;
+  apply?: boolean;
+  verbose?: boolean;
+  parallel?: boolean;
+  title?: string;
+  type?: string;
+}
+
+interface ArxivMetadata {
+  title: string | null;
+  authors: string[];
+  published: string | null;
+  abstract: string | null;
+}
+
+interface ForumMetadata {
+  title: string;
+  authors: string[];
+  published: string | null;
+}
+
+interface ScholarMetadata {
+  title: string;
+  authors: string[];
+  published: string | null;
+  abstract: string | null;
+}
+
+interface ValidationIssue {
+  resource: Resource;
+  type: string;
+  message: string;
+  url?: string;
+  stored?: string;
+  fetched?: string;
+}
+
+interface Publication {
+  id: string;
+  name: string;
+  domains?: string[];
+}
+
+interface Entity {
+  id: string;
+  tags?: string[];
+}
+
+interface Conversion {
+  original: string;
+  replacement: string;
+  resource: Resource;
+  isNew: boolean;
+}
 
 // ============ Utilities ============
 
-function hashId(str) {
+function hashId(str: string): string {
   return createHash('sha256').update(str).digest('hex').slice(0, 16);
 }
 
@@ -44,7 +136,7 @@ function hashId(str) {
  * Determine which file a new resource belongs to based on type/publication.
  * Only used for NEW resources that don't have a source file yet.
  */
-function getResourceCategory(resource) {
+function getResourceCategory(resource: Resource): string {
   if (resource.type === 'paper') return 'papers';
   if (resource.type === 'government') return 'government';
   if (resource.type === 'reference') return 'reference';
@@ -56,7 +148,7 @@ function getResourceCategory(resource) {
       if (['nature.com', 'science.org', 'springer.com', 'wiley.com', 'sciencedirect.com'].some(d => domain.includes(d))) return 'academic';
       if (['openai.com', 'anthropic.com', 'deepmind.com', 'google.com/deepmind'].some(d => domain.includes(d))) return 'ai-labs';
       if (['nytimes.com', 'washingtonpost.com', 'bbc.com', 'reuters.com', 'theguardian.com'].some(d => domain.includes(d))) return 'news-media';
-    } catch {}
+    } catch (_err: unknown) {}
   }
   return 'web-other';
 }
@@ -65,8 +157,8 @@ function getResourceCategory(resource) {
  * Load all resources from the split directory.
  * Tags each resource with _sourceFile so we can write back to the same file.
  */
-function loadResources() {
-  const resources = [];
+function loadResources(): Resource[] {
+  const resources: Resource[] = [];
   if (!existsSync(RESOURCES_DIR)) {
     return resources;
   }
@@ -75,7 +167,7 @@ function loadResources() {
   for (const file of files) {
     const filepath = join(RESOURCES_DIR, file);
     const content = readFileSync(filepath, 'utf-8');
-    const data = parseYaml(content) || [];
+    const data = (parseYaml(content) || []) as Resource[];
     const category = file.replace('.yaml', '');
     for (const resource of data) {
       resource._sourceFile = category;
@@ -89,9 +181,9 @@ function loadResources() {
  * Save resources back to their source files, preserving the existing directory structure.
  * New resources (without _sourceFile) are categorized by getResourceCategory().
  */
-function saveResources(resources) {
+function saveResources(resources: Resource[]): void {
   // Group by source file, preserving the original structure
-  const byFile = {};
+  const byFile: Record<string, Omit<Resource, '_sourceFile'>[]> = {};
 
   for (const resource of resources) {
     const category = resource._sourceFile || getResourceCategory(resource);
@@ -109,12 +201,12 @@ function saveResources(resources) {
   }
 }
 
-function loadPages() {
+function loadPages(): PageEntry[] {
   return loadPagesJson();
 }
 
-function normalizeUrl(url) {
-  const variations = new Set();
+function normalizeUrl(url: string): string[] {
+  const variations = new Set<string>();
   try {
     const parsed = new URL(url);
     const base = parsed.href.replace(/\/$/, '');
@@ -132,14 +224,14 @@ function normalizeUrl(url) {
       variations.add(withWww);
       variations.add(withWww + '/');
     }
-  } catch {
+  } catch (_err: unknown) {
     variations.add(url);
   }
   return Array.from(variations);
 }
 
-function buildUrlToResourceMap(resources) {
-  const map = new Map();
+function buildUrlToResourceMap(resources: Resource[]): Map<string, Resource> {
+  const map = new Map<string, Resource>();
   for (const r of resources) {
     if (!r.url) continue;
     for (const url of normalizeUrl(r.url)) {
@@ -149,10 +241,10 @@ function buildUrlToResourceMap(resources) {
   return map;
 }
 
-function extractMarkdownLinks(content) {
-  const links = [];
+function extractMarkdownLinks(content: string): MarkdownLink[] {
+  const links: MarkdownLink[] = [];
   const linkRegex = /(?<!!)\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = linkRegex.exec(content)) !== null) {
     const [full, text, url] = match;
     links.push({ text, url, full, index: match.index });
@@ -160,7 +252,7 @@ function extractMarkdownLinks(content) {
   return links;
 }
 
-function findMdxFiles(dir, files = []) {
+function findMdxFiles(dir: string, files: string[] = []): string[] {
   if (!existsSync(dir)) return files;
   const entries = readdirSync(dir);
   for (const entry of entries) {
@@ -175,7 +267,7 @@ function findMdxFiles(dir, files = []) {
   return files;
 }
 
-function findFileByName(name) {
+function findFileByName(name: string): string | null {
   const allFiles = findMdxFiles(CONTENT_DIR);
   // Try exact match first
   let match = allFiles.find(f => basename(f, '.mdx') === name);
@@ -185,7 +277,7 @@ function findFileByName(name) {
   return match || null;
 }
 
-function guessResourceType(url) {
+function guessResourceType(url: string): string {
   const domain = new URL(url).hostname.toLowerCase();
   if (domain.includes('arxiv.org')) return 'paper';
   if (domain.includes('nature.com') || domain.includes('science.org')) return 'paper';
@@ -201,17 +293,17 @@ function guessResourceType(url) {
   return 'web';
 }
 
-function parseArgs(args) {
-  const opts = {};
+function parseArgs(args: string[]): ParsedOpts {
+  const opts: ParsedOpts = {};
   for (let i = 0; i < args.length; i++) {
     if (args[i].startsWith('--')) {
       const key = args[i].slice(2);
       const next = args[i + 1];
       if (next && !next.startsWith('--')) {
-        opts[key] = isNaN(next) ? next : parseFloat(next);
+        (opts as Record<string, unknown>)[key] = isNaN(Number(next)) ? next : parseFloat(next);
         i++;
       } else {
-        opts[key] = true;
+        (opts as Record<string, unknown>)[key] = true;
       }
     } else if (!opts._cmd) {
       opts._cmd = args[i];
@@ -225,9 +317,9 @@ function parseArgs(args) {
 
 // ============ List Command ============
 
-function cmdList(opts) {
-  const limit = opts.limit || 30;
-  const minUnconv = opts['min-unconv'] || 1;
+function cmdList(opts: ParsedOpts): void {
+  const limit = (opts.limit as number) || 30;
+  const minUnconv = (opts['min-unconv'] as number) || 1;
 
   const pages = loadPages();
 
@@ -256,10 +348,10 @@ function cmdList(opts) {
 
 // ============ Show Command ============
 
-function cmdShow(opts) {
+function cmdShow(opts: ParsedOpts): void {
   const name = opts._args?.[0];
   if (!name) {
-    console.error('Usage: resource-manager.mjs show <file-name>');
+    console.error('Usage: resource-manager.ts show <file-name>');
     process.exit(1);
   }
 
@@ -277,8 +369,8 @@ function cmdShow(opts) {
   console.log(`\n📄 ${relative('.', filePath)}`);
   console.log(`   Total external links: ${links.length}\n`);
 
-  const convertible = [];
-  const needsResource = [];
+  const convertible: (MarkdownLink & { resource: Resource })[] = [];
+  const needsResource: MarkdownLink[] = [];
 
   for (const link of links) {
     const resource = urlMap.get(link.url) || urlMap.get(link.url.replace(/\/$/, ''));
@@ -313,13 +405,13 @@ function cmdShow(opts) {
 
 // ============ Process Command ============
 
-function cmdProcess(opts) {
+function cmdProcess(opts: ParsedOpts): void {
   const name = opts._args?.[0];
   const dryRun = !opts.apply;
   const skipCreate = opts['skip-create'];
 
   if (!name) {
-    console.error('Usage: resource-manager.mjs process <file-name> [--apply] [--skip-create]');
+    console.error('Usage: resource-manager.ts process <file-name> [--apply] [--skip-create]');
     process.exit(1);
   }
 
@@ -338,8 +430,8 @@ function cmdProcess(opts) {
   console.log(`   Mode: ${dryRun ? 'DRY RUN' : 'APPLYING'}`);
   console.log(`   External links: ${links.length}\n`);
 
-  const conversions = [];
-  const newResources = [];
+  const conversions: Conversion[] = [];
+  const newResources: Resource[] = [];
 
   for (const link of links) {
     let resource = urlMap.get(link.url) || urlMap.get(link.url.replace(/\/$/, ''));
@@ -426,13 +518,13 @@ function cmdProcess(opts) {
 
 // ============ Create Command ============
 
-function cmdCreate(opts) {
+function cmdCreate(opts: ParsedOpts): void {
   const url = opts._args?.[0];
-  const title = opts.title;
-  const type = opts.type;
+  const title = opts.title as string | undefined;
+  const type = opts.type as string | undefined;
 
   if (!url) {
-    console.error('Usage: resource-manager.mjs create <url> [--title "..."] [--type paper|blog|web]');
+    console.error('Usage: resource-manager.ts create <url> [--title "..."] [--type paper|blog|web]');
     process.exit(1);
   }
 
@@ -449,7 +541,7 @@ function cmdCreate(opts) {
   }
 
   const id = hashId(url);
-  const resource = {
+  const resource: Resource = {
     id,
     url,
     title: title || new URL(url).hostname,
@@ -479,8 +571,8 @@ function cmdCreate(opts) {
 /**
  * Extract ArXiv ID from URL
  */
-function extractArxivId(url) {
-  const patterns = [
+function extractArxivId(url: string): string | null {
+  const patterns: RegExp[] = [
     /arxiv\.org\/(?:abs|pdf|html)\/(\d+\.\d+)(?:v\d+)?/,
     /arxiv\.org\/(?:abs|pdf|html)\/([a-z-]+\/\d+)/,
   ];
@@ -494,16 +586,16 @@ function extractArxivId(url) {
 /**
  * Fetch metadata from ArXiv API
  */
-async function fetchArxivBatch(arxivIds) {
+async function fetchArxivBatch(arxivIds: string[]): Promise<Map<string, ArxivMetadata>> {
   const idList = arxivIds.join(',');
   const url = `http://export.arxiv.org/api/query?id_list=${idList}&max_results=${arxivIds.length}`;
-  const response = await fetch(url);
+  const response: Response = await fetch(url);
   if (!response.ok) throw new Error(`ArXiv API error: ${response.status}`);
-  const xml = await response.text();
+  const xml: string = await response.text();
 
-  const results = new Map();
+  const results = new Map<string, ArxivMetadata>();
   const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
-  let match;
+  let match: RegExpExecArray | null;
 
   while ((match = entryRegex.exec(xml)) !== null) {
     const entry = match[1];
@@ -511,17 +603,19 @@ async function fetchArxivBatch(arxivIds) {
     if (!idMatch) continue;
     const id = idMatch[1].replace(/v\d+$/, '');
 
-    const authors = [];
+    const authors: string[] = [];
     const authorRegex = /<author>[\s\S]*?<name>([^<]+)<\/name>[\s\S]*?<\/author>/g;
-    let authorMatch;
+    let authorMatch: RegExpExecArray | null;
     while ((authorMatch = authorRegex.exec(entry)) !== null) {
       authors.push(authorMatch[1].trim());
     }
 
+    const titleMatch = entry.match(/<title>([\s\S]*?)<\/title>/);
     const publishedMatch = entry.match(/<published>([^<]+)<\/published>/);
     const summaryMatch = entry.match(/<summary>([\s\S]*?)<\/summary>/);
 
     results.set(id, {
+      title: titleMatch ? titleMatch[1].replace(/\s+/g, ' ').trim() : null,
       authors,
       published: publishedMatch ? publishedMatch[1].split('T')[0] : null,
       abstract: summaryMatch ? summaryMatch[1].replace(/\s+/g, ' ').trim() : null,
@@ -533,8 +627,8 @@ async function fetchArxivBatch(arxivIds) {
 /**
  * Extract ArXiv metadata for resources
  */
-async function extractArxivMetadata(opts) {
-  const batch = opts.batch || 100;
+async function extractArxivMetadata(opts: ParsedOpts): Promise<number> {
+  const batch = (opts.batch as number) || 100;
   const dryRun = opts['dry-run'];
   const verbose = opts.verbose;
   const skipSave = opts._skipSave;
@@ -542,7 +636,7 @@ async function extractArxivMetadata(opts) {
   if (!opts._skipSave) console.log('📚 ArXiv Metadata Extractor');
   if (dryRun && !opts._skipSave) console.log('   DRY RUN');
 
-  const resources = opts._resources || loadResources();
+  const resources: Resource[] = (opts._resources as Resource[] | undefined) || loadResources();
   const arxivResources = resources.filter(r => {
     if (!r.url || !r.url.includes('arxiv.org')) return false;
     if (r.authors && r.authors.length > 0) return false;
@@ -557,7 +651,7 @@ async function extractArxivMetadata(opts) {
     return 0;
   }
 
-  const idToResource = new Map();
+  const idToResource = new Map<string, Resource>();
   for (const r of toProcess) {
     const arxivId = extractArxivId(r.url);
     if (arxivId) idToResource.set(arxivId, r);
@@ -580,8 +674,9 @@ async function extractArxivMetadata(opts) {
         if (verbose) console.log(`   ✓ ${resource.title}`);
       }
       if (i + 20 < allIds.length) await sleep(3000);
-    } catch (err) {
-      console.error(`   Error: ${err.message}`);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error(`   Error: ${error.message}`);
     }
   }
 
@@ -597,7 +692,7 @@ async function extractArxivMetadata(opts) {
 /**
  * Extract forum post slug
  */
-function extractForumSlug(url) {
+function extractForumSlug(url: string): string | null {
   const match = url.match(/(?:lesswrong\.com|alignmentforum\.org|forum\.effectivealtruism\.org)\/posts\/([a-zA-Z0-9]+)/);
   return match ? match[1] : null;
 }
@@ -605,25 +700,25 @@ function extractForumSlug(url) {
 /**
  * Fetch forum metadata via GraphQL
  */
-async function fetchForumMetadata(postId, isEAForum) {
+async function fetchForumMetadata(postId: string, isEAForum: boolean): Promise<ForumMetadata | null> {
   const endpoint = isEAForum
     ? 'https://forum.effectivealtruism.org/graphql'
     : 'https://www.lesswrong.com/graphql';
 
   const query = `query { post(input: {selector: {_id: "${postId}"}}) { result { title postedAt user { displayName } coauthors { displayName } } } }`;
 
-  const response = await fetch(endpoint, {
+  const response: Response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query }),
   });
 
   if (!response.ok) return null;
-  const data = await response.json();
+  const data = await response.json() as { data?: { post?: { result?: { title: string; postedAt?: string; user?: { displayName: string }; coauthors?: { displayName: string }[] } } } };
   const post = data?.data?.post?.result;
   if (!post) return null;
 
-  const authors = [post.user?.displayName];
+  const authors: string[] = [post.user?.displayName].filter((x): x is string => typeof x === 'string');
   if (post.coauthors) authors.push(...post.coauthors.map(c => c.displayName));
 
   return {
@@ -636,15 +731,15 @@ async function fetchForumMetadata(postId, isEAForum) {
 /**
  * Extract forum metadata for resources
  */
-async function extractForumMetadata(opts) {
-  const batch = opts.batch || 100;
+async function extractForumMetadata(opts: ParsedOpts): Promise<number> {
+  const batch = (opts.batch as number) || 100;
   const dryRun = opts['dry-run'];
   const verbose = opts.verbose;
 
   if (!opts._skipSave) console.log('📝 Forum Metadata Extractor (LW/AF/EAF)');
   if (dryRun && !opts._skipSave) console.log('   DRY RUN');
 
-  const resources = opts._resources || loadResources();
+  const resources: Resource[] = (opts._resources as Resource[] | undefined) || loadResources();
   const forumResources = resources.filter(r => {
     if (!r.url) return false;
     if (r.authors && r.authors.length > 0) return false;
@@ -664,16 +759,17 @@ async function extractForumMetadata(opts) {
     const slug = extractForumSlug(r.url);
     const isEA = r.url.includes('forum.effectivealtruism.org');
     try {
-      const meta = await fetchForumMetadata(slug, isEA);
-      if (meta?.authors?.length > 0) {
+      const meta = await fetchForumMetadata(slug ?? '', isEA);
+      if (meta && meta.authors && meta.authors.length > 0) {
         r.authors = meta.authors;
         if (meta.published) r.published_date = meta.published;
         updated++;
         if (verbose) console.log(`   ✓ ${r.title}`);
       }
       await sleep(200);
-    } catch (err) {
-      if (verbose) console.log(`   ✗ ${r.title}: ${err.message}`);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      if (verbose) console.log(`   ✗ ${r.title}: ${error.message}`);
     }
   }
 
@@ -689,9 +785,9 @@ async function extractForumMetadata(opts) {
 /**
  * Extract DOI from URL
  */
-function extractDOI(url) {
+function extractDOI(url: string): string | null {
   // Match DOI patterns
-  const patterns = [
+  const patterns: RegExp[] = [
     /doi\.org\/(10\.\d{4,}\/[^\s]+)/,
     /nature\.com\/articles\/([^\s?#]+)/,
     /science\.org\/doi\/(10\.\d{4,}\/[^\s]+)/,
@@ -706,25 +802,25 @@ function extractDOI(url) {
 /**
  * Fetch metadata from Semantic Scholar API
  */
-async function fetchSemanticScholarMetadata(identifier) {
+async function fetchSemanticScholarMetadata(identifier: string): Promise<ScholarMetadata | null> {
   const url = `https://api.semanticscholar.org/graph/v1/paper/${identifier}?fields=title,authors,year,abstract,publicationDate`;
-  const response = await fetch(url);
+  const response: Response = await fetch(url);
   if (!response.ok) return null;
-  const data = await response.json();
+  const data = await response.json() as { title?: string; authors?: { name: string }[]; year?: number; abstract?: string; publicationDate?: string };
   if (!data) return null;
 
   return {
-    title: data.title,
+    title: data.title || '',
     authors: data.authors?.map(a => a.name) || [],
     published: data.publicationDate || (data.year ? `${data.year}` : null),
-    abstract: data.abstract,
+    abstract: data.abstract || null,
   };
 }
 
 /**
  * Check if URL could have Semantic Scholar data
  */
-function isScholarlyUrl(url) {
+function isScholarlyUrl(url: string): boolean {
   const scholarlyDomains = [
     'nature.com', 'science.org', 'springer.com', 'wiley.com',
     'sciencedirect.com', 'plos.org', 'pnas.org', 'cell.com',
@@ -737,15 +833,15 @@ function isScholarlyUrl(url) {
 /**
  * Extract Semantic Scholar metadata for resources
  */
-async function extractScholarMetadata(opts) {
-  const batch = opts.batch || 50;
+async function extractScholarMetadata(opts: ParsedOpts): Promise<number> {
+  const batch = (opts.batch as number) || 50;
   const dryRun = opts['dry-run'];
   const verbose = opts.verbose;
 
   if (!opts._skipSave) console.log('🎓 Semantic Scholar Metadata Extractor');
   if (dryRun && !opts._skipSave) console.log('   DRY RUN');
 
-  const resources = opts._resources || loadResources();
+  const resources: Resource[] = (opts._resources as Resource[] | undefined) || loadResources();
 
   // Find scholarly resources without authors
   const scholarResources = resources.filter(r => {
@@ -783,7 +879,7 @@ async function extractScholarMetadata(opts) {
 
     try {
       const meta = await fetchSemanticScholarMetadata(doi);
-      if (meta?.authors?.length > 0) {
+      if (meta && meta.authors && meta.authors.length > 0) {
         r.authors = meta.authors;
         if (meta.published) r.published_date = meta.published;
         if (meta.abstract && !r.abstract) r.abstract = meta.abstract;
@@ -793,9 +889,10 @@ async function extractScholarMetadata(opts) {
         failed++;
       }
       await sleep(100); // Rate limit
-    } catch (err) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       failed++;
-      if (verbose) console.log(`   ✗ ${r.title}: ${err.message}`);
+      if (verbose) console.log(`   ✗ ${r.title}: ${error.message}`);
     }
   }
 
@@ -811,8 +908,8 @@ async function extractScholarMetadata(opts) {
 /**
  * Extract metadata using Firecrawl for general web pages
  */
-async function extractWebMetadata(opts) {
-  const batch = opts.batch || 20;
+async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
+  const batch = (opts.batch as number) || 20;
   const dryRun = opts['dry-run'];
   const verbose = opts.verbose;
 
@@ -826,7 +923,7 @@ async function extractWebMetadata(opts) {
 
   if (dryRun && !opts._skipSave) console.log('   DRY RUN');
 
-  const resources = opts._resources || loadResources();
+  const resources: Resource[] = (opts._resources as Resource[] | undefined) || loadResources();
 
   // Find web resources without authors (excluding those handled by other extractors)
   const webResources = resources.filter(r => {
@@ -849,20 +946,20 @@ async function extractWebMetadata(opts) {
   }
 
   // Dynamic import for Firecrawl
-  let FirecrawlApp;
+  let FirecrawlApp: unknown;
   try {
     const module = await import('@mendable/firecrawl-js');
     FirecrawlApp = module.default;
-  } catch {
+  } catch (_err: unknown) {
     console.log('   ⚠️  @mendable/firecrawl-js not installed');
     return 0;
   }
 
-  const firecrawl = new FirecrawlApp({ apiKey: FIRECRAWL_KEY });
+  const firecrawl = new (FirecrawlApp as new (opts: { apiKey: string }) => { batchScrape: (urls: string[], opts: unknown) => Promise<{ data?: Array<{ metadata?: Record<string, unknown> }> }>; scrape: (url: string, opts: unknown) => Promise<{ metadata?: Record<string, unknown> }> })({ apiKey: FIRECRAWL_KEY });
   let updated = 0;
 
   // Build URL to resource map
-  const urlToResource = new Map();
+  const urlToResource = new Map<string, Resource>();
   for (const r of toProcess) {
     urlToResource.set(r.url, r);
   }
@@ -880,29 +977,29 @@ async function extractWebMetadata(opts) {
 
     // Process results
     for (const result of results.data || []) {
-      const r = urlToResource.get(result.metadata?.sourceURL || result.metadata?.url);
+      const metadata = (result.metadata || {}) as Record<string, unknown>;
+      const r = urlToResource.get((metadata.sourceURL as string) || (metadata.url as string));
       if (!r) continue;
-
-      const metadata = result.metadata || {};
 
       // Extract authors from various metadata fields
       const authorFields = ['author', 'authors', 'DC.Contributor', 'DC.Creator', 'article:author', 'og:article:author'];
-      let authors = null;
+      let authors: string[] | null = null;
       for (const field of authorFields) {
         const value = metadata[field];
         if (value) {
           if (Array.isArray(value)) {
-            authors = value.filter(a => a && typeof a === 'string');
+            authors = value.filter((a): a is string => a && typeof a === 'string');
           } else if (typeof value === 'string') {
             authors = value.includes(',') ? value.split(',').map(a => a.trim()) : [value];
           }
-          if (authors?.length > 0) break;
+          if (authors?.length && authors.length > 0) break;
         }
       }
 
-      const publishedDate = metadata.publishedTime || metadata.datePublished || metadata.article?.publishedTime;
+      const articleMeta = metadata.article as Record<string, unknown> | undefined;
+      const publishedDate = (metadata.publishedTime as string) || (metadata.datePublished as string) || (articleMeta?.publishedTime as string | undefined);
 
-      if (authors?.length > 0) {
+      if (authors?.length && authors.length > 0) {
         r.authors = authors;
         updated++;
         if (verbose) console.log(`   ✓ ${r.title} (authors: ${authors.join(', ')})`);
@@ -913,32 +1010,34 @@ async function extractWebMetadata(opts) {
         if (verbose && !authors?.length) console.log(`   ✓ ${r.title} (date: ${publishedDate})`);
       }
     }
-  } catch (err) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     // Fall back to sequential if batch fails
-    if (!opts._skipSave) console.log(`   Batch failed (${err.message}), falling back to sequential...`);
+    if (!opts._skipSave) console.log(`   Batch failed (${error.message}), falling back to sequential...`);
 
     for (const r of toProcess) {
       try {
         const result = await firecrawl.scrape(r.url, { formats: ['markdown'] });
-        const metadata = result.metadata || {};
+        const metadata = (result.metadata || {}) as Record<string, unknown>;
 
         const authorFields = ['author', 'authors', 'DC.Contributor', 'DC.Creator', 'article:author', 'og:article:author'];
-        let authors = null;
+        let authors: string[] | null = null;
         for (const field of authorFields) {
           const value = metadata[field];
           if (value) {
             if (Array.isArray(value)) {
-              authors = value.filter(a => a && typeof a === 'string');
+              authors = value.filter((a): a is string => a && typeof a === 'string');
             } else if (typeof value === 'string') {
               authors = value.includes(',') ? value.split(',').map(a => a.trim()) : [value];
             }
-            if (authors?.length > 0) break;
+            if (authors?.length && authors.length > 0) break;
           }
         }
 
-        const publishedDate = metadata.publishedTime || metadata.datePublished || metadata.article?.publishedTime;
+        const articleMeta = metadata.article as Record<string, unknown> | undefined;
+        const publishedDate = (metadata.publishedTime as string) || (metadata.datePublished as string) || (articleMeta?.publishedTime as string | undefined);
 
-        if (authors?.length > 0) {
+        if (authors?.length && authors.length > 0) {
           r.authors = authors;
           updated++;
         }
@@ -948,8 +1047,9 @@ async function extractWebMetadata(opts) {
         }
 
         await sleep(7000);
-      } catch (e) {
-        if (verbose) console.log(`   ✗ ${r.title}: ${e.message}`);
+      } catch (e: unknown) {
+        const innerError = e instanceof Error ? e : new Error(String(e));
+        if (verbose) console.log(`   ✗ ${r.title}: ${innerError.message}`);
       }
     }
   }
@@ -966,12 +1066,12 @@ async function extractWebMetadata(opts) {
 /**
  * Show metadata statistics
  */
-function showMetadataStats() {
+function showMetadataStats(): void {
   console.log('📊 Resource Metadata Statistics\n');
 
   const resources = loadResources();
   const total = resources.length;
-  const withAuthors = resources.filter(r => r.authors?.length > 0).length;
+  const withAuthors = resources.filter(r => r.authors?.length && r.authors.length > 0).length;
   const withDate = resources.filter(r => r.published_date).length;
   const withAbstract = resources.filter(r => r.abstract).length;
   const withSummary = resources.filter(r => r.summary).length;
@@ -984,9 +1084,9 @@ function showMetadataStats() {
 
   // Count by extractable source
   const arxiv = resources.filter(r => r.url?.includes('arxiv.org') && !r.authors?.length).length;
-  const forum = resources.filter(r => extractForumSlug(r.url) && !r.authors?.length).length;
+  const forum = resources.filter(r => r.url && extractForumSlug(r.url) && !r.authors?.length).length;
   const scholarly = resources.filter(r => r.url && isScholarlyUrl(r.url) && !r.url.includes('arxiv.org') && !r.authors?.length).length;
-  const web = resources.filter(r => r.url && !r.authors?.length && !r.url.includes('arxiv.org') && !extractForumSlug(r.url) && !isScholarlyUrl(r.url)).length;
+  const web = resources.filter(r => r.url && !r.authors?.length && !r.url.includes('arxiv.org') && !(r.url && extractForumSlug(r.url)) && !isScholarlyUrl(r.url)).length;
 
   console.log('\nPending extraction:');
   console.log(`  ArXiv: ${arxiv}`);
@@ -995,12 +1095,12 @@ function showMetadataStats() {
   console.log(`  Web (Firecrawl): ${web}`);
 
   // Top domains without metadata
-  const domains = {};
+  const domains: Record<string, number> = {};
   for (const r of resources.filter(r => r.url && !r.authors?.length)) {
     try {
       const domain = new URL(r.url).hostname.replace('www.', '');
       domains[domain] = (domains[domain] || 0) + 1;
-    } catch {}
+    } catch (_err: unknown) {}
   }
   const sorted = Object.entries(domains).sort((a, b) => b[1] - a[1]).slice(0, 10);
 
@@ -1013,7 +1113,7 @@ function showMetadataStats() {
 /**
  * Main metadata command router
  */
-async function cmdMetadata(opts) {
+async function cmdMetadata(opts: ParsedOpts): Promise<void> {
   const source = opts._args?.[0];
   const parallel = opts.parallel;
 
@@ -1036,7 +1136,7 @@ async function cmdMetadata(opts) {
     console.log('🚀 Running all extractors in parallel...\n');
 
     const resources = loadResources();
-    const sharedOpts = { ...opts, _resources: resources, _skipSave: true };
+    const sharedOpts: ParsedOpts = { ...opts, _resources: resources, _skipSave: true };
 
     const results = await Promise.allSettled([
       extractArxivMetadata(sharedOpts),
@@ -1090,14 +1190,14 @@ async function cmdMetadata(opts) {
 
 // ============ Rebuild Citations ============
 
-async function cmdRebuildCitations(opts) {
+async function cmdRebuildCitations(opts: ParsedOpts): Promise<void> {
   const dryRun = opts['dry-run'];
 
   console.log('🔗 Rebuilding cited_by relationships');
   if (dryRun) console.log('   DRY RUN');
 
   const resources = loadResources();
-  const resourceMap = new Map();
+  const resourceMap = new Map<string, Resource>();
   for (const r of resources) {
     r.cited_by = [];
     resourceMap.set(r.id, r);
@@ -1112,16 +1212,16 @@ async function cmdRebuildCitations(opts) {
     const articleId = basename(filePath, '.mdx');
     if (articleId === 'index') continue;
 
-    const ids = new Set();
-    let match;
+    const ids = new Set<string>();
+    let match: RegExpExecArray | null;
     while ((match = rComponentRegex.exec(content)) !== null) {
       ids.add(match[1]);
     }
 
     for (const id of ids) {
       const resource = resourceMap.get(id);
-      if (resource && !resource.cited_by.includes(articleId)) {
-        resource.cited_by.push(articleId);
+      if (resource && !resource.cited_by!.includes(articleId)) {
+        resource.cited_by!.push(articleId);
         totalCitations++;
       }
     }
@@ -1129,10 +1229,10 @@ async function cmdRebuildCitations(opts) {
 
   // Clean up empty cited_by arrays
   for (const r of resources) {
-    if (r.cited_by.length === 0) delete r.cited_by;
+    if (r.cited_by!.length === 0) delete r.cited_by;
   }
 
-  const withCited = resources.filter(r => r.cited_by?.length > 0).length;
+  const withCited = resources.filter(r => r.cited_by?.length && r.cited_by.length > 0).length;
   console.log(`   Resources with citations: ${withCited}`);
   console.log(`   Total citations: ${totalCitations}`);
 
@@ -1145,13 +1245,13 @@ async function cmdRebuildCitations(opts) {
 
 // ============ Enrich Resources ============
 
-function loadPublications() {
+function loadPublications(): Publication[] {
   const content = readFileSync(PUBLICATIONS_FILE, 'utf-8');
-  return parseYaml(content) || [];
+  return (parseYaml(content) || []) as Publication[];
 }
 
-function buildDomainToPublicationMap(publications) {
-  const map = new Map();
+function buildDomainToPublicationMap(publications: Publication[]): Map<string, Publication> {
+  const map = new Map<string, Publication>();
   for (const pub of publications) {
     if (!pub.domains) continue;
     for (const domain of pub.domains) {
@@ -1162,12 +1262,12 @@ function buildDomainToPublicationMap(publications) {
 }
 
 // Infer topic tags from resource content and context
-function inferTags(resource, entities = []) {
-  const tags = new Set();
+function inferTags(resource: Resource, entities: Entity[] = []): string[] {
+  const tags = new Set<string>();
   const text = `${resource.title || ''} ${resource.abstract || ''} ${resource.summary || ''}`.toLowerCase();
 
   // Topic detection
-  const topicPatterns = [
+  const topicPatterns: { pattern: RegExp; tag: string }[] = [
     { pattern: /\b(alignment|aligned|misalign)/i, tag: 'alignment' },
     { pattern: /\b(interpretab|mechanistic|circuits|features)/i, tag: 'interpretability' },
     { pattern: /\b(governance|regulat|policy|policymaker)/i, tag: 'governance' },
@@ -1206,7 +1306,7 @@ function inferTags(resource, entities = []) {
   return Array.from(tags).slice(0, 5);
 }
 
-async function cmdEnrich(opts) {
+async function cmdEnrich(opts: ParsedOpts): Promise<void> {
   const dryRun = opts['dry-run'];
   const verbose = opts.verbose;
 
@@ -1218,17 +1318,17 @@ async function cmdEnrich(opts) {
   const domainMap = buildDomainToPublicationMap(publications);
 
   // Load entities for tag inference (read all YAML files from data/entities/)
-  let entities = [];
+  let entities: Entity[] = [];
   try {
     const entitiesDir = join(DATA_DIR, 'entities');
     if (existsSync(entitiesDir)) {
       for (const file of readdirSync(entitiesDir).filter(f => f.endsWith('.yaml'))) {
         const content = readFileSync(join(entitiesDir, file), 'utf-8');
-        const parsed = parseYaml(content);
-        if (Array.isArray(parsed)) entities.push(...parsed);
+        const parsed = parseYaml(content) as unknown;
+        if (Array.isArray(parsed)) entities.push(...(parsed as Entity[]));
       }
     }
-  } catch (e) {
+  } catch (_e: unknown) {
     console.warn('   Could not load entities for tag inference');
   }
 
@@ -1246,7 +1346,7 @@ async function cmdEnrich(opts) {
           pubMapped++;
           if (verbose) console.log(`   📰 ${r.id} → ${pub.name}`);
         }
-      } catch {}
+      } catch (_err: unknown) {}
     }
 
     // Infer tags if missing
@@ -1265,7 +1365,7 @@ async function cmdEnrich(opts) {
 
   // Stats
   const withPub = resources.filter(r => r.publication_id).length;
-  const withTags = resources.filter(r => r.tags?.length > 0).length;
+  const withTags = resources.filter(r => r.tags?.length && r.tags.length > 0).length;
   console.log(`\n   Total with publication_id: ${withPub} (${Math.round(withPub/resources.length*100)}%)`);
   console.log(`   Total with tags: ${withTags} (${Math.round(withTags/resources.length*100)}%)`);
 
@@ -1281,7 +1381,7 @@ async function cmdEnrich(opts) {
 /**
  * Normalize title for fuzzy comparison
  */
-function normalizeTitle(title) {
+function normalizeTitle(title: string): string {
   return (title || '')
     .toLowerCase()
     .replace(/[^\w\s]/g, ' ')
@@ -1292,7 +1392,7 @@ function normalizeTitle(title) {
 /**
  * Check if two titles are similar enough
  */
-function titlesAreSimilar(stored, fetched) {
+function titlesAreSimilar(stored: string, fetched: string): boolean {
   const a = normalizeTitle(stored);
   const b = normalizeTitle(fetched);
   if (!a || !b) return true; // Can't compare
@@ -1310,22 +1410,22 @@ function titlesAreSimilar(stored, fetched) {
 /**
  * Validate arXiv resources against API
  */
-async function validateArxiv(resources, opts) {
+async function validateArxiv(resources: Resource[], opts: ParsedOpts): Promise<ValidationIssue[]> {
   const verbose = opts.verbose;
-  const limit = opts.limit || 50;
+  const limit = (opts.limit as number) || 50;
 
   const arxivResources = resources.filter(r => r.url?.includes('arxiv.org'));
   console.log(`   Found ${arxivResources.length} arXiv resources`);
 
   const toCheck = arxivResources.slice(0, limit);
-  const idToResource = new Map();
+  const idToResource = new Map<string, Resource>();
 
   for (const r of toCheck) {
     const arxivId = extractArxivId(r.url);
     if (arxivId) idToResource.set(arxivId, r);
   }
 
-  const issues = [];
+  const issues: ValidationIssue[] = [];
   const allIds = Array.from(idToResource.keys());
 
   for (let i = 0; i < allIds.length; i += 20) {
@@ -1336,7 +1436,7 @@ async function validateArxiv(resources, opts) {
       const metadata = await fetchArxivBatch(batchIds);
 
       for (const arxivId of batchIds) {
-        const resource = idToResource.get(arxivId);
+        const resource = idToResource.get(arxivId)!;
         const fetched = metadata.get(arxivId);
 
         if (!fetched) {
@@ -1360,9 +1460,9 @@ async function validateArxiv(resources, opts) {
         }
 
         // Check author mismatch (if we have stored authors)
-        if (resource.authors?.length > 0 && fetched.authors?.length > 0) {
+        if (resource.authors?.length && resource.authors.length > 0 && fetched.authors?.length > 0) {
           // Normalize names - handle "Last, First" vs "First Last" formats
-          const normalizeName = (name) => {
+          const normalizeName = (name: string): string => {
             const parts = name.split(/[,\s]+/).filter(p => p.length > 1);
             return parts.sort().join(' ').toLowerCase();
           };
@@ -1383,8 +1483,9 @@ async function validateArxiv(resources, opts) {
       }
 
       if (i + 20 < allIds.length) await sleep(3000);
-    } catch (err) {
-      console.error(`\n   API error: ${err.message}`);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error(`\n   API error: ${error.message}`);
     }
   }
 
@@ -1395,8 +1496,8 @@ async function validateArxiv(resources, opts) {
 /**
  * Check for broken URLs (HTTP errors)
  */
-async function validateUrls(resources, opts) {
-  const limit = opts.limit || 100;
+async function validateUrls(resources: Resource[], opts: ParsedOpts): Promise<ValidationIssue[]> {
+  const limit = (opts.limit as number) || 100;
   const verbose = opts.verbose;
 
   // Sample random resources to check
@@ -1407,7 +1508,7 @@ async function validateUrls(resources, opts) {
 
   console.log(`   Checking ${toCheck.length} random URLs...`);
 
-  const issues = [];
+  const issues: ValidationIssue[] = [];
   let checked = 0;
 
   for (const resource of toCheck) {
@@ -1420,7 +1521,7 @@ async function validateUrls(resources, opts) {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
 
-      const response = await fetch(resource.url, {
+      const response: Response = await fetch(resource.url, {
         method: 'HEAD',
         signal: controller.signal,
         headers: { 'User-Agent': 'LongtermWikiValidator/1.0' },
@@ -1437,8 +1538,9 @@ async function validateUrls(resources, opts) {
           url: resource.url
         });
       }
-    } catch (err) {
-      if (err.name === 'AbortError') {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      if (error.name === 'AbortError') {
         issues.push({
           resource,
           type: 'timeout',
@@ -1459,8 +1561,8 @@ async function validateUrls(resources, opts) {
 /**
  * Validate Wikipedia links exist and match expected topic
  */
-async function validateWikipedia(resources, opts) {
-  const limit = opts.limit || 50;
+async function validateWikipedia(resources: Resource[], opts: ParsedOpts): Promise<ValidationIssue[]> {
+  const limit = (opts.limit as number) || 50;
   const verbose = opts.verbose;
 
   const wikiResources = resources.filter(r =>
@@ -1469,7 +1571,7 @@ async function validateWikipedia(resources, opts) {
   console.log(`   Found ${wikiResources.length} Wikipedia resources`);
 
   const toCheck = wikiResources.slice(0, limit);
-  const issues = [];
+  const issues: ValidationIssue[] = [];
 
   for (let i = 0; i < toCheck.length; i++) {
     const resource = toCheck[i];
@@ -1485,7 +1587,7 @@ async function validateWikipedia(resources, opts) {
 
       // Use Wikipedia API to check if article exists
       const apiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(urlMatch[1])}`;
-      const response = await fetch(apiUrl, {
+      const response: Response = await fetch(apiUrl, {
         headers: { 'User-Agent': 'LongtermWikiValidator/1.0' }
       });
 
@@ -1497,7 +1599,7 @@ async function validateWikipedia(resources, opts) {
           url: resource.url
         });
       } else if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as { title?: string };
         // Check if stored title matches Wikipedia title
         if (resource.title && data.title) {
           if (!titlesAreSimilar(resource.title, data.title) &&
@@ -1514,7 +1616,7 @@ async function validateWikipedia(resources, opts) {
       }
 
       await sleep(100); // Be polite to Wikipedia
-    } catch (err) {
+    } catch (_err: unknown) {
       // Ignore network errors
     }
   }
@@ -1526,8 +1628,8 @@ async function validateWikipedia(resources, opts) {
 /**
  * Validate forum posts (LessWrong, EA Forum, Alignment Forum)
  */
-async function validateForumPosts(resources, opts) {
-  const limit = opts.limit || 50;
+async function validateForumPosts(resources: Resource[], opts: ParsedOpts): Promise<ValidationIssue[]> {
+  const limit = (opts.limit as number) || 50;
   const verbose = opts.verbose;
 
   const forumResources = resources.filter(r => {
@@ -1539,7 +1641,7 @@ async function validateForumPosts(resources, opts) {
   console.log(`   Found ${forumResources.length} forum resources`);
 
   const toCheck = forumResources.slice(0, limit);
-  const issues = [];
+  const issues: ValidationIssue[] = [];
 
   for (let i = 0; i < toCheck.length; i++) {
     const resource = toCheck[i];
@@ -1554,7 +1656,7 @@ async function validateForumPosts(resources, opts) {
       const postId = postMatch[1];
 
       // Determine which API to use
-      let apiUrl;
+      let apiUrl: string;
       if (resource.url.includes('lesswrong.com')) {
         apiUrl = 'https://www.lesswrong.com/graphql';
       } else if (resource.url.includes('alignmentforum.org')) {
@@ -1567,7 +1669,7 @@ async function validateForumPosts(resources, opts) {
         query: `query { post(input: {selector: {_id: "${postId}"}}) { result { title postedAt } } }`
       };
 
-      const response = await fetch(apiUrl, {
+      const response: Response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1577,7 +1679,7 @@ async function validateForumPosts(resources, opts) {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as { data?: { post?: { result?: { title: string; postedAt?: string } } } };
         const post = data?.data?.post?.result;
 
         if (!post) {
@@ -1601,7 +1703,7 @@ async function validateForumPosts(resources, opts) {
       }
 
       await sleep(200); // Rate limit
-    } catch (err) {
+    } catch (_err: unknown) {
       // Ignore network errors
     }
   }
@@ -1613,8 +1715,8 @@ async function validateForumPosts(resources, opts) {
 /**
  * Validate dates are sane (not in future, not too old, proper format)
  */
-function validateDates(resources, opts) {
-  const issues = [];
+function validateDates(resources: Resource[], opts: ParsedOpts): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
   const now = new Date();
   const minDate = new Date('1990-01-01'); // AI safety didn't exist before this
   const maxDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Allow 1 week into future for timezone issues
@@ -1645,7 +1747,7 @@ function validateDates(resources, opts) {
       continue;
     }
 
-    if (date > maxDate) {
+    if (date.getTime() > maxDate.getTime()) {
       issues.push({
         resource,
         type: 'date_future',
@@ -1654,7 +1756,7 @@ function validateDates(resources, opts) {
       });
     }
 
-    if (date < minDate) {
+    if (date.getTime() < minDate.getTime()) {
       issues.push({
         resource,
         type: 'date_ancient',
@@ -1671,8 +1773,8 @@ function validateDates(resources, opts) {
 /**
  * Validate DOIs via CrossRef API
  */
-async function validateDois(resources, opts) {
-  const limit = opts.limit || 50;
+async function validateDois(resources: Resource[], opts: ParsedOpts): Promise<ValidationIssue[]> {
+  const limit = (opts.limit as number) || 50;
   const verbose = opts.verbose;
 
   // Find resources with DOIs (in URL or doi field)
@@ -1687,7 +1789,7 @@ async function validateDois(resources, opts) {
   console.log(`   Found ${doiResources.length} resources with DOIs`);
 
   const toCheck = doiResources.slice(0, limit);
-  const issues = [];
+  const issues: ValidationIssue[] = [];
 
   for (let i = 0; i < toCheck.length; i++) {
     const resource = toCheck[i];
@@ -1706,7 +1808,7 @@ async function validateDois(resources, opts) {
 
       // Query CrossRef
       const apiUrl = `https://api.crossref.org/works/${encodeURIComponent(doi)}`;
-      const response = await fetch(apiUrl, {
+      const response: Response = await fetch(apiUrl, {
         headers: { 'User-Agent': 'LongtermWikiValidator/1.0 (mailto:admin@example.com)' }
       });
 
@@ -1718,11 +1820,11 @@ async function validateDois(resources, opts) {
           url: resource.url
         });
       } else if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as { message?: { title?: string[] } };
         const work = data.message;
 
         // Check title match
-        if (resource.title && work.title?.[0]) {
+        if (resource.title && work?.title?.[0]) {
           if (!titlesAreSimilar(resource.title, work.title[0])) {
             issues.push({
               resource,
@@ -1736,7 +1838,7 @@ async function validateDois(resources, opts) {
       }
 
       await sleep(100); // CrossRef asks for polite rate limiting
-    } catch (err) {
+    } catch (_err: unknown) {
       // Ignore network errors
     }
   }
@@ -1745,7 +1847,7 @@ async function validateDois(resources, opts) {
   return issues;
 }
 
-async function cmdValidate(opts) {
+async function cmdValidate(opts: ParsedOpts): Promise<void> {
   const source = opts._args?.[0] || 'all';
   const verbose = opts.verbose;
   const limit = opts.limit;
@@ -1755,7 +1857,7 @@ async function cmdValidate(opts) {
   const resources = loadResources();
   console.log(`   Total resources: ${resources.length}\n`);
 
-  const allIssues = [];
+  const allIssues: ValidationIssue[] = [];
 
   if (source === 'arxiv' || source === 'all') {
     console.log('📚 Validating arXiv papers...');
@@ -1802,7 +1904,7 @@ async function cmdValidate(opts) {
     console.log(`\n⚠️  Found ${allIssues.length} potential issues:\n`);
 
     // Group by type
-    const byType = {};
+    const byType: Record<string, ValidationIssue[]> = {};
     for (const issue of allIssues) {
       byType[issue.type] = byType[issue.type] || [];
       byType[issue.type].push(issue);
@@ -1832,13 +1934,13 @@ async function cmdValidate(opts) {
 
 // ============ Utility ============
 
-function sleep(ms) {
+function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // ============ Help ============
 
-function showHelp() {
+function showHelp(): void {
   console.log(`
 Resource Manager CLI
 
@@ -1883,24 +1985,24 @@ Options:
   --verbose              Show detailed output
 
 Examples:
-  node crux/resource-manager.mjs list --limit 20
-  node crux/resource-manager.mjs show bioweapons
-  node crux/resource-manager.mjs process economic-labor --apply
-  node crux/resource-manager.mjs metadata stats
-  node crux/resource-manager.mjs metadata arxiv --batch 50
-  node crux/resource-manager.mjs metadata all
-  node crux/resource-manager.mjs validate arxiv --limit 100
-  node crux/resource-manager.mjs validate all --verbose
-  node crux/resource-manager.mjs enrich
-  node crux/resource-manager.mjs rebuild-citations
+  node crux/resource-manager.ts list --limit 20
+  node crux/resource-manager.ts show bioweapons
+  node crux/resource-manager.ts process economic-labor --apply
+  node crux/resource-manager.ts metadata stats
+  node crux/resource-manager.ts metadata arxiv --batch 50
+  node crux/resource-manager.ts metadata all
+  node crux/resource-manager.ts validate arxiv --limit 100
+  node crux/resource-manager.ts validate all --verbose
+  node crux/resource-manager.ts enrich
+  node crux/resource-manager.ts rebuild-citations
 `);
 }
 
 // ============ Main ============
 
-const opts = parseArgs(process.argv.slice(2));
+async function main(): Promise<void> {
+  const opts = parseArgs(process.argv.slice(2));
 
-async function main() {
   switch (opts._cmd) {
     case 'list':
       cmdList(opts);
@@ -1939,7 +2041,10 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error('Error:', err.message);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch(err => {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error('Error:', error.message);
+    process.exit(1);
+  });
+}

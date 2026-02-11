@@ -7,15 +7,44 @@
 import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
-import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.js';
-import { componentImportsRule } from '../../lib/rules/component-imports.js';
-import { ContentFile } from '../../lib/validation-engine.js';
+import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
+import { componentImportsRule } from '../../lib/rules/component-imports.ts';
+import { ContentFile } from '../../lib/validation-engine.ts';
+
+interface ValidationLoopContext {
+  log: (phase: string, message: string) => void;
+  ROOT: string;
+  getTopicDir: (topic: string) => string;
+}
+
+interface FullValidationContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: unknown) => string;
+  ROOT: string;
+  getTopicDir: (topic: string) => string;
+}
+
+interface ValidationRuleIssue {
+  file?: string;
+  severity?: string;
+  [key: string]: unknown;
+}
+
+interface ValidationJson {
+  issues?: ValidationRuleIssue[];
+}
+
+interface ValidationResults {
+  critical: { passed: number; failed: number; errors: Array<{ rule: string; issues?: ValidationRuleIssue[]; error?: string }> };
+  quality: { passed: number; failed: number; warnings: Array<{ rule: string; issues: ValidationRuleIssue[] }> };
+  compile: { success: boolean; error: string | null };
+}
 
 /**
  * Ensure all used wiki components are properly imported.
  * Delegates to the shared component-imports validation rule.
  */
-export function ensureComponentImports(filePath) {
+export function ensureComponentImports(filePath: string): { fixed: boolean; added: string[] } {
   if (!fs.existsSync(filePath)) return { fixed: false, added: [] };
 
   const content = fs.readFileSync(filePath, 'utf-8');
@@ -40,7 +69,7 @@ export function ensureComponentImports(filePath) {
   return { fixed: false, added: [] };
 }
 
-export async function runValidationLoop(topic, { log, ROOT, getTopicDir }) {
+export async function runValidationLoop(topic: string, { log, ROOT, getTopicDir }: ValidationLoopContext): Promise<{ success: boolean; error?: string; hasOutput?: boolean; exitCode?: number | null }> {
   log('validate', 'Starting validation loop...');
 
   const draftPath = path.join(getTopicDir(topic), 'draft.mdx');
@@ -125,12 +154,12 @@ Keep iterating until ALL checks pass. Run validation again after each fix.`;
     claude.stdin.end();
 
     let stdout = '';
-    claude.stdout.on('data', data => {
+    claude.stdout.on('data', (data: Buffer) => {
       stdout += data.toString();
       process.stdout.write(data);
     });
 
-    claude.on('close', code => {
+    claude.on('close', (code: number | null) => {
       const finalPath = path.join(getTopicDir(topic), 'final.mdx');
       const hasOutput = fs.existsSync(finalPath);
       resolve({
@@ -142,16 +171,16 @@ Keep iterating until ALL checks pass. Run validation again after each fix.`;
   });
 }
 
-export async function runFullValidation(topic, { log, saveResult, ROOT, getTopicDir }) {
+export async function runFullValidation(topic: string, { log, saveResult, ROOT, getTopicDir }: FullValidationContext): Promise<{ success: boolean; results: ValidationResults }> {
   log('validate-full', 'Running comprehensive validation...');
 
   const finalPath = path.join(getTopicDir(topic), 'final.mdx');
   if (!fs.existsSync(finalPath)) {
     log('validate-full', 'No final.mdx found, skipping');
-    return { success: false, error: 'No final.mdx found' };
+    return { success: false, results: { critical: { passed: 0, failed: 0, errors: [] }, quality: { passed: 0, failed: 0, warnings: [] }, compile: { success: false, error: 'No final.mdx found' } } };
   }
 
-  const results = {
+  const results: ValidationResults = {
     critical: { passed: 0, failed: 0, errors: [] },
     quality: { passed: 0, failed: 0, warnings: [] },
     compile: { success: false, error: null }
@@ -168,7 +197,8 @@ export async function runFullValidation(topic, { log, saveResult, ROOT, getTopic
     });
     results.compile.success = true;
     log('validate-full', '  ✓ MDX compiles');
-  } catch (error) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     results.compile.error = error.message;
     log('validate-full', '  ✗ MDX compilation failed');
   }
@@ -189,14 +219,15 @@ export async function runFullValidation(topic, { log, saveResult, ROOT, getTopic
         log('validate-full', '  ✓ Fixed unquoted lastEdited date');
       }
     }
-  } catch (fmError) {
+  } catch (err: unknown) {
+    const fmError = err instanceof Error ? err : new Error(String(err));
     log('validate-full', `  Could not check frontmatter: ${fmError.message}`);
   }
 
   // 2. Run unified rules
   log('validate-full', 'Running validation rules...');
 
-  const extractJson = (output) => {
+  const extractJson = (output: string): ValidationJson | null => {
     const lines = output.split('\n');
     const jsonStartIdx = lines.findIndex(line => line.trim().startsWith('{'));
     if (jsonStartIdx === -1) return null;
@@ -209,7 +240,7 @@ export async function runFullValidation(topic, { log, saveResult, ROOT, getTopic
   for (const rule of CRITICAL_RULES) {
     try {
       const { execSync } = await import('child_process');
-      let output;
+      let output: string;
       let hasParseError = false;
 
       try {
@@ -217,14 +248,15 @@ export async function runFullValidation(topic, { log, saveResult, ROOT, getTopic
           `node crux/crux.mjs validate unified --rules=${rule} --ci 2>&1`,
           { cwd: ROOT, stdio: 'pipe', timeout: 30000, maxBuffer: 10 * 1024 * 1024 }
         ).toString();
-      } catch (execError) {
+      } catch (err: unknown) {
+        const execError = err as { stdout?: Buffer; stderr?: Buffer };
         output = execError.stdout?.toString() || execError.stderr?.toString() || '';
       }
 
-      let json = null;
+      let json: ValidationJson | null = null;
       try {
         json = extractJson(output);
-      } catch (parseErr) {
+      } catch (parseErr: unknown) {
         hasParseError = true;
       }
 
@@ -266,7 +298,8 @@ export async function runFullValidation(topic, { log, saveResult, ROOT, getTopic
         results.critical.passed++;
         log('validate-full', `  ✓ ${rule}`);
       }
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       results.critical.failed++;
       results.critical.errors.push({ rule, error: error.message });
       log('validate-full', `  ✗ ${rule}: check failed`);
@@ -301,7 +334,8 @@ export async function runFullValidation(topic, { log, saveResult, ROOT, getTopic
         results.quality.passed++;
         log('validate-full', `  ✓ ${rule}`);
       }
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       log('validate-full', `  ? ${rule}: check skipped`);
     }
   }

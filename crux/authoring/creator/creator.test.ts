@@ -6,8 +6,8 @@
  * Run: node crux/authoring/creator/creator.test.ts
  */
 
-import { levenshteinDistance, similarity, toSlug } from './duplicate-detection.mjs';
-import { extractUrls } from './source-fetching.mjs';
+import { levenshteinDistance, similarity, toSlug } from './duplicate-detection.ts';
+import { extractUrls } from './source-fetching.ts';
 
 let passed = 0;
 let failed = 0;
@@ -17,9 +17,10 @@ function test(name: string, fn: () => void): void {
     fn();
     console.log(`✓ ${name}`);
     passed++;
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = e instanceof Error ? e : new Error(String(e));
     console.log(`✗ ${name}`);
-    console.log(`  ${e.message}`);
+    console.log(`  ${error.message}`);
     failed++;
   }
 }
