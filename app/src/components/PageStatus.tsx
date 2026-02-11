@@ -586,12 +586,14 @@ function IssuesSection({
   quality,
   suggestedQuality,
   lastEdited,
+  contentFormat,
 }: {
   issues?: PageIssues;
   metrics?: PageMetrics;
   quality?: number;
   suggestedQuality?: number;
   lastEdited?: string;
+  contentFormat?: ContentFormat;
 }) {
   const detectedIssues: Issue[] = [];
 
@@ -640,7 +642,9 @@ function IssuesSection({
   }
 
   if (metrics) {
-    if (metrics.tableCount === 0 && metrics.diagramCount === 0) {
+    // Only suggest adding tables/diagrams for article-format pages
+    const format = contentFormat || "article";
+    if (format === "article" && metrics.tableCount === 0 && metrics.diagramCount === 0) {
       detectedIssues.push({
         type: "info",
         label: "Structure",
@@ -828,6 +832,7 @@ export function PageStatus({
         quality={quality}
         suggestedQuality={suggestedQuality}
         lastEdited={lastEdited}
+        contentFormat={contentFormat}
       />
 
       {/* Single todo */}

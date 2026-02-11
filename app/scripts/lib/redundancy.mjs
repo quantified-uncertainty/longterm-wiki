@@ -96,6 +96,9 @@ function jaccardSimilarity(setA, setB) {
  * Returns { pageRedundancy, pairs } where:
  *   - pageRedundancy: Map<pageId, { maxSimilarity, similarPages[] }>
  *   - pairs: Array of { pageA, pageB, similarity, wordSimilarity }
+ *
+ * Only compares pages within the same contentFormat to avoid
+ * false positives (e.g. a table page sharing keywords with an article).
  */
 export function computeRedundancy(pages) {
   // Process each page
@@ -105,6 +108,7 @@ export function computeRedundancy(pages) {
       id: page.id,
       path: page.path,
       title: page.title,
+      contentFormat: page.contentFormat || 'article',
       text,
       shingles: getShingles(text),
       words: getWords(text),
@@ -128,6 +132,9 @@ export function computeRedundancy(pages) {
     for (let j = i + 1; j < processed.length; j++) {
       const a = processed[i];
       const b = processed[j];
+
+      // Only compare pages of the same content format
+      if (a.contentFormat !== b.contentFormat) continue;
 
       // Compute both n-gram and word similarity
       const shingleSimilarity = jaccardSimilarity(a.shingles, b.shingles);

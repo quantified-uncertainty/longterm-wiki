@@ -249,6 +249,7 @@ interface PageInfo {
   subcategory: string | null;
   isModel: boolean;
   pageType: string;
+  contentFormat: string;
   currentImportance: number | null;
   currentQuality: number | null;
   currentRatings: Ratings | null;
@@ -354,6 +355,7 @@ function collectPages(): PageInfo[] {
       subcategory,
       isModel,
       pageType,
+      contentFormat: fm.contentFormat || 'article',
       currentImportance: fm.importance ?? null,
       currentQuality: fm.quality ?? null,
       currentRatings: fm.ratings ?? null,
@@ -851,11 +853,13 @@ async function main(): Promise<void> {
     console.log(`Filtered to ${pages.length} pages without importance`);
   }
 
-  // Skip overview pages (index.mdx), stub pages, and internal files (starting with _)
+  // Skip overview pages (index.mdx), stub pages, non-graded formats, and internal files (starting with _)
   const skippedOverview: number = pages.filter(p => p.pageType === 'overview').length;
   const skippedStub: number = pages.filter(p => p.pageType === 'stub').length;
-  pages = pages.filter(p => p.pageType === 'content' && !p.id.startsWith('_'));
-  console.log(`Filtered to ${pages.length} content pages (skipped ${skippedOverview} overview, ${skippedStub} stub)`);
+  const nonGradedFormats = ['index', 'dashboard'];
+  const skippedFormat: number = pages.filter(p => nonGradedFormats.includes(p.contentFormat)).length;
+  pages = pages.filter(p => p.pageType === 'content' && !p.id.startsWith('_') && !nonGradedFormats.includes(p.contentFormat));
+  console.log(`Filtered to ${pages.length} content pages (skipped ${skippedOverview} overview, ${skippedStub} stub, ${skippedFormat} non-graded format)`);
 
   if (options.limit) {
     pages = pages.slice(0, options.limit);

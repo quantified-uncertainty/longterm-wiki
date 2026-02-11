@@ -193,8 +193,9 @@ function buildPagesRegistry(urlToResource) {
 
         const urlPath = `${urlPrefix}/${id}/`;
 
-        // Extract structural metrics
-        const metrics = extractMetrics(content, fullPath);
+        // Extract structural metrics (format-aware scoring)
+        const contentFormat = fm.contentFormat || 'article';
+        const metrics = extractMetrics(content, fullPath, contentFormat);
         const currentQuality = fm.quality ? parseInt(fm.quality) : null;
 
         // Find unconverted links (markdown links that have matching resources)

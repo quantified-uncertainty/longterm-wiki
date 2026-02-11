@@ -312,10 +312,11 @@ describe("Data Layer", () => {
   });
 
   describe("getExploreItems", () => {
-    it("returns items for all entities", async () => {
+    it("returns items for entities with pages", async () => {
       const { getExploreItems } = await import("../../data/index");
       const items = getExploreItems();
-      expect(items.length).toBeGreaterThanOrEqual(2);
+      // Only entities/pages with content appear; mock has 1 entity with a page
+      expect(items.length).toBeGreaterThanOrEqual(1);
     });
 
     it("merges page data into entity items", async () => {
