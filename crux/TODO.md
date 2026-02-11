@@ -3,14 +3,13 @@
 These are larger refactoring items identified during the TypeScript migration review.
 They require more design work and coordination but would significantly improve code quality.
 
-## 1. Unify Command Handler Pattern
+## ~~1. Unify Command Handler Pattern~~ ✅ RESOLVED (no change needed)
 
-**Problem**: Three incompatible patterns exist for command handlers:
-- `buildCommands()` with `SCRIPTS` map (subprocess delegation) — used by `validate.ts`, `fix.ts`, `analyze.ts`, `generate.ts`
-- Direct async exports with `commands` registry — used by `gaps.ts`, `insights.ts`, `resources.ts`
-- Hybrid approach — used by `updates.ts`, `content.ts`
-
-**Suggested approach**: Standardize on the direct export + `commands` registry pattern. Convert `buildCommands()`-based handlers to use direct exports where the command logic is simple enough. Keep subprocess delegation only for truly heavy scripts that benefit from isolation.
+Audit found all 9 command files already share a consistent interface:
+`commands: Record<string, handler>` + `getHelp(): string`. The three
+implementation patterns (buildCommands for subprocess-heavy ops, direct
+exports for lightweight library calls, custom factory for resources.ts)
+are each justified by their use case. No mechanical unification needed.
 
 ## 2. Break Up `resource-manager.ts`
 
