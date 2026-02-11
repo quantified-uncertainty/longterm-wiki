@@ -5,8 +5,9 @@
  * Typed loaders for generated JSON files (app/src/data/*.json).
  */
 
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { readFileSync, existsSync } from 'fs';
+import { fileURLToPath } from 'url';
 
 // ---------------------------------------------------------------------------
 // Types for generated JSON (match what build-data.mjs produces)
@@ -168,8 +169,10 @@ export interface ExpertEntry {
 // Path constants
 // ---------------------------------------------------------------------------
 
-/** Project root directory (current working directory) */
-export const PROJECT_ROOT: string = process.cwd();
+/** Project root directory (derived from this file's location: crux/lib/) */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+export const PROJECT_ROOT: string = join(__dirname, '../..');
 
 /** Base content directory (relative path from repo root) */
 export const CONTENT_DIR: string = 'content/docs';

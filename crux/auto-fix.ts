@@ -7,6 +7,7 @@
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { getColors } from './lib/output.ts';
+import { PROJECT_ROOT } from './lib/content-types.ts';
 
 const args: string[] = process.argv.slice(2);
 const DRY_RUN: boolean = args.includes('--dry-run');
@@ -66,7 +67,7 @@ function runFixer(fixer: Fixer): FixerResult {
   try {
     const output = execSync(fixer.command, {
       encoding: 'utf8',
-      cwd: process.cwd(),
+      cwd: PROJECT_ROOT,
       stdio: ['pipe', 'pipe', 'pipe']
     });
 

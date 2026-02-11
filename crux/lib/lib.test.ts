@@ -18,6 +18,7 @@ import {
   isIndexPage,
   extractEntityId,
   CONTENT_DIR,
+  PROJECT_ROOT,
 } from './content-types.ts';
 
 // =============================================================================
@@ -162,8 +163,8 @@ describe('output.ts', () => {
     expect(typeof logger.formatIssue === 'function').toBe(true);
   });
 
-  it('formatPath removes cwd prefix', () => {
-    const result = formatPath(process.cwd() + '/src/test.js');
+  it('formatPath removes project root prefix', () => {
+    const result = formatPath(PROJECT_ROOT + '/src/test.js');
     expect(result).toBe('src/test.js');
   });
 

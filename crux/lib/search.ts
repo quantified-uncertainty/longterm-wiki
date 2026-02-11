@@ -12,8 +12,9 @@
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import MiniSearch from 'minisearch';
+import { GENERATED_DATA_DIR_ABS } from './content-types.ts';
 
-const APP_DATA_DIR = join(process.cwd(), 'app/src/data');
+const APP_DATA_DIR = GENERATED_DATA_DIR_ABS;
 
 export interface SearchResult {
   id: string;

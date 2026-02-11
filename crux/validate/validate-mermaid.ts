@@ -777,7 +777,7 @@ function main(): void {
       console.log(`${colors.dim}  Checked ${files.length} files in ${duration}ms${colors.reset}\n`);
     } else {
       for (const { file, issues, chartCount } of allIssues) {
-        const relPath = file.replace(process.cwd() + '/', '');
+        const relPath = file.replace(PROJECT_ROOT + '/', '');
         console.log(`${colors.bold}${relPath}${colors.reset} ${colors.dim}(${chartCount} diagram${chartCount > 1 ? 's' : ''})${colors.reset}`);
 
         for (const issue of issues) {

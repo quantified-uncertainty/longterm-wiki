@@ -45,8 +45,7 @@ They require more design work and coordination but would significantly improve c
 - `--ci` = machine-friendly output (no colors, no progress bars, possibly JSON)
 - All commands should support both flags consistently
 
-## 5. Resolve `PROJECT_ROOT` via `__dirname` Instead of `process.cwd()`
+## ~~5. Resolve `PROJECT_ROOT` via `__dirname` Instead of `process.cwd()`~~ ✅ DONE
 
-**Problem**: Several files compute `PROJECT_ROOT` using `process.cwd()`, which breaks if the CLI is invoked from a subdirectory.
-
-**Suggested approach**: Use `import.meta.url` + `fileURLToPath` to compute paths relative to the source file location, as `content-types.ts` already does with `DATA_DIR_ABS` and `CONTENT_DIR_ABS`. Ensure all path constants are derived from `__dirname`-equivalent, not `process.cwd()`.
+Completed: `PROJECT_ROOT` in `content-types.ts` now uses `import.meta.url` + `fileURLToPath`.
+All 15+ `process.cwd()` usages across crux/ replaced with `PROJECT_ROOT` imports.
