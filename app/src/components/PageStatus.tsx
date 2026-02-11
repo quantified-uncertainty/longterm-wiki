@@ -3,6 +3,8 @@ import { cn } from "@lib/utils";
 import {
   detectPageType,
   PAGE_TYPE_INFO,
+  CONTENT_FORMAT_INFO,
+  type ContentFormat,
 } from "@/lib/page-types";
 import styles from "@/components/wiki/tooltip.module.css";
 
@@ -50,6 +52,7 @@ export interface PageStatusProps {
   issues?: PageIssues;
   pageType?: string;
   pathname?: string;
+  contentFormat?: ContentFormat;
 }
 
 // ============================================================================
@@ -324,6 +327,24 @@ function PageTypeBadge({
   );
 }
 
+function ContentFormatBadge({
+  contentFormat,
+}: {
+  contentFormat?: ContentFormat;
+}) {
+  const format = contentFormat || "article";
+  const info = CONTENT_FORMAT_INFO[format];
+  if (format === "article") return null; // Don't show badge for default format
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold border border-transparent ${info.color}`}
+    >
+      {info.label}
+    </span>
+  );
+}
+
 function QualityDisplay({
   quality,
   suggestedQuality,
@@ -565,12 +586,14 @@ function IssuesSection({
   quality,
   suggestedQuality,
   lastEdited,
+  contentFormat,
 }: {
   issues?: PageIssues;
   metrics?: PageMetrics;
   quality?: number;
   suggestedQuality?: number;
   lastEdited?: string;
+  contentFormat?: ContentFormat;
 }) {
   const detectedIssues: Issue[] = [];
 
@@ -619,7 +642,9 @@ function IssuesSection({
   }
 
   if (metrics) {
-    if (metrics.tableCount === 0 && metrics.diagramCount === 0) {
+    // Only suggest adding tables/diagrams for article-format pages
+    const format = contentFormat || "article";
+    if (format === "article" && metrics.tableCount === 0 && metrics.diagramCount === 0) {
       detectedIssues.push({
         type: "info",
         label: "Structure",
@@ -686,6 +711,7 @@ export function PageStatus({
   issues,
   pageType,
   pathname,
+  contentFormat,
 }: PageStatusProps) {
   const detectedType = detectPageType(pathname || "", pageType);
   const isATMPage = detectedType === "ai-transition-model";
@@ -720,6 +746,7 @@ export function PageStatus({
             Page Status
           </span>
           <PageTypeBadge pageType={pageType} pathname={pathname} />
+          <ContentFormatBadge contentFormat={contentFormat} />
         </div>
         <div className="flex items-center gap-0 text-xs text-muted-foreground">
           {metaItems.map((item, i) => (
@@ -805,6 +832,7 @@ export function PageStatus({
         quality={quality}
         suggestedQuality={suggestedQuality}
         lastEdited={lastEdited}
+        contentFormat={contentFormat}
       />
 
       {/* Single todo */}

@@ -1,14 +1,13 @@
 ---
 title: "Entity Relationship Graph"
 description: "Interactive visualization of entity connections in the knowledge base"
+contentFormat: dashboard
 sidebar:
   label: "Entity Graph"
   order: 101
 importance: 5
 quality: 18
 llmSummary: "Interactive network visualization tool showing entity relationships in the knowledge base, with basic graph analysis (cluster detection, connection counts, orphan identification). Purely infrastructure for navigation - no substantive content on AI safety."
-tableOfContents: false
-fullWidth: true
 ratings:
   novelty: 1
   rigor: 2
@@ -22,10 +21,6 @@ metrics:
 ---
 import { EntityGraph } from '@components/wiki';
 import { findOrphans, detectClusters, getMostConnected } from '@lib/graph-analysis';
-import FullWidthLayout from '@components/FullWidthLayout';
-
-<FullWidthLayout />
-
 export const orphans = findOrphans();
 export const clusters = detectClusters();
 export const topConnected = getMostConnected(10);

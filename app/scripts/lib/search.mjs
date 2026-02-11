@@ -15,7 +15,7 @@ import MiniSearch from 'minisearch';
  * (app/src/lib/search.ts and crux/lib/search.mjs), not here —
  * constructor-level searchOptions don't survive toJSON/loadJSON.
  */
-const SEARCH_FIELDS = ['title', 'description', 'tags', 'entityType', 'id'];
+const SEARCH_FIELDS = ['title', 'description', 'tags', 'entityType', 'id', 'contentFormat'];
 
 /**
  * Build search documents from typed entities, pages, and the ID registry.
@@ -44,6 +44,7 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
       description: page.llmSummary || page.description || entity.description || '',
       tags: (entity.tags || []).join(' '),
       entityType: entity.entityType || '',
+      contentFormat: page.contentFormat || 'article',
       // Metadata for result display (not indexed)
       _numericId: numericId,
       _type: entity.entityType || 'concept',
@@ -65,6 +66,7 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
       description: page.llmSummary || page.description || '',
       tags: (page.tags || []).join(' '),
       entityType: page.category || '',
+      contentFormat: page.contentFormat || 'article',
       _numericId: numericId,
       _type: page.category || 'concept',
       _importance: page.importance,
@@ -89,6 +91,7 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
     type: d._type,
     importance: d._importance,
     quality: d._quality,
+    contentFormat: d.contentFormat,
   }));
 
   return {

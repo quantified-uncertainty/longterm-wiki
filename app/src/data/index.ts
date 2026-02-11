@@ -241,6 +241,8 @@ export interface BacklinkEntry {
   relationship?: string;
 }
 
+export type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
+
 export interface Page {
   id: string;
   path: string;
@@ -248,6 +250,7 @@ export interface Page {
   title: string;
   quality: number | null;
   importance: number | null;
+  contentFormat: ContentFormat;
   tractability: number | null;
   neglectedness: number | null;
   uncertainty: number | null;
@@ -769,6 +772,7 @@ export interface ExploreItem {
   category: string | null;
   riskCategory: string | null;
   lastUpdated: string | null;
+  contentFormat?: ContentFormat;
   href?: string;
   meta?: string;
   sourceTitle?: string;
@@ -793,83 +797,9 @@ const CATEGORY_TO_TYPE: Record<string, string> = {
   other: "concept",
 };
 
-// MANUAL MAINTENANCE: This table list is hardcoded because table metadata
-// (row/col counts, descriptions) is not included in database.json.
-// TODO: Include table metadata in build-data.mjs output to automate this.
-const TABLES = [
-  {
-    id: "safety-approaches",
-    title: "Safety Approaches",
-    description: "Safety research effectiveness vs capability uplift.",
-    href: "/wiki/safety-approaches-table",
-    path: "/knowledge-base/responses/safety-approaches",
-    rows: 42,
-    cols: 9,
-  },
-  {
-    id: "safety-generalizability",
-    title: "Safety Generalizability",
-    description: "Safety approaches across AI architectures.",
-    href: "/wiki/safety-generalizability-table",
-    path: "/knowledge-base/responses/safety-generalizability",
-    rows: 42,
-    cols: 8,
-  },
-  {
-    id: "safety-matrix",
-    title: "Safety × Architecture Matrix",
-    description: "Safety approaches vs architecture scenarios.",
-    href: "/wiki/safety-generalizability-table",
-    path: "/knowledge-base/responses/safety-generalizability",
-    rows: 42,
-    cols: 12,
-  },
-  {
-    id: "architecture-scenarios",
-    title: "Architecture Scenarios",
-    description: "Deployment patterns and base architectures.",
-    href: "/wiki/architecture-scenarios-table",
-    path: "/knowledge-base/architecture-scenarios",
-    rows: 12,
-    cols: 7,
-  },
-  {
-    id: "deployment-architectures",
-    title: "Deployment Architectures",
-    description: "How AI systems are deployed.",
-    href: "/wiki/deployment-architectures-table",
-    path: "/knowledge-base/deployment-architectures",
-    rows: 8,
-    cols: 6,
-  },
-  {
-    id: "accident-risks",
-    title: "Accident Risks",
-    description: "Accident and misalignment risks.",
-    href: "/wiki/accident-risks-table",
-    path: "/knowledge-base/risks/accident",
-    rows: 16,
-    cols: 7,
-  },
-  {
-    id: "eval-types",
-    title: "Evaluation Types",
-    description: "Evaluation methodologies comparison.",
-    href: "/wiki/eval-types-table",
-    path: "/knowledge-base/models/eval-types",
-    rows: 18,
-    cols: 8,
-  },
-  {
-    id: "transition-model",
-    title: "AI Transition Model Parameters",
-    description: "All AI Transition Model parameters.",
-    href: "/wiki/table",
-    path: "/ai-transition-model",
-    rows: 45,
-    cols: 6,
-  },
-];
+// Table items are now derived from pages with contentFormat=table.
+// The hardcoded TABLES array has been eliminated — all table pages are
+// detected automatically via the contentFormat field in frontmatter.
 
 // Insight shape as stored in database.json
 interface DatabaseInsight {
@@ -922,6 +852,7 @@ export function getExploreItems(): ExploreItem[] {
       category: page?.category ?? null,
       riskCategory: isRisk(entity) ? (entity.riskCategory || null) : null,
       lastUpdated: page?.lastUpdated ?? null,
+      contentFormat: page?.contentFormat,
     };
   });
 
@@ -933,7 +864,7 @@ export function getExploreItems(): ExploreItem[] {
       id: page.id,
       numericId: db.idRegistry?.bySlug[page.id] || page.id,
       title: page.title,
-      type: CATEGORY_TO_TYPE[page.category] || "concept",
+      type: page.contentFormat === "table" ? "table" : page.contentFormat === "diagram" ? "diagram" : CATEGORY_TO_TYPE[page.category] || "concept",
       description: page.llmSummary || page.description || null,
       tags: page.tags || [],
       clusters: page.clusters || [],
@@ -943,26 +874,8 @@ export function getExploreItems(): ExploreItem[] {
       category: page.category ?? null,
       riskCategory: null,
       lastUpdated: page.lastUpdated ?? null,
+      contentFormat: page.contentFormat,
     }));
-
-  // Table items
-  const tableItems: ExploreItem[] = TABLES.map((table) => ({
-    id: `table-${table.id}`,
-    numericId: `table-${table.id}`,
-    title: table.title,
-    type: "table",
-    description: table.description,
-    tags: [],
-    clusters: pageClusterMap.get(table.path) || ["ai-safety"],
-    wordCount: null,
-    quality: null,
-    importance: null,
-    category: null,
-    riskCategory: null,
-    lastUpdated: null,
-    href: table.href,
-    meta: `${table.rows} × ${table.cols}`,
-  }));
 
   // Diagram items — entities with causeEffectGraph data
   // Generic entities preserve all raw fields including causeEffectGraph.
@@ -1015,6 +928,7 @@ export function getExploreItems(): ExploreItem[] {
         category: null,
         riskCategory: null,
         lastUpdated: e.lastUpdated || null,
+        contentFormat: "diagram" as ContentFormat,
         href: resolveDiagramHref(e)!,
         meta: `${nodeCount} nodes`,
       };
@@ -1051,5 +965,5 @@ export function getExploreItems(): ExploreItem[] {
     };
   });
 
-  return [...entityItems, ...pageOnlyItems, ...tableItems, ...diagramItems, ...insightItems];
+  return [...entityItems, ...pageOnlyItems, ...diagramItems, ...insightItems];
 }

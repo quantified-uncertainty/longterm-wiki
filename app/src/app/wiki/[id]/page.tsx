@@ -8,7 +8,8 @@ import {
 } from "@/lib/mdx";
 import type { MdxPage, MdxError } from "@/lib/mdx";
 import { getEntityById, getPageById, getEntityPath } from "@/data";
-import type { Page } from "@/data";
+import type { Page, ContentFormat } from "@/data";
+import { CONTENT_FORMAT_INFO } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RelatedPages } from "@/components/RelatedPages";
@@ -56,23 +57,37 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageData = getPageById(slug);
   const title = entity?.title || pageData?.title || slug;
   const description = entity?.description || pageData?.description || undefined;
+  const format = (pageData?.contentFormat || "article") as ContentFormat;
+  const ogType = format === "article" ? "article" : "website";
   return {
     title,
     description,
     openGraph: {
       title,
       description,
-      type: "article",
+      type: ogType,
       ...(pageData?.lastUpdated && { modifiedTime: pageData.lastUpdated }),
     },
   };
 }
 
+/** Map contentFormat to schema.org @type */
+function schemaType(format: ContentFormat): string {
+  switch (format) {
+    case "table": return "Dataset";
+    case "diagram": return "ImageObject";
+    case "index": return "CollectionPage";
+    case "dashboard": return "WebPage";
+    default: return "Article";
+  }
+}
+
 function JsonLd({ pageData, title, slug }: { pageData?: Page; title?: string; slug: string }) {
   const headline = title || pageData?.title || slug;
+  const format = (pageData?.contentFormat || "article") as ContentFormat;
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": schemaType(format),
     headline,
     ...(pageData?.description && { description: pageData.description }),
     ...(pageData?.llmSummary && { abstract: pageData.llmSummary }),
@@ -94,6 +109,63 @@ function JsonLd({ pageData, title, slug }: { pageData?: Page; title?: string; sl
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: safeJson }}
     />
+  );
+}
+
+/** Shared metadata bar rendered above all content formats */
+function ContentMeta({
+  page,
+  pageData,
+  slug,
+  contentFormat,
+}: {
+  page: MdxPage;
+  pageData: Page | undefined;
+  slug: string;
+  contentFormat: ContentFormat;
+}) {
+  const lastUpdated = pageData?.lastUpdated;
+  const githubUrl = pageData?.filePath
+    ? `${GITHUB_HISTORY_BASE}/${pageData.filePath}`
+    : null;
+  const entity = getEntityById(slug);
+  const numId = slugToNumericId(slug);
+  const pageTitle = page.frontmatter.title || entity?.title || slug;
+  const formatInfo = CONTENT_FORMAT_INFO[contentFormat];
+
+  return (
+    <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+      <Breadcrumbs
+        category={pageData?.category}
+        title={page.frontmatter.title || entity?.title}
+      />
+      <div className="page-meta">
+        {lastUpdated && (
+          <span className="page-meta-updated">
+            Updated {lastUpdated}
+          </span>
+        )}
+        {githubUrl && (
+          <a
+            href={githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="page-meta-github"
+          >
+            <Github size={14} />
+            History
+          </a>
+        )}
+        {numId && (
+          <a href={`/wiki/${numId}/data`} className="page-meta-github">
+            <Database size={14} />
+            Data
+          </a>
+        )}
+        <PageFeedback pageTitle={pageTitle} pageSlug={slug} />
+        <InfoBoxToggle />
+      </div>
+    </div>
   );
 }
 
@@ -119,7 +191,7 @@ function MdxErrorView({ error }: { error: MdxError }) {
   );
 }
 
-function ArticleView({
+function ContentView({
   page,
   pageData,
   entityPath,
@@ -132,50 +204,22 @@ function ArticleView({
   slug: string;
   fullWidth?: boolean;
 }) {
-  const lastUpdated = pageData?.lastUpdated;
-  const githubUrl = pageData?.filePath
-    ? `${GITHUB_HISTORY_BASE}/${pageData.filePath}`
-    : null;
   const entity = getEntityById(slug);
-  const numId = slugToNumericId(slug);
-  const pageTitle = page.frontmatter.title || entity?.title || slug;
+  const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
+  const formatInfo = CONTENT_FORMAT_INFO[contentFormat];
+  const isArticle = contentFormat === "article";
 
   return (
     <InfoBoxVisibilityProvider>
       <JsonLd pageData={pageData} title={page.frontmatter.title} slug={slug} />
-      <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
-        <Breadcrumbs
-          category={pageData?.category}
-          title={page.frontmatter.title || entity?.title}
-        />
-        <div className="page-meta">
-          {lastUpdated && (
-            <span className="page-meta-updated">
-              Updated {lastUpdated}
-            </span>
-          )}
-          {githubUrl && (
-            <a
-              href={githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="page-meta-github"
-            >
-              <Github size={14} />
-              History
-            </a>
-          )}
-          {numId && (
-            <a href={`/wiki/${numId}/data`} className="page-meta-github">
-              <Database size={14} />
-              Data
-            </a>
-          )}
-          <PageFeedback pageTitle={pageTitle} pageSlug={slug} />
-          <InfoBoxToggle />
-        </div>
-      </div>
+      <ContentMeta
+        page={page}
+        pageData={pageData}
+        slug={slug}
+        contentFormat={contentFormat}
+      />
       <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}`}>
+        {/* PageStatus shown for graded formats or pages with editorial content */}
         <PageStatus
           quality={pageData?.quality ?? undefined}
           importance={pageData?.importance ?? undefined}
@@ -194,11 +238,13 @@ function ArticleView({
           }}
           pageType={page.frontmatter.pageType}
           pathname={entityPath}
+          contentFormat={contentFormat}
         />
         {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
-        {entity && <DataInfoBox entityId={slug} />}
+        {isArticle && entity && <DataInfoBox entityId={slug} />}
         {page.content}
-        <RelatedPages entityId={slug} entity={entity} />
+        {/* Related pages only shown for articles — tables/diagrams are self-contained */}
+        {isArticle && <RelatedPages entityId={slug} entity={entity} />}
       </article>
     </InfoBoxVisibilityProvider>
   );
@@ -253,12 +299,14 @@ export default async function WikiPage({ params }: PageProps) {
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
     const entityPath = getEntityPath(slug) || "";
-    const fullWidth = result.frontmatter.fullWidth === true;
+    const pageData = getPageById(slug);
+    const formatInfo = CONTENT_FORMAT_INFO[(pageData?.contentFormat || "article") as ContentFormat];
+    const fullWidth = result.frontmatter.fullWidth === true || formatInfo?.fullWidth === true;
     return (
       <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
-        <ArticleView
+        <ContentView
           page={result}
-          pageData={getPageById(slug)}
+          pageData={pageData}
           entityPath={entityPath}
           slug={slug}
           fullWidth={fullWidth}
@@ -279,12 +327,14 @@ export default async function WikiPage({ params }: PageProps) {
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
     const entityPath = getEntityPath(id) || "";
-    const fullWidth = result.frontmatter.fullWidth === true;
+    const pageData = getPageById(id);
+    const formatInfo = CONTENT_FORMAT_INFO[(pageData?.contentFormat || "article") as ContentFormat];
+    const fullWidth = result.frontmatter.fullWidth === true || formatInfo?.fullWidth === true;
     return (
       <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
-        <ArticleView
+        <ContentView
           page={result}
-          pageData={getPageById(id)}
+          pageData={pageData}
           entityPath={entityPath}
           slug={id}
           fullWidth={fullWidth}

@@ -26,6 +26,12 @@ export const qualitySourceRule = {
       return issues;
     }
 
+    // Non-graded formats (index, dashboard) don't need quality/ratings
+    const format = fm.contentFormat || 'article';
+    if (format === 'index' || format === 'dashboard') {
+      return issues;
+    }
+
     // Check if quality is set but ratings is missing
     if (fm.quality !== undefined && fm.quality !== null) {
       const hasRatings = fm.ratings &&

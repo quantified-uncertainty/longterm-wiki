@@ -32,9 +32,12 @@ export interface QualityCriterion {
   pattern?: string;
 }
 
+export type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
+
 export interface PageTemplate {
   id: string;
   name: string;
+  contentFormat?: ContentFormat;
   minWordCount?: number;
   usesATMPage?: boolean;
   frontmatter: FrontmatterField[];
@@ -235,6 +238,44 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
     qualityCriteria: [
       { id: 'has-examples', label: 'Has Examples', weight: 20, detection: 'content', pattern: 'example|instance|case' },
       { id: 'word-count', label: 'Sufficient Length', weight: 15, detection: 'content' },
+    ],
+  },
+  'data-table': {
+    id: 'data-table',
+    name: 'Interactive Data Table',
+    contentFormat: 'table',
+    frontmatter: [
+      { name: 'title', required: true, weight: 5 },
+      { name: 'description', required: true, weight: 15 },
+      { name: 'contentFormat', required: true, weight: 5 },
+      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'update_frequency', required: true, weight: 5 },
+    ],
+    sections: [],
+    qualityCriteria: [
+      { id: 'has-description', label: 'Has Contextual Description', weight: 15, detection: 'content', pattern: '\\w{20,}' },
+      { id: 'has-data-source', label: 'Documents Data Sources', weight: 20, detection: 'content', pattern: 'source|methodology|data|based on' },
+      { id: 'has-methodology', label: 'Explains Rating Methodology', weight: 20, detection: 'content', pattern: 'methodology|criteria|rating|scale|how .* rated' },
+      { id: 'has-component', label: 'Has Table Component', weight: 25, detection: 'component', pattern: 'TableView|Table' },
+      { id: 'has-changelog', label: 'Documents Recent Changes', weight: 15, detection: 'content', pattern: 'changelog|changes|updated|added|removed' },
+    ],
+  },
+  'visualization': {
+    id: 'visualization',
+    name: 'Diagram / Visualization',
+    contentFormat: 'diagram',
+    frontmatter: [
+      { name: 'title', required: true, weight: 5 },
+      { name: 'description', required: true, weight: 15 },
+      { name: 'contentFormat', required: true, weight: 5 },
+      { name: 'lastEdited', required: true, weight: 5 },
+    ],
+    sections: [],
+    qualityCriteria: [
+      { id: 'has-description', label: 'Has Contextual Description', weight: 20, detection: 'content', pattern: '\\w{20,}' },
+      { id: 'has-visualization', label: 'Has Visualization Component', weight: 30, detection: 'component', pattern: 'Graph|Chart|Mermaid|CauseEffect|Visualization' },
+      { id: 'has-data-source', label: 'Documents Data Sources', weight: 20, detection: 'content', pattern: 'source|data|based on' },
+      { id: 'has-interpretation', label: 'Has Interpretation Guide', weight: 20, detection: 'content', pattern: 'interpret|reading|legend|meaning|represents' },
     ],
   },
 };

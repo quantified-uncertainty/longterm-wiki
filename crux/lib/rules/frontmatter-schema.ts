@@ -30,6 +30,7 @@ const frontmatterSchema = z.object({
 
   // Custom LongtermWiki fields
   pageType: z.enum(['content', 'stub', 'documentation']).optional(),
+  contentFormat: z.enum(['article', 'table', 'diagram', 'index', 'dashboard']).optional(),
   quality: z.number().min(0).max(100).optional(),
   importance: z.number().min(0).max(100).optional(),
   tractability: z.number().min(0).max(100).optional(),
@@ -132,6 +133,18 @@ export const frontmatterSchemaRule = {
           severity: Severity.ERROR,
         }));
       }
+    }
+
+    // Cross-field: graded content formats (table, diagram) should have update tracking
+    const gradedFormats = ['table', 'diagram'];
+    if (gradedFormats.includes(frontmatter.contentFormat) && !frontmatter.update_frequency) {
+      issues.push(new Issue({
+        rule: 'frontmatter-schema',
+        file: contentFile.path,
+        line: 1,
+        message: `Pages with contentFormat: "${frontmatter.contentFormat}" should have update_frequency set`,
+        severity: Severity.WARNING,
+      }));
     }
 
     // Cross-field: update_frequency requires lastEdited or lastUpdated
