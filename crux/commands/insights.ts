@@ -7,6 +7,9 @@
  * - Formats output for display
  */
 
+import type { Insight, InsightsData, CheckResult, AllChecksResult, InsightStats, RatingDistribution, DuplicatePair } from '../lib/insights.ts';
+import type { CommandResult } from '../lib/cli.ts';
+import type { Logger } from '../lib/output.ts';
 import * as lib from '../lib/insights.ts';
 import { createLogger, formatCount } from '../lib/output.ts';
 import { join } from 'path';
@@ -17,21 +20,21 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Resolve paths relative to the repo root
-const REPO_ROOT = join(__dirname, '..', '..');
-const INSIGHTS_PATH = join(REPO_ROOT, 'data', 'insights.yaml');
-const CONTENT_DIR = join(REPO_ROOT, 'content', 'docs');
+const REPO_ROOT: string = join(__dirname, '..', '..');
+const INSIGHTS_PATH: string = join(REPO_ROOT, 'data', 'insights.yaml');
+const CONTENT_DIR: string = join(REPO_ROOT, 'content', 'docs');
 
 /**
  * Default command - run all checks
  */
-export async function check(args, options) {
-  const log = createLogger(options.ci);
+export async function check(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
   const result = lib.runAllChecks(insights, CONTENT_DIR, {
-    only: options.only?.split(','),
-    skip: options.skip?.split(','),
+    only: (options.only as string)?.split(','),
+    skip: (options.skip as string)?.split(','),
   });
 
   if (options.ci) {
@@ -83,12 +86,12 @@ export async function check(args, options) {
 /**
  * Check for duplicate insights
  */
-export async function duplicates(args, options) {
-  const log = createLogger(options.ci);
+export async function duplicates(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
-  const threshold = parseFloat(options.threshold || '0.7');
+  const threshold = parseFloat((options.threshold as string) || '0.7');
   const result = lib.checkDuplicates(insights, { threshold });
 
   if (options.ci) {
@@ -111,7 +114,7 @@ export async function duplicates(args, options) {
     output += `${c.green}No duplicates found above ${threshold * 100}% threshold${c.reset}\n`;
   }
 
-  output += `\n${c.dim}Checked ${result.stats.pairsChecked} pairs${c.reset}\n`;
+  output += `\n${c.dim}Checked ${(result.stats as Record<string, unknown>)?.pairsChecked} pairs${c.reset}\n`;
 
   return { output, exitCode: result.passed ? 0 : 1 };
 }
@@ -119,8 +122,8 @@ export async function duplicates(args, options) {
 /**
  * Check rating calibration
  */
-export async function ratings(args, options) {
-  const log = createLogger(options.ci);
+export async function ratings(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
@@ -138,7 +141,7 @@ export async function ratings(args, options) {
   // Show distributions
   if (result.stats?.distributions) {
     output += `${c.bold}Rating Distributions:${c.reset}\n`;
-    for (const [field, dist] of Object.entries(result.stats.distributions)) {
+    for (const [field, dist] of Object.entries(result.stats.distributions as Record<string, RatingDistribution>)) {
       output += `  ${field}: min=${dist.min}, max=${dist.max}, mean=${dist.mean.toFixed(2)}, median=${dist.median}\n`;
     }
     output += '\n';
@@ -161,8 +164,8 @@ export async function ratings(args, options) {
 /**
  * Check source paths
  */
-export async function sources(args, options) {
-  const log = createLogger(options.ci);
+export async function sources(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
@@ -184,7 +187,7 @@ export async function sources(args, options) {
     }
   }
 
-  output += `\n${c.dim}Valid: ${result.stats.validSources}, Invalid: ${result.stats.invalidSources}${c.reset}\n`;
+  output += `\n${c.dim}Valid: ${(result.stats as Record<string, unknown>)?.validSources}, Invalid: ${(result.stats as Record<string, unknown>)?.invalidSources}${c.reset}\n`;
 
   return { output, exitCode: result.passed ? 0 : 1 };
 }
@@ -192,12 +195,12 @@ export async function sources(args, options) {
 /**
  * Check for stale insights
  */
-export async function staleness(args, options) {
-  const log = createLogger(options.ci);
+export async function staleness(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
-  const staleDays = parseInt(options.days || '90', 10);
+  const staleDays = parseInt((options.days as string) || '90', 10);
   const result = lib.checkStaleness(insights, { staleDays });
 
   if (options.ci) {
@@ -210,9 +213,9 @@ export async function staleness(args, options) {
   output += `${c.bold}${c.blue}Staleness Check${c.reset}\n`;
   output += `${c.dim}Threshold: ${staleDays} days${c.reset}\n\n`;
 
-  output += `Recent: ${c.green}${result.stats.recent}${c.reset}\n`;
-  output += `Stale: ${c.yellow}${result.stats.stale}${c.reset}\n`;
-  output += `Unverified: ${c.dim}${result.stats.unverified}${c.reset}\n`;
+  output += `Recent: ${c.green}${(result.stats as Record<string, unknown>)?.recent}${c.reset}\n`;
+  output += `Stale: ${c.yellow}${(result.stats as Record<string, unknown>)?.stale}${c.reset}\n`;
+  output += `Unverified: ${c.dim}${(result.stats as Record<string, unknown>)?.unverified}${c.reset}\n`;
 
   return { output, exitCode: 0 };
 }
@@ -220,8 +223,8 @@ export async function staleness(args, options) {
 /**
  * Show statistics
  */
-export async function stats(args, options) {
-  const log = createLogger(options.ci);
+export async function stats(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
@@ -273,18 +276,18 @@ export async function stats(args, options) {
 /**
  * Apply fixes to insights
  */
-export async function fix(args, options) {
-  const log = createLogger(options.ci);
+export async function fix(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
   const data = lib.loadInsights(INSIGHTS_PATH);
   let insights = data.insights || [];
 
   const c = log.colors;
   let output = '';
-  const changes = [];
+  const changes: string[] = [];
 
   // Add verification dates
   if (options.addVerified) {
-    const before = insights.filter(i => !i.lastVerified).length;
+    const before = insights.filter((i: Insight) => !i.lastVerified).length;
     insights = lib.addVerificationDates(insights);
     changes.push(`Added lastVerified to ${before} insights`);
   }
@@ -328,7 +331,7 @@ export async function fix(args, options) {
 /**
  * Command registry
  */
-export const commands = {
+export const commands: Record<string, (args: string[], options: Record<string, unknown>) => Promise<CommandResult>> = {
   check,
   duplicates,
   ratings,
@@ -341,7 +344,7 @@ export const commands = {
 /**
  * Get help text for insights domain
  */
-export function getHelp() {
+export function getHelp(): string {
   return `
 Insights Domain - Insight quality management
 

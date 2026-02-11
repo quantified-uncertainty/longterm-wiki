@@ -7,13 +7,48 @@
 import fs from 'fs';
 import path from 'path';
 import { batchResearch, generateResearchQueries } from '../../lib/openrouter.ts';
+import type { BatchResearchResult, ResearchQuery } from '../../lib/openrouter.ts';
+
+interface ResearchContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: unknown) => string;
+}
+
+interface ScryContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: unknown) => string;
+}
+
+interface ResearchSource {
+  category: string;
+  query: string;
+  content: string;
+  citations: string[];
+  tokens: number;
+  cost: number;
+}
+
+interface ScrySearch {
+  table: string;
+  query: string;
+}
+
+interface ScryRow {
+  title: string;
+  uri: string;
+  snippet?: string;
+  original_author: string;
+  date: string;
+  platform?: string;
+  searchQuery?: string;
+}
 
 const SCRY_PUBLIC_KEY = process.env.SCRY_API_KEY || 'exopriors_public_readonly_v1_2025';
 
-export async function runPerplexityResearch(topic, depth, { log, saveResult }) {
+export async function runPerplexityResearch(topic: string, depth: string, { log, saveResult }: ResearchContext): Promise<{ success: boolean; cost: number; queryCount: number }> {
   log('research', `Starting Perplexity research (${depth})...`);
 
-  let queries = generateResearchQueries(topic);
+  let queries: ResearchQuery[] = generateResearchQueries(topic);
 
   if (depth === 'lite') {
     queries = queries.slice(0, 6);
@@ -28,10 +63,10 @@ export async function runPerplexityResearch(topic, depth, { log, saveResult }) {
 
   log('research', `Running ${queries.length} Perplexity queries...`);
 
-  const results = await batchResearch(queries, { concurrency: 3 });
+  const results: BatchResearchResult[] = await batchResearch(queries, { concurrency: 3 });
 
   let totalCost = 0;
-  const researchSources = [];
+  const researchSources: ResearchSource[] = [];
 
   for (const result of results) {
     totalCost += result.cost || 0;
@@ -62,16 +97,16 @@ export async function runPerplexityResearch(topic, depth, { log, saveResult }) {
   return { success: true, cost: totalCost, queryCount: queries.length };
 }
 
-export async function runScryResearch(topic, { log, saveResult }) {
+export async function runScryResearch(topic: string, { log, saveResult }: ScryContext): Promise<{ success: boolean; resultCount: number }> {
   log('scry', 'Searching SCRY (EA Forum, LessWrong)...');
 
-  const searches = [
+  const searches: ScrySearch[] = [
     { table: 'mv_eaforum_posts', query: topic },
     { table: 'mv_lesswrong_posts', query: topic },
     { table: 'mv_eaforum_posts', query: `${topic} criticism` },
   ];
 
-  const results = [];
+  const results: ScryRow[] = [];
 
   for (const search of searches) {
     try {
@@ -89,7 +124,7 @@ export async function runScryResearch(topic, { log, saveResult }) {
         body: sql,
       });
 
-      const data = await response.json();
+      const data = await response.json() as { rows?: ScryRow[] };
 
       if (data.rows) {
         const platform = search.table.includes('eaforum') ? 'EA Forum' : 'LessWrong';
@@ -100,13 +135,14 @@ export async function runScryResearch(topic, { log, saveResult }) {
           searchQuery: search.query,
         })));
       }
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       log('scry', `  Error searching ${search.table}: ${error.message}`);
     }
   }
 
   // Deduplicate by URI
-  const seen = new Set();
+  const seen = new Set<string>();
   const unique = results.filter(r => {
     if (seen.has(r.uri)) return false;
     seen.add(r.uri);

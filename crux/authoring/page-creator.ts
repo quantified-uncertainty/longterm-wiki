@@ -15,19 +15,19 @@
  * Total: ~$4-5 vs $10+ with all-Claude approach
  *
  * Usage:
- *   node crux/authoring/page-creator.mjs "SecureBio" --tier standard
- *   node crux/authoring/page-creator.mjs "Community Notes" --tier premium
+ *   node crux/authoring/page-creator.ts "SecureBio" --tier standard
+ *   node crux/authoring/page-creator.ts "Community Notes" --tier premium
  *
  * Module structure (under creator/):
- *   duplicate-detection.mjs  — fuzzy page matching
- *   canonical-links.mjs      — finds Wikipedia, LW, EA Forum links
- *   research.mjs             — Perplexity + SCRY research
- *   source-fetching.mjs      — URL registration, Firecrawl, directions
- *   synthesis.mjs            — Claude article generation
- *   verification.mjs         — source/quote verification
- *   validation.mjs           — validation loop + component imports
- *   grading.mjs              — quality grading
- *   deployment.mjs           — deploy, cross-links, review
+ *   duplicate-detection.ts   — fuzzy page matching
+ *   canonical-links.ts       — finds Wikipedia, LW, EA Forum links
+ *   research.ts              — Perplexity + SCRY research
+ *   source-fetching.ts       — URL registration, Firecrawl, directions
+ *   synthesis.ts             — Claude article generation
+ *   verification.ts          — source/quote verification
+ *   validation.ts            — validation loop + component imports
+ *   grading.ts               — quality grading
+ *   deployment.ts            — deploy, cross-links, review
  */
 
 import fs from 'fs';
@@ -36,25 +36,32 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
 // Sub-modules
-import { checkForExistingPage } from './creator/duplicate-detection.mjs';
-import { findCanonicalLinks } from './creator/canonical-links.mjs';
-import { runPerplexityResearch, runScryResearch } from './creator/research.mjs';
-import { registerResearchSources, fetchRegisteredSources, processDirections, loadSourceFile } from './creator/source-fetching.mjs';
-import { runSynthesis } from './creator/synthesis.mjs';
-import { runSourceVerification } from './creator/verification.mjs';
-import { ensureComponentImports, runValidationLoop, runFullValidation } from './creator/validation.mjs';
-import { runGrading } from './creator/grading.mjs';
-import { createCategoryDirectory, deployToDestination, validateCrossLinks, runReview } from './creator/deployment.mjs';
+import { checkForExistingPage } from './creator/duplicate-detection.ts';
+import { findCanonicalLinks } from './creator/canonical-links.ts';
+import { runPerplexityResearch, runScryResearch } from './creator/research.ts';
+import { registerResearchSources, fetchRegisteredSources, processDirections, loadSourceFile } from './creator/source-fetching.ts';
+import { runSynthesis } from './creator/synthesis.ts';
+import { runSourceVerification } from './creator/verification.ts';
+import { ensureComponentImports, runValidationLoop, runFullValidation } from './creator/validation.ts';
+import { runGrading } from './creator/grading.ts';
+import { createCategoryDirectory, deployToDestination, validateCrossLinks, runReview } from './creator/deployment.ts';
 
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(__dirname, '../..');
-const TEMP_DIR = path.join(ROOT, '.claude/temp/page-creator');
+const ROOT: string = path.join(__dirname, '../..');
+const TEMP_DIR: string = path.join(ROOT, '.claude/temp/page-creator');
 
 // ============ Configuration ============
 
-const TIERS = {
+interface TierConfig {
+  name: string;
+  estimatedCost: string;
+  phases: string[];
+  description: string;
+}
+
+const TIERS: Record<string, TierConfig> = {
   budget: {
     name: 'Budget',
     estimatedCost: '$2-3',
@@ -77,23 +84,31 @@ const TIERS = {
 
 // ============ Utility Functions ============
 
-function ensureDir(dirPath) {
+interface PipelineContext {
+  log: (phase: string, message: string) => void;
+  saveResult: (topic: string, filename: string, data: string | object) => string;
+  getTopicDir: (topic: string) => string;
+  ensureDir: (dirPath: string) => void;
+  ROOT: string;
+}
+
+function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
 }
 
-function log(phase, message) {
-  const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+function log(phase: string, message: string): void {
+  const timestamp: string = new Date().toISOString().split('T')[1].split('.')[0];
   console.log(`[${timestamp}] [${phase}] ${message}`);
 }
 
-function getTopicDir(topic) {
+function getTopicDir(topic: string): string {
   const sanitized = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   return path.join(TEMP_DIR, sanitized);
 }
 
-function saveResult(topic, filename, data) {
+function saveResult(topic: string, filename: string, data: string | object): string {
   const dir = getTopicDir(topic);
   ensureDir(dir);
   const filePath = path.join(dir, filename);
@@ -109,20 +124,29 @@ function saveResult(topic, filename, data) {
  * Context object passed to sub-modules so they can use shared utilities
  * without relying on closures over module-scoped variables.
  */
-function createContext() {
+function createContext(): PipelineContext {
   return { log, saveResult, getTopicDir, ensureDir, ROOT };
 }
 
 // ============ Pipeline Runner ============
 
-async function runPipeline(topic, tier = 'standard', directions = null, sourceFilePath = null) {
+interface PipelineResults {
+  topic: string;
+  tier: string;
+  startTime: string;
+  endTime?: string;
+  phases: Record<string, { success: boolean; [key: string]: unknown }>;
+  totalCost: number;
+}
+
+async function runPipeline(topic: string, tier: string = 'standard', directions: string | null = null, sourceFilePath: string | null = null): Promise<PipelineResults> {
   const config = TIERS[tier];
   if (!config) {
     console.error(`Unknown tier: ${tier}`);
     process.exit(1);
   }
 
-  let phases = directions
+  let phases: string[] = directions
     ? ['process-directions', ...config.phases]
     : [...config.phases];
 
@@ -148,10 +172,10 @@ async function runPipeline(topic, tier = 'standard', directions = null, sourceFi
   console.log(`Phases: ${phases.join(' → ')}`);
   console.log(`${'='.repeat(60)}\n`);
 
-  const pipelineContext = { directions, sourceFilePath };
+  const pipelineContext: { directions: string | null; sourceFilePath: string | null } = { directions, sourceFilePath };
   const ctx = createContext();
 
-  const results = {
+  const results: PipelineResults = {
     topic,
     tier,
     startTime: new Date().toISOString(),
@@ -164,7 +188,7 @@ async function runPipeline(topic, tier = 'standard', directions = null, sourceFi
     log(phase, 'Starting...');
 
     try {
-      let result;
+      let result: Record<string, unknown>;
 
       switch (phase) {
         case 'process-directions':
@@ -172,22 +196,22 @@ async function runPipeline(topic, tier = 'standard', directions = null, sourceFi
           break;
 
         case 'load-source-file':
-          result = await loadSourceFile(topic, pipelineContext.sourceFilePath, ctx);
+          result = await loadSourceFile(topic, pipelineContext.sourceFilePath!, ctx);
           break;
 
         case 'canonical-links':
           result = await findCanonicalLinks(topic, ctx);
-          results.totalCost += result.cost || 0;
+          results.totalCost += (result.cost as number) || 0;
           break;
 
         case 'research-perplexity':
           result = await runPerplexityResearch(topic, 'standard', ctx);
-          results.totalCost += result.cost || 0;
+          results.totalCost += (result.cost as number) || 0;
           break;
 
         case 'research-perplexity-deep':
           result = await runPerplexityResearch(topic, 'deep', ctx);
-          results.totalCost += result.cost || 0;
+          results.totalCost += (result.cost as number) || 0;
           break;
 
         case 'research-scry':
@@ -204,7 +228,7 @@ async function runPipeline(topic, tier = 'standard', directions = null, sourceFi
 
         case 'synthesize':
           result = await runSynthesis(topic, 'standard', ctx);
-          results.totalCost += result.budget || 0;
+          results.totalCost += (result.budget as number) || 0;
           break;
 
         case 'synthesize-fast':
@@ -214,13 +238,13 @@ async function runPipeline(topic, tier = 'standard', directions = null, sourceFi
 
         case 'synthesize-quality':
           result = await runSynthesis(topic, 'quality', ctx);
-          results.totalCost += result.budget || 0;
+          results.totalCost += (result.budget as number) || 0;
           break;
 
         case 'verify-sources':
           result = await runSourceVerification(topic, ctx);
-          if (result.warnings?.length > 0) {
-            log(phase, `Found ${result.warnings.length} potential hallucination(s) - review recommended`);
+          if ((result.warnings as Array<unknown>)?.length > 0) {
+            log(phase, `Found ${(result.warnings as Array<unknown>).length} potential hallucination(s) - review recommended`);
           }
           break;
 
@@ -262,7 +286,8 @@ async function runPipeline(topic, tier = 'standard', directions = null, sourceFi
       results.phases[phase] = { success: true, ...result };
       log(phase, 'Complete');
 
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       log(phase, `Failed: ${error.message}`);
       results.phases[phase] = { success: false, error: error.message };
 
@@ -295,7 +320,7 @@ async function runPipeline(topic, tier = 'standard', directions = null, sourceFi
 
 // ============ CLI ============
 
-function printHelp() {
+function printHelp(): void {
   console.log(`
 Page Creator - Cost-Optimized Pipeline
 
@@ -303,7 +328,7 @@ Uses Perplexity for research ($0.10) + Claude for synthesis ($2-3)
 Total: $4-6 vs $10+ with all-Claude approach
 
 Usage:
-  node crux/authoring/page-creator.mjs "<topic>" [options]
+  node crux/authoring/page-creator.ts "<topic>" [options]
 
 Options:
   --tier <tier>            Quality tier: budget, standard, premium (default: standard)
@@ -350,16 +375,16 @@ ${Object.entries(TIERS).map(([key, config]) =>
   ).join('\n')}
 
 Examples:
-  node crux/authoring/page-creator.mjs "MIRI" --tier standard
-  node crux/authoring/page-creator.mjs "Anthropic" --tier premium
-  node crux/authoring/page-creator.mjs "Lighthaven" --phase grade
-  node crux/authoring/page-creator.mjs "Some Event" --dest knowledge-base/incidents --create-category "Incidents"
-  node crux/authoring/page-creator.mjs "SecureBio" --source-file ./reports/securebio-analysis.md
-  node crux/authoring/page-creator.mjs "SecureBio" --source-file ./notes.txt --directions "Focus on policy"
+  node crux/authoring/page-creator.ts "MIRI" --tier standard
+  node crux/authoring/page-creator.ts "Anthropic" --tier premium
+  node crux/authoring/page-creator.ts "Lighthaven" --phase grade
+  node crux/authoring/page-creator.ts "Some Event" --dest knowledge-base/incidents --create-category "Incidents"
+  node crux/authoring/page-creator.ts "SecureBio" --source-file ./reports/securebio-analysis.md
+  node crux/authoring/page-creator.ts "SecureBio" --source-file ./notes.txt --directions "Focus on policy"
 `);
 }
 
-async function main() {
+async function main(): Promise<void> {
   const args = process.argv.slice(2);
 
   if (args.includes('--help') || args.length === 0) {
@@ -367,20 +392,20 @@ async function main() {
     process.exit(0);
   }
 
-  const topic = args.find(arg => !arg.startsWith('--'));
-  const tierIndex = args.indexOf('--tier');
-  const tier = tierIndex !== -1 ? args[tierIndex + 1] : 'standard';
-  const phaseIndex = args.indexOf('--phase');
-  const singlePhase = phaseIndex !== -1 ? args[phaseIndex + 1] : null;
-  const destIndex = args.indexOf('--dest');
-  const destPath = destIndex !== -1 ? args[destIndex + 1] : null;
-  const directionsIndex = args.indexOf('--directions');
-  const directions = directionsIndex !== -1 ? args[directionsIndex + 1] : null;
-  const sourceFileIndex = args.indexOf('--source-file');
-  const sourceFilePath = sourceFileIndex !== -1 ? path.resolve(args[sourceFileIndex + 1]) : null;
-  const createCategoryIndex = args.indexOf('--create-category');
-  const createCategoryLabel = createCategoryIndex !== -1 ? args[createCategoryIndex + 1] : null;
-  const forceCreate = args.includes('--force');
+  const topic: string | undefined = args.find(arg => !arg.startsWith('--'));
+  const tierIndex: number = args.indexOf('--tier');
+  const tier: string = tierIndex !== -1 ? args[tierIndex + 1] : 'standard';
+  const phaseIndex: number = args.indexOf('--phase');
+  const singlePhase: string | null = phaseIndex !== -1 ? args[phaseIndex + 1] : null;
+  const destIndex: number = args.indexOf('--dest');
+  const destPath: string | null = destIndex !== -1 ? args[destIndex + 1] : null;
+  const directionsIndex: number = args.indexOf('--directions');
+  const directions: string | null = directionsIndex !== -1 ? args[directionsIndex + 1] : null;
+  const sourceFileIndex: number = args.indexOf('--source-file');
+  const sourceFilePath: string | null = sourceFileIndex !== -1 ? path.resolve(args[sourceFileIndex + 1]) : null;
+  const createCategoryIndex: number = args.indexOf('--create-category');
+  const createCategoryLabel: string | null = createCategoryIndex !== -1 ? args[createCategoryIndex + 1] : null;
+  const forceCreate: boolean = args.includes('--force');
 
   if (sourceFilePath && !fs.existsSync(sourceFilePath)) {
     console.error(`Error: Source file not found: ${sourceFilePath}`);
@@ -425,7 +450,7 @@ async function main() {
   // If running a single phase, execute just that phase
   if (singlePhase) {
     console.log(`Running single phase: ${singlePhase} for "${topic}"`);
-    let result;
+    let result: unknown;
     switch (singlePhase) {
       case 'process-directions':
         if (!directions) {
@@ -502,16 +527,16 @@ async function main() {
     const deployResult = deployToDestination(topic, destPath, ctx);
 
     if (deployResult.success) {
-      console.log(`✓ Deployed to: ${deployResult.deployedTo}`);
+      console.log(`ok Deployed to: ${deployResult.deployedTo}`);
 
       // Cross-linking validation
       const entitySlug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      const crossLinkCheck = validateCrossLinks(deployResult.deployedTo);
+      const crossLinkCheck = validateCrossLinks(deployResult.deployedTo!);
 
       console.log(`\n${'─'.repeat(50)}`);
       if (crossLinkCheck.warnings.length > 0) {
         console.log(`${'\x1b[33m'}Cross-linking issues detected:${'\x1b[0m'}`);
-        crossLinkCheck.warnings.forEach(w => console.log(`   - ${w}`));
+        crossLinkCheck.warnings.forEach((w: string) => console.log(`   - ${w}`));
         console.log(`\n   Outbound EntityLinks (${crossLinkCheck.outboundCount}): ${crossLinkCheck.outboundIds.join(', ') || 'none'}`);
       } else {
         console.log(`${'\x1b[32m'}Cross-linking looks good (${crossLinkCheck.outboundCount} outbound EntityLinks)${'\x1b[0m'}`);
@@ -523,7 +548,7 @@ async function main() {
       console.log(`\n   This shows pages that mention this entity but don't link to it.`);
       console.log(`   Consider adding EntityLinks to improve wiki connectivity.`);
     } else {
-      console.log(`✗ Deployment failed: ${deployResult.error}`);
+      console.log(`FAIL Deployment failed: ${deployResult.error}`);
     }
   } else {
     console.log(`\nTip: Use --dest <path> to deploy directly to content directory`);
@@ -531,4 +556,6 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch(console.error);
+}

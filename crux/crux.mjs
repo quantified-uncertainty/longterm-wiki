@@ -39,11 +39,11 @@ import { createLogger } from './lib/output.ts';
 import * as validateCommands from './commands/validate.ts';
 import * as analyzeCommands from './commands/analyze.ts';
 import * as fixCommands from './commands/fix.ts';
-import * as contentCommands from './commands/content.mjs';
+import * as contentCommands from './commands/content.ts';
 import * as generateCommands from './commands/generate.ts';
-import * as resourcesCommands from './commands/resources.mjs';
-import * as insightsCommands from './commands/insights.mjs';
-import * as gapsCommands from './commands/gaps.mjs';
+import * as resourcesCommands from './commands/resources.ts';
+import * as insightsCommands from './commands/insights.ts';
+import * as gapsCommands from './commands/gaps.ts';
 import * as updatesCommands from './commands/updates.ts';
 
 const domains = {

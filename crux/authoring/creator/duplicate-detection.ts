@@ -7,11 +7,29 @@
 import fs from 'fs';
 import path from 'path';
 
+interface DuplicateMatch {
+  title: string;
+  path: string;
+  similarity: number;
+  type: string;
+}
+
+interface DuplicateCheckResult {
+  exists: boolean;
+  matches: DuplicateMatch[];
+}
+
+interface DatabaseEntity {
+  title?: string;
+  name?: string;
+  path?: string;
+}
+
 /**
  * Calculate Levenshtein distance between two strings
  */
-export function levenshteinDistance(a, b) {
-  const matrix = [];
+export function levenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
   for (let i = 0; i <= b.length; i++) {
     matrix[i] = [i];
   }
@@ -37,7 +55,7 @@ export function levenshteinDistance(a, b) {
 /**
  * Calculate similarity ratio (0-1, where 1 is identical)
  */
-export function similarity(a, b) {
+export function similarity(a: string, b: string): number {
   const aLower = a.toLowerCase();
   const bLower = b.toLowerCase();
   const distance = levenshteinDistance(aLower, bLower);
@@ -48,7 +66,7 @@ export function similarity(a, b) {
 /**
  * Normalize a string to a slug for comparison
  */
-export function toSlug(str) {
+export function toSlug(str: string): string {
   return str.toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
@@ -58,17 +76,17 @@ export function toSlug(str) {
  * Check if a page with similar name already exists
  * Returns { exists: boolean, matches: Array<{title, path, similarity}> }
  */
-export async function checkForExistingPage(topic, ROOT) {
+export async function checkForExistingPage(topic: string, ROOT: string): Promise<DuplicateCheckResult> {
   const registryPath = path.join(ROOT, 'app/src/data/pathRegistry.json');
   const databasePath = path.join(ROOT, 'app/src/data/database.json');
 
-  const matches = [];
+  const matches: DuplicateMatch[] = [];
   const topicSlug = toSlug(topic);
   const topicLower = topic.toLowerCase();
 
   // Check pathRegistry for slug matches
   if (fs.existsSync(registryPath)) {
-    const registry = JSON.parse(fs.readFileSync(registryPath, 'utf-8'));
+    const registry: Record<string, string> = JSON.parse(fs.readFileSync(registryPath, 'utf-8'));
     for (const [id, urlPath] of Object.entries(registry)) {
       if (id.startsWith('__index__')) continue;
 
@@ -88,7 +106,7 @@ export async function checkForExistingPage(topic, ROOT) {
 
   // Check database.json for title matches
   if (fs.existsSync(databasePath)) {
-    const database = JSON.parse(fs.readFileSync(databasePath, 'utf-8'));
+    const database: Record<string, DatabaseEntity[]> = JSON.parse(fs.readFileSync(databasePath, 'utf-8'));
     const allEntities = Object.values(database).flat();
 
     for (const entity of allEntities) {

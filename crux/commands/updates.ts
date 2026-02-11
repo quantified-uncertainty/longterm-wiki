@@ -260,12 +260,12 @@ export async function run(args: string[], options: CommandOptions): Promise<Comm
     output += `  Priority: ${page.priority} | ${page.daysSinceEdit}d since edit | freq: ${page.updateFrequency}d\n`;
 
     if (dryRun) {
-      output += `  ${c.dim}(dry run — would run: page-improver.mjs -- ${page.id} --tier ${tier} --apply --grade)${c.reset}\n\n`;
+      output += `  ${c.dim}(dry run — would run: page-improver.ts -- ${page.id} --tier ${tier} --apply --grade)${c.reset}\n\n`;
       continue;
     }
 
     try {
-      const cmdArgs = ['crux/authoring/page-improver.mjs', '--', page.id, '--tier', tier, '--apply', '--grade'];
+      const cmdArgs = ['--import', 'tsx/esm', '--no-warnings', 'crux/authoring/page-improver.ts', '--', page.id, '--tier', tier, '--apply', '--grade'];
       output += `  ${c.dim}Running: node ${cmdArgs.join(' ')}${c.reset}\n`;
 
       // Print accumulated output before starting long-running process

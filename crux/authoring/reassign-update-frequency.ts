@@ -4,7 +4,7 @@
  * Reassign Update Frequency Based on Volatility
  *
  * The bootstrap assigned update_frequency based on importance scores, but
- * importance ≠ volatility. This script uses a hybrid approach:
+ * importance != volatility. This script uses a hybrid approach:
  *   1. Rule-based heuristics for clear categories (subcategory, path)
  *   2. Claude Haiku for ambiguous cases
  *
@@ -16,23 +16,24 @@
  *   90d: ~80-100  (theoretical frameworks, models, settled arguments)
  *
  * Usage:
- *   node crux/authoring/reassign-update-frequency.mjs              # Dry run
- *   node crux/authoring/reassign-update-frequency.mjs --apply      # Apply changes
- *   node crux/authoring/reassign-update-frequency.mjs --verbose    # Show all decisions
+ *   node crux/authoring/reassign-update-frequency.ts              # Dry run
+ *   node crux/authoring/reassign-update-frequency.ts --apply      # Apply changes
+ *   node crux/authoring/reassign-update-frequency.ts --verbose    # Show all decisions
  */
 
 import { readFileSync, writeFileSync, readdirSync } from 'fs';
 import { join, relative } from 'path';
+import { fileURLToPath } from 'url';
 import Anthropic from '@anthropic-ai/sdk';
 
-const PROJECT_ROOT = process.cwd();
-const CONTENT_DIR = join(PROJECT_ROOT, 'content/docs');
+const PROJECT_ROOT: string = process.cwd();
+const CONTENT_DIR: string = join(PROJECT_ROOT, 'content/docs');
 
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
-const VALID_FREQUENCIES = [3, 7, 21, 45, 90];
+const VALID_FREQUENCIES: number[] = [3, 7, 21, 45, 90];
 const CONCURRENCY = 10;
 const MAX_RETRIES = 3;
 
@@ -44,7 +45,7 @@ const MAX_RETRIES = 3;
  * Subcategory-based defaults. These provide a starting point.
  * "null" means "use Haiku to decide."
  */
-const SUBCATEGORY_DEFAULTS = {
+const SUBCATEGORY_DEFAULTS: Record<string, number> = {
   // Fast-moving orgs
   'labs': 7,                          // AI labs are fast-moving
 
@@ -128,16 +129,35 @@ const SUBCATEGORY_DEFAULTS = {
   'outcomes': 45,
 };
 
+interface PageData {
+  filePath: string;
+  title: string;
+  subcategory: string | null;
+  importance: string | null;
+  currentFreq: number;
+  firstParagraph: string;
+  path: string;
+  content: string;
+}
+
+interface ClassificationResult {
+  frequency: number;
+  reason: string;
+  source: string;
+}
+
+interface PageResult extends PageData, ClassificationResult {}
+
 /**
  * Path-based heuristics (applied when no subcategory match)
  */
-function getPathDefault(path) {
-  if (path.includes('history')) return 90;
-  if (path.includes('models/')) return 90;
-  if (path.includes('people/')) return 45;
-  if (path.includes('cruxes/')) return 45;
-  if (path.includes('scenarios/')) return 45;
-  if (path.includes('worldviews/')) return 45;
+function getPathDefault(pagePath: string): number | null {
+  if (pagePath.includes('history')) return 90;
+  if (pagePath.includes('models/')) return 90;
+  if (pagePath.includes('people/')) return 45;
+  if (pagePath.includes('cruxes/')) return 45;
+  if (pagePath.includes('scenarios/')) return 45;
+  if (pagePath.includes('worldviews/')) return 45;
   // organizations/ without a subcategory match → let Haiku decide
   return null; // ambiguous
 }
@@ -146,7 +166,7 @@ function getPathDefault(path) {
  * Exact title matches for specific known entities.
  * Only matches the EXACT title, not substrings.
  */
-const TITLE_EXACT_OVERRIDES = {
+const TITLE_EXACT_OVERRIDES: Record<string, number> = {
   // Top labs → 3d (only the main org page)
   'OpenAI': 3,
   'Anthropic': 3,
@@ -173,7 +193,7 @@ const TITLE_EXACT_OVERRIDES = {
   // Analytical pages about labs → use subcategory/path instead (no override)
 };
 
-function ruleBasedClassify(page) {
+function ruleBasedClassify(page: PageData): ClassificationResult | null {
   // 1. Check exact title overrides
   if (TITLE_EXACT_OVERRIDES[page.title] != null) {
     return {
@@ -206,8 +226,8 @@ function ruleBasedClassify(page) {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function findMdxFiles(dir) {
-  const results = [];
+function findMdxFiles(dir: string): string[] {
+  const results: string[] = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -219,11 +239,11 @@ function findMdxFiles(dir) {
   return results;
 }
 
-function parseFrontmatter(content) {
+function parseFrontmatter(content: string): Record<string, string> {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
   if (!match) return {};
   const lines = match[1].split('\n');
-  const result = {};
+  const result: Record<string, string> = {};
   for (const line of lines) {
     const kv = line.match(/^(\w[\w_]*):\s*(.+)$/);
     if (kv) {
@@ -237,12 +257,12 @@ function parseFrontmatter(content) {
   return result;
 }
 
-function getFirstParagraph(content) {
+function getFirstParagraph(content: string): string {
   const match = content.match(/^---\n[\s\S]*?\n---\n([\s\S]*)$/);
   if (!match) return '';
   const body = match[1];
   const lines = body.split('\n');
-  let paragraph = [];
+  const paragraph: string[] = [];
   let inParagraph = false;
 
   for (const line of lines) {
@@ -266,14 +286,14 @@ function getFirstParagraph(content) {
   return words.slice(0, 150).join(' ');
 }
 
-function getPathContext(filePath) {
+function getPathContext(filePath: string): string {
   const rel = relative(CONTENT_DIR, filePath);
   const parts = rel.split('/');
   parts.pop();
   return parts.join('/');
 }
 
-function replaceUpdateFrequency(content, newFreq) {
+function replaceUpdateFrequency(content: string, newFreq: number): string {
   return content.replace(
     /^(update_frequency:\s*)\d+/m,
     `$1${newFreq}`
@@ -284,8 +304,8 @@ function replaceUpdateFrequency(content, newFreq) {
 // Claude API (for ambiguous pages only)
 // ---------------------------------------------------------------------------
 
-async function classifyWithHaiku(client, page, retries = 0) {
-  const prompt = `Classify this AI safety wiki page by how often the UNDERLYING SUBJECT changes in reality. This is about volatility of the real-world topic, NOT importance.
+async function classifyWithHaiku(client: Anthropic, page: PageData, retries: number = 0): Promise<ClassificationResult> {
+  const prompt: string = `Classify this AI safety wiki page by how often the UNDERLYING SUBJECT changes in reality. This is about volatility of the real-world topic, NOT importance.
 
 Title: ${page.title}
 Path: ${page.path}
@@ -325,11 +345,13 @@ Return ONLY: {"frequency": N, "reason": "5 words max"}`;
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const text = response.content[0].text.trim();
+    const block = response.content[0];
+    if (!block || block.type !== 'text') throw new Error('No text block in response');
+    const text = block.text.trim();
     const jsonMatch = text.match(/\{[\s\S]*?\}/);
     if (!jsonMatch) throw new Error(`No JSON: ${text}`);
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    const parsed: { frequency: number; reason: string } = JSON.parse(jsonMatch[0]);
     const freq = Number(parsed.frequency);
 
     if (!VALID_FREQUENCIES.includes(freq)) {
@@ -337,10 +359,10 @@ Return ONLY: {"frequency": N, "reason": "5 words max"}`;
     }
 
     return { frequency: freq, reason: parsed.reason, source: 'haiku' };
-  } catch (err) {
+  } catch (err: unknown) {
     if (retries < MAX_RETRIES) {
       const delay = Math.pow(2, retries) * 1000;
-      await new Promise(r => setTimeout(r, delay));
+      await new Promise<void>(r => setTimeout(r, delay));
       return classifyWithHaiku(client, page, retries + 1);
     }
     throw err;
@@ -351,16 +373,16 @@ Return ONLY: {"frequency": N, "reason": "5 words max"}`;
 // Main
 // ---------------------------------------------------------------------------
 
-async function main() {
+async function main(): Promise<void> {
   const args = process.argv.slice(2);
-  const apply = args.includes('--apply');
-  const verbose = args.includes('--verbose');
+  const apply: boolean = args.includes('--apply');
+  const verbose: boolean = args.includes('--verbose');
 
   const client = new Anthropic();
 
   // Collect all pages that have update_frequency
   const files = findMdxFiles(CONTENT_DIR);
-  const pages = [];
+  const pages: PageData[] = [];
 
   for (const filePath of files) {
     if (filePath.endsWith('index.mdx') || filePath.endsWith('index.md')) continue;
@@ -384,14 +406,14 @@ async function main() {
   }
 
   console.log(`\nReassign Update Frequency (Volatility-Based)`);
-  console.log('─'.repeat(55));
+  console.log('\u2500'.repeat(55));
   console.log(`  Pages to classify: ${pages.length}`);
   console.log(`  Mode: ${apply ? 'APPLY' : 'DRY RUN'}`);
   console.log('');
 
   // Phase 1: Rule-based classification
-  const ruleResults = [];
-  const needsHaiku = [];
+  const ruleResults: PageResult[] = [];
+  const needsHaiku: PageData[] = [];
 
   for (const page of pages) {
     const result = ruleBasedClassify(page);
@@ -407,7 +429,7 @@ async function main() {
   console.log('');
 
   // Phase 2: Haiku classification for ambiguous pages
-  const haikuResults = [];
+  const haikuResults: PageResult[] = [];
   let processed = 0;
   let errors = 0;
 
@@ -424,7 +446,8 @@ async function main() {
 
       if (result.status === 'rejected') {
         errors++;
-        console.error(`  ERROR ${page.title}: ${result.reason.message}`);
+        const reason = result.reason instanceof Error ? result.reason : new Error(String(result.reason));
+        console.error(`  ERROR ${page.title}: ${reason.message}`);
         haikuResults.push({ ...page, frequency: page.currentFreq, reason: 'ERROR', source: 'error' });
         continue;
       }
@@ -438,17 +461,17 @@ async function main() {
   if (needsHaiku.length > 0) console.log('');
 
   // Combine results
-  const allResults = [...ruleResults, ...haikuResults];
+  const allResults: PageResult[] = [...ruleResults, ...haikuResults];
 
   // Apply changes
   let changeCount = 0;
   for (const r of allResults) {
-    const changed = r.frequency !== r.currentFreq;
+    const changed: boolean = r.frequency !== r.currentFreq;
 
     if (changed) {
       changeCount++;
-      const arrow = r.currentFreq > r.frequency ? '↓' : '↑';
-      console.log(`  ${String(r.currentFreq + 'd').padEnd(4)} → ${String(r.frequency + 'd').padEnd(4)} ${arrow} ${r.title} [${r.source}] (${r.reason})`);
+      const arrow: string = r.currentFreq > r.frequency ? '\u2193' : '\u2191';
+      console.log(`  ${String(r.currentFreq + 'd').padEnd(4)} \u2192 ${String(r.frequency + 'd').padEnd(4)} ${arrow} ${r.title} [${r.source}] (${r.reason})`);
 
       if (apply) {
         const newContent = replaceUpdateFrequency(r.content, r.frequency);
@@ -462,7 +485,7 @@ async function main() {
   console.log('');
 
   // Summary
-  console.log('─'.repeat(55));
+  console.log('\u2500'.repeat(55));
   console.log(`  Total processed: ${allResults.length}`);
   console.log(`  Changed:         ${changeCount}`);
   console.log(`  Unchanged:       ${allResults.length - changeCount}`);
@@ -470,8 +493,8 @@ async function main() {
   console.log('');
 
   // Distribution
-  const beforeDist = {};
-  const afterDist = {};
+  const beforeDist: Record<string, number> = {};
+  const afterDist: Record<string, number> = {};
   for (const r of allResults) {
     beforeDist[r.currentFreq + 'd'] = (beforeDist[r.currentFreq + 'd'] || 0) + 1;
     afterDist[r.frequency + 'd'] = (afterDist[r.frequency + 'd'] || 0) + 1;
@@ -479,12 +502,12 @@ async function main() {
 
   console.log('Frequency Distribution:');
   console.log('  Freq    Before  After   Target');
-  const targets = { '3d': '5-10', '7d': '30-50', '21d': '100-150', '45d': '150-200', '90d': '80-100' };
+  const targets: Record<string, string> = { '3d': '5-10', '7d': '30-50', '21d': '100-150', '45d': '150-200', '90d': '80-100' };
   for (const f of ['3d', '7d', '21d', '45d', '90d']) {
-    const before = beforeDist[f] || 0;
-    const after = afterDist[f] || 0;
-    const diff = after - before;
-    const diffStr = diff > 0 ? `+${diff}` : diff < 0 ? `${diff}` : '  0';
+    const before: number = beforeDist[f] || 0;
+    const after: number = afterDist[f] || 0;
+    const diff: number = after - before;
+    const diffStr: string = diff > 0 ? `+${diff}` : diff < 0 ? `${diff}` : '  0';
     console.log(`  ${f.padEnd(5)}  ${String(before).padStart(5)}  ${String(after).padStart(5)} (${diffStr.padStart(4)})  [${targets[f]}]`);
   }
 
@@ -493,7 +516,10 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error('Fatal error:', err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: unknown) => {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error('Fatal error:', error);
+    process.exit(1);
+  });
+}
