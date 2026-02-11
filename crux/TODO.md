@@ -23,15 +23,11 @@ They require more design work and coordination but would significantly improve c
 - `resource-dedup.ts` — Deduplication logic
 - `resource-manager.ts` — Orchestrator that imports from above
 
-## 3. Move `process.exit()` Out of Library Code
+## ~~3. Move `process.exit()` Out of Library Code~~ ✅ DONE
 
-**Problem**: Several library/utility files call `process.exit()` directly, making them hard to test and reuse:
-- `resource-manager.ts`
-- `page-improver.ts`
-- `page-creator.ts`
-- Various authoring scripts
-
-**Suggested approach**: Have library functions throw errors or return error codes. Only the CLI entry point (`crux.mjs`) and top-level script shebangs should call `process.exit()`.
+Fixed `lib/anthropic.ts` `createClient()` — the only exported library function with
+`process.exit()`. Now throws an Error instead. All other `process.exit()` calls are
+in `main()` functions guarded by `if (process.argv[1] === ...)`, which is correct.
 
 ## ~~4. Standardize `--ci` / `--json` Output Behavior~~ ✅ DONE
 
