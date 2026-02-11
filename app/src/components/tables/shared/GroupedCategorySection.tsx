@@ -84,7 +84,7 @@ function GroupHeader({
   switch (style) {
     case "dark-slate":
       return (
-        <div className="bg-slate-900 text-white px-4 py-2 rounded-t-md font-semibold text-sm uppercase tracking-wide">
+        <div className="bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 px-4 py-2 rounded-t-md font-semibold text-sm uppercase tracking-wide">
           {label}
           {description && ` — ${description}`}
         </div>

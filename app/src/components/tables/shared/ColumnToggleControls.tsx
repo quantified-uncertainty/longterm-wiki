@@ -46,7 +46,7 @@ export function ColumnToggleControls<T extends string>({
             className={cn(
               "px-2 py-0.5 text-[10px] font-medium rounded-full transition-colors",
               isActive
-                ? "bg-foreground/80 text-background"
+                ? "bg-muted text-foreground ring-1 ring-border"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
             )}
           >
