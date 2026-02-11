@@ -212,3 +212,61 @@ If Phase 1–3 show strong user demand for short content:
 - Phase 1: Structured summary YAML schema, `<KeyTakeaways>` component, InfoBox expand toggle (~200 lines)
 - Phase 2: Remark plugin for section wrapping, `<CollapsibleSection>` component, section metadata in build pipeline (~500 lines)
 - Phase 3: `<ViewModeProvider>` context, header toggle, URL param handling (~300 lines)
+
+## Phase 1 Implementation Status
+
+Phase 1 has been implemented. Here's what was built:
+
+### 1. Structured Summary Schema
+
+New `structuredSummary` frontmatter field with three sub-fields:
+
+```yaml
+structuredSummary:
+  oneLiner: "One sentence explaining what this thing is"
+  keyPoints:
+    - "First key quantitative or qualitative finding"
+    - "Second key point"
+    - "Third key point"
+  bottomLine: "So-what for a decision-maker"
+```
+
+**Files changed:**
+- `crux/lib/rules/frontmatter-schema.ts` — Zod validation schema
+- `app/src/data/index.ts` — TypeScript `Page` interface
+- `app/scripts/build-data.mjs` — Build pipeline passthrough
+
+### 2. InfoBox Expand/Collapse Toggle
+
+The InfoBox description was previously CSS-truncated to 3 lines (`line-clamp-3`) with no way to see the full text. Now it's interactive: if the text overflows 3 lines, a "Show more" / "Show less" button appears.
+
+**New file:** `app/src/components/wiki/InfoBoxDescription.tsx` — Client component using `useRef` + `useEffect` to detect overflow, toggling `line-clamp-3` on click.
+
+### 3. KeyTakeaways MDX Component
+
+A new `<KeyTakeaways>` component for hand-curated bullet summaries at the top of articles. Renders as a visually distinct card with an indigo accent (lightbulb icon + "Key Takeaways" header).
+
+**New file:** `app/src/components/wiki/KeyTakeaways.tsx`
+**Registered in:** `app/src/components/mdx-components.tsx`
+
+### 4. Structured Summary Rendering in PageStatus
+
+When a `structuredSummary` is available, PageStatus renders it as:
+- **One-liner** in bold at the top
+- **Key points** as a bullet list
+- **Bottom line** in a highlighted indigo box with a "BOTTOM LINE" label
+
+Falls back to the existing flat `llmSummary` paragraph when no structured summary exists.
+
+### 5. Example Pages
+
+Structured summaries and KeyTakeaways added to:
+- `content/docs/knowledge-base/risks/scheming.mdx` — Risk page with both `structuredSummary` and `<KeyTakeaways>`
+- `content/docs/knowledge-base/responses/interpretability.mdx` — Response page with both
+
+### Next Steps for Phase 1 Rollout
+
+- Run `crux content improve` across all pages to auto-generate `structuredSummary` fields
+- Hand-review generated summaries for high-importance pages (importance >= 70)
+- Add `<KeyTakeaways>` to the top 30 most-visited pages
+- Consider making `structuredSummary` a required field in page templates for new pages

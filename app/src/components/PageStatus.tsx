@@ -37,10 +37,17 @@ interface PageIssues {
   };
 }
 
+export interface StructuredSummary {
+  oneLiner: string;
+  keyPoints: string[];
+  bottomLine: string;
+}
+
 export interface PageStatusProps {
   quality?: number;
   importance?: number;
   llmSummary?: string;
+  structuredSummary?: StructuredSummary;
   lastEdited?: string;
   updateFrequency?: number;
   todo?: string;
@@ -700,6 +707,7 @@ export function PageStatus({
   quality,
   importance,
   llmSummary,
+  structuredSummary,
   lastEdited,
   updateFrequency,
   todo,
@@ -720,6 +728,7 @@ export function PageStatus({
     quality ||
     importance ||
     llmSummary ||
+    structuredSummary ||
     lastEdited ||
     todo ||
     (todos && todos.length > 0);
@@ -815,15 +824,35 @@ export function PageStatus({
         </div>
       )}
 
-      {/* LLM Summary */}
-      {llmSummary && (
+      {/* Summary — structured if available, else flat llmSummary */}
+      {structuredSummary ? (
+        <div className="border-t border-border px-3.5 pt-2 pb-2.5">
+          <SectionHeader>Summary</SectionHeader>
+          <p className="m-0 mb-2 text-[13px] leading-relaxed text-foreground font-medium">
+            {structuredSummary.oneLiner}
+          </p>
+          <ul className="m-0 mb-2 pl-4 flex flex-col gap-0.5">
+            {structuredSummary.keyPoints.map((point, i) => (
+              <li key={i} className="text-[13px] leading-relaxed text-muted-foreground list-disc">
+                {point}
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-start gap-1.5 rounded-md bg-indigo-500/[0.06] px-2.5 py-1.5 text-[13px] leading-relaxed text-foreground/90">
+            <span className="shrink-0 text-indigo-500 font-semibold text-[11px] uppercase tracking-wide mt-px">
+              Bottom line
+            </span>
+            <span>{structuredSummary.bottomLine}</span>
+          </div>
+        </div>
+      ) : llmSummary ? (
         <div className="border-t border-border px-3.5 pt-2 pb-2.5">
           <SectionHeader>Summary</SectionHeader>
           <p className="m-0 text-[13px] leading-relaxed text-muted-foreground">
             {llmSummary}
           </p>
         </div>
-      )}
+      ) : null}
 
       {/* Issues */}
       <IssuesSection

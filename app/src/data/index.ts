@@ -257,6 +257,11 @@ export interface Page {
   causalLevel: string | null;
   lastUpdated: string | null;
   llmSummary: string | null;
+  structuredSummary: {
+    oneLiner: string;
+    keyPoints: string[];
+    bottomLine: string;
+  } | null;
   description: string | null;
   ratings: {
     novelty?: number;

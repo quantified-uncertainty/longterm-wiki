@@ -8,6 +8,7 @@ import { severityColors, maturityColors, riskCategoryColors } from "./shared/sty
 import { getEntityTypeHeader, getEntityTypeLabel, getOrgTypeLabel } from "@/data/entity-ontology";
 import type { AnyEntityTypeName } from "@/data/entity-type-names";
 import type { ExternalLinksData } from "@/data";
+import { InfoBoxDescription } from "./InfoBoxDescription";
 
 type LucideIcon = React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement> & { size?: number | string }>;
 
@@ -238,12 +239,8 @@ export function InfoBox({
         {title && <h3 className="m-0 text-sm font-semibold leading-tight text-white">{title}</h3>}
       </div>
 
-      {/* Description */}
-      {description && (
-        <div className="px-4 py-2.5 border-b border-border">
-          <p className="text-xs text-muted-foreground leading-relaxed m-0 line-clamp-3">{description}</p>
-        </div>
-      )}
+      {/* Description — expandable if text overflows 3 lines */}
+      {description && <InfoBoxDescription description={description} />}
 
       {/* External Links */}
       {extLinkEntries.length > 0 && (
