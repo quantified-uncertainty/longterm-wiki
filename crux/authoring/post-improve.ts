@@ -87,6 +87,11 @@ async function runGrading(limit: number): Promise<RunResult> {
         resolve({ success: false, error: stderr });
       }
     });
+
+    proc.on('error', (err: Error) => {
+      console.log(`   \u26A0\uFE0F  Grading failed to start: ${err.message}`);
+      resolve({ success: false, error: err.message });
+    });
   });
 }
 

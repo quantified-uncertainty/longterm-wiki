@@ -392,20 +392,18 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  const topic: string | undefined = args.find(arg => !arg.startsWith('--'));
-  const tierIndex: number = args.indexOf('--tier');
-  const tier: string = tierIndex !== -1 ? args[tierIndex + 1] : 'standard';
-  const phaseIndex: number = args.indexOf('--phase');
-  const singlePhase: string | null = phaseIndex !== -1 ? args[phaseIndex + 1] : null;
-  const destIndex: number = args.indexOf('--dest');
-  const destPath: string | null = destIndex !== -1 ? args[destIndex + 1] : null;
-  const directionsIndex: number = args.indexOf('--directions');
-  const directions: string | null = directionsIndex !== -1 ? args[directionsIndex + 1] : null;
-  const sourceFileIndex: number = args.indexOf('--source-file');
-  const sourceFilePath: string | null = sourceFileIndex !== -1 ? path.resolve(args[sourceFileIndex + 1]) : null;
-  const createCategoryIndex: number = args.indexOf('--create-category');
-  const createCategoryLabel: string | null = createCategoryIndex !== -1 ? args[createCategoryIndex + 1] : null;
-  const forceCreate: boolean = args.includes('--force');
+  // Use shared parseCliArgs for consistent --key=value handling
+  const { parseCliArgs } = await import('../lib/cli.ts');
+  const parsed = parseCliArgs(args);
+
+  const topic: string | undefined = parsed._positional[0];
+  const tier: string = (parsed.tier as string) || 'standard';
+  const singlePhase: string | null = (parsed.phase as string) || null;
+  const destPath: string | null = (parsed.dest as string) || null;
+  const directions: string | null = (parsed.directions as string) || null;
+  const sourceFilePath: string | null = parsed['source-file'] ? path.resolve(parsed['source-file'] as string) : null;
+  const createCategoryLabel: string | null = (parsed['create-category'] as string) || null;
+  const forceCreate: boolean = parsed.force === true;
 
   if (sourceFilePath && !fs.existsSync(sourceFilePath)) {
     console.error(`Error: Source file not found: ${sourceFilePath}`);
@@ -533,18 +531,20 @@ async function main(): Promise<void> {
       const entitySlug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const crossLinkCheck = validateCrossLinks(deployResult.deployedTo!);
 
+      const { getColors } = await import('../lib/output.ts');
+      const c = getColors();
       console.log(`\n${'─'.repeat(50)}`);
       if (crossLinkCheck.warnings.length > 0) {
-        console.log(`${'\x1b[33m'}Cross-linking issues detected:${'\x1b[0m'}`);
+        console.log(`${c.yellow}Cross-linking issues detected:${c.reset}`);
         crossLinkCheck.warnings.forEach((w: string) => console.log(`   - ${w}`));
         console.log(`\n   Outbound EntityLinks (${crossLinkCheck.outboundCount}): ${crossLinkCheck.outboundIds.join(', ') || 'none'}`);
       } else {
-        console.log(`${'\x1b[32m'}Cross-linking looks good (${crossLinkCheck.outboundCount} outbound EntityLinks)${'\x1b[0m'}`);
+        console.log(`${c.green}Cross-linking looks good (${crossLinkCheck.outboundCount} outbound EntityLinks)${c.reset}`);
       }
 
-      console.log(`\n${'\x1b[33m'}Cross-linking reminder:${'\x1b[0m'}`);
+      console.log(`\n${c.yellow}Cross-linking reminder:${c.reset}`);
       console.log(`   After running 'pnpm build', check cross-links:`);
-      console.log(`   ${'\x1b[36m'}node crux/crux.mjs analyze entity-links ${entitySlug}${'\x1b[0m'}`);
+      console.log(`   ${c.cyan}node crux/crux.mjs analyze entity-links ${entitySlug}${c.reset}`);
       console.log(`\n   This shows pages that mention this entity but don't link to it.`);
       console.log(`   Consider adding EntityLinks to improve wiki connectivity.`);
     } else {

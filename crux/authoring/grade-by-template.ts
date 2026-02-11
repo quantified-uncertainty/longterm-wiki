@@ -240,13 +240,14 @@ function gradeFile(filePath: string, template: PageTemplate): GradeResult {
 }
 
 async function main(): Promise<void> {
-  const args: string[] = process.argv.slice(2);
-  const templateFilter: string | undefined = args.find((a, i) => args[i - 1] === '--template');
-  const pageFilter: string | undefined = args.find((a, i) => args[i - 1] === '--page');
-  const outputJson: boolean = args.includes('--json');
-  const outputCsv: boolean = args.includes('--csv');
-  const onlyFailing: boolean = args.includes('--failing');
-  const topN: number = parseInt(args.find((a, i) => args[i - 1] === '--top') || '0');
+  const { parseCliArgs } = await import('../lib/cli.ts');
+  const parsed = parseCliArgs(process.argv.slice(2));
+  const templateFilter: string | undefined = (parsed.template as string) || undefined;
+  const pageFilter: string | undefined = (parsed.page as string) || undefined;
+  const outputJson: boolean = parsed.json === true;
+  const outputCsv: boolean = parsed.csv === true;
+  const onlyFailing: boolean = parsed.failing === true;
+  const topN: number = parseInt((parsed.top as string) || '0');
 
   const files: string[] = findMdxFiles(CONTENT_DIR);
   const results: GradeResult[] = [];

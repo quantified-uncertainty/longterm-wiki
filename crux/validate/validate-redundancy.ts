@@ -13,6 +13,7 @@
 
 import { fileURLToPath } from 'url';
 import { db, articles } from '../lib/knowledge-db.ts';
+import { parseCliArgs } from '../lib/cli.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
 // =============================================================================
@@ -515,20 +516,13 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
 }
 
 function main(): void {
-  const args = process.argv.slice(2);
+  const parsed = parseCliArgs(process.argv.slice(2));
 
   // Parse arguments
-  let threshold = DEFAULT_THRESHOLD;
-  let topN: number | null = null;
+  let threshold = parsed.threshold ? parseFloat(parsed.threshold as string) : DEFAULT_THRESHOLD;
+  let topN: number | null = parsed.top ? parseInt(parsed.top as string) : null;
 
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--threshold' && args[i + 1]) {
-      threshold = parseFloat(args[i + 1]);
-      i++;
-    } else if (args[i] === '--top' && args[i + 1]) {
-      topN = parseInt(args[i + 1]);
-      i++;
-    } else if (args[i] === '--help') {
+  if (parsed.help === true) {
       console.log(`
 Usage: npx tsx crux/validate/validate-redundancy.ts [options]
 
@@ -553,7 +547,7 @@ Examples:
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error(String(err));
     console.error('Error:', error.message);
-    process.exit(2);
+    process.exit(1);
   }
 }
 

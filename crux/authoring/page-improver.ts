@@ -969,18 +969,29 @@ function listPages(pages: PageData[], options: ListOptions = {}): void {
 }
 
 // Parse arguments (bare '--' is skipped so flags still work after it)
+// Supports both --key=value and --key value formats
 function parseArgs(args: string[]): ParsedArgs {
   const opts: ParsedArgs = { _positional: [] };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--') continue;
     if (args[i].startsWith('--')) {
-      const key = args[i].slice(2);
-      const next = args[i + 1];
-      if (next && !next.startsWith('--')) {
-        opts[key] = next;
-        i++;
+      const raw = args[i].slice(2);
+      const eqIdx = raw.indexOf('=');
+      if (eqIdx !== -1) {
+        // --key=value format
+        const key = raw.slice(0, eqIdx);
+        const value = raw.slice(eqIdx + 1);
+        opts[key] = value;
       } else {
-        opts[key] = true;
+        // --key value or --flag format
+        const key = raw;
+        const next = args[i + 1];
+        if (next && !next.startsWith('--')) {
+          opts[key] = next;
+          i++;
+        } else {
+          opts[key] = true;
+        }
       }
     } else {
       (opts._positional as string[]).push(args[i]);

@@ -209,6 +209,7 @@ async function validateWikipedia(resources: Resource[], opts: ParsedOpts): Promi
 
   const toCheck = wikiResources.slice(0, limit);
   const issues: ValidationIssue[] = [];
+  let networkErrors = 0;
 
   for (let i = 0; i < toCheck.length; i++) {
     const resource = toCheck[i];
@@ -254,10 +255,13 @@ async function validateWikipedia(resources: Resource[], opts: ParsedOpts): Promi
 
       await sleep(100); // Be polite to Wikipedia
     } catch (_err: unknown) {
-      // Ignore network errors
+      networkErrors++;
     }
   }
 
+  if (networkErrors > 0) {
+    console.log(`   (${networkErrors} resource(s) skipped due to network errors)`);
+  }
   console.log();
   return issues;
 }

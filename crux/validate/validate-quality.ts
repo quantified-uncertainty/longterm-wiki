@@ -22,6 +22,8 @@ import { fileURLToPath } from 'url';
 import { loadPages as loadPagesData } from '../lib/content-types.ts';
 import type { PageEntry } from '../lib/content-types.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
+import { parseCliArgs } from '../lib/cli.ts';
+import { getColors as getSharedColors } from '../lib/output.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -68,13 +70,11 @@ interface QualityValidatorOptions extends ValidatorOptions {
 // ---------------------------------------------------------------------------
 
 function makeColors(ciMode: boolean): AnsiColors {
-  return ciMode ? {
-    reset: '', bold: '', dim: '',
-    red: '', yellow: '', green: '', blue: '', cyan: ''
-  } : {
-    reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m',
-    red: '\x1b[31m', yellow: '\x1b[33m', green: '\x1b[32m',
-    blue: '\x1b[34m', cyan: '\x1b[36m'
+  const shared = getSharedColors(ciMode);
+  return {
+    reset: shared.reset, bold: shared.bold, dim: shared.dim,
+    red: shared.red, yellow: shared.yellow, green: shared.green,
+    blue: shared.blue, cyan: shared.cyan
   };
 }
 
@@ -324,15 +324,12 @@ export function runCheck(options?: QualityValidatorOptions): ValidatorResult {
 }
 
 function main(): void {
-  const args: string[] = process.argv.slice(2);
-  const PAGE_FILTER: string | null = args.includes('--page')
-    ? args[args.indexOf('--page') + 1]
-    : null;
+  const parsed = parseCliArgs(process.argv.slice(2));
 
   const result = runCheck({
-    ci: args.includes('--ci'),
-    large: args.includes('--large'),
-    page: PAGE_FILTER,
+    ci: parsed.ci === true,
+    large: parsed.large === true,
+    page: (parsed.page as string) || null,
   });
 
   process.exit(result.passed ? 0 : 1);

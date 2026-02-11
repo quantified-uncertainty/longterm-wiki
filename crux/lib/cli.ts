@@ -117,6 +117,49 @@ export function formatDuration(ms: number): string {
   return `${(ms / 1000).toFixed(2)}s`;
 }
 
+/**
+ * Parsed CLI arguments.
+ * Named options are stored as key-value pairs.
+ * Positional arguments are stored in _positional.
+ */
+export interface ParsedCliArgs {
+  _positional: string[];
+  [key: string]: string | boolean | string[];
+}
+
+/**
+ * Parse CLI arguments, handling both --key=value and --key value formats.
+ * Bare '--' separators are skipped. Boolean flags (no value) are set to true.
+ */
+export function parseCliArgs(argv: string[]): ParsedCliArgs {
+  const opts: ParsedCliArgs = { _positional: [] };
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--') continue;
+    if (argv[i].startsWith('--')) {
+      const raw = argv[i].slice(2);
+      const eqIdx = raw.indexOf('=');
+      if (eqIdx !== -1) {
+        // --key=value format
+        const key = raw.slice(0, eqIdx);
+        opts[key] = raw.slice(eqIdx + 1);
+      } else {
+        // --key value or --flag format
+        const key = raw;
+        const next = argv[i + 1];
+        if (next && !next.startsWith('--')) {
+          opts[key] = next;
+          i++;
+        } else {
+          opts[key] = true;
+        }
+      }
+    } else {
+      (opts._positional as string[]).push(argv[i]);
+    }
+  }
+  return opts;
+}
+
 export interface ScriptConfig {
   script: string;
   description?: string;
