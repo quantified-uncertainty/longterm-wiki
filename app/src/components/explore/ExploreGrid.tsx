@@ -28,7 +28,23 @@ const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
   { label: "Epistemic", value: "epistemic" },
 ];
 
-type SortKey = "relevance" | "title" | "importance" | "quality" | "wordCount" | "recentlyEdited";
+type SortKey = "recommended" | "relevance" | "title" | "importance" | "quality" | "wordCount" | "recentlyEdited";
+
+/** Compute a blended "recommended" score that favors recent, high-quality content. */
+function recommendedScore(item: ExploreItem): number {
+  // Recency: exponential decay with ~120-day half-life (0-10 scale)
+  let recency = 0;
+  if (item.lastUpdated) {
+    const daysAgo = (Date.now() - new Date(item.lastUpdated).getTime()) / 86_400_000;
+    recency = 10 * Math.exp(-daysAgo / 120);
+  }
+  const quality = item.quality || 0;
+  const importance = item.importance || 0;
+  // Small bonus for substantive content (log-scaled, capped)
+  const wordBonus = item.wordCount ? Math.min(2, Math.log10(item.wordCount + 1) - 1.5) : 0;
+
+  return recency * 2 + quality * 2 + importance * 0.5 + wordBonus;
+}
 
 /**
  * Resolve a URL param value (e.g. "organizations", "organization", "People")
@@ -135,7 +151,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     initialRiskCat ? 1 : initialEntityIndex
   );
   const [activeRiskCat, setActiveRiskCat] = useState(initialRiskCatIndex);
-  const [sortKey, setSortKey] = useState<SortKey>("relevance");
+  const [sortKey, setSortKey] = useState<SortKey>("recommended");
   const [visibleCount, setVisibleCount] = useState(60);
 
   // MiniSearch scores: id → relevance score (null = no active search or not yet loaded)
@@ -303,18 +319,28 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
           return (b.wordCount || 0) - (a.wordCount || 0);
         case "recentlyEdited":
           return (b.lastUpdated || "").localeCompare(a.lastUpdated || "");
-        case "relevance":
-        default: {
+        case "relevance": {
           // When searching with MiniSearch, sort by search relevance score
           if (searchScores) {
             const scoreA = searchScores.get(a.id) || 0;
             const scoreB = searchScores.get(b.id) || 0;
             return scoreB - scoreA;
           }
-          // Default: importance-weighted relevance
+          // Fallback: importance-weighted relevance
           const scoreA = (a.importance || 0) * 2 + (a.quality || 0);
           const scoreB = (b.importance || 0) * 2 + (b.quality || 0);
           return scoreB - scoreA;
+        }
+        case "recommended":
+        default: {
+          // When searching, defer to MiniSearch relevance
+          if (searchScores) {
+            const scoreA = searchScores.get(a.id) || 0;
+            const scoreB = searchScores.get(b.id) || 0;
+            return scoreB - scoreA;
+          }
+          // Blend of recency, quality, and importance
+          return recommendedScore(b) - recommendedScore(a);
         }
       }
     });
@@ -370,11 +396,12 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
           onChange={(e) => setSortKey(e.target.value as SortKey)}
           className="text-sm px-3 py-1.5 border border-border rounded-md bg-background text-foreground"
         >
-          <option value="relevance">Relevance</option>
-          <option value="importance">Importance</option>
-          <option value="quality">Quality</option>
-          <option value="wordCount">Word Count</option>
+          <option value="recommended">Recommended</option>
           <option value="recentlyEdited">Recently Edited</option>
+          <option value="quality">Quality</option>
+          <option value="importance">Importance</option>
+          <option value="relevance">Relevance</option>
+          <option value="wordCount">Word Count</option>
           <option value="title">Title (A-Z)</option>
         </select>
       </div>
