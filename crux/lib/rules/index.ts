@@ -5,63 +5,63 @@
  * Add new rules here to make them available to the validation engine.
  */
 
-import type { Rule } from '../validation-engine.js';
+import type { Rule } from '../validation-engine.ts';
 
 // Content validation rules
-import { entityLinkIdsRule } from './entitylink-ids.js';
-import { dollarSignsRule } from './dollar-signs.js';
-import { tildeDollarRule } from './tilde-dollar.js';
-import { comparisonOperatorsRule } from './comparison-operators.js';
-import { estimateBoxesRule } from './estimate-boxes.js';
-import { placeholdersRule } from './placeholders.js';
-import { fakeUrlsRule } from './fake-urls.js';
-import { internalLinksRule } from './internal-links.js';
-import { componentRefsRule } from './component-refs.js';
-import { preferEntityLinkRule } from './prefer-entitylink.js';
-import { entityMentionsRule } from './entity-mentions.js';
+import { entityLinkIdsRule } from './entitylink-ids.ts';
+import { dollarSignsRule } from './dollar-signs.ts';
+import { tildeDollarRule } from './tilde-dollar.ts';
+import { comparisonOperatorsRule } from './comparison-operators.ts';
+import { estimateBoxesRule } from './estimate-boxes.ts';
+import { placeholdersRule } from './placeholders.ts';
+import { fakeUrlsRule } from './fake-urls.ts';
+import { internalLinksRule } from './internal-links.ts';
+import { componentRefsRule } from './component-refs.ts';
+import { preferEntityLinkRule } from './prefer-entitylink.ts';
+import { entityMentionsRule } from './entity-mentions.ts';
 
 // Sidebar/structure rules
-import { sidebarCoverageRule } from './sidebar-coverage.js';
-import { sidebarIndexRule } from './sidebar-index.js';
+import { sidebarCoverageRule } from './sidebar-coverage.ts';
+import { sidebarIndexRule } from './sidebar-index.ts';
 
 // File-level rules
-import { jsxInMdRule } from './jsx-in-md.js';
-import { cruftFilesRule } from './cruft-files.js';
+import { jsxInMdRule } from './jsx-in-md.ts';
+import { cruftFilesRule } from './cruft-files.ts';
 
 // Markdown formatting rules
-import { markdownListsRule } from './markdown-lists.js';
-import { consecutiveBoldLabelsRule } from './consecutive-bold-labels.js';
+import { markdownListsRule } from './markdown-lists.ts';
+import { consecutiveBoldLabelsRule } from './consecutive-bold-labels.ts';
 
 // Component validation rules
-import { componentPropsRule } from './component-props.js';
-import { componentImportsRule } from './component-imports.js';
-import { citationUrlsRule } from './citation-urls.js';
-import { vagueCitationsRule } from './vague-citations.js';
+import { componentPropsRule } from './component-props.ts';
+import { componentImportsRule } from './component-imports.ts';
+import { citationUrlsRule } from './citation-urls.ts';
+import { vagueCitationsRule } from './vague-citations.ts';
 
 // External link validation
-import { externalLinksRule } from './external-links.js';
+import { externalLinksRule } from './external-links.ts';
 
 // Schema validation rules
-import { frontmatterSchemaRule } from './frontmatter-schema.js';
+import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 
 // Quality validation rules
-import { qualitySourceRule } from './quality-source.js';
-import { temporalArtifactsRule } from './temporal-artifacts.js';
-import { editorialArtifactsRule } from './editorial-artifacts.js';
-import { outdatedNamesRule } from './outdated-names.js';
+import { qualitySourceRule } from './quality-source.ts';
+import { temporalArtifactsRule } from './temporal-artifacts.ts';
+import { editorialArtifactsRule } from './editorial-artifacts.ts';
+import { outdatedNamesRule } from './outdated-names.ts';
 
 // Fact consistency
-import { factConsistencyRule } from './fact-consistency.js';
+import { factConsistencyRule } from './fact-consistency.ts';
 
 // Squiggle model quality
-import { squiggleQualityRule } from './squiggle-quality.js';
+import { squiggleQualityRule } from './squiggle-quality.ts';
 
 // Content quality warning rules (3-step grading pipeline)
-import { insiderJargonRule } from './insider-jargon.js';
-import { falseCertaintyRule } from './false-certainty.js';
-import { prescriptiveLanguageRule } from './prescriptive-language.js';
-import { toneMarkersRule } from './tone-markers.js';
-import { structuralQualityRule } from './structural-quality.js';
+import { insiderJargonRule } from './insider-jargon.ts';
+import { falseCertaintyRule } from './false-certainty.ts';
+import { prescriptiveLanguageRule } from './prescriptive-language.ts';
+import { toneMarkersRule } from './tone-markers.ts';
+import { structuralQualityRule } from './structural-quality.ts';
 
 // Re-export all rules individually
 export {

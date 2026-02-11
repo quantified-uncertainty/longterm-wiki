@@ -26,7 +26,7 @@
  * Cost estimate: ~$0.06 per page (full pipeline), ~$0.01 per page (warnings-only)
  */
 
-import { createClient, callClaude, parseJsonResponse, MODELS } from '../lib/anthropic.ts';
+import { createClient, callClaude, parseJsonResponse } from '../lib/anthropic.ts';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, relative, basename, dirname } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';

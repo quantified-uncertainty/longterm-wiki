@@ -8,7 +8,7 @@
  * - EntityLink, DataInfoBox, InfoBox, Backlinks, Mermaid, R, DataExternalLinks
  */
 
-import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock } from '../mdx-utils.ts';
 
 // Components from @components/wiki that are commonly used.

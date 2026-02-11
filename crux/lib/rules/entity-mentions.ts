@@ -13,9 +13,9 @@
  * may be intentional (e.g., when an entity is mentioned many times on one page).
  */
 
-import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
-import { loadDatabase } from '../content-types.js';
+import { loadDatabase } from '../content-types.ts';
 
 // ---------------------------------------------------------------------------
 // Interfaces

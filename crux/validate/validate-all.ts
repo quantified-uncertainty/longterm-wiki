@@ -26,6 +26,7 @@ import { dirname, join } from 'path';
 import { ValidationEngine, Severity, type Issue } from '../lib/validation-engine.ts';
 import { allRules } from '../lib/rules/index.ts';
 import { getColors } from '../lib/output.ts';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
 
 const __filename: string = fileURLToPath(import.meta.url);
 const __dirname: string = dirname(__filename);
@@ -228,7 +229,7 @@ function runSubprocessCheck(check: SubprocessCheckDescriptor): Promise<Subproces
     const runnerArgs: string[] = ['--import', 'tsx/esm', '--no-warnings', scriptPath, ...childArgs];
 
     const child: ChildProcess = spawn('node', runnerArgs, {
-      cwd: process.cwd(),
+      cwd: PROJECT_ROOT,
       stdio: ['inherit', 'pipe', 'pipe'],
     });
 

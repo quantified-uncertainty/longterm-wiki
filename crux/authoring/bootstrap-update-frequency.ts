@@ -19,12 +19,11 @@
  *   node crux/authoring/bootstrap-update-frequency.ts --verbose    # Show all pages
  */
 
-import { readFileSync, writeFileSync, readdirSync } from 'fs';
-import { join, relative } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
+import { relative } from 'path';
 import { fileURLToPath } from 'url';
-
-const PROJECT_ROOT: string = process.cwd();
-const CONTENT_DIR: string = join(PROJECT_ROOT, 'content/docs');
+import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
+import { findMdxFiles } from '../lib/file-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Config
@@ -45,21 +44,6 @@ const FREQUENCY_RULES: FrequencyRule[] = [
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function findMdxFiles(dir: string): string[] {
-  const results: string[] = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const fullPath: string = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      results.push(...findMdxFiles(fullPath));
-    } else if (/\.(mdx?|md)$/.test(entry.name)) {
-      results.push(fullPath);
-    }
-  }
-  return results;
-}
-
-// parseFrontmatter is defined inside main() after yaml is imported
 
 /**
  * Insert update_frequency into frontmatter YAML string without rewriting the whole thing.

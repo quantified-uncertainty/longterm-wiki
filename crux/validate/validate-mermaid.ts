@@ -25,11 +25,10 @@ import { spawnSync, execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
+import { CONTENT_DIR_ABS as CONTENT_DIR, PROJECT_ROOT } from '../lib/content-types.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const CONTENT_DIR = join(__dirname, '../..', 'content/docs');
-const TEMP_DIR = join(__dirname, '../..', '.mermaid-validate-temp');
+const TEMP_DIR = join(PROJECT_ROOT, '.mermaid-validate-temp');
 
 // ============================================================================
 // TYPES
@@ -778,7 +777,7 @@ function main(): void {
       console.log(`${colors.dim}  Checked ${files.length} files in ${duration}ms${colors.reset}\n`);
     } else {
       for (const { file, issues, chartCount } of allIssues) {
-        const relPath = file.replace(process.cwd() + '/', '');
+        const relPath = file.replace(PROJECT_ROOT + '/', '');
         console.log(`${colors.bold}${relPath}${colors.reset} ${colors.dim}(${chartCount} diagram${chartCount > 1 ? 's' : ''})${colors.reset}`);
 
         for (const issue of issues) {

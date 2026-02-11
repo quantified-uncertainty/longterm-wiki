@@ -10,7 +10,7 @@
  * These patterns are intentionally narrow to reduce false positives.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 
 const TONE_MARKER_PATTERNS: { pattern: RegExp; message: string }[] = [
   // "actually" as emphasis/correction (not "actually implemented" or in quotes)

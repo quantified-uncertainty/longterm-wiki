@@ -19,7 +19,7 @@ interface ResourceCommandConfig {
 const COMMANDS: Record<string, ResourceCommandConfig> = {
   list: {
     description: 'List pages with unconverted links',
-    passthrough: ['limit', 'json'],
+    passthrough: ['ci', 'limit', 'json'],
   },
   show: {
     description: 'Show unconverted links in a file',

@@ -1,9 +1,4 @@
-#!/usr/bin/env node
-/**
- * Unit Tests for Shared Library Modules
- *
- * Run: node scripts/lib/lib.test.ts
- */
+import { describe, it, expect } from 'vitest';
 
 import { findMdxFiles, findFiles, getDirectories } from './file-utils.ts';
 import {
@@ -23,73 +18,47 @@ import {
   isIndexPage,
   extractEntityId,
   CONTENT_DIR,
-} from './content-types.js';
-
-let passed = 0;
-let failed = 0;
-
-function test(name: string, fn: () => void): void {
-  try {
-    fn();
-    console.log(`✓ ${name}`);
-    passed++;
-  } catch (e: unknown) {
-    const error = e instanceof Error ? e : new Error(String(e));
-    console.log(`✗ ${name}`);
-    console.log(`  ${error.message}`);
-    failed++;
-  }
-}
-
-function assert(condition: boolean, message?: string): void {
-  if (!condition) throw new Error(message || 'Assertion failed');
-}
-
-function assertEqual(actual: unknown, expected: unknown, message?: string): void {
-  if (actual !== expected) {
-    throw new Error(message || `Expected ${expected}, got ${actual}`);
-  }
-}
+  PROJECT_ROOT,
+} from './content-types.ts';
 
 // =============================================================================
-// file-utils.mjs tests
+// file-utils.ts tests
 // =============================================================================
 
-console.log('\n📁 file-utils.mjs');
+describe('file-utils.ts', () => {
+  it('findMdxFiles returns array', () => {
+    const result = findMdxFiles('content/docs/knowledge-base/models');
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length > 0).toBe(true);
+    expect(result.every((f: string) => f.endsWith('.mdx') || f.endsWith('.md'))).toBe(true);
+  });
 
-test('findMdxFiles returns array', () => {
-  const result = findMdxFiles('content/docs/knowledge-base/models');
-  assert(Array.isArray(result), 'Should return array');
-  assert(result.length > 0, 'Should find files');
-  assert(result.every((f: string) => f.endsWith('.mdx') || f.endsWith('.md')), 'Should only find MDX/MD files');
-});
+  it('findMdxFiles handles non-existent directory', () => {
+    const result = findMdxFiles('/nonexistent/path');
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBe(0);
+  });
 
-test('findMdxFiles handles non-existent directory', () => {
-  const result = findMdxFiles('/nonexistent/path');
-  assert(Array.isArray(result), 'Should return array');
-  assertEqual(result.length, 0, 'Should return empty array');
-});
+  it('findFiles with extensions filter', () => {
+    const result = findFiles('data', ['.yaml', '.yml']);
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length > 0).toBe(true);
+    expect(result.every((f: string) => f.endsWith('.yaml') || f.endsWith('.yml'))).toBe(true);
+  });
 
-test('findFiles with extensions filter', () => {
-  const result = findFiles('data', ['.yaml', '.yml']);
-  assert(Array.isArray(result), 'Should return array');
-  assert(result.length > 0, 'Should find YAML files');
-  assert(result.every((f: string) => f.endsWith('.yaml') || f.endsWith('.yml')), 'Should only find YAML files');
-});
-
-test('getDirectories returns directories', () => {
-  const result = getDirectories('content/docs/knowledge-base');
-  assert(Array.isArray(result), 'Should return array');
-  assert(result.length > 0, 'Should find directories');
+  it('getDirectories returns directories', () => {
+    const result = getDirectories('content/docs/knowledge-base');
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length > 0).toBe(true);
+  });
 });
 
 // =============================================================================
-// mdx-utils.mjs tests
+// mdx-utils.ts tests
 // =============================================================================
 
-console.log('\n📝 mdx-utils.mjs');
-
-const sampleMdx = `---
+describe('mdx-utils.ts', () => {
+  const sampleMdx = `---
 title: Test Page
 description: A test description
 quality: 3
@@ -108,156 +77,144 @@ Some key points here.
 A subsection with [a link](/path/to/page).
 `;
 
-test('parseFrontmatter extracts YAML', () => {
-  const result = parseFrontmatter(sampleMdx);
-  assertEqual(result.title, 'Test Page');
-  assertEqual(result.description, 'A test description');
-  assertEqual(result.quality, 3);
-});
+  it('parseFrontmatter extracts YAML', () => {
+    const result = parseFrontmatter(sampleMdx);
+    expect(result.title).toBe('Test Page');
+    expect(result.description).toBe('A test description');
+    expect(result.quality).toBe(3);
+  });
 
-test('parseFrontmatter handles missing frontmatter', () => {
-  const result = parseFrontmatter('Just content, no frontmatter');
-  assert(typeof result === 'object', 'Should return object');
-  assertEqual(Object.keys(result).length, 0, 'Should be empty');
-});
+  it('parseFrontmatter handles missing frontmatter', () => {
+    const result = parseFrontmatter('Just content, no frontmatter');
+    expect(typeof result === 'object').toBe(true);
+    expect(Object.keys(result).length).toBe(0);
+  });
 
-test('getContentBody removes frontmatter', () => {
-  const result = getContentBody(sampleMdx);
-  assert(!result.includes('---'), 'Should not contain frontmatter delimiters');
-  assert(result.includes('## Overview'), 'Should contain body content');
-});
+  it('getContentBody removes frontmatter', () => {
+    const result = getContentBody(sampleMdx);
+    expect(result.includes('---')).toBe(false);
+    expect(result.includes('## Overview')).toBe(true);
+  });
 
-test('hasFrontmatter detects frontmatter', () => {
-  assert(hasFrontmatter(sampleMdx) === true, 'Should detect frontmatter');
-  assert(hasFrontmatter('No frontmatter') === false, 'Should detect missing frontmatter');
-});
+  it('hasFrontmatter detects frontmatter', () => {
+    expect(hasFrontmatter(sampleMdx)).toBe(true);
+    expect(hasFrontmatter('No frontmatter')).toBe(false);
+  });
 
-test('extractH2Sections finds h2 headings', () => {
-  const body = getContentBody(sampleMdx);
-  const sections = extractH2Sections(body);
-  assertEqual(sections.length, 2, 'Should find 2 h2 sections');
-  assertEqual(sections[0].title, 'Overview');
-  assertEqual(sections[1].title, 'Key Points');
-});
+  it('extractH2Sections finds h2 headings', () => {
+    const body = getContentBody(sampleMdx);
+    const sections = extractH2Sections(body);
+    expect(sections.length).toBe(2);
+    expect(sections[0].title).toBe('Overview');
+    expect(sections[1].title).toBe('Key Points');
+  });
 
-test('extractHeadings finds all headings', () => {
-  const body = getContentBody(sampleMdx);
-  const headings = extractHeadings(body);
-  assertEqual(headings.length, 3, 'Should find 3 headings');
-  assert(headings.some((h: any) => h.level === 2 && h.title === 'Overview'));
-  assert(headings.some((h: any) => h.level === 3 && h.title === 'Subsection'));
-});
+  it('extractHeadings finds all headings', () => {
+    const body = getContentBody(sampleMdx);
+    const headings = extractHeadings(body);
+    expect(headings.length).toBe(3);
+    expect(headings.some((h: any) => h.level === 2 && h.title === 'Overview')).toBe(true);
+    expect(headings.some((h: any) => h.level === 3 && h.title === 'Subsection')).toBe(true);
+  });
 
-test('countWords counts correctly', () => {
-  const body = 'One two three four five.';
-  assertEqual(countWords(body), 5);
-});
+  it('countWords counts correctly', () => {
+    const body = 'One two three four five.';
+    expect(countWords(body)).toBe(5);
+  });
 
-test('countWords excludes code blocks', () => {
-  const body = 'Real words here.\n```\ncode block content\n```\nMore words.';
-  const count = countWords(body);
-  assert(count < 10, 'Should not count code block words');
-});
+  it('countWords excludes code blocks', () => {
+    const body = 'Real words here.\n```\ncode block content\n```\nMore words.';
+    const count = countWords(body);
+    expect(count < 10).toBe(true);
+  });
 
-test('extractLinks finds markdown links', () => {
-  const body = getContentBody(sampleMdx);
-  const links = extractLinks(body);
-  assertEqual(links.length, 1);
-  assertEqual(links[0].url, '/path/to/page');
-  assertEqual(links[0].text, 'a link');
-});
-
-// =============================================================================
-// output.mjs tests
-// =============================================================================
-
-console.log('\n🎨 output.mjs');
-
-test('getColors returns color object', () => {
-  const colors = getColors(false);
-  assert('red' in colors, 'Should have red');
-  assert('green' in colors, 'Should have green');
-  assert('reset' in colors, 'Should have reset');
-  assert(colors.red.length > 0, 'Colors should have escape codes');
-});
-
-test('getColors returns empty in CI mode', () => {
-  const colors = getColors(true);
-  assertEqual(colors.red, '', 'CI mode should have empty colors');
-  assertEqual(colors.green, '', 'CI mode should have empty colors');
-});
-
-test('createLogger returns logger object', () => {
-  const logger = createLogger(true);
-  assert(typeof logger.log === 'function');
-  assert(typeof logger.error === 'function');
-  assert(typeof logger.formatIssue === 'function');
-});
-
-test('formatPath removes cwd prefix', () => {
-  const result = formatPath(process.cwd() + '/src/test.js');
-  assertEqual(result, 'src/test.js');
-});
-
-test('formatCount pluralizes correctly', () => {
-  assertEqual(formatCount(1, 'file'), '1 file');
-  assertEqual(formatCount(2, 'file'), '2 files');
-  assertEqual(formatCount(0, 'file'), '0 files');
-  assertEqual(formatCount(2, 'entry', 'entries'), '2 entries');
+  it('extractLinks finds markdown links', () => {
+    const body = getContentBody(sampleMdx);
+    const links = extractLinks(body);
+    expect(links.length).toBe(1);
+    expect(links[0].url).toBe('/path/to/page');
+    expect(links[0].text).toBe('a link');
+  });
 });
 
 // =============================================================================
-// content-types.js tests
+// output.ts tests
 // =============================================================================
 
-console.log('\n📋 content-types.js');
+describe('output.ts', () => {
+  it('getColors returns color object', () => {
+    const colors = getColors(false);
+    expect('red' in colors).toBe(true);
+    expect('green' in colors).toBe(true);
+    expect('reset' in colors).toBe(true);
+    expect(colors.red.length > 0).toBe(true);
+  });
 
-test('CONTENT_TYPES has expected types', () => {
-  assert('model' in CONTENT_TYPES);
-  assert('risk' in CONTENT_TYPES);
-  assert('response' in CONTENT_TYPES);
-});
+  it('getColors returns empty in CI mode', () => {
+    const colors = getColors(true);
+    expect(colors.red).toBe('');
+    expect(colors.green).toBe('');
+  });
 
-test('getContentType identifies paths correctly', () => {
-  assertEqual(getContentType('/path/to/models/some-model.mdx'), 'model');
-  assertEqual(getContentType('/path/to/risks/some-risk.mdx'), 'risk');
-  assertEqual(getContentType('/path/to/responses/some-response.mdx'), 'response');
-  assertEqual(getContentType('/path/to/other/page.mdx'), null);
-});
+  it('createLogger returns logger object', () => {
+    const logger = createLogger(true);
+    expect(typeof logger.log === 'function').toBe(true);
+    expect(typeof logger.error === 'function').toBe(true);
+    expect(typeof logger.formatIssue === 'function').toBe(true);
+  });
 
-test('getStalenessThreshold returns thresholds', () => {
-  const modelThreshold = getStalenessThreshold('model');
-  const riskThreshold = getStalenessThreshold('risk');
-  assert(typeof modelThreshold === 'number');
-  assert(typeof riskThreshold === 'number');
-  assertEqual(modelThreshold, 90);
-  assertEqual(riskThreshold, 60);
-});
+  it('formatPath removes project root prefix', () => {
+    const result = formatPath(PROJECT_ROOT + '/src/test.js');
+    expect(result).toBe('src/test.js');
+  });
 
-test('isIndexPage detects index files', () => {
-  assert(isIndexPage('/path/to/index.mdx') === true);
-  assert(isIndexPage('/path/to/index.md') === true);
-  assert(isIndexPage('/path/to/other.mdx') === false);
-});
-
-test('extractEntityId extracts filename', () => {
-  assertEqual(extractEntityId('/path/to/deceptive-alignment.mdx'), 'deceptive-alignment');
-  assertEqual(extractEntityId('/path/to/index.mdx'), null);
-});
-
-test('CONTENT_DIR is set correctly', () => {
-  assertEqual(CONTENT_DIR, 'content/docs');
+  it('formatCount pluralizes correctly', () => {
+    expect(formatCount(1, 'file')).toBe('1 file');
+    expect(formatCount(2, 'file')).toBe('2 files');
+    expect(formatCount(0, 'file')).toBe('0 files');
+    expect(formatCount(2, 'entry', 'entries')).toBe('2 entries');
+  });
 });
 
 // =============================================================================
-// Summary
+// content-types.ts tests
 // =============================================================================
 
-console.log('\n' + '─'.repeat(50));
-console.log(`\n✅ Passed: ${passed}`);
-if (failed > 0) {
-  console.log(`❌ Failed: ${failed}`);
-  process.exit(1);
-} else {
-  console.log('\n🎉 All tests passed!');
-}
+describe('content-types.ts', () => {
+  it('CONTENT_TYPES has expected types', () => {
+    expect('model' in CONTENT_TYPES).toBe(true);
+    expect('risk' in CONTENT_TYPES).toBe(true);
+    expect('response' in CONTENT_TYPES).toBe(true);
+  });
+
+  it('getContentType identifies paths correctly', () => {
+    expect(getContentType('/path/to/models/some-model.mdx')).toBe('model');
+    expect(getContentType('/path/to/risks/some-risk.mdx')).toBe('risk');
+    expect(getContentType('/path/to/responses/some-response.mdx')).toBe('response');
+    expect(getContentType('/path/to/other/page.mdx')).toBe(null);
+  });
+
+  it('getStalenessThreshold returns thresholds', () => {
+    const modelThreshold = getStalenessThreshold('model');
+    const riskThreshold = getStalenessThreshold('risk');
+    expect(typeof modelThreshold === 'number').toBe(true);
+    expect(typeof riskThreshold === 'number').toBe(true);
+    expect(modelThreshold).toBe(90);
+    expect(riskThreshold).toBe(60);
+  });
+
+  it('isIndexPage detects index files', () => {
+    expect(isIndexPage('/path/to/index.mdx')).toBe(true);
+    expect(isIndexPage('/path/to/index.md')).toBe(true);
+    expect(isIndexPage('/path/to/other.mdx')).toBe(false);
+  });
+
+  it('extractEntityId extracts filename', () => {
+    expect(extractEntityId('/path/to/deceptive-alignment.mdx')).toBe('deceptive-alignment');
+    expect(extractEntityId('/path/to/index.mdx')).toBe(null);
+  });
+
+  it('CONTENT_DIR is set correctly', () => {
+    expect(CONTENT_DIR).toBe('content/docs');
+  });
+});

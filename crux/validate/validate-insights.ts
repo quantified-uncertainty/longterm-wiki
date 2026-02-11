@@ -19,17 +19,10 @@ import type { AllChecksResult, CheckIssue } from '../lib/insights.ts';
 import { createLogger } from '../lib/output.ts';
 import type { Logger } from '../lib/output.ts';
 import { join } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS } from '../lib/content-types.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-const __filename: string = fileURLToPath(import.meta.url);
-const __dirname: string = dirname(__filename);
-
-// Resolve paths relative to the repo root
-const REPO_ROOT: string = join(__dirname, '../..');
-const INSIGHTS_PATH: string = join(REPO_ROOT, 'data', 'insights');
-const CONTENT_DIR: string = join(REPO_ROOT, 'content', 'docs');
+const INSIGHTS_PATH: string = join(DATA_DIR_ABS, 'insights');
 
 export async function runCheck(options?: ValidatorOptions): Promise<ValidatorResult> {
   const CI_MODE: boolean = options?.ci ?? process.argv.includes('--ci');

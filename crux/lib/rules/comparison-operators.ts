@@ -10,8 +10,8 @@
  *   <1 year timeframe      -> parsed as JSX
  */
 
-import { createRule, Issue, Severity, FixType } from '../validation-engine.js';
-import type { ContentFile, ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity, FixType } from '../validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
 import { matchLinesOutsideCode, isInJsxAttribute } from '../mdx-utils.ts';
 
 // Pattern: < followed by a digit or \$ (escaped dollar sign)

@@ -10,7 +10,7 @@
  * These patterns target prescriptive framing in analytical content.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 
 const PRESCRIPTIVE_PATTERNS: { pattern: RegExp; message: string }[] = [
   // "should" / "must" / "need to" in analytical voice (not in quotes or attributions)

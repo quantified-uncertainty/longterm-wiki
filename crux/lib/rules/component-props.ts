@@ -5,7 +5,7 @@
  * For example, KeyPeople requires `people={[...]}` prop, not `<KeyPeople>content</KeyPeople>`.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 
 // Components that require specific props and cannot have children
 const PROP_REQUIRED_COMPONENTS = [

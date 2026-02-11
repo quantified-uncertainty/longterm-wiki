@@ -24,36 +24,36 @@ pnpm crux updates list --overdue
 crux.mjs                  CLI entry point — parses args, dispatches to domains
 │
 ├── commands/             Domain handlers (one file per domain)
-│   ├── validate.mjs      Validation checks (compile, unified rules, quality)
-│   ├── analyze.mjs       Analysis & reporting
-│   ├── fix.mjs           Auto-fix operations
-│   ├── content.mjs       Page authoring (improve, create, grade)
-│   ├── generate.mjs      Content generation (YAML, summaries, diagrams)
-│   ├── resources.mjs     External resource management
-│   ├── insights.mjs      Insight quality management
-│   ├── gaps.mjs          Insight gap analysis
-│   └── updates.mjs       Schedule-aware page update system
+│   ├── validate.ts       Validation checks (compile, unified rules, quality)
+│   ├── analyze.ts        Analysis & reporting
+│   ├── fix.ts            Auto-fix operations
+│   ├── content.ts        Page authoring (improve, create, grade)
+│   ├── generate.ts       Content generation (YAML, summaries, diagrams)
+│   ├── resources.ts      External resource management
+│   ├── insights.ts       Insight quality management
+│   ├── gaps.ts           Insight gap analysis
+│   └── updates.ts        Schedule-aware page update system
 │
 ├── authoring/            Page authoring scripts (invoked by content domain)
-│   ├── page-creator.mjs  Create new pages with research pipeline
-│   ├── page-improver.mjs Improve existing pages with AI
-│   ├── grade-content.mjs 3-step AI grading pipeline
-│   ├── grade-by-template.mjs  Grade pages against template requirements
-│   ├── regrade.mjs       Quick re-grade wrapper
-│   ├── post-improve.mjs  Post-improvement cleanup
+│   ├── page-creator.ts   Create new pages with research pipeline
+│   ├── page-improver.ts  Improve existing pages with AI
+│   ├── grade-content.ts  3-step AI grading pipeline
+│   ├── grade-by-template.ts   Grade pages against template requirements
+│   ├── regrade.ts        Quick re-grade wrapper
+│   ├── post-improve.ts   Post-improvement cleanup
 │   └── creator/          Sub-modules for page-creator
 │
 ├── lib/                  Shared utilities
-│   ├── cli.mjs           CLI helpers (buildCommands)
+│   ├── cli.ts            CLI helpers (buildCommands)
 │   ├── content-types.ts  Path constants, type definitions
-│   ├── file-utils.mjs    File discovery (findMdxFiles)
-│   ├── mdx-utils.mjs     MDX/frontmatter parsing
-│   ├── metrics-extractor.mjs  Content metrics (word count, tables, etc.)
-│   ├── page-templates.mjs     Page template definitions (shared by grading & authoring)
+│   ├── file-utils.ts     File discovery (findMdxFiles)
+│   ├── mdx-utils.ts      MDX/frontmatter parsing
+│   ├── metrics-extractor.ts   Content metrics (word count, tables, etc.)
+│   ├── page-templates.ts      Page template definitions (shared by grading & authoring)
 │   ├── validation-engine.ts   Rule-based validation framework
 │   ├── rules/            Individual validation rules
-│   ├── anthropic.mjs     Claude API wrapper
-│   ├── output.mjs        Logging/formatting
+│   ├── anthropic.ts      Claude API wrapper
+│   ├── output.ts         Logging/formatting
 │   └── ...
 │
 ├── validate/             Validation scripts (invoked by validate domain)
@@ -96,7 +96,7 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 
 ## How to Add a CLI Command
 
-1. Add a handler function to the appropriate `commands/<domain>.mjs`
+1. Add a handler function to the appropriate `commands/<domain>.ts`
 2. For script-based commands, add an entry to the `SCRIPTS` object with `script:` pointing to the script path (relative to `crux/`)
 3. For inline commands, export an async function matching the command name
 4. Add to the `commands` export and update `getHelp()`
@@ -105,7 +105,7 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 
 **Style guides** live in `content/docs/internal/` as MDX pages (e.g., `risk-style-guide.mdx`, `response-style-guide.mdx`). These are human-readable reference documents.
 
-**Page templates** are defined in `lib/page-templates.mjs`. Each template specifies required frontmatter fields, required sections, and quality criteria. Templates are currently used by `grade-by-template.mjs` for scoring pages against their declared template.
+**Page templates** are defined in `lib/page-templates.ts`. Each template specifies required frontmatter fields, required sections, and quality criteria. Templates are currently used by `grade-by-template.ts` for scoring pages against their declared template.
 
 Pages declare their template via the `pageTemplate` frontmatter field (e.g., `pageTemplate: knowledge-base-risk`).
 

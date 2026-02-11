@@ -13,12 +13,13 @@
  * efficient batching of HTTP requests.
  */
 
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock } from '../mdx-utils.ts';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import https from 'https';
 import http from 'http';
+import { PROJECT_ROOT } from '../content-types.ts';
 
 interface CacheEntry {
   status: number;
@@ -29,7 +30,7 @@ interface CacheEntry {
 
 type LinkCache = Record<string, CacheEntry>;
 
-const CACHE_DIR = join(process.cwd(), '.claude', 'temp');
+const CACHE_DIR = join(PROJECT_ROOT, '.claude', 'temp');
 const CACHE_FILE = join(CACHE_DIR, 'external-links-cache.json');
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 

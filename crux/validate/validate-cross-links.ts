@@ -42,7 +42,7 @@ const HELP_MODE: boolean = args.includes('--help');
 const thresholdArg: string | undefined = args.find((a: string) => a.startsWith('--threshold'));
 const THRESHOLD: number = thresholdArg ? parseInt(thresholdArg.split('=')[1]) || 3 : 3;
 
-const colors = getColors(JSON_MODE);
+const colors = getColors(CI_MODE || JSON_MODE);
 
 function showHelp(): void {
   console.log(`

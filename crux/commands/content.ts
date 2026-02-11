@@ -14,34 +14,34 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
     script: 'authoring/page-improver.ts',
     description: 'Improve an existing page with AI assistance',
-    passthrough: ['tier', 'directions', 'dryRun'],
+    passthrough: ['ci', 'tier', 'directions', 'dryRun'],
     positional: true,
   },
   create: {
     script: 'authoring/page-creator.ts',
     description: 'Create a new page with research pipeline',
-    passthrough: ['tier', 'phase', 'output', 'help'],
+    passthrough: ['ci', 'tier', 'phase', 'output', 'help'],
     positional: true,
   },
   regrade: {
     script: 'authoring/regrade.ts',
     description: 'Re-grade content quality ratings',
-    passthrough: ['batch', 'dryRun'],
+    passthrough: ['ci', 'batch', 'dryRun'],
   },
   grade: {
     script: 'authoring/grade-by-template.ts',
     description: 'Grade pages by template compliance',
-    passthrough: ['verbose'],
+    passthrough: ['ci', 'verbose'],
   },
   'grade-content': {
     script: 'authoring/grade-content.ts',
     description: 'Grade content quality with AI (3-step pipeline)',
-    passthrough: ['batch', 'model', 'dryRun', 'skipWarnings', 'warningsOnly'],
+    passthrough: ['ci', 'batch', 'model', 'dryRun', 'skipWarnings', 'warningsOnly'],
   },
   polish: {
     script: 'authoring/post-improve.ts',
     description: 'Post-improvement cleanup and polish',
-    passthrough: [],
+    passthrough: ['ci'],
   },
 };
 

@@ -110,13 +110,13 @@ async function main(): Promise<void> {
   if (!gradeOnly) {
     // Fix dollar signs
     results.dollarFix = run(
-      'node crux/crux.mjs validate unified --rules=dollar-signs --fix',
+      'node --import tsx/esm --no-warnings crux/crux.mjs validate unified --rules=dollar-signs --fix',
       'Fixing dollar sign escaping'
     );
 
     // Fix comparison operators
     results.comparisonFix = run(
-      'node crux/crux.mjs validate unified --rules=comparison-operators --fix',
+      'node --import tsx/esm --no-warnings crux/crux.mjs validate unified --rules=comparison-operators --fix',
       'Fixing comparison operators'
     );
   }
