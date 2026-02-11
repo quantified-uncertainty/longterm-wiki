@@ -1,0 +1,39 @@
+import type { MetadataRoute } from "next";
+import { getAllPages } from "@/data";
+
+const SITE_URL = "https://longtermwiki.org";
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const pages = getAllPages();
+
+  const pageEntries: MetadataRoute.Sitemap = pages.map((page) => ({
+    url: `${SITE_URL}${page.path}`,
+    lastModified: page.lastUpdated ?? undefined,
+    changeFrequency: deriveChangeFrequency(page.updateFrequency ?? null),
+    priority: derivePriority(page.importance),
+  }));
+
+  const staticEntries: MetadataRoute.Sitemap = [
+    { url: SITE_URL, changeFrequency: "weekly", priority: 1.0 },
+    { url: `${SITE_URL}/wiki`, changeFrequency: "weekly", priority: 0.9 },
+  ];
+
+  return [...staticEntries, ...pageEntries];
+}
+
+/** Map importance (0-100) to sitemap priority (0.0-1.0). */
+function derivePriority(importance: number | null): number {
+  if (importance == null) return 0.3;
+  return Math.round(Math.max(0.1, importance / 100) * 10) / 10;
+}
+
+/** Map updateFrequency (days) to sitemap changeFrequency. */
+function deriveChangeFrequency(
+  updateFrequencyDays: number | null,
+): "daily" | "weekly" | "monthly" | "yearly" {
+  if (updateFrequencyDays == null) return "monthly";
+  if (updateFrequencyDays <= 7) return "daily";
+  if (updateFrequencyDays <= 30) return "weekly";
+  if (updateFrequencyDays <= 180) return "monthly";
+  return "yearly";
+}

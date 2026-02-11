@@ -8,7 +8,7 @@
  *   node scripts/generate-llm-files.mjs
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
 // Configuration
@@ -39,11 +39,11 @@ const CONFIG = {
   ],
 };
 
-import { CONTENT_DIR as LONGTERM_CONTENT_DIR, OUTPUT_DIR as LOCAL_OUTPUT_DIR } from './lib/content-types.mjs';
+import { CONTENT_DIR as LONGTERM_CONTENT_DIR, OUTPUT_DIR as LOCAL_OUTPUT_DIR, PROJECT_ROOT } from './lib/content-types.mjs';
 
 const DATA_DIR = LOCAL_OUTPUT_DIR;  // Read generated pages.json from local output
 const CONTENT_DIR = LONGTERM_CONTENT_DIR;  // Read MDX from longterm
-const OUTPUT_DIR = 'public';
+const OUTPUT_DIR = join(PROJECT_ROOT, 'public');
 
 /**
  * Load pages.json data
@@ -175,6 +175,7 @@ This file provides an index of site content for LLMs. For full documentation, se
 
 - [Core Documentation (llms-core.txt)](${CONFIG.site.url}/llms-core.txt): High-importance pages (~30K tokens) - fits in chat context
 - [Full Documentation (llms-full.txt)](${CONFIG.site.url}/llms-full.txt): Complete content - for embeddings/RAG
+- [Sitemap](${CONFIG.site.url}/sitemap.xml): XML sitemap of all pages
 
 ## Site Structure
 
@@ -366,6 +367,11 @@ Estimated tokens: ~${Math.round(totalTokens / 1000)}K
  */
 export function generateLLMFiles() {
   console.log('\nGenerating LLM accessibility files...');
+
+  // Ensure output directory exists
+  if (!existsSync(OUTPUT_DIR)) {
+    mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
 
   // Load page data
   const pages = loadPages();
