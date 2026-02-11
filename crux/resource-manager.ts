@@ -27,7 +27,8 @@ import { join, basename, relative } from 'path';
 import { createHash } from 'crypto';
 import { fileURLToPath } from 'url';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import { CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPages as loadPagesJson, type PageEntry } from './lib/content-types.ts';
+import { CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPages as loadPagesJson, type PageEntry, type Entity } from './lib/content-types.ts';
+import { findMdxFiles } from './lib/file-utils.ts';
 
 const RESOURCES_DIR: string = join(DATA_DIR, 'resources');
 const PUBLICATIONS_FILE: string = join(DATA_DIR, 'publications.yaml');
@@ -112,11 +113,6 @@ interface Publication {
   id: string;
   name: string;
   domains?: string[];
-}
-
-interface Entity {
-  id: string;
-  tags?: string[];
 }
 
 interface Conversion {
@@ -252,20 +248,6 @@ function extractMarkdownLinks(content: string): MarkdownLink[] {
   return links;
 }
 
-function findMdxFiles(dir: string, files: string[] = []): string[] {
-  if (!existsSync(dir)) return files;
-  const entries = readdirSync(dir);
-  for (const entry of entries) {
-    const path = join(dir, entry);
-    const stat = statSync(path);
-    if (stat.isDirectory()) {
-      findMdxFiles(path, files);
-    } else if (entry.endsWith('.mdx')) {
-      files.push(path);
-    }
-  }
-  return files;
-}
 
 function findFileByName(name: string): string | null {
   const allFiles = findMdxFiles(CONTENT_DIR);

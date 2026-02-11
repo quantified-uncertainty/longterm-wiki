@@ -9,12 +9,13 @@
  *   where staleness = days_since_last_edit / update_frequency
  */
 
-import { readFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join, relative } from 'path';
 import { execFileSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
+import { findMdxFiles } from '../lib/file-utils.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
@@ -64,22 +65,6 @@ interface CommandOptions {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-/**
- * Recursively find all MDX/MD files in a directory
- */
-function findMdxFiles(dir: string): string[] {
-  const results: string[] = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const fullPath = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      results.push(...findMdxFiles(fullPath));
-    } else if (/\.(mdx?|md)$/.test(entry.name)) {
-      results.push(fullPath);
-    }
-  }
-  return results;
-}
 
 /**
  * Derive page ID from file path (filename without extension, or directory name for index files)

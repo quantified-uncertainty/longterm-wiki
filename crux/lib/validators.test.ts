@@ -1,76 +1,36 @@
-#!/usr/bin/env node
-/**
- * Unit Tests for Validators
- *
- * Tests the core validation logic used by the validator scripts.
- * Run: node scripts/lib/validators.test.ts
- */
-
+import { describe, it, expect } from 'vitest';
 import { existsSync } from 'fs';
 import { extractMetrics, suggestQuality, getQualityDiscrepancy } from './metrics-extractor.ts';
-
-let passed = 0;
-let failed = 0;
-
-function test(name: string, fn: () => void): void {
-  try {
-    fn();
-    console.log(`✓ ${name}`);
-    passed++;
-  } catch (e: unknown) {
-    const error = e instanceof Error ? e : new Error(String(e));
-    console.log(`✗ ${name}`);
-    console.log(`  ${error.message}`);
-    failed++;
-  }
-}
-
-function assert(condition: boolean, message?: string): void {
-  if (!condition) throw new Error(message || 'Assertion failed');
-}
-
-function assertEqual(actual: unknown, expected: unknown, message?: string): void {
-  if (actual !== expected) {
-    throw new Error(message || `Expected ${expected}, got ${actual}`);
-  }
-}
-
-function assertInRange(value: number, min: number, max: number, message?: string): void {
-  if (value < min || value > max) {
-    throw new Error(message || `Expected ${value} to be in range [${min}, ${max}]`);
-  }
-}
 
 // =============================================================================
 // Validator scripts exist
 // =============================================================================
 
-console.log('\n📁 Validator scripts exist');
+describe('Validator scripts exist', () => {
+  const validatorScripts: string[] = [
+    'crux/validate/validate-all.ts',
+    'crux/validate/validate-data.ts',
+    'crux/validate/validate-internal-links.ts',
+    'crux/validate/validate-mdx-syntax.ts',
+    'crux/validate/validate-style-guide.ts',
+    'crux/validate/validate-consistency.ts',
+    'crux/validate/check-staleness.ts',
+    'crux/validate/validate-sidebar.ts',
+  ];
 
-const validatorScripts: string[] = [
-  'crux/validate/validate-all.ts',
-  'crux/validate/validate-data.ts',
-  'crux/validate/validate-internal-links.ts',
-  'crux/validate/validate-mdx-syntax.ts',
-  'crux/validate/validate-style-guide.ts',
-  'crux/validate/validate-consistency.ts',
-  'crux/validate/check-staleness.ts',
-  'crux/validate/validate-sidebar.ts',
-];
-
-for (const script of validatorScripts) {
-  test(`${script} exists`, () => {
-    assert(existsSync(script), `Script ${script} should exist`);
-  });
-}
+  for (const script of validatorScripts) {
+    it(`${script} exists`, () => {
+      expect(existsSync(script)).toBe(true);
+    });
+  }
+});
 
 // =============================================================================
 // metrics-extractor.ts tests
 // =============================================================================
 
-console.log('\n📊 metrics-extractor.ts');
-
-const sampleQ1Content = `---
+describe('metrics-extractor.ts', () => {
+  const sampleQ1Content = `---
 title: Stub Page
 ---
 
@@ -79,7 +39,7 @@ title: Stub Page
 Brief content.
 `;
 
-const sampleQ5Content = `---
+  const sampleQ5Content = `---
 title: Excellent Page
 quality: 5
 ---
@@ -123,270 +83,271 @@ This analysis has several limitations that should be considered.
 Based on the evidence, we conclude that the risk is significant but manageable.
 `;
 
-test('extractMetrics returns valid structure', () => {
-  const metrics = extractMetrics(sampleQ1Content);
-  assert('wordCount' in metrics, 'Should have wordCount');
-  assert('tableCount' in metrics, 'Should have tableCount');
-  assert('diagramCount' in metrics, 'Should have diagramCount');
-  assert('structuralScore' in metrics, 'Should have structuralScore');
-});
+  it('extractMetrics returns valid structure', () => {
+    const metrics = extractMetrics(sampleQ1Content);
+    expect('wordCount' in metrics).toBe(true);
+    expect('tableCount' in metrics).toBe(true);
+    expect('diagramCount' in metrics).toBe(true);
+    expect('structuralScore' in metrics).toBe(true);
+  });
 
-test('extractMetrics counts words correctly', () => {
-  const metrics = extractMetrics(sampleQ1Content);
-  assert(metrics.wordCount > 0, 'Should count words');
-  assert(metrics.wordCount < 20, 'Should have few words in stub');
-});
+  it('extractMetrics counts words correctly', () => {
+    const metrics = extractMetrics(sampleQ1Content);
+    expect(metrics.wordCount > 0).toBe(true);
+    expect(metrics.wordCount < 20).toBe(true);
+  });
 
-test('extractMetrics detects tables', () => {
-  const metrics = extractMetrics(sampleQ5Content);
-  assertEqual(metrics.tableCount, 2, 'Should find 2 tables');
-});
+  it('extractMetrics detects tables', () => {
+    const metrics = extractMetrics(sampleQ5Content);
+    expect(metrics.tableCount).toBe(2);
+  });
 
-test('extractMetrics detects Mermaid diagrams', () => {
-  const metrics = extractMetrics(sampleQ5Content);
-  assertEqual(metrics.diagramCount, 1, 'Should find 1 diagram');
-});
+  it('extractMetrics detects Mermaid diagrams', () => {
+    const metrics = extractMetrics(sampleQ5Content);
+    expect(metrics.diagramCount).toBe(1);
+  });
 
-test('extractMetrics detects links', () => {
-  const metrics = extractMetrics(sampleQ5Content);
-  assert(metrics.externalLinks >= 4, 'Should find external links');
-});
+  it('extractMetrics detects links', () => {
+    const metrics = extractMetrics(sampleQ5Content);
+    expect(metrics.externalLinks >= 4).toBe(true);
+  });
 
-test('extractMetrics detects overview section', () => {
-  const metricsQ1 = extractMetrics(sampleQ1Content);
-  const metricsQ5 = extractMetrics(sampleQ5Content);
-  assertEqual(metricsQ1.hasOverview, true, 'Q1 should have overview');
-  assertEqual(metricsQ5.hasOverview, true, 'Q5 should have overview');
-});
+  it('extractMetrics detects overview section', () => {
+    const metricsQ1 = extractMetrics(sampleQ1Content);
+    const metricsQ5 = extractMetrics(sampleQ5Content);
+    expect(metricsQ1.hasOverview).toBe(true);
+    expect(metricsQ5.hasOverview).toBe(true);
+  });
 
-test('extractMetrics detects conclusion', () => {
-  const metricsQ1 = extractMetrics(sampleQ1Content);
-  const metricsQ5 = extractMetrics(sampleQ5Content);
-  assertEqual(metricsQ1.hasConclusion, false, 'Q1 should not have conclusion');
-  assertEqual(metricsQ5.hasConclusion, true, 'Q5 should have conclusion');
-});
+  it('extractMetrics detects conclusion', () => {
+    const metricsQ1 = extractMetrics(sampleQ1Content);
+    const metricsQ5 = extractMetrics(sampleQ5Content);
+    expect(metricsQ1.hasConclusion).toBe(false);
+    expect(metricsQ5.hasConclusion).toBe(true);
+  });
 
-test('structuralScore is higher for better content', () => {
-  const metricsQ1 = extractMetrics(sampleQ1Content);
-  const metricsQ5 = extractMetrics(sampleQ5Content);
-  assert(metricsQ5.structuralScore > metricsQ1.structuralScore,
-    `Q5 score (${metricsQ5.structuralScore}) should be higher than Q1 (${metricsQ1.structuralScore})`);
-});
+  it('structuralScore is higher for better content', () => {
+    const metricsQ1 = extractMetrics(sampleQ1Content);
+    const metricsQ5 = extractMetrics(sampleQ5Content);
+    expect(metricsQ5.structuralScore > metricsQ1.structuralScore).toBe(true);
+  });
 
-test('structuralScoreNormalized is 0-50', () => {
-  const metrics = extractMetrics(sampleQ5Content);
-  assertInRange(metrics.structuralScoreNormalized, 0, 50, 'Normalized score should be 0-50');
+  it('structuralScoreNormalized is 0-50', () => {
+    const metrics = extractMetrics(sampleQ5Content);
+    expect(metrics.structuralScoreNormalized).toBeGreaterThanOrEqual(0);
+    expect(metrics.structuralScoreNormalized).toBeLessThanOrEqual(50);
+  });
 });
 
 // =============================================================================
 // suggestQuality tests
 // =============================================================================
 
-console.log('\n⭐ suggestQuality');
+describe('suggestQuality', () => {
+  it('suggestQuality returns 0-100', () => {
+    for (let score = 0; score <= 15; score++) {
+      const quality = suggestQuality(score);
+      expect(quality).toBeGreaterThanOrEqual(0);
+      expect(quality).toBeLessThanOrEqual(100);
+    }
+  });
 
-test('suggestQuality returns 0-100', () => {
-  for (let score = 0; score <= 15; score++) {
-    const quality = suggestQuality(score);
-    assertInRange(quality, 0, 100, `Quality for score ${score} should be 0-100`);
-  }
-});
+  it('suggestQuality increases with score', () => {
+    const q0 = suggestQuality(0);
+    const q6 = suggestQuality(6);
+    const q12 = suggestQuality(12);
+    expect(q12 >= q6).toBe(true);
+    expect(q6 >= q0).toBe(true);
+  });
 
-test('suggestQuality increases with score', () => {
-  const q0 = suggestQuality(0);
-  const q6 = suggestQuality(6);
-  const q12 = suggestQuality(12);
-  assert(q12 >= q6, 'Higher scores should suggest higher quality');
-  assert(q6 >= q0, 'Higher scores should suggest higher quality');
-});
-
-test('suggestQuality maps scores linearly', () => {
-  // Score 0 → 0%, Score 15 → 100%
-  assertEqual(suggestQuality(0), 0);
-  assertEqual(suggestQuality(15), 100);
-  // Middle score maps proportionally
-  assertEqual(suggestQuality(7), Math.round((7 / 15) * 100)); // ~47
-  assertEqual(suggestQuality(10), Math.round((10 / 15) * 100)); // ~67
+  it('suggestQuality maps scores linearly', () => {
+    // Score 0 → 0%, Score 15 → 100%
+    expect(suggestQuality(0)).toBe(0);
+    expect(suggestQuality(15)).toBe(100);
+    // Middle score maps proportionally
+    expect(suggestQuality(7)).toBe(Math.round((7 / 15) * 100)); // ~47
+    expect(suggestQuality(10)).toBe(Math.round((10 / 15) * 100)); // ~67
+  });
 });
 
 // =============================================================================
 // getQualityDiscrepancy tests
 // =============================================================================
 
-console.log('\n📉 getQualityDiscrepancy');
+describe('getQualityDiscrepancy', () => {
+  it('getQualityDiscrepancy returns valid structure', () => {
+    const result = getQualityDiscrepancy(40, 6); // current 40%, structural score 6 → suggested 40%
+    expect('current' in result).toBe(true);
+    expect('suggested' in result).toBe(true);
+    expect('discrepancy' in result).toBe(true);
+    expect('flag' in result).toBe(true);
+  });
 
-test('getQualityDiscrepancy returns valid structure', () => {
-  const result = getQualityDiscrepancy(40, 6); // current 40%, structural score 6 → suggested 40%
-  assert('current' in result, 'Should have current');
-  assert('suggested' in result, 'Should have suggested');
-  assert('discrepancy' in result, 'Should have discrepancy');
-  assert('flag' in result, 'Should have flag');
-});
+  it('getQualityDiscrepancy calculates correctly', () => {
+    // current 50%, structural score 3 → suggested 20% (3/15*100)
+    const result = getQualityDiscrepancy(50, 3);
+    expect(result.current).toBe(50);
+    expect(result.suggested).toBe(20);
+    expect(result.discrepancy).toBe(30); // 50 - 20 = 30 (overrated)
+    expect(result.discrepancy > 0).toBe(true);
+  });
 
-test('getQualityDiscrepancy calculates correctly', () => {
-  // current 50%, structural score 3 → suggested 20% (3/15*100)
-  const result = getQualityDiscrepancy(50, 3);
-  assertEqual(result.current, 50);
-  assertEqual(result.suggested, 20);
-  assertEqual(result.discrepancy, 30); // 50 - 20 = 30 (overrated)
-  assert(result.discrepancy > 0, 'Should have positive discrepancy (overrated)');
-});
-
-test('getQualityDiscrepancy flags large discrepancies', () => {
-  // current 80%, score 0 → suggested 0%, discrepancy 80 → large (>=20)
-  const large = getQualityDiscrepancy(80, 0);
-  // current 40%, score 6 → suggested 40%, discrepancy 0 → ok
-  const small = getQualityDiscrepancy(40, 6);
-  assertEqual(large.flag, 'large', 'Large gap should be flagged');
-  assertEqual(small.flag, 'ok', 'Small gap should be ok');
+  it('getQualityDiscrepancy flags large discrepancies', () => {
+    // current 80%, score 0 → suggested 0%, discrepancy 80 → large (>=20)
+    const large = getQualityDiscrepancy(80, 0);
+    // current 40%, score 6 → suggested 40%, discrepancy 0 → ok
+    const small = getQualityDiscrepancy(40, 6);
+    expect(large.flag).toBe('large');
+    expect(small.flag).toBe('ok');
+  });
 });
 
 // =============================================================================
 // MDX Syntax patterns (from validate-mdx-syntax)
 // =============================================================================
 
-console.log('\n🔍 MDX syntax validation patterns');
+describe('MDX syntax validation patterns', () => {
+  function testMdxPattern(pattern: RegExp, content: string): boolean {
+    return pattern.test(content);
+  }
 
-function testMdxPattern(pattern: RegExp, content: string): boolean {
-  return pattern.test(content);
-}
+  it('detects mermaid codeblocks', () => {
+    const pattern = /^```mermaid/m;
+    expect(testMdxPattern(pattern, '```mermaid\nflowchart TD\n```')).toBe(true);
+    expect(testMdxPattern(pattern, '<Mermaid chart={`...`} />')).toBe(false);
+  });
 
-test('detects mermaid codeblocks', () => {
-  const pattern = /^```mermaid/m;
-  assert(testMdxPattern(pattern, '```mermaid\nflowchart TD\n```'), 'Should detect mermaid codeblock');
-  assert(!testMdxPattern(pattern, '<Mermaid chart={`...`} />'), 'Should not detect Mermaid component');
-});
-
-test('detects unescaped < in tables', () => {
-  const pattern = /\| <[0-9]/;
-  assert(testMdxPattern(pattern, '| <30% |'), 'Should detect <30% in table');
-  assert(!testMdxPattern(pattern, '| less than 30% |'), 'Should not flag "less than"');
+  it('detects unescaped < in tables', () => {
+    const pattern = /\| <[0-9]/;
+    expect(testMdxPattern(pattern, '| <30% |')).toBe(true);
+    expect(testMdxPattern(pattern, '| less than 30% |')).toBe(false);
+  });
 });
 
 // =============================================================================
 // Link validation patterns (from validate-internal-links)
 // =============================================================================
 
-console.log('\n🔗 Link validation patterns');
-
-function extractInternalLinks(content: string): Array<{ text: string; href: string }> {
-  const links: Array<{ text: string; href: string }> = [];
-  const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
-  let match: RegExpExecArray | null;
-  while ((match = linkRegex.exec(content)) !== null) {
-    const [, text, href] = match;
-    if (!href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:')) {
-      links.push({ text, href });
+describe('Link validation patterns', () => {
+  function extractInternalLinks(content: string): Array<{ text: string; href: string }> {
+    const links: Array<{ text: string; href: string }> = [];
+    const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
+    let match: RegExpExecArray | null;
+    while ((match = linkRegex.exec(content)) !== null) {
+      const [, text, href] = match;
+      if (!href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:')) {
+        links.push({ text, href });
+      }
     }
+    return links;
   }
-  return links;
-}
 
-test('extractInternalLinks finds internal links', () => {
-  const content = 'See [this page](/knowledge-base/risks/) for details.';
-  const links = extractInternalLinks(content);
-  assertEqual(links.length, 1);
-  assertEqual(links[0].href, '/knowledge-base/risks/');
-});
+  it('extractInternalLinks finds internal links', () => {
+    const content = 'See [this page](/knowledge-base/risks/) for details.';
+    const links = extractInternalLinks(content);
+    expect(links.length).toBe(1);
+    expect(links[0].href).toBe('/knowledge-base/risks/');
+  });
 
-test('extractInternalLinks ignores external links', () => {
-  const content = 'See [Google](https://google.com) and [internal](/path/).';
-  const links = extractInternalLinks(content);
-  assertEqual(links.length, 1);
-  assertEqual(links[0].href, '/path/');
-});
+  it('extractInternalLinks ignores external links', () => {
+    const content = 'See [Google](https://google.com) and [internal](/path/).';
+    const links = extractInternalLinks(content);
+    expect(links.length).toBe(1);
+    expect(links[0].href).toBe('/path/');
+  });
 
-test('extractInternalLinks ignores anchors', () => {
-  const content = 'Jump to [section](#overview) or [page](/page/).';
-  const links = extractInternalLinks(content);
-  assertEqual(links.length, 1);
+  it('extractInternalLinks ignores anchors', () => {
+    const content = 'Jump to [section](#overview) or [page](/page/).';
+    const links = extractInternalLinks(content);
+    expect(links.length).toBe(1);
+  });
 });
 
 // =============================================================================
 // Placeholder validator functions (from validate-placeholders.ts)
 // =============================================================================
 
-console.log('\n📝 Placeholder validator helpers');
+describe('Placeholder validator helpers', () => {
+  // Inline implementations for testing
+  function getSectionContent(body: string, sectionName: string): string | null {
+    const headerPattern = sectionName === 'Limitations'
+      ? /^##\s+Limitations?\s*$/mi
+      : new RegExp(`^##\\s+${sectionName}\\s*$`, 'mi');
 
-// Inline implementations for testing
-function getSectionContent(body: string, sectionName: string): string | null {
-  const headerPattern = sectionName === 'Limitations'
-    ? /^##\s+Limitations?\s*$/mi
-    : new RegExp(`^##\\s+${sectionName}\\s*$`, 'mi');
+    const headerMatch = body.match(headerPattern);
+    if (!headerMatch) return null;
 
-  const headerMatch = body.match(headerPattern);
-  if (!headerMatch) return null;
+    const startIndex = headerMatch.index! + headerMatch[0].length;
+    const afterHeader = body.slice(startIndex);
+    const nextH2Match = afterHeader.match(/\n##\s+[^#]/);
+    const endIndex = nextH2Match ? nextH2Match.index! : afterHeader.length;
 
-  const startIndex = headerMatch.index! + headerMatch[0].length;
-  const afterHeader = body.slice(startIndex);
-  const nextH2Match = afterHeader.match(/\n##\s+[^#]/);
-  const endIndex = nextH2Match ? nextH2Match.index! : afterHeader.length;
+    return afterHeader.slice(0, endIndex);
+  }
 
-  return afterHeader.slice(0, endIndex);
-}
+  function isInCodeBlock(content: string, position: number): boolean {
+    const before = content.slice(0, position);
+    const tripleBackticks = (before.match(/```/g) || []).length;
+    return tripleBackticks % 2 === 1;
+  }
 
-function isInCodeBlock(content: string, position: number): boolean {
-  const before = content.slice(0, position);
-  const tripleBackticks = (before.match(/```/g) || []).length;
-  return tripleBackticks % 2 === 1;
-}
+  function isInMermaid(content: string, position: number): boolean {
+    const before = content.slice(0, position);
+    const lastMermaidOpen = before.lastIndexOf('<Mermaid');
+    if (lastMermaidOpen === -1) return false;
 
-function isInMermaid(content: string, position: number): boolean {
-  const before = content.slice(0, position);
-  const lastMermaidOpen = before.lastIndexOf('<Mermaid');
-  if (lastMermaidOpen === -1) return false;
+    const afterMermaid = content.slice(lastMermaidOpen, position);
+    const closingPattern = /`\s*}\s*\/>/;
+    const closingMatch = afterMermaid.match(closingPattern);
+    return !closingMatch;
+  }
 
-  const afterMermaid = content.slice(lastMermaidOpen, position);
-  const closingPattern = /`\s*}\s*\/>/;
-  const closingMatch = afterMermaid.match(closingPattern);
-  return !closingMatch;
-}
+  function isInComment(content: string, position: number): boolean {
+    const before = content.slice(0, position);
+    const opens = (before.match(/<!--/g) || []).length;
+    const closes = (before.match(/-->/g) || []).length;
+    return opens > closes;
+  }
 
-function isInComment(content: string, position: number): boolean {
-  const before = content.slice(0, position);
-  const opens = (before.match(/<!--/g) || []).length;
-  const closes = (before.match(/-->/g) || []).length;
-  return opens > closes;
-}
+  function getLineNumber(content: string, position: number): number {
+    return content.slice(0, position).split('\n').length;
+  }
 
-function getLineNumber(content: string, position: number): number {
-  return content.slice(0, position).split('\n').length;
-}
-
-// getSectionContent tests
-test('getSectionContent extracts simple section', () => {
-  const body = `## Overview
+  // getSectionContent tests
+  it('getSectionContent extracts simple section', () => {
+    const body = `## Overview
 
 This is the overview section.
 
 ## Next Section
 
 Different content.`;
-  const content = getSectionContent(body, 'Overview');
-  assert(content !== null, 'Should find section');
-  assert(content!.includes('This is the overview section'), 'Should include content');
-  assert(!content!.includes('Different content'), 'Should not include next section');
-});
+    const content = getSectionContent(body, 'Overview');
+    expect(content).not.toBeNull();
+    expect(content!).toContain('This is the overview section');
+    expect(content!).not.toContain('Different content');
+  });
 
-test('getSectionContent handles section at end of document', () => {
-  const body = `## First
+  it('getSectionContent handles section at end of document', () => {
+    const body = `## First
 
 Some.
 
 ## Overview
 
 Last section with no following header.`;
-  const content = getSectionContent(body, 'Overview');
-  assert(content !== null, 'Should find section');
-  assert(content!.includes('Last section'), 'Should include content');
-});
+    const content = getSectionContent(body, 'Overview');
+    expect(content).not.toBeNull();
+    expect(content!).toContain('Last section');
+  });
 
-test('getSectionContent returns null for missing section', () => {
-  const body = `## Overview\n\nContent.`;
-  assertEqual(getSectionContent(body, 'NonExistent'), null);
-});
+  it('getSectionContent returns null for missing section', () => {
+    const body = `## Overview\n\nContent.`;
+    expect(getSectionContent(body, 'NonExistent')).toBeNull();
+  });
 
-test('getSectionContent does not match h3 headings', () => {
-  const body = `## Overview
+  it('getSectionContent does not match h3 headings', () => {
+    const body = `## Overview
 
 Main content.
 
@@ -397,104 +358,92 @@ Subsection content.
 ## Next
 
 Next content.`;
-  const content = getSectionContent(body, 'Overview');
-  assert(content!.includes('Subsection content'), 'Should include h3 content');
-  assert(!content!.includes('Next content'), 'Should stop at h2');
-});
+    const content = getSectionContent(body, 'Overview');
+    expect(content!).toContain('Subsection content');
+    expect(content!).not.toContain('Next content');
+  });
 
-test('getSectionContent handles Limitation/Limitations variant', () => {
-  // The regex makes the 's' optional: Limitations? matches both Limitation and Limitations
-  const body1 = `## Limitation\n\nLimits here.\n\n## Next`;
-  const body2 = `## Limitations\n\nLimits here.\n\n## Next`;
-  assert(getSectionContent(body1, 'Limitations') !== null, 'Should find Limitation (singular)');
-  assert(getSectionContent(body2, 'Limitations') !== null, 'Should find Limitations (plural)');
-});
+  it('getSectionContent handles Limitation/Limitations variant', () => {
+    // The regex makes the 's' optional: Limitations? matches both Limitation and Limitations
+    const body1 = `## Limitation\n\nLimits here.\n\n## Next`;
+    const body2 = `## Limitations\n\nLimits here.\n\n## Next`;
+    expect(getSectionContent(body1, 'Limitations')).not.toBeNull();
+    expect(getSectionContent(body2, 'Limitations')).not.toBeNull();
+  });
 
-// isInCodeBlock tests
-test('isInCodeBlock detects position inside code', () => {
-  const content = `Text\n\n\`\`\`js\nconst TODO = 1;\n\`\`\`\n\nAfter`;
-  const todoPos = content.indexOf('TODO');
-  assert(isInCodeBlock(content, todoPos), 'TODO inside code should be detected');
-});
+  // isInCodeBlock tests
+  it('isInCodeBlock detects position inside code', () => {
+    const content = `Text\n\n\`\`\`js\nconst TODO = 1;\n\`\`\`\n\nAfter`;
+    const todoPos = content.indexOf('TODO');
+    expect(isInCodeBlock(content, todoPos)).toBe(true);
+  });
 
-test('isInCodeBlock detects position outside code', () => {
-  const content = `TODO before\n\n\`\`\`js\nconst x = 1;\n\`\`\``;
-  const todoPos = content.indexOf('TODO');
-  assert(!isInCodeBlock(content, todoPos), 'TODO outside code should not be detected');
-});
+  it('isInCodeBlock detects position outside code', () => {
+    const content = `TODO before\n\n\`\`\`js\nconst x = 1;\n\`\`\``;
+    const todoPos = content.indexOf('TODO');
+    expect(isInCodeBlock(content, todoPos)).toBe(false);
+  });
 
-// isInMermaid tests
-test('isInMermaid detects position inside diagram', () => {
-  const content = `<Mermaid client:load chart={\`
+  // isInMermaid tests
+  it('isInMermaid detects position inside diagram', () => {
+    const content = `<Mermaid client:load chart={\`
 graph TD
     A[TBD] --> B
 \`} />
 
 After`;
-  const tbdPos = content.indexOf('TBD');
-  assert(isInMermaid(content, tbdPos), 'TBD inside Mermaid should be detected');
-});
+    const tbdPos = content.indexOf('TBD');
+    expect(isInMermaid(content, tbdPos)).toBe(true);
+  });
 
-test('isInMermaid detects position outside diagram', () => {
-  const content = `<Mermaid client:load chart={\`
+  it('isInMermaid detects position outside diagram', () => {
+    const content = `<Mermaid client:load chart={\`
 graph TD
     A --> B
 \`} />
 
 TBD outside`;
-  const tbdPos = content.lastIndexOf('TBD');
-  assert(!isInMermaid(content, tbdPos), 'TBD outside Mermaid should not be detected');
-});
+    const tbdPos = content.lastIndexOf('TBD');
+    expect(isInMermaid(content, tbdPos)).toBe(false);
+  });
 
-test('isInMermaid handles br tags correctly', () => {
-  // Regression test: <br/> inside Mermaid was incorrectly closing detection
-  const content = `<Mermaid client:load chart={\`
+  it('isInMermaid handles br tags correctly', () => {
+    // Regression test: <br/> inside Mermaid was incorrectly closing detection
+    const content = `<Mermaid client:load chart={\`
 graph TD
     A[Line<br/>TBD]
 \`} />`;
-  const tbdPos = content.indexOf('TBD');
-  assert(isInMermaid(content, tbdPos), 'TBD after <br/> should still be inside Mermaid');
+    const tbdPos = content.indexOf('TBD');
+    expect(isInMermaid(content, tbdPos)).toBe(true);
+  });
+
+  it('isInMermaid handles no Mermaid present', () => {
+    const content = `Regular TBD content.`;
+    const tbdPos = content.indexOf('TBD');
+    expect(isInMermaid(content, tbdPos)).toBe(false);
+  });
+
+  // isInComment tests
+  it('isInComment detects position inside comment', () => {
+    const content = `Before\n\n<!-- TODO: fix -->\n\nAfter`;
+    const todoPos = content.indexOf('TODO');
+    expect(isInComment(content, todoPos)).toBe(true);
+  });
+
+  it('isInComment detects position outside comment', () => {
+    const content = `TODO outside\n\n<!-- comment -->`;
+    const todoPos = content.indexOf('TODO');
+    expect(isInComment(content, todoPos)).toBe(false);
+  });
+
+  // getLineNumber tests
+  it('getLineNumber returns correct line', () => {
+    const content = `Line 1\nLine 2\nLine 3 target`;
+    expect(getLineNumber(content, content.indexOf('target'))).toBe(3);
+  });
+
+  it('getLineNumber handles empty lines', () => {
+    const content = `Line 1\n\nLine 3\n\nLine 5 target`;
+    expect(getLineNumber(content, content.indexOf('target'))).toBe(5);
+  });
 });
-
-test('isInMermaid handles no Mermaid present', () => {
-  const content = `Regular TBD content.`;
-  const tbdPos = content.indexOf('TBD');
-  assert(!isInMermaid(content, tbdPos), 'Should return false when no Mermaid');
-});
-
-// isInComment tests
-test('isInComment detects position inside comment', () => {
-  const content = `Before\n\n<!-- TODO: fix -->\n\nAfter`;
-  const todoPos = content.indexOf('TODO');
-  assert(isInComment(content, todoPos), 'TODO inside comment should be detected');
-});
-
-test('isInComment detects position outside comment', () => {
-  const content = `TODO outside\n\n<!-- comment -->`;
-  const todoPos = content.indexOf('TODO');
-  assert(!isInComment(content, todoPos), 'TODO outside comment should not be detected');
-});
-
-// getLineNumber tests
-test('getLineNumber returns correct line', () => {
-  const content = `Line 1\nLine 2\nLine 3 target`;
-  assertEqual(getLineNumber(content, content.indexOf('target')), 3);
-});
-
-test('getLineNumber handles empty lines', () => {
-  const content = `Line 1\n\nLine 3\n\nLine 5 target`;
-  assertEqual(getLineNumber(content, content.indexOf('target')), 5);
-});
-
-// =============================================================================
-// Summary
-// =============================================================================
-
-console.log('\n' + '─'.repeat(50));
-console.log(`\n✅ Passed: ${passed}`);
-if (failed > 0) {
-  console.log(`❌ Failed: ${failed}`);
-  process.exit(1);
-} else {
-  console.log('\n🎉 All tests passed!');
-}

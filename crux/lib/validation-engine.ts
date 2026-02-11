@@ -20,7 +20,7 @@ import { parse as parseYaml } from 'yaml';
 import { findMdxFiles } from './file-utils.ts';
 import { getColors, type Colors } from './output.ts';
 import { parseFrontmatterAndBody } from './mdx-utils.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './content-types.ts';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, type Frontmatter } from './content-types.ts';
 import { parseSidebarConfig, type SidebarParseResult } from './sidebar-utils.ts';
 
 // ---------------------------------------------------------------------------
@@ -162,7 +162,7 @@ export class ContentFile {
   path: string;
   relativePath: string;
   raw: string;
-  frontmatter: Record<string, any>;
+  frontmatter: Frontmatter;
   body: string;
   extension: string;
   isIndex: boolean;
@@ -175,7 +175,7 @@ export class ContentFile {
     this.raw = raw;
 
     const parsed = parseFrontmatterAndBody(raw);
-    this.frontmatter = parsed.frontmatter as Record<string, any>;
+    this.frontmatter = parsed.frontmatter as Frontmatter;
     this.body = parsed.body;
 
     this.extension = filePath.split('.').pop() || '';

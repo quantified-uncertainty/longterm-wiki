@@ -1,149 +1,109 @@
-#!/usr/bin/env -S node --import tsx/esm --no-warnings
-/**
- * Unit Tests for Page Creator Sub-Modules
- *
- * Tests pure-logic functions extracted during the refactoring.
- * Run: node crux/authoring/creator/creator.test.ts
- */
-
+import { describe, it, expect } from 'vitest';
 import { levenshteinDistance, similarity, toSlug } from './duplicate-detection.ts';
 import { extractUrls } from './source-fetching.ts';
 
-let passed = 0;
-let failed = 0;
-
-function test(name: string, fn: () => void): void {
-  try {
-    fn();
-    console.log(`✓ ${name}`);
-    passed++;
-  } catch (e: unknown) {
-    const error = e instanceof Error ? e : new Error(String(e));
-    console.log(`✗ ${name}`);
-    console.log(`  ${error.message}`);
-    failed++;
-  }
-}
-
-function assert(condition: boolean, message?: string): void {
-  if (!condition) throw new Error(message || 'Assertion failed');
-}
-
-function assertEqual(actual: unknown, expected: unknown, message?: string): void {
-  if (actual !== expected) {
-    throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
-  }
-}
-
 // ─── Duplicate Detection Tests ───
 
-console.log('\n=== Duplicate Detection ===\n');
+describe('Duplicate Detection', () => {
+  it('levenshteinDistance: identical strings', () => {
+    expect(levenshteinDistance('hello', 'hello')).toBe(0);
+  });
 
-test('levenshteinDistance: identical strings', () => {
-  assertEqual(levenshteinDistance('hello', 'hello'), 0);
-});
+  it('levenshteinDistance: one substitution', () => {
+    expect(levenshteinDistance('hello', 'hallo')).toBe(1);
+  });
 
-test('levenshteinDistance: one substitution', () => {
-  assertEqual(levenshteinDistance('hello', 'hallo'), 1);
-});
+  it('levenshteinDistance: one insertion', () => {
+    expect(levenshteinDistance('hello', 'helloo')).toBe(1);
+  });
 
-test('levenshteinDistance: one insertion', () => {
-  assertEqual(levenshteinDistance('hello', 'helloo'), 1);
-});
+  it('levenshteinDistance: one deletion', () => {
+    expect(levenshteinDistance('hello', 'helo')).toBe(1);
+  });
 
-test('levenshteinDistance: one deletion', () => {
-  assertEqual(levenshteinDistance('hello', 'helo'), 1);
-});
+  it('levenshteinDistance: empty strings', () => {
+    expect(levenshteinDistance('', '')).toBe(0);
+    expect(levenshteinDistance('abc', '')).toBe(3);
+    expect(levenshteinDistance('', 'abc')).toBe(3);
+  });
 
-test('levenshteinDistance: empty strings', () => {
-  assertEqual(levenshteinDistance('', ''), 0);
-  assertEqual(levenshteinDistance('abc', ''), 3);
-  assertEqual(levenshteinDistance('', 'abc'), 3);
-});
+  it('similarity: identical strings', () => {
+    expect(similarity('hello', 'hello')).toBe(1);
+  });
 
-test('similarity: identical strings', () => {
-  assertEqual(similarity('hello', 'hello'), 1);
-});
+  it('similarity: case insensitive', () => {
+    expect(similarity('Hello', 'hello')).toBe(1);
+  });
 
-test('similarity: case insensitive', () => {
-  assertEqual(similarity('Hello', 'hello'), 1);
-});
+  it('similarity: returns 0-1 range', () => {
+    const sim = similarity('abc', 'xyz');
+    expect(sim).toBeGreaterThanOrEqual(0);
+    expect(sim).toBeLessThanOrEqual(1);
+  });
 
-test('similarity: returns 0-1 range', () => {
-  const sim = similarity('abc', 'xyz');
-  assert(sim >= 0 && sim <= 1, `Similarity ${sim} not in [0, 1]`);
-});
+  it('similarity: similar strings have high score', () => {
+    const sim = similarity('OpenAI', 'OpenAi');
+    expect(sim).toBeGreaterThanOrEqual(0.8);
+  });
 
-test('similarity: similar strings have high score', () => {
-  const sim = similarity('OpenAI', 'OpenAi');
-  assert(sim >= 0.8, `Expected >= 0.8, got ${sim}`);
-});
+  it('similarity: very different strings have low score', () => {
+    const sim = similarity('apple', 'bicycle');
+    expect(sim).toBeLessThan(0.5);
+  });
 
-test('similarity: very different strings have low score', () => {
-  const sim = similarity('apple', 'bicycle');
-  assert(sim < 0.5, `Expected < 0.5, got ${sim}`);
-});
+  it('toSlug: basic conversion', () => {
+    expect(toSlug('Hello World')).toBe('hello-world');
+  });
 
-test('toSlug: basic conversion', () => {
-  assertEqual(toSlug('Hello World'), 'hello-world');
-});
+  it('toSlug: special characters', () => {
+    expect(toSlug("Open Philanthropy's Fund")).toBe('open-philanthropy-s-fund');
+  });
 
-test('toSlug: special characters', () => {
-  assertEqual(toSlug("Open Philanthropy's Fund"), 'open-philanthropy-s-fund');
-});
+  it('toSlug: trims dashes', () => {
+    expect(toSlug('--hello--')).toBe('hello');
+  });
 
-test('toSlug: trims dashes', () => {
-  assertEqual(toSlug('--hello--'), 'hello');
-});
-
-test('toSlug: handles numbers', () => {
-  assertEqual(toSlug('80000 Hours'), '80000-hours');
+  it('toSlug: handles numbers', () => {
+    expect(toSlug('80000 Hours')).toBe('80000-hours');
+  });
 });
 
 // ─── URL Extraction Tests ───
 
-console.log('\n=== URL Extraction ===\n');
+describe('URL Extraction', () => {
+  it('extractUrls: basic URL', () => {
+    const urls = extractUrls('Check out https://example.com for more');
+    expect(urls.length).toBe(1);
+    expect(urls[0]).toBe('https://example.com');
+  });
 
-test('extractUrls: basic URL', () => {
-  const urls = extractUrls('Check out https://example.com for more');
-  assertEqual(urls.length, 1);
-  assertEqual(urls[0], 'https://example.com');
+  it('extractUrls: multiple URLs', () => {
+    const urls = extractUrls('See https://a.com and http://b.com');
+    expect(urls.length).toBe(2);
+  });
+
+  it('extractUrls: strips trailing punctuation', () => {
+    const urls = extractUrls('Visit https://example.com.');
+    expect(urls[0]).toBe('https://example.com');
+  });
+
+  it('extractUrls: handles trailing comma', () => {
+    const urls = extractUrls('Visit https://example.com, for more');
+    expect(urls[0]).toBe('https://example.com');
+  });
+
+  it('extractUrls: handles unbalanced parens', () => {
+    const urls = extractUrls('(see https://example.com/path)');
+    expect(urls[0]).toBe('https://example.com/path');
+  });
+
+  it('extractUrls: preserves balanced parens in URL', () => {
+    const urls = extractUrls('https://en.wikipedia.org/wiki/Test_(computing)');
+    expect(urls[0]).toBe('https://en.wikipedia.org/wiki/Test_(computing)');
+  });
+
+  it('extractUrls: no URLs returns empty', () => {
+    const urls = extractUrls('No links here');
+    expect(urls.length).toBe(0);
+  });
 });
-
-test('extractUrls: multiple URLs', () => {
-  const urls = extractUrls('See https://a.com and http://b.com');
-  assertEqual(urls.length, 2);
-});
-
-test('extractUrls: strips trailing punctuation', () => {
-  const urls = extractUrls('Visit https://example.com.');
-  assertEqual(urls[0], 'https://example.com');
-});
-
-test('extractUrls: handles trailing comma', () => {
-  const urls = extractUrls('Visit https://example.com, for more');
-  assertEqual(urls[0], 'https://example.com');
-});
-
-test('extractUrls: handles unbalanced parens', () => {
-  const urls = extractUrls('(see https://example.com/path)');
-  assertEqual(urls[0], 'https://example.com/path');
-});
-
-test('extractUrls: preserves balanced parens in URL', () => {
-  const urls = extractUrls('https://en.wikipedia.org/wiki/Test_(computing)');
-  assertEqual(urls[0], 'https://en.wikipedia.org/wiki/Test_(computing)');
-});
-
-test('extractUrls: no URLs returns empty', () => {
-  const urls = extractUrls('No links here');
-  assertEqual(urls.length, 0);
-});
-
-// ─── Summary ───
-
-console.log(`\n${'='.repeat(40)}`);
-console.log(`Results: ${passed} passed, ${failed} failed`);
-if (failed > 0) {
-  process.exit(1);
-}

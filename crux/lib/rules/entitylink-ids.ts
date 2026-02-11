@@ -15,10 +15,9 @@
  */
 
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.ts';
 import { existsSync } from 'fs';
 import { join } from 'path';
-
-const CONTENT_DIR = join(process.cwd(), 'content/docs');
 
 /**
  * Check if a path-style ID resolves to a real content file.
