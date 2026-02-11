@@ -62,6 +62,7 @@ interface CommandOptions {
   tier?: string;
   dryRun?: boolean;
   triage?: boolean;
+  noTriage?: boolean;
   [key: string]: unknown;
 }
 
@@ -227,7 +228,8 @@ export async function run(args: string[], options: CommandOptions): Promise<Comm
   const count = parseInt(options.count || '1', 10);
   const tier = options.tier || 'standard';
   const dryRun = options.dryRun;
-  const useTriage = options.triage;
+  // Triage is ON by default — use --no-triage to skip
+  const useTriage = options.noTriage ? false : (options.triage !== undefined ? options.triage : true);
 
   // Only run overdue pages by default
   const overdue = candidates.filter(p => p.overdue);
@@ -613,7 +615,7 @@ Options:
   --overdue            Only show overdue pages (staleness >= 1.0)
   --count=N            Number of pages to improve/triage (default: 1 for run, 5 for triage)
   --tier=<tier>        Improvement tier: polish, standard, deep (default: standard)
-  --triage             Auto-select tier per page via news check (use with run)
+  --no-triage          Skip news-check triage (triage is ON by default for run)
   --dry-run            Preview what run would do without executing
   --json               Output as JSON
   --ci                 JSON output for CI pipelines
@@ -636,8 +638,8 @@ Examples:
   crux updates list                       Show top 10 update priorities
   crux updates list --overdue --limit=20  All overdue pages
   crux updates triage --count=10          Preview triage for top 10 overdue
-  crux updates run --triage --count=5     Run with auto tier selection
-  crux updates run --count=3 --tier=polish  Quick-improve top 3
+  crux updates run --count=5              Run with triage (default)
+  crux updates run --count=3 --no-triage --tier=polish  Skip triage, force polish
   crux updates run --dry-run              Preview without executing
   crux updates stats                      Show coverage stats
 `;

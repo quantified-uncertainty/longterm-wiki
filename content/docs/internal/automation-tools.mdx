@@ -77,6 +77,86 @@ node scripts/page-improver.mjs --list --max-qual 3 --min-imp 50
 
 ---
 
+## Scheduled Updates
+
+The update schedule system tracks which pages are overdue for refresh based on `update_frequency` (days) in frontmatter. It prioritizes pages by combining staleness with importance.
+
+### How Scheduling Works
+
+Each page declares how often it should be updated:
+
+```yaml
+update_frequency: 7     # Check weekly
+lastEdited: "2026-01-15"
+importance: 85
+```
+
+**Priority scoring**: `staleness x (importance / 100)`, where staleness = days since edit / update frequency. Pages with staleness >= 1.0 are overdue.
+
+| Importance | Default Frequency |
+|------------|-------------------|
+| >= 80 | 7 days (weekly) |
+| >= 60 | 21 days (3 weeks) |
+| >= 40 | 45 days (6 weeks) |
+| >= 20 | 90 days (3 months) |
+
+### Commands
+
+```bash
+# See what needs updating
+pnpm crux updates list                        # Top 10 by priority
+pnpm crux updates list --overdue --limit=20   # All overdue pages
+
+# Preview triage recommendations (cheap, ~$0.08/page)
+pnpm crux updates triage --count=10
+
+# Run updates (triage is ON by default)
+pnpm crux updates run --count=5               # Triage + update top 5
+pnpm crux updates run --count=3 --no-triage --tier=polish  # Skip triage
+
+# Statistics
+pnpm crux updates stats
+```
+
+### Cost-Aware Triage
+
+By default, `updates run` checks for new developments before committing to an expensive update. For each page it does a cheap news check (~\$0.08) using web search + SCRY, then recommends a tier:
+
+| Triage Result | Action | Cost |
+|---------------|--------|------|
+| **skip** | No new developments — page is current | \$0 |
+| **polish** | Minor tweaks only | \$2-3 |
+| **standard** | Notable new developments to add | \$5-8 |
+| **deep** | Major developments requiring thorough research | \$10-15 |
+
+**Example savings**: 10 pages at standard = ~\$65. With triage, if 6 have no news: ~\$26 + \$0.80 triage = ~\$27.
+
+Use `--no-triage` to skip the news check and apply a fixed tier to all pages.
+
+### Update Tiers (Page Improver)
+
+```bash
+# Single page with specific tier
+node crux/authoring/page-improver.ts -- <page-id> --tier polish --apply
+node crux/authoring/page-improver.ts -- <page-id> --tier standard --apply --grade
+node crux/authoring/page-improver.ts -- <page-id> --tier deep --apply --grade
+
+# Auto-select tier via triage
+node crux/authoring/page-improver.ts -- <page-id> --tier triage --apply --grade
+
+# Triage only (no update)
+node crux/authoring/page-improver.ts -- <page-id> --triage
+```
+
+| Tier | Cost | Phases |
+|------|------|--------|
+| polish | \$2-3 | analyze, improve, validate |
+| standard | \$5-8 | analyze, research, improve, validate, review |
+| deep | \$10-15 | analyze, research-deep, improve, validate, review, gap-fill |
+| triage | ~\$0.08 + tier cost | news check, then auto-selects above |
+
+---
+
 ## Content Grading
 
 Uses Claude Sonnet API to automatically grade pages with importance, quality, and AI-generated summaries.
