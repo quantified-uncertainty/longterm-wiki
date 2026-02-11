@@ -186,14 +186,15 @@ async function validateFile(filePath: string): Promise<ValidationFileResult> {
       recmaPlugins: [],
     });
     return { success: true };
-  } catch (error) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     const pos = parseErrorPosition(error as Error & { line?: number; column?: number });
     const snippet = pos ? getErrorSnippet(content, pos.line, pos.column) : null;
-    const suggestion = getSuggestion(error as Error, content, pos);
+    const suggestion = getSuggestion(error, content, pos);
 
     return {
       success: false,
-      error: { message: (error as Error).message, position: pos, snippet, suggestion },
+      error: { message: error.message, position: pos, snippet, suggestion },
     };
   }
 }

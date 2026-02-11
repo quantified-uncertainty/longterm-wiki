@@ -550,8 +550,9 @@ Examples:
     const results = analyzeRedundancy(threshold);
     const exitCode = printReport(results, topN);
     process.exit(exitCode);
-  } catch (error) {
-    console.error('Error:', (error as Error).message);
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error('Error:', error.message);
     process.exit(2);
   }
 }

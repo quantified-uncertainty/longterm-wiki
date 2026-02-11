@@ -1051,11 +1051,13 @@ async function main(): Promise<void> {
     console.log(`  ${range}: ${bar} (${count})`);
   }
 
-  const impAvg: number = importanceScores.reduce((a, b) => a + b, 0) / importanceScores.length;
-  const impMedian: number = importanceScores[Math.floor(importanceScores.length / 2)];
-  console.log(`\n  Avg: ${impAvg.toFixed(1)}, Median: ${impMedian.toFixed(1)}`);
-  console.log(`  Top 5: ${importanceScores.slice(0, 5).map(x => x.toFixed(1)).join(', ')}`);
-  console.log(`  Bottom 5: ${importanceScores.slice(-5).map(x => x.toFixed(1)).join(', ')}`);
+  if (importanceScores.length > 0) {
+    const impAvg: number = importanceScores.reduce((a, b) => a + b, 0) / importanceScores.length;
+    const impMedian: number = importanceScores[Math.floor(importanceScores.length / 2)];
+    console.log(`\n  Avg: ${impAvg.toFixed(1)}, Median: ${impMedian.toFixed(1)}`);
+    console.log(`  Top 5: ${importanceScores.slice(0, 5).map(x => x.toFixed(1)).join(', ')}`);
+    console.log(`  Bottom 5: ${importanceScores.slice(-5).map(x => x.toFixed(1)).join(', ')}`);
+  }
 
   // Quality distribution by range (0-100 scale)
   const qualRanges: Record<string, number> = {
@@ -1072,9 +1074,11 @@ async function main(): Promise<void> {
     console.log(`  ${range}: ${bar} (${count})`);
   }
 
-  const qualAvg: number = qualityScores.reduce((a, b) => a + b, 0) / qualityScores.length;
-  const qualMedian: number = qualityScores[Math.floor(qualityScores.length / 2)];
-  console.log(`\n  Avg: ${qualAvg.toFixed(1)}, Median: ${qualMedian.toFixed(1)}`)
+  if (qualityScores.length > 0) {
+    const qualAvg: number = qualityScores.reduce((a, b) => a + b, 0) / qualityScores.length;
+    const qualMedian: number = qualityScores[Math.floor(qualityScores.length / 2)];
+    console.log(`\n  Avg: ${qualAvg.toFixed(1)}, Median: ${qualMedian.toFixed(1)}`);
+  }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

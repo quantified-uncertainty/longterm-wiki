@@ -25,7 +25,7 @@ import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { CONTENT_DIR } from '../lib/content-types.ts';
 import { countWords, countTables, countDiagrams, countInternalLinks } from '../lib/metrics-extractor.ts';
-import { PAGE_TEMPLATES } from '../lib/page-templates.ts';
+import { PAGE_TEMPLATES, type PageTemplate, type FrontmatterField, type SectionDef, type QualityCriterion } from '../lib/page-templates.ts';
 
 interface ScoreDetail {
   field?: string;
@@ -66,36 +66,6 @@ interface GradeResult {
   metadata: GradeMetadata;
 }
 
-interface TemplateField {
-  name: string;
-  weight?: number;
-  required?: boolean;
-}
-
-interface TemplateSection {
-  label: string;
-  weight?: number;
-  required?: boolean;
-  alternateLabels?: string[];
-}
-
-interface QualityCriterion {
-  id?: string;
-  label: string;
-  weight?: number;
-  detection: string;
-  pattern?: string;
-}
-
-interface PageTemplate {
-  id: string;
-  name: string;
-  frontmatter: TemplateField[];
-  sections: TemplateSection[];
-  qualityCriteria: QualityCriterion[];
-  minWordCount?: number;
-}
-
 interface TemplateStats {
   count: number;
   grades: Record<string, number>;
@@ -123,7 +93,7 @@ function countCitations(content: string): number {
   return countInternalLinks(content);
 }
 
-function sectionMatches(heading: string, section: TemplateSection): boolean {
+function sectionMatches(heading: string, section: SectionDef): boolean {
   const normalizedHeading: string = heading.toLowerCase().trim();
   if (section.label.toLowerCase() === normalizedHeading) return true;
   if (section.alternateLabels?.some(alt => normalizedHeading.includes(alt.toLowerCase()))) return true;
@@ -293,11 +263,11 @@ async function main(): Promise<void> {
 
     const templateId: string | undefined = frontmatter.pageTemplate;
 
-    if (!templateId || !(PAGE_TEMPLATES as Record<string, PageTemplate>)[templateId]) continue;
+    if (!templateId || !PAGE_TEMPLATES[templateId]) continue;
     if (templateFilter && templateId !== templateFilter) continue;
     if (pageFilter && !file.includes(pageFilter)) continue;
 
-    const template: PageTemplate = (PAGE_TEMPLATES as Record<string, PageTemplate>)[templateId];
+    const template = PAGE_TEMPLATES[templateId];
     const result: GradeResult = gradeFile(file, template);
     results.push(result);
   }
@@ -374,7 +344,7 @@ async function main(): Promise<void> {
   console.log('='.repeat(80));
   console.log('\nOverall Summary:');
   console.log(`  Total pages graded: ${results.length}`);
-  const avgPercent: number = Math.round(results.reduce((s, r) => s + r.percentage, 0) / results.length);
+  const avgPercent: number = results.length > 0 ? Math.round(results.reduce((s, r) => s + r.percentage, 0) / results.length) : 0;
   console.log(`  Average score: ${avgPercent}%`);
   const gradeCount: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, F: 0 };
   results.forEach(r => gradeCount[r.grade]++);

@@ -243,8 +243,8 @@ export async function stats(args: string[], options: Record<string, unknown>): P
     pagesWithInsights: pagesWithInsights.length,
     pagesWithNoInsights: pagesWithNoInsights.length,
     highImportanceNoInsights: highImpNoInsights.length,
-    coverage: Math.round((pagesWithInsights.length / pagesWithImportance.length) * 100),
-    avgInsightsPerPage: (insights.length / pagesWithInsights.length).toFixed(1),
+    coverage: pagesWithImportance.length > 0 ? Math.round((pagesWithInsights.length / pagesWithImportance.length) * 100) : 0,
+    avgInsightsPerPage: pagesWithInsights.length > 0 ? (insights.length / pagesWithInsights.length).toFixed(1) : '0.0',
     byCategory,
   };
 
@@ -267,7 +267,7 @@ export async function stats(args: string[], options: Record<string, unknown>): P
 
   output += `${c.bold}By Category:${c.reset}\n`;
   for (const [cat, data] of Object.entries(byCategory).sort((a, b) => b[1].total - a[1].total)) {
-    const pct = Math.round((data.withInsights / data.total) * 100);
+    const pct = data.total > 0 ? Math.round((data.withInsights / data.total) * 100) : 0;
     output += `  ${cat}: ${data.withInsights}/${data.total} pages (${pct}%), ${data.insightCount} insights\n`;
   }
 

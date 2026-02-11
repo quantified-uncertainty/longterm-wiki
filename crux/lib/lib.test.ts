@@ -33,9 +33,10 @@ function test(name: string, fn: () => void): void {
     fn();
     console.log(`✓ ${name}`);
     passed++;
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = e instanceof Error ? e : new Error(String(e));
     console.log(`✗ ${name}`);
-    console.log(`  ${e.message}`);
+    console.log(`  ${error.message}`);
     failed++;
   }
 }
