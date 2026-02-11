@@ -65,10 +65,10 @@ for (const script of validatorScripts) {
 }
 
 // =============================================================================
-// metrics-extractor.mjs tests
+// metrics-extractor.ts tests
 // =============================================================================
 
-console.log('\n📊 metrics-extractor.mjs');
+console.log('\n📊 metrics-extractor.ts');
 
 const sampleQ1Content = `---
 title: Stub Page
@@ -302,7 +302,7 @@ test('extractInternalLinks ignores anchors', () => {
 });
 
 // =============================================================================
-// Placeholder validator functions (from validate-placeholders.mjs)
+// Placeholder validator functions (from validate-placeholders.ts)
 // =============================================================================
 
 console.log('\n📝 Placeholder validator helpers');

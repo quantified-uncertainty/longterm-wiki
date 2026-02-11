@@ -15,7 +15,7 @@
 
 import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
-import { loadDatabase } from '../content-types.js';
+import { loadDatabase } from '../content-types.ts';
 
 // ---------------------------------------------------------------------------
 // Interfaces

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --import tsx/esm --no-warnings
 /**
  * Unit Tests for Page Creator Sub-Modules
  *

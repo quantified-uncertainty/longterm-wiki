@@ -6,7 +6,7 @@
  * separate validator scripts that each re-read all files.
  *
  * Usage:
- *   import { ValidationEngine } from './validation-engine.js';
+ *   import { ValidationEngine } from './validation-engine.ts';
  *
  *   const engine = new ValidationEngine();
  *   await engine.load();

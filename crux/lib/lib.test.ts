@@ -52,10 +52,10 @@ function assertEqual(actual: unknown, expected: unknown, message?: string): void
 }
 
 // =============================================================================
-// file-utils.mjs tests
+// file-utils.ts tests
 // =============================================================================
 
-console.log('\n📁 file-utils.mjs');
+console.log('\n📁 file-utils.ts');
 
 test('findMdxFiles returns array', () => {
   const result = findMdxFiles('content/docs/knowledge-base/models');
@@ -84,10 +84,10 @@ test('getDirectories returns directories', () => {
 });
 
 // =============================================================================
-// mdx-utils.mjs tests
+// mdx-utils.ts tests
 // =============================================================================
 
-console.log('\n📝 mdx-utils.mjs');
+console.log('\n📝 mdx-utils.ts');
 
 const sampleMdx = `---
 title: Test Page
@@ -168,10 +168,10 @@ test('extractLinks finds markdown links', () => {
 });
 
 // =============================================================================
-// output.mjs tests
+// output.ts tests
 // =============================================================================
 
-console.log('\n🎨 output.mjs');
+console.log('\n🎨 output.ts');
 
 test('getColors returns color object', () => {
   const colors = getColors(false);
@@ -207,10 +207,10 @@ test('formatCount pluralizes correctly', () => {
 });
 
 // =============================================================================
-// content-types.js tests
+// content-types.ts tests
 // =============================================================================
 
-console.log('\n📋 content-types.js');
+console.log('\n📋 content-types.ts');
 
 test('CONTENT_TYPES has expected types', () => {
   assert('model' in CONTENT_TYPES);

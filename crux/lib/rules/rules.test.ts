@@ -7,14 +7,14 @@
  */
 
 import { Issue, Severity, FixType, createRule } from '../validation-engine.ts';
-import { dollarSignsRule } from './dollar-signs.js';
-import { comparisonOperatorsRule } from './comparison-operators.js';
-import { tildeDollarRule } from './tilde-dollar.js';
-import { fakeUrlsRule } from './fake-urls.js';
-import { placeholdersRule } from './placeholders.js';
-import { consecutiveBoldLabelsRule } from './consecutive-bold-labels.js';
-import { temporalArtifactsRule } from './temporal-artifacts.js';
-import { vagueCitationsRule } from './vague-citations.js';
+import { dollarSignsRule } from './dollar-signs.ts';
+import { comparisonOperatorsRule } from './comparison-operators.ts';
+import { tildeDollarRule } from './tilde-dollar.ts';
+import { fakeUrlsRule } from './fake-urls.ts';
+import { placeholdersRule } from './placeholders.ts';
+import { consecutiveBoldLabelsRule } from './consecutive-bold-labels.ts';
+import { temporalArtifactsRule } from './temporal-artifacts.ts';
+import { vagueCitationsRule } from './vague-citations.ts';
 
 let passed = 0;
 let failed = 0;

@@ -12,7 +12,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
-import { loadDatabase, loadPathRegistry, DATA_DIR_ABS, type Entity } from '../content-types.js';
+import { loadDatabase, loadPathRegistry, DATA_DIR_ABS, type Entity } from '../content-types.ts';
 
 const DATA_DIR = DATA_DIR_ABS;
 

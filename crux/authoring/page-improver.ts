@@ -26,7 +26,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import Anthropic from '@anthropic-ai/sdk';
-import type { MessageParam, ContentBlock, ToolUseBlock, ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages';
+import type { MessageParam, ToolUseBlock, ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';

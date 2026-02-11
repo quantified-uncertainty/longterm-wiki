@@ -3,7 +3,7 @@
  * Unit Tests for CLI Utilities and TypeScript Migration Infrastructure
  *
  * Tests:
- *   - cli.mjs: camelToKebab, kebabToCamel, formatDuration, optionsToArgs,
+ *   - cli.ts: camelToKebab, kebabToCamel, formatDuration, optionsToArgs,
  *              createScriptHandler, buildCommands
  *   - content-types.ts: loadGeneratedJson, typed loaders, constants
  *   - validation-engine.ts: Issue, ContentFile, ValidationEngine, createRule,
@@ -46,7 +46,7 @@ import {
   createRule,
   Severity,
   FixType,
-} from './validation-engine.js';
+} from './validation-engine.ts';
 
 let passed = 0;
 let failed = 0;
@@ -90,10 +90,10 @@ function assertDeepEqual(actual: unknown, expected: unknown, message?: string): 
 }
 
 // =============================================================================
-// cli.mjs — camelToKebab
+// cli.ts — camelToKebab
 // =============================================================================
 
-console.log('\n🔧 cli.mjs — camelToKebab');
+console.log('\n🔧 cli.ts — camelToKebab');
 
 test('camelToKebab converts simple camelCase', () => {
   assertEqual(camelToKebab('dryRun'), 'dry-run');
@@ -112,10 +112,10 @@ test('camelToKebab handles single char segments', () => {
 });
 
 // =============================================================================
-// cli.mjs — kebabToCamel
+// cli.ts — kebabToCamel
 // =============================================================================
 
-console.log('\n🔧 cli.mjs — kebabToCamel');
+console.log('\n🔧 cli.ts — kebabToCamel');
 
 test('kebabToCamel converts simple kebab-case', () => {
   assertEqual(kebabToCamel('dry-run'), 'dryRun');
@@ -135,10 +135,10 @@ test('camelToKebab and kebabToCamel are inverses', () => {
 });
 
 // =============================================================================
-// cli.mjs — formatDuration
+// cli.ts — formatDuration
 // =============================================================================
 
-console.log('\n🔧 cli.mjs — formatDuration');
+console.log('\n🔧 cli.ts — formatDuration');
 
 test('formatDuration formats milliseconds', () => {
   assertEqual(formatDuration(500), '500ms');
@@ -158,10 +158,10 @@ test('formatDuration formats zero', () => {
 });
 
 // =============================================================================
-// cli.mjs — optionsToArgs
+// cli.ts — optionsToArgs
 // =============================================================================
 
-console.log('\n🔧 cli.mjs — optionsToArgs');
+console.log('\n🔧 cli.ts — optionsToArgs');
 
 test('optionsToArgs converts boolean true to flag', () => {
   const result = optionsToArgs({ verbose: true });
@@ -207,10 +207,10 @@ test('optionsToArgs handles multiple options', () => {
 });
 
 // =============================================================================
-// cli.mjs — createScriptHandler
+// cli.ts — createScriptHandler
 // =============================================================================
 
-console.log('\n🔧 cli.mjs — createScriptHandler');
+console.log('\n🔧 cli.ts — createScriptHandler');
 
 test('createScriptHandler returns a function', () => {
   const handler = createScriptHandler('test', {
@@ -232,10 +232,10 @@ test('createScriptHandler filters to passthrough options only', async () => {
 });
 
 // =============================================================================
-// cli.mjs — buildCommands
+// cli.ts — buildCommands
 // =============================================================================
 
-console.log('\n🔧 cli.mjs — buildCommands');
+console.log('\n🔧 cli.ts — buildCommands');
 
 test('buildCommands creates handler for each script', () => {
   const scripts = {

@@ -11,7 +11,7 @@ import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock } from '../mdx-utils.ts';
-import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.js';
+import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.ts';
 
 const APP_DIR = join(process.cwd(), 'app/src/app');
 

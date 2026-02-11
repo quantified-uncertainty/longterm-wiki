@@ -23,7 +23,7 @@ import 'dotenv/config';
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
-import { join, basename, dirname, relative } from 'path';
+import { join, basename, relative } from 'path';
 import { createHash } from 'crypto';
 import { fileURLToPath } from 'url';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
