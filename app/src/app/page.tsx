@@ -54,11 +54,10 @@ export default function Home() {
     return { ...topic, items: clusterItems };
   });
 
-  // Featured content: highest-scoring across all items (not already shown in topics)
-  const topicItemIds = new Set(topicData.flatMap((t) => t.items.map((i) => i.id)));
-  const featured = allItems
-    .filter((item) => !topicItemIds.has(item.id))
-    .sort((a, b) => score(b) - score(a))
+  // Recently updated pages — quality >= 40, sorted by lastUpdated descending
+  const recentlyUpdated = allItems
+    .filter((item) => item.lastUpdated && (item.quality ?? 0) >= 40)
+    .sort((a, b) => new Date(b.lastUpdated!).getTime() - new Date(a.lastUpdated!).getTime())
     .slice(0, 8);
 
   // Entity type counts for the stats
@@ -143,10 +142,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured content */}
+      {/* Recently updated */}
       <section className="pb-16">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">Featured content</h2>
+          <h2 className="text-2xl font-semibold">Recently updated</h2>
           <Link
             href="/wiki"
             className="text-sm text-muted-foreground hover:text-foreground no-underline transition-colors"
@@ -155,7 +154,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {featured.map((item) => (
+          {recentlyUpdated.map((item) => (
             <ContentCard key={item.id} item={item} />
           ))}
         </div>
