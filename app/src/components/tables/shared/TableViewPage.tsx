@@ -155,7 +155,7 @@ export function TableViewPage<TData, TColumnKey extends string>({
               className={cn(
                 "px-2.5 py-1 text-xs rounded-md transition-colors",
                 link.active
-                  ? "bg-foreground text-background font-medium"
+                  ? "bg-muted text-foreground font-medium"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
             >
