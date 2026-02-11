@@ -14,6 +14,7 @@
  *   1 = Validation failed
  */
 
+import { fileURLToPath } from 'url';
 import * as insights from '../lib/insights.ts';
 import type { AllChecksResult, CheckIssue } from '../lib/insights.ts';
 import { createLogger } from '../lib/output.ts';

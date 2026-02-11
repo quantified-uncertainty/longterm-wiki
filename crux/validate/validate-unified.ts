@@ -75,6 +75,16 @@ async function main(): Promise<void> {
     console.log(`${colors.bold}${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}\n`);
   }
 
+  // Warn about unknown rule names
+  if (parsedArgs.selectedRules) {
+    const knownIds = new Set(allRules.map((r: { id: string }) => r.id));
+    const unknown = parsedArgs.selectedRules.filter((id: string) => id && !knownIds.has(id));
+    if (unknown.length > 0) {
+      console.error(`${colors.yellow}Warning: Unknown rule(s): ${unknown.join(', ')}${colors.reset}`);
+      console.error(`${colors.dim}Available: ${[...knownIds].join(', ')}${colors.reset}\n`);
+    }
+  }
+
   // Register rules
   for (const rule of allRules) {
     if (!parsedArgs.selectedRules || parsedArgs.selectedRules.includes(rule.id)) {
