@@ -8,7 +8,8 @@ import {
 } from "@/lib/mdx";
 import type { MdxPage, MdxError } from "@/lib/mdx";
 import { getEntityById, getPageById, getEntityPath } from "@/data";
-import type { Page } from "@/data";
+import type { Page, ContentFormat } from "@/data";
+import { CONTENT_FORMAT_INFO } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RelatedPages } from "@/components/RelatedPages";
@@ -139,6 +140,7 @@ function ArticleView({
   const entity = getEntityById(slug);
   const numId = slugToNumericId(slug);
   const pageTitle = page.frontmatter.title || entity?.title || slug;
+  const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
 
   return (
     <InfoBoxVisibilityProvider>
@@ -194,6 +196,7 @@ function ArticleView({
           }}
           pageType={page.frontmatter.pageType}
           pathname={entityPath}
+          contentFormat={contentFormat}
         />
         {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
         {entity && <DataInfoBox entityId={slug} />}
@@ -253,12 +256,14 @@ export default async function WikiPage({ params }: PageProps) {
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
     const entityPath = getEntityPath(slug) || "";
-    const fullWidth = result.frontmatter.fullWidth === true;
+    const pageData = getPageById(slug);
+    const formatInfo = CONTENT_FORMAT_INFO[(pageData?.contentFormat || "article") as ContentFormat];
+    const fullWidth = result.frontmatter.fullWidth === true || formatInfo?.fullWidth === true;
     return (
       <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
         <ArticleView
           page={result}
-          pageData={getPageById(slug)}
+          pageData={pageData}
           entityPath={entityPath}
           slug={slug}
           fullWidth={fullWidth}
@@ -279,12 +284,14 @@ export default async function WikiPage({ params }: PageProps) {
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
     const entityPath = getEntityPath(id) || "";
-    const fullWidth = result.frontmatter.fullWidth === true;
+    const pageData = getPageById(id);
+    const formatInfo = CONTENT_FORMAT_INFO[(pageData?.contentFormat || "article") as ContentFormat];
+    const fullWidth = result.frontmatter.fullWidth === true || formatInfo?.fullWidth === true;
     return (
       <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
         <ArticleView
           page={result}
-          pageData={getPageById(id)}
+          pageData={pageData}
           entityPath={entityPath}
           slug={id}
           fullWidth={fullWidth}

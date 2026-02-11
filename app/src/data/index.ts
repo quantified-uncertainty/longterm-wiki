@@ -241,6 +241,8 @@ export interface BacklinkEntry {
   relationship?: string;
 }
 
+export type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
+
 export interface Page {
   id: string;
   path: string;
@@ -248,6 +250,7 @@ export interface Page {
   title: string;
   quality: number | null;
   importance: number | null;
+  contentFormat: ContentFormat;
   tractability: number | null;
   neglectedness: number | null;
   uncertainty: number | null;
@@ -769,6 +772,7 @@ export interface ExploreItem {
   category: string | null;
   riskCategory: string | null;
   lastUpdated: string | null;
+  contentFormat?: ContentFormat;
   href?: string;
   meta?: string;
   sourceTitle?: string;
@@ -922,6 +926,7 @@ export function getExploreItems(): ExploreItem[] {
       category: page?.category ?? null,
       riskCategory: isRisk(entity) ? (entity.riskCategory || null) : null,
       lastUpdated: page?.lastUpdated ?? null,
+      contentFormat: page?.contentFormat,
     };
   });
 
@@ -933,7 +938,7 @@ export function getExploreItems(): ExploreItem[] {
       id: page.id,
       numericId: db.idRegistry?.bySlug[page.id] || page.id,
       title: page.title,
-      type: CATEGORY_TO_TYPE[page.category] || "concept",
+      type: page.contentFormat === "table" ? "table" : page.contentFormat === "diagram" ? "diagram" : CATEGORY_TO_TYPE[page.category] || "concept",
       description: page.llmSummary || page.description || null,
       tags: page.tags || [],
       clusters: page.clusters || [],
@@ -943,9 +948,13 @@ export function getExploreItems(): ExploreItem[] {
       category: page.category ?? null,
       riskCategory: null,
       lastUpdated: page.lastUpdated ?? null,
+      contentFormat: page.contentFormat,
     }));
 
-  // Table items
+  // Table items — hardcoded list supplements pages with contentFormat=table
+  // Pages with contentFormat=table are already included via pageOnlyItems/entityItems.
+  // This list adds metadata (row/col counts) not yet available from the build pipeline.
+  // TODO: Remove this hardcoded list once table metadata is part of build-data output.
   const tableItems: ExploreItem[] = TABLES.map((table) => ({
     id: `table-${table.id}`,
     numericId: `table-${table.id}`,
@@ -960,6 +969,7 @@ export function getExploreItems(): ExploreItem[] {
     category: null,
     riskCategory: null,
     lastUpdated: null,
+    contentFormat: "table" as ContentFormat,
     href: table.href,
     meta: `${table.rows} × ${table.cols}`,
   }));
@@ -1015,6 +1025,7 @@ export function getExploreItems(): ExploreItem[] {
         category: null,
         riskCategory: null,
         lastUpdated: e.lastUpdated || null,
+        contentFormat: "diagram" as ContentFormat,
         href: resolveDiagramHref(e)!,
         meta: `${nodeCount} nodes`,
       };

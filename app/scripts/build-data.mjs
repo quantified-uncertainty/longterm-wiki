@@ -210,6 +210,8 @@ function buildPagesRegistry(urlToResource) {
           title: fm.title || id.replace(/-/g, ' '),
           quality: currentQuality,
           importance: fm.importance ? parseInt(fm.importance) : null,
+          // Content format: article (default), table, diagram, index, dashboard
+          contentFormat: fm.contentFormat || 'article',
           // ITN framework fields (0-100 scale)
           tractability: fm.tractability ? parseInt(fm.tractability) : null,
           neglectedness: fm.neglectedness ? parseInt(fm.neglectedness) : null,

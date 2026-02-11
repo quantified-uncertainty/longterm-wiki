@@ -12,12 +12,69 @@ export type PageType =
   | "ai-transition-model"
   | "overview";
 
+export type ContentFormat = "article" | "table" | "diagram" | "index" | "dashboard";
+
 export interface PageTypeInfo {
   label: string;
   description: string;
   styleGuideUrl?: string;
   color: string;
 }
+
+export interface ContentFormatInfo {
+  label: string;
+  description: string;
+  color: string;
+  /** Whether this format implies full-width layout */
+  fullWidth: boolean;
+  /** Whether this format disables table of contents */
+  noTableOfContents: boolean;
+  /** Whether pages of this format should be graded */
+  graded: boolean;
+}
+
+export const CONTENT_FORMAT_INFO: Record<ContentFormat, ContentFormatInfo> = {
+  article: {
+    label: "Article",
+    description: "Standard wiki article with prose content",
+    color: "bg-blue-500/20 text-blue-400 border-blue-500/40",
+    fullWidth: false,
+    noTableOfContents: false,
+    graded: true,
+  },
+  table: {
+    label: "Table",
+    description: "Interactive comparison or data table",
+    color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/40",
+    fullWidth: true,
+    noTableOfContents: true,
+    graded: true,
+  },
+  diagram: {
+    label: "Diagram",
+    description: "Visualization or interactive diagram",
+    color: "bg-orange-500/20 text-orange-400 border-orange-500/40",
+    fullWidth: true,
+    noTableOfContents: true,
+    graded: true,
+  },
+  index: {
+    label: "Index",
+    description: "Browse or navigation page",
+    color: "bg-slate-500/20 text-slate-400 border-slate-500/40",
+    fullWidth: true,
+    noTableOfContents: true,
+    graded: false,
+  },
+  dashboard: {
+    label: "Dashboard",
+    description: "Metrics and analytics dashboard",
+    color: "bg-slate-500/20 text-slate-400 border-slate-500/40",
+    fullWidth: true,
+    noTableOfContents: true,
+    graded: false,
+  },
+};
 
 export const PAGE_TYPE_INFO: Record<PageType, PageTypeInfo> = {
   content: {
