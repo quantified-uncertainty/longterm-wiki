@@ -1,31 +1,29 @@
 ---
-title: Canada AIDA
-description: Canada's proposed Artificial Intelligence and Data Act, a comprehensive federal AI regulation that died in Parliament in 2025, offering critical lessons about the challenges of AI governance and the risks of framework legislation approaches.
+title: "Canada AIDA"
+description: "Canada's proposed Artificial Intelligence and Data Act, a comprehensive federal AI regulation that died in Parliament in 2025, offering critical lessons about the challenges of AI governance and the risks of framework legislation approaches."
 sidebar:
   order: 24
-quality: 72
-llmSummary: Canada's Artificial Intelligence and Data Act (AIDA), introduced June 2022, died in Parliament January 2025 without passage, offering critical lessons on AI governance failure. Key problems included framework legislation deferring definitions to regulations, omnibus bill structure bundling AI with privacy reform, exclusionary consultation (9 of 300+ meetings with civil society), and inability to satisfy either industry (wanted clarity) or civil society (wanted stronger protections), with maximum proposed penalties of CAD $15M/5% revenue and up to 5 years imprisonment.
-lastEdited: "2025-12-28"
-importance: 68.5
+llmSummary: "Comprehensive analysis of Canada's failed Artificial Intelligence and Data Act (AIDA), which died in Parliament in January 2025 after three years of development. Documents specific failure modes including framework legislation problems, exclusionary consultation (9 of 300+ meetings with civil society), and provides scenario analysis with probability estimates for future Canadian AI regulation approaches."
+lastEdited: "2026-02-11"
+importance: 42
 update_frequency: 7
-todos:
-  - Complete 'Quick Assessment' section (4 placeholders)
-  - Complete 'How It Works' section
-  - Complete 'Limitations' section (6 placeholders)
 ratings:
-  novelty: 6.2
-  rigor: 6.8
-  actionability: 7.1
-  completeness: 7.5
+  focus: 4.5
+  novelty: 3.2
+  rigor: 4.1
+  concreteness: 5.8
+  actionability: 4.3
+  objectivity: 3.8
 metrics:
-  wordCount: 3411
-  citations: 19
+  wordCount: 2396
+  citations: 18
   tables: 15
-  diagrams: 1
+  diagrams: 2
 clusters:
-  - governance
-  - ai-safety
-subcategory: governance-legislation
+  - "governance"
+  - "ai-safety"
+subcategory: "governance-legislation"
+quality: 46
 ---
 import {DataInfoBox, R, Mermaid, EntityLink} from '@components/wiki';
 
@@ -52,7 +50,7 @@ The stakes of AIDA's failure extend beyond Canada's borders. As a G7 member and 
 | **Criminal Sanctions** | Up to 5 years imprisonment for serious harm offenses |
 | **Key Exclusions** | Government institutions, national security applications |
 
-*Source: <R id="3c74d1ac7695604e">Government of Canada AIDA Companion Document</R>*
+*Source: [Government of Canada AIDA Companion Document](https://www.ic.gc.ca/eic/site/693.nsf/eng/00196.html)*
 
 ### Legislative Timeline
 
@@ -74,244 +72,279 @@ flowchart TD
     style G fill:#9E9E9E
 `} />
 
-The diagram shows how AIDA moved from initial introduction through a prolonged committee process. The <R id="931d5735344da4c0">November 2023 amendments</R> represented a significant pivot, introducing new concepts like general-purpose AI regulation. However, the <R id="072cc2f513f3b23f">April 2024 open letter</R> from nearly 60 civil society organizations calling for AIDA's withdrawal signaled that stakeholder consensus remained elusive. Parliament's prorogation in January 2025 terminated all pending legislation, including Bill C-27.
+## Quick Assessment
 
-## Legislative Architecture and Requirements
+AIDA's failure provides critical insights across four key dimensions of AI governance effectiveness:
 
-### Definitional Framework
+| Assessment Dimension | Rating | Analysis |
+|---------------------|--------|----------|
+| **Technical Feasibility** | ⚠️ Low | Risk assessment requirements unworkable with current AI interpretability limitations; "high-impact" thresholds undefined |
+| **Political Sustainability** | ❌ Failed | Omnibus structure created coalition of opponents; framework approach satisfied neither industry nor civil society |
+| **Implementation Readiness** | ⚠️ Poor | No institutional capacity for AI Commissioner role; enforcement mechanisms untested and potentially unworkable |
+| **International Alignment** | ⚠️ Mixed | Neither aligned with EU AI Act nor distinct from US approach; created compliance fragmentation for global companies |
 
-AIDA's core innovation was focusing regulation on "high-impact" AI systems rather than attempting to regulate all AI applications. The bill defined these as systems that could have "significant impact" on individuals across four critical domains: employment decisions, access to services and opportunities, health and safety outcomes, and economic interests. This approach aimed to capture consequential AI while avoiding over-regulation of low-risk applications like recommendation engines or basic automation.
+*Source: [Cambridge Data & Policy: Missed Opportunities Analysis](https://www.cambridge.org/core/journals/data-and-policy/article/missed-opportunities-in-ai-regulation-lessons-from-canadas-ai-and-data-act/5178DE82B270CD41FA3B7ECFC94BF810)*
 
-However, the bill's definitional structure became a major source of controversy. AIDA was explicitly designed as "framework legislation"—a skeleton law that would delegate the crucial task of defining terms like "high-impact AI system," "significant harm," and "biased output" to future regulations. Critics argued this approach violated democratic principles by allowing the executive branch to determine the law's actual scope without parliamentary oversight. The framework approach created profound uncertainty for businesses, who couldn't assess compliance obligations until regulations were written, potentially years after the law's passage.
+## How It Works
 
-The bill also attempted to address general-purpose AI (GPAI) systems in amendments proposed in November 2023, recognizing that foundation models like GPT-4 required different treatment than specific-use AI applications. These provisions would have required GPAI providers to assess systemic risks and implement safeguards, but the definitions remained vague and the requirements largely aspirational.
+AIDA was designed as a risk-based regulatory framework that would have operated through several interconnected mechanisms, though none were ever implemented due to the bill's death:
+
+### Risk Classification System
+
+The legislation proposed a binary classification system distinguishing "high-impact" AI systems requiring full regulatory compliance from other AI applications subject only to basic transparency requirements. The "high-impact" designation would apply to systems that could "reasonably be expected" to have significant effects on individuals in four critical areas:
+
+- **Employment decisions**: Hiring, firing, promotion, or work assignment algorithms
+- **Access to services**: Financial services, healthcare, education, or housing decisions  
+- **Health and safety outcomes**: Medical diagnosis, autonomous vehicle controls, industrial safety systems
+- **Economic interests**: Credit scoring, insurance underwriting, or fraud detection systems
+
+However, the specific thresholds and assessment criteria would have been defined through future regulations, creating fundamental uncertainty about the law's actual scope.
+
+### Compliance Framework Architecture
+
+<Mermaid chart={`
+flowchart TD
+    A[AI System Development] --> B{High-Impact Assessment}
+    B -->|Yes| C[Risk Assessment Required]
+    B -->|No| D[Basic Transparency Only]
+    
+    C --> E[Document Potential Harms]
+    E --> F[Implement Mitigation Measures]
+    F --> G[Establish Human Oversight]
+    G --> H[Monitor System Performance]
+    H --> I[Report to AI Commissioner]
+    
+    D --> J[Plain Language Description]
+    J --> K[User Notification Requirements]
+    
+    I --> L{Commissioner Review}
+    L -->|Compliant| M[Continue Operation]
+    L -->|Non-Compliant| N[Enforcement Action]
+    
+    style C fill:#ff9999
+    style I fill:#ffcc99
+    style N fill:#ff6666
+`} />
 
 ### Operational Requirements
 
-For systems meeting the "high-impact" threshold, AIDA prescribed a comprehensive risk management framework. Organizations would be required to conduct systematic risk assessments before deployment, identifying potential harms to individuals and evaluating their likelihood and severity. These assessments would need to be documented, regularly updated, and made available to the proposed AI and Data Commissioner upon request.
+For high-impact systems, AIDA would have mandated a comprehensive risk management lifecycle:
 
-The mitigation requirements represented AIDA's core regulatory mechanism. Organizations would need to implement concrete safeguards against identified risks, monitor their effectiveness over time, and update measures as systems evolved or new risks emerged. The bill mandated "appropriate human oversight" but left the definition of "appropriate" to future interpretation, creating another area of regulatory uncertainty.
+1. **Pre-deployment Risk Assessment**: Organizations would conduct systematic analysis of potential harms, their likelihood, and severity before system deployment
+2. **Mitigation Implementation**: Required safeguards against identified risks, with documented effectiveness measures
+3. **Human Oversight**: "Appropriate" human supervision of AI decision-making, though specific requirements undefined
+4. **Transparency Obligations**: Plain-language descriptions of system functionality and decision processes
+5. **Individual Notification**: Users must be informed when AI systems affect decisions about them
+6. **Ongoing Monitoring**: Continuous assessment of system performance and emerging risks
+7. **Commissioner Reporting**: Regular submissions to the AI and Data Commissioner for compliance review
 
-Transparency provisions aimed to address the "black box" problem in AI decision-making. Organizations would need to publish plain-language descriptions of their AI systems' functionality and decision-making processes. When AI systems made decisions affecting individuals, those individuals would need to be notified that AI was involved. However, the bill provided limited detail on the format, timing, or substance of these disclosures, leaving significant implementation questions unresolved.
+### Enforcement Mechanisms
 
-### Enforcement and Penalties
+The proposed AI and Data Commissioner would have operated through a graduated enforcement approach:
 
-AIDA proposed creating a new AI and Data Commissioner with broad oversight authority, including the power to conduct audits, issue compliance orders, and impose administrative penalties. This represented a significant expansion of Canada's regulatory apparatus, requiring new hiring, training, and institutional development. The Commissioner would also have research and guidance functions, positioning the office as both enforcer and educator.
+| Enforcement Level | Trigger | Tools Available | Maximum Penalties |
+|------------------|---------|-----------------|------------------|
+| **Guidance** | New deployments, uncertainty | Best practice documents, technical standards | None |
+| **Administrative** | Non-compliance, reporting failures | Compliance orders, administrative penalties | CAD \$15M or 5% global revenue |
+| **Criminal** | Serious harm, willful violations | Criminal prosecution, imprisonment | CAD \$10M, 3% revenue, 5 years prison |
+| **Emergency** | Imminent public harm | Immediate system shutdown orders | Varies by situation |
 
-The bill's criminal provisions targeted the most egregious AI harms through a two-tiered structure. It would be an offense to knowingly or recklessly possess or use AI systems causing "serious harm," with maximum penalties of CAD \$10 million or 3% of global revenue, whichever was higher. Lesser offenses carried fines up to CAD \$10,000 for individuals or CAD \$50,000 for organizations. However, the criminal threshold of "serious harm" was set deliberately high, leading civil society groups to argue that most algorithmic discrimination and bias would escape criminal sanction.
+*Source: [McInnes Cooper AIDA Analysis](https://www.mcinnescooper.com/publications/the-demise-of-the-artificial-intelligence-and-data-act-aida-5-key-lessons/)*
 
-### Penalty Structure Comparison
+## Limitations
 
-AIDA's penalties were designed to be among the most stringent globally, exceeding even GDPR fines in some categories:
+AIDA's design contained fundamental flaws that ultimately contributed to its failure, offering important lessons for future AI governance efforts:
 
-| Offense Category | AIDA (Proposed) | EU AI Act | GDPR |
-|-----------------|-----------------|-----------|------|
-| **Maximum Administrative** | CAD \$15M or 5% global revenue | EUR 35M or 7% global revenue | EUR 20M or 4% global revenue |
-| **Serious Criminal** | CAD \$10M or 3% global revenue | EUR 15M or 3% global revenue | N/A |
-| **Individual Criminal** | Up to 5 years imprisonment | N/A | N/A |
-| **Minor Violations** | CAD \$10K-\$10K | EUR 7.5M or 1.5% global revenue | Case-by-case |
-| **Enforcement Body** | AI and Data Commissioner | National authorities | Data Protection Authorities |
+### Framework Legislation Problems
 
-*Sources: <R id="db2042c850b3f5ee">Cox & Palmer AIDA Analysis</R>, <R id="826429b38b01aba0">Fasken Comparative Analysis</R>*
+The bill's approach of deferring crucial definitions to future regulations created a democratic deficit that undermined stakeholder support. Key terms like "high-impact AI system," "significant harm," and "biased output" would have been defined by bureaucratic processes rather than parliamentary debate. This meant that Parliament could not properly evaluate the bill's actual impact, while businesses faced complete uncertainty about compliance obligations. [Montreal AI Ethics Institute analysis](https://montrealethics.ai/the-death-of-canadas-artificial-intelligence-and-data-act-what-happened-and-whats-next-for-ai-regulation-in-canada/) noted that this approach "violated basic principles of democratic governance by allowing the executive to determine law's scope without legislative oversight."
 
-Notably, AIDA was unique among major AI regulatory frameworks in proposing criminal sanctions including imprisonment, reflecting Canada's approach to treating the most serious AI harms as comparable to other forms of criminal negligence.
+### Technical Feasibility Gaps
 
-## The Politics of Failure
+The risk assessment requirements reflected aspirational thinking rather than technical reality. Current AI systems often exhibit emergent behaviors difficult to predict during development, making prospective harm identification inherently limited. The bill provided no guidance for assessing risks from rapidly evolving systems that undergo continuous learning or regular model updates. Academic experts questioned whether meaningful risk assessment was possible given current limitations in <EntityLink id="ai-alignment">AI interpretability</EntityLink> and <EntityLink id="ai-transparency">AI transparency</EntityLink> research.
 
-### Parliamentary Process and Omnibus Structure
+### Stakeholder Consultation Failures  
 
-AIDA's failure began with its legislative packaging. The government embedded AI regulation within Bill C-27, a massive omnibus bill that also reformed consumer privacy law through the Consumer Privacy Protection Act (CPPA) and created new data mobility rights. This structure reflected political expedience—the government wanted to present a comprehensive "digital charter" addressing multiple technology concerns—but proved strategically disastrous.
+The [Cambridge University study](https://www.cambridge.org/core/journals/data-and-policy/article/missed-opportunities-in-ai-regulation-lessons-from-canadas-ai-and-data-act/5178DE82B270CD41FA3B7ECFC94BF810) documented severe consultation process failures: before June 2022 tabling, no public consultations occurred, and subsequent engagement involved over 300 invitation-only meetings where only nine included civil society representatives. Marginalized communities, workers vulnerable to AI impacts, and advocacy organizations were systematically excluded from drafting and development processes.
 
-The omnibus approach meant that any controversy in one part could sink the entire bill. Privacy reform attracted fierce lobbying from business groups concerned about compliance costs and enforcement mechanisms. AI regulation faced criticism from both industry (over uncertainty) and civil society (over weak protections). Data portability provisions raised complex technical questions about implementation. Rather than building coalition support for any single reform, the government created a target-rich environment for opposition.
+### Institutional Capacity Shortfalls
 
-Parliamentary procedure compounded these problems. Committee study of the bill stretched across multiple sessions as witnesses raised hundreds of concerns requiring government response. The proposed amendments in November 2023 were substantial enough to constitute virtually a new bill, but political convention prevented starting the legislative process fresh. By 2024, it became clear the bill was too complex and controversial to pass before the next election.
+Creating the proposed AI and Data Commissioner would have required substantial expertise in AI technology, regulatory enforcement, legal analysis, and policy development—skills in short supply in government. The office would have needed to develop enforcement guidelines, compliance frameworks, and technical assessment capabilities from scratch, with no established precedents or international coordination mechanisms. The bill provided minimal guidance on resource allocation, priority-setting, or performance measurement for this new regulatory institution.
 
-### Industry and Civil Society Opposition
+### International Misalignment Issues
 
-AIDA faced opposition from unexpected quarters, illustrating the difficulty of crafting AI regulation that satisfies diverse stakeholders. Canada's technology sector, generally supportive of reasonable regulation, criticized the framework approach for creating business uncertainty. Major AI companies argued that undefined terms made compliance planning impossible and that overly broad definitions could capture beneficial AI applications.
+AIDA's definitions and requirements aligned poorly with emerging international standards. The "high-impact" classification system differed significantly from the EU AI Act's four-tier risk approach, creating compliance fragmentation for global companies. Simultaneously, the framework was more restrictive than the US sectoral approach, potentially disadvantaging Canadian AI development. [White & Case analysis](https://www.whitecase.com/insight-alert/artificial-intelligence-and-data-act-introduced-canada-parliament) highlighted that this misalignment would have forced multinational companies to maintain separate compliance systems for Canada, increasing costs and complexity without clear safety benefits.
 
-The Canadian Chamber of Commerce and other business groups focused on international competitiveness concerns. They noted that AIDA would be more restrictive than the absence of federal AI law in the United States, potentially disadvantaging Canadian AI development. Simultaneously, they argued it was less comprehensive than the EU AI Act, creating regulatory fragmentation for companies operating globally.
+### Enforcement Practicality Problems
 
-Civil society organizations attacked AIDA from the opposite direction, arguing its protections were inadequate. Groups like the Citizen Lab and <R id="072cc2f513f3b23f">Canadian Civil Liberties Association</R> highlighted that the criminal prohibition applied only to "serious harm"—a threshold so high it would rarely be met. They also criticized weak transparency requirements, exemptions for government AI systems, and the lack of private rights of action for individuals harmed by AI decisions.
+The criminal provisions set the "serious harm" threshold so high that most cases of <EntityLink id="algorithmic-bias">algorithmic bias</EntityLink> and discrimination would escape sanction. Civil society groups noted that proving "serious harm" with required criminal law certainty would be nearly impossible given current understanding of AI system causation. Additionally, the lack of private rights of action meant individuals harmed by AI decisions would have no direct legal recourse, relying entirely on the Commissioner's enforcement discretion.
 
-### Stakeholder Criticisms Summary
+## Post-Failure Analysis and Current Status
 
-The following table summarizes the major criticisms from different stakeholder groups, illustrating how AIDA failed to build consensus from any direction:
+### Federal Government Response
 
-| Stakeholder Group | Primary Concerns | Key Demands |
-|-------------------|------------------|-------------|
-| **Industry/Tech Sector** | Regulatory uncertainty, undefined terms, compliance costs | Clear definitions, longer implementation timeline |
-| **Civil Society** | Weak protections, high "serious harm" threshold, no private rights of action | Stronger enforcement, individual remedies, lower harm thresholds |
-| **Labor Unions** | No worker protections, automation impacts ignored | Labor rights provisions, algorithmic management rules |
-| **Indigenous Groups** | Data sovereignty not addressed, excluded from consultation | Indigenous data governance, meaningful participation |
-| **Academics** | Risk assessment impractical, definitional vagueness | Technical standards, independent research funding |
-| **Provincial Governments** | Federal overreach, coordination gaps | Provincial consultation, clear jurisdictional boundaries |
+Following AIDA's death in January 2025, the Mark Carney Liberal government has signaled a fundamental shift in approach to AI regulation. The appointment of Evan Solomon as Canada's first federal Minister of Artificial Intelligence and Digital Innovation in September 2025 marked a new direction emphasizing economic opportunity over comprehensive regulation. [Policy Options IRPP reported](https://policyoptions.irpp.org/2025/09/ai-government/) that Minister Solomon "came to office vowing the government wouldn't 'over-index' on AI regulation," instead focusing on AI as a tool to deliver government services more efficiently.
 
-*Sources: <R id="4513a259cfc847a8">Montreal AI Ethics Institute Analysis</R>, <R id="2a2365be0b3f496c">Cambridge Data & Policy Study</R>*
+The current federal approach prioritizes regulating AI through existing privacy legislation rather than creating new AI-specific laws. [Osler's 2025 Legal Outlook](https://www.osler.com/en/insights/reports/2025-legal-outlook/canadas-2026-privacy-priorities-data-sovereignty-open-banking-and-ai/) notes that "the current federal government has indicated that it will seek to regulate AI through privacy legislation, policy and investment, rather than overarching AI-specific legislation." This represents a significant retreat from the comprehensive regulatory approach that AIDA embodied.
 
-A <R id="2a2365be0b3f496c">Cambridge University study</R> documented that AIDA's consultation process was particularly problematic: before tabling in June 2022, no public consultations were conducted, and subsequent engagement included over 300 invite-only meetings where only nine involved civil society representatives. The study noted that "sectors and workers vulnerable to the impacts of AI systems, marginalized communities, and civil society organizations were largely excluded from participating in the drafting and development of the AIDA."
+### Provincial Regulatory Responses
 
-Academic experts added technical criticisms, questioning whether the risk assessment framework was workable given the current state of AI interpretability research. They noted that requiring organizations to identify potential harms prospectively was challenging when AI capabilities and failure modes remained poorly understood.
+With federal leadership absent, provinces have moved to fill the AI governance gap through targeted measures:
 
-## International Context and Comparative Analysis
+| Province | Initiative | Scope | Status |
+|----------|-----------|-------|--------|
+| **Ontario** | Bill 194 (Protecting Workers from Artificial Intelligence Act) | Public sector AI use: hospitals, education, law enforcement, ministries | Active |
+| **Quebec** | Law 25 expansion + MCN AI principles | Private sector data protection + public sector AI governance | Leading framework |
+| **British Columbia** | AI Ethics Framework development | Public sector AI procurement and deployment | Under development |
+| **Alberta** | Digital Technology Review | AI in healthcare and social services | Consultation phase |
 
-### Diverging Global Approaches
+*Source: [Schwartz Reisman Institute: What's Next After AIDA?](https://srinstitute.utoronto.ca/news/whats-next-for-aida)*
 
-AIDA's development occurred during a critical period of international AI governance, as major jurisdictions pursued different regulatory strategies. The European Union was finalizing its comprehensive AI Act, which categorizes AI systems into risk tiers and prescribes detailed requirements for each category. The United States maintained its sectoral approach, relying on existing agencies and laws rather than creating new AI-specific regulation. China continued developing its own framework emphasizing state control and national security considerations.
+Quebec has emerged as the de facto leader in Canadian AI governance. The province's Ministère de la Cybersécurité et du Numérique (MCN) has adopted comprehensive principles for responsible AI use by public bodies, while Law 25's expanded data protection provisions now serve as the primary AI-related regulatory framework for many Canadian organizations. [Schwartz Reisman Institute analysis](https://srinstitute.utoronto.ca/news/whats-next-for-aida) indicates that "Quebec's Law 25 has taken over the spotlight as the primary AI regulation framework in the absence of federal legislation."
 
-### International Regulatory Comparison
+### International Implications and Competitive Position
 
-| Dimension | Canada (AIDA) | EU AI Act | United States | China |
-|-----------|--------------|-----------|---------------|-------|
-| **Approach** | Framework legislation | Prescriptive risk-based | Sectoral/agency-based | State-directed |
-| **Risk Categories** | High-impact only | 4 tiers (minimal to unacceptable) | Sector-specific | Application-specific |
-| **Definition Clarity** | Deferred to regulations | Detailed in legislation | Varies by sector | Evolving |
-| **GPAI Provisions** | Added via 2023 amendments | Comprehensive Chapter V | Limited | Generative AI rules |
-| **Criminal Penalties** | Yes (up to 5 years) | No | Sector-dependent | Yes |
-| **Private Rights** | No | Limited | Sector-dependent | Limited |
-| **Implementation Timeline** | Never implemented | 2025-2027 | Ongoing | Ongoing |
-| **Current Status** | Dead | In force | No comprehensive law | Active |
+AIDA's failure has significantly damaged Canada's position in international AI governance forums. [Xenoss analysis](https://xenoss.io/blog/ai-regulation-canada) from May 2025 notes that "Canada was once a global leader in AI research, but by 2025, it has been overtaken by countries like the U.S., China, France, Germany, and the UK—mainly due to policy inertia and delayed implementation." The absence of federal AI regulation leaves Canada unable to contribute meaningfully to G7 and OECD discussions on AI governance standards.
 
-*Source: <R id="6301563c9b9e4ee1">White & Case Global AI Regulatory Tracker</R>*
+This regulatory gap creates particular challenges in the context of evolving US-Canada trade relationships. The Trump administration's December 2025 executive order establishing an "AI Litigation Task Force to challenge state AI laws deemed inconsistent with federal policy" signals increased US federal involvement in AI governance, potentially pressuring Canada to develop compatible frameworks or risk trade disputes.
 
-AIDA represented an attempt to chart a middle course between these approaches. It was more comprehensive than US sectoral regulation but less detailed than the EU's prescriptive framework. The bill aimed to provide regulatory certainty without stifling innovation, but this balancing act proved politically unsustainable. Industry wanted either no regulation (like the US) or clear, detailed requirements (like the EU). Civil society wanted stronger protections regardless of innovation concerns.
+### Industry and Civil Society Reactions
 
-The timing of AIDA's development proved particularly challenging. As the EU AI Act moved toward implementation, Canadian stakeholders increasingly demanded either full alignment with EU requirements (to ease compliance for global companies) or explicit divergence with clear justification. The government's attempt to develop an independent Canadian approach satisfied neither constituency.
+The technology sector's response to AIDA's death has been mixed. While some organizations expressed relief at avoiding immediate compliance obligations, [Montreal AI Ethics Institute](https://montrealethics.ai/the-death-of-canadas-artificial-intelligence-and-data-act-what-happened-and-whats-next-for-ai-regulation-in-canada/) reports that many companies now face greater uncertainty operating without clear federal guidance while navigating a "patchwork of provincial regulations and international requirements."
 
-### Lessons from EU AI Act Implementation
+Civil society organizations have largely viewed AIDA's failure as an opportunity to advocate for stronger protections in future legislation. However, the current federal government's deregulatory stance suggests that comprehensive AI legislation may not be forthcoming in the near term, leading some advocacy groups to focus their efforts at provincial levels or through privacy law reforms.
 
-The EU AI Act's successful passage in 2024 highlighted AIDA's weaknesses by contrast. The EU legislation succeeded by providing detailed, prescriptive requirements that gave businesses clarity about compliance obligations. While the EU approach was criticized as overly complex, it avoided the framework legislation trap that doomed AIDA. Businesses knew what would be required, even if they disagreed with specific provisions.
+## Scenario Analysis for Future Canadian AI Regulation
 
-The EU also benefited from a different political structure. The European Parliament, Commission, and Council each had distinct roles in developing the legislation, with multiple opportunities for revision and refinement. Canada's Westminster system provided fewer formal mechanisms for incorporating stakeholder feedback and building consensus.
+Based on current political dynamics and international trends, several scenarios emerge for Canada's AI governance future:
 
-Most importantly, the EU framed AI regulation as essential for maintaining European values and competitiveness in a global technology race. This narrative created political momentum that sustained the legislation through years of development. Canada struggled to articulate a similarly compelling rationale for AI regulation, particularly given the absence of major Canadian AI companies facing immediate regulatory pressure.
+### Scenario 1: Sectoral Approach (Probability: 45%)
 
-## Technical and Implementation Challenges
+**Timeline**: 2026-2027  
+**Description**: The federal government pursues domain-specific AI regulations through existing sectoral regulators rather than comprehensive legislation.
 
-### The Definition Problem
+| Sector | Regulatory Agency | Likely Requirements | Implementation Timeline |
+|--------|------------------|-------------------|----------------------|
+| **Financial Services** | OSFI, provincial securities commissions | <EntityLink id="ai-risk-assessment">AI risk assessments</EntityLink> for credit/underwriting | 2026 |
+| **Healthcare** | Health Canada, provincial health authorities | <EntityLink id="algorithmic-accountability">AI system validation</EntityLink> for medical devices | 2027 |
+| **Employment** | Labour Canada, provincial labour boards | Disclosure requirements for hiring algorithms | 2026 |
+| **Transportation** | Transport Canada | Safety standards for <EntityLink id="foundation-models">autonomous vehicle AI</EntityLink> | 2027-2028 |
 
-AIDA's core challenge was defining "artificial intelligence" and "high-impact systems" in legally workable terms. The bill defined AI broadly as any system that processes data to generate content, make predictions, or recommend actions. Critics noted this definition could capture everything from simple spreadsheet formulas to advanced machine learning models, creating potential over-inclusion problems.
+This approach would build on existing regulatory expertise and avoid the political complexities that doomed AIDA. However, it would create regulatory gaps for AI applications that span multiple sectors and could result in inconsistent standards across domains.
 
-The "high-impact" concept was more innovative but equally problematic. The bill proposed that systems would be high-impact if they could "reasonably be expected" to have significant effects on individuals. However, determining such expectations requires predicting AI system behavior in complex real-world environments—a task that remains challenging even for AI developers themselves.
+### Scenario 2: Provincial Patchwork Expansion (Probability: 35%)
 
-The framework approach exacerbated these definitional challenges by deferring crucial determinations to future regulations. Unlike in a detailed statutory scheme, stakeholders couldn't evaluate AIDA's actual impact because its scope would only be determined through subsequent regulatory processes. This created a classic legislative chicken-and-egg problem: Parliament couldn't properly evaluate the bill without knowing its scope, but the scope couldn't be determined without passing the bill.
+**Timeline**: Ongoing  
+**Description**: Provincial governments continue expanding their AI governance frameworks in the absence of federal leadership.
 
-### Risk Assessment Practicalities
+The Quebec-Ontario model could spread to other provinces, creating a complex compliance environment. [Schwartz Reisman Institute](https://srinstitute.utoronto.ca/news/whats-next-for-aida) analysis suggests this would result in:
 
-AIDA's risk assessment requirements reflected best practices from AI ethics literature but faced serious implementation challenges. The bill required organizations to identify potential harms, assess their likelihood and severity, and implement corresponding mitigation measures. However, current AI systems often exhibit emergent behaviors that are difficult to predict during development, making prospective risk assessment inherently limited.
+- **Compliance fragmentation**: Companies operating nationally would face multiple regulatory requirements
+- **Regulatory competition**: Provinces might compete by offering more permissive AI rules to attract investment  
+- **Innovation barriers**: Smaller companies could struggle with multi-jurisdictional compliance costs
+- **Constitutional challenges**: Federal-provincial jurisdiction disputes over AI regulation
 
-The bill also failed to address how organizations should conduct risk assessments for rapidly evolving AI systems. Many modern AI applications involve continuous learning or regular model updates, potentially changing risk profiles after initial assessment. AIDA provided no guidance on how frequently assessments should be updated or what changes would trigger reassessment requirements.
+### Scenario 3: Comprehensive Reintroduction (Probability: 15%)
 
-Technical experts noted that effective risk assessment requires deep understanding of both AI systems and their deployment contexts. Most organizations lack such expertise, creating potential compliance challenges and possibly incentivizing box-checking exercises rather than substantive safety analysis.
+**Timeline**: 2028-2030  
+**Description**: A future federal government introduces new comprehensive AI legislation, incorporating lessons from AIDA's failure and international developments.
 
-### Enforcement Complexity
+Key improvements would likely include:
+- **Detailed statutory definitions** rather than framework legislation approach
+- **Standalone bill** avoiding omnibus structure problems  
+- **Enhanced stakeholder consultation** with mandatory public participation
+- **Phased implementation** allowing institutional capacity development
+- **International alignment** with EU AI Act and other major frameworks
 
-Creating the proposed AI and Data Commissioner would require substantial institutional development. The office would need staff with expertise in AI technology, regulatory enforcement, legal analysis, and policy development—skills in short supply in government. The Commissioner would also need to develop enforcement guidelines, compliance frameworks, and technical assessment capabilities.
+### Scenario 4: Status Quo Continuation (Probability: 25%)
 
-The bill provided little guidance on how the Commissioner should prioritize enforcement actions or allocate limited resources across potentially thousands of AI systems. Unlike traditional regulatory domains where violations are relatively clear-cut, AI regulation involves complex technical judgments about system behavior and risk levels that could strain traditional enforcement approaches.
+**Timeline**: Indefinite  
+**Description**: No new federal AI legislation emerges, with governance relying on existing privacy laws and provincial initiatives.
 
-International coordination presented additional challenges. With different countries developing different AI regulatory frameworks, the Commissioner would need to navigate questions of extraterritorial jurisdiction, mutual recognition of compliance assessments, and coordination with foreign regulators—areas where AIDA provided minimal guidance.
-
-## Current Status and Future Prospects
-
-### Immediate Aftermath
-
-AIDA's death in January 2025 left Canada without comprehensive AI regulation at precisely the moment when such governance is becoming crucial. The federal election results will largely determine whether similar legislation is reintroduced, but early indicators suggest the new government is likely to pursue some form of AI regulation given growing public concern and international pressure.
-
-Provincial governments may attempt to fill the regulatory gap. Quebec has been developing its own AI governance framework, building on its existing privacy legislation and AI ethics principles. Ontario has also signaled interest in AI regulation, particularly for public sector applications. However, provincial regulation would create a fragmented compliance environment that could complicate business operations and limit effectiveness.
-
-The business community's response has been mixed. Some organizations expressed relief at avoiding immediate compliance obligations, while others noted that regulatory uncertainty continues without clear federal guidance. International companies operating in Canada face particular challenges, needing to comply with EU AI Act requirements in Europe while operating under different standards in Canada.
-
-### Scenario Analysis for Reintroduction
-
-Multiple pathways exist for future Canadian AI regulation. The <R id="b3259737aa13e1c4">Schwartz Reisman Institute</R> and other policy analysts have identified several potential directions:
-
-| Scenario | Probability | Timeline | Key Features | Implications |
-|----------|-------------|----------|--------------|--------------|
-| **Comprehensive Reintroduction** | 25-35% | 2027-2029 | Prescriptive requirements, detailed definitions, independent regulator | High certainty, slower implementation, EU alignment possible |
-| **Sectoral Approach** | 35-45% | 2026-2027 | Domain-specific rules (healthcare, employment, finance) | Faster deployment, regulatory gaps, builds on existing agencies |
-| **Voluntary Framework** | 15-25% | 2025-2026 | Industry codes, government guidance, no penalties | Low compliance burden, limited effectiveness, innovation-friendly |
-| **Provincial Patchwork** | 20-30% | Ongoing | Ontario Bill 194 as model, Quebec framework | Fragmented compliance, jurisdictional gaps, uneven protection |
-
-A **comprehensive reintroduction** scenario would see the new government introduce similar legislation, potentially incorporating lessons from AIDA's failure and the EU AI Act's implementation experience. This approach might abandon the framework structure in favor of more detailed statutory requirements, potentially adding 2-3 years to the legislative timeline but creating greater certainty.
-
-A **sectoral approach** would regulate AI applications within specific domains—employment, healthcare, financial services—rather than attempting comprehensive coverage. This strategy could build on existing regulatory frameworks and expertise but would create gaps and inconsistencies across sectors. Implementation would be faster but potentially less effective for addressing AI risks that span multiple domains.
-
-The **voluntary framework** option would see the government issue guidance and principles for AI development and deployment without legal requirements. This approach would have lower compliance costs and faster implementation but would lack enforcement mechanisms and might not address the most serious AI risks.
-
-A **wait-and-see** approach would defer new legislation while monitoring the EU AI Act's implementation and other international developments. This strategy minimizes near-term regulatory burden but risks leaving Canada behind as other jurisdictions develop AI governance expertise and frameworks.
-
-### International Implications
-
-AIDA's failure affects broader international AI governance efforts. Canada was positioned as a potential middle-power leader in AI regulation, offering an alternative to both US market-driven approaches and EU regulatory approaches. The bill's collapse leaves the field more clearly divided between these two models, potentially reducing regulatory diversity and innovation.
-
-The failure also complicates international coordination efforts. The G7, OECD, and other multilateral forums rely on member countries having domestic AI governance frameworks to enable meaningful coordination. Canada's regulatory gap limits its ability to contribute to such discussions and may encourage other countries to adopt more cautious approaches to AI legislation.
-
-For the global AI industry, AIDA's failure reinforces the regulatory fragmentation that makes compliance planning challenging. Companies operating internationally must now navigate the EU AI Act, various US sectoral requirements, and potentially different approaches in other jurisdictions, without clear Canadian requirements to consider.
+This scenario would leave Canada increasingly isolated from international AI governance trends and could result in:
+- **Trade disadvantages**: Misalignment with partner country regulations affecting commerce
+- **Innovation risks**: Regulatory uncertainty limiting AI development and deployment  
+- **Protection gaps**: Insufficient safeguards for individuals affected by AI systems
+- **International marginalization**: Reduced influence in global AI governance forums
 
 ## Critical Lessons for AI Governance
 
-### Framework Legislation Risks
+### The Framework Legislation Trap
 
-AIDA's failure provides clear evidence of the risks inherent in framework legislation approaches to emerging technology regulation. While such approaches offer flexibility to address rapidly evolving technologies, they create unacceptable uncertainty for both regulated entities and affected individuals. The democratic deficit created by delegating key definitional questions to regulatory processes undermined political support from all stakeholder groups.
+AIDA's failure provides definitive evidence that framework legislation approaches are unsuitable for emerging technology regulation in parliamentary systems. The democratic legitimacy problems created by deferring key definitions to regulatory processes proved politically fatal. [McInnes Cooper's analysis](https://www.mcinnescooper.com/publications/the-demise-of-the-artificial-intelligence-and-data-act-aida-5-key-lessons/) concludes that "any future AI legislation must provide detailed, specific requirements in the statute itself, even if this requires more frequent legislative updates."
 
-Future AI legislation should prioritize specificity over flexibility, providing clear definitions and requirements even if they require periodic updating. The EU AI Act's detailed approach, while complex, offers superior guidance for compliance and enforcement compared to AIDA's framework structure.
+The EU AI Act's success demonstrates that detailed, prescriptive approaches—while complex—offer superior stakeholder buy-in compared to flexible framework approaches. Businesses prefer regulatory certainty even when requirements are burdensome, while civil society groups need specific protections to evaluate legislation's effectiveness.
 
-### Political Strategy Considerations
+### Consultation Process Criticality
 
-The omnibus bill structure that embedded AIDA within broader digital governance reform proved strategically disastrous. Each component attracted different opponents, creating a coalition against the entire package that was larger than opposition to any individual component. Future AI legislation should be introduced as standalone bills that can build focused political support.
+The [Cambridge study](https://www.cambridge.org/core/journals/data-and-policy/article/missed-opportunities-in-ai-regulation-lessons-from-canadas-ai-and-data-act/5178DE82B270CD41FA3B7ECFC94BF810) documenting AIDA's exclusionary consultation process highlights how procedural failures can doom substantively reasonable legislation. The bill's technical merits became irrelevant once stakeholder groups concluded they had been excluded from meaningful participation in its development.
 
-The timing of AI legislation also matters significantly. AIDA's three-year development process stretched across electoral cycles, allowing opposition to build and momentum to dissipate. Rapid passage may be necessary to avoid the political risks inherent in extended legislative processes, particularly for emerging technology issues that lack established stakeholder positions.
+Future AI governance efforts must prioritize inclusive consultation from the earliest stages, with particular attention to engaging marginalized communities most likely to face AI harms. The consultation process itself becomes a source of political legitimacy that can sustain legislation through implementation challenges.
 
-### Definitional and Technical Challenges
+### Institutional Readiness Requirements
 
-AIDA's struggles with defining "AI" and "high-impact systems" illustrate fundamental challenges in technology regulation. Legal definitions must be precise enough for compliance and enforcement but broad enough to capture relevant technological developments. Future legislation should consider functional rather than technological definitions, focusing on impacts and capabilities rather than specific technical implementations.
+Creating effective AI regulation requires substantial institutional development that cannot be accomplished overnight. The proposed AI Commissioner role would have required hiring specialized staff, developing technical assessment capabilities, creating enforcement procedures, and establishing international coordination mechanisms. AIDA provided no realistic timeline or resource allocation for this institutional development.
 
-The risk assessment framework concept remains sound but requires more detailed guidance and support mechanisms. Governments should consider developing standardized assessment tools, providing technical assistance for smaller organizations, and creating safe harbors for good-faith compliance efforts.
+Future AI legislation should either build on existing regulatory capacity or provide multi-year implementation timelines with dedicated funding for institutional development. The technical complexity of AI systems demands regulatory expertise that traditional government approaches may not accommodate.
 
-### Enforcement and Implementation
+### International Coordination Imperatives
 
-Creating new regulatory institutions like the proposed AI Commissioner requires substantial lead time and resources. Future AI legislation should either build on existing regulatory capacity or provide realistic timelines and funding for institutional development. The complexity of AI technology demands specialized expertise that traditional regulatory approaches may not accommodate.
+As AI systems increasingly operate across borders, domestic regulation cannot be developed in isolation from international frameworks. AIDA's misalignment with both EU and US approaches created compliance costs without corresponding safety or innovation benefits. The bill's failure demonstrates that middle-power countries like Canada cannot simply chart independent regulatory courses without considering competitive and diplomatic implications.
 
-International coordination should be considered from the outset rather than addressed retrospectively. As AI systems increasingly operate across borders, regulatory frameworks must account for jurisdictional complexity and coordination requirements from their initial design.
+Effective AI governance requires active engagement with international standard-setting processes and careful consideration of regulatory interoperability with major trading partners. This doesn't require complete harmonization, but does demand strategic thinking about where divergence is justified and where alignment is essential.
 
-AIDA's failure ultimately demonstrates that AI governance remains an unsolved problem even in jurisdictions committed to addressing it. The technical complexity, political sensitivity, and international dimensions of AI regulation create implementation challenges that existing legislative and regulatory approaches struggle to address. However, the urgency of AI governance means that policymakers cannot simply avoid these challenges—they must develop new approaches that learn from failures like AIDA while maintaining ambition for effective AI oversight.
+### Alternative Regulatory Pathways
 
-### Summary of Key Lessons
+AIDA's failure has forced Canada to explore alternative approaches to AI governance that other jurisdictions might also consider:
 
-| Lesson Category | What AIDA Got Wrong | Recommendation for Future Legislation |
+| Approach | Advantages | Disadvantages | Suitability |
+|----------|------------|---------------|-------------|
+| **Privacy Law Expansion** | Builds on existing frameworks, faster implementation | Limited scope, may miss AI-specific risks | Medium-term bridge solution |
+| **<EntityLink id="regulatory-sandboxes">Regulatory Sandbox</EntityLink> Programs** | Innovation-friendly, learning-oriented | Limited coverage, voluntary participation | Sectoral testing environments |
+| **Professional Standards Integration** | Industry expertise, self-regulation elements | Variable enforcement, capture risks | Technical standards development |
+| **Procurement Requirements** | Government leverage, immediate implementation | Public sector only, limited reach | Risk-free initial deployment |
+
+The current Canadian approach of combining privacy law expansion with provincial sectoral requirements may prove more politically sustainable than comprehensive federal legislation, though it creates coordination and coverage challenges.
+
+## Summary and Strategic Implications
+
+AIDA's failure represents more than a single legislative setback—it demonstrates the fundamental difficulties of governing emerging technologies through traditional regulatory approaches. The bill's death has left Canada without federal AI governance at precisely the moment when such frameworks are becoming essential for international competitiveness and public protection.
+
+The lessons from AIDA extend far beyond Canada's borders. Framework legislation approaches that defer key definitions to regulatory processes create unacceptable political and economic uncertainty. Omnibus legislative structures that bundle multiple complex reforms generate opposition coalitions larger than support for individual components. Exclusionary consultation processes undermine democratic legitimacy regardless of technical merit.
+
+Perhaps most significantly, AIDA's failure illustrates that even jurisdictions broadly supportive of AI regulation face enormous challenges translating policy intentions into workable law. Canada's AI research leadership, supportive public opinion, and regulatory capacity were insufficient to overcome the technical and political complexities of comprehensive AI governance.
+
+For the global AI governance community, AIDA serves as both cautionary tale and learning opportunity. The bill's flaws were identifiable and addressable, but the political system proved unable to make necessary corrections before momentum was lost. Future AI legislation efforts must account for these implementation realities from the outset rather than assuming technical solutions can overcome political and institutional constraints.
+
+The immediate impact of AIDA's death is Canada's marginalization from international AI governance leadership and the emergence of a complex provincial regulatory patchwork. The longer-term implications depend on whether future governments can learn from AIDA's mistakes to develop more effective approaches to AI governance—or whether the failure marks Canada's permanent retreat from comprehensive technology regulation.
+
+As [Montreal AI Ethics Institute](https://montrealethics.ai/the-death-of-canadas-artificial-intelligence-and-data-act-what-happened-and-whats-next-for-ai-regulation-in-canada/) concluded, "AIDA will be remembered by many as a national AI legislation failure." The question now is whether this failure will catalyze better approaches to AI governance or discourage future regulatory ambition in Canada and other jurisdictions facing similar challenges.
+
+### Key Lessons for Practitioners
+
+| Lesson Category | AIDA's Failure Mode | Recommendation for Future Efforts |
 |-----------------|--------------------|------------------------------------|
-| **Legislative Structure** | Framework approach deferred key definitions | Provide detailed, prescriptive requirements in statute |
-| **Political Strategy** | Omnibus bill created coalition of opponents | Standalone AI legislation with focused scope |
-| **Stakeholder Engagement** | Exclusionary consultation (9 of 300+ meetings with civil society) | Open, inclusive public consultation from earliest stages |
-| **Scope Definition** | Vague "high-impact" threshold | Clear, measurable criteria with sector-specific guidance |
-| **Institutional Design** | New commissioner without established capacity | Build on existing regulatory infrastructure |
-| **Rights Framework** | No private rights of action, weak remedies | Individual enforcement mechanisms, lower harm thresholds |
-| **International Alignment** | Neither aligned with EU nor distinct from US | Clear positioning relative to major frameworks |
-| **Timeline** | 3+ year process lost momentum | Faster passage or phased implementation |
+| **Legislative Design** | Framework approach created uncertainty | Provide detailed statutory requirements with clear definitions |
+| **Political Strategy** | Omnibus structure generated broad opposition | Standalone legislation with focused scope and clear benefits |
+| **Stakeholder Relations** | Exclusionary consultation (9 of 300+ meetings with civil society) | Open, inclusive public engagement from earliest development stages |
+| **Technical Standards** | Vague "high-impact" criteria | Measurable, testable criteria with sector-specific guidance |
+| **Institutional Planning** | No capacity development timeline | Multi-year implementation with dedicated institutional development |
+| **International Strategy** | Neither EU-aligned nor US-distinct | Clear positioning relative to major frameworks with justification |
+| **Implementation Timeline** | 3+ year process lost political momentum | Faster passage or credible phased implementation approach |
+| **Rights Framework** | No individual enforcement mechanisms | Private rights of action with accessible remedies |
 
-*Sources: <R id="42365d7c4104a03d">NEJM AI Analysis</R>, <R id="d44db02ed7d5d717">McInnes Cooper Key Lessons</R>*
-
-## References
-
-The following sources provide comprehensive analysis of AIDA's development, failure, and implications:
-
-- <R id="3c74d1ac7695604e">Government of Canada AIDA Companion Document</R> - Official government explanation of AIDA's provisions and objectives
-- <R id="06618a4f6d16e974">Parliament of Canada Bill C-27 Legislative Info</R> - Full legislative history and status
-- <R id="4513a259cfc847a8">Montreal AI Ethics Institute: The Death of AIDA</R> - Comprehensive post-mortem analysis
-- <R id="2a2365be0b3f496c">Cambridge Data & Policy: Missed Opportunities in AI Regulation</R> - Academic analysis of AIDA's consultation failures
-- <R id="42365d7c4104a03d">NEJM AI: Lessons from AIDA's Failure</R> - Healthcare-focused implications analysis
-- <R id="6301563c9b9e4ee1">White & Case Global AI Regulatory Tracker</R> - International comparative context
+*Sources: [Cambridge Data & Policy Analysis](https://www.cambridge.org/core/journals/data-and-policy/article/missed-opportunities-in-ai-regulation-lessons-from-canadas-ai-and-data-act/5178DE82B270CD41FA3B7ECFC94BF810), [McInnes Cooper Lessons Analysis](https://www.mcinnescooper.com/publications/the-demise-of-the-artificial-intelligence-and-data-act-aida-5-key-lessons/)*
 
 ---
 
 ## AI Transition Model Context
 
-AIDA's failure provides lessons for how legislation can affect the <EntityLink id="ai-transition-model" />:
+AIDA's failure provides lessons for how legislation can affect the transition to advanced AI systems:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="regulatory-capacity" /> | Framework legislation approach left key definitions to future regulations, creating uncertainty |
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="institutional-quality" /> | Omnibus structure bundling AI with privacy reform proved politically unworkable |
+| <EntityLink id="civilizational-competence">Civilizational Competence</EntityLink> | <EntityLink id="regulatory-capacity">Regulatory Capacity</EntityLink> | Framework legislation approach left key definitions to future regulations, demonstrating institutional inability to address technical complexity |
+| <EntityLink id="civilizational-competence">Civilizational Competence</EntityLink> | <EntityLink id="democratic-oversight">Democratic Oversight</EntityLink> | Exclusionary consultation process (9 of 300+ meetings with civil society) undermined democratic legitimacy |
+| <EntityLink id="civilizational-competence">Civilizational Competence</EntityLink> | <EntityLink id="technical-standards">Technical Standards Development</EntityLink> | Risk assessment requirements exceeded current AI interpretability capabilities, revealing gaps between regulatory ambition and technical reality |
 
-AIDA demonstrates that even AI-supportive jurisdictions face significant governance challenges; definitional vagueness and regulatory uncertainty can doom legislation despite strong initial support.
+AIDA demonstrates that even AI-supportive jurisdictions with strong research capacity face significant governance challenges when technical complexity meets political constraints and institutional limitations.
