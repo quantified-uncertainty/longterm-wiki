@@ -33,17 +33,11 @@ They require more design work and coordination but would significantly improve c
 
 **Suggested approach**: Have library functions throw errors or return error codes. Only the CLI entry point (`crux.mjs`) and top-level script shebangs should call `process.exit()`.
 
-## 4. Standardize `--ci` / `--json` Output Behavior
+## ~~4. Standardize `--ci` / `--json` Output Behavior~~ ✅ DONE
 
-**Problem**: Inconsistent handling of `--ci` and `--json` flags across commands:
-- Some commands treat `--ci` as JSON output
-- Some have separate `--json` and `--ci` flags with different behavior
-- Some commands don't support either flag
-
-**Suggested approach**: Define a convention:
-- `--json` = structured JSON output (for programmatic consumption)
-- `--ci` = machine-friendly output (no colors, no progress bars, possibly JSON)
-- All commands should support both flags consistently
+Completed: Fixed `validate-cross-links.ts` colors bug, standardized `insights.ts`
+to check `options.ci || options.json` consistently, added `'ci'` to all passthrough
+lists in `analyze.ts`, `resources.ts`, `content.ts`, and `generate.ts`.
 
 ## ~~5. Resolve `PROJECT_ROOT` via `__dirname` Instead of `process.cwd()`~~ ✅ DONE
 

@@ -20,7 +20,7 @@ const INSIGHTS_PATH: string = join(DATA_DIR_ABS, 'insights');
  * Default command - run all checks
  */
 export async function check(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const log = createLogger(options.ci as boolean);
+  const log = createLogger(!!(options.ci || options.json));
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
@@ -29,7 +29,7 @@ export async function check(args: string[], options: Record<string, unknown>): P
     skip: (options.skip as string)?.split(','),
   });
 
-  if (options.ci) {
+  if (options.ci || options.json) {
     return { output: JSON.stringify(result, null, 2), exitCode: result.passed ? 0 : 1 };
   }
 
@@ -79,14 +79,14 @@ export async function check(args: string[], options: Record<string, unknown>): P
  * Check for duplicate insights
  */
 export async function duplicates(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const log = createLogger(options.ci as boolean);
+  const log = createLogger(!!(options.ci || options.json));
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
   const threshold = parseFloat((options.threshold as string) || '0.7');
   const result = lib.checkDuplicates(insights, { threshold });
 
-  if (options.ci) {
+  if (options.ci || options.json) {
     return { output: JSON.stringify(result, null, 2), exitCode: result.passed ? 0 : 1 };
   }
 
@@ -115,13 +115,13 @@ export async function duplicates(args: string[], options: Record<string, unknown
  * Check rating calibration
  */
 export async function ratings(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const log = createLogger(options.ci as boolean);
+  const log = createLogger(!!(options.ci || options.json));
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
   const result = lib.checkRatings(insights);
 
-  if (options.ci) {
+  if (options.ci || options.json) {
     return { output: JSON.stringify(result, null, 2), exitCode: result.passed ? 0 : 1 };
   }
 
@@ -157,13 +157,13 @@ export async function ratings(args: string[], options: Record<string, unknown>):
  * Check source paths
  */
 export async function sources(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const log = createLogger(options.ci as boolean);
+  const log = createLogger(!!(options.ci || options.json));
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
   const result = lib.checkSources(insights, CONTENT_DIR);
 
-  if (options.ci) {
+  if (options.ci || options.json) {
     return { output: JSON.stringify(result, null, 2), exitCode: result.passed ? 0 : 1 };
   }
 
@@ -188,14 +188,14 @@ export async function sources(args: string[], options: Record<string, unknown>):
  * Check for stale insights
  */
 export async function staleness(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const log = createLogger(options.ci as boolean);
+  const log = createLogger(!!(options.ci || options.json));
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
   const staleDays = parseInt((options.days as string) || '90', 10);
   const result = lib.checkStaleness(insights, { staleDays });
 
-  if (options.ci) {
+  if (options.ci || options.json) {
     return { output: JSON.stringify(result, null, 2), exitCode: 0 };
   }
 
@@ -216,7 +216,7 @@ export async function staleness(args: string[], options: Record<string, unknown>
  * Show statistics
  */
 export async function stats(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const log = createLogger(options.ci as boolean);
+  const log = createLogger(!!(options.ci || options.json));
   const data = lib.loadInsights(INSIGHTS_PATH);
   const insights = data.insights || [];
 
@@ -269,7 +269,7 @@ export async function stats(args: string[], options: Record<string, unknown>): P
  * Apply fixes to insights
  */
 export async function fix(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const log = createLogger(options.ci as boolean);
+  const log = createLogger(!!(options.ci || options.json));
   const data = lib.loadInsights(INSIGHTS_PATH);
   let insights = data.insights || [];
 
