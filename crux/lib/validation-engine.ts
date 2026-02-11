@@ -20,7 +20,7 @@ import { parse as parseYaml } from 'yaml';
 import { findMdxFiles } from './file-utils.ts';
 import { getColors, type Colors } from './output.ts';
 import { parseFrontmatterAndBody } from './mdx-utils.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './content-types.js';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './content-types.ts';
 import { parseSidebarConfig, type SidebarParseResult } from './sidebar-utils.ts';
 
 // ---------------------------------------------------------------------------

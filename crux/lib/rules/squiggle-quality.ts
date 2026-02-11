@@ -6,7 +6,7 @@
  * 2. Checks that SquiggleEstimate has a title prop
  */
 
-import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity, ContentFile, ValidationEngine } from '../validation-engine.ts';
 
 // ---------------------------------------------------------------------------
 // Interfaces

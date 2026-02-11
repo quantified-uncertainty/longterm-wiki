@@ -6,7 +6,7 @@
  * Run: node --import tsx/esm crux/lib/rules/rules.test.ts
  */
 
-import { Issue, Severity, FixType, createRule } from '../validation-engine.js';
+import { Issue, Severity, FixType, createRule } from '../validation-engine.ts';
 import { dollarSignsRule } from './dollar-signs.js';
 import { comparisonOperatorsRule } from './comparison-operators.js';
 import { tildeDollarRule } from './tilde-dollar.js';

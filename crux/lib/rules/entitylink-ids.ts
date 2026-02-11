@@ -14,7 +14,7 @@
  * for unrecognized IDs, so path-style IDs work if the content exists.
  */
 
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { existsSync } from 'fs';
 import { join } from 'path';
 

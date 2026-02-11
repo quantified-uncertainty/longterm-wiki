@@ -11,7 +11,7 @@
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { loadDatabase, loadPathRegistry, DATA_DIR_ABS, type Entity } from '../content-types.js';
 
 const DATA_DIR = DATA_DIR_ABS;

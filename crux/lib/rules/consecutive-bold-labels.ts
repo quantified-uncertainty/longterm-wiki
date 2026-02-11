@@ -20,7 +20,7 @@
  *   **Mitigation**: Faster preprint sharing
  */
 
-import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock } from '../mdx-utils.ts';
 
 // Pattern: line starting with **SomeLabel**: or **SomeLabel**:

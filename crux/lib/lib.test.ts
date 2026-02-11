@@ -23,7 +23,7 @@ import {
   isIndexPage,
   extractEntityId,
   CONTENT_DIR,
-} from './content-types.js';
+} from './content-types.ts';
 
 let passed = 0;
 let failed = 0;

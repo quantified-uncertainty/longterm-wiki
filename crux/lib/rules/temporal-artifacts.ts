@@ -8,7 +8,7 @@
  * Good: "As of early 2026..." or "The convention remains in..."
  */
 
-import { Severity, Issue, ContentFile, ValidationEngine } from '../validation-engine.js';
+import { Severity, Issue, ContentFile, ValidationEngine } from '../validation-engine.ts';
 
 // ---------------------------------------------------------------------------
 // Interfaces

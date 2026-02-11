@@ -37,7 +37,7 @@ import {
   CONTENT_DIR,
   DATA_DIR,
   GENERATED_DATA_DIR,
-} from './content-types.js';
+} from './content-types.ts';
 
 import {
   Issue,
