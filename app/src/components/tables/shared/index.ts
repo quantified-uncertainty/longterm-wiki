@@ -1,5 +1,7 @@
 // Shared table view components and utilities
 export * from "./table-view-styles";
+export * from "./cell-components";
+export * from "./column-helpers";
 export * from "./useColumnVisibility";
 export { ColumnToggleControls } from "./ColumnToggleControls";
 export { TableViewHeader } from "./TableViewHeader";

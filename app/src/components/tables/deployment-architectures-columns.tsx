@@ -1,100 +1,21 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { cn } from "@/lib/utils";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import {
-  getBadgeClass,
-  getSafetyOutlookClass,
   getLevelSortValue,
 } from "./shared/table-view-styles";
+import { LevelBadge, CellNote, SafetyOutlookBadge } from "./shared/cell-components";
+import { levelNoteColumn, prosConsColumns } from "./shared/column-helpers";
 import type { Architecture, SafetyOutlook, Category, Source } from "@data/tables/ai-architectures";
 
 export type { SafetyOutlook, Category, Source, Architecture } from "@data/tables/ai-architectures";
-
-// Badge components
-function LevelBadge({ level }: { level: string }) {
-  return (
-    <span
-      className={cn(
-        "inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap",
-        getBadgeClass(level)
-      )}
-    >
-      {level}
-    </span>
-  );
-}
-
-function AdoptionBadge({ level }: { level: string }) {
-  return (
-    <span
-      className={cn(
-        "inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap",
-        getBadgeClass(level, "adoption")
-      )}
-    >
-      {level}
-    </span>
-  );
-}
 
 function TimelineBadge({ timeline }: { timeline: string }) {
   return (
     <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap bg-purple-200 text-purple-800 dark:bg-purple-800 dark:text-purple-200">
       {timeline}
     </span>
-  );
-}
-
-function SafetyOutlookBadge({
-  rating,
-  score,
-}: {
-  rating: SafetyOutlook;
-  score?: number;
-}) {
-  const labels: Record<SafetyOutlook, string> = {
-    favorable: "Favorable",
-    mixed: "Mixed",
-    challenging: "Challenging",
-    unknown: "Unknown",
-  };
-
-  return (
-    <div className="flex flex-col gap-1">
-      {score !== undefined && (
-        <div
-          className={cn(
-            "text-lg font-bold",
-            rating === "favorable"
-              ? "text-green-700 dark:text-green-400"
-              : rating === "mixed"
-                ? "text-amber-700 dark:text-amber-400"
-                : "text-red-700 dark:text-red-400"
-          )}
-        >
-          {score}/10
-        </div>
-      )}
-      <span
-        className={cn(
-          "inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap",
-          getSafetyOutlookClass(rating)
-        )}
-      >
-        {labels[rating]}
-      </span>
-    </div>
-  );
-}
-
-function CellNote({ note }: { note?: string }) {
-  if (!note) return null;
-  return (
-    <div className="text-[9px] text-muted-foreground mt-1 line-clamp-2">
-      {note}
-    </div>
   );
 }
 
@@ -118,24 +39,6 @@ function SourcesCell({ sources }: { sources: Source[] }) {
           {src.year && (
             <span className="text-muted-foreground/70 ml-1">({src.year})</span>
           )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ProsCons({ items, type }: { items: string[]; type: "pro" | "con" }) {
-  const prefix = type === "pro" ? "+" : "−";
-  const colorClass =
-    type === "pro"
-      ? "text-green-700 dark:text-green-400"
-      : "text-red-700 dark:text-red-400";
-
-  return (
-    <div className="text-[11px] space-y-0.5">
-      {items.map((item) => (
-        <div key={item} className={colorClass}>
-          {prefix} {item}
         </div>
       ))}
     </div>
@@ -172,7 +75,7 @@ export const createDeploymentArchitecturesColumns = (): ColumnDef<Architecture>[
     ),
     cell: ({ row }) => (
       <div>
-        <AdoptionBadge level={row.original.adoption} />
+        <LevelBadge level={row.original.adoption} category="adoption" />
         <CellNote note={row.original.adoptionNote} />
         <div className="mt-1">
           <TimelineBadge timeline={row.original.timeline} />
@@ -208,126 +111,12 @@ export const createDeploymentArchitecturesColumns = (): ColumnDef<Architecture>[
       return a - b;
     },
   },
-  {
-    id: "agencyLevel",
-    accessorFn: (row) => row.agencyLevel.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Level of autonomous decision-making">
-        Agency Level
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.agencyLevel.level} />
-        <CellNote note={row.original.agencyLevel.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.agencyLevel.level);
-      const b = getLevelSortValue(rowB.original.agencyLevel.level);
-      return a - b;
-    },
-  },
-  {
-    id: "decomposition",
-    accessorFn: (row) => row.decomposition.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="How tasks are broken down">
-        Decomposition
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.decomposition.level} />
-        <CellNote note={row.original.decomposition.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.decomposition.level);
-      const b = getLevelSortValue(rowB.original.decomposition.level);
-      return a - b;
-    },
-  },
-  {
-    id: "oversight",
-    accessorFn: (row) => row.oversight.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Human oversight mechanism">
-        Oversight
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.oversight.level} />
-        <CellNote note={row.original.oversight.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.oversight.level);
-      const b = getLevelSortValue(rowB.original.oversight.level);
-      return a - b;
-    },
-  },
-  {
-    id: "whitebox",
-    accessorFn: (row) => row.whitebox.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Interpretability of internals">
-        White-box
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.whitebox.level} />
-        <CellNote note={row.original.whitebox.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.whitebox.level);
-      const b = getLevelSortValue(rowB.original.whitebox.level);
-      return a - b;
-    },
-  },
-  {
-    id: "modularity",
-    accessorFn: (row) => row.modularity.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Component separation">
-        Modularity
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.modularity.level} />
-        <CellNote note={row.original.modularity.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.modularity.level);
-      const b = getLevelSortValue(rowB.original.modularity.level);
-      return a - b;
-    },
-  },
-  {
-    id: "verifiable",
-    accessorFn: (row) => row.verifiable.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Formal verification possible">
-        Verifiable
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.verifiable.level} />
-        <CellNote note={row.original.verifiable.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.verifiable.level);
-      const b = getLevelSortValue(rowB.original.verifiable.level);
-      return a - b;
-    },
-  },
+  levelNoteColumn<Architecture>({ id: "agencyLevel", accessor: (r) => r.agencyLevel, label: "Agency Level", tooltip: "Level of autonomous decision-making" }),
+  levelNoteColumn<Architecture>({ id: "decomposition", accessor: (r) => r.decomposition, label: "Decomposition", tooltip: "How tasks are broken down" }),
+  levelNoteColumn<Architecture>({ id: "oversight", accessor: (r) => r.oversight, label: "Oversight", tooltip: "Human oversight mechanism" }),
+  levelNoteColumn<Architecture>({ id: "whitebox", accessor: (r) => r.whitebox, label: "White-box", tooltip: "Interpretability of internals" }),
+  levelNoteColumn<Architecture>({ id: "modularity", accessor: (r) => r.modularity, label: "Modularity", tooltip: "Component separation" }),
+  levelNoteColumn<Architecture>({ id: "verifiable", accessor: (r) => r.verifiable, label: "Verifiable", tooltip: "Formal verification possible" }),
   {
     id: "sources",
     accessorKey: "sources",
@@ -335,20 +124,12 @@ export const createDeploymentArchitecturesColumns = (): ColumnDef<Architecture>[
     cell: ({ row }) => <SourcesCell sources={row.original.sources} />,
     enableSorting: false,
   },
-  {
-    id: "safetyPros",
-    accessorKey: "safetyPros",
-    header: () => <span className="text-xs">Safety Pros</span>,
-    cell: ({ row }) => <ProsCons items={row.original.safetyPros} type="pro" />,
-    enableSorting: false,
-  },
-  {
-    id: "safetyCons",
-    accessorKey: "safetyCons",
-    header: () => <span className="text-xs">Safety Cons</span>,
-    cell: ({ row }) => <ProsCons items={row.original.safetyCons} type="con" />,
-    enableSorting: false,
-  },
+  ...prosConsColumns<Architecture>({
+    prosId: "safetyPros",
+    consId: "safetyCons",
+    prosField: (r) => r.safetyPros,
+    consField: (r) => r.safetyCons,
+  }),
 ];
 
 // Column config for visibility toggles

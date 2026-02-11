@@ -3,12 +3,9 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
 import { SortableHeader } from "@/components/ui/sortable-header";
-import {
-  getBadgeClass,
-  getSafetyOutlookClass,
-  getLevelSortValue,
-  categoryColors,
-} from "./shared/table-view-styles";
+import { categoryColors } from "./shared/table-view-styles";
+import { CellNote, SafetyOutlookBadge, ItemList } from "./shared/cell-components";
+import { levelNoteColumn, prosConsColumns } from "./shared/column-helpers";
 
 // Re-export types from data file
 export type {
@@ -54,78 +51,11 @@ export const SPARKLINE_DATA: Record<string, number[]> = {
 // Import CATEGORIES for use in this file
 import { CATEGORIES } from "@data/tables/architecture-scenarios";
 
-// Badge components
-function LevelBadge({ level }: { level: string }) {
-  return (
-    <span
-      className={cn(
-        "inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap",
-        getBadgeClass(level)
-      )}
-    >
-      {level}
-    </span>
-  );
-}
-
 function LikelihoodBadge({ likelihood }: { likelihood: string }) {
   return (
     <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap bg-blue-200 text-blue-800 dark:bg-blue-700 dark:text-blue-100">
       {likelihood}
     </span>
-  );
-}
-
-function SafetyOutlookBadge({
-  rating,
-  score,
-}: {
-  rating: SafetyOutlook;
-  score?: number;
-}) {
-  const labels: Record<SafetyOutlook, string> = {
-    favorable: "Favorable",
-    mixed: "Mixed",
-    challenging: "Challenging",
-    unknown: "Unknown",
-  };
-
-  return (
-    <div className="flex flex-col gap-1">
-      {score !== undefined && (
-        <div
-          className={cn(
-            "text-lg font-bold",
-            rating === "favorable"
-              ? "text-green-700 dark:text-green-400"
-              : rating === "mixed"
-                ? "text-amber-700 dark:text-amber-400"
-                : rating === "challenging"
-                  ? "text-red-700 dark:text-red-400"
-                  : "text-muted-foreground"
-          )}
-        >
-          {score}/10
-        </div>
-      )}
-      <span
-        className={cn(
-          "inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap",
-          getSafetyOutlookClass(rating)
-        )}
-      >
-        {labels[rating]}
-      </span>
-    </div>
-  );
-}
-
-function CellNote({ note }: { note?: string }) {
-  if (!note) return null;
-  return (
-    <div className="text-[9px] text-muted-foreground mt-1 line-clamp-2">
-      {note}
-    </div>
   );
 }
 
@@ -213,43 +143,6 @@ function PapersCell({ papers }: { papers: Link[] }) {
           ) : (
             <span className="text-muted-foreground">{paper.title}</span>
           )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Pros/Cons list
-function ProsCons({ items, type }: { items: string[]; type: "pro" | "con" }) {
-  const prefix = type === "pro" ? "+" : "−";
-  const colorClass =
-    type === "pro"
-      ? "text-green-700 dark:text-green-400"
-      : "text-red-700 dark:text-red-400";
-
-  return (
-    <div className="text-[11px] space-y-0.5">
-      {items.map((item) => (
-        <div key={item} className={colorClass}>
-          {prefix} {item}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Key risks/opportunities list
-function RiskOpportunityList({ items, type }: { items: string[]; type: "risk" | "opportunity" }) {
-  const colorClass =
-    type === "risk"
-      ? "text-red-700 dark:text-red-400"
-      : "text-green-700 dark:text-green-400";
-
-  return (
-    <div className="text-[11px] space-y-0.5">
-      {items.map((item) => (
-        <div key={item} className={colorClass}>
-          • {item}
         </div>
       ))}
     </div>
@@ -371,7 +264,7 @@ export const createArchitectureScenariosColumns = (): ColumnDef<Scenario>[] => [
     accessorKey: "safetyOutlook",
     header: () => <span className="text-xs">Key Risks</span>,
     cell: ({ row }) => (
-      <RiskOpportunityList items={row.original.safetyOutlook.keyRisks} type="risk" />
+      <ItemList items={row.original.safetyOutlook.keyRisks} type="risk" />
     ),
     enableSorting: false,
   },
@@ -380,130 +273,16 @@ export const createArchitectureScenariosColumns = (): ColumnDef<Scenario>[] => [
     accessorKey: "safetyOutlook",
     header: () => <span className="text-xs">Key Opportunities</span>,
     cell: ({ row }) => (
-      <RiskOpportunityList items={row.original.safetyOutlook.keyOpportunities} type="opportunity" />
+      <ItemList items={row.original.safetyOutlook.keyOpportunities} type="opportunity" />
     ),
     enableSorting: false,
   },
-  {
-    id: "whitebox",
-    accessorFn: (row) => row.whitebox.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Interpretability of internals">
-        White-box
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.whitebox.level} />
-        <CellNote note={row.original.whitebox.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.whitebox.level);
-      const b = getLevelSortValue(rowB.original.whitebox.level);
-      return a - b;
-    },
-  },
-  {
-    id: "training",
-    accessorFn: (row) => row.training.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Training approach">
-        Trainable
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.training.level} />
-        <CellNote note={row.original.training.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.training.level);
-      const b = getLevelSortValue(rowB.original.training.level);
-      return a - b;
-    },
-  },
-  {
-    id: "predictability",
-    accessorFn: (row) => row.predictability.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Behavior predictability">
-        Predictable
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.predictability.level} />
-        <CellNote note={row.original.predictability.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.predictability.level);
-      const b = getLevelSortValue(rowB.original.predictability.level);
-      return a - b;
-    },
-  },
-  {
-    id: "modularity",
-    accessorFn: (row) => row.modularity.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Component separation">
-        Modular
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.modularity.level} />
-        <CellNote note={row.original.modularity.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.modularity.level);
-      const b = getLevelSortValue(rowB.original.modularity.level);
-      return a - b;
-    },
-  },
-  {
-    id: "verifiable",
-    accessorFn: (row) => row.formalVerifiable.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Formal verification possible">
-        Verifiable
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.formalVerifiable.level} />
-        <CellNote note={row.original.formalVerifiable.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.formalVerifiable.level);
-      const b = getLevelSortValue(rowB.original.formalVerifiable.level);
-      return a - b;
-    },
-  },
-  {
-    id: "tractability",
-    accessorFn: (row) => row.researchTractability.level,
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Research tractability">
-        Research Tractability
-      </SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div>
-        <LevelBadge level={row.original.researchTractability.level} />
-        <CellNote note={row.original.researchTractability.note} />
-      </div>
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = getLevelSortValue(rowA.original.researchTractability.level);
-      const b = getLevelSortValue(rowB.original.researchTractability.level);
-      return a - b;
-    },
-  },
+  levelNoteColumn<Scenario>({ id: "whitebox", accessor: (r) => r.whitebox, label: "White-box", tooltip: "Interpretability of internals" }),
+  levelNoteColumn<Scenario>({ id: "training", accessor: (r) => r.training, label: "Trainable", tooltip: "Training approach" }),
+  levelNoteColumn<Scenario>({ id: "predictability", accessor: (r) => r.predictability, label: "Predictable", tooltip: "Behavior predictability" }),
+  levelNoteColumn<Scenario>({ id: "modularity", accessor: (r) => r.modularity, label: "Modular", tooltip: "Component separation" }),
+  levelNoteColumn<Scenario>({ id: "verifiable", accessor: (r) => r.formalVerifiable, label: "Verifiable", tooltip: "Formal verification possible" }),
+  levelNoteColumn<Scenario>({ id: "tractability", accessor: (r) => r.researchTractability, label: "Research Tractability", tooltip: "Research tractability" }),
   {
     id: "keyPapers",
     accessorKey: "keyPapers",
@@ -518,20 +297,12 @@ export const createArchitectureScenariosColumns = (): ColumnDef<Scenario>[] => [
     cell: ({ row }) => <LabsCell labs={row.original.labs} />,
     enableSorting: false,
   },
-  {
-    id: "safetyPros",
-    accessorKey: "safetyPros",
-    header: () => <span className="text-xs">Safety Pros</span>,
-    cell: ({ row }) => <ProsCons items={row.original.safetyPros} type="pro" />,
-    enableSorting: false,
-  },
-  {
-    id: "safetyCons",
-    accessorKey: "safetyCons",
-    header: () => <span className="text-xs">Safety Cons</span>,
-    cell: ({ row }) => <ProsCons items={row.original.safetyCons} type="con" />,
-    enableSorting: false,
-  },
+  ...prosConsColumns<Scenario>({
+    prosId: "safetyPros",
+    consId: "safetyCons",
+    prosField: (r) => r.safetyPros,
+    consField: (r) => r.safetyCons,
+  }),
 ];
 
 // Column config for visibility toggles

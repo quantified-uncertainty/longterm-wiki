@@ -1,8 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { ColumnConfig, ColumnGroup } from "./useColumnVisibility";
-import { columnGroupColors } from "./table-view-styles";
+import type { ColumnConfig } from "./useColumnVisibility";
 
 interface ColumnToggleControlsProps<T extends string> {
   columns: Record<T, ColumnConfig>;
@@ -14,7 +13,8 @@ interface ColumnToggleControlsProps<T extends string> {
 }
 
 /**
- * Column toggle controls with preset buttons
+ * Column toggle controls with preset buttons.
+ * Uses neutral styling — active columns are filled, inactive are outlined.
  */
 export function ColumnToggleControls<T extends string>({
   columns,
@@ -27,27 +27,27 @@ export function ColumnToggleControls<T extends string>({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-2 p-3 bg-muted/30 rounded-lg border",
+        "flex flex-wrap items-center gap-1 px-2 py-1.5 bg-muted/20 rounded-md border border-border/40",
         className
       )}
     >
-      <span className="text-xs font-medium text-muted-foreground mr-1">
+      <span className="text-[10px] font-medium text-muted-foreground mr-0.5">
         Columns:
       </span>
 
       {Object.entries(columns).map(([key, config]) => {
         const col = config as ColumnConfig;
         const isActive = visibleColumns.has(key as T);
-        const groupColors = columnGroupColors[col.group] || columnGroupColors.overview;
 
         return (
           <button
             key={key}
             onClick={() => toggleColumn(key as T)}
             className={cn(
-              "px-2.5 py-1 text-[11px] font-medium rounded border transition-colors",
-              isActive ? groupColors.active : groupColors.inactive,
-              "hover:opacity-90"
+              "px-2 py-0.5 text-[10px] font-medium rounded-full transition-colors",
+              isActive
+                ? "bg-foreground/80 text-background"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
             )}
           >
             {col.label}
@@ -55,19 +55,13 @@ export function ColumnToggleControls<T extends string>({
         );
       })}
 
-      <span className="text-xs font-medium text-muted-foreground ml-3 mr-1">
-        Presets:
-      </span>
+      <span className="text-muted-foreground/30 mx-1">|</span>
 
       {Object.keys(presets).map((preset) => (
         <button
           key={preset}
           onClick={() => applyPreset(preset)}
-          className={cn(
-            "px-2.5 py-1 text-[11px] font-medium rounded border transition-colors",
-            "border-indigo-500 text-indigo-600 hover:bg-indigo-50",
-            "dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-950"
-          )}
+          className="px-2 py-0.5 text-[10px] font-medium rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors underline underline-offset-2 decoration-muted-foreground/30"
         >
           {formatPresetLabel(preset)}
         </button>
@@ -77,7 +71,6 @@ export function ColumnToggleControls<T extends string>({
 }
 
 function formatPresetLabel(preset: string): string {
-  // Capitalize first letter and handle common presets
   const labels: Record<string, string> = {
     default: "Default",
     all: "All",

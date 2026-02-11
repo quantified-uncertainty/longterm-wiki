@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, type ReactNode } from "react"
+import { useState, useMemo, useRef, useEffect, type ReactNode } from "react"
 import {
   useReactTable,
   getCoreRowModel,
@@ -10,8 +10,9 @@ import {
   type ColumnDef,
   type Row,
 } from "@tanstack/react-table"
+import { cn } from "@/lib/utils"
+import { X } from "lucide-react"
 import { DataTable } from "@/components/ui/data-table"
-import { TableViewHeader } from "./TableViewHeader"
 import { ColumnToggleControls } from "./ColumnToggleControls"
 import { ViewModeToggle, type ViewMode } from "./ViewModeToggle"
 import { useColumnVisibility, type ColumnConfig } from "./useColumnVisibility"
@@ -19,11 +20,6 @@ import {
   GroupedCategorySection,
   type GroupHeaderStyle,
 } from "./GroupedCategorySection"
-
-interface Breadcrumb {
-  label: string
-  href: string
-}
 
 interface NavLink {
   label: string
@@ -37,26 +33,22 @@ interface GroupingConfig<TData> {
   groupLabels: Record<string, string>
   groupDescriptions?: Record<string, string>
   headerStyle: GroupHeaderStyle
-  /** Tailwind class for dots keyed by group key (colored-dot style) */
   groupDotClasses?: Record<string, string>
-  /** CSS hex colors for dots keyed by group key (inline-color style) */
   groupDotColors?: Record<string, string>
   hideCategoryColumnInGroupedMode?: boolean
   categoryColumnId?: string
 }
 
 export interface TableViewConfig<TData, TColumnKey extends string> {
-  // Page layout
-  title: string
-  breadcrumbs: Breadcrumb[]
-  navLinks?: NavLink[]
-
   // Data + columns
   data: TData[]
   createColumns: () => ColumnDef<TData>[]
   columnConfig: Record<TColumnKey, ColumnConfig>
   columnPresets: Record<string, TColumnKey[]>
   pinnedColumn?: string
+
+  // Navigation between related tables
+  navLinks?: NavLink[]
 
   // Grouping (optional)
   grouping?: GroupingConfig<TData>
@@ -78,14 +70,12 @@ export interface TableViewConfig<TData, TColumnKey extends string> {
 }
 
 export function TableViewPage<TData, TColumnKey extends string>({
-  title,
-  breadcrumbs,
-  navLinks,
   data,
   createColumns,
   columnConfig,
   columnPresets,
   pinnedColumn,
+  navLinks,
   grouping,
   defaultViewMode = "unified",
   defaultSorting = [],
@@ -110,11 +100,9 @@ export function TableViewPage<TData, TColumnKey extends string>({
     Object.keys(columnConfig).forEach((key) => {
       visibility[key] = visibleColumns.has(key as TColumnKey)
     })
-    // Pinned column is always visible (set after loop so it can't be overwritten)
     if (pinnedColumn) {
       visibility[pinnedColumn] = true
     }
-    // Hide category column in grouped mode if configured
     if (
       viewMode === "grouped" &&
       grouping?.hideCategoryColumnInGroupedMode &&
@@ -156,14 +144,28 @@ export function TableViewPage<TData, TColumnKey extends string>({
   }, [data, grouping])
 
   return (
-    <div className={className ?? "min-h-screen flex flex-col bg-background"}>
-      <TableViewHeader
-        title={title}
-        breadcrumbs={breadcrumbs}
-        navLinks={navLinks}
-      />
+    <div className={className ?? "flex flex-col"}>
+      {/* Nav links for switching between related tables */}
+      {navLinks && navLinks.length > 0 && (
+        <nav className="flex items-center gap-1.5 mb-2">
+          {navLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "px-2.5 py-1 text-xs rounded-md transition-colors",
+                link.active
+                  ? "bg-foreground text-background font-medium"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      )}
 
-      <div className="p-4 space-y-4">
+      <div className="space-y-2">
         {aboveControls}
 
         <ColumnToggleControls
@@ -174,19 +176,31 @@ export function TableViewPage<TData, TColumnKey extends string>({
           applyPreset={applyPreset}
         />
 
-        {description}
+        {/* Controls row: view mode toggle + info toggles */}
+        <div className="flex flex-wrap items-center gap-3">
+          {grouping && (
+            <ViewModeToggle
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              unifiedLabel="Unified Table"
+              groupedLabel="Grouped by Category"
+            />
+          )}
 
-        {grouping && (
-          <ViewModeToggle
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            unifiedLabel="Unified Table"
-            groupedLabel="Grouped by Category"
-          />
-        )}
+          {description && (
+            <ExpandableInfo label="About this table">
+              {description}
+            </ExpandableInfo>
+          )}
 
-        {legend}
+          {legend && (
+            <ExpandableInfo label="Legend">
+              {legend}
+            </ExpandableInfo>
+          )}
+        </div>
 
+        {/* Table */}
         {viewMode === "unified" || !grouping ? (
           <div className="overflow-x-auto">
             <DataTable
@@ -217,6 +231,51 @@ export function TableViewPage<TData, TColumnKey extends string>({
 
         {footer}
       </div>
+    </div>
+  )
+}
+
+/** Inline toggle that reveals content in a dropdown panel below the trigger row */
+function ExpandableInfo({ label, children }: { label: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e: MouseEvent) {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [open])
+
+  return (
+    <div className="relative" ref={panelRef}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          "text-xs font-medium cursor-pointer select-none inline-flex items-center gap-1 px-2 py-1 rounded-md transition-colors",
+          open
+            ? "bg-muted text-foreground"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+        )}
+      >
+        <span className={cn("text-[10px] transition-transform", open && "rotate-90")}>&#x25B6;</span>
+        {label}
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 w-[min(600px,90vw)] rounded-lg border border-border bg-background shadow-lg p-4">
+          <button
+            onClick={() => setOpen(false)}
+            className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <div className="text-sm pr-6">{children}</div>
+        </div>
+      )}
     </div>
   )
 }
