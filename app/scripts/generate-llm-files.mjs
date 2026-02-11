@@ -209,6 +209,7 @@ This file provides an index of site content for LLMs. For full documentation, se
 - [Core Documentation (llms-core.txt)](${CONFIG.site.url}/llms-core.txt): High-importance pages (~30K tokens) - fits in chat context
 - [Full Documentation (llms-full.txt)](${CONFIG.site.url}/llms-full.txt): Complete content - for embeddings/RAG
 - [Sitemap](${CONFIG.site.url}/sitemap.xml): XML sitemap of all pages
+- Per-page plain text: append \`.txt\` to any wiki URL (e.g. ${CONFIG.site.url}/wiki/E1.txt)
 
 ## Site Structure
 
@@ -398,6 +399,52 @@ Estimated tokens: ~${Math.round(totalTokens / 1000)}K
 }
 
 /**
+ * Generate per-page .txt files for individual LLM access.
+ * Writes one file per page to public/wiki/{numericId}.txt
+ */
+function generatePerPageTxt(pages) {
+  const wikiDir = join(OUTPUT_DIR, 'wiki');
+  if (!existsSync(wikiDir)) {
+    mkdirSync(wikiDir, { recursive: true });
+  }
+
+  const map = getSlugToNumericId();
+  let generated = 0;
+  let skipped = 0;
+
+  for (const page of pages) {
+    const numericId = map[page.id];
+    if (!numericId) {
+      skipped++;
+      continue;
+    }
+
+    const body = extractContent(page.filePath);
+    if (!body) {
+      skipped++;
+      continue;
+    }
+
+    const meta = [
+      `# ${page.title}`,
+      '',
+      `URL: ${getPageUrl(page)}`,
+      page.importance != null ? `Importance: ${page.importance}` : null,
+      page.quality != null ? `Quality: ${page.quality}` : null,
+      page.llmSummary ? `Summary: ${page.llmSummary}` : null,
+      '',
+      '---',
+      '',
+    ].filter((line) => line !== null).join('\n');
+
+    writeFileSync(join(wikiDir, `${numericId}.txt`), meta + body + '\n');
+    generated++;
+  }
+
+  return { generated, skipped };
+}
+
+/**
  * Main function - generate all LLM files
  */
 export function generateLLMFiles() {
@@ -427,10 +474,15 @@ export function generateLLMFiles() {
   writeFileSync(join(OUTPUT_DIR, 'llms-full.txt'), fullTxt);
   console.log(`  ✓ llms-full.txt (${fullPages} pages, ~${Math.round(fullTokens / 1000)}K tokens)`);
 
+  // Generate per-page .txt files
+  const { generated: perPageCount, skipped: perPageSkipped } = generatePerPageTxt(pages);
+  console.log(`  ✓ wiki/*.txt (${perPageCount} pages, ${perPageSkipped} skipped)`);
+
   return {
     llmsTxt: { size: llmsTxt.length },
     llmsCore: { pages: corePages, tokens: coreTokens },
     llmsFull: { pages: fullPages, tokens: fullTokens },
+    perPage: { generated: perPageCount, skipped: perPageSkipped },
   };
 }
 

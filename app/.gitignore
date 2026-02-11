@@ -20,6 +20,7 @@ public/search-docs.json
 public/llms.txt
 public/llms-core.txt
 public/llms-full.txt
+public/wiki/*.txt
 
 # Vercel
 .vercel
