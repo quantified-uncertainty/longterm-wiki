@@ -1,0 +1,214 @@
+---
+title: "Research: Adaptive Page Length & Summary Systems"
+description: "Analysis of approaches for handling variable page lengths, better summaries, and progressive disclosure on the wiki"
+sidebar:
+  order: 18
+---
+
+## Problem Statement
+
+The wiki has ~625 pages ranging from empty stubs (0 words) to comprehensive analyses (10,000+ words). Different readers want different levels of depth:
+
+- **Skimmers** want a 2-sentence takeaway
+- **Decision-makers** want a structured 200-word summary with key numbers
+- **Researchers** want the full article with all evidence and nuance
+
+Currently every reader gets the same page. The wiki has a two-tier summary system (`description` and `llmSummary` in frontmatter) and infoboxes, but these aren't doing enough to serve short-attention readers.
+
+## Current State
+
+### Page Length Distribution
+
+| Word Count | Pages | Share | Character |
+|-----------|-------|-------|-----------|
+| 0–100 | ~98 | 16% | Stubs, tables, dashboards |
+| 101–800 | ~39 | 6% | Short reference pages |
+| 801–2,000 | ~144 | 23% | Expanded articles |
+| 2,001–3,500 | ~200 | 32% | **Modal range** — standard articles |
+| 3,501–5,000 | ~121 | 19% | Comprehensive analyses |
+| 5,000+ | ~24 | 4% | Hub pages (bioweapons, org profiles) |
+
+Median: ~2,200 words. Mean: ~2,274 words. The longest page (bioweapons) is 10,646 words.
+
+### What Exists Today
+
+**Two-tier summaries:**
+- `description` (frontmatter): 1–2 sentences, ~100–200 chars. Used in meta tags and OG cards.
+- `llmSummary` (frontmatter): AI-generated, 200–500 chars. Shown in PageStatus component, EntityLink hover tooltips, and InfoBox fallback.
+
+**InfoBox:**
+- Right-floating card (280px desktop, full-width mobile) showing entity metadata, key facts, related entries, ratings, links.
+- Description is CSS-truncated to 3 lines (`line-clamp-3`) with no "read more" button.
+
+**PageStatus banner:**
+- Shows quality/importance badges, word count, and llmSummary text above the article.
+- Currently a static block — no collapse/expand behavior.
+
+**Table of Contents:**
+- Sticky sidebar on desktop, auto-generated from H2/H3 headings.
+- Scroll-tracking via IntersectionObserver.
+- Only renders if 3+ headings exist.
+
+**Key gaps:**
+- No interactive expand/collapse on article sections.
+- No user preference for "show me the short version."
+- InfoBox description truncation has no expand affordance.
+- Same rendering for 200-word and 10,000-word pages.
+
+## Approaches
+
+### Approach 1: Better Summaries & InfoBoxes (Low Effort, High Impact)
+
+Don't change the page rendering model at all. Instead, invest in making the top-of-page experience much richer so skimmers never need to scroll.
+
+**What to do:**
+
+1. **Structured llmSummary**: Instead of a single paragraph, generate summaries with a consistent structure:
+   - **One-liner** (what is this thing, in one sentence)
+   - **Key numbers** (2–4 bullet points with the most important quantitative claims)
+   - **Bottom line** (so-what for a decision-maker)
+   - Store this as structured YAML in frontmatter rather than a single string.
+
+2. **Expand the InfoBox description**: Add a "Show full summary" toggle to the InfoBox so the `line-clamp-3` truncation is interactive. The `llmSummary` text is already there — just hidden by CSS.
+
+3. **Quick Assessment tables**: Many KB risk pages already have a "Quick Assessment" table at the top. Standardize this across all page types (not just risks) and enforce it in page templates.
+
+4. **Key Takeaways component**: A new MDX component (`<KeyTakeaways>`) that authors place after the first heading. Renders as a highlighted box with 3–5 bullet points. Unlike the auto-generated llmSummary, this is hand-curated.
+
+**Pros:** No architectural changes. Works with static generation. Improves every page visit. Incremental — can improve one page at a time.
+
+**Cons:** Doesn't actually shorten pages. Skimmers still see a long scrollbar. Every page still ships its full HTML.
+
+### Approach 2: Collapsible Sections (Medium Effort)
+
+Keep full SSG but make sections below the overview collapsed by default on long pages.
+
+**What to do:**
+
+1. **Auto-wrap H2 sections** in a `<CollapsibleSection>` component during MDX compilation. The Radix UI Collapsible primitive already exists in the codebase (`app/src/components/ui/collapsible.tsx`).
+
+2. **Default behavior by page length:**
+   - \< 1,500 words: all sections expanded (short page, no need to collapse)
+   - 1,500–4,000 words: Overview expanded, rest collapsed
+   - \> 4,000 words: Overview expanded, rest collapsed, with a "Expand all" button
+
+3. **Remember user state**: Use localStorage (pattern already established with `DevModeToggle` and `InfoBoxVisibility`) to remember which sections the user expanded.
+
+4. **Section word counts**: Extend `build-data.mjs` to compute per-section word counts and display them as subtle badges on collapsed headers ("Risk Assessment — 840 words").
+
+**Pros:** All content still pre-rendered (SEO-friendly). Readers see a manageable page. Existing Radix primitives reduce build effort. Section-level anchors and TOC continue to work.
+
+**Cons:** All HTML still ships to the client (no payload savings). Requires an MDX plugin or remark plugin to auto-wrap sections. Testing the collapse/expand UX across 625 pages needs care.
+
+### Approach 3: View Mode Toggle (Medium-High Effort)
+
+Give readers a "Summary / Standard / Full" toggle that controls how much of the page is shown.
+
+**What to do:**
+
+1. **Three view modes:**
+   - **Summary**: InfoBox + structured summary + key takeaways only (~200–400 words). No article body.
+   - **Standard**: Overview section + Quick Assessment + collapsed detail sections (~800–1,500 words visible).
+   - **Full**: Everything expanded, as today.
+
+2. **A `<ViewModeProvider>` context** (following the `InfoBoxVisibilityProvider` pattern) wrapping the page layout. A toggle in the page header or breadcrumb bar.
+
+3. **Persist preference** in localStorage. Default to "Standard" for pages over 3,000 words, "Full" for shorter pages.
+
+4. **URL parameter support**: `?view=summary` so links can point to a specific view. Useful for sharing with non-technical audiences.
+
+**Pros:** Directly addresses the "different readers want different depths" problem. URL parameters make it shareable. Could eventually be personalized per-user.
+
+**Cons:** Significant UX design work. Need to ensure "Summary" mode is genuinely useful (not just a worse version of the page). Three modes means three things to test and maintain.
+
+### Approach 4: Per-User LLM Rewriting (High Effort, Experimental)
+
+Dynamically rewrite pages using an LLM to match each reader's desired length and expertise level.
+
+**What to do:**
+
+1. **On-demand summarization API**: A serverless function that takes a page ID, target length (e.g., 200 words), and audience (e.g., "policymaker" / "ML researcher"), and returns a rewritten version using Claude.
+
+2. **Caching layer**: Cache rewrites by (page\_id, length, audience) tuple. Pre-generate common variants at build time for high-importance pages.
+
+3. **UI**: A slider or dropdown: "Show me this in: 1 paragraph / 1 page / full article" with a loading indicator while the rewrite generates.
+
+**Pros:** Most flexible. Each reader gets exactly what they want. Could support multiple languages, reading levels, or domain expertise.
+
+**Cons:** Expensive (LLM call per page view, even with caching). Latency on first view. Risk of LLM introducing errors or losing nuance. Breaks the "wiki as source of truth" model — which version is canonical? Requires moving away from pure SSG. Hard to quality-control generated summaries at scale.
+
+### Approach 5: Tiered Content Authoring (High Effort, High Quality)
+
+Author pages at multiple depths deliberately, as part of the content pipeline.
+
+**What to do:**
+
+1. **Extend page templates** to require three tiers of content:
+   - **Tier 1 — Card** (~50 words): Title + one-line description + key metric. Already roughly exists as `description` field.
+   - **Tier 2 — Brief** (~300 words): Structured summary with key numbers, main arguments, and bottom line. New frontmatter field or dedicated MDX section.
+   - **Tier 3 — Full**: The existing article.
+
+2. **Authoring tooling**: Extend `crux content improve` to generate Tier 2 briefs from Tier 3 content. Run this across all pages to bootstrap.
+
+3. **Render by context**: Card view in search results and related-pages lists. Brief view as default for pages over 3,000 words (with "Read full article" link). Full view on click-through.
+
+4. **Quality control**: Grade briefs separately from full articles. A bad brief on a good article is worse than no brief.
+
+**Pros:** Highest quality — human-reviewed summaries at each tier. Each tier is a first-class piece of content. Cards improve search/browse experience even without changing page rendering.
+
+**Cons:** Multiplies authoring work by ~2x. Need to keep tiers in sync when content changes. 625 pages is a lot of briefs to write (though LLM-assisted).
+
+## Recommendations
+
+The approaches aren't mutually exclusive. Here's a phased plan:
+
+**Phase 1 — Improve what exists (Approach 1)**
+
+This is the highest-leverage, lowest-risk starting point:
+
+- Restructure `llmSummary` into a structured format (one-liner, key numbers, bottom line). Run the `crux` authoring pipeline to regenerate summaries for all pages.
+- Add an expand toggle to the InfoBox description (currently just CSS `line-clamp-3`).
+- Standardize Quick Assessment tables across all page types (risks already have them).
+- Create a `<KeyTakeaways>` MDX component for hand-curated bullet summaries.
+
+**Phase 2 — Collapsible sections (Approach 2)**
+
+Once summaries are solid, make long pages less intimidating:
+
+- Build a remark plugin that wraps H2 sections in `<CollapsibleSection>`.
+- Default-collapse sections below Overview on pages over ~2,000 words.
+- Add section word counts to collapsed headers.
+- Store expansion state in localStorage.
+
+**Phase 3 — View mode toggle (Approach 3, partial)**
+
+Add a Summary/Full toggle (skip the "Standard" middle mode to reduce complexity):
+
+- Summary mode shows structured summary + InfoBox + Key Takeaways only.
+- Full mode shows the complete page (with collapsible sections from Phase 2).
+- Persist preference. Support `?view=summary` URL parameter.
+
+**Phase 4 (optional) — Tiered authoring (Approach 5)**
+
+If Phase 1–3 show strong user demand for short content:
+
+- Extend page templates to include a Tier 2 brief section.
+- Use `crux content improve` to auto-generate briefs, then human-review.
+- Render briefs as the default view for high-importance, high-length pages.
+
+**Skip for now:** Approach 4 (per-user LLM rewriting). The cost, latency, and quality-control challenges outweigh the benefits given the wiki's static architecture. If the wiki moves to a server-rendered model for other reasons, revisit.
+
+## Technical Feasibility Notes
+
+**Existing infrastructure that helps:**
+- Radix UI `Collapsible` and `Tabs` components are already in the codebase
+- `InfoBoxVisibilityProvider` context establishes the toggle-with-localStorage pattern
+- `DevModeToggle` proves localStorage preferences work across sessions
+- `extractHeadings()` in `mdx.ts` already parses H2/H3 structure at compile time
+- `build-data.mjs` already computes page-level metrics; extending to section-level is straightforward
+- `crux content improve` can be extended to generate structured summaries
+
+**What would need to be built:**
+- Phase 1: Structured summary YAML schema, `<KeyTakeaways>` component, InfoBox expand toggle (~200 lines)
+- Phase 2: Remark plugin for section wrapping, `<CollapsibleSection>` component, section metadata in build pipeline (~500 lines)
+- Phase 3: `<ViewModeProvider>` context, header toggle, URL param handling (~300 lines)
