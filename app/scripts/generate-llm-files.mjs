@@ -20,30 +20,67 @@ const CONFIG = {
   // Site metadata
   site: {
     name: 'LongtermWiki',
-    url: 'https://longtermwiki.org',
+    url: 'https://longterm-wiki.vercel.app',
     description:
       'A comprehensive knowledge base for AI safety research, covering risks, responses, organizations, and the AI transition model.',
   },
-  // Categories to organize content
+  // Categories to organize content (matched against page.category field)
   categories: [
-    { key: 'risks', label: 'AI Risks', pathPrefix: '/knowledge-base/risks/' },
-    { key: 'responses', label: 'Responses & Alignment', pathPrefix: '/knowledge-base/responses/' },
-    { key: 'capabilities', label: 'Capabilities', pathPrefix: '/knowledge-base/capabilities/' },
-    { key: 'organizations', label: 'Organizations', pathPrefix: '/knowledge-base/organizations/' },
-    { key: 'people', label: 'People', pathPrefix: '/knowledge-base/people/' },
-    { key: 'funders', label: 'Funders', pathPrefix: '/knowledge-base/funders/' },
-    { key: 'concepts', label: 'Concepts', pathPrefix: '/knowledge-base/concepts/' },
-    { key: 'forecasting', label: 'Forecasting', pathPrefix: '/knowledge-base/forecasting/' },
-    { key: 'ai-transition-model', label: 'AI Transition Model', pathPrefix: '/ai-transition-model/' },
-    { key: 'analysis', label: 'Analysis', pathPrefix: '/analysis/' },
+    { key: 'risks', label: 'AI Risks' },
+    { key: 'responses', label: 'Responses & Alignment' },
+    { key: 'capabilities', label: 'Capabilities' },
+    { key: 'organizations', label: 'Organizations' },
+    { key: 'people', label: 'People' },
+    { key: 'funders', label: 'Funders' },
+    { key: 'concepts', label: 'Concepts' },
+    { key: 'forecasting', label: 'Forecasting' },
+    { key: 'ai-transition-model', label: 'AI Transition Model' },
+    { key: 'analysis', label: 'Analysis' },
   ],
 };
 
-import { CONTENT_DIR as LONGTERM_CONTENT_DIR, OUTPUT_DIR as LOCAL_OUTPUT_DIR, PROJECT_ROOT } from './lib/content-types.mjs';
+import { CONTENT_DIR as LONGTERM_CONTENT_DIR, OUTPUT_DIR as LOCAL_OUTPUT_DIR, PROJECT_ROOT, DATA_DIR as YAML_DATA_DIR } from './lib/content-types.mjs';
 
 const DATA_DIR = LOCAL_OUTPUT_DIR;  // Read generated pages.json from local output
 const CONTENT_DIR = LONGTERM_CONTENT_DIR;  // Read MDX from longterm
 const OUTPUT_DIR = join(PROJECT_ROOT, 'public');
+
+/**
+ * Load id-registry.json to map page slugs to numeric IDs (E1, E2, ...)
+ */
+function loadIdRegistry() {
+  const registryPath = join(YAML_DATA_DIR, 'id-registry.json');
+  if (!existsSync(registryPath)) {
+    return {};
+  }
+  const registry = JSON.parse(readFileSync(registryPath, 'utf-8'));
+  // Build reverse map: slug → numericId
+  const slugToNumericId = {};
+  for (const [numId, slug] of Object.entries(registry.entities || {})) {
+    slugToNumericId[slug] = numId;
+  }
+  return slugToNumericId;
+}
+
+// Loaded once and reused across all generators
+let _slugToNumericId = null;
+
+function getSlugToNumericId() {
+  if (!_slugToNumericId) {
+    _slugToNumericId = loadIdRegistry();
+  }
+  return _slugToNumericId;
+}
+
+/**
+ * Get the canonical URL for a page (using /wiki/E{n} numeric IDs)
+ */
+function getPageUrl(page) {
+  const map = getSlugToNumericId();
+  const numericId = map[page.id];
+  const wikiPath = numericId ? `/wiki/${numericId}` : `/wiki/${page.id}`;
+  return `${CONFIG.site.url}${wikiPath}`;
+}
 
 /**
  * Load pages.json data
@@ -128,7 +165,7 @@ function getVersion() {
 }
 
 /**
- * Categorize pages by path prefix
+ * Categorize pages by their category field
  */
 function categorizePages(pages) {
   const categorized = {};
@@ -138,16 +175,12 @@ function categorizePages(pages) {
   }
   categorized['other'] = [];
 
+  const categoryKeys = new Set(CONFIG.categories.map((c) => c.key));
+
   for (const page of pages) {
-    let assigned = false;
-    for (const cat of CONFIG.categories) {
-      if (page.path.startsWith(cat.pathPrefix)) {
-        categorized[cat.key].push(page);
-        assigned = true;
-        break;
-      }
-    }
-    if (!assigned) {
+    if (page.category && categoryKeys.has(page.category)) {
+      categorized[page.category].push(page);
+    } else {
       categorized['other'].push(page);
     }
   }
@@ -197,7 +230,7 @@ This file provides an index of site content for LLMs. For full documentation, se
     content += `### ${cat.label}\n\n`;
     for (const page of topPages) {
       const importance = page.importance ? ` (importance: ${page.importance})` : '';
-      content += `- [${page.title}](${CONFIG.site.url}${page.path})${importance}\n`;
+      content += `- [${page.title}](${getPageUrl(page)})${importance}\n`;
     }
     content += '\n';
   }
@@ -251,10 +284,11 @@ function generateLlmsCoreTxt(pages) {
   const includedPages = [];
 
   for (const page of corePagesRaw) {
+    const pageUrl = getPageUrl(page);
     const pageContent = `
 ------------------------------------------------------------
 ## ${page.title}
-Path: ${page.path}
+URL: ${pageUrl}
 Importance: ${page.importance} | Quality: ${page.quality || 'unrated'}
 ------------------------------------------------------------
 
@@ -278,7 +312,7 @@ ${page.llmSummary}
 
 ## Index
 
-${includedPages.map((p) => `- ${p.title}: ${CONFIG.site.url}${p.path}`).join('\n')}
+${includedPages.map((p) => `- ${p.title}: ${getPageUrl(p)}`).join('\n')}
 
 ---
 Generated: ${date} | Pages included: ${includedPages.length} | Estimated tokens: ~${Math.round(tokenCount / 1000)}K
@@ -333,10 +367,11 @@ function generateLlmsFullTxt(pages) {
         continue;
       }
 
+      const pageUrl = getPageUrl(page);
       const header = `
 ------------------------------------------------------------
 ## ${page.title}
-Path: ${page.path}
+URL: ${pageUrl}
 Importance: ${page.importance || 'unrated'} | Quality: ${page.quality || 'unrated'}
 ${page.llmSummary ? `Summary: ${page.llmSummary}` : ''}
 ------------------------------------------------------------

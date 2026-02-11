@@ -1,13 +1,13 @@
 import type { MetadataRoute } from "next";
-import { getAllPages } from "@/data";
+import { getAllPages, getEntityHref } from "@/data";
 
-const SITE_URL = "https://longtermwiki.org";
+const SITE_URL = "https://longterm-wiki.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = getAllPages();
 
   const pageEntries: MetadataRoute.Sitemap = pages.map((page) => ({
-    url: `${SITE_URL}${page.path}`,
+    url: `${SITE_URL}${getEntityHref(page.id)}`,
     lastModified: page.lastUpdated ?? undefined,
     changeFrequency: deriveChangeFrequency(page.updateFrequency ?? null),
     priority: derivePriority(page.importance),
