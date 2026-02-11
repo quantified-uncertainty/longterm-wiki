@@ -59,6 +59,7 @@ async function runGrading(limit: number): Promise<RunResult> {
 
   return new Promise((resolve) => {
     const proc: ChildProcess = spawn('node', [
+      '--import', 'tsx/esm', '--no-warnings',
       'crux/authoring/grade-content.ts',
       '--category', 'knowledge-base',
       '--limit', String(limit),

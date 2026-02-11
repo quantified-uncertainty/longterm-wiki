@@ -22,6 +22,7 @@ import { spawn, type ChildProcess } from 'child_process';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { loadPages } from '../lib/content-types.ts';
+import type { PageEntry } from '../lib/content-types.ts';
 
 const __dirname: string = dirname(fileURLToPath(import.meta.url));
 
@@ -55,9 +56,9 @@ function findOverratedPages(): string[] {
   }
 
   return pages
-    .filter((p: Record<string, unknown>) => p.quality && p.suggestedQuality)
-    .filter((p: Record<string, unknown>) => (p.quality as number) - (p.suggestedQuality as number) >= 20)
-    .map((p: Record<string, unknown>) => p.id as string);
+    .filter((p: PageEntry) => p.quality != null && p.suggestedQuality != null)
+    .filter((p: PageEntry) => (p.quality ?? 0) - (p.suggestedQuality ?? 0) >= 20)
+    .map((p: PageEntry) => p.id);
 }
 
 /**
@@ -71,7 +72,7 @@ function gradePage(pageId: string): Promise<GradeResult> {
 
     console.log(`\n\u{1F4DD} ${DRY_RUN ? 'Previewing' : 'Re-grading'}: ${pageId}`);
 
-    const child: ChildProcess = spawn('node', [gradeScript, ...gradeArgs], {
+    const child: ChildProcess = spawn('node', ['--import', 'tsx/esm', '--no-warnings', gradeScript, ...gradeArgs], {
       cwd: process.cwd(),
       stdio: 'inherit',
       env: process.env,

@@ -109,6 +109,9 @@ export async function runGrading(topic: string, { log, saveResult, getTopicDir }
 
   try {
     const client = createClient();
+    if (!client) {
+      return { success: false, error: 'Anthropic API key not configured' };
+    }
 
     const userPrompt = `Grade this content page:
 
@@ -141,7 +144,11 @@ Respond with JSON:
       messages: [{ role: 'user', content: userPrompt }]
     });
 
-    const text = (response.content[0] as { text: string }).text;
+    const block = response.content[0];
+    if (!block || block.type !== 'text') {
+      return { success: false, error: 'Expected text response from API' };
+    }
+    const text = block.text;
     const grades = parseJsonResponse(text) as GradingResult | null;
 
     if (!grades || !grades.importance) {

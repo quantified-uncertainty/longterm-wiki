@@ -9,19 +9,17 @@
 
 import type { Insight, InsightsData, CheckResult, AllChecksResult, InsightStats, RatingDistribution, DuplicatePair } from '../lib/insights.ts';
 import type { CommandResult } from '../lib/cli.ts';
-import type { Logger } from '../lib/output.ts';
 import * as lib from '../lib/insights.ts';
-import { createLogger, formatCount } from '../lib/output.ts';
-import { join } from 'path';
+import { createLogger } from '../lib/output.ts';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Resolve paths relative to the repo root
 const REPO_ROOT: string = join(__dirname, '..', '..');
-const INSIGHTS_PATH: string = join(REPO_ROOT, 'data', 'insights.yaml');
+const INSIGHTS_PATH: string = join(REPO_ROOT, 'data', 'insights');
 const CONTENT_DIR: string = join(REPO_ROOT, 'content', 'docs');
 
 /**

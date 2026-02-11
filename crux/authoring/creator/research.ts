@@ -4,8 +4,6 @@
  * Handles Perplexity and SCRY research phases.
  */
 
-import fs from 'fs';
-import path from 'path';
 import { batchResearch, generateResearchQueries } from '../../lib/openrouter.ts';
 import type { BatchResearchResult, ResearchQuery } from '../../lib/openrouter.ts';
 

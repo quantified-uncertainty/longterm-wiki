@@ -88,7 +88,7 @@ function calculateGaps(pages: PageEntry[], insights: InsightEntry[]): GapEntry[]
       return {
         title: page.title,
         path: page.path,
-        filePath: page.filePath,
+        filePath: page.filePath ?? page.path,
         importance,
         quality,
         insightCount,
@@ -222,7 +222,7 @@ export async function stats(args: string[], options: Record<string, unknown>): P
   const pagesWithImportance = pages.filter((p: PageEntry) => p.importance != null && p.importance > 0);
   const pagesWithInsights = pagesWithImportance.filter((p: PageEntry) => insightCounts.has(p.path));
   const pagesWithNoInsights = pagesWithImportance.filter((p: PageEntry) => !insightCounts.has(p.path));
-  const highImpNoInsights = pagesWithNoInsights.filter((p: PageEntry) => p.importance >= 70);
+  const highImpNoInsights = pagesWithNoInsights.filter((p: PageEntry) => (p.importance ?? 0) >= 70);
 
   // Category breakdown
   const byCategory: Record<string, { total: number; withInsights: number; insightCount: number }> = {};

@@ -1,7 +1,7 @@
 /**
  * Page Template Definitions
  *
- * Shared template definitions used by grading (grade-by-template.mjs) and
+ * Shared template definitions used by grading (grade-by-template.ts) and
  * potentially authoring tools (page-creator, page-improver) in the future.
  *
  * Each template defines:

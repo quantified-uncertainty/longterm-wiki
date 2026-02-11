@@ -80,6 +80,7 @@ interface ParsedOpts {
 }
 
 interface ArxivMetadata {
+  title: string | null;
   authors: string[];
   published: string | null;
   abstract: string | null;
@@ -609,10 +610,12 @@ async function fetchArxivBatch(arxivIds: string[]): Promise<Map<string, ArxivMet
       authors.push(authorMatch[1].trim());
     }
 
+    const titleMatch = entry.match(/<title>([\s\S]*?)<\/title>/);
     const publishedMatch = entry.match(/<published>([^<]+)<\/published>/);
     const summaryMatch = entry.match(/<summary>([\s\S]*?)<\/summary>/);
 
     results.set(id, {
+      title: titleMatch ? titleMatch[1].replace(/\s+/g, ' ').trim() : null,
       authors,
       published: publishedMatch ? publishedMatch[1].split('T')[0] : null,
       abstract: summaryMatch ? summaryMatch[1].replace(/\s+/g, ' ').trim() : null,
@@ -756,8 +759,8 @@ async function extractForumMetadata(opts: ParsedOpts): Promise<number> {
     const slug = extractForumSlug(r.url);
     const isEA = r.url.includes('forum.effectivealtruism.org');
     try {
-      const meta = await fetchForumMetadata(slug!, isEA);
-      if (meta?.authors?.length > 0) {
+      const meta = await fetchForumMetadata(slug ?? '', isEA);
+      if (meta && meta.authors && meta.authors.length > 0) {
         r.authors = meta.authors;
         if (meta.published) r.published_date = meta.published;
         updated++;
@@ -876,7 +879,7 @@ async function extractScholarMetadata(opts: ParsedOpts): Promise<number> {
 
     try {
       const meta = await fetchSemanticScholarMetadata(doi);
-      if (meta?.authors?.length > 0) {
+      if (meta && meta.authors && meta.authors.length > 0) {
         r.authors = meta.authors;
         if (meta.published) r.published_date = meta.published;
         if (meta.abstract && !r.abstract) r.abstract = meta.abstract;

@@ -5,7 +5,6 @@
  */
 
 import type { CommandResult } from '../lib/cli.ts';
-import { createLogger } from '../lib/output.ts';
 import { runScript, optionsToArgs } from '../lib/cli.ts';
 
 interface ResourceCommandConfig {
@@ -61,8 +60,6 @@ function createCommandHandler(
   config: ResourceCommandConfig,
 ): (args: string[], options: Record<string, unknown>) => Promise<CommandResult> {
   return async function (args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-    const log = createLogger((options.ci || options.json) as boolean);
-
     // Build the command args
     const cmdArgs: string[] = [name];
 

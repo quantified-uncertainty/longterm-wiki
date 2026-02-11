@@ -60,6 +60,7 @@ export interface Rule {
     input: ContentFile | ContentFile[],
     engine: ValidationEngine,
   ): Issue[] | Promise<Issue[]>;
+  fix?(content: string, issue: Issue): string | null;
 }
 
 export interface ValidateOptions {
@@ -508,8 +509,8 @@ export class ValidationEngine {
 // ---------------------------------------------------------------------------
 
 /** Create a simple rule */
-export function createRule({ id, name, description, scope = 'file', check }: Rule): Rule {
-  return { id, name, description, scope, check };
+export function createRule({ id, name, description, scope = 'file', check, fix }: Rule): Rule {
+  return { id, name, description, scope, check, ...(fix && { fix }) };
 }
 
 export default ValidationEngine;

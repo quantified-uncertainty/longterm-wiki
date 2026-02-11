@@ -27,7 +27,7 @@
  */
 
 import { createClient, callClaude, parseJsonResponse, MODELS } from '../lib/anthropic.ts';
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, relative, basename, dirname } from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { fileURLToPath } from 'url';
@@ -258,7 +258,7 @@ interface PageInfo {
 
 interface Warning {
   rule: string;
-  line: number;
+  line?: number;
   message: string;
   severity: string;
 }

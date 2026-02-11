@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --import tsx/esm --no-warnings
 
 /**
  * Page Improvement Pipeline
@@ -221,13 +221,6 @@ function writeTemp(pageId: string, filename: string, content: string | object): 
   return filePath;
 }
 
-function readTemp(pageId: string, filename: string): string | object | null {
-  const filePath = path.join(TEMP_DIR, pageId, filename);
-  if (!fs.existsSync(filePath)) return null;
-  const content = fs.readFileSync(filePath, 'utf-8');
-  return filename.endsWith('.json') ? JSON.parse(content) : content;
-}
-
 // Load page data
 function loadPages(): PageData[] {
   const pagesPath = path.join(ROOT, 'app/src/data/pages.json');
@@ -289,7 +282,7 @@ async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<
     for (const toolUse of toolUseBlocks) {
       let result: string;
       try {
-        const input = toolUse.input as Record<string, string>;
+        const input = (toolUse.input ?? {}) as Record<string, string>;
         if (toolUse.name === 'web_search') {
           result = await executeWebSearch(input.query);
         } else if (toolUse.name === 'scry_search') {
