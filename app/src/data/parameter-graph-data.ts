@@ -799,6 +799,7 @@ export interface RawGraphDataExport {
     type: 'cause' | 'intermediate' | 'effect';
     order?: number;
     subgroup?: string;
+    href?: string;
     subItems?: SubItem[];
     confidence?: number;
     confidenceLabel?: string;
@@ -830,6 +831,7 @@ export function getRawGraphData(): RawGraphDataExport {
     type: node.type,
     order: node.order,
     subgroup: node.subgroup,
+    href: (node as any).href as string | undefined,
     subItems: node.subItems?.map(item => enrichSubItem(item, node.type, node.id)),
     confidence: node.confidence,
     confidenceLabel: node.confidenceLabel,
