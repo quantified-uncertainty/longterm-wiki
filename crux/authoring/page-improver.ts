@@ -190,6 +190,123 @@ interface PipelineOptions {
   deep?: boolean;
 }
 
+// ---------------------------------------------------------------------------
+// Triage: cheap news-check to auto-select update tier
+// ---------------------------------------------------------------------------
+
+export interface TriageResult {
+  pageId: string;
+  title: string;
+  lastEdited: string;
+  recommendedTier: 'skip' | 'polish' | 'standard' | 'deep';
+  reason: string;
+  newDevelopments: string[];
+  estimatedCost: string;
+  triageCost: string;
+}
+
+/**
+ * Cheap pre-check (~$0.10-0.20) to determine if a page needs updating and at what tier.
+ *
+ * Uses Haiku + web search + SCRY to check for new developments since the page's
+ * last edit date, then recommends skip/polish/standard/deep.
+ *
+ * Cost breakdown:
+ *   - Web search: ~$0.05 (Sonnet web search, 1 query)
+ *   - SCRY search: free
+ *   - Haiku classification: ~$0.01-0.02
+ *   Total: ~$0.06-0.10 per page
+ */
+export async function triagePhase(page: PageData, lastEdited: string): Promise<TriageResult> {
+  log('triage', `Checking for news since ${lastEdited}: "${page.title}"`);
+
+  const filePath = getFilePath(page.path);
+  const currentContent = fs.readFileSync(filePath, 'utf-8');
+
+  // Extract frontmatter summary for context (first 500 chars of content after frontmatter)
+  const contentAfterFm = currentContent.replace(/^---[\s\S]*?---\n/, '');
+  const contentPreview = contentAfterFm.slice(0, 500);
+
+  // Run web search and SCRY search in parallel
+  const searchQuery = `${page.title} developments news ${lastEdited} to ${new Date().toISOString().slice(0, 10)}`;
+  const scryQuery = page.title;
+
+  const [webResults, scryResults] = await Promise.all([
+    executeWebSearch(searchQuery).catch(err => `Web search failed: ${err.message}`),
+    executeScrySearch(scryQuery).catch(err => `SCRY search failed: ${err.message}`),
+  ]);
+
+  // Use Haiku to classify — cheap and fast
+  const classificationPrompt = `You are triaging whether a wiki page needs updating.
+
+## Page
+- Title: ${page.title}
+- ID: ${page.id}
+- Last edited: ${lastEdited}
+- Content preview: ${contentPreview}
+
+## Recent Web Results
+${webResults}
+
+## Recent EA Forum / LessWrong Results (SCRY)
+${scryResults}
+
+## Task
+
+Based on the search results, determine if there are significant new developments since ${lastEdited} that warrant updating this page.
+
+Classify into one of these tiers:
+
+- **skip**: No meaningful new developments found. Page content is still current.
+- **polish**: Minor updates only — small corrections, formatting, or very minor new info. (~$2-3)
+- **standard**: Notable new developments that should be added — new papers, policy changes, funding rounds, etc. (~$5-8)
+- **deep**: Major developments requiring thorough research — new organizations, paradigm shifts, major incidents, etc. (~$10-15)
+
+Output ONLY a JSON object:
+{
+  "recommendedTier": "skip|polish|standard|deep",
+  "reason": "1-2 sentence explanation of why this tier",
+  "newDevelopments": ["list", "of", "specific", "new", "developments", "found"]
+}`;
+
+  const result = await runAgent(classificationPrompt, {
+    model: MODELS.haiku,
+    maxTokens: 1000,
+  });
+
+  let parsed: { recommendedTier: string; reason: string; newDevelopments: string[] };
+  try {
+    const jsonMatch = result.match(/\{[\s\S]*\}/);
+    parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(result);
+  } catch {
+    log('triage', 'Warning: Could not parse triage result, defaulting to standard');
+    parsed = { recommendedTier: 'standard', reason: 'Triage parsing failed, using default', newDevelopments: [] };
+  }
+
+  // Validate tier
+  const validTiers: string[] = ['skip', 'polish', 'standard', 'deep'];
+  const tier = (validTiers.includes(parsed.recommendedTier)
+    ? parsed.recommendedTier
+    : 'standard') as TriageResult['recommendedTier'];
+
+  const costMap = { skip: '$0', polish: '$2-3', standard: '$5-8', deep: '$10-15' };
+
+  const triageResult: TriageResult = {
+    pageId: page.id,
+    title: page.title,
+    lastEdited,
+    recommendedTier: tier,
+    reason: parsed.reason || '',
+    newDevelopments: parsed.newDevelopments || [],
+    estimatedCost: costMap[tier],
+    triageCost: '~$0.08',
+  };
+
+  writeTemp(page.id, 'triage.json', triageResult);
+  log('triage', `Result: ${tier} — ${parsed.reason}`);
+  return triageResult;
+}
+
 interface PipelineResults {
   pageId: string;
   title: string;
@@ -264,7 +381,7 @@ function buildObjectivityContext(page: PageData, analysis: AnalysisResult): stri
 }
 
 // Load page data
-function loadPages(): PageData[] {
+export function loadPages(): PageData[] {
   const pagesPath = path.join(ROOT, 'app/src/data/pages.json');
   if (!fs.existsSync(pagesPath)) {
     console.error('Error: pages.json not found. Run `pnpm build` first.');
@@ -299,7 +416,7 @@ function enrichWithFrontmatterRatings(page: PageData): PageData {
   return page;
 }
 
-function findPage(pages: PageData[], query: string): PageData | null {
+export function findPage(pages: PageData[], query: string): PageData | null {
   let page = pages.find(p => p.id === query);
   if (page) return enrichWithFrontmatterRatings(page);
 
@@ -315,7 +432,7 @@ function findPage(pages: PageData[], query: string): PageData | null {
   return null;
 }
 
-function getFilePath(pagePath: string): string {
+export function getFilePath(pagePath: string): string {
   const cleanPath = pagePath.replace(/^\/|\/$/g, '');
   return path.join(ROOT, 'content/docs', cleanPath + '.mdx');
 }
@@ -908,14 +1025,8 @@ Start your response with "---" (the frontmatter delimiter).`;
 }
 
 // Main pipeline
-async function runPipeline(pageId: string, options: PipelineOptions = {}): Promise<PipelineResults> {
-  const { tier = 'standard', directions = '', dryRun = false } = options;
-  const tierConfig = TIERS[tier];
-
-  if (!tierConfig) {
-    console.error(`Unknown tier: ${tier}. Available: ${Object.keys(TIERS).join(', ')}`);
-    process.exit(1);
-  }
+export async function runPipeline(pageId: string, options: PipelineOptions = {}): Promise<PipelineResults> {
+  let { tier = 'standard', directions = '', dryRun = false } = options;
 
   // Find page
   const pages = loadPages();
@@ -932,8 +1043,48 @@ async function runPipeline(pageId: string, options: PipelineOptions = {}): Promi
     process.exit(1);
   }
 
+  // Handle triage tier: run news check to auto-select the real tier
+  let triageResult: TriageResult | undefined;
+  if (tier === 'triage') {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const fmMatch = content.match(/lastEdited:\s*["']?(\d{4}-\d{2}-\d{2})["']?/);
+    const lastEdited = fmMatch?.[1] || 'unknown';
+    triageResult = await triagePhase(page, lastEdited);
+
+    if (triageResult.recommendedTier === 'skip') {
+      console.log(`\nTriage: SKIP — ${triageResult.reason}`);
+      return {
+        pageId: page.id,
+        title: page.title,
+        tier: 'skip',
+        directions,
+        duration: '0',
+        phases: ['triage'],
+        review: undefined,
+        outputPath: '',
+      };
+    }
+
+    tier = triageResult.recommendedTier;
+    // If triage found specific new developments, add them to directions
+    if (triageResult.newDevelopments.length > 0) {
+      const triageDirections = `New developments to incorporate: ${triageResult.newDevelopments.join('; ')}`;
+      directions = directions ? `${directions}\n\n${triageDirections}` : triageDirections;
+    }
+    log('triage', `Auto-selected tier: ${tier}`);
+  }
+
+  const tierConfig = TIERS[tier];
+  if (!tierConfig) {
+    console.error(`Unknown tier: ${tier}. Available: ${Object.keys(TIERS).join(', ')}, triage`);
+    process.exit(1);
+  }
+
   console.log('\n' + '='.repeat(60));
   console.log(`Improving: "${page.title}"`);
+  if (triageResult) {
+    console.log(`Triage: ${triageResult.reason}`);
+  }
   console.log(`Tier: ${tierConfig.name} (${tierConfig.cost})`);
   console.log(`Phases: ${tierConfig.phases.join(' → ')}`);
   if (directions) console.log(`Directions: ${directions}`);
@@ -1119,9 +1270,10 @@ Usage:
 
 Options:
   --directions "..."   Specific improvement directions
-  --tier <tier>        polish ($2-3), standard ($5-8), deep ($10-15)
+  --tier <tier>        polish ($2-3), standard ($5-8), deep ($10-15), or triage (auto)
   --apply              Apply changes directly (don't just preview)
   --grade              Run grade-content.ts after applying (requires --apply)
+  --triage             Run news-check triage only (no improvement)
   --list               List pages needing improvement
   --limit N            Limit list results (default: 20)
 
@@ -1129,11 +1281,13 @@ Tiers:
   polish    Quick single-pass, no research
   standard  Light research + improve + review (default)
   deep      Full SCRY + web research, gap filling
+  triage    Auto-select tier via cheap news check (~$0.08)
 
 Examples:
   node crux/authoring/page-improver.ts -- open-philanthropy --directions "add 2024 grants"
   node crux/authoring/page-improver.ts -- far-ai --tier deep --directions "add publications"
   node crux/authoring/page-improver.ts -- cea --tier polish
+  node crux/authoring/page-improver.ts -- cea --triage           # Check if update needed
   node crux/authoring/page-improver.ts -- --list --limit 30
 `);
     return;
@@ -1150,6 +1304,24 @@ Examples:
     console.error('Error: No page ID provided');
     console.error('Try: node crux/authoring/page-improver.ts -- --list');
     process.exit(1);
+  }
+
+  // Triage-only mode: just check if update is needed
+  if (opts.triage) {
+    const pages = loadPages();
+    const page = findPage(pages, pageId);
+    if (!page) {
+      console.error(`Page not found: ${pageId}`);
+      process.exit(1);
+    }
+    const filePath = getFilePath(page.path);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const fmMatch = content.match(/lastEdited:\s*["']?(\d{4}-\d{2}-\d{2})["']?/);
+    const lastEdited = fmMatch?.[1] || 'unknown';
+    const result = await triagePhase(page, lastEdited);
+    console.log('\nTriage Result:');
+    console.log(JSON.stringify(result, null, 2));
+    return;
   }
 
   await runPipeline(pageId, {
