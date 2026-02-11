@@ -173,5 +173,9 @@ If you find any logicalIssues or temporalArtifacts, also fix them directly in th
     claude.on('close', (code: number | null) => {
       resolve({ success: code === 0 });
     });
+
+    claude.on('error', (err: Error) => {
+      resolve({ success: false, error: err.message });
+    });
   });
 }

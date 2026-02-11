@@ -47,16 +47,13 @@ interface Candidate {
 }
 
 // Parse args
-const args = process.argv.slice(2);
-function getArg(name: string, defaultValue: string | null): string | null {
-  const index = args.indexOf(`--${name}`);
-  if (index === -1) return defaultValue;
-  return args[index + 1] || defaultValue;
-}
+import { parseCliArgs } from '../lib/cli.ts';
 
-const LIST_MODE = args.includes('--list');
-const BATCH_SIZE = parseInt(getArg('batch', '0') || '0');
-const SPECIFIC_ID = args.find(a => !a.startsWith('--'));
+const parsed = parseCliArgs(process.argv.slice(2));
+
+const LIST_MODE = parsed.list === true;
+const BATCH_SIZE = parseInt((parsed.batch as string) || '0');
+const SPECIFIC_ID = parsed._positional[0] || undefined;
 
 // Load AI Transition Model data (merged from multiple YAML files)
 function loadTransitionModelData(): TransitionModelEntity[] {
@@ -237,7 +234,7 @@ Task({
 
 // Main
 function main(): void {
-  if (args.includes('--help') || args.includes('-h')) {
+  if (parsed.help === true || parsed.h === true) {
     console.log(`
 Research Report Generator
 

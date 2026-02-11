@@ -43,13 +43,23 @@ function parseArgs(args: string[]): ParsedOpts {
   const opts: ParsedOpts = {};
   for (let i = 0; i < args.length; i++) {
     if (args[i].startsWith('--')) {
-      const key = args[i].slice(2);
-      const next = args[i + 1];
-      if (next && !next.startsWith('--')) {
-        (opts as Record<string, unknown>)[key] = isNaN(Number(next)) ? next : parseFloat(next);
-        i++;
+      const raw = args[i].slice(2);
+      const eqIdx = raw.indexOf('=');
+      if (eqIdx !== -1) {
+        // --key=value format
+        const key = raw.slice(0, eqIdx);
+        const val = raw.slice(eqIdx + 1);
+        (opts as Record<string, unknown>)[key] = isNaN(Number(val)) ? val : parseFloat(val);
       } else {
-        (opts as Record<string, unknown>)[key] = true;
+        // --key value or --flag format
+        const key = raw;
+        const next = args[i + 1];
+        if (next && !next.startsWith('--')) {
+          (opts as Record<string, unknown>)[key] = isNaN(Number(next)) ? next : parseFloat(next);
+          i++;
+        } else {
+          (opts as Record<string, unknown>)[key] = true;
+        }
       }
     } else if (!opts._cmd) {
       opts._cmd = args[i];

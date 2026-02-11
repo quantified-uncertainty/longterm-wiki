@@ -71,22 +71,18 @@ interface ProcessStats {
   totalTokens: number;
 }
 
-const args = process.argv.slice(2);
+import { parseCliArgs } from '../lib/cli.ts';
 
-function getArg(name: string, defaultValue: string | null): string | null {
-  const index = args.indexOf(`--${name}`);
-  if (index === -1) return defaultValue;
-  return args[index + 1] || defaultValue;
-}
+const parsed = parseCliArgs(process.argv.slice(2));
 
-const TYPE = getArg('type', 'articles')!;
-const BATCH_SIZE = parseInt(getArg('batch', '10')!);
-const MODEL_NAME = getArg('model', 'haiku')!;
-const CONCURRENCY = parseInt(getArg('concurrency', '3')!);
-const RESUMMARY = args.includes('--resummary');
-const SPECIFIC_ID = getArg('id', null);
-const DRY_RUN = args.includes('--dry-run');
-const VERBOSE = args.includes('--verbose');
+const TYPE = (parsed.type as string) || 'articles';
+const BATCH_SIZE = parseInt((parsed.batch as string) || '10');
+const MODEL_NAME = (parsed.model as string) || 'haiku';
+const CONCURRENCY = parseInt((parsed.concurrency as string) || '3');
+const RESUMMARY = parsed.resummary === true;
+const SPECIFIC_ID = (parsed.id as string) || null;
+const DRY_RUN = parsed['dry-run'] === true;
+const VERBOSE = parsed.verbose === true;
 
 const MODEL_ID = resolveModel(MODEL_NAME);
 

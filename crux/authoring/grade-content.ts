@@ -35,6 +35,7 @@ import { CONTENT_DIR } from '../lib/content-types.ts';
 import { ValidationEngine, ContentFile } from '../lib/validation-engine.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
+import { parseCliArgs } from '../lib/cli.ts';
 import {
   insiderJargonRule,
   falseCertaintyRule,
@@ -47,7 +48,7 @@ import type Anthropic from '@anthropic-ai/sdk';
 const OUTPUT_FILE = '.claude/temp/grades-output.json';
 
 // Parse command line args
-const args: string[] = process.argv.slice(2);
+const parsed = parseCliArgs(process.argv.slice(2));
 
 interface Options {
   page: string | null;
@@ -63,16 +64,16 @@ interface Options {
 }
 
 const options: Options = {
-  page: args.includes('--page') ? args[args.indexOf('--page') + 1] : null,
-  dryRun: args.includes('--dry-run'),
-  limit: args.includes('--limit') ? parseInt(args[args.indexOf('--limit') + 1]) : null,
-  category: args.includes('--category') ? args[args.indexOf('--category') + 1] : null,
-  skipGraded: args.includes('--skip-graded'),
-  output: args.includes('--output') ? args[args.indexOf('--output') + 1] : OUTPUT_FILE,
-  apply: args.includes('--apply'),
-  parallel: args.includes('--parallel') ? parseInt(args[args.indexOf('--parallel') + 1]) : 1,
-  skipWarnings: args.includes('--skip-warnings'),
-  warningsOnly: args.includes('--warnings-only'),
+  page: (parsed.page as string) || null,
+  dryRun: parsed['dry-run'] === true,
+  limit: parsed.limit ? parseInt(parsed.limit as string) : null,
+  category: (parsed.category as string) || null,
+  skipGraded: parsed['skip-graded'] === true,
+  output: (parsed.output as string) || OUTPUT_FILE,
+  apply: parsed.apply === true,
+  parallel: parsed.parallel ? parseInt(parsed.parallel as string) : 1,
+  skipWarnings: parsed['skip-warnings'] === true,
+  warningsOnly: parsed['warnings-only'] === true,
 };
 
 const SYSTEM_PROMPT: string = `You are an expert evaluator of AI safety content for a resource aimed at **expert AI prioritization work** - helping researchers and funders identify and prioritize concrete interventions to reduce AI existential risk.

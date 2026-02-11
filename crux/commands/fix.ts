@@ -13,7 +13,7 @@ const SCRIPTS = {
   all: {
     script: 'auto-fix.ts',
     description: 'Run all auto-fixers',
-    passthrough: ['dryRun'],
+    passthrough: ['dryRun', 'ci'],
   },
   'entity-links': {
     script: 'validate/validate-entity-links.ts',
@@ -24,12 +24,12 @@ const SCRIPTS = {
   'cross-links': {
     script: 'fix/fix-cross-links.ts',
     description: 'Add EntityLinks to plain text entity mentions',
-    passthrough: ['apply', 'verbose', 'file'],
+    passthrough: ['apply', 'verbose', 'file', 'ci', 'dryRun'],
   },
   'broken-links': {
     script: 'fix-broken-links.ts',
     description: 'Fix broken internal links',
-    passthrough: ['dryRun'],
+    passthrough: ['dryRun', 'ci'],
     extraArgs: ['--fix'],
   },
   markdown: {
@@ -65,7 +65,7 @@ const SCRIPTS = {
   imports: {
     script: 'fix/fix-component-imports.ts',
     description: 'Add missing component imports to MDX files',
-    passthrough: ['apply', 'verbose', 'file'],
+    passthrough: ['apply', 'verbose', 'file', 'ci', 'dryRun'],
   },
 };
 
