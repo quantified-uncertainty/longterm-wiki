@@ -8,8 +8,8 @@
  * - Lorem ipsum text
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.js';
-import type { ContentFile, ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity } from '../validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock, isInMermaid, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
 
 // Placeholder patterns to detect

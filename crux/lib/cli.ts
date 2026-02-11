@@ -7,6 +7,7 @@
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { PROJECT_ROOT } from './content-types.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,7 +35,7 @@ export async function runScript(
   options: RunScriptOptions = {},
 ): Promise<RunScriptResult> {
   const fullPath = join(SCRIPTS_DIR, scriptPath);
-  const { streamOutput = false, cwd = process.cwd() } = options;
+  const { streamOutput = false, cwd = PROJECT_ROOT } = options;
 
   return new Promise((resolve) => {
     // Always register tsx/esm so scripts can use .ts imports

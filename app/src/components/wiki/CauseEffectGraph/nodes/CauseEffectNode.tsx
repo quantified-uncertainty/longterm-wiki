@@ -240,10 +240,10 @@ export function CauseEffectNode({ data, selected, id }: NodeProps<Node<CauseEffe
   const borderRadius = NODE_BORDER_RADIUS[nodeType] || '12px';
 
   const hasSubItems = data.subItems && data.subItems.length > 0;
-  const isClickable = !!data.href;
+  const isClickable = !!data.href && !data.suppressNavigation;
 
   const handleClick = () => {
-    if (data.href) {
+    if (data.href && !data.suppressNavigation) {
       window.location.href = data.href;
     }
   };

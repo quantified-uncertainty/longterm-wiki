@@ -13,33 +13,33 @@ const SCRIPTS = {
   yaml: {
     script: 'generate/generate-yaml.ts',
     description: 'Generate YAML from MDX files',
-    passthrough: ['verbose', 'dryRun'],
+    passthrough: ['ci', 'verbose', 'dryRun'],
     positional: true,
   },
   summaries: {
     script: 'generate/generate-summaries.ts',
     description: 'Generate summaries with AI',
-    passthrough: ['type', 'batch', 'concurrency', 'model', 'resummary', 'id', 'dryRun', 'verbose'],
+    passthrough: ['ci', 'type', 'batch', 'concurrency', 'model', 'resummary', 'id', 'dryRun', 'verbose'],
   },
   diagrams: {
     script: 'generate/generate-data-diagrams.ts',
     description: 'Generate diagrams from entity data',
-    passthrough: ['verbose'],
+    passthrough: ['ci', 'verbose'],
   },
   'schema-diagrams': {
     script: 'generate/generate-schema-diagrams.ts',
     description: 'Generate schema diagrams',
-    passthrough: [],
+    passthrough: ['ci'],
   },
   'schema-docs': {
     script: 'generate/generate-schema-docs.ts',
     description: 'Generate documentation from schema',
-    passthrough: [],
+    passthrough: ['ci'],
   },
   reports: {
     script: 'generate/generate-research-reports.ts',
     description: 'Generate research reports',
-    passthrough: ['topic', 'output', 'verbose'],
+    passthrough: ['ci', 'topic', 'output', 'verbose'],
     positional: true,
   },
 };

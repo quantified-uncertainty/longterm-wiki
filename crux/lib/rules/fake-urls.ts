@@ -10,8 +10,8 @@
  * These are worse than no URL - they're actively misleading.
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.js';
-import type { ContentFile, ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity } from '../validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
 
 // Fake URL patterns to detect

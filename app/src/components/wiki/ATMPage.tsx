@@ -71,6 +71,12 @@ export function ATMPage({
   // Extract backlinks ID (strip tmc- prefix for backlinks lookup)
   const backlinksId = entityId.replace(/^tmc-/, '');
 
+  // Determine graph node ID for "View in Graph" link
+  // Sub-items have parentFactor; top-level factors/scenarios use their own ID
+  const tmcEntity = entity as { parentFactor?: string };
+  const graphNodeId = tmcEntity.parentFactor || backlinksId;
+  const graphUrl = `/ai-transition-model/graph/?node=${encodeURIComponent(graphNodeId)}`;
+
   return (
     <div className="flex flex-col gap-6">
       {/* Description as intro prose */}
@@ -79,6 +85,23 @@ export function ATMPage({
           <p className="m-0">{entity.description}</p>
         </div>
       )}
+
+      {/* Graph link */}
+      <div className="text-sm">
+        <a
+          href={graphUrl}
+          className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors no-underline"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          View in AI Transition Model Graph
+        </a>
+      </div>
 
       {/* Custom content from MDX children */}
       {children && (

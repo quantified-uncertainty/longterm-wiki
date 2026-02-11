@@ -26,11 +26,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import Anthropic from '@anthropic-ai/sdk';
-import type { MessageParam, ContentBlock, ToolUseBlock, ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages';
+import type { MessageParam, ToolUseBlock, ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
+import { MODELS } from '../lib/anthropic.ts';
 // Inlined from content-types.ts to keep this file self-contained
 const CRITICAL_RULES: string[] = [
   'dollar-signs',
@@ -259,7 +260,7 @@ function getImportPath(): string {
 // Run Claude with tools
 async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<string> {
   const {
-    model = 'claude-sonnet-4-20250514',
+    model = MODELS.sonnet,
     maxTokens = 16000,
     tools = [],
     systemPrompt = ''
@@ -329,7 +330,7 @@ async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<
 async function executeWebSearch(query: string): Promise<string> {
   // Use Anthropic's web search via a simple agent call
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: MODELS.sonnet,
     max_tokens: 4000,
     tools: [{
       type: 'web_search_20250305',
@@ -409,7 +410,7 @@ Focus especially on the user's directions: "${directions || 'general improvement
 Output ONLY valid JSON, no markdown code blocks.`;
 
   const result = await runAgent(prompt, {
-    model: options.analysisModel || 'claude-sonnet-4-20250514',
+    model: options.analysisModel || MODELS.sonnet,
     maxTokens: 4000
   });
 
@@ -515,7 +516,7 @@ Output ONLY valid JSON at the end.`;
   ];
 
   const result = await runAgent(prompt, {
-    model: options.researchModel || 'claude-sonnet-4-20250514',
+    model: options.researchModel || MODELS.sonnet,
     maxTokens: 8000,
     tools
   });
@@ -591,7 +592,7 @@ Do not output markdown code blocks - output the raw MDX directly.
 Start your response with "---" (the frontmatter delimiter).`;
 
   const result = await runAgent(prompt, {
-    model: options.improveModel || 'claude-sonnet-4-20250514',
+    model: options.improveModel || MODELS.sonnet,
     maxTokens: 16000
   });
 
@@ -658,7 +659,7 @@ Output a JSON review:
 Output ONLY valid JSON.`;
 
   const result = await runAgent(prompt, {
-    model: options.reviewModel || 'claude-sonnet-4-20250514',
+    model: options.reviewModel || MODELS.sonnet,
     maxTokens: 4000
   });
 
@@ -785,7 +786,7 @@ Fix each issue. Output the COMPLETE fixed MDX content.
 Start your response with "---" (the frontmatter delimiter).`;
 
   const result = await runAgent(prompt, {
-    model: options.improveModel || 'claude-sonnet-4-20250514',
+    model: options.improveModel || MODELS.sonnet,
     maxTokens: 16000
   });
 

@@ -136,7 +136,7 @@ export function runCheck(options?: ValidatorOptions): ValidatorResult {
       console.log(`${colors.red}Found ${errorCount} sidebar configuration issue(s):${colors.reset}\n`);
 
       for (const { file, issues } of allIssues) {
-        const relPath: string = file.replace(process.cwd() + '/', '');
+        const relPath: string = formatPath(file);
         console.log(`${colors.bold}${relPath}${colors.reset}`);
 
         for (const issue of issues) {

@@ -59,4 +59,4 @@ longterm-wiki/
 - **Squiggle models**: See `app/CLAUDE.md` for SquiggleEstimate style guide
 - **Internal sidebar** (`app/src/lib/internal-nav.ts`): When adding internal pages, place them in the correct section. "Research" is for research reports/proposals only. Schema/architecture/technical docs go in "Architecture & Schema". Check existing section semantics before adding.
 - **Mermaid diagrams**: Follow `content/docs/internal/mermaid-diagrams.mdx` style guide — prefer `flowchart TD`, max 3-4 parallel nodes, use tables for taxonomies, max 15-20 nodes per diagram.
-- **Page templates**: Defined in `crux/lib/page-templates.mjs`, style guides in `content/docs/internal/`
+- **Page templates**: Defined in `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`

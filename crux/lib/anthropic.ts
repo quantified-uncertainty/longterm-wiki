@@ -75,9 +75,10 @@ export function createClient({ apiKey, required = true }: CreateClientOptions = 
 
   if (!key) {
     if (required) {
-      console.error('Error: ANTHROPIC_API_KEY not found in environment');
-      console.error('Make sure you have a .env or .env.local file with ANTHROPIC_API_KEY=sk-...');
-      process.exit(1);
+      throw new Error(
+        'ANTHROPIC_API_KEY not found in environment. ' +
+        'Make sure you have a .env or .env.local file with ANTHROPIC_API_KEY=sk-...'
+      );
     }
     return null;
   }

@@ -8,7 +8,7 @@
  * These are content-level checks, not formatting rules.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 
 /**
  * Count words in a text string (rough but fast)

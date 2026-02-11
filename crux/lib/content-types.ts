@@ -5,12 +5,61 @@
  * Typed loaders for generated JSON files (app/src/data/*.json).
  */
 
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { readFileSync, existsSync } from 'fs';
+import { fileURLToPath } from 'url';
 
 // ---------------------------------------------------------------------------
 // Types for generated JSON (match what build-data.mjs produces)
 // ---------------------------------------------------------------------------
+
+/**
+ * MDX frontmatter fields used across wiki pages.
+ * Known fields get type hints; arbitrary fields still allowed via index signature.
+ */
+export interface Frontmatter {
+  title?: string;
+  description?: string;
+  sidebar?: { label?: string; order?: number; hidden?: boolean; badge?: unknown };
+  pageType?: 'content' | 'stub' | 'documentation';
+  quality?: number;
+  importance?: number;
+  tractability?: number;
+  neglectedness?: number;
+  uncertainty?: number;
+  llmSummary?: string;
+  lastEdited?: string;
+  lastUpdated?: Date | string | boolean;
+  createdAt?: Date | string;
+  todo?: string;
+  todos?: string[];
+  seeAlso?: string;
+  ratings?: {
+    novelty?: number;
+    rigor?: number;
+    actionability?: number;
+    completeness?: number;
+    changeability?: number;
+    xriskImpact?: number;
+    trajectoryImpact?: number;
+    uncertainty?: number;
+  };
+  metrics?: {
+    wordCount?: number;
+    citations?: number;
+    tables?: number;
+    diagrams?: number;
+  };
+  maturity?: string;
+  fullWidth?: boolean;
+  update_frequency?: number;
+  entityId?: string;
+  roles?: string[];
+  pageTemplate?: string;
+  draft?: boolean;
+  // Allow arbitrary additional fields
+  [key: string]: any;
+}
 
 export interface Entity {
   id: string;
@@ -120,8 +169,10 @@ export interface ExpertEntry {
 // Path constants
 // ---------------------------------------------------------------------------
 
-/** Project root directory (current working directory) */
-export const PROJECT_ROOT: string = process.cwd();
+/** Project root directory (derived from this file's location: crux/lib/) */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+export const PROJECT_ROOT: string = join(__dirname, '../..');
 
 /** Base content directory (relative path from repo root) */
 export const CONTENT_DIR: string = 'content/docs';

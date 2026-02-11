@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 
 // Mirror the schema from content.config.ts
 const frontmatterSchema = z.object({

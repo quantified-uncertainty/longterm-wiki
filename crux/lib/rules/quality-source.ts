@@ -8,7 +8,7 @@
  * outside the proper grading pipeline.
  */
 
-import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 
 export const qualitySourceRule = {

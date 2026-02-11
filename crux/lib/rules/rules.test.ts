@@ -1,416 +1,547 @@
-#!/usr/bin/env node
 /**
  * Unit Tests for Validation Rules
- *
- * Tests the CRITICAL and key QUALITY validation rules.
- * Run: node --import tsx/esm crux/lib/rules/rules.test.ts
  */
 
-import { Issue, Severity, FixType, createRule } from '../validation-engine.js';
-import { dollarSignsRule } from './dollar-signs.js';
-import { comparisonOperatorsRule } from './comparison-operators.js';
-import { tildeDollarRule } from './tilde-dollar.js';
-import { fakeUrlsRule } from './fake-urls.js';
-import { placeholdersRule } from './placeholders.js';
-import { consecutiveBoldLabelsRule } from './consecutive-bold-labels.js';
-import { temporalArtifactsRule } from './temporal-artifacts.js';
-import { vagueCitationsRule } from './vague-citations.js';
-
-let passed = 0;
-let failed = 0;
-
-function test(name: string, fn: () => void): void {
-  try {
-    fn();
-    console.log(`✓ ${name}`);
-    passed++;
-  } catch (e: unknown) {
-    const error = e instanceof Error ? e : new Error(String(e));
-    console.log(`✗ ${name}`);
-    console.log(`  ${error.message}`);
-    failed++;
-  }
-}
-
-function assert(condition: boolean, message?: string): void {
-  if (!condition) throw new Error(message || 'Assertion failed');
-}
-
-function assertEqual(actual: unknown, expected: unknown, message?: string): void {
-  if (actual !== expected) {
-    throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
-  }
-}
+import { describe, it, expect } from 'vitest';
+import { Issue, Severity, FixType, createRule } from '../validation-engine.ts';
+import { dollarSignsRule } from './dollar-signs.ts';
+import { comparisonOperatorsRule } from './comparison-operators.ts';
+import { tildeDollarRule } from './tilde-dollar.ts';
+import { fakeUrlsRule } from './fake-urls.ts';
+import { placeholdersRule } from './placeholders.ts';
+import { consecutiveBoldLabelsRule } from './consecutive-bold-labels.ts';
+import { temporalArtifactsRule } from './temporal-artifacts.ts';
+import { vagueCitationsRule } from './vague-citations.ts';
+import { componentPropsRule } from './component-props.ts';
+import { citationUrlsRule } from './citation-urls.ts';
+import { componentImportsRule } from './component-imports.ts';
+import { frontmatterSchemaRule } from './frontmatter-schema.ts';
+import { matchLinesOutsideCode } from '../mdx-utils.ts';
+import { shouldSkipValidation } from '../mdx-utils.ts';
 
 /**
  * Create a mock content file for testing rules
  */
 function mockContent(body: string, opts: Record<string, unknown> = {}): Record<string, unknown> {
+  const frontmatter = opts.frontmatter || { title: 'Test Page' };
+  const raw = opts.raw || `---\ntitle: Test Page\n---\n${body}`;
   return {
     path: opts.path || 'content/docs/test-page.mdx',
     relativePath: opts.relativePath || 'test-page.mdx',
     body,
-    frontmatter: opts.frontmatter || { title: 'Test Page' },
+    raw,
+    frontmatter,
     isIndex: opts.isIndex || false,
   };
 }
 
-// =============================================================================
-// dollar-signs rule
-// =============================================================================
-
-console.log('\n💲 dollar-signs rule');
-
-test('detects unescaped $ before numbers', () => {
-  const content = mockContent('The cost is $100 per unit.');
-  const issues = dollarSignsRule.check(content, {});
-  assertEqual(issues.length, 1);
-  assert(issues[0].message.includes('Unescaped dollar sign'));
-  assertEqual(issues[0].severity, Severity.ERROR);
-});
-
-test('allows escaped \\$ before numbers', () => {
-  const content = mockContent('The cost is \\$100 per unit.');
-  const issues = dollarSignsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-test('detects double-escaped \\\\$ in body', () => {
-  const content = mockContent('The cost is \\\\$100.');
-  const issues = dollarSignsRule.check(content, {});
-  // Should detect double-escaped (the regex is /\\\\\$/g which matches literal \\$)
-  assert(issues.some((i: any) => i.message.includes('Double-escaped')));
-});
-
-test('skips $ in code blocks', () => {
-  const content = mockContent('```\n$100\n```');
-  const issues = dollarSignsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-test('detects multiple $ on same line', () => {
-  const content = mockContent('Between $5 and $10.');
-  const issues = dollarSignsRule.check(content, {});
-  assertEqual(issues.length, 2);
-});
-
-// =============================================================================
-// comparison-operators rule
-// =============================================================================
-
-console.log('\n⚖️  comparison-operators rule');
-
-test('detects unescaped < before numbers', () => {
-  const content = mockContent('Response time <10ms is ideal.');
-  const issues = comparisonOperatorsRule.check(content, {});
-  assertEqual(issues.length, 1);
-  assert(issues[0].message.includes('Unescaped'));
-  assertEqual(issues[0].severity, Severity.ERROR);
-});
-
-test('allows already-escaped &lt;', () => {
-  const content = mockContent('Response time &lt;10ms is ideal.');
-  const issues = comparisonOperatorsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-test('skips < in code blocks', () => {
-  const content = mockContent('```\nif (x < 10) {}\n```');
-  const issues = comparisonOperatorsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-test('does not flag valid HTML/JSX tags', () => {
-  const content = mockContent('<div>hello</div>');
-  const issues = comparisonOperatorsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-// =============================================================================
-// tilde-dollar rule
-// =============================================================================
-
-console.log('\n〜 tilde-dollar rule');
-
-test('detects ~\\$ pattern', () => {
-  const content = mockContent('approximately ~\\$29M in funding.');
-  const issues = tildeDollarRule.check(content, {});
-  assert(issues.length >= 1);
-  assert(issues[0].message.includes('Tilde before escaped dollar'));
-  assertEqual(issues[0].severity, Severity.ERROR);
-});
-
-test('allows ≈\\$ pattern', () => {
-  const content = mockContent('approximately ≈\\$29M in funding.');
-  const issues = tildeDollarRule.check(content, {});
-  // Should not flag the ≈ version
-  const tildeDollarIssues = issues.filter((i: any) => i.message.includes('Tilde before escaped'));
-  assertEqual(tildeDollarIssues.length, 0);
-});
-
-test('detects tilde before number in table cell', () => {
-  const content = mockContent('| Name | Value |\n|---|---|\n| Test | ~86% |');
-  const issues = tildeDollarRule.check(content, {});
-  assert(issues.length >= 1);
-  assert(issues.some((i: any) => i.message.includes('Tilde in table cell')));
-});
-
-// =============================================================================
-// fake-urls rule
-// =============================================================================
-
-console.log('\n🔗 fake-urls rule');
-
-test('detects example.com URLs', () => {
-  const content = mockContent('[link](https://example.com/page)');
-  const issues = fakeUrlsRule.check(content, {});
-  assert(issues.length >= 1);
-  assert(issues[0].message.includes('example.com'));
-});
-
-test('detects localhost URLs', () => {
-  const content = mockContent('[local](http://localhost:3000/test)');
-  const issues = fakeUrlsRule.check(content, {});
-  assert(issues.length >= 1);
-  assert(issues[0].message.includes('localhost'));
-});
-
-test('detects placeholder domains', () => {
-  const content = mockContent('[test](https://placeholder.com/stuff)');
-  const issues = fakeUrlsRule.check(content, {});
-  assert(issues.length >= 1);
-});
-
-test('does not flag real URLs', () => {
-  const content = mockContent('[real](https://arxiv.org/abs/2301.01234)');
-  const issues = fakeUrlsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-test('skips documentation pages', () => {
-  const content = mockContent('[link](https://example.com)', {
-    frontmatter: { title: 'Docs', pageType: 'documentation' },
+describe('dollar-signs rule', () => {
+  it('detects unescaped $ before numbers', () => {
+    const content = mockContent('The cost is $100 per unit.');
+    const issues = dollarSignsRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message.includes('Unescaped dollar sign')).toBe(true);
+    expect(issues[0].severity).toBe(Severity.ERROR);
   });
-  const issues = fakeUrlsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
 
-test('skips stub pages', () => {
-  const content = mockContent('[link](https://example.com)', {
-    frontmatter: { title: 'Stub', pageType: 'stub' },
+  it('allows escaped \\$ before numbers', () => {
+    const content = mockContent('The cost is \\$100 per unit.');
+    const issues = dollarSignsRule.check(content, {});
+    expect(issues.length).toBe(0);
   });
-  const issues = fakeUrlsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
 
-test('skips internal docs', () => {
-  const content = mockContent('[link](https://example.com)', {
-    relativePath: '/internal/guide.mdx',
+  it('detects double-escaped \\\\$ in body', () => {
+    const content = mockContent('The cost is \\\\$100.');
+    const issues = dollarSignsRule.check(content, {});
+    // Should detect double-escaped (the regex is /\\\\\$/g which matches literal \\$)
+    expect(issues.some((i: any) => i.message.includes('Double-escaped'))).toBe(true);
   });
-  const issues = fakeUrlsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
 
-// =============================================================================
-// placeholders rule
-// =============================================================================
-
-console.log('\n📝 placeholders rule');
-
-test('detects TODO markers', () => {
-  const content = mockContent('This section needs TODO: fill in details.');
-  const issues = placeholdersRule.check(content, {});
-  assert(issues.length >= 1);
-  assert(issues.some((i: any) => i.message.includes('TODO')));
-});
-
-test('detects Lorem ipsum', () => {
-  const content = mockContent('Lorem ipsum dolor sit amet.');
-  const issues = placeholdersRule.check(content, {});
-  assert(issues.length >= 1);
-  assertEqual(issues[0].severity, Severity.ERROR);
-});
-
-test('detects bracketed placeholders', () => {
-  const content = mockContent('The value is [TBD] and [Value] here.');
-  const issues = placeholdersRule.check(content, {});
-  assert(issues.length >= 1);
-});
-
-test('skips placeholders in code blocks', () => {
-  const content = mockContent('```\nTODO: implement this\n```');
-  const issues = placeholdersRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-test('skips stub pages', () => {
-  const content = mockContent('TODO: fill in later', {
-    frontmatter: { title: 'Stub', pageType: 'stub' },
+  it('skips $ in code blocks', () => {
+    const content = mockContent('```\n$100\n```');
+    const issues = dollarSignsRule.check(content, {});
+    expect(issues.length).toBe(0);
   });
-  const issues = placeholdersRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
 
-// =============================================================================
-// consecutive-bold-labels rule
-// =============================================================================
-
-console.log('\n🏷️  consecutive-bold-labels rule');
-
-test('detects consecutive bold labels without blank lines', () => {
-  const content = mockContent('**Concern**: Academic publishing too slow\n**Response**: Rigorous evaluation helps');
-  const issues = consecutiveBoldLabelsRule.check(content, {});
-  assertEqual(issues.length, 1);
-  assert(issues[0].message.includes('Consecutive bold label'));
-});
-
-test('allows bold labels with blank lines between', () => {
-  const content = mockContent('**Concern**: Academic publishing too slow\n\n**Response**: Rigorous evaluation helps');
-  const issues = consecutiveBoldLabelsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-test('skips bold labels in code blocks', () => {
-  const content = mockContent('```\n**Concern**: text\n**Response**: text\n```');
-  const issues = consecutiveBoldLabelsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-// =============================================================================
-// temporal-artifacts rule
-// =============================================================================
-
-console.log('\n🕐 temporal-artifacts rule');
-
-test('detects "as of the research" phrasing', () => {
-  const content = mockContent('As of the research data through late 2024, this remains true.');
-  const issues = temporalArtifactsRule.check(content, {});
-  assert(issues.length >= 1);
-  assert(issues[0].message.includes('Temporal artifact'));
-});
-
-test('detects "no information found in sources" pattern', () => {
-  const content = mockContent('No information is available in the available sources.');
-  const issues = temporalArtifactsRule.check(content, {});
-  assert(issues.length >= 1);
-});
-
-test('does not flag normal date references', () => {
-  const content = mockContent('OpenAI was founded in 2015.');
-  const issues = temporalArtifactsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-// =============================================================================
-// vague-citations rule
-// =============================================================================
-
-console.log('\n📋 vague-citations rule');
-
-test('detects vague citations in table source columns', () => {
-  const content = mockContent(
-    '| Claim | Date | Source |\n|---|---|---|\n| Some claim | 2024 | Interview |'
-  );
-  const issues = vagueCitationsRule.check(content, {});
-  assert(issues.length >= 1);
-  assert(issues[0].message.includes('Vague citation'));
-});
-
-test('does not flag specific sources in tables', () => {
-  const content = mockContent(
-    '| Claim | Date | Source |\n|---|---|---|\n| Some claim | 2024 | Joe Rogan Experience #123 |'
-  );
-  const issues = vagueCitationsRule.check(content, {});
-  assertEqual(issues.length, 0);
-});
-
-test('only flags source columns, not other columns', () => {
-  const content = mockContent(
-    '| Name | Type | Source |\n|---|---|---|\n| Interview Guide | Document | [Link](https://example.com) |'
-  );
-  // "Interview Guide" is in the Name column, not Source - should not be flagged as vague
-  const vagueIssues = content.body ? vagueCitationsRule.check(content, {}) : [];
-  // Filter to only vague-citations issues (not other rules)
-  const vagueCitationIssues = vagueIssues.filter((i: any) => i.rule === 'vague-citations');
-  assertEqual(vagueCitationIssues.length, 0);
-});
-
-// =============================================================================
-// matchLinesOutsideCode utility
-// =============================================================================
-
-console.log('\n🔧 matchLinesOutsideCode utility');
-
-import { matchLinesOutsideCode } from '../mdx-utils.ts';
-
-test('matches patterns on regular lines', () => {
-  const matches: Array<{ text: string; line: number }> = [];
-  matchLinesOutsideCode('hello world\nfoo bar', /foo/g, ({ match, lineNum }: { match: RegExpMatchArray; lineNum: number }) => {
-    matches.push({ text: match[0], line: lineNum });
+  it('detects multiple $ on same line', () => {
+    const content = mockContent('Between $5 and $10.');
+    const issues = dollarSignsRule.check(content, {});
+    expect(issues.length).toBe(2);
   });
-  assertEqual(matches.length, 1);
-  assertEqual(matches[0].text, 'foo');
-  assertEqual(matches[0].line, 2);
 });
 
-test('skips matches inside code blocks', () => {
-  const matches: string[] = [];
-  matchLinesOutsideCode('```\nfoo\n```\nfoo', /foo/g, ({ match }: { match: RegExpMatchArray }) => {
-    matches.push(match[0]);
+describe('comparison-operators rule', () => {
+  it('detects unescaped < before numbers', () => {
+    const content = mockContent('Response time <10ms is ideal.');
+    const issues = comparisonOperatorsRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message.includes('Unescaped')).toBe(true);
+    expect(issues[0].severity).toBe(Severity.ERROR);
   });
-  assertEqual(matches.length, 1);
-});
 
-test('supports custom skip function', () => {
-  const matches: string[] = [];
-  matchLinesOutsideCode('foo bar foo', /foo/g, ({ match }: { match: RegExpMatchArray }) => {
-    matches.push(match[0]);
-  }, { skip: (body: string, pos: number) => pos > 5 });
-  assertEqual(matches.length, 1);
-});
-
-test('handles multiple matches per line', () => {
-  const matches: string[] = [];
-  matchLinesOutsideCode('$1 and $2 and $3', /\$(\d)/g, ({ match }: { match: RegExpMatchArray }) => {
-    matches.push(match[0]);
+  it('allows already-escaped &lt;', () => {
+    const content = mockContent('Response time &lt;10ms is ideal.');
+    const issues = comparisonOperatorsRule.check(content, {});
+    expect(issues.length).toBe(0);
   });
-  assertEqual(matches.length, 3);
+
+  it('skips < in code blocks', () => {
+    const content = mockContent('```\nif (x < 10) {}\n```');
+    const issues = comparisonOperatorsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('does not flag valid HTML/JSX tags', () => {
+    const content = mockContent('<div>hello</div>');
+    const issues = comparisonOperatorsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+});
+
+describe('tilde-dollar rule', () => {
+  it('detects ~\\$ pattern', () => {
+    const content = mockContent('approximately ~\\$29M in funding.');
+    const issues = tildeDollarRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+    expect(issues[0].message.includes('Tilde before escaped dollar')).toBe(true);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+  });
+
+  it('allows ≈\\$ pattern', () => {
+    const content = mockContent('approximately ≈\\$29M in funding.');
+    const issues = tildeDollarRule.check(content, {});
+    // Should not flag the ≈ version
+    const tildeDollarIssues = issues.filter((i: any) => i.message.includes('Tilde before escaped'));
+    expect(tildeDollarIssues.length).toBe(0);
+  });
+
+  it('detects tilde before number in table cell', () => {
+    const content = mockContent('| Name | Value |\n|---|---|\n| Test | ~86% |');
+    const issues = tildeDollarRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+    expect(issues.some((i: any) => i.message.includes('Tilde in table cell'))).toBe(true);
+  });
+});
+
+describe('fake-urls rule', () => {
+  it('detects example.com URLs', () => {
+    const content = mockContent('[link](https://example.com/page)');
+    const issues = fakeUrlsRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+    expect(issues[0].message.includes('example.com')).toBe(true);
+  });
+
+  it('detects localhost URLs', () => {
+    const content = mockContent('[local](http://localhost:3000/test)');
+    const issues = fakeUrlsRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+    expect(issues[0].message.includes('localhost')).toBe(true);
+  });
+
+  it('detects placeholder domains', () => {
+    const content = mockContent('[test](https://placeholder.com/stuff)');
+    const issues = fakeUrlsRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+  });
+
+  it('does not flag real URLs', () => {
+    const content = mockContent('[real](https://arxiv.org/abs/2301.01234)');
+    const issues = fakeUrlsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips documentation pages', () => {
+    const content = mockContent('[link](https://example.com)', {
+      frontmatter: { title: 'Docs', pageType: 'documentation' },
+    });
+    const issues = fakeUrlsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips stub pages', () => {
+    const content = mockContent('[link](https://example.com)', {
+      frontmatter: { title: 'Stub', pageType: 'stub' },
+    });
+    const issues = fakeUrlsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips internal docs', () => {
+    const content = mockContent('[link](https://example.com)', {
+      relativePath: '/internal/guide.mdx',
+    });
+    const issues = fakeUrlsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+});
+
+describe('placeholders rule', () => {
+  it('detects TODO markers', () => {
+    const content = mockContent('This section needs TODO: fill in details.');
+    const issues = placeholdersRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+    expect(issues.some((i: any) => i.message.includes('TODO'))).toBe(true);
+  });
+
+  it('detects Lorem ipsum', () => {
+    const content = mockContent('Lorem ipsum dolor sit amet.');
+    const issues = placeholdersRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+  });
+
+  it('detects bracketed placeholders', () => {
+    const content = mockContent('The value is [TBD] and [Value] here.');
+    const issues = placeholdersRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+  });
+
+  it('skips placeholders in code blocks', () => {
+    const content = mockContent('```\nTODO: implement this\n```');
+    const issues = placeholdersRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips stub pages', () => {
+    const content = mockContent('TODO: fill in later', {
+      frontmatter: { title: 'Stub', pageType: 'stub' },
+    });
+    const issues = placeholdersRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+});
+
+describe('consecutive-bold-labels rule', () => {
+  it('detects consecutive bold labels without blank lines', () => {
+    const content = mockContent('**Concern**: Academic publishing too slow\n**Response**: Rigorous evaluation helps');
+    const issues = consecutiveBoldLabelsRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message.includes('Consecutive bold label')).toBe(true);
+  });
+
+  it('allows bold labels with blank lines between', () => {
+    const content = mockContent('**Concern**: Academic publishing too slow\n\n**Response**: Rigorous evaluation helps');
+    const issues = consecutiveBoldLabelsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips bold labels in code blocks', () => {
+    const content = mockContent('```\n**Concern**: text\n**Response**: text\n```');
+    const issues = consecutiveBoldLabelsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+});
+
+describe('temporal-artifacts rule', () => {
+  it('detects "as of the research" phrasing', () => {
+    const content = mockContent('As of the research data through late 2024, this remains true.');
+    const issues = temporalArtifactsRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+    expect(issues[0].message.includes('Temporal artifact')).toBe(true);
+  });
+
+  it('detects "no information found in sources" pattern', () => {
+    const content = mockContent('No information is available in the available sources.');
+    const issues = temporalArtifactsRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+  });
+
+  it('does not flag normal date references', () => {
+    const content = mockContent('OpenAI was founded in 2015.');
+    const issues = temporalArtifactsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+});
+
+describe('vague-citations rule', () => {
+  it('detects vague citations in table source columns', () => {
+    const content = mockContent(
+      '| Claim | Date | Source |\n|---|---|---|\n| Some claim | 2024 | Interview |'
+    );
+    const issues = vagueCitationsRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+    expect(issues[0].message.includes('Vague citation')).toBe(true);
+  });
+
+  it('does not flag specific sources in tables', () => {
+    const content = mockContent(
+      '| Claim | Date | Source |\n|---|---|---|\n| Some claim | 2024 | Joe Rogan Experience #123 |'
+    );
+    const issues = vagueCitationsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('only flags source columns, not other columns', () => {
+    const content = mockContent(
+      '| Name | Type | Source |\n|---|---|---|\n| Interview Guide | Document | [Link](https://example.com) |'
+    );
+    // "Interview Guide" is in the Name column, not Source - should not be flagged as vague
+    const vagueIssues = content.body ? vagueCitationsRule.check(content, {}) : [];
+    // Filter to only vague-citations issues (not other rules)
+    const vagueCitationIssues = vagueIssues.filter((i: any) => i.rule === 'vague-citations');
+    expect(vagueCitationIssues.length).toBe(0);
+  });
+});
+
+describe('matchLinesOutsideCode utility', () => {
+  it('matches patterns on regular lines', () => {
+    const matches: Array<{ text: string; line: number }> = [];
+    matchLinesOutsideCode('hello world\nfoo bar', /foo/g, ({ match, lineNum }: { match: RegExpMatchArray; lineNum: number }) => {
+      matches.push({ text: match[0], line: lineNum });
+    });
+    expect(matches.length).toBe(1);
+    expect(matches[0].text).toBe('foo');
+    expect(matches[0].line).toBe(2);
+  });
+
+  it('skips matches inside code blocks', () => {
+    const matches: string[] = [];
+    matchLinesOutsideCode('```\nfoo\n```\nfoo', /foo/g, ({ match }: { match: RegExpMatchArray }) => {
+      matches.push(match[0]);
+    });
+    expect(matches.length).toBe(1);
+  });
+
+  it('supports custom skip function', () => {
+    const matches: string[] = [];
+    matchLinesOutsideCode('foo bar foo', /foo/g, ({ match }: { match: RegExpMatchArray }) => {
+      matches.push(match[0]);
+    }, { skip: (body: string, pos: number) => pos > 5 });
+    expect(matches.length).toBe(1);
+  });
+
+  it('handles multiple matches per line', () => {
+    const matches: string[] = [];
+    matchLinesOutsideCode('$1 and $2 and $3', /\$(\d)/g, ({ match }: { match: RegExpMatchArray }) => {
+      matches.push(match[0]);
+    });
+    expect(matches.length).toBe(3);
+  });
+});
+
+describe('shouldSkipValidation utility', () => {
+  it('skips stub pages', () => {
+    expect(shouldSkipValidation({ pageType: 'stub' })).toBe(true);
+  });
+
+  it('skips documentation pages', () => {
+    expect(shouldSkipValidation({ pageType: 'documentation' })).toBe(true);
+  });
+
+  it('does not skip content pages', () => {
+    expect(shouldSkipValidation({ pageType: 'content' })).toBe(false);
+  });
+
+  it('does not skip pages without pageType', () => {
+    expect(shouldSkipValidation({})).toBe(false);
+  });
 });
 
 // =============================================================================
-// shouldSkipValidation utility
+// component-props rule
 // =============================================================================
 
-console.log('\n🔧 shouldSkipValidation utility');
+describe('component-props rule', () => {
+  it('detects KeyPeople with children content', () => {
+    const content = mockContent('<KeyPeople>\n- Person A\n- Person B\n</KeyPeople>');
+    const issues = componentPropsRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('KeyPeople');
+    expect(issues[0].message).toContain('people');
+    expect(issues[0].severity).toBe(Severity.ERROR);
+  });
 
-import { shouldSkipValidation } from '../mdx-utils.ts';
+  it('allows KeyPeople with people prop', () => {
+    const content = mockContent('<KeyPeople people={[{ name: "Alice", role: "CEO" }]} />');
+    const issues = componentPropsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
 
-test('skips stub pages', () => {
-  assert(shouldSkipValidation({ pageType: 'stub' }));
-});
+  it('detects KeyQuestions with children content', () => {
+    const content = mockContent('<KeyQuestions>\n- Question 1?\n</KeyQuestions>');
+    const issues = componentPropsRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('KeyQuestions');
+    expect(issues[0].message).toContain('questions');
+  });
 
-test('skips documentation pages', () => {
-  assert(shouldSkipValidation({ pageType: 'documentation' }));
-});
+  it('allows KeyQuestions with questions prop', () => {
+    const content = mockContent('<KeyQuestions questions={["Q1?", "Q2?"]} />');
+    const issues = componentPropsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
 
-test('does not skip content pages', () => {
-  assert(!shouldSkipValidation({ pageType: 'content' }));
-});
-
-test('does not skip pages without pageType', () => {
-  assert(!shouldSkipValidation({}));
+  it('returns no issues for content without prop-required components', () => {
+    const content = mockContent('Just some regular content here.');
+    const issues = componentPropsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
 });
 
 // =============================================================================
-// Summary
+// citation-urls rule
 // =============================================================================
 
-console.log('\n──────────────────────────────────────────────────\n');
+describe('citation-urls rule', () => {
+  it('detects undefined URLs in footnotes', () => {
+    const content = mockContent('[^1]: [Some Paper](undefined)');
+    const issues = citationUrlsRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('undefined');
+    expect(issues[0].severity).toBe(Severity.ERROR);
+  });
 
-if (failed > 0) {
-  console.log(`❌ Passed: ${passed}, Failed: ${failed}`);
-  process.exit(1);
-} else {
-  console.log(`✅ Passed: ${passed}`);
-  console.log('\n🎉 All tests passed!');
-}
+  it('detects empty URLs in footnotes', () => {
+    const content = mockContent('[^2]: [Some Paper]()');
+    const issues = citationUrlsRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('empty');
+    expect(issues[0].severity).toBe(Severity.ERROR);
+  });
+
+  it('detects placeholder URLs in footnotes', () => {
+    const content = mockContent('[^3]: [Title](https://example.com)');
+    const issues = citationUrlsRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('placeholder');
+    expect(issues[0].severity).toBe(Severity.WARNING);
+  });
+
+  it('allows valid footnote URLs', () => {
+    const content = mockContent('[^1]: [Real Paper](https://arxiv.org/abs/2301.01234)');
+    const issues = citationUrlsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('detects multiple bad footnotes', () => {
+    const content = mockContent('[^1]: [A](undefined)\n[^2]: [B]()');
+    const issues = citationUrlsRule.check(content, {});
+    expect(issues.length).toBe(2);
+  });
+
+  it('returns no issues for content without footnotes', () => {
+    const content = mockContent('Regular content with [a link](https://real.com).');
+    const issues = citationUrlsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+});
+
+// =============================================================================
+// component-imports rule
+// =============================================================================
+
+describe('component-imports rule', () => {
+  it('detects missing imports for used wiki components', () => {
+    const raw = `---\ntitle: Test\n---\n<EntityLink id="test">Test</EntityLink>`;
+    const content = mockContent('<EntityLink id="test">Test</EntityLink>', { raw });
+    const issues = componentImportsRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('EntityLink');
+    expect(issues[0].severity).toBe(Severity.ERROR);
+  });
+
+  it('allows properly imported components', () => {
+    const raw = `---\ntitle: Test\n---\nimport { EntityLink } from '@components/wiki';\n\n<EntityLink id="test">Test</EntityLink>`;
+    const content = mockContent('<EntityLink id="test">Test</EntityLink>', { raw });
+    const issues = componentImportsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips unknown (non-wiki) components', () => {
+    const raw = `---\ntitle: Test\n---\n<CustomComponent />`;
+    const content = mockContent('<CustomComponent />', { raw });
+    const issues = componentImportsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips components in code blocks', () => {
+    const body = '```\n<EntityLink id="test">Test</EntityLink>\n```';
+    const raw = `---\ntitle: Test\n---\n${body}`;
+    const content = mockContent(body, { raw });
+    const issues = componentImportsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('detects multiple missing imports', () => {
+    const body = '<EntityLink id="test">Test</EntityLink>\n<Mermaid chart={`graph TD`} />';
+    const raw = `---\ntitle: Test\n---\n${body}`;
+    const content = mockContent(body, { raw });
+    const issues = componentImportsRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('EntityLink');
+    expect(issues[0].message).toContain('Mermaid');
+  });
+
+  it('returns no issues for content without components', () => {
+    const content = mockContent('Just text, no components.');
+    const issues = componentImportsRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+});
+
+// =============================================================================
+// frontmatter-schema rule
+// =============================================================================
+
+describe('frontmatter-schema rule', () => {
+  it('valid frontmatter passes', () => {
+    const raw = '---\ntitle: Good Page\ndescription: A valid page\nquality: 50\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Good Page', description: 'A valid page', quality: 50 },
+    });
+    const issues = frontmatterSchemaRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('detects invalid quality value (out of range)', () => {
+    const raw = '---\ntitle: Test\nquality: 200\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', quality: 200 },
+    });
+    const issues = frontmatterSchemaRule.check(content, {});
+    expect(issues.some((i: any) => i.message.includes('quality'))).toBe(true);
+  });
+
+  it('detects missing title', () => {
+    const raw = '---\ndescription: No title\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { description: 'No title' },
+    });
+    const issues = frontmatterSchemaRule.check(content, {});
+    expect(issues.some((i: any) => i.message.includes('title'))).toBe(true);
+  });
+
+  it('detects update_frequency without lastEdited', () => {
+    const raw = '---\ntitle: Test\nupdate_frequency: 7\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', update_frequency: 7 },
+    });
+    const issues = frontmatterSchemaRule.check(content, {});
+    expect(issues.some((i: any) => i.message.includes('update_frequency'))).toBe(true);
+  });
+
+  it('allows update_frequency with lastEdited', () => {
+    const raw = '---\ntitle: Test\nupdate_frequency: 7\nlastEdited: "2025-01-01"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', update_frequency: 7, lastEdited: '2025-01-01' },
+    });
+    const issues = frontmatterSchemaRule.check(content, {});
+    const crossFieldIssues = issues.filter((i: any) => i.message.includes('update_frequency'));
+    expect(crossFieldIssues.length).toBe(0);
+  });
+
+  it('detects invalid pageType', () => {
+    const raw = '---\ntitle: Test\npageType: invalid\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', pageType: 'invalid' },
+    });
+    const issues = frontmatterSchemaRule.check(content, {});
+    expect(issues.some((i: any) => i.message.includes('pageType'))).toBe(true);
+  });
+});

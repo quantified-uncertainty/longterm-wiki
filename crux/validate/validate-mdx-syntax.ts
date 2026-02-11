@@ -291,7 +291,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
       console.log(`${colors.green}✓ No syntax issues found${colors.reset}\n`);
     } else {
       for (const { file, issues } of allIssues) {
-        const relPath = file.replace(process.cwd() + '/', '');
+        const relPath = formatPath(file);
         console.log(`${colors.bold}${relPath}${colors.reset}`);
 
         for (const issue of issues) {

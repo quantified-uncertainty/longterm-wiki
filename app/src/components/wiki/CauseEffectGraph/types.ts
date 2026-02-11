@@ -45,6 +45,7 @@ export interface CauseEffectNodeData extends Record<string, unknown> {
   sources?: string[];
   relatedConcepts?: string[];
   href?: string;  // URL to navigate to when node is clicked
+  suppressNavigation?: boolean;  // When true, clicking the node won't navigate (allows path highlighting/details panel to work instead)
   scores?: NodeScores;  // Scoring dimensions for node
   scoreIntensity?: number;  // Computed score intensity (0-1) for highlighting, -1 = no score
   highlightColor?: 'purple' | 'red' | 'green' | 'blue' | 'yellow';  // Color for score highlighting

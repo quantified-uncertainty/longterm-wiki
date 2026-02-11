@@ -23,7 +23,7 @@ import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { CONTENT_DIR, loadPathRegistry } from '../lib/content-types.ts';
+import { CONTENT_DIR, PROJECT_ROOT, loadPathRegistry } from '../lib/content-types.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import type { Colors } from '../lib/output.ts';
 import type { PathRegistry } from '../lib/content-types.ts';
@@ -86,7 +86,7 @@ interface EntityLinkValidatorOptions extends ValidatorOptions {
 type ReverseRegistry = Record<string, string>;
 
 // Next.js app directory for standalone pages
-const APP_DIR: string = join(process.cwd(), 'app/src/app');
+const APP_DIR: string = join(PROJECT_ROOT, 'app/src/app');
 
 /**
  * Extract all markdown links from file content

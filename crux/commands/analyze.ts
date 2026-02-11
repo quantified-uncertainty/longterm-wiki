@@ -13,7 +13,7 @@ const SCRIPTS = {
   all: {
     script: 'analyze/analyze-all.ts',
     description: 'Run all analysis checks (health report)',
-    passthrough: ['json', 'brief'],
+    passthrough: ['ci', 'json', 'brief'],
   },
   mentions: {
     script: 'validate/validate-unified.ts',
@@ -24,12 +24,12 @@ const SCRIPTS = {
   links: {
     script: 'analyze/analyze-link-coverage.ts',
     description: 'Analyze cross-reference coverage',
-    passthrough: ['json', 'orphans', 'topLinked', 'page'],
+    passthrough: ['ci', 'json', 'orphans', 'topLinked', 'page'],
   },
   'entity-links': {
     script: 'analyze/analyze-entity-links.ts',
     description: 'Analyze linking for a specific entity',
-    passthrough: ['json', 'help'],
+    passthrough: ['ci', 'json', 'help'],
     positional: true,
   },
   quality: {

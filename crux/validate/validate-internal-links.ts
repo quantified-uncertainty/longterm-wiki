@@ -27,7 +27,7 @@ import { join, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
-import { CONTENT_DIR } from '../lib/content-types.ts';
+import { CONTENT_DIR, PROJECT_ROOT } from '../lib/content-types.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
 const args: string[] = process.argv.slice(2);
@@ -142,7 +142,7 @@ function extractInternalLinks(content: string, filePath: string): InternalLink[]
 }
 
 // Next.js app directory for standalone pages
-const APP_DIR: string = join(process.cwd(), 'app/src/app');
+const APP_DIR: string = join(PROJECT_ROOT, 'app/src/app');
 
 /**
  * Check if an internal link resolves to an existing file

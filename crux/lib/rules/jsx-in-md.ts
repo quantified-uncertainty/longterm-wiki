@@ -8,8 +8,8 @@
  * to use <EntityLink> components but displayed them as raw text.
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.js';
-import type { ContentFile, ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity } from '../validation-engine.ts';
+import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
 
 // Common JSX component patterns
 const JSX_PATTERNS: RegExp[] = [

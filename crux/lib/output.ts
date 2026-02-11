@@ -5,6 +5,8 @@
  * Supports CI mode (no colors) via --ci flag or CI=true environment variable.
  */
 
+import { PROJECT_ROOT } from './content-types.ts';
+
 export interface Colors {
   red: string;
   green: string;
@@ -120,10 +122,10 @@ export function createLogger(ciMode: boolean = isCI()): Logger {
 }
 
 /**
- * Format a file path relative to cwd
+ * Format a file path relative to project root
  */
 export function formatPath(filePath: string): string {
-  return filePath.replace(process.cwd() + '/', '');
+  return filePath.replace(PROJECT_ROOT + '/', '');
 }
 
 /**

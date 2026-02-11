@@ -59,6 +59,7 @@ interface CauseEffectGraphProps {
   showScores?: boolean;  // Show score indicators on nodes (default false)
   renderHeaderRight?: () => React.ReactNode;  // Custom content for right side of header
   scoreHighlight?: ScoreHighlightMode;  // Highlight nodes by score dimension (opacity based on score value)
+  onNodeClick?: (node: Node<CauseEffectNodeData>) => void;  // External callback when a node is clicked
 }
 
 // Generate YAML representation of graph data
@@ -279,6 +280,7 @@ function CauseEffectGraphInner({
   showScores = false,
   renderHeaderRight,
   scoreHighlight,
+  onNodeClick: onNodeClickExternal,
 }: CauseEffectGraphProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<CauseEffectNodeData>>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<CauseEffectEdgeData>>([]);
@@ -377,14 +379,15 @@ function CauseEffectGraphInner({
 
   const onEdgeMouseLeave = useCallback(() => setHoveredEdgeId(null), []);
 
-  // Node click handler for path highlighting
+  // Node click handler for path highlighting and external callback
   const onNodeClick: NodeMouseHandler<Node<CauseEffectNodeData>> = useCallback(
     (event, node) => {
+      onNodeClickExternal?.(node);
       if (!enablePathHighlighting) return;
       // Toggle: if clicking same node, clear; otherwise set new
       setPathHighlightNodeId((prev) => (prev === node.id ? null : node.id));
     },
-    [enablePathHighlighting]
+    [enablePathHighlighting, onNodeClickExternal]
   );
 
   // Compute path highlight data

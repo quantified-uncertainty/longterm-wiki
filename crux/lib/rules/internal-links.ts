@@ -9,11 +9,11 @@
 
 import { existsSync } from 'fs';
 import { join, dirname } from 'path';
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.js';
+import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock } from '../mdx-utils.ts';
-import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.js';
+import { CONTENT_DIR_ABS as CONTENT_DIR, PROJECT_ROOT } from '../content-types.ts';
 
-const APP_DIR = join(process.cwd(), 'app/src/app');
+const APP_DIR = join(PROJECT_ROOT, 'app/src/app');
 
 /**
  * Check if an internal link resolves to an existing file
