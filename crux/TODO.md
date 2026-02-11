@@ -11,16 +11,15 @@ implementation patterns (buildCommands for subprocess-heavy ops, direct
 exports for lightweight library calls, custom factory for resources.ts)
 are each justified by their use case. No mechanical unification needed.
 
-## 2. Break Up `resource-manager.ts`
+## ~~2. Break Up `resource-manager.ts`~~ ✅ DONE
 
-**Problem**: At ~2050 lines, `resource-manager.ts` is a monolith handling URL validation, entity matching, YAML I/O, deduplication, and reporting.
-
-**Suggested approach**: Split into focused modules:
-- `resource-validator.ts` — URL checking and validation
-- `resource-matcher.ts` — Entity matching logic
-- `resource-io.ts` — YAML file read/write
-- `resource-dedup.ts` — Deduplication logic
-- `resource-manager.ts` — Orchestrator that imports from above
+Split the ~2050-line monolith into 6 focused modules:
+- `resource-types.ts` — Shared types, interfaces, constants (~95 lines)
+- `resource-io.ts` — YAML file read/write, publication loading (~90 lines)
+- `resource-utils.ts` — URL normalization, link extraction, ID utilities (~145 lines)
+- `resource-metadata.ts` — ArXiv, forum, Semantic Scholar, web metadata fetchers (~490 lines)
+- `resource-validator.ts` — Validation against arXiv, Wikipedia, forums, DOIs, dates (~440 lines)
+- `resource-manager.ts` — Slim CLI orchestrator with command handlers (~607 lines)
 
 ## ~~3. Move `process.exit()` Out of Library Code~~ ✅ DONE
 
