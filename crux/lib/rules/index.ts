@@ -62,6 +62,7 @@ import { falseCertaintyRule } from './false-certainty.ts';
 import { prescriptiveLanguageRule } from './prescriptive-language.ts';
 import { toneMarkersRule } from './tone-markers.ts';
 import { structuralQualityRule } from './structural-quality.ts';
+import { evaluativeFramingRule } from './evaluative-framing.ts';
 
 // Re-export all rules individually
 export {
@@ -98,6 +99,7 @@ export {
   prescriptiveLanguageRule,
   toneMarkersRule,
   structuralQualityRule,
+  evaluativeFramingRule,
   squiggleQualityRule,
 };
 
@@ -135,6 +137,7 @@ export const allRules: Rule[] = [
   prescriptiveLanguageRule,
   toneMarkersRule,
   structuralQualityRule,
+  evaluativeFramingRule,
   squiggleQualityRule,
 ];
 

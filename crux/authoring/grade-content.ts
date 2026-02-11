@@ -41,6 +41,7 @@ import {
   prescriptiveLanguageRule,
   toneMarkersRule,
   structuralQualityRule,
+  evaluativeFramingRule,
 } from '../lib/rules/index.ts';
 import type Anthropic from '@anthropic-ai/sdk';
 
@@ -547,6 +548,7 @@ const WARNING_RULES = [
   prescriptiveLanguageRule,
   toneMarkersRule,
   structuralQualityRule,
+  evaluativeFramingRule,
 ];
 
 /**

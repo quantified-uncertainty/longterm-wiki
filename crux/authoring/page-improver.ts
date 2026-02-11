@@ -51,6 +51,10 @@ const QUALITY_RULES: string[] = [
   'placeholders',
   'vague-citations',
   'temporal-artifacts',
+  'evaluative-framing',
+  'tone-markers',
+  'false-certainty',
+  'prescriptive-language',
 ];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -101,6 +105,16 @@ interface PageData {
   path: string;
   quality?: number;
   importance?: number;
+  ratings?: {
+    objectivity?: number;
+    rigor?: number;
+    focus?: number;
+    novelty?: number;
+    completeness?: number;
+    concreteness?: number;
+    actionability?: number;
+    [key: string]: number | undefined;
+  };
 }
 
 interface AnalysisResult {
@@ -222,6 +236,33 @@ function writeTemp(pageId: string, filename: string, content: string | object): 
   return filePath;
 }
 
+// Build objectivity context from previous ratings and analysis
+function buildObjectivityContext(page: PageData, analysis: AnalysisResult): string {
+  const parts: string[] = [];
+  const objScore = page.ratings?.objectivity;
+
+  if (objScore !== undefined && objScore < 6) {
+    parts.push(`## ⚠️ Objectivity Alert`);
+    parts.push(`This page's previous objectivity rating was **${objScore}/10** (below the 6.0 threshold).`);
+    parts.push(`Pay special attention to neutrality — this page has a history of biased framing.`);
+    parts.push('');
+  }
+
+  const objectivityIssues = (analysis as any).objectivityIssues as string[] | undefined;
+  if (objectivityIssues && objectivityIssues.length > 0) {
+    if (parts.length === 0) parts.push('## Objectivity Issues Found in Analysis');
+    else parts.push('### Specific Issues Identified');
+    for (const issue of objectivityIssues) {
+      parts.push(`- ${issue}`);
+    }
+    parts.push('');
+    parts.push('**Fix all of these objectivity issues** in your improvement. Replace evaluative language with neutral descriptions backed by data.');
+    parts.push('');
+  }
+
+  return parts.length > 0 ? '\n' + parts.join('\n') + '\n' : '';
+}
+
 // Load page data
 function loadPages(): PageData[] {
   const pagesPath = path.join(ROOT, 'app/src/data/pages.json');
@@ -232,14 +273,40 @@ function loadPages(): PageData[] {
   return JSON.parse(fs.readFileSync(pagesPath, 'utf-8'));
 }
 
+// Enrich page data with ratings from frontmatter (pages.json doesn't include objectivity)
+function enrichWithFrontmatterRatings(page: PageData): PageData {
+  try {
+    const filePath = getFilePath(page.path);
+    if (!fs.existsSync(filePath)) return page;
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!fmMatch) return page;
+    const fm = fmMatch[1];
+    // Parse ratings block from YAML frontmatter
+    const ratingsMatch = fm.match(/^ratings:\s*\n((?:\s+\w+:\s*[\d.]+\n?)*)/m);
+    if (ratingsMatch) {
+      const ratings: Record<string, number> = {};
+      const lines = ratingsMatch[1].split('\n');
+      for (const line of lines) {
+        const kv = line.match(/^\s+(\w+):\s*([\d.]+)/);
+        if (kv) ratings[kv[1]] = parseFloat(kv[2]);
+      }
+      page.ratings = ratings;
+    }
+  } catch {
+    // Silently ignore — ratings enrichment is best-effort
+  }
+  return page;
+}
+
 function findPage(pages: PageData[], query: string): PageData | null {
   let page = pages.find(p => p.id === query);
-  if (page) return page;
+  if (page) return enrichWithFrontmatterRatings(page);
 
   const matches = pages.filter(p =>
     p.id.includes(query) || p.title.toLowerCase().includes(query.toLowerCase())
   );
-  if (matches.length === 1) return matches[0];
+  if (matches.length === 1) return enrichWithFrontmatterRatings(matches[0]);
   if (matches.length > 1) {
     console.log('Multiple matches found:');
     matches.slice(0, 10).forEach(p => console.log(`  - ${p.id} (${p.title})`));
@@ -404,6 +471,7 @@ Analyze the page and output a JSON object with:
 4. **improvements**: Array of specific improvements to make, prioritized
 5. **entityLinks**: Array of entity IDs that should be linked but aren't
 6. **citations**: Assessment of citation quality (count, authoritative sources, gaps)
+7. **objectivityIssues**: Array of specific objectivity/neutrality problems found (loaded language, evaluative labels, asymmetric framing, missing counterarguments, advocacy-adjacent tone)
 
 Focus especially on the user's directions: "${directions || 'general improvement'}"
 
@@ -544,6 +612,9 @@ async function improvePhase(page: PageData, analysis: AnalysisResult, research: 
   const currentContent = fs.readFileSync(filePath, 'utf-8');
   const importPath = getImportPath();
 
+  // Build objectivity context from previous ratings
+  const objectivityContext = buildObjectivityContext(page, analysis);
+
   const prompt = `Improve this wiki page based on the analysis and research.
 
 ## Page Info
@@ -560,7 +631,7 @@ ${JSON.stringify(analysis, null, 2)}
 
 ## Research Sources
 ${JSON.stringify(research, null, 2)}
-
+${objectivityContext}
 ## Current Content
 \`\`\`mdx
 ${currentContent}
@@ -584,6 +655,35 @@ Make targeted improvements based on the analysis and directions. Follow these gu
 - Ensure tables have source links
 - **NEVER use vague citations** like "Interview", "Earnings call", "Conference talk", "Reports", "Various"
 - Always specify: exact source name, date, and context (e.g., "Tesla Q4 2021 earnings call", "MIT Aeronautics Symposium (Oct 2014)")
+
+### Objectivity & Neutrality (CRITICAL)
+Write in **encyclopedic/analytical tone**, not advocacy or journalism. This is a wiki, not an opinion piece.
+
+**Language rules:**
+- NEVER use evaluative adjectives: "remarkable", "unprecedented", "formidable", "alarming", "troubling", "devastating"
+- NEVER use "represents a [judgment]" framing (e.g., "represents a complete failure") — state what happened: "none of the 150 bills passed"
+- NEVER use "proved [judgment]" (e.g., "proved decisive") — describe the evidence: "lobbying spending correlated with bill defeat"
+- NEVER use evaluative labels in tables: "Concerning", "Inadequate", "Weak", "Poor" — use data: "25 departures from 3,000 staff (0.8%)"
+- NEVER use dramatic characterizations: "complete failure", "total collapse", "unprecedented crisis"
+- Avoid "watershed", "groundbreaking", "pioneering", "game-changing" — describe the specific innovation
+
+**Framing rules:**
+- Present competing perspectives with equal analytical depth — if you explain criticism, also explain the defense
+- When describing policy outcomes, use neutral language: "did not pass" not "failed"; "modified" not "weakened"
+- Attribute opinions explicitly: "Critics argue..." / "Proponents contend..." — never present one side as obvious truth
+- For uncertain claims, always use hedging: "evidence suggests", "approximately", "estimated at"
+- When citing a source with known ideological positioning, note it: "according to [X], a [conservative/progressive/industry] think tank"
+
+**Assessment tables:**
+- Use quantitative labels: "3 of 8 commitments met (38%)" not "Poor compliance"
+- Use trend descriptions: "Down 15% YoY" not "Declining"
+- If you must use qualitative labels, define the methodology: "Based on [criteria], rated [level]"
+
+### Source Integration
+- When integrating research, note source credibility: think tank positioning, potential conflicts of interest
+- For contested claims, cite sources from multiple perspectives
+- Distinguish between primary sources (government documents, company filings) and secondary analysis (news, blogs)
+- Weight primary sources over secondary; peer-reviewed over journalism
 
 ### Output Format
 Output the COMPLETE improved MDX file content. Include all frontmatter and content.
@@ -647,11 +747,13 @@ Check for:
 5. **Citations**: Mix of footnotes (prose) and inline links (tables)
 6. **Tables**: Properly formatted markdown tables
 7. **Components**: Imports match usage
+8. **Objectivity**: No evaluative adjectives ("remarkable", "unprecedented"), no "represents a [judgment]" framing, no evaluative table labels ("Concerning", "Weak"), competing perspectives given equal depth, opinions attributed to specific actors
 
 Output a JSON review:
 {
   "valid": true/false,
   "issues": ["issue 1", "issue 2"],
+  "objectivityIssues": ["specific objectivity problem 1"],
   "suggestions": ["optional improvement 1"],
   "qualityScore": 70-100
 }
