@@ -11,6 +11,9 @@ src/data/search-docs.json
 src/data/id-registry.json
 src/data/pathRegistry.json
 src/data/schema.ts
+src/data/pages.json
+src/data/stats.json
+src/data/link-health.json
 
 # Search index served at runtime (copied from src/data by prebuild)
 public/search-index.json
