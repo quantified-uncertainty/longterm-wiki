@@ -1,5 +1,5 @@
 {
-  "_nextId": 680,
+  "_nextId": 683,
   "entities": {
     "E1": "adversarial-robustness",
     "E2": "agentic-ai",
@@ -679,6 +679,9 @@
     "E676": "gap-analysis",
     "E677": "insights",
     "E678": "quantitative-claims",
-    "E679": "table-candidates"
+    "E679": "table-candidates",
+    "E680": "ai-assisted-knowledge-management",
+    "E681": "grokipedia",
+    "E682": "wikipedia-and-ai"
   }
 }

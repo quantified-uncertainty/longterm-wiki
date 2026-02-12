@@ -65,3 +65,24 @@
   description: Quarterly competition run by Metaculus comparing human Pro Forecasters against AI forecasting bots.
   path: /knowledge-base/responses/ai-forecasting-benchmark/
   lastUpdated: 2026-01
+
+- id: ai-assisted-knowledge-management
+  type: concept
+  title: AI-Assisted Knowledge Management
+  description: Tools and platforms using LLMs to help create, maintain, and query knowledge bases, from personal tools (Obsidian+AI, Notion AI) to open-source RAG frameworks (LlamaIndex, Haystack).
+  path: /knowledge-base/responses/ai-assisted-knowledge-management/
+  lastUpdated: 2026-02
+
+- id: grokipedia
+  type: project
+  title: Grokipedia
+  description: xAI's AI-generated encyclopedia launched October 2025, growing to 6M+ articles with documented quality concerns including political bias and scientific inaccuracies.
+  path: /knowledge-base/responses/grokipedia/
+  lastUpdated: 2026-02
+
+- id: wikipedia-and-ai
+  type: concept
+  title: Wikipedia and AI Content
+  description: Wikipedia's evolving relationship with AI-generated content, including defensive policies, WikiProject AI Cleanup, model collapse risks, and sustainability challenges.
+  path: /knowledge-base/responses/wikipedia-and-ai/
+  lastUpdated: 2026-02
