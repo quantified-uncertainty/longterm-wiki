@@ -326,7 +326,7 @@ Return ONLY: {"frequency": N, "reason": "5 words max"}`;
 
   try {
     const response = await client.messages.create({
-      model: 'claude-3-5-haiku-20241022',
+      model: 'claude-3-5-haiku-latest',
       max_tokens: 60,
       messages: [{ role: 'user', content: prompt }],
     });
