@@ -16,13 +16,13 @@ metrics:
   wordCount: 6800
   citations: 45
   tables: 12
-  diagrams: 1
+  diagrams: 9
 clusters:
   - ai-safety
   - governance
 subcategory: analysis-models
 ---
-import {Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+import {Backlinks, Mermaid, EntityLink, DataExternalLinks, SquiggleEstimate} from '@components/wiki';
 
 ## Quick Assessment
 
@@ -59,6 +59,15 @@ Major historical infrastructure investments provide context for the current AI b
 | Railroad Boom (US) | 1840s-1850s | \$1.2B | \$95B[^16] | \$95M/year | Multiple boom-bust cycles; essential infrastructure but significant stranded assets |
 | AI Infrastructure | 2024-2026 | \$1.4T projected | \$1.4T | \$466B/year | Ongoing; outcomes uncertain |
 
+<Mermaid chart={`
+%%{init: {'theme':'default'}}%%
+xychart-beta
+    title "Peak Annual Spending Rate by Cycle (2026 USD, Billions)"
+    x-axis ["Highways", "Apollo", "Railroads", "Telecom", "AI Infra"]
+    y-axis "Annual Rate" 0 --> 500
+    bar [15, 20, 6, 240, 467]
+`} />
+
 The telecom buildout of 1996-2001 offers the most relevant comparison. During that period, telecommunications companies invested approximately \$650 billion (nominal) in fiber optic networks and wireless infrastructure, driven by projected internet growth.[^15] The buildout resulted in significant overcapacity, with dark fiber capacity utilization below 3% by 2002.[^17] However, the infrastructure eventually supported subsequent internet growth, suggesting that timing and demand forecasting accuracy matter more than whether infrastructure is ultimately utilized.
 
 Key differences from the telecom cycle:
@@ -82,6 +91,17 @@ Key differences from the telecom cycle:
 | Oracle | \$7.0B | \$15.0B | \$50.0B | +233% | [Q3 FY2025 Earnings Call](https://oracle.com/investor)[^10] |
 | xAI | \$3.0B | \$18.0B | \$30B+ | +67%+ | [Series E Funding Announcement](https://x.ai)[^19] |
 | **Combined** | **≈\$238B** | **≈\$415B** | **≈\$700B+** | **≈+69%** | |
+
+<Mermaid chart={`
+%%{init: {'theme':'default'}}%%
+xychart-beta
+    title "Hyperscaler Capex 2024-2026 (Billions USD)"
+    x-axis ["Amazon", "Alphabet", "Microsoft", "Meta", "Oracle", "xAI"]
+    y-axis "Capex" 0 --> 220
+    bar "2024" [83, 52.5, 56, 37, 7, 3]
+    bar "2025" [131, 91.4, 88, 72, 15, 18]
+    bar "2026" [200, 180, 147.5, 125, 50, 30]
+`} />
 
 #### Amazon — \$200B in 2026
 
@@ -161,6 +181,15 @@ The capital intensity of AI infrastructure varies significantly across companies
 | Meta | \$125B | \$175B | 71% | \$115B | 109% | [2025 10-K](https://sec.gov)[^9][^7] |
 | Oracle | \$50B | \$55B | 91% | \$20B | 250% | [2025 10-K](https://sec.gov)[^10][^7] |
 
+<Mermaid chart={`
+%%{init: {'theme':'default'}}%%
+xychart-beta
+    title "2026 Capex as Percentage of 2025 Revenue"
+    x-axis ["Amazon", "Alphabet", "Microsoft", "Meta", "Oracle", "Telecom Peak", "Energy Avg"]
+    y-axis "Capex/Revenue (%)" 0 --> 100
+    bar [31, 46, 55, 71, 91, 35, 20]
+`} />
+
 These ratios indicate that all five major hyperscalers are spending more on capex than they generate in operating cash flow, necessitating either debt issuance, asset sales, or reduced shareholder returns. Oracle's 250% capex/OCF ratio is particularly notable, requiring substantial external financing.[^10]
 
 For context, the capital-intensive energy sector typically maintains capex/revenue ratios of 15-25%, while the telecom sector during its 1996-2001 buildout peaked at approximately 35% capex/revenue.[^15][^34]
@@ -221,6 +250,15 @@ JPMorgan's analysis suggests the technology industry must collect an incremental
 | Low Return (5% ROIC) | \$500B | \$2T (2026-2030) | Hardware-like margins; slow adoption; significant cannibalization |
 | No Return (0% ROIC) | \$250B | \$1T (2026-2030) | Covers depreciation only; no economic profit |
 
+<Mermaid chart={`
+%%{init: {'theme':'default'}}%%
+xychart-beta
+    title "Required Annual AI Revenue by 2030 Under Different Return Scenarios"
+    x-axis ["0% (Depreciation)", "5% ROIC", "10% ROIC (Base)", "15% ROIC"]
+    y-axis "Required Revenue" 0 --> 1600
+    bar [250, 500, 1000, 1500]
+`} />
+
 ### Revenue Pathway Analysis
 
 For context on the \$1 trillion annual revenue target, current AI revenue data points include:
@@ -234,6 +272,24 @@ For context on the \$1 trillion annual revenue target, current AI revenue data p
 | GitHub Copilot | \$2B estimated | \$5B projected | Developer subscriptions | [Microsoft Disclosures](https://microsoft.com)[^39] |
 | Other Enterprise AI | \$10B estimated | \$25B projected | Various vendors | Industry estimates |
 | **Total** | **≈\$90B** | **≈\$190B** | | |
+
+<SquiggleEstimate title="AI Revenue Growth Trajectory to 2030 ($B)" code={`
+// Can AI revenue grow from ~\$90B to the \$1T needed for 10% ROIC?
+rev2025 = 90
+rev2026 = 160 to 220
+rev2027 = rev2026 * (1.4 to 2.0)
+rev2028 = rev2027 * (1.3 to 1.8)
+rev2029 = rev2028 * (1.2 to 1.6)
+rev2030 = rev2029 * (1.15 to 1.5)
+{
+  "2025 (est.)": rev2025,
+  "2026": rev2026,
+  "2027": rev2027,
+  "2028": rev2028,
+  "2029": rev2029,
+  "2030": rev2030
+}
+`} />
 
 Current 2025 AI revenue of approximately \$90 billion would need to grow to \$1 trillion by 2030, implying a compound annual growth rate (CAGR) of approximately 61% — faster than cloud computing's 40% CAGR during 2010-2020 but slower than mobile app revenue's 85% CAGR during 2008-2015.[^40]
 
@@ -323,6 +379,22 @@ AI infrastructure at the projected scale requires substantial electrical power g
 | US DOE | 15-20 GW incremental | 50-75 GW cumulative | Based on announced data center projects | [DOE Grid Study 2025](https://energy.gov)[^29] |
 | Goldman Sachs | 18 GW incremental | 60 GW cumulative | Extrapolation from hyperscaler capex plans | [Goldman Infrastructure Report 2025](https://goldmansachs.com)[^45] |
 | EPRI | 12-25 GW range | 40-80 GW range | Scenarios based on AI adoption rates | [EPRI Data Center Study 2025](https://epri.com)[^46] |
+
+<SquiggleEstimate title="Cumulative AI Data Center Power Demand (GW)" code={`
+// DOE estimates: 15-20 GW incremental in 2026, 50-75 GW cumulative by 2030
+capacity2026 = 15 to 25
+capacity2027 = capacity2026 * (1.3 to 1.6)
+capacity2028 = capacity2027 * (1.2 to 1.4)
+capacity2029 = capacity2028 * (1.1 to 1.3)
+capacity2030 = capacity2029 * (1.05 to 1.2)
+{
+  "2026": capacity2026,
+  "2027": capacity2027,
+  "2028": capacity2028,
+  "2029": capacity2029,
+  "2030": capacity2030
+}
+`} />
 
 For context, 1 gigawatt serves approximately 700,000 US homes.[^47] The projected 15-20 GW of incremental 2026 demand equals the residential power consumption of 10-14 million homes, or roughly the entire state of Pennsylvania.
 
@@ -431,6 +503,29 @@ Physical infrastructure creates potential governance intervention points:
 4. **Power supply**: Energy regulators can influence or restrict data center power access
 5. **Chip design tools**: EDA software (Cadence, Synopsys, Siemens) required for chip design
 
+<Mermaid chart={`
+flowchart TD
+    subgraph Supply["Semiconductor Supply Chain"]
+        EDA["EDA Tools<br/>Cadence, Synopsys"] --> DESIGN["Chip Design<br/>Nvidia, AMD"]
+        DESIGN --> TSMC["TSMC Fabrication<br/>90%+ advanced nodes"]
+        HBM["HBM Memory<br/>3 suppliers"] --> ASSEMBLY["System Assembly"]
+        TSMC --> ASSEMBLY
+    end
+
+    subgraph Infra["Physical Infrastructure"]
+        POWER["Power Supply<br/>Grid, nuclear, gas"] --> DC["Data Centers"]
+        ASSEMBLY --> DC
+    end
+
+    DC --> TRAINING["Frontier AI Training"]
+
+    style EDA fill:#cceeff
+    style TSMC fill:#cceeff
+    style HBM fill:#cceeff
+    style POWER fill:#fff4e1
+    style TRAINING fill:#ffcccc
+`} />
+
 These chokepoints enable potential governance interventions such as:
 - Compute allocation requirements (e.g., mandating safety testing access)
 - Export controls and international agreements
@@ -475,6 +570,13 @@ Chinese technology companies are investing heavily in AI infrastructure, though 
 | ByteDance | \$25-30B | Content recommendation, generative AI | [Financial Times Analysis](https://ft.com)[^62] |
 | Huawei | \$30-35B | Cloud infrastructure, AI chips | [Financial Times Analysis](https://ft.com)[^62] |
 | **Estimated Total** | **\$145-180B** | | |
+
+<Mermaid chart={`
+pie title "2026 Global AI Infrastructure Investment (Estimated)"
+    "US Hyperscalers (~700B)" : 700
+    "Chinese Tech (~163B)" : 163
+    "European Union (~35B)" : 35
+`} />
 
 China's total estimated AI infrastructure spending of \$145-180 billion is lower than the US total but still substantial. Key differences:
 
