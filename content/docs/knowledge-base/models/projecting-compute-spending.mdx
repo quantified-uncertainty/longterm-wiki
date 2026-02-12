@@ -16,7 +16,7 @@ metrics:
   wordCount: 6800
   citations: 45
   tables: 12
-  diagrams: 9
+  diagrams: 15
 clusters:
   - ai-safety
   - governance
@@ -44,6 +44,29 @@ For two consecutive years, Wall Street consensus estimates for AI capex were sub
 To contextualize the \$700 billion figure: it represents approximately 2.1% of projected 2026 US GDP flowing from five companies into infrastructure buildout in a single year — more than four times the combined annual capital expenditure of the entire publicly traded US energy sector.[^12]
 
 This spending trajectory influences <EntityLink id="ai-governance">AI governance</EntityLink> dynamics: the physical infrastructure being deployed determines the <EntityLink id="ai-training-compute">compute available</EntityLink> for training frontier models, the geographic distribution of AI capabilities, and the economic incentives shaping competitive dynamics between AI developers.
+
+<SquiggleEstimate title="Cumulative Hyperscaler AI Capex 2024-2030 ($T)" code={`
+// Goldman/JPMorgan project ≈\$5T cumulative through 2030
+// 2024-2026 are known; 2027-2030 carry increasing uncertainty
+capex2024 = 0.238
+capex2025 = 0.415
+capex2026 = 0.700
+capex2027 = capex2026 * (0.9 to 1.3)
+capex2028 = capex2027 * (0.85 to 1.2)
+capex2029 = capex2028 * (0.8 to 1.15)
+capex2030 = capex2029 * (0.75 to 1.1)
+cumulative = capex2024 + capex2025 + capex2026 + capex2027 + capex2028 + capex2029 + capex2030
+{
+  "2024 (actual)": capex2024,
+  "2025 (actual)": capex2025,
+  "2026 (guided)": capex2026,
+  "2027": capex2027,
+  "2028": capex2028,
+  "2029": capex2029,
+  "2030": capex2030,
+  "Cumulative 2024-2030": cumulative
+}
+`} />
 
 ## Historical Context
 
@@ -167,6 +190,16 @@ Global semiconductor sales reached \$791.7 billion in 2025, representing 25.6% y
 | Other Semiconductors | \$266.7B | +8.5% | Broad electronics demand | [SIA Q4 2025 Report](https://semiconductors.org)[^5] |
 | **Total** | **\$791.7B** | **+25.6%** | | |
 
+<Mermaid chart={`
+%%{init: {'theme':'default'}}%%
+xychart-beta
+    title "Global Semiconductor Sales by Segment (Billions USD)"
+    x-axis ["Logic (AI Chips)", "Memory (HBM)", "Other Semiconductors"]
+    y-axis "Annual Sales" 0 --> 350
+    bar "2024" [216, 165, 246]
+    bar "2025" [302, 223, 267]
+`} />
+
 Nvidia maintains approximately 90% market share in AI accelerators used for training large language models.[^32] The company's fiscal year 2025 revenue (ended January 2025) reached \$130.5 billion, representing 114% year-over-year growth, with data center revenue comprising \$116.2 billion of the total.[^33] Wall Street analysts estimate Nvidia's calendar year 2026 revenue at approximately \$280-324 billion, maintaining gross margins near 70%.[^32][^33]
 
 ### Capital Efficiency Metrics
@@ -204,6 +237,27 @@ Hardware depreciation significantly impacts the actual economics of AI infrastru
 | 4 years | Alphabet, Microsoft | \$25B annual depreciation per \$100B invested; moderate lifecycle |
 | 5 years | Amazon (some equipment) | \$20B annual depreciation per \$100B invested; optimistic on longevity |
 
+<SquiggleEstimate title="Annual Depreciation Burden from AI Capex ($B)" code={`
+// Each year's capex creates ~4 years of depreciation at 25%/year
+// Shows how depreciation costs compound as investment accumulates
+dep2025 = 238 * 0.25  // from 2024 capex
+dep2026 = dep2025 + 415 * 0.25  // add 2025 layer
+dep2027 = dep2026 + 700 * 0.25  // add 2026 layer
+capex2027 = 700 * (0.9 to 1.3)
+dep2028 = dep2027 + capex2027 * 0.25  // add 2027 layer, 2024 rolls off
+   - 238 * 0.25
+capex2028 = capex2027 * (0.85 to 1.2)
+dep2029 = dep2028 + capex2028 * 0.25  // 2025 rolls off
+   - 415 * 0.25
+{
+  "2025": dep2025,
+  "2026": dep2026,
+  "2027": dep2027,
+  "2028": dep2028,
+  "2029": dep2029
+}
+`} />
+
 If the \$700 billion in 2026 capex is depreciated over 4 years on average, these companies face \$175 billion in annual depreciation expenses starting in 2027, which must be covered by revenue from AI products and services to maintain profitability. Additionally, technological advancement in AI accelerators creates functional obsolescence risk: H100 GPUs from 2023 are already being replaced by H200 and GB200 systems with 2-3x performance improvements, potentially rendering older hardware economically obsolete before the end of its depreciation schedule.[^36]
 
 ### Funding Mechanisms
@@ -217,6 +271,16 @@ The \$700 billion in 2026 capex is funded through multiple sources:
 | **Debt Issuance** | \$108B | \$150B estimated | Amazon \$35B, Oracle \$50B planned, Meta \$15B, Alphabet \$8B | [SEC Filings](https://sec.gov)[^22] |
 | **Cash Reserves** | \$446B combined | N/A | Available but preference to preserve balance sheet strength | [Company 10-Ks](https://sec.gov)[^7] |
 | **Equity Issuance** | \$20B (Oracle) | \$30B estimated | Oracle at-the-market offering; some analysts expect others to follow | [Oracle 8-K](https://sec.gov)[^22] |
+
+<Mermaid chart={`
+%%{init: {'theme':'default'}}%%
+xychart-beta
+    title "Capital Reallocation: Buybacks vs AI Capex (Billions USD)"
+    x-axis ["2021", "2022", "2023", "2024", "2025", "2026 (est.)"]
+    y-axis "Spending" 0 --> 750
+    bar "Share Buybacks" [149, 130, 100, 75, 50, 50]
+    bar "AI Capex" [50, 80, 120, 238, 415, 700]
+`} />
 
 The shift from share buybacks to capex represents a significant reallocation of capital. In 2021, these five companies spent \$149 billion buying back their own stock; in Q4 2025, combined buybacks fell to \$12.6 billion, the lowest level since Q1 2018.[^8] This reallocation implies management teams believe AI infrastructure investments will generate higher returns than returning capital to shareholders, though it also reduces financial flexibility.
 
@@ -274,7 +338,7 @@ For context on the \$1 trillion annual revenue target, current AI revenue data p
 | **Total** | **≈\$90B** | **≈\$190B** | | |
 
 <SquiggleEstimate title="AI Revenue Growth Trajectory to 2030 ($B)" code={`
-// Can AI revenue grow from ~\$90B to the \$1T needed for 10% ROIC?
+// Can AI revenue grow from ≈\$90B to the \$1T needed for 10% ROIC?
 rev2025 = 90
 rev2026 = 160 to 220
 rev2027 = rev2026 * (1.4 to 2.0)
@@ -306,6 +370,15 @@ Multiple revenue pathways could contribute to the \$1 trillion target:
 **Drug discovery and materials science**: AI-accelerated research in pharmaceuticals and materials could generate substantial value, though revenue recognition may be delayed by regulatory approval timelines.
 
 **Code generation**: GitHub Copilot and similar tools are used by 1.8 million developers as of Q4 2025.[^39] If 30 million of the world's ~50 million developers adopt AI coding tools at \$30/month, that represents \$11 billion annually.
+
+<Mermaid chart={`
+pie title "Potential Revenue Sources to Reach 1T Target"
+    "Enterprise Productivity (480B)" : 480
+    "Consumer AI Services (240B)" : 240
+    "Autonomous Systems (100B)" : 100
+    "Code Generation (11B)" : 11
+    "Other (Drug Discovery, Materials)" : 169
+`} />
 
 However, several factors complicate revenue projections:
 
@@ -436,6 +509,21 @@ xAI's approach — building on-site natural gas power generation — bypasses gr
 - Economics depend on natural gas pricing (currently \$3-4/MMBtu but historically volatile)[^54]
 
 As of Q1 2026, xAI's 2 GW Colossus facility operates on on-site gas generation, while the company plans to transition partially to renewable energy for future expansion.[^23]
+
+<Mermaid chart={`
+%%{init: {'theme':'default'}}%%
+timeline
+    title AI Data Center Power Source Timelines
+    2025 : xAI Colossus 2 GW (on-site gas)
+         : 50 GW renewable PPAs contracted
+    2026 : Grid interconnection for early projects
+         : Natural gas peaker plants
+    2027-2028 : Meta Oklo 50 MW (SMR nuclear)
+              : Microsoft TMI-1 835 MW restart
+    2029+ : Amazon X-energy 300 MW (SMR)
+          : Meta TerraPower 500 MW
+          : Large-scale grid nuclear
+`} />
 
 #### Renewable Energy Contracts
 
