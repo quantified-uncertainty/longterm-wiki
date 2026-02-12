@@ -42,7 +42,7 @@ The core claim is that the value of any action affecting AI timelines can be dec
 
 This decomposition makes it possible to compare seemingly incommensurable actions — a safety research breakthrough, a capabilities speedup, or a regulatory slowdown — on the same scale.
 
-**Central framing**: "Speeding up TAI arrival by 1% is estimated to increase the probability of existential catastrophe by 0.3-1.5 percentage points, while adjusting the conditional value of the long-term future by -0.2% to +0.5%."
+**Central framing**: At current readiness levels, pulling TAI forward by 1 year is estimated to increase the probability of existential catastrophe by 1-4 percentage points, while producing ambiguous effects on the conditional value of the long-term future (earlier benefits vs. less mature governance). The net effect depends critically on how prepared we are when TAI arrives.
 
 ## Connection to the AI Transition Model
 
@@ -64,6 +64,18 @@ The simplification is deliberate: while the full causal model has dozens of para
 | Conditional value | $V(T)$ | Expected value of the future given survival |
 | Delay cost | $C(\Delta T)$ | Annual cost of delayed TAI benefits |
 
+**Readiness scale anchors**: $S$ and $G$ are normalized to [0, 1] where the endpoints represent:
+
+| Score | Safety readiness $S$ | Governance readiness $G$ |
+|-------|---------------------|-------------------------|
+| **0.0** | No alignment research exists | No AI-specific governance institutions |
+| **0.25** | Basic techniques exist (RLHF, evals) but not validated for TAI-level systems | Preliminary regulations exist (EU AI Act) but not designed for TAI risks |
+| **0.50** | Scalable oversight and interpretability work for current frontier models; untested at TAI level | Major jurisdictions have enforceable TAI-specific frameworks; international coordination is functional |
+| **0.75** | Alignment techniques empirically validated on near-TAI systems; known failure modes are covered | Global governance regime with monitoring, enforcement, and incident response capacity |
+| **1.0** | High confidence that alignment generalizes to TAI; formal or empirical guarantees | Mature international regime comparable to nuclear governance; tested through incidents |
+
+These anchors are inherently subjective. The key insight is not the precise numbers but the *shape* of the relationship: marginal returns to preparation are highest when readiness is low.
+
 ### The Value Equation
 
 The expected value of a time shift $\Delta T$ can be expressed as:
@@ -81,7 +93,7 @@ The probability of existential catastrophe depends on the gap between capability
 
 $$R(T) = R_{base} \cdot f\left(\frac{Capability(T)}{Safety(T) \cdot Governance(T)}\right)$$
 
-Since capability at deployment is roughly fixed (TAI is TAI regardless of when it arrives), the key determinant is how much time safety and governance have had to prepare. More time generally means lower risk, but with diminishing returns as readiness approaches sufficiency.
+A simplifying assumption: capability at the TAI threshold is roughly fixed regardless of arrival date. In practice, earlier TAI may differ qualitatively — different architectures, capability profiles, or failure modes — which this model does not capture (see Limitations). Under this simplification, the key determinant of risk is how much time safety and governance have had to prepare. More time generally means lower risk, but with diminishing returns as readiness approaches sufficiency.
 
 ### Marginal Risk per Unit of Acceleration
 
@@ -129,8 +141,12 @@ Acceleration does not only affect risk — it also affects the value of the futu
 | Less time for pre-TAI coordination and norm-setting | Negative | -0.1-0.5% per year | Medium |
 | Higher lock-in risk from less mature governance | Negative | -0.2-1.0% per year | Low |
 | Faster compounding of TAI-enabled economic growth | Positive | +0.1-0.5% per year | Low |
+| Lost option value from less time to learn about alignment difficulty | Negative | -0.1-0.5% per year | Medium |
+| Earlier AI-assisted safety research (TAI helps solve alignment) | Positive | +0.1-1.0% per year | Very Low |
 
 The net conditional value effect of acceleration is ambiguous and depends heavily on assumptions about how much governance maturity matters for post-TAI outcomes.
+
+Two effects deserve special attention. **Option value of delay**: additional time before TAI lets us learn whether alignment is fundamentally hard or tractable, whether specific governance approaches work, and what failure modes actually manifest in increasingly capable systems. This learning has asymmetric value — discovering that alignment is harder than expected is much more useful before TAI arrives than after. **AI-assisted safety research**: sufficiently capable AI systems might dramatically accelerate alignment research itself, creating a dynamic where some capability acceleration is positive for safety. This is highly uncertain — it depends on whether near-TAI systems are capable enough to help with alignment but not yet dangerous enough to pose catastrophic risks, a potentially narrow window.
 
 ## Comparative Analysis of Actions
 
@@ -223,7 +239,7 @@ This illustrates the core insight: **the same acceleration can be net positive o
 
 ### The Readiness Curve
 
-The relationship between preparation time and risk reduction is not linear. It follows an S-curve: very early preparation has modest returns (foundational research), the middle period has the highest returns (translating research into deployable safety measures), and late preparation has diminishing returns (fine-tuning already-adequate measures).
+The relationship between preparation time and risk reduction is not linear. It follows a concave curve with diminishing marginal returns: the first few years of additional preparation yield the largest risk reductions (deploying known safety techniques, establishing basic governance), while later years yield progressively less (fine-tuning already-adequate measures, hardening against increasingly unlikely failure modes). This is why the current moment — when readiness is low and marginal returns are high — is so critical.
 
 <Mermaid chart={`
 xychart-beta
@@ -248,14 +264,14 @@ This means that for deceleration to be effective at reducing x-risk, it must eit
 
 ### Differential Technology Development
 
-Not all acceleration is equal. The concept of <EntityLink id="differential-technology-development">differential technology development</EntityLink> distinguishes between advancing safety-relevant vs. capability-relevant technologies. The ideal is to accelerate safety research while leaving capability timelines unchanged — achieving risk reduction without the costs of delay.
+Not all acceleration is equal. The concept of differential technology development (introduced in Bostrom 2014) distinguishes between advancing safety-relevant vs. capability-relevant technologies. The ideal is to accelerate safety research while leaving capability timelines unchanged — achieving risk reduction without the costs of delay.
 
-| Development Type | Timeline Effect | Risk Effect | Cost |
-|------------------|----------------|-------------|------|
-| **Pure safety acceleration** | None | Strong negative (risk reduction) | Low |
-| **Pure capability acceleration** | Negative (earlier TAI) | Positive (risk increase) | Delayed benefits cost |
-| **Mixed research** (e.g., interpretability) | Slight negative | Net negative (risk reduction) | Low |
-| **Infrastructure** (compute, data) | Negative | Positive (risk increase) | Variable |
+| Development Type | Timeline Effect | X-Risk Effect | Direct Cost |
+|------------------|----------------|---------------|-------------|
+| **Pure safety acceleration** | None | Reduced | Low |
+| **Pure capability acceleration** | Earlier TAI | Increased | Low (but large externality) |
+| **Mixed research** (e.g., interpretability) | Slightly earlier TAI | Net reduced | Low |
+| **Infrastructure** (compute, data) | Earlier TAI | Increased | Variable |
 
 ## Sensitivity Analysis
 
@@ -289,7 +305,7 @@ Safety organizations should also consider the **racing multiplier** when evaluat
 
 ### For Capabilities Organizations
 
-The model implies that capabilities organizations creating acceleration should account for the marginal x-risk created. At current readiness levels, pulling TAI forward by 1 year creates roughly 1-4 percentage points of additional x-risk. If the long-term future is worth \$10^{15}+ in expected value, this represents an enormous externality.
+The model implies that capabilities organizations creating acceleration should account for the marginal x-risk created. At current readiness levels, pulling TAI forward by 1 year creates roughly 1-4 percentage points of additional x-risk. If the long-term future is worth quadrillions of dollars or more in expected value, this represents an enormous externality.
 
 This does not mean all capabilities work is net negative — complementary work that advances both safety and capabilities can be net positive, and acceleration becomes less costly as safety readiness improves.
 
@@ -303,13 +319,15 @@ The racing multiplier is the strongest argument for international coordination: 
 
 The model provides a framework for comparing any intervention on a common scale: how many **x-risk-adjusted years** does it produce? This enables portfolio optimization across very different intervention types.
 
-| Intervention Type | Effective x-risk-adjusted Years | Cost per Year | Cost-effectiveness Rank |
-|-------------------|---------------------------------|---------------|------------------------|
-| **Alignment research** | 0.5-3 per breakthrough | \$10-100M per breakthrough | 1st |
-| **Compute governance** | 0.3-1.5 globally | \$50-200M for implementation | 2nd |
-| **International coordination** | 0.2-1.0 per agreement | \$20-100M per agreement | 3rd |
-| **National regulation** | 0.1-0.5 (racing-adjusted) | \$10-50M for advocacy | 4th |
-| **Voluntary commitments** | 0.05-0.2 | \$5-20M | 5th |
+| Intervention Type | Effective x-risk-adjusted Years | Cost | Notes |
+|-------------------|---------------------------------|------|-------|
+| **Alignment research** | 0.5-3 per breakthrough | \$10-100M per breakthrough | Highest ceiling but depends on tractability |
+| **Compute governance** | 0.3-1.5 globally | \$50-200M for implementation | High leverage, closing window |
+| **International coordination** | 0.2-1.0 per agreement | \$20-100M per agreement | Ranges overlap with compute governance |
+| **National regulation** | 0.1-0.5 (racing-adjusted) | \$10-50M for advocacy | Heavily discounted by racing multiplier |
+| **Voluntary commitments** | 0.05-0.2 | \$5-20M | Fragile, low counterfactual impact |
+
+Note that the ranges overlap substantially — the ranking is suggestive, not definitive. A high-impact compute governance intervention could outperform a marginal alignment research program. Portfolio diversification across types is likely optimal.
 
 ## Key Uncertainties
 
@@ -340,6 +358,8 @@ This model provides a unified framework for comparing acceleration and decelerat
 **Tail risks and unknown unknowns**: The parameter estimates are based on current understanding. Novel alignment failure modes or unexpected capability jumps could invalidate the smooth tradeoff curves assumed here.
 
 **Heterogeneity of TAI**: "Transformative AI" is not a single event. Different capabilities may arrive at different times, and the risks associated with each may vary independently.
+
+**Recursive dynamics**: The model treats safety progress and capability progress as independent, but they interact. Most importantly, increasingly capable AI systems may accelerate safety research itself — meaning acceleration could simultaneously reduce preparation time *and* increase the rate of safety progress. The net effect of this dynamic is deeply uncertain and could change the sign of the model's conclusions for moderate acceleration.
 
 ## Related Models
 
