@@ -278,4 +278,53 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { id: 'has-interpretation', label: 'Has Interpretation Guide', weight: 20, detection: 'content', pattern: 'interpret|reading|legend|meaning|represents' },
     ],
   },
+  'knowledge-base-person': {
+    id: 'knowledge-base-person',
+    name: 'Knowledge Base - Person',
+    minWordCount: 400,
+    frontmatter: [
+      { name: 'title', required: true, weight: 5 },
+      { name: 'description', required: true, weight: 15 },
+      { name: 'lastEdited', required: true, weight: 5 },
+    ],
+    sections: [
+      { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 15 },
+      { id: 'background', label: 'Professional Background', alternateLabels: ['Background', 'Career', 'Education and Career', 'Early Career'], required: true, weight: 15 },
+      { id: 'contributions', label: 'Key Contributions', alternateLabels: ['Contributions', 'Research', 'Notable Work', 'Publications', 'Technical Contributions'], required: false, weight: 10 },
+      { id: 'positions', label: 'Positions and Views', alternateLabels: ['Views', 'Philosophy', 'Core Philosophy', 'Key Positions'], required: false, weight: 10 },
+      { id: 'criticism', label: 'Criticism', alternateLabels: ['Criticisms', 'Concerns', 'Controversies', 'Limitations', 'Debate'], required: false, weight: 10 },
+    ],
+    qualityCriteria: [
+      { id: 'has-citations', label: 'Has Citations (critical for accuracy)', weight: 25, detection: 'citation', pattern: '<R id=|\\[\\^\\d+\\]|\\[.*\\]\\(http' },
+      { id: 'has-primary-sources', label: 'Has Primary Sources', weight: 15, detection: 'content', pattern: 'interview|testimony|blog post|paper|tweet|announcement' },
+      { id: 'has-data-table', label: 'Has Background/Role Table', weight: 10, detection: 'table' },
+      { id: 'word-count', label: 'Sufficient Length', weight: 10, detection: 'content' },
+      { id: 'has-entitylinks', label: 'Links to Related Entities', weight: 10, detection: 'component', pattern: 'EntityLink' },
+    ],
+  },
+  'knowledge-base-organization': {
+    id: 'knowledge-base-organization',
+    name: 'Knowledge Base - Organization',
+    minWordCount: 500,
+    frontmatter: [
+      { name: 'title', required: true, weight: 5 },
+      { name: 'description', required: true, weight: 15 },
+      { name: 'lastEdited', required: true, weight: 5 },
+    ],
+    sections: [
+      { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 15 },
+      { id: 'history', label: 'History', alternateLabels: ['Background', 'Founding', 'Origins'], required: true, weight: 10 },
+      { id: 'activities', label: 'Key Activities', alternateLabels: ['Activities', 'Programs', 'Research Areas', 'Products', 'Services', 'Mission'], required: true, weight: 15 },
+      { id: 'funding', label: 'Funding', alternateLabels: ['Funding and Financials', 'Financials', 'Revenue', 'Budget'], required: false, weight: 10 },
+      { id: 'criticism', label: 'Criticism', alternateLabels: ['Criticisms', 'Concerns', 'Controversies', 'Limitations'], required: false, weight: 10 },
+      { id: 'people', label: 'Key People', alternateLabels: ['Leadership', 'Team', 'Staff', 'Notable Members'], required: false, weight: 5 },
+    ],
+    qualityCriteria: [
+      { id: 'has-citations', label: 'Has Citations (critical for accuracy)', weight: 25, detection: 'citation', pattern: '<R id=|\\[\\^\\d+\\]|\\[.*\\]\\(http' },
+      { id: 'has-primary-sources', label: 'Has Primary Sources', weight: 15, detection: 'content', pattern: 'annual report|tax filing|press release|official|announcement|blog post' },
+      { id: 'has-data-table', label: 'Has Data Tables', weight: 10, detection: 'table' },
+      { id: 'word-count', label: 'Sufficient Length', weight: 10, detection: 'content' },
+      { id: 'has-entitylinks', label: 'Links to Related Entities', weight: 10, detection: 'component', pattern: 'EntityLink' },
+    ],
+  },
 };

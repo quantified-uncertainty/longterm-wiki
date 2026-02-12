@@ -64,6 +64,12 @@ BALANCE CHECK - Flag these issues in balanceFlags array:
 - "one-sided-framing": Article presents only positive OR only negative perspective without balance
 - "uncritical-claims": Major claims presented as fact without attribution ("X is..." vs "X claims...")
 
+BIOGRAPHICAL/ORGANIZATIONAL ACCURACY FLAGS (apply to person & org pages):
+- "unsourced-biographical-details": Specific dates, roles, credentials, or achievements stated without citation
+- "missing-primary-sources": No links to official websites, CVs, LinkedIn, company filings, or direct statements
+- "unverified-quotes": Attributed quotes that may not be verbatim from a cited source
+- "speculative-motivations": Attributing specific motivations or reasoning to a person without a direct quote or source
+
 IMPORTANCE guidelines:
 - 90-100: Essential for prioritization decisions
 - 70-89: High value for practitioners
