@@ -86,6 +86,19 @@ pnpm crux validate                  # Full validation (advisory)
 ```
 **The `unified --rules=...` check is the blocking CI gate.** Always run it before committing. Use `--fix` to auto-fix issues.
 
+### Self-review checklist (before committing any page)
+
+After writing or editing a page, re-read the full page and check each of these:
+
+1. **Links resolve**: Every `<EntityLink id="X">` must match an actual `- id: X` in `data/entities/*.yaml`. Grep to verify: `grep "^- id: X" data/entities/*.yaml`
+2. **Prose matches data**: Claims in prose paragraphs must agree with numbers in tables and charts in the same page. Read them side-by-side.
+3. **Units are consistent**: If the overview uses years, the tables and worked examples should use years — not percentages of timeline, not months. Pick one unit and stick with it.
+4. **Assumptions are flagged**: Any simplifying assumption ("X is roughly fixed", "we treat Y as exogenous") must be explicitly marked as a simplification with a pointer to the Limitations section. Never assert a modeling shortcut as fact.
+5. **Scales are grounded**: If you define a [0, 1] parameter, immediately define what 0 and 1 mean with concrete anchors. Write the anchors *before* writing estimates that use the scale.
+6. **Rendering works**: For any expression mixing `\$`, `^`, `{}`, or LaTeX-like notation, think through the MDX rendering pipeline. When in doubt, use plain text.
+7. **Rankings acknowledge uncertainty**: If ranges overlap, do not assign definitive ordinal rankings. Say "roughly ordered by median" or "suggestive, not definitive."
+8. **No missing dynamics**: For analytical/model pages, check whether you've addressed: option value of delay, racing/coordination effects, recursive dynamics (AI accelerating safety research), and whether effects are qualitatively different (not just quantitatively shifted).
+
 ### If you must create a page manually
 Write the initial draft, then immediately run the improve pipeline on it:
 ```bash
