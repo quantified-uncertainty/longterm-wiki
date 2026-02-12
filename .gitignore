@@ -24,14 +24,9 @@ app/out/
 app/next-env.d.ts
 app/tsconfig.tsbuildinfo
 
-# Generated data (rebuilt by prebuild script)
-app/src/data/database.json
-app/src/data/id-registry.json
-app/src/data/pathRegistry.json
+# Generated data (all rebuilt by prebuild script / build-data.mjs)
+app/src/data/*.json
 app/src/data/schema.ts
-app/src/data/pages.json
-app/src/data/stats.json
-app/src/data/link-health.json
 
 # Auto-generated LLM accessibility files
 app/public/llms*.txt
