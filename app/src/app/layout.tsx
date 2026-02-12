@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DevModeToggle } from "@/components/DevModeToggle";
 import { SearchButton, SearchDialog } from "@/components/SearchDialog";
+import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://longtermwiki.org"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Longterm Wiki",
     template: "%s | Longterm Wiki",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
     description: "AI Safety Knowledge Base",
     type: "website",
     siteName: "Longterm Wiki",
-    url: "https://longtermwiki.org",
+    url: SITE_URL,
   },
   twitter: {
     card: "summary",
