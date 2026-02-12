@@ -1,7 +1,7 @@
 name: "Content error"
 description: "Report an error, inaccuracy, or outdated information on a wiki page"
 type: "Bug"
-labels: ["content-issue"]
+labels: ["wiki-page-fix"]
 body:
   - type: input
     id: page

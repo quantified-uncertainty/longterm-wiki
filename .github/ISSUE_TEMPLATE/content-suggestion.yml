@@ -1,7 +1,7 @@
 name: "Content suggestion"
 description: "Suggest an addition to an existing page, or propose a new page"
 type: "Feature"
-labels: ["content-suggestion"]
+labels: ["wiki-page-addition"]
 body:
   - type: dropdown
     id: suggestion-type
