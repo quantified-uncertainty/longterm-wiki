@@ -166,6 +166,13 @@ function scanContentEntityLinks(pages, entityMap) {
  *   4. Content similarity/redundancy  (weight 0–3, scaled by similarity)
  *   5. Shared tags                    (weight varies by specificity)
  *
+ * Quality boost: Each neighbor's raw score is multiplied by a gentle factor
+ * based on the target page's quality and importance ratings:
+ *   boost = 1 + quality/40 + importance/400   (max ~1.45x)
+ * Unrated pages default to average values (q=5, imp=50 → 1.25x) so they
+ * aren't penalized vs rated pages. This nudges high-quality content up
+ * without reordering strongly-related connections.
+ *
  * Returns: entityId -> sorted array of { id, type, title, score }
  */
 function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
@@ -231,25 +238,59 @@ function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
     }
   }
 
-  // Convert to output: sorted by score, capped at top 20 per entity
+  // Convert to output: apply quality boost, then type-diverse selection.
+  // Guarantees representation from each type before filling by score.
+  const MAX_PER_ENTITY = 25;
+  const MIN_PER_TYPE = 2;
+
   const output = {};
   for (const [entityId, neighbors] of Object.entries(graph)) {
-    const sorted = [...neighbors.entries()]
-      .filter(([, score]) => score >= 1.0)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 20)
-      .map(([id, score]) => {
-        const e = entityMap.get(id);
+    const scored = [...neighbors.entries()]
+      .map(([targetId, rawScore]) => {
+        // Gentle boost: nudge high-quality pages up without reordering strong links.
+        // Unrated pages get average defaults so they aren't penalized.
+        const targetPage = pageMap.get(targetId);
+        const q = targetPage?.quality ?? 5;
+        const imp = targetPage?.importance ?? 50;
+        const boost = 1 + q / 40 + imp / 400;
+        const e = entityMap.get(targetId);
         return {
-          id,
+          id: targetId,
           type: e?.type || 'concept',
-          title: e?.title || id,
-          score: Math.round(score * 100) / 100,
+          title: e?.title || targetId,
+          score: Math.round(rawScore * boost * 100) / 100,
         };
-      });
+      })
+      .filter(entry => entry.score >= 1.0)
+      .sort((a, b) => b.score - a.score);
 
-    if (sorted.length > 0) {
-      output[entityId] = sorted;
+    // Type-diverse selection: guarantee MIN_PER_TYPE from each type,
+    // then fill remaining slots with highest-scoring entries.
+    const selected = new Set();
+    const byType = new Map();
+    for (const entry of scored) {
+      if (!byType.has(entry.type)) byType.set(entry.type, []);
+      byType.get(entry.type).push(entry);
+    }
+
+    // Phase 1: take top MIN_PER_TYPE from each type
+    for (const [, entries] of byType) {
+      for (const entry of entries.slice(0, MIN_PER_TYPE)) {
+        selected.add(entry.id);
+      }
+    }
+
+    // Phase 2: fill remaining slots by score (may already be selected)
+    for (const entry of scored) {
+      if (selected.size >= MAX_PER_ENTITY) break;
+      selected.add(entry.id);
+    }
+
+    // Build final list in score order
+    const result = scored.filter(e => selected.has(e.id)).slice(0, MAX_PER_ENTITY);
+
+    if (result.length > 0) {
+      output[entityId] = result;
     }
   }
 
