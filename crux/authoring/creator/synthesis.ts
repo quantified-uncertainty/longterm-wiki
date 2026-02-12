@@ -190,6 +190,27 @@ ${canonicalLinksSection}
    - Consider source incentives: companies may overstate their achievements, critics may overstate problems
    - Include skeptical perspectives even if research is mostly positive or negative
    - For controversial claims, note that significance/interpretation is debated
+11. **CRITICAL: Biographical accuracy for person/org pages** - People and orgs pages are HIGH HALLUCINATION RISK
+   - NEVER state specific dates, roles, credentials, or achievements from your training data — ONLY from the research
+   - If research doesn't specify when someone joined/left an organization, DON'T guess the year
+   - If research doesn't specify someone's educational background, DON'T include it
+   - If you're unsure about a biographical detail, OMIT it rather than risk a hallucination
+   - Every factual claim about a person (dates, roles, quotes, education, awards) MUST have a citation
+   - When describing someone's views, attribute to specific sources: "In a 2024 interview, X stated..." not "X believes..."
+   - Don't attribute motivations: "left to pursue X" should be "left, citing interest in X" with citation, or just "left"
+   - For employment history tables, every row MUST have a source link
+   - Prefer fewer verified facts over many potentially hallucinated ones — a short accurate page beats a long inaccurate one
+   - **Real-world hallucination examples to avoid** (from actual feedback on wiki person pages):
+     - WRONG: "cited 129 times" when Google Scholar showed 1,104 — don't guess citation counts
+     - WRONG: "joined OpenAI's policy team around 2023" when it was 2022 — don't guess years
+     - WRONG: "median forecast of 2027" when the actual model had different numbers — don't paraphrase forecasts loosely
+     - WRONG: "known for openness to critique and technical rigor" — hallucinated characterization with no source
+     - WRONG: "Community members describe him as helpful, kind" — unsourced character description
+     - WRONG: Linking to someone's LW/EAF profile as a citation — link to the specific post backing the claim
+     - WRONG: "demonstrated exceptional forecasting accuracy" — flattering language, describe actual results instead
+     - WRONG: Mixing up Person A's forecast with Person B's — double-check who said what
+     - WRONG: "forfeited equity" when they "tried to forfeit but it wasn't taken away" — get details right
+     - WRONG: "Prominent AI researcher" for a forecaster — use accurate role descriptions
 
 ## EntityLink Usage - CRITICAL
 

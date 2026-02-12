@@ -64,6 +64,10 @@ import { toneMarkersRule } from './tone-markers.ts';
 import { structuralQualityRule } from './structural-quality.ts';
 import { evaluativeFramingRule } from './evaluative-framing.ts';
 
+// Biographical accuracy (person/org pages)
+import { unsourcedBiographicalClaimsRule } from './unsourced-biographical-claims.ts';
+import { evaluativeFlattery } from './evaluative-flattery.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -101,6 +105,8 @@ export {
   structuralQualityRule,
   evaluativeFramingRule,
   squiggleQualityRule,
+  unsourcedBiographicalClaimsRule,
+  evaluativeFlattery,
 };
 
 export const allRules: Rule[] = [
@@ -139,6 +145,8 @@ export const allRules: Rule[] = [
   structuralQualityRule,
   evaluativeFramingRule,
   squiggleQualityRule,
+  unsourcedBiographicalClaimsRule,
+  evaluativeFlattery,
 ];
 
 export default allRules;

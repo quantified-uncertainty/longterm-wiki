@@ -43,6 +43,8 @@ import {
   toneMarkersRule,
   structuralQualityRule,
   evaluativeFramingRule,
+  unsourcedBiographicalClaimsRule,
+  evaluativeFlattery,
 } from '../lib/rules/index.ts';
 import type Anthropic from '@anthropic-ai/sdk';
 
@@ -550,6 +552,8 @@ const WARNING_RULES = [
   toneMarkersRule,
   structuralQualityRule,
   evaluativeFramingRule,
+  unsourcedBiographicalClaimsRule,
+  evaluativeFlattery,
 ];
 
 /**
@@ -622,6 +626,7 @@ Checklist categories:
 - Concreteness (CON): vague generalities, abstract recommendations, vague timelines, missing magnitudes
 - Cross-Page (XPC): contradictory figures, stale valuations, missing cross-references
 - Formatting (FMT): long paragraphs, missing data dates, formatting inconsistencies
+- Biographical Accuracy (BIO) — APPLY ONLY TO PERSON/ORG PAGES: unsourced dates/roles/credentials, missing primary sources (official site, CV, direct statements), attributed quotes without verbatim source, speculative motivations ("X believed that..." without citation), unverified employment history, potential LLM hallucination patterns (confident specific claims without evidence)
 
 Respond with JSON:
 {

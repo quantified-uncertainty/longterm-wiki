@@ -55,6 +55,8 @@ const QUALITY_RULES: string[] = [
   'tone-markers',
   'false-certainty',
   'prescriptive-language',
+  'unsourced-biographical-claims',
+  'evaluative-flattery',
 ];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -847,6 +849,29 @@ Write in **encyclopedic/analytical tone**, not advocacy or journalism. This is a
 - Distinguish between primary sources (government documents, company filings) and secondary analysis (news, blogs)
 - Weight primary sources over secondary; peer-reviewed over journalism
 
+### Biographical Accuracy (CRITICAL for person/org pages)
+People and organizations are VERY sensitive to inaccuracies. Real people read these pages and are embarrassed/upset by errors.
+- **NEVER add biographical facts from your training data** — only from research sources or existing cited content
+- **NEVER guess dates**: If you don't have a source for when someone joined/left/founded something, don't add or change dates
+- **NEVER embellish**: Don't add phrases like "demonstrated exceptional X" or "known for Y" without a specific source
+- **NEVER invent statistics**: Citation counts, visitor numbers, funding amounts must come from cited sources
+- **NEVER attribute views without sources**: Don't say "X believes..." — say "X stated in [source]..."
+- **NEVER mix up who said what**: When paraphrasing debates/forecasts, double-check which claims belong to which person
+- **Remove flattery**: Replace "prominent researcher", "exceptional track record", "competitive excellence" with neutral factual descriptions
+- **Prefer omission over hallucination**: A shorter accurate page is better than a longer one with errors
+- **Every specific claim needs a citation**: dates, roles, numbers, quotes, achievements — if unsourced, flag or remove
+- **Link citations directly**: When a footnote is just a URL, consider using an inline link instead of a footnote that redirects
+- **Real-world hallucination examples** (from actual subject feedback on wiki person pages):
+  - WRONG: "cited 129 times" (actual: 1,104) — never guess citation/stat numbers
+  - WRONG: "joined in 2023" (actual: 2022) — never guess employment dates
+  - WRONG: "known for openness to critique and technical rigor" — hallucinated characterization
+  - WRONG: Citing someone's LW profile page instead of a specific post — link to the actual evidence
+  - WRONG: "demonstrated exceptional forecasting accuracy" — flattery, describe specific results
+  - WRONG: Confusing Person A's forecast with Person B's — verify who said what
+  - WRONG: "Prominent AI researcher" for someone who is a forecaster — use accurate role descriptions
+  - WRONG: "forfeited equity" when it was "tried to forfeit but equity wasn't taken away" — get details right
+  - WRONG: Sections like "Other Research Contributions" that pad with low-value content — prefer focused accuracy
+
 ### Output Format
 Output the COMPLETE improved MDX file content. Include all frontmatter and content.
 Do not output markdown code blocks - output the raw MDX directly.
@@ -1212,6 +1237,39 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
           const footnoteCount = new Set(improvedContent.match(/\[\^\d+\]/g) || []).size;
           if (footnoteCount > 0) {
             log('improve', `⚠ ${footnoteCount} footnote citations added without web research — citations are LLM-generated and should be verified`);
+          }
+        }
+        // Extra hallucination warnings for person/org pages
+        if (page.path.includes('/people/') || page.path.includes('/organizations/')) {
+          log('improve', '⚠ PERSON/ORG PAGE — high hallucination risk. Verifying biographical claims...');
+          const bioPatterns = [
+            { pattern: /\b(?:joined|left|departed)\b.*\b(?:in|since)\s+\d{4}\b/gi, label: 'employment dates' },
+            { pattern: /\bPhD|Ph\.D\.|doctorate|master's|bachelor's|degree\b.*\b(?:from|at)\s+[A-Z]/gi, label: 'education claims' },
+            { pattern: /\b(?:founded|co-founded|established)\b.*\b(?:in|circa)\s+\d{4}\b/gi, label: 'founding dates' },
+          ];
+          let bioWarnings = 0;
+          const lines = improvedContent.split('\n');
+          for (const line of lines) {
+            // Skip lines that already have citations
+            if (/\[\^\d+\]|<R\s+id=|\]\(https?:\/\//.test(line)) continue;
+            for (const { pattern, label } of bioPatterns) {
+              pattern.lastIndex = 0;
+              if (pattern.test(line)) {
+                bioWarnings++;
+                if (bioWarnings <= 5) {
+                  log('improve', `  ⚠ Unsourced ${label}: "${line.trim().slice(0, 70)}..."`);
+                }
+              }
+            }
+          }
+          if (bioWarnings > 5) {
+            log('improve', `  ... and ${bioWarnings - 5} more unsourced biographical claims`);
+          }
+          if (bioWarnings > 0) {
+            log('improve', `  TOTAL: ${bioWarnings} biographical claims without citations — review these carefully`);
+            if (tier === 'polish') {
+              log('improve', '  Consider using --tier=standard to add research-backed citations');
+            }
           }
         }
         break;
