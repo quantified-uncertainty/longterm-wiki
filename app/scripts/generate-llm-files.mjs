@@ -8,7 +8,7 @@
  *   node scripts/generate-llm-files.mjs
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
 import { join } from 'path';
 
 // Configuration
@@ -404,7 +404,15 @@ Estimated tokens: ~${Math.round(totalTokens / 1000)}K
  */
 function generatePerPageTxt(pages) {
   const wikiDir = join(OUTPUT_DIR, 'wiki');
-  if (!existsSync(wikiDir)) {
+
+  // Clean stale .txt files before regenerating
+  if (existsSync(wikiDir)) {
+    for (const file of readdirSync(wikiDir)) {
+      if (file.endsWith('.txt')) {
+        unlinkSync(join(wikiDir, file));
+      }
+    }
+  } else {
     mkdirSync(wikiDir, { recursive: true });
   }
 
