@@ -99,7 +99,7 @@ const TIERS: Record<string, TierConfig> = {
 };
 
 // Initialize Anthropic client
-const anthropic = new Anthropic();
+const anthropic = new Anthropic({ timeout: 10 * 60 * 1000 });
 
 interface PageData {
   id: string;
@@ -529,13 +529,20 @@ async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<
   } = options;
 
   const messages: MessageParam[] = [{ role: 'user', content: prompt }];
-  let response = await anthropic.messages.create({
-    model,
-    max_tokens: maxTokens,
-    system: systemPrompt,
-    tools: tools as Anthropic.Messages.Tool[],
-    messages
-  });
+
+  // Use streaming to prevent timeouts on long-running requests
+  async function streamCreate(msgs: MessageParam[]): Promise<Anthropic.Messages.Message> {
+    const stream = anthropic.messages.stream({
+      model,
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      tools: tools as Anthropic.Messages.Tool[],
+      messages: msgs
+    });
+    return await stream.finalMessage();
+  }
+
+  let response = await streamCreate(messages);
 
   // Handle tool use loop
   while (response.stop_reason === 'tool_use') {
@@ -574,13 +581,7 @@ async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<
     messages.push({ role: 'assistant', content: response.content });
     messages.push({ role: 'user', content: toolResults });
 
-    response = await anthropic.messages.create({
-      model,
-      max_tokens: maxTokens,
-      system: systemPrompt,
-      tools: tools as Anthropic.Messages.Tool[],
-      messages
-    });
+    response = await streamCreate(messages);
   }
 
   // Extract text from response
