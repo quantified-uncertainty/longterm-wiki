@@ -15,6 +15,7 @@
  *   fix         Auto-fix operations
  *   content     Page management (improve, create, grade)
  *   generate    Content generation (yaml, summaries, diagrams)
+ *   visual      Diagram, chart & model pipeline (create, review, audit, improve)
  *   resources   External resource management
  *   insights    Insight quality management
  *   gaps        Insight gap analysis
@@ -41,6 +42,7 @@ import * as analyzeCommands from './commands/analyze.ts';
 import * as fixCommands from './commands/fix.ts';
 import * as contentCommands from './commands/content.ts';
 import * as generateCommands from './commands/generate.ts';
+import * as visualCommands from './commands/visual.ts';
 import * as resourcesCommands from './commands/resources.ts';
 import * as insightsCommands from './commands/insights.ts';
 import * as gapsCommands from './commands/gaps.ts';
@@ -52,6 +54,7 @@ const domains = {
   fix: fixCommands,
   content: contentCommands,
   generate: generateCommands,
+  visual: visualCommands,
   resources: resourcesCommands,
   insights: insightsCommands,
   gaps: gapsCommands,
@@ -116,6 +119,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   fix         Auto-fix operations
   content     Page management (improve, create, grade)
   generate    Content generation (yaml, summaries, diagrams)
+  visual      Diagram, chart & model pipeline
   resources   External resource management
   insights    Insight quality management
   gaps        Insight gap analysis
