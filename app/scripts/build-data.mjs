@@ -220,6 +220,7 @@ function buildPagesRegistry(urlToResource) {
           causalLevel: fm.causalLevel || null,
           lastUpdated: fm.lastUpdated || fm.lastEdited || null,
           llmSummary: fm.llmSummary || null,
+          structuredSummary: fm.structuredSummary || null,
           description: fm.description || null,
           // Extract ratings for model pages
           ratings: fm.ratings || null,

@@ -28,6 +28,9 @@ import ArchitectureScenariosTableView from "@/components/tables/views/Architectu
 import DeploymentArchitecturesTableView from "@/components/tables/views/DeploymentArchitecturesTableView";
 import SafetyGeneralizabilityTableView from "@/components/tables/views/SafetyGeneralizabilityTableView";
 
+// Summary components
+import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
+
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
 import { KeyQuestions } from "@/components/wiki/KeyQuestions";
@@ -108,6 +111,9 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
 
   // Callout — rendered from :::note, :::tip, :::caution, :::danger directives
   Callout,
+
+  // Summary — prominent key takeaways box at top of articles
+  KeyTakeaways,
 
   // Aside — Starlight callout component, mapped to Callout
   Aside,

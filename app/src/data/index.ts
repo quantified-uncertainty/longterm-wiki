@@ -243,6 +243,12 @@ export interface BacklinkEntry {
 
 export type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
 
+export interface StructuredSummary {
+  oneLiner: string;
+  keyPoints: string[];
+  bottomLine: string;
+}
+
 export interface Page {
   id: string;
   path: string;
@@ -257,6 +263,7 @@ export interface Page {
   causalLevel: string | null;
   lastUpdated: string | null;
   llmSummary: string | null;
+  structuredSummary: StructuredSummary | null;
   description: string | null;
   ratings: {
     novelty?: number;

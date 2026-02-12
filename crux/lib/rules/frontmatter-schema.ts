@@ -38,6 +38,11 @@ const frontmatterSchema = z.object({
   neglectedness: z.number().min(0).max(100).optional(),
   uncertainty: z.number().min(0).max(100).optional(),
   llmSummary: z.string().optional(),
+  structuredSummary: z.object({
+    oneLiner: z.string(),
+    keyPoints: z.array(z.string()).min(1).max(7),
+    bottomLine: z.string(),
+  }).optional(),
   lastEdited: z.string().optional(),
   todo: z.string().optional(),
   todos: z.array(z.string()).optional(),

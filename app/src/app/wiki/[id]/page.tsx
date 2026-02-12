@@ -229,6 +229,7 @@ function ContentView({
           quality={pageData?.quality ?? undefined}
           importance={pageData?.importance ?? undefined}
           llmSummary={pageData?.llmSummary ?? undefined}
+          structuredSummary={pageData?.structuredSummary ?? undefined}
           lastEdited={pageData?.lastUpdated ?? undefined}
           updateFrequency={pageData?.updateFrequency ?? undefined}
           todo={page.frontmatter.todo}
