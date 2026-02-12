@@ -168,6 +168,12 @@ const SUBPROCESS_CHECKS: SubprocessCheckDescriptor[] = [
     script: 'validate-insights.ts',
     description: 'Insight schema, ratings, and source paths',
   },
+  {
+    id: 'models',
+    name: 'Model Freshness',
+    script: 'validate-models.ts',
+    description: 'Claude model versions are up-to-date',
+  },
   // Note: 'quality' check excluded from CI - it's advisory only
   // Run `npm run validate:quality` manually to check quality ratings
 ];

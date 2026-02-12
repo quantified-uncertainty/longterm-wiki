@@ -23,13 +23,20 @@ config({ path: '.env' });
 config({ path: '.env.local' });
 
 /**
+ * Date when MODELS were last verified as current.
+ * validate-models.ts warns if this is more than 60 days old.
+ * Update this date after confirming models are still the latest versions.
+ */
+export const MODELS_LAST_VERIFIED = '2026-02-12';
+
+/**
  * Available Claude models with standardized names
  */
 export const MODELS: Record<string, string> = {
   // Fast and cheap - good for high-volume tasks
-  haiku: 'claude-3-5-haiku-latest',
+  haiku: 'claude-haiku-4-5-20251001',
   // Balanced - good for most tasks
-  sonnet: 'claude-sonnet-4-20250514',
+  sonnet: 'claude-sonnet-4-5-20250929',
   // Most capable - for complex tasks
   opus: 'claude-opus-4-6',
 };
@@ -41,6 +48,7 @@ const MODEL_ALIASES: Record<string, string> = {
   'haiku': MODELS.haiku,
   'sonnet': MODELS.sonnet,
   'opus': MODELS.opus,
+  'claude-haiku-4-5-20251001': MODELS.haiku,
   'claude-3-5-haiku-latest': MODELS.haiku,
   'claude-3-5-haiku-20241022': MODELS.haiku,
   'claude-sonnet-4-20250514': MODELS.sonnet,

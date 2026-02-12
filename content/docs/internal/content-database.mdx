@@ -208,8 +208,8 @@ npm run crux -- generate summaries --dry-run
 
 | Model | ID | Cost (per 1M input tokens) | Use case |
 |-------|----|-----------------------------|----------|
-| haiku | claude-3-5-haiku-20241022 | ≈\$0.25 | Bulk summarization |
-| sonnet | claude-sonnet-4-20250514 | ≈\$3.00 | Higher quality |
+| haiku | claude-haiku-4-5-20251001 | ≈\$0.25 | Bulk summarization |
+| sonnet | claude-sonnet-4-5-20250929 | ≈\$3.00 | Higher quality |
 | opus | claude-opus-4-6 | ≈\$5.00 | Best quality |
 
 **Cost estimates:**
@@ -324,7 +324,7 @@ summaries.upsert('entity-id', 'article', {
   summary: 'Full summary...',
   keyPoints: ['Point 1', 'Point 2'],
   keyClaims: [{ claim: '...', value: '...' }],
-  model: 'claude-3-5-haiku-20241022',
+  model: 'claude-haiku-4-5-20251001',
   tokensUsed: 1247
 });
 
