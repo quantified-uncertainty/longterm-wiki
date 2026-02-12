@@ -93,15 +93,26 @@ pnpm crux content improve <page-id> --tier=polish --apply
 ```
 This adds proper citations, fixes escaping, validates EntityLinks, and syncs frontmatter metrics.
 
-## CI Verification
+## CI Verification — MANDATORY
 
-After pushing a branch or PR, always verify CI passes:
-1. Wait ~3-5 minutes for CI to complete
-2. Check the PR's check status on GitHub
+**Never assume CI will pass. Always verify.**
+
+### Before pushing: run CI checks locally
+```bash
+cd app && node scripts/build-data.mjs            # 1. Build data layer
+pnpm test                                         # 2. Run all tests (must be 0 failures)
+pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only  # 3. Blocking validation
+pnpm build                                        # 4. Full Next.js build (catches compile errors)
+```
+All four must succeed before pushing. If any fail, fix the issue first.
+
+### After pushing: confirm CI is green
+1. Check the PR's check status on GitHub (use `gh pr checks` or ask the user for a screenshot)
+2. **Do not say "CI should pass" — wait for actual confirmation**
 3. If checks fail, investigate the failure, fix locally, and push again
 4. Do not consider work complete until CI is green
 
-The CI runs two jobs:
+### CI jobs
 - **build-and-test**: Builds the app and runs vitest (blocking)
 - **validate**: Runs `pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only` (blocking), then the full validation suite (advisory/non-blocking)
 
