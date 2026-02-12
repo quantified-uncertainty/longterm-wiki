@@ -50,6 +50,45 @@ longterm-wiki/
 3. Next.js app reads `database.json` at build time
 4. MDX pages in `content/docs/` are compiled via next-mdx-remote
 
+## Page Authoring Workflow
+
+When creating or editing wiki pages, **always use the Crux content pipeline**. Do not manually write wiki pages from scratch.
+
+### Prerequisites
+
+If `app/src/data/pages.json` doesn't exist, generate it first:
+```bash
+node app/scripts/build-data.mjs
+```
+
+### Creating a new page
+```bash
+pnpm crux content create "Page Title" --tier=standard
+```
+Tiers: `polish` (quick, ~$2-3), `standard` (with research, ~$5-8), `deep` (full research, ~$10-15)
+
+### Improving an existing page
+```bash
+pnpm crux content improve <page-id> --tier=polish --apply
+```
+Use `--directions "specific instructions"` for targeted improvements.
+Use `--apply` to write changes directly (otherwise outputs to temp file for review).
+Use `--grade` with `--apply` to auto-grade after improvement.
+
+### After any page edit (manual or pipeline)
+```bash
+pnpm crux fix escaping              # Auto-fix dollar signs, comparisons, tildes
+pnpm crux fix markdown              # Auto-fix list formatting, bold labels
+pnpm crux validate                  # Verify no errors introduced
+```
+
+### If you must create a page manually
+Write the initial draft, then immediately run the improve pipeline on it:
+```bash
+pnpm crux content improve <page-id> --tier=polish --apply
+```
+This adds proper citations, fixes escaping, validates EntityLinks, and syncs frontmatter metrics.
+
 ## Key Conventions
 
 - **Path aliases**: Use `@/`, `@components/`, `@data/`, `@lib/` in app code
