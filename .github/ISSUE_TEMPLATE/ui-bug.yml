@@ -1,6 +1,7 @@
 name: "UI / frontend bug"
 description: "Report a rendering issue, broken layout, or other UI problem"
-labels: ["bug", "ui"]
+type: "Bug"
+labels: ["ui-bug"]
 body:
   - type: input
     id: page
