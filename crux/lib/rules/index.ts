@@ -68,6 +68,9 @@ import { evaluativeFramingRule } from './evaluative-framing.ts';
 import { unsourcedBiographicalClaimsRule } from './unsourced-biographical-claims.ts';
 import { evaluativeFlattery } from './evaluative-flattery.ts';
 
+// Citation coverage
+import { footnoteCoverageRule } from './footnote-coverage.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -107,6 +110,7 @@ export {
   squiggleQualityRule,
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
+  footnoteCoverageRule,
 };
 
 export const allRules: Rule[] = [
@@ -147,6 +151,7 @@ export const allRules: Rule[] = [
   squiggleQualityRule,
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
+  footnoteCoverageRule,
 ];
 
 export default allRules;

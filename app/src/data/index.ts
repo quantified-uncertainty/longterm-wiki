@@ -284,6 +284,7 @@ export interface Page {
     diagramCount: number;
     internalLinks: number;
     externalLinks: number;
+    footnoteCount: number;
     bulletRatio: number;
     sectionCount: number;
     hasOverview: boolean;
