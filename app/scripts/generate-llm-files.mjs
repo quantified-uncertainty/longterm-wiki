@@ -20,7 +20,7 @@ const CONFIG = {
   // Site metadata
   site: {
     name: 'LongtermWiki',
-    url: 'https://longterm-wiki.vercel.app',
+    url: 'https://www.longtermwiki.com',
     description:
       'A comprehensive knowledge base for AI safety research, covering risks, responses, organizations, and the AI transition model.',
   },

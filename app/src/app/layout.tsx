@@ -5,7 +5,7 @@ import { SearchButton, SearchDialog } from "@/components/SearchDialog";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://longtermwiki.org"),
+  metadataBase: new URL("https://www.longtermwiki.com"),
   title: {
     default: "Longterm Wiki",
     template: "%s | Longterm Wiki",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     description: "AI Safety Knowledge Base",
     type: "website",
     siteName: "Longterm Wiki",
-    url: "https://longtermwiki.org",
+    url: "https://www.longtermwiki.com",
   },
   twitter: {
     card: "summary",

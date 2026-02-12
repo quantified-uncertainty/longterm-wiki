@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllPages, getEntityHref } from "@/data";
 
-const SITE_URL = "https://longterm-wiki.vercel.app";
+const SITE_URL = "https://www.longtermwiki.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = getAllPages();

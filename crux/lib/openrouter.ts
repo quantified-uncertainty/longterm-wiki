@@ -74,7 +74,7 @@ export async function callOpenRouter(prompt: string, options: OpenRouterOptions 
     headers: {
       'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://longtermwiki.vercel.app',
+      'HTTP-Referer': 'https://www.longtermwiki.com',
       'X-Title': 'LongtermWiki Page Creator'
     },
     body: JSON.stringify({
