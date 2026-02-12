@@ -2506,6 +2506,52 @@
       type: policy
   lastUpdated: 2026-02
 
+- id: maim
+  type: policy
+  title: "MAIM (Mutually Assured AI Malfunction)"
+  description: >-
+    A deterrence framework proposed by Dan Hendrycks, Eric Schmidt, and Alexandr Wang
+    in their 2025 paper 'Superintelligence Strategy'. MAIM posits that rival states will
+    naturally deter each other from pursuing unilateral AI dominance because destabilizing
+    AI projects can be sabotaged through an escalation ladder from espionage to kinetic
+    strikes. Part of a three-pillar framework including nonproliferation and competitiveness.
+  tags:
+    - ai-deterrence
+    - international-governance
+    - geopolitics
+    - superintelligence
+    - national-security
+  clusters:
+    - ai-safety
+    - governance
+    - geopolitics
+  sources:
+    - title: "Superintelligence Strategy"
+      url: https://arxiv.org/abs/2503.05628
+      author: Dan Hendrycks, Eric Schmidt, Alexandr Wang
+    - title: "AI Deterrence Is Our Best Option"
+      url: https://ai-frontiers.org/articles/ai-deterrence-is-our-best-option
+      author: Dan Hendrycks, Anka Khoja
+    - title: "Refining MAIM: Identifying Changes Required to Meet Conditions for Deterrence"
+      url: https://intelligence.org/2025/04/11/refining-maim-identifying-changes-required-to-meet-conditions-for-deterrence/
+      author: MIRI
+  relatedEntries:
+    - id: dan-hendrycks
+      type: person
+    - id: cais
+      type: organization
+    - id: racing-dynamics
+      type: risk
+    - id: compute-governance
+      type: policy
+    - id: export-controls
+      type: policy
+    - id: international-regimes
+      type: policy
+    - id: coordination-mechanisms
+      type: policy
+  lastUpdated: 2026-02
+
 - id: open-source
   type: approach
   title: Open Source Safety
