@@ -30,12 +30,30 @@ const TYPE_TO_GROUP: Record<string, string> = {
   funder: "Funders",
 };
 
+// Preferred group ordering per source entity type.
+// Groups not listed fall back to score-based ordering after the listed ones.
+const GROUP_ORDER_BY_SOURCE_TYPE: Record<string, string[]> = {
+  lab: ["People", "Safety Research", "Approaches", "Analysis", "Risks", "Labs", "Policy", "Organizations"],
+  "lab-research": ["People", "Safety Research", "Approaches", "Analysis", "Risks", "Labs"],
+  "lab-academic": ["People", "Safety Research", "Approaches", "Analysis", "Risks", "Labs"],
+  researcher: ["Labs", "Organizations", "Safety Research", "Approaches", "People", "Analysis", "Risks"],
+  risk: ["Approaches", "Safety Research", "People", "Labs", "Analysis", "Risks", "Models", "Policy"],
+  approach: ["Safety Research", "Risks", "People", "Labs", "Analysis", "Approaches", "Models"],
+  "safety-agenda": ["Approaches", "People", "Labs", "Risks", "Analysis", "Models"],
+  concept: ["Approaches", "Risks", "People", "Labs", "Analysis", "Safety Research"],
+  policy: ["Organizations", "Labs", "Risks", "Approaches", "People", "Analysis"],
+  analysis: ["People", "Labs", "Risks", "Approaches", "Analysis", "Safety Research"],
+  organization: ["People", "Labs", "Safety Research", "Approaches", "Analysis", "Policy"],
+  model: ["Risks", "Approaches", "Safety Research", "Analysis", "People", "Labs", "Models"],
+};
+
 interface RelatedPageItem {
   id: string;
   title: string;
   href: string;
   type: string;
   score: number;
+  label?: string;
 }
 
 interface TypeGroup {
@@ -47,7 +65,10 @@ interface TypeGroup {
 const MAX_PER_GROUP = 6;
 const MAX_TOTAL = 25;
 
-function groupByType(items: RelatedPageItem[]): TypeGroup[] {
+function groupByType(
+  items: RelatedPageItem[],
+  sourceType?: string
+): TypeGroup[] {
   const groups = new Map<string, RelatedPageItem[]>();
 
   for (const item of items) {
@@ -56,14 +77,35 @@ function groupByType(items: RelatedPageItem[]): TypeGroup[] {
     groups.get(groupLabel)!.push(item);
   }
 
-  // Convert to array, compute max score per group, sort groups by max score
-  return [...groups.entries()]
-    .map(([label, groupItems]) => ({
-      label,
-      items: groupItems.slice(0, MAX_PER_GROUP),
-      maxScore: Math.max(...groupItems.map((i) => i.score)),
-    }))
-    .sort((a, b) => b.maxScore - a.maxScore);
+  const result = [...groups.entries()].map(([label, groupItems]) => ({
+    label,
+    items: groupItems.slice(0, MAX_PER_GROUP),
+    maxScore: Math.max(...groupItems.map((i) => i.score)),
+  }));
+
+  // Context-aware ordering: use preferred order for source type if available,
+  // then fall back to score-based ordering for unlisted groups
+  const preferredOrder = sourceType
+    ? GROUP_ORDER_BY_SOURCE_TYPE[sourceType]
+    : undefined;
+
+  if (preferredOrder) {
+    result.sort((a, b) => {
+      const aIdx = preferredOrder.indexOf(a.label);
+      const bIdx = preferredOrder.indexOf(b.label);
+      // Both in preferred list: use preferred order
+      if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+      // Only one in preferred list: it comes first
+      if (aIdx !== -1) return -1;
+      if (bIdx !== -1) return 1;
+      // Neither in list: fall back to score
+      return b.maxScore - a.maxScore;
+    });
+  } else {
+    result.sort((a, b) => b.maxScore - a.maxScore);
+  }
+
+  return result;
 }
 
 function GroupSection({ group }: { group: TypeGroup }) {
@@ -81,6 +123,11 @@ function GroupSection({ group }: { group: TypeGroup }) {
             >
               {item.title}
             </Link>
+            {item.label && (
+              <span className="text-[0.65rem] text-muted-foreground shrink-0">
+                {item.label}
+              </span>
+            )}
           </div>
         ))}
       </div>
@@ -90,9 +137,10 @@ function GroupSection({ group }: { group: TypeGroup }) {
 
 export function RelatedPages({
   entityId,
+  entity,
 }: {
   entityId: string;
-  entity?: unknown;
+  entity?: { type?: string } | null;
 }) {
   const allItems: RelatedPageItem[] = getRelatedGraphFor(entityId).map(
     (entry) => ({
@@ -101,12 +149,14 @@ export function RelatedPages({
       href: entry.href,
       type: entry.type,
       score: entry.score,
+      label: entry.label,
     })
   );
 
   if (allItems.length === 0) return null;
 
-  const groups = groupByType(allItems.slice(0, MAX_TOTAL));
+  const sourceType = entity?.type;
+  const groups = groupByType(allItems.slice(0, MAX_TOTAL), sourceType);
 
   return (
     <section className="mt-12 pt-6 border-t border-border">

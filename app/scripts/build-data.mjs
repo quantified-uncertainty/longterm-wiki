@@ -173,7 +173,7 @@ function scanContentEntityLinks(pages, entityMap) {
  * aren't penalized vs rated pages. This nudges high-quality content up
  * without reordering strongly-related connections.
  *
- * Returns: entityId -> sorted array of { id, type, title, score }
+ * Returns: entityId -> sorted array of { id, type, title, score, label? }
  */
 function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
   const entityMap = new Map(entities.map(e => [e.id, e]));
@@ -181,6 +181,45 @@ function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
 
   // Accumulator: graph[entityId] = Map<relatedId, score>
   const graph = {};
+
+  // Directional labels from YAML relatedEntries (not symmetric)
+  // labels[from][to] = "analyzes"
+  const labels = {};
+
+  // Map for auto-generating reverse labels
+  const INVERSE_LABEL = {
+    'causes': 'caused by',
+    'cause': 'caused by',
+    'mitigates': 'mitigated by',
+    'mitigated-by': 'mitigates',
+    'mitigation': 'mitigated by',
+    'requires': 'required by',
+    'enables': 'enabled by',
+    'blocks': 'blocked by',
+    'supersedes': 'superseded by',
+    'increases': 'increased by',
+    'decreases': 'decreased by',
+    'supports': 'supported by',
+    'measures': 'measured by',
+    'measured-by': 'measures',
+    'analyzed-by': 'analyzes',
+    'analyzes': 'analyzed by',
+    'child-of': 'parent of',
+    'composed-of': 'component of',
+    'component': 'composed of',
+    'addresses': 'addressed by',
+    'affects': 'affected by',
+    'amplifies': 'amplified by',
+    'contributes-to': 'receives contribution from',
+    'driven-by': 'drives',
+    'driver': 'driven by',
+    'drives': 'driven by',
+    'leads-to': 'leads',
+    'shaped-by': 'shapes',
+    'prerequisite': 'depends on',
+    'research': 'researched by',
+    'models': 'modeled by',
+  };
 
   function addEdge(a, b, weight) {
     if (a === b) return;
@@ -195,6 +234,20 @@ function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
     if (entity.relatedEntries) {
       for (const ref of entity.relatedEntries) {
         addEdge(entity.id, ref.id, 10);
+        // Store directional label if present
+        if (ref.relationship && ref.relationship !== 'related') {
+          if (!labels[entity.id]) labels[entity.id] = {};
+          labels[entity.id][ref.id] = ref.relationship.replace(/-/g, ' ');
+          // Also store inverse label for the reverse direction
+          const inverse = INVERSE_LABEL[ref.relationship];
+          if (inverse) {
+            if (!labels[ref.id]) labels[ref.id] = {};
+            // Don't overwrite an explicit label with an inferred one
+            if (!labels[ref.id][entity.id]) {
+              labels[ref.id][entity.id] = inverse;
+            }
+          }
+        }
       }
     }
   }
@@ -254,12 +307,16 @@ function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
         const imp = targetPage?.importance ?? 50;
         const boost = 1 + q / 40 + imp / 400;
         const e = entityMap.get(targetId);
-        return {
+        const entry = {
           id: targetId,
           type: e?.type || 'concept',
           title: e?.title || targetId,
           score: Math.round(rawScore * boost * 100) / 100,
         };
+        // Attach directional label if one exists for this specific pair
+        const lbl = labels[entityId]?.[targetId];
+        if (lbl) entry.label = lbl;
+        return entry;
       })
       .filter(entry => entry.score >= 1.0)
       .sort((a, b) => b.score - a.score);

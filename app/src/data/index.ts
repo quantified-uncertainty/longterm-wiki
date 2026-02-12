@@ -86,6 +86,7 @@ export interface RelatedGraphEntry {
   type: string;
   title: string;
   score: number;
+  label?: string;
 }
 
 interface DatabaseShape {
@@ -558,6 +559,7 @@ export function getRelatedGraphFor(
   title: string;
   href: string;
   score: number;
+  label?: string;
 }> {
   const db = getDatabase();
   const entries = db.relatedGraph?.[entityId] || [];
