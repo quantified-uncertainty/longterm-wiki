@@ -150,6 +150,10 @@ async function compileFromPath(filePath: string, slug: string): Promise<MdxPage 
       components: mdxComponents,
       options: {
         parseFrontmatter: false,
+        // next-mdx-remote v6 blocks JS expressions by default (CVE-2026-0969).
+        // Our MDX content uses JSX components (EntityLink, SquiggleEstimate, etc.)
+        // which require JS expressions, so we must explicitly allow them.
+        blockJS: false,
         mdxOptions: {
           remarkPlugins: [remarkGfm, remarkMath, remarkDirective, remarkCallouts],
           // eslint-disable-next-line @typescript-eslint/no-explicit-any -- rehype plugin type incompatibility with next-mdx-remote
