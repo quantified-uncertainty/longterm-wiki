@@ -1,20 +1,20 @@
 ---
 title: "Projecting Compute Spending"
-description: "Analysis of hyperscaler AI infrastructure capital expenditure, with $700B+ planned for 2026 across six major companies. Examines spending projections through 2030, funding mechanisms, supply chain dynamics, and economic conditions required to justify investments."
+description: "Analysis of hyperscaler AI infrastructure capital expenditure, with $700B+ planned for 2026 across six major companies. Examines spending projections through 2030, funding mechanisms, supply chain dynamics, economic conditions required to justify investments, and structural power risks from compute concentration under US jurisdiction."
 sidebar:
   order: 51
 importance: 72
 lastEdited: "2026-02-12"
 update_frequency: 30
-llmSummary: "Hyperscalers plan $700B+ in AI infrastructure capex for 2026 (58% increase over 2025), led by Amazon at $200B, Alphabet $185B, Microsoft $145-150B, Meta $115-135B, Oracle $50B, and xAI $30B+. Global chip sales projected to reach $1 trillion in 2026. JPMorgan estimates investments require $1 trillion in annual AI revenue to generate 10% returns. Analysis covers funding mechanisms, supply chain constraints, power requirements, and revenue pathway uncertainties."
+llmSummary: "Hyperscalers plan $700B+ in AI infrastructure capex for 2026 (58% increase over 2025), led by Amazon at $200B, Alphabet $185B, Microsoft $145-150B, Meta $115-135B, Oracle $50B, and xAI $30B+. All six are US companies subject to US jurisdiction (CLOUD Act, FISA 702), creating a jurisdictional monopoly over global frontier AI compute. Analysis covers funding mechanisms, supply chain constraints, power requirements, revenue pathway uncertainties, and structural risks including cybersecurity vulnerability, military-commercial dual use, collusion dynamics, and extreme concentration scenarios."
 ratings:
   novelty: 6
   rigor: 7
   actionability: 6
   completeness: 8
 metrics:
-  wordCount: 6800
-  citations: 45
+  wordCount: 7000
+  citations: 67
   tables: 12
   diagrams: 15
 clusters:
@@ -643,6 +643,29 @@ Based on the spending trajectory and its implications, several governance approa
 6. **Antitrust analysis**: Evaluate whether compute concentration among 5-6 companies creates governance leverage or reduces competition-driven safety corners-cutting
 
 These recommendations are not universally endorsed and face substantial implementation challenges.
+
+## Structural Power and Adversarial Risks
+
+> **For comprehensive analysis**, see <EntityLink id="compute-concentration">Compute Concentration</EntityLink>, which covers:
+> - US jurisdictional monopoly (CLOUD Act, FISA 702) over global AI compute
+> - Cybersecurity and systemic vulnerability of concentrated infrastructure
+> - Military-commercial dual use and the trust problem it creates
+> - Collusion dynamics and historical precedents (DRAM, LCD, no-poach)
+> - Extreme concentration scenarios and democratic accountability gaps
+
+The spending data documented above reveals a structural fact that extends beyond economics: **all six major AI infrastructure spenders are US-headquartered companies subject to US federal jurisdiction.** The CLOUD Act and FISA Section 702 give the US government effective legal authority to compel access to data — including model weights, training data, and inference queries — processed through any of these companies' infrastructure, anywhere in the world. No contractual data residency provision overrides these statutes.
+
+This jurisdictional monopoly, combined with \$700 billion in annual capex concentrated in 5-6 entities, creates a set of interlocking risks:
+
+| Risk Dimension | Key Finding |
+|----------------|-------------|
+| **US jurisdiction** | All 6 spenders subject to CLOUD Act/FISA 702; Microsoft admitted to French Senate it cannot guarantee data sovereignty |
+| **Cybersecurity** | NVIDIA Container Toolkit vulnerability (CVSS 9.0) affected all providers simultaneously; 50% of US data centers in two regions |
+| **Military dual use** | Pentagon GenAI.mil serves 3M personnel via same commercial infrastructure; \$200M contracts to Anthropic, Google, OpenAI, xAI |
+| **Collusion conditions** | 5-6 players with interlocking JVs and shared supplier — structural conditions matching DRAM/LCD cartel environments |
+| **Concentration trajectory** | Self-reinforcing loop gain of 1.2-2.0; capital barriers growing from \$238B (2024) to \$700B (2026) |
+
+These dynamics are analyzed in depth on the dedicated <EntityLink id="compute-concentration">Compute Concentration</EntityLink> risk page, which examines how the physical, legal, and economic characteristics of compute infrastructure create risks qualitatively different from those posed by software or data concentration.
 
 ## International Context
 
