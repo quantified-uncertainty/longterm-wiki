@@ -2007,7 +2007,7 @@
   title: AI Acceleration Tradeoff Model
   description: >-
     A quantitative framework for evaluating the costs and benefits of speeding up or slowing down AI development.
-    Models how changes to TAI arrival time affect existential risk, safety preparedness, governance readiness,
+    Analyzes how changes to TAI arrival time affect existential risk, safety preparedness, governance readiness,
     and the expected value of the long-term future.
   customFields:
     - label: Model Type
