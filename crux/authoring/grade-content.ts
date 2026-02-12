@@ -45,6 +45,7 @@ import {
   evaluativeFramingRule,
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
+  footnoteCoverageRule,
 } from '../lib/rules/index.ts';
 import type Anthropic from '@anthropic-ai/sdk';
 
@@ -401,10 +402,20 @@ function computeMetrics(content: string): Metrics {
   const withoutComponents = withoutImports.replace(/<[^>]+\/>/g, '').replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, '');
   const proseWords = withoutComponents.split(/\s+/).filter(w => w.length > 0).length;
 
-  // Count citations: <R id="..."> and markdown links [text](url)
+  // Count citations: <R id="..."> components and GFM footnote references [^N]
   const rComponents = (withoutFm.match(/<R\s+id=/g) || []).length;
-  const mdLinks = (withoutFm.match(/\[[^\]]+\]\(https?:\/\/[^)]+\)/g) || []).length;
-  const citations = rComponents + mdLinks;
+  // Count unique footnote references (not definitions like [^1]: ...)
+  const footnoteRefs = new Set<string>();
+  const footnotePattern = /\[\^(\d+)\]/g;
+  for (const line of withoutFm.split('\n')) {
+    if (/^\[\^\d+\]:/.test(line.trim())) continue; // Skip definitions
+    let match: RegExpExecArray | null;
+    footnotePattern.lastIndex = 0;
+    while ((match = footnotePattern.exec(line)) !== null) {
+      footnoteRefs.add(match[1]);
+    }
+  }
+  const citations = rComponents + footnoteRefs.size;
 
   // Count tables (markdown tables with |---|)
   const tables = (withoutFm.match(/\|[-:]+\|/g) || []).length;
@@ -554,6 +565,7 @@ const WARNING_RULES = [
   evaluativeFramingRule,
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
+  footnoteCoverageRule,
 ];
 
 /**
