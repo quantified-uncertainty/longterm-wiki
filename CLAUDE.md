@@ -50,6 +50,19 @@ longterm-wiki/
 3. Next.js app reads `database.json` at build time
 4. MDX pages in `content/docs/` are compiled via next-mdx-remote
 
+## Page Creation
+
+**Always use the crux pipeline for new pages** — do not create MDX files manually:
+```bash
+pnpm crux content create "Topic Name" --tier standard
+pnpm crux content create "Topic Name" --tier standard --directions "Focus on X"
+pnpm crux content create "Topic Name" --source-file ./notes.md  # skip web research, use local file
+```
+
+The pipeline handles Perplexity research, source fetching, citation registration (`<R>` tags), synthesis, validation, and grading automatically. Manual page creation skips all of this and produces lower-quality pages without formal citations.
+
+**API keys are in environment variables** (`process.env`), NOT in `.env` files. Check `env | grep -i API` to verify available keys before assuming they're missing. Required keys: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`. Optional: `FIRECRAWL_KEY`, `SCRY_API_KEY`.
+
 ## Key Conventions
 
 - **Path aliases**: Use `@/`, `@components/`, `@data/`, `@lib/` in app code
