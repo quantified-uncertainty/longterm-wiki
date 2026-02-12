@@ -37,3 +37,29 @@ lists in `analyze.ts`, `resources.ts`, `content.ts`, and `generate.ts`.
 
 Completed: `PROJECT_ROOT` in `content-types.ts` now uses `import.meta.url` + `fileURLToPath`.
 All 15+ `process.cwd()` usages across crux/ replaced with `PROJECT_ROOT` imports.
+
+## 6. Migrate existing pages to use `entityType` in frontmatter
+
+Currently ~600 pages in entity-required categories (people, organizations, risks,
+responses, models, worldviews, intelligence-paradigms) rely on YAML entity definitions
+in `data/entities/` instead of declaring `entityType` in their frontmatter.
+
+The page-creator pipeline now auto-sets `entityType` for newly created pages (using
+the category-to-entityType mapping in `crux/lib/category-entity-types.ts`), so new
+pages get auto-entities from the frontmatter scanner at build time. But existing pages
+still depend on YAML.
+
+### Migration plan
+
+1. **Write a script** to scan all MDX pages in entity-required categories and add
+   `entityType: <type>` to their frontmatter (using the same mapping).
+2. **Verify** that build-data produces identical entities after the migration
+   (YAML entities still take precedence, so this is additive).
+3. **Gradually** move rich entity metadata (relatedEntries, customFields) into
+   frontmatter fields if desired, or keep YAML as the source for relational data.
+
+### Why this matters
+
+- Eliminates the two-file requirement for new pages
+- Makes frontmatter self-describing (you can see the entity type without checking YAML)
+- Reduces the chance of the CI failure we hit (missing entity definitions)

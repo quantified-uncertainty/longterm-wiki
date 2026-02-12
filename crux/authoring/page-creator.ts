@@ -45,6 +45,7 @@ import { runSourceVerification } from './creator/verification.ts';
 import { ensureComponentImports, runValidationLoop, runFullValidation } from './creator/validation.ts';
 import { runGrading } from './creator/grading.ts';
 import { createCategoryDirectory, deployToDestination, validateCrossLinks, runReview } from './creator/deployment.ts';
+import { inferEntityType } from '../lib/category-entity-types.ts';
 
 dotenv.config();
 
@@ -139,7 +140,7 @@ interface PipelineResults {
   totalCost: number;
 }
 
-async function runPipeline(topic: string, tier: string = 'standard', directions: string | null = null, sourceFilePath: string | null = null): Promise<PipelineResults> {
+async function runPipeline(topic: string, tier: string = 'standard', directions: string | null = null, sourceFilePath: string | null = null, destPath: string | null = null): Promise<PipelineResults> {
   const config = TIERS[tier];
   if (!config) {
     console.error(`Unknown tier: ${tier}`);
@@ -227,17 +228,17 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
           break;
 
         case 'synthesize':
-          result = await runSynthesis(topic, 'standard', ctx);
+          result = await runSynthesis(topic, 'standard', ctx, destPath);
           results.totalCost += (result.budget as number) || 0;
           break;
 
         case 'synthesize-fast':
-          result = await runSynthesis(topic, 'fast', ctx);
+          result = await runSynthesis(topic, 'fast', ctx, destPath);
           results.totalCost += 1.0;
           break;
 
         case 'synthesize-quality':
-          result = await runSynthesis(topic, 'quality', ctx);
+          result = await runSynthesis(topic, 'quality', ctx, destPath);
           results.totalCost += (result.budget as number) || 0;
           break;
 
@@ -480,7 +481,7 @@ async function main(): Promise<void> {
         result = await fetchRegisteredSources(topic, { maxSources: 15 }, ctx);
         break;
       case 'synthesize':
-        result = await runSynthesis(topic, tier === 'premium' ? 'quality' : 'standard', ctx);
+        result = await runSynthesis(topic, tier === 'premium' ? 'quality' : 'standard', ctx, destPath);
         break;
       case 'verify-sources':
         result = await runSourceVerification(topic, ctx);
@@ -510,7 +511,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  await runPipeline(topic, tier, directions, sourceFilePath);
+  await runPipeline(topic, tier, directions, sourceFilePath, destPath);
 
   // Deploy to destination if --dest provided
   if (destPath) {
@@ -540,6 +541,21 @@ async function main(): Promise<void> {
         console.log(`\n   Outbound EntityLinks (${crossLinkCheck.outboundCount}): ${crossLinkCheck.outboundIds.join(', ') || 'none'}`);
       } else {
         console.log(`${c.green}Cross-linking looks good (${crossLinkCheck.outboundCount} outbound EntityLinks)${c.reset}`);
+      }
+
+      // Entity type check — warn if deploying to entity-required category without entityType
+      const expectedType = inferEntityType(destPath);
+      if (expectedType) {
+        const deployedContent = fs.readFileSync(deployResult.deployedTo!, 'utf-8');
+        const hasEntityType = /^entityType:/m.test(deployedContent);
+        if (!hasEntityType) {
+          console.log(`\n${c.yellow}WARNING: No entityType in frontmatter${c.reset}`);
+          console.log(`   Category "${destPath}" expects entityType: "${expectedType}"`);
+          console.log(`   Without it, this page will fail the CI entity test.`);
+          console.log(`   Add to frontmatter: entityType: "${expectedType}"`);
+        } else {
+          console.log(`\n${c.green}Entity type set in frontmatter${c.reset}`);
+        }
       }
 
       console.log(`\n${c.yellow}Cross-linking reminder:${c.reset}`);
