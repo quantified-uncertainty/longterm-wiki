@@ -16,6 +16,7 @@ import { componentPropsRule } from './component-props.ts';
 import { citationUrlsRule } from './citation-urls.ts';
 import { componentImportsRule } from './component-imports.ts';
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
+import { footnoteCoverageRule } from './footnote-coverage.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 
@@ -543,5 +544,75 @@ describe('frontmatter-schema rule', () => {
     });
     const issues = frontmatterSchemaRule.check(content, {});
     expect(issues.some((i: any) => i.message.includes('pageType'))).toBe(true);
+  });
+});
+
+// =============================================================================
+// footnote-coverage rule
+// =============================================================================
+
+describe('footnote-coverage rule', () => {
+  const longProse = 'This is a sentence with several words in it. '.repeat(20); // ~200 words
+  const veryLongProse = longProse + longProse; // ~400 words
+
+  it('warns when a knowledge-base page has no footnotes and sufficient prose', () => {
+    const content = mockContent(veryLongProse, {
+      relativePath: 'knowledge-base/responses/test-page.mdx',
+    });
+    const issues = footnoteCoverageRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('No footnote citations');
+    expect(issues[0].severity).toBe(Severity.WARNING);
+  });
+
+  it('does not warn when page has footnote citations', () => {
+    const content = mockContent(veryLongProse + '\n\nSome claim.[^1]\n\n[^1]: [Source](https://example.org)', {
+      relativePath: 'knowledge-base/organizations/test-org.mdx',
+    });
+    const issues = footnoteCoverageRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips non-knowledge-base pages', () => {
+    const content = mockContent(veryLongProse, {
+      relativePath: 'guides/some-guide.mdx',
+    });
+    const issues = footnoteCoverageRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips short pages', () => {
+    const content = mockContent('A short page with few words.', {
+      relativePath: 'knowledge-base/risks/short-risk.mdx',
+    });
+    const issues = footnoteCoverageRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips index pages', () => {
+    const content = mockContent(veryLongProse, {
+      relativePath: 'knowledge-base/index.mdx',
+      isIndex: true,
+    });
+    const issues = footnoteCoverageRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips stub pages', () => {
+    const content = mockContent(veryLongProse, {
+      relativePath: 'knowledge-base/risks/test-stub.mdx',
+      frontmatter: { title: 'Test', pageType: 'stub' },
+    });
+    const issues = footnoteCoverageRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('does not count footnote definitions as references', () => {
+    // A page with only footnote definitions but no inline references
+    const content = mockContent(veryLongProse + '\n\n[^1]: [Source](https://example.org)', {
+      relativePath: 'knowledge-base/people/test-person.mdx',
+    });
+    const issues = footnoteCoverageRule.check(content, {});
+    expect(issues.length).toBe(1); // definitions alone don't count
   });
 });
