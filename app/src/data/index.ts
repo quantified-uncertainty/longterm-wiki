@@ -81,6 +81,13 @@ interface RawEntity {
   };
 }
 
+export interface SuggestedRelatedEntry {
+  id: string;
+  type: string;
+  title: string;
+  score: number;
+}
+
 interface DatabaseShape {
   typedEntities?: Array<Record<string, unknown>>;
   resources: Resource[];
@@ -88,6 +95,7 @@ interface DatabaseShape {
   experts: Expert[];
   organizations: Organization[];
   backlinks: Record<string, BacklinkEntry[]>;
+  suggestedRelated: Record<string, SuggestedRelatedEntry[]>;
   pathRegistry: Record<string, string>;
   idRegistry: IdRegistryMaps;
   pages: Page[];
@@ -535,6 +543,27 @@ export function getBacklinksFor(
   return links.map((link) => ({
     ...link,
     href: getEntityHref(link.id, link.type),
+  }));
+}
+
+// ============================================================================
+// SUGGESTED RELATED
+// ============================================================================
+
+export function getSuggestedRelatedFor(
+  entityId: string
+): Array<{
+  id: string;
+  type: string;
+  title: string;
+  href: string;
+  score: number;
+}> {
+  const db = getDatabase();
+  const entries = db.suggestedRelated?.[entityId] || [];
+  return entries.map((entry) => ({
+    ...entry,
+    href: getEntityHref(entry.id, entry.type),
   }));
 }
 

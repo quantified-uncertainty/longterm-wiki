@@ -118,6 +118,120 @@ function computeBacklinks(entities) {
 }
 
 /**
+ * Scan MDX content for <EntityLink id="..."> references.
+ * Returns inbound map: targetEntityId -> array of source pages that link to it.
+ * Must be called before rawContent is stripped from pages.
+ */
+function scanContentEntityLinks(pages, entityMap) {
+  const inbound = {};
+  let totalLinks = 0;
+
+  for (const page of pages) {
+    if (!page.rawContent) continue;
+
+    const regex = /<EntityLink\s+[^>]*id="([^"]+)"/g;
+    let match;
+    const seen = new Set();
+
+    while ((match = regex.exec(page.rawContent)) !== null) {
+      const targetId = match[1];
+      if (targetId === page.id) continue; // Skip self-links
+      if (seen.has(targetId)) continue;
+      seen.add(targetId);
+
+      if (!inbound[targetId]) {
+        inbound[targetId] = [];
+      }
+      const sourceEntity = entityMap.get(page.id);
+      inbound[targetId].push({
+        id: page.id,
+        type: sourceEntity?.type || 'concept',
+        title: page.title,
+      });
+      totalLinks++;
+    }
+  }
+
+  return { inbound, totalLinks };
+}
+
+/**
+ * Compute suggested related pages for each entity using multiple signals:
+ * - Tag overlap (weighted by tag specificity)
+ * - Content similarity (from redundancy scores)
+ * - Name/prefix matching (e.g. "anthropic" → "anthropic-ipo")
+ *
+ * Excludes entities already in relatedEntries or backlinks.
+ * Returns: entityId -> array of { id, type, title, score }
+ */
+function computeSuggestedRelated(entities, pages, backlinks, tagIndex) {
+  const entityMap = new Map(entities.map(e => [e.id, e]));
+  const pageMap = new Map(pages.map(p => [p.id, p]));
+  const suggested = {};
+
+  for (const entity of entities) {
+    const scores = new Map();
+
+    // 1. Tag overlap — entities sharing tags, weighted by tag specificity
+    if (entity.tags?.length) {
+      for (const tag of entity.tags) {
+        const tagEntities = tagIndex[tag] || [];
+        // Rarer tags are more informative
+        const specificity = 1 / Math.log2(tagEntities.length + 2);
+        for (const te of tagEntities) {
+          if (te.id === entity.id) continue;
+          scores.set(te.id, (scores.get(te.id) || 0) + specificity * 3);
+        }
+      }
+    }
+
+    // 2. Content similarity (from page redundancy scores)
+    const page = pageMap.get(entity.id);
+    if (page?.redundancy?.similarPages) {
+      for (const sp of page.redundancy.similarPages) {
+        if (sp.id === entity.id) continue;
+        scores.set(sp.id, (scores.get(sp.id) || 0) + (sp.similarity / 100) * 3);
+      }
+    }
+
+    // 3. Name/prefix matching — child pages are strongly related
+    for (const other of entities) {
+      if (other.id === entity.id) continue;
+      if (other.id.startsWith(entity.id + '-') || entity.id.startsWith(other.id + '-')) {
+        scores.set(other.id, (scores.get(other.id) || 0) + 4);
+      }
+    }
+
+    // Filter out entities already in explicit relatedEntries or backlinks
+    const existingIds = new Set([
+      ...(entity.relatedEntries?.map(r => r.id) || []),
+      ...(backlinks[entity.id]?.map(b => b.id) || []),
+    ]);
+
+    const top = [...scores.entries()]
+      .filter(([id]) => !existingIds.has(id))
+      .filter(([, score]) => score >= 1.0)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([id, score]) => {
+        const e = entityMap.get(id);
+        return {
+          id,
+          type: e?.type || 'concept',
+          title: e?.title || id,
+          score: Math.round(score * 100) / 100,
+        };
+      });
+
+    if (top.length > 0) {
+      suggested[entity.id] = top;
+    }
+  }
+
+  return suggested;
+}
+
+/**
  * Build inverted tag index
  * Returns a map: tag -> array of entities with that tag
  */
@@ -519,6 +633,30 @@ function main() {
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource);
 
+  // =========================================================================
+  // CONTENT ENTITY LINKS — scan MDX for <EntityLink> references
+  // Must happen before rawContent is stripped (below).
+  // =========================================================================
+  const entityMap = new Map(entities.map(e => [e.id, e]));
+  const { inbound: contentInbound, totalLinks: contentLinkCount } = scanContentEntityLinks(pages, entityMap);
+
+  // Merge content-derived inbound links into backlinks
+  let contentBacklinksMerged = 0;
+  for (const [targetId, sources] of Object.entries(contentInbound)) {
+    if (!backlinks[targetId]) {
+      backlinks[targetId] = [];
+    }
+    const existingIds = new Set(backlinks[targetId].map(b => b.id));
+    for (const source of sources) {
+      if (!existingIds.has(source.id)) {
+        backlinks[targetId].push(source);
+        contentBacklinksMerged++;
+      }
+    }
+  }
+  console.log(`  contentLinks: ${contentLinkCount} EntityLink references scanned, ${contentBacklinksMerged} new backlinks added`);
+
+  // Re-count backlinks after merging content links
   // Enrich pages with backlink counts
   for (const page of pages) {
     const pageBacklinks = backlinks[page.id] || [];
@@ -546,6 +684,14 @@ function main() {
   // Store redundancy pairs for analysis
   database.redundancyPairs = redundancyPairs.slice(0, 100); // Top 100 pairs
   console.log(`  redundancy: ${redundancyPairs.length} similar pairs found`);
+
+  // =========================================================================
+  // SUGGESTED RELATED — compute additional related pages from tags,
+  // content similarity, and name-prefix matching.
+  // =========================================================================
+  const suggestedRelated = computeSuggestedRelated(entities, pages, backlinks, tagIndex);
+  database.suggestedRelated = suggestedRelated;
+  console.log(`  suggestedRelated: ${Object.keys(suggestedRelated).length} entities have suggestions`);
 
   database.pages = pages;
 
@@ -665,6 +811,7 @@ function main() {
   writeFileSync(join(OUTPUT_DIR, 'stats.json'), JSON.stringify(stats, null, 2));
   writeFileSync(join(OUTPUT_DIR, 'pathRegistry.json'), JSON.stringify(pathRegistry, null, 2));
   writeFileSync(join(OUTPUT_DIR, 'pages.json'), JSON.stringify(pages, null, 2));
+  writeFileSync(join(OUTPUT_DIR, 'suggestedRelated.json'), JSON.stringify(suggestedRelated, null, 2));
 
   console.log('✓ Written individual JSON files');
   console.log('✓ Written derived data files (backlinks, tagIndex, stats, pathRegistry)');

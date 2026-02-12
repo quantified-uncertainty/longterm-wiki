@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getBacklinksFor, getEntityById, getEntityHref, getPageById } from "@/data";
+import { getBacklinksFor, getEntityById, getEntityHref, getSuggestedRelatedFor } from "@/data";
 import type { Entity } from "@/data";
 
 interface RelatedPageItem {
@@ -68,7 +68,7 @@ export function RelatedPages({
     }
   }
 
-  // Backlinks (pages that reference this page)
+  // Backlinks (pages that reference this page via relatedEntries or EntityLinks)
   const backlinkItems: RelatedPageItem[] = [];
   const relatedIds = new Set(relatedItems.map((r) => r.id));
   for (const bl of getBacklinksFor(entityId)) {
@@ -83,9 +83,27 @@ export function RelatedPages({
     }
   }
 
+  // Suggested related (from tags, content similarity, name-prefix matching)
+  const allShownIds = new Set([
+    ...relatedItems.map((r) => r.id),
+    ...backlinkItems.map((b) => b.id),
+  ]);
+  const suggestedItems: RelatedPageItem[] = [];
+  for (const entry of getSuggestedRelatedFor(entityId)) {
+    if (!allShownIds.has(entry.id)) {
+      suggestedItems.push({
+        id: entry.id,
+        title: entry.title,
+        href: entry.href,
+        type: entry.type,
+      });
+    }
+  }
+
   const uniqueRelated = dedup(relatedItems);
   const uniqueBacklinks = dedup(backlinkItems);
-  if (uniqueRelated.length === 0 && uniqueBacklinks.length === 0) return null;
+  const uniqueSuggested = dedup(suggestedItems);
+  if (uniqueRelated.length === 0 && uniqueBacklinks.length === 0 && uniqueSuggested.length === 0) return null;
 
   return (
     <section className="mt-12 pt-6 border-t border-border">
@@ -99,6 +117,12 @@ export function RelatedPages({
         <div className={uniqueRelated.length > 0 ? "mt-8" : ""}>
           <h2 className="text-lg font-semibold mb-4">Backlinks</h2>
           <PageGrid items={uniqueBacklinks} />
+        </div>
+      )}
+      {uniqueSuggested.length > 0 && (
+        <div className={uniqueRelated.length > 0 || uniqueBacklinks.length > 0 ? "mt-8" : ""}>
+          <h2 className="text-lg font-semibold mb-4">See Also</h2>
+          <PageGrid items={uniqueSuggested} />
         </div>
       )}
     </section>
