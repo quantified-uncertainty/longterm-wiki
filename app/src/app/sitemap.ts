@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllPages, getEntityHref } from "@/data";
-
-const SITE_URL = "https://www.longtermwiki.com";
+import { SITE_URL } from "@/lib/site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = getAllPages();
