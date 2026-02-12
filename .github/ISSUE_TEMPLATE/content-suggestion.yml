@@ -1,5 +1,6 @@
 name: "Content suggestion"
 description: "Suggest an addition to an existing page, or propose a new page"
+type: "Feature"
 labels: ["content-suggestion"]
 body:
   - type: dropdown
