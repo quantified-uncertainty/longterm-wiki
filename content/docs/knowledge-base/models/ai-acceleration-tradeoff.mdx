@@ -1,0 +1,374 @@
+---
+title: AI Acceleration Tradeoff Model
+description: A quantitative framework for evaluating the costs and benefits of speeding up or slowing down AI development. Analyzes how changes to TAI arrival time affect existential risk, safety preparedness, governance readiness, and the expected value of the long-term future.
+sidebar:
+  order: 90
+contentType: analysis
+quality: 50
+ratings:
+  focus: 9
+  novelty: 7
+  rigor: 6.5
+  completeness: 7
+  concreteness: 8
+  actionability: 7.5
+lastEdited: "2026-02-12"
+importance: 87
+update_frequency: 90
+llmSummary: "Quantitative framework for evaluating how changes to AI development speed affect existential risk and long-term value. Models the marginal impact of acceleration/deceleration on P(existential catastrophe), safety readiness, governance preparedness, and conditional future value. Finds that 1 year of additional preparation time reduces x-risk by 1-4 percentage points depending on current readiness, but also delays economic and scientific benefits worth 0.1-0.5% of future value annually."
+metrics:
+  wordCount: 3500
+  citations: 15
+  tables: 12
+  diagrams: 2
+clusters:
+  - ai-safety
+  - governance
+subcategory: safety-models
+---
+import {DataInfoBox, Backlinks, KeyQuestions, Mermaid, EntityLink} from '@components/wiki';
+
+<DataInfoBox entityId="ai-acceleration-tradeoff" ratings={frontmatter.ratings} />
+
+## Overview
+
+Many AI safety interventions, governance proposals, and capabilities advances can be analyzed through a common lens: how much do they speed up or slow down the arrival of transformative AI (TAI), and what are the consequences of that time shift? This model provides a quantitative framework for making those comparisons.
+
+The core claim is that the value of any action affecting AI timelines can be decomposed into its effects on three quantities:
+
+1. **P(existential catastrophe)** — How does the time shift change the probability of permanent human disempowerment or extinction?
+2. **Conditional future value** — How does the time shift change the expected value of the future, assuming we survive the transition?
+3. **Transition costs** — What are the direct costs of the time shift itself (delayed benefits, economic disruption, or racing incentives)?
+
+This decomposition makes it possible to compare seemingly incommensurable actions — a safety research breakthrough, a capabilities speedup, or a regulatory slowdown — on the same scale.
+
+**Central framing**: "Speeding up TAI arrival by 1% is estimated to increase the probability of existential catastrophe by 0.3-1.5 percentage points, while adjusting the conditional value of the long-term future by -0.2% to +0.5%."
+
+## Connection to the AI Transition Model
+
+This model operationalizes the <EntityLink id="__index__/ai-transition-model">AI Transition Model</EntityLink>'s causal framework by collapsing its many root factors into a single dimension: **time available for preparation**. The AI Transition Model identifies root factors like <EntityLink id="safety-capability-gap">safety-capability gap</EntityLink>, <EntityLink id="racing-intensity">racing intensity</EntityLink>, and <EntityLink id="civilizational-competence">civilizational competence</EntityLink>. Each of these factors evolves over time. Accelerating TAI arrival means less time for safety research, governance development, and institutional adaptation — widening the gap between capability and readiness.
+
+The simplification is deliberate: while the full causal model has dozens of parameters, many real-world decisions reduce to "does this make TAI come sooner or later, and by how much?"
+
+## The Core Model
+
+### Definitions
+
+| Variable | Symbol | Description |
+|----------|--------|-------------|
+| TAI arrival time | $T$ | Year when transformative AI is deployed |
+| Baseline x-risk | $R_0$ | P(existential catastrophe) at current trajectory |
+| Time shift | $\Delta T$ | Change in TAI arrival time (positive = delay, negative = acceleration) |
+| Safety readiness | $S(t)$ | Safety research maturity as a function of time (0 to 1) |
+| Governance readiness | $G(t)$ | Governance and institutional preparedness (0 to 1) |
+| Conditional value | $V(T)$ | Expected value of the future given survival |
+| Delay cost | $C(\Delta T)$ | Annual cost of delayed TAI benefits |
+
+### The Value Equation
+
+The expected value of a time shift $\Delta T$ can be expressed as:
+
+$$EV(\Delta T) = \Delta V_{risk} + \Delta V_{conditional} - C(\Delta T)$$
+
+Where:
+- $\Delta V_{risk}$ = value gained from reduced existential risk (or lost from increased risk)
+- $\Delta V_{conditional}$ = change in the value of the future conditional on survival
+- $C(\Delta T)$ = direct costs of the time shift
+
+### Risk as a Function of Preparation Time
+
+The probability of existential catastrophe depends on the gap between capability and readiness at the moment of TAI deployment:
+
+$$R(T) = R_{base} \cdot f\left(\frac{Capability(T)}{Safety(T) \cdot Governance(T)}\right)$$
+
+Since capability at deployment is roughly fixed (TAI is TAI regardless of when it arrives), the key determinant is how much time safety and governance have had to prepare. More time generally means lower risk, but with diminishing returns as readiness approaches sufficiency.
+
+### Marginal Risk per Unit of Acceleration
+
+The key quantity for decision-making is the **marginal change in x-risk per unit of acceleration**:
+
+$$\frac{\partial R}{\partial T} \approx -\left(\frac{\partial S}{\partial t} \cdot w_S + \frac{\partial G}{\partial t} \cdot w_G\right) \cdot \text{risk sensitivity}$$
+
+This derivative is negative (more time reduces risk) but its magnitude varies enormously depending on where we are in the preparation curve.
+
+## Parameter Estimates
+
+### Current State Assessment
+
+| Parameter | Current Estimate | 90% CI | Source |
+|-----------|-----------------|--------|--------|
+| Baseline P(x-catastrophe from AI) | 10-25% | 3-50% | [Metaculus](https://www.metaculus.com/questions/2568/ragnar%25C3%25B6k-question-series-if-a-global-catastrophe-occurs-will-it-be-due-to-ai/), expert surveys |
+| Safety readiness $S$ | 0.15-0.30 | 0.05-0.50 | Based on interpretability coverage, alignment techniques maturity |
+| Governance readiness $G$ | 0.10-0.25 | 0.05-0.40 | Based on regulatory frameworks, international coordination |
+| Safety improvement rate $\partial S / \partial t$ | 3-8 pp/year | 1-15 pp/year | Historical progress in interpretability, RLHF |
+| Governance improvement rate $\partial G / \partial t$ | 2-5 pp/year | 1-10 pp/year | EU AI Act pace, international treaty formation rate |
+| TAI arrival (median estimate) | 2030-2040 | 2027-2060 | [Metaculus](https://www.metaculus.com/questions/5121/date-of-artificial-general-intelligence/) aggregated forecasts |
+
+### Marginal Risk Estimates by Readiness Level
+
+The value of additional preparation time depends heavily on current readiness. When readiness is very low, each additional year of preparation is extremely valuable. When readiness is near-sufficient, additional time provides diminishing returns.
+
+| Readiness Level | Safety $S$ | Governance $G$ | Risk Reduction per Year of Delay | Confidence |
+|-----------------|-----------|----------------|----------------------------------|------------|
+| **Very low** (current) | 0.15 | 0.15 | 2-4 pp | Medium |
+| **Low** | 0.30 | 0.25 | 1.5-3 pp | Medium |
+| **Moderate** | 0.50 | 0.40 | 0.5-2 pp | Low |
+| **High** | 0.70 | 0.60 | 0.1-0.5 pp | Low |
+| **Near-sufficient** | 0.85 | 0.80 | \<0.1 pp | Very Low |
+
+These estimates imply that at current readiness levels, each additional year of preparation time reduces existential risk by roughly 1-4 percentage points. Given that the expected value of the long-term future is astronomically large, even small reductions in x-risk are enormously valuable.
+
+### Conditional Future Value Effects
+
+Acceleration does not only affect risk — it also affects the value of the future conditional on surviving the transition. These effects are more ambiguous:
+
+| Effect of Earlier TAI | Direction | Magnitude | Confidence |
+|-----------------------|-----------|-----------|------------|
+| Earlier access to scientific breakthroughs | Positive | +0.1-0.3% of future value per year | Low |
+| Earlier solutions to ongoing catastrophes (climate, disease) | Positive | +0.05-0.2% per year | Low |
+| Less time for pre-TAI coordination and norm-setting | Negative | -0.1-0.5% per year | Medium |
+| Higher lock-in risk from less mature governance | Negative | -0.2-1.0% per year | Low |
+| Faster compounding of TAI-enabled economic growth | Positive | +0.1-0.5% per year | Low |
+
+The net conditional value effect of acceleration is ambiguous and depends heavily on assumptions about how much governance maturity matters for post-TAI outcomes.
+
+## Comparative Analysis of Actions
+
+### Acceleration/Deceleration Estimates by Action Type
+
+The following table estimates the timeline impact of various actions, along with their effects on risk and conditional value:
+
+| Action | Timeline Effect | Risk Effect | Conditional Value Effect | Net Assessment |
+|--------|----------------|-------------|--------------------------|----------------|
+| **Major capabilities breakthrough** | -1 to -3 years | +2-8 pp x-risk | +0.1-0.5% conditional value | Likely net negative unless safety is already sufficient |
+| **Major alignment breakthrough** | 0 to -0.5 years (may speed capabilities) | -3-10 pp x-risk | +0.5-2% conditional value | Strongly net positive |
+| **Comprehensive AI regulation** | +0.5 to +2 years | -1-4 pp x-risk | -0.1 to +0.3% conditional value | Usually net positive, depends on racing dynamics |
+| **International compute governance** | +0.5 to +1 year | -1-3 pp x-risk | +0.1-0.3% conditional value | Net positive if enforceable |
+| **Voluntary safety commitments (RSPs)** | +0.1 to +0.5 years | -0.5-2 pp x-risk | +0.1-0.2% conditional value | Modestly positive, fragile |
+| **Open-sourcing frontier models** | -0.5 to -1 year (via ecosystem acceleration) | +1-3 pp x-risk | +0.1-0.5% conditional value (democratization) | Ambiguous, depends on model dangerousness |
+| **Interpretability research** | Roughly neutral | -0.5-3 pp x-risk | +0.2-1% conditional value | Net positive |
+| **Hardware export controls** | +0.5 to +2 years (for affected actors) | -0.5-2 pp x-risk | -0.1-0.3% conditional value (global inequality) | Complex, depends on target |
+| **Massive compute investment** | -0.5 to -2 years | +1-5 pp x-risk | +0.1-0.3% conditional value | Usually net negative |
+| **AI moratorium (1 year)** | +1 year | -1-4 pp x-risk | -0.1-0.3% conditional value | Net positive at current readiness levels |
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Actions["Actions Affecting AI Timelines"]
+        CAP[Capabilities Research]
+        SAF[Safety Research]
+        REG[Regulation]
+        GOV[Compute Governance]
+    end
+
+    subgraph Timeline["Timeline Effects"]
+        ACC[Acceleration<br/>TAI arrives sooner]
+        DEC[Deceleration<br/>TAI arrives later]
+    end
+
+    subgraph Outcomes["Outcome Effects"]
+        RISK[X-Risk Change]
+        COND[Conditional Value]
+        COST[Direct Costs]
+    end
+
+    CAP -->|"-1 to -3 years"| ACC
+    SAF -->|"≈0 years"| DEC
+    REG -->|"+0.5 to +2 years"| DEC
+    GOV -->|"+0.5 to +1 year"| DEC
+
+    ACC --> RISK
+    DEC --> RISK
+    ACC --> COND
+    DEC --> COND
+    ACC --> COST
+    DEC --> COST
+
+    style ACC fill:#ffcccc
+    style DEC fill:#cceeff
+    style RISK fill:#ffe0cc
+    style COND fill:#ccffcc
+`} />
+
+### Worked Example: Evaluating a Capabilities Advance
+
+Suppose a new architecture reduces compute requirements by 10x, effectively pulling TAI forward by approximately 2 years. At current readiness levels (safety \~0.20, governance \~0.15):
+
+| Component | Calculation | Estimate |
+|-----------|-------------|----------|
+| **Risk increase** | 2 years \* 2-4 pp/year | +4-8 pp additional x-risk |
+| **Conditional value gain** | 2 years \* 0.1-0.3%/year | +0.2-0.6% conditional value |
+| **Net assessment** | Risk increase dominates | **Net negative** at current readiness |
+
+If safety readiness were instead at 0.70 (after major alignment breakthroughs):
+
+| Component | Calculation | Estimate |
+|-----------|-------------|----------|
+| **Risk increase** | 2 years \* 0.1-0.5 pp/year | +0.2-1.0 pp additional x-risk |
+| **Conditional value gain** | 2 years \* 0.1-0.3%/year | +0.2-0.6% conditional value |
+| **Net assessment** | Effects roughly balanced | **Ambiguous** — depends on value of the future |
+
+This illustrates the core insight: **the same acceleration can be net positive or net negative depending on the current state of safety readiness.**
+
+### Worked Example: Evaluating Regulation That Slows AI by 1 Year
+
+| Component | Calculation | Estimate |
+|-----------|-------------|----------|
+| **Risk reduction** | 1 year \* 2-4 pp/year | -2-4 pp x-risk |
+| **Conditional value loss** | 1 year \* 0.1-0.3%/year | -0.1-0.3% conditional value |
+| **Delayed benefits** | 1 year of forgone TAI applications | Significant but finite |
+| **Racing risk** | Unilateral slowdown may shift development to less safety-conscious actors | +0.5-2 pp x-risk (partially offsetting) |
+| **Net assessment** | Risk reduction dominates unless racing fully offsets | **Usually net positive** at current readiness |
+
+## Key Dynamics and Nonlinearities
+
+### The Readiness Curve
+
+The relationship between preparation time and risk reduction is not linear. It follows an S-curve: very early preparation has modest returns (foundational research), the middle period has the highest returns (translating research into deployable safety measures), and late preparation has diminishing returns (fine-tuning already-adequate measures).
+
+<Mermaid chart={`
+xychart-beta
+    title "Risk Reduction vs. Years of Additional Preparation"
+    x-axis "Additional Years of Preparation" [0, 1, 2, 3, 5, 8, 10, 15, 20]
+    y-axis "Cumulative Risk Reduction (pp)" 0 --> 25
+    line [0, 3, 6, 9, 14, 19, 21, 23, 24]
+`} />
+
+### Racing Dynamics and Unilateral Action
+
+A critical complication: actions that slow one actor may not slow the global frontier if other actors continue at full speed. This introduces a **racing multiplier** that reduces the effective deceleration:
+
+| Scenario | Effective Deceleration | Racing Multiplier | Notes |
+|----------|------------------------|-------------------|-------|
+| **Global regulation (enforced)** | 80-100% of nominal | 0.8-1.0 | Best case, hard to achieve |
+| **Major power agreement** | 50-80% of nominal | 0.5-0.8 | US-China-EU coordination |
+| **Unilateral national regulation** | 20-50% of nominal | 0.2-0.5 | Development shifts elsewhere |
+| **Single lab voluntary slowdown** | 5-15% of nominal | 0.05-0.15 | Competitors fill gap quickly |
+
+This means that for deceleration to be effective at reducing x-risk, it must either be globally coordinated or work through mechanisms that do not merely shift development to other actors (such as compute governance that affects all actors simultaneously).
+
+### Differential Technology Development
+
+Not all acceleration is equal. The concept of <EntityLink id="differential-technology-development">differential technology development</EntityLink> distinguishes between advancing safety-relevant vs. capability-relevant technologies. The ideal is to accelerate safety research while leaving capability timelines unchanged — achieving risk reduction without the costs of delay.
+
+| Development Type | Timeline Effect | Risk Effect | Cost |
+|------------------|----------------|-------------|------|
+| **Pure safety acceleration** | None | Strong negative (risk reduction) | Low |
+| **Pure capability acceleration** | Negative (earlier TAI) | Positive (risk increase) | Delayed benefits cost |
+| **Mixed research** (e.g., interpretability) | Slight negative | Net negative (risk reduction) | Low |
+| **Infrastructure** (compute, data) | Negative | Positive (risk increase) | Variable |
+
+## Sensitivity Analysis
+
+The model's conclusions are most sensitive to the following parameters:
+
+| Parameter | Base Case | If Higher | If Lower | Impact on Conclusions |
+|-----------|-----------|-----------|----------|----------------------|
+| **Baseline x-risk** | 15% | Risk reduction more valuable | Risk reduction less valuable | Changes magnitude but not direction |
+| **Safety improvement rate** | 5 pp/year | Each year of delay more valuable | Years of delay less valuable | Critical for net assessment |
+| **Racing multiplier** | 0.5 | Unilateral action less effective | Unilateral action more effective | Determines which actions work |
+| **Conditional value of future** | Astronomical | Risk reduction dominates any analysis | Tradeoffs more balanced | Determines whether any acceleration is acceptable |
+| **Current safety readiness** | 0.20 | Additional time less valuable | Additional time more valuable | Key crux for near-term decisions |
+| **P(alignment is easy)** | 20% | Acceleration less dangerous | Acceleration more dangerous | Changes optimal strategy significantly |
+
+### Scenario Analysis
+
+| Scenario | Acceleration Assessment | Deceleration Assessment | Optimal Strategy |
+|----------|------------------------|-------------------------|------------------|
+| **Alignment is hard, timelines short** | Very dangerous | Very valuable | Aggressive deceleration + safety investment |
+| **Alignment is hard, timelines long** | Dangerous | Valuable but less urgent | Steady safety investment, prepare governance |
+| **Alignment is tractable, timelines short** | Moderately dangerous | Moderately valuable | Focus on solving alignment, moderate deceleration |
+| **Alignment is tractable, timelines long** | Roughly neutral | Modest value | Solve alignment, let capabilities proceed |
+
+## Implications
+
+### For AI Safety Organizations
+
+The model implies that AI safety organizations should evaluate their work partly in terms of **effective time purchased**. An alignment research program that makes TAI 2 percentage points safer is equivalent to one that delays TAI by roughly 0.5-2 years (at current readiness levels), because both reduce x-risk by similar amounts. This provides a common currency for comparing research and governance work.
+
+Safety organizations should also consider the **racing multiplier** when evaluating governance proposals. Proposals that only slow one actor are much less valuable than those that slow the global frontier.
+
+### For Capabilities Organizations
+
+The model implies that capabilities organizations creating acceleration should account for the marginal x-risk created. At current readiness levels, pulling TAI forward by 1 year creates roughly 1-4 percentage points of additional x-risk. If the long-term future is worth \$10^{15}+ in expected value, this represents an enormous externality.
+
+This does not mean all capabilities work is net negative — complementary work that advances both safety and capabilities can be net positive, and acceleration becomes less costly as safety readiness improves.
+
+### For Policymakers
+
+Regulation that slows AI development by 1 year is more valuable when safety readiness is lower (as it currently is) and less valuable as readiness improves. This suggests a dynamic regulatory approach: stricter requirements now when marginal preparation time is most valuable, gradually loosening as safety research matures and governance institutions develop capacity.
+
+The racing multiplier is the strongest argument for international coordination: unilateral slowdowns are 2-10x less effective than coordinated ones.
+
+### For Forecasters and Funders
+
+The model provides a framework for comparing any intervention on a common scale: how many **x-risk-adjusted years** does it produce? This enables portfolio optimization across very different intervention types.
+
+| Intervention Type | Effective x-risk-adjusted Years | Cost per Year | Cost-effectiveness Rank |
+|-------------------|---------------------------------|---------------|------------------------|
+| **Alignment research** | 0.5-3 per breakthrough | \$10-100M per breakthrough | 1st |
+| **Compute governance** | 0.3-1.5 globally | \$50-200M for implementation | 2nd |
+| **International coordination** | 0.2-1.0 per agreement | \$20-100M per agreement | 3rd |
+| **National regulation** | 0.1-0.5 (racing-adjusted) | \$10-50M for advocacy | 4th |
+| **Voluntary commitments** | 0.05-0.2 | \$5-20M | 5th |
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "How much does one additional year of preparation actually reduce existential risk at current readiness levels?",
+    "How large is the racing multiplier — does unilateral deceleration just shift development elsewhere?",
+    "Does acceleration ever become net positive, and if so at what safety readiness threshold?",
+    "How should we weigh the conditional value effects (earlier scientific progress, earlier solutions to other catastrophes) against x-risk increases?",
+    "Can differential technology development actually work in practice, or does safety research inevitably speed up capabilities too?"
+  ]}
+/>
+
+## Model Limitations
+
+### What This Model Captures
+
+This model provides a unified framework for comparing acceleration and deceleration effects across different action types. It quantifies the tradeoff between preparation time and delayed benefits, and identifies current readiness level as the key determinant of whether acceleration is net positive or negative.
+
+### What This Model Misses
+
+**Endogenous timelines**: The model treats TAI arrival time as exogenous, but in reality safety research, governance, and capabilities interact in complex feedback loops. Safety breakthroughs may enable faster capability deployment; regulation may redirect rather than slow research.
+
+**Discrete vs. continuous risk**: The model assumes a smooth relationship between preparation time and risk, but real risk may be concentrated around specific capability thresholds where preparation either is or is not sufficient.
+
+**Political economy**: The model does not account for the political dynamics of acceleration and deceleration — who benefits, who bears costs, and how this affects the feasibility of various interventions.
+
+**Tail risks and unknown unknowns**: The parameter estimates are based on current understanding. Novel alignment failure modes or unexpected capability jumps could invalidate the smooth tradeoff curves assumed here.
+
+**Heterogeneity of TAI**: "Transformative AI" is not a single event. Different capabilities may arrive at different times, and the risks associated with each may vary independently.
+
+## Related Models
+
+- <EntityLink id="safety-capability-tradeoff">Safety-Capability Tradeoff Model</EntityLink> — When safety and capabilities conflict vs. complement
+- <EntityLink id="capability-alignment-race">Capability-Alignment Race</EntityLink> — Quantifying the gap between capability and safety readiness
+- <EntityLink id="intervention-timing-windows">Intervention Timing Windows</EntityLink> — Which interventions have closing windows
+- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> — How competition affects the effectiveness of deceleration
+- <EntityLink id="intervention-effectiveness-matrix">Intervention Effectiveness Matrix</EntityLink> — Which interventions address which risks
+
+## Sources
+
+### Foundational Frameworks
+- Bostrom, Nick. [Superintelligence: Paths, Dangers, Strategies](https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies) (2014) — Original framework for differential technology development
+- Ord, Toby. [The Precipice](https://theprecipice.com/) (2020) — Existential risk estimates and the value of the long-term future
+- Carlsmith, Joseph. [Is Power-Seeking AI an Existential Risk?](https://arxiv.org/abs/2206.13353) (2022) — Structured decomposition of AI x-risk
+
+### Risk Quantification
+- [Metaculus AI Risk Questions](https://www.metaculus.com/questions/2568/ragnar%25C3%25B6k-question-series-if-a-global-catastrophe-occurs-will-it-be-due-to-ai/) — Aggregated forecasts on AI-related existential risk
+- Cotra, Ajeya. [Without Specific Countermeasures](https://www.cold-takes.com/without-specific-countermeasures-the-easiest-path-to-transformative-ai-likely-leads-to-ai-takeover/) (2022) — Argument that default trajectory is dangerous
+- Armstrong, Bostrom \& Shulman. [Racing to the Precipice](https://www.fhi.ox.ac.uk/wp-content/uploads/Racing-to-the-precipice-a-model-of-artificial-intelligence-development.pdf) (2016) — Game-theoretic model of AI racing dynamics
+
+### Timeline Estimates
+- [Metaculus AGI Timeline](https://www.metaculus.com/questions/5121/date-of-artificial-general-intelligence/) — Community predictions on AGI arrival
+- [AI Impacts Expert Survey](https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/) (2022) — Survey of ML researchers on AI timeline expectations
+
+### Governance and Regulation
+- Sastry, Girish et al. [Computing Power and the Governance of AI](https://arxiv.org/abs/2402.08797) (2024) — Compute governance as leverage point
+- Dafoe, Allan. [AI Governance: A Research Agenda](https://www.fhi.ox.ac.uk/wp-content/uploads/GovAI-Agenda.pdf) (2018) — Foundational governance research agenda
+
+## Related Pages
+
+<Backlinks entityId="ai-acceleration-tradeoff" />

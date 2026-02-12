@@ -2002,6 +2002,39 @@
     - safety
     - capabilities
   lastUpdated: 2025-12
+- id: ai-acceleration-tradeoff
+  type: model
+  title: AI Acceleration Tradeoff Model
+  description: >-
+    A quantitative framework for evaluating the costs and benefits of speeding up or slowing down AI development.
+    Models how changes to TAI arrival time affect existential risk, safety preparedness, governance readiness,
+    and the expected value of the long-term future.
+  customFields:
+    - label: Model Type
+      value: Cost-Benefit Analysis
+    - label: Scope
+      value: AI Timeline Acceleration/Deceleration
+    - label: Key Insight
+      value: The value of acceleration vs. deceleration depends critically on current safety readiness level
+  relatedEntries:
+    - id: safety-capability-tradeoff
+      type: model
+      relationship: related
+    - id: capability-alignment-race
+      type: model
+      relationship: related
+    - id: intervention-timing-windows
+      type: model
+      relationship: related
+    - id: racing-dynamics
+      type: risk
+      relationship: related
+  tags:
+    - acceleration
+    - timelines
+    - safety
+    - governance
+  lastUpdated: 2026-02
 - id: safety-research-allocation
   type: model
   title: Safety Research Allocation Model
