@@ -1,0 +1,189 @@
+---
+title: "MAIM (Mutually Assured AI Malfunction)"
+description: "A deterrence framework proposed by Dan Hendrycks, Eric Schmidt, and Alexandr Wang in which rival states prevent unilateral AI dominance through the credible threat of sabotaging each other's destabilizing AI projects, analogous to nuclear Mutually Assured Destruction (MAD). Part of the broader Superintelligence Strategy paper (2025) alongside nonproliferation and competitiveness pillars."
+sidebar:
+  order: 1
+maturity: Emerging
+quality: 55
+llmSummary: "MAIM (Mutually Assured AI Malfunction) is a deterrence framework introduced in the 2025 paper 'Superintelligence Strategy' by Dan Hendrycks (CAIS), Eric Schmidt, and Alexandr Wang. It proposes that rival states will naturally deter each other from pursuing unilateral AI dominance because destabilizing AI projects can be sabotaged through an escalation ladder ranging from espionage to kinetic strikes on datacenters. Critics from MIRI, RAND, and IAPS have raised concerns about observability challenges, unclear red lines, escalation risks, and the fundamental disanalogies between AI deterrence and nuclear MAD. Proponents argue MAIM describes the existing strategic reality and can serve as scaffolding for international cooperation and verification regimes."
+lastEdited: "2026-02-12"
+importance: 72
+update_frequency: 60
+ratings:
+  novelty: 7
+  rigor: 5.5
+  actionability: 5
+  completeness: 6.5
+metrics:
+  wordCount: 2200
+  citations: 15
+  tables: 4
+  diagrams: 1
+clusters:
+  - ai-safety
+  - governance
+  - geopolitics
+---
+import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+
+<DataExternalLinks pageId="maim" />
+
+<DataInfoBox entityId="maim" />
+
+## Overview
+
+Mutually Assured AI Malfunction (MAIM) is a deterrence framework for managing great-power competition over advanced AI. Introduced by <EntityLink id="dan-hendrycks" /> (director of <EntityLink id="cais" />), Eric Schmidt (former Google CEO), and Alexandr Wang (Scale AI CEO) in their March 2025 paper [*Superintelligence Strategy*](https://arxiv.org/abs/2503.05628), MAIM proposes that any state's aggressive bid for unilateral AI dominance will be met with preventive sabotage by rivals.
+
+The framework draws an analogy to nuclear Mutually Assured Destruction (MAD), but operates through preemption rather than retaliation. Because destabilizing AI projects are relatively easy to sabotage — through interventions ranging from covert cyberattacks to kinetic strikes on datacenters — the authors argue that MAIM already describes the strategic picture AI superpowers find themselves in. The resulting stalemate could postpone the emergence of superintelligence, curtail many loss-of-control scenarios, and undercut efforts to secure a strategic monopoly.
+
+MAIM is one pillar of a broader three-part framework alongside nonproliferation (tracking AI chips and preventing rogue access) and competitiveness (guaranteeing domestic chip manufacturing capacity). The paper has generated extensive debate, with critiques from <EntityLink id="miri" />, RAND, and the Institute for AI Policy and Strategy (IAPS) raising concerns about observability, escalation risks, and the limits of the nuclear analogy.
+
+## The Three Pillars
+
+The *Superintelligence Strategy* paper presents MAIM within a broader strategic framework:
+
+| Pillar | Objective | Key Mechanisms |
+|--------|-----------|----------------|
+| **Deterrence (MAIM)** | Prevent destabilizing AI projects | Espionage, sabotage, credible threat of escalation |
+| **Nonproliferation** | Keep weaponizable AI out of rogue hands | Chip tracking, export controls, supply chain security |
+| **Competitiveness** | Maintain national AI advantage | Domestic chip manufacturing, talent retention, R&D investment |
+
+The deterrence pillar is most novel and controversial. The nonproliferation and competitiveness pillars build on existing policy proposals around <EntityLink id="compute-governance" />, <EntityLink id="export-controls" />, and <EntityLink id="hardware-enabled-governance" />.
+
+## How MAIM Works
+
+### Escalation Ladder
+
+The framework outlines a graduated set of responses to a rival's destabilizing AI development:
+
+| Level | Action | Description | Reversibility |
+|-------|--------|-------------|---------------|
+| 1 | Intelligence gathering | Espionage on rival AI projects and capabilities | Non-destructive |
+| 2 | Covert sabotage | Insider tampering with model weights, training data, or chip fabrication | Partially reversible |
+| 3 | Overt cyberattacks | Visible disruption of datacenters, power grids, or cooling systems | Moderately reversible |
+| 4 | Kinetic strikes | Physical destruction of AI infrastructure and datacenters | Irreversible |
+| 5 | Broader hostilities | Escalation beyond AI-specific targets | Irreversible |
+
+Rather than waiting for a rival to weaponize a superintelligent system, states would act preemptively to disable threatening projects. The authors argue this dynamic stabilizes the strategic landscape without requiring formal treaty negotiations — all that is necessary is that states collectively recognize their strategic situation.
+
+### Deterrence Logic
+
+<Mermaid chart={`
+flowchart TD
+    A[State A pursues<br/>AI dominance] --> B{Rivals detect<br/>destabilizing project?}
+    B -->|Yes| C[Rivals assess threat level]
+    B -->|No| D[Project proceeds<br/>undetected]
+    C --> E{Credible threat<br/>to balance of power?}
+    E -->|Yes| F[Escalation ladder<br/>activated]
+    E -->|No| G[Monitoring<br/>continues]
+    F --> H[Project sabotaged<br/>or delayed]
+    H --> I[Deterrence reinforced:<br/>MAIM equilibrium]
+    D --> J[Observability<br/>failure]
+
+    style A fill:#f9d71c,stroke:#333
+    style H fill:#ff6b6b,stroke:#333
+    style J fill:#ff6b6b,stroke:#333
+    style I fill:#90EE90,stroke:#333
+`} />
+
+The stabilizing logic requires three conditions: rivals must be able to observe destabilizing projects, they must have credible means to sabotage them, and the threat of sabotage must outweigh the expected gains from pursuing dominance.
+
+### Proposed Stabilization Policies
+
+The paper recommends several policies to strengthen MAIM stability:
+
+- **Clarify escalation ladders**: Establish common knowledge about maiming readiness to prevent misinterpretation of rival actions
+- **Prevent chip smuggling**: Keep decisions about AI development with rational state actors rather than rogue regimes
+- **Remote datacenter placement**: Follow the "city avoidance" principle from the nuclear era, reducing collateral damage from potential strikes
+- **Transparency and verification**: Mutual inspection regimes to reduce false-positive sabotage attacks
+- **AI-assisted inspections**: Deploy "confidentiality-preserving AI verifiers" that can confirm compliance without revealing proprietary details
+
+## Differences from Nuclear MAD
+
+While *Superintelligence Strategy* draws a pedagogical parallel between MAIM and MAD, the authors acknowledge these are structurally different frameworks:
+
+| Dimension | Nuclear MAD | AI MAIM |
+|-----------|------------|---------|
+| Mechanism | Retaliation after attack | Preemption before dominance |
+| Observability | Relatively high (satellite imagery, seismic detection) | Low (AI development behind closed doors) |
+| Subject behavior | Weapons are inert tools | AI systems can adapt and evolve |
+| Attribution | Generally clear (missile launches detectable) | Difficult (cyberattacks hard to attribute) |
+| Escalation risk | Well-understood doctrine | Novel and untested |
+| Red lines | Clear (nuclear use) | Ambiguous (what counts as "destabilizing"?) |
+
+Hendrycks and Khoja later [clarified](https://ai-frontiers.org/articles/ai-deterrence-is-our-best-option) that the analogy was somewhat loose and the MAIM argument stands on its own merits, independent of how closely it mirrors MAD.
+
+## Major Critiques
+
+### Observability Problem
+
+A [critique published on AI Frontiers](https://ai-frontiers.org/articles/why-maim-falls-short-for-superintelligence-deterrence) highlights that MAIM hinges on nations observing one another's progress toward superintelligence. AI development happens behind closed doors with breakthroughs often concealed as proprietary secrets. This creates two dangerous failure modes: missing important signs of advancement, or misinterpreting normal activity as a threat and triggering unnecessary sabotage.
+
+### MIRI's Formal Analysis
+
+<EntityLink id="miri" /> published a detailed [analysis applying formal deterrence theory](https://intelligence.org/2025/04/11/refining-maim-identifying-changes-required-to-meet-conditions-for-deterrence/) to MAIM, finding:
+
+- **Unclear red lines**: What constitutes a "destabilizing AI project" is ambiguous and difficult to monitor
+- **Questionable credibility**: Sabotage likely only delays rather than denies rival capabilities, weakening the deterrent
+- **Timing problems**: Intelligence recursion might proceed too quickly to be identified and responded to
+- **Volatile calculus**: Immense stakes and uncertainty make deterrence calculations unpredictable
+
+MIRI proposed an alternative regime centered on earlier, more monitorable red lines.
+
+### RAND Assessment
+
+[RAND noted](https://www.rand.org/pubs/commentary/2025/03/seeking-stability-in-the-competition-for-ai-advantage.html) that the paper makes a critical contribution to the AI policy debate, but the MAIM world described is "entirely inconsistent with the current reality of private sector-driven AI development." The gap between the state-centric deterrence model and the actual landscape of private AI labs raises implementation questions.
+
+### Escalation and Moral Hazard Concerns
+
+Additional critiques include:
+
+- **Escalation risk**: Strikes on AI infrastructure could be perceived as acts of war, since AI infrastructure is deeply intertwined with economic and military power
+- **Moral hazard**: Accepting AI malfunction as a strategic tool could lower ethical standards and reduce investment in proactive safety measures
+- **Asymmetric perceptions**: China may view US chip restrictions as more threatening than American policymakers realize, undermining stable deterrence
+- **Attribution challenges**: Difficulty attributing cyberattacks creates risk of miscalculation and overreaction
+
+### IAPS Stability Analysis
+
+The [Institute for AI Policy and Strategy analyzed](https://www.iaps.ai/research/crucial-considerations-in-asi-deterrence) whether a MAIM regime could remain stable long enough for superintelligence to be developed safely. They concluded this depends crucially on verification — without confidence that rivals are complying, each side faces pressure to defect first.
+
+## Relationship to Other Frameworks
+
+MAIM intersects with several existing governance proposals:
+
+- **<EntityLink id="compute-governance" />**: The nonproliferation pillar relies on controlling access to AI-relevant compute
+- **<EntityLink id="export-controls" />**: Current US chip restrictions to China are a precursor to MAIM-style nonproliferation
+- **<EntityLink id="coordination-mechanisms" />**: MAIM's escalation ladders and verification proposals complement international coordination efforts
+- **<EntityLink id="racing-dynamics" />**: MAIM attempts to address the same competitive pressures that drive <EntityLink id="racing-dynamics" />
+- **<EntityLink id="pause" />**: Some critics argue that advocating for compute pauses or development moratoria would be more effective than deterrence
+
+## Path Toward Cooperation
+
+Proponents argue MAIM is not merely a framework for mutual threat but a stepping stone toward deeper cooperation:
+
+- States would prefer mutual visibility and leverage over an all-out race
+- MAIM's tools — escalation ladders, transparency mechanisms, and verification regimes — provide scaffolding for legitimately enforceable international agreements
+- Deterrence can begin with unilateral capabilities and mature into a system of international verification
+- The framework could eventually evolve into something resembling <EntityLink id="international-regimes" /> for AI governance
+
+## Key Uncertainties
+
+| Uncertainty | Impact on MAIM Viability | Current Assessment |
+|-------------|--------------------------|-------------------|
+| Observability of AI progress | Foundational — MAIM fails without it | Low confidence in current monitoring |
+| Speed of intelligence recursion | Determines response window | Highly contested among experts |
+| Private sector vs. state control | Affects who makes deterrence decisions | Current development is private-sector-led |
+| Attribution capability | Required for proportionate response | Inadequate for cyber domain |
+| Stability of equilibrium | Determines long-term viability | Unclear — no historical precedent |
+
+## Sources and Further Reading
+
+- Hendrycks, Schmidt, Wang. ["Superintelligence Strategy"](https://arxiv.org/abs/2503.05628) (arXiv:2503.05628, March 2025)
+- Hendrycks and Khoja. ["AI Deterrence Is Our Best Option"](https://ai-frontiers.org/articles/ai-deterrence-is-our-best-option) (AI Frontiers, September 2025)
+- MIRI. ["Refining MAIM: Identifying Changes Required to Meet Conditions for Deterrence"](https://intelligence.org/2025/04/11/refining-maim-identifying-changes-required-to-meet-conditions-for-deterrence/) (April 2025)
+- ["Superintelligence Deterrence Has an Observability Problem"](https://ai-frontiers.org/articles/why-maim-falls-short-for-superintelligence-deterrence) (AI Frontiers)
+- RAND. ["Seeking Stability in the Competition for AI Advantage"](https://www.rand.org/pubs/commentary/2025/03/seeking-stability-in-the-competition-for-ai-advantage.html) (March 2025)
+- IAPS. ["Crucial Considerations in ASI Deterrence"](https://www.iaps.ai/research/crucial-considerations-in-asi-deterrence)
+- Full paper website: [nationalsecurity.ai](https://www.nationalsecurity.ai)
+
+<Backlinks entityId="maim" />

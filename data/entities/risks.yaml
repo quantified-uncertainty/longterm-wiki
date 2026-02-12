@@ -2631,6 +2631,71 @@
   lastUpdated: 2026-02
 
 # === Auto-generated stubs for pages missing entities ===
+- id: compute-concentration
+  type: risk
+  title: Compute Concentration
+  severity: high
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2028
+    earliest: 2025
+    latest: 2035
+  maturity: Growing
+  customFields:
+    - label: Type
+      value: Structural/Systemic
+    - label: Jurisdictional Scope
+      value: All 6 major spenders US-headquartered
+    - label: Investment Scale
+      value: $700B+ annual capex (2026)
+  relatedEntries:
+    - id: concentration-of-power
+      type: risk
+    - id: lock-in
+      type: risk
+    - id: racing-dynamics
+      type: risk
+    - id: projecting-compute-spending
+      type: model
+  sources:
+    - title: "Securing the Backbone of AI: Cyber Threats (New America)"
+      url: https://www.newamerica.org/future-security/reports/securing-the-backbone-of-ai/cyber-threats/
+      date: '2025'
+    - title: "CLOUD Act and FISA 702: Is Your Cloud Truly Sovereign?"
+      url: https://www.civo.com/blog/is-your-cloud-truly-sovereign
+      date: '2025'
+    - title: "Pentagon Taps Four Commercial Tech Firms (Defense News)"
+      url: https://www.defensenews.com/pentagon/2025/07/15/pentagon-taps-four-commercial-tech-firms-to-expand-military-use-of-ai/
+      date: '2025'
+    - title: "AI Antitrust Landscape 2025 (Greenberg Traurig)"
+      url: https://www.gtlaw.com/en/insights/2025/9/ai-antitrust-landscape-2025-federal-policy-algorithm-cases-and-regulatory-scrutiny
+      date: '2025'
+    - title: "NVIDIAScape Vulnerability CVE-2025-23266 (Wiz Research)"
+      url: https://www.wiz.io/blog/nvidia-ai-vulnerability-cve-2025-23266-nvidiascape
+      date: '2025'
+    - title: "DoD AI Strategy for the Department of War"
+      url: https://media.defense.gov/2026/Jan/12/2003855671/-1/-1/0/ARTIFICIAL-INTELLIGENCE-STRATEGY-FOR-THE-DEPARTMENT-OF-WAR.PDF
+      date: '2026'
+  description: >-
+    The concentration of 80-90% of global frontier AI compute among 5-6 US-headquartered companies
+    creates structural risks including jurisdictional monopoly under US law (CLOUD Act, FISA 702),
+    systemic cybersecurity vulnerability where a single supply-chain flaw can affect all providers,
+    military-commercial dual use tensions as the same infrastructure serves Pentagon and global
+    commercial customers, oligopolistic coordination conditions matching historical cartel environments,
+    and self-reinforcing concentration dynamics with loop gains of 1.2-2.0. Distinct from the broader
+    concentration-of-power risk because physical compute infrastructure is expensive, slow to build,
+    geographically fixed, and legally jurisdictional in ways software and data are not.
+  tags:
+    - compute
+    - governance
+    - concentration
+    - cybersecurity
+    - jurisdiction
+    - geopolitics
+  lastUpdated: 2026-02
+
 - id: steganography
   type: risk
   title: Steganography

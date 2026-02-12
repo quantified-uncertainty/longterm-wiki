@@ -99,7 +99,19 @@ Re-read the full page and verify:
 
 For model/analysis pages, also run the full review checklist in `content/docs/internal/models.mdx` (Part 7).
 
-### If you must create a page manually
+### CRITICAL: If the Crux pipeline fails, FIX THE PIPELINE — do NOT bypass it
+
+**NEVER write a wiki page manually as a workaround when `pnpm crux content create` or `pnpm crux content improve` fails.** This is the single most important rule for page authoring.
+
+When the crux library fails:
+1. **Read the error output carefully.** Identify the root cause (missing data, bad import, schema issue, API error, etc.)
+2. **Investigate the relevant crux source code** in `crux/` — the commands, authoring scripts, lib utilities, and validation code are all in this repo and are all fixable.
+3. **Fix the bug in the crux library itself**, then re-run the pipeline command.
+4. If the fix is non-trivial, ask the user for guidance — but still do not fall back to manual page writing.
+
+Manually written pages are missing: proper citations, EntityLink validation, frontmatter metric syncing, template structure, research integration, and quality grading. They create technical debt that is harder to fix later than fixing the pipeline now.
+
+### If you must create a page manually (last resort, only with explicit user approval)
 Write the initial draft, then immediately run the improve pipeline on it:
 ```bash
 pnpm crux content improve <page-id> --tier=polish --apply
