@@ -4,12 +4,8 @@ out/
 next-env.d.ts
 tsconfig.tsbuildinfo
 
-# Generated data (rebuilt by prebuild script)
-src/data/database.json
-src/data/search-index.json
-src/data/search-docs.json
-src/data/id-registry.json
-src/data/pathRegistry.json
+# Generated data (all rebuilt by prebuild script / build-data.mjs)
+src/data/*.json
 src/data/schema.ts
 src/data/pages.json
 src/data/stats.json
