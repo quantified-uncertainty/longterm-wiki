@@ -20,7 +20,7 @@ import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
-import { type VisualType } from './visual-types.ts';
+import { extractVisuals, type ExtractedVisual } from './visual-types.ts';
 import {
   MERMAID_STYLE_GUIDE,
   SQUIGGLE_STYLE_GUIDE,
@@ -33,57 +33,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = path.join(PROJECT_ROOT, '.claude/temp/visual-improve');
 
 // ============================================================================
-// Visual extraction
-// ============================================================================
-
-interface ExtractedVisual {
-  type: VisualType;
-  code: string;
-  raw: string;
-  line: number;
-  /** Start/end offsets in the original content string */
-  startOffset: number;
-  endOffset: number;
-}
-
-function extractVisuals(content: string): ExtractedVisual[] {
-  const visuals: ExtractedVisual[] = [];
-
-  // Mermaid
-  const mermaidRegex = /<(?:MermaidDiagram|Mermaid)[^>]*chart=\{`([\s\S]*?)`\}[^>]*\/?>/g;
-  let match: RegExpExecArray | null;
-  while ((match = mermaidRegex.exec(content)) !== null) {
-    visuals.push({
-      type: 'mermaid',
-      code: match[1],
-      raw: match[0],
-      line: content.substring(0, match.index).split('\n').length,
-      startOffset: match.index,
-      endOffset: match.index + match[0].length,
-    });
-  }
-
-  // Squiggle
-  const squiggleRegex = /<SquiggleEstimate[^>]*code=\{`([\s\S]*?)`\}[^>]*\/?>/g;
-  while ((match = squiggleRegex.exec(content)) !== null) {
-    visuals.push({
-      type: 'squiggle',
-      code: match[1],
-      raw: match[0],
-      line: content.substring(0, match.index).split('\n').length,
-      startOffset: match.index,
-      endOffset: match.index + match[0].length,
-    });
-  }
-
-  return visuals;
-}
-
-// ============================================================================
 // Improvement prompt
 // ============================================================================
 
-function getStyleGuide(type: VisualType): string {
+function getStyleGuide(type: string): string {
   switch (type) {
     case 'mermaid':
       return MERMAID_STYLE_GUIDE;
@@ -238,7 +191,7 @@ async function main(): Promise<void> {
   let offsetAdjustment = 0;
   const results: Array<{
     index: number;
-    type: VisualType;
+    type: string;
     original: string;
     improved: string;
   }> = [];

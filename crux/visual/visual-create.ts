@@ -21,10 +21,12 @@ import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
 import {
-  type VisualType,
-  isVisualType,
+  type GeneratableVisualType,
+  isGeneratableVisualType,
   VISUAL_COMPONENT_MAP,
 } from './visual-types.ts';
+
+type VisualType = GeneratableVisualType;
 import {
   MERMAID_STYLE_GUIDE,
   SQUIGGLE_STYLE_GUIDE,
@@ -205,7 +207,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  if (!type || !isVisualType(type)) {
+  if (!type || !isGeneratableVisualType(type)) {
     console.error(
       `${colors.red}Error: --type required. Valid types: mermaid, squiggle, cause-effect, comparison, disagreement${colors.reset}`,
     );

@@ -25,10 +25,10 @@ import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
 import {
-  type VisualType,
-  VISUAL_DETECTION_PATTERNS,
   type VisualReviewResult,
   type SyntaxIssue,
+  extractVisuals as sharedExtractVisuals,
+  type ExtractedVisual,
 } from './visual-types.ts';
 import { VISUAL_REVIEW_SYSTEM_PROMPT } from './visual-prompts.ts';
 
@@ -36,83 +36,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = path.join(PROJECT_ROOT, '.claude/temp/visual-review');
 const SCREENSHOT_DIR = path.join(TEMP_DIR, 'screenshots');
 
-// ============================================================================
-// Visual extraction from MDX
-// ============================================================================
-
-interface ExtractedVisual {
-  type: VisualType;
-  code: string;
-  line: number;
-  raw: string;
-}
-
-function extractVisuals(content: string): ExtractedVisual[] {
-  const visuals: ExtractedVisual[] = [];
-
-  // Extract Mermaid diagrams
-  const mermaidRegex = /<(?:MermaidDiagram|Mermaid)[^>]*chart=\{`([\s\S]*?)`\}[^>]*\/?>/g;
-  let match: RegExpExecArray | null;
-  while ((match = mermaidRegex.exec(content)) !== null) {
-    const line = content.substring(0, match.index).split('\n').length;
-    visuals.push({
-      type: 'mermaid',
-      code: match[1],
-      line,
-      raw: match[0],
-    });
-  }
-
-  // Extract Squiggle models
-  const squiggleRegex = /<SquiggleEstimate[^>]*code=\{`([\s\S]*?)`\}[^>]*\/?>/g;
-  while ((match = squiggleRegex.exec(content)) !== null) {
-    const line = content.substring(0, match.index).split('\n').length;
-    visuals.push({
-      type: 'squiggle',
-      code: match[1],
-      line,
-      raw: match[0],
-    });
-  }
-
-  // Extract CauseEffectGraph (detect presence but full code is complex JSX)
-  const cegRegex = /<(?:CauseEffectGraph|PageCauseEffectGraph)[^>]*>/g;
-  while ((match = cegRegex.exec(content)) !== null) {
-    const line = content.substring(0, match.index).split('\n').length;
-    visuals.push({
-      type: 'cause-effect',
-      code: match[0],
-      line,
-      raw: match[0],
-    });
-  }
-
-  // Extract ComparisonTable
-  const ctRegex = /<ComparisonTable[\s\S]*?\/>/g;
-  while ((match = ctRegex.exec(content)) !== null) {
-    const line = content.substring(0, match.index).split('\n').length;
-    visuals.push({
-      type: 'comparison',
-      code: match[0],
-      line,
-      raw: match[0],
-    });
-  }
-
-  // Extract DisagreementMap
-  const dmRegex = /<DisagreementMap[\s\S]*?\/>/g;
-  while ((match = dmRegex.exec(content)) !== null) {
-    const line = content.substring(0, match.index).split('\n').length;
-    visuals.push({
-      type: 'disagreement',
-      code: match[0],
-      line,
-      raw: match[0],
-    });
-  }
-
-  return visuals;
-}
+// Use shared extraction from crux/lib/visual-detection.ts
+const extractVisuals = sharedExtractVisuals;
 
 // ============================================================================
 // Static analysis

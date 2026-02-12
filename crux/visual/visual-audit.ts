@@ -22,9 +22,9 @@ import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
 import {
-  type VisualType,
+  type GeneratableVisualType,
   type PageVisualCoverage,
-  VISUAL_DETECTION_PATTERNS,
+  countVisuals,
 } from './visual-types.ts';
 import { VISUAL_SUGGEST_TYPE_PROMPT } from './visual-prompts.ts';
 
@@ -52,31 +52,10 @@ function extractFrontmatterNumber(content: string, field: string): number | unde
   return isNaN(num) ? undefined : num;
 }
 
-function countVisualsByType(content: string): Record<VisualType, number> {
-  const counts: Record<VisualType, number> = {
-    mermaid: 0,
-    squiggle: 0,
-    'cause-effect': 0,
-    comparison: 0,
-    disagreement: 0,
-  };
+// countVisualsByType is now the shared countVisuals from visual-detection.ts
 
-  for (const [type, patterns] of Object.entries(VISUAL_DETECTION_PATTERNS)) {
-    for (const pattern of patterns) {
-      // Reset regex state
-      const regex = new RegExp(pattern.source, pattern.flags);
-      const matches = content.match(regex);
-      if (matches) {
-        counts[type as VisualType] += matches.length;
-      }
-    }
-  }
-
-  return counts;
-}
-
-function suggestVisualTypes(content: string, title: string): VisualType[] {
-  const suggestions: VisualType[] = [];
+function suggestVisualTypes(content: string, title: string): GeneratableVisualType[] {
+  const suggestions: GeneratableVisualType[] = [];
   const body = content.replace(/^---\n[\s\S]*?\n---\n?/, '').toLowerCase();
 
   // Mermaid: pages with processes, hierarchies, categorizations
@@ -155,8 +134,8 @@ async function main(): Promise<void> {
     const quality = extractFrontmatterNumber(content, 'quality');
     const importance = extractFrontmatterNumber(content, 'importance');
 
-    const visualCounts = countVisualsByType(content);
-    const totalVisuals = Object.values(visualCounts).reduce((a, b) => a + b, 0);
+    const visualCounts = countVisuals(content);
+    const totalVisuals = visualCounts.total;
 
     const suggestedTypes = suggestVisualTypes(content, title);
     // A page needs visuals if it has none and either importance >= 50 or word count >= 800
@@ -171,7 +150,7 @@ async function main(): Promise<void> {
       wordCount,
       quality,
       importance,
-      visuals: { ...visualCounts, total: totalVisuals },
+      visuals: visualCounts,
       needsVisuals,
       suggestedTypes,
     });
@@ -190,12 +169,14 @@ async function main(): Promise<void> {
   const pagesNeedingVisuals = coverage.filter((p) => p.needsVisuals).length;
   const totalVisualCount = coverage.reduce((a, p) => a + p.visuals.total, 0);
 
-  const typeCounts: Record<VisualType, number> = {
+  const typeCounts = {
     mermaid: coverage.reduce((a, p) => a + p.visuals.mermaid, 0),
     squiggle: coverage.reduce((a, p) => a + p.visuals.squiggle, 0),
     'cause-effect': coverage.reduce((a, p) => a + p.visuals['cause-effect'], 0),
     comparison: coverage.reduce((a, p) => a + p.visuals.comparison, 0),
     disagreement: coverage.reduce((a, p) => a + p.visuals.disagreement, 0),
+    'table-view': coverage.reduce((a, p) => a + p.visuals['table-view'], 0),
+    'markdown-table': coverage.reduce((a, p) => a + p.visuals['markdown-table'], 0),
   };
 
   if (format === 'json' || ci) {
@@ -230,11 +211,13 @@ async function main(): Promise<void> {
   console.log(`  Total visual elements:  ${totalVisualCount}`);
   console.log();
   console.log(`${colors.bold}By type:${colors.reset}`);
-  console.log(`  Mermaid:        ${typeCounts.mermaid}`);
-  console.log(`  Squiggle:       ${typeCounts.squiggle}`);
-  console.log(`  CauseEffect:    ${typeCounts['cause-effect']}`);
-  console.log(`  Comparison:     ${typeCounts.comparison}`);
-  console.log(`  Disagreement:   ${typeCounts.disagreement}`);
+  console.log(`  Mermaid:         ${typeCounts.mermaid}`);
+  console.log(`  Squiggle:        ${typeCounts.squiggle}`);
+  console.log(`  CauseEffect:     ${typeCounts['cause-effect']}`);
+  console.log(`  Comparison:      ${typeCounts.comparison}`);
+  console.log(`  Disagreement:    ${typeCounts.disagreement}`);
+  console.log(`  TableView:       ${typeCounts['table-view']}`);
+  console.log(`  Markdown Table:  ${typeCounts['markdown-table']}`);
   console.log();
 
   if (pagesNeedingVisuals > 0) {

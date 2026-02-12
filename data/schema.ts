@@ -323,6 +323,70 @@ export const CauseEffectGraph = z.object({
 export type CauseEffectGraph = z.infer<typeof CauseEffectGraph>;
 
 // =============================================================================
+// VISUAL TYPES (Canonical taxonomy of visual elements used in wiki pages)
+// =============================================================================
+
+/**
+ * The canonical set of visual element types used across the wiki.
+ * This enum is the single source of truth — used by:
+ *   - Metrics extraction (counting visuals per page)
+ *   - Visual pipeline (crux visual create/review/audit/improve)
+ *   - Page templates (quality criteria for visual content)
+ *   - Build-data (computing page metrics)
+ */
+export const VisualType = z.enum([
+  'mermaid',         // MermaidDiagram — flowcharts, pie, timeline, quadrant, etc.
+  'squiggle',        // SquiggleEstimate — probability distributions and models
+  'cause-effect',    // CauseEffectGraph / PageCauseEffectGraph — interactive causal diagrams
+  'comparison',      // ComparisonTable — side-by-side comparison tables
+  'disagreement',    // DisagreementMap — position comparison cards
+  'table-view',      // Interactive TableView pages (SafetyApproachesTableView, etc.)
+  'markdown-table',  // Standard markdown tables (| col | col |)
+]);
+export type VisualType = z.infer<typeof VisualType>;
+
+/**
+ * Maps each VisualType to the JSX component names that render it.
+ * Used for detection in MDX content and for generating import statements.
+ * Component names must match what's registered in mdx-components.tsx.
+ */
+export const VISUAL_COMPONENT_NAMES: Record<string, readonly string[]> = {
+  'mermaid': ['MermaidDiagram', 'Mermaid'],
+  'squiggle': ['SquiggleEstimate'],
+  'cause-effect': ['CauseEffectGraph', 'PageCauseEffectGraph'],
+  'comparison': ['ComparisonTable'],
+  'disagreement': ['DisagreementMap'],
+  'table-view': [
+    'SafetyApproachesTableView',
+    'AccidentRisksTableView',
+    'EvalTypesTableView',
+    'ArchitectureScenariosTableView',
+    'DeploymentArchitecturesTableView',
+    'SafetyGeneralizabilityTableView',
+  ],
+  // 'markdown-table' is detected by syntax (| --- |), not by component name
+};
+
+/**
+ * Reusable visual definition stored in data/visuals/*.yaml.
+ * Can be embedded into multiple pages via `crux visual embed`.
+ */
+export const VisualDefinition = z.object({
+  id: z.string(),
+  type: VisualType,
+  title: z.string(),
+  description: z.string().optional(),
+  usedIn: z.array(z.string()),               // Page IDs where this visual is embedded
+  tags: z.array(z.string()).optional(),
+  content: z.string(),                        // Visual code (Mermaid, Squiggle, JSX, etc.)
+  props: z.record(z.unknown()).optional(),     // Additional component props
+  quality: z.number().min(0).max(100).optional(),
+  lastReviewed: z.string().optional(),
+  reviewNotes: z.array(z.string()).optional(),
+});
+export type VisualDefinition = z.infer<typeof VisualDefinition>;
+
+// =============================================================================
 // CONTENT SECTIONS (Rich content stored in YAML for entity pages)
 // =============================================================================
 

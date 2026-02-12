@@ -3,7 +3,20 @@
  *
  * Extracts structural quality metrics from MDX content.
  * Used by build-data.mjs to compute page quality scores.
+ *
+ * Visual detection delegates to visual-detection.ts which derives
+ * its patterns from the canonical VisualType in data/schema.ts.
  */
+
+import {
+  countDiagrams as countDiagramsShared,
+  countTables as countTablesShared,
+  countVisuals,
+  type VisualCounts,
+} from './visual-detection.ts';
+
+export type { VisualCounts } from './visual-detection.ts';
+export { countVisuals } from './visual-detection.ts';
 
 export interface SectionCount {
   h2: number;
@@ -24,6 +37,8 @@ export interface ContentMetrics {
   hasConclusion: boolean;
   structuralScore: number;
   structuralScoreNormalized: number;
+  /** Per-type visual counts (mermaid, squiggle, cause-effect, etc.) */
+  visualCounts?: VisualCounts;
 }
 
 export interface QualityDiscrepancy {
@@ -43,11 +58,14 @@ export function extractMetrics(content: string, filePath: string = ''): ContentM
   // Remove import statements
   const contentNoImports = bodyContent.replace(/^import\s+.*$/gm, '');
 
+  // Use shared visual detection for comprehensive counting
+  const visualCounts = countVisuals(contentNoImports);
+
   const metrics: ContentMetrics = {
-    // Raw counts
+    // Raw counts — table/diagram counts now include ALL visual types
     wordCount: countWords(contentNoImports),
-    tableCount: countTables(contentNoImports),
-    diagramCount: countDiagrams(contentNoImports),
+    tableCount: countTablesShared(contentNoImports),
+    diagramCount: countDiagramsShared(contentNoImports),
     internalLinks: countInternalLinks(contentNoImports),
     externalLinks: countExternalLinks(contentNoImports),
     sectionCount: countSections(contentNoImports),
@@ -65,6 +83,9 @@ export function extractMetrics(content: string, filePath: string = ''): ContentM
 
     // Normalized score (0-50)
     structuralScoreNormalized: 0,
+
+    // Detailed per-type visual counts
+    visualCounts,
   };
 
   // Calculate structural score
@@ -103,29 +124,19 @@ export function countWords(content: string): number {
 }
 
 /**
- * Count markdown tables
+ * Count all table-type visuals (markdown tables + ComparisonTable + TableView).
+ * Delegates to shared visual-detection.ts for comprehensive counting.
  */
 export function countTables(content: string): number {
-  // Count separator rows to determine table count
-  const separatorPattern = /^\|[\s-:|]+\|$/gm;
-  const separators = content.match(separatorPattern) || [];
-
-  return separators.length;
+  return countTablesShared(content);
 }
 
 /**
- * Count Mermaid diagrams
+ * Count all diagram-type visuals (Mermaid + Squiggle + CauseEffectGraph).
+ * Delegates to shared visual-detection.ts for comprehensive counting.
  */
 export function countDiagrams(content: string): number {
-  // Match Mermaid component usage
-  const mermaidComponent = /<Mermaid[^>]*>/g;
-  const componentMatches = content.match(mermaidComponent) || [];
-
-  // Also match mermaid code blocks
-  const mermaidCodeBlock = /```mermaid/g;
-  const codeBlockMatches = content.match(mermaidCodeBlock) || [];
-
-  return componentMatches.length + codeBlockMatches.length;
+  return countDiagramsShared(content);
 }
 
 /**

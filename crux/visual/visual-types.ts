@@ -1,14 +1,38 @@
 /**
- * Visual Pipeline - Shared Types
+ * Visual Pipeline - Types
  *
- * Type definitions for the visual creation, review, and management pipeline.
+ * Re-exports canonical types from data/schema.ts and shared detection
+ * from crux/lib/visual-detection.ts. Pipeline-specific types (review
+ * results, audit coverage, etc.) are defined here.
+ *
+ * The canonical VisualType enum and VISUAL_COMPONENT_NAMES live in
+ * data/schema.ts so that both the app and crux can use them.
  */
 
 // ============================================================================
-// Visual types supported by the pipeline
+// Re-exports from canonical sources
 // ============================================================================
 
-export const VISUAL_TYPES = [
+// Canonical visual type enum (from data/schema.ts)
+export type { VisualType, VisualDefinition } from '../../data/schema.ts';
+export { VisualType as VisualTypeEnum, VISUAL_COMPONENT_NAMES } from '../../data/schema.ts';
+
+// Shared detection (from crux/lib/visual-detection.ts)
+export {
+  countVisuals,
+  countDiagrams,
+  countTables,
+  extractVisuals,
+  type VisualCounts,
+  type ExtractedVisual,
+} from '../lib/visual-detection.ts';
+
+// ============================================================================
+// Generatable visual types (subset that the visual pipeline can create)
+// These exclude markdown-table and table-view which are created differently.
+// ============================================================================
+
+export const GENERATABLE_VISUAL_TYPES = [
   'mermaid',
   'squiggle',
   'cause-effect',
@@ -16,18 +40,19 @@ export const VISUAL_TYPES = [
   'disagreement',
 ] as const;
 
-export type VisualType = (typeof VISUAL_TYPES)[number];
+export type GeneratableVisualType = (typeof GENERATABLE_VISUAL_TYPES)[number];
 
-export function isVisualType(value: string): value is VisualType {
-  return VISUAL_TYPES.includes(value as VisualType);
+export function isGeneratableVisualType(value: string): value is GeneratableVisualType {
+  return GENERATABLE_VISUAL_TYPES.includes(value as GeneratableVisualType);
 }
 
 // ============================================================================
-// Component mapping for each visual type
+// Component mapping for generation (import statements and props)
+// Only for generatable types — used by visual-create and visual-embed.
 // ============================================================================
 
 export const VISUAL_COMPONENT_MAP: Record<
-  VisualType,
+  GeneratableVisualType,
   { component: string; import: string; propsType: string }
 > = {
   mermaid: {
@@ -58,54 +83,6 @@ export const VISUAL_COMPONENT_MAP: Record<
 };
 
 // ============================================================================
-// Detection patterns for finding visuals in MDX content
-// ============================================================================
-
-export const VISUAL_DETECTION_PATTERNS: Record<VisualType, RegExp[]> = {
-  mermaid: [
-    /<MermaidDiagram[\s>]/g,
-    /<Mermaid[\s>]/g,
-    /<Mermaid\s+client:load/g,
-  ],
-  squiggle: [/<SquiggleEstimate[\s>]/g],
-  'cause-effect': [
-    /<CauseEffectGraph[\s>]/g,
-    /<PageCauseEffectGraph[\s>]/g,
-  ],
-  comparison: [/<ComparisonTable[\s>]/g],
-  disagreement: [/<DisagreementMap[\s>]/g],
-};
-
-// ============================================================================
-// Visual data model for reusable/referenced visuals
-// ============================================================================
-
-export interface VisualDefinition {
-  /** Unique identifier for this visual */
-  id: string;
-  /** Human-readable title */
-  title: string;
-  /** Visual type */
-  type: VisualType;
-  /** Description of what this visual shows */
-  description?: string;
-  /** Page IDs where this visual is used */
-  usedIn: string[];
-  /** Tags for categorization */
-  tags?: string[];
-  /** The visual content (Mermaid code, Squiggle code, or JSON data) */
-  content: string;
-  /** Props to pass to the component (JSON) */
-  props?: Record<string, unknown>;
-  /** Quality score from last review (0-100) */
-  quality?: number;
-  /** Last review date */
-  lastReviewed?: string;
-  /** Review notes from last AI review */
-  reviewNotes?: string[];
-}
-
-// ============================================================================
 // Audit types
 // ============================================================================
 
@@ -122,12 +99,12 @@ export interface PageVisualCoverage {
     'cause-effect': number;
     comparison: number;
     disagreement: number;
+    'table-view': number;
+    'markdown-table': number;
     total: number;
   };
-  /** Whether this page should have visuals based on word count and importance */
   needsVisuals: boolean;
-  /** Suggested visual types based on content analysis */
-  suggestedTypes: VisualType[];
+  suggestedTypes: GeneratableVisualType[];
 }
 
 // ============================================================================
@@ -137,12 +114,9 @@ export interface PageVisualCoverage {
 export interface VisualReviewResult {
   pageId: string;
   visualIndex: number;
-  type: VisualType;
-  /** Static analysis issues */
+  type: string;
   syntaxIssues: SyntaxIssue[];
-  /** AI quality review (if screenshot was taken) */
   qualityReview?: QualityReview;
-  /** Screenshot path (if taken) */
   screenshotPath?: string;
 }
 
@@ -166,7 +140,7 @@ export interface QualityReview {
 
 export interface VisualCreateOptions {
   pageId: string;
-  type: VisualType;
+  type: GeneratableVisualType;
   directions?: string;
   model?: string;
   dryRun?: boolean;
@@ -174,11 +148,9 @@ export interface VisualCreateOptions {
 }
 
 export interface VisualCreateResult {
-  type: VisualType;
+  type: GeneratableVisualType;
   component: string;
   code: string;
-  /** Full MDX snippet ready to paste into page */
   mdxSnippet: string;
-  /** Import statement needed */
   importStatement: string;
 }

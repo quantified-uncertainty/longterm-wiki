@@ -20,7 +20,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
-import { type VisualDefinition, VISUAL_COMPONENT_MAP, type VisualType } from './visual-types.ts';
+import { type VisualDefinition, VISUAL_COMPONENT_MAP, type GeneratableVisualType } from './visual-types.ts';
 
 const DATA_DIR = path.join(PROJECT_ROOT, 'data');
 const VISUALS_DIR = path.join(DATA_DIR, 'visuals');
@@ -70,7 +70,7 @@ function findVisualById(
 // ============================================================================
 
 function generateMdxSnippet(visual: VisualDefinition): string {
-  const componentInfo = VISUAL_COMPONENT_MAP[visual.type as VisualType];
+  const componentInfo = VISUAL_COMPONENT_MAP[visual.type as GeneratableVisualType];
   if (!componentInfo) {
     throw new Error(`Unknown visual type: ${visual.type}`);
   }
