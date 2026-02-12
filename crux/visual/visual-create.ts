@@ -14,91 +14,27 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
-import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
-import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { createClient, callClaude } from '../lib/anthropic.ts';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors, isCI } from '../lib/output.ts';
+import { getContentBody } from '../lib/mdx-utils.ts';
+import { stripMarkdownFences } from '../lib/mdx-utils.ts';
+import { findPageById } from '../lib/page-resolution.ts';
 import {
   type GeneratableVisualType,
   isGeneratableVisualType,
   VISUAL_COMPONENT_MAP,
 } from './visual-types.ts';
+import { getStyleGuide } from './visual-prompts.ts';
 
-type VisualType = GeneratableVisualType;
-import {
-  MERMAID_STYLE_GUIDE,
-  SQUIGGLE_STYLE_GUIDE,
-  CAUSE_EFFECT_STYLE_GUIDE,
-  COMPARISON_STYLE_GUIDE,
-  DISAGREEMENT_STYLE_GUIDE,
-} from './visual-prompts.ts';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = path.join(PROJECT_ROOT, '.claude/temp/visual');
-
-// ============================================================================
-// Page resolution
-// ============================================================================
-
-function findPageById(pageId: string): { filePath: string; content: string } | null {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  for (const file of files) {
-    const relPath = path.relative(CONTENT_DIR_ABS, file);
-    const id = relPath.replace(/\.mdx?$/, '').replace(/\//g, '/');
-    const slug = path.basename(relPath, path.extname(relPath));
-
-    if (slug === pageId || id === pageId || relPath === pageId) {
-      const content = fs.readFileSync(file, 'utf-8');
-      return { filePath: file, content };
-    }
-  }
-  return null;
-}
-
-function extractFrontmatter(
-  content: string,
-): Record<string, string | number | string[]> {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return {};
-
-  const result: Record<string, string | number | string[]> = {};
-  for (const line of match[1].split('\n')) {
-    const idx = line.indexOf(':');
-    if (idx > 0) {
-      const key = line.slice(0, idx).trim();
-      const value = line.slice(idx + 1).trim();
-      result[key] = value.replace(/^["']|["']$/g, '');
-    }
-  }
-  return result;
-}
-
-function getBodyContent(content: string): string {
-  return content.replace(/^---\n[\s\S]*?\n---\n?/, '');
-}
 
 // ============================================================================
 // Prompt construction
 // ============================================================================
 
-function getStyleGuide(type: VisualType): string {
-  switch (type) {
-    case 'mermaid':
-      return MERMAID_STYLE_GUIDE;
-    case 'squiggle':
-      return SQUIGGLE_STYLE_GUIDE;
-    case 'cause-effect':
-      return CAUSE_EFFECT_STYLE_GUIDE;
-    case 'comparison':
-      return COMPARISON_STYLE_GUIDE;
-    case 'disagreement':
-      return DISAGREEMENT_STYLE_GUIDE;
-  }
-}
-
-function buildSystemPrompt(type: VisualType): string {
+function buildSystemPrompt(type: GeneratableVisualType): string {
   const componentInfo = VISUAL_COMPONENT_MAP[type];
   const styleGuide = getStyleGuide(type);
 
@@ -124,12 +60,11 @@ Include the import statement on the first line, then a blank line, then the comp
 }
 
 function buildUserPrompt(
-  type: VisualType,
+  type: GeneratableVisualType,
   pageTitle: string,
   pageContent: string,
   directions?: string,
 ): string {
-  // Truncate very long content to fit in context
   const maxContentLength = 12000;
   const truncatedContent =
     pageContent.length > maxContentLength
@@ -159,11 +94,7 @@ function extractImportAndComponent(raw: string): {
   importStatement: string;
   componentCode: string;
 } {
-  // Strip markdown fences if the model wrapped it
-  let cleaned = raw.trim();
-  if (cleaned.startsWith('```')) {
-    cleaned = cleaned.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '');
-  }
+  const cleaned = stripMarkdownFences(raw);
 
   const lines = cleaned.split('\n');
   const importLines: string[] = [];
@@ -214,27 +145,23 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // Resolve page
   const page = findPageById(pageId);
   if (!page) {
     console.error(`${colors.red}Error: page not found: ${pageId}${colors.reset}`);
     process.exit(1);
   }
 
-  const frontmatter = extractFrontmatter(page.content);
-  const pageTitle = (frontmatter.title as string) || pageId;
-  const body = getBodyContent(page.content);
+  const body = getContentBody(page.content);
 
   if (!ci) {
     console.log(
-      `${colors.blue}Creating ${type} visual for "${pageTitle}"...${colors.reset}`,
+      `${colors.blue}Creating ${type} visual for "${page.title}"...${colors.reset}`,
     );
     if (directions) {
       console.log(`${colors.dim}Directions: ${directions}${colors.reset}`);
     }
   }
 
-  // Create Anthropic client
   const client = createClient();
   if (!client) {
     console.error(
@@ -243,9 +170,8 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // Generate
   const systemPrompt = buildSystemPrompt(type);
-  const userPrompt = buildUserPrompt(type, pageTitle, body, directions);
+  const userPrompt = buildUserPrompt(type, page.title, body, directions);
 
   const result = await callClaude(client, {
     model,
@@ -270,7 +196,6 @@ async function main(): Promise<void> {
     );
   }
 
-  // Write output
   if (!dryRun) {
     const outDir = outputPath
       ? path.dirname(outputPath)

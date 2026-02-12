@@ -14,16 +14,14 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
 import { parseCliArgs } from '../lib/cli.ts';
-import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors, isCI } from '../lib/output.ts';
+import { findPageById } from '../lib/page-resolution.ts';
 import { type VisualDefinition, VISUAL_COMPONENT_MAP, type GeneratableVisualType } from './visual-types.ts';
 
-const DATA_DIR = path.join(PROJECT_ROOT, 'data');
-const VISUALS_DIR = path.join(DATA_DIR, 'visuals');
+const VISUALS_DIR = path.join(PROJECT_ROOT, 'data', 'visuals');
 const TEMP_DIR = path.join(PROJECT_ROOT, '.claude/temp/visual-embed');
 
 // ============================================================================
@@ -89,14 +87,7 @@ function generateMdxSnippet(visual: VisualDefinition): string {
     }
 
     case 'cause-effect':
-      // CauseEffectGraph data is already JSX-compatible JSON
-      snippet += visual.content;
-      break;
-
     case 'comparison':
-      snippet += visual.content;
-      break;
-
     case 'disagreement':
       snippet += visual.content;
       break;
@@ -106,25 +97,6 @@ function generateMdxSnippet(visual: VisualDefinition): string {
   }
 
   return snippet;
-}
-
-// ============================================================================
-// Page resolution
-// ============================================================================
-
-function findPageById(pageId: string): { filePath: string; content: string } | null {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  for (const file of files) {
-    const slug = path.basename(file, path.extname(file));
-    const relPath = path.relative(CONTENT_DIR_ABS, file);
-    const id = relPath.replace(/\.mdx?$/, '');
-
-    if (slug === pageId || id === pageId) {
-      const content = fs.readFileSync(file, 'utf-8');
-      return { filePath: file, content };
-    }
-  }
-  return null;
 }
 
 // ============================================================================
@@ -275,7 +247,6 @@ content: |
     process.exit(1);
   }
 
-  // Find end of the heading line
   const insertPos =
     sectionMatch.index + sectionMatch[0].length;
   const updated =

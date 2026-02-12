@@ -14,42 +14,20 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
-import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
-import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { createClient, callClaude } from '../lib/anthropic.ts';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors, isCI } from '../lib/output.ts';
+import { stripMarkdownFences } from '../lib/mdx-utils.ts';
+import { findPageById } from '../lib/page-resolution.ts';
 import { extractVisuals, type ExtractedVisual } from './visual-types.ts';
-import {
-  MERMAID_STYLE_GUIDE,
-  SQUIGGLE_STYLE_GUIDE,
-  CAUSE_EFFECT_STYLE_GUIDE,
-  COMPARISON_STYLE_GUIDE,
-  DISAGREEMENT_STYLE_GUIDE,
-} from './visual-prompts.ts';
+import { getStyleGuide } from './visual-prompts.ts';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = path.join(PROJECT_ROOT, '.claude/temp/visual-improve');
 
 // ============================================================================
 // Improvement prompt
 // ============================================================================
-
-function getStyleGuide(type: string): string {
-  switch (type) {
-    case 'mermaid':
-      return MERMAID_STYLE_GUIDE;
-    case 'squiggle':
-      return SQUIGGLE_STYLE_GUIDE;
-    case 'cause-effect':
-      return CAUSE_EFFECT_STYLE_GUIDE;
-    case 'comparison':
-      return COMPARISON_STYLE_GUIDE;
-    case 'disagreement':
-      return DISAGREEMENT_STYLE_GUIDE;
-  }
-}
 
 function buildImprovePrompt(
   visual: ExtractedVisual,
@@ -95,28 +73,8 @@ ${surroundingContent.substring(0, 6000)}`;
 }
 
 // ============================================================================
-// Page resolution
+// Context extraction
 // ============================================================================
-
-function findPageById(pageId: string): { filePath: string; content: string; title: string } | null {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  for (const file of files) {
-    const slug = path.basename(file, path.extname(file));
-    const relPath = path.relative(CONTENT_DIR_ABS, file);
-    const id = relPath.replace(/\.mdx?$/, '');
-
-    if (slug === pageId || id === pageId) {
-      const content = fs.readFileSync(file, 'utf-8');
-      const titleMatch = content.match(/^title:\s*["']?(.+?)["']?\s*$/m);
-      return {
-        filePath: file,
-        content,
-        title: titleMatch?.[1] || slug,
-      };
-    }
-  }
-  return null;
-}
 
 function getSurroundingContent(
   content: string,
@@ -223,11 +181,7 @@ async function main(): Promise<void> {
       temperature: 0.2,
     });
 
-    let improved = result.text.trim();
-    // Strip markdown fences
-    if (improved.startsWith('```')) {
-      improved = improved.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '');
-    }
+    const improved = stripMarkdownFences(result.text);
 
     if (!ci) {
       console.log(`${colors.dim}--- original ---${colors.reset}`);

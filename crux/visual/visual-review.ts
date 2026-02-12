@@ -17,27 +17,24 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { spawnSync, execSync } from 'child_process';
 import { parseCliArgs } from '../lib/cli.ts';
-import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
+import { createClient, callClaude } from '../lib/anthropic.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
+import { stripMarkdownFences } from '../lib/mdx-utils.ts';
+import { findPageById } from '../lib/page-resolution.ts';
 import {
   type VisualReviewResult,
   type SyntaxIssue,
-  extractVisuals as sharedExtractVisuals,
+  extractVisuals,
   type ExtractedVisual,
 } from './visual-types.ts';
 import { VISUAL_REVIEW_SYSTEM_PROMPT } from './visual-prompts.ts';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = path.join(PROJECT_ROOT, '.claude/temp/visual-review');
 const SCREENSHOT_DIR = path.join(TEMP_DIR, 'screenshots');
-
-// Use shared extraction from crux/lib/visual-detection.ts
-const extractVisuals = sharedExtractVisuals;
 
 // ============================================================================
 // Static analysis
@@ -150,7 +147,6 @@ function analyzeSquiggleSyntax(code: string): SyntaxIssue[] {
   let match: RegExpExecArray | null;
   while ((match = mixtureRegex.exec(code)) !== null) {
     const args = match[1];
-    // Look for bare numbers not in "X to Y" patterns
     const bareNumbers = args.match(/(?<!\w)(\d+(?:\.\d+)?(?:e\d+)?)(?!\s*to\b)/g);
     if (bareNumbers && bareNumbers.length > 0) {
       issues.push({
@@ -194,7 +190,6 @@ async function takeScreenshot(
   pageId: string,
   visualIndex: number,
 ): Promise<string | null> {
-  // Check if puppeteer is available
   try {
     execSync('node -e "require(\'puppeteer\')"', {
       stdio: 'pipe',
@@ -210,7 +205,6 @@ async function takeScreenshot(
     return null;
   }
 
-  // Check if dev server is running
   try {
     execSync('curl -s -o /dev/null -w "%{http_code}" http://localhost:3001', {
       stdio: 'pipe',
@@ -231,7 +225,6 @@ async function takeScreenshot(
     `${pageId}-visual-${visualIndex}.png`,
   );
 
-  // Use a small Node script to take the screenshot
   const screenshotScript = `
     const puppeteer = require('puppeteer');
     (async () => {
@@ -295,40 +288,10 @@ Return ONLY a JSON object with: score (0-100), strengths (array), issues (array)
       temperature: 0,
     });
 
-    // Parse JSON response
-    let cleaned = result.text.trim();
-    if (cleaned.startsWith('```')) {
-      cleaned = cleaned.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '');
-    }
-
-    return JSON.parse(cleaned);
-  } catch (err) {
+    return JSON.parse(stripMarkdownFences(result.text));
+  } catch {
     return null;
   }
-}
-
-// ============================================================================
-// Page resolution
-// ============================================================================
-
-function findPageById(pageId: string): { filePath: string; content: string; title: string } | null {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  for (const file of files) {
-    const slug = path.basename(file, path.extname(file));
-    const relPath = path.relative(CONTENT_DIR_ABS, file);
-    const id = relPath.replace(/\.mdx?$/, '');
-
-    if (slug === pageId || id === pageId) {
-      const content = fs.readFileSync(file, 'utf-8');
-      const titleMatch = content.match(/^title:\s*["']?(.+?)["']?\s*$/m);
-      return {
-        filePath: file,
-        content,
-        title: titleMatch?.[1] || slug,
-      };
-    }
-  }
-  return null;
 }
 
 // ============================================================================
@@ -354,7 +317,7 @@ async function main(): Promise<void> {
       console.error(`${colors.red}Error: page not found: ${pageId}${colors.reset}`);
       process.exit(1);
     }
-    pagesToReview.push({ ...page, slug: pageId });
+    pagesToReview.push({ ...page, slug: page.slug });
   } else {
     const files = findMdxFiles(CONTENT_DIR_ABS);
     for (const file of files) {

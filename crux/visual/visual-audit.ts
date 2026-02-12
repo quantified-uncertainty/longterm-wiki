@@ -15,48 +15,32 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
-import { createClient, callClaude } from '../lib/anthropic.ts';
-import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
+import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
+import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
 import {
   type GeneratableVisualType,
   type PageVisualCoverage,
   countVisuals,
 } from './visual-types.ts';
-import { VISUAL_SUGGEST_TYPE_PROMPT } from './visual-prompts.ts';
 
 // ============================================================================
 // Content analysis
 // ============================================================================
 
 function countWords(content: string): number {
-  const body = content.replace(/^---\n[\s\S]*?\n---\n?/, '');
+  const body = getContentBody(content);
   const noImports = body.replace(/^import\s+.*$/gm, '');
   const noJsx = noImports.replace(/<[^>]+>/g, ' ');
   const noCode = noJsx.replace(/```[\s\S]*?```/g, '');
   return noCode.split(/\s+/).filter((w) => w.length > 0).length;
 }
 
-function extractFrontmatterField(content: string, field: string): string | undefined {
-  const match = content.match(new RegExp(`^${field}:\\s*["']?(.+?)["']?\\s*$`, 'm'));
-  return match?.[1];
-}
-
-function extractFrontmatterNumber(content: string, field: string): number | undefined {
-  const val = extractFrontmatterField(content, field);
-  if (val === undefined) return undefined;
-  const num = parseFloat(val);
-  return isNaN(num) ? undefined : num;
-}
-
-// countVisualsByType is now the shared countVisuals from visual-detection.ts
-
-function suggestVisualTypes(content: string, title: string): GeneratableVisualType[] {
+function suggestVisualTypes(content: string): GeneratableVisualType[] {
   const suggestions: GeneratableVisualType[] = [];
-  const body = content.replace(/^---\n[\s\S]*?\n---\n?/, '').toLowerCase();
+  const body = getContentBody(content).toLowerCase();
 
   // Mermaid: pages with processes, hierarchies, categorizations
   if (
@@ -130,14 +114,15 @@ async function main(): Promise<void> {
 
     const slug = path.basename(file, path.extname(file));
     const relPath = path.relative(CONTENT_DIR_ABS, file);
-    const title = extractFrontmatterField(content, 'title') || slug;
-    const quality = extractFrontmatterNumber(content, 'quality');
-    const importance = extractFrontmatterNumber(content, 'importance');
+    const frontmatter = parseFrontmatter(content);
+    const title = (frontmatter.title as string) || slug;
+    const quality = typeof frontmatter.quality === 'number' ? frontmatter.quality : undefined;
+    const importance = typeof frontmatter.importance === 'number' ? frontmatter.importance : undefined;
 
     const visualCounts = countVisuals(content);
     const totalVisuals = visualCounts.total;
 
-    const suggestedTypes = suggestVisualTypes(content, title);
+    const suggestedTypes = suggestVisualTypes(content);
     // A page needs visuals if it has none and either importance >= 50 or word count >= 800
     const needsVisuals =
       totalVisuals === 0 &&

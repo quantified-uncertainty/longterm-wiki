@@ -241,6 +241,27 @@ import { DisagreementMap } from '@components/wiki/DisagreementMap';
 `;
 
 // ============================================================================
+// Style guide lookup (shared by visual-create and visual-improve)
+// ============================================================================
+
+export function getStyleGuide(type: string): string {
+  switch (type) {
+    case 'mermaid':
+      return MERMAID_STYLE_GUIDE;
+    case 'squiggle':
+      return SQUIGGLE_STYLE_GUIDE;
+    case 'cause-effect':
+      return CAUSE_EFFECT_STYLE_GUIDE;
+    case 'comparison':
+      return COMPARISON_STYLE_GUIDE;
+    case 'disagreement':
+      return DISAGREEMENT_STYLE_GUIDE;
+    default:
+      return '';
+  }
+}
+
+// ============================================================================
 // Visual review prompts
 // ============================================================================
 

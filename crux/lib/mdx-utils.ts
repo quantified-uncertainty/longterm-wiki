@@ -319,6 +319,18 @@ export function shouldSkipPosition(content: string, position: number): boolean {
   );
 }
 
+/**
+ * Strip markdown code fences from AI-generated output.
+ * Handles ```lang\n...\n``` wrapping that models sometimes add.
+ */
+export function stripMarkdownFences(text: string): string {
+  let cleaned = text.trim();
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '');
+  }
+  return cleaned;
+}
+
 export interface MatchCallbackInfo {
   match: RegExpExecArray;
   line: string;
