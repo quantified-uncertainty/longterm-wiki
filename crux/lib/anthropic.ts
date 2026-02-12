@@ -29,7 +29,7 @@ export const MODELS: Record<string, string> = {
   // Fast and cheap - good for high-volume tasks
   haiku: 'claude-3-5-haiku-latest',
   // Balanced - good for most tasks
-  sonnet: 'claude-sonnet-4-20250514',
+  sonnet: 'claude-sonnet-4-5-20250929',
   // Most capable - for complex tasks
   opus: 'claude-opus-4-6',
 };
