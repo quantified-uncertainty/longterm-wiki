@@ -237,6 +237,7 @@ function buildPagesRegistry(urlToResource) {
             diagramCount: metrics.diagramCount,
             internalLinks: metrics.internalLinks,
             externalLinks: metrics.externalLinks,
+            footnoteCount: metrics.footnoteCount,
             bulletRatio: Math.round(metrics.bulletRatio * 100) / 100,
             sectionCount: metrics.sectionCount.total,
             hasOverview: metrics.hasOverview,

@@ -36,6 +36,7 @@ import { ValidationEngine, ContentFile } from '../lib/validation-engine.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseCliArgs } from '../lib/cli.ts';
+import { countFootnoteRefs } from '../lib/metrics-extractor.ts';
 import {
   insiderJargonRule,
   falseCertaintyRule,
@@ -404,18 +405,7 @@ function computeMetrics(content: string): Metrics {
 
   // Count citations: <R id="..."> components and GFM footnote references [^N]
   const rComponents = (withoutFm.match(/<R\s+id=/g) || []).length;
-  // Count unique footnote references (not definitions like [^1]: ...)
-  const footnoteRefs = new Set<string>();
-  const footnotePattern = /\[\^(\d+)\]/g;
-  for (const line of withoutFm.split('\n')) {
-    if (/^\[\^\d+\]:/.test(line.trim())) continue; // Skip definitions
-    let match: RegExpExecArray | null;
-    footnotePattern.lastIndex = 0;
-    while ((match = footnotePattern.exec(line)) !== null) {
-      footnoteRefs.add(match[1]);
-    }
-  }
-  const citations = rComponents + footnoteRefs.size;
+  const citations = rComponents + countFootnoteRefs(withoutFm);
 
   // Count tables (markdown tables with |---|)
   const tables = (withoutFm.match(/\|[-:]+\|/g) || []).length;
