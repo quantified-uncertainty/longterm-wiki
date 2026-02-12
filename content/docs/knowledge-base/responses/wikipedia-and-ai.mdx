@@ -1,0 +1,264 @@
+---
+title: Wikipedia and AI Content
+description: Wikipedia's evolving relationship with AI-generated content, including defensive policies (G15 speedy deletion, disclosure requirements), WikiProject AI Cleanup (~5% of new articles found AI-generated), the "Humanizer" evasion controversy, model collapse risks, and the broader challenge of maintaining human-curated knowledge quality in an era of AI content proliferation. Wikipedia saw an 8% decline in human pageviews in 2025 alongside rising AI scraping costs.
+sidebar:
+  order: 11
+lastEdited: "2026-02-12"
+importance: 55
+update_frequency: 30
+clusters:
+  - epistemics
+  - ai-safety
+subcategory: epistemic-tools-tools
+---
+import {EntityLink, Backlinks, KeyQuestions, Mermaid} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **AI Content Infiltration** | Significant and growing | Princeton study: ~5% of 3,000 new articles AI-generated (Oct 2024) |
+| **Policy Response** | Comprehensive | G15 speedy deletion, disclosure requirements, talk page restrictions, detection guides |
+| **Community Defense** | Active | WikiProject AI Cleanup active since late 2023; volunteer editors fighting AI-generated drafts |
+| **Detection Arms Race** | Escalating | "Humanizer" plugin (Jan 2026) weaponized Wikipedia's own detection guide for evasion |
+| **Traffic Impact** | Declining | 8% human pageview drop (2025); 200M fewer unique monthly visitors since 2022 |
+| **Model Collapse Relevance** | Central | Wikipedia is primary training data for LLMs (47.9% of ChatGPT's top-10 cited sources) |
+| **Sustainability Risk** | High | Declining traffic + rising scraping costs threaten volunteer model |
+
+## Overview
+
+Wikipedia occupies a uniquely critical position in the AI-generated content landscape. As the world's largest human-curated knowledge base—7.1 million English articles maintained by volunteer editors—it serves simultaneously as:
+
+1. **The primary training data source** for large language models (47.9% of ChatGPT's top-10 cited sources)
+2. **A target** for AI-generated content infiltration (~5% of new articles found AI-generated)
+3. **A battleground** where the tension between AI content generation and human knowledge curation plays out in real policy and community action
+4. **A canary** for the broader health of human epistemic infrastructure
+
+This three-way pressure—being consumed as training data, invaded by AI-generated content, and losing traffic to AI summaries—makes Wikipedia the central case study for understanding how AI affects <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink>. The outcomes of Wikipedia's struggle with AI content have direct implications for all knowledge bases, including those in the AI safety space.
+
+For Wikipedia pageview analytics and traffic decline data specifically, see <EntityLink id="wikipedia-views">Wikipedia Views</EntityLink>.
+
+<Mermaid chart={`
+flowchart TD
+    subgraph PRESSURES["Three-Way Pressure on Wikipedia"]
+        TRAIN[AI trains ON Wikipedia<br/>47.9% of ChatGPT citations]
+        INVADE[AI content infiltrates Wikipedia<br/>5% of new articles]
+        DIVERT[AI summaries divert traffic<br/>8% pageview decline]
+    end
+
+    subgraph RESPONSES["Wikipedia's Responses"]
+        POLICY[Defensive policies<br/>G15, disclosure, detection]
+        CLEANUP[WikiProject AI Cleanup<br/>Volunteer detection effort]
+        PARTNERS[Enterprise partnerships<br/>Amazon, Meta, Microsoft, Google]
+    end
+
+    TRAIN --> FEEDBACK[Model Collapse<br/>Feedback Loop]
+    INVADE --> FEEDBACK
+    FEEDBACK --> QUALITY[Knowledge Quality<br/>Degradation Risk]
+
+    PRESSURES --> RESPONSES
+
+    style PRESSURES fill:#ffebee
+    style RESPONSES fill:#e8f5e9
+    style FEEDBACK fill:#fff3e0
+`} />
+
+---
+
+## Wikipedia's AI Content Policies
+
+Wikipedia has developed the most comprehensive policy framework of any major platform for handling AI-generated content. These policies evolved rapidly from 2023 to 2025 in response to growing AI content infiltration.
+
+### Core Policies (as of August 2025)
+
+| Policy | Rule | Enforcement |
+|--------|------|-------------|
+| **G15 Speedy Deletion** | LLM-generated pages without adequate human review can be immediately deleted without discussion | Admins can delete on sight |
+| **Disclosure Requirement** | Every edit incorporating LLM output must identify the AI used in the edit summary | False denial of LLM use is sanctionable |
+| **Talk Page Restrictions** | LLM-generated comments may be struck or collapsed by any editor | Repeated misuse leads to user blocks |
+| **Source Reliability** | LLMs are not reliable sources and cannot be cited | Exception only if published by reliable outlets with verified accuracy |
+| **Automated Detection** | "Signs of AI Writing" guide maintained for community detection | WikiProject AI Cleanup applies these criteria |
+
+### The Case Against LLM-Generated Articles
+
+Wikipedia maintains an explicit policy page outlining why LLM-generated articles are problematic:
+
+- **Hallucination**: LLMs generate plausible-sounding but false claims, including fabricated citations
+- **Verification burden**: AI-generated content shifts the work of ensuring accuracy from creators to reviewers
+- **Source quality**: LLMs cannot verify whether their training data sources are reliable
+- **Style mimicry without substance**: AI can replicate Wikipedia's formatting without Wikipedia's accuracy standards
+- **Volume problem**: AI makes it easy to create large volumes of content that overwhelm human review capacity
+
+---
+
+## WikiProject AI Cleanup
+
+Active since late 2023, WikiProject AI Cleanup is a volunteer effort to identify and remove AI-written content from Wikipedia. It represents the community's primary organized response to AI content infiltration.
+
+### Scale of the Problem
+
+| Metric | Finding |
+|--------|---------|
+| **AI article rate** | ~5% of 3,000 newly created articles were AI-generated (Princeton study, Oct 2024) |
+| **Editor reports** | Editors describe being "flooded non-stop with horrendous drafts" created using AI |
+| **Content quality** | AI articles reported to contain "lies and fake references" requiring significant time to fix |
+| **Detection challenge** | AI-generated text increasingly difficult to distinguish from human writing |
+
+### Detection Guide: Signs of AI Writing
+
+WikiProject AI Cleanup maintains a detection guide identifying characteristic patterns of LLM-generated text:
+
+| Pattern | Description |
+|---------|-------------|
+| **Vocabulary tells** | Overuse of "delve," "moreover," "it is important to note," "multifaceted" |
+| **Punctuation** | Excessive em dashes; curly quotation marks (from LLM outputs) |
+| **Tone** | Overly formal, promotional, or superlative language |
+| **Structure** | Generic organization without Wikipedia-specific formatting conventions |
+| **Citations** | References to sources that don't exist or don't support claims |
+| **Hedging patterns** | Excessive qualifications and "balanced" framing of non-controversial topics |
+
+### The "Humanizer" Evasion (January 2026)
+
+In January 2026, Siqi Chen released an open-source Claude Code plugin called "Humanizer" that feeds AI a list of 24 language patterns from WikiProject AI Cleanup's detection guide, instructing the AI to avoid those patterns when generating text.
+
+This effectively weaponized Wikipedia's defense against itself—using the detection guide as a training input for evasion. The incident illustrates the fundamental arms race dynamic: every public detection method becomes an evasion guide. It also mirrors broader AI safety concerns about the difficulty of maintaining oversight of systems specifically designed to avoid detection.
+
+---
+
+## Traffic, Sustainability, and AI Scraping
+
+Wikipedia faces a sustainability challenge from multiple AI-related pressures. For detailed traffic analytics, see <EntityLink id="wikipedia-views">Wikipedia Views</EntityLink>.
+
+### Key Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Human pageview decline** | ~8% (March-August 2025 vs. 2024) |
+| **Unique visitor decline** | ~200M fewer monthly visitors since March 2022 |
+| **Total daily visits** | 14%+ decline over three years (263M → 226M) |
+| **AI scraping bandwidth** | 50% spike in costs |
+| **Click-through on AI summaries** | Only 1% of users click links within AI summaries |
+| **Wikipedia's share of AI citations** | 47.9% of ChatGPT's top-10 sources; 5.7% of Google AI Overviews |
+
+### Enterprise Partnerships
+
+In response to these pressures, the Wikimedia Foundation formed partnerships with Amazon, Meta, Microsoft, Mistral AI, Perplexity, Google, and others in January 2026. These partnerships aim to ensure that AI companies using Wikipedia content contribute to Wikipedia's sustainability.
+
+### The AI Summary Experiment
+
+In June 2025, Wikimedia tested "Simple Article Summaries"—AI-generated summaries displayed on Wikipedia articles. The experiment drew immediate backlash from editors who called it a "ghastly idea," and it was halted the same month. The incident reflects deep community resistance to integrating AI-generated content into a platform built on human curation.
+
+---
+
+## Model Collapse and the Wikipedia Feedback Loop
+
+Wikipedia occupies a central position in the model collapse problem because it serves as training data for the same AI systems that generate content which then infiltrates Wikipedia.
+
+### The Feedback Loop
+
+<Mermaid chart={`
+flowchart TD
+    A[Wikipedia<br/>7.1M human-written articles] -->|"Primary training data"| B[LLMs<br/>GPT, Claude, Grok, etc.]
+    B -->|"Generate articles"| C[AI-generated content<br/>Enters web + Wikipedia]
+    C -->|"Contaminates"| D[Future training data<br/>Now includes AI content]
+    D -->|"Trains"| E[Future LLMs<br/>Degraded by AI content]
+    E -->|"Lower quality output"| F[More AI content<br/>With reduced variance]
+    F -->|"Further contamination"| A
+
+    style A fill:#e8f5e9
+    style C fill:#fff3e0
+    style E fill:#ffebee
+    style F fill:#ffebee
+`} />
+
+### Model Collapse (Shumailov et al., Nature 2024)
+
+Formally described in Nature (July 2024), model collapse occurs when LLMs degrade through successive generations of training on AI-generated content:
+
+| Aspect | Details |
+|--------|---------|
+| **Mechanism** | Central Limit Theorem ensures each generation reduces output variance and eliminates distribution tails |
+| **Timeline** | Measurable degradation within 5 generations of recursive training |
+| **What's lost** | Rare but crucial patterns—specialized, minority-perspective, and nuanced knowledge |
+| **Scale** | AI-written web articles rose from 4.2% to over 50% by late 2024 |
+| **Current status** | Not solved as of 2025; only mitigated through careful data curation |
+
+### Knowledge Collapse
+
+Knowledge collapse is the broader societal consequence: if AI systems with model collapse produce narrower outputs, "long-tail" ideas fade from public consciousness. This is particularly concerning for:
+
+- **AI safety research**: Much important content exists in the long tail (technical alignment work, niche policy proposals, minority expert positions)
+- **Emerging fields**: New research directions may be underrepresented in training data
+- **Non-Western knowledge**: Already underrepresented in Wikipedia, further marginalized by model collapse
+- **Contrarian views**: Minority expert positions that may be correct get smoothed away by statistical averaging
+
+---
+
+## Proposed Mitigations
+
+| Mitigation | How It Works | Who's Doing It |
+|-----------|-------------|----------------|
+| **G15 speedy deletion** | Immediate removal of unreviewed AI content | Wikipedia admins |
+| **Disclosure requirements** | Mandatory AI use declaration in edit summaries | Wikipedia community |
+| **<EntityLink id="content-authentication">Content authentication</EntityLink> (C2PA)** | Cryptographic provenance tracking for digital content | Coalition of 200+ organizations |
+| **<EntityLink id="provenance-tracing">Provenance tracing</EntityLink>** | Track claim origins and evidence chains | Research-stage infrastructure |
+| **RAG from human sources** | Ground AI in verified human-written knowledge | <EntityLink id="stampy-aisafety-info">Stampy</EntityLink>, <EntityLink id="elicit">Elicit</EntityLink>, NotebookLM |
+| **Human-in-the-loop review** | Require human verification of all AI outputs | <EntityLink id="longterm-wiki">Longterm Wiki</EntityLink> pipeline |
+| **Data provenance for training** | Separate human-written from AI-generated training data | Research-stage |
+| **Enterprise partnerships** | AI companies fund Wikipedia sustainability | Wikimedia Foundation (2026) |
+| **Reducing wiki bias** | Address existing biases that AI amplifies | Wikimedia Diff (Feb 2026) initiative |
+
+---
+
+## Implications for AI Safety Knowledge Infrastructure
+
+### Wikipedia as Epistemic Foundation
+
+AI safety research depends on Wikipedia in multiple ways:
+
+1. **LLM quality**: Researchers use LLMs trained on Wikipedia. If Wikipedia's quality degrades from AI contamination, the tools researchers use become less reliable.
+2. **Public understanding**: Wikipedia articles on AI safety topics shape public discourse and policy. Inaccurate AI-generated content about <EntityLink id="alignment">AI alignment</EntityLink>, <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>, or other risks could distort public understanding.
+3. **Training data**: AI safety datasets (like <EntityLink id="stampy-aisafety-info">Stampy's</EntityLink> Alignment Research Dataset) draw partly from Wikipedia and could be contaminated.
+
+### Lessons for AI Safety Wikis
+
+| Lesson from Wikipedia | Application to AI Safety Knowledge |
+|----------------------|-------------------------------------|
+| **Volunteer model is fragile** | AI safety wikis need sustainable funding, not just volunteer labor |
+| **Detection arms race is unwinnable** | Focus on provenance and human review rather than AI detection |
+| **AI self-review doesn't work** | Don't use the same AI to generate and verify content (cf. <EntityLink id="grokipedia">Grokipedia</EntityLink>) |
+| **Community resistance matters** | Wikipedia editors' resistance to AI content preserved quality standards |
+| **Transparency enables trust** | Clear labeling of human vs. AI-generated content builds credibility |
+| **Scale creates vulnerability** | Larger knowledge bases are harder to protect from AI contamination |
+
+### The Broader Epistemic Stakes
+
+Wikipedia's struggle with AI content is a microcosm of a broader challenge for epistemic infrastructure. If the world's most successful open knowledge project—with decades of community norms, millions of volunteer hours, and proven governance structures—struggles to maintain quality in the face of AI content, the challenge for newer, smaller projects is even greater. AI safety knowledge projects should study Wikipedia's experience closely and build defenses proactively rather than reactively.
+
+---
+
+## Key Questions
+
+<KeyQuestions
+  questions={[
+    "Can Wikipedia's volunteer model survive the combined pressure of declining traffic, AI content infiltration, and rising scraping costs?",
+    "Will the detection arms race between AI content generators and WikiProject AI Cleanup converge or diverge?",
+    "How much of Wikipedia's content will be AI-generated within 5 years, and what quality impact will this have?",
+    "Should Wikipedia embrace controlled AI assistance (like its halted Simple Summaries experiment) rather than fighting it?",
+    "What would a sustainable funding model for human-curated knowledge bases look like in an AI-dominated information landscape?",
+    "How can AI safety knowledge projects avoid the model collapse feedback loop while still using LLMs for efficiency?"
+  ]}
+/>
+
+## External Links
+
+- [Wikipedia: Large Language Models (policy)](https://en.wikipedia.org/wiki/Wikipedia:Large_language_models)
+- [Wikipedia: Case Against LLM-Generated Articles](https://en.wikipedia.org/wiki/Wikipedia:Case_against_LLM-generated_articles)
+- [Wikipedia: Signs of AI Writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
+- [WikiProject AI Cleanup](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_AI_Cleanup)
+- [Wikimedia AI Strategy](https://wikimediafoundation.org/news/2025/04/30/our-new-ai-strategy-puts-wikipedias-humans-first/)
+- [Wikimedia AI Partnerships (Jan 2026)](https://techcrunch.com/2026/01/15/wikimedia-foundation-announces-new-ai-partnerships-with-amazon-meta-microsoft-perplexity-and-others/)
+- [Model Collapse - Nature (2024)](https://www.nature.com/articles/s41586-024-07566-y)
+- [Wikipedia at 25 - Scientific American](https://www.scientificamerican.com/article/at-25-wikipedia-now-faces-its-most-existential-threat-generative-a-i/)
+
+<Backlinks />

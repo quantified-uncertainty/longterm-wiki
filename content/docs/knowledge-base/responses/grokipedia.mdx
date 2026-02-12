@@ -1,0 +1,163 @@
+---
+title: Grokipedia
+description: xAI's AI-generated encyclopedia launched October 2025, growing from 800K to 6M+ articles in three months. Multiple independent reviews (Wired, NBC News, PolitiFact) documented right-leaning political bias, scientific inaccuracies, and verbatim Wikipedia copying. Articles cannot be directly edited by users. Positioned as a Wikipedia alternative but fundamentally dependent on Wikipedia's human-curated content as training data.
+sidebar:
+  order: 10
+lastEdited: "2026-02-12"
+importance: 42
+update_frequency: 30
+clusters:
+  - epistemics
+  - ai-safety
+subcategory: epistemic-tools-tools
+---
+import {EntityLink, Backlinks, KeyQuestions, Mermaid} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Scale** | Massive | 800K articles at launch (Oct 2025); 6M+ by Jan 2026, approaching Wikipedia's ~7.1M English articles |
+| **Growth** | Unprecedented | Google clicks: 19/month (Nov 2025) to 3.2M/month (Jan 2026) |
+| **Quality** | Low | Right-leaning bias, scientific inaccuracies, pseudoscience documented by multiple outlets |
+| **Editorial Model** | AI-only | No direct user editing; users suggest corrections reviewed by Grok |
+| **Independence** | Low | Depends on Wikipedia as training data; copies content verbatim in some cases |
+| **Epistemic Reliability** | Poor | No peer review, no editorial board, no transparent sourcing methodology |
+
+## Overview
+
+Grokipedia is an AI-generated encyclopedia created by xAI (Elon Musk's AI company), launched on October 27, 2025. It is the most prominent attempt to create a fully AI-generated alternative to Wikipedia, using the Grok LLM to produce articles at unprecedented scale—growing from approximately 800,000 articles at launch to over 6 million by January 2026.
+
+The project represents a significant test case for AI-generated <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink>. While its scale demonstrates the raw production capability of LLMs, the documented quality problems—political bias, scientific inaccuracies, verbatim copying from Wikipedia—illustrate the gap between quantity and reliability in AI-generated knowledge. Grokipedia's experience is particularly instructive for anyone building AI-assisted knowledge systems, including projects in the AI safety space.
+
+---
+
+## Project Details
+
+| Attribute | Details |
+|-----------|---------|
+| **Launch date** | October 27, 2025 |
+| **Creator** | xAI (Elon Musk) |
+| **Underlying model** | Grok LLM |
+| **Articles at launch** | ~800,000 |
+| **Articles (Jan 2026)** | 6+ million |
+| **Google traffic** | 19 clicks/month (Nov 2025) → 3.2M clicks/month (Jan 2026) |
+| **Editing** | Users cannot directly edit; can suggest corrections via logged-in accounts, reviewed by Grok |
+| **License** | "X Community License" (non-commercial/research) for AI-generated content; CC BY-SA for Wikipedia-sourced articles |
+| **Platform** | Integrated with X (formerly Twitter) ecosystem |
+
+---
+
+## Content Generation Approach
+
+Grokipedia articles are generated through two primary methods:
+
+1. **Grok LLM generation**: The AI produces articles from its training data, which includes Wikipedia and other web sources
+2. **Wikipedia forking**: Some articles are copied or adapted from Wikipedia, sometimes with modifications and sometimes verbatim
+
+Articles cannot be directly edited by users. Instead, logged-in users can submit correction suggestions that are reviewed by Grok itself—creating a system where the same AI that generated potentially inaccurate content also serves as the quality gate for corrections.
+
+---
+
+## Documented Quality Concerns
+
+Multiple independent outlets have reviewed Grokipedia content and found systematic problems:
+
+### Political Bias
+
+| Source | Finding |
+|--------|---------|
+| **Wired** | Documented right-leaning bias across political topics |
+| **NBC News** | Found systematic bias in coverage of political figures and events |
+| **The Guardian** | Identified partisan framing in articles on contested topics |
+| **The Atlantic** | Reported biased treatment of political and cultural subjects |
+| **PolitiFact** | Fact-checked specific claims and found political bias |
+
+### Factual Accuracy
+
+| Issue | Examples |
+|-------|---------|
+| **Scientific inaccuracies** | Unsourced or inaccurate claims on vaccines, climate change, and race |
+| **Selective omissions** | Musk's own Grokipedia entry omits controversial incidents included in his Wikipedia article |
+| **Pseudoscience** | Articles promoting conspiracy theories and pseudoscientific claims |
+| **Fake references** | Citations to sources that don't exist or don't support the claimed facts |
+
+### Wikipedia Content Issues
+
+| Issue | Evidence |
+|-------|---------|
+| **Verbatim copying** | Forbes found multiple articles copied word-for-word from Wikipedia |
+| **Altered copies** | Some Wikipedia content modified in ways that introduced bias or inaccuracies |
+| **License ambiguity** | AI-generated content uses "X Community License" (non-commercial); Wikipedia-sourced content carries CC BY-SA, but boundaries between the two are unclear |
+
+---
+
+## The Wikipedia Dependency
+
+Grokipedia has a fundamentally paradoxical relationship with Wikipedia: it positions itself as a competitor and alternative while depending on Wikipedia as its primary knowledge source.
+
+Jimmy Wales responded to Grokipedia's launch by saying he didn't have "high expectations" as LLMs "weren't sophisticated enough." The Wikimedia Foundation stated that "this human-created knowledge is what AI companies rely on to generate content; even Grokipedia needs Wikipedia to exist."
+
+This dependency illustrates a broader pattern in AI-generated content: systems that produce content at scale are typically parasitic on human-curated knowledge bases, using them as training data while potentially undermining the communities and incentive structures that maintain them. See <EntityLink id="wikipedia-and-ai">Wikipedia and AI Content</EntityLink> for detailed analysis of how this dynamic affects Wikipedia's sustainability.
+
+---
+
+## Comparison with Other Knowledge Platforms
+
+| Platform | Content Source | Editing Model | Quality Control | Scale |
+|----------|---------------|---------------|-----------------|-------|
+| **Grokipedia** | AI-generated + Wikipedia forks | No direct editing; AI reviews suggestions | Grok self-review | 6M+ articles |
+| **Wikipedia** | Human-written | Open editing with community review | Editorial policies, peer review, WikiProject AI Cleanup | 7.1M English articles |
+| **<EntityLink id="stampy-aisafety-info">Stampy / AISafety.info</EntityLink>** | Human-written + RAG chatbot | Community + fellowship editing | PageRank-style voting, human review | 280+ answers |
+| **<EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>** | AI-assisted pipeline, human editorial | Editorial control | Multi-step validation, quality scoring | ~625 pages |
+| **Perplexity Pages** | AI-researched, user-reviewed | User publishes after review | Citation-first, user oversight | Growing library |
+
+---
+
+## Implications for AI Safety
+
+### As a Case Study
+
+Grokipedia serves as a concrete case study for what happens when AI-generated content is deployed at scale without robust quality controls:
+
+- **Bias amplification**: Training data biases are reflected and potentially amplified in generated content
+- **Quality floor**: Speed of generation far outpaces speed of verification, creating a large volume of unverified content
+- **Self-referential review**: Using the same AI to both generate and review content provides no independent quality check
+- **Parasitic dynamics**: Dependence on human-curated sources while potentially undermining those sources
+
+### Model Collapse Risk
+
+Grokipedia contributes to the broader model collapse risk: 6M+ AI-generated articles entering the web's content pool become potential training data for future AI models. Each generation of models trained partly on AI-generated content produces outputs with reduced variance—losing the "long tail" of nuanced, specialized knowledge that human-written content contains. This phenomenon, formally described in Nature (July 2024, Shumailov et al.), shows measurable degradation within 5 generations of recursive training.
+
+### Lessons for AI Safety Knowledge Projects
+
+| Lesson | Evidence from Grokipedia | Application |
+|--------|-------------------------|-------------|
+| **Human review is essential** | AI self-review catches few systematic biases | Maintain human editorial oversight |
+| **Source transparency matters** | Unclear sourcing makes verification impossible | Require explicit citations for all claims |
+| **Scale without quality harms trust** | 6M articles with known inaccuracies undermine credibility | Prioritize accuracy over article count |
+| **Independence from single actors** | Platform reflects creator's biases | Distribute editorial control |
+| **Provenance tracking** | Unclear which content is original vs. copied | Track human vs. AI authorship explicitly |
+
+---
+
+## Key Questions
+
+<KeyQuestions
+  questions={[
+    "Will Grokipedia's quality improve with model updates, or are the biases structural?",
+    "How much of Grokipedia's traffic comes from users treating it as authoritative vs. curiosity-driven visits?",
+    "Does Grokipedia's existence accelerate the model collapse problem by adding millions of AI-generated articles to the web?",
+    "What governance model would be needed for an AI-generated encyclopedia to achieve Wikipedia-level trust?",
+    "Will AI-generated encyclopedias converge toward accuracy over time, or will competitive pressures favor speed and engagement over quality?"
+  ]}
+/>
+
+## External Links
+
+- [Grokipedia](https://grokipedia.com/)
+- [Grokipedia - Wikipedia](https://en.wikipedia.org/wiki/Grokipedia)
+- [NBC News: Elon Musk Launches Grokipedia](https://www.nbcnews.com/tech/tech-news/elon-musk-launches-grokipedia-alternative-woke-wikipedia-rcna240171)
+- [CNBC: Grokipedia Goes Live](https://www.cnbc.com/2025/10/28/elon-musks-ai-wikipedia-competitor-grokipedia-goes-live.html)
+
+<Backlinks />
