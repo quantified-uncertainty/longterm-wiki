@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface InfoBoxDescriptionProps {
   description: string;
@@ -15,13 +15,29 @@ export function InfoBoxDescription({ description }: InfoBoxDescriptionProps) {
   const [isClamped, setIsClamped] = useState(false);
   const textRef = useRef<HTMLParagraphElement>(null);
 
-  useEffect(() => {
+  const checkOverflow = useCallback(() => {
     const el = textRef.current;
     if (el) {
-      // scrollHeight > clientHeight means text overflows the line-clamp
       setIsClamped(el.scrollHeight > el.clientHeight + 1);
     }
-  }, [description]);
+  }, []);
+
+  useEffect(() => {
+    checkOverflow();
+
+    // Re-check after fonts finish loading (line heights may change)
+    if (typeof document !== "undefined" && document.fonts?.ready) {
+      document.fonts.ready.then(checkOverflow);
+    }
+
+    // Re-check on resize (InfoBox width can change between mobile/desktop)
+    const el = textRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(checkOverflow);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [description, checkOverflow]);
 
   return (
     <div className="px-4 py-2.5 border-b border-border">

@@ -6,6 +6,7 @@ import {
   CONTENT_FORMAT_INFO,
   type ContentFormat,
 } from "@/lib/page-types";
+import type { StructuredSummary } from "@/data";
 import styles from "@/components/wiki/tooltip.module.css";
 
 // ============================================================================
@@ -35,12 +36,6 @@ interface PageIssues {
       similarity: number;
     }>;
   };
-}
-
-export interface StructuredSummary {
-  oneLiner: string;
-  keyPoints: string[];
-  bottomLine: string;
 }
 
 export interface PageStatusProps {

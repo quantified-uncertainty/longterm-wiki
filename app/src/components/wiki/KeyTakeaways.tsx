@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Lightbulb } from "lucide-react";
 
 interface KeyTakeawaysProps {
   children?: ReactNode;
@@ -22,20 +23,7 @@ export function KeyTakeaways({ children, title }: KeyTakeawaysProps) {
   return (
     <div className="my-6 rounded-lg border border-indigo-500/20 bg-indigo-500/[0.04] px-5 py-4 text-[0.9rem] [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
       <div className="flex items-center gap-2 mb-3">
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          className="text-indigo-500 shrink-0"
-        >
-          <circle cx="8" cy="6" r="4" />
-          <line x1="6" y1="12" x2="10" y2="12" strokeLinecap="round" />
-          <line x1="6.5" y1="14" x2="9.5" y2="14" strokeLinecap="round" />
-          <line x1="8" y1="10" x2="8" y2="12" />
-        </svg>
+        <Lightbulb size={16} className="text-indigo-500 shrink-0" />
         <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
           {title || "Key Takeaways"}
         </span>
