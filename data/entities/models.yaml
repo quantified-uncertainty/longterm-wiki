@@ -2208,6 +2208,35 @@
     - robustness
   lastUpdated: 2025-12
 
+- id: projecting-compute-spending
+  type: model
+  title: Projecting Compute Spending
+  description: >-
+    Analysis of hyperscaler AI infrastructure capital expenditure, with $700B+ planned for 2026 across six major
+    companies. Examines spending projections through 2030, funding mechanisms, supply chain dynamics, and economic
+    conditions required to justify investments.
+  customFields:
+    - label: Model Type
+      value: Economic Analysis
+    - label: Scope
+      value: AI Infrastructure Investment
+    - label: Key Finding
+      value: $700B+ planned capex in 2026 requires $1T annual AI revenue for 10% returns
+  relatedEntries:
+    - id: compute-governance
+      type: concept
+      relationship: related
+    - id: racing-dynamics
+      type: risk
+      relationship: related
+  tags:
+    - compute
+    - infrastructure
+    - capex
+    - economics
+    - ai-investment
+  lastUpdated: 2026-02
+
 # === Auto-generated stubs for pages missing entities ===
 - id: longtermwiki-impact
   type: model
