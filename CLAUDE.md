@@ -107,10 +107,24 @@ pnpm build                                        # 4. Full Next.js build (catch
 All four must succeed before pushing. If any fail, fix the issue first.
 
 ### After pushing: confirm CI is green
-1. Check the PR's check status on GitHub (use `gh pr checks` or ask the user for a screenshot)
+1. Check CI status using the GitHub API (`gh` is not installed; use `curl` instead):
+```bash
+# Get the HEAD sha
+SHA=$(git rev-parse HEAD)
+# Query check runs (requires GITHUB_TOKEN in env)
+curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/commits/$SHA/check-runs" \
+  | python3 -c "
+import sys, json; data = json.load(sys.stdin)
+for r in data.get('check_runs', []):
+    print(f\"  {r['name']:40s} {r['status']:12s} {r.get('conclusion') or '(pending)'}\")
+print(f\"Total: {data['total_count']} checks\")
+"
+```
 2. **Do not say "CI should pass" — wait for actual confirmation**
-3. If checks fail, investigate the failure, fix locally, and push again
-4. Do not consider work complete until CI is green
+3. If checks show `queued` or `in_progress`, wait 30-60s and poll again
+4. If checks fail, investigate the failure, fix locally, and push again
+5. Do not consider work complete until CI is green
 
 ### CI jobs
 - **build-and-test**: Builds the app and runs vitest (blocking)
