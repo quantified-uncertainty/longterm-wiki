@@ -156,63 +156,88 @@ function scanContentEntityLinks(pages, entityMap) {
 }
 
 /**
- * Compute suggested related pages for each entity using multiple signals:
- * - Tag overlap (weighted by tag specificity)
- * - Content similarity (from redundancy scores)
- * - Name/prefix matching (e.g. "anthropic" → "anthropic-ipo")
+ * Compute a bidirectional related-pages graph combining all signals.
+ * Every connection is symmetric: if A relates to B, B relates to A.
  *
- * Excludes entities already in relatedEntries or backlinks.
- * Returns: entityId -> array of { id, type, title, score }
+ * Signals (from strongest to weakest):
+ *   1. Explicit YAML relatedEntries  (weight 10)
+ *   2. Name/prefix matching          (weight 6)
+ *   3. Content EntityLinks            (weight 5)
+ *   4. Content similarity/redundancy  (weight 0–3, scaled by similarity)
+ *   5. Shared tags                    (weight varies by specificity)
+ *
+ * Returns: entityId -> sorted array of { id, type, title, score }
  */
-function computeSuggestedRelated(entities, pages, backlinks, tagIndex) {
+function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
   const entityMap = new Map(entities.map(e => [e.id, e]));
   const pageMap = new Map(pages.map(p => [p.id, p]));
-  const suggested = {};
 
+  // Accumulator: graph[entityId] = Map<relatedId, score>
+  const graph = {};
+
+  function addEdge(a, b, weight) {
+    if (a === b) return;
+    for (const [from, to] of [[a, b], [b, a]]) {
+      if (!graph[from]) graph[from] = new Map();
+      graph[from].set(to, (graph[from].get(to) || 0) + weight);
+    }
+  }
+
+  // 1. Explicit YAML relatedEntries (strongest signal)
   for (const entity of entities) {
-    const scores = new Map();
+    if (entity.relatedEntries) {
+      for (const ref of entity.relatedEntries) {
+        addEdge(entity.id, ref.id, 10);
+      }
+    }
+  }
 
-    // 1. Tag overlap — entities sharing tags, weighted by tag specificity
-    if (entity.tags?.length) {
-      for (const tag of entity.tags) {
-        const tagEntities = tagIndex[tag] || [];
-        // Rarer tags are more informative
-        const specificity = 1 / Math.log2(tagEntities.length + 2);
-        for (const te of tagEntities) {
-          if (te.id === entity.id) continue;
-          scores.set(te.id, (scores.get(te.id) || 0) + specificity * 3);
+  // 2. Name/prefix matching (e.g. "anthropic" ↔ "anthropic-ipo")
+  for (let i = 0; i < entities.length; i++) {
+    for (let j = i + 1; j < entities.length; j++) {
+      const a = entities[i].id, b = entities[j].id;
+      if (b.startsWith(a + '-') || a.startsWith(b + '-')) {
+        addEdge(a, b, 6);
+      }
+    }
+  }
+
+  // 3. Content EntityLinks (directional in content, but stored bidirectionally)
+  for (const [targetId, sources] of Object.entries(contentInbound)) {
+    for (const source of sources) {
+      addEdge(source.id, targetId, 5);
+    }
+  }
+
+  // 4. Content similarity from redundancy scores
+  for (const page of pages) {
+    if (!page.redundancy?.similarPages) continue;
+    for (const sp of page.redundancy.similarPages) {
+      addEdge(page.id, sp.id, (sp.similarity / 100) * 3);
+    }
+  }
+
+  // 5. Shared tags — weighted by specificity (rarer tags are more informative)
+  for (const entity of entities) {
+    if (!entity.tags?.length) continue;
+    for (const tag of entity.tags) {
+      const tagEntities = tagIndex[tag] || [];
+      const specificity = 1 / Math.log2(tagEntities.length + 2);
+      for (const te of tagEntities) {
+        if (te.id !== entity.id) {
+          addEdge(entity.id, te.id, specificity * 2);
         }
       }
     }
+  }
 
-    // 2. Content similarity (from page redundancy scores)
-    const page = pageMap.get(entity.id);
-    if (page?.redundancy?.similarPages) {
-      for (const sp of page.redundancy.similarPages) {
-        if (sp.id === entity.id) continue;
-        scores.set(sp.id, (scores.get(sp.id) || 0) + (sp.similarity / 100) * 3);
-      }
-    }
-
-    // 3. Name/prefix matching — child pages are strongly related
-    for (const other of entities) {
-      if (other.id === entity.id) continue;
-      if (other.id.startsWith(entity.id + '-') || entity.id.startsWith(other.id + '-')) {
-        scores.set(other.id, (scores.get(other.id) || 0) + 4);
-      }
-    }
-
-    // Filter out entities already in explicit relatedEntries or backlinks
-    const existingIds = new Set([
-      ...(entity.relatedEntries?.map(r => r.id) || []),
-      ...(backlinks[entity.id]?.map(b => b.id) || []),
-    ]);
-
-    const top = [...scores.entries()]
-      .filter(([id]) => !existingIds.has(id))
+  // Convert to output: sorted by score, capped at top 20 per entity
+  const output = {};
+  for (const [entityId, neighbors] of Object.entries(graph)) {
+    const sorted = [...neighbors.entries()]
       .filter(([, score]) => score >= 1.0)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 10)
+      .slice(0, 20)
       .map(([id, score]) => {
         const e = entityMap.get(id);
         return {
@@ -223,12 +248,12 @@ function computeSuggestedRelated(entities, pages, backlinks, tagIndex) {
         };
       });
 
-    if (top.length > 0) {
-      suggested[entity.id] = top;
+    if (sorted.length > 0) {
+      output[entityId] = sorted;
     }
   }
 
-  return suggested;
+  return output;
 }
 
 /**
@@ -686,12 +711,12 @@ function main() {
   console.log(`  redundancy: ${redundancyPairs.length} similar pairs found`);
 
   // =========================================================================
-  // SUGGESTED RELATED — compute additional related pages from tags,
-  // content similarity, and name-prefix matching.
+  // RELATED GRAPH — unified bidirectional graph combining all signals:
+  // explicit YAML, content EntityLinks, tags, similarity, name-prefix.
   // =========================================================================
-  const suggestedRelated = computeSuggestedRelated(entities, pages, backlinks, tagIndex);
-  database.suggestedRelated = suggestedRelated;
-  console.log(`  suggestedRelated: ${Object.keys(suggestedRelated).length} entities have suggestions`);
+  const relatedGraph = computeRelatedGraph(entities, pages, contentInbound, tagIndex);
+  database.relatedGraph = relatedGraph;
+  console.log(`  relatedGraph: ${Object.keys(relatedGraph).length} entities have connections`);
 
   database.pages = pages;
 
@@ -811,7 +836,7 @@ function main() {
   writeFileSync(join(OUTPUT_DIR, 'stats.json'), JSON.stringify(stats, null, 2));
   writeFileSync(join(OUTPUT_DIR, 'pathRegistry.json'), JSON.stringify(pathRegistry, null, 2));
   writeFileSync(join(OUTPUT_DIR, 'pages.json'), JSON.stringify(pages, null, 2));
-  writeFileSync(join(OUTPUT_DIR, 'suggestedRelated.json'), JSON.stringify(suggestedRelated, null, 2));
+  writeFileSync(join(OUTPUT_DIR, 'relatedGraph.json'), JSON.stringify(relatedGraph, null, 2));
 
   console.log('✓ Written individual JSON files');
   console.log('✓ Written derived data files (backlinks, tagIndex, stats, pathRegistry)');

@@ -1,22 +1,11 @@
 import Link from "next/link";
-import { getBacklinksFor, getEntityById, getEntityHref, getSuggestedRelatedFor } from "@/data";
-import type { Entity } from "@/data";
+import { getRelatedGraphFor } from "@/data";
 
 interface RelatedPageItem {
   id: string;
   title: string;
   href: string;
   type: string;
-  relationship?: string;
-}
-
-function dedup(items: RelatedPageItem[]): RelatedPageItem[] {
-  const seen = new Set<string>();
-  return items.filter((item) => {
-    if (seen.has(item.id)) return false;
-    seen.add(item.id);
-    return true;
-  });
 }
 
 function PageGrid({ items, max = 20 }: { items: RelatedPageItem[]; max?: number }) {
@@ -48,83 +37,23 @@ function PageGrid({ items, max = 20 }: { items: RelatedPageItem[]; max?: number 
 
 export function RelatedPages({
   entityId,
-  entity,
 }: {
   entityId: string;
-  entity?: Entity | null;
+  entity?: unknown;
 }) {
-  // Explicit related entries
-  const relatedItems: RelatedPageItem[] = [];
-  if (entity?.relatedEntries) {
-    for (const entry of entity.relatedEntries) {
-      const related = getEntityById(entry.id);
-      relatedItems.push({
-        id: entry.id,
-        title: related?.title || entry.id.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
-        href: getEntityHref(entry.id, entry.type),
-        type: entry.type,
-        relationship: entry.relationship,
-      });
-    }
-  }
+  const items: RelatedPageItem[] = getRelatedGraphFor(entityId).map((entry) => ({
+    id: entry.id,
+    title: entry.title,
+    href: entry.href,
+    type: entry.type,
+  }));
 
-  // Backlinks (pages that reference this page via relatedEntries or EntityLinks)
-  const backlinkItems: RelatedPageItem[] = [];
-  const relatedIds = new Set(relatedItems.map((r) => r.id));
-  for (const bl of getBacklinksFor(entityId)) {
-    if (!relatedIds.has(bl.id)) {
-      backlinkItems.push({
-        id: bl.id,
-        title: bl.title,
-        href: bl.href,
-        type: bl.type,
-        relationship: bl.relationship,
-      });
-    }
-  }
-
-  // Suggested related (from tags, content similarity, name-prefix matching)
-  const allShownIds = new Set([
-    ...relatedItems.map((r) => r.id),
-    ...backlinkItems.map((b) => b.id),
-  ]);
-  const suggestedItems: RelatedPageItem[] = [];
-  for (const entry of getSuggestedRelatedFor(entityId)) {
-    if (!allShownIds.has(entry.id)) {
-      suggestedItems.push({
-        id: entry.id,
-        title: entry.title,
-        href: entry.href,
-        type: entry.type,
-      });
-    }
-  }
-
-  const uniqueRelated = dedup(relatedItems);
-  const uniqueBacklinks = dedup(backlinkItems);
-  const uniqueSuggested = dedup(suggestedItems);
-  if (uniqueRelated.length === 0 && uniqueBacklinks.length === 0 && uniqueSuggested.length === 0) return null;
+  if (items.length === 0) return null;
 
   return (
     <section className="mt-12 pt-6 border-t border-border">
-      {uniqueRelated.length > 0 && (
-        <>
-          <h2 className="text-lg font-semibold mb-4">Related Pages</h2>
-          <PageGrid items={uniqueRelated} />
-        </>
-      )}
-      {uniqueBacklinks.length > 0 && (
-        <div className={uniqueRelated.length > 0 ? "mt-8" : ""}>
-          <h2 className="text-lg font-semibold mb-4">Backlinks</h2>
-          <PageGrid items={uniqueBacklinks} />
-        </div>
-      )}
-      {uniqueSuggested.length > 0 && (
-        <div className={uniqueRelated.length > 0 || uniqueBacklinks.length > 0 ? "mt-8" : ""}>
-          <h2 className="text-lg font-semibold mb-4">See Also</h2>
-          <PageGrid items={uniqueSuggested} />
-        </div>
-      )}
+      <h2 className="text-lg font-semibold mb-4">Related Pages</h2>
+      <PageGrid items={items} />
     </section>
   );
 }

@@ -81,7 +81,7 @@ interface RawEntity {
   };
 }
 
-export interface SuggestedRelatedEntry {
+export interface RelatedGraphEntry {
   id: string;
   type: string;
   title: string;
@@ -95,7 +95,7 @@ interface DatabaseShape {
   experts: Expert[];
   organizations: Organization[];
   backlinks: Record<string, BacklinkEntry[]>;
-  suggestedRelated: Record<string, SuggestedRelatedEntry[]>;
+  relatedGraph: Record<string, RelatedGraphEntry[]>;
   pathRegistry: Record<string, string>;
   idRegistry: IdRegistryMaps;
   pages: Page[];
@@ -547,10 +547,10 @@ export function getBacklinksFor(
 }
 
 // ============================================================================
-// SUGGESTED RELATED
+// RELATED GRAPH (bidirectional, multi-signal)
 // ============================================================================
 
-export function getSuggestedRelatedFor(
+export function getRelatedGraphFor(
   entityId: string
 ): Array<{
   id: string;
@@ -560,7 +560,7 @@ export function getSuggestedRelatedFor(
   score: number;
 }> {
   const db = getDatabase();
-  const entries = db.suggestedRelated?.[entityId] || [];
+  const entries = db.relatedGraph?.[entityId] || [];
   return entries.map((entry) => ({
     ...entry,
     href: getEntityHref(entry.id, entry.type),
