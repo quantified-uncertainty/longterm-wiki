@@ -668,6 +668,15 @@ flowchart TD
 - [ ] Ratings are justified by content quality
 - [ ] Ratings are consistent with similar models
 
+### Content Consistency
+- [ ] Every simplifying assumption is explicitly flagged as such (with a pointer to Limitations), never asserted as fact
+- [ ] Every [0, 1] or other numeric scale has grounded anchors defining what the endpoints mean — write anchors *before* writing estimates that use the scale
+- [ ] Rankings with overlapping ranges say "roughly ordered by median" or "suggestive, not definitive" — no definitive ordinal rankings when ranges overlap
+- [ ] Option value of delay is addressed (additional time lets us learn whether alignment is hard or easy)
+- [ ] Racing/coordination effects are addressed (does unilateral action just shift activity elsewhere?)
+- [ ] Recursive dynamics are addressed where relevant (e.g. AI accelerating safety research) — goes beyond the structural feedback loops in Methodology to check for domain-specific self-referential dynamics
+- [ ] Effects are distinguished as qualitatively different where appropriate, not just quantitatively shifted
+
 ### Common Issues to Fix
 
 | Issue | Fix |

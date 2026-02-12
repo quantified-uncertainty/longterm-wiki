@@ -2,6 +2,8 @@
 
 AI safety wiki with ~625 MDX pages, Next.js frontend, YAML data layer, and CLI tooling.
 
+**Keep CLAUDE.md as a routing document** — brief instructions and pointers to detailed guides. Detailed style guidance, checklists, and templates live in `content/docs/internal/` (see Page templates below). Do not expand CLAUDE.md with long explanations; instead add detail to the appropriate internal style guide and reference it from here.
+
 ## Quick Reference
 
 ```bash
@@ -85,6 +87,17 @@ pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-on
 pnpm crux validate                  # Full validation (advisory)
 ```
 **The `unified --rules=...` check is the blocking CI gate.** Always run it before committing. Use `--fix` to auto-fix issues.
+
+### Self-review checklist (before committing any page)
+
+Re-read the full page and verify:
+
+1. **Links resolve**: Every `<EntityLink id="X">` has a matching `- id: X` in `data/entities/*.yaml`
+2. **Prose matches data**: Claims in prose agree with numbers in tables/charts on the same page
+3. **Units are consistent**: Same unit throughout (don't mix years in overview with months in tables)
+4. **Rendering works**: For `\$`, `^`, `{}` or LaTeX-like notation, think through MDX rendering. When in doubt, use plain text.
+
+For model/analysis pages, also run the full review checklist in `content/docs/internal/models.mdx` (Part 7).
 
 ### CRITICAL: If the Crux pipeline fails, FIX THE PIPELINE — do NOT bypass it
 
