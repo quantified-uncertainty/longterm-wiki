@@ -14,7 +14,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
     script: 'authoring/page-improver.ts',
     description: 'Improve an existing page with AI assistance',
-    passthrough: ['ci', 'tier', 'directions', 'dryRun'],
+    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'triage'],
     positional: true,
   },
   create: {

@@ -554,6 +554,51 @@ async function executeScrySearch(query: string, table: string = 'mv_eaforum_post
   }
 }
 
+// Compute actual metrics from MDX content and sync into frontmatter
+function syncFrontmatterMetrics(content: string): string {
+  // Split frontmatter from body
+  const fmMatch = content.match(/^(---\n[\s\S]*?\n---)\n([\s\S]*)$/);
+  if (!fmMatch) return content;
+  let frontmatter = fmMatch[1];
+  const body = fmMatch[2];
+
+  // Count words in body (excluding MDX components, imports, frontmatter)
+  const textOnly = body
+    .replace(/^import\s.*/gm, '')              // Remove imports
+    .replace(/<[^>]+\/>/g, '')                  // Remove self-closing components
+    .replace(/<[A-Z]\w+[^>]*>[\s\S]*?<\/[A-Z]\w+>/g, '') // Remove component blocks
+    .replace(/\[.*?\]\(.*?\)/g, (m) => m.replace(/\(.*?\)/, '')) // Keep link text only
+    .replace(/[|*#`_\-\[\]>]/g, ' ')           // Remove markdown syntax
+    .replace(/\^\[\d+\]/g, '')                  // Remove footnote refs
+    .replace(/\[\^\d+\]:/g, '');                // Remove footnote defs
+  const wordCount = textOnly.split(/\s+/).filter(w => w.length > 0).length;
+
+  // Count footnote citations ([^N] references in body, not definitions)
+  const citationRefs = new Set(body.match(/\[\^\d+\]/g) || []);
+  const citations = citationRefs.size;
+
+  // Count markdown tables (lines starting with |)
+  const tableHeaderLines = (body.match(/^\|.*\|.*\|$/gm) || [])
+    .filter(line => !line.match(/^\|[\s\-:|]+\|$/)); // Exclude separator lines
+  // Each table has a header row; count unique tables by checking for separator after header
+  const tableSeparators = (body.match(/^\|[\s\-:|]+\|$/gm) || []);
+  const tables = tableSeparators.length;
+
+  // Count Mermaid diagrams
+  const diagrams = (body.match(/<Mermaid\s/g) || []).length;
+
+  // Update metrics in frontmatter
+  const metricsBlock = `metrics:\n  wordCount: ${wordCount}\n  citations: ${citations}\n  tables: ${tables}\n  diagrams: ${diagrams}`;
+  if (frontmatter.match(/^metrics:\s*\n(?:\s+\w+:\s*\d+\n?)*/m)) {
+    frontmatter = frontmatter.replace(
+      /^metrics:\s*\n(?:\s+\w+:\s*[\d.]+\n?)*/m,
+      metricsBlock
+    );
+  }
+
+  return frontmatter + '\n' + body;
+}
+
 // Phase: Analyze
 async function analyzePhase(page: PageData, directions: string, options: PipelineOptions): Promise<AnalysisResult> {
   log('analyze', 'Starting analysis');
@@ -903,6 +948,7 @@ async function validatePhase(page: PageData, improvedContent: string, options: P
 
   const filePath = getFilePath(page.path);
   const originalContent = fs.readFileSync(filePath, 'utf-8');
+  let fixedContent = improvedContent;
 
   // Write improved content to the actual file so validators check the new version
   fs.writeFileSync(filePath, improvedContent);
@@ -953,6 +999,53 @@ async function validatePhase(page: PageData, improvedContent: string, options: P
       }
     }
 
+    // Validate EntityLink IDs against known pages/entities
+    log('validate', 'Checking EntityLink IDs against registry...');
+    try {
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      const entityLinkIds = [...fileContent.matchAll(/<EntityLink\s+id="([^"]+)"/g)].map(m => m[1]);
+      if (entityLinkIds.length > 0) {
+        const pages = loadPages();
+        const pageIds = new Set(pages.map(p => p.id));
+        const invalidIds = entityLinkIds.filter(id => !pageIds.has(id));
+        if (invalidIds.length > 0) {
+          const uniqueInvalid = [...new Set(invalidIds)];
+          issues.quality.push({
+            rule: 'entitylink-registry',
+            count: uniqueInvalid.length,
+            output: `EntityLink IDs not found in pages registry: ${uniqueInvalid.join(', ')}`
+          });
+          log('validate', `  warn entitylink-registry: ${uniqueInvalid.length} unresolved ID(s): ${uniqueInvalid.join(', ')}`);
+        } else {
+          log('validate', `  ok entitylink-registry (${entityLinkIds.length} links verified)`);
+        }
+      } else {
+        log('validate', '  ok entitylink-registry (no EntityLinks)');
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      log('validate', `  ? entitylink-registry: check failed — ${error.message?.slice(0, 100)}`);
+    }
+
+    // Auto-fix escaping and formatting issues before final validation
+    log('validate', 'Running auto-fixes (escaping, markdown)...');
+    try {
+      execSync(
+        `${NODE_TSX} crux/crux.mjs fix escaping 2>&1`,
+        { cwd: ROOT, encoding: 'utf-8', timeout: 60000 }
+      );
+      execSync(
+        `${NODE_TSX} crux/crux.mjs fix markdown 2>&1`,
+        { cwd: ROOT, encoding: 'utf-8', timeout: 60000 }
+      );
+      // Re-read the auto-fixed content
+      fixedContent = fs.readFileSync(filePath, 'utf-8');
+      log('validate', '  ok auto-fixes applied');
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      log('validate', `  warn auto-fix failed: ${error.message?.slice(0, 100)}`);
+    }
+
     // Check MDX compilation
     log('validate', 'Checking MDX compilation...');
     try {
@@ -977,7 +1070,7 @@ async function validatePhase(page: PageData, improvedContent: string, options: P
   const hasCritical: boolean = issues.critical.length > 0;
   log('validate', `Complete (critical: ${issues.critical.length}, quality: ${issues.quality.length})`);
 
-  return { issues, hasCritical, improvedContent };
+  return { issues, hasCritical, improvedContent: fixedContent };
 }
 
 // Phase: Gap Fill (deep tier only)
@@ -1112,14 +1205,26 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
       case 'improve':
         improvedContent = await improvePhase(page, analysis!, research || { sources: [] }, directions, options);
+        // Sync frontmatter metrics (wordCount, citations, tables, diagrams) with actual content
+        improvedContent = syncFrontmatterMetrics(improvedContent);
+        // Warn about unverified citations in tiers without research
+        if (tier === 'polish' && !research?.sources?.length) {
+          const footnoteCount = new Set(improvedContent.match(/\[\^\d+\]/g) || []).size;
+          if (footnoteCount > 0) {
+            log('improve', `⚠ ${footnoteCount} footnote citations added without web research — citations are LLM-generated and should be verified`);
+          }
+        }
         break;
 
-      case 'validate':
+      case 'validate': {
         const validation = await validatePhase(page, improvedContent!, options);
+        // Use auto-fixed content from validate phase (escaping, markdown fixes)
+        improvedContent = validation.improvedContent;
         if (validation.hasCritical) {
           log('validate', 'Critical validation issues found - may need manual fixes');
         }
         break;
+      }
 
       case 'gap-fill':
         improvedContent = await gapFillPhase(page, improvedContent!, review || { valid: true, issues: [] }, options);
