@@ -79,8 +79,10 @@ Use `--grade` with `--apply` to auto-grade after improvement.
 ```bash
 pnpm crux fix escaping              # Auto-fix dollar signs, comparisons, tildes
 pnpm crux fix markdown              # Auto-fix list formatting, bold labels
-pnpm crux validate                  # Verify no errors introduced
+pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only  # MUST pass (blocking in CI)
+pnpm crux validate                  # Full validation (advisory)
 ```
+**The `unified --rules=...` check is the blocking CI gate.** Always run it before committing. Use `--fix` to auto-fix issues.
 
 ### If you must create a page manually
 Write the initial draft, then immediately run the improve pipeline on it:
@@ -88,6 +90,18 @@ Write the initial draft, then immediately run the improve pipeline on it:
 pnpm crux content improve <page-id> --tier=polish --apply
 ```
 This adds proper citations, fixes escaping, validates EntityLinks, and syncs frontmatter metrics.
+
+## CI Verification
+
+After pushing a branch or PR, always verify CI passes:
+1. Wait ~3-5 minutes for CI to complete
+2. Check the PR's check status on GitHub
+3. If checks fail, investigate the failure, fix locally, and push again
+4. Do not consider work complete until CI is green
+
+The CI runs two jobs:
+- **build-and-test**: Builds the app and runs vitest (blocking)
+- **validate**: Runs `pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only` (blocking), then the full validation suite (advisory/non-blocking)
 
 ## Key Conventions
 
