@@ -67,6 +67,8 @@ pnpm crux content create "Page Title" --tier=standard
 ```
 Tiers: `polish` (quick, ~$2-3), `standard` (with research, ~$5-8), `deep` (full research, ~$10-15)
 
+**API keys are in environment variables** (`process.env`), NOT in `.env` files. Check `env | grep -i API` to verify available keys before assuming they're missing. Required keys: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`. Optional: `FIRECRAWL_KEY`, `SCRY_API_KEY`.
+
 ### Improving an existing page
 ```bash
 pnpm crux content improve <page-id> --tier=polish --apply
@@ -91,15 +93,40 @@ pnpm crux content improve <page-id> --tier=polish --apply
 ```
 This adds proper citations, fixes escaping, validates EntityLinks, and syncs frontmatter metrics.
 
-## CI Verification
+## CI Verification — MANDATORY
 
-After pushing a branch or PR, always verify CI passes:
-1. Wait ~3-5 minutes for CI to complete
-2. Check the PR's check status on GitHub
-3. If checks fail, investigate the failure, fix locally, and push again
-4. Do not consider work complete until CI is green
+**Never assume CI will pass. Always verify.**
 
-The CI runs two jobs:
+### Before pushing: run CI checks locally
+```bash
+cd app && node scripts/build-data.mjs            # 1. Build data layer
+pnpm test                                         # 2. Run all tests (must be 0 failures)
+pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only  # 3. Blocking validation
+pnpm build                                        # 4. Full Next.js build (catches compile errors)
+```
+All four must succeed before pushing. If any fail, fix the issue first.
+
+### After pushing: confirm CI is green
+1. Check CI status using the GitHub API (`gh` is not installed; use `curl` instead):
+```bash
+# Get the HEAD sha
+SHA=$(git rev-parse HEAD)
+# Query check runs (requires GITHUB_TOKEN in env)
+curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/commits/$SHA/check-runs" \
+  | python3 -c "
+import sys, json; data = json.load(sys.stdin)
+for r in data.get('check_runs', []):
+    print(f\"  {r['name']:40s} {r['status']:12s} {r.get('conclusion') or '(pending)'}\")
+print(f\"Total: {data['total_count']} checks\")
+"
+```
+2. **Do not say "CI should pass" — wait for actual confirmation**
+3. If checks show `queued` or `in_progress`, wait 30-60s and poll again
+4. If checks fail, investigate the failure, fix locally, and push again
+5. Do not consider work complete until CI is green
+
+### CI jobs
 - **build-and-test**: Builds the app and runs vitest (blocking)
 - **validate**: Runs `pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only` (blocking), then the full validation suite (advisory/non-blocking)
 

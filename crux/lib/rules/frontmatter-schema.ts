@@ -6,6 +6,7 @@
 
 import { z } from 'zod';
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { ALL_ENTITY_TYPE_NAMES } from '../../../app/src/data/entity-type-names.ts';
 
 // Mirror the schema from content.config.ts
 const frontmatterSchema = z.object({
@@ -60,6 +61,7 @@ const frontmatterSchema = z.object({
   maturity: z.string().optional(),
   fullWidth: z.boolean().optional(),
   update_frequency: z.number().positive().optional(),
+  entityType: z.enum(ALL_ENTITY_TYPE_NAMES as unknown as [string, ...string[]]).optional(),
   entityId: z.string().optional(),
   roles: z.array(z.string()).optional(),
   pageTemplate: z.string().optional(),

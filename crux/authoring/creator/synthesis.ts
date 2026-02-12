@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
+import { inferEntityType } from '../../lib/category-entity-types.ts';
 
 interface LoadResultContext {
   loadResult: (topic: string, filename: string) => Record<string, unknown> | null;
@@ -59,7 +60,7 @@ interface SourceFileData {
   content: string;
 }
 
-export function getSynthesisPrompt(topic: string, quality: string, { loadResult }: LoadResultContext): string {
+export function getSynthesisPrompt(topic: string, quality: string, { loadResult }: LoadResultContext, destPath?: string | null): string {
   const researchData = loadResult(topic, 'perplexity-research.json') as ResearchData | null;
   const scryData = loadResult(topic, 'scry-research.json') as ScryData | null;
   const directionsData = loadResult(topic, 'directions.json') as DirectionsData | null;
@@ -223,7 +224,7 @@ Write the complete MDX article to: .claude/temp/page-creator/${topic.toLowerCase
 Include proper frontmatter:
 ---
 title: "${topic}"
-description: "..."
+description: "..."${destPath ? `\nentityType: "${inferEntityType(destPath) || 'concept'}"` : ''}
 importance: 50
 lastEdited: "${new Date().toISOString().split('T')[0]}"
 sidebar:
@@ -248,7 +249,7 @@ import {EntityLink, Backlinks, R, DataInfoBox, DataExternalLinks} from '@compone
 - <Backlinks />`;
 }
 
-export async function runSynthesis(topic: string, quality: string, { log, ROOT }: SynthesisContext): Promise<{ success: boolean; model: string; budget: number }> {
+export async function runSynthesis(topic: string, quality: string, { log, ROOT }: SynthesisContext, destPath?: string | null): Promise<{ success: boolean; model: string; budget: number }> {
   log('synthesis', `Generating article (${quality})...`);
 
   return new Promise((resolve, reject) => {
@@ -273,7 +274,7 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
       if (!fs.existsSync(filePath)) return null;
       const content = fs.readFileSync(filePath, 'utf-8');
       return f.endsWith('.json') ? JSON.parse(content) : content;
-    }});
+    }}, destPath);
 
     claude.stdin.write(prompt);
     claude.stdin.end();

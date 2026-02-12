@@ -1,0 +1,248 @@
+---
+title: AI-Assisted Knowledge Management
+description: Tools and platforms that use LLMs to help organizations and individuals create, maintain, and query knowledge bases and wikis. The ecosystem spans personal tools (Obsidian+AI, Notion AI), public knowledge graphs (Golden, Wikidata), source-grounded research assistants (NotebookLM, Perplexity Pages), and open-source RAG frameworks (LlamaIndex, Haystack), with implications for epistemic infrastructure and AI safety knowledge synthesis.
+sidebar:
+  order: 8
+lastEdited: "2026-02-12"
+importance: 45
+update_frequency: 30
+clusters:
+  - epistemics
+  - ai-safety
+subcategory: epistemic-tools-tools
+---
+import {EntityLink, Backlinks, KeyQuestions, Mermaid} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Market Maturity** | Rapidly evolving | Major platform releases in 2025-2026 (Notion 3.0, NotebookLM Ultra, Perplexity Pages) |
+| **Accuracy** | Varies widely | Source-grounded tools (NotebookLM) claim near-zero hallucination; general tools hallucinate frequently |
+| **Open Source Ecosystem** | Growing | LlamaIndex, Haystack, RAGFlow provide customizable pipelines |
+| **Cost** | \$0-100/month | Free tiers available; heavy AI usage can reach \$100+/month |
+| **Relevance to Epistemic Infrastructure** | High | These tools reshape how organizations build and maintain structured knowledge |
+| **AI Safety Application** | Direct | <EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>, <EntityLink id="stampy-aisafety-info">Stampy</EntityLink>, and similar projects use these approaches |
+
+## Overview
+
+AI-assisted knowledge management refers to the growing ecosystem of tools that use large language models to help individuals and organizations create, maintain, query, and synthesize knowledge bases. Unlike traditional wikis or note-taking tools that rely entirely on manual authoring, these systems use LLMs for tasks ranging from semantic search and auto-linking to full article generation and autonomous knowledge base maintenance.
+
+The space spans several categories: personal knowledge tools with AI plugins (Obsidian, Roam Research), team collaboration platforms with integrated AI (Notion, Coda), AI-native knowledge graphs (Golden.com), source-grounded research assistants (Google NotebookLM, Perplexity Pages), and open-source retrieval-augmented generation (RAG) frameworks that developers can use to build custom knowledge systems (LlamaIndex, Haystack).
+
+This ecosystem is directly relevant to <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink> for AI safety. Projects like the <EntityLink id="longterm-wiki">Longterm Wiki</EntityLink> and <EntityLink id="stampy-aisafety-info">Stampy / AISafety.info</EntityLink> already use LLM-assisted pipelines for content creation, grading, and synthesis. Understanding the broader landscape of AI knowledge management tools informs how such projects can be built more effectively and what quality/accuracy tradeoffs are involved.
+
+<Mermaid chart={`
+flowchart TD
+    subgraph PERSONAL["Personal Knowledge Tools"]
+        OBS[Obsidian + AI Plugins]
+        ROAM[Roam Research]
+        MEM[Mem.ai]
+    end
+
+    subgraph TEAM["Team Platforms"]
+        NOTION[Notion AI]
+        CODA[Coda AI]
+    end
+
+    subgraph PUBLIC["Public Knowledge Systems"]
+        GOLDEN[Golden.com]
+        PERPLEXITY[Perplexity Pages]
+        NOTEBOOK[Google NotebookLM]
+    end
+
+    subgraph INFRA["Open Source Infrastructure"]
+        LLAMA[LlamaIndex]
+        HAY[Haystack]
+        RAGFLOW[RAGFlow]
+    end
+
+    PERSONAL -->|"Individual researchers"| USE[Knowledge Creation]
+    TEAM -->|"Organizations"| USE
+    PUBLIC -->|"Public audiences"| USE
+    INFRA -->|"Custom deployments"| USE
+
+    style PERSONAL fill:#e3f2fd
+    style TEAM fill:#fff3e0
+    style PUBLIC fill:#e8f5e9
+    style INFRA fill:#f3e5f5
+`} />
+
+---
+
+## Personal Knowledge Tools with AI
+
+### Obsidian + AI Plugins
+
+Obsidian is an offline-first, Markdown-based note-taking tool with a rich plugin ecosystem. As of 2025, there are 86+ AI plugins with over 19,000 combined GitHub stars, transforming personal vaults into AI-powered knowledge bases.
+
+| Plugin | GitHub Stars | Approach | Key Feature |
+|--------|-------------|----------|-------------|
+| **Smart Connections** | ~4,400 | Local-first embeddings | Maps relationships between notes using AI embeddings; works entirely offline |
+| **Copilot for Obsidian** | ~5,800 | Cloud-based chat | "Vault Q&A" indexes all notes for semantic search; supports GPT-4, Claude |
+| **Notemd** | Newer | Auto-linking | Auto-generates wiki-links for key concepts, creates concept notes, performs web research |
+
+**Smart Connections** creates a local "map of meaning" using embeddings, showing related notes in real time without sending data to external servers. It ships a tiny embeddings model via transformers.js for fully local operation, though it also supports cloud models.
+
+**Copilot for Obsidian** provides a chat interface where users can "talk to their vault" in natural language. The AI searches relevant notes and provides summarized answers with links back to source material.
+
+**Practical considerations:** Initial setup for AI-enhanced Obsidian requires 3-5 hours. Monthly costs range from free (local models only) to \$20-100+ depending on cloud API usage. The core philosophical divide in the ecosystem is between local-first privacy (Smart Connections) and feature-rich cloud integration (Copilot).
+
+### Mem.ai
+
+Founded in 2019, Mem.ai is an AI-first knowledge platform that eliminates manual organization through intelligent tagging, automatic connections, and natural language search. Its "Temporal Context" feature tracks not just what users save but when and how they interact with information, surfacing time-relevant content. The Mem X AI assistant generates summaries and answers questions about stored content.
+
+### Roam Research
+
+Roam Research pioneered graph-database note-taking with bidirectional linking, favoring networked thought over hierarchical folders. Used primarily by academics and knowledge workers at \$15-20/month. Roam's philosophy emphasizes intentional knowledge-building over AI automation, though third-party integrations now add LLM capabilities.
+
+---
+
+## Team Knowledge Platforms
+
+### Notion AI
+
+Notion 3.0 (September 2025) introduced autonomous AI Agents, shifting from "AI that suggests" to "AI that executes."
+
+| Capability | Description |
+|-----------|-------------|
+| **Multi-model access** | Toggle between GPT-5, Claude, and o3 within workspace |
+| **Autonomous agents** | Build launch plans, break into tasks, assign work, draft docs; update hundreds of pages at once |
+| **AI database properties** | Smart autofill, AI summary, AI keywords, AI translation |
+| **Natural language search** | Find information using plain language instead of exact keywords |
+| **Context integration** | Reads Slack, Google Drive, Teams data; aware of comments and version history |
+
+Notion's agent capabilities make it one of the most powerful platforms for maintaining large organizational knowledge bases. The January 2026 (v3.2) release brought full mobile AI support.
+
+**Limitations:** Proprietary platform, per-user pricing (\$20/user/month for AI features), and vendor lock-in concerns limit suitability for open <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink> projects.
+
+### Coda AI
+
+Coda AI focuses on internal knowledge bases, offering document summarization, FAQ generation, and natural language search via AI Chat. Unique pricing model: only "Doc Makers" pay; editors and viewers access for free. Its document-centric architecture suits structured knowledge management but lacks real-time collaboration features found in Notion.
+
+---
+
+## Public Knowledge Systems
+
+### Golden.com
+
+Golden is building a canonical knowledge graph with a goal of mapping 10 billion entities and their public knowledge. Backed by \$20M from a16z, Founders Fund, and Balaji Srinivasan.
+
+| Feature | Details |
+|---------|---------|
+| **Scale** | Targeting 10 billion entities |
+| **Data types** | Prose, multimedia, timelines, 100+ fields per entity |
+| **AI role** | NLP-based collection from fragmented internet sources; automated updates |
+| **Human verification** | Users accept or reject AI suggestions |
+| **Protocol vision** | Decentralized, open, permissionless knowledge graph |
+| **Products** | Knowledge Graph, Query Tool, Data Requests, API, CRM integrations, ChatGPT Plugin |
+
+Golden's approach—AI generates, humans verify—is particularly relevant as a model for <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink>. The decentralized protocol vision aims for canonical, neutral, factual knowledge without centralized editorial control. However, the project's ambition far exceeds current delivery, and the quality of AI-generated entries varies significantly.
+
+### Google NotebookLM
+
+NotebookLM is built on Gemini with a "source-grounded" architecture that strictly analyzes only user-provided materials rather than drawing on general training data.
+
+| Feature | Details |
+|---------|---------|
+| **Source limit** | Up to 600 sources per notebook (Ultra tier) |
+| **Output formats** | Audio Overviews (podcast-style), Video Overviews, infographics, slide decks, Learning Guide |
+| **Hallucination approach** | Constrained to user-provided sources only |
+| **Gemini integration** | Attach notebooks to conversations (up to 300 sources on Pro plans) |
+| **Pricing** | Free tier available; Ultra for heavy users |
+
+NotebookLM's source-grounding approach is significant for epistemic quality—by constraining outputs to user-provided materials, it avoids the hallucination problems that plague general-purpose LLMs. Google is positioning NotebookLM as "the operating system for the knowledge economy." For AI safety research, this approach offers a model for how LLM-assisted knowledge synthesis can maintain verifiable accuracy.
+
+### Perplexity Pages
+
+Perplexity Pages transforms AI research into structured, formatted articles that users can publish to a growing library. Combined with Internal Knowledge Search (search across web + uploaded documents) and Deep Research (20-50 targeted queries per report), Perplexity functions as both a personal research tool and a publishing platform.
+
+**Relevance:** Perplexity Pages represents a middle ground between fully automated encyclopedias (like <EntityLink id="grokipedia">Grokipedia</EntityLink>) and fully human-written wikis—users direct the research, AI synthesizes, and users review before publishing. Citation transparency is a core feature.
+
+---
+
+## Open Source RAG Frameworks
+
+Retrieval-Augmented Generation (RAG) frameworks form the infrastructure layer that enables custom AI-assisted knowledge systems. Rather than using off-the-shelf products, organizations can build tailored knowledge management pipelines.
+
+| Framework | Focus | Key Features |
+|-----------|-------|-------------|
+| **LlamaIndex** | Data framework for LLMs | Automates ingestion, indexing, retrieval; supports vector stores, keyword indices, knowledge graphs |
+| **Haystack** (Deepset AI) | Production-ready LLM pipelines | Modular AI orchestration with customizable, composable pipelines |
+| **RAGFlow** | Full-featured RAG platform | GraphRAG support (knowledge graphs from documents), agentic reasoning, Docker deployment |
+| **LightRAG** | Lightweight RAG | Designed for limited hardware; simpler setup |
+| **Casibase** | RAG knowledge platform | Open-source knowledge base management |
+
+### RAG in Practice: AI Safety Knowledge Bases
+
+Several AI safety projects use RAG-based approaches:
+
+| Project | RAG Approach | Source Corpus |
+|---------|-------------|---------------|
+| **<EntityLink id="stampy-aisafety-info">Stampy / AISafety.info</EntityLink>** | Vector embeddings + GPT | 10K-100K alignment research documents |
+| **<EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>** | Claude-based synthesis pipeline | Web research + source fetching + validation |
+| **<EntityLink id="elicit">Elicit</EntityLink>** | Semantic Scholar integration | 125M+ academic papers |
+
+The <EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>'s page creation pipeline exemplifies a practical RAG workflow: Perplexity-based web research feeds into source fetching, Claude-based synthesis, automated source verification, and iterative validation—producing structured wiki pages at approximately \$4-6 per page.
+
+---
+
+## IBM-Wikimedia Initiative
+
+A notable development in open knowledge infrastructure: IBM and the Wikimedia Foundation are making Wikidata's 120 million entries and 2.4 billion edits more accessible to LLMs via DataStax Astra DB on IBM watsonx.data. The initiative achieved a 30x query speed improvement and 90% reduction in development time for accessing structured knowledge. Wikimedia is building Model Context Protocol (MCP) integration for Wikidata and exploring GraphRAG, which could make the world's largest open knowledge graph a first-class resource for AI-assisted knowledge systems.
+
+---
+
+## Comparison of Approaches
+
+| Tool | AI Role | Open/Closed | Hallucination Control | Best For |
+|------|---------|-------------|----------------------|----------|
+| **Obsidian + Plugins** | Assists human authors | Open source (plugins) | User controls sources | Individual researchers |
+| **Notion AI** | Agents execute tasks | Proprietary | Limited; general LLM | Team knowledge bases |
+| **Golden.com** | Generates, humans verify | Aims for decentralized | Human review layer | Canonical entity data |
+| **NotebookLM** | Source-grounded analysis | Proprietary (free tier) | Constrained to sources | Research synthesis |
+| **Perplexity Pages** | Researches and drafts | Proprietary | Citation-first | Published articles |
+| **LlamaIndex/Haystack** | Custom RAG pipelines | Open source | Configurable | Custom knowledge systems |
+| **<EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>** | Pipeline-assisted authoring | Open source | Multi-step validation | AI safety knowledge |
+
+---
+
+## Implications for Epistemic Infrastructure
+
+### Opportunities
+
+These tools create genuine opportunities for improving the quality and scale of knowledge infrastructure for AI safety and longtermism:
+
+1. **Cost reduction:** AI-assisted pipelines reduce the cost of creating structured knowledge pages from hundreds of dollars (manual research + writing) to \$4-10 per page, enabling much larger knowledge bases.
+
+2. **Source-grounding as a pattern:** NotebookLM's approach—constraining LLM outputs to provided sources—offers a replicable model for maintaining accuracy in AI-assisted knowledge synthesis.
+
+3. **Knowledge graph integration:** The IBM-Wikimedia initiative and Golden.com demonstrate how structured knowledge graphs can serve as authoritative backing stores for LLM-generated content.
+
+4. **RAG for specialized domains:** Open-source RAG frameworks enable organizations like <EntityLink id="quri">QURI</EntityLink> to build custom knowledge pipelines tailored to specific domains (AI safety, forecasting, risk analysis) rather than depending on general-purpose tools.
+
+### Risks and Limitations
+
+1. **Accuracy-speed tradeoff:** Faster, cheaper content creation increases the risk of errors propagating through knowledge bases. Multi-step validation pipelines partially address this but add cost and complexity.
+
+2. **Knowledge collapse feedback loops:** AI systems trained on AI-generated content degrade over time—a phenomenon formally described as "model collapse." Knowledge bases that rely heavily on LLM generation risk contributing to this cycle. See <EntityLink id="wikipedia-and-ai">Wikipedia and AI Content</EntityLink> for detailed analysis of the model collapse feedback loop.
+
+3. **Vendor dependence:** Most powerful tools (Notion AI, NotebookLM) are proprietary, creating dependency on commercial platforms for epistemic infrastructure that should ideally be durable and independent.
+
+4. **Quality verification at scale:** As AI-assisted tools make it easy to generate large volumes of content, the bottleneck shifts from content creation to content verification—which remains largely a human task.
+
+---
+
+## Key Questions
+
+<KeyQuestions
+  questions={[
+    "Can source-grounded approaches (NotebookLM-style) maintain accuracy at the scale needed for comprehensive knowledge bases?",
+    "What validation pipelines are sufficient to catch LLM errors before they propagate through interconnected knowledge systems?",
+    "How should AI safety organizations balance speed of knowledge creation against verification rigor?",
+    "Will open-source RAG frameworks achieve parity with proprietary platforms for knowledge management?",
+    "How can knowledge bases that use LLMs in their construction avoid contributing to model collapse?"
+  ]}
+/>
+
+<Backlinks />
