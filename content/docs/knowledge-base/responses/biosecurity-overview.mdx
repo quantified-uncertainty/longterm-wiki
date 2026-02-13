@@ -14,11 +14,6 @@ ratings:
   rigor: 4
   actionability: 5
   completeness: 4
-metrics:
-  wordCount: 1000
-  citations: 5
-  tables: 3
-  diagrams: 1
 clusters:
   - biorisks
   - ai-safety
@@ -29,7 +24,7 @@ import {Mermaid, EntityLink} from '@components/wiki';
 
 ## Overview
 
-The EA/x-risk community funds and operates a portfolio of biosecurity interventions designed to reduce catastrophic biological risks—both from natural pandemics and from deliberate misuse of advancing biotechnology and AI capabilities. <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> alone has directed \$230M+ toward biosecurity through 140+ grants.[^1]
+The EA/x-risk community funds and operates a portfolio of biosecurity interventions designed to reduce catastrophic biological risks—both from natural pandemics and from deliberate misuse of advancing biotechnology and AI capabilities. <EntityLink id="E552">Coefficient Giving</EntityLink> alone has directed \$230M+ toward biosecurity through 140+ grants.[^1]
 
 These interventions are organized around Kevin Esvelt's **Delay, Detect, Defend** framework, which structures biosecurity responses into three complementary layers: slowing dangerous capability proliferation, building early warning systems for novel threats, and developing resilience through countermeasures and physical defenses.
 
@@ -69,13 +64,13 @@ The framework treats these layers as complementary: restrictions buy time while 
 
 | Intervention | Key Actors | Description |
 |---|---|---|
-| **DNA Synthesis Screening** | <EntityLink id="securedna">SecureDNA</EntityLink>, <EntityLink id="ibbis">IBBIS</EntityLink>/NTI, IGSC | Preventing orders of synthetic DNA that could reconstruct dangerous pathogens. SecureDNA provides free cryptographic screening to synthesis providers. |
-| **Metagenomic Surveillance** | <EntityLink id="securebio">SecureBio</EntityLink>/NAO, CDC | The Nucleic Acid Observatory sequences all genetic material in wastewater to detect novel threats. CDC's proposed Biothreat Radar (\$52M) builds on this work.[^2] |
+| **DNA Synthesis Screening** | <EntityLink id="E564">SecureDNA</EntityLink>, <EntityLink id="E536">IBBIS</EntityLink>/NTI, IGSC | Preventing orders of synthetic DNA that could reconstruct dangerous pathogens. SecureDNA provides free cryptographic screening to synthesis providers. |
+| **Metagenomic Surveillance** | <EntityLink id="E563">SecureBio</EntityLink>/NAO, CDC | The Nucleic Acid Observatory sequences all genetic material in wastewater to detect novel threats. CDC's proposed Biothreat Radar (\$52M) builds on this work.[^2] |
 | **AI Bio-Capability Evaluations** | SecureBio (VCT), Anthropic, OpenAI, RAND | Testing whether AI systems can meaningfully assist bioweapon development, including the Virology Capabilities Test and red-team studies.[^3] |
-| **Medical Countermeasures** | <EntityLink id="red-queen-bio">Red Queen Bio</EntityLink>, BARDA, CEPI | "Defensive co-scaling"—pre-building countermeasures against AI-mapped biothreats. Platform vaccines and broad-spectrum antivirals. |
-| **Far-UVC & Physical Defenses** | <EntityLink id="blueprint-biosecurity">Blueprint Biosecurity</EntityLink>, Columbia University | Far-UVC light (222nm) inactivates 99.8% of airborne pathogens in occupied spaces. Blueprint runs the EXHALE evaluation program.[^4] |
+| **Medical Countermeasures** | <EntityLink id="E556">Red Queen Bio</EntityLink>, BARDA, CEPI | "Defensive co-scaling"—pre-building countermeasures against AI-mapped biothreats. Platform vaccines and broad-spectrum antivirals. |
+| **Far-UVC & Physical Defenses** | <EntityLink id="E515">Blueprint Biosecurity</EntityLink>, Columbia University | Far-UVC light (222nm) inactivates 99.8% of airborne pathogens in occupied spaces. Blueprint runs the EXHALE evaluation program.[^4] |
 | **AI Capability Restrictions** | Anthropic (ASL-3), OpenAI, Google DeepMind | Output filtering and deployment restrictions for frontier AI models based on CBRN capability evaluations. |
-| **Biosecurity Governance** | <EntityLink id="nti-bio">NTI Bio</EntityLink>, CSIS, Council on Strategic Risks | Strengthening the BWC, policy research on AI-enabled bioterrorism, dual-use research oversight.[^5] |
+| **Biosecurity Governance** | <EntityLink id="E551">NTI Bio</EntityLink>, CSIS, Council on Strategic Risks | Strengthening the BWC, policy research on AI-enabled bioterrorism, dual-use research oversight.[^5] |
 
 ---
 
@@ -83,13 +78,13 @@ The framework treats these layers as complementary: restrictions buy time while 
 
 | Organization | Focus | Key Funding |
 |---|---|---|
-| <EntityLink id="securebio">SecureBio</EntityLink> | Delay/Detect/Defend framework; NAO; AI evals | \$9.4M+ from Coefficient Giving |
-| <EntityLink id="securedna">SecureDNA</EntityLink> | DNA synthesis screening technology | Swiss foundation |
-| <EntityLink id="ibbis">IBBIS</EntityLink> | International screening standards | Coefficient Giving via NTI |
-| <EntityLink id="blueprint-biosecurity">Blueprint Biosecurity</EntityLink> | Far-UVC technology deployment | \$900K from Coefficient Giving (2024) |
-| <EntityLink id="red-queen-bio">Red Queen Bio</EntityLink> | AI-driven medical countermeasures | \$15M seed (OpenAI-led) |
-| <EntityLink id="nti-bio">NTI Bio</EntityLink> | Biosecurity governance, BWC | \$7.8M from Coefficient Giving |
-| <EntityLink id="centre-for-long-term-resilience">Centre for Long-Term Resilience</EntityLink> | UK biosecurity policy | EA-funded |
+| <EntityLink id="E563">SecureBio</EntityLink> | Delay/Detect/Defend framework; NAO; AI evals | \$9.4M+ from Coefficient Giving |
+| <EntityLink id="E564">SecureDNA</EntityLink> | DNA synthesis screening technology | Swiss foundation |
+| <EntityLink id="E536">IBBIS</EntityLink> | International screening standards | Coefficient Giving via NTI |
+| <EntityLink id="E515">Blueprint Biosecurity</EntityLink> | Far-UVC technology deployment | \$900K from Coefficient Giving (2024) |
+| <EntityLink id="E556">Red Queen Bio</EntityLink> | AI-driven medical countermeasures | \$15M seed (OpenAI-led) |
+| <EntityLink id="E551">NTI Bio</EntityLink> | Biosecurity governance, BWC | \$7.8M from Coefficient Giving |
+| <EntityLink id="E429">Centre for Long-Term Resilience</EntityLink> | UK biosecurity policy | EA-funded |
 
 For a full list, see the Biosecurity Organizations section under Organizations in the sidebar.
 
@@ -97,7 +92,7 @@ For a full list, see the Biosecurity Organizations section under Organizations i
 
 ## Further Reading
 
-- **[Is EA Biosecurity Work Limited to Restricting LLM Biological Use?](/knowledge-base/reports/ea-biosecurity-scope/)** — Detailed report analyzing the full intervention portfolio, funding flows, government adoption, and the restriction vs. resilience debate.
+- **[Is EA Biosecurity Work Limited to Restricting LLM Biological Use?](/knowledge-base/responses/ea-biosecurity-scope/)** — Detailed report analyzing the full intervention portfolio, funding flows, government adoption, and the restriction vs. resilience debate.
 
 ---
 

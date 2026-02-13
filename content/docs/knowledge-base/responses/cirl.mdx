@@ -13,11 +13,6 @@ ratings:
   rigor: 5
   actionability: 3
   completeness: 6
-metrics:
-  wordCount: 800
-  citations: 7
-  tables: 40
-  diagrams: 1
 clusters:
   - ai-safety
 subcategory: alignment-theoretical
@@ -34,16 +29,16 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 | Scalability | Low-Medium | Theoretical properties scale; practical implementation remains challenging |
 | Current Maturity | Low | Primarily academic; no production deployments |
 | Time Horizon | 5-15 years | Needs fundamental advances in deep learning integration |
-| Key Proponents | UC Berkeley CHAI | <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, Anca Dragan, Dylan Hadfield-Menell |
+| Key Proponents | UC Berkeley CHAI | <EntityLink id="E290">Stuart Russell</EntityLink>, Anca Dragan, Dylan Hadfield-Menell |
 | Annual Investment | \$1-5M/year | Primarily academic grants |
 
 ## Overview
 
-Cooperative Inverse Reinforcement Learning (CIRL), also known as Cooperative IRL or Assistance Games, is a theoretical framework developed at UC Berkeley's <EntityLink id="chai">Center for Human-Compatible AI</EntityLink> (CHAI) that reconceptualizes the <EntityLink id="alignment">AI alignment</EntityLink> problem as a cooperative game between humans and AI systems. Unlike standard reinforcement learning where agents optimize a fixed reward function, CIRL agents maintain uncertainty about human preferences and learn these preferences through interaction while cooperating with humans to maximize expected value under this uncertainty.
+Cooperative Inverse Reinforcement Learning (CIRL), also known as Cooperative IRL or Assistance Games, is a theoretical framework developed at UC Berkeley's <EntityLink id="E57">Center for Human-Compatible AI</EntityLink> (CHAI) that reconceptualizes the <EntityLink id="E439">AI alignment</EntityLink> problem as a cooperative game between humans and AI systems. Unlike standard reinforcement learning where agents optimize a fixed reward function, CIRL agents maintain uncertainty about human preferences and learn these preferences through interaction while cooperating with humans to maximize expected value under this uncertainty.
 
 The key insight is that an AI system uncertain about what humans want has incentive to remain corrigible - to allow itself to be corrected, to seek clarification, and to avoid actions with irreversible consequences. If the AI might be wrong about human values, acting cautiously and deferring to human judgment becomes instrumentally valuable rather than requiring explicit constraints. This addresses the corrigibility problem at a deeper level than approaches that try to add constraints on top of a capable optimizer.
 
-CIRL represents some of the most rigorous theoretical work in AI alignment, with formal proofs about agent behavior under various assumptions. However, it faces significant challenges in practical application: the framework assumes access to human reward functions in a way that doesn't translate directly to training <EntityLink id="language-models">large language models</EntityLink>, and the gap between CIRL's elegant theory and the messy reality of deep learning remains substantial. Current investment (\$1-5M/year) remains primarily academic, though the theoretical foundations influence broader thinking about alignment. Recent work on [AssistanceZero](https://arxiv.org/abs/2504.07091) (Laidlaw et al., 2025) demonstrates the first scalable approach to solving assistance games, suggesting the theory-practice gap may be narrowing.
+CIRL represents some of the most rigorous theoretical work in AI alignment, with formal proofs about agent behavior under various assumptions. However, it faces significant challenges in practical application: the framework assumes access to human reward functions in a way that doesn't translate directly to training <EntityLink id="E186">large language models</EntityLink>, and the gap between CIRL's elegant theory and the messy reality of deep learning remains substantial. Current investment (\$1-5M/year) remains primarily academic, though the theoretical foundations influence broader thinking about alignment. Recent work on [AssistanceZero](https://arxiv.org/abs/2504.07091) (Laidlaw et al., 2025) demonstrates the first scalable approach to solving assistance games, suggesting the theory-practice gap may be narrowing.
 
 ## How It Works
 
@@ -75,11 +70,11 @@ The robot maintains a probability distribution over possible human preferences a
 
 | Risk | Relevance | How CIRL Helps |
 |------|-----------|----------------|
-| <EntityLink id="goal-misgeneralization">Goal Misgeneralization</EntityLink> | High | Maintains uncertainty rather than locking onto inferred goals |
-| <EntityLink id="corrigibility">Corrigibility Failures</EntityLink> | High | Uncertainty creates instrumental incentive to accept correction |
-| <EntityLink id="reward-hacking">Reward Hacking</EntityLink> | Medium | Human remains in loop to refine reward signal |
-| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | Medium | Information-seeking behavior conflicts with deception incentives |
-| <EntityLink id="scheming">Scheming</EntityLink> | Low-Medium | Deference to humans limits autonomous scheming |
+| <EntityLink id="E151">Goal Misgeneralization</EntityLink> | High | Maintains uncertainty rather than locking onto inferred goals |
+| <EntityLink id="E79">Corrigibility Failures</EntityLink> | High | Uncertainty creates instrumental incentive to accept correction |
+| <EntityLink id="E253">Reward Hacking</EntityLink> | Medium | Human remains in loop to refine reward signal |
+| <EntityLink id="E93">Deceptive Alignment</EntityLink> | Medium | Information-seeking behavior conflicts with deception incentives |
+| <EntityLink id="E274">Scheming</EntityLink> | Low-Medium | Deference to humans limits autonomous scheming |
 
 ## Risk Assessment & Impact
 
@@ -212,8 +207,8 @@ The challenges are in implementation:
 
 ### Theoretical Connections
 
-- **<EntityLink id="rlhf">RLHF</EntityLink>**: CIRL provides theoretical foundation; RLHF is practical approximation
-- **<EntityLink id="reward-modeling">Reward Modeling</EntityLink>**: CIRL explains why learned rewards should include uncertainty
+- **<EntityLink id="E259">RLHF</EntityLink>**: CIRL provides theoretical foundation; RLHF is practical approximation
+- **<EntityLink id="E600">Reward Modeling</EntityLink>**: CIRL explains why learned rewards should include uncertainty
 - **Corrigibility Research**: CIRL provides formal treatment
 
 ### Key Distinctions
@@ -295,7 +290,7 @@ CIRL relates to the <EntityLink id="ai-transition-model" /> through:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | CIRL provides theoretical path to robust alignment through uncertainty |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | CIRL provides theoretical path to robust alignment through uncertainty |
 | <EntityLink id="ai-capability-level" /> | Corrigibility | CIRL agents should remain corrigible as capabilities scale |
 
 CIRL's theoretical contributions influence alignment thinking even without direct implementation, providing a target to aim for in practical alignment work.

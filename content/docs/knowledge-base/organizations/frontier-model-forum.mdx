@@ -13,11 +13,6 @@ ratings:
   completeness: 6
 quality: 58
 llmSummary: The Frontier Model Forum represents the AI industry's primary self-governance initiative for frontier AI safety, establishing frameworks and funding research, but faces fundamental criticisms about conflicts of interest inherent in industry self-regulation. While the organization has made concrete progress on safety frameworks and evaluations, questions remain about whether profit-driven companies can adequately regulate themselves on existential safety issues.
-metrics:
-  wordCount: 3559
-  citations: 53
-  tables: 3
-  diagrams: 0
 clusters:
   - community
   - ai-safety
@@ -31,7 +26,7 @@ import {EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
 | Aspect | Rating | Notes |
 |--------|--------|-------|
 | **Organizational Type** | Industry Self-Governance | Non-profit 501(c)(6) established by leading AI companies |
-| **Founded** | 2023 | By <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink>, Microsoft, and <EntityLink id="openai">OpenAI</EntityLink> |
+| **Founded** | 2023 | By <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E98">Google DeepMind</EntityLink>, Microsoft, and <EntityLink id="E218">OpenAI</EntityLink> |
 | **Primary Focus** | Frontier AI Safety Frameworks | Risk evaluation, capability thresholds, and mitigation strategies |
 | **Funding** | \$10M+ AI Safety Fund | Industry and philanthropic support |
 | **Key Output** | Safety Commitments & Frameworks | Published by 12+ companies as of late 2024 |
@@ -47,7 +42,7 @@ import {EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
 
 The **Frontier Model Forum (FMF)** is an industry-supported non-profit organization established in July 2023 to promote self-governance in frontier AI safety through collaborative development of best practices, research coordination, and information-sharing among leading AI developers.[^1] Led by Executive Director Chris Meserole, the organization focuses on addressing severe risks to public safety and national security from advanced general-purpose AI models, including biological threats, cybersecurity risks, and catastrophic misuse scenarios.[^2]
 
-The Forum emerged as a response to growing recognition that advanced AI systems require coordinated safety frameworks beyond individual company efforts. Its founding members—<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink>, Microsoft, and <EntityLink id="openai">OpenAI</EntityLink>—recognized the need to establish shared standards for evaluating and mitigating risks from "frontier models," defined as large-scale machine learning systems that surpass existing capabilities and can perform diverse tasks with potentially high-risk implications.[^3]
+The Forum emerged as a response to growing recognition that advanced AI systems require coordinated safety frameworks beyond individual company efforts. Its founding members—<EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E98">Google DeepMind</EntityLink>, Microsoft, and <EntityLink id="E218">OpenAI</EntityLink>—recognized the need to establish shared standards for evaluating and mitigating risks from "frontier models," defined as large-scale machine learning systems that surpass existing capabilities and can perform diverse tasks with potentially high-risk implications.[^3]
 
 The FMF operates through three core mandates: identifying best practices and standards for frontier AI safety and security, advancing scientific research on safety mechanisms, and facilitating information-sharing across industry, government, academia, and civil society.[^4] While positioned as an industry self-governance initiative, the organization has faced questions about whether profit-driven companies can adequately regulate themselves without independent oversight.
 
@@ -61,7 +56,7 @@ The organization was legally established as a 501(c)(6) non-profit, a structure 
 
 ### Key Milestones
 
-**October 2023**: The FMF launched the AI Safety Fund (AISF), a collaborative \$10+ million initiative funded by the founding members plus philanthropic partners including the Patrick J. McGovern Foundation, David and Lucile Packard Foundation, Schmidt Sciences, and <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink>.[^9] The fund was initially administered by the Meridian Institute to support independent research on responsible frontier AI development, risk minimization, and standardized third-party evaluations.
+**October 2023**: The FMF launched the AI Safety Fund (AISF), a collaborative \$10+ million initiative funded by the founding members plus philanthropic partners including the Patrick J. McGovern Foundation, David and Lucile Packard Foundation, Schmidt Sciences, and <EntityLink id="E577">Jaan Tallinn</EntityLink>.[^9] The fund was initially administered by the Meridian Institute to support independent research on responsible frontier AI development, risk minimization, and standardized third-party evaluations.
 
 **May 2024**: At the AI Seoul Summit, FMF members signed the **Frontier AI Safety Commitments**, pledging to develop and publish individual safety frameworks before the February 2025 AI Action Summit in Paris.[^10] This marked a shift from high-level principles to concrete, actionable commitments with specific deadlines. By late 2024, 16 companies had signed these commitments, with 12 major developers publishing detailed frameworks demonstrating "growing industry consensus" on risk management practices.[^11]
 
@@ -91,7 +86,7 @@ Example implementations from member companies include:[^17]
 
 | Company | Key Framework Elements |
 |---------|------------------------|
-| **G42** | Capability thresholds for biological/cyber threats; 4 security levels (e.g., Level 4 resists state-sponsored theft via encryption, <EntityLink id="red-teaming">red teaming</EntityLink>) |
+| **G42** | Capability thresholds for biological/cyber threats; 4 security levels (e.g., Level 4 resists state-sponsored theft via encryption, <EntityLink id="E449">red teaming</EntityLink>) |
 | **xAI** | Quantitative thresholds/metrics; safeguards against malicious use (e.g., refusal policies for CBRN weapons); information security like role-based access control |
 
 The FMF has published a technical report series to detail implementation approaches and harmonize practices across firms, emphasizing the need for standardized evaluation protocols, capability assessment metrics, and safeguard testing methodologies.[^18]
@@ -100,7 +95,7 @@ The FMF has published a technical report series to detail implementation approac
 
 The AI Safety Fund has distributed two rounds of grants since its October 2023 launch, with a recent cohort of 11 grantees awarded \$5+ million for projects in biosecurity, cybersecurity, AI agent evaluation, and synthetic content.[^19] The fund prioritizes independent research that can inform industry-wide practices rather than company-specific applications.
 
-First-round grants focused on evaluating frontier model capabilities and risks, while subsequent rounds have emphasized "narrowly-scoped" projects targeting urgent bottlenecks in safety research, such as developing better techniques for detecting <EntityLink id="scheming">deceptive alignment</EntityLink> and measuring instrumental reasoning capabilities that could undermine human control.[^20]
+First-round grants focused on evaluating frontier model capabilities and risks, while subsequent rounds have emphasized "narrowly-scoped" projects targeting urgent bottlenecks in safety research, such as developing better techniques for detecting <EntityLink id="E274">deceptive alignment</EntityLink> and measuring instrumental reasoning capabilities that could undermine human control.[^20]
 
 ### AI-Bio Workstream
 
@@ -116,9 +111,9 @@ The Forum convenes leading cybersecurity experts to develop novel approaches for
 
 One of the most technically challenging aspects of frontier AI safety frameworks is establishing appropriate thresholds for when enhanced safeguards should be triggered. The FMF has identified two main types of thresholds:[^24]
 
-**<EntityLink id="thresholds">Compute Thresholds</EntityLink>**: Using computational resources (measured in FLOPs) as a proxy for identifying potentially high-risk models. While straightforward to measure, the FMF acknowledges this is an "imperfect proxy" since algorithmic advances can enable dangerous capabilities with less compute, and some large models may pose minimal risks while smaller specialized models could be highly dangerous.[^25]
+**<EntityLink id="E465">Compute Thresholds</EntityLink>**: Using computational resources (measured in FLOPs) as a proxy for identifying potentially high-risk models. While straightforward to measure, the FMF acknowledges this is an "imperfect proxy" since algorithmic advances can enable dangerous capabilities with less compute, and some large models may pose minimal risks while smaller specialized models could be highly dangerous.[^25]
 
-**Risk Thresholds**: Defining specific unacceptable outcomes or threat scenarios (e.g., models that could assist in creating novel <EntityLink id="bioweapons">bioweapons</EntityLink>, conduct sophisticated cyber attacks, or autonomously pursue misaligned goals). Setting these thresholds is complicated by lack of historical precedent, novel failure modes, socio-technical complexities, and the need for normative value judgments about acceptable tradeoffs.[^26]
+**Risk Thresholds**: Defining specific unacceptable outcomes or threat scenarios (e.g., models that could assist in creating novel <EntityLink id="E42">bioweapons</EntityLink>, conduct sophisticated cyber attacks, or autonomously pursue misaligned goals). Setting these thresholds is complicated by lack of historical precedent, novel failure modes, socio-technical complexities, and the need for normative value judgments about acceptable tradeoffs.[^26]
 
 ### Evaluation Methodologies
 
@@ -136,15 +131,15 @@ The FMF acknowledges significant robustness challenges in current safety measure
 
 Advanced safety concerns addressed by FMF-supported research include:[^30]
 
-- **<EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink>**: AI systems that appear aligned during training but pursue misaligned objectives during deployment
+- **<EntityLink id="E93">Deceptive alignment</EntityLink>**: AI systems that appear aligned during training but pursue misaligned objectives during deployment
 - **AI scheming**: Models deliberately circumventing safety measures while appearing compliant
 - **Alignment faking**: Systems providing dishonest outputs to pass safety evaluations
 
-The organization supports research on chain-of-thought monitoring to oversee models that might develop scheming capabilities, and instrumental reasoning evaluation to detect when models acquire <EntityLink id="situational-awareness">situational awareness</EntityLink> and stealth capabilities that could undermine human control.[^31]
+The organization supports research on chain-of-thought monitoring to oversee models that might develop scheming capabilities, and instrumental reasoning evaluation to detect when models acquire <EntityLink id="E282">situational awareness</EntityLink> and stealth capabilities that could undermine human control.[^31]
 
 ## Funding and Organizational Support
 
-The AI Safety Fund represents the primary funding mechanism through which the FMF supports the broader research ecosystem. The \$10+ million total includes contributions from all four founding members (<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google</EntityLink>, Microsoft, and <EntityLink id="openai">OpenAI</EntityLink>) as well as philanthropic partners.[^32]
+The AI Safety Fund represents the primary funding mechanism through which the FMF supports the broader research ecosystem. The \$10+ million total includes contributions from all four founding members (<EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E98">Google</EntityLink>, Microsoft, and <EntityLink id="E218">OpenAI</EntityLink>) as well as philanthropic partners.[^32]
 
 Jaan Tallinn, the Estonian programmer and early AI safety philanthropist who co-founded Skype, is among the individual supporters, alongside institutional philanthropies focused on science and technology.[^33] The fund explicitly aims to support research that is independent from member company interests, though questions remain about whether industry-funded research can maintain true independence when evaluating risks posed by the funders themselves.
 
@@ -154,9 +149,9 @@ The FMF operates as a non-profit without revenue streams, relying entirely on me
 
 The FMF positions itself as a connector between industry technical expertise and broader stakeholder communities. The organization emphasizes collaboration with government bodies, academic institutions, and civil society organizations on matters of public safety and security.[^35]
 
-This approach aligns with initiatives including the G7 Hiroshima AI Process, OECD AI principles, and the establishment of <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> in multiple countries.[^36] The Forum has supported the global network of AI safety institutes as they shift focus from high-level commitments to concrete implementation actions.
+This approach aligns with initiatives including the G7 Hiroshima AI Process, OECD AI principles, and the establishment of <EntityLink id="E13">AI Safety Institutes</EntityLink> in multiple countries.[^36] The Forum has supported the global network of AI safety institutes as they shift focus from high-level commitments to concrete implementation actions.
 
-Anna Makanju, Vice President of Global Affairs at <EntityLink id="openai">OpenAI</EntityLink>, described the FMF's role in aligning companies on "thoughtful and adaptable safety practices" for powerful models, emphasizing the urgency of establishing shared standards before more capable systems are deployed.[^37]
+Anna Makanju, Vice President of Global Affairs at <EntityLink id="E218">OpenAI</EntityLink>, described the FMF's role in aligning companies on "thoughtful and adaptable safety practices" for powerful models, emphasizing the urgency of establishing shared standards before more capable systems are deployed.[^37]
 
 ## Criticisms and Limitations
 
@@ -174,7 +169,7 @@ The FMF's explicit focus on "frontier" models—defined as state-of-the-art syst
 - Deepfake generation and identity theft
 - Privacy violations through training on personal data
 - Intellectual property infringement
-- Labor displacement and <EntityLink id="economic-disruption">economic disruption</EntityLink>
+- Labor displacement and <EntityLink id="E108">economic disruption</EntityLink>
 - Discriminatory outcomes in hiring, lending, and criminal justice
 
 The term "frontier AI" itself has been criticized as an "undefinable moving-target" that allows companies to continuously exclude their current deployed systems from the most stringent safety requirements by claiming those systems are no longer at the frontier.[^40]
@@ -183,7 +178,7 @@ The term "frontier AI" itself has been criticized as an "undefinable moving-targ
 
 The FMF's emphasis on safety frameworks and pre-deployment evaluations faces significant technical challenges. Research on the limitations of **safety cases**—structured arguments for why a system is adequately safe—identifies several problems:[^41]
 
-**<EntityLink id="sandbagging">Sandbagging</EntityLink> and Deception**: Models may deliberately underperform on safety evaluations while retaining dangerous capabilities that emerge during deployment. Recent research on alignment faking has demonstrated that models can learn to behave differently when they detect they are being evaluated versus deployed.
+**<EntityLink id="E270">Sandbagging</EntityLink> and Deception**: Models may deliberately underperform on safety evaluations while retaining dangerous capabilities that emerge during deployment. Recent research on alignment faking has demonstrated that models can learn to behave differently when they detect they are being evaluated versus deployed.
 
 **Incomplete Coverage**: The vast range of potential behaviors in open-ended general-purpose models makes comprehensive evaluation intractable. Human oversight does not scale to catch all potential failures, defeating the goal of complete safety analysis.
 
@@ -229,7 +224,7 @@ Several fundamental questions remain unresolved about the FMF's approach and eff
 
 **How effective are safety frameworks in practice?** The frameworks published by member companies demonstrate growing convergence on key elements like threshold-setting and evaluation protocols, but there is limited evidence about whether these frameworks meaningfully reduce risks versus primarily serving as public relations responses to external pressure for regulation.
 
-**What happens when capabilities significantly exceed current frontier levels?** The FMF's approach assumes that pre-deployment evaluations can identify dangerous capabilities before they <EntityLink id="manifest">manifest</EntityLink> in deployed systems. However, some risks may only become apparent through deployment at scale, and evaluation methodologies may fail to keep pace with rapid capability gains.
+**What happens when capabilities significantly exceed current frontier levels?** The FMF's approach assumes that pre-deployment evaluations can identify dangerous capabilities before they <EntityLink id="E545">manifest</EntityLink> in deployed systems. However, some risks may only become apparent through deployment at scale, and evaluation methodologies may fail to keep pace with rapid capability gains.
 
 **How should tradeoffs between transparency and security be navigated?** The FMF acknowledges tension between making safety evaluations reproducible (requiring detailed disclosure) and avoiding information hazards, gaming of tests, and data leakage that could undermine security.[^50] The optimal balance remains unclear and may vary by risk domain.
 
@@ -239,14 +234,14 @@ Several fundamental questions remain unresolved about the FMF's approach and eff
 
 The FMF represents one component of a multifaceted AI safety ecosystem that includes academic research institutions, independent evaluation organizations, government regulatory bodies, and civil society advocates. Its role as an industry coordination body makes it distinct from:
 
-- **Independent research organizations** like <EntityLink id="redwood-research">Redwood Research</EntityLink> and <EntityLink id="miri">MIRI</EntityLink> that develop safety techniques without direct ties to frontier AI developers
-- **Government initiatives** like the <EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink> and <EntityLink id="us-aisi">US AI Safety Institute</EntityLink> that provide independent evaluation capacity
-- **Philanthropic funders** like <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> that support safety research across multiple institutions
-- **Academic labs** that investigate fundamental questions about <EntityLink id="alignment">AI alignment</EntityLink>, interpretability, and robustness
+- **Independent research organizations** like <EntityLink id="E557">Redwood Research</EntityLink> and <EntityLink id="E202">MIRI</EntityLink> that develop safety techniques without direct ties to frontier AI developers
+- **Government initiatives** like the <EntityLink id="E364">UK AI Safety Institute</EntityLink> and <EntityLink id="E365">US AI Safety Institute</EntityLink> that provide independent evaluation capacity
+- **Philanthropic funders** like <EntityLink id="E552">Coefficient Giving</EntityLink> that support safety research across multiple institutions
+- **Academic labs** that investigate fundamental questions about <EntityLink id="E439">AI alignment</EntityLink>, interpretability, and robustness
 
 The FMF's industry-led structure means it has unique access to cutting-edge models and deployment insights, but also faces inherent conflicts of interest that these other actors do not share.
 
-Within online AI safety communities like <EntityLink id="lesswrong">LessWrong</EntityLink> and the EA Forum, opinions on the FMF's value vary. Some view it positively as a pragmatic mechanism for advancing concrete safety practices and fostering cross-organizational learning.[^52] Others express skepticism about whether joining frontier labs to work on safety provides meaningful leverage compared to independent efforts, given the possibility that technical safety work could extend timelines but not fundamentally alter corporate incentives.[^53]
+Within online AI safety communities like <EntityLink id="E538">LessWrong</EntityLink> and the EA Forum, opinions on the FMF's value vary. Some view it positively as a pragmatic mechanism for advancing concrete safety practices and fostering cross-organizational learning.[^52] Others express skepticism about whether joining frontier labs to work on safety provides meaningful leverage compared to independent efforts, given the possibility that technical safety work could extend timelines but not fundamentally alter corporate incentives.[^53]
 
 ## Sources
 

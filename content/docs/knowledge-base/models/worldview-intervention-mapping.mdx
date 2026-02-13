@@ -20,11 +20,6 @@ todos:
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Strategic Importance' section
   - Complete 'Limitations' section (6 placeholders)
-metrics:
-  wordCount: 307
-  citations: 25
-  tables: 51
-  diagrams: 2
 clusters:
   - ai-safety
   - epistemics
@@ -32,11 +27,11 @@ subcategory: intervention-models
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="worldview-intervention-mapping" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E377" ratings={frontmatter.ratings} />
 
 ## Overview
 
-This model maps how beliefs about AI risk create distinct worldview clusters with dramatically different intervention priorities. Different worldviews imply 2-10x differences in optimal resource allocation across <EntityLink id="pause">pause advocacy</EntityLink>, technical research, and governance work. 
+This model maps how beliefs about AI risk create distinct worldview clusters with dramatically different intervention priorities. Different worldviews imply 2-10x differences in optimal resource allocation across <EntityLink id="E467">pause advocacy</EntityLink>, technical research, and governance work. 
 
 The model identifies that misalignment between personal beliefs and work focus may waste 20-50% of field resources. <R id="f771d4f56ad4dbaa">AI safety researchers</R> hold fundamentally different assumptions about timelines, technical difficulty, and coordination feasibility, but these differences often don't translate to coherent intervention choices.
 
@@ -141,9 +136,9 @@ quadrantChart
 
 | Intervention Category | Priority | Expected ROI | Key Advocates |
 |----------------------|----------|-------------|---------------|
-| Pause/slowdown advocacy | **Very High** | 10x+ if successful | <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> |
+| Pause/slowdown advocacy | **Very High** | 10x+ if successful | <EntityLink id="E114">Eliezer Yudkowsky</EntityLink> |
 | Compute governance | **Very High** | 5-8x via bottlenecks | <R id="0b85365d787dfe9a">RAND reports</R> |
-| Technical safety research | **High** | 2-4x (low prob, high value) | <EntityLink id="miri">MIRI</EntityLink> approach |
+| Technical safety research | **High** | 2-4x (low prob, high value) | <EntityLink id="E202">MIRI</EntityLink> approach |
 | International coordination | **Medium** | 8x if achieved (low prob) | <R id="1593095c92d34ed8">FHI governance work</R> |
 | Field-building | **Low** | 1-2x (insufficient time) | Long-term capacity building |
 | Public engagement | **Medium** | 3-5x via political support | <R id="a8fda81d4a00ec7c">Pause AI movement</R> |
@@ -155,12 +150,12 @@ quadrantChart
 
 | Intervention Category | Priority | Expected ROI | Leading Organizations |
 |----------------------|----------|-------------|----------------------|
-| Technical safety research | **Very High** | 8-12x via direct solutions | <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="redwood-research">Redwood</EntityLink> |
-| <EntityLink id="interpretability">Interpretability</EntityLink> | **Very High** | 6-10x via understanding | <EntityLink id="chris-olah">Chris Olah's work</EntityLink> |
+| Technical safety research | **Very High** | 8-12x via direct solutions | <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E557">Redwood</EntityLink> |
+| <EntityLink id="E174">Interpretability</EntityLink> | **Very High** | 6-10x via understanding | <EntityLink id="E59">Chris Olah's work</EntityLink> |
 | Lab safety standards | **High** | 4-6x via industry norms | <R id="0e7aef26385afeed">Partnership on AI</R> |
 | Compute governance | **Medium** | 3-5x supplementary value | <R id="f0d95954b449240a">CSET</R> research |
 | Pause advocacy | **Low** | 1x or negative (unnecessary) | Premature intervention |
-| Field-building | **High** | 5-8x via capacity | <EntityLink id="chai">CHAI</EntityLink>, <R id="ba3a8bd9c8404d7b">MATS</R> |
+| Field-building | **High** | 5-8x via capacity | <EntityLink id="E57">CHAI</EntityLink>, <R id="ba3a8bd9c8404d7b">MATS</R> |
 
 **Coherence Check:** If you believe this worldview but work on pause advocacy or aggressive regulation, your efforts may be counterproductive.
 
@@ -169,7 +164,7 @@ quadrantChart
 
 | Intervention Category | Priority | Expected ROI | Key Institutions |
 |----------------------|----------|-------------|------------------|
-| International coordination | **Very High** | 10-15x via global governance | <EntityLink id="uk-aisi">UK AISI</EntityLink>, <EntityLink id="us-aisi">US AISI</EntityLink> |
+| International coordination | **Very High** | 10-15x via global governance | <EntityLink id="E364">UK AISI</EntityLink>, <EntityLink id="E365">US AISI</EntityLink> |
 | Domestic regulation | **Very High** | 6-10x via norm-setting | <R id="1102501c88207df3">EU AI Act</R> |
 | Institution-building | **Very High** | 8-12x via capacity | <R id="fdf68a8f30f57dee">AI Safety Institute</R> development |
 | Technical standards | **High** | 4-6x enabling governance | <R id="54dbc15413425997">NIST AI RMF</R> |
@@ -200,7 +195,7 @@ The following analysis shows how intervention effectiveness varies dramatically 
 | **Pause/slowdown** | Very High (10x) | Low (1x) | Medium (4x) | Very Low (-2x) |
 | **Compute governance** | Very High (8x) | Medium (3x) | High (6x) | Low (1x) |
 | **Alignment research** | High (3x) | Low (2x) | Very High (12x) | Low (1x) |
-| **<EntityLink id="interpretability">Interpretability</EntityLink>** | High (4x) | Medium (5x) | Very High (10x) | Medium (3x) |
+| **<EntityLink id="E174">Interpretability</EntityLink>** | High (4x) | Medium (5x) | Very High (10x) | Medium (3x) |
 | **International treaties** | Medium (2x) | Low (1x) | Very High (15x) | Medium (4x) |
 | **Domestic regulation** | Medium (3x) | Medium (4x) | High (8x) | Medium (3x) |
 | **Lab safety standards** | High (6x) | High (7x) | High (8x) | Medium (4x) |
@@ -357,20 +352,20 @@ Based on <R id="2e0c662574087c2a">AI Alignment Forum</R> surveys and <R id="ec45
 
 | Organization | Primary Worldview | Core Interventions |
 |-------------|-------------------|-------------------|
-| **<EntityLink id="miri">MIRI</EntityLink>** | Doomer (short+hard) | Agent foundations, pause advocacy |
-| **<EntityLink id="anthropic">Anthropic</EntityLink>** | Technical optimist | Constitutional AI, interpretability |
+| **<EntityLink id="E202">MIRI</EntityLink>** | Doomer (short+hard) | Agent foundations, pause advocacy |
+| **<EntityLink id="E22">Anthropic</EntityLink>** | Technical optimist | Constitutional AI, interpretability |
 | **<R id="f0d95954b449240a">CSET</R>** | Governance-focused | Policy research, international coordination |
-| **<EntityLink id="redwood-research">Redwood Research</EntityLink>** | Technical optimist | Alignment research, interpretability |
+| **<EntityLink id="E557">Redwood Research</EntityLink>** | Technical optimist | Alignment research, interpretability |
 
 ## Related Models & Pages
 
 ### Complementary Models
-- <EntityLink id="ai-risk-portfolio-analysis" /> - Risk category prioritization across scenarios
-- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> - How competition affects coordination feasibility
-- <EntityLink id="international-coordination-game" label="International Coordination Game" /> - Factors affecting cooperation
+- <EntityLink id="E12" /> - Risk category prioritization across scenarios
+- <EntityLink id="E239">Racing Dynamics</EntityLink> - How competition affects coordination feasibility
+- <EntityLink id="E172" label="International Coordination Game" /> - Factors affecting cooperation
 
 ### Related Worldviews
-- <EntityLink id="doomer">Doomer Worldview</EntityLink> - Short timelines, hard alignment assumptions
-- <EntityLink id="governance-focused">Governance-Focused Worldview</EntityLink> - Coordination optimism, institution-building focus
-- <EntityLink id="long-timelines">Long Timelines Worldview</EntityLink> - Patient capital, fundamental research emphasis
+- <EntityLink id="E504">Doomer Worldview</EntityLink> - Short timelines, hard alignment assumptions
+- <EntityLink id="E397">Governance-Focused Worldview</EntityLink> - Coordination optimism, institution-building focus
+- <EntityLink id="E505">Long Timelines Worldview</EntityLink> - Patient capital, fundamental research emphasis
 

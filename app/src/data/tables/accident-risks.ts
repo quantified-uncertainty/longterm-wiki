@@ -782,20 +782,8 @@ export const abstractionLevelDescriptions: Record<AbstractionLevel, string> = {
   OUTCOME: 'Resulting states and scenarios',
 };
 
-// Get risks by category
-export function getRisksByCategory(category: string): AccidentRisk[] {
-  return accidentRisks.filter((risk) => risk.category === category);
-}
-
-// Get risks by abstraction level
-export function getRisksByAbstractionLevel(
-  level: AbstractionLevel
-): AccidentRisk[] {
-  return accidentRisks.filter((risk) => risk.abstractionLevel === level);
-}
-
-// Get related risks for a given risk
-export function getRelatedRisks(
+// Get related risks for a given risk — used internally
+function getRelatedRisks(
   riskId: string
 ): { risk: AccidentRisk; relationship: RiskRelationship }[] {
   const risk = accidentRisks.find((r) => r.id === riskId);

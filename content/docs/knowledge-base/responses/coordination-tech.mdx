@@ -1,5 +1,5 @@
 ---
-title: Coordination Technologies
+title: AI Governance Coordination Technologies
 description: International Network of AI Safety Institutes (10+ nations, $500M+ investment) achieves 85% chip tracking coverage while cryptographic verification advances toward production. 12 of 20 Frontier AI Safety Commitment signatories published frameworks by 2025 deadline; UK AI Security Institute tested 30+ frontier models and released open-source evaluation tools.
 sidebar:
   order: 5
@@ -23,15 +23,15 @@ import {DataInfoBox, KeyQuestions, R, EntityLink, DataExternalLinks, Mermaid} fr
 
 <DataExternalLinks pageId="coordination-tech" />
 
-<DataInfoBox entityId="coordination-tech" />
+<DataInfoBox entityId="E77" />
 
 ## Quick Assessment
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Tractability** | Medium-High | \$120M+ invested in <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> globally; [International Network of AISIs](https://www.nist.gov/news-events/news/2024/11/fact-sheet-us-department-commerce-us-department-state-launch-international) established with 10+ member nations |
+| **Tractability** | Medium-High | \$120M+ invested in <EntityLink id="E13">AI Safety Institutes</EntityLink> globally; [International Network of AISIs](https://www.nist.gov/news-events/news/2024/11/fact-sheet-us-department-commerce-us-department-state-launch-international) established with 10+ member nations |
 | **Effectiveness** | Partial (60-85% compliance) | 12 of 16 [Frontier AI Safety Commitments](https://metr.org/blog/2025-12-09-common-elements-of-frontier-ai-safety-policies/) signatories published safety frameworks by deadline; voluntary compliance shows limitations |
-| **Implementation Maturity** | Medium | <EntityLink id="monitoring">Compute monitoring</EntityLink> achieves 85% chip tracking coverage; cryptographic verification adds 100-10,000x overhead limiting real-time use |
+| **Implementation Maturity** | Medium | <EntityLink id="E464">Compute monitoring</EntityLink> achieves 85% chip tracking coverage; cryptographic verification adds 100-10,000x overhead limiting real-time use |
 | **International Coordination** | Fragmented | 10 nations in AISI Network; US/UK declined Paris Summit declaration (Feb 2025); China engagement limited |
 | **Timeline to Production** | 1-3 years for monitoring, 3-5 years for verification | [UK AISI](https://www.aisi.gov.uk/blog/our-2025-year-in-review) tested 30+ frontier models in 2025; zero-knowledge ML proofs remain 100-1000x overhead |
 | **Investment Level** | \$120M+ government, \$10M+ industry | UK AISI: £66M/year + £1.5B compute access; US AISI: \$140M; [FMF AI Safety Fund](https://www.frontiermodelforum.org/ai-safety-fund/): \$10M+ |
@@ -42,21 +42,21 @@ import {DataInfoBox, KeyQuestions, R, EntityLink, DataExternalLinks, Mermaid} fr
 
 Many of the most pressing challenges in AI safety and information integrity are fundamentally coordination problems. Individual actors face incentives to defect from collectively optimal behaviors—racing to deploy potentially dangerous AI systems, failing to invest in costly verification infrastructure, or prioritizing engagement over truth in information systems. Coordination technologies represent a crucial class of tools designed to overcome these collective action failures by enabling actors to find, commit to, and maintain cooperative equilibria.
 
-The urgency of developing effective coordination mechanisms has intensified with the rapid advancement of AI capabilities. Current research suggests that without coordination, <EntityLink id="racing-dynamics">racing dynamics</EntityLink> could compress safety timelines by 2-5 years compared to optimal development trajectories. Unlike traditional regulatory approaches that rely primarily on top-down enforcement, coordination technologies often work by changing the strategic structure of interactions themselves, making cooperation individually rational rather than merely collectively beneficial.
+The urgency of developing effective coordination mechanisms has intensified with the rapid advancement of AI capabilities. Current research suggests that without coordination, <EntityLink id="E239">racing dynamics</EntityLink> could compress safety timelines by 2-5 years compared to optimal development trajectories. Unlike traditional regulatory approaches that rely primarily on top-down enforcement, coordination technologies often work by changing the strategic structure of interactions themselves, making cooperation individually rational rather than merely collectively beneficial.
 
-Success in coordination technology development could determine whether humanity can navigate the transition to advanced AI systems safely. The <R id="43c333342d63e444"><EntityLink id="frontier-model-forum">Frontier Model Forum</EntityLink>'s</R> membership now includes all major AI labs, representing 85% of frontier model development capacity. Government initiatives like the <R id="c9c2bcaca0d2c3e6"><EntityLink id="us-aisi">US AI Safety Institute</EntityLink></R> and <EntityLink id="uk-aisi">UK AISI</EntityLink> have allocated \$180M+ in coordination infrastructure investment since 2023, with measurable impacts on industry <EntityLink id="responsible-scaling-policies">responsible scaling policies</EntityLink>.
+Success in coordination technology development could determine whether humanity can navigate the transition to advanced AI systems safely. The <R id="43c333342d63e444"><EntityLink id="E427">Frontier Model Forum</EntityLink>'s</R> membership now includes all major AI labs, representing 85% of frontier model development capacity. Government initiatives like the <R id="c9c2bcaca0d2c3e6"><EntityLink id="E365">US AI Safety Institute</EntityLink></R> and <EntityLink id="E364">UK AISI</EntityLink> have allocated \$180M+ in coordination infrastructure investment since 2023, with measurable impacts on industry <EntityLink id="E252">responsible scaling policies</EntityLink>.
 
 ## Risk/Impact Assessment
 
 | Risk Category | Severity | Likelihood (2-5yr) | Current Trend | Key Indicators | Mitigation Status |
 |---------------|----------|-------------------|---------------|----------------|-------------------|
-| <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> | Very High | 75% | Worsening | 40% reduction in pre-deployment testing time | Partial (RSP adoption) |
+| <EntityLink id="E239">Racing Dynamics</EntityLink> | Very High | 75% | Worsening | 40% reduction in pre-deployment testing time | Partial (RSP adoption) |
 | Verification Failures | High | 60% | Stable | 30% of compute unmonitored | Active development |
 | International Fragmentation | High | 55% | Mixed | 3 major regulatory frameworks diverging | Diplomatic efforts ongoing |
 | Regulatory Capture | Medium | 45% | Improving | 70% industry self-regulation reliance | Standards development |
 | Technical Obsolescence | Medium | 35% | Stable | Annual 10x crypto verification improvements | Research investment |
 
-*Source: <R id="03c995f7743c75a8">CSIS <EntityLink id="ai-governance">AI Governance</EntityLink> Database</R> and expert elicitation survey (n=127), December 2024*
+*Source: <R id="03c995f7743c75a8">CSIS <EntityLink id="E608">AI Governance</EntityLink> Database</R> and expert elicitation survey (n=127), December 2024*
 
 ## Current Coordination Landscape
 
@@ -64,9 +64,9 @@ Success in coordination technology development could determine whether humanity 
 
 | Organization | RSP Framework | Safety Testing Period | Third-Party Audits | Compliance Score |
 |--------------|----------------|----------------------|-------------------|------------------|
-| <EntityLink id="anthropic">Anthropic</EntityLink> | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> + RSP | 90+ days | Quarterly (ARC Evals) | 8.1/10 |
-| <EntityLink id="openai">OpenAI</EntityLink> | Safety Standards | 60+ days | Biannual (internal) | 7.2/10 |
-| <EntityLink id="deepmind">DeepMind</EntityLink> | Capability Assessment | 120+ days | Internal + external | 7.8/10 |
+| <EntityLink id="E22">Anthropic</EntityLink> | <EntityLink id="E451">Constitutional AI</EntityLink> + RSP | 90+ days | Quarterly (ARC Evals) | 8.1/10 |
+| <EntityLink id="E218">OpenAI</EntityLink> | Safety Standards | 60+ days | Biannual (internal) | 7.2/10 |
+| <EntityLink id="E98">DeepMind</EntityLink> | Capability Assessment | 120+ days | Internal + external | 7.8/10 |
 | Meta | Llama Safety Protocol | 30+ days | Limited external | 5.4/10 |
 | xAI | Minimal framework | &lt;30 days | None public | 3.2/10 |
 
@@ -112,7 +112,7 @@ Zero-knowledge and homomorphic encryption systems for AI verification have achie
 | Secure Multi-Party Computation | 10-100x | Federated training | Operational | <R id="2f04234eb2619860">Private AI</R>, <R id="2fdb8def36ebd686">OpenMined</R> |
 | TEE-based Verification | 1.1-2x | Execution integrity | Operational | Intel SGX, AMD SEV |
 
-**Technical Challenge**: Current cryptographic verification adds 100-10,000x computational overhead for <EntityLink id="language-models">large language models</EntityLink>, limiting real-time deployment applications. However, [recent research](https://kudelskisecurity.com/modern-ciso-blog/zkml-verifiable-machine-learning-using-zero-knowledge-proof) demonstrates ZKML can verify ML inference without exposing model parameters, with five key properties identified for AI validation: non-interactivity, transparent setup, standard representations, succinctness, and post-quantum security.
+**Technical Challenge**: Current cryptographic verification adds 100-10,000x computational overhead for <EntityLink id="E186">large language models</EntityLink>, limiting real-time deployment applications. However, [recent research](https://kudelskisecurity.com/modern-ciso-blog/zkml-verifiable-machine-learning-using-zero-knowledge-proof) demonstrates ZKML can verify ML inference without exposing model parameters, with five key properties identified for AI validation: non-interactivity, transparent setup, standard representations, succinctness, and post-quantum security.
 
 ### Monitoring Infrastructure Architecture
 
@@ -155,7 +155,7 @@ flowchart TD
     style Governance fill:#fff3e6
 `} />
 
-<EntityLink id="metr">METR</EntityLink> and <EntityLink id="apollo-research">Apollo Research</EntityLink> have developed standardized evaluation protocols covering 12 capability domains with 85% coverage of safety-relevant properties. The [UK AI Security Institute](https://www.aisi.gov.uk/blog/our-2025-year-in-review) tested over 30 frontier models in 2025, releasing open-source tools including Inspect, InspectSandbox, and ControlArena now used by governments and companies worldwide.
+<EntityLink id="E201">METR</EntityLink> and <EntityLink id="E24">Apollo Research</EntityLink> have developed standardized evaluation protocols covering 12 capability domains with 85% coverage of safety-relevant properties. The [UK AI Security Institute](https://www.aisi.gov.uk/blog/our-2025-year-in-review) tested over 30 frontier models in 2025, releasing open-source tools including Inspect, InspectSandbox, and ControlArena now used by governments and companies worldwide.
 
 ## Game-Theoretic Analysis Framework
 
@@ -278,7 +278,7 @@ Governments are deploying targeted subsidies and tax mechanisms to encourage coo
 | UN Global Dialogue on AI | July 2026 Geneva | 75% | Multi-stakeholder consensus | [Launched](https://press.un.org/en/2025/sgsm22839.doc.htm); Scientific Panel established |
 
 **Industry Evolution**:
-Research by <EntityLink id="epoch-ai">Epoch AI</EntityLink> projects 85% of frontier labs will adopt binding RSPs by end of 2025. [METR tracking](https://metr.org/faisc) shows 12 of 20 Frontier AI Safety Commitment signatories (60%) published frameworks by the February 2025 deadline, with xAI and Nvidia among late adopters.
+Research by <EntityLink id="E125">Epoch AI</EntityLink> projects 85% of frontier labs will adopt binding RSPs by end of 2025. [METR tracking](https://metr.org/faisc) shows 12 of 20 Frontier AI Safety Commitment signatories (60%) published frameworks by the February 2025 deadline, with xAI and Nvidia among late adopters.
 
 ### Medium-Term Outlook (2026-2030)
 
@@ -329,7 +329,7 @@ Research by <EntityLink id="epoch-ai">Epoch AI</EntityLink> projects 85% of fron
 ### Technical Scalability Challenges
 
 **Verification Completeness Limits**:
-Current safety evaluations can assess ~40% of potentially dangerous capabilities. <EntityLink id="metr">METR</EntityLink> research suggests theoretical ceiling of 80-85% coverage for superintelligent systems due to fundamental evaluation limits.
+Current safety evaluations can assess ~40% of potentially dangerous capabilities. <EntityLink id="E201">METR</EntityLink> research suggests theoretical ceiling of 80-85% coverage for superintelligent systems due to fundamental evaluation limits.
 
 **Cryptographic Assumptions**:
 Post-quantum cryptography development could invalidate current verification systems. <R id="661fa26a6de38861">NIST post-quantum standards</R> adoption timeline (2025-2030) creates transition risks.
@@ -366,7 +366,7 @@ OpenAI's November 2023 governance crisis highlighted instability in AI lab corpo
 | Institution | Coordination Role | Budget | Key Resources |
 |-------------|-----------------|--------|---------------|
 | <R id="c9c2bcaca0d2c3e6">NIST AI Safety Institute</R> | Standards development | \$140M (5yr) | <R id="54dbc15413425997">AI RMF</R> |
-| <EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink> | International leadership | £100M (5yr) | <R id="254bcdc7bfcdcd73">Summit proceedings</R> |
+| <EntityLink id="E364">UK AI Safety Institute</EntityLink> | International leadership | £100M (5yr) | <R id="254bcdc7bfcdcd73">Summit proceedings</R> |
 | <R id="fc75d07e5516b396">EU AI Office</R> | Regulatory implementation | €95M | <R id="1ad6dc89cded8b0c">AI Act guidance</R> |
 
 ### Technical Resources
@@ -409,8 +409,8 @@ Coordination technologies improve the <EntityLink id="ai-transition-model" /> th
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="transition-turbulence" /> | <EntityLink id="racing-intensity" /> | Commitment devices and monitoring reduce destructive competition |
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="international-coordination" /> | Verification infrastructure enables trustworthy agreements |
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="institutional-quality" /> | \$120M government investment builds coordination capacity |
+| <EntityLink id="E358" /> | <EntityLink id="E242" /> | Commitment devices and monitoring reduce destructive competition |
+| <EntityLink id="E60" /> | <EntityLink id="E171" /> | Verification infrastructure enables trustworthy agreements |
+| <EntityLink id="E60" /> | <EntityLink id="E167" /> | \$120M government investment builds coordination capacity |
 
 Current racing dynamics reduce safety timelines by 2-5 years; coordination technologies offer path to cooperative development.

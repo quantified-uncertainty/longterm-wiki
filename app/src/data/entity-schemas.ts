@@ -6,10 +6,6 @@
  * customFields are mapped to typed per-entity fields.
  */
 import { z } from "zod";
-import {
-  OLD_TYPE_MAP as _OLD_TYPE_MAP,
-  OLD_LAB_TYPE_TO_ORG_TYPE as _OLD_LAB_TYPE_TO_ORG_TYPE,
-} from "./entity-type-names";
 
 // ============================================================================
 // BASE SCHEMA (shared by all entity types)
@@ -50,13 +46,15 @@ const BaseEntity = z.object({
   status: z.string().optional(),
   customFields: z.array(CustomField).default([]),
   relatedTopics: z.array(z.string()).default([]),
+  // Summary/overview page that this entity belongs to (entity or page ID)
+  summaryPage: z.string().optional(),
 });
 
 // ============================================================================
 // PER-TYPE SCHEMAS
 // ============================================================================
 
-export const RiskEntitySchema = BaseEntity.extend({
+const RiskEntitySchema = BaseEntity.extend({
   entityType: z.literal("risk"),
   severity: z
     .enum(["low", "medium", "medium-high", "high", "critical", "catastrophic"])
@@ -90,18 +88,18 @@ export const RiskEntitySchema = BaseEntity.extend({
     .optional(),
 });
 
-export const RiskFactorEntitySchema = BaseEntity.extend({
+const RiskFactorEntitySchema = BaseEntity.extend({
   entityType: z.literal("risk-factor"),
 });
 
-export const PersonEntitySchema = BaseEntity.extend({
+const PersonEntitySchema = BaseEntity.extend({
   entityType: z.literal("person"),
   role: z.string().optional(),
   affiliation: z.string().optional(),
   knownFor: z.array(z.string()).default([]),
 });
 
-export const OrganizationEntitySchema = BaseEntity.extend({
+const OrganizationEntitySchema = BaseEntity.extend({
   entityType: z.literal("organization"),
   orgType: z
     .enum([
@@ -121,7 +119,7 @@ export const OrganizationEntitySchema = BaseEntity.extend({
   funding: z.string().optional(),
 });
 
-export const PolicyEntitySchema = BaseEntity.extend({
+const PolicyEntitySchema = BaseEntity.extend({
   entityType: z.literal("policy"),
   introduced: z.string().optional(),
   policyStatus: z.string().optional(),
@@ -129,74 +127,74 @@ export const PolicyEntitySchema = BaseEntity.extend({
   scope: z.string().optional(),
 });
 
-export const ApproachEntitySchema = BaseEntity.extend({
+const ApproachEntitySchema = BaseEntity.extend({
   entityType: z.literal("approach"),
 });
 
-export const SafetyAgendaEntitySchema = BaseEntity.extend({
+const SafetyAgendaEntitySchema = BaseEntity.extend({
   entityType: z.literal("safety-agenda"),
   goal: z.string().optional(),
 });
 
-export const ConceptEntitySchema = BaseEntity.extend({
+const ConceptEntitySchema = BaseEntity.extend({
   entityType: z.literal("concept"),
 });
 
-export const CruxEntitySchema = BaseEntity.extend({
+const CruxEntitySchema = BaseEntity.extend({
   entityType: z.literal("crux"),
 });
 
-export const ModelEntitySchema = BaseEntity.extend({
+const ModelEntitySchema = BaseEntity.extend({
   entityType: z.literal("model"),
 });
 
-export const CapabilityEntitySchema = BaseEntity.extend({
+const CapabilityEntitySchema = BaseEntity.extend({
   entityType: z.literal("capability"),
 });
 
-export const ProjectEntitySchema = BaseEntity.extend({
+const ProjectEntitySchema = BaseEntity.extend({
   entityType: z.literal("project"),
 });
 
-export const AnalysisEntitySchema = BaseEntity.extend({
+const AnalysisEntitySchema = BaseEntity.extend({
   entityType: z.literal("analysis"),
 });
 
-export const HistoricalEntitySchema = BaseEntity.extend({
+const HistoricalEntitySchema = BaseEntity.extend({
   entityType: z.literal("historical"),
 });
 
-export const ArgumentEntitySchema = BaseEntity.extend({
+const ArgumentEntitySchema = BaseEntity.extend({
   entityType: z.literal("argument"),
 });
 
-export const ScenarioEntitySchema = BaseEntity.extend({
+const ScenarioEntitySchema = BaseEntity.extend({
   entityType: z.literal("scenario"),
 });
 
-export const CaseStudyEntitySchema = BaseEntity.extend({
+const CaseStudyEntitySchema = BaseEntity.extend({
   entityType: z.literal("case-study"),
 });
 
-export const FunderEntitySchema = BaseEntity.extend({
+const FunderEntitySchema = BaseEntity.extend({
   entityType: z.literal("funder"),
 });
 
-export const ResourceEntitySchema = BaseEntity.extend({
+const ResourceEntitySchema = BaseEntity.extend({
   entityType: z.literal("resource"),
 });
 
-export const ParameterEntitySchema = BaseEntity.extend({
+const ParameterEntitySchema = BaseEntity.extend({
   entityType: z.literal("parameter"),
 });
 
-export const MetricEntitySchema = BaseEntity.extend({
+const MetricEntitySchema = BaseEntity.extend({
   entityType: z.literal("metric"),
 });
 
 // Catch-all for entity types we haven't explicitly modeled
 // (e.g., ai-transition-model-* types)
-export const GenericEntitySchema = BaseEntity.extend({
+const GenericEntitySchema = BaseEntity.extend({
   entityType: z.string(),
 });
 
@@ -241,12 +239,7 @@ export type RiskEntity = z.infer<typeof RiskEntitySchema>;
 export type PersonEntity = z.infer<typeof PersonEntitySchema>;
 export type OrganizationEntity = z.infer<typeof OrganizationEntitySchema>;
 export type PolicyEntity = z.infer<typeof PolicyEntitySchema>;
-export type ApproachEntity = z.infer<typeof ApproachEntitySchema>;
-export type SafetyAgendaEntity = z.infer<typeof SafetyAgendaEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;
-
-/** All possible entityType string literals for typed entities */
-export type EntityTypeName = TypedEntity["entityType"];
 
 // ============================================================================
 // TYPE GUARDS
@@ -268,14 +261,3 @@ export function isPolicy(e: TypedEntity | GenericEntity): e is PolicyEntity {
   return e.entityType === "policy";
 }
 
-// ============================================================================
-// TYPE MAPPING FROM OLD DATABASE TYPES
-// (Canonical definitions live in entity-type-names.ts; re-exported here for
-// backward compatibility with existing consumers.)
-// ============================================================================
-
-/** @see entity-type-names.ts for the canonical definition */
-export const OLD_TYPE_MAP = _OLD_TYPE_MAP;
-
-/** @see entity-type-names.ts for the canonical definition */
-export const OLD_LAB_TYPE_TO_ORG_TYPE = _OLD_LAB_TYPE_TO_ORG_TYPE;

@@ -16,11 +16,6 @@ ratings:
   rigor: 7
   actionability: 6
   completeness: 7
-metrics:
-  wordCount: 4200
-  citations: 40
-  tables: 6
-  diagrams: 1
 clusters:
   - ai-safety
   - governance
@@ -30,7 +25,7 @@ import {DataInfoBox, Mermaid, EntityLink, DataExternalLinks} from '@components/w
 
 <DataExternalLinks pageId="compute-concentration" />
 
-<DataInfoBox entityId="compute-concentration" />
+<DataInfoBox entityId="E684" />
 
 ## Quick Assessment
 
@@ -45,11 +40,11 @@ import {DataInfoBox, Mermaid, EntityLink, DataExternalLinks} from '@components/w
 
 ## Overview
 
-The global AI infrastructure buildout documented in the <EntityLink id="projecting-compute-spending">Projecting Compute Spending</EntityLink> analysis reveals an investment pattern that concentrates the vast majority of frontier AI training compute among a handful of entities. This page examines the structural risks that concentration creates — dimensions that extend beyond standard market competition or economic analysis.
+The global AI infrastructure buildout documented in the <EntityLink id="E680">Projecting Compute Spending</EntityLink> analysis reveals an investment pattern that concentrates the vast majority of frontier AI training compute among a handful of entities. This page examines the structural risks that concentration creates — dimensions that extend beyond standard market competition or economic analysis.
 
 The core structural fact: **all six major AI infrastructure spenders are US-headquartered companies subject to US federal jurisdiction.** This means the world's frontier AI training compute, model weights, training data, and inference infrastructure falls overwhelmingly under a single national legal framework. Combined with the scale of investment (\$700B+ in 2026 alone), this creates a set of interlocking risks — jurisdictional, cybersecurity, military-commercial, oligopolistic, and democratic — that have no close historical precedent.
 
-This risk is distinct from the broader <EntityLink id="concentration-of-power">concentration of power</EntityLink> risk, which covers power accumulation across multiple dimensions (talent, data, capital, political influence). Compute concentration is one specific mechanism within that broader picture, but it warrants dedicated analysis because the physical infrastructure creates unique dynamics: it is expensive, slow to build, geographically fixed, legally jurisdictional, and strategically targetable in ways that software and data are not.
+This risk is distinct from the broader <EntityLink id="E68">concentration of power</EntityLink> risk, which covers power accumulation across multiple dimensions (talent, data, capital, political influence). Compute concentration is one specific mechanism within that broader picture, but it warrants dedicated analysis because the physical infrastructure creates unique dynamics: it is expensive, slow to build, geographically fixed, legally jurisdictional, and strategically targetable in ways that software and data are not.
 
 ---
 
@@ -70,7 +65,7 @@ The US controlled roughly 70% of global internet infrastructure in the 1990s, bu
 
 ### Compute as Geopolitical Lever
 
-US policymakers have explicitly articulated this dynamic. Anthropic CEO Dario Amodei argued in 2025 that enforced <EntityLink id="export-controls">export controls</EntityLink> could ensure "a unipolar world, where only the US and its allies have these models."[^10] OpenAI has lobbied for aggressive export restrictions on Chinese competitors.[^11] The Biden administration's AI Diffusion Rule (January 2025) created a three-tier system restricting AI chip exports to approximately 150 countries before the Trump administration rescinded it in May 2025.[^12]
+US policymakers have explicitly articulated this dynamic. Anthropic CEO Dario Amodei argued in 2025 that enforced <EntityLink id="E136">export controls</EntityLink> could ensure "a unipolar world, where only the US and its allies have these models."[^10] OpenAI has lobbied for aggressive export restrictions on Chinese competitors.[^11] The Biden administration's AI Diffusion Rule (January 2025) created a three-tier system restricting AI chip exports to approximately 150 countries before the Trump administration rescinded it in May 2025.[^12]
 
 The historical parallel is the US dollar's role as global reserve currency, which enables financial sanctions via SWIFT (as demonstrated against Russia in 2022). Control over AI compute creates analogous leverage: nations dependent on US-controlled compute can be cut off from AI capabilities through executive action — without requiring any other country's cooperation.
 
@@ -162,7 +157,7 @@ FTC Commissioner Holyoak stated in 2025 that "antitrust enforcers need to be vig
 
 Current trends suggest concentration could increase. Capital requirements are growing exponentially — from \$238 billion in 2024 to \$700 billion in 2026 — creating barriers that eliminate potential competitors. If smaller players face financial difficulties (Oracle's negative free cash flow and \$175 billion in debt is a near-term risk factor), acquisition by larger players would further concentrate control.
 
-The self-reinforcing dynamics are documented in the wiki's <EntityLink id="winner-take-all-concentration">winner-take-all concentration model</EntityLink>, which estimates a loop gain of 1.2-2.0. At loop gains above 1.0, concentration is the stable equilibrium.
+The self-reinforcing dynamics are documented in the wiki's <EntityLink id="E375">winner-take-all concentration model</EntityLink>, which estimates a loop gain of 1.2-2.0. At loop gains above 1.0, concentration is the stable equilibrium.
 
 <Mermaid chart={`
 flowchart TD
@@ -210,11 +205,11 @@ AI compute concentration does not yet approach these levels of strategic importa
 4. **Open-source competitiveness**: If open-weight models remain within striking distance of frontier closed models, compute concentration matters less for capability access (though not for training-phase risks).
 5. **Geopolitical fragmentation**: US-China decoupling could create two parallel compute ecosystems, reducing single-jurisdiction risk but creating other dynamics.
 
-None of the outcomes described above are inevitable. They are structural possibilities created by the investment pattern documented in the <EntityLink id="projecting-compute-spending">spending analysis</EntityLink>. Whether they materialize depends on governance choices made in the near term — a window that the physical infrastructure buildout makes partially predictable but that is closing as capital is deployed.
+None of the outcomes described above are inevitable. They are structural possibilities created by the investment pattern documented in the <EntityLink id="E680">spending analysis</EntityLink>. Whether they materialize depends on governance choices made in the near term — a window that the physical infrastructure buildout makes partially predictable but that is closing as capital is deployed.
 
 ## References
 
-[^1]: Combined analysis from Amazon, Alphabet, Microsoft, Meta, Oracle, and xAI earnings calls and filings, Q4 2025 through Q1 2026. See <EntityLink id="projecting-compute-spending">Projecting Compute Spending</EntityLink> for full breakdown.
+[^1]: Combined analysis from Amazon, Alphabet, Microsoft, Meta, Oracle, and xAI earnings calls and filings, Q4 2025 through Q1 2026. See <EntityLink id="E680">Projecting Compute Spending</EntityLink> for full breakdown.
 [^2]: US Congress, "Clarifying Lawful Overseas Use of Data Act (CLOUD Act)," H.R. 4943, enacted March 2018. [Congress.gov](https://www.congress.gov/bill/115th-congress/house-bill/4943)
 [^3]: Foreign Intelligence Surveillance Act of 1978, Section 702, as amended by the FISA Amendments Act of 2008. Reauthorized April 2024. Congressional Research Service analysis.
 [^4]: Wiz Research, "NVIDIAScape: Critical Container Escape Vulnerability (CVE-2025-23266)," 2025. [Wiz Blog](https://www.wiz.io/blog/nvidia-ai-vulnerability-cve-2025-23266-nvidiascape)

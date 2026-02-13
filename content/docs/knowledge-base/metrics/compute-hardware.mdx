@@ -12,11 +12,6 @@ ratings:
   rigor: 6.8
   actionability: 7.1
   completeness: 7.5
-metrics:
-  wordCount: 4053
-  citations: 55
-  tables: 11
-  diagrams: 1
 clusters: ["ai-safety", "governance"]
 ---
 import {R, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
@@ -47,7 +42,7 @@ Compute and hardware metrics are fundamental to understanding AI progress. The a
 
 ### Why This Matters
 
-Hardware availability directly constrains AI capabilities development. Training compute determines which models can be built, efficiency improvements affect economic viability of deployment, and supply chain dynamics influence geopolitical competition. These metrics inform policy decisions including export controls, compute governance proposals, and infrastructure planning.
+Hardware availability directly constrains AI capabilities development. Training compute determines which models can be built, efficiency improvements affect economic viability of deployment, and supply chain dynamics influence geopolitical competition. These metrics inform policy decisions including <EntityLink id="E136">export controls</EntityLink>, <EntityLink id="compute-governance">compute governance</EntityLink> proposals, and infrastructure planning.
 
 ### AI Hardware Supply Chain
 
@@ -114,10 +109,10 @@ As of mid-2024, Epoch AI estimates approximately **4 million H100-equivalent GPU
 The stock of computing power from NVIDIA chips has been **doubling every 10 months** since 2019, with growth accelerating to 2.3x per year.
 
 **Major Lab Holdings (End of 2024 estimates)**:
-- OpenAI: approximately 250k average, ramping to 460k H100-equivalents by year-end (5% of global supply)
-- Anthropic: approximately 360k H100-equivalents (4% of global supply), including 400k Amazon Trainium2
-- Google: Largest holder with proprietary TPUs plus GPUs (21% of global AI compute)
-- Meta: 13% of global AI compute share
+- <EntityLink id="openai">OpenAI</EntityLink>: approximately 250k average, ramping to 460k H100-equivalents by year-end (5% of global supply)
+- <EntityLink id="anthropic">Anthropic</EntityLink>: approximately 360k H100-equivalents (4% of global supply), including 400k Amazon Trainium2
+- <EntityLink id="deepmind">Google</EntityLink>: Largest holder with proprietary TPUs plus GPUs (21% of global AI compute)
+- <EntityLink id="E549">Meta</EntityLink>: 13% of global AI compute share
 
 **Data Quality**: Medium. Based on cost reports, capacity estimates, and informed analysis from industry observers.
 
@@ -153,8 +148,8 @@ Training compute for frontier AI models has grown **4-5x per year** since 2010, 
 - By 2028: Projected 165 models at greater than 10²⁵ FLOP; 81 models at greater than 10²⁶ FLOP
 
 **Regulatory Thresholds**:
-- **EU AI Act**: 10²⁵ FLOP reporting requirement
-- **US Executive Order 14110**: 10²⁶ FLOP reporting requirement
+- **<EntityLink id="E127">EU AI Act</EntityLink>**: 10²⁵ FLOP reporting requirement
+- **<EntityLink id="E366">US Executive Order 14110</EntityLink>**: 10²⁶ FLOP reporting requirement
 
 **Cost Trajectory**: The cost of training frontier AI models has grown by a factor of 2-3x per year for the past eight years, suggesting that the largest models will cost over a billion dollars by 2027 (<R id="b11835a2ec16107f">arXiv analysis</R>).
 

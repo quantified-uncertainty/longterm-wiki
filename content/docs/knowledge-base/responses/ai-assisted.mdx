@@ -13,11 +13,6 @@ ratings:
   rigor: 6.5
   actionability: 7
   completeness: 7.5
-metrics:
-  wordCount: 987
-  citations: 54
-  tables: 19
-  diagrams: 1
 clusters:
   - ai-safety
 subcategory: alignment
@@ -30,16 +25,16 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 AI-assisted alignment uses current AI systems to help solve alignment problems—from automated red-teaming that discovered over 95% of potential jailbreaks, to interpretability research that identified [10 million interpretable features](https://www.anthropic.com/news/mapping-mind-language-model) in Claude 3 Sonnet, to recursive oversight protocols that aim to scale human supervision to superhuman systems. Global investment in AI safety alignment research reached approximately [\$8.9 billion in 2025](https://www.secondtalent.com/resources/ai-startup-funding-investment/), with 50-150 full-time researchers working directly on AI-assisted approaches.
 
-This approach is already deployed at major AI labs. <EntityLink id="anthropic">Anthropic</EntityLink>'s [Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) reduced jailbreak success rates from 86% baseline to 4.4% with AI assistance—withstanding over 3,000 hours of expert red-teaming with no universal jailbreak discovered. <EntityLink id="openai">OpenAI</EntityLink>'s [weak-to-strong generalization research](https://openai.com/index/weak-to-strong-generalization/) showed that GPT-4 trained on GPT-2 labels can recover 80-90% of GPT-3.5-level performance on NLP tasks. The <R id="2fdf91febf06daaf">Anthropic-OpenAI joint evaluation</R> in 2025 demonstrated both the promise and risks of automated alignment testing, with o3 showing better-aligned behavior than Claude Opus 4 on most dimensions tested.
+This approach is already deployed at major AI labs. <EntityLink id="E22">Anthropic</EntityLink>'s [Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) reduced jailbreak success rates from 86% baseline to 4.4% with AI assistance—withstanding over 3,000 hours of expert red-teaming with no universal jailbreak discovered. <EntityLink id="E218">OpenAI</EntityLink>'s [weak-to-strong generalization research](https://openai.com/index/weak-to-strong-generalization/) showed that GPT-4 trained on GPT-2 labels can recover 80-90% of GPT-3.5-level performance on NLP tasks. The <R id="2fdf91febf06daaf">Anthropic-OpenAI joint evaluation</R> in 2025 demonstrated both the promise and risks of automated alignment testing, with o3 showing better-aligned behavior than Claude Opus 4 on most dimensions tested.
 
-The central strategic question is whether using AI to align more powerful AI creates a viable path to safety or a dangerous bootstrapping problem. Current evidence suggests AI assistance provides significant capability gains for specific alignment tasks, but scalability to superhuman systems remains uncertain—effectiveness estimates range from 85-95% for current systems to 30-60% for superhuman AI. OpenAI's dedicated Superalignment team was <R id="33a4513e1449b55d">dissolved in May 2024</R> after disagreements about company priorities, with key personnel (including <EntityLink id="jan-leike">Jan Leike</EntityLink>) moving to Anthropic to continue the research. [Safe Superintelligence](https://techfundingnews.com/openai-anthropic-xai-ai-funding-trends-2025/), co-founded by former OpenAI chief scientist <EntityLink id="ilya-sutskever">Ilya Sutskever</EntityLink>, raised \$2 billion in January 2025 to focus exclusively on alignment.
+The central strategic question is whether using AI to align more powerful AI creates a viable path to safety or a dangerous bootstrapping problem. Current evidence suggests AI assistance provides significant capability gains for specific alignment tasks, but scalability to superhuman systems remains uncertain—effectiveness estimates range from 85-95% for current systems to 30-60% for superhuman AI. OpenAI's dedicated Superalignment team was <R id="33a4513e1449b55d">dissolved in May 2024</R> after disagreements about company priorities, with key personnel (including <EntityLink id="E182">Jan Leike</EntityLink>) moving to Anthropic to continue the research. [Safe Superintelligence](https://techfundingnews.com/openai-anthropic-xai-ai-funding-trends-2025/), co-founded by former OpenAI chief scientist <EntityLink id="E163">Ilya Sutskever</EntityLink>, raised \$2 billion in January 2025 to focus exclusively on alignment.
 
 ## Quick Assessment
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | Tractability | **High** | Already deployed; [Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) reduced jailbreaks from 86% to 4.4% |
-| Effectiveness | **Medium-High** | <EntityLink id="weak-to-strong">Weak-to-strong generalization</EntityLink> recovers 80-90% of strong model capability |
+| Effectiveness | **Medium-High** | <EntityLink id="E452">Weak-to-strong generalization</EntityLink> recovers 80-90% of strong model capability |
 | Scalability | **Uncertain** | Works for current systems; untested for superhuman AI |
 | Safety Risk | **Medium** | Bootstrapping problem: helper AI must already be aligned |
 | Investment Level | **\$8-10B sector-wide** | [Safe Superintelligence raised \$2B](https://techfundingnews.com/openai-anthropic-xai-ai-funding-trends-2025/); alignment-specific investment ≈\$8.9B expected in 2025 |
@@ -256,12 +251,12 @@ The fundamental question: can we safely use AI to align more powerful AI?
 
 ## AI Transition Model Context
 
-AI-assisted alignment improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="misalignment-potential" />:
+AI-assisted alignment improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="E205" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | AI assistance helps safety research keep pace with capability advances |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Automated red-teaming finds failure modes humans miss |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Weak-to-strong generalization extends human oversight to superhuman systems |
+| <EntityLink id="E205" /> | <EntityLink id="E261" /> | AI assistance helps safety research keep pace with capability advances |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Automated red-teaming finds failure modes humans miss |
+| <EntityLink id="E205" /> | <EntityLink id="E160" /> | Weak-to-strong generalization extends human oversight to superhuman systems |
 
 AI-assisted alignment is critical for short-timeline scenarios where human-only research cannot scale fast enough.

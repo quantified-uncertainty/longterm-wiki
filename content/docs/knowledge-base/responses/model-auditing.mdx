@@ -13,11 +13,6 @@ ratings:
   rigor: 7
   actionability: 6.5
   completeness: 7.5
-metrics:
-  wordCount: 1597
-  citations: 85
-  tables: 43
-  diagrams: 2
 clusters:
   - ai-safety
   - governance
@@ -31,20 +26,20 @@ import {Mermaid, DataExternalLinks, R, EntityLink} from '@components/wiki';
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Maturity** | Growing (2023-present) | <EntityLink id="metr">METR</EntityLink> spun off Dec 2023; UK AISI Nov 2023; US AISI Feb 2024; formal MOUs signed Aug 2024 |
+| **Maturity** | Growing (2023-present) | <EntityLink id="E201">METR</EntityLink> spun off Dec 2023; UK AISI Nov 2023; US AISI Feb 2024; formal MOUs signed Aug 2024 |
 | **Investment** | \$10-50M/year across ecosystem | METR (≈\$10M), UK AISI (≈\$15-20M), Apollo (≈\$1M), US AISI (≈\$10-15M), plus commercial sector |
 | **Coverage** | All major frontier models | GPT-4.5, GPT-5, o3, Claude 3.5/3.7/Opus 4, Gemini evaluated pre-deployment |
 | **Effectiveness** | Medium - adds accountability | Independence valuable; limited by same detection challenges as internal teams |
 | **Scalability** | Partial - capacity constrained | Auditor expertise must keep pace with frontier; ≈200 staff total across major organizations |
 | **Deception Robustness** | Weak | Apollo found o1 maintains deception in greater than 85% of follow-ups; behavioral evals have ceiling |
-| **Regulatory Status** | Voluntary (US/UK) to mandatory (EU) | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> requires third-party conformity assessment for high-risk systems by Aug 2026 |
-| **<EntityLink id="international-coordination">International Coordination</EntityLink>** | Emerging | International Network of AISIs launched Nov 2024 with 10 member countries |
+| **Regulatory Status** | Voluntary (US/UK) to mandatory (EU) | <EntityLink id="E127">EU AI Act</EntityLink> requires third-party conformity assessment for high-risk systems by Aug 2026 |
+| **<EntityLink id="E171">International Coordination</EntityLink>** | Emerging | International Network of AISIs launched Nov 2024 with 10 member countries |
 
 ## Overview
 
 Third-party model auditing involves external organizations independently evaluating AI systems for safety properties, dangerous capabilities, and alignment characteristics that the developing lab might miss or downplay. Unlike internal safety teams who may face pressure to approve deployments, third-party auditors provide independent assessment with no financial stake in the model's commercial success. This creates an accountability mechanism similar to financial auditing, where external verification adds credibility to safety claims.
 
-The field has grown rapidly since 2023. Organizations like [METR](https://metr.org/) (Model Evaluation and Threat Research), [Apollo Research](https://www.apolloresearch.ai/), and government <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> now conduct pre-deployment evaluations of frontier models. METR has partnerships with <EntityLink id="anthropic">Anthropic</EntityLink> and <EntityLink id="openai">OpenAI</EntityLink>, evaluating GPT-4.5, GPT-5, Claude 3.5 Sonnet, o3, and other models before public release. In August 2024, the [US AI Safety Institute signed formal agreements](https://www.nist.gov/news-events/news/2024/08/us-ai-safety-institute-signs-agreements-regarding-ai-safety-research) with both Anthropic and OpenAI for pre- and post-deployment model testing—the first official government-industry agreements on AI safety evaluation. The <EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink> (now rebranded as the [AI Security Institute](https://www.aisi.gov.uk/)) conducts independent assessments and coordinates with US AISI on methodology, having conducted joint evaluations including their [December 2024 assessment of OpenAI's o1 model](https://www.aisi.gov.uk/blog/pre-deployment-evaluation-of-openais-o1-model).
+The field has grown rapidly since 2023. Organizations like [METR](https://metr.org/) (Model Evaluation and Threat Research), [Apollo Research](https://www.apolloresearch.ai/), and government <EntityLink id="E13">AI Safety Institutes</EntityLink> now conduct pre-deployment evaluations of frontier models. METR has partnerships with <EntityLink id="E22">Anthropic</EntityLink> and <EntityLink id="E218">OpenAI</EntityLink>, evaluating GPT-4.5, GPT-5, Claude 3.5 Sonnet, o3, and other models before public release. In August 2024, the [US AI Safety Institute signed formal agreements](https://www.nist.gov/news-events/news/2024/08/us-ai-safety-institute-signs-agreements-regarding-ai-safety-research) with both Anthropic and OpenAI for pre- and post-deployment model testing—the first official government-industry agreements on AI safety evaluation. The <EntityLink id="E364">UK AI Safety Institute</EntityLink> (now rebranded as the [AI Security Institute](https://www.aisi.gov.uk/)) conducts independent assessments and coordinates with US AISI on methodology, having conducted joint evaluations including their [December 2024 assessment of OpenAI's o1 model](https://www.aisi.gov.uk/blog/pre-deployment-evaluation-of-openais-o1-model).
 
 Despite progress, third-party auditing faces significant challenges. Auditors require deep access to models that labs may be reluctant to provide. Auditor expertise must keep pace with rapidly advancing capabilities. And even competent auditors face the same fundamental detection challenges as internal teams: sophisticated deception could evade any behavioral evaluation. Third-party auditing adds a valuable layer of accountability but should not be mistaken for a complete solution to AI safety verification.
 
@@ -66,7 +61,7 @@ Despite progress, third-party auditing faces significant challenges. Auditors re
 | Organization | Annual Budget (est.) | Models Evaluated (2024-2025) | Coverage |
 |--------------|---------------------|------------------------------|----------|
 | **METR** | ≈\$10M | GPT-4.5, GPT-5, o3, o4-mini, Claude 3.5/3.7/Opus 4 | Autonomous capabilities, AI R&D |
-| **<EntityLink id="apollo-research">Apollo Research</EntityLink>** | ≈\$5M | o1, Claude 3.5 Sonnet, Claude 3 Opus, Gemini 1.5 Pro, Llama 3.1 405B, Claude Opus 4 | <EntityLink id="scheming">Scheming</EntityLink>, deception |
+| **<EntityLink id="E24">Apollo Research</EntityLink>** | ≈\$5M | o1, Claude 3.5 Sonnet, Claude 3 Opus, Gemini 1.5 Pro, Llama 3.1 405B, Claude Opus 4 | <EntityLink id="E274">Scheming</EntityLink>, deception |
 | **UK AISI** | ≈\$15-20M | All major frontier models | Cyber, bio, safeguards |
 | **US AISI** | ≈\$10-15M | o1, Claude 3.5 Sonnet (joint with UK) | Cross-domain evaluation |
 | **Scale AI (SEAL)** | Commercial | Various (contracted by US AISI) | Performance benchmarks |

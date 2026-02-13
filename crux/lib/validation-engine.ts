@@ -22,12 +22,13 @@ import { getColors, type Colors } from './output.ts';
 import { parseFrontmatterAndBody } from './mdx-utils.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, type Frontmatter } from './content-types.ts';
 import { parseSidebarConfig, type SidebarParseResult } from './sidebar-utils.ts';
+import { logBulkFixes } from './edit-log.ts';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface FixSpec {
+interface FixSpec {
   type: string;
   content?: string;
   oldText?: string;
@@ -40,9 +41,9 @@ export interface FixSpec {
   [key: string]: unknown;
 }
 
-export type SidebarConfig = SidebarParseResult;
+type SidebarConfig = SidebarParseResult;
 
-export interface IssueOptions {
+interface IssueOptions {
   rule: string;
   file: string;
   line?: number;
@@ -63,12 +64,12 @@ export interface Rule {
   fix?(content: string, issue: Issue): string | null;
 }
 
-export interface ValidateOptions {
+interface ValidateOptions {
   ruleIds?: string[] | null;
   files?: string[] | null;
 }
 
-export interface FormatOptions {
+interface FormatOptions {
   ci?: boolean;
   verbose?: boolean;
 }
@@ -211,6 +212,7 @@ export class ValidationEngine {
   pathRegistry: Record<string, string>;
   reversePathRegistry: Record<string, string>;
   entities: unknown;
+  idRegistry: { byNumericId: Record<string, string>; bySlug: Record<string, string> } | null;
   sidebarConfig: SidebarConfig;
 
   constructor(options: EngineOptions = {}) {
@@ -227,6 +229,7 @@ export class ValidationEngine {
     this.pathRegistry = {};
     this.reversePathRegistry = {};
     this.entities = null;
+    this.idRegistry = null;
     this.sidebarConfig = { entries: [], directories: new Set() };
   }
 
@@ -248,6 +251,19 @@ export class ValidationEngine {
 
     this.pathRegistry = (loadJSON('data/pathRegistry.json') as Record<string, string>) || {};
     this.entities = loadYAML('data/entities.yaml') || {};
+
+    // Load id-registry for numeric ID resolution
+    const rawRegistry = loadJSON('data/id-registry.json') as { entities?: Record<string, string> } | null;
+    if (rawRegistry?.entities) {
+      const byNumericId = rawRegistry.entities;
+      const bySlug: Record<string, string> = {};
+      for (const [eid, slug] of Object.entries(byNumericId)) {
+        bySlug[slug] = eid;
+      }
+      this.idRegistry = { byNumericId, bySlug };
+    } else {
+      this.idRegistry = null;
+    }
 
     this.reversePathRegistry = {};
     for (const [id, path] of Object.entries(this.pathRegistry)) {
@@ -366,15 +382,25 @@ export class ValidationEngine {
     let filesFixed = 0;
     let issuesFixed = 0;
 
+    const modifiedFiles: string[] = [];
     for (const [filePath, fileIssues] of byFile) {
       const content = readFileSync(filePath, 'utf-8');
       const fixed = this._applyFixesToContent(content, fileIssues);
 
       if (fixed !== content) {
         writeFileSync(filePath, fixed);
+        modifiedFiles.push(filePath);
         filesFixed++;
         issuesFixed += fileIssues.length;
       }
+    }
+
+    if (modifiedFiles.length > 0) {
+      logBulkFixes(modifiedFiles, {
+        tool: 'crux-fix',
+        agency: 'automated',
+        note: 'Auto-fixed validation issues (escaping, markdown, etc.)',
+      });
     }
 
     return { filesFixed, issuesFixed };

@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient, parseJsonResponse } from '../../lib/anthropic.ts';
+import { appendEditLog } from '../../lib/edit-log.ts';
 
 interface GradingContext {
   log: (phase: string, message: string) => void;
@@ -188,18 +189,9 @@ Respond with JSON:
       frontmatter.balanceFlags = balanceFlags;
     }
 
-    // Count metrics
-    const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
-    const citations = (body.match(/\[\^\d+\]/g) || []).length;
-    const tables = (body.match(/^\|/gm) || []).length > 0 ? Math.floor((body.match(/^\|/gm) || []).length / 3) : 0;
-    const diagrams = (body.match(/<Mermaid/g) || []).length;
-
-    frontmatter.metrics = {
-      wordCount,
-      citations: new Set((body.match(/\[\^\d+\]/g) || [])).size,
-      tables,
-      diagrams
-    };
+    // Metrics (wordCount, citations, tables, diagrams) are computed at build time
+    // by app/scripts/lib/metrics-extractor.mjs — not stored in frontmatter.
+    delete frontmatter.metrics;
 
     // Write updated file
     const { stringify: stringifyYaml } = await import('yaml');
@@ -207,6 +199,16 @@ Respond with JSON:
     yamlStr = yamlStr.replace(/^(lastEdited:\s*)(\d{4}-\d{2}-\d{2})$/m, '$1"$2"');
     const newContent = `---\n${yamlStr}---\n${body}`;
     fs.writeFileSync(finalPath, newContent);
+
+    // Use sanitized topic as page ID (matches deployment.ts slug derivation).
+    // Do NOT use pageIdFromPath(finalPath) — finalPath is a temp dir path
+    // like .claude/temp/page-creator/topic/final.mdx which would resolve to "final".
+    const pageId = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    appendEditLog(pageId, {
+      tool: 'crux-grade',
+      agency: 'automated',
+      note: `Initial creation grading: quality=${quality}, importance=${grades.importance}`,
+    });
 
     log('grade', `Graded: imp=${grades.importance}, qual=${quality}`);
     log('grade', `  Summary: ${grades.llmSummary?.slice(0, 100)}...`);

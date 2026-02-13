@@ -161,7 +161,7 @@ export async function callClaude(client: Anthropic, {
 /**
  * Custom error for rate limiting
  */
-export class RateLimitError extends Error {
+class RateLimitError extends Error {
   retryAfter: number;
 
   constructor(retryAfter: number) {
@@ -176,65 +176,6 @@ export class RateLimitError extends Error {
  */
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-export interface BatchResult<T, I> {
-  success: boolean;
-  item: I;
-  result?: T;
-  error?: unknown;
-}
-
-export interface ProcessBatchOptions<I> {
-  concurrency?: number;
-  delayBetweenBatches?: number;
-  onProgress?: ((info: { completed: number; total: number; item: I; result?: unknown; error?: unknown }) => void) | null;
-}
-
-/**
- * Process items in batches with rate limiting
- */
-export async function processBatch<T, I>(
-  items: I[],
-  processor: (item: I) => Promise<T>,
-  {
-    concurrency = 3,
-    delayBetweenBatches = 200,
-    onProgress = null,
-  }: ProcessBatchOptions<I> = {},
-): Promise<BatchResult<T, I>[]> {
-  const results: BatchResult<T, I>[] = [];
-  let completed = 0;
-
-  for (let i = 0; i < items.length; i += concurrency) {
-    const batch = items.slice(i, i + concurrency);
-    const batchResults = await Promise.all(
-      batch.map(async (item) => {
-        try {
-          const result = await processor(item);
-          completed++;
-          if (onProgress) {
-            onProgress({ completed, total: items.length, item, result });
-          }
-          return { success: true, item, result } as BatchResult<T, I>;
-        } catch (error) {
-          completed++;
-          if (onProgress) {
-            onProgress({ completed, total: items.length, item, error });
-          }
-          return { success: false, item, error } as BatchResult<T, I>;
-        }
-      })
-    );
-    results.push(...batchResults);
-
-    // Delay between batches to avoid rate limiting
-    if (i + concurrency < items.length) {
-      await sleep(delayBetweenBatches);
-    }
-  }
-
-  return results;
 }
 
 /**

@@ -27,6 +27,7 @@ import { findMdxFiles } from './lib/file-utils.ts';
 import { getColors } from './lib/output.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities } from './lib/content-types.ts';
 import type { PathRegistry } from './lib/content-types.ts';
+import { logBulkFixes } from './lib/edit-log.ts';
 
 // Load path registry for EntityLink conversion
 const pathRegistry: PathRegistry = loadPathRegistry();
@@ -396,6 +397,7 @@ async function main(): Promise<void> {
   };
 
   const filesToFix: FileToFix[] = [];
+  const fixedFiles: string[] = [];
 
   // First pass: find all broken links
   for (const file of files) {
@@ -513,6 +515,7 @@ async function main(): Promise<void> {
       }
     } else {
       writeFileSync(file, fixed);
+      fixedFiles.push(file);
       results.fixed += fixCount;
       console.log(`${colors.green}Fixed${colors.reset} ${relFile}: ${fixCount} links`);
     }
@@ -524,6 +527,13 @@ async function main(): Promise<void> {
     console.log(`${colors.yellow}Dry run complete. Run with --fix to apply changes.${colors.reset}`);
   } else if (FIX_MODE) {
     console.log(`${colors.green}Fixed ${results.fixed} broken links${colors.reset}`);
+    if (fixedFiles.length > 0) {
+      logBulkFixes(fixedFiles, {
+        tool: 'crux-fix',
+        agency: 'automated',
+        note: 'Fixed broken internal links',
+      });
+    }
   }
 }
 

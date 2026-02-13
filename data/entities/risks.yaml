@@ -114,7 +114,7 @@
 - id: automation-bias
   numericId: E32
   type: risk
-  title: Automation Bias
+  title: Automation Bias (AI Systems)
   severity: medium
   likelihood:
     level: very-high
@@ -264,7 +264,7 @@
 - id: concentration-of-power
   numericId: E68
   type: risk
-  title: Concentration of Power
+  title: AI-Driven Concentration of Power
   severity: high
   likelihood:
     level: medium-high
@@ -314,7 +314,7 @@
 - id: consensus-manufacturing
   numericId: E72
   type: risk
-  title: Consensus Manufacturing
+  title: AI-Powered Consensus Manufacturing
   severity: high
   likelihood:
     level: medium
@@ -409,7 +409,7 @@
 - id: cyber-psychosis
   numericId: E83
   type: risk
-  title: Cyber Psychosis
+  title: AI-Induced Cyber Psychosis
   severity: medium-high
   likelihood:
     level: medium
@@ -673,7 +673,7 @@
 - id: distributional-shift
   numericId: E105
   type: risk
-  title: Distributional Shift
+  title: AI Distributional Shift
   severity: medium
   likelihood:
     level: very-high
@@ -708,7 +708,7 @@
 - id: economic-disruption
   numericId: E108
   type: risk
-  title: Economic Disruption
+  title: AI-Driven Economic Disruption
   severity: medium-high
   likelihood:
     level: high
@@ -806,7 +806,7 @@
 - id: enfeeblement
   numericId: E118
   type: risk
-  title: Enfeeblement
+  title: AI-Induced Enfeeblement
   severity: medium-high
   likelihood:
     level: medium
@@ -953,7 +953,7 @@
 - id: expertise-atrophy
   numericId: E133
   type: risk
-  title: Expertise Atrophy
+  title: AI-Induced Expertise Atrophy
   severity: high
   likelihood:
     level: medium
@@ -1010,7 +1010,7 @@
 - id: flash-dynamics
   numericId: E142
   type: risk
-  title: Flash Dynamics
+  title: AI Flash Dynamics
   severity: high
   likelihood:
     level: medium-high
@@ -1205,7 +1205,7 @@
 - id: institutional-capture
   numericId: E166
   type: risk
-  title: Institutional Decision Capture
+  title: AI-Driven Institutional Decision Capture
   severity: high
   likelihood:
     level: medium
@@ -1309,7 +1309,7 @@
 - id: irreversibility
   numericId: E179
   type: risk
-  title: Irreversibility
+  title: AI-Induced Irreversibility
   severity: critical
   likelihood:
     level: medium
@@ -1471,7 +1471,7 @@
 - id: legal-evidence-crisis
   numericId: E188
   type: risk
-  title: Legal Evidence Crisis
+  title: AI-Driven Legal Evidence Crisis
   severity: high
   likelihood:
     level: medium
@@ -1529,7 +1529,7 @@
 - id: lock-in
   numericId: E189
   type: risk
-  title: Lock-in
+  title: AI Value Lock-in
   severity: catastrophic
   likelihood:
     level: medium
@@ -1586,7 +1586,7 @@
 - id: authoritarian-takeover
   numericId: E29
   type: risk
-  title: Authoritarian Takeover
+  title: AI-Enabled Authoritarian Takeover
   severity: catastrophic
   likelihood:
     level: medium
@@ -1673,7 +1673,7 @@
 - id: multipolar-trap
   numericId: E209
   type: risk
-  title: Multipolar Trap
+  title: Multipolar Trap (AI Development)
   severity: high
   likelihood:
     level: medium-high
@@ -1766,7 +1766,7 @@
 - id: preference-manipulation
   numericId: E230
   type: risk
-  title: Preference Manipulation
+  title: AI Preference Manipulation
   severity: high
   likelihood:
     level: medium
@@ -1873,7 +1873,7 @@
 - id: racing-dynamics
   numericId: E239
   type: risk
-  title: Racing Dynamics
+  title: AI Development Racing Dynamics
   severity: high
   likelihood:
     level: high
@@ -1925,7 +1925,7 @@
 - id: reality-fragmentation
   numericId: E244
   type: risk
-  title: Reality Fragmentation
+  title: AI-Accelerated Reality Fragmentation
   severity: high
   likelihood:
     level: medium
@@ -2027,7 +2027,7 @@
 - id: sandbagging
   numericId: E270
   type: risk
-  title: Sandbagging
+  title: AI Capability Sandbagging
   severity: high
   likelihood:
     level: medium
@@ -2458,7 +2458,7 @@
 - id: trust-cascade
   numericId: E360
   type: risk
-  title: Trust Cascade Failure
+  title: AI Trust Cascade Failure
   severity: critical
   likelihood:
     level: medium
@@ -2514,7 +2514,7 @@
 - id: trust-decline
   numericId: E362
   type: risk
-  title: Trust Decline
+  title: AI-Driven Trust Decline
   severity: medium-high
   likelihood:
     level: high
@@ -2552,7 +2552,7 @@
 - id: winner-take-all
   numericId: E374
   type: risk
-  title: Winner-Take-All Dynamics
+  title: AI Winner-Take-All Dynamics
   severity: high
   likelihood:
     level: high
@@ -2753,16 +2753,149 @@
     - geopolitics
   lastUpdated: 2026-02
 
+- id: concentrated-compute-cybersecurity-risk
+  numericId: E689
+  type: risk
+  title: Concentrated Compute as a Cybersecurity Risk
+  severity: high
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2028
+    earliest: 2025
+    latest: 2035
+  description: >-
+    The concentration of $700B+ in AI infrastructure across 5-6 US companies creates a novel
+    cybersecurity risk surface where hardware monoculture (NVIDIA 90-95% market share), physical
+    concentration (50% of US data centers in two regions), and software supply chain dependencies
+    (CUDA, PyTorch) mean a single vulnerability or attack could compromise a significant fraction
+    of global frontier AI compute. The NVIDIA Container Toolkit CVE-2025-23266 (CVSS 9.0)
+    demonstrated this risk by affecting all major cloud providers simultaneously.
+  relatedEntries:
+    - id: compute-concentration
+      type: risk
+    - id: concentration-of-power
+      type: risk
+  tags:
+    - compute
+    - cybersecurity
+    - concentration
+    - infrastructure
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+
+- id: financial-stability-risks-ai-capex
+  numericId: E690
+  type: risk
+  title: Financial Stability Risks from AI Capital Expenditure
+  severity: medium
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2028
+    earliest: 2026
+    latest: 2032
+  description: >-
+    The $700B+ AI infrastructure investment in 2026 creates financial stability risks through
+    a 6-14x gap between capex and direct AI revenue, growing debt-financed construction ($200B+
+    in data center debt), free cash flow destruction at major tech companies (Alphabet FCF down
+    89%, Meta down ~90%), and structural parallels to the 1990s telecom bubble ($1.4T projected
+    2024-2026 vs $1.2T telecom inflation-adjusted). Risks could transmit to broader markets
+    through index fund concentration, credit contagion, and semiconductor supply chain cascades.
+  relatedEntries:
+    - id: projecting-compute-spending
+      type: model
+    - id: ai-revenue-sources
+      type: organization
+    - id: economic-disruption
+      type: risk
+  tags:
+    - economics
+    - financial-risk
+    - capex
+    - bubble
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+
 - id: steganography
   numericId: E603
   type: risk
-  title: Steganography
+  title: AI Model Steganography
   description: >-
     Comprehensive analysis of AI steganography risks - systems hiding
     information in outputs to enable covert coordination or evade oversight.
     GPT-4 class models encode 3-5 bits/KB with under 30% human detection rates.
     NeurIPS 2024 research achieved information-theoretically undetectable
-    channels; LASR 
+    channels; LASR
   clusters:
     - ai-safety
+  lastUpdated: 2026-02
+
+- id: ai-enabled-untraceable-misuse
+  numericId: E691
+  type: risk
+  title: AI-Enabled Untraceable Misuse
+  description: >-
+    AI systems simultaneously amplify harmful capabilities and obscure
+    attribution, enabling bad actors to conduct spam campaigns, political
+    manipulation, synthetic identity fraud, and coordinated harassment with
+    reduced risk of identification. This dual amplification creates a
+    self-reinforcing cycle where greater capability enables more autonomous
+    agents, more attribution ambiguity, reduced deterrence, and further misuse.
+  severity: high
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Status
+      value: Actively occurring across multiple domains
+    - label: Key Risk
+      value: Simultaneous capability amplification and attribution defeat
+  relatedEntries:
+    - id: fraud
+      type: risk
+    - id: disinformation
+      type: risk
+    - id: deepfakes
+      type: risk
+    - id: cyberweapons
+      type: risk
+    - id: authentication-collapse
+      type: risk
+    - id: trust-cascade
+      type: risk
+    - id: dual-use
+      type: concept
+    - id: proliferation
+      type: risk
+  sources:
+    - title: Four Responsibility Gaps with Artificial Intelligence
+      url: https://link.springer.com/article/10.1007/s13347-021-00450-x
+      author: Santoni de Sio & Mecacci
+      date: '2021'
+    - title: The Malicious Use of Artificial Intelligence
+      url: https://arxiv.org/abs/1802.07228
+      author: Brundage et al.
+      date: '2018'
+    - title: Generative Language Models and Automated Influence Operations
+      url: https://arxiv.org/abs/2301.04246
+      author: Goldstein et al.
+      date: '2023'
+    - title: Practices for Governing Agentic AI Systems
+      url: https://cdn.openai.com/papers/practices-for-governing-agentic-ai-systems.pdf
+      author: Shavit & Agarwal
+      date: '2023'
+  clusters:
+    - cyber
+    - ai-safety
+    - governance
   lastUpdated: 2026-02

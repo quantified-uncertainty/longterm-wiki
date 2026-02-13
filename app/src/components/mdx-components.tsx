@@ -42,7 +42,6 @@ import { CruxList } from "@/components/wiki/CruxList";
 
 // Ported stub components — medium priority
 import { Tags } from "@/components/wiki/Tags";
-import { FullWidthLayout } from "@/components/wiki/FullWidthLayout";
 import { ModelsList } from "@/components/wiki/ModelsList";
 import { FactorRelationshipDiagram } from "@/components/wiki/FactorRelationshipDiagram";
 import { ImpactList } from "@/components/wiki/ImpactList";
@@ -66,7 +65,7 @@ function Stub({ children }: { children?: React.ReactNode }) {
 // Legacy component names still referenced in MDX content, rendered as stubs.
 // Dead stubs removed: Code, Steps, Icon, FileTree
 // Ported stubs removed: Badge, Crux, CruxList, DisagreementMap,
-//   FactorRelationshipDiagram, FullWidthLayout, ImpactList, KeyPeople,
+//   FactorRelationshipDiagram, ImpactList, KeyPeople,
 //   KeyQuestions, ModelsList, Section, TabItem, Tabs, Tags
 const stubNames = [
   "AnthropicFact", "ArticleSources",
@@ -159,7 +158,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Ported stub components — medium priority
   Tags,
   Badge,
-  FullWidthLayout,
   ModelsList,
   FactorRelationshipDiagram,
   ImpactList,

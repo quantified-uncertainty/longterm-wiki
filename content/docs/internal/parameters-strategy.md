@@ -10,11 +10,6 @@ ratings:
   rigor: 0
   actionability: 0
   completeness: 0
-metrics:
-  wordCount: 1005
-  citations: 2
-  tables: 30
-  diagrams: 1
 ---
 # Key Parameters Implementation Strategy
 

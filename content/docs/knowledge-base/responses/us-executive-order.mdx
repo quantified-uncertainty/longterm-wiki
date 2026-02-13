@@ -1,5 +1,5 @@
 ---
-title: US Executive Order on AI
+title: "US Executive Order on Safe, Secure, and Trustworthy AI"
 description: Executive Order 14110 (October 2023) placed 150 requirements on 50+ federal entities, established compute-based reporting thresholds (10^26 FLOP for general models, 10^23 for biological), and created the US AI Safety Institute. Revoked after 15 months with ~85% completion; AISI renamed to CAISI in June 2025 with mission shifted from safety to innovation.
 sidebar:
   order: 4
@@ -13,11 +13,6 @@ ratings:
   rigor: 7
   actionability: 6
   completeness: 8
-metrics:
-  wordCount: 2800
-  citations: 45
-  tables: 22
-  diagrams: 2
 clusters:
   - ai-safety
   - governance
@@ -27,11 +22,11 @@ import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@component
 
 <DataExternalLinks pageId="us-executive-order" />
 
-<DataInfoBox entityId="us-executive-order" />
+<DataInfoBox entityId="E366" />
 
 ## Overview
 
-<R id="80350b150694b2ae">Executive Order 14110</R> on Safe, Secure, and Trustworthy Artificial Intelligence, signed by President Biden on October 30, 2023, represented the most comprehensive federal response to <EntityLink id="ai-governance">AI governance</EntityLink> in US history. The 111-page directive established mandatory reporting requirements for frontier AI systems, created new oversight institutions, and addressed both immediate risks like algorithmic bias and long-term catastrophic risks from advanced AI capabilities. According to analysis by [Stanford HAI](https://hai.stanford.edu/policy/tracking-us-ai-executive-order), the order placed 150 specific requirements on over 50 federal entities—making it the most detailed AI policy directive ever issued by any government.
+<R id="80350b150694b2ae">Executive Order 14110</R> on Safe, Secure, and Trustworthy Artificial Intelligence, signed by President Biden on October 30, 2023, represented the most comprehensive federal response to <EntityLink id="E608">AI governance</EntityLink> in US history. The 111-page directive established mandatory reporting requirements for frontier AI systems, created new oversight institutions, and addressed both immediate risks like algorithmic bias and long-term catastrophic risks from advanced AI capabilities. According to analysis by [Stanford HAI](https://hai.stanford.edu/policy/tracking-us-ai-executive-order), the order placed 150 specific requirements on over 50 federal entities—making it the most detailed AI policy directive ever issued by any government.
 
 **The order was revoked by President Trump on January 20, 2025**, within hours of his assuming office. The White House stated that EO 14110 "hindered AI innovation and imposed onerous and unnecessary government control over the development of AI." <R id="adc7475b9d9e8300">Stanford HAI tracking</R> showed that approximately 85% of the order's 150 distinct requirements had been completed before revocation.
 
@@ -43,12 +38,12 @@ import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@component
 | **Scope** | 150+ requirements | Across 50+ federal entities per [Stanford HAI](https://hai.stanford.edu/policy/tracking-us-ai-executive-order) |
 | **Implementation** | ≈85% completed | 13/13 management requirements fully implemented per [GAO](https://www.gao.gov/products/gao-24-107332) |
 | **Budget Impact** | \$10M initial, \$47.7M requested | AISI received \$10M FY2024; Biden requested +\$47.7M for FY2025 |
-| **Companies Affected** | Fewer than 15 | [BIS assessment](https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence): no more than 15 companies exceeded <EntityLink id="thresholds">compute thresholds</EntityLink> |
+| **Companies Affected** | Fewer than 15 | [BIS assessment](https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence): no more than 15 companies exceeded <EntityLink id="E465">compute thresholds</EntityLink> |
 | **Enforcement** | Weak | No specified penalties; relied on voluntary cooperation |
 | **Durability** | Revoked Day 1 | Executive action vulnerable to administration change |
 | **Legacy** | Partial survival | Final rules (KYC) require formal rulemaking to rescind; AISI → CAISI June 2025 |
 
-For AI safety, the order represented both progress and limitations. It normalized government oversight of frontier AI development and created institutional capacity through the <EntityLink id="us-aisi">US AI Safety Institute</EntityLink>. Yet it primarily focused on transparency and voluntary cooperation rather than mandatory safety requirements or deployment restrictions.
+For AI safety, the order represented both progress and limitations. It normalized government oversight of frontier AI development and created institutional capacity through the <EntityLink id="E365">US AI Safety Institute</EntityLink>. Yet it primarily focused on transparency and voluntary cooperation rather than mandatory safety requirements or deployment restrictions.
 
 ## Key Provisions and Mechanisms
 
@@ -69,7 +64,7 @@ The order's most innovative feature was its use of computational thresholds to t
 
 A Biden Administration official stated that "the threshold was set such that current models wouldn't be captured but the next generation state-of-the-art models likely would." The <R id="be28595c77015785">Bureau of Industry and Security assessed</R> that no more than 15 companies exceeded the reporting thresholds for models and computing clusters.
 
-**No model ever triggered the threshold before revocation.** <EntityLink id="epoch-ai">Epoch AI</EntityLink> estimated GPT-5 pretraining at approximately 3 × 10^25 FLOP—still below the 10^26 threshold. This reflects a shift in frontier AI development: rather than scaling pre-training compute by orders of magnitude, labs increasingly focus on inference-time compute (reasoning models like <EntityLink id="openai">OpenAI</EntityLink> o1) and algorithmic efficiency improvements. xAI's Colossus data center may have approached 10^26 FLOP for some training runs, but this remains unconfirmed.
+**No model ever triggered the threshold before revocation.** <EntityLink id="E125">Epoch AI</EntityLink> estimated GPT-5 pretraining at approximately 3 × 10^25 FLOP—still below the 10^26 threshold. This reflects a shift in frontier AI development: rather than scaling pre-training compute by orders of magnitude, labs increasingly focus on inference-time compute (reasoning models like <EntityLink id="E218">OpenAI</EntityLink> o1) and algorithmic efficiency improvements. xAI's Colossus data center may have approached 10^26 FLOP for some training runs, but this remains unconfirmed.
 
 The separate 10^23 FLOP threshold for biological sequence models reflected concerns that even smaller models could assist in bioweapon development—approximately 1,000 times less compute than the general threshold, acknowledging that biological design capabilities may emerge at lower scales than general intelligence capabilities.
 
@@ -87,7 +82,7 @@ The order established the US AI Safety Institute (AISI) within the National Inst
 | **Feb 2024** | Elizabeth Kelly appointed as director; <R id="a65ad4f1a30f1737">AISIC consortium created</R> with 200+ member organizations |
 | **Mar 2024** | \$10M initial budget allocated (vs. \$17.7M FY2025 request) |
 | **May 2024** | NIST Director warns only <R id="9c32cfd89be14b40">\$1M actually available</R>; "very difficult without additional funding" |
-| **Aug 2024** | <R id="627bb42e8f74be04">Agreements signed</R> with <EntityLink id="anthropic">Anthropic</EntityLink> and OpenAI for pre-deployment testing |
+| **Aug 2024** | <R id="627bb42e8f74be04">Agreements signed</R> with <EntityLink id="E22">Anthropic</EntityLink> and OpenAI for pre-deployment testing |
 | **Nov 2024** | First joint evaluation with UK AISI: <R id="a0bcc81243f8fbee">Claude 3.5 Sonnet assessment</R> |
 | **Dec 2024** | <R id="be88ea80f559e453">OpenAI o1 model evaluation</R> published |
 | **Jan 2025** | EO 14110 revoked; AISI future uncertain |
@@ -372,13 +367,13 @@ The EO 14110 experience offers several lessons for future AI governance efforts:
 
 ## AI Transition Model Context
 
-The US Executive Order (while in effect) affected the <EntityLink id="ai-transition-model" /> through <EntityLink id="civilizational-competence" />:
+The US Executive Order (while in effect) affected the <EntityLink id="ai-transition-model" /> through <EntityLink id="E60" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="regulatory-capacity" /> | Created AISI and compute-based reporting requirements |
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="institutional-quality" /> | Established precedent for government oversight of frontier AI |
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="international-coordination" /> | Launched international AI safety network with allies |
+| <EntityLink id="E60" /> | <EntityLink id="E249" /> | Created AISI and compute-based reporting requirements |
+| <EntityLink id="E60" /> | <EntityLink id="E167" /> | Established precedent for government oversight of frontier AI |
+| <EntityLink id="E60" /> | <EntityLink id="E171" /> | Launched international AI safety network with allies |
 
 The order's revocation after 15 months demonstrates the fragility of executive action for AI governance; congressional legislation would provide more durable institutional capacity.
 

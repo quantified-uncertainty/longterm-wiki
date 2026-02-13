@@ -13,11 +13,6 @@ ratings:
   rigor: 5
   actionability: 6
   completeness: 5
-metrics:
-  wordCount: 3800
-  citations: 42
-  tables: 8
-  diagrams: 1
 clusters: ["biorisks", "ai-safety", "governance", "community"]
 ---
 import {Mermaid, EntityLink, KeyQuestions} from '@components/wiki';
@@ -32,11 +27,11 @@ This report maps the full landscape of biosecurity interventions relevant to AI-
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Total EA Biosecurity Funding** | \$230M+ from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> alone | 140+ grants across Biosecurity & Pandemic Preparedness fund[^1] |
+| **Total EA Biosecurity Funding** | \$230M+ from <EntityLink id="E552">Coefficient Giving</EntityLink> alone | 140+ grants across Biosecurity & Pandemic Preparedness fund[^1] |
 | **Intervention Categories** | 6+ distinct categories | DNA screening, surveillance, countermeasures, AI evals, physical defenses, governance |
 | **% That Is "LLM Restrictions"** | Small minority | Most funding goes to detection infrastructure, screening technology, and countermeasures |
 | **Government Adoption** | Growing | CDC Biothreat Radar (\$52M proposed FY2026); OSTP synthesis screening framework; military ANTI-DOTE program |
-| **Key Framework** | Delay / Detect / Defend | <EntityLink id="securebio">SecureBio</EntityLink>'s organizing model, widely adopted |
+| **Key Framework** | Delay / Detect / Defend | <EntityLink id="E563">SecureBio</EntityLink>'s organizing model, widely adopted |
 | **Biggest Gap** | Medical countermeasures | Resilience-based approaches like broad-spectrum antivirals remain underfunded relative to need |
 
 ---
@@ -85,9 +80,9 @@ DNA synthesis screening is arguably the most concrete, technically mature biosec
 
 **Key initiatives:**
 
-- **<EntityLink id="securedna">SecureDNA</EntityLink>** — A Swiss nonprofit foundation co-founded by Kevin Esvelt, providing free, privacy-preserving screening software to DNA synthesis providers. Uses cryptographic protocols so that neither the order contents nor the hazard database are revealed during screening. Can detect hazardous sequences down to 30 base pairs—already exceeding the OSTP framework's 2026 requirement of 50bp screening.[^2]
+- **<EntityLink id="E564">SecureDNA</EntityLink>** — A Swiss nonprofit foundation co-founded by Kevin Esvelt, providing free, privacy-preserving screening software to DNA synthesis providers. Uses cryptographic protocols so that neither the order contents nor the hazard database are revealed during screening. Can detect hazardous sequences down to 30 base pairs—already exceeding the OSTP framework's 2026 requirement of 50bp screening.[^2]
 
-- **<EntityLink id="ibbis">IBBIS (International Biosecurity and Biosafety Initiative for Science)</EntityLink>** — Launched by NTI in 2024, headquartered in Geneva, led by Piers Millett (former Deputy Head of the BWC Implementation Support Unit). Develops the **Common Mechanism** for international DNA synthesis screening.[^3]
+- **<EntityLink id="E536">IBBIS (International Biosecurity and Biosafety Initiative for Science)</EntityLink>** — Launched by NTI in 2024, headquartered in Geneva, led by Piers Millett (former Deputy Head of the BWC Implementation Support Unit). Develops the **Common Mechanism** for international DNA synthesis screening.[^3]
 
 - **OSTP Synthesis Screening Framework** — The Biden administration's April 2024 framework requiring federally funded researchers to procure synthetic nucleic acids only from screened providers. Implementation began April 2025 (200nt minimum), with 50nt minimum from October 2026. The Trump administration's May 2025 Executive Order directed revision of the framework but maintained its core screening requirements.[^4]
 
@@ -114,7 +109,7 @@ Some critics assume that AI capability restrictions constitute the entirety of E
 
 ### Metagenomic Pathogen Surveillance
 
-The **Nucleic Acid Observatory (NAO)**, operated by <EntityLink id="securebio">SecureBio</EntityLink> under Jeff Kaufman's leadership, represents perhaps the most distinctive EA contribution to biosecurity—and one that has nothing to do with LLM restrictions.
+The **Nucleic Acid Observatory (NAO)**, operated by <EntityLink id="E563">SecureBio</EntityLink> under Jeff Kaufman's leadership, represents perhaps the most distinctive EA contribution to biosecurity—and one that has nothing to do with LLM restrictions.
 
 **How it works:** Unlike traditional PCR-based surveillance (which can only detect known pathogens), the NAO performs **untargeted metagenomic sequencing** of wastewater—sequencing *all* genetic material in a sample. This means it can detect completely novel, engineered, or unknown pathogens, including those specifically designed to evade traditional surveillance.[^11]
 
@@ -149,13 +144,13 @@ Some critics have highlighted resilience-based approaches as more promising than
 
 ### Medical Countermeasures
 
-- **<EntityLink id="red-queen-bio">Red Queen Bio</EntityLink>** — Spun out of HelixNano (clinical-stage mRNA therapeutics), raised a **\$15M seed round led by OpenAI** in 2025. Core thesis: "defensive co-scaling"—coupling defensive compute and funding to the same forces driving the AI capability race. Works with frontier labs to map AI-enabled biothreats and pre-build medical countermeasures.[^19]
-- **Platform vaccine technologies** — mRNA platforms (demonstrated during COVID-19) enable rapid design of vaccines against novel pathogens within days of sequencing. The <EntityLink id="coalition-for-epidemic-preparedness-innovations">Coalition for Epidemic Preparedness Innovations (CEPI)</EntityLink> has invested over \$1.5B in pandemic preparedness vaccines, including its 100 Days Mission to compress vaccine development timelines.
+- **<EntityLink id="E556">Red Queen Bio</EntityLink>** — Spun out of HelixNano (clinical-stage mRNA therapeutics), raised a **\$15M seed round led by OpenAI** in 2025. Core thesis: "defensive co-scaling"—coupling defensive compute and funding to the same forces driving the AI capability race. Works with frontier labs to map AI-enabled biothreats and pre-build medical countermeasures.[^19]
+- **Platform vaccine technologies** — mRNA platforms (demonstrated during COVID-19) enable rapid design of vaccines against novel pathogens within days of sequencing. The <EntityLink id="E520">Coalition for Epidemic Preparedness Innovations (CEPI)</EntityLink> has invested over \$1.5B in pandemic preparedness vaccines, including its 100 Days Mission to compress vaccine development timelines.
 - **Broad-spectrum antivirals** — Still underdeveloped relative to need. Could provide pathogen-agnostic treatment.
 
 ### Far-UVC and Physical Defenses
 
-**<EntityLink id="blueprint-biosecurity">Blueprint Biosecurity</EntityLink>**, an EA-funded organization, has made **far-UVC technology** a centerpiece of their work:
+**<EntityLink id="E515">Blueprint Biosecurity</EntityLink>**, an EA-funded organization, has made **far-UVC technology** a centerpiece of their work:
 
 - Far-UVC light (222nm) can **inactivate 99.8% of airborne pathogens** in occupied spaces while remaining safe for human exposure—the light is absorbed by dead skin cells before reaching living tissue.[^20]
 - Columbia University research (David Brenner) demonstrated effectiveness; technology licensed to Ushio Inc. (Care222 product line).[^21]
@@ -182,22 +177,22 @@ Some critics have highlighted resilience-based approaches as more promising than
 
 | Organization | Focus | EA-Adjacent? | Key Funding |
 |---|---|---|---|
-| <EntityLink id="securebio">SecureBio</EntityLink> | Delay/Detect/Defend framework; NAO; AI evals | Yes | \$9.4M+ from Coefficient Giving |
-| <EntityLink id="securedna">SecureDNA</EntityLink> | DNA synthesis screening technology | Yes (Esvelt co-founder) | Swiss foundation |
-| <EntityLink id="ibbis">IBBIS</EntityLink> | International screening standards | Partially (NTI-launched) | Coefficient Giving via NTI |
-| <EntityLink id="blueprint-biosecurity">Blueprint Biosecurity</EntityLink> | Far-UVC technology deployment | Yes | \$900K from Coefficient Giving (2024) |
-| <EntityLink id="red-queen-bio">Red Queen Bio</EntityLink> | AI-driven medical countermeasures | Partially (OpenAI-funded) | \$15M seed (OpenAI-led) |
-| <EntityLink id="nti-bio">NTI Bio</EntityLink> | Biosecurity governance, BWC | Partially | \$7.8M from Coefficient Giving |
-| <EntityLink id="council-on-strategic-risks">Council on Strategic Risks</EntityLink> | National security biosecurity policy | No (traditional national security) | Various |
+| <EntityLink id="E563">SecureBio</EntityLink> | Delay/Detect/Defend framework; NAO; AI evals | Yes | \$9.4M+ from Coefficient Giving |
+| <EntityLink id="E564">SecureDNA</EntityLink> | DNA synthesis screening technology | Yes (Esvelt co-founder) | Swiss foundation |
+| <EntityLink id="E536">IBBIS</EntityLink> | International screening standards | Partially (NTI-launched) | Coefficient Giving via NTI |
+| <EntityLink id="E515">Blueprint Biosecurity</EntityLink> | Far-UVC technology deployment | Yes | \$900K from Coefficient Giving (2024) |
+| <EntityLink id="E556">Red Queen Bio</EntityLink> | AI-driven medical countermeasures | Partially (OpenAI-funded) | \$15M seed (OpenAI-led) |
+| <EntityLink id="E551">NTI Bio</EntityLink> | Biosecurity governance, BWC | Partially | \$7.8M from Coefficient Giving |
+| <EntityLink id="E522">Council on Strategic Risks</EntityLink> | National security biosecurity policy | No (traditional national security) | Various |
 | CSIS | Policy research on AI-bio threats | No | Various |
-| <EntityLink id="johns-hopkins-center-for-health-security">Johns Hopkins CHS</EntityLink> | Biosecurity policy and analysis | No | Various |
-| <EntityLink id="centre-for-long-term-resilience">Centre for Long-Term Resilience</EntityLink> | UK biosecurity policy | Yes | EA-funded |
+| <EntityLink id="E423">Johns Hopkins CHS</EntityLink> | Biosecurity policy and analysis | No | Various |
+| <EntityLink id="E429">Centre for Long-Term Resilience</EntityLink> | UK biosecurity policy | Yes | EA-funded |
 
 ---
 
 ## Key Funding Flows
 
-<EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> (renamed Coefficient Giving in November 2025) is the dominant funder. Key biosecurity grants:
+<EntityLink id="E552">Coefficient Giving</EntityLink> (renamed Coefficient Giving in November 2025) is the dominant funder. Key biosecurity grants:
 
 | Recipient | Amount | Purpose |
 |-----------|--------|---------|
@@ -243,7 +238,7 @@ This is substantively different from the perception that EA biosecurity work is 
 [^5]: [Edison, Toner & Esvelt 2026, Nature Communications](https://www.nature.com/articles/s41467-025-67955-3)
 [^6]: [2026 International AI Safety Report](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026)
 [^7]: [2026 International AI Safety Report](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026)
-[^8]: <EntityLink id="bioweapons">Bioweapons page analysis of open-source risks</EntityLink>
+[^8]: <EntityLink id="E42">Bioweapons page analysis of open-source risks</EntityLink>
 [^9]: [NTI Bio BWC work](https://www.nti.org/news/nti-bio-offers-biosecurity-solutions-at-the-biological-weapons-convention-review-conference/)
 [^10]: [CSIS 2025 report](https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should)
 [^11]: [NAO methodology](https://naobservatory.org/); [P2RA study in The Lancet Microbe](https://www.thelancet.com/journals/lanmic/article/PIIS2666-5247(25)00115-6/fulltext)

@@ -138,7 +138,7 @@
       type: researcher
     - id: paul-christiano
       type: researcher
-    - id: centre-for-effective-altruism
+    - id: cea
       type: lab
   lastUpdated: 2026-02
 
@@ -327,7 +327,7 @@
       type: analysis
     - id: openai
       type: lab
-    - id: google-deepmind
+    - id: deepmind
       type: lab
   lastUpdated: 2026-02
 
@@ -366,7 +366,7 @@
 - id: short-timeline-policy-implications
   numericId: E415
   type: analysis
-  title: Short Timeline Policy Implications
+  title: Short AI Timeline Policy Implications
   description: >-
     Analysis of what policies and interventions become more or less important if
     transformative AI arrives in 1-5 years rather than decades. Short timelines
@@ -398,7 +398,7 @@
 - id: technical-pathways
   numericId: E416
   type: analysis
-  title: Technical Pathway Decomposition
+  title: AI Safety Technical Pathway Decomposition
   description: >-
     Model mapping technical pathways from capability advances to catastrophic
     risk outcomes. Finds accident risks (deceptive alignment, goal
@@ -428,7 +428,7 @@
 - id: feedback-loops
   numericId: E417
   type: analysis
-  title: Feedback Loop & Cascade Model
+  title: AI Risk Feedback Loop & Cascade Model
   description: >-
     System dynamics model analyzing how AI risks emerge from reinforcing
     feedback loops. Capabilities compound at 2.5x per year while safety
@@ -455,7 +455,7 @@
 - id: multi-actor-landscape
   numericId: E418
   type: analysis
-  title: Multi-Actor Strategic Landscape
+  title: AI Safety Multi-Actor Strategic Landscape
   description: >-
     Model analyzing how risk depends on which actors develop TAI. US-China
     capability gap narrowed from 9.26% to 1.70% (2024-2025), while open-source

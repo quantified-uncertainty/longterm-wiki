@@ -13,11 +13,6 @@ ratings:
   rigor: 5
   actionability: 4
   completeness: 6
-metrics:
-  wordCount: 650
-  citations: 7
-  tables: 42
-  diagrams: 1
 clusters:
   - ai-safety
 subcategory: alignment-theoretical
@@ -32,7 +27,7 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 |-----------|--------|-------|
 | Tractability | Medium | Game-theoretic foundations exist; translating to real AI systems is challenging |
 | Scalability | High | Principles apply across multi-agent deployments from chatbots to autonomous systems |
-| Current Maturity | Low-Medium | Active research at DeepMind, <EntityLink id="chai">CHAI</EntityLink>; limited production deployment |
+| Current Maturity | Low-Medium | Active research at DeepMind, <EntityLink id="E57">CHAI</EntityLink>; limited production deployment |
 | Time Horizon | 3-7 years | Growing urgency as multi-agent AI deployments proliferate |
 | Key Proponents | DeepMind, CHAI, Cooperative AI Foundation | [\$15M foundation](https://www.cooperativeai.com/foundation) established 2021 |
 
@@ -42,7 +37,7 @@ Cooperative AI is a research agenda focused on developing AI systems that can co
 
 The research draws on game theory, multi-agent reinforcement learning, mechanism design, and social science to understand when and how cooperation emerges (or fails to emerge) among intelligent agents. Key questions include: How can AI systems be designed to cooperate even when competitive pressures exist? What mechanisms enable stable cooperation? How do we prevent races to the bottom where AI systems undercut safety standards to gain competitive advantage?
 
-Led primarily by <EntityLink id="deepmind">DeepMind</EntityLink> and academic groups including UC Berkeley's CHAI, cooperative AI research has grown in prominence as multi-agent AI deployments become common. The foundational paper ["Open Problems in Cooperative AI"](https://arxiv.org/abs/2012.08630) (Dafoe et al., 2020) established the research agenda and led to the creation of the [Cooperative AI Foundation](https://www.cooperativeai.com/foundation) with \$15 million in funding. The field addresses both near-term concerns (multiple AI assistants interacting, AI-AI negotiation) and long-term concerns (preventing catastrophic multi-agent dynamics, ensuring AI systems don't defect on cooperative arrangements with humanity). However, the work remains largely theoretical with limited production deployment, and fundamental challenges remain in defining what "cooperation" means in high-stakes scenarios.
+Led primarily by <EntityLink id="E98">DeepMind</EntityLink> and academic groups including UC Berkeley's CHAI, cooperative AI research has grown in prominence as multi-agent AI deployments become common. The foundational paper ["Open Problems in Cooperative AI"](https://arxiv.org/abs/2012.08630) (Dafoe et al., 2020) established the research agenda and led to the creation of the [Cooperative AI Foundation](https://www.cooperativeai.com/foundation) with \$15 million in funding. The field addresses both near-term concerns (multiple AI assistants interacting, AI-AI negotiation) and long-term concerns (preventing catastrophic multi-agent dynamics, ensuring AI systems don't defect on cooperative arrangements with humanity). However, the work remains largely theoretical with limited production deployment, and fundamental challenges remain in defining what "cooperation" means in high-stakes scenarios.
 
 ## How It Works
 
@@ -92,9 +87,9 @@ Cooperative AI research addresses the challenge of ensuring AI systems work toge
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> | High | Provides frameworks for cooperative agreements between AI developers to avoid safety-capability tradeoffs |
+| <EntityLink id="E239">Racing Dynamics</EntityLink> | High | Provides frameworks for cooperative agreements between AI developers to avoid safety-capability tradeoffs |
 | <EntityLink id="misalignment">Goal Misalignment</EntityLink> | Medium | Assistance games formalize how AI can learn human preferences through cooperation |
-| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | Medium | Research on verifying genuine vs. simulated cooperation helps detect deceptive agents |
+| <EntityLink id="E93">Deceptive Alignment</EntityLink> | Medium | Research on verifying genuine vs. simulated cooperation helps detect deceptive agents |
 | <EntityLink id="multi-agent-safety">Multi-Agent Safety</EntityLink> | High | Directly addresses coordination failures, adversarial dynamics, and collective action problems |
 | <EntityLink id="loss-of-control">Loss of Control</EntityLink> | Medium | Cooperative training may produce AI systems more amenable to human oversight |
 
@@ -241,7 +236,7 @@ Training AI to navigate social dilemmas appropriately:
 | **DeepMind** | Multi-agent RL, game theory | Foundational papers, experiments |
 | **CHAI (Berkeley)** | Human-AI cooperation | CIRL, assistance games |
 | **Academic Groups** | Theoretical foundations | Game theory, mechanism design |
-| <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> | Funding | Research grants |
+| <EntityLink id="E521">Coefficient Giving</EntityLink> | Funding | Research grants |
 
 ## Deception Robustness
 
@@ -267,8 +262,8 @@ Training AI to navigate social dilemmas appropriately:
 
 ### Complementary Techniques
 
-- **<EntityLink id="cirl">CIRL</EntityLink>**: Specific framework for human-AI cooperation
-- **<EntityLink id="model-spec">Model Specifications</EntityLink>**: Define cooperative behavioral expectations
+- **<EntityLink id="E586">CIRL</EntityLink>**: Specific framework for human-AI cooperation
+- **<EntityLink id="E594">Model Specifications</EntityLink>**: Define cooperative behavioral expectations
 - **Mechanism Design**: Create cooperation-inducing environments
 
 ### Key Distinctions
@@ -330,7 +325,7 @@ Cooperative AI relates to the <EntityLink id="ai-transition-model" /> through:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | Multi-agent dynamics | Addresses coordination failures between AI systems |
+| <EntityLink id="E205" /> | Multi-agent dynamics | Addresses coordination failures between AI systems |
 | <EntityLink id="deployment-decisions" /> | Interaction protocols | Shapes how AI systems are deployed together |
 
 As AI systems become more numerous and capable, the dynamics between them become increasingly important for global outcomes. Cooperative AI research provides foundations for beneficial multi-agent futures.

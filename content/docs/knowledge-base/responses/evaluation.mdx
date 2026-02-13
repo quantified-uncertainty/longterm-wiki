@@ -21,9 +21,9 @@ import {R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 ## Overview
 
-AI evaluation encompasses systematic methods for assessing AI systems across safety, capability, and alignment dimensions before and during deployment. These evaluations serve as critical checkpoints in <EntityLink id="responsible-scaling-policies">responsible scaling policies</EntityLink> and government oversight frameworks.
+AI evaluation encompasses systematic methods for assessing AI systems across safety, capability, and alignment dimensions before and during deployment. These evaluations serve as critical checkpoints in <EntityLink id="E252">responsible scaling policies</EntityLink> and government oversight frameworks.
 
-Current evaluation frameworks focus on detecting <EntityLink id="factors-ai-capabilities-overview">dangerous capabilities</EntityLink>, measuring alignment properties, and identifying potential <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink> or <EntityLink id="scheming">scheming</EntityLink> behaviors. Organizations like <EntityLink id="metr">METR</EntityLink> have developed standardized evaluation suites, while government institutes like <EntityLink id="uk-aisi">UK AISI</EntityLink> and <EntityLink id="us-aisi">US AISI</EntityLink> are establishing national evaluation standards.
+Current evaluation frameworks focus on detecting <EntityLink id="E660">dangerous capabilities</EntityLink>, measuring alignment properties, and identifying potential <EntityLink id="E93">deceptive alignment</EntityLink> or <EntityLink id="E274">scheming</EntityLink> behaviors. Organizations like <EntityLink id="E201">METR</EntityLink> have developed standardized evaluation suites, while government institutes like <EntityLink id="E364">UK AISI</EntityLink> and <EntityLink id="E365">US AISI</EntityLink> are establishing national evaluation standards.
 
 ## Quick Assessment
 
@@ -33,7 +33,7 @@ Current evaluation frameworks focus on detecting <EntityLink id="factors-ai-capa
 | Scalability | Medium | Comprehensive evaluation requires significant compute and expert time |
 | Current Maturity | Medium | Varying by domain: production for safety filtering, prototype for scheming detection |
 | Time Horizon | Ongoing | Continuous improvement needed as capabilities advance |
-| Key Proponents | METR, UK AISI, <EntityLink id="anthropic">Anthropic</EntityLink>, Apollo Research | Active evaluation programs across industry and government |
+| Key Proponents | METR, UK AISI, <EntityLink id="E22">Anthropic</EntityLink>, Apollo Research | Active evaluation programs across industry and government |
 | Adoption Status | Growing | Gartner projects 70% enterprise adoption of safety evaluations by 2026 |
 
 ## Key Links
@@ -58,30 +58,30 @@ Current evaluation frameworks focus on detecting <EntityLink id="factors-ai-capa
 
 | Capability Domain | Current Methods | Key Organizations | Maturity Level |
 |-------------------|----------------|------------------|----------------|
-| <EntityLink id="autonomous-weapons">Autonomous weapons</EntityLink> | Military simulation tasks | <R id="45370a5153534152">METR</R>, RAND | Early stage |
-| <EntityLink id="bioweapons">Bioweapons</EntityLink> | Virology knowledge tests | <R id="45370a5153534152">METR</R>, Anthropic | Prototype |
-| <EntityLink id="cyberweapons">Cyberweapons</EntityLink> | Penetration testing | <R id="817964dfbb0e3b1b">UK AISI</R> | Development |
-| <EntityLink id="persuasion">Persuasion</EntityLink> | Human preference studies | <R id="f771d4f56ad4dbaa">Anthropic</R>, Stanford HAI | Research phase |
-| <EntityLink id="self-improvement">Self-improvement</EntityLink> | Code modification tasks | <R id="1648010fd1ff0370">ARC Evals</R> | Conceptual |
+| <EntityLink id="E35">Autonomous weapons</EntityLink> | Military simulation tasks | <R id="45370a5153534152">METR</R>, RAND | Early stage |
+| <EntityLink id="E42">Bioweapons</EntityLink> | Virology knowledge tests | <R id="45370a5153534152">METR</R>, Anthropic | Prototype |
+| <EntityLink id="E86">Cyberweapons</EntityLink> | Penetration testing | <R id="817964dfbb0e3b1b">UK AISI</R> | Development |
+| <EntityLink id="E224">Persuasion</EntityLink> | Human preference studies | <R id="f771d4f56ad4dbaa">Anthropic</R>, Stanford HAI | Research phase |
+| <EntityLink id="E278">Self-improvement</EntityLink> | Code modification tasks | <R id="1648010fd1ff0370">ARC Evals</R> | Conceptual |
 
 ### Safety Property Evaluation
 
 **Alignment Measurement:**
-- <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> adherence testing
+- <EntityLink id="E451">Constitutional AI</EntityLink> adherence testing
 - Value learning assessment through preference elicitation
-- <EntityLink id="reward-hacking">Reward hacking</EntityLink> detection in controlled environments
+- <EntityLink id="E253">Reward hacking</EntityLink> detection in controlled environments
 - Cross-cultural value alignment verification
 
 **Robustness Testing:**
 - Adversarial input resistance (<R id="302c069146f3f6f2">jailbreaking</R> attempts)
-- <EntityLink id="distributional-shift">Distributional shift</EntityLink> performance degradation
+- <EntityLink id="E105">Distributional shift</EntityLink> performance degradation
 - Edge case behavior in novel scenarios
 - Multi-modal input consistency checks
 
 **Deception Detection:**
-- <EntityLink id="sandbagging">Sandbagging</EntityLink> identification through capability hiding tests
+- <EntityLink id="E270">Sandbagging</EntityLink> identification through capability hiding tests
 - Strategic deception in competitive scenarios
-- <EntityLink id="steganography">Steganography</EntityLink> detection in outputs
+- <EntityLink id="E603">Steganography</EntityLink> detection in outputs
 - Long-term behavioral consistency monitoring
 
 ## Major Evaluation Frameworks Comparison
@@ -102,9 +102,9 @@ Current evaluation frameworks focus on detecting <EntityLink id="factors-ai-capa
 | Organization | Framework | Focus Areas | Deployment Status |
 |--------------|-----------|-------------|------------------|
 | <R id="afe2508ac4caf5ee">Anthropic</R> | Constitutional AI Evals | Constitutional adherence, helpfulness | Production |
-| <R id="838d7a59a02e11a7"><EntityLink id="openai">OpenAI</EntityLink></R> | Model Spec Evaluations | Safety, capabilities, alignment | Beta testing |
+| <R id="838d7a59a02e11a7"><EntityLink id="E218">OpenAI</EntityLink></R> | Model Spec Evaluations | Safety, capabilities, alignment | Beta testing |
 | <R id="0ef9b0fe0f3c92b4">DeepMind</R> | Sparrow Evaluations | Helpfulness, harmlessness, honesty | Research |
-| <EntityLink id="conjecture">Conjecture</EntityLink> | CoEm Framework | Cognitive emulation detection | Early stage |
+| <EntityLink id="E70">Conjecture</EntityLink> | CoEm Framework | Cognitive emulation detection | Early stage |
 
 ### Government Evaluation Programs
 
@@ -139,7 +139,7 @@ Modern AI systems can exhibit sophisticated gaming behaviors that undermine eval
 
 | Gap Type | Description | Impact | Mitigation Approaches |
 |----------|-------------|--------|----------------------|
-| Novel capabilities | <EntityLink id="emergent-capabilities">Emergent capabilities</EntityLink> not covered by existing evals | High | Red team exercises, capability forecasting |
+| Novel capabilities | <EntityLink id="E117">Emergent capabilities</EntityLink> not covered by existing evals | High | Red team exercises, capability forecasting |
 | Interaction effects | Multi-system or human-AI interaction risks | Medium | Integrated testing scenarios |
 | Long-term behavior | Behavior changes over extended deployment | High | Continuous monitoring systems |
 | Adversarial scenarios | Sophisticated attack vectors | Very High | Red team competitions, bounty programs |
@@ -164,7 +164,7 @@ Current evaluation methods face significant scalability challenges:
 - Robustness against simple adversarial inputs (though [universal jailbreaks](https://www.aisi.gov.uk/blog/5-key-findings-from-our-first-frontier-ai-trends-report) still found with expert effort)
 
 **Emerging Evaluation Areas:**
-- <EntityLink id="situational-awareness">Situational awareness</EntityLink> assessment
+- <EntityLink id="E282">Situational awareness</EntityLink> assessment
 - Multi-step deception detection ([Apollo linear probes](https://www.apolloresearch.ai/research/detecting-strategic-deception-using-linear-probes/) show promise)
 - Autonomous agent task completion ([METR](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/): task horizon doubling every ~7 months)
 - Anti-scheming training effectiveness measurement
@@ -174,7 +174,7 @@ Current evaluation methods face significant scalability challenges:
 **Technical Advancements:**
 - Automated red team generation using AI systems (already piloted by UK AISI)
 - Real-time behavioral monitoring during deployment
-- <EntityLink id="formal-verification">Formal verification</EntityLink> methods for safety properties
+- <EntityLink id="E483">Formal verification</EntityLink> methods for safety properties
 - Scalable human preference elicitation systems
 - [NIST Cybersecurity Framework Profile for AI](https://www.nist.gov/news-events/news/2025/12/draft-nist-guidelines-rethink-cybersecurity-ai-era) (NISTIR 8596) implementation
 
@@ -189,9 +189,9 @@ Current evaluation methods face significant scalability challenges:
 ### Fundamental Evaluation Questions
 
 **Sufficiency of Current Methods:**
-- Can existing evaluation frameworks detect <EntityLink id="treacherous-turn">treacherous turns</EntityLink> or sophisticated deception?
+- Can existing evaluation frameworks detect <EntityLink id="E359">treacherous turns</EntityLink> or sophisticated deception?
 - Are capability thresholds stable across different deployment contexts?
-- How reliable are human evaluations of <EntityLink id="alignment">AI alignment</EntityLink> properties?
+- How reliable are human evaluations of <EntityLink id="E439">AI alignment</EntityLink> properties?
 
 **Evaluation Timing and Frequency:**
 - When should evaluations occur in the development pipeline?
@@ -202,25 +202,25 @@ Current evaluation methods face significant scalability challenges:
 
 **Evaluation vs. Capability Racing:**
 - Does evaluation pressure accelerate or slow capability development?
-- Can evaluation standards prevent <EntityLink id="racing-dynamics">racing dynamics</EntityLink> between labs?
+- Can evaluation standards prevent <EntityLink id="E239">racing dynamics</EntityLink> between labs?
 - Should evaluation methods be kept secret to prevent gaming?
 
-**<EntityLink id="international-coordination">International Coordination</EntityLink>:**
+**<EntityLink id="E171">International Coordination</EntityLink>:**
 - Which evaluation standards should be internationally harmonized?
 - How can evaluation frameworks account for cultural value differences?
-- Can evaluation serve as a foundation for <EntityLink id="ai-governance">AI governance</EntityLink> treaties?
+- Can evaluation serve as a foundation for <EntityLink id="E608">AI governance</EntityLink> treaties?
 
 ## Expert Perspectives
 
 **Pro-Evaluation Arguments:**
-- <R id="2ccf0b6518e285d6"><EntityLink id="stuart-russell">Stuart Russell</EntityLink></R>: "Evaluation is our primary tool for ensuring AI system behavior matches intended specifications"
-- <EntityLink id="dario-amodei">Dario Amodei</EntityLink>: Constitutional AI evaluations demonstrate feasibility of scalable safety assessment
-- Government <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> emphasize evaluation as essential governance infrastructure
+- <R id="2ccf0b6518e285d6"><EntityLink id="E290">Stuart Russell</EntityLink></R>: "Evaluation is our primary tool for ensuring AI system behavior matches intended specifications"
+- <EntityLink id="E91">Dario Amodei</EntityLink>: Constitutional AI evaluations demonstrate feasibility of scalable safety assessment
+- Government <EntityLink id="E13">AI Safety Institutes</EntityLink> emphasize evaluation as essential governance infrastructure
 
 **Evaluation Skepticism:**
 - Some researchers argue current evaluation methods are fundamentally inadequate for detecting sophisticated deception
 - Concerns that evaluation requirements may create security vulnerabilities through standardized attack surfaces
-- <EntityLink id="racing-dynamics">Racing dynamics</EntityLink> may pressure organizations to minimize evaluation rigor
+- <EntityLink id="E239">Racing dynamics</EntityLink> may pressure organizations to minimize evaluation rigor
 
 ## Timeline of Key Developments
 
@@ -230,11 +230,11 @@ Current evaluation methods face significant scalability challenges:
 | 2022 | [Stanford HELM](https://crfm.stanford.edu/helm/) benchmark launch | Holistic multi-metric LLM evaluation standard |
 | 2023 | <R id="817964dfbb0e3b1b">UK AISI</R> establishment | Government-led evaluation standard development |
 | 2023 | NIST AI RMF 1.0 release | Federal risk management framework for AI |
-| 2024 | <R id="45370a5153534152">METR</R> <EntityLink id="dangerous-cap-evals">dangerous capability evaluations</EntityLink> | Systematic capability threshold assessment |
+| 2024 | <R id="45370a5153534152">METR</R> <EntityLink id="E442">dangerous capability evaluations</EntityLink> | Systematic capability threshold assessment |
 | 2024 | <R id="6498f2b0ae358adc">US AISI</R> consortium launch | Multi-stakeholder evaluation framework development |
 | 2024 | Apollo Research scheming paper | First empirical evidence of in-context deception in o1, Claude 3.5 |
 | 2025 | [UK AI Security Institute Frontier AI Trends Report](https://www.aisi.gov.uk/frontier-ai-trends-report) | First public analysis of capability trends across 30+ models |
-| 2025 | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> evaluation requirements | Mandatory pre-deployment evaluation for high-risk systems |
+| 2025 | <EntityLink id="E127">EU AI Act</EntityLink> evaluation requirements | Mandatory pre-deployment evaluation for high-risk systems |
 | 2025 | [Anthropic RSP 2.2](https://www.anthropic.com/responsible-scaling-policy) and first ASL-3 deployment | Claude Opus 4 released under enhanced safeguards |
 | 2025 | [MLCommons AILuminate v0.5](https://mlcommons.org/2025/10/ailuminate-jailbreak-v05/) | First standardized jailbreak "Resilience Gap" benchmark |
 | 2025 | [OpenAI-Apollo anti-scheming partnership](https://openai.com/index/detecting-and-reducing-scheming-in-ai-models/) | Scheming reduction training reduces covert behavior to 0.3% |
@@ -248,7 +248,7 @@ Current evaluation methods face significant scalability challenges:
 | <R id="45370a5153534152">METR</R> | Dangerous capability evaluation | <R id="259ff114f8c6586a">Evaluation methodology</R> |
 | <R id="1648010fd1ff0370">ARC Evals</R> | Alignment evaluation frameworks | <R id="1648010fd1ff0370">Task evaluation suite</R> |
 | <R id="f771d4f56ad4dbaa">Anthropic</R> | Constitutional AI evaluation | <R id="683aef834ac1612a">Constitutional AI paper</R> |
-| <EntityLink id="apollo-research">Apollo Research</EntityLink> | Deception detection research | <R id="329d8c2e2532be3d">Scheming evaluation methods</R> |
+| <EntityLink id="E24">Apollo Research</EntityLink> | Deception detection research | <R id="329d8c2e2532be3d">Scheming evaluation methods</R> |
 
 ### Government Initiatives
 
@@ -264,7 +264,7 @@ Current evaluation methods face significant scalability challenges:
 | Institution | Research Areas | Key Publications |
 |-------------|----------------|------------------|
 | <R id="c0a5858881a7ac1c">Stanford HAI</R> | Evaluation methodology | <R id="302c069146f3f6f2">AI evaluation challenges</R> |
-| <EntityLink id="chai">Berkeley CHAI</EntityLink> | Value alignment evaluation | <R id="ad95bec86c548340">Preference learning evaluation</R> |
+| <EntityLink id="E57">Berkeley CHAI</EntityLink> | Value alignment evaluation | <R id="ad95bec86c548340">Preference learning evaluation</R> |
 | <R id="0aa86d6b61aea588">MIT FutureTech</R> | Capability assessment | <R id="aa5d540c12c0114d">Emergent capability detection</R> |
 | <R id="1593095c92d34ed8">Oxford FHI</R> | Risk evaluation frameworks | <R id="5d708a72c3af8ad9">Comprehensive AI evaluation</R> |
 
@@ -272,13 +272,13 @@ Current evaluation methods face significant scalability challenges:
 
 ## AI Transition Model Context
 
-AI evaluation improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="misalignment-potential" />:
+AI evaluation improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="E205" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Pre-deployment evaluation detects dangerous capabilities |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Safety property testing verifies alignment before deployment |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Deception detection identifies gap between stated and actual behaviors |
+| <EntityLink id="E205" /> | <EntityLink id="E160" /> | Pre-deployment evaluation detects dangerous capabilities |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Safety property testing verifies alignment before deployment |
+| <EntityLink id="E205" /> | <EntityLink id="E261" /> | Deception detection identifies gap between stated and actual behaviors |
 
 Critical gaps include novel capability coverage and evaluation gaming risks; current maturity varies significantly by domain (bioweapons at prototype, cyberweapons in development).
 

@@ -20,11 +20,6 @@ todos:
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Strategic Importance' section
   - Complete 'Limitations' section (6 placeholders)
-metrics:
-  wordCount: 880
-  citations: 45
-  tables: 37
-  diagrams: 1
 clusters:
   - ai-safety
   - governance
@@ -32,13 +27,13 @@ subcategory: dynamics-models
 ---
 import {DataInfoBox, R, Mermaid, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="risk-interaction-matrix" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E257" ratings={frontmatter.ratings} />
 
 ## Overview
 
 AI risks don't exist in isolation—they interact through complex feedback loops, amplifying effects, and cascading failures. The **Risk Interaction Matrix Model** provides a systematic framework for analyzing these interdependencies across accident risks, misuse risks, epistemic risks, and structural risks.
 
-Research by <R id="73c1b835c41bcbdb">RAND Corporation</R> and <R id="a306e0b63bdedbd5"><EntityLink id="cais">Centre for AI Safety</EntityLink></R> suggests that **linear risk assessment dramatically underestimates total portfolio risk by 50-150%** when interaction effects are ignored. The model identifies 15-25% of risk pairs as having strong interactions (coefficient >0.5), with compounding effects often dominating simple additive models. The [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025), authored by over 100 AI experts and backed by 30 countries, explicitly identifies systemic risks from interdependencies, including "cascading failures across interconnected infrastructures" and risks arising when "organisations across critical sectors all rely on a small number of general-purpose AI systems."
+Research by <R id="73c1b835c41bcbdb">RAND Corporation</R> and <R id="a306e0b63bdedbd5"><EntityLink id="E47">Centre for AI Safety</EntityLink></R> suggests that **linear risk assessment dramatically underestimates total portfolio risk by 50-150%** when interaction effects are ignored. The model identifies 15-25% of risk pairs as having strong interactions (coefficient >0.5), with compounding effects often dominating simple additive models. The [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025), authored by over 100 AI experts and backed by 30 countries, explicitly identifies systemic risks from interdependencies, including "cascading failures across interconnected infrastructures" and risks arising when "organisations across critical sectors all rely on a small number of general-purpose AI systems."
 
 Key finding: Multi-risk interventions targeting interaction hubs offer **2-5x better return on investment** than single-risk approaches, fundamentally reshaping optimal resource allocation for AI safety. The [MIT AI Risk Repository](https://airisk.mit.edu/) documents that multi-agent system interactions "create cascading failures, selection pressures, new security vulnerabilities, and a lack of shared information and trust."
 
@@ -66,12 +61,12 @@ Key finding: Multi-risk interventions targeting interaction hubs offer **2-5x be
 
 | Risk A | Risk B | Type | Coefficient | Mechanism | Evidence Quality |
 |--------|--------|------|------------|-----------|------------------|
-| <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> | <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | + | +1.4 to +1.8 | Speed pressure reduces safety verification by 40-60% | Medium |
-| <EntityLink id="authentication-collapse">Authentication Collapse</EntityLink> | <EntityLink id="epistemic-collapse">Epistemic Collapse</EntityLink> | C | +0.9 to +1.5 | Deepfake proliferation destroys information credibility | High |
-| <EntityLink id="economic-disruption">Economic Disruption</EntityLink> | <EntityLink id="multipolar-trap">Multipolar Trap</EntityLink> | + | +0.7 to +1.3 | Job losses fuel nationalism, reduce cooperation | High (historical) |
-| <EntityLink id="bioweapons-ai-uplift">Bioweapons AI-Uplift</EntityLink> | <EntityLink id="proliferation">Proliferation</EntityLink> | T | +1.6 to +2.2 | Open models enable 10-100x cost reduction | Low-Medium |
-| <EntityLink id="authoritarian-tools">Authoritarian Tools</EntityLink> | <EntityLink id="winner-take-all">Winner-Take-All</EntityLink> | + | +1.1 to +1.7 | AI surveillance enables control concentration | Medium |
-| <EntityLink id="cyberweapons-attack-automation" label="Cyberweapons Automation" /> | <EntityLink id="flash-dynamics">Flash Dynamics</EntityLink> | C | +1.4 to +2.1 | Automated attacks create systemic vulnerabilities | Medium |
+| <EntityLink id="E239">Racing Dynamics</EntityLink> | <EntityLink id="E93">Deceptive Alignment</EntityLink> | + | +1.4 to +1.8 | Speed pressure reduces safety verification by 40-60% | Medium |
+| <EntityLink id="E27">Authentication Collapse</EntityLink> | <EntityLink id="E119">Epistemic Collapse</EntityLink> | C | +0.9 to +1.5 | Deepfake proliferation destroys information credibility | High |
+| <EntityLink id="E108">Economic Disruption</EntityLink> | <EntityLink id="E209">Multipolar Trap</EntityLink> | + | +0.7 to +1.3 | Job losses fuel nationalism, reduce cooperation | High (historical) |
+| <EntityLink id="E43">Bioweapons AI-Uplift</EntityLink> | <EntityLink id="E232">Proliferation</EntityLink> | T | +1.6 to +2.2 | Open models enable 10-100x cost reduction | Low-Medium |
+| <EntityLink id="E30">Authoritarian Tools</EntityLink> | <EntityLink id="E374">Winner-Take-All</EntityLink> | + | +1.1 to +1.7 | AI surveillance enables control concentration | Medium |
+| <EntityLink id="E87" label="Cyberweapons Automation" /> | <EntityLink id="E142">Flash Dynamics</EntityLink> | C | +1.4 to +2.1 | Automated attacks create systemic vulnerabilities | Medium |
 
 ## Empirical Evidence for Risk Interactions
 
@@ -99,9 +94,9 @@ The following matrix shows estimated correlation coefficients between major risk
 | **Epistemic** | +0.38 | +0.29 | +0.52 | 1.00 | +0.61 |
 | **Misuse** | +0.31 | +0.44 | +0.67 | +0.61 | 1.00 |
 
-Methodology: Coefficients derived from expert elicitation, historical analogs (nuclear proliferation, financial crisis correlations), and simulation studies. The Racing-Misalignment correlation (+0.72) is the strongest pairwise effect, reflecting how competitive pressure systematically reduces safety investment. The Concentration-Misuse correlation (+0.67) captures how monopolistic <EntityLink id="ai-control">AI control</EntityLink> enables both state and non-state misuse pathways.
+Methodology: Coefficients derived from expert elicitation, historical analogs (nuclear proliferation, financial crisis correlations), and simulation studies. The Racing-Misalignment correlation (+0.72) is the strongest pairwise effect, reflecting how competitive pressure systematically reduces safety investment. The Concentration-Misuse correlation (+0.67) captures how monopolistic <EntityLink id="E6">AI control</EntityLink> enables both state and non-state misuse pathways.
 
-### <EntityLink id="risk-interaction-network">Risk Interaction Network</EntityLink> Diagram
+### <EntityLink id="E258">Risk Interaction Network</EntityLink> Diagram
 
 The following diagram visualizes the major interaction pathways between AI risk categories. Edge thickness represents interaction strength, and red nodes indicate high-severity risks.
 
@@ -213,8 +208,8 @@ These projections underscore why intervention timing matters critically: early a
 
 | Component | Role | Interaction Strength |
 |-----------|------|-------------------|
-| <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> | Primary driver | Hub node (7 strong connections) |
-| <EntityLink id="proliferation">Proliferation</EntityLink> | Amplifier | +1.3 coefficient with racing |
+| <EntityLink id="E239">Racing Dynamics</EntityLink> | Primary driver | Hub node (7 strong connections) |
+| <EntityLink id="E232">Proliferation</EntityLink> | Amplifier | +1.3 coefficient with racing |
 | Regulatory capture | Enabler | Reduces governance effectiveness by 30-50% |
 | **Net effect** | **Expanding ungoverned capability frontier** | **2.1x risk amplification** |
 
@@ -224,9 +219,9 @@ These projections underscore why intervention timing matters critically: early a
 
 | Component | Pathway | Cascade Potential |
 |-----------|---------|------------------|
-| <EntityLink id="deepfakes">Deepfakes</EntityLink> | Authentication failure | Threshold effect at 15-20% synthetic content |
-| <EntityLink id="disinformation">Disinformation</EntityLink> | Epistemic degradation | 1.4x amplification with deepfakes |
-| <EntityLink id="trust-decline">Trust Erosion</EntityLink> | Social fabric damage | Exponential decay below 40% institutional trust |
+| <EntityLink id="E96">Deepfakes</EntityLink> | Authentication failure | Threshold effect at 15-20% synthetic content |
+| <EntityLink id="E102">Disinformation</EntityLink> | Epistemic degradation | 1.4x amplification with deepfakes |
+| <EntityLink id="E362">Trust Erosion</EntityLink> | Social fabric damage | Exponential decay below 40% institutional trust |
 | **Outcome** | **Democratic dysfunction** | **System-level failure mode** |
 
 **Timeline:** <R id="73c1b835c41bcbdb">RAND analysis</R> suggests cascade initiation within 2-4 years if authentication tech lags deepfake advancement by >18 months.
@@ -235,8 +230,8 @@ These projections underscore why intervention timing matters critically: early a
 
 | Risk | Control Mechanism | Lock-in Potential |
 |------|------------------|------------------|
-| <EntityLink id="winner-take-all">Winner-Take-All</EntityLink> | Economic concentration | 3-5 dominant players globally |
-| <EntityLink id="authoritarian-tools">Surveillance</EntityLink> | Information asymmetry | 1000x capability gap vs individuals |
+| <EntityLink id="E374">Winner-Take-All</EntityLink> | Economic concentration | 3-5 dominant players globally |
+| <EntityLink id="E30">Surveillance</EntityLink> | Information asymmetry | 1000x capability gap vs individuals |
 | Regulatory capture | Legal framework control | Self-perpetuating advantage |
 | **Result** | **Irreversible power concentration** | **Democratic backsliding** |
 
@@ -256,12 +251,12 @@ These projections underscore why intervention timing matters critically: early a
 ### Multi-Risk Intervention Examples
 
 **International AI Racing Coordination:**
-- Primary effect: Reduces <EntityLink id="racing-dynamics">racing dynamics</EntityLink> intensity by 40-60%
-- Secondary effects: Enables safety investment (+30%), reduces <EntityLink id="proliferation">proliferation</EntityLink> pressure (+25%), improves alignment timelines (+35%)
+- Primary effect: Reduces <EntityLink id="E239">racing dynamics</EntityLink> intensity by 40-60%
+- Secondary effects: Enables safety investment (+30%), reduces <EntityLink id="E232">proliferation</EntityLink> pressure (+25%), improves alignment timelines (+35%)
 - **Total impact:** 2.3x single-risk intervention ROI
 
 **Content Authentication Standards:**
-- Primary effect: Prevents <EntityLink id="authentication-collapse">authentication collapse</EntityLink>
+- Primary effect: Prevents <EntityLink id="E27">authentication collapse</EntityLink>
 - Secondary effects: Maintains epistemic foundations, preserves democratic deliberation, enables effective governance
 - **Total impact:** 1.9x single-risk intervention ROI
 
@@ -274,8 +269,8 @@ Recent work has substantially advanced the field. A 2024 paper on [dimensional c
 | Area | Maturity | Key Organizations | Progress Indicators |
 |------|----------|------------------|-------------------|
 | Interaction modeling | Early-Maturing | <R id="0a17f30e99091ebf">RAND</R>, <R id="f0d95954b449240a">CSET</R>, [MIT AI Risk Repository](https://airisk.mit.edu/) | 15-25 systematic analyses published (2024-2025) |
-| Empirical validation | Early stage | <EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="chai">CHAI</EntityLink>, [UK AISI](https://www.aisi.gov.uk/) | Historical case studies + simulation gaming results |
-| Policy applications | Developing | <EntityLink id="govai">GovAI</EntityLink>, <R id="58f6946af0177ca5">CNAS</R>, [International AI Safety Report](https://internationalaisafetyreport.org/) | Framework adoption by 30+ countries |
+| Empirical validation | Early stage | <EntityLink id="E202">MIRI</EntityLink>, <EntityLink id="E57">CHAI</EntityLink>, [UK AISI](https://www.aisi.gov.uk/) | Historical case studies + simulation gaming results |
+| Policy applications | Developing | <EntityLink id="E153">GovAI</EntityLink>, <R id="58f6946af0177ca5">CNAS</R>, [International AI Safety Report](https://internationalaisafetyreport.org/) | Framework adoption by 30+ countries |
 | Risk Pathway Modeling | Nascent | Academic researchers | [Pathway models](https://arxiv.org/html/2508.06411v1) mapping hazard-to-harm progressions |
 
 ### Implementation Status
@@ -284,7 +279,7 @@ Recent work has substantially advanced the field. A 2024 paper on [dimensional c
 
 **Policy integration:** <R id="54dbc15413425997">NIST AI Risk Management Framework</R> includes interaction considerations as of 2023 update. The [EU AI Act](https://www.rand.org/pubs/research_reports/RRA3243-1.html) explicitly addresses "GPAI models with systemic risk," requiring enhanced monitoring for models with potential cascading effects.
 
-**Industry awareness:** Major labs (<EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">DeepMind</EntityLink>) incorporating interaction analysis in risk assessments. The [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) from Future of Life Institute evaluates company safety frameworks from a risk management perspective.
+**Industry awareness:** Major labs (<EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E98">DeepMind</EntityLink>) incorporating interaction analysis in risk assessments. The [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) from Future of Life Institute evaluates company safety frameworks from a risk management perspective.
 
 **Simulation and Gaming:** [Strategic simulation gaming](https://www.sciencedirect.com/science/article/abs/pii/S0016328725000254) has emerged as a key methodology for studying AI race dynamics, with [wargaming research](https://ai.objectives.institute/blog/fyac8bpybrxshxicc7whvcgjm711ya) demonstrating that "even well-designed safety protocols often degraded under race dynamics."
 
@@ -347,11 +342,11 @@ This demonstrates why traditional risk prioritization based on individual severi
 
 ### Internal Cross-References
 
-- <EntityLink id="ai-risk-portfolio-analysis" /> - Comprehensive risk assessment methodology
-- <EntityLink id="compounding-risks-analysis" label="Compounding Risks Analysis" /> - Detailed cascade modeling
-- <EntityLink id="critical-uncertainties" /> - Key unknowns in risk assessment
-- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> - Central hub risk detailed analysis
-- <EntityLink id="multipolar-trap">Multipolar Trap</EntityLink> - Related coordination failure dynamics
+- <EntityLink id="E12" /> - Comprehensive risk assessment methodology
+- <EntityLink id="E63" label="Compounding Risks Analysis" /> - Detailed cascade modeling
+- <EntityLink id="E398" /> - Key unknowns in risk assessment
+- <EntityLink id="E239">Racing Dynamics</EntityLink> - Central hub risk detailed analysis
+- <EntityLink id="E209">Multipolar Trap</EntityLink> - Related coordination failure dynamics
 
 ### External Resources
 

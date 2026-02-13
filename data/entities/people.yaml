@@ -298,7 +298,7 @@
 - id: elizabeth-kelly
   numericId: E115
   type: researcher
-  title: Elizabeth Kelly
+  title: Elizabeth Kelly (US AISI Director)
   customFields:
     - label: Role
       value: Director
@@ -873,7 +873,7 @@
 - id: elon-musk
   numericId: E116
   type: researcher
-  title: Elon Musk
+  title: Elon Musk (AI Industry)
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
   status: stub
   relatedEntries:
@@ -906,7 +906,7 @@
 - id: david-sacks
   numericId: E431
   type: researcher
-  title: David Sacks
+  title: David Sacks (White House AI Czar)
   description: >-
     South African-American entrepreneur, venture capitalist, and White House AI and
     Crypto Czar who co-founded Craft Ventures and played key roles at PayPal and
@@ -936,7 +936,7 @@
 - id: marc-andreessen
   numericId: E432
   type: researcher
-  title: Marc Andreessen
+  title: Marc Andreessen (AI Investor)
   description: >-
     American software engineer, entrepreneur, and venture capitalist who co-created
     Mosaic, founded Netscape, and co-founded Andreessen Horowitz. Known for
@@ -994,7 +994,7 @@
 - id: philip-tetlock
   numericId: E434
   type: researcher
-  title: Philip Tetlock
+  title: Philip Tetlock (Forecasting Pioneer)
   description: >-
     Psychologist and forecasting researcher who pioneered the science of
     superforecasting through the Good Judgment Project, demonstrating that
@@ -1051,7 +1051,7 @@
 - id: dustin-moskovitz
   numericId: E436
   type: researcher
-  title: Dustin Moskovitz
+  title: Dustin Moskovitz (AI Safety Funder)
   description: >-
     Facebook co-founder who became the world's youngest self-made billionaire in
     2011. Together with his wife Cari Tuna, he has given away over $4 billion

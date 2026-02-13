@@ -57,12 +57,8 @@ const frontmatterSchema = z.object({
     trajectoryImpact: z.number().min(0).max(100).optional(),
     uncertainty: z.number().min(0).max(100).optional(),
   }).optional(),
-  metrics: z.object({
-    wordCount: z.number().optional(),
-    citations: z.number().optional(),
-    tables: z.number().optional(),
-    diagrams: z.number().optional(),
-  }).optional(),
+  // metrics (wordCount, citations, tables, diagrams) are computed at build time
+  // by app/scripts/lib/metrics-extractor.mjs — not stored in frontmatter.
   maturity: z.string().optional(),
   fullWidth: z.boolean().optional(),
   update_frequency: z.number().positive().optional(),

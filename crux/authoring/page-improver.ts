@@ -32,6 +32,9 @@ import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { MODELS } from '../lib/anthropic.ts';
+import { buildEntityLookupForContent } from '../lib/entity-lookup.ts';
+import { convertSlugsToNumericIds } from './creator/deployment.ts';
+import { appendEditLog, getDefaultRequestedBy } from '../lib/edit-log.ts';
 // Inlined from content-types.ts to keep this file self-contained
 const CRITICAL_RULES: string[] = [
   'dollar-signs',
@@ -184,14 +187,13 @@ function repairFrontmatter(content: string): string {
   // Fix 3: Top-level keys that got incorrectly indented under a block.
   // e.g. "  clusters:" should be "clusters:" if it's a known top-level key.
   const knownSubKeys = new Set([
-    'wordCount', 'citations', 'tables', 'diagrams', // metrics sub-keys
     'novelty', 'rigor', 'actionability', 'completeness', // ratings sub-keys
     'objectivity', 'focus', 'concreteness',
     'order', 'label', // sidebar sub-keys
   ]);
   const topLevelKeys = new Set([
     'title', 'description', 'sidebar', 'quality', 'importance', 'lastEdited',
-    'update_frequency', 'llmSummary', 'ratings', 'metrics', 'clusters',
+    'update_frequency', 'llmSummary', 'ratings', 'clusters',
     'draft', 'aliases', 'redirects', 'tags',
   ]);
   const lines = fm.split('\n');
@@ -765,54 +767,8 @@ async function executeScrySearch(query: string, table: string = 'mv_eaforum_post
   }
 }
 
-// Compute actual metrics from MDX content and sync into frontmatter
-function syncFrontmatterMetrics(content: string): string {
-  // Split frontmatter from body
-  const fmMatch = content.match(/^(---\n[\s\S]*?\n---)\n([\s\S]*)$/);
-  if (!fmMatch) return content;
-  let frontmatter = fmMatch[1];
-  const body = fmMatch[2];
-
-  // Count words in body (excluding MDX components, imports, frontmatter)
-  const textOnly = body
-    .replace(/^import\s.*/gm, '')              // Remove imports
-    .replace(/<[^>]+\/>/g, '')                  // Remove self-closing components
-    .replace(/<[A-Z]\w+[^>]*>[\s\S]*?<\/[A-Z]\w+>/g, '') // Remove component blocks
-    .replace(/\[.*?\]\(.*?\)/g, (m) => m.replace(/\(.*?\)/, '')) // Keep link text only
-    .replace(/[|*#`_\-\[\]>]/g, ' ')           // Remove markdown syntax
-    .replace(/\^\[\d+\]/g, '')                  // Remove footnote refs
-    .replace(/\[\^\d+\]:/g, '');                // Remove footnote defs
-  const wordCount = textOnly.split(/\s+/).filter(w => w.length > 0).length;
-
-  // Count footnote citations ([^N] references in body, not definitions)
-  const citationRefs = new Set(body.match(/\[\^\d+\]/g) || []);
-  const citations = citationRefs.size;
-
-  // Count markdown tables (lines starting with |)
-  const tableHeaderLines = (body.match(/^\|.*\|.*\|$/gm) || [])
-    .filter(line => !line.match(/^\|[\s\-:|]+\|$/)); // Exclude separator lines
-  // Each table has a header row; count unique tables by checking for separator after header
-  const tableSeparators = (body.match(/^\|[\s\-:|]+\|$/gm) || []);
-  const tables = tableSeparators.length;
-
-  // Count Mermaid diagrams
-  const diagrams = (body.match(/<Mermaid\s/g) || []).length;
-
-  // Update metrics in frontmatter
-  // The trailing \n is critical — without it the last metrics line merges with the next key.
-  // Use [ \t]+ (not \s+) in the sub-key pattern to avoid matching across newlines.
-  const metricsBlock = `metrics:\n  wordCount: ${wordCount}\n  citations: ${citations}\n  tables: ${tables}\n  diagrams: ${diagrams}\n`;
-  if (frontmatter.match(/^metrics:\s*\n(?:[ \t]+\w+:[ \t]*[\d.]+\n?)*/m)) {
-    frontmatter = frontmatter.replace(
-      /^metrics:\s*\n(?:[ \t]+\w+:[ \t]*[\d.]+\n?)*/m,
-      metricsBlock
-    );
-  }
-
-  // Safety: run frontmatter repair to catch any YAML corruption
-  const reassembled = frontmatter + '\n' + body;
-  return repairFrontmatter(reassembled);
-}
+// Metrics (wordCount, citations, tables, diagrams) are computed at build time
+// by app/scripts/lib/metrics-extractor.mjs — not stored in frontmatter.
 
 // Phase: Analyze
 async function analyzePhase(page: PageData, directions: string, options: PipelineOptions): Promise<AnalysisResult> {
@@ -992,6 +948,12 @@ async function improvePhase(page: PageData, analysis: AnalysisResult, research: 
   // Build objectivity context from previous ratings
   const objectivityContext = buildObjectivityContext(page, analysis);
 
+  // Build entity lookup table for numeric ID usage
+  log('improve', 'Building entity lookup table...');
+  const entityLookup = buildEntityLookupForContent(currentContent, ROOT);
+  const entityLookupCount = entityLookup.split('\n').filter(Boolean).length;
+  log('improve', `  Found ${entityLookupCount} relevant entities for lookup`);
+
   const prompt = `Improve this wiki page based on the analysis and research.
 
 ## Page Info
@@ -1021,14 +983,23 @@ Make targeted improvements based on the analysis and directions. Follow these gu
 ### Wiki Conventions
 - Use GFM footnotes for prose citations: [^1], [^2], etc.
 - Use inline links in tables: [Source Name](url)
-- EntityLinks: <EntityLink id="entity-id">Display Text</EntityLink>
+- EntityLinks use **numeric IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
 - Escape dollar signs: \\$100M not $100M
 - Import from: '${importPath}'
+
+### Entity Lookup Table
+
+Use the numeric IDs below when writing EntityLinks. The format is: E## = slug → "Display Name"
+ONLY use IDs from this table. If an entity is not listed here, use plain text instead.
+
+\`\`\`
+${entityLookup}
+\`\`\`
 
 ### Quality Standards
 - Add citations from the research sources
 - Replace vague claims with specific numbers
-- Add EntityLinks for related concepts
+- Add EntityLinks for related concepts (using E## IDs from the lookup table above)
 - Ensure tables have source links
 - **NEVER use vague citations** like "Interview", "Earnings call", "Conference talk", "Reports", "Various"
 - Always specify: exact source name, date, and context (e.g., "Tesla Q4 2021 earnings call", "MIT Aeronautics Symposium (Oct 2014)")
@@ -1091,6 +1062,10 @@ These are now rendered automatically by the RelatedPages React component at buil
 Remove any existing such sections from the content. Also remove any <Backlinks> component
 usage and its import if no other usage remains.
 
+### Frontmatter Rules
+- Do NOT add a \`metrics:\` block (wordCount, citations, tables, diagrams) — these are computed at build time.
+- Do NOT remove or change the \`quality:\` field — it is managed by a separate grading pipeline.
+
 ### Output Format
 Output the COMPLETE improved MDX file content. Include all frontmatter and content.
 Do not output markdown code blocks - output the raw MDX directly.
@@ -1119,11 +1094,9 @@ Start your response with "---" (the frontmatter delimiter).`;
     `lastEdited: "${today}"`
   );
 
-  // Remove quality field - must be set by grade-content.ts only
-  improvedContent = improvedContent.replace(
-    /^quality:\s*\d+\s*\n/m,
-    ''
-  );
+  // Preserve existing quality field — only grade-content.ts should change it.
+  // Previously this was removed unconditionally, but that caused quality to be
+  // lost when running improve without --grade.
 
   // Repair any YAML frontmatter corruption from model output
   improvedContent = repairFrontmatter(improvedContent);
@@ -1131,6 +1104,15 @@ Start your response with "---" (the frontmatter delimiter).`;
   // Strip any "Related Pages" / "See Also" / "Related Content" sections
   // (now rendered automatically by the RelatedPages component)
   improvedContent = stripRelatedPagesSections(improvedContent);
+
+  // Convert any remaining slug-based EntityLink IDs to numeric (E##) format.
+  // The LLM should use E## IDs from the lookup table, but this is a safety net
+  // in case it falls back to slug-based IDs from the training data.
+  const { content: convertedContent, converted: slugsConverted } = convertSlugsToNumericIds(improvedContent, ROOT);
+  if (slugsConverted > 0) {
+    log('improve', `  Converted ${slugsConverted} remaining slug-based EntityLink ID(s) to E## format`);
+    improvedContent = convertedContent;
+  }
 
   writeTemp(page.id, 'improved.mdx', improvedContent);
   log('improve', 'Complete');
@@ -1258,7 +1240,22 @@ async function validatePhase(page: PageData, improvedContent: string, options: P
       if (entityLinkIds.length > 0) {
         const pages = loadPages();
         const pageIds = new Set(pages.map(p => p.id));
-        const invalidIds = entityLinkIds.filter(id => !pageIds.has(id));
+
+        // Also load id-registry so we can resolve E## → slug
+        let idRegistry: Record<string, string> = {};
+        try {
+          const raw = fs.readFileSync(path.join(ROOT, 'data/id-registry.json'), 'utf-8');
+          idRegistry = JSON.parse(raw).entities || {};
+        } catch { /* ignore */ }
+
+        const invalidIds = entityLinkIds.filter(id => {
+          // Accept E## format — resolve to slug and check
+          if (/^E\d+$/i.test(id)) {
+            const slug = idRegistry[id.toUpperCase()];
+            return !slug; // invalid only if E## doesn't exist in registry
+          }
+          return !pageIds.has(id);
+        });
         if (invalidIds.length > 0) {
           const uniqueInvalid = [...new Set(invalidIds)];
           issues.quality.push({
@@ -1460,8 +1457,6 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
       case 'improve':
         improvedContent = await improvePhase(page, analysis!, research || { sources: [] }, directions, options);
-        // Sync frontmatter metrics (wordCount, citations, tables, diagrams) with actual content
-        improvedContent = syncFrontmatterMetrics(improvedContent);
         // Warn about unverified citations in tiers without research
         if (tier === 'polish' && !research?.sources?.length) {
           const footnoteCount = new Set(improvedContent.match(/\[\^\d+\]/g) || []).size;
@@ -1559,6 +1554,17 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     // Apply changes directly
     fs.copyFileSync(finalPath, filePath);
     console.log(`\nChanges applied to ${filePath}`);
+
+    // Log improvement in edit log
+    const editNote = directions
+      ? `Improved (${tier}): ${directions.slice(0, 120)}`
+      : `Improved (${tier})`;
+    appendEditLog(page.id, {
+      tool: 'crux-improve',
+      agency: 'ai-directed',
+      requestedBy: getDefaultRequestedBy(),
+      note: editNote,
+    });
 
     // Run grading if requested
     if (options.grade) {

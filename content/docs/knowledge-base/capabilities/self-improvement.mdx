@@ -13,18 +13,13 @@ ratings:
   rigor: 7.2
   actionability: 6.5
   completeness: 7.8
-metrics:
-  wordCount: 2447
-  citations: 38
-  tables: 33
-  diagrams: 3
 clusters: ["ai-safety"]
 ---
 import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 <DataExternalLinks pageId="self-improvement" />
 
-<DataInfoBox entityId="self-improvement" />
+<DataInfoBox entityId="E278" />
 
 ## Quick Assessment
 
@@ -33,7 +28,7 @@ import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@component
 | **Current Capability** | Moderate-High | AlphaEvolve achieved 23-32.5% training speedups; Darwin Gödel Machine improved SWE-bench from 20% to 50% |
 | **Recursive Potential** | Uncertain (30-70%) | Software feedback multiplier r estimated at 1.2 (range: 0.4-3.6); r > 1 indicates acceleration possible |
 | **Timeline to RSI** | 5-15 years | Conservative: 10-30 years; aggressive: 5-10 years for meaningful autonomous research |
-| **Task Horizon Growth** | ≈7 months doubling | <EntityLink id="metr">METR</EntityLink> 2025: AI task completion horizons doubling every 7 months (2019-2025); possible 4-month acceleration in 2024 |
+| **Task Horizon Growth** | ≈7 months doubling | <EntityLink id="E201">METR</EntityLink> 2025: AI task completion horizons doubling every 7 months (2019-2025); possible 4-month acceleration in 2024 |
 | **Compute Bottleneck** | Debated | CES model: strong substitutes (σ > 1) suggests RSI possible; frontier experiments model (σ ≈ 0) suggests compute binding |
 | **Grade: AutoML/NAS** | A- | Production deployments; 23% training speedups; 75% SOTA recovery rate on open problems |
 | **Grade: Code Self-Modification** | B+ | Darwin Gödel Machine 50% SWE-bench; AI Scientist paper accepted at ICLR workshop |
@@ -46,13 +41,13 @@ import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@component
 | Official Website | [simple.wikipedia.org](https://simple.wikipedia.org/wiki/Recursive_self-improvement) |
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Recursive_self-improvement) |
 | Wikidata | [wikidata.org](https://www.wikidata.org/wiki/Q1768494) |
-| <EntityLink id="lesswrong">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/w/recursive-self-improvement) |
+| <EntityLink id="E538">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/w/recursive-self-improvement) |
 
 ## Overview
 
 Self-improvement in AI systems represents one of the most consequential and potentially dangerous developments in artificial intelligence. At its core, this capability involves AI systems enhancing their own abilities, optimizing their architectures, or creating more capable successor systems with minimal human intervention. This phenomenon spans a spectrum from today's automated machine learning tools to theoretical scenarios of recursive self-improvement that could trigger rapid, uncontrollable capability explosions.
 
-The significance of AI self-improvement extends far beyond technical optimization. It represents a potential inflection point where human oversight becomes insufficient to control AI development trajectories. Current systems already demonstrate limited self-improvement through automated hyperparameter tuning, neural architecture search, and training on AI-generated data. However, the trajectory toward more autonomous self-modification raises fundamental questions about maintaining <EntityLink id="human-agency">human agency</EntityLink> over AI systems that could soon surpass human capabilities in designing their own successors.
+The significance of AI self-improvement extends far beyond technical optimization. It represents a potential inflection point where human oversight becomes insufficient to control AI development trajectories. Current systems already demonstrate limited self-improvement through automated hyperparameter tuning, neural architecture search, and training on AI-generated data. However, the trajectory toward more autonomous self-modification raises fundamental questions about maintaining <EntityLink id="E157">human agency</EntityLink> over AI systems that could soon surpass human capabilities in designing their own successors.
 
 The stakes are existential because self-improvement could enable AI systems to rapidly traverse the capability spectrum from current levels to superintelligence, potentially within timeframes that preclude human intervention or safety measures. This makes understanding, predicting, and controlling self-improvement dynamics central to AI safety research and global governance efforts.
 
@@ -60,7 +55,7 @@ The stakes are existential because self-improvement could enable AI systems to r
 
 | Dimension | Assessment | Notes |
 |-----------|------------|-------|
-| Severity | **Existential** | Could trigger uncontrollable intelligence explosion; <EntityLink id="nick-bostrom">Nick Bostrom</EntityLink> estimates fast takeoff could occur within hours to days |
+| Severity | **Existential** | Could trigger uncontrollable intelligence explosion; <EntityLink id="E215">Nick Bostrom</EntityLink> estimates fast takeoff could occur within hours to days |
 | Likelihood | **Uncertain (30-70%)** | Depends on whether AI can achieve genuine research creativity; current evidence shows limited but growing capability |
 | Timeline | **Medium-term (5-15 years)** | Conservative estimates: 10-30 years; aggressive projections: 5-10 years for meaningful autonomous research |
 | Trend | **Accelerating** | AlphaEvolve (2025) achieved 23% training speedup; AI agents increasingly automating research tasks |
@@ -82,9 +77,9 @@ The stakes are existential because self-improvement could enable AI systems to r
 | Expert | Position | Key Claim |
 |--------|----------|-----------|
 | Nick Bostrom | Oxford FHI | "Once artificial intelligence reaches human level... AIs would help constructing better AIs" creating an intelligence explosion |
-| <EntityLink id="stuart-russell">Stuart Russell</EntityLink> | UC Berkeley | Self-improvement loop "could quickly escape human oversight" without governance; advocates for purely altruistic, humble machines |
+| <EntityLink id="E290">Stuart Russell</EntityLink> | UC Berkeley | Self-improvement loop "could quickly escape human oversight" without governance; advocates for purely altruistic, humble machines |
 | I.J. Good | Originator (1965) | First formalized intelligence explosion hypothesis: sufficiently intelligent machine as "the last invention that man need ever make" |
-| <EntityLink id="dario-amodei">Dario Amodei</EntityLink> | <EntityLink id="anthropic">Anthropic</EntityLink> CEO | "A temporary lead could be parlayed into a durable advantage" due to AI's ability to help make smarter AI |
+| <EntityLink id="E91">Dario Amodei</EntityLink> | <EntityLink id="E22">Anthropic</EntityLink> CEO | "A temporary lead could be parlayed into a durable advantage" due to AI's ability to help make smarter AI |
 | Forethought Foundation | Research org | ≈50% probability that software feedback loops drive accelerating progress, absent human bottlenecks |
 
 ## Current Manifestations of Self-Improvement
@@ -370,8 +365,8 @@ These findings suggest that while AI is increasingly contributing to its own dev
 
 | Response | Mechanism | Current Status | Effectiveness |
 |----------|-----------|----------------|---------------|
-| <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink> | Capability evaluations before deployment | Anthropic, OpenAI, DeepMind implementing | Medium |
-| <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> | Government evaluation of dangerous capabilities | US, UK, Japan established | Low-Medium |
+| <EntityLink id="E252">Responsible Scaling Policies</EntityLink> | Capability evaluations before deployment | Anthropic, OpenAI, DeepMind implementing | Medium |
+| <EntityLink id="E13">AI Safety Institutes</EntityLink> | Government evaluation of dangerous capabilities | US, UK, Japan established | Low-Medium |
 | Compute Governance | Control access to training resources | Export controls in place | Medium |
 | Interpretability research | Understand model internals during modification | Active research area | Low (early stage) |
 | Formal verification | Prove alignment properties preserved | Theoretical exploration | Very Low (nascent) |

@@ -1,5 +1,5 @@
 ---
-title: "Solution Cruxes"
+title: "AI Safety Solution Cruxes"
 description: "Key uncertainties that determine which technical, coordination, and epistemic solutions to prioritize for AI safety and governance. Maps decision-relevant uncertainties across verification scaling, international cooperation, and infrastructure funding with specific probability estimates and strategic implications."
 sidebar:
   order: 5
@@ -13,11 +13,6 @@ ratings:
   rigor: 6.8
   actionability: 7.2
   completeness: 7.5
-metrics:
-  wordCount: 2341
-  citations: 62
-  tables: 47
-  diagrams: 1
 clusters: ["ai-safety", "governance"]
 ---
 import {Crux, CruxList, R, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
@@ -39,7 +34,7 @@ Solution cruxes are the key uncertainties that determine which interventions we 
 
 The landscape of AI safety solutions spans three critical domains: technical approaches that use AI systems themselves to verify and authenticate content; coordination mechanisms that align incentives across labs, nations, and institutions; and infrastructure investments that create sustainable epistemic institutions. Within each domain, fundamental uncertainties about feasibility, cost-effectiveness, and adoption timelines create genuine disagreements among experts about optimal resource allocation.
 
-These disagreements have enormous practical implications. Whether AI-based verification can keep pace with AI-based generation determines if we should invest billions in detection infrastructure or pivot to provenance-based approaches. Whether frontier AI labs can coordinate without regulatory compulsion shapes the balance between industry engagement and government intervention. Whether credible commitment mechanisms can be designed determines if international <EntityLink id="ai-governance">AI governance</EntityLink> is achievable or if we should prepare for an uncoordinated race.
+These disagreements have enormous practical implications. Whether AI-based verification can keep pace with AI-based generation determines if we should invest billions in detection infrastructure or pivot to provenance-based approaches. Whether frontier AI labs can coordinate without regulatory compulsion shapes the balance between industry engagement and government intervention. Whether credible commitment mechanisms can be designed determines if international <EntityLink id="E608">AI governance</EntityLink> is achievable or if we should prepare for an uncoordinated race.
 
 ## Risk Assessment
 
@@ -47,21 +42,21 @@ These disagreements have enormous practical implications. Whether AI-based verif
 |---------------|----------|------------|----------|-------|
 | Verification-generation arms race | High | 70% | 2-3 years | Accelerating |
 | Coordination failure under pressure | Critical | 60% | 1-2 years | Worsening |
-| <EntityLink id="epistemic-infrastructure">Epistemic infrastructure</EntityLink> collapse | High | 40% | 3-5 years | Stable |
+| <EntityLink id="E122">Epistemic infrastructure</EntityLink> collapse | High | 40% | 3-5 years | Stable |
 | International governance breakdown | Critical | 55% | 2-4 years | Worsening |
 
 ## Solution Effectiveness Overview
 
-The <R id="97185b28d68545b4">2025 AI Safety Index</R> from the <EntityLink id="fli">Future of Life Institute</EntityLink> and the <R id="b163447fdc804872">International AI Safety Report 2025</R>---compiled by 96 AI experts representing 30 countries---provide sobering assessments of current solution effectiveness. Despite growing investment, core challenges including alignment, control, interpretability, and robustness remain unresolved, with system complexity growing year by year. The following table summarizes effectiveness estimates across major solution categories based on 2024-2025 assessments.
+The <R id="97185b28d68545b4">2025 AI Safety Index</R> from the <EntityLink id="E528">Future of Life Institute</EntityLink> and the <R id="b163447fdc804872">International AI Safety Report 2025</R>---compiled by 96 AI experts representing 30 countries---provide sobering assessments of current solution effectiveness. Despite growing investment, core challenges including alignment, control, interpretability, and robustness remain unresolved, with system complexity growing year by year. The following table summarizes effectiveness estimates across major solution categories based on 2024-2025 assessments.
 
 | Solution Category | Estimated Effectiveness | Investment Level (2024) | Maturity | Key Gaps |
 |-------------------|------------------------|------------------------|----------|----------|
 | Technical alignment research | Moderate (35-50%) | \$500M-1B | Early research | Scalability, verification |
-| <EntityLink id="interpretability">Interpretability</EntityLink> | Promising (40-55%) | \$100-200M | Active research | Superposition, automation |
-| <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink> | Limited (25-35%) | N/A (policy) | Deployed but weak | Vague thresholds, compliance |
+| <EntityLink id="E174">Interpretability</EntityLink> | Promising (40-55%) | \$100-200M | Active research | Superposition, automation |
+| <EntityLink id="E252">Responsible Scaling Policies</EntityLink> | Limited (25-35%) | N/A (policy) | Deployed but weak | Vague thresholds, compliance |
 | Third-party evaluations (<R id="45370a5153534152">METR</R>) | Moderate (45-55%) | \$10-20M | Operational | Coverage, standardization |
 | Compute governance | Theoretical (20-30%) | \$5-10M | Early research | Verification mechanisms |
-| <EntityLink id="international-coordination">International coordination</EntityLink> | Very limited (15-25%) | \$50-100M | Nascent | US-China competition |
+| <EntityLink id="E171">International coordination</EntityLink> | Very limited (15-25%) | \$50-100M | Nascent | US-China competition |
 
 According to <R id="7ae6b3be2d2043c1">Anthropic's recommended research directions</R>, the main reason current AI systems do not pose catastrophic risks is that they lack many of the capabilities necessary for causing catastrophic harm---not because alignment solutions have been proven effective. This distinction is crucial for understanding the urgency of solution development.
 
@@ -151,7 +146,7 @@ The technical domain centers on whether AI systems can be effectively turned aga
 
 The current evidence presents a mixed picture. <R id="7671d8111f8b8247">DARPA's SemaFor program</R>, launched in 2021 with \$26 million in funding, has demonstrated some success in semantic forensics for manipulated media, but primarily on specific types of synthetic content rather than the broad spectrum of AI-generated material now emerging. Meanwhile, commercial detection tools like <R id="2a656ac18fe6b4d6">GPTZero</R> report accuracy rates of 85-95% on academic writing, but these drop significantly when generators are specifically designed to evade detection.
 
-The fundamental challenge lies in the asymmetric nature of the problem. Content generators need only produce plausible outputs, while detectors must distinguish between authentic and synthetic content across all possible generation techniques. This asymmetry may prove insurmountable, particularly as generation models become more sophisticated and numerous through <EntityLink id="factors-ai-capabilities-overview">capabilities scaling</EntityLink>.
+The fundamental challenge lies in the asymmetric nature of the problem. Content generators need only produce plausible outputs, while detectors must distinguish between authentic and synthetic content across all possible generation techniques. This asymmetry may prove insurmountable, particularly as generation models become more sophisticated and numerous through <EntityLink id="E660">capabilities scaling</EntityLink>.
 
 However, optimists point to potential advantages for verification systems: they can be specialized for detection tasks, leverage multiple modalities simultaneously, and benefit from centralized training on comprehensive datasets of known synthetic content. The emergence of foundation models specifically designed for verification, such as those being developed at <R id="f771d4f56ad4dbaa">Anthropic</R> and <R id="e9aaa7b5e18f9f41">OpenAI</R>, suggests this approach may have untapped potential.
 
@@ -272,7 +267,7 @@ Coordination cruxes address whether different actors—from AI labs to nation-st
 
 | Mechanism | Participants | Binding Nature | Track Record | Key Challenges |
 |-----------|-------------|----------------|--------------|----------------|
-| <EntityLink id="responsible-scaling-policies">RSPs</EntityLink> | 4 major labs | Voluntary | Mixed compliance | Vague standards, competitive pressure |
+| <EntityLink id="E252">RSPs</EntityLink> | 4 major labs | Voluntary | Mixed compliance | Vague standards, competitive pressure |
 | <R id="fdf68a8f30f57dee">AI Safety Institute</R> networks | 8+ countries | Non-binding | Early stage | Limited authority, funding |
 | Export controls | US + allies | Legal | Partially effective | Circumvention, coordination gaps |
 | Voluntary commitments | Major labs | Self-enforced | Poor | No external verification |
@@ -316,9 +311,9 @@ Coordination cruxes address whether different actors—from AI labs to nation-st
   ]}
 />
 
-The emergence of <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies (RSPs)</EntityLink> in 2023-2024, adopted by <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, and <EntityLink id="deepmind">Google DeepMind</EntityLink>, represents the most significant attempt at voluntary lab coordination to date. These policies outline safety evaluations and deployment standards that labs commit to follow as their models become more capable.
+The emergence of <EntityLink id="E252">Responsible Scaling Policies (RSPs)</EntityLink> in 2023-2024, adopted by <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, and <EntityLink id="E98">Google DeepMind</EntityLink>, represents the most significant attempt at voluntary lab coordination to date. These policies outline safety evaluations and deployment standards that labs commit to follow as their models become more capable.
 
-However, early implementation has revealed significant limitations: evaluation standards remain vague, triggering thresholds are subjective, and competitive pressures create incentives to interpret requirements leniently. Analysis by <EntityLink id="metr">METR</EntityLink> and <EntityLink id="arc">ARC Evaluations</EntityLink> shows substantial variations in how labs implement similar commitments.
+However, early implementation has revealed significant limitations: evaluation standards remain vague, triggering thresholds are subjective, and competitive pressures create incentives to interpret requirements leniently. Analysis by <EntityLink id="E201">METR</EntityLink> and <EntityLink id="E25">ARC Evaluations</EntityLink> shows substantial variations in how labs implement similar commitments.
 
 ### Third-Party Evaluation Effectiveness
 
@@ -394,7 +389,7 @@ Historical precedent suggests mixed prospects for voluntary coordination in high
 
 Current US-China AI relations are characterized by strategic competition rather than cooperation. Export controls on semiconductors, restrictions on Chinese AI companies, and national security framings dominate the policy landscape. The <R id="9ae4c87175cc63c0">CHIPS Act</R> and export restrictions target Chinese AI development directly, while China's response includes increased domestic investment and alternative supply chains.
 
-However, some limited dialogue continues through academic conferences, multilateral forums like the G20, and informal diplomatic channels. The <EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink> and <EntityLink id="seoul-declaration">Seoul Declaration</EntityLink> provide potential multilateral venues for engagement.
+However, some limited dialogue continues through academic conferences, multilateral forums like the G20, and informal diplomatic channels. The <EntityLink id="E364">UK AI Safety Institute</EntityLink> and <EntityLink id="E279">Seoul Declaration</EntityLink> provide potential multilateral venues for engagement.
 
 ### International Coordination Prospects by Risk Area
 
@@ -444,7 +439,7 @@ The most promising path may involve narrow cooperation on specific risks where i
   ]}
 />
 
-The emerging field of compute governance offers the most promising avenue for credible commitment mechanisms. Unlike software or model parameters, computational resources are physical and potentially observable. Research by <EntityLink id="govai">GovAI</EntityLink> has outlined monitoring systems that could track large-scale training runs, creating verifiable bounds on certain types of AI development.
+The emerging field of compute governance offers the most promising avenue for credible commitment mechanisms. Unlike software or model parameters, computational resources are physical and potentially observable. Research by <EntityLink id="E153">GovAI</EntityLink> has outlined monitoring systems that could track large-scale training runs, creating verifiable bounds on certain types of AI development.
 
 However, the feasibility of comprehensive compute monitoring remains unclear. Cloud computing, distributed training, and algorithm efficiency improvements create multiple pathways for evading monitoring systems. International variation in monitoring capabilities and willingness could create safe havens for actors seeking to avoid commitments.
 
@@ -468,9 +463,9 @@ The <R id="e11a50f25b1a20df">UN High-Level Advisory Body on AI</R> submitted sev
 
 | Governance Initiative | Participants | Binding Status | Effectiveness Assessment |
 |----------------------|--------------|----------------|-------------------------|
-| <EntityLink id="international-summits">AI Safety Summits</EntityLink> | 28+ countries | Non-binding | Limited (pageantry vs progress) |
+| <EntityLink id="E173">AI Safety Summits</EntityLink> | 28+ countries | Non-binding | Limited (pageantry vs progress) |
 | EU AI Act | EU members | Binding | Moderate (implementation pending) |
-| <EntityLink id="us-executive-order">US Executive Order</EntityLink> | US federal | Executive (rescindable) | Limited (political uncertainty) |
+| <EntityLink id="E366">US Executive Order</EntityLink> | US federal | Executive (rescindable) | Limited (political uncertainty) |
 | UN HLAB recommendations | UN members | Non-binding | Minimal (no implementation) |
 | Bilateral US-China dialogues | US, China | Ad hoc | Very limited (competition dominant) |
 
@@ -485,7 +480,7 @@ The final domain addresses whether we can build sustainable systems for truth, k
 | Wikipedia | \$150M | 1.7B monthly | 90%+ (citations) | Donations |
 | Fact-checking orgs | \$50M total | 100M+ reach | 85-95% | Mixed funding |
 | Academic peer review | \$5B+ (estimated) | Research community | Variable | Institution-funded |
-| <EntityLink id="prediction-markets">Prediction markets</EntityLink> | \$100M+ volume | &lt;1M active | 75-85% | Commercial |
+| <EntityLink id="E228">Prediction markets</EntityLink> | \$100M+ volume | &lt;1M active | 75-85% | Commercial |
 
 <Crux
   id="forecasting-ai-combo"
@@ -525,7 +520,7 @@ The final domain addresses whether we can build sustainable systems for truth, k
   ]}
 />
 
-<R id="d99a6d0fb1edc2db">Metaculus</R> has been conducting systematic experiments with <EntityLink id="ai-forecasting">AI forecasting</EntityLink> since 2023, with early results suggesting that AI systems can match or exceed human forecasters on certain types of questions, particularly those involving quantitative trends or pattern recognition from large datasets. However, humans continue to outperform on questions requiring contextual judgment, novel reasoning, or understanding of political and social dynamics.
+<R id="d99a6d0fb1edc2db">Metaculus</R> has been conducting systematic experiments with <EntityLink id="E9">AI forecasting</EntityLink> since 2023, with early results suggesting that AI systems can match or exceed human forecasters on certain types of questions, particularly those involving quantitative trends or pattern recognition from large datasets. However, humans continue to outperform on questions requiring contextual judgment, novel reasoning, or understanding of political and social dynamics.
 
 ### AI vs Human Forecasting Performance
 

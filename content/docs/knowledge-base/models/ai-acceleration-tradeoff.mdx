@@ -16,11 +16,6 @@ lastEdited: "2026-02-12"
 importance: 87
 update_frequency: 90
 llmSummary: "Quantitative framework for evaluating how changes to AI development speed affect existential risk and long-term value. Models the marginal impact of acceleration/deceleration on P(existential catastrophe), safety readiness, governance preparedness, and conditional future value. Finds that 1 year of additional preparation time reduces x-risk by 1-4 percentage points depending on current readiness, but also delays economic and scientific benefits worth 0.1-0.5% of future value annually."
-metrics:
-  wordCount: 3900
-  citations: 10
-  tables: 14
-  diagrams: 2
 clusters:
   - ai-safety
   - governance
@@ -28,7 +23,7 @@ subcategory: safety-models
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="ai-acceleration-tradeoff" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E687" ratings={frontmatter.ratings} />
 
 ## Overview
 
@@ -46,7 +41,7 @@ This decomposition makes it possible to compare seemingly incommensurable action
 
 ## Connection to the AI Transition Model
 
-This model operationalizes the <EntityLink id="__index__/ai-transition-model">AI Transition Model</EntityLink>'s causal framework by collapsing its many root factors into a single dimension: **time available for preparation**. The AI Transition Model identifies root factors like <EntityLink id="safety-capability-gap">safety-capability gap</EntityLink>, <EntityLink id="racing-intensity">racing intensity</EntityLink>, and <EntityLink id="civilizational-competence">civilizational competence</EntityLink>. Each of these factors evolves over time. Accelerating TAI arrival means less time for safety research, governance development, and institutional adaptation — widening the gap between capability and readiness.
+This model operationalizes the <EntityLink id="__index__/ai-transition-model">AI Transition Model</EntityLink>'s causal framework by collapsing its many root factors into a single dimension: **time available for preparation**. The AI Transition Model identifies root factors like <EntityLink id="E261">safety-capability gap</EntityLink>, <EntityLink id="E242">racing intensity</EntityLink>, and <EntityLink id="E60">civilizational competence</EntityLink>. Each of these factors evolves over time. Accelerating TAI arrival means less time for safety research, governance development, and institutional adaptation — widening the gap between capability and readiness.
 
 The simplification is deliberate: while the full causal model has dozens of parameters, many real-world decisions reduce to "does this make TAI come sooner or later, and by how much?"
 
@@ -361,11 +356,11 @@ This model provides a unified framework for comparing acceleration and decelerat
 
 ## Related Models
 
-- <EntityLink id="safety-capability-tradeoff">Safety-Capability Tradeoff Model</EntityLink> — When safety and capabilities conflict vs. complement
-- <EntityLink id="capability-alignment-race">Capability-Alignment Race</EntityLink> — Quantifying the gap between capability and safety readiness
-- <EntityLink id="intervention-timing-windows">Intervention Timing Windows</EntityLink> — Which interventions have closing windows
-- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> — How competition affects the effectiveness of deceleration
-- <EntityLink id="intervention-effectiveness-matrix">Intervention Effectiveness Matrix</EntityLink> — Which interventions address which risks
+- <EntityLink id="E262">Safety-Capability Tradeoff Model</EntityLink> — When safety and capabilities conflict vs. complement
+- <EntityLink id="E414">Capability-Alignment Race</EntityLink> — Quantifying the gap between capability and safety readiness
+- <EntityLink id="E178">Intervention Timing Windows</EntityLink> — Which interventions have closing windows
+- <EntityLink id="E239">Racing Dynamics</EntityLink> — How competition affects the effectiveness of deceleration
+- <EntityLink id="E177">Intervention Effectiveness Matrix</EntityLink> — Which interventions address which risks
 
 ## Sources
 

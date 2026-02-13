@@ -14,11 +14,6 @@ ratings:
   rigor: 5.8
   actionability: 4.5
   completeness: 6.5
-metrics:
-  wordCount: 1164
-  citations: 49
-  tables: 36
-  diagrams: 1
 clusters: ["ai-safety"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
@@ -44,7 +39,7 @@ The key characteristic is that **all capability comes from the model itself** - 
 
 ## Architecture
 
-The minimal scaffolding architecture represents the simplest possible deployment pattern for <EntityLink id="language-models">large language models</EntityLink>. All intelligence resides in the foundation model itself, with the surrounding infrastructure handling only basic input/output formatting.
+The minimal scaffolding architecture represents the simplest possible deployment pattern for <EntityLink id="E186">large language models</EntityLink>. All intelligence resides in the foundation model itself, with the surrounding infrastructure handling only basic input/output formatting.
 
 <Mermaid chart={`
 flowchart TD

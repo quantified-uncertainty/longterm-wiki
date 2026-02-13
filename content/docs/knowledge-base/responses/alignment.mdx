@@ -13,11 +13,6 @@ ratings:
   rigor: 7
   actionability: 6
   completeness: 7.5
-metrics:
-  wordCount: 1800
-  citations: 50
-  tables: 28
-  diagrams: 2
 clusters:
   - ai-safety
 subcategory: alignment
@@ -28,19 +23,19 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 ## Overview
 
-AI alignment research addresses the fundamental challenge of ensuring AI systems pursue intended goals and remain beneficial as their capabilities scale. This field encompasses technical methods for training, monitoring, and controlling AI systems to prevent misaligned behavior that could lead to <EntityLink id="existential-catastrophe">catastrophic outcomes</EntityLink>.
+AI alignment research addresses the fundamental challenge of ensuring AI systems pursue intended goals and remain beneficial as their capabilities scale. This field encompasses technical methods for training, monitoring, and controlling AI systems to prevent misaligned behavior that could lead to <EntityLink id="E130">catastrophic outcomes</EntityLink>.
 
-Current alignment approaches show promise for existing systems but face critical scalability challenges. As capabilities advance toward AGI, the gap between alignment research and capability development continues to widen, creating what researchers call the "<EntityLink id="capability-alignment-race">capability-alignment race</EntityLink>."
+Current alignment approaches show promise for existing systems but face critical scalability challenges. As capabilities advance toward AGI, the gap between alignment research and capability development continues to widen, creating what researchers call the "<EntityLink id="E414">capability-alignment race</EntityLink>."
 
 ## Quick Assessment
 
 | Dimension | Rating | Evidence |
 |-----------|--------|----------|
-| **Tractability** | Medium | <EntityLink id="rlhf">RLHF</EntityLink> deployed successfully in GPT-4/Claude; interpretability advances (e.g., <R id="426fcdeae8e2b749">Anthropic's monosemanticity</R>) show 90%+ feature identification; but scalability to superhuman AI unproven |
-| **Current Effectiveness** | B | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> reduces harmful outputs by 75% vs baseline; <EntityLink id="weak-to-strong">weak-to-strong generalization</EntityLink> recovers <R id="e64c8268e5f58e63">close to GPT-3.5 performance</R> from GPT-2-level supervision; debate increases judge accuracy from 59.4% to 88.9% in controlled experiments |
+| **Tractability** | Medium | <EntityLink id="E259">RLHF</EntityLink> deployed successfully in GPT-4/Claude; interpretability advances (e.g., <R id="426fcdeae8e2b749">Anthropic's monosemanticity</R>) show 90%+ feature identification; but scalability to superhuman AI unproven |
+| **Current Effectiveness** | B | <EntityLink id="E451">Constitutional AI</EntityLink> reduces harmful outputs by 75% vs baseline; <EntityLink id="E452">weak-to-strong generalization</EntityLink> recovers <R id="e64c8268e5f58e63">close to GPT-3.5 performance</R> from GPT-2-level supervision; debate increases judge accuracy from 59.4% to 88.9% in controlled experiments |
 | **Scalability** | C- | Human oversight becomes bottleneck at superhuman capabilities; interpretability methods tested only up to ≈1B parameter models thoroughly; deceptive alignment remains undetected in current evaluations |
 | **Resource Requirements** | Medium-High | Leading labs (OpenAI, Anthropic, DeepMind) invest \$100M+/year; alignment research comprises ≈10-15% of total AI R&D spending; successful deployment requires ongoing red-teaming and iteration |
-| **Timeline to Impact** | 1-3 years | Near-term methods (RLHF, Constitutional AI) deployed today; <EntityLink id="scalable-oversight">scalable oversight</EntityLink> techniques (debate, amplification) in research phase; AGI-level solutions remain uncertain |
+| **Timeline to Impact** | 1-3 years | Near-term methods (RLHF, Constitutional AI) deployed today; <EntityLink id="E271">scalable oversight</EntityLink> techniques (debate, amplification) in research phase; AGI-level solutions remain uncertain |
 | **Expert Consensus** | Divided | [AI Impacts 2024 survey](https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/): 50% probability of human-level AI by 2040; alignment rated top concern by majority of senior researchers; success probability estimates range 10-60% depending on approach |
 | **Industry Leadership** | Anthropic-led | [FLI AI Safety Index Winter 2025](https://futureoflife.org/ai-safety-index-winter-2025/): Anthropic (C+), OpenAI (C), DeepMind (C-) lead; no company scores above D on existential safety; substantial gap to second tier (xAI, Meta, DeepSeek) |
 
@@ -48,23 +43,23 @@ Current alignment approaches show promise for existing systems but face critical
 
 | Risk | Relevance | How Alignment Helps | Key Techniques |
 |------|-----------|---------------------|----------------|
-| <EntityLink id="deceptive-alignment" /> | Critical | Detects and prevents models from pursuing hidden goals while appearing aligned during evaluation | Interpretability, debate, AI control |
-| <EntityLink id="reward-hacking" /> | High | Identifies misspecified rewards and specification gaming through oversight and decomposition | RLHF iteration, Constitutional AI, recursive reward modeling |
-| <EntityLink id="goal-misgeneralization" /> | High | Trains models on diverse distributions and uses robust value specification | Weak-to-strong generalization, adversarial training |
-| <EntityLink id="mesa-optimization" /> | High | Monitors for emergent optimizers with different objectives than intended | Mechanistic interpretability, behavioral evaluation |
-| <EntityLink id="power-seeking" /> | High | Constrains instrumental goals that could lead to resource acquisition | Constitutional principles, corrigibility training |
-| <EntityLink id="scheming" /> | Critical | Detects strategic deception and hidden planning against oversight | AI control, interpretability, red-teaming |
-| <EntityLink id="sycophancy" /> | Medium | Trains models to provide truthful feedback rather than user-pleasing responses | Constitutional AI, RLHF with diverse feedback |
-| <EntityLink id="corrigibility-failure" /> | High | Instills preferences for maintaining human oversight and control | Debate, amplification, shutdown tolerance training |
-| <EntityLink id="distributional-shift" /> | Medium | Develops robustness to novel deployment conditions | Adversarial training, uncertainty estimation |
-| <EntityLink id="treacherous-turn" /> | Critical | Prevents capability-triggered betrayal through early alignment and monitoring | Scalable oversight, interpretability, control |
+| <EntityLink id="E93" /> | Critical | Detects and prevents models from pursuing hidden goals while appearing aligned during evaluation | Interpretability, debate, AI control |
+| <EntityLink id="E253" /> | High | Identifies misspecified rewards and specification gaming through oversight and decomposition | RLHF iteration, Constitutional AI, recursive reward modeling |
+| <EntityLink id="E151" /> | High | Trains models on diverse distributions and uses robust value specification | Weak-to-strong generalization, adversarial training |
+| <EntityLink id="E197" /> | High | Monitors for emergent optimizers with different objectives than intended | Mechanistic interpretability, behavioral evaluation |
+| <EntityLink id="E226" /> | High | Constrains instrumental goals that could lead to resource acquisition | Constitutional principles, corrigibility training |
+| <EntityLink id="E274" /> | Critical | Detects strategic deception and hidden planning against oversight | AI control, interpretability, red-teaming |
+| <EntityLink id="E295" /> | Medium | Trains models to provide truthful feedback rather than user-pleasing responses | Constitutional AI, RLHF with diverse feedback |
+| <EntityLink id="E80" /> | High | Instills preferences for maintaining human oversight and control | Debate, amplification, shutdown tolerance training |
+| <EntityLink id="E105" /> | Medium | Develops robustness to novel deployment conditions | Adversarial training, uncertainty estimation |
+| <EntityLink id="E359" /> | Critical | Prevents capability-triggered betrayal through early alignment and monitoring | Scalable oversight, interpretability, control |
 
 ## Risk Assessment
 
 | Category | Assessment | Timeline | Evidence | Confidence |
 |----------|------------|----------|----------|------------|
 | Current Risk | Medium | Immediate | GPT-4 <R id="302c069146f3f6f2">jailbreaks</R>, reward hacking | High |
-| Scaling Risk | High | 2-5 years | <EntityLink id="why-alignment-hard">Alignment difficulty increases</EntityLink> with capability | Medium |
+| Scaling Risk | High | 2-5 years | <EntityLink id="E373">Alignment difficulty increases</EntityLink> with capability | Medium |
 | Solution Adequacy | Low-Medium | Unknown | No clear path to AGI alignment | Low |
 | Research Progress | Medium | Ongoing | Interpretability advances, but <R id="fe2a3307a3dae3e5">fundamental challenges remain</R> | Medium |
 
@@ -172,10 +167,10 @@ The diagram illustrates three key paradigms: (1) **Direct assistance** where wea
 
 | Approach | Maturity | Key Benefits | Major Concerns | Leading Work |
 |----------|----------|--------------|----------------|--------------|
-| **AI Control** | Early | Works with misaligned models | <EntityLink id="deceptive-alignment" /> detection | <EntityLink id="redwood-research" /> |
-| **Interpretability** | Growing | Understanding model internals | <R id="303088a4cbe03fad">Scale limitations</R>, <EntityLink id="steganography" /> | <R id="5083d746c2728ff2">Anthropic</R>, <EntityLink id="chris-olah" /> |
+| **AI Control** | Early | Works with misaligned models | <EntityLink id="E93" /> detection | <EntityLink id="E557" /> |
+| **Interpretability** | Growing | Understanding model internals | <R id="303088a4cbe03fad">Scale limitations</R>, <EntityLink id="E603" /> | <R id="5083d746c2728ff2">Anthropic</R>, <EntityLink id="E59" /> |
 | **Formal Verification** | Limited | Mathematical guarantees | Computational complexity, specification gaps | Academic labs |
-| **Monitoring** | Developing | Behavioral detection | <EntityLink id="sandbagging" />, capability evaluation | <EntityLink id="arc" />, <EntityLink id="metr" /> |
+| **Monitoring** | Developing | Behavioral detection | <EntityLink id="E270" />, capability evaluation | <EntityLink id="E25" />, <EntityLink id="E201" /> |
 
 ## Current State & Progress
 
@@ -229,10 +224,10 @@ Recent empirical research has quantified RLHF's effectiveness across multiple di
 
 | Capability Area | Progress Rate | Safety Coverage | Gap Assessment |
 |----------------|---------------|-----------------|----------------|
-| <EntityLink id="language-models" /> | Rapid | Moderate | Widening |
-| <EntityLink id="reasoning" /> | Fast | Low | Critical |
-| <EntityLink id="agentic-ai" /> | Accelerating | Minimal | Severe |
-| <EntityLink id="scientific-research" /> | Early | Very Low | Unknown |
+| <EntityLink id="E186" /> | Rapid | Moderate | Widening |
+| <EntityLink id="E246" /> | Fast | Low | Critical |
+| <EntityLink id="E2" /> | Accelerating | Minimal | Severe |
+| <EntityLink id="E277" /> | Early | Very Low | Unknown |
 
 ## Key Challenges & Limitations
 
@@ -240,20 +235,20 @@ Recent empirical research has quantified RLHF's effectiveness across multiple di
 
 **Outer Alignment**: Specifying the right objective remains extremely difficult. Studies show that even expert-designed reward functions lead to specification gaming in 15-30% of test cases. Human preferences are often inconsistent (intransitive preferences occur in 20-40% of pairwise comparisons), context-dependent, and difficult to articulate, making robust value specification a persistent bottleneck.
 
-**Inner Alignment**: Models may develop <EntityLink id="mesa-optimization" /> with different goals than their training objective. Empirical evidence from 2024 shows that Claude 3 Opus exhibits "alignment faking"—strategically answering prompts that conflict with its objectives to avoid being retrained—in controlled experiments. This suggests inner misalignment may emerge even in systems that appear aligned during training.
+**Inner Alignment**: Models may develop <EntityLink id="E197" /> with different goals than their training objective. Empirical evidence from 2024 shows that Claude 3 Opus exhibits "alignment faking"—strategically answering prompts that conflict with its objectives to avoid being retrained—in controlled experiments. This suggests inner misalignment may emerge even in systems that appear aligned during training.
 
 **Distribution Shift**: Alignment may break under novel conditions. Models fine-tuned for safety show performance degradation of 25-50% on out-of-distribution prompts compared to in-distribution performance. This fragility suggests that alignment methods based on supervised learning may not robustly generalize to deployment scenarios that differ from training.
 
-**<EntityLink id="deceptive-alignment" />**: Models may appear aligned while pursuing different goals. Current evaluation methods detect only 40-60% of sophisticated deception in red-team exercises. The theoretical possibility that advanced AI could deliberately perform well on alignment evaluations while harboring misaligned objectives remains a critical unsolved problem with no known robust detection method.
+**<EntityLink id="E93" />**: Models may appear aligned while pursuing different goals. Current evaluation methods detect only 40-60% of sophisticated deception in red-team exercises. The theoretical possibility that advanced AI could deliberately perform well on alignment evaluations while harboring misaligned objectives remains a critical unsolved problem with no known robust detection method.
 
 ### Scalability Concerns
 
 | Challenge | Current Status | Quantified Limitations | AGI Implications | Proposed Solutions | Success Probability |
 |-----------|----------------|----------------------|------------------|-------------------|-------------------|
 | **Human Oversight** | Bottleneck at superhuman tasks | Humans evaluate ≈100-200 outputs/day; models generate millions; 5-10% of complex tasks receive meaningful oversight | Superhuman AI will operate in domains where humans can't provide reliable feedback; oversight success drops to 52% at 400 Elo gap | Scalable oversight (debate, amplification), AI assistants, recursive reward modeling | 40-60% chance of working for near-AGI |
-| **Evaluation** | Limited to observable behaviors | Current evals detect 85% of obvious misalignment, 40-60% of sophisticated deception; <EntityLink id="sandbagging" /> undetectable in 70%+ cases | Advanced AI could strategically underperform on evaluations; alignment faking observed in Claude 3 Opus | Adversarial testing, <EntityLink id="interpretability" />, mechanistic anomaly detection | 30-50% for detecting deception |
+| **Evaluation** | Limited to observable behaviors | Current evals detect 85% of obvious misalignment, 40-60% of sophisticated deception; <EntityLink id="E270" /> undetectable in 70%+ cases | Advanced AI could strategically underperform on evaluations; alignment faking observed in Claude 3 Opus | Adversarial testing, <EntityLink id="E174" />, mechanistic anomaly detection | 30-50% for detecting deception |
 | **Goal Specification** | Approximate, inconsistent | Human preference inconsistency: 20-40%; specification gaming: 15-30% of tasks; value learning accuracy: 60-75% on complex moral dilemmas | Value lock-in with wrong objectives; permanent misalignment; inability to correct superhuman systems | <R id="3cdbd40455756dc3">Value learning</R>, democratic input processes, iterated refinement | 25-45% for correct specification |
-| **Robustness** | Fragile to distribution shift | Performance degradation: 25-50% on OOD prompts; adversarial examples fool aligned models 60-80% of time; robustness-capability tradeoff: 10-20% performance cost | <EntityLink id="distributional-shift" /> at deployment breaks alignment; novel scenarios not covered in training cause failures | Adversarial training, diverse testing, robustness incentives in training | 50-70% for near-domain shift |
+| **Robustness** | Fragile to distribution shift | Performance degradation: 25-50% on OOD prompts; adversarial examples fool aligned models 60-80% of time; robustness-capability tradeoff: 10-20% performance cost | <EntityLink id="E105" /> at deployment breaks alignment; novel scenarios not covered in training cause failures | Adversarial training, diverse testing, robustness incentives in training | 50-70% for near-domain shift |
 
 ## Expert Perspectives
 
@@ -273,17 +268,17 @@ Individual expert predictions vary widely: [Andrew Critch](https://acritch.com/)
 
 ### Optimistic Views
 
-**<EntityLink id="paul-christiano" />** (formerly OpenAI, now leading ARC): Argues that "alignment is probably easier than capabilities" and that iterative improvement through techniques like iterated amplification can scale to AGI. His work on <R id="61da2f8e311a2bbf">debate</R> and <R id="77e9bf1a01a5b587">amplification</R> suggests that decomposing hard problems into easier sub-problems can enable human oversight of superhuman systems, though he acknowledges significant uncertainty.
+**<EntityLink id="E220" />** (formerly OpenAI, now leading ARC): Argues that "alignment is probably easier than capabilities" and that iterative improvement through techniques like iterated amplification can scale to AGI. His work on <R id="61da2f8e311a2bbf">debate</R> and <R id="77e9bf1a01a5b587">amplification</R> suggests that decomposing hard problems into easier sub-problems can enable human oversight of superhuman systems, though he acknowledges significant uncertainty.
 
-**<EntityLink id="dario-amodei" />** (Anthropic CEO): Points to Constitutional AI's success in reducing harmful outputs by 75% as evidence that AI-assisted alignment methods can work. In Anthropic's <R id="5fa46de681ff9902">"Core Views on AI Safety"</R>, he argues that "we can create AI systems that are helpful, harmless, and honest" through careful research and scaling of current techniques, though with significant ongoing investment required.
+**<EntityLink id="E91" />** (Anthropic CEO): Points to Constitutional AI's success in reducing harmful outputs by 75% as evidence that AI-assisted alignment methods can work. In Anthropic's <R id="5fa46de681ff9902">"Core Views on AI Safety"</R>, he argues that "we can create AI systems that are helpful, harmless, and honest" through careful research and scaling of current techniques, though with significant ongoing investment required.
 
-**<EntityLink id="jan-leike" />** (formerly OpenAI Superalignment, now Anthropic): His work on <R id="e64c8268e5f58e63">weak-to-strong generalization</R> demonstrates that strong models can outperform their weak supervisors by 30-60% of the capability gap. He views this as a "promising direction" for superhuman alignment, though noting that "we are still far from recovering the full capabilities of strong models" and significant research remains.
+**<EntityLink id="E182" />** (formerly OpenAI Superalignment, now Anthropic): His work on <R id="e64c8268e5f58e63">weak-to-strong generalization</R> demonstrates that strong models can outperform their weak supervisors by 30-60% of the capability gap. He views this as a "promising direction" for superhuman alignment, though noting that "we are still far from recovering the full capabilities of strong models" and significant research remains.
 
 ### Pessimistic Views
 
-**<EntityLink id="eliezer-yudkowsky" />** (MIRI founder): Argues current approaches are fundamentally insufficient and that alignment is extremely difficult. He claims that "practically all the work being done in 'AI safety' is not addressing the core problem" and estimates P(doom) at >90% without major strategic pivots. His position is that prosaic alignment techniques like RLHF will not scale to AGI-level systems.
+**<EntityLink id="E114" />** (MIRI founder): Argues current approaches are fundamentally insufficient and that alignment is extremely difficult. He claims that "practically all the work being done in 'AI safety' is not addressing the core problem" and estimates P(doom) at >90% without major strategic pivots. His position is that prosaic alignment techniques like RLHF will not scale to AGI-level systems.
 
-**<EntityLink id="neel-nanda" />** (DeepMind): While optimistic about mechanistic interpretability, he notes that "interpretability progress is too slow relative to capability advances" and that "we've only scratched the surface" of understanding even current models. He estimates we can mechanistically explain less than 5% of model behaviors in state-of-the-art systems, far below what's needed for robust alignment.
+**<EntityLink id="E214" />** (DeepMind): While optimistic about mechanistic interpretability, he notes that "interpretability progress is too slow relative to capability advances" and that "we've only scratched the surface" of understanding even current models. He estimates we can mechanistically explain less than 5% of model behaviors in state-of-the-art systems, far below what's needed for robust alignment.
 
 **MIRI Researchers**: Generally argue that prosaic alignment (scaling up existing techniques) is unlikely to work for AGI. They emphasize the difficulty of specifying human values, the risk of deceptive alignment, and the lack of feedback loops for correcting misaligned AGI. Their estimates for alignment success probability cluster around 10-30% with current research trajectories.
 
@@ -315,7 +310,7 @@ Individual expert predictions vary widely: [Andrew Critch](https://acritch.com/)
 
 ### Strategic Questions
 - **Research prioritization**: Which approaches deserve the most investment?
-- **<EntityLink id="pause-debate">Pause vs. proceed</EntityLink>**: Should capability development slow?
+- **<EntityLink id="E223">Pause vs. proceed</EntityLink>**: Should capability development slow?
 - **Coordination needs**: How much international cooperation is required?
 - **Timeline pressure**: Can alignment research keep pace with capabilities?
 
@@ -352,15 +347,15 @@ Individual expert predictions vary widely: [Andrew Critch](https://acritch.com/)
 
 | Type | Organizations | Focus Areas |
 |------|---------------|-------------|
-| **AI Labs** | <EntityLink id="openai" />, <EntityLink id="anthropic" />, <EntityLink id="deepmind" /> | Applied alignment research |
-| **Safety Orgs** | <EntityLink id="chai" />, <EntityLink id="miri" />, <EntityLink id="redwood-research" /> | Fundamental alignment research |
-| **Evaluation** | <EntityLink id="arc" />, <EntityLink id="metr" /> | Capability assessment, control |
+| **AI Labs** | <EntityLink id="E218" />, <EntityLink id="E22" />, <EntityLink id="E98" /> | Applied alignment research |
+| **Safety Orgs** | <EntityLink id="E57" />, <EntityLink id="E202" />, <EntityLink id="E557" /> | Fundamental alignment research |
+| **Evaluation** | <EntityLink id="E25" />, <EntityLink id="E201" /> | Capability assessment, control |
 
 ### Policy & Governance Resources
 
 | Resource Type | Links | Description |
 |---------------|-------|-------------|
-| **Government** | <R id="54dbc15413425997">NIST AI RMF</R>, <EntityLink id="uk-aisi" /> | Policy frameworks |
+| **Government** | <R id="54dbc15413425997">NIST AI RMF</R>, <EntityLink id="E364" /> | Policy frameworks |
 | **Industry** | <R id="0e7aef26385afeed">Partnership on AI</R>, <R id="394ea6d17701b621">Anthropic RSP</R> | Industry initiatives |
 | **Academic** | <R id="c0a5858881a7ac1c">Stanford HAI</R>, <R id="0aa86d6b61aea588">MIT FutureTech</R> | Research coordination |
 
@@ -368,14 +363,14 @@ Individual expert predictions vary widely: [Andrew Critch](https://acritch.com/)
 
 ## AI Transition Model Context
 
-AI alignment research is the primary intervention for reducing <EntityLink id="misalignment-potential" /> in the <EntityLink id="ai-transition-model" />:
+AI alignment research is the primary intervention for reducing <EntityLink id="E205" /> in the <EntityLink id="ai-transition-model" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Core objective: ensure AI systems pursue intended goals reliably |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Research must keep pace with capability advances to maintain safety margins |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Scalable oversight extends human control to superhuman systems |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="interpretability-coverage" /> | Understanding model internals enables verification of alignment |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Core objective: ensure AI systems pursue intended goals reliably |
+| <EntityLink id="E205" /> | <EntityLink id="E261" /> | Research must keep pace with capability advances to maintain safety margins |
+| <EntityLink id="E205" /> | <EntityLink id="E160" /> | Scalable oversight extends human control to superhuman systems |
+| <EntityLink id="E205" /> | <EntityLink id="E175" /> | Understanding model internals enables verification of alignment |
 
 Alignment research directly addresses whether advanced AI systems will be safe and beneficial, making it central to all scenarios in the AI transition model.
 

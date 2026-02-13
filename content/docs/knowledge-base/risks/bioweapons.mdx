@@ -16,11 +16,6 @@ ratings:
   rigor: 6.8
   actionability: 6.2
   completeness: 7.5
-metrics:
-  wordCount: 7718
-  citations: 76
-  tables: 36
-  diagrams: 2
 clusters:
   - ai-safety
   - biorisks
@@ -31,15 +26,15 @@ import {DataInfoBox, ModelsList, Mermaid, R, EntityLink, DataExternalLinks} from
 
 <DataExternalLinks pageId="bioweapons" />
 
-<DataInfoBox entityId="bioweapons" />
+<DataInfoBox entityId="E42" />
 
 ## Quick Assessment
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Current AI Uplift** | Low-Moderate (1.3-2.5x) | RAND 2024: no significant difference; <EntityLink id="anthropic">Anthropic</EntityLink> 2025: "substantially fewer critical failures" with AI |
+| **Current AI Uplift** | Low-Moderate (1.3-2.5x) | RAND 2024: no significant difference; <EntityLink id="E22">Anthropic</EntityLink> 2025: "substantially fewer critical failures" with AI |
 | **Expert Risk Estimate** | 0.3% → 1.5% annual with AI capabilities | [FRI survey](https://forecastingresearch.org/ai-enabled-biorisk): 5x increase if AI matches expert virologists |
-| **Frontier Model Status** | Expert-level knowledge achieved | <EntityLink id="openai">OpenAI</EntityLink>'s o3: 94th percentile on VCT; Claude Opus 4 triggered ASL-3 |
+| **Frontier Model Status** | Expert-level knowledge achieved | <EntityLink id="E218">OpenAI</EntityLink>'s o3: 94th percentile on VCT; Claude Opus 4 triggered ASL-3 |
 | **Screening Evasion** | 75%+ pre-patch; 97% post-patch | Microsoft 2024; patch deployed globally Oct 2025 |
 | **Open-Source Risk** | High concern | DeepSeek "worst tested" for biosafety (Amodei 2025) |
 | **Wet Lab Bottleneck** | Remains primary barrier | Soviet Biopreparat: 30,000+ staff over decades; Aum Shinrikyo failed |
@@ -71,11 +66,11 @@ However, 2025 has marked a significant shift in official assessments. OpenAI now
 | Response | Mechanism | Effectiveness |
 |----------|-----------|---------------|
 | <EntityLink id="responses/biosecurity">Biosecurity Interventions</EntityLink> | DNA screening, surveillance, countermeasures, physical defenses | High (portfolio) |
-| <EntityLink id="responsible-scaling-policies" /> | Internal biosecurity evaluations before deployment | Medium |
-| <EntityLink id="compute-governance" /> | Limits access to training resources for dangerous models | Medium |
-| <EntityLink id="export-controls" /> | Restricts AI chip exports to adversary nations | Low-Medium |
-| <EntityLink id="ai-safety-institutes" /> | Government evaluation of biosecurity risks | Medium |
-| <EntityLink id="voluntary-commitments" /> | Lab pledges on dangerous capability evaluation | Low |
+| <EntityLink id="E252" /> | Internal biosecurity evaluations before deployment | Medium |
+| <EntityLink id="E64" /> | Limits access to training resources for dangerous models | Medium |
+| <EntityLink id="E136" /> | Restricts AI chip exports to adversary nations | Low-Medium |
+| <EntityLink id="E13" /> | Government evaluation of biosecurity risks | Medium |
+| <EntityLink id="E369" /> | Lab pledges on dangerous capability evaluation | Low |
 
 ---
 
@@ -107,11 +102,11 @@ The [Forecasting Research Institute](https://forecastingresearch.org/ai-enabled-
 
 **Key insight:** Safeguards (closed weights, anti-jailbreaking, DNA screening) can reduce risk nearly to baseline even with advanced AI capabilities.
 
-The <EntityLink id="bioweapons-attack-chain">Bioweapons Attack Chain Model</EntityLink> estimates compound attack probability at 0.02% - 3.6% depending on assumptions, with substantial uncertainty at each step. The wide range reflects genuine disagreement about key parameters.
+The <EntityLink id="E44">Bioweapons Attack Chain Model</EntityLink> estimates compound attack probability at 0.02% - 3.6% depending on assumptions, with substantial uncertainty at each step. The wide range reflects genuine disagreement about key parameters.
 
-**Existential risk context:** In *The Precipice*, Oxford philosopher <EntityLink id="toby-ord">Toby Ord</EntityLink> estimates the chance of <EntityLink id="existential-catastrophe">existential catastrophe</EntityLink> from engineered pandemics at **1 in 30 by 2100**—second only to AI among anthropogenic risks. While not all engineered pandemics would be AI-assisted, this frames the potential severity. Ord notes that it "now seems within the reach of near-term biological advances to create pandemics that would kill greater than 50% of the population—not just in a particular area, but globally."
+**Existential risk context:** In *The Precipice*, Oxford philosopher <EntityLink id="E355">Toby Ord</EntityLink> estimates the chance of <EntityLink id="E130">existential catastrophe</EntityLink> from engineered pandemics at **1 in 30 by 2100**—second only to AI among anthropogenic risks. While not all engineered pandemics would be AI-assisted, this frames the potential severity. Ord notes that it "now seems within the reach of near-term biological advances to create pandemics that would kill greater than 50% of the population—not just in a particular area, but globally."
 
-**Industry concerns:** In July 2023, Anthropic CEO <EntityLink id="dario-amodei">Dario Amodei</EntityLink> stated that within two to three years, there was a "substantial risk" that AI tools would "greatly widen the range of actors with the technical capability to conduct a large-scale biological attack." The CNAS report notes this could "expose the United States to catastrophic threats far exceeding the impact of COVID-19."
+**Industry concerns:** In July 2023, Anthropic CEO <EntityLink id="E91">Dario Amodei</EntityLink> stated that within two to three years, there was a "substantial risk" that AI tools would "greatly widen the range of actors with the technical capability to conduct a large-scale biological attack." The CNAS report notes this could "expose the United States to catastrophic threats far exceeding the impact of COVID-19."
 
 ### Arguments for High Risk
 
@@ -400,7 +395,7 @@ Much of the disagreement about AI-bioweapons risk reduces to a small number of f
 
 **If capabilities continue scaling:** Future systems will be substantially more dangerous; governance is racing against time.
 
-The <EntityLink id="bioweapons-timeline">AI-Bioweapons Timeline Model</EntityLink> projects capability thresholds, with synthesis assistance potentially arriving 2027-2032 and novel agent design 2030-2040.
+The <EntityLink id="E45">AI-Bioweapons Timeline Model</EntityLink> projects capability thresholds, with synthesis assistance potentially arriving 2027-2032 and novel agent design 2030-2040.
 
 ### Crux 5: How Effective Are Guardrails and Countermeasures?
 
@@ -635,7 +630,7 @@ flowchart TD
 | Deployment | Low | High | Could optimize dispersal |
 | Evading countermeasures | Moderate | Variable | Could design novel variants |
 
-See <EntityLink id="bioweapons-attack-chain">Bioweapons Attack Chain Model</EntityLink> for detailed probability estimates at each stage.
+See <EntityLink id="E44">Bioweapons Attack Chain Model</EntityLink> for detailed probability estimates at each stage.
 
 ### Specific Assistance Pathways
 
@@ -1210,17 +1205,17 @@ The debate often reduces to different assessments of:
 
 ## Analytical Models
 
-<ModelsList entityId="bioweapons" />
+<ModelsList entityId="E42" />
 
 ---
 
 ## AI Transition Model Context
 
-Bioweapons risk affects the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="misuse-potential" />:
+Bioweapons risk affects the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="E207" />:
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="biological-threat-exposure" /> | Direct parameter—AI uplift for bioweapon development |
-| <EntityLink id="ai-control-concentration" /> | Powerful AI in few hands increases misuse risk |
+| <EntityLink id="E41" /> | Direct parameter—AI uplift for bioweapon development |
+| <EntityLink id="E7" /> | Powerful AI in few hands increases misuse risk |
 
-The bioweapons pathway can lead to <EntityLink id="human-catastrophe" />—catastrophic outcomes from humans misusing AI capabilities, distinct from AI misalignment.
+The bioweapons pathway can lead to <EntityLink id="E158" />—catastrophic outcomes from humans misusing AI capabilities, distinct from AI misalignment.
