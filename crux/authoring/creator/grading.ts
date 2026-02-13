@@ -188,18 +188,9 @@ Respond with JSON:
       frontmatter.balanceFlags = balanceFlags;
     }
 
-    // Count metrics
-    const wordCount = body.split(/\s+/).filter(w => w.length > 0).length;
-    const citations = (body.match(/\[\^\d+\]/g) || []).length;
-    const tables = (body.match(/^\|/gm) || []).length > 0 ? Math.floor((body.match(/^\|/gm) || []).length / 3) : 0;
-    const diagrams = (body.match(/<Mermaid/g) || []).length;
-
-    frontmatter.metrics = {
-      wordCount,
-      citations: new Set((body.match(/\[\^\d+\]/g) || [])).size,
-      tables,
-      diagrams
-    };
+    // Metrics (wordCount, citations, tables, diagrams) are computed at build time
+    // by app/scripts/lib/metrics-extractor.mjs — not stored in frontmatter.
+    delete frontmatter.metrics;
 
     // Write updated file
     const { stringify: stringifyYaml } = await import('yaml');

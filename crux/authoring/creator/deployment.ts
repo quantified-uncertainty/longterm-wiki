@@ -218,8 +218,7 @@ If you find any logicalIssues or temporalArtifacts, also fix them directly in th
   const { spawn } = await import('child_process');
 
   return new Promise((resolve, reject) => {
-    const claude = spawn('npx', [
-      '@anthropic-ai/claude-code',
+    const claude = spawn('claude', [
       '-p',
       '--print',
       '--dangerously-skip-permissions',

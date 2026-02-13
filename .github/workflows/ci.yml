@@ -54,6 +54,12 @@ jobs:
       - name: MDX syntax check (blocking)
         run: pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
 
+      - name: YAML schema validation (blocking)
+        run: pnpm crux validate schema
+
+      - name: Frontmatter schema validation (blocking)
+        run: pnpm crux validate unified --rules=frontmatter-schema --errors-only
+
       - name: Run validation suite (advisory)
         if: always()
         run: |

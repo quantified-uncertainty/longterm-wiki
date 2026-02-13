@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://www.longtermwiki.com/sitemap.xml
+LLMs-Txt: https://www.longtermwiki.com/llms.txt

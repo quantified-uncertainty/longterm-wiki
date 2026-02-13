@@ -12,11 +12,6 @@ ratings:
   rigor: 2
   actionability: 3
   completeness: 4
-metrics:
-  wordCount: 174
-  citations: 0
-  tables: 0
-  diagrams: 0
 ---
 # Stub Pages Style Guide
 

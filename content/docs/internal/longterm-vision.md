@@ -10,11 +10,6 @@ ratings:
   rigor: 0
   actionability: 0
   completeness: 0
-metrics:
-  wordCount: 871
-  citations: 0
-  tables: 7
-  diagrams: 0
 ---
 # LongtermWiki: Comprehensive AI Impact & Risk Navigator
 

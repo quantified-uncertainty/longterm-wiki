@@ -2753,6 +2753,76 @@
     - geopolitics
   lastUpdated: 2026-02
 
+- id: concentrated-compute-cybersecurity-risk
+  numericId: E689
+  type: risk
+  title: Concentrated Compute as a Cybersecurity Risk
+  severity: high
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2028
+    earliest: 2025
+    latest: 2035
+  description: >-
+    The concentration of $700B+ in AI infrastructure across 5-6 US companies creates a novel
+    cybersecurity risk surface where hardware monoculture (NVIDIA 90-95% market share), physical
+    concentration (50% of US data centers in two regions), and software supply chain dependencies
+    (CUDA, PyTorch) mean a single vulnerability or attack could compromise a significant fraction
+    of global frontier AI compute. The NVIDIA Container Toolkit CVE-2025-23266 (CVSS 9.0)
+    demonstrated this risk by affecting all major cloud providers simultaneously.
+  relatedEntries:
+    - id: compute-concentration
+      type: risk
+    - id: concentration-of-power
+      type: risk
+  tags:
+    - compute
+    - cybersecurity
+    - concentration
+    - infrastructure
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+
+- id: financial-stability-risks-ai-capex
+  numericId: E690
+  type: risk
+  title: Financial Stability Risks from AI Capital Expenditure
+  severity: medium
+  likelihood:
+    level: medium
+    status: emerging
+  timeframe:
+    median: 2028
+    earliest: 2026
+    latest: 2032
+  description: >-
+    The $700B+ AI infrastructure investment in 2026 creates financial stability risks through
+    a 6-14x gap between capex and direct AI revenue, growing debt-financed construction ($200B+
+    in data center debt), free cash flow destruction at major tech companies (Alphabet FCF down
+    89%, Meta down ~90%), and structural parallels to the 1990s telecom bubble ($1.4T projected
+    2024-2026 vs $1.2T telecom inflation-adjusted). Risks could transmit to broader markets
+    through index fund concentration, credit contagion, and semiconductor supply chain cascades.
+  relatedEntries:
+    - id: projecting-compute-spending
+      type: model
+    - id: ai-revenue-sources
+      type: organization
+    - id: economic-disruption
+      type: risk
+  tags:
+    - economics
+    - financial-risk
+    - capex
+    - bubble
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+
 - id: steganography
   numericId: E603
   type: risk
@@ -2762,7 +2832,70 @@
     information in outputs to enable covert coordination or evade oversight.
     GPT-4 class models encode 3-5 bits/KB with under 30% human detection rates.
     NeurIPS 2024 research achieved information-theoretically undetectable
-    channels; LASR 
+    channels; LASR
   clusters:
     - ai-safety
+  lastUpdated: 2026-02
+
+- id: ai-enabled-untraceable-misuse
+  numericId: E691
+  type: risk
+  title: AI-Enabled Untraceable Misuse
+  description: >-
+    AI systems simultaneously amplify harmful capabilities and obscure
+    attribution, enabling bad actors to conduct spam campaigns, political
+    manipulation, synthetic identity fraud, and coordinated harassment with
+    reduced risk of identification. This dual amplification creates a
+    self-reinforcing cycle where greater capability enables more autonomous
+    agents, more attribution ambiguity, reduced deterrence, and further misuse.
+  severity: high
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Status
+      value: Actively occurring across multiple domains
+    - label: Key Risk
+      value: Simultaneous capability amplification and attribution defeat
+  relatedEntries:
+    - id: fraud
+      type: risk
+    - id: disinformation
+      type: risk
+    - id: deepfakes
+      type: risk
+    - id: cyberweapons
+      type: risk
+    - id: authentication-collapse
+      type: risk
+    - id: trust-cascade
+      type: risk
+    - id: dual-use
+      type: concept
+    - id: proliferation
+      type: risk
+  sources:
+    - title: Four Responsibility Gaps with Artificial Intelligence
+      url: https://link.springer.com/article/10.1007/s13347-021-00450-x
+      author: Santoni de Sio & Mecacci
+      date: '2021'
+    - title: The Malicious Use of Artificial Intelligence
+      url: https://arxiv.org/abs/1802.07228
+      author: Brundage et al.
+      date: '2018'
+    - title: Generative Language Models and Automated Influence Operations
+      url: https://arxiv.org/abs/2301.04246
+      author: Goldstein et al.
+      date: '2023'
+    - title: Practices for Governing Agentic AI Systems
+      url: https://cdn.openai.com/papers/practices-for-governing-agentic-ai-systems.pdf
+      author: Shavit & Agarwal
+      date: '2023'
+  clusters:
+    - cyber
+    - ai-safety
+    - governance
   lastUpdated: 2026-02
