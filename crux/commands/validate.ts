@@ -91,6 +91,11 @@ const SCRIPTS = {
     description: 'YAML schema validation',
     passthrough: ['ci'],
   },
+  'edit-logs': {
+    script: 'validate/validate-edit-logs.ts',
+    description: 'Edit log schema and integrity',
+    passthrough: ['ci'],
+  },
   financials: {
     script: 'validate/validate-financials.ts',
     description: 'Financial data staleness and consistency',
