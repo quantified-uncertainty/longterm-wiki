@@ -10,42 +10,32 @@ import type { LucideIcon } from "lucide-react";
 const TOPIC_SECTIONS: {
   label: string;
   cluster: string;
-  description: string;
   icon: LucideIcon;
   accentColor: string;
-  borderColor: string;
 }[] = [
   {
     label: "AI Safety",
     cluster: "ai-safety",
-    description: "Alignment, interpretability, and technical approaches to safe AI systems.",
     icon: Shield,
     accentColor: "text-emerald-600 dark:text-emerald-400",
-    borderColor: "border-l-emerald-400 dark:border-l-emerald-600",
   },
   {
     label: "Governance",
     cluster: "governance",
-    description: "Policy, regulation, and institutional approaches to AI risk management.",
     icon: Scale,
     accentColor: "text-violet-600 dark:text-violet-400",
-    borderColor: "border-l-violet-400 dark:border-l-violet-600",
   },
   {
     label: "Biorisks",
     cluster: "biorisks",
-    description: "Biological risks from AI capabilities and dual-use research.",
     icon: Bug,
     accentColor: "text-red-600 dark:text-red-400",
-    borderColor: "border-l-red-400 dark:border-l-red-600",
   },
   {
     label: "Epistemics",
     cluster: "epistemics",
-    description: "Forecasting, decision-making, and reasoning about AI futures.",
     icon: Brain,
     accentColor: "text-blue-600 dark:text-blue-400",
-    borderColor: "border-l-blue-400 dark:border-l-blue-600",
   },
 ];
 
