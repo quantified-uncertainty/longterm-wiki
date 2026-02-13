@@ -1,5 +1,5 @@
 {
-  "_nextId": 688,
+  "_nextId": 691,
   "entities": {
     "E1": "adversarial-robustness",
     "E2": "agentic-ai",
@@ -687,6 +687,9 @@
     "E684": "compute-concentration",
     "E685": "maim",
     "E686": "openclaw-matplotlib-incident-2026",
-    "E687": "ai-acceleration-tradeoff"
+    "E687": "ai-acceleration-tradeoff",
+    "E688": "government-authority-commercial-ai-infrastructure",
+    "E689": "concentrated-compute-cybersecurity-risk",
+    "E690": "financial-stability-risks-ai-capex"
   }
 }
