@@ -2,9 +2,9 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
-## 2026-02-13 | claude/improve-page-titles-GYyFb | Improve specificity of generic page titles
+## 2026-02-13 | claude/improve-page-titles-GYyFb | Comprehensive page title disambiguation
 
-**What was done:** Updated 17 page titles across entity YAML and MDX frontmatter to be more specific to the AI safety domain. Generic titles like "Intervention Portfolio", "Field Building Analysis", "Corporate Responses", and "Solution Cruxes" were disambiguated with domain qualifiers (e.g., "AI Safety Intervention Portfolio"). Also added geographic specificity ("US Government Authority...") and parenthetical disambiguation ("Multipolar Trap (AI Development)").
+**What was done:** Systematic audit and disambiguation of ~80 generic page titles across 60 files (8 entity YAML + 52 MDX). Changes included: (1) domain qualifiers on generic risk/concept/approach titles (e.g., "Lock-in" → "AI Value Lock-in", "Economic Disruption" → "AI-Driven Economic Disruption"), (2) geographic specificity ("Executive Order..." → "US Executive Order..."), (3) parenthetical role disambiguators on people ("Elon Musk" → "Elon Musk (AI Industry)"), (4) context on opaque org names ("Manifold" → "Manifold (Prediction Market)"), (5) "AI" prefix on 22+ model analysis titles.
 
 **Issues encountered:**
 - pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
@@ -12,8 +12,9 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 
 **Learnings/notes:**
 - Entity titles live in `data/entities/*.yaml` (title field) and must match MDX frontmatter titles
-- Some MDX pages have different titles from their entity (e.g., "Influencing AI Labs Directly" vs entity "Corporate Influence") — these were aligned during the rename
-- The wiki already uses parenthetical disambiguation for roles (e.g., "Anthropic (Funder)") — this session extended that pattern to domain context
+- Some MDX pages have different titles from their entity — these were aligned during the rename
+- Parenthetical disambiguation works for roles and org types; prefix ("AI-Driven", "AI-Induced") works for domain specificity
+- Many model/analysis pages had extremely generic titles (e.g., "Warning Signs Model", "Defense in Depth Model") that needed AI qualifier
 
 ---
 

@@ -353,7 +353,7 @@
 - id: existential-risk
   numericId: E131
   type: concept
-  title: Existential Risk
+  title: Existential Risk from AI
   description: Risks that could cause human extinction or permanently curtail humanity's long-term potential.
   status: stub
   relatedEntries:
@@ -417,7 +417,7 @@
 - id: scaling-laws
   numericId: E273
   type: concept
-  title: Scaling Laws
+  title: AI Scaling Laws
   description: Empirical relationships between model size, compute, data, and AI performance that have driven recent AI progress.
   status: stub
   relatedEntries:
@@ -445,7 +445,7 @@
 - id: data-constraints
   numericId: E92
   type: concept
-  title: Data Constraints
+  title: AI Training Data Constraints
   description: Limitations on AI training due to availability, quality, or accessibility of training data.
   status: stub
   relatedEntries:
