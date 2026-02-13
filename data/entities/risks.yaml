@@ -1673,7 +1673,7 @@
 - id: multipolar-trap
   numericId: E209
   type: risk
-  title: Multipolar Trap
+  title: Multipolar Trap (AI Development)
   severity: high
   likelihood:
     level: medium-high

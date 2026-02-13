@@ -2,6 +2,21 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/improve-page-titles-GYyFb | Improve specificity of generic page titles
+
+**What was done:** Updated 17 page titles across entity YAML and MDX frontmatter to be more specific to the AI safety domain. Generic titles like "Intervention Portfolio", "Field Building Analysis", "Corporate Responses", and "Solution Cruxes" were disambiguated with domain qualifiers (e.g., "AI Safety Intervention Portfolio"). Also added geographic specificity ("US Government Authority...") and parenthetical disambiguation ("Multipolar Trap (AI Development)").
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+- build-data.mjs must be run from `app/` directory due to `process.cwd()` path resolution
+
+**Learnings/notes:**
+- Entity titles live in `data/entities/*.yaml` (title field) and must match MDX frontmatter titles
+- Some MDX pages have different titles from their entity (e.g., "Influencing AI Labs Directly" vs entity "Corporate Influence") — these were aligned during the rename
+- The wiki already uses parenthetical disambiguation for roles (e.g., "Anthropic (Funder)") — this session extended that pattern to domain context
+
+---
+
 ## 2026-02-13 | claude/add-llm-warning-banner-aWFt0 | Add LLM warning banner to wiki pages
 
 **What was done:** Added a dismissible warning banner to all wiki pages informing readers that content was written by an LLM with minimal human supervision. The banner uses localStorage to persist dismissal, so once closed it stays hidden across all pages.
