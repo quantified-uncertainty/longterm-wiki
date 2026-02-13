@@ -4,7 +4,7 @@
  * Common file discovery and traversal functions used across validators and generators.
  */
 
-import { existsSync, readdirSync, statSync, type Stats } from 'fs';
+import { existsSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
 /**
@@ -51,28 +51,6 @@ export function findFiles(dir: string, extensions: string[], results: string[] =
     // Skip directories that can't be read
   }
   return results;
-}
-
-/**
- * Walk a directory tree, calling a callback for each file
- */
-export function walkDirectory(dir: string, callback: (filePath: string, stat: Stats) => void): void {
-  if (!existsSync(dir)) return;
-
-  try {
-    const files = readdirSync(dir);
-    for (const file of files) {
-      const filePath = join(dir, file);
-      const stat = statSync(filePath);
-      if (stat.isDirectory()) {
-        walkDirectory(filePath, callback);
-      } else {
-        callback(filePath, stat);
-      }
-    }
-  } catch {
-    // Skip directories that can't be read
-  }
 }
 
 /**

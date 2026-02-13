@@ -20,6 +20,7 @@
  *   insights    Insight quality management
  *   gaps        Insight gap analysis
  *   updates     Schedule-aware page update system
+ *   edit-log    View and query per-page edit history
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -47,6 +48,7 @@ import * as resourcesCommands from './commands/resources.ts';
 import * as insightsCommands from './commands/insights.ts';
 import * as gapsCommands from './commands/gaps.ts';
 import * as updatesCommands from './commands/updates.ts';
+import * as editLogCommands from './commands/edit-log.ts';
 
 const domains = {
   validate: validateCommands,
@@ -59,6 +61,7 @@ const domains = {
   insights: insightsCommands,
   gaps: gapsCommands,
   updates: updatesCommands,
+  'edit-log': editLogCommands,
 };
 
 /**
@@ -124,6 +127,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   insights    Insight quality management
   gaps        Insight gap analysis
   updates     Schedule-aware page update system
+  edit-log    View and query per-page edit history
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

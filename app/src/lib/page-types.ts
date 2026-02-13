@@ -3,7 +3,7 @@
  * Adapted from longterm app's page-types.ts
  */
 
-export type PageType =
+type PageType =
   | "content"
   | "risk"
   | "response"
@@ -14,14 +14,14 @@ export type PageType =
 
 export type ContentFormat = "article" | "table" | "diagram" | "index" | "dashboard";
 
-export interface PageTypeInfo {
+interface PageTypeInfo {
   label: string;
   description: string;
   styleGuideUrl?: string;
   color: string;
 }
 
-export interface ContentFormatInfo {
+interface ContentFormatInfo {
   label: string;
   description: string;
   color: string;

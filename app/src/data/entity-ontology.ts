@@ -63,7 +63,7 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
   risk: {
     label: "Risk",
     icon: Bug,
-    iconColor: "text-amber-600 dark:text-amber-400",
+    iconColor: "text-red-600 dark:text-red-400",
     badgeColor: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
     headerColor: "#dc2626",
   },
@@ -256,7 +256,7 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
  * When an entity is `entityType: "organization"` with a specific `orgType`,
  * use these to override the default organization icon/label.
  */
-export interface OrgTypeDefinition {
+interface OrgTypeDefinition {
   label: string;
   icon: LucideIcon;
   iconColor: string;
@@ -264,7 +264,7 @@ export interface OrgTypeDefinition {
   headerColor: string;
 }
 
-export const ORG_TYPE_DISPLAY: Record<string, OrgTypeDefinition> = {
+const ORG_TYPE_DISPLAY: Record<string, OrgTypeDefinition> = {
   "frontier-lab": { label: "Frontier Lab", icon: Rocket, iconColor: "text-orange-600 dark:text-orange-400", headerColor: "#dc2626" },
   "safety-org": { label: "Safety Org", icon: Microscope, iconColor: "text-teal-600 dark:text-teal-400", headerColor: "#0d9488" },
   academic: { label: "Academic", icon: GraduationCap, iconColor: "text-indigo-600 dark:text-indigo-400", headerColor: "#059669" },

@@ -51,7 +51,7 @@ export interface OpenRouterResult {
 /**
  * Call OpenRouter API
  */
-export async function callOpenRouter(prompt: string, options: OpenRouterOptions = {}): Promise<OpenRouterResult> {
+async function callOpenRouter(prompt: string, options: OpenRouterOptions = {}): Promise<OpenRouterResult> {
   const {
     model = MODELS.PERPLEXITY_SONAR,
     maxTokens = 2000,
@@ -344,19 +344,3 @@ export function generateResearchQueries(topic: string): ResearchQuery[] {
   return [...baseQueries, ...adversarialQueries, ...commonQueries];
 }
 
-/**
- * Quick single research call (for testing)
- */
-export async function quickResearch(topic: string): Promise<OpenRouterResult> {
-  const query = `Give me a comprehensive overview of "${topic}" including:
-- What it is and its mission
-- Key people and leadership
-- Funding sources and amounts
-- Major projects or research
-- Criticisms or controversies
-- Recent news and developments
-
-Include specific facts, dates, and numbers where available.`;
-
-  return perplexityResearch(query, { detailed: true });
-}

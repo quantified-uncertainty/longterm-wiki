@@ -370,4 +370,6 @@ export const QUALITY_RULES: string[] = [
   'placeholders',
   'vague-citations',
   'temporal-artifacts',
+  'citation-doi-mismatch',
+  'mermaid-style',
 ];

@@ -24,6 +24,7 @@ import {
   InfoBoxToggle,
 } from "@/components/wiki/InfoBoxVisibility";
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
+import { LlmWarningBanner } from "@/components/wiki/LlmWarningBanner";
 
 const GITHUB_HISTORY_BASE =
   "https://github.com/quantified-uncertainty/longterm-wiki/commits/main/content/docs";
@@ -223,6 +224,7 @@ function ContentView({
         slug={slug}
         contentFormat={contentFormat}
       />
+      <LlmWarningBanner />
       <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}`}>
         {/* PageStatus shown for graded formats or pages with editorial content */}
         <PageStatus
@@ -249,9 +251,9 @@ function ContentView({
         {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
         {isArticle && entity && <DataInfoBox entityId={slug} />}
         {page.content}
-        {/* Related pages only shown for articles — tables/diagrams are self-contained */}
-        {isArticle && <RelatedPages entityId={slug} entity={entity} />}
       </article>
+      {/* Related pages rendered outside prose to avoid inherited link styles */}
+      {isArticle && <RelatedPages entityId={slug} entity={entity} />}
     </InfoBoxVisibilityProvider>
   );
 }

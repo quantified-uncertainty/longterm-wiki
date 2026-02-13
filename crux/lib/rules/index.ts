@@ -71,6 +71,12 @@ import { evaluativeFlattery } from './evaluative-flattery.ts';
 // Citation coverage
 import { footnoteCoverageRule } from './footnote-coverage.ts';
 
+// Citation accuracy
+import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
+
+// Diagram style compliance
+import { mermaidStyleRule } from './mermaid-style.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -111,6 +117,8 @@ export {
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
   footnoteCoverageRule,
+  citationDoiMismatchRule,
+  mermaidStyleRule,
 };
 
 export const allRules: Rule[] = [
@@ -152,6 +160,8 @@ export const allRules: Rule[] = [
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
   footnoteCoverageRule,
+  citationDoiMismatchRule,
+  mermaidStyleRule,
 ];
 
 export default allRules;

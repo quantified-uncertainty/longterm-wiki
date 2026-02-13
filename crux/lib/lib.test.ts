@@ -4,11 +4,6 @@ import { findMdxFiles, findFiles, getDirectories } from './file-utils.ts';
 import {
   parseFrontmatter,
   getContentBody,
-  hasFrontmatter,
-  extractH2Sections,
-  extractHeadings,
-  countWords,
-  extractLinks,
 } from './mdx-utils.ts';
 import { getColors, createLogger, formatPath, formatCount } from './output.ts';
 import {
@@ -96,45 +91,6 @@ A subsection with [a link](/path/to/page).
     expect(result.includes('## Overview')).toBe(true);
   });
 
-  it('hasFrontmatter detects frontmatter', () => {
-    expect(hasFrontmatter(sampleMdx)).toBe(true);
-    expect(hasFrontmatter('No frontmatter')).toBe(false);
-  });
-
-  it('extractH2Sections finds h2 headings', () => {
-    const body = getContentBody(sampleMdx);
-    const sections = extractH2Sections(body);
-    expect(sections.length).toBe(2);
-    expect(sections[0].title).toBe('Overview');
-    expect(sections[1].title).toBe('Key Points');
-  });
-
-  it('extractHeadings finds all headings', () => {
-    const body = getContentBody(sampleMdx);
-    const headings = extractHeadings(body);
-    expect(headings.length).toBe(3);
-    expect(headings.some((h: any) => h.level === 2 && h.title === 'Overview')).toBe(true);
-    expect(headings.some((h: any) => h.level === 3 && h.title === 'Subsection')).toBe(true);
-  });
-
-  it('countWords counts correctly', () => {
-    const body = 'One two three four five.';
-    expect(countWords(body)).toBe(5);
-  });
-
-  it('countWords excludes code blocks', () => {
-    const body = 'Real words here.\n```\ncode block content\n```\nMore words.';
-    const count = countWords(body);
-    expect(count < 10).toBe(true);
-  });
-
-  it('extractLinks finds markdown links', () => {
-    const body = getContentBody(sampleMdx);
-    const links = extractLinks(body);
-    expect(links.length).toBe(1);
-    expect(links[0].url).toBe('/path/to/page');
-    expect(links[0].text).toBe('a link');
-  });
 });
 
 // =============================================================================

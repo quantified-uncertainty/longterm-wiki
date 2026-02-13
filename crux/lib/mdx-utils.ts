@@ -45,14 +45,6 @@ export function getContentBody(content: string): string {
 }
 
 /**
- * Get raw frontmatter string (without delimiters)
- */
-export function getRawFrontmatter(content: string): string | null {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
-  return match ? match[1] : null;
-}
-
-/**
  * Update frontmatter fields while preserving existing content
  */
 export function updateFrontmatter(content: string, updates: Record<string, unknown>): string {
@@ -66,138 +58,16 @@ export function updateFrontmatter(content: string, updates: Record<string, unkno
 }
 
 /**
- * Replace frontmatter entirely
- */
-export function replaceFrontmatter(content: string, newFrontmatter: Record<string, unknown>): string {
-  const body = getContentBody(content);
-  const yamlString = stringifyYaml(newFrontmatter, { lineWidth: 0 }).trim();
-
-  return `---\n${yamlString}\n---\n${body}`;
-}
-
-/**
- * Check if content has valid frontmatter
- */
-export function hasFrontmatter(content: string): boolean {
-  return /^---\n[\s\S]*?\n---/.test(content);
-}
-
-export interface Section {
-  title: string;
-  line: number;
-}
-
-/**
- * Extract all h2 sections from content body
- */
-export function extractH2Sections(body: string): Section[] {
-  const sections: Section[] = [];
-  const regex = /^##\s+(.+)$/gm;
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(body)) !== null) {
-    const lineNum = body.substring(0, match.index).split('\n').length;
-    sections.push({
-      title: match[1].trim(),
-      line: lineNum,
-    });
-  }
-  return sections;
-}
-
-export interface Heading {
-  level: number;
-  title: string;
-  line: number;
-}
-
-/**
- * Extract all headings from content body
- */
-export function extractHeadings(body: string): Heading[] {
-  const headings: Heading[] = [];
-  const regex = /^(#{1,6})\s+(.+)$/gm;
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(body)) !== null) {
-    const lineNum = body.substring(0, match.index).split('\n').length;
-    headings.push({
-      level: match[1].length,
-      title: match[2].trim(),
-      line: lineNum,
-    });
-  }
-  return headings;
-}
-
-/**
- * Count words in content (excluding code blocks and frontmatter)
- */
-export function countWords(body: string): number {
-  // Remove code blocks
-  const withoutCode = body.replace(/```[\s\S]*?```/g, '');
-  // Remove inline code
-  const withoutInline = withoutCode.replace(/`[^`]+`/g, '');
-  // Count words
-  return withoutInline.split(/\s+/).filter(w => w.length > 0).length;
-}
-
-export interface Link {
-  text: string;
-  url: string;
-  line: number;
-}
-
-/**
- * Extract links from MDX content
- */
-export function extractLinks(body: string): Link[] {
-  const links: Link[] = [];
-  const regex = /\[([^\]]*)\]\(([^)]+)\)/g;
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(body)) !== null) {
-    const lineNum = body.substring(0, match.index).split('\n').length;
-    links.push({
-      text: match[1],
-      url: match[2],
-      line: lineNum,
-    });
-  }
-  return links;
-}
-
-/**
  * Page types that should skip content validation
  * These pages contain examples/documentation that would trigger false positives
  */
 const SKIP_VALIDATION_PAGE_TYPES = ['stub', 'documentation'];
 
 /**
- * File path patterns that should skip validation
- */
-const SKIP_VALIDATION_PATHS: RegExp[] = [
-  /\/index\.(mdx?|md)$/,        // Index/overview pages
-  /\/_[^/]+\.(mdx?|md)$/,       // Files starting with underscore
-  /\/internal\//,               // Internal docs directory
-];
-
-/**
  * Check if a page should skip validation based on frontmatter
  */
 export function shouldSkipValidation(frontmatter: Record<string, unknown>): boolean {
   return SKIP_VALIDATION_PAGE_TYPES.includes(frontmatter.pageType as string);
-}
-
-/**
- * Check if a file should skip validation based on path
- */
-export function shouldSkipValidationByPath(filePath: string): boolean {
-  return SKIP_VALIDATION_PATHS.some(pattern => pattern.test(filePath));
-}
-
-/**
- * Combined check: skip validation if either frontmatter or path matches
- */
-export function shouldSkipValidationFull(frontmatter: Record<string, unknown>, filePath: string): boolean {
-  return shouldSkipValidation(frontmatter) || shouldSkipValidationByPath(filePath);
 }
 
 // ============================================================================

@@ -81,7 +81,7 @@ interface RawEntity {
   };
 }
 
-export interface RelatedGraphEntry {
+interface RelatedGraphEntry {
   id: string;
   type: string;
   title: string;
@@ -177,10 +177,9 @@ function getTypedEntities(): AnyEntity[] {
 // Re-export typed entity types for consumers
 export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity } from "./entity-schemas";
 export type { AnyEntity };
-export { isRisk, isPerson, isOrganization, isPolicy } from "./entity-schemas";
 
 /** @deprecated Use TypedEntity instead */
-export interface Entity {
+interface Entity {
   id: string;
   type: string;
   title: string;
@@ -200,7 +199,7 @@ export interface Entity {
   content?: any;
 }
 
-export interface Resource {
+interface Resource {
   id: string;
   url: string;
   title: string;
@@ -213,7 +212,7 @@ export interface Resource {
   credibility_override?: number;
 }
 
-export interface Publication {
+interface Publication {
   id: string;
   name: string;
   type: string;
@@ -223,7 +222,7 @@ export interface Publication {
   description?: string;
 }
 
-export interface Expert {
+interface Expert {
   id: string;
   name: string;
   affiliation?: string;
@@ -232,7 +231,7 @@ export interface Expert {
   knownFor?: string[];
 }
 
-export interface Organization {
+interface Organization {
   id: string;
   name: string;
   type: string;
@@ -243,7 +242,7 @@ export interface Organization {
   employees?: string;
 }
 
-export interface BacklinkEntry {
+interface BacklinkEntry {
   id: string;
   type: string;
   title: string;
@@ -630,6 +629,7 @@ export function getEntityInfoBoxData(entityId: string) {
   if (!entity) return null;
 
   const resolvedRelatedEntries = entity.relatedEntries?.map((entry) => ({
+    id: entry.id,
     type: entry.type,
     title:
       getTypedEntityById(entry.id)?.title ||
@@ -774,16 +774,6 @@ export function getEntityInfoBoxData(entityId: string) {
     policyAuthor,
     scope,
   };
-}
-
-/** @deprecated Use getEntityInfoBoxData with entityId for person entities */
-export function getExpertInfoBoxData(expertId: string) {
-  return getEntityInfoBoxData(expertId);
-}
-
-/** @deprecated Use getEntityInfoBoxData with entityId for organization entities */
-export function getOrgInfoBoxData(orgId: string) {
-  return getEntityInfoBoxData(orgId);
 }
 
 // ============================================================================
