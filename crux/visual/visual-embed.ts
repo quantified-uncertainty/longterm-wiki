@@ -19,7 +19,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors, isCI } from '../lib/output.ts';
 import { findPageById } from '../lib/page-resolution.ts';
-import { type VisualDefinition, VISUAL_COMPONENT_MAP, type GeneratableVisualType } from './visual-types.ts';
+import { type VisualDefinition, VISUAL_COMPONENT_MAP, isGeneratableVisualType } from './visual-types.ts';
 
 const VISUALS_DIR = path.join(PROJECT_ROOT, 'data', 'visuals');
 const TEMP_DIR = path.join(PROJECT_ROOT, '.claude/temp/visual-embed');
@@ -68,10 +68,13 @@ function findVisualById(
 // ============================================================================
 
 function generateMdxSnippet(visual: VisualDefinition): string {
-  const componentInfo = VISUAL_COMPONENT_MAP[visual.type as GeneratableVisualType];
-  if (!componentInfo) {
-    throw new Error(`Unknown visual type: ${visual.type}`);
+  if (!isGeneratableVisualType(visual.type)) {
+    throw new Error(
+      `Visual type "${visual.type}" cannot be embedded. ` +
+      `Supported types: mermaid, squiggle, cause-effect, comparison, disagreement`,
+    );
   }
+  const componentInfo = VISUAL_COMPONENT_MAP[visual.type];
 
   let snippet = `${componentInfo.import}\n\n`;
 

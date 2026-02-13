@@ -282,26 +282,3 @@ Return a JSON object:
   "suggestions": ["list of specific improvements"]
 }`;
 
-export const VISUAL_SUGGEST_TYPE_PROMPT = `You are analyzing a wiki page to determine which visual types would best complement the content.
-
-For each suggested visual, explain:
-1. What type (mermaid, squiggle, cause-effect, comparison, disagreement)
-2. What specific concept it should visualize
-3. Where in the page it should be placed (after which section heading)
-
-Consider:
-- Mermaid: good for processes, hierarchies, categorizations, timelines
-- Squiggle: good for uncertain quantities, forecasts, cost estimates
-- CauseEffectGraph: good for causal relationships, influence diagrams
-- ComparisonTable: good for comparing approaches, organizations, methods
-- DisagreementMap: good for contested topics with multiple expert positions
-
-Return a JSON array of suggestions:
-[
-  {
-    "type": "mermaid",
-    "concept": "AI risk taxonomy showing major risk categories",
-    "placement": "after Overview section",
-    "priority": "high"
-  }
-]`;

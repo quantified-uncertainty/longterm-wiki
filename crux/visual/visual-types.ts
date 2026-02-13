@@ -1,31 +1,23 @@
 /**
  * Visual Pipeline - Types
  *
- * Re-exports canonical types from data/schema.ts and shared detection
- * from crux/lib/visual-detection.ts. Pipeline-specific types (review
- * results, audit coverage, etc.) are defined here.
+ * Pipeline-specific types (review results, audit coverage, generatable
+ * types, component map) live here. Canonical types (VisualType,
+ * VisualDefinition, VISUAL_COMPONENT_NAMES) live in data/schema.ts.
+ * Detection utilities live in crux/lib/visual-detection.ts.
  *
- * The canonical VisualType enum and VISUAL_COMPONENT_NAMES live in
- * data/schema.ts so that both the app and crux can use them.
+ * Import guidelines:
+ *   - Canonical types:  import from 'data/schema.ts'
+ *   - Detection:        import from 'crux/lib/visual-detection.ts'
+ *   - Pipeline types:   import from here (visual-types.ts)
  */
 
-// ============================================================================
-// Re-exports from canonical sources
-// ============================================================================
+import type { VisualCounts } from '../lib/visual-detection.ts';
 
-// Canonical visual type enum (from data/schema.ts)
+// Re-export types that pipeline scripts need alongside pipeline types
 export type { VisualType, VisualDefinition } from '../../data/schema.ts';
-export { VisualType as VisualTypeEnum, VISUAL_COMPONENT_NAMES } from '../../data/schema.ts';
-
-// Shared detection (from crux/lib/visual-detection.ts)
-export {
-  countVisuals,
-  countDiagrams,
-  countTables,
-  extractVisuals,
-  type VisualCounts,
-  type ExtractedVisual,
-} from '../lib/visual-detection.ts';
+export type { VisualCounts, ExtractedVisual } from '../lib/visual-detection.ts';
+export { countVisuals, extractVisuals } from '../lib/visual-detection.ts';
 
 // ============================================================================
 // Generatable visual types (subset that the visual pipeline can create)
@@ -93,16 +85,7 @@ export interface PageVisualCoverage {
   wordCount: number;
   quality?: number;
   importance?: number;
-  visuals: {
-    mermaid: number;
-    squiggle: number;
-    'cause-effect': number;
-    comparison: number;
-    disagreement: number;
-    'table-view': number;
-    'markdown-table': number;
-    total: number;
-  };
+  visuals: VisualCounts;
   needsVisuals: boolean;
   suggestedTypes: GeneratableVisualType[];
 }
@@ -132,25 +115,4 @@ export interface QualityReview {
   strengths: string[];
   issues: string[];
   suggestions: string[];
-}
-
-// ============================================================================
-// Create/Improve pipeline types
-// ============================================================================
-
-export interface VisualCreateOptions {
-  pageId: string;
-  type: GeneratableVisualType;
-  directions?: string;
-  model?: string;
-  dryRun?: boolean;
-  output?: string;
-}
-
-export interface VisualCreateResult {
-  type: GeneratableVisualType;
-  component: string;
-  code: string;
-  mdxSnippet: string;
-  importStatement: string;
 }

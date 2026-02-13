@@ -11,9 +11,8 @@
  */
 
 import { VISUAL_COMPONENT_NAMES } from '../../data/schema.ts';
+import { getLineNumber } from './mdx-utils.ts';
 
-// Re-export for convenience
-export { VISUAL_COMPONENT_NAMES } from '../../data/schema.ts';
 export type { VisualType } from '../../data/schema.ts';
 
 // ============================================================================
@@ -162,7 +161,7 @@ export function extractVisuals(content: string): ExtractedVisual[] {
       type: 'mermaid',
       code: match[1],
       raw: match[0],
-      line: content.substring(0, match.index).split('\n').length,
+      line: getLineNumber(content, match.index),
       startOffset: match.index,
       endOffset: match.index + match[0].length,
     });
@@ -176,7 +175,7 @@ export function extractVisuals(content: string): ExtractedVisual[] {
       type: 'squiggle',
       code: match[1],
       raw: match[0],
-      line: content.substring(0, match.index).split('\n').length,
+      line: getLineNumber(content, match.index),
       startOffset: match.index,
       endOffset: match.index + match[0].length,
     });
@@ -189,7 +188,7 @@ export function extractVisuals(content: string): ExtractedVisual[] {
       type: 'cause-effect',
       code: match[0],
       raw: match[0],
-      line: content.substring(0, match.index).split('\n').length,
+      line: getLineNumber(content, match.index),
       startOffset: match.index,
       endOffset: match.index + match[0].length,
     });
@@ -202,7 +201,7 @@ export function extractVisuals(content: string): ExtractedVisual[] {
       type: 'comparison',
       code: match[0],
       raw: match[0],
-      line: content.substring(0, match.index).split('\n').length,
+      line: getLineNumber(content, match.index),
       startOffset: match.index,
       endOffset: match.index + match[0].length,
     });
@@ -215,7 +214,7 @@ export function extractVisuals(content: string): ExtractedVisual[] {
       type: 'disagreement',
       code: match[0],
       raw: match[0],
-      line: content.substring(0, match.index).split('\n').length,
+      line: getLineNumber(content, match.index),
       startOffset: match.index,
       endOffset: match.index + match[0].length,
     });

@@ -9,14 +9,13 @@
  */
 
 import {
-  countDiagrams as countDiagramsShared,
-  countTables as countTablesShared,
+  countDiagrams,
+  countTables,
   countVisuals,
-  type VisualCounts,
 } from './visual-detection.ts';
 
 export type { VisualCounts } from './visual-detection.ts';
-export { countVisuals } from './visual-detection.ts';
+export { countVisuals, countDiagrams, countTables } from './visual-detection.ts';
 
 export interface SectionCount {
   h2: number;
@@ -65,8 +64,8 @@ export function extractMetrics(content: string, filePath: string = ''): ContentM
   const metrics: ContentMetrics = {
     // Raw counts — table/diagram counts now include ALL visual types
     wordCount: countWords(contentNoImports),
-    tableCount: countTablesShared(contentNoImports),
-    diagramCount: countDiagramsShared(contentNoImports),
+    tableCount: countTables(contentNoImports),
+    diagramCount: countDiagrams(contentNoImports),
     internalLinks: countInternalLinks(contentNoImports),
     externalLinks: countExternalLinks(contentNoImports),
     footnoteCount: countFootnoteRefs(contentNoImports),
@@ -123,22 +122,6 @@ export function countWords(content: string): number {
   // Count words
   const words = text.split(/\s+/).filter(w => w.length > 0);
   return words.length;
-}
-
-/**
- * Count all table-type visuals (markdown tables + ComparisonTable + TableView).
- * Delegates to shared visual-detection.ts for comprehensive counting.
- */
-export function countTables(content: string): number {
-  return countTablesShared(content);
-}
-
-/**
- * Count all diagram-type visuals (Mermaid + Squiggle + CauseEffectGraph).
- * Delegates to shared visual-detection.ts for comprehensive counting.
- */
-export function countDiagrams(content: string): number {
-  return countDiagramsShared(content);
 }
 
 /**
