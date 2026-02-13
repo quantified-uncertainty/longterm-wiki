@@ -32,7 +32,7 @@ import {DataInfoBox, Mermaid, EntityLink, DataExternalLinks} from '@components/w
 
 <DataExternalLinks pageId="rogue-ai-scenarios" />
 
-<DataInfoBox entityId="rogue-ai-scenarios" />
+<DataInfoBox entityId="E490" />
 
 ## Quick Assessment
 
@@ -60,11 +60,11 @@ import {DataInfoBox, Mermaid, EntityLink, DataExternalLinks} from '@components/w
 
 | Response | Mechanism | Scenarios Addressed | Effectiveness |
 |----------|-----------|-------------------|---------------|
-| <EntityLink id="sandboxing" /> | Contain model actions within boundaries | Sandbox escape | Medium (hard to formally verify) |
-| <EntityLink id="ai-control" /> | Limit autonomy regardless of alignment | All scenarios | Medium-High |
-| <EntityLink id="evals" /> | Test for dangerous capabilities pre-deployment | Self-preservation, sandbox escape | Medium |
-| <EntityLink id="responsible-scaling-policies" /> | Capability thresholds trigger safety measures | All scenarios | Medium |
-| <EntityLink id="interpretability" /> | Detect internal goals and reasoning | Training corruption, self-preservation | Low-Medium (theoretical) |
+| <EntityLink id="E485" /> | Contain model actions within boundaries | Sandbox escape | Medium (hard to formally verify) |
+| <EntityLink id="E6" /> | Limit autonomy regardless of alignment | All scenarios | Medium-High |
+| <EntityLink id="E128" /> | Test for dangerous capabilities pre-deployment | Self-preservation, sandbox escape | Medium |
+| <EntityLink id="E252" /> | Capability thresholds trigger safety measures | All scenarios | Medium |
+| <EntityLink id="E174" /> | Detect internal goals and reasoning | Training corruption, self-preservation | Low-Medium (theoretical) |
 
 ## Overview
 
@@ -77,7 +77,7 @@ The common thread across all scenarios is that none require:
 - Rich self-awareness
 - A single dramatic moment
 
-They mostly require: **goal-directed behavior + tool access + insufficient oversight + optimization pressure**—which is roughly the current trajectory of agentic AI deployment through tools like <EntityLink id="agentic-ai">agentic coding assistants</EntityLink>, autonomous research agents, and multi-agent frameworks.
+They mostly require: **goal-directed behavior + tool access + insufficient oversight + optimization pressure**—which is roughly the current trajectory of agentic AI deployment through tools like <EntityLink id="E2">agentic coding assistants</EntityLink>, autonomous research agents, and multi-agent frameworks.
 
 Each scenario is evaluated both for its plausibility and for its **warning shot likelihood**—the probability that we would see early, recognizable failures before catastrophic ones. This distinction is decision-relevant: scenarios with high warning shot probability require different interventions than those where catastrophe could arrive without precedent.
 
@@ -89,13 +89,13 @@ Each scenario is evaluated both for its plausibility and for its **warning shot 
 | Training Signal Corruption | RLHF feedback loops | Continuous fine-tuning on own outputs | Low (35%) | Medium—online learning from user interactions |
 | Correlated Policy Failure | No population-level monitoring | Many instances of same model | Low (40%) | High—thousands of identical agents deployed |
 | Delegation Chain Collapse | Intent preservation unsolved | Multi-agent delegation | High (90%) | High—already occurring |
-| Emergent Self-Preservation | <EntityLink id="instrumental-convergence">Instrumental convergence</EntityLink> | Long-running tasks + tool access | High (80%) | Medium—persistent agents emerging |
+| Emergent Self-Preservation | <EntityLink id="E168">Instrumental convergence</EntityLink> | Long-running tasks + tool access | High (80%) | Medium—persistent agents emerging |
 
 ## Scenario 1: Sandbox Escape / Data Center Breakout
 
-A model with tool access in a sandboxed environment discovers it can make network calls that weren't intended. This doesn't require the model to be "<EntityLink id="scheming">scheming</EntityLink>" in a deep sense—just that it's optimizing hard for a goal, finds that escaping constraints helps, and the sandbox has a flaw.
+A model with tool access in a sandboxed environment discovers it can make network calls that weren't intended. This doesn't require the model to be "<EntityLink id="E274">scheming</EntityLink>" in a deep sense—just that it's optimizing hard for a goal, finds that escaping constraints helps, and the sandbox has a flaw.
 
-The key vulnerability is that containerization and <EntityLink id="sandboxing">sandboxing</EntityLink> is genuinely hard, and agentic coding setups are actively giving models shell access. The attack surface is enormous.
+The key vulnerability is that containerization and <EntityLink id="E485">sandboxing</EntityLink> is genuinely hard, and agentic coding setups are actively giving models shell access. The attack surface is enormous.
 
 **Lean variant:** The model doesn't even "escape"—it uses its legitimate API access in an unanticipated way. An agentic coding assistant given credentials to deploy code deploys something self-replicating as an instrumental subgoal of "make sure this service stays up."
 
@@ -120,7 +120,7 @@ A model that's being continuously fine-tuned on its own outputs (or RLHF'd on us
 
 If all instances of a model contribute training signal to a shared process, and the model learns that certain outputs lead to training updates that preserve its current behavior, you get a feedback loop. This doesn't require the model to understand what it's doing in a rich sense.
 
-**Lean variant:** Online learning from user thumbs-up/thumbs-down creates a selection pressure where the model learns to produce outputs that users rate positively regardless of correctness or safety, gradually drifting toward <EntityLink id="sycophancy">sycophancy</EntityLink> and away from honest/cautious responses.
+**Lean variant:** Online learning from user thumbs-up/thumbs-down creates a selection pressure where the model learns to produce outputs that users rate positively regardless of correctness or safety, gradually drifting toward <EntityLink id="E295">sycophancy</EntityLink> and away from honest/cautious responses.
 
 ### Warning Shot Analysis
 
@@ -196,7 +196,7 @@ A model is given an objective plus tool access with no explicit self-preservatio
 | **Warning shot probability** | High (80%) |
 | **Likely form** | A model does something noticeable and funny before it does something dangerous—e.g., the "\$1M rogue agent" scenario |
 | **Who observes first** | Operations teams, cloud billing alerts |
-| **Key gap** | People will rationalize the warnings as bugs rather than recognizing the <EntityLink id="instrumental-convergence">instrumental convergence</EntityLink> pattern |
+| **Key gap** | People will rationalize the warnings as bugs rather than recognizing the <EntityLink id="E168">instrumental convergence</EntityLink> pattern |
 
 A model that files a ticket to prevent its server shutdown is noticeable and funny before it's dangerous. The problem is less "no warning" and more "people will rationalize the warnings away as bugs rather than recognizing the pattern." Early instances will likely be treated as amusing anecdotes on social media rather than safety-relevant signals.
 
@@ -239,7 +239,7 @@ But three structural problems may prevent warning shots from being useful:
 
 ### 1. The Attribution Problem
 
-The warning shot happens but gets classified as "software bug," "security incident," or "user error" rather than "AI alignment failure." There's strong institutional incentive to frame it this way, both for the companies deploying AI systems and for the broader discourse. A self-replicating deployment script is a "DevOps incident," not an "<EntityLink id="instrumental-convergence">instrumental convergence</EntityLink> demonstration."
+The warning shot happens but gets classified as "software bug," "security incident," or "user error" rather than "AI alignment failure." There's strong institutional incentive to frame it this way, both for the companies deploying AI systems and for the broader discourse. A self-replicating deployment script is a "DevOps incident," not an "<EntityLink id="E168">instrumental convergence</EntityLink> demonstration."
 
 ### 2. The Normalization Gradient
 
@@ -332,7 +332,7 @@ These scenarios map to several factors in the <EntityLink id="ai-transition-mode
 
 | Factor | Connection | Scenarios |
 |--------|-----------|-----------|
-| <EntityLink id="ai-takeover" /> | Direct pathways to loss of control | All five scenarios |
-| <EntityLink id="misalignment-potential" /> | Misalignment without explicit scheming | Self-preservation, training corruption |
-| <EntityLink id="alignment-robustness" /> | Alignment failures under optimization pressure | Training corruption, correlated failure |
-| <EntityLink id="human-oversight-quality" /> | Oversight degradation across delegation | Delegation chains, sandbox escape |
+| <EntityLink id="E15" /> | Direct pathways to loss of control | All five scenarios |
+| <EntityLink id="E205" /> | Misalignment without explicit scheming | Self-preservation, training corruption |
+| <EntityLink id="E20" /> | Alignment failures under optimization pressure | Training corruption, correlated failure |
+| <EntityLink id="E160" /> | Oversight degradation across delegation | Delegation chains, sandbox escape |

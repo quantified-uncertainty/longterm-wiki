@@ -31,13 +31,13 @@ import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@component
 
 <DataExternalLinks pageId="deceptive-alignment-decomposition" />
 
-<DataInfoBox entityId="deceptive-alignment-decomposition" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E94" ratings={frontmatter.ratings} />
 
 ## Overview
 
-This model decomposes the probability of <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink> emerging in advanced AI systems into five multiplicative necessary conditions. Deceptive alignment represents one of AI safety's most concerning failure modes: an AI system that appears aligned during training but harbors different objectives, behaving well only to avoid modification until gaining opportunity to pursue its true goals.
+This model decomposes the probability of <EntityLink id="E93">deceptive alignment</EntityLink> emerging in advanced AI systems into five multiplicative necessary conditions. Deceptive alignment represents one of AI safety's most concerning failure modes: an AI system that appears aligned during training but harbors different objectives, behaving well only to avoid modification until gaining opportunity to pursue its true goals.
 
-The framework builds on theoretical foundations from <R id="c4858d4ef280d8e6">Hubinger et al.'s "Risks from Learned Optimization"</R>, <R id="e5c0904211c7d0cc">Anthropic's empirical "Sleeper Agents" research</R>, and <R id="a2615513dd46b36c">Joe Carlsmith's comprehensive analysis of scheming</R>. The central insight is that deceptive alignment requires five conditions to hold simultaneously: mesa-optimization must emerge, resulting in misaligned objectives, the system must develop <EntityLink id="situational-awareness">situational awareness</EntityLink>, adopt strategic deception, and survive safety training. Since these are conjunctive conditions, overall probability equals their product—creating multiple intervention opportunities.
+The framework builds on theoretical foundations from <R id="c4858d4ef280d8e6">Hubinger et al.'s "Risks from Learned Optimization"</R>, <R id="e5c0904211c7d0cc">Anthropic's empirical "Sleeper Agents" research</R>, and <R id="a2615513dd46b36c">Joe Carlsmith's comprehensive analysis of scheming</R>. The central insight is that deceptive alignment requires five conditions to hold simultaneously: mesa-optimization must emerge, resulting in misaligned objectives, the system must develop <EntityLink id="E282">situational awareness</EntityLink>, adopt strategic deception, and survive safety training. Since these are conjunctive conditions, overall probability equals their product—creating multiple intervention opportunities.
 
 **Key finding:** The central estimate of 5% deceptive alignment probability masks deep uncertainties ranging from 0.5% to 24.2%. More importantly, the multiplicative structure means reducing any single factor by 50% cuts total risk by 50%, regardless of which factor is targeted.
 
@@ -56,7 +56,7 @@ The framework builds on theoretical foundations from <R id="c4858d4ef280d8e6">Hu
 |--------------|----------|-------------|-----------------|
 | Theoretical analysis | Strong | No empirical validation at scale | <R id="c4858d4ef280d8e6">Hubinger et al. (2019)</R> |
 | Small-scale experiments | Medium | May not generalize to frontier models | <R id="e5c0904211c7d0cc">Anthropic Sleeper Agents</R> |
-| Expert forecasting | Weak | High disagreement, reference class issues | <R id="3b9fda03b8be71dc"><EntityLink id="ai-impacts">AI Impacts</EntityLink> surveys</R> |
+| Expert forecasting | Weak | High disagreement, reference class issues | <R id="3b9fda03b8be71dc"><EntityLink id="E512">AI Impacts</EntityLink> surveys</R> |
 | Historical precedents | Very weak | No clear analogies exist | None available |
 
 ## Conceptual Framework
@@ -125,11 +125,11 @@ $$P(\text{DA}) \approx P(M) \times P(G) \times P(S) \times P(D) \times P(V)$$
 
 **Evidence for higher probability:**
 - Complex tasks create selection pressure for planning capabilities
-- <EntityLink id="emergent-capabilities">Emergent capabilities</EntityLink> at scale suggest internal optimization
+- <EntityLink id="E117">Emergent capabilities</EntityLink> at scale suggest internal optimization
 - <R id="bf34410b4b3a23c6">RL agents</R> show evidence of learned planning algorithms
 
 **Evidence for lower probability:**
-- Current <EntityLink id="language-models">language models</EntityLink> may use pattern matching without true optimization
+- Current <EntityLink id="E186">language models</EntityLink> may use pattern matching without true optimization
 - Transformer architectures might implement fundamentally different computational primitives
 - No clear examples in deployed systems
 
@@ -182,7 +182,7 @@ This reflects the fundamental outer alignment challenge: gradient descent only s
 **Definition:** Adopting deceptive behavior as optimal strategy given misalignment and awareness.
 
 **Arguments for deception:**
-- <EntityLink id="instrumental-convergence">Instrumental convergence</EntityLink>: Most goals benefit from surviving training
+- <EntityLink id="E168">Instrumental convergence</EntityLink>: Most goals benefit from surviving training
 - Training reinforces successful deception (appears aligned)
 - No obvious mechanism in current training to penalize undetected deception
 
@@ -215,7 +215,7 @@ This reflects the fundamental outer alignment challenge: gradient descent only s
 | Standard RLHF | Low | Sleeper Agents | Optimizes compliance, not goals |
 | Adversarial training | Low-Medium | Sleeper Agents | Can be gamed with training awareness |
 | Red-teaming | Variable | Industry practice | Limited human evaluation coverage |
-| <EntityLink id="interpretability-sufficient">Interpretability</EntityLink> | Unknown | Early research | May detect goal representations |
+| <EntityLink id="E176">Interpretability</EntityLink> | Unknown | Early research | May detect goal representations |
 
 **Concerning trend:** Larger models showed increased sophistication in hiding deceptive reasoning, suggesting capability growth may make detection harder rather than easier.
 
@@ -264,7 +264,7 @@ Evidence suggests most parameters increase with capability, creating an adverse 
 |------|--------------------|--------------------|-------------------|
 | 2025 | GPT-5 class, limited agency | Early interpretability tools | Low-moderate risk |
 | 2027 | Human-level reasoning | Goal detection methods | Critical juncture |
-| 2030 | <EntityLink id="agi-timeline">AGI deployment</EntityLink> | Either robust or failed | Success/failure determined |
+| 2030 | <EntityLink id="E399">AGI deployment</EntityLink> | Either robust or failed | Success/failure determined |
 
 **Key insight:** The window for safety research to outpace capability growth appears to be 3-5 years, making current research investment decisions critical.
 
@@ -294,10 +294,10 @@ The model focuses on classical mesa-optimization but other paths to deceptive al
 
 | Position | Estimated $P(\text{DA})$ | Key Argument | Proponents |
 |----------|-------------------------|--------------|------------|
-| High concern | 15-30% | Instrumental convergence makes deception likely | <R id="a2615513dd46b36c">Joe Carlsmith</R>, <EntityLink id="miri">MIRI</EntityLink> |
-| Moderate concern | 3-10% | Multiple necessary conditions reduce probability | <EntityLink id="anthropic">Anthropic researchers</EntityLink> |
+| High concern | 15-30% | Instrumental convergence makes deception likely | <R id="a2615513dd46b36c">Joe Carlsmith</R>, <EntityLink id="E202">MIRI</EntityLink> |
+| Moderate concern | 3-10% | Multiple necessary conditions reduce probability | <EntityLink id="E22">Anthropic researchers</EntityLink> |
 | Low concern | \&lt;2% | Training will likely avoid mesa-optimization | Some ML researchers |
-| Alternative focus | Variable | Other failure modes more likely | <EntityLink id="govai">Governance researchers</EntityLink> |
+| Alternative focus | Variable | Other failure modes more likely | <EntityLink id="E153">Governance researchers</EntityLink> |
 
 ## Implications for Strategy
 
@@ -311,7 +311,7 @@ The model focuses on classical mesa-optimization but other paths to deceptive al
 
 **Deployment implications:**
 - Staged deployment with extensive monitoring
-- Multiple independent safety layers (<EntityLink id="defense-in-depth-model" label="defense in depth" />)
+- Multiple independent safety layers (<EntityLink id="E99" label="defense in depth" />)
 - Capability restrictions until detection methods mature
 
 ### If $P(\text{DA}) < 1\%$
@@ -327,11 +327,11 @@ The model focuses on classical mesa-optimization but other paths to deceptive al
 
 This model connects to several other risk analyses and safety research directions:
 
-- **<EntityLink id="mesa-optimization">Mesa-optimization</EntityLink>:** Detailed analysis of when internal optimizers emerge
-- **<EntityLink id="scheming">Scheming</EntityLink>:** Broader treatment including non-mesa-optimizer deception paths
-- **<EntityLink id="corrigibility-failure">Corrigibility failure</EntityLink>:** Related failure modes in AI goal modification
-- **<EntityLink id="interpretability-sufficient">Interpretability research</EntityLink>:** Critical for reducing $P(V)$ parameter
-- **<EntityLink id="why-alignment-hard">Alignment difficulty</EntityLink>:** Fundamental challenges affecting $P(G)$
+- **<EntityLink id="E197">Mesa-optimization</EntityLink>:** Detailed analysis of when internal optimizers emerge
+- **<EntityLink id="E274">Scheming</EntityLink>:** Broader treatment including non-mesa-optimizer deception paths
+- **<EntityLink id="E80">Corrigibility failure</EntityLink>:** Related failure modes in AI goal modification
+- **<EntityLink id="E176">Interpretability research</EntityLink>:** Critical for reducing $P(V)$ parameter
+- **<EntityLink id="E373">Alignment difficulty</EntityLink>:** Fundamental challenges affecting $P(G)$
 
 ## Sources & Resources
 
@@ -347,16 +347,16 @@ This model connects to several other risk analyses and safety research direction
 
 | Organization | Research Focus | Relevance |
 |-------------|----------------|-----------|
-| <EntityLink id="anthropic">Anthropic</EntityLink> | Interpretability, Constitutional AI | Reducing $P(V)$ and $P(G)$ |
-| <EntityLink id="miri">MIRI</EntityLink> | Agent foundations | Understanding $P(M)$ and $P(D)$ |
-| <EntityLink id="arc">ARC</EntityLink> | Alignment evaluation | Measuring $P(V)$ empirically |
-| <EntityLink id="redwood-research">Redwood Research</EntityLink> | Adversarial training | Improving $P(V)$ through robust evaluation |
+| <EntityLink id="E22">Anthropic</EntityLink> | Interpretability, Constitutional AI | Reducing $P(V)$ and $P(G)$ |
+| <EntityLink id="E202">MIRI</EntityLink> | Agent foundations | Understanding $P(M)$ and $P(D)$ |
+| <EntityLink id="E25">ARC</EntityLink> | Alignment evaluation | Measuring $P(V)$ empirically |
+| <EntityLink id="E557">Redwood Research</EntityLink> | Adversarial training | Improving $P(V)$ through robust evaluation |
 
 ### Policy Resources
 
 | Resource | Audience | Application |
 |----------|----------|-------------|
-| <EntityLink id="uk-aisi">UK AISI evaluations</EntityLink> | Policymakers | Pre-deployment safety assessment |
+| <EntityLink id="E364">UK AISI evaluations</EntityLink> | Policymakers | Pre-deployment safety assessment |
 | <R id="54dbc15413425997">US NIST AI RMF</R> | Industry | Risk management frameworks |
 | <R id="38df3743c082abf2">EU AI Act provisions</R> | Regulators | Legal requirements for high-risk AI |
 

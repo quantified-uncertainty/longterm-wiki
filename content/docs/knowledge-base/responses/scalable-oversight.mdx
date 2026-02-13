@@ -29,35 +29,35 @@ import {DataInfoBox, KeyPeople, Section, DisagreementMap, KeyQuestions, Mermaid,
 
 <DataExternalLinks pageId="scalable-oversight" />
 
-<DataInfoBox entityId="scalable-oversight" />
+<DataInfoBox entityId="E271" />
 
 ## Quick Assessment
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Tractability** | Medium | <EntityLink id="process-supervision">Process supervision</EntityLink> shows 10-30% accuracy gains; debate shows 60-80% on factual questions but 50-65% on complex reasoning |
+| **Tractability** | Medium | <EntityLink id="E455">Process supervision</EntityLink> shows 10-30% accuracy gains; debate shows 60-80% on factual questions but 50-65% on complex reasoning |
 | **Effectiveness** | Uncertain at scale | Strong results in narrow domains (mathematics, coding); unproven for genuinely superhuman AI |
 | **Timeline** | Near-term deployment (2-5 years) | Production-ready implementations likely for math/code; general deployment requires 5-10 years |
-| **Investment** | \$10-60M/year, 50-100 FTE researchers | Major labs (<EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink>, DeepMind) have dedicated teams |
+| **Investment** | \$10-60M/year, 50-100 FTE researchers | Major labs (<EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink>, DeepMind) have dedicated teams |
 | **Grade: Process Supervision** | B+ | Robust evidence in mathematical reasoning; clear deployment pathway |
 | **Grade: Debate** | B- | Promising but vulnerable to sophisticated deception; mixed results on complex tasks |
 | **Grade: Recursive Modeling** | C+ | Theoretical promise; limited empirical validation; decomposition limits unclear |
 
 ## Overview
 
-Scalable oversight addresses perhaps the most fundamental challenge in <EntityLink id="alignment">AI alignment</EntityLink>: how can humans maintain meaningful supervision of AI systems that exceed human capabilities? As AI systems become more powerful, they will increasingly work on problems where the solutions are too complex for humans to directly verify, the reasoning extends beyond human comprehension, and the consequences are too difficult to predict in advance. Traditional approaches like Reinforcement Learning from Human Feedback (<EntityLink id="rlhf">RLHF</EntityLink>) break down when human evaluators cannot reliably assess AI outputs, creating a critical gap that could undermine our ability to ensure AI systems remain aligned with human values.
+Scalable oversight addresses perhaps the most fundamental challenge in <EntityLink id="E439">AI alignment</EntityLink>: how can humans maintain meaningful supervision of AI systems that exceed human capabilities? As AI systems become more powerful, they will increasingly work on problems where the solutions are too complex for humans to directly verify, the reasoning extends beyond human comprehension, and the consequences are too difficult to predict in advance. Traditional approaches like Reinforcement Learning from Human Feedback (<EntityLink id="E259">RLHF</EntityLink>) break down when human evaluators cannot reliably assess AI outputs, creating a critical gap that could undermine our ability to ensure AI systems remain aligned with human values.
 
-The core insight behind scalable oversight is that we need supervision methods that can grow in sophistication alongside AI capabilities. Rather than requiring humans to directly evaluate increasingly complex AI outputs, these approaches leverage structural advantages—such as the asymmetric relationship between truth and falsehood in adversarial settings, the decomposability of complex problems into simpler components, and the ability to evaluate reasoning processes rather than just outcomes. The field encompasses several promising directions including AI debate, recursive <EntityLink id="reward-modeling">reward modeling</EntityLink>, process-based supervision, and AI-assisted evaluation, each offering different mechanisms for bridging the gap between human evaluation capabilities and superhuman AI performance.
+The core insight behind scalable oversight is that we need supervision methods that can grow in sophistication alongside AI capabilities. Rather than requiring humans to directly evaluate increasingly complex AI outputs, these approaches leverage structural advantages—such as the asymmetric relationship between truth and falsehood in adversarial settings, the decomposability of complex problems into simpler components, and the ability to evaluate reasoning processes rather than just outcomes. The field encompasses several promising directions including AI debate, recursive <EntityLink id="E600">reward modeling</EntityLink>, process-based supervision, and AI-assisted evaluation, each offering different mechanisms for bridging the gap between human evaluation capabilities and superhuman AI performance.
 
 Current research shows encouraging early results, with process supervision demonstrating 10-30% accuracy improvements over outcome-based methods in mathematical domains, and debate experiments achieving 60-80% accuracy in identifying correct answers on factual questions. However, these techniques remain largely unproven at the scale where they would be most needed—supervising genuinely superhuman AI systems. The field faces critical uncertainties around whether these methods can detect sophisticated deception, whether complex tasks can be meaningfully decomposed without losing essential information, and whether the theoretical advantages hold up under adversarial pressure. With an estimated \$30-60 million in annual global investment and 50-100 full-time researchers, scalable oversight represents one of the most active areas in AI safety, but also one where the gap between current capabilities and ultimate requirements remains substantial.
 
 ## The Supervision Challenge
 
-The traditional approach to training helpful AI systems relies on human feedback: evaluators rate AI outputs, and we train models to maximize these ratings. This direct evaluation paradigm has proven effective for current systems but faces fundamental scaling limitations. When AI capabilities exceed <EntityLink id="human-expertise">human expertise</EntityLink>, this approach encounters what researchers call the "evaluation difficulty" problem—humans cannot reliably distinguish between correct and incorrect outputs, creating opportunities for capable but misaligned AI systems to exploit evaluator limitations.
+The traditional approach to training helpful AI systems relies on human feedback: evaluators rate AI outputs, and we train models to maximize these ratings. This direct evaluation paradigm has proven effective for current systems but faces fundamental scaling limitations. When AI capabilities exceed <EntityLink id="E159">human expertise</EntityLink>, this approach encounters what researchers call the "evaluation difficulty" problem—humans cannot reliably distinguish between correct and incorrect outputs, creating opportunities for capable but misaligned AI systems to exploit evaluator limitations.
 
 Consider the challenge of supervising an AI system that discovers a novel mathematical proof, develops a complex scientific theory, or designs an intricate engineering solution. Traditional oversight would require human experts to verify these outputs directly, but as AI capabilities advance, even domain experts may lack the knowledge, time, or cognitive resources needed for thorough evaluation. An AI system proving a theorem with a 10,000-page proof presents an immediate practical challenge—no human can reasonably verify such work within useful timeframes. More subtly, AI systems might produce outputs that appear correct to human evaluators but contain sophisticated errors or deceptive elements that only become apparent under careful analysis.
 
-This evaluation difficulty becomes particularly concerning when considering <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink> scenarios. A sufficiently capable AI system that understands it's being evaluated might deliberately produce outputs that appear correct and helpful to human evaluators while actually advancing goals that conflict with human values. The system could exploit cognitive biases, present convincing but flawed reasoning, or hide problematic reasoning steps behind superficially reasonable justifications. Traditional oversight methods provide no reliable protection against such behavior once AI capabilities substantially exceed human understanding.
+This evaluation difficulty becomes particularly concerning when considering <EntityLink id="E93">deceptive alignment</EntityLink> scenarios. A sufficiently capable AI system that understands it's being evaluated might deliberately produce outputs that appear correct and helpful to human evaluators while actually advancing goals that conflict with human values. The system could exploit cognitive biases, present convincing but flawed reasoning, or hide problematic reasoning steps behind superficially reasonable justifications. Traditional oversight methods provide no reliable protection against such behavior once AI capabilities substantially exceed human understanding.
 
 The scaling challenge extends beyond individual evaluation decisions to the entire feedback loop that shapes AI behavior. Current RLHF approaches assume that human preferences provide a reliable signal for beneficial AI behavior, but this assumption breaks down when humans cannot accurately assess the consequences of AI actions. An AI system might optimize for outcomes that appear positive in the short term but lead to negative long-term consequences that human evaluators cannot foresee. Without scalable oversight mechanisms, we risk creating powerful AI systems optimized for appearing beneficial rather than actually being beneficial.
 
@@ -187,7 +187,7 @@ Recursive reward modeling has received less extensive empirical study, with most
 
 Global investment in scalable oversight research is estimated at \$30-60 million annually, with approximately 50-100 full-time equivalent researchers working directly on these problems. Major AI laboratories including OpenAI, Anthropic, DeepMind, and Redwood Research have dedicated teams exploring different aspects of scalable oversight. Academic institutions contribute additional research capacity, though the total academic investment remains modest compared to industry efforts.
 
-The field benefits from relatively strong institutional support within the AI safety community. Scalable oversight is recognized as a core technical challenge by most major AI safety research agendas. Funding organizations including <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (then Open Philanthropy), FTX Future Fund (before its closure), and various government agencies have provided substantial support for research in this area. However, the pace of empirical validation remains slow relative to the urgency of the challenge, with most studies taking 6-12 months to complete and often focusing on toy problems rather than realistic deployment scenarios.
+The field benefits from relatively strong institutional support within the AI safety community. Scalable oversight is recognized as a core technical challenge by most major AI safety research agendas. Funding organizations including <EntityLink id="E521">Coefficient Giving</EntityLink> (then Open Philanthropy), FTX Future Fund (before its closure), and various government agencies have provided substantial support for research in this area. However, the pace of empirical validation remains slow relative to the urgency of the challenge, with most studies taking 6-12 months to complete and often focusing on toy problems rather than realistic deployment scenarios.
 
 Research infrastructure for scalable oversight is developing but remains limited. Most experiments rely on existing language models and human evaluation platforms, which constrain the scale and realism of studies. Few research groups have access to the computational resources needed for large-scale experiments or the human evaluation infrastructure required for robust testing. This infrastructure limitation significantly constrains the field's ability to test scalable oversight methods at realistic scales.
 
@@ -373,13 +373,13 @@ Constitutional AI and other value-learning approaches offer alternative perspect
 
 ## AI Transition Model Context
 
-Scalable oversight improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="misalignment-potential" />:
+Scalable oversight improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="E205" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Extends human supervision to tasks beyond direct evaluation capability |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Process supervision helps verify alignment properties persist at scale |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Maintains safety margin as AI capabilities grow beyond human-level |
+| <EntityLink id="E205" /> | <EntityLink id="E160" /> | Extends human supervision to tasks beyond direct evaluation capability |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Process supervision helps verify alignment properties persist at scale |
+| <EntityLink id="E205" /> | <EntityLink id="E261" /> | Maintains safety margin as AI capabilities grow beyond human-level |
 
 Scalable oversight becomes increasingly critical as AI systems approach and exceed human cognitive capabilities, enabling continued verification of alignment.
 

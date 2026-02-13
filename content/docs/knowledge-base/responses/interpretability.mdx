@@ -35,7 +35,7 @@ import {DataInfoBox, KeyPeople, Section, DisagreementMap, KeyQuestions, Mermaid,
 
 <DataExternalLinks pageId="interpretability" />
 
-<DataInfoBox entityId="interpretability" />
+<DataInfoBox entityId="E174" />
 
 <KeyTakeaways>
 - **34M+ interpretable features** extracted from Claude 3 Sonnet, but less than 5% of frontier model computations are currently understood
@@ -48,7 +48,7 @@ import {DataInfoBox, KeyPeople, Section, DisagreementMap, KeyQuestions, Mermaid,
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Research Investment** | High | \$50-100M/year globally; <EntityLink id="goodfire">Goodfire</EntityLink> [raised \$50M Series A](https://www.prnewswire.com/news-releases/goodfire-raises-50m-series-a-to-advance-ai-interpretability-research-302431030.html) (April 2025); <EntityLink id="anthropic">Anthropic</EntityLink>, DeepMind, <EntityLink id="openai">OpenAI</EntityLink> have dedicated teams |
+| **Research Investment** | High | \$50-100M/year globally; <EntityLink id="E430">Goodfire</EntityLink> [raised \$50M Series A](https://www.prnewswire.com/news-releases/goodfire-raises-50m-series-a-to-advance-ai-interpretability-research-302431030.html) (April 2025); <EntityLink id="E22">Anthropic</EntityLink>, DeepMind, <EntityLink id="E218">OpenAI</EntityLink> have dedicated teams |
 | **Model Coverage** | Low (less than 5%) | Current techniques explain less than 5% of frontier model computations; [DeepMind deprioritized SAEs](https://arxiv.org/abs/2404.14082) after limited safety application results |
 | **Feature Discovery** | Accelerating (34M+ features) | Anthropic extracted 34M+ interpretable features from Claude 3 Sonnet with 90% automated labeling accuracy |
 | **Scaling Progress** | Promising but uncertain | [Gemma Scope 2](https://deepmind.google/discover/blog/gemma-scope-2/) covers models up to 27B parameters; 110 PB data storage required |
@@ -63,13 +63,13 @@ import {DataInfoBox, KeyPeople, Section, DisagreementMap, KeyQuestions, Mermaid,
 |--------|------|
 | Official Website | [neelnanda.io](https://www.neelnanda.io/mechanistic-interpretability/glossary) |
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Mechanistic_interpretability) |
-| <EntityLink id="lesswrong">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/g6rpo6hshodRaaZF3/mech-interp-wiki-page-and-why-you-should-edit-wikipedia-1) |
+| <EntityLink id="E538">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/g6rpo6hshodRaaZF3/mech-interp-wiki-page-and-why-you-should-edit-wikipedia-1) |
 
 ## Overview
 
 Mechanistic interpretability represents one of the most technically promising yet challenging approaches to AI safety, seeking to understand artificial intelligence systems by reverse-engineering their internal computations rather than treating them as black boxes. The field aims to identify meaningful circuits, features, and algorithms that explain model behavior at a granular level, providing transparency into the cognitive processes that drive AI decision-making.
 
-The safety implications are profound: if successful, mechanistic interpretability could enable direct detection of deceptive or misaligned cognition, verification that models have learned intended concepts rather than harmful proxies, and understanding of unexpected capabilities before they <EntityLink id="manifest">manifest</EntityLink> in deployment. This represents a fundamental shift from behavioral evaluation—which sophisticated models could potentially game—toward direct inspection of the computational mechanisms underlying AI reasoning. With an estimated \$10-100 million in annual global investment and rapid technical progress, the field has demonstrated preliminary success in finding safety-relevant features in frontier models, though significant scalability challenges remain.
+The safety implications are profound: if successful, mechanistic interpretability could enable direct detection of deceptive or misaligned cognition, verification that models have learned intended concepts rather than harmful proxies, and understanding of unexpected capabilities before they <EntityLink id="E545">manifest</EntityLink> in deployment. This represents a fundamental shift from behavioral evaluation—which sophisticated models could potentially game—toward direct inspection of the computational mechanisms underlying AI reasoning. With an estimated \$10-100 million in annual global investment and rapid technical progress, the field has demonstrated preliminary success in finding safety-relevant features in frontier models, though significant scalability challenges remain.
 
 Current evidence suggests mechanistic interpretability occupies a critical position in the AI safety landscape: essential if alignment proves difficult (as the only reliable way to detect sophisticated deception), but valuable even if alignment proves easier (for verification and robustness). [MIT Technology Review named mechanistic interpretability one of its 10 Breakthrough Technologies for 2026](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/), recognizing its potential to transform AI safety. However, with less than 5% of frontier model computations currently understood and a 3-7 year estimated timeline to safety-critical applications, the approach faces a race against the pace of AI development. As [Dario Amodei noted](https://www.darioamodei.com/post/the-urgency-of-interpretability), interpretability is "among the best bets to help us transform black-box neural networks into understandable, steerable systems."
 
@@ -210,7 +210,7 @@ Mechanistic interpretability has attracted substantial investment from major AI 
 | **Anthropic** | \$25-40M | 30-50 | Scaling Monosemanticity, Attribution Graphs, Circuit Tracing | \$5-10M/year in SAE training |
 | **Google DeepMind** | \$15-25M | 20-30 | Gemma Scope 2, Tracr compiler | 110 PB data storage for Gemma Scope |
 | **OpenAI** | \$10-15M | 10-20 | Sparse circuits research, [AI lie detector development](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/) | Undisclosed |
-| **<EntityLink id="goodfire">Goodfire</EntityLink>** | \$50M raised (Series A, April 2025) | 15-25 | Ember platform, open-source SAE tools | Growing |
+| **<EntityLink id="E430">Goodfire</EntityLink>** | \$50M raised (Series A, April 2025) | 15-25 | Ember platform, open-source SAE tools | Growing |
 | **Academic Sector** | \$10-20M | 30-50 | Theoretical foundations, benchmarking | Limited; often under \$1M/project |
 | **Total Global** | **\$75-150M** | **150-200** | — | **\$15-30M/year** |
 
@@ -280,11 +280,11 @@ Despite these uncertainties, mechanistic interpretability represents one of the 
 
 | Risk | Mechanism | Effectiveness |
 |------|-----------|---------------|
-| <EntityLink id="deceptive-alignment" /> | Detect deception-related features/circuits | Medium-High (if scalable) |
-| <EntityLink id="scheming" /> | Find evidence of strategic deception | Medium-High |
-| <EntityLink id="mesa-optimization" /> | Identify mesa-objectives in model internals | Medium |
-| <EntityLink id="reward-hacking" /> | Detect proxy optimization vs. true goals | Medium |
-| <EntityLink id="goal-misgeneralization" /> | Understand learned goal representations | Medium |
+| <EntityLink id="E93" /> | Detect deception-related features/circuits | Medium-High (if scalable) |
+| <EntityLink id="E274" /> | Find evidence of strategic deception | Medium-High |
+| <EntityLink id="E197" /> | Identify mesa-objectives in model internals | Medium |
+| <EntityLink id="E253" /> | Detect proxy optimization vs. true goals | Medium |
+| <EntityLink id="E151" /> | Understand learned goal representations | Medium |
 
 <DisagreementMap
   topic="Effectiveness of Interpretability for AI Safety"
@@ -300,9 +300,9 @@ Despite these uncertainties, mechanistic interpretability represents one of the 
 
 ## Complementary Interventions
 
-- <EntityLink id="ai-control" /> - Defense-in-depth if interpretability misses something
-- <EntityLink id="evals" /> - Behavioral testing complements internal analysis
-- <EntityLink id="scalable-oversight" /> - Process-based methods as alternative/complement
+- <EntityLink id="E6" /> - Defense-in-depth if interpretability misses something
+- <EntityLink id="E128" /> - Behavioral testing complements internal analysis
+- <EntityLink id="E271" /> - Process-based methods as alternative/complement
 
 <Section title="Key People">
   <KeyPeople people={[
@@ -350,13 +350,13 @@ Despite these uncertainties, mechanistic interpretability represents one of the 
 
 ## AI Transition Model Context
 
-Interpretability improves the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="misalignment-potential" />:
+Interpretability improves the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="E205" />:
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="interpretability-coverage" /> | Direct improvement—this is the core parameter interpretability affects |
-| <EntityLink id="alignment-robustness" /> | Enables verification that alignment techniques actually work |
-| <EntityLink id="safety-capability-gap" /> | Helps close the gap by providing tools to understand advanced AI |
+| <EntityLink id="E175" /> | Direct improvement—this is the core parameter interpretability affects |
+| <EntityLink id="E20" /> | Enables verification that alignment techniques actually work |
+| <EntityLink id="E261" /> | Helps close the gap by providing tools to understand advanced AI |
 
-Interpretability reduces <EntityLink id="existential-catastrophe" /> probability by enabling detection of <EntityLink id="scheming" /> and <EntityLink id="deceptive-alignment" />.
+Interpretability reduces <EntityLink id="E130" /> probability by enabling detection of <EntityLink id="E274" /> and <EntityLink id="E93" />.
 

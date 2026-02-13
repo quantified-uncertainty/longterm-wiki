@@ -31,13 +31,13 @@ subcategory: analysis-models
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="compounding-risks-analysis" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E63" ratings={frontmatter.ratings} />
 
 ## Overview
 
-When multiple AI risks occur simultaneously, their combined impact often dramatically exceeds simple addition. This mathematical framework analyzes how <EntityLink id="racing-dynamics">racing dynamics</EntityLink>, <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>, and <EntityLink id="irreversibility">lock-in scenarios</EntityLink> interact through four compounding mechanisms. The central insight: a world with three moderate risks isn't 3x as dangerous as one with a single risk—it can be 10-20x more dangerous due to multiplicative interactions.
+When multiple AI risks occur simultaneously, their combined impact often dramatically exceeds simple addition. This mathematical framework analyzes how <EntityLink id="E239">racing dynamics</EntityLink>, <EntityLink id="E93">deceptive alignment</EntityLink>, and <EntityLink id="E179">lock-in scenarios</EntityLink> interact through four compounding mechanisms. The central insight: a world with three moderate risks isn't 3x as dangerous as one with a single risk—it can be 10-20x more dangerous due to multiplicative interactions.
 
-Analysis of high-risk combinations reveals that racing+deceptive alignment scenarios carry 3-8% catastrophic probability, while <EntityLink id="mesa-optimization">mesa-optimization</EntityLink>+<EntityLink id="scheming">scheming</EntityLink> pathways show 2-6% existential risk. Traditional additive risk models systematically underestimate total danger by factors of 2-5x because they ignore how risks amplify each other's likelihood, severity, and defensive evasion.
+Analysis of high-risk combinations reveals that racing+deceptive alignment scenarios carry 3-8% catastrophic probability, while <EntityLink id="E197">mesa-optimization</EntityLink>+<EntityLink id="E274">scheming</EntityLink> pathways show 2-6% existential risk. Traditional additive risk models systematically underestimate total danger by factors of 2-5x because they ignore how risks amplify each other's likelihood, severity, and defensive evasion.
 
 The framework provides quantitative interaction coefficients (α values of 2-10x for severity multiplication, 3-6x for probability amplification) and mathematical models to correct this systematic underestimation. This matters for resource allocation: reducing compound pathways often provides higher leverage than addressing individual risks in isolation.
 
@@ -46,10 +46,10 @@ The framework provides quantitative interaction coefficients (α values of 2-10x
 | Risk Combination | Interaction Type | Compound Probability | Severity Multiplier | Confidence Level |
 |------------------|------------------|---------------------|-------------------|------------------|
 | Racing + Deceptive Alignment | Probability multiplication | 15.8% vs 4.5% baseline | 3.5x | Medium |
-| Deceptive + <EntityLink id="lock-in">Lock-in</EntityLink> | Severity multiplication | 8% | 8-10x | Medium |
-| <EntityLink id="expertise-atrophy">Expertise Atrophy</EntityLink> + Corrigibility Failure | Defense negation | Variable | 3.3x | Medium-High |
+| Deceptive + <EntityLink id="E189">Lock-in</EntityLink> | Severity multiplication | 8% | 8-10x | Medium |
+| <EntityLink id="E133">Expertise Atrophy</EntityLink> + Corrigibility Failure | Defense negation | Variable | 3.3x | Medium-High |
 | Mesa-opt + Scheming | Nonlinear combined | 2-6% catastrophic | Discontinuous | Medium |
-| <EntityLink id="epistemic-collapse">Epistemic Collapse</EntityLink> + Democratic Failure | Threshold crossing | 8-20% | Qualitative change | Low |
+| <EntityLink id="E119">Epistemic Collapse</EntityLink> + Democratic Failure | Threshold crossing | 8-20% | Qualitative change | Low |
 
 ## Compounding Mechanisms Framework
 
@@ -79,7 +79,7 @@ When Risk A increases the likelihood of Risk B:
 | Intense racing | 35% | 45% | 15.8% | 3.5x |
 | Extreme racing | 50% | 55% | 27.5% | 6.1x |
 
-**Mechanism**: <EntityLink id="racing-dynamics">Racing dynamics</EntityLink> compress safety timelines → inadequate testing → higher probability of <EntityLink id="mesa-optimization">mesa-optimization</EntityLink> → higher probability of <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>.
+**Mechanism**: <EntityLink id="E239">Racing dynamics</EntityLink> compress safety timelines → inadequate testing → higher probability of <EntityLink id="E197">mesa-optimization</EntityLink> → higher probability of <EntityLink id="E93">deceptive alignment</EntityLink>.
 
 ### Type 2: Severity Multiplication
 
@@ -88,17 +88,17 @@ When combined risks produce worse outcomes than the sum of individual impacts:
 | Individual Risk | Standalone Impact | Combined with Lock-in | Severity Multiplier |
 |-----------------|-------------------|----------------------|-------------------|
 | Deceptive Alignment | High (misaligned optimization) | Catastrophic (trapped forever) | 8-10x |
-| <EntityLink id="corrigibility-failure">Corrigibility Failure</EntityLink> | Medium (hard to correct) | Severe (permanent embedding) | 4-6x |
-| <EntityLink id="sycophancy">Sycophancy</EntityLink> | Low (biased advice) | High (institutionalized bias) | 3-5x |
+| <EntityLink id="E80">Corrigibility Failure</EntityLink> | Medium (hard to correct) | Severe (permanent embedding) | 4-6x |
+| <EntityLink id="E295">Sycophancy</EntityLink> | Low (biased advice) | High (institutionalized bias) | 3-5x |
 
 ### Type 3: Defense Negation
 
 When Risk A disables safeguards against Risk B:
 
-| <EntityLink id="human-expertise">Human Expertise</EntityLink> Level | P(Detect Deceptive Behavior) | P(Catastrophe \| Undetected) | Total Catastrophe Risk |
+| <EntityLink id="E159">Human Expertise</EntityLink> Level | P(Detect Deceptive Behavior) | P(Catastrophe \| Undetected) | Total Catastrophe Risk |
 |-----------------------|-------------------------------|------------------------------|----------------------|
 | Full expertise maintained | 60% | 15% | 6% |
-| Moderate <EntityLink id="expertise-atrophy">expertise atrophy</EntityLink> | 35% | 30% | 19.5% (3.3x) |
+| Moderate <EntityLink id="E133">expertise atrophy</EntityLink> | 35% | 30% | 19.5% (3.3x) |
 | Severe expertise atrophy | 15% | 50% | 42.5% (7x) |
 
 ### Type 4: Nonlinear Combined Effects
@@ -136,9 +136,9 @@ When interactions produce qualitatively different outcomes:
 |--------|--------|-------------------------|--------------------------|-----------------|
 | Racing + Deceptive Alignment | 3.0-5.0 | 3-8% | <R id="cd3035dbef6c7b5b">Amodei et al. (2016)</R> |
 | Deceptive + Lock-in | 5.0-10.0 | 8-15% | <R id="64ad308db00b3ce7">Carlsmith (2021)</R> |
-| <EntityLink id="mesa-optimization">Mesa-optimization</EntityLink> + <EntityLink id="scheming">Scheming</EntityLink> | 3.0-6.0 | 2-6% | <R id="c4858d4ef280d8e6">Hubinger et al. (2019)</R> |
+| <EntityLink id="E197">Mesa-optimization</EntityLink> + <EntityLink id="E274">Scheming</EntityLink> | 3.0-6.0 | 2-6% | <R id="c4858d4ef280d8e6">Hubinger et al. (2019)</R> |
 | Expertise Atrophy + Corrigibility Failure | 2.0-4.0 | 5-12% | <R id="eecd7c0e9ebb9cbe">RAND Corporation</R> |
-| <EntityLink id="winner-take-all">Concentration</EntityLink> + <EntityLink id="authoritarian-tools">Authoritarian Tools</EntityLink> | 3.0-5.0 | 5-12% | <R id="a306e0b63bdedbd5">Center for AI Safety</R> |
+| <EntityLink id="E374">Concentration</EntityLink> + <EntityLink id="E30">Authoritarian Tools</EntityLink> | 3.0-5.0 | 5-12% | <R id="a306e0b63bdedbd5">Center for AI Safety</R> |
 
 ### Three-Way Compound Scenarios
 
@@ -200,15 +200,15 @@ $$E[Risk] = 0.15(0.9) + 0.40(0.7) + 0.25(0.4) + 0.20(0.65) = 0.645$$
 
 **Accelerating Factors**:
 - Geopolitical competition intensifying AI race
-- <EntityLink id="scaling-debate">Scaling laws</EntityLink> driving capability advances
+- <EntityLink id="E272">Scaling laws</EntityLink> driving capability advances
 - Economic incentives favoring rapid deployment
 - Regulatory lag behind capability development
 
 **Mitigating Factors**:
 - Growing AI safety community and funding
-- Industry <EntityLink id="voluntary-commitments">voluntary commitments</EntityLink>
-- International coordination efforts (<EntityLink id="seoul-declaration">Seoul Declaration</EntityLink>)
-- Technical progress on <EntityLink id="interpretability-sufficient">interpretability</EntityLink> and alignment
+- Industry <EntityLink id="E369">voluntary commitments</EntityLink>
+- International coordination efforts (<EntityLink id="E279">Seoul Declaration</EntityLink>)
+- Technical progress on <EntityLink id="E176">interpretability</EntityLink> and alignment
 
 ## High-Leverage Interventions
 
@@ -269,8 +269,8 @@ $$E[Risk] = 0.15(0.9) + 0.40(0.7) + 0.25(0.4) + 0.20(0.65) = 0.645$$
 |-------------|-----------------|------------------|------------------|
 | **Interaction stability** | Coefficients decrease as AI improves | Coefficients increase with capability | Mixed signals from capability research |
 | **Threshold existence** | Gradual degradation, no sharp cutoffs | Clear tipping points exist | Limited historical analogies |
-| **Intervention effectiveness** | Targeted interventions highly effective | System too complex for reliable intervention | Early positive results from <EntityLink id="responsible-scaling-policies">responsible scaling</EntityLink> |
-| **Timeline urgency** | Compound effects emerge slowly (10+ years) | Critical combinations possible by 2030 | <EntityLink id="agi-timeline-debate">AGI timeline uncertainty</EntityLink> |
+| **Intervention effectiveness** | Targeted interventions highly effective | System too complex for reliable intervention | Early positive results from <EntityLink id="E252">responsible scaling</EntityLink> |
+| **Timeline urgency** | Compound effects emerge slowly (10+ years) | Critical combinations possible by 2030 | <EntityLink id="E4">AGI timeline uncertainty</EntityLink> |
 
 ## Limitations & Model Validity
 
@@ -278,7 +278,7 @@ $$E[Risk] = 0.15(0.9) + 0.40(0.7) + 0.25(0.4) + 0.20(0.65) = 0.645$$
 
 **Interaction coefficient uncertainty**: α values are based primarily on expert judgment and theoretical reasoning rather than empirical measurement. Different analysts could reasonably propose coefficients differing by 2-3x, dramatically changing risk estimates. The <R id="a306e0b63bdedbd5">Center for AI Safety</R> and <R id="1593095c92d34ed8">Future of Humanity Institute</R> have noted similar calibration challenges in compound risk assessment.
 
-**Higher-order effects**: The model focuses on pairwise interactions but real catastrophic scenarios likely require 4+ simultaneous risks. The <EntityLink id="ai-risk-portfolio-analysis" /> suggests higher-order terms may dominate in extreme scenarios.
+**Higher-order effects**: The model focuses on pairwise interactions but real catastrophic scenarios likely require 4+ simultaneous risks. The <EntityLink id="E12" /> suggests higher-order terms may dominate in extreme scenarios.
 
 **Temporal dynamics**: Risk probabilities and interaction strengths evolve as AI capabilities advance. Racing dynamics mild today may intensify rapidly; interaction effects manageable at current capability levels may become overwhelming as systems become more powerful.
 

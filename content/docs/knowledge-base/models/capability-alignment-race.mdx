@@ -37,7 +37,7 @@ import CauseEffectGraph from '@components/CauseEffectGraph';
 
 The Capability-Alignment Race Model quantifies the fundamental dynamic determining AI safety: the gap between advancing capabilities and our readiness to safely deploy them. Current analysis shows capabilities ~3 years ahead of alignment readiness, with this gap widening at 0.5 years annually. 
 
-The model tracks how frontier compute (currently 10²⁶ FLOP for largest training runs) and algorithmic improvements drive capability progress at ~10-15 percentage points per year, while alignment research (interpretability at ~15% coverage, <EntityLink id="scalable-oversight">scalable oversight</EntityLink> at ~30% maturity) advances more slowly. This creates deployment pressure worth \$100B annually, racing against governance systems operating at ~25% effectiveness.
+The model tracks how frontier compute (currently 10²⁶ FLOP for largest training runs) and algorithmic improvements drive capability progress at ~10-15 percentage points per year, while alignment research (interpretability at ~15% coverage, <EntityLink id="E271">scalable oversight</EntityLink> at ~30% maturity) advances more slowly. This creates deployment pressure worth \$100B annually, racing against governance systems operating at ~25% effectiveness.
 
 <div class="breakout">
 <CauseEffectGraph
@@ -418,7 +418,7 @@ The model tracks how frontier compute (currently 10²⁶ FLOP for largest traini
 
 | Component | Current State | Growth Rate | 2027 Projection | Source |
 |-----------|---------------|-------------|------------------|--------|
-| Training compute | 10²⁶ FLOP | 4x/year | 10²⁸ FLOP | <R id="2efa03ce0d906d78"><EntityLink id="epoch-ai">Epoch AI</EntityLink></R> |
+| Training compute | 10²⁶ FLOP | 4x/year | 10²⁸ FLOP | <R id="2efa03ce0d906d78"><EntityLink id="E125">Epoch AI</EntityLink></R> |
 | Algorithmic efficiency | 2x 2024 baseline | 1.5x/year | 3.4x baseline | <R id="6c2f85e163e0c4a4">Erdil & Besiroglu (2023)</R> |
 | Performance (MMLU) | 89% | +8pp/year | >95% | <R id="a2cf0d0271acb097">Anthropic</R> |
 | Frontier lab lead | 6 months | Stable | 3-6 months | <R id="0532c540957038e6">RAND</R> |
@@ -442,7 +442,7 @@ Economic value drives rapid deployment, creating misalignment between safety nee
 | Military competition | 0.6/1.0 intensity | Increasing | 0.8/1.0 | Arms control treaties |
 | Lab competition | 6 month lead | Shortening | 3 month lead | Industry coordination |
 
-Quote from <R id="ebb2f8283d5a6014"><EntityLink id="paul-christiano">Paul Christiano</EntityLink></R>: "The core challenge is that capabilities are advancing faster than our ability to align them. If this gap continues to widen, we'll be in serious trouble."
+Quote from <R id="ebb2f8283d5a6014"><EntityLink id="E220">Paul Christiano</EntityLink></R>: "The core challenge is that capabilities are advancing faster than our ability to align them. If this gap continues to widen, we'll be in serious trouble."
 
 ## Current State & Trajectory
 
@@ -464,7 +464,7 @@ The race is in a critical phase with capabilities accelerating faster than align
 | Governance strength | 0.25/1.0 | 0.4/1.0 | 0.6/1.0 | Improving |
 | Warning shot probability | 15%/year | 20%/year | 25%/year | Increasing |
 
-Based on <R id="8fef0d8c902de618"><EntityLink id="metaculus">Metaculus</EntityLink> forecasts</R> and expert surveys from <R id="38eba87d0a888e2e"><EntityLink id="ai-impacts">AI Impacts</EntityLink></R>.
+Based on <R id="8fef0d8c902de618"><EntityLink id="E199">Metaculus</EntityLink> forecasts</R> and expert surveys from <R id="38eba87d0a888e2e"><EntityLink id="E512">AI Impacts</EntityLink></R>.
 
 ### Potential Turning Points
 
@@ -488,7 +488,7 @@ Critical junctures that could alter trajectories:
 ### Governance Questions
 
 - **Regulatory capture**: Will AI labs co-opt government oversight? <R id="5cde1bae73096dd7">CNAS analysis</R> suggests 40% risk
-- **<EntityLink id="international-coordination">International coordination</EntityLink>**: Can major powers cooperate on AI safety? <R id="0532c540957038e6">RAND assessment</R> shows limited progress
+- **<EntityLink id="E171">International coordination</EntityLink>**: Can major powers cooperate on AI safety? <R id="0532c540957038e6">RAND assessment</R> shows limited progress
 - **Democratic response**: Will public concern drive effective policy? Polling shows <R id="6b09f789e606b1d2">growing awareness</R> but uncertain translation to action
 
 ### Strategic Cruxes
@@ -502,15 +502,15 @@ Core disagreements among experts on alignment difficulty:
 
 ## Timeline of Critical Events
 
-| Period | Capability Milestones | <EntityLink id="alignment-progress">Alignment Progress</EntityLink> | Governance Developments |
+| Period | Capability Milestones | <EntityLink id="E19">Alignment Progress</EntityLink> | Governance Developments |
 |--------|----------------------|-------------------|------------------------|
-| **2025** | GPT-5 level, 80% human tasks | Basic interpretability tools | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> implementation |
+| **2025** | GPT-5 level, 80% human tasks | Basic interpretability tools | <EntityLink id="E127">EU AI Act</EntityLink> implementation |
 | **2026** | Multimodal AGI claims | Scalable oversight demos | US federal AI legislation |
 | **2027** | Superhuman in most domains | Alignment tax \&lt;10% | International AI treaty |
 | **2028** | Recursive self-improvement | Deception detection tools | Compute governance regime |
 | **2030** | Transformative AI deployment | Mature alignment stack | Global coordination framework |
 
-Based on <R id="8fef0d8c902de618">Metaculus community predictions</R> and <R id="9e229de82a60bdc2"><EntityLink id="fhi">Future of Humanity Institute</EntityLink> surveys</R>.
+Based on <R id="8fef0d8c902de618">Metaculus community predictions</R> and <R id="9e229de82a60bdc2"><EntityLink id="E140">Future of Humanity Institute</EntityLink> surveys</R>.
 
 ## Resource Requirements & Strategic Investments
 
@@ -531,24 +531,24 @@ Leading efforts to address the capability-alignment gap:
 
 | Organization | Focus | Annual Budget | Approach |
 |-------------|-------|---------------|----------|
-| <EntityLink id="anthropic">Anthropic</EntityLink> | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> | \$500M | Constitutional training |
-| <EntityLink id="deepmind">DeepMind</EntityLink> | Alignment team | \$100M | Scalable oversight |
-| <EntityLink id="miri">MIRI</EntityLink> | <EntityLink id="agent-foundations">Agent foundations</EntityLink> | \$15M | Theoretical foundations |
-| <EntityLink id="arc">ARC</EntityLink> | Alignment research | \$20M | Empirical alignment |
+| <EntityLink id="E22">Anthropic</EntityLink> | <EntityLink id="E451">Constitutional AI</EntityLink> | \$500M | Constitutional training |
+| <EntityLink id="E98">DeepMind</EntityLink> | Alignment team | \$100M | Scalable oversight |
+| <EntityLink id="E202">MIRI</EntityLink> | <EntityLink id="E584">Agent foundations</EntityLink> | \$15M | Theoretical foundations |
+| <EntityLink id="E25">ARC</EntityLink> | Alignment research | \$20M | Empirical alignment |
 
 ## Related Models & Cross-References
 
 This model connects to several other risk analyses:
 
-- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink>: How competition accelerates capability development
-- <EntityLink id="multipolar-trap">Multipolar Trap</EntityLink>: Coordination failures in competitive environments  
+- <EntityLink id="E239">Racing Dynamics</EntityLink>: How competition accelerates capability development
+- <EntityLink id="E209">Multipolar Trap</EntityLink>: Coordination failures in competitive environments  
 - Warning Signs: Indicators of dangerous capability-alignment gaps
 - <EntityLink id="__index__/ai-transition-model">Takeoff Dynamics</EntityLink>: Speed of AI development and adaptation time
 
 The model also informs key debates:
-- <EntityLink id="pause-debate">Pause vs. Proceed</EntityLink>: Whether to slow capability development
-- <EntityLink id="open-vs-closed">Open vs. Closed</EntityLink>: Model release policies and <EntityLink id="proliferation">proliferation</EntityLink> speed
-- <EntityLink id="regulation-debate">Regulation Approaches</EntityLink>: Government responses to the race dynamic
+- <EntityLink id="E223">Pause vs. Proceed</EntityLink>: Whether to slow capability development
+- <EntityLink id="E217">Open vs. Closed</EntityLink>: Model release policies and <EntityLink id="E232">proliferation</EntityLink> speed
+- <EntityLink id="E248">Regulation Approaches</EntityLink>: Government responses to the race dynamic
 
 ## Sources & Resources
 

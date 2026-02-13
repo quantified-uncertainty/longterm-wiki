@@ -32,11 +32,11 @@ import {InfoBox, DisagreementMap, Mermaid, R, EntityLink, DataExternalLinks} fro
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | **Expert Consensus** | Median 5-14% extinction probability by 2100 | [AI Impacts 2023](https://wiki.aiimpacts.org/ai_timelines/predictions_of_human-level_ai_timelines/ai_timeline_surveys/2023_expert_survey_on_progress_in_ai): 2,788 researchers; mean 14.4%, median 5% |
-| **AGI Timeline** | Median 2027-2040 depending on source | <EntityLink id="anthropic">Anthropic</EntityLink> predicts [late 2026/early 2027](https://blog.redwoodresearch.org/p/whats-up-with-anthropic-predicting); <EntityLink id="metaculus">Metaculus</EntityLink> median October 2027 (weak AGI) |
+| **AGI Timeline** | Median 2027-2040 depending on source | <EntityLink id="E22">Anthropic</EntityLink> predicts [late 2026/early 2027](https://blog.redwoodresearch.org/p/whats-up-with-anthropic-predicting); <EntityLink id="E199">Metaculus</EntityLink> median October 2027 (weak AGI) |
 | **Premise 1 (Capabilities)** | Strong evidence | Scaling laws continue; GPT-4 at 90th percentile on bar exam; economic investment exceeds \$100B annually |
-| **Premise 2 (Misalignment)** | Moderate-strong evidence | Orthogonality thesis; <EntityLink id="reward-hacking">reward hacking</EntityLink> documented across domains; sleeper agents persist through safety training |
-| **Premise 3 (Danger)** | Moderate evidence | <EntityLink id="instrumental-convergence">Instrumental convergence</EntityLink>; capability advantage; [power-seeking as optimal policy](https://arxiv.org/abs/1912.01683) |
-| **Premise 4 (Time)** | Key uncertainty (crux) | Alignment research at \$180-200M/year vs \$100B+ capabilities; <EntityLink id="racing-dynamics">racing dynamics</EntityLink> persist |
+| **Premise 2 (Misalignment)** | Moderate-strong evidence | Orthogonality thesis; <EntityLink id="E253">reward hacking</EntityLink> documented across domains; sleeper agents persist through safety training |
+| **Premise 3 (Danger)** | Moderate evidence | <EntityLink id="E168">Instrumental convergence</EntityLink>; capability advantage; [power-seeking as optimal policy](https://arxiv.org/abs/1912.01683) |
+| **Premise 4 (Time)** | Key uncertainty (crux) | Alignment research at \$180-200M/year vs \$100B+ capabilities; <EntityLink id="E239">racing dynamics</EntityLink> persist |
 | **Safety Research Investment** | Significantly underfunded | ≈\$180-200M/year external funding; ≈\$100M internal lab spending; less than 1% of capabilities investment |
 | **Trend Direction** | Concern increasing | [AI Safety Clock](https://futureoflife.org/ai-safety-index-summer-2025/) moved from 29 to 20 minutes to midnight (Sept 2024-Sept 2025) |
 
@@ -58,14 +58,14 @@ This page presents the strongest version of the argument for AI existential risk
 
 | Source | Population | Extinction Probability | Notes |
 |--------|------------|----------------------|-------|
-| <R id="3b5912fe113394f3"><EntityLink id="ai-impacts">AI Impacts</EntityLink> Survey (2023)</R> | 2,788 AI researchers | Mean 14.4%, Median 5% | "By 2100, human extinction or severe disempowerment" |
+| <R id="3b5912fe113394f3"><EntityLink id="E512">AI Impacts</EntityLink> Survey (2023)</R> | 2,788 AI researchers | Mean 14.4%, Median 5% | "By 2100, human extinction or severe disempowerment" |
 | <R id="4e7f0e37bace9678">Grace et al. Survey (2024)</R> | 2,778 published researchers | Median 5% | "Within the next 100 years" |
 | [Geoffrey Hinton (2025)](https://en.wikipedia.org/wiki/Existential_risk_from_artificial_intelligence) | Nobel laureate, "godfather of AI" | 10-20% | "Within the next three decades" |
 | [Shane Legg (2025)](https://en.wikipedia.org/wiki/P(doom)) | DeepMind Chief AGI Scientist | 5-50% | Wide range reflecting uncertainty |
 | <R id="d53c6b234827504e">Existential Risk Persuasion Tournament</R> | 80 experts + 89 superforecasters | Experts: higher, Superforecasters: 0.38% | AI experts more pessimistic than generalist forecasters |
-| <EntityLink id="toby-ord">Toby Ord</EntityLink> (*The Precipice*) | Single expert estimate | 10% | AI as largest anthropogenic x-risk |
+| <EntityLink id="E355">Toby Ord</EntityLink> (*The Precipice*) | Single expert estimate | 10% | AI as largest anthropogenic x-risk |
 | <R id="d9fb00b6393b6112">Joe Carlsmith (2021, updated)</R> | Detailed analysis | 5% → greater than 10% | Report initially estimated 5%, later revised upward |
-| <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> | Single expert estimate | ≈90% | Most pessimistic prominent voice |
+| <EntityLink id="E114">Eliezer Yudkowsky</EntityLink> | Single expert estimate | ≈90% | Most pessimistic prominent voice |
 | Roman Yampolskiy | Single expert estimate | 99% | Argues superintelligence control is impossible |
 
 **Key finding**: Roughly 40% of surveyed AI researchers indicated greater than 10% chance of catastrophic outcomes from AI progress, and 78% agreed technical researchers "should be concerned about catastrophic risks." A [2025 survey](https://arxiv.org/html/2502.14870v1) found that experts' disagreement on p(doom) follows partly from their varying exposure to key AI safety concepts—those least familiar with safety research are typically least concerned about catastrophic risk.
@@ -82,7 +82,7 @@ This page presents the strongest version of the argument for AI existential risk
 
 **P4**: We may not solve the alignment problem before building extremely capable AI
 
-**C**: Therefore, there is a significant probability of AI-caused <EntityLink id="existential-catastrophe">existential catastrophe</EntityLink>
+**C**: Therefore, there is a significant probability of AI-caused <EntityLink id="E130">existential catastrophe</EntityLink>
 
 <Mermaid chart={`
 flowchart TD
@@ -257,7 +257,7 @@ Reports from <R id="1ed975df72c30426">Bloomberg and The Information</R> suggest 
 
 **Key trend**: <R id="f2394e3212f072f5">AGI timeline forecasts have compressed dramatically</R> in recent years. Metaculus median dropped from 2035 in 2022 to 2027-2033 by late 2024. Anthropic is the only major AI company with an official public timeline, predicting "powerful AI systems" by late 2026/early 2027—what they describe as "a country of geniuses in a datacenter."
 
-(See <EntityLink id="agi-timeline">AI Timelines</EntityLink> for detailed analysis)
+(See <EntityLink id="E399">AI Timelines</EntityLink> for detailed analysis)
 
 ## Premise 2: Capable AI May Have Misaligned Goals
 
@@ -602,8 +602,8 @@ The <R id="e5c0904211c7d0cc">"Sleeper Agents" paper</R> from Anthropic demonstra
 |-----------------|-------------------------|--------|
 | **Capabilities investment** | greater than \$100 billion | Industry estimates; compute, training, talent |
 | **Internal lab safety research** | ≈\$100 million combined | [Industry estimates](https://quickmarketpitch.com/blogs/news/ai-safety-investors); Anthropic, OpenAI, DeepMind |
-| **External safety funding** | \$180-200 million | <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (\$13.6M in 2024), government programs |
-| **<EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (2024)** | \$13.6 million | ≈60% of all external AI safety investment |
+| **External safety funding** | \$180-200 million | <EntityLink id="E521">Coefficient Giving</EntityLink> (\$13.6M in 2024), government programs |
+| **<EntityLink id="E521">Coefficient Giving</EntityLink> (2024)** | \$13.6 million | ≈60% of all external AI safety investment |
 | **UK AISI budget (2025)** | \$15 million | Government funding increase |
 | **US NSF AI Safety Program** | \$12 million | 47% increase over 2024 |
 | **EU Horizon Europe allocation** | \$18 million | AI safety research specifically |
@@ -950,12 +950,12 @@ What evidence would change this argument?
 
 This argument connects to several other formal arguments:
 
-- **<EntityLink id="why-alignment-hard">Why Alignment Might Be Hard</EntityLink>**: Detailed analysis of P2 and P4
-- **<EntityLink id="case-against-xrisk">Case Against X-Risk</EntityLink>**: Strongest objections to this argument
-- **<EntityLink id="why-alignment-easy">Why Alignment Might Be Easy</EntityLink>**: Optimistic case on P4
+- **<EntityLink id="E373">Why Alignment Might Be Hard</EntityLink>**: Detailed analysis of P2 and P4
+- **<EntityLink id="E55">Case Against X-Risk</EntityLink>**: Strongest objections to this argument
+- **<EntityLink id="E372">Why Alignment Might Be Easy</EntityLink>**: Optimistic case on P4
 
 See also:
-- <EntityLink id="agi-timeline">AI Timelines</EntityLink> for detailed analysis of P1
+- <EntityLink id="E399">AI Timelines</EntityLink> for detailed analysis of P1
 - Alignment Difficulty for detailed analysis of P2 and P4
 - <EntityLink id="__index__/ai-transition-model">Takeoff Speed</EntityLink> for analysis relevant to P3
 

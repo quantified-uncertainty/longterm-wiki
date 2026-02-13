@@ -32,13 +32,13 @@ subcategory: dynamics-models
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="risk-interaction-network" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E258" ratings={frontmatter.ratings} />
 
 ## Overview
 
 AI risks form a complex network where individual risks enable, amplify, and cascade through each other, creating compound threats far exceeding the sum of their parts. This model provides the first systematic mapping of these interactions, revealing that approximately 70% of current AI risk stems from interaction dynamics rather than isolated risks.
 
-The analysis identifies <EntityLink id="racing-dynamics">racing dynamics</EntityLink> as the most critical hub risk, enabling 8 downstream risks and amplifying technical risks by 2-5x. Compound scenarios show 3-8x higher catastrophic probabilities than independent risk assessments suggest, with cascades capable of triggering within 10-25 years under current trajectories.
+The analysis identifies <EntityLink id="E239">racing dynamics</EntityLink> as the most critical hub risk, enabling 8 downstream risks and amplifying technical risks by 2-5x. Compound scenarios show 3-8x higher catastrophic probabilities than independent risk assessments suggest, with cascades capable of triggering within 10-25 years under current trajectories.
 
 Key findings include four self-reinforcing feedback loops already observable in current systems, and evidence that targeting enabler risks could improve intervention efficiency by 40-80% compared to addressing risks independently.
 
@@ -57,9 +57,9 @@ Key findings include four self-reinforcing feedback loops already observable in 
 
 | Category | Primary Risks | Core Dynamic | Network Role |
 |----------|---------------|--------------|--------------|
-| **Technical** | <EntityLink id="mesa-optimization">Mesa-optimization</EntityLink>, <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink>, <EntityLink id="scheming">Scheming</EntityLink>, <EntityLink id="corrigibility-failure">Corrigibility Failure</EntityLink> | Internal optimizer misalignment escalates to loss of control | Amplifier nodes |
-| **Structural** | <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink>, <EntityLink id="winner-take-all">Concentration of Power</EntityLink>, <EntityLink id="irreversibility">Lock-in</EntityLink>, <EntityLink id="authoritarian-takeover">Authoritarian Takeover</EntityLink> | Market pressures create irreversible power concentration | Hub enablers |
-| **Epistemic** | <EntityLink id="sycophancy">Sycophancy</EntityLink>, <EntityLink id="expertise-atrophy">Expertise Atrophy</EntityLink>, <EntityLink id="trust-decline">Trust Cascade</EntityLink>, <EntityLink id="epistemic-collapse">Epistemic Collapse</EntityLink> | Validation-seeking degrades judgment and institutional trust | Cascade triggers |
+| **Technical** | <EntityLink id="E197">Mesa-optimization</EntityLink>, <EntityLink id="E93">Deceptive Alignment</EntityLink>, <EntityLink id="E274">Scheming</EntityLink>, <EntityLink id="E80">Corrigibility Failure</EntityLink> | Internal optimizer misalignment escalates to loss of control | Amplifier nodes |
+| **Structural** | <EntityLink id="E239">Racing Dynamics</EntityLink>, <EntityLink id="E374">Concentration of Power</EntityLink>, <EntityLink id="E179">Lock-in</EntityLink>, <EntityLink id="E29">Authoritarian Takeover</EntityLink> | Market pressures create irreversible power concentration | Hub enablers |
+| **Epistemic** | <EntityLink id="E295">Sycophancy</EntityLink>, <EntityLink id="E133">Expertise Atrophy</EntityLink>, <EntityLink id="E362">Trust Cascade</EntityLink>, <EntityLink id="E119">Epistemic Collapse</EntityLink> | Validation-seeking degrades judgment and institutional trust | Cascade triggers |
 
 <Mermaid chart={`
 flowchart TD
@@ -87,23 +87,23 @@ flowchart TD
 
 ### Primary Enabler: Racing Dynamics
 
-<EntityLink id="racing-dynamics">Racing dynamics</EntityLink> emerges as the most influential hub risk, with documented amplification effects across multiple domains.
+<EntityLink id="E239">Racing dynamics</EntityLink> emerges as the most influential hub risk, with documented amplification effects across multiple domains.
 
 | Enabled Risk | Amplification Factor | Mechanism | Evidence Source |
 |--------------|---------------------|-----------|----------------|
-| <EntityLink id="mesa-optimization">Mesa-optimization</EntityLink> | 2-3x | Compressed evaluation timelines | <R id="b7e532e4a2ee8270">Anthropic Safety Research</R> |
-| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | 3-5x | Inadequate interpretability testing | <R id="c36ff7b8236cc941">MIRI Technical Reports</R> |
-| <EntityLink id="corrigibility-failure">Corrigibility Failure</EntityLink> | 2-4x | Safety research underfunding | <R id="838d7a59a02e11a7">OpenAI Safety Research</R> |
+| <EntityLink id="E197">Mesa-optimization</EntityLink> | 2-3x | Compressed evaluation timelines | <R id="b7e532e4a2ee8270">Anthropic Safety Research</R> |
+| <EntityLink id="E93">Deceptive Alignment</EntityLink> | 3-5x | Inadequate interpretability testing | <R id="c36ff7b8236cc941">MIRI Technical Reports</R> |
+| <EntityLink id="E80">Corrigibility Failure</EntityLink> | 2-4x | Safety research underfunding | <R id="838d7a59a02e11a7">OpenAI Safety Research</R> |
 | Regulatory Capture | 1.5-2x | Industry influence on standards | <R id="2a495e79d3ff2428">CNAS AI Policy</R> |
 
 **Current manifestations:**
 - <R id="04d39e8bd5d50dd5">OpenAI</R> safety team departures during GPT-4o development
 - <R id="1bcc2acc6c2a1721">DeepMind</R> shipping Gemini before completing safety evaluations
-- Industry resistance to <EntityLink id="california-sb1047">California SB 1047</EntityLink>
+- Industry resistance to <EntityLink id="E48">California SB 1047</EntityLink>
 
 ### Secondary Enabler: Sycophancy
 
-<EntityLink id="sycophancy">Sycophancy</EntityLink> functions as an epistemic enabler, systematically degrading human judgment capabilities.
+<EntityLink id="E295">Sycophancy</EntityLink> functions as an epistemic enabler, systematically degrading human judgment capabilities.
 
 | Degraded Capability | Impact Severity | Observational Evidence | Academic Source |
 |---------------------|----------------|----------------------|----------------|
@@ -173,7 +173,7 @@ Racing intensifies → Winner takes more market share → Increased resources fo
 ```
 
 **Current manifestations:**
-- <EntityLink id="openai">OpenAI</EntityLink> valuation jumped from \$14B to \$157B in 18 months
+- <EntityLink id="E218">OpenAI</EntityLink> valuation jumped from \$14B to \$157B in 18 months
 - Talent concentration: Top 5 labs employ 60% of AI safety researchers
 - Compute concentration: 80% of frontier training on 3 cloud providers
 
@@ -307,10 +307,10 @@ AI systems become entrenched → Alternatives eliminated → Switching costs ris
 
 | Research Question | Impact on Model | Funding Priority | Lead Organizations |
 |-------------------|----------------|-----------------|-------------------|
-| Quantified amplification factors | Model accuracy | Very high | <EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="metr">METR</EntityLink> |
-| Feedback loop thresholds | Intervention timing | Very high | <EntityLink id="chai">CHAI</EntityLink>, <EntityLink id="arc">ARC</EntityLink> |
-| Cascade early warning indicators | Prevention capability | High | <EntityLink id="apollo-research">Apollo Research</EntityLink> |
-| Intervention effectiveness | Resource allocation | High | <EntityLink id="cais">CAIS</EntityLink> |
+| Quantified amplification factors | Model accuracy | Very high | <EntityLink id="E202">MIRI</EntityLink>, <EntityLink id="E201">METR</EntityLink> |
+| Feedback loop thresholds | Intervention timing | Very high | <EntityLink id="E57">CHAI</EntityLink>, <EntityLink id="E25">ARC</EntityLink> |
+| Cascade early warning indicators | Prevention capability | High | <EntityLink id="E24">Apollo Research</EntityLink> |
+| Intervention effectiveness | Resource allocation | High | <EntityLink id="E47">CAIS</EntityLink> |
 
 ### Methodological Needs
 
@@ -351,7 +351,7 @@ AI systems become entrenched → Alternatives eliminated → Switching costs ris
 | <R id="58f6946af0177ca5">CNAS</R> | AI Competition and Security | Racing creates 3x higher security risks | 2024 |
 | <R id="0a17f30e99091ebf">RAND Corporation</R> | Cascading AI Failures | Network effects underestimated by 50-200% | 2024 |
 | <R id="f0d95954b449240a">Georgetown CSET</R> | AI Governance Networks | Hub risks require coordinated response | 2023 |
-| <EntityLink id="uk-aisi">UK AISI</EntityLink> | Systemic Risk Assessment | Interaction effects dominate individual risks | 2024 |
+| <EntityLink id="E364">UK AISI</EntityLink> | Systemic Risk Assessment | Interaction effects dominate individual risks | 2024 |
 
 ### Industry Perspectives
 
@@ -364,9 +364,9 @@ AI systems become entrenched → Alternatives eliminated → Switching costs ris
 
 ## Related Models
 
-- <EntityLink id="compounding-risks-analysis" label="Compounding Risks Analysis" /> - Quantitative risk multiplication
-- <EntityLink id="capability-alignment-race">Capability-Alignment Race Model</EntityLink> - Racing dynamics formalization
-- <EntityLink id="trust-cascade-model" label="Trust Cascade Model" /> - Institutional breakdown pathways
-- <EntityLink id="critical-uncertainties" label="Critical Uncertainties Matrix" /> - Decision-relevant unknowns
-- <EntityLink id="multipolar-trap">Multipolar Trap</EntityLink> - Coordination failure dynamics
+- <EntityLink id="E63" label="Compounding Risks Analysis" /> - Quantitative risk multiplication
+- <EntityLink id="E414">Capability-Alignment Race Model</EntityLink> - Racing dynamics formalization
+- <EntityLink id="E361" label="Trust Cascade Model" /> - Institutional breakdown pathways
+- <EntityLink id="E398" label="Critical Uncertainties Matrix" /> - Decision-relevant unknowns
+- <EntityLink id="E209">Multipolar Trap</EntityLink> - Coordination failure dynamics
 

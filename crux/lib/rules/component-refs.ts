@@ -20,6 +20,30 @@ const DATA_DIR = DATA_DIR_ABS;
 let entitiesCache: Set<string> | null = null;
 let externalLinksCache: Set<string> | null = null;
 let safetyApproachesCache: Set<string> | null = null;
+let idRegistryCache: Record<string, string> | null = null;
+
+/** Load numeric-ID → slug mapping from id-registry.json */
+function loadIdRegistry(): Record<string, string> {
+  if (idRegistryCache) return idRegistryCache;
+  try {
+    const raw = readFileSync(join(DATA_DIR, 'id-registry.json'), 'utf-8');
+    const registry = JSON.parse(raw);
+    idRegistryCache = registry.entities || {};
+    return idRegistryCache;
+  } catch {
+    idRegistryCache = {};
+    return idRegistryCache;
+  }
+}
+
+/** Resolve a numeric ID (E35) to its slug, or return the ID unchanged */
+function resolveNumericId(id: string): string {
+  if (/^E\d+$/.test(id)) {
+    const registry = loadIdRegistry();
+    return registry[id] || id;
+  }
+  return id;
+}
 
 function loadEntities(): Set<string> {
   if (entitiesCache) return entitiesCache;
@@ -170,7 +194,8 @@ export const componentRefsRule = createRule({
       const entityLinkRegex = /<EntityLink\s+id=["']([^"']+)["']/g;
       let match: RegExpExecArray | null;
       while ((match = entityLinkRegex.exec(body)) !== null) {
-        const id = match[1];
+        const rawId = match[1];
+        const id = resolveNumericId(rawId);
         const lineNum = body.slice(0, match.index).split('\n').length;
 
         const isValid = entities.has(id) ||
@@ -184,7 +209,7 @@ export const componentRefsRule = createRule({
             rule: this.id,
             file: content.path,
             line: lineNum,
-            message: `EntityLink id="${id}" not found in entities or safety-approaches`,
+            message: `EntityLink id="${rawId}" not found in entities or safety-approaches`,
             severity: Severity.ERROR,
           }));
         }
@@ -196,7 +221,8 @@ export const componentRefsRule = createRule({
       const infoBoxRegex = /<DataInfoBox\s+entityId=["']([^"']+)["']/g;
       let match: RegExpExecArray | null;
       while ((match = infoBoxRegex.exec(body)) !== null) {
-        const id = match[1];
+        const rawId = match[1];
+        const id = resolveNumericId(rawId);
         const lineNum = body.slice(0, match.index).split('\n').length;
 
         if (!entities.has(id)) {
@@ -204,7 +230,7 @@ export const componentRefsRule = createRule({
             rule: this.id,
             file: content.path,
             line: lineNum,
-            message: `DataInfoBox entityId="${id}" not found in entities`,
+            message: `DataInfoBox entityId="${rawId}" not found in entities`,
             severity: Severity.ERROR,
           }));
         }

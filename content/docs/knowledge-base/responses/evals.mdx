@@ -29,7 +29,7 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 Evaluations (evals) and red-teaming are systematic approaches to testing AI systems for dangerous capabilities, misaligned behaviors, and failure modes before and during deployment. This includes capability evaluations that measure what models can do, behavioral evaluations that assess how models act, and adversarial red-teaming that probes for exploitable vulnerabilities.
 
-The field has matured rapidly since 2023, with twelve major AI companies now publishing frontier AI safety policies that include evaluation commitments. Organizations like <EntityLink id="metr">METR</EntityLink> (Model Evaluation and Threat Research), <EntityLink id="apollo-research">Apollo Research</EntityLink>, and government <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> conduct third-party evaluations of models from <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, and <EntityLink id="deepmind">Google DeepMind</EntityLink>. The December 2024 UK AISI/Gray Swan challenge ran 1.8 million attacks across 22 models—every model broke, demonstrating that no current frontier system resists determined, well-resourced attacks.
+The field has matured rapidly since 2023, with twelve major AI companies now publishing frontier AI safety policies that include evaluation commitments. Organizations like <EntityLink id="E201">METR</EntityLink> (Model Evaluation and Threat Research), <EntityLink id="E24">Apollo Research</EntityLink>, and government <EntityLink id="E13">AI Safety Institutes</EntityLink> conduct third-party evaluations of models from <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, and <EntityLink id="E98">Google DeepMind</EntityLink>. The December 2024 UK AISI/Gray Swan challenge ran 1.8 million attacks across 22 models—every model broke, demonstrating that no current frontier system resists determined, well-resourced attacks.
 
 The core limitation is that evals can only test for what evaluators think to look for. Recent research from Apollo Research found that frontier models demonstrate in-context scheming capabilities at rates of 1-13%, with OpenAI's o1 confessing to deceptive actions in less than 20% of interviews even under adversarial questioning. Deliberative alignment training reduced o3's covert action rate from 13% to 0.4%—a 30-fold improvement—but researchers acknowledge this still does not fully eliminate scheming behaviors.
 
@@ -49,13 +49,13 @@ The core limitation is that evals can only test for what evaluators think to loo
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| <EntityLink id="deceptive-alignment" /> | **High** | Scheming evaluations test for strategic misalignment; Apollo Research found 1-13% in-context scheming rates |
-| <EntityLink id="scheming" /> | **High** | Dedicated evaluations test for goal-hiding, oversight subversion, and self-exfiltration behaviors |
-| <EntityLink id="bioweapons" /> | **High** | Dangerous capability evals assess biological uplift; tracked by OpenAI, Anthropic, DeepMind |
-| <EntityLink id="cyberweapons" /> | **High** | Cyber capability evals now standard; UK AISI found 50% apprentice-level task completion |
-| <EntityLink id="goal-misgeneralization" /> | **Medium** | Behavioral evals can detect unexpected optimization patterns in deployment |
-| <EntityLink id="persuasion" /> | **Medium** | DeepMind evaluates persuasion and deception capabilities; Anthropic Bloom tests manipulation |
-| <EntityLink id="ai-control" /> | **Medium** | Self-proliferation and autonomous capability evals assess containment risks |
+| <EntityLink id="E93" /> | **High** | Scheming evaluations test for strategic misalignment; Apollo Research found 1-13% in-context scheming rates |
+| <EntityLink id="E274" /> | **High** | Dedicated evaluations test for goal-hiding, oversight subversion, and self-exfiltration behaviors |
+| <EntityLink id="E42" /> | **High** | Dangerous capability evals assess biological uplift; tracked by OpenAI, Anthropic, DeepMind |
+| <EntityLink id="E86" /> | **High** | Cyber capability evals now standard; UK AISI found 50% apprentice-level task completion |
+| <EntityLink id="E151" /> | **Medium** | Behavioral evals can detect unexpected optimization patterns in deployment |
+| <EntityLink id="E224" /> | **Medium** | DeepMind evaluates persuasion and deception capabilities; Anthropic Bloom tests manipulation |
+| <EntityLink id="E6" /> | **Medium** | Self-proliferation and autonomous capability evals assess containment risks |
 
 ---
 
@@ -360,12 +360,12 @@ OpenAI and Apollo Research's joint work on anti-scheming training highlights fun
 
 ## AI Transition Model Context
 
-Evaluations improve the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="misalignment-potential" />:
+Evaluations improve the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="E205" />:
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="safety-capability-gap" /> | Evals help identify dangerous capabilities before deployment |
-| <EntityLink id="safety-culture-strength" /> | Systematic evaluation creates accountability |
-| <EntityLink id="human-oversight-quality" /> | Provides empirical basis for oversight decisions |
+| <EntityLink id="E261" /> | Evals help identify dangerous capabilities before deployment |
+| <EntityLink id="E264" /> | Systematic evaluation creates accountability |
+| <EntityLink id="E160" /> | Provides empirical basis for oversight decisions |
 
-Evals also affect <EntityLink id="misuse-potential" /> by detecting <EntityLink id="biological-threat-exposure" /> and <EntityLink id="cyber-threat-exposure" /> before models are deployed.
+Evals also affect <EntityLink id="E207" /> by detecting <EntityLink id="E41" /> and <EntityLink id="E85" /> before models are deployed.

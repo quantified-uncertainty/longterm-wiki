@@ -31,13 +31,13 @@ import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} fr
 
 <DataExternalLinks pageId="ai-forecasting" />
 
-<DataInfoBox entityId="ai-forecasting" />
+<DataInfoBox entityId="E9" />
 
 ## Comprehensive Overview
 
-AI-augmented forecasting represents a rapidly maturing approach to prediction that combines artificial intelligence's computational strengths with human judgment and contextual understanding. Rather than replacing human forecasters entirely, this hybrid methodology leverages AI's ability to process vast amounts of information quickly and consistently while relying on humans for novel reasoning, value judgments, and calibration in unprecedented scenarios. The field has gained significant traction since 2022, driven by improvements in <EntityLink id="language-models">large language models</EntityLink> and growing evidence that human-AI combinations can outperform either approach alone.
+AI-augmented forecasting represents a rapidly maturing approach to prediction that combines artificial intelligence's computational strengths with human judgment and contextual understanding. Rather than replacing human forecasters entirely, this hybrid methodology leverages AI's ability to process vast amounts of information quickly and consistently while relying on humans for novel reasoning, value judgments, and calibration in unprecedented scenarios. The field has gained significant traction since 2022, driven by improvements in <EntityLink id="E186">large language models</EntityLink> and growing evidence that human-AI combinations can outperform either approach alone.
 
-The importance of this development extends far beyond academic interest. Accurate forecasting is crucial for existential risk assessment, policy planning, technology governance, and strategic decision-making across domains where the stakes are highest. Current evidence suggests that AI-augmented systems can achieve 5-15% improvements in Brier scores compared to human-only forecasting while reducing costs by 50-200x. However, significant challenges remain, particularly in calibrating AI confidence on tail risks and maintaining <EntityLink id="human-expertise">human expertise</EntityLink> in an increasingly AI-assisted environment.
+The importance of this development extends far beyond academic interest. Accurate forecasting is crucial for existential risk assessment, policy planning, technology governance, and strategic decision-making across domains where the stakes are highest. Current evidence suggests that AI-augmented systems can achieve 5-15% improvements in Brier scores compared to human-only forecasting while reducing costs by 50-200x. However, significant challenges remain, particularly in calibrating AI confidence on tail risks and maintaining <EntityLink id="E159">human expertise</EntityLink> in an increasingly AI-assisted environment.
 
 This technology sits at a critical juncture where technical capabilities are advancing rapidly, but fundamental questions about optimal human-AI collaboration remain unresolved. The next 1-3 years will likely determine whether AI-augmented forecasting becomes a transformative tool for navigating uncertainty or encounters limitations that constrain its effectiveness to narrow domains.
 
@@ -45,9 +45,9 @@ This technology sits at a critical juncture where technical capabilities are adv
 
 ### Information Processing Pipeline
 
-Contemporary AI-augmented forecasting systems typically operate through a multi-stage pipeline that maximizes each component's strengths. The process begins with AI systems performing comprehensive information retrieval, scanning thousands of documents, research papers, news articles, and databases in minutes rather than the days or weeks required for human analysis. Advanced systems like <EntityLink id="futuresearch">FutureSearch</EntityLink> employ retrieval-augmented generation (RAG) to identify relevant historical precedents, statistical patterns, and domain-specific evidence that human forecasters might miss due to cognitive limitations or knowledge gaps.
+Contemporary AI-augmented forecasting systems typically operate through a multi-stage pipeline that maximizes each component's strengths. The process begins with AI systems performing comprehensive information retrieval, scanning thousands of documents, research papers, news articles, and databases in minutes rather than the days or weeks required for human analysis. Advanced systems like <EntityLink id="E530">FutureSearch</EntityLink> employ retrieval-augmented generation (RAG) to identify relevant historical precedents, statistical patterns, and domain-specific evidence that human forecasters might miss due to cognitive limitations or knowledge gaps.
 
-The synthesis stage involves AI systems generating structured summaries, identifying key considerations, and flagging potential biases or information gaps. Modern implementations use sophisticated prompting techniques to <EntityLink id="elicit">elicit</EntityLink> calibrated probability estimates from large language models, often employing chain-of-thought reasoning to make the AI's logic transparent for human review. <EntityLink id="metaculus">Metaculus</EntityLink> experiments have shown that GPT-4-class models can achieve Brier scores between 0.18-0.25 on resolved questions, comparable to median human forecasters but with dramatically faster processing speeds.
+The synthesis stage involves AI systems generating structured summaries, identifying key considerations, and flagging potential biases or information gaps. Modern implementations use sophisticated prompting techniques to <EntityLink id="E526">elicit</EntityLink> calibrated probability estimates from large language models, often employing chain-of-thought reasoning to make the AI's logic transparent for human review. <EntityLink id="E199">Metaculus</EntityLink> experiments have shown that GPT-4-class models can achieve Brier scores between 0.18-0.25 on resolved questions, comparable to median human forecasters but with dramatically faster processing speeds.
 
 ### Human-AI Collaboration Models
 
@@ -89,11 +89,11 @@ Extensive testing across multiple platforms has established a clear picture of c
 
 However, significant performance disparities emerge across question categories. AI systems excel at technology timeline forecasts where historical patent data, publication trends, and benchmark progressions provide clear signals. On these questions, AI-only forecasts achieve Brier scores 15-25% better than individual human experts. Conversely, on geopolitical questions involving novel scenarios, cultural factors, or recent events post-training cutoff, AI performance degrades substantially, with Brier scores 20-40% worse than experienced human forecasters.
 
-The most compelling evidence comes from hybrid system performance. <EntityLink id="epoch-ai">Epoch AI</EntityLink>'s analysis of 1,200 technology forecasts over 2023-2024 found that optimal human-AI combinations achieved Brier scores averaging 0.17, compared to 0.21 for AI-only and 0.23 for individual humans. This 19% improvement over human baselines represents substantial practical value, particularly given the 50-200x cost reduction compared to expert human analysis.
+The most compelling evidence comes from hybrid system performance. <EntityLink id="E125">Epoch AI</EntityLink>'s analysis of 1,200 technology forecasts over 2023-2024 found that optimal human-AI combinations achieved Brier scores averaging 0.17, compared to 0.21 for AI-only and 0.23 for individual humans. This 19% improvement over human baselines represents substantial practical value, particularly given the 50-200x cost reduction compared to expert human analysis.
 
 ### Calibration and Confidence Assessment
 
-One of the most critical findings involves AI calibration on probability extremes. While modern language models demonstrate reasonable calibration on moderate probabilities (20-80%), they exhibit systematic overconfidence on tail events below 5% or above 95% probability. This presents serious challenges for existential risk forecasting, where accurate tail risk assessment is paramount. Research by the <EntityLink id="fri">Forecasting Research Institute</EntityLink> indicates that AI systems assign 10-15% probability to events that occur less than 2% of the time, representing dangerous overconfidence in low-probability scenarios.
+One of the most critical findings involves AI calibration on probability extremes. While modern language models demonstrate reasonable calibration on moderate probabilities (20-80%), they exhibit systematic overconfidence on tail events below 5% or above 95% probability. This presents serious challenges for existential risk forecasting, where accurate tail risk assessment is paramount. Research by the <EntityLink id="E147">Forecasting Research Institute</EntityLink> indicates that AI systems assign 10-15% probability to events that occur less than 2% of the time, representing dangerous overconfidence in low-probability scenarios.
 
 Calibration training has shown promise for addressing these issues. Fine-tuning approaches using large datasets of resolved forecasting questions have improved AI calibration by 20-30% on extreme probabilities, though performance still lags behind experienced human forecasters. The development of uncertainty quantification techniques specifically for language models represents an active area of research with potentially transformative implications for AI safety applications.
 
@@ -119,7 +119,7 @@ AI systems also demonstrate valuable consistency that human forecasters often la
 
 ### Current State (2024-2025)
 
-The field currently stands at a transition point between research experimentation and practical deployment. Major forecasting platforms including Metaculus, <EntityLink id="good-judgment">Good Judgment</EntityLink>, and emerging commercial services have integrated AI capabilities to varying degrees. Academic research has established robust evidence for the effectiveness of hybrid approaches, while identifying key limitations that constrain broader adoption.
+The field currently stands at a transition point between research experimentation and practical deployment. Major forecasting platforms including Metaculus, <EntityLink id="E532">Good Judgment</EntityLink>, and emerging commercial services have integrated AI capabilities to varying degrees. Academic research has established robust evidence for the effectiveness of hybrid approaches, while identifying key limitations that constrain broader adoption.
 
 Current systems primarily operate in "human-in-the-loop" configurations, with AI providing research assistance, initial estimates, or ensemble aggregation rather than autonomous forecasting. Training data limitations, calibration challenges, and trust concerns prevent fully automated deployment for high-stakes applications. However, rapid improvements in language model capabilities and specialized forecasting training suggest this landscape will evolve quickly.
 
@@ -196,7 +196,7 @@ The geopolitical implications of advanced AI forecasting capabilities raise ques
 | **<R id="120adc539e2fa558">Epoch AI</R>** | AI progress tracking and quantitative forecasting | Compute trends, capability milestone prediction |
 | **<R id="46c32aeaf3c3caac">Forecasting Research Institute</R>** | Methodology research, human-AI collaboration | Calibration studies, best practice development |
 | **<R id="664518d11aec3317">Good Judgment</R>** | Superforecasting training and research | Human baseline performance, training methodologies |
-| **<R id="a306e0b63bdedbd5"><EntityLink id="cais">Center for AI Safety</EntityLink></R>** | AI risk assessment and forecasting | Safety-focused forecasting applications |
+| **<R id="a306e0b63bdedbd5"><EntityLink id="E47">Center for AI Safety</EntityLink></R>** | AI risk assessment and forecasting | Safety-focused forecasting applications |
 
 ### Key Papers and Research
 
@@ -220,11 +220,11 @@ The geopolitical implications of advanced AI forecasting capabilities raise ques
 
 ## AI Transition Model Context
 
-AI-augmented forecasting improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="civilizational-competence" />:
+AI-augmented forecasting improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="E60" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="epistemic-health" /> | 5-15% Brier score improvements enable better AI risk assessment |
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="institutional-quality" /> | 50-200x cost reductions democratize forecasting infrastructure |
+| <EntityLink id="E60" /> | <EntityLink id="E121" /> | 5-15% Brier score improvements enable better AI risk assessment |
+| <EntityLink id="E60" /> | <EntityLink id="E167" /> | 50-200x cost reductions democratize forecasting infrastructure |
 
 AI forecasting exhibits dangerous overconfidence on tail events below 5% probability, creating risks for existential risk assessment where rare catastrophic outcomes are most relevant.

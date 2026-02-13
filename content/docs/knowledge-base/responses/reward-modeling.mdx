@@ -28,11 +28,11 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
 ## Overview
 
-Reward modeling is the technique of training a separate neural network to predict which outputs humans would prefer, enabling AI systems to be trained via reinforcement learning without requiring human feedback on every output. The reward model learns from a dataset of human comparisons between outputs, then serves as a proxy for human judgment during RL training. This approach is fundamental to <EntityLink id="rlhf">RLHF</EntityLink> and underlies essentially all modern AI assistants including ChatGPT, Claude, and Gemini.
+Reward modeling is the technique of training a separate neural network to predict which outputs humans would prefer, enabling AI systems to be trained via reinforcement learning without requiring human feedback on every output. The reward model learns from a dataset of human comparisons between outputs, then serves as a proxy for human judgment during RL training. This approach is fundamental to <EntityLink id="E259">RLHF</EntityLink> and underlies essentially all modern AI assistants including ChatGPT, Claude, and Gemini.
 
-The core innovation, introduced in Christiano et al.'s 2017 work "Deep Reinforcement Learning from Human Preferences," was recognizing that human feedback is expensive and slow, but a learned model of human preferences can provide cheap, fast training signal. By training a reward model on tens of thousands of human comparisons, systems can then generate millions of training signals without additional human annotation. This scalability breakthrough enabled RLHF to become practical for <EntityLink id="language-models">large language models</EntityLink>.
+The core innovation, introduced in Christiano et al.'s 2017 work "Deep Reinforcement Learning from Human Preferences," was recognizing that human feedback is expensive and slow, but a learned model of human preferences can provide cheap, fast training signal. By training a reward model on tens of thousands of human comparisons, systems can then generate millions of training signals without additional human annotation. This scalability breakthrough enabled RLHF to become practical for <EntityLink id="E186">large language models</EntityLink>.
 
-However, reward modeling inherits and potentially amplifies all limitations of RLHF. The reward model is trained to predict what humans would prefer, not what is actually good - creating a gap that sophisticated policies can exploit. As models become more capable, "<EntityLink id="reward-hacking">reward hacking</EntityLink>" - finding outputs that score highly on the reward model without being genuinely good - becomes increasingly severe. Research by [Gao et al. (2023)](https://arxiv.org/abs/2210.10760) established scaling laws for this overoptimization, showing that proxy reward scores diverge from true performance in predictable ways. The reward model also provides no protection against deception: a deceptive AI could easily produce outputs that the reward model rates highly while pursuing entirely different objectives.
+However, reward modeling inherits and potentially amplifies all limitations of RLHF. The reward model is trained to predict what humans would prefer, not what is actually good - creating a gap that sophisticated policies can exploit. As models become more capable, "<EntityLink id="E253">reward hacking</EntityLink>" - finding outputs that score highly on the reward model without being genuinely good - becomes increasingly severe. Research by [Gao et al. (2023)](https://arxiv.org/abs/2210.10760) established scaling laws for this overoptimization, showing that proxy reward scores diverge from true performance in predictable ways. The reward model also provides no protection against deception: a deceptive AI could easily produce outputs that the reward model rates highly while pursuing entirely different objectives.
 
 ## Quick Assessment
 
@@ -43,7 +43,7 @@ However, reward modeling inherits and potentially amplifies all limitations of R
 | Current Maturity | High | Universal adoption at frontier labs since 2022 |
 | Time Horizon | Deployed | Core component of ChatGPT, Claude, Gemini |
 | Safety Contribution | Low | Enables alignment training but vulnerable to hacking |
-| Key Proponents | <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink>, DeepMind | All use reward models in production |
+| Key Proponents | <EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink>, DeepMind | All use reward models in production |
 
 ## How It Works
 
@@ -79,10 +79,10 @@ The reward modeling pipeline operates in three stages. First, human annotators c
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| <EntityLink id="misuse">Misuse</EntityLink> | Medium | Trains models to refuse harmful requests |
-| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | Low | Cannot detect hidden goals; only evaluates outputs |
-| <EntityLink id="sycophancy">Sycophancy</EntityLink> | Low | Often exacerbates this via human preference for validation |
-| <EntityLink id="goal-misgeneralization">Goal Misgeneralization</EntityLink> | Low | Reward models don't verify goal representations |
+| <EntityLink id="E206">Misuse</EntityLink> | Medium | Trains models to refuse harmful requests |
+| <EntityLink id="E93">Deceptive Alignment</EntityLink> | Low | Cannot detect hidden goals; only evaluates outputs |
+| <EntityLink id="E295">Sycophancy</EntityLink> | Low | Often exacerbates this via human preference for validation |
+| <EntityLink id="E151">Goal Misgeneralization</EntityLink> | Low | Reward models don't verify goal representations |
 
 ## Risk Assessment & Impact
 
@@ -212,15 +212,15 @@ Reward modeling provides no protection against this pattern because reward is on
 
 ### Techniques That Build on Reward Modeling
 
-- **<EntityLink id="rlhf">RLHF</EntityLink>**: Reward modeling is core component
-- **<EntityLink id="constitutional-ai">Constitutional AI</EntityLink>**: Uses AI-generated preferences but same reward modeling paradigm
-- **<EntityLink id="process-supervision">Process Supervision</EntityLink>**: Extends reward modeling to reasoning steps
+- **<EntityLink id="E259">RLHF</EntityLink>**: Reward modeling is core component
+- **<EntityLink id="E451">Constitutional AI</EntityLink>**: Uses AI-generated preferences but same reward modeling paradigm
+- **<EntityLink id="E455">Process Supervision</EntityLink>**: Extends reward modeling to reasoning steps
 
 ### Alternative Approaches
 
 - **Direct Preference Optimization (DPO)**: Bypasses explicit reward model
-- **<EntityLink id="debate">Debate</EntityLink>**: Adversarial rather than predictive evaluation
-- **<EntityLink id="mech-interp">Mechanistic Interpretability</EntityLink>**: Understand internals rather than predict outputs
+- **<EntityLink id="E482">Debate</EntityLink>**: Adversarial rather than predictive evaluation
+- **<EntityLink id="E477">Mechanistic Interpretability</EntityLink>**: Understand internals rather than predict outputs
 
 ## Research Directions
 
@@ -287,7 +287,7 @@ Reward modeling relates to the <EntityLink id="ai-transition-model" /> through:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Reward hacking represents alignment failure mode |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Reward hacking represents alignment failure mode |
 | <EntityLink id="ai-capability-level" /> | Training paradigm | Enables current capabilities but fails at scale |
 
 Reward modeling is essential infrastructure for current AI development, but its limitations become the limitations of the alignment approaches that depend on it.

@@ -31,12 +31,12 @@ import {Mermaid, R, EntityLink, DataExternalLinks, DataInfoBox} from '@component
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Research Investment** | Low (\$1-5M/year) | ARC Theory team has 3 permanent researchers; received \$265K from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> (2022); returned \$1.25M FTX grant |
+| **Research Investment** | Low (\$1-5M/year) | ARC Theory team has 3 permanent researchers; received \$265K from <EntityLink id="E552">Coefficient Giving</EntityLink> (2022); returned \$1.25M FTX grant |
 | **Problem Status** | Unsolved | 197 proposals submitted to [ELK Prize](https://www.alignment.org/blog/elk-prize-results/); \$50K and \$100K prizes remain unclaimed |
 | **Best Empirical Results** | 75-89% AUROC | [Quirky LMs paper](https://arxiv.org/abs/2312.01037): LogR on contrast pairs recovers 89% of truth-untruth gap; anomaly detection achieves 0.95 AUROC |
 | **CCS Baseline** | 4% above zero-shot | [Burns et al. 2023](https://arxiv.org/abs/2212.03827): CCS outperforms zero-shot by 4% on average across 10 datasets |
 | **Timeline to Solution** | Unknown (potentially unsolvable) | No proposed solution survives ARC's builder-breaker methodology; theoretical barriers may be fundamental |
-| **Safety Importance** | Critical (if solved) | Would enable detection of <EntityLink id="deceptive-alignment" /> and verification of AI beliefs |
+| **Safety Importance** | Critical (if solved) | Would enable detection of <EntityLink id="E93" /> and verification of AI beliefs |
 | **Industry Adoption** | None | Purely theoretical research; no production implementations |
 | **Grade** | C+ | High potential impact but uncertain tractability; limited progress despite 3+ years of focused research |
 
@@ -320,9 +320,9 @@ flowchart TD
 
 | Problem | Relationship |
 |---------|--------------|
-| **<EntityLink id="deceptive-alignment" />** | ELK would detect deceptive alignment |
-| **<EntityLink id="interpretability" />** | ELK is specific interpretability goal |
-| **<EntityLink id="scalable-oversight" />** | ELK enables human oversight of superhuman AI |
+| **<EntityLink id="E93" />** | ELK would detect deceptive alignment |
+| **<EntityLink id="E174" />** | ELK is specific interpretability goal |
+| **<EntityLink id="E271" />** | ELK enables human oversight of superhuman AI |
 | **Honest AI** | ELK is prerequisite for guaranteed honesty |
 
 ### If ELK is Solved
@@ -348,8 +348,8 @@ If ELK is solved, it would address:
 
 | Risk | Mechanism | Effectiveness |
 |------|-----------|---------------|
-| **<EntityLink id="deceptive-alignment" />** | Forces honest reporting of intentions | Very High |
-| **<EntityLink id="scheming" />** | Detects strategic deception | Very High |
+| **<EntityLink id="E93" />** | Forces honest reporting of intentions | Very High |
+| **<EntityLink id="E274" />** | Detects strategic deception | Very High |
 | **Oversight Failure** | Enables verification of AI beliefs | Very High |
 | **Value Misalignment** | Can detect misaligned goals | High |
 
@@ -400,8 +400,8 @@ ELK research affects the <EntityLink id="ai-transition-model" /> through oversig
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="human-oversight-quality" /> | Oversight effectiveness | Enables verification of AI beliefs and intentions |
-| <EntityLink id="alignment-robustness" /> | Deception detection | Would make deceptive alignment impossible |
-| <EntityLink id="misalignment-potential" /> | Alignment verification | Could verify AI systems are aligned |
+| <EntityLink id="E160" /> | Oversight effectiveness | Enables verification of AI beliefs and intentions |
+| <EntityLink id="E20" /> | Deception detection | Would make deceptive alignment impossible |
+| <EntityLink id="E205" /> | Alignment verification | Could verify AI systems are aligned |
 
 ELK is a foundational problem for AI safety. If solved, it would provide the basis for genuine oversight of advanced AI systems. If unsolvable, it implies we must rely on control-based approaches rather than trust-based oversight. The problem's difficulty and importance make it a critical research priority despite uncertain tractability.

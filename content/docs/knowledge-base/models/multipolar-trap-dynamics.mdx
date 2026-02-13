@@ -31,15 +31,15 @@ subcategory: dynamics-models
 ---
 import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="multipolar-trap-dynamics" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E210" ratings={frontmatter.ratings} />
 
 ## Overview
 
-The <EntityLink id="multipolar-trap">multipolar trap</EntityLink> model analyzes how multiple competing actors in AI development become trapped in collectively destructive equilibria despite individual preferences for coordinated safety. This game-theoretic framework reveals that even when all actors genuinely prefer safe AI development, individual rationality systematically drives unsafe outcomes through competitive pressures.
+The <EntityLink id="E209">multipolar trap</EntityLink> model analyzes how multiple competing actors in AI development become trapped in collectively destructive equilibria despite individual preferences for coordinated safety. This game-theoretic framework reveals that even when all actors genuinely prefer safe AI development, individual rationality systematically drives unsafe outcomes through competitive pressures.
 
 The core mechanism operates as an N-player prisoner's dilemma where each actor faces a choice: invest in safety (slowing development) or cut corners (accelerating deployment). When one actor defects toward speed, others must follow or lose critical competitive positioning. The result is a race to the bottom in safety standards, even when no participant desires this outcome.
 
-**Key findings:** Universal cooperation probability drops from 81% with 2 actors to 21% with 15 actors. Central estimates show 20-35% probability of partial coordination escape, 5-10% risk of catastrophic competitive <EntityLink id="lock-in">lock-in</EntityLink>. Compute governance offers the highest-leverage intervention with 20-35% risk reduction potential.
+**Key findings:** Universal cooperation probability drops from 81% with 2 actors to 21% with 15 actors. Central estimates show 20-35% probability of partial coordination escape, 5-10% risk of catastrophic competitive <EntityLink id="E189">lock-in</EntityLink>. Compute governance offers the highest-leverage intervention with 20-35% risk reduction potential.
 
 ## Risk Assessment
 
@@ -49,7 +49,7 @@ The core mechanism operates as an N-player prisoner's dilemma where each actor f
 | **Safety investment erosion** | High | 65-80% | Ongoing | ↗ Worsening | Release cycles: 24mo → 3-6mo compression |
 | **Information sharing collapse** | Medium | 40-60% | 2-5 years | ↔ Stable (poor) | Limited inter-lab safety research sharing |
 | **Regulatory arbitrage** | Medium | 50-70% | 2-4 years | ↗ Increasing | <R id="34469a08fb038984">Industry lobbying</R> against binding standards |
-| **<EntityLink id="trust-cascade">Trust cascade failure</EntityLink>** | High | 30-45% | 1-3 years | ↗ Concerning | Public accusations, agreement violations |
+| **<EntityLink id="E360">Trust cascade failure</EntityLink>** | High | 30-45% | 1-3 years | ↗ Concerning | Public accusations, agreement violations |
 
 ## Game-Theoretic Framework
 
@@ -108,8 +108,8 @@ Critical insight: coordination difficulty scales exponentially with participant 
 |------|-------|---------------------|---------------|
 | **Nov 2022** | <R id="5d0c50035bac37ed">ChatGPT launch</R> | Industry-wide acceleration | Testing windows shortened |
 | **Feb 2023** | <R id="ad5a96cbc53d3240">Google's rushed Bard launch</R> | Demo errors signal quality compromise | Safety testing sacrificed |
-| **Mar 2023** | <R id="f5041642fb213c07"><EntityLink id="anthropic">Anthropic</EntityLink> Claude release</R> | Matches accelerated timeline | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> insufficient buffer |
-| **Jul 2023** | <R id="69c685f410104791">Meta Llama 2 open-source</R> | Capability diffusion escalation | Open weights <EntityLink id="proliferation">proliferation</EntityLink> |
+| **Mar 2023** | <R id="f5041642fb213c07"><EntityLink id="E22">Anthropic</EntityLink> Claude release</R> | Matches accelerated timeline | <EntityLink id="E451">Constitutional AI</EntityLink> insufficient buffer |
+| **Jul 2023** | <R id="69c685f410104791">Meta Llama 2 open-source</R> | Capability diffusion escalation | Open weights <EntityLink id="E232">proliferation</EntityLink> |
 
 <Mermaid chart={`flowchart TD
     A[ChatGPT Success] --> B[Competitor Panic]
@@ -205,7 +205,7 @@ Compute governance offers the highest-leverage intervention because:
 | **Trust collapse** | Public accusations, agreement violations | Partial erosion observed | Difficult |
 | **First-mover decisive advantage** | Insurmountable capability lead | Unclear if applies to AI | N/A |
 | **Institutional breakdown** | Regulations obsolete on arrival | Trending toward | Moderate |
-| **Capability criticality** | <EntityLink id="self-improvement">Recursive self-improvement</EntityLink> | Not yet reached | None |
+| **Capability criticality** | <EntityLink id="E278">Recursive self-improvement</EntityLink> | Not yet reached | None |
 
 ### Scenario Probability Assessment
 
@@ -250,7 +250,7 @@ The model assumes:
 
 **Tier 1 (Immediate):**
 1. **Compute governance infrastructure** — Physical chokepoint with enforcement capability
-2. **Verification system development** — Enable <EntityLink id="solutions">repeated game cooperation</EntityLink>
+2. **Verification system development** — Enable <EntityLink id="E393">repeated game cooperation</EntityLink>
 3. **Liability framework design** — Internalize safety externalities
 
 **Tier 2 (Medium-term):**
@@ -271,9 +271,9 @@ The multipolar trap represents one of the most tractable yet critical aspects of
 
 ## Related Models
 
-- <EntityLink id="racing-dynamics-impact" label="Racing Dynamics Impact" /> — Specific competitive pressure mechanisms
-- <EntityLink id="winner-take-all-concentration" label="Winner-Take-All Concentration" /> — First-mover advantage implications
-- <EntityLink id="critical-uncertainties" /> — Key variables determining outcomes
+- <EntityLink id="E240" label="Racing Dynamics Impact" /> — Specific competitive pressure mechanisms
+- <EntityLink id="E375" label="Winner-Take-All Concentration" /> — First-mover advantage implications
+- <EntityLink id="E398" /> — Key variables determining outcomes
 
 ## Sources & Resources
 
@@ -291,7 +291,7 @@ The multipolar trap represents one of the most tractable yet critical aspects of
 | Organization | Focus | URL |
 |--------------|-------|-----|
 | <R id="a306e0b63bdedbd5">Centre for AI Safety</R> | Technical safety research | https://www.safe.ai/ |
-| <EntityLink id="uk-aisi">AI Safety Institute (UK)</EntityLink> | Government safety evaluation | https://www.aisi.gov.uk/ |
+| <EntityLink id="E364">AI Safety Institute (UK)</EntityLink> | Government safety evaluation | https://www.aisi.gov.uk/ |
 | <R id="01f718ecb2210e25">Frontier Model Forum</R> | Industry coordination | https://www.frontiermodeIforum.org/ |
 | <R id="0e7aef26385afeed">Partnership on AI</R> | Multi-stakeholder collaboration | https://www.partnershiponai.org/ |
 

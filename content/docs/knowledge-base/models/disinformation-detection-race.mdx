@@ -29,15 +29,15 @@ subcategory: domain-models
 ---
 import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="disinformation-detection-race" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E103" ratings={frontmatter.ratings} />
 
 ## Overview
 
 AI enables both the generation of increasingly convincing synthetic content and the detection of such content, creating an adversarial arms race with profound implications for information integrity. This model analyzes the competitive dynamics between generation and detection, projecting that generation holds structural advantages that make detection-based defenses increasingly unreliable. The central insight is that this is not a symmetric competition: generators can explicitly train against detectors, have access to detector architectures, and optimize specifically for indistinguishability, while detectors must generalize to unseen generation techniques and face a moving target.
 
-Understanding these dynamics matters because detection failure would fundamentally change the information landscape. If content-based detection falls below practical utility (which this model projects by 2028-2030), societies cannot rely on technical systems to distinguish authentic from synthetic content. This creates what researchers call the "liar's dividend"—not only can synthetic content deceive, but authentic content becomes deniable ("that video of me is a deepfake"). The epistemic implications extend far beyond <EntityLink id="disinformation">disinformation</EntityLink> to affect legal proceedings, journalism, personal relationships, and institutional trust.
+Understanding these dynamics matters because detection failure would fundamentally change the information landscape. If content-based detection falls below practical utility (which this model projects by 2028-2030), societies cannot rely on technical systems to distinguish authentic from synthetic content. This creates what researchers call the "liar's dividend"—not only can synthetic content deceive, but authentic content becomes deniable ("that video of me is a deepfake"). The epistemic implications extend far beyond <EntityLink id="E102">disinformation</EntityLink> to affect legal proceedings, journalism, personal relationships, and institutional trust.
 
-The model evaluates four scenarios for how this race might unfold: detection failure (55% probability), transition to provenance-based authentication (30%), detection parity (10%), and <EntityLink id="alignment">AI alignment</EntityLink> solutions (5%). The most likely outcome—detection failure—argues strongly for accelerating alternative approaches, particularly cryptographic provenance systems like C2PA. Current detection accuracy trends from ~85-95% in 2018 to ~60-70% in 2024 suggest we have perhaps 3-5 years before content-based detection becomes practically useless, making this a critical window for building alternative infrastructure.
+The model evaluates four scenarios for how this race might unfold: detection failure (55% probability), transition to provenance-based authentication (30%), detection parity (10%), and <EntityLink id="E439">AI alignment</EntityLink> solutions (5%). The most likely outcome—detection failure—argues strongly for accelerating alternative approaches, particularly cryptographic provenance systems like C2PA. Current detection accuracy trends from ~85-95% in 2018 to ~60-70% in 2024 suggest we have perhaps 3-5 years before content-based detection becomes practically useless, making this a critical window for building alternative infrastructure.
 
 ## Conceptual Framework
 
@@ -416,9 +416,9 @@ This model has significant limitations that affect confidence in its projections
 
 ## Related Models
 
-- <EntityLink id="disinformation-electoral-impact" /> - Impact assessment even if detection fails
-- <EntityLink id="deepfakes-authentication-crisis" /> - Specific to synthetic media
-- <EntityLink id="trust-cascade-model" /> - Institutional trust erosion dynamics
+- <EntityLink id="E104" /> - Impact assessment even if detection fails
+- <EntityLink id="E97" /> - Specific to synthetic media
+- <EntityLink id="E361" /> - Institutional trust erosion dynamics
 
 ## Sources
 

@@ -32,13 +32,13 @@ subcategory: analysis-models
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="ai-risk-portfolio-analysis" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E12" ratings={frontmatter.ratings} />
 
 ## Overview
 
-This framework provides quantitative estimates for allocating limited resources across AI risk categories. Based on expert surveys and risk assessment methodologies from organizations like <R id="0a17f30e99091ebf">RAND</R> and <R id="f0d95954b449240a"><EntityLink id="cset">Center for Security and Emerging Technology</EntityLink> (CSET)</R>, the analysis estimates misalignment accounts for 40-70% of existential risk, misuse 15-35%, and structural risks 10-25%.
+This framework provides quantitative estimates for allocating limited resources across AI risk categories. Based on expert surveys and risk assessment methodologies from organizations like <R id="0a17f30e99091ebf">RAND</R> and <R id="f0d95954b449240a"><EntityLink id="E524">Center for Security and Emerging Technology</EntityLink> (CSET)</R>, the analysis estimates misalignment accounts for 40-70% of existential risk, misuse 15-35%, and structural risks 10-25%.
 
-The model draws from <R id="d199149badb220f3">portfolio optimization theory</R> and <R id="d64c91adf6a2e394"><EntityLink id="coefficient-giving">Coefficient Giving's</EntityLink> cause prioritization framework</R>, addressing the critical question: How should the AI safety community allocate its \$100M+ annual resources across different risk categories? All estimates carry substantial uncertainty (±50% or higher), making the framework's value in relative comparisons rather than precise numbers.
+The model draws from <R id="d199149badb220f3">portfolio optimization theory</R> and <R id="d64c91adf6a2e394"><EntityLink id="E521">Coefficient Giving's</EntityLink> cause prioritization framework</R>, addressing the critical question: How should the AI safety community allocate its \$100M+ annual resources across different risk categories? All estimates carry substantial uncertainty (±50% or higher), making the framework's value in relative comparisons rather than precise numbers.
 
 ## Risk Assessment Matrix
 
@@ -71,7 +71,7 @@ $$
 
 ### Timeline-Dependent Allocation
 
-Resource allocation should vary significantly based on <EntityLink id="agi-timeline">AGI timeline beliefs</EntityLink>:
+Resource allocation should vary significantly based on <EntityLink id="E399">AGI timeline beliefs</EntityLink>:
 
 | Timeline Scenario | Misalignment | Misuse | Structural | Rationale |
 |------------------|--------------|--------|------------|-----------|
@@ -95,18 +95,18 @@ pie title Current Resource Allocation vs Optimal (Medium Timeline)
 
 | Category | Primary Bottleneck | Marginal $ Value | Saturation Risk | Key Organizations |
 |----------|-------------------|------------------|-----------------|------------------|
-| Misalignment | Conceptual clarity | High (if skilled) | Medium | <EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink> |
+| Misalignment | Conceptual clarity | High (if skilled) | Medium | <EntityLink id="E202">MIRI</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink> |
 | Misuse | Government engagement | Very High | Low | <R id="58f6946af0177ca5">CNAS</R>, <R id="f0d95954b449240a">CSET</R> |
-| Structural | Framework development | High | Very Low | <EntityLink id="govai">GovAI</EntityLink>, <EntityLink id="cais">CAIS</EntityLink> |
+| Structural | Framework development | High | Very Low | <EntityLink id="E153">GovAI</EntityLink>, <EntityLink id="E47">CAIS</EntityLink> |
 | Accidents | Implementation gaps | Medium | High | <R id="0e7aef26385afeed">Partnership on AI</R> |
 
 ### Funding Landscape Analysis
 
-Based on comprehensive analysis from <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, [Longview Philanthropy estimates](https://forum.effectivealtruism.org/posts/XdhwXppfqrpPL2YDX/an-overview-of-the-ai-safety-funding-situation), and [LTFF reporting](https://forum.effectivealtruism.org/posts/pJyCWzevPHsycj4oQ/long-term-future-fund-may-2023-to-march-2024-payout), external AI safety funding reached approximately \$110-130M in 2024:
+Based on comprehensive analysis from <EntityLink id="E521">Coefficient Giving</EntityLink>, [Longview Philanthropy estimates](https://forum.effectivealtruism.org/posts/XdhwXppfqrpPL2YDX/an-overview-of-the-ai-safety-funding-situation), and [LTFF reporting](https://forum.effectivealtruism.org/posts/pJyCWzevPHsycj4oQ/long-term-future-fund-may-2023-to-march-2024-payout), external AI safety funding reached approximately \$110-130M in 2024:
 
 | Funding Source | 2024 Amount | Share | Key Focus Areas |
 |----------------|-------------|-------|-----------------|
-| <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> | \$63.6M | ≈49% | Technical alignment, evaluations, governance |
+| <EntityLink id="E521">Coefficient Giving</EntityLink> | \$63.6M | ≈49% | Technical alignment, evaluations, governance |
 | Survival & Flourishing Fund | \$19M+ | ≈15% | Diverse safety research |
 | Long-Term Future Fund | \$5.4M | ≈4% | Early-career, small orgs |
 | Jaan Tallinn & individual donors | \$20M | ≈15% | Direct grants to researchers |
@@ -125,7 +125,7 @@ The breakdown by research area reveals significant concentration in interpretabi
 | Agent safety | \$8.2M | 6% | Emerging | 10-15% |
 
 <Aside type="note" title="Coefficient Giving Dominance">
-<EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> accounts for nearly 60% of all external AI safety investment, with \$63.6M deployed in 2024. Since 2017, Coefficient Giving has donated approximately \$336M to AI safety (~12% of their total \$2.8B in giving). The median Coefficient Giving AI safety grant is \$257k; the average is \$1.67M.
+<EntityLink id="E521">Coefficient Giving</EntityLink> accounts for nearly 60% of all external AI safety investment, with \$63.6M deployed in 2024. Since 2017, Coefficient Giving has donated approximately \$336M to AI safety (~12% of their total \$2.8B in giving). The median Coefficient Giving AI safety grant is \$257k; the average is \$1.67M.
 </Aside>
 
 ## Risk Interdependency Network
@@ -260,7 +260,7 @@ Based on 2024 funding analysis, specific portfolio rebalancing recommendations:
 
 | Funder Type | Current Allocation | Recommended Shift | Specific Opportunities | Priority |
 |-------------|-------------------|-------------------|------------------------|----------|
-| <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> | 68% evals, 12% interp | +15% governance, +10% agent safety | GovAI expansion, international capacity | High |
+| <EntityLink id="E521">Coefficient Giving</EntityLink> | 68% evals, 12% interp | +15% governance, +10% agent safety | GovAI expansion, international capacity | High |
 | SFF/individual donors | Technical focus | +\$5-10M to neglected areas | Value learning, formal verification | High |
 | LTFF | Early career, small orgs | Maintain current portfolio | Continue diversified approach | Medium |
 | Government agencies | Policy-aligned research | +\$20-30M to independent oversight | AISI expansion, red-teaming | Very High |
@@ -300,7 +300,7 @@ Career decision framework based on <R id="ec456e4a78161d43">80,000 Hours methodo
 
 ### 2024 Funding Landscape
 
-Based on [detailed analysis](https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation) and <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> grant data, external AI safety funding has evolved significantly:
+Based on [detailed analysis](https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation) and <EntityLink id="E521">Coefficient Giving</EntityLink> grant data, external AI safety funding has evolved significantly:
 
 | Year | External Funding | Internal Lab Safety | Total (Est.) | Key Developments |
 |------|------------------|---------------------|--------------|------------------|
@@ -316,7 +316,7 @@ Major AI labs—Anthropic, OpenAI, and DeepMind—invest an estimated \$500M+ co
 
 ### Coefficient Giving Technical AI Safety Grants (2024)
 
-[Detailed analysis](https://www.lesswrong.com/posts/adzfKEW98TswZEA6T/brief-analysis-of-op-technical-ai-safety-funding) of <EntityLink id="coefficient-giving">Coefficient Giving's</EntityLink> \$28M in Technical AI Safety grants reveals:
+[Detailed analysis](https://www.lesswrong.com/posts/adzfKEW98TswZEA6T/brief-analysis-of-op-technical-ai-safety-funding) of <EntityLink id="E521">Coefficient Giving's</EntityLink> \$28M in Technical AI Safety grants reveals:
 
 | Focus Area | Share of CG TAIS | Key Recipients | Assessment |
 |------------|------------------|----------------|------------|
@@ -335,7 +335,7 @@ Major AI labs—Anthropic, OpenAI, and DeepMind—invest an estimated \$500M+ co
 | Medium timelines (5-15y) | \$200-350M | 55% | 30% | 15% | Build institutions + research |
 | Long timelines (15+y) | \$150-250M | 45% | 35% | 20% | Institutional capacity |
 
-<EntityLink id="coefficient-giving">Coefficient Giving's</EntityLink> 2025 RFP commits at least \$40M to technical AI safety, with potential for "substantially more depending on application quality." Priority areas marked include agent safety, interpretability, and evaluation methods.
+<EntityLink id="E521">Coefficient Giving's</EntityLink> 2025 RFP commits at least \$40M to technical AI safety, with potential for "substantially more depending on application quality." Priority areas marked include agent safety, interpretability, and evaluation methods.
 
 ## Key Model Limitations
 
@@ -362,7 +362,7 @@ Major AI labs—Anthropic, OpenAI, and DeepMind—invest an estimated \$500M+ co
 
 | Source | Type | Coverage | Update Frequency | URL |
 |--------|------|----------|------------------|-----|
-| <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> Grants Database | Primary | All CG grants | Real-time | openphilanthropy.org |
+| <EntityLink id="E521">Coefficient Giving</EntityLink> Grants Database | Primary | All CG grants | Real-time | openphilanthropy.org |
 | [EA Funds LTFF Reports](https://forum.effectivealtruism.org/posts/pJyCWzevPHsycj4oQ/long-term-future-fund-may-2023-to-march-2024-payout) | Primary | LTFF grants | Quarterly | effectivealtruism.org |
 | [Longview Philanthropy Analysis](https://forum.effectivealtruism.org/posts/XdhwXppfqrpPL2YDX/an-overview-of-the-ai-safety-funding-situation) | Analysis | Landscape overview | Annual | EA Forum |
 | [CG Technical Safety Analysis](https://www.lesswrong.com/posts/adzfKEW98TswZEA6T/brief-analysis-of-op-technical-ai-safety-funding) | Analysis | CG TAIS breakdown | Annual | LessWrong |
@@ -398,7 +398,7 @@ Major AI labs—Anthropic, OpenAI, and DeepMind—invest an estimated \$500M+ co
 
 This framework connects with several other analytical models:
 
-- <EntityLink id="compounding-risks-analysis" label="Compounding Risks Analysis" /> - How risks interact and amplify
-- <EntityLink id="critical-uncertainties" label="Critical Uncertainties Framework" /> - Key unknowns affecting strategy
-- <EntityLink id="capability-alignment-race">Capability-Alignment Race Model</EntityLink> - Timeline dynamics
-- <EntityLink id="defense-in-depth-model" /> - Multi-layered risk mitigation
+- <EntityLink id="E63" label="Compounding Risks Analysis" /> - How risks interact and amplify
+- <EntityLink id="E398" label="Critical Uncertainties Framework" /> - Key unknowns affecting strategy
+- <EntityLink id="E414">Capability-Alignment Race Model</EntityLink> - Timeline dynamics
+- <EntityLink id="E99" /> - Multi-layered risk mitigation

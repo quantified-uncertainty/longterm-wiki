@@ -30,7 +30,7 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 Capability unlearning represents a direct approach to AI safety: rather than preventing misuse through behavioral constraints that might be circumvented, remove the dangerous capabilities themselves from the model. If a model genuinely doesn't know how to synthesize dangerous pathogens or construct cyberattacks, it cannot be misused for these purposes regardless of jailbreaks, fine-tuning attacks, or other elicitation techniques.
 
-The approach has gained significant research attention following the development of benchmarks like [WMDP (Weapons of Mass Destruction Proxy)](https://arxiv.org/abs/2403.03218), released in March 2024 by the <EntityLink id="cais">Center for AI Safety</EntityLink> in collaboration with over twenty academic institutions and industry partners. WMDP contains 3,668 multiple-choice questions measuring dangerous knowledge in biosecurity, cybersecurity, and chemical security. Researchers have demonstrated that various techniques including gradient-based unlearning, <EntityLink id="representation-engineering">representation engineering</EntityLink>, and fine-tuning can reduce model performance on these benchmarks while preserving general capabilities.
+The approach has gained significant research attention following the development of benchmarks like [WMDP (Weapons of Mass Destruction Proxy)](https://arxiv.org/abs/2403.03218), released in March 2024 by the <EntityLink id="E47">Center for AI Safety</EntityLink> in collaboration with over twenty academic institutions and industry partners. WMDP contains 3,668 multiple-choice questions measuring dangerous knowledge in biosecurity, cybersecurity, and chemical security. Researchers have demonstrated that various techniques including gradient-based unlearning, <EntityLink id="E479">representation engineering</EntityLink>, and fine-tuning can reduce model performance on these benchmarks while preserving general capabilities.
 
 However, the field faces fundamental challenges that may limit its effectiveness. First, verifying complete capability removal is extremely difficult, as capabilities may be recoverable through fine-tuning, prompt engineering, or other elicitation methods. Second, dangerous and beneficial knowledge are often entangled, meaning removal may degrade useful capabilities. Third, for advanced AI systems, the model might understand what capabilities are being removed and resist or hide the remaining knowledge. These limitations suggest capability unlearning is best viewed as one layer in a defense-in-depth strategy rather than a complete solution.
 
@@ -232,9 +232,9 @@ The [TOFU benchmark](https://arxiv.org/abs/2401.06121) (published at COLM 2024) 
 
 | Risk | Relevance | How Unlearning Helps | Limitations |
 |------|-----------|---------------------|-------------|
-| <EntityLink id="bioweapons" /> | **High** | Removes pathogen synthesis, enhancement knowledge | Dual-use biology knowledge entangled |
+| <EntityLink id="E42" /> | **High** | Removes pathogen synthesis, enhancement knowledge | Dual-use biology knowledge entangled |
 | <EntityLink id="cyberattacks" /> | **High** | Removes exploit development, attack techniques | Security knowledge widely distributed |
-| <EntityLink id="misuse-potential" /> | **High** | Directly reduces dangerous capability surface | Recovery via fine-tuning possible |
+| <EntityLink id="E207" /> | **High** | Directly reduces dangerous capability surface | Recovery via fine-tuning possible |
 | <EntityLink id="open-sourcing-risk" /> | **High** | Critical for open-weight releases where runtime controls absent | Verification impossible before release |
 | <EntityLink id="capability-overhang" /> | **Medium** | Reduces latent dangerous capabilities | Does not address emergent capabilities |
 
@@ -284,7 +284,7 @@ Capability unlearning affects the <EntityLink id="ai-transition-model" /> throug
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misuse-potential" /> | Dangerous capabilities | Directly reduces misuse potential |
+| <EntityLink id="E207" /> | Dangerous capabilities | Directly reduces misuse potential |
 | <EntityLink id="bioweapon-risk" /> | Biosecurity | Removes pathogen synthesis knowledge |
 | <EntityLink id="cyberattack-risk" /> | Cybersecurity | Removes attack technique knowledge |
 
