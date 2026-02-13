@@ -40,8 +40,11 @@ function generateMdxStub(entity) {
   // Extract sidebar order from entity if available
   const sidebarOrder = entity.sidebarOrder || 99;
 
+  // Include numericId so the page inherits the entity's stable ID
+  const numericIdLine = entity.numericId ? `\nnumericId: ${entity.numericId}` : '';
+
   return `---
-title: "${entity.title}"
+title: "${entity.title}"${numericIdLine}
 sidebar:
   order: ${sidebarOrder}
 ---

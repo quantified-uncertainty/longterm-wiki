@@ -50,6 +50,8 @@ const BaseEntity = z.object({
   status: z.string().optional(),
   customFields: z.array(CustomField).default([]),
   relatedTopics: z.array(z.string()).default([]),
+  // Summary/overview page that this entity belongs to (entity or page ID)
+  summaryPage: z.string().optional(),
 });
 
 // ============================================================================

@@ -173,6 +173,7 @@ function transformEntity(raw, expertMap, orgMap) {
     status: raw.status,
     customFields: raw.customFields || [],
     relatedTopics: raw.relatedTopics || [],
+    summaryPage: raw.summaryPage,
   };
 
   // Helper to find a customField value

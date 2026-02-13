@@ -443,6 +443,8 @@ function buildPagesRegistry(urlToResource) {
 
         pages.push({
           id,
+          numericId: fm.numericId || null,
+          _fullPath: fullPath,
           path: urlPath,
           filePath: relative(CONTENT_DIR, fullPath),
           title: fm.title || id.replace(/-/g, ' '),
@@ -628,49 +630,83 @@ function main() {
   database.entities = entities;
 
   // =========================================================================
-  // ID REGISTRY — assign stable numeric IDs (E1, E2, ...) to every entity
+  // ID REGISTRY — derive from numericId fields in source files (YAML + MDX)
+  //
+  // IDs are stored in source files (YAML `numericId:` or MDX frontmatter).
+  // This section reads them, detects conflicts, and assigns IDs to any
+  // new entities that don't have one yet (writing back to source files).
+  // The id-registry.json is generated as a derived build artifact only.
   // =========================================================================
   const ID_REGISTRY_FILE = join(DATA_DIR, 'id-registry.json');
-  let idRegistry = { _nextId: 1, entities: {} };
-  if (existsSync(ID_REGISTRY_FILE)) {
-    idRegistry = JSON.parse(readFileSync(ID_REGISTRY_FILE, 'utf-8'));
-  }
-
-  // Build reverse map: slug → numericId
   const slugToNumericId = {};
-  for (const [numId, slug] of Object.entries(idRegistry.entities)) {
-    slugToNumericId[slug] = numId;
+  const numericIdToSlug = {};
+  const conflicts = [];
+
+  // Collect numericIds from all entities (YAML + frontmatter)
+  for (const entity of entities) {
+    if (entity.numericId) {
+      // Detect conflicts: two different entities claiming the same numericId
+      if (numericIdToSlug[entity.numericId] && numericIdToSlug[entity.numericId] !== entity.id) {
+        conflicts.push(`${entity.numericId} claimed by both "${numericIdToSlug[entity.numericId]}" and "${entity.id}"`);
+      }
+      numericIdToSlug[entity.numericId] = entity.id;
+      slugToNumericId[entity.id] = entity.numericId;
+    }
   }
 
-  // Assign IDs to any new entities not yet in the registry
+  if (conflicts.length > 0) {
+    console.error('\n  ERROR: numericId conflicts detected:');
+    for (const c of conflicts) console.error(`    ${c}`);
+    process.exit(1);
+  }
+
+  // Compute next available ID from existing assignments
+  let nextId = 1;
+  for (const numId of Object.keys(numericIdToSlug)) {
+    const n = parseInt(numId.slice(1));
+    if (n >= nextId) nextId = n + 1;
+  }
+
+  // Assign IDs to entities that don't have one yet, writing back to source
   let newAssignments = 0;
   for (const entity of entities) {
-    if (!slugToNumericId[entity.id]) {
-      const numId = `E${idRegistry._nextId}`;
-      idRegistry.entities[numId] = entity.id;
+    if (!entity.numericId) {
+      const numId = `E${nextId}`;
+      entity.numericId = numId;
+      numericIdToSlug[numId] = entity.id;
       slugToNumericId[entity.id] = numId;
-      idRegistry._nextId++;
+      nextId++;
       newAssignments++;
+
+      // Write the new numericId back to the source file
+      if (entity._source === 'frontmatter' && entity._filePath) {
+        // MDX frontmatter entity: inject numericId into frontmatter
+        const content = readFileSync(entity._filePath, 'utf-8');
+        const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
+        writeFileSync(entity._filePath, updated);
+        console.log(`    Assigned ${numId} → ${entity.id} (wrote to MDX frontmatter)`);
+      } else {
+        // YAML entity: would need to update YAML file
+        // For now, warn — this should be handled by `crux content create`
+        console.warn(`    WARNING: Assigned ${numId} → ${entity.id} (YAML entity without numericId — add manually)`);
+      }
     }
-    // Attach numericId to entity object
-    entity.numericId = slugToNumericId[entity.id];
   }
 
-  // Save updated registry
-  if (newAssignments > 0) {
-    writeFileSync(ID_REGISTRY_FILE, JSON.stringify(idRegistry, null, 2));
-    console.log(`  idRegistry: assigned ${newAssignments} new IDs (total: ${Object.keys(idRegistry.entities).length})`);
-  } else {
-    console.log(`  idRegistry: all ${Object.keys(idRegistry.entities).length} entities have IDs`);
-  }
-
-  // Copy id-registry.json to app output directory for consistency
+  // Generate id-registry.json as derived build artifact
+  const idRegistry = { _nextId: nextId, entities: numericIdToSlug };
+  writeFileSync(ID_REGISTRY_FILE, JSON.stringify(idRegistry, null, 2));
   copyFileSync(ID_REGISTRY_FILE, join(OUTPUT_DIR, 'id-registry.json'));
-  console.log(`  idRegistry: copied to ${join(OUTPUT_DIR, 'id-registry.json')}`);
+
+  if (newAssignments > 0) {
+    console.log(`  idRegistry: assigned ${newAssignments} new IDs (total: ${Object.keys(numericIdToSlug).length})`);
+  } else {
+    console.log(`  idRegistry: all ${Object.keys(numericIdToSlug).length} entities have IDs`);
+  }
 
   // Build lookup maps for database output
   const idRegistryOutput = {
-    byNumericId: { ...idRegistry.entities },
+    byNumericId: { ...numericIdToSlug },
     bySlug: { ...slugToNumericId },
   };
   database.idRegistry = idRegistryOutput;
@@ -801,8 +837,9 @@ function main() {
       maxSimilarity: 0,
       similarPages: [],
     };
-    // Remove rawContent to keep JSON size reasonable
+    // Remove internal fields to keep JSON size reasonable
     delete page.rawContent;
+    delete page._fullPath;
   }
 
   // Store redundancy pairs for analysis
@@ -820,8 +857,8 @@ function main() {
   database.pages = pages;
 
   // =========================================================================
-  // EXTEND ID REGISTRY — assign numeric IDs to page-only content (no entity)
-  // This ensures table/diagram/index pages get E-prefixed IDs like all entities.
+  // EXTEND ID REGISTRY — collect numericIds from page-only content (no entity)
+  // Pages can declare numericId in MDX frontmatter. New pages get auto-assigned.
   // =========================================================================
   const entityIds = new Set(entities.map(e => e.id));
   // Skip infrastructure/internal categories — only assign IDs to real content pages
@@ -832,23 +869,47 @@ function main() {
   let pageIdAssignments = 0;
   for (const page of pages) {
     if (entityIds.has(page.id)) continue;        // Already has an entity (and thus an ID)
-    if (slugToNumericId[page.id]) continue;       // Already in registry
+    if (slugToNumericId[page.id]) continue;       // Already in registry from entity
     if (skipCategories.has(page.category)) continue; // Infrastructure pages
     if (page.contentFormat === 'dashboard') continue; // Dashboard pages are infrastructure
-    const numId = `E${idRegistry._nextId}`;
-    idRegistry.entities[numId] = page.id;
-    slugToNumericId[page.id] = numId;
-    idRegistry._nextId++;
-    pageIdAssignments++;
+
+    if (page.numericId) {
+      // Page already has a numericId from frontmatter.
+      // For generated stubs, the numericId may already be assigned to the parent
+      // entity (e.g., page "epistemics" inherits E319 from entity "tmc-epistemics").
+      // Just add the page slug as an alias — don't error on this.
+      if (!numericIdToSlug[page.numericId]) {
+        numericIdToSlug[page.numericId] = page.id;
+      }
+      slugToNumericId[page.id] = page.numericId;
+    } else {
+      // Assign a new numericId and write it back to the MDX frontmatter
+      const numId = `E${nextId}`;
+      numericIdToSlug[numId] = page.id;
+      slugToNumericId[page.id] = numId;
+      page.numericId = numId;
+      nextId++;
+      pageIdAssignments++;
+
+      // Write back to MDX frontmatter
+      if (page._fullPath) {
+        const content = readFileSync(page._fullPath, 'utf-8');
+        const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
+        writeFileSync(page._fullPath, updated);
+        console.log(`    Assigned ${numId} → ${page.id} (wrote to MDX frontmatter)`);
+      }
+    }
   }
+
+  // Always update the registry output maps (page-only entries may have added slugs)
+  const updatedRegistry = { _nextId: nextId, entities: numericIdToSlug };
+  writeFileSync(ID_REGISTRY_FILE, JSON.stringify(updatedRegistry, null, 2));
+  copyFileSync(ID_REGISTRY_FILE, join(OUTPUT_DIR, 'id-registry.json'));
+  idRegistryOutput.byNumericId = { ...numericIdToSlug };
+  idRegistryOutput.bySlug = { ...slugToNumericId };
+  database.idRegistry = idRegistryOutput;
   if (pageIdAssignments > 0) {
-    writeFileSync(ID_REGISTRY_FILE, JSON.stringify(idRegistry, null, 2));
-    copyFileSync(ID_REGISTRY_FILE, join(OUTPUT_DIR, 'id-registry.json'));
-    // Update the registry output maps
-    idRegistryOutput.byNumericId = { ...idRegistry.entities };
-    idRegistryOutput.bySlug = { ...slugToNumericId };
-    database.idRegistry = idRegistryOutput;
-    console.log(`  idRegistry: assigned ${pageIdAssignments} new page IDs (total: ${Object.keys(idRegistry.entities).length})`);
+    console.log(`  idRegistry: assigned ${pageIdAssignments} new page IDs (total: ${Object.keys(numericIdToSlug).length})`);
   }
 
   const pagesWithQuality = pages.filter(p => p.quality !== null).length;

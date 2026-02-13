@@ -55,7 +55,7 @@ Every entity has two identifiers:
 | **Slug** | `deceptive-alignment` | Human-readable, used in YAML |
 | **Numeric** | `E42` | Stable canonical URL (`/wiki/E42/`), never changes |
 
-The mapping lives in `data/id-registry.json` and is maintained automatically by the build script.
+Each entity stores its `numericId` directly in its source file (YAML `numericId:` field or MDX frontmatter). The build script derives `data/id-registry.json` as a build artifact.
 
 ### Entity Types (24 canonical + aliases)
 

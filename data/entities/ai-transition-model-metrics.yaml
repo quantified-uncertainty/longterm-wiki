@@ -1,4 +1,5 @@
 - id: alignment-progress
+  numericId: E19
   type: ai-transition-model-metric
   title: Alignment Progress
   description: Metrics tracking AI alignment research progress including interpretability coverage,
@@ -19,6 +20,7 @@
     - research
   lastUpdated: 2025-12
 - id: safety-research
+  numericId: E265
   type: ai-transition-model-metric
   title: Safety Research
   description: Metrics tracking AI safety research including researcher headcount, funding levels,
@@ -39,6 +41,7 @@
     - funding
   lastUpdated: 2025-12
 - id: lab-behavior
+  numericId: E184
   type: ai-transition-model-metric
   title: Lab Behavior
   description: Metrics tracking frontier AI lab practices including RSP compliance, safety
@@ -59,6 +62,7 @@
     - safety
   lastUpdated: 2025-12
 - id: public-opinion
+  numericId: E236
   type: ai-transition-model-metric
   title: Public Opinion
   description: Metrics tracking public awareness, concern levels, and trust regarding AI systems and AI safety.
@@ -75,6 +79,7 @@
     - trust
   lastUpdated: 2025-12
 - id: expert-opinion
+  numericId: E132
   type: ai-transition-model-metric
   title: Expert Opinion
   description: Metrics from AI researcher surveys including P(doom) estimates, timeline predictions,
@@ -92,6 +97,7 @@
     - forecasts
   lastUpdated: 2025-12
 - id: economic-labor
+  numericId: E111
   type: ai-transition-model-metric
   title: Economic & Labor
   description: Metrics tracking AI's economic impact including investment levels, automation rates,
@@ -112,6 +118,7 @@
     - automation
   lastUpdated: 2025-12
 - id: capabilities
+  numericId: E50
   type: ai-transition-model-metric
   title: AI Capabilities
   description: Metrics tracking AI capability development including benchmark performance, task
@@ -126,6 +133,7 @@
     - progress
   lastUpdated: 2025-12
 - id: compute-hardware
+  numericId: E65
   type: ai-transition-model-metric
   title: Compute & Hardware
   description: Metrics tracking compute trends including GPU production, training compute, efficiency
@@ -143,6 +151,7 @@
     - infrastructure
   lastUpdated: 2025-12
 - id: geopolitics
+  numericId: E150
   type: ai-transition-model-metric
   title: Geopolitics
   description: Metrics tracking international AI dynamics including US-China relations, talent flows,
@@ -160,6 +169,7 @@
     - coordination
   lastUpdated: 2025-12
 - id: structural
+  numericId: E289
   type: ai-transition-model-metric
   title: Structural Indicators
   description: Metrics tracking structural societal factors including information quality,

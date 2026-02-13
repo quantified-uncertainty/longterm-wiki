@@ -1,11 +1,166 @@
 ---
 title: "Compute Monitoring"
-description: "Tracking and monitoring computational resources used for AI training"
+description: "Tracking and monitoring computational resources used for AI training and inference"
 sidebar:
   order: 50
-quality: 0
-importance: 0
-lastEdited: "2026-02-09"
+importance: 7
+lastEdited: "2026-02-12"
 ---
 
-This page is a stub. Content needed.
+**Compute monitoring** refers to the systematic tracking, measurement, and analysis of computational resources used in **AI training** and inference workloads. This includes monitoring hardware utilization, energy consumption, costs, and performance metrics to optimize resource allocation and manage the substantial computational demands of modern **machine learning** systems.
+
+## Overview
+
+As AI models have grown in size and complexity, the computational resources required for training and deploying them have increased dramatically. Compute monitoring has become essential for organizations to manage costs, optimize performance, track environmental impact, and ensure efficient use of expensive hardware resources like GPUs and TPUs.
+
+Effective compute monitoring enables researchers and engineers to:
+- Track resource utilization and identify bottlenecks
+- Estimate and control training costs
+- Optimize model architectures and training procedures
+- Measure and reduce environmental impact
+- Plan capacity and resource allocation
+- Debug performance issues in **distributed training** systems
+
+## Key Metrics
+
+### Computational Metrics
+
+**FLOPs (Floating Point Operations)**: The total number of floating-point operations required to train or run a model. FLOPs provide a hardware-independent measure of computational work, though actual wall-clock time depends on hardware efficiency.
+
+**GPU/TPU Utilization**: The percentage of time accelerator hardware is actively computing versus idle. High utilization (>80%) typically indicates efficient resource use, though the optimal level depends on the workload characteristics.
+
+**Memory Usage**: Tracking GPU memory, system RAM, and storage I/O is critical as memory constraints often limit batch sizes and model sizes that can be trained.
+
+**Throughput**: Measured in samples per second, iterations per second, or tokens per second depending on the domain. This indicates the actual training or inference speed achieved.
+
+### Cost Metrics
+
+**Compute Hours**: Total GPU-hours, TPU-hours, or CPU-hours consumed. Cloud providers typically bill based on these units.
+
+**Dollar Cost**: Direct monetary cost of compute resources, including on-demand pricing, reserved instances, spot instances, or dedicated hardware amortization.
+
+**Cost per Training Run**: Total expenditure to train a model to convergence, enabling comparison across different approaches and architectures.
+
+### Energy and Environmental Metrics
+
+**Energy Consumption**: Measured in kilowatt-hours (kWh), tracking the electrical energy consumed by compute infrastructure.
+
+**Carbon Footprint**: CO₂ equivalent emissions based on energy consumption and the carbon intensity of the power source. Carbon intensity varies significantly by region and time of day.
+
+**Power Usage Effectiveness (PUE)**: Ratio of total facility power to IT equipment power, measuring data center efficiency. Modern data centers typically achieve PUE between 1.1 and 1.5.
+
+## Monitoring Tools and Platforms
+
+### Experiment Tracking Platforms
+
+**Weights & Biases**: A commercial platform for tracking experiments, visualizing metrics, and comparing runs. Provides real-time monitoring of training metrics, system resources, and costs.
+
+**MLflow**: An open-source platform for managing the machine learning lifecycle, including experiment tracking, model registry, and deployment monitoring.
+
+**TensorBoard**: TensorFlow's visualization toolkit for tracking metrics, visualizing model graphs, and profiling performance. Widely used across frameworks beyond TensorFlow.
+
+**Neptune.ai**: A metadata store for MLOps, focusing on experiment tracking and model registry with extensive logging capabilities.
+
+### System Monitoring Tools
+
+**NVIDIA DCGM (Data Center GPU Manager)**: System-level monitoring for NVIDIA GPUs, providing metrics on utilization, temperature, power consumption, and health status.
+
+**Prometheus**: Open-source monitoring and alerting toolkit, commonly used for tracking infrastructure metrics in Kubernetes-based ML systems.
+
+**Grafana**: Visualization platform often paired with Prometheus for creating dashboards of system and application metrics.
+
+### Cloud Provider Solutions
+
+**AWS CloudWatch**: Amazon's monitoring service for AWS resources, including EC2 GPU instances and SageMaker training jobs.
+
+**Azure Monitor**: Microsoft's monitoring solution for Azure resources, integrated with Azure Machine Learning.
+
+**Google Cloud Monitoring**: Formerly Stackdriver, provides monitoring for Google Cloud resources including Vertex AI and Google Kubernetes Engine.
+
+### Profiling Tools
+
+**NVIDIA Nsight Systems**: Performance analysis tool for GPU-accelerated applications, identifying bottlenecks in CUDA kernels and data transfers.
+
+**PyTorch Profiler**: Built-in profiling tools for PyTorch workloads, analyzing CPU and GPU time, memory usage, and operator-level performance.
+
+**TensorFlow Profiler**: Performance analysis for TensorFlow models, integrated with TensorBoard for visualization.
+
+## Best Practices
+
+### For Individual Researchers
+
+- Log all hyperparameters and system configurations with each experiment
+- Track wall-clock time alongside computational metrics to identify inefficiencies
+- Monitor GPU utilization to ensure hardware is being effectively used
+- Use spot instances or preemptible VMs for cost-sensitive experimentation
+- Archive metrics and logs for reproducibility and future reference
+
+### For Teams and Organizations
+
+- Establish standard metrics and logging practices across projects
+- Implement automated monitoring with alerts for anomalies or failures
+- Create dashboards showing resource utilization across the organization
+- Track costs by project, team, or experiment to enable budgeting
+- Conduct periodic reviews of resource efficiency and optimization opportunities
+- Document and share best practices for efficient training
+
+### For Large-Scale Training
+
+- Use distributed tracing to monitor communication overhead in multi-node training
+- Implement checkpointing strategies to recover from failures without full reruns
+- Monitor data loading and preprocessing to prevent GPU starvation
+- Track per-step times to detect degradation or configuration issues
+- Use profiling tools to optimize critical paths in training loops
+- Consider carbon-aware scheduling to train during periods of lower grid carbon intensity
+
+## Cost Optimization Strategies
+
+**Right-sizing Instances**: Select instance types with appropriate GPU memory and compute capacity for the workload, avoiding overprovisioning.
+
+**Spot/Preemptible Instances**: Use interruptible compute at 60-90% discounts for fault-tolerant workloads with checkpointing.
+
+**Reserved Capacity**: Commit to long-term resource reservations for predictable workloads to receive discounted rates.
+
+**Mixed Precision Training**: Use 16-bit floating point where appropriate to reduce memory usage and increase throughput.
+
+**Gradient Accumulation**: Simulate larger batch sizes on limited hardware by accumulating gradients across multiple forward passes.
+
+**Model Parallelism and Pipelining**: Distribute large models across multiple devices efficiently to maximize utilization.
+
+**Early Stopping**: Terminate unproductive training runs based on validation metrics to avoid wasting resources.
+
+## Environmental Considerations
+
+The carbon footprint of AI training has become a significant concern as model sizes and training compute have grown exponentially. Monitoring and reducing environmental impact involves:
+
+- Tracking energy consumption and estimating carbon emissions based on regional grid intensity
+- Scheduling training during periods of low carbon intensity when using renewable energy sources
+- Optimizing model efficiency to reduce total compute requirements
+- Considering model distillation and pruning to reduce inference costs
+- Using data centers with high renewable energy percentages and low PUE
+- Reporting compute and emissions in research publications for transparency
+
+Carbon tracking tools like CodeCarbon and experiment-impact-tracker can automatically log emissions based on compute usage and location.
+
+## Integration with MLOps
+
+Compute monitoring integrates with broader **MLOps** workflows:
+
+- **CI/CD Pipelines**: Automated testing of model changes includes resource utilization tests
+- **Model Registry**: Metadata about training compute and costs stored with model versions
+- **Deployment Monitoring**: Tracking inference latency, throughput, and cost in production
+- **Resource Scheduling**: Automated allocation and deallocation based on workload demands
+- **Cost Attribution**: Linking compute costs to specific models, teams, or business units
+
+## Challenges
+
+**Granularity vs. Overhead**: Detailed monitoring adds measurement overhead that can impact training performance. Finding the right balance between visibility and efficiency is essential.
+
+**Multi-Tenancy**: In shared clusters, accurately attributing resource usage to specific jobs and users requires careful instrumentation.
+
+**Heterogeneous Infrastructure**: Organizations often use multiple cloud providers and on-premise hardware, requiring unified monitoring approaches.
+
+**Metric Standardization**: Lack of standardized metrics across platforms makes comparison difficult, particularly for carbon footprint calculations.
+
+**Real-time Visibility**: Providing real-time dashboards for long-running training jobs without significant performance impact requires efficient logging infrastructure.
+

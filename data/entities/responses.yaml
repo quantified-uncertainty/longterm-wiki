@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: ai-safety-institutes
+  numericId: E13
   type: policy
   title: AI Safety Institutes (AISIs)
   customFields:
@@ -26,6 +27,7 @@
       author: Summit Participants
   lastUpdated: 2025-12
 - id: california-sb1047
+  numericId: E48
   type: policy
   title: Safe and Secure Innovation for Frontier Artificial Intelligence Models Act
   customFields:
@@ -78,6 +80,7 @@
     - political-strategy
   lastUpdated: 2025-12
 - id: canada-aida
+  numericId: E49
   type: policy
   title: Artificial Intelligence and Data Act (AIDA)
   customFields:
@@ -108,6 +111,7 @@
     the order paper when Parliament was dissolved in January 2025.
   lastUpdated: 2025-12
 - id: china-ai-regulations
+  numericId: E58
   type: policy
   title: China AI Regulatory Framework
   customFields:
@@ -169,6 +173,7 @@
     - geopolitics
   lastUpdated: 2025-12
 - id: colorado-ai-act
+  numericId: E62
   type: policy
   title: Colorado Artificial Intelligence Act
   customFields:
@@ -191,6 +196,7 @@
     May 17, 2024, it takes effect February 1, 2026.
   lastUpdated: 2025-12
 - id: compute-governance
+  numericId: E64
   type: policy
   title: Compute Governance
   customFields:
@@ -242,6 +248,7 @@
     - cloud-computing
   lastUpdated: 2025-12
 - id: compute-thresholds
+  numericId: E67
   type: policy
   title: Compute Thresholds
   customFields:
@@ -272,6 +279,7 @@
     - flop-thresholds
   lastUpdated: 2025-12
 - id: compute-monitoring
+  numericId: E66
   type: policy
   title: Compute Monitoring
   customFields:
@@ -301,6 +309,7 @@
     - cloud-computing
   lastUpdated: 2025-12
 - id: international-compute-regimes
+  numericId: E170
   type: policy
   title: International Compute Regimes
   customFields:
@@ -330,6 +339,7 @@
     - iaea-model
   lastUpdated: 2025-12
 - id: eu-ai-act
+  numericId: E127
   type: policy
   title: EU AI Act
   customFields:
@@ -362,6 +372,7 @@
     - compute-thresholds
   lastUpdated: 2025-12
 - id: export-controls
+  numericId: E136
   type: policy
   title: US AI Chip Export Controls
   customFields:
@@ -392,6 +403,7 @@
     constrain AI development through hardware governance.
   lastUpdated: 2025-12
 - id: failed-stalled-proposals
+  numericId: E137
   type: policy
   title: Failed and Stalled AI Proposals
   customFields:
@@ -412,6 +424,7 @@
     political constraints, industry opposition patterns, and the challenges of regulating rapidly evolving technology.
   lastUpdated: 2025-12
 - id: international-summits
+  numericId: E173
   type: policy
   title: International AI Safety Summit Series
   customFields:
@@ -469,6 +482,7 @@
     - policy-summits
   lastUpdated: 2025-12
 - id: nist-ai-rmf
+  numericId: E216
   type: policy
   title: NIST AI Risk Management Framework (AI RMF)
   customFields:
@@ -495,6 +509,7 @@
     of Standards and Technology to help organizations manage risks associated with AI systems.
   lastUpdated: 2025-12
 - id: responsible-scaling-policies
+  numericId: E252
   type: policy
   title: Responsible Scaling Policies (RSPs)
   customFields:
@@ -519,6 +534,7 @@
       date: May 2024
   lastUpdated: 2025-12
 - id: seoul-declaration
+  numericId: E279
   type: policy
   title: Seoul Declaration on AI Safety
   customFields:
@@ -541,6 +557,7 @@
     following the Bletchley Park Summit in November 2023.
   lastUpdated: 2025-12
 - id: standards-bodies
+  numericId: E288
   type: policy
   title: AI Standards Development
   customFields:
@@ -562,6 +579,7 @@
       author: European Commission
   lastUpdated: 2025-12
 - id: us-executive-order
+  numericId: E366
   type: policy
   title: Executive Order on Safe, Secure, and Trustworthy AI
   customFields:
@@ -610,6 +628,7 @@
     - executive-policy
   lastUpdated: 2025-12
 - id: us-state-legislation
+  numericId: E367
   type: policy
   title: US State AI Legislation Landscape
   customFields:
@@ -631,6 +650,7 @@
     2024, hundreds of AI-related bills have been introduced across all 50 states, with several significant laws enacted.
   lastUpdated: 2025-12
 - id: voluntary-commitments
+  numericId: E369
   type: policy
   title: Voluntary AI Safety Commitments
   customFields:
@@ -685,6 +705,7 @@
     - safety-standards
   lastUpdated: 2025-12
 - id: epistemic-security
+  numericId: E123
   type: approach
   title: Epistemic Security
   customFields:
@@ -761,6 +782,7 @@
     - information-security
   lastUpdated: 2025-12
 - id: pause-advocacy
+  numericId: E221
   type: approach
   title: Pause Advocacy
   customFields:
@@ -797,6 +819,7 @@
     - coordination
   lastUpdated: 2025-12
 - id: ai-control
+  numericId: E6
   type: safety-agenda
   title: AI Control
   customFields:
@@ -840,6 +863,7 @@
     - untrusted-ai
   lastUpdated: 2025-12
 - id: anthropic-core-views
+  numericId: E23
   type: safety-agenda
   title: Anthropic Core Views
   website: https://anthropic.com/news/core-views-on-ai-safety
@@ -876,6 +900,7 @@
     - research-agenda
   lastUpdated: 2025-12
 - id: corrigibility
+  numericId: E79
   type: safety-agenda
   title: Corrigibility
   customFields:
@@ -899,6 +924,7 @@
     - ai-control
     - value-learning
 - id: evals
+  numericId: E128
   type: safety-agenda
   title: AI Evaluations
   customFields:
@@ -924,6 +950,7 @@
     - red-teaming
     - capability-assessment
 - id: interpretability
+  numericId: E174
   type: safety-agenda
   title: Interpretability
   customFields:
@@ -981,6 +1008,7 @@
     - activation-patching
   lastUpdated: 2025-12
 - id: scalable-oversight
+  numericId: E271
   type: safety-agenda
   title: Scalable Oversight
   customFields:
@@ -1033,6 +1061,7 @@
     - superhuman-ai
   lastUpdated: 2025-12
 - id: ai-forecasting
+  numericId: E9
   type: approach
   title: AI-Augmented Forecasting
   customFields:
@@ -1083,6 +1112,7 @@
     - calibration
   lastUpdated: 2025-12
 - id: content-authentication
+  numericId: E74
   type: approach
   title: Content Authentication
   customFields:
@@ -1141,6 +1171,7 @@
     - trust
   lastUpdated: 2025-12
 - id: coordination-tech
+  numericId: E77
   type: approach
   title: Coordination Technologies
   customFields:
@@ -1199,6 +1230,7 @@
     - verification
   lastUpdated: 2025-12
 - id: deliberation
+  numericId: E100
   type: approach
   title: AI-Assisted Deliberation
   customFields:
@@ -1251,6 +1283,7 @@
     - consensus-building
   lastUpdated: 2025-12
 - id: epistemic-infrastructure
+  numericId: E122
   type: approach
   title: Epistemic Infrastructure
   customFields:
@@ -1312,6 +1345,7 @@
     - ai-for-good
   lastUpdated: 2025-12
 - id: hybrid-systems
+  numericId: E161
   type: approach
   title: AI-Human Hybrid Systems
   customFields:
@@ -1372,6 +1406,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: prediction-markets
+  numericId: E228
   type: approach
   title: Prediction Markets
   customFields:
@@ -1433,6 +1468,7 @@
     - decision-making
   lastUpdated: 2025-12
 - id: value-learning
+  numericId: E368
   type: safety-agenda
   title: Value Learning
   description: >-
@@ -1450,6 +1486,7 @@
     - learning
   lastUpdated: 2025-12
 - id: prosaic-alignment
+  numericId: E235
   type: safety-agenda
   title: Prosaic Alignment
   description: >-
@@ -1461,6 +1498,7 @@
     - research-agenda
   lastUpdated: 2025-12
 - id: ai-executive-order
+  numericId: E8
   type: policy
   title: Biden AI Executive Order
   description: >-
@@ -1476,6 +1514,7 @@
     - regulation
   lastUpdated: 2025-12
 - id: eval-saturation
+  numericId: E437
   type: approach
   title: "Eval Saturation & The Evals Gap"
   description: >-
@@ -1505,6 +1544,7 @@
   lastUpdated: 2026-02
 
 - id: evaluation-awareness
+  numericId: E438
   type: approach
   title: "Evaluation Awareness"
   description: >-
@@ -1535,6 +1575,7 @@
   lastUpdated: 2026-02
 
 - id: alignment
+  numericId: E439
   type: approach
   title: AI Alignment
   description: >-
@@ -1563,6 +1604,7 @@
   lastUpdated: 2026-02
 
 - id: scalable-eval-approaches
+  numericId: E440
   type: approach
   title: "Scalable Eval Approaches"
   description: >-
@@ -1592,6 +1634,7 @@
   lastUpdated: 2026-02
 
 - id: scheming-detection
+  numericId: E441
   type: approach
   title: "Scheming & Deception Detection"
   description: >-
@@ -1620,6 +1663,7 @@
   lastUpdated: 2026-02
 
 - id: dangerous-cap-evals
+  numericId: E442
   type: approach
   title: "Dangerous Capability Evaluations"
   description: >-
@@ -1650,6 +1694,7 @@
   lastUpdated: 2026-02
 
 - id: capability-elicitation
+  numericId: E443
   type: approach
   title: "Capability Elicitation"
   description: >-
@@ -1677,6 +1722,7 @@
   lastUpdated: 2026-02
 
 - id: safety-cases
+  numericId: E444
   type: approach
   title: "AI Safety Cases"
   description: >-
@@ -1706,6 +1752,7 @@
   lastUpdated: 2026-02
 
 - id: sleeper-agent-detection
+  numericId: E445
   type: approach
   title: "Sleeper Agent Detection"
   description: >-
@@ -1733,6 +1780,7 @@
   lastUpdated: 2026-02
 
 - id: ai-assisted
+  numericId: E446
   type: approach
   title: "AI-Assisted Alignment"
   description: >-
@@ -1759,6 +1807,7 @@
   lastUpdated: 2026-02
 
 - id: evaluation
+  numericId: E447
   type: approach
   title: "AI Evaluation"
   description: >-
@@ -1788,6 +1837,7 @@
   lastUpdated: 2026-02
 
 - id: alignment-evals
+  numericId: E448
   type: approach
   title: "Alignment Evaluations"
   description: >-
@@ -1817,6 +1867,7 @@
   lastUpdated: 2026-02
 
 - id: red-teaming
+  numericId: E449
   type: approach
   title: "Red Teaming"
   description: >-
@@ -1844,6 +1895,7 @@
   lastUpdated: 2026-02
 
 - id: model-auditing
+  numericId: E450
   type: approach
   title: "Third-Party Model Auditing"
   description: >-
@@ -1871,6 +1923,7 @@
   lastUpdated: 2026-02
 
 - id: constitutional-ai
+  numericId: E451
   type: approach
   title: "Constitutional AI"
   description: >-
@@ -1897,6 +1950,7 @@
   lastUpdated: 2026-02
 
 - id: weak-to-strong
+  numericId: E452
   type: approach
   title: "Weak-to-Strong Generalization"
   description: >-
@@ -1925,6 +1979,7 @@
   lastUpdated: 2026-02
 
 - id: capability-unlearning
+  numericId: E453
   type: approach
   title: "Capability Unlearning / Removal"
   description: >-
@@ -1949,6 +2004,7 @@
   lastUpdated: 2026-02
 
 - id: preference-optimization
+  numericId: E454
   type: approach
   title: "Preference Optimization Methods"
   description: >-
@@ -1975,6 +2031,7 @@
   lastUpdated: 2026-02
 
 - id: process-supervision
+  numericId: E455
   type: approach
   title: "Process Supervision"
   description: >-
@@ -2001,6 +2058,7 @@
   lastUpdated: 2026-02
 
 - id: refusal-training
+  numericId: E456
   type: approach
   title: "Refusal Training"
   description: >-
@@ -2031,6 +2089,7 @@
 # Generated 2026-02-08
 
 - id: california-sb53
+  numericId: E457
   type: policy
   title: California SB 53
   description: >-
@@ -2059,6 +2118,7 @@
   lastUpdated: 2026-02
 
 - id: intervention-portfolio
+  numericId: E458
   type: approach
   title: Intervention Portfolio
   description: >-
@@ -2089,6 +2149,7 @@
   lastUpdated: 2026-02
 
 - id: evals-governance
+  numericId: E459
   type: policy
   title: Evals-Based Deployment Gates
   description: >-
@@ -2116,6 +2177,7 @@
   lastUpdated: 2026-02
 
 - id: pause-moratorium
+  numericId: E460
   type: policy
   title: Pause / Moratorium
   description: >-
@@ -2143,6 +2205,7 @@
   lastUpdated: 2026-02
 
 - id: rsp
+  numericId: E461
   type: policy
   title: Responsible Scaling Policies
   description: >-
@@ -2170,6 +2233,7 @@
   lastUpdated: 2026-02
 
 - id: corporate
+  numericId: E462
   type: approach
   title: Corporate Responses
   description: >-
@@ -2199,6 +2263,7 @@
   lastUpdated: 2026-02
 
 - id: hardware-enabled-governance
+  numericId: E463
   type: policy
   title: Hardware-Enabled Governance
   description: >-
@@ -2227,6 +2292,7 @@
   lastUpdated: 2026-02
 
 - id: monitoring
+  numericId: E464
   type: policy
   title: Compute Monitoring
   description: >-
@@ -2254,6 +2320,7 @@
   lastUpdated: 2026-02
 
 - id: thresholds
+  numericId: E465
   type: policy
   title: Compute Thresholds
   description: >-
@@ -2283,6 +2350,7 @@
   lastUpdated: 2026-02
 
 - id: lab-culture
+  numericId: E466
   type: approach
   title: Lab Safety Culture
   description: >-
@@ -2312,6 +2380,7 @@
   lastUpdated: 2026-02
 
 - id: pause
+  numericId: E467
   type: approach
   title: Pause Advocacy
   description: >-
@@ -2341,6 +2410,7 @@
   lastUpdated: 2026-02
 
 - id: training-programs
+  numericId: E468
   type: approach
   title: AI Safety Training Programs
   description: >-
@@ -2367,6 +2437,7 @@
   lastUpdated: 2026-02
 
 - id: bletchley-declaration
+  numericId: E469
   type: policy
   title: Bletchley Declaration
   description: >-
@@ -2395,6 +2466,7 @@
   lastUpdated: 2026-02
 
 - id: coordination-mechanisms
+  numericId: E470
   type: policy
   title: International Coordination Mechanisms
   description: >-
@@ -2423,6 +2495,7 @@
   lastUpdated: 2026-02
 
 - id: new-york-raise-act
+  numericId: E471
   type: policy
   title: New York RAISE Act
   description: >-
@@ -2451,6 +2524,7 @@
   lastUpdated: 2026-02
 
 - id: model-registries
+  numericId: E472
   type: policy
   title: Model Registries
   description: >-
@@ -2478,6 +2552,7 @@
   lastUpdated: 2026-02
 
 - id: international-regimes
+  numericId: E473
   type: policy
   title: International Compute Regimes
   description: >-
@@ -2507,6 +2582,7 @@
   lastUpdated: 2026-02
 
 - id: maim
+  numericId: E685
   type: policy
   title: "MAIM (Mutually Assured AI Malfunction)"
   description: >-
@@ -2552,6 +2628,7 @@
   lastUpdated: 2026-02
 
 - id: open-source
+  numericId: E474
   type: approach
   title: Open Source Safety
   description: >-
@@ -2579,6 +2656,7 @@
   lastUpdated: 2026-02
 
 - id: whistleblower-protections
+  numericId: E475
   type: policy
   title: AI Whistleblower Protections
   description: >-
@@ -2609,6 +2687,7 @@
   lastUpdated: 2026-02
 
 - id: field-building-analysis
+  numericId: E476
   type: approach
   title: Field Building Analysis
   description: >-
@@ -2636,6 +2715,7 @@
   lastUpdated: 2026-02
 
 - id: mech-interp
+  numericId: E477
   type: approach
   title: Mechanistic Interpretability
   description: >-
@@ -2665,6 +2745,7 @@
   lastUpdated: 2026-02
 
 - id: circuit-breakers
+  numericId: E478
   type: approach
   title: Circuit Breakers / Inference Interventions
   description: >-
@@ -2693,6 +2774,7 @@
   lastUpdated: 2026-02
 
 - id: representation-engineering
+  numericId: E479
   type: approach
   title: Representation Engineering
   description: >-
@@ -2719,6 +2801,7 @@
   lastUpdated: 2026-02
 
 - id: sparse-autoencoders
+  numericId: E480
   type: approach
   title: Sparse Autoencoders (SAEs)
   description: >-
@@ -2748,6 +2831,7 @@
   lastUpdated: 2026-02
 
 - id: eliciting-latent-knowledge
+  numericId: E481
   type: approach
   title: Eliciting Latent Knowledge (ELK)
   description: >-
@@ -2775,6 +2859,7 @@
   lastUpdated: 2026-02
 
 - id: debate
+  numericId: E482
   type: approach
   title: AI Safety via Debate
   description: >-
@@ -2804,6 +2889,7 @@
   lastUpdated: 2026-02
 
 - id: formal-verification
+  numericId: E483
   type: approach
   title: Formal Verification
   description: >-
@@ -2830,6 +2916,7 @@
   lastUpdated: 2026-02
 
 - id: provably-safe
+  numericId: E484
   type: approach
   title: Provably Safe AI (davidad agenda)
   description: >-
@@ -2859,6 +2946,7 @@
   lastUpdated: 2026-02
 
 - id: sandboxing
+  numericId: E485
   type: approach
   title: Sandboxing / Containment
   description: >-
@@ -2889,6 +2977,7 @@
   lastUpdated: 2026-02
 
 - id: structured-access
+  numericId: E486
   type: approach
   title: Structured Access / API-Only
   description: >-
@@ -2917,6 +3006,7 @@
   lastUpdated: 2026-02
 
 - id: tool-restrictions
+  numericId: E487
   type: approach
   title: Tool-Use Restrictions
   description: >-
@@ -2949,6 +3039,7 @@
   lastUpdated: 2026-02
 
 - id: multi-agent
+  numericId: E488
   type: approach
   title: Multi-Agent Safety
   description: >-
@@ -2978,6 +3069,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: adversarial-training
+  numericId: E583
   type: approach
   title: Adversarial Training
   description: >-
@@ -2990,6 +3082,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: agent-foundations
+  numericId: E584
   type: approach
   title: Agent Foundations
   description: >-
@@ -3001,6 +3094,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ai-for-human-reasoning-fellowship
+  numericId: E585
   type: approach
   title: AI for Human Reasoning Fellowship
   description: >-
@@ -3014,6 +3108,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ai-watch
+  numericId: E386
   type: project
   title: AI Watch
   description: >-
@@ -3025,7 +3120,9 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: cirl
+  numericId: E586
   type: approach
   title: Cooperative IRL (CIRL)
   description: >-
@@ -3037,6 +3134,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: coe-ai-convention
+  numericId: E587
   type: policy
   title: Council of Europe Framework Convention on Artificial Intelligence
   description: >-
@@ -3050,6 +3148,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: collective-epistemics-design-sketches
+  numericId: E588
   type: approach
   title: Design Sketches for Collective Epistemics
   description: >-
@@ -3062,6 +3161,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: community-notes
+  numericId: E381
   type: project
   title: X Community Notes
   description: >-
@@ -3073,7 +3173,9 @@
     - epistemics
     - governance
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: community-notes-for-everything
+  numericId: E589
   type: approach
   title: Community Notes for Everything
   description: >-
@@ -3086,6 +3188,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: cooperative-ai
+  numericId: E590
   type: approach
   title: Cooperative AI
   description: >-
@@ -3097,6 +3200,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: deepfake-detection
+  numericId: E591
   type: approach
   title: Deepfake Detection
   description: >-
@@ -3110,6 +3214,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: donations-list-website
+  numericId: E389
   type: project
   title: Donations List Website
   description: >-
@@ -3121,7 +3226,9 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: epistemic-virtue-evals
+  numericId: E592
   type: approach
   title: Epistemic Virtue Evals
   description: >-
@@ -3134,6 +3241,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: labor-transition
+  numericId: E593
   type: approach
   title: "Labor Transition & Economic Resilience"
   description: >-
@@ -3147,6 +3255,7 @@
     - governance
   lastUpdated: 2026-02
 - id: longterm-wiki
+  numericId: E384
   type: project
   title: Longterm Wiki
   description: >-
@@ -3159,9 +3268,12 @@
     - epistemics
     - community
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: mit-ai-risk-repository
+  numericId: E383
   type: project
   title: MIT AI Risk Repository
+  summaryPage: epistemic-tools-tools-overview
   description: >-
     The MIT AI Risk Repository catalogs 1,700+ AI risks from 65+ frameworks into
     a searchable database with dual taxonomies (causal and domain-based).
@@ -3174,6 +3286,7 @@
     - governance
   lastUpdated: 2026-02
 - id: model-spec
+  numericId: E594
   type: policy
   title: Model Specifications
   description: >-
@@ -3187,6 +3300,7 @@
     - governance
   lastUpdated: 2026-02
 - id: org-watch
+  numericId: E388
   type: project
   title: Org Watch
   description: >-
@@ -3197,7 +3311,9 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: output-filtering
+  numericId: E595
   type: approach
   title: Output Filtering
   description: >-
@@ -3211,6 +3327,7 @@
     - governance
   lastUpdated: 2026-02
 - id: probing
+  numericId: E596
   type: approach
   title: Probing / Linear Probes
   description: >-
@@ -3223,6 +3340,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: provenance-tracing
+  numericId: E597
   type: approach
   title: Provenance Tracing
   description: >-
@@ -3235,6 +3353,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: public-education
+  numericId: E598
   type: approach
   title: Public Education
   description: >-
@@ -3248,6 +3367,7 @@
     - governance
   lastUpdated: 2026-02
 - id: reliability-tracking
+  numericId: E599
   type: approach
   title: Reliability Tracking
   description: >-
@@ -3260,6 +3380,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: reward-modeling
+  numericId: E600
   type: approach
   title: Reward Modeling
   description: >-
@@ -3272,6 +3393,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: rhetoric-highlighting
+  numericId: E601
   type: approach
   title: Rhetoric Highlighting
   description: >-
@@ -3284,6 +3406,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: roastmypost
+  numericId: E385
   type: project
   title: RoastMyPost
   description: >-
@@ -3297,7 +3420,9 @@
     - ai-safety
     - community
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: stampy-aisafety-info
+  numericId: E382
   type: project
   title: Stampy / AISafety.info
   description: >-
@@ -3311,7 +3436,9 @@
     - community
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: texas-traiga
+  numericId: E602
   type: policy
   title: Texas TRAIGA Responsible AI Governance Act
   description: >-
@@ -3325,6 +3452,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: timelines-wiki
+  numericId: E387
   type: project
   title: Timelines Wiki
   description: >-
@@ -3336,7 +3464,9 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: wikipedia-views
+  numericId: E390
   type: project
   title: Wikipedia Views
   description: >-
@@ -3347,8 +3477,10 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 
 - id: government-authority-commercial-ai-infrastructure
+  numericId: E688
   type: policy
   title: Government Authority Over Commercial AI Infrastructure
   description: >-
@@ -3378,6 +3510,7 @@
   lastUpdated: 2026-02
 
 - id: goal-misgeneralization-research
+  numericId: E633
   type: approach
   title: Goal Misgeneralization Research
   description: >-

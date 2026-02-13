@@ -1,4 +1,5 @@
 - id: "tmc-economic-power"
+  numericId: E315
   type: "ai-transition-model-subitem"
   title: "Economic Power Lock-in"
   parentFactor: "long-term-lockin"
@@ -220,6 +221,7 @@
         effect: "decreases"
         strength: "weak"
 - id: "tmc-political-power"
+  numericId: E334
   type: "ai-transition-model-subitem"
   title: "Political Power Lock-in"
   parentFactor: "long-term-lockin"
@@ -498,6 +500,7 @@
         strength: "strong"
   lastUpdated: "2026-01"
 - id: "tmc-values"
+  numericId: E354
   type: "ai-transition-model-subitem"
   title: "Values Lock-in"
   parentFactor: "long-term-lockin"
@@ -724,6 +727,7 @@
         strength: "medium"
   lastUpdated: "2026-01"
 - id: "tmc-epistemic-lockin"
+  numericId: E318
   type: "ai-transition-model-subitem"
   title: "Epistemic Lock-in"
   parentFactor: "long-term-lockin"
@@ -1005,6 +1009,7 @@
         effect: "decreases"
   lastUpdated: "2026-01"
 - id: "tmc-suffering-lock-in"
+  numericId: E350
   type: "ai-transition-model-subitem"
   title: "Suffering Lock-in"
   parentFactor: "long-term-lockin"

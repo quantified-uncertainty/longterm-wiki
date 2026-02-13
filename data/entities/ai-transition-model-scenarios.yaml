@@ -1,4 +1,5 @@
 - id: existential-catastrophe
+  numericId: E130
   type: ai-transition-model-scenario
   title: Existential Catastrophe
   description: The probability and severity of catastrophic AI-related events—loss of control,
@@ -184,6 +185,7 @@
         strength: strong
         effect: increases
 - id: long-term-trajectory
+  numericId: E194
   type: ai-transition-model-scenario
   title: Long-term Trajectory
   description: The quality of humanity's long-term future given successful AI transition—measuring
@@ -393,6 +395,7 @@
         strength: strong
         effect: increases
 - id: ai-takeover
+  numericId: E15
   type: ai-transition-model-scenario
   title: AI Takeover
   description: Scenarios where AI systems pursue goals misaligned with human values at scale,
@@ -421,6 +424,7 @@
     - misalignment
   lastUpdated: 2025-12
 - id: human-catastrophe
+  numericId: E158
   type: ai-transition-model-scenario
   title: Human-Caused Catastrophe
   description: Catastrophic outcomes caused by human actors using AI as a tool—including state actors,
@@ -452,6 +456,7 @@
     - misuse
   lastUpdated: 2025-12
 - id: long-term-lockin
+  numericId: E193
   type: ai-transition-model-scenario
   title: Long-term Lock-in
   description: Scenarios where AI enables irreversible commitment to suboptimal values, power
@@ -483,6 +488,7 @@
     - long-term
   lastUpdated: 2025-12
 - id: misaligned-catastrophe
+  numericId: E204
   type: ai-transition-model-scenario
   title: Misaligned Catastrophe - The Bad Ending
   description: A scenario where alignment fails and AI systems pursue misaligned goals with
@@ -504,6 +510,7 @@
     - misalignment
   lastUpdated: 2025-01
 - id: slow-takeoff-muddle
+  numericId: E283
   type: ai-transition-model-scenario
   title: Slow Takeoff Muddle - Muddling Through
   description: A scenario of gradual AI progress with mixed outcomes, partial governance, and ongoing
@@ -525,6 +532,7 @@
     - base-case
   lastUpdated: 2025-01
 - id: aligned-agi
+  numericId: E18
   type: ai-transition-model-scenario
   title: Aligned AGI - The Good Ending
   description: A scenario where AI labs successfully solve alignment and coordinated deployment leads
@@ -546,6 +554,7 @@
     - optimistic
   lastUpdated: 2025-01
 - id: multipolar-competition
+  numericId: E208
   type: ai-transition-model-scenario
   title: Multipolar Competition - The Fragmented World
   description: A fragmented AI future where no single actor achieves dominance, leading to persistent
@@ -567,6 +576,7 @@
     - competition
   lastUpdated: 2025-01
 - id: pause-and-redirect
+  numericId: E222
   type: ai-transition-model-scenario
   title: Pause and Redirect - The Deliberate Path
   description: A scenario where humanity coordinates to deliberately slow AI development for safety preparation.
