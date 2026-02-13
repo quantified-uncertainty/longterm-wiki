@@ -184,14 +184,13 @@ function repairFrontmatter(content: string): string {
   // Fix 3: Top-level keys that got incorrectly indented under a block.
   // e.g. "  clusters:" should be "clusters:" if it's a known top-level key.
   const knownSubKeys = new Set([
-    'wordCount', 'citations', 'tables', 'diagrams', // metrics sub-keys
     'novelty', 'rigor', 'actionability', 'completeness', // ratings sub-keys
     'objectivity', 'focus', 'concreteness',
     'order', 'label', // sidebar sub-keys
   ]);
   const topLevelKeys = new Set([
     'title', 'description', 'sidebar', 'quality', 'importance', 'lastEdited',
-    'update_frequency', 'llmSummary', 'ratings', 'metrics', 'clusters',
+    'update_frequency', 'llmSummary', 'ratings', 'clusters',
     'draft', 'aliases', 'redirects', 'tags',
   ]);
   const lines = fm.split('\n');
@@ -765,54 +764,8 @@ async function executeScrySearch(query: string, table: string = 'mv_eaforum_post
   }
 }
 
-// Compute actual metrics from MDX content and sync into frontmatter
-function syncFrontmatterMetrics(content: string): string {
-  // Split frontmatter from body
-  const fmMatch = content.match(/^(---\n[\s\S]*?\n---)\n([\s\S]*)$/);
-  if (!fmMatch) return content;
-  let frontmatter = fmMatch[1];
-  const body = fmMatch[2];
-
-  // Count words in body (excluding MDX components, imports, frontmatter)
-  const textOnly = body
-    .replace(/^import\s.*/gm, '')              // Remove imports
-    .replace(/<[^>]+\/>/g, '')                  // Remove self-closing components
-    .replace(/<[A-Z]\w+[^>]*>[\s\S]*?<\/[A-Z]\w+>/g, '') // Remove component blocks
-    .replace(/\[.*?\]\(.*?\)/g, (m) => m.replace(/\(.*?\)/, '')) // Keep link text only
-    .replace(/[|*#`_\-\[\]>]/g, ' ')           // Remove markdown syntax
-    .replace(/\^\[\d+\]/g, '')                  // Remove footnote refs
-    .replace(/\[\^\d+\]:/g, '');                // Remove footnote defs
-  const wordCount = textOnly.split(/\s+/).filter(w => w.length > 0).length;
-
-  // Count footnote citations ([^N] references in body, not definitions)
-  const citationRefs = new Set(body.match(/\[\^\d+\]/g) || []);
-  const citations = citationRefs.size;
-
-  // Count markdown tables (lines starting with |)
-  const tableHeaderLines = (body.match(/^\|.*\|.*\|$/gm) || [])
-    .filter(line => !line.match(/^\|[\s\-:|]+\|$/)); // Exclude separator lines
-  // Each table has a header row; count unique tables by checking for separator after header
-  const tableSeparators = (body.match(/^\|[\s\-:|]+\|$/gm) || []);
-  const tables = tableSeparators.length;
-
-  // Count Mermaid diagrams
-  const diagrams = (body.match(/<Mermaid\s/g) || []).length;
-
-  // Update metrics in frontmatter
-  // The trailing \n is critical — without it the last metrics line merges with the next key.
-  // Use [ \t]+ (not \s+) in the sub-key pattern to avoid matching across newlines.
-  const metricsBlock = `metrics:\n  wordCount: ${wordCount}\n  citations: ${citations}\n  tables: ${tables}\n  diagrams: ${diagrams}\n`;
-  if (frontmatter.match(/^metrics:\s*\n(?:[ \t]+\w+:[ \t]*[\d.]+\n?)*/m)) {
-    frontmatter = frontmatter.replace(
-      /^metrics:\s*\n(?:[ \t]+\w+:[ \t]*[\d.]+\n?)*/m,
-      metricsBlock
-    );
-  }
-
-  // Safety: run frontmatter repair to catch any YAML corruption
-  const reassembled = frontmatter + '\n' + body;
-  return repairFrontmatter(reassembled);
-}
+// Metrics (wordCount, citations, tables, diagrams) are computed at build time
+// by app/scripts/lib/metrics-extractor.mjs — not stored in frontmatter.
 
 // Phase: Analyze
 async function analyzePhase(page: PageData, directions: string, options: PipelineOptions): Promise<AnalysisResult> {
@@ -1091,6 +1044,10 @@ These are now rendered automatically by the RelatedPages React component at buil
 Remove any existing such sections from the content. Also remove any <Backlinks> component
 usage and its import if no other usage remains.
 
+### Frontmatter Rules
+- Do NOT add a \`metrics:\` block (wordCount, citations, tables, diagrams) — these are computed at build time.
+- Do NOT remove or change the \`quality:\` field — it is managed by a separate grading pipeline.
+
 ### Output Format
 Output the COMPLETE improved MDX file content. Include all frontmatter and content.
 Do not output markdown code blocks - output the raw MDX directly.
@@ -1119,11 +1076,9 @@ Start your response with "---" (the frontmatter delimiter).`;
     `lastEdited: "${today}"`
   );
 
-  // Remove quality field - must be set by grade-content.ts only
-  improvedContent = improvedContent.replace(
-    /^quality:\s*\d+\s*\n/m,
-    ''
-  );
+  // Preserve existing quality field — only grade-content.ts should change it.
+  // Previously this was removed unconditionally, but that caused quality to be
+  // lost when running improve without --grade.
 
   // Repair any YAML frontmatter corruption from model output
   improvedContent = repairFrontmatter(improvedContent);
@@ -1460,8 +1415,6 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
       case 'improve':
         improvedContent = await improvePhase(page, analysis!, research || { sources: [] }, directions, options);
-        // Sync frontmatter metrics (wordCount, citations, tables, diagrams) with actual content
-        improvedContent = syncFrontmatterMetrics(improvedContent);
         // Warn about unverified citations in tiers without research
         if (tier === 'polish' && !research?.sources?.length) {
           const footnoteCount = new Set(improvedContent.match(/\[\^\d+\]/g) || []).size;

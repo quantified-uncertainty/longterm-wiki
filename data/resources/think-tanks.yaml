@@ -2170,3 +2170,14 @@
     - compute-thresholds
     - governance
     - us-aisi
+- id: 0749fd23bc08105b
+  url: https://www.rand.org/pubs/perspectives/PEA4361-1.html
+  title: "Evaluating Select Global Technical Options for Countering a Rogue AI"
+  type: web
+  publication_id: rand
+  cited_by:
+    - rogue-ai-scenarios
+  tags:
+    - ai-safety
+    - x-risk
+    - containment
