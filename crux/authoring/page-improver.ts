@@ -189,10 +189,11 @@ function repairFrontmatter(content: string): string {
     'novelty', 'rigor', 'actionability', 'completeness', // ratings sub-keys
     'objectivity', 'focus', 'concreteness',
     'order', 'label', // sidebar sub-keys
+    'date', 'method', 'by', 'note', // editLog entry sub-keys
   ]);
   const topLevelKeys = new Set([
     'title', 'description', 'sidebar', 'quality', 'importance', 'lastEdited',
-    'update_frequency', 'llmSummary', 'ratings', 'clusters',
+    'update_frequency', 'llmSummary', 'ratings', 'clusters', 'editLog',
     'draft', 'aliases', 'redirects', 'tags',
   ]);
   const lines = fm.split('\n');
@@ -210,6 +211,56 @@ function repairFrontmatter(content: string): string {
     repaired.push(line);
   }
   fm = repaired.join('\n');
+
+  return '---\n' + fm + '\n---' + rest;
+}
+
+// ---------------------------------------------------------------------------
+// Edit log management
+// ---------------------------------------------------------------------------
+
+export interface EditLogEntry {
+  date: string;
+  method: 'crux-create' | 'crux-improve' | 'crux-grade' | 'claude-code' | 'manual' | 'bulk-update';
+  by?: string;
+  note?: string;
+}
+
+/**
+ * Append an edit log entry to the frontmatter of an MDX content string.
+ * Preserves existing editLog entries and adds the new one at the end.
+ */
+export function appendEditLogEntry(content: string, entry: EditLogEntry): string {
+  const fmMatch = content.match(/^(---\n)([\s\S]*?)(\n---)/);
+  if (!fmMatch) return content;
+
+  let fm = fmMatch[2];
+  const rest = content.slice(fmMatch[0].length);
+
+  // Build the YAML entry string
+  let entryYaml = `  - date: "${entry.date}"\n    method: ${entry.method}`;
+  if (entry.by) entryYaml += `\n    by: ${entry.by}`;
+  if (entry.note) entryYaml += `\n    note: "${entry.note.replace(/"/g, '\\"')}"`;
+
+  // Check if editLog already exists in frontmatter
+  const editLogMatch = fm.match(/^editLog:\s*$/m);
+  if (editLogMatch) {
+    // Find where editLog block ends (next top-level key or end of frontmatter)
+    const editLogIndex = fm.indexOf(editLogMatch[0]);
+    const afterEditLog = fm.slice(editLogIndex + editLogMatch[0].length);
+    // Find the next top-level key (line starting with a non-space character followed by colon)
+    const nextKeyMatch = afterEditLog.match(/\n([a-zA-Z_]\w*:)/);
+    if (nextKeyMatch) {
+      const insertPos = editLogIndex + editLogMatch[0].length + nextKeyMatch.index!;
+      fm = fm.slice(0, insertPos) + '\n' + entryYaml + fm.slice(insertPos);
+    } else {
+      // editLog is the last field — append at end
+      fm = fm + '\n' + entryYaml;
+    }
+  } else {
+    // No editLog yet — add it at the end of frontmatter
+    fm = fm + '\neditLog:\n' + entryYaml;
+  }
 
   return '---\n' + fm + '\n---' + rest;
 }
@@ -1064,6 +1115,7 @@ usage and its import if no other usage remains.
 ### Frontmatter Rules
 - Do NOT add a \`metrics:\` block (wordCount, citations, tables, diagrams) — these are computed at build time.
 - Do NOT remove or change the \`quality:\` field — it is managed by a separate grading pipeline.
+- Preserve the \`editLog:\` block exactly as-is — new entries are appended automatically by the pipeline.
 
 ### Output Format
 Output the COMPLETE improved MDX file content. Include all frontmatter and content.
@@ -1526,6 +1578,17 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   }
 
   const totalDuration: string = ((Date.now() - startTime) / 1000).toFixed(1);
+
+  // Append edit log entry
+  const editNote = directions
+    ? `Improved via Crux pipeline (${tier}): ${directions.slice(0, 120)}`
+    : `Improved via Crux pipeline (${tier})`;
+  improvedContent = appendEditLogEntry(improvedContent!, {
+    date: new Date().toISOString().split('T')[0],
+    method: 'crux-improve',
+    by: 'system',
+    note: editNote,
+  });
 
   // Write final output
   const finalPath = writeTemp(page.id, 'final.mdx', improvedContent!);

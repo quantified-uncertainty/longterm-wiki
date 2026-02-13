@@ -2,6 +2,20 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Add per-page editLog to frontmatter
+
+**What was done:** Added an `editLog` array field to page frontmatter that tracks how each page was created/modified. Each entry records date, method (crux-create, crux-improve, crux-grade, claude-code, manual, bulk-update), who requested it, and a free-text note. Integrated into the Crux create, improve, and grade pipelines so entries are appended automatically.
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- `appendEditLogEntry()` exported from page-improver.ts for reuse by other scripts
+- The repairFrontmatter function's knownSubKeys set needed editLog entry sub-keys (date, method, by, note) to avoid incorrect dedenting
+- grade-content.ts uses the `yaml` library to parse/stringify, so editLog Date objects need explicit conversion to strings
+
+---
+
 ## 2026-02-13 | claude/add-llm-warning-banner-aWFt0 | Add LLM warning banner to wiki pages
 
 **What was done:** Added a dismissible warning banner to all wiki pages informing readers that content was written by an LLM with minimal human supervision. The banner uses localStorage to persist dismissal, so once closed it stays hidden across all pages.

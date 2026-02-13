@@ -761,9 +761,30 @@ function applyGradesToFile(page: PageInfo, grades: GradeResult, metrics: Metrics
   // by app/scripts/lib/metrics-extractor.mjs — not stored in frontmatter.
   delete fm.metrics;
 
+  // Append edit log entry for grading
+  const today = new Date().toISOString().split('T')[0];
+  if (!Array.isArray(fm.editLog)) {
+    fm.editLog = [];
+  }
+  (fm.editLog as Array<Record<string, string>>).push({
+    date: today,
+    method: 'crux-grade',
+    by: 'system',
+    note: `Quality graded: ${derivedQuality}, importance: ${grades.importance}`,
+  });
+
   // Ensure lastEdited is a string (not Date object)
   if (fm.lastEdited instanceof Date) {
     fm.lastEdited = fm.lastEdited.toISOString().split('T')[0];
+  }
+
+  // Ensure editLog dates are strings (YAML parser may convert to Date objects)
+  if (Array.isArray(fm.editLog)) {
+    for (const entry of fm.editLog as Array<Record<string, unknown>>) {
+      if (entry.date instanceof Date) {
+        entry.date = (entry.date as Date).toISOString().split('T')[0];
+      }
+    }
   }
 
   // Reconstruct file with proper quoting for date strings
