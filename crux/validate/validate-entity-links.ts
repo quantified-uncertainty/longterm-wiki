@@ -27,6 +27,7 @@ import { CONTENT_DIR, PROJECT_ROOT, loadPathRegistry } from '../lib/content-type
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import type { Colors } from '../lib/output.ts';
 import type { PathRegistry } from '../lib/content-types.ts';
+import { logBulkFixes } from '../lib/edit-log.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -332,6 +333,7 @@ export function runCheck(options?: EntityLinkValidatorOptions): ValidatorResult 
   if (FIX_MODE && filesToFix.size > 0) {
     let fixedFiles = 0;
     let fixedLinks = 0;
+    const modifiedFiles: string[] = [];
 
     for (const [file, fixes] of filesToFix) {
       let content: string = readFileSync(file, 'utf-8');
@@ -353,8 +355,17 @@ export function runCheck(options?: EntityLinkValidatorOptions): ValidatorResult 
 
       if (modified) {
         writeFileSync(file, content);
+        modifiedFiles.push(file);
         fixedFiles++;
       }
+    }
+
+    if (modifiedFiles.length > 0) {
+      logBulkFixes(modifiedFiles, {
+        tool: 'crux-fix',
+        agency: 'automated',
+        note: 'Converted markdown links to EntityLink components',
+      });
     }
 
     if (!CI_MODE) {

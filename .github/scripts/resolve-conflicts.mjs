@@ -163,7 +163,7 @@ async function resolveFile(filePath) {
 
   const result = await callAPIWithRetry({
     model: "claude-sonnet-4-5-20250929",
-    max_tokens: 65536,
+    max_tokens: 64000,
     system: SYSTEM_PROMPT,
     messages: [
       {
