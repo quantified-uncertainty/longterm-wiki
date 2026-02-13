@@ -2,6 +2,20 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/fix-issue-105-SUiYf | Complete entityType frontmatter migration
+
+**What was done:** Added `entityType` to frontmatter of 469 MDX pages across 7 entity-required categories (people, organizations, risks, responses, models, worldviews, intelligence-paradigms). Wrote a migration script (`crux/scripts/migrate-entity-types.mjs`) that reads the CATEGORY_ENTITY_TYPES mapping and inserts the appropriate entityType into each page's frontmatter. Verified build output: all 645 pre-existing entities unchanged, 23 new auto-entities correctly created for pages that previously lacked both YAML and frontmatter entity definitions. All tests (308) pass, all blocking CI checks pass, full build succeeds.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+
+**Learnings/notes:**
+- 23 pages in entity-required categories had neither YAML entities nor frontmatter entityType — the migration surfaced these gaps
+- The frontmatter scanner correctly creates auto-entities only when no YAML entity exists (YAML takes precedence)
+- Migration is fully reversible — removing entityType from frontmatter falls back to YAML lookup
+
+---
+
 ## 2026-02-13 | claude/wiki-gap-analysis-l7Cp8 | Systematic wiki gap analysis
 
 **What was done:** Ran `crux gaps list`, `crux gaps stats`, and manual topic coverage analysis across all 639 wiki pages. Identified 386 pages needing insight extraction (203 high-importance with zero insights). Produced a gap analysis report at `content/docs/internal/gap-analysis-2026-02.mdx`. Built a Suggested Pages dashboard (`app/internal/suggested-pages/`) with exactly 100 ranked page suggestions (priorities 1–100) in a sortable DataTable, using numeric priority based on mention frequency across existing pages (grep + EntityLink counts) and editorial importance. Updated gap-analysis MDX to reference the dashboard instead of inline tier lists.
