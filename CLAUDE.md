@@ -18,6 +18,7 @@ pnpm test                        # Run vitest tests
 pnpm crux validate               # Run all validation checks
 pnpm crux --help                 # Show all CLI domains
 pnpm crux content improve <id>   # Improve a wiki page
+pnpm crux edit-log view <id>     # View edit history for a page
 ```
 
 ## Repository Structure
@@ -31,6 +32,7 @@ longterm-wiki/
 │   ├── resources/              # External resource links
 │   ├── insights/               # Cross-page insights
 │   ├── graphs/                 # Cause-effect graph data
+│   ├── edit-logs/              # Per-page edit history (YAML, auto-maintained)
 │   └── id-registry.json        # Derived build artifact (gitignored)
 ├── app/                        # Next.js 15 frontend
 │   ├── src/                    # App source code
@@ -169,3 +171,4 @@ print(f\"Total: {data['total_count']} checks\")
 - **Internal sidebar** (`app/src/lib/internal-nav.ts`): When adding internal pages, place them in the correct section. "Research" is for research reports/proposals only. Schema/architecture/technical docs go in "Architecture & Schema". Check existing section semantics before adding.
 - **Mermaid diagrams**: Follow `content/docs/internal/mermaid-diagrams.mdx` style guide — prefer `flowchart TD`, max 3-4 parallel nodes, use tables for taxonomies, max 15-20 nodes per diagram.
 - **Page templates**: Defined in `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
+- **Edit logs**: Per-page edit history in `data/edit-logs/<page-id>.yaml`, auto-maintained by Crux pipelines. Use `pnpm crux edit-log view <page-id>` to inspect. See `crux/lib/edit-log.ts` for the API.
