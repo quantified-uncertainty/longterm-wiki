@@ -617,7 +617,7 @@ async function main(): Promise<void> {
     logBulkFixes(modifiedFiles, {
       tool: 'crux-fix',
       agency: 'automated',
-      note: `Auto-linked ${totalChanges} EntityLinks in ${filesChanged} files`,
+      note: 'Auto-linked EntityLink components',
     });
   }
 

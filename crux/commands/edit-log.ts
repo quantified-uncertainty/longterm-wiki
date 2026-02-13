@@ -206,6 +206,7 @@ export const commands: Record<string, (args: string[], options: Record<string, u
   view,
   list,
   stats,
+  default: list,
 };
 
 /**

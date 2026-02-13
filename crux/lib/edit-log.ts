@@ -63,12 +63,34 @@ function logFilePath(pageId: string): string {
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Extract page ID (slug) from an absolute or content-relative MDX file path. */
+/**
+ * Extract page ID (slug) from an absolute or content-relative MDX file path.
+ *
+ * Uses the filename (last path segment) as the slug, which matches the `page.id`
+ * convention used throughout the codebase. Index files use the parent directory name.
+ *
+ * NOTE: This assumes all non-index MDX filenames are unique across the content tree.
+ * If two pages share the same filename in different directories, they would collide.
+ * As of Feb 2026 there are no such collisions among the ~625 pages.
+ */
 export function pageIdFromPath(filePath: string): string {
   const rel = filePath.startsWith(CONTENT_DIR)
     ? filePath.slice(CONTENT_DIR.length + 1)
     : filePath;
   return rel.replace(/\.mdx?$/, '').replace(/\/index$/, '').split('/').pop()!;
+}
+
+// ---------------------------------------------------------------------------
+// Defaults
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the default value for `requestedBy` based on environment.
+ * Checks CRUX_REQUESTED_BY env var first, then falls back to USER, then 'system'.
+ * Callers should use this instead of hardcoding 'system'.
+ */
+export function getDefaultRequestedBy(): string {
+  return process.env.CRUX_REQUESTED_BY || process.env.USER || 'system';
 }
 
 // ---------------------------------------------------------------------------
@@ -102,8 +124,8 @@ export function appendEditLog(pageId: string, entry: Omit<EditLogEntry, 'date'> 
     date: entry.date || new Date().toISOString().split('T')[0],
     tool: entry.tool,
     agency: entry.agency,
-    ...(entry.requestedBy && { requestedBy: entry.requestedBy }),
-    ...(entry.note && { note: entry.note }),
+    ...(entry.requestedBy != null && { requestedBy: entry.requestedBy }),
+    ...(entry.note != null && { note: entry.note }),
   };
 
   existing.push(fullEntry);

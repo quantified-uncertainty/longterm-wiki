@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { appendEditLog, readEditLog, pageIdFromPath, logBulkFixes } from './edit-log.ts';
+import { appendEditLog, readEditLog, pageIdFromPath, logBulkFixes, getDefaultRequestedBy } from './edit-log.ts';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const EDIT_LOGS_DIR = path.join(ROOT, 'data/edit-logs');
@@ -98,6 +98,20 @@ describe('edit-log', () => {
       expect(entries[0].requestedBy).toBeUndefined();
       expect(entries[0].note).toBeUndefined();
     });
+
+    it('preserves empty string values for optional fields', () => {
+      appendEditLog(TEST_PAGE_ID, {
+        tool: 'manual',
+        agency: 'human',
+        requestedBy: '',
+        note: '',
+      });
+
+      const entries = readEditLog(TEST_PAGE_ID);
+      expect(entries).toHaveLength(1);
+      expect(entries[0].requestedBy).toBe('');
+      expect(entries[0].note).toBe('');
+    });
   });
 
   describe('pageIdFromPath', () => {
@@ -114,6 +128,36 @@ describe('edit-log', () => {
     it('handles index files', () => {
       const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
       expect(pageIdFromPath(`${root}/content/docs/knowledge-base/risks/index.mdx`)).toBe('risks');
+    });
+  });
+
+  describe('getDefaultRequestedBy', () => {
+    const origCrux = process.env.CRUX_REQUESTED_BY;
+    const origUser = process.env.USER;
+
+    afterEach(() => {
+      // Restore originals
+      if (origCrux !== undefined) process.env.CRUX_REQUESTED_BY = origCrux;
+      else delete process.env.CRUX_REQUESTED_BY;
+      if (origUser !== undefined) process.env.USER = origUser;
+      else delete process.env.USER;
+    });
+
+    it('returns CRUX_REQUESTED_BY when set', () => {
+      process.env.CRUX_REQUESTED_BY = 'ozzie';
+      expect(getDefaultRequestedBy()).toBe('ozzie');
+    });
+
+    it('falls back to USER when CRUX_REQUESTED_BY is not set', () => {
+      delete process.env.CRUX_REQUESTED_BY;
+      process.env.USER = 'testuser';
+      expect(getDefaultRequestedBy()).toBe('testuser');
+    });
+
+    it('falls back to system when neither env var is set', () => {
+      delete process.env.CRUX_REQUESTED_BY;
+      delete process.env.USER;
+      expect(getDefaultRequestedBy()).toBe('system');
     });
   });
 

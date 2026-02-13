@@ -296,7 +296,7 @@ if (!APPLY_MODE) {
     {
       tool: 'crux-fix',
       agency: 'automated',
-      note: `Removed ${totalSections} redundant related-pages sections`,
+      note: 'Removed redundant related-pages section',
     },
   );
 }

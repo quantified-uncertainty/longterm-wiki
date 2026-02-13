@@ -399,7 +399,7 @@ export class ValidationEngine {
       logBulkFixes(modifiedFiles, {
         tool: 'crux-fix',
         agency: 'automated',
-        note: `Auto-fixed ${issuesFixed} validation issues (escaping, markdown, etc.)`,
+        note: 'Auto-fixed validation issues (escaping, markdown, etc.)',
       });
     }
 

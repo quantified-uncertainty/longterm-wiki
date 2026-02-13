@@ -34,7 +34,7 @@ import { fileURLToPath } from 'url';
 import { MODELS } from '../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../lib/entity-lookup.ts';
 import { convertSlugsToNumericIds } from './creator/deployment.ts';
-import { appendEditLog } from '../lib/edit-log.ts';
+import { appendEditLog, getDefaultRequestedBy } from '../lib/edit-log.ts';
 // Inlined from content-types.ts to keep this file self-contained
 const CRITICAL_RULES: string[] = [
   'dollar-signs',
@@ -1562,7 +1562,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     appendEditLog(page.id, {
       tool: 'crux-improve',
       agency: 'ai-directed',
-      requestedBy: 'system',
+      requestedBy: getDefaultRequestedBy(),
       note: editNote,
     });
 

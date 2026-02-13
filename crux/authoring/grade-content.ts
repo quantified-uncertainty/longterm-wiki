@@ -37,7 +37,7 @@ import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { countFootnoteRefs } from '../lib/metrics-extractor.ts';
-import { appendEditLog } from '../lib/edit-log.ts';
+import { appendEditLog, getDefaultRequestedBy } from '../lib/edit-log.ts';
 import {
   insiderJargonRule,
   falseCertaintyRule,
@@ -1001,7 +1001,7 @@ async function main(): Promise<void> {
             appendEditLog(page.id, {
               tool: 'crux-grade',
               agency: 'automated',
-              requestedBy: 'system',
+              requestedBy: getDefaultRequestedBy(),
               note: `Quality graded: ${derivedQuality}, importance: ${grades.importance.toFixed(1)}`,
             });
           } else {

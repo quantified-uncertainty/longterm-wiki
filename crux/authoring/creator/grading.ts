@@ -7,7 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient, parseJsonResponse } from '../../lib/anthropic.ts';
-import { appendEditLog, pageIdFromPath } from '../../lib/edit-log.ts';
+import { appendEditLog } from '../../lib/edit-log.ts';
 
 interface GradingContext {
   log: (phase: string, message: string) => void;
@@ -200,7 +200,11 @@ Respond with JSON:
     const newContent = `---\n${yamlStr}---\n${body}`;
     fs.writeFileSync(finalPath, newContent);
 
-    appendEditLog(pageIdFromPath(finalPath), {
+    // Use sanitized topic as page ID (matches deployment.ts slug derivation).
+    // Do NOT use pageIdFromPath(finalPath) — finalPath is a temp dir path
+    // like .claude/temp/page-creator/topic/final.mdx which would resolve to "final".
+    const pageId = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    appendEditLog(pageId, {
       tool: 'crux-grade',
       agency: 'automated',
       note: `Initial creation grading: quality=${quality}, importance=${grades.importance}`,

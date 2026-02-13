@@ -364,7 +364,7 @@ export function runCheck(options?: EntityLinkValidatorOptions): ValidatorResult 
       logBulkFixes(modifiedFiles, {
         tool: 'crux-fix',
         agency: 'automated',
-        note: `Converted ${fixedLinks} markdown links to EntityLink components`,
+        note: 'Converted markdown links to EntityLink components',
       });
     }
 

@@ -272,7 +272,7 @@ async function main(): Promise<void> {
     logBulkFixes(modifiedFiles, {
       tool: 'crux-fix',
       agency: 'automated',
-      note: `Fixed missing component imports (${totalChanges} imports in ${filesChanged} files)`,
+      note: 'Fixed missing component imports',
     });
   }
 

@@ -531,7 +531,7 @@ async function main(): Promise<void> {
       logBulkFixes(fixedFiles, {
         tool: 'crux-fix',
         agency: 'automated',
-        note: `Fixed ${results.fixed} broken internal links`,
+        note: 'Fixed broken internal links',
       });
     }
   }
