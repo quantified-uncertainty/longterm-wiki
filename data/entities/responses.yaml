@@ -581,7 +581,7 @@
 - id: us-executive-order
   numericId: E366
   type: policy
-  title: Executive Order on Safe, Secure, and Trustworthy AI
+  title: US Executive Order on Safe, Secure, and Trustworthy AI
   customFields:
     - label: Type
       value: Executive Order
@@ -707,7 +707,7 @@
 - id: epistemic-security
   numericId: E123
   type: approach
-  title: Epistemic Security
+  title: AI-Era Epistemic Security
   customFields:
     - label: Definition
       value: Protecting collective capacity for knowledge and truth-finding
@@ -1114,7 +1114,7 @@
 - id: content-authentication
   numericId: E74
   type: approach
-  title: Content Authentication
+  title: AI Content Authentication
   customFields:
     - label: Maturity
       value: Standards emerging; early deployment
@@ -1173,7 +1173,7 @@
 - id: coordination-tech
   numericId: E77
   type: approach
-  title: Coordination Technologies
+  title: AI Governance Coordination Technologies
   customFields:
     - label: Maturity
       value: Emerging; active development
@@ -1285,7 +1285,7 @@
 - id: epistemic-infrastructure
   numericId: E122
   type: approach
-  title: Epistemic Infrastructure
+  title: AI-Era Epistemic Infrastructure
   customFields:
     - label: Maturity
       value: Conceptual; partial implementations
@@ -1408,7 +1408,7 @@
 - id: prediction-markets
   numericId: E228
   type: approach
-  title: Prediction Markets
+  title: Prediction Markets (AI Forecasting)
   customFields:
     - label: Maturity
       value: Growing adoption; proven concept
@@ -1470,7 +1470,7 @@
 - id: value-learning
   numericId: E368
   type: safety-agenda
-  title: Value Learning
+  title: AI Value Learning
   description: >-
     Research agenda focused on AI systems learning human values from data, behavior, or feedback rather than explicit
     specification.
@@ -2120,7 +2120,7 @@
 - id: intervention-portfolio
   numericId: E458
   type: approach
-  title: Intervention Portfolio
+  title: AI Safety Intervention Portfolio
   description: >-
     Strategic overview of AI safety interventions analyzing ~$650M annual investment across 1,100
     FTEs. Maps 13+ interventions against 4 risk categories with ITN prioritization, finding 85% of
@@ -2235,7 +2235,7 @@
 - id: corporate
   numericId: E462
   type: approach
-  title: Corporate Responses
+  title: Corporate AI Safety Responses
   description: >-
     How major AI companies are responding to safety concerns through internal policies, responsible
     scaling frameworks, safety teams, and disclosure practices, with analysis of effectiveness and
@@ -2352,7 +2352,7 @@
 - id: lab-culture
   numericId: E466
   type: approach
-  title: Lab Safety Culture
+  title: AI Lab Safety Culture
   description: >-
     Analysis of interventions to improve safety culture within AI labs. Evidence from 2024-2025
     shows significant gaps: no company scored above C+ overall (FLI Winter 2025), all received D
@@ -2630,7 +2630,7 @@
 - id: open-source
   numericId: E474
   type: approach
-  title: Open Source Safety
+  title: Open Source AI Safety
   description: >-
     Analysis of whether releasing AI model weights publicly is net positive or negative for safety.
     The July 2024 NTIA report recommends monitoring but not restricting open weights, while
@@ -2689,7 +2689,7 @@
 - id: field-building-analysis
   numericId: E476
   type: approach
-  title: Field Building Analysis
+  title: AI Safety Field Building Analysis
   description: >-
     Analysis of AI safety field-building interventions including education programs (ARENA, MATS,
     BlueDot). The field grew from approximately 400 FTEs in 2022 to 1,100 FTEs in 2025 (21-30%
@@ -2891,7 +2891,7 @@
 - id: formal-verification
   numericId: E483
   type: approach
-  title: Formal Verification
+  title: Formal Verification (AI Safety)
   description: >-
     Mathematical proofs of AI system properties and behavior bounds, offering potentially strong
     safety guarantees if achievable but currently limited to small systems and facing fundamental
@@ -3187,6 +3187,19 @@
     - epistemics
     - ai-safety
   lastUpdated: 2026-02
+- id: x-com-epistemics
+  numericId: E692
+  type: approach
+  title: X.com Platform Epistemics
+  description: >-
+    Analysis of X.com's epistemic practices and impact on information quality.
+    Community Notes reduces repost virality by 46% but only 8-10% of notes display.
+    Engagement-driven algorithms amplify low-credibility content, API restrictions
+    ended 100+ research projects, and verification changes degraded trust signals.
+  clusters:
+    - epistemics
+    - governance
+  lastUpdated: 2026-02
 - id: cooperative-ai
   numericId: E590
   type: approach
@@ -3243,7 +3256,7 @@
 - id: labor-transition
   numericId: E593
   type: approach
-  title: "Labor Transition & Economic Resilience"
+  title: "AI Labor Transition & Economic Resilience"
   description: >-
     Reviews standard policy interventions (reskilling, UBI, portable benefits,
     automation taxes) for managing AI-driven job displacement, citing WEF
@@ -3288,7 +3301,7 @@
 - id: model-spec
   numericId: E594
   type: policy
-  title: Model Specifications
+  title: AI Model Specifications
   description: >-
     Model specifications are explicit documents defining AI behavior, now
     published by all major frontier labs (Anthropic, OpenAI, Google, Meta) as of
@@ -3315,7 +3328,7 @@
 - id: output-filtering
   numericId: E595
   type: approach
-  title: Output Filtering
+  title: AI Output Filtering
   description: >-
     Comprehensive analysis of AI output filtering showing detection rates of
     70-98% depending on content type, with 100% of models vulnerable to
@@ -3342,7 +3355,7 @@
 - id: provenance-tracing
   numericId: E597
   type: approach
-  title: Provenance Tracing
+  title: AI Content Provenance Tracing
   description: >-
     A proposed epistemic infrastructure making knowledge provenance transparent
     and traversable—enabling anyone to see the chain of citations, original data
@@ -3355,7 +3368,7 @@
 - id: public-education
   numericId: E598
   type: approach
-  title: Public Education
+  title: AI Risk Public Education
   description: >-
     Public education initiatives show measurable but modest impacts: MIT
     programs increased accurate AI risk perception by 34%, while 67% of
@@ -3369,7 +3382,7 @@
 - id: reliability-tracking
   numericId: E599
   type: approach
-  title: Reliability Tracking
+  title: AI System Reliability Tracking
   description: >-
     A proposed system for systematically assessing the track records of public
     actors by topic, scoring factual claims against sources, predictions against
@@ -3395,7 +3408,7 @@
 - id: rhetoric-highlighting
   numericId: E601
   type: approach
-  title: Rhetoric Highlighting
+  title: AI-Assisted Rhetoric Highlighting
   description: >-
     A proposed automated system for detecting and flagging
     persuasive-but-misleading rhetoric, including logical fallacies, emotionally
@@ -3482,7 +3495,7 @@
 - id: government-authority-commercial-ai-infrastructure
   numericId: E688
   type: policy
-  title: Government Authority Over Commercial AI Infrastructure
+  title: US Government Authority Over Commercial AI Infrastructure
   description: >-
     The US government possesses extensive legal authority to direct, commandeer, or access
     the $700B+ in commercial AI infrastructure owned by US companies, through the Defense

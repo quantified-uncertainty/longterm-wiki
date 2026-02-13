@@ -17,6 +17,33 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 
 ---
 
+## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Fix 6 edit log review issues
+
+**What was done:** Fixed all 6 issues from paranoid code review of the edit log PR. Critical: grading.ts was using `pageIdFromPath(finalPath)` on a temp path (resolved to "final" instead of actual page slug) — now uses sanitized `topic` parameter directly. Verified no actual slug collisions exist among ~625 pages. Added `default: list` command so `crux edit-log` works without subcommand. Changed all `logBulkFixes` callers to use per-page generic notes instead of misleading aggregate counts. Added `getDefaultRequestedBy()` helper (checks `CRUX_REQUESTED_BY` → `USER` → `'system'`) and wired it into all 4 pipeline call sites. Fixed falsy check in `appendEditLog` to use `!= null` so empty strings are preserved. Added 4 new tests (14 total edit-log tests, 269 total tests).
+
+**Issues encountered:**
+- No actual slug collisions found among non-index pages — the theoretical collision risk noted in review does not affect current content
+
+**Learnings/notes:**
+- Page IDs (slugs) are derived identically across the codebase (last path segment), so edit log IDs match `page.id` convention
+- `getDefaultRequestedBy()` is the cleanest way to thread user identity without adding CLI flags to every pipeline
+
+---
+
+## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Full edit log system integration
+
+**What was done:** Fully integrated file-based edit log system across entire codebase. Per-page YAML files in `data/edit-logs/` track every page modification with tool, agency, requestedBy, and note fields. Integrated into 9 write paths: page create, improve, grade (x2), and 5 fix/validation scripts. Added `crux edit-log` CLI domain with view/list/stats commands. Added `crux validate edit-logs` validator. Documented in CLAUDE.md. 10 unit tests.
+
+**Issues encountered:**
+- First implementation was frontmatter-based; reworked to file-based after design review
+
+**Learnings/notes:**
+- Storing structured data in frontmatter is risky because LLMs rewrite the entire file during improve
+- `logBulkFixes()` and `pageIdFromPath()` helpers simplify integration for fix scripts
+- `crux/validate/types.ts` is imported but doesn't exist; dead import in several validators
+
+---
+
 ## 2026-02-13 | claude/add-llm-warning-banner-aWFt0 | Add LLM warning banner to wiki pages
 
 **What was done:** Added a dismissible warning banner to all wiki pages informing readers that content was written by an LLM with minimal human supervision. The banner uses localStorage to persist dismissal, so once closed it stays hidden across all pages.

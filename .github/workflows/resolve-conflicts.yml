@@ -1,0 +1,104 @@
+name: Resolve Merge Conflicts
+
+# Runs after auto-rebase completes to resolve PRs that still have
+# actual merge conflicts using the Claude API.
+#
+# Requires: ANTHROPIC_API_KEY secret in the repository.
+
+on:
+  # Run after auto-rebase finishes (proper sequencing, no sleep hack)
+  workflow_run:
+    workflows: ["Auto-Rebase PRs"]
+    types: [completed]
+
+  # Also run on a schedule to catch any stragglers
+  schedule:
+    - cron: "0 */6 * * *" # every 6 hours
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Only one instance at a time to avoid race conditions
+concurrency:
+  group: resolve-conflicts
+  cancel-in-progress: false
+
+jobs:
+  find-conflicted-prs:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.find.outputs.matrix }}
+      has_conflicts: ${{ steps.find.outputs.has_conflicts }}
+    steps:
+      - name: Find PRs with merge conflicts
+        id: find
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # Get open PRs and check mergeable state
+          prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --base main --state open \
+            --json number,headRefName,mergeable \
+            --jq '[.[] | select(.mergeable == "CONFLICTING") | {number: .number, branch: .headRefName}]')
+
+          echo "Conflicted PRs: $prs"
+
+          if [ "$prs" = "[]" ] || [ -z "$prs" ]; then
+            echo "has_conflicts=false" >> "$GITHUB_OUTPUT"
+            echo "matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_conflicts=true" >> "$GITHUB_OUTPUT"
+            echo "matrix={\"include\":$prs}" >> "$GITHUB_OUTPUT"
+          fi
+
+  resolve:
+    needs: find-conflicted-prs
+    if: needs.find-conflicted-prs.outputs.has_conflicts == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix: ${{ fromJson(needs.find-conflicted-prs.outputs.matrix) }}
+      max-parallel: 1 # Resolve one at a time to avoid push races
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Resolve conflicts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PR_BRANCH: ${{ matrix.branch }}
+          PR_NUMBER: ${{ matrix.number }}
+        run: node .github/scripts/resolve-conflicts.mjs
+
+      - name: Post comment on PR
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment "${{ matrix.number }}" --repo "$GITHUB_REPOSITORY" \
+            --body "Merge conflicts with \`main\` were automatically resolved by the conflict resolver. Please review the merge commit to ensure correctness."
+
+      - name: Post failure comment
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment "${{ matrix.number }}" --repo "$GITHUB_REPOSITORY" \
+            --body "Automatic conflict resolution failed for this PR. Manual resolution is needed."
