@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@lib/utils";
 import { Lightbulb, FlaskConical, Target, CheckCircle2, ExternalLink, BookOpen, GraduationCap, MessageSquare, Briefcase } from "lucide-react";
 import { EntityTypeIcon, entityTypeConfig } from "./EntityTypeIcon";
+import { EntityLink } from "./EntityLink";
 import { severityColors, maturityColors, riskCategoryColors } from "./shared/style-config";
 import { getEntityTypeHeader, getEntityTypeLabel, getOrgTypeLabel } from "@/data/entity-ontology";
 import type { AnyEntityTypeName } from "@/data/entity-type-names";
@@ -46,7 +47,7 @@ export interface InfoBoxProps {
   knownFor?: string;
   customFields?: { label: string; value: string; link?: string }[];
   relatedTopics?: string[];
-  relatedEntries?: { type: string; title: string; href: string }[];
+  relatedEntries?: { id?: string; type: string; title: string; href: string }[];
   ratings?: ModelRatingsData;
   description?: string;
   externalLinks?: ExternalLinksData;
@@ -89,7 +90,14 @@ function getImportanceColor(value: number): string {
   return "#94a3b8";
 }
 
+const IRREGULAR_PLURALS: Record<string, string> = {
+  Person: "People",
+  person: "People",
+};
+
 function pluralize(label: string): string {
+  if (IRREGULAR_PLURALS[label]) return IRREGULAR_PLURALS[label];
+  if (label.endsWith("sis")) return label.slice(0, -3) + "ses";
   if (label.endsWith("s") || label.endsWith("x") || label.endsWith("sh") || label.endsWith("ch")) return label + "es";
   if (label.endsWith("y") && !/[aeiou]y$/i.test(label)) return label.slice(0, -1) + "ies";
   return label + "s";
@@ -235,9 +243,9 @@ export function InfoBox({
     : null;
 
   return (
-    <Card className="wiki-infobox float-right w-[280px] mb-4 ml-6 overflow-hidden text-sm max-md:float-none max-md:w-full max-md:ml-0 max-md:mb-6">
+    <Card className="wiki-infobox float-right w-[280px] mb-4 ml-6 overflow-visible text-sm max-md:float-none max-md:w-full max-md:ml-0 max-md:mb-6">
       {/* Header */}
-      <div className="px-3 py-2.5 text-white" style={{ backgroundColor: typeInfo.headerColor }}>
+      <div className="px-3 py-2.5 text-white rounded-t-lg" style={{ backgroundColor: typeInfo.headerColor }}>
         <span className="block text-[10px] uppercase tracking-wide opacity-90 mb-0.5">{typeInfo.label}</span>
         {title && <h3 className="m-0 text-sm font-semibold leading-tight text-white">{title}</h3>}
       </div>
@@ -362,27 +370,29 @@ export function InfoBox({
 
       {/* Related Entries */}
       {groupedEntries && sortedTypes.length > 0 && (
-        <div className="px-4 py-3 border-t border-border">
-          <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Related</div>
-          <div className="flex flex-col gap-2">
+        <div className="px-4 py-2 border-t border-border">
+          <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">Related</div>
+          <div className="flex flex-col gap-1.5">
             {sortedTypes.map((t) => {
               const entries = groupedEntries![t]!;
               const config = entityTypeConfig[t as keyof typeof entityTypeConfig];
               return (
-                <div key={t} className="flex flex-col gap-0">
-                  <div className="flex items-center gap-1.5 mb-0.5">
+                <div key={t} className="flex flex-col">
+                  <div className="flex items-center gap-1 mb-0.5">
                     {config && <EntityTypeIcon type={t} size="xs" />}
-                    <span className="text-muted-foreground font-medium text-[0.7rem] uppercase tracking-tight">
+                    <span className="text-muted-foreground font-medium text-[0.65rem] uppercase tracking-tight">
                       {pluralize(getEntityTypeLabel(t))}
                     </span>
                   </div>
-                  <ul className="list-none m-0 p-0 pl-[1.125rem] flex flex-col">
+                  <div className="pl-[1.125rem] flex flex-wrap gap-1">
                     {entries.map((entry, i) => (
-                      <li key={i} className="list-none m-0 p-0 leading-snug">
-                        <Link href={entry.href} className="text-accent-foreground no-underline hover:underline">{entry.title}</Link>
-                      </li>
+                      entry.id ? (
+                        <EntityLink key={i} id={entry.id} className="text-xs">{entry.title}</EntityLink>
+                      ) : (
+                        <Link key={i} href={entry.href} className="inline-flex items-center px-2 py-0.5 bg-muted rounded text-xs text-accent-foreground no-underline transition-colors hover:bg-muted/80">{entry.title}</Link>
+                      )
                     ))}
-                  </ul>
+                  </div>
                 </div>
               );
             })}
