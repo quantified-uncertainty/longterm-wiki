@@ -4,7 +4,7 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 
 ## 2026-02-13 | claude/wiki-gap-analysis-l7Cp8 | Systematic wiki gap analysis
 
-**What was done:** Ran `crux gaps list`, `crux gaps stats`, and manual topic coverage analysis across all 639 wiki pages. Identified 386 pages needing insight extraction (203 high-importance with zero insights) and 20 prioritized missing/under-covered topics. Produced a gap analysis report at `content/docs/internal/gap-analysis-2026-02.mdx`. Built a Suggested Pages dashboard as a Next.js route (`app/internal/suggested-pages/`) with a sortable/searchable DataTable (matching Update Schedule pattern), replacing an earlier MDX-with-tabs version.
+**What was done:** Ran `crux gaps list`, `crux gaps stats`, and manual topic coverage analysis across all 639 wiki pages. Identified 386 pages needing insight extraction (203 high-importance with zero insights). Produced a gap analysis report at `content/docs/internal/gap-analysis-2026-02.mdx`. Built a Suggested Pages dashboard (`app/internal/suggested-pages/`) with 100 ranked page suggestions in a single sortable DataTable, using numeric priority (1-98) based on mention frequency across existing pages (grep + EntityLink counts) and editorial importance. Data sourced from automated cross-reference analysis of all 628 wiki pages.
 
 **Issues encountered:**
 - pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
