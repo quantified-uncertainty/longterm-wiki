@@ -80,11 +80,11 @@ function parseSessionLog(logPath) {
     const body = content.slice(entry.startIndex, endIndex);
 
     // Extract "What was done" summary
-    const summaryMatch = body.match(/\*\*What was done:\*\*\s*(.+?)(?:\n\n|\n\*\*)/s);
+    const summaryMatch = body.match(/\*\*What was done:\*\*\s*(.+?)(?:\n\n|\n\*\*|\n---)/s);
     const summary = summaryMatch ? summaryMatch[1].trim() : '';
 
     // Extract "Pages" list
-    const pagesMatch = body.match(/\*\*Pages:\*\*\s*(.+?)(?:\n\n|\n\*\*)/s);
+    const pagesMatch = body.match(/\*\*Pages:\*\*\s*(.+?)(?:\n\n|\n\*\*|\n---)/s);
     if (!pagesMatch) continue; // No pages field — infrastructure-only session
 
     const pageIds = pagesMatch[1]

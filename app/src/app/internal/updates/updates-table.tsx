@@ -3,18 +3,8 @@
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
+import { formatFrequencyShort } from "@lib/format";
 import type { UpdateScheduleItem } from "@/data";
-
-function formatFrequency(days: number): string {
-  if (days <= 7) return "Weekly";
-  if (days <= 14) return "Biweekly";
-  if (days <= 21) return "3 weeks";
-  if (days <= 30) return "Monthly";
-  if (days <= 45) return "6 weeks";
-  if (days <= 60) return "Bimonthly";
-  if (days <= 90) return "Quarterly";
-  return `${Math.round(days / 30)}mo`;
-}
 
 function formatDaysUntil(days: number): string {
   if (days < -30) return `${Math.abs(Math.round(days / 7))}w overdue`;
@@ -69,7 +59,7 @@ const columns: ColumnDef<UpdateScheduleItem>[] = [
     ),
     cell: ({ row }) => (
       <span className="text-xs text-muted-foreground">
-        {formatFrequency(row.original.updateFrequency)}
+        {formatFrequencyShort(row.original.updateFrequency)}
       </span>
     ),
   },

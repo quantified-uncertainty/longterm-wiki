@@ -2,6 +2,21 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Review fixes: DRY, types, docs, parser
+
+**What was done:** PR review follow-up: extracted shared `formatAge`/`formatFrequency` utilities to `@lib/format.ts` (removed 3 duplicate implementations), added `evergreen` and `changeHistory` to crux `Frontmatter`/`PageEntry` types, hardened `parseSessionLog` regex against EOF edge cases, documented changeHistory system in automation-tools.mdx.
+
+**Pages:** automation-tools
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- `formatAge()` had three subtly different implementations (capitalization, abbreviation). Consolidated to one canonical version in `@lib/format.ts`.
+- The session log parser's regex `(.+?)(?:\n\n|\n\*\*)` would fail if a field were the last thing before `---` or EOF. Added `\n---` as an alternative terminator.
+
+---
+
 ## 2026-02-13 | claude/optional-report-updates-lpTVT | Connect session log to page change history
 
 **What was done:** Added `Pages:` field to session log format, built a parser in build-data.mjs that extracts page-level change history from session log entries, added `changeHistory` to the Page interface, added a per-page "Change History" section in PageStatus (with timeline of sessions that touched the page), and created a master `/internal/page-changes` dashboard with a sortable/searchable table of all page changes grouped by session.

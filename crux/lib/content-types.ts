@@ -53,6 +53,7 @@ export interface Frontmatter {
   maturity?: string;
   fullWidth?: boolean;
   update_frequency?: number;
+  evergreen?: boolean;
   entityId?: string;
   roles?: string[];
   pageTemplate?: string;
@@ -127,6 +128,14 @@ export interface PageEntry {
     structuralScore: number;
   };
   suggestedQuality?: number;
+  updateFrequency?: number | null;
+  evergreen?: boolean;
+  changeHistory?: Array<{
+    date: string;
+    branch: string;
+    title: string;
+    summary: string;
+  }>;
   wordCount?: number;
   unconvertedLinks?: Array<{ url: string; text: string; line: number }>;
   unconvertedLinkCount?: number;

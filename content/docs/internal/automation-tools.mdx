@@ -162,6 +162,30 @@ node crux/authoring/page-improver.ts -- <page-id> --triage
 
 ---
 
+## Page Change Tracking
+
+Claude Code sessions log which wiki pages they modify. This creates a per-page change history that feeds two dashboards.
+
+### How It Works
+
+1. Each Claude Code session appends an entry to `.claude/session-log.md` with a `**Pages:**` field listing the page slugs that were edited.
+2. At build time, `build-data.mjs` parses the session log and attaches a `changeHistory` array to each page in `database.json`.
+3. The data flows to two places:
+   - **Per-page**: A "Change History" section in the PageStatus card shows which sessions touched this page.
+   - **Site-wide**: The [Page Changes dashboard](/internal/page-changes) shows all page edits across all sessions in a sortable table.
+
+### Session Log Format
+
+The `**Pages:**` field uses page slugs (filenames without `.mdx`), comma-separated:
+
+```
+**Pages:** ai-risks, compute-governance, anthropic
+```
+
+Omit the field entirely for infrastructure-only sessions that don't edit wiki pages.
+
+---
+
 ## Content Grading
 
 Uses Claude Sonnet API to automatically grade pages with importance, quality, and AI-generated summaries.
