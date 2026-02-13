@@ -7,6 +7,64 @@
 import fs from 'fs';
 import path from 'path';
 
+interface IdRegistry {
+  _nextId: number;
+  entities: Record<string, string>;
+}
+
+let _slugToNumeric: Record<string, string> | null = null;
+
+/** Load slug→E## mapping from id-registry.json (lazy, cached) */
+function getSlugToNumericMap(ROOT: string): Record<string, string> {
+  if (_slugToNumeric) return _slugToNumeric;
+  try {
+    const raw = fs.readFileSync(path.join(ROOT, 'data/id-registry.json'), 'utf-8');
+    const registry: IdRegistry = JSON.parse(raw);
+    _slugToNumeric = {};
+    for (const [eid, slug] of Object.entries(registry.entities)) {
+      _slugToNumeric[slug] = eid;
+    }
+    return _slugToNumeric;
+  } catch {
+    _slugToNumeric = {};
+    return _slugToNumeric;
+  }
+}
+
+/** Convert slug-based EntityLink/DataInfoBox IDs to numeric (E##) format */
+export function convertSlugsToNumericIds(content: string, ROOT: string): { content: string; converted: number } {
+  const slugToNumeric = getSlugToNumericMap(ROOT);
+  let converted = 0;
+
+  // Convert EntityLink id="slug" → id="E##"
+  const result = content.replace(
+    /(<EntityLink\s+[^>]*?)id="([^"]+)"/g,
+    (_match, prefix, id) => {
+      if (/^E\d+$/i.test(id)) return _match; // already numeric
+      if (slugToNumeric[id]) {
+        converted++;
+        return `${prefix}id="${slugToNumeric[id]}"`;
+      }
+      return _match; // slug not in registry, leave as-is
+    }
+  );
+
+  // Convert DataInfoBox entityId="slug" → entityId="E##"
+  const result2 = result.replace(
+    /entityId="([^"]+)"/g,
+    (_match, id) => {
+      if (/^E\d+$/i.test(id)) return _match;
+      if (slugToNumeric[id]) {
+        converted++;
+        return `entityId="${slugToNumeric[id]}"`;
+      }
+      return _match;
+    }
+  );
+
+  return { content: result2, converted };
+}
+
 interface DeployContext {
   ROOT: string;
   getTopicDir: (topic: string) => string;
@@ -67,7 +125,13 @@ export function deployToDestination(topic: string, destPath: string, { ROOT, get
 
   ensureDir(fullDestDir);
 
-  fs.copyFileSync(finalPath, fullDestPath);
+  // Copy and convert slug-based EntityLink IDs to numeric (E##) format
+  let content = fs.readFileSync(finalPath, 'utf-8');
+  const { content: converted, converted: count } = convertSlugsToNumericIds(content, ROOT);
+  fs.writeFileSync(fullDestPath, converted);
+  if (count > 0) {
+    console.log(`  Converted ${count} EntityLink ID(s) to numeric format`);
+  }
 
   return {
     success: true,

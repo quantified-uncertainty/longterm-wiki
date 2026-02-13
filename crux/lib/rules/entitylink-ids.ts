@@ -82,19 +82,33 @@ export const entityLinkIdsRule = createRule({
       regex.lastIndex = 0;
 
       while ((match = regex.exec(line)) !== null) {
-        const id = match[1];
+        const rawId = match[1];
+
+        // Resolve numeric IDs (E35 → slug) before validation
+        let id = rawId;
+        if (/^E\d+$/i.test(rawId) && engine.idRegistry) {
+          const slug = engine.idRegistry.byNumericId[rawId.toUpperCase()];
+          if (slug) {
+            id = slug;
+          } else {
+            issues.push(new Issue({
+              rule: this.id,
+              file: content.path,
+              line: lineNum,
+              message: `EntityLink id="${rawId}" is not a registered numeric ID`,
+              severity: Severity.WARNING,
+            }));
+            continue;
+          }
+        }
 
         // Check if ID exists in pathRegistry or entities
-        // Also check with __index__/ prefix for index pages
-        // And check __index__/ai-transition-model/factors/ prefix for factor IDs
         const inPathRegistry = engine.pathRegistry && (
           engine.pathRegistry[id] ||
           engine.pathRegistry[`__index__/${id}`] ||
           engine.pathRegistry[`__index__/ai-transition-model/factors/${id}`]
         );
         const inEntities = engine.entities && (engine.entities as Record<string, unknown>)[id];
-
-        // For path-style IDs, check if the fallback path resolves to a real file
         const resolvesViaPath = pathStyleIdResolvesToFile(id);
 
         if (!inPathRegistry && !inEntities && !resolvesViaPath) {
@@ -102,7 +116,7 @@ export const entityLinkIdsRule = createRule({
             rule: this.id,
             file: content.path,
             line: lineNum,
-            message: `EntityLink id="${id}" does not resolve to any known path or entity`,
+            message: `EntityLink id="${rawId}" does not resolve to any known path or entity`,
             severity: Severity.WARNING,
           }));
         }

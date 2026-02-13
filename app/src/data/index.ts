@@ -809,7 +809,7 @@ function loadExternalLinksMap(): Map<string, ExternalLinksData> {
 export function getExternalLinks(
   pageId: string
 ): ExternalLinksData | undefined {
-  return loadExternalLinksMap().get(pageId);
+  return loadExternalLinksMap().get(resolveId(pageId));
 }
 
 // ============================================================================
