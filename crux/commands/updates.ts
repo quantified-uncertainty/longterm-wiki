@@ -101,6 +101,9 @@ function loadUpdateCandidates(): UpdateCandidate[] {
     // Skip stubs and documentation pages
     if (fm.pageType === 'stub' || fm.pageType === 'documentation') continue;
 
+    // Skip non-evergreen pages (reports, blog posts)
+    if (fm.evergreen === false) continue;
+
     const updateFrequency = Number(fm.update_frequency);
     if (updateFrequency <= 0 || isNaN(updateFrequency)) continue;
 
