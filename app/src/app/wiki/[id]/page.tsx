@@ -249,9 +249,9 @@ function ContentView({
         {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
         {isArticle && entity && <DataInfoBox entityId={slug} />}
         {page.content}
-        {/* Related pages only shown for articles — tables/diagrams are self-contained */}
-        {isArticle && <RelatedPages entityId={slug} entity={entity} />}
       </article>
+      {/* Related pages rendered outside prose to avoid inherited link styles */}
+      {isArticle && <RelatedPages entityId={slug} entity={entity} />}
     </InfoBoxVisibilityProvider>
   );
 }

@@ -28,14 +28,6 @@ const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
   { label: "Epistemic", value: "epistemic" },
 ];
 
-// CONTENT FORMAT filter
-const FORMAT_GROUPS: { label: string; value: string | null }[] = [
-  { label: "All", value: null },
-  { label: "Articles", value: "article" },
-  { label: "Tables", value: "table" },
-  { label: "Diagrams", value: "diagram" },
-];
-
 type SortKey = "recommended" | "relevance" | "title" | "importance" | "quality" | "wordCount" | "recentlyEdited";
 
 /** Compute a blended "recommended" score that favors recent, high-quality content. */
@@ -159,7 +151,6 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     initialRiskCat ? 1 : initialEntityIndex
   );
   const [activeRiskCat, setActiveRiskCat] = useState(initialRiskCatIndex);
-  const [activeFormat, setActiveFormat] = useState(0);
   const [sortKey, setSortKey] = useState<SortKey>("recommended");
   const [visibleCount, setVisibleCount] = useState(60);
 
@@ -247,11 +238,6 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     updateUrlParams({ riskCategory: value });
   }
 
-  function handleFormatChange(index: number) {
-    setActiveFormat(index);
-    setVisibleCount(60);
-  }
-
   // Filter out AI transition model subitems (internal model data, not articles)
   const articleItems = useMemo(
     () => items.filter((item) => !item.type.startsWith("ai-transition-model")),
@@ -293,14 +279,6 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     });
   }, [fieldFiltered]);
 
-  // Compute content format counts (against search + field-filtered items)
-  const formatCounts = useMemo(() => {
-    return FORMAT_GROUPS.map((group) => {
-      if (!group.value) return fieldFiltered.length;
-      return fieldFiltered.filter((item) => (item.contentFormat || "article") === group.value).length;
-    });
-  }, [fieldFiltered]);
-
   // Show risk category filter only when viewing Risks
   const showRiskCatFilter = activeEntity === 1;
 
@@ -316,11 +294,6 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   const filtered = useMemo(() => {
     let result = fieldFiltered;
 
-    // Content format filter
-    const formatGroup = FORMAT_GROUPS[activeFormat];
-    if (formatGroup.value) {
-      result = result.filter((item) => (item.contentFormat || "article") === formatGroup.value);
-    }
 
     // Entity type filter
     const group = ENTITY_GROUPS[activeEntity];
@@ -374,7 +347,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     });
 
     return result;
-  }, [fieldFiltered, activeEntity, activeRiskCat, activeFormat, searchScores, sortKey]);
+  }, [fieldFiltered, activeEntity, activeRiskCat, searchScores, sortKey]);
 
   return (
     <div>
@@ -404,13 +377,6 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
           active={activeEntity}
           onSelect={handleEntityChange}
           counts={entityCounts}
-        />
-        <FilterRow
-          label="Format"
-          options={FORMAT_GROUPS.map((g) => g.label)}
-          active={activeFormat}
-          onSelect={handleFormatChange}
-          counts={formatCounts}
         />
         {showRiskCatFilter && (
           <FilterRow
