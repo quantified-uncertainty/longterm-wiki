@@ -4,6 +4,7 @@
 - id: authentication-collapse
   numericId: E27
   type: risk
+  summaryPage: epistemic-overview
   title: Authentication Collapse
   severity: critical
   likelihood:
@@ -58,6 +59,7 @@
 - id: authoritarian-tools
   numericId: E30
   type: risk
+  summaryPage: misuse-overview
   title: AI Authoritarian Tools
   severity: high
   likelihood:
@@ -114,6 +116,7 @@
 - id: automation-bias
   numericId: E32
   type: risk
+  summaryPage: accident-overview
   title: Automation Bias
   severity: medium
   likelihood:
@@ -154,6 +157,7 @@
 - id: autonomous-weapons
   numericId: E35
   type: risk
+  summaryPage: misuse-overview
   title: Autonomous Weapons
   severity: high
   likelihood:
@@ -204,6 +208,7 @@
 - id: bioweapons
   numericId: E42
   type: risk
+  summaryPage: misuse-overview
   title: Bioweapons Risk
   severity: catastrophic
   likelihood:
@@ -264,6 +269,7 @@
 - id: concentration-of-power
   numericId: E68
   type: risk
+  summaryPage: structural-overview
   title: Concentration of Power
   severity: high
   likelihood:
@@ -314,6 +320,7 @@
 - id: consensus-manufacturing
   numericId: E72
   type: risk
+  summaryPage: epistemic-overview
   title: Consensus Manufacturing
   severity: high
   likelihood:
@@ -370,6 +377,7 @@
 - id: corrigibility-failure
   numericId: E80
   type: risk
+  summaryPage: accident-overview
   title: Corrigibility Failure
   severity: catastrophic
   likelihood:
@@ -409,6 +417,7 @@
 - id: cyber-psychosis
   numericId: E83
   type: risk
+  summaryPage: epistemic-overview
   title: Cyber Psychosis
   severity: medium-high
   likelihood:
@@ -466,6 +475,7 @@
 - id: cyberweapons
   numericId: E86
   type: risk
+  summaryPage: misuse-overview
   title: Cyberweapons Risk
   severity: high
   likelihood:
@@ -520,6 +530,7 @@
 - id: deceptive-alignment
   numericId: E93
   type: risk
+  summaryPage: accident-overview
   title: Deceptive Alignment
   severity: catastrophic
   likelihood:
@@ -566,6 +577,7 @@
 - id: deepfakes
   numericId: E96
   type: risk
+  summaryPage: misuse-overview
   title: Deepfakes
   severity: medium-high
   likelihood:
@@ -620,6 +632,7 @@
 - id: disinformation
   numericId: E102
   type: risk
+  summaryPage: misuse-overview
   title: AI Disinformation
   severity: high
   likelihood:
@@ -673,6 +686,7 @@
 - id: distributional-shift
   numericId: E105
   type: risk
+  summaryPage: accident-overview
   title: Distributional Shift
   severity: medium
   likelihood:
@@ -708,6 +722,7 @@
 - id: economic-disruption
   numericId: E108
   type: risk
+  summaryPage: structural-overview
   title: Economic Disruption
   severity: medium-high
   likelihood:
@@ -763,6 +778,7 @@
 - id: emergent-capabilities
   numericId: E117
   type: risk
+  summaryPage: accident-overview
   title: Emergent Capabilities
   severity: high
   likelihood:
@@ -806,6 +822,7 @@
 - id: enfeeblement
   numericId: E118
   type: risk
+  summaryPage: structural-overview
   title: Enfeeblement
   severity: medium-high
   likelihood:
@@ -859,6 +876,7 @@
 - id: epistemic-collapse
   numericId: E119
   type: risk
+  summaryPage: epistemic-overview
   title: Epistemic Collapse
   severity: high
   likelihood:
@@ -899,6 +917,7 @@
 - id: erosion-of-agency
   numericId: E126
   type: risk
+  summaryPage: structural-overview
   title: Erosion of Human Agency
   severity: medium-high
   likelihood:
@@ -953,6 +972,7 @@
 - id: expertise-atrophy
   numericId: E133
   type: risk
+  summaryPage: epistemic-overview
   title: Expertise Atrophy
   severity: high
   likelihood:
@@ -1010,6 +1030,7 @@
 - id: flash-dynamics
   numericId: E142
   type: risk
+  summaryPage: structural-overview
   title: Flash Dynamics
   severity: high
   likelihood:
@@ -1058,6 +1079,7 @@
 - id: fraud
   numericId: E145
   type: risk
+  summaryPage: misuse-overview
   title: AI-Powered Fraud
   severity: high
   likelihood:
@@ -1109,6 +1131,7 @@
 - id: goal-misgeneralization
   numericId: E151
   type: risk
+  summaryPage: accident-overview
   title: Goal Misgeneralization
   severity: high
   likelihood:
@@ -1152,6 +1175,7 @@
 - id: historical-revisionism
   numericId: E155
   type: risk
+  summaryPage: epistemic-overview
   title: AI-Enabled Historical Revisionism
   severity: high
   likelihood:
@@ -1205,6 +1229,7 @@
 - id: institutional-capture
   numericId: E166
   type: risk
+  summaryPage: epistemic-overview
   title: Institutional Decision Capture
   severity: high
   likelihood:
@@ -1265,6 +1290,7 @@
 - id: instrumental-convergence
   numericId: E168
   type: risk
+  summaryPage: accident-overview
   title: Instrumental Convergence
   severity: high
   likelihood:
@@ -1309,6 +1335,7 @@
 - id: irreversibility
   numericId: E179
   type: risk
+  summaryPage: structural-overview
   title: Irreversibility
   severity: critical
   likelihood:
@@ -1361,6 +1388,7 @@
 - id: knowledge-monopoly
   numericId: E183
   type: risk
+  summaryPage: epistemic-overview
   title: AI Knowledge Monopoly
   severity: critical
   likelihood:
@@ -1417,6 +1445,7 @@
 - id: learned-helplessness
   numericId: E187
   type: risk
+  summaryPage: epistemic-overview
   title: Epistemic Learned Helplessness
   severity: high
   likelihood:
@@ -1471,6 +1500,7 @@
 - id: legal-evidence-crisis
   numericId: E188
   type: risk
+  summaryPage: epistemic-overview
   title: Legal Evidence Crisis
   severity: high
   likelihood:
@@ -1529,6 +1559,7 @@
 - id: lock-in
   numericId: E189
   type: risk
+  summaryPage: structural-overview
   title: Lock-in
   severity: catastrophic
   likelihood:
@@ -1586,6 +1617,7 @@
 - id: authoritarian-takeover
   numericId: E29
   type: risk
+  summaryPage: structural-overview
   title: Authoritarian Takeover
   severity: catastrophic
   likelihood:
@@ -1629,6 +1661,7 @@
 - id: mesa-optimization
   numericId: E197
   type: risk
+  summaryPage: accident-overview
   title: Mesa-Optimization
   severity: catastrophic
   likelihood:
@@ -1673,6 +1706,7 @@
 - id: multipolar-trap
   numericId: E209
   type: risk
+  summaryPage: structural-overview
   title: Multipolar Trap
   severity: high
   likelihood:
@@ -1722,6 +1756,7 @@
 - id: power-seeking
   numericId: E226
   type: risk
+  summaryPage: accident-overview
   title: Power-Seeking AI
   severity: catastrophic
   likelihood:
@@ -1766,6 +1801,7 @@
 - id: preference-manipulation
   numericId: E230
   type: risk
+  summaryPage: epistemic-overview
   title: Preference Manipulation
   severity: high
   likelihood:
@@ -1822,6 +1858,7 @@
 - id: proliferation
   numericId: E232
   type: risk
+  summaryPage: structural-overview
   title: AI Proliferation
   severity: high
   likelihood:
@@ -1873,6 +1910,7 @@
 - id: racing-dynamics
   numericId: E239
   type: risk
+  summaryPage: structural-overview
   title: Racing Dynamics
   severity: high
   likelihood:
@@ -1925,6 +1963,7 @@
 - id: reality-fragmentation
   numericId: E244
   type: risk
+  summaryPage: epistemic-overview
   title: Reality Fragmentation
   severity: high
   likelihood:
@@ -1982,6 +2021,7 @@
 - id: reward-hacking
   numericId: E253
   type: risk
+  summaryPage: accident-overview
   title: Reward Hacking
   severity: high
   likelihood:
@@ -2027,6 +2067,7 @@
 - id: sandbagging
   numericId: E270
   type: risk
+  summaryPage: accident-overview
   title: Sandbagging
   severity: high
   likelihood:
@@ -2068,6 +2109,7 @@
 - id: scheming
   numericId: E274
   type: risk
+  summaryPage: accident-overview
   title: Scheming
   severity: catastrophic
   likelihood:
@@ -2118,6 +2160,7 @@
 - id: scientific-corruption
   numericId: E276
   type: risk
+  summaryPage: epistemic-overview
   title: Scientific Knowledge Corruption
   severity: high
   likelihood:
@@ -2177,6 +2220,7 @@
 - id: sharp-left-turn
   numericId: E281
   type: risk
+  summaryPage: accident-overview
   title: Sharp Left Turn
   severity: catastrophic
   likelihood:
@@ -2218,6 +2262,7 @@
 - id: surveillance
   numericId: E292
   type: risk
+  summaryPage: misuse-overview
   title: AI Mass Surveillance
   severity: high
   likelihood:
@@ -2272,6 +2317,7 @@
 - id: sycophancy
   numericId: E295
   type: risk
+  summaryPage: accident-overview
   title: Sycophancy
   severity: medium
   likelihood:
@@ -2314,6 +2360,7 @@
 - id: epistemic-sycophancy
   numericId: E124
   type: risk
+  summaryPage: epistemic-overview
   title: Epistemic Sycophancy
   severity: medium-high
   likelihood:
@@ -2368,6 +2415,7 @@
 - id: treacherous-turn
   numericId: E359
   type: risk
+  summaryPage: accident-overview
   title: Treacherous Turn
   severity: catastrophic
   likelihood:
@@ -2410,6 +2458,7 @@
 - id: rogue-ai-scenarios
   numericId: E490
   type: risk
+  summaryPage: accident-overview
   title: Rogue AI Scenarios
   severity: catastrophic
   likelihood:
@@ -2458,6 +2507,7 @@
 - id: trust-cascade
   numericId: E360
   type: risk
+  summaryPage: epistemic-overview
   title: Trust Cascade Failure
   severity: critical
   likelihood:
@@ -2514,6 +2564,7 @@
 - id: trust-decline
   numericId: E362
   type: risk
+  summaryPage: epistemic-overview
   title: Trust Decline
   severity: medium-high
   likelihood:
@@ -2552,6 +2603,7 @@
 - id: winner-take-all
   numericId: E374
   type: risk
+  summaryPage: structural-overview
   title: Winner-Take-All Dynamics
   severity: high
   likelihood:
@@ -2660,6 +2712,7 @@
 - id: sleeper-agents
   numericId: E489
   type: risk
+  summaryPage: accident-overview
   title: "Sleeper Agents: Training Deceptive LLMs"
   description: >-
     Anthropic's 2024 research demonstrating that large language models can be trained to exhibit
@@ -2690,6 +2743,7 @@
 - id: compute-concentration
   numericId: E684
   type: risk
+  summaryPage: structural-overview
   title: Compute Concentration
   severity: high
   likelihood:
@@ -2756,6 +2810,7 @@
 - id: concentrated-compute-cybersecurity-risk
   numericId: E689
   type: risk
+  summaryPage: structural-overview
   title: Concentrated Compute as a Cybersecurity Risk
   severity: high
   likelihood:
@@ -2790,6 +2845,7 @@
 - id: financial-stability-risks-ai-capex
   numericId: E690
   type: risk
+  summaryPage: structural-overview
   title: Financial Stability Risks from AI Capital Expenditure
   severity: medium
   likelihood:
@@ -2826,6 +2882,7 @@
 - id: steganography
   numericId: E603
   type: risk
+  summaryPage: accident-overview
   title: Steganography
   description: >-
     Comprehensive analysis of AI steganography risks - systems hiding
@@ -2840,6 +2897,7 @@
 - id: ai-enabled-untraceable-misuse
   numericId: E691
   type: risk
+  summaryPage: misuse-overview
   title: AI-Enabled Untraceable Misuse
   description: >-
     AI systems simultaneously amplify harmful capabilities and obscure

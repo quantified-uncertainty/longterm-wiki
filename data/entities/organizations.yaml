@@ -4,6 +4,7 @@
 - id: anthropic
   numericId: E22
   type: lab
+  summaryPage: labs-overview
   title: Anthropic
   website: https://anthropic.com
   relatedEntries:
@@ -72,6 +73,7 @@
 - id: deepmind
   numericId: E98
   type: lab
+  summaryPage: labs-overview
   title: Google DeepMind
   website: https://deepmind.google
   relatedEntries:
@@ -144,6 +146,7 @@
 - id: openai
   numericId: E218
   type: lab
+  summaryPage: labs-overview
   title: OpenAI
   website: https://openai.com
   relatedEntries:
@@ -215,6 +218,7 @@
 - id: xai
   numericId: E378
   type: lab
+  summaryPage: labs-overview
   title: xAI
   website: https://x.ai
   relatedEntries:
@@ -258,6 +262,7 @@
 - id: chai
   numericId: E57
   type: lab-academic
+  summaryPage: safety-orgs-overview
   title: CHAI
   website: https://humancompatible.ai
   relatedEntries:
@@ -288,6 +293,7 @@
 - id: apollo-research
   numericId: E24
   type: lab-research
+  summaryPage: safety-orgs-overview
   title: Apollo Research
   website: https://www.apolloresearch.ai
   relatedEntries:
@@ -339,6 +345,7 @@
 - id: cais
   numericId: E47
   type: lab-research
+  summaryPage: safety-orgs-overview
   title: CAIS
   website: https://safe.ai
   relatedEntries:
@@ -368,6 +375,7 @@
 - id: conjecture
   numericId: E70
   type: lab-research
+  summaryPage: safety-orgs-overview
   title: Conjecture
   website: https://conjecture.dev
   relatedEntries:
@@ -412,6 +420,7 @@
 - id: far-ai
   numericId: E138
   type: lab-research
+  summaryPage: safety-orgs-overview
   title: FAR AI
   website: https://far.ai
   relatedEntries:
@@ -457,6 +466,7 @@
 - id: govai
   numericId: E153
   type: lab-research
+  summaryPage: safety-orgs-overview
   title: GovAI
   website: https://governance.ai
   relatedEntries:
@@ -485,6 +495,7 @@
 - id: metr
   numericId: E201
   type: lab-research
+  summaryPage: safety-orgs-overview
   title: METR
   website: https://metr.org
   relatedEntries:
@@ -544,6 +555,7 @@
 - id: arc
   numericId: E25
   type: organization
+  summaryPage: safety-orgs-overview
   title: ARC
   website: https://alignment.org
   relatedEntries:
@@ -601,6 +613,7 @@
 - id: epoch-ai
   numericId: E125
   type: organization
+  summaryPage: safety-orgs-overview
   title: Epoch AI
   website: https://epochai.org
   relatedEntries:
@@ -650,6 +663,7 @@
 - id: miri
   numericId: E202
   type: organization
+  summaryPage: safety-orgs-overview
   title: MIRI
   website: https://intelligence.org
   relatedEntries:
@@ -758,6 +772,7 @@
 - id: uk-aisi
   numericId: E364
   type: organization
+  summaryPage: government-orgs-overview
   title: UK AI Safety Institute
   website: https://www.aisi.gov.uk
   relatedEntries:
@@ -810,6 +825,7 @@
 - id: us-aisi
   numericId: E365
   type: organization
+  summaryPage: government-orgs-overview
   title: US AI Safety Institute
   website: https://www.nist.gov/aisi
   relatedEntries:
@@ -875,6 +891,7 @@
 - id: fhi
   numericId: E140
   type: organization
+  summaryPage: safety-orgs-overview
   title: Future of Humanity Institute
   description: Oxford University research center focused on existential risks, founded by Nick Bostrom. Closed in 2024.
   status: stub
@@ -974,6 +991,7 @@
 - id: nist-ai
   numericId: E424
   type: organization
+  summaryPage: government-orgs-overview
   title: NIST and AI Safety
   description: >-
     The National Institute of Standards and Technology's role in developing AI
@@ -1001,6 +1019,7 @@
 - id: ssi
   numericId: E425
   type: lab-research
+  summaryPage: labs-overview
   title: Safe Superintelligence Inc (SSI)
   description: >-
     AI research startup founded by Ilya Sutskever, Daniel Gross, and Daniel Levy
@@ -1030,6 +1049,7 @@
 - id: controlai
   numericId: E426
   type: organization
+  summaryPage: safety-orgs-overview
   title: ControlAI
   description: >-
     UK-based AI safety advocacy organization focused on preventing artificial
@@ -1057,6 +1077,7 @@
 - id: frontier-model-forum
   numericId: E427
   type: organization
+  summaryPage: safety-orgs-overview
   title: Frontier Model Forum
   description: >-
     Industry-led non-profit organization promoting self-governance in frontier AI
@@ -1086,6 +1107,7 @@
 - id: palisade-research
   numericId: E428
   type: lab-research
+  summaryPage: safety-orgs-overview
   title: Palisade Research
   description: >-
     Nonprofit organization investigating offensive AI capabilities and
@@ -1142,6 +1164,7 @@
 - id: goodfire
   numericId: E430
   type: lab-research
+  summaryPage: safety-orgs-overview
   title: Goodfire
   description: >-
     AI interpretability research lab developing tools to decode and control neural
@@ -1190,6 +1213,7 @@
 - id: 80000-hours
   numericId: E510
   type: organization
+  summaryPage: safety-orgs-overview
   title: 80,000 Hours
   description: >-
     80,000 Hours is the largest EA career organization, reaching 10M+ readers
@@ -1204,6 +1228,7 @@
 - id: ai-futures-project
   numericId: E511
   type: organization
+  summaryPage: safety-orgs-overview
   title: AI Futures Project
   description: >-
     AI Futures Project is a nonprofit founded in 2024-2025 by former OpenAI
@@ -1276,6 +1301,7 @@
 - id: bridgewater-aia-labs
   numericId: E516
   type: organization
+  summaryPage: labs-overview
   title: Bridgewater AIA Labs
   description: >-
     Bridgewater AIA Labs launched a $2B AI-driven macro fund in July 2024 that
@@ -1290,6 +1316,7 @@
 - id: cea
   numericId: E517
   type: organization
+  summaryPage: community-building-overview
   title: Centre for Effective Altruism
   description: >-
     Oxford-based organization that coordinates the effective altruism movement,
@@ -1301,6 +1328,7 @@
 - id: center-for-applied-rationality
   numericId: E518
   type: organization
+  summaryPage: community-building-overview
   title: Center for Applied Rationality
   description: >-
     Berkeley nonprofit founded 2012 teaching applied rationality through
@@ -1368,6 +1396,7 @@
 - id: cser
   numericId: E523
   type: organization
+  summaryPage: safety-orgs-overview
   title: CSER (Centre for the Study of Existential Risk)
   description: >-
     CSER is a Cambridge-based existential risk research centre founded in 2012,
@@ -1384,6 +1413,7 @@
 - id: cset
   numericId: E524
   type: organization
+  summaryPage: safety-orgs-overview
   title: CSET (Center for Security and Emerging Technology)
   description: >-
     CSET is a $100M+ Georgetown center with 50+ staff conducting data-driven AI
@@ -1398,6 +1428,7 @@
 - id: ea-global
   numericId: E525
   type: organization
+  summaryPage: community-building-overview
   title: EA Global
   description: >-
     EA Global is a series of selective conferences organized by the Centre for
@@ -1507,6 +1538,7 @@
 - id: gpai
   numericId: E533
   type: organization
+  summaryPage: government-orgs-overview
   title: Global Partnership on Artificial Intelligence (GPAI)
   description: >-
     GPAI represents the first major multilateral AI governance initiative but
@@ -1522,6 +1554,7 @@
 - id: gratified
   numericId: E534
   type: organization
+  summaryPage: community-building-overview
   title: Gratified
   description: >-
     Gratified is an early-stage coffee and art community organization in San
@@ -1575,6 +1608,7 @@
 - id: lesswrong
   numericId: E538
   type: organization
+  summaryPage: community-building-overview
   title: LessWrong
   description: >-
     LessWrong is a rationality-focused community blog founded in 2009 that has
@@ -1588,6 +1622,7 @@
 - id: lighthaven
   numericId: E539
   type: organization
+  summaryPage: community-building-overview
   title: Lighthaven
   description: >-
     Lighthaven is a Berkeley conference venue operated by Lightcone
@@ -1602,6 +1637,7 @@
 - id: lightning-rod-labs
   numericId: E540
   type: organization
+  summaryPage: safety-orgs-overview
   title: Lightning Rod Labs
   description: >-
     Lightning Rod Labs is an early-stage AI company using temporal data to train
@@ -1670,6 +1706,7 @@
 - id: manifest
   numericId: E545
   type: organization
+  summaryPage: community-building-overview
   title: Manifest
   description: >-
     Manifest is a 2024 forecasting conference that generated significant
@@ -1711,6 +1748,7 @@
 - id: mats
   numericId: E548
   type: organization
+  summaryPage: safety-orgs-overview
   title: MATS ML Alignment Theory Scholars program
   description: >-
     MATS is a well-documented 12-week fellowship program that has successfully
@@ -1725,6 +1763,7 @@
 - id: meta-ai
   numericId: E549
   type: organization
+  summaryPage: labs-overview
   title: Meta AI (FAIR)
   description: >-
     Meta AI has invested $66-72B in AI infrastructure (2025) with AGI targeted
@@ -1740,6 +1779,7 @@
 - id: microsoft
   numericId: E550
   type: organization
+  summaryPage: labs-overview
   title: Microsoft AI
   description: >-
     Microsoft invested $80B+ in AI infrastructure (FY2025) with a restructured
@@ -1782,6 +1822,7 @@
 - id: pause-ai
   numericId: E553
   type: organization
+  summaryPage: safety-orgs-overview
   title: Pause AI
   description: >-
     Pause AI is a grassroots advocacy movement founded May 2023 calling for
@@ -1837,6 +1878,7 @@
 - id: redwood-research
   numericId: E557
   type: organization
+  summaryPage: safety-orgs-overview
   title: Redwood Research
   description: >-
     A nonprofit AI safety and security research organization founded in 2021,
@@ -1909,6 +1951,7 @@
 - id: secure-ai-project
   numericId: E562
   type: organization
+  summaryPage: safety-orgs-overview
   title: Secure AI Project
   description: >-
     Policy advocacy organization founded ~2022-2023 by Nick Beckstead focusing
@@ -1955,6 +1998,7 @@
 - id: seldon-lab
   numericId: E565
   type: organization
+  summaryPage: safety-orgs-overview
   title: Seldon Lab
   description: >-
     Seldon Lab is a San Francisco-based AI safety accelerator founded in early
@@ -2026,6 +2070,7 @@
 - id: the-sequences
   numericId: E570
   type: organization
+  summaryPage: community-building-overview
   title: The Sequences by Eliezer Yudkowsky
   description: >-
     A foundational collection of blog posts on rationality, cognitive biases,

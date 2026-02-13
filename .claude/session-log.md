@@ -2,6 +2,23 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/issue-95-longterm-wiki-q75Oo | Add summary pages for content clusters
+
+**What was done:** Created 9 new overview/summary pages for major content clusters that lacked them: safety-orgs-overview (25 orgs), labs-overview (8 labs), community-building-overview (8 orgs), government-orgs-overview (4 government bodies), governance-overview (27+ governance responses), accident-overview (18 risks), epistemic-overview (16 risks), structural-overview (15 risks), and misuse-overview (9 risks). Added `summaryPage` field to ~100 entities across organizations.yaml, responses.yaml, and risks.yaml linking them to their respective overview pages. Added new overview page IDs to test exclusion list.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+- New overview pages needed to be added to EXCLUDED_PAGE_IDS in validate-entities.test.ts (overview pages don't have YAML entity backing)
+- Some risk entity IDs in risks.yaml differed from expected names (e.g., `erosion-of-agency` not `erosion-of-human-agency`, `surveillance` not `mass-surveillance`)
+
+**Learnings/notes:**
+- Overview pages follow a pattern: numericId, title, description, sidebar (label: Overview, order: 0), subcategory matching the cluster
+- The `summaryPage` field on entities stores just the page filename (without .mdx), e.g., `summaryPage: safety-orgs-overview`
+- Existing overview pages use two EntityLink formats: E-codes (`<EntityLink id="E123">`) and path-based (`<EntityLink id="organizations/epistemic-orgs/epoch-ai">`)
+- Risk pages have 4 natural subcategories (accident, epistemic, structural, misuse) that map well to overview pages
+
+---
+
 ## 2026-02-13 | claude/wiki-gap-analysis-l7Cp8 | Systematic wiki gap analysis
 
 **What was done:** Ran `crux gaps list`, `crux gaps stats`, and manual topic coverage analysis across all 639 wiki pages. Identified 386 pages needing insight extraction (203 high-importance with zero insights). Produced a gap analysis report at `content/docs/internal/gap-analysis-2026-02.mdx`. Built a Suggested Pages dashboard (`app/internal/suggested-pages/`) with exactly 100 ranked page suggestions (priorities 1–100) in a sortable DataTable, using numeric priority based on mention frequency across existing pages (grep + EntityLink counts) and editorial importance. Updated gap-analysis MDX to reference the dashboard instead of inline tier lists.

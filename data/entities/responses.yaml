@@ -4,6 +4,7 @@
 - id: ai-safety-institutes
   numericId: E13
   type: policy
+  summaryPage: governance-overview
   title: AI Safety Institutes (AISIs)
   customFields:
     - label: Established
@@ -29,6 +30,7 @@
 - id: california-sb1047
   numericId: E48
   type: policy
+  summaryPage: governance-overview
   title: Safe and Secure Innovation for Frontier Artificial Intelligence Models Act
   customFields:
     - label: Introduced
@@ -82,6 +84,7 @@
 - id: canada-aida
   numericId: E49
   type: policy
+  summaryPage: governance-overview
   title: Artificial Intelligence and Data Act (AIDA)
   customFields:
     - label: Introduced
@@ -113,6 +116,7 @@
 - id: china-ai-regulations
   numericId: E58
   type: policy
+  summaryPage: governance-overview
   title: China AI Regulatory Framework
   customFields:
     - label: Approach
@@ -175,6 +179,7 @@
 - id: colorado-ai-act
   numericId: E62
   type: policy
+  summaryPage: governance-overview
   title: Colorado Artificial Intelligence Act
   customFields:
     - label: Signed
@@ -198,6 +203,7 @@
 - id: compute-governance
   numericId: E64
   type: policy
+  summaryPage: governance-overview
   title: Compute Governance
   customFields:
     - label: Approach
@@ -250,6 +256,7 @@
 - id: compute-thresholds
   numericId: E67
   type: policy
+  summaryPage: governance-overview
   title: Compute Thresholds
   customFields:
     - label: Approach
@@ -281,6 +288,7 @@
 - id: compute-monitoring
   numericId: E66
   type: policy
+  summaryPage: governance-overview
   title: Compute Monitoring
   customFields:
     - label: Approach
@@ -311,6 +319,7 @@
 - id: international-compute-regimes
   numericId: E170
   type: policy
+  summaryPage: governance-overview
   title: International Compute Regimes
   customFields:
     - label: Approach
@@ -341,6 +350,7 @@
 - id: eu-ai-act
   numericId: E127
   type: policy
+  summaryPage: governance-overview
   title: EU AI Act
   customFields:
     - label: Type
@@ -374,6 +384,7 @@
 - id: export-controls
   numericId: E136
   type: policy
+  summaryPage: governance-overview
   title: US AI Chip Export Controls
   customFields:
     - label: Initial Rules
@@ -405,6 +416,7 @@
 - id: failed-stalled-proposals
   numericId: E137
   type: policy
+  summaryPage: governance-overview
   title: Failed and Stalled AI Proposals
   customFields:
     - label: Purpose
@@ -426,6 +438,7 @@
 - id: international-summits
   numericId: E173
   type: policy
+  summaryPage: governance-overview
   title: International AI Safety Summit Series
   customFields:
     - label: First Summit
@@ -484,6 +497,7 @@
 - id: nist-ai-rmf
   numericId: E216
   type: policy
+  summaryPage: governance-overview
   title: NIST AI Risk Management Framework (AI RMF)
   customFields:
     - label: Version
@@ -511,6 +525,7 @@
 - id: responsible-scaling-policies
   numericId: E252
   type: policy
+  summaryPage: governance-overview
   title: Responsible Scaling Policies (RSPs)
   customFields:
     - label: Type
@@ -536,6 +551,7 @@
 - id: seoul-declaration
   numericId: E279
   type: policy
+  summaryPage: governance-overview
   title: Seoul Declaration on AI Safety
   customFields:
     - label: Predecessor
@@ -559,6 +575,7 @@
 - id: standards-bodies
   numericId: E288
   type: policy
+  summaryPage: governance-overview
   title: AI Standards Development
   customFields:
     - label: Key Bodies
@@ -581,6 +598,7 @@
 - id: us-executive-order
   numericId: E366
   type: policy
+  summaryPage: governance-overview
   title: Executive Order on Safe, Secure, and Trustworthy AI
   customFields:
     - label: Type
@@ -630,6 +648,7 @@
 - id: us-state-legislation
   numericId: E367
   type: policy
+  summaryPage: governance-overview
   title: US State AI Legislation Landscape
   customFields:
     - label: Most active states
@@ -652,6 +671,7 @@
 - id: voluntary-commitments
   numericId: E369
   type: policy
+  summaryPage: governance-overview
   title: Voluntary AI Safety Commitments
   customFields:
     - label: Nature
@@ -2439,6 +2459,7 @@
 - id: bletchley-declaration
   numericId: E469
   type: policy
+  summaryPage: governance-overview
   title: Bletchley Declaration
   description: >-
     World-first international agreement on AI safety signed by 28 countries at the November 2023
@@ -2468,6 +2489,7 @@
 - id: coordination-mechanisms
   numericId: E470
   type: policy
+  summaryPage: governance-overview
   title: International Coordination Mechanisms
   description: >-
     International coordination on AI safety involves multilateral treaties, bilateral dialogues,
@@ -2497,6 +2519,7 @@
 - id: new-york-raise-act
   numericId: E471
   type: policy
+  summaryPage: governance-overview
   title: New York RAISE Act
   description: >-
     State legislation requiring safety protocols, incident reporting, and transparency from
@@ -2526,6 +2549,7 @@
 - id: model-registries
   numericId: E472
   type: policy
+  summaryPage: governance-overview
   title: Model Registries
   description: >-
     Centralized databases of frontier AI models that enable governments to track development,
@@ -2554,6 +2578,7 @@
 - id: international-regimes
   numericId: E473
   type: policy
+  summaryPage: governance-overview
   title: International Compute Regimes
   description: >-
     Multilateral coordination mechanisms for AI compute governance, exploring pathways from
