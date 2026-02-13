@@ -2136,7 +2136,7 @@
     - governance
     - community
   relatedEntries:
-    - id: technical-ai-safety
+    - id: tmc-technical-ai-safety
       type: concept
     - id: coefficient-giving
       type: organization
@@ -2517,7 +2517,7 @@
       type: policy
     - id: thresholds
       type: policy
-    - id: ai-governance
+    - id: tmc-ai-governance
       type: policy
     - id: openai
       type: organization
@@ -2706,7 +2706,7 @@
   relatedEntries:
     - id: coefficient-giving
       type: organization
-    - id: technical-ai-safety
+    - id: tmc-technical-ai-safety
       type: concept
     - id: training-programs
       type: approach

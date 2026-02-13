@@ -37,7 +37,7 @@ Current research suggests representation engineering occupies a middle ground be
 | Scalability | High | Techniques demonstrated on models from 7B to 72B parameters |
 | Current Maturity | Medium | Active research since 2023; production applications emerging |
 | Time Horizon | 0-2 years | Already being applied at inference time; rapid iteration |
-| Key Proponents | <EntityLink id="cais">Center for AI Safety</EntityLink>, Harvard, MIT | [Zou et al. 2023](https://arxiv.org/abs/2310.01405), [Li et al. 2024](https://arxiv.org/abs/2306.03341) |
+| Key Proponents | <EntityLink id="E47">Center for AI Safety</EntityLink>, Harvard, MIT | [Zou et al. 2023](https://arxiv.org/abs/2310.01405), [Li et al. 2024](https://arxiv.org/abs/2306.03341) |
 
 ## How It Works
 
@@ -223,17 +223,17 @@ For practitioners seeking to implement representation engineering:
 
 | Risk | Mechanism | Effectiveness |
 |------|-----------|---------------|
-| <EntityLink id="epistemic-sycophancy">Sycophancy</EntityLink> | Detect and steer away from agreeable-but-false outputs | Medium-High |
-| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | Detect deception-related representations | Medium |
+| <EntityLink id="E124">Sycophancy</EntityLink> | Detect and steer away from agreeable-but-false outputs | Medium-High |
+| <EntityLink id="E93">Deceptive Alignment</EntityLink> | Detect deception-related representations | Medium |
 | Jailbreaking | Internal state monitoring for adversarial prompts | High |
-| <EntityLink id="reward-hacking">Reward Hacking</EntityLink> | Steer toward intended behaviors | Medium |
+| <EntityLink id="E253">Reward Hacking</EntityLink> | Steer toward intended behaviors | Medium |
 
 ## Complementary Interventions
 
-- <EntityLink id="interpretability">Mechanistic Interpretability</EntityLink> - Deeper understanding to complement surface steering
-- <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> - Training-time alignment that steering can reinforce
-- <EntityLink id="ai-control">AI Control</EntityLink> - Defense-in-depth with steering as one layer
-- <EntityLink id="evals">Evaluations</EntityLink> - Behavioral testing to validate steering effects
+- <EntityLink id="E174">Mechanistic Interpretability</EntityLink> - Deeper understanding to complement surface steering
+- <EntityLink id="E451">Constitutional AI</EntityLink> - Training-time alignment that steering can reinforce
+- <EntityLink id="E6">AI Control</EntityLink> - Defense-in-depth with steering as one layer
+- <EntityLink id="E128">Evaluations</EntityLink> - Behavioral testing to validate steering effects
 
 ## Sources
 
@@ -255,12 +255,12 @@ For practitioners seeking to implement representation engineering:
 
 ## AI Transition Model Context
 
-Representation engineering improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="misalignment-potential" />:
+Representation engineering improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="E205" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="interpretability-coverage" /> | Enables reading and detecting concept-level representations including deception |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Steering vectors provide runtime behavior modification without retraining |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Internal monitoring detects jailbreaks and adversarial intent |
+| <EntityLink id="E205" /> | <EntityLink id="E175" /> | Enables reading and detecting concept-level representations including deception |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Steering vectors provide runtime behavior modification without retraining |
+| <EntityLink id="E205" /> | <EntityLink id="E160" /> | Internal monitoring detects jailbreaks and adversarial intent |
 
 Representation engineering provides practical near-term safety applications while mechanistic interpretability develops deeper understanding.

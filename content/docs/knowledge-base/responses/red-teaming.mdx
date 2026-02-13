@@ -24,9 +24,9 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
 ## Overview
 
-Red teaming is a systematic adversarial evaluation methodology used to identify vulnerabilities, dangerous capabilities, and failure modes in AI systems before deployment. Originally developed in cybersecurity and military contexts, red teaming has become a critical component of AI safety evaluation, particularly for <EntityLink id="large-language-models">language models</EntityLink> and <EntityLink id="agentic-ai">agentic systems</EntityLink>.
+Red teaming is a systematic adversarial evaluation methodology used to identify vulnerabilities, dangerous capabilities, and failure modes in AI systems before deployment. Originally developed in cybersecurity and military contexts, red teaming has become a critical component of AI safety evaluation, particularly for <EntityLink id="E400">language models</EntityLink> and <EntityLink id="E2">agentic systems</EntityLink>.
 
-Red teaming serves as both a capability evaluation tool and a safety measure, helping organizations understand what their AI systems can do—including capabilities they may not have intended to enable. As AI systems become more capable, red teaming provides essential empirical data for <EntityLink id="responsible-scaling-policies">responsible scaling policies</EntityLink> and deployment decisions.
+Red teaming serves as both a capability evaluation tool and a safety measure, helping organizations understand what their AI systems can do—including capabilities they may not have intended to enable. As AI systems become more capable, red teaming provides essential empirical data for <EntityLink id="E252">responsible scaling policies</EntityLink> and deployment decisions.
 
 ## Quick Assessment
 
@@ -36,8 +36,8 @@ Red teaming serves as both a capability evaluation tool and a safety measure, he
 | **Scalability** | Medium | Human red teaming limited; automated methods emerging |
 | **Current Maturity** | Medium-High | Standard practice at major labs since 2023 |
 | **Time Horizon** | Immediate | Can be implemented now; ongoing challenge to keep pace with capabilities |
-| **Key Proponents** | <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, METR, UK AISI | Active programs with published methodologies |
-| **Regulatory Status** | Increasing | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> and NIST AI RMF mandate adversarial testing |
+| **Key Proponents** | <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, METR, UK AISI | Active programs with published methodologies |
+| **Regulatory Status** | Increasing | <EntityLink id="E127">EU AI Act</EntityLink> and NIST AI RMF mandate adversarial testing |
 
 ## How It Works
 
@@ -86,7 +86,7 @@ Red teaming follows a structured cycle: teams first define threat models based o
 | Method | Description | Effectiveness | Example Organizations |
 |---------|-------------|---------------|---------------------|
 | **Direct Prompts** | Explicit requests for prohibited content | Low (10-20% success) | <R id="f771d4f56ad4dbaa">Anthropic</R> |
-| **Role-Playing** | Fictional scenarios to bypass safeguards | Medium (30-50% success) | <EntityLink id="metr">METR</EntityLink> |
+| **Role-Playing** | Fictional scenarios to bypass safeguards | Medium (30-50% success) | <EntityLink id="E201">METR</EntityLink> |
 | **Multi-step Attacks** | Complex prompt chains | High (60-80% success) | Academic researchers |
 | **Obfuscation** | Encoding, language switching, symbols | Variable (20-70% success) | Security researchers |
 
@@ -94,10 +94,10 @@ Red teaming follows a structured cycle: teams first define threat models based o
 
 Red teaming systematically probes for concerning capabilities:
 
-- **<EntityLink id="persuasion">Persuasion</EntityLink>**: Testing ability to manipulate human beliefs
-- **<EntityLink id="deceptive-alignment">Deception</EntityLink>**: Evaluating tendency to provide false information strategically
-- **<EntityLink id="situational-awareness">Situational Awareness</EntityLink>**: Assessing model understanding of its training and deployment
-- **<EntityLink id="self-improvement">Self-improvement</EntityLink>**: Testing ability to enhance its own capabilities
+- **<EntityLink id="E224">Persuasion</EntityLink>**: Testing ability to manipulate human beliefs
+- **<EntityLink id="E93">Deception</EntityLink>**: Evaluating tendency to provide false information strategically
+- **<EntityLink id="E282">Situational Awareness</EntityLink>**: Assessing model understanding of its training and deployment
+- **<EntityLink id="E278">Self-improvement</EntityLink>**: Testing ability to enhance its own capabilities
 
 ### Multi-Modal Attack Surfaces
 
@@ -112,12 +112,12 @@ Red teaming systematically probes for concerning capabilities:
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | High | Probes for hidden goals and strategic deception through adversarial scenarios |
-| <EntityLink id="persuasion">Manipulation & Persuasion</EntityLink> | High | Tests ability to manipulate human beliefs and behaviors |
+| <EntityLink id="E93">Deceptive Alignment</EntityLink> | High | Probes for hidden goals and strategic deception through adversarial scenarios |
+| <EntityLink id="E224">Manipulation & Persuasion</EntityLink> | High | Tests ability to manipulate human beliefs and behaviors |
 | <EntityLink id="model-manipulation">Model Manipulation</EntityLink> | High | Identifies prompt injection and jailbreaking vulnerabilities |
-| <EntityLink id="bioweapons">Bioweapons Risk</EntityLink> | High | Evaluates whether models provide dangerous biological information |
+| <EntityLink id="E42">Bioweapons Risk</EntityLink> | High | Evaluates whether models provide dangerous biological information |
 | <EntityLink id="cyberattacks">Cyber Offense</EntityLink> | High | Tests for malicious code generation and vulnerability exploitation |
-| <EntityLink id="situational-awareness">Situational Awareness</EntityLink> | Medium | Assesses model understanding of its training and deployment context |
+| <EntityLink id="E282">Situational Awareness</EntityLink> | Medium | Assesses model understanding of its training and deployment context |
 
 ## Current State & Implementation
 
@@ -126,12 +126,12 @@ Red teaming systematically probes for concerning capabilities:
 **Industry Red Teaming:**
 - <R id="1d07abc7b6f1c574">Anthropic</R>: Constitutional AI evaluation
 - <R id="e09fc9ef04adca70">OpenAI</R>: GPT-4 system card methodology
-- <EntityLink id="deepmind">DeepMind</EntityLink>: Sparrow safety evaluation
+- <EntityLink id="E98">DeepMind</EntityLink>: Sparrow safety evaluation
 
 **Independent Evaluation:**
-- <EntityLink id="metr">METR</EntityLink>: Autonomous replication and adaptation testing
-- <EntityLink id="uk-aisi">UK AISI</EntityLink>: National AI safety evaluations
-- <EntityLink id="apollo-research">Apollo Research</EntityLink>: Deceptive alignment detection
+- <EntityLink id="E201">METR</EntityLink>: Autonomous replication and adaptation testing
+- <EntityLink id="E364">UK AISI</EntityLink>: National AI safety evaluations
+- <EntityLink id="E24">Apollo Research</EntityLink>: Deceptive alignment detection
 
 **Government Programs:**
 - [NIST ARIA Program](https://ai-challenges.nist.gov/): Invites AI developers to submit models for red teaming and large-scale field testing
@@ -191,7 +191,7 @@ Red teaming faces significant scaling issues as AI capabilities advance:
 
 ### 2025-2027: Critical Scaling Period
 - **Challenge**: Human red teaming capacity vs. AI capability growth
-- **Risk**: Evaluation gaps for advanced <EntityLink id="agentic-ai">agentic systems</EntityLink>
+- **Risk**: Evaluation gaps for advanced <EntityLink id="E2">agentic systems</EntityLink>
 - **Response**: Development of AI-assisted red teaming methods
 
 ### Evaluation Completeness
@@ -213,9 +213,9 @@ Red teaming faces significant scaling issues as AI capabilities advance:
 
 Red teaming connects to broader AI safety approaches:
 
-- **<EntityLink id="evaluation">Evaluation</EntityLink>**: Core component of capability assessment
-- **<EntityLink id="responsible-scaling-policies">Responsible Scaling</EntityLink>**: Provides safety thresholds for deployment decisions
-- **<EntityLink id="why-alignment-hard">Alignment Research</EntityLink>**: Empirical testing of alignment methods
+- **<EntityLink id="E447">Evaluation</EntityLink>**: Core component of capability assessment
+- **<EntityLink id="E252">Responsible Scaling</EntityLink>**: Provides safety thresholds for deployment decisions
+- **<EntityLink id="E373">Alignment Research</EntityLink>**: Empirical testing of alignment methods
 - **Governance**: Informs regulatory evaluation requirements
 
 ## Sources & Resources
@@ -239,7 +239,7 @@ Red teaming connects to broader AI safety approaches:
 |-------------|------------|------------------|
 | <R id="c0a5858881a7ac1c">Stanford HAI</R> | Evaluation methods | Red teaming taxonomies |
 | <R id="e9e9fc88176f4432">MIT CSAIL</R> | Adversarial ML | Jailbreaking analysis |
-| <EntityLink id="chai">Berkeley CHAI</EntityLink> | Alignment testing | Safety evaluation frameworks |
+| <EntityLink id="E57">Berkeley CHAI</EntityLink> | Alignment testing | Safety evaluation frameworks |
 | [CMU Block Center](https://www.cmu.edu/block-center/) | NIST Guidelines | Red teaming for generative AI |
 
 ### Key Research Papers
@@ -254,13 +254,13 @@ Red teaming connects to broader AI safety approaches:
 
 ## AI Transition Model Context
 
-Red teaming improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="misalignment-potential" />:
+Red teaming improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="E205" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Identifies failure modes and vulnerabilities before deployment |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Helps evaluate whether safety keeps pace with capabilities |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Provides empirical data for oversight decisions |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Identifies failure modes and vulnerabilities before deployment |
+| <EntityLink id="E205" /> | <EntityLink id="E261" /> | Helps evaluate whether safety keeps pace with capabilities |
+| <EntityLink id="E205" /> | <EntityLink id="E160" /> | Provides empirical data for oversight decisions |
 
 Red teaming effectiveness is bounded by evaluator capabilities; as AI systems exceed human-level performance, automated and AI-assisted red teaming becomes critical.
 

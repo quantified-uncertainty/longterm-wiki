@@ -75,11 +75,11 @@ flowchart TD
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| <EntityLink id="misuse">Misuse</EntityLink> | High | Prevents jailbreaks that could enable harmful content generation |
+| <EntityLink id="E206">Misuse</EntityLink> | High | Prevents jailbreaks that could enable harmful content generation |
 | <EntityLink id="prompt-injection">Prompt Injection</EntityLink> | High | Trains models to distinguish instructions from data |
 | <EntityLink id="jailbreaking">Jailbreaking</EntityLink> | High | Primary defense against circumventing safety guidelines |
-| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | None | Does not address internal model goals or hidden objectives |
-| <EntityLink id="goal-misgeneralization">Goal Misgeneralization</EntityLink> | None | Targets external inputs, not internal learned representations |
+| <EntityLink id="E93">Deceptive Alignment</EntityLink> | None | Does not address internal model goals or hidden objectives |
+| <EntityLink id="E151">Goal Misgeneralization</EntityLink> | None | Targets external inputs, not internal learned representations |
 
 ## Risk Assessment & Impact
 
@@ -216,7 +216,7 @@ A deceptive model faces no challenge from adversarial training - it simply produ
 | Approach | Relationship | Benefit |
 |----------|--------------|---------|
 | **Output Filtering** | Defense in depth | Catch training misses |
-| **<EntityLink id="red-teaming">Red Teaming</EntityLink>** | Attack discovery | Supplies adversarial examples |
+| **<EntityLink id="E449">Red Teaming</EntityLink>** | Attack discovery | Supplies adversarial examples |
 | **Monitoring** | Detection | Catch attacks in production |
 | **Circuit Breakers** | Runtime intervention | Stop detected attacks |
 
@@ -295,7 +295,7 @@ Adversarial training relates to the <EntityLink id="ai-transition-model" /> thro
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | Attack surface | Reduces but doesn't eliminate vulnerability |
+| <EntityLink id="E205" /> | Attack surface | Reduces but doesn't eliminate vulnerability |
 | <EntityLink id="deployment-decisions" /> | Deployment safety | Necessary for responsible deployment |
 
 Adversarial training is important operational security but doesn't address fundamental alignment challenges - it defends against external attacks while the deeper concern is internal model properties.

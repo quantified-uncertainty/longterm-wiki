@@ -26,7 +26,7 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 Provably Safe AI represents one of the most ambitious research agendas in AI safety: designing advanced AI systems where safety is guaranteed by mathematical construction rather than verified through empirical testing. Led primarily by [David "davidad" Dalrymple](https://davidad.org/davidad_cv.pdf)---the youngest-ever MIT graduate degree recipient at age 16, former Filecoin co-inventor, and current Programme Director at [ARIA](https://www.aria.org.uk/programme-safeguarded-ai/)---this agenda seeks to create AI systems whose safety properties can be formally proven before deployment, potentially enabling safe development even of superintelligent systems.
 
-The foundational paper <R id="d8da577aed1e4384">Towards Guaranteed Safe AI</R>, published in May 2024 by Dalrymple, Joar Skalse, and co-authors including <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>, <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, <EntityLink id="max-tegmark">Max Tegmark</EntityLink>, and Sanjit Seshia, introduces the core framework of "guaranteed safe (GS) AI." The approach requires three components: a **world model** (mathematical description of how the AI affects the outside world), a **safety specification** (mathematical description of acceptable effects), and a **verifier** (auditable proof certificate that the AI satisfies the specification relative to the world model).
+The foundational paper <R id="d8da577aed1e4384">Towards Guaranteed Safe AI</R>, published in May 2024 by Dalrymple, Joar Skalse, and co-authors including <EntityLink id="E380">Yoshua Bengio</EntityLink>, <EntityLink id="E290">Stuart Russell</EntityLink>, <EntityLink id="E433">Max Tegmark</EntityLink>, and Sanjit Seshia, introduces the core framework of "guaranteed safe (GS) AI." The approach requires three components: a **world model** (mathematical description of how the AI affects the outside world), a **safety specification** (mathematical description of acceptable effects), and a **verifier** (auditable proof certificate that the AI satisfies the specification relative to the world model).
 
 The core insight motivating this work is that current AI safety approaches fundamentally rely on empirical testing and behavioral observation, which may be insufficient for systems capable of strategic deception or operating in novel circumstances. If we could instead construct AI systems where safety properties are mathematically guaranteed, we could have much stronger assurance that these properties will hold regardless of the system's capabilities or intentions. This parallels how we trust airplanes because their structural properties are verified through engineering analysis, not just flight testing. Crucially, this approach does not require interpretability to be solved and could still rule out deceptive alignment.
 
@@ -189,10 +189,10 @@ Proponents point to the remarkable success of formal verification in other domai
 
 | Approach | Similarity | Key Difference |
 |----------|------------|----------------|
-| **<EntityLink id="formal-verification" />** | Both use proofs | Provably safe designs from scratch |
-| **<EntityLink id="constitutional-ai" />** | Both specify rules | Mathematical vs natural language |
-| **<EntityLink id="ai-control" />** | Both aim for safety | Internal guarantees vs external constraints |
-| **<EntityLink id="interpretability" />** | Both seek understanding | Formal specification vs empirical analysis |
+| **<EntityLink id="E483" />** | Both use proofs | Provably safe designs from scratch |
+| **<EntityLink id="E451" />** | Both specify rules | Mathematical vs natural language |
+| **<EntityLink id="E6" />** | Both aim for safety | Internal guarantees vs external constraints |
+| **<EntityLink id="E174" />** | Both seek understanding | Formal specification vs empirical analysis |
 
 ## Scalability Assessment
 
@@ -220,11 +220,11 @@ If successful, provably safe AI would provide mathematical guarantees against se
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| <EntityLink id="misalignment-potential" /> | High | Safety specification formally encodes human values; verifier proves actions satisfy specification |
-| <EntityLink id="deceptive-alignment" /> | High | Proofs preclude deception by construction---no gap between training and deployment behavior |
-| <EntityLink id="power-seeking" /> | High | Actions mathematically constrained to proven-safe subset; cannot acquire unauthorized resources |
-| <EntityLink id="goal-misgeneralization" /> | High | Formal world model and specification prevent unintended optimization targets |
-| <EntityLink id="scheming" /> | Medium | Bounded agent cannot pursue hidden agendas if all actions must pass verification |
+| <EntityLink id="E205" /> | High | Safety specification formally encodes human values; verifier proves actions satisfy specification |
+| <EntityLink id="E93" /> | High | Proofs preclude deception by construction---no gap between training and deployment behavior |
+| <EntityLink id="E226" /> | High | Actions mathematically constrained to proven-safe subset; cannot acquire unauthorized resources |
+| <EntityLink id="E151" /> | High | Formal world model and specification prevent unintended optimization targets |
+| <EntityLink id="E274" /> | Medium | Bounded agent cannot pursue hidden agendas if all actions must pass verification |
 
 ## Current State
 
@@ -296,8 +296,8 @@ Provably safe AI affects the <EntityLink id="ai-transition-model" /> through fun
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="alignment-robustness" /> | Verification strength | Would provide mathematical alignment guarantees |
-| <EntityLink id="misalignment-potential" /> | Alignment approach | Eliminates misalignment by construction |
-| <EntityLink id="safety-capability-gap" /> | Gap closure | Verified systems have provable safety properties |
+| <EntityLink id="E20" /> | Verification strength | Would provide mathematical alignment guarantees |
+| <EntityLink id="E205" /> | Alignment approach | Eliminates misalignment by construction |
+| <EntityLink id="E261" /> | Gap closure | Verified systems have provable safety properties |
 
 The provably safe AI agenda represents a moonshot approach that could fundamentally solve AI safety if successful. The extreme difficulty of the technical challenges means success is uncertain, but the potential value of even partial progress justifies significant research investment. This approach is particularly valuable as a complement to empirical safety work, providing a fundamentally different path to safe AI.

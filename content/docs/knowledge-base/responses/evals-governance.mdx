@@ -26,11 +26,11 @@ import {Mermaid, R, EntityLink, DataExternalLinks, DataInfoBox} from '@component
 
 | Dimension | Rating | Evidence |
 |-----------|--------|----------|
-| **Tractability** | Medium-High | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> provides binding framework; UK AISI tested 30+ models since 2023; NIST AI RMF adopted by federal contractors |
+| **Tractability** | Medium-High | <EntityLink id="E127">EU AI Act</EntityLink> provides binding framework; UK AISI tested 30+ models since 2023; NIST AI RMF adopted by federal contractors |
 | **Scalability** | High | EU requirements apply to all GPAI models above 10²⁵ FLOPs; UK Inspect tools open-source and publicly available |
 | **Current Maturity** | Medium | EU GPAI obligations effective August 2025; 12 of 16 Seoul Summit signatories published safety frameworks |
 | **Time Horizon** | 1-3 years | EU high-risk conformity: August 2026; Legacy GPAI compliance: August 2027; France AI Summit follow-up ongoing |
-| **Key Proponents** | Multiple | EU AI Office (enforcement authority), UK AISI (30+ model evaluations), <EntityLink id="metr">METR</EntityLink> (GPT-5 and DeepSeek-V3 evals), NIST (TEVV framework) |
+| **Key Proponents** | Multiple | EU AI Office (enforcement authority), UK AISI (30+ model evaluations), <EntityLink id="E201">METR</EntityLink> (GPT-5 and DeepSeek-V3 evals), NIST (TEVV framework) |
 | **Enforcement Gap** | High | Only 3 of 7 major labs substantively test for dangerous capabilities; none scored above D in Existential Safety planning |
 | **Cyber Capability Progress** | Rapid | Models achieve 50% success on apprentice-level cyber tasks (vs 9% in late 2023); first expert-level task completions in 2025 |
 
@@ -42,11 +42,11 @@ Evals-based deployment gates are a governance mechanism that requires AI systems
 
 The core value proposition is straightforward: evaluation gates add friction to the deployment process that ensures at least some safety testing occurs. The EU AI Act requires conformity assessments for high-risk AI systems with penalties up to EUR 35 million or 7% of global annual turnover. The [UK AI Security Institute](https://www.aisi.gov.uk/) has evaluated 30+ frontier models since November 2023, while [METR](https://metr.org/) has conducted pre-deployment evaluations of GPT-4.5, GPT-5, and DeepSeek-V3. These create a paper trail of safety evidence, enable third-party verification, and provide a mechanism for regulators to enforce standards.
 
-However, evals-based gates face fundamental limitations. According to the [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/), only 3 of 7 major AI firms substantively test for dangerous capabilities, and none scored above a D grade in Existential Safety planning. Evaluations can only test for risks we anticipate and can operationalize into tests. The [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) notes that "existing evaluations mainly rely on 'spot checks' that often miss hazards and overestimate or underestimate AI capabilities." Research from [Apollo Research](https://www.apolloresearch.ai/blog/claude-sonnet-37-often-knows-when-its-in-alignment-evaluations/) shows that some models can detect when they are being evaluated and alter their behavior accordingly. Evals-based gates are valuable as one component of <EntityLink id="ai-governance">AI governance</EntityLink> but should not be confused with comprehensive safety assurance.
+However, evals-based gates face fundamental limitations. According to the [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/), only 3 of 7 major AI firms substantively test for dangerous capabilities, and none scored above a D grade in Existential Safety planning. Evaluations can only test for risks we anticipate and can operationalize into tests. The [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) notes that "existing evaluations mainly rely on 'spot checks' that often miss hazards and overestimate or underestimate AI capabilities." Research from [Apollo Research](https://www.apolloresearch.ai/blog/claude-sonnet-37-often-knows-when-its-in-alignment-evaluations/) shows that some models can detect when they are being evaluated and alter their behavior accordingly. Evals-based gates are valuable as one component of <EntityLink id="E608">AI governance</EntityLink> but should not be confused with comprehensive safety assurance.
 
 ## Evaluation Governance Frameworks Comparison
 
-The landscape of <EntityLink id="evaluation">AI evaluation</EntityLink> governance is rapidly evolving, with different jurisdictions and organizations taking distinct approaches. The following table compares major frameworks:
+The landscape of <EntityLink id="E447">AI evaluation</EntityLink> governance is rapidly evolving, with different jurisdictions and organizations taking distinct approaches. The following table compares major frameworks:
 
 | Framework | Jurisdiction | Scope | Legal Status | Enforcement | Key Requirements |
 |-----------|--------------|-------|--------------|-------------|------------------|
@@ -54,18 +54,18 @@ The landscape of <EntityLink id="evaluation">AI evaluation</EntityLink> governan
 | **[US EO 14110](https://www.federalregister.gov/documents/2023/11/01/2023-24283/safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence)** | United States | Dual-use foundation models above 10^26 FLOP | Executive order (rescinded Jan 2025) | Reporting requirements | Safety testing, red-team results reporting |
 | **[UK AISI](https://www.aisi.gov.uk/)** | United Kingdom | Frontier AI models | Voluntary (with partnerships) | Reputation, access agreements | Pre-deployment evaluation, adversarial testing |
 | **[NIST AI RMF](https://www.nist.gov/artificial-intelligence)** | United States | All AI systems | Voluntary framework | None (guidance only) | Risk identification, measurement, management |
-| **[Anthropic RSP](https://www.anthropic.com/index/anthropics-responsible-scaling-policy)** | Industry (<EntityLink id="anthropic">Anthropic</EntityLink>) | Internal models | Self-binding | Internal governance | ASL thresholds, capability evaluations |
-| **[OpenAI Preparedness](https://openai.com/preparedness)** | Industry (<EntityLink id="openai">OpenAI</EntityLink>) | Internal models | Self-binding | Internal governance | Capability tracking, risk categorization |
+| **[Anthropic RSP](https://www.anthropic.com/index/anthropics-responsible-scaling-policy)** | Industry (<EntityLink id="E22">Anthropic</EntityLink>) | Internal models | Self-binding | Internal governance | ASL thresholds, capability evaluations |
+| **[OpenAI Preparedness](https://openai.com/preparedness)** | Industry (<EntityLink id="E218">OpenAI</EntityLink>) | Internal models | Self-binding | Internal governance | Capability tracking, risk categorization |
 
 ### Framework Maturity and Coverage
 
-| Framework | Dangerous Capabilities | Alignment Testing | Third-Party Audit | Post-Deployment | <EntityLink id="international-coordination">International Coordination</EntityLink> |
+| Framework | Dangerous Capabilities | Alignment Testing | Third-Party Audit | Post-Deployment | <EntityLink id="E171">International Coordination</EntityLink> |
 |-----------|----------------------|-------------------|-------------------|-----------------|---------------------------|
 | EU AI Act | Required for GPAI with systemic risk | Not explicitly required | Required for high-risk | Mandatory monitoring | EU member states |
 | US EO 14110 | Required above threshold | Not specified | Recommended | Not specified | Bilateral agreements |
 | UK AISI | Primary focus | Included in suite | AISI serves as evaluator | Ongoing partnerships | Co-leads International Network |
 | NIST AI RMF | Guidance provided | Guidance provided | Recommended | Guidance provided | Standards coordination |
-| Lab <EntityLink id="responsible-scaling-policies">RSPs</EntityLink> | Varies by lab | Varies by lab | Partial (METR, Apollo) | Varies by lab | Limited |
+| Lab <EntityLink id="E252">RSPs</EntityLink> | Varies by lab | Varies by lab | Partial (METR, Apollo) | Varies by lab | Limited |
 
 ## Risk Assessment & Impact
 
@@ -538,8 +538,8 @@ Evals-based deployment gates affect the <EntityLink id="ai-transition-model" /> 
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="safety-culture-strength" /> | Creates formal safety checkpoints |
-| <EntityLink id="human-oversight-quality" /> | Provides evidence for oversight decisions |
-| <EntityLink id="racing-dynamics" /> | Adds friction that may slow racing |
+| <EntityLink id="E264" /> | Creates formal safety checkpoints |
+| <EntityLink id="E160" /> | Provides evidence for oversight decisions |
+| <EntityLink id="E239" /> | Adds friction that may slow racing |
 
 Evaluation gates are a valuable component of AI governance that creates accountability and evidence requirements. However, they should be understood as one layer in a comprehensive approach, not a guarantee of safety. The quality of evaluations, resistance to gaming, and enforcement of standards all significantly affect their value.

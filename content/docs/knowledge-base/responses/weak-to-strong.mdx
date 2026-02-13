@@ -23,11 +23,11 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
 ## Overview
 
-Weak-to-strong generalization is a research direction investigating whether weaker AI systems or humans can successfully supervise and <EntityLink id="elicit">elicit</EntityLink> good behavior from stronger AI systems. This question sits at the heart of AI safety: as AI systems surpass human capabilities, our ability to evaluate and correct their behavior degrades. If weak supervisors can reliably guide strong systems toward good behavior, alignment approaches like <EntityLink id="rlhf">RLHF</EntityLink> might continue working; if not, we face a fundamental gap between AI capability and human oversight capacity.
+Weak-to-strong generalization is a research direction investigating whether weaker AI systems or humans can successfully supervise and <EntityLink id="E526">elicit</EntityLink> good behavior from stronger AI systems. This question sits at the heart of AI safety: as AI systems surpass human capabilities, our ability to evaluate and correct their behavior degrades. If weak supervisors can reliably guide strong systems toward good behavior, alignment approaches like <EntityLink id="E259">RLHF</EntityLink> might continue working; if not, we face a fundamental gap between AI capability and human oversight capacity.
 
-Introduced as a concrete research program by <EntityLink id="openai">OpenAI</EntityLink> in late 2023 with the paper ["Weak-to-Strong Generalization: Eliciting Strong Capabilities With Weak Supervision"](https://arxiv.org/abs/2312.09390) by Burns et al. (published at [ICML 2024](https://proceedings.mlr.press/v235/burns24b.html)), weak-to-strong generalization uses current AI systems as a testbed for this problem. By training a strong model using labels from a weaker model, researchers can study whether the strong model merely imitates the weak model's mistakes or whether it generalizes to perform better than its supervisor. The foundational finding was striking: a GPT-2-level model supervising GPT-4 can recover **approximately 80% of the performance gap** on NLP tasks when using an auxiliary confidence loss—achieving close to GPT-3.5-level performance even on problems where the weak model failed. With naive finetuning alone, Performance Gap Recovery (PGR) ranges from 20-50% depending on task type.
+Introduced as a concrete research program by <EntityLink id="E218">OpenAI</EntityLink> in late 2023 with the paper ["Weak-to-Strong Generalization: Eliciting Strong Capabilities With Weak Supervision"](https://arxiv.org/abs/2312.09390) by Burns et al. (published at [ICML 2024](https://proceedings.mlr.press/v235/burns24b.html)), weak-to-strong generalization uses current AI systems as a testbed for this problem. By training a strong model using labels from a weaker model, researchers can study whether the strong model merely imitates the weak model's mistakes or whether it generalizes to perform better than its supervisor. The foundational finding was striking: a GPT-2-level model supervising GPT-4 can recover **approximately 80% of the performance gap** on NLP tasks when using an auxiliary confidence loss—achieving close to GPT-3.5-level performance even on problems where the weak model failed. With naive finetuning alone, Performance Gap Recovery (PGR) ranges from 20-50% depending on task type.
 
-However, significant gaps remain. <EntityLink id="reward-modeling">Reward modeling</EntityLink>—critical for RLHF—shows only **20-40% PGR**, suggesting current alignment techniques may scale poorly to superhuman models. The [OpenAI Superalignment team](https://openai.com/index/weak-to-strong-generalization/) (approximately 30 researchers) launched a [\$10M grants program](https://openai.com/index/superalignment-fast-grants/) to accelerate research, with additional \$5M from Eric Schmidt.
+However, significant gaps remain. <EntityLink id="E600">Reward modeling</EntityLink>—critical for RLHF—shows only **20-40% PGR**, suggesting current alignment techniques may scale poorly to superhuman models. The [OpenAI Superalignment team](https://openai.com/index/weak-to-strong-generalization/) (approximately 30 researchers) launched a [\$10M grants program](https://openai.com/index/superalignment-fast-grants/) to accelerate research, with additional \$5M from Eric Schmidt.
 
 The fundamental uncertainty is whether these early results transfer to the most important cases: detecting deception, preventing power-seeking behavior, and maintaining alignment as AI systems approach and exceed human-level capabilities. A deceptive AI system might behave very differently than the non-deceptive systems used in current experiments. As [Anthropic's 2025 research recommendations](https://alignment.anthropic.com/2025/recommended-directions/) note, developing testbeds where systematic overseer errors can be studied remains a priority.
 
@@ -39,7 +39,7 @@ The fundamental uncertainty is whether these early results transfer to the most 
 | **Scalability** | Core research question | PGR increases with both weak supervisor size and strong student size; largest students achieve PGR above 50% ([ICML 2024](https://proceedings.mlr.press/v235/burns24b.html)) |
 | **Current Maturity** | Proof-of-concept stage | Published at ICML 2024; debate extension shows promise ([Lang et al., 2025](https://arxiv.org/abs/2501.13124)); no production deployment |
 | **Time Horizon** | 3-7 years to deployment | Needs methods that work consistently across settings; reward modeling remains challenging (20-40% PGR) |
-| **Key Proponents** | OpenAI Superalignment (≈30 researchers), <EntityLink id="anthropic">Anthropic</EntityLink> | [OpenAI blog](https://openai.com/index/weak-to-strong-generalization/), [Anthropic 2025 directions](https://alignment.anthropic.com/2025/recommended-directions/) |
+| **Key Proponents** | OpenAI Superalignment (≈30 researchers), <EntityLink id="E22">Anthropic</EntityLink> | [OpenAI blog](https://openai.com/index/weak-to-strong-generalization/), [Anthropic 2025 directions](https://alignment.anthropic.com/2025/recommended-directions/) |
 | **Investment Level** | \$10-15M/year dedicated | OpenAI: \$10M grants program + \$5M from Eric Schmidt; \$150K/year fellowships for grad students ([Fast Grants](https://openai.com/index/superalignment-fast-grants/)) |
 | **Critical Limitation** | Deception untested | No experiments yet with strategically deceptive models; current tests use non-adversarial strong models |
 
@@ -253,9 +253,9 @@ Research has expanded significantly since the original 2023 paper, with multiple
 
 ### Complementary Techniques
 
-- **<EntityLink id="process-supervision">Process Supervision</EntityLink>**: Could improve weak supervisor quality
-- **<EntityLink id="debate">AI Safety via Debate</EntityLink>**: Alternative scalable oversight approach
-- **<EntityLink id="mech-interp">Mechanistic Interpretability</EntityLink>**: Could verify generalization is genuine
+- **<EntityLink id="E455">Process Supervision</EntityLink>**: Could improve weak supervisor quality
+- **<EntityLink id="E482">AI Safety via Debate</EntityLink>**: Alternative scalable oversight approach
+- **<EntityLink id="E477">Mechanistic Interpretability</EntityLink>**: Could verify generalization is genuine
 
 ### Key Comparisons
 
@@ -343,7 +343,7 @@ Weak-to-strong generalization relates to the <EntityLink id="ai-transition-model
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Determines if current alignment approaches can scale |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Determines if current alignment approaches can scale |
 | <EntityLink id="ai-capability-level" /> | Oversight gap | Directly addresses supervision-capability gap |
 
 Whether weak-to-strong generalization works fundamentally determines the viability of current alignment approaches as AI capabilities increase.
@@ -352,7 +352,7 @@ Whether weak-to-strong generalization works fundamentally determines the viabili
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| <EntityLink id="scalable-oversight">Scalable Oversight Failure</EntityLink> | High | Directly addresses the core problem of supervising systems smarter than the supervisor |
-| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | High | If successful, could detect when models behave differently during training vs deployment |
-| <EntityLink id="reward-hacking">Reward Hacking</EntityLink> | Medium | Strong models may generalize to true intent rather than exploiting supervisor errors |
-| <EntityLink id="goal-misgeneralization">Goal Misgeneralization</EntityLink> | Medium | Tests whether models learn intended behavior beyond their training distribution |
+| <EntityLink id="E271">Scalable Oversight Failure</EntityLink> | High | Directly addresses the core problem of supervising systems smarter than the supervisor |
+| <EntityLink id="E93">Deceptive Alignment</EntityLink> | High | If successful, could detect when models behave differently during training vs deployment |
+| <EntityLink id="E253">Reward Hacking</EntityLink> | Medium | Strong models may generalize to true intent rather than exploiting supervisor errors |
+| <EntityLink id="E151">Goal Misgeneralization</EntityLink> | Medium | Tests whether models learn intended behavior beyond their training distribution |

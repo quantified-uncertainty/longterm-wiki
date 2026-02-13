@@ -36,7 +36,7 @@ import {EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
 |--------|------|
 | Official Tool | [pageviews.wmcloud.org](https://pageviews.wmcloud.org) |
 | Wikipedia Documentation | [Wikipedia:Pageview statistics](https://en.wikipedia.org/wiki/Wikipedia:Pageview_statistics) |
-| <EntityLink id="vipul-naik">Vipul Naik</EntityLink>'s Tool | [wikipediaviews.org](https://wikipediaviews.org/) |
+| <EntityLink id="E581">Vipul Naik</EntityLink>'s Tool | [wikipediaviews.org](https://wikipediaviews.org/) |
 | GitHub Repository | [vipulnaik/wikipediaviews](https://github.com/vipulnaik/wikipediaviews) |
 
 ## Overview
@@ -59,7 +59,7 @@ The Pageviews Analysis toolset expanded to include specialized features: Langvie
 
 ### Independent Research Infrastructure
 
-<EntityLink id="vipul-naik">Vipul Naik</EntityLink> created Wikipedia Views (wikipediaviews.org) as part of his broader data infrastructure projects, which also include the <EntityLink id="donations-list-website">Donations List Website</EntityLink>.[^11] The tool provides an alternative interface for analyzing Wikipedia traffic patterns, with particular emphasis on comparing multiple pages across time periods. The underlying code is publicly available on GitHub at vipulnaik/wikipediaviews, released to the public domain.[^12]
+<EntityLink id="E581">Vipul Naik</EntityLink> created Wikipedia Views (wikipediaviews.org) as part of his broader data infrastructure projects, which also include the <EntityLink id="E389">Donations List Website</EntityLink>.[^11] The tool provides an alternative interface for analyzing Wikipedia traffic patterns, with particular emphasis on comparing multiple pages across time periods. The underlying code is publicly available on GitHub at vipulnaik/wikipediaviews, released to the public domain.[^12]
 
 Naik's system addresses some limitations of the official tools while introducing its own. It draws on both stats.grok.se for historical desktop data (including bot views before June 2015) and the Wikimedia REST API for July 2015 onward (with bot filtering).[^13] This hybrid approach provides longer historical coverage but creates discontinuities in the data series. The tool supports extensive language coverage and flexible date range selection, making it particularly useful for longitudinal research.
 
@@ -136,7 +136,7 @@ Recent bot sophistication extends beyond simple user-agent spoofing. Modern scra
 
 Traditional pageview metrics from stats.grok.se counted only desktop Wikipedia site views, ignoring mobile sites and Wikipedia Zero (a low-bandwidth mobile version for developing countries).[^38] Mobile data became available through pagecounts-all-sites in September 2014, creating a structural break in time series analysis. By 2015, mobile traffic exceeded desktop, making pre-2015 numbers increasingly misleading indicators of total readership.[^39]
 
-This gap significantly distorts trend analysis. Desktop declines from 2013-2014 appeared steeper than they actually were because growing mobile usage went unmeasured. Analysts like <EntityLink id="issa-rice">Issa Rice</EntityLink> and <EntityLink id="vipul-naik">Vipul Naik</EntityLink> emphasized that apparent pageview drops largely reflected measurement flaws rather than declining interest.[^40] Even established articles in leading categories showed 50-67% declines from 2013-2014 when examining desktop data alone, but these drops were partially or fully offset by mobile growth.[^41]
+This gap significantly distorts trend analysis. Desktop declines from 2013-2014 appeared steeper than they actually were because growing mobile usage went unmeasured. Analysts like <EntityLink id="E576">Issa Rice</EntityLink> and <EntityLink id="E581">Vipul Naik</EntityLink> emphasized that apparent pageview drops largely reflected measurement flaws rather than declining interest.[^40] Even established articles in leading categories showed 50-67% declines from 2013-2014 when examining desktop data alone, but these drops were partially or fully offset by mobile growth.[^41]
 
 The transition to comprehensive measurement in July 2015 helps prospective analysis but leaves historical comparisons fraught with uncertainty. Researchers cannot definitively determine total (desktop + mobile) pageview trends before 2015, limiting longitudinal studies spanning that transition.
 
@@ -188,7 +188,7 @@ Desktop traffic fell approximately one-third overall between 2013 and 2015, but 
 
 Skeptics of the decline narrative emphasize that pageview data quality issues make firm conclusions difficult. Bot contamination, mobile undercounting before 2015, redirect handling problems, and infrastructure losses from incomplete logging all distort trend analysis.[^61] The discontinuity between stats.grok.se data (including bots, desktop only) and Wikimedia REST API data (bot-filtered, including mobile) creates apparent declines that may be largely artifactual.
 
-<EntityLink id="vipul-naik">Vipul Naik</EntityLink> and <EntityLink id="issa-rice">Issa Rice</EntityLink>, who conducted extensive analysis of Wikipedia pageview trends in the 2010s, consistently emphasized that measurement flaws and data source changes explain more of the observed decline than genuine drops in human usage.[^62] Their work, revisited after additional years of data became available, maintained this position even as declines continued.
+<EntityLink id="E581">Vipul Naik</EntityLink> and <EntityLink id="E576">Issa Rice</EntityLink>, who conducted extensive analysis of Wikipedia pageview trends in the 2010s, consistently emphasized that measurement flaws and data source changes explain more of the observed decline than genuine drops in human usage.[^62] Their work, revisited after additional years of data became available, maintained this position even as declines continued.
 
 The May 2025 Brazil bot traffic incident illustrates how classification changes can dramatically shift apparent trends.[^63] What initially appeared as a surge in human interest was reclassified as bot activity after detection improvements, suggesting that prior periods may similarly include substantial misclassified bot traffic that distorts trend interpretation.
 
@@ -206,7 +206,7 @@ Some commentary on pageview declines takes a deliberately non-serious approach, 
 
 ### Wikipedia as AI Training Data
 
-Wikipedia's role as training data for <EntityLink id="language-models">large language models</EntityLink> connects pageview analysis to broader AI safety concerns. The encyclopedia's comprehensive, relatively reliable, and freely available content makes it indispensable for AI training, with Wikipedia comprising 47.9% of ChatGPT's top-10 cited sources.[^68] This dependency creates a feedback loop: AI systems trained on Wikipedia provide summaries that reduce Wikipedia traffic, potentially threatening the volunteer community that maintains the training data.
+Wikipedia's role as training data for <EntityLink id="E186">large language models</EntityLink> connects pageview analysis to broader AI safety concerns. The encyclopedia's comprehensive, relatively reliable, and freely available content makes it indispensable for AI training, with Wikipedia comprising 47.9% of ChatGPT's top-10 cited sources.[^68] This dependency creates a feedback loop: AI systems trained on Wikipedia provide summaries that reduce Wikipedia traffic, potentially threatening the volunteer community that maintains the training data.
 
 According to Wikimedia officials, generative AI uses Wikipedia datasets for training but often fails to link back, causing users to forgo site visits.[^69] This raises sustainability questions—if fewer users visit Wikipedia, volunteer editor recruitment may decline, potentially degrading the content quality that makes Wikipedia valuable for AI training. The Wikimedia Foundation runs largely on public donations, making reduced traffic particularly concerning for long-term financial sustainability.[^70]
 
@@ -236,7 +236,7 @@ Several fundamental questions about Wikipedia pageviews remain unresolved:
 
 **How sustainable is Wikipedia's volunteer model if pageviews continue declining?** The connection between readership, editor recruitment, and content quality needs empirical investigation to assess whether current trends threaten Wikipedia's long-term viability.
 
-**Can independent pageview analysis tools maintain data quality?** <EntityLink id="vipul-naik">Vipul Naik</EntityLink>'s Wikipedia Views and similar projects depend on Wikimedia APIs and data access policies. Whether these tools can adapt to Wikimedia's evolving bot detection and privacy protections remains uncertain.
+**Can independent pageview analysis tools maintain data quality?** <EntityLink id="E581">Vipul Naik</EntityLink>'s Wikipedia Views and similar projects depend on Wikimedia APIs and data access policies. Whether these tools can adapt to Wikimedia's evolving bot detection and privacy protections remains uncertain.
 
 **What would more accurate measurement reveal about true trends?** If bot contamination, mobile gaps, and redirect issues were fully resolved, would Wikipedia pageviews show growth, decline, or stability? The measurement infrastructure may be too compromised to definitively answer this question even prospectively.
 

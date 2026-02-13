@@ -943,7 +943,7 @@
       type: organization
     - id: marc-andreessen
       type: researcher
-    - id: ai-governance
+    - id: tmc-ai-governance
       type: concept
   lastUpdated: 2026-02
 
@@ -994,7 +994,7 @@
       type: researcher
     - id: openai
       type: organization
-    - id: ai-governance
+    - id: tmc-ai-governance
       type: concept
   lastUpdated: 2026-02
 

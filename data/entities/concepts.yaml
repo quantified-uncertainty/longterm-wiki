@@ -739,7 +739,7 @@
       type: concept
     - id: epistemic-infrastructure
       type: concept
-    - id: ai-governance
+    - id: tmc-ai-governance
       type: concept
   lastUpdated: 2026-02
 
@@ -896,7 +896,7 @@
       type: organization
     - id: agi-timeline
       type: concept
-    - id: ai-governance
+    - id: tmc-ai-governance
       type: concept
   lastUpdated: 2026-02
 

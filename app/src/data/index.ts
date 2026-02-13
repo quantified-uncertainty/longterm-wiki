@@ -376,15 +376,15 @@ function pageIndex() {
 // LOOKUP FUNCTIONS
 // ============================================================================
 
-/** Get a typed entity by ID (may be a generic entity for unknown types) */
+/** Get a typed entity by ID — accepts numeric (E35) or slug (deepmind) */
 export function getTypedEntityById(id: string): AnyEntity | undefined {
-  return typedEntityIndex().get(id);
+  return typedEntityIndex().get(resolveId(id));
 }
 
 /** @deprecated Use getTypedEntityById for new code */
 export function getEntityById(id: string): Entity | undefined {
   // Return typed entity cast to the old Entity interface for backward compat
-  const typed = typedEntityIndex().get(id);
+  const typed = typedEntityIndex().get(resolveId(id));
   if (!typed) return undefined;
   return {
     id: typed.id,
@@ -424,7 +424,7 @@ export function getOrganizationById(id: string): Organization | undefined {
 }
 
 export function getPageById(id: string): Page | undefined {
-  return pageIndex().get(id);
+  return pageIndex().get(resolveId(id));
 }
 
 export function getAllPages(): Page[] {
@@ -512,9 +512,22 @@ export function getResourcePublication(
 // PATH REGISTRY & ENTITY HREF
 // ============================================================================
 
+/**
+ * Resolve an ID that may be numeric (E35) or a slug (deepmind) to its slug form.
+ * Returns the original ID if it's already a slug or not found in the registry.
+ */
+export function resolveId(id: string): string {
+  if (/^E\d+$/.test(id)) {
+    const registry = getIdRegistry();
+    return registry.byNumericId[id] || id;
+  }
+  return id;
+}
+
 export function getEntityPath(id: string): string | null {
+  const slug = resolveId(id);
   const db = getDatabase();
-  return db.pathRegistry?.[id] || db.pathRegistry?.[`__index__/${id}`] || null;
+  return db.pathRegistry?.[slug] || db.pathRegistry?.[`__index__/${slug}`] || null;
 }
 
 export function getIdRegistry(): IdRegistryMaps {
@@ -523,6 +536,11 @@ export function getIdRegistry(): IdRegistryMaps {
 
 export function getEntityHref(id: string, _type?: string): string {
   const registry = getIdRegistry();
+  // If already a numeric ID (E35), use it directly
+  if (/^E\d+$/.test(id) && registry.byNumericId[id]) {
+    return `/wiki/${id}`;
+  }
+  // Otherwise look up slug → numeric ID
   const numericId = registry.bySlug[id];
   return numericId ? `/wiki/${numericId}` : `/wiki/${id}`;
 }
@@ -540,8 +558,9 @@ export function getBacklinksFor(
   href: string;
   relationship?: string;
 }> {
+  const slug = resolveId(entityId);
   const db = getDatabase();
-  const links = db.backlinks?.[entityId] || [];
+  const links = db.backlinks?.[slug] || [];
   return links.map((link) => ({
     ...link,
     href: getEntityHref(link.id, link.type),
@@ -809,7 +828,7 @@ function loadExternalLinksMap(): Map<string, ExternalLinksData> {
 export function getExternalLinks(
   pageId: string
 ): ExternalLinksData | undefined {
-  return loadExternalLinksMap().get(pageId);
+  return loadExternalLinksMap().get(resolveId(pageId));
 }
 
 // ============================================================================

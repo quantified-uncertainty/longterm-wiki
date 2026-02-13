@@ -25,15 +25,15 @@ import {Mermaid, DataExternalLinks, DataInfoBox, R, EntityLink} from '@component
 
 Sparse Autoencoders (SAEs) represent a breakthrough technique in mechanistic interpretability that addresses the fundamental challenge of neural network polysemanticity. In modern language models, individual neurons often respond to multiple unrelated concepts (e.g., a single neuron activating for both "the Golden Gate Bridge" and "requests for help"), making direct interpretation of neural activations extremely difficult. SAEs solve this by learning to decompose dense, polysemantic activations into sparse, monosemantic feature vectors where each dimension corresponds to a single interpretable concept.
 
-The technique works by training an auxiliary neural network to reconstruct model activations through a bottleneck that encourages sparse representations. When trained on billions of activation samples, SAEs discover features that correspond to human-interpretable concepts ranging from concrete entities like "San Francisco" to abstract notions like "deception in political contexts." <EntityLink id="anthropic">Anthropic</EntityLink>'s landmark 2024 work extracted over 34 million interpretable features from Claude 3 Sonnet, with automated evaluation finding that 90% of high-activating features have clear human-interpretable explanations.
+The technique works by training an auxiliary neural network to reconstruct model activations through a bottleneck that encourages sparse representations. When trained on billions of activation samples, SAEs discover features that correspond to human-interpretable concepts ranging from concrete entities like "San Francisco" to abstract notions like "deception in political contexts." <EntityLink id="E22">Anthropic</EntityLink>'s landmark 2024 work extracted over 34 million interpretable features from Claude 3 Sonnet, with automated evaluation finding that 90% of high-activating features have clear human-interpretable explanations.
 
-For AI safety, SAEs offer a potentially transformative capability: the ability to directly detect safety-relevant cognition inside models. Researchers have identified features corresponding to lying, manipulation, security vulnerabilities, power-seeking behavior, and <EntityLink id="sycophancy">sycophancy</EntityLink>. If SAE research scales successfully, it could provide the foundation for runtime monitoring systems that flag concerning internal states, deception detection during training, and verification that alignment techniques actually work at the mechanistic level.
+For AI safety, SAEs offer a potentially transformative capability: the ability to directly detect safety-relevant cognition inside models. Researchers have identified features corresponding to lying, manipulation, security vulnerabilities, power-seeking behavior, and <EntityLink id="E295">sycophancy</EntityLink>. If SAE research scales successfully, it could provide the foundation for runtime monitoring systems that flag concerning internal states, deception detection during training, and verification that alignment techniques actually work at the mechanistic level.
 
 ## Quick Assessment
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Research Investment** | High (\$50-100M/yr) | <EntityLink id="goodfire">Goodfire</EntityLink> [raised \$50M Series A](https://www.goodfire.ai/blog/announcing-our-50m-series-a) (April 2025); Anthropic, DeepMind, <EntityLink id="openai">OpenAI</EntityLink> dedicated teams |
+| **Research Investment** | High (\$50-100M/yr) | <EntityLink id="E430">Goodfire</EntityLink> [raised \$50M Series A](https://www.goodfire.ai/blog/announcing-our-50m-series-a) (April 2025); Anthropic, DeepMind, <EntityLink id="E218">OpenAI</EntityLink> dedicated teams |
 | **Feature Extraction Scale** | 34M+ features | [Anthropic 2024](https://transformer-circuits.pub/2024/scaling-monosemanticity/) extracted 34M from Claude 3 Sonnet with 90% interpretability scores |
 | **Model Coverage** | 100B+ parameters | Works on Claude 3 Sonnet, GPT-4, Gemma 2/3 up to 27B; [Goodfire released SAEs for DeepSeek R1 (671B)](https://www.goodfire.ai/research/under-the-hood-of-a-reasoning-model) |
 | **Safety Impact** | Low-Medium (current) | Promising but [DeepMind deprioritized](https://deepmindsafetyresearch.medium.com/negative-results-for-sparse-autoencoders-on-downstream-tasks-and-deprioritising-sae-research-6cadcfc125b9) after SAEs underperformed linear probes on downstream safety tasks |
@@ -69,9 +69,9 @@ The following table compares key research efforts in sparse autoencoder developm
 | Organization | Estimated Investment | Team Size | Focus Areas | Key Products/Releases |
 |--------------|---------------------|-----------|-------------|----------------------|
 | **Anthropic** | \$25-40M/year | 30-50 FTE | Scaling monosemanticity, circuit tracing, safety features | Claude SAEs, Attribution Graphs |
-| **<EntityLink id="deepmind">Google DeepMind</EntityLink>** | \$15-25M/year | 20-30 FTE | Open-source tools, benchmarking, architectural innovation | Gemma Scope 1 & 2 (110 PB data) |
+| **<EntityLink id="E98">Google DeepMind</EntityLink>** | \$15-25M/year | 20-30 FTE | Open-source tools, benchmarking, architectural innovation | Gemma Scope 1 & 2 (110 PB data) |
 | **OpenAI** | \$10-15M/year | 10-20 FTE | Scaling laws, k-sparse architecture | GPT-4 SAEs, TopK methods |
-| **<EntityLink id="goodfire">Goodfire</EntityLink>** | \$50M raised (Series A) | 15-25 FTE | Commercial interpretability, open-source models | Ember platform, Llama/DeepSeek SAEs |
+| **<EntityLink id="E430">Goodfire</EntityLink>** | \$50M raised (Series A) | 15-25 FTE | Commercial interpretability, open-source models | Ember platform, Llama/DeepSeek SAEs |
 | **Academic Sector** | \$10-20M/year | 30-50 FTE | Theoretical foundations, benchmarking, applications | [MIT thesis work](https://dspace.mit.edu/handle/1721.1/163714), InterpBench |
 | **Total Global** | **\$75-150M/year** | **150-200 FTE** | — | — |
 
@@ -364,11 +364,11 @@ flowchart TD
 
 | Risk | Mechanism | Effectiveness |
 |------|-----------|---------------|
-| <EntityLink id="deceptive-alignment" /> | Detect deception-related features during inference | Medium-High (if scalable) |
-| <EntityLink id="scheming" /> | Find evidence of strategic deception in internal representations | Medium-High |
-| <EntityLink id="mesa-optimization" /> | Identify mesa-objectives in model internals | Medium |
-| <EntityLink id="reward-hacking" /> | Detect proxy optimization vs. true goals | Medium |
-| <EntityLink id="goal-misgeneralization" /> | Understand learned goal representations | Medium |
+| <EntityLink id="E93" /> | Detect deception-related features during inference | Medium-High (if scalable) |
+| <EntityLink id="E274" /> | Find evidence of strategic deception in internal representations | Medium-High |
+| <EntityLink id="E197" /> | Identify mesa-objectives in model internals | Medium |
+| <EntityLink id="E253" /> | Detect proxy optimization vs. true goals | Medium |
+| <EntityLink id="E151" /> | Understand learned goal representations | Medium |
 
 ## Recommendation
 
@@ -384,10 +384,10 @@ Priority areas for additional investment:
 
 ## Related Approaches
 
-- <EntityLink id="interpretability" /> - Parent field; SAEs are a key technique within mechanistic interpretability
-- <EntityLink id="probing" /> - Alternative method using linear probes; DeepMind found probes outperform SAEs on some tasks
-- <EntityLink id="representation-engineering" /> - Uses SAE-discovered features for activation steering
-- <EntityLink id="ai-control" /> - Complementary defense-in-depth approach if interpretability misses deception
+- <EntityLink id="E174" /> - Parent field; SAEs are a key technique within mechanistic interpretability
+- <EntityLink id="E596" /> - Alternative method using linear probes; DeepMind found probes outperform SAEs on some tasks
+- <EntityLink id="E479" /> - Uses SAE-discovered features for activation steering
+- <EntityLink id="E6" /> - Complementary defense-in-depth approach if interpretability misses deception
 
 ## Sources & Resources
 

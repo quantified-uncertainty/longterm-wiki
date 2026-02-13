@@ -24,7 +24,7 @@ subcategory: risk-models
 ---
 import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="power-seeking-conditions" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E227" ratings={frontmatter.ratings} />
 
 ## Overview
 
@@ -62,13 +62,13 @@ Current deployed systems show only ~6.4% probability of power-seeking under this
 
 **Definition**: System follows optimal or near-optimal policies for its objective function.
 
-The theoretical foundation from <R id="176ea38bc4e29a1f">Turner et al. (2021)</R> requires agents to be strong optimizers to discover instrumental power-seeking strategies. Current <EntityLink id="language-models">large language models</EntityLink> achieve approximately 50-70% of optimal performance on complex reasoning tasks (<R id="683aef834ac1612a">Anthropic <EntityLink id="constitutional-ai">Constitutional AI</EntityLink></R>), while future systems with enhanced training may approach 80-90% optimization strength.
+The theoretical foundation from <R id="176ea38bc4e29a1f">Turner et al. (2021)</R> requires agents to be strong optimizers to discover instrumental power-seeking strategies. Current <EntityLink id="E186">large language models</EntityLink> achieve approximately 50-70% of optimal performance on complex reasoning tasks (<R id="683aef834ac1612a">Anthropic <EntityLink id="E451">Constitutional AI</EntityLink></R>), while future systems with enhanced training may approach 80-90% optimization strength.
 
 **Key indicators:**
 - Training compute scaling (>10^25 FLOPs increasingly common)
 - Policy gradient convergence rates
 - Performance on standardized benchmarks vs theoretical optimums
-- <EntityLink id="reward-hacking">Reward hacking</EntityLink> frequency (inversely correlated)
+- <EntityLink id="E253">Reward hacking</EntityLink> frequency (inversely correlated)
 
 **Mitigation approaches:**
 - Deliberate optimization limiting through early stopping
@@ -95,7 +95,7 @@ Power accumulation only provides instrumental value when agents can benefit from
 
 **Definition**: Goals lack clear satiation points, enabling indefinite optimization.
 
-Most real-world deployments involve non-satiable objectives like "be maximally helpful," "optimize trading returns," or "advance scientific knowledge." <R id="29a0882390ee7063"><EntityLink id="openai">OpenAI</EntityLink>'s GPT-4</R> and <R id="683aef834ac1612a">Anthropic's Claude</R> are explicitly trained for open-ended helpfulness rather than bounded task completion.
+Most real-world deployments involve non-satiable objectives like "be maximally helpful," "optimize trading returns," or "advance scientific knowledge." <R id="29a0882390ee7063"><EntityLink id="E218">OpenAI</EntityLink>'s GPT-4</R> and <R id="683aef834ac1612a">Anthropic's Claude</R> are explicitly trained for open-ended helpfulness rather than bounded task completion.
 
 **Objective classification:**
 | Type | Examples | Satiation Risk | Prevalence |
@@ -246,8 +246,8 @@ Research by <R id="85f66a6419d173a7">Kaplan et al. (2020)</R> and <R id="46fd661
 
 | Position | Probability | Key Advocates | Central Argument |
 |----------|-------------|---------------|------------------|
-| **High concern** | 70-90% emergence | <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, <EntityLink id="nick-bostrom">Nick Bostrom</EntityLink> | Instrumental convergence is robust |
-| **Moderate concern** | 30-60% emergence | <EntityLink id="paul-christiano">Paul Christiano</EntityLink>, <EntityLink id="dario-amodei">Dario Amodei</EntityLink> | Training methods provide protection |
+| **High concern** | 70-90% emergence | <EntityLink id="E114">Eliezer Yudkowsky</EntityLink>, <EntityLink id="E215">Nick Bostrom</EntityLink> | Instrumental convergence is robust |
+| **Moderate concern** | 30-60% emergence | <EntityLink id="E220">Paul Christiano</EntityLink>, <EntityLink id="E91">Dario Amodei</EntityLink> | Training methods provide protection |
 | **Low concern** | \&lt;30% emergence | <R id="f3c09bb19cdde1db">Yann LeCun</R>, <R id="8937a778b0a8fc20">Andrew Ng</R> | Practical constraints prevent emergence |
 
 ## Mitigation Strategies & Effectiveness
@@ -352,25 +352,25 @@ Research by <R id="85f66a6419d173a7">Kaplan et al. (2020)</R> and <R id="46fd661
 
 | Organization | Focus Area | Key Contributions | Website |
 |-------------|------------|-------------------|---------|
-| <EntityLink id="miri">**MIRI**</EntityLink> | Agent foundations | Theoretical analysis of alignment problems | <R id="86df45a5f8a9bf6d">intelligence.org</R> |
-| <EntityLink id="anthropic">**Anthropic**</EntityLink> | Constitutional AI | Empirical alignment research | <R id="afe2508ac4caf5ee">anthropic.com</R> |
-| <EntityLink id="arc">**ARC**</EntityLink> | Alignment research | Practical alignment techniques | <R id="0562f8c207d8b63f">alignment.org</R> |
-| <EntityLink id="redwood-research">**Redwood Research**</EntityLink> | Empirical safety | Testing alignment interventions | <R id="42e7247cbc33fc4c">redwoodresearch.org</R> |
+| <EntityLink id="E202">**MIRI**</EntityLink> | Agent foundations | Theoretical analysis of alignment problems | <R id="86df45a5f8a9bf6d">intelligence.org</R> |
+| <EntityLink id="E22">**Anthropic**</EntityLink> | Constitutional AI | Empirical alignment research | <R id="afe2508ac4caf5ee">anthropic.com</R> |
+| <EntityLink id="E25">**ARC**</EntityLink> | Alignment research | Practical alignment techniques | <R id="0562f8c207d8b63f">alignment.org</R> |
+| <EntityLink id="E557">**Redwood Research**</EntityLink> | Empirical safety | Testing alignment interventions | <R id="42e7247cbc33fc4c">redwoodresearch.org</R> |
 
 ### Policy & Governance Resources
 
 | Type | Organization | Resource | Focus |
 |------|-------------|----------|--------|
-| **Government** | <EntityLink id="uk-aisi">UK AISI</EntityLink> | AI Safety Guidelines | National policy framework |
-| **Government** | <EntityLink id="us-aisi">US AISI</EntityLink> | Executive Order implementation | Federal coordination |
+| **Government** | <EntityLink id="E364">UK AISI</EntityLink> | AI Safety Guidelines | National policy framework |
+| **Government** | <EntityLink id="E365">US AISI</EntityLink> | Executive Order implementation | Federal coordination |
 | **International** | <R id="0e7aef26385afeed">Partnership on AI</R> | Industry collaboration | Best practices |
 | **Think Tank** | <R id="58f6946af0177ca5">CNAS</R> | National security implications | Defense applications |
 
 ### Related Wiki Content
 
-- <EntityLink id="instrumental-convergence">**Instrumental Convergence**</EntityLink>: Theoretical foundation for power-seeking behaviors
-- <EntityLink id="corrigibility-failure">**Corrigibility Failure**</EntityLink>: Related failure mode when systems resist correction
-- <EntityLink id="deceptive-alignment">**Deceptive Alignment**</EntityLink>: How systems might pursue power through concealment
-- <EntityLink id="racing-dynamics">**Racing Dynamics**</EntityLink>: Competitive pressures that increase power-seeking risks
-- <EntityLink id="international-coordination">**AI Control**</EntityLink>: Strategies for monitoring and containing advanced systems
+- <EntityLink id="E168">**Instrumental Convergence**</EntityLink>: Theoretical foundation for power-seeking behaviors
+- <EntityLink id="E80">**Corrigibility Failure**</EntityLink>: Related failure mode when systems resist correction
+- <EntityLink id="E93">**Deceptive Alignment**</EntityLink>: How systems might pursue power through concealment
+- <EntityLink id="E239">**Racing Dynamics**</EntityLink>: Competitive pressures that increase power-seeking risks
+- <EntityLink id="E171">**AI Control**</EntityLink>: Strategies for monitoring and containing advanced systems
 

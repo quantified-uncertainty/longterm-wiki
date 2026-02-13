@@ -29,7 +29,7 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 | **Scalability** | Uncertain | 30M+ features extracted from Claude 3 Sonnet; estimated 1B+ features may exist in even small models ([Amodei 2025](https://www.darioamodei.com/post/the-urgency-of-interpretability)) |
 | **Current Investment** | \$100M+ combined | Anthropic, OpenAI, DeepMind internal safety research; interpretability represents over 40% of AI safety funding ([2025 analysis](https://quickmarketpitch.com/blogs/news/ai-safety-investors)) |
 | **Time Horizon** | 5-10 years | Amodei predicts "MRI for AI" achievable by 2030-2035, but warns AI may outpace interpretability |
-| **Field Status** | Active debate | MIT Technology Review named <EntityLink id="interpretability">mechanistic interpretability</EntityLink> a [2026 Breakthrough Technology](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/); DeepMind pivoted away from SAEs in March 2025 |
+| **Field Status** | Active debate | MIT Technology Review named <EntityLink id="E174">mechanistic interpretability</EntityLink> a [2026 Breakthrough Technology](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/); DeepMind pivoted away from SAEs in March 2025 |
 | **Key Risk** | Capability outpacing | Amodei warns "country of geniuses in a datacenter" could arrive 2026-2027, potentially before interpretability matures |
 | **Safety Application** | Promising early results | Anthropic's internal "blue teams" detected planted misalignment in 3 of 4 trials using interpretability tools |
 
@@ -37,7 +37,7 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
 Mechanistic interpretability is a research field focused on understanding neural networks by reverse-engineering their internal computations, identifying interpretable features and circuits that explain how models process information and generate outputs. Unlike behavioral approaches that treat models as black boxes, mechanistic interpretability aims to open the box and understand the algorithms implemented by neural network weights. As [Anthropic CEO Dario Amodei noted](https://www.darioamodei.com/post/the-urgency-of-interpretability), "People outside the field are often surprised and alarmed to learn that we do not understand how our own AI creations work. They are right to be concerned: this lack of understanding is essentially unprecedented in the history of technology."
 
-The field has grown substantially since <EntityLink id="chris-olah">Chris Olah</EntityLink>'s foundational ["Zoom In: An Introduction to Circuits"](https://distill.pub/2020/circuits/zoom-in/) work at <EntityLink id="openai">OpenAI</EntityLink> and subsequent research at <EntityLink id="anthropic">Anthropic</EntityLink> and <EntityLink id="deepmind">DeepMind</EntityLink>. Key discoveries include identifying specific circuits responsible for indirect object identification, induction heads that enable in-context learning, and features that represent interpretable concepts. The development of Sparse Autoencoders (SAEs) for finding interpretable features has accelerated recent progress, with Anthropic's ["Scaling Monosemanticity"](https://transformer-circuits.pub/2024/scaling-monosemanticity/) (May 2024) demonstrating that 30 million+ interpretable features can be extracted from Claude 3 Sonnet—though researchers estimate 1 billion or more concepts may exist even in small models. Safety-relevant features identified include those related to deception, <EntityLink id="sycophancy">sycophancy</EntityLink>, and dangerous content.
+The field has grown substantially since <EntityLink id="E59">Chris Olah</EntityLink>'s foundational ["Zoom In: An Introduction to Circuits"](https://distill.pub/2020/circuits/zoom-in/) work at <EntityLink id="E218">OpenAI</EntityLink> and subsequent research at <EntityLink id="E22">Anthropic</EntityLink> and <EntityLink id="E98">DeepMind</EntityLink>. Key discoveries include identifying specific circuits responsible for indirect object identification, induction heads that enable in-context learning, and features that represent interpretable concepts. The development of Sparse Autoencoders (SAEs) for finding interpretable features has accelerated recent progress, with Anthropic's ["Scaling Monosemanticity"](https://transformer-circuits.pub/2024/scaling-monosemanticity/) (May 2024) demonstrating that 30 million+ interpretable features can be extracted from Claude 3 Sonnet—though researchers estimate 1 billion or more concepts may exist even in small models. Safety-relevant features identified include those related to deception, <EntityLink id="E295">sycophancy</EntityLink>, and dangerous content.
 
 Mechanistic interpretability is particularly important for AI safety because it offers one of the few potential paths to detecting deception and verifying alignment at a fundamental level. If we can understand what a model is actually computing - not just what outputs it produces - we might be able to verify that it has genuinely aligned objectives rather than merely exhibiting aligned behavior. However, significant challenges remain: current techniques don't yet scale to understanding complete models at the frontier, and it's unclear whether interpretability research can keep pace with capability advances.
 
@@ -86,11 +86,11 @@ flowchart TD
 
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
-| <EntityLink id="deceptive-alignment" /> | **High** | Could detect when stated outputs differ from internal representations |
-| <EntityLink id="scheming" /> | **High** | May identify strategic reasoning or hidden goal pursuit in activations |
-| <EntityLink id="mesa-optimization" /> | **Medium** | Could reveal unexpected optimization targets in model internals |
-| <EntityLink id="reward-hacking" /> | **Medium** | May expose when models exploit reward proxies vs. intended objectives |
-| <EntityLink id="emergent-capabilities" /> | **Low-Medium** | Could identify latent dangerous capabilities before behavioral manifestation |
+| <EntityLink id="E93" /> | **High** | Could detect when stated outputs differ from internal representations |
+| <EntityLink id="E274" /> | **High** | May identify strategic reasoning or hidden goal pursuit in activations |
+| <EntityLink id="E197" /> | **Medium** | Could reveal unexpected optimization targets in model internals |
+| <EntityLink id="E253" /> | **Medium** | May expose when models exploit reward proxies vs. intended objectives |
+| <EntityLink id="E117" /> | **Low-Medium** | Could identify latent dangerous capabilities before behavioral manifestation |
 
 ### Core Concepts
 
@@ -315,8 +315,8 @@ SAEs find interpretable features by training autoencoders with sparsity constrai
 
 ### Complementary Techniques
 
-- **<EntityLink id="representation-engineering">Representation Engineering</EntityLink>**: Uses interpretability findings to steer behavior; places population-level representations rather than neurons at the center of analysis
-- **<EntityLink id="process-supervision">Process Supervision</EntityLink>**: Interpretability could verify reasoning matches shown steps
+- **<EntityLink id="E479">Representation Engineering</EntityLink>**: Uses interpretability findings to steer behavior; places population-level representations rather than neurons at the center of analysis
+- **<EntityLink id="E455">Process Supervision</EntityLink>**: Interpretability could verify reasoning matches shown steps
 - **Probing**: Simpler technique that trains classifiers on activations; DeepMind found linear probes outperform SAEs on some practical tasks
 - **Activation Patching**: Swaps activations between contexts to establish causal relationships
 
@@ -423,7 +423,7 @@ Mechanistic interpretability relates to the <EntityLink id="ai-transition-model"
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Could verify alignment at fundamental level |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Could verify alignment at fundamental level |
 | <EntityLink id="ai-capability-level" /> | Transparency | Makes AI systems more understandable |
 
 Mechanistic interpretability is one of the few research directions that could provide genuine confidence in AI alignment rather than relying on behavioral proxies. Its success or failure significantly impacts the viability of building safe advanced AI.

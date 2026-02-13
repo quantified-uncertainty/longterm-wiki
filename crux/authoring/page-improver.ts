@@ -32,6 +32,8 @@ import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { MODELS } from '../lib/anthropic.ts';
+import { buildEntityLookupForContent } from '../lib/entity-lookup.ts';
+import { convertSlugsToNumericIds } from './creator/deployment.ts';
 // Inlined from content-types.ts to keep this file self-contained
 const CRITICAL_RULES: string[] = [
   'dollar-signs',
@@ -945,6 +947,12 @@ async function improvePhase(page: PageData, analysis: AnalysisResult, research: 
   // Build objectivity context from previous ratings
   const objectivityContext = buildObjectivityContext(page, analysis);
 
+  // Build entity lookup table for numeric ID usage
+  log('improve', 'Building entity lookup table...');
+  const entityLookup = buildEntityLookupForContent(currentContent, ROOT);
+  const entityLookupCount = entityLookup.split('\n').filter(Boolean).length;
+  log('improve', `  Found ${entityLookupCount} relevant entities for lookup`);
+
   const prompt = `Improve this wiki page based on the analysis and research.
 
 ## Page Info
@@ -974,14 +982,23 @@ Make targeted improvements based on the analysis and directions. Follow these gu
 ### Wiki Conventions
 - Use GFM footnotes for prose citations: [^1], [^2], etc.
 - Use inline links in tables: [Source Name](url)
-- EntityLinks: <EntityLink id="entity-id">Display Text</EntityLink>
+- EntityLinks use **numeric IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
 - Escape dollar signs: \\$100M not $100M
 - Import from: '${importPath}'
+
+### Entity Lookup Table
+
+Use the numeric IDs below when writing EntityLinks. The format is: E## = slug → "Display Name"
+ONLY use IDs from this table. If an entity is not listed here, use plain text instead.
+
+\`\`\`
+${entityLookup}
+\`\`\`
 
 ### Quality Standards
 - Add citations from the research sources
 - Replace vague claims with specific numbers
-- Add EntityLinks for related concepts
+- Add EntityLinks for related concepts (using E## IDs from the lookup table above)
 - Ensure tables have source links
 - **NEVER use vague citations** like "Interview", "Earnings call", "Conference talk", "Reports", "Various"
 - Always specify: exact source name, date, and context (e.g., "Tesla Q4 2021 earnings call", "MIT Aeronautics Symposium (Oct 2014)")
@@ -1086,6 +1103,15 @@ Start your response with "---" (the frontmatter delimiter).`;
   // Strip any "Related Pages" / "See Also" / "Related Content" sections
   // (now rendered automatically by the RelatedPages component)
   improvedContent = stripRelatedPagesSections(improvedContent);
+
+  // Convert any remaining slug-based EntityLink IDs to numeric (E##) format.
+  // The LLM should use E## IDs from the lookup table, but this is a safety net
+  // in case it falls back to slug-based IDs from the training data.
+  const { content: convertedContent, converted: slugsConverted } = convertSlugsToNumericIds(improvedContent, ROOT);
+  if (slugsConverted > 0) {
+    log('improve', `  Converted ${slugsConverted} remaining slug-based EntityLink ID(s) to E## format`);
+    improvedContent = convertedContent;
+  }
 
   writeTemp(page.id, 'improved.mdx', improvedContent);
   log('improve', 'Complete');
@@ -1213,7 +1239,22 @@ async function validatePhase(page: PageData, improvedContent: string, options: P
       if (entityLinkIds.length > 0) {
         const pages = loadPages();
         const pageIds = new Set(pages.map(p => p.id));
-        const invalidIds = entityLinkIds.filter(id => !pageIds.has(id));
+
+        // Also load id-registry so we can resolve E## → slug
+        let idRegistry: Record<string, string> = {};
+        try {
+          const raw = fs.readFileSync(path.join(ROOT, 'data/id-registry.json'), 'utf-8');
+          idRegistry = JSON.parse(raw).entities || {};
+        } catch { /* ignore */ }
+
+        const invalidIds = entityLinkIds.filter(id => {
+          // Accept E## format — resolve to slug and check
+          if (/^E\d+$/i.test(id)) {
+            const slug = idRegistry[id.toUpperCase()];
+            return !slug; // invalid only if E## doesn't exist in registry
+          }
+          return !pageIds.has(id);
+        });
         if (invalidIds.length > 0) {
           const uniqueInvalid = [...new Set(invalidIds)];
           issues.quality.push({

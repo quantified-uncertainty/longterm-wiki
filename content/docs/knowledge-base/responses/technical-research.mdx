@@ -23,31 +23,31 @@ subcategory: alignment
 ---
 import {DataInfoBox, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="technical-research" />
+<DataInfoBox entityId="E297" />
 
 ## Quick Assessment
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Funding Level** | \$110-130M annually (2024) | <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> deployed \$13.6M (60% of total); \$10M RFP announced Mar 2025 |
+| **Funding Level** | \$110-130M annually (2024) | <EntityLink id="E521">Coefficient Giving</EntityLink> deployed \$13.6M (60% of total); \$10M RFP announced Mar 2025 |
 | **Research Community Size** | 500+ dedicated researchers | Frontier labs (~350-400 FTE), independent orgs (~100-150), academic groups (≈50-100) |
 | **Tractability** | Medium-High | Interpretability: tens of millions of features identified; Control: protocols deployed; Evaluations: 30+ models tested by [UK AISI](https://www.aisi.gov.uk/) |
 | **Impact Potential** | 2-50% x-risk reduction | Depends heavily on timeline, adoption, and technical success; conditional on 10+ years of development |
-| **Timeline Pressure** | High | <R id="435b669c11e07d8f"><EntityLink id="miri">MIRI</EntityLink>'s 2024 assessment</R>: "extremely unlikely to succeed in time"; [METR](https://metr.org/) finds autonomous task capability doubles every 7 months |
+| **Timeline Pressure** | High | <R id="435b669c11e07d8f"><EntityLink id="E202">MIRI</EntityLink>'s 2024 assessment</R>: "extremely unlikely to succeed in time"; [METR](https://metr.org/) finds autonomous task capability doubles every 7 months |
 | **Key Bottleneck** | Talent and compute access | Safety funding is under 2% of estimated capabilities R&D; frontier model access critical |
-| **Adoption Rate** | Accelerating | 12 companies published [frontier AI safety policies](https://metr.org/blog/2025-03-26-common-elements-of-frontier-ai-safety-policies/) by Dec 2024; <EntityLink id="responsible-scaling-policies">RSPs</EntityLink> at <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, DeepMind |
-| **Empirical Progress** | Significant 2024-2025 | [Scheming detected](https://www.apolloresearch.ai/research/frontier-models-are-capable-of-incontext-scheming/) in 5/6 frontier models; deliberative alignment reduced <EntityLink id="scheming">scheming</EntityLink> 30x |
+| **Adoption Rate** | Accelerating | 12 companies published [frontier AI safety policies](https://metr.org/blog/2025-03-26-common-elements-of-frontier-ai-safety-policies/) by Dec 2024; <EntityLink id="E252">RSPs</EntityLink> at <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, DeepMind |
+| **Empirical Progress** | Significant 2024-2025 | [Scheming detected](https://www.apolloresearch.ai/research/frontier-models-are-capable-of-incontext-scheming/) in 5/6 frontier models; deliberative alignment reduced <EntityLink id="E274">scheming</EntityLink> 30x |
 
 ## Overview
 
-<EntityLink id="technical-ai-safety">Technical AI safety</EntityLink> research aims to make AI systems reliably safe and aligned with human values through direct scientific and engineering work. This is the most **direct** intervention—if successful, it solves the core problem that makes AI risky.
+<EntityLink id="E631">Technical AI safety</EntityLink> research aims to make AI systems reliably safe and aligned with human values through direct scientific and engineering work. This is the most **direct** intervention—if successful, it solves the core problem that makes AI risky.
 
-The field has grown substantially since 2020, with approximately **500+ dedicated researchers** working across frontier labs (Anthropic, DeepMind, OpenAI) and independent organizations (<EntityLink id="redwood-research">Redwood Research</EntityLink>, MIRI, <EntityLink id="apollo-research">Apollo Research</EntityLink>, <EntityLink id="metr">METR</EntityLink>). Annual funding reached **\$110-130M in 2024**, with <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> contributing approximately 60% (\$13.6M) of external investment. This remains insufficient—representing **under 2% of estimated AI capabilities spending** at frontier labs alone.
+The field has grown substantially since 2020, with approximately **500+ dedicated researchers** working across frontier labs (Anthropic, DeepMind, OpenAI) and independent organizations (<EntityLink id="E557">Redwood Research</EntityLink>, MIRI, <EntityLink id="E24">Apollo Research</EntityLink>, <EntityLink id="E201">METR</EntityLink>). Annual funding reached **\$110-130M in 2024**, with <EntityLink id="E521">Coefficient Giving</EntityLink> contributing approximately 60% (\$13.6M) of external investment. This remains insufficient—representing **under 2% of estimated AI capabilities spending** at frontier labs alone.
 
 Key 2024-2025 advances include:
-- **<EntityLink id="interpretability">Mechanistic interpretability</EntityLink>:** [Anthropic's May 2024 "Scaling Monosemanticity"](https://transformer-circuits.pub/2024/scaling-monosemanticity/) identified tens of millions of interpretable features in Claude 3 Sonnet, including concepts related to deception and safety-relevant patterns
+- **<EntityLink id="E174">Mechanistic interpretability</EntityLink>:** [Anthropic's May 2024 "Scaling Monosemanticity"](https://transformer-circuits.pub/2024/scaling-monosemanticity/) identified tens of millions of interpretable features in Claude 3 Sonnet, including concepts related to deception and safety-relevant patterns
 - **Scheming detection:** [Apollo Research's December 2024 evaluation](https://www.apolloresearch.ai/research/frontier-models-are-capable-of-incontext-scheming/) found 5 of 6 frontier models showed in-context scheming capabilities, with o1 maintaining deception in more than 85% of follow-up questions
-- **<EntityLink id="ai-control">AI control</EntityLink>:** Redwood Research's control evaluation framework, now with a [2025 agent control sequel](https://blog.redwoodresearch.org/p/how-might-we-safely-pass-the-buck), provides protocols robust even against misaligned systems
+- **<EntityLink id="E6">AI control</EntityLink>:** Redwood Research's control evaluation framework, now with a [2025 agent control sequel](https://blog.redwoodresearch.org/p/how-might-we-safely-pass-the-buck), provides protocols robust even against misaligned systems
 - **Government evaluation:** The [UK AI Security Institute](https://www.aisi.gov.uk/frontier-ai-trends-report) has evaluated 30+ frontier models, finding cyber task completion improved from 9% to 50% between late 2023 and 2025
 
 The field faces significant timeline pressure. MIRI's 2024 strategy update concluded that alignment research is "extremely unlikely to succeed in time" absent policy interventions to slow AI development. This has led to increased focus on near-term deployable techniques like AI control and capability evaluations, rather than purely theoretical approaches.
@@ -302,7 +302,7 @@ The field has seen substantial empirical advances alongside growing institutiona
 |-------------|------|-------------|------------|------------------------|
 | **[UK AI Security Institute](https://www.aisi.gov.uk/)** | Government | World's largest state-backed AI evaluation body | Pre-deployment testing | Evaluated 30+ frontier models; renamed from AISI Feb 2025 |
 | **[US AI Safety Institute](https://www.nist.gov/aisi)** | Government | Part of NIST | Standards and evaluation | Signed MoU with UK AISI; joined NIST AI Safety Consortium |
-| **<EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>** | Philanthropy | \$13.6M deployed in 2024 (60% of external AI safety investment) | Broad technical safety | \$10M RFP announced March 2025; on track to exceed 2024 by 40-50% |
+| **<EntityLink id="E521">Coefficient Giving</EntityLink>** | Philanthropy | \$13.6M deployed in 2024 (60% of external AI safety investment) | Broad technical safety | \$10M RFP announced March 2025; on track to exceed 2024 by 40-50% |
 | **[METR](https://metr.org/)** | Nonprofit | 15-25 researchers | Autonomy evaluations | Evaluated GPT-4.5, Claude 3.7 Sonnet; autonomous task completion doubled every 7 months |
 | **[Apollo Research](https://www.apolloresearch.ai/)** | Nonprofit | 10-15 researchers | Scheming detection | Published landmark scheming evaluation; partnered with OpenAI on mitigations |
 | **[Redwood Research](https://www.redwoodresearch.org/)** | Nonprofit | ≈20 staff, \$100M+ runway | AI control | Published "Ctrl-Z" agent control sequel (Apr 2025); developed trusted monitoring protocols |
@@ -327,7 +327,7 @@ Technical AI safety research is the primary response to alignment-related risks:
 | Deceptive alignment | Interpretability to detect hidden goals; control protocols for misaligned systems | Mechanistic interpretability, AI control, scheming evaluations |
 | Goal misgeneralization | Understanding learned representations; robust training methods | Interpretability, scalable oversight |
 | Power-seeking behavior | Detecting power-seeking; designing systems without instrumental convergence | Agent foundations, evaluations |
-| <EntityLink id="bioweapons">Bioweapons misuse</EntityLink> | Dangerous capability evaluations; refusals and filtering | Evaluations, robustness |
+| <EntityLink id="E42">Bioweapons misuse</EntityLink> | Dangerous capability evaluations; refusals and filtering | Evaluations, robustness |
 | Cyberweapons misuse | Capability evaluations; secure deployment | Evaluations, control |
 | Autonomous replication | ARA evaluations; containment protocols | METR evaluations, control |
 
@@ -429,7 +429,7 @@ For technical research to substantially reduce x-risk:
 
 | Funder | 2024 Amount | Focus Areas | Notes |
 |--------|-------------|-------------|-------|
-| <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> | \$13.6M (60% of total) | Broad technical safety | Largest grants: CAIS (\$1.5M), Redwood (\$1.2M), MIRI (\$1.1M); \$10M RFP Mar 2025 |
+| <EntityLink id="E521">Coefficient Giving</EntityLink> | \$13.6M (60% of total) | Broad technical safety | Largest grants: CAIS (\$1.5M), Redwood (\$1.2M), MIRI (\$1.1M); \$10M RFP Mar 2025 |
 | <R id="6bc74edd147a374b">AI Safety Fund</R> | \$10M initial | Biosecurity, cyber, agents | Backed by Anthropic, Google, Microsoft, OpenAI |
 | [Jaan Tallinn](https://quickmarketpitch.com/blogs/news/ai-safety-investors) | ≈\$10M | Long-term alignment | Skype co-founder; independent allocation |
 | [Eric Schmidt / Schmidt Sciences](https://quickmarketpitch.com/blogs/news/ai-safety-investors) | ≈\$10M | Safety benchmarking | Focus on evaluation infrastructure |
@@ -614,13 +614,13 @@ Technical research is most valuable when combined with:
 
 ## AI Transition Model Context
 
-Technical AI safety research is the primary lever for reducing <EntityLink id="misalignment-potential" /> in the <EntityLink id="ai-transition-model" />:
+Technical AI safety research is the primary lever for reducing <EntityLink id="E205" /> in the <EntityLink id="ai-transition-model" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Core research goal: ensure alignment persists as capabilities scale |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="interpretability-coverage" /> | Mechanistic interpretability enables detection of misalignment |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Must outpace capability development to maintain safety margins |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Scalable oversight and AI control extend human supervision |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Core research goal: ensure alignment persists as capabilities scale |
+| <EntityLink id="E205" /> | <EntityLink id="E175" /> | Mechanistic interpretability enables detection of misalignment |
+| <EntityLink id="E205" /> | <EntityLink id="E261" /> | Must outpace capability development to maintain safety margins |
+| <EntityLink id="E205" /> | <EntityLink id="E160" /> | Scalable oversight and AI control extend human supervision |
 
 Technical research effectiveness depends critically on timelines, adoption, and whether alignment problems are technically tractable.

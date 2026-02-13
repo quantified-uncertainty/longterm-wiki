@@ -32,16 +32,16 @@ import {Mermaid, R, EntityLink, DataExternalLinks, DataInfoBox} from '@component
 | **Capability Gap Erosion** | Critical concern | MMLU gap collapsed from 17.5 to [0.3 percentage points](https://developers.redhat.com/articles/2026/01/07/state-open-source-ai-models-2025) (2023-2025); open models run on consumer GPUs with 6-12 month lag |
 | **Investment Level** | \$10-50M/yr | Core to lab deployment strategy; commercially incentivized |
 | **Grade: Frontier Control** | B+ | Effective for latest capabilities; degrading as open models improve |
-| **Grade: <EntityLink id="proliferation">Proliferation</EntityLink> Prevention** | C+ | Works short-term; long-term value uncertain as capability gap narrows |
+| **Grade: <EntityLink id="E232">Proliferation</EntityLink> Prevention** | C+ | Works short-term; long-term value uncertain as capability gap narrows |
 | **SI Readiness** | Partial | Maintains human control point; SI might manipulate API users or exploit open alternatives |
 
 ## Overview
 
-Structured access refers to providing AI capabilities through controlled interfaces, typically APIs, rather than releasing model weights that allow unrestricted use. This approach, championed by organizations like <EntityLink id="openai">OpenAI</EntityLink> and <EntityLink id="anthropic">Anthropic</EntityLink> for their most capable models, maintains developer control over how AI systems are used. Through an API, the provider can implement usage policies, monitor for misuse, update models, and revoke access if necessary. According to [GovAI research](https://www.governance.ai/analysis/sharing-powerful-ai-models), structured access aims to "prevent dangerous AI capabilities from being widely accessible, whilst preserving access to AI capabilities that can be used safely." The enterprise LLM market has grown rapidly under this model, with [total enterprise spend reaching \$1.4 billion](https://natlawreview.com/press-releases/enterprise-llm-spend-reaches-84b-anthropic-overtakes-openai-according-new) by mid-2025—more than doubling from \$1.5 billion in November 2024.
+Structured access refers to providing AI capabilities through controlled interfaces, typically APIs, rather than releasing model weights that allow unrestricted use. This approach, championed by organizations like <EntityLink id="E218">OpenAI</EntityLink> and <EntityLink id="E22">Anthropic</EntityLink> for their most capable models, maintains developer control over how AI systems are used. Through an API, the provider can implement usage policies, monitor for misuse, update models, and revoke access if necessary. According to [GovAI research](https://www.governance.ai/analysis/sharing-powerful-ai-models), structured access aims to "prevent dangerous AI capabilities from being widely accessible, whilst preserving access to AI capabilities that can be used safely." The enterprise LLM market has grown rapidly under this model, with [total enterprise spend reaching \$1.4 billion](https://natlawreview.com/press-releases/enterprise-llm-spend-reaches-84b-anthropic-overtakes-openai-according-new) by mid-2025—more than doubling from \$1.5 billion in November 2024.
 
 The concept was formally articulated in Toby Shevlane's [2022 paper](https://arxiv.org/abs/2201.05159) proposing a middle ground between fully open and fully closed AI development. Rather than the binary choice of "release weights" or "don't deploy at all," structured access enables wide access to capabilities while maintaining meaningful oversight. Shevlane argued that structured access is "most effective when implemented through cloud-based AI services, rather than disseminating AI software that runs locally on users' hardware" because cloud-based interfaces provide developers greater scope for controlling usage and protecting against unauthorized modifications.
 
-Structured access has become the default for frontier AI systems, with GPT-4, Claude, and Gemini all available primarily through APIs. This creates a significant control point that enables other safety measures: <EntityLink id="output-filtering">output filtering</EntityLink>, usage monitoring, rate limiting, and the ability to update or retract capabilities. However, structured access faces mounting pressure from open-weight alternatives. Analysis of 94 leading LLMs shows open-source models now within [0.3 percentage points](https://fourweekmba.com/the-open-model-convergence-how-the-frontier-gap-collapsed-to-6-months/) of proprietary systems on MMLU benchmarks—down from a 17.5-point gap in 2024. The capability gap has collapsed from years to approximately 6 months, significantly reducing the window during which structured access provides meaningful differentiation.
+Structured access has become the default for frontier AI systems, with GPT-4, Claude, and Gemini all available primarily through APIs. This creates a significant control point that enables other safety measures: <EntityLink id="E595">output filtering</EntityLink>, usage monitoring, rate limiting, and the ability to update or retract capabilities. However, structured access faces mounting pressure from open-weight alternatives. Analysis of 94 leading LLMs shows open-source models now within [0.3 percentage points](https://fourweekmba.com/the-open-model-convergence-how-the-frontier-gap-collapsed-to-6-months/) of proprietary systems on MMLU benchmarks—down from a 17.5-point gap in 2024. The capability gap has collapsed from years to approximately 6 months, significantly reducing the window during which structured access provides meaningful differentiation.
 
 ## Enterprise Market Adoption
 
@@ -127,7 +127,7 @@ The AI deployment landscape encompasses a spectrum from fully closed to fully op
 | **Policy enforcement** | Terms of service, content filtering | Can update policies within hours; ≈15% of employees paste sensitive data into uncontrolled LLMs ([source](https://www.protecto.ai/blog/ai-data-privacy-statistics-trends/)) |
 | **Regulatory compliance** | Audit logs, data retention controls | Enterprise features enable SOC 2, HIPAA, ISO 27001 compliance |
 | **Incident response** | Rapid model updates, access revocation | Anthropic maintains jailbreak response procedures with same-day patching capability |
-| **Research access** | Tiered researcher programs | <EntityLink id="govai">GovAI</EntityLink> framework enables safety research while limiting proliferation |
+| **Research access** | Tiered researcher programs | <EntityLink id="E153">GovAI</EntityLink> framework enables safety research while limiting proliferation |
 | **Gradual deployment** | Staged rollouts, A/B testing | OpenAI's production review process evaluates risk before full deployment |
 | **Geographic controls** | IP blocking, ownership verification | Anthropic blocks Chinese-controlled entities globally as of 2025 |
 
@@ -414,8 +414,8 @@ Structured access affects the <EntityLink id="ai-transition-model" /> through mu
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="misuse-potential" /> | Enables monitoring and intervention to reduce misuse |
-| <EntityLink id="human-oversight-quality" /> | Maintains human control point over AI capabilities |
-| <EntityLink id="safety-culture-strength" /> | Demonstrates commitment to responsible deployment |
+| <EntityLink id="E207" /> | Enables monitoring and intervention to reduce misuse |
+| <EntityLink id="E160" /> | Maintains human control point over AI capabilities |
+| <EntityLink id="E264" /> | Demonstrates commitment to responsible deployment |
 
 Structured access is a valuable safety measure that should be the default for frontier AI systems. However, its effectiveness is contingent on maintaining a significant capability gap with open-weight alternatives, and it should be understood as one layer of a defense-in-depth strategy rather than a complete solution to AI safety.

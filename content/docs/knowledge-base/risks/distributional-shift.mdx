@@ -21,7 +21,7 @@ subcategory: accident
 ---
 import {DataInfoBox, R, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="distributional-shift" />
+<DataInfoBox entityId="E105" />
 
 ## Quick Assessment
 
@@ -33,7 +33,7 @@ import {DataInfoBox, R, Mermaid, DataExternalLinks, EntityLink} from '@component
 | **Trend** | Worsening | Deployment contexts expanding faster than robustness research; 71% of hospitals now use predictive AI (up from 66% in 2023) |
 | **Detectability** | Low | Systems often fail silently with high confidence; OOD detection achieves only 60-80% accuracy on benchmarks |
 | **Research Investment** | ≈\$50-100M/year | Major labs (Google, Meta, Stanford) have dedicated robustness teams; WILDS benchmark has 1,500+ citations |
-| **Mitigation Maturity** | Medium | <EntityLink id="process-supervision">Process supervision</EntityLink>, domain randomization, and OOD detection show promise but remain incomplete solutions |
+| **Mitigation Maturity** | Medium | <EntityLink id="E455">Process supervision</EntityLink>, domain randomization, and OOD detection show promise but remain incomplete solutions |
 
 ## Overview
 
@@ -41,7 +41,7 @@ Distributional shift represents one of the most fundamental and pervasive challe
 
 The phenomenon affects virtually all deployed machine learning systems and has been identified as one of the most common causes of AI system failure in real-world applications. Research by Amodei et al. (2016) highlighted distributional shift as a core technical safety challenge, while subsequent studies have documented widespread failures across domains from computer vision (40-45% accuracy drops on [ObjectNet](https://objectnet.dev/)) to medical AI (Epic's sepsis model missed 67% of cases when deployed across hospitals). The problem is particularly acute because failures often occur silently—systems continue operating with apparent confidence while producing incorrect outputs, giving users no indication that the system has moved outside its competence.
 
-Beyond immediate deployment failures, distributional shift connects to deeper questions about <EntityLink id="alignment">AI alignment</EntityLink> and robustness. As AI systems become more capable and autonomous, their ability to maintain aligned behavior across diverse and novel contexts becomes critical for safe operation. The phenomenon of <EntityLink id="goal-misgeneralization">goal misgeneralization</EntityLink>, where systems pursue unintended objectives in new contexts, can be understood as a form of distributional shift in learned objectives rather than inputs.
+Beyond immediate deployment failures, distributional shift connects to deeper questions about <EntityLink id="E439">AI alignment</EntityLink> and robustness. As AI systems become more capable and autonomous, their ability to maintain aligned behavior across diverse and novel contexts becomes critical for safe operation. The phenomenon of <EntityLink id="E151">goal misgeneralization</EntityLink>, where systems pursue unintended objectives in new contexts, can be understood as a form of distributional shift in learned objectives rather than inputs.
 
 ## Risk Assessment
 

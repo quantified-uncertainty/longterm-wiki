@@ -27,11 +27,11 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | **Tractability** | Medium-High | Well-understood security engineering; [gVisor](https://gvisor.dev/), [Firecracker](https://firecracker-microvm.github.io/) provide production-ready solutions; AI-specific integration requires ongoing research |
-| **Scalability** | Partial | Effective for current systems; <EntityLink id="metr">METR</EntityLink> finds [GPT-5 time horizon ≈2 hours](https://evaluations.metr.org/gpt-5-report/)—not yet capable of autonomous replication; harder against future more capable AI |
+| **Scalability** | Partial | Effective for current systems; <EntityLink id="E201">METR</EntityLink> finds [GPT-5 time horizon ≈2 hours](https://evaluations.metr.org/gpt-5-report/)—not yet capable of autonomous replication; harder against future more capable AI |
 | **Current Maturity** | Medium | \$7.6B AI agent market (2025) with [85% enterprise adoption](https://www.demandsage.com/ai-agents-statistics/); sandbox tooling emerging rapidly |
 | **Time Horizon** | Immediate | Required now—[30+ CVEs in AI coding tools](https://thehackernews.com/2025/12/researchers-uncover-30-flaws-in-ai.html) disclosed in 2025; [CVE-2024-0132](https://www.wiz.io/blog/nvidia-ai-vulnerability-deep-dive-cve-2024-0132) (NVIDIA) enables container escape |
-| **Market Investment** | Growing | AI agent startups raised [\$3.8B in 2024](https://www.demandsage.com/ai-agents-statistics/) (3x YoY); projected \$1.3T <EntityLink id="agentic-ai">agentic AI</EntityLink> spend by 2029 ([IDC](https://my.idc.com/getdoc.jsp?containerId=prUS53765225)) |
-| **Key Practitioners** | Active | [METR](https://metr.org/), [UK AISI](https://www.aisi.gov.uk/), Docker, <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink> conducting evaluations and implementing containment |
+| **Market Investment** | Growing | AI agent startups raised [\$3.8B in 2024](https://www.demandsage.com/ai-agents-statistics/) (3x YoY); projected \$1.3T <EntityLink id="E2">agentic AI</EntityLink> spend by 2029 ([IDC](https://my.idc.com/getdoc.jsp?containerId=prUS53765225)) |
+| **Key Practitioners** | Active | [METR](https://metr.org/), [UK AISI](https://www.aisi.gov.uk/), Docker, <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink> conducting evaluations and implementing containment |
 | **Social Engineering Risk** | High | AI boxing experiments show [60-70% escape rate](https://www.lesswrong.com/w/ai-boxing-containment) through persuasion alone; humans remain weakest link |
 
 ## Overview
@@ -621,8 +621,8 @@ Sandboxing affects the <EntityLink id="ai-transition-model" /> through multiple 
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="misalignment-potential" /> | Reduces damage from unaligned behavior |
-| <EntityLink id="human-oversight-quality" /> | Enables meaningful human control |
-| <EntityLink id="misuse-potential" /> | Limits unauthorized capabilities |
+| <EntityLink id="E205" /> | Reduces damage from unaligned behavior |
+| <EntityLink id="E160" /> | Enables meaningful human control |
+| <EntityLink id="E207" /> | Limits unauthorized capabilities |
 
 Sandboxing is a critical component of defense-in-depth but should not be relied upon as the sole safety measure. Its value is proportional to the strength of other safety measures; containment buys time but doesn't solve alignment.

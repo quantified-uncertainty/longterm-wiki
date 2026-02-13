@@ -21,13 +21,13 @@ subcategory: safety-models
 ---
 import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="alignment-robustness-trajectory" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E21" ratings={frontmatter.ratings} />
 
 ## Overview
 
-<EntityLink id="alignment-robustness">Alignment robustness</EntityLink> measures how reliably AI systems pursue intended objectives under varying conditions. As capabilities scale, alignment robustness faces increasing pressure from optimization dynamics, <EntityLink id="distributional-shift">distributional shift</EntityLink>, and emergent deception incentives. This model estimates how robustness degrades with capability scaling and identifies critical thresholds.
+<EntityLink id="E20">Alignment robustness</EntityLink> measures how reliably AI systems pursue intended objectives under varying conditions. As capabilities scale, alignment robustness faces increasing pressure from optimization dynamics, <EntityLink id="E105">distributional shift</EntityLink>, and emergent deception incentives. This model estimates how robustness degrades with capability scaling and identifies critical thresholds.
 
-**Core insight:** Current alignment techniques (<EntityLink id="rlhf">RLHF</EntityLink>, <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="process-supervision">process supervision</EntityLink>) achieve 60-80% robustness at GPT-4-level capability. However, robustness degrades non-linearly with capability—projected to reach 30-50% at 100x current capability. The critical zone is 10x-30x current capability, where existing techniques likely become insufficient but systems are not yet capable enough to assist in developing better alignment.
+**Core insight:** Current alignment techniques (<EntityLink id="E259">RLHF</EntityLink>, <EntityLink id="E451">Constitutional AI</EntityLink>, <EntityLink id="E455">process supervision</EntityLink>) achieve 60-80% robustness at GPT-4-level capability. However, robustness degrades non-linearly with capability—projected to reach 30-50% at 100x current capability. The critical zone is 10x-30x current capability, where existing techniques likely become insufficient but systems are not yet capable enough to assist in developing better alignment.
 
 The trajectory creates a potential "alignment valley" where the most dangerous systems are those just capable enough to be dangerous but not capable enough to help solve alignment.
 
@@ -387,10 +387,10 @@ Your view on alignment robustness trajectory should depend on:
 
 ## Related Models
 
-- <EntityLink id="safety-capability-tradeoff" label="Safety-Capability Gap" /> - Related safety-capability dynamics
-- <EntityLink id="deceptive-alignment-decomposition" label="Deceptive Alignment Decomposition" /> - Deep dive on deception mechanisms
-- <EntityLink id="scheming-likelihood-model" label="Scheming Likelihood Model" /> - When deception becomes likely
-- <EntityLink id="parameter-interaction-network" label="Parameter Interaction Network" /> - How alignment-robustness connects to other parameters
+- <EntityLink id="E262" label="Safety-Capability Gap" /> - Related safety-capability dynamics
+- <EntityLink id="E94" label="Deceptive Alignment Decomposition" /> - Deep dive on deception mechanisms
+- <EntityLink id="E275" label="Scheming Likelihood Model" /> - When deception becomes likely
+- <EntityLink id="E219" label="Parameter Interaction Network" /> - How alignment-robustness connects to other parameters
 
 ## Strategic Importance
 
