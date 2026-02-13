@@ -101,6 +101,118 @@ const TIERS: Record<string, TierConfig> = {
 // Initialize Anthropic client
 const anthropic = new Anthropic({ timeout: 10 * 60 * 1000 });
 
+// ---------------------------------------------------------------------------
+// Resilience helpers: retry, streaming, progress heartbeat
+// ---------------------------------------------------------------------------
+
+/** Retry an async fn with exponential backoff. */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  { maxRetries = 2, label = 'API call' }: { maxRetries?: number; label?: string } = {}
+): Promise<T> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      const isRetryable =
+        error.message.includes('timeout') ||
+        error.message.includes('ECONNRESET') ||
+        error.message.includes('socket hang up') ||
+        error.message.includes('overloaded') ||
+        error.message.includes('529') ||
+        error.message.includes('rate_limit');
+      if (!isRetryable || attempt === maxRetries) throw err;
+      const delay = Math.pow(2, attempt + 1) * 1000; // 2s, 4s
+      log('retry', `${label} failed (${error.message.slice(0, 80)}), retrying in ${delay / 1000}s (attempt ${attempt + 1}/${maxRetries})…`);
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+  throw new Error('unreachable');
+}
+
+/** Start a heartbeat timer that logs a dot every `intervalSec` seconds. Returns a stop function. */
+function startHeartbeat(phase: string, intervalSec = 30): () => void {
+  const start = Date.now();
+  const timer = setInterval(() => {
+    const elapsed = ((Date.now() - start) / 1000).toFixed(0);
+    process.stderr.write(`[${formatTime()}] [${phase}] … still running (${elapsed}s)\n`);
+  }, intervalSec * 1000);
+  return () => clearInterval(timer);
+}
+
+/**
+ * Streaming wrapper for Anthropic API calls.
+ * Uses server-sent events to keep the connection alive through proxies.
+ */
+async function streamingCreate(
+  params: Parameters<typeof anthropic.messages.create>[0]
+): Promise<Anthropic.Messages.Message> {
+  const stream = anthropic.messages.stream(params as any);
+  return await stream.finalMessage();
+}
+
+// ---------------------------------------------------------------------------
+// YAML frontmatter repair
+// ---------------------------------------------------------------------------
+
+/**
+ * Validate and repair YAML frontmatter after model generation.
+ * Catches common LLM errors like merged lines, missing newlines, etc.
+ */
+function repairFrontmatter(content: string): string {
+  const fmMatch = content.match(/^(---\n)([\s\S]*?)(\n---)/);
+  if (!fmMatch) return content;
+
+  let fm = fmMatch[2];
+  const rest = content.slice(fmMatch[0].length);
+
+  // Fix 1: Lines where a YAML key:value is merged with another key on the same line.
+  // e.g. "  diagrams: 1clusters: [...]" → "  diagrams: 1\nclusters: [...]"
+  // This happens when the LLM drops the newline between frontmatter fields.
+  // IMPORTANT: Use [ \t] (not \s) to avoid matching across newlines, which would
+  // corrupt multi-line YAML structures (e.g., splitting "wordCount" into "w\nordCount").
+  fm = fm.replace(/^([ \t]+\w+:[ \t]*\S+?)([a-zA-Z_][\w]*:[ \t])/gm, '$1\n$2');
+
+  // Fix 2: Remove backslash-escaping from YAML string values.
+  // The LLM often escapes dollar signs (\$) in frontmatter YAML strings, but
+  // YAML doesn't need escaping — only MDX body content does. \$ in YAML causes
+  // MDX compilation errors like "Invalid escape sequence \$".
+  fm = fm.replace(/^(\w+:.*)\\\$/gm, '$1$');
+  fm = fm.replace(/^([ \t]+\w+:.*)\\\$/gm, '$1$');
+
+  // Fix 3: Top-level keys that got incorrectly indented under a block.
+  // e.g. "  clusters:" should be "clusters:" if it's a known top-level key.
+  const knownSubKeys = new Set([
+    'wordCount', 'citations', 'tables', 'diagrams', // metrics sub-keys
+    'novelty', 'rigor', 'actionability', 'completeness', // ratings sub-keys
+    'objectivity', 'focus', 'concreteness',
+    'order', 'label', // sidebar sub-keys
+  ]);
+  const topLevelKeys = new Set([
+    'title', 'description', 'sidebar', 'quality', 'importance', 'lastEdited',
+    'update_frequency', 'llmSummary', 'ratings', 'metrics', 'clusters',
+    'draft', 'aliases', 'redirects', 'tags',
+  ]);
+  const lines = fm.split('\n');
+  const repaired: string[] = [];
+  for (const line of lines) {
+    const indentedKeyMatch = line.match(/^(\s{2,})(\w+):\s/);
+    if (indentedKeyMatch) {
+      const key = indentedKeyMatch[2];
+      if (topLevelKeys.has(key) && !knownSubKeys.has(key)) {
+        // This top-level key got incorrectly indented — dedent it
+        repaired.push(line.replace(/^\s+/, ''));
+        continue;
+      }
+    }
+    repaired.push(line);
+  }
+  fm = repaired.join('\n');
+
+  return '---\n' + fm + '\n---' + rest;
+}
+
 interface PageData {
   id: string;
   title: string;
@@ -519,7 +631,7 @@ function getImportPath(): string {
   return '@components/wiki';
 }
 
-// Run Claude with tools
+// Run Claude with tools (streaming + retry + heartbeat)
 async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<string> {
   const {
     model = MODELS.sonnet,
@@ -530,22 +642,31 @@ async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<
 
   const messages: MessageParam[] = [{ role: 'user', content: prompt }];
 
-  // Use streaming to prevent timeouts on long-running requests
-  async function streamCreate(msgs: MessageParam[]): Promise<Anthropic.Messages.Message> {
-    const stream = anthropic.messages.stream({
-      model,
-      max_tokens: maxTokens,
-      system: systemPrompt,
-      tools: tools as Anthropic.Messages.Tool[],
-      messages: msgs
-    });
-    return await stream.finalMessage();
+  const makeRequest = (msgs: MessageParam[]) =>
+    withRetry(
+      () => streamingCreate({
+        model,
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        tools: tools as Anthropic.Messages.Tool[],
+        messages: msgs
+      }),
+      { label: `runAgent(${model}, ${maxTokens} tokens)` }
+    );
+
+  const stopHeartbeat = startHeartbeat('api', 30);
+  let response: Anthropic.Messages.Message;
+  try {
+    response = await makeRequest(messages);
+  } finally {
+    stopHeartbeat();
   }
 
-  let response = await streamCreate(messages);
-
   // Handle tool use loop
-  while (response.stop_reason === 'tool_use') {
+  let toolTurns = 0;
+  const MAX_TOOL_TURNS = 10;
+  while (response.stop_reason === 'tool_use' && toolTurns < MAX_TOOL_TURNS) {
+    toolTurns++;
     const toolUseBlocks = response.content.filter((b): b is ToolUseBlock => b.type === 'tool_use');
     const toolResults: ToolResultBlockParam[] = [];
 
@@ -581,7 +702,15 @@ async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<
     messages.push({ role: 'assistant', content: response.content });
     messages.push({ role: 'user', content: toolResults });
 
-    response = await streamCreate(messages);
+    const stopLoop = startHeartbeat('api-tool-loop', 30);
+    try {
+      response = await makeRequest(messages);
+    } finally {
+      stopLoop();
+    }
+  }
+  if (toolTurns >= MAX_TOOL_TURNS) {
+    log('api', `Warning: hit tool turn limit (${MAX_TOOL_TURNS}), stopping agent loop`);
   }
 
   // Extract text from response
@@ -591,20 +720,23 @@ async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<
 
 // Tool implementations
 async function executeWebSearch(query: string): Promise<string> {
-  // Use Anthropic's web search via a simple agent call
-  const response = await anthropic.messages.create({
-    model: MODELS.sonnet,
-    max_tokens: 4000,
-    tools: [{
-      type: 'web_search_20250305',
-      name: 'web_search',
-      max_uses: 3
-    }],
-    messages: [{
-      role: 'user',
-      content: `Search for: "${query}". Return the top 5 most relevant results with titles, URLs, and brief descriptions.`
-    }]
-  });
+  // Use Anthropic's web search via streaming (prevents proxy timeouts)
+  const response = await withRetry(
+    () => streamingCreate({
+      model: MODELS.sonnet,
+      max_tokens: 4000,
+      tools: [{
+        type: 'web_search_20250305',
+        name: 'web_search',
+        max_uses: 3
+      } as any],
+      messages: [{
+        role: 'user',
+        content: `Search for: "${query}". Return the top 5 most relevant results with titles, URLs, and brief descriptions.`
+      }]
+    }),
+    { label: 'web_search' }
+  );
 
   const textBlocks = response.content.filter((b): b is Anthropic.Messages.TextBlock => b.type === 'text');
   return textBlocks.map(b => b.text).join('\n');
@@ -667,15 +799,19 @@ function syncFrontmatterMetrics(content: string): string {
   const diagrams = (body.match(/<Mermaid\s/g) || []).length;
 
   // Update metrics in frontmatter
-  const metricsBlock = `metrics:\n  wordCount: ${wordCount}\n  citations: ${citations}\n  tables: ${tables}\n  diagrams: ${diagrams}`;
-  if (frontmatter.match(/^metrics:\s*\n(?:\s+\w+:\s*\d+\n?)*/m)) {
+  // The trailing \n is critical — without it the last metrics line merges with the next key.
+  // Use [ \t]+ (not \s+) in the sub-key pattern to avoid matching across newlines.
+  const metricsBlock = `metrics:\n  wordCount: ${wordCount}\n  citations: ${citations}\n  tables: ${tables}\n  diagrams: ${diagrams}\n`;
+  if (frontmatter.match(/^metrics:\s*\n(?:[ \t]+\w+:[ \t]*[\d.]+\n?)*/m)) {
     frontmatter = frontmatter.replace(
-      /^metrics:\s*\n(?:\s+\w+:\s*[\d.]+\n?)*/m,
+      /^metrics:\s*\n(?:[ \t]+\w+:[ \t]*[\d.]+\n?)*/m,
       metricsBlock
     );
   }
 
-  return frontmatter + '\n' + body;
+  // Safety: run frontmatter repair to catch any YAML corruption
+  const reassembled = frontmatter + '\n' + body;
+  return repairFrontmatter(reassembled);
 }
 
 // Phase: Analyze
@@ -989,6 +1125,9 @@ Start your response with "---" (the frontmatter delimiter).`;
     ''
   );
 
+  // Repair any YAML frontmatter corruption from model output
+  improvedContent = repairFrontmatter(improvedContent);
+
   // Strip any "Related Pages" / "See Also" / "Related Content" sections
   // (now rendered automatically by the RelatedPages component)
   improvedContent = stripRelatedPagesSections(improvedContent);
@@ -1224,6 +1363,9 @@ Start your response with "---" (the frontmatter delimiter).`;
     }
   }
 
+  // Repair any YAML frontmatter corruption from model output
+  fixedContent = repairFrontmatter(fixedContent);
+
   writeTemp(page.id, 'final.mdx', fixedContent);
   log('gap-fill', 'Complete');
   return fixedContent;
@@ -1301,8 +1443,9 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   // Run phases based on tier
   for (const phase of tierConfig.phases) {
     const phaseStart: number = Date.now();
+    const stopPhaseHeartbeat = startHeartbeat(phase, 60);
 
-    switch (phase) {
+    try { switch (phase) {
       case 'analyze':
         analysis = await analyzePhase(page, directions, options);
         break;
@@ -1378,6 +1521,10 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       case 'review':
         review = await reviewPhase(page, improvedContent!, options);
         break;
+    }
+
+    } finally {
+      stopPhaseHeartbeat();
     }
 
     const phaseDuration: string = ((Date.now() - phaseStart) / 1000).toFixed(1);
