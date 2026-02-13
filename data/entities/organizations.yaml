@@ -8,20 +8,27 @@
   relatedEntries:
     - id: dario-amodei
       type: researcher
+      relationship: leads-to
     - id: chris-olah
       type: researcher
+      relationship: research
     - id: jan-leike
       type: researcher
+      relationship: research
     - id: openai
       type: organization
     - id: interpretability
       type: safety-agenda
+      relationship: research
     - id: scalable-oversight
       type: safety-agenda
+      relationship: research
     - id: deceptive-alignment
       type: risk
+      relationship: addresses
     - id: racing-dynamics
       type: risk
+      relationship: affects
   sources:
     - title: Anthropic Company Website
       url: https://anthropic.com
@@ -68,20 +75,26 @@
   relatedEntries:
     - id: demis-hassabis
       type: researcher
+      relationship: leads-to
     - id: shane-legg
       type: researcher
+      relationship: leads-to
     - id: openai
       type: organization
     - id: anthropic
       type: organization
     - id: scalable-oversight
       type: safety-agenda
+      relationship: research
     - id: reward-hacking
       type: risk
+      relationship: addresses
     - id: racing-dynamics
       type: risk
+      relationship: affects
     - id: concentration-of-power
       type: risk
+      relationship: affects
   sources:
     - title: Google DeepMind Website
       url: https://deepmind.google
@@ -133,20 +146,27 @@
   relatedEntries:
     - id: sam-altman
       type: researcher
+      relationship: leads-to
     - id: ilya-sutskever
       type: researcher
+      relationship: leads-to
     - id: jan-leike
       type: researcher
+      relationship: research
     - id: anthropic
       type: organization
     - id: interpretability
       type: safety-agenda
+      relationship: research
     - id: scalable-oversight
       type: safety-agenda
+      relationship: research
     - id: racing-dynamics
       type: risk
+      relationship: affects
     - id: deceptive-alignment
       type: risk
+      relationship: addresses
   sources:
     - title: OpenAI Website
       url: https://openai.com
