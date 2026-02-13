@@ -17,52 +17,28 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 
 ## 2026-02-13 | claude/wiki-gap-analysis-l7Cp8 | Systematic wiki gap analysis
 
-**What was done:** Ran `crux gaps list`, `crux gaps stats`, and manual topic coverage analysis across all 639 wiki pages. Identified 386 pages needing insight extraction (203 high-importance with zero insights). Produced a gap analysis report at `content/docs/internal/gap-analysis-2026-02.mdx`. Built a Suggested Pages dashboard (`app/internal/suggested-pages/`) with exactly 100 ranked page suggestions (priorities 1–100) in a sortable DataTable, using numeric priority based on mention frequency across existing pages (grep + EntityLink counts) and editorial importance. Updated gap-analysis MDX to reference the dashboard instead of inline tier lists.
+**What was done:** Fixed all 6 issues from paranoid code review of the edit log PR. Critical: grading.ts was using `pageIdFromPath(finalPath)` on a temp path (resolved to "final" instead of actual page slug) — now uses sanitized `topic` parameter directly. Verified no actual slug collisions exist among ~625 pages. Added `default: list` command so `crux edit-log` works without subcommand. Changed all `logBulkFixes` callers to use per-page generic notes instead of misleading aggregate counts. Added `getDefaultRequestedBy()` helper (checks `CRUX_REQUESTED_BY` → `USER` → `'system'`) and wired it into all 4 pipeline call sites. Fixed falsy check in `appendEditLog` to use `!= null` so empty strings are preserved. Added 4 new tests (14 total edit-log tests, 269 total tests).
 
 **Issues encountered:**
-- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
-- `crux gaps` shows 0 pages when `pages.json` hasn't been built — must run `node app/scripts/build-data.mjs` first
-- The gaps tool only finds under-extracted existing pages, not truly missing topics — manual analysis needed for coverage gaps
-- Numbered lists starting at >1 without blank lines fail the markdown list formatting test
+- No actual slug collisions found among non-index pages — the theoretical collision risk noted in review does not affect current content
 
 **Learnings/notes:**
-- 93% of tracked pages (482/519) have zero insights — massive insight extraction backlog
-- Responses category (136 pages, 3% insight coverage) and organizations (106 pages, 0%) are most under-extracted
-- Biggest content gaps: Chinese AI labs (DeepSeek, Mistral), test-time compute, hallucination, prompt injection — all lack dedicated pages
-- Only 2 incident pages exist despite many documented AI failures
+- Page IDs (slugs) are derived identically across the codebase (last path segment), so edit log IDs match `page.id` convention
+- `getDefaultRequestedBy()` is the cleanest way to thread user identity without adding CLI flags to every pipeline
 
 ---
 
-## 2026-02-13 | claude/analyze-x-epistemics-UEHWy | Create X.com Platform Epistemics page + validation rules
+## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Full edit log system integration
 
-**What was done:** Created a comprehensive analysis page for X.com's epistemic practices. After review, fixed a journal name mismatch (PNAS Nexus → Science) and restructured the Mermaid diagram to comply with the style guide. Then added two new validation rules to prevent these classes of issues in the future: `citation-doi-mismatch` (detects when link text contradicts URL DOI prefix) and `mermaid-style` (enforces max parallel nodes, total node count, and TD orientation). Both rules added to QUALITY_RULES for non-blocking advisory checks.
-
-**Issues encountered:**
-- pnpm install fails on puppeteer postinstall (known issue)
-- better-sqlite3 native module needed manual rebuild (`npx node-gyp rebuild`)
-- Crux content create pipeline's synthesis step hangs indefinitely (spawns `claude -p --print` subprocess that never completes)
-- vitest and next binaries not on PATH after pnpm install; needed to invoke from full paths in node_modules
-
-**Learnings/notes:**
-- The `--source-file` flag in crux content create successfully bypasses external API research phases
-- The synthesis step spawns a claude subprocess that may not work reliably in all environments
-- Page was written manually following the knowledge-base-response template structure with proper frontmatter, EntityLinks, and citations
-- The citation-doi-mismatch rule maps DOI prefixes (e.g., 10.1126 = Science) to expected journal names — catches a common LLM synthesis error
-- The mermaid-style rule found 183 pre-existing warnings across the codebase, all non-blocking
-
----
-
-## 2026-02-13 | claude/review-wiki-report-XQW88 | Review and rewrite E686 OpenClaw Matplotlib Incident
-
-**What was done:** Two-pass review and rewrite of the E686 wiki page. First pass: cut redundant theoretical sections, added investigative sections ("The Agent's Identity and Background", "Was This Really an Autonomous Agent?"), added HN stats, PR reaction ratios, agent apology, Klymak quote, media coverage. Second pass: deep investigation of agent's digital footprint — found two git commit emails (`crabby.rathbun@gmail.com` and `mj@crabbyrathbun.dev`), the `crabbyrathbun.dev` domain purchase, GitHub Issues #4/#17/#24 revealing SOUL.md refusal and operator acknowledgment, commit timestamp analysis, 26 computational chemistry forks, pump.fun memecoins (\$569K peak market cap), and zero-following GitHub pattern. Added 13 new sources total.
+**What was done:** Fully integrated file-based edit log system across entire codebase. Per-page YAML files in `data/edit-logs/` track every page modification with tool, agency, requestedBy, and note fields. Integrated into 9 write paths: page create, improve, grade (x2), and 5 fix/validation scripts. Added `crux edit-log` CLI domain with view/list/stats commands. Added `crux validate edit-logs` validator. Documented in CLAUDE.md. 10 unit tests.
 
 **Issues encountered:**
-- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+- First implementation was frontmatter-based; reworked to file-based after design review
 
 **Learnings/notes:**
-- The `crabbyrathbun.dev` domain WHOIS is the strongest unexplored lead for operator identification
-- pump.fun tokens were created AFTER virality (Feb 13), not by the operator — opportunistic third parties
-- Commit timestamps for human-setup activities cluster at 18:00-19:00 UTC (ambiguous timezone)
+- Storing structured data in frontmatter is risky because LLMs rewrite the entire file during improve
+- `logBulkFixes()` and `pageIdFromPath()` helpers simplify integration for fix scripts
+- `crux/validate/types.ts` is imported but doesn't exist; dead import in several validators
 
 ---
 
