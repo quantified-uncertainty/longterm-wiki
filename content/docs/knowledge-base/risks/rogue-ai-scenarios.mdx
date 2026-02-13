@@ -28,7 +28,7 @@ clusters:
   - ai-safety
 subcategory: accident
 ---
-import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+import {DataInfoBox, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
 <DataExternalLinks pageId="rogue-ai-scenarios" />
 
@@ -336,17 +336,3 @@ These scenarios map to several factors in the <EntityLink id="ai-transition-mode
 | <EntityLink id="misalignment-potential" /> | Misalignment without explicit scheming | Self-preservation, training corruption |
 | <EntityLink id="alignment-robustness" /> | Alignment failures under optimization pressure | Training corruption, correlated failure |
 | <EntityLink id="human-oversight-quality" /> | Oversight degradation across delegation | Delegation chains, sandbox escape |
-
----
-
-## Related Pages
-
-- <EntityLink id="scheming" /> — The explicit deception variant; these scenarios are the "scheming not required" counterparts
-- <EntityLink id="instrumental-convergence" /> — Theoretical foundation for self-preservation and resource-seeking scenarios
-- <EntityLink id="treacherous-turn" /> — The dramatic single-moment variant; these scenarios describe gradual/distributed alternatives
-- <EntityLink id="power-seeking" /> — The capability these scenarios converge toward
-- <EntityLink id="deceptive-alignment" /> — Related but requires richer internal goal structure than these scenarios assume
-- <EntityLink id="sandboxing" /> — Primary defense against the sandbox escape scenario
-- <EntityLink id="corrigibility-failure" /> — What the self-preservation scenario produces
-
-<Backlinks entityId="rogue-ai-scenarios" />

@@ -256,7 +256,7 @@ ratings:
   actionability: 5
   completeness: 6
 ---
-import {EntityLink, Backlinks, R, DataInfoBox, DataExternalLinks} from '@components/wiki';
+import {EntityLink, R, DataInfoBox, DataExternalLinks} from '@components/wiki';
 
 ## Article Sections
 - Quick Assessment (table)
@@ -267,7 +267,8 @@ import {EntityLink, Backlinks, R, DataInfoBox, DataExternalLinks} from '@compone
 - Criticisms/Concerns (if applicable)
 - Key Uncertainties
 - Sources (footnotes)
-- <Backlinks />`;
+
+Do NOT include a "Related Pages", "See Also", or "Related Content" section — these are rendered automatically by the RelatedPages component.`;
 }
 
 export async function runSynthesis(topic: string, quality: string, { log, ROOT }: SynthesisContext, destPath?: string | null): Promise<{ success: boolean; model: string; budget: number }> {

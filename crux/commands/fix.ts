@@ -67,6 +67,11 @@ const SCRIPTS = {
     description: 'Add missing component imports to MDX files',
     passthrough: ['apply', 'verbose', 'file', 'ci', 'dryRun'],
   },
+  'related-pages': {
+    script: 'fix/fix-related-pages.ts',
+    description: 'Remove redundant manual Related Pages / See Also sections',
+    passthrough: ['apply', 'verbose', 'file', 'ci', 'dryRun'],
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'all');
@@ -95,6 +100,7 @@ Examples:
   crux fix entity-links             Convert markdown links to EntityLink
   crux fix escaping                 Fix all escaping issues
   crux fix markdown                 Fix markdown formatting
+  crux fix related-pages            Remove redundant Related Pages sections
   crux fix dollars                  Escape dollar signs only
 `;
 }
