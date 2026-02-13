@@ -3187,6 +3187,19 @@
     - epistemics
     - ai-safety
   lastUpdated: 2026-02
+- id: x-com-epistemics
+  numericId: E692
+  type: approach
+  title: X.com Platform Epistemics
+  description: >-
+    Analysis of X.com's epistemic practices and impact on information quality.
+    Community Notes reduces repost virality by 46% but only 8-10% of notes display.
+    Engagement-driven algorithms amplify low-credibility content, API restrictions
+    ended 100+ research projects, and verification changes degraded trust signals.
+  clusters:
+    - epistemics
+    - governance
+  lastUpdated: 2026-02
 - id: cooperative-ai
   numericId: E590
   type: approach
