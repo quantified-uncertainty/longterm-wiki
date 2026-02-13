@@ -28,6 +28,21 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 
 ---
 
+## 2026-02-13 | claude/cross-reference-audit-9EGQp | Cross-reference audit across wiki pages
+
+**What was done:** Audited ~40 wiki pages across 5 topic clusters (compute governance, alignment/interpretability, bio risk/misuse, organizations, scaling/race dynamics) for consistency and cross-linking. Fixed factual inconsistency in misuse-risks.mdx (cyber CTF scores: 87% → 76% to match detailed data tables). Clarified interpretability coverage discrepancy (5% mechanistic vs 15% behavior coverage) in capability-alignment-race.mdx. Added ~30 missing EntityLinks across 12 files connecting related pages that discussed the same topics without cross-references.
+
+**Issues encountered:**
+- Background agents lost their output files between turns, requiring restart of all 5 audit agents
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+
+**Learnings/notes:**
+- Many pages use E-number IDs (E22, E98, etc.) which map to kebab-case IDs in YAML via numericId field; both formats work in EntityLinks
+- The "interpretability coverage" metric means different things on different pages: mechanistic understanding (<5%) vs behavior coverage (15-25%) — both are valid but should be labeled clearly
+- compute-hardware.mdx had zero EntityLinks in its body text despite being a critical hub page; now has links to labs, EU AI Act, and US EO
+
+---
+
 ## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Fix 6 edit log review issues
 
 **What was done:** Fixed all 6 issues from paranoid code review of the edit log PR. Critical: grading.ts was using `pageIdFromPath(finalPath)` on a temp path (resolved to "final" instead of actual page slug) — now uses sanitized `topic` parameter directly. Verified no actual slug collisions exist among ~625 pages. Added `default: list` command so `crux edit-log` works without subcommand. Changed all `logBulkFixes` callers to use per-page generic notes instead of misleading aggregate counts. Added `getDefaultRequestedBy()` helper (checks `CRUX_REQUESTED_BY` → `USER` → `'system'`) and wired it into all 4 pipeline call sites. Fixed falsy check in `appendEditLog` to use `!= null` so empty strings are preserved. Added 4 new tests (14 total edit-log tests, 269 total tests).

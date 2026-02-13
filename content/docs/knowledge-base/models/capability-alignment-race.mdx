@@ -32,7 +32,7 @@ import CauseEffectGraph from '@components/CauseEffectGraph';
 
 The Capability-Alignment Race Model quantifies the fundamental dynamic determining AI safety: the gap between advancing capabilities and our readiness to safely deploy them. Current analysis shows capabilities ~3 years ahead of alignment readiness, with this gap widening at 0.5 years annually. 
 
-The model tracks how frontier compute (currently 10²⁶ FLOP for largest training runs) and algorithmic improvements drive capability progress at ~10-15 percentage points per year, while alignment research (interpretability at ~15% coverage, <EntityLink id="E271">scalable oversight</EntityLink> at ~30% maturity) advances more slowly. This creates deployment pressure worth \$100B annually, racing against governance systems operating at ~25% effectiveness.
+The model tracks how frontier compute (currently 10²⁶ FLOP for largest training runs) and algorithmic improvements drive capability progress at ~10-15 percentage points per year, while alignment research (interpretability at ~15% behavior coverage—though [less than 5%](/docs/knowledge-base/responses/interpretability) of frontier model computations are mechanistically understood—and <EntityLink id="E271">scalable oversight</EntityLink> at ~30% maturity) advances more slowly. This creates deployment pressure worth \$100B annually, racing against governance systems operating at ~25% effectiveness.
 
 <div class="breakout">
 <CauseEffectGraph
@@ -422,7 +422,7 @@ The model tracks how frontier compute (currently 10²⁶ FLOP for largest traini
 
 | Component | Current Coverage | Improvement Rate | 2027 Projection | Critical Gap |
 |-----------|------------------|------------------|-----------------|--------------|
-| Interpretability | 15% | +5pp/year | 30% | Need 80% for safety |
+| Interpretability (behavior coverage) | 15% | +5pp/year | 30% | Need 80% for safety |
 | Scalable oversight | 30% | +8pp/year | 54% | Need 90% for superhuman |
 | Deception detection | 20% | +3pp/year | 29% | Need 95% for AGI |
 | Alignment tax | 15% loss | -2pp/year | 9% loss | Target \&lt;5% for adoption |
