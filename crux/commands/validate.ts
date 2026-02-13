@@ -101,13 +101,6 @@ const SCRIPTS = {
 export const commands = buildCommands(SCRIPTS, 'all');
 
 /**
- * List available rules (for unified engine)
- */
-export async function listRules(args: string[], options: Record<string, unknown>) {
-  return commands.unified(args, { ...options, list: true });
-}
-
-/**
  * Get help text for validate domain
  */
 export function getHelp() {

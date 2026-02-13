@@ -27,7 +27,7 @@ import { parseSidebarConfig, type SidebarParseResult } from './sidebar-utils.ts'
 // Types
 // ---------------------------------------------------------------------------
 
-export interface FixSpec {
+interface FixSpec {
   type: string;
   content?: string;
   oldText?: string;
@@ -40,9 +40,9 @@ export interface FixSpec {
   [key: string]: unknown;
 }
 
-export type SidebarConfig = SidebarParseResult;
+type SidebarConfig = SidebarParseResult;
 
-export interface IssueOptions {
+interface IssueOptions {
   rule: string;
   file: string;
   line?: number;
@@ -63,12 +63,12 @@ export interface Rule {
   fix?(content: string, issue: Issue): string | null;
 }
 
-export interface ValidateOptions {
+interface ValidateOptions {
   ruleIds?: string[] | null;
   files?: string[] | null;
 }
 
-export interface FormatOptions {
+interface FormatOptions {
   ci?: boolean;
   verbose?: boolean;
 }

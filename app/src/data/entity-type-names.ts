@@ -18,7 +18,7 @@
  * All canonical (primary) entity type names.
  * These are the "real" types — each represents a distinct entity category.
  */
-export const CANONICAL_ENTITY_TYPE_NAMES = [
+const CANONICAL_ENTITY_TYPE_NAMES = [
   "risk",
   "risk-factor",
   "capability",
@@ -55,7 +55,7 @@ export const CANONICAL_ENTITY_TYPE_NAMES = [
 ] as const;
 
 /** TypeScript type for a canonical entity type name */
-export type CanonicalEntityTypeName = (typeof CANONICAL_ENTITY_TYPE_NAMES)[number];
+type CanonicalEntityTypeName = (typeof CANONICAL_ENTITY_TYPE_NAMES)[number];
 
 // =============================================================================
 // ENTITY TYPE ALIASES (old/alternate names → canonical names)
@@ -83,7 +83,7 @@ export const ENTITY_TYPE_ALIASES: Record<string, CanonicalEntityTypeName> = {
 };
 
 /** All alias type name strings */
-export const ENTITY_TYPE_ALIAS_NAMES = Object.keys(ENTITY_TYPE_ALIASES) as Array<
+const ENTITY_TYPE_ALIAS_NAMES = Object.keys(ENTITY_TYPE_ALIASES) as Array<
   keyof typeof ENTITY_TYPE_ALIASES
 >;
 
@@ -138,16 +138,3 @@ export const OLD_LAB_TYPE_TO_ORG_TYPE: Record<string, string> = {
   "lab-startup": "startup",
 };
 
-// =============================================================================
-// HELPER: Resolve alias to canonical
-// =============================================================================
-
-/**
- * Resolve an entity type name to its canonical form.
- * If the input is already canonical, returns it unchanged.
- * If it's an alias, returns the canonical name.
- * If unknown, returns the input as-is (for forward compatibility).
- */
-export function resolveEntityType(type: string): string {
-  return ENTITY_TYPE_ALIASES[type] ?? type;
-}

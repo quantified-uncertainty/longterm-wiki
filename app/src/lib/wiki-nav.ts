@@ -12,7 +12,7 @@ import { getEntityHref, getAllPages } from "@/data";
 import type { NavSection } from "./internal-nav";
 
 // Re-export NavSection so consumers can import from one place
-export type { NavSection, NavItem } from "./internal-nav";
+export type { NavSection } from "./internal-nav";
 
 // ============================================================================
 // MODEL CATEGORY LABELS
@@ -253,7 +253,7 @@ export function getWikiNav(type: WikiSidebarType): NavSection[] {
 /**
  * Get the sidebar title for a given sidebar type.
  */
-export function getWikiSidebarTitle(type: WikiSidebarType): string {
+function getWikiSidebarTitle(type: WikiSidebarType): string {
   switch (type) {
     case "models":
       return "Reference";

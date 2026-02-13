@@ -189,7 +189,7 @@ function transformSubItems(items?: RawSubItem[]): { label: string; description?:
 let _nodes: Node<CauseEffectNodeData>[] | null = null;
 let _edges: Edge<CauseEffectEdgeData>[] | null = null;
 
-export function getSafetyGeneralizabilityNodes(): Node<CauseEffectNodeData>[] {
+function getSafetyGeneralizabilityNodes(): Node<CauseEffectNodeData>[] {
   if (!_nodes) {
     const rawData = getRawData();
     _nodes = rawData.nodes.map(node => ({
@@ -210,7 +210,7 @@ export function getSafetyGeneralizabilityNodes(): Node<CauseEffectNodeData>[] {
   return _nodes;
 }
 
-export function getSafetyGeneralizabilityEdges(): Edge<CauseEffectEdgeData>[] {
+function getSafetyGeneralizabilityEdges(): Edge<CauseEffectEdgeData>[] {
   if (!_edges) {
     const rawData = getRawData();
     _edges = rawData.edges.map(edge => ({
