@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { getRelatedGraphFor, getPageById, getEntityById } from "@/data";
+import { ENTITY_TYPES } from "@/data/entity-ontology";
 import { getEntityTypeIcon } from "./wiki/EntityTypeIcon";
-import styles from "./wiki/tooltip.module.css";
+import { getTypeLabel, getTypeColor } from "./explore/explore-utils";
+import { EntityLink } from "./wiki/EntityLink";
 import { cn } from "@lib/utils";
 
 // Map entity types to display group names
@@ -33,37 +35,26 @@ const TYPE_TO_GROUP: Record<string, string> = {
   funder: "Funders",
 };
 
-// Entity type → color for the dot indicator
-const TYPE_COLOR: Record<string, string> = {
-  researcher: "bg-blue-400",
-  lab: "bg-violet-400",
-  "lab-academic": "bg-violet-400",
-  "lab-research": "bg-violet-400",
-  organization: "bg-slate-400",
-  "safety-agenda": "bg-emerald-400",
-  approach: "bg-teal-400",
-  risk: "bg-red-400",
-  policy: "bg-amber-400",
-  concept: "bg-sky-400",
-  capability: "bg-sky-400",
-  model: "bg-indigo-400",
-  "ai-transition-model-parameter": "bg-indigo-400",
-  "ai-transition-model-factor": "bg-indigo-400",
-  "ai-transition-model-metric": "bg-indigo-400",
-  "ai-transition-model-scenario": "bg-indigo-400",
-  "ai-transition-model-subitem": "bg-indigo-400",
-  analysis: "bg-orange-400",
-  project: "bg-orange-400",
-  crux: "bg-rose-400",
-  argument: "bg-rose-400",
-  historical: "bg-stone-400",
-  event: "bg-stone-400",
-  parameter: "bg-cyan-400",
-  funder: "bg-lime-400",
+// Representative icon type for each group (used for group headers)
+const GROUP_ICON_TYPE: Record<string, string> = {
+  People: "person",
+  Labs: "organization",
+  Organizations: "organization",
+  "Safety Research": "safety-agenda",
+  Approaches: "approach",
+  Risks: "risk",
+  Policy: "policy",
+  Concepts: "concept",
+  Models: "model",
+  "Transition Model": "parameter",
+  Analysis: "analysis",
+  "Key Debates": "crux",
+  Historical: "historical",
+  Parameters: "parameter",
+  Funders: "funder",
 };
 
 // Preferred group ordering per source entity type.
-// Groups not listed fall back to score-based ordering after the listed ones.
 const GROUP_ORDER_BY_SOURCE_TYPE: Record<string, string[]> = {
   lab: ["People", "Safety Research", "Approaches", "Analysis", "Risks", "Labs", "Policy", "Organizations"],
   "lab-research": ["People", "Safety Research", "Approaches", "Analysis", "Risks", "Labs"],
@@ -78,13 +69,6 @@ const GROUP_ORDER_BY_SOURCE_TYPE: Record<string, string[]> = {
   organization: ["People", "Labs", "Safety Research", "Approaches", "Analysis", "Policy"],
   model: ["Risks", "Approaches", "Safety Research", "Analysis", "People", "Labs", "Models"],
 };
-
-function formatEntityType(type: string): string {
-  return type
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
 
 function truncate(text: string, max: number): string {
   return text.length <= max ? text : text.slice(0, max - 3) + "...";
@@ -128,8 +112,6 @@ function groupByType(
     maxScore: Math.max(...groupItems.map((i) => i.score)),
   }));
 
-  // Context-aware ordering: use preferred order for source type if available,
-  // then fall back to score-based ordering for unlisted groups
   const preferredOrder = sourceType
     ? GROUP_ORDER_BY_SOURCE_TYPE[sourceType]
     : undefined;
@@ -150,114 +132,45 @@ function groupByType(
   return result;
 }
 
-function TypeDot({ type }: { type: string }) {
-  const color = TYPE_COLOR[type] || "bg-gray-400";
-  return <span className={`inline-block w-1.5 h-1.5 rounded-full ${color} shrink-0`} />;
-}
-
-function RelationshipLabel({ label }: { label: string }) {
+function FeaturedItem({ item }: { item: RelatedPageItem }) {
   return (
-    <span className="inline-flex items-center px-1.5 py-0 text-[0.6rem] leading-4 font-medium rounded bg-muted text-muted-foreground shrink-0">
-      {label}
-    </span>
-  );
-}
-
-function ItemTooltip({ item }: { item: RelatedPageItem }) {
-  const entity = getEntityById(item.id);
-  const page = getPageById(item.id);
-  const summary = page?.llmSummary || page?.description || entity?.description;
-  const TypeIcon = entity ? getEntityTypeIcon(entity.type) : null;
-
-  if (!summary && !entity?.type) return null;
-
-  return (
-    <span
-      className={cn(
-        styles.tooltip,
-        "absolute left-0 bottom-full mb-1 z-50 w-[280px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-      )}
-      role="tooltip"
+    <Link
+      href={item.href}
+      className="group block p-4 border border-border rounded-lg hover:border-foreground/30 hover:shadow-sm transition-all no-underline [&_*]:no-underline bg-card"
     >
-      {entity?.type && (
-        <span className="flex items-center gap-1.5 mb-2 text-xs text-muted-foreground">
-          {TypeIcon && <TypeIcon className="w-3 h-3" />}
-          <span className="uppercase tracking-wide">{formatEntityType(entity.type)}</span>
+      <div className="flex items-center justify-between mb-2">
+        <span className={`text-xs font-medium px-2 py-0.5 rounded ${getTypeColor(item.type)}`}>
+          {getTypeLabel(item.type)}
         </span>
-      )}
-      <span className="block font-semibold text-foreground mb-1.5 text-sm">
-        {item.title}
-      </span>
-      {summary && (
-        <span className="block text-muted-foreground text-[0.8rem] leading-snug">
-          {truncate(summary, 200)}
-        </span>
-      )}
-      {page?.quality && (
-        <span className="block mt-2 text-xs text-muted-foreground">
-          Quality: {page.quality}/100
-        </span>
-      )}
-    </span>
-  );
-}
-
-function TopItem({ item }: { item: RelatedPageItem }) {
-  const groupName = TYPE_TO_GROUP[item.type] || "Other";
-  return (
-    <div className={cn(styles.wrapper, "flex items-start gap-2 py-0.5")}>
-      <TypeDot type={item.type} />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <Link
-            href={item.href}
-            className="text-[13px] font-medium text-accent-foreground no-underline hover:underline"
-          >
-            {item.title}
-          </Link>
-          {item.label && <RelationshipLabel label={item.label} />}
-          <span className="text-[0.6rem] text-muted-foreground/60">{groupName}</span>
-        </div>
-        {item.description && (
-          <p className="text-xs text-muted-foreground mt-0 mb-0 leading-snug line-clamp-1">
-            {item.description}
-          </p>
-        )}
       </div>
-      <ItemTooltip item={item} />
-    </div>
+      <h3 className="text-sm font-semibold text-foreground mb-1.5 group-hover:text-accent-foreground">
+        {item.title}
+      </h3>
+      {item.description && item.description !== item.title && (
+        <p className="text-xs text-muted-foreground leading-relaxed mb-0">
+          {truncate(item.description, 150)}
+        </p>
+      )}
+    </Link>
   );
 }
 
 function CompactItem({ item }: { item: RelatedPageItem }) {
-  return (
-    <div className={cn(styles.wrapper, "flex items-center gap-1.5 py-0.5")}>
-      <TypeDot type={item.type} />
-      <Link
-        href={item.href}
-        className="text-[13px] text-accent-foreground no-underline hover:underline truncate"
-      >
-        {item.title}
-      </Link>
-      {item.label && <RelationshipLabel label={item.label} />}
-      <ItemTooltip item={item} />
-    </div>
-  );
-}
-
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <h3 className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">
-      {children}
-    </h3>
-  );
+  return <EntityLink id={item.id} />;
 }
 
 function GroupSection({ group }: { group: TypeGroup }) {
+  const iconType = GROUP_ICON_TYPE[group.label];
+  const Icon = iconType ? getEntityTypeIcon(iconType) : null;
+  const iconColor = iconType ? ENTITY_TYPES[iconType]?.iconColor : undefined;
+
   return (
     <div>
-      <SectionHeading>{group.label}</SectionHeading>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-0">
+      <h3 className="text-[0.65rem] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 mb-2">
+        {Icon && <Icon className={cn("w-4 h-4 opacity-50", iconColor)} />}
+        {group.label}
+      </h3>
+      <div className="flex flex-wrap gap-1.5">
         {group.items.map((item) => (
           <CompactItem key={item.id} item={item} />
         ))}
@@ -273,8 +186,9 @@ export function RelatedPages({
   entityId: string;
   entity?: { type?: string } | null;
 }) {
-  const allItems: RelatedPageItem[] = getRelatedGraphFor(entityId).map(
-    (entry) => {
+  const allItems: RelatedPageItem[] = getRelatedGraphFor(entityId)
+    .filter((entry) => !entry.id.startsWith("__index__"))
+    .map((entry) => {
       const page = getPageById(entry.id);
       const desc =
         page?.structuredSummary?.oneLiner ||
@@ -288,21 +202,16 @@ export function RelatedPages({
         type: entry.type,
         score: entry.score,
         label: entry.label,
-        description: desc
-          ? desc.length > 120
-            ? desc.slice(0, 117) + "..."
-            : desc
-          : undefined,
+        description: desc ? truncate(desc, 150) : undefined,
       };
-    }
-  );
+    });
 
   if (allItems.length === 0) return null;
 
   const sourceType = entity?.type;
   const bounded = allItems.slice(0, MAX_TOTAL);
 
-  // Top items: highest-scored, shown with descriptions
+  // Top items: highest-scored, shown as featured cards
   const topItems = bounded.slice(0, TOP_ITEMS_COUNT);
   const topIds = new Set(topItems.map((i) => i.id));
 
@@ -311,17 +220,22 @@ export function RelatedPages({
   const groups = groupByType(remaining, sourceType);
 
   return (
-    <section className="not-prose mt-10 pt-5 border-t border-border">
-      <SectionHeading>Related Pages</SectionHeading>
-      <div className="mb-3">
+    <section className="not-prose mt-10 pt-6 border-t border-border">
+      <h2 className="text-2xl font-bold text-foreground mb-6">Related Pages</h2>
+      <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">
+        Top Related Pages
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
         {topItems.map((item) => (
-          <TopItem key={item.id} item={item} />
+          <FeaturedItem key={item.id} item={item} />
         ))}
       </div>
       {groups.length > 0 && (
-        <div className="space-y-1.5">
+        <div className="columns-2 lg:columns-3 gap-6">
           {groups.map((group) => (
-            <GroupSection key={group.label} group={group} />
+            <div key={group.label} className="break-inside-avoid mb-8">
+              <GroupSection group={group} />
+            </div>
           ))}
         </div>
       )}

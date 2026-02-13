@@ -63,7 +63,7 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
   risk: {
     label: "Risk",
     icon: Bug,
-    iconColor: "text-amber-600 dark:text-amber-400",
+    iconColor: "text-red-600 dark:text-red-400",
     badgeColor: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
     headerColor: "#dc2626",
   },
