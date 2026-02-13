@@ -90,7 +90,14 @@ function getImportanceColor(value: number): string {
   return "#94a3b8";
 }
 
+const IRREGULAR_PLURALS: Record<string, string> = {
+  Person: "People",
+  person: "People",
+};
+
 function pluralize(label: string): string {
+  if (IRREGULAR_PLURALS[label]) return IRREGULAR_PLURALS[label];
+  if (label.endsWith("sis")) return label.slice(0, -3) + "ses";
   if (label.endsWith("s") || label.endsWith("x") || label.endsWith("sh") || label.endsWith("ch")) return label + "es";
   if (label.endsWith("y") && !/[aeiou]y$/i.test(label)) return label.slice(0, -1) + "ies";
   return label + "s";
@@ -363,31 +370,29 @@ export function InfoBox({
 
       {/* Related Entries */}
       {groupedEntries && sortedTypes.length > 0 && (
-        <div className="px-4 py-3 border-t border-border">
-          <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Related</div>
-          <div className="flex flex-col gap-2">
+        <div className="px-4 py-2 border-t border-border">
+          <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">Related</div>
+          <div className="flex flex-col gap-1.5">
             {sortedTypes.map((t) => {
               const entries = groupedEntries![t]!;
               const config = entityTypeConfig[t as keyof typeof entityTypeConfig];
               return (
-                <div key={t} className="flex flex-col gap-0">
-                  <div className="flex items-center gap-1.5 mb-0.5">
+                <div key={t} className="flex flex-col">
+                  <div className="flex items-center gap-1 mb-0.5">
                     {config && <EntityTypeIcon type={t} size="xs" />}
-                    <span className="text-muted-foreground font-medium text-[0.7rem] uppercase tracking-tight">
+                    <span className="text-muted-foreground font-medium text-[0.65rem] uppercase tracking-tight">
                       {pluralize(getEntityTypeLabel(t))}
                     </span>
                   </div>
-                  <ul className="list-none m-0 p-0 pl-[1.125rem] flex flex-col gap-0.5">
+                  <div className="pl-[1.125rem] flex flex-wrap gap-1">
                     {entries.map((entry, i) => (
-                      <li key={i} className="list-none m-0 p-0 leading-snug">
-                        {entry.id ? (
-                          <EntityLink id={entry.id} className="text-xs">{entry.title}</EntityLink>
-                        ) : (
-                          <Link href={entry.href} className="text-accent-foreground no-underline hover:underline">{entry.title}</Link>
-                        )}
-                      </li>
+                      entry.id ? (
+                        <EntityLink key={i} id={entry.id} className="text-xs">{entry.title}</EntityLink>
+                      ) : (
+                        <Link key={i} href={entry.href} className="inline-flex items-center px-2 py-0.5 bg-muted rounded text-xs text-accent-foreground no-underline transition-colors hover:bg-muted/80">{entry.title}</Link>
+                      )
                     ))}
-                  </ul>
+                  </div>
                 </div>
               );
             })}
