@@ -2832,7 +2832,70 @@
     information in outputs to enable covert coordination or evade oversight.
     GPT-4 class models encode 3-5 bits/KB with under 30% human detection rates.
     NeurIPS 2024 research achieved information-theoretically undetectable
-    channels; LASR 
+    channels; LASR
   clusters:
     - ai-safety
+  lastUpdated: 2026-02
+
+- id: ai-enabled-untraceable-misuse
+  numericId: E691
+  type: risk
+  title: AI-Enabled Untraceable Misuse
+  description: >-
+    AI systems simultaneously amplify harmful capabilities and obscure
+    attribution, enabling bad actors to conduct spam campaigns, political
+    manipulation, synthetic identity fraud, and coordinated harassment with
+    reduced risk of identification. This dual amplification creates a
+    self-reinforcing cycle where greater capability enables more autonomous
+    agents, more attribution ambiguity, reduced deterrence, and further misuse.
+  severity: high
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Growing
+  customFields:
+    - label: Status
+      value: Actively occurring across multiple domains
+    - label: Key Risk
+      value: Simultaneous capability amplification and attribution defeat
+  relatedEntries:
+    - id: fraud
+      type: risk
+    - id: disinformation
+      type: risk
+    - id: deepfakes
+      type: risk
+    - id: cyberweapons
+      type: risk
+    - id: authentication-collapse
+      type: risk
+    - id: trust-cascade
+      type: risk
+    - id: dual-use
+      type: concept
+    - id: proliferation
+      type: risk
+  sources:
+    - title: Four Responsibility Gaps with Artificial Intelligence
+      url: https://link.springer.com/article/10.1007/s13347-021-00450-x
+      author: Santoni de Sio & Mecacci
+      date: '2021'
+    - title: The Malicious Use of Artificial Intelligence
+      url: https://arxiv.org/abs/1802.07228
+      author: Brundage et al.
+      date: '2018'
+    - title: Generative Language Models and Automated Influence Operations
+      url: https://arxiv.org/abs/2301.04246
+      author: Goldstein et al.
+      date: '2023'
+    - title: Practices for Governing Agentic AI Systems
+      url: https://cdn.openai.com/papers/practices-for-governing-agentic-ai-systems.pdf
+      author: Shavit & Agarwal
+      date: '2023'
+  clusters:
+    - cyber
+    - ai-safety
+    - governance
   lastUpdated: 2026-02

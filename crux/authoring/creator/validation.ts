@@ -137,8 +137,7 @@ Read the draft article at: ${draftPath}
 Keep iterating until ALL checks pass. Run validation again after each fix.`;
 
   return new Promise((resolve, reject) => {
-    const claude = spawn('npx', [
-      '@anthropic-ai/claude-code',
+    const claude = spawn('claude', [
       '-p',
       '--print',
       '--dangerously-skip-permissions',
