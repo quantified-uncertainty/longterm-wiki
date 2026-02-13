@@ -13,11 +13,6 @@ ratings:
   rigor: 6.5
   actionability: 7.5
   completeness: 7
-metrics:
-  wordCount: 1425
-  citations: 53
-  tables: 40
-  diagrams: 2
 clusters:
   - ai-safety
   - governance
@@ -32,9 +27,9 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Effectiveness** | High (70-90% risk reduction for targeted threats) | [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec05-bp01.html) rates lack of least privilege implementation as "High" risk; <EntityLink id="metr">METR</EntityLink> evaluations show properly sandboxed agents have substantially reduced attack surface |
+| **Effectiveness** | High (70-90% risk reduction for targeted threats) | [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/gensec05-bp01.html) rates lack of least privilege implementation as "High" risk; <EntityLink id="E201">METR</EntityLink> evaluations show properly sandboxed agents have substantially reduced attack surface |
 | **Implementation Maturity** | Medium (fragmented across providers) | Over 13,000 MCP servers on GitHub in 2025 alone; [UK AISI Inspect toolkit](https://www.aisi.gov.uk/blog/the-inspect-sandboxing-toolkit-scalable-and-secure-ai-agent-evaluations) now used by governments, companies, and academics worldwide |
-| **Adoption Rate** | Growing rapidly (97M+ monthly SDK downloads for MCP) | [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-11-25) backed by <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, Google, Microsoft; donated to Linux Foundation December 2025 |
+| **Adoption Rate** | Growing rapidly (97M+ monthly SDK downloads for MCP) | [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-11-25) backed by <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, Google, Microsoft; donated to Linux Foundation December 2025 |
 | **Vulnerability Surface** | High (9.4 CVSS critical vulnerabilities found) | [CVE-2025-49596](https://www.oligo.security/blog/critical-rce-vulnerability-in-anthropic-mcp-inspector-cve-2025-49596) in MCP Inspector enables browser-based RCE; hundreds of "NeighborJack" vulnerabilities discovered across 7,000+ MCP servers |
 | **Bypass Difficulty** | Medium-Low (35% of incidents from simple prompts) | [Obsidian Security](https://www.obsidiansecurity.com/blog/prompt-injection) reports 35% of AI security incidents caused by prompt injection, some leading to \$100K+ losses |
 | **Defense-in-Depth Value** | Critical (no single control sufficient) | [UK AISI](https://github.com/UKGovernmentBEIS/aisi-sandboxing) emphasizes container isolation alone insufficient; requires OS primitives, hardware virtualization, and network segmentation combined |
@@ -42,7 +37,7 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 ## Overview
 
-Tool-use restrictions are among the most direct and effective safety measures for <EntityLink id="agentic-ai">agentic AI</EntityLink> systems. Rather than trying to shape model behavior through training, restrictions simply remove access to dangerous capabilities. An AI agent without access to code execution cannot deploy malware; one without financial API access cannot make unauthorized purchases; one without email access cannot conduct phishing campaigns. These hard limits provide guarantees that behavioral training cannot.
+Tool-use restrictions are among the most direct and effective safety measures for <EntityLink id="E2">agentic AI</EntityLink> systems. Rather than trying to shape model behavior through training, restrictions simply remove access to dangerous capabilities. An AI agent without access to code execution cannot deploy malware; one without financial API access cannot make unauthorized purchases; one without email access cannot conduct phishing campaigns. These hard limits provide guarantees that behavioral training cannot.
 
 The approach is especially important given the rapid expansion of AI agent capabilities. Systems like Claude Computer Use, OpenAI's function calling, and various autonomous agents are gaining access to browsers, file systems, code execution, and external APIs. Each new tool represents both capability expansion and risk surface expansion. Tool restrictions create a deliberate friction that forces explicit decisions about what capabilities are necessary and appropriate for a given deployment context.
 
@@ -455,8 +450,8 @@ Tool restrictions affect the <EntityLink id="ai-transition-model" /> through mul
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="misuse-potential" /> | Directly limits harmful capabilities |
-| <EntityLink id="misalignment-potential" /> | Constrains damage from misaligned behavior |
-| <EntityLink id="human-oversight-quality" /> | Creates explicit checkpoints for human control |
+| <EntityLink id="E207" /> | Directly limits harmful capabilities |
+| <EntityLink id="E205" /> | Constrains damage from misaligned behavior |
+| <EntityLink id="E160" /> | Creates explicit checkpoints for human control |
 
 Tool restrictions are among the most tractable near-term interventions for AI safety. They provide hard guarantees that don't depend on model alignment, making them especially valuable during the current period of uncertainty about model motivations and capabilities.

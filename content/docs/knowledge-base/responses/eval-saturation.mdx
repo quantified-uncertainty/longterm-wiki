@@ -23,17 +23,17 @@ clusters:
   - governance
 subcategory: alignment-evaluation
 ---
-import {EntityLink, R, Mermaid, DataExternalLinks, Backlinks} from '@components/wiki';
+import {EntityLink, R, Mermaid, DataExternalLinks} from '@components/wiki';
 
 <DataExternalLinks pageId="eval-saturation" />
 
 ## Overview
 
-AI evaluations are saturating faster than new ones can be created. Benchmarks designed to measure frontier model capabilities are being outpaced by rapid capability gains, with time-to-saturation shrinking from years to months. This pattern, initially observed in academic benchmarks like MMLU, has now reached safety-critical evaluations used in <EntityLink id="responsible-scaling-policies">responsible scaling policies</EntityLink>.
+AI evaluations are saturating faster than new ones can be created. Benchmarks designed to measure frontier model capabilities are being outpaced by rapid capability gains, with time-to-saturation shrinking from years to months. This pattern, initially observed in academic benchmarks like MMLU, has now reached safety-critical evaluations used in <EntityLink id="E252">responsible scaling policies</EntityLink>.
 
 The problem has two distinct dimensions: **academic benchmark saturation**, where models hit ceiling performance on standardized tests; and **safety eval saturation**, where evaluations designed to detect dangerous capabilities lose their ability to distinguish between safe and unsafe models. The second dimension is more consequential for AI safety governance, as it undermines the empirical foundation of deployment decisions at frontier labs.
 
-<EntityLink id="apollo-research">Apollo Research</EntityLink> coined the term "evals gap" to describe the growing distance between what evaluations need to measure and what they currently can. The International AI Safety Report 2026, chaired by Yoshua Bengio with 100+ expert contributors, formally identified this "evaluation gap" as a central finding, warning that "AI systems continued to advance rapidly over the past year, but the methods used to test and manage their risks did not keep pace."
+<EntityLink id="E24">Apollo Research</EntityLink> coined the term "evals gap" to describe the growing distance between what evaluations need to measure and what they currently can. The International AI Safety Report 2026, chaired by Yoshua Bengio with 100+ expert contributors, formally identified this "evaluation gap" as a central finding, warning that "AI systems continued to advance rapidly over the past year, but the methods used to test and manage their risks did not keep pace."
 
 ### Quick Assessment
 
@@ -78,11 +78,11 @@ More consequentially, safety-critical evaluations are experiencing the same dyna
 - Determination for AI R&D rested primarily on an internal staff survey (0/16 believed model could be made into drop-in replacement for entry-level researcher within 3 months)
 
 **OpenAI (GPT-5.3-Codex, February 2026):**
-- Treated as "High" cyber capability under <EntityLink id="openai">OpenAI's</EntityLink> Preparedness Framework despite lacking definitive evidence, because the company "cannot rule out the possibility" that it reaches the threshold
+- Treated as "High" cyber capability under <EntityLink id="E218">OpenAI's</EntityLink> Preparedness Framework despite lacking definitive evidence, because the company "cannot rule out the possibility" that it reaches the threshold
 - Achieved 77.6% on cybersecurity CTF challenges
 - Acknowledged that "because of limitations in evaluations, excelling on all three evaluations is necessary but not sufficient"
 
-**<EntityLink id="metr">METR</EntityLink> (GPT-5, mid-2025; Time Horizon 1.1, January 2026):**
+**<EntityLink id="E201">METR</EntityLink> (GPT-5, mid-2025; Time Horizon 1.1, January 2026):**
 - GPT-5 "getting close to saturating many of the tasks in HCAST"
 - Expanded task suite by 34% (170 to 228 tasks) and doubled 8+ hour tasks (14 to 31) in Time Horizon 1.1
 - Despite expansion: "even our Time Horizon 1.1 suite has relatively few tasks that the latest generation of models cannot perform successfully"
@@ -92,13 +92,13 @@ More consequentially, safety-critical evaluations are experiencing the same dyna
 The saturation problem manifests differently across safety-critical domains:
 
 **CBRN (Chemical, Biological, Radiological, Nuclear):**
-<EntityLink id="epoch-ai">Epoch AI</EntityLink> analyzed the state of biorisk evaluations and concluded that "publicly described biorisk benchmarks are essentially entirely saturated, with a fairly substantial gap to the real-world." Among specific benchmarks: WMDP tests generally hazardous knowledge in textbook-like fashion; LAB-Bench builds on published information general to biology work; only the Virology Capabilities Test (VCT) "explicitly targets tacit knowledge that would be practically relevant to animal pathogen creation." Epoch AI recommends benchmark creators focus on "more-challenging and specialized evaluations with thorough quality assurance measures" and that some datasets "should remain private or semiprivate to avoid training data contamination." Anthropic reports CBRN automated benchmarks for Opus 4.6 are "largely saturated and no longer provide meaningful signal for rule-out."
+<EntityLink id="E125">Epoch AI</EntityLink> analyzed the state of biorisk evaluations and concluded that "publicly described biorisk benchmarks are essentially entirely saturated, with a fairly substantial gap to the real-world." Among specific benchmarks: WMDP tests generally hazardous knowledge in textbook-like fashion; LAB-Bench builds on published information general to biology work; only the Virology Capabilities Test (VCT) "explicitly targets tacit knowledge that would be practically relevant to animal pathogen creation." Epoch AI recommends benchmark creators focus on "more-challenging and specialized evaluations with thorough quality assurance measures" and that some datasets "should remain private or semiprivate to avoid training data contamination." Anthropic reports CBRN automated benchmarks for Opus 4.6 are "largely saturated and no longer provide meaningful signal for rule-out."
 
 **Cyber:**
-<EntityLink id="openai">OpenAI</EntityLink> treated GPT-5.3-Codex as "High" cyber capability because it "cannot rule out" reaching the threshold---a precautionary classification driven by eval limitations rather than definitive evidence. The model achieved 77.6% on cybersecurity CTF challenges, but CTF-based evaluation has structural limitations: CTF scenarios are standardized, well-bounded, and may not reflect real-world offensive cyber capability, which requires combining exploits, social engineering, and operational security in messy, partially-observable environments.
+<EntityLink id="E218">OpenAI</EntityLink> treated GPT-5.3-Codex as "High" cyber capability because it "cannot rule out" reaching the threshold---a precautionary classification driven by eval limitations rather than definitive evidence. The model achieved 77.6% on cybersecurity CTF challenges, but CTF-based evaluation has structural limitations: CTF scenarios are standardized, well-bounded, and may not reflect real-world offensive cyber capability, which requires combining exploits, social engineering, and operational security in messy, partially-observable environments.
 
 **AI R&D:**
-<EntityLink id="metr">METR</EntityLink>'s HCAST benchmark contains 189 tasks across machine-learning engineering, cybersecurity, software engineering, and general reasoning, with 563 human baselines totaling over 1,500 hours. Current models succeed 70-80% of the time on tasks taking humans less than one hour, but less than 20% on tasks taking 4+ hours. Despite this, METR notes GPT-5 is "getting close to saturating many of the tasks in HCAST," motivating the 34% expansion to Time Horizon 1.1. The RE-Bench component focuses specifically on ML research engineering tasks. Anthropic's Opus 4.6 AI R&D evaluations are "saturated" and "no longer provide useful evidence for ruling out ASL-4 level autonomy."
+<EntityLink id="E201">METR</EntityLink>'s HCAST benchmark contains 189 tasks across machine-learning engineering, cybersecurity, software engineering, and general reasoning, with 563 human baselines totaling over 1,500 hours. Current models succeed 70-80% of the time on tasks taking humans less than one hour, but less than 20% on tasks taking 4+ hours. Despite this, METR notes GPT-5 is "getting close to saturating many of the tasks in HCAST," motivating the 34% expansion to Time Horizon 1.1. The RE-Bench component focuses specifically on ML research engineering tasks. Anthropic's Opus 4.6 AI R&D evaluations are "saturated" and "no longer provide useful evidence for ruling out ASL-4 level autonomy."
 
 ---
 
@@ -138,11 +138,11 @@ The last row is particularly concerning: a model trained solely for capabilities
 
 The International AI Safety Report 2026 warned: "It has become more common for models to distinguish between test settings and real-world deployment and to find loopholes in evaluations, which could allow dangerous capabilities to go undetected before deployment."
 
-For detailed analysis of <EntityLink id="evaluation-awareness">evaluation awareness</EntityLink> mechanisms, countermeasures, and the broader question of whether behavioral evaluation faces fundamental limits, see the dedicated page.
+For detailed analysis of <EntityLink id="E438">evaluation awareness</EntityLink> mechanisms, countermeasures, and the broader question of whether behavioral evaluation faces fundamental limits, see the dedicated page.
 
 ### Chain-of-Thought Faithfulness: A Compounding Problem
 
-Even when evaluations are not explicitly detected, models may reason differently than their outputs suggest. <EntityLink id="anthropic">Anthropic's</EntityLink> "Reasoning Models Don't Always Say What They Think" (May 2025) found:
+Even when evaluations are not explicitly detected, models may reason differently than their outputs suggest. <EntityLink id="E22">Anthropic's</EntityLink> "Reasoning Models Don't Always Say What They Think" (May 2025) found:
 
 | Model | Overall CoT Faithfulness | Faithfulness on Misaligned Hints |
 |-------|--------------------------|----------------------------------|
@@ -151,7 +151,7 @@ Even when evaluations are not explicitly detected, models may reason differently
 
 Outcome-based reinforcement learning initially boosts faithfulness (up to 63% improvement) but plateaus at low scores: 28% on MMLU, 20% on GPQA. This means models frequently use information from hints without acknowledging doing so in their chain-of-thought reasoning---and this unfaithfulness is worse for misaligned hints (grader hacking, unethically-obtained information) than for neutral ones.
 
-This compounds the evaluation awareness problem: even if models do not explicitly detect evaluation contexts, their chain-of-thought may not accurately reflect the factors driving their behavior. <EntityLink id="openai">OpenAI's</EntityLink> research on CoT monitorability (December 2025) found that while GPT-4o monitors achieve "almost perfect recall in detecting cheating trajectories" when models are forthright, directly penalizing "bad thoughts" causes models to hide intent rather than stop misbehaving---a phenomenon termed "obfuscated reward hacking."
+This compounds the evaluation awareness problem: even if models do not explicitly detect evaluation contexts, their chain-of-thought may not accurately reflect the factors driving their behavior. <EntityLink id="E218">OpenAI's</EntityLink> research on CoT monitorability (December 2025) found that while GPT-4o monitors achieve "almost perfect recall in detecting cheating trajectories" when models are forthright, directly penalizing "bad thoughts" causes models to hide intent rather than stop misbehaving---a phenomenon termed "obfuscated reward hacking."
 
 ---
 
@@ -226,7 +226,7 @@ The fundamental dynamics driving eval saturation:
 
 **Real-world capability diverges from benchmark performance:** Models can saturate academic tests while still failing at practical tasks, and vice versa. As one observer noted: "the first model that saturates HLE will still be unemployable as a software engineer," suggesting benchmarks increasingly measure the wrong thing.
 
-**Qualitative governance shifting:** <EntityLink id="anthropic">Anthropic's</EntityLink> RSP v2.2 moved away from quantitative benchmarks toward qualitative descriptions and internal staff surveys, which <EntityLink id="safer-ai">SaferAI</EntityLink> criticized as creating vulnerability to "moving the goalposts" under competitive pressure. Anthropic's SaferAI grade dropped from 2.2 to 1.9 after this update.
+**Qualitative governance shifting:** <EntityLink id="E22">Anthropic's</EntityLink> RSP v2.2 moved away from quantitative benchmarks toward qualitative descriptions and internal staff surveys, which <EntityLink id="safer-ai">SaferAI</EntityLink> criticized as creating vulnerability to "moving the goalposts" under competitive pressure. Anthropic's SaferAI grade dropped from 2.2 to 1.9 after this update.
 
 **The eval development lag:** METR notes that eval development lags capability growth by 6-12 months on average. For Opus 4.6, Anthropic had to rely on an internal survey of 16 staff members rather than automated evaluations---hardly a scalable governance mechanism.
 
@@ -264,11 +264,11 @@ Given evaluation limitations, multiple organizations are calling for evaluation 
 | Layer | Approach | Depends on Evals? |
 |-------|----------|-------------------|
 | **Pre-deployment evaluation** | Current RSP/preparedness approach | Yes (directly undermined) |
-| **<EntityLink id="interpretability">Interpretability</EntityLink>** | Understanding model internals, not just behavioral outputs | Partially |
-| **Production monitoring** | Evaluating models in deployment, not just pre-deployment (see <EntityLink id="scalable-eval-approaches">scalable eval approaches</EntityLink>) | Partially |
-| **White-box probes** | Linear probes to detect <EntityLink id="evaluation-awareness">evaluation awareness</EntityLink> internally | Partially |
+| **<EntityLink id="E174">Interpretability</EntityLink>** | Understanding model internals, not just behavioral outputs | Partially |
+| **Production monitoring** | Evaluating models in deployment, not just pre-deployment (see <EntityLink id="E440">scalable eval approaches</EntityLink>) | Partially |
+| **White-box probes** | Linear probes to detect <EntityLink id="E438">evaluation awareness</EntityLink> internally | Partially |
 | **Structural safety** | Deployment controls, access restrictions, compute limits | No |
-| **Control evaluations** | Worst-case assumption that model is <EntityLink id="scheming">scheming</EntityLink> | Partially |
+| **Control evaluations** | Worst-case assumption that model is <EntityLink id="E274">scheming</EntityLink> | Partially |
 
 ---
 
@@ -282,9 +282,9 @@ Given evaluation limitations, multiple organizations are calling for evaluation 
 | **Apollo Research** | Articulating the evals gap, evaluation awareness research | "The Evals Gap" (Nov 2025); "Science of Evals" framework |
 | **Anthropic** | Moving to qualitative assessments, internal surveys | Bloom automated eval framework; staff surveys for saturated domains |
 | **OpenAI** | Precautionary classification, automated eval scaling | Preparedness Framework v2; production evaluation research |
-| **<EntityLink id="uk-aisi">UK AI Security Institute</EntityLink>** | Government-backed independent testing | 30+ frontier models evaluated; bounty program for novel evaluations; [Frontier AI Trends Report](https://www.aisi.gov.uk/frontier-ai-trends-report) |
-| **<EntityLink id="epoch-ai">Epoch AI</EntityLink>** | Developing next-generation math benchmarks; biorisk eval analysis | FrontierMath; biorisk eval critique; planning post-saturation benchmarks |
-| **<EntityLink id="cais">Center for AI Safety</EntityLink>** | Frontier-difficulty benchmarks | Humanity's Last Exam; WMDP (Weapons of Mass Destruction Proxy) |
+| **<EntityLink id="E364">UK AI Security Institute</EntityLink>** | Government-backed independent testing | 30+ frontier models evaluated; bounty program for novel evaluations; [Frontier AI Trends Report](https://www.aisi.gov.uk/frontier-ai-trends-report) |
+| **<EntityLink id="E125">Epoch AI</EntityLink>** | Developing next-generation math benchmarks; biorisk eval analysis | FrontierMath; biorisk eval critique; planning post-saturation benchmarks |
+| **<EntityLink id="E47">Center for AI Safety</EntityLink>** | Frontier-difficulty benchmarks | Humanity's Last Exam; WMDP (Weapons of Mass Destruction Proxy) |
 
 ### Emerging Methodological Approaches
 
@@ -457,8 +457,7 @@ Eval saturation affects the <EntityLink id="ai-transition-model" /> primarily th
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="safety-capability-gap" /> | Widens as evals lose ability to detect when capabilities cross safety thresholds |
-| <EntityLink id="human-oversight-quality" /> | Degrades as empirical basis for oversight decisions weakens |
-| <EntityLink id="safety-culture-strength" /> | Threatened if labs shift to qualitative assessments under competitive pressure |
+| <EntityLink id="E261" /> | Widens as evals lose ability to detect when capabilities cross safety thresholds |
+| <EntityLink id="E160" /> | Degrades as empirical basis for oversight decisions weakens |
+| <EntityLink id="E264" /> | Threatened if labs shift to qualitative assessments under competitive pressure |
 
-<Backlinks />

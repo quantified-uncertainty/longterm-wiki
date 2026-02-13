@@ -1,4 +1,5 @@
 - id: "tmc-state-actor"
+  numericId: E349
   type: "ai-transition-model-subitem"
   title: "State-Caused Catastrophe"
   parentFactor: "human-catastrophe"
@@ -451,6 +452,7 @@
 
           - Future of Life Institute — Work on lethal autonomous weapons\n"
 - id: "tmc-rogue-actor"
+  numericId: E343
   type: "ai-transition-model-subitem"
   title: "Rogue Actor Catastrophe"
   parentFactor: "human-catastrophe"

@@ -10,11 +10,6 @@ ratings:
   rigor: 0
   actionability: 0
   completeness: 0
-metrics:
-  wordCount: 1005
-  citations: 2
-  tables: 30
-  diagrams: 1
 ---
 # Key Parameters Implementation Strategy
 
@@ -92,7 +87,7 @@ quality: 4
 llmSummary: "2-3 sentence summary for AI context. Include key statistics and the main factors that increase/decrease this parameter."
 lastEdited: "2025-12-28"
 ---
-import {DataInfoBox, Backlinks, Mermaid, R} from '@components/wiki';
+import {DataInfoBox, Mermaid, R} from '@components/wiki';
 
 <DataInfoBox entityId="parameter-id-here" />
 
@@ -223,24 +218,11 @@ flowchart TD
 - Point 1
 - Point 2
 
----
-
-## Related Pages
-
-### Related Risk
-- [Risk Name](/knowledge-base/risks/category/risk-page/) — Describes threats to this parameter
-
-### Related Interventions
-- [Intervention](/knowledge-base/responses/category/intervention/)
-
----
-
 ## Sources & Key Research
 
 ### Category 1
 - <R id="resource-id">Source name</R>
 
-<Backlinks entityId="parameter-id-here" />
 ```
 
 ### Step 4: Validate

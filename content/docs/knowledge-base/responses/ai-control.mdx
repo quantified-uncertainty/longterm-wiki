@@ -13,21 +13,16 @@ ratings:
   rigor: 7
   actionability: 7
   completeness: 8
-metrics:
-  wordCount: 1600
-  citations: 21
-  tables: 14
-  diagrams: 1
 clusters:
   - ai-safety
   - governance
 subcategory: alignment-deployment
 ---
-import {DataInfoBox, KeyPeople, Section, Backlinks, DisagreementMap, KeyQuestions, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+import {DataInfoBox, KeyPeople, Section, DisagreementMap, KeyQuestions, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
 <DataExternalLinks pageId="ai-control" />
 
-<DataInfoBox entityId="ai-control" />
+<DataInfoBox entityId="E6" />
 
 ## Quick Assessment
 
@@ -37,14 +32,14 @@ import {DataInfoBox, KeyPeople, Section, Backlinks, DisagreementMap, KeyQuestion
 | **Scalability** | Medium | Effective for current and near-future models; uncertain beyond 10x human-level capability |
 | **Current Maturity** | Medium | Active research with [empirical results](https://arxiv.org/abs/2312.06942); pilot deployments underway |
 | **Time Horizon** | 1-5 years | Practical for near-term deployment; may not scale to superintelligent systems |
-| **Key Proponents** | <EntityLink id="redwood-research" />, <EntityLink id="arc" /> | [ICML 2024 paper](https://proceedings.mlr.press/v235/greenblatt24a.html) established methodology |
+| **Key Proponents** | <EntityLink id="E557" />, <EntityLink id="E25" /> | [ICML 2024 paper](https://proceedings.mlr.press/v235/greenblatt24a.html) established methodology |
 | **Investment Level** | \$6.5-11M/year | Growing from near-zero in 2021; [UK AISI](https://alignmentproject.aisi.gov.uk/) provides £15M+ globally |
 
 ## Overview
 
 AI Control represents a paradigm shift in AI safety research, abandoning the assumption that alignment will succeed and instead asking: "How can we safely deploy AI systems that might actively work against us?" This defensive approach focuses on maintaining safety through external constraints rather than trusting AI intentions. Unlike traditional alignment research that seeks to make AI systems want to do the right thing, control methods assume potential adversarial behavior and design protocols to detect, contain, and mitigate harmful actions.
 
-The approach emerged from growing recognition that alignment may prove intractable within the timelines of AI development. The foundational paper ["AI Control: Improving Safety Despite Intentional Subversion"](https://arxiv.org/abs/2312.06942) by Greenblatt, Shlegeris, Sachan, and Roger (published at [ICML 2024](https://proceedings.mlr.press/v235/greenblatt24a.html)) established the methodology and demonstrated that control protocols could achieve 80-95% detection rates against GPT-4 level models attempting to insert backdoors. Research led primarily by <EntityLink id="redwood-research" /> suggests this approach could reduce catastrophic risks by 40-60% if alignment efforts fail, while maintaining 70-85% tractability for AI systems up to roughly human-level capability. The core insight separates two historically conflated problems: ensuring AI systems pursue intended goals (alignment) versus ensuring safety regardless of AI intentions (control).
+The approach emerged from growing recognition that alignment may prove intractable within the timelines of AI development. The foundational paper ["AI Control: Improving Safety Despite Intentional Subversion"](https://arxiv.org/abs/2312.06942) by Greenblatt, Shlegeris, Sachan, and Roger (published at [ICML 2024](https://proceedings.mlr.press/v235/greenblatt24a.html)) established the methodology and demonstrated that control protocols could achieve 80-95% detection rates against GPT-4 level models attempting to insert backdoors. Research led primarily by <EntityLink id="E557" /> suggests this approach could reduce catastrophic risks by 40-60% if alignment efforts fail, while maintaining 70-85% tractability for AI systems up to roughly human-level capability. The core insight separates two historically conflated problems: ensuring AI systems pursue intended goals (alignment) versus ensuring safety regardless of AI intentions (control).
 
 This distinction enables concrete progress on safety measures that can be empirically tested and iteratively improved, providing a more immediate and testable path to AI safety than purely theoretical alignment approaches. The methodology has gained traction among safety researchers as a practical bridge during the transition period to advanced AI systems.
 
@@ -117,7 +112,7 @@ Key monitoring innovations include:
 - **Behavioral anomaly detection**: Statistical analysis identifying deviations from expected behavior patterns
 - **Cross-system verification**: Multiple AI monitors with diverse architectures checking each other
 - **Human oversight integration**: Automated flagging systems directing human attention to highest-risk decisions
-- **Interpretability-enhanced monitoring**: Leveraging <EntityLink id="interpretability" /> tools to detect internal misalignment
+- **Interpretability-enhanced monitoring**: Leveraging <EntityLink id="E174" /> tools to detect internal misalignment
 
 ### Containment Strategy Evolution
 
@@ -146,9 +141,9 @@ Recent empirical work has focused on testing control protocols against increasin
 
 Several organizations have begun implementing control-inspired approaches in limited production environments:
 
-- **<EntityLink id="openai" />**: 2024 deployment protocols include monitoring elements for high-stakes applications
-- **<EntityLink id="anthropic" />**: Constitutional AI methods incorporate containment principles
-- **<EntityLink id="deepmind" />**: Safety-by-design approaches align with control methodology
+- **<EntityLink id="E218" />**: 2024 deployment protocols include monitoring elements for high-stakes applications
+- **<EntityLink id="E22" />**: Constitutional AI methods incorporate containment principles
+- **<EntityLink id="E98" />**: Safety-by-design approaches align with control methodology
 
 These early implementations show promise but operate at limited scale and capability levels compared to the challenges anticipated for human-level AI systems.
 
@@ -164,7 +159,7 @@ These early implementations show promise but operate at limited scale and capabi
 | **Government/Military** | \$0.5-1M | 2-5 | Applications research |
 | **Total** | \$6.5-11M | 25-40 | Diverse approaches |
 
-The field has grown from near-zero investment in 2021 to current levels, representing significant momentum but still a fraction of overall AI safety funding. The [UK AI Security Institute's Alignment Project](https://alignmentproject.aisi.gov.uk/) now provides over £15 million globally for control and alignment research, supported by an international coalition including Canadian AISI, Schmidt Sciences, and AWS. <EntityLink id="miri" />, traditionally focused on alignment, has begun exploring control-adjacent approaches, while newer organizations like <EntityLink id="arc" /> integrate control concepts into their research agendas.
+The field has grown from near-zero investment in 2021 to current levels, representing significant momentum but still a fraction of overall AI safety funding. The [UK AI Security Institute's Alignment Project](https://alignmentproject.aisi.gov.uk/) now provides over £15 million globally for control and alignment research, supported by an international coalition including Canadian AISI, Schmidt Sciences, and AWS. <EntityLink id="E202" />, traditionally focused on alignment, has begun exploring control-adjacent approaches, while newer organizations like <EntityLink id="E25" /> integrate control concepts into their research agendas.
 
 ### Technical Challenges and Bottlenecks
 
@@ -178,7 +173,7 @@ Current research faces several immediate technical obstacles requiring resolutio
 | **Adversarial Sophistication** | High | Critical | Ongoing |
 | **Integration Complexity** | Medium | Important | 2-4 years |
 
-Human oversight represents perhaps the most immediate practical bottleneck. Individual reviewers can process only 100-500 flagged actions per hour, creating fundamental scaling limitations. Research into automated oversight and <EntityLink id="scalable-oversight" /> methods offers potential solutions but remains immature.
+Human oversight represents perhaps the most immediate practical bottleneck. Individual reviewers can process only 100-500 flagged actions per hour, creating fundamental scaling limitations. Research into automated oversight and <EntityLink id="E271" /> methods offers potential solutions but remains immature.
 
 ## Trajectory and Future Development
 
@@ -202,7 +197,7 @@ The critical test period for AI Control approaches will likely occur within this
 | **Capability Scaling** | 50-70% | AI development pace | Fundamental scaling limits |
 | **Safety Demonstration** | 60-75% | Empirical validation | Real-world complexity |
 
-<EntityLink id="governance-policy" /> developments may significantly accelerate adoption. The EU AI Act and similar legislation increasingly mandate monitoring and containment measures for high-risk AI applications, potentially driving rapid practical deployment and iteration of these methods.
+<EntityLink id="E154" /> developments may significantly accelerate adoption. The EU AI Act and similar legislation increasingly mandate monitoring and containment measures for high-risk AI applications, potentially driving rapid practical deployment and iteration of these methods.
 
 ### Long-Term Uncertainties (5-10 Years)
 
@@ -268,11 +263,11 @@ AI Control provides defense-in-depth against failure modes where alignment techn
 
 | Risk | Relevance | How It Helps | Evidence |
 |------|-----------|--------------|----------|
-| <EntityLink id="deceptive-alignment" /> | **High** | Behavioral monitoring catches deceptive actions regardless of model intent | [Alignment faking paper](https://arxiv.org/abs/2412.14093) shows models can strategically fake compliance |
-| <EntityLink id="scheming" /> | **High** | Redundant monitoring and human oversight prevent undetected coordination | Control evaluations specifically test against scheming models |
-| <EntityLink id="mesa-optimization" /> | **Medium-High** | Containment limits damage from emergent inner optimizers | Does not prevent formation but limits consequences |
-| <EntityLink id="goal-misgeneralization" /> | **Medium** | Anomaly detection identifies out-of-distribution behavior | Subtle generalization errors remain difficult to detect |
-| <EntityLink id="power-seeking" /> | **Medium** | Capability restrictions and sandboxing limit resource acquisition | May delay rather than prevent determined power-seeking |
+| <EntityLink id="E93" /> | **High** | Behavioral monitoring catches deceptive actions regardless of model intent | [Alignment faking paper](https://arxiv.org/abs/2412.14093) shows models can strategically fake compliance |
+| <EntityLink id="E274" /> | **High** | Redundant monitoring and human oversight prevent undetected coordination | Control evaluations specifically test against scheming models |
+| <EntityLink id="E197" /> | **Medium-High** | Containment limits damage from emergent inner optimizers | Does not prevent formation but limits consequences |
+| <EntityLink id="E151" /> | **Medium** | Anomaly detection identifies out-of-distribution behavior | Subtle generalization errors remain difficult to detect |
+| <EntityLink id="E226" /> | **Medium** | Capability restrictions and sandboxing limit resource acquisition | May delay rather than prevent determined power-seeking |
 
 ## Integration with Broader Safety Ecosystem
 
@@ -282,15 +277,15 @@ AI Control works most effectively as part of a comprehensive safety strategy rat
 
 | Complementary Approach | Synergy Level | Integration Challenges | Resource Requirements |
 |-----------------------|---------------|----------------------|---------------------|
-| **<EntityLink id="interpretability" />** | High | Technical complexity | \$2-5M additional research |
-| **<EntityLink id="scalable-oversight" />** | High | Coordination requirements | 5-10 additional FTEs |
-| **<EntityLink id="evals" />** | Medium-High | Standardization needs | \$1-3M protocol development |
-| **<EntityLink id="constitutional-ai" />** | Medium | Different paradigm assumptions | Integration research needed |
+| **<EntityLink id="E174" />** | High | Technical complexity | \$2-5M additional research |
+| **<EntityLink id="E271" />** | High | Coordination requirements | 5-10 additional FTEs |
+| **<EntityLink id="E128" />** | Medium-High | Standardization needs | \$1-3M protocol development |
+| **<EntityLink id="E451" />** | Medium | Different paradigm assumptions | Integration research needed |
 | **Governance Frameworks** | High | Implementation coordination | Policy development resources |
 
 ### Regulatory and Industry Integration
 
-The approach has gained attention from policymakers as a concrete framework for AI safety requirements. <EntityLink id="international-summits" /> have highlighted control methods as practical approaches for near-term implementation.
+The approach has gained attention from policymakers as a concrete framework for AI safety requirements. <EntityLink id="E173" /> have highlighted control methods as practical approaches for near-term implementation.
 
 **Current regulatory integration includes**:
 - EU AI Act high-risk system requirements align with control principles
@@ -314,8 +309,8 @@ The approach has gained attention from policymakers as a concrete framework for 
 
 **Key expert positions include**:
 
-- **<EntityLink id="buck-shlegeris" /> (Redwood Research)**: "Control offers our best near-term path to safe AI deployment, with 70-85% tractability for human-level systems"
-- **<EntityLink id="paul-christiano" /> (ARC)**: "Control complements alignment research by providing safety during the development process"
+- **<EntityLink id="E46" /> (Redwood Research)**: "Control offers our best near-term path to safe AI deployment, with 70-85% tractability for human-level systems"
+- **<EntityLink id="E220" /> (ARC)**: "Control complements alignment research by providing safety during the development process"
 - **MIRI perspective**: "Control may provide limited safety benefits but insufficient for superintelligent systems"
 - **Industry view**: Economic overhead creates adoption challenges without regulatory requirements
 
@@ -387,15 +382,14 @@ Total estimated need: \$38-68M annually, compared to current investment of appro
 
 ## AI Transition Model Context
 
-AI Control improves the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="misalignment-potential" />:
+AI Control improves the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="E205" />:
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="human-oversight-quality" /> | Direct improvement—control mechanisms ensure oversight remains effective |
-| <EntityLink id="alignment-robustness" /> | Provides defense-in-depth if alignment techniques fail |
+| <EntityLink id="E160" /> | Direct improvement—control mechanisms ensure oversight remains effective |
+| <EntityLink id="E20" /> | Provides defense-in-depth if alignment techniques fail |
 
-AI Control is particularly valuable because it works even if AI systems are actively scheming—potentially reducing <EntityLink id="existential-catastrophe" /> probability substantially if alignment fails. [Redwood Research argues](https://blog.redwoodresearch.org/p/the-case-for-ensuring-that-powerful) that control techniques can provide meaningful safety even against actively scheming AI systems.
+AI Control is particularly valuable because it works even if AI systems are actively scheming—potentially reducing <EntityLink id="E130" /> probability substantially if alignment fails. [Redwood Research argues](https://blog.redwoodresearch.org/p/the-case-for-ensuring-that-powerful) that control techniques can provide meaningful safety even against actively scheming AI systems.
 
 <Section title="Related Pages">
-  <Backlinks entityId="ai-control" />
 </Section>

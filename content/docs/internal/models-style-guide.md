@@ -10,11 +10,6 @@ ratings:
   rigor: 4
   actionability: 5
   completeness: 7
-metrics:
-  wordCount: 887
-  citations: 0
-  tables: 9
-  diagrams: 0
 ---
 # Models Style Guide
 

@@ -15,23 +15,18 @@ ratings:
 importance: 71.5
 update_frequency: 90
 llmSummary: Models institutional trust as a network contagion problem, finding cascades become irreversible below 30-40% trust thresholds and that AI multiplies attack effectiveness 60-5000x while degrading defenses 30-90%. Current US institutions (media 32%, government 20%) are already in cascade-vulnerable states with 45-60% probability of media-initiated cascade over 5 years.
-metrics:
-  wordCount: 548
-  citations: 19
-  tables: 31
-  diagrams: 3
 clusters:
   - epistemics
   - ai-safety
 subcategory: cascade-models
 ---
-import {DataInfoBox, Backlinks, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
+import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="trust-cascade-model" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E361" ratings={frontmatter.ratings} />
 
 ## Overview
 
-Modern democratic societies depend on a complex web of institutional trust relationships that have evolved over centuries. Media organizations validate claims, scientific institutions generate verified knowledge, courts adjudicate disputes based on evidence, and governments coordinate collective action. These institutions do not operate in isolation; they form an interdependent network where each institution's credibility partly derives from its relationships with others. When one institution loses public trust, the effects ripple outward through validation chains, threatening the entire <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink> that enables large-scale cooperation.
+Modern democratic societies depend on a complex web of institutional trust relationships that have evolved over centuries. Media organizations validate claims, scientific institutions generate verified knowledge, courts adjudicate disputes based on evidence, and governments coordinate collective action. These institutions do not operate in isolation; they form an interdependent network where each institution's credibility partly derives from its relationships with others. When one institution loses public trust, the effects ripple outward through validation chains, threatening the entire <EntityLink id="E122">epistemic infrastructure</EntityLink> that enables large-scale cooperation.
 
 This model analyzes trust cascade failures as a network contagion problem, applying insights from epidemiology, financial contagion theory, and complex systems research. The central question is whether AI-accelerated attacks on institutional trust could trigger catastrophic, potentially irreversible cascades that fundamentally undermine the capacity for coordinated truth-seeking in democratic societies. The model identifies critical thresholds around 30-40% trust levels below which institutions lose their ability to validate others, creating self-reinforcing decline spirals that become extremely difficult to reverse.
 
@@ -559,9 +554,9 @@ Longer-term investments should focus on fundamental trust infrastructure transfo
 
 ## Related Models
 
-- <EntityLink id="authentication-collapse-timeline" label="Authentication Collapse Timeline" /> - Verification failure cascade
-- <EntityLink id="sycophancy-feedback-loop">Sycophancy Feedback Loop Model</EntityLink> - Echo chamber reinforcement
-- <EntityLink id="epistemic-collapse-threshold" /> - Society-wide knowledge failure
+- <EntityLink id="E28" label="Authentication Collapse Timeline" /> - Verification failure cascade
+- <EntityLink id="E296">Sycophancy Feedback Loop Model</EntityLink> - Echo chamber reinforcement
+- <EntityLink id="E120" /> - Society-wide knowledge failure
 
 ## Sources and Evidence
 
@@ -585,7 +580,3 @@ Longer-term investments should focus on fundamental trust infrastructure transfo
 - [Christakis & Fowler (2013)](https://pmc.ncbi.nlm.nih.gov/articles/PMC3830455/): "Social Contagion Theory" - Network-based behavioral spread
 - Schelling (1978): "Micromotives and Macrobehavior" - Threshold models
 - Gladwell (2000): "The Tipping Point"
-
-## Related Pages
-
-<Backlinks entityId="trust-cascade-model" />

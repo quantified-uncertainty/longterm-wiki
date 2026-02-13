@@ -57,12 +57,17 @@ export function scanFrontmatterEntities(yamlEntityIds, contentDir) {
         if (yamlEntityIds.has(entityId)) continue; // YAML entity takes precedence
 
         if (fm.entityType) {
-          autoEntities.push({
+          const entity = {
             id: entityId,
             type: fm.entityType,
             title: fm.title || id.replace(/-/g, ' '),
             _source: 'frontmatter',
-          });
+            _filePath: fullPath,
+          };
+          if (fm.numericId) {
+            entity.numericId = fm.numericId;
+          }
+          autoEntities.push(entity);
         }
       }
     }

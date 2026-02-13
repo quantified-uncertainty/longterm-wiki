@@ -16,19 +16,14 @@ lastEdited: "2026-02-02"
 importance: 78.5
 update_frequency: 90
 llmSummary: Analyzes when AI safety measures conflict with capabilities, finding most interventions impose 5-15% capability cost but RLHF actually improves usability +10-30%. Under strong racing dynamics (60-75% probability), safety investment creates competitive disadvantage; coordination or regulation required to prevent race-to-bottom equilibrium.
-metrics:
-  wordCount: 1569
-  citations: 21
-  tables: 38
-  diagrams: 2
 clusters:
   - ai-safety
   - governance
 subcategory: safety-models
 ---
-import {DataInfoBox, Backlinks, KeyQuestions, Mermaid, EntityLink} from '@components/wiki';
+import {DataInfoBox, KeyQuestions, Mermaid, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="safety-capability-tradeoff" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E262" ratings={frontmatter.ratings} />
 
 ## Overview
 
@@ -499,9 +494,9 @@ Technical uncertainty means future developments may change relationships between
 
 ## Related Models
 
-- <EntityLink id="intervention-effectiveness-matrix" /> - Which interventions address which risks
-- <EntityLink id="racing-dynamics">Racing Dynamics Model</EntityLink> - Competitive pressures in AI development
-- <EntityLink id="defense-in-depth-model" /> - How safety measures combine
+- <EntityLink id="E177" /> - Which interventions address which risks
+- <EntityLink id="E239">Racing Dynamics Model</EntityLink> - Competitive pressures in AI development
+- <EntityLink id="E99" /> - How safety measures combine
 
 ## Sources
 
@@ -526,7 +521,3 @@ Technical uncertainty means future developments may change relationships between
 ### Industry and Policy
 - [OpenAI Safety Approach](https://openai.com/safety/how-we-think-about-safety-alignment/) - Defense-in-depth framework
 - [AI Safety Textbook: AI Race Dynamics](https://www.aisafetybook.com/textbook/ai-race) - Overview of competitive pressures
-
-## Related Pages
-
-<Backlinks entityId="safety-capability-tradeoff" />

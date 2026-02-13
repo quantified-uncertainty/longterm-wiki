@@ -15,11 +15,6 @@ ratings:
   completeness: 8
   concreteness: 7.5
   actionability: 6
-metrics:
-  wordCount: 634
-  citations: 0
-  tables: 12
-  diagrams: 0
 ---
 import {EntityLink} from '@components/wiki';
 
@@ -42,7 +37,7 @@ This page documents the technical side—how the wiki is built, how content is o
 
 | Section | Purpose | Examples |
 |---------|---------|----------|
-| **Knowledge Base** | Core content on risks, interventions, organizations, people | <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink>, <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> |
+| **Knowledge Base** | Core content on risks, interventions, organizations, people | <EntityLink id="E93">Deceptive Alignment</EntityLink>, <EntityLink id="E13">AI Safety Institutes</EntityLink> |
 | **AI Transition Model** | Comprehensive factor network with outcomes and scenarios | Factors, scenarios, quantitative estimates |
 | **Models** | Analytical frameworks for understanding dynamics | Risk models, cascade models, governance models |
 | **Project** | Public-facing documentation about LongtermWiki itself | Vision, strategy, similar projects |
@@ -161,8 +156,8 @@ The wiki uses stable ID-based linking that survives path reorganization:
 ```mdx
 import {EntityLink} from '@components/wiki';
 
-The <EntityLink id="scheming">scheming</EntityLink> risk relates to
-<EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>.
+The <EntityLink id="E274">scheming</EntityLink> risk relates to
+<EntityLink id="E93">deceptive alignment</EntityLink>.
 ```
 
 Benefits:
@@ -176,9 +171,7 @@ Benefits:
 Every page can display incoming links:
 
 ```mdx
-import {Backlinks} from '@components/wiki';
 
-<Backlinks entityId="deceptive-alignment" />
 ```
 
 ### Post-Edit Linking Check

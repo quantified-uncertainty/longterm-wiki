@@ -13,15 +13,10 @@ ratings:
   rigor: 6.8
   actionability: 5.5
   completeness: 7.5
-metrics:
-  wordCount: 1377
-  citations: 66
-  tables: 83
-  diagrams: 1
 clusters: ["ai-safety"]
 ---
 import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
-import {DataInfoBox, Backlinks} from '@components/wiki';
+import {DataInfoBox} from '@components/wiki';
 
 <DataExternalLinks pageId="capabilities" />
 
@@ -37,7 +32,6 @@ import {DataInfoBox, Backlinks} from '@components/wiki';
 | **Multimodal Integration** | Production-ready | Gemini 2.0, GPT-4o: real-time voice (180ms latency), video analysis operational |
 | **Scientific Discovery** | Transformative in specific domains | AlphaFold: 3.2M+ researchers, 47,000+ citations; FunSearch: novel mathematical discoveries |
 
-
 ## Key Links
 
 | Source | Link |
@@ -45,14 +39,13 @@ import {DataInfoBox, Backlinks} from '@components/wiki';
 | Official Website | [youtube.com](https://www.youtube.com/watch?v=6SCkGKW08Dw) |
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/AI_capability_control) |
 
-
 ## Overview
 
-This page tracks concrete, measurable indicators of AI capabilities across multiple domains through systematic benchmark analysis. Understanding capability trajectories is critical for forecasting <EntityLink id="agi-timeline">transformative AI timelines</EntityLink>, anticipating safety challenges, and evaluating whether alignment techniques scale with <EntityLink id="emergent-capabilities">emerging capabilities</EntityLink>.
+This page tracks concrete, measurable indicators of AI capabilities across multiple domains through systematic benchmark analysis. Understanding capability trajectories is critical for forecasting <EntityLink id="E399">transformative AI timelines</EntityLink>, anticipating safety challenges, and evaluating whether alignment techniques scale with <EntityLink id="E117">emerging capabilities</EntityLink>.
 
 **Key Finding**: Most benchmarks show exponential progress from 2023-2025, with frontier models achieving 86-96% performance on language understanding (MMLU), coding (HumanEval), and math (GSM8K). However, significant gaps persist in robustness, adversarial resistance, and sustained multi-day task completion, indicating a disconnect between benchmark performance and production reliability.
 
-**Safety Implication**: Rapid capability advancement outpaces development of reliable evaluation methods, creating blind spots in AI risk assessment as models approach human-level performance on narrow benchmarks while exhibiting unpredictable behaviors in real-world deployment. This evaluation-reality gap poses critical challenges for <EntityLink id="why-alignment-hard">alignment research</EntityLink> and safety validation.
+**Safety Implication**: Rapid capability advancement outpaces development of reliable evaluation methods, creating blind spots in AI risk assessment as models approach human-level performance on narrow benchmarks while exhibiting unpredictable behaviors in real-world deployment. This evaluation-reality gap poses critical challenges for <EntityLink id="E373">alignment research</EntityLink> and safety validation.
 
 The <R id="54fcb72b74acfae9">recent o3 release</R> achieved 87.5% on ARC-AGI, representing a 3x improvement over previous models and bringing us to the threshold of AGI capability markers on several benchmarks simultaneously.
 
@@ -192,7 +185,7 @@ flowchart TD
 - **o1-preview**: Scored 83rd percentile among human competitors
 - **o3**: Achieved 96.7% accuracy, surpassing 99% of human mathematical competition participants
 
-**Implication for <EntityLink id="scientific-research">Scientific Research</EntityLink>**: Mathematical breakthrough capability suggests potential for automated theorem proving and advanced scientific reasoning, though formal verification gaps persist.
+**Implication for <EntityLink id="E277">Scientific Research</EntityLink>**: Mathematical breakthrough capability suggests potential for automated theorem proving and advanced scientific reasoning, though formal verification gaps persist.
 
 ---
 
@@ -212,7 +205,7 @@ flowchart TD
 
 **Progress Rate**: 28.8% → 96.3% in 3.5 years (2021-2024), representing the fastest benchmark progression observed across all domains.
 
-**Robustness Analysis**: The persistent 3-7% gap between HumanEval and <R id="a6abd72df7a3dc9d">EvalPlus</R> (with additional test cases) reveals ongoing reliability challenges, highlighting concerns for <EntityLink id="coding">software safety applications</EntityLink>.
+**Robustness Analysis**: The persistent 3-7% gap between HumanEval and <R id="a6abd72df7a3dc9d">EvalPlus</R> (with additional test cases) reveals ongoing reliability challenges, highlighting concerns for <EntityLink id="E61">software safety applications</EntityLink>.
 
 ### Real-World Software Engineering
 
@@ -237,7 +230,7 @@ flowchart TD
 | IOI (International Olympiad) | Gold medal equivalent | Variable by year | Elite competitive level |
 | **USACO** | **Advanced division** | Beginner-Advanced | **Top tier** |
 
-**Significance**: Programming competition success demonstrates sophisticated algorithmic thinking and optimization capabilities relevant to <EntityLink id="self-improvement">self-improvement</EntityLink> and <EntityLink id="scientific-research">autonomous research</EntityLink>.
+**Significance**: Programming competition success demonstrates sophisticated algorithmic thinking and optimization capabilities relevant to <EntityLink id="E278">self-improvement</EntityLink> and <EntityLink id="E277">autonomous research</EntityLink>.
 
 ---
 
@@ -271,7 +264,7 @@ flowchart TD
 | **Feature Implementation** | **45%** | **67%** | Cross-component integration | Unintended behavioral changes |
 | **System Architecture** | **15%** | **23%** | Long-term consequences | Fundamental security design flaws |
 
-**Critical Finding**: Success rates show clear inverse correlation with task complexity and planning horizon, indicating fundamental limitations in <EntityLink id="long-horizon">long-horizon planning</EntityLink> despite benchmark achievements.
+**Critical Finding**: Success rates show clear inverse correlation with task complexity and planning horizon, indicating fundamental limitations in <EntityLink id="E192">long-horizon planning</EntityLink> despite benchmark achievements.
 
 ### Domain-Specific Autonomous Performance
 
@@ -304,9 +297,9 @@ flowchart TD
 | <R id="08aca1a4de71818f">Gemini 2.0 Flash</R> | 2M tokens | ≈1.5M tokens | 15% degradation | Community testing |
 
 **Safety Implications of Massive Context**:
-- Enhanced <EntityLink id="situational-awareness">situational awareness</EntityLink> through comprehensive information integration
+- Enhanced <EntityLink id="E282">situational awareness</EntityLink> through comprehensive information integration
 - Ability to process entire software projects for vulnerability analysis
-- Comprehensive document analysis enabling sophisticated <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink> strategies
+- Comprehensive document analysis enabling sophisticated <EntityLink id="E93">deceptive alignment</EntityLink> strategies
 - Long-term conversation memory enabling persistent relationship manipulation
 
 ---
@@ -383,7 +376,7 @@ flowchart TD
 | **Experimental Design** | **45% feasibility** | **Below expert** | Low reliability | Context limitations |
 | **Data Analysis** | **81% accuracy** | **Near expert** | High reliability | Statistical validity |
 
-**Critical Assessment**: While AI accelerates research processes, breakthrough discoveries remain primarily human-driven with AI assistance rather than AI-originated insights, indicating gaps in creative <EntityLink id="scientific-research">scientific research capabilities</EntityLink>.
+**Critical Assessment**: While AI accelerates research processes, breakthrough discoveries remain primarily human-driven with AI assistance rather than AI-originated insights, indicating gaps in creative <EntityLink id="E277">scientific research capabilities</EntityLink>.
 
 ---
 
@@ -422,7 +415,7 @@ flowchart TD
 | **Multimodal Injection** | 89% | 94% | Image-text fusion | No systematic defense |
 | **Gradient-based Methods** | 43% | 67% | White-box optimization | Research countermeasures |
 
-**Critical Security Gap**: Attack sophistication is advancing faster than defense mechanisms, particularly for multimodal and chain-of-thought systems, creating escalating vulnerabilities for <EntityLink id="responsible-scaling-policies">AI safety deployment</EntityLink>.
+**Critical Security Gap**: Attack sophistication is advancing faster than defense mechanisms, particularly for multimodal and chain-of-thought systems, creating escalating vulnerabilities for <EntityLink id="E252">AI safety deployment</EntityLink>.
 
 ---
 
@@ -547,13 +540,7 @@ AI capabilities metrics directly inform the <EntityLink id="ai-transition-model"
 
 | Parameter | Relationship | Tracking Importance |
 |-----------|--------------|-------------------|
-| <EntityLink id="ai-capabilities" /> | Primary output measure | Benchmark performance tracks capability trajectory |
-| <EntityLink id="agi-timeline" /> | Forecasting input | Benchmark saturation indicates proximity to AGI |
-| <EntityLink id="misalignment-potential" /> | Safety evaluation | Capability-safety gap assessment requires accurate metrics |
-| <EntityLink id="human-oversight-quality" /> | Scalability concern | Evaluation-reality gap undermines oversight |
-
----
-
-## Related Pages
-
-<Backlinks entityId="capabilities" />
+| <EntityLink id="E5" /> | Primary output measure | Benchmark performance tracks capability trajectory |
+| <EntityLink id="E399" /> | Forecasting input | Benchmark saturation indicates proximity to AGI |
+| <EntityLink id="E205" /> | Safety evaluation | Capability-safety gap assessment requires accurate metrics |
+| <EntityLink id="E160" /> | Scalability concern | Evaluation-reality gap undermines oversight |

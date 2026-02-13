@@ -12,17 +12,12 @@ ratings:
   rigor: 4.5
   actionability: 5.5
   completeness: 5
-metrics:
-  wordCount: 2900
-  citations: 22
-  tables: 11
-  diagrams: 1
 clusters:
   - epistemics
   - ai-safety
 subcategory: epistemic-tools-approaches
 ---
-import {Backlinks, Mermaid, KeyQuestions, EntityLink} from '@components/wiki';
+import {Mermaid, KeyQuestions, EntityLink} from '@components/wiki';
 
 *Part of the [Design Sketches for Collective Epistemics](/knowledge-base/responses/collective-epistemics-design-sketches/) series by Forethought Foundation.*
 
@@ -154,7 +149,7 @@ Several existing platforms implement aspects of reliability tracking:
 
 | Platform | What It Tracks | Scale | Key Metric | Status |
 |----------|---------------|-------|-----------|--------|
-| **<EntityLink id="metaculus">Metaculus</EntityLink>** | Probabilistic predictions; public track records | 15K+ forecasters | Brier 0.107; \$30K tournament prizes | Active; largest |
+| **<EntityLink id="E199">Metaculus</EntityLink>** | Probabilistic predictions; public track records | 15K+ forecasters | Brier 0.107; \$30K tournament prizes | Active; largest |
 | **[Good Judgment Open](https://www.gjopen.com/)** | Forecasting tournaments; Superforecaster recruitment | Thousands | Public leaderboards | Active |
 | **[Manifold Markets](https://manifold.markets/)** | Play-money market; public calibration data | 89K+ trades | Probability-outcome alignment | Active |
 | **[Polymarket](https://www.polymarket.com/)** | Real-money market; defined resolution criteria | \$1-3B/year volume | Best liquidity for prediction markets | Active |
@@ -300,9 +295,9 @@ This example illustrates both the power (concrete accountability) and the diffic
 
 Reliability tracking is directly relevant to several aspects of the <EntityLink id="ai-transition-model">AI transition model</EntityLink>:
 
-- **<EntityLink id="epistemic-health">Epistemic health</EntityLink>**: Making track records visible creates accountability for claims about AI capabilities, risks, and timelines
-- **<EntityLink id="civilizational-competence">Civilizational competence</EntityLink>**: Better-calibrated public discourse about AI improves the quality of governance decisions
-- **<EntityLink id="societal-trust">Societal trust</EntityLink>**: Trust based on track records is more robust than trust based on authority or charisma
+- **<EntityLink id="E121">Epistemic health</EntityLink>**: Making track records visible creates accountability for claims about AI capabilities, risks, and timelines
+- **<EntityLink id="E60">Civilizational competence</EntityLink>**: Better-calibrated public discourse about AI improves the quality of governance decisions
+- **<EntityLink id="E285">Societal trust</EntityLink>**: Trust based on track records is more robust than trust based on authority or charisma
 - **Lab accountability**: Systematic tracking of AI lab claims could be a lightweight governance mechanism that complements formal regulation
 
 ## Key Uncertainties
@@ -321,7 +316,6 @@ Reliability tracking is directly relevant to several aspects of the <EntityLink 
 
 - **Original Report**: [Design Sketches for Collective Epistemics — Reliability Tracking](https://www.forethought.org/research/design-sketches-collective-epistemics#reliability-tracking) — Forethought Foundation
 - **Key Research**: *Expert Political Judgment* by Philip Tetlock (2005) — foundational work on prediction accuracy and calibration
-- **Prediction Platforms**: <EntityLink id="metaculus">Metaculus</EntityLink>, <EntityLink id="prediction-markets">Prediction Markets</EntityLink>
+- **Prediction Platforms**: <EntityLink id="E199">Metaculus</EntityLink>, <EntityLink id="E228">Prediction Markets</EntityLink>
 - **Overview**: [Design Sketches for Collective Epistemics](/knowledge-base/responses/collective-epistemics-design-sketches/) — parent page with all five proposed tools
 
-<Backlinks />

@@ -1,4 +1,5 @@
 - id: "tmc-recursive-ai"
+  numericId: E339
   type: "ai-transition-model-subitem"
   title: "Recursive AI Capabilities"
   parentFactor: "ai-uses"
@@ -169,6 +170,7 @@
         strength: "medium"
         effect: "mixed"
 - id: "tmc-industries"
+  numericId: E327
   type: "ai-transition-model-subitem"
   title: "AI in Industries"
   parentFactor: "ai-uses"
@@ -334,6 +336,7 @@
         strength: "medium"
         effect: "mixed"
 - id: "tmc-governments"
+  numericId: E322
   type: "ai-transition-model-subitem"
   title: "AI in Governments"
   parentFactor: "ai-uses"
@@ -498,6 +501,7 @@
         strength: "strong"
         effect: "increases"
 - id: "tmc-coordination"
+  numericId: E311
   type: "ai-transition-model-subitem"
   title: "AI for Coordination"
   parentFactor: "ai-uses"

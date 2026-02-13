@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: corporate-influence
+  numericId: E78
   type: crux
   title: Corporate Influence
   customFields:
@@ -52,6 +53,7 @@
     - corporate-governance
   lastUpdated: 2025-12
 - id: field-building
+  numericId: E141
   type: crux
   title: Field Building and Community
   customFields:
@@ -95,6 +97,7 @@
     - career-development
   lastUpdated: 2025-12
 - id: governance-policy
+  numericId: E154
   type: crux
   title: AI Governance and Policy
   customFields:
@@ -142,6 +145,7 @@
     - export-controls
     - ai-safety-summits
 - id: research-agendas
+  numericId: E251
   type: crux
   title: Research Agendas
   customFields:
@@ -192,6 +196,7 @@
     - scalable-oversight
   lastUpdated: 2025-12
 - id: technical-research
+  numericId: E297
   type: crux
   title: Technical AI Safety Research
   customFields:
@@ -243,6 +248,7 @@
     - robustness
   lastUpdated: 2025-12
 - id: misuse
+  numericId: E206
   type: concept
   title: AI Misuse
   description: >-
@@ -255,6 +261,7 @@
     - ai-risk
   lastUpdated: 2025-12
 - id: dual-use
+  numericId: E106
   type: concept
   title: Dual-Use Technology
   description: Technologies that have both beneficial civilian applications and potential military or harmful uses.
@@ -265,6 +272,7 @@
     - governance
   lastUpdated: 2025-12
 - id: fast-takeoff
+  numericId: E139
   type: concept
   title: Fast Takeoff
   description: >-
@@ -282,6 +290,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: superintelligence
+  numericId: E291
   type: concept
   title: Superintelligence
   description: Hypothetical AI systems with cognitive abilities vastly exceeding those of humans across virtually all domains.
@@ -297,6 +306,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: content-moderation
+  numericId: E75
   type: concept
   title: Content Moderation
   description: Techniques and policies for controlling AI outputs to prevent harmful, misleading, or inappropriate content.
@@ -307,6 +317,7 @@
     - deployment
   lastUpdated: 2025-12
 - id: agi-race
+  numericId: E3
   type: concept
   title: AGI Race
   description: >-
@@ -322,6 +333,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: capability-evaluations
+  numericId: E52
   type: concept
   title: Capability Evaluations
   description: >-
@@ -339,6 +351,7 @@
     - capabilities
   lastUpdated: 2025-12
 - id: existential-risk
+  numericId: E131
   type: concept
   title: Existential Risk
   description: Risks that could cause human extinction or permanently curtail humanity's long-term potential.
@@ -352,6 +365,7 @@
     - longtermism
   lastUpdated: 2025-12
 - id: adversarial-robustness
+  numericId: E1
   type: concept
   title: Adversarial Robustness
   description: AI systems' resistance to adversarial inputs designed to cause errors or unintended behaviors.
@@ -362,6 +376,7 @@
     - safety
   lastUpdated: 2025-12
 - id: natural-abstractions
+  numericId: E213
   type: concept
   title: Natural Abstractions
   description: >-
@@ -376,6 +391,7 @@
     - theory
   lastUpdated: 2025-12
 - id: benchmarking
+  numericId: E38
   type: concept
   title: AI Benchmarking
   description: Standardized evaluation methods for comparing AI system performance across tasks and capabilities.
@@ -386,6 +402,7 @@
     - capabilities
   lastUpdated: 2025-12
 - id: transformative-ai
+  numericId: E357
   type: concept
   title: Transformative AI
   description: AI systems capable of causing changes to society as significant as the industrial or agricultural revolutions.
@@ -398,6 +415,7 @@
     - societal-impact
   lastUpdated: 2025-12
 - id: scaling-laws
+  numericId: E273
   type: concept
   title: Scaling Laws
   description: Empirical relationships between model size, compute, data, and AI performance that have driven recent AI progress.
@@ -411,6 +429,7 @@
     - forecasting
   lastUpdated: 2025-12
 - id: ai-timelines
+  numericId: E16
   type: concept
   title: AI Timelines
   description: Predictions and analysis of when various AI capability milestones (AGI, transformative AI) might be reached.
@@ -424,6 +443,7 @@
     - ai-development
   lastUpdated: 2025-12
 - id: data-constraints
+  numericId: E92
   type: concept
   title: Data Constraints
   description: Limitations on AI training due to availability, quality, or accessibility of training data.
@@ -437,6 +457,7 @@
     - limitations
   lastUpdated: 2025-12
 - id: is-ai-xrisk-real
+  numericId: E181
   type: crux
   title: Is AI Existential Risk Real?
   description: The fundamental debate about whether AI poses existential risk to humanity.
@@ -453,6 +474,7 @@
     - fundamental
   lastUpdated: 2025-01
 - id: open-vs-closed
+  numericId: E217
   type: crux
   title: Open vs Closed Source AI
   description: The safety implications of releasing AI model weights publicly versus keeping them proprietary.
@@ -469,6 +491,7 @@
     - governance
   lastUpdated: 2025-01
 - id: pause-debate
+  numericId: E223
   type: crux
   title: Should We Pause AI Development?
   description: The debate over whether to halt or slow advanced AI research to ensure safety.
@@ -485,6 +508,7 @@
     - governance
   lastUpdated: 2025-01
 - id: agi-timeline-debate
+  numericId: E4
   type: crux
   title: When Will AGI Arrive?
   description: The debate over AGI timelines from imminent to decades away to never with current approaches.
@@ -501,6 +525,7 @@
     - agi
   lastUpdated: 2025-01
 - id: regulation-debate
+  numericId: E248
   type: crux
   title: Government Regulation vs Industry Self-Governance
   description: Should AI be controlled through government regulation or industry self-governance?
@@ -517,6 +542,7 @@
     - governance
   lastUpdated: 2025-01
 - id: interpretability-sufficient
+  numericId: E176
   type: crux
   title: Is Interpretability Sufficient for Safety?
   description: Debate over whether mechanistic interpretability can ensure AI safety.
@@ -533,6 +559,7 @@
     - safety-research
   lastUpdated: 2025-01
 - id: scaling-debate
+  numericId: E272
   type: crux
   title: Is Scaling All You Need?
   description: The debate over whether scaling compute and data is sufficient for AGI or if we need new paradigms.
@@ -549,6 +576,7 @@
     - capabilities
   lastUpdated: 2025-01
 - id: why-alignment-easy
+  numericId: E372
   type: argument
   title: Why Alignment Might Be Easy
   description: >-
@@ -567,6 +595,7 @@
     - optimistic
   lastUpdated: 2025-01
 - id: case-against-xrisk
+  numericId: E55
   type: argument
   title: The Case Against AI Existential Risk
   description: The strongest skeptical arguments against AI existential risk, presenting positions from prominent researchers.
@@ -583,6 +612,7 @@
     - skeptical
   lastUpdated: 2025-01
 - id: why-alignment-hard
+  numericId: E373
   type: argument
   title: Why Alignment Might Be Hard
   description: >-
@@ -601,6 +631,7 @@
     - pessimistic
   lastUpdated: 2025-01
 - id: case-for-xrisk
+  numericId: E56
   type: argument
   title: The Case For AI Existential Risk
   description: >-
@@ -620,6 +651,7 @@
   lastUpdated: 2025-01
 
 - id: ai-welfare
+  numericId: E391
   type: concept
   title: AI Welfare and Digital Minds
   description: >-
@@ -647,6 +679,7 @@
   lastUpdated: 2026-02
 
 - id: misuse-risks
+  numericId: E392
   type: crux
   title: Misuse Risk Cruxes
   description: >-
@@ -679,6 +712,7 @@
   lastUpdated: 2026-02
 
 - id: solutions
+  numericId: E393
   type: crux
   title: Solution Cruxes
   description: >-
@@ -705,11 +739,12 @@
       type: concept
     - id: epistemic-infrastructure
       type: concept
-    - id: ai-governance
+    - id: tmc-ai-governance
       type: concept
   lastUpdated: 2026-02
 
 - id: accident-risks
+  numericId: E394
   type: crux
   title: Accident Risk Cruxes
   description: >-
@@ -741,6 +776,7 @@
   lastUpdated: 2026-02
 
 - id: structural-risks
+  numericId: E395
   type: crux
   title: Structural Risk Cruxes
   description: >-
@@ -770,6 +806,7 @@
   lastUpdated: 2026-02
 
 - id: epistemic-risks
+  numericId: E396
   type: crux
   title: Epistemic Cruxes
   description: >-
@@ -799,6 +836,7 @@
   lastUpdated: 2026-02
 
 - id: governance-focused
+  numericId: E397
   type: concept
   title: Governance-Focused Worldview
   description: >-
@@ -831,6 +869,7 @@
   lastUpdated: 2026-02
 
 - id: critical-uncertainties
+  numericId: E398
   type: crux
   title: Critical Uncertainties Model
   description: >-
@@ -857,11 +896,12 @@
       type: organization
     - id: agi-timeline
       type: concept
-    - id: ai-governance
+    - id: tmc-ai-governance
       type: concept
   lastUpdated: 2026-02
 
 - id: agi-timeline
+  numericId: E399
   type: concept
   title: AGI Timeline
   description: >-
@@ -893,6 +933,7 @@
   lastUpdated: 2026-02
 
 - id: large-language-models
+  numericId: E400
   type: concept
   title: Large Language Models
   description: >-
@@ -924,6 +965,7 @@
   lastUpdated: 2026-02
 
 - id: heavy-scaffolding
+  numericId: E401
   type: concept
   title: Heavy Scaffolding / Agentic Systems
   description: >-
@@ -953,6 +995,7 @@
   lastUpdated: 2026-02
 
 - id: provable-safe
+  numericId: E402
   type: concept
   title: Provable / Guaranteed Safe AI
   description: >-
@@ -983,6 +1026,7 @@
   lastUpdated: 2026-02
 
 - id: dense-transformers
+  numericId: E403
   type: concept
   title: Dense Transformers
   description: >-
@@ -1015,6 +1059,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: doomer
+  numericId: E504
   type: concept
   title: AI Doomer Worldview
   description: >-
@@ -1028,6 +1073,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: long-timelines
+  numericId: E505
   type: concept
   title: Long-Timelines Technical Worldview
   description: >-
@@ -1041,6 +1087,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: optimistic
+  numericId: E506
   type: concept
   title: Optimistic Alignment Worldview
   description: >-

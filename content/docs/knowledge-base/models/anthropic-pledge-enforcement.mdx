@@ -15,11 +15,6 @@ ratings:
   objectivity: 7
   concreteness: 6
   actionability: 7
-metrics:
-  wordCount: 4500
-  citations: 12
-  tables: 8
-  diagrams: 0
 clusters:
   - community
   - ai-safety
@@ -35,10 +30,10 @@ todos:
   - Research how Mackenzie Scott's giving was structured (irrevocable or discretionary?)
 subcategory: intervention-models
 ---
-import {EntityLink, Backlinks} from '@components/wiki';
+import {EntityLink} from '@components/wiki';
 
 :::note[Page Context]
-This page evaluates interventions to increase the probability that <EntityLink id="anthropic-investors">Anthropic co-founders' 80% donation pledges</EntityLink> are fulfilled. Inspired by [SiebeRozendal's EA Forum comment](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors) suggesting it would be "worthwhile to ask/pressure Anthropic's founders to make their pledges legally binding." All cost-effectiveness estimates are rough. The "critical" estimates attempt to correct for common biases in this type of analysis (see [Why These Numbers Are Probably Still Wrong](#why-these-numbers-are-probably-still-wrong)).
+This page evaluates interventions to increase the probability that <EntityLink id="E406">Anthropic co-founders' 80% donation pledges</EntityLink> are fulfilled. Inspired by [SiebeRozendal's EA Forum comment](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors) suggesting it would be "worthwhile to ask/pressure Anthropic's founders to make their pledges legally binding." All cost-effectiveness estimates are rough. The "critical" estimates attempt to correct for common biases in this type of analysis (see [Why These Numbers Are Probably Still Wrong](#why-these-numbers-are-probably-still-wrong)).
 :::
 
 ## Key Takeaway
@@ -55,10 +50,10 @@ Before evaluating interventions, an honest question: **are we trying to help fou
 - They made the pledge voluntarily and publicly. They presumably want to follow through.
 - Donating appreciated stock rather than selling it avoids ≈37% capital gains tax — this is genuinely in their financial interest regardless of timing, and pre-IPO commitment is behaviorally easier.
 - Foundation creation is hard; reducing activation energy for something they already want to do is a service.
-- <EntityLink id="dario-amodei">Dario Amodei</EntityLink>'s essay framing suggests genuine conviction, not performative pledging.
+- <EntityLink id="E91">Dario Amodei</EntityLink>'s essay framing suggests genuine conviction, not performative pledging.
 
 **Case that "enforcement" is adversarial and unwelcome:**
-- Founders deliberately chose non-binding pledges. They could have created irrevocable trusts or followed the <EntityLink id="openai-foundation">OpenAI Foundation</EntityLink> model. They didn't. This was a choice, not an oversight.
+- Founders deliberately chose non-binding pledges. They could have created irrevocable trusts or followed the <EntityLink id="E421">OpenAI Foundation</EntityLink> model. They didn't. This was a choice, not an oversight.
 - Public accountability tracking is surveillance they didn't consent to. It assumes bad faith.
 - Legal conversion removes flexibility they explicitly retained—flexibility to change timing, amounts, recipients, or to respond to changed circumstances.
 - External organizations framing themselves as enforcement bodies for billionaires' personal financial decisions is presumptuous and could permanently damage relationships.
@@ -82,13 +77,13 @@ Before evaluating interventions, an honest question: **are we trying to help fou
 
 | # | Intervention | Description | Est. Cost (inc. hidden) | Est. EV (very rough) |
 |---|-------------|------------|-----------|-------------|
-| 1 | **DAF pre-commitment** | Help founders transfer equity to donor-advised funds before IPO, when the behavioral commitment cost is lowest — equity is illiquid paper wealth, not yet a spendable dollar amount. The matching program (3:1 historically) means employees have already done this, making it natural for founders too. Donating appreciated stock avoids ≈37% capital gains tax vs. selling first, and pre-IPO commitment locks in giving before the liquidity phase transition. See <EntityLink id="anthropic-pre-ipo-daf-transfers">pre-IPO DAF analysis</EntityLink> for details. **Key limitation**: DAFs are restricted to 501(c)(3) grants only — no political donations, no lobbying, no 501(c)(4) organizations like ARI. DAFs also allow grants to any 501(c)(3), so donors retain full advisory discretion over allocation. | \$300K-1M | \$50-250M |
+| 1 | **DAF pre-commitment** | Help founders transfer equity to donor-advised funds before IPO, when the behavioral commitment cost is lowest — equity is illiquid paper wealth, not yet a spendable dollar amount. The matching program (3:1 historically) means employees have already done this, making it natural for founders too. Donating appreciated stock avoids ≈37% capital gains tax vs. selling first, and pre-IPO commitment locks in giving before the liquidity phase transition. See <EntityLink id="E412">pre-IPO DAF analysis</EntityLink> for details. **Key limitation**: DAFs are restricted to 501(c)(3) grants only — no political donations, no lobbying, no 501(c)(4) organizations like ARI. DAFs also allow grants to any 501(c)(3), so donors retain full advisory discretion over allocation. | \$300K-1M | \$50-250M |
 | 2 | **Public accountability** | Publish annual reports tracking founder pledge progress, modeled on IPS's Giving Pledge analysis. Tracks public donations, foundation/DAF transfers, and secondary market sales. **Honest concern**: This is the intervention most likely to backfire. Billionaire giving tracked publicly against their will creates adversarial dynamics. Elon Musk has been publicly shamed for years about Giving Pledge non-compliance with zero behavior change. Founder giving is largely private, so most "tracking" would be speculative. | \$750K-2M (5yr) | \$20-200M |
-| 3 | **Peer influence** | Connect founders with mega-philanthropists who've followed through: <EntityLink id="dustin-moskovitz">Moskovitz</EntityLink>, Mackenzie Scott, Chuck Feeney's legacy. Social proof is powerful. **Honest concern**: Moskovitz is already an Anthropic investor and Karnofsky works there—these connections already exist organically. Outside organizations "orchestrating" dinners adds little marginal value and risks feeling manipulative if founders realize it was engineered. | \$100-500K | \$5-50M |
+| 3 | **Peer influence** | Connect founders with mega-philanthropists who've followed through: <EntityLink id="E436">Moskovitz</EntityLink>, Mackenzie Scott, Chuck Feeney's legacy. Social proof is powerful. **Honest concern**: Moskovitz is already an Anthropic investor and Karnofsky works there—these connections already exist organically. Outside organizations "orchestrating" dinners adds little marginal value and risks feeling manipulative if founders realize it was engineered. | \$100-500K | \$5-50M |
 | 4 | **Legal pledge conversion** | Work with top philanthropic attorneys to draft irrevocable trust instruments, binding pledge agreements, or charitable LLCs. Approach founders through trusted intermediaries. Strongest mechanism if adopted—near-certain fulfillment. **Honest concern**: Founders chose non-binding pledges deliberately. Asking them to voluntarily remove their own flexibility is a big ask with ≈3-10% acceptance probability. The founders who'd agree (Dario, Daniela) are already the ones most likely to give. | \$500K-2M | \$50-350M |
 | 5 | **Time-bound commitments** | Encourage founders to upgrade vague "80% eventually" to specific milestones (e.g., "50% within 5 years of IPO, 80% within 15 years"). Draws on behavioral science showing implementation intentions increase follow-through. **Honest concern**: This is outside organizations telling billionaires when to give their money. Very low P(Agree) and could feel presumptuous. | \$200-600K | \$10-100M |
 | 6 | **Foundation creation** | Offer full-service foundation setup: legal entity, tax structure, staffing (ED, program officers), governance design, grantmaking strategy, cause area research. Reduces the biggest practical barrier—the effort of figuring out how to deploy billions effectively. **Honest concern**: At \$7-10B per founder, they can hire McKinsey, Bridgespan, or any advisory firm they want. Effective giving organizations don't have a monopoly on foundation infrastructure. The counterfactual value is in influencing *mission*, not providing *services*. | \$1-5M | \$30-150M |
-| 7 | **LTBT governance** | Advocate for the <EntityLink id="long-term-benefit-trust">Long-Term Benefit Trust</EntityLink> to include pledge monitoring in its governance mandate. The LTBT already has mission-accountability powers (board appointment). **Honest concern**: The LTBT governs the *company*, not founders' *personal wealth*. Expanding its mandate to police personal financial commitments raises serious overreach questions. P(Adoption) is very low (2-8%). | \$300K-1.5M | \$10-100M |
+| 7 | **LTBT governance** | Advocate for the <EntityLink id="E407">Long-Term Benefit Trust</EntityLink> to include pledge monitoring in its governance mandate. The LTBT already has mission-accountability powers (board appointment). **Honest concern**: The LTBT governs the *company*, not founders' *personal wealth*. Expanding its mandate to police personal financial commitments raises serious overreach questions. P(Adoption) is very low (2-8%). | \$300K-1.5M | \$10-100M |
 
 **Note on EV estimates**: These expected value figures discount for P(Engagement), probability shift, and counterfactual adjustment. They represent rough guesses at marginal expected philanthropic capital mobilized, not total capital affected. Wide ranges reflect genuine uncertainty—the actual value could easily be zero or negative for interventions that backfire. Do not treat these as reliable forecasts.
 
@@ -115,14 +110,14 @@ The collaborative-only approach (\$1.4-6.5M → \$85-450M, roughly **~13-320:1**
 
 | Organization | Best Role | Why | Concern |
 |--------------|----------|-----|---------|
-| <EntityLink id="longview-philanthropy">Longview Philanthropy</EntityLink> | Lead advisory + advocacy | Already advises AI safety donors; may have founder access | Opportunity cost of senior staff time |
-| <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> | Fund + coordinate | <EntityLink id="dustin-moskovitz">Moskovitz</EntityLink> connection to Anthropic | Moskovitz may already be doing this informally |
+| <EntityLink id="E542">Longview Philanthropy</EntityLink> | Lead advisory + advocacy | Already advises AI safety donors; may have founder access | Opportunity cost of senior staff time |
+| <EntityLink id="E521">Coefficient Giving</EntityLink> | Fund + coordinate | <EntityLink id="E436">Moskovitz</EntityLink> connection to Anthropic | Moskovitz may already be doing this informally |
 | Giving What We Can | Pledge tracking (if done collaboratively) | Pledge infrastructure experience | Adversarial tracking would damage their brand |
-| GiveWell | Advise on allocation | <EntityLink id="dario-amodei">Dario Amodei</EntityLink>'s early involvement; trusted brand | GiveWell focuses on global health, not meta-philanthropy |
+| GiveWell | Advise on allocation | <EntityLink id="E91">Dario Amodei</EntityLink>'s early involvement; trusted brand | GiveWell focuses on global health, not meta-philanthropy |
 
 ## Why This Matters
 
-All seven Anthropic co-founders have pledged to donate 80% of their equity (\$39-59B at current \$350B valuation), but these pledges are non-binding. Only 36% of deceased <EntityLink id="giving-pledge">Giving Pledge</EntityLink> signatories met even a 50% threshold, and living pledgers have grown 166% wealthier since signing. [IPS](https://ips-dc.org/report-giving-pledge-at-15/) Only 2 of 7 Anthropic founders (<EntityLink id="dario-amodei">Dario</EntityLink> and <EntityLink id="daniela-amodei">Daniela Amodei</EntityLink>) have documented strong connections to the effective giving community; the other 5 founders' cause priorities are unknown. For the full capital analysis, see <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink>. For comparison with the <EntityLink id="openai-foundation">OpenAI Foundation</EntityLink>'s legally binding model, see that page.
+All seven Anthropic co-founders have pledged to donate 80% of their equity (\$39-59B at current \$350B valuation), but these pledges are non-binding. Only 36% of deceased <EntityLink id="E531">Giving Pledge</EntityLink> signatories met even a 50% threshold, and living pledgers have grown 166% wealthier since signing. [IPS](https://ips-dc.org/report-giving-pledge-at-15/) Only 2 of 7 Anthropic founders (<EntityLink id="E91">Dario</EntityLink> and <EntityLink id="E90">Daniela Amodei</EntityLink>) have documented strong connections to the effective giving community; the other 5 founders' cause priorities are unknown. For the full capital analysis, see <EntityLink id="E406">Anthropic (Funder)</EntityLink>. For comparison with the <EntityLink id="E421">OpenAI Foundation</EntityLink>'s legally binding model, see that page.
 
 ## Cost-Effectiveness Framework
 
@@ -145,7 +140,7 @@ Even a 1 percentage point increase in fulfillment probability appears worth \$25
 
 **1. Selection bias (largest deflator)**
 
-The founders most likely to engage with pledge-enforcement interventions are Dario and Daniela Amodei—who are also by far the most likely to fulfill their pledges *regardless* of any intervention. Dario is the 43rd GWWC signatory and early GiveWell fan. Daniela is married to <EntityLink id="holden-karnofsky">Holden Karnofsky</EntityLink>. The counterfactual impact of "encouraging" them to give is probably near zero.
+The founders most likely to engage with pledge-enforcement interventions are Dario and Daniela Amodei—who are also by far the most likely to fulfill their pledges *regardless* of any intervention. Dario is the 43rd GWWC signatory and early GiveWell fan. Daniela is married to <EntityLink id="E156">Holden Karnofsky</EntityLink>. The counterfactual impact of "encouraging" them to give is probably near zero.
 
 The other 5 founders (Brown, Kaplan, McCandlish, Clark, Olah) have no documented connections to the effective giving community, making them both harder to reach *and* less likely to respond to this kind of advocacy. Interventions aimed at them face much lower P(Engage) and much lower probability of shifting behavior.
 
@@ -176,7 +171,7 @@ A founder could fulfill the 80% pledge entirely by donating to their alma mater,
 
 **Estimated cost**: \$300K-\$1M over 2-3 years. Includes philanthropic tax attorney (\$100-300K), senior staff relationship-building time (\$100-400K opportunity cost), and ongoing advisory (\$50-200K). The \$50-200K "naive" cost only counts the direct legal fees.
 
-**Why it might work**: Pre-IPO is the moment when commitment cost is lowest — equity is illiquid paper wealth, not a visible dollar amount. Anthropic's employee matching program has already normalized DAF transfers within the company. The broader financial case (donating appreciated stock avoids ≈37% capital gains tax vs. selling first) is genuinely beneficial for founders who plan to give. Pre-IPO is specifically advantageous because the behavioral commitment cost is lowest: committing before the IPO's liquidity phase transition makes the wealth feel "real." See <EntityLink id="anthropic-pre-ipo-daf-transfers">pre-IPO DAF analysis</EntityLink> for the full financial case.
+**Why it might work**: Pre-IPO is the moment when commitment cost is lowest — equity is illiquid paper wealth, not a visible dollar amount. Anthropic's employee matching program has already normalized DAF transfers within the company. The broader financial case (donating appreciated stock avoids ≈37% capital gains tax vs. selling first) is genuinely beneficial for founders who plan to give. Pre-IPO is specifically advantageous because the behavioral commitment cost is lowest: committing before the IPO's liquidity phase transition makes the wealth feel "real." See <EntityLink id="E412">pre-IPO DAF analysis</EntityLink> for the full financial case.
 
 **Why it might not**: Founders' personal wealth managers and tax attorneys are already advising them on tax-efficient giving. They don't need effective giving organizations to tell them about DAFs. The marginal value is in *cause allocation advice*, not the vehicle itself. And DAFs preserve full advisory discretion — money in a DAF can go to any 501(c)(3), regardless of impact. A thoughtful founder might also reasonably prefer to retain flexibility on vehicle choice (foundation, CRT, direct grants) rather than locking into a DAF.
 
@@ -242,7 +237,7 @@ A founder could fulfill the 80% pledge entirely by donating to their alma mater,
 
 ### 7. LTBT Governance Enhancement
 
-**What**: Advocate for the <EntityLink id="long-term-benefit-trust">Long-Term Benefit Trust</EntityLink> to add pledge monitoring to its mandate.
+**What**: Advocate for the <EntityLink id="E407">Long-Term Benefit Trust</EntityLink> to add pledge monitoring to its mandate.
 
 **Estimated cost**: \$300K-1.5M. Requires governance consulting, legal analysis, and sustained advocacy with Trust members (Zach Robinson, Neil Buddy Shah, Kanika Bahl).
 
@@ -286,14 +281,3 @@ Even the "critical" estimates above may be wrong in either direction:
 | **Doing nothing** | Founders give at baseline rate (40-60%) | Zero cost, zero backfire risk | Leaves \$10-40B on the table vs. 100% fulfillment |
 
 The honest assessment: this is a high-variance bet. The expected value is probably positive, but the confidence interval includes zero (or negative) outcomes. It's most attractive if you believe (a) the founders without existing giving commitments are reachable, (b) backfire risk can be managed through careful execution, and (c) effective giving organizations can influence cause allocation, not just total giving.
-
-## See Also
-
-- <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink> — Full analysis of EA-aligned capital at Anthropic
-- <EntityLink id="giving-pledge">Giving Pledge</EntityLink> — Historical fulfillment rates and patterns
-- <EntityLink id="long-term-benefit-trust">Long-Term Benefit Trust</EntityLink> — Anthropic's governance structure
-- <EntityLink id="openai-foundation">OpenAI Foundation</EntityLink> — Contrasting legally binding model
-- <EntityLink id="longview-philanthropy">Longview Philanthropy</EntityLink> — Potential lead organization
-- <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> — Potential funder/coordinator
-
-<Backlinks />

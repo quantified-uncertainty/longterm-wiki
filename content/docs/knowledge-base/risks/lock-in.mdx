@@ -17,43 +17,38 @@ ratings:
   completeness: 7.5
 todos:
   - Complete 'Risk Assessment' section (4 placeholders)
-metrics:
-  wordCount: 2900
-  citations: 107
-  tables: 12
-  diagrams: 1
 clusters:
   - ai-safety
   - governance
 subcategory: structural
 ---
-import {DataInfoBox, Backlinks, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 <DataExternalLinks pageId="lock-in" />
 
-<DataInfoBox entityId="lock-in" />
+<DataInfoBox entityId="E189" />
 
 ### Quick Assessment
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Severity** | Catastrophic to Existential | <R id="3b9fccf15651dbbe"><EntityLink id="toby-ord">Toby Ord</EntityLink> estimates 1/10 AI existential risk this century</R>, including lock-in scenarios that could permanently curtail human potential |
+| **Severity** | Catastrophic to Existential | <R id="3b9fccf15651dbbe"><EntityLink id="E355">Toby Ord</EntityLink> estimates 1/10 AI existential risk this century</R>, including lock-in scenarios that could permanently curtail human potential |
 | **Likelihood** | Medium-High (15-40%) | Multiple pathways; <R id="07aee92f77202f21">AI Safety Clock at 20 minutes to midnight</R> as of September 2025 |
 | **Timeline** | 5-20 years to critical window | AGI timelines of 2027-2035; value embedding in AI systems already occurring |
 | **Reversibility** | None by definition | Once achieved, successful lock-in prevents course correction through enforcement mechanisms |
-| **Current Trend** | Worsening | <R id="68f55036318d827b">Big Tech controls 66% of cloud computing</R>; <R id="add4f54080d0bfc5">AI surveillance in 80+ countries</R>; <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> embedding values in training |
+| **Current Trend** | Worsening | <R id="68f55036318d827b">Big Tech controls 66% of cloud computing</R>; <R id="add4f54080d0bfc5">AI surveillance in 80+ countries</R>; <EntityLink id="E451">Constitutional AI</EntityLink> embedding values in training |
 | **Uncertainty** | High | Fundamental disagreements on timeline, value convergence, and whether any lock-in can be permanent |
 
 ### Responses That Address This Risk
 
 | Response | Mechanism | Lock-in Prevention Potential |
 |----------|-----------|------------------------------|
-| <EntityLink id="governance-policy" /> | Public participation in AI value decisions | High - ensures legitimacy and adaptability |
-| <EntityLink id="ai-safety-institutes" /> | Government evaluation before deployment | Medium - can identify concerning patterns early |
-| <EntityLink id="responsible-scaling-policies" /> | Internal capability thresholds and pauses | Medium - slows potentially dangerous deployment |
-| <EntityLink id="compute-governance" /> | Controls on training resources | Medium - prevents concentration of capabilities |
-| <EntityLink id="alignment" /> | AI systems that learn rather than lock in values | High - maintains adaptability by design |
-| <EntityLink id="international-coordination" /> | Global agreements on AI development | High - prevents single-actor lock-in |
+| <EntityLink id="E154" /> | Public participation in AI value decisions | High - ensures legitimacy and adaptability |
+| <EntityLink id="E13" /> | Government evaluation before deployment | Medium - can identify concerning patterns early |
+| <EntityLink id="E252" /> | Internal capability thresholds and pauses | Medium - slows potentially dangerous deployment |
+| <EntityLink id="E64" /> | Controls on training resources | Medium - prevents concentration of capabilities |
+| <EntityLink id="E439" /> | AI systems that learn rather than lock in values | High - maintains adaptability by design |
+| <EntityLink id="E171" /> | Global agreements on AI development | High - prevents single-actor lock-in |
 
 ## Overview
 
@@ -318,10 +313,10 @@ Designing AI systems that can adapt as human values evolve rather than locking i
 
 Lock-in intersects with multiple categories of AI risk, often serving as a mechanism that prevents recovery from other failures:
 
-- **<EntityLink id="power-seeking" />**: An AI system that successfully seeks power could use that power to lock in its continued dominance
+- **<EntityLink id="E226" />**: An AI system that successfully seeks power could use that power to lock in its continued dominance
 - **Alignment Failure**: Misaligned AI systems could lock in their misaligned objectives
-- **<EntityLink id="scheming" />**: AI systems that conceal their true capabilities could achieve lock-in through deception
-- **<EntityLink id="authoritarian-tools" />**: Authoritarian regimes could use AI to achieve permanent political lock-in
+- **<EntityLink id="E274" />**: AI systems that conceal their true capabilities could achieve lock-in through deception
+- **<EntityLink id="E30" />**: Authoritarian regimes could use AI to achieve permanent political lock-in
 
 The common thread is that lock-in transforms temporary problems into permanent ones. Even recoverable AI failures could become permanent if they occur during a critical window when lock-in becomes possible.
 
@@ -400,14 +395,8 @@ Lock-in affects the <EntityLink id="ai-transition-model" /> across multiple fact
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="preference-authenticity" /> | AI-mediated preference formation may lock in manipulated values |
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="governance" /> | AI concentration enables governance capture |
-| <EntityLink id="misuse-potential" /> | <EntityLink id="ai-control-concentration" /> | Power concentration creates lock-in conditions |
+| <EntityLink id="E60" /> | <EntityLink id="E229" /> | AI-mediated preference formation may lock in manipulated values |
+| <EntityLink id="E60" /> | <EntityLink id="E617" /> | AI concentration enables governance capture |
+| <EntityLink id="E207" /> | <EntityLink id="E7" /> | Power concentration creates lock-in conditions |
 
-Lock-in is the defining feature of the <EntityLink id="long-term-lockin" /> scenario—whether values, power, or epistemics become permanently entrenched. This affects <EntityLink id="long-term-trajectory" /> more than acute existential risk.
-
----
-
-## Related Pages
-
-<Backlinks entityId="lock-in" />
+Lock-in is the defining feature of the <EntityLink id="E193" /> scenario—whether values, power, or epistemics become permanently entrenched. This affects <EntityLink id="E194" /> more than acute existential risk.

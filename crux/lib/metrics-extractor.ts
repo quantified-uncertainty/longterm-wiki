@@ -30,6 +30,7 @@ export interface ContentMetrics {
   diagramCount: number;
   internalLinks: number;
   externalLinks: number;
+  footnoteCount: number;
   sectionCount: SectionCount;
   codeBlockCount: number;
   bulletRatio: number;
@@ -68,6 +69,7 @@ export function extractMetrics(content: string, filePath: string = ''): ContentM
     diagramCount: countDiagramsShared(contentNoImports),
     internalLinks: countInternalLinks(contentNoImports),
     externalLinks: countExternalLinks(contentNoImports),
+    footnoteCount: countFootnoteRefs(contentNoImports),
     sectionCount: countSections(contentNoImports),
     codeBlockCount: countCodeBlocks(contentNoImports),
 
@@ -169,6 +171,23 @@ export function countExternalLinks(content: string): number {
 }
 
 /**
+ * Count unique GFM footnote references [^N] (excluding definitions)
+ */
+export function countFootnoteRefs(content: string): number {
+  const refs = new Set<string>();
+  const pattern = /\[\^(\d+)\]/g;
+  for (const line of content.split('\n')) {
+    if (/^\[\^\d+\]:/.test(line.trim())) continue; // Skip definitions
+    pattern.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(line)) !== null) {
+      refs.add(match[1]);
+    }
+  }
+  return refs.size;
+}
+
+/**
  * Count h2 and h3 sections
  */
 function countSections(content: string): SectionCount {
@@ -236,10 +255,11 @@ function calculateStructuralScore(metrics: ContentMetrics): number {
   if (metrics.internalLinks >= 4) score += 2;
   else if (metrics.internalLinks >= 1) score += 1;
 
-  // External links/citations: 0-3 pts
-  if (metrics.externalLinks >= 6) score += 3;
-  else if (metrics.externalLinks >= 3) score += 2;
-  else if (metrics.externalLinks >= 1) score += 1;
+  // External citations (footnotes + external links): 0-3 pts
+  const citationCount = metrics.footnoteCount + metrics.externalLinks;
+  if (citationCount >= 6) score += 3;
+  else if (citationCount >= 3) score += 2;
+  else if (citationCount >= 1) score += 1;
 
   // Bullet ratio (lower is better): 0-2 pts
   if (metrics.bulletRatio < 0.3) score += 2;

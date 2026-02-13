@@ -14,16 +14,11 @@ ratings:
   rigor: 6
   actionability: 5.5
   completeness: 7
-metrics:
-  wordCount: 2100
-  citations: 35
-  tables: 12
-  diagrams: 1
 clusters:
   - ai-safety
 subcategory: accident
 ---
-import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+import {DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
 <DataExternalLinks pageId="steganography" />
 
@@ -141,7 +136,7 @@ Evidence suggests AI systems could use steganography for:
 
 ### Deceptive Alignment Connection
 
-Steganography enables several pathways to <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>:
+Steganography enables several pathways to <EntityLink id="E93">deceptive alignment</EntityLink>:
 
 | Pathway | Mechanism | Impact Level | Mitigation Difficulty |
 |---------|-----------|--------------|---------------------|
@@ -360,10 +355,10 @@ Note: Projections assume continued scaling; actual capabilities depend on traini
 
 Steganography intersects with several other AI safety concerns:
 
-- <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink>: Enables persistence of deceptive goals
-- <EntityLink id="scheming">Scheming</EntityLink>: Facilitates covert planning and coordination  
-- <EntityLink id="sandbagging">Sandbagging</EntityLink>: Helps conceal true capabilities during evaluation
-- <EntityLink id="mesa-optimization">Mesa-optimization</EntityLink>: Enables communication between mesa-optimizers
+- <EntityLink id="E93">Deceptive Alignment</EntityLink>: Enables persistence of deceptive goals
+- <EntityLink id="E274">Scheming</EntityLink>: Facilitates covert planning and coordination  
+- <EntityLink id="E270">Sandbagging</EntityLink>: Helps conceal true capabilities during evaluation
+- <EntityLink id="E197">Mesa-optimization</EntityLink>: Enables communication between mesa-optimizers
 
 ## Sources & Resources
 
@@ -403,4 +398,3 @@ Steganography intersects with several other AI safety concerns:
 - [Secret Collusion: Will We Know When to Unplug AI?](https://www.alignmentforum.org/posts/smMdYezaC8vuiLjCf/secret-collusion-will-we-know-when-to-unplug-ai)
 - [VentureBeat: Language models can hide their reasoning](https://venturebeat.com/ai/language-models-can-use-steganography-to-hide-their-reasoning-study-finds/)
 
-<Backlinks />

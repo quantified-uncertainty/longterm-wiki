@@ -26,6 +26,7 @@ import { findMdxFiles } from '../lib/file-utils.ts';
 import { CONTENT_DIR } from '../lib/content-types.ts';
 import { countWords, countTables, countDiagrams, countInternalLinks } from '../lib/metrics-extractor.ts';
 import { PAGE_TEMPLATES, type PageTemplate, type FrontmatterField, type SectionDef, type QualityCriterion } from '../lib/page-templates.ts';
+import { parseCliArgs } from '../lib/cli.ts';
 
 interface ScoreDetail {
   field?: string;
@@ -240,7 +241,6 @@ function gradeFile(filePath: string, template: PageTemplate): GradeResult {
 }
 
 async function main(): Promise<void> {
-  const { parseCliArgs } = await import('../lib/cli.ts');
   const parsed = parseCliArgs(process.argv.slice(2));
   const templateFilter: string | undefined = (parsed.template as string) || undefined;
   const pageFilter: string | undefined = (parsed.page as string) || undefined;

@@ -15,11 +15,6 @@ ratings:
   concreteness: 6.2
   actionability: 3.8
   objectivity: 3.5
-metrics:
-  wordCount: 1337
-  citations: 89
-  tables: 28
-  diagrams: 2
 clusters:
   - "ai-safety"
   - "community"
@@ -27,7 +22,7 @@ clusters:
 subcategory: "labs"
 quality: 51
 ---
-import {Backlinks, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
+import {Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
 <DataExternalLinks pageId="meta-ai" />
 
@@ -75,7 +70,7 @@ In January 2026, Meta [cut about 10% of staff focusing on metaverse-related VR p
 | **Headquarters** | Menlo Park, California |
 | **Parent Company** | Meta Platforms, Inc. |
 | **Current Leadership** | Robert Fergus (FAIR Director, May 2025); Ahmad Al-Dahle (GenAI); Alexandr Wang & Nat Friedman (Meta Superintelligence Labs) |
-| **Former Leadership** | <EntityLink id="yann-lecun">Yann LeCun</EntityLink> (2013-2018, Chief AI Scientist until Nov 2025); Jérôme Pesenti (2018-2022); Joelle Pineau (2023-May 2025) |
+| **Former Leadership** | <EntityLink id="E582">Yann LeCun</EntityLink> (2013-2018, Chief AI Scientist until Nov 2025); Jérôme Pesenti (2018-2022); Joelle Pineau (2023-May 2025) |
 | **Research Locations** | Menlo Park, New York City, Paris, London, Montreal, Seattle, Pittsburgh, Tel Aviv |
 | **Parent Company Employees** | ≈78,800 (Q4 2025) |
 | **Parent Company Revenue** | \$200.97B (FY 2025) |
@@ -87,7 +82,7 @@ Meta AI, originally founded as Facebook Artificial Intelligence Research (FAIR) 
 
 Meta AI has made foundational contributions to the AI ecosystem, most notably through [PyTorch](https://pytorch.org/), which now powers approximately [63% of training models](https://www.metacareers.com/blog/how-pytorch-unlocks-ai-research-and-productization-at-scale) and runs over 5 trillion inferences per day across 50 data centers. The lab's open-source [LLaMA model family](https://ai.meta.com/blog/meta-llama-3/) has been downloaded over one billion times, making it a cornerstone of the open-source AI ecosystem. In September 2022, Meta [transferred PyTorch governance](https://about.fb.com/news/2022/09/pytorch-foundation-to-accelerate-progress-in-ai-research/) to an independent foundation under the Linux Foundation.
 
-However, the organization has faced significant internal challenges. More than [half of the 14 authors](https://fortune.com/2025/04/10/meta-ai-research-lab-fair-questions-departures-future-yann-lecun-new-beginning/) of the original LLaMA research paper departed within six months of publication, with key researchers joining <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="google-deepmind">Google DeepMind</EntityLink>, <EntityLink id="microsoft">Microsoft AI</EntityLink>, and startups like <EntityLink id="mistral-ai">Mistral AI</EntityLink>. The lab has been described as "dying a slow death" by former employees, with research increasingly deprioritized in favor of product development through the GenAI team.
+However, the organization has faced significant internal challenges. More than [half of the 14 authors](https://fortune.com/2025/04/10/meta-ai-research-lab-fair-questions-departures-future-yann-lecun-new-beginning/) of the original LLaMA research paper departed within six months of publication, with key researchers joining <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E98">Google DeepMind</EntityLink>, <EntityLink id="E550">Microsoft AI</EntityLink>, and startups like <EntityLink id="mistral-ai">Mistral AI</EntityLink>. The lab has been described as "dying a slow death" by former employees, with research increasingly deprioritized in favor of product development through the GenAI team.
 
 Meta's AI safety approach remains notably weaker than competitors. The company's [Frontier AI Framework](https://about.fb.com/news/2025/02/meta-approach-frontier-ai/) published in February 2025 addresses CBRN risks but received criticism for lacking robust evaluation methodologies. The [Future of Life Institute's 2025 Winter AI Safety Index](https://www.euronews.com/next/2025/12/03/ai-less-regulated-than-sandwiches-as-tech-firms-race-toward-superintelligence-study-says) found that Meta, like other major AI companies, had no testable plan for maintaining human control over highly capable AI systems. Chief AI Scientist Yann LeCun [publicly characterized](https://techcrunch.com/2024/10/12/metas-yann-lecun-says-worries-about-a-i-s-existential-threat-are-complete-b-s/) existential risk concerns as "complete B.S." throughout his tenure.
 
@@ -96,8 +91,8 @@ Meta's AI safety approach remains notably weaker than competitors. The company's
 | Risk Category | Assessment | Evidence | Trend |
 |---------------|------------|----------|-------|
 | **Safety Research Deprioritization** | High | FAIR restructured under GenAI (2024); VP of AI Research Joelle Pineau departed; product teams prioritized | Worsening |
-| **<EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> Contribution** | Medium-High | \$66-72B AI investment (2025); AGI by 2027 timeline; Meta Superintelligence Labs founded June 2025 | Intensifying |
-| **Open Weights <EntityLink id="proliferation">Proliferation</EntityLink>** | Medium | LLaMA 4 available as open weights; no effective controls post-release; 1B+ downloads | Stable |
+| **<EntityLink id="E239">Racing Dynamics</EntityLink> Contribution** | Medium-High | \$66-72B AI investment (2025); AGI by 2027 timeline; Meta Superintelligence Labs founded June 2025 | Intensifying |
+| **Open Weights <EntityLink id="E232">Proliferation</EntityLink>** | Medium | LLaMA 4 available as open weights; no effective controls post-release; 1B+ downloads | Stable |
 | **Safety Culture Gap** | High | LeCun dismissed existential risk; Frontier Framework criticized as inadequate; human risk reviewers replaced with AI | Worsening |
 | **Talent Exodus Impact** | Medium-High | 50%+ original LLaMA authors departed; key researchers joined competitors; institutional knowledge loss | Stabilizing |
 
@@ -246,11 +241,11 @@ A larger [Hyperion facility is designed to scale up to 5 gigawatts](https://www.
 
 The [Future of Life Institute's 2025 Winter AI Safety Index](https://futureoflife.org/ai-safety-index-winter-2025/) gave Meta a C+ grade reflecting mixed performance across safety domains. While Meta has formalized and published its frontier AI safety framework with clear thresholds and risk modeling mechanisms, the evaluation found significant gaps in safety culture and implementation.
 
-Meta continues [red-teaming in areas of public safety and critical infrastructure](https://ai.meta.com/blog/meta-llama-3-1-ai-responsibility/), evaluating models against risks including cybersecurity, catastrophic risks, and child safety. The company conducts pre-deployment risk assessments, safety evaluations and extensive red teaming, though critics argue these processes lack the rigor of competitors like <EntityLink id="anthropic">Anthropic</EntityLink>.
+Meta continues [red-teaming in areas of public safety and critical infrastructure](https://ai.meta.com/blog/meta-llama-3-1-ai-responsibility/), evaluating models against risks including cybersecurity, catastrophic risks, and child safety. The company conducts pre-deployment risk assessments, safety evaluations and extensive red teaming, though critics argue these processes lack the rigor of competitors like <EntityLink id="E22">Anthropic</EntityLink>.
 
 ### Safety Framework Limitations
 
-| Element | Meta | <EntityLink id="openai">OpenAI</EntityLink> | <EntityLink id="anthropic">Anthropic</EntityLink> |
+| Element | Meta | <EntityLink id="E218">OpenAI</EntityLink> | <EntityLink id="E22">Anthropic</EntityLink> |
 |---------|------|--------|-----------|
 | **Published** | [Feb 2025](https://about.fb.com/news/2025/02/meta-approach-frontier-ai/) | Beta 2023, v2 Apr 2025 | Sep 2023, updated May 2025 |
 | **Risk Thresholds** | Moderate/High/Critical | Medium/High/Critical | ASL-2/3/4 |
@@ -263,7 +258,7 @@ Meta continues [red-teaming in areas of public safety and critical infrastructur
 
 ### Strategic Rationale
 
-Meta's open-source AI strategy differs fundamentally from competitors like <EntityLink id="openai">OpenAI</EntityLink> and <EntityLink id="anthropic">Anthropic</EntityLink>. As [Mark Zuckerberg articulated in July 2024](https://time.com/7002563/mark-zuckerberg-ai-llama-meta-open-source/):
+Meta's open-source AI strategy differs fundamentally from competitors like <EntityLink id="E218">OpenAI</EntityLink> and <EntityLink id="E22">Anthropic</EntityLink>. As [Mark Zuckerberg articulated in July 2024](https://time.com/7002563/mark-zuckerberg-ai-llama-meta-open-source/):
 
 > "A key difference between Meta and closed model providers is that selling access to AI models isn't our business model."
 
@@ -318,7 +313,7 @@ Meta's custom chip strategy has accelerated significantly:
 
 Meta faces increasing competition from newer entrants:
 
-| Dimension | Meta AI | <EntityLink id="openai">OpenAI</EntityLink> | <EntityLink id="anthropic">Anthropic</EntityLink> | <EntityLink id="xai">xAI</EntityLink> | <EntityLink id="character-ai">Character.AI</EntityLink> |
+| Dimension | Meta AI | <EntityLink id="E218">OpenAI</EntityLink> | <EntityLink id="E22">Anthropic</EntityLink> | <EntityLink id="E378">xAI</EntityLink> | <EntityLink id="character-ai">Character.AI</EntityLink> |
 |-----------|---------|--------|-----------|---------|---------------|
 | **Open Source** | High (LLaMA) | None (closed) | None (closed) | Limited | None |
 | **Safety Priority** | Low | Medium | High | Low | Medium |
@@ -403,5 +398,3 @@ The departure of Yann LeCun and his [public dismissal of existential risk](https
 [^28]: [TechCrunch - LeCun World Model Startup](https://techcrunch.com/2025/12/19/yann-lecun-confirms-his-new-world-model-startup-reportedly-seeks-5b-valuation/)
 [^29]: [AI Magazine - Prometheus Supercluster](https://aimagazine.com/articles/mark-zuckerberg-reveals-100bn-meta-ai-supercluster-push)
 [^30]: [Fox News - World's Largest Superclusters](https://www.foxnews.com/tech/meta-builds-worlds-largest-ai-superclusters-future)
-
-<Backlinks entityId="meta-ai" />

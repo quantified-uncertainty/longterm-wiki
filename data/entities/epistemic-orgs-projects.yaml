@@ -3,6 +3,7 @@
 
 # Organizations
 - id: quri
+  numericId: E238
   type: organization
   title: QURI (Quantified Uncertainty Research Institute)
   description: Nonprofit research organization developing tools for probabilistic reasoning and forecasting, including Squiggle, Metaforecast, and SquiggleAI.
@@ -10,6 +11,7 @@
   lastUpdated: 2026-01
 
 - id: metaculus
+  numericId: E199
   type: organization
   title: Metaculus
   description: Reputation-based prediction aggregation platform that has become the primary source for AI timeline forecasts, with over 1 million predictions across 15,000+ questions.
@@ -17,6 +19,7 @@
   lastUpdated: 2026-01
 
 - id: fri
+  numericId: E147
   type: organization
   title: Forecasting Research Institute (FRI)
   description: Research institute advancing forecasting methodology through large-scale tournaments and rigorous experiments, led by Philip Tetlock.
@@ -25,64 +28,82 @@
 
 # Projects
 - id: squiggle
+  numericId: E286
   type: project
   title: Squiggle
   description: Domain-specific programming language for probabilistic estimation with native distribution types and Monte Carlo sampling.
   path: /knowledge-base/responses/squiggle/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: metaforecast
+  numericId: E200
   type: project
   title: Metaforecast
   description: Forecast aggregation platform combining predictions from 10+ sources into a unified search interface.
   path: /knowledge-base/responses/metaforecast/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: squiggleai
+  numericId: E287
   type: project
   title: SquiggleAI
   description: LLM-powered tool for generating probabilistic models in Squiggle from natural language descriptions.
   path: /knowledge-base/responses/squiggleai/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: xpt
+  numericId: E379
   type: project
   title: XPT (Existential Risk Persuasion Tournament)
   description: Four-month structured forecasting tournament bringing together superforecasters and domain experts through adversarial collaboration.
   path: /knowledge-base/responses/xpt/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: forecastbench
+  numericId: E144
   type: project
   title: ForecastBench
   description: Dynamic, contamination-free benchmark for evaluating LLM forecasting capabilities, published at ICLR 2025.
   path: /knowledge-base/responses/forecastbench/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: ai-forecasting-benchmark
+  numericId: E10
   type: project
   title: AI Forecasting Benchmark Tournament
   description: Quarterly competition run by Metaculus comparing human Pro Forecasters against AI forecasting bots.
   path: /knowledge-base/responses/ai-forecasting-benchmark/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: ai-assisted-knowledge-management
+  numericId: E681
   type: concept
   title: AI-Assisted Knowledge Management
   description: Tools and platforms using LLMs to help create, maintain, and query knowledge bases, from personal tools (Obsidian+AI, Notion AI) to open-source RAG frameworks (LlamaIndex, Haystack).
   path: /knowledge-base/responses/ai-assisted-knowledge-management/
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 
 - id: grokipedia
+  numericId: E682
   type: project
   title: Grokipedia
   description: xAI's AI-generated encyclopedia launched October 2025, growing to 6M+ articles with documented quality concerns including political bias and scientific inaccuracies.
   path: /knowledge-base/responses/grokipedia/
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 
 - id: wikipedia-and-ai
+  numericId: E683
   type: concept
   title: Wikipedia and AI Content
   description: Wikipedia's evolving relationship with AI-generated content, including defensive policies, WikiProject AI Cleanup, model collapse risks, and sustainability challenges.
   path: /knowledge-base/responses/wikipedia-and-ai/
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview

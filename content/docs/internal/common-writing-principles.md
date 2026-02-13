@@ -12,11 +12,6 @@ ratings:
   rigor: 5
   actionability: 7
   completeness: 6
-metrics:
-  wordCount: 1200
-  citations: 0
-  tables: 5
-  diagrams: 0
 ---
 # Common Writing Principles
 

@@ -13,17 +13,12 @@ ratings:
   completeness: 5
 quality: 55
 llmSummary: Comprehensive overview of the EU AI Act's risk-based regulatory framework, particularly its two-tier approach to foundation models that distinguishes between standard and systemic risk AI systems. The analysis provides valuable implementation details and governance structure but cuts off before addressing key criticisms and global implications.
-metrics:
-  wordCount: 4254
-  citations: 98
-  tables: 9
-  diagrams: 0
 clusters:
   - ai-safety
   - governance
 subcategory: governance-legislation
 ---
-import {EntityLink, Backlinks, KeyPeople, KeyQuestions, Section} from '@components/wiki';
+import {EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
 
 ## Quick Assessment
 
@@ -38,13 +33,11 @@ import {EntityLink, Backlinks, KeyPeople, KeyQuestions, Section} from '@componen
 | **Maximum Penalties** | €35M or 7% global turnover |
 | **Enforcement Body** | European AI Office |
 
-
 ## Key Links
 
 | Source | Link |
 |--------|------|
 | Official Website | [europarl.europa.eu](https://www.europarl.europa.eu/topics/en/article/20230601STO93804/eu-ai-act-first-regulation-on-artificial-intelligence) |
-
 
 ## Overview
 
@@ -104,7 +97,7 @@ The AI Act establishes four risk levels for AI systems, each with corresponding 
 |------------|----------|--------------|----------|
 | **Unacceptable** | Social scoring, subliminal manipulation, real-time biometric ID in public (with exceptions), untargeted facial recognition scraping | Complete prohibition | February 2, 2025[^31] |
 | **High-Risk** | CV-scanning tools, critical infrastructure AI, AI in education/employment/law enforcement, product safety systems | Mandatory risk assessments, EU database registration, conformity assessment, CE marking, human oversight, lifecycle monitoring | August 2, 2026[^32] |
-| **Limited** | Chatbots, <EntityLink id="deepfakes">deepfakes</EntityLink>, emotion recognition systems | Transparency obligations (label AI-generated content, disclose AI interaction) | August 2, 2026[^33] |
+| **Limited** | Chatbots, <EntityLink id="E96">deepfakes</EntityLink>, emotion recognition systems | Transparency obligations (label AI-generated content, disclose AI interaction) | August 2, 2026[^33] |
 | **Minimal** | Spam filters, video games, AI-enabled inventory systems | No specific obligations beyond existing laws | Already applicable[^34] |
 
 ### Prohibited AI Practices
@@ -126,7 +119,7 @@ These prohibitions took effect on **February 2, 2025**, making them the first en
 
 ### Defining General-Purpose AI
 
-The Act regulates **foundation models** under the category of "general-purpose AI" (GPAI) models, defined as AI systems trained on large amounts of data that can perform a wide variety of tasks across different applications.[^38][^39] This includes <EntityLink id="language-models">large language models</EntityLink> like GPT-4, Claude, and Llama, as well as multimodal foundation models.
+The Act regulates **foundation models** under the category of "general-purpose AI" (GPAI) models, defined as AI systems trained on large amounts of data that can perform a wide variety of tasks across different applications.[^38][^39] This includes <EntityLink id="E186">large language models</EntityLink> like GPT-4, Claude, and Llama, as well as multimodal foundation models.
 
 GPAI models are regulated separately from application-specific AI systems because of their adaptability across multiple downstream uses, some of which may be high-risk even if the model itself was not designed for those purposes.[^40]
 
@@ -147,7 +140,7 @@ Applicable to all general-purpose AI model providers, regardless of size or capa
 
 **Tier 2: Systemic Risk GPAI Models (Enhanced Obligations)**
 
-Designated based on <EntityLink id="thresholds">compute thresholds</EntityLink> (>10²⁵ FLOPs for training) or Commission assessment of capabilities, market impact, and potential for widespread harm:[^45][^46]
+Designated based on <EntityLink id="E465">compute thresholds</EntityLink> (>10²⁵ FLOPs for training) or Commission assessment of capabilities, market impact, and potential for widespread harm:[^45][^46]
 
 - Model evaluations and adversarial testing to identify systemic risks
 - Assessment and mitigation of risks to health, safety, fundamental rights, environment, democracy, and rule of law
@@ -181,11 +174,11 @@ Chairs and vice-chairs leading the code's development include:[^54][^55]
 | Name | Role | Background |
 |------|------|------------|
 | **Nuria Oliver** | Chair | Director, ELLIS Alicante Foundation; PhD in AI from MIT; IEEE/ACM Fellow |
-| **<EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>** | Chair | Turing Award winner; Professor at Université de Montréal; Founder of Mila |
+| **<EntityLink id="E380">Yoshua Bengio</EntityLink>** | Chair | Turing Award winner; Professor at Université de Montréal; Founder of Mila |
 | **Alexander Peukert** | Co-Chair (Copyright) | Professor of Civil/Commercial/Information Law, Goethe University Frankfurt |
 | **Marietje Schaake** | Chair | Fellow at Stanford Cyber Policy Center & Institute for Human-Centred AI |
 | **Daniel Privitera** | Vice-Chair | Founder/Executive Director, KIRA Center; Lead Writer of International Scientific Report on Advanced AI Safety |
-| **Markus Anderljung** | Vice-Chair | Director of Policy & Research, <EntityLink id="govai">Centre for the Governance of AI</EntityLink> |
+| **Markus Anderljung** | Vice-Chair | Director of Policy & Research, <EntityLink id="E153">Centre for the Governance of AI</EntityLink> |
 
 The Commission and AI Board have confirmed this code as an adequate voluntary compliance tool that may serve as a mitigating factor when determining fines for violations.[^56]
 
@@ -236,7 +229,7 @@ For startups and SMEs, caps are available to prevent disproportionate financial 
 
 ### Innovation vs. Regulation Tensions
 
-The Act's approach to foundation models has sparked intense debate over whether it strikes the right balance between safety and innovation. **France, Germany, and Italy** actively opposed strict GPAI regulations during negotiations, arguing they would harm European AI competitiveness against US and Chinese firms.[^67][^68] French startup Mistral AI, German company Aleph Alpha, and other European AI developers expressed concerns that compliance burdens would disadvantage them against better-resourced non-EU competitors like <EntityLink id="openai">OpenAI</EntityLink> and <EntityLink id="anthropic">Anthropic</EntityLink>.
+The Act's approach to foundation models has sparked intense debate over whether it strikes the right balance between safety and innovation. **France, Germany, and Italy** actively opposed strict GPAI regulations during negotiations, arguing they would harm European AI competitiveness against US and Chinese firms.[^67][^68] French startup Mistral AI, German company Aleph Alpha, and other European AI developers expressed concerns that compliance burdens would disadvantage them against better-resourced non-EU competitors like <EntityLink id="E218">OpenAI</EntityLink> and <EntityLink id="E22">Anthropic</EntityLink>.
 
 Critics point to Europe's existing lag in AI development—trailing US leaders in compute resources, funding, and technical talent—and warn the Act may widen this gap.[^69] The regulatory approach contrasts sharply with the US, where voluntary industry standards and executive orders provide more flexible governance frameworks.[^70]
 
@@ -268,7 +261,7 @@ Stanford's Center for Research on Foundation Models (CRFM) noted that the comput
 
 AI safety researchers have criticized the Act for insufficient provisions addressing **existential risks** from advanced AI systems.[^79][^80] While the Act mandates evaluations for systemic risks, it includes:
 
-- No requirements for **<EntityLink id="alignment">AI alignment</EntityLink> research** (ensuring advanced systems' goals match human values)
+- No requirements for **<EntityLink id="E439">AI alignment</EntityLink> research** (ensuring advanced systems' goals match human values)
 - No provisions for third-party researcher access to models for safety evaluations
 - No adverse event reporting mechanisms comparable to pharmaceutical or aviation safety systems
 - No explicit coverage of scenarios involving misaligned superintelligent systems
@@ -279,7 +272,7 @@ The focus on immediate deployment risks (manipulation, discrimination, privacy v
 
 Several practical enforcement concerns have emerged:[^82][^83]
 
-- **<EntityLink id="regulatory-capacity">Regulatory capacity</EntityLink>**: Whether the AI Office and national authorities have sufficient expertise and resources to effectively monitor rapidly evolving foundation models
+- **<EntityLink id="E249">Regulatory capacity</EntityLink>**: Whether the AI Office and national authorities have sufficient expertise and resources to effectively monitor rapidly evolving foundation models
 - **Extraterritorial reach**: Questions about enforcing requirements on non-EU providers, especially for open-source models uploaded from outside the EU
 - **Compliance burden**: Particularly for SMEs and researchers who may lack resources for extensive documentation and risk assessments
 - **Loopholes**: Compute-intensive models may quickly become outdated as a metric; workarounds for training data disclosure requirements
@@ -324,7 +317,7 @@ The Act's global influence extends through its potential to serve as a model for
 
 ### Bilateral and Multilateral Engagement
 
-The EU actively engages in international <EntityLink id="ai-governance">AI governance</EntityLink> through multiple channels:[^93]
+The EU actively engages in international <EntityLink id="E608">AI governance</EntityLink> through multiple channels:[^93]
 
 - **Bilateral cooperation**: Partnerships with Canada, US, India, Japan, South Korea, Singapore, Australia, and UK
 - **Multilateral forums**: Participation in G7, G20, OECD, and Global Partnership on AI discussions
@@ -364,8 +357,6 @@ Several major questions remain about the Act's effectiveness and evolution:
 7. **Systemic risk designation**: How will the Commission operationalize its discretion to designate foundation models as posing systemic risk beyond the compute threshold? Will this process be transparent and predictable?
 
 8. **Open-source implications**: How will the Act affect open-source foundation models like Llama, Mistral, and others? Will compliance burdens disproportionately affect open development compared to proprietary systems?
-
-<Backlinks />
 
 ## Sources
 

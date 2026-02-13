@@ -18,31 +18,26 @@ ratings:
   rigor: 6.8
   actionability: 5.5
   completeness: 7.1
-metrics:
-  wordCount: 4669
-  citations: 29
-  tables: 16
-  diagrams: 1
 clusters:
   - ai-safety
   - governance
 subcategory: governance-compute-governance
 ---
-import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks} from '@components/wiki';
+import {DataInfoBox, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
-<DataInfoBox entityId="international-compute-regimes" />
+<DataInfoBox entityId="E170" />
 
 :::note[Part of Compute Governance]
-This page covers **international regimes**—one approach within the broader Compute Governance framework. See also: <EntityLink id="export-controls">Export Controls</EntityLink>, <EntityLink id="thresholds">Thresholds</EntityLink>, <EntityLink id="monitoring">Monitoring</EntityLink>.
+This page covers **international regimes**—one approach within the broader Compute Governance framework. See also: <EntityLink id="E136">Export Controls</EntityLink>, <EntityLink id="E465">Thresholds</EntityLink>, <EntityLink id="E464">Monitoring</EntityLink>.
 :::
 
 ## Overview
 
-International compute regimes represent a critical but challenging approach to governing AI development through multilateral coordination. Unlike unilateral measures such as export controls or domestic regulations, these regimes would establish binding international agreements that coordinate compute governance across nations—analogous to nuclear non-proliferation treaties or chemical weapons conventions. While mostly in proposal and early discussion stages, these frameworks could potentially address fundamental limitations of national-only approaches to <EntityLink id="ai-governance">AI governance</EntityLink>.
+International compute regimes represent a critical but challenging approach to governing AI development through multilateral coordination. Unlike unilateral measures such as export controls or domestic regulations, these regimes would establish binding international agreements that coordinate compute governance across nations—analogous to nuclear non-proliferation treaties or chemical weapons conventions. While mostly in proposal and early discussion stages, these frameworks could potentially address fundamental limitations of national-only approaches to <EntityLink id="E608">AI governance</EntityLink>.
 
 The core premise underlying international compute regimes is that unilateral governance has inherent limitations in governing a global technology. Export controls can be circumvented through third countries or alternative supply chains. Domestic compute thresholds only apply within specific jurisdictions, creating regulatory arbitrage opportunities. Monitoring systems require international cooperation to achieve comprehensive coverage of global AI development. Racing dynamics between nations can undermine individual countries' safety measures, as competitive pressures override precautionary approaches.
 
-Current progress remains limited to high-level political declarations, with the November 2023 <EntityLink id="bletchley-declaration">Bletchley Declaration</EntityLink> representing the first international agreement to acknowledge catastrophic AI risks, signed by 28 countries including the United States, United Kingdom, European Union members, and China. However, these agreements remain entirely non-binding and lack enforcement mechanisms, verification systems, or specific commitments beyond general principles. The path from these declarative statements to meaningful binding regimes faces substantial political, technical, and institutional challenges.
+Current progress remains limited to high-level political declarations, with the November 2023 <EntityLink id="E469">Bletchley Declaration</EntityLink> representing the first international agreement to acknowledge catastrophic AI risks, signed by 28 countries including the United States, United Kingdom, European Union members, and China. However, these agreements remain entirely non-binding and lack enforcement mechanisms, verification systems, or specific commitments beyond general principles. The path from these declarative statements to meaningful binding regimes faces substantial political, technical, and institutional challenges.
 
 ### Quick Assessment
 
@@ -53,15 +48,15 @@ Current progress remains limited to high-level political declarations, with the 
 | Current Status | Early implementation | 28 countries in Bletchley process; 1 binding treaty (Council of Europe, Sept 2024); 118 UN member states absent from governance initiatives | <R id="5b0fdfb5ea562bd2">UN HLAB 2024</R> |
 | Time Horizon | Long-term | 5-10+ years for meaningful compute regimes; first binding treaty achieved 2024 | <R id="6bc8cc6226add0a9">Council of Europe Framework Convention</R> |
 | Negotiation Cost | High | \$50-200M over 5-10 years for track-1 and track-2 diplomacy | Policy analysis estimates |
-| Verification Feasibility | Uncertain | Hardware monitoring 40-70% coverage possible; chip tracking analogous to nuclear verification | <R id="397d960772172592"><EntityLink id="cset">CSET</EntityLink> research</R> |
+| Verification Feasibility | Uncertain | Hardware monitoring 40-70% coverage possible; chip tracking analogous to nuclear verification | <R id="397d960772172592"><EntityLink id="E524">CSET</EntityLink> research</R> |
 
 ### Risks Addressed
 
 | Risk | Mechanism | Effectiveness |
 |------|-----------|---------------|
-| <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> | Coordinated limits prevent races | High (if achieved) |
-| <EntityLink id="proliferation">Proliferation</EntityLink> | Global verification of compute access | High (if achieved) |
-| <EntityLink id="concentration-of-power">Concentration of Power</EntityLink> | Multilateral rather than unilateral control | Medium |
+| <EntityLink id="E239">Racing Dynamics</EntityLink> | Coordinated limits prevent races | High (if achieved) |
+| <EntityLink id="E232">Proliferation</EntityLink> | Global verification of compute access | High (if achieved) |
+| <EntityLink id="E68">Concentration of Power</EntityLink> | Multilateral rather than unilateral control | Medium |
 
 ---
 
@@ -72,7 +67,7 @@ The following table compares major international AI governance initiatives as of
 | Initiative/Regime | Type | Participants | Key Provisions | Status | Effectiveness Assessment |
 |-------------------|------|--------------|----------------|--------|-------------------------|
 | <R id="79f2157d0aa55bdd">Bletchley Declaration</R> (Nov 2023) | Non-binding declaration | 28 countries including US, UK, EU, China | Acknowledges catastrophic AI risks; commits to international cooperation on safety | Active; <R id="73d81d3ead01bc0e">expanded to Seoul Summit</R> May 2024 | Low (declaratory only); laid groundwork for future cooperation |
-| <R id="73d81d3ead01bc0e">Seoul Declaration</R> (May 2024) | Non-binding declaration | 10 countries + EU (Leaders' Session); 27 countries + EU (Ministerial) | Adds "innovation" and "inclusivity" to safety agenda; creates International Network of <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> | Active; notably China did not sign | Low-Medium (created institutional network but non-binding) |
+| <R id="73d81d3ead01bc0e">Seoul Declaration</R> (May 2024) | Non-binding declaration | 10 countries + EU (Leaders' Session); 27 countries + EU (Ministerial) | Adds "innovation" and "inclusivity" to safety agenda; creates International Network of <EntityLink id="E13">AI Safety Institutes</EntityLink> | Active; notably China did not sign | Low-Medium (created institutional network but non-binding) |
 | <R id="6bc8cc6226add0a9">Council of Europe Framework Convention</R> (Sept 2024) | Binding treaty | 46 CoE members + 11 observers; signed by 10 states including US, UK, EU | First legally binding AI governance agreement; focuses on human rights and democratic values | Newly signed; not yet ratified | Medium (first binding treaty but limited participation from Global South and adversaries) |
 | <R id="5b0fdfb5ea562bd2">UN AI Advisory Body</R> (Sept 2024) | Recommendations | 39 experts from 33 countries | Proposes 7 recommendations including International Scientific Panel, Policy Dialogue, AI Standards Exchange | Recommendation phase; GA to establish process 2024-2025 | Uncertain (comprehensive but requires political will; 118 of 193 UN states absent from major AI governance initiatives) |
 | IAEA-like Institution | Proposal | N/A | Registry of large training runs; inspections of AI facilities; capability evaluations; international safety standards | Proposal stage; <R id="bb6ddef6704acd21">conceptual papers published</R> | High potential if achieved (5-15% probability by 2030) |
@@ -97,7 +92,7 @@ flowchart TD
     HLAB --> DIALOGUE[Proposed Policy Dialogue<br/>on AI Governance]
 
     BLETCHLEY[Bletchley Process<br/>28 countries] --> SEOUL[Seoul Summit 2024<br/>International Network of AI Safety Institutes]
-    SEOUL --> PARIS[Paris Summit 2025<br/>TBD outcomes]
+    SEOUL --> PARIS[Paris AI Action Summit<br/>Feb 2025, 60+ countries<br/>Focus on public interest AI]
 
     COE[Council of Europe<br/>46 members + 11 observers] --> TREATY[Framework Convention<br/>Sept 2024<br/>First Binding Treaty]
 
@@ -349,15 +344,9 @@ The following table synthesizes the current state of international AI governance
 
 ## Related Approaches
 
-- <EntityLink id="export-controls">Export Controls</EntityLink> — Current unilateral restrictions that international regimes could supplement or replace
-- <EntityLink id="thresholds">Compute Thresholds</EntityLink> — Domestic regulatory triggers that require international coordination for effectiveness
-- <EntityLink id="monitoring">Compute Monitoring</EntityLink> — Technical foundation enabling verification for international agreements
-
----
-
-## Related Pages
-
----
+- <EntityLink id="E136">Export Controls</EntityLink> — Current unilateral restrictions that international regimes could supplement or replace
+- <EntityLink id="E465">Compute Thresholds</EntityLink> — Domestic regulatory triggers that require international coordination for effectiveness
+- <EntityLink id="E464">Compute Monitoring</EntityLink> — Technical foundation enabling verification for international agreements
 
 ## AI Transition Model Context
 
@@ -365,9 +354,9 @@ International compute regimes improve the <EntityLink id="ai-transition-model" /
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="international-coordination" /> | Treaties establish binding commitments on development pace and safety standards |
-| <EntityLink id="transition-turbulence" /> | <EntityLink id="racing-intensity" /> | Coordinated limits prevent destructive race to the bottom |
-| <EntityLink id="transition-turbulence" /> | <EntityLink id="ai-control-concentration" /> | Multilateral governance distributes oversight across stakeholders |
+| <EntityLink id="E60" /> | <EntityLink id="E171" /> | Treaties establish binding commitments on development pace and safety standards |
+| <EntityLink id="E358" /> | <EntityLink id="E242" /> | Coordinated limits prevent destructive race to the bottom |
+| <EntityLink id="E358" /> | <EntityLink id="E7" /> | Multilateral governance distributes oversight across stakeholders |
 
 International regimes are high-impact but low-probability interventions; 10-25% chance of meaningful regimes by 2035 but potential 30-60% reduction in racing dynamics if achieved.
 

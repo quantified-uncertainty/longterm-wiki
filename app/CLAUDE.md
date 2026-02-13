@@ -63,7 +63,7 @@ longterm-wiki/
 │   ├── resources/             # External resource links
 │   ├── insights/              # Extracted insights
 │   ├── graphs/                # Causal graph YAML
-│   └── id-registry.json       # Persistent entity ID mapping
+│   └── id-registry.json       # Derived build artifact (gitignored)
 ├── app/                       # Next.js 15 frontend (this directory)
 │   ├── src/
 │   │   ├── app/               # App Router pages

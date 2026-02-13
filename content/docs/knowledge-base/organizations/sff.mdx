@@ -13,18 +13,13 @@ ratings:
   rigor: 6
   actionability: 5.5
   completeness: 7
-metrics:
-  wordCount: 2694
-  citations: 79
-  tables: 42
-  diagrams: 2
 clusters:
   - community
   - ai-safety
   - governance
 subcategory: funders
 ---
-import {DataInfoBox, Backlinks, Mermaid, EntityLink} from '@components/wiki';
+import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 
 ## Quick Assessment
 
@@ -55,15 +50,15 @@ import {DataInfoBox, Backlinks, Mermaid, EntityLink} from '@components/wiki';
 | **Mechanism** | S-process (multi-recommender simulation allocation) |
 | **Funding Programs** | S-Process Grant Rounds (1-2/year), Speculation Grants (rolling), Matching Pledges (2025+) |
 | **Total Historical Giving** | \$100M+ since 2019 |
-| **S-Process Developers** | Andrew Critch, <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink>, Oliver Habryka, Kevin Arlin, Jason Moggridge |
+| **S-Process Developers** | Andrew Critch, <EntityLink id="E577">Jaan Tallinn</EntityLink>, Oliver Habryka, Kevin Arlin, Jason Moggridge |
 
 ## Overview
 
-The [Survival and Flourishing Fund](https://survivalandflourishing.fund/) (SFF) is the second-largest funder of AI safety research after <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, having distributed over \$100 million since beginning grantmaking in 2019. Financed primarily by [Jaan Tallinn](https://en.wikipedia.org/wiki/Jaan_Tallinn), the Skype and Kazaa co-founder with an estimated net worth of approximately \$900 million, SFF uses a distinctive algorithmic mechanism called the "S-process" to allocate grants based on recommendations from multiple advisors.
+The [Survival and Flourishing Fund](https://survivalandflourishing.fund/) (SFF) is the second-largest funder of AI safety research after <EntityLink id="E521">Coefficient Giving</EntityLink>, having distributed over \$100 million since beginning grantmaking in 2019. Financed primarily by [Jaan Tallinn](https://en.wikipedia.org/wiki/Jaan_Tallinn), the Skype and Kazaa co-founder with an estimated net worth of approximately \$900 million, SFF uses a distinctive algorithmic mechanism called the "S-process" to allocate grants based on recommendations from multiple advisors.
 
 SFF originated from the [Berkeley Existential Risk Initiative](https://existence.org/) (BERI) in 2019 as a way to continue BERI's grantmaking activities while allowing BERI to focus on its core mission of operational support. Initially funded with approximately \$2 million from BERI (itself funded by Tallinn), SFF has grown dramatically: from \$2 million distributed in 2019 to \$34.33 million in 2025.
 
-SFF's focus has increasingly centered on AI safety as the field has grown. In 2025, approximately 86% of grants went to AI-related projects, up from roughly 50% in 2019. This reflects both Tallinn's longstanding concern about AI existential risk and the growing urgency perceived in the field. The fund supports a diverse portfolio ranging from technical research organizations (<EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="metr">METR</EntityLink>, <EntityLink id="far-ai">FAR AI</EntityLink>) to policy groups (Center for AI Policy, <EntityLink id="govai">GovAI</EntityLink>) and field-building initiatives (SERI MATS, <EntityLink id="80000-hours">80,000 Hours</EntityLink>).
+SFF's focus has increasingly centered on AI safety as the field has grown. In 2025, approximately 86% of grants went to AI-related projects, up from roughly 50% in 2019. This reflects both Tallinn's longstanding concern about AI existential risk and the growing urgency perceived in the field. The fund supports a diverse portfolio ranging from technical research organizations (<EntityLink id="E202">MIRI</EntityLink>, <EntityLink id="E201">METR</EntityLink>, <EntityLink id="E138">FAR AI</EntityLink>) to policy groups (Center for AI Policy, <EntityLink id="E153">GovAI</EntityLink>) and field-building initiatives (SERI MATS, <EntityLink id="E510">80,000 Hours</EntityLink>).
 
 The S-process mechanism distinguishes SFF from traditional foundations. Rather than having a single decision-maker or voting committee, SFF uses multiple "recommenders" (typically 6-12 per round) who express their funding preferences as mathematical utility functions. An algorithm then computes final allocations that respect funders' meta-preferences about which recommenders to trust on which topics. Critically, the system is designed to favor funding projects that *at least one* recommender is excited about, rather than projects that achieve consensus approval.
 
@@ -75,8 +70,8 @@ SFF's 2025 grant round distributed \$34.33 million across dozens of organization
 
 | Cause Area | Amount | Share | Key Recipients |
 |------------|--------|-------|----------------|
-| **AI Safety & Governance** | ≈\$29.5M | 86% | MIRI, METR, <EntityLink id="cais">CAIS</EntityLink>, GovAI, Apollo, FAR AI, university programs |
-| **Biosecurity** | ≈\$2.5M | 7% | <EntityLink id="securebio">SecureBio</EntityLink>, Johns Hopkins CHS, NTI |
+| **AI Safety & Governance** | ≈\$29.5M | 86% | MIRI, METR, <EntityLink id="E47">CAIS</EntityLink>, GovAI, Apollo, FAR AI, university programs |
+| **Biosecurity** | ≈\$2.5M | 7% | <EntityLink id="E563">SecureBio</EntityLink>, Johns Hopkins CHS, NTI |
 | **Other X-Risk** | ≈\$1.5M | 4% | Nuclear risk, forecasting, civilizational resilience |
 | **Meta/Community** | ≈\$0.8M | 3% | EA community building, longevity, fertility research |
 
@@ -84,11 +79,11 @@ SFF's 2025 grant round distributed \$34.33 million across dozens of organization
 
 | Organization | Focus Area | Notes |
 |--------------|------------|-------|
-| **[MIRI](https://intelligence.org/)** | Technical alignment research | Longstanding SFF grantee; founded by <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> |
-| **[METR](https://metr.org/)** (formerly ARC Evals) | Frontier model evaluations | Leading <EntityLink id="dangerous-cap-evals">dangerous capability evaluations</EntityLink>; budget rapidly growing |
+| **[MIRI](https://intelligence.org/)** | Technical alignment research | Longstanding SFF grantee; founded by <EntityLink id="E114">Eliezer Yudkowsky</EntityLink> |
+| **[METR](https://metr.org/)** (formerly ARC Evals) | Frontier model evaluations | Leading <EntityLink id="E442">dangerous capability evaluations</EntityLink>; budget rapidly growing |
 | **[Center for AI Safety](https://www.safe.ai/)** | Research and advocacy | Total SFF funding: \$6.4M+ historically |
 | **[Apollo Research](https://apolloresearch.ai/)** | Deception detection in AI | Leading European evals group; recent o1 research |
-| **[GovAI](https://www.governance.ai/)** | <EntityLink id="ai-governance">AI governance</EntityLink> research | Oxford-based policy research |
+| **[GovAI](https://www.governance.ai/)** | <EntityLink id="E608">AI governance</EntityLink> research | Oxford-based policy research |
 | **[FAR AI](https://far.ai/)** | Alignment research | Technical safety research |
 | **[SecureBio](https://www.securebio.org/)** | AI + biosecurity intersection | \$250K in 2025; some recommenders felt deserved more |
 | **[Palisade Research](https://palisaderesearch.org/)** | Security research | AI safety security focus |
@@ -413,7 +408,7 @@ SFF operates alongside but independently from other major longtermist funders, e
 
 **Post-FTX Importance**: After the collapse of FTX and the Future Fund in late 2022, SFF became even more critical to the longtermist funding ecosystem. The Future Fund had been positioned as a major new funder with similar cause priorities; its disappearance increased reliance on SFF and Coefficient Giving.
 
-**LTFF Relationship**: LTFF has received funding from both SFF and Coefficient Giving, making it partially downstream of these larger funders. [About 40% of LTFF's 2022 funding came from Coefficient (then Coefficient Giving)](https://forum.effectivealtruism.org/posts/zt6MsCCDStm74HFwo/ea-funds-organisational-update-open-philanthropy-matching-and). LTFF typically makes smaller grants (\$10K-\$500K) compared to SFF's median ≈\$100K and often funds individuals or very early-stage projects.
+**LTFF Relationship**: LTFF has received funding from both SFF and Coefficient Giving, making it partially downstream of these larger funders. [About 40% of LTFF's 2022 funding came from Coefficient (then Open Philanthropy)](https://forum.effectivealtruism.org/posts/zt6MsCCDStm74HFwo/ea-funds-organisational-update-open-philanthropy-matching-and). LTFF typically makes smaller grants (\$10K-\$500K) compared to SFF's median ≈\$100K and often funds individuals or very early-stage projects.
 
 **Lightspeed Grants**: Also primarily funded by Jaan Tallinn, Lightspeed Grants focuses on even faster turnaround than SFF's Speculation Grants. The 2023-H2 round included \$9.62M from Lightspeed Grants incorporated into the SFF announcement.
 
@@ -583,4 +578,3 @@ The shift from ~50% AI focus in 2019 to ~86% in 2025 reflects both genuine urgen
 - [Survival and Flourishing Corp](https://survivalandflourishing.com/)
 - [EA Forum Topic: Survival and Flourishing](https://forum.effectivealtruism.org/topics/survival-and-flourishing)
 
-<Backlinks />

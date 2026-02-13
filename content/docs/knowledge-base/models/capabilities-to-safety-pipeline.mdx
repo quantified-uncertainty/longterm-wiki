@@ -19,25 +19,20 @@ todos:
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Strategic Importance' section
   - Complete 'Limitations' section (6 placeholders)
-metrics:
-  wordCount: 1031
-  citations: 23
-  tables: 55
-  diagrams: 2
 clusters:
   - ai-safety
   - governance
 subcategory: safety-models
 ---
-import {DataInfoBox, Backlinks, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
+import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="capabilities-to-safety-pipeline" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E51" ratings={frontmatter.ratings} />
 
 ## Overview
 
 The capabilities-to-safety pipeline model analyzes how ML researchers transition from capabilities work to AI safety research. Given severe talent constraints in safety work, the pool of 50,000-100,000 experienced ML researchers globally represents the most promising source of qualified safety researchers. Understanding transition dynamics is critical as the field requires researchers with deep ML expertise who can address alignment challenges and emerging capabilities.
 
-The model reveals severe pipeline bottlenecks. Only 20-30% of ML researchers are aware of safety concerns, and just 10-15% of aware researchers seriously consider transitioning. Among those considering transition, 60-75% are blocked by practical barriers. This yields current annual transition rates of only 50-400 researchers—far below what's needed as AI systems approach <EntityLink id="agi-timeline">AGI timelines</EntityLink>.
+The model reveals severe pipeline bottlenecks. Only 20-30% of ML researchers are aware of safety concerns, and just 10-15% of aware researchers seriously consider transitioning. Among those considering transition, 60-75% are blocked by practical barriers. This yields current annual transition rates of only 50-400 researchers—far below what's needed as AI systems approach <EntityLink id="E399">AGI timelines</EntityLink>.
 
 The analysis identifies high-leverage intervention points. Training programs like <R id="ba3a8bd9c8404d7b">MATS</R> achieve 60-80% conversion rates at \$10-40K per transition. Fellowship programs targeting financial barriers show promise at \$50-100K per transition. Internal advocacy within frontier AI labs could unlock 50-100 additional transitions annually. These interventions could plausibly double transition rates within 2-3 years with coordinated investment.
 
@@ -343,7 +338,7 @@ Several key uncertainties affect optimal intervention strategy and resource allo
 
 **Timing Considerations:** Whether to invest heavily in transitions now or wait for AI capabilities to advance further, potentially increasing motivation naturally.
 
-**Organizational Capture Risk:** Whether high transition rates from specific organizations (<EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="deepmind">DeepMind</EntityLink>) could reduce safety-conscious voices within those organizations.
+**Organizational Capture Risk:** Whether high transition rates from specific organizations (<EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E98">DeepMind</EntityLink>) could reduce safety-conscious voices within those organizations.
 
 ## Future Research Directions
 
@@ -402,4 +397,3 @@ Current model limitations suggest several enhancement priorities:
 | **<R id="bff2f5843023e85e">EA Forum Career Posts</R>** | Career advice | Transition guidance |
 | **Safety researcher Slack communities** | Professional network | Peer support |
 
-<Backlinks entityId="capabilities-to-safety-pipeline" />

@@ -752,6 +752,8 @@ export const Entity = z.object({
   resources: z.array(z.string()).optional(),      // Resource IDs from data/resources/
   // Parameter distinctions (for parameter-type entities)
   parameterDistinctions: ParameterDistinctions.optional(),
+  // Summary/overview page this entity belongs to (entity or page ID)
+  summaryPage: z.string().optional(),
 });
 export type Entity = z.infer<typeof Entity>;
 

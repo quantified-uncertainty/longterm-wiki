@@ -2,6 +2,8 @@
 
 AI safety wiki with ~625 MDX pages, Next.js frontend, YAML data layer, and CLI tooling.
 
+**Keep CLAUDE.md as a routing document** — brief instructions and pointers to detailed guides. Detailed style guidance, checklists, and templates live in `content/docs/internal/` (see Page templates below). Do not expand CLAUDE.md with long explanations; instead add detail to the appropriate internal style guide and reference it from here.
+
 ## Quick Reference
 
 ```bash
@@ -29,7 +31,7 @@ longterm-wiki/
 │   ├── resources/              # External resource links
 │   ├── insights/               # Cross-page insights
 │   ├── graphs/                 # Cause-effect graph data
-│   └── id-registry.json        # Persistent numeric ID mapping
+│   └── id-registry.json        # Derived build artifact (gitignored)
 ├── app/                        # Next.js 15 frontend
 │   ├── src/                    # App source code
 │   ├── scripts/                # Build scripts (build-data.mjs)
@@ -82,11 +84,36 @@ Use `--grade` with `--apply` to auto-grade after improvement.
 pnpm crux fix escaping              # Auto-fix dollar signs, comparisons, tildes
 pnpm crux fix markdown              # Auto-fix list formatting, bold labels
 pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only  # MUST pass (blocking in CI)
+pnpm crux validate schema           # MUST pass (blocking in CI) — validates YAML entity types, fields
+pnpm crux validate unified --rules=frontmatter-schema --errors-only  # MUST pass (blocking in CI) — validates MDX frontmatter
 pnpm crux validate                  # Full validation (advisory)
 ```
-**The `unified --rules=...` check is the blocking CI gate.** Always run it before committing. Use `--fix` to auto-fix issues.
+**Three checks are blocking CI gates:** `unified --rules=comparison-operators,dollar-signs`, `schema`, and `unified --rules=frontmatter-schema`. All must pass before committing.
 
-### If you must create a page manually
+### Self-review checklist (before committing any page)
+
+Re-read the full page and verify:
+
+1. **Links resolve**: Every `<EntityLink id="X">` has a matching `- id: X` in `data/entities/*.yaml`
+2. **Prose matches data**: Claims in prose agree with numbers in tables/charts on the same page
+3. **Units are consistent**: Same unit throughout (don't mix years in overview with months in tables)
+4. **Rendering works**: For `\$`, `^`, `{}` or LaTeX-like notation, think through MDX rendering. When in doubt, use plain text.
+
+For model/analysis pages, also run the full review checklist in `content/docs/internal/models.mdx` (Part 7).
+
+### CRITICAL: If the Crux pipeline fails, FIX THE PIPELINE — do NOT bypass it
+
+**NEVER write a wiki page manually as a workaround when `pnpm crux content create` or `pnpm crux content improve` fails.** This is the single most important rule for page authoring.
+
+When the crux library fails:
+1. **Read the error output carefully.** Identify the root cause (missing data, bad import, schema issue, API error, etc.)
+2. **Investigate the relevant crux source code** in `crux/` — the commands, authoring scripts, lib utilities, and validation code are all in this repo and are all fixable.
+3. **Fix the bug in the crux library itself**, then re-run the pipeline command.
+4. If the fix is non-trivial, ask the user for guidance — but still do not fall back to manual page writing.
+
+Manually written pages are missing: proper citations, EntityLink validation, frontmatter metric syncing, template structure, research integration, and quality grading. They create technical debt that is harder to fix later than fixing the pipeline now.
+
+### If you must create a page manually (last resort, only with explicit user approval)
 Write the initial draft, then immediately run the improve pipeline on it:
 ```bash
 pnpm crux content improve <page-id> --tier=polish --apply
@@ -101,10 +128,12 @@ This adds proper citations, fixes escaping, validates EntityLinks, and syncs fro
 ```bash
 cd app && node scripts/build-data.mjs            # 1. Build data layer
 pnpm test                                         # 2. Run all tests (must be 0 failures)
-pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only  # 3. Blocking validation
-pnpm build                                        # 4. Full Next.js build (catches compile errors)
+pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only  # 3. MDX syntax (blocking)
+pnpm crux validate schema                         # 4. YAML schema (blocking)
+pnpm crux validate unified --rules=frontmatter-schema --errors-only  # 5. Frontmatter schema (blocking)
+pnpm build                                        # 6. Full Next.js build (catches compile errors)
 ```
-All four must succeed before pushing. If any fail, fix the issue first.
+All six must succeed before pushing. If any fail, fix the issue first.
 
 ### After pushing: confirm CI is green
 1. Check CI status using the GitHub API (`gh` is not installed; use `curl` instead):
@@ -128,7 +157,7 @@ print(f\"Total: {data['total_count']} checks\")
 
 ### CI jobs
 - **build-and-test**: Builds the app and runs vitest (blocking)
-- **validate**: Runs `pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only` (blocking), then the full validation suite (advisory/non-blocking)
+- **validate**: Runs three blocking checks (MDX syntax, YAML schema, frontmatter schema), then the full validation suite (advisory/non-blocking)
 
 ## Key Conventions
 

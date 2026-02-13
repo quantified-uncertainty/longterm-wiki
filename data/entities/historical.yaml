@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: deep-learning-era
+  numericId: E95
   type: historical
   title: Deep Learning Revolution Era
   customFields:
@@ -66,6 +67,7 @@
     - dario-amodei
   lastUpdated: 2025-12
 - id: early-warnings
+  numericId: E107
   type: historical
   title: Early Warnings Era
   customFields:
@@ -123,6 +125,7 @@
     - science-fiction
   lastUpdated: 2025-12
 - id: mainstream-era
+  numericId: E195
   type: historical
   title: Mainstream Era
   customFields:
@@ -184,6 +187,7 @@
     - government-regulation
   lastUpdated: 2025-12
 - id: miri-era
+  numericId: E203
   type: historical
   title: The MIRI Era
   customFields:
@@ -241,6 +245,7 @@
     - effective-altruism
   lastUpdated: 2025-12
 - id: ai-safety-summit
+  numericId: E14
   type: historical
   title: AI Safety Summit (Bletchley Park)
   description: >-

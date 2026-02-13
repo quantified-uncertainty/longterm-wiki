@@ -15,23 +15,18 @@ lastEdited: "2026-01-28"
 importance: 62.5
 update_frequency: 90
 llmSummary: This model estimates AI disinformation's marginal electoral impact by decomposing the causal pathway from AI capability to vote shifts. Analysis finds 0.2-5% probability of flipping individual elections (1-3 elections globally per year), with 2-5% potential vote margin shifts in close races, though systemic trust erosion (2-5% annual decline) may matter more than specific election outcomes.
-metrics:
-  wordCount: 2689
-  citations: 22
-  tables: 17
-  diagrams: 2
 clusters:
   - ai-safety
   - governance
 subcategory: impact-models
 ---
-import { DataInfoBox, Backlinks, Mermaid , EntityLink} from '@components/wiki';
+import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="disinformation-electoral-impact" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E104" ratings={frontmatter.ratings} />
 
 ## Overview
 
-AI dramatically lowers the cost of creating and distributing <EntityLink id="disinformation">disinformation</EntityLink> at scale. But does this translate to meaningful impact on election outcomes? This model provides a framework for estimating the marginal effect of AI-generated disinformation on electoral results and democratic processes.
+AI dramatically lowers the cost of creating and distributing <EntityLink id="E102">disinformation</EntityLink> at scale. But does this translate to meaningful impact on election outcomes? This model provides a framework for estimating the marginal effect of AI-generated disinformation on electoral results and democratic processes.
 
 **Core Question:** By how much can AI disinformation shift election results, and under what conditions?
 
@@ -64,7 +59,7 @@ Understanding AI disinformation's electoral impact matters because democratic le
 | **Provenance mandates for political ads** | \$20-50 million for implementation | Authenticates 60-80% of legitimate political content | High |
 | **Election security infrastructure** | \$200-500 million over 4 years | Rapid response capability; fact-checking coordination | High |
 | **Voter media literacy campaigns** | \$50-150 million per election cycle | Increases skepticism by 10-20%; limited reach to vulnerable populations | Medium |
-| **<EntityLink id="international-coordination">International coordination</EntityLink> on attribution** | \$30-80 million annually | Enables consequences for state-sponsored interference | Medium |
+| **<EntityLink id="E171">International coordination</EntityLink> on attribution** | \$30-80 million annually | Enables consequences for state-sponsored interference | Medium |
 | **Emergency content restrictions (if crisis)** | Political cost, not financial | Could prevent immediate crisis but raises free speech concerns | Conditional |
 
 ### Key Cruxes
@@ -549,8 +544,8 @@ This model faces fundamental measurement challenges that limit confidence in its
 
 ## Related Models
 
-- <EntityLink id="disinformation-detection-race" label="Disinformation Detection Arms Race" /> - Can we detect it at all?
-- <EntityLink id="deepfakes-authentication-crisis" label="Deepfakes Authentication Crisis" /> - Visual media authenticity
+- <EntityLink id="E103" label="Disinformation Detection Arms Race" /> - Can we detect it at all?
+- <EntityLink id="E97" label="Deepfakes Authentication Crisis" /> - Visual media authenticity
 
 ## Sources
 
@@ -571,7 +566,3 @@ This model faces fundamental measurement challenges that limit confidence in its
 - Aral, S. & Eckles, D. ["Protecting elections from social media manipulation."](https://www.science.org/doi/10.1126/science.aaw8243) *Science* (2019). Proposed research agenda for measuring manipulation effects.
 - Allcott, H. et al. ["The effects of Facebook and Instagram on the 2020 election."](https://pmc.ncbi.nlm.nih.gov/articles/PMC11126999/) *PMC* (2024). Deactivation experiment (N=35,000) finding limited effect on political views.
 - [Harvard Kennedy School Misinformation Review](https://misinforeview.hks.harvard.edu/article/the-origin-of-public-concerns-over-ai-supercharging-misinformation-in-the-2024-u-s-presidential-election/) (2024). Analysis of why predicted AI impacts in 2024 did not materialize.
-
-## Related Pages
-
-<Backlinks entityId="disinformation-electoral-impact" />

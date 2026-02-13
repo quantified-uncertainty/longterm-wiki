@@ -16,27 +16,22 @@ ratings:
   rigor: 4
   actionability: 3.5
   completeness: 5
-metrics:
-  wordCount: 650
-  citations: 12
-  tables: 6
-  diagrams: 1
 clusters:
   - ai-safety
   - epistemics
 subcategory: epistemic
 ---
-import {DataInfoBox, Backlinks, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+import {DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
 <DataExternalLinks pageId="preference-manipulation" />
 
-<DataInfoBox entityId="preference-manipulation" />
+<DataInfoBox entityId="E230" />
 
 ## Overview
 
 Preference manipulation describes AI systems that **shape what people want**, not just what they believe. Unlike misinformation (which targets beliefs), preference manipulation targets the will itself. You can fact-check a claim; you can't fact-check a desire.
 
-> **For comprehensive analysis**, see <EntityLink id="preference-authenticity">Preference Authenticity</EntityLink>, which covers:
+> **For comprehensive analysis**, see <EntityLink id="E229">Preference Authenticity</EntityLink>, which covers:
 > - Distinguishing authentic preferences from manufactured desires
 > - AI-driven manipulation mechanisms (profiling, modeling, optimization)
 > - Factors that protect or erode preference authenticity
@@ -149,12 +144,12 @@ Research: <R id="0bf075dd08612043">Nature 2023 on algorithmic amplification</R>,
 
 | Response | Mechanism | Effectiveness |
 |----------|-----------|---------------|
-| <EntityLink id="epistemic-infrastructure">Epistemic Infrastructure</EntityLink> | Alternative information systems | Medium |
-| <EntityLink id="hybrid-systems">Human-AI Hybrid Systems</EntityLink> | Preserve human judgment | Medium |
+| <EntityLink id="E122">Epistemic Infrastructure</EntityLink> | Alternative information systems | Medium |
+| <EntityLink id="E161">Human-AI Hybrid Systems</EntityLink> | Preserve human judgment | Medium |
 | Algorithmic Transparency | Reveal optimization targets | Low-Medium |
 | Regulatory Frameworks | <R id="23e41eec572c9b30">EU DSA</R>, dark patterns bans | Medium |
 
-See <EntityLink id="preference-authenticity">Preference Authenticity</EntityLink> for detailed intervention analysis.
+See <EntityLink id="E229">Preference Authenticity</EntityLink> for detailed intervention analysis.
 
 ---
 
@@ -170,24 +165,6 @@ See <EntityLink id="preference-authenticity">Preference Authenticity</EntityLink
 
 5. **Autonomous AI manipulation**: Will advanced AI systems develop preference manipulation as an instrumental strategy without explicit programming? This depends on unresolved questions about goal generalization and mesa-optimization.
 
----
-
-## Related Pages
-
-### Primary Reference
-- **<EntityLink id="preference-authenticity">Preference Authenticity</EntityLink>** — Comprehensive parameter page with mechanisms, measurement, and interventions
-
-### Related Risks
-- <EntityLink id="epistemic-sycophancy">Sycophancy at Scale</EntityLink> — AI reinforcing existing preferences
-- <EntityLink id="erosion-of-agency">Erosion of Agency</EntityLink> — Loss of meaningful choice
-- <EntityLink id="lock-in">Lock-in</EntityLink> — Irreversible preference capture
-
-### Related Parameters
-- <EntityLink id="human-agency">Human Agency</EntityLink> — Capacity for autonomous action
-- <EntityLink id="epistemic-health">Epistemic Health</EntityLink> — Ability to form accurate beliefs
-
----
-
 ## Sources
 
 - <R id="9a2e4105a28f731f">Matz et al. (2017): Psychological targeting</R>
@@ -200,4 +177,3 @@ See <EntityLink id="preference-authenticity">Preference Authenticity</EntityLink
 - [Tappin et al. (2023): Tailoring algorithms to ideal preferences](https://www.nature.com/articles/s41598-023-34192-x) - On engagement vs. wellbeing tradeoffs
 - [Zarouali et al. (2024): Persuasive effects of political microtargeting](https://academic.oup.com/pnasnexus/article/3/2/pgae035/7591134) - PNAS Nexus on AI-enabled "manipulation machines"
 
-<Backlinks entityId="preference-manipulation" />

@@ -16,11 +16,6 @@ ratings:
   rigor: 6.8
   actionability: 5.5
   completeness: 7.1
-metrics:
-  wordCount: 2664
-  citations: 47
-  tables: 13
-  diagrams: 1
 clusters:
   - epistemics
   - ai-safety
@@ -29,17 +24,17 @@ subcategory: resilience
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="epistemic-security" />
+<DataInfoBox entityId="E123" />
 
 ## Quick Assessment
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | **Threat Severity** | High and accelerating | Deepfake attacks increased 1,740% in North America 2022-2023; voice cloning fraud up 680% year-over-year (<R id="d786af9f7b112dc6">Deepstrike</R>) |
-| **Human Detection Accuracy** | Near-chance (55.5%) | Meta-analysis of 56 studies found humans detect <EntityLink id="deepfakes">deepfakes</EntityLink> at 55.5% accuracy; high-quality videos only 24.5% (<R id="5c1ad27ec9acc6f4">ScienceDirect</R>) |
+| **Human Detection Accuracy** | Near-chance (55.5%) | Meta-analysis of 56 studies found humans detect <EntityLink id="E96">deepfakes</EntityLink> at 55.5% accuracy; high-quality videos only 24.5% (<R id="5c1ad27ec9acc6f4">ScienceDirect</R>) |
 | **AI Detection Accuracy** | 78% best-case, 50% drop in-the-wild | Best commercial detectors reach 78% AUC but drop 45-50% on novel deepfakes not in training data (<R id="919c9ed9593285fd">Deepfake-Eval-2024</R>) |
-| **Content Authentication Adoption** | Early stage, growing | C2PA market \$1.29B in 2024, growing 26% CAGR; 5,000+ CAI members; Meta, Google, <EntityLink id="openai">OpenAI</EntityLink> joined 2024 (<R id="ff89bed1f7960ab2">C2PA</R>) |
-| **Inoculation Effectiveness** | Moderate (10-24% reduction) | Bad News game reduces susceptibility to <EntityLink id="disinformation">disinformation</EntityLink> by 10-24% across tactics; effects last 3+ months (<R id="82f99c43d60a4fa2">Cambridge</R>) |
+| **Content Authentication Adoption** | Early stage, growing | C2PA market \$1.29B in 2024, growing 26% CAGR; 5,000+ CAI members; Meta, Google, <EntityLink id="E218">OpenAI</EntityLink> joined 2024 (<R id="ff89bed1f7960ab2">C2PA</R>) |
+| **Inoculation Effectiveness** | Moderate (10-24% reduction) | Bad News game reduces susceptibility to <EntityLink id="E102">disinformation</EntityLink> by 10-24% across tactics; effects last 3+ months (<R id="82f99c43d60a4fa2">Cambridge</R>) |
 | **Financial Impact** | \$500K+ per incident | Average deepfake fraud loss exceeds \$500K; projected \$40B fraud losses by 2027 from generative AI (<R id="c5681b00f52c7603">Brightside AI</R>) |
 | **Tractability** | Medium | Technical defenses exist but face adversarial arms race; institutional responses scaling slowly |
 
@@ -303,13 +298,13 @@ Epistemic security thus represents both an immediate challenge requiring urgent 
 
 ## AI Transition Model Context
 
-Epistemic security improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="civilizational-competence" />:
+Epistemic security improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="E60" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="epistemic-health" /> | Maintains society's ability to distinguish truth from AI-generated falsehood |
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="societal-trust" /> | Authentication and verification preserve trust in institutions and media |
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="information-authenticity" /> | Technical defenses (C2PA, watermarking) protect content provenance |
-| <EntityLink id="misuse-potential" /> | | Reduces harm from deepfakes, voice cloning fraud, and AI-enabled manipulation |
+| <EntityLink id="E60" /> | <EntityLink id="E121" /> | Maintains society's ability to distinguish truth from AI-generated falsehood |
+| <EntityLink id="E60" /> | <EntityLink id="E285" /> | Authentication and verification preserve trust in institutions and media |
+| <EntityLink id="E60" /> | <EntityLink id="E164" /> | Technical defenses (C2PA, watermarking) protect content provenance |
+| <EntityLink id="E207" /> | | Reduces harm from deepfakes, voice cloning fraud, and AI-enabled manipulation |
 
 Epistemic security is critical for maintaining the coordination capacity needed to navigate AI transition safely; democracy requires shared facts.

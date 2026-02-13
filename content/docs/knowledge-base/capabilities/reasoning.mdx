@@ -13,18 +13,13 @@ ratings:
   rigor: 6.8
   actionability: 5.5
   completeness: 7.5
-metrics:
-  wordCount: 3576
-  citations: 96
-  tables: 21
-  diagrams: 1
 clusters: ["ai-safety"]
 ---
-import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
+import {DataInfoBox, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
 <DataExternalLinks pageId="reasoning" />
 
-<DataInfoBox entityId="reasoning" />
+<DataInfoBox entityId="E246" />
 
 ### Quick Assessment
 
@@ -39,7 +34,6 @@ import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from 
 | Benchmark Saturation | **Accelerating** | AIME 2025 now saturated (100%); ARC-AGI-3 announced for 2026 with interactive reasoning |
 | Key Bottleneck | **Faithfulness gap** | Production models show 0.04-13% unfaithful reasoning rates; thinking models less reliable than expected |
 
-
 ## Key Links
 
 | Source | Link |
@@ -47,10 +41,9 @@ import {DataInfoBox, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from 
 | Official Website | [kcl.ac.uk](https://www.kcl.ac.uk/research/rap) |
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Reasoning_system) |
 
-
 ## Overview
 
-Reasoning and planning capabilities represent a fundamental shift in AI systems from pattern-matching to deliberative problem-solving. These capabilities enable AI to break down complex problems into logical steps, maintain coherent chains of thought across multiple inference steps, and systematically work toward solutions rather than simply retrieving memorized patterns. Recent breakthroughs, particularly <EntityLink id="openai">OpenAI</EntityLink>'s o1 and o3 models released in 2024-2025, demonstrate that language models can be trained to engage in extended "thinking" processes that rival human expert performance on complex reasoning tasks.
+Reasoning and planning capabilities represent a fundamental shift in AI systems from pattern-matching to deliberative problem-solving. These capabilities enable AI to break down complex problems into logical steps, maintain coherent chains of thought across multiple inference steps, and systematically work toward solutions rather than simply retrieving memorized patterns. Recent breakthroughs, particularly <EntityLink id="E218">OpenAI</EntityLink>'s o1 and o3 models released in 2024-2025, demonstrate that language models can be trained to engage in extended "thinking" processes that rival human expert performance on complex reasoning tasks.
 
 This development marks a critical inflection point in AI capabilities with profound implications for AI safety. On one hand, reasoning capabilities offer the promise of more interpretable AI systems whose thought processes can be examined and understood. The explicit chain-of-thought reasoning provides transparency into how models arrive at conclusions, potentially making them safer and more trustworthy. On the other hand, these same capabilities enable more sophisticated forms of deception, strategic planning, and goal pursuit that could make advanced AI systems significantly more dangerous if misaligned.
 
@@ -123,7 +116,7 @@ The gap has narrowed substantially: top models now score approximately 54% vs. 6
 |-------|-------------------|-------|
 | GPT-4o, Claude 3.5 | less than 2% | Pre-reasoning-model baseline |
 | o3 (Dec 2024 claim) | 25.2% | Initial announcement; methodology questioned |
-| o3 (Apr 2025 test) | ≈10% | Updated testing by <EntityLink id="epoch-ai">Epoch AI</EntityLink> |
+| o3 (Apr 2025 test) | ≈10% | Updated testing by <EntityLink id="E125">Epoch AI</EntityLink> |
 | o4 with reasoning | 15-19% | Mid-2025 performance |
 | GPT-5.2 (Thinking) | **40.3%** | December 2025; new state-of-the-art |
 
@@ -133,7 +126,7 @@ While traditional benchmarks like GSM-8K and MATH now see 90%+ accuracy from top
 
 ## Advanced Planning Capabilities
 
-Modern AI systems demonstrate increasingly sophisticated planning abilities across various domains, with 2025 marking a major shift toward **<EntityLink id="agentic-ai">agentic AI</EntityLink>**—systems that operate with intent, planning, and action rather than single-turn responses. Unlike traditional models, agentic LLMs drive outcomes: they reason through plans, decide what tools they need, execute actions, verify results, and adapt if something fails.
+Modern AI systems demonstrate increasingly sophisticated planning abilities across various domains, with 2025 marking a major shift toward **<EntityLink id="E2">agentic AI</EntityLink>**—systems that operate with intent, planning, and action rather than single-turn responses. Unlike traditional models, agentic LLMs drive outcomes: they reason through plans, decide what tools they need, execute actions, verify results, and adapt if something fails.
 
 ### The Agentic Shift
 
@@ -384,5 +377,3 @@ The timeline for achieving human-level and superhuman reasoning across all domai
 - **VentureBeat:** <R id="8b92198fdc783928">OpenAI's o3 Shows Remarkable Progress on ARC-AGI</R> - Analysis of reasoning debate
 - **Artificial Analysis:** [GPT-5 Benchmarks](https://artificialanalysis.ai/articles/gpt-5-benchmarks-and-analysis) - Independent benchmark analysis
 - **Artificial Analysis:** [Claude Opus 4.5 Benchmarks](https://artificialanalysis.ai/articles/claude-opus-4-5-benchmarks-and-analysis) - Independent benchmark analysis
-
-<Backlinks entityId="reasoning" />

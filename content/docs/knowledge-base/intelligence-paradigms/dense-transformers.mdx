@@ -14,11 +14,6 @@ ratings:
   rigor: 6.8
   actionability: 5.5
   completeness: 7.3
-metrics:
-  wordCount: 249
-  citations: 49
-  tables: 40
-  diagrams: 1
 clusters: ["ai-safety"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
@@ -31,10 +26,10 @@ import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 |-----------|------------|----------|
 | **Dominance** | Near-total (95%+ of frontier models) | GPT-4, Claude 3, Gemini, Llama 3 all use transformer base architecture |
 | **Scalability** | Proven to 1.8T+ parameters | GPT-4 reportedly ≈1.8T params ([SemiAnalysis 2023](https://semianalysis.com/2023/07/10/gpt-4-architecture-infrastructure/)); Llama 3 405B trained on 3.8x10^25 FLOPs |
-| **Interpretability** | Primitive despite open weights | <EntityLink id="anthropic">Anthropic</EntityLink> 2024: found millions of features in Claude 3 Sonnet, still cannot predict behavior |
-| **Training Efficiency** | Well-understood pipeline | <EntityLink id="rlhf">RLHF</EntityLink> (InstructGPT 2022): 1.3B model preferred over 175B GPT-3 with alignment |
-| **Safety Tooling** | Most developed but inadequate | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, RLHF, red-teaming exist; deception detection remains unsolved |
-| **Predictability** | Low for <EntityLink id="emergent-capabilities">emergent capabilities</EntityLink> | Abilities appear abruptly at scale thresholds; GPT-4 shows phase transitions |
+| **Interpretability** | Primitive despite open weights | <EntityLink id="E22">Anthropic</EntityLink> 2024: found millions of features in Claude 3 Sonnet, still cannot predict behavior |
+| **Training Efficiency** | Well-understood pipeline | <EntityLink id="E259">RLHF</EntityLink> (InstructGPT 2022): 1.3B model preferred over 175B GPT-3 with alignment |
+| **Safety Tooling** | Most developed but inadequate | <EntityLink id="E451">Constitutional AI</EntityLink>, RLHF, red-teaming exist; deception detection remains unsolved |
+| **Predictability** | Low for <EntityLink id="E117">emergent capabilities</EntityLink> | Abilities appear abruptly at scale thresholds; GPT-4 shows phase transitions |
 | **Longevity** | Dominant for 3-5+ years minimum | Infrastructure investment, training expertise, tooling all favor transformers |
 
 
@@ -356,11 +351,3 @@ The core challenge: RLHF and Constitutional AI train models to produce outputs h
 - Epoch AI (2024). ["Most of OpenAI's 2024 compute went to experiments"](https://epoch.ai/data-insights/openai-compute-spend). (≈\$1B R&D, ≈\$1B inference)
 - Fortune (2024). ["Why the cost of AI could soon become too much to bear"](https://fortune.com/2024/04/04/ai-training-costs-how-much-is-too-much-openai-gpt-anthropic-microsoft/).
 - Entrepreneur (2024). ["Anthropic CEO: AI Will Cost \$10 Billion to Train By 2025"](https://www.entrepreneur.com/business-news/anthropic-ceo-ai-will-cost-10-billion-to-train-by-2025/476750).
-
----
-
-## Related Pages
-
-- <EntityLink id="sparse-moe">Sparse/MoE Transformers</EntityLink> - Efficiency-focused variant
-- <EntityLink id="heavy-scaffolding">Heavy Scaffolding</EntityLink> - How transformers are deployed
-- <EntityLink id="interpretability">Mechanistic Interpretability</EntityLink> - Efforts to understand internals

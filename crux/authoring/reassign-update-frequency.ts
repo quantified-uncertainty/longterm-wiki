@@ -157,6 +157,7 @@ function getPathDefault(pagePath: string): number | null {
   if (pagePath.includes('cruxes/')) return 45;
   if (pagePath.includes('scenarios/')) return 45;
   if (pagePath.includes('worldviews/')) return 45;
+  if (pagePath.includes('project/')) return 21;   // meta pages about this wiki
   // organizations/ without a subcategory match → let Haiku decide
   return null; // ambiguous
 }
@@ -188,6 +189,13 @@ const TITLE_EXACT_OVERRIDES: Record<string, number> = {
   'Sam Altman': 7,
   'Dario Amodei': 7,
   'Elon Musk': 7,
+
+  // Meta / self-referential pages (about this wiki) → 7d
+  // The wiki itself changes constantly, so pages describing it need weekly updates
+  'Longterm Wiki': 7,
+
+  // Wiki impact model → 21d (inputs change as the wiki grows)
+  'LongtermWiki Impact Model': 21,
 
   // Analytical pages about labs → use subcategory/path instead (no override)
 };

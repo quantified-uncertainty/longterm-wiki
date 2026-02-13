@@ -13,11 +13,6 @@ ratings:
   rigor: 6.5
   actionability: 7
   completeness: 7.5
-metrics:
-  wordCount: 598
-  citations: 45
-  tables: 26
-  diagrams: 2
 clusters:
   - ai-safety
 subcategory: alignment-training
@@ -34,7 +29,7 @@ import {Mermaid, EntityLink, DataExternalLinks, R} from '@components/wiki';
 | **Effectiveness** | Medium-High | DPO matches RLHF on summarization; PPO still outperforms by 1.3-2.9 points on reasoning/coding tasks ([Xu et al. 2024](https://arxiv.org/abs/2404.10719)) |
 | **Adoption** | Rapidly growing | 65% of YC startups use DPO for AI training (2025); 70% of enterprises use preference methods, up from 25% in 2023 |
 | **Timeline** | Already deployed | DPO used in production by major labs; GRPO powers [DeepSeek-R1](https://arxiv.org/abs/2501.12948) reasoning models |
-| **Research Investment** | High | Active area across <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, Meta, DeepSeek; multiple variants published in 2024-2025 |
+| **Research Investment** | High | Active area across <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, Meta, DeepSeek; multiple variants published in 2024-2025 |
 | **Scalability** | Uncertain at frontier | Methods work well at 7B-70B scale; untested for superhuman reasoning alignment |
 | **Grade** | B+ | Important efficiency gains but does not solve fundamental alignment challenges |
 
@@ -355,16 +350,16 @@ For organizations implementing preference optimization:
 
 | Risk | Mechanism | Effectiveness |
 |------|-----------|---------------|
-| <EntityLink id="reward-hacking">Reward Hacking</EntityLink> | Implicit rewards harder to hack | Medium |
-| <EntityLink id="epistemic-sycophancy">Sycophancy</EntityLink> | Better preference data can reduce | Medium |
-| <EntityLink id="goal-misgeneralization">Goal Misgeneralization</EntityLink> | More stable training may help | Low-Medium |
+| <EntityLink id="E253">Reward Hacking</EntityLink> | Implicit rewards harder to hack | Medium |
+| <EntityLink id="E124">Sycophancy</EntityLink> | Better preference data can reduce | Medium |
+| <EntityLink id="E151">Goal Misgeneralization</EntityLink> | More stable training may help | Low-Medium |
 
 ## Complementary Interventions
 
-- <EntityLink id="rlhf">RLHF & Constitutional AI</EntityLink> - The baseline these methods improve upon
-- <EntityLink id="evals">Evaluations</EntityLink> - Essential for validating preference learning
-- <EntityLink id="scalable-oversight">Scalable Oversight</EntityLink> - Better human feedback for preferences
-- <EntityLink id="representation-engineering">Representation Engineering</EntityLink> - Verify alignment beyond behavioral preferences
+- <EntityLink id="E259">RLHF & Constitutional AI</EntityLink> - The baseline these methods improve upon
+- <EntityLink id="E128">Evaluations</EntityLink> - Essential for validating preference learning
+- <EntityLink id="E271">Scalable Oversight</EntityLink> - Better human feedback for preferences
+- <EntityLink id="E479">Representation Engineering</EntityLink> - Verify alignment beyond behavioral preferences
 
 ## Sources
 
@@ -398,11 +393,11 @@ For organizations implementing preference optimization:
 
 ## AI Transition Model Context
 
-Preference optimization methods improve the <EntityLink id="ai-transition-model" /> through <EntityLink id="misalignment-potential" />:
+Preference optimization methods improve the <EntityLink id="ai-transition-model" /> through <EntityLink id="E205" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | More stable training reduces reward hacking and mode collapse |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Lower costs enable faster alignment iteration |
+| <EntityLink id="E205" /> | <EntityLink id="E20" /> | More stable training reduces reward hacking and mode collapse |
+| <EntityLink id="E205" /> | <EntityLink id="E261" /> | Lower costs enable faster alignment iteration |
 
 Efficient preference optimization accelerates safety research but does not address fundamental scalability challenges at superhuman capability levels.

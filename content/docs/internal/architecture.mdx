@@ -279,7 +279,7 @@ sequenceDiagram
     participant Registry as pathRegistry.json
     participant Database as database.json
 
-    MDX->>Component: <EntityLink id="open-philanthropy">
+    MDX->>Component: <EntityLink id="E552">
     Component->>Registry: Lookup path for ID
     Registry-->>Component: /knowledge-base/organizations/funders/open-philanthropy
     Component->>Database: Get entity metadata

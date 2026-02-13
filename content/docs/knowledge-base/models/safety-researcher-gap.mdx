@@ -19,20 +19,15 @@ todos:
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Strategic Importance' section
   - Complete 'Limitations' section (6 placeholders)
-metrics:
-  wordCount: 1202
-  citations: 17
-  tables: 51
-  diagrams: 0
 clusters:
   - ai-safety
   - community
   - governance
 subcategory: safety-models
 ---
-import {DataInfoBox, Backlinks, KeyQuestions, R, EntityLink} from '@components/wiki';
+import {DataInfoBox, KeyQuestions, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="safety-researcher-gap" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E268" ratings={frontmatter.ratings} />
 
 ## Overview
 
@@ -53,7 +48,7 @@ The model identifies four critical bottlenecks: insufficient training pathways, 
 
 ## Current Supply Analysis
 
-### Narrow Definition Supply (<EntityLink id="technical-ai-safety">Technical AI Safety</EntityLink>)
+### Narrow Definition Supply (<EntityLink id="E631">Technical AI Safety</EntityLink>)
 
 | Category | 2024 Estimate | Growth Rate | Quality Distribution |
 |----------|---------------|-------------|---------------------|
@@ -64,13 +59,13 @@ The model identifies four critical bottlenecks: insufficient training pathways, 
 
 ### Broader Definition Supply (Safety-Adjacent)
 
-Organizations like <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, and <EntityLink id="deepmind">DeepMind</EntityLink> employ researchers working on safety-relevant problems who don't identify primarily as safety researchers.
+Organizations like <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, and <EntityLink id="E98">DeepMind</EntityLink> employ researchers working on safety-relevant problems who don't identify primarily as safety researchers.
 
 | Category | 2024 Estimate | Conversion Rate to Safety |
 |----------|---------------|--------------------------|
 | ML researchers with safety interest | 2,000-5,000 | 5-15% |
 | Interpretability/robustness researchers | 1,000-2,000 | 20-40% |
-| <EntityLink id="ai-governance">AI governance</EntityLink>/policy researchers | 500-1,000 | 10-30% |
+| <EntityLink id="E608">AI governance</EntityLink>/policy researchers | 500-1,000 | 10-30% |
 | **Potential conversion pool** | **3,500-8,000** | **10-25%** |
 
 ## Demand Assessment
@@ -81,8 +76,8 @@ Organizations like <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLin
 |-------------------|----------------|-----------|--------------|---------|
 | Frontier labs (safety teams) | 500-1,000 | 60-80% | \$150-800K | <R id="4d2d026d3cca4d9d">Anthropic careers</R>, <R id="e86c6559775d4746">OpenAI jobs</R> |
 | Academic safety groups | 200-400 | 40-60% | \$80-200K | University job boards |
-| Safety orgs (<EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="chai">CHAI</EntityLink>, etc.) | 100-200 | 50-70% | \$100-300K | <EntityLink id="80000-hours">80,000 Hours</EntityLink> job board |
-| Government/policy roles (<EntityLink id="us-aisi">AISI</EntityLink>) | 50-100 | 30-50% | \$120-250K | USAjobs.gov |
+| Safety orgs (<EntityLink id="E202">MIRI</EntityLink>, <EntityLink id="E57">CHAI</EntityLink>, etc.) | 100-200 | 50-70% | \$100-300K | <EntityLink id="E510">80,000 Hours</EntityLink> job board |
+| Government/policy roles (<EntityLink id="E365">AISI</EntityLink>) | 50-100 | 30-50% | \$120-250K | USAjobs.gov |
 | **Total current demand** | **850-1,700** | **50-70%** | **Varies** | Multiple sources |
 
 ### Projected Demand Under Scaling Scenarios
@@ -137,11 +132,11 @@ Current training programs show significant variation in effectiveness and cost-e
 
 ### Bottleneck 2: Funding Architecture
 
-Organizations like <R id="dd0cf0ff290cc68e"><EntityLink id="open-philanthropy">Coefficient Giving</EntityLink></R> provide substantial funding, but total resources remain insufficient for scaling scenarios.
+Organizations like <R id="dd0cf0ff290cc68e"><EntityLink id="E552">Coefficient Giving</EntityLink></R> provide substantial funding, but total resources remain insufficient for scaling scenarios.
 
 | Funding Source | 2024 Allocation | Growth Rate | Sustainability |
 |----------------|-----------------|-------------|----------------|
-| <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> | \$50-100M | Stable | Medium-term |
+| <EntityLink id="E521">Coefficient Giving</EntityLink> | \$50-100M | Stable | Medium-term |
 | Frontier lab budgets | \$100-300M | 20-30%/year | Market-dependent |
 | Government funding | \$20-50M | Slow | Policy-dependent |
 | Other foundations | \$10-30M | Variable | Uncertain |
@@ -149,7 +144,7 @@ Organizations like <R id="dd0cf0ff290cc68e"><EntityLink id="open-philanthropy">C
 
 ### Bottleneck 3: Competition from Capabilities Research
 
-The <EntityLink id="racing-dynamics">racing dynamics</EntityLink> between safety and capabilities create severe talent competition, with capabilities roles offering substantially higher compensation.
+The <EntityLink id="E239">racing dynamics</EntityLink> between safety and capabilities create severe talent competition, with capabilities roles offering substantially higher compensation.
 
 | Experience Level | Safety Org Salary | Capabilities Lab Salary | Premium Ratio |
 |------------------|-------------------|------------------------|---------------|
@@ -405,10 +400,10 @@ Talent development interventions show strong ROI compared to opportunity costs:
 
 This talent gap model connects to several other risks that could compound or mitigate the shortage:
 
-- <EntityLink id="expertise-atrophy">Expertise Atrophy</EntityLink>: If AI tools replace <EntityLink id="human-expertise">human expertise</EntityLink>, safety researcher skills may degrade
-- <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink>: Competition between labs drives talent toward capabilities rather than safety
-- <EntityLink id="flash-dynamics">Flash Dynamics</EntityLink>: Rapid AI development could outpace even scaled talent pipelines
-- <EntityLink id="scientific-corruption">Scientific Corruption</EntityLink>: Poor incentives could reduce effective research output per researcher
+- <EntityLink id="E133">Expertise Atrophy</EntityLink>: If AI tools replace <EntityLink id="E159">human expertise</EntityLink>, safety researcher skills may degrade
+- <EntityLink id="E239">Racing Dynamics</EntityLink>: Competition between labs drives talent toward capabilities rather than safety
+- <EntityLink id="E142">Flash Dynamics</EntityLink>: Rapid AI development could outpace even scaled talent pipelines
+- <EntityLink id="E276">Scientific Corruption</EntityLink>: Poor incentives could reduce effective research output per researcher
 
 ## Strategic Implications
 
@@ -446,6 +441,5 @@ The talent shortage represents a foundational constraint on AI safety progress t
 |--------------|-------|------|
 | <R id="f35c467b353f990f">Centre for AI Governance</R> | Policy research | https://www.governance.ai/ |
 | <R id="0e7aef26385afeed">Partnership on AI</R> | Industry coordination | https://www.partnershiponai.org/ |
-| <R id="1593095c92d34ed8"><EntityLink id="fhi">Future of Humanity Institute</EntityLink></R> | Long-term research | https://www.fhi.ox.ac.uk/ |
+| <R id="1593095c92d34ed8"><EntityLink id="E140">Future of Humanity Institute</EntityLink></R> | Long-term research | https://www.fhi.ox.ac.uk/ |
 
-<Backlinks entityId="safety-researcher-gap" />

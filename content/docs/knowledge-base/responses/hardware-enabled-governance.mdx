@@ -13,11 +13,6 @@ ratings:
   rigor: 7.2
   actionability: 7.5
   completeness: 7.8
-metrics:
-  wordCount: 660
-  citations: 70
-  tables: 52
-  diagrams: 3
 clusters:
   - ai-safety
   - governance
@@ -41,7 +36,7 @@ import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
 ## Overview
 
-Hardware-enabled governance mechanisms (HEMs) represent a potentially powerful but controversial approach to <EntityLink id="ai-governance">AI governance</EntityLink>: embedding monitoring and control capabilities directly into the AI chips and computing infrastructure used to train and deploy advanced AI systems. Unlike export controls that prevent initial access to hardware or compute thresholds that trigger regulatory requirements, HEMs would enable ongoing verification and enforcement even after hardware has been deployed.
+Hardware-enabled governance mechanisms (HEMs) represent a potentially powerful but controversial approach to <EntityLink id="E608">AI governance</EntityLink>: embedding monitoring and control capabilities directly into the AI chips and computing infrastructure used to train and deploy advanced AI systems. Unlike export controls that prevent initial access to hardware or compute thresholds that trigger regulatory requirements, HEMs would enable ongoing verification and enforcement even after hardware has been deployed.
 
 The appeal is significant. [RAND Corporation research](https://www.rand.org/pubs/working_papers/WRA3056-1.html) argues that HEMs could "provide a new way of limiting the uses of U.S.-designed high-performance microchips" that complements existing controls. The policy urgency is real: an [estimated 100,000 export-controlled GPUs were smuggled into China](https://www.transformernews.ai/p/ai-chip-location-verification-nvidia-china-csa) in 2024 alone, with some estimates ranging up to one million. If AI governance requires not just knowing who has advanced chips, but verifying how they're used, hardware-level mechanisms offer a potential solution. Remote attestation could verify that chips are running approved workloads; cryptographic licensing could prevent unauthorized large-scale training; geolocation constraints could enforce export controls on a continuing basis.
 
@@ -461,10 +456,10 @@ HEMs would function alongside export controls:
 
 ## Complementary Interventions
 
-- <EntityLink id="export-controls">Export Controls</EntityLink> - Initial access controls that HEMs verify
-- <EntityLink id="thresholds">Compute Thresholds</EntityLink> - Thresholds that HEMs could detect
-- <EntityLink id="monitoring">Compute Monitoring</EntityLink> - Broader monitoring framework
-- <EntityLink id="international-regimes">International Regimes</EntityLink> - Governance for global coordination
+- <EntityLink id="E136">Export Controls</EntityLink> - Initial access controls that HEMs verify
+- <EntityLink id="E465">Compute Thresholds</EntityLink> - Thresholds that HEMs could detect
+- <EntityLink id="E464">Compute Monitoring</EntityLink> - Broader monitoring framework
+- <EntityLink id="E473">International Regimes</EntityLink> - Governance for global coordination
 
 ## Sources
 
@@ -502,9 +497,9 @@ Hardware-enabled governance affects the <EntityLink id="ai-transition-model" /> 
 
 | Factor | Parameter | Impact | Confidence |
 |--------|-----------|--------|------------|
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="regulatory-capacity" /> | Enables verification of safety requirements even after hardware deployment; could increase regulatory capacity by 20-40% | Medium |
-| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Remote attestation could verify AI systems are running approved workloads; enables [workload verification without exposing IP](https://arxiv.org/html/2505.03742v1) | Medium |
-| <EntityLink id="transition-turbulence" /> | <EntityLink id="ai-control-concentration" /> | Risk of authoritarian misuse if governance mechanisms are captured; requires strong abuse prevention | Medium-High |
+| <EntityLink id="E60" /> | <EntityLink id="E249" /> | Enables verification of safety requirements even after hardware deployment; could increase regulatory capacity by 20-40% | Medium |
+| <EntityLink id="E205" /> | <EntityLink id="E160" /> | Remote attestation could verify AI systems are running approved workloads; enables [workload verification without exposing IP](https://arxiv.org/html/2505.03742v1) | Medium |
+| <EntityLink id="E358" /> | <EntityLink id="E7" /> | Risk of authoritarian misuse if governance mechanisms are captured; requires strong abuse prevention | Medium-High |
 
 **Key uncertainties:**
 - Whether [algorithmic efficiency improvements](https://www.governance.ai/analysis/computing-power-and-the-governance-of-artificial-intelligence) will outpace hardware controls

@@ -14,11 +14,6 @@ ratings:
   rigor: 6.5
   actionability: 5.5
   completeness: 7
-metrics:
-  wordCount: 179
-  citations: 73
-  tables: 39
-  diagrams: 2
 clusters: ["ai-safety", "governance"]
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
@@ -33,7 +28,7 @@ import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 | **Reliability** | Low-Moderate | Multi-agent systems show 50%+ failure rates on complex tasks; error propagation remains key bottleneck |
 | **Safety Profile** | Mixed | Scaffold code is auditable, but autonomy amplifies scope of potential harms across physical, financial, and digital dimensions |
 | **Research Maturity** | Medium | ReAct (ICLR 2023) established foundations; 1,600+ annotated failure traces now available via MAST-Data |
-| **Deployment Status** | Production | Claude Code, Devin, <EntityLink id="openai">OpenAI</EntityLink> Assistants in commercial use; enterprise adoption accelerating |
+| **Deployment Status** | Production | Claude Code, Devin, <EntityLink id="E218">OpenAI</EntityLink> Assistants in commercial use; enterprise adoption accelerating |
 | **Scalability** | Uncertain | Performance gains plateau at longer time horizons; 32-hour tasks show humans outperforming AI 2:1 |
 | **Dominance Probability** | 25-40% | Strong growth trends but reliability constraints may limit ceiling |
 
@@ -44,7 +39,7 @@ import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 |--------|------|
 | Official Website | [lilianweng.github.io](https://lilianweng.github.io/posts/2023-06-23-agent/) |
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Movable_scaffolding_system) |
-| <EntityLink id="lesswrong">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/mAwxebLw3nYbDivmt/scaffolded-llms-less-obvious-concerns) |
+| <EntityLink id="E538">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/mAwxebLw3nYbDivmt/scaffolded-llms-less-obvious-concerns) |
 | arXiv | [arxiv.org](https://arxiv.org/html/2510.25445v1) |
 
 
@@ -52,7 +47,7 @@ import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
 Heavy scaffolding refers to AI systems where significant capability and behavior emerges from the **orchestration code** rather than just the underlying model. These systems combine foundation models with tools, persistent memory, multi-agent coordination, and autonomous operation loops.
 
-Examples include Claude Code (<EntityLink id="anthropic">Anthropic</EntityLink>'s coding agent), Devin (Cognition's software engineer), AutoGPT, and various research agent frameworks. The key distinguishing feature is that the **scaffold itself is a major determinant of system behavior**, not just a thin wrapper around model calls.
+Examples include Claude Code (<EntityLink id="E22">Anthropic</EntityLink>'s coding agent), Devin (Cognition's software engineer), AutoGPT, and various research agent frameworks. The key distinguishing feature is that the **scaffold itself is a major determinant of system behavior**, not just a thin wrapper around model calls.
 
 This paradigm has an estimated **25-40% probability** of being dominant at transformative AI, with strong growth trends as scaffolding becomes easier to build and demonstrates clear capability gains. The [2025 International AI Safety Report](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) notes that "increasingly capable AI agents will likely present new, significant challenges for risk management."
 
@@ -384,9 +379,3 @@ Understanding the economics of agentic systems is critical for both deployment d
 - [LLM-Agents-Papers](https://github.com/AGI-Edgerunners/LLM-Agents-Papers) - Comprehensive repository of agent research.
 - [ACM Computing Surveys: AI Agents Under Threat](https://dl.acm.org/doi/10.1145/3716628) - Security challenges survey; identifies "emergent behaviors" including "destructive behaviors."
 - [Gradient Institute: Multi-Agent Risk Analysis](https://www.gradientinstitute.org/assets/gradient_multiagent_report.pdf) - Risk analysis techniques for multi-agent systems.
-
-## Related Pages
-
-- <EntityLink id="light-scaffolding">Light Scaffolding</EntityLink> - Simpler tool use patterns
-- <EntityLink id="dense-transformers">Dense Transformers</EntityLink> - Underlying model architecture
-- AI Control Problem - Broader control challenges

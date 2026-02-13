@@ -19,6 +19,7 @@ interface PageMetrics {
   diagramCount: number;
   internalLinks: number;
   externalLinks: number;
+  footnoteCount: number;
   bulletRatio: number;
   sectionCount: number;
   hasOverview: boolean;
@@ -469,7 +470,7 @@ function StructureDisplay({ metrics }: { metrics: PageMetrics }) {
     { label: "Tables", max: 3, earned: structureItemScore(metrics.tableCount, [[3, 3], [2, 2], [1, 1]]) },
     { label: "Diagrams", max: 2, earned: structureItemScore(metrics.diagramCount, [[2, 2], [1, 1]]) },
     { label: "Internal links", max: 2, earned: structureItemScore(metrics.internalLinks, [[4, 2], [1, 1]]) },
-    { label: "External citations", max: 3, earned: structureItemScore(metrics.externalLinks, [[6, 3], [3, 2], [1, 1]]) },
+    { label: "Citations", max: 3, earned: structureItemScore(metrics.footnoteCount + metrics.externalLinks, [[6, 3], [3, 2], [1, 1]]) },
     { label: "Prose ratio", max: 2, earned: metrics.bulletRatio < 0.3 ? 2 : metrics.bulletRatio < 0.5 ? 1 : 0 },
     { label: "Overview section", max: 1, earned: metrics.hasOverview ? 1 : 0 },
   ];
@@ -781,7 +782,8 @@ export function PageStatus({
             <MetricChip icon={<IconTable />} value={metrics.tableCount} label="Tables" description="Data tables in the page" />
             <MetricChip icon={<IconDiagram />} value={metrics.diagramCount} label="Diagrams" description="Charts and visual diagrams" />
             <MetricChip icon={<IconLink />} value={metrics.internalLinks} label="Internal Links" description="Links to other wiki pages" />
-            <MetricChip icon={<IconBook />} value={metrics.externalLinks} label="External Citations" description="References to outside sources" />
+            <MetricChip icon={<IconBook />} value={metrics.footnoteCount} label="Footnotes" description="Footnote citations [^N] with sources" />
+            <MetricChip icon={<IconLink />} value={metrics.externalLinks} label="External Links" description="Markdown links to outside URLs" />
             <MetricChip
               icon={<span className="text-[10px] font-bold">%</span>}
               value={`${Math.round(metrics.bulletRatio * 100)}%`}

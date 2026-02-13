@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
 import { inferEntityType } from '../../lib/category-entity-types.ts';
+import { buildEntityLookupForTopic } from '../../lib/entity-lookup.ts';
 
 interface LoadResultContext {
   loadResult: (topic: string, filename: string) => Record<string, unknown> | null;
@@ -60,7 +61,7 @@ interface SourceFileData {
   content: string;
 }
 
-export function getSynthesisPrompt(topic: string, quality: string, { loadResult }: LoadResultContext, destPath?: string | null): string {
+export function getSynthesisPrompt(topic: string, quality: string, { loadResult }: LoadResultContext, destPath?: string | null, ROOT?: string): string {
   const researchData = loadResult(topic, 'perplexity-research.json') as ResearchData | null;
   const scryData = loadResult(topic, 'scry-research.json') as ScryData | null;
   const directionsData = loadResult(topic, 'directions.json') as DirectionsData | null;
@@ -175,7 +176,7 @@ ${canonicalLinksSection}
    - When attributing quotes to specific people, the quote MUST appear in the research data
    - This is especially important for EA/rationalist community members whose names you may recognize
 3. **Escape dollar signs** - Write \\$100M not $100M
-4. **Use EntityLink for internal refs** - <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>
+4. **Use EntityLink for internal refs** - \`<EntityLink id="E##">Display Name</EntityLink>\` (use IDs from the Entity Lookup Table below)
 5. **Include criticism section** if research supports it
 6. **60%+ prose** - Not just tables and bullet points
 7. **Limited info fallback** - If research is sparse, write a shorter article rather than padding with filler
@@ -215,28 +216,23 @@ ${canonicalLinksSection}
 
 ## EntityLink Usage - CRITICAL
 
-**Format**: \`<EntityLink id="entity-id">Display Text</EntityLink>\`
+**Format**: \`<EntityLink id="E##">Display Text</EntityLink>\`
 
-**IMPORTANT**:
-- IDs are simple slugs like "open-philanthropy", NOT paths like "organizations/funders/open-philanthropy"
-- ONLY use EntityLinks for entities that exist in the wiki
-- If unsure whether an entity exists, use plain text instead of guessing an ID
-- NEVER invent EntityLink IDs - if you're not certain, don't use EntityLink
+EntityLinks use **numeric IDs** (E##). Use the lookup table below to find the correct ID.
+ONLY use IDs from this table. If an entity is not listed, use plain text instead.
+NEVER invent EntityLink IDs — if you're not certain, don't use EntityLink.
+
+### Entity Lookup Table
+
+\`\`\`
+${ROOT ? buildEntityLookupForTopic(topic, ROOT) : '(entity lookup not available)'}
+\`\`\`
 
 **PRIORITY CROSS-LINKING** (most important):
 - **Creators/Authors**: If the subject was created by someone in the wiki, ALWAYS EntityLink them
-  - Example: For a tool page, link to its creator: "created by <EntityLink id="vipul-naik">Vipul Naik</EntityLink>"
-  - Example: For a research project, link to the lead researcher
 - **Related Projects**: Link to sibling projects by the same creator
-  - Example: "part of an ecosystem including <EntityLink id="timelines-wiki">Timelines Wiki</EntityLink>"
 - **Funders/Organizations**: Link to funding sources and affiliated organizations
 - **Key People**: Link to researchers, founders, and notable figures mentioned substantively
-
-**Common valid IDs** (partial list - use plain text if entity not listed):
-open-philanthropy, anthropic, openai, deepmind, miri, lesswrong, redwood-research,
-eliezer-yudkowsky, paul-christiano, dario-amodei, scheming, misuse-risks, cea,
-80000-hours, arc-evals, metr, epoch-ai, fhi, cais, sff, ltff, fli,
-vipul-naik, issa-rice, timelines-wiki, donations-list-website, ai-watch, org-watch
 
 ## Output Format
 
@@ -256,7 +252,7 @@ ratings:
   actionability: 5
   completeness: 6
 ---
-import {EntityLink, Backlinks, R, DataInfoBox, DataExternalLinks} from '@components/wiki';
+import {EntityLink, R, DataInfoBox, DataExternalLinks} from '@components/wiki';
 
 ## Article Sections
 - Quick Assessment (table)
@@ -267,7 +263,8 @@ import {EntityLink, Backlinks, R, DataInfoBox, DataExternalLinks} from '@compone
 - Criticisms/Concerns (if applicable)
 - Key Uncertainties
 - Sources (footnotes)
-- <Backlinks />`;
+
+Do NOT include a "Related Pages", "See Also", or "Related Content" section — these are rendered automatically by the RelatedPages component.`;
 }
 
 export async function runSynthesis(topic: string, quality: string, { log, ROOT }: SynthesisContext, destPath?: string | null): Promise<{ success: boolean; model: string; budget: number }> {
@@ -277,8 +274,7 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
     const model = quality === 'quality' ? 'opus' : 'sonnet';
     const budget = quality === 'quality' ? 3.0 : 2.0;
 
-    const claude = spawn('npx', [
-      '@anthropic-ai/claude-code',
+    const claude = spawn('claude', [
       '-p',
       '--print',
       '--dangerously-skip-permissions',
@@ -295,7 +291,7 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
       if (!fs.existsSync(filePath)) return null;
       const content = fs.readFileSync(filePath, 'utf-8');
       return f.endsWith('.json') ? JSON.parse(content) : content;
-    }}, destPath);
+    }}, destPath, ROOT);
 
     claude.stdin.write(prompt);
     claude.stdin.end();

@@ -7,6 +7,7 @@ import {
   countDiagrams,
   countInternalLinks,
   countExternalLinks,
+  countFootnoteRefs,
   suggestQuality,
 } from './metrics-extractor.ts';
 
@@ -113,6 +114,36 @@ describe('countExternalLinks', () => {
   });
 });
 
+describe('countFootnoteRefs', () => {
+  it('counts unique footnote references', () => {
+    const content = 'Some text[^1] and more[^2] and again[^1]';
+    expect(countFootnoteRefs(content)).toBe(2); // [^1] and [^2], deduped
+  });
+
+  it('skips footnote definitions', () => {
+    const content = `Some text[^1] and more[^2]
+
+[^1]: https://example.com
+[^2]: https://example.org`;
+    expect(countFootnoteRefs(content)).toBe(2);
+  });
+
+  it('returns 0 for content with only definitions', () => {
+    const content = `[^1]: https://example.com
+[^2]: https://example.org`;
+    expect(countFootnoteRefs(content)).toBe(0);
+  });
+
+  it('returns 0 for no footnotes', () => {
+    expect(countFootnoteRefs('Just regular text with [links](https://example.com)')).toBe(0);
+  });
+
+  it('handles many footnotes', () => {
+    const content = 'A[^1] B[^2] C[^3] D[^4] E[^5] F[^6] G[^7] H[^8] I[^9] J[^10]';
+    expect(countFootnoteRefs(content)).toBe(10);
+  });
+});
+
 describe('suggestQuality', () => {
   it('score 0 gives quality 0', () => {
     expect(suggestQuality(0)).toBe(0);
@@ -157,5 +188,23 @@ This is a test article with some content here.
     expect(metrics.tableCount).toBe(1);
     expect(metrics.hasOverview).toBe(true);
     expect(metrics.structuralScore).toBeGreaterThanOrEqual(0);
+    expect(metrics.footnoteCount).toBe(0);
+  });
+
+  it('counts footnotes in full content', () => {
+    const content = `---
+title: Test
+---
+
+## Overview
+
+AI safety is important[^1] and growing[^2].
+
+[^1]: [Source](https://example.com)
+[^2]: [Source](https://example.org)
+`;
+    const metrics = extractMetrics(content);
+    expect(metrics.footnoteCount).toBe(2);
+    expect(metrics.externalLinks).toBe(2); // footnote definition links
   });
 });

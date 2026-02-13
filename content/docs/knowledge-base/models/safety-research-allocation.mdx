@@ -26,26 +26,21 @@ todos:
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Strategic Importance' section
   - Complete 'Limitations' section (6 placeholders)
-metrics:
-  wordCount: 984
-  citations: 26
-  tables: 29
-  diagrams: 0
 clusters:
   - ai-safety
   - governance
   - community
 subcategory: intervention-models
 ---
-import {DataInfoBox, Backlinks, R, EntityLink} from '@components/wiki';
+import {DataInfoBox, R, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="safety-research-allocation" ratings={frontmatter.ratings} />
+<DataInfoBox entityId="E266" ratings={frontmatter.ratings} />
 
 ## Overview
 
 AI safety research allocation determines which existential risks get addressed and which remain neglected. With approximately \$100M annually flowing into safety research across sectors, resource distribution shapes everything from alignment research priorities to governance capacity.
 
-Current allocation shows stark imbalances: industry controls 60-70% of resources while academia receives only 15-20%, creating systematic gaps in independent research. <R id="898065a672b179c6">Expert analysis</R> suggests this distribution leads to 30-50% efficiency losses compared to optimal allocation, with critical areas like <EntityLink id="multi-agent">multi-agent safety</EntityLink> receiving 3-5x less attention than warranted by their risk contribution.
+Current allocation shows stark imbalances: industry controls 60-70% of resources while academia receives only 15-20%, creating systematic gaps in independent research. <R id="898065a672b179c6">Expert analysis</R> suggests this distribution leads to 30-50% efficiency losses compared to optimal allocation, with critical areas like <EntityLink id="E488">multi-agent safety</EntityLink> receiving 3-5x less attention than warranted by their risk contribution.
 
 The model reveals three key findings: (1) talent concentration in 5-10 organizations creates dangerous dependencies, (2) commercial incentives systematically underfund long-term theoretical work, and (3) government capacity building lags 5-10 years behind need.
 
@@ -69,14 +64,14 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 | **Government** | \$80-150M | 100-200 | Medium | Technical capacity |
 | **Nonprofits** | \$70-120M | 150-300 | Low | Funding volatility |
 
-*Sources: <R id="2aa20a88a0b0cbcf"><EntityLink id="open-philanthropy">Coefficient Giving</EntityLink></R> funding data, <R id="cf5fd74e8db11565">RAND</R> workforce analysis*
+*Sources: <R id="2aa20a88a0b0cbcf"><EntityLink id="E552">Coefficient Giving</EntityLink></R> funding data, <R id="cf5fd74e8db11565">RAND</R> workforce analysis*
 
 ### Geographic Concentration Analysis
 
 | Location | Research FTE | % of Total | Major Organizations |
 |----------|-------------|------------|-------------------|
-| **SF Bay Area** | 700-900 | 45% | <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink> |
-| **London** | 250-350 | 20% | <EntityLink id="deepmind">DeepMind</EntityLink>, <EntityLink id="uk-aisi">UK AISI</EntityLink> |
+| **SF Bay Area** | 700-900 | 45% | <EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink> |
+| **London** | 250-350 | 20% | <EntityLink id="E98">DeepMind</EntityLink>, <EntityLink id="E364">UK AISI</EntityLink> |
 | **Boston/NYC** | 200-300 | 15% | MIT, Harvard, NYU |
 | **Other** | 300-400 | 20% | Distributed globally |
 
@@ -96,7 +91,7 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 - 2023-2024: ~60+ academics transitioned annually
 - Projected 2025-2027: 80-120 annually at current rates
 
-*Source: <R id="ff4ccf1d5769e99e"><EntityLink id="80000-hours">80,000 Hours</EntityLink></R> career tracking*
+*Source: <R id="ff4ccf1d5769e99e"><EntityLink id="E510">80,000 Hours</EntityLink></R> career tracking*
 
 ### Research Priority Distortions
 
@@ -114,7 +109,7 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 ### Institutional Capacity
 
 **Leading Academic Programs:**
-- <R id="9c4106b68045dbd6"><EntityLink id="chai">CHAI</EntityLink> Berkeley</R>: 15-20 FTE researchers
+- <R id="9c4106b68045dbd6"><EntityLink id="E57">CHAI</EntityLink> Berkeley</R>: 15-20 FTE researchers
 - <R id="c0a5858881a7ac1c">Stanford HAI</R>: 25-30 FTE safety-focused
 - MIT CSAIL: 10-15 FTE relevant researchers
 - Oxford FHI: 8-12 FTE (funding uncertain)
@@ -144,9 +139,9 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 
 | Organization | Staff | Budget | Focus Areas |
 |-------------|-------|--------|-------------|
-| <EntityLink id="us-aisi">US AISI</EntityLink> | 50-80 | \$50-100M | Evaluation, standards |
+| <EntityLink id="E365">US AISI</EntityLink> | 50-80 | \$50-100M | Evaluation, standards |
 | <R id="85ee8e554a07476b">NIST AI</R> | 30-50 | \$30-60M | Risk frameworks |
-| <EntityLink id="uk-aisi">UK AISI</EntityLink> | 40-60 | £30-50M | Frontier evaluation |
+| <EntityLink id="E364">UK AISI</EntityLink> | 40-60 | £30-50M | Frontier evaluation |
 | EU AI Office | 20-40 | €40-80M | Regulation implementation |
 
 *Sources: Government budget documents, public hiring data*
@@ -173,7 +168,7 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 | <R id="dd0cf0ff290cc68e">Coefficient Giving</R> | \$50-80M | All areas | Research-driven |
 | Survival & Flourishing Fund | \$15-25M | Alignment theory | Community-based |
 | Long-Term Future Fund | \$5-15M | Early career | High-risk tolerance |
-| <EntityLink id="fli">Future of Life Institute</EntityLink> | \$5-10M | Governance | Public engagement |
+| <EntityLink id="E528">Future of Life Institute</EntityLink> | \$5-10M | Governance | Public engagement |
 
 *Data from public grant databases and annual reports*
 
@@ -195,7 +190,7 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 
 | Research Area | Current % | Optimal % | Funding Gap |
 |---------------|-----------|-----------|-------------|
-| **<EntityLink id="rlhf">RLHF</EntityLink>/Training** | 25% | 15% | Over-funded |
+| **<EntityLink id="E259">RLHF</EntityLink>/Training** | 25% | 15% | Over-funded |
 | **Interpretability** | 20% | 20% | Adequate |
 | **Evaluation/Benchmarks** | 15% | 25% | \$70M gap |
 | **Alignment Theory** | 10% | 20% | \$70M gap |
@@ -211,9 +206,9 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 - Current funding: \<\$20M annually
 - Estimated need: \$60-80M annually
 - Key challenges: Coordination failures, competitive dynamics
-- Research orgs: <EntityLink id="miri">MIRI</EntityLink>, academic game theorists
+- Research orgs: <EntityLink id="E202">MIRI</EntityLink>, academic game theorists
 
-**<EntityLink id="corrigibility">Corrigibility Research</EntityLink>:**
+**<EntityLink id="E79">Corrigibility Research</EntityLink>:**
 - Current funding: \<\$15M annually
 - Estimated need: \$50-70M annually
 - Key challenges: Theoretical foundations, empirical testing
@@ -230,7 +225,7 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 | **UK** | \$80-120M | 15% global | Evaluation leadership | US alignment |
 | **China** | \$50-100M? | 10% global | State-directed | Limited transparency |
 
-*Estimates from <R id="f0d95954b449240a">Georgetown <EntityLink id="cset">CSET</EntityLink></R> analysis*
+*Estimates from <R id="f0d95954b449240a">Georgetown <EntityLink id="E524">CSET</EntityLink></R> analysis*
 
 ### Coordination Challenges
 
@@ -269,7 +264,7 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 - Industry dominance reaches 75-80% by 2027
 - Academic sector contracts to 10-15%
 - Critical research areas remain underfunded
-- <EntityLink id="racing-dynamics">Racing dynamics</EntityLink> intensify
+- <EntityLink id="E239">Racing dynamics</EntityLink> intensify
 
 **Government Intervention (25% probability):**
 - Major public investment (\$500M+ annually)
@@ -355,7 +350,7 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 
 | Source | Key Findings | Methodology |
 |--------|-------------|-------------|
-| <R id="cc6b17623c06f2d7">Dafoe (2018)</R> | <EntityLink id="ai-governance">AI governance</EntityLink> research agenda | Expert consultation |
+| <R id="cc6b17623c06f2d7">Dafoe (2018)</R> | <EntityLink id="E608">AI governance</EntityLink> research agenda | Expert consultation |
 | <R id="4c76d88cc9dd70a0">Zhang et al. (2021)</R> | AI research workforce analysis | Survey data |
 | <R id="f771d4f56ad4dbaa">Anthropic (2023)</R> | Industry safety research priorities | Internal analysis |
 
@@ -383,4 +378,3 @@ The model reveals three key findings: (1) talent concentration in 5-10 organizat
 | <R id="ec456e4a78161d43">80,000 Hours</R> | Career tracking | Individual transitions |
 | <R id="076dbb82d053643f">Coefficient Giving</R> | Grant databases | Foundation funding |
 
-<Backlinks entityId="safety-research-allocation" />

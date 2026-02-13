@@ -118,6 +118,243 @@ function computeBacklinks(entities) {
 }
 
 /**
+ * Scan MDX content for <EntityLink id="..."> references.
+ * Returns inbound map: targetEntityId -> array of source pages that link to it.
+ * Must be called before rawContent is stripped from pages.
+ */
+function scanContentEntityLinks(pages, entityMap) {
+  const inbound = {};
+  let totalLinks = 0;
+
+  for (const page of pages) {
+    if (!page.rawContent) continue;
+
+    const regex = /<EntityLink\s+[^>]*id="([^"]+)"/g;
+    let match;
+    const seen = new Set();
+
+    while ((match = regex.exec(page.rawContent)) !== null) {
+      const targetId = match[1];
+      if (targetId === page.id) continue; // Skip self-links
+      if (seen.has(targetId)) continue;
+      seen.add(targetId);
+
+      if (!inbound[targetId]) {
+        inbound[targetId] = [];
+      }
+      const sourceEntity = entityMap.get(page.id);
+      inbound[targetId].push({
+        id: page.id,
+        type: sourceEntity?.type || 'concept',
+        title: page.title,
+      });
+      totalLinks++;
+    }
+  }
+
+  return { inbound, totalLinks };
+}
+
+/**
+ * Compute a bidirectional related-pages graph combining all signals.
+ * Every connection is symmetric: if A relates to B, B relates to A.
+ *
+ * Signals (from strongest to weakest):
+ *   1. Explicit YAML relatedEntries  (weight 10)
+ *   2. Name/prefix matching          (weight 6)
+ *   3. Content EntityLinks            (weight 5)
+ *   4. Content similarity/redundancy  (weight 0–3, scaled by similarity)
+ *   5. Shared tags                    (weight varies by specificity)
+ *
+ * Quality boost: Each neighbor's raw score is multiplied by a gentle factor
+ * based on the target page's quality and importance ratings:
+ *   boost = 1 + quality/40 + importance/400   (max ~1.45x)
+ * Unrated pages default to average values (q=5, imp=50 → 1.25x) so they
+ * aren't penalized vs rated pages. This nudges high-quality content up
+ * without reordering strongly-related connections.
+ *
+ * Returns: entityId -> sorted array of { id, type, title, score, label? }
+ */
+function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
+  const entityMap = new Map(entities.map(e => [e.id, e]));
+  const pageMap = new Map(pages.map(p => [p.id, p]));
+
+  // Accumulator: graph[entityId] = Map<relatedId, score>
+  const graph = {};
+
+  // Directional labels from YAML relatedEntries (not symmetric)
+  // labels[from][to] = "analyzes"
+  const labels = {};
+
+  // Map for auto-generating reverse labels
+  const INVERSE_LABEL = {
+    'causes': 'caused by',
+    'cause': 'caused by',
+    'mitigates': 'mitigated by',
+    'mitigated-by': 'mitigates',
+    'mitigation': 'mitigated by',
+    'requires': 'required by',
+    'enables': 'enabled by',
+    'blocks': 'blocked by',
+    'supersedes': 'superseded by',
+    'increases': 'increased by',
+    'decreases': 'decreased by',
+    'supports': 'supported by',
+    'measures': 'measured by',
+    'measured-by': 'measures',
+    'analyzed-by': 'analyzes',
+    'analyzes': 'analyzed by',
+    'child-of': 'parent of',
+    'composed-of': 'component of',
+    'component': 'composed of',
+    'addresses': 'addressed by',
+    'affects': 'affected by',
+    'amplifies': 'amplified by',
+    'contributes-to': 'receives contribution from',
+    'driven-by': 'drives',
+    'driver': 'driven by',
+    'drives': 'driven by',
+    'leads-to': 'leads',
+    'shaped-by': 'shapes',
+    'prerequisite': 'depends on',
+    'research': 'researched by',
+    'models': 'modeled by',
+  };
+
+  function addEdge(a, b, weight) {
+    if (a === b) return;
+    for (const [from, to] of [[a, b], [b, a]]) {
+      if (!graph[from]) graph[from] = new Map();
+      graph[from].set(to, (graph[from].get(to) || 0) + weight);
+    }
+  }
+
+  // 1. Explicit YAML relatedEntries (strongest signal)
+  for (const entity of entities) {
+    if (entity.relatedEntries) {
+      for (const ref of entity.relatedEntries) {
+        addEdge(entity.id, ref.id, 10);
+        // Store directional label if present
+        if (ref.relationship && ref.relationship !== 'related') {
+          if (!labels[entity.id]) labels[entity.id] = {};
+          labels[entity.id][ref.id] = ref.relationship.replace(/-/g, ' ');
+          // Also store inverse label for the reverse direction
+          const inverse = INVERSE_LABEL[ref.relationship];
+          if (inverse) {
+            if (!labels[ref.id]) labels[ref.id] = {};
+            // Don't overwrite an explicit label with an inferred one
+            if (!labels[ref.id][entity.id]) {
+              labels[ref.id][entity.id] = inverse;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Name/prefix matching (e.g. "anthropic" ↔ "anthropic-ipo")
+  for (let i = 0; i < entities.length; i++) {
+    for (let j = i + 1; j < entities.length; j++) {
+      const a = entities[i].id, b = entities[j].id;
+      if (b.startsWith(a + '-') || a.startsWith(b + '-')) {
+        addEdge(a, b, 6);
+      }
+    }
+  }
+
+  // 3. Content EntityLinks (directional in content, but stored bidirectionally)
+  for (const [targetId, sources] of Object.entries(contentInbound)) {
+    for (const source of sources) {
+      addEdge(source.id, targetId, 5);
+    }
+  }
+
+  // 4. Content similarity from redundancy scores
+  for (const page of pages) {
+    if (!page.redundancy?.similarPages) continue;
+    for (const sp of page.redundancy.similarPages) {
+      addEdge(page.id, sp.id, (sp.similarity / 100) * 3);
+    }
+  }
+
+  // 5. Shared tags — weighted by specificity (rarer tags are more informative)
+  for (const entity of entities) {
+    if (!entity.tags?.length) continue;
+    for (const tag of entity.tags) {
+      const tagEntities = tagIndex[tag] || [];
+      const specificity = 1 / Math.log2(tagEntities.length + 2);
+      for (const te of tagEntities) {
+        if (te.id !== entity.id) {
+          addEdge(entity.id, te.id, specificity * 2);
+        }
+      }
+    }
+  }
+
+  // Convert to output: apply quality boost, then type-diverse selection.
+  // Guarantees representation from each type before filling by score.
+  const MAX_PER_ENTITY = 25;
+  const MIN_PER_TYPE = 2;
+
+  const output = {};
+  for (const [entityId, neighbors] of Object.entries(graph)) {
+    const scored = [...neighbors.entries()]
+      .map(([targetId, rawScore]) => {
+        // Gentle boost: nudge high-quality pages up without reordering strong links.
+        // Unrated pages get average defaults so they aren't penalized.
+        const targetPage = pageMap.get(targetId);
+        const q = targetPage?.quality ?? 5;
+        const imp = targetPage?.importance ?? 50;
+        const boost = 1 + q / 40 + imp / 400;
+        const e = entityMap.get(targetId);
+        const entry = {
+          id: targetId,
+          type: e?.type || 'concept',
+          title: e?.title || targetId,
+          score: Math.round(rawScore * boost * 100) / 100,
+        };
+        // Attach directional label if one exists for this specific pair
+        const lbl = labels[entityId]?.[targetId];
+        if (lbl) entry.label = lbl;
+        return entry;
+      })
+      .filter(entry => entry.score >= 1.0)
+      .sort((a, b) => b.score - a.score);
+
+    // Type-diverse selection: guarantee MIN_PER_TYPE from each type,
+    // then fill remaining slots with highest-scoring entries.
+    const selected = new Set();
+    const byType = new Map();
+    for (const entry of scored) {
+      if (!byType.has(entry.type)) byType.set(entry.type, []);
+      byType.get(entry.type).push(entry);
+    }
+
+    // Phase 1: take top MIN_PER_TYPE from each type
+    for (const [, entries] of byType) {
+      for (const entry of entries.slice(0, MIN_PER_TYPE)) {
+        selected.add(entry.id);
+      }
+    }
+
+    // Phase 2: fill remaining slots by score (may already be selected)
+    for (const entry of scored) {
+      if (selected.size >= MAX_PER_ENTITY) break;
+      selected.add(entry.id);
+    }
+
+    // Build final list in score order
+    const result = scored.filter(e => selected.has(e.id)).slice(0, MAX_PER_ENTITY);
+
+    if (result.length > 0) {
+      output[entityId] = result;
+    }
+  }
+
+  return output;
+}
+
+/**
  * Build inverted tag index
  * Returns a map: tag -> array of entities with that tag
  */
@@ -206,6 +443,8 @@ function buildPagesRegistry(urlToResource) {
 
         pages.push({
           id,
+          numericId: fm.numericId || null,
+          _fullPath: fullPath,
           path: urlPath,
           filePath: relative(CONTENT_DIR, fullPath),
           title: fm.title || id.replace(/-/g, ' '),
@@ -237,6 +476,7 @@ function buildPagesRegistry(urlToResource) {
             diagramCount: metrics.diagramCount,
             internalLinks: metrics.internalLinks,
             externalLinks: metrics.externalLinks,
+            footnoteCount: metrics.footnoteCount,
             bulletRatio: Math.round(metrics.bulletRatio * 100) / 100,
             sectionCount: metrics.sectionCount.total,
             hasOverview: metrics.hasOverview,
@@ -390,49 +630,83 @@ function main() {
   database.entities = entities;
 
   // =========================================================================
-  // ID REGISTRY — assign stable numeric IDs (E1, E2, ...) to every entity
+  // ID REGISTRY — derive from numericId fields in source files (YAML + MDX)
+  //
+  // IDs are stored in source files (YAML `numericId:` or MDX frontmatter).
+  // This section reads them, detects conflicts, and assigns IDs to any
+  // new entities that don't have one yet (writing back to source files).
+  // The id-registry.json is generated as a derived build artifact only.
   // =========================================================================
   const ID_REGISTRY_FILE = join(DATA_DIR, 'id-registry.json');
-  let idRegistry = { _nextId: 1, entities: {} };
-  if (existsSync(ID_REGISTRY_FILE)) {
-    idRegistry = JSON.parse(readFileSync(ID_REGISTRY_FILE, 'utf-8'));
-  }
-
-  // Build reverse map: slug → numericId
   const slugToNumericId = {};
-  for (const [numId, slug] of Object.entries(idRegistry.entities)) {
-    slugToNumericId[slug] = numId;
+  const numericIdToSlug = {};
+  const conflicts = [];
+
+  // Collect numericIds from all entities (YAML + frontmatter)
+  for (const entity of entities) {
+    if (entity.numericId) {
+      // Detect conflicts: two different entities claiming the same numericId
+      if (numericIdToSlug[entity.numericId] && numericIdToSlug[entity.numericId] !== entity.id) {
+        conflicts.push(`${entity.numericId} claimed by both "${numericIdToSlug[entity.numericId]}" and "${entity.id}"`);
+      }
+      numericIdToSlug[entity.numericId] = entity.id;
+      slugToNumericId[entity.id] = entity.numericId;
+    }
   }
 
-  // Assign IDs to any new entities not yet in the registry
+  if (conflicts.length > 0) {
+    console.error('\n  ERROR: numericId conflicts detected:');
+    for (const c of conflicts) console.error(`    ${c}`);
+    process.exit(1);
+  }
+
+  // Compute next available ID from existing assignments
+  let nextId = 1;
+  for (const numId of Object.keys(numericIdToSlug)) {
+    const n = parseInt(numId.slice(1));
+    if (n >= nextId) nextId = n + 1;
+  }
+
+  // Assign IDs to entities that don't have one yet, writing back to source
   let newAssignments = 0;
   for (const entity of entities) {
-    if (!slugToNumericId[entity.id]) {
-      const numId = `E${idRegistry._nextId}`;
-      idRegistry.entities[numId] = entity.id;
+    if (!entity.numericId) {
+      const numId = `E${nextId}`;
+      entity.numericId = numId;
+      numericIdToSlug[numId] = entity.id;
       slugToNumericId[entity.id] = numId;
-      idRegistry._nextId++;
+      nextId++;
       newAssignments++;
+
+      // Write the new numericId back to the source file
+      if (entity._source === 'frontmatter' && entity._filePath) {
+        // MDX frontmatter entity: inject numericId into frontmatter
+        const content = readFileSync(entity._filePath, 'utf-8');
+        const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
+        writeFileSync(entity._filePath, updated);
+        console.log(`    Assigned ${numId} → ${entity.id} (wrote to MDX frontmatter)`);
+      } else {
+        // YAML entity: would need to update YAML file
+        // For now, warn — this should be handled by `crux content create`
+        console.warn(`    WARNING: Assigned ${numId} → ${entity.id} (YAML entity without numericId — add manually)`);
+      }
     }
-    // Attach numericId to entity object
-    entity.numericId = slugToNumericId[entity.id];
   }
 
-  // Save updated registry
-  if (newAssignments > 0) {
-    writeFileSync(ID_REGISTRY_FILE, JSON.stringify(idRegistry, null, 2));
-    console.log(`  idRegistry: assigned ${newAssignments} new IDs (total: ${Object.keys(idRegistry.entities).length})`);
-  } else {
-    console.log(`  idRegistry: all ${Object.keys(idRegistry.entities).length} entities have IDs`);
-  }
-
-  // Copy id-registry.json to app output directory for consistency
+  // Generate id-registry.json as derived build artifact
+  const idRegistry = { _nextId: nextId, entities: numericIdToSlug };
+  writeFileSync(ID_REGISTRY_FILE, JSON.stringify(idRegistry, null, 2));
   copyFileSync(ID_REGISTRY_FILE, join(OUTPUT_DIR, 'id-registry.json'));
-  console.log(`  idRegistry: copied to ${join(OUTPUT_DIR, 'id-registry.json')}`);
+
+  if (newAssignments > 0) {
+    console.log(`  idRegistry: assigned ${newAssignments} new IDs (total: ${Object.keys(numericIdToSlug).length})`);
+  } else {
+    console.log(`  idRegistry: all ${Object.keys(numericIdToSlug).length} entities have IDs`);
+  }
 
   // Build lookup maps for database output
   const idRegistryOutput = {
-    byNumericId: { ...idRegistry.entities },
+    byNumericId: { ...numericIdToSlug },
     bySlug: { ...slugToNumericId },
   };
   database.idRegistry = idRegistryOutput;
@@ -519,6 +793,30 @@ function main() {
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource);
 
+  // =========================================================================
+  // CONTENT ENTITY LINKS — scan MDX for <EntityLink> references
+  // Must happen before rawContent is stripped (below).
+  // =========================================================================
+  const entityMap = new Map(entities.map(e => [e.id, e]));
+  const { inbound: contentInbound, totalLinks: contentLinkCount } = scanContentEntityLinks(pages, entityMap);
+
+  // Merge content-derived inbound links into backlinks
+  let contentBacklinksMerged = 0;
+  for (const [targetId, sources] of Object.entries(contentInbound)) {
+    if (!backlinks[targetId]) {
+      backlinks[targetId] = [];
+    }
+    const existingIds = new Set(backlinks[targetId].map(b => b.id));
+    for (const source of sources) {
+      if (!existingIds.has(source.id)) {
+        backlinks[targetId].push(source);
+        contentBacklinksMerged++;
+      }
+    }
+  }
+  console.log(`  contentLinks: ${contentLinkCount} EntityLink references scanned, ${contentBacklinksMerged} new backlinks added`);
+
+  // Re-count backlinks after merging content links
   // Enrich pages with backlink counts
   for (const page of pages) {
     const pageBacklinks = backlinks[page.id] || [];
@@ -539,19 +837,28 @@ function main() {
       maxSimilarity: 0,
       similarPages: [],
     };
-    // Remove rawContent to keep JSON size reasonable
+    // Remove internal fields to keep JSON size reasonable
     delete page.rawContent;
+    delete page._fullPath;
   }
 
   // Store redundancy pairs for analysis
   database.redundancyPairs = redundancyPairs.slice(0, 100); // Top 100 pairs
   console.log(`  redundancy: ${redundancyPairs.length} similar pairs found`);
 
+  // =========================================================================
+  // RELATED GRAPH — unified bidirectional graph combining all signals:
+  // explicit YAML, content EntityLinks, tags, similarity, name-prefix.
+  // =========================================================================
+  const relatedGraph = computeRelatedGraph(entities, pages, contentInbound, tagIndex);
+  database.relatedGraph = relatedGraph;
+  console.log(`  relatedGraph: ${Object.keys(relatedGraph).length} entities have connections`);
+
   database.pages = pages;
 
   // =========================================================================
-  // EXTEND ID REGISTRY — assign numeric IDs to page-only content (no entity)
-  // This ensures table/diagram/index pages get E-prefixed IDs like all entities.
+  // EXTEND ID REGISTRY — collect numericIds from page-only content (no entity)
+  // Pages can declare numericId in MDX frontmatter. New pages get auto-assigned.
   // =========================================================================
   const entityIds = new Set(entities.map(e => e.id));
   // Skip infrastructure/internal categories — only assign IDs to real content pages
@@ -562,23 +869,47 @@ function main() {
   let pageIdAssignments = 0;
   for (const page of pages) {
     if (entityIds.has(page.id)) continue;        // Already has an entity (and thus an ID)
-    if (slugToNumericId[page.id]) continue;       // Already in registry
+    if (slugToNumericId[page.id]) continue;       // Already in registry from entity
     if (skipCategories.has(page.category)) continue; // Infrastructure pages
     if (page.contentFormat === 'dashboard') continue; // Dashboard pages are infrastructure
-    const numId = `E${idRegistry._nextId}`;
-    idRegistry.entities[numId] = page.id;
-    slugToNumericId[page.id] = numId;
-    idRegistry._nextId++;
-    pageIdAssignments++;
+
+    if (page.numericId) {
+      // Page already has a numericId from frontmatter.
+      // For generated stubs, the numericId may already be assigned to the parent
+      // entity (e.g., page "epistemics" inherits E319 from entity "tmc-epistemics").
+      // Just add the page slug as an alias — don't error on this.
+      if (!numericIdToSlug[page.numericId]) {
+        numericIdToSlug[page.numericId] = page.id;
+      }
+      slugToNumericId[page.id] = page.numericId;
+    } else {
+      // Assign a new numericId and write it back to the MDX frontmatter
+      const numId = `E${nextId}`;
+      numericIdToSlug[numId] = page.id;
+      slugToNumericId[page.id] = numId;
+      page.numericId = numId;
+      nextId++;
+      pageIdAssignments++;
+
+      // Write back to MDX frontmatter
+      if (page._fullPath) {
+        const content = readFileSync(page._fullPath, 'utf-8');
+        const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
+        writeFileSync(page._fullPath, updated);
+        console.log(`    Assigned ${numId} → ${page.id} (wrote to MDX frontmatter)`);
+      }
+    }
   }
+
+  // Always update the registry output maps (page-only entries may have added slugs)
+  const updatedRegistry = { _nextId: nextId, entities: numericIdToSlug };
+  writeFileSync(ID_REGISTRY_FILE, JSON.stringify(updatedRegistry, null, 2));
+  copyFileSync(ID_REGISTRY_FILE, join(OUTPUT_DIR, 'id-registry.json'));
+  idRegistryOutput.byNumericId = { ...numericIdToSlug };
+  idRegistryOutput.bySlug = { ...slugToNumericId };
+  database.idRegistry = idRegistryOutput;
   if (pageIdAssignments > 0) {
-    writeFileSync(ID_REGISTRY_FILE, JSON.stringify(idRegistry, null, 2));
-    copyFileSync(ID_REGISTRY_FILE, join(OUTPUT_DIR, 'id-registry.json'));
-    // Update the registry output maps
-    idRegistryOutput.byNumericId = { ...idRegistry.entities };
-    idRegistryOutput.bySlug = { ...slugToNumericId };
-    database.idRegistry = idRegistryOutput;
-    console.log(`  idRegistry: assigned ${pageIdAssignments} new page IDs (total: ${Object.keys(idRegistry.entities).length})`);
+    console.log(`  idRegistry: assigned ${pageIdAssignments} new page IDs (total: ${Object.keys(numericIdToSlug).length})`);
   }
 
   const pagesWithQuality = pages.filter(p => p.quality !== null).length;
@@ -665,6 +996,7 @@ function main() {
   writeFileSync(join(OUTPUT_DIR, 'stats.json'), JSON.stringify(stats, null, 2));
   writeFileSync(join(OUTPUT_DIR, 'pathRegistry.json'), JSON.stringify(pathRegistry, null, 2));
   writeFileSync(join(OUTPUT_DIR, 'pages.json'), JSON.stringify(pages, null, 2));
+  writeFileSync(join(OUTPUT_DIR, 'relatedGraph.json'), JSON.stringify(relatedGraph, null, 2));
 
   console.log('✓ Written individual JSON files');
   console.log('✓ Written derived data files (backlinks, tagIndex, stats, pathRegistry)');

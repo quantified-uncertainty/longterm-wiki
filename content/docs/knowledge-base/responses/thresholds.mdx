@@ -20,21 +20,21 @@ clusters:
   - governance
 subcategory: governance-compute-governance
 ---
-import {DataInfoBox, Backlinks, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
+import {DataInfoBox, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
 <DataExternalLinks pageId="thresholds" />
 
-<DataInfoBox entityId="compute-thresholds" />
+<DataInfoBox entityId="E67" />
 
 :::note[Part of Compute Governance]
-This page covers **compute thresholds**—one approach within the broader Compute Governance framework. See also: <EntityLink id="export-controls">Export Controls</EntityLink>, <EntityLink id="monitoring">Monitoring</EntityLink>, <EntityLink id="international-regimes">International Regimes</EntityLink>.
+This page covers **compute thresholds**—one approach within the broader Compute Governance framework. See also: <EntityLink id="E136">Export Controls</EntityLink>, <EntityLink id="E464">Monitoring</EntityLink>, <EntityLink id="E473">International Regimes</EntityLink>.
 :::
 
 ## Overview
 
-Compute thresholds represent one of the most concrete regulatory approaches to <EntityLink id="ai-governance">AI governance</EntityLink> implemented to date, using **training compute as a measurable trigger** for safety and transparency requirements. Unlike export controls that restrict access or monitoring systems that provide ongoing visibility, thresholds create a simple binary rule: if you train a model above X floating-point operations (FLOP), you must comply with specific regulatory obligations.
+Compute thresholds represent one of the most concrete regulatory approaches to <EntityLink id="E608">AI governance</EntityLink> implemented to date, using **training compute as a measurable trigger** for safety and transparency requirements. Unlike export controls that restrict access or monitoring systems that provide ongoing visibility, thresholds create a simple binary rule: if you train a model above X floating-point operations (FLOP), you must comply with specific regulatory obligations.
 
-This approach has gained traction because compute is both measurable and correlates with model capabilities, albeit imperfectly. The European Union's AI Act established a 10^25 FLOP threshold in 2024, while the <EntityLink id="us-executive-order">US Executive Order on AI</EntityLink> set a 10^26 FLOP trigger in October 2023. These implementations represent the first large-scale attempt to regulate AI development based on resource consumption rather than demonstrated capabilities or actor identity.
+This approach has gained traction because compute is both measurable and correlates with model capabilities, albeit imperfectly. The European Union's AI Act established a 10^25 FLOP threshold in 2024, while the <EntityLink id="E366">US Executive Order on AI</EntityLink> set a 10^26 FLOP trigger in October 2023. These implementations represent the first large-scale attempt to regulate AI development based on resource consumption rather than demonstrated capabilities or actor identity.
 
 However, compute thresholds face a fundamental challenge: **algorithmic efficiency improvements of approximately 2x per year** are decoupling compute requirements from capabilities. A model requiring 10^25 FLOP in 2023 might achieve equivalent performance with only 10^24 FLOP by 2026, potentially making static thresholds obsolete within 3-5 years. This creates an ongoing tension between the tractability of compute-based triggers and their diminishing relevance as a proxy for AI capabilities and associated risks.
 
@@ -42,7 +42,7 @@ However, compute thresholds face a fundamental challenge: **algorithmic efficien
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Regulatory Adoption** | High | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> (10^25 FLOP, effective Aug 2025), US EO 14110 (10^26 FLOP, active since Oct 2023) |
+| **Regulatory Adoption** | High | <EntityLink id="E127">EU AI Act</EntityLink> (10^25 FLOP, effective Aug 2025), US EO 14110 (10^26 FLOP, active since Oct 2023) |
 | **Cost to Trigger** | \$7-100M+ | Training at 10^25 FLOP costs \$7-10M; at 10^26 FLOP costs \$70-100M ([Epoch AI](https://epoch.ai/blog/how-much-does-it-cost-to-train-frontier-ai-models)) |
 | **Models Currently Captured** | 5-15 globally | GPT-4, Gemini 1.5 Pro, Claude 3.7, Grok 3, Llama 3 ([EU AI Office](https://artificialintelligenceact.eu/gpai-guidelines-overview/)) |
 | **Algorithmic Efficiency Erosion** | 2x every 8-17 months | Compute required for given capability halving roughly every 8-17 months ([OpenAI](https://openai.com/index/ai-and-efficiency/)) |
@@ -54,9 +54,9 @@ However, compute thresholds face a fundamental challenge: **algorithmic efficien
 
 | Risk | Mechanism | Effectiveness |
 |------|-----------|---------------|
-| <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> | Forces safety testing before deployment | Medium |
-| <EntityLink id="bioweapons">Bioweapons</EntityLink> | Lower thresholds for bio-sequence models | Medium |
-| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | Requires evaluation before deployment | Low-Medium |
+| <EntityLink id="E239">Racing Dynamics</EntityLink> | Forces safety testing before deployment | Medium |
+| <EntityLink id="E42">Bioweapons</EntityLink> | Lower thresholds for bio-sequence models | Medium |
+| <EntityLink id="E93">Deceptive Alignment</EntityLink> | Requires evaluation before deployment | Low-Medium |
 
 ### Global Compute Threshold Comparison
 
@@ -117,7 +117,7 @@ The United States took a different approach with [Executive Order 14110](https:/
 
 The dual-threshold approach reflects differentiated risk assessment, with the biological threshold set at roughly GPT-3 scale (10^23 FLOP) to capture potential bioweapon development risks at lower capability levels. According to [Mayer Brown analysis](https://www.mayerbrown.com/en/insights/publications/2024/09/us-department-of-commerce-issues-proposal-to-require-reporting-development-of-advanced-ai-models-and-computer-clusters), the Bureau of Industry and Security assesses that **no more than 15 companies** currently exceed the reporting thresholds for models and computing clusters.
 
-Notable implementations include Meta's reporting of Llama 3 training (estimated ~4 × 10^25 FLOP) and <EntityLink id="openai">OpenAI</EntityLink>'s compliance with pre-training notification requirements. The Department of Commerce has established [preliminary reporting mechanisms](https://www.dorsey.com/newsresources/publications/client-alerts/2024/10/ai-models-and-computing-clusters-reporting), though as [noted by the Institute for Law & AI](https://law-ai.org/the-role-of-compute-thresholds-for-ai-governance/), the executive order was among those revoked by President Trump upon entering office, creating uncertainty about US threshold policy continuity.
+Notable implementations include Meta's reporting of Llama 3 training (estimated ~4 × 10^25 FLOP) and <EntityLink id="E218">OpenAI</EntityLink>'s compliance with pre-training notification requirements. The Department of Commerce has established [preliminary reporting mechanisms](https://www.dorsey.com/newsresources/publications/client-alerts/2024/10/ai-models-and-computing-clusters-reporting), though as [noted by the Institute for Law & AI](https://law-ai.org/the-role-of-compute-thresholds-for-ai-governance/), the executive order was among those revoked by President Trump upon entering office, creating uncertainty about US threshold policy continuity.
 
 ### Comparative International Approaches
 
@@ -366,24 +366,18 @@ The following research organizations have produced foundational work on compute 
 
 ## Related Approaches
 
-- <EntityLink id="export-controls">Export Controls</EntityLink> — Restricting access rather than triggering requirements
-- <EntityLink id="monitoring">Compute Monitoring</EntityLink> — Ongoing visibility into training
-- <EntityLink id="international-regimes">International Regimes</EntityLink> — Multilateral threshold coordination
-
----
-
-## Related Pages
-
----
+- <EntityLink id="E136">Export Controls</EntityLink> — Restricting access rather than triggering requirements
+- <EntityLink id="E464">Compute Monitoring</EntityLink> — Ongoing visibility into training
+- <EntityLink id="E473">International Regimes</EntityLink> — Multilateral threshold coordination
 
 ## AI Transition Model Context
 
-Compute thresholds improve the <EntityLink id="ai-transition-model" /> through <EntityLink id="civilizational-competence" />:
+Compute thresholds improve the <EntityLink id="ai-transition-model" /> through <EntityLink id="E60" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="regulatory-capacity" /> | Objective triggers enable automated enforcement of safety requirements |
-| <EntityLink id="civilizational-competence" /> | <EntityLink id="institutional-quality" /> | Clear thresholds reduce regulatory discretion and political capture |
+| <EntityLink id="E60" /> | <EntityLink id="E249" /> | Objective triggers enable automated enforcement of safety requirements |
+| <EntityLink id="E60" /> | <EntityLink id="E167" /> | Clear thresholds reduce regulatory discretion and political capture |
 
 Threshold effectiveness depends on keeping pace with algorithmic efficiency improvements; static thresholds become obsolete within 3-5 years.
 

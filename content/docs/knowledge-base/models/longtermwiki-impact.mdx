@@ -13,19 +13,14 @@ ratings:
   actionability: 6
 lastEdited: "2026-02-04"
 importance: 50
-update_frequency: 90
+update_frequency: 21
 llmSummary: "Fermi estimation of LongtermWiki value grounded in base rates. GiveWell shows 3% of donors choose based on effectiveness research; 80k Hours achieves ~107 significant plan changes/year; think tanks rarely demonstrate causal policy impact. Conservative central estimate: $100-500K/yr in effective value through researcher onboarding (primary), funder information improvement (secondary), with high-variance 'inspiration' pathway that's hard to quantify. Much lower than naive estimates due to: limited counterfactual impact of information on decisions, small target audience, and low probability of behavioral change."
-metrics:
-  wordCount: 3200
-  citations: 25
-  tables: 18
-  diagrams: 1
 clusters:
   - ai-safety
   - governance
 subcategory: impact-models
 ---
-import { DataInfoBox, Backlinks, Mermaid, EntityLink, R } from '@components/wiki';
+import {DataInfoBox, Mermaid, EntityLink, R} from '@components/wiki';
 
 <DataInfoBox ratings={frontmatter.ratings} />
 
@@ -366,11 +361,3 @@ Given this analysis:
 4. **"Inspiration" pathway is worth trying** — but shouldn't drive resource allocation
 
 5. **Track actual behavior change, not just usage** — pageviews don't equal impact
-
-## See Also
-
-- [LongtermWiki Value Proposition](/internal/longtermwiki-value-proposition/) — Strategic analysis and pathways
-- <EntityLink id="anthropic-impact">Anthropic Impact Assessment</EntityLink> — Similar impact modeling approach
-- <EntityLink id="ai-transition-model">AI Transition Model</EntityLink> — Broader framework
-
-<Backlinks />

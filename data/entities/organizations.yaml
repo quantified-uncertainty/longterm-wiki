@@ -2,26 +2,34 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: anthropic
+  numericId: E22
   type: lab
   title: Anthropic
   website: https://anthropic.com
   relatedEntries:
     - id: dario-amodei
       type: researcher
+      relationship: leads-to
     - id: chris-olah
       type: researcher
+      relationship: research
     - id: jan-leike
       type: researcher
+      relationship: research
     - id: openai
       type: organization
     - id: interpretability
       type: safety-agenda
+      relationship: research
     - id: scalable-oversight
       type: safety-agenda
+      relationship: research
     - id: deceptive-alignment
       type: risk
+      relationship: addresses
     - id: racing-dynamics
       type: risk
+      relationship: affects
   sources:
     - title: Anthropic Company Website
       url: https://anthropic.com
@@ -62,26 +70,33 @@
     - racing-dynamics
   lastUpdated: 2025-12
 - id: deepmind
+  numericId: E98
   type: lab
   title: Google DeepMind
   website: https://deepmind.google
   relatedEntries:
     - id: demis-hassabis
       type: researcher
+      relationship: leads-to
     - id: shane-legg
       type: researcher
+      relationship: leads-to
     - id: openai
       type: organization
     - id: anthropic
       type: organization
     - id: scalable-oversight
       type: safety-agenda
+      relationship: research
     - id: reward-hacking
       type: risk
+      relationship: addresses
     - id: racing-dynamics
       type: risk
+      relationship: affects
     - id: concentration-of-power
       type: risk
+      relationship: affects
   sources:
     - title: Google DeepMind Website
       url: https://deepmind.google
@@ -127,26 +142,34 @@
     - scalable-oversight
   lastUpdated: 2025-12
 - id: openai
+  numericId: E218
   type: lab
   title: OpenAI
   website: https://openai.com
   relatedEntries:
     - id: sam-altman
       type: researcher
+      relationship: leads-to
     - id: ilya-sutskever
       type: researcher
+      relationship: leads-to
     - id: jan-leike
       type: researcher
+      relationship: research
     - id: anthropic
       type: organization
     - id: interpretability
       type: safety-agenda
+      relationship: research
     - id: scalable-oversight
       type: safety-agenda
+      relationship: research
     - id: racing-dynamics
       type: risk
+      relationship: affects
     - id: deceptive-alignment
       type: risk
+      relationship: addresses
   sources:
     - title: OpenAI Website
       url: https://openai.com
@@ -190,6 +213,7 @@
     - alignment-research
   lastUpdated: 2025-12
 - id: xai
+  numericId: E378
   type: lab
   title: xAI
   website: https://x.ai
@@ -232,6 +256,7 @@
     - agi-development
   lastUpdated: 2025-12
 - id: chai
+  numericId: E57
   type: lab-academic
   title: CHAI
   website: https://humancompatible.ai
@@ -261,6 +286,7 @@
     - academic-ai-safety
   lastUpdated: 2025-12
 - id: apollo-research
+  numericId: E24
   type: lab-research
   title: Apollo Research
   website: https://www.apolloresearch.ai
@@ -311,6 +337,7 @@
     - adversarial-testing
   lastUpdated: 2025-12
 - id: cais
+  numericId: E47
   type: lab-research
   title: CAIS
   website: https://safe.ai
@@ -339,6 +366,7 @@
     - ai-risk-communication
   lastUpdated: 2025-12
 - id: conjecture
+  numericId: E70
   type: lab-research
   title: Conjecture
   website: https://conjecture.dev
@@ -382,6 +410,7 @@
     - alternative-paradigms
   lastUpdated: 2025-12
 - id: far-ai
+  numericId: E138
   type: lab-research
   title: FAR AI
   website: https://far.ai
@@ -426,6 +455,7 @@
     - academic-ai-safety
   lastUpdated: 2025-12
 - id: govai
+  numericId: E153
   type: lab-research
   title: GovAI
   website: https://governance.ai
@@ -453,6 +483,7 @@
     - regulation
   lastUpdated: 2025-12
 - id: metr
+  numericId: E201
   type: lab-research
   title: METR
   website: https://metr.org
@@ -511,6 +542,7 @@
     - preparedness-framework
   lastUpdated: 2025-12
 - id: arc
+  numericId: E25
   type: organization
   title: ARC
   website: https://alignment.org
@@ -567,6 +599,7 @@
     - sandbagging
   lastUpdated: 2025-12
 - id: epoch-ai
+  numericId: E125
   type: organization
   title: Epoch AI
   website: https://epochai.org
@@ -615,6 +648,7 @@
     - trend-extrapolation
   lastUpdated: 2025-12
 - id: miri
+  numericId: E202
   type: organization
   title: MIRI
   website: https://intelligence.org
@@ -674,6 +708,7 @@
     - deconfusion
   lastUpdated: 2025-12
 - id: redwood
+  numericId: E247
   type: organization
   title: Redwood Research
   website: https://redwoodresearch.org
@@ -721,6 +756,7 @@
     - safety-protocols
   lastUpdated: 2025-12
 - id: uk-aisi
+  numericId: E364
   type: organization
   title: UK AI Safety Institute
   website: https://www.aisi.gov.uk
@@ -772,6 +808,7 @@
     - regulatory-framework
   lastUpdated: 2025-12
 - id: us-aisi
+  numericId: E365
   type: organization
   title: US AI Safety Institute
   website: https://www.nist.gov/aisi
@@ -821,6 +858,7 @@
     - standard-setting
   lastUpdated: 2025-12
 - id: arc-evals
+  numericId: E26
   type: organization
   title: ARC Evaluations
   description: Organization focused on evaluating AI systems for dangerous capabilities. Now largely absorbed into METR.
@@ -835,6 +873,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: fhi
+  numericId: E140
   type: organization
   title: Future of Humanity Institute
   description: Oxford University research center focused on existential risks, founded by Nick Bostrom. Closed in 2024.
@@ -853,6 +892,7 @@
 # Generated 2026-02-08
 
 - id: openai-foundation
+  numericId: E421
   type: organization
   title: OpenAI Foundation
   description: >-
@@ -882,6 +922,7 @@
   lastUpdated: 2026-02
 
 - id: leading-the-future
+  numericId: E422
   type: organization
   title: Leading the Future super PAC
   description: >-
@@ -902,11 +943,12 @@
       type: organization
     - id: marc-andreessen
       type: researcher
-    - id: ai-governance
+    - id: tmc-ai-governance
       type: concept
   lastUpdated: 2026-02
 
 - id: johns-hopkins-center-for-health-security
+  numericId: E423
   type: organization
   title: Johns Hopkins Center for Health Security
   description: >-
@@ -930,6 +972,7 @@
   lastUpdated: 2026-02
 
 - id: nist-ai
+  numericId: E424
   type: organization
   title: NIST and AI Safety
   description: >-
@@ -951,11 +994,12 @@
       type: researcher
     - id: openai
       type: organization
-    - id: ai-governance
+    - id: tmc-ai-governance
       type: concept
   lastUpdated: 2026-02
 
 - id: ssi
+  numericId: E425
   type: lab-research
   title: Safe Superintelligence Inc (SSI)
   description: >-
@@ -984,6 +1028,7 @@
   lastUpdated: 2026-02
 
 - id: controlai
+  numericId: E426
   type: organization
   title: ControlAI
   description: >-
@@ -1010,6 +1055,7 @@
   lastUpdated: 2026-02
 
 - id: frontier-model-forum
+  numericId: E427
   type: organization
   title: Frontier Model Forum
   description: >-
@@ -1038,6 +1084,7 @@
   lastUpdated: 2026-02
 
 - id: palisade-research
+  numericId: E428
   type: lab-research
   title: Palisade Research
   description: >-
@@ -1068,6 +1115,7 @@
   lastUpdated: 2026-02
 
 - id: centre-for-long-term-resilience
+  numericId: E429
   type: organization
   title: Centre for Long-Term Resilience
   description: >-
@@ -1092,6 +1140,7 @@
   lastUpdated: 2026-02
 
 - id: goodfire
+  numericId: E430
   type: lab-research
   title: Goodfire
   description: >-
@@ -1124,6 +1173,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: 1day-sooner
+  numericId: E509
   type: organization
   title: 1Day Sooner
   description: >-
@@ -1138,6 +1188,7 @@
     - governance
   lastUpdated: 2026-02
 - id: 80000-hours
+  numericId: E510
   type: organization
   title: 80,000 Hours
   description: >-
@@ -1151,6 +1202,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ai-futures-project
+  numericId: E511
   type: organization
   title: AI Futures Project
   description: >-
@@ -1164,6 +1216,7 @@
     - community
   lastUpdated: 2026-02
 - id: ai-impacts
+  numericId: E512
   type: organization
   title: AI Impacts
   description: >-
@@ -1178,6 +1231,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: ai-revenue-sources
+  numericId: E513
   type: organization
   title: AI Revenue Sources
   description: >-
@@ -1191,6 +1245,7 @@
     - governance
   lastUpdated: 2026-02
 - id: arb-research
+  numericId: E514
   type: organization
   title: Arb Research
   description: >-
@@ -1205,6 +1260,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: blueprint-biosecurity
+  numericId: E515
   type: organization
   title: Blueprint Biosecurity
   description: >-
@@ -1218,6 +1274,7 @@
     - governance
   lastUpdated: 2026-02
 - id: bridgewater-aia-labs
+  numericId: E516
   type: organization
   title: Bridgewater AIA Labs
   description: >-
@@ -1231,6 +1288,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: cea
+  numericId: E517
   type: organization
   title: Centre for Effective Altruism
   description: >-
@@ -1241,6 +1299,7 @@
     - community
   lastUpdated: 2026-02
 - id: center-for-applied-rationality
+  numericId: E518
   type: organization
   title: Center for Applied Rationality
   description: >-
@@ -1253,6 +1312,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: chan-zuckerberg-initiative
+  numericId: E519
   type: organization
   title: Chan Zuckerberg Initiative
   description: >-
@@ -1265,6 +1325,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: coalition-for-epidemic-preparedness-innovations
+  numericId: E520
   type: organization
   title: Coalition for Epidemic Preparedness Innovations
   description: >-
@@ -1277,6 +1338,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: coefficient-giving
+  numericId: E521
   type: organization
   title: Coefficient Giving
   description: >-
@@ -1291,6 +1353,7 @@
     - governance
   lastUpdated: 2026-02
 - id: council-on-strategic-risks
+  numericId: E522
   type: organization
   title: Council on Strategic Risks
   description: >-
@@ -1303,6 +1366,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: cser
+  numericId: E523
   type: organization
   title: CSER (Centre for the Study of Existential Risk)
   description: >-
@@ -1318,6 +1382,7 @@
     - governance
   lastUpdated: 2026-02
 - id: cset
+  numericId: E524
   type: organization
   title: CSET (Center for Security and Emerging Technology)
   description: >-
@@ -1331,6 +1396,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ea-global
+  numericId: E525
   type: organization
   title: EA Global
   description: >-
@@ -1342,6 +1408,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: elicit
+  numericId: E526
   type: organization
   title: Elicit
   description: >-
@@ -1355,6 +1422,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: epistemic-orgs-epoch-ai
+  numericId: E527
   type: organization
   title: Epoch AI
   description: >-
@@ -1368,6 +1436,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: fli
+  numericId: E528
   type: organization
   title: Future of Life Institute (FLI)
   description: >-
@@ -1382,6 +1451,7 @@
     - governance
   lastUpdated: 2026-02
 - id: founders-fund
+  numericId: E529
   type: organization
   title: Founders Fund
   description: >-
@@ -1394,6 +1464,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: futuresearch
+  numericId: E530
   type: organization
   title: FutureSearch
   description: >-
@@ -1408,6 +1479,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: giving-pledge
+  numericId: E531
   type: organization
   title: Giving Pledge
   description: >-
@@ -1419,6 +1491,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: good-judgment
+  numericId: E532
   type: organization
   title: Good Judgment
   description: >-
@@ -1432,6 +1505,7 @@
     - community
   lastUpdated: 2026-02
 - id: gpai
+  numericId: E533
   type: organization
   title: Global Partnership on Artificial Intelligence (GPAI)
   description: >-
@@ -1446,6 +1520,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: gratified
+  numericId: E534
   type: organization
   title: Gratified
   description: >-
@@ -1457,6 +1532,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: hewlett-foundation
+  numericId: E535
   type: organization
   title: William and Flora Hewlett Foundation
   description: >-
@@ -1469,6 +1545,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ibbis
+  numericId: E536
   type: organization
   title: IBBIS (International Biosecurity and Biosafety Initiative for Science)
   description: >-
@@ -1482,6 +1559,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: kalshi
+  numericId: E537
   type: organization
   title: Kalshi
   description: >-
@@ -1495,6 +1573,7 @@
     - community
   lastUpdated: 2026-02
 - id: lesswrong
+  numericId: E538
   type: organization
   title: LessWrong
   description: >-
@@ -1507,6 +1586,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: lighthaven
+  numericId: E539
   type: organization
   title: Lighthaven
   description: >-
@@ -1520,6 +1600,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: lightning-rod-labs
+  numericId: E540
   type: organization
   title: Lightning Rod Labs
   description: >-
@@ -1532,6 +1613,7 @@
     - community
   lastUpdated: 2026-02
 - id: lionheart-ventures
+  numericId: E541
   type: organization
   title: Lionheart Ventures
   description: >-
@@ -1544,6 +1626,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: longview-philanthropy
+  numericId: E542
   type: organization
   title: Longview Philanthropy
   description: >-
@@ -1559,6 +1642,7 @@
     - biorisks
   lastUpdated: 2026-02
 - id: ltff
+  numericId: E543
   type: organization
   title: Long-Term Future Fund (LTFF)
   description: >-
@@ -1572,6 +1656,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: macarthur-foundation
+  numericId: E544
   type: organization
   title: MacArthur Foundation
   description: >-
@@ -1583,6 +1668,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: manifest
+  numericId: E545
   type: organization
   title: Manifest
   description: >-
@@ -1595,6 +1681,7 @@
     - community
   lastUpdated: 2026-02
 - id: manifold
+  numericId: E546
   type: organization
   title: Manifold
   description: >-
@@ -1608,6 +1695,7 @@
     - community
   lastUpdated: 2026-02
 - id: manifund
+  numericId: E547
   type: organization
   title: Manifund
   description: >-
@@ -1621,6 +1709,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: mats
+  numericId: E548
   type: organization
   title: MATS ML Alignment Theory Scholars program
   description: >-
@@ -1634,6 +1723,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: meta-ai
+  numericId: E549
   type: organization
   title: Meta AI (FAIR)
   description: >-
@@ -1648,6 +1738,7 @@
     - governance
   lastUpdated: 2026-02
 - id: microsoft
+  numericId: E550
   type: organization
   title: Microsoft AI
   description: >-
@@ -1662,6 +1753,7 @@
     - governance
   lastUpdated: 2026-02
 - id: nti-bio
+  numericId: E551
   type: organization
   title: "NTI | bio (Nuclear Threat Initiative - Biological Program)"
   description: >-
@@ -1676,6 +1768,7 @@
     - community
   lastUpdated: 2026-02
 - id: open-philanthropy
+  numericId: E552
   type: organization
   title: Open Philanthropy
   description: >-
@@ -1687,6 +1780,7 @@
     - governance
   lastUpdated: 2026-02
 - id: pause-ai
+  numericId: E553
   type: organization
   title: Pause AI
   description: >-
@@ -1700,6 +1794,7 @@
     - governance
   lastUpdated: 2026-02
 - id: peter-thiel-philanthropy
+  numericId: E554
   type: organization
   title: Peter Thiel (Funder)
   description: >-
@@ -1712,6 +1807,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: polymarket
+  numericId: E555
   type: organization
   title: Polymarket
   description: >-
@@ -1725,6 +1821,7 @@
     - community
   lastUpdated: 2026-02
 - id: red-queen-bio
+  numericId: E556
   type: organization
   title: Red Queen Bio
   description: >-
@@ -1738,6 +1835,7 @@
     - governance
   lastUpdated: 2026-02
 - id: redwood-research
+  numericId: E557
   type: organization
   title: Redwood Research
   description: >-
@@ -1750,6 +1848,7 @@
     - community
   lastUpdated: 2026-02
 - id: rethink-priorities
+  numericId: E558
   type: organization
   title: Rethink Priorities
   description: >-
@@ -1765,6 +1864,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: safety-orgs-epoch-ai
+  numericId: E559
   type: organization
   title: Epoch AI
   description: >-
@@ -1780,6 +1880,7 @@
     - governance
   lastUpdated: 2026-02
 - id: samotsvety
+  numericId: E560
   type: organization
   title: Samotsvety
   description: >-
@@ -1793,6 +1894,7 @@
     - community
   lastUpdated: 2026-02
 - id: schmidt-futures
+  numericId: E561
   type: organization
   title: Schmidt Futures
   description: >-
@@ -1805,6 +1907,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: secure-ai-project
+  numericId: E562
   type: organization
   title: Secure AI Project
   description: >-
@@ -1819,6 +1922,7 @@
     - governance
   lastUpdated: 2026-02
 - id: securebio
+  numericId: E563
   type: organization
   title: SecureBio
   description: >-
@@ -1834,6 +1938,7 @@
     - governance
   lastUpdated: 2026-02
 - id: securedna
+  numericId: E564
   type: organization
   title: SecureDNA
   description: >-
@@ -1848,6 +1953,7 @@
     - governance
   lastUpdated: 2026-02
 - id: seldon-lab
+  numericId: E565
   type: organization
   title: Seldon Lab
   description: >-
@@ -1861,6 +1967,7 @@
     - governance
   lastUpdated: 2026-02
 - id: sentinel
+  numericId: E566
   type: organization
   title: Sentinel
   description: >-
@@ -1875,6 +1982,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: sff
+  numericId: E567
   type: organization
   title: Survival and Flourishing Fund (SFF)
   description: >-
@@ -1889,6 +1997,7 @@
     - governance
   lastUpdated: 2026-02
 - id: situational-awareness-lp
+  numericId: E568
   type: organization
   title: Situational Awareness LP
   description: >-
@@ -1902,6 +2011,7 @@
     - governance
   lastUpdated: 2026-02
 - id: swift-centre
+  numericId: E569
   type: organization
   title: Swift Centre
   description: >-
@@ -1914,6 +2024,7 @@
     - community
   lastUpdated: 2026-02
 - id: the-sequences
+  numericId: E570
   type: organization
   title: The Sequences by Eliezer Yudkowsky
   description: >-
@@ -1925,6 +2036,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: turion
+  numericId: E571
   type: organization
   title: Turion
   description: >-
@@ -1937,6 +2049,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: vara
+  numericId: E572
   type: organization
   title: Value Aligned Research Advisors
   description: >-
@@ -1949,6 +2062,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: vitalik-buterin-philanthropy
+  numericId: E573
   type: organization
   title: Vitalik Buterin (Funder)
   description: >-

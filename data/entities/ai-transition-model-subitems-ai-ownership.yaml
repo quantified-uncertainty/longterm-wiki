@@ -1,4 +1,5 @@
 - id: "tmc-companies"
+  numericId: E308
   type: "ai-transition-model-subitem"
   title: "AI Ownership - Companies"
   parentFactor: "ai-ownership"
@@ -334,6 +335,7 @@
           </ATMPage>"
   sidebarOrder: 2
 - id: "tmc-countries"
+  numericId: E313
   type: "ai-transition-model-subitem"
   title: "AI Ownership - Countries"
   parentFactor: "ai-ownership"
@@ -620,6 +622,7 @@
           </ATMPage>"
   sidebarOrder: 1
 - id: "tmc-shareholders"
+  numericId: E346
   type: "ai-transition-model-subitem"
   title: "AI Ownership - Shareholders"
   parentFactor: "ai-ownership"

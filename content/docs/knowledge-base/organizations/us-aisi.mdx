@@ -13,22 +13,17 @@ ratings:
   rigor: 6
   actionability: 5
   completeness: 7.5
-metrics:
-  wordCount: 3200
-  citations: 40
-  tables: 17
-  diagrams: 1
 clusters:
   - ai-safety
   - governance
   - community
 subcategory: government
 ---
-import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, Backlinks, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
+import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
 <DataExternalLinks pageId="us-aisi" />
 
-<DataInfoBox entityId="us-aisi" />
+<DataInfoBox entityId="E365" />
 
 ### Quick Facts
 
@@ -48,14 +43,14 @@ import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, Backlink
 |-----------|------------|----------|
 | **Budget & Resources** | Underfunded relative to scope | Initial \$10M allocation (March 2024); FY2025 request of \$12.7M; [NIST faces chronic underfunding](https://fedscoop.com/nist-budget-cuts-ai-safety-institute/) |
 | **Regulatory Authority** | Limited (voluntary standards only) | No direct enforcement power; relies on industry cooperation and coordination with other agencies |
-| **Technical Capacity** | Growing but constrained | Staff recruited from <EntityLink id="metr">METR</EntityLink>, <EntityLink id="apollo-research">Apollo Research</EntityLink>; [73 probationary staff affected by March 2025 layoffs](https://techcrunch.com/2025/02/22/us-ai-safety-institute-could-face-big-cuts/) |
+| **Technical Capacity** | Growing but constrained | Staff recruited from <EntityLink id="E201">METR</EntityLink>, <EntityLink id="E24">Apollo Research</EntityLink>; [73 probationary staff affected by March 2025 layoffs](https://techcrunch.com/2025/02/22/us-ai-safety-institute-could-face-big-cuts/) |
 | **Industry Cooperation** | Strong (pre-2025) | [Formal MOUs with OpenAI and Anthropic](https://www.nist.gov/news-events/news/2024/08/us-ai-safety-institute-signs-agreements-anthropic-openai) for pre-deployment access |
 | **International Leadership** | High | Co-chair of [International Network of AI Safety Institutes](https://www.nist.gov/news-events/news/2024/11/fact-sheet-us-department-commerce-us-department-state-launch-international) (11 members); close bilateral with UK AISI |
 | **2025 Trajectory** | Uncertain | Director departed February 2025; renamed to CAISI June 2025; [leadership vacuum and mission shift](https://www.techpolicy.press/from-safety-to-security-renaming-the-us-ai-safety-institute-is-not-just-semantics/) |
 
 The US AI Safety Institute (US AISI) represents the United States government's primary institutional response to mounting concerns about artificial intelligence risks. Established in 2023 within the National Institute of Standards and Technology (NIST), the institute serves as the federal government's central hub for AI safety research, evaluation, and standard-setting. Created in the wake of breakthroughs like ChatGPT and growing awareness of potential catastrophic risks from advanced AI systems, US AISI bridges the gap between cutting-edge technical research and government policy oversight.
 
-The institute's core mission encompasses developing safety standards for AI systems, conducting independent evaluations of frontier models before deployment, coordinating with industry and international partners, and providing technical expertise to inform regulation. Unlike purely academic research organizations or private lab safety teams, US AISI operates with the unique authority and responsibility that comes from government backing, positioning it to influence both industry practices and international <EntityLink id="ai-governance">AI governance</EntityLink> frameworks.
+The institute's core mission encompasses developing safety standards for AI systems, conducting independent evaluations of frontier models before deployment, coordinating with industry and international partners, and providing technical expertise to inform regulation. Unlike purely academic research organizations or private lab safety teams, US AISI operates with the unique authority and responsibility that comes from government backing, positioning it to influence both industry practices and international <EntityLink id="E608">AI governance</EntityLink> frameworks.
 
 The creation of US AISI marks a fundamental shift in AI safety from a primarily academic and private sector concern to an official government priority with institutional backing and potential regulatory authority. As the first major government entity dedicated specifically to AI safety, its development and effectiveness will significantly influence how democratic societies govern transformative AI technologies.
 
@@ -73,8 +68,8 @@ The US AI Safety Institute emerged from a perfect storm of technological advance
 | February 8, 2024 | <R id="860b4b3c4ea0f158">AI Safety Institute Consortium (AISIC) launched</R> with 200+ members |
 | March 2024 | \$10 million budget allocated |
 | April 2024 | US-UK bilateral agreement signed for joint safety testing |
-| May 2024 | <R id="d7f3b09c8828f487">International Network of <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink></R> launched at Seoul Summit |
-| August 29, 2024 | <R id="627bb42e8f74be04">Formal agreements signed with <EntityLink id="anthropic">Anthropic</EntityLink> and <EntityLink id="openai">OpenAI</EntityLink></R> for model access |
+| May 2024 | <R id="d7f3b09c8828f487">International Network of <EntityLink id="E13">AI Safety Institutes</EntityLink></R> launched at Seoul Summit |
+| August 29, 2024 | <R id="627bb42e8f74be04">Formal agreements signed with <EntityLink id="E22">Anthropic</EntityLink> and <EntityLink id="E218">OpenAI</EntityLink></R> for model access |
 | November 2024 | <R id="a0bcc81243f8fbee">First joint US-UK evaluation</R> of Claude 3.5 Sonnet published |
 | December 2024 | <R id="2ef355efe9937701">First AISIC plenary meeting</R> at University of Maryland |
 | January 2025 | Executive Order 14110 revoked by Trump administration |
@@ -89,7 +84,7 @@ The US AI Safety Institute emerged from a perfect storm of technological advance
 | FY2025 (Additional) | \$17.7M | Supplemental investment for AI standards and testing | [NIST FY2025 Summary](https://www.nist.gov/congressional-and-legislative-affairs/nist-appropriations-summary-1/fy-2025-presidential-budget) |
 | FY2025 (Actual) | Uncertain | Congressional appropriations subject to cuts; NIST facing workforce reductions | [FedScoop](https://fedscoop.com/nist-budget-cuts-ai-safety-institute/) |
 
-For comparison, the <EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink> (now AI Security Institute) received £100M (\$127M) over two years—approximately 12x the initial US AISI allocation on a per-year basis.
+For comparison, the <EntityLink id="E364">UK AI Safety Institute</EntityLink> (now AI Security Institute) received £100M (\$127M) over two years—approximately 12x the initial US AISI allocation on a per-year basis.
 
 The institute was formally announced as part of President Biden's Executive Order on Safe, Secure, and Trustworthy Artificial Intelligence in October 2023, which represented the most comprehensive US government action on AI to date. The decision to house the institute within NIST reflected strategic thinking about leveraging the agency's technical credibility, history of successful standard-setting in areas like cybersecurity, and non-partisan scientific reputation. NIST's placement within the Department of Commerce also signaled the administration's intent to balance safety concerns with innovation and competitiveness considerations.
 
@@ -389,4 +384,3 @@ Elizabeth Kelly was named to [TIME's 100 Most Influential People in AI](https://
 - <R id="0572f91896f52377">CSIS: AI Safety Institute International Network Recommendations</R>
 - <R id="89860462901f56f7">Wikipedia: AI Safety Institute</R>
 
-<Backlinks entityId="us-aisi" />

@@ -17,11 +17,6 @@ llmSummary: "Identifies 35 high-leverage uncertainties in AI risk across compute
 todos:
   - Complete 'Conceptual Framework' section
   - Complete 'Quantitative Analysis' section (8 placeholders)
-metrics:
-  wordCount: 1259
-  citations: 30
-  tables: 29
-  diagrams: 1
 clusters:
   - ai-safety
   - governance
@@ -34,9 +29,9 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
 
 Effective AI risk prioritization requires identifying which uncertainties most affect expected outcomes. This model maps 35 high-leverage variables across six domains—hardware, algorithms, governance, economics, safety research, and capability thresholds—to help researchers and policymakers focus evidence-gathering where it matters most. The central question: **which empirical uncertainties, if resolved, would most change our strategic recommendations for AI safety?**
 
-The key insight is that a small number of cruxes—perhaps 8-12 variables—drive the majority of disagreement about AI risk levels and appropriate responses. Expert surveys consistently show wide disagreement on these specific parameters: the <R id="3f9927ec7945e4f2"><EntityLink id="ai-impacts">AI Impacts</EntityLink> 2023 survey</R> found that 41-51% of AI researchers assign greater than 10% probability to human extinction or severe disempowerment from AI, yet the remaining researchers assign much lower probabilities. This disagreement stems primarily from differing estimates of alignment difficulty, takeoff speed, and governance tractability—all variables included in this model.
+The key insight is that a small number of cruxes—perhaps 8-12 variables—drive the majority of disagreement about AI risk levels and appropriate responses. Expert surveys consistently show wide disagreement on these specific parameters: the <R id="3f9927ec7945e4f2"><EntityLink id="E512">AI Impacts</EntityLink> 2023 survey</R> found that 41-51% of AI researchers assign greater than 10% probability to human extinction or severe disempowerment from AI, yet the remaining researchers assign much lower probabilities. This disagreement stems primarily from differing estimates of alignment difficulty, takeoff speed, and governance tractability—all variables included in this model.
 
-The model synthesizes data from multiple authoritative sources. <R id="bb81f2a99fdba0ec"><EntityLink id="metaculus">Metaculus</EntityLink> forecasts</R> show <EntityLink id="agi-timeline">AGI timeline</EntityLink> estimates have collapsed from 50 years (2020) to approximately 5 years (2024), with current median around 2027-2031. <R id="9587b65b1192289d"><EntityLink id="epoch-ai">Epoch AI</EntityLink> research</R> projects training compute could reach 10^28-10^30 FLOP by 2030, while their data analysis suggests high-quality training data may be exhausted by 2025-2028 depending on overtraining factors. These empirical findings directly inform the parameter estimates visualized below.
+The model synthesizes data from multiple authoritative sources. <R id="bb81f2a99fdba0ec"><EntityLink id="E199">Metaculus</EntityLink> forecasts</R> show <EntityLink id="E399">AGI timeline</EntityLink> estimates have collapsed from 50 years (2020) to approximately 5 years (2024), with current median around 2027-2031. <R id="9587b65b1192289d"><EntityLink id="E125">Epoch AI</EntityLink> research</R> projects training compute could reach 10^28-10^30 FLOP by 2030, while their data analysis suggests high-quality training data may be exhausted by 2025-2028 depending on overtraining factors. These empirical findings directly inform the parameter estimates visualized below.
 
 **Core thesis**: Focus on ~35 nodes that are (1) high-leverage, (2) genuinely uncertain, and (3) empirically resolvable or at least operationalizable.
 
@@ -641,9 +636,9 @@ This model draws on multiple evidence streams to estimate parameter values and u
 | Source Type | Examples | Variables Informed | Update Frequency |
 |-------------|----------|-------------------|------------------|
 | **Expert Surveys** | <R id="3f9927ec7945e4f2">AI Impacts</R>, <R id="40fcdcc3ffba5188">Pew Research</R>, <R id="b163447fdc804872">International AI Safety Report</R> | Alignment difficulty, extinction probability, timeline estimates | Annual |
-| **Forecasting Platforms** | <R id="bb81f2a99fdba0ec">Metaculus</R>, <EntityLink id="manifold">Manifold</EntityLink>, <EntityLink id="polymarket">Polymarket</EntityLink> | AGI timelines, capability milestones, policy outcomes | Continuous |
+| **Forecasting Platforms** | <R id="bb81f2a99fdba0ec">Metaculus</R>, <EntityLink id="E546">Manifold</EntityLink>, <EntityLink id="E555">Polymarket</EntityLink> | AGI timelines, capability milestones, policy outcomes | Continuous |
 | **Industry Reports** | <R id="da87f2b213eb9272">Stanford AI Index</R>, <R id="c1e31a3255ae290d">McKinsey State of AI</R>, <R id="9587b65b1192289d">Epoch AI</R> | Compute trends, algorithmic progress, economic value | Annual |
-| **Governance Tracking** | <R id="d5796bc00a131872">IAPP <EntityLink id="ai-governance">AI Governance</EntityLink></R>, regulatory databases | Policy stringency, compliance rates, enforcement actions | Quarterly |
+| **Governance Tracking** | <R id="d5796bc00a131872">IAPP <EntityLink id="E608">AI Governance</EntityLink></R>, regulatory databases | Policy stringency, compliance rates, enforcement actions | Quarterly |
 | **Safety Research** | Lab publications, interpretability benchmarks, red-team exercises | Alignment tax, deception detection, oversight limits | Ongoing |
 
 **Methodology notes:** Parameter estimates use median values from multiple sources where available. Uncertainty ranges reflect the 10th-90th percentile of expert/forecaster distributions. The "resolvable via" column identifies empirical pathways to reduce uncertainty. Variables are classified as high-leverage if resolving uncertainty would shift expected loss by >\$1T or change recommended interventions.
@@ -910,11 +905,11 @@ This critical uncertainties framework connects to several other analytical tools
 
 | Related Model | Relationship |
 |---------------|--------------|
-| <EntityLink id="racing-dynamics-impact" label="Racing Dynamics Impact" /> | Explores economic/strategic variables in depth |
-| <EntityLink id="capability-threshold-model" /> | Details capability threshold variables |
+| <EntityLink id="E240" label="Racing Dynamics Impact" /> | Explores economic/strategic variables in depth |
+| <EntityLink id="E53" /> | Details capability threshold variables |
 | Lab Incentives Model | Analyzes safety funding and coordination dynamics |
-| <EntityLink id="warning-signs-model" /> | Expands on warning shot and response lag variables |
-| <EntityLink id="international-coordination-game" label="International Coordination Game" /> | Deep dive on US-China and multilateral dynamics |
+| <EntityLink id="E370" /> | Expands on warning shot and response lag variables |
+| <EntityLink id="E172" label="International Coordination Game" /> | Deep dive on US-China and multilateral dynamics |
 
 ---
 
