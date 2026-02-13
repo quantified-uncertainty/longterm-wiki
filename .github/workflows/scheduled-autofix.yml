@@ -1,0 +1,153 @@
+name: Scheduled Auto-fix
+
+# Runs crux auto-fixers (escaping, markdown, entity-links, frontmatter, etc.)
+# on a schedule and creates a PR if any changes were made.
+#
+# This catches fixable issues that accumulate over time — unescaped dollar
+# signs, broken markdown lists, missing EntityLink conversions, etc.
+
+on:
+  schedule:
+    - cron: "0 6 * * 3" # Every Wednesday at 6am UTC
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Only one auto-fix at a time
+concurrency:
+  group: scheduled-autofix
+  cancel-in-progress: false
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build data
+        run: cd app && node scripts/build-data.mjs
+
+      - name: Run auto-fixers
+        run: |
+          set -euo pipefail
+
+          echo "=== Running escaping fixer ==="
+          pnpm crux fix escaping --apply 2>&1 || true
+
+          echo "=== Running markdown fixer ==="
+          pnpm crux fix markdown --apply 2>&1 || true
+
+          echo "=== Running frontmatter fixer ==="
+          pnpm crux fix frontmatter --apply 2>&1 || true
+
+          echo "=== Running dollar sign fixer ==="
+          pnpm crux fix dollars --apply 2>&1 || true
+
+          echo "=== Running comparison operator fixer ==="
+          pnpm crux fix comparisons --apply 2>&1 || true
+
+          echo "=== Running import fixer ==="
+          pnpm crux fix imports --apply 2>&1 || true
+
+          echo "=== Running related-pages fixer ==="
+          pnpm crux fix related-pages --apply 2>&1 || true
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+            # Count changed files for the PR description
+            CHANGED=$(git diff --stat | tail -1)
+            echo "change_summary=$CHANGED" >> "$GITHUB_OUTPUT"
+
+            # List changed files
+            git diff --name-only > /tmp/changed-files.txt
+            FILE_COUNT=$(wc -l < /tmp/changed-files.txt)
+            echo "file_count=$FILE_COUNT" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected, nothing to fix."
+          fi
+
+      - name: Verify fixes pass validation
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          # Rebuild data after fixes
+          cd app && node scripts/build-data.mjs && cd ..
+
+          # Run blocking validation checks
+          pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
+          pnpm crux validate schema
+          pnpm crux validate unified --rules=frontmatter-schema --errors-only
+
+      - name: Create pull request
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          DATE=$(date -u +"%Y-%m-%d")
+          BRANCH="autofix/$DATE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "chore: auto-fix content issues ($DATE)
+
+          Ran crux auto-fixers: escaping, markdown, frontmatter, dollars,
+          comparisons, imports, related-pages.
+
+          ${{ steps.changes.outputs.file_count }} file(s) changed."
+
+          git push -u origin "$BRANCH"
+
+          # Build PR body with changed file list
+          BODY=$(cat <<'EOF'
+          ## Auto-fix Content Issues
+
+          Scheduled run of `crux fix` auto-fixers found and fixed content issues.
+
+          ### Fixers run
+          - `crux fix escaping` — Dollar signs, comparison operators, tildes
+          - `crux fix markdown` — List formatting, bold labels
+          - `crux fix frontmatter` — Unquoted dates, schema issues
+          - `crux fix dollars` — Unescaped dollar signs
+          - `crux fix comparisons` — Unescaped comparison operators
+          - `crux fix imports` — Missing component imports
+          - `crux fix related-pages` — Redundant related pages sections
+
+          ### Validation
+          All blocking validation checks passed after fixes were applied.
+
+          ### Changed files
+          EOF
+          )
+
+          # Append file list
+          BODY="$BODY"$'\n\n```\n'"$(cat /tmp/changed-files.txt)"$'\n```'
+
+          gh pr create --repo "$GITHUB_REPOSITORY" \
+            --title "chore: auto-fix content issues ($DATE)" \
+            --label "auto-fix" \
+            --body "$BODY"

@@ -1,0 +1,241 @@
+name: Link Rot & Resource Checker
+
+# Comprehensive link validation: external URL health (via crux check-links),
+# internal references, and orphaned files. Runs weekly and posts a GitHub
+# issue with findings.
+#
+# Uses the new check-links system (PR #116) which supports:
+# - Domain-aware validation (DOI, ArXiv, forum GraphQL, standard HTTP)
+# - Tiered persistent caching (14d healthy, 3d broken, 30d unverifiable)
+# - 20 parallel requests with per-domain rate limiting
+# - Wayback Machine archive suggestions for dead links
+
+on:
+  schedule:
+    - cron: "0 9 * * 6" # Every Saturday at 9am UTC
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45 # check-links can be slow with 4000+ URLs
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build data
+        run: cd app && node scripts/build-data.mjs
+
+      # Restore link check cache from previous runs
+      - name: Restore link check cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/link-check-cache.json
+          key: link-check-${{ github.run_id }}
+          restore-keys: link-check-
+
+      - name: Run link checks
+        id: checks
+        run: |
+          set -euo pipefail
+
+          mkdir -p /tmp/link-checks
+
+          ISSUES_FOUND=false
+
+          # 1. External URL health (the comprehensive check-links system)
+          echo "=== Running external link rot detection ==="
+          if pnpm crux check-links --report 2>&1 | tee /tmp/link-checks/check-links.txt; then
+            echo "external_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "external_ok=false" >> "$GITHUB_OUTPUT"
+            ISSUES_FOUND=true
+          fi
+
+          # Copy the JSON report if generated
+          if [ -f .cache/link-check-report.json ]; then
+            cp .cache/link-check-report.json /tmp/link-checks/report.json
+          fi
+
+          # 2. Reference validation (EntityLink, DataInfoBox)
+          echo "=== Validating entity references ==="
+          if pnpm crux validate refs --ci > /tmp/link-checks/refs.json 2>&1; then
+            echo "refs_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "refs_ok=false" >> "$GITHUB_OUTPUT"
+            ISSUES_FOUND=true
+          fi
+
+          # 3. Orphan detection
+          echo "=== Checking for orphans ==="
+          if pnpm crux validate orphans --ci > /tmp/link-checks/orphans.json 2>&1; then
+            echo "orphans_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "orphans_ok=false" >> "$GITHUB_OUTPUT"
+            ISSUES_FOUND=true
+          fi
+
+          # 4. Internal link validation
+          echo "=== Checking internal links ==="
+          if pnpm crux validate links --ci > /tmp/link-checks/links.json 2>&1; then
+            echo "links_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "links_ok=false" >> "$GITHUB_OUTPUT"
+            ISSUES_FOUND=true
+          fi
+
+          echo "issues_found=$ISSUES_FOUND" >> "$GITHUB_OUTPUT"
+
+      - name: Generate issue body
+        id: body
+        run: |
+          set -euo pipefail
+
+          BODY=$(python3 << 'PYEOF'
+          import json, os
+          from datetime import datetime
+
+          def safe_load(path):
+              try:
+                  with open(path) as f:
+                      return json.load(f)
+              except:
+                  return None
+
+          date = datetime.utcnow().strftime("%Y-%m-%d")
+          lines = []
+
+          lines.append(f"# Link & Resource Validation — {date}\n")
+          lines.append("*Weekly automated check. External URLs checked via `crux check-links`.*\n")
+
+          # Check results table
+          external_ok = os.environ.get("EXTERNAL_OK", "true") == "true"
+          refs_ok = os.environ.get("REFS_OK", "true") == "true"
+          orphans_ok = os.environ.get("ORPHANS_OK", "true") == "true"
+          links_ok = os.environ.get("LINKS_OK", "true") == "true"
+
+          lines.append("## Check Results\n")
+          lines.append("| Check | Status |")
+          lines.append("|-------|--------|")
+          lines.append(f"| External URLs (link rot) | {'pass' if external_ok else '**ISSUES FOUND**'} |")
+          lines.append(f"| Entity References | {'pass' if refs_ok else '**ISSUES FOUND**'} |")
+          lines.append(f"| Orphaned Files | {'pass' if orphans_ok else '**ISSUES FOUND**'} |")
+          lines.append(f"| Internal Links | {'pass' if links_ok else '**ISSUES FOUND**'} |")
+          lines.append("")
+
+          # Parse check-links report if available
+          report = safe_load("/tmp/link-checks/report.json")
+          if report:
+              summary = report.get("summary", {})
+              lines.append("## External URL Report\n")
+              lines.append(f"- **Total URLs checked:** {summary.get('total', '?')}")
+              lines.append(f"- **Healthy:** {summary.get('healthy', '?')}")
+              lines.append(f"- **Broken:** {summary.get('broken', '?')}")
+              lines.append(f"- **Redirected:** {summary.get('redirected', '?')}")
+              lines.append(f"- **Timeout:** {summary.get('timeout', '?')}")
+              lines.append(f"- **Unverifiable:** {summary.get('unverifiable', '?')}")
+              lines.append("")
+
+              broken = report.get("broken", [])
+              if broken:
+                  lines.append("### Broken URLs\n")
+                  lines.append("| URL | Source | Status |")
+                  lines.append("|-----|--------|--------|")
+                  for item in broken[:30]:
+                      url = item.get("url", "?")
+                      if len(url) > 60:
+                          url = url[:57] + "..."
+                      source = item.get("source", "?")
+                      status = item.get("status", "?")
+                      lines.append(f"| {url} | {source} | {status} |")
+                  if len(broken) > 30:
+                      lines.append(f"\n*...and {len(broken) - 30} more. Run `pnpm crux check-links --report` locally for the full list.*")
+                  lines.append("")
+
+          lines.append("## How to investigate\n")
+          lines.append("```bash")
+          lines.append("pnpm crux check-links --verbose        # Full external link check")
+          lines.append("pnpm crux check-links --fix            # Suggest archive.org replacements")
+          lines.append("pnpm crux validate refs                # EntityLink/DataInfoBox references")
+          lines.append("pnpm crux validate orphans             # Orphaned files")
+          lines.append("pnpm crux validate links               # Internal links")
+          lines.append("```\n")
+          lines.append("Auto-fixable:")
+          lines.append("```bash")
+          lines.append("pnpm crux fix entity-links --apply     # Fix EntityLink references")
+          lines.append("pnpm crux fix broken-links --apply     # Fix broken internal links")
+          lines.append("```")
+
+          lines.append("\n---")
+          lines.append(f"*Last updated: {date}*")
+
+          print("\n".join(lines))
+          PYEOF
+          )
+
+          # Write to file to avoid shell escaping issues
+          echo "$BODY" > /tmp/issue-body.md
+
+      - name: Create or update issue
+        if: steps.checks.outputs.issues_found == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXTERNAL_OK: ${{ steps.checks.outputs.external_ok }}
+          REFS_OK: ${{ steps.checks.outputs.refs_ok }}
+          ORPHANS_OK: ${{ steps.checks.outputs.orphans_ok }}
+          LINKS_OK: ${{ steps.checks.outputs.links_ok }}
+        run: |
+          set -euo pipefail
+          DATE=$(date -u +"%Y-%m-%d")
+
+          ISSUE_NUMBER=$(gh issue list --repo "$GITHUB_REPOSITORY" \
+            --label "link-check" --state open --json number \
+            --jq '.[0].number // empty' 2>/dev/null || true)
+
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" \
+              --title "Link & Resource Issues — $DATE" \
+              -F /tmp/issue-body.md
+            echo "Updated issue #$ISSUE_NUMBER"
+          else
+            gh label create "link-check" --repo "$GITHUB_REPOSITORY" \
+              --description "Automated link validation findings" \
+              --color "e4e669" 2>/dev/null || true
+
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "Link & Resource Issues — $DATE" \
+              --label "link-check" \
+              -F /tmp/issue-body.md
+            echo "Created new link check issue"
+          fi
+
+      - name: Close issue if all clear
+        if: steps.checks.outputs.issues_found == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUMBER=$(gh issue list --repo "$GITHUB_REPOSITORY" \
+            --label "link-check" --state open --json number \
+            --jq '.[0].number // empty' 2>/dev/null || true)
+
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue close "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" \
+              --comment "All link and resource checks passed as of $(date -u +%Y-%m-%d). Closing."
+            echo "Closed issue #$ISSUE_NUMBER (all checks passed)"
+          else
+            echo "No open link-check issues, and all checks passed."
+          fi

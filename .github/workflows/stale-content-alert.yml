@@ -1,0 +1,170 @@
+name: Stale Content Alert
+
+# Checks for overdue wiki pages daily and maintains a tracking issue.
+# Uses the crux updates system which computes priority based on
+# staleness (days_since_edit / update_frequency) × importance.
+
+on:
+  schedule:
+    - cron: "0 7 * * *" # Daily at 7am UTC
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check-stale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build data
+        run: cd app && node scripts/build-data.mjs
+
+      - name: Check overdue pages
+        id: check
+        run: |
+          set -euo pipefail
+
+          # Get overdue pages as JSON
+          pnpm crux updates list --overdue --json --limit=50 > /tmp/overdue.json 2>&1 || true
+
+          # Get stats
+          pnpm crux updates stats --json > /tmp/stats.json 2>&1 || true
+
+          # Count overdue
+          OVERDUE_COUNT=$(python3 -c "
+          import json
+          try:
+              with open('/tmp/overdue.json') as f:
+                  data = json.load(f)
+              print(len(data) if isinstance(data, list) else 0)
+          except:
+              print(0)
+          ")
+
+          echo "overdue_count=$OVERDUE_COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Update tracking issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          DATE=$(date -u +"%Y-%m-%d")
+          OVERDUE_COUNT="${{ steps.check.outputs.overdue_count }}"
+
+          BODY=$(python3 << 'PYEOF'
+          import json, sys
+          from datetime import datetime
+
+          def safe_load(path):
+              try:
+                  with open(path) as f:
+                      return json.load(f)
+              except:
+                  return None
+
+          date = datetime.utcnow().strftime("%Y-%m-%d")
+          lines = []
+
+          overdue = safe_load("/tmp/overdue.json")
+          stats = safe_load("/tmp/stats.json")
+
+          lines.append(f"# Stale Content Tracker — {date}\n")
+          lines.append("*Updated daily. Pages ranked by update priority (staleness x importance).*\n")
+
+          if stats:
+              lines.append("## Summary\n")
+              lines.append(f"- **Tracked pages:** {stats.get('pagesWithFrequency', '?')} of {stats.get('totalPages', '?')}")
+              lines.append(f"- **Currently overdue:** {stats.get('overdueCount', '?')}")
+              lines.append(f"- **Avg staleness:** {stats.get('avgStaleness', '?')}x")
+              lines.append("")
+
+          if overdue and isinstance(overdue, list) and len(overdue) > 0:
+              # Critical (priority >= 1.0)
+              critical = [p for p in overdue if p.get("priority", 0) >= 1.0]
+              if critical:
+                  lines.append("## Critical (priority >= 1.0)\n")
+                  lines.append("| Priority | Page | Last Edited | Frequency | Staleness |")
+                  lines.append("|----------|------|-------------|-----------|-----------|")
+                  for p in critical:
+                      lines.append(f"| **{p.get('priority', '?')}** | {p.get('title', '?')} | {p.get('lastEdited', '?')} | {p.get('updateFrequency', '?')}d | {p.get('staleness', '?')}x |")
+                  lines.append("")
+
+              # Warning (priority 0.5-1.0)
+              warning = [p for p in overdue if 0.5 <= p.get("priority", 0) < 1.0]
+              if warning:
+                  lines.append("## Warning (priority 0.5–1.0)\n")
+                  lines.append("| Priority | Page | Last Edited | Frequency | Staleness |")
+                  lines.append("|----------|------|-------------|-----------|-----------|")
+                  for p in warning:
+                      lines.append(f"| {p.get('priority', '?')} | {p.get('title', '?')} | {p.get('lastEdited', '?')} | {p.get('updateFrequency', '?')}d | {p.get('staleness', '?')}x |")
+                  lines.append("")
+
+              # Rest
+              rest = [p for p in overdue if p.get("priority", 0) < 0.5]
+              if rest:
+                  lines.append(f"<details><summary>{len(rest)} more overdue pages (priority < 0.5)</summary>\n")
+                  lines.append("| Priority | Page | Last Edited | Frequency |")
+                  lines.append("|----------|------|-------------|-----------|")
+                  for p in rest:
+                      lines.append(f"| {p.get('priority', '?')} | {p.get('title', '?')} | {p.get('lastEdited', '?')} | {p.get('updateFrequency', '?')}d |")
+                  lines.append("\n</details>\n")
+          else:
+              lines.append("## All pages up to date\n")
+              lines.append("No overdue pages found.\n")
+
+          # Category breakdown from stats
+          if stats and "byCategory" in stats:
+              cats = stats["byCategory"]
+              cats_with_overdue = {k: v for k, v in cats.items() if v.get("overdue", 0) > 0}
+              if cats_with_overdue:
+                  lines.append("## By Category\n")
+                  lines.append("| Category | Tracked | Overdue | Avg Priority |")
+                  lines.append("|----------|---------|---------|--------------|")
+                  for cat, data in sorted(cats_with_overdue.items(), key=lambda x: -x[1].get("overdue", 0)):
+                      lines.append(f"| {cat} | {data.get('total', '?')} | {data.get('overdue', '?')} | {data.get('avgPriority', '?')} |")
+                  lines.append("")
+
+          lines.append("---")
+          lines.append(f"*Last updated: {date} | Run `pnpm crux updates list --overdue` locally for full details*")
+
+          print("\n".join(lines))
+          PYEOF
+          )
+
+          # Find or create the tracking issue
+          ISSUE_NUMBER=$(gh issue list --repo "$GITHUB_REPOSITORY" \
+            --label "stale-content" --state open --json number \
+            --jq '.[0].number // empty' 2>/dev/null || true)
+
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" \
+              --title "Stale Content Tracker — $DATE ($OVERDUE_COUNT overdue)" \
+              --body "$BODY"
+            echo "Updated issue #$ISSUE_NUMBER"
+          else
+            gh label create "stale-content" --repo "$GITHUB_REPOSITORY" \
+              --description "Stale content tracking" \
+              --color "d93f0b" 2>/dev/null || true
+
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "Stale Content Tracker — $DATE ($OVERDUE_COUNT overdue)" \
+              --label "stale-content" \
+              --body "$BODY"
+            echo "Created new stale content tracking issue"
+          fi

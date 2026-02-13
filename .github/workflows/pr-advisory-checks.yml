@@ -1,0 +1,180 @@
+name: PR Advisory Checks
+
+# Runs additional (non-blocking) crux validation checks on PRs that
+# touch content files, and posts a summary comment with findings.
+#
+# These go beyond the blocking CI checks (dollar-signs, comparisons,
+# schema, frontmatter-schema) to surface advisory issues like:
+# - Broken internal links
+# - Missing cross-references
+# - Style guide violations
+# - Cross-page consistency issues
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "content/docs/**"
+      - "data/**"
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  advisory-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build data
+        run: cd app && node scripts/build-data.mjs
+
+      - name: Run advisory checks
+        id: checks
+        run: |
+          set -euo pipefail
+
+          mkdir -p /tmp/advisory
+
+          # Track which checks found issues
+          ISSUES_FOUND=false
+
+          # 1. Internal link validation
+          echo "=== Checking internal links ==="
+          if pnpm crux validate links --ci > /tmp/advisory/links.json 2>&1; then
+            echo "links_passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "links_passed=false" >> "$GITHUB_OUTPUT"
+            ISSUES_FOUND=true
+          fi
+
+          # 2. Cross-link suggestions
+          echo "=== Checking cross-links ==="
+          if pnpm crux validate cross-links --ci > /tmp/advisory/cross-links.json 2>&1; then
+            echo "crosslinks_passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "crosslinks_passed=false" >> "$GITHUB_OUTPUT"
+            ISSUES_FOUND=true
+          fi
+
+          # 3. Style guide compliance
+          echo "=== Checking style ==="
+          if pnpm crux validate style --ci > /tmp/advisory/style.json 2>&1; then
+            echo "style_passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "style_passed=false" >> "$GITHUB_OUTPUT"
+            ISSUES_FOUND=true
+          fi
+
+          # 4. Cross-page consistency
+          echo "=== Checking consistency ==="
+          if pnpm crux validate consistency --ci > /tmp/advisory/consistency.json 2>&1; then
+            echo "consistency_passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "consistency_passed=false" >> "$GITHUB_OUTPUT"
+            ISSUES_FOUND=true
+          fi
+
+          # 5. EntityLink validation
+          echo "=== Checking entity links ==="
+          if pnpm crux validate entity-links --ci > /tmp/advisory/entity-links.json 2>&1; then
+            echo "entitylinks_passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "entitylinks_passed=false" >> "$GITHUB_OUTPUT"
+            ISSUES_FOUND=true
+          fi
+
+          # 6. Mermaid diagram validation
+          echo "=== Checking mermaid diagrams ==="
+          if pnpm crux validate mermaid --ci > /tmp/advisory/mermaid.json 2>&1; then
+            echo "mermaid_passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "mermaid_passed=false" >> "$GITHUB_OUTPUT"
+            ISSUES_FOUND=true
+          fi
+
+          echo "issues_found=$ISSUES_FOUND" >> "$GITHUB_OUTPUT"
+
+      - name: Post advisory comment
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # Build comment body
+          BODY=$(python3 << 'PYEOF'
+          import json, os
+
+          def safe_load(path):
+              try:
+                  with open(path) as f:
+                      return json.load(f)
+              except:
+                  return None
+
+          def check_icon(passed):
+              return "pass" if passed else "warn"
+
+          lines = []
+          lines.append("### Advisory Content Checks\n")
+          lines.append("These are **non-blocking** checks that surface potential content issues.\n")
+
+          checks = [
+              ("Internal Links", "links", "${{ steps.checks.outputs.links_passed }}"),
+              ("Cross-links", "cross-links", "${{ steps.checks.outputs.crosslinks_passed }}"),
+              ("Style Guide", "style", "${{ steps.checks.outputs.style_passed }}"),
+              ("Consistency", "consistency", "${{ steps.checks.outputs.consistency_passed }}"),
+              ("Entity Links", "entity-links", "${{ steps.checks.outputs.entitylinks_passed }}"),
+              ("Mermaid Diagrams", "mermaid", "${{ steps.checks.outputs.mermaid_passed }}"),
+          ]
+
+          lines.append("| Check | Status |")
+          lines.append("|-------|--------|")
+
+          has_issues = False
+          for name, file_key, passed_str in checks:
+              passed = passed_str == "true"
+              icon = "pass" if passed else "**warn**"
+              lines.append(f"| {name} | {icon} |")
+              if not passed:
+                  has_issues = True
+
+          lines.append("")
+
+          if has_issues:
+              lines.append("*Some advisory checks found issues. These are informational and do not block merging.*")
+              lines.append("*Run `pnpm crux validate` locally for detailed output.*")
+          else:
+              lines.append("*All advisory checks passed.*")
+
+          lines.append("\n---\n*Auto-generated by PR Advisory Checks*")
+
+          print("\n".join(lines))
+          PYEOF
+          )
+
+          # Delete previous advisory comment if exists (avoid duplicates)
+          EXISTING=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            --jq '.[] | select(.body | contains("Advisory Content Checks")) | .id' 2>/dev/null | head -1 || true)
+
+          if [ -n "$EXISTING" ]; then
+            gh api -X DELETE "repos/${{ github.repository }}/issues/comments/$EXISTING" 2>/dev/null || true
+          fi
+
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --body "$BODY"
