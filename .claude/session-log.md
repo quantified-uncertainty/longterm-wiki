@@ -2,6 +2,21 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/add-wiki-images-uEG2h | Add Wikimedia Commons images to AI capex article
+
+**What was done:** Added three freely-licensed images from Wikimedia Commons to the Financial Stability Risks from AI Capital Expenditure page: a Google data center exterior photo (Overview section), the NASDAQ dot-com bubble chart (Historical Parallels section), and a stages-of-a-bubble diagram (Scenario Analysis section). Updated frontmatter diagrams metric accordingly.
+
+**Issues encountered:**
+- Wikimedia Commons API and direct upload.wikimedia.org URLs blocked by egress policy in curl; used WebSearch + MD5 hash computation to construct correct Wikimedia URLs
+- pnpm crux command not found until running with full node path
+
+**Learnings/notes:**
+- External images work out of the box via the MDX `img` override in mdx-components.tsx (uses Next.js Image with `unoptimized` for external URLs)
+- Wikimedia Commons thumb URLs follow pattern: `/wikipedia/commons/thumb/{hash[0]}/{hash[0:2]}/Filename/800px-Filename`
+- The wiki's image infrastructure is ready for more images; the bottleneck is sourcing, not rendering
+
+---
+
 ## 2026-02-13 | claude/add-llm-warning-banner-aWFt0 | Add LLM warning banner to wiki pages
 
 **What was done:** Added a dismissible warning banner to all wiki pages informing readers that content was written by an LLM with minimal human supervision. The banner uses localStorage to persist dismissal, so once closed it stays hidden across all pages.
