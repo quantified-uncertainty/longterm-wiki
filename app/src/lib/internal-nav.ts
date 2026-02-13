@@ -39,6 +39,7 @@ export const INTERNAL_NAV: NavSection[] = [
       { label: "Enhancement Queue", href: "/internal/enhancement-queue" },
       { label: "Suggested Pages", href: "/internal/suggested-pages" },
       { label: "Update Schedule", href: "/internal/updates" },
+      { label: "Page Changes", href: "/internal/page-changes" },
       { label: "Fact Dashboard", href: "/internal/facts" },
       { label: "Automation Tools", href: "/internal/automation-tools" },
       { label: "Content Database", href: "/internal/content-database" },

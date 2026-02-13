@@ -41,6 +41,75 @@ const DATA_FILES = [
   { key: 'parameterGraph', file: 'parameter-graph.yaml', isObject: true }, // Graph structure (not array)
 ];
 
+/**
+ * Parse .claude/session-log.md and return a map of pageId → ChangeEntry[]
+ *
+ * Each session entry looks like:
+ *   ## 2026-02-13 | branch-name | Short title
+ *   **What was done:** Summary text.
+ *   **Pages:** page-id-1, page-id-2
+ *   ...
+ *
+ * Returns: { [pageId]: [{ date, branch, title, summary }] }
+ */
+function parseSessionLog(logPath) {
+  const pageHistory = {};
+
+  if (!existsSync(logPath)) {
+    return pageHistory;
+  }
+
+  const content = readFileSync(logPath, 'utf-8');
+  // Split into entries by ## headings
+  const entryPattern = /^## (\d{4}-\d{2}-\d{2}) \| ([^\|]+?) \| (.+)$/gm;
+  const entries = [];
+  let match;
+
+  while ((match = entryPattern.exec(content)) !== null) {
+    entries.push({
+      date: match[1],
+      branch: match[2].trim(),
+      title: match[3].trim(),
+      startIndex: match.index,
+    });
+  }
+
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    const endIndex = i + 1 < entries.length ? entries[i + 1].startIndex : content.length;
+    const body = content.slice(entry.startIndex, endIndex);
+
+    // Extract "What was done" summary
+    const summaryMatch = body.match(/\*\*What was done:\*\*\s*(.+?)(?:\n\n|\n\*\*|\n---)/s);
+    const summary = summaryMatch ? summaryMatch[1].trim() : '';
+
+    // Extract "Pages" list
+    const pagesMatch = body.match(/\*\*Pages:\*\*\s*(.+?)(?:\n\n|\n\*\*|\n---)/s);
+    if (!pagesMatch) continue; // No pages field — infrastructure-only session
+
+    const pageIds = pagesMatch[1]
+      .split(',')
+      .map(id => id.trim())
+      .filter(id => id.length > 0);
+
+    const changeEntry = {
+      date: entry.date,
+      branch: entry.branch,
+      title: entry.title,
+      summary,
+    };
+
+    for (const pageId of pageIds) {
+      if (!pageHistory[pageId]) {
+        pageHistory[pageId] = [];
+      }
+      pageHistory[pageId].push(changeEntry);
+    }
+  }
+
+  return pageHistory;
+}
+
 function loadYaml(filename) {
   const filepath = join(DATA_DIR, filename);
   if (!existsSync(filepath)) {
@@ -486,6 +555,8 @@ function buildPagesRegistry(urlToResource) {
           suggestedQuality: suggestQuality(metrics.structuralScore, fm),
           // Update frequency (days between updates)
           updateFrequency: fm.update_frequency ? parseInt(fm.update_frequency) : null,
+          // Evergreen flag (false = point-in-time content like reports, excluded from update schedule)
+          evergreen: fm.evergreen === false ? false : true,
           // Legacy field for backwards compatibility
           wordCount: metrics.wordCount,
           // Unconverted links (markdown links with matching resources)
@@ -853,6 +924,22 @@ function main() {
   const relatedGraph = computeRelatedGraph(entities, pages, contentInbound, tagIndex);
   database.relatedGraph = relatedGraph;
   console.log(`  relatedGraph: ${Object.keys(relatedGraph).length} entities have connections`);
+
+  // =========================================================================
+  // SESSION LOG → PAGE CHANGE HISTORY
+  // Parse .claude/session-log.md and attach changeHistory to each page
+  // =========================================================================
+  const sessionLogPath = join(PROJECT_ROOT, '..', '.claude', 'session-log.md');
+  const pageChangeHistory = parseSessionLog(sessionLogPath);
+  let pagesWithHistory = 0;
+  for (const page of pages) {
+    const history = pageChangeHistory[page.id];
+    if (history && history.length > 0) {
+      page.changeHistory = history;
+      pagesWithHistory++;
+    }
+  }
+  console.log(`  changeHistory: ${Object.keys(pageChangeHistory).length} pages have session history (from ${sessionLogPath})`);
 
   database.pages = pages;
 

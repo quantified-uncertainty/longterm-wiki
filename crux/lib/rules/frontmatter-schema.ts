@@ -62,6 +62,7 @@ const frontmatterSchema = z.object({
   maturity: z.string().optional(),
   fullWidth: z.boolean().optional(),
   update_frequency: z.number().positive().optional(),
+  evergreen: z.boolean().optional(),
   entityType: z.enum(ALL_ENTITY_TYPE_NAMES as unknown as [string, ...string[]]).optional(),
   entityId: z.string().optional(),
   roles: z.array(z.string()).optional(),
@@ -140,13 +141,24 @@ export const frontmatterSchemaRule = {
 
     // Cross-field: graded content formats (table, diagram) should have update tracking
     const gradedFormats = ['table', 'diagram'];
-    if (gradedFormats.includes(frontmatter.contentFormat) && !frontmatter.update_frequency) {
+    if (gradedFormats.includes(frontmatter.contentFormat) && !frontmatter.update_frequency && frontmatter.evergreen !== false) {
       issues.push(new Issue({
         rule: 'frontmatter-schema',
         file: contentFile.path,
         line: 1,
         message: `Pages with contentFormat: "${frontmatter.contentFormat}" should have update_frequency set`,
         severity: Severity.WARNING,
+      }));
+    }
+
+    // Cross-field: evergreen: false is incompatible with update_frequency
+    if (frontmatter.evergreen === false && frontmatter.update_frequency) {
+      issues.push(new Issue({
+        rule: 'frontmatter-schema',
+        file: contentFile.path,
+        line: 1,
+        message: `Pages with evergreen: false should not have update_frequency (non-evergreen pages are excluded from the update schedule)`,
+        severity: Severity.ERROR,
       }));
     }
 

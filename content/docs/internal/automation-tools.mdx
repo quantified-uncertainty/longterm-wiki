@@ -95,6 +95,16 @@ importance: 85
 | >= 40 | 45 days (6 weeks) |
 | >= 20 | 90 days (3 months) |
 
+### Opting Out: Non-Evergreen Pages
+
+Some pages are point-in-time content (reports, experiments, proposals) that don't need ongoing updates. Set `evergreen: false` in frontmatter to exclude them from the update schedule:
+
+```yaml
+evergreen: false    # This page is a snapshot, not maintained
+```
+
+Pages with `evergreen: false` are skipped by the update schedule, the bootstrap script, and the reassign script. All existing report pages under `internal/reports/` use this flag.
+
 ### Commands
 
 ```bash
@@ -149,6 +159,30 @@ node crux/authoring/page-improver.ts -- <page-id> --triage
 | standard | \$5-8 | analyze, research, improve, validate, review |
 | deep | \$10-15 | analyze, research-deep, improve, validate, review, gap-fill |
 | triage | ≈\$0.08 + tier cost | news check, then auto-selects above |
+
+---
+
+## Page Change Tracking
+
+Claude Code sessions log which wiki pages they modify. This creates a per-page change history that feeds two dashboards.
+
+### How It Works
+
+1. Each Claude Code session appends an entry to `.claude/session-log.md` with a `**Pages:**` field listing the page slugs that were edited.
+2. At build time, `build-data.mjs` parses the session log and attaches a `changeHistory` array to each page in `database.json`.
+3. The data flows to two places:
+   - **Per-page**: A "Change History" section in the PageStatus card shows which sessions touched this page.
+   - **Site-wide**: The [Page Changes dashboard](/internal/page-changes) shows all page edits across all sessions in a sortable table.
+
+### Session Log Format
+
+The `**Pages:**` field uses page slugs (filenames without `.mdx`), comma-separated:
+
+```
+**Pages:** ai-risks, compute-governance, anthropic
+```
+
+Omit the field entirely for infrastructure-only sessions that don't edit wiki pages.
 
 ---
 

@@ -234,12 +234,14 @@ function ContentView({
           structuredSummary={pageData?.structuredSummary ?? undefined}
           lastEdited={pageData?.lastUpdated ?? undefined}
           updateFrequency={pageData?.updateFrequency ?? undefined}
+          evergreen={pageData?.evergreen}
           todo={page.frontmatter.todo}
           todos={page.frontmatter.todos}
           wordCount={pageData?.wordCount}
           backlinkCount={pageData?.backlinkCount}
           metrics={pageData?.metrics}
           suggestedQuality={pageData?.suggestedQuality}
+          changeHistory={pageData?.changeHistory}
           issues={{
             unconvertedLinkCount: pageData?.unconvertedLinkCount,
             redundancy: pageData?.redundancy,

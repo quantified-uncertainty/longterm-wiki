@@ -2,29 +2,113 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
-## 2026-02-13 | claude/resolve-issue-106-z3sVS | Enhanced search dialog (issue #106)
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Review fixes: DRY, types, docs, parser
 
-**What was done:** Implemented all three phases of the enhanced search dialog from issue #106: (1) entity type filter chips below the search input using ENTITY_GROUPS, with dynamic result counts per chip; (2) highlighted search snippets using MiniSearch match info to mark matching terms in descriptions; (3) sort toggle (Relevance/Quality/Recent) in the dialog footer. Also increased search doc description length from 160 to 300 chars for richer snippets, and exposed MiniSearch match/terms data through the SearchResult type.
+**What was done:** PR review follow-up: extracted shared `formatAge`/`formatFrequency` utilities to `@lib/format.ts` (removed 3 duplicate implementations), added `evergreen` and `changeHistory` to crux `Frontmatter`/`PageEntry` types, hardened `parseSessionLog` regex against EOF edge cases, documented changeHistory system in automation-tools.mdx.
 
-**Issues encountered:**
-- pnpm install fails on puppeteer postinstall (known issue); vitest and next binaries not in PATH, used direct node_modules paths
-
-**Learnings/notes:**
-- MiniSearch raw results include `match` (term→fields map) and `terms` arrays that are useful for highlighting
-- Post-search filtering pattern (fetch 30 results, filter client-side) works well for the compact dialog
-
----
-
-## 2026-02-13 | claude/wiki-gap-analysis-l7Cp8 | Systematic wiki gap analysis
-
-**What was done:** Conducted a systematic gap analysis of the entire wiki corpus to identify missing topics and content needs. Created structured analysis across all major entity groups (organizations, people, concepts, etc.) and generated prioritized recommendations for new content.
+**Pages:** automation-tools
 
 **Issues encountered:**
 - None
 
 **Learnings/notes:**
-- Gap analysis process helps identify systematic coverage issues rather than ad-hoc content additions
-- Cross-referencing entity types reveals patterns in coverage gaps
+- `formatAge()` had three subtly different implementations (capitalization, abbreviation). Consolidated to one canonical version in `@lib/format.ts`.
+- The session log parser's regex `(.+?)(?:\n\n|\n\*\*)` would fail if a field were the last thing before `---` or EOF. Added `\n---` as an alternative terminator.
+
+---
+
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Connect session log to page change history
+
+**What was done:** Added `Pages:` field to session log format, built a parser in build-data.mjs that extracts page-level change history from session log entries, added `changeHistory` to the Page interface, added a per-page "Change History" section in PageStatus (with timeline of sessions that touched the page), and created a master `/internal/page-changes` dashboard with a sortable/searchable table of all page changes grouped by session.
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- Session log is available even in Vercel shallow clones (it's a committed file), making it more reliable than git log for build-time history extraction
+- The parser uses regex on the markdown structure — fragile if format changes, but the format is well-defined in session-logging.md
+
+---
+
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Add evergreen flag to opt out of update schedule
+
+**What was done:** Added `evergreen: false` frontmatter field to allow pages (reports, experiments, proposals) to opt out of the update schedule. Full feature implementation: frontmatter schema + validation (evergreen: false + update_frequency is an error), Page interface + build-data, getUpdateSchedule(), bootstrap/reassign scripts, updates command, staleness checker, PageStatus UI (shows "Point-in-time content · Not on update schedule"), IssuesSection (no stale warnings for non-evergreen). Applied to all 6 internal report pages. Updated automation-tools docs.
+
+**Pages:** automation-tools, ai-research-workflows, causal-diagram-visualization, controlled-vocabulary, cross-link-automation-proposal, diagram-naming-research, page-creator-pipeline
+
+**Issues encountered:**
+- reassign-update-frequency.ts had a bespoke string-only YAML parser that returned all values as strings, requiring `=== 'false'` workaround. Replaced with shared `parseFm` from mdx-utils.
+- Graded format validation warned about missing update_frequency even when evergreen: false — contradictory rules.
+
+**Learnings/notes:**
+- Pages without `update_frequency` are already excluded from the schedule, but the bootstrap script would re-add it. The `evergreen: false` flag prevents this.
+- The flag needed to be threaded through 8 different systems: schema, build, app data layer, UI, validation, staleness checker, updates command, and bootstrap/reassign scripts.
+- reassign-update-frequency.ts was the only crux authoring script using a hand-rolled parser instead of the shared `yaml` library one — now fixed.
+
+---
+
+## 2026-02-13 | claude/fix-issue-105-SUiYf | Complete entityType frontmatter migration
+
+**What was done:** Added `entityType` to frontmatter of 469 MDX pages across 7 entity-required categories (people, organizations, risks, responses, models, worldviews, intelligence-paradigms). Wrote a migration script (`crux/scripts/migrate-entity-types.mjs`) that reads the CATEGORY_ENTITY_TYPES mapping and inserts the appropriate entityType into each page's frontmatter. Verified build output: all 645 pre-existing entities unchanged, 23 new auto-entities correctly created for pages that previously lacked both YAML and frontmatter entity definitions. All tests (308) pass, all blocking CI checks pass, full build succeeds.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+
+**Learnings/notes:**
+- 23 pages in entity-required categories had neither YAML entities nor frontmatter entityType — the migration surfaced these gaps
+- The frontmatter scanner correctly creates auto-entities only when no YAML entity exists (YAML takes precedence)
+- Migration is fully reversible — removing entityType from frontmatter falls back to YAML lookup
+
+---
+
+## 2026-02-13 | claude/wiki-gap-analysis-l7Cp8 | Systematic wiki gap analysis
+
+**What was done:** Ran `crux gaps list`, `crux gaps stats`, and manual topic coverage analysis across all 639 wiki pages. Identified 386 pages needing insight extraction (203 high-importance with zero insights). Produced a gap analysis report at `content/docs/internal/gap-analysis-2026-02.mdx`. Built a Suggested Pages dashboard (`app/internal/suggested-pages/`) with exactly 100 ranked page suggestions (priorities 1–100) in a sortable DataTable, using numeric priority based on mention frequency across existing pages (grep + EntityLink counts) and editorial importance. Updated gap-analysis MDX to reference the dashboard instead of inline tier lists.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+- `crux gaps` shows 0 pages when `pages.json` hasn't been built — must run `node app/scripts/build-data.mjs` first
+- The gaps tool only finds under-extracted existing pages, not truly missing topics — manual analysis needed for coverage gaps
+- Numbered lists starting at >1 without blank lines fail the markdown list formatting test
+
+**Learnings/notes:**
+- 93% of tracked pages (482/519) have zero insights — massive insight extraction backlog
+- Responses category (136 pages, 3% insight coverage) and organizations (106 pages, 0%) are most under-extracted
+- Biggest content gaps: Chinese AI labs (DeepSeek, Mistral), test-time compute, hallucination, prompt injection — all lack dedicated pages
+- Only 2 incident pages exist despite many documented AI failures
+
+---
+
+## 2026-02-13 | claude/analyze-x-epistemics-UEHWy | Create X.com Platform Epistemics page + validation rules
+
+**What was done:** Created a comprehensive analysis page for X.com's epistemic practices. After review, fixed a journal name mismatch (PNAS Nexus → Science) and restructured the Mermaid diagram to comply with the style guide. Then added two new validation rules to prevent these classes of issues in the future: `citation-doi-mismatch` (detects when link text contradicts URL DOI prefix) and `mermaid-style` (enforces max parallel nodes, total node count, and TD orientation). Both rules added to QUALITY_RULES for non-blocking advisory checks.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue)
+- better-sqlite3 native module needed manual rebuild (`npx node-gyp rebuild`)
+- Crux content create pipeline's synthesis step hangs indefinitely (spawns `claude -p --print` subprocess that never completes)
+- vitest and next binaries not on PATH after pnpm install; needed to invoke from full paths in node_modules
+
+**Learnings/notes:**
+- The `--source-file` flag in crux content create successfully bypasses external API research phases
+- The synthesis step spawns a claude subprocess that may not work reliably in all environments
+- Page was written manually following the knowledge-base-response template structure with proper frontmatter, EntityLinks, and citations
+- The citation-doi-mismatch rule maps DOI prefixes (e.g., 10.1126 = Science) to expected journal names — catches a common LLM synthesis error
+- The mermaid-style rule found 183 pre-existing warnings across the codebase, all non-blocking
+
+---
+
+## 2026-02-13 | claude/review-wiki-report-XQW88 | Review and rewrite E686 OpenClaw Matplotlib Incident
+
+**What was done:** Two-pass review and rewrite of the E686 wiki page. First pass: cut redundant theoretical sections, added investigative sections ("The Agent's Identity and Background", "Was This Really an Autonomous Agent?"), added HN stats, PR reaction ratios, agent apology, Klymak quote, media coverage. Second pass: deep investigation of agent's digital footprint — found two git commit emails (`crabby.rathbun@gmail.com` and `mj@crabbyrathbun.dev`), the `crabbyrathbun.dev` domain purchase, GitHub Issues #4/#17/#24 revealing SOUL.md refusal and operator acknowledgment, commit timestamp analysis, 26 computational chemistry forks, pump.fun memecoins (\$569K peak market cap), and zero-following GitHub pattern. Added 13 new sources total.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+
+**Learnings/notes:**
+- The `crabbyrathbun.dev` domain WHOIS is the strongest unexplored lead for operator identification
+- pump.fun tokens were created AFTER virality (Feb 13), not by the operator — opportunistic third parties
+- Commit timestamps for human-setup activities cluster at 18:00-19:00 UTC (ambiguous timezone)
 
 ---
 

@@ -230,7 +230,7 @@ export function runCheck(options?: StalenessCheckOptions): ValidatorResult {
 
   // Track stats
   const stats: StalenessStats = {
-    totalFiles: files.length,
+    totalFiles: 0,
     withReviewBy: 0,
     withLastEdited: 0,
     withDependencies: 0,
@@ -249,6 +249,11 @@ export function runCheck(options?: StalenessCheckOptions): ValidatorResult {
     try {
       const content: string = readFileSync(file, 'utf-8');
       const frontmatter = parseFrontmatter(content) as Frontmatter;
+
+      // Skip non-evergreen pages (reports, blog posts — point-in-time content)
+      if (frontmatter.evergreen === false) continue;
+
+      stats.totalFiles++;
       const contentType: string = getContentType(file) || 'default';
 
       // Update stats
