@@ -2,9 +2,24 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Connect session log to page change history
+
+**What was done:** Added `Pages:` field to session log format, built a parser in build-data.mjs that extracts page-level change history from session log entries, added `changeHistory` to the Page interface, added a per-page "Change History" section in PageStatus (with timeline of sessions that touched the page), and created a master `/internal/page-changes` dashboard with a sortable/searchable table of all page changes grouped by session.
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- Session log is available even in Vercel shallow clones (it's a committed file), making it more reliable than git log for build-time history extraction
+- The parser uses regex on the markdown structure — fragile if format changes, but the format is well-defined in session-logging.md
+
+---
+
 ## 2026-02-13 | claude/optional-report-updates-lpTVT | Add evergreen flag to opt out of update schedule
 
 **What was done:** Added `evergreen: false` frontmatter field to allow pages (reports, experiments, proposals) to opt out of the update schedule. Full feature implementation: frontmatter schema + validation (evergreen: false + update_frequency is an error), Page interface + build-data, getUpdateSchedule(), bootstrap/reassign scripts, updates command, staleness checker, PageStatus UI (shows "Point-in-time content · Not on update schedule"), IssuesSection (no stale warnings for non-evergreen). Applied to all 6 internal report pages. Updated automation-tools docs.
+
+**Pages:** automation-tools, ai-research-workflows, causal-diagram-visualization, controlled-vocabulary, cross-link-automation-proposal, diagram-naming-research, page-creator-pipeline
 
 **Issues encountered:**
 - reassign-update-frequency.ts had a bespoke string-only YAML parser that returned all values as strings, requiring `=== 'false'` workaround. Replaced with shared `parseFm` from mdx-utils.

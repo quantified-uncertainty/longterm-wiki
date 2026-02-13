@@ -6,7 +6,7 @@ import {
   CONTENT_FORMAT_INFO,
   type ContentFormat,
 } from "@/lib/page-types";
-import type { StructuredSummary } from "@/data";
+import type { StructuredSummary, ChangeEntry } from "@/data";
 import styles from "@/components/wiki/tooltip.module.css";
 
 // ============================================================================
@@ -54,6 +54,7 @@ export interface PageStatusProps {
   metrics?: PageMetrics;
   suggestedQuality?: number;
   issues?: PageIssues;
+  changeHistory?: ChangeEntry[];
   pageType?: string;
   pathname?: string;
   contentFormat?: ContentFormat;
@@ -702,6 +703,52 @@ function IssuesSection({
 // MAIN COMPONENT
 // ============================================================================
 
+// ============================================================================
+// CHANGE HISTORY SECTION
+// ============================================================================
+
+function ChangeHistorySection({
+  changeHistory,
+}: {
+  changeHistory?: ChangeEntry[];
+}) {
+  if (!changeHistory || changeHistory.length === 0) return null;
+
+  return (
+    <div className="border-t border-border px-3.5 pt-2 pb-2.5">
+      <SectionHeader
+        count={changeHistory.length}
+        countColor="bg-sky-500/15 text-sky-500"
+      >
+        Change History
+      </SectionHeader>
+      <div className="flex flex-col gap-1">
+        {changeHistory.map((entry, index) => (
+          <div
+            key={index}
+            className="rounded-md bg-sky-500/[0.06] px-2.5 py-1.5 text-xs"
+          >
+            <div className="flex items-center gap-1.5">
+              <IconCalendar className="shrink-0 text-sky-500" />
+              <span className="font-medium text-foreground">
+                {entry.title}
+              </span>
+              <span className="text-muted-foreground">
+                {formatAge(entry.date)}
+              </span>
+            </div>
+            {entry.summary && (
+              <p className="mt-0.5 ml-[18px] text-muted-foreground leading-relaxed line-clamp-2">
+                {entry.summary}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function PageStatus({
   quality,
   importance,
@@ -716,6 +763,7 @@ export function PageStatus({
   backlinkCount,
   metrics,
   suggestedQuality,
+  changeHistory,
   issues,
   pageType,
   pathname,
@@ -731,7 +779,8 @@ export function PageStatus({
     structuredSummary ||
     lastEdited ||
     todo ||
-    (todos && todos.length > 0);
+    (todos && todos.length > 0) ||
+    (changeHistory && changeHistory.length > 0);
   if (!hasEditorialContent && !isATMPage) {
     return null;
   }
@@ -876,6 +925,9 @@ export function PageStatus({
         contentFormat={contentFormat}
         evergreen={evergreen}
       />
+
+      {/* Change history */}
+      <ChangeHistorySection changeHistory={changeHistory} />
 
       {/* Single todo */}
       {todo && (

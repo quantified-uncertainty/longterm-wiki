@@ -241,6 +241,7 @@ function ContentView({
           backlinkCount={pageData?.backlinkCount}
           metrics={pageData?.metrics}
           suggestedQuality={pageData?.suggestedQuality}
+          changeHistory={pageData?.changeHistory}
           issues={{
             unconvertedLinkCount: pageData?.unconvertedLinkCount,
             redundancy: pageData?.redundancy,

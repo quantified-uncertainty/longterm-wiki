@@ -257,6 +257,13 @@ export interface StructuredSummary {
   bottomLine: string;
 }
 
+export interface ChangeEntry {
+  date: string;
+  branch: string;
+  title: string;
+  summary: string;
+}
+
 export interface Page {
   id: string;
   path: string;
@@ -285,6 +292,7 @@ export interface Page {
   clusters?: string[];
   updateFrequency?: number | null;
   evergreen?: boolean;
+  changeHistory?: ChangeEntry[];
   wordCount?: number;
   backlinkCount?: number;
   metrics?: {
@@ -486,6 +494,46 @@ export function getUpdateSchedule(): UpdateScheduleItem[] {
 
   // Sort by priority descending (most urgent first)
   items.sort((a, b) => b.priority - a.priority);
+  return items;
+}
+
+export interface PageChangeItem {
+  pageId: string;
+  pageTitle: string;
+  pagePath: string;
+  numericId: string;
+  date: string;
+  branch: string;
+  sessionTitle: string;
+  summary: string;
+  category: string;
+}
+
+export function getPageChanges(): PageChangeItem[] {
+  const db = getDatabase();
+  const pages = db.pages || [];
+  const items: PageChangeItem[] = [];
+
+  for (const page of pages) {
+    if (!page.changeHistory || page.changeHistory.length === 0) continue;
+    const numericId = db.idRegistry?.bySlug[page.id] || page.id;
+    for (const entry of page.changeHistory) {
+      items.push({
+        pageId: page.id,
+        pageTitle: page.title,
+        pagePath: page.path,
+        numericId,
+        date: entry.date,
+        branch: entry.branch,
+        sessionTitle: entry.title,
+        summary: entry.summary,
+        category: page.category,
+      });
+    }
+  }
+
+  // Sort by date descending (most recent first)
+  items.sort((a, b) => b.date.localeCompare(a.date));
   return items;
 }
 
