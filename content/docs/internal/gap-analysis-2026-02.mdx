@@ -29,115 +29,26 @@ The wiki has **strong structural coverage** (639 pages across 25 categories) but
 
 ---
 
-## Part 1: Top 20 Missing or Under-Covered Pages (Prioritized)
+## Part 1: Missing or Under-Covered Pages
 
-These are ranked by a combined score of (a) importance to AI safety discourse in early 2026, (b) how completely the topic is absent, and (c) how fast-moving the area is.
+A prioritized list of 100 missing pages is maintained in the [Suggested Pages dashboard](/internal/suggested-pages), ranked by numeric priority (1–100) based on how often each topic is mentioned across existing pages and editorial importance to AI safety coverage.
 
-### Tier 1: Critical Gaps (highest priority)
+The top 10 gaps by priority:
 
-#### 1. DeepSeek (Organization Page)
-- **Status**: PARTIAL — mentioned in MoE and SSM pages, but no dedicated organization page
-- **Why critical**: DeepSeek R1/V3 fundamentally changed compute-efficiency assumptions in 2024-2025. No entity in `organizations.yaml`. Geopolitically significant as a leading Chinese frontier lab.
-- **Action**: Create organization page via `crux content create`
+| Priority | Topic | Mentions | Status |
+|----------|-------|----------|--------|
+| 100 | AI Governance | 183 | Sub-topics exist, no umbrella page |
+| 99 | Reinforcement Learning | 81 | No standalone page |
+| 98 | Retrieval-Augmented Generation (RAG) | 404 | No page |
+| 97 | GPT-4 | 193 | No page |
+| 96 | Claude (Model Family) | 186 | No page |
+| 95 | Frontier Model (Concept) | 161 | No definition page |
+| 94 | Training Data | 111 | No page |
+| 93 | Safety Evaluations | 106 | No page |
+| 92 | Misalignment Potential | 110 | 110 EntityLinks, no page |
+| 91 | Civilizational Competence | 104 | 104 EntityLinks, no page |
 
-#### 2. Test-Time Compute & Reasoning Models
-- **Status**: PARTIAL — mentioned in `critical-uncertainties.mdx` and `slow-takeoff-muddle.mdx`, no dedicated page
-- **Why critical**: The o1/o3/R1 paradigm of inference-time scaling is a fundamental architectural shift. Changes safety assumptions about capability scaling, evaluation, and containment.
-- **Action**: Create capabilities or intelligence-paradigms page
-
-#### 3. Frontier Model Transparency & Safety Reporting
-- **Status**: PARTIAL — safety cases, responsible scaling policies exist as separate pages, but no page comparing what labs actually report or tracking compliance
-- **Why critical**: Every major lab now publishes safety evaluations. Without a comparison/tracking page, the wiki can't answer "are labs actually getting safer?"
-- **Action**: Create responses page analyzing lab transparency practices
-
-#### 4. Hallucination
-- **Status**: PARTIAL — referenced in 33 files, no dedicated page
-- **Why critical**: Remains the most user-visible AI failure mode. Has distinct mechanisms, measurement approaches, and mitigation strategies that deserve systematic treatment.
-- **Action**: Create risks page
-
-#### 5. Prompt Injection & Jailbreaking
-- **Status**: PARTIAL — discussed across red-teaming, refusal-training, tool-restrictions pages, no dedicated page
-- **Why critical**: Primary attack vector against deployed LLMs. Active research area with rapidly evolving techniques and defenses.
-- **Action**: Create risks page (prompt injection) and/or responses page (defenses)
-
-### Tier 2: High Priority
-
-#### 6. Mistral AI (Organization Page)
-- **Status**: PARTIAL — mentioned in MoE/SSM discussions and Meta AI page, no dedicated page
-- **Why critical**: Leading European frontier lab, important for EU AI Act context and non-US AI development.
-- **Action**: Create organization page
-
-#### 7. AI Incidents Compendium (2024-2026)
-- **Status**: EXISTS but extremely thin — only 2 incident pages
-- **Why critical**: Documented AI failures are essential evidence for safety arguments. The wiki needs systematic incident tracking.
-- **Action**: Create 5-10 additional incident pages covering major documented failures
-
-#### 8. Data Poisoning
-- **Status**: PARTIAL — mentioned in 13 files, no dedicated page
-- **Why critical**: Supply-chain attack on training data is an active threat. Distinct from adversarial robustness (which has a stub page).
-- **Action**: Create risks page
-
-#### 9. Multimodal AI & Vision Models
-- **Status**: PARTIAL — referenced in 38 files, no dedicated page
-- **Why critical**: GPT-4V, Gemini, and multimodal models represent a capability frontier with distinct safety challenges (image-based jailbreaks, visual hallucination, etc.).
-- **Action**: Create capabilities page
-
-#### 10. AI Liability & Legal Frameworks
-- **Status**: PARTIAL — legal-evidence-crisis page exists for a related topic, regulatory pages exist, but no dedicated liability analysis
-- **Why critical**: "Who pays when AI causes harm?" is a foundational governance question becoming urgent as deployment scales.
-- **Action**: Create responses or risks page
-
-### Tier 3: Important Gaps
-
-#### 11. Foundation Model Commoditization
-- **Status**: PARTIAL — ai-revenue-sources and winner-take-all-concentration pages touch on this
-- **Why critical**: Pricing collapse and model convergence change lab incentives for safety investment.
-- **Action**: Create models or future-projections page
-
-#### 12. Speculative Decoding & Inference Optimization
-- **Status**: MISSING — virtually no coverage
-- **Why critical**: How models are deployed affects safety properties. Speculative decoding, quantization, and distillation have safety implications.
-- **Action**: Create intelligence-paradigms page
-
-#### 13. Adversarial Robustness (Expand Stub)
-- **Status**: EXISTS as stub — page at `responses/adversarial-robustness.mdx` marked "stub. Content needed." Referenced in 122 files.
-- **Why critical**: One of the most-referenced concepts in the wiki has no actual content.
-- **Action**: `crux content improve adversarial-robustness --tier=standard --apply`
-
-#### 14. Chinese AI Ecosystem
-- **Status**: PARTIAL — geopolitics metrics page covers some of this, export-controls page covers policy responses
-- **Why critical**: Baidu, Alibaba, Tencent, ByteDance, and other Chinese labs are frontier competitors. Safety practices and governance differ significantly.
-- **Action**: Create overview page under responses or a new geographic section
-
-#### 15. Model Merging & Weight Manipulation
-- **Status**: PARTIAL — MoE page covers mixture architectures, but model merging (TIES, DARE, etc.) is a separate technique with distinct safety implications
-- **Why critical**: Widely used in open-source community to combine capabilities, potentially bypassing safety fine-tuning.
-- **Action**: Create risks or intelligence-paradigms page
-
-#### 16. In-Context Learning & Few-Shot Capabilities
-- **Status**: MISSING — no dedicated page despite being fundamental to LLM capability
-- **Why critical**: Defines what models can do without fine-tuning. Safety implications for capability elicitation and jailbreaking.
-- **Action**: Create capabilities page
-
-#### 17. Reward Modeling (Dedicated Page)
-- **Status**: PARTIAL — covered within RLHF page, but reward modeling is its own research area
-- **Why critical**: Reward hacking page exists (risks), but the positive side (how to specify rewards correctly) deserves dedicated treatment.
-- **Action**: Create responses page
-
-#### 18. AI-Enabled Scientific Fraud
-- **Status**: MISSING — not found in any page
-- **Why critical**: Emerging risk as LLMs generate convincing text. Paper mills, fabricated data, fake peer reviews are growing concerns.
-- **Action**: Create risks page
-
-#### 19. Post-Deployment Monitoring & Safety Ops
-- **Status**: MISSING — no dedicated page on runtime monitoring, anomaly detection, or safety operations
-- **Why critical**: Most safety work focuses on pre-deployment. The gap between training-time safety and deployment-time safety is under-explored.
-- **Action**: Create responses page
-
-#### 20. Compute Governance Implementation
-- **Status**: PARTIAL — compute thresholds, hardware-enabled governance, export controls pages exist, but no implementation tracking
-- **Why critical**: Compute governance is the most concrete governance lever. Tracking whether thresholds are actually enforced is essential.
-- **Action**: Create models or metrics page tracking enforcement
+See the [full list of 100 suggested pages](/internal/suggested-pages) for details
 
 ---
 
@@ -201,18 +112,18 @@ From `crux gaps stats`:
 
 ### Immediate actions (next sessions)
 
-1. **Create 5 Tier-1 pages** via `crux content create`: DeepSeek, Test-Time Compute, Frontier Model Transparency, Hallucination, Prompt Injection
+1. **Create top-priority pages** (priority 90+) via `crux content create` — see [Suggested Pages](/internal/suggested-pages)
 2. **Expand adversarial-robustness stub** via `crux content improve`
 3. **Run insight extraction** on top-20 gap-scored pages
 
 ### Short-term actions
 
-1. **Create 5 Tier-2 pages**: Mistral AI, AI Incidents (batch), Data Poisoning, Multimodal AI, AI Liability
+1. **Create priority 70–89 pages**: DeepSeek, Hallucination, Multimodal AI, Jailbreaking, etc.
 2. **Run insight extraction** on all 0-insight pages with importance \>= 80 (203 pages)
 
 ### Medium-term actions
 
-1. **Create 10 Tier-3 pages**: Foundation Model Commoditization, Speculative Decoding, Chinese AI Ecosystem, Model Merging, In-Context Learning, Reward Modeling, AI-Enabled Scientific Fraud, Post-Deployment Monitoring, Compute Governance Implementation
+1. **Work through priority 40–69 pages** from the [Suggested Pages](/internal/suggested-pages) dashboard
 2. **Systematic insight extraction** across remaining categories
 
 ---

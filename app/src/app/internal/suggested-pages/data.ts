@@ -6,7 +6,9 @@ import type { SuggestedPage } from "./suggested-pages-table";
 // MDX pages that reference this term in prose or via EntityLink.
 
 export const suggestions: SuggestedPage[] = [
-  // --- 95–100: referenced on 100+ pages, fundamental gaps ---
+  // --- 91–100: referenced on 80+ pages, fundamental gaps ---
+  { title: "AI Governance", type: "concept", priority: 100, mentions: 183, reason: "Mentioned on 183 pages. Sub-topics exist (compute governance, etc.) but no umbrella page." },
+  { title: "Reinforcement Learning", type: "concept", priority: 99, mentions: 81, reason: "Mentioned on 81 pages. Underpins RLHF, reward modeling, and alignment methods — no standalone page." },
   { title: "Retrieval-Augmented Generation (RAG)", type: "concept", priority: 98, mentions: 404, reason: "Referenced on 404 pages — most-mentioned concept without a page." },
   { title: "GPT-4", type: "capability", priority: 97, mentions: 193, reason: "Central reference point for frontier capabilities, mentioned on 193 pages." },
   { title: "Claude (Model Family)", type: "capability", priority: 96, mentions: 186, reason: "Anthropic's flagship model, mentioned on 186 pages, no standalone page." },
@@ -17,13 +19,14 @@ export const suggestions: SuggestedPage[] = [
   { title: "Civilizational Competence", type: "ai-transition-model", priority: 91, mentions: 104, reason: "104 EntityLinks to this transition-model factor, no page exists." },
 
   // --- 85–94: 40–99 page mentions ---
+  { title: "Model Evaluation (Methodology)", type: "response", priority: 90, mentions: 55, reason: "Referenced on 55 pages. Capability evals, dangerous-capability evals, eval science — no methodology page." },
   { title: "Fine-Tuning", type: "concept", priority: 89, mentions: 89, reason: "Key technique for adapting models; safety implications of open fine-tuning." },
   { title: "Gemini (Google DeepMind)", type: "capability", priority: 88, mentions: 88, reason: "Google's frontier model family, mentioned on 88 pages." },
   { title: "Llama (Meta)", type: "capability", priority: 87, mentions: 82, reason: "Most widely used open-weights model. 82 page mentions." },
   { title: "DeepSeek", type: "organization", priority: 86, mentions: 71, reason: "Chinese frontier lab (R1, V3) — changed compute-efficiency assumptions globally." },
   { title: "GPT-5 / Next-Gen OpenAI", type: "capability", priority: 85, mentions: 67, reason: "Frequently referenced as next capability milestone, 67 page mentions." },
   { title: "Transformer Architecture", type: "concept", priority: 84, mentions: 65, reason: "The architecture underlying all frontier models; no explainer page." },
-  { title: "Jailbreaking & Prompt Injection", type: "risk", priority: 83, mentions: 59, reason: "Primary attack vector against deployed LLMs. 59 mentions + dangling links." },
+  { title: "Jailbreaking & Prompt Injection", type: "risk", priority: 83, mentions: 81, reason: "Primary attack vector against deployed LLMs. Covers direct jailbreaks + indirect injection in tool-use contexts." },
   { title: "Multimodal AI", type: "capability", priority: 82, mentions: 49, reason: "Vision/audio models have distinct safety challenges. 49 mentions." },
   { title: "Training Runs & Compute Cost", type: "concept", priority: 81, mentions: 47, reason: "Economics of training — cost, duration, environmental impact. 47 mentions." },
   { title: "Foundation Model (Concept)", type: "concept", priority: 80, mentions: 46, reason: "Distinct from 'frontier model' — the general category. 46 mentions." },
@@ -42,7 +45,7 @@ export const suggestions: SuggestedPage[] = [
 
   // --- 60–69: 15–25 page mentions, significant gaps ---
   { title: "Synthetic Data", type: "concept", priority: 69, mentions: 24, reason: "Self-play and synthetic training data — model collapse risk. 24 mentions." },
-  { title: "Prompt Injection (Technical)", type: "risk", priority: 68, mentions: 22, reason: "Distinct from jailbreaking — indirect injection in tool-use contexts." },
+  { title: "Model Weights (Security & Access)", type: "concept", priority: 68, mentions: 40, reason: "Referenced on 40 pages. Weight theft, open release decisions, proliferation risk — no standalone page." },
   { title: "Pre-Training", type: "concept", priority: 67, mentions: 21, reason: "The initial training phase. Distinct safety considerations from fine-tuning." },
   { title: "Knowledge Distillation", type: "concept", priority: 66, mentions: 20, reason: "Compressing large models; safety properties may not transfer. 20 mentions." },
   { title: "Post-Training (RLHF, Safety)", type: "concept", priority: 65, mentions: 20, reason: "Where safety alignment happens in practice. 20 mentions." },
@@ -68,7 +71,7 @@ export const suggestions: SuggestedPage[] = [
   { title: "Hugging Face", type: "organization", priority: 49, mentions: 10, reason: "Central hub for open-weights models and datasets." },
   { title: "Knowledge Graphs for AI", type: "concept", priority: 48, mentions: 10, reason: "Structured knowledge + LLMs. 10 mentions." },
   { title: "Alignment Tax", type: "concept", priority: 47, mentions: 9, reason: "Cost of making models safe vs. capable. Key policy concept." },
-  { title: "Image Generation (Diffusion)", type: "capability", priority: 46, mentions: 9, reason: "DALL-E, Midjourney, Stable Diffusion — distinct safety issues." },
+  { title: "Image & Video Generation", type: "capability", priority: 46, mentions: 16, reason: "Diffusion models, DALL-E, Midjourney, Sora — architecture and safety issues." },
   { title: "AI Auditing", type: "response", priority: 45, mentions: 9, reason: "Third-party safety audits. Emerging profession." },
   { title: "Data Poisoning", type: "risk", priority: 44, mentions: 8, reason: "Supply-chain attack on training data. Distinct from adversarial examples." },
   { title: "Brain Emulation", type: "concept", priority: 43, mentions: 8, reason: "Whole brain emulation as alternative path to AGI. 8 mentions." },
@@ -77,7 +80,7 @@ export const suggestions: SuggestedPage[] = [
   { title: "AI Consciousness & Moral Status", type: "concept", priority: 40, mentions: 7, reason: "Sentience, moral patienthood, digital minds. 7 mentions." },
 
   // --- 30–39: important but less frequently referenced ---
-  { title: "Diffusion Models", type: "concept", priority: 39, mentions: 7, reason: "Architecture behind image/video generation." },
+  { title: "AI Technical Standards", type: "response", priority: 39, mentions: 38, reason: "Referenced on 38 pages. ISO, NIST, IEEE frameworks — how standards interact with regulation." },
   { title: "Chain-of-Thought Reasoning", type: "concept", priority: 38, mentions: 6, reason: "Prompting technique that elicits reasoning. Safety implications." },
   { title: "Function Calling & Tool Use", type: "capability", priority: 37, mentions: 6, reason: "Agentic capability — models invoking APIs. Security concerns." },
   { title: "Differential Privacy", type: "response", priority: 36, mentions: 6, reason: "Mathematical privacy guarantees for training data." },
