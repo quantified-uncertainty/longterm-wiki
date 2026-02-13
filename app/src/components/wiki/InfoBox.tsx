@@ -370,21 +370,21 @@ export function InfoBox({
 
       {/* Related Entries */}
       {groupedEntries && sortedTypes.length > 0 && (
-        <div className="px-4 py-2 border-t border-border">
-          <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">Related</div>
-          <div className="flex flex-col gap-1.5">
+        <div className="px-4 py-3 border-t border-border">
+          <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Related</div>
+          <div className="flex flex-col gap-4">
             {sortedTypes.map((t) => {
               const entries = groupedEntries![t]!;
               const config = entityTypeConfig[t as keyof typeof entityTypeConfig];
               return (
                 <div key={t} className="flex flex-col">
-                  <div className="flex items-center gap-1 mb-0.5">
+                  <div className="flex items-center gap-1 mb-1">
                     {config && <EntityTypeIcon type={t} size="xs" />}
                     <span className="text-muted-foreground font-medium text-[0.65rem] uppercase tracking-tight">
                       {pluralize(getEntityTypeLabel(t))}
                     </span>
                   </div>
-                  <div className="pl-[1.125rem] flex flex-wrap gap-1">
+                  <div className="pl-[1.125rem] flex flex-wrap gap-1.5">
                     {entries.map((entry, i) => (
                       entry.id ? (
                         <EntityLink key={i} id={entry.id} className="text-xs">{entry.title}</EntityLink>
