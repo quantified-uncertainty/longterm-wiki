@@ -37,6 +37,7 @@ export const INTERNAL_NAV: NavSection[] = [
     defaultOpen: true,
     items: [
       { label: "Enhancement Queue", href: "/internal/enhancement-queue" },
+      { label: "Suggested Pages", href: "/internal/suggested-pages" },
       { label: "Update Schedule", href: "/internal/updates" },
       { label: "Page Changes", href: "/internal/page-changes" },
       { label: "Fact Dashboard", href: "/internal/facts" },
@@ -78,6 +79,7 @@ export const INTERNAL_NAV: NavSection[] = [
       { label: "Cross-Link Automation", href: "/internal/reports/cross-link-automation-proposal" },
       { label: "Diagram Naming", href: "/internal/reports/diagram-naming-research" },
       { label: "Page Creator Pipeline", href: "/internal/reports/page-creator-pipeline" },
+      { label: "Gap Analysis (Feb 2026)", href: "/internal/gap-analysis-2026-02" },
     ],
   },
   {
