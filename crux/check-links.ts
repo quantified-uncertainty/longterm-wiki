@@ -17,7 +17,7 @@
  *   --clear-cache     Clear the link check cache before running
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, relative } from 'path';
 import { parse as parseYaml } from 'yaml';
 import https from 'https';
@@ -27,7 +27,7 @@ import { loadResources } from './resource-io.ts';
 import { findMdxFiles } from './lib/file-utils.ts';
 import { isInCodeBlock } from './lib/mdx-utils.ts';
 import { parseCliArgs } from './lib/cli.ts';
-import type { Resource } from './resource-types.ts';
+import { sleep, extractArxivId } from './resource-utils.ts';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -111,7 +111,6 @@ const REQUEST_TIMEOUT_MS = 15000;
 const RETRY_DELAY_MS = 3000;
 const PER_DOMAIN_DELAY_MS = 500; // ~2 req/s per domain
 
-const RESOURCES_DIR = join(DATA_DIR_ABS, 'resources');
 const EXTERNAL_LINKS_FILE = join(DATA_DIR_ABS, 'external-links.yaml');
 
 // Domains that should be checked via DOI resolution instead of direct URL
@@ -139,11 +138,19 @@ const UNVERIFIABLE_DOMAINS = [
 const SKIP_DOMAINS = [
   'academic.oup.com',
   'pubsonline.informs.org',
+  'proceedings.neurips.cc',
   'cambridge.org',
   'papers.ssrn.com',
   'ieee.org',
   'dl.acm.org',
   'jstor.org',
+  // Rate-limiters
+  'venturebeat.com',
+  'linearb.io',
+  'openphilanthropy.org',
+  'metaculus.com',
+  // Government/institutional sites that block bots
+  'un.org',
   'europarl.europa.eu',
 ];
 
@@ -156,11 +163,15 @@ function loadCache(): LinkCache {
     const now = Date.now();
     const fresh: LinkCache = {};
     for (const [url, entry] of Object.entries(data)) {
-      const ttl = entry.ok
-        ? CACHE_TTL_HEALTHY_MS
-        : entry.status === -1
-          ? CACHE_TTL_UNVERIFIABLE_MS
-          : CACHE_TTL_BROKEN_MS;
+      // Check special statuses first (unverifiable/skipped have ok:true
+      // so must be checked before the ok branch)
+      const ttl = entry.status === -1
+        ? CACHE_TTL_UNVERIFIABLE_MS   // 30 days for unverifiable domains
+        : entry.status === -2
+          ? CACHE_TTL_UNVERIFIABLE_MS // 30 days for skipped domains
+          : entry.ok
+            ? CACHE_TTL_HEALTHY_MS    // 14 days for healthy URLs
+            : CACHE_TTL_BROKEN_MS;    // 3 days for broken URLs
       if (now - entry.checkedAt < ttl) {
         fresh[url] = entry;
       }
@@ -266,6 +277,7 @@ function collectContentUrls(): UrlEntry[] {
     for (const { url, line, text } of extracted) {
       const cleanUrl = url.replace(/[.,;:!?)]+$/, '');
       if (!cleanUrl.startsWith('http')) continue;
+      if (isTruncatedUrl(cleanUrl)) continue;
 
       const source: UrlSource = {
         file: relPath,
@@ -285,13 +297,31 @@ function collectContentUrls(): UrlEntry[] {
 }
 
 /**
- * Extract URLs from MDX body content (markdown links, HTML hrefs, footnotes)
+ * Check if a URL looks truncated (unbalanced parentheses from markdown parsing).
+ * e.g., https://en.wikipedia.org/wiki/P(doom gets truncated from [P(doom)](url)
+ */
+function isTruncatedUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    const path = parsed.pathname;
+    const openParens = (path.match(/\(/g) || []).length;
+    const closeParens = (path.match(/\)/g) || []).length;
+    return openParens > closeParens;
+  } catch {
+    return true; // malformed URL
+  }
+}
+
+/**
+ * Extract URLs from MDX body content (markdown links, bare URLs, HTML hrefs, footnotes)
  */
 function extractUrlsFromContent(body: string): Array<{ url: string; line: number; text: string }> {
   const urls: Array<{ url: string; line: number; text: string }> = [];
 
   // Markdown links: [text](url)
   const mdLinkRegex = /\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g;
+  // Bare URLs in text (not inside markdown link syntax)
+  const bareUrlRegex = /(?<!\[)\b(https?:\/\/[^\s<>"\])}]+)/g;
   // HTML href attributes
   const hrefRegex = /href=["'](https?:\/\/[^"']+)["']/g;
   // Footnote citations: [^n]: [text](url) or [^n]: url
@@ -299,6 +329,9 @@ function extractUrlsFromContent(body: string): Array<{ url: string; line: number
 
   const lines = body.split('\n');
   let position = 0;
+
+  // Track URLs found via markdown links to avoid double-counting with bare URL regex
+  const markdownLinkUrls = new Set<string>();
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -310,6 +343,15 @@ function extractUrlsFromContent(body: string): Array<{ url: string; line: number
       mdLinkRegex.lastIndex = 0;
       while ((match = mdLinkRegex.exec(line)) !== null) {
         urls.push({ url: match[2], line: i + 1, text: match[1] });
+        markdownLinkUrls.add(match[2]);
+      }
+
+      // Bare URLs (skip those already captured as markdown links)
+      bareUrlRegex.lastIndex = 0;
+      while ((match = bareUrlRegex.exec(line)) !== null) {
+        if (!markdownLinkUrls.has(match[1])) {
+          urls.push({ url: match[1], line: i + 1, text: '' });
+        }
       }
 
       // HTML href
@@ -402,10 +444,6 @@ function getCheckStrategy(url: string): CheckStrategy {
 
 // ─── URL Checking ───────────────────────────────────────────────────────────
 
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 /**
  * Make an HTTP request and return status info. Follows redirects manually to
  * track the final URL.
@@ -449,10 +487,19 @@ function httpCheck(url: string, method: 'HEAD' | 'GET' = 'HEAD'): Promise<{
 
       // Track redirects
       if (status >= 300 && status < 400 && res.headers.location) {
+        let redirectUrl = res.headers.location;
+        // Resolve relative redirect URLs to absolute
+        if (redirectUrl.startsWith('/')) {
+          redirectUrl = `${parsedUrl.protocol}//${parsedUrl.host}${redirectUrl}`;
+        } else if (!redirectUrl.startsWith('http')) {
+          // Relative path without leading slash
+          const basePath = parsedUrl.pathname.replace(/\/[^/]*$/, '/');
+          redirectUrl = `${parsedUrl.protocol}//${parsedUrl.host}${basePath}${redirectUrl}`;
+        }
         resolve({
           status,
           ok: true, // redirects are OK, just noteworthy
-          redirectUrl: res.headers.location,
+          redirectUrl,
           responseTimeMs: elapsed,
         });
         return;
@@ -494,7 +541,7 @@ async function doiCheck(url: string): Promise<{ status: number; ok: boolean; err
   }
 
   const doi = doiMatch[1];
-  const doiUrl = `https://doi.org/${doi}`;
+  const doiUrl = `https://doi.org/${encodeURIComponent(doi)}`;
   return httpCheck(doiUrl);
 }
 
@@ -502,14 +549,14 @@ async function doiCheck(url: string): Promise<{ status: number; ok: boolean; err
  * Check an ArXiv URL via the ArXiv API
  */
 async function arxivCheck(url: string): Promise<{ status: number; ok: boolean; error?: string; responseTimeMs: number }> {
-  const idMatch = url.match(/arxiv\.org\/(?:abs|pdf|html)\/(\d+\.\d+)(?:v\d+)?/);
-  if (!idMatch) {
+  const arxivId = extractArxivId(url);
+  if (!arxivId) {
     return httpCheck(url);
   }
 
   const start = Date.now();
   try {
-    const apiUrl = `http://export.arxiv.org/api/query?id_list=${idMatch[1]}&max_results=1`;
+    const apiUrl = `http://export.arxiv.org/api/query?id_list=${arxivId}&max_results=1`;
     const response = await fetch(apiUrl, {
       headers: { 'User-Agent': 'LongtermWikiLinkChecker/1.0' },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
@@ -617,12 +664,10 @@ async function checkSingleUrl(url: string): Promise<{
       break;
   }
 
-  // Retry once on transient failures (5xx, timeout)
+  // Retry once on transient failures (5xx, timeout) via HTTP fallback
   if (!result.ok && (result.status >= 500 || result.error === 'timeout')) {
     await sleep(RETRY_DELAY_MS);
-    const retry = strategy === 'http'
-      ? await httpCheck(url)
-      : await httpCheck(url); // fall back to HTTP for retries
+    const retry = await httpCheck(url);
     if (retry.ok) {
       return { ...retry, strategy };
     }
@@ -687,11 +732,16 @@ async function checkUrlsBatch(
   if (toCheck.length === 0) return results;
 
   let checked = 0;
-  let index = 0;
+
+  // Work queue: each worker synchronously pulls the next item before awaiting.
+  // This prevents the race where two workers read the same index after an await.
+  const queue = [...toCheck];
 
   async function worker(): Promise<void> {
-    while (index < toCheck.length) {
-      const entry = toCheck[index++];
+    while (queue.length > 0) {
+      // Synchronous pull — safe because JS is single-threaded at this point
+      // (no await between the length check and shift)
+      const entry = queue.shift()!;
       const domain = getDomain(entry.url);
 
       // Per-domain rate limiting
