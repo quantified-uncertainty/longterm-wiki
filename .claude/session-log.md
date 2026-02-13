@@ -47,6 +47,71 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 
 ---
 
+## 2026-02-13 | claude/fix-issue-105-SUiYf | Complete entityType frontmatter migration
+
+**What was done:** Added `entityType` to frontmatter of 469 MDX pages across 7 entity-required categories (people, organizations, risks, responses, models, worldviews, intelligence-paradigms). Wrote a migration script (`crux/scripts/migrate-entity-types.mjs`) that reads the CATEGORY_ENTITY_TYPES mapping and inserts the appropriate entityType into each page's frontmatter. Verified build output: all 645 pre-existing entities unchanged, 23 new auto-entities correctly created for pages that previously lacked both YAML and frontmatter entity definitions. All tests (308) pass, all blocking CI checks pass, full build succeeds.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+
+**Learnings/notes:**
+- 23 pages in entity-required categories had neither YAML entities nor frontmatter entityType — the migration surfaced these gaps
+- The frontmatter scanner correctly creates auto-entities only when no YAML entity exists (YAML takes precedence)
+- Migration is fully reversible — removing entityType from frontmatter falls back to YAML lookup
+
+---
+
+## 2026-02-13 | claude/wiki-gap-analysis-l7Cp8 | Systematic wiki gap analysis
+
+**What was done:** Ran `crux gaps list`, `crux gaps stats`, and manual topic coverage analysis across all 639 wiki pages. Identified 386 pages needing insight extraction (203 high-importance with zero insights). Produced a gap analysis report at `content/docs/internal/gap-analysis-2026-02.mdx`. Built a Suggested Pages dashboard (`app/internal/suggested-pages/`) with exactly 100 ranked page suggestions (priorities 1–100) in a sortable DataTable, using numeric priority based on mention frequency across existing pages (grep + EntityLink counts) and editorial importance. Updated gap-analysis MDX to reference the dashboard instead of inline tier lists.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+- `crux gaps` shows 0 pages when `pages.json` hasn't been built — must run `node app/scripts/build-data.mjs` first
+- The gaps tool only finds under-extracted existing pages, not truly missing topics — manual analysis needed for coverage gaps
+- Numbered lists starting at >1 without blank lines fail the markdown list formatting test
+
+**Learnings/notes:**
+- 93% of tracked pages (482/519) have zero insights — massive insight extraction backlog
+- Responses category (136 pages, 3% insight coverage) and organizations (106 pages, 0%) are most under-extracted
+- Biggest content gaps: Chinese AI labs (DeepSeek, Mistral), test-time compute, hallucination, prompt injection — all lack dedicated pages
+- Only 2 incident pages exist despite many documented AI failures
+
+---
+
+## 2026-02-13 | claude/analyze-x-epistemics-UEHWy | Create X.com Platform Epistemics page + validation rules
+
+**What was done:** Created a comprehensive analysis page for X.com's epistemic practices. After review, fixed a journal name mismatch (PNAS Nexus → Science) and restructured the Mermaid diagram to comply with the style guide. Then added two new validation rules to prevent these classes of issues in the future: `citation-doi-mismatch` (detects when link text contradicts URL DOI prefix) and `mermaid-style` (enforces max parallel nodes, total node count, and TD orientation). Both rules added to QUALITY_RULES for non-blocking advisory checks.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue)
+- better-sqlite3 native module needed manual rebuild (`npx node-gyp rebuild`)
+- Crux content create pipeline's synthesis step hangs indefinitely (spawns `claude -p --print` subprocess that never completes)
+- vitest and next binaries not on PATH after pnpm install; needed to invoke from full paths in node_modules
+
+**Learnings/notes:**
+- The `--source-file` flag in crux content create successfully bypasses external API research phases
+- The synthesis step spawns a claude subprocess that may not work reliably in all environments
+- Page was written manually following the knowledge-base-response template structure with proper frontmatter, EntityLinks, and citations
+- The citation-doi-mismatch rule maps DOI prefixes (e.g., 10.1126 = Science) to expected journal names — catches a common LLM synthesis error
+- The mermaid-style rule found 183 pre-existing warnings across the codebase, all non-blocking
+
+---
+
+## 2026-02-13 | claude/review-wiki-report-XQW88 | Review and rewrite E686 OpenClaw Matplotlib Incident
+
+**What was done:** Two-pass review and rewrite of the E686 wiki page. First pass: cut redundant theoretical sections, added investigative sections ("The Agent's Identity and Background", "Was This Really an Autonomous Agent?"), added HN stats, PR reaction ratios, agent apology, Klymak quote, media coverage. Second pass: deep investigation of agent's digital footprint — found two git commit emails (`crabby.rathbun@gmail.com` and `mj@crabbyrathbun.dev`), the `crabbyrathbun.dev` domain purchase, GitHub Issues #4/#17/#24 revealing SOUL.md refusal and operator acknowledgment, commit timestamp analysis, 26 computational chemistry forks, pump.fun memecoins (\$569K peak market cap), and zero-following GitHub pattern. Added 13 new sources total.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+
+**Learnings/notes:**
+- The `crabbyrathbun.dev` domain WHOIS is the strongest unexplored lead for operator identification
+- pump.fun tokens were created AFTER virality (Feb 13), not by the operator — opportunistic third parties
+- Commit timestamps for human-setup activities cluster at 18:00-19:00 UTC (ambiguous timezone)
+
+---
+
 ## 2026-02-13 | claude/cross-reference-audit-9EGQp | Cross-reference audit across wiki pages
 
 **What was done:** Audited ~40 wiki pages across 5 topic clusters (compute governance, alignment/interpretability, bio risk/misuse, organizations, scaling/race dynamics) for consistency and cross-linking. Fixed factual inconsistency in misuse-risks.mdx (cyber CTF scores: 87% → 76% to match detailed data tables). Clarified interpretability coverage discrepancy (5% mechanistic vs 15% behavior coverage) in capability-alignment-race.mdx. Added ~30 missing EntityLinks across 12 files connecting related pages that discussed the same topics without cross-references.
