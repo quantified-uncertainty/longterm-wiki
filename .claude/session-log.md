@@ -2,17 +2,17 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
-## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Add per-page editLog to frontmatter
+## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Add per-page edit log system
 
-**What was done:** Added an `editLog` array field to page frontmatter that tracks how each page was created/modified. Each entry records date, method (crux-create, crux-improve, crux-grade, claude-code, manual, bulk-update), who requested it, and a free-text note. Integrated into the Crux create, improve, and grade pipelines so entries are appended automatically.
+**What was done:** Added a file-based edit log system (`data/edit-logs/<page-id>.yaml`) that tracks how each page was created/modified. Each entry records date, tool used, agency (human/ai-directed/automated), who requested it, and a free-text note. Chose external files over frontmatter to avoid LLM corruption risk and keep frontmatter clean. Integrated into Crux create (deployment.ts), improve (page-improver.ts), and grade (grade-content.ts) pipelines with 6 new unit tests.
 
 **Issues encountered:**
-- None
+- First implementation was frontmatter-based; reworked to file-based after design review
 
 **Learnings/notes:**
-- `appendEditLogEntry()` exported from page-improver.ts for reuse by other scripts
-- The repairFrontmatter function's knownSubKeys set needed editLog entry sub-keys (date, method, by, note) to avoid incorrect dedenting
-- grade-content.ts uses the `yaml` library to parse/stringify, so editLog Date objects need explicit conversion to strings
+- Storing structured data in frontmatter is risky because LLMs rewrite the entire file during improve; external files sidestep this
+- Three-field schema (tool + agency + requestedBy) captures more nuance than a single "method" field
+- `crux/lib/edit-log.ts` exports `appendEditLog()` and `readEditLog()` for use by any script
 
 ---
 

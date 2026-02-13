@@ -251,11 +251,6 @@ ratings:
   rigor: 6
   actionability: 5
   completeness: 6
-editLog:
-  - date: "${new Date().toISOString().split('T')[0]}"
-    method: crux-create
-    by: system
-    note: "Initial page creation via Crux pipeline"
 ---
 import {EntityLink, R, DataInfoBox, DataExternalLinks} from '@components/wiki';
 

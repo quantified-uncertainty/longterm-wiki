@@ -37,6 +37,7 @@ import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { countFootnoteRefs } from '../lib/metrics-extractor.ts';
+import { appendEditLog } from '../lib/edit-log.ts';
 import {
   insiderJargonRule,
   falseCertaintyRule,
@@ -761,30 +762,9 @@ function applyGradesToFile(page: PageInfo, grades: GradeResult, metrics: Metrics
   // by app/scripts/lib/metrics-extractor.mjs — not stored in frontmatter.
   delete fm.metrics;
 
-  // Append edit log entry for grading
-  const today = new Date().toISOString().split('T')[0];
-  if (!Array.isArray(fm.editLog)) {
-    fm.editLog = [];
-  }
-  (fm.editLog as Array<Record<string, string>>).push({
-    date: today,
-    method: 'crux-grade',
-    by: 'system',
-    note: `Quality graded: ${derivedQuality}, importance: ${grades.importance}`,
-  });
-
   // Ensure lastEdited is a string (not Date object)
   if (fm.lastEdited instanceof Date) {
     fm.lastEdited = fm.lastEdited.toISOString().split('T')[0];
-  }
-
-  // Ensure editLog dates are strings (YAML parser may convert to Date objects)
-  if (Array.isArray(fm.editLog)) {
-    for (const entry of fm.editLog as Array<Record<string, unknown>>) {
-      if (entry.date instanceof Date) {
-        entry.date = (entry.date as Date).toISOString().split('T')[0];
-      }
-    }
   }
 
   // Reconstruct file with proper quoting for date strings
@@ -1017,7 +997,14 @@ async function main(): Promise<void> {
         let applied = false;
         if (options.apply) {
           applied = applyGradesToFile(page, grades, metrics, derivedQuality);
-          if (!applied) {
+          if (applied) {
+            appendEditLog(page.id, {
+              tool: 'crux-grade',
+              agency: 'automated',
+              requestedBy: 'system',
+              note: `Quality graded: ${derivedQuality}, importance: ${grades.importance.toFixed(1)}`,
+            });
+          } else {
             console.error(`  Failed to apply grades to ${page.filePath}`);
           }
         }

@@ -67,12 +67,6 @@ const frontmatterSchema = z.object({
   roles: z.array(z.string()).optional(),
   pageTemplate: z.string().optional(),
   createdAt: z.union([z.date(), z.string()]).optional(), // YAML parser returns dates as strings or Date objects
-  editLog: z.array(z.object({
-    date: z.union([z.string(), z.date()]),
-    method: z.enum(['crux-create', 'crux-improve', 'crux-grade', 'claude-code', 'manual', 'bulk-update']),
-    by: z.string().optional(),
-    note: z.string().optional(),
-  })).optional(),
 }).passthrough();
 
 export const frontmatterSchemaRule = {
