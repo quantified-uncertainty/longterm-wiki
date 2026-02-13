@@ -707,6 +707,24 @@ export function getEntityInfoBoxData(entityId: string) {
     scope = entity.scope;
   }
 
+  // Resolve summaryPage to title + href
+  let summaryPage: { title: string; href: string } | undefined;
+  if (entity.summaryPage) {
+    const summaryEntity = getTypedEntityById(entity.summaryPage);
+    const summaryPageData = getPageById(entity.summaryPage);
+    const summaryTitle =
+      summaryEntity?.title ||
+      summaryPageData?.title ||
+      entity.summaryPage
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+    summaryPage = {
+      title: summaryTitle,
+      href: getEntityHref(entity.summaryPage),
+    };
+  }
+
   return {
     type: entity.entityType,
     title: entity.title,
@@ -720,6 +738,7 @@ export function getEntityInfoBoxData(entityId: string) {
     category,
     maturity,
     relatedSolutions,
+    summaryPage,
     // Person
     affiliation,
     role,

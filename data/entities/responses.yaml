@@ -3121,6 +3121,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: cirl
   numericId: E586
   type: approach
@@ -3173,6 +3174,7 @@
     - epistemics
     - governance
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: community-notes-for-everything
   numericId: E589
   type: approach
@@ -3225,6 +3227,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: epistemic-virtue-evals
   numericId: E592
   type: approach
@@ -3266,10 +3269,12 @@
     - epistemics
     - community
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: mit-ai-risk-repository
   numericId: E383
   type: project
   title: MIT AI Risk Repository
+  summaryPage: epistemic-tools-tools-overview
   description: >-
     The MIT AI Risk Repository catalogs 1,700+ AI risks from 65+ frameworks into
     a searchable database with dual taxonomies (causal and domain-based).
@@ -3307,6 +3312,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: output-filtering
   numericId: E595
   type: approach
@@ -3415,6 +3421,7 @@
     - ai-safety
     - community
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: stampy-aisafety-info
   numericId: E382
   type: project
@@ -3430,6 +3437,7 @@
     - community
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: texas-traiga
   numericId: E602
   type: policy
@@ -3457,6 +3465,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: wikipedia-views
   numericId: E390
   type: project
@@ -3469,6 +3478,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 
 - id: goal-misgeneralization-research
   numericId: E633
