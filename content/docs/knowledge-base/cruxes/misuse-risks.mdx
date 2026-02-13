@@ -4,7 +4,7 @@ description: "Key uncertainties that determine views on AI misuse risks, includi
 sidebar:
   order: 2
 quality: 65
-llmSummary: "Comprehensive analysis of 13 AI misuse cruxes with quantified evidence showing mixed uplift (RAND bio study found no significant difference, but cyber CTF scores improved 27%→87% in 4 months), deepfake incidents projected at 8M by 2025 (up from 500K in 2023), and human detection accuracy at only 24.5%. Framework explicitly maps uncertainties to policy responses (restrictions, compute governance, detection systems) with probability ranges for each position."
+llmSummary: "Comprehensive analysis of 13 AI misuse cruxes with quantified evidence showing mixed uplift (RAND bio study found no significant difference, but cyber CTF scores improved 27%→76% in 3 months), deepfake incidents projected at 8M by 2025 (up from 500K in 2023), and human detection accuracy at only 24.5%. Framework explicitly maps uncertainties to policy responses (restrictions, compute governance, detection systems) with probability ranges for each position."
 lastEdited: "2026-01-30"
 importance: 82.5
 update_frequency: 7
@@ -24,7 +24,7 @@ import {Crux, CruxList, DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid} 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | **Overall Severity** | High | AI misuse incidents rose 8x since 2022; <EntityLink id="E96">deepfakes</EntityLink> responsible for 6.5% of all fraud ([AI Incident Database](https://incidentdatabase.ai/)) |
-| **Current Uplift Evidence** | Mixed | RAND 2024 <EntityLink id="E42">bioweapons</EntityLink> study found no significant uplift; <EntityLink id="E218">OpenAI</EntityLink> cyber CTF scores improved 27% to 87% in 4 months ([RAND](https://www.rand.org/pubs/research_reports/RRA2977-2.html), [OpenAI](https://openai.com/index/strengthening-cyber-resilience/)) |
+| **Current Uplift Evidence** | Mixed | RAND 2024 <EntityLink id="E42">bioweapons</EntityLink> study found no significant uplift; <EntityLink id="E218">OpenAI</EntityLink> cyber CTF scores improved 27% to 76% in 3 months ([RAND](https://www.rand.org/pubs/research_reports/RRA2977-2.html), [OpenAI](https://openai.com/index/strengthening-cyber-resilience/)) |
 | **Bioweapons Risk** | Contested | 13/57 AI bio-tools rated "Red" risk; OpenAI o3 at 94th percentile virology; wet-lab bottleneck may dominate |
 | **Cyber Risk** | Escalating | 68% of analysts say AI phishing harder to detect; 703% increase in credential phishing H2 2024 ([Deepstrike](https://deepstrike.io/blog/ai-cybersecurity-threats-2025)) |
 | **<EntityLink id="E102">Disinformation</EntityLink> Risk** | High | Deepfake fraud up 2,137% since 2022; human detection accuracy only 24.5% ([UNESCO](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing)) |
@@ -45,7 +45,7 @@ Misuse risk cruxes are the fundamental uncertainties that shape how policymakers
 
 Current evidence remains mixed across domains. The <R id="0fe4cfa7ca5f2270">RAND biological uplift study</R> (January 2024) tested 15 red teams with and without LLM access, finding no statistically significant difference in bioweapon attack plan viability. However, RAND's subsequent [Global Risk Index for AI-enabled Biological Tools](https://www.rand.org/randeurope/research/projects/2024/ai-risk-index.html) (2024) evaluated 57 state-of-the-art tools and indexed 13 as "Red" (action required), with one tool reaching the highest level of critical misuse-relevant capabilities. Meanwhile, <R id="2b6675e423040e53">CNAS analyses</R> and [Georgetown CSET research](https://cset.georgetown.edu/publication/how-to-assess-the-likelihood-of-malicious-use-of-advanced-ai-systems/) emphasize that rapid capability improvements require ongoing reassessment.
 
-In cybersecurity, [OpenAI's threat assessment](https://openai.com/index/strengthening-cyber-resilience/) (December 2025) notes that AI cyber capabilities improved from 27% to 87% on capture-the-flag benchmarks between August and December 2025, with [GPT-5.2-Codex](https://openai.com/index/introducing-gpt-5-2-codex/) achieving the highest scores. According to [Deepstrike's 2025 analysis](https://deepstrike.io/blog/ai-cybersecurity-threats-2025), 68% of cyber threat analysts report AI-generated phishing is harder to detect than ever, with a 703% increase in credential phishing attacks in H2 2024. Deepfake incidents grew from 500,000 files in 2023 to a projected 8 million in 2025 ([Keepnet Labs](https://keepnetlabs.com/blog/deepfake-statistics-and-trends)), with businesses losing an average of \$100,000 per deepfake-related fraud incident and the [\$25.6 million Hong Kong deepfake fraud case](https://sqmagazine.co.uk/deepfake-statistics/) serving as a landmark incident.
+In cybersecurity, [OpenAI's threat assessment](https://openai.com/index/strengthening-cyber-resilience/) (2025) notes that AI cyber capabilities improved from 27% to 76% on capture-the-flag benchmarks between August and November 2025, with [GPT-5.2-Codex](https://openai.com/index/introducing-gpt-5-2-codex/) achieving the highest scores. According to [Deepstrike's 2025 analysis](https://deepstrike.io/blog/ai-cybersecurity-threats-2025), 68% of cyber threat analysts report AI-generated phishing is harder to detect than ever, with a 703% increase in credential phishing attacks in H2 2024. Deepfake incidents grew from 500,000 files in 2023 to a projected 8 million in 2025 ([Keepnet Labs](https://keepnetlabs.com/blog/deepfake-statistics-and-trends)), with businesses losing an average of \$100,000 per deepfake-related fraud incident and the [\$25.6 million Hong Kong deepfake fraud case](https://sqmagazine.co.uk/deepfake-statistics/) serving as a landmark incident.
 
 The stakes are substantial: if AI provides significant capability uplift to malicious actors, urgent restrictions on model access and compute governance become critical. If defenses can keep pace with offensive capabilities, investment priorities shift toward detection and response systems rather than prevention.
 
@@ -61,7 +61,7 @@ flowchart TD
 
     subgraph Domains["Risk Domains"]
         BIO[Bioweapons<br/>RAND: no significant uplift]
-        CYBER[Cyberweapons<br/>CTF: 27% to 87%]
+        CYBER[Cyberweapons<br/>CTF: 27% to 76%]
         DISINFO[Disinformation<br/>8M deepfakes by 2025]
         AWS[Autonomous Weapons<br/>UN Resolution 166-3]
     end

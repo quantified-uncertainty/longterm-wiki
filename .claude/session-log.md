@@ -2,6 +2,21 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/cross-reference-audit-9EGQp | Cross-reference audit across wiki pages
+
+**What was done:** Audited ~40 wiki pages across 5 topic clusters (compute governance, alignment/interpretability, bio risk/misuse, organizations, scaling/race dynamics) for consistency and cross-linking. Fixed factual inconsistency in misuse-risks.mdx (cyber CTF scores: 87% → 76% to match detailed data tables). Clarified interpretability coverage discrepancy (5% mechanistic vs 15% behavior coverage) in capability-alignment-race.mdx. Added ~30 missing EntityLinks across 12 files connecting related pages that discussed the same topics without cross-references.
+
+**Issues encountered:**
+- Background agents lost their output files between turns, requiring restart of all 5 audit agents
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+
+**Learnings/notes:**
+- Many pages use E-number IDs (E22, E98, etc.) which map to kebab-case IDs in YAML via numericId field; both formats work in EntityLinks
+- The "interpretability coverage" metric means different things on different pages: mechanistic understanding (<5%) vs behavior coverage (15-25%) — both are valid but should be labeled clearly
+- compute-hardware.mdx had zero EntityLinks in its body text despite being a critical hub page; now has links to labs, EU AI Act, and US EO
+
+---
+
 ## 2026-02-13 | claude/add-llm-warning-banner-aWFt0 | Add LLM warning banner to wiki pages
 
 **What was done:** Added a dismissible warning banner to all wiki pages informing readers that content was written by an LLM with minimal human supervision. The banner uses localStorage to persist dismissal, so once closed it stays hidden across all pages.
