@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: agentic-ai
+  numericId: E2
   type: capability
   title: Agentic AI
   customFields:
@@ -35,6 +36,7 @@
     - ai-control
   lastUpdated: 2025-12
 - id: coding
+  numericId: E61
   type: capability
   title: Autonomous Coding
   customFields:
@@ -67,6 +69,7 @@
     - ai-assisted-development
   lastUpdated: 2025-12
 - id: language-models
+  numericId: E186
   type: capability
   title: Large Language Models
   customFields:
@@ -102,6 +105,7 @@
     - claude
   lastUpdated: 2025-12
 - id: long-horizon
+  numericId: E192
   type: capability
   title: Long-Horizon Autonomous Tasks
   customFields:
@@ -137,6 +141,7 @@
     - memory-systems
   lastUpdated: 2025-12
 - id: persuasion
+  numericId: E224
   type: capability
   title: Persuasion and Social Manipulation
   customFields:
@@ -173,6 +178,7 @@
     - human-autonomy
   lastUpdated: 2025-12
 - id: reasoning
+  numericId: E246
   type: capability
   title: Reasoning and Planning
   customFields:
@@ -208,6 +214,7 @@
     - philosophy
   lastUpdated: 2025-12
 - id: rlhf
+  numericId: E259
   type: capability
   title: RLHF
   customFields:
@@ -227,6 +234,7 @@
     - human-feedback
     - alignment
 - id: scientific-research
+  numericId: E277
   type: capability
   title: Scientific Research Capabilities
   customFields:
@@ -264,6 +272,7 @@
     - bioweapons-risk
   lastUpdated: 2025-12
 - id: self-improvement
+  numericId: E278
   type: capability
   title: Self-Improvement and Recursive Enhancement
   customFields:
@@ -302,6 +311,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: situational-awareness
+  numericId: E282
   type: capability
   title: Situational Awareness
   customFields:
@@ -371,6 +381,7 @@
     - training-gaming
   lastUpdated: 2025-12
 - id: tool-use
+  numericId: E356
   type: capability
   title: Tool Use and Computer Use
   customFields:
@@ -410,6 +421,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: biological-organoid
+  numericId: E491
   type: capability
   title: Biological / Organoid Computing
   description: >-
@@ -423,6 +435,7 @@
     - biorisks
   lastUpdated: 2026-02
 - id: brain-computer-interfaces
+  numericId: E492
   type: capability
   title: Brain-Computer Interfaces
   description: >-
@@ -435,6 +448,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: collective-intelligence
+  numericId: E493
   type: capability
   title: Collective Intelligence / Coordination
   description: >-
@@ -446,6 +460,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: genetic-enhancement
+  numericId: E494
   type: capability
   title: Genetic Enhancement / Selection
   description: >-
@@ -459,6 +474,7 @@
     - biorisks
   lastUpdated: 2026-02
 - id: light-scaffolding
+  numericId: E495
   type: capability
   title: Light Scaffolding
   description: >-
@@ -472,6 +488,7 @@
     - governance
   lastUpdated: 2026-02
 - id: minimal-scaffolding
+  numericId: E496
   type: capability
   title: Minimal Scaffolding
   description: >-
@@ -484,6 +501,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: neuro-symbolic
+  numericId: E497
   type: capability
   title: Neuro-Symbolic Hybrid Systems
   description: >-
@@ -496,6 +514,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: neuromorphic
+  numericId: E498
   type: capability
   title: Neuromorphic Hardware
   description: >-
@@ -508,6 +527,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: novel-unknown
+  numericId: E499
   type: capability
   title: Novel / Unknown Approaches
   description: >-
@@ -520,6 +540,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: sparse-moe
+  numericId: E500
   type: capability
   title: Sparse / MoE Transformers
   description: >-
@@ -532,6 +553,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ssm-mamba
+  numericId: E501
   type: capability
   title: State-Space Models / Mamba
   description: >-
@@ -544,6 +566,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: whole-brain-emulation
+  numericId: E502
   type: capability
   title: Whole Brain Emulation
   description: >-
@@ -556,6 +579,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: world-models
+  numericId: E503
   type: capability
   title: World Models + Planning
   description: >-

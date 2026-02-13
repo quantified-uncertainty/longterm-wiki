@@ -1,4 +1,5 @@
 - id: "tmc-technical-ai-safety"
+  numericId: E353
   type: "ai-transition-model-subitem"
   title: "Technical AI Safety"
   parentFactor: "misalignment-potential"
@@ -264,6 +265,7 @@
         strength: "strong"
         effect: "decreases"
 - id: "tmc-ai-governance"
+  numericId: E301
   type: "ai-transition-model-subitem"
   title: "AI Governance"
   parentFactor: "misalignment-potential"
@@ -428,6 +430,7 @@
         strength: "medium"
         effect: "increases"
 - id: "tmc-lab-safety"
+  numericId: E332
   type: "ai-transition-model-subitem"
   title: "Lab Safety Practices"
   parentFactor: "misalignment-potential"

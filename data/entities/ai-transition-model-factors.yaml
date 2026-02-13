@@ -1,4 +1,5 @@
 - id: misalignment-potential
+  numericId: E205
   type: ai-transition-model-factor
   title: Misalignment Potential
   description: The aggregate risk that AI systems pursue goals misaligned with human values—combining
@@ -225,6 +226,7 @@
         strength: medium
         effect: mixed
 - id: misuse-potential
+  numericId: E207
   type: ai-transition-model-factor
   title: Misuse Potential
   description: The aggregate risk from deliberate harmful use of AI—including biological weapons,
@@ -462,6 +464,7 @@
         strength: medium
         effect: mixed
 - id: ai-capabilities
+  numericId: E5
   type: ai-transition-model-factor
   title: AI Capabilities
   description: The aggregate advancement of AI system capabilities—including reasoning, autonomy,
@@ -676,6 +679,7 @@
         strength: medium
         effect: mixed
 - id: ai-uses
+  numericId: E17
   type: ai-transition-model-factor
   title: AI Uses
   description: How AI capabilities are deployed across sectors—including research acceleration,
@@ -921,6 +925,7 @@
         strength: medium
         effect: mixed
 - id: ai-ownership
+  numericId: E11
   type: ai-transition-model-factor
   title: AI Ownership
   description: The distribution of control over AI systems across actors—countries, companies, and
@@ -1149,6 +1154,7 @@
         strength: medium
         effect: mixed
 - id: civilizational-competence
+  numericId: E60
   type: ai-transition-model-factor
   title: Civilizational Competence
   description: Society's aggregate capacity to navigate AI transition well—including governance
@@ -1392,6 +1398,7 @@
         strength: medium
         effect: mixed
 - id: transition-turbulence
+  numericId: E358
   type: ai-transition-model-factor
   title: Transition Turbulence
   description: The severity of disruption during the AI transition period—economic displacement,

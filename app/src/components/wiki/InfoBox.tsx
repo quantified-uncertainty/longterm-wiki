@@ -61,6 +61,8 @@ export interface InfoBoxProps {
   policyStatus?: string;
   policyAuthor?: string;
   scope?: string;
+  // Summary/overview page this entity belongs to
+  summaryPage?: { title: string; href: string };
 }
 
 
@@ -166,6 +168,7 @@ export function InfoBox({
   policyStatus,
   policyAuthor,
   scope,
+  summaryPage,
 }: InfoBoxProps) {
   const typeInfo = getEntityTypeHeader(type, orgType);
 
@@ -238,6 +241,16 @@ export function InfoBox({
         <span className="block text-[10px] uppercase tracking-wide opacity-90 mb-0.5">{typeInfo.label}</span>
         {title && <h3 className="m-0 text-sm font-semibold leading-tight text-white">{title}</h3>}
       </div>
+
+      {/* Summary Page — "Part of" breadcrumb */}
+      {summaryPage && (
+        <div className="px-4 py-1.5 border-b border-border bg-muted/30">
+          <span className="text-[0.7rem] text-muted-foreground">Part of </span>
+          <Link href={summaryPage.href} className="text-[0.7rem] text-accent-foreground no-underline hover:underline font-medium">
+            {summaryPage.title}
+          </Link>
+        </div>
+      )}
 
       {/* Description — expandable if text overflows 3 lines */}
       {description && <InfoBoxDescription description={description} />}

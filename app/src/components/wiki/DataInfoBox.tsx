@@ -79,6 +79,8 @@ export function DataInfoBox({ entityId, type: inlineType, ...inlineProps }: Data
           policyStatus={data.policyStatus}
           policyAuthor={data.policyAuthor}
           scope={data.scope}
+          // Summary page
+          summaryPage={data.summaryPage}
           {...inlineProps}
         />
       </HideableInfoBox>

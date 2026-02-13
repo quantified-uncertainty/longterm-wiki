@@ -31,7 +31,7 @@ longterm-wiki/
 │   ├── resources/              # External resource links
 │   ├── insights/               # Cross-page insights
 │   ├── graphs/                 # Cause-effect graph data
-│   └── id-registry.json        # Persistent numeric ID mapping
+│   └── id-registry.json        # Derived build artifact (gitignored)
 ├── app/                        # Next.js 15 frontend
 │   ├── src/                    # App source code
 │   ├── scripts/                # Build scripts (build-data.mjs)

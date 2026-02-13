@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: authentication-collapse
+  numericId: E27
   type: risk
   title: Authentication Collapse
   severity: critical
@@ -55,6 +56,7 @@
     - provenance
   lastUpdated: 2025-12
 - id: authoritarian-tools
+  numericId: E30
   type: risk
   title: AI Authoritarian Tools
   severity: high
@@ -110,6 +112,7 @@
     - governance
   lastUpdated: 2025-12
 - id: automation-bias
+  numericId: E32
   type: risk
   title: Automation Bias
   severity: medium
@@ -149,6 +152,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: autonomous-weapons
+  numericId: E35
   type: risk
   title: Autonomous Weapons
   severity: high
@@ -198,6 +202,7 @@
     - warfare
   lastUpdated: 2025-12
 - id: bioweapons
+  numericId: E42
   type: risk
   title: Bioweapons Risk
   severity: catastrophic
@@ -257,6 +262,7 @@
     - ai-misuse
   lastUpdated: 2025-12
 - id: concentration-of-power
+  numericId: E68
   type: risk
   title: Concentration of Power
   severity: high
@@ -306,6 +312,7 @@
     - lock-in
   lastUpdated: 2025-12
 - id: consensus-manufacturing
+  numericId: E72
   type: risk
   title: Consensus Manufacturing
   severity: high
@@ -361,6 +368,7 @@
     - democratic-process
   lastUpdated: 2025-12
 - id: corrigibility-failure
+  numericId: E80
   type: risk
   title: Corrigibility Failure
   severity: catastrophic
@@ -399,6 +407,7 @@
     - self-preservation
   lastUpdated: 2025-12
 - id: cyber-psychosis
+  numericId: E83
   type: risk
   title: Cyber Psychosis
   severity: medium-high
@@ -455,6 +464,7 @@
     - disinformation
   lastUpdated: 2025-12
 - id: cyberweapons
+  numericId: E86
   type: risk
   title: Cyberweapons Risk
   severity: high
@@ -508,6 +518,7 @@
     - national-security
   lastUpdated: 2025-12
 - id: deceptive-alignment
+  numericId: E93
   type: risk
   title: Deceptive Alignment
   severity: catastrophic
@@ -553,6 +564,7 @@
     - interpretability
   lastUpdated: 2025-12
 - id: deepfakes
+  numericId: E96
   type: risk
   title: Deepfakes
   severity: medium-high
@@ -606,6 +618,7 @@
     - ai-misuse
   lastUpdated: 2025-12
 - id: disinformation
+  numericId: E102
   type: risk
   title: AI Disinformation
   severity: high
@@ -658,6 +671,7 @@
     - deepfakes
   lastUpdated: 2025-12
 - id: distributional-shift
+  numericId: E105
   type: risk
   title: Distributional Shift
   severity: medium
@@ -692,6 +706,7 @@
     - deployment
   lastUpdated: 2025-12
 - id: economic-disruption
+  numericId: E108
   type: risk
   title: Economic Disruption
   severity: medium-high
@@ -746,6 +761,7 @@
     - economic-policy
   lastUpdated: 2025-12
 - id: emergent-capabilities
+  numericId: E117
   type: risk
   title: Emergent Capabilities
   severity: high
@@ -788,6 +804,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: enfeeblement
+  numericId: E118
   type: risk
   title: Enfeeblement
   severity: medium-high
@@ -840,6 +857,7 @@
     - long-term
   lastUpdated: 2025-12
 - id: epistemic-collapse
+  numericId: E119
   type: risk
   title: Epistemic Collapse
   severity: high
@@ -879,6 +897,7 @@
     - democracy
   lastUpdated: 2025-12
 - id: erosion-of-agency
+  numericId: E126
   type: risk
   title: Erosion of Human Agency
   severity: medium-high
@@ -932,6 +951,7 @@
     - digital-rights
   lastUpdated: 2025-12
 - id: expertise-atrophy
+  numericId: E133
   type: risk
   title: Expertise Atrophy
   severity: high
@@ -988,6 +1008,7 @@
     - resilience
   lastUpdated: 2025-12
 - id: flash-dynamics
+  numericId: E142
   type: risk
   title: Flash Dynamics
   severity: high
@@ -1035,6 +1056,7 @@
     - human-oversight
   lastUpdated: 2025-12
 - id: fraud
+  numericId: E145
   type: risk
   title: AI-Powered Fraud
   severity: high
@@ -1085,6 +1107,7 @@
     - identity
   lastUpdated: 2025-12
 - id: goal-misgeneralization
+  numericId: E151
   type: risk
   title: Goal Misgeneralization
   severity: high
@@ -1127,6 +1150,7 @@
     - out-of-distribution
   lastUpdated: 2025-12
 - id: historical-revisionism
+  numericId: E155
   type: risk
   title: AI-Enabled Historical Revisionism
   severity: high
@@ -1179,6 +1203,7 @@
     - collective-memory
   lastUpdated: 2025-12
 - id: institutional-capture
+  numericId: E166
   type: risk
   title: Institutional Decision Capture
   severity: high
@@ -1238,6 +1263,7 @@
     - institutional-risk
   lastUpdated: 2025-12
 - id: instrumental-convergence
+  numericId: E168
   type: risk
   title: Instrumental Convergence
   severity: high
@@ -1281,6 +1307,7 @@
     - orthogonality-thesis
   lastUpdated: 2025-12
 - id: irreversibility
+  numericId: E179
   type: risk
   title: Irreversibility
   severity: critical
@@ -1332,6 +1359,7 @@
     - long-term-future
   lastUpdated: 2025-12
 - id: knowledge-monopoly
+  numericId: E183
   type: risk
   title: AI Knowledge Monopoly
   severity: critical
@@ -1387,6 +1415,7 @@
     - information-infrastructure
   lastUpdated: 2025-12
 - id: learned-helplessness
+  numericId: E187
   type: risk
   title: Epistemic Learned Helplessness
   severity: high
@@ -1440,6 +1469,7 @@
     - democratic-decay
   lastUpdated: 2025-12
 - id: legal-evidence-crisis
+  numericId: E188
   type: risk
   title: Legal Evidence Crisis
   severity: high
@@ -1497,6 +1527,7 @@
     - content-provenance
   lastUpdated: 2025-12
 - id: lock-in
+  numericId: E189
   type: risk
   title: Lock-in
   severity: catastrophic
@@ -1553,6 +1584,7 @@
     - long-term
   lastUpdated: 2025-12
 - id: authoritarian-takeover
+  numericId: E29
   type: risk
   title: Authoritarian Takeover
   severity: catastrophic
@@ -1595,6 +1627,7 @@
     - lock-in
   lastUpdated: 2025-12
 - id: mesa-optimization
+  numericId: E197
   type: risk
   title: Mesa-Optimization
   severity: catastrophic
@@ -1638,6 +1671,7 @@
     - base-optimizer
   lastUpdated: 2025-12
 - id: multipolar-trap
+  numericId: E209
   type: risk
   title: Multipolar Trap
   severity: high
@@ -1686,6 +1720,7 @@
     - collective-action
   lastUpdated: 2025-12
 - id: power-seeking
+  numericId: E226
   type: risk
   title: Power-Seeking AI
   severity: catastrophic
@@ -1729,6 +1764,7 @@
     - resource-acquisition
   lastUpdated: 2025-12
 - id: preference-manipulation
+  numericId: E230
   type: risk
   title: Preference Manipulation
   severity: high
@@ -1784,6 +1820,7 @@
     - digital-manipulation
   lastUpdated: 2025-12
 - id: proliferation
+  numericId: E232
   type: risk
   title: AI Proliferation
   severity: high
@@ -1834,6 +1871,7 @@
     - regulation
   lastUpdated: 2025-12
 - id: racing-dynamics
+  numericId: E239
   type: risk
   title: Racing Dynamics
   severity: high
@@ -1885,6 +1923,7 @@
     - arms-race
   lastUpdated: 2025-12
 - id: reality-fragmentation
+  numericId: E244
   type: risk
   title: Reality Fragmentation
   severity: high
@@ -1941,6 +1980,7 @@
     - shared-reality
   lastUpdated: 2025-12
 - id: reward-hacking
+  numericId: E253
   type: risk
   title: Reward Hacking
   severity: high
@@ -1985,6 +2025,7 @@
     - proxy-gaming
   lastUpdated: 2025-12
 - id: sandbagging
+  numericId: E270
   type: risk
   title: Sandbagging
   severity: high
@@ -2025,6 +2066,7 @@
     - red-teaming
   lastUpdated: 2025-12
 - id: scheming
+  numericId: E274
   type: risk
   title: Scheming
   severity: catastrophic
@@ -2074,6 +2116,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: scientific-corruption
+  numericId: E276
   type: risk
   title: Scientific Knowledge Corruption
   severity: high
@@ -2132,6 +2175,7 @@
     - ai-detection
   lastUpdated: 2025-12
 - id: sharp-left-turn
+  numericId: E281
   type: risk
   title: Sharp Left Turn
   severity: catastrophic
@@ -2172,6 +2216,7 @@
     - takeoff-speed
   lastUpdated: 2025-12
 - id: surveillance
+  numericId: E292
   type: risk
   title: AI Mass Surveillance
   severity: high
@@ -2225,6 +2270,7 @@
     - governance
   lastUpdated: 2025-12
 - id: sycophancy
+  numericId: E295
   type: risk
   title: Sycophancy
   severity: medium
@@ -2266,6 +2312,7 @@
     - ai-assistants
   lastUpdated: 2025-12
 - id: epistemic-sycophancy
+  numericId: E124
   type: risk
   title: Epistemic Sycophancy
   severity: medium-high
@@ -2319,6 +2366,7 @@
     - epistemic-integrity
   lastUpdated: 2025-12
 - id: treacherous-turn
+  numericId: E359
   type: risk
   title: Treacherous Turn
   severity: catastrophic
@@ -2360,6 +2408,7 @@
     - corrigibility
   lastUpdated: 2025-12
 - id: rogue-ai-scenarios
+  numericId: E490
   type: risk
   title: Rogue AI Scenarios
   severity: catastrophic
@@ -2407,6 +2456,7 @@
     - delegation
   lastUpdated: 2026-02
 - id: trust-cascade
+  numericId: E360
   type: risk
   title: Trust Cascade Failure
   severity: critical
@@ -2462,6 +2512,7 @@
     - democratic-backsliding
   lastUpdated: 2025-12
 - id: trust-decline
+  numericId: E362
   type: risk
   title: Trust Decline
   severity: medium-high
@@ -2499,6 +2550,7 @@
     - polarization
   lastUpdated: 2025-12
 - id: winner-take-all
+  numericId: E374
   type: risk
   title: Winner-Take-All Dynamics
   severity: high
@@ -2544,6 +2596,7 @@
     - regional-development
   lastUpdated: 2025-12
 - id: autonomous-replication
+  numericId: E34
   type: risk
   title: Autonomous Replication
   description: Risk of AI systems copying themselves to new hardware or cloud instances without authorization.
@@ -2566,6 +2619,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: cyber-offense
+  numericId: E82
   type: risk
   title: AI-Enabled Cyberattacks
   description: Risk of AI systems being used to discover vulnerabilities, craft exploits, or conduct sophisticated cyberattacks.
@@ -2583,6 +2637,7 @@
     - dangerous-capabilities
   lastUpdated: 2025-12
 - id: bio-risk
+  numericId: E40
   type: risk
   title: AI-Enabled Biological Risks
   description: Risk of AI systems enabling creation or enhancement of biological weapons or dangerous pathogens.
@@ -2603,6 +2658,7 @@
   lastUpdated: 2025-12
 
 - id: sleeper-agents
+  numericId: E489
   type: risk
   title: "Sleeper Agents: Training Deceptive LLMs"
   description: >-
@@ -2632,6 +2688,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: compute-concentration
+  numericId: E684
   type: risk
   title: Compute Concentration
   severity: high
@@ -2697,6 +2754,7 @@
   lastUpdated: 2026-02
 
 - id: steganography
+  numericId: E603
   type: risk
   title: Steganography
   description: >-
