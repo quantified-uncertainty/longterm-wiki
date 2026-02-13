@@ -2,6 +2,19 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/fix-broken-wiki-links-RWnZ9 | Fix broken EntityLinks on E689
+
+**What was done:** Fixed two broken EntityLinks on the Concentrated Compute as a Cybersecurity Risk page (E689). Created a new `nvidia` entity (E693) in organizations.yaml since it was referenced by 4 pages but had no entity definition, causing it to appear as a broken "Concept" link. Changed `<EntityLink id="google-deepmind">` to `<EntityLink id="deepmind">` to use the correct existing entity ID (E98).
+
+**Issues encountered:**
+- Non-existent EntityLink IDs default to type `concept` in the related graph builder, causing organizations like NVIDIA to appear under "Concepts" section
+
+**Learnings/notes:**
+- `build-data.mjs` assigns `type: 'concept'` as default for any EntityLink target that doesn't have an entity definition — this is how broken links end up under "Concepts" in the Related Pages section
+- The YAML schema validates RelatedEntry structure but does NOT validate that referenced entity IDs actually exist
+
+---
+
 ## 2026-02-13 | claude/wiki-gap-analysis-l7Cp8 | Systematic wiki gap analysis
 
 **What was done:** Ran `crux gaps list`, `crux gaps stats`, and manual topic coverage analysis across all 639 wiki pages. Identified 386 pages needing insight extraction (203 high-importance with zero insights). Produced a gap analysis report at `content/docs/internal/gap-analysis-2026-02.mdx`. Built a Suggested Pages dashboard (`app/internal/suggested-pages/`) with exactly 100 ranked page suggestions (priorities 1–100) in a sortable DataTable, using numeric priority based on mention frequency across existing pages (grep + EntityLink counts) and editorial importance. Updated gap-analysis MDX to reference the dashboard instead of inline tier lists.
