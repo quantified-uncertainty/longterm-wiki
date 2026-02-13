@@ -22,7 +22,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { relative } from 'path';
 import { fileURLToPath } from 'url';
-import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
+import { CONTENT_DIR_ABS as CONTENT_DIR, isPageEvergreen } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parse as parseYaml } from 'yaml';
 
@@ -137,8 +137,8 @@ async function main(): Promise<void> {
       continue;
     }
 
-    // Skip non-evergreen pages (reports, blog posts)
-    if (fm.evergreen === false) {
+    // Skip non-evergreen pages (reports, internal docs, project pages)
+    if (!isPageEvergreen(fm, filePath)) {
       skipped++;
       continue;
     }

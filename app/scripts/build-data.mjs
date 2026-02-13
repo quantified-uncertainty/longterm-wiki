@@ -556,7 +556,10 @@ function buildPagesRegistry(urlToResource) {
           // Update frequency (days between updates)
           updateFrequency: fm.update_frequency ? parseInt(fm.update_frequency) : null,
           // Evergreen flag (false = point-in-time content like reports, excluded from update schedule)
-          evergreen: fm.evergreen === false ? false : true,
+          // Explicit frontmatter value wins; otherwise internal/ and project/ pages default to false
+          evergreen: fm.evergreen === true ? true
+            : fm.evergreen === false ? false
+            : !(fullPath.includes('/internal/') || fullPath.includes('/project/')),
           // Legacy field for backwards compatibility
           wordCount: metrics.wordCount,
           // Unconverted links (markdown links with matching resources)

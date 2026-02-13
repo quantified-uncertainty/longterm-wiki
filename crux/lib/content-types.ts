@@ -286,6 +286,39 @@ export function isIndexPage(filePath: string): boolean {
   return filePath.endsWith('index.mdx') || filePath.endsWith('index.md');
 }
 
+/**
+ * Directories that default to non-evergreen (point-in-time / project docs).
+ * Pages in these directories are excluded from update scheduling unless
+ * they explicitly set `evergreen: true` in frontmatter.
+ */
+const NON_EVERGREEN_PATH_PATTERNS: RegExp[] = [
+  /\/internal\//,
+  /\/project\//,
+];
+
+/**
+ * Determine whether a page should be treated as evergreen content.
+ *
+ * - Explicit `evergreen: true/false` in frontmatter always wins.
+ * - Pages in `internal/` or `project/` directories default to non-evergreen.
+ * - Everything else defaults to evergreen.
+ */
+export function isPageEvergreen(
+  frontmatter: Pick<Frontmatter, 'evergreen'>,
+  filePath: string,
+): boolean {
+  // Explicit flag always takes priority
+  if (frontmatter.evergreen === true) return true;
+  if (frontmatter.evergreen === false) return false;
+
+  // Path-based default: internal/project pages are non-evergreen
+  for (const pattern of NON_EVERGREEN_PATH_PATTERNS) {
+    if (pattern.test(filePath)) return false;
+  }
+
+  return true;
+}
+
 export function extractEntityId(filePath: string): string | null {
   const match = filePath.match(/([^/]+)\.(mdx?|md)$/);
   if (!match) return null;

@@ -14,7 +14,7 @@ import { join, relative } from 'path';
 import { execFileSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
-import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
+import { CONTENT_DIR_ABS, PROJECT_ROOT, isPageEvergreen } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import type { CommandResult } from '../lib/cli.ts';
 import { triagePhase, loadPages as loadPagesFromImprover, findPage as findPageFromImprover } from '../authoring/page-improver.ts';
@@ -101,8 +101,8 @@ function loadUpdateCandidates(): UpdateCandidate[] {
     // Skip stubs and documentation pages
     if (fm.pageType === 'stub' || fm.pageType === 'documentation') continue;
 
-    // Skip non-evergreen pages (reports, blog posts)
-    if (fm.evergreen === false) continue;
+    // Skip non-evergreen pages (reports, internal docs, project pages)
+    if (!isPageEvergreen(fm, filePath)) continue;
 
     const updateFrequency = Number(fm.update_frequency);
     if (updateFrequency <= 0 || isNaN(updateFrequency)) continue;

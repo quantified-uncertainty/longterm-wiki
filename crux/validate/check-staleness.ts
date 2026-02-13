@@ -24,7 +24,7 @@ import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
-import { getContentType, getStalenessThreshold, CONTENT_DIR, DEFAULT_STALENESS_THRESHOLD } from '../lib/content-types.ts';
+import { getContentType, getStalenessThreshold, CONTENT_DIR, DEFAULT_STALENESS_THRESHOLD, isPageEvergreen } from '../lib/content-types.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import type { Colors } from '../lib/output.ts';
 
@@ -250,8 +250,8 @@ export function runCheck(options?: StalenessCheckOptions): ValidatorResult {
       const content: string = readFileSync(file, 'utf-8');
       const frontmatter = parseFrontmatter(content) as Frontmatter;
 
-      // Skip non-evergreen pages (reports, blog posts — point-in-time content)
-      if (frontmatter.evergreen === false) continue;
+      // Skip non-evergreen pages (reports, internal docs, project pages)
+      if (!isPageEvergreen(frontmatter, file)) continue;
 
       stats.totalFiles++;
       const contentType: string = getContentType(file) || 'default';

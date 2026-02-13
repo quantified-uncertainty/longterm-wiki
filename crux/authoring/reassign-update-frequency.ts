@@ -25,7 +25,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { relative } from 'path';
 import { fileURLToPath } from 'url';
 import Anthropic from '@anthropic-ai/sdk';
-import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
+import { CONTENT_DIR_ABS as CONTENT_DIR, isPageEvergreen } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter as parseFm } from '../lib/mdx-utils.ts';
 
@@ -373,7 +373,7 @@ async function main(): Promise<void> {
 
     if (!fm.update_frequency) continue;
     if (fm.pageType === 'stub' || fm.pageType === 'documentation') continue;
-    if (fm.evergreen === false) continue;
+    if (!isPageEvergreen(fm, filePath)) continue;
 
     pages.push({
       filePath,
