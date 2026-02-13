@@ -13,3 +13,4 @@
 - Pipe into `while read` creates a subshell that swallows errors; use here-string (`<<< "$var"`) instead
 - The two workflows complement each other: auto-rebase handles ~90% of cases, conflict resolver handles the rest
 - Per-session files completely eliminate the #1 merge conflict source (every session prepending to the same file)
+- Must delete the old `.claude/session-log.md` file when migrating — leaving it behind causes the very conflicts the migration was designed to prevent
