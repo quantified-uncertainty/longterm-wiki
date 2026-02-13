@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { cn } from "@lib/utils";
+import { formatAge, formatFrequency } from "@lib/format";
 import {
   detectPageType,
   PAGE_TYPE_INFO,
   CONTENT_FORMAT_INFO,
   type ContentFormat,
 } from "@/lib/page-types";
-import type { StructuredSummary } from "@/data";
+import type { StructuredSummary, ChangeEntry } from "@/data";
 import styles from "@/components/wiki/tooltip.module.css";
 
 // ============================================================================
@@ -46,6 +47,7 @@ export interface PageStatusProps {
   structuredSummary?: StructuredSummary;
   lastEdited?: string;
   updateFrequency?: number;
+  evergreen?: boolean;
   todo?: string;
   todos?: string[];
   wordCount?: number;
@@ -53,6 +55,7 @@ export interface PageStatusProps {
   metrics?: PageMetrics;
   suggestedQuality?: number;
   issues?: PageIssues;
+  changeHistory?: ChangeEntry[];
   pageType?: string;
   pathname?: string;
   contentFormat?: ContentFormat;
@@ -113,30 +116,6 @@ function getImportanceLevel(importance: number): string {
 function formatWordCount(count: number): string {
   if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
   return count.toString();
-}
-
-function formatAge(lastEdited: string): string {
-  const today = new Date();
-  const edited = new Date(lastEdited);
-  const days = Math.floor(
-    (today.getTime() - edited.getTime()) / (1000 * 60 * 60 * 24)
-  );
-  if (days <= 0) return "today";
-  if (days === 1) return "1 day ago";
-  if (days <= 14) return `${days} days ago`;
-  if (days <= 60) return `${Math.round(days / 7)} weeks ago`;
-  return `${Math.round(days / 30)} months ago`;
-}
-
-function formatFrequency(days: number): string {
-  if (days <= 7) return "weekly";
-  if (days <= 14) return "biweekly";
-  if (days <= 21) return "every 3 weeks";
-  if (days <= 30) return "monthly";
-  if (days <= 45) return "every 6 weeks";
-  if (days <= 60) return "bimonthly";
-  if (days <= 90) return "quarterly";
-  return `every ${Math.round(days / 30)} months`;
 }
 
 function getUpdateStatus(
@@ -590,6 +569,7 @@ function IssuesSection({
   suggestedQuality,
   lastEdited,
   contentFormat,
+  evergreen,
 }: {
   issues?: PageIssues;
   metrics?: PageMetrics;
@@ -597,6 +577,7 @@ function IssuesSection({
   suggestedQuality?: number;
   lastEdited?: string;
   contentFormat?: ContentFormat;
+  evergreen?: boolean;
 }) {
   const detectedIssues: Issue[] = [];
 
@@ -631,7 +612,7 @@ function IssuesSection({
     });
   }
 
-  if (lastEdited) {
+  if (lastEdited && evergreen !== false) {
     const days = Math.floor(
       (Date.now() - new Date(lastEdited).getTime()) / (1000 * 60 * 60 * 24)
     );
@@ -699,6 +680,52 @@ function IssuesSection({
 // MAIN COMPONENT
 // ============================================================================
 
+// ============================================================================
+// CHANGE HISTORY SECTION
+// ============================================================================
+
+function ChangeHistorySection({
+  changeHistory,
+}: {
+  changeHistory?: ChangeEntry[];
+}) {
+  if (!changeHistory || changeHistory.length === 0) return null;
+
+  return (
+    <div className="border-t border-border px-3.5 pt-2 pb-2.5">
+      <SectionHeader
+        count={changeHistory.length}
+        countColor="bg-sky-500/15 text-sky-500"
+      >
+        Change History
+      </SectionHeader>
+      <div className="flex flex-col gap-1">
+        {changeHistory.map((entry, index) => (
+          <div
+            key={index}
+            className="rounded-md bg-sky-500/[0.06] px-2.5 py-1.5 text-xs"
+          >
+            <div className="flex items-center gap-1.5">
+              <IconCalendar className="shrink-0 text-sky-500" />
+              <span className="font-medium text-foreground">
+                {entry.title}
+              </span>
+              <span className="text-muted-foreground">
+                {formatAge(entry.date)}
+              </span>
+            </div>
+            {entry.summary && (
+              <p className="mt-0.5 ml-[18px] text-muted-foreground leading-relaxed line-clamp-2">
+                {entry.summary}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function PageStatus({
   quality,
   importance,
@@ -706,12 +733,14 @@ export function PageStatus({
   structuredSummary,
   lastEdited,
   updateFrequency,
+  evergreen,
   todo,
   todos,
   wordCount,
   backlinkCount,
   metrics,
   suggestedQuality,
+  changeHistory,
   issues,
   pageType,
   pathname,
@@ -727,7 +756,8 @@ export function PageStatus({
     structuredSummary ||
     lastEdited ||
     todo ||
-    (todos && todos.length > 0);
+    (todos && todos.length > 0) ||
+    (changeHistory && changeHistory.length > 0);
   if (!hasEditorialContent && !isATMPage) {
     return null;
   }
@@ -794,8 +824,19 @@ export function PageStatus({
         )}
       </div>
 
-      {/* Update Schedule */}
-      {updateFrequency && (
+      {/* Update Schedule / Evergreen status */}
+      {evergreen === false ? (
+        <div className="flex items-center gap-2 border-t border-border px-3.5 py-2 text-xs text-muted-foreground">
+          <IconCalendar className="shrink-0 opacity-60" />
+          <span className="text-muted-foreground">
+            Point-in-time content
+          </span>
+          <span className="inline-block size-[3px] rounded-full bg-border" />
+          <span className="text-muted-foreground/70">
+            Not on update schedule
+          </span>
+        </div>
+      ) : updateFrequency ? (
         <div className="flex items-center gap-2 border-t border-border px-3.5 py-2 text-xs text-muted-foreground">
           <IconCalendar className="shrink-0 opacity-60" />
           <span>
@@ -819,7 +860,7 @@ export function PageStatus({
             </>
           )}
         </div>
-      )}
+      ) : null}
 
       {/* Summary — structured if available, else flat llmSummary */}
       {structuredSummary ? (
@@ -859,7 +900,11 @@ export function PageStatus({
         suggestedQuality={suggestedQuality}
         lastEdited={lastEdited}
         contentFormat={contentFormat}
+        evergreen={evergreen}
       />
+
+      {/* Change history */}
+      <ChangeHistorySection changeHistory={changeHistory} />
 
       {/* Single todo */}
       {todo && (

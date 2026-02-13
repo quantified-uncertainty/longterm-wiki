@@ -137,6 +137,12 @@ async function main(): Promise<void> {
       continue;
     }
 
+    // Skip non-evergreen pages (reports, blog posts)
+    if (fm.evergreen === false) {
+      skipped++;
+      continue;
+    }
+
     // Already has update_frequency
     if (fm.update_frequency != null) {
       alreadySet++;
