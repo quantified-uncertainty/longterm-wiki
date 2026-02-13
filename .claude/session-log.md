@@ -2,6 +2,19 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/resolve-issue-106-z3sVS | Enhanced search dialog (issue #106)
+
+**What was done:** Implemented all three phases of the enhanced search dialog from issue #106: (1) entity type filter chips below the search input using ENTITY_GROUPS, with dynamic result counts per chip; (2) highlighted search snippets using MiniSearch match info to mark matching terms in descriptions; (3) sort toggle (Relevance/Quality/Recent) in the dialog footer. Also increased search doc description length from 160 to 300 chars for richer snippets, and exposed MiniSearch match/terms data through the SearchResult type.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue); vitest and next binaries not in PATH, used direct node_modules paths
+
+**Learnings/notes:**
+- MiniSearch raw results include `match` (term→fields map) and `terms` arrays that are useful for highlighting
+- Post-search filtering pattern (fetch 30 results, filter client-side) works well for the compact dialog
+
+---
+
 ## 2026-02-13 | claude/wiki-gap-analysis-l7Cp8 | Systematic wiki gap analysis
 
 **What was done:** Ran `crux gaps list`, `crux gaps stats`, and manual topic coverage analysis across all 639 wiki pages. Identified 386 pages needing insight extraction (203 high-importance with zero insights). Produced a gap analysis report at `content/docs/internal/gap-analysis-2026-02.mdx`. Built a Suggested Pages dashboard (`app/internal/suggested-pages/`) with exactly 100 ranked page suggestions (priorities 1–100) in a sortable DataTable, using numeric priority based on mention frequency across existing pages (grep + EntityLink counts) and editorial importance. Updated gap-analysis MDX to reference the dashboard instead of inline tier lists.

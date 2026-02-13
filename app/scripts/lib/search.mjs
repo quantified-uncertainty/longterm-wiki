@@ -86,7 +86,7 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
   const docs = documents.map(d => ({
     id: d.id,
     title: d.title,
-    description: truncate(d.description, 160),
+    description: truncate(d.description, 300),
     numericId: d._numericId,
     type: d._type,
     importance: d._importance,
