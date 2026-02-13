@@ -124,7 +124,7 @@
           changeability: 6  # Research progress possible with resources
           certainty: 3      # High uncertainty about whether solutions exist
         color: slate
-      - id: ai-governance
+      - id: tmc-ai-governance
         label: AI Governance
         type: intermediate
         entityRef: tmc-ai-governance

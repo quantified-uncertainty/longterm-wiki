@@ -133,7 +133,7 @@
       type: researcher
     - id: paul-christiano
       type: researcher
-    - id: centre-for-effective-altruism
+    - id: cea
       type: lab
   lastUpdated: 2026-02
 
@@ -316,7 +316,7 @@
       type: analysis
     - id: openai
       type: lab
-    - id: google-deepmind
+    - id: deepmind
       type: lab
   lastUpdated: 2026-02
 

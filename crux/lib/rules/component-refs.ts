@@ -27,8 +27,8 @@ function loadEntities(): Set<string> {
     const database = loadDatabase();
     entitiesCache = new Set();
 
-    // Entities are stored as an array, extract IDs
-    const entities = database.entities || [];
+    // Entities are stored as typedEntities in database.json (raw entities stripped by build-data)
+    const entities = (database as any).typedEntities || database.entities || [];
     if (Array.isArray(entities)) {
       for (const entity of entities) {
         if (entity && entity.id) {
@@ -46,8 +46,19 @@ function loadEntities(): Set<string> {
 
     // Also add IDs from pathRegistry (more comprehensive)
     const pathRegistry = loadPathRegistry();
-    for (const id of Object.keys(pathRegistry)) {
+    for (const [id, path] of Object.entries(pathRegistry)) {
       entitiesCache.add(id);
+      // Also index by path segments so EntityLink id="capabilities/agentic-ai" matches
+      // pathRegistry value "/knowledge-base/capabilities/agentic-ai/"
+      if (typeof path === 'string') {
+        const stripped = path.replace(/^\//, '').replace(/\/$/, '');
+        entitiesCache.add(stripped);
+        // Also add without the top-level prefix (e.g., "knowledge-base/capabilities/x" -> "capabilities/x")
+        const withoutPrefix = stripped.replace(/^knowledge-base\//, '');
+        if (withoutPrefix !== stripped) {
+          entitiesCache.add(withoutPrefix);
+        }
+      }
     }
 
     return entitiesCache;
