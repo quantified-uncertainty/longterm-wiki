@@ -2719,8 +2719,6 @@
       type: risk
     - id: concentration-of-power
       type: risk
-    - id: nvidia
-      type: organization
   tags:
     - compute
     - cybersecurity
@@ -2753,7 +2751,7 @@
     - id: projecting-compute-spending
       type: model
     - id: ai-revenue-sources
-      type: concept
+      type: organization
     - id: economic-disruption
       type: risk
   tags:

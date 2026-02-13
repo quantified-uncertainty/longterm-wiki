@@ -2524,7 +2524,6 @@
   clusters:
     - ai-safety
     - governance
-    - geopolitics
   sources:
     - title: "Superintelligence Strategy"
       url: https://arxiv.org/abs/2503.05628
@@ -3367,7 +3366,7 @@
     - id: export-controls
       type: policy
     - id: geopolitics
-      type: metric
+      type: ai-transition-model-metric
   tags:
     - governance
     - legal-framework
@@ -3389,5 +3388,5 @@
     - id: goal-misgeneralization
       type: risk
   clusters:
-    - alignment
+    - ai-safety
   lastUpdated: 2026-02
