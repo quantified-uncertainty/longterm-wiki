@@ -278,8 +278,7 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
     const model = quality === 'quality' ? 'opus' : 'sonnet';
     const budget = quality === 'quality' ? 3.0 : 2.0;
 
-    const claude = spawn('npx', [
-      '@anthropic-ai/claude-code',
+    const claude = spawn('claude', [
       '-p',
       '--print',
       '--dangerously-skip-permissions',
