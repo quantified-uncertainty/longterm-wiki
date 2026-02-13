@@ -2,6 +2,23 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/analyze-x-epistemics-UEHWy | Create X.com Platform Epistemics page
+
+**What was done:** Created a comprehensive analysis page for X.com's epistemic practices, covering Community Notes effectiveness, engagement algorithm impacts, API restrictions on research, verification changes, Grok AI concerns, content moderation cuts, and treatment of journalists. Registered entity in responses.yaml. All blocking CI checks pass.
+
+**Issues encountered:**
+- pnpm install fails on puppeteer postinstall (known issue)
+- better-sqlite3 native module needed manual rebuild (`npx node-gyp rebuild`)
+- Crux content create pipeline's synthesis step hangs indefinitely (spawns `claude -p --print` subprocess that never completes)
+- vitest and next binaries not on PATH after pnpm install; needed to invoke from full paths in node_modules
+
+**Learnings/notes:**
+- The `--source-file` flag in crux content create successfully bypasses external API research phases
+- The synthesis step spawns a claude subprocess that may not work reliably in all environments
+- Page was written manually following the knowledge-base-response template structure with proper frontmatter, EntityLinks, and citations
+
+---
+
 ## 2026-02-13 | claude/add-llm-warning-banner-aWFt0 | Add LLM warning banner to wiki pages
 
 **What was done:** Added a dismissible warning banner to all wiki pages informing readers that content was written by an LLM with minimal human supervision. The banner uses localStorage to persist dismissal, so once closed it stays hidden across all pages.

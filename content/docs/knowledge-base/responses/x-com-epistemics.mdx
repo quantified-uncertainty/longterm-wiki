@@ -1,0 +1,205 @@
+---
+title: "X.com Platform Epistemics"
+description: "Analysis of X.com's epistemic practices and their impact on information quality. Community Notes reduces repost virality by 46% but only 8-10% of notes display. Meanwhile, engagement-driven algorithms amplify low-credibility content, API restrictions have ended 100+ research projects, link penalties suppress external sourcing, and verification changes have degraded trust signals."
+sidebar:
+  order: 7
+lastEdited: "2026-02-13"
+quality: 20
+importance: 55
+update_frequency: 30
+ratings:
+  novelty: 3.5
+  rigor: 5.0
+  actionability: 3.0
+  completeness: 5.5
+llmSummary: "X.com presents a deeply mixed epistemic profile. Community Notes demonstrates genuine innovation in crowdsourced fact-checking, reducing repost virality by 46% and encouraging voluntary retraction of misleading posts. However, the platform's engagement-driven algorithm systematically amplifies emotionally charged and low-credibility content, API restrictions have destroyed independent research access, verification changes have degraded trust signals, and the platform owner's personal misinformation has generated over 2 billion views. The net epistemic impact is substantially negative."
+clusters:
+  - epistemics
+  - governance
+subcategory: epistemic-tools-tools
+---
+import {Mermaid, KeyQuestions, EntityLink} from '@components/wiki';
+
+## Overview
+
+X.com (formerly Twitter) occupies a unique position in the global information ecosystem. With approximately 550 million monthly active users, it remains one of the primary platforms for real-time news dissemination, political discourse, and public accountability. Since <EntityLink id="elon-musk">Elon Musk</EntityLink>'s acquisition in October 2022, the platform has undergone sweeping changes affecting nearly every dimension of its epistemic function.
+
+The platform's epistemic profile is deeply contradictory. On one hand, X hosts <EntityLink id="community-notes">Community Notes</EntityLink>, a genuinely innovative crowdsourced fact-checking system that reduces misinformation virality by [46%](https://www.washington.edu/news/2025/09/18/community-notes-x-false-information-viral/) when notes display. On the other hand, the platform's engagement-driven algorithm [systematically amplifies](https://www.science.org/doi/10.1126/science.adu5584) emotionally charged and low-credibility content, API restrictions have [ended 100+ research projects](https://www.cjr.org/tow_center/qa-what-happened-to-academic-research-on-twitter.php), and the platform owner himself has generated [over 2 billion views](https://techcrunch.com/2024/11/05/elon-musks-false-and-misleading-election-claims-have-been-viewed-2-billion-times-on-x/) on false or misleading election claims. The net effect is a platform where isolated epistemic innovations coexist with structural features that degrade information quality at scale.
+
+## Quick Assessment
+
+| Dimension | Rating | Notes |
+|-----------|--------|-------|
+| Community Notes effectiveness | Medium-High | 46% repost reduction when notes display, but only 8-10% of notes reach visibility |
+| Algorithm transparency | Low-Medium | Partially open-sourced in 2024, but not kept current; practical transparency limited |
+| Content moderation | Low | 50% increase in hate speech; trust and safety staff cut by up to 80% |
+| Research access | Very Low | Free API eliminated; 100+ studies canceled; legal threats against researchers |
+| Verification integrity | Low | Pay-for-checkmark system degraded trust signals; impersonation demonstrated |
+| Link/source sharing | Low | 30-50% algorithmic penalty on external links discourages sourcing |
+| AI integration (Grok) | Very Low | Documented misinformation, deepfake generation, and ideological prompt manipulation |
+| Owner conduct | Very Low | 87 false election claims with 2B+ views; attacks on journalists and media |
+| Real-time information | Medium | Still valuable for breaking events, but increasingly compromised by bots and misinformation |
+| Net epistemic impact | Negative | Positive innovations outweighed by structural degradation |
+
+## How It Works
+
+X.com's epistemic properties emerge from the interaction of several systems: the recommendation algorithm, Community Notes, content moderation policies, verification infrastructure, and the integrated Grok AI chatbot.
+
+### Recommendation Algorithm
+
+The recommendation algorithm was partially open-sourced in early 2024, revealing an engagement scoring formula that weights retweets at 20x, replies at 13.5x, profile clicks at 12x, link clicks at 11x, and bookmarks at 10x relative to likes. This weighting structure inherently favors content that provokes strong reactions over content that is merely informative.
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Positive["Positive Epistemic Features"]
+        CN[Community Notes\n46% repost reduction]
+        AT[Algorithm Transparency\nPartially open-sourced]
+        RT[Real-time Information\nBreaking news access]
+    end
+
+    subgraph Negative["Negative Epistemic Features"]
+        EA[Engagement Algorithm\nAmplifies outrage]
+        LP[Link Penalties\n30-50% reach reduction]
+        API[API Restrictions\n100+ studies ended]
+        VC[Verification Degraded\nPay-for-checkmark]
+        CM[Content Moderation Gutted\n50% more hate speech]
+        GK[Grok AI\nDocumented misinformation]
+        OC[Owner Conduct\n2B+ views on false claims]
+    end
+
+    CN --> |Partially offsets| EA
+    EA --> |Undermines| CN
+    LP --> |Discourages| RT
+    API --> |Prevents study of| EA
+    VC --> |Reduces trust in| CN
+`} />
+
+Key algorithmic features that affect epistemics:
+
+- **Premium account boost**: Paid accounts receive documented [4x/2x algorithmic amplification](https://www.tweetarchivist.com/how-twitter-algorithm-works-2025), meaning subscribers get disproportionate reach regardless of content quality
+- **Link penalty**: External links receive a [30-50% reach reduction](https://www.socialmediatoday.com/news/x-formerly-twitter-testing-links-in-app-link-post-penalties/803176/), with A/B tests showing a 94% decrease in visibility for posts containing links. This directly discourages citation and external sourcing
+- **Political amplification**: Research from Queensland University of Technology found that after Musk's endorsement of Trump in July 2024, Musk's posts received approximately [6.4 million additional views](https://www.techpolicy.press/new-research-points-to-possible-algorithmic-bias-on-x/) (a 138% increase), and Republican-leaning accounts received significant boosts
+
+### Community Notes
+
+Community Notes remains the platform's strongest epistemic feature. See the dedicated <EntityLink id="community-notes">Community Notes</EntityLink> page for detailed analysis. Key findings:
+
+- Posts with Community Notes saw [reposts drop 46% and likes drop 44%](https://www.pnas.org/doi/10.1073/pnas.2503413122) on average (PNAS, September 2025)
+- Posts with notes were [32% more likely](https://pubsonline.informs.org/doi/10.1287/isre.2024.1609) to be voluntarily deleted by authors
+- Medical professionals rated [98%](https://www.rochester.edu/newscenter/crowdsourcing-fact-checking-community-notes-social-media-676142/) of COVID-19-related notes as accurate
+
+However, critical limitations persist: only [8-10%](https://arxiv.org/html/2510.00650v1) of proposed notes reach "helpful" status, the average delay to note display is approximately 75.5 hours (by which time [96.7% of reposts](https://arxiv.org/html/2510.00650v1) have occurred), and participation is declining (monthly submissions dropped from ~120,000 in January 2025 to below 60,000 by May 2025).
+
+### Content Moderation
+
+Content moderation capacity was dramatically reduced following the acquisition. Trust and safety teams experienced up to [80% cuts](https://fortune.com/2024/02/06/inside-elon-musk-x-twitter-austin-content-moderation/) in dedicated engineering roles, and the Trust and Safety Council was dissolved in December 2022. The total moderation workforce dropped to approximately 1,849 for 550 million monthly active users, a ratio of roughly 1 moderator per 297,000 users.
+
+Consequences have been measurable: hate speech increased [50% overall](https://viterbischool.usc.edu/news/2025/02/a-platform-problem-hate-speech-and-bots-still-thriving-on-x/) post-acquisition, with transphobic slurs up 260%, racist tweets up 42%, and homophobic tweets up 30% (USC Viterbi / PLOS ONE, 2024). As of August 2023, [86%](https://news.berkeley.edu/2025/02/13/study-finds-persistent-spike-in-hate-speech-on-x/) of posts reported for hate speech were still hosted.
+
+## Epistemic Harms: Detailed Analysis
+
+### Engagement Algorithm Amplifies Low-Credibility Content
+
+The research consensus on X's algorithm is clear. A preregistered algorithmic audit published in [PNAS Nexus (March 2025)](https://www.science.org/doi/10.1126/science.adu5584) found that X's engagement-based algorithm amplifies emotionally charged, out-group hostile content that makes users feel worse about their political opponents. Users reported they did not prefer the political tweets selected by the algorithm.
+
+A 10-day experiment with 1,256 volunteers during the 2024 U.S. presidential campaign provided [causal evidence](https://www.science.org/doi/10.1126/science.adu5584) that algorithmic exposure to anti-democratic attitudes and partisan hostility alters affective polarization, shifting out-party animosity by more than 2 points on a 100-point feeling thermometer. Analysis of approximately [2.7 million posts](https://link.springer.com/article/10.1140/epjds/s13688-024-00456-3) confirmed that engagement-based recommender systems amplify low-credibility content on COVID-19 and climate change topics (EPJ Data Science, March 2024).
+
+### API Restrictions Destroyed Research Access
+
+In February 2023, X eliminated free API access and introduced tiered pricing (Basic at \$100/month, Pro at \$5,000/month, Enterprise at custom pricing). The free Academic Research API tier was discontinued entirely.
+
+The impact has been severe:
+
+- [100+ studies](https://www.cjr.org/tow_center/qa-what-happened-to-academic-research-on-twitter.php) canceled or suspended, with over 250 projects jeopardized
+- [76 long-term efforts](https://independenttechresearch.org/letter-twitters-new-api-plans-will-devastate-public-interest-research/) terminated, including public tools like Botometer (bot detection) and Hoaxy (misinformation visualization)
+- [13% decline](https://arxiv.org/pdf/2404.07340) in Twitter-related academic studies in 2024
+- Approximately [50% of surveyed researchers](https://journals.sagepub.com/doi/10.1177/15365042241252125) reported increased worry about legal repercussions of studying the platform
+
+The EU's Digital Services Act (Article 40, effective 2024) attempts to address this by allowing national authorities to compel researcher access, but enforcement remains inconsistent.
+
+### Verification Changes Degraded Trust Signals
+
+The blue checkmark shifted from a merit-based credential confirming identity and notability to a [subscription product](https://en.wikipedia.org/wiki/Twitter_verification) (\$8/month) available to anyone meeting basic eligibility criteria. Legacy verification was removed on April 1, 2023.
+
+The epistemic consequences are significant: the checkmark, once a reliable signal of account authenticity, became meaningless as a trust indicator. A Washington Post columnist successfully created a verified impersonation account of a U.S. Senator. The paid checkmark now provides algorithmic amplification (4x/2x boost), meaning paying users get disproportionate reach regardless of credibility.
+
+### Grok AI Integration
+
+X's integrated AI chatbot Grok has been characterized as an "[epistemic weapon](https://www.techpolicy.press/grok-is-an-epistemic-weapon/)" by Tech Policy Press. Documented incidents include:
+
+- **Election misinformation (2024)**: Grok incorrectly stated ballot deadlines had passed in multiple states; [false information persisted](https://www.pbs.org/newshour/politics/why-does-the-ai-powered-chatbot-grok-post-false-offensive-things-on-x) for over a week
+- **Fabricated breaking news (April 2024)**: Grok treated unverified X posts about Iran attacking Israel as real news
+- **Prompt manipulation (February 2025)**: Grok 3's system prompt contained instructions to ignore sources mentioning Musk/Trump spreading misinformation
+- **Pro-Kremlin narratives (October 2025)**: Institute for Strategic Dialogue [found Grok amplifying](https://globalwitness.org/en/campaigns/digital-threats/conspiracy-and-toxicity-xs-ai-chatbot-grok-shares-disinformation-in-replies-to-political-queries/) pro-Russian narratives
+- **Deepfake crisis (2025)**: Users produced an estimated [6,700 sexually suggestive images per hour](https://en.wikipedia.org/wiki/Grok_sexual_deepfake_scandal), leading Malaysia and Indonesia to block Grok access
+
+Millions of users globally now use Grok as a fact-checking tool [despite its demonstrated inaccuracy](https://www.aljazeera.com/economy/2025/7/11/as-millions-adopt-grok-to-fact-check-misinformation-abounds), which is particularly concerning in markets where alternative fact-checking infrastructure is limited.
+
+### Link Penalties Discourage External Sourcing
+
+The algorithmic suppression of external links has direct epistemic consequences. A/B tests showed posts with links received only [3,670 views versus 65,400](https://www.socialmediatoday.com/news/x-formerly-twitter-testing-links-in-app-link-post-penalties/803176/) for nearly identical link-free posts. This incentivizes users to make claims without citing sources, post screenshots rather than links to primary sources, and keeps users within X's information ecosystem rather than directing them to more detailed or authoritative external content.
+
+In October 2025, X began testing an in-app browser to display links without sending users off-platform, effectively acknowledging the harm while attempting to retain users within its ecosystem.
+
+### Treatment of Journalists and Media
+
+The platform has engaged in a pattern of actions against journalists:
+
+- **December 2022**: Ten journalists from major outlets [suspended](https://www.pbs.org/newshour/nation/journalists-who-wrote-about-owner-elon-musk-suspended-from-twitter) for covering Musk's jet-tracking controversy
+- **January 2024**: At least eight prominent accounts [suspended](https://www.vice.com/en/article/x-purges-prominent-journalists-leftists-with-no-explanation/), predominantly left-leaning journalists
+- Media outlets including BBC and NPR were labeled as "state-affiliated" with visibility restrictions
+- The Guardian (10.7M followers) stopped posting to X entirely
+- Musk filed a lawsuit against Media Matters after it documented hate speech increases
+
+## Risks Addressed
+
+Despite its predominantly negative trajectory, X addresses several epistemic needs:
+
+- **Real-time information**: The platform remains one of the fastest channels for breaking news, crisis information, and public accountability, though this is increasingly compromised by bot activity
+- **Crowdsourced fact-checking**: <EntityLink id="community-notes">Community Notes</EntityLink> demonstrates that bridging algorithms can produce cross-partisan consensus fact-checks perceived as more legitimate than centralized alternatives
+- **Platform adoption of Community Notes**: Meta, TikTok, and YouTube have adopted similar models, making X's innovation a potential [cross-platform standard](https://arxiv.org/html/2502.14132v2) for content moderation
+- **Algorithm transparency**: The partial open-sourcing of the recommendation algorithm was unprecedented among major platforms, even if practical transparency remains limited
+
+## Limitations
+
+The positive epistemic features of X.com are severely constrained by structural factors:
+
+1. **Community Notes timing**: The bridging algorithm's requirement for cross-partisan consensus means notes arrive after [96.7% of viral spread](https://arxiv.org/html/2510.00650v1) has already occurred, limiting aggregate impact
+2. **Community Notes declining participation**: Monthly note submissions [halved](https://www.nbcnews.com/tech/social-media/x-twitter-community-notes-disappear-data-rcna210710) between January and May 2025, coinciding with Musk's claim that the system was "being gamed"
+3. **Owner conflict of interest**: Musk spent over \$200 million supporting Trump's 2024 campaign while simultaneously controlling the platform's algorithm and moderation policies, an [unprecedented concentration](https://edmo.eu/publications/how-elon-musks-powerful-disinformation-machine-works/) of media and political power
+4. **Research ecosystem destruction**: The API shutdown has degraded the academic community's ability to monitor epistemic effects precisely when the platform is undergoing its most significant changes
+5. **Platform fragmentation**: User exodus (daily users declined from approximately 250 million to [157 million](https://www.nbcnews.com/tech/tech-news/x-sees-largest-user-exodus-musk-takeover-rcna179793)) has driven growth at alternatives like Bluesky and Threads, reducing shared information spaces
+6. **Advertiser flight**: Only [4% of marketers](https://fortune.com/2024/02/06/inside-elon-musk-x-twitter-austin-content-moderation/) believe brands are safe on X, with advertising revenue falling 46.4%, reducing economic incentives for platform quality improvement
+
+## Impact on Elections
+
+The 2024 U.S. presidential election provided a critical test case. Musk personally posted [87 false or misleading election claims](https://techcrunch.com/2024/11/05/elon-musks-false-and-misleading-election-claims-have-been-viewed-2-billion-times-on-x/) generating over 2 billion views, while [74% of accurate Community Notes](https://fortune.com/2024/10/31/x-community-notes-fact-checks-us-election-misinformation/) on election misinformation were never displayed. USC researchers [uncovered](https://viterbischool.usc.edu/news/2024/11/information-operation-threatens-the-2024-u-s-presidential-election/) coordinated information operations amplifying partisan narratives across X and other platforms.
+
+Internationally, Brazil [banned X](https://en.wikipedia.org/wiki/Censorship_of_Twitter) in August 2024 for non-compliance with judicial orders related to disinformation (lifted October 2024 after \$5.2 million in fines). In early 2025, Musk launched [100+ posts](https://edmo.eu/publications/how-elon-musks-powerful-disinformation-machine-works/) (100M+ views) attacking the UK Labour government and openly supporting far-right European parties.
+
+## Key Uncertainties
+
+<KeyQuestions
+  questions={[
+    "Will Community Notes participation stabilize or continue declining, potentially rendering the system ineffective?",
+    "Can engagement-driven algorithms be reformed to reduce amplification of low-credibility content without sacrificing platform growth?",
+    "Will regulatory frameworks like the EU Digital Services Act effectively restore independent research access?",
+    "How will Grok's role as a de facto fact-checker affect information quality, particularly in developing markets with limited alternatives?",
+    "Will platform fragmentation (Bluesky, Threads) produce better epistemic environments, or merely fragment shared information spaces?"
+  ]}
+/>
+
+## Sources
+
+1. University of Washington (2025). [Community Notes reduce virality](https://www.washington.edu/news/2025/09/18/community-notes-x-false-information-viral/). PNAS.
+2. Gies Business, UIUC (2024). [Community Notes and voluntary retraction](https://giesbusiness.illinois.edu/news/2024/11/18/study--community-notes-on-x-could-be-key-to-curbing-misinformation). Information Systems Research.
+3. Columbia Journalism Review (2024). [Impact on academic research](https://www.cjr.org/tow_center/qa-what-happened-to-academic-research-on-twitter.php).
+4. Science (2025). [Algorithmic exposure and affective polarization](https://www.science.org/doi/10.1126/science.adu5584).
+5. USC Viterbi / PLOS ONE (2024). [Hate speech trends post-acquisition](https://viterbischool.usc.edu/news/2025/02/a-platform-problem-hate-speech-and-bots-still-thriving-on-x/).
+6. TechPolicy.Press (2025). [Grok as epistemic weapon](https://www.techpolicy.press/grok-is-an-epistemic-weapon/).
+7. TechCrunch (2024). [Musk election misinformation at 2B views](https://techcrunch.com/2024/11/05/elon-musks-false-and-misleading-election-claims-have-been-viewed-2-billion-times-on-x/).
+8. EPJ Data Science (2024). [Algorithmic amplification of low-credibility content](https://link.springer.com/article/10.1140/epjds/s13688-024-00456-3).
+9. Fortune (2024). [Community Notes fail on election misinfo](https://fortune.com/2024/10/31/x-community-notes-fact-checks-us-election-misinformation/).
+10. NBC News (2025). [Community Notes participation declining](https://www.nbcnews.com/tech/social-media/x-twitter-community-notes-disappear-data-rcna210710).
+11. EDMO (2025). [Musk's disinformation machine](https://edmo.eu/publications/how-elon-musks-powerful-disinformation-machine-works/).
+12. ACM FAccT (2025). [Political exposure bias on X](https://dl.acm.org/doi/10.1145/3715275.3732159).
