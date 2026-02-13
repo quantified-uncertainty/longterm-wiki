@@ -7,11 +7,13 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 **What was done:** Added `evergreen: false` frontmatter field to allow pages (reports, experiments, proposals) to opt out of the update schedule. Full feature implementation: frontmatter schema + validation (evergreen: false + update_frequency is an error), Page interface + build-data, getUpdateSchedule(), bootstrap/reassign scripts, updates command, staleness checker, PageStatus UI (shows "Point-in-time content · Not on update schedule"), IssuesSection (no stale warnings for non-evergreen). Applied to all 6 internal report pages. Updated automation-tools docs.
 
 **Issues encountered:**
-- None
+- reassign-update-frequency.ts had a bespoke string-only YAML parser that returned all values as strings, requiring `=== 'false'` workaround. Replaced with shared `parseFm` from mdx-utils.
+- Graded format validation warned about missing update_frequency even when evergreen: false — contradictory rules.
 
 **Learnings/notes:**
 - Pages without `update_frequency` are already excluded from the schedule, but the bootstrap script would re-add it. The `evergreen: false` flag prevents this.
 - The flag needed to be threaded through 8 different systems: schema, build, app data layer, UI, validation, staleness checker, updates command, and bootstrap/reassign scripts.
+- reassign-update-frequency.ts was the only crux authoring script using a hand-rolled parser instead of the shared `yaml` library one — now fixed.
 
 ---
 

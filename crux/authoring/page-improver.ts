@@ -192,7 +192,7 @@ function repairFrontmatter(content: string): string {
   ]);
   const topLevelKeys = new Set([
     'title', 'description', 'sidebar', 'quality', 'importance', 'lastEdited',
-    'update_frequency', 'llmSummary', 'ratings', 'clusters',
+    'update_frequency', 'evergreen', 'llmSummary', 'ratings', 'clusters',
     'draft', 'aliases', 'redirects', 'tags',
   ]);
   const lines = fm.split('\n');

@@ -27,6 +27,7 @@ import { fileURLToPath } from 'url';
 import Anthropic from '@anthropic-ai/sdk';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
+import { parseFrontmatter as parseFm } from '../lib/mdx-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Config
@@ -233,22 +234,8 @@ function ruleBasedClassify(page: PageData): ClassificationResult | null {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function parseFrontmatter(content: string): Record<string, string> {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return {};
-  const lines = match[1].split('\n');
-  const result: Record<string, string> = {};
-  for (const line of lines) {
-    const kv = line.match(/^(\w[\w_]*):\s*(.+)$/);
-    if (kv) {
-      let val = kv[2].trim();
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-        val = val.slice(1, -1);
-      }
-      result[kv[1]] = val;
-    }
-  }
-  return result;
+function parseFrontmatter(content: string): Record<string, unknown> {
+  return parseFm(content);
 }
 
 function getFirstParagraph(content: string): string {
@@ -385,14 +372,14 @@ async function main(): Promise<void> {
     const fm = parseFrontmatter(content);
 
     if (!fm.update_frequency) continue;
-    if (fm.pageType === 'stub' || fm.pageType === 'documentation' || fm.pageType === '"documentation"') continue;
-    if (fm.evergreen === 'false' || fm.evergreen === false) continue;
+    if (fm.pageType === 'stub' || fm.pageType === 'documentation') continue;
+    if (fm.evergreen === false) continue;
 
     pages.push({
       filePath,
-      title: fm.title || relative(CONTENT_DIR, filePath),
-      subcategory: fm.subcategory || null,
-      importance: fm.importance || null,
+      title: (fm.title as string) || relative(CONTENT_DIR, filePath),
+      subcategory: (fm.subcategory as string) || null,
+      importance: (fm.importance as string) || null,
       currentFreq: Number(fm.update_frequency),
       firstParagraph: getFirstParagraph(content),
       path: getPathContext(filePath),

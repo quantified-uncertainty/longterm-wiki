@@ -141,7 +141,7 @@ export const frontmatterSchemaRule = {
 
     // Cross-field: graded content formats (table, diagram) should have update tracking
     const gradedFormats = ['table', 'diagram'];
-    if (gradedFormats.includes(frontmatter.contentFormat) && !frontmatter.update_frequency) {
+    if (gradedFormats.includes(frontmatter.contentFormat) && !frontmatter.update_frequency && frontmatter.evergreen !== false) {
       issues.push(new Issue({
         rule: 'frontmatter-schema',
         file: contentFile.path,
