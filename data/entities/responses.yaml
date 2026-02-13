@@ -2524,7 +2524,6 @@
   clusters:
     - ai-safety
     - governance
-    - geopolitics
   sources:
     - title: "Superintelligence Strategy"
       url: https://arxiv.org/abs/2503.05628
@@ -3360,5 +3359,5 @@
     - id: goal-misgeneralization
       type: risk
   clusters:
-    - alignment
+    - ai-safety
   lastUpdated: 2026-02
