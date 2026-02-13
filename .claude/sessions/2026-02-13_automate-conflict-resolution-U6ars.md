@@ -15,3 +15,6 @@
 - Per-session files completely eliminate the #1 merge conflict source (every session prepending to the same file)
 - Must delete the old `.claude/session-log.md` file when migrating — leaving it behind causes the very conflicts the migration was designed to prevent
 - `claude-sonnet-4-5-20250929` has a max output token limit of 64000, not 65536 — using 65536 causes a 400 error
+- Large YAML data files (69K-119K chars) cause 502 API gateway timeouts when sent whole — resolved by adding hunk-by-hunk conflict resolution that extracts individual conflict blocks with surrounding context
+- Network-level errors ("fetch failed") need explicit try/catch in the retry loop — they bypass the HTTP status code handling
+- Retry backoff of 2s/4s/8s is too aggressive for large API requests — increased to 4s/8s/16s/32s/60s with 5 attempts
