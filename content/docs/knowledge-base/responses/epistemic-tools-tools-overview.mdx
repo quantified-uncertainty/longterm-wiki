@@ -1,6 +1,6 @@
 ---
 title: Tools & Platforms
-description: Specific tools and platforms for improving collective judgment, quantified uncertainty, and decision-making under uncertainty.
+description: Software platforms and tools designed to support forecasting, prediction, knowledge coordination, and decision-making under uncertainty in the epistemic infrastructure ecosystem.
 sidebar:
   label: Overview
   order: 0
@@ -8,31 +8,86 @@ subcategory: epistemic-tools-tools
 ---
 import {EntityLink} from '@components/wiki';
 
-Specific tools and platforms in the <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink> space:
+## Overview
 
-**Forecasting & Prediction:**
-- **<EntityLink id="squiggle">Squiggle</EntityLink>**: Probabilistic programming language for uncertainty quantification
-- **<EntityLink id="squiggleai">SquiggleAI</EntityLink>**: LLM-powered probabilistic model generation
-- **<EntityLink id="metaforecast">Metaforecast</EntityLink>**: Cross-platform forecast aggregation
+Epistemic tools are software platforms and systems designed to improve individual and collective reasoning, particularly for decision-making under uncertainty. These tools implement various mechanisms—from probabilistic programming languages to crowdsourced verification systems—that aim to make beliefs more explicit, quantifiable, and subject to empirical testing.[^1]
 
-**Benchmarking:**
-- **<EntityLink id="forecastbench">ForecastBench</EntityLink>**: Dynamic benchmark for AI forecasting capabilities
-- **<EntityLink id="ai-forecasting-benchmark">AI Forecasting Benchmark Tournament</EntityLink>**: Human vs AI forecasting competition
+The tools documented here span several functional categories: forecasting and prediction platforms that elicit and aggregate probabilistic judgments; knowledge coordination systems that organize information for specific research communities; benchmarking frameworks that evaluate forecasting capabilities; and verification systems that assess claim accuracy at scale. While these tools are used across multiple domains, this overview focuses on platforms with significant adoption or relevance within the AI safety and existential risk research communities.
 
-**Research Coordination:**
-- **<EntityLink id="xpt">XPT</EntityLink>**: Structured adversarial collaboration on existential risks
+The effectiveness of epistemic tools varies by context and implementation. <EntityLink id="prediction-markets">Prediction markets</EntityLink> and structured forecasting platforms have demonstrated moderate improvements in accuracy over individual judgment in some domains,[^2] though challenges remain around liquidity, participation incentives, and the selection of questions amenable to these methods. Knowledge coordination tools address different problems—organizing research literature, tracking expert consensus, and reducing information asymmetries—with effectiveness that is harder to quantify systematically.
 
-**Verification:**
-- **<EntityLink id="community-notes">X Community Notes</EntityLink>**: Crowdsourced fact-checking at scale
+## Tool Categories
 
-**Knowledge Coordination:**
-- **<EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>**: Strategic intelligence platform for AI safety prioritization
-- **<EntityLink id="stampy-aisafety-info">Stampy / AISafety.info</EntityLink>**: AI safety Q&A wiki with LLM chatbot
-- **<EntityLink id="mit-ai-risk-repository">MIT AI Risk Repository</EntityLink>**: Database of 1,700+ categorized AI risks
+### Forecasting & Prediction
 
-**AI-Assisted Knowledge & Encyclopedias:**
-- **<EntityLink id="ai-assisted-knowledge-management">AI-Assisted Knowledge Management</EntityLink>**: Tools for LLM-assisted wiki and knowledge base creation (Obsidian+AI, Notion AI, Golden, NotebookLM, RAG frameworks)
-- **<EntityLink id="grokipedia">Grokipedia</EntityLink>**: xAI's AI-generated encyclopedia (6M+ articles); case study in scale vs. quality tradeoffs
-- **<EntityLink id="wikipedia-and-ai">Wikipedia and AI Content</EntityLink>**: Wikipedia's policies, WikiProject AI Cleanup, model collapse, and the sustainability challenge
+Platforms and languages for generating, expressing, and aggregating probabilistic forecasts:
 
-These tools aim to improve decision-making on high-stakes questions, particularly around AI development and existential risk.
+- **<EntityLink id="squiggle">Squiggle</EntityLink>**: Programming language for expressing uncertainty using probability distributions, enabling Monte Carlo simulation and sensitivity analysis for quantitative models
+- **<EntityLink id="squiggleai">SquiggleAI</EntityLink>**: Experimental system that uses large language models to generate Squiggle code from natural language descriptions of uncertain quantities
+- **<EntityLink id="metaforecast">Metaforecast</EntityLink>**: Aggregator that collected forecasts from multiple prediction platforms (Metaculus, Manifold Markets, Polymarket, and others) into a searchable database; development ceased in 2023[^3]
+
+Additional major forecasting platforms not yet documented in this wiki include Metaculus (a free forecasting tournament platform with 100,000+ registered users), Manifold Markets (a play-money prediction market), and Good Judgment Open (run by the research group that outperformed intelligence analysts in IARPA's forecasting tournaments).[^4]
+
+### Benchmarking & Evaluation
+
+Systems for measuring forecasting accuracy and comparing human and AI performance:
+
+- **<EntityLink id="forecastbench">ForecastBench</EntityLink>**: Benchmark dataset designed to evaluate AI systems' forecasting capabilities on questions with verifiable resolutions
+- **<EntityLink id="ai-forecasting-benchmark">AI Forecasting Benchmark Tournament</EntityLink>**: Competition format comparing human forecasters against AI systems on the same question set
+
+### Research Coordination
+
+Platforms that structure expert collaboration on research questions:
+
+- **<EntityLink id="xpt">XPT</EntityLink>**: Framework for adversarial collaboration where researchers with differing views jointly investigate questions about existential risk, documenting both agreements and remaining disagreements
+
+### Verification & Fact-Checking
+
+Systems for assessing claim accuracy using crowdsourced evaluation:
+
+- **<EntityLink id="community-notes">X Community Notes</EntityLink>**: Crowdsourced system that allows users to add context to posts on X (formerly Twitter), with notes displayed based on cross-partisan agreement rather than majority vote[^5]
+
+### Knowledge Coordination
+
+Wikis, databases, and knowledge management systems focused on specific research domains:
+
+- **<EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>**: Wiki focused on AI safety research prioritization and strategic questions about transformative AI development
+- **<EntityLink id="stampy-aisafety-info">Stampy / AISafety.info</EntityLink>**: Question-and-answer database about AI safety topics, integrated with a large language model chatbot interface
+- **<EntityLink id="mit-ai-risk-repository">MIT AI Risk Repository</EntityLink>**: Structured database of 1,700+ AI risk scenarios and failure modes, with standardized categorization
+
+### Tracking & Documentation Infrastructure
+
+Databases and websites that systematically track organizations, people, funding, and events in the AI safety and EA ecosystems:
+
+- **<EntityLink id="ai-watch">AI Watch</EntityLink>**: Database by Issa Rice tracking AI safety organizations, people, funding, and publications
+- **<EntityLink id="org-watch">Org Watch</EntityLink>**: Tracking website by Issa Rice monitoring EA and AI safety organizations
+- **<EntityLink id="timelines-wiki">Timelines Wiki</EntityLink>**: MediaWiki project documenting chronological histories of AI safety and EA organizations
+- **<EntityLink id="donations-list-website">Donations List Website</EntityLink>**: Open-source database tracking \$72.8B in philanthropic donations (1969-2023) across 75+ donors
+- **<EntityLink id="wikipedia-views">Wikipedia Views</EntityLink>**: Analytics tools for tracking Wikipedia pageview data, useful for measuring public attention to AI safety topics
+
+### AI-Assisted Knowledge & Content Quality
+
+Tools and systems that use large language models to support knowledge base creation, maintenance, and content quality:
+
+- **<EntityLink id="ai-assisted-knowledge-management">AI-Assisted Knowledge Management</EntityLink>**: Category covering LLM integrations with note-taking and wiki software (Obsidian plugins, Notion AI, Golden, NotebookLM) and retrieval-augmented generation frameworks
+- **<EntityLink id="grokipedia">Grokipedia</EntityLink>**: AI-generated encyclopedia created by xAI with 6+ million articles; notable as a case study in scaling AI-generated encyclopedic content and the resulting tradeoffs in quality control
+- **<EntityLink id="wikipedia-and-ai">Wikipedia and AI Content</EntityLink>**: Documentation of how Wikipedia addresses AI-generated content through policies, WikiProject AI Cleanup, and debates about maintaining editorial standards at scale
+- **<EntityLink id="roastmypost">RoastMyPost</EntityLink>**: LLM-powered tool using multiple specialized AI agents for fact-checking, logical fallacy detection, and math verification of written content
+
+## Ecosystem Characteristics
+
+These tools reflect different approaches to improving collective reasoning. Forecasting platforms attempt to harness wisdom-of-crowds effects by aggregating many individual predictions. Knowledge coordination systems address information organization and accessibility problems. Verification tools create incentive structures for accurate assessment.
+
+Integration between these tools remains limited. Forecasts from platforms like Metaculus or Manifold Markets are not systematically fed into knowledge bases. Probabilistic models created in Squiggle are typically not connected to forecasting platforms for validation. The research and development of these tools occurs mostly independently, with different codebases, data formats, and user communities.
+
+Most platforms in this space operate as non-profit projects or venture-backed companies with uncertain sustainability models. User bases remain relatively small and concentrated within specific communities interested in rationality, effective altruism, or AI safety. Mainstream adoption of quantified forecasting tools outside these communities has been limited, with notable exceptions like prediction markets focused on political or financial outcomes.
+
+[^1]: Tetlock, P. E., & Gardner, D. (2015). *Superforecasting: The Art and Science of Prediction*. Crown Publishers. Documents research on forecasting accuracy and methods for improving judgment under uncertainty.
+
+[^2]: Atanasov, P., et al. (2017). "Distilling the Wisdom of Crowds: Prediction Markets vs. Prediction Polls." *Management Science*, 63(3), 691-706. Meta-analysis finding prediction markets slightly outperform polls in some contexts, with effect sizes varying by domain.
+
+[^3]: Metaforecast development status from project GitHub repository (last updated October 2023) and maintainer statements on LessWrong.
+
+[^4]: User count for Metaculus from platform about page (accessed 2024); Good Judgment Open performance documented in Mellers, B., et al. (2014). "Psychological Strategies for Winning a Geopolitical Forecasting Tournament." *Psychological Science*, 25(5), 1106-1115.
+
+[^5]: Community Notes algorithm description: Birdwatch/Community Notes Technical Whitepaper, X Corp (2024). Describes bridging-based ranking that prioritizes notes rated helpful by users who typically disagree.

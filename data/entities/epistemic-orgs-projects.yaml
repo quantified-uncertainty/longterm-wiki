@@ -30,6 +30,7 @@
   description: Domain-specific programming language for probabilistic estimation with native distribution types and Monte Carlo sampling.
   path: /knowledge-base/responses/squiggle/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: metaforecast
   type: project
@@ -37,6 +38,7 @@
   description: Forecast aggregation platform combining predictions from 10+ sources into a unified search interface.
   path: /knowledge-base/responses/metaforecast/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: squiggleai
   type: project
@@ -44,6 +46,7 @@
   description: LLM-powered tool for generating probabilistic models in Squiggle from natural language descriptions.
   path: /knowledge-base/responses/squiggleai/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: xpt
   type: project
@@ -51,6 +54,7 @@
   description: Four-month structured forecasting tournament bringing together superforecasters and domain experts through adversarial collaboration.
   path: /knowledge-base/responses/xpt/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: forecastbench
   type: project
@@ -58,6 +62,7 @@
   description: Dynamic, contamination-free benchmark for evaluating LLM forecasting capabilities, published at ICLR 2025.
   path: /knowledge-base/responses/forecastbench/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: ai-forecasting-benchmark
   type: project
@@ -65,6 +70,7 @@
   description: Quarterly competition run by Metaculus comparing human Pro Forecasters against AI forecasting bots.
   path: /knowledge-base/responses/ai-forecasting-benchmark/
   lastUpdated: 2026-01
+  summaryPage: epistemic-tools-tools-overview
 
 - id: ai-assisted-knowledge-management
   type: concept
@@ -72,6 +78,7 @@
   description: Tools and platforms using LLMs to help create, maintain, and query knowledge bases, from personal tools (Obsidian+AI, Notion AI) to open-source RAG frameworks (LlamaIndex, Haystack).
   path: /knowledge-base/responses/ai-assisted-knowledge-management/
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 
 - id: grokipedia
   type: project
@@ -79,6 +86,7 @@
   description: xAI's AI-generated encyclopedia launched October 2025, growing to 6M+ articles with documented quality concerns including political bias and scientific inaccuracies.
   path: /knowledge-base/responses/grokipedia/
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 
 - id: wikipedia-and-ai
   type: concept
@@ -86,3 +94,4 @@
   description: Wikipedia's evolving relationship with AI-generated content, including defensive policies, WikiProject AI Cleanup, model collapse risks, and sustainability challenges.
   path: /knowledge-base/responses/wikipedia-and-ai/
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview

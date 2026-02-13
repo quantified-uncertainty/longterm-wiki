@@ -3026,6 +3026,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: cirl
   type: approach
   title: Cooperative IRL (CIRL)
@@ -3074,6 +3075,7 @@
     - epistemics
     - governance
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: community-notes-for-everything
   type: approach
   title: Community Notes for Everything
@@ -3122,6 +3124,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: epistemic-virtue-evals
   type: approach
   title: Epistemic Virtue Evals
@@ -3160,9 +3163,11 @@
     - epistemics
     - community
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: mit-ai-risk-repository
   type: project
   title: MIT AI Risk Repository
+  summaryPage: epistemic-tools-tools-overview
   description: >-
     The MIT AI Risk Repository catalogs 1,700+ AI risks from 65+ frameworks into
     a searchable database with dual taxonomies (causal and domain-based).
@@ -3198,6 +3203,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: output-filtering
   type: approach
   title: Output Filtering
@@ -3298,6 +3304,7 @@
     - ai-safety
     - community
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: stampy-aisafety-info
   type: project
   title: Stampy / AISafety.info
@@ -3312,6 +3319,7 @@
     - community
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: texas-traiga
   type: policy
   title: Texas TRAIGA Responsible AI Governance Act
@@ -3337,6 +3345,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: wikipedia-views
   type: project
   title: Wikipedia Views
@@ -3348,6 +3357,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 
 - id: goal-misgeneralization-research
   type: approach
