@@ -23,7 +23,7 @@ export function LlmWarningBanner() {
   }
 
   return (
-    <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-900 dark:text-amber-200">
+    <div className="my-6 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-900 dark:text-amber-200">
       <div className="flex items-start gap-3">
         <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
