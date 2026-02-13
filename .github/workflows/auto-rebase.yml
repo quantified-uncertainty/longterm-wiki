@@ -1,0 +1,60 @@
+name: Auto-Rebase PRs
+
+# When main is updated, rebase all open PRs to surface conflicts early.
+# PRs with no real conflicts get silently rebased; PRs with conflicts
+# are left alone for the conflict-resolver workflow to handle.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  rebase-open-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rebase open PRs onto main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # List open PR branches targeting main
+          prs=$(gh pr list --base main --state open --json number,headRefName --jq '.[] | "\(.number) \(.headRefName)"')
+
+          if [ -z "$prs" ]; then
+            echo "No open PRs to rebase."
+            exit 0
+          fi
+
+          echo "$prs" | while read -r pr_number branch; do
+            echo "::group::PR #${pr_number} (${branch})"
+
+            git fetch origin "$branch"
+            git checkout "origin/$branch"
+            git checkout -B "$branch"
+
+            if git rebase origin/main; then
+              # Check if rebase actually changed anything
+              if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/$branch)" ]; then
+                echo "Rebased successfully — pushing updated branch."
+                git push origin "$branch" --force-with-lease
+              else
+                echo "Already up to date."
+              fi
+            else
+              echo "::warning::PR #${pr_number} (${branch}) has merge conflicts — skipping rebase."
+              git rebase --abort
+            fi
+
+            echo "::endgroup::"
+          done

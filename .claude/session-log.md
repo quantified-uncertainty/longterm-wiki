@@ -2,6 +2,21 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/automate-conflict-resolution-U6ars | Add automated merge conflict resolution
+
+**What was done:** Added two GitHub Actions workflows to automate merge conflict handling across parallel Claude Code PRs. (1) `auto-rebase.yml` — triggers on push to main, rebases all open PRs to keep them up-to-date (handles the common case of no real conflicts). (2) `resolve-conflicts.yml` + `.github/scripts/resolve-conflicts.mjs` — finds PRs with actual merge conflicts, sends each conflicted file to the Claude API (Sonnet) for semantic resolution, commits the merge, and posts a comment on the PR. Runs after auto-rebase, on a 6-hour schedule, and on manual trigger.
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- The two workflows complement each other: auto-rebase handles ~90% of cases (branch just behind main), conflict resolver handles the rest
+- Conflict resolver uses `max-parallel: 1` to avoid push races when multiple PRs are conflicted
+- Requires `ANTHROPIC_API_KEY` secret in the repository for the conflict resolver to work
+- Uses Sonnet for cost efficiency — MDX/YAML conflicts are straightforward enough that Opus isn't needed
+
+---
+
 ## 2026-02-13 | claude/analyze-x-epistemics-UEHWy | Create X.com Platform Epistemics page + validation rules
 
 **What was done:** Created a comprehensive analysis page for X.com's epistemic practices. After review, fixed a journal name mismatch (PNAS Nexus → Science) and restructured the Mermaid diagram to comply with the style guide. Then added two new validation rules to prevent these classes of issues in the future: `citation-doi-mismatch` (detects when link text contradicts URL DOI prefix) and `mermaid-style` (enforces max parallel nodes, total node count, and TD orientation). Both rules added to QUALITY_RULES for non-blocking advisory checks.
