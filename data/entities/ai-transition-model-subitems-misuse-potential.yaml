@@ -1,4 +1,5 @@
 - id: "tmc-robot-threat"
+  numericId: E341
   type: "ai-transition-model-subitem"
   title: "Robot Threat Exposure"
   parentFactor: "misuse-potential"
@@ -144,6 +145,7 @@
         strength: "medium"
         effect: "decreases"
 - id: "tmc-surprise-threat"
+  numericId: E351
   type: "ai-transition-model-subitem"
   title: "Surprise Threat Exposure"
   parentFactor: "misuse-potential"

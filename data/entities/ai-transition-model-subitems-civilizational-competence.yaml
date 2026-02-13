@@ -1,4 +1,5 @@
 - id: "tmc-civcomp-adaptability"
+  numericId: E307
   type: "ai-transition-model-subitem"
   title: "Adaptability"
   parentFactor: "civilizational-competence"
@@ -150,6 +151,7 @@
         strength: "strong"
         effect: "increases"
 - id: "tmc-civ-epistemics"
+  numericId: E305
   type: "ai-transition-model-subitem"
   title: "Civilizational Epistemics"
   parentFactor: "civilizational-competence"
@@ -301,6 +303,7 @@
         strength: "strong"
         effect: "increases"
 - id: "tmc-civ-governance"
+  numericId: E306
   type: "ai-transition-model-subitem"
   title: "Civilizational Governance"
   parentFactor: "civilizational-competence"

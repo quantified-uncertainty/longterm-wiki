@@ -1,4 +1,5 @@
 - id: international-coordination
+  numericId: E171
   type: ai-transition-model-parameter
   title: International Coordination
   description: Degree of global cooperation on AI governance and safety, measured through treaty
@@ -173,6 +174,7 @@
         strength: medium
         effect: mixed
 - id: societal-trust
+  numericId: E285
   type: ai-transition-model-parameter
   title: Societal Trust
   description: Level of public confidence in institutions, experts, and verification systems. A
@@ -378,6 +380,7 @@
         strength: medium
         effect: mixed
 - id: epistemic-health
+  numericId: E121
   type: ai-transition-model-parameter
   title: Epistemic Health
   description: Society's collective ability to distinguish truth from falsehood and form shared
@@ -579,6 +582,7 @@
         strength: medium
         effect: mixed
 - id: information-authenticity
+  numericId: E164
   type: ai-transition-model-parameter
   title: Information Authenticity
   description: The degree to which content circulating in society can be verified as genuine—tracing
@@ -695,6 +699,7 @@
         strength: strong
         effect: increases
 - id: ai-control-concentration
+  numericId: E7
   type: ai-transition-model-parameter
   title: AI Control Concentration
   description: How concentrated or distributed power over AI development and deployment is across
@@ -802,6 +807,7 @@
         strength: medium
         effect: increases
 - id: human-agency
+  numericId: E157
   type: ai-transition-model-parameter
   title: Human Agency
   description: Degree of meaningful human control over decisions affecting their lives. Includes
@@ -919,6 +925,7 @@
         strength: strong
         effect: increases
 - id: economic-stability
+  numericId: E112
   type: ai-transition-model-parameter
   title: Economic Stability
   description: Resilience of economic systems to AI-driven changes—including labor market
@@ -1051,6 +1058,7 @@
         strength: medium
         effect: increases
 - id: human-expertise
+  numericId: E159
   type: ai-transition-model-parameter
   title: Human Expertise
   description: Maintenance of human skills, knowledge, and cognitive capabilities in an AI-augmented
@@ -1165,6 +1173,7 @@
         strength: medium
         effect: increases
 - id: human-oversight-quality
+  numericId: E160
   type: ai-transition-model-parameter
   title: Human Oversight Quality
   description: Effectiveness of human review, decision authority, and correction capability over AI
@@ -1342,6 +1351,7 @@
         strength: medium
         effect: mixed
 - id: alignment-robustness
+  numericId: E20
   type: ai-transition-model-parameter
   title: Alignment Robustness
   description: How reliably AI systems pursue intended goals across contexts, distribution shifts, and
@@ -1549,6 +1559,7 @@
         strength: strong
         effect: mixed
 - id: safety-capability-gap
+  numericId: E261
   type: ai-transition-model-parameter
   title: Safety-Capability Gap
   description: The lag between AI capability advances and corresponding safety/alignment
@@ -1739,6 +1750,7 @@
         strength: strong
         effect: mixed
 - id: interpretability-coverage
+  numericId: E175
   type: ai-transition-model-parameter
   title: Interpretability Coverage
   description: The percentage of model behavior that can be explained and understood by researchers.
@@ -1905,6 +1917,7 @@
         strength: strong
         effect: mixed
 - id: regulatory-capacity
+  numericId: E249
   type: ai-transition-model-parameter
   title: Regulatory Capacity
   description: Ability of governments to effectively understand, evaluate, and regulate AI systems,
@@ -2061,6 +2074,7 @@
         strength: medium
         effect: increases
 - id: institutional-quality
+  numericId: E167
   type: ai-transition-model-parameter
   title: Institutional Quality
   description: Health and effectiveness of institutions involved in AI governance, including
@@ -2217,6 +2231,7 @@
         strength: medium
         effect: increases
 - id: reality-coherence
+  numericId: E243
   type: ai-transition-model-parameter
   title: Reality Coherence
   description: The degree to which different populations share common factual beliefs about basic
@@ -2387,6 +2402,7 @@
         strength: strong
         effect: increases
 - id: preference-authenticity
+  numericId: E229
   type: ai-transition-model-parameter
   title: Preference Authenticity
   description: The degree to which human preferences reflect genuine values rather than externally
@@ -2552,6 +2568,7 @@
         strength: medium
         effect: increases
 - id: racing-intensity
+  numericId: E242
   type: ai-transition-model-parameter
   title: Racing Intensity
   description: The degree of competitive pressure driving AI development speed over safety. High
@@ -2742,6 +2759,7 @@
         strength: medium
         effect: increases
 - id: safety-culture-strength
+  numericId: E264
   type: ai-transition-model-parameter
   title: Safety Culture Strength
   description: The degree to which AI organizations genuinely prioritize safety in decisions, resource
@@ -2920,6 +2938,7 @@
         strength: medium
         effect: mixed
 - id: coordination-capacity
+  numericId: E76
   type: ai-transition-model-parameter
   title: Coordination Capacity
   description: The degree to which AI stakeholders successfully coordinate on safety standards,
@@ -3098,6 +3117,7 @@
         strength: strong
         effect: mixed
 - id: biological-threat-exposure
+  numericId: E41
   type: ai-transition-model-parameter
   title: Biological Threat Exposure
   description: Society's vulnerability to biological threats including AI-enabled bioweapons. Measures
@@ -3278,6 +3298,7 @@
         strength: strong
         effect: mixed
 - id: cyber-threat-exposure
+  numericId: E85
   type: ai-transition-model-parameter
   title: Cyber Threat Exposure
   description: Society's vulnerability to cyber attacks including AI-enabled threats. Measures
@@ -3455,6 +3476,7 @@
         strength: strong
         effect: mixed
 - id: societal-resilience
+  numericId: E284
   type: ai-transition-model-parameter
   title: Societal Resilience
   description: Society's ability to maintain essential functions and recover from AI-related failures,

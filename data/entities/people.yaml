@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: buck-shlegeris
+  numericId: E46
   type: researcher
   title: Buck Shlegeris
   website: https://redwoodresearch.org
@@ -11,6 +12,7 @@
     - label: Known For
       value: AI safety research, Redwood Research leadership
 - id: chris-olah
+  numericId: E59
   type: researcher
   title: Chris Olah
   website: https://colah.github.io
@@ -64,6 +66,7 @@
     - monosemanticity
   lastUpdated: 2025-12
 - id: connor-leahy
+  numericId: E71
   type: researcher
   title: Connor Leahy
   website: https://conjecture.dev
@@ -114,6 +117,7 @@
     - red-teaming
   lastUpdated: 2025-12
 - id: dan-hendrycks
+  numericId: E89
   type: researcher
   title: Dan Hendrycks
   website: https://hendrycks.com
@@ -163,6 +167,7 @@
     - compute-governance
   lastUpdated: 2025-12
 - id: daniela-amodei
+  numericId: E90
   type: researcher
   title: Daniela Amodei
   website: https://anthropic.com
@@ -172,6 +177,7 @@
     - label: Known For
       value: Co-founding Anthropic, Operations and business leadership
 - id: dario-amodei
+  numericId: E91
   type: researcher
   title: Dario Amodei
   website: https://anthropic.com
@@ -228,9 +234,11 @@
     - empirical-alignment
   lastUpdated: 2025-12
 - id: demis-hassabis
+  numericId: E101
   type: researcher
   title: Demis Hassabis
 - id: eliezer-yudkowsky
+  numericId: E114
   type: researcher
   title: Eliezer Yudkowsky
   website: https://intelligence.org
@@ -288,6 +296,7 @@
     - deception
   lastUpdated: 2025-12
 - id: elizabeth-kelly
+  numericId: E115
   type: researcher
   title: Elizabeth Kelly
   customFields:
@@ -296,12 +305,15 @@
     - label: Known For
       value: Leading US AI Safety Institute, AI policy
 - id: evan-hubinger
+  numericId: E129
   type: researcher
   title: Evan Hubinger
 - id: gary-marcus
+  numericId: E148
   type: researcher
   title: Gary Marcus
 - id: geoffrey-hinton
+  numericId: E149
   type: researcher
   title: Geoffrey Hinton
   website: https://www.cs.toronto.edu/~hinton/
@@ -352,6 +364,7 @@
     - autonomous-weapons
   lastUpdated: 2025-12
 - id: holden-karnofsky
+  numericId: E156
   type: researcher
   title: Holden Karnofsky
   website: https://coefficientgiving.org
@@ -401,6 +414,7 @@
     - grantmaking
   lastUpdated: 2025-12
 - id: ian-hogarth
+  numericId: E162
   type: researcher
   title: Ian Hogarth
   customFields:
@@ -409,6 +423,7 @@
     - label: Known For
       value: Leading UK AI Safety Institute, AI investor and writer
 - id: ilya-sutskever
+  numericId: E163
   type: researcher
   title: Ilya Sutskever
   website: https://ssi.inc
@@ -459,6 +474,7 @@
     - gpt
   lastUpdated: 2025-12
 - id: jan-leike
+  numericId: E182
   type: researcher
   title: Jan Leike
   website: https://anthropic.com
@@ -512,9 +528,11 @@
     - deception
   lastUpdated: 2025-12
 - id: nate-soares
+  numericId: E212
   type: researcher
   title: Nate Soares (MIRI)
 - id: neel-nanda
+  numericId: E214
   type: researcher
   title: Neel Nanda
   website: https://www.neelnanda.io
@@ -567,6 +585,7 @@
     - science-communication
   lastUpdated: 2025-12
 - id: nick-bostrom
+  numericId: E215
   type: researcher
   title: Nick Bostrom
   website: https://nickbostrom.com
@@ -619,6 +638,7 @@
     - control-problem
   lastUpdated: 2025-12
 - id: paul-christiano
+  numericId: E220
   type: researcher
   title: Paul Christiano
   website: https://alignment.org
@@ -675,12 +695,15 @@
     - deception
   lastUpdated: 2025-12
 - id: robin-hanson
+  numericId: E260
   type: researcher
   title: Robin Hanson
 - id: sam-altman
+  numericId: E269
   type: researcher
   title: Sam Altman
 - id: shane-legg
+  numericId: E280
   type: researcher
   title: Shane Legg
   website: https://deepmind.google
@@ -690,6 +713,7 @@
     - label: Known For
       value: Co-founding DeepMind, Early work on AGI, Machine super intelligence thesis
 - id: stuart-russell
+  numericId: E290
   type: researcher
   title: Stuart Russell
   website: https://people.eecs.berkeley.edu/~russell/
@@ -743,6 +767,7 @@
     - governance
   lastUpdated: 2025-12
 - id: toby-ord
+  numericId: E355
   type: researcher
   title: Toby Ord
   website: https://www.tobyord.com
@@ -794,6 +819,7 @@
     - future-generations
   lastUpdated: 2025-12
 - id: yoshua-bengio
+  numericId: E380
   type: researcher
   title: Yoshua Bengio
   website: https://yoshuabengio.org
@@ -845,6 +871,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: elon-musk
+  numericId: E116
   type: researcher
   title: Elon Musk
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
@@ -859,6 +886,7 @@
     - ai-labs
   lastUpdated: 2025-12
 - id: beth-barnes
+  numericId: E39
   type: researcher
   title: Beth Barnes
   description: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
@@ -876,6 +904,7 @@
 # Generated 2026-02-08
 
 - id: david-sacks
+  numericId: E431
   type: researcher
   title: David Sacks
   description: >-
@@ -905,6 +934,7 @@
   lastUpdated: 2026-02
 
 - id: marc-andreessen
+  numericId: E432
   type: researcher
   title: Marc Andreessen
   description: >-
@@ -931,6 +961,7 @@
   lastUpdated: 2026-02
 
 - id: max-tegmark
+  numericId: E433
   type: researcher
   title: Max Tegmark
   description: >-
@@ -961,6 +992,7 @@
   lastUpdated: 2026-02
 
 - id: philip-tetlock
+  numericId: E434
   type: researcher
   title: Philip Tetlock
   description: >-
@@ -986,6 +1018,7 @@
   lastUpdated: 2026-02
 
 - id: eli-lifland
+  numericId: E435
   type: researcher
   title: Eli Lifland
   description: >-
@@ -1016,6 +1049,7 @@
   lastUpdated: 2026-02
 
 - id: dustin-moskovitz
+  numericId: E436
   type: researcher
   title: Dustin Moskovitz
   description: >-
@@ -1048,6 +1082,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: gwern
+  numericId: E574
   type: researcher
   title: Gwern Branwen
   description: >-
@@ -1060,6 +1095,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: helen-toner
+  numericId: E575
   type: researcher
   title: Helen Toner
   description: >-
@@ -1072,6 +1108,7 @@
     - governance
   lastUpdated: 2026-02
 - id: issa-rice
+  numericId: E576
   type: researcher
   title: Issa Rice
   description: >-
@@ -1084,6 +1121,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: jaan-tallinn
+  numericId: E577
   type: researcher
   title: Jaan Tallinn
   description: >-
@@ -1096,6 +1134,7 @@
     - governance
   lastUpdated: 2026-02
 - id: leopold-aschenbrenner
+  numericId: E578
   type: researcher
   title: Leopold Aschenbrenner
   description: >-
@@ -1108,6 +1147,7 @@
     - governance
   lastUpdated: 2026-02
 - id: nuno-sempere
+  numericId: E579
   type: researcher
   title: Nuño Sempere
   description: >-
@@ -1120,6 +1160,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: vidur-kapur
+  numericId: E580
   type: researcher
   title: Vidur Kapur
   description: >-
@@ -1133,6 +1174,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: vipul-naik
+  numericId: E581
   type: researcher
   title: Vipul Naik
   description: >-
@@ -1145,6 +1187,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: yann-lecun
+  numericId: E582
   type: researcher
   title: Yann LeCun
   description: >-

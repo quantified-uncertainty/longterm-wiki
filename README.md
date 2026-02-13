@@ -92,7 +92,7 @@ Entities come from two sources, merged at build time (YAML takes precedence):
 
 ## Entity ID System
 
-Entities have both string slugs (`geoffrey-hinton`) and numeric IDs (`E42`). Wiki pages use numeric IDs as canonical URLs. The mapping is stored in `data/id-registry.json`.
+Entities have both string slugs (`geoffrey-hinton`) and numeric IDs (`E42`). Wiki pages use numeric IDs as canonical URLs. Each entity stores its `numericId` in its source file (YAML or MDX frontmatter); `data/id-registry.json` is a derived build artifact.
 
 ## CI
 
