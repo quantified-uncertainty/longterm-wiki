@@ -2,6 +2,7 @@ import Image from "next/image";
 import { EntityLink, MultiEntityLinks } from "@/components/wiki/EntityLink";
 import { ResourceLink, R } from "@/components/wiki/ResourceLink";
 import { F } from "@/components/wiki/F";
+import { Calc } from "@/components/wiki/Calc";
 import { MermaidDiagram } from "@/components/wiki/MermaidDiagram";
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
 import { Backlinks } from "@/components/wiki/Backlinks";
@@ -97,6 +98,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   ResourceLink,
   R,
   F,
+  Calc,
   DataInfoBox,
   Backlinks,
   DataExternalLinks,

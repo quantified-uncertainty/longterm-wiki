@@ -24,7 +24,7 @@ clusters:
   - governance
 subcategory: labs
 ---
-import {DataInfoBox, EntityLink, DataExternalLinks, SquiggleEstimate} from '@components/wiki';
+import {DataInfoBox, EntityLink, DataExternalLinks, SquiggleEstimate, Calc} from '@components/wiki';
 
 <DataExternalLinks pageId="anthropic" />
 
@@ -74,7 +74,7 @@ This is the main Anthropic company page. For detailed analysis on specific topic
 
 ### Quick Financial Context
 
-As of January 2026: \$350B valuation, \$9B ARR (end 2025), targeting \$20-26B for 2026. Anthropic trades at ≈39x revenue vs <EntityLink id="openai">OpenAI</EntityLink>'s ≈25x—see <EntityLink id="anthropic-valuation">Valuation Analysis</EntityLink> for why this premium may or may not be justified (including 25% customer concentration risk and margin pressure).
+As of January 2026: <F e="anthropic" f="valuation" /> valuation, <F e="anthropic" f="revenue-arr-2025" /> ARR (end 2025), targeting <F e="anthropic" f="revenue-2026-guidance" /> for 2026. Anthropic trades at ≈<Calc expr="{anthropic.valuation} / {anthropic.revenue-arr-2025}" precision={0} suffix="x" /> revenue vs <EntityLink id="openai">OpenAI</EntityLink>'s ≈25x—see <EntityLink id="anthropic-valuation">Valuation Analysis</EntityLink> for why this premium may or may not be justified (including <F e="anthropic" f="customer-concentration" /> customer concentration risk and margin pressure).
 
 <SquiggleEstimate title="Anthropic Revenue Trajectory (ARR, $B)" code={`
 // Anthropic revenue growth trajectory
@@ -95,9 +95,11 @@ rev2028 = rev2027 * (1.3 to 2.0)  // further deceleration
 
 <SquiggleEstimate title="Anthropic Valuation Scenario Analysis" code={`
 // Revenue-based valuation model
+currentValuation = 350  // \$B — from canonical facts
 revenue2026 = 20 to 26  // \$B guidance
 revenueMultiple = 10 to 45  // range of forward multiples for AI companies
 impliedValuation = revenue2026 * revenueMultiple * 1e9
+currentPSRatio = currentValuation / 9  // valuation / ARR
 
 // Scenario-weighted valuation (continuous ranges)
 bull = 400e9 to 650e9
