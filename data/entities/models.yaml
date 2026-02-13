@@ -1388,7 +1388,7 @@
 - id: risk-activation-timeline
   numericId: E255
   type: model
-  title: Risk Activation Timeline Model
+  title: AI Risk Activation Timeline Model
   description: >-
     This model maps when risks become critical based on capability levels. Near-term risks activate at current
     capabilities; transformative risks require advanced autonomous systems.
@@ -1418,7 +1418,7 @@
 - id: capability-threshold-model
   numericId: E53
   type: model
-  title: Capability Threshold Model
+  title: AI Capability Threshold Model
   description: >-
     This model maps capability levels to risk activation thresholds. It identifies 15-25% benchmark performance as
     indicating early risk emergence, with 50% marking qualitative shift to complex autonomous execution.
@@ -1448,7 +1448,7 @@
 - id: warning-signs-model
   numericId: E370
   type: model
-  title: Warning Signs Model
+  title: AI Risk Warning Signs Model
   description: >-
     This model catalogs early indicators for detecting emerging AI risks. It prioritizes indicators by lead time,
     reliability, and actionability.
@@ -1711,7 +1711,7 @@
 - id: intervention-effectiveness-matrix
   numericId: E177
   type: model
-  title: Intervention Effectiveness Matrix
+  title: AI Safety Intervention Effectiveness Matrix
   description: Mapping AI safety interventions to the risks they mitigate, with effectiveness estimates and gap analysis
   customFields:
     - label: Model Type
@@ -1728,7 +1728,7 @@
 - id: lab-incentives-model
   numericId: E185
   type: model
-  title: Lab Incentives Model
+  title: AI Lab Incentives Model
   description: >-
     This model analyzes competitive and reputational pressures on lab safety decisions. It identifies conditions where
     market dynamics systematically underweight safety investment.
@@ -1760,7 +1760,7 @@
 - id: risk-interaction-matrix
   numericId: E257
   type: model
-  title: Risk Interaction Matrix
+  title: AI Risk Interaction Matrix
   description: >-
     This model analyzes how risks amplify, mitigate, or transform each other. It identifies 15-25% of risk pairs as
     strongly interacting, with compounding effects dominating.
@@ -1779,7 +1779,7 @@
 - id: safety-research-value
   numericId: E267
   type: model
-  title: Safety Research Value Model
+  title: AI Safety Research Value Model
   description: >-
     This model estimates marginal returns on safety research investment. It finds current funding levels significantly
     below optimal, with 2-5x returns available in neglected areas.
@@ -1821,7 +1821,7 @@
 - id: compounding-risks-analysis
   numericId: E63
   type: model
-  title: Compounding Risks Analysis Model
+  title: AI Compounding Risks Analysis Model
   description: >-
     This model analyzes how risks compound beyond additive effects. Key combinations include racing+concentration
     (40-60% coverage needed) and mesa-optimization+scheming (2-6% catastrophic probability).
@@ -1847,7 +1847,7 @@
 - id: defense-in-depth-model
   numericId: E99
   type: model
-  title: Defense in Depth Model
+  title: AI Safety Defense in Depth Model
   description: >-
     This model analyzes how layered safety measures combine. Individual layers provide 20-60% coverage; independence
     between layers is critical for compound effectiveness.
@@ -1870,7 +1870,7 @@
 - id: institutional-adaptation-speed
   numericId: E165
   type: model
-  title: Institutional Adaptation Speed Model
+  title: Institutional AI Adaptation Speed Model
   description: >-
     This model analyzes institutional adaptation rates to AI. It finds institutions change at 10-30% of needed rate per
     year while AI creates 50-200% annual gaps, with regulatory lag historically spanning 15-70 years.
@@ -1899,7 +1899,7 @@
 - id: international-coordination-game
   numericId: E172
   type: model
-  title: International Coordination Game Model
+  title: International AI Coordination Game Model
   description: >-
     This model analyzes game-theoretic dynamics of international AI governance. It identifies key equilibria between
     US-China competition and potential cooperation pathways through safety agreements.
@@ -1934,7 +1934,7 @@
 - id: media-policy-feedback-loop
   numericId: E196
   type: model
-  title: Media-Policy Feedback Loop Model
+  title: AI Media-Policy Feedback Loop Model
   description: >-
     This model analyzes cycles between media coverage, public opinion, and AI policy. It finds media framing
     significantly shapes policy windows, with 6-18 month lag between coverage spikes and regulatory response.
@@ -1953,7 +1953,7 @@
 - id: post-incident-recovery
   numericId: E225
   type: model
-  title: Post-Incident Recovery Model
+  title: Post-AI-Incident Recovery Model
   description: >-
     This model analyzes recovery pathways from AI incidents. It finds clear attribution enables 3-5x faster recovery,
     and recommends 5-10% of safety resources for recovery capacity, particularly trust and skill preservation.
@@ -1972,7 +1972,7 @@
 - id: public-opinion-evolution
   numericId: E237
   type: model
-  title: Public Opinion Evolution Model
+  title: Public Opinion on AI Evolution Model
   description: >-
     This model analyzes how public AI risk perception evolves. It finds major incidents shift opinion by 10-25
     percentage points, decaying with 6-12 month half-life.
@@ -1995,7 +1995,7 @@
 - id: risk-cascade-pathways
   numericId: E256
   type: model
-  title: Risk Cascade Pathways Model
+  title: AI Risk Cascade Pathways Model
   description: >-
     This model maps common pathways where one risk triggers others. Key cascades include
     racing→corner-cutting→incident→regulation-capture and epistemic→trust→coordination-failure.
@@ -2021,7 +2021,7 @@
 - id: risk-interaction-network
   numericId: E258
   type: model
-  title: Risk Interaction Network Model
+  title: AI Risk Interaction Network Model
   description: >-
     This model maps how risks enable and reinforce each other. It identifies racing dynamics and concentration of power
     as central hub risks affecting most others.
@@ -2110,7 +2110,7 @@
 - id: safety-research-allocation
   numericId: E266
   type: model
-  title: Safety Research Allocation Model
+  title: AI Safety Research Allocation Model
   description: >-
     This model analyzes safety research resource distribution. It identifies neglected areas including multi-agent
     dynamics and corrigibility, with 3-5x funding gaps vs core alignment.
@@ -2136,7 +2136,7 @@
 - id: safety-researcher-gap
   numericId: E268
   type: model
-  title: Safety Researcher Gap Model
+  title: AI Safety Researcher Gap Model
   description: >-
     This model analyzes mismatch between safety researcher supply and demand. It estimates 3-10x gap between needed
     researchers and current pipeline capacity.
@@ -2159,7 +2159,7 @@
 - id: whistleblower-dynamics
   numericId: E371
   type: model
-  title: Whistleblower Dynamics Model
+  title: AI Lab Whistleblower Dynamics Model
   description: >-
     This model analyzes information flow from AI insiders to the public. It estimates significant barriers reduce
     whistleblowing by 70-90% compared to optimal transparency.
@@ -2182,7 +2182,7 @@
 - id: parameter-interaction-network
   numericId: E219
   type: model
-  title: Parameter Interaction Network Model
+  title: AI Risk Parameter Interaction Network Model
   description: >-
     This model maps causal relationships between 22 key AI safety parameters. It identifies 7 feedback loops and 4
     critical dependency clusters, showing that epistemic-health and institutional-quality are highest-leverage
@@ -2221,7 +2221,7 @@
 - id: safety-culture-equilibrium
   numericId: E263
   type: model
-  title: Safety Culture Equilibrium Model
+  title: AI Safety Culture Equilibrium Model
   description: >-
     This model analyzes stable states for AI lab safety culture under competitive pressure. It identifies three
     equilibria and transition conditions requiring coordinated commitment or major incident.
@@ -2256,7 +2256,7 @@
 - id: regulatory-capacity-threshold
   numericId: E250
   type: model
-  title: Regulatory Capacity Threshold Model
+  title: AI Regulatory Capacity Threshold Model
   description: >-
     This model estimates minimum regulatory capacity for credible AI oversight. It finds current US/UK capacity at
     0.15-0.25 of the 0.4-0.6 threshold needed, with a 3-5 year window to build capacity.

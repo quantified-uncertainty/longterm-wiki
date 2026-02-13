@@ -19,6 +19,7 @@ import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
+import { logBulkFixes } from '../lib/edit-log.ts';
 
 const args: string[] = process.argv.slice(2);
 const APPLY_MODE: boolean = args.includes('--apply');
@@ -240,6 +241,7 @@ async function main(): Promise<void> {
 
   let totalChanges = 0;
   let filesChanged = 0;
+  const modifiedFiles: string[] = [];
 
   for (const file of files) {
     const relPath = relative(PROJECT_ROOT, file);
@@ -261,8 +263,17 @@ async function main(): Promise<void> {
 
     if (APPLY_MODE) {
       writeFileSync(file, result.content);
+      modifiedFiles.push(file);
       console.log(`  ${colors.green}✓${colors.reset} Saved`);
     }
+  }
+
+  if (APPLY_MODE && modifiedFiles.length > 0) {
+    logBulkFixes(modifiedFiles, {
+      tool: 'crux-fix',
+      agency: 'automated',
+      note: 'Fixed missing component imports',
+    });
   }
 
   console.log();

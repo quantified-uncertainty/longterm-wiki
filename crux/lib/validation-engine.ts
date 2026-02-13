@@ -22,6 +22,7 @@ import { getColors, type Colors } from './output.ts';
 import { parseFrontmatterAndBody } from './mdx-utils.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, type Frontmatter } from './content-types.ts';
 import { parseSidebarConfig, type SidebarParseResult } from './sidebar-utils.ts';
+import { logBulkFixes } from './edit-log.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -381,15 +382,25 @@ export class ValidationEngine {
     let filesFixed = 0;
     let issuesFixed = 0;
 
+    const modifiedFiles: string[] = [];
     for (const [filePath, fileIssues] of byFile) {
       const content = readFileSync(filePath, 'utf-8');
       const fixed = this._applyFixesToContent(content, fileIssues);
 
       if (fixed !== content) {
         writeFileSync(filePath, fixed);
+        modifiedFiles.push(filePath);
         filesFixed++;
         issuesFixed += fileIssues.length;
       }
+    }
+
+    if (modifiedFiles.length > 0) {
+      logBulkFixes(modifiedFiles, {
+        tool: 'crux-fix',
+        agency: 'automated',
+        note: 'Auto-fixed validation issues (escaping, markdown, etc.)',
+      });
     }
 
     return { filesFixed, issuesFixed };
