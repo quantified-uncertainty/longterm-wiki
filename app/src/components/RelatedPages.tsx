@@ -311,15 +311,15 @@ export function RelatedPages({
   const groups = groupByType(remaining, sourceType);
 
   return (
-    <section className="mt-10 pt-5 border-t border-border">
+    <section className="not-prose mt-10 pt-5 border-t border-border">
       <SectionHeading>Related Pages</SectionHeading>
-      <div className="space-y-0.5 mb-3">
+      <div className="mb-3">
         {topItems.map((item) => (
           <TopItem key={item.id} item={item} />
         ))}
       </div>
       {groups.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {groups.map((group) => (
             <GroupSection key={group.label} group={group} />
           ))}
