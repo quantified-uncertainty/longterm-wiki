@@ -2,6 +2,18 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Add evergreen flag to opt out of update schedule
+
+**What was done:** Added `evergreen: false` frontmatter field to allow pages (reports, experiments, proposals) to opt out of the update schedule. Updated frontmatter schema, Page interface, build-data extraction, getUpdateSchedule(), and both bootstrap/reassign scripts to respect the flag. Applied `evergreen: false` to all 6 internal report pages. Updated automation-tools docs.
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- Pages without `update_frequency` are already excluded from the schedule, but the bootstrap script would re-add it. The `evergreen: false` flag prevents this.
+
+---
+
 ## 2026-02-13 | claude/add-llm-warning-banner-aWFt0 | Add LLM warning banner to wiki pages
 
 **What was done:** Added a dismissible warning banner to all wiki pages informing readers that content was written by an LLM with minimal human supervision. The banner uses localStorage to persist dismissal, so once closed it stays hidden across all pages.

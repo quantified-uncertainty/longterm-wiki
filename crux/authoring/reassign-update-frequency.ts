@@ -386,6 +386,7 @@ async function main(): Promise<void> {
 
     if (!fm.update_frequency) continue;
     if (fm.pageType === 'stub' || fm.pageType === 'documentation' || fm.pageType === '"documentation"') continue;
+    if (fm.evergreen === 'false' || fm.evergreen === false) continue;
 
     pages.push({
       filePath,

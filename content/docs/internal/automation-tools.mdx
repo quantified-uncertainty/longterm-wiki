@@ -95,6 +95,16 @@ importance: 85
 | >= 40 | 45 days (6 weeks) |
 | >= 20 | 90 days (3 months) |
 
+### Opting Out: Non-Evergreen Pages
+
+Some pages are point-in-time content (reports, experiments, proposals) that don't need ongoing updates. Set `evergreen: false` in frontmatter to exclude them from the update schedule:
+
+```yaml
+evergreen: false    # This page is a snapshot, not maintained
+```
+
+Pages with `evergreen: false` are skipped by the update schedule, the bootstrap script, and the reassign script. All existing report pages under `internal/reports/` use this flag.
+
 ### Commands
 
 ```bash

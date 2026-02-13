@@ -284,6 +284,7 @@ export interface Page {
   tags?: string[];
   clusters?: string[];
   updateFrequency?: number | null;
+  evergreen?: boolean;
   wordCount?: number;
   backlinkCount?: number;
   metrics?: {
@@ -454,6 +455,7 @@ export function getUpdateSchedule(): UpdateScheduleItem[] {
 
   for (const page of pages) {
     if (!page.updateFrequency) continue;
+    if (page.evergreen === false) continue;
 
     const lastUpdated = page.lastUpdated;
     const daysSince = lastUpdated

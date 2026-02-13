@@ -62,6 +62,7 @@ const frontmatterSchema = z.object({
   maturity: z.string().optional(),
   fullWidth: z.boolean().optional(),
   update_frequency: z.number().positive().optional(),
+  evergreen: z.boolean().optional(),
   entityType: z.enum(ALL_ENTITY_TYPE_NAMES as unknown as [string, ...string[]]).optional(),
   entityId: z.string().optional(),
   roles: z.array(z.string()).optional(),

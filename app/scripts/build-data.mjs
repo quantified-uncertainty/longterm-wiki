@@ -486,6 +486,8 @@ function buildPagesRegistry(urlToResource) {
           suggestedQuality: suggestQuality(metrics.structuralScore, fm),
           // Update frequency (days between updates)
           updateFrequency: fm.update_frequency ? parseInt(fm.update_frequency) : null,
+          // Evergreen flag (false = point-in-time content like reports, excluded from update schedule)
+          evergreen: fm.evergreen === false ? false : true,
           // Legacy field for backwards compatibility
           wordCount: metrics.wordCount,
           // Unconverted links (markdown links with matching resources)
