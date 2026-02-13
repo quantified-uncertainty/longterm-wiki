@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { getRelatedGraphFor, getPageById } from "@/data";
+import { getRelatedGraphFor, getPageById, getEntityById } from "@/data";
+import { getEntityTypeIcon } from "./wiki/EntityTypeIcon";
+import styles from "./wiki/tooltip.module.css";
+import { cn } from "@lib/utils";
 
 // Map entity types to display group names
 const TYPE_TO_GROUP: Record<string, string> = {
@@ -76,6 +79,17 @@ const GROUP_ORDER_BY_SOURCE_TYPE: Record<string, string[]> = {
   model: ["Risks", "Approaches", "Safety Research", "Analysis", "People", "Labs", "Models"],
 };
 
+function formatEntityType(type: string): string {
+  return type
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function truncate(text: string, max: number): string {
+  return text.length <= max ? text : text.slice(0, max - 3) + "...";
+}
+
 interface RelatedPageItem {
   id: string;
   title: string;
@@ -124,12 +138,9 @@ function groupByType(
     result.sort((a, b) => {
       const aIdx = preferredOrder.indexOf(a.label);
       const bIdx = preferredOrder.indexOf(b.label);
-      // Both in preferred list: use preferred order
       if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
-      // Only one in preferred list: it comes first
       if (aIdx !== -1) return -1;
       if (bIdx !== -1) return 1;
-      // Neither in list: fall back to score
       return b.maxScore - a.maxScore;
     });
   } else {
@@ -152,16 +163,55 @@ function RelationshipLabel({ label }: { label: string }) {
   );
 }
 
+function ItemTooltip({ item }: { item: RelatedPageItem }) {
+  const entity = getEntityById(item.id);
+  const page = getPageById(item.id);
+  const summary = page?.llmSummary || page?.description || entity?.description;
+  const TypeIcon = entity ? getEntityTypeIcon(entity.type) : null;
+
+  if (!summary && !entity?.type) return null;
+
+  return (
+    <span
+      className={cn(
+        styles.tooltip,
+        "absolute left-0 bottom-full mb-1 z-50 w-[280px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+      )}
+      role="tooltip"
+    >
+      {entity?.type && (
+        <span className="flex items-center gap-1.5 mb-2 text-xs text-muted-foreground">
+          {TypeIcon && <TypeIcon className="w-3 h-3" />}
+          <span className="uppercase tracking-wide">{formatEntityType(entity.type)}</span>
+        </span>
+      )}
+      <span className="block font-semibold text-foreground mb-1.5 text-sm">
+        {item.title}
+      </span>
+      {summary && (
+        <span className="block text-muted-foreground text-[0.8rem] leading-snug">
+          {truncate(summary, 200)}
+        </span>
+      )}
+      {page?.quality && (
+        <span className="block mt-2 text-xs text-muted-foreground">
+          Quality: {page.quality}/100
+        </span>
+      )}
+    </span>
+  );
+}
+
 function TopItem({ item }: { item: RelatedPageItem }) {
   const groupName = TYPE_TO_GROUP[item.type] || "Other";
   return (
-    <div className="flex items-start gap-2 py-1">
+    <div className={cn(styles.wrapper, "flex items-start gap-2 py-0.5")}>
       <TypeDot type={item.type} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 flex-wrap">
           <Link
             href={item.href}
-            className="text-sm font-medium text-accent-foreground no-underline hover:underline"
+            className="text-[13px] font-medium text-accent-foreground no-underline hover:underline"
           >
             {item.title}
           </Link>
@@ -174,32 +224,40 @@ function TopItem({ item }: { item: RelatedPageItem }) {
           </p>
         )}
       </div>
+      <ItemTooltip item={item} />
     </div>
   );
 }
 
 function CompactItem({ item }: { item: RelatedPageItem }) {
   return (
-    <div className="flex items-center gap-1.5 py-0.5">
+    <div className={cn(styles.wrapper, "flex items-center gap-1.5 py-0.5")}>
       <TypeDot type={item.type} />
       <Link
         href={item.href}
-        className="text-sm text-accent-foreground no-underline hover:underline truncate"
+        className="text-[13px] text-accent-foreground no-underline hover:underline truncate"
       >
         {item.title}
       </Link>
       {item.label && <RelationshipLabel label={item.label} />}
+      <ItemTooltip item={item} />
     </div>
+  );
+}
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">
+      {children}
+    </h3>
   );
 }
 
 function GroupSection({ group }: { group: TypeGroup }) {
   return (
     <div>
-      <h3 className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">
-        {group.label}
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
+      <SectionHeading>{group.label}</SectionHeading>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-0">
         {group.items.map((item) => (
           <CompactItem key={item.id} item={item} />
         ))}
@@ -254,14 +312,14 @@ export function RelatedPages({
 
   return (
     <section className="mt-10 pt-5 border-t border-border">
-      <h2 className="text-lg font-semibold mb-3">Related Pages</h2>
-      <div className="space-y-0.5 mb-4">
+      <SectionHeading>Related Pages</SectionHeading>
+      <div className="space-y-0.5 mb-3">
         {topItems.map((item) => (
           <TopItem key={item.id} item={item} />
         ))}
       </div>
       {groups.length > 0 && (
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {groups.map((group) => (
             <GroupSection key={group.label} group={group} />
           ))}
