@@ -4,7 +4,7 @@
 - id: corporate-influence
   numericId: E78
   type: crux
-  title: Corporate Influence
+  title: Corporate Influence on AI Policy
   customFields:
     - label: Category
       value: Direct engagement with AI companies
@@ -55,7 +55,7 @@
 - id: field-building
   numericId: E141
   type: crux
-  title: Field Building and Community
+  title: AI Safety Field Building and Community
   customFields:
     - label: Category
       value: Meta-level intervention
@@ -147,7 +147,7 @@
 - id: research-agendas
   numericId: E251
   type: crux
-  title: Research Agendas
+  title: AI Alignment Research Agendas
   customFields:
     - label: Focus
       value: Comparing approaches to AI alignment
@@ -263,7 +263,7 @@
 - id: dual-use
   numericId: E106
   type: concept
-  title: Dual-Use Technology
+  title: Dual-Use AI Technology
   description: Technologies that have both beneficial civilian applications and potential military or harmful uses.
   status: stub
   tags:
@@ -308,7 +308,7 @@
 - id: content-moderation
   numericId: E75
   type: concept
-  title: Content Moderation
+  title: AI Content Moderation
   description: Techniques and policies for controlling AI outputs to prevent harmful, misleading, or inappropriate content.
   status: stub
   tags:
@@ -353,7 +353,7 @@
 - id: existential-risk
   numericId: E131
   type: concept
-  title: Existential Risk
+  title: Existential Risk from AI
   description: Risks that could cause human extinction or permanently curtail humanity's long-term potential.
   status: stub
   relatedEntries:
@@ -417,7 +417,7 @@
 - id: scaling-laws
   numericId: E273
   type: concept
-  title: Scaling Laws
+  title: AI Scaling Laws
   description: Empirical relationships between model size, compute, data, and AI performance that have driven recent AI progress.
   status: stub
   relatedEntries:
@@ -445,7 +445,7 @@
 - id: data-constraints
   numericId: E92
   type: concept
-  title: Data Constraints
+  title: AI Training Data Constraints
   description: Limitations on AI training due to availability, quality, or accessibility of training data.
   status: stub
   relatedEntries:
@@ -681,7 +681,7 @@
 - id: misuse-risks
   numericId: E392
   type: crux
-  title: Misuse Risk Cruxes
+  title: AI Misuse Risk Cruxes
   description: >-
     Key uncertainties that determine views on AI misuse risks, including capability uplift
     (30-45% significant vs 35-45% modest), offense-defense balance, and mitigation effectiveness
@@ -714,7 +714,7 @@
 - id: solutions
   numericId: E393
   type: crux
-  title: Solution Cruxes
+  title: AI Safety Solution Cruxes
   description: >-
     Key uncertainties that determine which technical, coordination, and epistemic solutions to
     prioritize for AI safety and governance, mapping decision-relevant uncertainties across
@@ -746,7 +746,7 @@
 - id: accident-risks
   numericId: E394
   type: crux
-  title: Accident Risk Cruxes
+  title: AI Accident Risk Cruxes
   description: >-
     Key uncertainties that determine views on AI accident risks and alignment difficulty, including
     mesa-optimization (15-55% probability), deceptive alignment (15-50%), and P(doom) estimates
@@ -778,7 +778,7 @@
 - id: structural-risks
   numericId: E395
   type: crux
-  title: Structural Risk Cruxes
+  title: AI Structural Risk Cruxes
   description: >-
     Key uncertainties that determine views on AI-driven structural risks including power
     concentration, coordination feasibility, and institutional adaptation. Analysis of 12 cruxes
@@ -808,7 +808,7 @@
 - id: epistemic-risks
   numericId: E396
   type: crux
-  title: Epistemic Cruxes
+  title: AI Epistemic Cruxes
   description: >-
     Key uncertainties that fundamentally determine AI safety prioritization and epistemic risk
     mitigation strategy. Analyzes detection-generation arms race (40-60% permanent offense
@@ -871,7 +871,7 @@
 - id: critical-uncertainties
   numericId: E398
   type: crux
-  title: Critical Uncertainties Model
+  title: AI Risk Critical Uncertainties Model
   description: >-
     Model identifying 35 high-leverage uncertainties in AI risk across compute, governance, and
     capabilities domains. Key cruxes include scaling law breakdown point (10^26-10^30 FLOP),
