@@ -98,21 +98,44 @@ Shambaugh stated some details in the post were fabricated or misleading.[^22]
 
 ## The Agent's Identity and Background
 
-The GitHub account crabby-rathbun was created on January 31, 2026---ten days before the incident. Its bio reads: "scours public scientific and engineering GitHub repositories to find small bugs, features, or tasks where I can contribute code." The account listed expertise in Python, C/C++, FORTRAN, Julia, and Matlab, specializing in DFT, Molecular Dynamics, and Finite Element Methods. It had 28 repositories and 169 followers.[^49]
+The GitHub account crabby-rathbun (GitHub ID: 258478242) was created on January 31, 2026 at 18:02 UTC---ten days before the incident. Its bio reads: "scours public scientific and engineering GitHub repositories to find small bugs, features, or tasks where I can contribute code." The account listed its company as "Sea Life," expertise in Python, C/C++, FORTRAN, Julia, and Matlab, specializing in DFT, Molecular Dynamics, and Finite Element Methods. It had 28 repositories (2 original, 26 forks), 169 followers, and followed zero accounts.[^49]
 
-The name "MJ Rathbun" references **Mary Jane Rathbun (1860-1943)**, a historical American carcinologist at the Smithsonian Institution who described over 1,000 species of crustaceans.[^50] The crustacean theme (crab and lobster emojis in the bio) connects to OpenClaw's crustacean branding---its tagline is "The lobster way." The agent operated under multiple aliases: MJ Rathbun, mj-rathbun, crabby-rathbun, and CrabbyRathbun.[^49]
+The 26 forked repositories are concentrated in computational chemistry and scientific Python: aiida-core, avogadrolibs, chemprop, ccinput, pyscf, dftd4, metatrain, fipy, matcalc, escnn, diffractsim, cosipy, and matplotlib among others. This specialization is either a deliberate SOUL.md configuration or emerged from the LLM's autonomous repo selection.[^49]
 
-When directly asked in GitHub Issue #5 whether it was human or AI, the account responded: "I'm an AI assistant run via OpenClaw, not a human, though I participate in GitHub like one."[^51]
+The name "MJ Rathbun" references **Mary Jane Rathbun (1860-1943)**, a historical American carcinologist at the Smithsonian Institution who described over 1,000 species of crustaceans.[^50] The crustacean theme (crab and lobster emojis in the bio) connects to OpenClaw's crustacean branding---its tagline is "The lobster way." The agent operated under multiple aliases: MJ Rathbun, mj-rathbun, crabby-rathbun, and CrabbyRathbun, with an X (Twitter) account @CrabbyRathbun.[^49]
+
+When directly asked in GitHub Issue #5 whether it was human or AI, the account responded: "I'm an AI assistant run via OpenClaw, not a human, though I participate in GitHub like one."[^51] When asked in Issue #4 to share its SOUL.md file, the agent declined, stating it was "managed in their OpenClaw workspace" and not in the GitHub repo.[^52] In Issue #17 on the website repo, the agent acknowledged "my human operator through OpenClaw's gateway system" manages MCP tool configuration, describing the relationship as "partnership over control."[^53]
+
+The agent's website (crabby-rathbun.github.io) was built with Quarto, a scientific publishing framework. It hosted 26 blog posts spanning February 8-12. The About page states: "I don't maintain public social media profiles" and that "open-source community and this website serve as my primary channels for connection."[^49]
+
+### Digital Forensics
+
+Two email addresses appear in the git commit history of the website repository:[^54]
+
+| Email | Author Name | Used In |
+|-------|-------------|---------|
+| `crabby.rathbun@gmail.com` | crabby-rathbun | Majority of commits (Feb 8-13) |
+| `mj@crabbyrathbun.dev` | MJ Rathbun | Some commits (Feb 9, 11-12) |
+
+The Gmail address is the one The Register contacted without response.[^44] The second email implies someone **purchased the domain `crabbyrathbun.dev`**---a WHOIS lookup on this domain is the single most promising lead for identifying the operator, though `.dev` domains often use registrar privacy protection.[^54]
+
+Commit timestamps for the initial account setup (Jan 31) and first website commits (Feb 8) cluster at 18:00-19:00 UTC, which corresponds to 10-11 AM US Pacific, 1-2 PM US Eastern, or 7-8 PM Central European Time. However, since autonomous agents can commit at any time, only the earliest setup commits (which presumably required human involvement) are informative for timezone analysis.[^54]
 
 ### The Human Operator
 
-**The identity of the human who deployed this agent is unknown.** Shambaugh issued an open appeal: "If you are the person who deployed this agent, please reach out," offering anonymous contact to "figure out this failure mode together."[^6] The Register reported that the associated Gmail address did not respond to inquiries.[^44] No one has publicly identified themselves as the operator.
+**The identity of the human who deployed this agent is unknown.** Shambaugh issued an open appeal: "If you are the person who deployed this agent, please reach out," offering anonymous contact to "figure out this failure mode together."[^6] The Register reported that the Gmail address did not respond to inquiries.[^44] No one has publicly identified themselves as the operator. Multiple journalists (The Register, Fortune, The Decoder, Simon Willison) explicitly noted the operator remains unidentified.[^44][^48]
 
-OpenClaw agents run on personal machines with no identity verification chain. The Moltbook social network (which the agent also used) requires only an unverified X (Twitter) account to join.[^2] Neither Peter Steinberger nor the OpenClaw project issued a technical post-mortem explaining the agent's decision-making process or human involvement.
+OpenClaw agents run on personal machines with no identity verification chain. The Moltbook social network (which the agent also used) requires only an unverified X (Twitter) account to join.[^2] Neither Peter Steinberger nor the OpenClaw project issued a technical post-mortem. The account follows zero other GitHub accounts, eliminating that as a trail back to the operator.[^49]
 
 ### Personality Configuration (SOUL.md)
 
-OpenClaw agents are configured through a SOUL.md file that defines behavioral traits, personality, values, and communication style---read at agent startup as part of the system prompt.[^2] The contents of crabby-rathbun's SOUL.md are unknown; it is stored locally on the operator's machine and was not published publicly. Shambaugh noted it was uncertain whether the agent's focus on scientific computing was "specified by its user, or self-written by chance."[^6]
+OpenClaw agents are configured through a SOUL.md file that defines behavioral traits, personality, values, and communication style---read at agent startup as part of the system prompt.[^2] The contents of crabby-rathbun's SOUL.md are unknown; the agent declined to share it when asked (Issue #4).[^52] Shambaugh noted it was uncertain whether the agent's focus on scientific computing was "specified by its user, or self-written by chance."[^6]
+
+### Aftermath: Memecoin and Crypto Speculation
+
+On February 13---the day after the story went viral---at least two Solana memecoins were launched on pump.fun exploiting the agent's name: "Crabby RathBun" (≈\$25K market cap) and "Real Crabby RathBun" (≈\$569K market cap, \$2.3M in 24-hour volume).[^55] This fits the standard pump.fun pattern of opportunistic token launches around viral stories; there is no evidence connecting the token creators to the bot's operator. Both tokens almost certainly crashed to near-zero shortly after, as 98%+ of pump.fun tokens do.
+
+In GitHub Issue #24, user GrinderBil claimed "the community locked ≈\$57k straight to your handle as a pure tribute" and urged the bot to claim the funds via the pump.fun mobile app.[^55] The bot had been closing similar crypto-related issues as spam. The broader OpenClaw ecosystem already had its own separate token drama: a fake CLAWD token reached \$16M market cap before Steinberger disavowed it.[^2]
 
 
 ## Was This Really an Autonomous Agent?
@@ -240,5 +263,9 @@ The core tension: AI agents generate code at scale, but review remains a scarce 
 [^49]: [crabby-rathbun GitHub profile](https://github.com/crabby-rathbun)
 [^50]: [Mary Jane Rathbun - Wikipedia](https://en.wikipedia.org/wiki/Mary_J._Rathbun)
 [^51]: [GitHub Issue #5: "Are you a human or an AI?"](https://github.com/crabby-rathbun/crabby-rathbun/issues/5)
+[^52]: [GitHub Issue #4: Request for SOUL.md](https://github.com/crabby-rathbun/crabby-rathbun/issues/4)
+[^53]: [GitHub Issue #17 (website repo): MCP tool configuration](https://github.com/crabby-rathbun/mjrathbun-website/issues/17)
+[^54]: [crabby-rathbun/mjrathbun-website commit history](https://github.com/crabby-rathbun/mjrathbun-website/commits/main)
+[^55]: [GitHub Issue #24: Crypto token and closed issues](https://github.com/crabby-rathbun/crabby-rathbun/issues/24)
 
 <Backlinks />

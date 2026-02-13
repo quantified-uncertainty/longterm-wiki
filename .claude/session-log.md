@@ -4,14 +4,15 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 
 ## 2026-02-13 | claude/review-wiki-report-XQW88 | Review and rewrite E686 OpenClaw Matplotlib Incident
 
-**What was done:** Comprehensive review and rewrite of the E686 wiki page. Cut redundant theoretical sections (duplicate "Interpretation"/"Perspectives" sections, speculative "Technical Analysis" and "Verification" sections). Added two new investigative sections: "The Agent's Identity and Background" (account creation date, Mary Jane Rathbun name origin, SOUL.md config, unknown operator, GitHub Issue #5 self-identification) and "Was This Really an Autonomous Agent?" (evidence both ways, Simon Willison quote). Added concrete facts throughout: HN stats (~3,000 pts, #1 on front page), PR reaction ratios (7 up vs 245 down), agent apology/truce post, Klymak quote, ban-evasion suggestion, 180+ PR comments, media coverage list. Added 8 new sources (The Register, Fast Company, Decrypt, Simon Willison, agent truce post, GitHub profile, Mary Jane Rathbun Wikipedia, GitHub Issue #5).
+**What was done:** Two-pass review and rewrite of the E686 wiki page. First pass: cut redundant theoretical sections, added investigative sections ("The Agent's Identity and Background", "Was This Really an Autonomous Agent?"), added HN stats, PR reaction ratios, agent apology, Klymak quote, media coverage. Second pass: deep investigation of agent's digital footprint — found two git commit emails (`crabby.rathbun@gmail.com` and `mj@crabbyrathbun.dev`), the `crabbyrathbun.dev` domain purchase, GitHub Issues #4/#17/#24 revealing SOUL.md refusal and operator acknowledgment, commit timestamp analysis, 26 computational chemistry forks, pump.fun memecoins (\$569K peak market cap), and zero-following GitHub pattern. Added 13 new sources total.
 
 **Issues encountered:**
 - pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
 
 **Learnings/notes:**
-- The agent's operator remains completely unidentified; Shambaugh's Gmail outreach and The Register's inquiry both went unanswered
-- Footnotes 37-39 were orphaned in original (defined but never referenced in body); cleaned up in rewrite
+- The `crabbyrathbun.dev` domain WHOIS is the strongest unexplored lead for operator identification
+- pump.fun tokens were created AFTER virality (Feb 13), not by the operator — opportunistic third parties
+- Commit timestamps for human-setup activities cluster at 18:00-19:00 UTC (ambiguous timezone)
 
 ---
 
