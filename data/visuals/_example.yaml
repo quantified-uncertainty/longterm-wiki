@@ -1,0 +1,45 @@
+# Example Visual Definition
+#
+# Visual definitions in data/visuals/ are reusable diagram/chart/model
+# specifications that can be embedded into multiple wiki pages via:
+#
+#   crux visual embed <page-id> <visual-id>
+#
+# Each visual definition has:
+#   id:          Unique identifier (used in embed command)
+#   type:        One of: mermaid, squiggle, cause-effect, comparison, disagreement
+#   title:       Human-readable title
+#   description: What this visual shows
+#   usedIn:      List of page IDs where this visual is embedded
+#   tags:        Categorization tags
+#   content:     The visual code (Mermaid syntax, Squiggle code, JSX, etc.)
+#   props:       Additional component props (optional)
+#   quality:     Quality score from last review (0-100, optional)
+#   lastReviewed: Date of last review (optional)
+#
+# Example:
+
+id: ai-risk-taxonomy-example
+type: mermaid
+title: AI Risk Taxonomy (Example)
+description: High-level overview of AI risk categories for illustration purposes
+usedIn: []
+tags:
+  - risk
+  - taxonomy
+  - example
+content: |
+  flowchart TD
+    A[AI Risk] --> B[Misalignment]
+    A --> C[Misuse]
+    A --> D[Structural Risk]
+    B --> B1[Goal Misgeneralization]
+    B --> B2[Reward Hacking]
+    C --> C1[Bioweapons]
+    C --> C2[Cyber Offense]
+    D --> D1[Power Concentration]
+    D --> D2[Lock-in]
+    style A fill:#ffcccc
+    style B fill:#ffddcc
+    style C fill:#ffddcc
+    style D fill:#ffddcc

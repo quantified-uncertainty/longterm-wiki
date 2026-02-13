@@ -158,6 +158,49 @@ export function getLineNumber(content: string, position: number): number {
   return content.slice(0, position).split('\n').length;
 }
 
+/**
+ * Get the line index (0-indexed) where frontmatter ends
+ * Returns 0 if no frontmatter found
+ */
+export function getFrontmatterEndLine(content: string): number {
+  const lines = content.split('\n');
+  if (lines[0] !== '---') return 0;
+
+  let dashCount = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i] === '---') {
+      dashCount++;
+      if (dashCount === 2) return i;
+    }
+  }
+  return 0;
+}
+
+/**
+ * Check if a position should be skipped for validation
+ * (in code block, JSX attribute, Mermaid, or comment)
+ */
+export function shouldSkipPosition(content: string, position: number): boolean {
+  return (
+    isInCodeBlock(content, position) ||
+    isInJsxAttribute(content, position) ||
+    isInMermaid(content, position) ||
+    isInComment(content, position)
+  );
+}
+
+/**
+ * Strip markdown code fences from AI-generated output.
+ * Handles ```lang\n...\n``` wrapping that models sometimes add.
+ */
+export function stripMarkdownFences(text: string): string {
+  let cleaned = text.trim();
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '');
+  }
+  return cleaned;
+}
+
 export interface MatchCallbackInfo {
   match: RegExpExecArray;
   line: string;

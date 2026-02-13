@@ -17,8 +17,15 @@ export interface SearchDoc {
   quality: number | null;
 }
 
+/** Which terms matched in which fields (from MiniSearch). */
+export type MatchInfo = Record<string, string[]>;
+
 export interface SearchResult extends SearchDoc {
   score: number;
+  /** Maps each matched term → list of fields it matched in. */
+  match: MatchInfo;
+  /** The query terms that produced this result. */
+  terms: string[];
 }
 
 const SEARCH_FIELDS = ["title", "description", "tags", "entityType", "id"];
@@ -115,6 +122,8 @@ export async function searchWiki(
       importance: doc?.importance ?? null,
       quality: doc?.quality ?? null,
       score: hit.score * boost,
+      match: (hit.match ?? {}) as MatchInfo,
+      terms: hit.terms ?? [],
     };
   });
 

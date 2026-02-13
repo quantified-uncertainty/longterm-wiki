@@ -15,6 +15,64 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 
 ---
 
+## 2026-02-13 | claude/fix-issue-108-2vDr6 | Bug fixes for check-links script
+
+**What was done:** Fixed multiple bugs in `crux/check-links.ts`: race condition in worker pool (shared index → queue.shift()), cache TTL logic for unverifiable/skipped domains, relative redirect URL resolution, truncated URL detection (unbalanced parens), bare URL extraction, DOI encoding, and dead retry logic branch. Added missing skip domains. Removed unused imports and switched to shared `sleep()`/`extractArxivId()` from `resource-utils.ts`.
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- The worker pool race condition occurred because multiple async workers could read the same `index` value after an `await` — using `queue.shift()` (synchronous before any await) fixes this
+- Cache TTL had a short-circuit bug: unverifiable domains (status -1) have `ok: true`, so the `ok` branch was checked first, giving them 14d TTL instead of 30d
+
+---
+
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Review fixes: DRY, types, docs, parser
+
+**What was done:** PR review follow-up: extracted shared `formatAge`/`formatFrequency` utilities to `@lib/format.ts` (removed 3 duplicate implementations), added `evergreen` and `changeHistory` to crux `Frontmatter`/`PageEntry` types, hardened `parseSessionLog` regex against EOF edge cases, documented changeHistory system in automation-tools.mdx.
+
+**Pages:** automation-tools
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- `formatAge()` had three subtly different implementations (capitalization, abbreviation). Consolidated to one canonical version in `@lib/format.ts`.
+- The session log parser's regex `(.+?)(?:\n\n|\n\*\*)` would fail if a field were the last thing before `---` or EOF. Added `\n---` as an alternative terminator.
+
+---
+
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Connect session log to page change history
+
+**What was done:** Added `Pages:` field to session log format, built a parser in build-data.mjs that extracts page-level change history from session log entries, added `changeHistory` to the Page interface, added a per-page "Change History" section in PageStatus (with timeline of sessions that touched the page), and created a master `/internal/page-changes` dashboard with a sortable/searchable table of all page changes grouped by session.
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- Session log is available even in Vercel shallow clones (it's a committed file), making it more reliable than git log for build-time history extraction
+- The parser uses regex on the markdown structure — fragile if format changes, but the format is well-defined in session-logging.md
+
+---
+
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Add evergreen flag to opt out of update schedule
+
+**What was done:** Added `evergreen: false` frontmatter field to allow pages (reports, experiments, proposals) to opt out of the update schedule. Full feature implementation: frontmatter schema + validation (evergreen: false + update_frequency is an error), Page interface + build-data, getUpdateSchedule(), bootstrap/reassign scripts, updates command, staleness checker, PageStatus UI (shows "Point-in-time content · Not on update schedule"), IssuesSection (no stale warnings for non-evergreen). Applied to all 6 internal report pages. Updated automation-tools docs.
+
+**Pages:** automation-tools, ai-research-workflows, causal-diagram-visualization, controlled-vocabulary, cross-link-automation-proposal, diagram-naming-research, page-creator-pipeline
+
+**Issues encountered:**
+- reassign-update-frequency.ts had a bespoke string-only YAML parser that returned all values as strings, requiring `=== 'false'` workaround. Replaced with shared `parseFm` from mdx-utils.
+- Graded format validation warned about missing update_frequency even when evergreen: false — contradictory rules.
+
+**Learnings/notes:**
+- Pages without `update_frequency` are already excluded from the schedule, but the bootstrap script would re-add it. The `evergreen: false` flag prevents this.
+- The flag needed to be threaded through 8 different systems: schema, build, app data layer, UI, validation, staleness checker, updates command, and bootstrap/reassign scripts.
+- reassign-update-frequency.ts was the only crux authoring script using a hand-rolled parser instead of the shared `yaml` library one — now fixed.
+
+---
+
 ## 2026-02-13 | claude/fix-issue-105-SUiYf | Complete entityType frontmatter migration
 
 **What was done:** Added `entityType` to frontmatter of 469 MDX pages across 7 entity-required categories (people, organizations, risks, responses, models, worldviews, intelligence-paradigms). Wrote a migration script (`crux/scripts/migrate-entity-types.mjs`) that reads the CATEGORY_ENTITY_TYPES mapping and inserts the appropriate entityType into each page's frontmatter. Verified build output: all 645 pre-existing entities unchanged, 23 new auto-entities correctly created for pages that previously lacked both YAML and frontmatter entity definitions. All tests (308) pass, all blocking CI checks pass, full build succeeds.
