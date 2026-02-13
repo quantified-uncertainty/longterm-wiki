@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { appendEditLog, readEditLog } from './edit-log.ts';
+import { appendEditLog, readEditLog, pageIdFromPath, logBulkFixes } from './edit-log.ts';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const EDIT_LOGS_DIR = path.join(ROOT, 'data/edit-logs');
@@ -97,6 +97,53 @@ describe('edit-log', () => {
       expect(entries).toHaveLength(1);
       expect(entries[0].requestedBy).toBeUndefined();
       expect(entries[0].note).toBeUndefined();
+    });
+  });
+
+  describe('pageIdFromPath', () => {
+    it('extracts slug from absolute content path', () => {
+      const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
+      expect(pageIdFromPath(`${root}/content/docs/knowledge-base/organizations/open-philanthropy.mdx`)).toBe('open-philanthropy');
+    });
+
+    it('extracts slug from nested path', () => {
+      const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
+      expect(pageIdFromPath(`${root}/content/docs/knowledge-base/people/nick-bostrom.mdx`)).toBe('nick-bostrom');
+    });
+
+    it('handles index files', () => {
+      const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
+      expect(pageIdFromPath(`${root}/content/docs/knowledge-base/risks/index.mdx`)).toBe('risks');
+    });
+  });
+
+  describe('logBulkFixes', () => {
+    const BULK_PAGE_1 = '__test-bulk-1__';
+    const BULK_PAGE_2 = '__test-bulk-2__';
+    const BULK_FILE_1 = path.join(EDIT_LOGS_DIR, `${BULK_PAGE_1}.yaml`);
+    const BULK_FILE_2 = path.join(EDIT_LOGS_DIR, `${BULK_PAGE_2}.yaml`);
+
+    afterEach(() => {
+      if (fs.existsSync(BULK_FILE_1)) fs.unlinkSync(BULK_FILE_1);
+      if (fs.existsSync(BULK_FILE_2)) fs.unlinkSync(BULK_FILE_2);
+    });
+
+    it('creates entries for multiple pages', () => {
+      const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
+      logBulkFixes(
+        [
+          `${root}/content/docs/test/${BULK_PAGE_1}.mdx`,
+          `${root}/content/docs/test/${BULK_PAGE_2}.mdx`,
+        ],
+        { tool: 'crux-fix', agency: 'automated', note: 'Test bulk fix' },
+      );
+
+      const entries1 = readEditLog(BULK_PAGE_1);
+      const entries2 = readEditLog(BULK_PAGE_2);
+      expect(entries1).toHaveLength(1);
+      expect(entries2).toHaveLength(1);
+      expect(entries1[0].tool).toBe('crux-fix');
+      expect(entries2[0].note).toBe('Test bulk fix');
     });
   });
 });

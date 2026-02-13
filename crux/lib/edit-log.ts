@@ -28,6 +28,7 @@ export type EditTool =
   | 'crux-create'    // pnpm crux content create
   | 'crux-improve'   // pnpm crux content improve
   | 'crux-grade'     // Crux grading pipeline
+  | 'crux-fix'       // Crux fix commands (escaping, markdown, cross-links, etc.)
   | 'claude-code'    // Claude Code interactive session
   | 'manual'         // Direct human file edits
   | 'bulk-script';   // Bulk automated scripts
@@ -51,10 +52,23 @@ export interface EditLogEntry {
 // ---------------------------------------------------------------------------
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
+const CONTENT_DIR = path.join(ROOT, 'content/docs');
 const EDIT_LOGS_DIR = path.join(ROOT, 'data/edit-logs');
 
 function logFilePath(pageId: string): string {
   return path.join(EDIT_LOGS_DIR, `${pageId}.yaml`);
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Extract page ID (slug) from an absolute or content-relative MDX file path. */
+export function pageIdFromPath(filePath: string): string {
+  const rel = filePath.startsWith(CONTENT_DIR)
+    ? filePath.slice(CONTENT_DIR.length + 1)
+    : filePath;
+  return rel.replace(/\.mdx?$/, '').replace(/\/index$/, '').split('/').pop()!;
 }
 
 // ---------------------------------------------------------------------------
@@ -102,4 +116,18 @@ export function appendEditLog(pageId: string, entry: Omit<EditLogEntry, 'date'> 
     logFilePath(pageId),
     stringifyYaml(existing, { lineWidth: 0 }),
   );
+}
+
+/**
+ * Log a bulk fix operation that modified multiple files.
+ * Appends one entry per affected page.
+ */
+export function logBulkFixes(
+  filePaths: string[],
+  entry: Omit<EditLogEntry, 'date'> & { date?: string },
+): void {
+  for (const fp of filePaths) {
+    const pageId = pageIdFromPath(fp);
+    appendEditLog(pageId, entry);
+  }
 }

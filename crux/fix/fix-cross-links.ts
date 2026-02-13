@@ -30,6 +30,7 @@ import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadOrganizations, loadExperts } from '../lib/content-types.ts';
+import { logBulkFixes } from '../lib/edit-log.ts';
 
 const args: string[] = process.argv.slice(2);
 const APPLY_MODE: boolean = args.includes('--apply');
@@ -558,6 +559,7 @@ async function main(): Promise<void> {
   let totalChanges = 0;
   let filesChanged = 0;
   let totalFuzzySuggestions = 0;
+  const modifiedFiles: string[] = [];
 
   for (const file of files) {
     const relPath = relative(CONTENT_DIR, file);
@@ -606,8 +608,17 @@ async function main(): Promise<void> {
 
     if (APPLY_MODE && hasChanges) {
       writeFileSync(file, result.modifiedContent!);
+      modifiedFiles.push(file);
       console.log(`  ${colors.green}✓${colors.reset} Saved ${relPath}`);
     }
+  }
+
+  if (APPLY_MODE && modifiedFiles.length > 0) {
+    logBulkFixes(modifiedFiles, {
+      tool: 'crux-fix',
+      agency: 'automated',
+      note: `Auto-linked ${totalChanges} EntityLinks in ${filesChanged} files`,
+    });
   }
 
   console.log();

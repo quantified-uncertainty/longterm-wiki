@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient, parseJsonResponse } from '../../lib/anthropic.ts';
+import { appendEditLog, pageIdFromPath } from '../../lib/edit-log.ts';
 
 interface GradingContext {
   log: (phase: string, message: string) => void;
@@ -198,6 +199,12 @@ Respond with JSON:
     yamlStr = yamlStr.replace(/^(lastEdited:\s*)(\d{4}-\d{2}-\d{2})$/m, '$1"$2"');
     const newContent = `---\n${yamlStr}---\n${body}`;
     fs.writeFileSync(finalPath, newContent);
+
+    appendEditLog(pageIdFromPath(finalPath), {
+      tool: 'crux-grade',
+      agency: 'automated',
+      note: `Initial creation grading: quality=${quality}, importance=${grades.importance}`,
+    });
 
     log('grade', `Graded: imp=${grades.importance}, qual=${quality}`);
     log('grade', `  Summary: ${grades.llmSummary?.slice(0, 100)}...`);

@@ -2,17 +2,17 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
-## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Add per-page edit log system
+## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Full edit log system integration
 
-**What was done:** Added a file-based edit log system (`data/edit-logs/<page-id>.yaml`) that tracks how each page was created/modified. Each entry records date, tool used, agency (human/ai-directed/automated), who requested it, and a free-text note. Chose external files over frontmatter to avoid LLM corruption risk and keep frontmatter clean. Integrated into Crux create (deployment.ts), improve (page-improver.ts), and grade (grade-content.ts) pipelines with 6 new unit tests.
+**What was done:** Fully integrated file-based edit log system across entire codebase. Per-page YAML files in `data/edit-logs/` track every page modification with tool, agency, requestedBy, and note fields. Integrated into 9 write paths: page create, improve, grade (x2), and 5 fix/validation scripts. Added `crux edit-log` CLI domain with view/list/stats commands. Added `crux validate edit-logs` validator. Documented in CLAUDE.md. 10 unit tests.
 
 **Issues encountered:**
 - First implementation was frontmatter-based; reworked to file-based after design review
 
 **Learnings/notes:**
-- Storing structured data in frontmatter is risky because LLMs rewrite the entire file during improve; external files sidestep this
-- Three-field schema (tool + agency + requestedBy) captures more nuance than a single "method" field
-- `crux/lib/edit-log.ts` exports `appendEditLog()` and `readEditLog()` for use by any script
+- Storing structured data in frontmatter is risky because LLMs rewrite the entire file during improve
+- `logBulkFixes()` and `pageIdFromPath()` helpers simplify integration for fix scripts
+- `crux/validate/types.ts` is imported but doesn't exist; dead import in several validators
 
 ---
 

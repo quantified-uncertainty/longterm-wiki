@@ -22,6 +22,7 @@ import { relative } from 'path';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
+import { logBulkFixes } from '../lib/edit-log.ts';
 
 const args: string[] = process.argv.slice(2);
 const APPLY_MODE: boolean = args.includes('--apply');
@@ -289,4 +290,13 @@ if (totalImportCleanups > 0) {
 
 if (!APPLY_MODE) {
   console.log(`\n${colors.yellow}Dry run — no files modified. Use --apply to apply changes.${colors.reset}`);
+} else if (results.length > 0) {
+  logBulkFixes(
+    results.map(r => r.filePath),
+    {
+      tool: 'crux-fix',
+      agency: 'automated',
+      note: `Removed ${totalSections} redundant related-pages sections`,
+    },
+  );
 }
