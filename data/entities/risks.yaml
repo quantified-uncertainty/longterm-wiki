@@ -2838,7 +2838,7 @@
   lastUpdated: 2026-02
 
 - id: ai-enabled-untraceable-misuse
-  numericId: E688
+  numericId: E691
   type: risk
   title: AI-Enabled Untraceable Misuse
   description: >-
