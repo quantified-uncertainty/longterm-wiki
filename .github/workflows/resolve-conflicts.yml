@@ -1,14 +1,15 @@
 name: Resolve Merge Conflicts
 
-# Runs after auto-rebase, or on a schedule, to resolve PRs that have
+# Runs after auto-rebase completes to resolve PRs that still have
 # actual merge conflicts using the Claude API.
 #
 # Requires: ANTHROPIC_API_KEY secret in the repository.
 
 on:
-  # Run after main is updated (gives auto-rebase time to handle easy cases)
-  push:
-    branches: [main]
+  # Run after auto-rebase finishes (proper sequencing, no sleep hack)
+  workflow_run:
+    workflows: ["Auto-Rebase PRs"]
+    types: [completed]
 
   # Also run on a schedule to catch any stragglers
   schedule:
@@ -19,7 +20,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: read
+  pull-requests: write
 
 # Only one instance at a time to avoid race conditions
 concurrency:
@@ -38,8 +39,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Wait for auto-rebase to finish (it runs on the same trigger)
-          sleep 60
+          set -euo pipefail
 
           # Get open PRs and check mergeable state
           prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --base main --state open \
@@ -60,6 +60,7 @@ jobs:
     needs: find-conflicted-prs
     if: needs.find-conflicted-prs.outputs.has_conflicts == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       matrix: ${{ fromJson(needs.find-conflicted-prs.outputs.matrix) }}
       max-parallel: 1 # Resolve one at a time to avoid push races
@@ -91,7 +92,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment ${{ matrix.number }} --repo "$GITHUB_REPOSITORY" \
+          gh pr comment "${{ matrix.number }}" --repo "$GITHUB_REPOSITORY" \
             --body "Merge conflicts with \`main\` were automatically resolved by the conflict resolver. Please review the merge commit to ensure correctness."
 
       - name: Post failure comment
@@ -99,5 +100,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment ${{ matrix.number }} --repo "$GITHUB_REPOSITORY" \
+          gh pr comment "${{ matrix.number }}" --repo "$GITHUB_REPOSITORY" \
             --body "Automatic conflict resolution failed for this PR. Manual resolution is needed."

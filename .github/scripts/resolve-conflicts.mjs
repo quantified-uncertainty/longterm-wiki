@@ -13,30 +13,45 @@
  *   PR_NUMBER         — PR number (for commit message)
  */
 
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const PR_BRANCH = process.env.PR_BRANCH;
 const PR_NUMBER = process.env.PR_NUMBER;
 
+// ── Input validation ───────────────────────────────────────────────────
+
 if (!ANTHROPIC_API_KEY) {
-  console.error("ANTHROPIC_API_KEY is not set — skipping conflict resolution.");
-  process.exit(0);
+  console.error("ANTHROPIC_API_KEY is not set — cannot resolve conflicts.");
+  process.exit(1); // Exit non-zero so the workflow posts a failure comment, not a success one
 }
 if (!PR_BRANCH) {
   console.error("PR_BRANCH is not set.");
   process.exit(1);
 }
 
-function run(cmd, opts = {}) {
-  console.log(`$ ${cmd}`);
-  return execSync(cmd, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"], ...opts });
+// Validate branch name to prevent any injection via crafted ref names.
+// Git branch names can contain alphanumeric, /, -, _, and .
+if (!/^[a-zA-Z0-9._\/-]+$/.test(PR_BRANCH)) {
+  console.error(`Invalid branch name: ${PR_BRANCH}`);
+  process.exit(1);
 }
 
-function runSafe(cmd) {
+const MAX_CONFLICTED_FILES = 20;
+
+// ── Shell-free git helpers ─────────────────────────────────────────────
+
+// Use execFileSync (no shell) to prevent command injection.
+function git(...args) {
+  const display = `$ git ${args.join(" ")}`;
+  console.log(display);
+  return execFileSync("git", args, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] });
+}
+
+function gitSafe(...args) {
   try {
-    return { ok: true, output: run(cmd) };
+    return { ok: true, output: git(...args) };
   } catch (e) {
     return { ok: false, output: e.stdout || "", stderr: e.stderr || "", code: e.status };
   }
@@ -46,13 +61,13 @@ function runSafe(cmd) {
 
 console.log(`\n=== Resolving conflicts for PR #${PR_NUMBER} on branch ${PR_BRANCH} ===\n`);
 
-run("git fetch origin main");
-run(`git fetch origin ${PR_BRANCH}`);
-run(`git checkout ${PR_BRANCH}`);
+git("fetch", "origin", "main");
+git("fetch", "origin", PR_BRANCH);
+git("checkout", PR_BRANCH);
 // Reset to remote state to ensure clean starting point
-run(`git reset --hard origin/${PR_BRANCH}`);
+git("reset", "--hard", `origin/${PR_BRANCH}`);
 
-const mergeResult = runSafe("git merge origin/main --no-edit");
+const mergeResult = gitSafe("merge", "origin/main", "--no-edit");
 
 if (mergeResult.ok) {
   console.log("No conflicts — merge succeeded cleanly.");
@@ -61,11 +76,19 @@ if (mergeResult.ok) {
 
 // ── Step 2: Identify conflicted files ──────────────────────────────────
 
-const conflictedFiles = run("git diff --name-only --diff-filter=U").trim().split("\n").filter(Boolean);
+const conflictedFiles = git("diff", "--name-only", "--diff-filter=U").trim().split("\n").filter(Boolean);
 
 if (conflictedFiles.length === 0) {
   console.log("Merge failed but no conflicted files detected — aborting.");
-  run("git merge --abort");
+  gitSafe("merge", "--abort");
+  process.exit(1);
+}
+
+if (conflictedFiles.length > MAX_CONFLICTED_FILES) {
+  console.error(
+    `Too many conflicted files (${conflictedFiles.length} > ${MAX_CONFLICTED_FILES}) — aborting to avoid excessive API cost.`
+  );
+  gitSafe("merge", "--abort");
   process.exit(1);
 }
 
@@ -89,6 +112,37 @@ Rules:
 
 Think carefully about the semantic intent of both sides before resolving.`;
 
+async function callAPIWithRetry(body, retries = 3) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) {
+      return { ok: true, data: await response.json() };
+    }
+
+    const status = response.status;
+    const errText = await response.text();
+
+    // Retry on transient errors (429 rate limit, 5xx server errors)
+    if ((status === 429 || status >= 500) && attempt < retries) {
+      const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+      console.error(`  API ${status} (attempt ${attempt}/${retries}) — retrying in ${delay / 1000}s...`);
+      await new Promise((r) => setTimeout(r, delay));
+      continue;
+    }
+
+    return { ok: false, status, error: errText };
+  }
+}
+
 async function resolveFile(filePath) {
   const content = readFileSync(filePath, "utf-8");
 
@@ -101,43 +155,40 @@ async function resolveFile(filePath) {
   // Verify it actually has conflict markers
   if (!content.includes("<<<<<<<")) {
     console.log(`  No conflict markers in ${filePath} — skipping.`);
-    run(`git add "${filePath}"`);
+    git("add", "--", filePath);
     return true;
   }
 
   console.log(`  Resolving: ${filePath} (${content.length} chars)`);
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-5-20250929",
-      max_tokens: 16384,
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: `Resolve the merge conflicts in this file (${filePath}):\n\n${content}`,
-        },
-      ],
-    }),
+  const result = await callAPIWithRetry({
+    model: "claude-sonnet-4-5-20250929",
+    max_tokens: 65536,
+    system: SYSTEM_PROMPT,
+    messages: [
+      {
+        role: "user",
+        content: `Resolve the merge conflicts in this file (${filePath}):\n\n${content}`,
+      },
+    ],
   });
 
-  if (!response.ok) {
-    const errText = await response.text();
-    console.error(`  API error for ${filePath}: ${response.status} ${errText}`);
+  if (!result.ok) {
+    console.error(`  API error for ${filePath}: ${result.status} ${result.error}`);
     return false;
   }
 
-  const data = await response.json();
+  const data = result.data;
   const resolvedContent = data.content?.[0]?.text;
 
   if (!resolvedContent) {
     console.error(`  Empty response for ${filePath}`);
+    return false;
+  }
+
+  // Check for truncation — if the model hit the token limit, the file is incomplete
+  if (data.stop_reason === "max_tokens") {
+    console.error(`  Response was truncated for ${filePath} (hit max_tokens) — skipping.`);
     return false;
   }
 
@@ -148,7 +199,7 @@ async function resolveFile(filePath) {
   }
 
   writeFileSync(filePath, resolvedContent);
-  run(`git add "${filePath}"`);
+  git("add", "--", filePath);
   console.log(`  Resolved: ${filePath}`);
   return true;
 }
@@ -173,24 +224,24 @@ console.log(`\n=== Results: ${resolved} resolved, ${failed} failed ===\n`);
 
 if (failed > 0) {
   console.error("Some files could not be resolved — aborting merge.");
-  run("git merge --abort");
+  gitSafe("merge", "--abort");
   process.exit(1);
 }
 
 // Check if there are still unresolved conflicts
-const remaining = runSafe("git diff --name-only --diff-filter=U");
+const remaining = gitSafe("diff", "--name-only", "--diff-filter=U");
 if (remaining.ok && remaining.output.trim()) {
   console.error("Unresolved files remain — aborting merge.");
-  run("git merge --abort");
+  gitSafe("merge", "--abort");
   process.exit(1);
 }
 
-// Commit the merge
-run(`git commit --no-edit`);
+// Commit the merge with an informative message
+git("commit", "-m", `Merge main into ${PR_BRANCH} (auto-resolved conflicts)\n\nConflicts in ${resolved} file(s) were resolved automatically by the Claude-powered conflict resolver.`);
 console.log("Merge committed successfully.");
 
 // Push
-const pushResult = runSafe(`git push origin ${PR_BRANCH}`);
+const pushResult = gitSafe("push", "origin", PR_BRANCH);
 if (!pushResult.ok) {
   console.error(`Push failed: ${pushResult.stderr}`);
   process.exit(1);
