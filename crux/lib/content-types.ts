@@ -332,6 +332,11 @@ export function loadExperts(): ExpertEntry[] {
  */
 export interface DatabaseSchema {
   entities?: Entity[];
+  typedEntities?: Array<{ id: string; [key: string]: unknown }>;
+  idRegistry?: {
+    byNumericId?: Record<string, string>;
+    bySlug?: Record<string, string>;
+  };
   experts?: ExpertEntry[];
   organizations?: OrganizationEntry[];
   facts?: Record<string, {

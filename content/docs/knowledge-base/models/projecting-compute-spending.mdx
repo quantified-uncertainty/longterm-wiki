@@ -38,7 +38,7 @@ For two consecutive years, Wall Street consensus estimates for AI capex were sub
 
 To contextualize the \$700 billion figure: it represents approximately 2.1% of projected 2026 US GDP flowing from five companies into infrastructure buildout in a single year — more than four times the combined annual capital expenditure of the entire publicly traded US energy sector.[^12]
 
-This spending trajectory influences <EntityLink id="E608">AI governance</EntityLink> dynamics: the physical infrastructure being deployed determines the <EntityLink id="ai-training-compute">compute available</EntityLink> for training frontier models, the geographic distribution of AI capabilities, and the economic incentives shaping competitive dynamics between AI developers.
+This spending trajectory influences <EntityLink id="E608">AI governance</EntityLink> dynamics: the physical infrastructure being deployed determines the compute available for training frontier models, the geographic distribution of AI capabilities, and the economic incentives shaping competitive dynamics between AI developers.
 
 <SquiggleEstimate title="Cumulative Hyperscaler AI Capex 2024-2030 ($T)" code={`
 // Goldman/JPMorgan project ≈\$5T cumulative through 2030
@@ -143,7 +143,7 @@ Oracle revised its fiscal year 2026 capital expenditure guidance upward to \$50 
 
 #### xAI — \$30B+ and Accelerating
 
-xAI closed a \$20 billion Series E funding round in January 2026, bringing total funding to approximately \$30 billion.[^19] The company's Colossus facility in Memphis, Tennessee, has expanded to 2 gigawatts of total capacity housing 555,000 <EntityLink id="nvidia">Nvidia</EntityLink> H200 GPUs, purchased for approximately \$18 billion at an estimated \$32,000 per unit.[^23] This represents the largest single AI training cluster globally as of Q1 2026. The company constructed the initial facility infrastructure in 19 days by building on-site natural gas power generation rather than waiting for utility grid interconnection, which typically requires 2-4 years.[^23]
+xAI closed a \$20 billion Series E funding round in January 2026, bringing total funding to approximately \$30 billion.[^19] The company's Colossus facility in Memphis, Tennessee, has expanded to 2 gigawatts of total capacity housing 555,000 Nvidia H200 GPUs, purchased for approximately \$18 billion at an estimated \$32,000 per unit.[^23] This represents the largest single AI training cluster globally as of Q1 2026. The company constructed the initial facility infrastructure in 19 days by building on-site natural gas power generation rather than waiting for utility grid interconnection, which typically requires 2-4 years.[^23]
 
 #### OpenAI / Stargate — \$500B Commitment by 2029
 
@@ -181,7 +181,7 @@ Global semiconductor sales reached \$791.7 billion in 2025, representing 25.6% y
 | Segment | 2025 Sales | YoY Growth | Primary Driver | Source |
 |---------|-----------|------------|----------------|---------|
 | Logic Products (AI Accelerators) | \$301.9B | +39.9% | Nvidia, AMD, Intel GPU/accelerator demand | [SIA Q4 2025 Report](https://semiconductors.org)[^5] |
-| Memory Chips | \$223.1B | +34.8% | <EntityLink id="hbm-memory">HBM</EntityLink> for AI training; supply constraints | [SIA Q4 2025 Report](https://semiconductors.org)[^5] |
+| Memory Chips | \$223.1B | +34.8% | HBM for AI training; supply constraints | [SIA Q4 2025 Report](https://semiconductors.org)[^5] |
 | Other Semiconductors | \$266.7B | +8.5% | Broad electronics demand | [SIA Q4 2025 Report](https://semiconductors.org)[^5] |
 | **Total** | **\$791.7B** | **+25.6%** | | |
 
@@ -543,13 +543,13 @@ Companies are investing in water recycling and air cooling alternatives, but the
 
 ## Strategic Implications for AI Governance
 
-The magnitude and pace of AI infrastructure investment creates several dynamics relevant to <EntityLink id="E608">AI governance</EntityLink> and <EntityLink id="ai-safety">AI safety</EntityLink>:
+The magnitude and pace of AI infrastructure investment creates several dynamics relevant to <EntityLink id="E608">AI governance</EntityLink> and AI safety:
 
 ### Capability Acceleration and Governance Windows
 
-The infrastructure being deployed in 2026 will determine the <EntityLink id="ai-training-compute">compute available</EntityLink> for frontier model training through 2028-2030. If hardware depreciation and replacement cycles are 3-5 years, the \$700 billion in 2026 capex establishes the training capacity ceiling until 2029-2031.
+The infrastructure being deployed in 2026 will determine the compute available for frontier model training through 2028-2030. If hardware depreciation and replacement cycles are 3-5 years, the \$700 billion in 2026 capex establishes the training capacity ceiling until 2029-2031.
 
-This timeline matters for governance: if <EntityLink id="agi">AGI</EntityLink> or highly capable AI systems emerge within this infrastructure generation, the governance window for implementing safety measures is constrained to the period before these systems are trained. Physical infrastructure creates a degree of predictability: unlike software which can scale instantly, <EntityLink id="gpu-clusters">GPU clusters</EntityLink> and <EntityLink id="data-centers">data centers</EntityLink> require 18-36 months from planning to operation.
+This timeline matters for governance: if AGI or highly capable AI systems emerge within this infrastructure generation, the governance window for implementing safety measures is constrained to the period before these systems are trained. Physical infrastructure creates a degree of predictability: unlike software which can scale instantly, GPU clusters and data centers require 18-36 months from planning to operation.
 
 ### Racing Dynamics and Safety Incentives
 
@@ -580,9 +580,9 @@ Approximately 60-70% of the \$700 billion in 2026 hyperscaler capex is being inv
 
 Physical infrastructure creates potential governance intervention points:
 
-1. **Semiconductor manufacturing**: <EntityLink id="tsmc">TSMC</EntityLink> produces >90% of advanced logic chips (3nm and below); single chokepoint for supply[^28]
-2. **<EntityLink id="hbm-memory">HBM memory</EntityLink>**: Three suppliers (SK Hynix, Samsung, Micron) control production
-3. **<EntityLink id="data-centers">Data centers</EntityLink>**: Physical facilities are regulatable at local, state, and national levels
+1. **Semiconductor manufacturing**: TSMC produces >90% of advanced logic chips (3nm and below); single chokepoint for supply[^28]
+2. **HBM memory**: Three suppliers (SK Hynix, Samsung, Micron) control production
+3. **Data centers**: Physical facilities are regulatable at local, state, and national levels
 4. **Power supply**: Energy regulators can influence or restrict data center power access
 5. **Chip design tools**: EDA software (Cadence, Synopsys, Siemens) required for chip design
 

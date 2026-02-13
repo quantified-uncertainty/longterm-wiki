@@ -148,6 +148,23 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   const expertIds = new Set<string>(experts.map((e: ExpertData) => e.id));
   const orgIds = new Set<string>(organizations.map((o: OrganizationData) => o.id));
 
+  // Also index numeric IDs (E43 → slug) from id-registry.json
+  try {
+    const registryPath = join(DATA_DIR, 'id-registry.json');
+    if (existsSync(registryPath)) {
+      const registry = JSON.parse(readFileSync(registryPath, 'utf-8')) as {
+        entities?: Record<string, string>;
+      };
+      if (registry.entities) {
+        for (const numericId of Object.keys(registry.entities)) {
+          entityIds.add(numericId);
+        }
+      }
+    }
+  } catch {
+    // id-registry.json is optional
+  }
+
   // Find all MDX files
   const mdxFiles = findMdxFiles(CONTENT_DIR);
   const mdxIds = new Set<string>(mdxFiles.map((f: string) => getEntityIdFromPath(f)));

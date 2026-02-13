@@ -169,7 +169,8 @@ export const componentRefsRule = createRule({
     const body = content.body;
 
     // Skip internal documentation (except for unused imports check)
-    const isInternalDoc = content.relativePath.includes('/internal/');
+    // relativePath is relative to content/docs, so it may start with "internal/" (no leading slash)
+    const isInternalDoc = content.relativePath.startsWith('internal/') || content.relativePath.includes('/internal/');
 
     // Load data sources
     const entities = loadEntities();

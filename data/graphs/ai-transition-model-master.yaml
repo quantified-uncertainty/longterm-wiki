@@ -4913,6 +4913,13 @@ detailedNodes:
 
 
   # From tmc-ai-governance diagram
+  - id: tmc-ai-governance
+    label: "AI Governance"
+    category: misalignment-potential
+    subcategory: tmc-ai-governance
+    type: intermediate
+    description: "Rules, institutions, and oversight mechanisms for AI development."
+
   - id: oversight-bodies
     label: "Oversight Bodies"
     category: parameters

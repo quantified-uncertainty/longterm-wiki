@@ -12,19 +12,24 @@
  *   1 - Missing nodes found
  */
 
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
+import { join } from 'path';
 import yaml from 'js-yaml';
 import { fileURLToPath } from 'url';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
-// AI Transition Model entities are split across multiple files
-const ENTITY_FILES: string[] = [
-  'data/entities/ai-transition-model-factors.yaml',
-  'data/entities/ai-transition-model-metrics.yaml',
-  'data/entities/ai-transition-model-parameters.yaml',
-  'data/entities/ai-transition-model-scenarios.yaml',
-  'data/entities/ai-transition-model-subitems.yaml',
-];
+// AI Transition Model entities are split across multiple files.
+// Discover them dynamically so we don't miss newly-added subitem files.
+function getEntityFiles(): string[] {
+  const dir = 'data/entities';
+  try {
+    return readdirSync(dir)
+      .filter(f => f.startsWith('ai-transition-model-') && f.endsWith('.yaml'))
+      .map(f => join(dir, f));
+  } catch {
+    return [];
+  }
+}
 const MASTER_GRAPH_PATH: string = 'data/graphs/ai-transition-model-master.yaml';
 
 interface CauseEffectNode {
@@ -68,7 +73,7 @@ interface MissingNode {
 export function runCheck(_options?: ValidatorOptions): ValidatorResult {
   // Load and combine all entity files
   const entities: Entity[] = [];
-  for (const filePath of ENTITY_FILES) {
+  for (const filePath of getEntityFiles()) {
     if (existsSync(filePath)) {
       const content = yaml.load(readFileSync(filePath, 'utf8')) as Entity[] | undefined;
       if (Array.isArray(content)) {

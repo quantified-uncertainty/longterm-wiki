@@ -98,8 +98,29 @@ interface ValidationIssues {
 // Load data sources
 function loadEntities(): Set<string> {
   try {
-    const database = loadDatabaseJson();
-    return new Set(Object.keys(database.entities || {}));
+    const database = loadDatabaseJson() as Record<string, unknown>;
+
+    // Build set of known entity slug IDs from typedEntities
+    const ids = new Set<string>();
+    const typedEntities = database.typedEntities as Array<{ id?: string }> | undefined;
+    if (Array.isArray(typedEntities)) {
+      for (const e of typedEntities) {
+        if (e.id) ids.add(e.id);
+      }
+    }
+
+    // Also index numeric IDs (E43 → slug) from idRegistry so that
+    // DataInfoBox entityId="E43" and EntityLink id="E43" resolve correctly
+    const idRegistry = database.idRegistry as {
+      byNumericId?: Record<string, string>;
+    } | undefined;
+    if (idRegistry?.byNumericId) {
+      for (const numericId of Object.keys(idRegistry.byNumericId)) {
+        ids.add(numericId);
+      }
+    }
+
+    return ids;
   } catch {
     log.warn('Warning: Could not load entities database. Run pnpm build first.');
     return new Set();
