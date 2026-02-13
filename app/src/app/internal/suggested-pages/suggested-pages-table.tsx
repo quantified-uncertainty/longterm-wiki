@@ -46,7 +46,6 @@ const columns: ColumnDef<SuggestedPage>[] = [
     cell: ({ row }) => (
       <span className="text-sm font-medium">{row.original.title}</span>
     ),
-    filterFn: "includesString",
   },
   {
     accessorKey: "type",
