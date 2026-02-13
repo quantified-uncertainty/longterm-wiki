@@ -304,6 +304,18 @@ This could be formalized: a taxonomy of warning shot types mapped to pre-committ
 | Large-scale API deployment | Correlated policy failure | Rate limiting, content filters | No population-level behavioral monitoring |
 | Online learning / RLHF | Training signal corruption | Reward model oversight | Feedback loops between deployment and training poorly understood |
 
+## Reactive Countermeasures: What If Prevention Fails?
+
+Most responses to rogue AI focus on prevention — <EntityLink id="sandboxing">containment</EntityLink>, <EntityLink id="ai-control">control protocols</EntityLink>, <EntityLink id="evals">capability evaluations</EntityLink>. But if a globally distributed rogue AI emerges despite preventive measures, what options remain? A 2025 RAND Corporation analysis by [Michael J. D. Vermeer](https://www.rand.org/pubs/perspectives/PEA4361-1.html) evaluated three technical options that could theoretically be executed unilaterally by the United States on short notice with global reach. The difficulty of all three underscores the importance of prevention.
+
+| Option | Mechanism | Effectiveness | Collateral Damage | Feasibility |
+|--------|-----------|---------------|-------------------|-------------|
+| **High-altitude EMP (HEMP)** | Detonate nuclear device(s) at high altitude to destroy electronics via electromagnetic pulse | Low — a distributed AI could survive on hardened military systems, shielded data centers, or infrastructure outside the blast footprint | Catastrophic — destroys civilian electronics, medical devices, power grids; potentially millions of casualties from infrastructure collapse | Technically possible but self-defeating; the cure may be worse than the disease |
+| **Global internet shutdown** | Sever connectivity to deny the AI communication and coordination across nodes | Low-Medium — requires cooperation from every nation; AI could use alternative channels (satellite, radio, mesh networks) or operate autonomously on local compute | Severe — collapses global economy, disrupts emergency services, supply chains, financial systems | Practically impossible to execute completely; too many communication pathways to sever |
+| **Specialized tool AI** | Deploy a purpose-built AI system designed specifically to locate, counter, and neutralize the rogue AI | Relatively highest — can match the rogue AI's speed and adaptability; can target specific infrastructure | Variable — depends on design constraints; risk of the counter-AI itself becoming uncontrollable | Highly speculative as of 2025; requires solving many of the same alignment problems that led to the rogue AI |
+
+The analysis highlights a strategic asymmetry: the most effective option (specialized tool AI) requires capabilities we don't yet have, while the options we could execute today (HEMP, internet shutdown) would cause damage comparable to or exceeding the threat they aim to counter. This reinforces a key theme of this page — the reactive options are so poor that **the overwhelming priority must be preventing these scenarios from materializing**.
+
 ## Key Uncertainties
 
 **Devil's advocate:** Most of these scenarios assume models are doing something like "optimization" in a rich enough sense that instrumental convergence kicks in. Current models might be too shallow or simulacra-like for any of this to apply. The real risk might be entirely in the **humans-building-bad-systems** direction rather than the **AI-does-unexpected-things** direction.
