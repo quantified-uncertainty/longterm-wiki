@@ -150,8 +150,8 @@
 .prose ul ul { list-style-type: circle; }
 .prose ul ul ul { list-style-type: square; }
 
-.prose a { color: var(--accent-foreground); text-decoration: underline; text-underline-offset: 2px; }
-.prose a:hover { opacity: 0.8; }
+.prose a { color: var(--accent-foreground); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; transition: text-decoration-color 0.15s, text-decoration-thickness 0.15s; }
+.prose a:hover { text-decoration-color: #6366f1; text-decoration-thickness: 2px; }
 
 .prose strong { font-weight: 600; }
 .prose em { font-style: italic; }
