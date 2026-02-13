@@ -193,6 +193,82 @@ interface PipelineOptions {
 }
 
 // ---------------------------------------------------------------------------
+// Post-processing: strip redundant Related Pages sections
+// ---------------------------------------------------------------------------
+
+const RELATED_SECTION_PATTERNS = [
+  /^## Related Pages\s*$/,
+  /^## See Also\s*$/,
+  /^## Related Content\s*$/,
+];
+
+/**
+ * Remove manual "Related Pages" / "See Also" / "Related Content" sections.
+ * These are now rendered automatically by the RelatedPages React component.
+ * Also cleans up unused Backlinks imports.
+ */
+function stripRelatedPagesSections(content: string): string {
+  const lines = content.split('\n');
+
+  // Find all ## heading indices
+  const sectionStarts: { index: number; heading: string }[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (/^## /.test(lines[i].trimEnd())) {
+      sectionStarts.push({ index: i, heading: lines[i].trimEnd() });
+    }
+  }
+
+  // Identify sections to remove (work backwards)
+  const rangesToRemove: { start: number; end: number }[] = [];
+  for (const { index, heading } of sectionStarts) {
+    if (!RELATED_SECTION_PATTERNS.some(p => p.test(heading))) continue;
+
+    const nextSection = sectionStarts.find(s => s.index > index);
+    let endIndex = nextSection ? nextSection.index : lines.length;
+    while (endIndex > index && lines[endIndex - 1].trim() === '') endIndex--;
+
+    // Check for preceding --- separator
+    let startIndex = index;
+    let checkIdx = index - 1;
+    while (checkIdx >= 0 && lines[checkIdx].trim() === '') checkIdx--;
+    if (checkIdx >= 0 && /^---\s*$/.test(lines[checkIdx])) startIndex = checkIdx;
+    while (startIndex > 0 && lines[startIndex - 1].trim() === '') startIndex--;
+
+    rangesToRemove.push({ start: startIndex, end: endIndex });
+  }
+
+  // Remove in reverse order
+  rangesToRemove.sort((a, b) => b.start - a.start);
+  for (const { start, end } of rangesToRemove) {
+    lines.splice(start, end - start);
+  }
+
+  let result = lines.join('\n');
+
+  // Clean up Backlinks import if no <Backlinks usage remains
+  const contentWithoutImports = result.replace(/^import\s.*$/gm, '');
+  if (!/<Backlinks[\s/>]/.test(contentWithoutImports)) {
+    result = result.replace(
+      /^(import\s*\{)([^}]*)(}\s*from\s*['"]@components\/wiki['"];?\s*)$/gm,
+      (match, prefix, imports, suffix) => {
+        const importList = imports.split(',').map((s: string) => s.trim()).filter(Boolean);
+        if (!importList.includes('Backlinks')) return match;
+        const filtered = importList.filter((s: string) => s !== 'Backlinks');
+        if (filtered.length === 0) return '';
+        return `${prefix}${filtered.join(', ')}${suffix}`;
+      }
+    );
+    result = result.replace(/\n{3,}/g, '\n\n');
+  }
+
+  // Ensure file ends with single newline
+  result = result.replace(/\n{3,}$/g, '\n');
+  if (!result.endsWith('\n')) result += '\n';
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
 // Triage: cheap news-check to auto-select update tier
 // ---------------------------------------------------------------------------
 
@@ -872,6 +948,12 @@ People and organizations are VERY sensitive to inaccuracies. Real people read th
   - WRONG: "forfeited equity" when it was "tried to forfeit but equity wasn't taken away" — get details right
   - WRONG: Sections like "Other Research Contributions" that pad with low-value content — prefer focused accuracy
 
+### Related Pages (DO NOT INCLUDE)
+Do NOT include "## Related Pages", "## See Also", or "## Related Content" sections.
+These are now rendered automatically by the RelatedPages React component at build time.
+Remove any existing such sections from the content. Also remove any <Backlinks> component
+usage and its import if no other usage remains.
+
 ### Output Format
 Output the COMPLETE improved MDX file content. Include all frontmatter and content.
 Do not output markdown code blocks - output the raw MDX directly.
@@ -905,6 +987,10 @@ Start your response with "---" (the frontmatter delimiter).`;
     /^quality:\s*\d+\s*\n/m,
     ''
   );
+
+  // Strip any "Related Pages" / "See Also" / "Related Content" sections
+  // (now rendered automatically by the RelatedPages component)
+  improvedContent = stripRelatedPagesSections(improvedContent);
 
   writeTemp(page.id, 'improved.mdx', improvedContent);
   log('improve', 'Complete');
