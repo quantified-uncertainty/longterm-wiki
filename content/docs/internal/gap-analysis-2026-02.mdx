@@ -1,0 +1,131 @@
+---
+title: "Wiki Gap Analysis — February 2026"
+description: "Systematic identification of coverage gaps across the wiki, prioritized by importance for AI safety coverage."
+sidebar_label: "Gap Analysis (Feb 2026)"
+---
+
+# Wiki Gap Analysis — February 2026
+
+Systematic review of coverage gaps across the wiki's 639 pages, combining `crux gaps list` output (existing pages needing insight extraction) with manual topic coverage analysis to identify both under-developed existing pages and entirely missing topics.
+
+## Executive Summary
+
+The wiki has **strong structural coverage** (639 pages across 25 categories) but significant gaps in three areas:
+
+1. **Insight extraction**: 386 pages (of 519 tracked) lack insights. 203 high-importance pages have zero insights.
+2. **Fast-moving topics**: Chinese AI labs, test-time compute, frontier model transparency, and recent incidents are under-represented.
+3. **Category imbalances**: Incidents (2 pages), forecasting (2 pages), and capabilities (11 pages) are notably thin relative to their importance.
+
+| Dimension | Coverage | Key Gap |
+|-----------|----------|---------|
+| Policy & governance | ~70% | Implementation tracking, enforcement status |
+| Safety techniques | ~55% | Post-2024 methods, effectiveness evidence |
+| Frontier evaluations | ~40% | Specific benchmarks, scaling analysis |
+| AI labs & orgs | ~65% | Chinese labs, emerging players |
+| Capabilities | ~45% | Vision/multimodal, inference-time compute |
+| Incidents | ~5% | Only 2 incident pages despite many documented cases |
+| Open-source safety | ~15% | Downstream risks, audit methods |
+| International governance | ~40% | Deep coordination, compliance tracking |
+
+---
+
+## Part 1: Missing or Under-Covered Pages
+
+A prioritized list of 100 missing pages is maintained in the [Suggested Pages dashboard](/internal/suggested-pages), ranked by numeric priority (1–100) based on how often each topic is mentioned across existing pages and editorial importance to AI safety coverage.
+
+The top 10 gaps by priority:
+
+| Priority | Topic | Mentions | Status |
+|----------|-------|----------|--------|
+| 100 | AI Governance | 183 | Sub-topics exist, no umbrella page |
+| 99 | Reinforcement Learning | 81 | No standalone page |
+| 98 | Retrieval-Augmented Generation (RAG) | 404 | No page |
+| 97 | GPT-4 | 193 | No page |
+| 96 | Claude (Model Family) | 186 | No page |
+| 95 | Frontier Model (Concept) | 161 | No definition page |
+| 94 | Training Data | 111 | No page |
+| 93 | Safety Evaluations | 106 | No page |
+| 92 | Misalignment Potential | 110 | 110 EntityLinks, no page |
+| 91 | Civilizational Competence | 104 | 104 EntityLinks, no page |
+
+See the [full list of 100 suggested pages](/internal/suggested-pages) for details.
+
+---
+
+## Part 2: Existing High-Priority Pages Needing Insight Extraction
+
+From `crux gaps list`, the top 20 existing pages with highest gap scores (importance × quality, zero insights):
+
+| Rank | Score | Imp | Qual | Page | Category |
+|------|-------|-----|------|------|----------|
+| 1 | 166 | 87 | 91 | Intervention Portfolio | responses |
+| 2 | 162 | 85 | 91 | Scheming & Deception Detection | responses |
+| 3 | 159 | 85 | 87 | OpenAI Foundation | organizations |
+| 4 | 157 | 82 | 91 | Capability Elicitation | responses |
+| 5 | 157 | 82 | 91 | AI Safety Cases | responses |
+| 6 | 157 | 82 | 91 | Bioweapons | risks |
+| 7 | 157 | 82 | 91 | Multipolar Trap | risks |
+| 8 | 151 | 87 | 73 | Intervention Effectiveness Matrix | models |
+| 9 | 151 | 90 | 68 | Evaluation Awareness | responses |
+| 10 | 151 | 79 | 91 | Reward Hacking | risks |
+| 11 | 151 | 85 | 78 | Sleeper Agents: Training Deceptive LLMs | risks |
+| 12 | 149 | 85 | 75 | AI Control | responses |
+| 13 | 149 | 90 | 65 | Eval Saturation & The Evals Gap | responses |
+| 14 | 149 | 78 | 91 | Pause Advocacy | responses |
+| 15 | 149 | 78 | 91 | Sandboxing / Containment | responses |
+| 16 | 149 | 78 | 91 | Structured Access / API-Only | responses |
+| 17 | 149 | 78 | 91 | Compute Thresholds | responses |
+| 18 | 149 | 78 | 91 | Tool-Use Restrictions | responses |
+| 19 | 149 | 78 | 91 | Voluntary Industry Commitments | responses |
+| 20 | 149 | 85 | 75 | Deceptive Alignment | risks |
+
+### Recommended batch for insight extraction:
+Run `crux insights extract` on these pages to populate the insights data layer. The responses category is most under-extracted (4/136 pages = 3% coverage).
+
+---
+
+## Part 3: Category-Level Coverage Statistics
+
+From `crux gaps stats`:
+
+| Category | Pages | With Insights | Coverage | Priority |
+|----------|-------|---------------|----------|----------|
+| responses | 136 | 4 | 3% | **CRITICAL** |
+| organizations | 106 | 0 | 0% | **CRITICAL** |
+| models | 78 | 0 | 0% | **HIGH** |
+| risks | 60 | 0 | 0% | **HIGH** |
+| people | 40 | 0 | 0% | Medium |
+| intelligence-paradigms | 16 | 0 | 0% | Medium |
+| capabilities | 11 | 10 | 91% | Low (well covered) |
+| debates | 11 | 3 | 27% | Medium |
+| metrics | 10 | 8 | 80% | Low (well covered) |
+| cruxes | 5 | 5 | 100% | Done |
+| future-projections | 5 | 4 | 80% | Low |
+| incidents | 2 | 0 | 0% | **HIGH** (few pages) |
+| forecasting | 2 | 2 | 100% | Done (but few pages) |
+
+**Key finding**: 93% of pages (482/519) have zero insights. The insight extraction pipeline should prioritize the responses (136 pages) and organizations (106 pages) categories.
+
+---
+
+## Part 4: Recommended Action Plan
+
+### Immediate actions (next sessions)
+
+1. **Create top-priority pages** (priority 90+) via `crux content create` — see [Suggested Pages](/internal/suggested-pages)
+2. **Expand adversarial-robustness stub** via `crux content improve`
+3. **Run insight extraction** on top-20 gap-scored pages
+
+### Short-term actions
+
+1. **Create priority 70–89 pages**: DeepSeek, Hallucination, Multimodal AI, Jailbreaking, etc.
+2. **Run insight extraction** on all 0-insight pages with importance \>= 80 (203 pages)
+
+### Medium-term actions
+
+1. **Work through priority 40–69 pages** from the [Suggested Pages](/internal/suggested-pages) dashboard
+2. **Systematic insight extraction** across remaining categories
+
+---
+
+*Generated by `crux gaps list`, `crux gaps stats`, and manual topic coverage analysis on 2026-02-13.*
