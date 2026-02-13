@@ -2600,7 +2600,6 @@
   clusters:
     - ai-safety
     - governance
-    - geopolitics
   sources:
     - title: "Superintelligence Strategy"
       url: https://arxiv.org/abs/2503.05628
@@ -3121,6 +3120,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: cirl
   numericId: E586
   type: approach
@@ -3173,6 +3173,7 @@
     - epistemics
     - governance
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: community-notes-for-everything
   numericId: E589
   type: approach
@@ -3225,6 +3226,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: epistemic-virtue-evals
   numericId: E592
   type: approach
@@ -3266,10 +3268,12 @@
     - epistemics
     - community
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: mit-ai-risk-repository
   numericId: E383
   type: project
   title: MIT AI Risk Repository
+  summaryPage: epistemic-tools-tools-overview
   description: >-
     The MIT AI Risk Repository catalogs 1,700+ AI risks from 65+ frameworks into
     a searchable database with dual taxonomies (causal and domain-based).
@@ -3307,6 +3311,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: output-filtering
   numericId: E595
   type: approach
@@ -3415,6 +3420,7 @@
     - ai-safety
     - community
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: stampy-aisafety-info
   numericId: E382
   type: project
@@ -3430,6 +3436,7 @@
     - community
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: texas-traiga
   numericId: E602
   type: policy
@@ -3457,6 +3464,7 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
 - id: wikipedia-views
   numericId: E390
   type: project
@@ -3468,6 +3476,37 @@
     infrastructure rather than core AI safety concerns.
   clusters:
     - ai-safety
+  lastUpdated: 2026-02
+  summaryPage: epistemic-tools-tools-overview
+
+- id: government-authority-commercial-ai-infrastructure
+  numericId: E688
+  type: policy
+  title: Government Authority Over Commercial AI Infrastructure
+  description: >-
+    The US government possesses extensive legal authority to direct, commandeer, or access
+    the $700B+ in commercial AI infrastructure owned by US companies, through the Defense
+    Production Act (priority contracts), CLOUD Act (global data access), FISA 702 (warrantless
+    surveillance of non-US persons), IEEPA (emergency commerce regulation), and executive orders.
+    Historical precedents include WWII industrial mobilization, post-9/11 PRISM surveillance,
+    and COVID-era DPA invocations. Current military-commercial integration (Pentagon contracts
+    with Anthropic, Google, OpenAI, xAI; GenAI.mil serving 3M personnel) creates pre-existing
+    channels for rapid mobilization.
+  relatedEntries:
+    - id: compute-concentration
+      type: risk
+    - id: export-controls
+      type: policy
+    - id: geopolitics
+      type: ai-transition-model-metric
+  tags:
+    - governance
+    - legal-framework
+    - military
+    - government
+    - dpa
+  clusters:
+    - governance
   lastUpdated: 2026-02
 
 - id: goal-misgeneralization-research
@@ -3482,5 +3521,5 @@
     - id: goal-misgeneralization
       type: risk
   clusters:
-    - alignment
+    - ai-safety
   lastUpdated: 2026-02

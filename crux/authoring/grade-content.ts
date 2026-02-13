@@ -757,8 +757,9 @@ function applyGradesToFile(page: PageInfo, grades: GradeResult, metrics: Metrics
   if (grades.ratings) {
     fm.ratings = grades.ratings;
   }
-  // Save metrics
-  fm.metrics = metrics;
+  // Metrics (wordCount, citations, tables, diagrams) are computed at build time
+  // by app/scripts/lib/metrics-extractor.mjs — not stored in frontmatter.
+  delete fm.metrics;
 
   // Ensure lastEdited is a string (not Date object)
   if (fm.lastEdited instanceof Date) {

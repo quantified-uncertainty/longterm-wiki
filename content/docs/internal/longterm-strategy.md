@@ -10,11 +10,6 @@ ratings:
   rigor: 0
   actionability: 0
   completeness: 0
-metrics:
-  wordCount: 2042
-  citations: 0
-  tables: 2
-  diagrams: 0
 ---
 # LongtermWiki Strategy Brainstorm
 

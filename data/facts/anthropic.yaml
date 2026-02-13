@@ -1,9 +1,16 @@
 entity: anthropic
 facts:
   valuation:
-    value: "$350 billion"
-    numeric: 350000000000
-    asOf: "2026-01"
+    value: "$380 billion"
+    numeric: 380000000000
+    asOf: "2026-02"
+    note: "Series G post-money valuation, February 2026"
+
+  revenue-run-rate:
+    value: "$14 billion"
+    numeric: 14000000000
+    asOf: "2026-02"
+    note: "Current run-rate revenue as of Series G announcement"
 
   revenue-arr-2025:
     value: "$9 billion"
@@ -14,6 +21,12 @@ facts:
   revenue-2026-guidance:
     value: "$20-26 billion"
     asOf: "2026-01"
+
+  total-funding:
+    value: "$67 billion+"
+    numeric: 67000000000
+    asOf: "2026-02"
+    note: "Total funding raised including $30B Series G"
 
   gross-margin:
     value: "40%"
