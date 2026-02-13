@@ -12,11 +12,6 @@ ratings:
   rigor: 4
   actionability: 5
   completeness: 6
-metrics:
-  wordCount: 262
-  citations: 0
-  tables: 3
-  diagrams: 0
 ---
 # AI Transition Model Style Guide
 
