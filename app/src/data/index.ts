@@ -611,6 +611,7 @@ export function getEntityInfoBoxData(entityId: string) {
   if (!entity) return null;
 
   const resolvedRelatedEntries = entity.relatedEntries?.map((entry) => ({
+    id: entry.id,
     type: entry.type,
     title:
       getTypedEntityById(entry.id)?.title ||

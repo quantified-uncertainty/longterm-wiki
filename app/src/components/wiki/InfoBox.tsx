@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@lib/utils";
 import { Lightbulb, FlaskConical, Target, CheckCircle2, ExternalLink, BookOpen, GraduationCap, MessageSquare, Briefcase } from "lucide-react";
 import { EntityTypeIcon, entityTypeConfig } from "./EntityTypeIcon";
+import { EntityLink } from "./EntityLink";
 import { severityColors, maturityColors, riskCategoryColors } from "./shared/style-config";
 import { getEntityTypeHeader, getEntityTypeLabel, getOrgTypeLabel } from "@/data/entity-ontology";
 import type { AnyEntityTypeName } from "@/data/entity-type-names";
@@ -46,7 +47,7 @@ export interface InfoBoxProps {
   knownFor?: string;
   customFields?: { label: string; value: string; link?: string }[];
   relatedTopics?: string[];
-  relatedEntries?: { type: string; title: string; href: string }[];
+  relatedEntries?: { id?: string; type: string; title: string; href: string }[];
   ratings?: ModelRatingsData;
   description?: string;
   externalLinks?: ExternalLinksData;
@@ -235,9 +236,9 @@ export function InfoBox({
     : null;
 
   return (
-    <Card className="wiki-infobox float-right w-[280px] mb-4 ml-6 overflow-hidden text-sm max-md:float-none max-md:w-full max-md:ml-0 max-md:mb-6">
+    <Card className="wiki-infobox float-right w-[280px] mb-4 ml-6 overflow-visible text-sm max-md:float-none max-md:w-full max-md:ml-0 max-md:mb-6">
       {/* Header */}
-      <div className="px-3 py-2.5 text-white" style={{ backgroundColor: typeInfo.headerColor }}>
+      <div className="px-3 py-2.5 text-white rounded-t-lg" style={{ backgroundColor: typeInfo.headerColor }}>
         <span className="block text-[10px] uppercase tracking-wide opacity-90 mb-0.5">{typeInfo.label}</span>
         {title && <h3 className="m-0 text-sm font-semibold leading-tight text-white">{title}</h3>}
       </div>
@@ -376,10 +377,14 @@ export function InfoBox({
                       {pluralize(getEntityTypeLabel(t))}
                     </span>
                   </div>
-                  <ul className="list-none m-0 p-0 pl-[1.125rem] flex flex-col">
+                  <ul className="list-none m-0 p-0 pl-[1.125rem] flex flex-col gap-0.5">
                     {entries.map((entry, i) => (
                       <li key={i} className="list-none m-0 p-0 leading-snug">
-                        <Link href={entry.href} className="text-accent-foreground no-underline hover:underline">{entry.title}</Link>
+                        {entry.id ? (
+                          <EntityLink id={entry.id} className="text-xs">{entry.title}</EntityLink>
+                        ) : (
+                          <Link href={entry.href} className="text-accent-foreground no-underline hover:underline">{entry.title}</Link>
+                        )}
                       </li>
                     ))}
                   </ul>
