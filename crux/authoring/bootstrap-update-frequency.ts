@@ -24,6 +24,7 @@ import { relative } from 'path';
 import { fileURLToPath } from 'url';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
+import { parse as parseYaml } from 'yaml';
 
 // ---------------------------------------------------------------------------
 // Config
@@ -95,7 +96,6 @@ interface Change {
 }
 
 async function main(): Promise<void> {
-  const { parse: parseYaml } = await import('yaml');
   const args: string[] = process.argv.slice(2);
   const apply: boolean = args.includes('--apply');
   const verbose: boolean = args.includes('--verbose');

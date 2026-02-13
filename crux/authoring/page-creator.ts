@@ -46,6 +46,8 @@ import { ensureComponentImports, runValidationLoop, runFullValidation } from './
 import { runGrading } from './creator/grading.ts';
 import { createCategoryDirectory, deployToDestination, validateCrossLinks, runReview } from './creator/deployment.ts';
 import { inferEntityType } from '../lib/category-entity-types.ts';
+import { parseCliArgs } from '../lib/cli.ts';
+import { getColors } from '../lib/output.ts';
 
 dotenv.config();
 
@@ -393,8 +395,6 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  // Use shared parseCliArgs for consistent --key=value handling
-  const { parseCliArgs } = await import('../lib/cli.ts');
   const parsed = parseCliArgs(args);
 
   const topic: string | undefined = parsed._positional[0];
@@ -532,7 +532,6 @@ async function main(): Promise<void> {
       const entitySlug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const crossLinkCheck = validateCrossLinks(deployResult.deployedTo!);
 
-      const { getColors } = await import('../lib/output.ts');
       const c = getColors();
       console.log(`\n${'─'.repeat(50)}`);
       if (crossLinkCheck.warnings.length > 0) {
