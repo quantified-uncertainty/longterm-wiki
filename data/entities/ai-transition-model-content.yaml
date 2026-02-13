@@ -1,4 +1,5 @@
 - id: tmc-compute-forecast-sketch
+  numericId: E310
   type: ai-transition-model-subitem
   title: Compute Forecast Model Sketch
   path: /ai-transition-model/compute-forecast-sketch/
@@ -322,6 +323,7 @@
           - Time slider → see which bottlenecks dominate when
   sidebarOrder: 1
 - id: tmc-existential-catastrophe
+  numericId: E320
   type: ai-transition-model-subitem
   title: Existential Catastrophe
   path: /ai-transition-model/existential-catastrophe/
@@ -390,6 +392,7 @@
           - [Civilizational Competence](/ai-transition-model/factors/civilizational-competence/)
   sidebarOrder: 1
 - id: tmc-long-term-trajectory
+  numericId: E333
   type: ai-transition-model-subitem
   title: Long-term Trajectory
   path: /ai-transition-model/long-term-trajectory/
@@ -483,6 +486,7 @@
           - [Long-term Lock-in](/ai-transition-model/scenarios/long-term-lockin/) — Key Ultimate Scenario for long-term trajectory
   sidebarOrder: 2
 - id: tmc-adaptability
+  numericId: E298
   type: ai-transition-model-subitem
   title: Societal Adaptability
   path: /ai-transition-model/adaptability/
@@ -561,6 +565,7 @@
           - [Epistemic Foundation](/ai-transition-model/factors/civilizational-competence/epistemics/) — Shared understanding enables collective adaptation
   sidebarOrder: 4
 - id: tmc-ai-control-concentration
+  numericId: E300
   type: ai-transition-model-subitem
   title: AI Control Concentration
   path: /ai-transition-model/ai-control-concentration/
@@ -915,6 +920,7 @@
           - <R id="16914f3b14803a87">CNAS: AI competition research</R>
   sidebarOrder: 3
 - id: tmc-alignment-robustness
+  numericId: E303
   type: ai-transition-model-subitem
   title: Alignment Robustness
   path: /ai-transition-model/alignment-robustness/
@@ -1233,6 +1239,7 @@
           - [UK AISI Programs](https://futureoflife.org/ai-safety-index-summer-2025/): International cooperation on model testing (U.S.-UK MOU, April 2024)
   sidebarOrder: 8
 - id: tmc-biological-threat-exposure
+  numericId: E304
   type: ai-transition-model-subitem
   title: Biological Threat Exposure
   parentFactor: misuse-potential
@@ -1579,6 +1586,7 @@
           - Nuclear Threat Initiative (NTI): Biosecurity program focusing on DNA synthesis governance
   sidebarOrder: 20
 - id: tmc-coordination-capacity
+  numericId: E312
   type: ai-transition-model-subitem
   title: Coordination Capacity
   path: /ai-transition-model/coordination-capacity/
@@ -1640,6 +1648,7 @@
           - [Regulatory Capacity](/ai-transition-model/factors/civilizational-competence/regulatory-capacity/) — Government ability to enforce agreements
   sidebarOrder: 19
 - id: tmc-cyber-threat-exposure
+  numericId: E314
   type: ai-transition-model-subitem
   title: Cyber Threat Exposure
   parentFactor: misuse-potential
@@ -2015,6 +2024,7 @@
           - <R id="4ba107b71a0707f9">Anthropic AI-Orchestrated Cyberattack Disclosure</R> — First documented fully AI-orchestrated espionage campaign (September 2025)
   sidebarOrder: 21
 - id: tmc-economic-stability
+  numericId: E316
   type: ai-transition-model-subitem
   title: Economic Stability
   parentFactor: transition-turbulence
@@ -2329,6 +2339,7 @@
           - <R id="055bfeb65d9fda1a">Martin Ford: Rise of the Robots</R> — "This time is different" debate
   sidebarOrder: 14
 - id: tmc-epistemic-health
+  numericId: E317
   type: ai-transition-model-subitem
   title: Epistemic Health
   path: /ai-transition-model/epistemic-health/
@@ -2661,6 +2672,7 @@
           - [Misinformation is Eroding the Public's Confidence in Democracy](https://www.brookings.edu/articles/misinformation-is-eroding-the-publics-confidence-in-democracy/) — Brookings Institution (July 2024)
   sidebarOrder: 2
 - id: tmc-epistemics
+  numericId: E319
   type: ai-transition-model-subitem
   title: Epistemic Foundation
   path: /ai-transition-model/epistemics/
@@ -2743,6 +2755,7 @@
           - [Governance Capacity](/ai-transition-model/factors/civilizational-competence/governance/) — Governance requires epistemic foundation
   sidebarOrder: 3
 - id: tmc-governance
+  numericId: E321
   type: ai-transition-model-subitem
   title: Governance Capacity
   path: /ai-transition-model/governance/
@@ -2823,6 +2836,7 @@
           - [Misalignment Potential](/ai-transition-model/factors/misalignment-potential/) — What governance regulates
   sidebarOrder: 2
 - id: tmc-human-agency
+  numericId: E324
   type: ai-transition-model-subitem
   title: Human Agency
   path: /ai-transition-model/human-agency/
@@ -3188,6 +3202,7 @@
           - [Zhang (2025): Algorithmic Management and Implications for Work](https://onlinelibrary.wiley.com/doi/10.1111/ntwe.12343) - *New Technology, Work and Employment*
   sidebarOrder: 4
 - id: tmc-human-expertise
+  numericId: E325
   type: ai-transition-model-subitem
   title: Human Expertise
   path: /ai-transition-model/human-expertise/
@@ -3570,6 +3585,7 @@
           - <R id="e6b22bc6e1fad7e9">FAA: Automation complacency research</R>
   sidebarOrder: 15
 - id: tmc-human-oversight-quality
+  numericId: E326
   type: ai-transition-model-subitem
   title: Human Oversight Quality
   path: /ai-transition-model/human-oversight-quality/
@@ -4052,6 +4068,7 @@
           - [Can There Be Oversight for AI?](https://www.dagstuhl.de/en/institute/news/2025/can-there-be-oversight-for-ai) — Dagstuhl 2025 expert consensus on feasibility
   sidebarOrder: 16
 - id: tmc-information-authenticity
+  numericId: E328
   type: ai-transition-model-subitem
   title: Information Authenticity
   path: /ai-transition-model/information-authenticity/
@@ -4367,6 +4384,7 @@
           - <R id="a9e3e225dba7fdd7">European Commission: Code of Practice on AI-Generated Content</R> — Implementation guidance
   sidebarOrder: 5
 - id: tmc-institutional-quality
+  numericId: E329
   type: ai-transition-model-subitem
   title: Institutional Quality
   path: /ai-transition-model/institutional-quality/
@@ -4735,6 +4753,7 @@
           - <R id="b09ff779df9ff054">AI in Policy Evaluation</R> - OECD analysis
   sidebarOrder: 13
 - id: tmc-international-coordination
+  numericId: E330
   type: ai-transition-model-subitem
   title: International Coordination
   path: /ai-transition-model/international-coordination/
@@ -5042,6 +5061,7 @@
           - <R id="697b30a2dacecc26">International Control of Powerful Technology: Lessons from the Baruch Plan</R> - GovAI
   sidebarOrder: 11
 - id: tmc-interpretability-coverage
+  numericId: E331
   type: ai-transition-model-subitem
   title: Interpretability Coverage
   path: /ai-transition-model/interpretability-coverage/
@@ -5404,6 +5424,7 @@
           - [ICML 2024 Mechanistic Interpretability Workshop](https://icml2024mi.pages.dev/) — 93 accepted papers including 5 prize winners, demonstrating explosive field growth
   sidebarOrder: 10
 - id: tmc-preference-authenticity
+  numericId: E335
   type: ai-transition-model-subitem
   title: Preference Authenticity
   path: /ai-transition-model/preference-authenticity/
@@ -5802,6 +5823,7 @@
           - <R id="3767db8f76073b0b">NYT: Rabbit Hole</R> — Podcast on radicalization
   sidebarOrder: 7
 - id: tmc-racing-intensity
+  numericId: E336
   type: ai-transition-model-subitem
   title: Racing Intensity
   parentFactor: transition-turbulence
@@ -6200,6 +6222,7 @@
           - <R id="0e7aef26385afeed">Partnership on AI</R> — Multi-stakeholder coordination
   sidebarOrder: 17
 - id: tmc-reality-coherence
+  numericId: E338
   type: ai-transition-model-subitem
   title: Reality Coherence
   path: /ai-transition-model/reality-coherence/
@@ -6589,6 +6612,7 @@
           - [World Privacy Forum (2024)](https://worldprivacyforum.org/posts/privacy-identity-and-trust-in-c2pa/) — Privacy and trust analysis of C2PA
   sidebarOrder: 6
 - id: tmc-regulatory-capacity
+  numericId: E340
   type: ai-transition-model-subitem
   title: Regulatory Capacity
   path: /ai-transition-model/regulatory-capacity/
@@ -6963,6 +6987,7 @@
           - [FLI AI Safety Index 2024-2025](https://futureoflife.org/ai-safety-index-summer-2025/) - Assessment of lab safety practices and regulatory engagement
   sidebarOrder: 12
 - id: tmc-robot-threat-exposure
+  numericId: E342
   type: ai-transition-model-subitem
   title: Robot Threat Exposure
   path: /ai-transition-model/robot-threat-exposure/
@@ -7126,6 +7151,7 @@
           - [Racing Intensity](/ai-transition-model/factors/transition-turbulence/racing-intensity/) — Competitive dynamics accelerating weapons development
   sidebarOrder: 22
 - id: tmc-safety-capability-gap
+  numericId: E344
   type: ai-transition-model-subitem
   title: Safety-Capability Gap
   path: /ai-transition-model/safety-capability-gap/
@@ -7449,6 +7475,7 @@
           - <R id="0fb8f4d1e83da12b">NIST ARIA Program (2024)</R> — Government evaluation framework addressing gap measurement
   sidebarOrder: 9
 - id: tmc-safety-culture-strength
+  numericId: E345
   type: ai-transition-model-subitem
   title: Safety Culture Strength
   path: /ai-transition-model/safety-culture-strength/
@@ -7773,6 +7800,7 @@
           - <R id="9c4106b68045dbd6">UC Berkeley CHAI</R> — Technical safety research
   sidebarOrder: 18
 - id: tmc-societal-resilience
+  numericId: E347
   type: ai-transition-model-subitem
   title: Societal Resilience
   path: /ai-transition-model/societal-resilience/
@@ -8154,6 +8182,7 @@
           - [Global Cloud Market Share Report 2025](https://www.tekrevol.com/blogs/global-cloud-market-share-report-statistics-2025/) — Market concentration data
   sidebarOrder: 22
 - id: tmc-societal-trust
+  numericId: E348
   type: ai-transition-model-subitem
   title: Societal Trust
   path: /ai-transition-model/societal-trust/
@@ -8497,6 +8526,7 @@
           - [Stanford Social Media Lab: Building Resilience in Communities of Color (2024)](https://sml.stanford.edu/publications/2024/building-resilience-misinformation-communities-color-results-two-studies-tailored)
   sidebarOrder: 1
 - id: tmc-surprise-threat-exposure
+  numericId: E352
   type: ai-transition-model-subitem
   title: Surprise Threat Exposure
   path: /ai-transition-model/surprise-threat-exposure/

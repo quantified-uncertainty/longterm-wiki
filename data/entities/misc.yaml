@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: effectiveness-assessment
+  numericId: E113
   type: analysis
   title: AI Policy Effectiveness
   customFields:
@@ -21,6 +22,7 @@
   description: 'As AI governance efforts multiply, a critical question emerges: Which policies are actually working?'
   lastUpdated: 2025-12
 - id: openai-foundation-governance
+  numericId: E404
   type: analysis
   title: OpenAI Foundation Governance Paradox
   description: >-
@@ -50,6 +52,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-valuation
+  numericId: E405
   type: analysis
   title: Anthropic Valuation Analysis
   description: >-
@@ -78,6 +81,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-investors
+  numericId: E406
   type: analysis
   title: Anthropic (Funder)
   description: >-
@@ -109,6 +113,7 @@
   lastUpdated: 2026-02
 
 - id: long-term-benefit-trust
+  numericId: E407
   type: analysis
   title: Long-Term Benefit Trust (Anthropic)
   description: >-
@@ -138,6 +143,7 @@
   lastUpdated: 2026-02
 
 - id: musk-openai-lawsuit
+  numericId: E408
   type: analysis
   title: Musk v. OpenAI Lawsuit
   description: >-
@@ -167,6 +173,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-ipo
+  numericId: E409
   type: analysis
   title: Anthropic IPO
   description: >-
@@ -196,6 +203,7 @@
   lastUpdated: 2026-02
 
 - id: elon-musk-philanthropy
+  numericId: E410
   type: analysis
   title: Elon Musk (Funder)
   description: >-
@@ -226,6 +234,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-pledge-enforcement
+  numericId: E411
   type: analysis
   title: "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
   description: >-
@@ -258,6 +267,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-pre-ipo-daf-transfers
+  numericId: E412
   type: analysis
   title: Anthropic Pre-IPO DAF Transfers
   description: >-
@@ -291,6 +301,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-impact
+  numericId: E413
   type: analysis
   title: Anthropic Impact Assessment Model
   description: >-
@@ -321,6 +332,7 @@
   lastUpdated: 2026-02
 
 - id: capability-alignment-race
+  numericId: E414
   type: analysis
   title: Capability-Alignment Race Model
   description: >-
@@ -352,6 +364,7 @@
   lastUpdated: 2026-02
 
 - id: short-timeline-policy-implications
+  numericId: E415
   type: analysis
   title: Short Timeline Policy Implications
   description: >-
@@ -383,6 +396,7 @@
   lastUpdated: 2026-02
 
 - id: technical-pathways
+  numericId: E416
   type: analysis
   title: Technical Pathway Decomposition
   description: >-
@@ -412,6 +426,7 @@
   lastUpdated: 2026-02
 
 - id: feedback-loops
+  numericId: E417
   type: analysis
   title: Feedback Loop & Cascade Model
   description: >-
@@ -438,6 +453,7 @@
   lastUpdated: 2026-02
 
 - id: multi-actor-landscape
+  numericId: E418
   type: analysis
   title: Multi-Actor Strategic Landscape
   description: >-
@@ -467,6 +483,7 @@
   lastUpdated: 2026-02
 
 - id: model-organisms-of-misalignment
+  numericId: E419
   type: analysis
   title: Model Organisms of Misalignment
   description: >-
@@ -497,6 +514,7 @@
   lastUpdated: 2026-02
 
 - id: ea-biosecurity-scope
+  numericId: E420
   type: analysis
   title: Is EA Biosecurity Work Limited to Restricting LLM Biological Use?
   description: >-
