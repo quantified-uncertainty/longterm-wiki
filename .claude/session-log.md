@@ -4,13 +4,14 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 
 ## 2026-02-13 | claude/optional-report-updates-lpTVT | Add evergreen flag to opt out of update schedule
 
-**What was done:** Added `evergreen: false` frontmatter field to allow pages (reports, experiments, proposals) to opt out of the update schedule. Updated frontmatter schema, Page interface, build-data extraction, getUpdateSchedule(), and both bootstrap/reassign scripts to respect the flag. Applied `evergreen: false` to all 6 internal report pages. Updated automation-tools docs.
+**What was done:** Added `evergreen: false` frontmatter field to allow pages (reports, experiments, proposals) to opt out of the update schedule. Full feature implementation: frontmatter schema + validation (evergreen: false + update_frequency is an error), Page interface + build-data, getUpdateSchedule(), bootstrap/reassign scripts, updates command, staleness checker, PageStatus UI (shows "Point-in-time content · Not on update schedule"), IssuesSection (no stale warnings for non-evergreen). Applied to all 6 internal report pages. Updated automation-tools docs.
 
 **Issues encountered:**
 - None
 
 **Learnings/notes:**
 - Pages without `update_frequency` are already excluded from the schedule, but the bootstrap script would re-add it. The `evergreen: false` flag prevents this.
+- The flag needed to be threaded through 8 different systems: schema, build, app data layer, UI, validation, staleness checker, updates command, and bootstrap/reassign scripts.
 
 ---
 

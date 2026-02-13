@@ -151,6 +151,17 @@ export const frontmatterSchemaRule = {
       }));
     }
 
+    // Cross-field: evergreen: false is incompatible with update_frequency
+    if (frontmatter.evergreen === false && frontmatter.update_frequency) {
+      issues.push(new Issue({
+        rule: 'frontmatter-schema',
+        file: contentFile.path,
+        line: 1,
+        message: `Pages with evergreen: false should not have update_frequency (non-evergreen pages are excluded from the update schedule)`,
+        severity: Severity.ERROR,
+      }));
+    }
+
     // Cross-field: update_frequency requires lastEdited or lastUpdated
     if (frontmatter.update_frequency && !frontmatter.lastEdited && !frontmatter.lastUpdated) {
       issues.push(new Issue({

@@ -234,6 +234,7 @@ function ContentView({
           structuredSummary={pageData?.structuredSummary ?? undefined}
           lastEdited={pageData?.lastUpdated ?? undefined}
           updateFrequency={pageData?.updateFrequency ?? undefined}
+          evergreen={pageData?.evergreen}
           todo={page.frontmatter.todo}
           todos={page.frontmatter.todos}
           wordCount={pageData?.wordCount}

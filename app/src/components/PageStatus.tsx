@@ -46,6 +46,7 @@ export interface PageStatusProps {
   structuredSummary?: StructuredSummary;
   lastEdited?: string;
   updateFrequency?: number;
+  evergreen?: boolean;
   todo?: string;
   todos?: string[];
   wordCount?: number;
@@ -590,6 +591,7 @@ function IssuesSection({
   suggestedQuality,
   lastEdited,
   contentFormat,
+  evergreen,
 }: {
   issues?: PageIssues;
   metrics?: PageMetrics;
@@ -597,6 +599,7 @@ function IssuesSection({
   suggestedQuality?: number;
   lastEdited?: string;
   contentFormat?: ContentFormat;
+  evergreen?: boolean;
 }) {
   const detectedIssues: Issue[] = [];
 
@@ -631,7 +634,7 @@ function IssuesSection({
     });
   }
 
-  if (lastEdited) {
+  if (lastEdited && evergreen !== false) {
     const days = Math.floor(
       (Date.now() - new Date(lastEdited).getTime()) / (1000 * 60 * 60 * 24)
     );
@@ -706,6 +709,7 @@ export function PageStatus({
   structuredSummary,
   lastEdited,
   updateFrequency,
+  evergreen,
   todo,
   todos,
   wordCount,
@@ -794,8 +798,19 @@ export function PageStatus({
         )}
       </div>
 
-      {/* Update Schedule */}
-      {updateFrequency && (
+      {/* Update Schedule / Evergreen status */}
+      {evergreen === false ? (
+        <div className="flex items-center gap-2 border-t border-border px-3.5 py-2 text-xs text-muted-foreground">
+          <IconCalendar className="shrink-0 opacity-60" />
+          <span className="text-muted-foreground">
+            Point-in-time content
+          </span>
+          <span className="inline-block size-[3px] rounded-full bg-border" />
+          <span className="text-muted-foreground/70">
+            Not on update schedule
+          </span>
+        </div>
+      ) : updateFrequency ? (
         <div className="flex items-center gap-2 border-t border-border px-3.5 py-2 text-xs text-muted-foreground">
           <IconCalendar className="shrink-0 opacity-60" />
           <span>
@@ -819,7 +834,7 @@ export function PageStatus({
             </>
           )}
         </div>
-      )}
+      ) : null}
 
       {/* Summary — structured if available, else flat llmSummary */}
       {structuredSummary ? (
@@ -859,6 +874,7 @@ export function PageStatus({
         suggestedQuality={suggestedQuality}
         lastEdited={lastEdited}
         contentFormat={contentFormat}
+        evergreen={evergreen}
       />
 
       {/* Single todo */}
