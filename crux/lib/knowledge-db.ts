@@ -789,61 +789,6 @@ export const claims = {
   }
 };
 
-// =============================================================================
-// RESEARCH CONTEXT
-// =============================================================================
-
-export interface ResearchContext {
-  article: ArticleRow;
-  relatedArticles: ArticleRow[];
-  sources: SourceRow[];
-  claims: ClaimRow[];
-  stats: {
-    relatedCount: number;
-    sourcesTotal: number;
-    sourcesFetched: number;
-    claimsCount: number;
-  };
-}
-
-/**
- * Get full research context for improving an article
- */
-export function getResearchContext(articleId: string): ResearchContext {
-  // Get the target article with summary
-  const article = articles.getWithSummary(articleId);
-  if (!article) {
-    throw new Error(`Article not found: ${articleId}`);
-  }
-
-  // Get related entities from the relations table
-  const relatedIds = relations.getRelated(articleId);
-
-  // Get related articles with summaries
-  const relatedArticles = relatedIds
-    .map(r => articles.getWithSummary(r.id))
-    .filter((a): a is ArticleRow => a !== undefined);
-
-  // Get sources cited by this article
-  const articleSources = sources.getForArticle(articleId);
-
-  // Get claims from related articles for consistency
-  const relatedClaims = relatedIds.flatMap(r => claims.getForEntity(r.id));
-
-  return {
-    article,
-    relatedArticles,
-    sources: articleSources,
-    claims: relatedClaims,
-    stats: {
-      relatedCount: relatedArticles.length,
-      sourcesTotal: articleSources.length,
-      sourcesFetched: articleSources.filter(s => s.content).length,
-      claimsCount: relatedClaims.length
-    }
-  };
-}
-
 export interface DatabaseStats {
   articles: number;
   sources: SourceStats;
