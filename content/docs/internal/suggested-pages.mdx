@@ -1,0 +1,143 @@
+---
+title: "Suggested Pages"
+description: "Prioritized list of pages the wiki should add, based on gap analysis of coverage vs. importance."
+sidebar:
+  order: 6
+lastEdited: "2026-02-13"
+pageType: documentation
+importance: 0
+quality: 0
+---
+import {EntityLink} from '@components/wiki';
+
+This dashboard tracks **pages that should exist but don't yet**. It complements the [Enhancement Queue](/internal/enhancement-queue/) (which tracks improvements to existing pages) and the [Update Schedule](/internal/updates/) (which tracks scheduled refreshes).
+
+Sourced from the [Feb 2026 Gap Analysis](/internal/gap-analysis-2026-02/) combining `crux gaps` output with manual topic coverage review.
+
+---
+
+## Summary
+
+| Priority | Count | Status |
+|----------|-------|--------|
+| Tier 1 — Critical | 5 | Pending |
+| Tier 2 — High | 5 | Pending |
+| Tier 3 — Important | 10 | Pending |
+| Stubs to expand | 1 | Pending |
+| **Total** | **21** | |
+
+**Last reviewed**: 2026-02-13
+
+---
+
+## Tier 1: Critical Gaps
+
+These topics are important to AI safety discourse in 2026, fast-moving, and have no dedicated page.
+
+<Tabs>
+<TabItem label="Critical" icon="warning">
+
+| # | Suggested Page | Type | Why Missing Matters | Status |
+|---|---------------|------|---------------------|--------|
+| 1 | **DeepSeek** | organization | Leading Chinese frontier lab (R1, V3) — changed compute-efficiency assumptions globally. No entity in `organizations.yaml`. | Pending |
+| 2 | **Test-Time Compute & Reasoning Models** | capability | The o1/o3/R1 inference-scaling paradigm is a fundamental shift. Changes safety assumptions about evaluation, containment, and capability forecasting. | Pending |
+| 3 | **Frontier Model Transparency & Safety Reporting** | response | Every major lab publishes safety evals, but no page compares what they report or tracks compliance. Related: <EntityLink id="E252">responsible-scaling-policies</EntityLink> | Pending |
+| 4 | **Hallucination** | risk | Referenced in 33+ existing pages but has no dedicated page. Most user-visible AI failure mode with distinct mechanisms and mitigations. | Pending |
+| 5 | **Prompt Injection & Jailbreaking** | risk | Primary attack vector against deployed LLMs. Discussed across red-teaming and refusal-training pages but no dedicated treatment. Related: <EntityLink id="E1">adversarial-robustness</EntityLink> | Pending |
+
+</TabItem>
+<TabItem label="High" icon="rocket">
+
+| # | Suggested Page | Type | Why Missing Matters | Status |
+|---|---------------|------|---------------------|--------|
+| 6 | **Mistral AI** | organization | Leading European frontier lab. Important for EU AI Act context and non-US AI development narrative. | Pending |
+| 7 | **AI Incidents Compendium (2024-2026)** | incidents | Only 2 incident pages exist. Documented failures are essential evidence for safety arguments. Need 5-10 incident pages. | Pending |
+| 8 | **Data Poisoning** | risk | Supply-chain attack on training data. Mentioned in 13 pages but no dedicated analysis. Distinct from adversarial robustness. | Pending |
+| 9 | **Multimodal AI & Vision Models** | capability | GPT-4V, Gemini, multimodal frontier has distinct safety challenges (image jailbreaks, visual hallucination). Referenced in 38 pages. | Pending |
+| 10 | **AI Liability & Legal Frameworks** | response | "Who pays when AI causes harm?" is a foundational governance question. Related: <EntityLink id="E188">legal-evidence-crisis</EntityLink> | Pending |
+
+</TabItem>
+<TabItem label="Important" icon="document">
+
+| # | Suggested Page | Type | Why Missing Matters | Status |
+|---|---------------|------|---------------------|--------|
+| 11 | **Foundation Model Commoditization** | model | Pricing collapse changes lab safety incentives. Related: <EntityLink id="E513">ai-revenue-sources</EntityLink>, <EntityLink id="E375">winner-take-all-concentration</EntityLink> | Pending |
+| 12 | **Speculative Decoding & Inference Optimization** | intelligence-paradigm | How models are deployed affects safety properties. Virtually no coverage. | Pending |
+| 13 | **Chinese AI Ecosystem** | response | Baidu, Alibaba, Tencent, ByteDance — safety practices and governance differ significantly. Related: geopolitics page | Pending |
+| 14 | **Model Merging & Weight Manipulation** | risk | Widely used in open-source to combine capabilities, potentially bypassing safety fine-tuning. | Pending |
+| 15 | **In-Context Learning & Few-Shot** | capability | Fundamental to LLM capability. Safety implications for capability elicitation and jailbreaking. | Pending |
+| 16 | **Reward Modeling** | response | Reward hacking exists as a risk page, but the positive side (how to specify rewards) needs dedicated treatment. Related: <EntityLink id="E600">reward-modeling</EntityLink> | Pending |
+| 17 | **AI-Enabled Scientific Fraud** | risk | Paper mills, fabricated data, fake peer reviews. Emerging risk with no coverage. Related: <EntityLink id="E276">scientific-corruption</EntityLink> | Pending |
+| 18 | **Post-Deployment Monitoring & Safety Ops** | response | Most safety work focuses on pre-deployment. Runtime monitoring and anomaly detection need dedicated coverage. | Pending |
+| 19 | **Compute Governance Implementation Tracking** | metric | Compute governance pages exist but don't track whether thresholds are actually enforced. Related: <EntityLink id="E64">compute-governance</EntityLink> | Pending |
+| 20 | **Adversarial Robustness (Expand Stub)** | response | Stub page exists — referenced by 122 other pages but marked "Content needed." Run `crux content improve adversarial-robustness --tier=standard --apply` | Pending |
+
+</TabItem>
+</Tabs>
+
+---
+
+## How to Create a Suggested Page
+
+### Using the Crux pipeline (required)
+
+```bash
+# 1. Create the page
+pnpm crux content create "Page Title" --tier=standard
+
+# 2. After creation, fix and validate
+pnpm crux fix escaping
+pnpm crux fix markdown
+pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
+pnpm crux validate schema
+pnpm crux validate unified --rules=frontmatter-schema --errors-only
+```
+
+### For the adversarial-robustness stub expansion
+
+```bash
+pnpm crux content improve adversarial-robustness --tier=standard --apply --grade
+```
+
+### After creating a page
+
+1. Update this dashboard: change Status from "Pending" to "Complete" and add the date
+2. Add the entity to `data/entities/*.yaml` if it doesn't exist yet
+3. Run the full CI checks before committing (see CLAUDE.md)
+
+---
+
+## Coverage Gaps by Category
+
+These categories have the thinnest coverage relative to their importance:
+
+| Category | Current Pages | Assessment | Biggest Gap |
+|----------|--------------|------------|-------------|
+| Incidents | 2 | Very thin | Need 5-10 more incident write-ups |
+| Capabilities | 11 | Thin | Vision/multimodal, test-time compute, in-context learning |
+| Forecasting | 2 | Very thin | Need more forecasting methodology pages |
+| History | 4 | Thin | Historical AI safety milestones under-documented |
+| Worldviews | 4 | Thin | Could expand with more perspective frameworks |
+
+For insight extraction gaps on existing pages, see the [Enhancement Queue](/internal/enhancement-queue/).
+
+---
+
+## Candidate Pages for Future Rounds
+
+These didn't make the top 20 but are worth tracking for future gap analyses:
+
+- **Autonomous AI agents in the wild** — deployment tracking (beyond lab demos)
+- **AI watermarking & content provenance** — C2PA, SynthID, etc.
+- **Synthetic data & self-play training** — safety implications
+- **Constitutional AI alternatives** — DPO, IPO, KTO and other RLHF replacements
+- **AI in military/intelligence applications** — beyond autonomous weapons
+- **Dual-use foundation models** — categorization and governance
+- **AI energy consumption & environmental impact** — scaling costs
+- **Interpretability tooling ecosystem** — SAE, probing, circuit analysis tools
+- **AI labor displacement tracking** — empirical evidence as of 2026
+- **Red-teaming-as-a-service** — commercial offerings and effectiveness
+
+---
+
+*See [Gap Analysis (Feb 2026)](/internal/gap-analysis-2026-02/) for the full methodology and data behind these recommendations.*
