@@ -2,20 +2,62 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
-## 2026-02-13 | claude/issue-95-longterm-wiki-q75Oo | Add summary pages for content clusters
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Review fixes: DRY, types, docs, parser
 
-**What was done:** Created 9 new overview/summary pages for major content clusters that lacked them: safety-orgs-overview (25 orgs), labs-overview (8 labs), community-building-overview (8 orgs), government-orgs-overview (4 government bodies), governance-overview (27+ governance responses), accident-overview (18 risks), epistemic-overview (16 risks), structural-overview (15 risks), and misuse-overview (9 risks). Added `summaryPage` field to ~100 entities across organizations.yaml, responses.yaml, and risks.yaml linking them to their respective overview pages. Added new overview page IDs to test exclusion list.
+**What was done:** PR review follow-up: extracted shared `formatAge`/`formatFrequency` utilities to `@lib/format.ts` (removed 3 duplicate implementations), added `evergreen` and `changeHistory` to crux `Frontmatter`/`PageEntry` types, hardened `parseSessionLog` regex against EOF edge cases, documented changeHistory system in automation-tools.mdx.
+
+**Pages:** automation-tools
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- `formatAge()` had three subtly different implementations (capitalization, abbreviation). Consolidated to one canonical version in `@lib/format.ts`.
+- The session log parser's regex `(.+?)(?:\n\n|\n\*\*)` would fail if a field were the last thing before `---` or EOF. Added `\n---` as an alternative terminator.
+
+---
+
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Connect session log to page change history
+
+**What was done:** Added `Pages:` field to session log format, built a parser in build-data.mjs that extracts page-level change history from session log entries, added `changeHistory` to the Page interface, added a per-page "Change History" section in PageStatus (with timeline of sessions that touched the page), and created a master `/internal/page-changes` dashboard with a sortable/searchable table of all page changes grouped by session.
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- Session log is available even in Vercel shallow clones (it's a committed file), making it more reliable than git log for build-time history extraction
+- The parser uses regex on the markdown structure — fragile if format changes, but the format is well-defined in session-logging.md
+
+---
+
+## 2026-02-13 | claude/optional-report-updates-lpTVT | Add evergreen flag to opt out of update schedule
+
+**What was done:** Added `evergreen: false` frontmatter field to allow pages (reports, experiments, proposals) to opt out of the update schedule. Full feature implementation: frontmatter schema + validation (evergreen: false + update_frequency is an error), Page interface + build-data, getUpdateSchedule(), bootstrap/reassign scripts, updates command, staleness checker, PageStatus UI (shows "Point-in-time content · Not on update schedule"), IssuesSection (no stale warnings for non-evergreen). Applied to all 6 internal report pages. Updated automation-tools docs.
+
+**Pages:** automation-tools, ai-research-workflows, causal-diagram-visualization, controlled-vocabulary, cross-link-automation-proposal, diagram-naming-research, page-creator-pipeline
+
+**Issues encountered:**
+- reassign-update-frequency.ts had a bespoke string-only YAML parser that returned all values as strings, requiring `=== 'false'` workaround. Replaced with shared `parseFm` from mdx-utils.
+- Graded format validation warned about missing update_frequency even when evergreen: false — contradictory rules.
+
+**Learnings/notes:**
+- Pages without `update_frequency` are already excluded from the schedule, but the bootstrap script would re-add it. The `evergreen: false` flag prevents this.
+- The flag needed to be threaded through 8 different systems: schema, build, app data layer, UI, validation, staleness checker, updates command, and bootstrap/reassign scripts.
+- reassign-update-frequency.ts was the only crux authoring script using a hand-rolled parser instead of the shared `yaml` library one — now fixed.
+
+---
+
+## 2026-02-13 | claude/fix-issue-105-SUiYf | Complete entityType frontmatter migration
+
+**What was done:** Added `entityType` to frontmatter of 469 MDX pages across 7 entity-required categories (people, organizations, risks, responses, models, worldviews, intelligence-paradigms). Wrote a migration script (`crux/scripts/migrate-entity-types.mjs`) that reads the CATEGORY_ENTITY_TYPES mapping and inserts the appropriate entityType into each page's frontmatter. Verified build output: all 645 pre-existing entities unchanged, 23 new auto-entities correctly created for pages that previously lacked both YAML and frontmatter entity definitions. All tests (308) pass, all blocking CI checks pass, full build succeeds.
 
 **Issues encountered:**
 - pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
-- New overview pages needed to be added to EXCLUDED_PAGE_IDS in validate-entities.test.ts (overview pages don't have YAML entity backing)
-- Some risk entity IDs in risks.yaml differed from expected names (e.g., `erosion-of-agency` not `erosion-of-human-agency`, `surveillance` not `mass-surveillance`)
 
 **Learnings/notes:**
-- Overview pages follow a pattern: numericId, title, description, sidebar (label: Overview, order: 0), subcategory matching the cluster
-- The `summaryPage` field on entities stores just the page filename (without .mdx), e.g., `summaryPage: safety-orgs-overview`
-- Existing overview pages use two EntityLink formats: E-codes (`<EntityLink id="E123">`) and path-based (`<EntityLink id="organizations/epistemic-orgs/epoch-ai">`)
-- Risk pages have 4 natural subcategories (accident, epistemic, structural, misuse) that map well to overview pages
+- 23 pages in entity-required categories had neither YAML entities nor frontmatter entityType — the migration surfaced these gaps
+- The frontmatter scanner correctly creates auto-entities only when no YAML entity exists (YAML takes precedence)
+- Migration is fully reversible — removing entityType from frontmatter falls back to YAML lookup
 
 ---
 
@@ -67,6 +109,48 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 - The `crabbyrathbun.dev` domain WHOIS is the strongest unexplored lead for operator identification
 - pump.fun tokens were created AFTER virality (Feb 13), not by the operator — opportunistic third parties
 - Commit timestamps for human-setup activities cluster at 18:00-19:00 UTC (ambiguous timezone)
+
+---
+
+## 2026-02-13 | claude/cross-reference-audit-9EGQp | Cross-reference audit across wiki pages
+
+**What was done:** Audited ~40 wiki pages across 5 topic clusters (compute governance, alignment/interpretability, bio risk/misuse, organizations, scaling/race dynamics) for consistency and cross-linking. Fixed factual inconsistency in misuse-risks.mdx (cyber CTF scores: 87% → 76% to match detailed data tables). Clarified interpretability coverage discrepancy (5% mechanistic vs 15% behavior coverage) in capability-alignment-race.mdx. Added ~30 missing EntityLinks across 12 files connecting related pages that discussed the same topics without cross-references.
+
+**Issues encountered:**
+- Background agents lost their output files between turns, requiring restart of all 5 audit agents
+- pnpm install fails on puppeteer postinstall (known issue), `--ignore-scripts` workaround used
+
+**Learnings/notes:**
+- Many pages use E-number IDs (E22, E98, etc.) which map to kebab-case IDs in YAML via numericId field; both formats work in EntityLinks
+- The "interpretability coverage" metric means different things on different pages: mechanistic understanding (<5%) vs behavior coverage (15-25%) — both are valid but should be labeled clearly
+- compute-hardware.mdx had zero EntityLinks in its body text despite being a critical hub page; now has links to labs, EU AI Act, and US EO
+
+---
+
+## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Fix 6 edit log review issues
+
+**What was done:** Fixed all 6 issues from paranoid code review of the edit log PR. Critical: grading.ts was using `pageIdFromPath(finalPath)` on a temp path (resolved to "final" instead of actual page slug) — now uses sanitized `topic` parameter directly. Verified no actual slug collisions exist among ~625 pages. Added `default: list` command so `crux edit-log` works without subcommand. Changed all `logBulkFixes` callers to use per-page generic notes instead of misleading aggregate counts. Added `getDefaultRequestedBy()` helper (checks `CRUX_REQUESTED_BY` → `USER` → `'system'`) and wired it into all 4 pipeline call sites. Fixed falsy check in `appendEditLog` to use `!= null` so empty strings are preserved. Added 4 new tests (14 total edit-log tests, 269 total tests).
+
+**Issues encountered:**
+- No actual slug collisions found among non-index pages — the theoretical collision risk noted in review does not affect current content
+
+**Learnings/notes:**
+- Page IDs (slugs) are derived identically across the codebase (last path segment), so edit log IDs match `page.id` convention
+- `getDefaultRequestedBy()` is the cleanest way to thread user identity without adding CLI flags to every pipeline
+
+---
+
+## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Full edit log system integration
+
+**What was done:** Fully integrated file-based edit log system across entire codebase. Per-page YAML files in `data/edit-logs/` track every page modification with tool, agency, requestedBy, and note fields. Integrated into 9 write paths: page create, improve, grade (x2), and 5 fix/validation scripts. Added `crux edit-log` CLI domain with view/list/stats commands. Added `crux validate edit-logs` validator. Documented in CLAUDE.md. 10 unit tests.
+
+**Issues encountered:**
+- First implementation was frontmatter-based; reworked to file-based after design review
+
+**Learnings/notes:**
+- Storing structured data in frontmatter is risky because LLMs rewrite the entire file during improve
+- `logBulkFixes()` and `pageIdFromPath()` helpers simplify integration for fix scripts
+- `crux/validate/types.ts` is imported but doesn't exist; dead import in several validators
 
 ---
 

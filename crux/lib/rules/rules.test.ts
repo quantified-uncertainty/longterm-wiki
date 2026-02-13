@@ -536,6 +536,50 @@ describe('frontmatter-schema rule', () => {
     expect(crossFieldIssues.length).toBe(0);
   });
 
+  it('detects evergreen: false with update_frequency (contradiction)', () => {
+    const raw = '---\ntitle: Test\nevergreen: false\nupdate_frequency: 7\nlastEdited: "2025-01-01"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', evergreen: false, update_frequency: 7, lastEdited: '2025-01-01' },
+    });
+    const issues = frontmatterSchemaRule.check(content, {});
+    expect(issues.some((i: any) => i.message.includes('evergreen: false') && i.message.includes('update_frequency'))).toBe(true);
+    expect(issues.some((i: any) => i.severity === Severity.ERROR && i.message.includes('evergreen'))).toBe(true);
+  });
+
+  it('allows evergreen: false without update_frequency', () => {
+    const raw = '---\ntitle: Test Report\nevergreen: false\nlastEdited: "2025-01-01"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test Report', evergreen: false, lastEdited: '2025-01-01' },
+    });
+    const issues = frontmatterSchemaRule.check(content, {});
+    const evergreenIssues = issues.filter((i: any) => i.message.includes('evergreen'));
+    expect(evergreenIssues.length).toBe(0);
+  });
+
+  it('allows evergreen: true with update_frequency', () => {
+    const raw = '---\ntitle: Test\nevergreen: true\nupdate_frequency: 7\nlastEdited: "2025-01-01"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', evergreen: true, update_frequency: 7, lastEdited: '2025-01-01' },
+    });
+    const issues = frontmatterSchemaRule.check(content, {});
+    const evergreenIssues = issues.filter((i: any) => i.message.includes('evergreen'));
+    expect(evergreenIssues.length).toBe(0);
+  });
+
+  it('does not warn about missing update_frequency for graded format when evergreen: false', () => {
+    const raw = '---\ntitle: Test\ncontentFormat: table\nevergreen: false\nlastEdited: "2025-01-01"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', contentFormat: 'table', evergreen: false, lastEdited: '2025-01-01' },
+    });
+    const issues = frontmatterSchemaRule.check(content, {});
+    const updateFreqIssues = issues.filter((i: any) => i.message.includes('update_frequency'));
+    expect(updateFreqIssues.length).toBe(0);
+  });
+
   it('detects invalid pageType', () => {
     const raw = '---\ntitle: Test\npageType: invalid\n---\nContent';
     const content = mockContent('Content', {

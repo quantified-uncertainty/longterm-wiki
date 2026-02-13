@@ -23,6 +23,7 @@ clusters:
   - ai-safety
   - governance
 subcategory: governance-compute-governance
+entityType: approach
 ---
 import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
@@ -81,7 +82,7 @@ flowchart TD
 
 ## Cloud KYC Implementation
 
-Cloud KYC leverages the natural chokepoint created by the concentration of AI training compute in major cloud providers. According to <R id="64895d06816dddf0">Synergy Research</R> data, the three major hyperscalers—AWS (30%), Microsoft Azure (21%), and Google Cloud (12%)—control approximately 63% of the global cloud infrastructure market as of Q4 2024. This concentration makes cloud-based monitoring particularly effective for frontier AI development, as training runs exceeding \$10-100 million in compute costs are economically impractical for most organizations to conduct on-premise. The implementation framework focuses on customer verification, usage reporting, and access controls that can be deployed relatively quickly given existing regulatory infrastructure.
+Cloud KYC leverages the natural chokepoint created by the concentration of AI training compute in major cloud providers. According to <R id="64895d06816dddf0">Synergy Research</R> data, the three major hyperscalers—AWS (30%), <EntityLink id="E550">Microsoft</EntityLink> Azure (21%), and <EntityLink id="deepmind">Google</EntityLink> Cloud (12%)—control approximately 63% of the global cloud infrastructure market as of Q4 2024. This concentration makes cloud-based monitoring particularly effective for frontier AI development, as training runs exceeding \$10-100 million in compute costs are economically impractical for most organizations to conduct on-premise. The implementation framework focuses on customer verification, usage reporting, and access controls that can be deployed relatively quickly given existing regulatory infrastructure.
 
 The customer verification component requires cloud providers to implement robust identity verification for customers requesting large amounts of compute resources. This goes beyond basic account creation to include verification of beneficial ownership, purpose-of-use declarations, and ongoing monitoring of usage patterns. As detailed in <R id="166215ac6c1d1698">GovAI's research on KYC schemes for compute providers</R>, organizations training models above specified compute thresholds would need to undergo enhanced due diligence similar to financial KYC processes. The <R id="dc9c71640f5c01b3">Department of Commerce's proposed rule</R> from February 2024 requires U.S. IaaS providers to develop Customer Identification Programs (CIPs) that verify beneficial ownership and collect identifying information about foreign customers.
 

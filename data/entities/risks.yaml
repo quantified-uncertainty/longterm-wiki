@@ -116,8 +116,8 @@
 - id: automation-bias
   numericId: E32
   type: risk
-  summaryPage: accident-overview
-  title: Automation Bias
+summaryPage: accident-overview
+title: Automation Bias (AI Systems)
   severity: medium
   likelihood:
     level: very-high
@@ -269,8 +269,8 @@
 - id: concentration-of-power
   numericId: E68
   type: risk
-  summaryPage: structural-overview
-  title: Concentration of Power
+summaryPage: structural-overview
+title: AI-Driven Concentration of Power
   severity: high
   likelihood:
     level: medium-high
@@ -320,8 +320,8 @@
 - id: consensus-manufacturing
   numericId: E72
   type: risk
-  summaryPage: epistemic-overview
-  title: Consensus Manufacturing
+summaryPage: epistemic-overview
+title: AI-Powered Consensus Manufacturing
   severity: high
   likelihood:
     level: medium
@@ -417,8 +417,8 @@
 - id: cyber-psychosis
   numericId: E83
   type: risk
-  summaryPage: epistemic-overview
-  title: Cyber Psychosis
+summaryPage: epistemic-overview
+title: AI-Induced Cyber Psychosis
   severity: medium-high
   likelihood:
     level: medium
@@ -686,8 +686,8 @@
 - id: distributional-shift
   numericId: E105
   type: risk
-  summaryPage: accident-overview
-  title: Distributional Shift
+summaryPage: accident-overview
+title: AI Distributional Shift
   severity: medium
   likelihood:
     level: very-high
@@ -722,8 +722,8 @@
 - id: economic-disruption
   numericId: E108
   type: risk
-  summaryPage: structural-overview
-  title: Economic Disruption
+summaryPage: structural-overview
+title: AI-Driven Economic Disruption
   severity: medium-high
   likelihood:
     level: high
@@ -822,8 +822,8 @@
 - id: enfeeblement
   numericId: E118
   type: risk
-  summaryPage: structural-overview
-  title: Enfeeblement
+summaryPage: structural-overview
+title: AI-Induced Enfeeblement
   severity: medium-high
   likelihood:
     level: medium
@@ -972,8 +972,8 @@
 - id: expertise-atrophy
   numericId: E133
   type: risk
-  summaryPage: epistemic-overview
-  title: Expertise Atrophy
+summaryPage: epistemic-overview
+title: AI-Induced Expertise Atrophy
   severity: high
   likelihood:
     level: medium
@@ -1030,8 +1030,8 @@
 - id: flash-dynamics
   numericId: E142
   type: risk
-  summaryPage: structural-overview
-  title: Flash Dynamics
+summaryPage: structural-overview
+title: AI Flash Dynamics
   severity: high
   likelihood:
     level: medium-high
@@ -1229,8 +1229,8 @@
 - id: institutional-capture
   numericId: E166
   type: risk
-  summaryPage: epistemic-overview
-  title: Institutional Decision Capture
+summaryPage: epistemic-overview
+title: AI-Driven Institutional Decision Capture
   severity: high
   likelihood:
     level: medium
@@ -1335,8 +1335,8 @@
 - id: irreversibility
   numericId: E179
   type: risk
-  summaryPage: structural-overview
-  title: Irreversibility
+summaryPage: structural-overview
+title: AI-Induced Irreversibility
   severity: critical
   likelihood:
     level: medium
@@ -1500,8 +1500,8 @@
 - id: legal-evidence-crisis
   numericId: E188
   type: risk
-  summaryPage: epistemic-overview
-  title: Legal Evidence Crisis
+summaryPage: epistemic-overview
+title: AI-Driven Legal Evidence Crisis
   severity: high
   likelihood:
     level: medium
@@ -1559,8 +1559,8 @@
 - id: lock-in
   numericId: E189
   type: risk
-  summaryPage: structural-overview
-  title: Lock-in
+summaryPage: structural-overview
+title: AI Value Lock-in
   severity: catastrophic
   likelihood:
     level: medium
@@ -1617,8 +1617,8 @@
 - id: authoritarian-takeover
   numericId: E29
   type: risk
-  summaryPage: structural-overview
-  title: Authoritarian Takeover
+summaryPage: structural-overview
+title: AI-Enabled Authoritarian Takeover
   severity: catastrophic
   likelihood:
     level: medium
@@ -1706,8 +1706,8 @@
 - id: multipolar-trap
   numericId: E209
   type: risk
-  summaryPage: structural-overview
-  title: Multipolar Trap
+summaryPage: structural-overview
+title: Multipolar Trap (AI Development)
   severity: high
   likelihood:
     level: medium-high
@@ -1801,8 +1801,8 @@
 - id: preference-manipulation
   numericId: E230
   type: risk
-  summaryPage: epistemic-overview
-  title: Preference Manipulation
+summaryPage: epistemic-overview
+title: AI Preference Manipulation
   severity: high
   likelihood:
     level: medium
@@ -1910,8 +1910,8 @@
 - id: racing-dynamics
   numericId: E239
   type: risk
-  summaryPage: structural-overview
-  title: Racing Dynamics
+summaryPage: structural-overview
+title: AI Development Racing Dynamics
   severity: high
   likelihood:
     level: high
@@ -1963,8 +1963,8 @@
 - id: reality-fragmentation
   numericId: E244
   type: risk
-  summaryPage: epistemic-overview
-  title: Reality Fragmentation
+summaryPage: epistemic-overview
+title: AI-Accelerated Reality Fragmentation
   severity: high
   likelihood:
     level: medium
@@ -2067,8 +2067,8 @@
 - id: sandbagging
   numericId: E270
   type: risk
-  summaryPage: accident-overview
-  title: Sandbagging
+summaryPage: accident-overview
+title: AI Capability Sandbagging
   severity: high
   likelihood:
     level: medium
@@ -2507,8 +2507,8 @@
 - id: trust-cascade
   numericId: E360
   type: risk
-  summaryPage: epistemic-overview
-  title: Trust Cascade Failure
+summaryPage: epistemic-overview
+title: AI Trust Cascade Failure
   severity: critical
   likelihood:
     level: medium
@@ -2564,8 +2564,8 @@
 - id: trust-decline
   numericId: E362
   type: risk
-  summaryPage: epistemic-overview
-  title: Trust Decline
+summaryPage: epistemic-overview
+title: AI-Driven Trust Decline
   severity: medium-high
   likelihood:
     level: high
@@ -2603,8 +2603,8 @@
 - id: winner-take-all
   numericId: E374
   type: risk
-  summaryPage: structural-overview
-  title: Winner-Take-All Dynamics
+summaryPage: structural-overview
+title: AI Winner-Take-All Dynamics
   severity: high
   likelihood:
     level: high
@@ -2882,8 +2882,8 @@
 - id: steganography
   numericId: E603
   type: risk
-  summaryPage: accident-overview
-  title: Steganography
+summaryPage: accident-overview
+title: AI Model Steganography
   description: >-
     Comprehensive analysis of AI steganography risks - systems hiding
     information in outputs to enable covert coordination or evade oversight.

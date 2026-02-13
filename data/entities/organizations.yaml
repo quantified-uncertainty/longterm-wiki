@@ -1441,7 +1441,7 @@
 - id: elicit
   numericId: E526
   type: organization
-  title: Elicit
+  title: Elicit (AI Research Tool)
   description: >-
     Elicit is an AI research assistant with 2M+ users that searches 138M papers
     and automates literature reviews, founded by AI alignment researchers from
@@ -1524,7 +1524,7 @@
 - id: good-judgment
   numericId: E532
   type: organization
-  title: Good Judgment
+  title: Good Judgment (Forecasting)
   description: >-
     Good Judgment Inc. is a commercial forecasting organization that emerged
     from successful IARPA research, demonstrating that trained
@@ -1594,7 +1594,7 @@
 - id: kalshi
   numericId: E537
   type: organization
-  title: Kalshi
+  title: Kalshi (Prediction Market)
   description: >-
     This is a comprehensive corporate profile of Kalshi, a US prediction market
     platform that offers some AI safety-related contracts but is primarily
@@ -1622,8 +1622,8 @@
 - id: lighthaven
   numericId: E539
   type: organization
-  summaryPage: community-building-overview
-  title: Lighthaven
+summaryPage: community-building-overview
+title: Lighthaven (Event Venue)
   description: >-
     Lighthaven is a Berkeley conference venue operated by Lightcone
     Infrastructure that serves as physical infrastructure for AI safety,
@@ -1706,8 +1706,8 @@
 - id: manifest
   numericId: E545
   type: organization
-  summaryPage: community-building-overview
-  title: Manifest
+summaryPage: community-building-overview
+title: Manifest (Forecasting Conference)
   description: >-
     Manifest is a 2024 forecasting conference that generated significant
     controversy within EA/rationalist communities due to speaker selection
@@ -1720,7 +1720,7 @@
 - id: manifold
   numericId: E546
   type: organization
-  title: Manifold
+  title: Manifold (Prediction Market)
   description: >-
     Manifold is a play-money prediction market with millions of predictions and
     ~2,000 peak daily users, showing AGI by 2030 at ~60% vs Metaculus ~45%.
@@ -2013,7 +2013,7 @@
 - id: sentinel
   numericId: E566
   type: organization
-  title: Sentinel
+  title: Sentinel (Catastrophic Risk Foresight)
   description: >-
     Sentinel is a 2024-founded foresight organization led by Nuño Sempere that
     processes millions of news items weekly through AI filtering and elite

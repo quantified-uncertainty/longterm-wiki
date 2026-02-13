@@ -34,6 +34,7 @@ import { fileURLToPath } from 'url';
 import { MODELS } from '../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../lib/entity-lookup.ts';
 import { convertSlugsToNumericIds } from './creator/deployment.ts';
+import { appendEditLog, getDefaultRequestedBy } from '../lib/edit-log.ts';
 // Inlined from content-types.ts to keep this file self-contained
 const CRITICAL_RULES: string[] = [
   'dollar-signs',
@@ -192,7 +193,7 @@ function repairFrontmatter(content: string): string {
   ]);
   const topLevelKeys = new Set([
     'title', 'description', 'sidebar', 'quality', 'importance', 'lastEdited',
-    'update_frequency', 'llmSummary', 'ratings', 'clusters',
+    'update_frequency', 'evergreen', 'llmSummary', 'ratings', 'clusters',
     'draft', 'aliases', 'redirects', 'tags',
   ]);
   const lines = fm.split('\n');
@@ -1553,6 +1554,17 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     // Apply changes directly
     fs.copyFileSync(finalPath, filePath);
     console.log(`\nChanges applied to ${filePath}`);
+
+    // Log improvement in edit log
+    const editNote = directions
+      ? `Improved (${tier}): ${directions.slice(0, 120)}`
+      : `Improved (${tier})`;
+    appendEditLog(page.id, {
+      tool: 'crux-improve',
+      agency: 'ai-directed',
+      requestedBy: getDefaultRequestedBy(),
+      note: editNote,
+    });
 
     // Run grading if requested
     if (options.grade) {

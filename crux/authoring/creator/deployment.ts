@@ -6,6 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 
 interface IdRegistry {
   _nextId: number;
@@ -132,6 +133,14 @@ export function deployToDestination(topic: string, destPath: string, { ROOT, get
   if (count > 0) {
     console.log(`  Converted ${count} EntityLink ID(s) to numeric format`);
   }
+
+  // Log page creation in edit log
+  appendEditLog(sanitizedTopic, {
+    tool: 'crux-create',
+    agency: 'ai-directed',
+    requestedBy: getDefaultRequestedBy(),
+    note: `Page created via Crux pipeline, deployed to ${destPath}/${sanitizedTopic}`,
+  });
 
   return {
     success: true,
