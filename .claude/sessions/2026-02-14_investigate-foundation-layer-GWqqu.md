@@ -1,17 +1,17 @@
 ## 2026-02-14 | claude/investigate-foundation-layer-GWqqu | Investigate Foundation-layer.ai
 
-**What was done:** Researched foundation-layer.ai through web searches, direct URL fetching, and codebase searches. The domain exists (serves a Framer-built website with a dark burgundy color scheme) but has no extractable text content due to client-side rendering. No search engine indexing, no Crunchbase/LinkedIn profile, no press coverage, and no social media mentions were found.
+**What was done:** Fully investigated foundation-layer.ai. The site is a Framer-built philanthropic guide by Tyler John (Effective Institutions Project, formerly Longview Philanthropy) aimed at persuading philanthropists to fund AI safety. Content extracted via Jina reader proxy (r.jina.ai) since the Framer site is entirely JS-rendered. The site contains 13 pages covering AGI timelines, existential risks, a five-pillar philanthropic strategy, and a getting-started guide for donors.
 
-**Pages:** (none)
+**Pages:** (none — research only, no wiki pages created)
 
 **Issues encountered:**
-- The foundation-layer.ai website is built with Framer and renders all content via JavaScript, making it impossible for server-side fetchers to extract text
-- No search results exist for the domain across Google, Crunchbase, LinkedIn, or Twitter
-- Subpages (/about, /team, /blog, /research, /mission) all return 404
-- The only identifiable text from the HTML source was "The Foundation Layer" in a CSS comment and a dark burgundy (#2c0119) color scheme
+- Direct WebFetch of the Framer site returned only CSS/JS boilerplate with no readable content
+- Site is not indexed by Google despite open robots.txt — likely too new
+- Solved by using Jina AI reader proxy (r.jina.ai) which renders JS before extracting content
 
 **Learnings/notes:**
-- foundation-layer.ai appears to be either pre-launch, in stealth mode, or an inactive/parked domain with a placeholder Framer page
-- No existing references to foundation-layer.ai exist in the longterm-wiki codebase
-- Not enough information is publicly available to create or justify a wiki page about this entity
-- If more context becomes available (e.g., a launch announcement, press release, or LinkedIn page), the investigation could be revisited
+- For JS-rendered sites (Framer, Next.js SSR-disabled, SPAs), use `https://r.jina.ai/<url>` as a workaround to extract content
+- The Foundation Layer is highly relevant to the longterm-wiki: covers AGI timelines, alignment, compute governance, biodefense, AI consciousness, and philanthropic funding landscape — all topics with existing wiki pages
+- Tyler John leads AI work at EIP, previously built Longview Philanthropy's AI team ($60M+ in grants), advises donors on $200M+ in planned giving
+- The site references many organizations already in the wiki (METR, Apollo Research, Anthropic, OpenAI, DeepMind, Longview Philanthropy, Blueprint Biosecurity, etc.)
+- Could be cited as a resource on relevant wiki pages (AI safety funding, philanthropic landscape, AGI timelines)
