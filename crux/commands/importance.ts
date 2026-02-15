@@ -1,8 +1,10 @@
 /**
  * Importance Command Handlers
  *
- * Manage the importance ranking — an ordered list of pages sorted by
- * importance to AI safety, from which 0-100 scores are derived.
+ * Manage importance rankings — ordered lists of pages from which 0-100 scores
+ * are derived. Two dimensions:
+ *   - readership: How important is this page for readers? (default)
+ *   - research:   How much value would deeper investigation yield?
  */
 
 import type { ScriptConfig, CommandResult } from '../lib/cli.ts';
@@ -12,23 +14,29 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   show: {
     script: 'importance/show.ts',
     description: 'Show current importance rankings',
-    passthrough: ['ci', 'top', 'unranked'],
+    passthrough: ['ci', 'top', 'unranked', 'dimension'],
   },
   sync: {
     script: 'importance/sync.ts',
-    description: 'Derive 0-100 scores from ranking and write to frontmatter',
+    description: 'Derive 0-100 scores from rankings and write to frontmatter',
     passthrough: ['ci', 'apply'],
   },
   rank: {
     script: 'importance/rank.ts',
     description: 'Use LLM to place page(s) in the ranking via comparison',
-    passthrough: ['ci', 'batch', 'auto'],
+    passthrough: ['ci', 'batch', 'auto', 'dimension'],
     positional: true,
   },
   seed: {
     script: 'importance/seed.ts',
     description: 'Bootstrap ranking from existing importance scores',
     passthrough: ['ci', 'apply'],
+  },
+  rerank: {
+    script: 'importance/rerank.ts',
+    description: 'Sort pages by importance using LLM judgment',
+    passthrough: ['ci', 'apply', 'sample', 'all', 'model', 'dimension', 'verify'],
+    positional: true,
   },
 };
 
@@ -45,32 +53,45 @@ export function getHelp(): string {
   return `
 Importance Domain - Ranking-based importance scoring
 
-The importance ranking is an ordered list of page IDs (most important first).
-Numeric 0-100 importance scores are derived from position in this list.
+Two ranking dimensions:
+  readership (default) — How important is this page for readers?
+  research             — How much value would deeper investigation yield?
+
+Rankings are ordered lists of page IDs (most important first).
+Scores (0-100) are derived from position and written to frontmatter.
 
 Commands:
 ${commandList}
 
 Workflow:
-  1. crux importance seed --apply         Bootstrap from existing scores
-  2. crux importance rank --batch=20      Refine with LLM comparisons
-  3. crux importance show --top=30        Review the ranking
-  4. crux importance sync --apply         Write scores to frontmatter
+  1. crux importance rerank --all --apply                       # Readership ranking
+  2. crux importance rerank --dimension=research --all --apply  # Research ranking
+  3. crux importance show --top=30                              # Review readership
+  4. crux importance show --dimension=research --top=30         # Review research
+  5. crux importance sync --apply                               # Write both to frontmatter
 
-You can also manually edit data/importance-ranking.yaml to reorder pages.
+Files:
+  data/importance-ranking.yaml   Readership ranking
+  data/research-ranking.yaml     Research importance ranking
 
 Options:
-  --top=<n>       Show top N pages (show)
-  --unranked      Also list unranked pages (show)
-  --batch=<n>     Rank N unranked pages (rank)
-  --apply         Write changes (sync, seed)
+  --dimension=<d>   Ranking dimension: readership (default) or research
+  --top=<n>         Show top N pages (show)
+  --unranked        Also list unranked pages (show)
+  --batch=<n>       Rank N unranked pages (rank)
+  --sample=<n>      Test with N diverse pages (rerank)
+  --all             Rerank all pages (rerank)
+  --verify          Fix local inversions in existing ranking (rerank)
+  --model=<m>       Model: haiku (default) or sonnet (rerank)
+  --apply           Write changes
 
 Examples:
   crux importance show --top=20
-  crux importance show --unranked
-  crux importance rank existential-risk
-  crux importance rank --batch=50
+  crux importance show --dimension=research --top=20
+  crux importance rerank --sample=20
+  crux importance rerank --dimension=research --sample=20
+  crux importance rerank --all --apply
+  crux importance rerank --verify --apply
   crux importance sync --apply
-  crux importance seed --apply
 `;
 }

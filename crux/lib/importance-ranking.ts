@@ -1,13 +1,18 @@
 /**
  * Importance Ranking Library
  *
- * Core functions for managing the importance ranking — an ordered list of page IDs
- * sorted by importance to AI safety (most important first).
+ * Core functions for managing importance rankings — ordered lists of page IDs
+ * that serve as the source of truth for importance scores.
  *
- * The ranking is the source of truth. Numeric 0-100 importance scores in page
- * frontmatter are derived from ranking position via `deriveScores()`.
+ * Two ranking dimensions:
+ *   - readership: How important is this page for readers navigating AI safety?
+ *   - research:   How much value would deeper investigation of this topic yield?
  *
- * Data file: data/importance-ranking.yaml
+ * Numeric 0-100 scores in page frontmatter are derived from ranking positions.
+ *
+ * Data files:
+ *   data/importance-ranking.yaml      (readership ranking)
+ *   data/research-ranking.yaml        (research importance ranking)
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
@@ -20,7 +25,23 @@ import { findMdxFiles } from './file-utils.ts';
 // Paths
 // ---------------------------------------------------------------------------
 
-export const RANKING_FILE = join(PROJECT_ROOT, 'data', 'importance-ranking.yaml');
+export const RANKING_DIR = join(PROJECT_ROOT, 'data');
+
+export const RANKING_FILES: Record<string, string> = {
+  readership: join(RANKING_DIR, 'importance-ranking.yaml'),
+  research: join(RANKING_DIR, 'research-ranking.yaml'),
+};
+
+/** Default ranking dimension (backward compat). */
+export const DEFAULT_DIMENSION = 'readership';
+
+/** Get path for a ranking dimension. Falls back to readership. */
+export function getRankingFile(dimension: string = DEFAULT_DIMENSION): string {
+  return RANKING_FILES[dimension] || RANKING_FILES.readership;
+}
+
+// Backward compat alias
+export const RANKING_FILE = RANKING_FILES.readership;
 
 // ---------------------------------------------------------------------------
 // Types
@@ -29,12 +50,6 @@ export const RANKING_FILE = join(PROJECT_ROOT, 'data', 'importance-ranking.yaml'
 export interface RankingData {
   /** Ordered list of page IDs, most important first. */
   ranking: string[];
-}
-
-export interface RankedPage {
-  id: string;
-  position: number; // 1-based
-  score: number; // derived 0-100
 }
 
 export interface DerivedScore {
@@ -47,12 +62,13 @@ export interface DerivedScore {
 // Load / Save
 // ---------------------------------------------------------------------------
 
-/** Load the ranking from YAML. Returns empty ranking if file doesn't exist. */
-export function loadRanking(): RankingData {
-  if (!existsSync(RANKING_FILE)) {
+/** Load a ranking from YAML. Returns empty ranking if file doesn't exist. */
+export function loadRanking(dimension: string = DEFAULT_DIMENSION): RankingData {
+  const file = getRankingFile(dimension);
+  if (!existsSync(file)) {
     return { ranking: [] };
   }
-  const raw = readFileSync(RANKING_FILE, 'utf-8');
+  const raw = readFileSync(file, 'utf-8');
   const data = parseYaml(raw) as RankingData;
   if (!data || !Array.isArray(data.ranking)) {
     return { ranking: [] };
@@ -60,23 +76,35 @@ export function loadRanking(): RankingData {
   return data;
 }
 
-/** Save the ranking to YAML. */
-export function saveRanking(data: RankingData): void {
+const DIMENSION_LABELS: Record<string, { title: string; description: string }> = {
+  readership: {
+    title: 'Readership Importance Ranking',
+    description: 'Pages ordered by how important they are for readers navigating AI safety.',
+  },
+  research: {
+    title: 'Research Importance Ranking',
+    description: 'Pages ordered by how much value deeper investigation would yield.',
+  },
+};
+
+/** Save a ranking to YAML. */
+export function saveRanking(data: RankingData, dimension: string = DEFAULT_DIMENSION): void {
+  const file = getRankingFile(dimension);
+  const label = DIMENSION_LABELS[dimension] || DIMENSION_LABELS.readership;
+
   const header = [
-    '# Importance Ranking',
-    '# Pages ordered by importance to AI safety (most important first).',
-    '# This list is the source of truth for importance scores.',
-    '# Run `pnpm crux importance sync` to derive 0-100 scores from this ordering.',
+    `# ${label.title}`,
+    `# ${label.description}`,
     '#',
-    '# To rank a new page: read the list, decide where it belongs relative to',
-    '# its neighbors, and insert it. The position IS the importance judgment.',
+    '# This list is the source of truth. Scores are derived from position.',
+    `# Run \`pnpm crux importance sync --apply\` to write scores to frontmatter.`,
     '#',
     `# Total ranked: ${data.ranking.length}`,
     '',
   ].join('\n');
 
   const yaml = stringifyYaml(data, { lineWidth: 0 });
-  writeFileSync(RANKING_FILE, header + yaml, 'utf-8');
+  writeFileSync(file, header + yaml, 'utf-8');
 }
 
 // ---------------------------------------------------------------------------
@@ -167,4 +195,11 @@ export function getNeighbors(
   const above = ranking.slice(Math.max(0, idx - radius), idx);
   const below = ranking.slice(idx + 1, Math.min(ranking.length, idx + 1 + radius));
   return { above, below };
+}
+
+/** Get all available ranking dimensions. */
+export function getAvailableDimensions(): string[] {
+  return Object.keys(RANKING_FILES).filter((dim) =>
+    existsSync(RANKING_FILES[dim]),
+  );
 }

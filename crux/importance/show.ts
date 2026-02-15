@@ -20,14 +20,17 @@ import {
   deriveScores,
   findUnrankedPages,
   findOrphanedEntries,
+  DEFAULT_DIMENSION,
 } from '../lib/importance-ranking.ts';
 
 const args = parseCliArgs(process.argv.slice(2));
 const log = createLogger(args.ci as boolean);
 const c = log.colors;
 
+const dimension = (args.dimension as string) || DEFAULT_DIMENSION;
+
 async function main() {
-  const { ranking } = loadRanking();
+  const { ranking } = loadRanking(dimension);
   const scores = deriveScores(ranking);
 
   // Build title lookup from pages.json
@@ -40,7 +43,8 @@ async function main() {
   // Determine how many to show
   const top = args.top ? parseInt(args.top as string, 10) : ranking.length;
 
-  log.heading(`Importance Ranking (${ranking.length} pages ranked)`);
+  const dimLabel = dimension === 'research' ? 'Research Importance' : 'Readership Importance';
+  log.heading(`${dimLabel} Ranking (${ranking.length} pages ranked)`);
   console.log('');
 
   // Show ranking table

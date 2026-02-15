@@ -34,6 +34,7 @@ const frontmatterSchema = z.object({
   contentFormat: z.enum(['article', 'table', 'diagram', 'index', 'dashboard']).optional(),
   quality: z.number().min(0).max(100).optional(),
   importance: z.number().min(0).max(100).optional(),
+  researchImportance: z.number().min(0).max(100).optional(),
   tractability: z.number().min(0).max(100).optional(),
   neglectedness: z.number().min(0).max(100).optional(),
   uncertainty: z.number().min(0).max(100).optional(),
