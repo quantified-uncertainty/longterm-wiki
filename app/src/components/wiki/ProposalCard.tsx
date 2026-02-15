@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@lib/utils";
+import { domainBadge, stanceBadge, feasibilityColor, statusLabel } from "./badge-styles";
 
 interface ProposalCardProps {
   id?: string;
@@ -16,37 +17,7 @@ interface ProposalCardProps {
   leadOrganizations?: string[];
   relatedProposals?: string[];
   className?: string;
-  "client:load"?: boolean;
 }
-
-const domainBadge: Record<string, string> = {
-  philanthropic: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-  biosecurity: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
-  governance: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  technical: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
-  "field-building": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  financial: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-};
-
-const stanceBadge: Record<string, string> = {
-  collaborative: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  adversarial: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  neutral: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-};
-
-const feasibilityColor: Record<string, string> = {
-  high: "text-green-700 dark:text-green-400",
-  medium: "text-yellow-700 dark:text-yellow-400",
-  low: "text-red-700 dark:text-red-400",
-};
-
-const statusLabel: Record<string, string> = {
-  idea: "Idea",
-  proposed: "Proposed",
-  "in-progress": "In Progress",
-  implemented: "Implemented",
-  abandoned: "Abandoned",
-};
 
 export function ProposalCard({
   name,

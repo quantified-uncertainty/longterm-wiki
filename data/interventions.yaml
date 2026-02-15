@@ -29,7 +29,7 @@
   fundingLevel: "$15-25M/year"
   fundingShare: "~18%"
   recommendedShift: Maintain
-  wikiPageId: E174
+  wikiPageId: interpretability
   relatedInterventions:
     - scalable-oversight
     - evaluations
@@ -64,7 +64,7 @@
   fundingLevel: "$1-12M/year"
   fundingShare: "~9%"
   recommendedShift: Increase to 15%
-  wikiPageId: E6
+  wikiPageId: ai-control
   relatedInterventions:
     - evaluations
     - responsible-scaling
@@ -98,7 +98,7 @@
   fundingLevel: "$12-18M/year"
   fundingShare: "~13%"
   recommendedShift: Increase to 20%
-  wikiPageId: E128
+  wikiPageId: evals
   relatedInterventions:
     - responsible-scaling
     - ai-safety-institutes
@@ -130,7 +130,7 @@
   fundingLevel: "$15-35M/year"
   fundingShare: "~25%"
   recommendedShift: Decrease to 20%
-  wikiPageId: E259
+  wikiPageId: rlhf
   relatedInterventions:
     - scalable-oversight
     - evaluations
@@ -160,7 +160,7 @@
     Active research area. Key open question whether oversight can scale to match
     AI capabilities. Debate and recursive reward modeling show promise but
     remain unproven at scale.
-  wikiPageId: E271
+  wikiPageId: scalable-oversight
   relatedInterventions:
     - interpretability
     - rlhf
@@ -191,7 +191,7 @@
   fundingLevel: "$1-10M/year"
   fundingShare: "~7%"
   recommendedShift: Increase to 12%
-  wikiPageId: E64
+  wikiPageId: compute-governance
   relatedInterventions:
     - export-controls
     - international-coordination
@@ -221,7 +221,7 @@
     US export controls provide estimated 1-3 year delays, but enforcement is
     imperfect — 140,000+ GPUs smuggled in 2024. Case-by-case licensing
     mechanisms in place.
-  wikiPageId: E136
+  wikiPageId: export-controls
   relatedInterventions:
     - compute-governance
     - international-coordination
@@ -248,7 +248,7 @@
     All major frontier labs now publish RSPs. Voluntary commitments show 53%
     mean compliance rate, with strongest adoption in security testing (70-85%).
     Durability under competitive pressure is key uncertainty.
-  wikiPageId: E252
+  wikiPageId: responsible-scaling-policies
   relatedInterventions:
     - evaluations
     - ai-safety-institutes
@@ -282,7 +282,7 @@
   fundingLevel: "$1-5M/year"
   fundingShare: "~4%"
   recommendedShift: Increase to 8%
-  wikiPageId: E473
+  wikiPageId: international-regimes
   relatedInterventions:
     - compute-governance
     - ai-safety-institutes
@@ -315,7 +315,7 @@
     UK and US AISIs secured pre-deployment access to frontier models. Face
     resource constraints and enforcement limitations. NIST invested $20M in
     AI Economic Security Centers.
-  wikiPageId: E13
+  wikiPageId: ai-safety-institutes
   relatedInterventions:
     - evaluations
     - responsible-scaling
@@ -349,7 +349,7 @@
   fundingLevel: "$10-15M/year"
   fundingShare: "~11%"
   recommendedShift: Maintain
-  wikiPageId: E476
+  wikiPageId: field-building-analysis
   relatedInterventions:
     - ai-safety-institutes
     - epistemic-resilience
@@ -383,7 +383,7 @@
   fundingLevel: "$1-4M/year"
   fundingShare: "~3%"
   recommendedShift: Increase to 8%
-  wikiPageId: E123
+  wikiPageId: epistemic-security
   relatedInterventions:
     - content-authentication
     - field-building
@@ -410,7 +410,7 @@
     C2PA standard gaining adoption. Major platforms implementing provenance
     metadata. Detection-based approaches struggle with arms race dynamics;
     attestation-based approaches more promising.
-  wikiPageId: E74
+  wikiPageId: content-authentication
   relatedInterventions:
     - epistemic-resilience
 

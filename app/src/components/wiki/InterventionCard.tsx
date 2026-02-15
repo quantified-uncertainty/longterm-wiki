@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@lib/utils";
+import { priorityBadge, categoryBadge, coverageColor, itnLabel } from "./badge-styles";
 
 interface RiskCoverage {
   accident?: string;
@@ -27,42 +28,11 @@ interface InterventionCardProps {
   timelineFit?: string;
   currentState?: string;
   fundingLevel?: string;
-  fundingShare?: string;
   recommendedShift?: string;
   relatedInterventions?: string[];
   relevantResearch?: ResearchRef[];
   className?: string;
-  "client:load"?: boolean;
 }
-
-const priorityBadge: Record<string, string> = {
-  "Very High": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  "High": "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  "Medium-High": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  "Medium": "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-};
-
-const categoryBadge: Record<string, string> = {
-  technical: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  governance: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  institutional: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  "field-building": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  resilience: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-};
-
-const coverageColor: Record<string, string> = {
-  high: "text-red-700 dark:text-red-400 font-semibold",
-  medium: "text-orange-600 dark:text-orange-400",
-  low: "text-slate-500 dark:text-slate-400",
-  none: "text-slate-300 dark:text-slate-600",
-};
-
-const itnLabel: Record<string, string> = {
-  critical: "Critical",
-  high: "High",
-  medium: "Medium",
-  low: "Low",
-};
 
 export function InterventionCard({
   name,
