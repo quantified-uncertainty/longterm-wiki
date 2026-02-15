@@ -38,6 +38,8 @@ import { KeyPeople } from "@/components/wiki/KeyPeople";
 import { DisagreementMap } from "@/components/wiki/DisagreementMap";
 import { Crux } from "@/components/wiki/Crux";
 import { CruxList } from "@/components/wiki/CruxList";
+import { InterventionCard } from "@/components/wiki/InterventionCard";
+import { InterventionList } from "@/components/wiki/InterventionList";
 
 // Ported stub components — medium priority
 import { Tags } from "@/components/wiki/Tags";
@@ -152,6 +154,8 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   DisagreementMap,
   Crux,
   CruxList,
+  InterventionCard,
+  InterventionList,
 
   // Ported stub components — medium priority
   Tags,
