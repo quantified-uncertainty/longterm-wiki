@@ -1,8 +1,8 @@
 ## 2026-02-15 | claude/ea-shareholder-diversification-M2UDC | EA shareholder diversification page
 
-**What was done:** Created a new wiki page analyzing EA shareholder diversification strategies (E694). Added "Employee Tax Urgency" section to DAF Transfers page (E412). Then performed detailed editorial review and fixed critical errors: 409A valuations corrected from preferred to common stock values, ISO/DAF interaction rewritten (can't donate unexercised ISOs), QSBS California non-conformance added, AMT rate corrected to include CA AMT, math errors fixed throughout diversification page, removed fabricated "Senterra Funders" entity, added missing E411 cross-reference.
+**What was done:** Created a new wiki page analyzing EA shareholder diversification strategies (E694). Added "Employee Tax Urgency" section to DAF Transfers page (E412). Then performed detailed editorial review and fixed critical errors: 409A valuations corrected from preferred to common stock values, ISO/DAF interaction rewritten (can't donate unexercised ISOs), QSBS California non-conformance added, AMT rate corrected to include CA AMT, math errors fixed throughout diversification page, removed fabricated "Senterra Funders" entity, added missing E411 cross-reference. Created two additional pages: EA Funding Absorption Capacity (estimating $500M-2B/year capacity) and FTX Collapse Lessons for EA Funding Resilience (retrospective with Anthropic parallels).
 
-**Pages:** ea-shareholder-diversification-anthropic, anthropic-pre-ipo-daf-transfers
+**Pages:** ea-shareholder-diversification-anthropic, anthropic-pre-ipo-daf-transfers, ea-funding-absorption-capacity, ftx-collapse-ea-funding-lessons
 
 **Issues encountered:**
 - Crux content pipeline synthesis fails (nested claude session). Wrote pages manually.
