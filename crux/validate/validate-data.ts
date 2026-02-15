@@ -148,6 +148,18 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   const expertIds = new Set<string>(experts.map((e: ExpertData) => e.id));
   const orgIds = new Set<string>(organizations.map((o: OrganizationData) => o.id));
 
+  // Build numeric ID → slug mapping from id-registry.json
+  const numericToSlug = new Map<string, string>();
+  const registryPath = join(DATA_DIR, 'id-registry.json');
+  if (existsSync(registryPath)) {
+    const registry = JSON.parse(readFileSync(registryPath, 'utf-8'));
+    if (registry.entities) {
+      for (const [numId, slug] of Object.entries(registry.entities)) {
+        numericToSlug.set(numId, slug as string);
+      }
+    }
+  }
+
   // Find all MDX files
   const mdxFiles = findMdxFiles(CONTENT_DIR);
   const mdxIds = new Set<string>(mdxFiles.map((f: string) => getEntityIdFromPath(f)));
@@ -269,9 +281,11 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
 
     const match = content.match(/<DataInfoBox\s+entityId="([^"]+)"/);
     if (match) {
-      const entityId = match[1];
+      const rawId = match[1];
+      // Resolve numeric IDs (e.g. "E5") to slugs
+      const entityId = rawId.match(/^E\d+$/) ? (numericToSlug.get(rawId) ?? rawId) : rawId;
       if (!entityIds.has(entityId) && !expertIds.has(entityId) && !orgIds.has(entityId)) {
-        console.log(`${colors.red}❌ ${file}: DataInfoBox references unknown entityId "${entityId}"${colors.reset}`);
+        console.log(`${colors.red}❌ ${file}: DataInfoBox references unknown entityId "${rawId}"${colors.reset}`);
         errors++;
         missingEntityRefs++;
       }
