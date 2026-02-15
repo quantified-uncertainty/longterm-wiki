@@ -671,6 +671,66 @@ export function getAllFacts(): Array<Fact & { key: string }> {
 }
 
 // ============================================================================
+// INSIGHTS
+// ============================================================================
+
+export interface InsightItem {
+  id: string;
+  insight: string;
+  source: string;
+  sourceTitle: string | null;
+  sourceHref: string;
+  tags: string[];
+  type: string;
+  surprising: number;
+  important: number;
+  actionable: number;
+  neglected: number;
+  compact: number;
+  composite: number;
+  added: string;
+}
+
+export function getInsights(): InsightItem[] {
+  const db = getDatabase();
+  const pageTitleMap = new Map<string, string>();
+  for (const page of db.pages || []) {
+    pageTitleMap.set(page.path, page.title);
+    if (!page.path.endsWith("/")) {
+      pageTitleMap.set(page.path + "/", page.title);
+    }
+  }
+
+  return (db.insights || []).map((insight) => {
+    const sourcePath = insight.source || "/insight-hunting";
+    const sourceTitle =
+      pageTitleMap.get(sourcePath) ||
+      pageTitleMap.get(sourcePath + "/") ||
+      null;
+    const composite =
+      insight.composite ??
+      (insight.surprising + insight.important + insight.actionable + insight.neglected + insight.compact) / 5;
+
+    return {
+      id: insight.id,
+      insight: insight.insight,
+      source: insight.source,
+      sourceTitle,
+      sourceHref: sourcePath,
+      tags: insight.tags || [],
+      type: insight.type,
+      surprising: insight.surprising,
+      important: insight.important,
+      actionable: insight.actionable,
+      neglected: insight.neglected,
+      compact: insight.compact,
+      composite,
+      added: insight.added,
+    };
+  });
+}
+
+// ============================================================================
 // INFOBOX DATA HELPERS
 // ============================================================================
 
