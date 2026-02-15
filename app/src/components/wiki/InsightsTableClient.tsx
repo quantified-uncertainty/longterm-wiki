@@ -42,8 +42,18 @@ const columns: ColumnDef<InsightItem>[] = [
     cell: ({ row }) => {
       const item = row.original;
       return (
-        <div className="min-w-[280px] max-w-[480px]">
-          <p className="text-sm leading-relaxed">{item.insight}</p>
+        <div className="min-w-[320px] max-w-[540px] py-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span
+              className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap shrink-0 ${TYPE_COLORS[item.type] || ""}`}
+            >
+              {TYPE_LABELS[item.type] || item.type}
+            </span>
+            <span className="text-xs tabular-nums font-medium text-muted-foreground">
+              {item.composite.toFixed(1)}
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed text-foreground">{item.insight}</p>
           {item.sourceTitle && (
             <Link
               href={item.sourceHref}

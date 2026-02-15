@@ -17,26 +17,28 @@ export default function InsightsPage() {
   }
 
   return (
-    <article className="prose max-w-none">
-      <h1>Critical Insights Index</h1>
-      <p className="text-muted-foreground">
-        All {insights.length} insights extracted from wiki pages, ranked by
-        composite score (average of surprising, important, actionable, neglected,
-        and compact). Each dimension is rated 1-5 for an AI safety researcher
-        audience.
-        {Object.keys(byType).length > 0 && (
-          <>
-            {" "}
-            Types:{" "}
-            {Object.entries(byType)
-              .sort((a, b) => b[1] - a[1])
-              .map(([type, count]) => `${type} (${count})`)
-              .join(", ")}
-            .
-          </>
-        )}
-      </p>
+    <div>
+      <div className="prose max-w-none mb-4">
+        <h1>Critical Insights Index</h1>
+        <p className="text-muted-foreground">
+          All {insights.length} insights extracted from wiki pages, ranked by
+          composite score (average of surprising, important, actionable, neglected,
+          and compact). Each dimension is rated 1-5 for an AI safety researcher
+          audience.
+          {Object.keys(byType).length > 0 && (
+            <>
+              {" "}
+              Types:{" "}
+              {Object.entries(byType)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => `${type} (${count})`)
+                .join(", ")}
+              .
+            </>
+          )}
+        </p>
+      </div>
       <InsightsTable data={insights} />
-    </article>
+    </div>
   );
 }
