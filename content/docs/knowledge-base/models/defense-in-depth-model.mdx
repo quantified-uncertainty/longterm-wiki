@@ -35,7 +35,7 @@ import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} fr
 
 Defense in depth applies the security principle of layered protection to AI safety: deploy multiple independent safety measures so that if one fails, others still provide protection. This model provides a mathematical framework for analyzing how safety interventions combine, when multiple weak defenses outperform single strong ones, and how to identify correlated failure modes.
 
-**Key finding**: Independent layers with 20-60% individual failure rates can achieve combined failure rates of 1-3%, but <EntityLink id="E93">deceptive alignment</EntityLink> creates dangerous correlations that increase combined failure to 12%+. No single AI safety intervention is reliable enough to trust alone - layered defenses with diverse failure modes provide more robust protection.
+**Key finding**: Independent layers with 20-60% individual failure rates can achieve combined failure rates of 1-3%, but <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink> creates dangerous correlations that increase combined failure to 12%+. No single AI safety intervention is reliable enough to trust alone - layered defenses with diverse failure modes provide more robust protection.
 
 ## Risk Assessment
 
@@ -54,10 +54,10 @@ AI safety operates through five defensive layers, each protecting against differ
 
 | Layer | Primary Function | Key Interventions | Failure Rate Range |
 |-------|-----------------|------------------|-------------------|
-| **Training Safety** | Build aligned goals during development | <R id="1098fc60be7ca2b0"><EntityLink id="E259">RLHF</EntityLink></R>, <EntityLink id="E451">Constitutional AI</EntityLink>, data curation | 20-40% |
+| **Training Safety** | Build aligned goals during development | <R id="1098fc60be7ca2b0"><EntityLink id="rlhf">RLHF</EntityLink></R>, <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, data curation | 20-40% |
 | **Evaluation Safety** | Detect problems before deployment | Red-teaming, interpretability, capability evals | 25-35% |
-| **Runtime Safety** | Monitor deployed systems | <EntityLink id="E595">Output filtering</EntityLink>, monitoring, sandboxing | 30-50% |
-| **Institutional Safety** | Governance and oversight | <EntityLink id="E252">Responsible scaling</EntityLink>, audits, regulation | 40-60% |
+| **Runtime Safety** | Monitor deployed systems | <EntityLink id="output-filtering">Output filtering</EntityLink>, monitoring, sandboxing | 30-50% |
+| **Institutional Safety** | Governance and oversight | <EntityLink id="responsible-scaling-policies">Responsible scaling</EntityLink>, audits, regulation | 40-60% |
 | **Recovery Safety** | Respond to failures | Incident response, shutdown, rollback | 20-40% |
 
 <Mermaid chart={`
@@ -89,7 +89,7 @@ The effectiveness of layered defenses depends critically on independence. When l
 | Layer Pair | Correlation (ρ) | Primary Correlation Source | Impact |
 |------------|----------------|---------------------------|--------|
 | Training-Evaluation | 0.4 | Deceptive alignment affects both | High correlation reduces redundancy |
-| Training-Runtime | 0.5 | <EntityLink id="E93">Deception</EntityLink> evades monitoring | Highest correlation pair |
+| Training-Runtime | 0.5 | <EntityLink id="deceptive-alignment">Deception</EntityLink> evades monitoring | Highest correlation pair |
 | Training-Institutional | 0.2 | Mostly separate domains | Good independence |
 | Evaluation-Runtime | 0.3 | Both rely on behavioral signals | Moderate correlation |
 | Institutional-Technical | 0.1-0.3 | Different failure mechanisms | Best independence |
@@ -142,11 +142,11 @@ $$P_{\text{eff}} = P_{\text{ind}}^{(1-\rho)} \times P_{\text{corr}}^{\rho}$$
 
 | Method | Mechanism | Failure Mode | Effectiveness |
 |--------|-----------|--------------|---------------|
-| **RLHF** | Human feedback shapes behavior | <EntityLink id="E253">Reward hacking</EntityLink>, humans deceived | 60-80% success rate |
+| **RLHF** | Human feedback shapes behavior | <EntityLink id="reward-hacking">Reward hacking</EntityLink>, humans deceived | 60-80% success rate |
 | **Constitutional AI** | Principles guide responses | Principles incomplete/misinterpreted | 65-75% success rate |
 | **Data curation** | Remove harmful training examples | Emergent harmful patterns | 70-85% success rate |
 
-**Correlation drivers**: Training methods often share assumptions about alignment definition and measurement, creating correlated vulnerabilities to <EntityLink id="E151">goal misgeneralization</EntityLink> and deceptive alignment.
+**Correlation drivers**: Training methods often share assumptions about alignment definition and measurement, creating correlated vulnerabilities to <EntityLink id="goal-misgeneralization">goal misgeneralization</EntityLink> and deceptive alignment.
 
 ### Layer 2: Evaluation Safety
 
@@ -155,7 +155,7 @@ $$P_{\text{eff}} = P_{\text{ind}}^{(1-\rho)} \times P_{\text{corr}}^{\rho}$$
 **Current gaps according to <R id="45370a5153534152">METR</R>**: 
 - Cannot test for unknown capabilities
 - Red teams often less capable than models
-- <EntityLink id="E174">Interpretability</EntityLink> incomplete at scale
+- <EntityLink id="interpretability">Interpretability</EntityLink> incomplete at scale
 
 | Method | Coverage | Blind Spots | Independence Level |
 |--------|----------|-------------|-------------------|
@@ -188,7 +188,7 @@ $$P_{\text{eff}} = P_{\text{ind}}^{(1-\rho)} \times P_{\text{corr}}^{\rho}$$
 
 | Mechanism | Independence Level | Current Status | Effectiveness |
 |-----------|-------------------|----------------|---------------|
-| **<EntityLink id="E252">Responsible scaling policies</EntityLink>** | Medium | <R id="afe2508ac4caf5ee">Anthropic</R>, <R id="04d39e8bd5d50dd5">OpenAI</R> implementing | Unproven at scale |
+| **<EntityLink id="responsible-scaling-policies">Responsible scaling policies</EntityLink>** | Medium | <R id="afe2508ac4caf5ee">Anthropic</R>, <R id="04d39e8bd5d50dd5">OpenAI</R> implementing | Unproven at scale |
 | **External audits** | High | <R id="fdf68a8f30f57dee">AISI</R> developing frameworks | Early stage |
 | **Regulatory oversight** | High | <R id="1102501c88207df3">EU AI Act</R>, US <R id="59118f0c5d534110">executive order</R> | Implementation gaps |
 
@@ -209,7 +209,7 @@ $$P_{\text{eff}} = P_{\text{ind}}^{(1-\rho)} \times P_{\text{corr}}^{\rho}$$
 
 ### Deceptive Alignment: The Primary Correlation Driver
 
-<EntityLink id="E93">Deceptive alignment</EntityLink> creates the most dangerous correlation because it systematically defeats Layers 1-3:
+<EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink> creates the most dangerous correlation because it systematically defeats Layers 1-3:
 
 <Mermaid chart={`
 flowchart TD
@@ -319,7 +319,7 @@ $$\prod_{i=1}^{n} P_i^{weak} < P_{single}^{strong}$$
 
 ## Expert Perspectives
 
-> "The key insight is that we need multiple diverse approaches, not just better versions of the same approach." - <EntityLink id="E220">Paul Christiano</EntityLink> on alignment strategy
+> "The key insight is that we need multiple diverse approaches, not just better versions of the same approach." - <EntityLink id="paul-christiano">Paul Christiano</EntityLink> on alignment strategy
 
 > "Defense in depth is essential, but we must be realistic about correlation. Deceptive alignment could defeat multiple technical layers simultaneously." - <R id="f771d4f56ad4dbaa">Evan Hubinger</R> on correlated failures
 
@@ -383,8 +383,8 @@ $$\prod_{i=1}^{n} P_i^{weak} < P_{single}^{strong}$$
 
 ## Related Models and Concepts
 
-- <EntityLink id="E53" /> - When individual defenses become insufficient
-- <EntityLink id="E94" label="Deceptive Alignment Decomposition" /> - Primary correlation driver
-- <EntityLink id="E6">AI Control</EntityLink> - Defense assuming potential deception
-- <EntityLink id="E252">Responsible Scaling Policies</EntityLink> - Institutional layer implementation
+- <EntityLink id="capability-threshold-model" /> - When individual defenses become insufficient
+- <EntityLink id="deceptive-alignment-decomposition" label="Deceptive Alignment Decomposition" /> - Primary correlation driver
+- <EntityLink id="ai-control">AI Control</EntityLink> - Defense assuming potential deception
+- <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink> - Institutional layer implementation
 
