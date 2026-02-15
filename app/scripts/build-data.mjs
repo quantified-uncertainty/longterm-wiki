@@ -42,7 +42,7 @@ const DATA_FILES = [
 ];
 
 /**
- * Parse .claude/session-log.md and return a map of pageId → ChangeEntry[]
+ * Parse session log content and return a map of pageId → ChangeEntry[]
  *
  * Each session entry looks like:
  *   ## 2026-02-13 | branch-name | Short title
@@ -52,14 +52,9 @@ const DATA_FILES = [
  *
  * Returns: { [pageId]: [{ date, branch, title, summary }] }
  */
-function parseSessionLog(logPath) {
+function parseSessionLogContent(content) {
   const pageHistory = {};
 
-  if (!existsSync(logPath)) {
-    return pageHistory;
-  }
-
-  const content = readFileSync(logPath, 'utf-8');
   // Split into entries by ## headings
   const entryPattern = /^## (\d{4}-\d{2}-\d{2}) \| ([^\|]+?) \| (.+)$/gm;
   const entries = [];
@@ -90,7 +85,7 @@ function parseSessionLog(logPath) {
     const pageIds = pagesMatch[1]
       .split(',')
       .map(id => id.trim())
-      .filter(id => id.length > 0);
+      .filter(id => id.length > 0 && /^[a-z0-9][a-z0-9-]*$/.test(id));
 
     const changeEntry = {
       date: entry.date,
@@ -108,6 +103,57 @@ function parseSessionLog(logPath) {
   }
 
   return pageHistory;
+}
+
+/**
+ * Collect all session log content from both the consolidated session-log.md
+ * and individual session files in .claude/sessions/*.md, then parse into
+ * a merged pageId → ChangeEntry[] map.
+ *
+ * Deduplicates entries that appear in both sources (same date+branch+title).
+ */
+function parseAllSessionLogs(consolidatedLogPath, sessionsDir) {
+  const allContent = [];
+
+  // Read consolidated log if it exists
+  if (existsSync(consolidatedLogPath)) {
+    allContent.push(readFileSync(consolidatedLogPath, 'utf-8'));
+  }
+
+  // Read individual session files
+  if (existsSync(sessionsDir)) {
+    const files = readdirSync(sessionsDir)
+      .filter(f => f.endsWith('.md'))
+      .sort();
+    for (const file of files) {
+      const filePath = join(sessionsDir, file);
+      if (statSync(filePath).isFile()) {
+        allContent.push(readFileSync(filePath, 'utf-8'));
+      }
+    }
+  }
+
+  if (allContent.length === 0) return {};
+
+  // Parse each source separately, then merge with deduplication
+  const merged = {};
+  const seen = new Set(); // Track "date|branch|title" to deduplicate
+
+  for (const content of allContent) {
+    const partial = parseSessionLogContent(content);
+    for (const [pageId, entries] of Object.entries(partial)) {
+      if (!merged[pageId]) merged[pageId] = [];
+      for (const entry of entries) {
+        const key = `${entry.date}|${entry.branch}|${entry.title}|${pageId}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          merged[pageId].push(entry);
+        }
+      }
+    }
+  }
+
+  return merged;
 }
 
 function loadYaml(filename) {
@@ -927,10 +973,12 @@ function main() {
 
   // =========================================================================
   // SESSION LOG → PAGE CHANGE HISTORY
-  // Parse .claude/session-log.md and attach changeHistory to each page
+  // Parse .claude/session-log.md and .claude/sessions/*.md, then attach
+  // changeHistory to each page.
   // =========================================================================
   const sessionLogPath = join(PROJECT_ROOT, '..', '.claude', 'session-log.md');
-  const pageChangeHistory = parseSessionLog(sessionLogPath);
+  const sessionsDir = join(PROJECT_ROOT, '..', '.claude', 'sessions');
+  const pageChangeHistory = parseAllSessionLogs(sessionLogPath, sessionsDir);
   let pagesWithHistory = 0;
   for (const page of pages) {
     const history = pageChangeHistory[page.id];
@@ -939,7 +987,7 @@ function main() {
       pagesWithHistory++;
     }
   }
-  console.log(`  changeHistory: ${Object.keys(pageChangeHistory).length} pages have session history (from ${sessionLogPath})`);
+  console.log(`  changeHistory: ${Object.keys(pageChangeHistory).length} pages have session history`);
 
   database.pages = pages;
 
