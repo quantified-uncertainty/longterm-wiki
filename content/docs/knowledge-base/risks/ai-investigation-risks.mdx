@@ -1,11 +1,11 @@
 ---
 title: AI-Powered Investigation Risks
-description: AI dramatically lowers the bar for investigative discovery, connecting publicly available information at scale to surface secrets that previously required serious detective work. Beneficial for exposing corruption and fraud (21 U.S. agencies use AI for anticorruption; UK SFO analyzed 30M documents via AI), but threatening for privacy as "privacy through obscurity" erodes. LLMs automate deanonymization, face-matching AI outperforms humans (92.5% vs 81.3%), and the mosaic effect enables identification from individually innocuous data points. 57% of consumers say AI threatens their privacy.
+description: AI dramatically lowers the bar for investigative discovery, connecting publicly available information at scale to surface secrets that previously required serious detective work. Beneficial for exposing corruption and fraud (21 U.S. agencies use AI for anticorruption; UK SFO analyzed 30M documents via AI), but threatening for privacy as "privacy through obscurity" erodes. LLMs automate deanonymization, GPT-4 achieves 80-94% face verification accuracy with zero training, and the mosaic effect enables identification from individually innocuous data points. 57% of consumers say AI's societal risks outweigh benefits.
 sidebar:
   order: 42
 maturity: Emerging
 quality: 40
-llmSummary: Analysis of AI-powered investigation as a dual-use capability. AI dramatically lowers the discoverability threshold for connecting public information, benefiting accountability (corruption detection, fraud investigation, investigative journalism) while threatening privacy through automated deanonymization and erosion of privacy through obscurity. Documents real-world examples including Bellingcat OSINT investigations, UK SFO analyzing 30M documents, and deanonymization of Netflix Prize data. 57% of consumers see AI as a privacy threat; GPT-4 face matching outperforms humans 92.5% to 81.3%.
+llmSummary: Analysis of AI-powered investigation as a dual-use capability. AI dramatically lowers the discoverability threshold for connecting public information, benefiting accountability (corruption detection, fraud investigation, investigative journalism) while threatening privacy through automated deanonymization and erosion of privacy through obscurity. Documents real-world examples including Bellingcat OSINT investigations, UK SFO analyzing 30M documents, and deanonymization of Netflix Prize data. GPT-4 achieves 80-94% face verification accuracy with zero training; Pew finds 57% of Americans say AI's societal risks outweigh benefits.
 lastEdited: "2026-02-15"
 importance: 55
 update_frequency: 30
@@ -33,10 +33,10 @@ import {DataInfoBox, Mermaid, EntityLink, DataExternalLinks} from '@components/w
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | **Current Deployment** | Operational and expanding | OSINT practitioners already use AI daily for collection, analysis, and writing ([2025 OSINT Year in Review](https://www.osintnewsletter.osint-jobs.com/p/2025-year-in-review-what-we-have)) |
-| **Deanonymization Capability** | Demonstrated at scale | Neural network identified 14.7-52.4% of users from anonymized interaction data ([Nature Communications](https://www.nature.com/articles/ncomms1544)); Netflix Prize data deanonymized via cross-referencing |
-| **Face Recognition** | Near-human or superhuman | GPT-4 scored 92.5% on face matching vs 81.3% for humans ([arXiv 2024](https://arxiv.org/html/2401.13641v1)); OpenAI restricts this capability |
+| **Deanonymization Capability** | Demonstrated at scale | Neural network identified 14.7-52.4% of users from anonymized interaction data ([Cretu et al. 2022](https://www.nature.com/articles/s41467-021-27714-6)); Netflix Prize data deanonymized via cross-referencing |
+| **Face Recognition** | Approaching dedicated models | GPT-4 achieved 80-94% face verification accuracy with zero training, vs ~96% for dedicated models ([Melzi et al. 2024](https://arxiv.org/abs/2401.13641)); OpenAI restricts this capability |
 | **Anti-Corruption Use** | 21 of 37 U.S. agencies use AI for fraud detection | Study of 1,757 AI applications across federal agencies ([Public Integrity 2025](https://www.tandfonline.com/doi/full/10.1080/10999922.2025.2554424)) |
-| **Privacy Concern** | Majority worried | 57% of consumers say AI threatens privacy; 81% expect data misuse ([Pew Research](https://www.pewresearch.org/)) |
+| **Privacy Concern** | Majority worried | 52% of Americans say AI does more to hurt than help privacy; 57% say AI's societal risks outweigh benefits ([Pew Research 2023](https://www.pewresearch.org/science/2023/11/21/growing-public-concern-about-the-role-of-artificial-intelligence-in-daily-life/)) |
 | **Regulatory Response** | Fragmented | EU AI Act bans some biometric ID; 20 U.S. states have privacy laws; no global framework for AI investigation |
 | **Chilling Effects** | Documented | Wikipedia terror-related article views dropped 30% post-Snowden; 28% curtailed social media activity ([EFF 2016](https://www.eff.org/deeplinks/2016/05/when-surveillance-chills-speech-new-studies-show-our-rights-free-association)) |
 
@@ -93,7 +93,7 @@ AI investigation tools have demonstrated substantial value in identifying corrup
 | **Federal fraud detection** | U.S. (21 agencies) | 1,757 AI applications | AI adopted for anticorruption across majority of federal agencies ([Public Integrity 2025](https://www.tandfonline.com/doi/full/10.1080/10999922.2025.2554424)) |
 | **Procurement monitoring** | Ukraine (ProZorro) | All government contracts | Transparent oversight, reduced corruption opportunities ([Transparency International](https://knowledgehub.transparency.org/helpdesk/harnessing-artificial-intelligence-ai-for-anti-corruption)) |
 | **Corruption risk flagging** | Hungary (Red Flags) | Public procurement | EU-funded AI identifies high-risk procurement procedures |
-| **Document analysis** | UK Serious Fraud Office | 30M documents (Rolls-Royce case) | Processed 600,000 documents daily, uncovered critical evidence |
+| **Document analysis** | UK Serious Fraud Office | 30M documents (Rolls-Royce case) | AI-assisted review uncovered critical evidence; led to GBP 497M settlement ([SFO 2017](https://www.sfo.gov.uk/cases/rolls-royce-plc/)) |
 | **Benefits fraud reduction** | UK government | GBP 70M investment (2022-2025) | Projected GBP 1.6B savings by 2030 |
 | **Cross-referencing** | Brazil | Government expenditures | AI bots identify bid-rigging, contract fraud, cartel practices |
 
@@ -132,7 +132,7 @@ The key insight is that LLMs and AI systems are "dismantling the manual barriers
 
 ### AI Face Matching and Recognition
 
-GPT-4 has demonstrated underlying face-matching capability that exceeds human performance — scoring [92.5% on standardized tests compared to 81.3% for humans](https://arxiv.org/html/2401.13641v1). While OpenAI restricts this capability in public-facing products, the underlying technical ability exists and will likely become available through other channels.
+GPT-4 has demonstrated substantial face-verification capability with zero specialized training — achieving [80.2% average accuracy across seven benchmark datasets, and 93.5% on the LFW dataset](https://arxiv.org/abs/2401.13641), compared to ~95.5% for dedicated models like ArcFace and AdaFace. While OpenAI restricts this capability in public-facing products, the underlying technical ability exists and will likely become available through other channels.
 
 The broader facial recognition landscape includes:
 
@@ -154,7 +154,7 @@ Empirical research documents measurable chilling effects from surveillance aware
 - **Facebook study** (Journalism & Mass Communications Quarterly): People self-censor, refraining from voicing minority views when aware of government monitoring
 - **Wikipedia study**: Monthly traffic to articles about terror groups [dropped 30% after the June 2013 Snowden disclosures](https://www.eff.org/deeplinks/2016/05/when-surveillance-chills-speech-new-studies-show-our-rights-free-association)
 - **Political activity**: Higher perceived surveillance chilled not only illegal activities but also *legitimate* political activities — sharing opinions, criticizing government
-- **Post-Snowden surveys**: 28% of respondents curtailed social media activities; 24% avoided certain topics in phone or email conversations
+- **PEN America survey** (2013, surveying writers): [28% curtailed social media activities](https://pen.org/research-resources/chilling-effects/); 24% avoided certain topics in phone or email conversations
 - **Uganda and Zimbabwe research** ([Oxford Academic](https://academic.oup.com/jhrp/article/16/1/397/7234270)): Surveillance effects manifest as self-censorship, "guilt by association" avoidance, and erosion of trust undermining political organizing
 
 The [UN Special Rapporteur on Freedom of Peaceful Assembly and Association](https://www.ohchr.org/en/calls-for-input/2025/call-input-hrc62-thematic-report-impact-digital-and-ai-assisted-surveillance-assembly) is preparing a thematic report on "Impact of digital and AI-assisted surveillance on assembly and association rights" due June 2026.
@@ -204,7 +204,7 @@ Current regulatory frameworks are fragmented and lag behind AI investigation cap
 |-----------|-------|----------------|------|
 | **EU AI Act** (2025) | EU member states | Bans some real-time biometric ID in public spaces; requires transparency | Doesn't address non-biometric OSINT; enforcement uncertain |
 | **GDPR** (Art. 25) | EU/EEA | Privacy by Design; data minimization; right to erasure | Difficult to enforce against AI inference from public data |
-| **U.S. state laws** (20 states by 2025) | Varies by state | Maryland has lowest threshold (10,000 consumers) | No federal framework; patchwork coverage |
+| **U.S. state laws** (20 states by 2025) | Varies by state | Maryland threshold as low as 10,000 consumers (if over 20% revenue from data sales) | No federal framework; patchwork coverage |
 | **Illinois BIPA** | Illinois | Biometric data consent requirements | Narrow focus on biometric data only |
 | **UN initiatives** | Advisory | Special Rapporteur report on surveillance and assembly (due June 2026) | Non-binding; no enforcement mechanism |
 
