@@ -1,0 +1,12 @@
+- date: 2026-02-15
+  tool: crux-improve
+  agency: ai-directed
+  note: >-
+    Added dedicated Employee Lockup Period Implications subsection covering
+    standard lockup structures, impact on employee donation pledges and DAFs,
+    stock price risk during lockup, buyback as partial mitigation, and secondary
+    market restrictions. Pipeline also restructured page with footnote citations.
+- date: 2026-02-15
+  tool: crux-fix
+  agency: automated
+  note: Auto-fixed validation issues (escaping, markdown, etc.)
