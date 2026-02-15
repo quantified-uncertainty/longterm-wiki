@@ -33,6 +33,18 @@ function ScoreBadge({ value }: { value: number }) {
   return <span className={`text-xs tabular-nums ${color}`}>{value.toFixed(1)}</span>;
 }
 
+/** Format a source path into a short readable label */
+function formatSourceLabel(href: string, title: string | null): string {
+  if (title) return title;
+  // Strip leading /knowledge-base/ or /ai-transition-model/ prefix and trailing /
+  return href
+    .replace(/^\/knowledge-base\//, "")
+    .replace(/^\/ai-transition-model\//, "ATM: ")
+    .replace(/\/$/, "")
+    .split("/")
+    .pop() || href;
+}
+
 const columns: ColumnDef<InsightItem>[] = [
   {
     accessorKey: "insight",
@@ -42,26 +54,14 @@ const columns: ColumnDef<InsightItem>[] = [
     cell: ({ row }) => {
       const item = row.original;
       return (
-        <div className="min-w-[320px] max-w-[540px] py-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span
-              className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap shrink-0 ${TYPE_COLORS[item.type] || ""}`}
-            >
-              {TYPE_LABELS[item.type] || item.type}
-            </span>
-            <span className="text-xs tabular-nums font-medium text-muted-foreground">
-              {item.composite.toFixed(1)}
-            </span>
-          </div>
+        <div className="min-w-[360px] max-w-[600px] py-1">
           <p className="text-sm leading-relaxed text-foreground">{item.insight}</p>
-          {item.sourceTitle && (
-            <Link
-              href={item.sourceHref}
-              className="text-[11px] text-muted-foreground hover:text-foreground no-underline mt-1 block"
-            >
-              → {item.sourceTitle}
-            </Link>
-          )}
+          <Link
+            href={item.sourceHref}
+            className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline no-underline mt-1 inline-block"
+          >
+            → {formatSourceLabel(item.sourceHref, item.sourceTitle)}
+          </Link>
         </div>
       );
     },
