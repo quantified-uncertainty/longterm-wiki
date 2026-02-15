@@ -674,6 +674,19 @@ export function getAllFacts(): Array<Fact & { key: string }> {
 // INSIGHTS
 // ============================================================================
 
+/** Build path→title lookup from pages, normalising trailing slashes. */
+function getPageTitleMap(): Map<string, string> {
+  const db = getDatabase();
+  const map = new Map<string, string>();
+  for (const page of db.pages || []) {
+    map.set(page.path, page.title);
+    if (!page.path.endsWith("/")) {
+      map.set(page.path + "/", page.title);
+    }
+  }
+  return map;
+}
+
 export interface InsightItem {
   id: string;
   insight: string;
@@ -692,15 +705,9 @@ export interface InsightItem {
 }
 
 export function getInsights(): InsightItem[] {
-  const db = getDatabase();
-  const pageTitleMap = new Map<string, string>();
-  for (const page of db.pages || []) {
-    pageTitleMap.set(page.path, page.title);
-    if (!page.path.endsWith("/")) {
-      pageTitleMap.set(page.path + "/", page.title);
-    }
-  }
+  const pageTitleMap = getPageTitleMap();
 
+  const db = getDatabase();
   return (db.insights || []).map((insight) => {
     const sourcePath = insight.source || "/insight-hunting";
     const sourceTitle =
@@ -1002,15 +1009,13 @@ export function getExploreItems(): ExploreItem[] {
 
   // Build cluster lookup from pages (for tables/insights)
   const pageClusterMap = new Map<string, string[]>();
-  const pageTitleMap = new Map<string, string>();
   for (const page of db.pages || []) {
     pageClusterMap.set(page.path, page.clusters || []);
-    pageTitleMap.set(page.path, page.title);
     if (!page.path.endsWith("/")) {
       pageClusterMap.set(page.path + "/", page.clusters || []);
-      pageTitleMap.set(page.path + "/", page.title);
     }
   }
+  const pageTitleMap = getPageTitleMap();
 
   // Items from typed entities (only those with actual content pages)
   const entityItems: ExploreItem[] = typedEntities.filter((entity) => pageMap.has(entity.id)).map((entity) => {

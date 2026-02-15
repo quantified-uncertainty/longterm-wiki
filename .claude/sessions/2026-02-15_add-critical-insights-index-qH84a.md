@@ -1,13 +1,13 @@
 ## 2026-02-15 | claude/add-critical-insights-index-qH84a | Add Critical Insights index page
 
-**What was done:** Created a new internal page at `/internal/insights` with a sortable table of all insights. The table displays all insight dimensions (surprising, important, actionable, neglected, compact, composite) as sortable columns, plus type badges, source links, and tags. Added `getInsights()` data layer function and sidebar nav entry.
+**What was done:** Created a new internal page at `/internal/insights` with a sortable table of all 1041 insights. Also wired the previously-stubbed `<InsightsTable />` MDX component to a real implementation, so the public insights page at `/insight-hunting/insights` now renders the full table. Extracted shared `getPageTitleMap()` helper and `InsightsTableClient` component to avoid duplication.
 
-**Pages:** (no wiki pages edited — internal infrastructure only)
+**Pages:** (no wiki page content edited — infrastructure/components only)
 
 **Issues encountered:**
-- None
+- The `<InsightsTable />` MDX component was a stub (empty gray box) on the public insights page — fixed by creating a server component wrapper + shared client table component.
 
 **Learnings/notes:**
 - Insights are stored in 6 YAML files under `data/insights/` by type (claim, counterintuitive, quantitative, research-gap, disagreement, neglected)
-- The `InsightsTable` component in mdx-components.tsx was previously a stub — this new page uses a dedicated route instead
-- Pattern for internal data pages: server page loads from `@/data`, passes props to `"use client"` table component using DataTable from `@/components/ui/data-table`
+- MDX components can be server components (no "use client") and import from `@/data` — they render server-side during MDX compilation
+- The pageTitleMap builder was duplicated in `getInsights()` and `getExploreItems()` — extracted to shared `getPageTitleMap()` function
