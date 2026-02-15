@@ -1,13 +1,16 @@
 ## 2026-02-15 | claude/add-critical-insights-index-qH84a | Add Critical Insights index page
 
-**What was done:** Created a new internal page at `/internal/insights` with a sortable table of all 1041 insights. Also wired the previously-stubbed `<InsightsTable />` MDX component to a real implementation, so the public insights page at `/insight-hunting/insights` now renders the full table. Extracted shared `getPageTitleMap()` helper and `InsightsTableClient` component to avoid duplication.
+**What was done:** Created a new internal page at `/internal/insights` with a sortable table of all 1041 insights. Also wired the previously-stubbed `<InsightsTable />` MDX component to a real implementation, so the public insights page at `/insight-hunting/insights` now renders the full table. Extracted shared `getPageTitleMap()` helper and `InsightsTableClient` component to avoid duplication. Follow-up: cleaned up the table — removed redundant inline badges from Insight column, made source page links always visible (with path-based fallback labels), abbreviated score column headers for compactness, added clickable tags that filter the search input, and wired column size hints through the DataTable component.
 
 **Pages:** (no wiki page content edited — infrastructure/components only)
 
 **Issues encountered:**
 - The `<InsightsTable />` MDX component was a stub (empty gray box) on the public insights page — fixed by creating a server component wrapper + shared client table component.
+- 81% of insights have source paths that don't map to any page title (deep ATM factor paths, model subpaths) — added `formatSourceLabel()` to derive readable labels from paths.
+- DataTable's `<th>`/`<td>` didn't respect TanStack Table's `size` column property — patched to apply `style={{ width }}` for columns with non-default sizes.
 
 **Learnings/notes:**
 - Insights are stored in 6 YAML files under `data/insights/` by type (claim, counterintuitive, quantitative, research-gap, disagreement, neglected)
 - MDX components can be server components (no "use client") and import from `@/data` — they render server-side during MDX compilation
 - The pageTitleMap builder was duplicated in `getInsights()` and `getExploreItems()` — extracted to shared `getPageTitleMap()` function
+- To let cell renderers control table-level state (e.g., globalFilter), manage the table instance in the parent component and pass callbacks via React context
