@@ -191,7 +191,7 @@ function computeBacklinks(entities) {
  * Returns inbound map: targetEntityId -> array of source pages that link to it.
  * Must be called before rawContent is stripped from pages.
  */
-function scanContentEntityLinks(pages, entityMap) {
+function scanContentEntityLinks(pages, entityMap, numericIdToSlug) {
   const inbound = {};
   let totalLinks = 0;
 
@@ -203,7 +203,11 @@ function scanContentEntityLinks(pages, entityMap) {
     const seen = new Set();
 
     while ((match = regex.exec(page.rawContent)) !== null) {
-      const targetId = match[1];
+      let targetId = match[1];
+      // Resolve numeric IDs (e.g. "E22") to slug IDs (e.g. "anthropic")
+      if (numericIdToSlug && numericIdToSlug[targetId]) {
+        targetId = numericIdToSlug[targetId];
+      }
       if (targetId === page.id) continue; // Skip self-links
       if (seen.has(targetId)) continue;
       seen.add(targetId);
@@ -868,8 +872,18 @@ function main() {
   // CONTENT ENTITY LINKS — scan MDX for <EntityLink> references
   // Must happen before rawContent is stripped (below).
   // =========================================================================
+  // Pre-populate numericIdToSlug with page-level numericIds (pages that aren't
+  // YAML entities but have numericId in frontmatter). This ensures numeric IDs
+  // like "E660" resolve to slugs like "factors-ai-capabilities-overview" when
+  // scanning EntityLink references below.
+  for (const page of pages) {
+    if (page.numericId && !numericIdToSlug[page.numericId]) {
+      numericIdToSlug[page.numericId] = page.id;
+    }
+  }
+
   const entityMap = new Map(entities.map(e => [e.id, e]));
-  const { inbound: contentInbound, totalLinks: contentLinkCount } = scanContentEntityLinks(pages, entityMap);
+  const { inbound: contentInbound, totalLinks: contentLinkCount } = scanContentEntityLinks(pages, entityMap, numericIdToSlug);
 
   // Merge content-derived inbound links into backlinks
   let contentBacklinksMerged = 0;
