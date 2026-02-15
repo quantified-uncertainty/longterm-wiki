@@ -30,7 +30,7 @@ categories:
     subItems:
       - id: technical-ai-safety
         label: "Technical AI Safety"
-      - id: ai-governance
+      - id: tmc-ai-governance
         label: "AI Governance"
       - id: lab-safety-practices
         label: "Lab Safety Practices"
