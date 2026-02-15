@@ -156,6 +156,15 @@ describe("Entity data validation", () => {
       "alignment-training-overview",
       "epistemic-tools-approaches-overview",
       "epistemic-tools-tools-overview",
+      "safety-orgs-overview",
+      "labs-overview",
+      "community-building-overview",
+      "government-orgs-overview",
+      "governance-overview",
+      "accident-overview",
+      "epistemic-overview",
+      "structural-overview",
+      "misuse-overview",
       // Comparison/analysis pages (not single entities)
       "frontier-ai-comparison",
       // Prediction track-record pages (sub-pages of people, not entities themselves)
