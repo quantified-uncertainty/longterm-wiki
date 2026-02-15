@@ -1,8 +1,8 @@
 ## 2026-02-15 | claude/ea-shareholder-diversification-M2UDC | EA shareholder diversification page
 
-**What was done:** Created a new wiki page analyzing strategies for EA-aligned Anthropic shareholders to reduce portfolio concentration risk. The page covers pre-IPO strategies (secondary market sales, expanded buybacks, DAF transfers, private placements) and post-IPO strategies (10b5-1 plans, charitable stock transfers, CRTs), with a priority framework targeting 20% pre-IPO diversification. Added entity definition to concepts.yaml (E694).
+**What was done:** Created a new wiki page analyzing strategies for EA-aligned Anthropic shareholders to reduce portfolio concentration risk (E694). Also added a detailed "Employee Tax Urgency" section to the Anthropic Pre-IPO DAF Transfers page (E412) covering ISOs/AMT, 83(b) elections, and QSBS eligibility.
 
-**Pages:** ea-shareholder-diversification-anthropic
+**Pages:** ea-shareholder-diversification-anthropic, anthropic-pre-ipo-daf-transfers
 
 **Issues encountered:**
 - Crux content pipeline synthesis step fails in this environment because it spawns a nested `claude` CLI session, which is blocked. Wrote the page manually following template structure.
