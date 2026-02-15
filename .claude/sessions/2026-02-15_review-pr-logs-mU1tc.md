@@ -1,13 +1,14 @@
-## 2026-02-15 | claude/review-pr-logs-mU1tc | Review last 20 PR session logs
+## 2026-02-15 | claude/review-pr-logs-mU1tc | Review last 20 PR logs and fix synthesis deadlock
 
-**What was done:** Reviewed session logs and GitHub PR metadata for the last 20 merged PRs (Feb 13–15). Compiled a summary of pages created/edited, infrastructure changes, notable recurring issues (crux pipeline synthesis broken, linter reassigning entity IDs, valuation inconsistencies across page clusters, session log migration breaking data pipeline), and aggregate stats (20 PRs, ~30+ pages edited, 4 new wiki pages, 2 new data layers, 3 new CLI tools).
+**What was done:** Reviewed session logs and GitHub PR metadata for the last 20 merged PRs (Feb 13–15). Identified the #1 recurring issue: crux synthesis subprocess hangs due to a Node.js pipe buffer deadlock (stderr never drained). Fixed the root cause in all 3 affected files (synthesis.ts, validation.ts, deployment.ts) by adding stderr drains, timeouts (5min/3min), and error handlers. Filed 4 GitHub issues for remaining items: #146 (synthesis deadlock documentation), #147 (entity ID partial matching), #148 (linter ID reassignment check), #149 (cross-page canonical data).
 
-**Pages:** (no wiki content pages changed — review-only session)
+**Pages:** (no wiki content pages changed)
 
 **Issues encountered:**
-- None
+- Pre-existing TS errors in crux/validate/ (unrelated module resolution issues)
+- deployment.ts return type didn't include `error` field despite already returning it in the error handler
 
 **Learnings/notes:**
-- The crux content pipeline synthesis step is the most frequently reported failure across sessions — it affects nearly every page creation task
-- Entity ID reassignment by the linter is a subtle and dangerous issue that has caused cross-page breakage
-- The `replace_all` tool on short strings (like `E6`) can match unintended targets (like `E64`)
+- The synthesis deadlock is a classic Node.js pattern: `stdio: ['pipe', 'pipe', 'pipe']` with unconsumed stderr fills the OS pipe buffer (~64KB), blocking the subprocess
+- All 3 subprocess spawns (synthesis, validation, review) had the same bug
+- deployment.ts was slightly more resilient (had an error handler) but still lacked stderr drain and timeout
