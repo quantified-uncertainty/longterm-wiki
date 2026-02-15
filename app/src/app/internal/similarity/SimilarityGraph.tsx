@@ -308,19 +308,19 @@ export function SimilarityGraph({ data }: Props) {
         "link",
         forceLink<SimNode, SimLink>(links)
           .id((d) => d.id)
-          .distance((d) => Math.max(30, 120 - d.score * 2))
-          .strength((d) => Math.min(0.3, d.score / 50))
+          .distance((d) => Math.max(60, 200 - d.score * 3))
+          .strength((d) => Math.min(0.2, d.score / 80))
       )
-      .force("charge", forceManyBody().strength(-30).distanceMax(300))
+      .force("charge", forceManyBody().strength(-120).distanceMax(600))
       .force(
         "center",
         forceCenter(dimensions.width / 2, dimensions.height / 2)
       )
       .force(
         "collide",
-        forceCollide<SimNode>((d) => d.radius + 1).iterations(2)
+        forceCollide<SimNode>((d) => d.radius + 2).iterations(2)
       )
-      .alphaDecay(0.02)
+      .alphaDecay(0.015)
       .on("tick", () => drawRef.current());
 
     simRef.current = sim;
@@ -496,23 +496,23 @@ export function SimilarityGraph({ data }: Props) {
         </div>
 
         {/* Stats */}
-        <div className="text-sm text-muted-foreground space-y-1">
+        <div className="text-sm text-muted-foreground space-y-1 min-w-48 min-h-[4.5rem]">
           <div>
             <strong>{visibleNodeCount}</strong> pages
           </div>
           <div>
             <strong>{visibleEdgeCount}</strong> connections
           </div>
-          {hoveredNode && (
-            <div className="text-foreground mt-1">
-              <strong>{hoveredNode.title}</strong>
-              <br />
-              <span className="text-xs">
-                importance: {hoveredNode.importance} | quality:{" "}
-                {hoveredNode.quality}
-              </span>
-            </div>
-          )}
+          <div
+            className={`text-foreground mt-1 transition-opacity ${hoveredNode ? "opacity-100" : "opacity-0"}`}
+          >
+            <strong>{hoveredNode?.title ?? "\u00A0"}</strong>
+            <br />
+            <span className="text-xs">
+              importance: {hoveredNode?.importance ?? 0} | quality:{" "}
+              {hoveredNode?.quality ?? 0}
+            </span>
+          </div>
         </div>
 
         {/* Type filters */}
