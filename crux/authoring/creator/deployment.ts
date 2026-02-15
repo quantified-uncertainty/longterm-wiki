@@ -226,6 +226,10 @@ If you find any logicalIssues or temporalArtifacts, also fix them directly in th
 
   const { spawn } = await import('child_process');
 
+  // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
+  const env = { ...process.env };
+  delete env.CLAUDECODE;
+
   return new Promise((resolve, reject) => {
     const claude = spawn('claude', [
       '-p',
@@ -236,6 +240,7 @@ If you find any logicalIssues or temporalArtifacts, also fix them directly in th
       '--allowedTools', 'Read,Write'
     ], {
       cwd: ROOT,
+      env,
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
