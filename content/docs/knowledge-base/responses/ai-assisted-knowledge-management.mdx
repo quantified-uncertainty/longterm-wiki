@@ -50,6 +50,7 @@ flowchart TD
         GOLDEN[Golden.com]
         PERPLEXITY[Perplexity Pages]
         NOTEBOOK[Google NotebookLM]
+        CODEWIKI[Google Code Wiki]
     end
 
     subgraph INFRA["Open Source Infrastructure"]
@@ -160,6 +161,25 @@ Perplexity Pages transforms AI research into structured, formatted articles that
 
 **Relevance:** Perplexity Pages represents a middle ground between fully automated encyclopedias (like <EntityLink id="E682">Grokipedia</EntityLink>) and fully human-written wikis—users direct the research, AI synthesizes, and users review before publishing. Citation transparency is a core feature.
 
+### Google Code Wiki
+
+Google Code Wiki (launched November 2025) uses Gemini to auto-generate and continuously maintain structured documentation for code repositories. Unlike static documentation that becomes outdated, Code Wiki regenerates after every commit, keeping architecture diagrams, module explanations, and cross-references synchronized with the codebase.
+
+| Feature | Details |
+|---------|---------|
+| **AI model** | Gemini |
+| **Inputs** | Public GitHub repositories (private repo support planned via Gemini CLI extension) |
+| **Outputs** | Structured wiki pages, architecture diagrams, class diagrams, sequence diagrams, interactive chat |
+| **Update mechanism** | Auto-regenerates after each commit |
+| **Deep code links** | Every wiki section links directly to relevant files, classes, and functions |
+| **Pricing** | Free public preview at codewiki.google |
+
+Code Wiki's interactive chat feature uses the repository's generated documentation as its knowledge base, allowing developers to ask natural-language questions about codebases and receive answers grounded in the current state of the code rather than general training data—a source-grounding approach similar to NotebookLM.
+
+**Limitations:** Code Wiki documents *what* code does and *how* it works but does not capture the *why* behind architectural decisions. Quality depends heavily on code readability, and support is currently limited to popular languages and frameworks. The tool works only with public repositories as of early 2026, though a Gemini CLI extension for private repos is on a waitlist.
+
+**Epistemic relevance:** Code Wiki demonstrates how AI can maintain living documentation at scale—a pattern applicable beyond codebases to any structured knowledge system. For open-source AI safety projects, auto-generated documentation could lower onboarding barriers and improve institutional knowledge preservation.
+
 ---
 
 ## Open Source RAG Frameworks
@@ -203,6 +223,7 @@ A notable development in open knowledge infrastructure: IBM and the Wikimedia Fo
 | **Golden.com** | Generates, humans verify | Aims for decentralized | Human review layer | Canonical entity data |
 | **NotebookLM** | Source-grounded analysis | Proprietary (free tier) | Constrained to sources | Research synthesis |
 | **Perplexity Pages** | Researches and drafts | Proprietary | Citation-first | Published articles |
+| **Google Code Wiki** | Auto-generates from code | Proprietary (free preview) | Source-grounded to repo | Code documentation |
 | **LlamaIndex/Haystack** | Custom RAG pipelines | Open source | Configurable | Custom knowledge systems |
 | **<EntityLink id="E384">Longterm Wiki</EntityLink>** | Pipeline-assisted authoring | Open source | Multi-step validation | AI safety knowledge |
 
