@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useMemo,
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import {
@@ -18,11 +19,7 @@ import {
 } from "d3-force";
 import { select } from "d3-selection";
 import { zoom, zoomIdentity, type D3ZoomEvent } from "d3-zoom";
-import type {
-  SimilarityNode,
-  SimilarityEdge,
-  SimilarityGraphData,
-} from "./get-similarity-data";
+import type { SimilarityGraphData } from "./get-similarity-data";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -69,6 +66,8 @@ export function SimilarityGraph({ data }: Props) {
   const transformRef = useRef(zoomIdentity);
   const hoveredRef = useRef<SimNode | null>(null);
   const dragNodeRef = useRef<SimNode | null>(null);
+  const wasDraggingRef = useRef(false);
+  const drawRef = useRef<() => void>(() => {});
 
   const [threshold, setThreshold] = useState(DEFAULT_THRESHOLD);
   const [hoveredNode, setHoveredNode] = useState<SimNode | null>(null);
@@ -77,16 +76,24 @@ export function SimilarityGraph({ data }: Props) {
   );
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
 
-  // Stats
-  const visibleNodes = nodesRef.current.filter((n) =>
-    selectedTypes.has(n.entityType)
+  // Stats: computed from props (always available, unlike refs which are
+  // empty on first render)
+  const nodeTypeMap = useMemo(
+    () => new Map(data.nodes.map((n) => [n.id, n.entityType])),
+    [data]
   );
-  const visibleEdges = linksRef.current.filter(
-    (l) =>
-      l.score >= threshold &&
-      selectedTypes.has((l.source as SimNode).entityType) &&
-      selectedTypes.has((l.target as SimNode).entityType)
+  const visibleNodeCount = useMemo(
+    () => data.nodes.filter((n) => selectedTypes.has(n.entityType)).length,
+    [data.nodes, selectedTypes]
   );
+  const visibleEdgeCount = useMemo(() => {
+    return data.edges.filter((e) => {
+      if (e.score < threshold) return false;
+      const sType = nodeTypeMap.get(e.source);
+      const tType = nodeTypeMap.get(e.target);
+      return sType && tType && selectedTypes.has(sType) && selectedTypes.has(tType);
+    }).length;
+  }, [data.edges, nodeTypeMap, threshold, selectedTypes]);
 
   // -----------------------------------------------------------------------
   // Resize observer
@@ -109,68 +116,39 @@ export function SimilarityGraph({ data }: Props) {
   }, []);
 
   // -----------------------------------------------------------------------
-  // Build simulation
+  // Hit-testing: find node under (clientX, clientY)
   // -----------------------------------------------------------------------
 
-  useEffect(() => {
-    const nodes: SimNode[] = data.nodes.map((n) => ({
-      ...n,
-      radius:
-        MIN_RADIUS +
-        ((n.importance ?? 50) / 100) * (MAX_RADIUS - MIN_RADIUS),
-    }));
+  const findNodeAt = useCallback(
+    (clientX: number, clientY: number): SimNode | null => {
+      const canvas = canvasRef.current;
+      if (!canvas) return null;
+      const rect = canvas.getBoundingClientRect();
+      const t = transformRef.current;
+      const x = (clientX - rect.left - t.x) / t.k;
+      const y = (clientY - rect.top - t.y) / t.k;
 
-    const nodeIndex = new Map(nodes.map((n) => [n.id, n]));
+      for (const n of nodesRef.current) {
+        if (!selectedTypes.has(n.entityType)) continue;
+        if (n.x == null || n.y == null) continue;
+        const dx = x - n.x;
+        const dy = y - n.y;
+        if (dx * dx + dy * dy < (n.radius + 4) * (n.radius + 4)) {
+          return n;
+        }
+      }
+      return null;
+    },
+    [selectedTypes]
+  );
 
-    const links: SimLink[] = data.edges
-      .filter((e) => nodeIndex.has(e.source) && nodeIndex.has(e.target))
-      .map((e) => ({
-        source: nodeIndex.get(e.source)!,
-        target: nodeIndex.get(e.target)!,
-        score: e.score,
-      }));
-
-    nodesRef.current = nodes;
-    linksRef.current = links;
-
-    const sim = forceSimulation<SimNode>(nodes)
-      .force(
-        "link",
-        forceLink<SimNode, SimLink>(links)
-          .id((d) => d.id)
-          .distance((d) => Math.max(30, 120 - d.score * 2))
-          .strength((d) => Math.min(0.3, d.score / 50))
-      )
-      .force("charge", forceManyBody().strength(-30).distanceMax(300))
-      .force(
-        "center",
-        forceCenter(dimensions.width / 2, dimensions.height / 2)
-      )
-      .force(
-        "collide",
-        forceCollide<SimNode>((d) => d.radius + 1).iterations(2)
-      )
-      .alphaDecay(0.02)
-      .on("tick", () => draw());
-
-    simRef.current = sim;
-
-    return () => {
-      sim.stop();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
-
-  // Update center force when dimensions change
-  useEffect(() => {
-    simRef.current
-      ?.force(
-        "center",
-        forceCenter(dimensions.width / 2, dimensions.height / 2)
-      )
-      .alpha(0.1)
-      .restart();
-  }, [dimensions]);
+  // Same hit-test but using a native DOM event (for the d3-zoom filter)
+  const findNodeAtNative = useCallback(
+    (event: PointerEvent | MouseEvent | WheelEvent): SimNode | null => {
+      return findNodeAt(event.clientX, event.clientY);
+    },
+    [findNodeAt]
+  );
 
   // -----------------------------------------------------------------------
   // Canvas draw
@@ -218,7 +196,10 @@ export function SimilarityGraph({ data }: Props) {
       const s = l.source as SimNode;
       const tgt = l.target as SimNode;
       if (l.score < threshold) continue;
-      if (!selectedTypes.has(s.entityType) || !selectedTypes.has(tgt.entityType))
+      if (
+        !selectedTypes.has(s.entityType) ||
+        !selectedTypes.has(tgt.entityType)
+      )
         continue;
       if (s.x == null || s.y == null || tgt.x == null || tgt.y == null)
         continue;
@@ -251,9 +232,7 @@ export function SimilarityGraph({ data }: Props) {
 
       ctx.beginPath();
       ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
-      ctx.fillStyle = dimmed
-        ? `rgba(180, 180, 180, ${alpha})`
-        : n.color;
+      ctx.fillStyle = dimmed ? `rgba(180, 180, 180, ${alpha})` : n.color;
       ctx.fill();
 
       if (n.id === hovered?.id) {
@@ -288,8 +267,10 @@ export function SimilarityGraph({ data }: Props) {
     }
 
     ctx.restore();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dimensions, threshold, selectedTypes]);
+
+  // Keep drawRef in sync so the simulation tick always calls the latest draw
+  drawRef.current = draw;
 
   // Redraw when filters change
   useEffect(() => {
@@ -297,7 +278,72 @@ export function SimilarityGraph({ data }: Props) {
   }, [draw]);
 
   // -----------------------------------------------------------------------
-  // Zoom
+  // Build simulation
+  // -----------------------------------------------------------------------
+
+  useEffect(() => {
+    const nodes: SimNode[] = data.nodes.map((n) => ({
+      ...n,
+      radius:
+        MIN_RADIUS +
+        ((n.importance ?? 50) / 100) * (MAX_RADIUS - MIN_RADIUS),
+    }));
+
+    const nodeIndex = new Map(nodes.map((n) => [n.id, n]));
+
+    const links: SimLink[] = data.edges
+      .filter((e) => nodeIndex.has(e.source) && nodeIndex.has(e.target))
+      .map((e) => ({
+        source: nodeIndex.get(e.source)!,
+        target: nodeIndex.get(e.target)!,
+        score: e.score,
+      }));
+
+    nodesRef.current = nodes;
+    linksRef.current = links;
+
+    const sim = forceSimulation<SimNode>(nodes)
+      .force(
+        "link",
+        forceLink<SimNode, SimLink>(links)
+          .id((d) => d.id)
+          .distance((d) => Math.max(30, 120 - d.score * 2))
+          .strength((d) => Math.min(0.3, d.score / 50))
+      )
+      .force("charge", forceManyBody().strength(-30).distanceMax(300))
+      .force(
+        "center",
+        forceCenter(dimensions.width / 2, dimensions.height / 2)
+      )
+      .force(
+        "collide",
+        forceCollide<SimNode>((d) => d.radius + 1).iterations(2)
+      )
+      .alphaDecay(0.02)
+      .on("tick", () => drawRef.current());
+
+    simRef.current = sim;
+
+    return () => {
+      sim.stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+
+  // Update center force when dimensions change
+  useEffect(() => {
+    simRef.current
+      ?.force(
+        "center",
+        forceCenter(dimensions.width / 2, dimensions.height / 2)
+      )
+      .alpha(0.1)
+      .restart();
+  }, [dimensions]);
+
+  // -----------------------------------------------------------------------
+  // Zoom — filter blocks zoom/pan when pointer is over a node so that
+  // node-drag and canvas-pan don't fight each other.
   // -----------------------------------------------------------------------
 
   useEffect(() => {
@@ -306,9 +352,23 @@ export function SimilarityGraph({ data }: Props) {
 
     const zoomBehavior = zoom<HTMLCanvasElement, unknown>()
       .scaleExtent([0.1, 8])
+      .filter((event: Event) => {
+        // Always allow wheel events (zoom in/out)
+        if (event.type === "wheel") return true;
+        // Block pan-drag when cursor is over a node
+        if (
+          event.type === "mousedown" ||
+          event.type === "pointerdown" ||
+          event.type === "touchstart"
+        ) {
+          const node = findNodeAtNative(event as PointerEvent);
+          if (node) return false;
+        }
+        return true;
+      })
       .on("zoom", (event: D3ZoomEvent<HTMLCanvasElement, unknown>) => {
         transformRef.current = event.transform;
-        draw();
+        drawRef.current();
       });
 
     select(canvas).call(zoomBehavior);
@@ -316,45 +376,23 @@ export function SimilarityGraph({ data }: Props) {
     return () => {
       select(canvas).on(".zoom", null);
     };
-  }, [draw]);
+  }, [findNodeAtNative]);
 
   // -----------------------------------------------------------------------
-  // Mouse interactions
+  // Mouse interactions (node hover, drag, click)
   // -----------------------------------------------------------------------
-
-  const findNodeAt = useCallback(
-    (clientX: number, clientY: number): SimNode | null => {
-      const canvas = canvasRef.current;
-      if (!canvas) return null;
-      const rect = canvas.getBoundingClientRect();
-      const t = transformRef.current;
-      const x = (clientX - rect.left - t.x) / t.k;
-      const y = (clientY - rect.top - t.y) / t.k;
-
-      for (const n of nodesRef.current) {
-        if (!selectedTypes.has(n.entityType)) continue;
-        if (n.x == null || n.y == null) continue;
-        const dx = x - n.x;
-        const dy = y - n.y;
-        if (dx * dx + dy * dy < (n.radius + 4) * (n.radius + 4)) {
-          return n;
-        }
-      }
-      return null;
-    },
-    [selectedTypes]
-  );
 
   const handleMouseMove = useCallback(
     (e: ReactMouseEvent<HTMLCanvasElement>) => {
       if (dragNodeRef.current) {
-        // Dragging
+        // Dragging a node — update its fixed position
         const canvas = canvasRef.current;
         if (!canvas) return;
         const rect = canvas.getBoundingClientRect();
         const t = transformRef.current;
         dragNodeRef.current.fx = (e.clientX - rect.left - t.x) / t.k;
         dragNodeRef.current.fy = (e.clientY - rect.top - t.y) / t.k;
+        wasDraggingRef.current = true;
         simRef.current?.alpha(0.3).restart();
         return;
       }
@@ -374,9 +412,8 @@ export function SimilarityGraph({ data }: Props) {
     (e: ReactMouseEvent<HTMLCanvasElement>) => {
       const node = findNodeAt(e.clientX, e.clientY);
       if (node) {
-        e.preventDefault();
-        e.stopPropagation();
         dragNodeRef.current = node;
+        wasDraggingRef.current = false;
         node.fx = node.x;
         node.fy = node.y;
         simRef.current?.alphaTarget(0.3).restart();
@@ -396,7 +433,11 @@ export function SimilarityGraph({ data }: Props) {
 
   const handleClick = useCallback(
     (e: ReactMouseEvent<HTMLCanvasElement>) => {
-      if (dragNodeRef.current) return;
+      // Skip navigation if the user was dragging a node
+      if (wasDraggingRef.current) {
+        wasDraggingRef.current = false;
+        return;
+      }
       const node = findNodeAt(e.clientX, e.clientY);
       if (node) {
         window.open(`/wiki/${node.id}`, "_blank");
@@ -456,10 +497,10 @@ export function SimilarityGraph({ data }: Props) {
         {/* Stats */}
         <div className="text-sm text-muted-foreground space-y-1">
           <div>
-            <strong>{visibleNodes.length}</strong> pages
+            <strong>{visibleNodeCount}</strong> pages
           </div>
           <div>
-            <strong>{visibleEdges.length}</strong> connections
+            <strong>{visibleEdgeCount}</strong> connections
           </div>
           {hoveredNode && (
             <div className="text-foreground mt-1">
