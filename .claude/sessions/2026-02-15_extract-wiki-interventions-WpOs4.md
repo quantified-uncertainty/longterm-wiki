@@ -1,13 +1,15 @@
-## 2026-02-15 | claude/extract-wiki-interventions-WpOs4 | Extract wiki interventions as structured data
+## 2026-02-15 | claude/extract-wiki-interventions-WpOs4 | Extract wiki proposals as structured data
 
-**What was done:** Created a semi-structured interventions data layer (similar to cruxes) by extending the Intervention schema, creating `data/interventions.yaml` with 14 interventions extracted from wiki pages, adding build pipeline integration, and creating `InterventionCard` and `InterventionList` React components for MDX rendering.
+**What was done:** Created two new data layers:
+1. **Interventions** (broad categories): Extended `Intervention` schema with risk coverage matrix, ITN prioritization, funding data. Created `data/interventions.yaml` with 14 broad intervention categories. `InterventionCard`/`InterventionList` components.
+2. **Proposals** (narrow, tactical): New `Proposal` data type for specific, speculative, actionable items extracted from wiki pages. Created `data/proposals.yaml` with 27 proposals across 6 domains (philanthropic, financial, governance, technical, biosecurity, field-building). Each has cost/EV estimates, honest concerns, feasibility, stance (collaborative/adversarial). `ProposalCard`/`ProposalList` components.
 
-**Pages:** intervention-portfolio
+**Pages:** anthropic-pledge-enforcement, ea-shareholder-diversification-anthropic, whistleblower-protections, hardware-enabled-governance, evals-governance, openai-foundation-governance, blueprint-biosecurity, securedna, ea-biosecurity-scope, worldview-intervention-mapping, intervention-portfolio
 
 **Issues encountered:**
 - None
 
 **Learnings/notes:**
-- The existing Intervention schema in `data/schema.ts` was minimal (6 fields). Extended it with risk coverage matrix, ITN prioritization, funding data, and cross-references (similar to Crux pattern).
-- Build pipeline automatically writes individual JSON files for each DATA_FILES entry, so adding `interventions.yaml` to DATA_FILES was sufficient.
-- The `build-data.mjs` script must be run from the `app/` directory (uses `process.cwd()` as PROJECT_ROOT, with `REPO_ROOT = join(cwd, '..')`).
+- "Proposal" name chosen to distinguish from existing "Intervention" ontology. Proposals are narrow tactical actions (e.g., "Help founders transfer equity to DAFs") vs. broad categories (e.g., "Compute Governance").
+- The E411 page (anthropic-pledge-enforcement) was the template: each proposal has name, description, cost estimate, EV estimate, honest concerns, stance, lead organizations.
+- Proposals span 6 domains: philanthropic (7), financial (4), governance (7), technical (1), biosecurity (5), field-building (3).

@@ -214,6 +214,57 @@ export const Intervention = z.object({
 export type Intervention = z.infer<typeof Intervention>;
 
 // =============================================================================
+// PROPOSALS (Narrow, speculative tactical actions extracted from wiki pages)
+// =============================================================================
+
+/**
+ * A Proposal is a specific, concrete, tactical action that someone could fund
+ * or execute — extracted from wiki page analysis. Unlike broad Interventions
+ * (e.g., "compute governance"), Proposals are narrow and actionable
+ * (e.g., "Help Anthropic founders transfer equity to DAFs before IPO").
+ *
+ * Modeled after Cruxes: canonical YAML reference → React component → MDX embedding.
+ */
+export const Proposal = z.object({
+  id: z.string(),                       // e.g., "daf-pre-commitment"
+  name: z.string(),                     // Short name, 3-10 words
+  description: z.string(),             // What specifically to do
+  // Source and classification
+  sourcePageId: z.string().optional(),  // Wiki page slug or entity ID where this was proposed
+  domain: z.enum([
+    'philanthropic',    // Donor/funder strategy
+    'biosecurity',      // Bio-related defense
+    'governance',       // Policy, regulation, oversight
+    'technical',        // Safety R&D, tooling
+    'field-building',   // Talent, institutions, community
+    'financial',        // Investment, diversification, markets
+  ]),
+  stance: z.enum([
+    'collaborative',    // Founders/labs would welcome this
+    'adversarial',      // Could provoke resistance or backfire
+    'neutral',          // Neither collaborative nor adversarial
+  ]).optional(),
+  // Cost-effectiveness (speculative)
+  costEstimate: z.string().optional(),  // e.g., "$300K-1M"
+  evEstimate: z.string().optional(),    // e.g., "$50-250M" or qualitative
+  // Assessment
+  feasibility: z.enum(['low', 'medium', 'high']).optional(),
+  honestConcerns: z.string().optional(), // Why it might not work or backfire
+  status: z.enum([
+    'idea',            // Proposed on wiki page, not yet acted on
+    'proposed',        // Formally proposed to decision-makers
+    'in-progress',     // Someone is working on it
+    'implemented',     // Done
+    'abandoned',       // Tried and stopped
+  ]).optional(),
+  // Who
+  leadOrganizations: z.array(z.string()).optional(), // Who could execute this
+  // Cross-references
+  relatedProposals: z.array(z.string()).optional(),  // Proposal ID references
+});
+export type Proposal = z.infer<typeof Proposal>;
+
+// =============================================================================
 // GLOSSARY
 // =============================================================================
 
@@ -810,6 +861,7 @@ export const Database = z.object({
   entities: z.array(Entity),
   resources: z.array(Resource),
   publications: z.array(Publication),
+  proposals: z.array(Proposal),
 });
 export type Database = z.infer<typeof Database>;
 

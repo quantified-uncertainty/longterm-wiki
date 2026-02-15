@@ -33,6 +33,7 @@ const DATA_FILES = [
   { key: 'estimates', file: 'estimates.yaml' },
   { key: 'cruxes', file: 'cruxes.yaml' },
   { key: 'interventions', file: 'interventions.yaml' },
+  { key: 'proposals', file: 'proposals.yaml' },
   { key: 'glossary', file: 'glossary.yaml' },
   { key: 'entities', dir: 'entities' }, // Split by entity type
   { key: 'literature', file: 'literature.yaml' },
