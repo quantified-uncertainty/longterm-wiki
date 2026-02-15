@@ -19,6 +19,7 @@ pnpm-debug.log*
 .DS_Store
 
 # Next.js
+.next/
 app/.next/
 app/out/
 app/next-env.d.ts
