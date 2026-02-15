@@ -31,7 +31,7 @@ import {DataInfoBox, Mermaid, R, DataExternalLinks, EntityLink} from '@component
 | Defense Readiness | **Inadequate** | Only 34.7% of organizations have deployed prompt injection defenses ([VentureBeat](https://venturebeat.com/security/openai-admits-that-prompt-injection-is-here-to-stay)) |
 | Improvement Rate | **Exponential** | 18x improvement on SWE-bench since 2023; OSWorld 5x in 12 months |
 | Industry Adoption | **Accelerating** | [MCP](https://en.wikipedia.org/wiki/Model_Context_Protocol): 97M+ monthly SDK downloads; 28% of Fortune 500 implemented |
-| Fundamental Fix | **Unlikely** | <EntityLink id="E218">OpenAI</EntityLink> admits prompt injection "may never be fully solved" |
+| Fundamental Fix | **Unlikely** | <EntityLink id="openai">OpenAI</EntityLink> admits prompt injection "may never be fully solved" |
 
 ## Key Links
 
@@ -61,7 +61,7 @@ The trajectory toward more capable tool-using agents appears inevitable, with ma
 
 Modern tool use systems typically employ a structured approach where AI models receive descriptions of available tools, generate properly formatted function calls, execute these calls in controlled environments, and process the results to continue task completion. This architecture has been implemented with varying degrees of sophistication across major AI systems. OpenAI's function calling, introduced in June 2023, established early patterns for structured API invocation with JSON schema validation and support for parallel tool execution. Google's Gemini Extensions focused on deep integration with Google's ecosystem, enabling cross-service workflows between Gmail, Calendar, and Drive.
 
-<EntityLink id="E22">Anthropic</EntityLink>'s Computer Use capability, launched in public beta in October 2024, represents a significant advancement by enabling direct desktop interaction. The system can take screenshots, interpret visual interfaces, move the mouse cursor, and provide keyboard input to control any application a human could operate. This universal interface approach eliminates the need for custom API integrations, though it currently operates more slowly than human users and struggles with complex visual interfaces or applications requiring rapid real-time interaction.
+<EntityLink id="anthropic">Anthropic</EntityLink>'s Computer Use capability, launched in public beta in October 2024, represents a significant advancement by enabling direct desktop interaction. The system can take screenshots, interpret visual interfaces, move the mouse cursor, and provide keyboard input to control any application a human could operate. This universal interface approach eliminates the need for custom API integrations, though it currently operates more slowly than human users and struggles with complex visual interfaces or applications requiring rapid real-time interaction.
 
 The underlying technical implementation relies heavily on vision-language models that can interpret screenshots and translate high-level instructions into specific UI interactions. Training these systems involves a combination of supervised fine-tuning on human demonstrations, reinforcement learning from successful task completion, and synthetic data generation. The challenge lies in teaching models both the mechanical aspects of tool operation (correct function call formatting, proper argument passing) and the strategic aspects (when to use which tools, how to recover from errors, how to chain tools effectively).
 

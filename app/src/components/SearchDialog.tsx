@@ -109,6 +109,8 @@ export function SearchDialog() {
         const r = await searchWiki(query, UNFILTERED_LIMIT);
         setAllResults(r);
         setSelected(0);
+      } catch {
+        setAllResults([]);
       } finally {
         setLoading(false);
       }
@@ -292,7 +294,7 @@ export function SearchDialog() {
             allResults.length > 0 &&
             results.length === 0 && (
               <div className="px-4 py-6 text-sm text-muted-foreground text-center">
-                No {group.label.toLowerCase()} matching &ldquo;{query}&rdquo;
+                No {group?.label.toLowerCase()} matching &ldquo;{query}&rdquo;
               </div>
             )}
 

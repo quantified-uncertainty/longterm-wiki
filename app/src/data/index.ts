@@ -959,7 +959,7 @@ export function getExploreItems(): ExploreItem[] {
       id: entity.id,
       numericId: entity.numericId || db.idRegistry?.bySlug[entity.id] || entity.id,
       title: entity.title,
-      type: entity.entityType,
+      type: page?.contentFormat === "table" ? "table" : page?.contentFormat === "diagram" ? "diagram" : entity.entityType,
       description: page?.llmSummary || page?.description || entity.description || null,
       tags: entity.tags || [],
       clusters: entity.clusters?.length ? entity.clusters : (page?.clusters || []),

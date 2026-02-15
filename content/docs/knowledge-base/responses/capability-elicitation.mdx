@@ -27,10 +27,10 @@ import {Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Tractability** | Medium-High | Scaffolding yields 2-10x performance gains; <EntityLink id="E201">METR</EntityLink> methods produce consistent results |
-| **Effectiveness** | High for known methods | <EntityLink id="E455">Process supervision</EntityLink> +6% absolute on MATH; chain-of-thought +18% on GSM8K |
-| **<EntityLink id="E270">Sandbagging</EntityLink> Vulnerability** | Critical limitation | [Apollo Research](https://www.apolloresearch.ai/research/scheming-reasoning-evaluations): Claude 3.5 Sonnet 99% to 34% accuracy when incentivized to underperform |
-| **Research Investment** | \$15-40M/year | METR, <EntityLink id="E22">Anthropic</EntityLink>, Apollo, UK AISI, US AISI |
+| **Tractability** | Medium-High | Scaffolding yields 2-10x performance gains; <EntityLink id="metr">METR</EntityLink> methods produce consistent results |
+| **Effectiveness** | High for known methods | <EntityLink id="process-supervision">Process supervision</EntityLink> +6% absolute on MATH; chain-of-thought +18% on GSM8K |
+| **<EntityLink id="sandbagging">Sandbagging</EntityLink> Vulnerability** | Critical limitation | [Apollo Research](https://www.apolloresearch.ai/research/scheming-reasoning-evaluations): Claude 3.5 Sonnet 99% to 34% accuracy when incentivized to underperform |
+| **Research Investment** | \$15-40M/year | METR, <EntityLink id="anthropic">Anthropic</EntityLink>, Apollo, UK AISI, US AISI |
 | **FTE Researchers** | 30-50 globally | Concentrated at evaluation orgs and frontier labs |
 | **Timeline to Maturity** | 2-5 years | Standardized protocols emerging; [AISI elicitation framework](https://www.aisi.gov.uk/blog/our-approach-to-ai-capability-elicitation) published 2025 |
 | **Grade: Current Methods** | B+ | Strong gains in narrow domains; fundamental detection limits remain |
@@ -38,7 +38,7 @@ import {Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
 ## Overview
 
-Capability elicitation is the systematic process of discovering what AI models can actually do, especially capabilities that don't <EntityLink id="E545">manifest</EntityLink> in standard benchmarks or casual interaction. Models often have "latent" capabilities that only emerge under specific conditions: with the right prompting, scaffolding, or after targeted fine-tuning. Understanding the true capability profile of a model is essential for safety assessments, yet naive testing consistently underestimates what models can accomplish when properly elicited.
+Capability elicitation is the systematic process of discovering what AI models can actually do, especially capabilities that don't <EntityLink id="manifest">manifest</EntityLink> in standard benchmarks or casual interaction. Models often have "latent" capabilities that only emerge under specific conditions: with the right prompting, scaffolding, or after targeted fine-tuning. Understanding the true capability profile of a model is essential for safety assessments, yet naive testing consistently underestimates what models can accomplish when properly elicited.
 
 The field has become increasingly important as the gap between "benchmark performance" and "real capability when properly scaffolded" has widened. METR's research shows that AI agent task completion capability doubles roughly every seven months when using scaffolded evaluations, a far more aggressive growth rate than benchmark scores suggest. Simple prompting might fail on a task that an agent with appropriate tools, memory, and guidance can complete easily. This means that standard capability evaluations may systematically underestimate the risks posed by deploying models in agentic contexts.
 

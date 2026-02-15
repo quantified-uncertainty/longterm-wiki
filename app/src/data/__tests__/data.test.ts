@@ -74,6 +74,18 @@ const mockDatabase = {
       customFields: [],
       relatedTopics: [],
     },
+    {
+      id: "table-entity",
+      entityType: "approach",
+      title: "Table With Entity",
+      description: "A table page that also has an entity definition",
+      tags: [],
+      clusters: [],
+      relatedEntries: [],
+      sources: [],
+      customFields: [],
+      relatedTopics: [],
+    },
   ],
   resources: [
     {
@@ -131,10 +143,12 @@ const mockDatabase = {
   pathRegistry: {
     "test-entity": "/knowledge-base/risks/test-entity",
     "other-entity": "/knowledge-base/concepts/other-entity",
+    "table-entity": "/knowledge-base/responses/table-entity",
+    "orphan-table": "/knowledge-base/risks/orphan-table",
   },
   idRegistry: {
-    byNumericId: { E1: "test-entity", E2: "other-entity", E3: "researcher-1" },
-    bySlug: { "test-entity": "E1", "other-entity": "E2", "researcher-1": "E3" },
+    byNumericId: { E1: "test-entity", E2: "other-entity", E3: "researcher-1", E4: "table-entity", E5: "orphan-table" },
+    bySlug: { "test-entity": "E1", "other-entity": "E2", "researcher-1": "E3", "table-entity": "E4", "orphan-table": "E5" },
   },
   pages: [
     {
@@ -154,6 +168,30 @@ const mockDatabase = {
       ratings: { novelty: 3, rigor: 4 },
       category: "risks",
       wordCount: 2500,
+    },
+    {
+      id: "table-entity",
+      path: "/knowledge-base/responses/table-entity",
+      filePath: "responses/table-entity.mdx",
+      title: "Table With Entity",
+      quality: 20,
+      importance: 30,
+      contentFormat: "table",
+      lastUpdated: "2025-02-01",
+      category: "responses",
+      wordCount: 0,
+    },
+    {
+      id: "orphan-table",
+      path: "/knowledge-base/risks/orphan-table",
+      filePath: "risks/orphan-table.mdx",
+      title: "Orphan Table",
+      quality: 20,
+      importance: 30,
+      contentFormat: "table",
+      lastUpdated: "2025-02-01",
+      category: "risks",
+      wordCount: 0,
     },
   ],
   facts: {
@@ -345,6 +383,33 @@ describe("Data Layer", () => {
       const conceptItem = items.find((i) => i.id === "other-entity");
       // other-entity has no page in the mock → should not appear in explore
       expect(conceptItem).toBeUndefined();
+    });
+
+    it("uses contentFormat as type when page is a table (even with entity)", async () => {
+      const { getExploreItems } = await import("../../data/index");
+      const items = getExploreItems();
+      // table-entity has entityType "approach" but contentFormat "table" → type must be "table"
+      const tableWithEntity = items.find((i) => i.id === "table-entity");
+      expect(tableWithEntity).toBeDefined();
+      expect(tableWithEntity?.type).toBe("table");
+      expect(tableWithEntity?.contentFormat).toBe("table");
+    });
+
+    it("uses contentFormat as type for table pages without entities", async () => {
+      const { getExploreItems } = await import("../../data/index");
+      const items = getExploreItems();
+      // orphan-table has no entity, contentFormat "table" → type must be "table"
+      const orphanTable = items.find((i) => i.id === "orphan-table");
+      expect(orphanTable).toBeDefined();
+      expect(orphanTable?.type).toBe("table");
+    });
+
+    it("all table-format pages appear under type 'table'", async () => {
+      const { getExploreItems } = await import("../../data/index");
+      const items = getExploreItems();
+      const tableItems = items.filter((i) => i.type === "table");
+      // Both table pages (with and without entity) must show as type "table"
+      expect(tableItems).toHaveLength(2);
     });
   });
 

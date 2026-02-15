@@ -30,13 +30,13 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 | Scalability | High | Specifically designed for superhuman AI oversight |
 | Current Maturity | Low-Medium | Promising results in constrained settings; no production deployment |
 | Time Horizon | 3-7 years | Requires further research before practical application |
-| Key Proponents | <EntityLink id="E22">Anthropic</EntityLink>, DeepMind, <EntityLink id="E218">OpenAI</EntityLink> | Active research programs with empirical results |
+| Key Proponents | <EntityLink id="anthropic">Anthropic</EntityLink>, DeepMind, <EntityLink id="openai">OpenAI</EntityLink> | Active research programs with empirical results |
 
 ## Overview
 
 AI Safety via Debate is an alignment approach where two AI systems argue opposing positions on a question while a human judge determines which argument is more convincing. The core theoretical insight is that if truth has an asymmetric advantage - honest arguments should ultimately be more defensible than deceptive ones - then humans can accurately evaluate superhuman AI outputs without needing to understand them directly. Instead of evaluating the answer, humans evaluate the quality of competing arguments about the answer.
 
-Proposed by [Geoffrey Irving and colleagues at OpenAI in 2018](https://arxiv.org/abs/1805.00899), debate represents one of the few alignment approaches specifically designed to scale to superintelligent systems. Unlike <EntityLink id="E259">RLHF</EntityLink>, which fundamentally breaks when humans cannot evaluate outputs, debate aims to leverage AI capabilities against themselves. The hope is that a deceptive AI could be exposed by an honest AI opponent, making deception much harder to sustain.
+Proposed by [Geoffrey Irving and colleagues at OpenAI in 2018](https://arxiv.org/abs/1805.00899), debate represents one of the few alignment approaches specifically designed to scale to superintelligent systems. Unlike <EntityLink id="rlhf">RLHF</EntityLink>, which fundamentally breaks when humans cannot evaluate outputs, debate aims to leverage AI capabilities against themselves. The hope is that a deceptive AI could be exposed by an honest AI opponent, making deception much harder to sustain.
 
 However, recent empirical work has begun validating the approach. A [2024 study by Khan et al.](https://arxiv.org/abs/2402.06782) found that debate helps both non-expert models and humans answer questions, achieving 76% and 88% accuracy respectively (compared to 48% and 60% naive baselines). [DeepMind research presented at NeurIPS 2024](https://arxiv.org/abs/2407.04622) demonstrated that debate outperforms consultancy across multiple tasks when weak LLM judges evaluate strong LLMs. Key open questions remain: whether truth maintains its advantage at superhuman capability levels, whether sophisticated debaters could collude or mislead judges, and whether the approach generalizes across all domains.
 
@@ -122,10 +122,10 @@ For debate to work as intended, several assumptions must hold:
 
 | Risk | Relevance | How Debate Helps |
 |------|-----------|------------------|
-| <EntityLink id="E93">Deceptive Alignment</EntityLink> | High | Honest AI opponent can expose deceptive reasoning; adversarial pressure makes hidden agendas harder to sustain |
-| <EntityLink id="E253">Reward Hacking</EntityLink> | Medium | Debate can surface cases where system exploits reward specification rather than achieving intended goal |
-| <EntityLink id="E274">Scheming</EntityLink> | High | Competing AI has incentive to expose strategic manipulation by opponent |
-| <EntityLink id="E295">Sycophancy</EntityLink> | Medium | Zero-sum structure discourages telling humans what they want to hear; opponent penalized for agreement |
+| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | High | Honest AI opponent can expose deceptive reasoning; adversarial pressure makes hidden agendas harder to sustain |
+| <EntityLink id="reward-hacking">Reward Hacking</EntityLink> | Medium | Debate can surface cases where system exploits reward specification rather than achieving intended goal |
+| <EntityLink id="scheming">Scheming</EntityLink> | High | Competing AI has incentive to expose strategic manipulation by opponent |
+| <EntityLink id="sycophancy">Sycophancy</EntityLink> | Medium | Zero-sum structure discourages telling humans what they want to hear; opponent penalized for agreement |
 | <EntityLink id="oversight-difficulty">Oversight Difficulty</EntityLink> | High | Core design goal: enables human oversight of superhuman outputs without direct evaluation |
 
 ## Scalability Analysis
@@ -188,8 +188,8 @@ Unlike RLHF, debate is specifically designed for superhuman AI:
 
 ### Complementary Techniques
 
-- **<EntityLink id="E477">Mechanistic Interpretability</EntityLink>**: Could verify debate outcomes internally
-- **<EntityLink id="E455">Process Supervision</EntityLink>**: Debate could use step-by-step reasoning transparency
+- **<EntityLink id="mech-interp">Mechanistic Interpretability</EntityLink>**: Could verify debate outcomes internally
+- **<EntityLink id="process-supervision">Process Supervision</EntityLink>**: Debate could use step-by-step reasoning transparency
 - **Market-based approaches**: Prediction markets share the adversarial information aggregation insight
 
 ### Key Distinctions
@@ -244,7 +244,7 @@ AI Safety via Debate relates to the <EntityLink id="ai-transition-model" /> thro
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Debate could provide robust alignment if assumptions hold |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Debate could provide robust alignment if assumptions hold |
 | <EntityLink id="ai-capability-level" /> | Scalable oversight | Designed to maintain oversight as capabilities increase |
 
 Debate's importance grows with AI capability - it's specifically designed for the regime where other approaches break down.

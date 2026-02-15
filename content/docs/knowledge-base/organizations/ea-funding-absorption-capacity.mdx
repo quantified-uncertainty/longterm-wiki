@@ -1,0 +1,247 @@
+---
+numericId: E695
+title: EA Funding Absorption Capacity
+description: "Analysis of how much capital the effective altruism ecosystem can productively deploy per year. Current absorption capacity is estimated at \\$500M-2B/year for AI safety, far below the \\$27-76B in expected Anthropic-linked capital. Key constraints are talent, management capacity, and strategic clarity rather than fundable proposals."
+quality: 3
+lastEdited: "2026-02-15"
+importance: 70
+update_frequency: 60
+llmSummary: "The EA ecosystem's ability to absorb large capital inflows is limited by talent pipelines, management capacity, and the challenge of maintaining quality at scale. Current AI safety funding is \\$120-150M/year, but even a 5-10x increase would strain existing infrastructure. This page estimates productive absorption capacity at \\$500M-2B/year today, identifies binding constraints, and analyzes how the ecosystem should prepare for the expected Anthropic liquidity event (\\$27-76B risk-adjusted). Historical precedents from the FTX era and Open Philanthropy's scaling challenges inform the analysis."
+ratings:
+  novelty: 7
+  rigor: 5
+  actionability: 8
+  completeness: 5
+clusters:
+  - community
+  - ai-safety
+  - governance
+todos:
+  - Track actual spending growth rates across major AI safety orgs
+  - Update with post-IPO deployment data when Anthropic IPO occurs
+  - Monitor new org formation rate and talent pipeline capacity
+subcategory: funders
+entityType: concept
+---
+import {EntityLink, SquiggleEstimate} from '@components/wiki';
+
+:::note[Page Scope]
+This page analyzes how much capital the EA ecosystem can productively absorb per year, focused on AI safety. For the capital supply side, see <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink> and <EntityLink id="ea-shareholder-diversification-anthropic">EA Shareholder Diversification from Anthropic</EntityLink>. For current funding levels, see <EntityLink id="funders-overview">Longtermist Funders</EntityLink>.
+
+**Data as of**: February 2026. Total AI safety funding: \≈\$120-150M/year. Expected Anthropic-linked capital: \$27-76B risk-adjusted.
+:::
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Current AI safety funding** | \$120-150M/year across all funders |
+| **Estimated absorption capacity (AI safety)** | \$500M-2B/year at current infrastructure |
+| **Expected capital supply** | \$27-76B from Anthropic liquidity event over 5-15 years |
+| **Annual deployment rate needed** | \$2-8B/year to deploy within reasonable timeline |
+| **Primary constraint** | Talent and management capacity, not fundable proposals |
+| **Time to scale capacity** | 3-5 years to build infrastructure for \$2B+/year deployment |
+| **Risk of rapid scaling** | Quality dilution, value drift, coordination failures |
+
+## Overview
+
+The effective altruism ecosystem faces an unprecedented challenge: the expected Anthropic liquidity event could deliver \$27-76B in risk-adjusted capital over 5-15 years, but the ecosystem currently deploys only \$120-150M/year on AI safety. Bridging this 20-50x gap requires not just more money but a fundamental scaling of organizational infrastructure, talent pipelines, and strategic capacity.
+
+"Absorption capacity" refers to the maximum rate at which an ecosystem can productively deploy additional capital—meaning each marginal dollar generates meaningful impact rather than being wasted on low-quality projects, inflated salaries, or organizational dysfunction. This is distinct from the total amount of money that *could be spent*; any amount of money can be spent, but spending productively is the binding constraint.
+
+The distinction matters because premature capital deployment can be actively harmful. The FTX era (2021-2022) demonstrated that rapid funding increases can create perverse incentives, attract grifters, and fund low-quality projects that damage the movement's reputation and effectiveness. A thoughtful analysis of absorption capacity is essential for planning how to deploy Anthropic-linked capital responsibly.
+
+## Current State of AI Safety Funding
+
+### Funding Sources
+
+Per the <EntityLink id="funders-overview">Longtermist Funders</EntityLink> overview, total AI safety funding is approximately \$120-150M/year:
+
+| Funder | Annual AI Safety | Share |
+|--------|-----------------|-------|
+| <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (Moskovitz) | \$65M | \≈55% |
+| <EntityLink id="sff">Survival and Flourishing Fund</EntityLink> | \$30M | \≈25% |
+| <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink> (direct) | \$10M | \≈8% |
+| <EntityLink id="vitalik-buterin-philanthropy">Vitalik Buterin</EntityLink> | \$5-15M | \≈5-10% |
+| <EntityLink id="ltff">Long-Term Future Fund</EntityLink> | \$5-10M | \≈5% |
+| Other sources | \$5-10M | \≈5% |
+| **Total** | **\$120-150M** | **100%** |
+
+### Where the Money Goes
+
+Major recipient categories include:
+
+- **Technical AI safety research** (alignment, interpretability, evaluations): \≈\$40-60M/year across <EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="redwood-research">Redwood Research</EntityLink>, <EntityLink id="metr">METR</EntityLink>, university labs, and independent researchers
+- **AI governance and policy**: \≈\$20-30M/year across think tanks, policy organizations, and government-adjacent groups
+- **Field-building and talent pipeline**: \≈\$15-25M/year through <EntityLink id="80000-hours">80,000 Hours</EntityLink>, university programs, and fellowships
+- **Regranting and infrastructure**: \≈\$10-20M/year through <EntityLink id="ltff">LTFF</EntityLink>, <EntityLink id="manifund">Manifund</EntityLink>, and fiscal sponsors
+- **Other** (biosecurity, nuclear risk, community building): \≈\$20-30M/year
+
+## Estimating Absorption Capacity
+
+### Framework
+
+Absorption capacity depends on several interacting factors:
+
+1. **Talent availability**: How many qualified people exist to do the work?
+2. **Management capacity**: Can organizations hire, onboard, and effectively manage new staff?
+3. **Strategic clarity**: Do funders know what interventions to fund at scale?
+4. **Organizational infrastructure**: Do grantmaking, legal, and administrative systems exist to handle 10-50x more capital?
+5. **Diminishing returns**: At what point does marginal spending become unproductive?
+
+### Estimate by Category
+
+<SquiggleEstimate title="AI Safety Annual Absorption Capacity" code={`
+// Technical research capacity
+techResearchCapacity = 150e6 to 500e6  // Limited by alignment researchers
+
+// Governance and policy capacity
+govCapacity = 100e6 to 400e6  // Growing fast, but talent-limited
+
+// Field building capacity
+fieldBuildingCapacity = 50e6 to 200e6  // Scholarships, programs, etc.
+
+// Infrastructure and regranting
+infraCapacity = 50e6 to 200e6
+
+// New org creation capacity
+newOrgCapacity = 100e6 to 500e6  // Speculative
+
+totalCapacity = techResearchCapacity + govCapacity + fieldBuildingCapacity + infraCapacity + newOrgCapacity
+totalCapacity
+`} />
+
+| Category | Current Spend | Estimated Capacity | Scaling Factor | Key Constraint |
+|----------|--------------|-------------------|----------------|----------------|
+| Technical AI safety research | \$40-60M | \$150-500M | 3-8x | Alignment researchers (maybe 200-500 worldwide) |
+| AI governance and policy | \$20-30M | \$100-400M | 4-13x | Policy expertise + government relationships |
+| Field-building | \$15-25M | \$50-200M | 2-8x | University partnerships, program quality |
+| Regranting infrastructure | \$10-20M | \$50-200M | 3-10x | Evaluator capacity, due diligence |
+| New org creation | \$5-10M | \$100-500M | 10-50x | Founders, but highest variance |
+| **Total** | **\$120-150M** | **\$500M-2B** | **3-13x** | |
+
+### Why Not Higher?
+
+Several factors cap absorption capacity well below the expected capital supply:
+
+**Talent is the binding constraint.** There are perhaps 200-500 people worldwide with the technical skills and alignment knowledge to do frontier AI safety research. Even with generous salaries, you cannot create experienced alignment researchers faster than the training pipeline allows (3-5 years from PhD to productive researcher). Throwing money at hiring creates bidding wars that inflate salaries without increasing output. [EA Forum](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors)
+
+**Management capacity scales slowly.** Even if you could hire researchers instantly, organizations need managers, administrative infrastructure, and institutional knowledge to be productive. Most AI safety organizations have fewer than 50 employees. Growing to 200+ requires a fundamentally different organizational structure, and the transitions are often painful and slow. <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> took years to scale its grantmaking capacity from \$50M/year to \$300M+/year, even with ample funding.
+
+**Strategic clarity is limited.** At \$120-150M/year, funders can fund most proposals that clear a reasonable quality bar. At \$2B/year, they would need 13x more high-quality proposals. It's unclear where \$2B/year in AI safety spending should go—the field hasn't developed enough strategic clarity to allocate that much capital confidently. Funding everything remotely connected to "AI safety" risks diluting focus and creating a cottage industry of low-impact projects.
+
+**Absorptive capacity itself is endogenous.** A key subtlety: spending on field-building and infrastructure *increases future absorption capacity*. Training more researchers, building better grantmaking systems, and creating new organizations all expand the ecosystem's ability to deploy capital productively. This means that early investments in capacity-building have high returns, but there's a 3-5 year lag before the increased capacity materializes.
+
+## Historical Precedents
+
+### The FTX Funding Surge (2021-2022)
+
+The FTX era provides the clearest natural experiment in rapid EA funding increases:
+
+- FTX Foundation/Future Fund committed \≈\$160M in grants before the collapse in November 2022
+- Many grants were announced with minimal due diligence on compressed timelines
+- The rapid funding surge attracted applicants and projects that may not have existed otherwise
+- After the collapse, \≈\$160M in committed grants were never disbursed, causing severe disruption to organizations that had already hired staff and committed to projects [CEA report](https://www.centreforeffectivealtruism.org/blog/changes-to-cea)
+
+**Lessons:** Rapid capital deployment created both real value (some good projects were funded) and real waste (poor vetting, coordination failures). The sudden withdrawal caused more damage than if the money had never been promised.
+
+### Open Philanthropy's Scaling Experience
+
+<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> has been the EA ecosystem's primary experiment in scaling grantmaking:
+
+- Grew from \≈\$50M/year (2016) to \$300M+/year (2023)
+- Even with dedicated staff, found it difficult to maintain grant quality at higher volumes
+- Repeatedly noted that finding excellent grant opportunities is harder than finding good ones
+- Eventually spun out <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (2024) as part of organizational evolution
+
+**Lesson:** Even patient, well-resourced grantmakers take years to scale effectively. The 6x growth over 7 years suggests a sustainable scaling rate of roughly 30-40% per year—not the 10-50x required by the Anthropic capital scenario.
+
+### Government Research Funding Analogies
+
+Government research agencies offer a parallel:
+
+- The NIH budget doubled from \$14B to \$28B between 1999-2003. Subsequent analysis found the rapid increase led to persistent problems: inflated costs, "soft money" positions that couldn't be sustained, and a generation of researchers stuck in long postdocs because expansion slowed. [Science](https://www.science.org/content/article/data-check-us-government-share-basic-research-funding-falls-below-50)
+- DARPA maintains quality partly by keeping programs small (\$10-50M each) and time-limited (3-5 years), with aggressive program rotation.
+
+**Lesson:** Even massive institutions with decades of experience struggle to absorb rapid funding increases without quality loss.
+
+## Scaling Pathways
+
+### How to Increase Capacity from \$500M to \$5B+/Year
+
+| Timeline | Target Capacity | Key Investments |
+|----------|----------------|-----------------|
+| **Years 1-2** | \$500M-1B | Expand existing orgs 2-3x; fund 20-50 new small projects; build regranting infrastructure |
+| **Years 3-5** | \$1-3B | New AI safety orgs at scale (50-200 employees each); university center-building; government partnerships |
+| **Years 5-10** | \$3-8B | Field professionalization; large-scale policy implementation; international expansion |
+
+### Priority Capacity Investments
+
+1. **Talent pipeline**: Fund 500+ PhD positions in AI safety, interpretability, and governance. Cost: \$200-500M over 5 years. Payoff: triples the qualified researcher pool. [EA Forum](https://forum.effectivealtruism.org/posts/H8SqwbLxKkiJur3c4/preparing-for-a-flush-future-work-giving-and-conduct)
+
+2. **Regranting infrastructure**: Scale <EntityLink id="ltff">LTFF</EntityLink>, <EntityLink id="manifund">Manifund</EntityLink>, and SFF 5-10x. Create new regranting bodies for specific cause areas. Cost: \$50-100M/year. Payoff: distributes evaluation capacity.
+
+3. **Organizational incubation**: Fund 50-100 new AI safety organizations over 5 years, with dedicated incubator support. Cost: \$500M-1B. Payoff: diversifies approaches and creates management capacity.
+
+4. **Government co-funding**: Leverage EA capital to attract 2-5x matching government funding for AI safety. The UK AISI and NIST AISI precedents suggest governments will fund AI safety if catalytic capital demonstrates viability. Payoff: multiplies effective capital deployment.
+
+5. **International expansion**: Build AI safety research capacity in EU, Japan, India, Singapore. Currently almost all capacity is US/UK. Cost: \$200-500M over 5 years. Payoff: geographic diversification and access to broader talent pools.
+
+## The Deployment Gap
+
+### Mismatch Between Supply and Capacity
+
+| Metric | Value |
+|--------|-------|
+| Expected capital supply (Anthropic, risk-adjusted) | \$27-76B over 5-15 years |
+| Implied annual deployment rate | \$2-8B/year |
+| Current annual absorption capacity | \$500M-2B/year |
+| **Gap** | **\$0-7.5B/year** |
+
+This gap implies several possible outcomes:
+
+1. **Slow deployment**: Capital sits in DAFs and investment vehicles for years, earning returns but not advancing AI safety. Risk: value drift, missed critical windows.
+
+2. **Forced rapid deployment**: Capital is pushed out faster than the ecosystem can absorb. Risk: low-quality grants, perverse incentives, ecosystem damage (the FTX pattern).
+
+3. **Capacity-first strategy**: Early capital is disproportionately invested in expanding absorption capacity. This is the recommended approach but requires patience and strategic discipline.
+
+4. **Diversification beyond EA**: Capital flows to non-EA AI safety efforts (government, corporate, international). This may be productive but loses EA's distinctive strategic focus.
+
+### Recommendations
+
+**For major holders (Moskovitz, Tallinn, founders):**
+- Begin deploying capital into capacity-building *now*, before the IPO liquidity event
+- Target 30-50% annual growth in the ecosystem, not 5-10x jumps
+- Fund talent pipelines and organizational infrastructure, not just projects
+
+**For grantmakers (<EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, <EntityLink id="sff">SFF</EntityLink>, <EntityLink id="ltff">LTFF</EntityLink>):**
+- Invest in evaluation capacity and due diligence infrastructure
+- Develop clear strategic frameworks for allocating \$1B+/year
+- Build relationships with government funders for co-investment
+
+**For the EA community:**
+- Take the deployment challenge as seriously as the earning challenge
+- Develop domain expertise that enables quality evaluation at scale
+- Prepare organizational and governance structures for 10-50x growth
+
+## Key Uncertainties
+
+| Uncertainty | Range | Impact |
+|-------------|-------|--------|
+| True talent pool size for AI safety | 200-2,000 | Determines technical research capacity ceiling |
+| Sustainable org growth rate | 20-50%/year | Limits speed of capacity expansion |
+| Government funding leverage ratio | 0-5x | Could multiply effective capacity dramatically |
+| Quality threshold for "productive" spending | Subjective | Determines whether deployment is 500M or 5B |
+| Anthropic capital timing | 3-15 years | Determines urgency of capacity building |
+| International expansion feasibility | Low-High | Could 2-3x capacity through new geographies |
+
+## Limitations
+
+**Estimates are speculative.** There is no established methodology for measuring philanthropic absorption capacity. The \$500M-2B range is based on analogies to government research funding, historical EA scaling patterns, and rough talent estimates—all of which could be significantly wrong.
+
+**Capacity is not static.** The very act of deploying capital changes absorption capacity. This creates a dynamic system where today's estimates may be poor predictors of capacity in 5 years.
+
+**Quality is subjective.** "Productive" spending is poorly defined for AI safety. Reasonable people disagree about whether funding more interpretability research, policy advocacy, or field-building is most valuable. This page estimates *quantity* of absorptive capacity without resolving which *directions* are most valuable.
+
+**Non-EA channels exist.** This analysis focuses on the EA ecosystem, but capital could also flow through government agencies, university systems, corporate R\&D, and international organizations. Including these channels could increase effective absorption capacity by 3-10x, though with less strategic control.

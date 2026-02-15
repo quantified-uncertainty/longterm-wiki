@@ -23,7 +23,7 @@ import {EntityLink, KeyQuestions, Mermaid} from '@components/wiki';
 | **Open Source Ecosystem** | Growing | LlamaIndex, Haystack, RAGFlow provide customizable pipelines |
 | **Cost** | \$0-100/month | Free tiers available; heavy AI usage can reach \$100+/month |
 | **Relevance to Epistemic Infrastructure** | High | These tools reshape how organizations build and maintain structured knowledge |
-| **AI Safety Application** | Direct | <EntityLink id="E384">Longterm Wiki</EntityLink>, <EntityLink id="E382">Stampy</EntityLink>, and similar projects use these approaches |
+| **AI Safety Application** | Direct | <EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>, <EntityLink id="stampy-aisafety-info">Stampy</EntityLink>, and similar projects use these approaches |
 
 ## Overview
 
@@ -31,7 +31,7 @@ AI-assisted knowledge management refers to the growing ecosystem of tools that u
 
 The space spans several categories: personal knowledge tools with AI plugins (Obsidian, Roam Research), team collaboration platforms with integrated AI (Notion, Coda), AI-native knowledge graphs (Golden.com), source-grounded research assistants (Google NotebookLM, Perplexity Pages), and open-source retrieval-augmented generation (RAG) frameworks that developers can use to build custom knowledge systems (LlamaIndex, Haystack).
 
-This ecosystem is directly relevant to <EntityLink id="E122">epistemic infrastructure</EntityLink> for AI safety. Projects like the <EntityLink id="E384">Longterm Wiki</EntityLink> and <EntityLink id="E382">Stampy / AISafety.info</EntityLink> already use LLM-assisted pipelines for content creation, grading, and synthesis. Understanding the broader landscape of AI knowledge management tools informs how such projects can be built more effectively and what quality/accuracy tradeoffs are involved.
+This ecosystem is directly relevant to <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink> for AI safety. Projects like the <EntityLink id="longterm-wiki">Longterm Wiki</EntityLink> and <EntityLink id="stampy-aisafety-info">Stampy / AISafety.info</EntityLink> already use LLM-assisted pipelines for content creation, grading, and synthesis. Understanding the broader landscape of AI knowledge management tools informs how such projects can be built more effectively and what quality/accuracy tradeoffs are involved.
 
 <Mermaid chart={`
 flowchart TD
@@ -50,6 +50,7 @@ flowchart TD
         GOLDEN[Golden.com]
         PERPLEXITY[Perplexity Pages]
         NOTEBOOK[Google NotebookLM]
+        CODEWIKI[Google Code Wiki]
     end
 
     subgraph INFRA["Open Source Infrastructure"]
@@ -115,7 +116,7 @@ Notion 3.0 (September 2025) introduced autonomous AI Agents, shifting from "AI t
 
 Notion's agent capabilities make it one of the most powerful platforms for maintaining large organizational knowledge bases. The January 2026 (v3.2) release brought full mobile AI support.
 
-**Limitations:** Proprietary platform, per-user pricing (\$20/user/month for AI features), and vendor lock-in concerns limit suitability for open <EntityLink id="E122">epistemic infrastructure</EntityLink> projects.
+**Limitations:** Proprietary platform, per-user pricing (\$20/user/month for AI features), and vendor lock-in concerns limit suitability for open <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink> projects.
 
 ### Coda AI
 
@@ -138,7 +139,7 @@ Golden is building a canonical knowledge graph with a goal of mapping 10 billion
 | **Protocol vision** | Decentralized, open, permissionless knowledge graph |
 | **Products** | Knowledge Graph, Query Tool, Data Requests, API, CRM integrations, ChatGPT Plugin |
 
-Golden's approach—AI generates, humans verify—is particularly relevant as a model for <EntityLink id="E122">epistemic infrastructure</EntityLink>. The decentralized protocol vision aims for canonical, neutral, factual knowledge without centralized editorial control. However, the project's ambition far exceeds current delivery, and the quality of AI-generated entries varies significantly.
+Golden's approach—AI generates, humans verify—is particularly relevant as a model for <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink>. The decentralized protocol vision aims for canonical, neutral, factual knowledge without centralized editorial control. However, the project's ambition far exceeds current delivery, and the quality of AI-generated entries varies significantly.
 
 ### Google NotebookLM
 
@@ -158,7 +159,26 @@ NotebookLM's source-grounding approach is significant for epistemic quality—by
 
 Perplexity Pages transforms AI research into structured, formatted articles that users can publish to a growing library. Combined with Internal Knowledge Search (search across web + uploaded documents) and Deep Research (20-50 targeted queries per report), Perplexity functions as both a personal research tool and a publishing platform.
 
-**Relevance:** Perplexity Pages represents a middle ground between fully automated encyclopedias (like <EntityLink id="E682">Grokipedia</EntityLink>) and fully human-written wikis—users direct the research, AI synthesizes, and users review before publishing. Citation transparency is a core feature.
+**Relevance:** Perplexity Pages represents a middle ground between fully automated encyclopedias (like <EntityLink id="grokipedia">Grokipedia</EntityLink>) and fully human-written wikis—users direct the research, AI synthesizes, and users review before publishing. Citation transparency is a core feature.
+
+### Google Code Wiki
+
+Google Code Wiki (launched November 2025) uses Gemini to auto-generate and continuously maintain structured documentation for code repositories. Unlike static documentation that becomes outdated, Code Wiki regenerates after every commit, keeping architecture diagrams, module explanations, and cross-references synchronized with the codebase.
+
+| Feature | Details |
+|---------|---------|
+| **AI model** | Gemini |
+| **Inputs** | Public GitHub repositories (private repo support planned via Gemini CLI extension) |
+| **Outputs** | Structured wiki pages, architecture diagrams, class diagrams, sequence diagrams, interactive chat |
+| **Update mechanism** | Auto-regenerates after each commit |
+| **Deep code links** | Every wiki section links directly to relevant files, classes, and functions |
+| **Pricing** | Free public preview at codewiki.google |
+
+Code Wiki's interactive chat feature uses the repository's generated documentation as its knowledge base, allowing developers to ask natural-language questions about codebases and receive answers grounded in the current state of the code rather than general training data—a source-grounding approach similar to NotebookLM.
+
+**Limitations:** Code Wiki documents *what* code does and *how* it works but does not capture the *why* behind architectural decisions. Quality depends heavily on code readability, and support is currently limited to popular languages and frameworks. The tool works only with public repositories as of early 2026, though a Gemini CLI extension for private repos is on a waitlist.
+
+**Epistemic relevance:** Code Wiki demonstrates how AI can maintain living documentation at scale—a pattern applicable beyond codebases to any structured knowledge system. For open-source AI safety projects, auto-generated documentation could lower onboarding barriers and improve institutional knowledge preservation.
 
 ---
 
@@ -180,11 +200,11 @@ Several AI safety projects use RAG-based approaches:
 
 | Project | RAG Approach | Source Corpus |
 |---------|-------------|---------------|
-| **<EntityLink id="E382">Stampy / AISafety.info</EntityLink>** | Vector embeddings + GPT | 10K-100K alignment research documents |
-| **<EntityLink id="E384">Longterm Wiki</EntityLink>** | Claude-based synthesis pipeline | Web research + source fetching + validation |
-| **<EntityLink id="E526">Elicit</EntityLink>** | Semantic Scholar integration | 125M+ academic papers |
+| **<EntityLink id="stampy-aisafety-info">Stampy / AISafety.info</EntityLink>** | Vector embeddings + GPT | 10K-100K alignment research documents |
+| **<EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>** | Claude-based synthesis pipeline | Web research + source fetching + validation |
+| **<EntityLink id="elicit">Elicit</EntityLink>** | Semantic Scholar integration | 125M+ academic papers |
 
-The <EntityLink id="E384">Longterm Wiki</EntityLink>'s page creation pipeline exemplifies a practical RAG workflow: Perplexity-based web research feeds into source fetching, Claude-based synthesis, automated source verification, and iterative validation—producing structured wiki pages at approximately \$4-6 per page.
+The <EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>'s page creation pipeline exemplifies a practical RAG workflow: Perplexity-based web research feeds into source fetching, Claude-based synthesis, automated source verification, and iterative validation—producing structured wiki pages at approximately \$4-6 per page.
 
 ---
 
@@ -203,8 +223,9 @@ A notable development in open knowledge infrastructure: IBM and the Wikimedia Fo
 | **Golden.com** | Generates, humans verify | Aims for decentralized | Human review layer | Canonical entity data |
 | **NotebookLM** | Source-grounded analysis | Proprietary (free tier) | Constrained to sources | Research synthesis |
 | **Perplexity Pages** | Researches and drafts | Proprietary | Citation-first | Published articles |
+| **Google Code Wiki** | Auto-generates from code | Proprietary (free preview) | Source-grounded to repo | Code documentation |
 | **LlamaIndex/Haystack** | Custom RAG pipelines | Open source | Configurable | Custom knowledge systems |
-| **<EntityLink id="E384">Longterm Wiki</EntityLink>** | Pipeline-assisted authoring | Open source | Multi-step validation | AI safety knowledge |
+| **<EntityLink id="longterm-wiki">Longterm Wiki</EntityLink>** | Pipeline-assisted authoring | Open source | Multi-step validation | AI safety knowledge |
 
 ---
 
@@ -220,13 +241,13 @@ These tools create genuine opportunities for improving the quality and scale of 
 
 3. **Knowledge graph integration:** The IBM-Wikimedia initiative and Golden.com demonstrate how structured knowledge graphs can serve as authoritative backing stores for LLM-generated content.
 
-4. **RAG for specialized domains:** Open-source RAG frameworks enable organizations like <EntityLink id="E238">QURI</EntityLink> to build custom knowledge pipelines tailored to specific domains (AI safety, forecasting, risk analysis) rather than depending on general-purpose tools.
+4. **RAG for specialized domains:** Open-source RAG frameworks enable organizations like <EntityLink id="quri">QURI</EntityLink> to build custom knowledge pipelines tailored to specific domains (AI safety, forecasting, risk analysis) rather than depending on general-purpose tools.
 
 ### Risks and Limitations
 
 1. **Accuracy-speed tradeoff:** Faster, cheaper content creation increases the risk of errors propagating through knowledge bases. Multi-step validation pipelines partially address this but add cost and complexity.
 
-2. **Knowledge collapse feedback loops:** AI systems trained on AI-generated content degrade over time—a phenomenon formally described as "model collapse." Knowledge bases that rely heavily on LLM generation risk contributing to this cycle. See <EntityLink id="E683">Wikipedia and AI Content</EntityLink> for detailed analysis of the model collapse feedback loop.
+2. **Knowledge collapse feedback loops:** AI systems trained on AI-generated content degrade over time—a phenomenon formally described as "model collapse." Knowledge bases that rely heavily on LLM generation risk contributing to this cycle. See <EntityLink id="wikipedia-and-ai">Wikipedia and AI Content</EntityLink> for detailed analysis of the model collapse feedback loop.
 
 3. **Vendor dependence:** Most powerful tools (Notion AI, NotebookLM) are proprietary, creating dependency on commercial platforms for epistemic infrastructure that should ideally be durable and independent.
 

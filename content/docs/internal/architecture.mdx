@@ -450,6 +450,66 @@ Each domain is a module with a `commands` export. Commands are async functions r
 
 **See**: `crux/README.md` for the full domain reference.
 
+### Validation System
+
+**Purpose**: Enforce content quality and consistency at multiple levels.
+
+**Architecture**: Single-pass validation engine runs composable rules. Each rule checks specific patterns and can optionally auto-fix issues.
+
+| Category | Examples | Blocking? |
+|----------|----------|-----------|
+| Critical | `dollar-signs`, `entitylink-ids`, `fake-urls` | Yes - breaks build |
+| Quality | `tilde-dollar`, `markdown-lists`, `placeholders` | No - warnings only |
+
+**Design decision**: Two-tier validation allows fast feedback while still catching serious issues. Critical rules run in CI; quality rules are advisory.
+
+---
+
+## Data Flow Diagrams
+
+### Page Creation Data Flow
+
+<Mermaid chart={`
+sequenceDiagram
+    participant User
+    participant PageCreator
+    participant Perplexity
+    participant Firecrawl
+    participant SQLite
+    participant Claude
+
+    User->>PageCreator: Create page "Topic"
+    PageCreator->>Perplexity: Research queries
+    Perplexity-->>PageCreator: Content + citation URLs
+    PageCreator->>SQLite: Register source URLs
+    PageCreator->>Firecrawl: Fetch page content
+    Firecrawl-->>SQLite: Store fetched content
+    PageCreator->>Claude: Synthesize with research
+    Claude-->>PageCreator: Draft MDX
+    PageCreator->>SQLite: Load fetched content
+    PageCreator->>PageCreator: Verify quotes against sources
+    PageCreator->>Claude: Validation loop
+    Claude-->>PageCreator: Fixed MDX
+    PageCreator-->>User: final.mdx
+`} />
+
+### Entity Resolution Flow
+
+<Mermaid chart={`
+sequenceDiagram
+    participant MDX as MDX Page
+    participant Component as EntityLink
+    participant Registry as pathRegistry.json
+    participant Database as database.json
+
+    MDX->>Component: <EntityLink id="open-philanthropy">
+    Component->>Registry: Lookup path for ID
+    Registry-->>Component: /knowledge-base/organizations/funders/open-philanthropy
+    Component->>Database: Get entity metadata
+    Database-->>Component: {title, type, ...}
+    Component-->>MDX: Rendered link with icon
+`} />
+
 ---
 
 ## Design Principles

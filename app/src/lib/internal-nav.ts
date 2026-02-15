@@ -16,7 +16,6 @@ export interface NavSection {
  *  - Dashboards & Tools: interactive tools and dashboards
  *  - Architecture & Schema: technical docs (data schema, architecture, data flow)
  *  - Style Guides: writing and content style guides
- *  - Experiments: experimental features and prototypes
  *  - Research: research reports and proposals (theoretical, not technical docs)
  */
 export const INTERNAL_NAV: NavSection[] = [
@@ -60,13 +59,6 @@ export const INTERNAL_NAV: NavSection[] = [
       { label: "Cause-Effect Diagrams", href: "/internal/cause-effect-diagrams" },
       { label: "Research Reports", href: "/internal/research-reports" },
       { label: "AI Transition Model", href: "/internal/ai-transition-model-style-guide" },
-    ],
-  },
-  {
-    title: "Experiments",
-    items: [
-      { label: "Insight Grid", href: "/internal/insight-grid-experiments" },
-      { label: "Risk Trajectory", href: "/internal/risk-trajectory-experiments" },
     ],
   },
   {
