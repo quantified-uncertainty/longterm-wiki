@@ -97,19 +97,25 @@ Beyond the general capital gains savings, Anthropic employees face several time-
 
 ### The ISO / AMT Trap
 
-Most early Anthropic employees likely hold Incentive Stock Options (ISOs). Exercising ISOs triggers Alternative Minimum Tax (AMT) on the spread between the strike price and fair market value (the 409A valuation)—even though the shares are illiquid and cannot be sold.
+Most early Anthropic employees likely hold Incentive Stock Options (ISOs). Exercising ISOs triggers Alternative Minimum Tax (AMT) on the spread between the strike price and the 409A fair market value—even though the shares are illiquid and cannot be sold.
 
-| Scenario | Strike Price | Current FMV (409A) | Spread | AMT Liability (≈28%) |
-|----------|-------------|-------------------|--------|---------------------|
-| Early employee (2021) | \$1-5/share | \$270+/share | \$265-269/share | \$74-75/share |
-| 2022-2023 hire | \$10-30/share | \$270+/share | \$240-260/share | \$67-73/share |
-| 2024 hire | \$50-100/share | \$270+/share | \$170-220/share | \$48-62/share |
+Note: 409A valuations for common stock are typically 30-60% below the preferred stock price due to lack-of-marketability discounts and the common/preferred rights gap. If the preferred price implies \≈\$270/share (from secondary markets), the 409A common stock valuation is likely \$100-190/share. Exact 409A figures are not public.
 
-**The problem:** An early employee with 100,000 options faces an AMT bill of \$7-8M on exercise—due in cash, on shares they cannot sell. As Anthropic's 409A valuation climbs with each funding round, this bill grows larger every quarter.
+| Scenario | Strike Price | Est. 409A FMV | Spread | Est. AMT (≈35% combined) |
+|----------|-------------|--------------|--------|--------------------------|
+| Early employee (2021) | \$1-5/share | \$100-190/share | \$95-189/share | \$33-66/share |
+| 2022-2023 hire | \$10-30/share | \$100-190/share | \$70-180/share | \$25-63/share |
+| 2024 hire | \$50-100/share | \$100-190/share | \$0-140/share | \$0-49/share |
 
-**Why this is time-sensitive:** Every new funding round raises the 409A fair market value, increasing the AMT spread. The Series G at \$380B likely pushed the 409A to its highest level yet. Employees who haven't exercised face a rapidly closing window where exercising is affordable.
+The combined AMT rate includes federal AMT (28% above exemption phase-out) plus California AMT (\~7%). For employees with large spreads, the exemption is fully phased out.
 
-**DAF interaction:** Donating appreciated stock directly to a DAF avoids both capital gains tax *and* AMT on the donated shares. For employees with ISO holdings and charitable intent, direct stock-to-DAF transfer may be more tax-efficient than exercising, paying AMT, and donating cash later.
+**The problem:** An early employee with 100,000 options could face an AMT bill of \$3-7M on exercise—due in cash, on shares they cannot sell. As Anthropic's 409A valuation climbs with each funding round, this bill grows larger. (Note: AMT paid generates a credit that can offset regular tax in future years when shares are eventually sold, so the AMT is partially a timing cost rather than a pure loss.)
+
+**Why this is time-sensitive:** Every new funding round raises the 409A fair market value, increasing the AMT spread. Employees who haven't exercised face a closing window where exercising is affordable.
+
+**DAF interaction:** Unexercised ISOs cannot be donated directly to a DAF—options are not transferable property. The employee must first **exercise** the ISO (triggering AMT at that point), then donate the resulting **shares** to a DAF. Donating the exercised shares avoids capital gains tax on any subsequent appreciation and generates a fair-market-value deduction, but does **not** undo the AMT triggered at exercise. The AMT credit generated can be recovered against future regular tax liability.
+
+Important caveats: (1) ISO favorable tax treatment requires holding shares 1 year after exercise AND 2 years after grant; donating before these periods is a disqualifying disposition. (2) Charitable deductions for appreciated long-term capital gain property donated to a DAF are limited to 30% of AGI per year (with 5-year carryforward). (3) Donating private company stock requires a qualified independent appraisal (Form 8283).
 
 ### 83(b) Election Windows
 
@@ -126,9 +132,9 @@ Qualified Small Business Stock (QSBS) under Section 1202 allows exclusion of up 
 - The holder has held the stock for 5+ years
 - The company meets "active business" requirements
 
-**For early Anthropic employees and investors:** If Anthropic qualified as a QSBS-eligible company at the time of early grants (2021-2022), and employees have held for 5+ years by 2026-2027, they could potentially exclude \$10M+ per person in capital gains from federal tax. At a combined California rate of ≈37%, this represents up to \$3.7M in tax savings per employee.
+**For early Anthropic employees and investors:** If Anthropic qualified as a QSBS-eligible company at the time of early grants (2021-2022), and employees have held for 5+ years by 2026-2027, they could potentially exclude \$10M+ per person in capital gains from **federal** tax. At the 23.8% federal rate (20% LTCG + 3.8% NIIT), this represents up to \≈\$2.4M in federal tax savings per employee. However, **California does not conform to Section 1202** and taxes QSBS gains at the full 13.3% state rate—a significant and often-overlooked limitation.
 
-**Open question:** Whether Anthropic's structure (Public Benefit Corporation, gross asset size at time of grants) qualifies under Section 1202 remains uncertain. Employees should seek tax counsel immediately—the qualification depends on company status at the time shares were acquired, not current status.
+**Likely unfavorable for most employees:** Anthropic raised \$124M in its Series A (announced January 2022), meaning gross assets likely exceeded the \$50M threshold before most employees received grants. QSBS qualification is therefore **unlikely for most employees**, though very early team members (pre-Series A) may still qualify. Anthropic's PBC structure does not categorically exclude QSBS eligibility (a PBC is a type of C-corp). Employees should seek tax counsel—the qualification depends on company status at the time shares were acquired, not current status.
 
 ### Tax Calendar Summary
 
@@ -138,16 +144,17 @@ Qualified Small Business Stock (QSBS) under Section 1202 allows exclusion of up 
 | **30 days from grant** | File 83(b) election | Irreversible; missing this can cost millions |
 | **5 years from acquisition** | Hold for QSBS eligibility | \$10M+ exclusion per person at stake |
 | **Year of exercise** | Plan for AMT cash needs | May need to sell other assets or take loans to pay AMT |
-| **Any time pre/post-IPO** | Donate stock to DAF instead of selling | Avoids capital gains and potentially AMT |
+| **Any time pre/post-IPO** | Donate exercised shares to DAF instead of selling | Avoids capital gains on appreciation beyond exercise price |
 
 ### Interaction with Matching Program
 
 The tax urgency reinforces the case for early matching program participation. An employee who:
-1. Exercises ISOs (triggering AMT)
-2. Then donates the exercised shares to a DAF under the matching program
-3. Receives 1:1 to 3:1 matching on the donated amount
+1. Exercises ISOs (triggering AMT on the spread—partially recoverable via AMT credit)
+2. Holds the resulting shares for 1+ year (to qualify as long-term capital gain property)
+3. Donates the shares to a DAF under the matching program (avoiding capital gains on post-exercise appreciation, and receiving a FMV deduction capped at 30% of AGI/year)
+4. Receives 1:1 to 3:1 matching on the donated amount
 
-...captures both the matching benefit *and* avoids capital gains on the donated shares. The combination of matching multiplier plus tax savings makes this among the most financially attractive charitable giving structures available to any private company employee.
+...captures both the matching benefit *and* avoids capital gains on post-exercise appreciation. The combination of matching multiplier plus capital gains avoidance makes this among the most financially attractive charitable giving structures available to any private company employee, despite the unavoidable AMT at exercise.
 
 **Anthropic could help** by providing employees with tax advisory resources, clear 409A valuation communications, and expanded charitable transfer options—all of which would directly increase the capital available for philanthropic purposes.
 
