@@ -432,6 +432,22 @@ export function SimilarityGraph({ data }: Props) {
     }
   }, []);
 
+  const handleMouseLeave = useCallback(() => {
+    // Release any dragged node
+    if (dragNodeRef.current) {
+      dragNodeRef.current.fx = null;
+      dragNodeRef.current.fy = null;
+      dragNodeRef.current = null;
+      simRef.current?.alphaTarget(0);
+    }
+    // Clear hover so nodes show actual colors while using controls
+    hoveredRef.current = null;
+    setHoveredNode(null);
+    draw();
+    const canvas = canvasRef.current;
+    if (canvas) canvas.style.cursor = "grab";
+  }, [draw]);
+
   const handleClick = useCallback(
     (e: ReactMouseEvent<HTMLCanvasElement>) => {
       // Skip navigation if the user was dragging a node
@@ -571,7 +587,7 @@ export function SimilarityGraph({ data }: Props) {
           onMouseMove={handleMouseMove}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
           onClick={handleClick}
         />
         <div className="absolute bottom-3 left-3 text-xs text-muted-foreground bg-background/80 rounded px-2 py-1">
