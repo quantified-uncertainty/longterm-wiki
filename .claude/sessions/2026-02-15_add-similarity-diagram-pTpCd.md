@@ -18,3 +18,5 @@
 - Canvas rendering handles 600+ nodes smoothly with d3-force simulation
 - When mixing d3 native listeners with React synthetic events on the same element, use d3's `filter` to coordinate — React's `stopPropagation` won't prevent d3 listeners
 - Always verify `pnpm add` succeeded by checking package.json, not just node_modules
+- Node click URLs must use numeric IDs (`/wiki/E42`) not slugs (`/wiki/ai-risks`) — slugs cause a 307 redirect since only numeric IDs are pre-rendered via `generateStaticParams`
+- RSC payload for 617 nodes + 4636 edges is ~427 KB raw / ~107 KB gzipped — acceptable for an internal tool page

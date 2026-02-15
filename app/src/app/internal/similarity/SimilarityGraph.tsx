@@ -27,6 +27,7 @@ import type { SimilarityGraphData } from "./get-similarity-data";
 
 interface SimNode extends SimulationNodeDatum {
   id: string;
+  href: string;
   title: string;
   entityType: string;
   color: string;
@@ -440,7 +441,7 @@ export function SimilarityGraph({ data }: Props) {
       }
       const node = findNodeAt(e.clientX, e.clientY);
       if (node) {
-        window.open(`/wiki/${node.id}`, "_blank");
+        window.open(node.href, "_blank");
       }
     },
     [findNodeAt]

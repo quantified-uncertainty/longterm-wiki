@@ -2,11 +2,13 @@ import {
   getAllPages,
   getTypedEntityById,
   getRelatedGraphFor,
+  getEntityHref,
 } from "@data/index";
 import { ENTITY_TYPES } from "@data/entity-ontology";
 
 export interface SimilarityNode {
   id: string;
+  href: string;
   title: string;
   entityType: string;
   color: string;
@@ -49,6 +51,7 @@ export function getSimilarityGraphData(): SimilarityGraphData {
       (entity as { entityType?: string } | undefined)?.entityType ?? "unknown";
     return {
       id: p.id,
+      href: getEntityHref(p.id),
       title: p.title,
       entityType,
       color: getColor(entityType),
