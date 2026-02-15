@@ -1,6 +1,6 @@
 ## 2026-02-15 | claude/fix-page-changes-update-4trhu | Fix page-changes not reading session files
 
-**What was done:** Fixed /internal/page-changes not updating for recent PRs. The build script (build-data.mjs) only read from the consolidated `.claude/session-log.md`, but session logging was migrated to per-session files in `.claude/sessions/` — so new sessions were invisible. Updated `parseSessionLog` to also read individual session files, with deduplication and a kebab-case filter for page IDs.
+**What was done:** Fixed /internal/page-changes not updating for recent PRs. The build script only read from `.claude/session-log.md`, but session logging was migrated to per-session files in `.claude/sessions/` — so new sessions were invisible. Extracted parser to `app/scripts/lib/session-log-parser.mjs` with 12 tests covering both sources, deduplication, and ID filtering. Added cross-reference comment in session-logging rules.
 
 **Pages:** (no wiki content pages changed)
 

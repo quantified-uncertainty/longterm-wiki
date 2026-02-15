@@ -23,6 +23,7 @@ import { parseNumericValue, resolveComputedFacts } from './lib/computed-facts.mj
 import { transformEntities } from './lib/entity-transform.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildSearchIndex } from './lib/search.mjs';
+import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
 
@@ -40,121 +41,6 @@ const DATA_FILES = [
   { key: 'publications', file: 'publications.yaml' },
   { key: 'parameterGraph', file: 'parameter-graph.yaml', isObject: true }, // Graph structure (not array)
 ];
-
-/**
- * Parse session log content and return a map of pageId → ChangeEntry[]
- *
- * Each session entry looks like:
- *   ## 2026-02-13 | branch-name | Short title
- *   **What was done:** Summary text.
- *   **Pages:** page-id-1, page-id-2
- *   ...
- *
- * Returns: { [pageId]: [{ date, branch, title, summary }] }
- */
-function parseSessionLogContent(content) {
-  const pageHistory = {};
-
-  // Split into entries by ## headings
-  const entryPattern = /^## (\d{4}-\d{2}-\d{2}) \| ([^\|]+?) \| (.+)$/gm;
-  const entries = [];
-  let match;
-
-  while ((match = entryPattern.exec(content)) !== null) {
-    entries.push({
-      date: match[1],
-      branch: match[2].trim(),
-      title: match[3].trim(),
-      startIndex: match.index,
-    });
-  }
-
-  for (let i = 0; i < entries.length; i++) {
-    const entry = entries[i];
-    const endIndex = i + 1 < entries.length ? entries[i + 1].startIndex : content.length;
-    const body = content.slice(entry.startIndex, endIndex);
-
-    // Extract "What was done" summary
-    const summaryMatch = body.match(/\*\*What was done:\*\*\s*(.+?)(?:\n\n|\n\*\*|\n---)/s);
-    const summary = summaryMatch ? summaryMatch[1].trim() : '';
-
-    // Extract "Pages" list
-    const pagesMatch = body.match(/\*\*Pages:\*\*\s*(.+?)(?:\n\n|\n\*\*|\n---)/s);
-    if (!pagesMatch) continue; // No pages field — infrastructure-only session
-
-    const pageIds = pagesMatch[1]
-      .split(',')
-      .map(id => id.trim())
-      .filter(id => id.length > 0 && /^[a-z0-9][a-z0-9-]*$/.test(id));
-
-    const changeEntry = {
-      date: entry.date,
-      branch: entry.branch,
-      title: entry.title,
-      summary,
-    };
-
-    for (const pageId of pageIds) {
-      if (!pageHistory[pageId]) {
-        pageHistory[pageId] = [];
-      }
-      pageHistory[pageId].push(changeEntry);
-    }
-  }
-
-  return pageHistory;
-}
-
-/**
- * Collect all session log content from both the consolidated session-log.md
- * and individual session files in .claude/sessions/*.md, then parse into
- * a merged pageId → ChangeEntry[] map.
- *
- * Deduplicates entries that appear in both sources (same date+branch+title).
- */
-function parseAllSessionLogs(consolidatedLogPath, sessionsDir) {
-  const allContent = [];
-
-  // Read consolidated log if it exists
-  if (existsSync(consolidatedLogPath)) {
-    allContent.push(readFileSync(consolidatedLogPath, 'utf-8'));
-  }
-
-  // Read individual session files
-  if (existsSync(sessionsDir)) {
-    const files = readdirSync(sessionsDir)
-      .filter(f => f.endsWith('.md'))
-      .sort();
-    for (const file of files) {
-      const filePath = join(sessionsDir, file);
-      if (statSync(filePath).isFile()) {
-        allContent.push(readFileSync(filePath, 'utf-8'));
-      }
-    }
-  }
-
-  if (allContent.length === 0) return {};
-
-  // Parse each source separately, then merge with deduplication
-  const merged = {};
-  const seen = new Set(); // Track "date|branch|title" to deduplicate
-
-  for (const content of allContent) {
-    const partial = parseSessionLogContent(content);
-    for (const [pageId, entries] of Object.entries(partial)) {
-      if (!merged[pageId]) merged[pageId] = [];
-      for (const entry of entries) {
-        const key = `${entry.date}|${entry.branch}|${entry.title}|${pageId}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          merged[pageId].push(entry);
-        }
-      }
-    }
-  }
-
-  return merged;
-}
 
 function loadYaml(filename) {
   const filepath = join(DATA_DIR, filename);
