@@ -372,7 +372,7 @@ async function main(): Promise<void> {
     const fm = parseFrontmatter(content);
 
     if (!fm.update_frequency) continue;
-    if (fm.pageType === 'stub' || fm.pageType === 'documentation') continue;
+    if (fm.pageType === 'stub' || fm.pageType === 'documentation' || fm.entityType === 'internal') continue;
     if (fm.evergreen === false) continue;
 
     pages.push({

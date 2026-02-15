@@ -1,7 +1,8 @@
 ---
+numericId: E726
 title: "LongtermWiki Vision"
 description: "Strategic vision and scope for the LongtermWiki project"
-pageType: "documentation"
+entityType: internal
 importance: 0
 quality: 2
 llmSummary: "Internal strategic planning document for the LongtermWiki project itself, outlining a 2-person-year scope to build a knowledge platform focused on AI safety prioritization cruxes. Proposes ~250 pages across risks, interventions, and causal models with worldview-based priority mapping."

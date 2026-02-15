@@ -550,6 +550,7 @@ export const EntityType = z.enum([
   'event',
   'debate',
   'intelligence-paradigm',
+  'internal',
   // AI Transition Model specific types
   'ai-transition-model-parameter',
   'ai-transition-model-metric',

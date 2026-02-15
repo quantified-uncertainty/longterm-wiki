@@ -244,7 +244,7 @@ export async function runCheck(options: ValidatorOptions = {}): Promise<Validato
       const frontmatter = parseFrontmatter(content);
       const body: string = getContentBody(content);
 
-      if (frontmatter.pageType === 'stub' || frontmatter.pageType === 'documentation') {
+      if (frontmatter.pageType === 'stub' || frontmatter.pageType === 'documentation' || frontmatter.entityType === 'internal') {
         continue;
       }
 
@@ -301,7 +301,7 @@ async function main(): Promise<void> {
       const body: string = getContentBody(content);
 
       // Skip stubs and documentation
-      if (frontmatter.pageType === 'stub' || frontmatter.pageType === 'documentation') {
+      if (frontmatter.pageType === 'stub' || frontmatter.pageType === 'documentation' || frontmatter.entityType === 'internal') {
         continue;
       }
 

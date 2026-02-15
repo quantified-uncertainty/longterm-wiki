@@ -98,8 +98,8 @@ function loadUpdateCandidates(): UpdateCandidate[] {
     // Skip pages without update_frequency
     if (fm.update_frequency == null) continue;
 
-    // Skip stubs and documentation pages
-    if (fm.pageType === 'stub' || fm.pageType === 'documentation') continue;
+    // Skip stubs, documentation, and internal pages
+    if (fm.pageType === 'stub' || fm.pageType === 'documentation' || fm.entityType === 'internal') continue;
 
     // Skip non-evergreen pages (reports, blog posts)
     if (fm.evergreen === false) continue;
@@ -381,7 +381,7 @@ export async function stats(args: string[], options: CommandOptions): Promise<Co
   for (const filePath of allFiles) {
     const content = readFileSync(filePath, 'utf-8');
     const fm = parseFrontmatter(content);
-    if (fm.pageType === 'stub' || fm.pageType === 'documentation') continue;
+    if (fm.pageType === 'stub' || fm.pageType === 'documentation' || fm.entityType === 'internal') continue;
     if (filePath.endsWith('index.mdx') || filePath.endsWith('index.md')) continue;
 
     totalPages++;
