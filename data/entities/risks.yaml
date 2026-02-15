@@ -2899,3 +2899,72 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+- id: ai-investigation-risks
+  numericId: E694
+  type: risk
+  title: AI-Powered Investigation Risks
+  description: >-
+    AI dramatically lowers the bar for investigative discovery by connecting
+    publicly available information at scale. This dual-use capability benefits
+    accountability (corruption detection, fraud investigation, OSINT journalism)
+    while threatening privacy as "privacy through obscurity" erodes. LLMs
+    automate deanonymization, the mosaic effect enables identification from
+    individually innocuous data points, and chilling effects on speech and
+    association intensify as investigation costs approach zero.
+  severity: medium
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Emerging
+  customFields:
+    - label: Status
+      value: Rapidly expanding capabilities; governance lagging
+    - label: Key Risk
+      value: Erosion of privacy through obscurity as AI lowers discoverability threshold
+  relatedEntries:
+    - id: surveillance
+      type: risk
+    - id: fraud
+      type: risk
+    - id: authentication-collapse
+      type: risk
+    - id: trust-decline
+      type: risk
+    - id: deepfakes
+      type: risk
+    - id: disinformation
+      type: risk
+    - id: ai-enabled-untraceable-misuse
+      type: risk
+  sources:
+    - title: "AI is undermining OSINT's core assumptions (Reuters Institute)"
+      url: https://reutersinstitute.politics.ox.ac.uk/news/ai-undermining-osints-core-assumptions-heres-how-journalists-should-adapt
+      date: '2025'
+    - title: "Privacy in an AI Era (Stanford HAI)"
+      url: https://hai.stanford.edu/news/privacy-ai-era-how-do-we-protect-our-personal-information
+    - title: "Anonymized Datasets Aren't As Anonymous As You Think (Opaque Systems)"
+      url: https://www.opaque.co/resources/articles/anonymized-datasets-arent-as-anonymous-as-you-think
+    - title: "Surveillance Chills Speech (EFF)"
+      url: https://www.eff.org/deeplinks/2016/05/when-surveillance-chills-speech-new-studies-show-our-rights-free-association
+      date: '2016'
+    - title: "OECD: AI in fighting corruption and promoting public integrity"
+      url: https://www.oecd.org/en/publications/2025/06/governing-with-artificial-intelligence_398fa287/full-report/ai-in-fighting-corruption-and-promoting-public-integrity_60f5c50a.html
+      date: '2025'
+    - title: "How Good is ChatGPT at Face Biometrics?"
+      url: https://arxiv.org/html/2401.13641v1
+      author: Melzi et al.
+      date: '2024'
+  tags:
+    - privacy
+    - osint
+    - deanonymization
+    - investigation
+    - dual-use
+    - governance
+  clusters:
+    - cyber
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
