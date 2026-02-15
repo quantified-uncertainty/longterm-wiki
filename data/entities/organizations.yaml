@@ -2023,6 +2023,29 @@
     - epistemics
     - community
   lastUpdated: 2026-02
+- id: the-foundation-layer
+  numericId: E693
+  type: organization
+  title: The Foundation Layer
+  website: https://foundation-layer.ai
+  description: >-
+    A philanthropic guide and fund by Tyler John (Effective Institutions
+    Project) aimed at mobilizing major donors toward AI safety. The Foundation
+    Layer Fund has facilitated 100+ grants exceeding $70M across five
+    intervention areas: alignment science, nonproliferation, defensive
+    technology, power distribution, and talent mobilization.
+  relatedEntries:
+    - id: longview-philanthropy
+      type: organization
+      relationship: related
+    - id: coefficient-giving
+      type: organization
+      relationship: related
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
 - id: the-sequences
   numericId: E570
   type: organization

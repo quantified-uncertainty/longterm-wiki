@@ -1860,3 +1860,27 @@
   cited_by:
     - takeoff
   publication_id: fli
+- id: 9c6a24147b148206
+  url: https://foundation-layer.ai/
+  title: "The Foundation Layer: A Philanthropic Guide to AI Safety"
+  type: web
+  summary: >-
+    A comprehensive philanthropic guide by Tyler John (Effective Institutions
+    Project) aimed at persuading major donors to fund AI safety. Covers AGI
+    timelines, existential risks (loss of control, malicious use, power
+    concentration), and proposes a five-pillar philanthropic strategy: alignment
+    science, nonproliferation, defensive technology, power distribution, and
+    talent mobilization. Includes a getting-started guide for donors with
+    specific funds and advisors.
+  key_points:
+    - Synthesizes five years of AI safety philanthropic advisory into a donor guide
+    - The Foundation Layer Fund has facilitated 100+ grants exceeding $70M
+    - Proposes five intervention pillars for AI safety philanthropy
+    - Covers alignment science, compute governance, biodefense, and political giving
+  tags:
+    - safety
+    - philanthropy
+    - funding
+    - governance
+    - x-risk
+    - field-building
