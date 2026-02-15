@@ -64,10 +64,13 @@ export function updateFrontmatter(content: string, updates: Record<string, unkno
 const SKIP_VALIDATION_PAGE_TYPES = ['stub', 'documentation'];
 
 /**
- * Check if a page should skip validation based on frontmatter
+ * Check if a page should skip validation based on frontmatter.
+ * Matches stub pages, legacy pageType: documentation, and entityType: internal.
  */
 export function shouldSkipValidation(frontmatter: Record<string, unknown>): boolean {
-  return SKIP_VALIDATION_PAGE_TYPES.includes(frontmatter.pageType as string);
+  if (SKIP_VALIDATION_PAGE_TYPES.includes(frontmatter.pageType as string)) return true;
+  if (frontmatter.entityType === 'internal') return true;
+  return false;
 }
 
 // ============================================================================
