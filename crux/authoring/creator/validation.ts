@@ -136,6 +136,10 @@ Read the draft article at: ${draftPath}
 
 Keep iterating until ALL checks pass. Run validation again after each fix.`;
 
+  // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
+  const env = { ...process.env };
+  delete env.CLAUDECODE;
+
   return new Promise((resolve, reject) => {
     const claude = spawn('claude', [
       '-p',
@@ -146,6 +150,7 @@ Keep iterating until ALL checks pass. Run validation again after each fix.`;
       '--allowedTools', 'Read,Write,Edit,Bash,Glob,Grep'
     ], {
       cwd: ROOT,
+      env,
       stdio: ['pipe', 'pipe', 'pipe']
     });
 

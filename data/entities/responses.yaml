@@ -3536,3 +3536,33 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+- id: ai-accountability
+  numericId: E700
+  type: approach
+  title: AI for Accountability and Anti-Corruption
+  description: >-
+    AI systems are emerging as tools for holding powerful actors accountable,
+    analyzing public records, tracing financial flows, monitoring environmental
+    violations, and documenting human rights abuses at previously impossible
+    scale. The ICIJ's AI-assisted investigations revealed $32+ trillion in
+    hidden wealth. This sousveillance dynamic represents the beneficial flip
+    side of AI surveillance capabilities.
+  relatedEntries:
+    - id: surveillance
+      type: risk
+    - id: authoritarian-tools
+      type: risk
+    - id: ai-powered-investigation
+      type: capability
+    - id: deanonymization
+      type: risk
+    - id: epistemic-collapse
+      type: risk
+    - id: concentration-of-power
+      type: risk
+    - id: disinformation
+      type: risk
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02

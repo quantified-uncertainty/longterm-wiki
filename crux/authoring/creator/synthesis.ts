@@ -274,6 +274,10 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
     const model = quality === 'quality' ? 'opus' : 'sonnet';
     const budget = quality === 'quality' ? 3.0 : 2.0;
 
+    // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
+    const env = { ...process.env };
+    delete env.CLAUDECODE;
+
     const claude = spawn('claude', [
       '-p',
       '--print',
@@ -283,6 +287,7 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
       '--allowedTools', 'Read,Write,Glob'
     ], {
       cwd: ROOT,
+      env,
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
