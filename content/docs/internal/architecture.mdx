@@ -178,7 +178,7 @@ Content quality is measured structurally, but the scoring adapts to the content 
 - **Tables** aren't penalized for low word count
 - **Diagrams** don't need prose length or section counts
 
-Metrics include raw counts (words, tables, diagrams, internal links, footnotes), ratios (bullet density), boolean checks (has overview?), and a composite structural score (0-15 raw, normalized to 0-50). A `suggestQuality` function proposes quality ratings based on structural scores, and `getQualityDiscrepancy` flags pages where the human-assigned quality disagrees with structural evidence.
+Metrics include raw counts (words, tables, diagrams, internal links, footnotes), ratios (bullet density), boolean checks (has overview?), and a composite structural score (0-15 raw, normalized to 0-50). A `suggestQuality` function proposes quality ratings based on structural scores, and `getQualityDiscrepancy` flags pages where the LLM-assigned quality disagrees with structural evidence.
 
 ### 8. Single-Pass Validation Engine
 

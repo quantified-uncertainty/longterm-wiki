@@ -396,7 +396,7 @@ function QualityDisplay({
           Quality: {quality}/100
         </span>
         <span className="block text-muted-foreground text-xs leading-snug">
-          Human-assigned rating of overall page quality, considering depth, accuracy, and completeness.
+          LLM-assigned rating of overall page quality, considering depth, accuracy, and completeness.
         </span>
         {hasDiscrepancy && (
           <span className="block mt-2 text-xs text-amber-500">
