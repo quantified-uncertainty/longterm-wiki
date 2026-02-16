@@ -2968,3 +2968,58 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+- id: deanonymization
+  numericId: E699
+  type: risk
+  title: AI-Powered Deanonymization
+  description: >-
+    AI dramatically lowers the cost and skill required to identify individuals
+    from supposedly anonymous data. Research shows 99.98% of Americans are
+    re-identifiable from 15 demographic attributes, and GPT-4 can infer
+    personal attributes from Reddit posts with 85% accuracy at $0.15 per
+    profile. AI transforms deanonymization from a specialist skill into a
+    commodity capability, threatening pseudonymity and enabling targeted
+    harassment, discrimination, and political repression.
+  severity: high
+  likelihood:
+    level: high
+    status: occurring
+  timeframe:
+    median: 2025
+  maturity: Emerging
+  customFields:
+    - label: Status
+      value: Academic demonstrations and real-world incidents occurring
+    - label: Key Concern
+      value: Erosion of pseudonymity and practical obscurity
+  relatedEntries:
+    - id: surveillance
+      type: risk
+    - id: authoritarian-tools
+      type: risk
+    - id: erosion-of-agency
+      type: risk
+    - id: epistemic-collapse
+      type: risk
+    - id: fraud
+      type: risk
+    - id: ai-powered-investigation
+      type: capability
+  sources:
+    - title: "Beyond Memorization: Violating Privacy Via Inference with Large Language Models"
+      url: https://arxiv.org/abs/2310.07298
+      author: Staab et al.
+      date: '2023'
+    - title: "Unique in the Crowd: The privacy bounds of human mobility"
+      url: https://www.nature.com/articles/srep01376
+      author: de Montjoye et al.
+      date: '2013'
+    - title: "Estimating the success of re-identifications in incomplete datasets using generative models"
+      url: https://www.nature.com/articles/s41467-019-10933-3
+      author: Rocher et al.
+      date: '2019'
+  clusters:
+    - ai-safety
+    - governance
+    - cyber
+  lastUpdated: 2026-02
