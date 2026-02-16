@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+# Cancel superseded runs for the same PR/branch (saves ~3 min per cancelled run).
+# Runs on main are never cancelled (each SHA produces a unique group).
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -49,6 +55,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build data (needed for validation)
+        id: build-data
         run: cd app && node scripts/build-data.mjs
 
       - name: MDX syntax check (blocking)
@@ -61,6 +68,7 @@ jobs:
         run: pnpm crux validate unified --rules=frontmatter-schema --errors-only
 
       - name: Run validation suite (advisory)
-        if: always()
+        if: "!cancelled()"
+        continue-on-error: true
         run: |
           pnpm crux validate || echo "::warning::Validation has pre-existing failures (non-blocking)"
