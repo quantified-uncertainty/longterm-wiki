@@ -1,92 +1,343 @@
 ---
 title: "System Architecture"
-description: "Technical architecture of the Longterm Wiki - data flow, pipelines, and design decisions"
+description: "Technical architecture of the Longterm Wiki — data pipeline, clever design patterns, and the ideas that make it work"
 sidebar:
   order: 0
   label: "Architecture"
-lastEdited: "2026-02-04"
+lastEdited: "2026-02-15"
 pageType: documentation
 importance: 0
 ---
 import { Mermaid } from '@components/wiki';
 
-This document provides a technical overview of how the Longterm Wiki is built, how data flows through the system, and the design rationale behind key architectural decisions.
+This document provides a technical overview of how the Longterm Wiki is built, the novel design patterns it uses, and the rationale behind key architectural decisions. It's intended both as a reference for contributors and as a catalog of the ideas that make the system work.
 
 <Aside type="tip" title="Keeping This Updated">
-This page documents system architecture. When making significant changes to pipelines or data flow, update the relevant sections here. See [Documentation Maintenance](#documentation-maintenance) for guidelines.
+When making significant changes to pipelines or data flow, update the relevant sections here. See [Documentation Maintenance](#documentation-maintenance) for guidelines.
 </Aside>
 
 ---
 
 ## High-Level Architecture
 
+The wiki is a **Next.js 15** application with a YAML-first data layer, a CLI toolchain (Crux), and an AI-assisted content pipeline.
+
 <Mermaid chart={`
 flowchart TB
     subgraph Sources["Data Sources"]
-        YAML[("YAML Files<br/>experts, orgs, cruxes")]
-        MDX[("MDX Pages<br/>~550 articles")]
-        EXT[("External URLs<br/>citations, resources")]
+        YAML[("YAML Files\nentities, facts, resources")]
+        MDX[("MDX Pages\n~625 articles")]
+        GRAPHS[("Graph Data\ncause-effect YAML")]
     end
 
-    subgraph Processing["Processing Layer"]
-        BUILD["build-data.mjs<br/>Entity compilation"]
-        SCAN["scan-content.mjs<br/>Content indexing"]
-        FETCH["fetch-sources.mjs<br/>Firecrawl fetching"]
-        CREATE["page-creator.mjs<br/>AI page generation"]
+    subgraph Build["Build-Time Processing"]
+        TRANSFORM["entity-transform.mjs\nType mapping"]
+        BUILDDATA["build-data.mjs\nCompilation pipeline"]
+        REDUNDANCY["redundancy.mjs\nSimilarity detection"]
+        SEARCH["search.mjs\nMiniSearch index"]
+        METRICS["metrics-extractor.mjs\nStructural scoring"]
+        FACTS["computed-facts.mjs\nExpression evaluator"]
     end
 
-    subgraph Storage["Storage Layer"]
-        JSON[("Generated JSON<br/>database, registry")]
-        SQLITE[("SQLite Cache<br/>.cache/knowledge.db")]
-        CACHE[("Source Cache<br/>.cache/sources/")]
+    subgraph Artifacts["Build Artifacts"]
+        JSON[("database.json\nAll entities + pages")]
+        REGISTRY[("id-registry.json\nStable numeric IDs")]
+        SEARCHIDX[("search-index.json\nMiniSearch data")]
     end
 
-    subgraph Output["Output"]
-        SITE["Static Site<br/>Astro/Starlight"]
-        CLI["CLI Tools<br/>crux commands"]
+    subgraph Runtime["Next.js Runtime"]
+        DATA["data/index.ts\nLazy-loaded indexes"]
+        COMPONENTS["React components\nEntityLink, InfoBox, etc."]
+        PAGES["MDX rendering\nnext-mdx-remote"]
     end
 
-    YAML --> BUILD
-    MDX --> BUILD
-    MDX --> SCAN
-    BUILD --> JSON
-    SCAN --> SQLITE
-    EXT --> FETCH
-    FETCH --> SQLITE
-    FETCH --> CACHE
-    JSON --> SITE
-    SQLITE --> CREATE
-    CACHE --> CREATE
-    CREATE --> MDX
+    YAML --> TRANSFORM --> BUILDDATA
+    MDX --> BUILDDATA
+    GRAPHS --> BUILDDATA
+    BUILDDATA --> REDUNDANCY
+    BUILDDATA --> SEARCH
+    BUILDDATA --> METRICS
+    BUILDDATA --> FACTS
+    BUILDDATA --> JSON
+    BUILDDATA --> REGISTRY
+    SEARCH --> SEARCHIDX
+    JSON --> DATA
+    DATA --> COMPONENTS
+    DATA --> PAGES
 `} />
+
+### Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Framework** | Next.js 15 with App Router |
+| **Components** | React 19 + next-mdx-remote |
+| **Styling** | Tailwind CSS v4 + shadcn/ui |
+| **Type Safety** | TypeScript + Zod schemas |
+| **Graphs** | ReactFlow (XYFlow) + Dagre/ELK layout |
+| **Diagrams** | Mermaid 11 |
+| **Search** | MiniSearch (build-time index) |
+| **CLI** | Crux (custom multi-domain CLI) |
+| **Data** | YAML sources → JSON build artifacts |
+| **Workspace** | pnpm workspaces (app + crux) |
+
+---
+
+## Clever Ideas
+
+This section catalogs the novel architectural patterns — the ideas that distinguish this system from a typical documentation site.
+
+### 1. Multi-Signal Relationship Graph
+
+**Location**: `app/scripts/build-data.mjs` (lines 230-424)
+
+Instead of manually curating "related pages" links, the system computes a weighted relationship graph by combining five different signals:
+
+| Signal | Weight | Source |
+|--------|--------|--------|
+| Explicit YAML `relatedEntries` | 10 | Human-authored |
+| Name/prefix matching (e.g. "anthropic" ↔ "anthropic-ipo") | 6 | Structural |
+| Content `\<EntityLink\>` references | 5 | Content-derived |
+| N-gram content similarity | 0–3 (scaled) | Computed |
+| Shared tags (specificity-weighted) | varies | Computed |
+
+Each neighbor's score gets a **quality boost** based on the target page's quality and importance ratings: `boost = 1 + quality/40 + importance/400` (max \~1.45x). Unrated pages default to average values so they aren't penalized.
+
+The output uses **type-diverse selection**: at least 2 entries from each entity type are guaranteed before filling remaining slots by score. This prevents the "related" sidebar from being dominated by one type.
+
+**Directional relationship labels** ("mitigates", "caused by") are preserved through an inverse-label mapping table, so both directions of a relationship get meaningful labels.
+
+### 2. Stable Numeric ID System
+
+**Location**: `app/scripts/build-data.mjs` (lines 704-776)
+
+Every entity gets a stable numeric ID (E1, E42, E552) that enables canonical URLs surviving slug renames.
+
+The key insight: **IDs are assigned at build time and written back to source files**. This means:
+- YAML entities and MDX frontmatter are the single source of truth
+- New entities get auto-assigned IDs on their first build
+- The `id-registry.json` is a derived artifact (gitignored), not a source of truth
+- ID conflicts are detected at build time and fail the build
+- No coordination overhead — just add a new entity and build
+
+Resolution at runtime supports both numeric IDs and slugs, so `<EntityLink id="E552">` and path-based lookups both work.
+
+### 3. Content-Derived Backlinks
+
+**Location**: `app/scripts/build-data.mjs` (lines 190-225, 867-888)
+
+The system merges two backlink sources intelligently:
+- **Explicit YAML** `relatedEntries` (semantic, directional)
+- **MDX content scans** for `<EntityLink id="X">` (implicit, extracted by regex)
+
+Content scanning happens before raw MDX is stripped from the build output, creating an inbound-link map that's deduplicated by ID. This means every entity knows both who links to it and who it links to, without manual maintenance.
+
+### 4. N-gram Redundancy Detection
+
+**Location**: `app/scripts/lib/redundancy.mjs`
+
+Pages are compared using **5-word n-gram shingling** (Jaccard similarity) combined with word overlap. The system:
+- Extracts clean text (strips code blocks, JSX, tables, headers, markdown formatting)
+- Compares only within the same `contentFormat` (articles vs. tables vs. diagrams) to avoid false positives
+- Uses `max(shingleSimilarity, wordSimilarity * 0.8)` as combined metric
+- Stores top 5 similar pages per page at a 10% threshold
+
+This feeds into the relationship graph (signal #4) and helps editors find pages that overlap.
+
+### 5. Safe Expression Evaluator for Computed Facts
+
+**Location**: `app/scripts/lib/computed-facts.mjs`
+
+Facts can reference other facts in expressions like `{openai.revenue-2024} * {growth-rate}`. Instead of using `eval()`, the system uses a **hand-written recursive descent parser** that supports:
+- Human-readable numeric parsing: `"$350 billion"` → `350_000_000_000`, `"40%"` → `0.4`
+- Arithmetic: `+`, `-`, `*`, `/`, parentheses
+- `{entity.factId}` references resolved in topological order
+- Format strings for display (currency prefixes, unit scaling)
+
+Dependencies are resolved topologically, so a fact referencing another computed fact works correctly. Non-computable facts (qualitative values) are flagged with `noCompute` and skipped.
+
+### 6. Build-Time Entity Transformation
+
+**Location**: `app/scripts/lib/entity-transform.mjs`
+
+Raw YAML entities are transformed into strictly typed entities at build time via a pure `transformEntity()` function. This handles:
+- **Type migration**: Old names (`lab-frontier`, `researcher`) map to canonical types (`organization`, `person`)
+- **Subtype extraction**: `lab-frontier` → `organization` + `orgType: frontier-lab`
+- **CustomField extraction**: Generic key-value `customFields` are promoted to typed fields (`Role`, `Affiliation`, `Founded`)
+- **Risk categorization**: Risk entities are auto-categorized (epistemic, misuse, structural) via a mapping table
+
+By doing this at build time, the runtime never encounters legacy type names. Unknown entity types pass through unchanged — the system is forward-compatible.
+
+### 7. Format-Aware Quality Metrics
+
+**Location**: `app/scripts/lib/metrics-extractor.mjs`
+
+Content quality is measured structurally, but the scoring adapts to the content format:
+- **Articles** are scored on word count, section structure, presence of overview/conclusion
+- **Tables** aren't penalized for low word count
+- **Diagrams** don't need prose length or section counts
+
+Metrics include raw counts (words, tables, diagrams, internal links, footnotes), ratios (bullet density), boolean checks (has overview?), and a composite structural score (0-15 raw, normalized to 0-50). A `suggestQuality` function proposes quality ratings based on structural scores, and `getQualityDiscrepancy` flags pages where the human-assigned quality disagrees with structural evidence.
+
+### 8. Single-Pass Validation Engine
+
+**Location**: `crux/lib/validation-engine.ts`
+
+Instead of having 20+ separate validator scripts that each re-read all 625 files, the validation engine **loads all content once** and runs composable rules against it:
+
+```
+engine.load()  →  read all files once  →  run each Rule.check()  →  collect Issues
+```
+
+Each Rule has:
+- `check()`: returns issues (pure function)
+- Optional `fix()`: returns corrected content (declarative `FixSpec` with `oldText`/`newText`)
+- `scope`: `'file'` (runs per file) or `'global'` (runs once on all files)
+
+Fixes are applied in bulk and logged to edit-logs. Three rules are **CI-blocking** (`comparison-operators`, `dollar-signs`, `frontmatter-schema`); the rest are advisory.
+
+### 9. YAML-First MDX Generation
+
+**Location**: `app/scripts/lib/mdx-generator.mjs`
+
+For entities whose content is defined entirely in YAML (like AI Transition Model factors), minimal MDX stub files are auto-generated. The guard condition for regeneration is carefully conservative:
+
+```
+shouldGenerateMdx = !fileExists OR (has <TransitionModelContent> AND no ## headings AND < 20 lines)
+```
+
+This means: generate if missing, regenerate if it's a short auto-generated stub, but **never overwrite custom content** (detected by presence of `##` headings or significant length). This enables a YAML-first workflow where data authors edit YAML and MDX files appear automatically.
+
+### 10. Lazy-Loaded Index System
+
+**Location**: `app/src/data/index.ts`
+
+The database is loaded once at server startup, but **indexes are built lazily** on first access:
+
+```typescript
+let _index: Map<string, Entity> | null = null;
+function getIndex() {
+  if (!_index) _index = new Map(getEntities().map(e => [e.id, e]));
+  return _index;
+}
+```
+
+This avoids building indexes for entity types that are never queried in a given request. Combined with Zod validation at load time (with graceful fallback to `GenericEntity` for unknown types), it balances strictness with forward-compatibility.
+
+### 11. Separated Search Index and Document Metadata
+
+**Location**: `app/scripts/lib/search.mjs`
+
+The build produces two files:
+- `search-index.json`: serialized MiniSearch index (only indexed fields)
+- `search-docs.json`: minimal document metadata for rendering results
+
+Only 6 fields are indexed (`title`, `description`, `tags`, `entityType`, `id`, `contentFormat`). Display metadata (`_numericId`, `_type`, `_importance`, `_quality`) is stored separately — available for result display without bloating the search index. Both files are copied to `public/` so the client can fetch them at runtime without needing `database.json`.
+
+### 12. Entity Ontology with Display Metadata
+
+**Location**: `app/src/data/entity-ontology.ts`
+
+A single file defines the canonical ontology for 30+ entity types, each with:
+- Lucide icon component
+- `iconColor` (Tailwind classes, light + dark variants)
+- `badgeColor` for explore-page filtering
+- `headerColor` for InfoBox headers
+
+Organization subtypes (`frontier-lab`, `safety-org`, `startup`, `academic`) get their own display metadata via a separate `ORG_TYPE_DISPLAY` map. **Backward-compat aliases** (`researcher` → `person`, `lab-*` → `organization`) allow gradual migrations without breaking existing data.
+
+### 13. Per-Page Edit Logs
+
+**Location**: `crux/lib/edit-log.ts`, `data/edit-logs/`
+
+Each page has a separate YAML file (`data/edit-logs/<page-id>.yaml`) tracking who changed it, when, and how:
+
+```yaml
+- date: "2026-02-13"
+  tool: crux-improve
+  agency: ai-directed
+  tier: standard
+  note: "Added citations and restructured overview"
+```
+
+By storing edit history **outside of page frontmatter**, the system separates editorial metadata from content. LLM-generated content can't accidentally corrupt the edit log. The bulk-fix system logs one entry per fixed file automatically.
+
+### 14. Session Log → Change History Integration
+
+**Location**: `app/scripts/build-data.mjs` (lines 45-100)
+
+Claude Code session logs (`.claude/sessions/*.md`) are parsed at build time and attached to pages in `database.json`. The structured format:
+
+```
+## 2026-02-13 | branch-name | Short title
+**What was done:** Summary text.
+**Pages:** page-id-1, page-id-2
+```
+
+...enables the system to show "what changed and why" for any page, correlated with git branches and PRs, without modifying the content files themselves.
+
+### 15. Frontmatter Entity Auto-Creation
+
+**Location**: `app/scripts/lib/frontmatter-scanner.mjs`
+
+Pages don't need a corresponding YAML entity file. The build script **auto-creates entities from MDX frontmatter** for any page that doesn't have one:
+
+```
+YAML entities (explicit) + frontmatter entities (auto-created) = full entity set
+```
+
+YAML entities take precedence. This means a page can start as just an MDX file with frontmatter, and the system treats it as a first-class entity — it gets a numeric ID, appears in search, and can be linked via `<EntityLink>`.
+
+### 16. Inverse Relationship Labels
+
+**Location**: `app/scripts/build-data.mjs` (lines 259-291)
+
+When entity A declares `relationship: "mitigates"` toward entity B, the system auto-generates the inverse label for the B→A direction using a lookup table:
+
+```
+"mitigates" ↔ "mitigated by"
+"causes" ↔ "caused by"
+"enables" ↔ "enabled by"
+"child-of" ↔ "parent of"
+```
+
+Explicit labels are never overwritten by inferred ones. This gives both sides of a relationship meaningful edge labels without requiring authors to declare both directions.
+
+### 17. Tag Specificity Weighting
+
+**Location**: `app/scripts/build-data.mjs` (lines 349-361)
+
+When computing related entities from shared tags, rarer tags get more weight:
+
+```
+specificity = 1 / log2(tagCount + 2)
+```
+
+A tag shared by 3 entities is more informative than one shared by 300. This prevents broad tags like "ai-safety" from drowning out specific connections.
 
 ---
 
 ## Core Systems
 
-### 1. Entity Data System
+### Entity Data Pipeline
 
-**Purpose**: Maintain structured data about people, organizations, and concepts that can be referenced across pages.
-
-**Flow**: YAML sources → build-data.mjs → JSON artifacts → React components
+**Flow**: YAML sources → entity-transform.mjs → build-data.mjs → JSON artifacts → React components
 
 | Component | Location | Purpose |
 |-----------|----------|---------|
-| Source YAML | `src/data/*.yaml` | Human-editable entity definitions |
-| Build script | `scripts/build-data.mjs` | Compiles YAML to JSON |
-| Generated JSON | `src/data/*.json` | Browser-ready data |
-| Components | `src/components/wiki/` | Display entity data |
+| Source YAML | `data/entities/*.yaml` | Human-editable entity definitions |
+| Entity transform | `app/scripts/lib/entity-transform.mjs` | Type mapping and normalization |
+| Build script | `app/scripts/build-data.mjs` | Main compilation pipeline |
+| Generated JSON | `app/src/data/database.json` | Browser-ready merged data |
+| Data layer | `app/src/data/index.ts` | Runtime access with Zod validation |
+| Components | `app/src/components/wiki/` | Display entity data |
 
 **Key files generated**:
-- `database.json` - All entities merged
-- `pathRegistry.json` - Entity ID → URL path mapping
-- `backlinks.json` - Reverse reference indices
+- `database.json` — All entities, pages, relations, facts, search data, statistics
+- `id-registry.json` — Numeric ID ↔ slug mappings (derived, gitignored)
+- `search-index.json` + `search-docs.json` — Client-side search data
 
-**Design decision**: YAML for human editing, JSON for runtime. This separation allows manual curation while keeping the site fast.
-
----
-
-### 2. Knowledge Database (SQLite)
+### Knowledge Database (SQLite)
 
 **Purpose**: Index content for analysis, cache external sources, and support AI-assisted workflows.
 
@@ -127,19 +378,11 @@ erDiagram
     }
 `} />
 
-**Key capabilities**:
-- Content indexing and search
-- Source fetching via Firecrawl API
-- AI summary generation
-- Change detection via content hashing
-
 **See**: [Content Database](/internal/content-database/) for full schema and API reference.
 
----
+### Page Creation Pipeline
 
-### 3. Page Creation Pipeline
-
-**Purpose**: Generate new wiki pages with proper citations using AI research and synthesis.
+**Purpose**: Generate wiki pages with proper citations using AI research and synthesis.
 
 **Pipeline phases**:
 
@@ -175,63 +418,43 @@ flowchart LR
     CACHE -.->|"Quote verification"| VS
 `} />
 
-**Design decisions**:
+**Key design decisions**:
 
 | Decision | Rationale |
 |----------|-----------|
-| Perplexity for research | Cheap (\$0.10), good at web search, provides citation URLs |
-| Register + fetch sources | Enables quote verification against actual content |
+| Perplexity for research | Cheap (\~\$0.10), good at web search, provides citation URLs |
+| Register + fetch sources | Enables quote verification against actual source content |
 | Verify-sources phase | Catches hallucinated quotes before publication |
 | Validation loop | Iterative fixing ensures build-passing output |
 
-**Cost tiers**:
-- Budget: \$2-3 (no source fetching)
-- Standard: \$4-6 (with source fetching + verification)
-- Premium: \$8-12 (deep research + review)
+**Cost tiers**: polish (\$2-3), standard (\$5-8), deep (\$10-15).
 
 **See**: [Page Creator Pipeline](/internal/reports/page-creator-pipeline/) for experiment results.
 
----
+### Crux CLI
 
-### 4. Source Fetching System
+**Purpose**: Unified CLI for all wiki tooling.
 
-**Purpose**: Fetch and cache actual webpage content for citation verification.
-
-**Flow**:
-
-```
-Citation URLs (from Perplexity)
-    → Register in SQLite (sources table)
-    → Fetch via Firecrawl API
-    → Store in SQLite + .cache/sources/
-    → Use in quote verification
-```
-
-**Components**:
-
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| Knowledge DB | `scripts/lib/knowledge-db.mjs` | SQLite wrapper, source tracking |
-| Fetch script | `scripts/utils/fetch-sources.mjs` | Standalone Firecrawl fetcher |
-| Page creator | `scripts/content/page-creator.mjs` | Integrated fetch during page creation |
-
-**Rate limiting**: 7 seconds between requests (Firecrawl free tier limit).
-
-**Design decision**: Fetch during page creation rather than eagerly. This keeps costs predictable and ensures we only fetch sources we actually need.
-
----
-
-### 5. Validation System
-
-**Purpose**: Ensure content quality and prevent build failures.
-
-**Architecture**: Unified rules engine with 20+ validators.
+**Architecture**: Domain-based command dispatch with 12+ domains:
 
 ```bash
-npm run crux -- validate unified --rules=dollar-signs,entitylink-ids
+pnpm crux validate          # Validation suite
+pnpm crux content create    # AI page creation
+pnpm crux content improve   # AI page improvement
+pnpm crux fix escaping      # Auto-fix MDX issues
+pnpm crux analyze           # Content analysis
+pnpm crux edit-log view     # Per-page edit history
 ```
 
-**Rule categories**:
+Each domain is a module with a `commands` export. Commands are async functions returning `{output, exitCode}`. A `--ci` flag switches output to JSON for CI integration.
+
+**See**: `crux/README.md` for the full domain reference.
+
+### Validation System
+
+**Purpose**: Enforce content quality and consistency at multiple levels.
+
+**Architecture**: Single-pass validation engine runs composable rules. Each rule checks specific patterns and can optionally auto-fix issues.
 
 | Category | Examples | Blocking? |
 |----------|----------|-----------|
@@ -291,47 +514,31 @@ sequenceDiagram
 
 ## Design Principles
 
-### 1. Separation of Source and Generated Data
+### 1. Source Files as Single Source of Truth
 
-**Principle**: Human-editable files (YAML, MDX) are separate from generated artifacts (JSON, SQLite).
+Human-editable files (YAML, MDX) are the canonical source. Everything else — JSON, search indexes, the ID registry — is a derived build artifact that can be regenerated. Generated files are gitignored where appropriate. This means: no merge conflicts on generated data, clear ownership boundaries, and deterministic builds from source.
 
-**Why**:
-- Generated files can be regenerated from source
-- No merge conflicts on generated files (gitignored where appropriate)
-- Clear ownership: humans edit YAML, scripts generate JSON
+### 2. Build-Time Computation, Runtime Speed
 
-### 2. Local-First Caching
-
-**Principle**: Cache computationally expensive results locally (SQLite, `.cache/`).
-
-**Why**:
-- AI summaries are expensive; don't regenerate unnecessarily
-- Source fetching has API costs; cache results
-- Content hashing enables incremental updates
-
-**Trade-off**: Cache must be rebuilt on new machines. This is acceptable because:
-- Build is deterministic from source files
-- Cache is optimization, not source of truth
+Expensive operations (relationship graph computation, redundancy detection, fact evaluation, search index building, entity transformation) all happen at build time. Runtime reads pre-computed JSON through lazy-loaded indexes. The result: a fast site with rich computed data, without runtime computation costs.
 
 ### 3. Progressive Enhancement for AI Features
 
-**Principle**: AI features (summaries, page creation) are optional enhancements.
-
-**Why**:
-- Wiki works without API keys
-- Failures in AI pipeline don't break the site
-- Costs are predictable and opt-in
+AI features (summaries, page creation, grading) are optional enhancements. The wiki builds and serves without any API keys. Failures in the AI pipeline don't break the site. Costs are predictable and opt-in per-tier.
 
 ### 4. Validation at Multiple Levels
 
-**Principle**: Catch errors early and at appropriate granularity.
+| Level | Tool | When | Blocking? |
+|-------|------|------|-----------|
+| Syntax | MDX compiler | Build time | Yes |
+| Schema | Zod validation | Build time (with fallback) | Soft |
+| Content rules | Validation engine | CI | 3 rules blocking |
+| References | EntityLink validator | CI | Advisory |
+| Quality | Grading pipeline | Manual trigger | No |
 
-| Level | Tool | When |
-|-------|------|------|
-| Syntax | MDX compiler | Build time |
-| Schema | Zod validation | Build time |
-| References | EntityLink validator | CI |
-| Quality | Grading pipeline | Manual trigger |
+### 5. Forward-Compatible by Default
+
+Unknown entity types pass through as `GenericEntity` (preserving all custom fields). Backward-compat aliases handle gradual migrations. The Zod schema validation logs warnings in dev but doesn't fail builds for unrecognized types. New features can be added to the data layer without updating every consumer.
 
 ---
 
@@ -339,11 +546,13 @@ sequenceDiagram
 
 | File | Purpose | When to Edit |
 |------|---------|--------------|
-| `astro.config.mjs` | Sidebar structure, Starlight config | Adding new sections |
-| `src/content.config.ts` | MDX frontmatter schema | Adding frontmatter fields |
-| `src/data/schema.ts` | Entity type definitions (Zod) | Adding entity types |
-| `scripts/lib/knowledge-db.mjs` | SQLite schema | Adding database tables |
-| `scripts/content/page-creator.mjs` | Page creation pipeline | Modifying generation flow |
+| `app/next.config.ts` | Next.js + MDX configuration | Adding plugins, redirects |
+| `app/src/data/entity-schemas.ts` | Entity type definitions (Zod) | Adding entity types or fields |
+| `app/src/data/entity-ontology.ts` | Display metadata (icons, colors) | Adding entity display styles |
+| `app/src/data/entity-type-names.ts` | Canonical entity type list | Adding new entity types |
+| `app/src/lib/internal-nav.ts` | Internal sidebar navigation | Adding internal pages |
+| `app/scripts/build-data.mjs` | Main build pipeline | Changing data flow |
+| `crux/lib/validation-engine.ts` | Validation rules framework | Adding validation rules |
 
 ---
 
@@ -354,48 +563,66 @@ sequenceDiagram
 | `ANTHROPIC_API_KEY` | Claude API access | Summaries, grading, page creation |
 | `OPENROUTER_API_KEY` | Perplexity via OpenRouter | Page creation research |
 | `FIRECRAWL_KEY` | Web page fetching | Source content fetching |
+| `SCRY_API_KEY` | Academic paper search | Deep research tier |
 
 All are optional. Features gracefully degrade when keys are missing.
 
 ---
 
-## Documentation Maintenance
+## Repository Structure
 
-### Keeping Docs Updated
+```
+longterm-wiki/
+├── content/docs/               # ~625 MDX wiki pages
+│   ├── knowledge-base/         # Risks, responses, orgs, people
+│   ├── ai-transition-model/    # Factor network with scenarios
+│   ├── models/                 # Analytical frameworks
+│   ├── project/                # Public project documentation
+│   └── internal/               # Contributor docs (including this page)
+├── data/                       # YAML source data
+│   ├── entities/               # Entity definitions (split by type)
+│   ├── facts/                  # Canonical facts with computed values
+│   ├── resources/              # External resource metadata
+│   ├── insights/               # Cross-page insights
+│   ├── graphs/                 # Cause-effect graph YAML
+│   └── edit-logs/              # Per-page edit history
+├── app/                        # Next.js 15 frontend
+│   ├── src/
+│   │   ├── app/                # App Router pages
+│   │   ├── components/         # React components (wiki/, ui/)
+│   │   ├── data/               # Data layer + Zod schemas
+│   │   └── lib/                # Utilities, search, navigation
+│   └── scripts/                # Build scripts + libraries
+│       ├── build-data.mjs      # Main data compilation pipeline
+│       └── lib/                # Build utilities (transform, metrics, search, etc.)
+├── crux/                       # Crux CLI + validation
+│   ├── crux.mjs                # CLI entry point
+│   ├── commands/               # Domain handlers
+│   ├── authoring/              # Page create/improve/grade
+│   ├── lib/                    # Validation engine, templates, utilities
+│   └── validate/               # Validation rule implementations
+└── package.json                # pnpm workspace root
+```
+
+---
+
+## Documentation Maintenance
 
 This architecture documentation should be updated when:
 
-1. **New pipeline phases added** - Update the pipeline diagram and phase list
-2. **Database schema changes** - Update the ER diagram
-3. **New environment variables** - Add to the environment variables table
-4. **New validation rules** - Document in the validation section
-
-### Freshness Indicators
-
-Each internal doc should include:
-- `lastEdited` in frontmatter (updated when content changes)
-- Verification notes for time-sensitive information
-
-### Automated Checks
-
-Consider adding:
-```bash
-# Check if docs mention deprecated scripts
-npm run crux -- validate docs-freshness
-```
-
-### Cross-References
-
-When code changes affect documentation:
-1. Update the relevant internal doc
-2. Add a comment in the code: `// Docs: /internal/architecture/#section-name`
-3. Run `npm run build` to verify links still work
+1. **New pipeline phases added** — Update the pipeline diagram and phase list
+2. **New clever patterns introduced** — Add to the "Clever Ideas" section
+3. **Database schema changes** — Update the ER diagram
+4. **New environment variables** — Add to the environment variables table
+5. **Tech stack changes** — Update the stack table and diagrams
 
 ---
 
 ## Related Documentation
 
-- [Content Database](/internal/content-database/) - SQLite schema and API
-- [Automation Tools](/internal/automation-tools/) - CLI reference
-- [Page Creator Pipeline](/internal/reports/page-creator-pipeline/) - Generation experiments
-- [About This Wiki](/internal/about-this-wiki/) - Contributor overview
+- [About This Wiki](/internal/about-this-wiki/) — Contributor overview
+- [Content Database](/internal/content-database/) — SQLite schema and API
+- [Automation Tools](/internal/automation-tools/) — CLI reference
+- [Page Creator Pipeline](/internal/reports/page-creator-pipeline/) — Generation experiments
+- [Schema Overview](/internal/schema/) — Entity types and data relationships
+- [Entity Reference](/internal/schema/entities/) — Complete entity type catalog
