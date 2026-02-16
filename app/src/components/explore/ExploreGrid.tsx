@@ -5,7 +5,6 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { ExploreItem } from "@/data";
 import { ENTITY_GROUPS } from "@/data/entity-ontology";
 import { searchWikiScores } from "@/lib/search";
-import { InsightCard } from "./InsightCard";
 import { ContentCard } from "./ContentCard";
 
 // FIELD filter — based on page clusters
@@ -410,11 +409,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       {/* Card grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filtered.slice(0, visibleCount).map((item) =>
-          item.type === "insight" ? (
-            <InsightCard key={item.id} item={item} />
-          ) : (
-            <ContentCard key={item.id} item={item} />
-          )
+          <ContentCard key={item.id} item={item} />
         )}
       </div>
 
