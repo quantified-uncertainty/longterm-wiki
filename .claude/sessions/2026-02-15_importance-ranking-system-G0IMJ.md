@@ -10,6 +10,8 @@ Session 3: Wired research importance scores through the full stack — synced `r
 
 Session 4: Deep iteration on ranking quality. Found four systematic issues: (1) 37 internal/meta pages leaking into top 100, (2) overview pages over-ranked in research, (3) core research topics stuck at bottom from merge artifacts, (4) AI transition model category dominating research top 50. Fixed by: moving internal pages to bottom of both rankings, relocating 28 overview pages to middle, manually promoting 15 misranked research topics (deceptive alignment #542->#31, sharp left turn #565->#43, emergent capabilities #547->#44, etc.), demoting vague pages. Ran 3 verification passes. Rewrote research prompt to emphasize specificity/tractability. Dashboard now shows rank positions (#N) with score in parens. Also fixed d3-force type declarations missing from parallel PR merge.
 
+Session 5: Paranoid code review found and fixed 6 critical + 3 warning issues: (1) `parseInt` truncating 0.5-increment scores in build-data.mjs → changed to `Number()`, (2) duplicate entries in both ranking YAML files (2 in importance, 8 in research) → removed, (3) 14 pages created on this branch never added to rankings → added, (4) `verifyRanking` splice bug using `sorted.length` instead of `windowIds.length` → fixed, (5) `rank.ts` ignoring `--dimension` flag → wired through, (6) stale `workshop-updated.mdx` in repo root → removed. Also added: deduplication in `loadRanking`, atomic file writes for ranking YAML, fixed misleading "both" text on dashboard. Re-synced all 658 pages.
+
 **Pages:** importance-ranking (internal documentation), importance-rankings (new internal dashboard)
 
 **Issues encountered:**
@@ -25,3 +27,6 @@ Session 4: Deep iteration on ranking quality. Found four systematic issues: (1) 
 - Readership dimension prompt emphasizes: centrality, foundational dependency, breadth, real-world relevance
 - Manual corrections are sometimes necessary for the most egregious merge artifacts — the algorithm can't self-correct across large rank distances
 - Internal/meta/project pages should be pre-filtered to the bottom before any ranking pass
+- `parseInt` silently truncates decimal scores — always use `Number()` for frontmatter numeric fields
+- Both ranking files must be kept in sync when adding new pages — the sync command only syncs scores, not page membership
+- The `verifyRanking` splice must use the original window width, not the sorted result length, to avoid duplicating entries when `sortBatch` drops pages

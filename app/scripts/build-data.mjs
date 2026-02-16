@@ -440,7 +440,7 @@ function buildPagesRegistry(urlToResource) {
         // Extract structural metrics (format-aware scoring)
         const contentFormat = fm.contentFormat || 'article';
         const metrics = extractMetrics(content, fullPath, contentFormat);
-        const currentQuality = fm.quality ? parseInt(fm.quality) : null;
+        const currentQuality = fm.quality != null ? Number(fm.quality) : null;
 
         // Find unconverted links (markdown links that have matching resources)
         const unconvertedLinks = urlToResource ? findUnconvertedLinks(content, urlToResource) : [];
@@ -456,14 +456,14 @@ function buildPagesRegistry(urlToResource) {
           filePath: relative(CONTENT_DIR, fullPath),
           title: fm.title || id.replace(/-/g, ' '),
           quality: currentQuality,
-          importance: fm.importance ? parseInt(fm.importance) : null,
-          researchImportance: fm.researchImportance ? parseInt(fm.researchImportance) : null,
+          importance: fm.importance != null ? Number(fm.importance) : null,
+          researchImportance: fm.researchImportance != null ? Number(fm.researchImportance) : null,
           // Content format: article (default), table, diagram, index, dashboard
           contentFormat: fm.contentFormat || 'article',
           // ITN framework fields (0-100 scale)
-          tractability: fm.tractability ? parseInt(fm.tractability) : null,
-          neglectedness: fm.neglectedness ? parseInt(fm.neglectedness) : null,
-          uncertainty: fm.uncertainty ? parseInt(fm.uncertainty) : null,
+          tractability: fm.tractability != null ? Number(fm.tractability) : null,
+          neglectedness: fm.neglectedness != null ? Number(fm.neglectedness) : null,
+          uncertainty: fm.uncertainty != null ? Number(fm.uncertainty) : null,
           causalLevel: fm.causalLevel || null,
           lastUpdated: fm.lastUpdated || fm.lastEdited || null,
           llmSummary: fm.llmSummary || null,

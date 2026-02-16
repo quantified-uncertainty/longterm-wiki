@@ -24,21 +24,28 @@ import {
   findUnrankedPages,
   insertAt,
   getNeighbors,
+  DEFAULT_DIMENSION,
 } from '../lib/importance-ranking.ts';
 
 const args = parseCliArgs(process.argv.slice(2));
 const log = createLogger(args.ci as boolean);
 const c = log.colors;
 
-const SYSTEM_PROMPT = `You are an AI safety researcher ranking wiki pages by their importance to understanding and mitigating AI risk.
+const dimension = (args.dimension as string) || DEFAULT_DIMENSION;
 
-When comparing two topics, consider:
-1. How central is this topic to AI safety? (core alignment concepts > peripheral topics)
-2. How much would understanding this topic help someone working on AI safety?
-3. How significant is this topic's real-world impact on AI risk trajectories?
-4. How many other important AI safety topics depend on understanding this one?
+const COMPARE_PROMPTS: Record<string, string> = {
+  readership: `You are ranking wiki pages by importance FOR READERS of an AI safety wiki. Which page is more important for someone trying to understand AI safety?
 
-You must respond with ONLY "A" or "B" — nothing else. No explanation, no hedging.`;
+Respond with ONLY "A" or "B".`,
+
+  research: `You are ranking wiki pages by RESEARCH VALUE — where a small research team's time would be best spent doing original investigation. This is NOT about broad importance. A narrow, neglected topic with tractable open questions beats a famous broad topic every time.
+
+Which topic would yield more surprising, decision-relevant findings from 40 hours of focused research?
+
+Respond with ONLY "A" or "B".`,
+};
+
+const SYSTEM_PROMPT = COMPARE_PROMPTS[dimension] || COMPARE_PROMPTS.readership;
 
 interface PageInfo {
   id: string;
@@ -125,7 +132,7 @@ async function main() {
     });
   }
 
-  const { ranking } = loadRanking();
+  const { ranking } = loadRanking(dimension);
   const positionalArgs = args._positional as string[];
 
   // Determine which pages to rank
@@ -214,7 +221,7 @@ async function main() {
   progress?.done();
 
   // Save updated ranking
-  saveRanking({ ranking: currentRanking });
+  saveRanking({ ranking: currentRanking }, dimension);
   log.success(`Ranking saved (${currentRanking.length} total pages)`);
 
   if (toRank.length > 1) {

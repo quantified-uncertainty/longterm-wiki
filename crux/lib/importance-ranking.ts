@@ -15,8 +15,9 @@
  *   data/research-ranking.yaml        (research importance ranking)
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, writeFileSync, renameSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { tmpdir } from 'os';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { PROJECT_ROOT, CONTENT_DIR_ABS } from './content-types.ts';
 import { findMdxFiles } from './file-utils.ts';
@@ -73,6 +74,13 @@ export function loadRanking(dimension: string = DEFAULT_DIMENSION): RankingData 
   if (!data || !Array.isArray(data.ranking)) {
     return { ranking: [] };
   }
+  // Deduplicate — keep first occurrence of each page ID
+  const seen = new Set<string>();
+  data.ranking = data.ranking.filter((id) => {
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
   return data;
 }
 
@@ -104,7 +112,11 @@ export function saveRanking(data: RankingData, dimension: string = DEFAULT_DIMEN
   ].join('\n');
 
   const yaml = stringifyYaml(data, { lineWidth: 0 });
-  writeFileSync(file, header + yaml, 'utf-8');
+  const content = header + yaml;
+  // Atomic write: write to temp file in same directory, then rename
+  const tmpFile = join(dirname(file), `.ranking-${Date.now()}.tmp`);
+  writeFileSync(tmpFile, content, 'utf-8');
+  renameSync(tmpFile, file);
 }
 
 // ---------------------------------------------------------------------------

@@ -2,8 +2,8 @@
 title: "Models Style Guide"
 description: "Style guide for writing model and analysis pages"
 pageType: "documentation"
-importance: 44
-researchImportance: 70
+importance: 45
+researchImportance: 70.5
 quality: 38
 llmSummary: "Internal style guide prescribing dense, quantified content structure for model pages: minimum 800 words, 2+ tables (4x3+), 1+ Mermaid diagram, mathematical formulations, and <30% bullets. Requires specific sections (overview, framework, quantitative analysis, cases, limitations) with probability ranges and scenario weighting throughout."
 ratings:

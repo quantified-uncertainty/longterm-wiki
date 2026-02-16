@@ -4,8 +4,8 @@ description: "Guidelines for minimal placeholder pages"
 pageType: "documentation"
 sidebar:
   order: 13
-importance: 12
-researchImportance: 7
+importance: 14
+researchImportance: 9.5
 quality: 19
 llmSummary: "Internal documentation providing guidelines for creating minimal placeholder pages (stubs) in the knowledge base, including when to use them, required formatting, and when to convert them to full pages. Covers basic content structure and validation procedures."
 ratings:

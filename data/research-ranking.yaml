@@ -152,7 +152,6 @@ ranking:
   - evaluation-awareness
   - tool-use
   - interpretability-sufficient
-  - agi-timeline-debate
   - seldon-lab
   - securebio
   - resources
@@ -186,7 +185,6 @@ ranking:
   - collective-epistemics-design-sketches
   - common-writing-principles
   - models-style-guide
-  - capability-unlearning
   - evals-governance
   - hybrid-systems
   - coordination-tech
@@ -262,8 +260,6 @@ ranking:
   - disinformation-detection-race
   - automation-bias-cascade
   - anthropic-pledge-enforcement
-  - racing-dynamics-impact
-  - regulatory-capacity-threshold
   - anthropic-impact
   - structural
   - risk-interaction-network
@@ -284,7 +280,6 @@ ranking:
   - fri
   - anthropic
   - transformative-ai
-  - anthropic-valuation
   - 80000-hours
   - cset
   - conjecture
@@ -391,7 +386,6 @@ ranking:
   - turion
   - polymarket
   - manifold
-  - rethink-priorities
   - eliezer-yudkowsky-predictions
   - elon-musk-predictions
   - leopold-aschenbrenner
@@ -442,7 +436,6 @@ ranking:
   - epistemic-security
   - coe-ai-convention
   - bletchley-declaration
-  - ai-assisted-knowledge-management
   - paul-christiano
   - dario-amodei
   - ilya-sutskever
@@ -615,7 +608,6 @@ ranking:
   - models
   - entities
   - longterm-vision
-  - longtermwiki-value-proposition
   - similar-projects
   - critical-insights
   - strategy-brainstorm
@@ -650,4 +642,25 @@ ranking:
   - changelog
   - anthropic-pages-refactor-notes
   - vipul-naik
+  - cirl
+  - compute-monitoring
+  - controlled-vocabulary
+  - epistemic-orgs-epoch-ai
+  - human-expertise
+  - institutional-adaptation-speed
+  - intervention-effectiveness-matrix
+  - swift-centre
+  - ai-accountability
+  - ai-investigation-risks
+  - ai-megaproject-infrastructure
+  - ai-powered-investigation
+  - ai-talent-market-dynamics
+  - astralis-foundation
+  - deanonymization
+  - frontier-lab-cost-structure
+  - planning-for-frontier-lab-scaling
+  - pre-tai-capital-deployment
+  - safety-spending-at-scale
+  - singapore-consensus
+  - the-foundation-layer
   - david-sacks

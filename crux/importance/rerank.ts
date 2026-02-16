@@ -288,8 +288,9 @@ async function verifyRanking(
 
     const sorted = await sortBatch(windowPages, client);
 
-    // Replace the window in the result
-    result.splice(start, sorted.length, ...sorted);
+    // Replace the window in the result (use windowIds.length, not sorted.length,
+    // in case sortBatch returned fewer items than the window)
+    result.splice(start, windowIds.length, ...sorted);
 
     // Count how many moved
     for (let i = 0; i < sorted.length; i++) {

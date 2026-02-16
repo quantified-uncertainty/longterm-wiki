@@ -18,7 +18,7 @@ export default function ImportanceRankingsPage() {
     <article className="prose max-w-none">
       <h1>Importance Rankings</h1>
       <p className="text-muted-foreground">
-        All {items.length} ranked pages with both readership importance and
+        All {items.length} ranked pages with readership importance and/or
         research value scores.{" "}
         <span className="font-medium text-foreground">{withImportance}</span>{" "}
         have readership scores,{" "}
