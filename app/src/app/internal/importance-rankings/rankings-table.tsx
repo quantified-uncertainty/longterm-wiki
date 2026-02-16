@@ -89,6 +89,7 @@ const columns: ColumnDef<PageRankingItem>[] = [
   },
   {
     accessorKey: "importanceRank",
+    sortUndefined: "last",
     header: ({ column }) => (
       <SortableHeader column={column}>Readership</SortableHeader>
     ),
@@ -102,6 +103,7 @@ const columns: ColumnDef<PageRankingItem>[] = [
   },
   {
     accessorKey: "researchRank",
+    sortUndefined: "last",
     header: ({ column }) => (
       <SortableHeader column={column}>Research</SortableHeader>
     ),

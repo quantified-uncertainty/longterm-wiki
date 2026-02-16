@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getPageRankings } from "@/data";
 import { RankingsTable } from "./rankings-table";
 import type { Metadata } from "next";
@@ -25,9 +26,9 @@ export default function ImportanceRankingsPage() {
         <span className="font-medium text-foreground">{withResearch}</span> have
         research scores. Scores are derived from position in ordered rankings
         (see{" "}
-        <a href="/internal/importance-ranking" className="no-underline">
+        <Link href="/internal/importance-ranking" className="no-underline">
           Importance Ranking System
-        </a>
+        </Link>
         ).
       </p>
       <RankingsTable data={items} />
