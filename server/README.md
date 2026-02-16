@@ -70,7 +70,7 @@ This is Phase 1 of a gradual migration from git-managed YAML to Postgres:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URL` | `postgresql://wiki:wiki_dev@localhost:5432/longterm_wiki` | Postgres connection string |
+| `DATABASE_URL` | `postgresql://wiki:wiki_dev@localhost:5433/longterm_wiki` | Postgres connection string |
 | `PORT` | `3002` | Server port |
 
 ## Development
