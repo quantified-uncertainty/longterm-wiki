@@ -381,5 +381,4 @@ export const QUALITY_RULES: string[] = [
   'vague-citations',
   'temporal-artifacts',
   'citation-doi-mismatch',
-  'mermaid-style',
 ];

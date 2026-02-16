@@ -129,7 +129,6 @@ interface DatabaseShape {
   idRegistry: IdRegistryMaps;
   pages: Page[];
   facts: Record<string, Fact>;
-  insights: DatabaseInsight[];
   stats: Record<string, unknown>;
 }
 
@@ -795,56 +794,6 @@ function getPageTitleMap(): Map<string, string> {
   return map;
 }
 
-export interface InsightItem {
-  id: string;
-  insight: string;
-  source: string;
-  sourceTitle: string | null;
-  sourceHref: string;
-  tags: string[];
-  type: string;
-  surprising: number;
-  important: number;
-  actionable: number;
-  neglected: number;
-  compact: number;
-  composite: number;
-  added: string;
-}
-
-export function getInsights(): InsightItem[] {
-  const pageTitleMap = getPageTitleMap();
-
-  const db = getDatabase();
-  return (db.insights || []).map((insight) => {
-    const sourcePath = insight.source || "/insight-hunting";
-    const sourceTitle =
-      pageTitleMap.get(sourcePath) ||
-      pageTitleMap.get(sourcePath + "/") ||
-      null;
-    const composite =
-      insight.composite ??
-      (insight.surprising + insight.important + insight.actionable + insight.neglected + insight.compact) / 5;
-
-    return {
-      id: insight.id,
-      insight: insight.insight,
-      source: insight.source,
-      sourceTitle,
-      sourceHref: sourcePath,
-      tags: insight.tags || [],
-      type: insight.type,
-      surprising: insight.surprising,
-      important: insight.important,
-      actionable: insight.actionable,
-      neglected: insight.neglected,
-      compact: insight.compact,
-      composite,
-      added: insight.added,
-    };
-  });
-}
-
 // ============================================================================
 // INFOBOX DATA HELPERS
 // ============================================================================
@@ -1093,37 +1042,11 @@ const CATEGORY_TO_TYPE: Record<string, string> = {
 // The hardcoded TABLES array has been eliminated — all table pages are
 // detected automatically via the contentFormat field in frontmatter.
 
-// Insight shape as stored in database.json
-interface DatabaseInsight {
-  id: string;
-  insight: string;
-  source: string;
-  tags: string[];
-  type: string;
-  surprising: number;
-  important: number;
-  actionable: number;
-  neglected: number;
-  compact: number;
-  added: string;
-  composite?: number | null;
-}
-
 export function getExploreItems(): ExploreItem[] {
   const db = getDatabase();
   const typedEntities = getTypedEntities();
   const pageMap = new Map((db.pages || []).map((p) => [p.id, p]));
   const entityIds = new Set(typedEntities.map((e) => e.id));
-
-  // Build cluster lookup from pages (for tables/insights)
-  const pageClusterMap = new Map<string, string[]>();
-  for (const page of db.pages || []) {
-    pageClusterMap.set(page.path, page.clusters || []);
-    if (!page.path.endsWith("/")) {
-      pageClusterMap.set(page.path + "/", page.clusters || []);
-    }
-  }
-  const pageTitleMap = getPageTitleMap();
 
   // Items from typed entities (only those with actual content pages)
   // Exclude internal pages — they participate in entity/backlink infrastructure but are not public content
@@ -1225,36 +1148,5 @@ export function getExploreItems(): ExploreItem[] {
       };
     });
 
-  // Insight items
-  const insightItems: ExploreItem[] = (db.insights || []).map((insight) => {
-    const sourcePath = insight.source || "/insight-hunting";
-    const parentClusters =
-      pageClusterMap.get(sourcePath) ||
-      pageClusterMap.get(sourcePath + "/") ||
-      ["ai-safety"];
-    const sourceTitle =
-      pageTitleMap.get(sourcePath) ||
-      pageTitleMap.get(sourcePath + "/") ||
-      undefined;
-    return {
-      id: `insight-${insight.id}`,
-      numericId: `insight-${insight.id}`,
-      title: insight.insight,
-      type: "insight",
-      description: insight.insight,
-      tags: insight.tags || [],
-      clusters: parentClusters,
-      wordCount: null,
-      quality: insight.composite || null,
-      readerImportance: insight.composite || null,
-      category: null,
-      riskCategory: null,
-      lastUpdated: null,
-      href: sourcePath,
-      meta: insight.composite?.toFixed(1) || undefined,
-      sourceTitle,
-    };
-  });
-
-  return [...entityItems, ...pageOnlyItems, ...diagramItems, ...insightItems];
+  return [...entityItems, ...pageOnlyItems, ...diagramItems];
 }

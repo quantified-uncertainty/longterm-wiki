@@ -163,12 +163,6 @@ const SUBPROCESS_CHECKS: SubprocessCheckDescriptor[] = [
     description: 'Individual diagram nodes exist in master graph',
   },
   {
-    id: 'insights',
-    name: 'Insights Quality',
-    script: 'validate-insights.ts',
-    description: 'Insight schema, ratings, and source paths',
-  },
-  {
     id: 'models',
     name: 'Model Freshness',
     script: 'validate-models.ts',

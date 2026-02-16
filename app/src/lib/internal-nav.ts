@@ -46,7 +46,6 @@ export const INTERNAL_NAV: NavSection[] = [
       { label: "Page Similarity", href: "/internal/similarity" },
       { label: "Interventions", href: "/internal/interventions" },
       { label: "Proposals", href: "/internal/proposals" },
-      { label: "Critical Insights", href: "/internal/insights" },
     ],
   },
   {

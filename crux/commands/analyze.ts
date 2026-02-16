@@ -15,12 +15,6 @@ const SCRIPTS = {
     description: 'Run all analysis checks (health report)',
     passthrough: ['ci', 'json', 'brief'],
   },
-  mentions: {
-    script: 'validate/validate-unified.ts',
-    description: 'Find unlinked entity mentions',
-    passthrough: ['ci'],
-    extraArgs: ['--rules=entity-mentions'],
-  },
   links: {
     script: 'analyze/analyze-link-coverage.ts',
     description: 'Analyze cross-reference coverage',
@@ -63,7 +57,6 @@ ${commandList}
 Options:
   --json          JSON output
   --brief         Summary only (all)
-  --verbose       Detailed output (mentions)
   --orphans       Show poorly-linked pages (links)
   --top-linked    Show most linked pages (links)
   --page=<id>     Analyze specific page (links)
@@ -72,7 +65,6 @@ Options:
 Examples:
   crux analyze                         Full health report
   crux analyze --brief                 Summary only
-  crux analyze mentions --verbose      Detailed unlinked mentions
   crux analyze links --orphans         Find orphaned pages
   crux analyze links --top-linked      Find most linked pages
   crux analyze entity-links sam-altman Check linking for an entity

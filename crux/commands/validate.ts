@@ -81,11 +81,6 @@ const SCRIPTS = {
     description: 'Content quality ratings (advisory)',
     passthrough: ['ci'],
   },
-  insights: {
-    script: 'validate/validate-insights.ts',
-    description: 'Insight schema and ratings',
-    passthrough: ['ci'],
-  },
   schema: {
     script: 'validate/validate-yaml-schema.ts',
     description: 'YAML schema validation',
