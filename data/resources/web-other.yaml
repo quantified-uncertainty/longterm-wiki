@@ -7969,27 +7969,24 @@
   fetched_at: 2025-12-28 01:53:06
 - id: 504a3ff51cc0c66b
   url: https://aisafetypriorities.org/
-  title: Singapore Consensus
+  title: The Singapore Consensus on Global AI Safety Research Priorities
   type: web
   local_filename: 504a3ff51cc0c66b.txt
   summary: >-
-    I apologize, but I cannot generate a meaningful summary for this source. The provided content
-    appears to be an incomplete or corrupted HTML fragment, specifically containing only a Google
-    Tag Manager iframe, which does not provide any substantive text or information about the
-    "Singapore Consensus". 
-
-
-    To properly analyze a source document, I would need:
-
-    - Full readable text content
-
-    - Clear context about the document's subject
-
-    - Actual substantive information about the topic
-
-
-    Would you be able to provide the complete text of the "Singapore Consensus" document? Without
-    the actual content, I cannot construct a valid summary following the requested JSON format.
+    The Singapore Consensus on Global AI Safety Research Priorities (arXiv:2506.20702) is a
+    consensus document produced by the 2025 Singapore Conference on AI (SCAI), held April 26,
+    2025, alongside ICLR 2025. Authored by Yoshua Bengio, Stuart Russell, Max Tegmark, Dawn
+    Song, and 84 additional co-authors from 11 countries, it builds on the 2025 International AI
+    Safety Report. The document organizes AI safety research into a defence-in-depth framework
+    with three areas: (1) Assessment — methods to measure AI system impacts, enhanced metrology,
+    and third-party audit infrastructure; (2) Development — specification, training, and
+    verification of trustworthy systems, including limiting AGI risk by constraining autonomy,
+    generality, or intelligence; (3) Control — post-deployment monitoring, ecosystem oversight,
+    societal resilience, and AI control setups robust to active subversion. Uniquely identifies
+    areas of mutual interest where even competitors benefit from cooperation on shared risk
+    thresholds, evaluation protocols, and safety benchmarks.
+  cited_by:
+    - international-summits
   fetched_at: 2025-12-28 02:03:25
 - id: c1ea94e3153eee62
   url: https://slatestarcodex.com/2014/07/30/meditations-on-moloch/

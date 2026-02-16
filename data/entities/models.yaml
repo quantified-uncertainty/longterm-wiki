@@ -2379,3 +2379,179 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+- id: pre-tai-capital-deployment
+  numericId: E706
+  type: model
+  title: "Pre-TAI Capital Deployment: $100B-$300B+ Spending Analysis"
+  description: >-
+    Analytical model examining how frontier AI labs could deploy $100-300B+
+    before transformative AI arrives, covering infrastructure, compute, talent,
+    safety, and implications for other organizations planning around AI lab
+    scaling. Compute infrastructure absorbs 50-65%, safety gets 1-5%.
+  relatedEntries:
+    - id: ai-megaproject-infrastructure
+      type: model
+    - id: safety-spending-at-scale
+      type: model
+    - id: frontier-lab-cost-structure
+      type: model
+    - id: ai-talent-market-dynamics
+      type: model
+    - id: planning-for-frontier-lab-scaling
+      type: model
+    - id: safety-research-value
+      type: model
+    - id: winner-take-all-concentration
+      type: model
+  tags:
+    - capital-deployment
+    - ai-spending
+    - infrastructure
+    - safety-funding
+    - economic-models
+  clusters:
+    - ai-safety
+    - governance
+    - community
+  lastUpdated: 2026-02
+- id: ai-megaproject-infrastructure
+  numericId: E707
+  type: model
+  title: "AI Megaproject Infrastructure"
+  description: >-
+    Analysis of the unprecedented data center and infrastructure buildout
+    required for frontier AI, covering Stargate, big tech capex commitments,
+    power constraints, chip supply chains, and the economics of AI-scale
+    facilities. Individual campuses cost $10-50B and require 100MW-1GW+ power.
+  relatedEntries:
+    - id: pre-tai-capital-deployment
+      type: model
+    - id: compute-hardware
+      type: ai-transition-model-metric
+    - id: compute-governance
+      type: policy
+    - id: winner-take-all-concentration
+      type: model
+  tags:
+    - data-centers
+    - infrastructure
+    - compute
+    - power-grid
+    - economic-models
+  clusters:
+    - governance
+    - ai-safety
+  lastUpdated: 2026-02
+- id: safety-spending-at-scale
+  numericId: E708
+  type: model
+  title: "Safety Spending at Scale"
+  description: >-
+    Analysis of what $1-50B+ annual AI safety budgets could accomplish,
+    examining absorptive capacity constraints, research portfolio design,
+    talent pipeline requirements, and the gap between current spending and
+    what meaningful safety would require. Binding constraint below $10B/year
+    is talent pipeline (~1,000 qualified safety researchers globally).
+  relatedEntries:
+    - id: pre-tai-capital-deployment
+      type: model
+    - id: safety-research-value
+      type: model
+    - id: ai-talent-market-dynamics
+      type: model
+    - id: field-building-analysis
+      type: approach
+  tags:
+    - safety-funding
+    - absorptive-capacity
+    - talent-pipeline
+    - intervention-models
+  clusters:
+    - ai-safety
+    - community
+    - governance
+  lastUpdated: 2026-02
+- id: frontier-lab-cost-structure
+  numericId: E703
+  type: model
+  title: "Frontier Lab Cost Structure"
+  description: >-
+    Financial anatomy of frontier AI labs including revenue breakdown, cost
+    allocation, path to profitability, and how financial structure shapes
+    safety priorities. OpenAI burns ~$9B/year on $20B ARR; Anthropic ~$5-7B
+    on $9B ARR. Safety receives 1-8% depending on the lab.
+  relatedEntries:
+    - id: pre-tai-capital-deployment
+      type: model
+    - id: anthropic-valuation
+      type: analysis
+    - id: openai-foundation
+      type: organization
+    - id: racing-dynamics-impact
+      type: model
+  tags:
+    - lab-finances
+    - cost-structure
+    - safety-spending
+    - economic-models
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+- id: ai-talent-market-dynamics
+  numericId: E704
+  type: model
+  title: "AI Talent Market Dynamics"
+  description: >-
+    Analysis of the AI researcher talent market as the binding constraint on
+    scaling both capabilities and safety. An estimated 5,000-10,000 researchers
+    globally can contribute to frontier AI, with 500-1,000 at the highest level.
+    Safety workforce (~2,000-3,500) is an order of magnitude smaller.
+  relatedEntries:
+    - id: pre-tai-capital-deployment
+      type: model
+    - id: safety-spending-at-scale
+      type: model
+    - id: capabilities-to-safety-pipeline
+      type: model
+    - id: field-building-analysis
+      type: approach
+  tags:
+    - talent
+    - compensation
+    - brain-drain
+    - safety-workforce
+    - economic-models
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02
+- id: planning-for-frontier-lab-scaling
+  numericId: E705
+  type: model
+  title: "Planning for Frontier Lab Scaling"
+  description: >-
+    Strategic framework for how governments, philanthropies, academia, startups,
+    and civil society should plan around frontier AI labs deploying $100-300B+
+    pre-TAI. The 2025-2028 window is critical because spending patterns are
+    being established and pre-IPO accountability mechanisms are still available.
+  relatedEntries:
+    - id: pre-tai-capital-deployment
+      type: model
+    - id: safety-spending-at-scale
+      type: model
+    - id: openai-foundation
+      type: organization
+    - id: anthropic-investors
+      type: analysis
+  tags:
+    - strategy
+    - governance
+    - philanthropy
+    - planning
+    - intervention-models
+  clusters:
+    - ai-safety
+    - governance
+    - community
+  lastUpdated: 2026-02
