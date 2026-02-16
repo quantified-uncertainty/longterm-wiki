@@ -17,6 +17,7 @@ import { citationUrlsRule } from './citation-urls.ts';
 import { componentImportsRule } from './component-imports.ts';
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { footnoteCoverageRule } from './footnote-coverage.ts';
+import { humanAttributionRule } from './human-attribution.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 
@@ -658,5 +659,54 @@ describe('footnote-coverage rule', () => {
     });
     const issues = footnoteCoverageRule.check(content, {});
     expect(issues.length).toBe(1); // definitions alone don't count
+  });
+});
+
+// =============================================================================
+// human-attribution rule
+// =============================================================================
+
+describe('human-attribution rule', () => {
+  it('detects "Human-assigned" in content', () => {
+    const content = mockContent('Human-assigned rating of overall page quality.');
+    const issues = humanAttributionRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('human attribution');
+  });
+
+  it('detects "human-assigned" (lowercase)', () => {
+    const content = mockContent('The human-assigned quality disagrees with structural evidence.');
+    const issues = humanAttributionRule.check(content, {});
+    expect(issues.length).toBe(1);
+  });
+
+  it('detects "human-rated"', () => {
+    const content = mockContent('This is a human-rated quality score.');
+    const issues = humanAttributionRule.check(content, {});
+    expect(issues.length).toBe(1);
+  });
+
+  it('detects "human-graded"', () => {
+    const content = mockContent('Pages are human-graded for quality.');
+    const issues = humanAttributionRule.check(content, {});
+    expect(issues.length).toBe(1);
+  });
+
+  it('does not flag "human-written" (legitimate usage)', () => {
+    const content = mockContent('Wikipedia contains 7.1 million human-written articles.');
+    const issues = humanAttributionRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('does not flag "human-generated" (legitimate usage)', () => {
+    const content = mockContent('High-quality human-generated text will be exhausted by 2028.');
+    const issues = humanAttributionRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips matches in code blocks', () => {
+    const content = mockContent('```\nhuman-assigned quality\n```');
+    const issues = humanAttributionRule.check(content, {});
+    expect(issues.length).toBe(0);
   });
 });
