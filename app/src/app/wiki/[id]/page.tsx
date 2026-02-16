@@ -230,6 +230,7 @@ function ContentView({
         <PageStatus
           quality={pageData?.quality ?? undefined}
           importance={pageData?.importance ?? undefined}
+          researchImportance={pageData?.researchImportance ?? undefined}
           llmSummary={pageData?.llmSummary ?? undefined}
           structuredSummary={pageData?.structuredSummary ?? undefined}
           lastEdited={pageData?.lastUpdated ?? undefined}

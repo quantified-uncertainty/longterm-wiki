@@ -43,6 +43,7 @@ interface PageIssues {
 export interface PageStatusProps {
   quality?: number;
   importance?: number;
+  researchImportance?: number;
   llmSummary?: string;
   structuredSummary?: StructuredSummary;
   lastEdited?: string;
@@ -81,6 +82,14 @@ const importanceLabels: Record<string, string> = {
   peripheral: "Peripheral",
 };
 
+const researchLabels: Record<string, string> = {
+  critical: "Critical",
+  high: "High",
+  moderate: "Moderate",
+  low: "Low",
+  minimal: "Minimal",
+};
+
 const qualityColors: Record<string, { ring: string; text: string }> = {
   comprehensive: { ring: "#10b981", text: "text-emerald-500" },
   good: { ring: "#3b82f6", text: "text-blue-500" },
@@ -97,6 +106,14 @@ const importanceColors: Record<string, { ring: string; text: string }> = {
   peripheral: { ring: "#94a3b8", text: "text-slate-400" },
 };
 
+const researchColors: Record<string, { ring: string; text: string }> = {
+  critical: { ring: "#f97316", text: "text-orange-500" },
+  high: { ring: "#f59e0b", text: "text-amber-500" },
+  moderate: { ring: "#eab308", text: "text-yellow-500" },
+  low: { ring: "#94a3b8", text: "text-slate-400" },
+  minimal: { ring: "#94a3b8", text: "text-slate-400" },
+};
+
 function getQualityLevel(quality: number): string {
   if (quality >= 80) return "comprehensive";
   if (quality >= 60) return "good";
@@ -111,6 +128,14 @@ function getImportanceLevel(importance: number): string {
   if (importance >= 50) return "useful";
   if (importance >= 30) return "reference";
   return "peripheral";
+}
+
+function getResearchLevel(score: number): string {
+  if (score >= 90) return "critical";
+  if (score >= 70) return "high";
+  if (score >= 50) return "moderate";
+  if (score >= 30) return "low";
+  return "minimal";
 }
 
 function formatWordCount(count: number): string {
@@ -416,6 +441,45 @@ function ImportanceDisplay({ importance }: { importance: number }) {
         </span>
         <span className="block text-muted-foreground text-xs leading-snug">
           How central this topic is to AI safety. Higher scores mean greater relevance to understanding or mitigating AI risk.
+        </span>
+      </span>
+    </span>
+  );
+}
+
+function ResearchDisplay({ researchImportance }: { researchImportance: number }) {
+  const level = getResearchLevel(researchImportance);
+  const colors = researchColors[level];
+
+  return (
+    <span className={cn(styles.wrapper, "cursor-help")}>
+      <span className="inline-flex items-center gap-2">
+        <ScoreRing value={researchImportance} max={100} color={colors.ring}>
+          <span className="text-[13px] font-bold tabular-nums text-foreground">
+            {researchImportance}
+          </span>
+        </ScoreRing>
+        <span className="flex flex-col">
+          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
+            Research
+          </span>
+          <span className={`text-[13px] font-semibold leading-snug ${colors.text}`}>
+            {researchLabels[level]}
+          </span>
+        </span>
+      </span>
+      <span
+        className={cn(
+          styles.tooltip,
+          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+        )}
+        role="tooltip"
+      >
+        <span className="block font-semibold text-foreground text-sm mb-1">
+          Research Value: {researchImportance}/100
+        </span>
+        <span className="block text-muted-foreground text-xs leading-snug">
+          How much value deeper investigation of this topic could yield. Higher scores indicate under-explored topics with high insight potential.
         </span>
       </span>
     </span>
@@ -729,6 +793,7 @@ function ChangeHistorySection({
 export function PageStatus({
   quality,
   importance,
+  researchImportance,
   llmSummary,
   structuredSummary,
   lastEdited,
@@ -752,6 +817,7 @@ export function PageStatus({
   const hasEditorialContent =
     quality ||
     importance ||
+    researchImportance ||
     llmSummary ||
     structuredSummary ||
     lastEdited ||
@@ -803,6 +869,9 @@ export function PageStatus({
           )}
           {importance !== undefined && (
             <ImportanceDisplay importance={importance} />
+          )}
+          {researchImportance !== undefined && (
+            <ResearchDisplay researchImportance={researchImportance} />
           )}
           {metrics && <StructureDisplay metrics={metrics} />}
         </div>

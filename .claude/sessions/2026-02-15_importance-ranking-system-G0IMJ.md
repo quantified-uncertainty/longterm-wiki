@@ -6,7 +6,9 @@ Session 1: Created core ranking infrastructure — `seed`, `show`, `rank`, `sync
 
 Session 2: Added `rerank` command with batch sort + merge algorithm for LLM-assisted full ranking. Iteratively tested with 20, 20, 40-page samples before running all 644 pages. Discovered merge artifacts (important pages ending up at bottom) — fixed with verification pass. User requested two importance dimensions: readership (broad/foundational topics for readers) and research (narrow/neglected topics with insight potential). Restructured entire system for multi-dimension support. Ran full readership verification pass and full research ranking.
 
-**Pages:** importance-ranking (new internal documentation page)
+Session 3: Wired research importance scores through the full stack — synced `researchImportance` to all page frontmatter (629 pages), added to build pipeline, Page interface, and PageStatus UI (new orange/amber "Research" score ring). Created `/internal/importance-rankings` dashboard page with sortable table showing both readership and research scores side by side. Added to internal nav under Dashboards & Tools.
+
+**Pages:** importance-ranking (internal documentation), importance-rankings (new internal dashboard)
 
 **Issues encountered:**
 - Binary search merge artifacts: pages from later batches accumulated comparison errors, causing important concepts (mesa-optimization, sleeper agents, treacherous turn) to sink to the bottom. Fixed by adding verification pass that re-sorts overlapping windows of 20 pages.

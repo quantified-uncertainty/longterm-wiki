@@ -271,6 +271,7 @@ export interface Page {
   title: string;
   quality: number | null;
   importance: number | null;
+  researchImportance: number | null;
   contentFormat: ContentFormat;
   tractability: number | null;
   neglectedness: number | null;
@@ -495,6 +496,36 @@ export function getUpdateSchedule(): UpdateScheduleItem[] {
   // Sort by priority descending (most urgent first)
   items.sort((a, b) => b.priority - a.priority);
   return items;
+}
+
+export interface PageRankingItem {
+  id: string;
+  numericId: string;
+  title: string;
+  quality: number | null;
+  importance: number | null;
+  researchImportance: number | null;
+  category: string;
+  wordCount: number;
+}
+
+export function getPageRankings(): PageRankingItem[] {
+  const db = getDatabase();
+  const pages = db.pages || [];
+
+  return pages
+    .filter((p: Page) => p.importance != null || p.researchImportance != null)
+    .map((p: Page) => ({
+      id: p.id,
+      numericId: db.idRegistry?.bySlug[p.id] || p.id,
+      title: p.title,
+      quality: p.quality,
+      importance: p.importance,
+      researchImportance: p.researchImportance,
+      category: p.category,
+      wordCount: p.wordCount ?? p.metrics?.wordCount ?? 0,
+    }))
+    .sort((a: PageRankingItem, b: PageRankingItem) => (b.importance ?? 0) - (a.importance ?? 0));
 }
 
 export interface PageChangeItem {
