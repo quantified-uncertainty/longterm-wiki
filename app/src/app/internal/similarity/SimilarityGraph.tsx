@@ -76,6 +76,7 @@ export function SimilarityGraph({ data }: Props) {
   const [selectedTypes, setSelectedTypes] = useState<Set<string>>(
     new Set(data.entityTypes.map((t) => t.type))
   );
+  const [showAllLabels, setShowAllLabels] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
 
   // Stats: computed from props (always available, unlike refs which are
@@ -244,32 +245,78 @@ export function SimilarityGraph({ data }: Props) {
       }
     }
 
-    // Draw hovered label
-    if (hovered && hovered.x != null && hovered.y != null) {
-      const label = hovered.title;
-      ctx.font = "bold 12px system-ui, sans-serif";
-      const metrics = ctx.measureText(label);
-      const pad = 4;
-      const lx = hovered.x + hovered.radius + 6;
-      const ly = hovered.y - 6;
+    // Draw labels for all nodes when showAllLabels is on
+    if (showAllLabels && !hovered) {
+      ctx.font = "8px system-ui, sans-serif";
+      for (const n of nodes) {
+        if (!selectedTypes.has(n.entityType)) continue;
+        if (n.x == null || n.y == null) continue;
+        const label = n.title;
+        const lx = n.x + n.radius + 4;
+        const ly = n.y + 3;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+        ctx.fillText(label, lx, ly);
+      }
+    }
 
-      ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-      ctx.beginPath();
-      ctx.roundRect(
-        lx - pad,
-        ly - 12 - pad,
-        metrics.width + pad * 2,
-        16 + pad * 2,
-        4
-      );
-      ctx.fill();
+    // Draw labels for hovered node and its connected neighbors
+    if (hovered) {
+      const labelNodes: { node: SimNode; bold: boolean }[] = [];
 
-      ctx.fillStyle = "#fff";
-      ctx.fillText(label, lx, ly);
+      // When showAllLabels is on, show all visible node names as small text
+      if (showAllLabels) {
+        ctx.font = "8px system-ui, sans-serif";
+        for (const n of nodes) {
+          if (n.id === hovered.id || connectedIds.has(n.id)) continue;
+          if (!selectedTypes.has(n.entityType)) continue;
+          if (n.x == null || n.y == null) continue;
+          const lx = n.x + n.radius + 4;
+          const ly = n.y + 3;
+          ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+          ctx.fillText(n.title, lx, ly);
+        }
+      }
+
+      // Connected neighbors first (smaller labels, drawn underneath)
+      for (const n of nodes) {
+        if (n.id === hovered.id) continue;
+        if (!connectedIds.has(n.id)) continue;
+        if (!selectedTypes.has(n.entityType)) continue;
+        if (n.x == null || n.y == null) continue;
+        labelNodes.push({ node: n, bold: false });
+      }
+
+      // Hovered node last (drawn on top)
+      if (hovered.x != null && hovered.y != null) {
+        labelNodes.push({ node: hovered, bold: true });
+      }
+
+      for (const { node: n, bold } of labelNodes) {
+        const label = n.title;
+        ctx.font = `${bold ? "bold " : ""}${bold ? 12 : 10}px system-ui, sans-serif`;
+        const metrics = ctx.measureText(label);
+        const pad = bold ? 4 : 3;
+        const lx = n.x! + n.radius + 6;
+        const ly = n.y! - 6;
+
+        ctx.fillStyle = bold ? "rgba(0, 0, 0, 0.85)" : "rgba(0, 0, 0, 0.7)";
+        ctx.beginPath();
+        ctx.roundRect(
+          lx - pad,
+          ly - (bold ? 12 : 10) - pad,
+          metrics.width + pad * 2,
+          (bold ? 16 : 14) + pad * 2,
+          3
+        );
+        ctx.fill();
+
+        ctx.fillStyle = "#fff";
+        ctx.fillText(label, lx, ly);
+      }
     }
 
     ctx.restore();
-  }, [dimensions, threshold, selectedTypes]);
+  }, [dimensions, threshold, selectedTypes, showAllLabels]);
 
   // Keep drawRef in sync so the simulation tick always calls the latest draw
   drawRef.current = draw;
@@ -529,19 +576,31 @@ export function SimilarityGraph({ data }: Props) {
           </div>
         </div>
 
+        {/* Options */}
+        <div className="flex flex-col gap-2 min-w-32">
+          <label className="text-sm font-medium flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={showAllLabels}
+              onChange={(e) => setShowAllLabels(e.target.checked)}
+              className="accent-blue-600"
+            />
+            Show labels
+          </label>
+        </div>
+
         {/* Stats */}
-        <div className="text-sm text-muted-foreground space-y-1 min-w-48 min-h-[4.5rem]">
+        <div className="text-sm text-muted-foreground space-y-1 w-72 shrink-0 overflow-hidden">
           <div>
-            <strong>{visibleNodeCount}</strong> pages
-          </div>
-          <div>
+            <strong>{visibleNodeCount}</strong> pages ·{" "}
             <strong>{visibleEdgeCount}</strong> connections
           </div>
           <div
-            className={`text-foreground mt-1 transition-opacity ${hoveredNode ? "opacity-100" : "opacity-0"}`}
+            className={`text-foreground transition-opacity ${hoveredNode ? "opacity-100" : "opacity-0"}`}
           >
-            <strong>{hoveredNode?.title ?? "\u00A0"}</strong>
-            <br />
+            <div className="font-semibold truncate">
+              {hoveredNode?.title ?? "\u00A0"}
+            </div>
             <span className="text-xs">
               importance: {hoveredNode?.importance ?? 0} | quality:{" "}
               {hoveredNode?.quality ?? 0}

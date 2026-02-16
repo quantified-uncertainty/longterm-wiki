@@ -1,0 +1,12 @@
+## 2026-02-16 | claude/add-similarity-diagram-pTpCd | Polish similarity graph UX
+
+**What was done:** Three UX improvements to the similarity graph: (1) show labels for all connected nodes on hover (not just the hovered node), with pill-shaped backgrounds, (2) added "Show labels" toggle to display all node names at once in small 8px font, (3) fixed stats column width stability — now uses fixed `w-72` with `shrink-0`, `overflow-hidden`, and `truncate` so long titles never cause the control bar to reflow.
+
+**Pages:** (no wiki page content changes)
+
+**Issues encountered:**
+- None
+
+**Learnings/notes:**
+- Canvas text labels at 8px are readable when zoomed in but get cluttered at default zoom with 600+ nodes — acceptable since it's an opt-in toggle
+- When `showAllLabels` is on during hover, non-connected node labels are drawn at lower opacity (0.25) to keep the focus on hovered+connected nodes
