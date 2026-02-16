@@ -19,45 +19,9 @@ import { getSynthesisPrompt } from './synthesis.ts';
 import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
 
 // ---------------------------------------------------------------------------
-// Shared helpers
+// Shared helpers (retry + heartbeat imported from shared module)
 // ---------------------------------------------------------------------------
-
-/** Retry an async fn with exponential backoff. */
-async function withRetry<T>(
-  fn: () => Promise<T>,
-  { maxRetries = 2, label = 'API call' }: { maxRetries?: number; label?: string } = {}
-): Promise<T> {
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (err: unknown) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      const isRetryable =
-        error.message.includes('timeout') ||
-        error.message.includes('ECONNRESET') ||
-        error.message.includes('socket hang up') ||
-        error.message.includes('overloaded') ||
-        error.message.includes('529') ||
-        error.message.includes('rate_limit');
-      if (!isRetryable || attempt === maxRetries) throw err;
-      const delay = Math.pow(2, attempt + 1) * 1000;
-      console.log(`[retry] ${label} failed (${error.message.slice(0, 80)}), retrying in ${delay / 1000}s…`);
-      await new Promise(r => setTimeout(r, delay));
-    }
-  }
-  throw new Error('unreachable');
-}
-
-/** Start a heartbeat timer that logs every `intervalSec` seconds. Returns a stop function. */
-function startHeartbeat(phase: string, intervalSec = 30): () => void {
-  const start = Date.now();
-  const timer = setInterval(() => {
-    const elapsed = ((Date.now() - start) / 1000).toFixed(0);
-    const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
-    process.stderr.write(`[${timestamp}] [${phase}] … still running (${elapsed}s)\n`);
-  }, intervalSec * 1000);
-  return () => clearInterval(timer);
-}
+import { withRetry, startHeartbeat } from '../../lib/resilience.ts';
 
 /** Stream a Claude API call and return the final message. */
 async function streamingCreate(

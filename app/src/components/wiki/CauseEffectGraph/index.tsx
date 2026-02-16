@@ -288,6 +288,7 @@ function CauseEffectGraphInner({
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
   const [pathHighlightNodeId, setPathHighlightNodeId] = useState<string | null>(null);
   const [isLayouting, setIsLayouting] = useState(true);
+  const [layoutError, setLayoutError] = useState<string | null>(null);
   const [currentZoom, setCurrentZoom] = useState(1);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const reactFlowInstance = useRef<ReactFlowInstance<any, any> | null>(null);
@@ -345,12 +346,17 @@ function CauseEffectGraphInner({
   const graphConfigKey = JSON.stringify(graphConfig);
   useEffect(() => {
     setIsLayouting(true);
+    setLayoutError(null);
     getLayoutedElements(initialNodes, initialEdges, graphConfig).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
       setIsLayouting(false);
     }).catch((error) => {
       console.error('Layout failed:', error);
+      // Fall back to unpositioned nodes so the graph is still usable
+      setNodes(initialNodes);
+      setEdges(initialEdges);
+      setLayoutError('Layout computation failed. Showing unpositioned graph.');
       setIsLayouting(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -649,6 +655,7 @@ function CauseEffectGraphInner({
         {activeTab === 'graph' && (
           <div className="cause-effect-graph__content">
             {isLayouting && <div className="cause-effect-graph__loading">Computing layout...</div>}
+            {layoutError && <div className="cause-effect-graph__loading" style={{ color: '#b45309', backgroundColor: '#fef3c7' }}>{layoutError}</div>}
             <ReactFlow
               nodes={styledNodes}
               edges={styledEdges}

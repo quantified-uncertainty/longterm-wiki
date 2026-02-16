@@ -185,8 +185,8 @@ interface Entity {
   title: string;
   description?: string;
   severity?: string;
-  likelihood?: any;
-  timeframe?: any;
+  likelihood?: string | { level: string; status?: string; display?: string };
+  timeframe?: string | { median: number; earliest?: number; latest?: number; display?: string };
   maturity?: string;
   website?: string;
   customFields?: { label: string; value: string; link?: string }[];
@@ -196,7 +196,7 @@ interface Entity {
   lastUpdated?: string;
   sourceRefs?: string[];
   sources?: { title: string; url?: string; author?: string; date?: string }[];
-  content?: any;
+  content?: unknown;
 }
 
 interface Resource {
@@ -762,7 +762,7 @@ export function getEntityInfoBoxData(entityId: string) {
   let timeframeStr: string | undefined;
   let category: string | undefined;
   let maturity: string | undefined;
-  let relatedSolutions: any[] | undefined;
+  let relatedSolutions: Array<{ id: string; title: string; type: string; href: string }> | undefined;
   let severity: string | undefined;
 
   if (isRisk(entity)) {

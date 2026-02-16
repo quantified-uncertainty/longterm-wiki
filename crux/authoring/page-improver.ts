@@ -105,44 +105,19 @@ const TIERS: Record<string, TierConfig> = {
 const anthropic = new Anthropic({ timeout: 10 * 60 * 1000 });
 
 // ---------------------------------------------------------------------------
-// Resilience helpers: retry, streaming, progress heartbeat
+// Resilience helpers (imported from shared module)
 // ---------------------------------------------------------------------------
+import { withRetry as _withRetry, startHeartbeat as _startHeartbeat } from '../lib/resilience.ts';
 
-/** Retry an async fn with exponential backoff. */
+/** Retry wrapper that feeds retries through the local `log()` function. */
 async function withRetry<T>(
   fn: () => Promise<T>,
-  { maxRetries = 2, label = 'API call' }: { maxRetries?: number; label?: string } = {}
+  opts: { maxRetries?: number; label?: string } = {}
 ): Promise<T> {
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (err: unknown) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      const isRetryable =
-        error.message.includes('timeout') ||
-        error.message.includes('ECONNRESET') ||
-        error.message.includes('socket hang up') ||
-        error.message.includes('overloaded') ||
-        error.message.includes('529') ||
-        error.message.includes('rate_limit');
-      if (!isRetryable || attempt === maxRetries) throw err;
-      const delay = Math.pow(2, attempt + 1) * 1000; // 2s, 4s
-      log('retry', `${label} failed (${error.message.slice(0, 80)}), retrying in ${delay / 1000}s (attempt ${attempt + 1}/${maxRetries})…`);
-      await new Promise(r => setTimeout(r, delay));
-    }
-  }
-  throw new Error('unreachable');
+  return _withRetry(fn, { ...opts, onRetry: (msg) => log('retry', msg) });
 }
 
-/** Start a heartbeat timer that logs a dot every `intervalSec` seconds. Returns a stop function. */
-function startHeartbeat(phase: string, intervalSec = 30): () => void {
-  const start = Date.now();
-  const timer = setInterval(() => {
-    const elapsed = ((Date.now() - start) / 1000).toFixed(0);
-    process.stderr.write(`[${formatTime()}] [${phase}] … still running (${elapsed}s)\n`);
-  }, intervalSec * 1000);
-  return () => clearInterval(timer);
-}
+const startHeartbeat = _startHeartbeat;
 
 /**
  * Streaming wrapper for Anthropic API calls.
