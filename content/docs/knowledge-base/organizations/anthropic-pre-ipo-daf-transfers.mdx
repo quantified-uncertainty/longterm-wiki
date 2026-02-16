@@ -1,8 +1,8 @@
 ---
 title: Anthropic Pre-IPO DAF Transfers
-description: "Analysis of charitable giving mechanisms at Anthropic, focusing on the employee matching program and potential founder transfers. The matching program (historically 3:1 at 50% of equity) is one of the most generous corporate charitable giving vehicles ever offered, and $20-40B in employee equity has already been committed to DAFs. Founder transfers remain uncertain ($1-8B expected pre-IPO). The financial case for participation is strong for anyone with charitable intent: the matching program multiplies giving 2-4x, and donating appreciated stock avoids ≈37% capital gains tax."
+description: "Analysis of charitable giving mechanisms at Anthropic, focusing on the employee matching program, potential founder transfers, and time-sensitive tax implications. The matching program (historically 3:1 at 50% of equity) is one of the most generous corporate charitable giving vehicles ever offered, and $20-40B in employee equity has already been committed to DAFs. Founder transfers remain uncertain ($1-8B expected pre-IPO). Employee tax urgency is high: ISO exercises trigger growing AMT bills as 409A valuations climb with each funding round, 83(b) election windows are irreversible, and QSBS (Section 1202) eligibility could save $10M+ per person but qualification is uncertain."
 quality: 58
-lastEdited: "2026-02-05"
+lastEdited: "2026-02-15"
 importance: 72
 update_frequency: 45
 contentType: analysis
@@ -22,7 +22,7 @@ clusters:
 todos:
   - Track any public announcements of founder DAF transfers or foundation creation
   - Clarify tax treatment of the matching program (is the match taxable income to the employee?)
-  - Research whether QSBS (Section 1202) exclusion applies to early Anthropic employees
+  - Confirm whether Anthropic's PBC structure and gross asset size at time of early grants qualifies under QSBS (Section 1202)
   - Get better data on employee matching program participation rates
   - Reconcile equity stake estimates (Forbes ≈1% vs. Brand Vision 2-3%)
 subcategory: funders
@@ -31,9 +31,9 @@ entityType: organization
 import {EntityLink} from '@components/wiki';
 
 :::note[Page Scope]
-This page analyzes how much Anthropic equity will be in donor-advised funds before IPO, with emphasis on why equity holders participate. For the broader analysis of all EA-aligned capital at Anthropic, see <EntityLink id="E406">Anthropic (Funder)</EntityLink>. For interventions targeting founder pledge fulfillment, see <EntityLink id="E411">Anthropic Founder Pledge Interventions</EntityLink>.
+This page analyzes how much Anthropic equity will be in donor-advised funds before IPO, with emphasis on why equity holders participate. For the broader analysis of all EA-aligned capital at Anthropic, see <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink>. For interventions targeting founder pledge fulfillment, see <EntityLink id="anthropic-pledge-enforcement">Anthropic Founder Pledge Interventions</EntityLink>.
 
-**Data as of**: February 2026. Current valuation: \$350B. IPO expected: 2026-2027.
+**Data as of**: February 2026. Current valuation: \$380B (Series G). IPO expected: 2026-2027.
 :::
 
 ## Quick Assessment
@@ -85,25 +85,92 @@ The tax case for donating stock applies equally pre- and post-IPO. The pre-IPO-s
 
 **1. The matching program window is NOW.** The matching terms are set at the time of participation. Employees who joined under the 3:1 program got far better terms than those joining under 1:1. The program could theoretically be further reduced or eliminated. Participating sooner captures better terms.
 
-**2. Behavioral pre-commitment before liquidity.** Behavioral economics research consistently shows that commitment is easier before resources feel "real." Pre-IPO, equity is paper wealth — committing a percentage feels costless. Post-IPO, the same equity shows up as a dollar amount in a brokerage account, and giving feels like a loss. <EntityLink id="E531">Giving Pledge</EntityLink> data shows that living pledgers have grown 166% wealthier (inflation-adjusted) since signing, suggesting wealth compounds faster than giving. [IPS](https://ips-dc.org/report-giving-pledge-at-15/)
+**2. Behavioral pre-commitment before liquidity.** Behavioral economics research consistently shows that commitment is easier before resources feel "real." Pre-IPO, equity is paper wealth — committing a percentage feels costless. Post-IPO, the same equity shows up as a dollar amount in a brokerage account, and giving feels like a loss. <EntityLink id="giving-pledge">Giving Pledge</EntityLink> data shows that living pledgers have grown 166% wealthier (inflation-adjusted) since signing, suggesting wealth compounds faster than giving. [IPS](https://ips-dc.org/report-giving-pledge-at-15/)
 
 **3. The 409A discount makes pre-IPO deductions smaller.** Pre-IPO, the IRS values private company common stock using 409A valuations, which are typically 50-70% below the latest preferred stock price. This means the tax *deduction* for a pre-IPO stock donation is smaller than the deduction for the same shares donated post-IPO at full market price. In terms of deduction value alone, post-IPO donation is slightly better — the pre-IPO advantage is the behavioral commitment, not the tax treatment.
 
 **4. Valuation expectations don't change the calculus much.** Whether you expect the stock to rise or fall post-IPO, the capital gains avoided by donating stock directly is the same. Higher future valuations mean bigger future deductions (arguing for patience), while uncertainty argues for acting now. For most donors, these second-order timing effects are dwarfed by the matching program benefit and the behavioral commitment value.
 
+## Employee Tax Urgency
+
+Beyond the general capital gains savings, Anthropic employees face several time-sensitive tax mechanisms that interact with DAF transfer decisions. These create narrow windows where action is far more favorable than delay.
+
+### The ISO / AMT Trap
+
+Most early Anthropic employees likely hold Incentive Stock Options (ISOs). Exercising ISOs triggers Alternative Minimum Tax (AMT) on the spread between the strike price and the 409A fair market value—even though the shares are illiquid and cannot be sold.
+
+Note: 409A valuations for common stock are typically 30-60% below the preferred stock price due to lack-of-marketability discounts and the common/preferred rights gap. If the preferred price implies \≈\$270/share (from secondary markets), the 409A common stock valuation is likely \$100-190/share. Exact 409A figures are not public.
+
+| Scenario | Strike Price | Est. 409A FMV | Spread | Est. AMT (≈35% combined) |
+|----------|-------------|--------------|--------|--------------------------|
+| Early employee (2021) | \$1-5/share | \$100-190/share | \$95-189/share | \$33-66/share |
+| 2022-2023 hire | \$10-30/share | \$100-190/share | \$70-180/share | \$25-63/share |
+| 2024 hire | \$50-100/share | \$100-190/share | \$0-140/share | \$0-49/share |
+
+The combined AMT rate includes federal AMT (28% above exemption phase-out) plus California AMT (\~7%). For employees with large spreads, the exemption is fully phased out.
+
+**The problem:** An early employee with 100,000 options could face an AMT bill of \$3-7M on exercise—due in cash, on shares they cannot sell. As Anthropic's 409A valuation climbs with each funding round, this bill grows larger. (Note: AMT paid generates a credit that can offset regular tax in future years when shares are eventually sold, so the AMT is partially a timing cost rather than a pure loss.)
+
+**Why this is time-sensitive:** Every new funding round raises the 409A fair market value, increasing the AMT spread. Employees who haven't exercised face a closing window where exercising is affordable.
+
+**DAF interaction:** Unexercised ISOs cannot be donated directly to a DAF—options are not transferable property. The employee must first **exercise** the ISO (triggering AMT at that point), then donate the resulting **shares** to a DAF. Donating the exercised shares avoids capital gains tax on any subsequent appreciation and generates a fair-market-value deduction, but does **not** undo the AMT triggered at exercise. The AMT credit generated can be recovered against future regular tax liability.
+
+Important caveats: (1) ISO favorable tax treatment requires holding shares 1 year after exercise AND 2 years after grant; donating before these periods is a disqualifying disposition. (2) Charitable deductions for appreciated long-term capital gain property donated to a DAF are limited to 30% of AGI per year (with 5-year carryforward). (3) Donating private company stock requires a qualified independent appraisal (Form 8283).
+
+### 83(b) Election Windows
+
+Employees who receive restricted stock (rather than options) have only **30 days** from the grant date to file an 83(b) election with the IRS. This election allows them to pay tax on the stock's value at grant—often near zero for early employees—rather than at vesting, when shares could be worth millions.
+
+**For early Anthropic employees:** Those who filed 83(b) elections in 2021-2022 locked in extremely low valuations. Those who missed the window face ordinary income tax (up to 37% federal + 13.3% California ≈ 50.3%) on the full vesting-date value of their shares. This is a permanent, irreversible tax disadvantage.
+
+**Implication for DAF planning:** Employees who missed 83(b) elections face especially high tax burdens at vesting and therefore benefit even more from donating stock directly to DAFs (avoiding the capital gains portion) rather than selling and donating cash.
+
+### QSBS (Section 1202) Exclusion
+
+Qualified Small Business Stock (QSBS) under Section 1202 allows exclusion of up to \$10M (or 10x cost basis) in capital gains from federal tax if:
+- The stock was acquired when the company was a C-corp with gross assets under \$50M
+- The holder has held the stock for 5+ years
+- The company meets "active business" requirements
+
+**For early Anthropic employees and investors:** If Anthropic qualified as a QSBS-eligible company at the time of early grants (2021-2022), and employees have held for 5+ years by 2026-2027, they could potentially exclude \$10M+ per person in capital gains from **federal** tax. At the 23.8% federal rate (20% LTCG + 3.8% NIIT), this represents up to \≈\$2.4M in federal tax savings per employee. However, **California does not conform to Section 1202** and taxes QSBS gains at the full 13.3% state rate—a significant and often-overlooked limitation.
+
+**Likely unfavorable for most employees:** Anthropic raised \$124M in its Series A (announced January 2022), meaning gross assets likely exceeded the \$50M threshold before most employees received grants. QSBS qualification is therefore **unlikely for most employees**, though very early team members (pre-Series A) may still qualify. Anthropic's PBC structure does not categorically exclude QSBS eligibility (a PBC is a type of C-corp). Employees should seek tax counsel—the qualification depends on company status at the time shares were acquired, not current status.
+
+### Tax Calendar Summary
+
+| Deadline | Action | Why It Matters |
+|----------|--------|---------------|
+| **Each funding round** | Consider exercising ISOs before 409A increase | AMT spread grows with each valuation step-up |
+| **30 days from grant** | File 83(b) election | Irreversible; missing this can cost millions |
+| **5 years from acquisition** | Hold for QSBS eligibility | \$10M+ exclusion per person at stake |
+| **Year of exercise** | Plan for AMT cash needs | May need to sell other assets or take loans to pay AMT |
+| **Any time pre/post-IPO** | Donate exercised shares to DAF instead of selling | Avoids capital gains on appreciation beyond exercise price |
+
+### Interaction with Matching Program
+
+The tax urgency reinforces the case for early matching program participation. An employee who:
+1. Exercises ISOs (triggering AMT on the spread—partially recoverable via AMT credit)
+2. Holds the resulting shares for 1+ year (to qualify as long-term capital gain property)
+3. Donates the shares to a DAF under the matching program (avoiding capital gains on post-exercise appreciation, and receiving a FMV deduction capped at 30% of AGI/year)
+4. Receives 1:1 to 3:1 matching on the donated amount
+
+...captures both the matching benefit *and* avoids capital gains on post-exercise appreciation. The combination of matching multiplier plus capital gains avoidance makes this among the most financially attractive charitable giving structures available to any private company employee, despite the unavoidable AMT at exercise.
+
+**Anthropic could help** by providing employees with tax advisory resources, clear 409A valuation communications, and expanded charitable transfer options—all of which would directly increase the capital available for philanthropic purposes.
+
 ## How Much Is Already in DAFs?
 
 ### Employee Equity: \$20-40B Already Committed
 
-The employee equity pool is estimated at 12-18% of Anthropic (\$42-63B at \$350B). [EA Forum](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors) Participation in the matching program varies significantly by cohort:
+The employee equity pool is estimated at 12-18% of Anthropic (\$46-68B at \$380B). [EA Forum](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors) Participation in the matching program varies significantly by cohort:
 
-| Cohort | Headcount | Share of Equity Pool | Program Terms | Est. Participation | DAF Value (at \$350B) |
+| Cohort | Headcount | Share of Equity Pool | Program Terms | Est. Participation | DAF Value (at \$380B) |
 |--------|-----------|---------------------|---------------|-------------------|---------------------|
-| Founding team (2021) | 15-20 | 25-35% | 3:1 at 50% | 50-70% | \$8-20B |
-| Early hires (2021-2022) | 50-80 | 20-30% | 3:1 at 50% | 40-60% | \$5-14B |
-| Growth phase (2023-2024) | 200-400 | 15-25% | 3:1 at 50% | 20-40% | \$2-8B |
+| Founding team (2021) | 15-20 | 25-35% | 3:1 at 50% | 50-70% | \$9-22B |
+| Early hires (2021-2022) | 50-80 | 20-30% | 3:1 at 50% | 40-60% | \$5-15B |
+| Growth phase (2023-2024) | 200-400 | 15-25% | 3:1 at 50% | 20-40% | \$2-9B |
 | Recent hires (2025+) | 500-2000 | 10-15% | 1:1 at 25% | 15-30% | \$1-3B |
-| **Total** | — | — | — | — | **\$16-45B** |
+| **Total** | — | — | — | — | **\$17-49B** |
 
 **Central estimate: \$20-40B** already committed to DAFs through employee matching.
 
@@ -117,23 +184,23 @@ Key facts:
 
 All seven co-founders have pledged to donate 80% of their wealth (non-binding). [Fortune](https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/) Their individual equity stakes are uncertain:
 
-| Source | Est. Stake per Founder | Value (at \$350B) | Total (7 founders) |
+| Source | Est. Stake per Founder | Value (at \$380B) | Total (7 founders) |
 |--------|----------------------|-------------------|-------------------|
-| Forbes (Dec 2025) | ≈1% | ≈\$3.7B | ≈\$26B |
-| Brand Vision | 2-3% | \$7-10.5B | \$49-74B |
-| **Range used here** | **1-3%** | **\$3.5-10.5B** | **\$25-74B** |
+| Forbes (Dec 2025) | ≈1% | ≈\$3.8B | ≈\$27B |
+| Brand Vision | 2-3% | \$7.6-11.4B | \$53-80B |
+| **Range used here** | **1-3%** | **\$3.8-11.4B** | **\$27-80B** |
 
 [Brand Vision](https://www.brandvm.com/post/dario-amodei-net-worth-in-2025) [Forbes](https://www.forbes.com/profile/dario-amodei/)
 
-Only 2 of 7 founders have documented strong philanthropic connections: <EntityLink id="E91">Dario Amodei</EntityLink> (43rd GWWC signatory, early GiveWell supporter) and <EntityLink id="E90">Daniela Amodei</EntityLink> (whose spouse <EntityLink id="E156">Holden Karnofsky</EntityLink>, co-founder of GiveWell, joined Anthropic in January 2025). [Fortune](https://fortune.com/2025/02/13/anthropic-hired-president-daniela-amodei-husband-ai-safety-responsible-scaling/) [EA Forum](https://forum.effectivealtruism.org/posts/53Gc35vDLK2u5nBxP/anthropic-is-not-being-consistently-candid-about-their)
+Only 2 of 7 founders have formal EA commitments—<EntityLink id="dario-amodei">Dario Amodei</EntityLink> (43rd GWWC signatory, early GiveWell supporter) and <EntityLink id="daniela-amodei">Daniela Amodei</EntityLink> (whose spouse <EntityLink id="holden-karnofsky">Holden Karnofsky</EntityLink>, co-founder of GiveWell, joined Anthropic in January 2025)—but all seven are embedded in the EA/rationalist/AI safety network through co-authorships, shared social circles, and the safety-motivated departure from OpenAI. See <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink> for detailed individual connections. [Fortune](https://fortune.com/2025/02/13/anthropic-hired-president-daniela-amodei-husband-ai-safety-responsible-scaling/) [EA Forum](https://forum.effectivealtruism.org/posts/53Gc35vDLK2u5nBxP/anthropic-is-not-being-consistently-candid-about-their)
 
 The financial case for founder DAF transfers is the same as for employees (stock donation avoids capital gains, commitment before liquidity reduces behavioral drift). But founders face additional friction: time constraints of running a rapidly scaling company, potential signaling effects to investors, and reasonable preference for flexibility on vehicle choice and cause allocation.
 
 | Scenario | Who Acts | Equity Transferred | Probability |
 |----------|----------|-------------------|-------------|
 | **No pre-IPO transfers** | 0/7 | \$0 | 25% |
-| **EA founders only, partial** | 2/7 | \$1.5-5B | 35% |
-| **EA founders only, aggressive** | 2/7 | \$4-12B | 12% |
+| **Formally EA-committed founders, partial** | 2/7 | \$1.5-5B | 35% |
+| **Formally EA-committed founders, aggressive** | 2/7 | \$4-12B | 12% |
 | **Broader team** | 3-7/7 | \$3-25B | 23% |
 | **Non-DAF vehicle (foundation, etc.)** | varies | varies | 5% |
 
@@ -173,7 +240,7 @@ DAF transfers are better than non-binding pledges (the commitment is irrevocable
 
 ## Giving Pledge Context
 
-The <EntityLink id="E531">Giving Pledge</EntityLink> provides the closest historical analogy for founder pledges, with an important threshold difference: Giving Pledge signatories commit to 50% of wealth, while Anthropic founders committed to 80%. Fulfillment at the higher threshold would likely be even lower. [IPS](https://ips-dc.org/report-giving-pledge-at-15/)
+The <EntityLink id="giving-pledge">Giving Pledge</EntityLink> provides the closest historical analogy for founder pledges, with an important threshold difference: Giving Pledge signatories commit to 50% of wealth, while Anthropic founders committed to 80%. Fulfillment at the higher threshold would likely be even lower. [IPS](https://ips-dc.org/report-giving-pledge-at-15/)
 
 Among 22 deceased Giving Pledge signatories, only 8 (36%) met even the 50% threshold. Living original pledgers have grown 166% wealthier in inflation-adjusted terms since 2010. These figures suggest non-binding pledges face serious fulfillment risk, especially for younger donors.
 

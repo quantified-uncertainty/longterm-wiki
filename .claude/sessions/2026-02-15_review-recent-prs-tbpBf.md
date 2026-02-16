@@ -1,0 +1,18 @@
+## 2026-02-15 | claude/review-recent-prs-tbpBf | Review recent PRs for bugs
+
+**What was done:** Audited ~20 recently merged PRs for bugs and code quality issues. Found and fixed 8 distinct bugs across multiple PRs including broken page links, unused imports, graph sync failures, unescaped dollar signs, missing error handling, and a validator that couldn't handle numeric entity IDs.
+
+**Pages:** capability-alignment-race, ea-shareholder-diversification-anthropic, factors-ai-capabilities-overview, factors-ai-ownership-overview, factors-ai-uses-overview, factors-misalignment-potential-overview, factors-misuse-potential-overview, factors-transition-turbulence-overview, automation-tools, gap-analysis-2026-02
+
+**Issues encountered:**
+- PR #121 (page changes dashboard) had broken links to internal pages — used `/wiki/` prefix for pages that live under `/internal/`
+- Legacy data validator (`validate-data.ts`) did not understand numeric entity IDs (E5, E11, etc.) introduced by the EntityLink ID migration, causing 213 false positive errors
+- PR #133 (EA shareholder diversification) had unescaped `$` signs in frontmatter description and llmSummary fields
+- Graph node sync was broken because master graph used `ai-governance` while entity files used `tmc-ai-governance`
+- 6 MDX files had orphaned `PageCauseEffectGraph` imports after Related Pages cleanup
+- Search dialog had no error handling for failed search index loads
+- Multiple internal link pages were missing trailing slashes
+
+**Learnings/notes:**
+- When numeric entity IDs are introduced, all validators that check entity references need to be updated — both the legacy subprocess validators and the unified rule engine
+- The `component-refs` unified rule still reports warnings for unused imports and DataInfoBox refs that are actually non-blocking (they don't prevent builds or rendering)

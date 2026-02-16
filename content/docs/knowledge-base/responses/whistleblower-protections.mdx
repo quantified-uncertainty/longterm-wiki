@@ -30,7 +30,7 @@ import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 | **Tractability** | Medium-High | Bipartisan AI Whistleblower Protection Act (S.1792) introduced May 2025 with 6 co-sponsors across parties; companion legislation in House |
 | **Current Protection Gap** | Severe | Existing laws (Sarbanes-Oxley, Dodd-Frank) do not cover AI safety disclosures; no federal protection for reporting alignment or security concerns |
 | **Corporate Barriers** | High | NDAs, non-disparagement clauses, and equity clawback provisions suppress disclosure; 13 employees signed "Right to Warn" letter citing confidentiality agreements |
-| **EU Status** | Advancing | <EntityLink id="E127">EU AI Act</EntityLink> Article 87 provides explicit whistleblower protections from August 2026; AI Office launched anonymous reporting tool November 2025 |
+| **EU Status** | Advancing | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> Article 87 provides explicit whistleblower protections from August 2026; AI Office launched anonymous reporting tool November 2025 |
 | **If AI Risk High** | Very High Value | Insider information critical—employees possess unique access to safety evaluation results, security vulnerabilities, and internal debates unavailable to external observers |
 | **Timeline to Impact** | 2-4 years | Legislative passage requires 1-2 years; cultural and enforcement changes require additional 2-3 years |
 | **Grade** | B+ | Strong momentum with bipartisan support; high potential impact on information asymmetry; implementation challenges remain |
@@ -39,7 +39,7 @@ import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
 Whistleblower protections for AI safety represent a critical but underdeveloped intervention point. Employees at AI companies often possess unique knowledge about safety risks, security vulnerabilities, or concerning development practices that external observers cannot access. Yet current legal frameworks provide inadequate protection for those who raise concerns, while employment contracts—particularly broad non-disclosure agreements and non-disparagement clauses—actively discourage disclosure. The result is a systematic information asymmetry that impedes effective oversight of AI development.
 
-The stakes became concrete in 2024. [Leopold Aschenbrenner](https://en.wikipedia.org/wiki/Leopold_Aschenbrenner), an <EntityLink id="E218">OpenAI</EntityLink> safety researcher, was [fired after writing an internal memo](https://www.transformernews.ai/p/openai-employee-says-he-was-fired) warning that the company's security protocols were "egregiously insufficient" to protect against foreign adversaries stealing model weights. In June 2024, [thirteen current and former employees](https://righttowarn.ai/) from OpenAI, <EntityLink id="E22">Anthropic</EntityLink>, and <EntityLink id="E98">Google DeepMind</EntityLink> published ["A Right to Warn about Advanced Artificial Intelligence"](https://time.com/6985504/openai-google-deepmind-employees-letter/), stating that confidentiality agreements and fear of retaliation prevented them from raising legitimate safety concerns. Microsoft engineer [Shane Jones reported to the FTC](https://www.cnbc.com/2024/03/06/microsoft-ai-engineer-says-copilot-designer-creates-disturbing-images.html) that Copilot Designer was producing harmful content including sexualized violence and images of minors—and alleged Microsoft's legal team blocked his attempts to alert the public.
+The stakes became concrete in 2024. [Leopold Aschenbrenner](https://en.wikipedia.org/wiki/Leopold_Aschenbrenner), an <EntityLink id="openai">OpenAI</EntityLink> safety researcher, was [fired after writing an internal memo](https://www.transformernews.ai/p/openai-employee-says-he-was-fired) warning that the company's security protocols were "egregiously insufficient" to protect against foreign adversaries stealing model weights. In June 2024, [thirteen current and former employees](https://righttowarn.ai/) from OpenAI, <EntityLink id="anthropic">Anthropic</EntityLink>, and <EntityLink id="deepmind">Google DeepMind</EntityLink> published ["A Right to Warn about Advanced Artificial Intelligence"](https://time.com/6985504/openai-google-deepmind-employees-letter/), stating that confidentiality agreements and fear of retaliation prevented them from raising legitimate safety concerns. Microsoft engineer [Shane Jones reported to the FTC](https://www.cnbc.com/2024/03/06/microsoft-ai-engineer-says-copilot-designer-creates-disturbing-images.html) that Copilot Designer was producing harmful content including sexualized violence and images of minors—and alleged Microsoft's legal team blocked his attempts to alert the public.
 
 In July 2024, [anonymous whistleblowers filed an SEC complaint](https://techcrunch.com/2024/07/13/whistleblowers-accuse-openai-of-illegally-restrictive-ndas/) alleging OpenAI's NDAs violated federal securities law by requiring employees to waive whistleblower compensation rights—a provision so restrictive that departing employees faced losing vested equity worth potentially millions of dollars if they criticized the company.
 
@@ -71,7 +71,7 @@ The fundamental problem: disclosures about AI safety concerns—even existential
 | **Non-compete** | Limit alternative employment | Varies by state |
 | **Trade secret claims** | Threat of litigation for disclosure | Increasingly used |
 
-OpenAI notably maintained restrictive provisions preventing departing employees from criticizing the company, [reportedly under threat of forfeiting vested equity](https://www.hrgrapevine.com/us/content/article/2024-05-20-sam-altman-apologizes-after-learning-strict-openai-ndas-threatened-to-claw-back-employee-equity). While OpenAI CEO <EntityLink id="E269">Sam Altman</EntityLink> later stated he was "genuinely embarrassed" and the company would not enforce these provisions, the chilling effect demonstrates how employment terms can suppress disclosure.
+OpenAI notably maintained restrictive provisions preventing departing employees from criticizing the company, [reportedly under threat of forfeiting vested equity](https://www.hrgrapevine.com/us/content/article/2024-05-20-sam-altman-apologizes-after-learning-strict-openai-ndas-threatened-to-claw-back-employee-equity). While OpenAI CEO <EntityLink id="sam-altman">Sam Altman</EntityLink> later stated he was "genuinely embarrassed" and the company would not enforce these provisions, the chilling effect demonstrates how employment terms can suppress disclosure.
 
 ### AI-Specific vs. Traditional Whistleblower Protections
 
@@ -317,7 +317,7 @@ Anthropic's [Responsible Scaling Policy](https://www.anthropic.com/index/anthrop
 
 | Risk | Mechanism | Effectiveness |
 |------|-----------|---------------|
-| <EntityLink id="E239">Racing Dynamics</EntityLink> | Employees can expose corner-cutting | Medium |
+| <EntityLink id="racing-dynamics">Racing Dynamics</EntityLink> | Employees can expose corner-cutting | Medium |
 | Inadequate Safety Testing | Safety researchers can report failures | High |
 | Security vulnerabilities | Security teams can disclose | High |
 | Regulatory capture | Provides alternative information channel | Medium |
@@ -325,10 +325,10 @@ Anthropic's [Responsible Scaling Policy](https://www.anthropic.com/index/anthrop
 
 ## Complementary Interventions
 
-- <EntityLink id="E466">Lab Culture</EntityLink> - Internal safety culture foundations
-- <EntityLink id="E13">AI Safety Institutes</EntityLink> - External bodies to receive disclosures
+- <EntityLink id="lab-culture">Lab Culture</EntityLink> - Internal safety culture foundations
+- <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> - External bodies to receive disclosures
 - Third-Party Auditing - Independent verification
-- <EntityLink id="E252">Responsible Scaling Policies</EntityLink> - Commitments that whistleblowers can verify
+- <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink> - Commitments that whistleblowers can verify
 
 ## Sources
 
@@ -367,8 +367,8 @@ Whistleblower protections improve the <EntityLink id="ai-transition-model" /> th
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="E60" /> | <EntityLink id="E249" /> | Addresses information asymmetry between companies and external observers |
-| <EntityLink id="E205" /> | <EntityLink id="E264" /> | Enables safety concerns to surface before catastrophic deployment |
-| <EntityLink id="E205" /> | <EntityLink id="E160" /> | Provides check on internal governance failures |
+| <EntityLink id="civilizational-competence" /> | <EntityLink id="regulatory-capacity" /> | Addresses information asymmetry between companies and external observers |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-culture-strength" /> | Enables safety concerns to surface before catastrophic deployment |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Provides check on internal governance failures |
 
 The 2024 "Right to Warn" statement from 13 AI employees highlights systematic information gaps that impede effective oversight of AI development.

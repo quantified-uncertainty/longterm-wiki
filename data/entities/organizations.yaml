@@ -2098,3 +2098,18 @@
     - ai-safety
     - community
   lastUpdated: 2026-02
+- id: nvidia
+  numericId: E693
+  type: organization
+  title: NVIDIA
+  website: https://www.nvidia.com
+  description: >-
+    NVIDIA holds 90-95% of the AI accelerator market, with its H100, H200, and
+    B200 GPUs powering virtually all frontier AI training. Revenue reached
+    $130.5B in FY2025 (114% YoY growth), driven almost entirely by data center
+    GPU sales. Its proprietary CUDA software ecosystem creates deep lock-in
+    across the AI training stack.
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02

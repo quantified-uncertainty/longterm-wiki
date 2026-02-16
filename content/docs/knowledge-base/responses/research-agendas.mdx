@@ -32,13 +32,13 @@ import {ComparisonTable, DataInfoBox, DisagreementMap, KeyQuestions, Mermaid, R,
 
 | Organization | Annual Budget | Staff Size | Primary Focus | Tractability | Timeline |
 |--------------|---------------|------------|---------------|--------------|----------|
-| **<EntityLink id="E22">Anthropic</EntityLink>** | ≈\$100M+ (safety research) | ≈15 red team + growing safety org | <EntityLink id="E451">Constitutional AI</EntityLink>, Interpretability | High (empirical validation) | 2-5 years |
-| **DeepMind** | \$50M+ (estimated) | 30-50 researchers, growing 37-39% annually | <EntityLink id="E271">Scalable Oversight</EntityLink>, <EntityLink id="E483">Formal Verification</EntityLink> | Medium (theoretical + empirical) | 5-10 years |
+| **<EntityLink id="anthropic">Anthropic</EntityLink>** | ≈\$100M+ (safety research) | ≈15 red team + growing safety org | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, Interpretability | High (empirical validation) | 2-5 years |
+| **DeepMind** | \$50M+ (estimated) | 30-50 researchers, growing 37-39% annually | <EntityLink id="scalable-oversight">Scalable Oversight</EntityLink>, <EntityLink id="formal-verification">Formal Verification</EntityLink> | Medium (theoretical + empirical) | 5-10 years |
 | **ARC** | ≈\$5M annually | ≈5-10 researchers | Eliciting Latent Knowledge | Low (fundamental problem) | 5-7 years |
-| **<EntityLink id="E557">Redwood Research</EntityLink>** | ≈\$5-10M annually (\$21M total raised) | Small team + Constellation (30k sqft) | <EntityLink id="E6">AI Control</EntityLink> protocols | High (practical protocols) | Near-term |
-| **<EntityLink id="E202">MIRI</EntityLink>** | \$7M (2025), \$10M reserves | ≈7 FTE comms, pivoting to governance | <EntityLink id="E584">Agent Foundations</EntityLink>, Policy | Low (fundamental theory) | Long-term/governance |
+| **<EntityLink id="redwood-research">Redwood Research</EntityLink>** | ≈\$5-10M annually (\$21M total raised) | Small team + Constellation (30k sqft) | <EntityLink id="ai-control">AI Control</EntityLink> protocols | High (practical protocols) | Near-term |
+| **<EntityLink id="miri">MIRI</EntityLink>** | \$7M (2025), \$10M reserves | ≈7 FTE comms, pivoting to governance | <EntityLink id="agent-foundations">Agent Foundations</EntityLink>, Policy | Low (fundamental theory) | Long-term/governance |
 | **SSI (Sutskever)** | \$2B raised (2024) | New org, building team | Superintelligence alignment | Unknown (stealth mode) | Long-term |
-| **<EntityLink id="E218">OpenAI</EntityLink> (dissolved)** | 20% compute allocation | Disbanded May 2024 | Superalignment (weak-to-strong) | N/A (team dissolved) | N/A |
+| **<EntityLink id="openai">OpenAI</EntityLink> (dissolved)** | 20% compute allocation | Disbanded May 2024 | Superalignment (weak-to-strong) | N/A (team dissolved) | N/A |
 
 ### Researcher Compensation Comparison
 
@@ -57,7 +57,7 @@ The compensation gap between frontier labs (Anthropic, DeepMind) and nonprofit r
 
 The AI safety landscape features dramatically different research agendas based on fundamentally different theories about what will make advanced AI systems safe. These approaches range from Anthropic's constitutional AI—which aims to instill human values through training—to MIRI's agent foundations work that seeks deep theoretical understanding before building anything. The differences aren't merely tactical but reflect deep disagreements about timelines, the nature of intelligence, and what kinds of failures we should expect.
 
-This fragmentation reflects both uncertainty about which technical approaches will succeed and disagreement about what "success" even looks like. Some agendas focus on making current <EntityLink id="E186">large language models</EntityLink> safer through better training techniques. Others prepare for scenarios where we deploy AI systems we cannot fully trust or understand. Still others argue that without fundamental conceptual breakthroughs, all current approaches will fail catastrophically. Understanding these differences is crucial for researchers, policymakers, and anyone trying to evaluate the overall trajectory of AI safety work.
+This fragmentation reflects both uncertainty about which technical approaches will succeed and disagreement about what "success" even looks like. Some agendas focus on making current <EntityLink id="language-models">large language models</EntityLink> safer through better training techniques. Others prepare for scenarios where we deploy AI systems we cannot fully trust or understand. Still others argue that without fundamental conceptual breakthroughs, all current approaches will fail catastrophically. Understanding these differences is crucial for researchers, policymakers, and anyone trying to evaluate the overall trajectory of AI safety work.
 
 The stakes of these disagreements are enormous. If constitutional AI succeeds at scale, we might achieve safe AGI through careful scaling of current techniques. If it fails and we haven't developed robust control protocols or verification methods, we could face exactly the catastrophic scenarios these research programs aim to prevent. The resource allocation decisions being made today across these different approaches may determine humanity's ability to navigate the development of transformative AI.
 
@@ -69,12 +69,12 @@ The AI safety funding ecosystem has evolved dramatically, with total available f
 |----------------|---------------|-------------|-------------|
 | **Anthropic internal** | \$100M+ (estimated) | Constitutional AI, interpretability, RSP | Internal priorities |
 | **DeepMind internal** | \$50M+ (estimated) | Scalable oversight, formal verification | Google priorities |
-| **<EntityLink id="E521">Coefficient Giving</EntityLink>** | \$16.6M (deep learning alignment) | Academic grants, org support | Capacity constrained |
+| **<EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>** | \$16.6M (deep learning alignment) | Academic grants, org support | Capacity constrained |
 | **OpenAI Fast Grants** | \$10M (one-time) | External alignment research | Completed program |
-| **<EntityLink id="E543">LTFF</EntityLink>/SFF** | \$5-10M annually | Small grants, independent researchers | Funding limited since 2024 |
+| **<EntityLink id="ltff">LTFF</EntityLink>/SFF** | \$5-10M annually | Small grants, independent researchers | Funding limited since 2024 |
 | **Government (AISI)** | Growing but small | Evaluation, standards | Early stage |
 
-A critical constraint emerged in late 2024: alignment grantmaking became mostly funding-bottlenecked rather than talent-bottlenecked. The Lightspeed grants round received far more promising applications than available funding, and the Long-Term Future Fund reported insufficient resources for worthy grants. Approximately 80-90% of external alignment funding flows through <EntityLink id="E521">Coefficient Giving</EntityLink>, creating concentration risk and capacity constraints in grant evaluation.
+A critical constraint emerged in late 2024: alignment grantmaking became mostly funding-bottlenecked rather than talent-bottlenecked. The Lightspeed grants round received far more promising applications than available funding, and the Long-Term Future Fund reported insufficient resources for worthy grants. Approximately 80-90% of external alignment funding flows through <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>, creating concentration risk and capacity constraints in grant evaluation.
 
 ### Research Agenda Relationships
 
@@ -494,8 +494,8 @@ Research agenda diversification improves the <EntityLink id="ai-transition-model
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Portfolio approach hedges against any single methodology failing |
-| <EntityLink id="E205" /> | <EntityLink id="E261" /> | Multiple research paths increase probability of keeping pace with capabilities |
-| <EntityLink id="E358" /> | <EntityLink id="E242" /> | Coordinated safety investment across labs reduces competitive pressure to cut corners |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Portfolio approach hedges against any single methodology failing |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Multiple research paths increase probability of keeping pace with capabilities |
+| <EntityLink id="transition-turbulence" /> | <EntityLink id="racing-intensity" /> | Coordinated safety investment across labs reduces competitive pressure to cut corners |
 
 The distribution of research funding across agendas significantly affects the probability of achieving safe AI development across different scenarios.

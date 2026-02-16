@@ -38,7 +38,7 @@ import {DataInfoBox, Mermaid, EntityLink, DataExternalLinks} from '@components/w
 | Attribute | Details |
 |-----------|---------|
 | **Name** | SquiggleAI |
-| **Organization** | <EntityLink id="E238">QURI</EntityLink> (Quantified Uncertainty Research Institute) |
+| **Organization** | <EntityLink id="quri">QURI</EntityLink> (Quantified Uncertainty Research Institute) |
 | **Lead** | Ozzie Gooen |
 | **Launched** | 2024 |
 | **Primary Model** | Claude Sonnet 4.5 |
@@ -47,9 +47,9 @@ import {DataInfoBox, Mermaid, EntityLink, DataExternalLinks} from '@components/w
 
 ## Overview
 
-[SquiggleAI](https://www.squiggle-language.com/docs/Ecosystem/SquiggleAI) integrates <EntityLink id="E186">large language models</EntityLink> to assist with probabilistic model creation, addressing a critical barrier QURI identified through years of experience building forecasting tools: **even highly skilled domain experts frequently struggle with basic programming requirements** for probabilistic modeling.
+[SquiggleAI](https://www.squiggle-language.com/docs/Ecosystem/SquiggleAI) integrates <EntityLink id="language-models">large language models</EntityLink> to assist with probabilistic model creation, addressing a critical barrier QURI identified through years of experience building forecasting tools: **even highly skilled domain experts frequently struggle with basic programming requirements** for probabilistic modeling.
 
-A subject matter expert might have deep knowledge about AI timelines, pandemic risk, or cost-effectiveness of interventions, but lack the programming fluency to translate their mental model into executable <EntityLink id="E286">Squiggle</EntityLink> code. SquiggleAI bridges this gap by accepting natural language descriptions and generating complete, runnable probabilistic models.
+A subject matter expert might have deep knowledge about AI timelines, pandemic risk, or cost-effectiveness of interventions, but lack the programming fluency to translate their mental model into executable <EntityLink id="squiggle">Squiggle</EntityLink> code. SquiggleAI bridges this gap by accepting natural language descriptions and generating complete, runnable probabilistic models.
 
 The system uses prompt caching to embed approximately 20,000 tokens of information about the Squiggle language—syntax, distributions, best practices—ensuring the LLM has deep knowledge of the domain-specific language. Most workflows complete within 20 seconds to 3 minutes, producing models typically 100-500 lines long depending on the model used.
 
@@ -253,10 +253,10 @@ SquiggleAI fits into QURI's tool ecosystem:
 
 | Tool | Purpose | SquiggleAI's Role |
 |------|---------|-------------------|
-| **<EntityLink id="E286">Squiggle</EntityLink>** | Probabilistic language | SquiggleAI generates Squiggle code |
+| **<EntityLink id="squiggle">Squiggle</EntityLink>** | Probabilistic language | SquiggleAI generates Squiggle code |
 | **Squiggle Hub** | Model hosting platform | SquiggleAI integrated directly |
-| **<EntityLink id="E200">Metaforecast</EntityLink>** | Forecast aggregation | SquiggleAI could use Metaforecast data as inputs |
-| **<EntityLink id="E385">RoastMyPost</EntityLink>** | LLM blog evaluation | Shared LLM integration experience |
+| **<EntityLink id="metaforecast">Metaforecast</EntityLink>** | Forecast aggregation | SquiggleAI could use Metaforecast data as inputs |
+| **<EntityLink id="roastmypost">RoastMyPost</EntityLink>** | LLM blog evaluation | Shared LLM integration experience |
 
 ## Funding
 

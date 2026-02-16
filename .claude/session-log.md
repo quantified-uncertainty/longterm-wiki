@@ -2,6 +2,19 @@
 
 Reverse-chronological log of Claude Code sessions on this repo. Each session appends a summary before its final commit. See `.claude/rules/session-logging.md` for the format.
 
+## 2026-02-13 | claude/fix-broken-wiki-links-RWnZ9 | Fix broken EntityLinks on E689
+
+**What was done:** Fixed two broken EntityLinks on the Concentrated Compute as a Cybersecurity Risk page (E689). Created a new `nvidia` entity (E693) in organizations.yaml since it was referenced by 4 pages but had no entity definition, causing it to appear as a broken "Concept" link. Changed `<EntityLink id="google-deepmind">` to `<EntityLink id="deepmind">` to use the correct existing entity ID (E98).
+
+**Issues encountered:**
+- Non-existent EntityLink IDs default to type `concept` in the related graph builder, causing organizations like NVIDIA to appear under "Concepts" section
+
+**Learnings/notes:**
+- `build-data.mjs` assigns `type: 'concept'` as default for any EntityLink target that doesn't have an entity definition — this is how broken links end up under "Concepts" in the Related Pages section
+- The YAML schema validates RelatedEntry structure but does NOT validate that referenced entity IDs actually exist
+
+---
+
 ## 2026-02-13 | claude/fix-issue-108-2vDr6 | Bug fixes for check-links script
 
 **What was done:** Fixed multiple bugs in `crux/check-links.ts`: race condition in worker pool (shared index → queue.shift()), cache TTL logic for unverifiable/skipped domains, relative redirect URL resolution, truncated URL detection (unbalanced parens), bare URL extraction, DOI encoding, and dead retry logic branch. Added missing skip domains. Removed unused imports and switched to shared `sleep()`/`extractArxivId()` from `resource-utils.ts`.
@@ -140,7 +153,7 @@ Reverse-chronological log of Claude Code sessions on this repo. Each session app
 
 ---
 
-## 2026-02-13 | claude/add-page-edit-descriptions-BwZBa | Fix 6 edit log review issues
+## 2026-02-13 | claude/wiki-gap-analysis-l7Cp8 | Systematic wiki gap analysis
 
 **What was done:** Fixed all 6 issues from paranoid code review of the edit log PR. Critical: grading.ts was using `pageIdFromPath(finalPath)` on a temp path (resolved to "final" instead of actual page slug) — now uses sanitized `topic` parameter directly. Verified no actual slug collisions exist among ~625 pages. Added `default: list` command so `crux edit-log` works without subcommand. Changed all `logBulkFixes` callers to use per-page generic notes instead of misleading aggregate counts. Added `getDefaultRequestedBy()` helper (checks `CRUX_REQUESTED_BY` → `USER` → `'system'`) and wired it into all 4 pipeline call sites. Fixed falsy check in `appendEditLog` to use `!= null` so empty strings are preserved. Added 4 new tests (14 total edit-log tests, 269 total tests).
 

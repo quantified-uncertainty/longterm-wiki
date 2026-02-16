@@ -1,0 +1,446 @@
+# Interventions Database
+# Semi-structured data for AI safety interventions extracted from wiki pages.
+# Modeled after cruxes.yaml — each intervention is a canonical reference
+# with risk coverage, ITN prioritization, and cross-references.
+#
+# Sources: intervention-portfolio.mdx, individual response pages, entity data.
+
+- id: interpretability
+  name: Mechanistic Interpretability
+  category: technical
+  description: >-
+    Developing tools to understand AI model internals — circuit analysis, sparse
+    autoencoders, attribution graphs — to detect deception, misalignment, and
+    hidden reasoning in neural networks.
+  riskCoverage:
+    accident: high
+    misuse: low
+    structural: low
+    epistemic: none
+  primaryMechanism: Detect deception and misalignment in model internals
+  tractability: medium
+  neglectedness: low
+  importance: high
+  overallPriority: High
+  timelineFit: Long
+  currentState: >-
+    Rapid progress; Anthropic attribution graphs revealed hidden reasoning in
+    Claude 3.5 Haiku. MIT Technology Review named it a 2026 Breakthrough Technology.
+  fundingLevel: "$15-25M/year"
+  fundingShare: "~18%"
+  recommendedShift: Maintain
+  wikiPageId: interpretability
+  relatedInterventions:
+    - scalable-oversight
+    - evaluations
+    - ai-control
+  relevantResearch:
+    - title: "Scaling Monosemanticity (Anthropic)"
+      url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
+    - title: "Accelerating AI Interpretability (FAS)"
+      url: https://fas.org/publication/accelerating-ai-interpretability/
+
+- id: ai-control
+  name: AI Control
+  category: technical
+  description: >-
+    External constraints on AI systems — monitoring, containment, redundancy,
+    and shutdown mechanisms — that provide safety regardless of whether the AI
+    is aligned.
+  riskCoverage:
+    accident: high
+    misuse: medium
+    structural: none
+    epistemic: none
+  primaryMechanism: External constraints regardless of AI intentions
+  tractability: high
+  neglectedness: medium
+  importance: high
+  overallPriority: Very High
+  timelineFit: Near
+  currentState: >-
+    Provides near-term safety benefits (70-85% tractability for human-level
+    systems). Practical bridge during the transition period.
+  fundingLevel: "$1-12M/year"
+  fundingShare: "~9%"
+  recommendedShift: Increase to 15%
+  wikiPageId: ai-control
+  relatedInterventions:
+    - evaluations
+    - responsible-scaling
+    - scalable-oversight
+  relevantResearch:
+    - title: "AI Control: Improving Safety Despite Intentional Subversion (Redwood Research)"
+      url: https://arxiv.org/abs/2312.06942
+
+- id: evaluations
+  name: Evaluations & Evals Infrastructure
+  category: technical
+  description: >-
+    Pre-deployment testing for dangerous capabilities — red teaming, benchmarks,
+    capability elicitation, and conformity assessments — to identify risks before
+    models are released.
+  riskCoverage:
+    accident: high
+    misuse: medium
+    structural: low
+    epistemic: none
+  primaryMechanism: Pre-deployment testing for dangerous capabilities
+  tractability: high
+  neglectedness: low
+  importance: medium
+  overallPriority: High
+  timelineFit: Near
+  currentState: >-
+    Already standard practice at major labs. EU AI Act mandates conformity
+    assessments with fines up to EUR 35M/7% turnover. METR partners with
+    Anthropic and OpenAI on frontier model evaluations.
+  fundingLevel: "$12-18M/year"
+  fundingShare: "~13%"
+  recommendedShift: Increase to 20%
+  wikiPageId: evals
+  relatedInterventions:
+    - responsible-scaling
+    - ai-safety-institutes
+    - ai-control
+  relevantResearch:
+    - title: "Coefficient Giving Capability Evaluations RFP"
+      url: https://www.openphilanthropy.org/request-for-proposals-improving-capability-evaluations/
+
+- id: rlhf
+  name: RLHF / Constitutional AI
+  category: technical
+  description: >-
+    Training methods that align model behavior with human preferences — RLHF,
+    RLAIF, Constitutional AI, DPO — to make models helpful, harmless, and honest.
+  riskCoverage:
+    accident: medium
+    misuse: medium
+    structural: none
+    epistemic: none
+  primaryMechanism: Train models to follow human preferences
+  tractability: high
+  neglectedness: low
+  importance: medium
+  overallPriority: Medium-High
+  timelineFit: Near
+  currentState: >-
+    Deployed at scale across all major labs. Limited effectiveness against
+    deceptive alignment. Most-funded intervention area.
+  fundingLevel: "$15-35M/year"
+  fundingShare: "~25%"
+  recommendedShift: Decrease to 20%
+  wikiPageId: rlhf
+  relatedInterventions:
+    - scalable-oversight
+    - evaluations
+  relevantResearch:
+    - title: "RLHF Limitations Paper"
+      url: https://arxiv.org/abs/2406.18346
+
+- id: scalable-oversight
+  name: Scalable Oversight
+  category: technical
+  description: >-
+    Methods to maintain human supervision of superhuman AI systems — debate,
+    recursive reward modeling, market-making — scaling oversight as capabilities
+    grow beyond human understanding.
+  riskCoverage:
+    accident: medium
+    misuse: low
+    structural: none
+    epistemic: none
+  primaryMechanism: Human supervision of superhuman systems
+  tractability: medium
+  neglectedness: medium
+  importance: high
+  overallPriority: Medium
+  timelineFit: Long
+  currentState: >-
+    Active research area. Key open question whether oversight can scale to match
+    AI capabilities. Debate and recursive reward modeling show promise but
+    remain unproven at scale.
+  wikiPageId: scalable-oversight
+  relatedInterventions:
+    - interpretability
+    - rlhf
+    - ai-control
+
+- id: compute-governance
+  name: Compute Governance
+  category: governance
+  description: >-
+    Using hardware chokepoints — chip tracking, compute thresholds, licensing —
+    to monitor and control access to AI training resources. One of few physical
+    levers on AI development.
+  riskCoverage:
+    accident: low
+    misuse: high
+    structural: medium
+    epistemic: none
+  primaryMechanism: Hardware chokepoints limit access to training compute
+  tractability: high
+  neglectedness: low
+  importance: high
+  overallPriority: Very High
+  timelineFit: Near
+  currentState: >-
+    EU AI Act compute thresholds active. US export controls implemented.
+    GovAI produces leading research on compute governance mechanisms.
+    Hardware-enabled governance (attestation-based licensing) has 5-10 year timeline.
+  fundingLevel: "$1-10M/year"
+  fundingShare: "~7%"
+  recommendedShift: Increase to 12%
+  wikiPageId: compute-governance
+  relatedInterventions:
+    - export-controls
+    - international-coordination
+    - responsible-scaling
+  relevantResearch:
+    - title: "GovAI Compute Governance Research"
+      url: https://www.governance.ai/research
+
+- id: export-controls
+  name: Export Controls
+  category: governance
+  description: >-
+    Restricting adversary access to AI training hardware through semiconductor
+    export controls, primarily US restrictions on advanced chip sales to China.
+  riskCoverage:
+    accident: low
+    misuse: high
+    structural: medium
+    epistemic: none
+  primaryMechanism: Restrict adversary access to training compute
+  tractability: medium
+  neglectedness: low
+  importance: high
+  overallPriority: High
+  timelineFit: Near
+  currentState: >-
+    US export controls provide estimated 1-3 year delays, but enforcement is
+    imperfect — 140,000+ GPUs smuggled in 2024. Case-by-case licensing
+    mechanisms in place.
+  wikiPageId: export-controls
+  relatedInterventions:
+    - compute-governance
+    - international-coordination
+
+- id: responsible-scaling
+  name: Responsible Scaling Policies
+  category: governance
+  description: >-
+    Industry frameworks that establish capability thresholds triggering safety
+    evaluations and deployment requirements. Covers 60-70% of frontier
+    development with estimated 10-25% risk reduction.
+  riskCoverage:
+    accident: medium
+    misuse: medium
+    structural: low
+    epistemic: none
+  primaryMechanism: Capability thresholds trigger safety requirements
+  tractability: medium
+  neglectedness: low
+  importance: medium
+  overallPriority: Medium-High
+  timelineFit: Near
+  currentState: >-
+    All major frontier labs now publish RSPs. Voluntary commitments show 53%
+    mean compliance rate, with strongest adoption in security testing (70-85%).
+    Durability under competitive pressure is key uncertainty.
+  wikiPageId: responsible-scaling-policies
+  relatedInterventions:
+    - evaluations
+    - ai-safety-institutes
+    - compute-governance
+  relevantResearch:
+    - title: "Future of Life AI Safety Index 2025"
+      url: https://futureoflife.org/ai-safety-index-summer-2025/
+
+- id: international-coordination
+  name: International Coordination
+  category: governance
+  description: >-
+    Frameworks for international agreements on AI development — treaties,
+    summits, safety standards — to reduce racing dynamics and establish
+    shared governance norms.
+  riskCoverage:
+    accident: low
+    misuse: medium
+    structural: high
+    epistemic: none
+  primaryMechanism: Reduce racing dynamics through agreements
+  tractability: low
+  neglectedness: high
+  importance: critical
+  overallPriority: High
+  timelineFit: Long
+  currentState: >-
+    Bletchley Declaration signed by 28 countries. International AI Safety
+    Report 2025 (100+ authors, 30 countries, led by Yoshua Bengio) represents
+    largest global collaboration to date. Low tractability given geopolitical tensions.
+  fundingLevel: "$1-5M/year"
+  fundingShare: "~4%"
+  recommendedShift: Increase to 8%
+  wikiPageId: international-regimes
+  relatedInterventions:
+    - compute-governance
+    - ai-safety-institutes
+    - export-controls
+  relevantResearch:
+    - title: "International AI Safety Report 2025"
+      url: https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025
+    - title: "Carnegie AI Safety as Global Public Good"
+      url: https://carnegieendowment.org/research/2025/03/examining-ai-safety-as-a-global-public-good-implications-challenges-and-research-priorities
+
+- id: ai-safety-institutes
+  name: AI Safety Institutes
+  category: institutional
+  description: >-
+    Government-affiliated technical institutions that evaluate frontier AI
+    systems, build public-sector expertise, and provide independent oversight
+    capacity separate from the labs themselves.
+  riskCoverage:
+    accident: medium
+    misuse: medium
+    structural: medium
+    epistemic: none
+  primaryMechanism: Government capacity for evaluation and oversight
+  tractability: medium
+  neglectedness: medium
+  importance: medium
+  overallPriority: Medium-High
+  timelineFit: Near-Long
+  currentState: >-
+    UK and US AISIs secured pre-deployment access to frontier models. Face
+    resource constraints and enforcement limitations. NIST invested $20M in
+    AI Economic Security Centers.
+  wikiPageId: ai-safety-institutes
+  relatedInterventions:
+    - evaluations
+    - responsible-scaling
+    - international-coordination
+  relevantResearch:
+    - title: "NIST AI Safety Institute"
+      url: https://www.nist.gov/artificial-intelligence/executive-order-safe-secure-and-trustworthy-artificial-intelligence
+
+- id: field-building
+  name: Field Building
+  category: field-building
+  description: >-
+    Growing the talent pipeline, funding base, and institutional capacity for
+    AI safety work — training programs, fellowships, career guidance, and
+    community infrastructure.
+  riskCoverage:
+    accident: medium
+    misuse: low
+    structural: medium
+    epistemic: low
+  primaryMechanism: Grow talent pipeline and research capacity
+  tractability: high
+  neglectedness: medium
+  importance: medium
+  overallPriority: Medium-High
+  timelineFit: Ongoing
+  currentState: >-
+    1,100 total AI safety FTEs in 2025 (up from 400 in 2022, 40%/year growth).
+    Pipeline over-optimized for researchers; shortage in governance, operations,
+    advocacy. 80,000 Hours and MATS are key programs.
+  fundingLevel: "$10-15M/year"
+  fundingShare: "~11%"
+  recommendedShift: Maintain
+  wikiPageId: field-building-analysis
+  relatedInterventions:
+    - ai-safety-institutes
+    - epistemic-resilience
+  relevantResearch:
+    - title: "80,000 Hours: AI Risk"
+      url: https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/
+    - title: "AI Safety Field Growth Analysis 2025"
+      url: https://forum.effectivealtruism.org/posts/7YDyziQxkWxbGmF3u/ai-safety-field-growth-analysis-2025
+
+- id: epistemic-resilience
+  name: Epistemic Resilience
+  category: resilience
+  description: >-
+    Protecting collective truth-finding capacity against AI-powered information
+    manipulation — deepfake detection, epistemic infrastructure, trust
+    frameworks, and media literacy.
+  riskCoverage:
+    accident: none
+    misuse: low
+    structural: low
+    epistemic: high
+  primaryMechanism: Protect collective truth-finding capacity
+  tractability: medium
+  neglectedness: high
+  importance: medium
+  overallPriority: Medium-High
+  timelineFit: Near-Long
+  currentState: >-
+    Under 5% of portfolio — severely neglected. Very few dedicated funders.
+    Addresses the least-covered risk category (epistemic risks).
+  fundingLevel: "$1-4M/year"
+  fundingShare: "~3%"
+  recommendedShift: Increase to 8%
+  wikiPageId: epistemic-security
+  relatedInterventions:
+    - content-authentication
+    - field-building
+
+- id: content-authentication
+  name: Content Authentication
+  category: resilience
+  description: >-
+    Technical systems to verify authentic content in an era of AI-generated
+    synthetic media — provenance tracking, watermarking, cryptographic
+    attestation, and C2PA standards.
+  riskCoverage:
+    accident: none
+    misuse: medium
+    structural: none
+    epistemic: high
+  primaryMechanism: Verify authentic content in synthetic era
+  tractability: medium
+  neglectedness: medium
+  importance: medium
+  overallPriority: Medium
+  timelineFit: Near
+  currentState: >-
+    C2PA standard gaining adoption. Major platforms implementing provenance
+    metadata. Detection-based approaches struggle with arms race dynamics;
+    attestation-based approaches more promising.
+  wikiPageId: content-authentication
+  relatedInterventions:
+    - epistemic-resilience
+
+- id: legislation
+  name: AI Legislation & Regulation
+  category: governance
+  description: >-
+    Binding legal requirements with enforcement mechanisms — EU AI Act, US state
+    bills, executive orders — that mandate safety practices and create
+    accountability for AI developers.
+  riskCoverage:
+    accident: low
+    misuse: medium
+    structural: medium
+    epistemic: none
+  primaryMechanism: Binding requirements with enforcement
+  tractability: medium
+  neglectedness: low
+  importance: high
+  overallPriority: High
+  timelineFit: Near-Long
+  currentState: >-
+    EU AI Act entered force August 2024, full applicability August 2026 (penalties
+    up to EUR 35M / 7% global turnover). US EO 14110 revoked January 2025 after
+    15 months. US state legislation active (CA SB 1047, CO AI Act). China has
+    content security and generative AI regulations.
+  fundingLevel: "$1-12M/year"
+  fundingShare: "~9%"
+  recommendedShift: Increase to 12%
+  relatedInterventions:
+    - responsible-scaling
+    - ai-safety-institutes
+    - compute-governance
