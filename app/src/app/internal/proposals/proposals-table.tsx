@@ -11,6 +11,7 @@ import {
   getExpandedRowModel,
 } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
+import { expandToggleColumn } from "@/components/tables/shared/column-helpers";
 import { ProposalCard } from "@/components/wiki/ProposalCard";
 import {
   domainBadge,
@@ -19,7 +20,7 @@ import {
   statusLabel,
 } from "@/components/wiki/badge-styles";
 import { cn } from "@lib/utils";
-import { ChevronRight, Search } from "lucide-react";
+import { FilterTabs, TableSearchBar } from "../shared";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -40,7 +41,7 @@ export interface ProposalRow {
   sourcePageId: string;
   leadOrganizations: string[];
   relatedProposals: string[];
-  leverage: number | null; // EV midpoint / cost midpoint
+  leverage: number | null;
   leverageLabel: string;
 }
 
@@ -63,29 +64,7 @@ const FEASIBILITY_ORDER: Record<string, number> = {
 };
 
 const columns: ColumnDef<ProposalRow>[] = [
-  {
-    id: "expand",
-    size: 32,
-    header: () => null,
-    cell: ({ row }) => (
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          row.toggleExpanded();
-        }}
-        className="p-1 rounded hover:bg-muted transition-colors"
-        aria-label={row.getIsExpanded() ? "Collapse" : "Expand"}
-      >
-        <ChevronRight
-          className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform",
-            row.getIsExpanded() && "rotate-90"
-          )}
-        />
-      </button>
-    ),
-  },
+  expandToggleColumn<ProposalRow>(),
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -231,6 +210,22 @@ const columns: ColumnDef<ProposalRow>[] = [
         </span>
       ),
   },
+  {
+    id: "leadOrgs",
+    header: "Lead Orgs",
+    cell: ({ row }) => (
+      <div className="flex flex-wrap gap-1 max-w-[160px]">
+        {row.original.leadOrganizations.map((org) => (
+          <span
+            key={org}
+            className="text-[10px] bg-muted rounded px-1.5 py-0.5"
+          >
+            {org}
+          </span>
+        ))}
+      </div>
+    ),
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -298,81 +293,6 @@ function SummaryCards({ summary }: { summary: ProposalSummary }) {
 }
 
 // ---------------------------------------------------------------------------
-// Domain Filter Tabs
-// ---------------------------------------------------------------------------
-
-function DomainFilters({
-  domains,
-  active,
-  onSelect,
-}: {
-  domains: Record<string, number>;
-  active: string | null;
-  onSelect: (d: string | null) => void;
-}) {
-  const total = Object.values(domains).reduce((a, b) => a + b, 0);
-
-  return (
-    <div className="flex flex-wrap gap-1.5 mb-4 not-prose">
-      <button
-        type="button"
-        onClick={() => onSelect(null)}
-        className={cn(
-          "rounded-full px-3 py-1 text-xs font-medium transition-colors",
-          active === null
-            ? "bg-foreground text-background"
-            : "bg-muted text-muted-foreground hover:bg-muted/80"
-        )}
-      >
-        All ({total})
-      </button>
-      {Object.entries(domains)
-        .sort(([, a], [, b]) => b - a)
-        .map(([domain, count]) => (
-          <button
-            key={domain}
-            type="button"
-            onClick={() => onSelect(active === domain ? null : domain)}
-            className={cn(
-              "rounded-full px-3 py-1 text-xs font-medium transition-colors",
-              active === domain
-                ? domainBadge[domain] || "bg-foreground text-background"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            )}
-          >
-            {domain} ({count})
-          </button>
-        ))}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Expanded Row
-// ---------------------------------------------------------------------------
-
-function ExpandedProposalRow({ row }: { row: ProposalRow }) {
-  return (
-    <div className="px-4 py-2 bg-muted/30">
-      <ProposalCard
-        name={row.name}
-        description={row.description}
-        domain={row.domain}
-        stance={row.stance}
-        costEstimate={row.costEstimate}
-        evEstimate={row.evEstimate}
-        feasibility={row.feasibility}
-        honestConcerns={row.honestConcerns}
-        status={row.status}
-        leadOrganizations={row.leadOrganizations}
-        relatedProposals={row.relatedProposals}
-        className="my-0 shadow-sm"
-      />
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Main Component
 // ---------------------------------------------------------------------------
 
@@ -411,36 +331,41 @@ export function ProposalsTable({
   return (
     <div className="space-y-0">
       <SummaryCards summary={summary} />
-      <DomainFilters
-        domains={summary.byDomain}
+      <FilterTabs
+        counts={summary.byDomain}
         active={domainFilter}
         onSelect={setDomainFilter}
+        badgeStyles={domainBadge}
+      />
+      <TableSearchBar
+        value={globalFilter}
+        onChange={setGlobalFilter}
+        placeholder="Search proposals..."
+        resultCount={table.getFilteredRowModel().rows.length}
+        totalCount={filteredData.length}
       />
 
-      {/* Search */}
-      <div className="flex items-center gap-4 pb-4 not-prose">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            placeholder="Search proposals..."
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-          />
-        </div>
-        <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {table.getFilteredRowModel().rows.length} of {filteredData.length}{" "}
-          results
-        </span>
-      </div>
-
-      {/* Table */}
       <div className="not-prose">
         <DataTable
           table={table}
           renderExpandedRow={(row) =>
             row.getIsExpanded() ? (
-              <ExpandedProposalRow row={row.original} />
+              <div className="px-4 py-2 bg-muted/30">
+                <ProposalCard
+                  name={row.original.name}
+                  description={row.original.description}
+                  domain={row.original.domain}
+                  stance={row.original.stance}
+                  costEstimate={row.original.costEstimate}
+                  evEstimate={row.original.evEstimate}
+                  feasibility={row.original.feasibility}
+                  honestConcerns={row.original.honestConcerns}
+                  status={row.original.status}
+                  leadOrganizations={row.original.leadOrganizations}
+                  relatedProposals={row.original.relatedProposals}
+                  className="my-0 shadow-sm"
+                />
+              </div>
             ) : null
           }
           getRowClassName={(row) =>

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import type { ColumnDef, SortingState, ColumnFiltersState } from "@tanstack/react-table";
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
   useReactTable,
   getCoreRowModel,
@@ -11,6 +11,7 @@ import {
   getExpandedRowModel,
 } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
+import { expandToggleColumn } from "@/components/tables/shared/column-helpers";
 import { InterventionCard } from "@/components/wiki/InterventionCard";
 import {
   priorityBadge,
@@ -19,7 +20,7 @@ import {
   itnLabel,
 } from "@/components/wiki/badge-styles";
 import { cn } from "@lib/utils";
-import { ChevronRight, Search } from "lucide-react";
+import { FilterTabs, TableSearchBar } from "../shared";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -86,29 +87,7 @@ const PRIORITY_ORDER: Record<string, number> = {
 // ---------------------------------------------------------------------------
 
 const columns: ColumnDef<InterventionRow>[] = [
-  {
-    id: "expand",
-    size: 32,
-    header: () => null,
-    cell: ({ row }) => (
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          row.toggleExpanded();
-        }}
-        className="p-1 rounded hover:bg-muted transition-colors"
-        aria-label={row.getIsExpanded() ? "Collapse" : "Expand"}
-      >
-        <ChevronRight
-          className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform",
-            row.getIsExpanded() && "rotate-90"
-          )}
-        />
-      </button>
-    ),
-  },
+  expandToggleColumn<InterventionRow>(),
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -257,9 +236,7 @@ function SummaryCards({ summary }: { summary: InterventionSummary }) {
         <div className="text-2xl font-bold text-red-600 dark:text-red-400">
           {(summary.byPriority["Very High"] || 0) + (summary.byPriority["High"] || 0)}
         </div>
-        <div className="text-xs text-muted-foreground">
-          High+ priority
-        </div>
+        <div className="text-xs text-muted-foreground">High+ priority</div>
         <div className="text-[10px] text-muted-foreground/70 mt-0.5">
           {summary.byPriority["Very High"] || 0} very high, {summary.byPriority["High"] || 0} high
         </div>
@@ -281,85 +258,6 @@ function SummaryCards({ summary }: { summary: InterventionSummary }) {
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Category Filter Tabs
-// ---------------------------------------------------------------------------
-
-function CategoryFilters({
-  categories,
-  active,
-  onSelect,
-}: {
-  categories: Record<string, number>;
-  active: string | null;
-  onSelect: (cat: string | null) => void;
-}) {
-  const total = Object.values(categories).reduce((a, b) => a + b, 0);
-
-  return (
-    <div className="flex flex-wrap gap-1.5 mb-4 not-prose">
-      <button
-        type="button"
-        onClick={() => onSelect(null)}
-        className={cn(
-          "rounded-full px-3 py-1 text-xs font-medium transition-colors",
-          active === null
-            ? "bg-foreground text-background"
-            : "bg-muted text-muted-foreground hover:bg-muted/80"
-        )}
-      >
-        All ({total})
-      </button>
-      {Object.entries(categories)
-        .sort(([, a], [, b]) => b - a)
-        .map(([cat, count]) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => onSelect(active === cat ? null : cat)}
-            className={cn(
-              "rounded-full px-3 py-1 text-xs font-medium transition-colors",
-              active === cat
-                ? categoryBadge[cat] || "bg-foreground text-background"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            )}
-          >
-            {cat} ({count})
-          </button>
-        ))}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Expanded Row
-// ---------------------------------------------------------------------------
-
-function ExpandedInterventionRow({ row }: { row: InterventionRow }) {
-  return (
-    <div className="px-4 py-2 bg-muted/30">
-      <InterventionCard
-        name={row.name}
-        category={row.category}
-        description={row.description}
-        riskCoverage={row.riskCoverage}
-        primaryMechanism={row.primaryMechanism}
-        tractability={row.tractability}
-        neglectedness={row.neglectedness}
-        importance={row.importance}
-        overallPriority={row.overallPriority}
-        timelineFit={row.timelineFit}
-        currentState={row.currentState}
-        fundingLevel={row.fundingLevel}
-        recommendedShift={row.recommendedShift}
-        relatedInterventions={row.relatedInterventions}
-        relevantResearch={row.relevantResearch}
-        className="my-0 shadow-sm"
-      />
     </div>
   );
 }
@@ -402,35 +300,45 @@ export function InterventionsTable({
   return (
     <div className="space-y-0">
       <SummaryCards summary={summary} />
-      <CategoryFilters
-        categories={summary.byCategory}
+      <FilterTabs
+        counts={summary.byCategory}
         active={categoryFilter}
         onSelect={setCategoryFilter}
+        badgeStyles={categoryBadge}
+      />
+      <TableSearchBar
+        value={globalFilter}
+        onChange={setGlobalFilter}
+        placeholder="Search interventions..."
+        resultCount={table.getFilteredRowModel().rows.length}
+        totalCount={filteredData.length}
       />
 
-      {/* Search */}
-      <div className="flex items-center gap-4 pb-4 not-prose">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            placeholder="Search interventions..."
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-          />
-        </div>
-        <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {table.getFilteredRowModel().rows.length} of {filteredData.length} results
-        </span>
-      </div>
-
-      {/* Table */}
       <div className="not-prose">
         <DataTable
           table={table}
           renderExpandedRow={(row) =>
             row.getIsExpanded() ? (
-              <ExpandedInterventionRow row={row.original} />
+              <div className="px-4 py-2 bg-muted/30">
+                <InterventionCard
+                  name={row.original.name}
+                  category={row.original.category}
+                  description={row.original.description}
+                  riskCoverage={row.original.riskCoverage}
+                  primaryMechanism={row.original.primaryMechanism}
+                  tractability={row.original.tractability}
+                  neglectedness={row.original.neglectedness}
+                  importance={row.original.importance}
+                  overallPriority={row.original.overallPriority}
+                  timelineFit={row.original.timelineFit}
+                  currentState={row.original.currentState}
+                  fundingLevel={row.original.fundingLevel}
+                  recommendedShift={row.original.recommendedShift}
+                  relatedInterventions={row.original.relatedInterventions}
+                  relevantResearch={row.original.relevantResearch}
+                  className="my-0 shadow-sm"
+                />
+              </div>
             ) : null
           }
           getRowClassName={(row) =>
