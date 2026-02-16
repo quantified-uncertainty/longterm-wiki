@@ -1,13 +1,45 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
+import { ChevronRight } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
+import { cn } from "@/lib/utils";
 import { getLevelSortValue } from "./table-view-styles";
 import { LevelBadge, CellNote, ProsCons } from "./cell-components";
 
 /**
  * Column factory functions that replace 15-line boilerplate with 1-line calls.
  */
+
+/**
+ * Create a chevron expand/collapse toggle column.
+ * Works with TanStack Table's built-in expand state (`getExpandedRowModel()`).
+ */
+export function expandToggleColumn<TData>(): ColumnDef<TData> {
+  return {
+    id: "expand",
+    size: 32,
+    header: () => null,
+    cell: ({ row }) => (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          row.toggleExpanded();
+        }}
+        className="p-1 rounded hover:bg-muted transition-colors"
+        aria-label={row.getIsExpanded() ? "Collapse" : "Expand"}
+      >
+        <ChevronRight
+          className={cn(
+            "h-4 w-4 text-muted-foreground transition-transform",
+            row.getIsExpanded() && "rotate-90"
+          )}
+        />
+      </button>
+    ),
+  };
+}
 
 /**
  * Create a column for a `{ level, note }` field.
