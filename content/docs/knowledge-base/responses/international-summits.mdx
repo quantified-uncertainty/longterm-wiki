@@ -1,12 +1,12 @@
 ---
 title: International AI Safety Summits
-description: Global diplomatic initiatives bringing together 28+ countries and major AI companies to establish international coordination on AI safety, producing non-binding declarations and institutional capacity building through AI Safety Institutes. Bletchley (2023), Seoul (2024), and Paris (2025) summits achieved formal recognition of catastrophic AI risks, with 16 companies signing Frontier AI Safety Commitments, though US and UK refused to sign Paris declaration.
+description: Global diplomatic and scientific initiatives bringing together 28+ countries and major AI companies to establish international coordination on AI safety, producing non-binding declarations and institutional capacity building through AI Safety Institutes. Bletchley (2023), Seoul (2024), Paris (2025), and the researcher-driven Singapore SCAI (2025) have achieved formal recognition of catastrophic AI risks, 16 companies signing Frontier AI Safety Commitments, and a defence-in-depth research consensus from 88 experts across 11 countries.
 sidebar:
   order: 8
 quality: 63
-llmSummary: Three international AI safety summits (2023-2025) achieved first formal recognition of catastrophic AI risks from 28+ countries, established 10+ AI Safety Institutes with $100-400M combined budgets, and secured voluntary commitments from 16 companies covering ~80% of frontier AI development. However, all commitments remain non-binding with no enforcement mechanisms, and the coalition is fracturing (US/UK refused Paris 2025 declaration), with estimated 15-30% probability of binding frameworks by 2030.
-lastEdited: "2026-01-29"
-importance: 62.5
+llmSummary: Three diplomatic AI safety summits (Bletchley 2023, Seoul 2024, Paris 2025) plus the researcher-driven Singapore SCAI conference (April 2025) achieved first formal recognition of catastrophic AI risks from 28+ countries, established 10+ AI Safety Institutes with $100-400M combined budgets, secured voluntary commitments from 16 companies covering ~80% of frontier AI development, and produced a defence-in-depth research consensus (Assessment, Development, Control) from 88 experts across 11 countries. However, all commitments remain non-binding with no enforcement mechanisms, and the diplomatic coalition is fracturing (US/UK refused Paris 2025 declaration), with estimated 15-30% probability of binding frameworks by 2030.
+lastEdited: "2026-02-16"
+importance: 72.5
 researchImportance: 17
 update_frequency: 21
 ratings:
@@ -27,7 +27,6 @@ import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@component
 <DataInfoBox entityId="E173" />
 
 ## Quick Assessment
-
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | **Enforcement Mechanism** | None—entirely voluntary | All declarations and commitments are non-binding; no penalties for non-compliance |
@@ -45,6 +44,7 @@ import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@component
 | **Bletchley Park** | Nov 1-2, 2023 | UK | 100+ delegates | <EntityLink id="bletchley-declaration">Bletchley Declaration</EntityLink> on AI risks | 28 countries + EU |
 | **Seoul** | May 21-22, 2024 | South Korea | Lower attendance | Frontier AI Safety Commitments | 27 countries + EU |
 | **Paris** | Feb 10-11, 2025 | France | 1,000+ stakeholders | Statement on Inclusive AI | 58 countries (excl. US, UK) |
+| **Singapore (SCAI)** | Apr 26, 2025 | Singapore | 100+ experts | Singapore Consensus on AI Safety Research Priorities | 88 co-authors from 11 countries |
 | **Delhi** (planned) | Feb 2026 | India | Projected 1,000+ | AI Impact focus | Projected 30+ countries |
 
 ## Comprehensive Overview
@@ -114,6 +114,24 @@ US Vice President J.D. Vance addressed world leaders stating, "This administrati
 
 The Current AI foundation is backed by nine governments (Finland, France, Germany, Chile, India, Kenya, Morocco, Nigeria, Slovenia, Switzerland) plus philanthropies and companies including Google and Salesforce. China announced establishment of a new body as its answer to AI safety institute calls, though functioning differently from US and UK models. India was announced as host of the next summit—the AI Impact Summit—in February 2026.
 
+## Singapore Conference on AI Safety Research Priorities (April 2025)
+
+The **Singapore Conference on AI: International Scientific Exchange on AI Safety (SCAI)**, held on April 26, 2025, alongside ICLR 2025, represented a distinct complement to the diplomatic summit series. Unlike the government-led Bletchley, Seoul, and Paris summits, SCAI was a researcher-driven convening focused specifically on identifying consensus technical research priorities for AI safety. The conference produced the **Singapore Consensus on Global AI Safety Research Priorities**, authored by <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>, <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, <EntityLink id="max-tegmark">Max Tegmark</EntityLink>, Dawn Song, Tegan Maharaj, Luke Ong, Lan Xue, Ya-Qin Zhang, and 80 additional co-authors from 11 countries (Australia, Canada, Chile, China, France, Japan, Korea, Netherlands, Singapore, UK, US).
+
+Building on the 2025 International AI Safety Report, the Singapore Consensus organized AI safety research into a **defence-in-depth framework** with three areas:
+
+| Area | Focus | Key Research Priorities |
+|------|-------|------------------------|
+| **Assessment** | Understanding severity and likelihood of AI harms | Standardized risk measurement methods, enhanced metrology for quantitative risk assessment, infrastructure for third-party audits, loss-of-control risk assessment |
+| **Development** | Creating trustworthy, secure, and reliable systems | Specification and validation of desired behavior, training and design for robustness against jailbreaks and tampering, formal verification |
+| **Control** | Post-deployment monitoring and intervention | System-level monitoring, ecosystem-wide oversight, societal resilience research, AI control setups that work even against actively subversive AI |
+
+The Consensus introduced several notable concepts. It proposed limiting AGI risk by deliberately constraining one or more of three dimensions—autonomy, generality, and intelligence—rather than trying to make fully general autonomous superintelligence safe. It also advocated for "non-agentic guardrails" where non-agentic AI systems monitor and intervene on agentic systems' proposed actions.
+
+Unlike previous safety reports, the Singapore Consensus explicitly identified **areas of mutual interest** where even competing actors benefit from cooperation—shared risk thresholds, evaluation protocols, and safety benchmarks—drawing parallels to aviation safety where fierce competitors collaborate on accident prevention.
+
+The Consensus was presented to digital ministers at the Asia Tech x Singapore Summit (ATxSummit) from May 28-29, 2025, bridging the gap between AI researchers and policymakers. Tegmark expressed increased optimism about future summits following SCAI, noting that "OpenAI, Anthropic, and all these companies sent people to the Singapore conference."
+
 ## Institutional Infrastructure and AI Safety Institutes
 
 The summit series has catalyzed unprecedented institutional capacity building for AI safety governance. The **<EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink>** (renamed AI Security Institute in February 2025), operational since late 2023, has conducted pre-deployment evaluations of frontier models including OpenAI's o1 and Anthropic's Claude 3.5 Sonnet. In May 2024, AISI released the open-source **Inspect AI Framework** for standardized safety evaluations.
@@ -175,6 +193,12 @@ flowchart TD
         P3[\$100M Current AI Foundation]
     end
 
+    subgraph SINGAPORE["Singapore SCAI (Apr 2025)"]
+        SG1[88 Researchers from 11 Countries]
+        SG2[Defence-in-Depth Safety Framework]
+        SG3[Areas of Mutual Interest Identified]
+    end
+
     subgraph DELHI["Delhi (Feb 2026)"]
         D1[AI Impact Summit]
         D2[Global South Focus]
@@ -182,15 +206,17 @@ flowchart TD
 
     BLETCHLEY --> SEOUL
     SEOUL --> PARIS
-    PARIS --> DELHI
+    PARIS --> SINGAPORE
+    SINGAPORE --> DELHI
 
     style B1 fill:#90EE90
     style S1 fill:#90EE90
     style P2 fill:#FFB6C1
     style S3 fill:#FFD700
+    style SG1 fill:#90EE90
 `} />
 
-The diagram illustrates the evolution from broad consensus at Bletchley to emerging divergence at Paris, with China abstaining at Seoul and the US/UK refusing to sign at Paris—representing a potential fracturing of the initial coalition.
+The diagram illustrates the evolution from broad consensus at Bletchley to emerging divergence at Paris, with China abstaining at Seoul and the US/UK refusing to sign at Paris. The Singapore SCAI conference then re-established researcher-driven consensus on safety priorities across geopolitical lines.
 
 ### Binding vs Non-Binding Outcomes Comparison
 
@@ -199,6 +225,7 @@ The diagram illustrates the evolution from broad consensus at Bletchley to emerg
 | **Bletchley 2023** | 0 | Declaration (28 countries), AISI announcements | None |
 | **Seoul 2024** | 0 | Declaration (27 countries), Frontier Safety Commitments (16 companies) | None; relies on reputational pressure |
 | **Paris 2025** | 0 | Statement (61 countries—excluding US/UK), Current AI Foundation (\$400M) | None |
+| **Singapore SCAI 2025** | 0 | Research consensus document (88 co-authors, 11 countries) | None; scientific consensus mechanism |
 | **EU AI Act** (for comparison) | Full legal framework | N/A | Fines up to €35M or 7% of global turnover |
 
 **Key insight**: After three summits spanning 15 months and involving 100+ countries, zero binding commitments have been achieved. The only binding AI governance framework remains the EU AI Act, which was developed independently of the summit process.
