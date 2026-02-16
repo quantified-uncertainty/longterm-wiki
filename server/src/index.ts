@@ -116,7 +116,8 @@ app.get("/api/ids/:slug", async (c) => {
     return c.json({ error: "not found" }, 404);
   }
 
-  return c.json({ numericId: `E${rows[0].numericId}`, ...rows[0] });
+  const { numericId, ...rest } = rows[0];
+  return c.json({ numericId: `E${numericId}`, ...rest });
 });
 
 // ---------------------------------------------------------------------------
