@@ -74,6 +74,9 @@ import { footnoteCoverageRule } from './footnote-coverage.ts';
 // Citation accuracy
 import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
 
+// False attribution detection
+import { humanAttributionRule } from './human-attribution.ts';
+
 // Diagram style compliance
 import { mermaidStyleRule } from './mermaid-style.ts';
 
@@ -116,6 +119,7 @@ export {
   squiggleQualityRule,
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
+  humanAttributionRule,
   footnoteCoverageRule,
   citationDoiMismatchRule,
   mermaidStyleRule,
@@ -159,6 +163,7 @@ export const allRules: Rule[] = [
   squiggleQualityRule,
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
+  humanAttributionRule,
   footnoteCoverageRule,
   citationDoiMismatchRule,
   mermaidStyleRule,
