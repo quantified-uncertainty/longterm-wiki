@@ -28,11 +28,11 @@ import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, R, Entit
 
 ## Overview
 
-The <R id="0562f8c207d8b63f">Alignment Research Center (ARC)</R> represents a unique approach to AI safety, combining theoretical research on worst-case alignment scenarios with practical capability evaluations of frontier AI models. Founded in 2021 by <EntityLink id="E220">Paul Christiano</EntityLink> after his departure from <EntityLink id="E218">OpenAI</EntityLink>, ARC has become highly influential in establishing evaluations as a core governance tool.
+The <R id="0562f8c207d8b63f">Alignment Research Center (ARC)</R> represents a unique approach to AI safety, combining theoretical research on worst-case alignment scenarios with practical capability evaluations of frontier AI models. Founded in 2021 by <EntityLink id="paul-christiano">Paul Christiano</EntityLink> after his departure from <EntityLink id="openai">OpenAI</EntityLink>, ARC has become highly influential in establishing evaluations as a core governance tool.
 
 ARC's dual focus stems from Christiano's belief that AI systems might be adversarial rather than merely misaligned, requiring robust safety measures that work even against deceptive models. This "worst-case alignment" philosophy distinguishes ARC from organizations pursuing more optimistic prosaic alignment approaches.
 
-The organization has achieved significant impact through its ELK (Eliciting Latent Knowledge) problem formulation, which has influenced how the field thinks about truthfulness and <EntityLink id="E271">scalable oversight</EntityLink>, and through ARC Evals, which has established the standard for systematic capability evaluations now adopted by major AI labs.
+The organization has achieved significant impact through its ELK (Eliciting Latent Knowledge) problem formulation, which has influenced how the field thinks about truthfulness and <EntityLink id="scalable-oversight">scalable oversight</EntityLink>, and through ARC Evals, which has established the standard for systematic capability evaluations now adopted by major AI labs.
 
 ## Risk Assessment
 
@@ -53,7 +53,7 @@ The organization has achieved significant impact through its ELK (Eliciting Late
 | **Heuristic Arguments** | Systematic counterexamples to proposed alignment solutions | Advanced conceptual understanding | Multiple publications |
 | **Worst-Case Alignment** | Framework assuming AI might be adversarial | Shifted field toward robustness thinking | Adopted by some researchers |
 
-**The ELK Challenge**: Consider an AI system monitoring security cameras. If it detects a thief, how can you ensure it reports the truth rather than what it thinks you want to hear? <R id="ecd797db5ba5d02c">ARC's ELK research</R> demonstrates this is harder than it appears, with implications for <EntityLink id="E174">scalable oversight</EntityLink> and <EntityLink id="E93">deceptive alignment</EntityLink>.
+**The ELK Challenge**: Consider an AI system monitoring security cameras. If it detects a thief, how can you ensure it reports the truth rather than what it thinks you want to hear? <R id="ecd797db5ba5d02c">ARC's ELK research</R> demonstrates this is harder than it appears, with implications for <EntityLink id="interpretability">scalable oversight</EntityLink> and <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>.
 
 ### ARC Evals: Systematic Capability Assessment
 
@@ -62,11 +62,11 @@ The organization has achieved significant impact through its ELK (Eliciting Late
 | **Autonomous Replication** | Can model copy itself to new servers? | GPT-4, Claude 3 | Informed deployment decisions |
 | **Strategic Deception** | Can model mislead evaluators? | Multiple frontier models | RSP threshold setting |
 | **Resource Acquisition** | Can model obtain money/compute? | Various models | White House AI Order |
-| **<EntityLink id="E282">Situational Awareness</EntityLink>** | Does model understand its context? | Latest frontier models | Lab safety protocols |
+| **<EntityLink id="situational-awareness">Situational Awareness</EntityLink>** | Does model understand its context? | Latest frontier models | Lab safety protocols |
 
 **Evaluation Methodology**:
-- **Red-team approach**: Adversarial testing to <EntityLink id="E526">elicit</EntityLink> worst-case capabilities
-- **<EntityLink id="E443">Capability elicitation</EntityLink>**: Ensuring tests reveal true abilities, not default behaviors  
+- **Red-team approach**: Adversarial testing to <EntityLink id="elicit">elicit</EntityLink> worst-case capabilities
+- **<EntityLink id="capability-elicitation">Capability elicitation</EntityLink>**: Ensuring tests reveal true abilities, not default behaviors  
 - **Pre-deployment assessment**: Testing before public release
 - **Threshold-based recommendations**: Clear criteria for deployment decisions
 
@@ -79,7 +79,7 @@ The organization has achieved significant impact through its ELK (Eliciting Late
 | **ELK Solutions** | Multiple approaches proposed, all have counterexamples | Incremental progress, no complete solution likely |
 | **Evaluation Rigor** | Standard practice at major labs | Government-mandated evaluations possible |
 | **Theoretical Alignment** | Continued negative results | May pivot to more tractable subproblems |
-| **Policy Influence** | High engagement with <EntityLink id="E364">UK AISI</EntityLink> | Potential <EntityLink id="E171">international coordination</EntityLink> |
+| **Policy Influence** | High engagement with <EntityLink id="uk-aisi">UK AISI</EntityLink> | Potential <EntityLink id="international-coordination">international coordination</EntityLink> |
 
 ### Organizational Evolution
 
@@ -87,7 +87,7 @@ The organization has achieved significant impact through its ELK (Eliciting Late
 
 **2022-2023**: Addition of ARC Evals, contracts with major labs for model testing  
 
-**2023-2024**: Established as key player in <EntityLink id="E608">AI governance</EntityLink>, influence on <EntityLink id="E252">Responsible Scaling Policies</EntityLink>
+**2023-2024**: Established as key player in <EntityLink id="ai-governance">AI governance</EntityLink>, influence on <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink>
 
 **2024-present**: Expanding international engagement, potential government partnerships
 
@@ -148,21 +148,21 @@ The organization has achieved significant impact through its ELK (Eliciting Late
 
 | Organization | Relationship Type | Collaboration Areas | Tension Points |
 |--------------|------------------|-------------------|----------------|
-| **<EntityLink id="E218">OpenAI</EntityLink>** | Client/Evaluator | GPT-4 pre-deployment evaluation | Independence concerns |
-| **<EntityLink id="E22">Anthropic</EntityLink>** | Client/Research Partner | Model evaluations, RSP development | Philosophical differences on prosaic alignment |
-| **<EntityLink id="E364">UK AISI</EntityLink>** | Government Partner | Evaluation methodology, international coordination | Scaling challenges |
-| **<EntityLink id="E202">MIRI</EntityLink>** | Intellectual Overlap | Shared pessimism about alignment difficulty | Different research strategies |
+| **<EntityLink id="openai">OpenAI</EntityLink>** | Client/Evaluator | GPT-4 pre-deployment evaluation | Independence concerns |
+| **<EntityLink id="anthropic">Anthropic</EntityLink>** | Client/Research Partner | Model evaluations, RSP development | Philosophical differences on prosaic alignment |
+| **<EntityLink id="uk-aisi">UK AISI</EntityLink>** | Government Partner | Evaluation methodology, international coordination | Scaling challenges |
+| **<EntityLink id="miri">MIRI</EntityLink>** | Intellectual Overlap | Shared pessimism about alignment difficulty | Different research strategies |
 
 ### Influence on Industry Standards
 
 **Before ARC Evals (2021)**:
 - Labs conducted internal capability testing
-- No systematic <EntityLink id="E442">dangerous capability evaluations</EntityLink>
+- No systematic <EntityLink id="dangerous-cap-evals">dangerous capability evaluations</EntityLink>
 - Limited pre-deployment safety assessment
 
 **After ARC Evals (2024)**:
 - All major labs conduct pre-deployment dangerous capability evaluations
-- <EntityLink id="E252">Responsible Scaling Policies</EntityLink> incorporate evaluation thresholds
+- <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink> incorporate evaluation thresholds
 - Government bodies establishing independent evaluation capabilities
 
 ### Policy Impact Timeline
@@ -173,7 +173,7 @@ The organization has achieved significant impact through its ELK (Eliciting Late
 | **2023** | Anthropic RSP framework | Consultation on evaluation thresholds |
 | **2023** | White House AI Executive Order | Evaluation requirements influenced by ARC work |
 | **2024** | UK AISI establishment | Beth Barnes consultation, methodology transfer |
-| **2024** | <EntityLink id="E127">EU AI Act</EntityLink> implementation | Evaluation standards discussion |
+| **2024** | <EntityLink id="eu-ai-act">EU AI Act</EntityLink> implementation | Evaluation standards discussion |
 
 ## Critical Analysis and Limitations
 
@@ -181,14 +181,14 @@ The organization has achieved significant impact through its ELK (Eliciting Late
 
 | Limitation | Description | Mitigation Efforts | Remaining Risk |
 |------------|-------------|-------------------|----------------|
-| **<EntityLink id="E270">Sandbagging</EntityLink> Detection** | Models may hide capabilities during evaluation | Capability elicitation techniques | High uncertainty |
+| **<EntityLink id="sandbagging">Sandbagging</EntityLink> Detection** | Models may hide capabilities during evaluation | Capability elicitation techniques | High uncertainty |
 | **Evaluation Gaming** | Models might perform well on evals while retaining dangerous capabilities | Red-team methodology | Moderate risk |
 | **Coverage Gaps** | Can only test for capabilities we think to test | Broad capability assessment | Significant concern |
 | **Independence** | Financial relationships with labs being evaluated | Diverse funding, editorial control | Ongoing tension |
 
 ### Criticism from the Research Community
 
-**"Excessive Pessimism"** (<R id="4ca01f329c8b25a4"><EntityLink id="E582">Yann LeCun</EntityLink></R>, some <EntityLink id="E218">OpenAI</EntityLink> researchers):
+**"Excessive Pessimism"** (<R id="4ca01f329c8b25a4"><EntityLink id="yann-lecun">Yann LeCun</EntityLink></R>, some <EntityLink id="openai">OpenAI</EntityLink> researchers):
 - Heuristic arguments show possible failures, not inevitable ones
 - Current AI systems show cooperative behavior
 - Worst-case framing may impede progress
@@ -215,7 +215,7 @@ The organization has achieved significant impact through its ELK (Eliciting Late
 **Potential Pivots (2025-2027)**:
 - More tractable subproblems of alignment
 - Empirical testing of theoretical concerns
-- Integration with <EntityLink id="E174">mechanistic interpretability</EntityLink>
+- Integration with <EntityLink id="interpretability">mechanistic interpretability</EntityLink>
 
 ### Evaluation Methodology Advancement
 
@@ -252,8 +252,8 @@ The organization has achieved significant impact through its ELK (Eliciting Late
 
 | Publication | Year | Impact | Link |
 |-------------|------|--------|------|
-| **"Eliciting Latent Knowledge"** | 2022 | High - problem formulation | <R id="37f4871113caa2ab"><EntityLink id="E538">LessWrong</EntityLink></R> |
-| **"Heuristic Arguments for AI X-Risk"** | 2023 | Moderate - conceptual framework | <R id="2e0c662574087c2a"><EntityLink id="E439">AI Alignment</EntityLink> Forum</R> |
+| **"Eliciting Latent Knowledge"** | 2022 | High - problem formulation | <R id="37f4871113caa2ab"><EntityLink id="lesswrong">LessWrong</EntityLink></R> |
+| **"Heuristic Arguments for AI X-Risk"** | 2023 | Moderate - conceptual framework | <R id="2e0c662574087c2a"><EntityLink id="alignment">AI Alignment</EntityLink> Forum</R> |
 | **Various Evaluation Reports** | 2022-2024 | High - policy influence | <R id="5b2c3eab9cbf35f1">ARC Evals GitHub</R> |
 
 ### External Analysis
@@ -262,4 +262,4 @@ The organization has achieved significant impact through its ELK (Eliciting Late
 |--------|-------------|--------------|
 | **<R id="f35c467b353f990f">Governance of AI</R>** | Policy analysis | Evaluation governance frameworks |
 | **<R id="0a17f30e99091ebf">RAND Corporation</R>** | Security analysis | National security implications |
-| **<R id="a306e0b63bdedbd5"><EntityLink id="E47">Center for AI Safety</EntityLink></R>** | Safety community | Technical safety assessment |
+| **<R id="a306e0b63bdedbd5"><EntityLink id="cais">Center for AI Safety</EntityLink></R>** | Safety community | Technical safety assessment |

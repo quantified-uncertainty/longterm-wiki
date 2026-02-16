@@ -19,6 +19,7 @@ import { TransitionModelInteractive } from "@/components/wiki/TransitionModelTab
 import { FactorSubItemsList, AllFactorsSubItems } from "@/components/wiki/FactorSubItemsList";
 import CauseEffectGraph from "@/components/wiki/CauseEffectGraph";
 import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
+import { InsightsTable } from "@/components/wiki/InsightsTable";
 
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
@@ -38,6 +39,10 @@ import { KeyPeople } from "@/components/wiki/KeyPeople";
 import { DisagreementMap } from "@/components/wiki/DisagreementMap";
 import { Crux } from "@/components/wiki/Crux";
 import { CruxList } from "@/components/wiki/CruxList";
+import { InterventionCard } from "@/components/wiki/InterventionCard";
+import { InterventionList } from "@/components/wiki/InterventionList";
+import { ProposalCard } from "@/components/wiki/ProposalCard";
+import { ProposalList } from "@/components/wiki/ProposalList";
 
 // Ported stub components — medium priority
 import { Tags } from "@/components/wiki/Tags";
@@ -72,7 +77,7 @@ const stubNames = [
   "DualOutcomeChart", "EntityGraph", "EstimateBox",
   "FactorAttributionMatrix", "FactorGauges",
   "FullModelDiagram", "ImpactGrid",
-  "InsightGridExperiments", "InsightScoreMatrix", "InsightsTable",
+  "InsightGridExperiments", "InsightScoreMatrix",
   "KnowledgeTreemap",
   "OutcomesTable", "PageIndex", "PixelDensityMap",
   "PriorityMatrix", "QualityDashboard", "ResearchFrontier", "ResourceCite",
@@ -139,6 +144,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   ArchitectureScenariosTableView,
   DeploymentArchitecturesTableView,
   SafetyGeneralizabilityTableView,
+  InsightsTable,
 
   // Starlight card components
   Card: StarlightCard,
@@ -152,6 +158,10 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   DisagreementMap,
   Crux,
   CruxList,
+  InterventionCard,
+  InterventionList,
+  ProposalCard,
+  ProposalList,
 
   // Ported stub components — medium priority
   Tags,
