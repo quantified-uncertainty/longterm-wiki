@@ -20,7 +20,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   create: {
     script: 'authoring/page-creator.ts',
     description: 'Create a new page with research pipeline',
-    passthrough: ['ci', 'tier', 'phase', 'output', 'help', 'sourceFile', 'source-file', 'dest', 'directions', 'force', 'create-category'],
+    passthrough: ['ci', 'tier', 'phase', 'output', 'help', 'sourceFile', 'source-file', 'dest', 'directions', 'force', 'create-category', 'api-direct', 'apiDirect'],
     positional: true,
   },
   regrade: {
@@ -69,6 +69,7 @@ Options:
   --model=<m>       Model to use (grade-content)
   --skip-warnings   Skip Steps 1-2, just rate (grade-content)
   --warnings-only   Run Steps 1-2 only, skip rating (grade-content)
+  --api-direct      Use Anthropic API directly instead of Claude CLI (create)
   --dry-run         Preview without changes
   --verbose         Detailed output
 
