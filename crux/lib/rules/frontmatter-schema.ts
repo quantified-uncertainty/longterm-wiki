@@ -65,6 +65,8 @@ const frontmatterSchema = z.object({
   evergreen: z.boolean().optional(),
   entityType: z.enum(ALL_ENTITY_TYPE_NAMES as unknown as [string, ...string[]]).optional(),
   entityId: z.string().optional(),
+  numericId: z.string().regex(/^E\d+$/, 'numericId must match format "E" followed by digits (e.g. "E710")').optional(),
+  subcategory: z.string().optional(),
   roles: z.array(z.string()).optional(),
   pageTemplate: z.string().optional(),
   createdAt: z.union([z.date(), z.string()]).optional(), // YAML parser returns dates as strings or Date objects
