@@ -25,9 +25,9 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 ## Overview
 
-Agent foundations research seeks to develop mathematical frameworks for understanding agency, goals, and alignment before advanced AI systems <EntityLink id="E545">manifest</EntityLink> the problems these frameworks aim to solve. The approach treats alignment as requiring theoretical prerequisites: formal definitions of concepts like "corrigibility," "embedded reasoning," and "value learning" that must be established before building reliably aligned systems.
+Agent foundations research seeks to develop mathematical frameworks for understanding agency, goals, and alignment before advanced AI systems <EntityLink id="manifest">manifest</EntityLink> the problems these frameworks aim to solve. The approach treats alignment as requiring theoretical prerequisites: formal definitions of concepts like "corrigibility," "embedded reasoning," and "value learning" that must be established before building reliably aligned systems.
 
-This research program was pioneered by the <EntityLink id="E202">Machine Intelligence Research Institute (MIRI)</EntityLink> starting in 2013. Key contributions include <R id="1da850cbb06cd522">embedded agency</R> (how agents reason about themselves within their environment), <R id="c03dfe0b505debd6">logical induction</R> (managing uncertainty about mathematical truths), <R id="170ed59807cc7b2f">functional decision theory</R> (how agents should make decisions under uncertainty), and <R id="33c4da848ef72141">formal corrigibility analysis</R> (conditions under which agents accept correction).
+This research program was pioneered by the <EntityLink id="miri">Machine Intelligence Research Institute (MIRI)</EntityLink> starting in 2013. Key contributions include <R id="1da850cbb06cd522">embedded agency</R> (how agents reason about themselves within their environment), <R id="c03dfe0b505debd6">logical induction</R> (managing uncertainty about mathematical truths), <R id="170ed59807cc7b2f">functional decision theory</R> (how agents should make decisions under uncertainty), and <R id="33c4da848ef72141">formal corrigibility analysis</R> (conditions under which agents accept correction).
 
 The field faces a critical juncture. In January 2024, MIRI announced a strategic pivot away from agent foundations research, stating that "alignment research at MIRI and in the larger field had gone too slowly" and that they "now believed this research was extremely unlikely to succeed in time to prevent an unprecedented catastrophe." MIRI has shifted focus to policy and communications work, with their agent foundations team discontinued. This development has intensified debate about whether agent foundations represents essential groundwork or a research dead end.
 
@@ -46,10 +46,10 @@ The field faces a critical juncture. In January 2024, MIRI announced a strategic
 
 | Worldview | Assessment | Reasoning |
 |-----------|------------|-----------|
-| <EntityLink id="E504">Doomer</EntityLink> | Mixed | May need foundations for robust alignment, but pessimistic about tractability |
-| <EntityLink id="E505">Long timelines</EntityLink> | Positive | More time for theoretical progress to compound |
-| <EntityLink id="E506">Optimistic</EntityLink> | Low priority | Empirical methods likely sufficient |
-| <EntityLink id="E397">Governance-focused</EntityLink> | Low priority | Policy interventions more tractable in relevant timeframes |
+| <EntityLink id="doomer">Doomer</EntityLink> | Mixed | May need foundations for robust alignment, but pessimistic about tractability |
+| <EntityLink id="long-timelines">Long timelines</EntityLink> | Positive | More time for theoretical progress to compound |
+| <EntityLink id="optimistic">Optimistic</EntityLink> | Low priority | Empirical methods likely sufficient |
+| <EntityLink id="governance-focused">Governance-focused</EntityLink> | Low priority | Policy interventions more tractable in relevant timeframes |
 
 ---
 
@@ -101,7 +101,7 @@ The <R id="bbc4bc9c2577c2d0">embedded agency sequence</R> identifies four interc
 
 **Robust Delegation**: How can an agent create successor agents that reliably pursue the original agent's goals? This connects to corrigibility and value learning.
 
-**Subsystem Alignment**: How can an agent ensure its internal optimization processes remain aligned with its overall goals? This prefigured the <EntityLink id="E197">mesa-optimization</EntityLink> concerns that later became central to alignment discourse.
+**Subsystem Alignment**: How can an agent ensure its internal optimization processes remain aligned with its overall goals? This prefigured the <EntityLink id="mesa-optimization">mesa-optimization</EntityLink> concerns that later became central to alignment discourse.
 
 ### Logical Induction: A Landmark Result
 
@@ -126,7 +126,7 @@ However, integration with decision theory remains incomplete. As Wei Dai and oth
 
 The paper proved that naive approaches fail. "Utility indifference"—giving equal utility to shutdown and continued operation—creates perverse incentives: if shutdown utility is too high, agents may engineer their own shutdown; if too low, they resist it.
 
-No complete solution exists. Stuart Armstrong's work at the Future of Humanity Institute continued exploring corrigibility, but fundamental obstacles remain. The problem connects to <EntityLink id="E168">instrumental convergence</EntityLink>: almost any goal creates incentives to resist modification.
+No complete solution exists. Stuart Armstrong's work at the Future of Humanity Institute continued exploring corrigibility, but fundamental obstacles remain. The problem connects to <EntityLink id="instrumental-convergence">instrumental convergence</EntityLink>: almost any goal creates incentives to resist modification.
 
 ### Decision Theory: FDT, UDT, and Open Questions
 
@@ -155,9 +155,9 @@ Proponents argue that alignment requires understanding agency at a fundamental l
 
 **Theoretical prerequisites exist**: Just as designing safe bridges requires understanding materials science, designing aligned AI may require understanding what goals, agency, and alignment formally mean. Ad hoc solutions may fail unpredictably on more capable systems.
 
-**Current methods won't scale**: Techniques like RLHF work on current systems but may fail catastrophically on more capable ones. The <EntityLink id="E281">sharp left turn</EntityLink> hypothesis suggests capabilities may generalize while alignment doesn't—requiring foundational understanding of why.
+**Current methods won't scale**: Techniques like RLHF work on current systems but may fail catastrophically on more capable ones. The <EntityLink id="sharp-left-turn">sharp left turn</EntityLink> hypothesis suggests capabilities may generalize while alignment doesn't—requiring foundational understanding of why.
 
-**Deceptive alignment is fundamental**: <EntityLink id="E93">Deceptive alignment</EntityLink> and <EntityLink id="E197">mesa-optimization</EntityLink> may require formal analysis rather than empirical debugging. These failure modes are precisely about systems that pass empirical tests while remaining misaligned.
+**Deceptive alignment is fundamental**: <EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink> and <EntityLink id="mesa-optimization">mesa-optimization</EntityLink> may require formal analysis rather than empirical debugging. These failure modes are precisely about systems that pass empirical tests while remaining misaligned.
 
 **Conceptual clarity enables coordination**: Even if formal solutions aren't achieved, precise problem definitions help researchers coordinate and avoid talking past each other.
 
@@ -169,7 +169,7 @@ Critics, including many who previously supported agent foundations, argue the ap
 
 **Neural networks may not fit formalisms**: Agent foundations research makes few assumptions about "gears-level properties" of AI systems. But modern AI is increasingly certain to be neural networks. <R id="05bdadec7b6b3ee9">Mechanistic interpretability</R> and empirical safety research can assume neural network architectures and make faster progress.
 
-**The Science of Deep Learning argument**: Researchers like <EntityLink id="E214">Neel Nanda</EntityLink> argue that understanding how neural networks actually work (through mechanistic interpretability, scaling laws, etc.) is more tractable than developing abstract theories. Neural network properties may generalize even if specific alignment techniques don't.
+**The Science of Deep Learning argument**: Researchers like <EntityLink id="neel-nanda">Neel Nanda</EntityLink> argue that understanding how neural networks actually work (through mechanistic interpretability, scaling laws, etc.) is more tractable than developing abstract theories. Neural network properties may generalize even if specific alignment techniques don't.
 
 **Theory-practice gap is uncertain**: It's unknown whether theoretical results will apply to systems that emerge from gradient descent. The gap between "ideal agents" studied in agent foundations and actual neural networks may be unbridgeable.
 
@@ -237,7 +237,7 @@ Critics, including many who previously supported agent foundations, argue the ap
 
 **Disadvantages**: Low tractability; uncertain practical relevance; declining institutional support (MIRI pivot); difficult to evaluate progress.
 
-**Alternatives to consider**: <EntityLink id="E174">Mechanistic interpretability</EntityLink>, <EntityLink id="E271">scalable oversight</EntityLink>, <EntityLink id="E6">AI control</EntityLink>, governance research.
+**Alternatives to consider**: <EntityLink id="interpretability">Mechanistic interpretability</EntityLink>, <EntityLink id="scalable-oversight">scalable oversight</EntityLink>, <EntityLink id="ai-control">AI control</EntityLink>, governance research.
 
 ---
 
@@ -264,19 +264,19 @@ Critics, including many who previously supported agent foundations, argue the ap
 
 ### Related Concepts
 
-- <EntityLink id="E174">Mechanistic Interpretability</EntityLink> - Empirical alternative to theoretical foundations
-- <EntityLink id="E197">Mesa-Optimization</EntityLink> - Risk identified through agent foundations research
-- <EntityLink id="E93">Deceptive Alignment</EntityLink> - Core problem agent foundations aims to address
+- <EntityLink id="interpretability">Mechanistic Interpretability</EntityLink> - Empirical alternative to theoretical foundations
+- <EntityLink id="mesa-optimization">Mesa-Optimization</EntityLink> - Risk identified through agent foundations research
+- <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> - Core problem agent foundations aims to address
 
 ---
 
 ## AI Transition Model Context
 
-Agent foundations research improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="E205" />:
+Agent foundations research improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="misalignment-potential" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Provides theoretical foundations for robust alignment across capability levels |
-| <EntityLink id="E205" /> | <EntityLink id="E261" /> | Formal understanding may enable alignment techniques that scale with capabilities |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Provides theoretical foundations for robust alignment across capability levels |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Formal understanding may enable alignment techniques that scale with capabilities |
 
 Agent foundations work is most valuable under long timeline assumptions where theoretical progress can compound before transformative AI development.

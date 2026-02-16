@@ -14,7 +14,7 @@ import { join, basename } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { fileURLToPath } from 'url';
 import { getColors, isCI, formatPath } from '../lib/output.ts';
-import { Entity, Resource, Publication } from '../../data/schema.ts';
+import { Entity, Resource, Publication, Intervention, Proposal } from '../../data/schema.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import type { ZodSchema, ZodError, ZodIssue } from 'zod';
 import type { Colors } from '../lib/output.ts';
@@ -156,6 +156,30 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   const pubErrors = validateItems(publications, Publication, 'Publication');
   allErrors.push(...pubErrors);
   if (!ciMode) console.log(`  ${publications.length} publications loaded`);
+
+  // 4. Validate interventions.yaml against Intervention schema
+  if (!ciMode) console.log(`${colors.dim}Checking interventions...${colors.reset}`);
+  const intPath = join(DATA_DIR, 'interventions.yaml');
+  const interventions: YamlItemWithSource[] = (loadYaml(intPath) as YamlItemWithSource[] | null) || [];
+  for (const item of interventions) {
+    item._sourceFile = intPath;
+  }
+  totalValidated += interventions.length;
+  const intErrors = validateItems(interventions, Intervention, 'Intervention');
+  allErrors.push(...intErrors);
+  if (!ciMode) console.log(`  ${interventions.length} interventions loaded`);
+
+  // 5. Validate proposals.yaml against Proposal schema
+  if (!ciMode) console.log(`${colors.dim}Checking proposals...${colors.reset}`);
+  const propPath = join(DATA_DIR, 'proposals.yaml');
+  const proposals: YamlItemWithSource[] = (loadYaml(propPath) as YamlItemWithSource[] | null) || [];
+  for (const item of proposals) {
+    item._sourceFile = propPath;
+  }
+  totalValidated += proposals.length;
+  const propErrors = validateItems(proposals, Proposal, 'Proposal');
+  allErrors.push(...propErrors);
+  if (!ciMode) console.log(`  ${proposals.length} proposals loaded`);
 
   // Output Results
   console.log();

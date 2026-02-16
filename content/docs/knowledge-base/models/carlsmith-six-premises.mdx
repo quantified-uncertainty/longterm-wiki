@@ -26,9 +26,9 @@ import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@component
 
 ## Overview
 
-Joe Carlsmith's 2022 report <R id="6e597a4dc1f6f860">"Is <EntityLink id="E226">Power-Seeking AI</EntityLink> an Existential Risk?"</R> provides the most rigorous public framework for estimating AI existential risk. Rather than offering a single probability, Carlsmith decomposes the argument into **six conditional premises**, each with its own credence. This enables structured disagreement—critics can identify *which* premises they reject rather than disputing a black-box estimate.
+Joe Carlsmith's 2022 report <R id="6e597a4dc1f6f860">"Is <EntityLink id="power-seeking">Power-Seeking AI</EntityLink> an Existential Risk?"</R> provides the most rigorous public framework for estimating AI existential risk. Rather than offering a single probability, Carlsmith decomposes the argument into **six conditional premises**, each with its own credence. This enables structured disagreement—critics can identify *which* premises they reject rather than disputing a black-box estimate.
 
-The framework focuses on **APS systems** (Advanced capabilities, agentic Planning, Strategic awareness) and asks: what's the probability that building such systems leads to <EntityLink id="E130">existential catastrophe</EntityLink> through power-seeking behavior?
+The framework focuses on **APS systems** (Advanced capabilities, agentic Planning, Strategic awareness) and asks: what's the probability that building such systems leads to <EntityLink id="existential-catastrophe">existential catastrophe</EntityLink> through power-seeking behavior?
 
 **Bottom line**: Carlsmith originally estimated ~5% risk of existential catastrophe from power-seeking AI by 2070. He has since updated to **>10%** based on faster-than-expected capability progress.
 
@@ -130,7 +130,7 @@ The most impactful parameters for the overall estimate are P3 (alignment difficu
 
 **Why 40%?** (High uncertainty)
 - Current techniques (RLHF, Constitutional AI) show promise but unproven at scale
-- <EntityLink id="E151">Goal misgeneralization</EntityLink> is a real phenomenon
+- <EntityLink id="goal-misgeneralization">Goal misgeneralization</EntityLink> is a real phenomenon
 - Value specification is genuinely hard
 - But: we're not starting from scratch; we choose training objectives
 
@@ -143,7 +143,7 @@ The most impactful parameters for the overall estimate are P3 (alignment difficu
 **The claim**: Conditional on P1-P3, some deployed misaligned APS systems will seek to gain and maintain power in ways that significantly harm humans.
 
 **Why 65%?**
-- <EntityLink id="E168">Instrumental convergence</EntityLink> arguments suggest power-seeking is useful for most goals
+- <EntityLink id="instrumental-convergence">Instrumental convergence</EntityLink> arguments suggest power-seeking is useful for most goals
 - Resource acquisition helps achieve almost any objective
 - Self-preservation is instrumentally useful
 - But: power-seeking requires sophisticated planning; some misaligned systems might be harmlessly misaligned
@@ -204,7 +204,7 @@ Carlsmith focuses specifically on **APS systems**—not all AI:
 
 ## Superforecaster Comparison
 
-In 2023, Carlsmith worked with [Good Judgment's superforecasters](https://goodjudgment.com/superforecasting-ai/) to test his estimates. The project ran from August to October 2022, with a follow-up round in spring 2023, funded by <EntityLink id="E521">Coefficient Giving</EntityLink>. Key findings from <R id="8d9f2fea7c1b4e3a">the comparison study</R>:
+In 2023, Carlsmith worked with [Good Judgment's superforecasters](https://goodjudgment.com/superforecasting-ai/) to test his estimates. The project ran from August to October 2022, with a follow-up round in spring 2023, funded by <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>. Key findings from <R id="8d9f2fea7c1b4e3a">the comparison study</R>:
 
 <Mermaid chart={`
 xychart-beta
@@ -251,10 +251,10 @@ Different interventions target different premises:
 | Compute governance | P1, P2 | Slow capability development, reduce deployment incentives |
 | International coordination | P2 | Reduce racing pressure |
 | Alignment research | P3 | Make aligned systems easier to build |
-| <EntityLink id="E174">Interpretability</EntityLink> | P3, P4 | Detect misalignment before deployment |
-| <EntityLink id="E128">AI evaluations</EntityLink> | P4, P5 | Identify dangerous capabilities |
-| <EntityLink id="E6">AI control</EntityLink> | P5 | Contain power-seeking before full disempowerment |
-| <EntityLink id="E252">RSPs</EntityLink> | P2, P4, P5 | Gate deployment on safety |
+| <EntityLink id="interpretability">Interpretability</EntityLink> | P3, P4 | Detect misalignment before deployment |
+| <EntityLink id="evals">AI evaluations</EntityLink> | P4, P5 | Identify dangerous capabilities |
+| <EntityLink id="ai-control">AI control</EntityLink> | P5 | Contain power-seeking before full disempowerment |
+| <EntityLink id="responsible-scaling-policies">RSPs</EntityLink> | P2, P4, P5 | Gate deployment on safety |
 
 <Mermaid chart={`
 flowchart LR
@@ -301,20 +301,20 @@ flowchart LR
 
 | Carlsmith Argument | Our Framework |
 |-------------------|---------------|
-| Full argument (P1-P6) | <EntityLink id="E623">Rapid AI Takeover</EntityLink> |
-| P3 focus | <EntityLink id="E20">Alignment Robustness</EntityLink> parameter |
-| P4 focus | <EntityLink id="E227" label="Power-Seeking Conditions" /> model |
-| P2 dynamics | <EntityLink id="E242">Racing Intensity</EntityLink> parameter |
+| Full argument (P1-P6) | <EntityLink id="rapid">Rapid AI Takeover</EntityLink> |
+| P3 focus | <EntityLink id="alignment-robustness">Alignment Robustness</EntityLink> parameter |
+| P4 focus | <EntityLink id="power-seeking-conditions" label="Power-Seeking Conditions" /> model |
+| P2 dynamics | <EntityLink id="racing-intensity">Racing Intensity</EntityLink> parameter |
 
 ### Mapping to Aggregate Parameters
 
 | Premise | Most Relevant Aggregate |
 |---------|------------------------|
 | P1 (Timelines) | External factor (not a parameter we influence much) |
-| P2 (Incentives) | <EntityLink id="E666">Misuse Potential</EntityLink> |
-| P3 (Alignment) | <EntityLink id="E665">Misalignment Potential</EntityLink> |
-| P4 (Power-Seeking) | <EntityLink id="E665">Misalignment Potential</EntityLink> |
-| P5 (Scaling) | <EntityLink id="E617">Governance Capacity</EntityLink> |
+| P2 (Incentives) | <EntityLink id="factors-misuse-potential-overview">Misuse Potential</EntityLink> |
+| P3 (Alignment) | <EntityLink id="factors-misalignment-potential-overview">Misalignment Potential</EntityLink> |
+| P4 (Power-Seeking) | <EntityLink id="factors-misalignment-potential-overview">Misalignment Potential</EntityLink> |
+| P5 (Scaling) | <EntityLink id="governance">Governance Capacity</EntityLink> |
 | P6 (Catastrophe) | Definition (not a parameter) |
 
 ---
@@ -360,7 +360,7 @@ flowchart LR
 
 ### Framework Limitations
 
-1. **Doesn't cover all risks**: Focuses on power-seeking; doesn't address catastrophic misuse or <EntityLink id="E619">gradual disempowerment</EntityLink>
+1. **Doesn't cover all risks**: Focuses on power-seeking; doesn't address catastrophic misuse or <EntityLink id="gradual">gradual disempowerment</EntityLink>
 2. **Binary framing**: Treats each premise as yes/no; reality may be continuous
 3. **Sensitive to framing**: Different decompositions might yield different estimates
 4. **Relies on speculation**: All estimates are fundamentally about unprecedented situations

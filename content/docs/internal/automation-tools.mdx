@@ -174,7 +174,7 @@ Claude Code sessions log which wiki pages they modify. This creates a per-page c
 2. At build time, `build-data.mjs` parses the session log and attaches a `changeHistory` array to each page in `database.json`.
 3. The data flows to two places:
    - **Per-page**: A "Change History" section in the PageStatus card shows which sessions touched this page.
-   - **Site-wide**: The [Page Changes dashboard](/internal/page-changes) shows all page edits across all sessions in a sortable table.
+   - **Site-wide**: The [Page Changes dashboard](/internal/page-changes/) shows all page edits across all sessions in a sortable table.
 
 ### Session Log Format
 
