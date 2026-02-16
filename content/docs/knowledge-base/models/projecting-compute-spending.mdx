@@ -33,13 +33,13 @@ import {Mermaid, EntityLink, DataExternalLinks, SquiggleEstimate} from '@compone
 
 ## Overview
 
-The AI infrastructure buildout from 2024-2026 represents a capital investment cycle that exceeds, in nominal dollar terms, the annual spending rates of previous major infrastructure projects. In Q4 2025 and Q1 2026 earnings calls, the five largest hyperscalers — Amazon, <EntityLink id="E98">Alphabet</EntityLink>, <EntityLink id="E550">Microsoft</EntityLink>, <EntityLink id="E549">Meta</EntityLink>, and Oracle — collectively announced approximately \$700 billion in planned capital expenditures for 2026.[^1][^2][^3][^9][^10] This represents a 58% increase over the \$443 billion spent in 2025, which was a 73% increase over 2024.
+The AI infrastructure buildout from 2024-2026 represents a capital investment cycle that exceeds, in nominal dollar terms, the annual spending rates of previous major infrastructure projects. In Q4 2025 and Q1 2026 earnings calls, the five largest hyperscalers — Amazon, <EntityLink id="deepmind">Alphabet</EntityLink>, <EntityLink id="microsoft">Microsoft</EntityLink>, <EntityLink id="meta-ai">Meta</EntityLink>, and Oracle — collectively announced approximately \$700 billion in planned capital expenditures for 2026.[^1][^2][^3][^9][^10] This represents a 58% increase over the \$443 billion spent in 2025, which was a 73% increase over 2024.
 
 For two consecutive years, Wall Street consensus estimates for AI capex were substantially lower than actual spending: analysts projected approximately 20% annual growth for both 2025 and 2026, while actual spending exceeded 50% growth in each period.[^11]
 
 To contextualize the \$700 billion figure: it represents approximately 2.1% of projected 2026 US GDP flowing from five companies into infrastructure buildout in a single year — more than four times the combined annual capital expenditure of the entire publicly traded US energy sector.[^12]
 
-This spending trajectory influences <EntityLink id="E608">AI governance</EntityLink> dynamics: the physical infrastructure being deployed determines the <EntityLink id="ai-training-compute">compute available</EntityLink> for training frontier models, the geographic distribution of AI capabilities, and the economic incentives shaping competitive dynamics between AI developers.
+This spending trajectory influences <EntityLink id="ai-governance">AI governance</EntityLink> dynamics: the physical infrastructure being deployed determines the <EntityLink id="ai-training-compute">compute available</EntityLink> for training frontier models, the geographic distribution of AI capabilities, and the economic incentives shaping competitive dynamics between AI developers.
 
 <SquiggleEstimate title="Cumulative Hyperscaler AI Capex 2024-2030 ($T)" code={`
 // Goldman/JPMorgan project ≈\$5T cumulative through 2030
@@ -128,11 +128,11 @@ Amazon CEO Andy Jassy announced \$200 billion in capital expenditures for 2026 d
 
 #### Alphabet — \$185B in 2026
 
-Alphabet provided capex guidance of \$175-185 billion for 2026 during its Q4 2025 earnings call, nearly doubling the \$91.4 billion spent in 2025 and far exceeding the \$52.5 billion spent in 2024.[^2] The midpoint guidance of \$180 billion was 55% above the analyst consensus estimate of approximately \$119.5 billion.[^11] CFO Anat Ashkenazi stated that approximately 60% of spending goes to servers and technical infrastructure, with 40% allocated to data centers and networking equipment.[^2] <EntityLink id="E98">Google</EntityLink> Cloud revenue reached \$17.7 billion in Q4 2025, and Alphabet's annual revenues exceeded \$400 billion for the first time.[^2]
+Alphabet provided capex guidance of \$175-185 billion for 2026 during its Q4 2025 earnings call, nearly doubling the \$91.4 billion spent in 2025 and far exceeding the \$52.5 billion spent in 2024.[^2] The midpoint guidance of \$180 billion was 55% above the analyst consensus estimate of approximately \$119.5 billion.[^11] CFO Anat Ashkenazi stated that approximately 60% of spending goes to servers and technical infrastructure, with 40% allocated to data centers and networking equipment.[^2] <EntityLink id="deepmind">Google</EntityLink> Cloud revenue reached \$17.7 billion in Q4 2025, and Alphabet's annual revenues exceeded \$400 billion for the first time.[^2]
 
 #### Microsoft — \$145–150B in 2026 (Estimated)
 
-Microsoft has not issued formal full-year guidance for calendar 2026 capex. The company spent \$49 billion on capital expenditures in the first half of fiscal year 2026 (July-December 2025), with Q4 calendar 2025 capex at \$37.5 billion, representing 65% year-over-year growth.[^3] Wall Street analysts project full calendar year 2026 estimates ranging from \$145 to \$165 billion based on current trajectory.[^11] Microsoft continues to invest alongside <EntityLink id="E218">OpenAI</EntityLink>, with plans to acquire approximately \$135 billion in equity stake in OpenAI as part of a corporate restructuring, while OpenAI has committed to purchasing \$250 billion in computing resources from Microsoft through 2030.[^20]
+Microsoft has not issued formal full-year guidance for calendar 2026 capex. The company spent \$49 billion on capital expenditures in the first half of fiscal year 2026 (July-December 2025), with Q4 calendar 2025 capex at \$37.5 billion, representing 65% year-over-year growth.[^3] Wall Street analysts project full calendar year 2026 estimates ranging from \$145 to \$165 billion based on current trajectory.[^11] Microsoft continues to invest alongside <EntityLink id="openai">OpenAI</EntityLink>, with plans to acquire approximately \$135 billion in equity stake in OpenAI as part of a corporate restructuring, while OpenAI has committed to purchasing \$250 billion in computing resources from Microsoft through 2030.[^20]
 
 #### Meta — \$115–135B in 2026
 
@@ -325,7 +325,7 @@ For context on the \$1 trillion annual revenue target, current AI revenue data p
 
 | Company/Product | 2025 AI Revenue | 2026 Projection | Revenue Model | Source |
 |-----------------|-----------------|-----------------|---------------|---------|
-| <EntityLink id="E218">OpenAI</EntityLink> | \$13B estimated | \$30B projected | Subscriptions + API | [The Information](https://theinformation.com)[^37] |
+| <EntityLink id="openai">OpenAI</EntityLink> | \$13B estimated | \$30B projected | Subscriptions + API | [The Information](https://theinformation.com)[^37] |
 | Microsoft AI Services | \$30B estimated | \$60B projected | Azure AI, Copilot subscriptions | [Analyst estimates](https://bloomberg.com)[^38] |
 | Google Cloud AI | \$15B estimated | \$30B projected | Vertex AI, Workspace AI features | [Analyst estimates](https://bloomberg.com)[^38] |
 | AWS AI Services | \$20B estimated | \$40B projected | Bedrock, SageMaker | [Analyst estimates](https://bloomberg.com)[^38] |
@@ -405,7 +405,7 @@ Arguments supporting revenue achievement:
 
 Arguments suggesting revenue targets may not materialize:
 
-- **Current losses**: <EntityLink id="E218">OpenAI</EntityLink> projects losses exceeding \$14 billion in 2026 despite \$30 billion in projected revenue, and cumulative losses potentially exceeding \$100 billion through 2030.[^37] This suggests unit economics may not support profitable scale.
+- **Current losses**: <EntityLink id="openai">OpenAI</EntityLink> projects losses exceeding \$14 billion in 2026 despite \$30 billion in projected revenue, and cumulative losses potentially exceeding \$100 billion through 2030.[^37] This suggests unit economics may not support profitable scale.
 - **Rapid obsolescence**: 3-5 year hardware replacement cycles require rapid payoff; if revenue growth doesn't materialize before next-generation hardware arrives, stranded asset risk increases.
 - **Concentration risk**: If a small number of applications dominate AI revenue, infrastructure may be overbuilt relative to actual demand concentration.
 - **Margin compression**: Intense competition and open-source alternatives may drive AI service pricing down faster than volume grows.
@@ -544,7 +544,7 @@ Companies are investing in water recycling and air cooling alternatives, but the
 
 ## Strategic Implications for AI Governance
 
-The magnitude and pace of AI infrastructure investment creates several dynamics relevant to <EntityLink id="E608">AI governance</EntityLink> and <EntityLink id="ai-safety">AI safety</EntityLink>:
+The magnitude and pace of AI infrastructure investment creates several dynamics relevant to <EntityLink id="ai-governance">AI governance</EntityLink> and <EntityLink id="ai-safety">AI safety</EntityLink>:
 
 ### Capability Acceleration and Governance Windows
 
@@ -575,7 +575,7 @@ Approximately 60-70% of the \$700 billion in 2026 hyperscaler capex is being inv
 - **US dominance**: Reinforces US position as primary location for frontier AI development
 - **Allied access**: Close US allies (UK, Canada, EU) can access US-based AI systems but may face latency or data sovereignty constraints
 - **China considerations**: China's AI infrastructure investment is substantial but not fully transparent; estimates suggest \$150-200 billion in annual AI capex across Alibaba, Tencent, Baidu, and ByteDance[^62]
-- **Export controls**: US government export controls on advanced semiconductors (<EntityLink id="E136">export controls</EntityLink>) limit China's access to frontier AI hardware, though effectiveness remains debated[^63]
+- **Export controls**: US government export controls on advanced semiconductors (<EntityLink id="export-controls">export controls</EntityLink>) limit China's access to frontier AI hardware, though effectiveness remains debated[^63]
 
 ### Compute Governance Leverage Points
 
@@ -626,7 +626,7 @@ However, chokepoint governance faces challenges:
 
 Based on the spending trajectory and its implications, several governance approaches merit consideration:
 
-1. **<EntityLink id="E64">Compute governance</EntityLink> frameworks**: Establish international norms for responsible compute allocation and monitoring of large training runs
+1. **<EntityLink id="compute-governance">Compute governance</EntityLink> frameworks**: Establish international norms for responsible compute allocation and monitoring of large training runs
 
 2. **Safety-conditional deployment standards**: Create industry standards (potentially with regulatory backstop) requiring safety testing proportional to system capabilities
 
@@ -642,7 +642,7 @@ These recommendations are not universally endorsed and face substantial implemen
 
 ## Structural Power and Adversarial Risks
 
-> **For comprehensive analysis**, see <EntityLink id="E684">Compute Concentration</EntityLink>, which covers:
+> **For comprehensive analysis**, see <EntityLink id="compute-concentration">Compute Concentration</EntityLink>, which covers:
 > - US jurisdictional monopoly (CLOUD Act, FISA 702) over global AI compute
 > - Cybersecurity and systemic vulnerability of concentrated infrastructure
 > - Military-commercial dual use and the trust problem it creates
@@ -661,7 +661,7 @@ This jurisdictional monopoly, combined with \$700 billion in annual capex concen
 | **Collusion conditions** | 5-6 players with interlocking JVs and shared supplier — structural conditions matching DRAM/LCD cartel environments |
 | **Concentration trajectory** | Self-reinforcing loop gain of 1.2-2.0; capital barriers growing from \$238B (2024) to \$700B (2026) |
 
-These dynamics are analyzed in depth on the dedicated <EntityLink id="E684">Compute Concentration</EntityLink> risk page, which examines how the physical, legal, and economic characteristics of compute infrastructure create risks qualitatively different from those posed by software or data concentration.
+These dynamics are analyzed in depth on the dedicated <EntityLink id="compute-concentration">Compute Concentration</EntityLink> risk page, which examines how the physical, legal, and economic characteristics of compute infrastructure create risks qualitatively different from those posed by software or data concentration.
 
 ## International Context
 

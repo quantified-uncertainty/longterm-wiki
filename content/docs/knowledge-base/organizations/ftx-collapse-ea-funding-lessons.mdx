@@ -1,0 +1,236 @@
+---
+numericId: E696
+title: "FTX Collapse: Lessons for EA Funding Resilience"
+description: "Retrospective analysis of the FTX collapse's impact on EA funding and the lessons it holds for managing future capital concentration risks, particularly the Anthropic liquidity event. The collapse destroyed \\~\\$160M in committed grants and revealed critical vulnerabilities in EA's funding infrastructure."
+quality: 3
+lastEdited: "2026-02-15"
+importance: 70
+update_frequency: 90
+llmSummary: "The November 2022 collapse of FTX destroyed ~$160M in committed EA grants, forced organizational layoffs across the ecosystem, and revealed deep vulnerabilities in EA's dependence on concentrated funding sources. This retrospective extracts lessons applicable to the current situation: $27-76B in risk-adjusted EA capital concentrated in Anthropic. Key parallels include single-funder dependence, reputational contagion, and the danger of spending committed-but-unreceived funds. Key differences include the much larger capital magnitude, the legal structure (DAFs vs. personal pledges), and the 3-5 year timeline before liquidity. The central lesson is that diversification of funding sources and conservative financial planning are essential, even when a single source appears overwhelmingly likely to deliver."
+ratings:
+  novelty: 6
+  rigor: 6
+  actionability: 7
+  completeness: 5
+clusters:
+  - community
+  - ai-safety
+  - governance
+todos:
+  - Track clawback resolution outcomes and final settlement terms
+  - Update with Anthropic IPO data when available
+  - Monitor whether EA orgs implement recommended resilience measures
+subcategory: funders
+entityType: concept
+---
+import {EntityLink} from '@components/wiki';
+
+:::note[Page Scope]
+This page analyzes the FTX collapse as a case study in EA funding fragility. For current EA funding landscape, see <EntityLink id="funders-overview">Longtermist Funders</EntityLink>. For the Anthropic concentration risk that makes these lessons urgent, see <EntityLink id="ea-shareholder-diversification-anthropic">EA Shareholder Diversification from Anthropic</EntityLink>. For how much capital the ecosystem can absorb, see <EntityLink id="ea-funding-absorption-capacity">EA Funding Absorption Capacity</EntityLink>.
+
+**Historical event**: November 2022. Analysis updated February 2026.
+:::
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Direct financial loss** | \≈\$160M in committed grants never disbursed |
+| **Indirect losses** | Organizational layoffs, project cancellations, hiring freezes across ecosystem |
+| **Reputational damage** | Severe; ongoing public association between EA and fraud |
+| **Clawback exposure** | \$26.8M returned by <EntityLink id="cea">CEA</EntityLink>; additional amounts by other orgs |
+| **Anthropic stake (FTX)** | \$500M invested → \$1.34B recovered for creditors (2.7x) |
+| **Current parallel** | \$27-76B in EA capital concentrated in Anthropic (170-500x larger) |
+| **Key lesson** | Never plan spending around unreceived capital from concentrated sources |
+
+## Overview
+
+On November 11, 2022, FTX—at the time valued at \$32B—filed for bankruptcy, destroying an estimated \$8B in customer deposits and eliminating what had been the EA ecosystem's second-largest funding source. Sam Bankman-Fried (SBF) had positioned himself as EA's most prominent public donor, pledging billions through the FTX Foundation and its Future Fund grantmaking arm.
+
+The collapse was sudden, total, and deeply damaging. In the span of 72 hours, the EA ecosystem lost:
+
+- **\≈\$160M in committed Future Fund grants** that were never disbursed [FTX Future Fund](https://ftxfuturefund.org/our-grants/)
+- **\$26.8M returned by CEA** to FTX's bankruptcy estate under clawback proceedings [CEA](https://www.centreforeffectivealtruism.org/blog/changes-to-cea)
+- **Intangible but significant reputational capital** as "effective altruism" became associated with fraud in mainstream coverage
+- **The second-largest EA funder**, reducing ecosystem funding by roughly 20-30%
+
+Three years later, the EA community has largely recovered financially—other funders expanded to partially fill the gap—but the institutional and reputational damage persists. More importantly, the lessons from FTX are directly applicable to the current concentration risk: \$27-76B in risk-adjusted EA capital tied to Anthropic, a figure 170-500x larger than the FTX losses.
+
+## The FTX-EA Funding Relationship
+
+### Scale and Scope
+
+Before the collapse, FTX-linked funding touched nearly every corner of the EA ecosystem:
+
+| Recipient Category | Amount | Status Post-Collapse |
+|-------------------|--------|---------------------|
+| Future Fund committed grants | \≈\$160M | Never disbursed; grantees received nothing |
+| <EntityLink id="cea">CEA</EntityLink> | \$13.9M received | \$26.8M returned (including interest) to bankruptcy estate |
+| <EntityLink id="80000-hours">80,000 Hours</EntityLink> | Unknown; organizational restructuring followed | Reduced headcount |
+| University programs (various) | \$10-30M committed | Most unfulfilled |
+| Political donations (Protect Our Future PAC) | \$27M spent | Subject to legal scrutiny |
+| Anthropic investment | \$500M (Series B, April 2022) | Recovered \$1.34B for creditors |
+| Various EA orgs | Tens of millions committed | Mostly unfulfilled |
+
+### Concentration Risk in Hindsight
+
+In 2021-2022, the EA funding landscape had two dominant sources:
+
+1. **Dustin Moskovitz** (via Open Philanthropy / Good Ventures): \≈\$300-500M/year
+2. **Sam Bankman-Fried** (via FTX Foundation / Future Fund): \≈\$160M committed in \≈9 months of operation (Feb-Nov 2022)
+
+Together, these two individuals controlled roughly 80-90% of all EA-directed funding. The loss of one eliminated 20-30% of actual annual disbursements and nearly all of the expected *growth* in EA funding. Many organizations had planned hiring and programs around Future Fund commitments that evaporated overnight.
+
+## What Went Wrong
+
+### 1. Spending Against Unreceived Commitments
+
+The most operationally damaging pattern was organizations hiring staff and launching programs based on Future Fund *commitments* before funds were actually received. When the commitments evaporated:
+
+- Organizations had payroll obligations they couldn't meet
+- Multi-year projects were abandoned mid-stream
+- Staff who relocated for EA jobs found themselves laid off within months
+
+**Lesson for Anthropic era:** Organizations should not plan spending around *expected* Anthropic-linked capital until it is actually in their accounts. Even DAF-committed capital can be redirected to non-EA causes by the DAF advisor.
+
+### 2. Insufficient Due Diligence on Funding Sources
+
+The EA community accepted FTX funding with minimal scrutiny of FTX's business practices. Warning signs existed:
+
+- FTX's trading volume and profitability claims were unusually high for its market position
+- SBF's "earn-to-give" philosophy created perverse incentives to maximize income regardless of ethical constraints
+- Alameda Research's opaque relationship with FTX raised corporate governance concerns
+- Some community members raised concerns that were dismissed or downplayed
+
+**Lesson for Anthropic era:** While Anthropic is a legitimate business with transparent governance, the *structure* of funding dependence matters as much as the *trustworthiness* of the funder. Even a completely ethical company can experience massive valuation declines.
+
+### 3. Reputational Contagion
+
+The FTX collapse permanently linked "effective altruism" with "crypto fraud" in public perception. This caused:
+
+- Difficulty recruiting non-EA talent to EA-adjacent organizations
+- Reduced credibility for EA ideas in policy discussions
+- Defensive posturing that distracted from substantive work
+- Loss of previously supportive media coverage
+
+**Lesson for Anthropic era:** If Anthropic experiences a major scandal, safety failure, or public controversy, EA organizations funded by Anthropic-linked capital will face guilt-by-association regardless of their actual relationship to the event.
+
+### 4. Legal and Financial Exposure
+
+The FTX bankruptcy created unexpected legal liabilities:
+
+- **Clawback proceedings**: FTX's estate pursued recovery of pre-collapse donations under fraudulent transfer laws. <EntityLink id="cea">CEA</EntityLink> returned \$26.8M. Other organizations faced similar demands.
+- **Regulatory scrutiny**: Political donations made through FTX-linked entities were scrutinized by the FEC and DOJ.
+- **Charitable status concerns**: Organizations that received FTX funds faced questions about their role in laundering reputation for a fraudulent enterprise.
+
+**Lesson for Anthropic era:** Large concentrated donations can create legal exposure even if the donor is acting in good faith. Tax complications, insider trading concerns around IPO timing, and SEC scrutiny of coordinated selling are all potential risks. See <EntityLink id="ea-shareholder-diversification-anthropic">EA Shareholder Diversification</EntityLink> for analysis of coordination risks.
+
+## FTX vs. Anthropic: Parallels and Differences
+
+### Parallels
+
+| Factor | FTX (2022) | Anthropic (2026) |
+|--------|-----------|-----------------|
+| Single-source dependence | SBF was \≈20-30% of EA funding | Anthropic-linked capital is \≈95% of expected *future* EA capital |
+| Concentrated decision-making | One person (SBF) controlled allocation | Small number of founders, investors, employees |
+| Illiquid commitments | Future Fund grants were commitments, not cash | Most capital is illiquid private stock |
+| Reputational coupling | "EA = crypto bro philanthropy" | "EA = Anthropic insiders" |
+| Rapid wealth creation | FTX went from \$0 to \$32B in 3 years | Anthropic went from \$0 to \$380B in 4 years |
+
+### Critical Differences
+
+| Factor | FTX (2022) | Anthropic (2026) |
+|--------|-----------|-----------------|
+| **Scale** | \≈\$160M lost | \$27-76B at risk (170-500x larger) |
+| **Business legitimacy** | Fraudulent exchange | Legitimate AI lab with real revenue |
+| **Legal structure** | Personal pledges from one individual | DAFs (legally committed to charity), multiple holders |
+| **Timeline** | Sudden collapse (72 hours) | Gradual liquidity over 3-10 years post-IPO |
+| **Diversification of holders** | Single funder | 7 founders + thousands of employees + investors |
+| **Underlying asset** | Crypto exchange (zero-sum) | AI company (producing real technology) |
+| **Recovery potential** | Zero (fraud) | High (valuation may recover after decline) |
+
+### What's Better About the Anthropic Situation
+
+1. **DAFs provide legal commitment.** An estimated \$20-40B is in DAFs that are legally required to go to 501(c)(3) organizations (though not necessarily EA causes). FTX commitments had no such legal backing.
+
+2. **Diversified holders.** Unlike FTX (one person), Anthropic capital is spread across founders, employees, and investors. Even if some holders drift from EA, others may follow through.
+
+3. **Gradual liquidity.** An IPO provides a gradual, predictable liquidity event rather than a sudden collapse. Organizations can plan around it.
+
+4. **Legitimate business.** Anthropic generates real revenue (\$2B+ ARR) from real products. A valuation decline is possible but total loss (like FTX) is extremely unlikely.
+
+### What's Worse About the Anthropic Situation
+
+1. **Far larger magnitude.** A 50% loss on \$27-76B is \$14-38B—roughly 100-250x the FTX loss. The ecosystem's financial planning is now dependent on a much larger single bet.
+
+2. **Longer timeline creates complacency.** FTX collapsed suddenly, which was devastating but also forced rapid adaptation. Anthropic's slow liquidity timeline (3-10 years) may create a "boiling frog" dynamic where the ecosystem gradually becomes more dependent without noticing.
+
+3. **Correlation with AI outcomes.** Anthropic's value is correlated with AI development trajectories. The scenarios where AI safety funding is most needed (rapid, uncontrolled AI progress) may be the scenarios where Anthropic faces the most competitive pressure and valuation risk.
+
+4. **Value drift over time.** As <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink> documents, the fraction of employees with EA alignment is declining with each cohort. A 10-year liquidity timeline means most capital will be controlled by people who joined Anthropic for career reasons, not EA commitment.
+
+## Lessons and Recommendations
+
+### For EA Organizations (Grant Recipients)
+
+1. **Never budget against uncommitted or unreceived funds.** Maintain 12-18 months of operating reserves from *received* (not committed) funding. The FTX collapse hit organizations hardest when they had already hired against expected grants.
+
+2. **Diversify funding sources.** No single funder should represent more than 30-40% of an organization's annual budget. This may mean accepting smaller total budgets for greater resilience.
+
+3. **Build for sustainability, not maximum growth.** The FTX era rewarded organizations that grew fastest. The organizations that survived best were those with conservative financial practices and multiple revenue streams.
+
+4. **Prepare contingency plans.** Every EA organization should have a written plan for "What happens if our largest funder disappears tomorrow?" including staff reduction plans, program prioritization, and emergency fundraising strategies.
+
+### For Funders and Grantmakers
+
+1. **Invest in ecosystem resilience, not just programs.** Fund reserve-building grants, organizational capacity, and diversified funding infrastructure. See <EntityLink id="ea-funding-absorption-capacity">EA Funding Absorption Capacity</EntityLink> for how to scale the ecosystem's deployment capacity.
+
+2. **Diversify early, diversify often.** <EntityLink id="ea-shareholder-diversification-anthropic">EA Shareholder Diversification from Anthropic</EntityLink> argues for diversifying at least 20% of EA holdings pre-IPO. The FTX experience strongly reinforces this recommendation.
+
+3. **Create institutional buffers.** Large DAF pools should not all be deployed simultaneously. A "rainy day" reserve of 2-3 years' ecosystem funding (\$300-500M) should be maintained in diversified assets.
+
+4. **Transparent communication.** Funders should communicate clearly about the certainty and timing of future grants, avoiding the FTX pattern where vague commitments were treated as firm pledges by recipients.
+
+### For the EA Community
+
+1. **Maintain epistemic standards around funding.** The FTX era saw insufficient scrutiny of FTX's practices. The community should apply the same rigor to Anthropic-related funding assumptions as it does to other empirical claims.
+
+2. **Plan for multiple scenarios.** The base case (\$27-76B from Anthropic over 10-15 years) should not be treated as a certainty. Plans should also account for 50% probability or less of the full amount materializing.
+
+3. **Decouple identity from funders.** The "EA = SBF" reputational damage was partly because the community had embraced SBF as a flagship success story. Similar risks exist if EA becomes too closely identified with Anthropic.
+
+## The Anthropic Stake Recovery
+
+One ironic outcome of the FTX collapse: FTX's \$500M investment in Anthropic's Series B (April 2022, at \$4B valuation) was one of the best investments in the bankruptcy estate.
+
+| Event | Date | Amount |
+|-------|------|--------|
+| FTX invests in Anthropic Series B | April 2022 | \$500M at \$4B valuation (13.56% diluted) |
+| FTX files for bankruptcy | November 2022 | Stake frozen |
+| First tranche sold | January 2024 | \$884M (2/3 of stake) |
+| Second tranche sold | March 2024 | \$452M (remaining 1/3) |
+| **Total recovered** | | **\$1.34B (2.7x return)** |
+
+At Anthropic's current \$380B valuation, the original stake (before dilution from subsequent rounds) would notionally be worth far more. The proceeds went entirely to FTX creditors, not to EA causes—illustrating how even a successful investment fails to serve its intended purpose when the holding entity collapses. [CNBC](https://www.cnbc.com/2024/03/25/ftx-estate-sells-majority-stake-in-startup-anthropic-for-884-million.html)
+
+**The counterfactual loss**: Had FTX not collapsed and SBF had directed even 10% of that stake's current value to EA causes, it would have exceeded the entire FTX Foundation's historical grantmaking. This represents the opportunity cost of concentrated, fragile funding structures.
+
+## Key Uncertainties
+
+| Uncertainty | Range | Impact |
+|-------------|-------|--------|
+| Total FTX clawbacks from EA orgs | \$30-100M | Determines net financial damage |
+| Long-term reputational recovery timeline | 5-15 years | Affects EA recruiting and policy credibility |
+| Whether EA orgs have actually implemented resilience measures | Low-High | Determines vulnerability to next shock |
+| Anthropic capital materialization probability | 40-90% | Determines whether FTX lessons are applied to a real scenario |
+| Whether DAF commitments are more resilient than personal pledges | Likely yes | Structural improvement over FTX-era giving |
+
+## Limitations
+
+**Counterfactual analysis is speculative.** We cannot know what EA funding would look like without the FTX collapse. Some beneficial organizational restructuring may have occurred precisely because of the crisis.
+
+**Survivorship bias.** This analysis focuses on organizations that survived. Some projects and organizations that were destroyed by the collapse may have been highly valuable, and their loss is hard to quantify.
+
+**The FTX analogy has limits.** Anthropic is a fundamentally different entity than FTX—a legitimate technology company vs. a fraudulent exchange. Drawing too strong an analogy risks overstating the risk of total loss. The relevant parallel is *concentration risk*, not *fraud risk*.
+
+**Political dynamics are omitted.** SBF's political donations and their aftermath are a significant part of the FTX story but are outside the scope of this funding-focused analysis.

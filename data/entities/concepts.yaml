@@ -1,6 +1,31 @@
 # Concepts Entities
 # Auto-generated from entities.yaml - edit this file directly
 
+- id: ea-shareholder-diversification-anthropic
+  type: concept
+  title: EA Shareholder Diversification from Anthropic
+  description: >-
+    Analysis of strategies for EA-aligned Anthropic shareholders to reduce portfolio
+    concentration risk. At $380B valuation, $27-76B in risk-adjusted EA capital is
+    tied to a single illiquid asset. Key strategies include secondary market sales,
+    expanded buybacks, DAF transfers, and post-IPO systematic selling plans.
+  tags:
+    - portfolio-risk
+    - anthropic
+    - effective-altruism
+    - diversification
+    - philanthropy
+  relatedEntries:
+    - id: anthropic
+      type: organization
+    - id: corporate-influence
+      type: crux
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
+
 - id: corporate-influence
   numericId: E78
   type: crux
