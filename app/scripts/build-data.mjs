@@ -918,10 +918,11 @@ function main() {
   // Pages can declare numericId in MDX frontmatter. New pages get auto-assigned.
   // =========================================================================
   const entityIds = new Set(entities.map(e => e.id));
-  // Skip infrastructure/internal categories — only assign IDs to real content pages
+  // Skip infrastructure categories — only assign IDs to non-content pages
+  // Note: 'internal', 'reports', 'schema' removed — internal pages now get entity IDs
   const skipCategories = new Set([
-    'internal', 'style-guides', 'schema', 'browse',
-    'dashboard', 'project', 'reports', 'guides',
+    'style-guides', 'browse',
+    'dashboard', 'project', 'guides',
   ]);
   let pageIdAssignments = 0;
   for (const page of pages) {

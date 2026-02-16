@@ -427,8 +427,8 @@ function processFile(filePath: string, entities: Map<string, EntityEntry>, pageE
   const content = readFileSync(filePath, 'utf-8');
   const frontmatter = parseFrontmatter(content);
 
-  // Skip stubs and documentation
-  if (frontmatter.pageType === 'stub' || frontmatter.pageType === 'documentation') {
+  // Skip stubs, documentation, and internal pages
+  if (frontmatter.pageType === 'stub' || frontmatter.pageType === 'documentation' || frontmatter.entityType === 'internal') {
     return { changes: [], skipped: 'pageType' };
   }
 

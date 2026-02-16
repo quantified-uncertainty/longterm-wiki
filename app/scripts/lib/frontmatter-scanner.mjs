@@ -74,7 +74,7 @@ export function scanFrontmatterEntities(yamlEntityIds, contentDir) {
   }
 
   scanDir(join(contentDir, 'knowledge-base'));
-  for (const topDir of ['ai-transition-model', 'analysis']) {
+  for (const topDir of ['ai-transition-model', 'analysis', 'internal']) {
     scanDir(join(contentDir, topDir));
   }
 

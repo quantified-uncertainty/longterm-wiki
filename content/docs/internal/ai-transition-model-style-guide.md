@@ -1,7 +1,8 @@
 ---
+numericId: E731
 title: "AI Transition Model Style Guide"
 description: "Style guide for AI Transition Model factor, scenario, and parameter pages"
-pageType: "documentation"
+entityType: internal
 sidebar:
   order: 12
 importance: 2

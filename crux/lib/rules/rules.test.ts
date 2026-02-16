@@ -337,6 +337,14 @@ describe('shouldSkipValidation utility', () => {
   it('does not skip pages without pageType', () => {
     expect(shouldSkipValidation({})).toBe(false);
   });
+
+  it('skips internal entity type pages', () => {
+    expect(shouldSkipValidation({ entityType: 'internal' })).toBe(true);
+  });
+
+  it('does not skip non-internal entity types', () => {
+    expect(shouldSkipValidation({ entityType: 'risk' })).toBe(false);
+  });
 });
 
 // =============================================================================

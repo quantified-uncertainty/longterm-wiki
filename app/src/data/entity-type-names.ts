@@ -46,6 +46,7 @@ const CANONICAL_ENTITY_TYPE_NAMES = [
   "event",
   "debate",
   "intelligence-paradigm",
+  "internal",
   // AI Transition Model specific types
   "ai-transition-model-parameter",
   "ai-transition-model-metric",

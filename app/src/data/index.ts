@@ -1018,7 +1018,8 @@ export function getExploreItems(): ExploreItem[] {
   const pageTitleMap = getPageTitleMap();
 
   // Items from typed entities (only those with actual content pages)
-  const entityItems: ExploreItem[] = typedEntities.filter((entity) => pageMap.has(entity.id)).map((entity) => {
+  // Exclude internal pages — they participate in entity/backlink infrastructure but are not public content
+  const entityItems: ExploreItem[] = typedEntities.filter((entity) => pageMap.has(entity.id) && entity.entityType !== "internal").map((entity) => {
     const page = pageMap.get(entity.id)!;
     return {
       id: entity.id,
