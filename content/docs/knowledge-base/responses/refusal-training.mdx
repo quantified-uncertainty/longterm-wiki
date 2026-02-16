@@ -24,9 +24,9 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 ## Overview
 
-Refusal training is a core component of modern AI safety practice, teaching language models to decline requests for harmful information or assistance. When a user asks for instructions on creating weapons, synthesizing drugs, or conducting cyberattacks, a properly trained model responds with a refusal rather than compliance. This behavior is instilled through <EntityLink id="E259">RLHF</EntityLink> (Reinforcement Learning from Human Feedback), where human raters prefer refusals to harmful completions.
+Refusal training is a core component of modern AI safety practice, teaching language models to decline requests for harmful information or assistance. When a user asks for instructions on creating weapons, synthesizing drugs, or conducting cyberattacks, a properly trained model responds with a refusal rather than compliance. This behavior is instilled through <EntityLink id="rlhf">RLHF</EntityLink> (Reinforcement Learning from Human Feedback), where human raters prefer refusals to harmful completions.
 
-The technique is universally deployed across all major AI chatbots and has meaningfully raised the barrier to casual misuse. However, refusal training faces fundamental limitations. The most significant is the persistent effectiveness of jailbreaks: researchers and users consistently find ways to <EntityLink id="E526">elicit</EntityLink> harmful content despite refusal training. This isn't a matter of incremental improvement; the jailbreak problem appears structural. Every major model release is followed within hours or days by published jailbreaks.
+The technique is universally deployed across all major AI chatbots and has meaningfully raised the barrier to casual misuse. However, refusal training faces fundamental limitations. The most significant is the persistent effectiveness of jailbreaks: researchers and users consistently find ways to <EntityLink id="elicit">elicit</EntityLink> harmful content despite refusal training. This isn't a matter of incremental improvement; the jailbreak problem appears structural. Every major model release is followed within hours or days by published jailbreaks.
 
 More fundamentally, refusal training addresses behavior, not underlying goals or values. A model that refuses harmful requests because refusals were rewarded during training is very different from a model that refuses because it genuinely doesn't want to cause harm. This distinction becomes critical as models become more capable: a sufficiently intelligent system could learn to produce safe-looking outputs during training while maintaining hidden goals. Refusal training provides no defense against such deceptive alignment.
 
@@ -41,7 +41,7 @@ More fundamentally, refusal training addresses behavior, not underlying goals or
 | **Scalability** | Limited | Every model tested has been jailbroken |
 | **Current Maturity** | Mature | Universally deployed across frontier labs |
 | **Time Horizon** | Ongoing | Continuous arms race with adversaries |
-| **Key Proponents** | <EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink>, Google | Part of standard safety training |
+| **Key Proponents** | <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink>, Google | Part of standard safety training |
 
 ## Risk Assessment & Impact
 
@@ -247,12 +247,12 @@ This suggests fundamental rather than incremental limitations. However, the AISI
 
 | Risk | Relevance | How Refusal Training Helps | Limitations |
 |------|-----------|---------------------------|-------------|
-| <EntityLink id="E207" /> | High | Blocks obvious harmful requests | Bypassed by sophisticated users |
-| <EntityLink id="E42" /> | Medium | Refuses synthesis instructions | Information often available elsewhere |
+| <EntityLink id="misuse-potential" /> | High | Blocks obvious harmful requests | Bypassed by sophisticated users |
+| <EntityLink id="bioweapons" /> | Medium | Refuses synthesis instructions | Information often available elsewhere |
 | <EntityLink id="cyberattacks" /> | Medium | Declines to write malware | Determined attackers can jailbreak |
-| <EntityLink id="E93" /> | None | No protection | Deceptive models would pass refusal training |
-| <EntityLink id="E274" /> | None | No protection | Scheming models optimize for passing training |
-| <EntityLink id="E151" /> | None | No protection | Addresses outputs, not goals |
+| <EntityLink id="deceptive-alignment" /> | None | No protection | Deceptive models would pass refusal training |
+| <EntityLink id="scheming" /> | None | No protection | Scheming models optimize for passing training |
+| <EntityLink id="goal-misgeneralization" /> | None | No protection | Addresses outputs, not goals |
 
 ## Relationship to Alignment
 
@@ -371,11 +371,11 @@ This creates both opportunities (more robust safety mechanisms) and risks (adver
 
 ## AI Transition Model Context
 
-Refusal training affects the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="E207" />:
+Refusal training affects the <EntityLink id="ai-transition-model" /> primarily through <EntityLink id="misuse-potential" />:
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="E207" /> | Moderate reduction in casual misuse |
-| <EntityLink id="E20" /> | No meaningful improvement |
+| <EntityLink id="misuse-potential" /> | Moderate reduction in casual misuse |
+| <EntityLink id="alignment-robustness" /> | No meaningful improvement |
 
 Refusal training is a deployment necessity but not a path to safe AI. It should be understood as harm reduction for current systems, not a solution to alignment.

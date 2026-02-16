@@ -163,20 +163,106 @@ export type Risk = z.infer<typeof Risk>;
 // INTERVENTIONS (Responses)
 // =============================================================================
 
+/**
+ * Coverage rating for how strongly an intervention addresses a risk category.
+ */
+export const CoverageLevel = z.enum(['none', 'low', 'medium', 'high']);
+export type CoverageLevel = z.infer<typeof CoverageLevel>;
+
+/**
+ * Risk coverage matrix — how strongly this intervention addresses each risk category.
+ */
+export const RiskCoverage = z.object({
+  accident: CoverageLevel.optional(),     // Misalignment, mesa-optimization
+  misuse: CoverageLevel.optional(),       // Bioweapons, cyberweapons
+  structural: CoverageLevel.optional(),   // Racing dynamics, lock-in
+  epistemic: CoverageLevel.optional(),    // Trust erosion, sycophancy at scale
+});
+export type RiskCoverage = z.infer<typeof RiskCoverage>;
+
 export const Intervention = z.object({
-  id: z.string(),                       // e.g., "interpretability-research"
+  id: z.string(),                       // e.g., "interpretability"
   name: z.string(),
   category: z.enum(['technical', 'governance', 'institutional', 'field-building', 'resilience']),
   subcategory: z.string().optional(),
   description: z.string().optional(),
-  addressesRisks: z.array(z.string()).optional(),  // Risk IDs
-  organizations: z.array(z.string()).optional(),   // Org IDs working on this
+  // Risk coverage matrix (like crux positions show different views, this shows risk coverage)
+  riskCoverage: RiskCoverage.optional(),
+  primaryMechanism: z.string().optional(),  // How it addresses risks
+  // ITN prioritization
   tractability: Importance.optional(),
   neglectedness: Importance.optional(),
-  importance: Importance.optional(),
-  timeHorizon: z.string().optional(),   // e.g., "1-3 years", "5+ years"
+  importance: Importance.optional(),       // Impact potential
+  overallPriority: z.string().optional(),  // Synthesized: "Very High", "High", "Medium-High", "Medium"
+  // Timeline and maturity
+  timelineFit: z.string().optional(),      // "Near", "Long", "Near-Long", "Ongoing"
+  currentState: z.string().optional(),     // Brief description of current status
+  // Funding
+  fundingLevel: z.string().optional(),     // e.g., "$15-25M/year"
+  fundingShare: z.string().optional(),     // e.g., "~18%"
+  recommendedShift: z.string().optional(), // e.g., "Increase to 20%"
+  // Cross-references
+  addressesRisks: z.array(z.string()).optional(),  // Risk IDs
+  organizations: z.array(z.string()).optional(),   // Org IDs working on this
+  wikiPageId: z.string().optional(),       // Entity ID of the wiki page for this intervention
+  relatedInterventions: z.array(z.string()).optional(),  // Intervention ID references
+  relevantResearch: z.array(z.object({
+    title: z.string(),
+    url: z.string().url().optional(),
+  })).optional(),
 });
 export type Intervention = z.infer<typeof Intervention>;
+
+// =============================================================================
+// PROPOSALS (Narrow, speculative tactical actions extracted from wiki pages)
+// =============================================================================
+
+/**
+ * A Proposal is a specific, concrete, tactical action that someone could fund
+ * or execute — extracted from wiki page analysis. Unlike broad Interventions
+ * (e.g., "compute governance"), Proposals are narrow and actionable
+ * (e.g., "Help Anthropic founders transfer equity to DAFs before IPO").
+ *
+ * Modeled after Cruxes: canonical YAML reference → React component → MDX embedding.
+ */
+export const Proposal = z.object({
+  id: z.string(),                       // e.g., "daf-pre-commitment"
+  name: z.string(),                     // Short name, 3-10 words
+  description: z.string(),             // What specifically to do
+  // Source and classification
+  sourcePageId: z.string().optional(),  // Wiki page slug or entity ID where this was proposed
+  domain: z.enum([
+    'philanthropic',    // Donor/funder strategy
+    'biosecurity',      // Bio-related defense
+    'governance',       // Policy, regulation, oversight
+    'technical',        // Safety R&D, tooling
+    'field-building',   // Talent, institutions, community
+    'financial',        // Investment, diversification, markets
+  ]),
+  stance: z.enum([
+    'collaborative',    // Founders/labs would welcome this
+    'adversarial',      // Could provoke resistance or backfire
+    'neutral',          // Neither collaborative nor adversarial
+  ]).optional(),
+  // Cost-effectiveness (speculative)
+  costEstimate: z.string().optional(),  // e.g., "$300K-1M"
+  evEstimate: z.string().optional(),    // e.g., "$50-250M" or qualitative
+  // Assessment
+  feasibility: z.enum(['low', 'medium', 'high']).optional(),
+  honestConcerns: z.string().optional(), // Why it might not work or backfire
+  status: z.enum([
+    'idea',            // Proposed on wiki page, not yet acted on
+    'proposed',        // Formally proposed to decision-makers
+    'in-progress',     // Someone is working on it
+    'implemented',     // Done
+    'abandoned',       // Tried and stopped
+  ]).optional(),
+  // Who
+  leadOrganizations: z.array(z.string()).optional(), // Who could execute this
+  // Cross-references
+  relatedProposals: z.array(z.string()).optional(),  // Proposal ID references
+});
+export type Proposal = z.infer<typeof Proposal>;
 
 // =============================================================================
 // GLOSSARY
@@ -775,6 +861,7 @@ export const Database = z.object({
   entities: z.array(Entity),
   resources: z.array(Resource),
   publications: z.array(Publication),
+  proposals: z.array(Proposal),
 });
 export type Database = z.infer<typeof Database>;
 

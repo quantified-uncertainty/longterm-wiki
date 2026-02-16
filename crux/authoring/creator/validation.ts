@@ -136,7 +136,13 @@ Read the draft article at: ${draftPath}
 
 Keep iterating until ALL checks pass. Run validation again after each fix.`;
 
+  // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
+  const env = { ...process.env };
+  delete env.CLAUDECODE;
+
   return new Promise((resolve, reject) => {
+    const TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
     const claude = spawn('claude', [
       '-p',
       '--print',
@@ -146,8 +152,14 @@ Keep iterating until ALL checks pass. Run validation again after each fix.`;
       '--allowedTools', 'Read,Write,Edit,Bash,Glob,Grep'
     ], {
       cwd: ROOT,
+      env,
       stdio: ['pipe', 'pipe', 'pipe']
     });
+
+    const timeout = setTimeout(() => {
+      claude.kill();
+      resolve({ success: false, error: `Validation loop timed out after ${TIMEOUT_MS / 1000}s`, hasOutput: false, exitCode: null });
+    }, TIMEOUT_MS);
 
     claude.stdin.write(validationPrompt);
     claude.stdin.end();
@@ -158,7 +170,18 @@ Keep iterating until ALL checks pass. Run validation again after each fix.`;
       process.stdout.write(data);
     });
 
+    // Drain stderr to prevent pipe buffer deadlock
+    claude.stderr.on('data', (data: Buffer) => {
+      process.stderr.write(data);
+    });
+
+    claude.on('error', (err: Error) => {
+      clearTimeout(timeout);
+      resolve({ success: false, error: `Failed to spawn validation subprocess: ${err.message}`, hasOutput: false, exitCode: null });
+    });
+
     claude.on('close', (code: number | null) => {
+      clearTimeout(timeout);
       const finalPath = path.join(getTopicDir(topic), 'final.mdx');
       const hasOutput = fs.existsSync(finalPath);
       resolve({

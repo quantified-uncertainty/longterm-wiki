@@ -35,3 +35,4 @@ Where `<branch-suffix>` is the branch name without the `claude/` prefix (e.g., f
 - Do NOT skip logging just because the session was small — even one-line fixes are worth tracking
 - The session log file should be part of the same commit as your other changes (not a separate commit)
 - Each session gets its own file — this avoids merge conflicts between parallel sessions
+- **Format is machine-parsed**: The `## date | branch | title` heading and `**Pages:**` field are parsed by `app/scripts/lib/session-log-parser.mjs` to build the `/internal/page-changes` dashboard. If you change the format here, update the parser and its tests too.
