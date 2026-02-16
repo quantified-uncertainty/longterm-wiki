@@ -29,17 +29,17 @@ import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@component
 
 | Dimension | Assessment | Details |
 |-----------|------------|---------|
-| Coverage | **60-70%** of frontier development | 3-4 major labs (<EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E98">Google DeepMind</EntityLink>, plus <EntityLink id="E550">Microsoft</EntityLink>, <EntityLink id="E549">Meta</EntityLink>, Amazon) |
+| Coverage | **60-70%** of frontier development | 3-4 major labs (<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink>, plus <EntityLink id="microsoft">Microsoft</EntityLink>, <EntityLink id="meta-ai">Meta</EntityLink>, Amazon) |
 | Risk Reduction | **10-25%** estimated | Limited by evaluation gaps (30-50%), safeguard effectiveness (40-70%), commitment durability (20-60% abandonment risk) |
 | Enforcement | **0%** external verification | Voluntary self-regulation; less than 20% external auditing; no binding enforcement |
-| Durability | **Low-Medium** confidence | <EntityLink id="E239">Racing dynamics</EntityLink> create 20-60% abandonment probability under competitive pressure |
+| Durability | **Low-Medium** confidence | <EntityLink id="racing-dynamics">Racing dynamics</EntityLink> create 20-60% abandonment probability under competitive pressure |
 | Timeline | **Near-term** (2023-2026) | ASL-3/High thresholds expected within 1-2 years; ASL-4/Critical systems 2026-2029 |
 | Cost | **\$1-20M per lab annually** | Plus \$10-30M industry-wide for external evaluation infrastructure |
-| Tractability | **Medium** | Technical evaluation challenges; standardization gaps; <EntityLink id="E171">international coordination</EntityLink> issues |
+| Tractability | **Medium** | Technical evaluation challenges; standardization gaps; <EntityLink id="international-coordination">international coordination</EntityLink> issues |
 
 ## Overview
 
-<EntityLink id="E461">Responsible Scaling Policies</EntityLink> (RSPs) represent the primary current approach by leading AI laboratories to manage catastrophic risks from increasingly capable AI systems. These voluntary frameworks establish capability thresholds that trigger mandatory safety evaluations and safeguards before continuing development or deployment. [Introduced by Anthropic in September 2023](https://metr.org/blog/2023-09-26-rsp/) and subsequently adopted by OpenAI, <EntityLink id="E98">Google DeepMind</EntityLink>, and others, RSPs mark a significant shift toward structured, proactive risk management in frontier AI development. The [UK AI Security Institute](https://www.aisi.gov.uk/blog/early-lessons-from-evaluating-frontier-ai-systems) has now evaluated over 30 frontier AI models since November 2023, providing independent government assessment of these frameworks' implementation.
+<EntityLink id="rsp">Responsible Scaling Policies</EntityLink> (RSPs) represent the primary current approach by leading AI laboratories to manage catastrophic risks from increasingly capable AI systems. These voluntary frameworks establish capability thresholds that trigger mandatory safety evaluations and safeguards before continuing development or deployment. [Introduced by Anthropic in September 2023](https://metr.org/blog/2023-09-26-rsp/) and subsequently adopted by OpenAI, <EntityLink id="deepmind">Google DeepMind</EntityLink>, and others, RSPs mark a significant shift toward structured, proactive risk management in frontier AI development. The [UK AI Security Institute](https://www.aisi.gov.uk/blog/early-lessons-from-evaluating-frontier-ai-systems) has now evaluated over 30 frontier AI models since November 2023, providing independent government assessment of these frameworks' implementation.
 
 The core innovation of RSPs lies in their conditional approach: rather than imposing blanket restrictions, they define specific capability benchmarks that, when crossed, require enhanced security measures, deployment controls, or development pauses until appropriate safeguards are implemented. This creates a scalable framework that can adapt as AI systems become more capable, while providing clear decision points for risk management. However, their reliance on industry self-regulation raises fundamental questions about effectiveness under competitive pressure and conflicts of interest.
 
@@ -61,8 +61,8 @@ The three leading AI laboratories have implemented distinct but conceptually sim
 | **Security Requirements** | ASL-3: Defense against sophisticated non-state attackers | Risk-calibrated access controls and weight security | Tiered security mitigations calibrated to capability levels |
 | **Governance** | Responsible Scaling Officer (RSO) can pause training/deployment; currently Jared Kaplan | Safety Advisory Group (SAG) reviews reports; board authority for Critical risks | Cross-functional safety governance; external review mechanisms |
 | **External Verification** | Committed to third-party auditing; regular public reporting | SAG includes internal leaders; external verification limited | Industry-leading proactive approach; external partnerships developing |
-| **Evaluation Frequency** | Before training above <EntityLink id="E465">compute thresholds</EntityLink>; at checkpoints; post-training | Capabilities Reports + Safeguards Reports for each covered system | Comprehensive evaluations before training and deployment decisions |
-| **<EntityLink id="E449">Red Teaming</EntityLink>** | Extensive red-teaming for ASL-3+; demonstrated in deployment standard | Required for High/Critical assessments | Required for CCL systems; expert adversarial testing |
+| **Evaluation Frequency** | Before training above <EntityLink id="thresholds">compute thresholds</EntityLink>; at checkpoints; post-training | Capabilities Reports + Safeguards Reports for each covered system | Comprehensive evaluations before training and deployment decisions |
+| **<EntityLink id="red-teaming">Red Teaming</EntityLink>** | Extensive red-teaming for ASL-3+; demonstrated in deployment standard | Required for High/Critical assessments | Required for CCL systems; expert adversarial testing |
 | **First Activation** | ASL-3 activated for Claude Opus 4 (early 2025) | Framework updated April 2025; o3/o4-mini below High | Multiple CCL updates through 2024-2025 |
 | **Version History** | v1.0 (Sept 2023) → v2.0 (Oct 2024) → v2.2 (May 2025) | Beta (Dec 2023) → v2 (April 2025) | v1.0 (May 2024) → v2.0 (Feb 2025) → v3.0 |
 | **Distinctive Features** | Biosafety-inspired ASL framework; clear RSO authority to pause | Streamlined to operational thresholds only; removed "low/medium" levels | First to address harmful manipulation and shutdown resistance/deceptive alignment |
@@ -306,9 +306,9 @@ Most critically, RSPs address only technical safety measures while leaving broad
 
 | Risk | Mechanism | Effectiveness |
 |------|-----------|---------------|
-| <EntityLink id="E42">Bioweapons</EntityLink> | CBRN capability evaluations before deployment | Medium |
-| <EntityLink id="E86">Cyberweapons</EntityLink> | Cyber capability evaluations | Medium |
-| <EntityLink id="E93">Deceptive Alignment</EntityLink> | Autonomy and deception evaluations | Low-Medium |
+| <EntityLink id="bioweapons">Bioweapons</EntityLink> | CBRN capability evaluations before deployment | Medium |
+| <EntityLink id="cyberweapons">Cyberweapons</EntityLink> | Cyber capability evaluations | Medium |
+| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | Autonomy and deception evaluations | Low-Medium |
 
 ## Sources
 
@@ -347,8 +347,8 @@ Responsible Scaling Policies improve the <EntityLink id="ai-transition-model" />
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="E205" /> | <EntityLink id="E264" /> | Institutionalizes safety practices at major labs |
-| <EntityLink id="E205" /> | <EntityLink id="E261" /> | Creates incentives to invest in safety before capability thresholds |
-| <EntityLink id="E358" /> | <EntityLink id="E242" /> | Potentially slows racing if commitments are binding |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-culture-strength" /> | Institutionalizes safety practices at major labs |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-capability-gap" /> | Creates incentives to invest in safety before capability thresholds |
+| <EntityLink id="transition-turbulence" /> | <EntityLink id="racing-intensity" /> | Potentially slows racing if commitments are binding |
 
-RSPs reduce <EntityLink id="E130" /> probability by creating pause points before dangerous capability thresholds, though effectiveness depends on commitment credibility.
+RSPs reduce <EntityLink id="existential-catastrophe" /> probability by creating pause points before dangerous capability thresholds, though effectiveness depends on commitment credibility.

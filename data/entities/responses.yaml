@@ -2465,6 +2465,41 @@
       type: policy
   lastUpdated: 2026-02
 
+- id: singapore-consensus
+  numericId: E701
+  type: policy
+  title: Singapore Consensus on AI Safety Research Priorities
+  description: >-
+    Consensus document from the 2025 Singapore Conference on AI (SCAI), authored by 88 researchers
+    from 11 countries, organizing AI safety research into a defence-in-depth framework across three
+    areas: Assessment, Development, and Control.
+  tags:
+    - international-consensus
+    - ai-safety-research
+    - defence-in-depth
+    - research-priorities
+    - scientific-cooperation
+  clusters:
+    - governance
+    - ai-safety
+  relatedEntries:
+    - id: international-summits
+      type: policy
+    - id: bletchley-declaration
+      type: policy
+    - id: ai-safety-institutes
+      type: policy
+    - id: coordination-mechanisms
+      type: policy
+  sources:
+    - title: The Singapore Consensus on Global AI Safety Research Priorities
+      url: https://arxiv.org/abs/2506.20702
+      date: June 2025
+    - title: Singapore Consensus (Official Site)
+      url: https://aisafetypriorities.org/
+      date: April 2025
+  lastUpdated: 2026-02
+
 - id: coordination-mechanisms
   numericId: E470
   type: policy
@@ -3535,4 +3570,34 @@
       type: risk
   clusters:
     - ai-safety
+  lastUpdated: 2026-02
+- id: ai-accountability
+  numericId: E700
+  type: approach
+  title: AI for Accountability and Anti-Corruption
+  description: >-
+    AI systems are emerging as tools for holding powerful actors accountable,
+    analyzing public records, tracing financial flows, monitoring environmental
+    violations, and documenting human rights abuses at previously impossible
+    scale. The ICIJ's AI-assisted investigations revealed $32+ trillion in
+    hidden wealth. This sousveillance dynamic represents the beneficial flip
+    side of AI surveillance capabilities.
+  relatedEntries:
+    - id: surveillance
+      type: risk
+    - id: authoritarian-tools
+      type: risk
+    - id: ai-powered-investigation
+      type: capability
+    - id: deanonymization
+      type: risk
+    - id: epistemic-collapse
+      type: risk
+    - id: concentration-of-power
+      type: risk
+    - id: disinformation
+      type: risk
+  clusters:
+    - ai-safety
+    - governance
   lastUpdated: 2026-02

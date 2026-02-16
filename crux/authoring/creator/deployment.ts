@@ -195,7 +195,7 @@ export function validateCrossLinks(filePath: string): CrossLinkResult {
 /**
  * Review phase — spawns Claude Code to do a critical review
  */
-export async function runReview(topic: string, { ROOT, getTopicDir, log }: ReviewContext): Promise<{ success: boolean }> {
+export async function runReview(topic: string, { ROOT, getTopicDir, log }: ReviewContext): Promise<{ success: boolean; error?: string }> {
   log('review', 'Running critical review...');
 
   const draftPath = path.join(getTopicDir(topic), 'draft.mdx');
@@ -226,7 +226,13 @@ If you find any logicalIssues or temporalArtifacts, also fix them directly in th
 
   const { spawn } = await import('child_process');
 
+  // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
+  const env = { ...process.env };
+  delete env.CLAUDECODE;
+
   return new Promise((resolve, reject) => {
+    const TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
+
     const claude = spawn('claude', [
       '-p',
       '--print',
@@ -236,17 +242,33 @@ If you find any logicalIssues or temporalArtifacts, also fix them directly in th
       '--allowedTools', 'Read,Write'
     ], {
       cwd: ROOT,
+      env,
       stdio: ['pipe', 'pipe', 'pipe']
     });
+
+    const timeout = setTimeout(() => {
+      claude.kill();
+      resolve({ success: false, error: `Review timed out after ${TIMEOUT_MS / 1000}s` });
+    }, TIMEOUT_MS);
 
     claude.stdin.write(reviewPrompt);
     claude.stdin.end();
 
+    // Drain stdout and stderr to prevent pipe buffer deadlock
+    claude.stdout.on('data', (data: Buffer) => {
+      process.stdout.write(data);
+    });
+    claude.stderr.on('data', (data: Buffer) => {
+      process.stderr.write(data);
+    });
+
     claude.on('close', (code: number | null) => {
+      clearTimeout(timeout);
       resolve({ success: code === 0 });
     });
 
     claude.on('error', (err: Error) => {
+      clearTimeout(timeout);
       resolve({ success: false, error: err.message });
     });
   });

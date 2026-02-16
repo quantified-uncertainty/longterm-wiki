@@ -28,7 +28,7 @@ const columns: ColumnDef<PageChangeItem>[] = [
     ),
     cell: ({ row }) => (
       <Link
-        href={`/wiki/${row.original.numericId}`}
+        href={row.original.pagePath}
         className="text-sm font-medium text-accent-foreground hover:underline no-underline"
       >
         {row.original.pageTitle}

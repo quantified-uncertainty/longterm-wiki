@@ -578,6 +578,42 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+- id: ai-powered-investigation
+  numericId: E698
+  type: capability
+  title: AI-Powered Investigation
+  description: >-
+    AI systems can synthesize vast volumes of public data — social media,
+    corporate filings, court records, satellite imagery — to conduct
+    investigative work at a scale and speed previously impossible. A 2023
+    ETH Zurich study showed GPT-4 inferred personal attributes from Reddit
+    posts with 85% accuracy. This dual-use capability enables both
+    anti-corruption journalism and mass privacy erosion.
+  severity: high
+  maturity: Emerging
+  customFields:
+    - label: Status
+      value: Operational and improving rapidly
+    - label: Key Concern
+      value: Dual-use tension between accountability and privacy
+  relatedEntries:
+    - id: agentic-ai
+      type: capability
+    - id: surveillance
+      type: risk
+    - id: deanonymization
+      type: risk
+    - id: ai-accountability
+      type: approach
+    - id: fraud
+      type: risk
+    - id: deepfakes
+      type: risk
+  clusters:
+    - ai-safety
+    - governance
+    - cyber
+  lastUpdated: 2026-02
 - id: world-models
   numericId: E503
   type: capability

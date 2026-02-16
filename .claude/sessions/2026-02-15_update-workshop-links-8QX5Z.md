@@ -1,0 +1,13 @@
+## 2026-02-15 | claude/update-workshop-links-8QX5Z | Update workshop page instructions
+
+**What was done:** Researched the workshop page at cairn-meta.vercel.app/workshop/ (source in quantified-uncertainty/cairn repo at apps/meta/src/content/docs/workshop.mdx) and produced detailed edit instructions for updating it. Changes include: fixing deprecated ea-crux-project.vercel.app URLs to longtermwiki.com, adding links to relevant wiki pages (E681, E384, E238), adding an Obsidian/Notion/NotebookLM non-code alternatives section, updating Claude Code description to include claude.ai/code web interface and app Code feature, updating page counts from ~500 to ~640, and reframing past events.
+
+**Pages:** (no longterm-wiki pages edited — changes target cairn repo workshop.mdx)
+
+**Issues encountered:**
+- The workshop.mdx file lives in the cairn repo (quantified-uncertainty/cairn), not the longterm-wiki repo. The git proxy only allows access to longterm-wiki, so direct edits to the cairn repo weren't possible.
+- The updated workshop.mdx was saved as workshop-updated.mdx in the longterm-wiki repo root as a reference artifact, with detailed instructions provided for applying changes.
+
+**Learnings/notes:**
+- ea-crux-project.vercel.app redirects to a deprecated version of the wiki. Current URL is www.longtermwiki.com (~640 pages).
+- The cairn repo is the original monorepo; longterm-wiki was split out in Feb 2025.

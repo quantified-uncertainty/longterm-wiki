@@ -24,7 +24,7 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 ## Overview
 
-Circuit breakers represent a class of runtime interventions that can detect and stop harmful model behavior during inference, before outputs reach users or actions are executed. Unlike <EntityLink id="E595">output filtering</EntityLink> which operates on completed outputs, circuit breakers can intervene mid-generation, potentially stopping harm earlier in the process. This includes monitoring activation patterns, detecting emerging harmful content, and intervening when dangerous patterns are detected.
+Circuit breakers represent a class of runtime interventions that can detect and stop harmful model behavior during inference, before outputs reach users or actions are executed. Unlike <EntityLink id="output-filtering">output filtering</EntityLink> which operates on completed outputs, circuit breakers can intervene mid-generation, potentially stopping harm earlier in the process. This includes monitoring activation patterns, detecting emerging harmful content, and intervening when dangerous patterns are detected.
 
 The approach draws inspiration from electrical circuit breakers that automatically interrupt dangerous current flows, and from software systems that halt operations when safety invariants are violated. For AI systems, circuit breakers can detect when a model is generating content that violates safety policies, when activation patterns suggest deceptive or manipulative intent, or when the system is attempting unauthorized actions.
 
@@ -44,7 +44,7 @@ Research organizations like [Gray Swan AI](https://www.grayswan.ai/research/circ
 
 ### Research Investment
 
-- **Current Investment**: \$10-30M/yr (Gray Swan, <EntityLink id="E22">Anthropic</EntityLink>, various labs)
+- **Current Investment**: \$10-30M/yr (Gray Swan, <EntityLink id="anthropic">Anthropic</EntityLink>, various labs)
 - **Recommendation**: Increase (practical near-term intervention; needs more research)
 - **Differential Progress**: Safety-leaning (primarily safety; some reliability benefits)
 
@@ -56,8 +56,8 @@ Different circuit breaker implementations offer varying tradeoffs between safety
 |----------|-----------|-------------------------|-------------------|------------------|-------------|
 | **Representation Rerouting (RR)** | Redirects harmful internal representations to orthogonal space | 87-90% | ≈1% capability loss | Low (≈5%) | Vulnerable to novel token-forcing attacks |
 | **Constitutional Classifiers** | Input/output filters trained on constitutional principles | 95.6% (from 86% baseline) | 0.38% increased refusal | 1-24% (improved over time) | No universal jailbreaks found but specific attacks possible |
-| **<EntityLink id="E456">Refusal Training</EntityLink> (<EntityLink id="E259">RLHF</EntityLink>)** | Train model to refuse harmful requests directly | 40-70% (varies widely) | Can reduce helpfulness | None at inference | Highly vulnerable to adversarial attacks |
-| **<EntityLink id="E583">Adversarial Training</EntityLink>** | Train against known attack patterns | 60-80% on trained attacks | Minor | High during training | Poor generalization to novel attacks |
+| **<EntityLink id="refusal-training">Refusal Training</EntityLink> (<EntityLink id="rlhf">RLHF</EntityLink>)** | Train model to refuse harmful requests directly | 40-70% (varies widely) | Can reduce helpfulness | None at inference | Highly vulnerable to adversarial attacks |
+| **<EntityLink id="adversarial-training">Adversarial Training</EntityLink>** | Train against known attack patterns | 60-80% on trained attacks | Minor | High during training | Poor generalization to novel attacks |
 | **Activation Clamping** | Modify activations when harmful patterns detected | 70-85% | 5-15% capability loss | Medium | Requires interpretability research |
 | **Output Filtering** | Post-generation content moderation | 50-70% | None | Medium | Can be bypassed with encoded content |
 
@@ -511,7 +511,7 @@ Circuit breakers affect the <EntityLink id="ai-transition-model" /> through:
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="E207" /> | Can catch some harmful outputs in real-time |
-| <EntityLink id="E160" /> | Provides automated enforcement of safety policies |
+| <EntityLink id="misuse-potential" /> | Can catch some harmful outputs in real-time |
+| <EntityLink id="human-oversight-quality" /> | Provides automated enforcement of safety policies |
 
 Circuit breakers are a valuable addition to the AI safety toolkit, providing a last line of defense that can catch issues other measures miss. Current implementations achieve 87-95% effectiveness against known attacks with acceptable capability tradeoffs (1% overhead for Anthropic's system). However, they should be understood as one layer in a defense-in-depth strategy, not a substitute for addressing fundamental alignment challenges. The adversarial arms race continues, with novel attacks regularly discovered that bypass existing defenses—reinforcing the need for ongoing research and layered approaches.

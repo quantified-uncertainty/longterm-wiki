@@ -30,15 +30,15 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 | Scalability | Medium | Limited by human ability to verify superhuman reasoning steps |
 | Current Maturity | Medium-High | Deployed in production (OpenAI o1); active research area |
 | Time Horizon | Now-3 years | Already improving math/coding; broader domains in development |
-| Key Proponents | OpenAI, DeepMind, <EntityLink id="E22">Anthropic</EntityLink> | [Let's Verify Step by Step](https://arxiv.org/abs/2305.20050) foundational paper |
+| Key Proponents | OpenAI, DeepMind, <EntityLink id="anthropic">Anthropic</EntityLink> | [Let's Verify Step by Step](https://arxiv.org/abs/2305.20050) foundational paper |
 
 ## Overview
 
-Process supervision is a training technique that rewards AI models for producing correct intermediate reasoning steps, not just correct final answers. While traditional outcome-based training only provides a training signal based on whether the final answer is right or wrong, process supervision evaluates each step in a chain-of-thought reasoning sequence. This approach emerged from research at <EntityLink id="E218">OpenAI</EntityLink> and others investigating how to improve mathematical reasoning and code generation.
+Process supervision is a training technique that rewards AI models for producing correct intermediate reasoning steps, not just correct final answers. While traditional outcome-based training only provides a training signal based on whether the final answer is right or wrong, process supervision evaluates each step in a chain-of-thought reasoning sequence. This approach emerged from research at <EntityLink id="openai">OpenAI</EntityLink> and others investigating how to improve mathematical reasoning and code generation.
 
 The key insight is that process supervision makes reasoning transparent and auditable. When a model is trained to show its work and each step is verified, it becomes much harder to arrive at a correct answer through flawed reasoning or to hide problematic logic within a chain of thought. This has clear safety benefits: if we can see and verify each reasoning step, we can catch errors, biases, or potentially deceptive reasoning before it leads to harmful outputs.
 
-However, process supervision shares a fundamental limitation with <EntityLink id="E259">RLHF</EntityLink>: it requires humans to evaluate reasoning steps. For complex or superhuman reasoning, humans may not be able to verify whether intermediate steps are valid. Additionally, sufficiently sophisticated models might learn to produce reasoning that appears valid while actually being subtly flawed, or maintain separate internal reasoning that differs from the visible chain of thought.
+However, process supervision shares a fundamental limitation with <EntityLink id="rlhf">RLHF</EntityLink>: it requires humans to evaluate reasoning steps. For complex or superhuman reasoning, humans may not be able to verify whether intermediate steps are valid. Additionally, sufficiently sophisticated models might learn to produce reasoning that appears valid while actually being subtly flawed, or maintain separate internal reasoning that differs from the visible chain of thought.
 
 ## How It Works
 
@@ -75,10 +75,10 @@ The core innovation is training a **Process Reward Model (PRM)** that evaluates 
 
 | Risk | Relevance | How Process Supervision Helps |
 |------|-----------|-------------------------------|
-| <EntityLink id="E253">Reward Hacking</EntityLink> | High | Harder to game step-by-step verification than end-to-end outcomes |
-| <EntityLink id="E93">Deceptive Alignment</EntityLink> | Medium | Makes reasoning chains visible and auditable; catches hidden flawed logic |
-| <EntityLink id="E274">Scheming</EntityLink> | Medium | Visible reasoning makes certain deception strategies more detectable |
-| <EntityLink id="E295">Sycophancy</EntityLink> | Low | Step verification can catch reasoning that reaches user-desired but incorrect conclusions |
+| <EntityLink id="reward-hacking">Reward Hacking</EntityLink> | High | Harder to game step-by-step verification than end-to-end outcomes |
+| <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | Medium | Makes reasoning chains visible and auditable; catches hidden flawed logic |
+| <EntityLink id="scheming">Scheming</EntityLink> | Medium | Visible reasoning makes certain deception strategies more detectable |
+| <EntityLink id="sycophancy">Sycophancy</EntityLink> | Low | Step verification can catch reasoning that reaches user-desired but incorrect conclusions |
 
 ## Risk Assessment & Impact
 
@@ -222,9 +222,9 @@ Process supervision makes certain forms of deception harder:
 
 ### Complementary Techniques
 
-- **<EntityLink id="E259">RLHF</EntityLink>**: Process supervision extends RLHF to reasoning steps
-- **<EntityLink id="E451">Constitutional AI</EntityLink>**: Can apply principles to reasoning process
-- **<EntityLink id="E477">Mechanistic Interpretability</EntityLink>**: Could verify internal reasoning matches shown reasoning
+- **<EntityLink id="rlhf">RLHF</EntityLink>**: Process supervision extends RLHF to reasoning steps
+- **<EntityLink id="constitutional-ai">Constitutional AI</EntityLink>**: Can apply principles to reasoning process
+- **<EntityLink id="mech-interp">Mechanistic Interpretability</EntityLink>**: Could verify internal reasoning matches shown reasoning
 
 ### Key Distinctions
 
@@ -272,7 +272,7 @@ Process supervision relates to the <EntityLink id="ai-transition-model" /> throu
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Improves transparency but doesn't solve fundamental alignment |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Improves transparency but doesn't solve fundamental alignment |
 | <EntityLink id="ai-capability-level" /> | Reasoning quality | Improves model reasoning capabilities |
 
 Process supervision represents solid incremental progress on making AI reasoning transparent, though it doesn't solve the fundamental challenge of overseeing superhuman systems.
