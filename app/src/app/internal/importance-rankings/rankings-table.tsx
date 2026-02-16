@@ -30,7 +30,7 @@ function RankWithScore({
   );
 }
 
-const importanceThresholds: [number, string][] = [
+const readerThresholds: [number, string][] = [
   [90, "text-purple-500"],
   [70, "text-violet-500"],
   [50, "text-indigo-500"],
@@ -88,16 +88,16 @@ const columns: ColumnDef<PageRankingItem>[] = [
     filterFn: "includesString",
   },
   {
-    accessorKey: "importanceRank",
+    accessorKey: "readerRank",
     sortUndefined: "last",
     header: ({ column }) => (
       <SortableHeader column={column}>Readership</SortableHeader>
     ),
     cell: ({ row }) => (
       <RankWithScore
-        rank={row.original.importanceRank}
-        score={row.original.importance}
-        thresholds={importanceThresholds}
+        rank={row.original.readerRank}
+        score={row.original.readerImportance}
+        thresholds={readerThresholds}
       />
     ),
   },
@@ -160,7 +160,7 @@ export function RankingsTable({ data }: { data: PageRankingItem[] }) {
       columns={columns}
       data={data}
       searchPlaceholder="Search pages..."
-      defaultSorting={[{ id: "importanceRank", desc: false }]}
+      defaultSorting={[{ id: "readerRank", desc: false }]}
     />
   );
 }

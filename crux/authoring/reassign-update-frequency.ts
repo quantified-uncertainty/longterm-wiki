@@ -133,7 +133,7 @@ interface PageData {
   filePath: string;
   title: string;
   subcategory: string | null;
-  importance: string | null;
+  readerImportance: string | null;
   currentFreq: number;
   firstParagraph: string;
   path: string;
@@ -379,7 +379,7 @@ async function main(): Promise<void> {
       filePath,
       title: (fm.title as string) || relative(CONTENT_DIR, filePath),
       subcategory: (fm.subcategory as string) || null,
-      importance: (fm.importance as string) || null,
+      readerImportance: (fm.readerImportance as string) || null,
       currentFreq: Number(fm.update_frequency),
       firstParagraph: getFirstParagraph(content),
       path: getPathContext(filePath),

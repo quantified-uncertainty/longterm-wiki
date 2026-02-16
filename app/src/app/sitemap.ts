@@ -9,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${SITE_URL}${getEntityHref(page.id)}`,
     lastModified: page.lastUpdated ?? undefined,
     changeFrequency: deriveChangeFrequency(page.updateFrequency ?? null),
-    priority: derivePriority(page.importance),
+    priority: derivePriority(page.readerImportance),
   }));
 
   const staticEntries: MetadataRoute.Sitemap = [

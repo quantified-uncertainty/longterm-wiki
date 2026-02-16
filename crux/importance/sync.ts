@@ -4,7 +4,7 @@
  * Sync Importance Scores
  *
  * Derives 0-100 scores from both ranking files and writes them to page frontmatter.
- *   - importance:          from data/importance-ranking.yaml (readership)
+ *   - readerImportance:    from data/importance-ranking.yaml (readership)
  *   - researchImportance:  from data/research-ranking.yaml  (research)
  *
  * Usage:
@@ -26,7 +26,7 @@ const apply = args.apply === true;
 
 /** Field name in frontmatter for each dimension. */
 const FRONTMATTER_FIELDS: Record<string, string> = {
-  readership: 'importance',
+  readership: 'readerImportance',
   research: 'researchImportance',
 };
 
@@ -83,26 +83,26 @@ function syncDimension(
       let updated: string;
       if (match) {
         updated = content.replace(fieldRegex, `${field}: ${newScore}`);
-      } else if (field === 'importance') {
-        // Insert importance after quality line
+      } else if (field === 'readerImportance') {
+        // Insert readerImportance after quality line
         const qualityMatch = content.match(/^quality:\s*[\d.]+\s*$/m);
         if (qualityMatch) {
           updated = content.replace(
             /^(quality:\s*[\d.]+)\s*$/m,
-            `$1\nimportance: ${newScore}`,
+            `$1\nreaderImportance: ${newScore}`,
           );
         } else {
           updated = content.replace(
             /^(---\n(?:.*\n)*?title:\s*.+)$/m,
-            `$1\nimportance: ${newScore}`,
+            `$1\nreaderImportance: ${newScore}`,
           );
         }
       } else {
         // Insert researchImportance after importance line, or after quality
-        const impMatch = content.match(/^importance:\s*[\d.]+\s*$/m);
+        const impMatch = content.match(/^readerImportance:\s*[\d.]+\s*$/m);
         if (impMatch) {
           updated = content.replace(
-            /^(importance:\s*[\d.]+)\s*$/m,
+            /^(readerImportance:\s*[\d.]+)\s*$/m,
             `$1\n${field}: ${newScore}`,
           );
         } else {

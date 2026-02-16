@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function ImportanceRankingsPage() {
   const items = getPageRankings();
 
-  const withImportance = items.filter((i) => i.importance != null).length;
+  const withImportance = items.filter((i) => i.readerImportance != null).length;
   const withResearch = items.filter((i) => i.researchImportance != null).length;
 
   return (

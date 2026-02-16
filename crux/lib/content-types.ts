@@ -23,7 +23,7 @@ export interface Frontmatter {
   sidebar?: { label?: string; order?: number; hidden?: boolean; badge?: unknown };
   pageType?: 'content' | 'stub' | 'documentation';
   quality?: number;
-  importance?: number;
+  readerImportance?: number;
   tractability?: number;
   neglectedness?: number;
   uncertainty?: number;
@@ -104,7 +104,7 @@ export interface PageEntry {
   filePath?: string;
   title: string;
   quality?: number;
-  importance?: number | null;
+  readerImportance?: number | null;
   tractability?: number | null;
   neglectedness?: number | null;
   uncertainty?: number | null;

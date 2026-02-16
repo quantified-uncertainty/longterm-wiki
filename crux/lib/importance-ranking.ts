@@ -11,7 +11,7 @@
  * Numeric 0-100 scores in page frontmatter are derived from ranking positions.
  *
  * Data files:
- *   data/importance-ranking.yaml      (readership ranking)
+ *   data/reader-importance-ranking.yaml (readership ranking)
  *   data/research-ranking.yaml        (research importance ranking)
  */
 
@@ -29,7 +29,7 @@ import { findMdxFiles } from './file-utils.ts';
 export const RANKING_DIR = join(PROJECT_ROOT, 'data');
 
 export const RANKING_FILES: Record<string, string> = {
-  readership: join(RANKING_DIR, 'importance-ranking.yaml'),
+  readership: join(RANKING_DIR, 'reader-importance-ranking.yaml'),
   research: join(RANKING_DIR, 'research-ranking.yaml'),
 };
 

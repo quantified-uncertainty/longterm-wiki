@@ -150,7 +150,7 @@ export function SearchDialog() {
     // (actual lastUpdated would need index schema change; importance is a
     // reasonable heuristic for now since important pages tend to be maintained)
     if (sortKey === "recent") {
-      sorted.sort((a, b) => (b.importance ?? 0) - (a.importance ?? 0));
+      sorted.sort((a, b) => (b.readerImportance ?? 0) - (a.readerImportance ?? 0));
     }
     return sorted;
   }, [filteredResults, sortKey]);

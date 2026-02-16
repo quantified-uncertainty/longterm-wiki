@@ -174,7 +174,7 @@ function scanContentEntityLinks(pages, entityMap, numericIdToSlug) {
  *   5. Shared tags                    (weight varies by specificity)
  *
  * Quality boost: Each neighbor's raw score is multiplied by a gentle factor
- * based on the target page's quality and importance ratings:
+ * based on the target page's quality and readerImportance ratings:
  *   boost = 1 + quality/40 + importance/400   (max ~1.45x)
  * Unrated pages default to average values (q=5, imp=50 → 1.25x) so they
  * aren't penalized vs rated pages. This nudges high-quality content up
@@ -311,7 +311,7 @@ function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
         // Unrated pages get average defaults so they aren't penalized.
         const targetPage = pageMap.get(targetId);
         const q = targetPage?.quality ?? 5;
-        const imp = targetPage?.importance ?? 50;
+        const imp = targetPage?.readerImportance ?? 50;
         const boost = 1 + q / 40 + imp / 400;
         const e = entityMap.get(targetId);
         const entry = {
@@ -456,7 +456,7 @@ function buildPagesRegistry(urlToResource) {
           filePath: relative(CONTENT_DIR, fullPath),
           title: fm.title || id.replace(/-/g, ' '),
           quality: currentQuality,
-          importance: fm.importance != null ? Number(fm.importance) : null,
+          readerImportance: fm.readerImportance != null ? Number(fm.readerImportance) : null,
           researchImportance: fm.researchImportance != null ? Number(fm.researchImportance) : null,
           // Content format: article (default), table, diagram, index, dashboard
           contentFormat: fm.contentFormat || 'article',
