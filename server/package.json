@@ -1,0 +1,27 @@
+{
+  "name": "longterm-wiki-server",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/migrate.ts",
+    "db:seed": "tsx src/seed.ts",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "drizzle-orm": "^0.38.0",
+    "hono": "^4.7.0",
+    "postgres": "^3.4.0",
+    "gray-matter": "^4.0.3",
+    "yaml": "^2.7.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.30.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

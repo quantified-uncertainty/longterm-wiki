@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: longterm-wiki-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: longterm_wiki
+      POSTGRES_USER: wiki
+      POSTGRES_PASSWORD: wiki_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

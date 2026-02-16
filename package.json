@@ -10,7 +10,12 @@
     "test:crux": "vitest run --config crux/vitest.config.ts",
     "validate": "node --import tsx/esm crux/crux.mjs validate",
     "crux": "node --import tsx/esm crux/crux.mjs",
-    "typecheck:tooling": "tsc --noEmit -p crux/tsconfig.json"
+    "typecheck:tooling": "tsc --noEmit -p crux/tsconfig.json",
+    "server": "pnpm --filter longterm-wiki-server dev",
+    "server:start": "pnpm --filter longterm-wiki-server start",
+    "db:generate": "pnpm --filter longterm-wiki-server db:generate",
+    "db:migrate": "pnpm --filter longterm-wiki-server db:migrate",
+    "db:seed": "pnpm --filter longterm-wiki-server db:seed"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
