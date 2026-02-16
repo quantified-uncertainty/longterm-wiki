@@ -2380,7 +2380,7 @@
     - governance
   lastUpdated: 2026-02
 - id: pre-tai-capital-deployment
-  numericId: E700
+  numericId: E706
   type: model
   title: "Pre-TAI Capital Deployment: $100B-$300B+ Spending Analysis"
   description: >-
@@ -2415,7 +2415,7 @@
     - community
   lastUpdated: 2026-02
 - id: ai-megaproject-infrastructure
-  numericId: E701
+  numericId: E707
   type: model
   title: "AI Megaproject Infrastructure"
   description: >-
@@ -2443,7 +2443,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: safety-spending-at-scale
-  numericId: E702
+  numericId: E708
   type: model
   title: "Safety Spending at Scale"
   description: >-
