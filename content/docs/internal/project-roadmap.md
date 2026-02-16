@@ -5,7 +5,7 @@ sidebar:
   order: 10
 lastEdited: "2026-01-02"
 importance: 6
-researchImportance: 87
+researchImportance: 5.5
 quality: 29
 llmSummary: "Internal project roadmap tracking wiki infrastructure status (14 validators, quality grading, dashboard all complete as of Jan 2026) and future priorities including batch content improvement for high-importance/low-quality pages and increased citation coverage. Emphasizes pragmatic approach: avoid over-engineering, adapt style guidelines to content."
 ratings:

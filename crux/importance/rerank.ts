@@ -102,26 +102,36 @@ Respond with ONLY "A" or "B".`,
   },
 
   research: {
-    sort: `You are ranking wiki pages by RESEARCH IMPORTANCE — which topics would yield the most valuable new insights if deeply investigated?
+    sort: `You are ranking wiki pages by RESEARCH VALUE — where would a small research team's time be BEST SPENT doing original investigation?
 
-This is NOT about which topic is broadly important. It's about where DEEPER RESEARCH would have the highest marginal value. The best topics are narrow but incredibly important — investigating them further could reveal critical insights.
+CRITICAL: This ranking must be VERY DIFFERENT from a "readership importance" ranking. Broad, well-known topics like "AI Capabilities", "Existential Risk", "AI Alignment", or "Superintelligence" should rank MIDDLE or LOW here — they are important for readers, but a wiki research team investigating "AI Capabilities" in general would produce vague, unfocused output. Research value comes from SPECIFICITY.
 
-Ranking criteria:
-1. **Insight potential**: Would deeper investigation reveal surprising findings that change how we think about AI risk? Narrow, specific topics often score highest here.
-2. **Neglectedness**: Is this topic under-researched relative to its potential importance? Under-explored angles on well-known problems rank very high.
-3. **Decision relevance**: Would new findings on this topic change what researchers, funders, or labs should do?
-4. **Crux resolution**: Does this topic contain unresolved disagreements that, if resolved, would significantly update views on AI risk?
+Think of it this way: if you had 40 hours to research ONE of these topics and write up findings, which would produce the most decision-relevant, surprising insights?
 
-Calibration:
-- Narrow technical topics with open questions (mesa-optimization, sleeper agents, scaling unpredictability) > broad overviews (AI alignment, existential risk)
-- Under-studied risks and mechanisms > well-documented concepts
-- Topics with expert disagreement > topics with consensus
-- Specific empirical questions (eval saturation, capability elicitation) > philosophical frameworks
-- Concrete safety approaches needing validation > established techniques
-- Broad overview/index pages rank LOW — they compile knowledge, not generate it
-- Internal/meta pages (wiki documentation, project pages) rank LOWEST`,
+Ranking criteria (in priority order):
+1. **Specificity + tractability**: Can this topic be meaningfully investigated in a bounded way? Narrow questions ("How reliable are scaling laws beyond current training runs?", "What fraction of AI safety orgs use evals?") >> broad categories ("AI governance", "AI capabilities")
+2. **Neglectedness**: Is there surprisingly little good analysis despite the topic mattering? Under-explored mechanisms, under-studied risks, emerging phenomena with thin literature
+3. **Crux resolution**: Does this topic contain disagreements that, if resolved with evidence, would change what researchers or funders do?
+4. **Surprise potential**: Could investigation overturn conventional wisdom or reveal non-obvious dynamics?
 
-    compare: `You are ranking wiki pages by RESEARCH IMPORTANCE — which topic would yield more valuable new insights if deeply investigated? Think about neglectedness, insight potential, and whether findings would change important decisions.
+WHAT RANKS HIGH:
+- Specific technical phenomena with open empirical questions (scaling unpredictability, mesa-optimization failure modes, eval saturation patterns)
+- Under-studied risk mechanisms (racing dynamics between labs, concrete paths from AI to bioweapons, value lock-in scenarios)
+- Topics where smart people visibly disagree and data could resolve it
+- Emerging areas where the conventional wisdom hasn't formed yet
+- Specific policy interventions that haven't been empirically evaluated
+
+WHAT RANKS LOW (even if important for readers):
+- Broad overview/umbrella topics (AI capabilities, existential risk, AI alignment, AI safety) — too vague for productive research
+- Well-documented concepts with consensus understanding (Turing test, Moore's law, transformer architecture)
+- People and organization profile pages — biographical, not researchable
+- Internal/meta/project pages — wiki infrastructure
+- Abstract philosophical frameworks — hard to make empirical progress on
+- "Factor overview" pages that aggregate sub-topics — the sub-topics themselves may rank high, but the overview is just an index`,
+
+    compare: `You are ranking wiki pages by RESEARCH VALUE — where a small research team's time would be best spent doing original investigation. This is NOT about broad importance. A narrow, neglected topic with tractable open questions beats a famous broad topic every time. "Scaling unpredictability" >> "AI capabilities". "Racing dynamics" >> "AI governance".
+
+Which topic would yield more surprising, decision-relevant findings from 40 hours of focused research?
 
 Respond with ONLY "A" or "B".`,
   },

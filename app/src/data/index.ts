@@ -504,7 +504,9 @@ export interface PageRankingItem {
   title: string;
   quality: number | null;
   importance: number | null;
+  importanceRank: number | null;
   researchImportance: number | null;
+  researchRank: number | null;
   category: string;
   wordCount: number;
 }
@@ -513,7 +515,7 @@ export function getPageRankings(): PageRankingItem[] {
   const db = getDatabase();
   const pages = db.pages || [];
 
-  return pages
+  const items = pages
     .filter((p: Page) => p.importance != null || p.researchImportance != null)
     .map((p: Page) => ({
       id: p.id,
@@ -521,11 +523,23 @@ export function getPageRankings(): PageRankingItem[] {
       title: p.title,
       quality: p.quality,
       importance: p.importance,
+      importanceRank: null as number | null,
       researchImportance: p.researchImportance,
+      researchRank: null as number | null,
       category: p.category,
       wordCount: p.wordCount ?? p.metrics?.wordCount ?? 0,
-    }))
-    .sort((a: PageRankingItem, b: PageRankingItem) => (b.importance ?? 0) - (a.importance ?? 0));
+    }));
+
+  // Derive ranks from score ordering (scores are derived from rank, so this recovers position)
+  const byImportance = items.filter((i) => i.importance != null).sort((a, b) => (b.importance ?? 0) - (a.importance ?? 0));
+  byImportance.forEach((item, idx) => { item.importanceRank = idx + 1; });
+
+  const byResearch = items.filter((i) => i.researchImportance != null).sort((a, b) => (b.researchImportance ?? 0) - (a.researchImportance ?? 0));
+  byResearch.forEach((item, idx) => { item.researchRank = idx + 1; });
+
+  // Default sort by readership importance
+  items.sort((a, b) => (b.importance ?? 0) - (a.importance ?? 0));
+  return items;
 }
 
 export interface PageChangeItem {

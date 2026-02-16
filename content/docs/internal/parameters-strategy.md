@@ -3,7 +3,7 @@ title: "Parameters Strategy"
 description: "Strategy for AI transition model parameters"
 pageType: "documentation"
 importance: 34
-researchImportance: 90
+researchImportance: 66
 quality: 3
 llmSummary: "Internal project management document providing implementation instructions for creating parameter pages in a knowledge base. Outlines workflow, templates, and batch assignments for parallel development work."
 ratings:

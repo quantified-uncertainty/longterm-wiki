@@ -5,6 +5,55 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import type { PageRankingItem } from "@/data";
 
+function RankWithScore({
+  rank,
+  score,
+  thresholds,
+}: {
+  rank: number | null;
+  score: number | null;
+  thresholds: [number, string][];
+}) {
+  if (rank == null || score == null)
+    return <span className="text-muted-foreground/40">-</span>;
+  const color =
+    thresholds.find(([t]) => score >= t)?.[1] ?? "text-muted-foreground";
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span className="text-xs tabular-nums font-semibold text-foreground">
+        #{rank}
+      </span>
+      <span className={`text-[11px] tabular-nums ${color}`}>
+        ({Math.round(score)})
+      </span>
+    </span>
+  );
+}
+
+const importanceThresholds: [number, string][] = [
+  [90, "text-purple-500"],
+  [70, "text-violet-500"],
+  [50, "text-indigo-500"],
+  [30, "text-slate-400"],
+  [0, "text-slate-400/60"],
+];
+
+const researchThresholds: [number, string][] = [
+  [90, "text-orange-500"],
+  [70, "text-amber-500"],
+  [50, "text-yellow-600"],
+  [30, "text-slate-400"],
+  [0, "text-slate-400/60"],
+];
+
+const qualityThresholds: [number, string][] = [
+  [80, "text-emerald-500"],
+  [60, "text-blue-500"],
+  [40, "text-amber-500"],
+  [20, "text-red-500"],
+  [0, "text-slate-400/60"],
+];
+
 function ScoreBadge({
   value,
   thresholds,
@@ -21,30 +70,6 @@ function ScoreBadge({
     </span>
   );
 }
-
-const importanceThresholds: [number, string][] = [
-  [90, "text-purple-500 font-semibold"],
-  [70, "text-violet-500"],
-  [50, "text-indigo-500"],
-  [30, "text-slate-400"],
-  [0, "text-slate-400/60"],
-];
-
-const researchThresholds: [number, string][] = [
-  [90, "text-orange-500 font-semibold"],
-  [70, "text-amber-500"],
-  [50, "text-yellow-600"],
-  [30, "text-slate-400"],
-  [0, "text-slate-400/60"],
-];
-
-const qualityThresholds: [number, string][] = [
-  [80, "text-emerald-500"],
-  [60, "text-blue-500"],
-  [40, "text-amber-500"],
-  [20, "text-red-500"],
-  [0, "text-slate-400/60"],
-];
 
 const columns: ColumnDef<PageRankingItem>[] = [
   {
@@ -63,25 +88,27 @@ const columns: ColumnDef<PageRankingItem>[] = [
     filterFn: "includesString",
   },
   {
-    accessorKey: "importance",
+    accessorKey: "importanceRank",
     header: ({ column }) => (
       <SortableHeader column={column}>Readership</SortableHeader>
     ),
     cell: ({ row }) => (
-      <ScoreBadge
-        value={row.original.importance}
+      <RankWithScore
+        rank={row.original.importanceRank}
+        score={row.original.importance}
         thresholds={importanceThresholds}
       />
     ),
   },
   {
-    accessorKey: "researchImportance",
+    accessorKey: "researchRank",
     header: ({ column }) => (
       <SortableHeader column={column}>Research</SortableHeader>
     ),
     cell: ({ row }) => (
-      <ScoreBadge
-        value={row.original.researchImportance}
+      <RankWithScore
+        rank={row.original.researchRank}
+        score={row.original.researchImportance}
         thresholds={researchThresholds}
       />
     ),
@@ -131,7 +158,7 @@ export function RankingsTable({ data }: { data: PageRankingItem[] }) {
       columns={columns}
       data={data}
       searchPlaceholder="Search pages..."
-      defaultSorting={[{ id: "importance", desc: true }]}
+      defaultSorting={[{ id: "importanceRank", desc: false }]}
     />
   );
 }
