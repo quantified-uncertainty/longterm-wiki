@@ -1,0 +1,155 @@
+---
+title: Singapore Consensus on AI Safety Research Priorities
+description: Consensus document from the 2025 Singapore Conference on AI (SCAI), authored by 88 researchers from 11 countries including Yoshua Bengio, Stuart Russell, Max Tegmark, and Dawn Song. Organizes AI safety research into a defence-in-depth framework across three areas (Assessment, Development, Control) and identifies areas of mutual interest where even competitors benefit from cooperation.
+sidebar:
+  order: 66
+quality: 45
+llmSummary: The Singapore Consensus on Global AI Safety Research Priorities (arXiv:2506.20702) is a consensus document produced by the April 2025 SCAI conference alongside ICLR 2025, authored by 88 researchers from 11 countries. Building on the 2025 International AI Safety Report, it organizes AI safety research into three defence-in-depth areas—Assessment (risk measurement, metrology, third-party audits), Development (specification, training, verification of trustworthy systems), and Control (post-deployment monitoring, ecosystem oversight, societal resilience). It proposes limiting AGI risk by constraining autonomy, generality, or intelligence dimensions, and advocates non-agentic AI monitoring agentic systems. Uniquely identifies areas of mutual interest for cooperation even among competitors.
+lastEdited: "2026-02-16"
+importance: 65
+update_frequency: 45
+ratings:
+  novelty: 6
+  rigor: 7
+  actionability: 5.5
+  completeness: 6.5
+clusters:
+  - ai-safety
+  - governance
+subcategory: governance-international
+entityType: approach
+---
+import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+
+<DataExternalLinks pageId="singapore-consensus" />
+
+<DataInfoBox entityId="E694" />
+
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Scope** | Technical AI safety research priorities | Covers general-purpose AI including LLMs, multimodal models, and AI agents |
+| **Framework** | Defence-in-depth (Assessment, Development, Control) | Three complementary areas that reinforce each other |
+| **Consensus Level** | 88 co-authors from 11 countries | Researchers from academia, industry, and government across geopolitical lines |
+| **Building On** | 2025 International AI Safety Report | Extends findings from the report backed by 33 governments |
+| **Novel Contribution** | Areas of mutual interest for competitor cooperation | Draws aviation safety parallels for shared risk thresholds and benchmarks |
+| **Binding Force** | None—scientific consensus document | Intended to inform policymakers, not create obligations |
+| **Policy Channel** | Presented at ATxSummit ministerial roundtable (May 2025) | Bridges AI research community and digital ministers |
+
+## Overview
+
+The **Singapore Consensus on Global AI Safety Research Priorities** is a consensus document produced by the 2025 Singapore Conference on AI: International Scientific Exchange on AI Safety (SCAI), held on April 26, 2025, alongside ICLR 2025 in Singapore. The document was designed by an Expert Planning Committee consisting of <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>, Tegan Maharaj, Luke Ong, <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, Dawn Song, <EntityLink id="max-tegmark">Max Tegmark</EntityLink>, Lan Xue, and Ya-Qin Zhang, with 80 additional co-authors contributing feedback through several rounds of revision.[^1]
+
+The Consensus builds on the 2025 International AI Safety Report (chaired by Bengio, backed by 33 governments) and aims to synthesize research priorities with broad agreement among diverse researchers. Its scope is limited to technical safety research for general-purpose AI (GPAI), including language models, multimodal models, and general-purpose agents—systems capable of performing or adapting to perform a wide range of tasks, particularly those that autonomously act and plan to accomplish complex tasks with minimal human oversight.
+
+The document adopts a **defence-in-depth model**, organizing AI safety research into three complementary areas: challenges with evaluating AI risks (Assessment), challenges with creating trustworthy AI systems (Development), and challenges with monitoring and intervening after deployment (Control). This framework ensures that failures in any single area are caught by the others.
+
+## The Three-Area Framework
+
+<Mermaid chart={`
+flowchart TD
+    subgraph ASSESS["Area 1: Assessment"]
+        A1[Risk measurement methods]
+        A2[Enhanced metrology]
+        A3[Third-party audit infrastructure]
+    end
+
+    subgraph DEVELOP["Area 2: Development"]
+        D1[Specification & validation]
+        D2[Training & design]
+        D3[Verification]
+    end
+
+    subgraph CONTROL["Area 3: Control"]
+        C1[System-level monitoring]
+        C2[Ecosystem-wide oversight]
+        C3[Societal resilience]
+    end
+
+    ASSESS -->|Informs design| DEVELOP
+    DEVELOP -->|Enables deployment| CONTROL
+    CONTROL -->|Reveals gaps| ASSESS
+
+    style ASSESS fill:#4A90D9
+    style DEVELOP fill:#7AB648
+    style CONTROL fill:#D97A4A
+`} />
+
+### Area 1: Risk Assessment
+
+The primary goal of risk assessment is to understand the severity and likelihood of potential harms. The Consensus identifies three sub-areas:
+
+**A. Developing methods to measure AI system impacts:** This includes standardized assessments for risky behaviors through audit techniques and benchmarks, evaluation of new capabilities (including potentially dangerous ones), and real-world societal impact assessment through field tests and prospective risk analysis.
+
+**B. Enhanced metrology:** Technical methods for quantitative risk assessment tailored to AI systems, aimed at reducing uncertainty and the need for large safety margins.
+
+**C. Third-party audit infrastructure:** Secure infrastructure enabling thorough evaluation while protecting intellectual property and preventing model theft.
+
+Key research topics include:
+- **Downstream impact forecasting**: Assessing societal impacts (labor, misinformation, privacy) through usage data, trend analysis, and risk modeling, including "uplift studies" on malicious use capabilities
+- **Loss-of-control risk assessment**: Assessing risks where advanced AI systems operate outside human control, potentially actively undermining control measures, including assessing AI agency, oversight evasion, persuasion, and resource acquisition capabilities
+
+The Consensus notes a lack of expert consensus on the likelihood of severe loss-of-control scenarios, underscoring the need for improved methodology.
+
+### Area 2: Development of Trustworthy Systems
+
+Following a classic safety engineering framework, this area covers specifying desired behavior, designing systems to meet specifications, and verifying compliance:
+
+**A. Specification & validation:** Defining how the system should behave and ensuring the definition meets user and societal needs.
+
+**B. Training & design:** New approaches to training data curation, robustness testing, and model editing to ensure systems resist tampering, jailbreaks, and misuse.
+
+**C. Verification:** Safety engineering approaches that formally specify, build, and verify safe functionality.
+
+The Consensus introduces two notable concepts:
+
+- **Limiting AGI risk dimensions**: A framework categorizing AGI as the convergence of autonomy, generality, and intelligence—suggesting risk mitigation by deliberately limiting one or more attributes in system design
+- **Non-agentic guardrails**: Using non-agentic AI systems to monitor agentic systems' proposed actions and intervene by blocking them if needed, including a "Scientist AI" that estimates the probability that a candidate action violates safety specifications
+
+### Area 3: Control and Societal Resilience
+
+This area addresses post-deployment challenges through feedback-loop interventions:
+
+- **System-level monitoring and intervention**: Scalable <EntityLink id="interpretability">interpretability</EntityLink> and red-teaming methods that reveal failures in real-world environments, especially multi-agent contexts
+- **Ecosystem-wide monitoring**: Continuous oversight extending beyond individual systems to the broader AI ecosystem
+- **Societal resilience research**: Strengthening societal infrastructure (economic, security) against AI-enabled disruption and misuse
+- **AI control setups**: Monitoring and intervention mechanisms that work even if the underlying untrusted AI system actively attempts to subvert safeguards
+
+## Areas of Mutual Interest
+
+Unlike previous safety reports, the Singapore Consensus explicitly identifies areas where stakeholders—including rival companies and nations—may benefit from cooperation. The authors draw comparisons to **aviation safety**, where fierce competitors collaborate to prevent accidents because shared safety standards benefit everyone.
+
+| Area of Mutual Interest | Why Competitors Benefit | Precedent |
+|--------------------------|------------------------|-----------|
+| **Shared risk thresholds** | Common understanding of when intervention is needed reduces regulatory uncertainty | Aviation safety standards |
+| **Evaluation protocols** | Standardized testing enables fairer comparison and reduces duplicated effort | Medical device testing |
+| **Safety benchmarks** | Shared baselines raise the floor for all actors and build public trust | Financial stress testing |
+
+The Consensus emphasizes that carefully defined risk thresholds are the first example—actors may find it in their self-interest to share them widely or cooperate on their development, even with competitors.
+
+## Context Within the Summit Series
+
+The Singapore Consensus occupies a distinct position within the evolving <EntityLink id="international-summits">international AI safety summit</EntityLink> series. While the Bletchley (2023), Seoul (2024), and Paris (2025) summits were government-led diplomatic convenings focused on declarations and commitments, SCAI was a researcher-driven conference focused specifically on technical research priorities.
+
+| Dimension | Diplomatic Summits | SCAI Singapore |
+|-----------|--------------------|----------------|
+| **Led by** | Governments | Researchers |
+| **Output** | Declarations, commitments | Consensus research priorities |
+| **Binding force** | Non-binding political commitments | Scientific consensus document |
+| **Participation** | 28-100+ countries | 88 researchers from 11 countries |
+| **Focus** | Risk recognition, institutional building | Technical safety research agenda |
+
+This researcher-driven approach was particularly significant following the Paris summit, where the US and UK refused to sign the declaration, raising concerns about fracturing political consensus. SCAI demonstrated that scientific consensus on AI safety priorities could be maintained across geopolitical lines even when diplomatic alignment weakened.
+
+## Limitations
+
+- **No enforcement mechanism**: Like the diplomatic summits, the Consensus relies on voluntary adoption by researchers, companies, and governments
+- **Scope limited to GPAI**: Does not address narrow AI systems, autonomous weapons specifically, or non-technical governance challenges
+- **Consensus by design**: Deliberately avoids areas of genuine disagreement (such as the likelihood of loss-of-control scenarios), which may limit usefulness on the most contested questions
+- **Living document**: Continues to evolve, meaning the research priorities may shift as the community revises them
+- **Implementation gap**: Identifying research priorities does not guarantee funding, talent allocation, or institutional support for pursuing them
+
+## Sources
+
+[^1]: Bengio, Y., Maharaj, T., Ong, L., Russell, S., Song, D., Tegmark, M., Xue, L., Zhang, Y-Q., et al. (2025). The Singapore Consensus on Global AI Safety Research Priorities. arXiv:2506.20702.
