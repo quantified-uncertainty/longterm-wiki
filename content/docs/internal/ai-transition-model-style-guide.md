@@ -4,8 +4,8 @@ description: "Style guide for AI Transition Model factor, scenario, and paramete
 pageType: "documentation"
 sidebar:
   order: 12
-importance: 34
-researchImportance: 56.5
+importance: 38
+researchImportance: 60.5
 quality: 32
 llmSummary: "Internal style guide documenting YAML-first architecture for AI Transition Model pages, specifying that ratings and metadata live in YAML while MDX contains only custom prose. Provides validation workflows and anti-patterns for maintaining consistency across factor, parameter, and scenario entities."
 ratings:
