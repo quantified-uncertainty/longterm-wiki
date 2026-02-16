@@ -165,7 +165,7 @@ print(f\"Total: {data['total_count']} checks\")
 ## Key Conventions
 
 - **Path aliases**: Use `@/`, `@components/`, `@data/`, `@lib/` in app code
-- **Entity types** (defined in `crux/lib/category-entity-types.ts`): person, organization, risk, approach, model, concept, intelligence-paradigm, capability, crux, debate, event, metric, project
+- **Entity types**: Canonical list in `app/src/data/entity-type-names.ts`. Category-mapped types (used by page creator): person, organization, risk, approach, model, concept, intelligence-paradigm, capability, crux, debate, event, metric, project. Additional types include: risk-factor, safety-agenda, policy, case-study, scenario, resource, funder, historical, analysis, parameter, argument, table, diagram, insight
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
 - **Squiggle models**: See `app/CLAUDE.md` for SquiggleEstimate style guide

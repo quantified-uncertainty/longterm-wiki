@@ -62,7 +62,7 @@ Commands:
 ${commandList}
 
 Options:
-  --tier=<t>        Quality tier: polish, standard, deep (improve/create)
+  --tier=<t>        Quality tier: budget/standard/premium (create), polish/standard/deep (improve)
   --directions=<d>  Specific improvement directions (improve)
   --output=<path>   Output file path (create)
   --batch=<n>       Batch size (regrade, grade-content)
