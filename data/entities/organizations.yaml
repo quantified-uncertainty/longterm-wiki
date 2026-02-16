@@ -2023,6 +2023,29 @@
     - epistemics
     - community
   lastUpdated: 2026-02
+- id: the-foundation-layer
+  numericId: E697
+  type: organization
+  title: The Foundation Layer
+  website: https://foundation-layer.ai
+  description: >-
+    A philanthropic guide and fund by Tyler John (Effective Institutions
+    Project) aimed at mobilizing major donors toward AI safety. The Foundation
+    Layer Fund has facilitated 100+ grants exceeding $70M across five
+    intervention areas: alignment science, nonproliferation, defensive
+    technology, power distribution, and talent mobilization.
+  relatedEntries:
+    - id: longview-philanthropy
+      type: organization
+      relationship: related
+    - id: coefficient-giving
+      type: organization
+      relationship: related
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  lastUpdated: 2026-02
 - id: the-sequences
   numericId: E570
   type: organization
@@ -2073,6 +2096,46 @@
     Balvi, and di
   clusters:
     - ai-safety
+    - community
+  lastUpdated: 2026-02
+- id: astralis-foundation
+  numericId: E698
+  type: organization
+  title: Astralis Foundation
+  website: https://astralisfoundation.org
+  relatedEntries:
+    - id: longview-philanthropy
+      type: organization
+      relationship: leads-to
+    - id: rethink-priorities
+      type: organization
+      relationship: leads-to
+    - id: beth-barnes
+      type: researcher
+      relationship: leads-to
+    - id: metr
+      type: organization
+      relationship: leads-to
+  sources:
+    - title: Astralis Foundation Website
+      url: https://astralisfoundation.org
+    - title: Astralis Foundation - Our People
+      url: https://astralisfoundation.org/our-people
+  description: >-
+    Astralis Foundation is a Swedish philanthropic organization focused on AI
+    safety and governance. It operates the Shared Horizons Fund and supports
+    initiatives such as the International Dialogues on AI Safety (IDAIS) and the
+    Nordics AI Safety Summit. Led by CEO Jona Glade and President Vilhelm
+    Skoglund, with offices in Stockholm, London, New York, and Vienna.
+  tags:
+    - ai-safety
+    - ai-governance
+    - philanthropy
+    - international-cooperation
+    - european-ai-policy
+  clusters:
+    - ai-safety
+    - governance
     - community
   lastUpdated: 2026-02
 - id: nvidia

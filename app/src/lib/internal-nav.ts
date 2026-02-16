@@ -43,6 +43,7 @@ export const INTERNAL_NAV: NavSection[] = [
       { label: "Automation Tools", href: "/internal/automation-tools" },
       { label: "Content Database", href: "/internal/content-database" },
       { label: "Page Similarity", href: "/internal/similarity" },
+      { label: "Critical Insights", href: "/internal/insights" },
     ],
   },
   {

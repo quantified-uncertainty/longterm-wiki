@@ -77,23 +77,28 @@ function DataTableWithTable<TData>({
         <TableHeader className="sticky top-0 z-20">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="hover:bg-transparent border-b-2 border-border/60">
-              {headerGroup.headers.map((header, idx) => (
-                <TableHead
-                  key={header.id}
-                  className={
-                    stickyFirstColumn && idx === 0
-                      ? "sticky left-0 z-30 bg-slate-100 dark:bg-slate-800 min-w-[180px] border-r border-border/40"
-                      : undefined
-                  }
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
-              ))}
+              {headerGroup.headers.map((header, idx) => {
+                const colSize = header.column.columnDef.size
+                const hasCustomSize = colSize !== undefined && colSize !== 150
+                return (
+                  <TableHead
+                    key={header.id}
+                    className={
+                      stickyFirstColumn && idx === 0
+                        ? "sticky left-0 z-30 bg-slate-100 dark:bg-slate-800 min-w-[180px] border-r border-border/40"
+                        : undefined
+                    }
+                    style={hasCustomSize ? { width: colSize } : undefined}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                )
+              })}
             </TableRow>
           ))}
         </TableHeader>
@@ -110,21 +115,26 @@ function DataTableWithTable<TData>({
                     data-state={row.getIsSelected() && "selected"}
                     className={rowClassName}
                   >
-                    {row.getVisibleCells().map((cell, idx) => (
-                      <TableCell
-                        key={cell.id}
-                        className={
-                          stickyFirstColumn && idx === 0
-                            ? "sticky left-0 z-[5] bg-white dark:bg-slate-900 border-r border-border/40"
-                            : undefined
-                        }
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell, idx) => {
+                      const colSize = cell.column.columnDef.size
+                      const hasCustomSize = colSize !== undefined && colSize !== 150
+                      return (
+                        <TableCell
+                          key={cell.id}
+                          className={
+                            stickyFirstColumn && idx === 0
+                              ? "sticky left-0 z-[5] bg-white dark:bg-slate-900 border-r border-border/40"
+                              : undefined
+                          }
+                          style={hasCustomSize ? { width: colSize } : undefined}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      )
+                    })}
                   </TableRow>
                   {expandedContent && (
                     <TableRow>

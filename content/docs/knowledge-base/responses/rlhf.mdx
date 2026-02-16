@@ -22,20 +22,20 @@ import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 ## Overview
 
-Reinforcement Learning from Human Feedback (RLHF) and <EntityLink id="E451">Constitutional AI</EntityLink> (CAI) represent the dominant paradigm for aligning <EntityLink id="E186">large language models</EntityLink> with human preferences. These techniques have enabled the deployment of AI assistants like ChatGPT, Claude, and Llama by training models to be helpful, harmless, and honest through systematic preference optimization.
+Reinforcement Learning from Human Feedback (RLHF) and <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> (CAI) represent the dominant paradigm for aligning <EntityLink id="language-models">large language models</EntityLink> with human preferences. These techniques have enabled the deployment of AI assistants like ChatGPT, Claude, and Llama by training models to be helpful, harmless, and honest through systematic preference optimization.
 
-The core idea is simple: rather than relying solely on predefined objectives, use human judgments (or AI-generated judgments based on constitutional principles) to shape model behavior. This approach has proven remarkably effective for current systems. <EntityLink id="E218">OpenAI</EntityLink>'s InstructGPT demonstrated that a 1.3B parameter model trained with RLHF could outperform the 175B parameter GPT-3 in human evaluations—showing that alignment can be more data-efficient than raw scaling.
+The core idea is simple: rather than relying solely on predefined objectives, use human judgments (or AI-generated judgments based on constitutional principles) to shape model behavior. This approach has proven remarkably effective for current systems. <EntityLink id="openai">OpenAI</EntityLink>'s InstructGPT demonstrated that a 1.3B parameter model trained with RLHF could outperform the 175B parameter GPT-3 in human evaluations—showing that alignment can be more data-efficient than raw scaling.
 
-However, these techniques face fundamental challenges as AI systems approach and exceed human capabilities. The core problem is straightforward: RLHF relies on humans being able to evaluate model outputs, but superhuman AI systems will produce outputs too complex for reliable human assessment. This "<EntityLink id="E271">scalable oversight</EntityLink>" problem—how to supervise AI systems smarter than their supervisors—represents one of the central open questions in <EntityLink id="E439">AI alignment</EntityLink>.
+However, these techniques face fundamental challenges as AI systems approach and exceed human capabilities. The core problem is straightforward: RLHF relies on humans being able to evaluate model outputs, but superhuman AI systems will produce outputs too complex for reliable human assessment. This "<EntityLink id="scalable-oversight">scalable oversight</EntityLink>" problem—how to supervise AI systems smarter than their supervisors—represents one of the central open questions in <EntityLink id="alignment">AI alignment</EntityLink>.
 
 ### Risks Addressed
 
 | Risk | How RLHF/CAI Helps | Effectiveness |
 |------|-------------------|---------------|
-| <EntityLink id="E206" /> | Trains refusal behaviors for dangerous requests | Moderate—can be jailbroken |
-| <EntityLink id="E394" /> | Reduces toxic, biased, and deceptive content | High for current systems |
-| <EntityLink id="E151" /> | Shapes outputs toward intended behavior | Low—addresses symptoms, not root cause |
-| <EntityLink id="E93" /> | No direct mitigation | Very Low—cannot detect deception |
+| <EntityLink id="misuse" /> | Trains refusal behaviors for dangerous requests | Moderate—can be jailbroken |
+| <EntityLink id="accident-risks" /> | Reduces toxic, biased, and deceptive content | High for current systems |
+| <EntityLink id="goal-misgeneralization" /> | Shapes outputs toward intended behavior | Low—addresses symptoms, not root cause |
+| <EntityLink id="deceptive-alignment" /> | No direct mitigation | Very Low—cannot detect deception |
 
 ### Quick Assessment
 
@@ -401,11 +401,11 @@ Unlike traditional offline RLHF, <R id="ebcbaba2d260e656">online iterative RLHF<
 
 ## AI Transition Model Context
 
-RLHF improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="E205" />:
+RLHF improves the <EntityLink id="ai-transition-model" /> through <EntityLink id="misalignment-potential" />:
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Shapes model behavior toward human preferences, reducing misalignment |
-| <EntityLink id="E205" /> | <EntityLink id="E160" /> | Creates feedback loop between human evaluators and model training |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Shapes model behavior toward human preferences, reducing misalignment |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="human-oversight-quality" /> | Creates feedback loop between human evaluators and model training |
 
 RLHF effectiveness is bounded by the scalable oversight problem: as AI capabilities exceed human evaluation ability, the approach faces fundamental limits.

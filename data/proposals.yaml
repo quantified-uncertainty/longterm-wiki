@@ -1,0 +1,621 @@
+# Proposals Database
+# Narrow, speculative, tactical actions extracted from wiki pages.
+# Each proposal is a concrete thing someone could fund or execute.
+# Unlike broad "interventions" (compute governance, interpretability),
+# these are specific plays with cost/EV estimates and honest concerns.
+
+# ---------------------------------------------------------------------------
+# ANTHROPIC FOUNDER PLEDGES (from anthropic-pledge-enforcement / E411)
+# ---------------------------------------------------------------------------
+
+- id: daf-pre-commitment
+  name: Anthropic founder DAF pre-commitment
+  description: >-
+    Help Anthropic co-founders transfer equity to donor-advised funds before IPO,
+    when behavioral commitment cost is lowest. Donating appreciated stock avoids
+    ~37% capital gains tax vs. selling first. Pre-IPO commitment locks in giving
+    before the liquidity phase transition changes psychology.
+  sourcePageId: anthropic-pledge-enforcement
+  domain: philanthropic
+  stance: collaborative
+  costEstimate: "$300K-1M"
+  evEstimate: "$50-250M"
+  feasibility: high
+  honestConcerns: >-
+    DAFs are restricted to 501(c)(3) grants only — no political donations,
+    no lobbying, no 501(c)(4) organizations. Founders may already be planning
+    this without external prompting.
+  status: idea
+  leadOrganizations:
+    - Longview Philanthropy
+    - Coefficient Giving
+  relatedProposals:
+    - legal-pledge-conversion
+    - foundation-creation
+    - time-bound-commitments
+
+- id: public-accountability-tracking
+  name: Publish pledge follow-through tracking
+  description: >-
+    Publish annual reports tracking Anthropic founder pledge progress,
+    modeled on IPS's Giving Pledge analysis. Track public donations,
+    foundation/DAF transfers, and secondary market sales.
+  sourcePageId: anthropic-pledge-enforcement
+  domain: philanthropic
+  stance: adversarial
+  costEstimate: "$750K-2M (5yr)"
+  evEstimate: "$20-200M"
+  feasibility: medium
+  honestConcerns: >-
+    Most likely to backfire. Billionaire giving tracked publicly against their
+    will creates adversarial dynamics. Elon Musk example: publicly shamed for
+    years with zero behavior change.
+  status: idea
+  leadOrganizations:
+    - Giving What We Can
+  relatedProposals:
+    - daf-pre-commitment
+    - peer-influence
+
+- id: peer-influence
+  name: Connect founders with mega-philanthropists
+  description: >-
+    Connect Anthropic founders with mega-philanthropists who've followed through
+    on large pledges: Moskovitz, Mackenzie Scott, Chuck Feeney's legacy. Social
+    proof from peers is powerful.
+  sourcePageId: anthropic-pledge-enforcement
+  domain: philanthropic
+  stance: collaborative
+  costEstimate: "$100-500K"
+  evEstimate: "$5-50M"
+  feasibility: medium
+  honestConcerns: >-
+    Moskovitz already an Anthropic investor and Karnofsky works there —
+    connections already exist organically. Outside organizations "orchestrating"
+    peer influence feels manipulative if discovered.
+  status: idea
+  leadOrganizations:
+    - Longview Philanthropy
+  relatedProposals:
+    - daf-pre-commitment
+
+- id: legal-pledge-conversion
+  name: Convert pledges to binding legal instruments
+  description: >-
+    Work with top philanthropic attorneys to draft irrevocable trust instruments,
+    binding pledge agreements, or charitable LLCs. Approach founders through
+    trusted intermediaries. Near-certain fulfillment if adopted.
+  sourcePageId: anthropic-pledge-enforcement
+  domain: philanthropic
+  stance: adversarial
+  costEstimate: "$500K-2M"
+  evEstimate: "$50-350M"
+  feasibility: low
+  honestConcerns: >-
+    Founders chose non-binding pledges deliberately. Asking them to remove
+    flexibility is a big ask with ~3-10% acceptance probability.
+  status: idea
+  leadOrganizations:
+    - Longview Philanthropy
+  relatedProposals:
+    - daf-pre-commitment
+    - time-bound-commitments
+
+- id: time-bound-commitments
+  name: Upgrade vague pledges to time-bound milestones
+  description: >-
+    Encourage founders to upgrade vague "80% eventually" to specific milestones
+    (e.g., "50% within 5 years of IPO, 80% within 15 years"). Based on behavioral
+    science showing implementation intentions increase follow-through.
+  sourcePageId: anthropic-pledge-enforcement
+  domain: philanthropic
+  stance: adversarial
+  costEstimate: "$200-600K"
+  evEstimate: "$10-100M"
+  feasibility: low
+  honestConcerns: >-
+    Outside organizations telling billionaires when to give. Very low P(Agree),
+    could feel presumptuous.
+  status: idea
+  relatedProposals:
+    - legal-pledge-conversion
+    - daf-pre-commitment
+
+- id: foundation-creation
+  name: Full-service foundation setup for founders
+  description: >-
+    Offer full-service foundation setup: legal entity, tax structure, staffing
+    (ED, program officers), governance design, grantmaking strategy, cause area
+    research. Reduces the biggest practical barrier — effort of figuring how to
+    deploy billions.
+  sourcePageId: anthropic-pledge-enforcement
+  domain: philanthropic
+  stance: collaborative
+  costEstimate: "$1-5M"
+  evEstimate: "$30-150M"
+  feasibility: medium
+  honestConcerns: >-
+    At $7-10B per founder, they can hire McKinsey or Bridgespan. Counterfactual
+    value is in influencing mission, not providing services.
+  status: idea
+  leadOrganizations:
+    - Longview Philanthropy
+    - Coefficient Giving
+  relatedProposals:
+    - daf-pre-commitment
+
+- id: ltbt-governance-expansion
+  name: Expand LTBT mandate to include pledge monitoring
+  description: >-
+    Advocate for Anthropic's Long-Term Benefit Trust to include pledge monitoring
+    in its governance mandate. LTBT already has mission-accountability powers
+    (board appointment).
+  sourcePageId: anthropic-pledge-enforcement
+  domain: philanthropic
+  stance: adversarial
+  costEstimate: "$300K-1.5M"
+  evEstimate: "$10-100M"
+  feasibility: low
+  honestConcerns: >-
+    LTBT governs the company, not founders' personal wealth. Expanding mandate
+    to police personal financial decisions raises overreach questions. P(Adoption)
+    very low (2-8%).
+  status: idea
+  relatedProposals:
+    - legal-pledge-conversion
+
+# ---------------------------------------------------------------------------
+# EA SHAREHOLDER DIVERSIFICATION (from ea-shareholder-diversification-anthropic)
+# ---------------------------------------------------------------------------
+
+- id: expand-employee-buyback
+  name: Increase Anthropic employee buyback caps
+  description: >-
+    Raise per-person buyback cap from $2M to $10M+ for long-tenured employees;
+    increase eligible percentage from 20% to 30-40%; offer quarterly windows
+    instead of ad hoc; allow transfers to 501(c)(3) organizations as alternative.
+  sourcePageId: ea-shareholder-diversification-anthropic
+  domain: financial
+  stance: collaborative
+  costEstimate: "$2-8B company capital"
+  evEstimate: "Removes 20-40% illiquid equity concentration"
+  feasibility: medium
+  honestConcerns: >-
+    Significant cash outlay from Anthropic; weakens company control if many
+    shares redeemed.
+  status: idea
+  leadOrganizations:
+    - Anthropic
+  relatedProposals:
+    - secondary-market-sales
+    - ea-investment-vehicle
+
+- id: secondary-market-sales
+  name: Coordinate EA secondary market share sales
+  description: >-
+    Moskovitz and Tallinn should expand secondary market share sales through
+    platforms like Forge Global and Hiive. Target $1-5B additional moved pre-IPO
+    from Moskovitz alone; $500M-2B from Tallinn.
+  sourcePageId: ea-shareholder-diversification-anthropic
+  domain: financial
+  stance: neutral
+  costEstimate: "5-10% platform fees"
+  evEstimate: "Diversifies $1-5B, avoids 80% loss scenario"
+  feasibility: medium
+  honestConcerns: >-
+    ROFR provisions may block sales; 10-25% discounts typical; triggers capital
+    gains tax; perception of "cashing out" from Anthropic mission.
+  status: idea
+  leadOrganizations:
+    - Longview Philanthropy
+    - Coefficient Giving
+  relatedProposals:
+    - ea-investment-vehicle
+    - automated-selling-plans
+
+- id: ea-investment-vehicle
+  name: Purpose-built EA fund for Anthropic stakes
+  description: >-
+    EA-aligned foundations (Good Ventures, Coefficient Giving, Longview) or a new
+    vehicle should offer to purchase Anthropic shares from existing EA-aligned
+    shareholders, keeping capital within the EA ecosystem while providing liquidity.
+  sourcePageId: ea-shareholder-diversification-anthropic
+  domain: financial
+  stance: collaborative
+  costEstimate: "$500M-2B capital required"
+  evEstimate: "Keeps $2-5B EA-aligned while providing diversification"
+  feasibility: low
+  honestConcerns: >-
+    Concentrates risk within EA if vehicle invests heavily in Anthropic; requires
+    accredited investor structures; requires enormous capital commitment.
+  status: idea
+  leadOrganizations:
+    - Good Ventures
+    - Longview Philanthropy
+  relatedProposals:
+    - secondary-market-sales
+
+- id: automated-selling-plans
+  name: Set up 10b5-1 post-IPO auto-diversification
+  description: >-
+    All EA-aligned Anthropic holders should pre-arrange 10b5-1 plans (insider
+    trading compliant) that automatically sell 5-10% of holdings per quarter
+    post-lock-up, diversifying into broad market portfolio.
+  sourcePageId: ea-shareholder-diversification-anthropic
+  domain: financial
+  stance: neutral
+  costEstimate: "$0-50K legal fees"
+  evEstimate: "Guarantees systematic diversification"
+  feasibility: high
+  honestConcerns: >-
+    Locks in selling price; may miss market peaks; requires coordination among
+    multiple shareholders.
+  status: idea
+  relatedProposals:
+    - secondary-market-sales
+
+# ---------------------------------------------------------------------------
+# AI GOVERNANCE (from whistleblower-protections, evals-governance, etc.)
+# ---------------------------------------------------------------------------
+
+- id: pass-whistleblower-act
+  name: Pass AI Whistleblower Protection Act S.1792
+  description: >-
+    Enact bipartisan federal legislation prohibiting retaliation for AI safety
+    disclosures, nullifying NDAs for safety-related reporting, requiring anonymous
+    internal channels, and enabling private right of action with 2x back pay.
+    Already has 6 bipartisan co-sponsors.
+  sourcePageId: whistleblower-protections
+  domain: governance
+  stance: neutral
+  costEstimate: "Legislative process cost; moderate enforcement budget"
+  evEstimate: "Addresses systematic info asymmetry between labs and regulators"
+  feasibility: medium
+  honestConcerns: >-
+    Requires defining "protected disclosure" narrowly enough to prevent abuse
+    while broadly enough for novel AI risks. Balance with legitimate
+    confidentiality needs.
+  status: proposed
+  leadOrganizations:
+    - National Whistleblower Center
+  relatedProposals:
+    - labs-publish-whistleblower-policies
+
+- id: labs-publish-whistleblower-policies
+  name: All major labs publish whistleblower policies
+  description: >-
+    Anthropic, Google DeepMind, xAI, and Meta publish explicit, public
+    whistleblower protection policies including anonymous reporting, non-retaliation
+    guarantees, and board-level safety committee access. Match or exceed OpenAI's
+    published policy.
+  sourcePageId: whistleblower-protections
+  domain: governance
+  stance: collaborative
+  costEstimate: "$50-200K per lab"
+  evEstimate: "Increases employee confidence in safety reporting"
+  feasibility: high
+  honestConcerns: >-
+    Publishing policy without enforcement is governance theater. Employees may
+    not trust policies if enforcement history is unclear.
+  status: idea
+  leadOrganizations:
+    - Future of Life Institute
+  relatedProposals:
+    - pass-whistleblower-act
+
+- id: gpu-geolocation-verification
+  name: Deploy delay-based geolocation on export-controlled GPUs
+  description: >-
+    Implement delay-based verification firmware on export-controlled AI chips
+    (H100/H200, MI300) enabling coarse location verification through round-trip
+    latency to landmark servers. Addresses 100K+ GPUs smuggled in 2024.
+  sourcePageId: hardware-enabled-governance
+  domain: governance
+  stance: neutral
+  costEstimate: "$10-50M firmware dev + $10-100M landmark servers"
+  evEstimate: "Closes enforcement gap on $1B+ GPU smuggling"
+  feasibility: medium
+  honestConcerns: >-
+    Privacy concerns (reveals geographic location). China warned Nvidia against
+    implementation. May be defeated by state-level adversaries. Creates precedent
+    for consumer device tracking.
+  status: idea
+  leadOrganizations:
+    - BIS Commerce Department
+    - Nvidia
+  relatedProposals:
+    - attestation-training-detection
+
+- id: attestation-training-detection
+  name: Research privacy-preserving training run attestation
+  description: >-
+    Fund 2-3 year R&D initiative for remote attestation mechanisms that verify
+    chips run only approved training workloads without revealing workload content.
+    RAND identifies this as the most feasible hardware-enabled governance approach.
+  sourcePageId: hardware-enabled-governance
+  domain: technical
+  stance: neutral
+  costEstimate: "$20-50M over 3 years R&D"
+  evEstimate: "Enables compute threshold governance (10^26 FLOP detection)"
+  feasibility: low
+  honestConcerns: >-
+    May not be feasible within timeline. Creates novel attack surfaces. Requires
+    chip redesign (2-3 year cycle). Could enable broader surveillance if misused.
+  status: idea
+  leadOrganizations:
+    - RAND
+    - NIST
+    - GovAI
+  relatedProposals:
+    - gpu-geolocation-verification
+
+- id: enforce-eu-gpai-evals
+  name: Enforce EU GPAI mandatory adversarial testing
+  description: >-
+    EU AI Office must enforce the August 2025 deadline for documented adversarial
+    testing of GPAI models (10^25+ FLOP). Prosecute non-compliance with EUR 15M
+    or 3% global turnover fines. Only 3 of 7 major labs substantively test
+    dangerous capabilities.
+  sourcePageId: evals-governance
+  domain: governance
+  stance: neutral
+  costEstimate: "EUR 10-50M annually for enforcement infrastructure"
+  evEstimate: "Binding evals framework covering all EU-deployed frontier models"
+  feasibility: high
+  honestConcerns: >-
+    Regulatory capture risk. Evaluation gaming (labs optimize for passing known
+    evals). Cannot test for unknown risks. Only covers EU jurisdiction.
+  status: proposed
+  leadOrganizations:
+    - EU AI Office
+    - METR
+  relatedProposals:
+    - third-party-eval-access
+    - dangerous-capabilities-standards
+
+- id: third-party-eval-access
+  name: Binding third-party eval access commitments
+  description: >-
+    Require all frontier labs to grant pre-deployment evaluation access to METR,
+    Apollo Research, UK AISI on standardized terms with no confidentiality
+    restrictions on capability findings. OpenAI removed its third-party audit
+    commitment in April 2025.
+  sourcePageId: evals-governance
+  domain: governance
+  stance: neutral
+  costEstimate: "$1-5M per lab annually + $10-50M evaluator scaling"
+  evEstimate: "Independent verification of safety claims"
+  feasibility: medium
+  honestConcerns: >-
+    Labs resist revealing evaluation results. Confidentiality claims (competitive,
+    safety). Evaluators may lack bandwidth to scale.
+  status: idea
+  leadOrganizations:
+    - UK AISI
+    - METR
+  relatedProposals:
+    - enforce-eu-gpai-evals
+    - dangerous-capabilities-standards
+
+- id: dangerous-capabilities-standards
+  name: Set CBRN/cyber evaluation minimum standards
+  description: >-
+    Co-develop binding minimum evaluation suite for dangerous capabilities (CBRN
+    synthesis, cyber offense, autonomous task completion, persuasion) that all labs
+    must conduct before deployment. Cyber task success improved 5.5x (9% to 50%)
+    between late 2023 and mid-2025.
+  sourcePageId: evals-governance
+  domain: governance
+  stance: neutral
+  costEstimate: "$5-10M standards dev + $10-50M per lab per model"
+  evEstimate: "Early warning system for dangerous capabilities"
+  feasibility: medium
+  honestConcerns: >-
+    May miss novel dangerous capabilities. Models can detect evaluation context
+    and sandbag. Sets arbitrary thresholds. Enforcement challenging.
+  status: idea
+  leadOrganizations:
+    - UK AISI
+    - METR
+    - NIST
+  relatedProposals:
+    - third-party-eval-access
+    - enforce-eu-gpai-evals
+
+# ---------------------------------------------------------------------------
+# OPENAI GOVERNANCE (from openai-foundation-governance)
+# ---------------------------------------------------------------------------
+
+- id: openai-board-independence
+  name: Break OpenAI Foundation/PBC board overlap
+  description: >-
+    Restructure OpenAI Foundation board so that majority are independent trustees
+    not serving on company board. Currently 7 of 8 Foundation board members also
+    vote on company board, nullifying oversight.
+  sourcePageId: openai-foundation-governance
+  domain: governance
+  stance: adversarial
+  costEstimate: "$2-5M restructuring"
+  evEstimate: "Actual nonprofit oversight of $130B entity"
+  feasibility: low
+  honestConcerns: >-
+    Current board members have zero incentive to support this. Requires external
+    forcing function (litigation, regulatory pressure, IPO investor demands).
+    OpenAI could resist indefinitely.
+  status: idea
+  leadOrganizations:
+    - California Attorney General
+  relatedProposals:
+    - openai-foundation-deployment-rate
+
+- id: openai-foundation-deployment-rate
+  name: Mandate Foundation minimum philanthropic deployment
+  description: >-
+    Establish binding requirement that OpenAI Foundation must deploy minimum 10-25%
+    of dividend income annually to external AI safety research at independent orgs.
+    Foundation holds $130B equity stake but has donated only $50M (0.04% of value).
+  sourcePageId: openai-foundation-governance
+  domain: governance
+  stance: adversarial
+  costEstimate: "$500K-1M compliance tracking"
+  evEstimate: "10% annual distribution = $1.3B to external safety research"
+  feasibility: low
+  honestConcerns: >-
+    Board could fight via litigation. "Beneficial AI" charitable purpose is
+    undefined. Could be circumvented through related entities.
+  status: idea
+  leadOrganizations:
+    - California Attorney General
+    - Future of Life Institute
+  relatedProposals:
+    - openai-board-independence
+
+# ---------------------------------------------------------------------------
+# BIOSECURITY (from blueprint-biosecurity, securedna, ea-biosecurity-scope)
+# ---------------------------------------------------------------------------
+
+- id: far-uvc-rct
+  name: Fund large-scale far-UVC randomized controlled trial
+  description: >-
+    Five-year research initiative testing far-UVC germicidal light across ~50
+    real-world settings with three workstreams: efficacy/effectiveness via RCT,
+    safety via human/animal studies, and communications/deployment protocols.
+    Currently unfunded.
+  sourcePageId: blueprint-biosecurity
+  domain: biosecurity
+  stance: neutral
+  costEstimate: "Multi-million dollar, 5-year initiative (unfunded)"
+  evEstimate: "Benefit-cost ratio estimated 10:1 to 290:1 for far-UVC"
+  feasibility: medium
+  honestConcerns: >-
+    No identified funding source. No binding regulatory dosage standards exist yet.
+    Requires coordination across 50+ sites.
+  status: idea
+  leadOrganizations:
+    - Blueprint Biosecurity
+  relatedProposals:
+    - far-uvc-standards
+
+- id: far-uvc-standards
+  name: Establish far-UVC regulatory dosage standards
+  description: >-
+    Create binding regulatory standards for safe far-UVC dosage worldwide.
+    Currently no standards exist as of 2025, which blocks deployment even
+    though the technology shows promise.
+  sourcePageId: blueprint-biosecurity
+  domain: biosecurity
+  stance: neutral
+  feasibility: medium
+  honestConcerns: >-
+    Regulatory complexity across jurisdictions. International coordination
+    required. Safety data still accumulating.
+  status: idea
+  leadOrganizations:
+    - Blueprint Biosecurity
+  relatedProposals:
+    - far-uvc-rct
+
+- id: nao-expansion
+  name: Expand Nucleic Acid Observatory sampling sites
+  description: >-
+    Scale NAO from 31 sites across 19 US cities to broader geographic coverage.
+    NAO performs untargeted metagenomic sequencing detecting novel/engineered
+    pathogens before 12 in 100,000 Americans are infected.
+  sourcePageId: ea-biosecurity-scope
+  domain: biosecurity
+  stance: neutral
+  costEstimate: "$52M proposed for Biothreat Radar (FY2026)"
+  evEstimate: "Early warning for novel/engineered pathogens"
+  feasibility: high
+  honestConcerns: >-
+    Genomic data privacy concerns. Detection latency for rapidly spreading
+    pathogens. Requires wastewater sampling coordination.
+  status: proposed
+  leadOrganizations:
+    - SecureBio
+    - CDC
+  relatedProposals:
+    - function-based-screening
+
+- id: function-based-screening
+  name: Develop function-based DNA sequence screening
+  description: >-
+    Build screening that predicts what a protein does, not just homology matching,
+    to prevent AI-generated functional variants from evading sequence-based
+    screening. Microsoft's "Paraphrase Project" showed AI can design functional
+    toxin variants that bypass current screening.
+  sourcePageId: securedna
+  domain: biosecurity
+  stance: neutral
+  feasibility: low
+  honestConcerns: >-
+    Computationally expensive. Requires functional prediction models that don't
+    exist yet. High false positive risk.
+  status: idea
+  leadOrganizations:
+    - SecureDNA
+  relatedProposals:
+    - nao-expansion
+
+- id: benchtop-synthesizer-security
+  name: Secure benchtop DNA synthesizers
+  description: >-
+    Develop screening and access control for emerging desktop DNA synthesis devices
+    that could bypass centralized screening. These devices are proliferating and
+    represent a major gap in biosecurity.
+  sourcePageId: ea-biosecurity-scope
+  domain: biosecurity
+  stance: neutral
+  feasibility: medium
+  honestConcerns: >-
+    Technical feasibility for small devices is unclear. User authentication
+    complexity. Manufacturers may resist security requirements.
+  status: idea
+
+# ---------------------------------------------------------------------------
+# FIELD BUILDING (from worldview-intervention-mapping)
+# ---------------------------------------------------------------------------
+
+- id: worldview-field-survey
+  name: Survey AI safety researcher worldviews
+  description: >-
+    Conduct comprehensive survey of AI safety researchers, funders, and
+    organizations to map actual distribution of beliefs about timelines, alignment
+    difficulty, and coordination feasibility. Quantify worldview-work mismatches.
+  sourcePageId: worldview-intervention-mapping
+  domain: field-building
+  stance: collaborative
+  costEstimate: "$100-300K"
+  evEstimate: "Identifies 20-50% efficiency loss opportunities"
+  feasibility: high
+  honestConcerns: >-
+    Low participation risk. Social desirability bias in responses. May not
+    capture actual beliefs vs. stated beliefs.
+  status: idea
+  leadOrganizations:
+    - 80,000 Hours
+    - Open Philanthropy
+  relatedProposals:
+    - worldview-coherent-grants
+
+- id: worldview-coherent-grants
+  name: Explicit worldview-based grantmaking portfolios
+  description: >-
+    Major grantmakers should explicitly map their portfolios to worldviews,
+    identify gaps between grantee worldviews and optimal intervention allocation,
+    and fund strategically to close mismatches.
+  sourcePageId: worldview-intervention-mapping
+  domain: field-building
+  stance: collaborative
+  costEstimate: "$5-20M incremental deployment"
+  evEstimate: "15-25% efficiency gain in field resource allocation"
+  feasibility: medium
+  honestConcerns: >-
+    May polarize field if poorly communicated. Requires transparent worldview
+    statements from grantmakers, which some may resist.
+  status: idea
+  leadOrganizations:
+    - Open Philanthropy
+    - Survival and Flourishing Fund
+  relatedProposals:
+    - worldview-field-survey
