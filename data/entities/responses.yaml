@@ -598,8 +598,8 @@
 - id: us-executive-order
   numericId: E366
   type: policy
-summaryPage: governance-overview
-title: US Executive Order on Safe, Secure, and Trustworthy AI
+  summaryPage: governance-overview
+  title: US Executive Order on Safe, Secure, and Trustworthy AI
   customFields:
     - label: Type
       value: Executive Order

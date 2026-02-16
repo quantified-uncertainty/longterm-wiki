@@ -1622,8 +1622,8 @@
 - id: lighthaven
   numericId: E539
   type: organization
-summaryPage: community-building-overview
-title: Lighthaven (Event Venue)
+  summaryPage: community-building-overview
+  title: Lighthaven (Event Venue)
   description: >-
     Lighthaven is a Berkeley conference venue operated by Lightcone
     Infrastructure that serves as physical infrastructure for AI safety,
@@ -1706,8 +1706,8 @@ title: Lighthaven (Event Venue)
 - id: manifest
   numericId: E545
   type: organization
-summaryPage: community-building-overview
-title: Manifest (Forecasting Conference)
+  summaryPage: community-building-overview
+  title: Manifest (Forecasting Conference)
   description: >-
     Manifest is a 2024 forecasting conference that generated significant
     controversy within EA/rationalist communities due to speaker selection
