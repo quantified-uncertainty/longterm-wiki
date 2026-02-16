@@ -5,7 +5,8 @@
 **Pages:** wiki-generation-architecture
 
 **Issues encountered:**
-- None significant. pnpm install required --ignore-scripts due to puppeteer postinstall failure, but this is a known environment issue.
+- pnpm install required --ignore-scripts due to puppeteer postinstall failure (known environment issue)
+- Pre-existing numericId conflicts (E698-E708) between internal pages infrastructure PR and parallel content branches -- not caused by this session
 
 **Learnings/notes:**
 - Stanford STORM's perspective-guided research (mining perspectives from similar articles) is a strong idea we could adopt

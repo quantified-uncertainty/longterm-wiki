@@ -73,7 +73,6 @@ export const INTERNAL_NAV: NavSection[] = [
       { label: "Cross-Link Automation", href: "/internal/reports/cross-link-automation-proposal" },
       { label: "Diagram Naming", href: "/internal/reports/diagram-naming-research" },
       { label: "Page Creator Pipeline", href: "/internal/reports/page-creator-pipeline" },
-      { label: "Wiki Generation Architecture", href: "/internal/reports/wiki-generation-architecture" },
       { label: "Gap Analysis (Feb 2026)", href: "/internal/gap-analysis-2026-02" },
     ],
   },
@@ -81,6 +80,7 @@ export const INTERNAL_NAV: NavSection[] = [
     title: "Architecture & Schema",
     items: [
       { label: "Architecture", href: "/internal/architecture" },
+      { label: "Wiki Generation Architecture", href: "/internal/wiki-generation-architecture" },
       { label: "Schema Overview", href: "/internal/schema" },
       { label: "Entity Reference", href: "/internal/schema/entities" },
       { label: "Schema Diagrams", href: "/internal/schema/diagrams" },
