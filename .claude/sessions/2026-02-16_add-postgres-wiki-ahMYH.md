@@ -1,14 +1,16 @@
 ## 2026-02-16 | add-postgres-wiki-ahMYH | Add Postgres server for IDs and edit logs
 
-**What was done:** Added a new `server/` workspace package with a Hono API server backed by Postgres (via Docker Compose) and Drizzle ORM. Provides atomic E ID generation (eliminates merge conflicts from parallel branches) and append-only edit logs. Includes a seed script to import existing YAML/MDX data into Postgres.
+**What was done:** Phase 1: Added `server/` workspace package (Hono + Drizzle + Postgres via Docker Compose) with atomic E ID generation and append-only edit logs. Phase 2: Wired `build-data.mjs` to use the server API for ID allocation (with graceful fallback to local), added dual-write to `crux/lib/edit-log.ts`, and created a shared client library. Fixed several issues found in code review: TOCTOU race condition in ID allocation (now uses atomic INSERT ON CONFLICT), `_fullPath` deletion ordering bug, seed re-run duplicating edit logs, NaN input validation, missing index on `edit_logs.page_id`, and added circuit-breaker for mid-build server failure.
 
 **Pages:** (none — infrastructure only)
 
 **Issues encountered:**
-- vitest binary not directly accessible via `pnpm test` in this environment (pre-existing issue), but tests pass when invoked directly
-- puppeteer Chrome download fails (pre-existing network issue, unrelated)
+- vitest binary not directly accessible via `pnpm test` in this environment (pre-existing)
+- `build-data.mjs` is a plain `.mjs` file so can't import `.ts` modules directly — inlined the server client as plain fetch calls instead
+- `main()` in build-data.mjs was not async — needed to make it async for `await` in ID allocation
 
 **Learnings/notes:**
-- The project already has `better-sqlite3` used for a research cache (`crux/lib/knowledge-db.ts`) — the Postgres setup is separate and serves as shared state across branches
-- Entity IDs are currently assigned sequentially in `build-data.mjs` (lines 672-703) by scanning all YAML/MDX files — the Postgres sequence replaces this with atomic allocation
-- Phase 2 should wire `build-data.mjs` ID assignment to call the server API, and have `crux/lib/edit-log.ts` dual-write to both YAML and Postgres
+- `_fullPath` is deleted from page objects at line 906 but needed later at line 992 — must save to a Map before deletion
+- The POST /api/ids/next endpoint had a TOCTOU race between SELECT check and INSERT — fixed with atomic INSERT ON CONFLICT + UNION ALL fallback
+- `onConflictDoNothing` on tables without unique constraints is silently ineffective
+- The crux tsconfig has ~100+ pre-existing type errors (missing modules, etc.) — none from our changes

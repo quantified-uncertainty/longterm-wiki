@@ -8,6 +8,13 @@
       "when": 1771269159434,
       "tag": "0000_first_hitman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1771270537786,
+      "tag": "0001_strange_beast",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+CREATE INDEX "edit_logs_page_id_idx" ON "edit_logs" USING btree ("page_id");

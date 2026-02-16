@@ -5,6 +5,7 @@ import {
   integer,
   timestamp,
   date,
+  index,
   uniqueIndex,
   pgSequence,
 } from "drizzle-orm/pg-core";
@@ -59,15 +60,19 @@ export const entityIds = pgTable(
  * concurrent branches never conflict.  During the migration period both stores
  * are written to (dual-write); the DB is authoritative for reads.
  */
-export const editLogs = pgTable("edit_logs", {
-  id: serial("id").primaryKey(),
-  pageId: text("page_id").notNull(),
-  date: date("date").notNull(),
-  tool: text("tool").notNull(), // crux-create, crux-improve, …
-  agency: text("agency").notNull(), // human, ai-directed, automated
-  requestedBy: text("requested_by"),
-  note: text("note"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const editLogs = pgTable(
+  "edit_logs",
+  {
+    id: serial("id").primaryKey(),
+    pageId: text("page_id").notNull(),
+    date: date("date").notNull(),
+    tool: text("tool").notNull(), // crux-create, crux-improve, …
+    agency: text("agency").notNull(), // human, ai-directed, automated
+    requestedBy: text("requested_by"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index("edit_logs_page_id_idx").on(table.pageId)],
+);

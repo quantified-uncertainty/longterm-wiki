@@ -18,6 +18,7 @@
 import fs from 'fs';
 import path from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { appendEditLogRemote, isServerAvailable } from './wiki-server-client.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -116,7 +117,8 @@ export function readEditLog(pageId: string): EditLogEntry[] {
   })) as EditLogEntry[];
 }
 
-/** Append a single entry to a page's edit log. Creates the file if needed. */
+/** Append a single entry to a page's edit log. Creates the file if needed.
+ *  Dual-writes to Postgres when the wiki server is available. */
 export function appendEditLog(pageId: string, entry: Omit<EditLogEntry, 'date'> & { date?: string }): void {
   const existing = readEditLog(pageId);
 
@@ -138,6 +140,18 @@ export function appendEditLog(pageId: string, entry: Omit<EditLogEntry, 'date'> 
     logFilePath(pageId),
     stringifyYaml(existing, { lineWidth: 0 }),
   );
+
+  // Dual-write to Postgres (fire-and-forget, never blocks YAML write)
+  appendEditLogRemote({
+    pageId,
+    date: fullEntry.date,
+    tool: fullEntry.tool,
+    agency: fullEntry.agency,
+    requestedBy: fullEntry.requestedBy,
+    note: fullEntry.note,
+  }).catch(() => {
+    // Silently ignore — YAML is the primary store during migration
+  });
 }
 
 /**

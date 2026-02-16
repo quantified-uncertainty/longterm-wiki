@@ -6,7 +6,7 @@
  *   2. Edit logs (from data/edit-logs/*.yaml)
  *
  * Safe to re-run — uses ON CONFLICT DO NOTHING for entity IDs and
- * checks for existing edit-log entries before inserting.
+ * truncates edit_logs before re-inserting (no natural unique key).
  *
  * Usage:
  *   pnpm --filter longterm-wiki-server db:seed
@@ -124,10 +124,10 @@ async function seedEntityIds() {
 
   console.log(`  Inserted ${inserted} new entity IDs (${entries.length - inserted} already existed).`);
 
-  // Set the sequence to max(numericId) + 1
-  const maxId = entries[entries.length - 1].numericId;
-  await sql`SELECT setval('entity_id_seq', ${maxId})`;
-  console.log(`  Sequence set to start after E${maxId}.`);
+  // Set the sequence to max(seeded IDs, existing DB IDs) so it never goes backwards
+  const maxSeeded = entries[entries.length - 1].numericId;
+  await sql`SELECT setval('entity_id_seq', GREATEST(${maxSeeded}, COALESCE((SELECT MAX(numeric_id) FROM entity_ids), 0)))`;
+  console.log(`  Sequence set to start after E${maxSeeded} (or higher if DB has later IDs).`);
 }
 
 // ---------------------------------------------------------------------------
@@ -140,6 +140,10 @@ async function seedEditLogs() {
     console.log("No edit-logs directory found, skipping.");
     return;
   }
+
+  // Truncate before re-seeding to avoid duplicates (edit_logs has no natural
+  // unique key, so ON CONFLICT can't deduplicate).
+  await sql`TRUNCATE edit_logs RESTART IDENTITY`;
 
   const files = readdirSync(editLogDir).filter((f) => f.endsWith(".yaml"));
   console.log(`Found ${files.length} edit-log files to seed.`);
@@ -163,11 +167,11 @@ async function seedEditLogs() {
       note: entry.note ? String(entry.note) : null,
     }));
 
-    await db.insert(editLogs).values(values).onConflictDoNothing();
+    await db.insert(editLogs).values(values);
     total += values.length;
   }
 
-  console.log(`  Inserted up to ${total} edit-log entries.`);
+  console.log(`  Inserted ${total} edit-log entries.`);
 }
 
 // ---------------------------------------------------------------------------

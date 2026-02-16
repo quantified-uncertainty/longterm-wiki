@@ -25,6 +25,41 @@ import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildSearchIndex } from './lib/search.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 
+// ---------------------------------------------------------------------------
+// Wiki server client — used for atomic ID allocation when the server is up.
+// Falls back to local sequential assignment when it's not.
+// ---------------------------------------------------------------------------
+const WIKI_SERVER_URL = process.env.WIKI_SERVER_URL ?? 'http://localhost:3002';
+let wikiServerAllocateId = null;
+if (WIKI_SERVER_URL !== 'off') {
+  try {
+    const res = await fetch(`${WIKI_SERVER_URL}/health`, { signal: AbortSignal.timeout(1000) });
+    if (res.ok) {
+      let serverFailed = false; // Circuit-breaker: stop trying after first failure
+      wikiServerAllocateId = async (slug, entityType, title) => {
+        if (serverFailed) return null;
+        try {
+          const r = await fetch(`${WIKI_SERVER_URL}/api/ids/next`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slug, entityType, title }),
+            signal: AbortSignal.timeout(3000),
+          });
+          if (!r.ok) return null;
+          return r.json();
+        } catch {
+          console.warn('  ⚠ Wiki server unreachable mid-build, falling back to local IDs');
+          serverFailed = true;
+          return null;
+        }
+      };
+      console.log('  ✓ Wiki server connected — using Postgres for ID allocation');
+    }
+  } catch {
+    // Server not running, will use local ID assignment
+  }
+}
+
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
 
 // Files to combine
@@ -605,7 +640,7 @@ function buildPathRegistry() {
 }
 
 
-function main() {
+async function main() {
   console.log('Building data bundle...\n');
 
   const database = {};
@@ -676,15 +711,33 @@ function main() {
     if (n >= nextId) nextId = n + 1;
   }
 
-  // Assign IDs to entities that don't have one yet, writing back to source
+  // Assign IDs to entities that don't have one yet, writing back to source.
+  // When the wiki server is running, IDs are allocated atomically from Postgres
+  // (no merge conflicts). Otherwise falls back to local sequential assignment.
   let newAssignments = 0;
   for (const entity of entities) {
     if (!entity.numericId) {
-      const numId = `E${nextId}`;
+      let numId;
+
+      // Try Postgres-backed allocation first
+      if (wikiServerAllocateId) {
+        const result = await wikiServerAllocateId(entity.id, entity.type, entity.title);
+        if (result) {
+          numId = result.numericId;
+          const n = parseInt(numId.slice(1));
+          if (n >= nextId) nextId = n + 1;
+        }
+      }
+
+      // Fall back to local sequential assignment
+      if (!numId) {
+        numId = `E${nextId}`;
+        nextId++;
+      }
+
       entity.numericId = numId;
       numericIdToSlug[numId] = entity.id;
       slugToNumericId[entity.id] = numId;
-      nextId++;
       newAssignments++;
 
       // Write the new numericId back to the source file
@@ -846,6 +899,12 @@ function main() {
   console.log('  Computing redundancy scores...');
   const { pageRedundancy, pairs: redundancyPairs } = computeRedundancy(pages);
 
+  // Save page file paths before cleanup (needed for writing numericId to frontmatter later)
+  const pageFilePaths = new Map();
+  for (const page of pages) {
+    if (page._fullPath) pageFilePaths.set(page.id, page._fullPath);
+  }
+
   // Add redundancy data to pages and remove rawContent
   for (const page of pages) {
     const redundancy = pageRedundancy.get(page.id);
@@ -920,19 +979,35 @@ function main() {
       }
       slugToNumericId[page.id] = page.numericId;
     } else {
-      // Assign a new numericId and write it back to the MDX frontmatter
-      const numId = `E${nextId}`;
+      // Assign a new numericId and write it back to the MDX frontmatter.
+      // Try Postgres-backed allocation first, fall back to local.
+      let numId;
+
+      if (wikiServerAllocateId) {
+        const result = await wikiServerAllocateId(page.id, page.category, page.title);
+        if (result) {
+          numId = result.numericId;
+          const n = parseInt(numId.slice(1));
+          if (n >= nextId) nextId = n + 1;
+        }
+      }
+
+      if (!numId) {
+        numId = `E${nextId}`;
+        nextId++;
+      }
+
       numericIdToSlug[numId] = page.id;
       slugToNumericId[page.id] = numId;
       page.numericId = numId;
-      nextId++;
       pageIdAssignments++;
 
-      // Write back to MDX frontmatter
-      if (page._fullPath) {
-        const content = readFileSync(page._fullPath, 'utf-8');
+      // Write back to MDX frontmatter (using saved path from before cleanup)
+      const fullPath = pageFilePaths.get(page.id);
+      if (fullPath) {
+        const content = readFileSync(fullPath, 'utf-8');
         const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
-        writeFileSync(page._fullPath, updated);
+        writeFileSync(fullPath, updated);
         console.log(`    Assigned ${numId} → ${page.id} (wrote to MDX frontmatter)`);
       }
     }
@@ -1082,4 +1157,4 @@ function main() {
   console.log('Or run `npm run validate` for all validators');
 }
 
-main();
+await main();

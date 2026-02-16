@@ -39,41 +39,31 @@ app.post("/api/ids/next", async (c) => {
     return c.json({ error: "slug is required" }, 400);
   }
 
-  // Check if slug already has an ID
-  const existing = await db
-    .select()
-    .from(entityIds)
-    .where(eq(entityIds.slug, body.slug))
-    .limit(1);
-
-  if (existing.length > 0) {
-    return c.json({
-      numericId: `E${existing[0].numericId}`,
-      slug: existing[0].slug,
-      alreadyExisted: true,
-    });
-  }
-
-  // Allocate next ID from sequence
-  const [{ nextval }] = await sql`SELECT nextval('entity_id_seq')`;
-
-  const [inserted] = await db
-    .insert(entityIds)
-    .values({
-      numericId: Number(nextval),
-      slug: body.slug,
-      entityType: body.entityType ?? null,
-      title: body.title ?? null,
-    })
-    .returning();
+  // Atomic upsert: INSERT with sequence value, ON CONFLICT return existing.
+  // This avoids the TOCTOU race where two concurrent requests for the same
+  // slug could both pass a SELECT check and then collide on INSERT.
+  const [row] = await sql`
+    WITH new_row AS (
+      INSERT INTO entity_ids (numeric_id, slug, entity_type, title)
+      VALUES (nextval('entity_id_seq'), ${body.slug}, ${body.entityType ?? null}, ${body.title ?? null})
+      ON CONFLICT (slug) DO NOTHING
+      RETURNING numeric_id, slug, FALSE AS already_existed
+    )
+    SELECT * FROM new_row
+    UNION ALL
+    SELECT numeric_id, slug, TRUE AS already_existed
+    FROM entity_ids
+    WHERE slug = ${body.slug}
+      AND NOT EXISTS (SELECT 1 FROM new_row)
+  `;
 
   return c.json(
     {
-      numericId: `E${inserted.numericId}`,
-      slug: inserted.slug,
-      alreadyExisted: false,
+      numericId: `E${row.numeric_id}`,
+      slug: row.slug,
+      alreadyExisted: row.already_existed,
     },
-    201,
+    row.already_existed ? 200 : 201,
   );
 });
 
@@ -83,8 +73,8 @@ app.post("/api/ids/next", async (c) => {
  * Query params: ?limit=100&offset=0
  */
 app.get("/api/ids", async (c) => {
-  const limit = Math.min(Number(c.req.query("limit") ?? 500), 5000);
-  const offset = Number(c.req.query("offset") ?? 0);
+  const limit = Math.min(Math.max(Number(c.req.query("limit")) || 500, 1), 5000);
+  const offset = Math.max(Number(c.req.query("offset")) || 0, 0);
 
   const rows = await db
     .select()
@@ -181,8 +171,8 @@ app.get("/api/edit-logs/:pageId", async (c) => {
  * Query params: ?limit=100&offset=0
  */
 app.get("/api/edit-logs", async (c) => {
-  const limit = Math.min(Number(c.req.query("limit") ?? 100), 1000);
-  const offset = Number(c.req.query("offset") ?? 0);
+  const limit = Math.min(Math.max(Number(c.req.query("limit")) || 100, 1), 1000);
+  const offset = Math.max(Number(c.req.query("offset")) || 0, 0);
 
   const rows = await db
     .select()
