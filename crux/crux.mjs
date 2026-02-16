@@ -35,8 +35,8 @@
  *   crux gaps list                           Find pages needing insights
  */
 
-import { parseArgs } from 'node:util';
 import { createLogger } from './lib/output.ts';
+import { parseCliArgs as _parseCliArgs, kebabToCamel } from './lib/cli.ts';
 
 // Domain handlers
 import * as validateCommands from './commands/validate.ts';
@@ -68,39 +68,33 @@ const domains = {
 };
 
 /**
- * Parse command-line arguments
+ * Parse command-line arguments using the shared parseCliArgs from cli.ts.
+ * Extracts domain (first positional) and command (second positional),
+ * then converts remaining named options to camelCase.
  */
-function parseCliArgs() {
-  const args = process.argv.slice(2);
+function parseArgs() {
+  const parsed = _parseCliArgs(process.argv.slice(2));
+  const positional = parsed._positional;
 
-  // Extract domain and command
-  let domain = null;
-  let command = null;
+  const domain = positional[0] || null;
+  const command = positional[1] || null;
+
+  // Convert kebab-case option keys to camelCase and build remaining args
+  const options = {};
   const remaining = [];
-
-  for (const arg of args) {
-    if (!arg.startsWith('-')) {
-      if (!domain) {
-        domain = arg;
-      } else if (!command) {
-        command = arg;
-      } else {
-        remaining.push(arg);
-      }
+  for (const [key, value] of Object.entries(parsed)) {
+    if (key === '_positional') continue;
+    options[kebabToCamel(key)] = value;
+    // Reconstruct the raw arg for passing to subcommands
+    if (value === true) {
+      remaining.push(`--${key}`);
     } else {
-      remaining.push(arg);
+      remaining.push(`--${key}=${value}`);
     }
   }
-
-  // Parse options from remaining args
-  const options = {};
-  for (const arg of remaining) {
-    if (arg.startsWith('--')) {
-      const [key, value] = arg.slice(2).split('=');
-      // Convert kebab-case to camelCase
-      const camelKey = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-      options[camelKey] = value === undefined ? true : value;
-    }
+  // Pass extra positional args (beyond domain + command) as remaining
+  for (const arg of positional.slice(2)) {
+    remaining.push(arg);
   }
 
   return { domain, command, args: remaining, options };
@@ -153,7 +147,7 @@ ${'\x1b[1m'}Domain Help:${'\x1b[0m'}
  * Main entry point
  */
 async function main() {
-  const { domain, command, args, options } = parseCliArgs();
+  const { domain, command, args, options } = parseArgs();
   const log = createLogger(options.ci);
 
   // Show help if requested or no domain specified

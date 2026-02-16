@@ -8,12 +8,9 @@ import fs from 'fs';
 import path from 'path';
 import { createClient, parseJsonResponse } from '../../lib/anthropic.ts';
 import { appendEditLog } from '../../lib/edit-log.ts';
+import type { TopicPhaseContext } from './types.ts';
 
-interface GradingContext {
-  log: (phase: string, message: string) => void;
-  saveResult: (topic: string, filename: string, data: unknown) => string;
-  getTopicDir: (topic: string) => string;
-}
+type GradingContext = TopicPhaseContext;
 
 interface GradingRatings {
   novelty: number;

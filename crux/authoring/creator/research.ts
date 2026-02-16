@@ -6,16 +6,10 @@
 
 import { batchResearch, generateResearchQueries } from '../../lib/openrouter.ts';
 import type { BatchResearchResult, ResearchQuery } from '../../lib/openrouter.ts';
+import type { ResearchPhaseContext } from './types.ts';
 
-interface ResearchContext {
-  log: (phase: string, message: string) => void;
-  saveResult: (topic: string, filename: string, data: unknown) => string;
-}
-
-interface ScryContext {
-  log: (phase: string, message: string) => void;
-  saveResult: (topic: string, filename: string, data: unknown) => string;
-}
+type ResearchContext = ResearchPhaseContext;
+type ScryContext = ResearchPhaseContext;
 
 interface ResearchSource {
   category: string;

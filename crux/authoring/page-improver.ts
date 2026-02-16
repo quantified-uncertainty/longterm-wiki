@@ -35,6 +35,7 @@ import { MODELS } from '../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../lib/entity-lookup.ts';
 import { convertSlugsToNumericIds } from './creator/deployment.ts';
 import { appendEditLog, getDefaultRequestedBy } from '../lib/edit-log.ts';
+import { createPhaseLogger } from '../lib/output.ts';
 // Inlined from content-types.ts to keep this file self-contained
 const CRITICAL_RULES: string[] = [
   'dollar-signs',
@@ -496,14 +497,7 @@ interface ParsedArgs {
   [key: string]: string | boolean | string[];
 }
 
-// Formatting helpers
-function formatTime(date: Date = new Date()): string {
-  return date.toTimeString().slice(0, 8);
-}
-
-function log(phase: string, message: string): void {
-  console.log(`[${formatTime()}] [${phase}] ${message}`);
-}
+const log = createPhaseLogger();
 
 // File operations
 function ensureDir(dir: string): void {

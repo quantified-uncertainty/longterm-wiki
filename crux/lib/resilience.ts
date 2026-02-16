@@ -5,6 +5,8 @@
  * so that retry logic and heartbeat timers stay consistent.
  */
 
+import { formatTime } from './output.ts';
+
 /** Options for {@link withRetry}. */
 export interface RetryOptions {
   maxRetries?: number;
@@ -55,8 +57,7 @@ export function startHeartbeat(
   const start = Date.now();
   const timer = setInterval(() => {
     const elapsed = ((Date.now() - start) / 1000).toFixed(0);
-    const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
-    writer(`[${timestamp}] [${phase}] … still running (${elapsed}s)`);
+    writer(`[${formatTime()}] [${phase}] … still running (${elapsed}s)`);
   }, intervalSec * 1000);
   return () => clearInterval(timer);
 }

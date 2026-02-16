@@ -17,6 +17,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { createClient, MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
 import { getSynthesisPrompt } from './synthesis.ts';
 import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
+import type { ValidationPhaseContext } from './types.ts';
 
 // ---------------------------------------------------------------------------
 // Shared helpers (retry + heartbeat imported from shared module)
@@ -44,11 +45,7 @@ function extractText(response: Anthropic.Messages.Message): string {
 // API-Direct Synthesis
 // ---------------------------------------------------------------------------
 
-interface SynthesisContext {
-  log: (phase: string, message: string) => void;
-  ROOT: string;
-  getTopicDir: (topic: string) => string;
-}
+type SynthesisContext = ValidationPhaseContext;
 
 /**
  * Generate a wiki article using the Anthropic API directly (no subprocess).
@@ -125,11 +122,7 @@ export async function runSynthesisApiDirect(
 // API-Direct Validation Loop
 // ---------------------------------------------------------------------------
 
-interface ValidationLoopContext {
-  log: (phase: string, message: string) => void;
-  ROOT: string;
-  getTopicDir: (topic: string) => string;
-}
+type ValidationLoopContext = ValidationPhaseContext;
 
 /**
  * Iteratively validate and fix a wiki article using the Anthropic API directly.
@@ -376,11 +369,7 @@ Do NOT wrap in markdown code blocks.`;
 // API-Direct Review
 // ---------------------------------------------------------------------------
 
-interface ReviewContext {
-  ROOT: string;
-  getTopicDir: (topic: string) => string;
-  log: (phase: string, message: string) => void;
-}
+type ReviewContext = ValidationPhaseContext;
 
 /**
  * Run a critical review using the Anthropic API directly (no subprocess).

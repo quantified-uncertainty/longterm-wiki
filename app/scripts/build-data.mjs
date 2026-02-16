@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readd
 import { spawnSync } from 'child_process';
 import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
-import { extractMetrics, suggestQuality, getQualityDiscrepancy } from './lib/metrics-extractor.mjs';
+import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../crux/lib/metrics-extractor.ts';
 import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
