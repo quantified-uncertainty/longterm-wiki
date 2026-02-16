@@ -1,5 +1,5 @@
 ---
-numericId: E728
+numericId: E753
 title: "Stub Pages Style Guide"
 description: "Guidelines for minimal placeholder pages"
 entityType: internal

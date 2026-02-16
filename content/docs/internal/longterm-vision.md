@@ -1,5 +1,5 @@
 ---
-numericId: E726
+numericId: E733
 title: "LongtermWiki Vision"
 description: "Strategic vision and scope for the LongtermWiki project"
 entityType: internal
