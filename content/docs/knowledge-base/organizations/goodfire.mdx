@@ -32,7 +32,7 @@ import {EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
 | **Funding** | \$209M+ (Seed: \$7M Aug 2024, Series A: \$50M Apr 2025, Series B: \$150M Feb 2026) |
 | **Valuation** | \$1.25B (as of Series B, Feb 2026) |
 | **Employees** | ≈39 (as of early 2026) |
-| **Key Product** | Ember (<EntityLink id="E174">mechanistic interpretability</EntityLink> API and platform) |
+| **Key Product** | Ember (<EntityLink id="interpretability">mechanistic interpretability</EntityLink> API and platform) |
 | **Focus** | Mechanistic interpretability, sparse autoencoders, AI safety |
 | **Notable Backers** | Anthropic (first direct investment), Menlo Ventures, Lightspeed Venture Partners |
 
@@ -49,7 +49,7 @@ Goodfire is an AI interpretability research lab and public benefit corporation s
 
 The company's flagship product, Ember, is the first hosted mechanistic interpretability API, providing researchers and developers with programmable access to AI model internals.[^3] Rather than treating models as black boxes, Ember enables users to examine individual "features" (interpretable patterns of neural activation), edit model behavior without retraining, and audit for safety issues before deployment. The platform supports models like Llama 3.3 70B and processes tokens at a rate that has tripled monthly since launch in December 2024.[^4]
 
-Goodfire's rapid ascent reflects growing industry recognition that interpretability is foundational to AI safety. The company raised \$50 million in Series A funding less than one year after founding, led by Menlo Ventures with participation from <EntityLink id="E22">Anthropic</EntityLink>—marking Anthropic's first direct investment in another company.[^5] Anthropic CEO <EntityLink id="E91">Dario Amodei</EntityLink> stated that "mechanistic interpretability is among the best bets to help us transform black-box neural networks into understandable, steerable systems."[^6] In February 2026, Goodfire raised a further \$150 million in Series B funding at a \$1.25 billion valuation, led by B Capital with participation from Salesforce Ventures, Eric Schmidt, and existing investors.[^43]
+Goodfire's rapid ascent reflects growing industry recognition that interpretability is foundational to AI safety. The company raised \$50 million in Series A funding less than one year after founding, led by Menlo Ventures with participation from <EntityLink id="anthropic">Anthropic</EntityLink>—marking Anthropic's first direct investment in another company.[^5] Anthropic CEO <EntityLink id="dario-amodei">Dario Amodei</EntityLink> stated that "mechanistic interpretability is among the best bets to help us transform black-box neural networks into understandable, steerable systems."[^6] In February 2026, Goodfire raised a further \$150 million in Series B funding at a \$1.25 billion valuation, led by B Capital with participation from Salesforce Ventures, Eric Schmidt, and existing investors.[^43]
 
 ## History and Founding
 
@@ -61,10 +61,10 @@ The company's founding in June 2024 was followed quickly by a \$7 million seed r
 
 ## Team and Expertise
 
-Beyond the three founders, Goodfire has assembled a team of leading researchers from <EntityLink id="E218">OpenAI</EntityLink> and <EntityLink id="E98">DeepMind</EntityLink>. The team includes:[^13]
+Beyond the three founders, Goodfire has assembled a team of leading researchers from <EntityLink id="openai">OpenAI</EntityLink> and <EntityLink id="deepmind">DeepMind</EntityLink>. The team includes:[^13]
 
-- **Lee Sharkey**: Pioneered the use of sparse autoencoders in language models and co-founded <EntityLink id="E24">Apollo Research</EntityLink>
-- **Nick Cammarata**: Started the interpretability team at OpenAI and worked closely with <EntityLink id="E59">Chris Olah</EntityLink>, widely considered the founder of mechanistic interpretability
+- **Lee Sharkey**: Pioneered the use of sparse autoencoders in language models and co-founded <EntityLink id="apollo-research">Apollo Research</EntityLink>
+- **Nick Cammarata**: Started the interpretability team at OpenAI and worked closely with <EntityLink id="chris-olah">Chris Olah</EntityLink>, widely considered the founder of mechanistic interpretability
 
 The team's collective contributions include authoring the three most-cited papers in mechanistic interpretability and pioneering techniques like sparse autoencoders (SAEs) for feature discovery, auto-interpretability methods, and knowledge extraction from models like AlphaZero.[^14]
 
@@ -94,7 +94,7 @@ Goodfire emphasizes safety-first applications of interpretability:[^20]
 - **Model diffing**: Detecting how and why unsafe behaviors emerge during training or fine-tuning
 - **PII detection**: Partnering with Rakuten to use sparse autoencoder probes to prevent personally identifiable information leakage[^21]
 
-Pre-release safety measures for Ember include feature moderation (removing harmful/explicit/malicious features), input/<EntityLink id="E595">output filtering</EntityLink>, and controlled access for researchers.[^22]
+Pre-release safety measures for Ember include feature moderation (removing harmful/explicit/malicious features), input/<EntityLink id="output-filtering">output filtering</EntityLink>, and controlled access for researchers.[^22]
 
 ### Intentional Design
 
@@ -117,19 +117,19 @@ A notable scientific achievement came from Goodfire's partnership with Arc Insti
 
 ## AI Safety and Alignment
 
-Goodfire positions mechanistic interpretability as foundational to <EntityLink id="E439">AI alignment</EntityLink> and safety. The company's approach addresses several key challenges:
+Goodfire positions mechanistic interpretability as foundational to <EntityLink id="alignment">AI alignment</EntityLink> and safety. The company's approach addresses several key challenges:
 
 ### Alignment Without Side Effects
 
-Traditional alignment methods like reinforcement learning from human feedback (<EntityLink id="E259">RLHF</EntityLink>) can produce unintended side effects, such as excessive refusal of benign requests or sycophantic behavior.[^29] Goodfire's feature steering offers an alternative by enabling precise, quantitative alignment of specific behaviors without degrading overall model performance.
+Traditional alignment methods like reinforcement learning from human feedback (<EntityLink id="rlhf">RLHF</EntityLink>) can produce unintended side effects, such as excessive refusal of benign requests or sycophantic behavior.[^29] Goodfire's feature steering offers an alternative by enabling precise, quantitative alignment of specific behaviors without degrading overall model performance.
 
 ### Detecting Deception and Hidden Behaviors
 
-One of the central challenges in AI safety is detecting deceptive or <EntityLink id="E274">scheming</EntityLink> behavior in advanced AI systems. Goodfire's model diffing and auditing tools aim to identify rare, undesired behaviors—such as a model encouraging self-harm—that might emerge during training or deployment.[^30] However, there is ongoing debate within the interpretability community about whether these techniques will scale to worst-case scenarios involving sophisticated deception.[^31]
+One of the central challenges in AI safety is detecting deceptive or <EntityLink id="scheming">scheming</EntityLink> behavior in advanced AI systems. Goodfire's model diffing and auditing tools aim to identify rare, undesired behaviors—such as a model encouraging self-harm—that might emerge during training or deployment.[^30] However, there is ongoing debate within the interpretability community about whether these techniques will scale to worst-case scenarios involving sophisticated deception.[^31]
 
 ### Governance and Compliance
 
-Interpretability tools like Ember may become essential for regulatory compliance. The <EntityLink id="E127">EU AI Act</EntityLink> mandates transparency for high-risk AI systems, with fines up to €20 million for violations.[^32] Goodfire's auditing and documentation capabilities could help organizations meet these requirements.
+Interpretability tools like Ember may become essential for regulatory compliance. The <EntityLink id="eu-ai-act">EU AI Act</EntityLink> mandates transparency for high-risk AI systems, with fines up to €20 million for violations.[^32] Goodfire's auditing and documentation capabilities could help organizations meet these requirements.
 
 ### Fellowship Program
 
@@ -141,13 +141,13 @@ Despite significant progress, Goodfire's approach faces several challenges and c
 
 ### Unproven Effectiveness in Worst-Case Scenarios
 
-There is substantial debate about whether mechanistic interpretability can reliably detect deception in advanced AI systems. Researcher <EntityLink id="E214">Neel Nanda</EntityLink> has noted that interpretability lacks "ground truth" for what concepts AI models actually use, making it difficult to validate interpretability claims.[^34] Some researchers favor alternative methods like linear probes.
+There is substantial debate about whether mechanistic interpretability can reliably detect deception in advanced AI systems. Researcher <EntityLink id="neel-nanda">Neel Nanda</EntityLink> has noted that interpretability lacks "ground truth" for what concepts AI models actually use, making it difficult to validate interpretability claims.[^34] Some researchers favor alternative methods like linear probes.
 
-A concrete example of interpretability's limitations emerged with GPT-4o's "extreme <EntityLink id="E295">sycophancy</EntityLink>" issue, which was detected behaviorally rather than through mechanistic analysis—no circuit was discovered, no particular weights or activations were identified as responsible, and mechanistic interpretability provided no advance warning.[^35]
+A concrete example of interpretability's limitations emerged with GPT-4o's "extreme <EntityLink id="sycophancy">sycophancy</EntityLink>" issue, which was detected behaviorally rather than through mechanistic analysis—no circuit was discovered, no particular weights or activations were identified as responsible, and mechanistic interpretability provided no advance warning.[^35]
 
 ### Competition from In-House Development
 
-Leading AI labs like <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, and <EntityLink id="E98">DeepMind</EntityLink> have the resources to develop interpretability tools internally. Anthropic has publicly committed to investing significantly in reliably detecting AI model problems by 2027.[^36] Additionally, open-source alternatives like Eleuther AI and InterpretML provide free interpretability frameworks, creating competitive pressure on commercial offerings.
+Leading AI labs like <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, and <EntityLink id="deepmind">DeepMind</EntityLink> have the resources to develop interpretability tools internally. Anthropic has publicly committed to investing significantly in reliably detecting AI model problems by 2027.[^36] Additionally, open-source alternatives like Eleuther AI and InterpretML provide free interpretability frameworks, creating competitive pressure on commercial offerings.
 
 ### Computational Cost and Accessibility
 
@@ -159,7 +159,7 @@ In February 2026, Goodfire Chief Scientist Thomas McGrath published "Intentional
 
 Critics argue that optimizing against interpretability signals during training teaches models to obfuscate their internal representations, ultimately degrading the very tools needed to detect misalignment.[^46] As Mowshowitz summarized: if you train against technique [T], "you are training the AI to obfuscate its thinking, and defeat [T]." A LessWrong post specifically questioning Goodfire's approach noted that even structurally different methods like gradient decomposition may not escape this fundamental dynamic, since "selection pressure just goes into the parts that you don't know about or don't completely understand."[^47]
 
-Defenders, including <EntityLink id="E214">Neel Nanda</EntityLink>, argued that this research direction is both legitimate and potentially critical for safety. Nanda noted that multiple researchers including Anthropic Fellows have worked on interpretability-in-training, and that understanding its risks and benefits requires empirical research rather than blanket prohibition.[^48] He acknowledged key uncertainties: "I don't know how well it will work, how much it will break interpretability tools, or which things are more or less dangerous."
+Defenders, including <EntityLink id="neel-nanda">Neel Nanda</EntityLink>, argued that this research direction is both legitimate and potentially critical for safety. Nanda noted that multiple researchers including Anthropic Fellows have worked on interpretability-in-training, and that understanding its risks and benefits requires empirical research rather than blanket prohibition.[^48] He acknowledged key uncertainties: "I don't know how well it will work, how much it will break interpretability tools, or which things are more or less dangerous."
 
 The debate took a personal dimension when founding research scientist Liv Gorton departed Goodfire in early 2026, with AI safety advocate Holly Elmore publicly speculating the departure was "for reasons of conscience."[^49] Gorton's departure—she had co-authored key research including the first sparse autoencoders on DeepSeek R1—highlighted the tensions between commercial applications of interpretability and its role as an independent safety tool.
 
@@ -177,7 +177,7 @@ Goodfire has raised approximately \$209 million across three rounds:[^39]
 | Series A | April 2025 | \$50M | Menlo Ventures | Anthropic, Lightspeed Venture Partners, B Capital, Work-Bench, Wing Ventures, South Park Commons, Metaplanet, Halcyon Ventures | \$200M |
 | Series B | February 2026 | \$150M | B Capital | Juniper Ventures, DFJ Growth, Salesforce Ventures, Menlo Ventures, Lightspeed Venture Partners, South Park Commons, Wing Venture Capital, Eric Schmidt | \$1.25B |
 
-The Series A round marked <EntityLink id="E22">Anthropic</EntityLink>'s first direct investment in another company, signaling significant industry validation.[^40] The Series B, closing less than a year later, valued Goodfire at \$1.25 billion—making it one of the fastest AI startups to reach unicorn status.[^43]
+The Series A round marked <EntityLink id="anthropic">Anthropic</EntityLink>'s first direct investment in another company, signaling significant industry validation.[^40] The Series B, closing less than a year later, valued Goodfire at \$1.25 billion—making it one of the fastest AI startups to reach unicorn status.[^43]
 
 Goodfire operates on a usage-based pricing model, charging per million tokens processed (input + output), with pricing tiered by model size:[^41]
 

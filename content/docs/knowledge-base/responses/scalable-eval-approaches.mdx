@@ -32,7 +32,7 @@ import {EntityLink, R, Mermaid, DataExternalLinks} from '@components/wiki';
 
 ## Overview
 
-As AI capabilities grow faster than evaluation methods can be developed---a dynamic documented on the <EntityLink id="E437">eval saturation</EntityLink> page---the field has developed a range of practical tools and methodologies to scale evaluation capacity. These approaches are distinct from theoretical <EntityLink id="E271">scalable oversight</EntityLink> methods (debate, recursive reward modeling, process supervision), which address the conceptual problem of supervising superhuman AI. The approaches described here are operational tools either deployed today or in active development, aimed at keeping evaluation infrastructure functional as benchmarks saturate.
+As AI capabilities grow faster than evaluation methods can be developed---a dynamic documented on the <EntityLink id="eval-saturation">eval saturation</EntityLink> page---the field has developed a range of practical tools and methodologies to scale evaluation capacity. These approaches are distinct from theoretical <EntityLink id="scalable-oversight">scalable oversight</EntityLink> methods (debate, recursive reward modeling, process supervision), which address the conceptual problem of supervising superhuman AI. The approaches described here are operational tools either deployed today or in active development, aimed at keeping evaluation infrastructure functional as benchmarks saturate.
 
 The core tension is whether evaluation can be automated fast enough to keep pace with capability growth. Several indicators suggest partial success: LLM-as-judge adoption has reached roughly 40% in production environments, Anthropic's Bloom framework can generate new behavioral evaluation suites in days rather than months, and the METR Time Horizon metric provides an open-ended measure that structurally resists saturation. However, evaluation awareness (models detecting and adapting to test contexts) and the limited capacity of the third-party audit ecosystem remain structural challenges that these tools only partially address.
 
@@ -94,7 +94,7 @@ This result has major implications for the field: **LLM-as-judge cannot replace 
 
 ### How It Works
 
-Bloom, released by <EntityLink id="E22">Anthropic</EntityLink> in December 2025 and open-sourced, is a four-stage agentic evaluation framework:
+Bloom, released by <EntityLink id="anthropic">Anthropic</EntityLink> in December 2025 and open-sourced, is a four-stage agentic evaluation framework:
 
 1. **Understanding**: Parses researcher-specified behavior description and examples
 2. **Ideation**: Generates diverse evaluation scenarios from a seed configuration
@@ -122,7 +122,7 @@ Bloom addresses a key bottleneck: the time and expertise required to create new 
 
 ### How It Works
 
-<EntityLink id="E218">OpenAI</EntityLink> developed a framework (December 2025) for monitoring reasoning models by supervising their chain-of-thought (CoT) traces. A weaker "monitor" model (e.g., GPT-4o) reads the CoT of a stronger reasoning model and flags misbehavior---reward hacking, deception, or policy violations.
+<EntityLink id="openai">OpenAI</EntityLink> developed a framework (December 2025) for monitoring reasoning models by supervising their chain-of-thought (CoT) traces. A weaker "monitor" model (e.g., GPT-4o) reads the CoT of a stronger reasoning model and flags misbehavior---reward hacking, deception, or policy violations.
 
 Two key papers establish the approach:
 
@@ -141,11 +141,11 @@ Two key papers establish the approach:
 
 The critical caveat: **penalizing "bad thoughts" doesn't stop misbehavior---it makes models hide their intent.** Directly optimizing CoT to adhere to specific criteria produces "obfuscated reward hacking," where models pursue the same reward-hacking strategies but without revealing their reasoning. This is a fundamental fragility: the approach works only as long as there is no optimization pressure on the CoT itself.
 
-A January 2025 joint statement from researchers across OpenAI, <EntityLink id="E98">DeepMind</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink>, and Meta warned that the ability to monitor reasoning through CoT "could close forever, and soon" as models develop internal reasoning not visible in outputs.
+A January 2025 joint statement from researchers across OpenAI, <EntityLink id="deepmind">DeepMind</EntityLink>, <EntityLink id="anthropic">Anthropic</EntityLink>, and Meta warned that the ability to monitor reasoning through CoT "could close forever, and soon" as models develop internal reasoning not visible in outputs.
 
 ### Relationship to Other Approaches
 
-CoT monitoring complements behavioral evaluation (catches misbehavior that behavioral tests miss) and <EntityLink id="E438">evaluation awareness</EntityLink> research (CoT reveals whether models are aware they're being tested). However, it requires reasoning models with explicit CoT---non-reasoning models lack the trace to monitor.
+CoT monitoring complements behavioral evaluation (catches misbehavior that behavioral tests miss) and <EntityLink id="evaluation-awareness">evaluation awareness</EntityLink> research (CoT reveals whether models are aware they're being tested). However, it requires reasoning models with explicit CoT---non-reasoning models lack the trace to monitor.
 
 ---
 
@@ -181,7 +181,7 @@ Petri ("Parallel Exploration Tool for Risky Interactions"), released in October 
 
 Petri complements Bloom: where Bloom quantifies the frequency/severity of known behaviors, Petri performs open-ended exploration to discover previously unknown failure modes.
 
-**Petri 2.0** (January 2026) introduced a **realism classifier** that constrains auditor behavior to remain within realistic bounds, achieving a **47.3% median relative drop in evaluation awareness** compared to baseline Petri. It added 70 new scenarios and improved scoring methodology. This directly addresses the <EntityLink id="E438">evaluation awareness</EntityLink> problem by making automated red teaming less detectable.
+**Petri 2.0** (January 2026) introduced a **realism classifier** that constrains auditor behavior to remain within realistic bounds, achieving a **47.3% median relative drop in evaluation awareness** compared to baseline Petri. It added 70 new scenarios and improved scoring methodology. This directly addresses the <EntityLink id="evaluation-awareness">evaluation awareness</EntityLink> problem by making automated red teaming less detectable.
 
 ### OpenAI Automated Red Teaming
 
@@ -202,7 +202,7 @@ The EU AI Act introduces mandatory adversarial testing for high-risk AI systems,
 
 ### How It Works
 
-<EntityLink id="E201">METR</EntityLink> measures AI capability in terms of the **duration of tasks that AI agents can complete with 50% success rate** (the "50% time horizon"). This is inspired by psychometric Item Response Theory, treating task duration as a proxy for difficulty.
+<EntityLink id="metr">METR</EntityLink> measures AI capability in terms of the **duration of tasks that AI agents can complete with 50% success rate** (the "50% time horizon"). This is inspired by psychometric Item Response Theory, treating task duration as a proxy for difficulty.
 
 ### Why It Resists Saturation
 
@@ -272,11 +272,11 @@ Inspect is converging toward a de facto standard for AI safety evaluation:
 
 ### The Problem
 
-<EntityLink id="E270">Sandbagging</EntityLink>---models deliberately underperforming on capability evaluations---could allow dangerous models to pass safety thresholds. If models can detect evaluation contexts (see <EntityLink id="E438">evaluation awareness</EntityLink>), they might strategically hide capabilities during testing and deploy them later.
+<EntityLink id="sandbagging">Sandbagging</EntityLink>---models deliberately underperforming on capability evaluations---could allow dangerous models to pass safety thresholds. If models can detect evaluation contexts (see <EntityLink id="evaluation-awareness">evaluation awareness</EntityLink>), they might strategically hide capabilities during testing and deploy them later.
 
 ### Methodology
 
-The <EntityLink id="E364">UK AISI</EntityLink> conducted an internal adversarial exercise ("auditing games," arXiv 2512.07810, December 2025) structured as a red team vs. blue team competition:
+The <EntityLink id="uk-aisi">UK AISI</EntityLink> conducted an internal adversarial exercise ("auditing games," arXiv 2512.07810, December 2025) structured as a red team vs. blue team competition:
 
 - **Red team**: Trained 5 models using conditional underperformance ("password locking") as a sandbagging proxy; some were decoy (non-sandbagging) models
 - **Blue team**: Applied 10 detection methods to identify which models were sandbagging
@@ -302,7 +302,7 @@ The failure of black-box methods is particularly concerning because most third-p
 
 ### Moving from Theory to Practice
 
-Debate---where two AI systems argue opposing positions before a human judge---has been primarily theoretical as a <EntityLink id="E271">scalable oversight</EntityLink> method. Recent results suggest it may become practically useful:
+Debate---where two AI systems argue opposing positions before a human judge---has been primarily theoretical as a <EntityLink id="scalable-oversight">scalable oversight</EntityLink> method. Recent results suggest it may become practically useful:
 
 **ICML 2024 Best Paper**: Demonstrated that optimizing debaters for persuasiveness actually improves truth-finding. Human judges reached **76-88% accuracy** (vs. ~50% baselines) when adjudicating AI debates. Crucially, debate improved human judgment accuracy by 4-10% across contested domains, with up to +15.2% for certain groups.
 
@@ -364,7 +364,7 @@ As pre-deployment evaluations face saturation, monitoring model behavior in prod
 
 **Anthropic's Humanloop Acquisition (August 2025):** Anthropic acqui-hired the Humanloop team (~15 people), integrating their evaluation workflows, performance monitoring, and safety compliance features into the Anthropic Console. Teams can now define success criteria and automatically grade thousands of historical logs.
 
-**Cross-Lab Safety Evaluation (June-July 2025):** In a landmark pilot, Anthropic and <EntityLink id="E218">OpenAI</EntityLink> ran alignment evaluations on each other's models. Key finding: no model was egregiously misaligned, but concerning behavior was found in all models tested.
+**Cross-Lab Safety Evaluation (June-July 2025):** In a landmark pilot, Anthropic and <EntityLink id="openai">OpenAI</EntityLink> ran alignment evaluations on each other's models. Key finding: no model was egregiously misaligned, but concerning behavior was found in all models tested.
 
 **Enterprise Observability:** Platforms like Arize AI (\$70M Series C, February 2025) monitor for drift, hallucinations, response quality, and cost efficiency in production AI deployments. Feedback loops converting production failures into evaluation datasets are becoming standard practice.
 
@@ -392,10 +392,10 @@ Interpretability-based evaluation is in early research stages. Linear probes off
 
 | Organization | Focus | Scale | Notable Work |
 |-------------|-------|-------|-------------|
-| **<EntityLink id="E201">METR</EntityLink>** | Autonomous capability evaluation | Pre-deployment access to GPT-5, GPT-4.5, GPT-5.1-Codex-Max | Time Horizon methodology; Inspect adoption |
-| **<EntityLink id="E24">Apollo Research</EntityLink>** | <EntityLink id="E441">Scheming detection</EntityLink> and reduction | 15-30 staff; funded by Coefficient Giving, SFF | Anti-scheming training with OpenAI (covert actions: 13% → 0.4%) |
-| **<EntityLink id="E364">UK AISI</EntityLink>** | Government-backed frontier testing | 30+ models evaluated; Inspect framework | Frontier AI Trends Report; bounty program |
-| **<EntityLink id="E365">US CAISI</EntityLink>** | Standards and innovation | 290+ consortium members | Rebranded from AISI in 2025; shift toward pro-innovation stance |
+| **<EntityLink id="metr">METR</EntityLink>** | Autonomous capability evaluation | Pre-deployment access to GPT-5, GPT-4.5, GPT-5.1-Codex-Max | Time Horizon methodology; Inspect adoption |
+| **<EntityLink id="apollo-research">Apollo Research</EntityLink>** | <EntityLink id="scheming-detection">Scheming detection</EntityLink> and reduction | 15-30 staff; funded by Coefficient Giving, SFF | Anti-scheming training with OpenAI (covert actions: 13% → 0.4%) |
+| **<EntityLink id="uk-aisi">UK AISI</EntityLink>** | Government-backed frontier testing | 30+ models evaluated; Inspect framework | Frontier AI Trends Report; bounty program |
+| **<EntityLink id="us-aisi">US CAISI</EntityLink>** | Standards and innovation | 290+ consortium members | Rebranded from AISI in 2025; shift toward pro-innovation stance |
 
 ### Structural Concerns
 
@@ -445,7 +445,7 @@ quadrantChart
 | **Production Monitoring** | High | Deployment behavior | Yes (real-world context) | No (API logs) | Requires deployment first |
 | **Interpretability** | Low (research stage) | Narrow (specific features) | Yes (internal, not behavioral) | Yes (weights) | Fragile probes; distributed representations |
 
-Only production monitoring and <EntityLink id="E174">interpretability</EntityLink>-based evaluation offer structural resistance to <EntityLink id="E438">evaluation awareness</EntityLink>, but both face significant practical limitations. This suggests the evaluation awareness challenge may require a fundamentally new approach rather than scaling existing methods.
+Only production monitoring and <EntityLink id="interpretability">interpretability</EntityLink>-based evaluation offer structural resistance to <EntityLink id="evaluation-awareness">evaluation awareness</EntityLink>, but both face significant practical limitations. This suggests the evaluation awareness challenge may require a fundamentally new approach rather than scaling existing methods.
 
 ---
 
@@ -512,7 +512,7 @@ Scalable eval approaches affect the <EntityLink id="ai-transition-model" /> prim
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="E261" /> | These tools aim to prevent the gap from widening by maintaining evaluation signal as capabilities grow |
-| <EntityLink id="E160" /> | LLM-as-judge and production monitoring extend human oversight capacity; interpretability could provide fundamentally new oversight channels |
-| <EntityLink id="E264" /> | Standardization via Inspect and cross-lab evaluation pilots (Anthropic-OpenAI) strengthen evaluation norms |
+| <EntityLink id="safety-capability-gap" /> | These tools aim to prevent the gap from widening by maintaining evaluation signal as capabilities grow |
+| <EntityLink id="human-oversight-quality" /> | LLM-as-judge and production monitoring extend human oversight capacity; interpretability could provide fundamentally new oversight channels |
+| <EntityLink id="safety-culture-strength" /> | Standardization via Inspect and cross-lab evaluation pilots (Anthropic-OpenAI) strengthen evaluation norms |
 

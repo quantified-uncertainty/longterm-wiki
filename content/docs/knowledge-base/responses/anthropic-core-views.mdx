@@ -32,20 +32,20 @@ import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | Research Investment | High (≈\$100-200M/year) | Estimated 15-25% of R&D budget on safety research; dedicated teams for interpretability, alignment, and red-teaming |
-| Interpretability Leadership | Highest in industry | 40-60 researchers led by <R id="5c66c0b83538d580"><EntityLink id="E59">Chris Olah</EntityLink></R>; published <R id="e724db341d6e0065">Scaling Monosemanticity</R> (May 2024) |
+| Interpretability Leadership | Highest in industry | 40-60 researchers led by <R id="5c66c0b83538d580"><EntityLink id="chris-olah">Chris Olah</EntityLink></R>; published <R id="e724db341d6e0065">Scaling Monosemanticity</R> (May 2024) |
 | Safety/Capability Ratio | Medium (20-30%) | Estimated 20-30% of 1,000+ technical staff focus primarily on safety vs. capability development |
-| Publication Output | Medium-High | 15-25 major papers annually including <EntityLink id="E451">Constitutional AI</EntityLink>, interpretability, and deception research |
-| Industry Influence | High | RSP framework adopted by <EntityLink id="E218">OpenAI</EntityLink>, DeepMind; <R id="627bb42e8f74be04">MOU with <EntityLink id="E365">US AI Safety Institute</EntityLink></R> (August 2024) |
+| Publication Output | Medium-High | 15-25 major papers annually including <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, interpretability, and deception research |
+| Industry Influence | High | RSP framework adopted by <EntityLink id="openai">OpenAI</EntityLink>, DeepMind; <R id="627bb42e8f74be04">MOU with <EntityLink id="us-aisi">US AI Safety Institute</EntityLink></R> (August 2024) |
 | Commercial Pressure Risk | High | \$5B+ run-rate revenue by August 2025; \$8B Amazon investment, \$3B Google investment create deployment incentives |
 | Governance Structure | Medium | Public Benefit Corporation status provides some protection; Jared Kaplan serves as Responsible Scaling Officer |
 
 ## Overview
 
-<EntityLink id="E22">Anthropic</EntityLink>'s <R id="5fa46de681ff9902">Core Views on AI Safety</R>, published in 2023, articulates the company's fundamental thesis: that meaningful AI safety work requires being at the frontier of AI development, not merely studying it from the sidelines. The approximately 6,000-word document outlines Anthropic's predictions that AI systems "will become far more capable in the next decade, possibly equaling or exceeding human level performance at most intellectual tasks," and argues that safety research must keep pace with these advances.
+<EntityLink id="anthropic">Anthropic</EntityLink>'s <R id="5fa46de681ff9902">Core Views on AI Safety</R>, published in 2023, articulates the company's fundamental thesis: that meaningful AI safety work requires being at the frontier of AI development, not merely studying it from the sidelines. The approximately 6,000-word document outlines Anthropic's predictions that AI systems "will become far more capable in the next decade, possibly equaling or exceeding human level performance at most intellectual tasks," and argues that safety research must keep pace with these advances.
 
-The Core Views emerge from Anthropic's unique position as a company founded in 2021 by <R id="6f8557a8ff87bf5a">seven former OpenAI employees</R>—including siblings Dario and <EntityLink id="E90">Daniela Amodei</EntityLink>—explicitly around AI safety concerns. The company has since raised over \$11 billion, including <R id="626e0dd4e20cf85e">\$8 billion from Amazon</R> and <R id="ac6cbd8d06bd1b94">\$3 billion from Google</R>, while reaching <R id="ec61859c92256ab0">over \$5 billion in annualized revenue</R> by August 2025. This dual identity—mission-driven safety organization and commercial AI lab—creates both opportunities and tensions that illuminate broader questions about how AI safety research should be conducted in an increasingly competitive landscape.
+The Core Views emerge from Anthropic's unique position as a company founded in 2021 by <R id="6f8557a8ff87bf5a">seven former OpenAI employees</R>—including siblings Dario and <EntityLink id="daniela-amodei">Daniela Amodei</EntityLink>—explicitly around AI safety concerns. The company has since raised over \$11 billion, including <R id="626e0dd4e20cf85e">\$8 billion from Amazon</R> and <R id="ac6cbd8d06bd1b94">\$3 billion from Google</R>, while reaching <R id="ec61859c92256ab0">over \$5 billion in annualized revenue</R> by August 2025. This dual identity—mission-driven safety organization and commercial AI lab—creates both opportunities and tensions that illuminate broader questions about how AI safety research should be conducted in an increasingly competitive landscape.
 
-At its essence, the Core Views document attempts to resolve what many see as a fundamental contradiction: how can building increasingly powerful AI systems be reconciled with concerns about AI safety and existential risk? Anthropic's answer involves a theory of change that emphasizes empirical research, <EntityLink id="E271">scalable oversight</EntityLink> techniques, and the development of safety methods that can keep pace with rapidly advancing capabilities. The document presents a three-tier framework (optimistic, intermediate, pessimistic scenarios) for how difficult alignment might prove to be, with corresponding strategic responses for each scenario. Whether this approach genuinely advances safety or primarily serves to justify commercial AI development remains one of the most contentious questions in <EntityLink id="E608">AI governance</EntityLink>.
+At its essence, the Core Views document attempts to resolve what many see as a fundamental contradiction: how can building increasingly powerful AI systems be reconciled with concerns about AI safety and existential risk? Anthropic's answer involves a theory of change that emphasizes empirical research, <EntityLink id="scalable-oversight">scalable oversight</EntityLink> techniques, and the development of safety methods that can keep pace with rapidly advancing capabilities. The document presents a three-tier framework (optimistic, intermediate, pessimistic scenarios) for how difficult alignment might prove to be, with corresponding strategic responses for each scenario. Whether this approach genuinely advances safety or primarily serves to justify commercial AI development remains one of the most contentious questions in <EntityLink id="ai-governance">AI governance</EntityLink>.
 
 ### Anthropic's Theory of Change
 
@@ -142,7 +142,7 @@ Anthropic's Core Views framework and associated research address multiple AI ris
 | Risk Category | Mechanism | Anthropic's Approach |
 |---------------|-----------|---------------------|
 | Deceptive alignment | AI systems optimizing for appearing aligned | Interpretability to detect deception features; Sleeper Agents research |
-| <EntityLink id="E42">Misuse - Bioweapons</EntityLink> | AI assisting biological weapon development | RSP biosecurity evaluations; Frontier Red Team assessments |
+| <EntityLink id="bioweapons">Misuse - Bioweapons</EntityLink> | AI assisting biological weapon development | RSP biosecurity evaluations; Frontier Red Team assessments |
 | Misuse - Cyberweapons | AI assisting cyberattacks | Capability thresholds before deployment; jailbreak-resistant classifiers |
 | Loss of control | AI systems pursuing unintended goals | Constitutional AI for value alignment; RSP deployment gates |
 | Racing dynamics | Labs cutting safety corners for competitive advantage | RSP framework exportable to other labs; industry norm-setting |
@@ -271,9 +271,9 @@ Anthropic's Core Views framework influences the <EntityLink id="ai-transition-mo
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="E205" /> | <EntityLink id="E20" /> | Constitutional AI and interpretability research develop alignment techniques |
-| <EntityLink id="E205" /> | <EntityLink id="E264" /> | RSP framework exports safety norms across industry |
-| <EntityLink id="E358" /> | <EntityLink id="E242" /> | Safety-focused competitor may reduce pressure to cut corners |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="alignment-robustness" /> | Constitutional AI and interpretability research develop alignment techniques |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-culture-strength" /> | RSP framework exports safety norms across industry |
+| <EntityLink id="transition-turbulence" /> | <EntityLink id="racing-intensity" /> | Safety-focused competitor may reduce pressure to cut corners |
 
 Anthropic's dual role as commercial lab and safety-focused organization tests whether frontier access genuinely advances safety research.
 

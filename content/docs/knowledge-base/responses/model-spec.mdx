@@ -30,7 +30,7 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 |-----------|------------|----------|
 | **Tractability** | High | All major frontier labs now publish specs; relatively low technical barriers to creation |
 | **Effectiveness** | Medium | Improves transparency and accountability; limited enforcement mechanisms |
-| **Adoption** | Widespread (2025) | Anthropic, OpenAI, <EntityLink id="E98">Google DeepMind</EntityLink>, Meta all publish model documentation |
+| **Adoption** | Widespread (2025) | Anthropic, OpenAI, <EntityLink id="deepmind">Google DeepMind</EntityLink>, Meta all publish model documentation |
 | **Investment** | \$10-30M/year industry-wide | Internal lab work on spec development and training integration |
 | **Timeline** | Immediate | Mature practice since 2019 ([Model Cards](https://arxiv.org/abs/1810.03993)); accelerating since 2024 |
 | **Key Limitation** | Spec-reality gap | Specifications don't guarantee implementation; gaming potential high |
@@ -39,9 +39,9 @@ import {R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
 
 ## Overview
 
-Model specifications are explicit, written documents that define the intended behavior, values, and boundaries of AI systems. Rather than relying solely on implicit learning from training data, model specs provide clear articulation of what an AI system should and should not do, how it should handle edge cases, and what values should guide its behavior when tradeoffs arise. As of 2025, all major frontier AI labs—including <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, Google DeepMind, and Meta—publish model specifications or detailed model cards for their systems.
+Model specifications are explicit, written documents that define the intended behavior, values, and boundaries of AI systems. Rather than relying solely on implicit learning from training data, model specs provide clear articulation of what an AI system should and should not do, how it should handle edge cases, and what values should guide its behavior when tradeoffs arise. As of 2025, all major frontier AI labs—including <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, Google DeepMind, and Meta—publish model specifications or detailed model cards for their systems.
 
-The practice emerged from recognizing that implicit behavioral training through <EntityLink id="E259">RLHF</EntityLink> alone leaves important questions unanswered: What should the model do when helpfulness conflicts with honesty? How should it handle requests that might be harmful in some contexts but legitimate in others? Model specs provide explicit answers to these questions, creating a documented target for training and a reference for evaluation. The foundational work on [Model Cards for Model Reporting](https://arxiv.org/abs/1810.03993) by Mitchell et al. (2019), which introduced standardized documentation for ML models, has been cited over 2,273 times and established the framework for AI behavior documentation.
+The practice emerged from recognizing that implicit behavioral training through <EntityLink id="rlhf">RLHF</EntityLink> alone leaves important questions unanswered: What should the model do when helpfulness conflicts with honesty? How should it handle requests that might be harmful in some contexts but legitimate in others? Model specs provide explicit answers to these questions, creating a documented target for training and a reference for evaluation. The foundational work on [Model Cards for Model Reporting](https://arxiv.org/abs/1810.03993) by Mitchell et al. (2019), which introduced standardized documentation for ML models, has been cited over 2,273 times and established the framework for AI behavior documentation.
 
 Anthropic's [Claude Soul Document](https://simonwillison.net/2025/Dec/2/claude-soul-document/)—a 14,000-token document embedded into model weights during supervised learning—represents one approach, defining Claude's identity, ethical framework, and hierarchy of principals (Anthropic → Operators → Users). OpenAI's [Model Spec](https://model-spec.openai.com/2025-12-18.html) has been updated 6+ times in 2025, with versions addressing agent principles, teen safety, and collective alignment input from over 1,000 people worldwide. Meta publishes comprehensive [Llama Model Cards](https://www.llama.com/docs/model-cards-and-prompt-formats/) alongside safety guardrails like Llama Guard.
 
@@ -247,8 +247,8 @@ For superintelligent systems, model specs face fundamental challenges:
 
 ### Integration with Training Methods
 
-- **<EntityLink id="E451">Constitutional AI</EntityLink>**: Specs inform constitutional principles
-- **<EntityLink id="E259">RLHF</EntityLink>**: Specs guide rater instructions
+- **<EntityLink id="constitutional-ai">Constitutional AI</EntityLink>**: Specs inform constitutional principles
+- **<EntityLink id="rlhf">RLHF</EntityLink>**: Specs guide rater instructions
 - **Evaluation**: Specs define test criteria
 
 ### Complementary Approaches
@@ -336,10 +336,10 @@ The [Model Context Protocol (MCP)](https://guptadeepak.com/the-complete-guide-to
 
 | Focus Area | Relevance |
 |------------|-----------|
-| **<EntityLink id="E451">Constitutional AI</EntityLink>** | Specs inform constitutional principles for training |
-| **<EntityLink id="E259">RLHF</EntityLink>** | Specs guide human rater instructions |
-| **<EntityLink id="E128">AI Evaluation</EntityLink>** | Specs define test criteria for verification |
-| **<EntityLink id="E252">Responsible Scaling Policies</EntityLink>** | Specs integrate with capability thresholds |
+| **<EntityLink id="constitutional-ai">Constitutional AI</EntityLink>** | Specs inform constitutional principles for training |
+| **<EntityLink id="rlhf">RLHF</EntityLink>** | Specs guide human rater instructions |
+| **<EntityLink id="evals">AI Evaluation</EntityLink>** | Specs define test criteria for verification |
+| **<EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink>** | Specs integrate with capability thresholds |
 
 ---
 
@@ -349,7 +349,7 @@ Model specifications relate to the <EntityLink id="ai-transition-model" /> throu
 
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
-| <EntityLink id="E205" /> | <EntityLink id="E264" /> | Specs enable transparent safety practices and external accountability |
+| <EntityLink id="misalignment-potential" /> | <EntityLink id="safety-culture-strength" /> | Specs enable transparent safety practices and external accountability |
 | <EntityLink id="deployment-decisions" /> | Deployment standards | Specs provide reference for safe deployment |
 
 Model specs contribute to safety infrastructure but don't solve the fundamental alignment problem - they're necessary but not sufficient for safe AI development.

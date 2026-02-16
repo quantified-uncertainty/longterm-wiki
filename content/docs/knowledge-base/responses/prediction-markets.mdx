@@ -31,7 +31,7 @@ Prediction markets are trading platforms where participants buy and sell contrac
 
 The empirical track record is strong. In U.S. presidential elections, prediction markets have outperformed polls by 15-25% on accuracy metrics, achieving Brier scores of 0.16-0.24 compared to 0.20-0.30 for polling averages (<R id="6de9674ebcc55023">Berg et al., 2008</R>). In scientific replication markets, traders correctly predicted which studies would replicate 85% of the time, compared to 58% for expert surveys (<R id="3a70c66d762d4007">Dreber et al., 2015</R>). The theoretical basis for this performance rests on information aggregation—when dispersed private information gets expressed through trading, prices converge toward accuracy (<R id="5e8664cd93020cde">Arrow et al., 2008</R>).
 
-For <EntityLink id="E122">epistemic infrastructure</EntityLink>, prediction markets offer three key advantages over alternatives like expert panels or opinion surveys. First, they create continuous, real-time probability estimates that update within minutes of relevant news. Second, they weight opinions by confidence—traders who believe strongly stake more capital. Third, they're resistant to ideological capture because consistently wrong traders lose money and exit the market. The foundational analysis by <R id="d52dcf2e6c08b5b2">Wolfers & Zitzewitz (2004)</R> demonstrates these mechanisms work across political, sports, and economic contexts.
+For <EntityLink id="epistemic-infrastructure">epistemic infrastructure</EntityLink>, prediction markets offer three key advantages over alternatives like expert panels or opinion surveys. First, they create continuous, real-time probability estimates that update within minutes of relevant news. Second, they weight opinions by confidence—traders who believe strongly stake more capital. Third, they're resistant to ideological capture because consistently wrong traders lose money and exit the market. The foundational analysis by <R id="d52dcf2e6c08b5b2">Wolfers & Zitzewitz (2004)</R> demonstrates these mechanisms work across political, sports, and economic contexts.
 
 ## Quick Assessment
 
@@ -41,7 +41,7 @@ For <EntityLink id="E122">epistemic infrastructure</EntityLink>, prediction mark
 | Scalability | Medium | Requires sufficient liquidity per question; thin markets unreliable |
 | Current Maturity | Medium-High | Decades of empirical evidence; mainstream adoption growing |
 | Time Horizon | Active now | Already deployed; question is expansion |
-| Key Proponents | <EntityLink id="E555">Polymarket</EntityLink>, <EntityLink id="E199">Metaculus</EntityLink>, <EntityLink id="E537">Kalshi</EntityLink> | Active platforms with different regulatory approaches |
+| Key Proponents | <EntityLink id="polymarket">Polymarket</EntityLink>, <EntityLink id="metaculus">Metaculus</EntityLink>, <EntityLink id="kalshi">Kalshi</EntityLink> | Active platforms with different regulatory approaches |
 
 ## How It Works
 
@@ -97,15 +97,15 @@ The prediction market ecosystem splits along a regulatory fault line.
 
 **Regulated real-money markets** face tighter constraints. In the U.S., the <R id="7546a582e1adddff">CFTC</R> classifies prediction contracts as derivatives, requiring platforms like <R id="8d054aa535ed84ad">Kalshi</R> to seek approval for each question category. Kalshi has steadily expanded permitted categories but operates with lower volume (\$100-300M annually) and narrower question sets. The UK and EU offer more permissive frameworks, with <R id="cd692e68fd8ba206">Betfair</R> handling \$50B+ in annual volume across sports and politics.
 
-**Play-money platforms** sidestep regulations by removing financial stakes. <R id="d99a6d0fb1edc2db">Metaculus</R> leads in AI and science forecasting with 15,000+ active forecasters and verified track records dating to 2015. Superforecasters on the platform achieve Brier scores of 0.15-0.19 on AI timeline questions (<R id="664518d11aec3317"><EntityLink id="E532">Good Judgment</EntityLink> research</R>). <EntityLink id="E546">Manifold</EntityLink> Markets allows users to create questions on any topic, trading coverage breadth for accuracy.
+**Play-money platforms** sidestep regulations by removing financial stakes. <R id="d99a6d0fb1edc2db">Metaculus</R> leads in AI and science forecasting with 15,000+ active forecasters and verified track records dating to 2015. Superforecasters on the platform achieve Brier scores of 0.15-0.19 on AI timeline questions (<R id="664518d11aec3317"><EntityLink id="good-judgment">Good Judgment</EntityLink> research</R>). <EntityLink id="manifold">Manifold</EntityLink> Markets allows users to create questions on any topic, trading coverage breadth for accuracy.
 
 ## Applications to AI Safety
 
-Prediction markets offer potentially valuable inputs for <EntityLink id="E608">AI governance</EntityLink>, though with significant limitations for the questions that matter most.
+Prediction markets offer potentially valuable inputs for <EntityLink id="ai-governance">AI governance</EntityLink>, though with significant limitations for the questions that matter most.
 
-For near-term forecasting, the track record is promising. Markets on AI policy questions (regulation passage, lab announcements, capability milestone dates) show roughly 70% accuracy on 1-year horizons. Metaculus hosts active questions on <R id="d51930ec3933c973"><EntityLink id="E399">AGI timeline</EntityLink> estimates</R>, capability benchmarks, and safety research progress. These provide continuously updated probability distributions that policymakers and researchers can incorporate into planning.
+For near-term forecasting, the track record is promising. Markets on AI policy questions (regulation passage, lab announcements, capability milestone dates) show roughly 70% accuracy on 1-year horizons. Metaculus hosts active questions on <R id="d51930ec3933c973"><EntityLink id="agi-timeline">AGI timeline</EntityLink> estimates</R>, capability benchmarks, and safety research progress. These provide continuously updated probability distributions that policymakers and researchers can incorporate into planning.
 
-The harder problem is long-horizon forecasting. Questions like "probability of AI-caused catastrophe by 2100" suffer from multiple issues. First, resolution is decades away, and traders heavily discount long-term payoffs—empirical estimates suggest 15-40% annual discount rates for prediction market positions. Second, the forecaster pool for <EntityLink id="E631">technical AI safety</EntityLink> questions is small, leading to thin liquidity and wide bid-ask spreads. Third, definitional ambiguity compounds over long horizons: what exactly counts as "transformative AI" or "<EntityLink id="E130">existential catastrophe</EntityLink>"?
+The harder problem is long-horizon forecasting. Questions like "probability of AI-caused catastrophe by 2100" suffer from multiple issues. First, resolution is decades away, and traders heavily discount long-term payoffs—empirical estimates suggest 15-40% annual discount rates for prediction market positions. Second, the forecaster pool for <EntityLink id="technical-ai-safety">technical AI safety</EntityLink> questions is small, leading to thin liquidity and wide bid-ask spreads. Third, definitional ambiguity compounds over long horizons: what exactly counts as "transformative AI" or "<EntityLink id="existential-catastrophe">existential catastrophe</EntityLink>"?
 
 Conditional markets offer a partial solution. Rather than betting on absolute outcomes, traders bet on "If policy X passes, probability of outcome Y." This enables comparison of different intervention strategies while allowing resolution on shorter timescales. The infrastructure for sophisticated conditional markets is still developing.
 
@@ -117,7 +117,7 @@ Several factors constrain prediction market accuracy and applicability.
 
 **Behavioral biases persist.** Despite financial incentives, traders exhibit the favorite-longshot bias (overweighting low-probability events) and herding (following visible trades rather than independent analysis). Extreme probability estimates (above 90% or below 10%) are particularly unreliable.
 
-**Resolution challenges.** Many interesting questions resist clean operationalization. "Will <EntityLink id="E439">AI alignment</EntityLink> research make meaningful progress by 2027?" requires subjective judgment that reasonable people dispute. Platforms handle this through resolution councils (<R id="f79d72e4e0f4c804">Metaculus</R>) or predefined criteria, but ambiguity creates risk that discourages trading.
+**Resolution challenges.** Many interesting questions resist clean operationalization. "Will <EntityLink id="alignment">AI alignment</EntityLink> research make meaningful progress by 2027?" requires subjective judgment that reasonable people dispute. Platforms handle this through resolution councils (<R id="f79d72e4e0f4c804">Metaculus</R>) or predefined criteria, but ambiguity creates risk that discourages trading.
 
 **Regulatory fragmentation.** U.S. restrictions push volume to offshore platforms with weaker oversight, while limiting mainstream institutional participation. Academic researchers, foundations, and government bodies often can't legally trade on the platforms with best liquidity.
 
@@ -162,6 +162,6 @@ Major platforms include <R id="ec03efffd7f860a5">Polymarket</R> (crypto-native, 
 
 ## AI Transition Model Context
 
-Prediction markets contribute to <EntityLink id="E60" /> primarily through improved <EntityLink id="E121" />. By providing continuously updated probability estimates with 15-25% better accuracy than traditional polling, they enable more calibrated beliefs about AI timelines, policy outcomes, and risk levels. This improved epistemic infrastructure supports better <EntityLink id="E167" /> by giving policymakers actionable probability distributions rather than vague expert opinions.
+Prediction markets contribute to <EntityLink id="civilizational-competence" /> primarily through improved <EntityLink id="epistemic-health" />. By providing continuously updated probability estimates with 15-25% better accuracy than traditional polling, they enable more calibrated beliefs about AI timelines, policy outcomes, and risk levels. This improved epistemic infrastructure supports better <EntityLink id="institutional-quality" /> by giving policymakers actionable probability distributions rather than vague expert opinions.
 
 The main limitation for AI safety applications is thin liquidity on long-horizon technical questions—exactly where accurate forecasts would be most valuable.

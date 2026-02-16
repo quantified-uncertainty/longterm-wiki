@@ -14,7 +14,7 @@
  * for unrecognized IDs, so path-style IDs work if the content exists.
  */
 
-import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
+import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.ts';
 import { existsSync } from 'fs';
 import { join } from 'path';
@@ -90,6 +90,21 @@ export const entityLinkIdsRule = createRule({
           const slug = engine.idRegistry.byNumericId[rawId.toUpperCase()];
           if (slug) {
             id = slug;
+            // Warn: prefer slug IDs over numeric IDs for readability and
+            // to avoid build-time resolution issues in related-pages graph
+            issues.push(new Issue({
+              rule: this.id,
+              file: content.path,
+              line: lineNum,
+              message: `EntityLink uses numeric ID "${rawId}" — prefer slug "${slug}"`,
+              severity: Severity.WARNING,
+              fix: {
+                type: FixType.REPLACE_TEXT,
+                oldText: `id="${rawId}"`,
+                newText: `id="${slug}"`,
+              },
+            }));
+            continue; // Slug is known-valid; skip path/entity resolution check
           } else {
             issues.push(new Issue({
               rule: this.id,

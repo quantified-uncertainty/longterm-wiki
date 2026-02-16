@@ -273,6 +273,11 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
   return new Promise((resolve, reject) => {
     const model = quality === 'quality' ? 'opus' : 'sonnet';
     const budget = quality === 'quality' ? 3.0 : 2.0;
+    const TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
+    // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
+    const env = { ...process.env };
+    delete env.CLAUDECODE;
 
     const claude = spawn('claude', [
       '-p',
@@ -283,8 +288,14 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
       '--allowedTools', 'Read,Write,Glob'
     ], {
       cwd: ROOT,
+      env,
       stdio: ['pipe', 'pipe', 'pipe']
     });
+
+    const timeout = setTimeout(() => {
+      claude.kill();
+      reject(new Error(`Synthesis timed out after ${TIMEOUT_MS / 1000}s`));
+    }, TIMEOUT_MS);
 
     const prompt = getSynthesisPrompt(topic, quality, { loadResult: (t: string, f: string) => {
       const filePath = path.join(ROOT, '.claude/temp/page-creator', t.toLowerCase().replace(/[^a-z0-9]+/g, '-'), f);
@@ -302,11 +313,24 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
       process.stdout.write(data);
     });
 
+    // Drain stderr to prevent pipe buffer deadlock
+    let stderr = '';
+    claude.stderr.on('data', (data: Buffer) => {
+      stderr += data.toString();
+      process.stderr.write(data);
+    });
+
+    claude.on('error', (err: Error) => {
+      clearTimeout(timeout);
+      reject(new Error(`Failed to spawn synthesis subprocess: ${err.message}`));
+    });
+
     claude.on('close', (code: number | null) => {
+      clearTimeout(timeout);
       if (code === 0) {
         resolve({ success: true, model, budget });
       } else {
-        reject(new Error(`Synthesis failed with code ${code}`));
+        reject(new Error(`Synthesis failed with code ${code}${stderr ? `\nstderr: ${stderr.slice(-2000)}` : ''}`));
       }
     });
   });

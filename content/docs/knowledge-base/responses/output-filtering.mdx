@@ -34,9 +34,9 @@ The approach also imposes a capability tax through false positives, blocking leg
 
 | Approach | Provider | Detection Rate | False Positive Rate | Latency Impact | Cost | Key Strength | Key Weakness |
 |----------|----------|----------------|---------------------|----------------|------|--------------|--------------|
-| **<EntityLink id="E218">OpenAI</EntityLink> Moderation API** | OpenAI | 89-98% (category-dependent) | 2.1% | Low (≈50ms) | Free | High accuracy for English content | [Weaker multilingual performance](https://arxiv.org/html/2501.01256v1) |
+| **<EntityLink id="openai">OpenAI</EntityLink> Moderation API** | OpenAI | 89-98% (category-dependent) | 2.1% | Low (≈50ms) | Free | High accuracy for English content | [Weaker multilingual performance](https://arxiv.org/html/2501.01256v1) |
 | **Llama Guard 3** | Meta | F1: 0.904 | Lower than GPT-4 | Medium | Open-source | [Outperforms GPT-4 in 7 languages](https://huggingface.co/meta-llama/Llama-Guard-3-8B) | Requires self-hosting |
-| **Constitutional Classifiers** | <EntityLink id="E22">Anthropic</EntityLink> | 95.6% (jailbreak block) | +0.38% (not significant) | +23.7% compute | Proprietary | [Robust against red-teaming](https://www.anthropic.com/research/constitutional-classifiers) | Compute overhead |
+| **Constitutional Classifiers** | <EntityLink id="anthropic">Anthropic</EntityLink> | 95.6% (jailbreak block) | +0.38% (not significant) | +23.7% compute | Proprietary | [Robust against red-teaming](https://www.anthropic.com/research/constitutional-classifiers) | Compute overhead |
 | **Perspective API** | Google/Jigsaw | AUC: 0.76 | Variable | Low | Free tier | Well-established, API accessible | [Higher false negative rates](https://arxiv.org/html/2501.01256v1) |
 | **Rule-based filters** | Custom | 60-80% | 5-15% | Very Low | Low | Fast, auditable, predictable | Brittle, easily circumvented |
 | **Semantic embedding** | Custom | 85-95% | 3-8% | High | Medium-High | Context-aware detection | Computationally expensive |
@@ -327,11 +327,11 @@ The shift toward AI-first content moderation is accelerating:
 
 ## AI Transition Model Context
 
-Output filtering primarily affects <EntityLink id="E207" /> by creating barriers to harmful content generation:
+Output filtering primarily affects <EntityLink id="misuse-potential" /> by creating barriers to harmful content generation:
 
 | Parameter | Impact |
 |-----------|--------|
-| <EntityLink id="E207" /> | Minor reduction in casual misuse; minimal effect on sophisticated actors |
-| <EntityLink id="E261" /> | Does not improve fundamental safety |
+| <EntityLink id="misuse-potential" /> | Minor reduction in casual misuse; minimal effect on sophisticated actors |
+| <EntityLink id="safety-capability-gap" /> | Does not improve fundamental safety |
 
 Output filtering represents necessary but insufficient safety infrastructure. It should be maintained as a deployment requirement but not mistaken for meaningful progress on alignment or catastrophic risk reduction.

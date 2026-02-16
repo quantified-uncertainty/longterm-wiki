@@ -29,13 +29,13 @@ import {R, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| Overall Compliance | **Mixed (53% average)** | August 2025 study of 16 companies found significant variation; <EntityLink id="E218">OpenAI</EntityLink> scored 83%, average was 53% |
+| Overall Compliance | **Mixed (53% average)** | August 2025 study of 16 companies found significant variation; <EntityLink id="openai">OpenAI</EntityLink> scored 83%, average was 53% |
 | Evaluation Timeline Trend | **Declining** | OpenAI reduced testing from months to days for some models; FT reports "weeks" compressed to "days" |
 | Safety Team Retention | **Concerning** | 25+ senior departures from OpenAI in 2024; Superalignment team dissolved |
 | Transparency | **Inadequate** | Google Gemini 2.5 Pro released without model card; OpenAI GPT-4.1 released without technical safety report |
 | Open-Source Gap | **Rapidly Narrowing** | Gap reduced from 16 months to 3-6 months in 2025; <EntityLink id="deepseek">DeepSeek R1</EntityLink> achieved near-parity at 27x lower cost |
-| External <EntityLink id="E449">Red Teaming</EntityLink> | **Standard but Limited** | 750+ researchers engaged via <EntityLink id="hackerone">HackerOne</EntityLink>; 15-30 day engagement windows may be insufficient |
-| Whistleblower Protection | **Underdeveloped** | Only OpenAI has published full policy (after media pressure); <EntityLink id="E457">California SB 53</EntityLink> protections start 2026 |
+| External <EntityLink id="red-teaming">Red Teaming</EntityLink> | **Standard but Limited** | 750+ researchers engaged via <EntityLink id="hackerone">HackerOne</EntityLink>; 15-30 day engagement windows may be insufficient |
+| Whistleblower Protection | **Underdeveloped** | Only OpenAI has published full policy (after media pressure); <EntityLink id="california-sb53">California SB 53</EntityLink> protections start 2026 |
 
 ## Methodology & Data Quality Assessment
 
@@ -46,7 +46,7 @@ This page aggregates data from multiple sources with varying reliability:
 | Data Type | Primary Sources | Verification Method | Limitations |
 |-----------|----------------|-------------------|-------------|
 | Voluntary Commitments | [Future of Life Institute study](https://futureoflife.org/ai-safety-index-summer-2025/), company disclosures | Public rubric scoring | Self-reported data, selective disclosure |
-| Safety Evaluations | Third-party evaluators (<EntityLink id="E201">METR</EntityLink>, <EntityLink id="E364">UK AISI</EntityLink>, <EntityLink id="E365">US AISI</EntityLink>) | Peer review, government validation | Limited access, short evaluation windows |
+| Safety Evaluations | Third-party evaluators (<EntityLink id="metr">METR</EntityLink>, <EntityLink id="uk-aisi">UK AISI</EntityLink>, <EntityLink id="us-aisi">US AISI</EntityLink>) | Peer review, government validation | Limited access, short evaluation windows |
 | Personnel Changes | Public announcements, investigative journalism | Cross-referencing multiple sources | Only visible departures tracked |
 | Model Releases | Benchmark tracking, company announcements | Performance verification via leaderboards | Gaming potential, selective metrics |
 
@@ -116,7 +116,7 @@ A [comprehensive study from August 2025](https://futureoflife.org/ai-safety-inde
 
 | Cohort | Companies | Mean Compliance | Range |
 |--------|-----------|-----------------|-------|
-| First (July 2023) | Amazon, <EntityLink id="E22">Anthropic</EntityLink>, Google, Inflection, <EntityLink id="E549">Meta</EntityLink>, Microsoft, OpenAI | 69.0% | 50-83% |
+| First (July 2023) | Amazon, <EntityLink id="anthropic">Anthropic</EntityLink>, Google, Inflection, <EntityLink id="meta-ai">Meta</EntityLink>, Microsoft, OpenAI | 69.0% | 50-83% |
 | Second (Sept 2023) | Adobe, Cohere, IBM, Nvidia, Palantir, Salesforce, Scale AI, Stability AI | 44.6% | 25-65% |
 | Third (July 2024) | Apple | Not fully assessed | N/A |
 | **Overall Average** | **16 companies** | **53%** | **17-83%** |
@@ -137,7 +137,7 @@ The [G7 Hiroshima AI Process (HAIP) Reporting Framework](https://futureoflife.or
 
 ### Expanded Commitments (2025)
 
-As of [December 2025, twelve companies have published frontier AI safety policies](https://metr.org/blog/2025-12-09-common-elements-of-frontier-ai-safety-policies/), with four additional companies joining since May 2024: <EntityLink id="E378">xAI</EntityLink>, Meta, Amazon, and Nvidia.[^2]
+As of [December 2025, twelve companies have published frontier AI safety policies](https://metr.org/blog/2025-12-09-common-elements-of-frontier-ai-safety-policies/), with four additional companies joining since May 2024: <EntityLink id="xai">xAI</EntityLink>, Meta, Amazon, and Nvidia.[^2]
 
 ### Recent Concerning Developments
 
@@ -152,7 +152,7 @@ As of [December 2025, twelve companies have published frontier AI safety policie
 
 ### First Confirmed Threshold Crossing
 
-<EntityLink id="E22">Anthropic</EntityLink> [announced the first publicly confirmed ASL-3 activation](https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy) for Claude Opus 4 in 2025, representing a milestone in <EntityLink id="E252">responsible scaling policy</EntityLink> implementation:
+<EntityLink id="anthropic">Anthropic</EntityLink> [announced the first publicly confirmed ASL-3 activation](https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy) for Claude Opus 4 in 2025, representing a milestone in <EntityLink id="responsible-scaling-policies">responsible scaling policy</EntityLink> implementation:
 
 | Threshold Level | Description | Security Requirements | Deployment Restrictions |
 |-----------------|-------------|----------------------|-------------------------|
@@ -167,7 +167,7 @@ As of [December 2025, twelve companies have published frontier AI safety policie
 | 2.1 | March 31, 2025 | Clarified thresholds beyond ASL-3 | 2.1 |
 | 2.2 | May 14, 2025 | Amended insider threat scope | 1.9 |
 
-**Grade Decline:** According to [SaferAI's analysis](https://www.safer-ai.org/anthropics-responsible-scaling-policy-update-makes-a-step-backwards), Anthropic's safety grade dropped from 2.2 to 1.9, placing them in the "weak" category alongside OpenAI and <EntityLink id="E98">Google DeepMind</EntityLink>. The primary concern is the shift away from precisely defined, quantitative thresholds.[^4]
+**Grade Decline:** According to [SaferAI's analysis](https://www.safer-ai.org/anthropics-responsible-scaling-policy-update-makes-a-step-backwards), Anthropic's safety grade dropped from 2.2 to 1.9, placing them in the "weak" category alongside OpenAI and <EntityLink id="deepmind">Google DeepMind</EntityLink>. The primary concern is the shift away from precisely defined, quantitative thresholds.[^4]
 
 ### Current Capability Thresholds
 
@@ -180,7 +180,7 @@ As of [December 2025, twelve companies have published frontier AI safety policie
 
 ### Evaluation Methodology Challenges
 
-Research by <EntityLink id="E24">Apollo Research</EntityLink> and others demonstrates that small improvements in elicitation methodology can dramatically increase scores on evaluation benchmarks. This creates uncertainty about whether reported threshold crossings reflect genuine capability increases or improved evaluation techniques.[^5]
+Research by <EntityLink id="apollo-research">Apollo Research</EntityLink> and others demonstrates that small improvements in elicitation methodology can dramatically increase scores on evaluation benchmarks. This creates uncertainty about whether reported threshold crossings reflect genuine capability increases or improved evaluation techniques.[^5]
 
 ---
 
@@ -252,7 +252,7 @@ From [HackerOne's aggregated testing data](https://www.hackerone.com/ai-red-team
 
 ### Anthropic Jailbreak Challenge Results (2025)
 
-<EntityLink id="E22">Anthropic</EntityLink>'s [partnership with HackerOne](https://www.anthropic.com/news/jailbreak-challenge) to test Constitutional Classifiers on Claude 3.5 Sonnet yielded significant findings:
+<EntityLink id="anthropic">Anthropic</EntityLink>'s [partnership with HackerOne](https://www.anthropic.com/news/jailbreak-challenge) to test Constitutional Classifiers on Claude 3.5 Sonnet yielded significant findings:
 
 - **300,000+ chat interactions** from 339 participants
 - **\$55,000 in bounties** paid to four successful teams  
@@ -287,7 +287,7 @@ While external red teaming is increasingly common, critical gaps remain:
 | 3 weeks later | [Simplified 6-page model card published](https://blog.google/technology/ai/google-gemini-2-5-pro-model-card/) | Called "meager" and "worrisome" by AI governance experts |
 | Late June 2025 | Detailed report finally published | [60 U.K. politicians signed open letter](https://www.parliament.uk/business/committees/committees-a-z/commons-select/science-and-technology-committee/) |
 
-**Parliamentary Response:** The [UK politicians' letter](https://www.parliament.uk/business/committees/committees-a-z/commons-select/science-and-technology-committee/) accused <EntityLink id="E98">Google DeepMind</EntityLink> of "a troubling breach of trust with governments and the public" and a "failure to honour" international commitments.[^12]
+**Parliamentary Response:** The [UK politicians' letter](https://www.parliament.uk/business/committees/committees-a-z/commons-select/science-and-technology-committee/) accused <EntityLink id="deepmind">Google DeepMind</EntityLink> of "a troubling breach of trust with governments and the public" and a "failure to honour" international commitments.[^12]
 
 ### OpenAI Documentation Gaps
 
@@ -320,8 +320,8 @@ Major frontier AI labs follow safety policies that include pre-deployment testin
 | Lab | Framework | Version | Testing Requirements |
 |-----|-----------|---------|---------------------|
 | OpenAI | [Preparedness Framework](https://openai.com/preparedness/) | Version 2 (April 2025) | Risk-based evaluation periods |
-| <EntityLink id="E98">Google DeepMind</EntityLink> | Frontier Safety Framework | Current version | Multi-stage assessment |
-| <EntityLink id="E22">Anthropic</EntityLink> | [<EntityLink id="E252">Responsible Scaling Policy</EntityLink>](https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy) | Version 2.2 (May 2025) | ASL-based thresholds |
+| <EntityLink id="deepmind">Google DeepMind</EntityLink> | Frontier Safety Framework | Current version | Multi-stage assessment |
+| <EntityLink id="anthropic">Anthropic</EntityLink> | [<EntityLink id="responsible-scaling-policies">Responsible Scaling Policy</EntityLink>](https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy) | Version 2.2 (May 2025) | ASL-based thresholds |
 
 ### Third-Party Evaluation Access
 
@@ -329,10 +329,10 @@ Major frontier AI labs follow safety policies that include pre-deployment testin
 
 | Evaluator | Access Type | Typical Duration | Limitations |
 |-----------|-------------|-----------------|-------------|
-| <EntityLink id="E364">UK AISI</EntityLink> | Pre-deployment | "Limited period" | Resource constraints |
-| <EntityLink id="E365">US AISI</EntityLink> | Government evaluation | Variable | Classified findings |
-| <EntityLink id="E201">METR</EntityLink> | Third-party assessment | Days to weeks | Company-controlled access |
-| <EntityLink id="E24">Apollo Research</EntityLink> | Specialized testing | Project-specific | Limited model access |
+| <EntityLink id="uk-aisi">UK AISI</EntityLink> | Pre-deployment | "Limited period" | Resource constraints |
+| <EntityLink id="us-aisi">US AISI</EntityLink> | Government evaluation | Variable | Classified findings |
+| <EntityLink id="metr">METR</EntityLink> | Third-party assessment | Days to weeks | Company-controlled access |
+| <EntityLink id="apollo-research">Apollo Research</EntityLink> | Specialized testing | Project-specific | Limited model access |
 
 ### Industry Trend Analysis
 
@@ -361,7 +361,7 @@ The AI industry experienced unprecedented release velocity in 2025, with [four m
 
 | Date | Company | Model | Key Capabilities | Safety Testing Duration |
 |------|---------|-------|-----------------|------------------------|
-| November 17 | <EntityLink id="E378">xAI</EntityLink> | Grok 4.1 | Advanced reasoning | Not disclosed |
+| November 17 | <EntityLink id="xai">xAI</EntityLink> | Grok 4.1 | Advanced reasoning | Not disclosed |
 | November 18 | Google | [Gemini 3](https://blog.google/technology/ai/google-gemini-3-launch/) | Historic 1501 Elo score | Weeks (reported) |
 | November 24 | Anthropic | Claude Opus 4.5 | 80%+ SWE-Bench Verified | ASL-3 evaluation |
 | December 11 | OpenAI | GPT-5.2 | Multi-modal reasoning | [Less than 1 week](https://www.ft.com/content/safety-evaluation-compressed) |
@@ -390,7 +390,7 @@ The [November-December 2025 release pattern](https://www.getpassionfruit.com/blo
 | OpenAI | 6+ frontier models | GPT-5 series, o3, Sora | Declining documentation |
 | Google | 4 major releases | Gemini 2.5/3, Genie 3.0 | Documentation delays |
 | Anthropic | 3 frontier models | Claude 4 family, ASL-3 crossing | Comprehensive reporting |
-| <EntityLink id="E549">Meta</EntityLink> | 2+ open models | Llama improvements | Brief model cards |
+| <EntityLink id="meta-ai">Meta</EntityLink> | 2+ open models | Llama improvements | Brief model cards |
 
 ---
 
@@ -498,7 +498,7 @@ The [AI Safety Field Growth Analysis from 2025](https://www.lesswrong.com/posts/
 
 ### Cross-Industry Safety Criticism (2025)
 
-AI safety researchers from multiple organizations publicly criticized <EntityLink id="E378">xAI</EntityLink>'s safety culture, describing practices as ["reckless" and "completely irresponsible"](https://www.techpolicypress.com/ai-safety-researchers-criticize-xai/) following internal scandals.[^22]
+AI safety researchers from multiple organizations publicly criticized <EntityLink id="xai">xAI</EntityLink>'s safety culture, describing practices as ["reckless" and "completely irresponsible"](https://www.techpolicypress.com/ai-safety-researchers-criticize-xai/) following internal scandals.[^22]
 
 ---
 

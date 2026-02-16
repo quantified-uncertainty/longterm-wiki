@@ -31,9 +31,9 @@ import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, R, Entit
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Mission Criticality** | Very High | Only major independent organization conducting pre-deployment <EntityLink id="E442">dangerous capability evaluations</EntityLink> for frontier AI labs |
+| **Mission Criticality** | Very High | Only major independent organization conducting pre-deployment <EntityLink id="dangerous-cap-evals">dangerous capability evaluations</EntityLink> for frontier AI labs |
 | **Research Output** | High | 77-task autonomy evaluation suite; [time horizons paper](https://arxiv.org/abs/2503.14499) showing 7-month doubling; RE-Bench; MALT dataset (10,919 transcripts) |
-| **Industry Integration** | Strong | Pre-deployment evaluations for <EntityLink id="E218">OpenAI</EntityLink> (GPT-4, GPT-4.5, GPT-5, o3), <EntityLink id="E22">Anthropic</EntityLink> (Claude 3.5, Claude 4), <EntityLink id="E98">Google DeepMind</EntityLink> |
+| **Industry Integration** | Strong | Pre-deployment evaluations for <EntityLink id="openai">OpenAI</EntityLink> (GPT-4, GPT-4.5, GPT-5, o3), <EntityLink id="anthropic">Anthropic</EntityLink> (Claude 3.5, Claude 4), <EntityLink id="deepmind">Google DeepMind</EntityLink> |
 | **Government Partnerships** | Growing | UK AI Safety Institute methodology partner; NIST AI Safety Institute Consortium member |
 | **Funding** | \$17M via Audacious Project | [Project Canary](https://metr.org/blog/2024-10-09-new-support-through-the-audacious-project/) collaboration with RAND received \$38M total; METR portion is \$17M |
 | **Independence** | Strong | Does not accept payment from labs for evaluations; uses donated compute credits; maintains editorial independence |
@@ -57,9 +57,9 @@ import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, R, Entit
 
 ## Overview
 
-METR (Model Evaluation and Threat Research), formerly known as ARC Evals, stands as the primary organization evaluating frontier AI models for dangerous capabilities before deployment. Founded in 2023 as a spin-off from <EntityLink id="E220">Paul Christiano</EntityLink>'s <EntityLink id="E25">Alignment Research Center</EntityLink>, METR serves as the critical gatekeeper determining whether cutting-edge AI systems can autonomously acquire resources, self-replicate, conduct cyberattacks, develop weapons of mass destruction, or engage in catastrophic manipulation. Their evaluations directly influence deployment decisions at OpenAI, Anthropic, Google DeepMind, and other leading AI developers.
+METR (Model Evaluation and Threat Research), formerly known as ARC Evals, stands as the primary organization evaluating frontier AI models for dangerous capabilities before deployment. Founded in 2023 as a spin-off from <EntityLink id="paul-christiano">Paul Christiano</EntityLink>'s <EntityLink id="arc">Alignment Research Center</EntityLink>, METR serves as the critical gatekeeper determining whether cutting-edge AI systems can autonomously acquire resources, self-replicate, conduct cyberattacks, develop weapons of mass destruction, or engage in catastrophic manipulation. Their evaluations directly influence deployment decisions at OpenAI, Anthropic, Google DeepMind, and other leading AI developers.
 
-METR occupies a unique and essential position in the AI safety ecosystem. When labs develop potentially transformative models, they turn to METR with the fundamental question: "Is this safe to release?" The organization's rigorous red-teaming and <EntityLink id="E443">capability elicitation</EntityLink> provides concrete empirical evidence about dangerous capabilities, bridging the gap between theoretical AI safety concerns and practical deployment decisions. Their work has already prevented potentially dangerous deployments and established industry standards for pre-release safety evaluation.
+METR occupies a unique and essential position in the AI safety ecosystem. When labs develop potentially transformative models, they turn to METR with the fundamental question: "Is this safe to release?" The organization's rigorous red-teaming and <EntityLink id="capability-elicitation">capability elicitation</EntityLink> provides concrete empirical evidence about dangerous capabilities, bridging the gap between theoretical AI safety concerns and practical deployment decisions. Their work has already prevented potentially dangerous deployments and established industry standards for pre-release safety evaluation.
 
 The stakes of METR's work cannot be overstated. As AI systems approach and potentially exceed human-level capabilities in critical domains, the window for implementing safety measures narrows rapidly. METR's evaluations represent one of the few concrete mechanisms currently in place to detect when AI systems cross thresholds that could pose existential risks to humanity. Their findings directly inform not only commercial deployment decisions but also government regulatory frameworks, making them a linchpin in global efforts to ensure advanced AI development remains beneficial rather than catastrophic.
 
@@ -79,7 +79,7 @@ The rebranding to METR (Model Evaluation and Threat Research) in 2023 marked the
 
 Throughout 2024, METR's influence expanded dramatically. The organization played crucial roles in informing OpenAI's Preparedness Framework, Anthropic's Responsible Scaling Policy, and Google DeepMind's Frontier Safety Framework. These partnerships transformed METR from an external consultant to an essential component of the AI safety infrastructure, with deployment decisions at major labs now contingent on METR's assessments. The organization also began collaborating with government entities, including the UK AI Safety Institute and US government bodies implementing AI Executive Order requirements.
 
-METR's current position represents a remarkable evolution from a small research team to a critical piece of global <EntityLink id="E608">AI governance</EntityLink> infrastructure. The organization now employs approximately 30 specialists, conducts regular evaluations of new frontier models, and has established itself as the authoritative voice on dangerous capability assessment. Their methodologies are being adopted internationally, their thresholds inform regulatory frameworks, and their findings shape public discourse about AI safety.
+METR's current position represents a remarkable evolution from a small research team to a critical piece of global <EntityLink id="ai-governance">AI governance</EntityLink> infrastructure. The organization now employs approximately 30 specialists, conducts regular evaluations of new frontier models, and has established itself as the authoritative voice on dangerous capability assessment. Their methodologies are being adopted internationally, their thresholds inform regulatory frameworks, and their findings shape public discourse about AI safety.
 
 ## Key Publications and Evaluations
 
@@ -88,7 +88,7 @@ METR's current position represents a remarkable evolution from a small research 
 | **GPT-5 Autonomy Evaluation** | 2025 | First comprehensive (non-"preliminary") evaluation; 50%-time horizon of 2h17m; no evidence of strategic sabotage but model shows eval awareness | <R id="7457262d461e2206">evaluations.metr.org</R> |
 | **GPT-5.1-Codex-Max Evaluation** | 2025 | Unlikely to pose significant catastrophic risks via self-improvement or rogue replication; capability trends continue rapidly | <R id="1060f486990f5014">evaluations.metr.org</R> |
 | **Measuring AI Ability to Complete Long Tasks** | March 2025 | Task length doubling time of ~7 months (accelerating to ~4 months in 2024-2025); 50%-time horizon of ≈50 minutes for Claude 3.7 Sonnet | <R id="ddd93038c44fbd36">arXiv:2503.14499</R> |
-| **MALT Dataset** | October 2025 | 10,919 reviewed transcripts for studying <EntityLink id="E253">reward hacking</EntityLink> and <EntityLink id="E270">sandbagging</EntityLink>; best monitors achieve 0.96 AUROC for detecting reward hacking | <R id="3ee11b82b7e1fd68">metr.org</R> |
+| **MALT Dataset** | October 2025 | 10,919 reviewed transcripts for studying <EntityLink id="reward-hacking">reward hacking</EntityLink> and <EntityLink id="sandbagging">sandbagging</EntityLink>; best monitors achieve 0.96 AUROC for detecting reward hacking | <R id="3ee11b82b7e1fd68">metr.org</R> |
 | **RE-Bench** | November 2024 | ML research engineering benchmark; agents achieve 4x human performance at 2h but humans outperform 2x at 32h | <R id="8cf2074dc6198776">arXiv:2411.15114</R> |
 | **Common Elements of Frontier AI Safety Policies** | Aug 2024, updated Dec 2025 | Analysis of 12 companies' safety policies; all use capability thresholds for CBRN, cyber, autonomous replication | <R id="c8782940b880d00f">metr.org</R> |
 | **GPT-4.5 Pre-deployment Evaluation** | February 2025 | Preliminary dangerous capability assessment conducted in partnership with OpenAI | <R id="a86b4f04559de6da">metr.org</R> |
@@ -215,7 +215,7 @@ METR employs adversarial evaluation—testing for worst-case behaviors rather th
 | **Sandbagging Detection** | MALT dataset for reward hacking detection | 0.96 AUROC achieved by best monitors |
 | **Quality control** | Multiple evaluators, cross-validation | Reproducible protocols; public methodology documentation |
 
-For general evaluation theory and scalable oversight approaches, see <EntityLink id="E271">Scalable Oversight</EntityLink>.
+For general evaluation theory and scalable oversight approaches, see <EntityLink id="scalable-oversight">Scalable Oversight</EntityLink>.
 
 ## Integration with Safety Frameworks
 
@@ -223,12 +223,12 @@ METR's evaluations are integrated into the safety frameworks of major AI labs an
 
 | Partner | Integration | Role |
 |---------|-------------|------|
-| **OpenAI** | <EntityLink id="E369">Preparedness Framework</EntityLink> | Pre-deployment evaluations for cybersecurity, CBRN, persuasion, autonomy |
-| **Anthropic** | <EntityLink id="E252">Responsible Scaling Policy</EntityLink> | ASL threshold assessments, independent verification |
-| **UK AISI** | <EntityLink id="E364">AI Safety Institute</EntityLink> | Methodology sharing, evaluator training |
-| **US AISI** | <EntityLink id="E365">NIST Consortium</EntityLink> | Executive Order implementation, standards development |
+| **OpenAI** | <EntityLink id="voluntary-commitments">Preparedness Framework</EntityLink> | Pre-deployment evaluations for cybersecurity, CBRN, persuasion, autonomy |
+| **Anthropic** | <EntityLink id="responsible-scaling-policies">Responsible Scaling Policy</EntityLink> | ASL threshold assessments, independent verification |
+| **UK AISI** | <EntityLink id="uk-aisi">AI Safety Institute</EntityLink> | Methodology sharing, evaluator training |
+| **US AISI** | <EntityLink id="us-aisi">NIST Consortium</EntityLink> | Executive Order implementation, standards development |
 
-These partnerships have established external evaluation as industry standard practice, with METR's findings directly influencing deployment decisions. For detailed analysis of these frameworks, see <EntityLink id="E369">Voluntary Industry Commitments</EntityLink> and <EntityLink id="E13">AI Safety Institutes</EntityLink>.
+These partnerships have established external evaluation as industry standard practice, with METR's findings directly influencing deployment decisions. For detailed analysis of these frameworks, see <EntityLink id="voluntary-commitments">Voluntary Industry Commitments</EntityLink> and <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink>.
 
 ## Critical Analysis and Challenges
 
