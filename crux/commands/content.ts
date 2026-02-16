@@ -69,6 +69,7 @@ Options:
   --model=<m>       Model to use (grade-content)
   --skip-warnings   Skip Steps 1-2, just rate (grade-content)
   --warnings-only   Run Steps 1-2 only, skip rating (grade-content)
+  --api-direct      Use Anthropic API directly instead of Claude CLI (create)
   --dry-run         Preview without changes
   --verbose         Detailed output
 

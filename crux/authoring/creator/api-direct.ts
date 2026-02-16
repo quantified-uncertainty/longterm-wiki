@@ -14,9 +14,8 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import Anthropic from '@anthropic-ai/sdk';
-import { createClient, MODELS } from '../../lib/anthropic.ts';
+import { createClient, MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
 import { getSynthesisPrompt } from './synthesis.ts';
-import { ensureComponentImports } from './validation.ts';
 import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -84,6 +83,7 @@ function extractText(response: Anthropic.Messages.Message): string {
 interface SynthesisContext {
   log: (phase: string, message: string) => void;
   ROOT: string;
+  getTopicDir: (topic: string) => string;
 }
 
 /**
@@ -93,15 +93,12 @@ interface SynthesisContext {
 export async function runSynthesisApiDirect(
   topic: string,
   quality: string,
-  { log, ROOT }: SynthesisContext,
+  { log, ROOT, getTopicDir }: SynthesisContext,
   destPath?: string | null
 ): Promise<{ success: boolean; model: string; budget: number }> {
   log('synthesis', `Generating article via API-direct (${quality})...`);
 
-  const client = createClient();
-  if (!client) {
-    throw new Error('ANTHROPIC_API_KEY not configured — cannot use API-direct synthesis');
-  }
+  const client = createClient(); // Throws if ANTHROPIC_API_KEY missing
 
   const model = quality === 'quality' ? MODELS.opus : MODELS.sonnet;
   const budget = quality === 'quality' ? 3.0 : 2.0;
@@ -145,8 +142,7 @@ export async function runSynthesisApiDirect(
     }
 
     // Write the draft to the expected location
-    const topicSlug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const draftDir = path.join(ROOT, '.claude/temp/page-creator', topicSlug);
+    const draftDir = getTopicDir(topic);
     if (!fs.existsSync(draftDir)) {
       fs.mkdirSync(draftDir, { recursive: true });
     }
@@ -194,10 +190,7 @@ export async function runValidationLoopApiDirect(
     return { success: false, error: 'No draft found' };
   }
 
-  const client = createClient();
-  if (!client) {
-    return { success: false, error: 'ANTHROPIC_API_KEY not configured' };
-  }
+  const client = createClient(); // Throws if ANTHROPIC_API_KEY missing
 
   const MAX_ITERATIONS = 3;
   let content = fs.readFileSync(draftPath, 'utf-8');
@@ -208,13 +201,6 @@ export async function runValidationLoopApiDirect(
 
     // Write content to draft for validation tools to check
     fs.writeFileSync(draftPath, content);
-
-    // Auto-fix component imports
-    const importResult = ensureComponentImports(draftPath);
-    if (importResult.fixed) {
-      log('validate', `  Auto-fixed missing imports: ${importResult.added.join(', ')}`);
-      content = fs.readFileSync(draftPath, 'utf-8');
-    }
 
     // Run auto-fixes
     try {
@@ -447,10 +433,7 @@ export async function runReviewApiDirect(
     return { success: false, error: 'No draft found for review' };
   }
 
-  const client = createClient();
-  if (!client) {
-    return { success: false, error: 'ANTHROPIC_API_KEY not configured' };
-  }
+  const client = createClient(); // Throws if ANTHROPIC_API_KEY missing
 
   const draftContent = fs.readFileSync(draftPath, 'utf-8');
 
@@ -506,19 +489,14 @@ If you find logicalIssues or temporalArtifacts, also output the fixed content se
     // Write review results
     const reviewPath = path.join(getTopicDir(topic), 'review.json');
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const review = JSON.parse(jsonMatch[0]);
-        fs.writeFileSync(reviewPath, JSON.stringify(review, null, 2));
-        log('review', `Review written to ${reviewPath}`);
+      const review = parseJsonResponse(text) as Record<string, unknown>;
+      fs.writeFileSync(reviewPath, JSON.stringify(review, null, 2));
+      log('review', `Review written to ${reviewPath}`);
 
-        // If temporal artifacts or logical issues found, try to fix the draft
-        const hasIssues = (review.logicalIssues?.length > 0) || (review.temporalArtifacts?.length > 0);
-        if (hasIssues) {
-          log('review', `Found issues: ${review.logicalIssues?.length || 0} logical, ${review.temporalArtifacts?.length || 0} temporal`);
-        }
-      } else {
-        fs.writeFileSync(reviewPath, JSON.stringify({ raw: text }, null, 2));
+      // If temporal artifacts or logical issues found, log summary
+      const hasIssues = ((review.logicalIssues as unknown[])?.length > 0) || ((review.temporalArtifacts as unknown[])?.length > 0);
+      if (hasIssues) {
+        log('review', `Found issues: ${(review.logicalIssues as unknown[])?.length || 0} logical, ${(review.temporalArtifacts as unknown[])?.length || 0} temporal`);
       }
     } catch {
       fs.writeFileSync(reviewPath, JSON.stringify({ raw: text }, null, 2));
