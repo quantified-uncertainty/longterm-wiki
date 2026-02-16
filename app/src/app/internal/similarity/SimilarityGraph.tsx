@@ -12,7 +12,8 @@ import {
   forceSimulation,
   forceLink,
   forceManyBody,
-  forceCenter,
+  forceX,
+  forceY,
   forceCollide,
   type SimulationNodeDatum,
   type SimulationLinkDatum,
@@ -50,7 +51,7 @@ interface Props {
 
 const MIN_RADIUS = 3;
 const MAX_RADIUS = 14;
-const DEFAULT_THRESHOLD = 5;
+const DEFAULT_THRESHOLD = 10;
 
 // ---------------------------------------------------------------------------
 // Component
@@ -279,7 +280,7 @@ export function SimilarityGraph({ data }: Props) {
   }, [draw]);
 
   // -----------------------------------------------------------------------
-  // Build simulation
+  // Build simulation — nodes are stable across threshold changes
   // -----------------------------------------------------------------------
 
   useEffect(() => {
@@ -290,37 +291,17 @@ export function SimilarityGraph({ data }: Props) {
         ((n.importance ?? 50) / 100) * (MAX_RADIUS - MIN_RADIUS),
     }));
 
-    const nodeIndex = new Map(nodes.map((n) => [n.id, n]));
-
-    const links: SimLink[] = data.edges
-      .filter((e) => nodeIndex.has(e.source) && nodeIndex.has(e.target))
-      .map((e) => ({
-        source: nodeIndex.get(e.source)!,
-        target: nodeIndex.get(e.target)!,
-        score: e.score,
-      }));
-
     nodesRef.current = nodes;
-    linksRef.current = links;
 
     const sim = forceSimulation<SimNode>(nodes)
-      .force(
-        "link",
-        forceLink<SimNode, SimLink>(links)
-          .id((d) => d.id)
-          .distance((d) => Math.max(60, 200 - d.score * 3))
-          .strength((d) => Math.min(0.2, d.score / 80))
-      )
-      .force("charge", forceManyBody().strength(-120).distanceMax(600))
-      .force(
-        "center",
-        forceCenter(dimensions.width / 2, dimensions.height / 2)
-      )
+      .force("charge", forceManyBody().strength(-200).distanceMax(800))
+      .force("x", forceX<SimNode>(dimensions.width / 2).strength(0.03))
+      .force("y", forceY<SimNode>(dimensions.height / 2).strength(0.03))
       .force(
         "collide",
         forceCollide<SimNode>((d) => d.radius + 2).iterations(2)
       )
-      .alphaDecay(0.015)
+      .alphaDecay(0.012)
       .on("tick", () => drawRef.current());
 
     simRef.current = sim;
@@ -331,13 +312,50 @@ export function SimilarityGraph({ data }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  // Update center force when dimensions change
+  // -----------------------------------------------------------------------
+  // Update link force when threshold changes — only edges at or above the
+  // threshold participate in the physics, so layout matches what's drawn.
+  // -----------------------------------------------------------------------
+
   useEffect(() => {
-    simRef.current
-      ?.force(
-        "center",
-        forceCenter(dimensions.width / 2, dimensions.height / 2)
+    const sim = simRef.current;
+    if (!sim) return;
+
+    const nodeIndex = new Map(nodesRef.current.map((n) => [n.id, n]));
+
+    const links: SimLink[] = data.edges
+      .filter(
+        (e) =>
+          e.score >= threshold &&
+          nodeIndex.has(e.source) &&
+          nodeIndex.has(e.target)
       )
+      .map((e) => ({
+        source: nodeIndex.get(e.source)!,
+        target: nodeIndex.get(e.target)!,
+        score: e.score,
+      }));
+
+    linksRef.current = links;
+
+    sim.force(
+      "link",
+      forceLink<SimNode, SimLink>(links)
+        .id((d) => d.id)
+        .distance((d) => Math.max(40, 160 - d.score * 2.5))
+        .strength((d) => Math.min(0.4, d.score / 40))
+    );
+
+    sim.alpha(0.4).restart();
+  }, [data, threshold]);
+
+  // Update centering forces when dimensions change
+  useEffect(() => {
+    const sim = simRef.current;
+    if (!sim) return;
+    sim
+      .force("x", forceX<SimNode>(dimensions.width / 2).strength(0.03))
+      .force("y", forceY<SimNode>(dimensions.height / 2).strength(0.03))
       .alpha(0.1)
       .restart();
   }, [dimensions]);
