@@ -73,7 +73,7 @@ node app/scripts/build-data.mjs
 ```bash
 pnpm crux content create "Page Title" --tier=standard
 ```
-Tiers: `polish` (quick, ~$2-3), `standard` (with research, ~$5-8), `deep` (full research, ~$10-15)
+Tiers: `budget` (~$2-3), `standard` (default, ~$4-6), `premium` (~$8-12)
 
 **API keys are in environment variables** (`process.env`), NOT in `.env` files. Check `env | grep -i API` to verify available keys before assuming they're missing. Required keys: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`. Optional: `FIRECRAWL_KEY`, `SCRY_API_KEY`.
 
@@ -81,6 +81,7 @@ Tiers: `polish` (quick, ~$2-3), `standard` (with research, ~$5-8), `deep` (full 
 ```bash
 pnpm crux content improve <page-id> --tier=polish --apply
 ```
+Tiers: `polish` (~$2-3), `standard` (default, ~$5-8), `deep` (~$10-15)
 Use `--directions "specific instructions"` for targeted improvements.
 Use `--apply` to write changes directly (otherwise outputs to temp file for review).
 Use `--grade` with `--apply` to auto-grade after improvement.
@@ -174,7 +175,7 @@ print(f\"Total: {data['total_count']} checks\")
 ## Key Conventions
 
 - **Path aliases**: Use `@/`, `@components/`, `@data/`, `@lib/` in app code
-- **Entity types**: risk, person, organization, approach, model, concept, etc.
+- **Entity types**: Canonical list in `app/src/data/entity-type-names.ts`. Category-mapped types (used by page creator): person, organization, risk, approach, model, concept, intelligence-paradigm, capability, crux, debate, event, metric, project. Additional types include: risk-factor, safety-agenda, policy, case-study, scenario, resource, funder, historical, analysis, parameter, argument, table, diagram, insight
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
 - **Squiggle models**: See `app/CLAUDE.md` for SquiggleEstimate style guide

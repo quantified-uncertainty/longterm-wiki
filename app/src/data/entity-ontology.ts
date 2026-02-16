@@ -37,6 +37,7 @@ import {
   Calendar,
   MessageSquare,
   Brain,
+  FileText,
 } from "lucide-react";
 
 type LucideIcon = React.ForwardRefExoticComponent<
@@ -248,6 +249,13 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
     iconColor: "text-violet-600 dark:text-violet-400",
     badgeColor: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
     headerColor: "#7c3aed",
+  },
+  internal: {
+    label: "Internal",
+    icon: FileText,
+    iconColor: "text-slate-500 dark:text-slate-400",
+    badgeColor: "bg-slate-100 text-slate-700 dark:bg-slate-800/30 dark:text-slate-300",
+    headerColor: "#64748b",
   },
 };
 

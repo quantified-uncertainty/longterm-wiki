@@ -45,6 +45,8 @@ import { runSourceVerification } from './creator/verification.ts';
 import { ensureComponentImports, runValidationLoop, runFullValidation } from './creator/validation.ts';
 import { runGrading } from './creator/grading.ts';
 import { createCategoryDirectory, deployToDestination, validateCrossLinks, runReview } from './creator/deployment.ts';
+import { runSynthesisApiDirect, runValidationLoopApiDirect, runReviewApiDirect } from './creator/api-direct.ts';
+import { shouldUseApiDirect } from '../lib/claude-cli.ts';
 import { inferEntityType } from '../lib/category-entity-types.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
@@ -142,7 +144,7 @@ interface PipelineResults {
   totalCost: number;
 }
 
-async function runPipeline(topic: string, tier: string = 'standard', directions: string | null = null, sourceFilePath: string | null = null, destPath: string | null = null): Promise<PipelineResults> {
+async function runPipeline(topic: string, tier: string = 'standard', directions: string | null = null, sourceFilePath: string | null = null, destPath: string | null = null, apiDirect: boolean = false): Promise<PipelineResults> {
   const config = TIERS[tier];
   if (!config) {
     console.error(`Unknown tier: ${tier}`);
@@ -166,6 +168,9 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
   console.log(`${'='.repeat(60)}`);
   console.log(`Topic: "${topic}"`);
   console.log(`Tier: ${config.name} (${config.estimatedCost})`);
+  if (apiDirect) {
+    console.log(`Mode: API-direct (using Anthropic API instead of Claude CLI)`);
+  }
   if (sourceFilePath) {
     console.log(`Source file: ${sourceFilePath}`);
   }
@@ -230,17 +235,23 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
           break;
 
         case 'synthesize':
-          result = await runSynthesis(topic, 'standard', ctx, destPath);
+          result = apiDirect
+            ? await runSynthesisApiDirect(topic, 'standard', ctx, destPath)
+            : await runSynthesis(topic, 'standard', ctx, destPath);
           results.totalCost += (result.budget as number) || 0;
           break;
 
         case 'synthesize-fast':
-          result = await runSynthesis(topic, 'fast', ctx, destPath);
+          result = apiDirect
+            ? await runSynthesisApiDirect(topic, 'fast', ctx, destPath)
+            : await runSynthesis(topic, 'fast', ctx, destPath);
           results.totalCost += 1.0;
           break;
 
         case 'synthesize-quality':
-          result = await runSynthesis(topic, 'quality', ctx, destPath);
+          result = apiDirect
+            ? await runSynthesisApiDirect(topic, 'quality', ctx, destPath)
+            : await runSynthesis(topic, 'quality', ctx, destPath);
           results.totalCost += (result.budget as number) || 0;
           break;
 
@@ -252,7 +263,9 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
           break;
 
         case 'review':
-          result = await runReview(topic, ctx);
+          result = apiDirect
+            ? await runReviewApiDirect(topic, ctx)
+            : await runReview(topic, ctx);
           results.totalCost += 1.0;
           break;
 
@@ -265,7 +278,9 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
               log('validate-loop', `Auto-fixed missing imports: ${importResult.added.join(', ')}`);
             }
           }
-          result = await runValidationLoop(topic, ctx);
+          result = apiDirect
+            ? await runValidationLoopApiDirect(topic, ctx)
+            : await runValidationLoop(topic, ctx);
           results.totalCost += 2.0;
           break;
 
@@ -341,6 +356,8 @@ Options:
   --directions <text>      Context, source URLs, and editorial guidance (see below)
   --phase <phase>          Run a single phase only (for resuming/testing)
   --force                  Skip duplicate page check (create even if similar page exists)
+  --api-direct             Use Anthropic API directly instead of spawning Claude CLI subprocess
+                           (auto-detected if claude CLI is unavailable)
   --help                   Show this help
 
 Directions:
@@ -405,6 +422,14 @@ async function main(): Promise<void> {
   const sourceFilePath: string | null = parsed['source-file'] ? path.resolve(parsed['source-file'] as string) : null;
   const createCategoryLabel: string | null = (parsed['create-category'] as string) || null;
   const forceCreate: boolean = parsed.force === true;
+
+  // API-direct mode: use Anthropic API instead of spawning Claude CLI subprocess.
+  // Auto-detects if --api-direct not explicitly set.
+  const apiDirectFlag = parsed['api-direct'] === true ? true : undefined;
+  const apiDirect = shouldUseApiDirect(apiDirectFlag);
+  if (apiDirect && !apiDirectFlag) {
+    console.log('Note: Claude CLI not available — auto-switching to API-direct mode');
+  }
 
   if (sourceFilePath && !fs.existsSync(sourceFilePath)) {
     console.error(`Error: Source file not found: ${sourceFilePath}`);
@@ -481,7 +506,9 @@ async function main(): Promise<void> {
         result = await fetchRegisteredSources(topic, { maxSources: 15 }, ctx);
         break;
       case 'synthesize':
-        result = await runSynthesis(topic, tier === 'premium' ? 'quality' : 'standard', ctx, destPath);
+        result = apiDirect
+          ? await runSynthesisApiDirect(topic, tier === 'premium' ? 'quality' : 'standard', ctx, destPath)
+          : await runSynthesis(topic, tier === 'premium' ? 'quality' : 'standard', ctx, destPath);
         break;
       case 'verify-sources':
         result = await runSourceVerification(topic, ctx);
@@ -495,7 +522,9 @@ async function main(): Promise<void> {
             log('validate-loop', `Auto-fixed missing imports: ${importResult.added.join(', ')}`);
           }
         }
-        result = await runValidationLoop(topic, ctx);
+        result = apiDirect
+          ? await runValidationLoopApiDirect(topic, ctx)
+          : await runValidationLoop(topic, ctx);
         break;
       case 'validate-full':
         result = await runFullValidation(topic, ctx);
@@ -511,7 +540,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  await runPipeline(topic, tier, directions, sourceFilePath, destPath);
+  await runPipeline(topic, tier, directions, sourceFilePath, destPath, apiDirect);
 
   // Deploy to destination if --dest provided
   if (destPath) {
