@@ -5,7 +5,7 @@ description: "Cross-cutting writing standards that apply to all content types. C
 entityType: internal
 sidebar:
   order: 9
-importance: 73.5
+readerImportance: 73.5
 researchImportance: 71
 quality: 0
 llmSummary: "Shared writing principles referenced by all domain-specific style guides. Three pillars: epistemic honesty (hedge uncertain claims, use ranges, source confidence levels), language neutrality (avoid insider jargon, describe things by what they are), and analytical tone (present tradeoffs rather than prescribe). Includes concrete word substitution tables and anti-patterns."
