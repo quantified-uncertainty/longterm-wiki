@@ -205,11 +205,11 @@ Documentation pages contain **internal reference material** about LongtermWiki i
 ### When to Use
 
 1. **Style guides**: Documentation of how to write different page types
-   - `/internal/risk-style-guide/`
-   - `/internal/response-style-guide/`
+   - [Risk Style Guide](/wiki/E750)
+   - [Response Style Guide](/wiki/E749)
 
 2. **Process documentation**: How LongtermWiki systems work
-   - This page (`/internal/page-types/`)
+   - This page ([Page Types](/wiki/E739))
    - Rating system documentation
 
 3. **Internal planning**: Strategy documents, project notes
@@ -270,9 +270,9 @@ Unlike content pages, documentation can freely include:
 
 ### Examples
 
-- `/internal/page-types.mdx` (this page)
-- `/internal/risk-style-guide.mdx`
-- `/internal/rating-system.mdx`
+- [Page Types](/wiki/E739) (this page)
+- [Risk Style Guide](/wiki/E750)
+- [Rating System](/wiki/E741)
 - `/project/similar-projects.mdx`
 
 ---
@@ -348,12 +348,12 @@ While `pageType` controls validation behavior, `pageTemplate` controls the **exp
 
 | Template | Used For | Style Guide |
 |----------|----------|-------------|
-| `knowledge-base-risk` | Risk analysis pages | `/internal/risk-style-guide/` |
-| `knowledge-base-response` | Intervention/response pages | `/internal/response-style-guide/` |
-| `knowledge-base-model` | Analytical models | `/internal/models-style-guide/` |
-| `ai-transition-model-factor` | ATM top-level factors | `/internal/ai-transition-model-style-guide/` |
-| `ai-transition-model-sub-item` | ATM sub-factors | `/internal/ai-transition-model-style-guide/` |
-| `ai-transition-model-scenario` | ATM scenarios | `/internal/ai-transition-model-style-guide/` |
+| `knowledge-base-risk` | Risk analysis pages | [Risk Style Guide](/wiki/E750) |
+| `knowledge-base-response` | Intervention/response pages | [Response Style Guide](/wiki/E749) |
+| `knowledge-base-model` | Analytical models | [Models Style Guide](/wiki/E736) |
+| `ai-transition-model-factor` | ATM top-level factors | [ATM Style Guide](/wiki/E721) |
+| `ai-transition-model-sub-item` | ATM sub-factors | [ATM Style Guide](/wiki/E721) |
+| `ai-transition-model-scenario` | ATM scenarios | [ATM Style Guide](/wiki/E721) |
 
 ### Template Detection
 
@@ -471,7 +471,7 @@ If you need a new page type (rare), follow these steps:
 
 3. **Update PageStatus component** in `src/components/wiki/PageStatus.tsx`
 
-4. **Create style guide** at `/internal/new-type-style-guide/`
+4. **Create style guide** in `content/docs/internal/` (it will be served at `/wiki/E<id>`)
 
 5. **Update this documentation**
 

@@ -16,13 +16,17 @@ function formatCategory(category: string): string {
 export function Breadcrumbs({
   category,
   title,
+  isInternal,
 }: {
   category?: string | null;
   title?: string;
+  isInternal?: boolean;
 }) {
-  const items: BreadcrumbItem[] = [{ label: "Wiki", href: "/wiki" }];
+  const items: BreadcrumbItem[] = isInternal
+    ? [{ label: "Internal", href: "/wiki/E779" }]
+    : [{ label: "Wiki", href: "/wiki" }];
 
-  if (category) {
+  if (category && !isInternal) {
     items.push({
       label: formatCategory(category),
       href: `/wiki?entity=${encodeURIComponent(category)}`,

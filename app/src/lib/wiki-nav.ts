@@ -210,10 +210,102 @@ export function getReferenceNav(): NavSection[] {
 }
 
 // ============================================================================
+// INTERNAL NAV
+// ============================================================================
+
+/**
+ * Build internal navigation with resolved /wiki/E<id> URLs.
+ * For MDX content pages, uses getEntityHref() to produce canonical /wiki/E<id> links.
+ * For React dashboard pages (no entity), keeps /internal/ URLs.
+ */
+export function getInternalNav(): NavSection[] {
+  /** Resolve a slug to its /wiki/E<id> URL, falling back to /internal/ path */
+  function href(slug: string, internalPath?: string): string {
+    const resolved = getEntityHref(slug);
+    // getEntityHref always returns /wiki/...; if the slug had a numericId it will be /wiki/E<id>
+    // If slug is not found in registry, it returns /wiki/<slug> which won't resolve — use fallback
+    if (resolved.startsWith("/wiki/E")) return resolved;
+    return internalPath || resolved;
+  }
+
+  return [
+    {
+      title: "Overview",
+      defaultOpen: true,
+      items: [
+        { label: "Internal Home", href: href("__index__/internal", "/wiki/E779") },
+        { label: "About This Wiki", href: href("about-this-wiki") },
+        { label: "Vision", href: href("longterm-vision") },
+        { label: "Strategy", href: href("longterm-strategy") },
+        { label: "Roadmap", href: href("project-roadmap") },
+        { label: "Value Proposition", href: href("longtermwiki-value-proposition") },
+      ],
+    },
+    {
+      title: "Dashboards & Tools",
+      defaultOpen: true,
+      items: [
+        { label: "Enhancement Queue", href: href("enhancement-queue") },
+        { label: "Suggested Pages", href: "/internal/suggested-pages" },
+        { label: "Update Schedule", href: "/internal/updates" },
+        { label: "Page Changes", href: "/internal/page-changes" },
+        { label: "Fact Dashboard", href: "/internal/facts" },
+        { label: "Automation Tools", href: href("automation-tools") },
+        { label: "Content Database", href: href("content-database") },
+        { label: "Importance Rankings", href: "/internal/importance-rankings" },
+        { label: "Page Similarity", href: "/internal/similarity" },
+        { label: "Interventions", href: "/internal/interventions" },
+        { label: "Proposals", href: "/internal/proposals" },
+      ],
+    },
+    {
+      title: "Style Guides",
+      items: [
+        { label: "Common Writing Principles", href: href("common-writing-principles") },
+        { label: "Page Types", href: href("page-types") },
+        { label: "Knowledge Base", href: href("knowledge-base") },
+        { label: "Risk Pages", href: href("risk-style-guide") },
+        { label: "Response Pages", href: href("response-style-guide") },
+        { label: "Models", href: href("models-style-guide") },
+        { label: "Stub Pages", href: href("stub-style-guide") },
+        { label: "Rating System", href: href("rating-system") },
+        { label: "Mermaid Diagrams", href: href("mermaid-diagrams") },
+        { label: "Cause-Effect Diagrams", href: href("cause-effect-diagrams") },
+        { label: "Research Reports", href: href("research-reports") },
+        { label: "AI Transition Model", href: href("ai-transition-model-style-guide") },
+      ],
+    },
+    {
+      title: "Research",
+      items: [
+        { label: "Reports Index", href: href("__index__/internal/reports", "/wiki/E780") },
+        { label: "AI Research Workflows", href: href("ai-research-workflows") },
+        { label: "Causal Diagram Visualization", href: href("causal-diagram-visualization") },
+        { label: "Controlled Vocabulary", href: href("controlled-vocabulary") },
+        { label: "Cross-Link Automation", href: href("cross-link-automation-proposal") },
+        { label: "Diagram Naming", href: href("diagram-naming-research") },
+        { label: "Page Creator Pipeline", href: href("page-creator-pipeline") },
+        { label: "Gap Analysis (Feb 2026)", href: href("gap-analysis-2026-02") },
+      ],
+    },
+    {
+      title: "Architecture & Schema",
+      items: [
+        { label: "Architecture", href: href("architecture") },
+        { label: "Wiki Generation Architecture", href: href("wiki-generation-architecture") },
+        { label: "Schema Overview", href: href("__index__/internal/schema", "/wiki/E781") },
+        { label: "Entity Reference", href: href("entities") },
+        { label: "Schema Diagrams", href: href("diagrams") },
+      ],
+    },
+  ];
+}
+
+// ============================================================================
 // DETECT WHICH SIDEBAR TO SHOW
 // ============================================================================
 
-export type WikiSidebarType = "models" | "atm" | null;
+export type WikiSidebarType = "models" | "atm" | "internal" | null;
 
 /**
  * Determine which sidebar to show based on the entity path.
@@ -233,6 +325,10 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
     return "atm";
   }
 
+  if (entityPath.startsWith("/internal/") || entityPath === "/internal") {
+    return "internal";
+  }
+
   return null;
 }
 
@@ -245,6 +341,8 @@ export function getWikiNav(type: WikiSidebarType): NavSection[] {
       return getReferenceNav();
     case "atm":
       return getAtmNav();
+    case "internal":
+      return getInternalNav();
     default:
       return [];
   }

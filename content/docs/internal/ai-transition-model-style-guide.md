@@ -19,7 +19,7 @@ ratings:
 
 The AI Transition Model (ATM) is a structured framework for understanding AI development trajectories. ATM pages differ from regular knowledge base content—they follow a specific schema and use YAML as the source of truth.
 
-**Prerequisite**: All ATM pages must follow the [Common Writing Principles](/internal/common-writing-principles/) — epistemic honesty, language neutrality, and analytical tone. The **objectivity** rating dimension measures this.
+**Prerequisite**: All ATM pages must follow the [Common Writing Principles](/wiki/E726) — epistemic honesty, language neutrality, and analytical tone. The **objectivity** rating dimension measures this.
 
 ## Page Type Detection
 
@@ -144,7 +144,7 @@ causeEffectGraph:
       strength: strong
 ```
 
-See `/internal/cause-effect-diagrams/` for detailed guidance.
+See the [Cause-Effect Diagrams](/wiki/E758) page for detailed guidance.
 
 ---
 
@@ -170,8 +170,8 @@ Task({
   subagent_type: 'general-purpose',
   prompt: `Add a cause-effect diagram to ATM entity [ENTITY_ID].
 
-  1. Read /internal/cause-effect-diagrams/ for schema
-  2. Read /internal/ai-transition-model-style-guide/
+  1. Read /wiki/E758 (Cause-Effect Diagrams) for schema
+  2. Read /wiki/E721 (AI Transition Model Style Guide)
   3. Identify upstream drivers and downstream effects
   4. Add causeEffectGraph to the entity in ai-transition-model.yaml
 

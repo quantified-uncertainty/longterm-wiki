@@ -16,7 +16,7 @@ export default function SuggestedPagesPage() {
         {suggestions.length} pages the wiki should add, ranked by priority.
         Priority is based on how often the topic is mentioned across existing
         pages and its importance to AI safety coverage. Sourced from the{" "}
-        <a href="/internal/gap-analysis-2026-02">Feb 2026 gap analysis</a>.
+        <a href="/wiki/E762">Feb 2026 gap analysis</a>.
       </p>
       <SuggestedPagesTable data={suggestions} />
     </article>

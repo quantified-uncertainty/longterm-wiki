@@ -17,7 +17,7 @@ ratings:
   completeness: 6
   completeness_reasoning: "Comprehensive view of infrastructure state and future work, well-organized with clear status indicators"
 ---
-This file tracks future infrastructure improvements and project priorities. For content-specific tasks, see the [Enhancement Queue](/internal/enhancement-queue/).
+This file tracks future infrastructure improvements and project priorities. For content-specific tasks, see the [Enhancement Queue](/wiki/E761).
 
 ## Current State (January 2026)
 
@@ -60,7 +60,7 @@ The project has mature infrastructure:
 ### Style Guide
 
 - [x] **Common writing principles** - Cross-cutting style guide for epistemic honesty, language neutrality, analytical tone
-  - Created at `/internal/common-writing-principles/`
+  - Created at `/wiki/E726` (Common Writing Principles)
   - Added 7th rating dimension: **objectivity** (0-10)
   - All domain style guides reference it
 
@@ -72,7 +72,7 @@ The project has mature infrastructure:
   - Could build a crux validator to flag "EA money", "non-EA", "EA causes" etc.
   - Apply going forward; retroactive cleanup is lower priority
 
-- [x] **Model page guidance** - Models style guide complete at `/internal/models-style-guide/`
+- [x] **Model page guidance** - Models style guide complete at `/wiki/E736` (Models Style Guide)
 
 - [ ] **Component usage patterns** - Document when to use:
   - EstimateBox vs plain tables
