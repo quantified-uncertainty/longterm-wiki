@@ -39,13 +39,13 @@ const entityId = args.find(arg => !arg.startsWith('-'));
 interface InboundLink {
   path: string;
   title: string;
-  importance: number;
+  readerImportance: number;
 }
 
 interface MissingInboundLink {
   path: string;
   title: string;
-  importance: number;
+  readerImportance: number;
   context: string;
   matchedTerm: string;
 }
@@ -260,13 +260,13 @@ function analyzeEntity(entityId: string, pathRegistry: PathRegistry, entities: E
           result.inbound.push({
             path: relPath,
             title: (frontmatter.title as string) || slug,
-            importance: (frontmatter.importance as number) || 0,
+            readerImportance: (frontmatter.readerImportance as number) || 0,
           });
         } else if (mentionResult.found) {
           result.missingInbound.push({
             path: relPath,
             title: (frontmatter.title as string) || slug,
-            importance: (frontmatter.importance as number) || 0,
+            readerImportance: (frontmatter.readerImportance as number) || 0,
             context: mentionResult.context,
             matchedTerm: mentionResult.term,
           });
@@ -285,9 +285,9 @@ function analyzeEntity(entityId: string, pathRegistry: PathRegistry, entities: E
     }
   }
 
-  // Sort by importance
-  result.inbound.sort((a, b) => b.importance - a.importance);
-  result.missingInbound.sort((a, b) => b.importance - a.importance);
+  // Sort by readerImportance
+  result.inbound.sort((a, b) => b.readerImportance - a.readerImportance);
+  result.missingInbound.sort((a, b) => b.readerImportance - a.readerImportance);
 
   return result;
 }
@@ -328,7 +328,7 @@ function main(): void {
   console.log(`${colors.bold}${colors.green}✓ Inbound Links${colors.reset} (${result.inbound.length} pages link to this entity):`);
   if (result.inbound.length > 0) {
     for (const page of result.inbound.slice(0, 15)) {
-      console.log(`  ${colors.dim}[${page.importance}]${colors.reset} ${page.title}`);
+      console.log(`  ${colors.dim}[${page.readerImportance}]${colors.reset} ${page.title}`);
     }
     if (result.inbound.length > 15) {
       console.log(`  ${colors.dim}... and ${result.inbound.length - 15} more${colors.reset}`);
@@ -342,7 +342,7 @@ function main(): void {
   console.log(`${colors.bold}${colors.yellow}⚠ Missing Inbound${colors.reset} (${result.missingInbound.length} pages mention but don't link):`);
   if (result.missingInbound.length > 0) {
     for (const page of result.missingInbound.slice(0, 12)) {
-      console.log(`  ${colors.dim}[${page.importance}]${colors.reset} ${page.title}`);
+      console.log(`  ${colors.dim}[${page.readerImportance}]${colors.reset} ${page.title}`);
       if (page.context) {
         // Truncate context and highlight the matched term
         let ctx = page.context.length > 80 ? page.context.slice(0, 80) + '...' : page.context;

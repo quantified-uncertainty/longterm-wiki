@@ -13,7 +13,7 @@ export interface SearchDoc {
   description: string;
   numericId: string;
   type: string;
-  importance: number | null;
+  readerImportance: number | null;
   quality: number | null;
 }
 
@@ -111,7 +111,7 @@ export async function searchWiki(
     // Exact title match — strongest signal that this is THE page
     if (title === q) boost *= 3.0;
     // Mild importance tiebreaker (0–33% boost)
-    boost *= 1 + (doc?.importance ?? 0) / 300;
+    boost *= 1 + (doc?.readerImportance ?? 0) / 300;
 
     return {
       id: doc?.id ?? hit.id,
@@ -119,7 +119,7 @@ export async function searchWiki(
       description: doc?.description ?? "",
       numericId: doc?.numericId ?? hit.id,
       type: doc?.type ?? "",
-      importance: doc?.importance ?? null,
+      readerImportance: doc?.readerImportance ?? null,
       quality: doc?.quality ?? null,
       score: hit.score * boost,
       match: (hit.match ?? {}) as MatchInfo,
@@ -157,7 +157,7 @@ export async function searchWikiScores(
 
     let boost = 1.0;
     if (title === q) boost *= 3.0;
-    boost *= 1 + (doc?.importance ?? 0) / 300;
+    boost *= 1 + (doc?.readerImportance ?? 0) / 300;
 
     scores.set(hit.id, hit.score * boost);
   }

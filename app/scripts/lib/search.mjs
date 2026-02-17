@@ -49,7 +49,7 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
       // Metadata for result display (not indexed)
       _numericId: numericId,
       _type: entity.entityType || 'concept',
-      _importance: page.importance,
+      _readerImportance: page.readerImportance,
       _quality: page.quality,
     });
   }
@@ -70,7 +70,7 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
       contentFormat: page.contentFormat || 'article',
       _numericId: numericId,
       _type: page.category || 'concept',
-      _importance: page.importance,
+      _readerImportance: page.readerImportance,
       _quality: page.quality,
     });
   }
@@ -90,7 +90,7 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
     description: truncate(d.description, 300),
     numericId: d._numericId,
     type: d._type,
-    importance: d._importance,
+    readerImportance: d._readerImportance,
     quality: d._quality,
     contentFormat: d.contentFormat,
   }));

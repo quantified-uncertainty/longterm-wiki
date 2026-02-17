@@ -13,8 +13,8 @@ import { join } from 'path';
 
 // Configuration
 const CONFIG = {
-  // Minimum importance score for inclusion in core docs
-  coreImportanceThreshold: 60,
+  // Minimum reader importance score for inclusion in core docs
+  coreReaderImportanceThreshold: 60,
   // Target token count for core docs (approximate, 1 token ≈ 4 chars)
   coreTargetTokens: 30000,
   // Site metadata
@@ -206,7 +206,7 @@ This file provides an index of site content for LLMs. For full documentation, se
 
 ## LLM Context Files
 
-- [Core Documentation (llms-core.txt)](${CONFIG.site.url}/llms-core.txt): High-importance pages (~30K tokens) - fits in chat context
+- [Core Documentation (llms-core.txt)](${CONFIG.site.url}/llms-core.txt): High reader-importance pages (~30K tokens) - fits in chat context
 - [Full Documentation (llms-full.txt)](${CONFIG.site.url}/llms-full.txt): Complete content - for embeddings/RAG
 - [Sitemap](${CONFIG.site.url}/sitemap.xml): XML sitemap of all pages
 - Per-page plain text: append \`.txt\` to any wiki URL (e.g. ${CONFIG.site.url}/wiki/E1.txt)
@@ -220,17 +220,17 @@ This file provides an index of site content for LLMs. For full documentation, se
     const catPages = categorized[cat.key];
     if (catPages.length === 0) continue;
 
-    // Sort by importance, take top 10
+    // Sort by reader importance, take top 10
     const topPages = catPages
-      .filter((p) => p.importance !== null)
-      .sort((a, b) => (b.importance || 0) - (a.importance || 0))
+      .filter((p) => p.readerImportance !== null)
+      .sort((a, b) => (b.readerImportance || 0) - (a.readerImportance || 0))
       .slice(0, 10);
 
     if (topPages.length === 0) continue;
 
     content += `### ${cat.label}\n\n`;
     for (const page of topPages) {
-      const importance = page.importance ? ` (importance: ${page.importance})` : '';
+      const importance = page.readerImportance ? ` (reader importance: ${page.readerImportance})` : '';
       content += `- [${page.title}](${getPageUrl(page)})${importance}\n`;
     }
     content += '\n';
@@ -239,18 +239,18 @@ This file provides an index of site content for LLMs. For full documentation, se
   // Summary stats
   const totalPages = pages.length;
   const pagesWithSummary = pages.filter((p) => p.llmSummary).length;
-  const highImportance = pages.filter((p) => p.importance >= CONFIG.coreImportanceThreshold).length;
+  const highImportance = pages.filter((p) => p.readerImportance >= CONFIG.coreReaderImportanceThreshold).length;
 
   content += `## Statistics
 
 - Total pages: ${totalPages}
 - Pages with LLM summaries: ${pagesWithSummary}
-- High-importance pages (≥${CONFIG.coreImportanceThreshold}): ${highImportance}
+- High reader-importance pages (≥${CONFIG.coreReaderImportanceThreshold}): ${highImportance}
 
 ## Usage Notes
 
 - Each page has an \`llmSummary\` field optimized for LLM consumption
-- Pages are rated by \`importance\` (0-100) and \`quality\` (0-100)
+- Pages are rated by \`readerImportance\` (0-100) and \`quality\` (0-100)
 - Use llms-core.txt for quick context, llms-full.txt for comprehensive knowledge
 `;
 
@@ -258,23 +258,23 @@ This file provides an index of site content for LLMs. For full documentation, se
 }
 
 /**
- * Generate llms-core.txt - High-importance pages with summaries
+ * Generate llms-core.txt - High reader-importance pages with summaries
  */
 function generateLlmsCoreTxt(pages) {
   const version = getVersion();
   const date = getDate();
 
-  // Filter to high-importance pages with summaries
+  // Filter to high reader-importance pages with summaries
   const corePagesRaw = pages
-    .filter((p) => p.importance >= CONFIG.coreImportanceThreshold && p.llmSummary)
-    .sort((a, b) => (b.importance || 0) - (a.importance || 0));
+    .filter((p) => p.readerImportance >= CONFIG.coreReaderImportanceThreshold && p.llmSummary)
+    .sort((a, b) => (b.readerImportance || 0) - (a.readerImportance || 0));
 
   // Build content, respecting token budget
   let content = `# ${CONFIG.site.name} - Core Documentation
 
 > Version: ${version} | Generated: ${date}
 >
-> High-importance pages for understanding AI safety research.
+> High reader-importance pages for understanding AI safety research.
 > For complete documentation, see: ${CONFIG.site.url}
 
 ================================================================================
@@ -290,7 +290,7 @@ function generateLlmsCoreTxt(pages) {
 ------------------------------------------------------------
 ## ${page.title}
 URL: ${pageUrl}
-Importance: ${page.importance} | Quality: ${page.quality || 'unrated'}
+Reader Importance: ${page.readerImportance} | Quality: ${page.quality || 'unrated'}
 ------------------------------------------------------------
 
 ${page.llmSummary}
@@ -350,10 +350,10 @@ function generateLlmsFullTxt(pages) {
     const catPages = categorized[cat.key];
     if (catPages.length === 0) continue;
 
-    // Sort by importance
+    // Sort by reader importance
     const sortedPages = catPages
-      .filter((p) => p.importance !== null)
-      .sort((a, b) => (b.importance || 0) - (a.importance || 0));
+      .filter((p) => p.readerImportance !== null)
+      .sort((a, b) => (b.readerImportance || 0) - (a.readerImportance || 0));
 
     if (sortedPages.length === 0) continue;
 
@@ -373,7 +373,7 @@ function generateLlmsFullTxt(pages) {
 ------------------------------------------------------------
 ## ${page.title}
 URL: ${pageUrl}
-Importance: ${page.importance || 'unrated'} | Quality: ${page.quality || 'unrated'}
+Reader Importance: ${page.readerImportance || 'unrated'} | Quality: ${page.quality || 'unrated'}
 ${page.llmSummary ? `Summary: ${page.llmSummary}` : ''}
 ------------------------------------------------------------
 
@@ -437,7 +437,7 @@ function generatePerPageTxt(pages) {
       `# ${page.title}`,
       '',
       `URL: ${getPageUrl(page)}`,
-      page.importance != null ? `Importance: ${page.importance}` : null,
+      page.readerImportance != null ? `Reader Importance: ${page.readerImportance}` : null,
       page.quality != null ? `Quality: ${page.quality}` : null,
       page.llmSummary ? `Summary: ${page.llmSummary}` : null,
       '',

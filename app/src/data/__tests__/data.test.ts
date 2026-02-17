@@ -170,7 +170,7 @@ const mockDatabase = {
       filePath: "risks/test-entity.mdx",
       title: "Test Entity",
       quality: 7,
-      importance: 85,
+      readerImportance: 85,
       tractability: null,
       neglectedness: null,
       uncertainty: null,
@@ -188,7 +188,7 @@ const mockDatabase = {
       filePath: "responses/table-entity.mdx",
       title: "Table With Entity",
       quality: 20,
-      importance: 30,
+      readerImportance: 30,
       contentFormat: "table",
       lastUpdated: "2025-02-01",
       category: "responses",
@@ -200,7 +200,7 @@ const mockDatabase = {
       filePath: "risks/orphan-table.mdx",
       title: "Orphan Table",
       quality: 20,
-      importance: 30,
+      readerImportance: 30,
       contentFormat: "table",
       lastUpdated: "2025-02-01",
       category: "risks",
@@ -388,7 +388,7 @@ describe("Data Layer", () => {
       const testItem = items.find((i) => i.id === "test-entity");
       expect(testItem).toBeDefined();
       expect(testItem?.quality).toBe(7);
-      expect(testItem?.importance).toBe(85);
+      expect(testItem?.readerImportance).toBe(85);
       expect(testItem?.description).toBe("A summary of the test entity.");
       expect(testItem?.wordCount).toBe(2500);
       expect(testItem?.lastUpdated).toBe("2025-01-15");

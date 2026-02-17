@@ -23,7 +23,7 @@ interface GradingRatings {
 }
 
 interface GradingResult {
-  importance: number;
+  readerImportance: number;
   ratings: GradingRatings;
   llmSummary?: string;
   balanceFlags?: string[];
@@ -33,7 +33,7 @@ interface GradingResult {
 interface Frontmatter {
   title?: string;
   description?: string;
-  importance?: number;
+  readerImportance?: number;
   ratings?: GradingRatings;
   quality?: number;
   llmSummary?: string;
@@ -49,7 +49,7 @@ interface Frontmatter {
 
 const GRADING_SYSTEM_PROMPT = `You are an expert evaluator of AI safety content. Score this page on:
 
-- importance (0-100): How significant for understanding AI risk
+- readerImportance (0-100): How significant for understanding AI risk
 - quality dimensions (0-10 each): novelty, rigor, actionability, completeness
 - llmSummary: 1-2 sentence summary with key conclusions
 - balanceFlags: Array of any balance/bias issues detected (see below)
@@ -80,7 +80,7 @@ IMPORTANCE guidelines:
 
 Respond with valid JSON only.`;
 
-export async function runGrading(topic: string, { log, saveResult, getTopicDir }: GradingContext): Promise<{ success: boolean; error?: string; importance?: number; quality?: number; ratings?: GradingRatings; llmSummary?: string }> {
+export async function runGrading(topic: string, { log, saveResult, getTopicDir }: GradingContext): Promise<{ success: boolean; error?: string; readerImportance?: number; quality?: number; ratings?: GradingRatings; llmSummary?: string }> {
   log('grade', 'Running quality grading on temp file...');
 
   const finalPath = path.join(getTopicDir(topic), 'final.mdx');
@@ -132,7 +132,7 @@ ${body.slice(0, 30000)}
 
 Respond with JSON:
 {
-  "importance": <0-100>,
+  "readerImportance": <0-100>,
   "ratings": {
     "novelty": <0-10>,
     "rigor": <0-10>,
@@ -158,12 +158,12 @@ Respond with JSON:
     const text = block.text;
     const grades = parseJsonResponse(text) as GradingResult | null;
 
-    if (!grades || !grades.importance) {
+    if (!grades || !grades.readerImportance) {
       log('grade', 'Invalid grading response');
       return { success: false, error: 'Invalid response' };
     }
 
-    log('grade', `Importance: ${grades.importance}, Quality: ${Math.round((grades.ratings.novelty + grades.ratings.rigor + grades.ratings.actionability + grades.ratings.completeness) * 2.5)}`);
+    log('grade', `Reader Importance: ${grades.readerImportance}, Quality: ${Math.round((grades.ratings.novelty + grades.ratings.rigor + grades.ratings.actionability + grades.ratings.completeness) * 2.5)}`);
 
     const balanceFlags = grades.balanceFlags || [];
     if (balanceFlags.length > 0) {
@@ -181,7 +181,7 @@ Respond with JSON:
     );
 
     // Update frontmatter
-    frontmatter.importance = grades.importance;
+    frontmatter.readerImportance = grades.readerImportance;
     frontmatter.ratings = grades.ratings;
     frontmatter.quality = quality;
     frontmatter.llmSummary = grades.llmSummary;
@@ -207,15 +207,15 @@ Respond with JSON:
     appendEditLog(pageId, {
       tool: 'crux-grade',
       agency: 'automated',
-      note: `Initial creation grading: quality=${quality}, importance=${grades.importance}`,
+      note: `Initial creation grading: quality=${quality}, readerImportance=${grades.readerImportance}`,
     });
 
-    log('grade', `Graded: imp=${grades.importance}, qual=${quality}`);
+    log('grade', `Graded: readerImp=${grades.readerImportance}, qual=${quality}`);
     log('grade', `  Summary: ${grades.llmSummary?.slice(0, 100)}...`);
 
     return {
       success: true,
-      importance: grades.importance,
+      readerImportance: grades.readerImportance,
       quality,
       ratings: grades.ratings,
       llmSummary: grades.llmSummary

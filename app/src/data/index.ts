@@ -297,7 +297,8 @@ export interface Page {
   filePath: string;
   title: string;
   quality: number | null;
-  importance: number | null;
+  readerImportance: number | null;
+  researchImportance: number | null;
   contentFormat: ContentFormat;
   tractability: number | null;
   neglectedness: number | null;
@@ -471,7 +472,7 @@ export interface UpdateScheduleItem {
   numericId: string;
   title: string;
   quality: number | null;
-  importance: number | null;
+  readerImportance: number | null;
   lastUpdated: string | null;
   updateFrequency: number;
   daysSinceUpdate: number;
@@ -499,8 +500,8 @@ export function getUpdateSchedule(): UpdateScheduleItem[] {
       : 999;
     const daysUntil = page.updateFrequency - daysSince;
     const staleness = daysSince / page.updateFrequency;
-    const importance = page.importance ?? 50;
-    const priority = staleness * (importance / 100);
+    const readerImp = page.readerImportance ?? 50;
+    const priority = staleness * (readerImp / 100);
 
     const numericId = db.idRegistry?.bySlug[page.id] || page.id;
 
@@ -509,7 +510,7 @@ export function getUpdateSchedule(): UpdateScheduleItem[] {
       numericId,
       title: page.title,
       quality: page.quality,
-      importance: page.importance,
+      readerImportance: page.readerImportance,
       lastUpdated,
       updateFrequency: page.updateFrequency,
       daysSinceUpdate: daysSince,
@@ -522,6 +523,50 @@ export function getUpdateSchedule(): UpdateScheduleItem[] {
 
   // Sort by priority descending (most urgent first)
   items.sort((a, b) => b.priority - a.priority);
+  return items;
+}
+
+export interface PageRankingItem {
+  id: string;
+  numericId: string;
+  title: string;
+  quality: number | null;
+  readerImportance: number | null;
+  readerRank: number | null;
+  researchImportance: number | null;
+  researchRank: number | null;
+  category: string;
+  wordCount: number;
+}
+
+export function getPageRankings(): PageRankingItem[] {
+  const db = getDatabase();
+  const pages = db.pages || [];
+
+  const items = pages
+    .filter((p: Page) => p.readerImportance != null || p.researchImportance != null)
+    .map((p: Page) => ({
+      id: p.id,
+      numericId: db.idRegistry?.bySlug[p.id] || p.id,
+      title: p.title,
+      quality: p.quality,
+      readerImportance: p.readerImportance,
+      readerRank: null as number | null,
+      researchImportance: p.researchImportance,
+      researchRank: null as number | null,
+      category: p.category,
+      wordCount: p.wordCount ?? p.metrics?.wordCount ?? 0,
+    }));
+
+  // Derive ranks from score ordering (scores are derived from rank, so this recovers position)
+  const byReader = items.filter((i) => i.readerImportance != null).sort((a, b) => (b.readerImportance ?? 0) - (a.readerImportance ?? 0));
+  byReader.forEach((item, idx) => { item.readerRank = idx + 1; });
+
+  const byResearch = items.filter((i) => i.researchImportance != null).sort((a, b) => (b.researchImportance ?? 0) - (a.researchImportance ?? 0));
+  byResearch.forEach((item, idx) => { item.researchRank = idx + 1; });
+
+  // Default sort by readership importance
+  items.sort((a, b) => (b.readerImportance ?? 0) - (a.readerImportance ?? 0));
   return items;
 }
 
@@ -964,7 +1009,7 @@ export interface ExploreItem {
   clusters: string[];
   wordCount: number | null;
   quality: number | null;
-  importance: number | null;
+  readerImportance: number | null;
   category: string | null;
   riskCategory: string | null;
   lastUpdated: string | null;
@@ -1017,7 +1062,7 @@ export function getExploreItems(): ExploreItem[] {
       clusters: entity.clusters?.length ? entity.clusters : (page?.clusters || []),
       wordCount: page?.wordCount ?? null,
       quality: page?.quality ?? null,
-      importance: page?.importance ?? null,
+      readerImportance: page?.readerImportance ?? null,
       category: page?.category ?? null,
       riskCategory: isRisk(entity) ? (entity.riskCategory || null) : null,
       lastUpdated: page?.lastUpdated ?? null,
@@ -1039,7 +1084,7 @@ export function getExploreItems(): ExploreItem[] {
       clusters: page.clusters || [],
       wordCount: page.wordCount ?? null,
       quality: page.quality ?? null,
-      importance: page.importance ?? null,
+      readerImportance: page.readerImportance ?? null,
       category: page.category ?? null,
       riskCategory: null,
       lastUpdated: page.lastUpdated ?? null,
@@ -1093,7 +1138,7 @@ export function getExploreItems(): ExploreItem[] {
         clusters: ["ai-safety"],
         wordCount: null,
         quality: null,
-        importance: null,
+        readerImportance: null,
         category: null,
         riskCategory: null,
         lastUpdated: e.lastUpdated || null,

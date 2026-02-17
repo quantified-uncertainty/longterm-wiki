@@ -1,0 +1,103 @@
+---
+title: "Importance Ranking System"
+description: "How wiki page importance scores are derived from ordered rankings using LLM-assisted comparison"
+pageType: "documentation"
+sidebar:
+  order: 7
+readerImportance: 7
+researchImportance: 9.5
+quality: 40
+---
+
+# Importance Ranking System
+
+Page importance scores (0-100) are derived from ordered rankings — lists of all pages sorted by importance. The ranking is the source of truth; numeric scores are computed from position.
+
+## Two Dimensions
+
+The system maintains two separate rankings that measure different things:
+
+| Dimension | Frontmatter Field | File | What It Measures |
+|---|---|---|---|
+| **Readership** | `importance` | `data/importance-ranking.yaml` | How important is this page for readers navigating AI safety? Broad, foundational topics rank high. |
+| **Research** | `researchImportance` | `data/research-ranking.yaml` | How much value would deeper investigation of this topic yield? Narrow, under-explored topics with high insight potential rank high. |
+
+These are intentionally different. A broad overview page like "AI Alignment" ranks high for readership but low for research (it compiles existing knowledge rather than generating new insights). A narrow page like "Mesa-Optimization" or "Sleeper Agents" might rank higher for research because deeper investigation could reveal critical findings.
+
+## Why Rankings Instead of Direct Scores?
+
+The previous system asked "rate this page's importance from 0 to 100" — but arbitrary scores are hard to calibrate. Is a 72 really more important than a 68? What does a 50 mean in absolute terms?
+
+Rankings solve this by forcing **relative comparisons**: is page A more important than page B? This is a much easier judgment call, and it ensures every score is meaningful relative to every other score.
+
+The 0-100 scores are then derived mechanically: position 1 maps to ~95, the last position maps to ~5, with linear interpolation between.
+
+## How It Works
+
+### Batch Sort + Merge
+
+For ranking all ~645 pages:
+
+1. **Phase 1 — Batch sort**: Split pages into groups of ~25. For each group, a single LLM prompt sorts them by importance. (~26 prompts)
+2. **Phase 2 — Merge**: Insert pages from remaining batches into the growing master ranking using binary search (each insertion takes ~10 pairwise comparisons). (~5,000 comparison calls)
+3. **Phase 3 — Verification**: Slide a window of 20 pages across the ranking, re-sorting each window to fix local inversions from merge noise. (~63 prompts)
+
+### Cost
+
+A full ranking run costs approximately **\$1-2** using Haiku. Breakdown:
+- 26 batch sort prompts (≈\$0.13)
+- ≈5,000 binary search comparisons (≈\$1.20)
+- ≈63 verification windows (≈\$0.30)
+
+### Prompts
+
+The readership and research dimensions use different system prompts that change what the LLM optimizes for:
+
+- **Readership**: Centrality, foundational dependency, real-world relevance, breadth
+- **Research**: Insight potential, neglectedness, decision relevance, crux resolution
+
+## CLI Commands
+
+```bash
+# View rankings
+pnpm crux importance show --top=30                        # Readership (default)
+pnpm crux importance show --dimension=research --top=30   # Research
+
+# Rerank all pages (takes ~40 min, costs ~$1-2)
+pnpm crux importance rerank --all --apply
+pnpm crux importance rerank --dimension=research --all --apply
+
+# Test with a sample first
+pnpm crux importance rerank --sample=20
+pnpm crux importance rerank --dimension=research --sample=20
+
+# Fix local inversions in existing ranking
+pnpm crux importance rerank --verify --apply
+
+# Write derived scores to page frontmatter
+pnpm crux importance sync --apply
+
+# Bootstrap from existing importance scores (one-time setup)
+pnpm crux importance seed --apply
+```
+
+## Relationship to Other Systems
+
+- **Critical Insights**: The research ranking aligns with the Critical Insights framework's emphasis on surprising, important, and neglected topics. Pages ranking high in research importance are natural candidates for insight extraction.
+- **Gap Analysis**: The gap system (`pnpm crux gaps`) uses importance scores to prioritize which pages need more insights. Updated importance scores feed directly into gap prioritization.
+- **Update Schedule**: The update scheduler uses importance to determine which stale pages to refresh first.
+- **Search Ranking**: Importance provides a tiebreaker boost in search results.
+- **Homepage**: Featured content on the homepage weighs importance 2x.
+
+## Files
+
+| Path | Purpose |
+|---|---|
+| `data/importance-ranking.yaml` | Readership ranking (ordered page ID list) |
+| `data/research-ranking.yaml` | Research importance ranking |
+| `crux/lib/importance-ranking.ts` | Core library (load, save, derive scores) |
+| `crux/importance/rerank.ts` | LLM-assisted ranking (batch sort + merge) |
+| `crux/importance/sync.ts` | Write derived scores to frontmatter |
+| `crux/importance/show.ts` | Display rankings |
+| `crux/importance/seed.ts` | Bootstrap from existing scores |
+| `crux/commands/importance.ts` | CLI registration |

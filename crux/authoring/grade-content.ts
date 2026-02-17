@@ -17,7 +17,7 @@
  *   --limit N          Only process N pages (for testing)
  *   --parallel N       Process N pages concurrently (default: 1)
  *   --category X       Only process pages in category (models, risks, responses, etc.)
- *   --skip-graded      Skip pages that already have importance set
+ *   --skip-graded      Skip pages that already have readerImportance set
  *   --output FILE      Write results to JSON file (default: grades-output.json)
  *   --apply            Apply grades directly to frontmatter (use with caution)
  *   --skip-warnings    Skip Steps 1-2, just rate (backward compat)
@@ -84,7 +84,7 @@ const options: Options = {
 
 const SYSTEM_PROMPT: string = `You are an expert evaluator of AI safety content for a resource aimed at **expert AI prioritization work** - helping researchers and funders identify and prioritize concrete interventions to reduce AI existential risk.
 
-Score each page on importance (0-100, one decimal place). Be discriminating - use the full range.
+Score each page on readerImportance (0-100, one decimal place). Be discriminating - use the full range.
 
 Also score each page on SEVEN quality dimensions (0-10 scale, one decimal). BE EXTREMELY HARSH - a 7 is exceptional, 8+ is world-class. Most wiki content should score 3-5.
 
@@ -202,7 +202,7 @@ FULL CONTENT:
 
 Respond with JSON (keep reasoning SHORT - max 2-3 sentences total):
 {
-  "importance": <0-100, one decimal>,
+  "readerImportance": <0-100, one decimal>,
   "ratings": {
     "focus": <0-10, one decimal>,
     "novelty": <0-10, one decimal>,
@@ -219,7 +219,7 @@ Respond with JSON (keep reasoning SHORT - max 2-3 sentences total):
 interface Frontmatter {
   title?: string;
   description?: string;
-  importance?: number | null;
+  readerImportance?: number | null;
   quality?: number | null;
   ratings?: Ratings | null;
   metrics?: Metrics;
@@ -257,7 +257,7 @@ interface PageInfo {
   isModel: boolean;
   pageType: string;
   contentFormat: string;
-  currentImportance: number | null;
+  currentReaderImportance: number | null;
   currentQuality: number | null;
   currentRatings: Ratings | null;
   content: string;
@@ -278,7 +278,7 @@ interface ChecklistWarning {
 }
 
 interface GradeResult {
-  importance: number;
+  readerImportance: number;
   ratings: Ratings;
   llmSummary?: string;
   reasoning?: string;
@@ -290,7 +290,7 @@ interface PageResult {
   category: string;
   isModel?: boolean;
   title: string;
-  importance?: number;
+  readerImportance?: number;
   ratings?: Ratings;
   metrics: Metrics;
   quality?: number;
@@ -363,7 +363,7 @@ function collectPages(): PageInfo[] {
       isModel,
       pageType,
       contentFormat: fm.contentFormat || 'article',
-      currentImportance: fm.importance ?? null,
+      currentReaderImportance: fm.readerImportance ?? null,
       currentQuality: fm.quality ?? null,
       currentRatings: fm.ratings ?? null,
       content,
@@ -749,7 +749,7 @@ function applyGradesToFile(page: PageInfo, grades: GradeResult, metrics: Metrics
   const fm = parseYaml(fmMatch[1]) || {} as Record<string, unknown>;
 
   // Update fields
-  fm.importance = grades.importance;
+  fm.readerImportance = grades.readerImportance;
   fm.quality = derivedQuality;
   if (grades.llmSummary) {
     fm.llmSummary = grades.llmSummary;
@@ -861,8 +861,8 @@ async function main(): Promise<void> {
   }
 
   if (options.skipGraded) {
-    pages = pages.filter(p => p.currentImportance === null);
-    console.log(`Filtered to ${pages.length} pages without importance`);
+    pages = pages.filter(p => p.currentReaderImportance === null);
+    console.log(`Filtered to ${pages.length} pages without readerImportance`);
   }
 
   // Skip overview pages (index.mdx), stub pages, non-graded formats, and internal files (starting with _)
@@ -982,7 +982,7 @@ async function main(): Promise<void> {
           category: page.category,
           isModel: page.isModel,
           title: page.title,
-          importance: grades.importance,
+          readerImportance: grades.readerImportance,
           ratings: grades.ratings,
           metrics,
           quality: derivedQuality,
@@ -1002,7 +1002,7 @@ async function main(): Promise<void> {
               tool: 'crux-grade',
               agency: 'automated',
               requestedBy: getDefaultRequestedBy(),
-              note: `Quality graded: ${derivedQuality}, importance: ${grades.importance.toFixed(1)}`,
+              note: `Quality graded: ${derivedQuality}, readerImportance: ${grades.readerImportance.toFixed(1)}`,
             });
           } else {
             console.error(`  Failed to apply grades to ${page.filePath}`);
@@ -1011,7 +1011,7 @@ async function main(): Promise<void> {
 
         const r = grades.ratings;
         const warnCount: string = options.skipWarnings ? '' : ` [${automatedWarnings.length + checklistWarnings.length}w]`;
-        console.log(`[${index + 1}/${pages.length}] ${page.id}: imp=${grades.importance.toFixed(1)}, f=${r.focus} n=${r.novelty} r=${r.rigor} c=${r.completeness} con=${r.concreteness} a=${r.actionability} o=${r.objectivity} → qual=${derivedQuality} (${metrics.wordCount}w, ${metrics.citations}cit)${warnCount}${options.apply ? (applied ? ' ok' : ' FAIL') : ''}`);
+        console.log(`[${index + 1}/${pages.length}] ${page.id}: readerImp=${grades.readerImportance.toFixed(1)}, f=${r.focus} n=${r.novelty} r=${r.rigor} c=${r.completeness} con=${r.concreteness} a=${r.actionability} o=${r.objectivity} → qual=${derivedQuality} (${metrics.wordCount}w, ${metrics.citations}cit)${warnCount}${options.apply ? (applied ? ' ok' : ' FAIL') : ''}`);
         return { success: true, result };
       } else {
         console.log(`[${index + 1}/${pages.length}] ${page.id}: FAILED (no ratings in response)`);
@@ -1056,30 +1056,30 @@ async function main(): Promise<void> {
   console.log(`Processed: ${processed}, Errors: ${errors}`);
 
   // Summary statistics
-  const importanceScores: number[] = results.map(r => r.importance).filter((x): x is number => x != null).sort((a, b) => b - a);
+  const readerImpScores: number[] = results.map(r => r.readerImportance).filter((x): x is number => x != null).sort((a, b) => b - a);
   const qualityScores: number[] = results.map(r => r.quality).filter((x): x is number => x != null).sort((a, b) => b - a);
 
-  // Importance distribution by range
+  // Reader importance distribution by range
   const impRanges: Record<string, number> = {
-    '90-100': importanceScores.filter(x => x >= 90).length,
-    '70-89': importanceScores.filter(x => x >= 70 && x < 90).length,
-    '50-69': importanceScores.filter(x => x >= 50 && x < 70).length,
-    '30-49': importanceScores.filter(x => x >= 30 && x < 50).length,
-    '0-29': importanceScores.filter(x => x < 30).length,
+    '90-100': readerImpScores.filter(x => x >= 90).length,
+    '70-89': readerImpScores.filter(x => x >= 70 && x < 90).length,
+    '50-69': readerImpScores.filter(x => x >= 50 && x < 70).length,
+    '30-49': readerImpScores.filter(x => x >= 30 && x < 50).length,
+    '0-29': readerImpScores.filter(x => x < 30).length,
   };
 
-  console.log('\nImportance Distribution (0-100):');
+  console.log('\nReader Importance Distribution (0-100):');
   for (const [range, count] of Object.entries(impRanges)) {
     const bar = '\u2588'.repeat(Math.ceil(count / 3));
     console.log(`  ${range}: ${bar} (${count})`);
   }
 
-  if (importanceScores.length > 0) {
-    const impAvg: number = importanceScores.reduce((a, b) => a + b, 0) / importanceScores.length;
-    const impMedian: number = importanceScores[Math.floor(importanceScores.length / 2)];
+  if (readerImpScores.length > 0) {
+    const impAvg: number = readerImpScores.reduce((a, b) => a + b, 0) / readerImpScores.length;
+    const impMedian: number = readerImpScores[Math.floor(readerImpScores.length / 2)];
     console.log(`\n  Avg: ${impAvg.toFixed(1)}, Median: ${impMedian.toFixed(1)}`);
-    console.log(`  Top 5: ${importanceScores.slice(0, 5).map(x => x.toFixed(1)).join(', ')}`);
-    console.log(`  Bottom 5: ${importanceScores.slice(-5).map(x => x.toFixed(1)).join(', ')}`);
+    console.log(`  Top 5: ${readerImpScores.slice(0, 5).map(x => x.toFixed(1)).join(', ')}`);
+    console.log(`  Bottom 5: ${readerImpScores.slice(-5).map(x => x.toFixed(1)).join(', ')}`);
   }
 
   // Quality distribution by range (0-100 scale)

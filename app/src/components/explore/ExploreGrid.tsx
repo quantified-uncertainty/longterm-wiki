@@ -27,7 +27,7 @@ const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
   { label: "Epistemic", value: "epistemic" },
 ];
 
-type SortKey = "recommended" | "relevance" | "title" | "importance" | "quality" | "wordCount" | "recentlyEdited";
+type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "quality" | "wordCount" | "recentlyEdited";
 
 /** Compute a blended "recommended" score that favors recent, high-quality content. */
 function recommendedScore(item: ExploreItem): number {
@@ -38,7 +38,7 @@ function recommendedScore(item: ExploreItem): number {
     recency = 10 * Math.exp(-daysAgo / 120);
   }
   const quality = item.quality || 0;
-  const importance = item.importance || 0;
+  const importance = item.readerImportance || 0;
   // Small bonus for substantive content (log-scaled, capped)
   const wordBonus = item.wordCount ? Math.min(2, Math.log10(item.wordCount + 1) - 1.5) : 0;
 
@@ -311,8 +311,8 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       switch (sortKey) {
         case "title":
           return a.title.localeCompare(b.title);
-        case "importance":
-          return (b.importance || 0) - (a.importance || 0);
+        case "readerImportance":
+          return (b.readerImportance || 0) - (a.readerImportance || 0);
         case "quality":
           return (b.quality || 0) - (a.quality || 0);
         case "wordCount":
@@ -327,8 +327,8 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
             return scoreB - scoreA;
           }
           // Fallback: importance-weighted relevance
-          const scoreA = (a.importance || 0) * 2 + (a.quality || 0);
-          const scoreB = (b.importance || 0) * 2 + (b.quality || 0);
+          const scoreA = (a.readerImportance || 0) * 2 + (a.quality || 0);
+          const scoreB = (b.readerImportance || 0) * 2 + (b.quality || 0);
           return scoreB - scoreA;
         }
         case "recommended":
@@ -399,7 +399,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
           <option value="recommended">Recommended</option>
           <option value="recentlyEdited">Recently Edited</option>
           <option value="quality">Quality</option>
-          <option value="importance">Importance</option>
+          <option value="readerImportance">Importance</option>
           <option value="relevance">Relevance</option>
           <option value="wordCount">Word Count</option>
           <option value="title">Title (A-Z)</option>
