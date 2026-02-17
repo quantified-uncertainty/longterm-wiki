@@ -437,15 +437,13 @@ describe("Data Layer", () => {
       expect(tableItems).toHaveLength(2);
     });
 
-    it("excludes internal pages from explore items", async () => {
+    it("includes internal pages in explore items", async () => {
       const { getExploreItems } = await import("../../data/index");
       const items = getExploreItems();
-      // internal-doc has entityType "internal" — must NOT appear in explore
+      // internal-doc has entityType "internal" — should appear in explore
       const internalItem = items.find((i) => i.id === "internal-doc");
-      expect(internalItem).toBeUndefined();
-      // No items should have type "internal"
-      const internalItems = items.filter((i) => i.type === "internal");
-      expect(internalItems).toHaveLength(0);
+      expect(internalItem).toBeDefined();
+      expect(internalItem!.type).toBe("internal");
     });
   });
 
