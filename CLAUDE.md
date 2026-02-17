@@ -194,3 +194,18 @@ GitHub Actions workflow (`.github/workflows/auto-update.yml`) runs daily at 06:0
 - **Mermaid diagrams**: Follow `content/docs/internal/mermaid-diagrams.mdx` style guide — prefer `flowchart TD`, max 3-4 parallel nodes, use tables for taxonomies, max 15-20 nodes per diagram.
 - **Page templates**: Defined in `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
 - **Edit logs**: Per-page edit history in `data/edit-logs/<page-id>.yaml`, auto-maintained by Crux pipelines. Use `pnpm crux edit-log view <page-id>` to inspect. See `crux/lib/edit-log.ts` for the API.
+
+## Internal Dashboards for New Features
+
+**When building significant new features, always consider creating an internal dashboard page** (`/internal/<feature>`) to visualize the feature's data, status, and history. Dashboards are essential for debugging, monitoring, and iterating on features later.
+
+**When to build a dashboard:** Any feature that produces data over time (run history, discovered items, status tracking, metrics) or that involves a pipeline with multiple stages (where seeing intermediate results aids debugging).
+
+**How to build one:**
+1. Create `app/src/app/internal/<name>/page.tsx` (server component — loads data)
+2. Create `app/src/app/internal/<name>/<name>-table.tsx` (client component — `"use client"` with `DataTable` from `@/components/ui/data-table.tsx`)
+3. Add navigation entry in `app/src/lib/wiki-nav.ts` under "Dashboards & Tools"
+4. Server components can read YAML/JSON files directly via `fs` for operational data
+5. Follow existing patterns in `app/src/app/internal/updates/` or `auto-update-runs/`
+
+**Examples:** Update Schedule, Page Changes, Fact Dashboard, Auto-Update Runs, Auto-Update News, Importance Rankings, Page Similarity, Interventions, Proposals.

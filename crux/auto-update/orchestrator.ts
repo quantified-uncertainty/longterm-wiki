@@ -15,7 +15,7 @@ import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { fetchAllSources, loadSeenItems, saveSeenItems } from './feed-fetcher.ts';
 import { buildDigest, normalizeTitle } from './digest.ts';
 import { routeDigest } from './page-router.ts';
-import type { AutoUpdateOptions, RunReport, RunResult } from './types.ts';
+import type { AutoUpdateOptions, RunReport, RunResult, NewsDigest, UpdatePlan } from './types.ts';
 
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
 
@@ -46,6 +46,16 @@ function saveRunReport(report: RunReport): string {
   const filepath = join(RUNS_DIR, filename);
   writeFileSync(filepath, stringifyYaml(report, { lineWidth: 120 }));
   return filepath;
+}
+
+/**
+ * Save digest + plan details alongside the run report for dashboard display.
+ * These are larger files but essential for browsing news items and routing decisions.
+ */
+function saveRunDetails(startedAt: string, digest: NewsDigest, plan: UpdatePlan): void {
+  const timestamp = startedAt.replace(/[:.]/g, '-').slice(0, 19);
+  const filepath = join(RUNS_DIR, `${timestamp}-details.yaml`);
+  writeFileSync(filepath, stringifyYaml({ digest, plan }, { lineWidth: 120 }));
 }
 
 // ── Page Improvement Execution ──────────────────────────────────────────────
@@ -237,6 +247,9 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       console.log(`    ${np.suggestedTitle} — ${np.reason.slice(0, 80)}`);
     }
   }
+
+  // Save digest + plan details for dashboard browsing
+  saveRunDetails(startedAt, digest, plan);
 
   if (dryRun) {
     console.log(`\n── Dry run — stopping before execution ──`);
