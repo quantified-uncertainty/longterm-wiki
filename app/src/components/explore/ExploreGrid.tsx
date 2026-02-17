@@ -21,9 +21,10 @@ const FIELD_GROUPS: { label: string; cluster: string | null }[] = [
   { label: "Biorisks", cluster: "biorisks" },
 ];
 
-// SECTION filter — based on page category (wiki section)
-const SECTION_GROUPS: { label: string; categories: string[] }[] = [
-  { label: "All", categories: [] },
+// SECTION filter — based on page category (wiki section).
+// "Other" uses a special empty-array marker and is computed dynamically at render
+// to catch any category not explicitly listed in the named groups.
+const NAMED_SECTION_GROUPS: { label: string; categories: string[] }[] = [
   { label: "Risks", categories: ["risks"] },
   { label: "Responses", categories: ["responses"] },
   { label: "Organizations", categories: ["organizations"] },
@@ -32,8 +33,10 @@ const SECTION_GROUPS: { label: string; categories: string[] }[] = [
   { label: "Capabilities", categories: ["capabilities", "intelligence-paradigms"] },
   { label: "Metrics", categories: ["metrics"] },
   { label: "Concepts", categories: ["cruxes", "debates", "worldviews"] },
-  { label: "Other", categories: ["history", "incidents", "forecasting", "future-projections"] },
 ];
+
+// All explicitly-claimed categories (used to compute "Other" dynamically)
+const NAMED_CATEGORIES = new Set(NAMED_SECTION_GROUPS.flatMap((g) => g.categories));
 
 // RISK CATEGORY filter
 const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
@@ -151,6 +154,25 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+
+  // Build section groups with dynamic "Other" catch-all.
+  // "Other" collects any category not claimed by a named group.
+  const SECTION_GROUPS = useMemo(() => {
+    const otherCategories = [
+      ...new Set(
+        items
+          .map((item) => item.category)
+          .filter((c): c is string => !!c && !NAMED_CATEGORIES.has(c))
+      ),
+    ];
+    return [
+      { label: "All", categories: [] as string[] },
+      ...NAMED_SECTION_GROUPS,
+      ...(otherCategories.length > 0
+        ? [{ label: "Other", categories: otherCategories }]
+        : []),
+    ];
+  }, [items]);
 
   // Read initial state from URL params
   const initialTag = searchParams.get("tag") || "";
@@ -314,14 +336,14 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       if (group.categories.length === 0) return fieldFiltered.length;
       return fieldFiltered.filter((item) => item.category && group.categories.includes(item.category)).length;
     });
-  }, [fieldFiltered]);
+  }, [fieldFiltered, SECTION_GROUPS]);
 
   // Items after search + field + section filter
   const sectionFiltered = useMemo(() => {
     const group = SECTION_GROUPS[activeSection];
     if (group.categories.length === 0) return fieldFiltered;
     return fieldFiltered.filter((item) => item.category && group.categories.includes(item.category));
-  }, [fieldFiltered, activeSection]);
+  }, [fieldFiltered, activeSection, SECTION_GROUPS]);
 
   // Compute entity type counts (against search + field + section-filtered items)
   const entityCounts = useMemo(() => {

@@ -28,6 +28,7 @@ function isIndexFile(filePath: string): boolean {
 
 /** Convert a kebab-case slug to a Title Case label. */
 function formatLabel(slug: string): string {
+  if (!slug) return slug;
   return slug
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -149,27 +150,16 @@ function buildSectionNav(
  * Build sidebar navigation for a knowledge-base section.
  * Reads section title from the index page, groups by subcategory,
  * and derives all labels from the page data.
+ *
+ * @param defaultOpen - Whether sections start expanded (default: true).
+ *   Set to false for secondary sections like metrics in the combined reference nav.
  */
-export function getKbSectionNav(sectionKey: string): NavSection[] {
-  return buildSectionNav(`knowledge-base/${sectionKey}`, sectionKey);
-}
-
-// ============================================================================
-// ANALYTICAL MODELS NAV (uses generic builder)
-// ============================================================================
-
-export function getModelsNav(): NavSection[] {
-  return buildSectionNav("knowledge-base/models", "models");
-}
-
-// ============================================================================
-// KEY METRICS NAV
-// ============================================================================
-
-export function getMetricsNav(): NavSection[] {
-  const nav = buildSectionNav("knowledge-base/metrics", "metrics");
-  // Metrics section starts collapsed since it's secondary to models
-  if (nav.length > 0) {
+export function getKbSectionNav(
+  sectionKey: string,
+  defaultOpen = true,
+): NavSection[] {
+  const nav = buildSectionNav(`knowledge-base/${sectionKey}`, sectionKey);
+  if (!defaultOpen && nav.length > 0) {
     for (const section of nav) {
       section.defaultOpen = false;
     }
@@ -260,14 +250,6 @@ export function getAtmNav(): NavSection[] {
   }
 
   return sections;
-}
-
-// ============================================================================
-// COMBINED REFERENCE NAV (Models + Metrics)
-// ============================================================================
-
-export function getReferenceNav(): NavSection[] {
-  return [...getModelsNav(), ...getMetricsNav()];
 }
 
 // ============================================================================
@@ -375,7 +357,9 @@ export type WikiSidebarType = "models" | "atm" | "internal" | "kb" | null;
 export function detectSidebarType(entityPath: string): WikiSidebarType {
   if (!entityPath) return null;
 
-  // Models and metrics keep their combined reference sidebar
+  // Models and metrics get a combined reference sidebar.
+  // Must check before the generic /knowledge-base/ pattern below,
+  // otherwise these paths would match the broader "kb" type.
   if (
     entityPath.startsWith("/knowledge-base/models/") ||
     entityPath.startsWith("/knowledge-base/metrics/")
@@ -422,7 +406,11 @@ export function getWikiNav(
 ): NavSection[] {
   switch (type) {
     case "models":
-      return getReferenceNav();
+      // Combined models + metrics sidebar; metrics collapsed by default
+      return [
+        ...getKbSectionNav("models"),
+        ...getKbSectionNav("metrics", false),
+      ];
     case "atm":
       return getAtmNav();
     case "internal":
