@@ -127,6 +127,10 @@ pnpm crux content improve <page-id> --tier=polish --apply
 ```
 This adds proper citations, fixes escaping, validates EntityLinks, and syncs frontmatter metrics.
 
+## PR Review & Ship Workflow — MANDATORY
+
+Before finishing any session, run the full review-and-ship workflow defined in `.claude/rules/pr-review-guidelines.md`. The sequence is: `/review` (fix all issues) → `/push-safe` (push + CI green) → conflict check. This is enforced automatically via the rules file.
+
 ## CI Verification — MANDATORY
 
 **Never assume CI will pass. Always verify.**
