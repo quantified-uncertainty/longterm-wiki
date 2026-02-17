@@ -1,0 +1,48 @@
+name: Claude Assistant
+
+# Interactive AI assistant for PRs and issues.
+# Mention @claude in any comment to ask questions, request code changes,
+# or diagnose CI failures. Claude has full repo context via CLAUDE.md.
+#
+# Requires: ANTHROPIC_API_KEY secret + Claude GitHub App installed.
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+  issues:
+    types: [opened, assigned, labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+  id-token: write
+
+jobs:
+  claude:
+    # Only run if triggered by @claude mention or relevant issue event
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (
+        github.event.action == 'assigned' && github.event.assignee.login == 'claude' ||
+        github.event.action == 'labeled' && github.event.label.name == 'claude'
+      ))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          additional_permissions: |
+            actions: read
