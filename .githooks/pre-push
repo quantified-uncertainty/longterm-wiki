@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#
+# Pre-push hook — runs CI-blocking checks before allowing push.
+# Activate with: git config core.hooksPath .githooks
+#
+# To bypass (emergencies only): git push --no-verify
+#
+
+set -euo pipefail
+
+echo ""
+echo "Running pre-push gate checks..."
+echo ""
+
+pnpm crux validate gate
+
+# Exit code from gate determines whether push proceeds
