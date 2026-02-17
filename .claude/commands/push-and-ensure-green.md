@@ -9,13 +9,7 @@ Run all CI checks locally, push to GitHub, and monitor until green. Fix and retr
 
 ## Step 1: Run all local checks (be paranoid)
 
-Run ALL of the following checks. Run them in parallel where possible:
-
-- `pnpm build` (includes build-data)
-- `pnpm test`
-- `node crux/crux.mjs validate`
-- `pnpm lint` (if it exists)
-- TypeScript type checking via `cd app && pnpm tsc --noEmit` (if tsconfig exists)
+Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all CI-blocking checks including TypeScript). If you also want the full Next.js build, use `--full`.
 
 ### Handling failures
 
@@ -30,7 +24,7 @@ Run ALL of the following checks. Run them in parallel where possible:
 ## Step 2: Push to GitHub
 
 1. Check `git status` for uncommitted changes. If there are any, ask the user what to do (commit, stash, etc.) — do NOT auto-commit without asking.
-2. If on `main`: push directly with `git push origin main`.
+2. **NEVER push directly to main.** If on `main`, stop and warn the user: "You are on the main branch. Create a feature branch first." Do not proceed.
 3. If on a feature branch:
    - Push with `git push -u origin HEAD`.
    - Check if a PR already exists:
@@ -49,7 +43,8 @@ Run ALL of the following checks. Run them in parallel where possible:
 
 ## Step 3: Verify GitHub is green
 
-1. Wait 15 seconds for checks to register, then poll CI status:
+1. Wait 15 seconds for checks to register, then run `pnpm crux ci status --wait` to poll until all checks complete.
+   If the `crux ci status` command is not available, fall back to manual polling:
    ```bash
    SHA=$(git rev-parse HEAD)
    curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \

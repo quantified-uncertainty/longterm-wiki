@@ -21,6 +21,7 @@
  *   check-links External URL health checking
  *   edit-log    View and query per-page edit history
  *   importance  Ranking-based importance scoring
+ *   ci          GitHub CI status and monitoring
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -47,6 +48,7 @@ import * as updatesCommands from './commands/updates.ts';
 import * as checkLinksCommands from './commands/check-links.ts';
 import * as editLogCommands from './commands/edit-log.ts';
 import * as importanceCommands from './commands/importance.ts';
+import * as ciCommands from './commands/ci.ts';
 
 const domains = {
   validate: validateCommands,
@@ -60,6 +62,7 @@ const domains = {
   'check-links': checkLinksCommands,
   'edit-log': editLogCommands,
   importance: importanceCommands,
+  ci: ciCommands,
 };
 
 /**
@@ -120,6 +123,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   check-links External URL health checking
   edit-log    View and query per-page edit history
   importance  Ranking-based importance scoring
+  ci          GitHub CI status and monitoring
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

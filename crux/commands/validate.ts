@@ -99,7 +99,7 @@ const SCRIPTS = {
   gate: {
     script: 'validate/validate-gate.ts',
     description: 'CI-blocking checks (pre-push gate)',
-    passthrough: ['ci', 'full'],
+    passthrough: ['ci', 'full', 'fix'],
   },
 };
 

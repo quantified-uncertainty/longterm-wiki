@@ -205,7 +205,7 @@ describe("Entity data validation", () => {
     it("auto-generated entities have valid types", () => {
       const frontmatterEntities = entities.filter(
         (e: RawEntity & { _source?: string }) =>
-          (e as Record<string, unknown>)._source === "frontmatter",
+          (e as unknown as Record<string, unknown>)._source === "frontmatter",
       );
       const invalid: string[] = [];
       for (const entity of frontmatterEntities) {
