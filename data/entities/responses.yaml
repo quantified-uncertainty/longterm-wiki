@@ -3687,3 +3687,11 @@
     A 2023 book by Jennifer Pahlka arguing that government digital failures stem from institutional culture that separates
     policy from implementation, creating a "cascade of rigidity" with implications for AI governance and state capacity.
   lastUpdated: 2026-02
+- id: reducing-hallucinations
+  numericId: E814
+  type: approach
+  title: Reducing Hallucinations in AI-Generated Wiki Content
+  description: >-
+    Technical and procedural strategies to ground AI-generated content in verified information and reduce factual
+    errors in wiki articles, covering RAG, verification techniques, prompt engineering, and human oversight.
+  lastUpdated: 2026-02
