@@ -33,6 +33,7 @@ export interface AnalysisResult {
   researchNeeded?: string[];
   improvements?: string[];
   entityLinks?: string[];
+  objectivityIssues?: string[];
   citations?: unknown;
   raw?: string;
   error?: string;

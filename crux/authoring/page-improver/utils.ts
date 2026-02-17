@@ -275,7 +275,7 @@ export function buildObjectivityContext(page: PageData, analysis: AnalysisResult
     parts.push('');
   }
 
-  const objectivityIssues = (analysis as Record<string, unknown>).objectivityIssues as string[] | undefined;
+  const objectivityIssues = analysis.objectivityIssues;
   if (objectivityIssues && objectivityIssues.length > 0) {
     if (parts.length === 0) parts.push('## Objectivity Issues Found in Analysis');
     else parts.push('### Specific Issues Identified');
