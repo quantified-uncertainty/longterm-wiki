@@ -15,9 +15,13 @@ import { MODELS } from '../../lib/anthropic.ts';
 import type { RunAgentOptions } from './types.ts';
 import { ROOT, SCRY_PUBLIC_KEY, log } from './utils.ts';
 
-// ── Anthropic client (singleton) ─────────────────────────────────────────────
+// ── Anthropic client (lazy singleton) ────────────────────────────────────────
 
-const client = createLlmClient();
+let _client: ReturnType<typeof createLlmClient> | null = null;
+function getClient() {
+  if (!_client) _client = createLlmClient();
+  return _client;
+}
 
 // ── Re-export for pipeline.ts ────────────────────────────────────────────────
 
@@ -27,7 +31,7 @@ export { startHeartbeat };
 
 export async function executeWebSearch(query: string): Promise<string> {
   const response = await withRetry(
-    () => streamingCreate(client, {
+    () => streamingCreate(getClient(), {
       model: MODELS.sonnet,
       max_tokens: 4000,
       tools: [{
@@ -98,7 +102,7 @@ export async function runAgent(prompt: string, options: RunAgentOptions = {}): P
     systemPrompt = ''
   } = options;
 
-  return runLlmAgent(client, prompt, {
+  return runLlmAgent(getClient(), prompt, {
     model,
     maxTokens,
     systemPrompt,

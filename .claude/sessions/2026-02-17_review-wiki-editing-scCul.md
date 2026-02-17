@@ -6,7 +6,7 @@
 - build-data.mjs expects `/home/user/data/` directory which doesn't exist in sandbox environment (pre-existing)
 - `executeWebSearch` uses Anthropic's `web_search_20250305` tool type which required keeping the raw API call rather than abstracting to `streamLlmCall`
 - Review agent flagged `validate/types.ts` as deleted — the file WAS deleted (in commit 9dd1d19) but the import in `validate-mermaid.ts` and `validate-internal-links.ts` is pre-existing and doesn't affect CI since those scripts are only loaded when their specific commands are invoked
-- CI `validate` check fails on this branch despite passing locally on both Node 20 and Node 22, with or without merge — could not reproduce; may be a CI environment issue
+- CI `validate` check failed because `crux.mjs` loads all command domains at startup, and `commands/updates.ts` → `page-improver.ts` → `pipeline.ts` → `api.ts` has a top-level `createLlmClient()` call that throws without `ANTHROPIC_API_KEY`. Fixed by making the client lazy.
 - `withRetry()` from resilience.ts only retries on network/rate-limit errors, not arbitrary errors — the hand-rolled retry in `classifyWithHaiku` intentionally retries all errors (JSON parse failures, bad frequency values) so cannot be replaced
 
 **Learnings/notes:**
