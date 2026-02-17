@@ -1,0 +1,248 @@
+---
+numericId: E827
+title: "Canonical Facts & Calc Usage Guide"
+entityType: internal
+description: "Strategy and conventions for using the F (fact) and Calc (computed value) components across wiki pages — when to make a number a fact, how to use showDate for temporal claims, and scaling guidelines."
+sidebar:
+  order: 10
+readerImportance: 12
+researchImportance: 15
+quality: 50
+ratings:
+  novelty: 3
+  rigor: 6
+  actionability: 8
+  completeness: 7
+lastEdited: "2026-02-17"
+evergreen: true
+update_frequency: 90
+---
+
+## Purpose
+
+The canonical facts system lets us store key numbers (valuations, revenue, headcounts) in YAML and reference them across wiki pages. When a number changes, we update one YAML file and every page that references it stays correct.
+
+Two MDX components power this:
+- **`<F>`** — display a single fact inline (with hover tooltip showing metadata)
+- **`<Calc>`** — compute a derived value from 2+ facts (e.g. revenue multiples, growth rates)
+
+## Quick Reference
+
+```jsx
+{/* Simple fact display */}
+<F e="anthropic" f="valuation">$380B</F>
+
+{/* Fact with auto-rendered value (no children needed) */}
+<F e="anthropic" f="valuation" />
+
+{/* Fact with inline date — renders "300,000+ (as of 2025)" */}
+<F e="anthropic" f="business-customers" showDate />
+
+{/* Computed value from two facts */}
+<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" />
+
+{/* Growth percentage */}
+<Calc expr="({anthropic.revenue-mid-2025} / {anthropic.revenue-early-2025} - 1) * 100" precision={0} suffix="%" />
+```
+
+## Which Numbers Should Be Facts?
+
+Not every number in the wiki should be a fact. The key question is: **will this number change when new data arrives?**
+
+### Must be facts (Tier 1)
+
+Numbers that **change over time** AND **appear on 2+ pages**.
+
+| Example | Why |
+|---------|-----|
+| Anthropic's valuation | Updated every funding round, referenced on IPO, valuation, and company pages |
+| OpenAI's revenue | Changes quarterly, appears on multiple comparison pages |
+| Total AI safety funding | Updated annually, appears on funding and field overview pages |
+
+These are the highest-ROI facts. Updating one YAML entry keeps N pages correct.
+
+### Should be facts (Tier 2)
+
+Numbers that **change over time** but currently appear on only 1 page.
+
+| Example | Why |
+|---------|-----|
+| "300,000+ business customers" | Will be 400,000+ within months |
+| Prediction market probabilities | Change daily |
+| Net cash burn rates | Updated quarterly |
+
+Even on one page, wrapping these in `<F>` means the update workflow is "edit YAML" not "search through prose."
+
+### Should NOT be facts (Tier 3)
+
+**Fixed historical numbers** that will never change.
+
+| Example | Why |
+|---------|-----|
+| "Founded in 2021" | Historical fact, won't update |
+| "Series A raised \$124M in May 2021" | Fixed in time |
+| "Hired Wilson Sonsini in December 2025" | One-time event |
+
+Making these into facts adds overhead with no benefit.
+
+### Decision flowchart
+
+1. Will this number change when new data comes in? **No** → plain text
+2. Does it appear on 2+ pages? **Yes** → must be a fact (Tier 1)
+3. Appears on 1 page but will change? **Yes** → should be a fact (Tier 2)
+
+## When to Use `<F>` vs `<Calc>`
+
+### Use `<F>` for single fact display
+
+Any time you're showing a stored number — a valuation, revenue figure, headcount, date — use `<F>`.
+
+```jsx
+{/* With explicit display text */}
+<F e="anthropic" f="valuation">\$380 billion</F>
+
+{/* Auto-display from the fact's value field */}
+<F e="anthropic" f="valuation" />
+
+{/* With inline date for temporal claims */}
+Over <F e="anthropic" f="business-customers" showDate /> business customers
+{/* Renders: "Over 300,000+ (as of 2025) business customers" */}
+```
+
+**`showDate`** is important for sentences where the recency of a number is part of the claim. When the fact gets updated (e.g. to 400,000+ / 2026-06), the prose automatically reads the new number and date without anyone needing to edit the surrounding text.
+
+### Use `<Calc>` for derived computations
+
+When you need a value that's **computed from 2+ facts** — ratios, multiples, growth percentages — use `<Calc>`.
+
+```jsx
+{/* Revenue multiple */}
+<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" />
+
+{/* Growth rate */}
+<Calc expr="({anthropic.revenue-mid-2025} / {anthropic.revenue-early-2025} - 1) * 100" precision={0} suffix="%" />
+
+{/* Comparison */}
+<Calc expr="{openai.valuation-2025} / {anthropic.valuation}" precision={1} suffix="x" />
+```
+
+The power: when **either** input fact updates, the derived number auto-updates too. A revenue multiple stays correct whether the valuation or revenue changes.
+
+### Do NOT use `<Calc>` for single values
+
+If you're just displaying one fact with no computation, use `<F>`, not `<Calc>`. `<Calc>` is for math, `<F>` is for display.
+
+```jsx
+{/* Wrong — no computation happening */}
+<Calc expr="{anthropic.valuation}" format="currency" />
+
+{/* Right — just display the fact */}
+<F e="anthropic" f="valuation" />
+```
+
+### Use plain text for everything else
+
+Historical numbers, qualitative descriptions, and one-off figures that won't change don't need either component.
+
+## YAML Fact Structure
+
+Facts live in `data/facts/<entity>.yaml`:
+
+```yaml
+entity: anthropic
+facts:
+  valuation:
+    value: "$380 billion"        # Human-readable display string
+    numeric: 380000000000        # Raw number (required for Calc)
+    asOf: "2026-02"              # When this was current
+    note: "Series G post-money"  # Context shown in tooltip
+    source: "https://..."        # Attribution URL
+```
+
+**Required fields:**
+- `value` — display string (used by `<F>` when no children are provided)
+- `numeric` — raw number (required if used in any `<Calc>` expression)
+- `asOf` — temporal anchor (strongly recommended for any changing number)
+
+**Optional fields:**
+- `note` — shown in tooltip
+- `source` — attribution link
+- `noCompute: true` — skip build-time computation (for non-numeric values like "2028")
+- `compute` — formula for build-time derived facts
+- `format` / `formatDivisor` — display formatting hints
+
+## Updating Facts
+
+When new data arrives:
+
+1. Edit the YAML file in `data/facts/<entity>.yaml`
+2. Update `value`, `numeric`, and `asOf`
+3. Run `node app/scripts/build-data.mjs` to rebuild
+4. Every `<F>` and `<Calc>` referencing that fact auto-updates
+
+**Keep old point-in-time facts as separate entries** when pages reference them explicitly:
+
+```yaml
+# Current valuation (gets updated)
+valuation:
+  value: "$380 billion"
+  numeric: 380000000000
+  asOf: "2026-02"
+
+# Historical snapshot (stays fixed, referenced by comparison sections)
+valuation-nov-2025:
+  value: "$350 billion"
+  numeric: 350000000000
+  asOf: "2025-11"
+```
+
+## Scaling Strategy
+
+Current state: 4 entity YAML files, ~5 pages using facts. Priority order for expansion:
+
+**Phase 1 — Organizations with fast-changing financials**
+Anthropic, OpenAI, xAI, Google DeepMind, Meta AI. These have valuations, revenue, headcounts that change quarterly. Highest density of volatile numbers.
+
+**Phase 2 — Field-level metrics**
+Compute benchmarks, total AI safety funding, researcher headcounts. Numbers that get updated with each new report and appear across multiple pages.
+
+**Phase 3 — Cross-referenced numbers**
+Any figure appearing on 3+ pages. Find these via grep and migrate to facts for consistency.
+
+Don't try to fact-ify everything at once. Expand entity-by-entity as pages get created or updated.
+
+## Common Patterns
+
+### Valuation with context
+
+```jsx
+valued at <F e="anthropic" f="valuation" /> in its latest funding round
+```
+
+### Temporal metric in prose
+
+```jsx
+Over <F e="anthropic" f="business-customers" showDate /> business customers
+{/* → "Over 300,000+ (as of 2025) business customers" */}
+```
+
+### Revenue multiple in a table
+
+```jsx
+| Metric | Value |
+|--------|-------|
+| **Revenue Multiple** | <Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" /> |
+```
+
+### Growth rate comparison
+
+```jsx
+revenue grew <Calc expr="({anthropic.revenue-mid-2025} / {anthropic.revenue-early-2025} - 1) * 100" precision={0} suffix="%" /> in seven months
+```
+
+### Side-by-side company comparison
+
+```jsx
+Anthropic trades at ≈<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" /> revenue
+vs OpenAI's ≈<Calc expr="{openai.valuation-2025} / {openai.revenue-arr-2025}" precision={0} suffix="x" />
+```

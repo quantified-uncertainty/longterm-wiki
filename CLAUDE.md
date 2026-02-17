@@ -191,6 +191,7 @@ GitHub Actions workflow (`.github/workflows/auto-update.yml`) runs daily at 06:0
 - **Tailwind CSS v4** with shadcn/ui components
 - **Squiggle models**: See `app/CLAUDE.md` for SquiggleEstimate style guide
 - **Internal sidebar** (`app/src/lib/internal-nav.ts`): When adding internal pages, place them in the correct section. "Research" is for research reports/proposals only. Schema/architecture/technical docs go in "Architecture & Schema". Check existing section semantics before adding.
+- **Canonical facts & Calc**: Follow `content/docs/internal/canonical-facts.mdx` style guide — use `<F>` for volatile numbers, `<Calc>` for derived computations, `showDate` for temporal claims. Facts YAML in `data/facts/`.
 - **Mermaid diagrams**: Follow `content/docs/internal/mermaid-diagrams.mdx` style guide — prefer `flowchart TD`, max 3-4 parallel nodes, use tables for taxonomies, max 15-20 nodes per diagram.
 - **Page templates**: Defined in `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
 - **Edit logs**: Per-page edit history in `data/edit-logs/<page-id>.yaml`, auto-maintained by Crux pipelines. Use `pnpm crux edit-log view <page-id>` to inspect. See `crux/lib/edit-log.ts` for the API.
