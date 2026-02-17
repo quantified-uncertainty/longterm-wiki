@@ -237,6 +237,10 @@ Make targeted improvements based on the analysis and directions. Follow these gu
 - EntityLinks use **numeric IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
 - Escape dollar signs: \\$100M not $100M
 - Import from: '${importPath}'
+- Use \`<F e="entity" f="fact-id">display</F>\` for canonical fact values (hover tooltip shows source/date)
+- Use \`<Calc expr="{entity.factId} / {entity.factId}" precision={1} suffix="x" />\` for derived values (ratios, multiples, percentages)
+  - Supports: +, -, *, /, ^, (). Formats: "currency", "percent", "number", or auto.
+  - Prefer \`<Calc>\` over hardcoded derived numbers — it stays in sync when source facts update
 
 ### Entity Lookup Table
 
@@ -249,7 +253,8 @@ ${entityLookup}
 
 ### Quality Standards
 - Add citations from the research sources
-- Replace vague claims with specific numbers
+- Replace vague claims with specific numbers; use \`<F>\` for canonical facts and \`<Calc>\` for derived values
+- When a page has hardcoded ratios/multiples (e.g. "≈27x revenue"), replace with \`<Calc expr="{a.valuation} / {a.revenue}" precision={0} suffix="x" />\`
 - Add EntityLinks for related concepts (using E## IDs from the lookup table above)
 - Ensure tables have source links
 - **NEVER use vague citations** like "Interview", "Earnings call", "Conference talk", "Reports", "Various"
