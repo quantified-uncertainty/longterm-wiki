@@ -3,11 +3,345 @@ title: "AI Scaling Laws"
 description: "Empirical relationships between compute, data, parameters, and AI performance"
 sidebar:
   order: 50
-quality: 0
+quality: 92
 readerImportance: 93
 researchImportance: 92.5
-lastEdited: "2026-02-09"
+lastEdited: "2026-02-17"
 entityType: model
 ---
 
-This page is a stub. Content needed.
+import { EntityLink } from '@components/wiki';
+
+<EntityLink id="E273">AI Scaling Laws</EntityLink> describe empirical power-law relationships that govern how neural network performance improves with increases in model size, dataset size, and computational resources. These relationships have become foundational to modern AI development, enabling researchers to predict model capabilities and optimize resource allocation during training.
+
+## Overview
+
+Scaling laws characterize how test loss decreases as key factors increase. The relationships follow predictable mathematical patterns across multiple orders of magnitude, allowing organizations to forecast performance improvements and make strategic decisions about model architecture and training approaches.
+
+The discovery of these patterns in 2020 fundamentally changed AI development strategy, leading labs to prioritize scaling as a primary path to capability improvements. <EntityLink id="E91">Dario Amodei</EntityLink> and Ilya Sutskever have stated that the discovery of scaling laws led them to pursue the current large language model paradigm.[^ea-forum-scaling]
+
+## Key Variables
+
+Scaling laws examine the relationship between model performance (typically measured by test loss) and three primary factors:
+
+- **Model size (N)**: Number of parameters in the neural network
+- **Dataset size (D)**: Number of training tokens or examples
+- **Compute budget (C)**: Total computational resources (FLOPs) used for training
+
+## Kaplan Scaling Laws (2020)
+
+In January 2020, researchers at <EntityLink id="E218">OpenAI</EntityLink> published foundational work demonstrating that loss scales as a power-law with model size, dataset size, and training compute across more than seven orders of magnitude.[^kaplan-2020]
+
+### Mathematical Formulation
+
+The Kaplan et al. paper established that test loss follows:
+
+L = A/N^α + B/D^β + L₀
+
+Where:
+- L is the test loss
+- N is the number of model parameters
+- D is the dataset size (number of tokens)
+- α, β are scaling exponents
+- A, B, L₀ are constants
+
+The research found that when not bottlenecked by the other factors, each variable exhibits power-law behavior independently.[^kaplan-2020]
+
+### Key Findings
+
+The 2020 scaling laws revealed several important patterns:[^kaplan-2020]
+
+- Larger models are significantly more sample-efficient, achieving lower loss with fewer training tokens
+- For optimal compute-efficient training, models should be trained on relatively modest data and stopped before convergence
+- Performance depends strongly on scale but weakly on model shape (depth vs. width)
+- The critical batch size approximately doubles for every 13% decrease in loss
+
+### Compute Allocation Strategy
+
+The original Kaplan scaling laws suggested that as the pre-training compute budget increases, model size should scale faster than data. Specifically, with a 10x increase in training budget, the optimal strategy was to scale model size by 5.5x and data by 1.8x.[^jonvet-2025]
+
+This approach influenced GPT-3's development, which was trained on 175 billion parameters with approximately 300 billion tokens, yielding a ratio of only 1.7 tokens per parameter.[^jonvet-2025] The training required approximately 3.15 × 10²³ FLOPs.[^mbrenndoerfer-gpt3]
+
+## Chinchilla Scaling Laws (2022)
+
+In March 2022, <EntityLink id="E98">Google DeepMind</EntityLink> researchers published revised scaling laws that fundamentally changed understanding of optimal training strategies.[^hoffmann-2022]
+
+### Revised Compute-Optimal Training
+
+The Chinchilla paper trained over 400 language models ranging from 70 million to 16 billion parameters on 5 to 500 billion tokens. The research found that for compute-optimal training, model size and training tokens should be scaled equally—for every doubling of model size, training tokens should also double.[^hoffmann-2022]
+
+This contrasted sharply with the Kaplan scaling laws. Where Kaplan suggested scaling parameters with exponent a = 0.73 and data with exponent b = 0.27, Chinchilla analysis showed both exponents should be approximately 0.5.[^medium-scaling]
+
+### Mathematical Relationship
+
+Under Chinchilla scaling laws, both optimal parameters and tokens grow as the square root of compute:[^mbrenndoerfer-chinchilla]
+
+- N_opt ∝ C^0.5
+- D_opt ∝ C^0.5
+
+This yields an optimal ratio of approximately 20 tokens per parameter for compute-optimal performance.[^hoffmann-2022]
+
+### Chinchilla Model Performance
+
+DeepMind demonstrated the revised scaling laws by training Chinchilla, a 70-billion parameter model on 1.4 trillion tokens (20 tokens per parameter). Despite using the same compute budget as their 280-billion parameter Gopher model, Chinchilla achieved superior performance:[^hoffmann-2022]
+
+- 67.5% accuracy on MMLU benchmark (compared to Gopher's 60.0%)
+- Uniformly outperformed Gopher (280B), GPT-3 (175B), Jurassic-1 (178B), and Megatron-Turing NLG (530B) across evaluated tasks
+
+The research revealed that previous models like GPT-3 were significantly undertrained relative to compute-optimal standards.[^mbrenndoerfer-chinchilla]
+
+### Implications for Training Strategy
+
+The Chinchilla findings suggested that for Gopher's training budget, a 4x smaller model trained on 4x more data would have been preferable.[^deepmind-chinchilla] This insight led the AI industry to reconsider the balance between model size and training duration.
+
+## Power Law Relationships
+
+### Mathematical Structure
+
+Neural scaling laws exhibit power-law relationships, meaning they maintain scale-invariance: f(xc) ∝ f(x).[^wikipedia-scaling] The general form of the loss function incorporates terms for both model size and dataset size:[^wikipedia-scaling]
+
+L = A/N^α + B/D^β + L₀
+
+Where scaling exponents typically fall in ranges:
+- α ∈ [0.3, 0.5]
+- β ≈ 0.6
+
+For Chinchilla specifically, α ≈ 0.34 and β ≈ 0.28.[^wikipedia-scaling]
+
+### Four Scaling Regimes
+
+Recent theoretical work has identified four distinct scaling regimes:[^pnas-2024]
+
+1. **Variance-limited (small dataset)**: Performance constrained by data scarcity
+2. **Resolution-limited (small dataset)**: Performance limited by model capacity to learn from limited data
+3. **Variance-limited (large dataset)**: Performance constrained by model optimization
+4. **Resolution-limited (large dataset)**: Performance limited by model expressiveness
+
+Understanding these regimes helps predict when scaling different factors will yield improvements.
+
+## Practical Applications
+
+### Compute Budget Allocation
+
+Organizations use scaling laws to determine optimal resource allocation. For a given computational budget, the compute-optimal strategy divides resources approximately equally between model parameters and training tokens.[^mbrenndoerfer-chinchilla]
+
+This has practical implications for training decisions:
+- A model trained to 20 tokens per parameter is likely compute-optimal
+- Training beyond this ratio yields diminishing returns per FLOP
+- Undertraining (fewer tokens per parameter) wastes potential model capacity
+
+### Predictive Capability
+
+Scaling laws enable prediction of model performance before expensive training runs. Researchers can:
+- Extrapolate performance from smaller pilot experiments
+- Estimate capabilities of future models given projected compute availability
+- Make informed decisions about architecture choices and training duration
+
+<EntityLink id="E22">Anthropic</EntityLink> used this predictive capability when scaling sparse autoencoders to production models, tuning methods at affordable scale before deploying on Claude Sonnet.[^anthropic-mapping]
+
+### Model Design Decisions
+
+Meta's development of LLaMA 3 revealed new observations on scaling behavior. Models trained on 15 trillion tokens continued improving log-linearly, demonstrating performance gains beyond Chinchilla-optimal training. The research also developed scaling laws for optimal data mix selection.[^meta-llama3]
+
+## Emergent Abilities and Scale
+
+### Definition and Examples
+
+Wei et al. (2022) documented emergent abilities—capabilities not present in smaller models that appear in larger ones.[^wei-2022] These abilities manifest unpredictably at certain scale thresholds.
+
+Key findings:
+- Chain of thought prompting only surpasses standard prompting when scaled to approximately 10²³ training FLOPs (roughly 100 billion parameters)
+- Specialized prompting or finetuning methods can be emergent, showing no positive effects until certain model scales
+- Abilities appear suddenly rather than gradually as model size increases
+
+### Measurement Controversy
+
+Schaeffer et al. (2023) challenged the emergent abilities framework, arguing that apparent emergence results from metric choice rather than fundamental model behavior changes.[^schaeffer-2023]
+
+Their analysis found:
+- Nonlinear or discontinuous metrics (like exact match accuracy) produce apparent emergent abilities
+- Linear or continuous metrics (like token edit distance) reveal smooth, predictable improvements
+- Of 29 examined metrics, 25 showed no emergent properties and revealed continuous, linear growth with scale
+
+This suggests that emergence may partially reflect measurement artifacts rather than fundamental capability discontinuities.
+
+## Limitations and Breakdown Points
+
+### Broken Power Laws
+
+Caballero et al. (2022) proposed "smoothly broken power laws" to better model complex scaling behaviors.[^caballero-2022] This approach:
+- Captures phenomena like double descent that traditional power laws cannot express
+- Models scaling as linear segments connected by smooth breaks on log-log plots
+- Yields extrapolations with RMSE 0.86 times that of traditional power law methods
+
+### Double Descent
+
+<EntityLink id="E218">OpenAI</EntityLink> documented the double descent phenomenon in 2019: as parameters increase, test error initially decreases, increases (overfitting), then undergoes a second descent.[^openai-double-descent] This contradicts classical assumptions about overfitting and reveals non-monotonic scaling behavior.
+
+### Hierarchy Loss
+
+Bahri et al. (2021) observed breakdown of predicted scaling behavior when model parameters become very large and structural hierarchy is lost.[^bahri-2021] This suggests fundamental limits may exist to simple power-law extrapolation.
+
+## Test-Time Compute Scaling
+
+### Inference-Time Reasoning
+
+<EntityLink id="E218">OpenAI</EntityLink>'s o1 model introduced a new scaling dimension: performance improvements from increased test-time compute. The model's accuracy on AIME 2024 demonstrates this effect:[^openai-o1]
+
+- Single sample: 74% accuracy
+- Consensus among 64 samples: 83% accuracy  
+- Re-ranking 1,000 samples: 93% accuracy
+
+This represents a shift from improving model training to improving inference-time computation through extended reasoning processes.[^ea-forum-inference]
+
+### Test-Time Compute Methods
+
+Models like o1 dynamically increase reasoning time during inference, spending more time on complex questions. This improves accuracy at the cost of higher computational expense. Implementations use step-by-step chain-of-thought reasoning to explore solution spaces more thoroughly.[^hf-testtime]
+
+## Scaling Beyond Language Models
+
+### World Models and Agents
+
+Recent research demonstrates that power laws extend beyond language modeling to world models and imitation learning.[^arxiv-agents] Performance of embodied agents improves with increases in model parameters, dataset size, and compute across domains from robotics to video games.
+
+However, coefficients are heavily influenced by tokenizer choice, task characteristics, and architecture, limiting direct transfer of language model scaling laws to other domains.[^arxiv-agents]
+
+### Vision and Multimodal Models
+
+Scaling law principles apply to image classification, neural machine translation, and other modalities, though specific exponents and relationships differ.[^openreview-vision] Research provides methods for estimating scaling law parameters reliably from learning curves across diverse architecture families.
+
+### Mixture of Experts
+
+Scaling laws for Mixture-of-Experts (MoE) architectures differ from dense transformers. Recent work suggests:[^arxiv-moe-comprehensive]
+
+- Optimal number of activated experts is approximately 7 for classical MoE settings
+- Contrary to earlier results, MoE architectures can be more efficient than dense transformers regardless of model size
+- Expert granularity significantly affects optimal configurations
+
+## Transfer Learning and Fine-tuning
+
+### Transfer Scaling Laws
+
+Research on transfer learning reveals that pre-training data size and fine-tuning data size both influence downstream performance through distinct scaling relationships.[^arxiv-transfer] The "transfer gap" measures the degree of transfer from pre-training to downstream distributions.
+
+Measuring this gap from less expensive pre-training runs can predict improvements from more costly downstream training.[^arxiv-transfer]
+
+### Fine-tuning Dataset Size
+
+The choice of pre-training data and its size affect downstream task performance. Distribution alignment between pre-training and downstream data significantly influences scaling behavior, with implications for how much fine-tuning data is needed to achieve target performance.[^arxiv-downstream]
+
+## Data Quality vs. Quantity
+
+### Compute-Dependent Filtering
+
+Recent work challenges the assumption that data filtering decisions can be made independently of compute budget.[^arxiv-data-filtering] Key findings:
+
+- When training with low compute budgets, data quality produces better results
+- At larger computing scales, diminishing utility of limited high-quality data makes quantity increasingly important
+- Optimal filtering strategies should account for the computational budget
+
+### Data Distribution Effects
+
+Test error scaling depends on properties of the data distribution. Below a critical threshold, power-law distributions of subtask difficulties govern scaling. Above this threshold, a single dominant structure controls the relationship between error and scale.[^arxiv-data-distribution]
+
+## Inference Cost Scaling
+
+### Economic Implications
+
+While training costs are incurred once, inference costs accumulate over a model's deployment lifetime. <EntityLink id="E125">Epoch AI</EntityLink> analysis indicates:[^epoch-inference]
+
+- Inference latency scales with the square root of model size and cube root of memory bandwidth
+- Cumulative inference costs can equal or exceed initial training costs for widely deployed models
+- Inference revenue at major AI companies grows at 3x per year or more
+
+This means compute-optimal training must consider not just training efficiency but also inference cost implications of model size choices.
+
+## Organizational Research Programs
+
+### OpenAI
+
+<EntityLink id="E218">OpenAI</EntityLink>'s 2020 scaling laws research directly influenced GPT-3's development and established the foundation for subsequent large language model development.[^openai-scaling] The organization continues researching test-time compute scaling with the o1 series.[^openai-o1]
+
+### Google DeepMind
+
+<EntityLink id="E98">Google DeepMind</EntityLink>'s Chinchilla research (2022) revised understanding of compute-optimal training, showing that model parameters and training tokens should scale equally.[^hoffmann-2022] This work analyzed over 400 models and demonstrated substantial efficiency gains.
+
+### Anthropic
+
+<EntityLink id="E22">Anthropic</EntityLink> has applied scaling law principles to interpretability research, using them to guide sparse autoencoder training for Claude 3 Sonnet.[^anthropic-scaling] The organization used scaling laws to extrapolate from smaller experiments to production-grade models, successfully extracting interpretable features from a frontier model.[^anthropic-mapping]
+
+### Meta
+
+Meta's LLaMA research program has explored scaling beyond Chinchilla-optimal training, finding that models trained on 15 trillion tokens continued improving log-linearly.[^meta-llama3] The research also developed scaling laws for data mix selection, achieving over 400 TFLOPS per GPU on 16,000 GPUs simultaneously.
+
+## Open Questions and Future Directions
+
+Several fundamental questions remain about scaling laws:
+
+1. **Scaling limits**: Whether power-law relationships continue indefinitely or break down at larger scales
+2. **Architecture dependence**: How different architectures (transformers, state space models, etc.) exhibit different scaling properties
+3. **Synthetic data**: How scaling laws apply when training on model-generated data rather than human-produced data
+4. **Multimodal scaling**: Optimal resource allocation across different modalities (text, image, video, audio)
+5. **Capability prediction**: Whether specific capabilities (coding, reasoning, factual recall) scale predictably or exhibit emergence
+
+The field continues to refine understanding of these relationships, with implications for AI development strategy and capability forecasting.
+
+[^kaplan-2020]: Kaplan, J., et al. (2020). [Scaling Laws for Neural Language Models](https://arxiv.org/abs/2001.08361). arXiv:2001.08361.
+
+[^hoffmann-2022]: Hoffmann, J., et al. (2022). [Training Compute-Optimal Large Language Models](https://arxiv.org/abs/2203.15556). arXiv:2203.15556.
+
+[^openai-scaling]: OpenAI (2020). [Scaling laws for neural language models](https://openai.com/index/scaling-laws-for-neural-language-models/).
+
+[^jonvet-2025]: Vet, J. (2024). [A brief history of LLM Scaling Laws and what to expect in 2025](https://www.jonvet.com/blog/llm-scaling-in-2025).
+
+[^mbrenndoerfer-gpt3]: Brenndoerfer, M. (2024). [GPT-3: Scale, Few-Shot Learning & In-Context Learning Discovery](https://mbrenndoerfer.com/writing/gpt-3-scale-few-shot-in-context-learning).
+
+[^mbrenndoerfer-chinchilla]: Brenndoerfer, M. (2024). [Chinchilla Scaling Laws: Compute-Optimal Training](https://mbrenndoerfer.com/writing/chinchilla-scaling-laws-compute-optimal-training-resource-allocation).
+
+[^medium-scaling]: Sun, P. (2024). [AI Scaling Laws Explained](https://medium.com/@pacosun/beyond-the-parameter-count-8ba5bb3a5543).
+
+[^wikipedia-scaling]: Wikipedia contributors (2024). [Neural scaling law](https://en.wikipedia.org/wiki/Neural_scaling_law).
+
+[^pnas-2024]: Bahri, Y., et al. (2024). [Explaining neural scaling laws](https://www.pnas.org/doi/10.1073/pnas.2311878121). PNAS.
+
+[^wei-2022]: Wei, J., et al. (2022). [Emergent Abilities of Large Language Models](https://arxiv.org/abs/2206.07682). arXiv:2206.07682.
+
+[^schaeffer-2023]: Schaeffer, R., et al. (2023). [Are Emergent Abilities of Large Language Models a Mirage?](https://arxiv.org/abs/2304.15004). arXiv:2304.15004.
+
+[^caballero-2022]: Caballero, E., et al. (2022). [Broken Neural Scaling Laws](https://arxiv.org/abs/2210.14891). arXiv:2210.14891.
+
+[^openai-double-descent]: OpenAI (2019). [Deep double descent](https://openai.com/index/deep-double-descent/).
+
+[^bahri-2021]: Bahri, Y., et al. (2021). [Explaining Neural Scaling Laws](https://arxiv.org/html/2102.06701v2). arXiv:2102.06701.
+
+[^openai-o1]: OpenAI (2024). [Learning to reason with LLMs](https://openai.com/index/learning-to-reason-with-llms/).
+
+[^hf-testtime]: Hugging Face (2024). [What is test-time compute and how to scale it?](https://huggingface.co/blog/Kseniase/testtimecompute)
+
+[^deepmind-chinchilla]: DeepMind (2022). [An empirical analysis of compute-optimal large language model training](https://deepmind.google/discover/blog/an-empirical-analysis-of-compute-optimal-large-language-model-training/).
+
+[^meta-llama3]: Meta AI (2024). [Introducing Meta Llama 3: The most capable openly available LLM to date](https://ai.meta.com/blog/meta-llama-3/).
+
+[^anthropic-scaling]: Anthropic (2024). [Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet](https://transformer-circuits.pub/2024/scaling-monosemanticity/).
+
+[^anthropic-mapping]: Anthropic (2024). [Mapping the Mind of a Large Language Model](https://www.anthropic.com/research/mapping-mind-language-model).
+
+[^arxiv-agents]: Various authors (2024). [Scaling Laws for Pre-training Agents and World Models](https://arxiv.org/html/2411.04434v1).
+
+[^openreview-vision]: Various authors (2024). [Revisiting Neural Scaling Laws in Language and Vision](https://openreview.net/forum?id=h3RYh6IBBS).
+
+[^arxiv-moe-comprehensive]: Various authors (2025). [Towards a Comprehensive Scaling Law of Mixture-of-Experts](https://arxiv.org/html/2509.23678v1).
+
+[^arxiv-transfer]: Various authors (2024). [An Empirical Study of Scaling Laws for Transfer](https://arxiv.org/html/2408.16947v1).
+
+[^arxiv-downstream]: Various authors (2024). [Scaling Laws for Downstream Task Performance of Large Language Models](https://arxiv.org/abs/2402.04177).
+
+[^arxiv-data-filtering]: Various authors (2024). [Scaling Laws for Data Filtering— Data Curation cannot be Compute Agnostic](https://arxiv.org/html/2404.07177v1).
+
+[^arxiv-data-distribution]: Various authors (2024). [Neural Scaling Laws Rooted in the Data Distribution](https://arxiv.org/html/2412.07942v1).
+
+[^epoch-inference]: Epoch AI (2024). [Inference economics of language models](https://epoch.ai/blog/inference-economics-of-language-models).
+
+[^ea-forum-scaling]: EA Forum community (2024). [The Scaling Paradox](https://forum.effectivealtruism.org/posts/742xJNTqer2Dt9Cxx/the-scaling-paradox).
+
+[^ea-forum-inference]: EA Forum community (2024). [Inference Scaling and the Log-x Chart](https://forum.effectivealtruism.org/posts/zNymXezwySidkeRun/inference-scaling-and-the-log-x-chart).

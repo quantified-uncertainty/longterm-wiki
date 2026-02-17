@@ -3,11 +3,231 @@ title: "AI Timelines"
 description: "Forecasts and debates about when transformative AI capabilities will be developed"
 sidebar:
   order: 50
-quality: 0
+quality: 95
 readerImportance: 93
 researchImportance: 92.5
-lastEdited: "2026-02-09"
+lastEdited: "2026-02-17"
 entityType: model
 ---
 
-This page is a stub. Content needed.
+import { EntityLink } from '@components/wiki';
+
+<EntityLink id="E16">AI timelines</EntityLink> refer to forecasts about when artificial intelligence systems will achieve transformative capabilities. Timeline estimates vary widely across methodologies and forecasters, with median predictions ranging from the 2030s to beyond 2100.
+
+## Definitions and Operationalizations
+
+### Transformative AI
+
+<EntityLink id="E552">Open Philanthropy</EntityLink> defines <EntityLink id="E357">transformative AI</EntityLink> (TAI) as "AI powerful enough to bring us into a new, qualitatively different future" comparable to the agricultural or industrial revolutions.[^1] This definition focuses on economic and societal impact rather than specific technical capabilities.
+
+### High-Level Machine Intelligence
+
+Expert surveys typically use "High-Level Machine Intelligence" (HLMI), defined as "when unaided machines can accomplish every task better and more cheaply than human workers."[^2] This operationalization allows researchers to elicit comparable forecasts across different survey waves.
+
+### AGI and Other Definitions
+
+The term "Artificial General Intelligence" (AGI) lacks a single agreed-upon definition. Google DeepMind researchers proposed defining AGI "in terms of capabilities, rather than processes" and suggested a levels-based framework distinguishing between performance (Narrow to Superhuman) and generality (Narrow to General).[^3] Different forecasting efforts use different operationalizations, making direct comparison of "AGI timelines" difficult without examining specific definitions.
+
+## Major Forecasting Methodologies
+
+### Biological Anchors
+
+Ajeya Cotra's 2020 biological anchors framework estimates TAI timelines by comparing required computational resources (measured in FLOP) to biological systems.[^4] The method involves:
+
+1. Estimating the effective compute required to train transformative models using various "anchors" (analogies to biological computation)
+2. Forecasting when sufficient compute will be affordable given historical cost trends
+3. Accounting for uncertainty through probability distributions over multiple anchors
+
+Scott Alexander's analysis of the framework reported probability distributions of 10% chance of TAI by 2031, 50% by 2052, and approximately 80% by 2100.[^5]
+
+In a 2022 update, Cotra shortened her timeline estimates based on recent progress, shifting her median from ~2050 to ~2040, with updated distributions of 15% by 2030, 35% by 2036, 50% by 2040, and 60% by 2050.[^6]
+
+### Compute-Centric Models
+
+Tom Davidson developed a compute-centric forecasting framework that models the relationship between computational resources, algorithmic progress, and economic growth.[^7] His model for <EntityLink id="E552">Open Philanthropy</EntityLink> estimates a median time of approximately 3 years from 20% to 100% automation of cognitive tasks, with superintelligence potentially arriving within a year after full automation.[^8]
+
+Davidson's earlier work on semi-informative priors used reference class forecasting to estimate AGI probability. His 2021 analysis suggested a central estimate of approximately 4% probability of AGI by 2036, with a preferred range of 1-10%.[^9]
+
+### Expert Surveys
+
+The 2022 Expert Survey on Progress in AI contacted 4,271 researchers who published at NeurIPS or ICML 2021, receiving 738 responses (17% response rate).[^10] The aggregate forecast estimated 36.6 years until HLMI from the survey date.
+
+A 2023 survey of 2,778 AI researchers found:[^11]
+
+- 50% probability of machines outperforming humans in every task by 2047
+- 10% probability by 2027
+- Median estimate 13 years shorter than the 2022 survey
+
+The survey demonstrated significant variation across questions and methodologies, with median estimates ranging from 2040s to 2070s depending on how questions were framed.[^12]
+
+### Community Forecasting
+
+Metaculus aggregates predictions from thousands of forecasters. As of early 2024, the community median for "weakly general AI" (defined as systems capable of performing most economically valuable work) was February 14, 2028, based on 1,700 forecasters.[^13]
+
+An AGI timeline dashboard aggregating multiple Metaculus questions estimated a combined forecast of 2031 for AGI arrival, with an 80% confidence interval of 2027-2045.[^14] However, different Metaculus questions using different resolution criteria produce varying estimates, ranging from early 2030s to 2050s.[^15]
+
+## Current Forecast Summary
+
+As of 2024-2025, major forecasting sources report:
+
+| Source | Median Estimate | Range/Distribution | Method |
+|--------|----------------|-------------------|---------|
+| [Cotra (2022)](https://www.alignmentforum.org/posts/AfH2oPHCApdKicM4m/two-year-update-on-my-personal-ai-timelines) | 2040 | 15% by 2030, 50% by 2040, 60% by 2050 | Biological anchors |
+| [Expert Survey (2023)](https://arxiv.org/abs/2401.02843) | 2047 | 10% by 2027, 50% by 2047 | Researcher survey (HLMI) |
+| [Metaculus Aggregate](https://agi-timelines-dashboard.vercel.app/) | 2031 | 80% CI: 2027-2045 | Community forecasting |
+| [Davidson (2021)](https://www.openphilanthropy.org/research/semi-informative-priors-over-ai-timelines/) | >2036 | 1-10% by 2036 | Semi-informative priors |
+
+These estimates are not directly comparable due to different definitions, methodologies, and operationalizations of "transformative AI" or "AGI."
+
+## Key Uncertainty Factors
+
+### Algorithmic Progress
+
+<EntityLink id="E125">Epoch AI</EntityLink> analysis of 231 language models found that algorithmic improvements reduce the compute required to reach given performance levels, with efficiency gains contributing approximately 3× per year after controlling for hardware improvements.[^16] The rate of future algorithmic progress remains uncertain, with implications for whether current trends in model capabilities will continue.
+
+### Compute Availability
+
+Training compute for state-of-the-art models increased by a factor of 4-5× per year from 2010-2024.[^17] <EntityLink id="E125">Epoch AI</EntityLink> analysis suggests training runs of 2×10²⁹ FLOP may be feasible by 2030, though constraints include power availability, chip manufacturing capacity, and data movement bottlenecks.[^18]
+
+A "latency wall" at approximately 2×10³¹ FLOP may be reached within 3 years, where data movement between chips dominates arithmetic computation time.[^19]
+
+### Data Constraints
+
+Research suggests that available human-generated training data could become a bottleneck this decade.[^20] For continued progress into the 2030s, methods may need to rely on synthetic data generation, data efficiency improvements, or alternative training paradigms.
+
+### Economic and Regulatory Factors
+
+Timeline forecasts typically assume continued large-scale investment in AI development and minimal regulatory constraints. Changes in either factor could significantly affect timelines, though quantifying these effects remains difficult.
+
+## Methodological Debates
+
+### Inside View vs. Outside View
+
+"Inside view" forecasting examines specific technical factors like compute trends, algorithmic progress, and scaling laws. "Outside view" forecasting uses reference classes from historical technology development.
+
+Robin Hanson's outside view analysis estimated "at least a century" to human-level AI based on expert estimates of progress rates, arguing that most technologies develop more slowly than initial expert predictions.[^21] This contrasts with inside-view models like biological anchors that estimate median timelines in the 2040s-2050s.
+
+<EntityLink id="E125">Epoch AI</EntityLink>'s literature review noted that inside-view models tend to predict shorter timelines than outside-view approaches.[^22]
+
+### Continuous vs. Discontinuous Progress
+
+<EntityLink id="E220">Paul Christiano</EntityLink> argued in 2018 for "slow takeoff," predicting that AGI development would appear as continuous economic acceleration rather than a breakthrough within a small group.[^23] He operationalized "slow takeoff" as the economy doubling over a 4-year interval before any 1-year doubling period.
+
+<EntityLink id="E114">Eliezer Yudkowsky</EntityLink> advocated for "fast takeoff" scenarios involving rapid recursive self-improvement.[^24] The 2008 Hanson-Yudkowsky debate and subsequent discussions examined whether AI systems could rapidly improve their own capabilities once reaching certain thresholds.[^25]
+
+Tom Davidson's 2023 compute-centric framework estimated approximately 3 years from 20% to 100% cognitive task automation, representing a middle position between very fast (months) and very slow (decades) scenarios.[^26]
+
+## Limitations and Criticisms
+
+### Forecasting Track Record
+
+Historical AI predictions have varied in accuracy. The AI field experienced multiple "AI winters" in the 1970s and 1980s following overly optimistic predictions.[^27] Some long-term forecasts, such as those by Hans Moravec and Ray Kurzweil using quantitative trend extrapolation, have tracked closer to observed progress than purely intuitive predictions.[^28]
+
+Recent capability improvements exceeded many expert predictions. The 2022 expert survey estimated that AI systems would not be able to write simple Python code until approximately 2027, but the 2023 survey revised this to 2025 after observing faster-than-expected progress.[^29]
+
+### Methodological Critiques
+
+Critics of timeline forecasting methodologies argue that:
+
+- Biological anchors involve numerous uncertain parameters with arbitrary values[^30]
+- Models lack empirical validation of core assumptions[^31]
+- Reference class forecasting struggles with unprecedented technologies[^32]
+- Expert predictions may suffer from availability bias and anchoring effects
+
+<EntityLink id="E114">Eliezer Yudkowsky</EntityLink> critiqued biological anchors for relying on "straightforward brain computation comparisons" that may not capture relevant algorithmic insights.[^33]
+
+### Unknown Unknowns
+
+All forecasting methodologies face challenges from potential discontinuities, breakthrough insights, or constraint violations not captured in trend extrapolations. Robin Hanson noted that scenarios involving "very lumpy tech advances, broadly-improving techs, [and] powerful secret techs" are each historically rare, suggesting that combinations of these factors (as in some short-timeline scenarios) may have low probability.[^34]
+
+## Implications for AI Safety
+
+Timeline estimates influence <EntityLink id="E50">AI safety</EntityLink> research prioritization. Shorter timelines suggest greater urgency for developing safety techniques and governance frameworks, while longer timelines allow more time for theoretical research and gradual implementation.
+
+Different timeline estimates also affect strategic questions about whether to focus on <EntityLink id="E271">scalable oversight</EntityLink>, <EntityLink id="E174">interpretability</EntityLink>, or governance interventions, and how much effort to allocate to near-term versus long-term safety concerns.
+
+<EntityLink id="E510">80,000 Hours</EntityLink> analysis noted that expert timeline estimates shortened significantly between 2022 and 2023 surveys, with implications for career planning and research prioritization in AI safety.[^35]
+
+## Historical Timeline Evolution
+
+Timeline predictions have shifted over time as capabilities improved:
+
+- **2016**: <EntityLink id="E552">Open Philanthropy</EntityLink> estimated "at least 10% probability" of TAI within 20 years (by 2036)[^36]
+- **2020**: Cotra's biological anchors: 50% by 2052
+- **2022**: Cotra updated median: 50% by 2040
+- **2023**: Expert survey median: 50% by 2047 (13 years shorter than 2022)
+- **2024**: Metaculus community: median around 2028-2031
+
+This pattern shows a general trend toward shorter estimates, though with significant variation across methodologies and substantial remaining uncertainty.
+
+[^1]: Holden Karnofsky, "[Some Background on Our Views Regarding Advanced Artificial Intelligence](https://www.openphilanthropy.org/blog/some-background-our-views-regarding-advanced-artificial-intelligence)," Open Philanthropy, 2016.
+
+[^2]: Katja Grace et al., "[When Will AI Exceed Human Performance? Evidence from AI Experts](https://arxiv.org/pdf/1705.08807)," arXiv:1705.08807, 2017.
+
+[^3]: Meredith Ringel Morris et al., "[Levels of AGI: Operationalizing Progress on the Path to AGI](https://arxiv.org/pdf/2311.02462)," arXiv:2311.02462, 2023.
+
+[^4]: Ajeya Cotra, "[Draft report on AI timelines](https://www.lesswrong.com/posts/KrJfoZzpSDpnrv9va/draft-report-on-ai-timelines)," LessWrong, 2020.
+
+[^5]: Scott Alexander, "[Biological Anchors: A Trick That Might Or Might Not Work](https://www.astralcodexten.com/p/biological-anchors-a-trick-that-might)," Astral Codex Ten, 2021.
+
+[^6]: Ajeya Cotra, "[Two-year update on my personal AI timelines](https://www.alignmentforum.org/posts/AfH2oPHCApdKicM4m/two-year-update-on-my-personal-ai-timelines)," Alignment Forum, 2022.
+
+[^7]: Holden Karnofsky, "[Forecasting transformative AI: the 'biological anchors' method in a nutshell](https://www.cold-takes.com/forecasting-transformative-ai-the-biological-anchors-method-in-a-nutshell/)," Cold Takes, 2021.
+
+[^8]: Scott Alexander, "[Davidson On Takeoff Speeds](https://www.astralcodexten.com/p/davidson-on-takeoff-speeds)," Astral Codex Ten, June 2023.
+
+[^9]: Tom Davidson, "[Semi-Informative Priors Over AI Timelines](https://www.openphilanthropy.org/research/semi-informative-priors-over-ai-timelines/)," Open Philanthropy, 2021.
+
+[^10]: Katja Grace and Ben Weinstein-Raun, "[2022 Expert Survey on Progress in AI](https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/)," AI Impacts, 2022.
+
+[^11]: Katja Grace et al., "[Thousands of AI Authors on the Future of AI](https://arxiv.org/abs/2401.02843)," arXiv:2401.02843, 2024.
+
+[^12]: "[Shrinking AGI timelines: a review of expert forecasts](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/)," 80,000 Hours, March 2025.
+
+[^13]: "[When Will Weakly General AI Arrive?](https://www.metaculus.com/questions/3479/date-weakly-general-ai-is-publicly-known/)," Metaculus, accessed 2024.
+
+[^14]: "[AGI Timelines Dashboard](https://agi-timelines-dashboard.vercel.app/)," accessed January 5, 2026.
+
+[^15]: "[Forecasting AGI: Insights from Prediction Markets](https://www.lesswrong.com/posts/dRbvHfEwb6Cuf6xn3/forecasting-agi-insights-from-prediction-markets-and-1)," LessWrong, 2023.
+
+[^16]: "[The Price of Progress: Algorithmic Efficiency and the Falling Cost of AI Inference](https://arxiv.org/html/2511.23455v1)," MIT researchers, November 2025.
+
+[^17]: "[Context: Current AI trends and uncertainties](https://cfg.eu/context/)," Centre for Future Generations, 2024.
+
+[^18]: "[Can AI scaling continue through 2030?](https://epoch.ai/blog/can-ai-scaling-continue-through-2030)," Epoch AI, 2024.
+
+[^19]: "[Data movement bottlenecks to large-scale model training](https://epoch.ai/blog/data-movement-bottlenecks-scaling-past-1e28-flop)," Epoch AI, 2024.
+
+[^20]: "[Will we run out of data? Limits of LLM scaling based on human-generated data](https://arxiv.org/html/2211.04325v2)," arXiv:2211.04325, 2022.
+
+[^21]: "[Conversation with Robin Hanson](https://aiimpacts.org/conversation-with-robin-hanson/)," AI Impacts, 2019.
+
+[^22]: "[Literature review of transformative artificial intelligence timelines](https://epoch.ai/blog/literature-review-of-transformative-artificial-intelligence-timelines)," Epoch AI, 2023.
+
+[^23]: Paul Christiano, "[Takeoff speeds](https://sideways-view.com/2018/02/24/takeoff-speeds/)," Sideways View, February 24, 2018.
+
+[^24]: Eliezer Yudkowsky, "[Intelligence Explosion Microeconomics](https://intelligence.org/files/IEM.pdf)," MIRI Technical Report, 2013.
+
+[^25]: "[The Hanson-Yudkowsky AI-Foom Debate](https://intelligence.org/ai-foom-debate/)," Machine Intelligence Research Institute, 2008.
+
+[^26]: Tom Davidson, "[What a Compute-Centric Framework Says About Takeoff Speeds](https://www.openphilanthropy.org/research/what-a-compute-centric-framework-says-about-takeoff-speeds/)," Open Philanthropy, June 27, 2023.
+
+[^27]: "[AI winter](https://en.wikipedia.org/wiki/AI_winter)," Wikipedia, accessed 2024.
+
+[^28]: "[AI Futures Model: Dec 2025 Update](https://blog.ai-futures.org/p/ai-futures-model-dec-2025-update)," AI Futures, December 2025.
+
+[^29]: "[Shrinking AGI timelines: a review of expert forecasts](https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/)," 80,000 Hours, March 2025.
+
+[^30]: Eliezer Yudkowsky, "[Biology-Inspired AGI Timelines: The Trick That Never Works](https://www.lesswrong.com/posts/ax695frGJEzGxFBK4/biology-inspired-agi-timelines-the-trick-that-never-works)," LessWrong, 2021.
+
+[^31]: "[The methodological limits of the AI 2027 forecast](https://futurescouting.substack.com/p/the-methodological-limits-of-the)," Future Scouting, 2025.
+
+[^32]: Titotal, "[A deep critique of AI 2027's bad timeline models](https://www.lesswrong.com/posts/PAYfmG2aRbdb74mEp/a-deep-critique-of-ai-2027-s-bad-timeline-models)," LessWrong, 2025.
+
+[^33]: Eliezer Yudkowsky, "[Biology-Inspired AGI Timelines: The Trick That Never Works](https://www.lesswrong.com/posts/ax695frGJEzGxFBK4/biology-inspired-agi-timelines-the-trick-that-never-works)," LessWrong, 2021.
+
+[^34]: Robin Hanson, "[What Are Reasonable AI Fears?](https://forum.effectivealtruism.org/posts/XnnfPC2gsgRFZezkE/linkpost-what-are-reasonable-ai-fears-by-robin-hanson-2023)," Effective Altruism Forum, 2023.
+
+[^35]: "[What the hell happened with AGI timelines in 2025?](https://80000hours.org/podcast/episodes/agi-timelines-in-2025/)," 80,000 Hours podcast, 2025.
+
+[^36]: Holden Karnofsky, "[Some Background on Our Views Regarding Advanced Artificial Intelligence](https://www.openphilanthropy.org/blog/some-background-our-views-regarding-advanced-artificial-intelligence)," Open Philanthropy, 2016.
