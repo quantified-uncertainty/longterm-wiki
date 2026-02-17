@@ -169,6 +169,20 @@ pnpm crux ci status --wait       # Poll every 30s until all checks complete
 - **build-and-test**: Builds the app and runs vitest (blocking)
 - **validate**: Runs three blocking checks (MDX syntax, YAML schema, frontmatter schema), then the full validation suite (advisory/non-blocking)
 
+## Auto-Update System
+
+News-driven automatic wiki updates. Fetches from RSS feeds and web searches, routes relevant news to wiki pages, and runs improvements. See `crux/auto-update/` for implementation and `data/auto-update/sources.yaml` for source configuration.
+
+```bash
+pnpm crux auto-update plan                    # Preview what would be updated
+pnpm crux auto-update run --budget=30         # Run with $30 budget cap
+pnpm crux auto-update digest                  # Just fetch and show news digest
+pnpm crux auto-update sources                 # List configured sources
+pnpm crux auto-update history                 # Show past runs
+```
+
+GitHub Actions workflow (`.github/workflows/auto-update.yml`) runs daily at 06:00 UTC. Configurable via `workflow_dispatch` with budget, page count, and source filters.
+
 ## Key Conventions
 
 - **Path aliases**: Use `@/`, `@components/`, `@data/`, `@lib/` in app code

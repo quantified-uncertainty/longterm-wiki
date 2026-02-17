@@ -1,0 +1,158 @@
+# Auto-Update News Sources
+#
+# RSS/Atom feeds and web sources checked for new AI safety-relevant information.
+# The auto-update system fetches these, builds a news digest, and routes
+# relevant items to wiki pages for updating.
+#
+# Fields:
+#   id:          Unique identifier for this source
+#   name:        Human-readable name
+#   type:        rss | atom | web-search
+#   url:         Feed URL (for rss/atom types)
+#   query:       Search query (for web-search types)
+#   frequency:   How often to check: daily | twice-daily | weekly
+#   categories:  Topic categories this source covers (used for routing)
+#   reliability: high | medium | low (affects how aggressively we trust items)
+#   enabled:     true/false
+
+sources:
+  # ── AI Lab Blogs ──────────────────────────────────────────────────────────
+
+  - id: openai-blog
+    name: OpenAI Blog
+    type: rss
+    url: https://openai.com/blog/rss.xml
+    frequency: daily
+    categories: [ai-labs, models, safety, policy]
+    reliability: high
+    enabled: true
+
+  - id: anthropic-blog
+    name: Anthropic Blog / Research
+    type: rss
+    url: https://www.anthropic.com/rss.xml
+    frequency: daily
+    categories: [ai-labs, safety, models, interpretability]
+    reliability: high
+    enabled: true
+
+  - id: deepmind-blog
+    name: Google DeepMind Blog
+    type: rss
+    url: https://deepmind.google/blog/rss.xml
+    frequency: daily
+    categories: [ai-labs, models, safety, research]
+    reliability: high
+    enabled: true
+
+  - id: meta-ai-blog
+    name: Meta AI Blog
+    type: rss
+    url: https://ai.meta.com/blog/rss/
+    frequency: daily
+    categories: [ai-labs, models, open-source]
+    reliability: high
+    enabled: true
+
+  # ── AI Safety / Alignment ─────────────────────────────────────────────────
+
+  - id: alignment-forum
+    name: Alignment Forum
+    type: rss
+    url: https://www.alignmentforum.org/feed.xml
+    frequency: daily
+    categories: [safety, alignment, research]
+    reliability: high
+    enabled: true
+
+  - id: lesswrong
+    name: LessWrong
+    type: rss
+    url: https://www.lesswrong.com/feed.xml
+    frequency: daily
+    categories: [safety, alignment, rationality, research]
+    reliability: medium
+    enabled: true
+
+  - id: ea-forum
+    name: EA Forum
+    type: rss
+    url: https://forum.effectivealtruism.org/feed.xml
+    frequency: daily
+    categories: [safety, policy, governance, funding]
+    reliability: medium
+    enabled: true
+
+  # ── Policy & Governance ───────────────────────────────────────────────────
+
+  - id: aisafety-news-search
+    name: AI Safety Policy News
+    type: web-search
+    query: "AI safety regulation policy governance 2026"
+    frequency: daily
+    categories: [policy, governance, regulation]
+    reliability: medium
+    enabled: true
+
+  - id: ai-executive-orders
+    name: AI Executive Orders & Legislation
+    type: web-search
+    query: "AI executive order legislation bill 2026"
+    frequency: weekly
+    categories: [policy, governance, regulation]
+    reliability: medium
+    enabled: true
+
+  # ── Newsletters & Aggregators ─────────────────────────────────────────────
+
+  - id: import-ai
+    name: Import AI Newsletter
+    type: rss
+    url: https://importai.substack.com/feed
+    frequency: weekly
+    categories: [ai-labs, models, policy, research]
+    reliability: high
+    enabled: true
+
+  - id: the-gradient
+    name: The Gradient
+    type: rss
+    url: https://thegradient.pub/rss/
+    frequency: weekly
+    categories: [research, models, safety]
+    reliability: high
+    enabled: true
+
+  - id: ml-safety-newsletter
+    name: ML Safety Newsletter
+    type: rss
+    url: https://newsletter.mlsafety.org/feed
+    frequency: weekly
+    categories: [safety, alignment, research]
+    reliability: high
+    enabled: true
+
+  # ── Arxiv ─────────────────────────────────────────────────────────────────
+
+  - id: arxiv-ai-safety
+    name: arXiv AI Safety Papers
+    type: web-search
+    query: "arxiv AI safety alignment interpretability new paper 2026"
+    frequency: daily
+    categories: [research, safety, alignment, interpretability]
+    reliability: medium
+    enabled: true
+
+  # ── Compute & Industry ────────────────────────────────────────────────────
+
+  - id: ai-industry-news
+    name: AI Industry News
+    type: web-search
+    query: "artificial intelligence funding compute GPU chips 2026"
+    frequency: weekly
+    categories: [compute, industry, funding]
+    reliability: medium
+    enabled: true
+
+# State tracking is stored in data/auto-update/state.yaml (auto-maintained).
+# This file is only for source configuration — it is never rewritten by code.
