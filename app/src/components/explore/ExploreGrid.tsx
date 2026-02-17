@@ -30,7 +30,7 @@ const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
   { label: "Epistemic", value: "epistemic" },
 ];
 
-type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "quality" | "wordCount" | "recentlyEdited";
+type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "researchImportance" | "quality" | "wordCount" | "recentlyEdited";
 
 /** Compute a blended "recommended" score that favors recent, high-quality content. */
 function recommendedScore(item: ExploreItem): number {
@@ -147,7 +147,8 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     : 0;
   const initialEntityIndex = initialEntity ? resolveEntityGroupIndex(initialEntity) : 0;
 
-  const initialView = (searchParams.get("view") as ViewMode) || "cards";
+  const rawView = searchParams.get("view");
+  const initialView: ViewMode = rawView === "table" ? "table" : "cards";
 
   const [viewMode, setViewMode] = useState<ViewMode>(initialView);
   const [search, setSearch] = useState(initialTag);
@@ -324,6 +325,8 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
             return a.title.localeCompare(b.title);
           case "readerImportance":
             return (b.readerImportance || 0) - (a.readerImportance || 0);
+          case "researchImportance":
+            return (b.researchImportance || 0) - (a.researchImportance || 0);
           case "quality":
             return (b.quality || 0) - (a.quality || 0);
           case "wordCount":
@@ -449,7 +452,8 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
                 <option value="recommended">Recommended</option>
                 <option value="recentlyEdited">Recently Edited</option>
                 <option value="quality">Quality</option>
-                <option value="readerImportance">Importance</option>
+                <option value="readerImportance">Reader Importance</option>
+                <option value="researchImportance">Research Importance</option>
                 <option value="relevance">Relevance</option>
                 <option value="wordCount">Word Count</option>
                 <option value="title">Title (A-Z)</option>

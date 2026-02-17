@@ -31,7 +31,7 @@ function formatWordCountCompact(count: number | null): string {
 
 function ScoreBadge({ value, max = 100 }: { value: number | null; max?: number }) {
   if (value == null) return <span className="text-muted-foreground/50">—</span>;
-  const pct = value / max;
+  const pct = Math.max(0, Math.min(value, max)) / max;
   const color =
     pct >= 0.7
       ? "text-emerald-600 dark:text-emerald-400"
