@@ -6,6 +6,7 @@ entityType: internal
 sidebar:
   order: 0
   label: Overview
+evergreen: true
 ---
 
 This section contains internal documentation for maintaining and contributing to the knowledge base.

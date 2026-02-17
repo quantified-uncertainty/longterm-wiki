@@ -127,13 +127,18 @@ pnpm crux content improve <page-id> --tier=polish --apply
 ```
 This adds proper citations, fixes escaping, validates EntityLinks, and syncs frontmatter metrics.
 
+## PR Review & Ship Workflow — MANDATORY
+
+Before finishing any session, run the full review-and-ship workflow defined in `.claude/rules/pr-review-guidelines.md`. The sequence is: `/paranoid-pr-review` (fix all issues) → `/push-and-ensure-green` (push + CI green) → conflict check. This is enforced automatically via the rules file.
+
 ## CI Verification — MANDATORY
 
 **Never assume CI will pass. Always verify.**
 
 ### Before pushing: run the gate check
 ```bash
-pnpm crux validate gate          # Runs: build-data, tests, 3 blocking validations
+pnpm crux validate gate          # Runs: build-data, tests, validations, typecheck
+pnpm crux validate gate --fix    # Auto-fix escaping + markdown before validating
 pnpm crux validate gate --full   # Also runs full Next.js build
 ```
 The gate check bundles all CI-blocking checks into one command. It fails fast — if any step fails, it stops and reports. The `.githooks/pre-push` hook runs this automatically on every `git push`.
@@ -143,30 +148,22 @@ The gate check bundles all CI-blocking checks into one command. It fails fast �
 The gate runs these steps sequentially:
 1. Build data layer (`app/scripts/build-data.mjs`)
 2. Run vitest tests
-3. MDX syntax check (comparison-operators, dollar-signs)
-4. YAML schema validation
-5. Frontmatter schema validation
-6. *(with `--full` only)* Full Next.js production build
+3. *(with `--fix` only)* Auto-fix escaping and markdown formatting
+4. MDX syntax check (comparison-operators, dollar-signs)
+5. YAML schema validation
+6. Frontmatter schema validation
+7. TypeScript type check (`tsc --noEmit`)
+8. *(with `--full` only)* Full Next.js production build
 
 ### After pushing: confirm CI is green
-1. Check CI status using the GitHub API (`gh` is not installed; use `curl` instead):
 ```bash
-# Get the HEAD sha
-SHA=$(git rev-parse HEAD)
-# Query check runs (requires GITHUB_TOKEN in env)
-curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/commits/$SHA/check-runs" \
-  | python3 -c "
-import sys, json; data = json.load(sys.stdin)
-for r in data.get('check_runs', []):
-    print(f\"  {r['name']:40s} {r['status']:12s} {r.get('conclusion') or '(pending)'}\")
-print(f\"Total: {data['total_count']} checks\")
-"
+pnpm crux ci status              # Check current CI status
+pnpm crux ci status --wait       # Poll every 30s until all checks complete
 ```
-2. **Do not say "CI should pass" — wait for actual confirmation**
-3. If checks show `queued` or `in_progress`, wait 30-60s and poll again
-4. If checks fail, investigate the failure, fix locally, and push again
-5. Do not consider work complete until CI is green
+1. **Do not say "CI should pass" — wait for actual confirmation**
+2. If checks show `queued` or `in_progress`, use `--wait` to poll automatically
+3. If checks fail, investigate the failure, fix locally, and push again
+4. Do not consider work complete until CI is green
 
 ### CI jobs
 - **build-and-test**: Builds the app and runs vitest (blocking)

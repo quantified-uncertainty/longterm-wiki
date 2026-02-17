@@ -6,6 +6,12 @@ facts:
     asOf: "2026-02"
     note: "Series G post-money valuation, February 2026"
 
+  valuation-nov-2025:
+    value: "$350 billion"
+    numeric: 350000000000
+    asOf: "2025-11"
+    note: "Valuation at Microsoft/Nvidia commitment, November 2025"
+
   revenue-run-rate:
     value: "$14 billion"
     numeric: 14000000000
@@ -18,9 +24,27 @@ facts:
     asOf: "2025-12"
     note: "Annualized run rate at end of 2025"
 
+  revenue-early-2025:
+    value: "$1 billion"
+    numeric: 1000000000
+    asOf: "2025-01"
+    note: "Approximate ARR at start of 2025"
+
+  revenue-mid-2025:
+    value: "$4 billion"
+    numeric: 4000000000
+    asOf: "2025-07"
+    note: "ARR as of mid-2025, per Series F announcement"
+
   revenue-2026-guidance:
     value: "$20-26 billion"
     asOf: "2026-01"
+
+  series-g-raise:
+    value: "$30 billion"
+    numeric: 30000000000
+    asOf: "2026-02"
+    note: "Series G round size, February 2026"
 
   total-funding:
     value: "$67 billion+"
@@ -60,6 +84,24 @@ facts:
   safety-pct-of-technical:
     value: "20-30%"
     asOf: "2025"
+
+  claude-code-run-rate:
+    value: "$2.5 billion"
+    numeric: 2500000000
+    asOf: "2026-02"
+    note: "Claude Code product run-rate revenue"
+
+  net-cash-burn-2025:
+    value: "$2.8 billion"
+    numeric: 2800000000
+    asOf: "2025"
+    note: "Projected net cash burn for 2025"
+
+  infrastructure-investment:
+    value: "$50 billion"
+    numeric: 50000000000
+    asOf: "2026"
+    note: "AI infrastructure expansion plan"
 
   breakeven-target:
     value: "2028"

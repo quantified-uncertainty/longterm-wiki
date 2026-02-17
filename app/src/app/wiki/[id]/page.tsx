@@ -9,7 +9,7 @@ import {
 import type { MdxPage, MdxError } from "@/lib/mdx";
 import { getEntityById, getPageById, getEntityPath } from "@/data";
 import type { Page, ContentFormat } from "@/data";
-import { CONTENT_FORMAT_INFO } from "@/lib/page-types";
+import { CONTENT_FORMAT_INFO, isFullWidth } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RelatedPages } from "@/components/RelatedPages";
@@ -168,13 +168,13 @@ function ContentMeta({
             History
           </a>
         )}
-        {!isInternal && numId && (
+        {numId && (
           <a href={`/wiki/${numId}/data`} className="page-meta-github">
             <Database size={14} />
             Data
           </a>
         )}
-        {!isInternal && <PageFeedback pageTitle={pageTitle} pageSlug={slug} />}
+        <PageFeedback pageTitle={pageTitle} pageSlug={slug} />
         {!isInternal && <InfoBoxToggle />}
       </div>
     </div>
@@ -235,32 +235,30 @@ function ContentView({
       {!isInternal && <LlmWarningBanner />}
       <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}`}>
         {/* PageStatus shown for graded formats or pages with editorial content */}
-        {!isInternal && (
-          <PageStatus
-            quality={pageData?.quality ?? undefined}
-            importance={pageData?.readerImportance ?? undefined}
-            researchImportance={pageData?.researchImportance ?? undefined}
-            llmSummary={pageData?.llmSummary ?? undefined}
-            structuredSummary={pageData?.structuredSummary ?? undefined}
-            lastEdited={pageData?.lastUpdated ?? undefined}
-            updateFrequency={pageData?.updateFrequency ?? undefined}
-            evergreen={pageData?.evergreen}
-            todo={page.frontmatter.todo}
-            todos={page.frontmatter.todos}
-            wordCount={pageData?.wordCount}
-            backlinkCount={pageData?.backlinkCount}
-            metrics={pageData?.metrics}
-            suggestedQuality={pageData?.suggestedQuality}
-            changeHistory={pageData?.changeHistory}
-            issues={{
-              unconvertedLinkCount: pageData?.unconvertedLinkCount,
-              redundancy: pageData?.redundancy,
-            }}
-            pageType={page.frontmatter.pageType}
-            pathname={entityPath}
-            contentFormat={contentFormat}
-          />
-        )}
+        <PageStatus
+          quality={pageData?.quality ?? undefined}
+          importance={pageData?.readerImportance ?? undefined}
+          researchImportance={pageData?.researchImportance ?? undefined}
+          llmSummary={pageData?.llmSummary ?? undefined}
+          structuredSummary={pageData?.structuredSummary ?? undefined}
+          lastEdited={pageData?.lastUpdated ?? undefined}
+          updateFrequency={pageData?.updateFrequency ?? undefined}
+          evergreen={pageData?.evergreen}
+          todo={page.frontmatter.todo}
+          todos={page.frontmatter.todos}
+          wordCount={pageData?.wordCount}
+          backlinkCount={pageData?.backlinkCount}
+          metrics={pageData?.metrics}
+          suggestedQuality={pageData?.suggestedQuality}
+          changeHistory={pageData?.changeHistory}
+          issues={{
+            unconvertedLinkCount: pageData?.unconvertedLinkCount,
+            redundancy: pageData?.redundancy,
+          }}
+          pageType={page.frontmatter.pageType}
+          pathname={entityPath}
+          contentFormat={contentFormat}
+        />
         {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
         {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
         {page.content}
@@ -321,8 +319,8 @@ export default async function WikiPage({ params }: PageProps) {
 
     const entityPath = getEntityPath(slug) || "";
     const pageData = getPageById(slug);
-    const formatInfo = CONTENT_FORMAT_INFO[(pageData?.contentFormat || "article") as ContentFormat];
-    const fullWidth = result.frontmatter.fullWidth === true || formatInfo?.fullWidth === true;
+    const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
+    const fullWidth = isFullWidth(contentFormat, result.frontmatter);
     return (
       <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
         <ContentView
@@ -349,8 +347,8 @@ export default async function WikiPage({ params }: PageProps) {
 
     const entityPath = getEntityPath(id) || "";
     const pageData = getPageById(id);
-    const formatInfo = CONTENT_FORMAT_INFO[(pageData?.contentFormat || "article") as ContentFormat];
-    const fullWidth = result.frontmatter.fullWidth === true || formatInfo?.fullWidth === true;
+    const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
+    const fullWidth = isFullWidth(contentFormat, result.frontmatter);
     return (
       <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
         <ContentView

@@ -67,6 +67,9 @@ jobs:
       - name: Frontmatter schema validation (blocking)
         run: pnpm crux validate unified --rules=frontmatter-schema --errors-only
 
+      - name: TypeScript type check (blocking)
+        run: cd app && npx tsc --noEmit
+
       - name: Run validation suite (advisory)
         if: "!cancelled()"
         continue-on-error: true

@@ -247,7 +247,19 @@ ratings:
   actionability: 5
   completeness: 6
 ---
-import {EntityLink, R, DataInfoBox, DataExternalLinks} from '@components/wiki';
+import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Inline Data Components
+
+Use these to keep numbers in sync with the canonical facts database:
+
+- **\\\`<F e="entity-id" f="fact-id">display text</F>\\\`** — Inline canonical fact with hover tooltip.
+  Example: \\\`<F e="anthropic" f="valuation">\\\\$380B</F>\\\`
+- **\\\`<Calc expr="..." format="..." precision={N} suffix="x" />\\\`** — Computed value from fact expressions.
+  The \\\`expr\\\` uses \\\`{entity.factId}\\\` references and supports +, -, *, /, ^, ().
+  Example: \\\`<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" />\\\` → "27x"
+  Formats: "currency" (\\$X billion), "percent" (X%), "number" (X,XXX), or auto.
+  Use \\\`<Calc>\\\` instead of hardcoding ratios, multiples, or other derived numbers.
 
 ## Article Sections
 - Quick Assessment (table)

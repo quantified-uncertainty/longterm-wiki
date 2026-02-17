@@ -8,6 +8,7 @@
 import fs from 'fs';
 import { MODELS } from '../../../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../../../lib/entity-lookup.ts';
+import { buildFactLookupForContent } from '../../../lib/fact-lookup.ts';
 import { convertSlugsToNumericIds } from '../../creator/deployment.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import {
@@ -31,11 +32,16 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   const entityLookupCount = entityLookup.split('\n').filter(Boolean).length;
   log('improve', `  Found ${entityLookupCount} relevant entities for lookup`);
 
+  log('improve', 'Building fact lookup table...');
+  const factLookup = buildFactLookupForContent(page.id, currentContent, ROOT);
+  const factLookupCount = factLookup ? factLookup.split('\n').filter(l => l && !l.startsWith('#')).length : 0;
+  log('improve', `  Found ${factLookupCount} available facts for wrapping`);
+
   const tier = options.tier || 'standard';
   const prompt = IMPROVE_PROMPT({
     page, filePath, importPath, directions,
     analysis, research, objectivityContext,
-    currentContent, entityLookup, tier,
+    currentContent, entityLookup, factLookup, tier,
   });
 
   const result = await runAgent(prompt, {

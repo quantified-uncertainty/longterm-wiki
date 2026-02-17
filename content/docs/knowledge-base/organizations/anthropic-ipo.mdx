@@ -19,7 +19,7 @@ balanceFlags:
 subcategory: finance
 entityType: organization
 ---
-import {EntityLink, KeyPeople, KeyQuestions, Section, F} from '@components/wiki';
+import {EntityLink, KeyPeople, KeyQuestions, Section, F, Calc} from '@components/wiki';
 
 :::note[Page Scope]
 This page focuses on **IPO timeline and preparation**. For valuation analysis (bull/bear cases, scenarios), see <EntityLink id="anthropic-valuation">Anthropic Valuation Analysis</EntityLink>. For company overview, see <EntityLink id="anthropic">Anthropic</EntityLink>. For EA capital implications, see <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink>.
@@ -33,7 +33,7 @@ This page focuses on **IPO timeline and preparation**. For valuation analysis (b
 |--------|--------|
 | **IPO Status** | Preparation phase; no SEC filing as of February 2026 |
 | **Timeline Estimate** | 2026 possible but uncertain; median prediction June 2027 |
-| **Current Valuation** | \$380 billion (Series G, February 2026) |
+| **Current Valuation** | <F e="anthropic" f="valuation">\$380 billion</F> (Series G, February 2026) |
 | **Key Milestones** | Wilson Sonsini hired (Dec 2025); informal bank discussions ongoing |
 | **Revenue Trajectory** | \$1B ARR (early 2025) → \$4B ARR (mid-2025) → \$9B+ (end 2025) → \$14B (Feb 2026) → targeting \$20-26B (2026) |
 | **Probability vs OpenAI** | 72% chance of IPO before OpenAI (Kalshi prediction market) |
@@ -50,7 +50,7 @@ This page focuses on **IPO timeline and preparation**. For valuation analysis (b
 
 <EntityLink id="anthropic">Anthropic</EntityLink>, the AI safety company founded in 2021 by former <EntityLink id="openai">OpenAI</EntityLink> researchers <EntityLink id="dario-amodei">Dario Amodei</EntityLink> and <EntityLink id="daniela-amodei">Daniela Amodei</EntityLink>, is actively preparing for a potential initial public offering as early as 2026. The company has taken several concrete steps toward going public, including hiring law firm Wilson Sonsini Goodrich & Rosati in December 2025—the same firm that managed Google's 2004 and LinkedIn's 2011 IPOs—and conducting preliminary discussions with major investment banks.[^1][^2]
 
-The IPO preparation comes amid extraordinary growth in Anthropic's business metrics. The company's annualized revenue run rate grew from approximately \$1 billion in early 2025 to \$4 billion by mid-2025, representing 300% growth in just seven months.[^3][^4] Anthropic is now guiding toward an annualized run rate of approximately \$26 billion by the end of 2026, driven by its Claude AI models and major enterprise contracts.[^5] This revenue acceleration, combined with a November 2025 funding round that valued the company at <F e="anthropic" f="valuation" />, has positioned Anthropic as a potential candidate for one of the largest technology IPOs in history.[^6]
+The IPO preparation comes amid extraordinary growth in Anthropic's business metrics. The company's annualized revenue run rate grew from approximately <F e="anthropic" f="revenue-early-2025">\$1 billion</F> in early 2025 to <F e="anthropic" f="revenue-mid-2025">\$4 billion</F> by mid-2025, representing <Calc expr="({anthropic.revenue-mid-2025} / {anthropic.revenue-early-2025} - 1) * 100" precision={0} suffix="%" /> growth in just seven months.[^3][^4] Anthropic is now guiding toward an annualized run rate of approximately <F e="anthropic" f="revenue-2026-guidance">\$20-26 billion</F> by the end of 2026, driven by its Claude AI models and major enterprise contracts.[^5] This revenue acceleration, combined with a November 2025 funding round that valued the company at <F e="anthropic" f="valuation" />, has positioned Anthropic as a potential candidate for one of the largest technology IPOs in history.[^6]
 
 However, significant uncertainty remains around both timing and execution. While some analysts view a 2026 IPO as feasible, others consider such a quick timeline unlikely without a formal SEC filing.[^7] Prediction markets reflect this ambiguity: Kalshi assigns Anthropic a 72% probability of going public before OpenAI, while Manifold Markets shows a median prediction of June 2027.[^8][^9] The company itself has made no public commitment to an IPO, with Chief Communications Officer Sasha de Marigny stating in late 2025 that there are "no immediate plans" for filing, though the company operates "as if publicly traded."[^10]
 
@@ -77,7 +77,7 @@ The timeline for an Anthropic IPO remains highly uncertain, with estimates rangi
 
 **Realistic scenario (2027):** Prediction markets suggest more caution. Manifold Markets shows a median prediction of June 2027 for an Anthropic IPO, reflecting skepticism about near-term execution.[^9] Even with preparation underway, completing the full IPO process—including SEC review, roadshow preparation, and market timing—typically requires significant lead time.
 
-**Probability relative to OpenAI:** Kalshi's prediction market assigns Anthropic a 72% chance of going public before OpenAI, though this percentage depends on trading volume and can change as developments surface.[^8] This suggests market participants view Anthropic as more likely to pursue a near-term IPO than its primary competitor, despite OpenAI's higher valuation of over \$500 billion.
+**Probability relative to OpenAI:** Kalshi's prediction market assigns Anthropic a 72% chance of going public before OpenAI, though this percentage depends on trading volume and can change as developments surface.[^8] This suggests market participants view Anthropic as more likely to pursue a near-term IPO than its primary competitor, despite OpenAI's higher valuation of over <F e="openai" f="valuation-2025">\$500 billion</F>.
 
 ## Financial Trajectory Supporting IPO
 
@@ -99,13 +99,13 @@ Anthropic's revenue trajectory has been one of the most compelling drivers of IP
 
 The company launched its Claude AI assistant in March 2023, and revenue growth accelerated dramatically following the release of Claude 3.5 and subsequent versions.[^3][^4] By August 2025, Anthropic claimed to be the fastest-growing technology company, with some reports indicating annualized revenue exceeding \$13 billion.[^13]
 
-Looking forward, Anthropic projects nearly tripling its annualized revenue to approximately \$20-26 billion by the end of 2026.[^5] This exceeds earlier expectations of single-digit billions from just six to nine months prior, reflecting rapid adoption of the latest Claude models and emerging enterprise deals becoming public.
+Looking forward, Anthropic projects nearly tripling its annualized revenue to approximately <F e="anthropic" f="revenue-2026-guidance">\$20-26 billion</F> by the end of 2026.[^5] This exceeds earlier expectations of single-digit billions from just six to nine months prior, reflecting rapid adoption of the latest Claude models and emerging enterprise deals becoming public.
 
 ### Customer Base and Enterprise Adoption
 
 Anthropic's customer metrics have grown even more dramatically than revenue:
 
-- **Over 300,000 business customers** as of late 2025 (300x growth from fewer than 1,000 two years earlier)[^3][^14]
+- **Over <F e="anthropic" f="business-customers">300,000</F> business customers** as of late 2025 (300x growth from fewer than 1,000 two years earlier)[^3][^14]
 - **Large accounts** (>\$100K ARR) increased nearly 7x in the past year[^14]
 - **Eight and nine-figure deals** tripled in 2025 compared to all of 2024[^14]
 - **Claims to be #1 in enterprise AI market share** per company statements[^15]
@@ -132,7 +132,7 @@ Anthropic's valuation has increased dramatically through successive funding roun
 | Nov 2025 | - | \$15B (committed) | \$350B | Microsoft, Nvidia |
 | Feb 2026 | Series G | \$30B | \$380B | GIC, Coatue (co-leads) |
 
-The February 2026 Series G round raised \$30 billion at a \$380 billion post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX. At the time of announcement, Anthropic reported \$14 billion in run-rate revenue. This follows the November 2025 partnership with Microsoft and Nvidia, which valued the company at \$350 billion.[^6][^16] The rapid succession of funding rounds—raising \$30B+ in under six months—reflects both the company's accelerating revenue growth and the broader AI investment boom.
+The February 2026 Series G round raised \$30 billion at a <F e="anthropic" f="valuation">\$380 billion</F> post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX. At the time of announcement, Anthropic reported <F e="anthropic" f="revenue-run-rate">\$14 billion</F> in run-rate revenue. This follows the November 2025 partnership with Microsoft and Nvidia, which valued the company at <F e="anthropic" f="valuation-nov-2025">\$350 billion</F>.[^6][^16] The rapid succession of funding rounds—raising \$30B+ in under six months—reflects both the company's accelerating revenue growth and the broader AI investment boom.
 
 Private market discussions reportedly reference aggressive forward revenue multiples of 30-50x for 2026 projections to justify these high valuations.[^5] While such multiples are elevated by historical standards, they reflect investor belief in Anthropic's potential to capture significant market share in enterprise AI.
 
@@ -147,36 +147,36 @@ For comprehensive valuation analysis including bear cases, see <EntityLink id="a
 | **Moderate Bull** | \$500-700B | 1.3-1.8x | 20-30% | Diversified customers, sustained growth |
 | **Strong Bull** | \$1-1.75T | 2.6-4.6x | 5-10% | Market leader, AGI progress |
 
-**Key context**: Anthropic now trades at ≈27x revenue (\$380B / \$14B run-rate) vs OpenAI's ≈25x (at \$500B with \$20B ARR)—a significant convergence from the ≈39x premium at the previous valuation. If OpenAI closes its \$100B round at \$830B, it would trade at ≈41x, well above Anthropic's current multiple. See the valuation page for detailed bull and bear case arguments.
+**Key context**: Anthropic now trades at ≈<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" /> revenue (<F e="anthropic" f="valuation">\$380B</F> / <F e="anthropic" f="revenue-run-rate">\$14B</F> run-rate) vs OpenAI's ≈<Calc expr="{openai.valuation-2025} / {openai.revenue-arr-2025}" precision={0} suffix="x" /> (at <F e="openai" f="valuation-2025">\$500B</F> with <F e="openai" f="revenue-arr-2025">\$20B</F> ARR)—a significant convergence from the ≈<Calc expr="{anthropic.valuation-nov-2025} / {anthropic.revenue-arr-2025}" precision={0} suffix="x" /> premium at the previous valuation. If OpenAI closes its \$100B round at \$830B, it would trade at ≈41x, well above Anthropic's current multiple. See the valuation page for detailed bull and bear case arguments.
 
 For implications of higher valuations on EA-aligned philanthropic capital (\$150B-\$1.5T+ potential), see <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink>.
 
 ### Path to Profitability
 
-Despite extraordinary revenue growth, Anthropic remains unprofitable and capital-intensive. The company is pacing toward approximately \$2.8 billion in net cash burn by the end of 2025.[^17] However, investors and the company project a path to breakeven by 2028—two years ahead of OpenAI's expected profitability timeline.[^5][^17]
+Despite extraordinary revenue growth, Anthropic remains unprofitable and capital-intensive. The company is pacing toward approximately <F e="anthropic" f="net-cash-burn-2025">\$2.8 billion</F> in net cash burn by the end of 2025.[^17] However, investors and the company project a path to breakeven by <F e="anthropic" f="breakeven-target">2028</F>—two years ahead of OpenAI's expected profitability timeline.[^5][^17]
 
 The improving unit economics are driven by several factors:
 
 - Increasing revenue per customer as enterprise adoption matures
 - Operational leverage as the customer base scales
-- Infrastructure investments (including a \$50 billion AI infrastructure expansion) that should support growth without proportional cost increases[^18]
+- Infrastructure investments (including a <F e="anthropic" f="infrastructure-investment">\$50 billion</F> AI infrastructure expansion) that should support growth without proportional cost increases[^18]
 
 ## Competitive Context with OpenAI
 
 ### The AI IPO Race
 
-The potential Anthropic IPO is unfolding against the backdrop of a broader AI IPO race, with OpenAI as the most prominent competitor. OpenAI, valued at over \$500 billion in private markets, is also reportedly testing the waters for an IPO and has started preparation, though no listing date has been suggested.[^11][^19]
+The potential Anthropic IPO is unfolding against the backdrop of a broader AI IPO race, with OpenAI as the most prominent competitor. OpenAI, valued at over <F e="openai" f="valuation-2025">\$500 billion</F> in private markets, is also reportedly testing the waters for an IPO and has started preparation, though no listing date has been suggested.[^11][^19]
 
 Several factors differentiate the Anthropic and OpenAI situations:
 
 **Anthropic's advantages:**
 - More concrete preparation steps (legal counsel hired, bank discussions underway)
 - Higher probability in prediction markets (72% chance of going public first)[^8]
-- Faster path to profitability (2028 vs 2030 for OpenAI)[^17]
+- Faster path to profitability (<F e="anthropic" f="breakeven-target">2028</F> vs 2030 for OpenAI)[^17]
 - Public benefit corporation structure may provide governance advantages
 
 **OpenAI's advantages:**
-- Significantly higher valuation (\$500B+ vs \$350B)
+- Significantly higher valuation (<F e="openai" f="valuation-2025">\$500B+</F> vs <F e="anthropic" f="valuation-nov-2025">\$350B</F>)
 - Larger consumer brand recognition via ChatGPT
 - More diverse product portfolio
 - Stronger revenue base (though growth rate may be slower)
@@ -189,11 +189,11 @@ Anthropic has positioned itself distinctly from OpenAI through several strategic
 
 **AI Safety Focus:** Anthropic emphasizes its constitutional AI approach and <EntityLink id="rsp">responsible scaling policy</EntityLink>, distinguishing itself through governance frameworks like the <EntityLink id="long-term-benefit-trust">Long-Term Benefit Trust</EntityLink> presented at the November 2023 AI Safety Summit.[^20] This focus resonates with enterprise customers concerned about AI risks and regulatory compliance.
 
-**Enterprise-First Strategy:** While OpenAI has pursued both consumer and enterprise markets, Anthropic has prioritized enterprise adoption, which is reflected in its customer metrics and business model. The company claims to be #1 in enterprise AI market share and has over 300,000 business customers.[^15]
+**Enterprise-First Strategy:** While OpenAI has pursued both consumer and enterprise markets, Anthropic has prioritized enterprise adoption, which is reflected in its customer metrics and business model. The company claims to be #1 in enterprise AI market share and has over <F e="anthropic" f="business-customers">300,000</F> business customers.[^15]
 
 **Public Benefit Corporation Structure:** Anthropic's legal structure as a public benefit corporation requires the board to balance mission (ensuring "transformative AI helps people and society flourish") alongside shareholder returns.[^21] This structure could provide advantages in navigating regulatory scrutiny and maintaining stakeholder trust through an IPO process.
 
-**Product Differentiation:** Claude models are recognized for coding ability, creativity, and reliability in critical operations.[^22] Claude Code's run-rate revenue exceeded \$2.5 billion by February 2026, more than doubling since early 2026.[^14]
+**Product Differentiation:** Claude models are recognized for coding ability, creativity, and reliability in critical operations.[^22] Claude Code's run-rate revenue exceeded <F e="anthropic" f="claude-code-run-rate">\$2.5 billion</F> by February 2026, more than doubling since early 2026.[^14]
 
 ## Factors Accelerating or Delaying IPO
 
@@ -201,11 +201,11 @@ Anthropic has positioned itself distinctly from OpenAI through several strategic
 
 Several dynamics could push Anthropic toward an earlier IPO:
 
-**Strong Revenue Momentum:** The revenue trajectory from \$1 billion to \$4 billion ARR in seven months, with guidance toward \$26 billion by end-2026, provides a compelling growth story that public markets typically reward.[^3][^4][^5]
+**Strong Revenue Momentum:** The revenue trajectory from <F e="anthropic" f="revenue-early-2025">\$1 billion</F> to <F e="anthropic" f="revenue-mid-2025">\$4 billion</F> ARR in seven months, with guidance toward <F e="anthropic" f="revenue-2026-guidance">\$20-26 billion</F> by end-2026, provides a compelling growth story that public markets typically reward.[^3][^4][^5]
 
 **Investor Pressure:** Large investors are encouraging Anthropic to file ahead of competitors like OpenAI, creating institutional momentum toward a public listing.[^5] These investors may see strategic value in being first to market and establishing valuation benchmarks.
 
-**Capital Requirements:** Anthropic's AI infrastructure expansion plans, including a \$50 billion investment program, require substantial capital.[^18] While the company has secured significant private funding, public markets could provide a larger and more sustainable capital base for long-term investments.
+**Capital Requirements:** Anthropic's AI infrastructure expansion plans, including a <F e="anthropic" f="infrastructure-investment">\$50 billion</F> investment program, require substantial capital.[^18] While the company has secured significant private funding, public markets could provide a larger and more sustainable capital base for long-term investments.
 
 **Competitive Dynamics:** If OpenAI moves toward an IPO, Anthropic may feel pressure to accelerate its own timeline to avoid unfavorable comparisons or being perceived as a follower rather than a leader in the space.
 
@@ -221,11 +221,11 @@ Conversely, several factors could slow or postpone an Anthropic IPO:
 
 **Revenue Concentration Risks:** Substantial portions of Anthropic's revenue are tied to specific platforms like GitHub Copilot and Cursor.[^13] This customer concentration could concern public market investors and require diversification before an IPO.
 
-**Profitability Timeline:** With \$2.8 billion in projected net cash burn for 2025 and profitability not expected until 2028, Anthropic would be going public with significant losses.[^17] While many technology companies have done so successfully, it adds complexity to valuation discussions.
+**Profitability Timeline:** With <F e="anthropic" f="net-cash-burn-2025">\$2.8 billion</F> in projected net cash burn for 2025 and profitability not expected until <F e="anthropic" f="breakeven-target">2028</F>, Anthropic would be going public with significant losses.[^17] While many technology companies have done so successfully, it adds complexity to valuation discussions.
 
 **Governance and Regulatory Scrutiny:** As a public benefit corporation with AI safety commitments, Anthropic may face additional scrutiny regarding how it balances mission and shareholder returns. Establishing clear frameworks for this balance before going public could require additional time.
 
-**Alternative Capital Sources:** The company's ability to raise massive private rounds (\$13 billion in September 2025, \$15 billion committed in November 2025, and \$30 billion in February 2026) reduces the urgency of an IPO as a capital-raising mechanism.[^16][^6]
+**Alternative Capital Sources:** The company's ability to raise massive private rounds (\$13 billion in September 2025, \$15 billion committed in November 2025, and <F e="anthropic" f="series-g-raise">\$30 billion</F> in February 2026) reduces the urgency of an IPO as a capital-raising mechanism.[^16][^6]
 
 ## Prediction Market Analysis
 
@@ -299,7 +299,7 @@ Market analysts have noted what one analysis describes as a "pit of speculative 
 - Supply chain disruptions that could affect AI infrastructure
 - Geopolitical tensions affecting international operations and markets
 
-The rapid valuation increase from \$183 billion in September 2025 to \$350 billion by November 2025 and \$380 billion by February 2026—more than doubling in five months—exemplifies these bubble concerns.[^16][^6] However, the revenue multiple compression from ≈39x to ≈27x suggests the valuation growth is partially supported by revenue growth rather than purely speculative.
+The rapid valuation increase from \$183 billion in September 2025 to <F e="anthropic" f="valuation-nov-2025">\$350 billion</F> by November 2025 and <F e="anthropic" f="valuation">\$380 billion</F> by February 2026—more than doubling in five months—exemplifies these bubble concerns.[^16][^6] However, the revenue multiple compression from ≈<Calc expr="{anthropic.valuation-nov-2025} / {anthropic.revenue-arr-2025}" precision={0} suffix="x" /> to ≈<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" /> suggests the valuation growth is partially supported by revenue growth rather than purely speculative.
 
 ### Revenue Concentration and Business Model Risks
 
@@ -307,16 +307,16 @@ Anthropic faces business model criticisms that could complicate its IPO:
 
 **Customer Concentration:** Substantial portions of Anthropic's revenue are tied to specific platforms like GitHub Copilot and Cursor.[^13] This concentration creates risk if these partnerships change or if competitors gain traction with the same customers.
 
-**Resource-Intensive Operations:** The company is capital-intensive with significant ongoing cash burn (\$2.8 billion projected for 2025).[^17] Many users are non-paying or low-revenue, creating challenges in achieving profitability. These financial pressures could be spotlighted post-IPO, as public companies face quarterly scrutiny.
+**Resource-Intensive Operations:** The company is capital-intensive with significant ongoing cash burn (<F e="anthropic" f="net-cash-burn-2025">\$2.8 billion</F> projected for 2025).[^17] Many users are non-paying or low-revenue, creating challenges in achieving profitability. These financial pressures could be spotlighted post-IPO, as public companies face quarterly scrutiny.
 
-**Competitive Position:** Despite strong growth, Anthropic faces intense competition from well-funded rivals including OpenAI (valued over \$500 billion), Google's Gemini, and others. The sustainability of current growth rates in such a competitive environment remains uncertain.
+**Competitive Position:** Despite strong growth, Anthropic faces intense competition from well-funded rivals including OpenAI (valued over <F e="openai" f="valuation-2025">\$500 billion</F>), Google's Gemini, and others. The sustainability of current growth rates in such a competitive environment remains uncertain.
 
 ### Disclosure and Valuation Uncertainty
 
 As a private company, Anthropic has limited disclosure requirements, creating uncertainty for potential public market investors:[^27]
 
 - **Limited Financial Disclosure:** Private valuations can change rapidly and may not reflect sustainable economics
-- **Uncertain Commercialization Timelines:** Path to profitability remains uncertain with breakeven not expected until 2028[^17]
+- **Uncertain Commercialization Timelines:** Path to profitability remains uncertain with breakeven not expected until <F e="anthropic" f="breakeven-target">2028</F>[^17]
 - **Difficulty Assessing Returns:** Without detailed financial statements, evaluating the company's actual performance versus private market valuations is challenging
 
 These factors complicate investor ability to assess Anthropic's true value ahead of a potential public offering and could lead to valuation volatility once detailed financials are disclosed in an S-1 filing.
@@ -341,7 +341,7 @@ Several fundamental uncertainties remain regarding Anthropic's potential IPO:
 
 **Revenue Sustainability:** Can the company maintain its extraordinary growth trajectory (tripling revenue in 2026) as the market matures and competition intensifies?[^5]
 
-**Profitability Path:** Will Anthropic achieve its 2028 breakeven target, or will public market scrutiny reveal challenges in the business model that delay profitability?[^17]
+**Profitability Path:** Will Anthropic achieve its <F e="anthropic" f="breakeven-target">2028</F> breakeven target, or will public market scrutiny reveal challenges in the business model that delay profitability?[^17]
 
 **Mission Preservation:** Can Anthropic maintain its AI safety focus and public benefit corporation mission while meeting public market expectations for growth and returns?
 

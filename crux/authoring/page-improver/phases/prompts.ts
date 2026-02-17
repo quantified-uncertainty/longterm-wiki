@@ -16,11 +16,12 @@ interface ImprovePromptArgs {
   objectivityContext: string;
   currentContent: string;
   entityLookup: string;
+  factLookup: string | null;
   tier: string;
 }
 
 export function IMPROVE_PROMPT(args: ImprovePromptArgs): string {
-  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, tier } = args;
+  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, factLookup, tier } = args;
 
   const isPolish = tier === 'polish';
   const isPersonPage = page.path?.includes('/people/') ?? false;
@@ -93,6 +94,10 @@ Make targeted improvements based on the analysis and directions. Follow these gu
 - EntityLinks use **numeric IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
 - Escape dollar signs: \\$100M not $100M
 - Import from: '${importPath}'
+- Use \`<F e="entity" f="fact-id">display</F>\` for canonical fact values (hover tooltip shows source/date)
+- Use \`<Calc expr="{entity.factId} / {entity.factId}" precision={1} suffix="x" />\` for derived values (ratios, multiples, percentages)
+  - Supports: +, -, *, /, ^, (). Formats: "currency", "percent", "number", or auto.
+  - Prefer \`<Calc>\` over hardcoded derived numbers — it stays in sync when source facts update
 
 ### Entity Lookup Table
 
@@ -102,10 +107,26 @@ ONLY use IDs from this table. If an entity is not listed here, use plain text in
 \`\`\`
 ${entityLookup}
 \`\`\`
+${factLookup ? `
+### Fact Lookup Table
 
+These canonical facts are available for wrapping with \`<F>\`. The format is: entity.factId: "display value" (as of date) — note.
+ONLY use fact IDs from this table. If a value doesn't match a fact here, leave it as plain text.
+
+When you encounter a hardcoded number in the prose that matches a fact below, wrap it:
+- Before: \`Anthropic raised \\$30 billion\`
+- After: \`Anthropic raised <F e="anthropic" f="series-g-raise">\\$30 billion</F>\`
+
+**Important:** Only wrap a value when the prose is clearly referring to the same thing the fact describes. For example, "\\$1B" could be revenue OR investment — check the fact's note to confirm the semantic match. When in doubt, leave it unwrapped.
+
+\`\`\`
+${factLookup}
+\`\`\`
+` : ''}
 ### Quality Standards
 - Add citations from the research sources
-- Replace vague claims with specific numbers
+- Replace vague claims with specific numbers; use \`<F>\` for canonical facts and \`<Calc>\` for derived values
+- When a page has hardcoded ratios/multiples (e.g. "≈27x revenue"), replace with \`<Calc expr="{a.valuation} / {a.revenue}" precision={0} suffix="x" />\`
 - Add EntityLinks for related concepts (using E## IDs from the lookup table above)
 - Ensure tables have source links
 - **NEVER use vague citations** like "Interview", "Earnings call", "Conference talk", "Reports", "Various"
