@@ -129,7 +129,7 @@ This adds proper citations, fixes escaping, validates EntityLinks, and syncs fro
 
 ## PR Review & Ship Workflow — MANDATORY
 
-Before finishing any session, run the full review-and-ship workflow defined in `.claude/rules/pr-review-guidelines.md`. The sequence is: `/review` (fix all issues) → `/push-safe` (push + CI green) → conflict check. This is enforced automatically via the rules file.
+Before finishing any session, run the full review-and-ship workflow defined in `.claude/rules/pr-review-guidelines.md`. The sequence is: `/paranoid-pr-review` (fix all issues) → `/push-and-ensure-green` (push + CI green) → conflict check. This is enforced automatically via the rules file.
 
 ## CI Verification — MANDATORY
 
