@@ -1,0 +1,160 @@
+name: Scheduled Maintenance
+
+# Runs periodic maintenance sweeps using Claude Code.
+# Daily: review merged PRs, propagate learnings
+# Weekly: full sweep — triage issues, review PRs, detect cruft
+# Monthly: deep cruft analysis + cleanup
+#
+# Requires: ANTHROPIC_API_KEY secret + Claude GitHub App installed.
+
+on:
+  schedule:
+    - cron: "30 7 * * 1-5" # Daily: weekdays 7:30am UTC
+    - cron: "0 9 * * 0" # Weekly: Sunday 9am UTC
+    - cron: "0 10 1 * *" # Monthly: 1st of month 10am UTC
+  workflow_dispatch:
+    inputs:
+      cadence:
+        description: "Maintenance cadence"
+        required: true
+        default: "weekly"
+        type: choice
+        options:
+          - daily
+          - weekly
+          - monthly
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+
+# Only one maintenance run at a time
+concurrency:
+  group: scheduled-maintenance
+  cancel-in-progress: false
+
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Determine cadence
+        id: cadence
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            CADENCE="${{ inputs.cadence }}"
+          elif [ "${{ github.event.schedule }}" = "30 7 * * 1-5" ]; then
+            CADENCE="daily"
+          elif [ "${{ github.event.schedule }}" = "0 9 * * 0" ]; then
+            CADENCE="weekly"
+          elif [ "${{ github.event.schedule }}" = "0 10 1 * *" ]; then
+            CADENCE="monthly"
+          else
+            CADENCE="weekly"
+          fi
+          echo "cadence=$CADENCE" >> "$GITHUB_OUTPUT"
+          echo "Maintenance cadence: $CADENCE"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create maintenance branch
+        id: branch
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          CADENCE="${{ steps.cadence.outputs.cadence }}"
+          BRANCH="claude/maintain-${DATE}-${CADENCE}-${GITHUB_RUN_NUMBER}"
+          git checkout -b "$BRANCH"
+          echo "name=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "Created branch: $BRANCH"
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build data layer
+        run: node --import tsx/esm app/scripts/build-data.mjs
+
+      - name: Run maintenance
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          additional_permissions: |
+            actions: read
+          prompt: |
+            You are running an automated maintenance sweep for the longterm-wiki project.
+
+            CADENCE: ${{ steps.cadence.outputs.cadence }}
+            BRANCH: ${{ steps.branch.outputs.name }}
+            DATE: ${{ steps.branch.outputs.date }}
+
+            ## What to do
+
+            Follow the maintenance workflow defined in `.claude/commands/maintain.md`, adapted for this cadence level.
+
+            ### If cadence = daily
+            1. Run `pnpm crux maintain review-prs`
+            2. Read the report. Focus on recurring issues (marked with `!!`).
+            3. If recurring issues exist, add them to `.claude/common-issues.md`.
+            4. Check for issues flagged as "potentially-resolved" — but DO NOT auto-close them (see rules below).
+
+            ### If cadence = weekly
+            1. Run `pnpm crux maintain` (full sweep).
+            2. Read the full report carefully.
+            3. Act on P0-P2 items:
+               - P0: Fix broken things (CI, validation).
+               - P1: Handle potentially-resolved issues (see rules below).
+               - P2: Propagate recurring learnings to `.claude/common-issues.md` or `.claude/rules/`.
+            4. For P3+ items that are too large to fix now, file GitHub issues so they're tracked.
+            5. Run `pnpm crux validate` and fix any blocking errors.
+
+            ### If cadence = monthly
+            1. Do everything from the weekly cadence.
+            2. Additionally run `pnpm crux maintain detect-cruft`.
+            3. For cruft items you're confident about (grep thoroughly first), clean them up.
+            4. For larger cruft items, file GitHub issues.
+
+            ## CRITICAL: Issue handling rules
+
+            **Be conservative with issues. When in doubt, comment — don't close.**
+
+            - **High confidence** (issue number explicitly referenced in a merged PR): Comment explaining the resolution and close.
+            - **Moderate confidence** (fuzzy title match from triage report): Leave a comment like:
+              "This looks like it may have been resolved by recent work (PR #X / commit Y). Can someone confirm so we can close this?"
+              Do NOT close the issue.
+            - **Low confidence** (stale but unclear): Leave no comment. Skip it.
+
+            The worst outcome is closing an issue that wasn't actually resolved. Err on the side of leaving things open.
+
+            ## After taking actions
+
+            1. If you made any file changes:
+               a. Run `pnpm crux validate gate` to verify nothing is broken.
+               b. Commit with message: "[maintenance] <cadence> sweep — <brief summary>"
+               c. Push: `git push -u origin ${{ steps.branch.outputs.name }}`
+               d. Create a PR with `gh pr create`. Use title format: "[maintenance] <Cadence> sweep <date>" and include a body summarizing what was done. Set `--base main`.
+               e. Verify CI passes with `pnpm crux ci status --wait` (or poll manually).
+
+            2. If you took actions on GitHub issues (comments/closures) but made NO file changes:
+               - No branch/PR needed. Just report what actions you took.
+
+            3. If the maintenance sweep found nothing actionable:
+               - Report "No maintenance actions needed" and exit cleanly.
+
+            ## Guardrails
+
+            - Follow all conventions in CLAUDE.md.
+            - Do NOT modify wiki page content directly. Page updates use `crux content improve`.
+            - Do NOT close more than 3 issues in a single run. If more are candidates, comment on the extras and flag them for human review.
+            - If the sweep reveals >10 actionable items, work the top 5 and file issues for the rest.
+            - Keep commits focused. If you make multiple kinds of changes, use separate commits.

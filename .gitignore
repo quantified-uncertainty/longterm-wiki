@@ -39,6 +39,7 @@ app/public/llms*.txt
 # Claude Code temp files
 .claude/temp/
 .claude/settings.local.json
+.claude/maintain-last-run.txt
 
 # Vercel
 .vercel

@@ -23,6 +23,7 @@
  *   edit-log    View and query per-page edit history
  *   importance  Ranking-based importance scoring
  *   ci          GitHub CI status and monitoring
+ *   maintain    Periodic maintenance and housekeeping
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -50,6 +51,7 @@ import * as checkLinksCommands from './commands/check-links.ts';
 import * as editLogCommands from './commands/edit-log.ts';
 import * as importanceCommands from './commands/importance.ts';
 import * as ciCommands from './commands/ci.ts';
+import * as maintainCommands from './commands/maintain.ts';
 import * as autoUpdateCommands from './commands/auto-update.ts';
 
 const domains = {
@@ -66,6 +68,7 @@ const domains = {
   'edit-log': editLogCommands,
   importance: importanceCommands,
   ci: ciCommands,
+  maintain: maintainCommands,
 };
 
 /**
@@ -128,6 +131,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   edit-log    View and query per-page edit history
   importance  Ranking-based importance scoring
   ci          GitHub CI status and monitoring
+  maintain    Periodic maintenance and housekeeping
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

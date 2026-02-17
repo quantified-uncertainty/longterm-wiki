@@ -29,8 +29,14 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 │   ├── fix.ts            Auto-fix operations
 │   ├── content.ts        Page authoring (improve, create, grade)
 │   ├── generate.ts       Content generation (YAML, summaries, diagrams)
+│   ├── visual.ts         Diagram, chart & model pipeline
 │   ├── resources.ts      External resource management
-│   └── updates.ts        Schedule-aware page update system
+│   ├── updates.ts        Schedule-aware page update system
+│   ├── check-links.ts    External URL health checking
+│   ├── edit-log.ts       Per-page edit history
+│   ├── importance.ts     Ranking-based importance scoring
+│   ├── ci.ts             GitHub CI status and monitoring
+│   └── maintain.ts       Periodic maintenance and housekeeping
 │
 ├── authoring/            Page authoring scripts (invoked by content domain)
 │   ├── page-creator.ts   Create new pages with research pipeline
@@ -52,6 +58,7 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 │   ├── rules/            Individual validation rules
 │   ├── anthropic.ts      Claude API wrapper
 │   ├── output.ts         Logging/formatting
+│   ├── github.ts         Shared GitHub API utilities (REPO constant, fetch wrapper)
 │   └── ...
 │
 ├── validate/             Validation scripts (invoked by validate domain)
@@ -71,6 +78,12 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 | **generate** | `data/`, `content/docs/` | `data/`, `content/docs/` |
 | **resources** | `data/resources/` | `data/resources/` |
 | **updates** | `content/docs/` frontmatter | invokes `content improve` |
+| **visual** | `content/docs/` | `content/docs/` (diagrams, charts) |
+| **check-links** | `data/resources/`, URLs | stdout (health reports) |
+| **edit-log** | `data/edit-logs/` | stdout (history) |
+| **importance** | `content/docs/`, `data/` | `content/docs/` frontmatter |
+| **ci** | GitHub API | stdout (check-run status) |
+| **maintain** | GitHub API, `.claude/sessions/`, codebase | stdout, GitHub issues |
 
 ## Domain Reference
 
@@ -81,6 +94,12 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 - **generate** — Generate YAML entities, summaries, diagrams, schema docs
 - **resources** — Manage external resource links in `data/resources/`
 - **updates** — Schedule-aware update queue using `update_frequency` frontmatter
+- **visual** — Create, review, audit, and improve diagrams/charts/models
+- **check-links** — Check external URL health and find broken links
+- **edit-log** — View and query per-page edit history from `data/edit-logs/`
+- **importance** — Ranking-based importance scoring for pages
+- **ci** — GitHub CI check-run status monitoring with optional polling
+- **maintain** — Periodic maintenance: PR review, issue triage, cruft detection
 
 ## How to Add a Validation Rule
 

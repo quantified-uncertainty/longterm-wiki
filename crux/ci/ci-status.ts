@@ -13,6 +13,7 @@
 
 import { execSync } from 'child_process';
 import { getColors } from '../lib/output.ts';
+import { githubApi, REPO } from '../lib/github.ts';
 
 const args: string[] = process.argv.slice(2);
 const WAIT_MODE: boolean = args.includes('--wait');
@@ -20,8 +21,6 @@ const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
 const SHA_ARG = args.find((a) => a.startsWith('--sha='))?.split('=')[1];
 const POLL_INTERVAL = 30_000; // 30 seconds
 const MAX_POLLS = 40; // 20 minutes max
-
-const REPO = 'quantified-uncertainty/longterm-wiki';
 
 const c = getColors(CI_MODE);
 
@@ -46,25 +45,7 @@ function getSha(): string {
 }
 
 async function fetchCheckRuns(sha: string): Promise<CheckRunsResponse> {
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) {
-    console.error(`${c.red}Error: GITHUB_TOKEN environment variable is required${c.reset}`);
-    process.exit(1);
-  }
-
-  const url = `https://api.github.com/repos/${REPO}/commits/${sha}/check-runs`;
-  const resp = await fetch(url, {
-    headers: {
-      Authorization: `token ${token}`,
-      Accept: 'application/vnd.github+json',
-    },
-  });
-
-  if (!resp.ok) {
-    throw new Error(`GitHub API returned ${resp.status}: ${await resp.text()}`);
-  }
-
-  return (await resp.json()) as CheckRunsResponse;
+  return githubApi<CheckRunsResponse>(`/repos/${REPO}/commits/${sha}/check-runs`);
 }
 
 function formatConclusion(conclusion: string | null, status: string): string {
