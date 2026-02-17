@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { sources, hashId, SOURCES_DIR } from '../../lib/knowledge-db.ts';
+import { getApiKey } from '../../lib/api-keys.ts';
 import type { TopicPhaseContext, ResearchPhaseContext } from './types.ts';
 
 type RegisterContext = TopicPhaseContext;
@@ -155,7 +156,7 @@ export async function fetchRegisteredSources(topic: string, options: FetchOption
 
   log('fetch-sources', 'Fetching source content with Firecrawl...');
 
-  const FIRECRAWL_KEY = process.env.FIRECRAWL_KEY;
+  const FIRECRAWL_KEY = getApiKey('FIRECRAWL_KEY');
   if (!FIRECRAWL_KEY) {
     log('fetch-sources', 'FIRECRAWL_KEY not set - skipping source fetching');
     return { success: false, error: 'No API key', fetched: 0 };
@@ -225,8 +226,16 @@ export async function fetchRegisteredSources(topic: string, options: FetchOption
       }
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
-      log('fetch-sources', `     ✗ ${error.message}`);
-      sources.markFailed(id, error.message);
+      const msg = error.message;
+      // Surface actionable diagnostics for common Firecrawl failures
+      if (msg.includes('Unauthorized') || msg.includes('Invalid token')) {
+        log('fetch-sources', `     ✗ Firecrawl auth failed: check FIRECRAWL_KEY — key may be invalid or contain embedded quotes`);
+      } else if (msg.includes('Insufficient credits') || msg.includes('credits')) {
+        log('fetch-sources', `     ✗ Firecrawl credits exhausted — visit https://firecrawl.dev/pricing`);
+      } else {
+        log('fetch-sources', `     ✗ ${msg}`);
+      }
+      sources.markFailed(id, msg);
       failed++;
     }
 

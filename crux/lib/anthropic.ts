@@ -17,6 +17,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { config } from 'dotenv';
+import { getApiKey } from './api-keys.ts';
 
 // Load environment variables from multiple possible locations
 config({ path: '.env' });
@@ -79,7 +80,7 @@ export interface CreateClientOptions {
  * Create an Anthropic client instance
  */
 export function createClient({ apiKey, required = true }: CreateClientOptions = {}): Anthropic | null {
-  const key = apiKey || process.env.ANTHROPIC_API_KEY;
+  const key = apiKey || getApiKey('ANTHROPIC_API_KEY');
 
   if (!key) {
     if (required) {
