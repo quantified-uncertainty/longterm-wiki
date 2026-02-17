@@ -12,6 +12,7 @@
 
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
+import { MARKDOWN_LINK_RE } from '../patterns.ts';
 
 // Internal paths that should use EntityLink
 const INTERNAL_PATH_PATTERNS = [
@@ -74,10 +75,7 @@ export const preferEntityLinkRule = createRule({
     }
 
     // Match markdown links: [text](path)
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    let match: RegExpExecArray | null;
-
-    while ((match = linkRegex.exec(body)) !== null) {
+    for (const match of body.matchAll(MARKDOWN_LINK_RE)) {
       const [fullMatch, text, href] = match;
       const position = match.index;
 

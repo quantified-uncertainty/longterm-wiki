@@ -20,6 +20,7 @@ import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
 import { logBulkFixes } from '../lib/edit-log.ts';
+import { COMPONENT_USAGE_RE, WIKI_IMPORT_RE } from '../lib/patterns.ts';
 
 const args: string[] = process.argv.slice(2);
 const APPLY_MODE: boolean = args.includes('--apply');
@@ -44,11 +45,9 @@ const WIKI_COMPONENTS: string[] = [
   'ComparisonTable',
 ];
 
-// Pattern to find JSX component usage: <ComponentName or <ComponentName>
-const COMPONENT_USAGE_PATTERN: RegExp = /<([A-Z][a-zA-Z0-9]*)/g;
-
-// Pattern to find imports from @components/wiki
-const WIKI_IMPORT_PATTERN: RegExp = /import\s*\{([^}]+)\}\s*from\s*['"]@components\/wiki['"]/;
+// Use shared patterns from patterns.ts
+const COMPONENT_USAGE_PATTERN = COMPONENT_USAGE_RE;
+const WIKI_IMPORT_PATTERN = WIKI_IMPORT_RE;
 
 // Pattern to find any import that includes a component name
 const anyImportPattern = (component: string): RegExp => new RegExp(`import.*\\b${component}\\b.*from`);
@@ -157,7 +156,7 @@ function findImportedComponents(content: string): Set<string> {
 function processFile(filePath: string): ProcessResult {
   const content = readFileSync(filePath, 'utf-8');
 
-  // Find frontmatter end
+  // Find frontmatter end (needs trailing \n for offset calc, distinct from FRONTMATTER_RE)
   const fmMatch = content.match(/^---\n[\s\S]*?\n---\n/);
   const bodyStart = fmMatch ? fmMatch[0].length : 0;
   const body = content.slice(bodyStart);

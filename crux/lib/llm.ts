@@ -148,7 +148,7 @@ export async function streamLlmCall(
 // ---------------------------------------------------------------------------
 
 /** Handler function for a tool call. Returns the tool result as a string. */
-export type ToolHandler = (input: Record<string, string>) => Promise<string>;
+export type ToolHandler = (input: Record<string, unknown>) => Promise<string>;
 
 export interface AgentOptions {
   model?: string;
@@ -199,7 +199,7 @@ export async function runLlmAgent(
         model,
         max_tokens: maxTokens,
         ...(systemPrompt && { system: systemPrompt }),
-        tools: tools as Anthropic.Messages.Tool[],
+        ...(tools.length > 0 && { tools: tools as Anthropic.Messages.Tool[] }),
         messages: msgs,
       }),
       { label: `${retryLabel}(${model}, ${maxTokens} tokens)`, onRetry: options.onRetry }
@@ -223,7 +223,7 @@ export async function runLlmAgent(
     for (const toolUse of toolUseBlocks) {
       let result: string;
       try {
-        const input = (toolUse.input ?? {}) as Record<string, string>;
+        const input = (toolUse.input ?? {}) as Record<string, unknown>;
         const handler = toolHandlers[toolUse.name];
         if (handler) {
           result = await handler(input);

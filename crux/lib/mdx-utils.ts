@@ -5,12 +5,13 @@
  */
 
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { FRONTMATTER_RE, stripFrontmatter } from './patterns.ts';
 
 /**
  * Parse YAML frontmatter from MDX content
  */
 export function parseFrontmatter(content: string): Record<string, unknown> {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  const match = content.match(FRONTMATTER_RE);
   if (!match) return {};
   try {
     return parseYaml(match[1]) || {};
@@ -40,8 +41,7 @@ export function parseFrontmatterAndBody(content: string): { frontmatter: Record<
  * Get content body (without frontmatter)
  */
 export function getContentBody(content: string): string {
-  const match = content.match(/^---\n[\s\S]*?\n---\n([\s\S]*)$/);
-  return match ? match[1] : content;
+  return stripFrontmatter(content);
 }
 
 /**

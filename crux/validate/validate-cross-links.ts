@@ -19,6 +19,7 @@ import { join, relative } from 'path';
 import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
+import { ENTITY_LINK_RE } from '../lib/patterns.ts';
 import { getColors } from '../lib/output.ts';
 import {
   PROJECT_ROOT,
@@ -151,10 +152,8 @@ function buildEntityLookup(database: DatabaseSchema, pathRegistry: PathRegistry)
  * Find EntityLinks in content
  */
 function findEntityLinks(content: string): Set<string> {
-  const regex = /<EntityLink\s+id="([^"]+)"/g;
   const links = new Set<string>();
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(content)) !== null) {
+  for (const match of content.matchAll(ENTITY_LINK_RE)) {
     links.add(match[1]);
   }
   return links;

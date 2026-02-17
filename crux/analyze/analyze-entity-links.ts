@@ -23,6 +23,7 @@ import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from '../lib/mdx-utils.ts';
 import { getColors } from '../lib/output.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadEntities, type Entity, type PathRegistry } from '../lib/content-types.ts';
+import { ENTITY_LINK_RE } from '../lib/patterns.ts';
 
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json');
@@ -155,10 +156,8 @@ function getEntitySearchTerms(entityId: string, entities: Entity[]): string[] {
  * Find EntityLink usages in content
  */
 function findEntityLinks(content: string): string[] {
-  const regex = /<EntityLink\s+id="([^"]+)"/g;
   const links: string[] = [];
-  let match;
-  while ((match = regex.exec(content)) !== null) {
+  for (const match of content.matchAll(ENTITY_LINK_RE)) {
     links.push(match[1]);
   }
   return [...new Set(links)];

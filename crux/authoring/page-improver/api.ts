@@ -7,7 +7,6 @@
 
 import fs from 'fs';
 import path from 'path';
-import Anthropic from '@anthropic-ai/sdk';
 import {
   createLlmClient, runLlmAgent, streamingCreate, extractText,
   startHeartbeat, withRetry, type ToolHandler,
@@ -76,10 +75,10 @@ export async function executeScrySearch(query: string, table: string = 'mv_eafor
 /** Build tool handlers for the page-improver agent. */
 function buildToolHandlers(): Record<string, ToolHandler> {
   return {
-    web_search: async (input) => executeWebSearch(input.query),
-    scry_search: async (input) => executeScrySearch(input.query, input.table),
+    web_search: async (input) => executeWebSearch(String(input.query)),
+    scry_search: async (input) => executeScrySearch(String(input.query), input.table ? String(input.table) : undefined),
     read_file: async (input) => {
-      const resolvedPath = path.resolve(input.path);
+      const resolvedPath = path.resolve(String(input.path));
       if (!resolvedPath.startsWith(ROOT)) {
         return 'Access denied: path must be within project root';
       }

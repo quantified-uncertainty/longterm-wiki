@@ -16,11 +16,10 @@ import { execSync } from 'child_process';
 import { MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
 import {
   createLlmClient, streamLlmCall, extractMdxContent,
-  withRetry, startHeartbeat,
 } from '../../lib/llm.ts';
 import { getSynthesisPrompt } from './synthesis.ts';
 import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
-import { stripFrontmatter } from '../../lib/patterns.ts';
+import { stripFrontmatter, FOOTNOTE_REF_RE, FOOTNOTE_DEF_RE } from '../../lib/patterns.ts';
 import type { ValidationPhaseContext } from './types.ts';
 
 // ---------------------------------------------------------------------------
@@ -238,8 +237,8 @@ function collectValidationIssues(
   }
 
   // Check for undefined footnotes
-  const footnoteRefs = bodyContent.match(/\[\^\d+\]/g) || [];
-  const footnoteDefinitions = bodyContent.match(/^\[\^\d+\]:/gm) || [];
+  const footnoteRefs = bodyContent.match(FOOTNOTE_REF_RE) || [];
+  const footnoteDefinitions = bodyContent.match(FOOTNOTE_DEF_RE) || [];
   const refNums = new Set(footnoteRefs.map(r => r.match(/\d+/)![0]));
   const defNums = new Set(footnoteDefinitions.map(d => d.match(/\d+/)![0]));
   const orphanRefs = [...refNums].filter(n => !defNums.has(n));
