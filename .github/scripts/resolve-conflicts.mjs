@@ -21,7 +21,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const ANTHROPIC_API_KEY = (process.env.ANTHROPIC_API_KEY || '').replace(/^["'\s]+|["'\s]+$/g, '');
 const PR_BRANCH = process.env.PR_BRANCH;
 const PR_NUMBER = process.env.PR_NUMBER;
 
