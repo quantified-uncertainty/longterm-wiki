@@ -84,16 +84,34 @@ function buildColumns(onSearchChange: (value: string) => void): ColumnDef<Explor
     },
     {
       accessorKey: "readerImportance",
-      header: ({ column }) => <SortableHeader column={column}>Imp.</SortableHeader>,
+      header: ({ column }) => <SortableHeader column={column} title="Reader importance (0–100)">Imp.</SortableHeader>,
       cell: ({ row }) => <ScoreBadge value={row.original.readerImportance} />,
       size: 60,
       sortUndefined: "last",
     },
     {
+      accessorKey: "researchImportance",
+      header: ({ column }) => <SortableHeader column={column} title="Research importance (0–100)">Res.</SortableHeader>,
+      cell: ({ row }) => <ScoreBadge value={row.original.researchImportance} />,
+      size: 60,
+      sortUndefined: "last",
+    },
+    {
       accessorKey: "quality",
-      header: ({ column }) => <SortableHeader column={column}>Qual.</SortableHeader>,
+      header: ({ column }) => <SortableHeader column={column} title="Page quality score (0–100)">Qual.</SortableHeader>,
       cell: ({ row }) => <ScoreBadge value={row.original.quality} />,
       size: 60,
+      sortUndefined: "last",
+    },
+    {
+      accessorKey: "backlinkCount",
+      header: ({ column }) => <SortableHeader column={column} title="Pages linking to this one">Links</SortableHeader>,
+      cell: ({ row }) => {
+        const count = row.original.backlinkCount;
+        if (count == null || count === 0) return <span className="text-muted-foreground/50">—</span>;
+        return <span className="text-muted-foreground tabular-nums text-xs">{count}</span>;
+      },
+      size: 55,
       sortUndefined: "last",
     },
     {
