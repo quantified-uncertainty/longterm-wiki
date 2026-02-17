@@ -364,18 +364,18 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       {/* Search + filters — constrained width */}
       <div className="max-w-7xl mx-auto px-6">
         {/* Search */}
-        <div className="mb-6">
+        <div className="mb-4">
           <input
             type="text"
             placeholder="Search entities..."
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
         {/* Filter rows */}
-        <div className="mb-6">
+        <div className="mb-4">
           <FilterRow
             label="Field"
             options={FIELD_GROUPS.map((g) => g.label)}
@@ -485,7 +485,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       {/* Table view — full page width */}
       {viewMode === "table" && (
         <div className="px-6">
-          <ExploreTable items={filtered} />
+          <ExploreTable items={filtered} onSearchChange={handleSearchChange} />
         </div>
       )}
 
