@@ -173,7 +173,7 @@ export function repairFrontmatter(content: string): string {
     'order', 'label',
   ]);
   const topLevelKeys = new Set([
-    'title', 'description', 'sidebar', 'quality', 'importance', 'lastEdited',
+    'title', 'description', 'sidebar', 'quality', 'readerImportance', 'lastEdited',
     'update_frequency', 'evergreen', 'llmSummary', 'ratings', 'clusters',
     'draft', 'aliases', 'redirects', 'tags',
   ]);

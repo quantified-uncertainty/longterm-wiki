@@ -1,11 +1,12 @@
 ---
-numericId: E713
+numericId: E741
 title: "Rating System"
 description: "Reference documentation for LongtermWiki's content quality and importance rating system"
 entityType: internal
 sidebar:
   order: 6
-importance: 5
+readerImportance: 11
+researchImportance: 10
 quality: 48
 llmSummary: "This page documents LongtermWiki's content rating system, which combines LLM-graded subscores (focus, novelty, rigor, completeness, objectivity, concreteness, actionability on 0-10 scales) with automated metrics (word count, citations) to derive quality scores (0-100) and importance ratings for prioritization decisions."
 ratings:
@@ -179,7 +180,7 @@ After grading, pages have this frontmatter structure:
 title: "Page Title"
 description: "Executive summary with methodology AND conclusions"
 quality: 65           # Derived 0-100
-importance: 75        # LLM-assessed 0-100
+readerImportance: 75        # LLM-assessed 0-100
 lastEdited: "2026-01-28"
 ratings:
   focus: 6.0          # 0-10 scale

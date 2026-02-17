@@ -43,7 +43,7 @@ const TOPIC_SECTIONS: {
 const DEPTH_TYPES = new Set(["model", "analysis", "crux", "argument", "case-study"]);
 
 function score(item: ExploreItem): number {
-  const imp = item.importance || 0;
+  const imp = item.readerImportance || 0;
   const qual = item.quality || 0;
   // Favor pages with substantial content (not stubs or thin introductions)
   const words = item.wordCount || 0;
@@ -89,7 +89,6 @@ export default function Home() {
   const allItems = getExploreItems().filter(
     (item) =>
       !item.type.startsWith("ai-transition-model") &&
-      item.type !== "insight" &&
       item.type !== "table" &&
       item.type !== "diagram"
   );

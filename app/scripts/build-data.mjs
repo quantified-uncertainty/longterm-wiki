@@ -185,7 +185,7 @@ function scanContentEntityLinks(pages, entityMap, numericIdToSlug) {
  *   5. Shared tags                    (weight varies by specificity)
  *
  * Quality boost: Each neighbor's raw score is multiplied by a gentle factor
- * based on the target page's quality and importance ratings:
+ * based on the target page's quality and readerImportance ratings:
  *   boost = 1 + quality/40 + importance/400   (max ~1.45x)
  * Unrated pages default to average values (q=5, imp=50 → 1.25x) so they
  * aren't penalized vs rated pages. This nudges high-quality content up
@@ -322,7 +322,7 @@ function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
         // Unrated pages get average defaults so they aren't penalized.
         const targetPage = pageMap.get(targetId);
         const q = targetPage?.quality ?? 5;
-        const imp = targetPage?.importance ?? 50;
+        const imp = targetPage?.readerImportance ?? 50;
         const boost = 1 + q / 40 + imp / 400;
         const e = entityMap.get(targetId);
         const entry = {
@@ -451,7 +451,7 @@ function buildPagesRegistry(urlToResource) {
         // Extract structural metrics (format-aware scoring)
         const contentFormat = fm.contentFormat || 'article';
         const metrics = extractMetrics(content, fullPath, contentFormat);
-        const currentQuality = fm.quality ? parseInt(fm.quality) : null;
+        const currentQuality = fm.quality != null ? Number(fm.quality) : null;
 
         // Find unconverted links (markdown links that have matching resources)
         const unconvertedLinks = urlToResource ? findUnconvertedLinks(content, urlToResource) : [];
@@ -467,13 +467,14 @@ function buildPagesRegistry(urlToResource) {
           filePath: relative(CONTENT_DIR, fullPath),
           title: fm.title || id.replace(/-/g, ' '),
           quality: currentQuality,
-          importance: fm.importance ? parseInt(fm.importance) : null,
+          readerImportance: fm.readerImportance != null ? Number(fm.readerImportance) : null,
+          researchImportance: fm.researchImportance != null ? Number(fm.researchImportance) : null,
           // Content format: article (default), table, diagram, index, dashboard
           contentFormat: fm.contentFormat || 'article',
           // ITN framework fields (0-100 scale)
-          tractability: fm.tractability ? parseInt(fm.tractability) : null,
-          neglectedness: fm.neglectedness ? parseInt(fm.neglectedness) : null,
-          uncertainty: fm.uncertainty ? parseInt(fm.uncertainty) : null,
+          tractability: fm.tractability != null ? Number(fm.tractability) : null,
+          neglectedness: fm.neglectedness != null ? Number(fm.neglectedness) : null,
+          uncertainty: fm.uncertainty != null ? Number(fm.uncertainty) : null,
           causalLevel: fm.causalLevel || null,
           lastUpdated: fm.lastUpdated || fm.lastEdited || null,
           llmSummary: fm.llmSummary || null,
@@ -678,12 +679,34 @@ function main() {
     process.exit(1);
   }
 
-  // Compute next available ID from existing assignments
+  // Compute next available ID from existing assignments.
+  // Also scan page-level numericIds (from MDX frontmatter) so auto-assigned
+  // entity IDs don't collide with IDs that pages already claim.
   let nextId = 1;
   for (const numId of Object.keys(numericIdToSlug)) {
     const n = parseInt(numId.slice(1));
     if (n >= nextId) nextId = n + 1;
   }
+  // Quick scan: collect numericIds already declared in MDX frontmatter across
+  // all content directories. This prevents auto-assigned entity IDs from
+  // colliding with page-level IDs that haven't been registered as entities yet.
+  const CONTENT_DIR_ROOT = join(PROJECT_ROOT, '..', 'content', 'docs');
+  function scanFrontmatterNumericIds(dir) {
+    if (!existsSync(dir)) return;
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        scanFrontmatterNumericIds(join(dir, entry.name));
+      } else if (entry.name.endsWith('.mdx') || entry.name.endsWith('.md')) {
+        const content = readFileSync(join(dir, entry.name), 'utf-8');
+        const match = content.match(/^numericId:\s*(E\d+)/m);
+        if (match) {
+          const n = parseInt(match[1].slice(1));
+          if (n >= nextId) nextId = n + 1;
+        }
+      }
+    }
+  }
+  scanFrontmatterNumericIds(CONTENT_DIR_ROOT);
 
   // Assign IDs to entities that don't have one yet, writing back to source
   let newAssignments = 0;
@@ -989,30 +1012,6 @@ function main() {
   const totalUnconvertedLinks = pages.reduce((sum, p) => sum + p.unconvertedLinkCount, 0);
   console.log(`  pages: ${pages.length} pages (${pagesWithQuality} with quality ratings)`);
   console.log(`  unconvertedLinks: ${totalUnconvertedLinks} links across ${pagesWithUnconvertedLinks} pages`);
-
-  // Load insights from src/data/insights/*.yaml
-  const insightsDir = join(DATA_DIR, 'insights');
-  const insightsList = [];
-  if (existsSync(insightsDir)) {
-    const insightFiles = readdirSync(insightsDir).filter(f => f.endsWith('.yaml'));
-    for (const file of insightFiles) {
-      const filepath = join(insightsDir, file);
-      const content = readFileSync(filepath, 'utf-8');
-      const parsed = parse(content);
-      if (parsed?.insights) {
-        for (const insight of parsed.insights) {
-          // Compute composite score if not present
-          if (insight.composite == null) {
-            const scores = [insight.surprising, insight.important, insight.actionable, insight.neglected, insight.compact].filter(v => v != null);
-            insight.composite = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
-          }
-          insightsList.push(insight);
-        }
-      }
-    }
-    console.log(`  insights: ${insightsList.length} insights from ${insightFiles.length} files`);
-  }
-  database.insights = insightsList;
 
   // Transform entities into typed entities (build-time transformation)
   console.log('\nTransforming entities...');

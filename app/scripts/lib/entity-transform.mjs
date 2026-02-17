@@ -238,6 +238,7 @@ function transformEntity(raw, expertMap, orgMap) {
     case 'parameter':
     case 'metric':
     case 'risk-factor':
+    case 'internal':
       return { ...base, entityType: canonicalType };
 
     default: {

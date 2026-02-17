@@ -5,7 +5,7 @@
 export interface Frontmatter {
   title?: string;
   description?: string;
-  importance?: number | null;
+  readerImportance?: number | null;
   quality?: number | null;
   ratings?: Ratings | null;
   metrics?: Metrics;
@@ -43,7 +43,7 @@ export interface PageInfo {
   isModel: boolean;
   pageType: string;
   contentFormat: string;
-  currentImportance: number | null;
+  currentReaderImportance: number | null;
   currentQuality: number | null;
   currentRatings: Ratings | null;
   content: string;
@@ -64,7 +64,7 @@ export interface ChecklistWarning {
 }
 
 export interface GradeResult {
-  importance: number;
+  readerImportance: number;
   ratings: Ratings;
   llmSummary?: string;
   reasoning?: string;
@@ -76,7 +76,7 @@ export interface PageResult {
   category: string;
   isModel?: boolean;
   title: string;
-  importance?: number;
+  readerImportance?: number;
   ratings?: Ratings;
   metrics: Metrics;
   quality?: number;

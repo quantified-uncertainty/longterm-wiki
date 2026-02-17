@@ -42,10 +42,10 @@ export const INTERNAL_NAV: NavSection[] = [
       { label: "Fact Dashboard", href: "/internal/facts" },
       { label: "Automation Tools", href: "/internal/automation-tools" },
       { label: "Content Database", href: "/internal/content-database" },
+      { label: "Importance Rankings", href: "/internal/importance-rankings" },
       { label: "Page Similarity", href: "/internal/similarity" },
       { label: "Interventions", href: "/internal/interventions" },
       { label: "Proposals", href: "/internal/proposals" },
-      { label: "Critical Insights", href: "/internal/insights" },
     ],
   },
   {
@@ -82,6 +82,7 @@ export const INTERNAL_NAV: NavSection[] = [
     title: "Architecture & Schema",
     items: [
       { label: "Architecture", href: "/internal/architecture" },
+      { label: "Wiki Generation Architecture", href: "/internal/wiki-generation-architecture" },
       { label: "Schema Overview", href: "/internal/schema" },
       { label: "Entity Reference", href: "/internal/schema/entities" },
       { label: "Schema Diagrams", href: "/internal/schema/diagrams" },

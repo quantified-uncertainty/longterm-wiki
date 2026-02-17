@@ -17,11 +17,10 @@
  *   generate    Content generation (yaml, summaries, diagrams)
  *   visual      Diagram, chart & model pipeline (create, review, audit, improve)
  *   resources   External resource management
- *   insights    Insight quality management
- *   gaps        Insight gap analysis
  *   updates     Schedule-aware page update system
  *   check-links External URL health checking
  *   edit-log    View and query per-page edit history
+ *   importance  Ranking-based importance scoring
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -31,8 +30,6 @@
  *   crux validate                            Run all validation checks
  *   crux validate compile --quick            Quick MDX compilation check
  *   crux validate unified --rules=dollars    Run specific rules
- *   crux insights check                      Check insight quality
- *   crux gaps list                           Find pages needing insights
  */
 
 import { createLogger } from './lib/output.ts';
@@ -46,11 +43,10 @@ import * as contentCommands from './commands/content.ts';
 import * as generateCommands from './commands/generate.ts';
 import * as visualCommands from './commands/visual.ts';
 import * as resourcesCommands from './commands/resources.ts';
-import * as insightsCommands from './commands/insights.ts';
-import * as gapsCommands from './commands/gaps.ts';
 import * as updatesCommands from './commands/updates.ts';
 import * as checkLinksCommands from './commands/check-links.ts';
 import * as editLogCommands from './commands/edit-log.ts';
+import * as importanceCommands from './commands/importance.ts';
 
 const domains = {
   validate: validateCommands,
@@ -60,11 +56,10 @@ const domains = {
   generate: generateCommands,
   visual: visualCommands,
   resources: resourcesCommands,
-  insights: insightsCommands,
-  gaps: gapsCommands,
   updates: updatesCommands,
   'check-links': checkLinksCommands,
   'edit-log': editLogCommands,
+  importance: importanceCommands,
 };
 
 /**
@@ -121,11 +116,10 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   generate    Content generation (yaml, summaries, diagrams)
   visual      Diagram, chart & model pipeline
   resources   External resource management
-  insights    Insight quality management
-  gaps        Insight gap analysis
   updates     Schedule-aware page update system
   check-links External URL health checking
   edit-log    View and query per-page edit history
+  importance  Ranking-based importance scoring
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
@@ -135,8 +129,6 @@ ${'\x1b[1m'}Examples:${'\x1b[0m'}
   crux validate                       Run all validation checks
   crux validate compile --quick       Quick MDX compilation check
   crux validate unified --fix         Auto-fix unified rule issues
-  crux insights check                 Check insight quality
-  crux gaps list --limit=10           Find pages needing insights
 
 ${'\x1b[1m'}Domain Help:${'\x1b[0m'}
   crux <domain> --help

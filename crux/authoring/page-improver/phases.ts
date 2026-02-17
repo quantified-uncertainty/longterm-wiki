@@ -36,7 +36,7 @@ export async function analyzePhase(page: PageData, directions: string, options: 
 - ID: ${page.id}
 - Title: ${page.title}
 - Quality: ${page.quality || 'N/A'}
-- Importance: ${page.importance || 'N/A'}
+- Importance: ${page.readerImportance || 'N/A'}
 - Path: ${filePath}
 
 ## User-Specified Directions

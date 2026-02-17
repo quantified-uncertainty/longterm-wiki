@@ -10,7 +10,8 @@
     "test:crux": "vitest run --config crux/vitest.config.ts",
     "validate": "node --import tsx/esm crux/crux.mjs validate",
     "crux": "node --import tsx/esm crux/crux.mjs",
-    "typecheck:tooling": "tsc --noEmit -p crux/tsconfig.json"
+    "typecheck:tooling": "tsc --noEmit -p crux/tsconfig.json",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",

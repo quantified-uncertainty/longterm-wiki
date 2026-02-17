@@ -4,7 +4,6 @@
  * Unified Wiki Health Analysis
  *
  * Runs all analysis tools and produces a combined report:
- * - Entity mentions (unlinked cross-references)
  * - Link coverage (orphans, underlinked pages)
  *
  * Usage:
@@ -14,8 +13,6 @@
  */
 
 import { fileURLToPath } from 'url';
-import { ValidationEngine, type Issue } from '../lib/validation-engine.ts';
-import { entityMentionsRule } from '../lib/rules/entity-mentions.ts';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT, loadBacklinks, loadEntities, type Entity, type BacklinksMap } from '../lib/content-types.ts';
 
@@ -27,20 +24,6 @@ const colors = getColors(JSON_MODE);
 // ---------------------------------------------------------------------------
 // Interfaces
 // ---------------------------------------------------------------------------
-
-interface TopFile {
-  file: string;
-  count: number;
-}
-
-interface EntityMentionsResult {
-  name: string;
-  description: string;
-  totalIssues: number;
-  filesAffected: number;
-  topFiles: TopFile[];
-  issues: Issue[];
-}
 
 interface LinkCoverageStats {
   totalPages: number;
@@ -66,7 +49,6 @@ interface LinkCoverageResult {
 }
 
 interface ReportSummary {
-  totalIssues: number;
   orphanPages: number;
   healthScore: number;
 }
@@ -74,38 +56,8 @@ interface ReportSummary {
 interface Report {
   timestamp: string;
   duration: string;
-  analyses: [EntityMentionsResult, LinkCoverageResult];
+  analyses: [LinkCoverageResult];
   summary: ReportSummary;
-}
-
-/**
- * Run entity mentions analysis
- */
-async function analyzeEntityMentions(): Promise<EntityMentionsResult> {
-  const engine = new ValidationEngine();
-  engine.addRule(entityMentionsRule);
-  await engine.load();
-
-  const issues = await engine.validate({ ruleIds: ['entity-mentions'] });
-
-  // Group by file
-  const byFile: Record<string, Issue[]> = {};
-  for (const issue of issues) {
-    if (!byFile[issue.file]) byFile[issue.file] = [];
-    byFile[issue.file].push(issue);
-  }
-
-  return {
-    name: 'Entity Mentions',
-    description: 'Unlinked references to known entities',
-    totalIssues: issues.length,
-    filesAffected: Object.keys(byFile).length,
-    topFiles: Object.entries(byFile)
-      .sort((a, b) => b[1].length - a[1].length)
-      .slice(0, 5)
-      .map(([file, issues]) => ({ file: file.replace(PROJECT_ROOT + '/', ''), count: issues.length })),
-    issues: BRIEF_MODE ? [] : issues.slice(0, 20)
-  };
 }
 
 /**
@@ -178,21 +130,17 @@ async function main(): Promise<void> {
   }
 
   // Run all analyses
-  const [entityMentions, linkCoverage] = await Promise.all([
-    analyzeEntityMentions(),
-    analyzeLinkCoverage()
-  ]);
+  const linkCoverage = await analyzeLinkCoverage();
 
   const duration = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
 
   const report: Report = {
     timestamp: new Date().toISOString(),
     duration,
-    analyses: [entityMentions, linkCoverage],
+    analyses: [linkCoverage],
     summary: {
-      totalIssues: entityMentions.totalIssues,
       orphanPages: linkCoverage.stats?.orphanPages || 0,
-      healthScore: calculateHealthScore(entityMentions, linkCoverage)
+      healthScore: calculateHealthScore(linkCoverage)
     }
   };
 
@@ -201,20 +149,8 @@ async function main(): Promise<void> {
     return;
   }
 
-  // Print entity mentions section
-  console.log(`${colors.yellow}📝 Entity Mentions${colors.reset}`);
-  console.log(`   ${entityMentions.description}`);
-  console.log(`   Found ${colors.cyan}${entityMentions.totalIssues}${colors.reset} unlinked mentions across ${entityMentions.filesAffected} files`);
-
-  if (entityMentions.topFiles.length > 0 && !BRIEF_MODE) {
-    console.log(`\n   Top files with opportunities:`);
-    for (const { file, count } of entityMentions.topFiles) {
-      console.log(`   ${colors.dim}•${colors.reset} ${file} (${count})`);
-    }
-  }
-
   // Print link coverage section
-  console.log(`\n${colors.yellow}🔗 Link Coverage${colors.reset}`);
+  console.log(`${colors.yellow}Link Coverage${colors.reset}`);
   console.log(`   ${linkCoverage.description}`);
 
   if (linkCoverage.stats) {
@@ -225,7 +161,7 @@ async function main(): Promise<void> {
     if (linkCoverage.orphanPages.length > 0 && !BRIEF_MODE) {
       console.log(`\n   Most isolated pages:`);
       for (const page of linkCoverage.orphanPages.slice(0, 5)) {
-        console.log(`   ${colors.dim}•${colors.reset} ${page.title} (${page.incomingLinks} links)`);
+        console.log(`   ${colors.dim}-${colors.reset} ${page.title} (${page.incomingLinks} links)`);
       }
     }
   } else if (linkCoverage.error) {
@@ -239,19 +175,15 @@ async function main(): Promise<void> {
 
   if (!BRIEF_MODE) {
     console.log(`\n${colors.dim}Run with --json for machine-readable output${colors.reset}`);
-    console.log(`${colors.dim}Run specific tools: node crux/crux.mjs analyze mentions | node crux/crux.mjs analyze links${colors.reset}`);
+    console.log(`${colors.dim}Run specific tools: node crux/crux.mjs analyze links${colors.reset}`);
   }
 }
 
 /**
  * Calculate a simple health score based on analysis results
  */
-function calculateHealthScore(entityMentions: EntityMentionsResult, linkCoverage: LinkCoverageResult): number {
+function calculateHealthScore(linkCoverage: LinkCoverageResult): number {
   let score = 100;
-
-  // Deduct for unlinked mentions (up to 30 points)
-  const mentionPenalty = Math.min(30, entityMentions.totalIssues * 0.5);
-  score -= mentionPenalty;
 
   // Deduct for orphan pages (up to 40 points)
   if (linkCoverage.stats) {

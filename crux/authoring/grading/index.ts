@@ -15,7 +15,7 @@
  *   --limit N          Only process N pages (for testing)
  *   --parallel N       Process N pages concurrently (default: 1)
  *   --category X       Only process pages in category
- *   --skip-graded      Skip pages that already have importance set
+ *   --skip-graded      Skip pages that already have readerImportance set
  *   --output FILE      Write results to JSON file
  *   --apply            Apply grades directly to frontmatter
  *   --skip-warnings    Skip Steps 1-2, just rate (backward compat)
@@ -114,7 +114,7 @@ function collectPages(): PageInfo[] {
       isModel,
       pageType,
       contentFormat: fm.contentFormat || 'article',
-      currentImportance: fm.importance ?? null,
+      currentReaderImportance: fm.readerImportance ?? null,
       currentQuality: fm.quality ?? null,
       currentRatings: fm.ratings ?? null,
       content,
@@ -139,7 +139,7 @@ function applyGradesToFile(page: PageInfo, grades: GradeResult, metrics: { wordC
 
   const fm = parseYaml(fmMatch[1]) || {} as Record<string, unknown>;
 
-  fm.importance = grades.importance;
+  fm.readerImportance = grades.readerImportance;
   fm.quality = derivedQuality;
   if (grades.llmSummary) {
     fm.llmSummary = grades.llmSummary;
@@ -246,8 +246,8 @@ async function main(): Promise<void> {
   }
 
   if (options.skipGraded) {
-    pages = pages.filter(p => p.currentImportance === null);
-    console.log(`Filtered to ${pages.length} pages without importance`);
+    pages = pages.filter(p => p.currentReaderImportance === null);
+    console.log(`Filtered to ${pages.length} pages without readerImportance`);
   }
 
   // Skip overview pages, stubs, non-graded formats, and internal files
@@ -361,7 +361,7 @@ async function main(): Promise<void> {
           category: page.category,
           isModel: page.isModel,
           title: page.title,
-          importance: grades.importance,
+          readerImportance: grades.readerImportance,
           ratings: grades.ratings,
           metrics,
           quality: derivedQuality,
@@ -381,7 +381,7 @@ async function main(): Promise<void> {
               tool: 'crux-grade',
               agency: 'automated',
               requestedBy: getDefaultRequestedBy(),
-              note: `Quality graded: ${derivedQuality}, importance: ${grades.importance.toFixed(1)}`,
+              note: `Quality graded: ${derivedQuality}, readerImportance: ${grades.readerImportance.toFixed(1)}`,
             });
           } else {
             console.error(`  Failed to apply grades to ${page.filePath}`);
@@ -390,7 +390,7 @@ async function main(): Promise<void> {
 
         const r = grades.ratings;
         const warnCount: string = options.skipWarnings ? '' : ` [${automatedWarnings.length + checklistWarnings.length}w]`;
-        console.log(`[${index + 1}/${pages.length}] ${page.id}: imp=${grades.importance.toFixed(1)}, f=${r.focus} n=${r.novelty} r=${r.rigor} c=${r.completeness} con=${r.concreteness} a=${r.actionability} o=${r.objectivity} → qual=${derivedQuality} (${metrics.wordCount}w, ${metrics.citations}cit)${warnCount}${options.apply ? (applied ? ' ok' : ' FAIL') : ''}`);
+        console.log(`[${index + 1}/${pages.length}] ${page.id}: imp=${grades.readerImportance.toFixed(1)}, f=${r.focus} n=${r.novelty} r=${r.rigor} c=${r.completeness} con=${r.concreteness} a=${r.actionability} o=${r.objectivity} → qual=${derivedQuality} (${metrics.wordCount}w, ${metrics.citations}cit)${warnCount}${options.apply ? (applied ? ' ok' : ' FAIL') : ''}`);
         return { success: true, result };
       } else {
         console.log(`[${index + 1}/${pages.length}] ${page.id}: FAILED (no ratings in response)`);
@@ -435,7 +435,7 @@ async function main(): Promise<void> {
   console.log(`Processed: ${processed}, Errors: ${errors}`);
 
   // Summary statistics
-  const importanceScores: number[] = results.map(r => r.importance).filter((x): x is number => x != null).sort((a, b) => b - a);
+  const importanceScores: number[] = results.map(r => r.readerImportance).filter((x): x is number => x != null).sort((a, b) => b - a);
   const qualityScores: number[] = results.map(r => r.quality).filter((x): x is number => x != null).sort((a, b) => b - a);
 
   const impRanges: Record<string, number> = {

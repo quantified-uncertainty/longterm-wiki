@@ -14,7 +14,7 @@ export interface PageData {
   title: string;
   path: string;
   quality?: number;
-  importance?: number;
+  readerImportance?: number;
   ratings?: {
     objectivity?: number;
     rigor?: number;

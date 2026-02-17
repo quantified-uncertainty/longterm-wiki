@@ -36,14 +36,14 @@ function listPages(pages: PageData[], options: ListOptions = {}): void {
 
   const candidates = pages
     .filter(p => p.quality && p.quality <= maxQuality)
-    .filter(p => p.importance && p.importance >= minImportance)
+    .filter(p => p.readerImportance && p.readerImportance >= minImportance)
     .filter(p => !p.path.includes('/models/'))
     .map(p => ({
       id: p.id,
       title: p.title,
       quality: p.quality!,
-      importance: p.importance!,
-      gap: p.importance! - p.quality!
+      importance: p.readerImportance!,
+      gap: p.readerImportance! - p.quality!
     }))
     .sort((a, b) => b.gap - a.gap)
     .slice(0, limit);

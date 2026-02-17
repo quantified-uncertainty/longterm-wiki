@@ -6,7 +6,7 @@
 
 export const SYSTEM_PROMPT: string = `You are an expert evaluator of AI safety content for a resource aimed at **expert AI prioritization work** - helping researchers and funders identify and prioritize concrete interventions to reduce AI existential risk.
 
-Score each page on importance (0-100, one decimal place). Be discriminating - use the full range.
+Score each page on readerImportance (0-100, one decimal place). Be discriminating - use the full range.
 
 Also score each page on SEVEN quality dimensions (0-10 scale, one decimal). BE EXTREMELY HARSH - a 7 is exceptional, 8+ is world-class. Most wiki content should score 3-5.
 
@@ -124,7 +124,7 @@ FULL CONTENT:
 
 Respond with JSON (keep reasoning SHORT - max 2-3 sentences total):
 {
-  "importance": <0-100, one decimal>,
+  "readerImportance": <0-100, one decimal>,
   "ratings": {
     "focus": <0-10, one decimal>,
     "novelty": <0-10, one decimal>,

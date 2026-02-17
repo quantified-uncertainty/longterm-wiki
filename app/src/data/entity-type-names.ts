@@ -42,7 +42,6 @@ const CANONICAL_ENTITY_TYPE_NAMES = [
   "argument",
   "table",
   "diagram",
-  "insight",
   "event",
   "debate",
   "intelligence-paradigm",

@@ -81,11 +81,6 @@ const SCRIPTS = {
     description: 'Content quality ratings (advisory)',
     passthrough: ['ci'],
   },
-  insights: {
-    script: 'validate/validate-insights.ts',
-    description: 'Insight schema and ratings',
-    passthrough: ['ci'],
-  },
   schema: {
     script: 'validate/validate-yaml-schema.ts',
     description: 'YAML schema validation',
@@ -100,6 +95,11 @@ const SCRIPTS = {
     script: 'validate/validate-financials.ts',
     description: 'Financial data staleness and consistency',
     passthrough: ['ci'],
+  },
+  gate: {
+    script: 'validate/validate-gate.ts',
+    description: 'CI-blocking checks (pre-push gate)',
+    passthrough: ['ci', 'full'],
   },
 };
 
@@ -130,6 +130,8 @@ Options:
 
 Examples:
   crux validate                           Run all checks
+  crux validate gate                      Run CI-blocking checks (pre-push)
+  crux validate gate --full               Include full Next.js build
   crux validate compile --quick           Quick compile check
   crux validate unified --rules=dollar-signs,markdown-lists
   crux validate unified --fix             Auto-fix unified rule issues

@@ -1,11 +1,12 @@
 ---
-numericId: E712
+numericId: E739
 title: "Page Type System"
 description: "Comprehensive reference for LongtermWiki's page classification system"
 entityType: internal
 sidebar:
   order: 5
-importance: 5
+readerImportance: 11
+researchImportance: 9.5
 quality: 65
 llmSummary: "Documents LongtermWiki's four-level page classification system (content, stub, documentation, overview) with explicit validation rules for each type, where content pages receive full quality grading while stubs/documentation are excluded from validation pipelines."
 ratings:
@@ -86,7 +87,7 @@ title: "Page Title"
 description: "Brief description for search and previews"
 # pageType: content  # Optional - this is the default
 quality: 45  # Set ONLY by grade-content.mjs
-importance: 60  # How significant for AI safety prioritization
+readerImportance: 60  # How significant for AI safety prioritization
 lastEdited: "2026-01-31"
 llmSummary: "One-sentence summary with key conclusions"
 ratings:
@@ -369,7 +370,7 @@ title: "Deceptive Alignment"
 description: "Risk of AI systems appearing aligned during training but pursuing different goals"
 pageType: content  # Optional - default
 quality: 67
-importance: 85
+readerImportance: 85
 ---
 ```
 

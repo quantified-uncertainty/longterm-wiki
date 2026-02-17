@@ -3,9 +3,9 @@
  *
  * Schedule-aware wiki page update system.
  * Uses `update_frequency` (days) in frontmatter to prioritize which pages
- * need refreshing, combining staleness with importance scoring.
+ * need refreshing, combining staleness with readerImportance scoring.
  *
- * Scoring: priority = staleness × (importance / 100)
+ * Scoring: priority = staleness × (readerImportance / 100)
  *   where staleness = days_since_last_edit / update_frequency
  */
 
@@ -33,7 +33,7 @@ interface UpdateCandidate {
   lastEdited: string;
   daysSinceEdit: number;
   staleness: number;
-  importance: number;
+  readerImportance: number;
   quality: number;
   priority: number;
   overdue: boolean;
@@ -126,12 +126,12 @@ function loadUpdateCandidates(): UpdateCandidate[] {
     }
 
     const staleness = daysSinceEdit / updateFrequency;
-    const importance = Number(fm.importance) || 50;
+    const readerImp = Number(fm.readerImportance) || 50;
     const quality = Number(fm.quality) || 50;
 
-    // priority = staleness × (importance / 100)
+    // priority = staleness × (readerImportance / 100)
     // Pages that are more overdue AND more important float to top
-    const priority = staleness * (importance / 100);
+    const priority = staleness * (readerImp / 100);
 
     candidates.push({
       id: pageId,
@@ -142,7 +142,7 @@ function loadUpdateCandidates(): UpdateCandidate[] {
       lastEdited: lastEditedStr || lastEditedDate.toISOString().slice(0, 10),
       daysSinceEdit,
       staleness: Math.round(staleness * 100) / 100,
-      importance,
+      readerImportance: readerImp,
       quality,
       priority: Math.round(priority * 100) / 100,
       overdue: staleness >= 1.0,
@@ -182,7 +182,7 @@ export async function list(args: string[], options: CommandOptions): Promise<Com
   let output = '';
 
   output += `${c.bold}${c.blue}Wiki Update Queue${c.reset}\n`;
-  output += `${c.dim}Pages ranked by update priority (staleness × importance)${c.reset}\n\n`;
+  output += `${c.dim}Pages ranked by update priority (staleness × readerImportance)${c.reset}\n\n`;
 
   // Summary stats
   const totalTracked = candidates.length;
@@ -206,7 +206,7 @@ export async function list(args: string[], options: CommandOptions): Promise<Com
     output += `${priColor}${String(p.priority.toFixed(1)).padStart(8)}${c.reset}  `;
     output += `${staleColor}${String(p.staleness.toFixed(1)).padStart(5)}${c.reset}  `;
     output += `${String(p.updateFrequency + 'd').padStart(4)}  `;
-    output += `${String(p.importance).padStart(3)}  `;
+    output += `${String(p.readerImportance).padStart(3)}  `;
     output += `${String(p.daysSinceEdit + 'd').padStart(4)}  `;
     output += `${p.title}\n`;
   }
@@ -385,7 +385,7 @@ export async function stats(args: string[], options: CommandOptions): Promise<Co
     if (filePath.endsWith('index.mdx') || filePath.endsWith('index.md')) continue;
 
     totalPages++;
-    if (fm.importance != null) pagesWithImportance++;
+    if (fm.readerImportance != null) pagesWithImportance++;
 
     if (fm.update_frequency != null) {
       const updateFrequency = Number(fm.update_frequency);
@@ -402,8 +402,8 @@ export async function stats(args: string[], options: CommandOptions): Promise<Co
           daysSinceEdit = Math.floor((now.getTime() - new Date(lastEditedStr).getTime()) / (1000 * 60 * 60 * 24));
         }
         const staleness = daysSinceEdit / updateFrequency;
-        const importance = Number(fm.importance) || 50;
-        const priority = staleness * (importance / 100);
+        const readerImp = Number(fm.readerImportance) || 50;
+        const priority = staleness * (readerImp / 100);
         const relPath = relative(CONTENT_DIR_ABS, filePath);
 
         candidates.push({
@@ -462,7 +462,7 @@ export async function stats(args: string[], options: CommandOptions): Promise<Co
   output += `${c.bold}Coverage:${c.reset}\n`;
   output += `  Total content pages: ${totalPages}\n`;
   output += `  Pages with update_frequency: ${pagesWithFrequency} (${statsData.coveragePercent}%)\n`;
-  output += `  Pages with importance score: ${pagesWithImportance}\n`;
+  output += `  Pages with readerImportance score: ${pagesWithImportance}\n`;
   output += `  Currently overdue: ${c.yellow}${overdueCount}${c.reset}\n`;
   output += `  Avg priority score: ${avgPriority}\n`;
   output += `  Avg staleness: ${avgStaleness}×\n\n`;
@@ -602,9 +602,9 @@ export function getHelp(): string {
 Updates Domain - Schedule-aware wiki page update system
 
 Uses update_frequency (days) in page frontmatter to prioritize which
-pages need refreshing, combining staleness with importance scoring.
+pages need refreshing, combining staleness with readerImportance scoring.
 
-  Priority = staleness × (importance / 100)
+  Priority = staleness × (readerImportance / 100)
   Staleness = days_since_last_edit / update_frequency
 
 Commands:
@@ -626,7 +626,7 @@ Options:
 Frontmatter fields:
   update_frequency: 7     # Desired update interval in days
   lastEdited: "2026-01-15"  # Last edit date (used for staleness)
-  importance: 85            # Page importance (0-100, used as weight)
+  readerImportance: 85      # Reader importance (0-100, used as weight)
 
 Cost-aware updating:
   The triage system checks for new developments before committing to
