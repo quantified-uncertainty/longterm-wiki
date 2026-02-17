@@ -2,123 +2,169 @@
  * Wiki sidebar navigation data builders.
  *
  * Server-side only: reads from the database to build NavSection[] arrays
- * for pages that need contextual sidebar navigation (Analytical Models,
- * AI Transition Model, Key Metrics).
+ * for pages that need contextual sidebar navigation.
+ *
+ * Navigation is fully data-driven: section titles come from index page
+ * frontmatter, subcategory groupings are derived from page.subcategory,
+ * and labels are formatted from slugs. No hardcoded section configs.
  *
  * Uses the shared data layer from @/data — no direct fs reads.
  */
 
-import { getEntityHref, getAllPages } from "@/data";
+import { getEntityHref, getAllPages, getPageById } from "@/data";
 import type { NavSection } from "./internal-nav";
 
 // Re-export NavSection so consumers can import from one place
 export type { NavSection } from "./internal-nav";
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
 
 /** Check if a filePath is an index file (should be excluded from sidebar nav). */
 function isIndexFile(filePath: string): boolean {
   return filePath.endsWith("index.mdx") || filePath.endsWith("index.md");
 }
 
-// ============================================================================
-// MODEL CATEGORY LABELS
-// ============================================================================
+/** Convert a kebab-case slug to a Title Case label. */
+function formatLabel(slug: string): string {
+  if (!slug) return slug;
+  return slug
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
-const MODEL_CATEGORY_LABELS: Record<string, string> = {
-  "analysis-models": "Analysis Models",
-  "cascade-models": "Cascade Models",
-  "domain-models": "Domain Models",
-  "dynamics-models": "Dynamics Models",
-  "framework-models": "Framework Models",
-  "governance-models": "Governance Models",
-  "impact-models": "Impact Models",
-  "intervention-models": "Intervention Models",
-  "race-models": "Race Models",
-  "risk-models": "Risk Models",
-  "safety-models": "Safety Models",
-  "societal-models": "Societal Models",
-  "threshold-models": "Threshold Models",
-  "timeline-models": "Timeline Models",
-};
+/** Resolve an index page slug to its /wiki/E<id> URL, with fallback. */
+function indexHref(prefix: string): string {
+  const slug = `__index__/${prefix}`;
+  const resolved = getEntityHref(slug);
+  if (resolved.startsWith("/wiki/E")) return resolved;
+  return `/wiki/${prefix}`;
+}
 
-const MODEL_CATEGORY_ORDER = [
-  "domain-models",
-  "timeline-models",
-  "cascade-models",
-  "societal-models",
-  "risk-models",
-  "framework-models",
-  "analysis-models",
-  "threshold-models",
-  "dynamics-models",
-  "impact-models",
-  "race-models",
-  "intervention-models",
-  "safety-models",
-  "governance-models",
-];
+/**
+ * Look up the index page title for a section.
+ * Falls back to formatting the section key if no index page exists.
+ */
+function getSectionTitle(prefix: string, sectionKey: string): string {
+  const indexSlug = `__index__/${prefix}`;
+  const indexPage = getPageById(indexSlug);
+  return indexPage?.title || formatLabel(sectionKey);
+}
 
 // ============================================================================
-// ANALYTICAL MODELS NAV
+// GENERIC SUBCATEGORY-GROUPED NAV BUILDER
 // ============================================================================
 
-export function getModelsNav(): NavSection[] {
+/**
+ * Build sidebar navigation for any section by reading page data.
+ * Groups pages by subcategory, deriving labels from slugs.
+ * Section title comes from the index page's frontmatter title.
+ */
+function buildSectionNav(
+  filePathPrefix: string,
+  sectionKey: string,
+): NavSection[] {
   const pages = getAllPages().filter(
     (p) =>
       p.filePath &&
-      p.filePath.startsWith("knowledge-base/models/") &&
+      p.filePath.startsWith(`${filePathPrefix}/`) &&
       !isIndexFile(p.filePath)
   );
 
-  // Group by subcategory (set during content flattening)
-  const groups: Record<string, { id: string; title: string }[]> = {};
+  if (pages.length === 0) return [];
+
+  const sectionTitle = getSectionTitle(filePathPrefix, sectionKey);
+
+  // Group pages by subcategory
+  const groups = new Map<string, { id: string; title: string }[]>();
+  const ungrouped: { id: string; title: string }[] = [];
+
   for (const page of pages) {
-    const category = page.subcategory; // e.g., "risk-models"
-    if (!category) continue;
-    if (!groups[category]) groups[category] = [];
-    groups[category].push({ id: page.id, title: page.title });
+    const item = { id: page.id, title: page.title };
+    if (page.subcategory) {
+      const list = groups.get(page.subcategory) || [];
+      list.push(item);
+      groups.set(page.subcategory, list);
+    } else {
+      ungrouped.push(item);
+    }
   }
 
   // Sort items within each group alphabetically
-  for (const key of Object.keys(groups)) {
-    groups[key].sort((a, b) => a.title.localeCompare(b.title));
+  for (const list of groups.values()) {
+    list.sort((a, b) => a.title.localeCompare(b.title));
+  }
+  ungrouped.sort((a, b) => a.title.localeCompare(b.title));
+
+  function toNavItems(items: { id: string; title: string }[]) {
+    return items.map((item) => ({
+      label: item.title,
+      href: getEntityHref(item.id),
+    }));
   }
 
-  // Build sections in specified order
-  const sections: NavSection[] = [];
-  for (const category of MODEL_CATEGORY_ORDER) {
-    const items = groups[category];
-    if (!items || items.length === 0) continue;
-    sections.push({
-      title: MODEL_CATEGORY_LABELS[category] || category,
-      items: items.map((item) => ({
-        label: item.title,
-        href: getEntityHref(item.id),
-      })),
-    });
+  // Top section with overview link
+  const sections: NavSection[] = [
+    {
+      title: sectionTitle,
+      defaultOpen: true,
+      items: [{ label: "Overview", href: indexHref(filePathPrefix) }],
+    },
+  ];
+
+  if (groups.size > 0) {
+    // Build sections sorted alphabetically by subcategory label
+    const sortedGroups = [...groups.entries()].sort((a, b) =>
+      formatLabel(a[0]).localeCompare(formatLabel(b[0]))
+    );
+
+    for (const [subcat, items] of sortedGroups) {
+      sections.push({
+        title: formatLabel(subcat),
+        items: toNavItems(items),
+      });
+    }
+
+    // Uncategorized pages go in "Other"
+    if (ungrouped.length > 0) {
+      sections.push({
+        title: "Other",
+        items: toNavItems(ungrouped),
+      });
+    }
+  } else {
+    // No subcategories — flat list under the section title
+    sections[0].items.push(...toNavItems(ungrouped));
   }
 
   return sections;
 }
 
 // ============================================================================
-// KEY METRICS NAV
+// KNOWLEDGE-BASE SECTION NAV (generic, data-driven)
 // ============================================================================
 
-export function getMetricsNav(): NavSection[] {
-  const pages = getAllPages().filter(
-    (p) =>
-      p.filePath &&
-      p.filePath.startsWith("knowledge-base/metrics/") &&
-      !isIndexFile(p.filePath)
-  );
-
-  const items = pages
-    .map((p) => ({ label: p.title, href: getEntityHref(p.id) }))
-    .sort((a, b) => a.label.localeCompare(b.label));
-
-  return items.length > 0
-    ? [{ title: "Key Metrics", defaultOpen: false, items }]
-    : [];
+/**
+ * Build sidebar navigation for a knowledge-base section.
+ * Reads section title from the index page, groups by subcategory,
+ * and derives all labels from the page data.
+ *
+ * @param defaultOpen - Whether sections start expanded (default: true).
+ *   Set to false for secondary sections like metrics in the combined reference nav.
+ */
+export function getKbSectionNav(
+  sectionKey: string,
+  defaultOpen = true,
+): NavSection[] {
+  const nav = buildSectionNav(`knowledge-base/${sectionKey}`, sectionKey);
+  if (!defaultOpen && nav.length > 0) {
+    for (const section of nav) {
+      section.defaultOpen = false;
+    }
+  }
+  return nav;
 }
 
 // ============================================================================
@@ -204,14 +250,6 @@ export function getAtmNav(): NavSection[] {
   }
 
   return sections;
-}
-
-// ============================================================================
-// COMBINED REFERENCE NAV (Models + Metrics)
-// ============================================================================
-
-export function getReferenceNav(): NavSection[] {
-  return [...getModelsNav(), ...getMetricsNav()];
 }
 
 // ============================================================================
@@ -312,7 +350,7 @@ export function getInternalNav(): NavSection[] {
 // DETECT WHICH SIDEBAR TO SHOW
 // ============================================================================
 
-export type WikiSidebarType = "models" | "atm" | "internal" | null;
+export type WikiSidebarType = "models" | "atm" | "internal" | "kb" | null;
 
 /**
  * Determine which sidebar to show based on the entity path.
@@ -321,6 +359,9 @@ export type WikiSidebarType = "models" | "atm" | "internal" | null;
 export function detectSidebarType(entityPath: string): WikiSidebarType {
   if (!entityPath) return null;
 
+  // Models and metrics get a combined reference sidebar.
+  // Must check before the generic /knowledge-base/ pattern below,
+  // otherwise these paths would match the broader "kb" type.
   if (
     entityPath.startsWith("/knowledge-base/models/") ||
     entityPath.startsWith("/knowledge-base/metrics/")
@@ -336,35 +377,51 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
     return "internal";
   }
 
+  // Any knowledge-base subsection gets a sidebar (no hardcoded list needed)
+  if (entityPath.startsWith("/knowledge-base/")) {
+    const parts = entityPath.split("/").filter(Boolean);
+    if (parts.length >= 2) {
+      return "kb";
+    }
+  }
+
   return null;
 }
 
 /**
- * Get the nav sections for a given sidebar type.
+ * Extract the KB section key from an entity path.
+ * e.g., "/knowledge-base/risks/scheming" → "risks"
  */
-export function getWikiNav(type: WikiSidebarType): NavSection[] {
+export function extractKbSection(entityPath: string): string | null {
+  if (!entityPath.startsWith("/knowledge-base/")) return null;
+  const parts = entityPath.split("/").filter(Boolean);
+  return parts.length >= 2 ? parts[1] : null;
+}
+
+/**
+ * Get the nav sections for a given sidebar type.
+ * For "kb" type, entityPath is required to determine which section.
+ */
+export function getWikiNav(
+  type: WikiSidebarType,
+  entityPath?: string,
+): NavSection[] {
   switch (type) {
     case "models":
-      return getReferenceNav();
+      // Combined models + metrics sidebar; metrics collapsed by default
+      return [
+        ...getKbSectionNav("models"),
+        ...getKbSectionNav("metrics", false),
+      ];
     case "atm":
       return getAtmNav();
     case "internal":
       return getInternalNav();
+    case "kb": {
+      const section = entityPath ? extractKbSection(entityPath) : null;
+      return section ? getKbSectionNav(section) : [];
+    }
     default:
       return [];
-  }
-}
-
-/**
- * Get the sidebar title for a given sidebar type.
- */
-function getWikiSidebarTitle(type: WikiSidebarType): string {
-  switch (type) {
-    case "models":
-      return "Reference";
-    case "atm":
-      return "AI Transition Model";
-    default:
-      return "";
   }
 }
