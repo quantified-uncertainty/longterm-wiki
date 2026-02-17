@@ -1003,30 +1003,6 @@ function main() {
   console.log(`  pages: ${pages.length} pages (${pagesWithQuality} with quality ratings)`);
   console.log(`  unconvertedLinks: ${totalUnconvertedLinks} links across ${pagesWithUnconvertedLinks} pages`);
 
-  // Load insights from src/data/insights/*.yaml
-  const insightsDir = join(DATA_DIR, 'insights');
-  const insightsList = [];
-  if (existsSync(insightsDir)) {
-    const insightFiles = readdirSync(insightsDir).filter(f => f.endsWith('.yaml'));
-    for (const file of insightFiles) {
-      const filepath = join(insightsDir, file);
-      const content = readFileSync(filepath, 'utf-8');
-      const parsed = parse(content);
-      if (parsed?.insights) {
-        for (const insight of parsed.insights) {
-          // Compute composite score if not present
-          if (insight.composite == null) {
-            const scores = [insight.surprising, insight.important, insight.actionable, insight.neglected, insight.compact].filter(v => v != null);
-            insight.composite = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
-          }
-          insightsList.push(insight);
-        }
-      }
-    }
-    console.log(`  insights: ${insightsList.length} insights from ${insightFiles.length} files`);
-  }
-  database.insights = insightsList;
-
   // Transform entities into typed entities (build-time transformation)
   console.log('\nTransforming entities...');
   const typedEntities = transformEntities(

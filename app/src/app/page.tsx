@@ -89,7 +89,6 @@ export default function Home() {
   const allItems = getExploreItems().filter(
     (item) =>
       !item.type.startsWith("ai-transition-model") &&
-      item.type !== "insight" &&
       item.type !== "table" &&
       item.type !== "diagram"
   );

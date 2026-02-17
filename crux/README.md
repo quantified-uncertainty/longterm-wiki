@@ -30,8 +30,6 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 │   ├── content.ts        Page authoring (improve, create, grade)
 │   ├── generate.ts       Content generation (YAML, summaries, diagrams)
 │   ├── resources.ts      External resource management
-│   ├── insights.ts       Insight quality management
-│   ├── gaps.ts           Insight gap analysis
 │   └── updates.ts        Schedule-aware page update system
 │
 ├── authoring/            Page authoring scripts (invoked by content domain)
@@ -72,8 +70,6 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 | **content** | `content/docs/`, `app/src/data/pages.json` | `content/docs/`, `.claude/temp/` |
 | **generate** | `data/`, `content/docs/` | `data/`, `content/docs/` |
 | **resources** | `data/resources/` | `data/resources/` |
-| **insights** | `data/insights/` | `data/insights/` |
-| **gaps** | `data/insights/`, `content/docs/` | stdout |
 | **updates** | `content/docs/` frontmatter | invokes `content improve` |
 
 ## Domain Reference
@@ -84,8 +80,6 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 - **content** — AI-powered page creation, improvement, and grading pipelines
 - **generate** — Generate YAML entities, summaries, diagrams, schema docs
 - **resources** — Manage external resource links in `data/resources/`
-- **insights** — Check and manage insight quality in `data/insights/`
-- **gaps** — Find pages that need insights or have coverage gaps
 - **updates** — Schedule-aware update queue using `update_frequency` frontmatter
 
 ## How to Add a Validation Rule

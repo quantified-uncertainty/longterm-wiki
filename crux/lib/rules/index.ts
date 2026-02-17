@@ -18,7 +18,6 @@ import { fakeUrlsRule } from './fake-urls.ts';
 import { internalLinksRule } from './internal-links.ts';
 import { componentRefsRule } from './component-refs.ts';
 import { preferEntityLinkRule } from './prefer-entitylink.ts';
-import { entityMentionsRule } from './entity-mentions.ts';
 
 // Sidebar/structure rules
 import { sidebarCoverageRule } from './sidebar-coverage.ts';
@@ -46,7 +45,6 @@ import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { numericIdIntegrityRule } from './numeric-id-integrity.ts';
 
 // Quality validation rules
-import { qualitySourceRule } from './quality-source.ts';
 import { temporalArtifactsRule } from './temporal-artifacts.ts';
 import { editorialArtifactsRule } from './editorial-artifacts.ts';
 import { outdatedNamesRule } from './outdated-names.ts';
@@ -57,7 +55,7 @@ import { factConsistencyRule } from './fact-consistency.ts';
 // Squiggle model quality
 import { squiggleQualityRule } from './squiggle-quality.ts';
 
-// Content quality warning rules (3-step grading pipeline)
+// Content quality warning rules (used by grading pipeline)
 import { insiderJargonRule } from './insider-jargon.ts';
 import { falseCertaintyRule } from './false-certainty.ts';
 import { prescriptiveLanguageRule } from './prescriptive-language.ts';
@@ -75,12 +73,6 @@ import { footnoteCoverageRule } from './footnote-coverage.ts';
 // Citation accuracy
 import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
 
-// False attribution detection
-import { humanAttributionRule } from './human-attribution.ts';
-
-// Diagram style compliance
-import { mermaidStyleRule } from './mermaid-style.ts';
-
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -93,7 +85,6 @@ export {
   internalLinksRule,
   componentRefsRule,
   preferEntityLinkRule,
-  entityMentionsRule,
   sidebarCoverageRule,
   sidebarIndexRule,
   jsxInMdRule,
@@ -107,7 +98,6 @@ export {
   externalLinksRule,
   frontmatterSchemaRule,
   numericIdIntegrityRule,
-  qualitySourceRule,
   temporalArtifactsRule,
   editorialArtifactsRule,
   outdatedNamesRule,
@@ -121,10 +111,8 @@ export {
   squiggleQualityRule,
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
-  humanAttributionRule,
   footnoteCoverageRule,
   citationDoiMismatchRule,
-  mermaidStyleRule,
 };
 
 export const allRules: Rule[] = [
@@ -138,7 +126,6 @@ export const allRules: Rule[] = [
   internalLinksRule,
   componentRefsRule,
   preferEntityLinkRule,
-  entityMentionsRule,
   sidebarCoverageRule,
   sidebarIndexRule,
   jsxInMdRule,
@@ -152,7 +139,6 @@ export const allRules: Rule[] = [
   externalLinksRule,
   frontmatterSchemaRule,
   numericIdIntegrityRule,
-  qualitySourceRule,
   temporalArtifactsRule,
   editorialArtifactsRule,
   outdatedNamesRule,
@@ -166,10 +152,8 @@ export const allRules: Rule[] = [
   squiggleQualityRule,
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
-  humanAttributionRule,
   footnoteCoverageRule,
   citationDoiMismatchRule,
-  mermaidStyleRule,
 ];
 
 export default allRules;
