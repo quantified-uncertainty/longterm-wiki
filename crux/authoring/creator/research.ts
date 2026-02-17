@@ -4,8 +4,14 @@
  * Handles Perplexity and SCRY research phases.
  */
 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { batchResearch, generateResearchQueries } from '../../lib/openrouter.ts';
 import type { BatchResearchResult, ResearchQuery } from '../../lib/openrouter.ts';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 interface ResearchContext {
   log: (phase: string, message: string) => void;
@@ -84,17 +90,34 @@ export async function runPerplexityResearch(topic: string, depth: string, { log,
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error(String(err));
     log('research', `Warning: Perplexity research failed: ${error.message}`);
-    log('research', 'Continuing with empty research — synthesis will use available data only');
-    saveResult(topic, 'perplexity-research.json', {
-      topic,
-      depth,
-      queryCount: queries.length,
-      totalCost: 0,
-      timestamp: new Date().toISOString(),
-      sources: [],
-      skipped: true,
-      skipReason: `Network error: ${error.message}`,
-    });
+
+    // Preserve existing research data if it has real sources (e.g. manually injected)
+    const sanitized = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const existingPath = path.join(__dirname, '../../..', '.claude/temp/page-creator', sanitized, 'perplexity-research.json');
+    let hasExistingSources = false;
+    try {
+      if (fs.existsSync(existingPath)) {
+        const existing = JSON.parse(fs.readFileSync(existingPath, 'utf-8'));
+        if (existing.sources && existing.sources.length > 0 && !existing.skipped) {
+          hasExistingSources = true;
+          log('research', `Preserving existing research data (${existing.sources.length} sources)`);
+        }
+      }
+    } catch { /* ignore parse errors */ }
+
+    if (!hasExistingSources) {
+      log('research', 'Continuing with empty research — synthesis will use available data only');
+      saveResult(topic, 'perplexity-research.json', {
+        topic,
+        depth,
+        queryCount: queries.length,
+        totalCost: 0,
+        timestamp: new Date().toISOString(),
+        sources: [],
+        skipped: true,
+        skipReason: `Network error: ${error.message}`,
+      });
+    }
     return { success: true, cost: 0, queryCount: 0 };
   }
 

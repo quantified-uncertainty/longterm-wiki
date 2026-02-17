@@ -3626,3 +3626,64 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+- id: state-capacity-ai-governance
+  type: concept
+  title: State Capacity and AI Governance
+  customFields:
+    - label: Core Concept
+      value: Government's ability to implement and enforce AI policy effectively
+    - label: Key Challenge
+      value: Gap between AI acceleration and governance capacity
+    - label: Key Thinker
+      value: Jennifer Pahlka (Code for America, USDS)
+  relatedEntries:
+    - id: compute-governance
+      type: policy
+    - id: ai-safety-institutes
+      type: policy
+    - id: recoding-america
+      type: resource
+  sources:
+    - title: Recoding America - Jennifer Pahlka
+      url: https://www.recodingamerica.us/
+      author: Jennifer Pahlka
+    - title: Pahlka Senate Testimony on AI in Government
+      url: https://fas.org/publication/pahlka-testifies-ai-govt-services/
+      author: Federation of American Scientists
+      date: January 2024
+    - title: AI Meets the Cascade of Rigidity
+      url: https://www.niskanencenter.org/ai-meets-the-cascade-of-rigidity/
+      author: Niskanen Center
+  description: >-
+    State capacity — the ability of government to implement its policy goals — is a binding constraint on AI governance.
+    Without technical expertise, institutional agility, and implementation capacity, even well-designed AI regulations risk
+    being toothless or counterproductive.
+  lastUpdated: 2026-02
+- id: recoding-america
+  type: resource
+  title: "Recoding America"
+  customFields:
+    - label: Author
+      value: Jennifer Pahlka
+    - label: Published
+      value: "2023"
+    - label: Publisher
+      value: Metropolitan Books / Henry Holt
+    - label: Core Thesis
+      value: Government technology failures stem from institutional culture separating policy from implementation
+  relatedEntries:
+    - id: state-capacity-ai-governance
+      type: concept
+    - id: compute-governance
+      type: policy
+  sources:
+    - title: Recoding America Official Website
+      url: https://www.recodingamerica.us/
+      author: Jennifer Pahlka
+    - title: "Recoding America: A Rallying Cry for State Capacity"
+      url: https://modernpower.substack.com/p/recoding-america-a-rallying-cry-for
+      author: Modern Power
+  description: >-
+    A 2023 book by Jennifer Pahlka arguing that government digital failures stem from institutional culture that separates
+    policy from implementation, creating a "cascade of rigidity" with implications for AI governance and state capacity.
+  lastUpdated: 2026-02

@@ -1,0 +1,220 @@
+---
+title: State Capacity and AI Governance
+description: Analysis of government capacity to implement AI policy, from civic
+  tech institutions to regulatory expertise gaps
+importance: 72
+lastEdited: "2026-02-17"
+sidebar:
+  order: 50
+ratings:
+  novelty: 7
+  rigor: 8
+  actionability: 7
+  completeness: 8
+quality: 75
+llmSummary: This article argues that government capacity to implement AI policy
+  is critically lagging behind AI development, creating an existential risk
+  through institutional erosion rather than just technical failure. It documents
+  the civic tech ecosystem's efforts to build this capacity and how recent
+  political disruptions (DOGE) have undermined it, while providing concrete
+  frameworks for understanding what effective AI governance requires.
+---
+import {EntityLink, R, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+<DataInfoBox>
+| Dimension | Assessment |
+|-----------|------------|
+| **Core Concept** | Government's ability to implement and enforce AI policy effectively |
+| **Key Challenge** | Gap between exponential AI acceleration and linear growth in governance capacity |
+| **Diagnostic Example** | Healthcare.gov collapse, COVID unemployment systems failures |
+| **Institutional Response** | Civic tech ecosystem (USDS, 18F, Code for America) |
+| **Current Status** | Deteriorating—DOGE initiative dismantled much of federal civic tech capacity |
+| **Scale of Need** | Estimated ≈300 excellent AI experts needed in government advisory/regulatory roles |
+| **Political Dimension** | Tension between state capacity libertarianism and laissez-faire approaches |
+</DataInfoBox>
+
+<DataExternalLinks
+  wikipedia="https://en.wikipedia.org/wiki/State_capacity"
+  officialSites={[
+    {name: "Code for America", url: "https://www.codeforamerica.org/"},
+    {name: "Recoding America (Pahlka)", url: "https://www.recodingamerica.us/"}
+  ]}
+/>
+
+## Overview
+
+State capacity refers to a government's ability to achieve its policy goals—to actually implement and deliver, not just legislate. In the context of <EntityLink id="E154">AI governance</EntityLink>, this concept has become increasingly important as governments attempt to regulate AI systems that are orders of magnitude more complex than previous technologies.[^1]
+
+The contrast between exponential growth of disruptive technology and the supply of governance mechanisms is starkest in the fields of digital governance and AI. Jennifer Pahlka, founder of Code for America and former U.S. Deputy Chief Technology Officer, argued in her 2023 book *Recoding America* that the separation between policy and implementation is "both false and self-defeating," rooted in an elitist view that implementation is beneath the people who make policy.[^2] Government is trapped in rigid, compliance-driven processes rather than agile, outcome-oriented approaches. The internet era coincided with a decline in state capacity; the AI era, Pahlka argues, must see a reversal of this trend.
+
+The challenge is acute: if governments cannot build functional IT systems—as seen in Healthcare.gov's initial collapse and state unemployment systems crashing during COVID—they face even greater challenges overseeing AI systems. <EntityLink id="E64">Compute governance</EntityLink>, algorithmic auditing, safety evaluations, and transparency requirements all require government staff who understand the technology. Without that capacity, regulation risks being either toothless or counterproductive.[^3]
+
+## The AI Governance Capacity Gap
+
+### Technical Expertise Deficit
+
+In January 2024 Senate testimony, Pahlka argued the success or failure of AI in government "comes down to how much capacity and competency we have to deploy these technologies thoughtfully."[^4] She warned against applying red tape to benign uses while lacking capacity to evaluate genuinely risky ones—a misallocation that could simultaneously slow beneficial innovation and fail to address genuine safety concerns.
+
+The capacity gap has multiple dimensions:
+
+**Technical understanding**: Regulation requires the ability to enforce—<EntityLink id="E64">compute governance</EntityLink>, algorithmic auditing, safety evaluations, and transparency requirements all require government staff who understand not just policy but the underlying technology. The kind of expertise needed to evaluate <EntityLink id="E270">capability sandbagging</EntityLink> or detect <EntityLink id="E93">deceptive alignment</EntityLink> in AI systems is fundamentally different from traditional regulatory expertise.
+
+**Implementation capacity**: Even well-crafted legislation may fail without deliberate investment in transparency and talent. The 2025 AI Safety Index from the Future of Life Institute found the industry "fundamentally unprepared for its own stated goals"—companies claim AGI within the decade but lack sufficient safety preparedness.[^5] Government oversight of this gap requires exactly the kind of technical capacity that is currently missing.
+
+**Scale mismatch**: Ezra Klein has argued government needs approximately 300 excellent AI experts in advisory, regulatory, and auditing roles.[^6] This represents not just a staffing challenge but a fundamental capacity-building exercise in an area where government has historically struggled to compete with private sector compensation and prestige.
+
+### State-Level Challenges
+
+385 AI bills were introduced across U.S. states in the 2025 legislative session.[^7] But states lack the AI expertise found in federal agencies or major private employers. Even well-crafted legislation like <EntityLink id="E48">California SB 1047</EntityLink> or <EntityLink id="E602">Texas TRAIGA</EntityLink> may fail without deliberate investment in implementation capacity and talent.
+
+The Centre for International Governance Innovation has framed the gap between AI acceleration and governance capacity as itself an existential risk vector, arguing that the "accumulative" pathway to AI catastrophe—gradual erosion of institutional capacity to manage AI-induced threats—is as dangerous as a sudden AGI scenario.[^8]
+
+## The Civic Technology Ecosystem
+
+### Institutional Infrastructure
+
+A network of organizations has emerged to build government technology capacity:
+
+**Code for America** (founded 2010 by Jennifer Pahlka) helps over 100 government agencies improve digital service delivery.[^9] The organization pioneered the model of bringing technology talent into government for tours of duty.
+
+**U.S. Digital Service** (USDS, founded 2014) is a White House unit focused on administration priorities, born from the Healthcare.gov rescue. It established the precedent of bringing top technologists into government for fixed terms to work on critical problems.
+
+**18F** (founded 2014) was a GSA unit providing agile development and user-centered design to agencies. The unit became a training ground for government technologists, with 85% of departing 18F staff in 2023 moving to other government technology positions.[^10]
+
+**Nava PBC** builds government technology as a public benefit corporation, demonstrating that private entities can work on government technology problems while maintaining a mission-driven focus.
+
+**U.S. Digital Response** (founded 2020 by Pahlka) deployed volunteer technologists during the COVID crisis, showcasing the potential for rapid capacity mobilization during emergencies.
+
+**Federation of American Scientists**, where Pahlka is now a Senior Fellow, works on AI in government, connecting the civic tech ecosystem with AI governance concerns.
+
+These organizations form a deeply interconnected ecosystem, creating a talent pipeline and shared practices for government technology work. The model they established—bringing in technologists for tours of duty, focusing on user-centered design, and building agile development capacity—represents exactly the kind of institutional capacity needed for AI oversight.
+
+### The DOGE Disruption
+
+The Department of Government Efficiency (DOGE) initiative in 2025-2026 provides a cautionary example of what happens when technology is deployed without state capacity. DOGE fired or scattered much of the civic tech workforce, dismantled 18F, and then used AI tools (the "DOGE AI Deregulation Decision Tool") to scan 200,000 federal rules for elimination—precisely the kind of crude, capacity-poor approach that Pahlka's framework warns against.[^11]
+
+A whistleblower complaint revealed DOGE uploaded sensitive Social Security data of 300+ million Americans to unsecured servers.[^12] This illustrates the risk of deploying AI systems without the institutional capacity, expertise, and oversight structures needed to do so responsibly. The incident demonstrates how attempts to use AI to "improve" government efficiency can backfire catastrophically when they bypass the very capacity structures needed for responsible technology deployment.
+
+The dismantling of the civic tech infrastructure is particularly concerning given the emerging AI governance challenges. The kinds of technologists USDS and 18F had been hiring—service designers, product managers, data engineers—are exactly what is needed for AI oversight, but at far greater scale.
+
+## Political Frameworks and State Capacity
+
+### State Capacity Libertarianism
+
+Tyler Cowen coined "State Capacity Libertarianism" in 2020, arguing for a minimal but highly capable government.[^13] His position on AI risk is "radical agnosticism," but critics have argued his own state capacity framework implies that laissez-faire is inadequate for AI risk—if AGI is "effectively the most powerful weapon man has ever created," you need reliable command and control, not just market dynamics.
+
+The framework suggests that even those skeptical of extensive government intervention should support building the capacity for effective intervention when it is necessary. The question shifts from "should government regulate AI?" to "does government have the capacity to regulate AI effectively if it needs to?"
+
+### The Governance vs. Self-Governance Debate
+
+Holden Karnofsky, co-founder of <EntityLink id="E552">Open Philanthropy</EntityLink>, has argued "there's no way to get to an actual low-level risk from AI without government policy playing an important role" and that escaping race dynamics requires universal rules.[^14] His preferred sequence: voluntary company-level commitments first (like <EntityLink id="E22">Anthropic</EntityLink>'s Responsible Scaling Policy), then government regulation builds on top of that foundation.
+
+This approach acknowledges both the need for government capacity and the current limitations. Industry self-governance can establish practices and norms that later regulation can formalize and universalize—but only if government has the capacity to understand, evaluate, and enforce those norms when they become regulation.
+
+### The Cascade of Rigidity
+
+The Niskanen Center has published Pahlka's work on "AI meets the cascade of rigidity," arguing that the same institutional dynamics that trapped government in waterfall-mode IT will hamper AI adoption and oversight unless actively reformed.[^15] The problem is not just lack of technical expertise but the structural impediments that make it difficult for government to act with the speed and flexibility that AI governance may require.
+
+Government procurement rules, personnel systems, and accountability structures were designed for an earlier era. They create what Pahlka calls a "cascade of rigidity"—each layer of process and compliance adding more constraints, until the system becomes nearly incapable of adapting to new challenges. This suggests that building AI governance capacity requires not just hiring more technical experts but fundamentally reforming how government operates.
+
+## Building Capacity for AI Oversight
+
+### Institutional Reform
+
+Pahlka has called for a "clear-eyed leapfrog" into a government operating model fit for the AI era, rather than bolting AI onto industrial-era bureaucracy.[^16] This would require:
+
+**Process reform**: Moving from rigid, compliance-driven processes to agile, outcome-oriented approaches. This doesn't mean abandoning accountability but reimagining how accountability works in a fast-moving technical domain.
+
+**Talent pipeline**: Creating career paths that make government technology work attractive to top technical talent. This includes competitive compensation, opportunities for meaningful impact, and pathways between government and private sector that don't stigmatize either direction of movement.
+
+**Technical infrastructure**: Building the institutional capacity to understand and evaluate AI systems. This includes compute resources for independent testing, access to training data and model internals, and the methodological expertise to conduct meaningful audits.
+
+**Regulatory experimentation**: Developing the capacity to test different governance approaches and learn from results, rather than locking in approaches that may prove inadequate.
+
+### Scale and Urgency
+
+Klein and Derek Thompson's "Abundance" framework argues for building government effectiveness as a prerequisite for managing technological change.[^17] This suggests the capacity-building challenge is not peripheral but central to navigating the AI transition safely.
+
+The timeline is challenging. If AI capabilities continue to advance rapidly, the window for building adequate governance capacity may be narrow. Yet capacity-building is inherently slow—it requires not just hiring people but building institutions, establishing practices, and creating the organizational culture that enables effective action.
+
+## Key Uncertainties
+
+**Capacity threshold**: How much state capacity is actually needed for safe AI governance? Klein's estimate of 300 excellent experts may be orders of magnitude too low if AI systems become as complex and consequential as some predict. Alternatively, with the right institutional design, effective governance might be possible with fewer but better-positioned people.
+
+**Speed of capacity building**: Can government capacity grow fast enough to keep pace with AI capabilities? The civic tech ecosystem took over a decade to establish, and DOGE disrupted much of it in months. Whether capacity-building or capacity-destruction is faster has major implications for AI safety trajectories.
+
+**Institutional design**: What organizational structures enable effective AI governance? Should capacity be centralized in specialized agencies, distributed across existing regulators, or some hybrid? Different structures have different strengths and weaknesses for handling fast-moving technical challenges.
+
+**International dimension**: While much discussion focuses on U.S. state capacity, AI governance is inherently international. How do capacity disparities between countries affect global governance prospects? Can international institutions provide capacity where national governments lack it?
+
+**Public vs. private capacity**: Should government build in-house capacity or rely on partnerships with private sector organizations (like Nava PBC) or academic institutions? Each approach has different scaling properties and different risks.
+
+**Measurement and accountability**: How do we measure whether governance capacity is adequate? What metrics distinguish between capacity that looks impressive on paper and capacity that can actually implement and enforce policy effectively?
+
+## Implications for AI Safety Strategy
+
+The state capacity framing suggests several strategic considerations for AI safety work:
+
+**Capacity-building as intervention**: Efforts to build government technical capacity may be as important as research on AI alignment or safety techniques. Without implementation capacity, even excellent policy ideas remain merely theoretical.
+
+**Sequencing matters**: Karnofsky's preferred sequence—voluntary company commitments followed by government regulation—implicitly acknowledges that government capacity needs time to develop. This suggests AI safety strategies should consider not just what governance is ultimately needed but what trajectory of capacity-building makes that governance achievable.
+
+**Field-building scope**: <EntityLink id="E141">AI safety field-building</EntityLink> typically focuses on research capacity, but governance capacity may be equally important. The skills needed—policy analysis, institutional design, regulatory expertise, technical-policy translation—are different from traditional AI safety research but potentially as important for outcomes.
+
+**Vulnerability to disruption**: The DOGE example shows that governance capacity can be destroyed faster than it can be built. This creates a ratchet effect—periods of capacity-destruction may be difficult to reverse. This suggests that protecting existing governance institutions may be as important as building new ones.
+
+**Crisis as opportunity**: U.S. Digital Response's founding during COVID shows that crises can enable rapid capacity mobilization. If an AI-related incident creates demand for governance capacity, having the organizational templates and talent networks ready to activate quickly could be crucial.
+
+## Criticisms and Limitations
+
+### Over-emphasis on Technical Capacity
+
+Some critics argue the focus on technical capacity misses that AI governance challenges are fundamentally political, not technical. Having experts who understand transformer architectures doesn't necessarily help resolve value conflicts about how AI should be governed or whose interests should be prioritized.
+
+### Elite Technocracy Concerns
+
+The civic tech model of bringing in outside experts for tours of duty has been criticized as elitist and potentially undemocratic. Career civil servants may have institutional knowledge that tour-of-duty technologists lack. There's a tension between the need for technical expertise and the democratic legitimacy of governance institutions.
+
+### Narrow Window Assumption
+
+The framing assumes there's a window during which capacity can be built before AI capabilities reach concerning levels. If AI capabilities advance faster than expected, or if the threshold for dangerous capabilities is lower than assumed, capacity-building approaches may be too slow to matter.
+
+### International Blind Spots
+
+Most discussion of state capacity and AI governance focuses on the United States. But AI development is international, and U.S. state capacity may be irrelevant if other countries lack similar capacity and become sites of AI development or deployment.
+
+## Sources
+
+[^1]: [The Existential Gap: Digital/AI Acceleration and Missing Global Governance Capacity](https://www.cigionline.org/articles/existential-gap-digitalai-acceleration-and-the-missing-global-governance-capacity/) - Centre for International Governance Innovation
+
+[^2]: [Recoding America - Jennifer Pahlka](https://www.recodingamerica.us/)
+
+[^3]: [Pahlka Senate Testimony on AI in Government Services](https://fas.org/publication/pahlka-testifies-ai-govt-services/) - Federation of American Scientists, January 2024
+
+[^4]: [Pahlka Senate Testimony on AI in Government Services](https://fas.org/publication/pahlka-testifies-ai-govt-services/) - Federation of American Scientists, January 2024
+
+[^5]: [AI Safety Index Summer 2025](https://futureoflife.org/ai-safety-index-summer-2025/) - Future of Life Institute
+
+[^6]: [Ezra Klein on AI and Washington DC](https://80000hours.org/podcast/episodes/ezra-klein-ai-and-dc/) - <EntityLink id="E510">80,000 Hours</EntityLink> Podcast
+
+[^7]: [Why AI Policy Thrives in Some States and Fades in Others](https://www.brookings.edu/articles/why-ai-policy-thrives-in-some-states-and-fades-in-others/) - Brookings Institution
+
+[^8]: [The Existential Gap: Digital/AI Acceleration and Missing Global Governance Capacity](https://www.cigionline.org/articles/existential-gap-digitalai-acceleration-and-the-missing-global-governance-capacity/) - Centre for International Governance Innovation
+
+[^9]: [Code for America](https://www.codeforamerica.org/)
+
+[^10]: [18F Wikipedia Entry](https://en.wikipedia.org/wiki/18F)
+
+[^11]: [100 Days of DOGE: Assessing Its Use of Data and AI](https://www.techpolicy.press/100-days-of-doge-assessing-its-use-of-data-and-ai-to-reshape-government/) - Tech Policy Press
+
+[^12]: [100 Days of DOGE: Assessing Its Use of Data and AI](https://www.techpolicy.press/100-days-of-doge-assessing-its-use-of-data-and-ai-to-reshape-government/) - Tech Policy Press
+
+[^13]: [What Libertarianism Has Become and Will Become: State Capacity Libertarianism](https://marginalrevolution.com/marginalrevolution/2020/01/what-libertarianism-has-become-and-will-become-state-capacity-libertarianism.html) - Tyler Cowen, Marginal Revolution, January 2020
+
+[^14]: [Holden Karnofsky on Concrete AI Safety at Frontier AI Companies](https://80000hours.org/podcast/episodes/holden-karnofsky-concrete-ai-safety-frontier-ai-companies/) - <EntityLink id="E510">80,000 Hours</EntityLink> Podcast
+
+[^15]: [AI Meets the Cascade of Rigidity](https://www.niskanencenter.org/ai-meets-the-cascade-of-rigidity/) - Niskanen Center
+
+[^16]: [Jennifer Pahlka on Reforming Government for the AI Era](https://www.bluemeridian.org/media/jennifer-pahlka-on-reforming-government-for-the-ai-era/) - Blue Meridian Partners
+
+[^17]: [Jennifer Pahlka on Reforming Government for the AI Era](https://www.bluemeridian.org/media/jennifer-pahlka-on-reforming-government-for-the-ai-era/) - Blue Meridian Partners
