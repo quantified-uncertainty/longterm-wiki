@@ -117,6 +117,10 @@ function parseSinceOption(options: CommandOptions): string {
   if (!DATE_FORMAT.test(since)) {
     throw new Error(`Invalid --since date format: "${since}". Expected YYYY-MM-DD.`);
   }
+  // Validate it's an actual date (regex alone allows 2026-99-99)
+  if (isNaN(new Date(since).getTime())) {
+    throw new Error(`Invalid date: "${since}". The format is correct but the date doesn't exist.`);
+  }
   return since;
 }
 
@@ -233,7 +237,7 @@ async function reviewPrs(_args: string[], options: CommandOptions): Promise<Comm
 
   // Fetch merged PRs
   const prsData = await githubApi<GitHubPullResponse[]>(
-    `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=50`
+    `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=100`
   );
 
   if (!Array.isArray(prsData)) {
@@ -382,7 +386,7 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
 
   // Fetch recent merged PRs to cross-reference
   const prsData = await githubApi<GitHubPullResponse[]>(
-    `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=50`
+    `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=100`
   );
 
   // Build searchable text from PR titles and session logs
@@ -410,8 +414,8 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
     const daysInactive = daysSince(issue.updatedAt);
     const issueNum = `#${issue.number}`;
 
-    // Check by issue number (exact match — high confidence)
-    const referencedByNumber = combinedSearchText.includes(issueNum);
+    // Check by issue number (word-boundary match — high confidence)
+    const referencedByNumber = new RegExp(`#${issue.number}\\b`).test(combinedSearchText);
     // Check by title word overlap (fuzzy — moderate confidence)
     const referencedByTitle = isLikelyReferenced(issue.title, combinedSearchText);
 
@@ -675,6 +679,16 @@ async function report(args: string[], options: CommandOptions): Promise<CommandR
     const prResult = await reviewPrs(args, { ...options, json: true });
     const issueResult = await triageIssues(args, { ...options, json: true });
     const cruftResult = await detectCruft(args, { ...options, json: true });
+
+    // Guard against sub-commands failing with non-JSON error output
+    if (prResult.exitCode !== 0 || issueResult.exitCode !== 0 || cruftResult.exitCode !== 0) {
+      const errors = [
+        prResult.exitCode !== 0 && `PR review: ${prResult.output.slice(0, 200)}`,
+        issueResult.exitCode !== 0 && `Issue triage: ${issueResult.output.slice(0, 200)}`,
+        cruftResult.exitCode !== 0 && `Cruft detection: ${cruftResult.output.slice(0, 200)}`,
+      ].filter(Boolean);
+      return { output: `One or more sub-reports failed:\n${errors.join('\n')}`, exitCode: 1 };
+    }
 
     const combined = {
       timestamp: new Date().toISOString(),
