@@ -23,6 +23,8 @@ pnpm crux validate               # Run all validation checks
 pnpm crux --help                 # Show all CLI domains
 pnpm crux content improve <id>   # Improve a wiki page
 pnpm crux edit-log view <id>     # View edit history for a page
+pnpm crux maintain               # Run maintenance sweep (PRs, issues, cruft)
+pnpm crux maintain status        # Check when maintenance last ran
 ```
 
 ## Repository Structure
