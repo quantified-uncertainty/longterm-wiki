@@ -168,13 +168,13 @@ function ContentMeta({
             History
           </a>
         )}
-        {!isInternal && numId && (
+        {numId && (
           <a href={`/wiki/${numId}/data`} className="page-meta-github">
             <Database size={14} />
             Data
           </a>
         )}
-        {!isInternal && <PageFeedback pageTitle={pageTitle} pageSlug={slug} />}
+        <PageFeedback pageTitle={pageTitle} pageSlug={slug} />
         {!isInternal && <InfoBoxToggle />}
       </div>
     </div>
@@ -235,32 +235,30 @@ function ContentView({
       {!isInternal && <LlmWarningBanner />}
       <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}`}>
         {/* PageStatus shown for graded formats or pages with editorial content */}
-        {!isInternal && (
-          <PageStatus
-            quality={pageData?.quality ?? undefined}
-            importance={pageData?.readerImportance ?? undefined}
-            researchImportance={pageData?.researchImportance ?? undefined}
-            llmSummary={pageData?.llmSummary ?? undefined}
-            structuredSummary={pageData?.structuredSummary ?? undefined}
-            lastEdited={pageData?.lastUpdated ?? undefined}
-            updateFrequency={pageData?.updateFrequency ?? undefined}
-            evergreen={pageData?.evergreen}
-            todo={page.frontmatter.todo}
-            todos={page.frontmatter.todos}
-            wordCount={pageData?.wordCount}
-            backlinkCount={pageData?.backlinkCount}
-            metrics={pageData?.metrics}
-            suggestedQuality={pageData?.suggestedQuality}
-            changeHistory={pageData?.changeHistory}
-            issues={{
-              unconvertedLinkCount: pageData?.unconvertedLinkCount,
-              redundancy: pageData?.redundancy,
-            }}
-            pageType={page.frontmatter.pageType}
-            pathname={entityPath}
-            contentFormat={contentFormat}
-          />
-        )}
+        <PageStatus
+          quality={pageData?.quality ?? undefined}
+          importance={pageData?.readerImportance ?? undefined}
+          researchImportance={pageData?.researchImportance ?? undefined}
+          llmSummary={pageData?.llmSummary ?? undefined}
+          structuredSummary={pageData?.structuredSummary ?? undefined}
+          lastEdited={pageData?.lastUpdated ?? undefined}
+          updateFrequency={pageData?.updateFrequency ?? undefined}
+          evergreen={pageData?.evergreen}
+          todo={page.frontmatter.todo}
+          todos={page.frontmatter.todos}
+          wordCount={pageData?.wordCount}
+          backlinkCount={pageData?.backlinkCount}
+          metrics={pageData?.metrics}
+          suggestedQuality={pageData?.suggestedQuality}
+          changeHistory={pageData?.changeHistory}
+          issues={{
+            unconvertedLinkCount: pageData?.unconvertedLinkCount,
+            redundancy: pageData?.redundancy,
+          }}
+          pageType={page.frontmatter.pageType}
+          pathname={entityPath}
+          contentFormat={contentFormat}
+        />
         {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
         {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
         {page.content}

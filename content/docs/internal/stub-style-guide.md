@@ -14,6 +14,9 @@ ratings:
   rigor: 2
   actionability: 3
   completeness: 4
+lastEdited: "2026-02-17"
+evergreen: true
+update_frequency: 90
 ---
 # Stub Pages Style Guide
 

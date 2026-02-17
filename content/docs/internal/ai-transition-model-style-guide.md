@@ -14,6 +14,9 @@ ratings:
   rigor: 4
   actionability: 5
   completeness: 6
+lastEdited: "2026-02-17"
+evergreen: true
+update_frequency: 90
 ---
 # AI Transition Model Style Guide
 

@@ -4,6 +4,8 @@ description: "Future work, infrastructure improvements, and project tracking"
 sidebar:
   order: 10
 lastEdited: "2026-01-02"
+evergreen: true
+update_frequency: 30
 readerImportance: 14
 researchImportance: 8.5
 quality: 29
