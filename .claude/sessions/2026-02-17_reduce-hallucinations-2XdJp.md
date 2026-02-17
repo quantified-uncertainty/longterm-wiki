@@ -4,6 +4,8 @@
 
 **Pages:** reducing-hallucinations
 
+**PR:** #189
+
 **Issues encountered:**
 - Crux synthesis phase timed out at 300s when using Claude CLI subprocess; succeeded with `--api-direct` flag using the Anthropic API directly
 - Firecrawl package not installed (`@mendable/firecrawl-js`), so source fetching was skipped; synthesis relied on Perplexity summaries only

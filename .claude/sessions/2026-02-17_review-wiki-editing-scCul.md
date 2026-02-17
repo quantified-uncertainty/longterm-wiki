@@ -23,3 +23,5 @@ Subsequent iterative testing and prompt refinement: ran pipeline on jan-leike, c
 - Anti-padding instructions ("Do NOT add thin, speculative sections") significantly improved output quality — without them, LLM creates many vague 2-3 bullet sections.
 
 **Pages:** dan-hendrycks, neel-nanda, nick-bostrom, jan-leike, chris-olah, far-ai, miri-era
+
+**PR:** #184

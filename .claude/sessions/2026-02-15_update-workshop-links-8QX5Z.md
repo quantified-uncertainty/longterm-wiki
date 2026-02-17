@@ -4,6 +4,8 @@
 
 **Pages:** (no longterm-wiki pages edited — changes target cairn repo workshop.mdx)
 
+**PR:** #132
+
 **Issues encountered:**
 - The workshop.mdx file lives in the cairn repo (quantified-uncertainty/cairn), not the longterm-wiki repo. The git proxy only allows access to longterm-wiki, so direct edits to the cairn repo weren't possible.
 - The updated workshop.mdx was saved as workshop-updated.mdx in the longterm-wiki repo root as a reference artifact, with detailed instructions provided for applying changes.

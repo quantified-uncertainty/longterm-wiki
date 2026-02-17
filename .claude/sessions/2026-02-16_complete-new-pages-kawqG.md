@@ -7,6 +7,8 @@
 
 **Pages:** safety-orgs-overview, labs-overview, community-building-overview, government-orgs-overview, governance-overview, accident-overview, epistemic-overview, structural-overview, misuse-overview
 
+**PR:** #168
+
 **Issues encountered:**
 - All 9 overview pages had `numericId` values that collided with existing entities, causing slug-based URLs to redirect to the wrong page
 - The build-data conflict checker didn't catch this because overview pages lack `entityType` in frontmatter

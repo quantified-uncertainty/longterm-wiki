@@ -4,6 +4,8 @@
 
 **Pages:** wiki-generation-architecture
 
+**PR:** #173
+
 **Issues encountered:**
 - pnpm install required --ignore-scripts due to puppeteer postinstall failure (known environment issue)
 - Pre-existing numericId conflicts (E698-E708) between internal pages infrastructure PR and parallel content branches -- not caused by this session

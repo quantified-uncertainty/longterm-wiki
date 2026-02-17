@@ -4,6 +4,8 @@
 
 **Pages:** about-this-wiki, ai-transition-model-style-guide, anthropic-pages-refactor-notes, architecture, automation-tools, cause-effect-diagrams, common-writing-principles, content-database, documentation-maintenance, enhancement-queue, gap-analysis-2026-02, importance-ranking, knowledge-base, longterm-strategy, longterm-vision, longtermwiki-value-proposition, mermaid-diagrams, models, models-style-guide, page-length-research, page-types, parameters-strategy, project-roadmap, rating-system, research-reports, response-style-guide, risk-style-guide, stub-style-guide, schema/diagrams, schema/entities, schema/index, reports/index, index
 
+**PR:** #185
+
 **Issues encountered:**
 - The build script reads `update_frequency` (snake_case) from frontmatter, not `updateFrequency` (camelCase). Initially used the wrong casing and had to fix across all files.
 - `getUpdateSchedule()` excluded internal pages — removed that guard so the update schedule dashboard includes them.

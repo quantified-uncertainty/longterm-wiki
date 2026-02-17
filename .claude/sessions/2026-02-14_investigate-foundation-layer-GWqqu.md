@@ -4,6 +4,8 @@
 
 **Pages:** the-foundation-layer, funders-overview
 
+**PR:** #144
+
 **Issues encountered:**
 - Framer site is entirely JS-rendered; direct WebFetch returned only CSS/JS boilerplate
 - Solved by using Jina AI reader proxy (`https://r.jina.ai/<url>`)

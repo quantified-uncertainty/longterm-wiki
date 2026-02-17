@@ -4,6 +4,8 @@
 
 **Pages:** architecture
 
+**PR:** #150
+
 **Issues encountered:**
 - `pnpm install` failed due to puppeteer network issues in the sandbox, preventing full build and test runs. All three blocking CI validations passed via direct `node crux/crux.mjs` invocation.
 
