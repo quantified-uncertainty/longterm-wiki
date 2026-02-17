@@ -132,6 +132,42 @@ sources:
     reliability: high
     enabled: true
 
+  - id: zvi-ai
+    name: "Zvi Mowshowitz (Don't Worry About the Vase)"
+    type: rss
+    url: https://thezvi.substack.com/feed
+    frequency: daily
+    categories: [safety, policy, models, ai-labs, governance]
+    reliability: high
+    enabled: true
+
+  - id: cais-newsletter
+    name: AI Safety Newsletter (CAIS)
+    type: rss
+    url: https://newsletter.safe.ai/feed
+    frequency: daily
+    categories: [safety, alignment, policy, research]
+    reliability: high
+    enabled: true
+
+  - id: last-week-in-ai
+    name: Last Week in AI
+    type: rss
+    url: https://lastweekin.ai/feed
+    frequency: daily
+    categories: [ai-labs, models, industry, research]
+    reliability: medium
+    enabled: true
+
+  - id: navigating-ai-risks
+    name: Navigating AI Risks
+    type: rss
+    url: https://navigatingairisks.substack.com/feed
+    frequency: daily
+    categories: [safety, governance, policy, risk]
+    reliability: medium
+    enabled: true
+
   # ── Arxiv ─────────────────────────────────────────────────────────────────
 
   - id: arxiv-ai-safety
