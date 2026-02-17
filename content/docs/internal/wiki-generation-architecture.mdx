@@ -603,21 +603,25 @@ pnpm crux content create "Topic" --tier=standard  # defaults to v2
 ### Alternative A: Keep Improving Current Pipeline
 
 **Pros**: Lower risk, incremental improvement, already works.
+
 **Cons**: Structural ceiling -- single-agent synthesis can't produce the cross-linking, computation, and diagram density we want. Diminishing returns on prompt engineering.
 
 ### Alternative B: Adopt STORM Directly
 
 **Pros**: Battle-tested, open source, good research quality.
+
 **Cons**: Python-only (we're TypeScript), no support for EntityLinks/Squiggle/Mermaid/YAML entities, no knowledge graph integration, would require heavy forking. The research stage is valuable but the writing stage doesn't match our needs.
 
 ### Alternative C: Full CrewAI/LangGraph Framework
 
 **Pros**: Rich agent orchestration, built-in patterns for sequential/parallel execution.
+
 **Cons**: Heavy framework dependency, Python ecosystem, abstractions don't map cleanly to our YAML-first data model. We'd spend more time fighting the framework than building features.
 
 ### Alternative D: Claude Agent SDK Multi-Agent (Proposed Approach)
 
 **Pros**: Same TypeScript ecosystem, direct Anthropic API integration, subagent orchestration built-in, proven at scale (90.2% improvement over single-agent in Anthropic's own eval). Builds on existing Crux infrastructure.
+
 **Cons**: Higher implementation effort than Alternative A, less battle-tested than STORM for research quality.
 
 **Recommendation**: Alternative D, borrowing specific ideas from STORM (perspective-guided research, simulated conversations) and GraphRAG (community summaries, graph-driven planning).
