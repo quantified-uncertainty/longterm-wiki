@@ -111,7 +111,8 @@ export type AnyEntityTypeName = (typeof ALL_ENTITY_TYPE_NAMES)[number];
  * Maps old database.json `type` values to canonical `entityType` values.
  * Types not listed here map to themselves (identity mapping).
  *
- * Previously duplicated in entity-schemas.ts as OLD_TYPE_MAP.
+ * IMPORTANT: Keep in sync with app/scripts/lib/entity-type-mappings.mjs
+ * (the plain-JS source used by build scripts that can't import .ts).
  */
 export const OLD_TYPE_MAP: Record<string, string> = {
   // Lab types → organization
@@ -128,7 +129,7 @@ export const OLD_TYPE_MAP: Record<string, string> = {
  * Maps old lab-* types to organization orgType values.
  * Used during entity transformation to set the orgType discriminator.
  *
- * Previously duplicated in entity-schemas.ts as OLD_LAB_TYPE_TO_ORG_TYPE.
+ * IMPORTANT: Keep in sync with app/scripts/lib/entity-type-mappings.mjs.
  */
 export const OLD_LAB_TYPE_TO_ORG_TYPE: Record<string, string> = {
   lab: "generic",

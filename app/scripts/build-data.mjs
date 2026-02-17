@@ -12,9 +12,9 @@ import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readd
 import { spawnSync } from 'child_process';
 import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
-import { extractMetrics, suggestQuality, getQualityDiscrepancy } from './lib/metrics-extractor.mjs';
+import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../crux/lib/metrics-extractor.ts';
 import { computeRedundancy } from './lib/redundancy.mjs';
-import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT } from './lib/content-types.mjs';
+import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
 import { buildUrlToResourceMap, findUnconvertedLinks, countConvertedLinks } from './lib/unconverted-links.mjs';
 import { generateMdxFromYaml } from './lib/mdx-generator.mjs';
@@ -50,8 +50,14 @@ function loadYaml(filename) {
     console.warn(`File not found: ${filepath}`);
     return [];
   }
-  const content = readFileSync(filepath, 'utf-8');
-  return parse(content) || [];
+  try {
+    const content = readFileSync(filepath, 'utf-8');
+    return parse(content) || [];
+  } catch (e) {
+    console.error(`Failed to parse YAML ${filepath}: ${e.message}`);
+    process.exitCode = 1;
+    return [];
+  }
 }
 
 /**
@@ -69,9 +75,14 @@ function loadYamlDir(dirname) {
 
   for (const file of files) {
     const filepath = join(dirpath, file);
-    const content = readFileSync(filepath, 'utf-8');
-    const data = parse(content) || [];
-    merged.push(...data);
+    try {
+      const content = readFileSync(filepath, 'utf-8');
+      const data = parse(content) || [];
+      merged.push(...data);
+    } catch (e) {
+      console.error(`Failed to parse YAML ${filepath}: ${e.message}`);
+      process.exitCode = 1;
+    }
   }
 
   return merged;
@@ -513,8 +524,7 @@ function buildPagesRegistry(urlToResource) {
   // Scan all content directories
   scanDirectory(join(CONTENT_DIR, 'knowledge-base'), '/knowledge-base');
 
-  const otherDirs = ['ai-transition-model', 'analysis', 'getting-started', 'browse', 'internal', 'style-guides', 'guides', 'insight-hunting', 'dashboard', 'project'];
-  for (const topDir of otherDirs) {
+  for (const topDir of TOP_LEVEL_CONTENT_DIRS) {
     const dirPath = join(CONTENT_DIR, topDir);
     if (existsSync(dirPath)) {
       scanDirectory(dirPath, `/${topDir}`);
@@ -566,8 +576,7 @@ function buildPathRegistry() {
   scanDirectory(join(CONTENT_DIR, 'knowledge-base'), '/knowledge-base');
 
   // Also scan other top-level content directories
-  const topLevelDirs = ['ai-transition-model', 'analysis', 'getting-started', 'browse', 'internal', 'style-guides', 'guides', 'insight-hunting', 'dashboard', 'project'];
-  for (const topDir of topLevelDirs) {
+  for (const topDir of TOP_LEVEL_CONTENT_DIRS) {
     const dirPath = join(CONTENT_DIR, topDir);
     if (existsSync(dirPath)) {
       scanDirectory(dirPath, `/${topDir}`);

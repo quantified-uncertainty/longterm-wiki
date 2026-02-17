@@ -31,7 +31,7 @@ async function runCheckLinks(
     return PASSTHROUGH_OPTIONS.includes(camelKey) || PASSTHROUGH_OPTIONS.includes(key);
   });
 
-  const result = await runScript('check-links.ts', filteredArgs, {
+  const result = await runScript('link-checker/index.ts', filteredArgs, {
     streamOutput: !quiet,
   });
 

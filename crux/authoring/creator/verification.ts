@@ -7,12 +7,9 @@
 import fs from 'fs';
 import path from 'path';
 import { getFetchedSourceContent } from './source-fetching.ts';
+import type { TopicPhaseContext } from './types.ts';
 
-interface VerificationContext {
-  log: (phase: string, message: string) => void;
-  saveResult: (topic: string, filename: string, data: unknown) => string;
-  getTopicDir: (topic: string) => string;
-}
+type VerificationContext = TopicPhaseContext;
 
 interface Warning {
   type: string;

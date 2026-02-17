@@ -41,9 +41,9 @@ const CALLOUT_LABELS: Record<string, string> = {
 
 function extractText(nodes: Node[]): string {
   return nodes
-    .map((n: any) => {
-      if (n.type === "text") return n.value;
-      if (n.children) return extractText(n.children);
+    .map((n) => {
+      if (n.type === "text") return (n as Node & { value: string }).value;
+      if ("children" in n) return extractText((n as Parent).children as Node[]);
       return "";
     })
     .join("");
@@ -97,8 +97,9 @@ const remarkCallouts: Plugin<[], Root> = () => {
         }
 
         node.data = node.data || {};
-        (node.data as any).hName = "Callout";
-        (node.data as any).hProperties = {
+        const data = node.data as Record<string, unknown>;
+        data.hName = "Callout";
+        data.hProperties = {
           variant: name,
           title: label,
         };
@@ -114,7 +115,7 @@ const remarkCallouts: Plugin<[], Root> = () => {
         parent &&
         typeof index === "number"
       ) {
-        const textNode: any = {
+        const textNode: Node & { value: string } = {
           type: "text",
           value: directiveToText(node as DirectiveNode),
         };

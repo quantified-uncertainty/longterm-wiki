@@ -145,3 +145,22 @@ export const CONTENT_DIR_ABS = CONTENT_DIR;
  * Absolute path to data directory (alias for DATA_DIR, already absolute).
  */
 export const DATA_DIR_ABS = DATA_DIR;
+
+/**
+ * Top-level content directories (besides knowledge-base, which is always scanned).
+ *
+ * Used by build-data.mjs (page registry + path registry) and frontmatter-scanner.mjs.
+ * Keep this as the single source of truth — do NOT duplicate this list elsewhere.
+ */
+export const TOP_LEVEL_CONTENT_DIRS = [
+  'ai-transition-model',
+  'analysis',
+  'getting-started',
+  'browse',
+  'internal',
+  'style-guides',
+  'guides',
+  'insight-hunting',
+  'dashboard',
+  'project',
+];
