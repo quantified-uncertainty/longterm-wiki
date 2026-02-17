@@ -1,0 +1,14 @@
+## 2026-02-17 | claude/reduce-hallucinations-3WTJT | Add per-page hallucination risk scoring
+
+**What was done:** Added a computed `hallucinationRisk` field (level/score/factors) to every page at build time, based on entity type, citation density, rigor scores, and content format. Replaced the binary LlmWarningBanner with a tiered ContentConfidenceBanner that shows per-page risk levels. Added hallucination risk data to LLM accessibility files (llms.txt, llms-core.txt, llms-full.txt, per-page .txt) for AI agent consumption. Added `balanceFlags` to frontmatter schema for future grading pipeline integration.
+
+**Pages:** reducing-hallucinations-in-ai-generated-wiki-content
+
+**Issues encountered:**
+- Balance flags from the grading pipeline aren't currently persisted to frontmatter — added schema support but no pages have them yet
+- `entityType` wasn't previously available in the pages data output; now attached from YAML entity map
+
+**Learnings/notes:**
+- Person/org pages without citations are the highest hallucination risk (score 95); well-cited concept pages are lowest (score ~15-25)
+- Current distribution: 91 high, 472 medium, 132 low risk pages
+- Verification priority queue (importance × risk) is the most useful output for AI agents — top priorities are high-importance person/org pages with zero citations

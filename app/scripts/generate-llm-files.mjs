@@ -251,6 +251,11 @@ This file provides an index of site content for LLMs. For full documentation, se
 
 - Each page has an \`llmSummary\` field optimized for LLM consumption
 - Pages are rated by \`readerImportance\` (0-100) and \`quality\` (0-100)
+- Pages include \`hallucinationRisk\` (level: low/medium/high, score: 0-100, factors[])
+- All content is AI-generated; higher risk scores indicate pages more likely to contain hallucinations
+- Verification priority = readerImportance × hallucinationRisk.score / 100
+- Risk factors include: biographical-claims, no-citations, low-citation-density, specific-factual-claims, low-rigor-score
+- Machine-readable risk data is available in pages.json for automated triage
 - Use llms-core.txt for quick context, llms-full.txt for comprehensive knowledge
 `;
 
@@ -290,7 +295,7 @@ function generateLlmsCoreTxt(pages) {
 ------------------------------------------------------------
 ## ${page.title}
 URL: ${pageUrl}
-Reader Importance: ${page.readerImportance} | Quality: ${page.quality || 'unrated'}
+Reader Importance: ${page.readerImportance} | Quality: ${page.quality || 'unrated'} | Hallucination Risk: ${page.hallucinationRisk?.level || 'unknown'} (${page.hallucinationRisk?.score ?? '?'}/100)
 ------------------------------------------------------------
 
 ${page.llmSummary}
@@ -373,7 +378,7 @@ function generateLlmsFullTxt(pages) {
 ------------------------------------------------------------
 ## ${page.title}
 URL: ${pageUrl}
-Reader Importance: ${page.readerImportance || 'unrated'} | Quality: ${page.quality || 'unrated'}
+Reader Importance: ${page.readerImportance || 'unrated'} | Quality: ${page.quality || 'unrated'} | Hallucination Risk: ${page.hallucinationRisk?.level || 'unknown'} (${page.hallucinationRisk?.score ?? '?'}/100)
 ${page.llmSummary ? `Summary: ${page.llmSummary}` : ''}
 ------------------------------------------------------------
 
@@ -433,12 +438,14 @@ function generatePerPageTxt(pages) {
       continue;
     }
 
+    const risk = page.hallucinationRisk;
     const meta = [
       `# ${page.title}`,
       '',
       `URL: ${getPageUrl(page)}`,
       page.readerImportance != null ? `Reader Importance: ${page.readerImportance}` : null,
       page.quality != null ? `Quality: ${page.quality}` : null,
+      risk ? `Hallucination Risk: ${risk.level} (${risk.score}/100)${risk.factors.length ? ' — ' + risk.factors.join(', ') : ''}` : null,
       page.llmSummary ? `Summary: ${page.llmSummary}` : null,
       '',
       '---',

@@ -24,7 +24,7 @@ import {
   InfoBoxToggle,
 } from "@/components/wiki/InfoBoxVisibility";
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
-import { LlmWarningBanner } from "@/components/wiki/LlmWarningBanner";
+import { ContentConfidenceBanner } from "@/components/wiki/ContentConfidenceBanner";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
@@ -233,7 +233,11 @@ function ContentView({
         contentFormat={contentFormat}
         isInternal={isInternal}
       />
-      {!isInternal && <LlmWarningBanner />}
+      {!isInternal && (
+        <ContentConfidenceBanner
+          hallucinationRisk={pageData?.hallucinationRisk}
+        />
+      )}
       <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}`}>
         {/* PageStatus shown for graded formats or pages with editorial content */}
         <PageStatus
