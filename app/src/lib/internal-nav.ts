@@ -82,6 +82,7 @@ export const INTERNAL_NAV: NavSection[] = [
     title: "Architecture & Schema",
     items: [
       { label: "Architecture", href: "/internal/architecture" },
+      { label: "Wiki Generation Architecture", href: "/internal/wiki-generation-architecture" },
       { label: "Schema Overview", href: "/internal/schema" },
       { label: "Entity Reference", href: "/internal/schema/entities" },
       { label: "Schema Diagrams", href: "/internal/schema/diagrams" },
