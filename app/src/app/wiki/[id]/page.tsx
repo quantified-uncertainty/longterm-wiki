@@ -294,7 +294,7 @@ function WithSidebar({
     return <div className={contentClass}>{children}</div>;
   }
 
-  const sections = getWikiNav(sidebarType);
+  const sections = getWikiNav(sidebarType, entityPath);
   return (
     <SidebarProvider>
       <WikiSidebar sections={sections} />

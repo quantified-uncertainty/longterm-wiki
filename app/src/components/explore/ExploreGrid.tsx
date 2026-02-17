@@ -21,6 +21,20 @@ const FIELD_GROUPS: { label: string; cluster: string | null }[] = [
   { label: "Biorisks", cluster: "biorisks" },
 ];
 
+// SECTION filter — based on page category (wiki section)
+const SECTION_GROUPS: { label: string; categories: string[] }[] = [
+  { label: "All", categories: [] },
+  { label: "Risks", categories: ["risks"] },
+  { label: "Responses", categories: ["responses"] },
+  { label: "Organizations", categories: ["organizations"] },
+  { label: "Models", categories: ["models"] },
+  { label: "People", categories: ["people"] },
+  { label: "Capabilities", categories: ["capabilities", "intelligence-paradigms"] },
+  { label: "Metrics", categories: ["metrics"] },
+  { label: "Concepts", categories: ["cruxes", "debates", "worldviews"] },
+  { label: "Other", categories: ["history", "incidents", "forecasting", "future-projections"] },
+];
+
 // RISK CATEGORY filter
 const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
   { label: "All Risks", value: null },
@@ -141,11 +155,15 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   // Read initial state from URL params
   const initialTag = searchParams.get("tag") || "";
   const initialEntity = searchParams.get("entity") || "";
+  const initialSection = searchParams.get("section") || "";
   const initialRiskCat = searchParams.get("riskCategory") || null;
   const initialRiskCatIndex = initialRiskCat
     ? Math.max(0, RISK_CATEGORY_GROUPS.findIndex((g) => g.value === initialRiskCat))
     : 0;
   const initialEntityIndex = initialEntity ? resolveEntityGroupIndex(initialEntity) : 0;
+  const initialSectionIndex = initialSection
+    ? Math.max(0, SECTION_GROUPS.findIndex((g) => g.label.toLowerCase() === initialSection.toLowerCase()))
+    : 0;
 
   const rawView = searchParams.get("view");
   const initialView: ViewMode = rawView === "table" ? "table" : "cards";
@@ -153,6 +171,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   const [viewMode, setViewMode] = useState<ViewMode>(initialView);
   const [search, setSearch] = useState(initialTag);
   const [activeField, setActiveField] = useState(0);
+  const [activeSection, setActiveSection] = useState(initialSectionIndex);
   const [activeEntity, setActiveEntity] = useState(
     initialRiskCat ? 1 : initialEntityIndex
   );
@@ -232,6 +251,13 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     setVisibleCount(60);
   }
 
+  function handleSectionChange(index: number) {
+    setActiveSection(index);
+    setVisibleCount(60);
+    const group = SECTION_GROUPS[index];
+    updateUrlParams({ section: group.categories.length > 0 ? group.label.toLowerCase() : null });
+  }
+
   function handleEntityChange(index: number) {
     setActiveEntity(index);
     setVisibleCount(60);
@@ -282,28 +308,43 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     return searchFiltered.filter((item) => item.clusters.includes(group.cluster!));
   }, [searchFiltered, activeField]);
 
-  // Compute entity type counts (against search + field-filtered items)
-  const entityCounts = useMemo(() => {
-    return ENTITY_GROUPS.map((group) => {
-      if (group.types.length === 0) return fieldFiltered.length;
-      return fieldFiltered.filter((item) => group.types.includes(item.type)).length;
+  // Compute section filter counts (against search + field-filtered items)
+  const sectionCounts = useMemo(() => {
+    return SECTION_GROUPS.map((group) => {
+      if (group.categories.length === 0) return fieldFiltered.length;
+      return fieldFiltered.filter((item) => item.category && group.categories.includes(item.category)).length;
     });
   }, [fieldFiltered]);
+
+  // Items after search + field + section filter
+  const sectionFiltered = useMemo(() => {
+    const group = SECTION_GROUPS[activeSection];
+    if (group.categories.length === 0) return fieldFiltered;
+    return fieldFiltered.filter((item) => item.category && group.categories.includes(item.category));
+  }, [fieldFiltered, activeSection]);
+
+  // Compute entity type counts (against search + field + section-filtered items)
+  const entityCounts = useMemo(() => {
+    return ENTITY_GROUPS.map((group) => {
+      if (group.types.length === 0) return sectionFiltered.length;
+      return sectionFiltered.filter((item) => group.types.includes(item.type)).length;
+    });
+  }, [sectionFiltered]);
 
   // Show risk category filter only when viewing Risks
   const showRiskCatFilter = activeEntity === 1;
 
-  // Compute risk category counts (against search + field-filtered risk items)
+  // Compute risk category counts (against search + field + section-filtered risk items)
   const riskCatCounts = useMemo(() => {
-    const riskItems = fieldFiltered.filter((item) => item.type === "risk");
+    const riskItems = sectionFiltered.filter((item) => item.type === "risk");
     return RISK_CATEGORY_GROUPS.map((group) => {
       if (!group.value) return riskItems.length;
       return riskItems.filter((item) => item.riskCategory === group.value).length;
     });
-  }, [fieldFiltered]);
+  }, [sectionFiltered]);
 
   const filtered = useMemo(() => {
-    let result = fieldFiltered;
+    let result = sectionFiltered;
 
     // Entity type filter
     const group = ENTITY_GROUPS[activeEntity];
@@ -357,7 +398,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     }
 
     return result;
-  }, [fieldFiltered, activeEntity, activeRiskCat, searchScores, sortKey, viewMode]);
+  }, [sectionFiltered, activeEntity, activeRiskCat, searchScores, sortKey, viewMode]);
 
   return (
     <div>
@@ -382,6 +423,13 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
             active={activeField}
             onSelect={handleFieldChange}
             counts={fieldCounts}
+          />
+          <FilterRow
+            label="Section"
+            options={SECTION_GROUPS.map((g) => g.label)}
+            active={activeSection}
+            onSelect={handleSectionChange}
+            counts={sectionCounts}
           />
           <FilterRow
             label="Entity"

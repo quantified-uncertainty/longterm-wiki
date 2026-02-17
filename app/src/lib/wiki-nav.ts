@@ -2,8 +2,13 @@
  * Wiki sidebar navigation data builders.
  *
  * Server-side only: reads from the database to build NavSection[] arrays
- * for pages that need contextual sidebar navigation (Analytical Models,
- * AI Transition Model, Key Metrics).
+ * for pages that need contextual sidebar navigation.
+ *
+ * Supported sidebar contexts:
+ * - Knowledge-base sections (risks, responses, organizations, etc.)
+ * - Analytical Models & Key Metrics
+ * - AI Transition Model
+ * - Internal pages
  *
  * Uses the shared data layer from @/data — no direct fs reads.
  */
@@ -17,6 +22,16 @@ export type { NavSection } from "./internal-nav";
 /** Check if a filePath is an index file (should be excluded from sidebar nav). */
 function isIndexFile(filePath: string): boolean {
   return filePath.endsWith("index.mdx") || filePath.endsWith("index.md");
+}
+
+/** Resolve an index page slug to its /wiki/E<id> URL, with fallback. */
+function indexHref(sectionKey: string): string {
+  const slug = `__index__/knowledge-base/${sectionKey}`;
+  const resolved = getEntityHref(slug);
+  // If it resolved to a numeric ID, use that
+  if (resolved.startsWith("/wiki/E")) return resolved;
+  // Fallback: direct path
+  return `/wiki/knowledge-base/${sectionKey}`;
 }
 
 // ============================================================================
@@ -215,6 +230,179 @@ export function getReferenceNav(): NavSection[] {
 }
 
 // ============================================================================
+// KNOWLEDGE-BASE SECTION SIDEBARS
+// ============================================================================
+
+/**
+ * Configuration for a knowledge-base section sidebar.
+ * Sections with subcategoryGroups get grouped navigation;
+ * sections without get a flat alphabetical list.
+ */
+interface KbSectionConfig {
+  title: string;
+  subcategoryGroups?: { title: string; subcategories: string[] }[];
+}
+
+/**
+ * Sidebar configurations for knowledge-base sections.
+ * Models and metrics are excluded — they use their own specialized nav builders.
+ */
+const KB_SECTIONS: Record<string, KbSectionConfig> = {
+  risks: {
+    title: "AI Risks",
+    subcategoryGroups: [
+      { title: "Accident Risks", subcategories: ["accident"] },
+      { title: "Misuse Risks", subcategories: ["misuse"] },
+      { title: "Structural Risks", subcategories: ["structural"] },
+      { title: "Epistemic Risks", subcategories: ["epistemic"] },
+      { title: "Economic Risks", subcategories: ["economic"] },
+    ],
+  },
+  responses: {
+    title: "Responses",
+    subcategoryGroups: [
+      {
+        title: "Alignment",
+        subcategories: [
+          "alignment",
+          "alignment-deployment",
+          "alignment-evaluation",
+          "alignment-interpretability",
+          "alignment-policy",
+          "alignment-theoretical",
+          "alignment-training",
+        ],
+      },
+      {
+        title: "Governance",
+        subcategories: [
+          "governance",
+          "governance-compute-governance",
+          "governance-industry",
+          "governance-international",
+          "governance-legislation",
+        ],
+      },
+      {
+        title: "Epistemic Tools",
+        subcategories: [
+          "epistemic-tools",
+          "epistemic-tools-approaches",
+          "epistemic-tools-tools",
+        ],
+      },
+      { title: "Biosecurity", subcategories: ["biosecurity"] },
+      { title: "Field Building", subcategories: ["field-building"] },
+      { title: "Institutions", subcategories: ["institutions"] },
+      { title: "Legal Frameworks", subcategories: ["legal-frameworks"] },
+      {
+        title: "Organizational Practices",
+        subcategories: ["organizational-practices"],
+      },
+      { title: "Resilience", subcategories: ["resilience"] },
+    ],
+  },
+  organizations: {
+    title: "Organizations",
+    subcategoryGroups: [
+      { title: "Labs", subcategories: ["labs"] },
+      { title: "Safety Organizations", subcategories: ["safety-orgs"] },
+      { title: "Funders", subcategories: ["funders"] },
+      { title: "Government", subcategories: ["government"] },
+      { title: "Community Building", subcategories: ["community-building"] },
+      {
+        title: "Epistemic Organizations",
+        subcategories: ["epistemic-orgs"],
+      },
+      { title: "Biosecurity", subcategories: ["biosecurity-orgs"] },
+      { title: "Political Advocacy", subcategories: ["political-advocacy"] },
+      { title: "Finance", subcategories: ["finance", "venture-capital"] },
+    ],
+  },
+  people: { title: "People" },
+  capabilities: { title: "Capabilities" },
+  "intelligence-paradigms": { title: "Intelligence Paradigms" },
+  debates: { title: "Debates" },
+  cruxes: { title: "Cruxes" },
+  "future-projections": { title: "Future Projections" },
+  worldviews: { title: "Worldviews" },
+  history: { title: "History" },
+  incidents: { title: "Incidents" },
+  forecasting: { title: "Forecasting" },
+};
+
+/** Set of KB section keys that have their own sidebar config. */
+export const KB_SECTION_KEYS = new Set(Object.keys(KB_SECTIONS));
+
+/**
+ * Build sidebar navigation for a knowledge-base section.
+ * Pages are grouped by subcategory when configured, otherwise shown as a flat list.
+ */
+export function getKbSectionNav(sectionKey: string): NavSection[] {
+  const config = KB_SECTIONS[sectionKey];
+  if (!config) return [];
+
+  const pages = getAllPages().filter(
+    (p) =>
+      p.filePath &&
+      p.filePath.startsWith(`knowledge-base/${sectionKey}/`) &&
+      !isIndexFile(p.filePath)
+  );
+
+  // Top section with overview link
+  const sections: NavSection[] = [
+    {
+      title: config.title,
+      defaultOpen: true,
+      items: [{ label: "Overview", href: indexHref(sectionKey) }],
+    },
+  ];
+
+  if (config.subcategoryGroups) {
+    // Track which pages have been assigned to a group
+    const assignedIds = new Set<string>();
+
+    for (const group of config.subcategoryGroups) {
+      const groupPages = pages.filter(
+        (p) => p.subcategory && group.subcategories.includes(p.subcategory)
+      );
+      if (groupPages.length === 0) continue;
+
+      for (const p of groupPages) assignedIds.add(p.id);
+
+      sections.push({
+        title: group.title,
+        items: groupPages
+          .map((p) => ({ label: p.title, href: getEntityHref(p.id) }))
+          .sort((a, b) => a.label.localeCompare(b.label)),
+      });
+    }
+
+    // Pages without a matching subcategory
+    const uncategorized = pages.filter((p) => !assignedIds.has(p.id));
+    if (uncategorized.length > 0) {
+      sections.push({
+        title: "Other",
+        items: uncategorized
+          .map((p) => ({ label: p.title, href: getEntityHref(p.id) }))
+          .sort((a, b) => a.label.localeCompare(b.label)),
+      });
+    }
+  } else {
+    // Flat list — all pages in one section
+    const items = pages
+      .map((p) => ({ label: p.title, href: getEntityHref(p.id) }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    if (items.length > 0) {
+      sections[0].items.push(...items);
+    }
+  }
+
+  return sections;
+}
+
+// ============================================================================
 // INTERNAL NAV
 // ============================================================================
 
@@ -310,7 +498,7 @@ export function getInternalNav(): NavSection[] {
 // DETECT WHICH SIDEBAR TO SHOW
 // ============================================================================
 
-export type WikiSidebarType = "models" | "atm" | "internal" | null;
+export type WikiSidebarType = "models" | "atm" | "internal" | "kb" | null;
 
 /**
  * Determine which sidebar to show based on the entity path.
@@ -319,6 +507,7 @@ export type WikiSidebarType = "models" | "atm" | "internal" | null;
 export function detectSidebarType(entityPath: string): WikiSidebarType {
   if (!entityPath) return null;
 
+  // Models and metrics keep their specialized sidebar
   if (
     entityPath.startsWith("/knowledge-base/models/") ||
     entityPath.startsWith("/knowledge-base/metrics/")
@@ -334,13 +523,39 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
     return "internal";
   }
 
+  // All other knowledge-base sections with a configured sidebar
+  if (entityPath.startsWith("/knowledge-base/")) {
+    const parts = entityPath.split("/").filter(Boolean);
+    // Need at least "knowledge-base" + section name (e.g., "risks")
+    if (parts.length >= 2 && KB_SECTION_KEYS.has(parts[1])) {
+      return "kb";
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Extract the KB section key from an entity path.
+ * e.g., "/knowledge-base/risks/scheming" → "risks"
+ */
+export function extractKbSection(entityPath: string): string | null {
+  if (!entityPath.startsWith("/knowledge-base/")) return null;
+  const parts = entityPath.split("/").filter(Boolean);
+  if (parts.length >= 2 && KB_SECTION_KEYS.has(parts[1])) {
+    return parts[1];
+  }
   return null;
 }
 
 /**
  * Get the nav sections for a given sidebar type.
+ * For "kb" type, entityPath is required to determine which section.
  */
-export function getWikiNav(type: WikiSidebarType): NavSection[] {
+export function getWikiNav(
+  type: WikiSidebarType,
+  entityPath?: string,
+): NavSection[] {
   switch (type) {
     case "models":
       return getReferenceNav();
@@ -348,21 +563,11 @@ export function getWikiNav(type: WikiSidebarType): NavSection[] {
       return getAtmNav();
     case "internal":
       return getInternalNav();
+    case "kb": {
+      const section = entityPath ? extractKbSection(entityPath) : null;
+      return section ? getKbSectionNav(section) : [];
+    }
     default:
       return [];
-  }
-}
-
-/**
- * Get the sidebar title for a given sidebar type.
- */
-function getWikiSidebarTitle(type: WikiSidebarType): string {
-  switch (type) {
-    case "models":
-      return "Reference";
-    case "atm":
-      return "AI Transition Model";
-    default:
-      return "";
   }
 }
