@@ -8,8 +8,8 @@
     "build": "pnpm --filter longterm-next build",
     "test": "pnpm --filter longterm-next test && vitest run --config crux/vitest.config.ts",
     "test:crux": "vitest run --config crux/vitest.config.ts",
-    "validate": "node --import tsx/esm crux/crux.mjs validate",
-    "crux": "node --import tsx/esm crux/crux.mjs",
+    "validate": "NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs validate",
+    "crux": "NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs",
     "typecheck:tooling": "tsc --noEmit -p crux/tsconfig.json",
     "prepare": "git config core.hooksPath .githooks"
   },

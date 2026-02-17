@@ -1,14 +1,15 @@
-## 2026-02-17 | claude/fix-api-network-restrictions-71ReE | Fix API key sanitization for external research APIs
+## 2026-02-17 | claude/fix-api-network-restrictions-71ReE | Fix API key sanitization and proxy support for research APIs
 
-**What was done:** Added `getApiKey()` utility that strips embedded quotes from environment variables, applied it to all API key reading locations (OpenRouter, Firecrawl, Anthropic, SCRY), and added actionable error diagnostics distinguishing auth failures from credit exhaustion. The root cause of PR #179's "network restrictions" was actually embedded quotes in `OPENROUTER_API_KEY` and `FIRECRAWL_KEY` env vars, not network blocking.
+**What was done:** Fixed two independent issues preventing external research APIs from working in the crux pipeline: (1) Added `getApiKey()` utility that strips embedded quotes from environment variables, applied to all API key reading locations; (2) Added `NODE_USE_ENV_PROXY=1` to package.json scripts so Node.js `fetch()` respects HTTP_PROXY env vars in proxy environments. Also added actionable error diagnostics for auth vs credit failures.
 
 **Issues encountered:**
-- `OPENROUTER_API_KEY` had embedded double quotes (`"sk-or-v1-..."`) causing 502 auth failures
-- `FIRECRAWL_KEY` had same issue, plus account has insufficient credits (billing issue)
-- SCRY worked fine (uses hardcoded public key fallback)
-- All API endpoints are network-reachable in Claude Code CLI environment
+- `OPENROUTER_API_KEY` and `FIRECRAWL_KEY` had embedded double quotes causing auth failures
+- Node.js `fetch()` ignores `HTTPS_PROXY` env var by default — `curl` works but `fetch` doesn't in proxy environments
+- `NODE_USE_ENV_PROXY=1` env var (Node 22.21+) fixes the proxy issue; it's ignored on older Node versions
 
 **Learnings/notes:**
-- Claude Code CLI has NO network restrictions to research APIs (unlike web sandbox)
-- The "network restrictions" reported in PR #179 were web-sandbox-specific; in CLI the actual issue is env var quoting
-- Firecrawl credits are exhausted — needs billing action separate from code fix
+- The sandbox container routes ALL outbound traffic through an HTTP proxy (visible via `HTTPS_PROXY` env var)
+- `curl` uses the proxy automatically; Node.js `fetch()` does NOT unless `NODE_USE_ENV_PROXY=1` or `--use-env-proxy` is set
+- This proxy issue is the actual root cause of PR #179's "network restrictions" — ALL external API calls via `fetch()` fail without proxy config
+- API key quoting is a secondary issue that also needs fixing
+- After both fixes: OpenRouter, SCRY, Firecrawl all confirmed working end-to-end
