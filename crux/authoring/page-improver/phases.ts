@@ -10,6 +10,7 @@ import { execSync } from 'child_process';
 import path from 'path';
 import { MODELS } from '../../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../../lib/entity-lookup.ts';
+import { buildFactLookupForContent } from '../../lib/fact-lookup.ts';
 import { convertSlugsToNumericIds } from '../creator/deployment.ts';
 import type {
   PageData, AnalysisResult, ResearchResult, ReviewResult,
@@ -205,6 +206,11 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   const entityLookupCount = entityLookup.split('\n').filter(Boolean).length;
   log('improve', `  Found ${entityLookupCount} relevant entities for lookup`);
 
+  log('improve', 'Building fact lookup table...');
+  const factLookup = buildFactLookupForContent(page.id, currentContent, ROOT);
+  const factLookupCount = factLookup ? factLookup.split('\n').filter(l => l && !l.startsWith('#')).length : 0;
+  log('improve', `  Found ${factLookupCount} available facts for wrapping`);
+
   const prompt = `Improve this wiki page based on the analysis and research.
 
 ## Page Info
@@ -250,7 +256,22 @@ ONLY use IDs from this table. If an entity is not listed here, use plain text in
 \`\`\`
 ${entityLookup}
 \`\`\`
+${factLookup ? `
+### Fact Lookup Table
 
+These canonical facts are available for wrapping with \`<F>\`. The format is: entity.factId: "display value" (as of date) — note.
+ONLY use fact IDs from this table. If a value doesn't match a fact here, leave it as plain text.
+
+When you encounter a hardcoded number in the prose that matches a fact below, wrap it:
+- Before: \`Anthropic raised \\$30 billion\`
+- After: \`Anthropic raised <F e="anthropic" f="series-g-raise">\\$30 billion</F>\`
+
+**Important:** Only wrap a value when the prose is clearly referring to the same thing the fact describes. For example, "\\$1B" could be revenue OR investment — check the fact's note to confirm the semantic match. When in doubt, leave it unwrapped.
+
+\`\`\`
+${factLookup}
+\`\`\`
+` : ''}
 ### Quality Standards
 - Add citations from the research sources
 - Replace vague claims with specific numbers; use \`<F>\` for canonical facts and \`<Calc>\` for derived values

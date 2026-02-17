@@ -72,11 +72,6 @@ const SCRIPTS = {
     description: 'Remove redundant manual Related Pages / See Also sections',
     passthrough: ['apply', 'verbose', 'file', 'ci', 'dryRun'],
   },
-  facts: {
-    script: 'fix/fix-facts.ts',
-    description: 'Replace hardcoded fact values with <F> components',
-    passthrough: ['apply', 'verbose', 'file', 'entity', 'limit', 'ci', 'dryRun'],
-  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'all');
@@ -106,8 +101,6 @@ Examples:
   crux fix escaping                 Fix all escaping issues
   crux fix markdown                 Fix markdown formatting
   crux fix related-pages            Remove redundant Related Pages sections
-  crux fix facts                    Replace hardcoded values with <F> components
-  crux fix facts --entity=anthropic Only process one entity's facts
   crux fix dollars                  Escape dollar signs only
 `;
 }
