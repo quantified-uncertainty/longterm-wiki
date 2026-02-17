@@ -1,0 +1,179 @@
+name: Content Overlap Detection
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'content/docs/**'
+
+jobs:
+  check-overlap:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Identify new wiki pages
+        id: new-pages
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100,
+            });
+
+            const newPages = files.filter(f =>
+              f.status === 'added' &&
+              f.filename.startsWith('content/docs/') &&
+              !f.filename.startsWith('content/docs/internal/') &&
+              f.filename.endsWith('.mdx')
+            );
+
+            if (newPages.length === 0) {
+              console.log('No new wiki pages added. Skipping overlap check.');
+              core.setOutput('has_new_pages', 'false');
+              return;
+            }
+
+            // Extract page IDs from filenames
+            // content/docs/knowledge-base/foo.mdx -> foo
+            // content/docs/foo.mdx -> foo
+            const pageIds = newPages.map(f => {
+              const parts = f.filename.replace('content/docs/', '').replace('.mdx', '').split('/');
+              return parts[parts.length - 1];
+            });
+
+            console.log(`New pages: ${pageIds.join(', ')}`);
+            core.setOutput('has_new_pages', 'true');
+            core.setOutput('new_page_ids', JSON.stringify(pageIds));
+            core.setOutput('new_page_files', JSON.stringify(newPages.map(f => f.filename)));
+
+      - name: Setup Node.js
+        if: steps.new-pages.outputs.has_new_pages == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Setup pnpm
+        if: steps.new-pages.outputs.has_new_pages == 'true'
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        if: steps.new-pages.outputs.has_new_pages == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Build data (computes redundancy)
+        if: steps.new-pages.outputs.has_new_pages == 'true'
+        run: cd app && node scripts/build-data.mjs
+
+      - name: Check overlap for new pages
+        if: steps.new-pages.outputs.has_new_pages == 'true'
+        id: overlap
+        uses: actions/github-script@v7
+        env:
+          NEW_PAGE_IDS: ${{ steps.new-pages.outputs.new_page_ids }}
+        with:
+          script: |
+            const fs = require('fs');
+
+            const newPageIds = JSON.parse(process.env.NEW_PAGE_IDS);
+            const SIMILARITY_THRESHOLD = 30; // 30%
+
+            // Read the built database
+            const dbPath = 'app/src/data/database.json';
+            if (!fs.existsSync(dbPath)) {
+              console.log('database.json not found — build may have failed. Skipping overlap check.');
+              core.setOutput('has_overlaps', 'false');
+              return;
+            }
+
+            const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+            const pages = db.pages || [];
+
+            const overlaps = [];
+
+            for (const pageId of newPageIds) {
+              const page = pages.find(p => p.id === pageId);
+              if (!page || !page.redundancy || !page.redundancy.similarPages) {
+                console.log(`Page "${pageId}" has no redundancy data.`);
+                continue;
+              }
+
+              const highSimilarity = page.redundancy.similarPages.filter(
+                sp => sp.similarity >= SIMILARITY_THRESHOLD
+              );
+
+              if (highSimilarity.length > 0) {
+                overlaps.push({
+                  pageId,
+                  title: page.title || pageId,
+                  similar: highSimilarity,
+                });
+              }
+            }
+
+            if (overlaps.length === 0) {
+              console.log('No significant content overlap detected.');
+              core.setOutput('has_overlaps', 'false');
+              return;
+            }
+
+            core.setOutput('has_overlaps', 'true');
+
+            // Build comment
+            let table = '| New Page | Similar To | Similarity |\n|----------|-----------|------------|\n';
+            for (const o of overlaps) {
+              for (const s of o.similar) {
+                table += `| \`${o.pageId}\` | \`${s.id}\` (${s.title || s.id}) | ${s.similarity}% |\n`;
+              }
+            }
+
+            const body = [
+              '## :mag: Content Overlap Detection',
+              '',
+              `Found **${overlaps.length} new page(s)** with significant content overlap (>${SIMILARITY_THRESHOLD}% similarity):`,
+              '',
+              table,
+              '',
+              'This may indicate:',
+              '- A page that should be **merged** with an existing page instead of created separately',
+              '- Content that should **link to** the existing page rather than duplicating it',
+              '- A legitimate new page that happens to share vocabulary (review and proceed if so)',
+              '',
+              '<sub>Computed using n-gram shingling. Posted by Content Overlap Detection.</sub>',
+            ].join('\n');
+
+            // Check for existing comment to update
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+
+            const botComment = comments.find(
+              c => c.user.type === 'Bot' && c.body.includes('Content Overlap Detection')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body,
+              });
+            }
+
+            // Advisory — warn but don't fail
+            core.warning(`${overlaps.length} new page(s) have >${SIMILARITY_THRESHOLD}% overlap with existing pages`);

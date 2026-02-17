@@ -1,0 +1,114 @@
+name: NumericId Conflict Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/entities/**'
+
+jobs:
+  check-duplicate-ids:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for duplicate numericId values
+        run: |
+          set -euo pipefail
+
+          echo "Scanning data/entities/*.yaml for duplicate numericId values..."
+
+          # Extract all numericId values with their source file and entity id context
+          # Format: "E42 filename.yaml entity-slug"
+          DUPLICATES=$(
+            for f in data/entities/*.yaml; do
+              # Use awk to track current entity id and extract numericId lines
+              awk -v file="$(basename "$f")" '
+                /^- id:/ { entity_id = $3 }
+                /^  id:/ { entity_id = $2 }
+                /numericId:/ {
+                  gsub(/^ +/, "")
+                  split($0, parts, ": ")
+                  nid = parts[2]
+                  gsub(/ /, "", nid)
+                  print nid " " file " " entity_id
+                }
+              ' "$f"
+            done | sort | awk '{
+              key = $1
+              if (key == prev_key) {
+                if (!printed_prev) {
+                  print prev_line
+                  printed_prev = 1
+                }
+                print $0
+              } else {
+                printed_prev = 0
+              }
+              prev_key = key
+              prev_line = $0
+            }'
+          )
+
+          if [ -n "$DUPLICATES" ]; then
+            echo ""
+            echo "::error::Duplicate numericId values detected!"
+            echo ""
+            echo "The following numericId values appear in multiple entities:"
+            echo "-----------------------------------------------------------"
+            echo "$DUPLICATES" | awk '{printf "  %-8s in %-45s (entity: %s)\n", $1, $2, $3}'
+            echo "-----------------------------------------------------------"
+            echo ""
+            echo "Each entity must have a unique numericId. This typically happens when"
+            echo "two parallel branches both assign the same ID. Fix by changing one of"
+            echo "the conflicting IDs to the next available number."
+            echo ""
+            echo "To find the next available ID, run:"
+            echo "  grep -rh 'numericId:' data/entities/ | sed 's/.*E//' | sort -n | tail -5"
+            exit 1
+          else
+            echo "No duplicate numericId values found."
+          fi
+
+      - name: Check for duplicate entity id slugs
+        run: |
+          set -euo pipefail
+
+          echo "Scanning data/entities/*.yaml for duplicate entity id slugs..."
+
+          # Extract all entity id values
+          DUPLICATES=$(
+            for f in data/entities/*.yaml; do
+              awk -v file="$(basename "$f")" '
+                /^- id:/ { print $3 " " file }
+              ' "$f"
+            done | sort | awk '{
+              key = $1
+              if (key == prev_key) {
+                if (!printed_prev) {
+                  print prev_line
+                  printed_prev = 1
+                }
+                print $0
+              } else {
+                printed_prev = 0
+              }
+              prev_key = key
+              prev_line = $0
+            }'
+          )
+
+          if [ -n "$DUPLICATES" ]; then
+            echo ""
+            echo "::error::Duplicate entity id slugs detected!"
+            echo ""
+            echo "The following entity ids appear in multiple files:"
+            echo "-----------------------------------------------------------"
+            echo "$DUPLICATES" | awk '{printf "  %-40s in %s\n", $1, $2}'
+            echo "-----------------------------------------------------------"
+            echo ""
+            echo "Each entity id must be globally unique across all YAML files."
+            exit 1
+          else
+            echo "No duplicate entity id slugs found."
+          fi

@@ -1,0 +1,168 @@
+name: Weekly Cross-Page Audit
+
+# Gate F: Periodic batch audit of wiki content quality.
+# Runs weekly, checks for cross-page inconsistencies, stale data,
+# and content quality drift. Posts a summary issue.
+# Cost target: ~$0.50/run (mostly from LLM-based checks).
+
+on:
+  schedule:
+    # Every Monday at 06:00 UTC
+    - cron: '0 6 * * 1'
+
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build data layer
+        run: cd app && node scripts/build-data.mjs
+
+      - name: Run consistency checks
+        id: consistency
+        continue-on-error: true
+        run: pnpm crux validate consistency --ci > /tmp/consistency.json 2>&1
+
+      - name: Run value consistency check
+        id: values
+        continue-on-error: true
+        run: pnpm crux validate unified --rules=value-consistency --ci > /tmp/values.json 2>&1
+
+      - name: Run quality check
+        id: quality
+        continue-on-error: true
+        run: pnpm crux validate quality --ci > /tmp/quality.json 2>&1
+
+      - name: Run full validation suite
+        id: full
+        continue-on-error: true
+        run: pnpm crux validate --ci > /tmp/full-validation.json 2>&1
+
+      - name: Generate audit report and create issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Read results
+            function readJSON(path) {
+              try {
+                return JSON.parse(fs.readFileSync(path, 'utf-8'));
+              } catch {
+                return null;
+              }
+            }
+
+            function readText(path) {
+              try {
+                return fs.readFileSync(path, 'utf-8').trim();
+              } catch {
+                return 'No output';
+              }
+            }
+
+            const consistency = readJSON('/tmp/consistency.json');
+            const values = readJSON('/tmp/values.json');
+            const quality = readJSON('/tmp/quality.json');
+            const full = readJSON('/tmp/full-validation.json');
+
+            // Build report sections
+            const sections = [];
+
+            // Value consistency
+            const valuesText = readText('/tmp/values.json');
+            if (values?.summary?.bySeverity?.warning > 0 || values?.summary?.bySeverity?.error > 0) {
+              const warnCount = (values.summary.bySeverity.warning || 0) + (values.summary.bySeverity.error || 0);
+              sections.push(`### Value Consistency\n\n**${warnCount} conflicting values** detected across pages.\n\nThese are cases where different pages state different numbers for the same entity's metric (e.g., revenue, valuation, founding year).\n\nRun \`pnpm crux validate unified --rules=value-consistency\` for details.`);
+            } else {
+              sections.push('### Value Consistency\n\nNo cross-page value conflicts detected.');
+            }
+
+            // Cross-page consistency
+            if (consistency?.warnings > 0) {
+              sections.push(`### Probability & Terminology Consistency\n\n**${consistency.warnings} warning(s)**, ${consistency.infos || 0} suggestion(s).\n\nRun \`pnpm crux validate consistency\` for details.`);
+            } else {
+              sections.push('### Probability & Terminology Consistency\n\nNo issues detected.');
+            }
+
+            // Quality ratings
+            const qualityText = readText('/tmp/quality.json');
+            if (quality?.warnings > 0 || quality?.errors > 0) {
+              const total = (quality?.warnings || 0) + (quality?.errors || 0);
+              sections.push(`### Content Quality\n\n**${total} quality issue(s)** detected.\n\nRun \`pnpm crux validate quality\` for details.`);
+            } else {
+              sections.push('### Content Quality\n\nNo quality issues detected.');
+            }
+
+            // Full validation summary
+            if (full?.summary) {
+              const { error = 0, warning = 0, info = 0 } = full.summary.bySeverity || {};
+              sections.push(`### Full Validation Suite\n\n- Errors: ${error}\n- Warnings: ${warning}\n- Info: ${info}\n\nRun \`pnpm crux validate\` for full details.`);
+            }
+
+            // Determine overall status
+            const hasIssues = sections.some(s => s.includes('**'));
+            const date = new Date().toISOString().split('T')[0];
+
+            const body = [
+              `## Weekly Wiki Audit — ${date}`,
+              '',
+              hasIssues
+                ? 'Issues were found that may need attention.'
+                : 'All checks passed. The wiki is in good shape.',
+              '',
+              ...sections,
+              '',
+              '---',
+              '<sub>Generated by Weekly Cross-Page Audit workflow.</sub>',
+            ].join('\n');
+
+            // Create or update the audit issue
+            // Search for an existing open audit issue
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'weekly-audit',
+              state: 'open',
+              per_page: 1,
+            });
+
+            if (issues.length > 0) {
+              // Update existing issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues[0].number,
+                title: `Weekly Wiki Audit — ${date}`,
+                body,
+              });
+              console.log(`Updated existing audit issue #${issues[0].number}`);
+            } else {
+              // Create new issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Weekly Wiki Audit — ${date}`,
+                body,
+                labels: ['weekly-audit'],
+              });
+              console.log('Created new audit issue');
+            }

@@ -1,0 +1,121 @@
+name: Grading Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'content/docs/**'
+
+jobs:
+  check-grades:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check quality grades on modified pages
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Get changed files in this PR
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100,
+            });
+
+            // Filter to MDX files under content/docs/ (excluding internal/)
+            const mdxFiles = files.filter(f =>
+              f.filename.startsWith('content/docs/') &&
+              !f.filename.startsWith('content/docs/internal/') &&
+              f.filename.endsWith('.mdx') &&
+              (f.status === 'added' || f.status === 'modified')
+            );
+
+            if (mdxFiles.length === 0) {
+              console.log('No wiki page changes to check.');
+              return;
+            }
+
+            console.log(`Checking ${mdxFiles.length} modified wiki pages for quality grades...`);
+
+            const missing = [];
+            for (const file of mdxFiles) {
+              try {
+                const content = fs.readFileSync(file.filename, 'utf-8');
+                // Extract frontmatter
+                const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+                if (!fmMatch) {
+                  missing.push({ file: file.filename, reason: 'no frontmatter' });
+                  continue;
+                }
+                const frontmatter = fmMatch[1];
+                // Check for quality field
+                const qualityMatch = frontmatter.match(/^quality:\s*(\d+)/m);
+                if (!qualityMatch) {
+                  missing.push({ file: file.filename, reason: 'no quality field' });
+                }
+              } catch (e) {
+                // File might have been deleted in the PR
+                console.log(`Skipping ${file.filename}: ${e.message}`);
+              }
+            }
+
+            if (missing.length === 0) {
+              console.log('All modified pages have quality grades.');
+              return;
+            }
+
+            // Build advisory comment
+            const fileList = missing.map(m =>
+              `| \`${m.file}\` | ${m.reason} |`
+            ).join('\n');
+
+            const body = [
+              '## :clipboard: Quality Grade Advisory',
+              '',
+              `${missing.length} of ${mdxFiles.length} modified wiki pages are missing quality grades:`,
+              '',
+              '| File | Issue |',
+              '|------|-------|',
+              fileList,
+              '',
+              'Consider adding a `quality` field (0-100) to frontmatter after editing.',
+              'You can auto-grade with: `pnpm crux content improve <page-id> --tier=polish --grade --apply`',
+              '',
+              '<sub>This is advisory only and does not block merge. Posted by Grading Check.</sub>',
+            ].join('\n');
+
+            // Check for existing comment to update
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+
+            const botComment = comments.find(
+              c => c.user.type === 'Bot' && c.body.includes('Quality Grade Advisory')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body,
+              });
+            }
+
+            // Advisory only — do not fail the check
+            core.warning(`${missing.length} page(s) missing quality grades (advisory)`);

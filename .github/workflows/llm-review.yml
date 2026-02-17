@@ -1,0 +1,160 @@
+name: LLM Diff Review
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Get PR diff and run LLM review
+        id: llm
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+            echo "::warning::ANTHROPIC_API_KEY not configured. Skipping LLM review."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Fetch the diff via GitHub API
+          DIFF=$(curl -s \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github.v3.diff" \
+            "https://api.github.com/repos/${REPO}/pulls/${PR_NUMBER}")
+
+          # Save full diff, then truncate for the API call
+          echo "$DIFF" > /tmp/pr_diff_full.txt
+          head -c 12000 /tmp/pr_diff_full.txt > /tmp/pr_diff.txt
+
+          FULL_SIZE=$(wc -c < /tmp/pr_diff_full.txt)
+          TRUNC_SIZE=$(wc -c < /tmp/pr_diff.txt)
+          if [ "$FULL_SIZE" -gt "$TRUNC_SIZE" ]; then
+            echo "" >> /tmp/pr_diff.txt
+            echo "[diff truncated: ${FULL_SIZE} chars total, showing first 12000]" >> /tmp/pr_diff.txt
+          fi
+
+          # Build the JSON payload using Python for proper escaping
+          python3 -c "
+          import json
+
+          diff = open('/tmp/pr_diff.txt').read()
+
+          prompt = '''You are reviewing a pull request for an AI safety wiki (longterm-wiki). The wiki uses MDX pages with YAML entity data.
+
+          Review this diff for:
+          1. Factual errors: Wrong numbers, dates, attributions, or claims
+          2. Broken EntityLinks: <EntityLink id=\"X\"> where X might not exist
+          3. Inconsistent values: Numbers in prose that contradict tables/charts on the same page
+          4. MDX syntax issues: Unescaped dollar signs or angle brackets
+          5. Style issues: Missing citations, vague claims, unclear prose
+
+          Be concise. Only flag genuine issues. If the diff looks good, say so briefly.
+          Do NOT comment on formatting, whitespace, or trivial style preferences.
+
+          PR diff:
+          ''' + diff
+
+          payload = {
+              'model': 'claude-haiku-4-5-20251001',
+              'max_tokens': 1024,
+              'messages': [{'role': 'user', 'content': prompt}]
+          }
+
+          with open('/tmp/payload.json', 'w') as f:
+              json.dump(payload, f)
+          " || { echo "::warning::Failed to build API payload."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; }
+
+          # Call Anthropic API
+          HTTP_CODE=$(curl -s -o /tmp/api_response.json -w "%{http_code}" \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "content-type: application/json" \
+            -d @/tmp/payload.json)
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::warning::LLM review API call failed (HTTP $HTTP_CODE). Skipping review."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Extract the text content from the response
+          python3 -c "
+          import json
+          data = json.load(open('/tmp/api_response.json'))
+          for block in data.get('content', []):
+              if block.get('type') == 'text':
+                  print(block['text'])
+                  break
+          " > /tmp/review.txt
+
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "Review generated successfully."
+
+      - name: Post review comment
+        if: steps.llm.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            let review;
+            try {
+              review = fs.readFileSync('/tmp/review.txt', 'utf-8').trim();
+            } catch (e) {
+              console.log('No review file found, skipping comment.');
+              return;
+            }
+
+            if (!review) {
+              console.log('Empty review, skipping comment.');
+              return;
+            }
+
+            const body = [
+              '## LLM Diff Review',
+              '',
+              review,
+              '',
+              '<sub>Automated review by Claude Haiku. This is advisory and does not block merge. Posted by LLM Diff Review.</sub>',
+            ].join('\n');
+
+            // Check for existing comment to update instead of posting duplicates
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+
+            const botComment = comments.find(
+              c => c.user.type === 'Bot' && c.body.includes('LLM Diff Review')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+              console.log('Updated existing LLM review comment.');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body,
+              });
+              console.log('Posted new LLM review comment.');
+            }

@@ -1,6 +1,6 @@
-## 2026-02-16 | claude/review-recent-prs-Z1dC2 | Review PRs + add pre-push gate
+## 2026-02-16 | claude/review-recent-prs-Z1dC2 | Review PRs + add quality gates
 
-**What was done:** Reviewed PRs #142-#160 (15 PRs) for improvement patterns, then added `crux validate gate` command and `.githooks/pre-push` hook to mechanically enforce CI-blocking checks before every push. Added `prepare` script to auto-configure hooks on `pnpm install`.
+**What was done:** Reviewed PRs #142-#160 (15 PRs) for improvement patterns, then implemented the full automated quality gates system from issue #162: pre-push gate, 7 GitHub Actions workflows, and a cross-page value consistency validation rule.
 
 **Pages:** (none — infrastructure only)
 
@@ -13,3 +13,5 @@
 - Hook auto-activates via `prepare` script on `pnpm install` — no manual setup needed
 - NumericId conflicts are the dominant recurring problem (6+ fix commits in review window)
 - Crux pipeline is non-functional in Claude Code web sessions (3 sessions hit this)
+- Value consistency rule finds 64 cross-page conflicts (~1s runtime), mostly revenue/valuation mismatches
+- Staged merge pipeline requires a `staging` branch to be created on the remote

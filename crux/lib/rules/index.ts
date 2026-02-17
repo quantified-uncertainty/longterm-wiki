@@ -53,6 +53,9 @@ import { outdatedNamesRule } from './outdated-names.ts';
 // Fact consistency
 import { factConsistencyRule } from './fact-consistency.ts';
 
+// Cross-page value consistency
+import { valueConsistencyRule } from './value-consistency.ts';
+
 // Squiggle model quality
 import { squiggleQualityRule } from './squiggle-quality.ts';
 
@@ -110,6 +113,7 @@ export {
   editorialArtifactsRule,
   outdatedNamesRule,
   factConsistencyRule,
+  valueConsistencyRule,
   insiderJargonRule,
   falseCertaintyRule,
   prescriptiveLanguageRule,
@@ -154,6 +158,7 @@ export const allRules: Rule[] = [
   editorialArtifactsRule,
   outdatedNamesRule,
   factConsistencyRule,
+  valueConsistencyRule,
   insiderJargonRule,
   falseCertaintyRule,
   prescriptiveLanguageRule,

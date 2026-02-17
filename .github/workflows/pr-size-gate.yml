@@ -1,0 +1,89 @@
+name: PR Size Gate
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+
+jobs:
+  check-size:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Check PR size and warn if too large
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100,
+            });
+
+            const changedFiles = files.length;
+            const newPages = files.filter(
+              f => f.status === 'added' && f.filename.startsWith('content/docs/') && f.filename.endsWith('.mdx')
+            );
+            const newPageCount = newPages.length;
+
+            console.log(`Changed files: ${changedFiles}, New wiki pages: ${newPageCount}`);
+
+            if (changedFiles <= 50 && newPageCount <= 3) {
+              console.log('PR size is within limits.');
+              return;
+            }
+
+            // Build warning message
+            const warnings = [];
+            if (changedFiles > 50) {
+              warnings.push(`- **${changedFiles} files changed** (threshold: 50)`);
+            }
+            if (newPageCount > 3) {
+              warnings.push(`- **${newPageCount} new wiki pages** (threshold: 3)`);
+              const pageList = newPages.map(f => `  - \`${f.filename}\``).join('\n');
+              warnings.push(`\n  New pages:\n${pageList}`);
+            }
+
+            const body = [
+              '## :warning: PR Size Warning',
+              '',
+              'This PR exceeds recommended size limits:',
+              '',
+              ...warnings,
+              '',
+              '**Consider splitting this into smaller PRs** to make review easier and reduce merge conflict risk.',
+              'Smaller PRs also get faster CI feedback and are easier to revert if needed.',
+              '',
+              '<sub>Posted by PR Size Gate</sub>',
+            ].join('\n');
+
+            // Check for existing bot comment to update instead of spamming
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+
+            const botComment = comments.find(
+              c => c.user.type === 'Bot' && c.body.includes('PR Size Warning')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+              console.log('Updated existing size warning comment.');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body,
+              });
+              console.log('Posted new size warning comment.');
+            }
