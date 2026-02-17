@@ -5,7 +5,9 @@
 
 import { useMemo, useState } from "react";
 import type { ColumnDef, Row } from "@tanstack/react-table";
-import { DataTable, SortableHeader } from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table";
+import { createColumns, parentCategories } from "./TransitionModelColumns";
+import { CombinedParentBadge, ExpandableRow } from "./TransitionModelHelpers";
 
 // ============================================================================
 // TYPES
@@ -33,526 +35,6 @@ interface TransitionModelTableClientProps {
 }
 
 type ViewMode = "flat" | "grouped";
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-// Map parent IDs to display categories
-const parentCategories: Record<string, "ai" | "society"> = {
-  "misalignment-potential": "ai",
-  "ai-capabilities": "ai",
-  "ai-uses": "ai",
-  "ai-ownership": "ai",
-  "civ-competence": "society",
-  "transition-turbulence": "society",
-  "misuse-potential": "society",
-};
-
-// ============================================================================
-// HELPER COMPONENTS
-// ============================================================================
-
-// Truncate description for preview
-function truncateText(text: string, maxLength: number = 150): string {
-  if (!text) return "";
-  const cleaned = text
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/[*_`#]/g, "")
-    .replace(/\n+/g, " ")
-    .trim();
-  if (cleaned.length <= maxLength) return cleaned;
-  return cleaned.slice(0, maxLength).trim() + "...";
-}
-
-// Parameter link - clickable with hover effect
-function ParamLink({
-  children,
-  href,
-  tier,
-  isHighPriority,
-}: {
-  children: React.ReactNode;
-  href?: string;
-  tier: "cause" | "intermediate" | "effect";
-  isHighPriority?: boolean;
-}) {
-  const colors: Record<string, string> = {
-    cause: "#1e40af",
-    intermediate: "#6d28d9",
-    effect: "#92400e",
-  };
-
-  const content = (
-    <span
-      className="flex items-center gap-1.5 text-[13px] font-semibold"
-      style={{ color: colors[tier] }}
-    >
-      {isHighPriority && (
-        <span
-          className="inline-block w-2 h-2 rounded-full shrink-0"
-          style={{ background: "#ef4444" }}
-          title="High X-risk impact (>70)"
-        />
-      )}
-      {children}
-    </span>
-  );
-
-  if (href) {
-    return (
-      <a
-        href={href}
-        className="block no-underline hover:underline"
-      >
-        {content}
-      </a>
-    );
-  }
-  return content;
-}
-
-// Rating cell with color-coded bar
-function RatingCell({
-  value,
-  colorType,
-}: {
-  value?: number;
-  colorType: "green" | "red" | "blue" | "gray";
-}) {
-  if (value === undefined)
-    return <span className="text-gray-400">&mdash;</span>;
-
-  const colorConfigs = {
-    green: { bar: "#22c55e", bg: "#dcfce7", text: "#166534" },
-    red: { bar: "#ef4444", bg: "#fee2e2", text: "#991b1b" },
-    blue: { bar: "#3b82f6", bg: "#dbeafe", text: "#1e40af" },
-    gray: { bar: "#6b7280", bg: "#f3f4f6", text: "#374151" },
-  };
-  const c = colorConfigs[colorType];
-
-  return (
-    <div className="flex items-center gap-2 min-w-[80px]">
-      <div
-        className="flex-1 h-1.5 rounded-full overflow-hidden"
-        style={{ background: c.bg }}
-      >
-        <div
-          className="h-full rounded-full"
-          style={{ width: `${value}%`, background: c.bar }}
-        />
-      </div>
-      <span
-        className="text-xs font-medium min-w-[24px]"
-        style={{ color: c.text }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
-
-// Combined parent badge with category prefix
-function CombinedParentBadge({
-  parent,
-  category,
-}: {
-  parent: string;
-  category?: "ai" | "society";
-}) {
-  const config = {
-    ai: {
-      prefix: "AI",
-      bg: "#eff6ff",
-      color: "#1d4ed8",
-      border: "#bfdbfe",
-      prefixBg: "#dbeafe",
-    },
-    society: {
-      prefix: "Society",
-      bg: "#ecfdf5",
-      color: "#047857",
-      border: "#a7f3d0",
-      prefixBg: "#d1fae5",
-    },
-  };
-  const c = config[category || "ai"];
-  return (
-    <span
-      className="inline-flex items-center rounded text-xs font-medium overflow-hidden"
-      style={{ border: `1px solid ${c.border}` }}
-    >
-      <span
-        className="px-1.5 py-0.5 text-[11px] font-semibold"
-        style={{ background: c.prefixBg, color: c.color }}
-      >
-        {c.prefix}
-      </span>
-      <span
-        className="px-2 py-0.5"
-        style={{ background: c.bg, color: c.color }}
-      >
-        {parent}
-      </span>
-    </span>
-  );
-}
-
-// Expandable row content
-function ExpandableRow({ row }: { row: SubItemRow }) {
-  if (!row.description) return null;
-
-  return (
-    <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 text-[13px] leading-relaxed text-slate-600">
-      <div className="max-w-[800px]">
-        {truncateText(row.description, 400)}
-        {row.href && (
-          <a
-            href={row.href}
-            className="ml-2 text-blue-500 no-underline font-medium hover:underline"
-          >
-            Read more &rarr;
-          </a>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Expand button
-function ExpandButton({
-  isExpanded,
-  onClick,
-  hasDescription,
-}: {
-  isExpanded: boolean;
-  onClick: () => void;
-  hasDescription: boolean;
-}) {
-  if (!hasDescription) return <span className="inline-block w-6" />;
-
-  return (
-    <button
-      onClick={onClick}
-      className="w-6 h-6 rounded border border-slate-200 flex items-center justify-center text-sm text-slate-500 cursor-pointer transition-all duration-150"
-      style={{
-        background: isExpanded ? "#eff6ff" : "white",
-      }}
-      title={isExpanded ? "Collapse" : "Expand description"}
-    >
-      {isExpanded ? "\u2212" : "+"}
-    </button>
-  );
-}
-
-// View action link
-function ViewActionLink({
-  href,
-  hoverColor,
-}: {
-  href?: string;
-  hoverColor: string;
-}) {
-  if (!href) return null;
-  return (
-    <a
-      href={href}
-      className="text-slate-500 no-underline text-xs px-2 py-1 rounded border border-slate-200 bg-white inline-block hover:bg-slate-100 transition-colors"
-      onMouseOver={(e) => {
-        e.currentTarget.style.color = hoverColor;
-      }}
-      onMouseOut={(e) => {
-        e.currentTarget.style.color = "";
-      }}
-    >
-      View &rarr;
-    </a>
-  );
-}
-
-// ============================================================================
-// COLUMN DEFINITIONS
-// ============================================================================
-
-function createCauseColumns(
-  expandedRows: Set<string>,
-  toggleRow: (id: string) => void
-): ColumnDef<SubItemRow>[] {
-  return [
-    {
-      id: "expand",
-      header: () => <span className="w-6" />,
-      cell: ({ row }) => (
-        <ExpandButton
-          isExpanded={expandedRows.has(row.original.subItem)}
-          onClick={() => toggleRow(row.original.subItem)}
-          hasDescription={!!row.original.description}
-        />
-      ),
-      size: 40,
-    },
-    {
-      accessorKey: "subItem",
-      header: ({ column }) => (
-        <SortableHeader column={column}>Parameter</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <ParamLink
-          href={row.original.href}
-          tier="cause"
-          isHighPriority={(row.original.ratings?.xriskImpact ?? 0) > 70}
-        >
-          {row.getValue("subItem")}
-        </ParamLink>
-      ),
-    },
-    {
-      accessorKey: "parent",
-      header: ({ column }) => (
-        <SortableHeader column={column}>Parent Factor</SortableHeader>
-      ),
-      cell: ({ row }) => {
-        const cat = parentCategories[row.original.parentId];
-        return (
-          <CombinedParentBadge
-            parent={row.getValue("parent")}
-            category={cat}
-          />
-        );
-      },
-    },
-    {
-      id: "changeability",
-      accessorFn: (row) => row.ratings?.changeability,
-      header: ({ column }) => (
-        <SortableHeader column={column}>Changeability</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <RatingCell
-          value={row.original.ratings?.changeability}
-          colorType="green"
-        />
-      ),
-    },
-    {
-      id: "uncertainty",
-      accessorFn: (row) => row.ratings?.uncertainty,
-      header: ({ column }) => (
-        <SortableHeader column={column}>Uncertainty</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <RatingCell
-          value={row.original.ratings?.uncertainty}
-          colorType="gray"
-        />
-      ),
-    },
-    {
-      id: "xriskImpact",
-      accessorFn: (row) => row.ratings?.xriskImpact,
-      header: ({ column }) => (
-        <SortableHeader column={column}>X-Risk</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <RatingCell
-          value={row.original.ratings?.xriskImpact}
-          colorType="red"
-        />
-      ),
-    },
-    {
-      id: "trajectoryImpact",
-      accessorFn: (row) => row.ratings?.trajectoryImpact,
-      header: ({ column }) => (
-        <SortableHeader column={column}>Trajectory</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <RatingCell
-          value={row.original.ratings?.trajectoryImpact}
-          colorType="blue"
-        />
-      ),
-    },
-    {
-      id: "actions",
-      header: () => null,
-      cell: ({ row }) => (
-        <ViewActionLink href={row.original.href} hoverColor="#1e40af" />
-      ),
-      size: 70,
-    },
-  ];
-}
-
-function createIntermediateColumns(
-  expandedRows: Set<string>,
-  toggleRow: (id: string) => void
-): ColumnDef<SubItemRow>[] {
-  return [
-    {
-      id: "expand",
-      header: () => <span className="w-6" />,
-      cell: ({ row }) => (
-        <ExpandButton
-          isExpanded={expandedRows.has(row.original.subItem)}
-          onClick={() => toggleRow(row.original.subItem)}
-          hasDescription={!!row.original.description}
-        />
-      ),
-      size: 40,
-    },
-    {
-      accessorKey: "subItem",
-      header: ({ column }) => (
-        <SortableHeader column={column}>Parameter</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <ParamLink
-          href={row.original.href}
-          tier="intermediate"
-          isHighPriority={(row.original.ratings?.xriskImpact ?? 0) > 70}
-        >
-          {row.getValue("subItem")}
-        </ParamLink>
-      ),
-    },
-    {
-      accessorKey: "parent",
-      header: ({ column }) => (
-        <SortableHeader column={column}>Parent Scenario</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <span
-          className="inline-block px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap"
-          style={{
-            background: "#f3e8ff",
-            color: "#7c3aed",
-            border: "1px solid #ddd6fe",
-          }}
-        >
-          {row.getValue("parent")}
-        </span>
-      ),
-    },
-    {
-      id: "changeability",
-      accessorFn: (row) => row.ratings?.changeability,
-      header: ({ column }) => (
-        <SortableHeader column={column}>Changeability</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <RatingCell
-          value={row.original.ratings?.changeability}
-          colorType="green"
-        />
-      ),
-    },
-    {
-      id: "uncertainty",
-      accessorFn: (row) => row.ratings?.uncertainty,
-      header: ({ column }) => (
-        <SortableHeader column={column}>Uncertainty</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <RatingCell
-          value={row.original.ratings?.uncertainty}
-          colorType="gray"
-        />
-      ),
-    },
-    {
-      id: "xriskImpact",
-      accessorFn: (row) => row.ratings?.xriskImpact,
-      header: ({ column }) => (
-        <SortableHeader column={column}>X-Risk</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <RatingCell
-          value={row.original.ratings?.xriskImpact}
-          colorType="red"
-        />
-      ),
-    },
-    {
-      id: "trajectoryImpact",
-      accessorFn: (row) => row.ratings?.trajectoryImpact,
-      header: ({ column }) => (
-        <SortableHeader column={column}>Trajectory</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <RatingCell
-          value={row.original.ratings?.trajectoryImpact}
-          colorType="blue"
-        />
-      ),
-    },
-    {
-      id: "actions",
-      header: () => null,
-      cell: ({ row }) => (
-        <ViewActionLink href={row.original.href} hoverColor="#7c3aed" />
-      ),
-      size: 70,
-    },
-  ];
-}
-
-function createEffectColumns(
-  expandedRows: Set<string>,
-  toggleRow: (id: string) => void
-): ColumnDef<SubItemRow>[] {
-  return [
-    {
-      id: "expand",
-      header: () => <span className="w-6" />,
-      cell: ({ row }) => (
-        <ExpandButton
-          isExpanded={expandedRows.has(row.original.subItem)}
-          onClick={() => toggleRow(row.original.subItem)}
-          hasDescription={!!row.original.description}
-        />
-      ),
-      size: 40,
-    },
-    {
-      accessorKey: "subItem",
-      header: ({ column }) => (
-        <SortableHeader column={column}>Parameter</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <ParamLink href={row.original.href} tier="effect">
-          {row.getValue("subItem")}
-        </ParamLink>
-      ),
-    },
-    {
-      accessorKey: "parent",
-      header: ({ column }) => (
-        <SortableHeader column={column}>Parent Outcome</SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <span
-          className="inline-block px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap"
-          style={{
-            background: "#fef3c7",
-            color: "#92400e",
-            border: "1px solid #fcd34d",
-          }}
-        >
-          {row.getValue("parent")}
-        </span>
-      ),
-    },
-    {
-      id: "actions",
-      header: () => null,
-      cell: ({ row }) => (
-        <ViewActionLink href={row.original.href} hoverColor="#92400e" />
-      ),
-      size: 70,
-    },
-  ];
-}
 
 // ============================================================================
 // TABLE SECTION
@@ -697,15 +179,57 @@ export default function TransitionModelTableClient({
   };
 
   const causeColumns = useMemo(
-    () => createCauseColumns(expandedRows, toggleRow),
+    () => createColumns(expandedRows, toggleRow, {
+      tier: "cause",
+      parentHeader: "Parent Factor",
+      parentCell: (parent, parentId) => (
+        <CombinedParentBadge parent={parent} category={parentCategories[parentId]} />
+      ),
+      actionHoverColor: "#1e40af",
+    }),
     [expandedRows]
   );
+
   const intermediateColumns = useMemo(
-    () => createIntermediateColumns(expandedRows, toggleRow),
+    () => createColumns(expandedRows, toggleRow, {
+      tier: "intermediate",
+      parentHeader: "Parent Scenario",
+      parentCell: (parent) => (
+        <span
+          className="inline-block px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap"
+          style={{
+            background: "#f3e8ff",
+            color: "#7c3aed",
+            border: "1px solid #ddd6fe",
+          }}
+        >
+          {parent}
+        </span>
+      ),
+      actionHoverColor: "#7c3aed",
+    }),
     [expandedRows]
   );
+
   const effectColumns = useMemo(
-    () => createEffectColumns(expandedRows, toggleRow),
+    () => createColumns(expandedRows, toggleRow, {
+      tier: "effect",
+      parentHeader: "Parent Outcome",
+      parentCell: (parent) => (
+        <span
+          className="inline-block px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap"
+          style={{
+            background: "#fef3c7",
+            color: "#92400e",
+            border: "1px solid #fcd34d",
+          }}
+        >
+          {parent}
+        </span>
+      ),
+      includeRatings: false,
+      actionHoverColor: "#92400e",
+    }),
     [expandedRows]
   );
 

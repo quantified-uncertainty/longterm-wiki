@@ -27,6 +27,9 @@ import { Legend, DataView, CopyIcon, CheckIcon, ExpandIcon, ShrinkIcon } from '.
 import { getLayoutedElements } from './layout';
 import { ZoomProvider } from './ZoomContext';
 import { MermaidDiagram } from '@/components/wiki/MermaidDiagram';
+import { computeCausalPath } from './graph-algorithms';
+import { toYaml, generateMermaidCode } from './graph-export';
+import { getStyledEdges, getStyledNodes } from './styled-elements';
 
 // Re-export types for external use
 export type { CauseEffectNodeData, CauseEffectEdgeData, GraphConfig, LayoutOptions, TypeLabels, SubgroupConfig, LegendItem, LayoutAlgorithm } from './types';
@@ -60,204 +63,6 @@ interface CauseEffectGraphProps {
   renderHeaderRight?: () => React.ReactNode;  // Custom content for right side of header
   scoreHighlight?: ScoreHighlightMode;  // Highlight nodes by score dimension (opacity based on score value)
   onNodeClick?: (node: Node<CauseEffectNodeData>) => void;  // External callback when a node is clicked
-}
-
-// Generate YAML representation of graph data
-function toYaml(nodes: Node<CauseEffectNodeData>[], edges: Edge<CauseEffectEdgeData>[]): string {
-  const edgesBySource = new Map<string, Edge<CauseEffectEdgeData>[]>();
-  for (const edge of edges) {
-    if (!edgesBySource.has(edge.source)) {
-      edgesBySource.set(edge.source, []);
-    }
-    edgesBySource.get(edge.source)!.push(edge);
-  }
-
-  const lines: string[] = ['nodes:'];
-
-  for (const node of nodes) {
-    lines.push(`  - id: ${node.id}`);
-    lines.push(`    label: "${node.data.label}"`);
-    if (node.data.type) lines.push(`    type: ${node.data.type}`);
-    if (node.data.confidence !== undefined) lines.push(`    confidence: ${node.data.confidence}`);
-    if (node.data.confidenceLabel) lines.push(`    confidenceLabel: "${node.data.confidenceLabel}"`);
-    if (node.data.description) lines.push(`    description: "${node.data.description.replace(/"/g, '\\"')}"`);
-    if (node.data.details) lines.push(`    details: "${node.data.details.replace(/"/g, '\\"')}"`);
-    if (node.data.relatedConcepts?.length) {
-      lines.push(`    relatedConcepts:`);
-      for (const concept of node.data.relatedConcepts) lines.push(`      - "${concept}"`);
-    }
-    if (node.data.sources?.length) {
-      lines.push(`    sources:`);
-      for (const source of node.data.sources) lines.push(`      - "${source}"`);
-    }
-    if (node.data.scores) {
-      const { novelty, sensitivity, changeability, certainty } = node.data.scores;
-      if (novelty !== undefined || sensitivity !== undefined || changeability !== undefined || certainty !== undefined) {
-        lines.push(`    scores:`);
-        if (novelty !== undefined) lines.push(`      novelty: ${novelty}`);
-        if (sensitivity !== undefined) lines.push(`      sensitivity: ${sensitivity}`);
-        if (changeability !== undefined) lines.push(`      changeability: ${changeability}`);
-        if (certainty !== undefined) lines.push(`      certainty: ${certainty}`);
-      }
-    }
-    const nodeEdges = edgesBySource.get(node.id);
-    if (nodeEdges?.length) {
-      lines.push(`    edges:`);
-      for (const edge of nodeEdges) {
-        lines.push(`      - target: ${edge.target}`);
-        if (edge.data?.strength) lines.push(`        strength: ${edge.data.strength}`);
-        if (edge.data?.confidence) lines.push(`        confidence: ${edge.data.confidence}`);
-        if (edge.data?.effect) lines.push(`        effect: ${edge.data.effect}`);
-        if (edge.data?.label) lines.push(`        label: "${edge.data.label}"`);
-      }
-    }
-    lines.push('');
-  }
-
-  return lines.join('\n');
-}
-
-// Unified graph traversal function for computing node/edge neighborhoods
-// - 'directed': Traverses upstream and downstream separately (for causal paths)
-// - 'undirected': Treats edges as bidirectional (for local neighborhood)
-function traverseGraph(
-  startNodeId: string,
-  edges: Edge<CauseEffectEdgeData>[],
-  depth: number,
-  mode: 'directed' | 'undirected'
-): { nodeIds: Set<string>; edgeIds: Set<string> } {
-  const nodeIds = new Set<string>([startNodeId]);
-  const edgeIds = new Set<string>();
-
-  // Build adjacency maps based on mode
-  const adjacencyMaps: Map<string, { nodeId: string; edgeId: string }[]>[] = [];
-
-  if (mode === 'directed') {
-    // Separate maps for downstream and upstream traversal
-    const downstream = new Map<string, { nodeId: string; edgeId: string }[]>();
-    const upstream = new Map<string, { nodeId: string; edgeId: string }[]>();
-
-    for (const edge of edges) {
-      if (!downstream.has(edge.source)) downstream.set(edge.source, []);
-      downstream.get(edge.source)!.push({ nodeId: edge.target, edgeId: edge.id });
-
-      if (!upstream.has(edge.target)) upstream.set(edge.target, []);
-      upstream.get(edge.target)!.push({ nodeId: edge.source, edgeId: edge.id });
-    }
-    adjacencyMaps.push(downstream, upstream);
-  } else {
-    // Single bidirectional map
-    const neighbors = new Map<string, { nodeId: string; edgeId: string }[]>();
-
-    for (const edge of edges) {
-      if (!neighbors.has(edge.source)) neighbors.set(edge.source, []);
-      neighbors.get(edge.source)!.push({ nodeId: edge.target, edgeId: edge.id });
-
-      if (!neighbors.has(edge.target)) neighbors.set(edge.target, []);
-      neighbors.get(edge.target)!.push({ nodeId: edge.source, edgeId: edge.id });
-    }
-    adjacencyMaps.push(neighbors);
-  }
-
-  // BFS traversal for each adjacency map
-  for (const adjacency of adjacencyMaps) {
-    let frontier = new Set([startNodeId]);
-    for (let d = 0; d < depth && frontier.size > 0; d++) {
-      const nextFrontier = new Set<string>();
-      for (const nodeId of frontier) {
-        for (const { nodeId: nextId, edgeId } of adjacency.get(nodeId) || []) {
-          edgeIds.add(edgeId);
-          if (!nodeIds.has(nextId)) {
-            nodeIds.add(nextId);
-            nextFrontier.add(nextId);
-          }
-        }
-      }
-      frontier = nextFrontier;
-    }
-  }
-
-  return { nodeIds, edgeIds };
-}
-
-// Convenience wrapper for causal path computation
-const computeCausalPath = (startNodeId: string, edges: Edge<CauseEffectEdgeData>[], maxDepth = 10) =>
-  traverseGraph(startNodeId, edges, maxDepth, 'directed');
-
-// Generate Mermaid flowchart syntax from graph data
-function generateMermaidCode(nodes: Node<CauseEffectNodeData>[], edges: Edge<CauseEffectEdgeData>[], direction: 'TD' | 'LR' = 'TD'): string {
-  const lines: string[] = [];
-  lines.push(`flowchart ${direction}`);
-  lines.push('');
-
-  // Group nodes by type for subgraphs
-  const nodesByType: Record<string, Node<CauseEffectNodeData>[]> = {};
-  for (const node of nodes) {
-    if (node.type === 'group' || node.type === 'subgroup' || node.type === 'clusterContainer') continue;
-    const nodeType = node.data.type || 'intermediate';
-    if (!nodesByType[nodeType]) nodesByType[nodeType] = [];
-    nodesByType[nodeType].push(node);
-  }
-
-  // Type labels and order
-  const typeLabels: Record<string, string> = {
-    leaf: 'Root Causes',
-    cause: 'Derived Factors',
-    intermediate: 'Direct Factors',
-    effect: 'Outcomes',
-  };
-  const typeOrder = ['leaf', 'cause', 'intermediate', 'effect'];
-
-  // Add nodes grouped by type
-  for (const nodeType of typeOrder) {
-    const typeNodes = nodesByType[nodeType];
-    if (!typeNodes || typeNodes.length === 0) continue;
-
-    const label = typeLabels[nodeType] || nodeType;
-    lines.push(`    subgraph ${nodeType}["${label}"]`);
-    for (const node of typeNodes) {
-      // Escape quotes and special chars in labels
-      const safeLabel = (node.data.label || node.id).replace(/"/g, "'").replace(/\[/g, '(').replace(/\]/g, ')');
-      // Use different shapes based on type
-      // Effect: stadium shape (rounded sides)
-      // All others: rectangle
-      if (nodeType === 'effect') {
-        lines.push(`        ${node.id}(["${safeLabel}"])`);
-      } else {
-        lines.push(`        ${node.id}["${safeLabel}"]`);
-      }
-    }
-    lines.push('    end');
-    lines.push('');
-  }
-
-  // Add edges
-  lines.push('    %% Edges');
-  for (const edge of edges) {
-    const edgeData = edge.data;
-    const arrowType = edgeData?.effect === 'decreases' ? '-.->|−|' :
-                      edgeData?.effect === 'mixed' ? '-.->|±|' :
-                      edgeData?.strength === 'strong' ? '==>' : '-->';
-    lines.push(`    ${edge.source} ${arrowType} ${edge.target}`);
-  }
-
-  // Add styling
-  lines.push('');
-  lines.push('    %% Styling');
-  lines.push('    classDef leaf fill:#f0fdfa,stroke:#14b8a6,stroke-width:2px');
-  lines.push('    classDef cause fill:#eff6ff,stroke:#3b82f6,stroke-width:2px');
-  lines.push('    classDef intermediate fill:#f8fafc,stroke:#64748b,stroke-width:2px');
-  lines.push('    classDef effect fill:#fffbeb,stroke:#f59e0b,stroke-width:2px');
-
-  // Apply classes to nodes
-  for (const nodeType of typeOrder) {
-    const typeNodes = nodesByType[nodeType];
-    if (typeNodes && typeNodes.length > 0) {
-      lines.push(`    class ${typeNodes.map(n => n.id).join(',')} ${nodeType}`);
-    }
-  }
-
-  return lines.join('\n');
 }
 
 // Inner component that has access to ReactFlow instance
@@ -416,129 +221,19 @@ function CauseEffectGraphInner({
   }, [hoveredNodeId, edges]);
 
   // Style edges based on hover, path highlighting, and edge hover states
-  const styledEdges = useMemo(() => {
-    return edges.map((edge) => {
-      const isHoveredEdge = hoveredEdgeId === edge.id;
-      const isConnectedToHoveredNode = edge.source === hoveredNodeId || edge.target === hoveredNodeId;
-      const isInPath = pathHighlight.edgeIds.has(edge.id);
-      const hasPathHighlight = pathHighlight.nodeIds.size > 0;
-      const hasHoveredNode = !!hoveredNodeId;
-
-      // Determine if this edge should be highlighted
-      const isHighlighted = isHoveredEdge || isConnectedToHoveredNode || isInPath;
-
-      // Determine opacity based on state
-      let opacity = 1;
-      if (hasPathHighlight && !isInPath) {
-        opacity = 0.15;
-      } else if (hasHoveredNode && !isConnectedToHoveredNode) {
-        opacity = 0.15;
-      }
-
-      // Show label on hover
-      const edgeData = edge.data as CauseEffectEdgeData | undefined;
-      const showLabel = isHoveredEdge && edgeData;
-      const effectLabel = edgeData?.effect === 'decreases' ? '−' : edgeData?.effect === 'mixed' ? '±' : '+';
-      const strengthLabel = edgeData?.strength === 'strong' ? 'Strong' : edgeData?.strength === 'weak' ? 'Weak' : '';
-
-      return {
-        ...edge,
-        label: showLabel ? `${strengthLabel} ${effectLabel}`.trim() : undefined,
-        labelStyle: showLabel ? {
-          fill: '#f1f5f9',
-          fontSize: 11,
-          fontWeight: 500,
-        } : undefined,
-        labelBgStyle: showLabel ? {
-          fill: edgeData?.effect === 'decreases' ? '#991b1b' : edgeData?.effect === 'mixed' ? '#854d0e' : '#166534',
-          fillOpacity: 1,
-        } : undefined,
-        labelBgPadding: [4, 6] as [number, number],
-        labelBgBorderRadius: 4,
-        style: {
-          ...edge.style,
-          opacity,
-          strokeWidth: isHighlighted
-            ? ((edge.style?.strokeWidth as number) || 2) * 1.5
-            : edge.style?.strokeWidth,
-        },
-        markerEnd: isHighlighted
-          ? edge.markerEnd
-          : (typeof edge.markerEnd === 'object' ? { ...edge.markerEnd, color: '#d6d3d1' } : edge.markerEnd) as typeof edge.markerEnd,
-        zIndex: isHighlighted ? 1000 : 0,
-        className: isInPath ? 'react-flow__edge--path-highlighted' : undefined,
-      };
-    });
-  }, [edges, hoveredNodeId, hoveredEdgeId, pathHighlight]);
+  const styledEdges = useMemo(
+    () => getStyledEdges({ edges, hoveredNodeId, hoveredEdgeId, pathHighlight }),
+    [edges, hoveredNodeId, hoveredEdgeId, pathHighlight]
+  );
 
   // Style nodes based on hover state, selection, path highlighting, and score highlighting
-  const styledNodes = useMemo(() => {
-    return nodes.map((node) => {
-      if (node.type === 'group' || node.type === 'subgroup' || node.type === 'clusterContainer') return node;
-
-      const isSelected = selectedNodeId === node.id;
-      const isPathRoot = pathHighlightNodeId === node.id;
-      const isInPath = pathHighlight.nodeIds.has(node.id);
-      const hasPathHighlight = pathHighlight.nodeIds.size > 0;
-      const isConnected = hoveredNodeId ? connectedNodeIds.has(node.id) : true;
-
-      // Determine opacity and score-based styling
-      let opacity = 1;
-      let scoreIntensity: number | undefined;
-      let highlightColor: 'purple' | 'red' | 'green' | 'blue' | 'yellow' | undefined;
-
-      // Map score dimensions to highlight colors
-      const scoreToColor: Record<string, 'purple' | 'red' | 'green' | 'blue'> = {
-        novelty: 'purple',
-        sensitivity: 'blue',
-        changeability: 'green',
-        certainty: 'red',
-      };
-
-      // Score-based highlighting takes precedence when active
-      if (scoreHighlight && node.data.scores) {
-        const score = node.data.scores[scoreHighlight];
-        highlightColor = scoreToColor[scoreHighlight];
-        if (score !== undefined) {
-          // Normalize score to 0-1 range for color intensity
-          scoreIntensity = (score - 1) / 9; // 0 for score 1, 1 for score 10
-        } else {
-          // No score for this dimension = very dimmed
-          scoreIntensity = -1; // Signal "no score"
-        }
-      } else if (scoreHighlight) {
-        // Score highlight mode active but node has no scores at all
-        scoreIntensity = -1;
-        highlightColor = scoreToColor[scoreHighlight];
-      } else if (hasPathHighlight && !isInPath) {
-        opacity = 0.3;
-      } else if (hoveredNodeId && !isConnected) {
-        opacity = 0.3;
-      }
-
-      return {
-        ...node,
-        selected: isSelected || isPathRoot,
-        data: {
-          ...node.data,
-          // Pass score intensity to node for styling
-          scoreIntensity,
-          // Pass highlight color for score-based styling
-          highlightColor,
-          // Pass active score dimension for fading non-active scores
-          activeScoreDimension: scoreHighlight,
-          // Pass showScores setting to node
-          showScores,
-        },
-        style: {
-          ...node.style,
-          opacity,
-          zIndex: isInPath || isConnected ? 1001 : undefined,
-        },
-        className: isInPath ? 'react-flow__node--path-highlighted' : undefined,
-      };
-    });
-  }, [nodes, hoveredNodeId, connectedNodeIds, selectedNodeId, pathHighlight, pathHighlightNodeId, scoreHighlight, showScores]);
+  const styledNodes = useMemo(
+    () => getStyledNodes({
+      nodes, hoveredNodeId, connectedNodeIds, selectedNodeId,
+      pathHighlight, pathHighlightNodeId, scoreHighlight, showScores,
+    }),
+    [nodes, hoveredNodeId, connectedNodeIds, selectedNodeId, pathHighlight, pathHighlightNodeId, scoreHighlight, showScores]
+  );
 
   // Keyboard handler for ESC
   useEffect(() => {

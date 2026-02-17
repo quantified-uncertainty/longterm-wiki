@@ -12,7 +12,7 @@ import { buildCommands } from '../lib/cli.ts';
  */
 const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
-    script: 'authoring/page-improver.ts',
+    script: 'authoring/page-improver/index.ts',
     description: 'Improve an existing page with AI assistance',
     passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'triage'],
     positional: true,
@@ -34,7 +34,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
     passthrough: ['ci', 'verbose'],
   },
   'grade-content': {
-    script: 'authoring/grade-content.ts',
+    script: 'authoring/grading/index.ts',
     description: 'Grade content quality with AI (3-step pipeline)',
     passthrough: ['ci', 'batch', 'model', 'dryRun', 'skipWarnings', 'warningsOnly'],
   },
