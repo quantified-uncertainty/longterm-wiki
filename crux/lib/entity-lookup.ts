@@ -13,6 +13,7 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
+import { ENTITY_LINK_RE, NUMERIC_ID_RE } from './patterns.ts';
 
 interface EntityEntry {
   id: string;      // slug, e.g. "anthropic"
@@ -93,9 +94,9 @@ export function buildEntityLookupForContent(content: string, ROOT: string): stri
   const relevantEntities = new Map<string, { eid: string; title: string; type?: string; reason: string }>();
 
   // 1. Find existing EntityLink references (both E## and slug-based)
-  const existingLinks = [...content.matchAll(/<EntityLink\s+[^>]*id="([^"]+)"/g)].map(m => m[1]);
+  const existingLinks = [...content.matchAll(ENTITY_LINK_RE)].map(m => m[1]);
   for (const id of existingLinks) {
-    if (/^E\d+$/i.test(id)) {
+    if (NUMERIC_ID_RE.test(id)) {
       // Already numeric — resolve to slug to find title
       const registry = loadRegistry(ROOT);
       const slug = registry.entities[id.toUpperCase()];

@@ -13,33 +13,14 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import Anthropic from '@anthropic-ai/sdk';
-import { createClient, MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
+import { MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
+import {
+  createLlmClient, streamLlmCall, extractMdxContent,
+} from '../../lib/llm.ts';
 import { getSynthesisPrompt } from './synthesis.ts';
 import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
+import { stripFrontmatter, FOOTNOTE_REF_RE, FOOTNOTE_DEF_RE } from '../../lib/patterns.ts';
 import type { ValidationPhaseContext } from './types.ts';
-
-// ---------------------------------------------------------------------------
-// Shared helpers (retry + heartbeat imported from shared module)
-// ---------------------------------------------------------------------------
-import { withRetry, startHeartbeat } from '../../lib/resilience.ts';
-
-/** Stream a Claude API call and return the final message. */
-async function streamingCreate(
-  client: Anthropic,
-  params: Parameters<typeof client.messages.create>[0]
-): Promise<Anthropic.Messages.Message> {
-  const stream = client.messages.stream(params as any);
-  return await stream.finalMessage();
-}
-
-/** Extract text from a Claude response. */
-function extractText(response: Anthropic.Messages.Message): string {
-  return response.content
-    .filter((b): b is Anthropic.Messages.TextBlock => b.type === 'text')
-    .map(b => b.text)
-    .join('\n');
-}
 
 // ---------------------------------------------------------------------------
 // API-Direct Synthesis
@@ -59,7 +40,7 @@ export async function runSynthesisApiDirect(
 ): Promise<{ success: boolean; model: string; budget: number }> {
   log('synthesis', `Generating article via API-direct (${quality})...`);
 
-  const client = createClient(); // Throws if ANTHROPIC_API_KEY missing
+  const client = createLlmClient();
 
   const model = quality === 'quality' ? MODELS.opus : MODELS.sonnet;
   const budget = quality === 'quality' ? 3.0 : 2.0;
@@ -74,48 +55,26 @@ export async function runSynthesisApiDirect(
     }
   }, destPath, ROOT);
 
-  const stopHeartbeat = startHeartbeat('synthesis', 30);
-  try {
-    const response = await withRetry(
-      () => streamingCreate(client, {
-        model,
-        max_tokens: 16000,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-      { label: 'synthesis' }
-    );
+  const text = await streamLlmCall(client, prompt, {
+    model,
+    maxTokens: 16000,
+    retryLabel: 'synthesis',
+    heartbeatPhase: 'synthesis',
+  });
 
-    const text = extractText(response);
+  const mdxContent = extractMdxContent(text);
 
-    // Extract the MDX content from the response
-    let mdxContent = text;
-
-    // If the model wrapped it in a code block, extract it
-    const codeBlockMatch = text.match(/```(?:mdx)?\n([\s\S]*?)```/);
-    if (codeBlockMatch) {
-      mdxContent = codeBlockMatch[1];
-    } else if (!text.startsWith('---')) {
-      // Try to find the frontmatter start
-      const fmStart = text.indexOf('---\n');
-      if (fmStart !== -1) {
-        mdxContent = text.slice(fmStart);
-      }
-    }
-
-    // Write the draft to the expected location
-    const draftDir = getTopicDir(topic);
-    if (!fs.existsSync(draftDir)) {
-      fs.mkdirSync(draftDir, { recursive: true });
-    }
-    const draftPath = path.join(draftDir, 'draft.mdx');
-    fs.writeFileSync(draftPath, mdxContent);
-
-    log('synthesis', `Draft written to ${draftPath} (${mdxContent.length} chars)`);
-
-    return { success: true, model, budget };
-  } finally {
-    stopHeartbeat();
+  // Write the draft to the expected location
+  const draftDir = getTopicDir(topic);
+  if (!fs.existsSync(draftDir)) {
+    fs.mkdirSync(draftDir, { recursive: true });
   }
+  const draftPath = path.join(draftDir, 'draft.mdx');
+  fs.writeFileSync(draftPath, mdxContent);
+
+  log('synthesis', `Draft written to ${draftPath} (${mdxContent.length} chars)`);
+
+  return { success: true, model, budget };
 }
 
 // ---------------------------------------------------------------------------
@@ -147,7 +106,7 @@ export async function runValidationLoopApiDirect(
     return { success: false, error: 'No draft found' };
   }
 
-  const client = createClient(); // Throws if ANTHROPIC_API_KEY missing
+  const client = createLlmClient();
 
   const MAX_ITERATIONS = 3;
   let content = fs.readFileSync(draftPath, 'utf-8');
@@ -193,40 +152,21 @@ export async function runValidationLoopApiDirect(
     // Ask Claude to fix the issues
     const fixPrompt = buildFixPrompt(content, issues, ROOT);
 
-    const stopHeartbeat = startHeartbeat('validate-fix', 30);
-    try {
-      const response = await withRetry(
-        () => streamingCreate(client, {
-          model: MODELS.sonnet,
-          max_tokens: 16000,
-          messages: [{ role: 'user', content: fixPrompt }],
-        }),
-        { label: 'validation-fix' }
-      );
+    const fixedText = await streamLlmCall(client, fixPrompt, {
+      model: MODELS.sonnet,
+      maxTokens: 16000,
+      retryLabel: 'validation-fix',
+      heartbeatPhase: 'validate-fix',
+    });
 
-      const fixedText = extractText(response);
+    const fixedContent = extractMdxContent(fixedText);
 
-      // Extract the fixed MDX content
-      let fixedContent = fixedText;
-      const codeBlockMatch = fixedText.match(/```(?:mdx)?\n([\s\S]*?)```/);
-      if (codeBlockMatch) {
-        fixedContent = codeBlockMatch[1];
-      } else if (!fixedText.startsWith('---')) {
-        const fmStart = fixedText.indexOf('---\n');
-        if (fmStart !== -1) {
-          fixedContent = fixedText.slice(fmStart);
-        }
-      }
-
-      // Only update if the response looks like valid MDX
-      if (fixedContent.startsWith('---')) {
-        content = fixedContent;
-        fs.writeFileSync(draftPath, content);
-      } else {
-        log('validate', '  Warning: Claude response did not contain valid MDX, keeping previous version');
-      }
-    } finally {
-      stopHeartbeat();
+    // Only update if the response looks like valid MDX
+    if (fixedContent.startsWith('---')) {
+      content = fixedContent;
+      fs.writeFileSync(draftPath, content);
+    } else {
+      log('validate', '  Warning: Claude response did not contain valid MDX, keeping previous version');
     }
   }
 
@@ -290,15 +230,15 @@ function collectValidationIssues(
   const content = fs.readFileSync(filePath, 'utf-8');
 
   // Check for unescaped dollar signs
-  const bodyContent = content.replace(/^---[\s\S]*?---/, ''); // Strip frontmatter
+  const bodyContent = stripFrontmatter(content);
   const unescapedDollar = bodyContent.match(/(?<!\\)\$\d/g);
   if (unescapedDollar) {
     issues.push(`[CRITICAL] Unescaped dollar signs found: ${unescapedDollar.length} instance(s)`);
   }
 
   // Check for undefined footnotes
-  const footnoteRefs = bodyContent.match(/\[\^\d+\]/g) || [];
-  const footnoteDefinitions = bodyContent.match(/^\[\^\d+\]:/gm) || [];
+  const footnoteRefs = bodyContent.match(FOOTNOTE_REF_RE) || [];
+  const footnoteDefinitions = bodyContent.match(FOOTNOTE_DEF_RE) || [];
   const refNums = new Set(footnoteRefs.map(r => r.match(/\d+/)![0]));
   const defNums = new Set(footnoteDefinitions.map(d => d.match(/\d+/)![0]));
   const orphanRefs = [...refNums].filter(n => !defNums.has(n));
@@ -386,7 +326,7 @@ export async function runReviewApiDirect(
     return { success: false, error: 'No draft found for review' };
   }
 
-  const client = createClient(); // Throws if ANTHROPIC_API_KEY missing
+  const client = createLlmClient();
 
   const draftContent = fs.readFileSync(draftPath, 'utf-8');
 
@@ -426,37 +366,28 @@ Return a JSON object with your findings:
 
 If you find logicalIssues or temporalArtifacts, also output the fixed content sections.`;
 
-  const stopHeartbeat = startHeartbeat('review', 30);
+  const text = await streamLlmCall(client, reviewPrompt, {
+    model: MODELS.sonnet,
+    maxTokens: 4000,
+    retryLabel: 'review',
+    heartbeatPhase: 'review',
+  });
+
+  // Write review results
+  const reviewPath = path.join(getTopicDir(topic), 'review.json');
   try {
-    const response = await withRetry(
-      () => streamingCreate(client, {
-        model: MODELS.sonnet,
-        max_tokens: 4000,
-        messages: [{ role: 'user', content: reviewPrompt }],
-      }),
-      { label: 'review' }
-    );
+    const review = parseJsonResponse(text) as Record<string, unknown>;
+    fs.writeFileSync(reviewPath, JSON.stringify(review, null, 2));
+    log('review', `Review written to ${reviewPath}`);
 
-    const text = extractText(response);
-
-    // Write review results
-    const reviewPath = path.join(getTopicDir(topic), 'review.json');
-    try {
-      const review = parseJsonResponse(text) as Record<string, unknown>;
-      fs.writeFileSync(reviewPath, JSON.stringify(review, null, 2));
-      log('review', `Review written to ${reviewPath}`);
-
-      // If temporal artifacts or logical issues found, log summary
-      const hasIssues = ((review.logicalIssues as unknown[])?.length > 0) || ((review.temporalArtifacts as unknown[])?.length > 0);
-      if (hasIssues) {
-        log('review', `Found issues: ${(review.logicalIssues as unknown[])?.length || 0} logical, ${(review.temporalArtifacts as unknown[])?.length || 0} temporal`);
-      }
-    } catch {
-      fs.writeFileSync(reviewPath, JSON.stringify({ raw: text }, null, 2));
+    // If temporal artifacts or logical issues found, log summary
+    const hasIssues = ((review.logicalIssues as unknown[])?.length > 0) || ((review.temporalArtifacts as unknown[])?.length > 0);
+    if (hasIssues) {
+      log('review', `Found issues: ${(review.logicalIssues as unknown[])?.length || 0} logical, ${(review.temporalArtifacts as unknown[])?.length || 0} temporal`);
     }
-
-    return { success: true };
-  } finally {
-    stopHeartbeat();
+  } catch {
+    fs.writeFileSync(reviewPath, JSON.stringify({ raw: text }, null, 2));
   }
+
+  return { success: true };
 }

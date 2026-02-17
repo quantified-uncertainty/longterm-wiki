@@ -28,6 +28,7 @@ import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
 import { CONTENT_DIR, PROJECT_ROOT } from '../lib/content-types.ts';
+import { MARKDOWN_LINK_RE } from '../lib/patterns.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 
 const args: string[] = process.argv.slice(2);
@@ -92,10 +93,6 @@ interface LinkValidationResults {
 function extractInternalLinks(content: string, filePath: string): InternalLink[] {
   const links: InternalLink[] = [];
 
-  // Match markdown links: [text](path)
-  const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
-  let match: RegExpExecArray | null;
-
   let lineNum = 0;
   let inCodeBlock = false;
   const lines: string[] = content.split('\n');
@@ -114,10 +111,8 @@ function extractInternalLinks(content: string, filePath: string): InternalLink[]
       continue;
     }
 
-    linkRegex.lastIndex = 0;
-
-    while ((match = linkRegex.exec(line)) !== null) {
-      const [fullMatch, text, href] = match;
+    for (const match of line.matchAll(MARKDOWN_LINK_RE)) {
+      const [, text, href] = match;
 
       // Skip external links, anchors, and mailto/tel
       if (href.startsWith('http://') ||

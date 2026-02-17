@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 import { createPhaseLogger } from '../../lib/output.ts';
 import { getApiKey } from '../../lib/api-keys.ts';
 import type { AnalysisResult, PageData, TierConfig } from './types.ts';
+import { FRONTMATTER_RE } from '../../lib/patterns.ts';
 
 // ── Shared constants ─────────────────────────────────────────────────────────
 
@@ -112,7 +113,7 @@ function enrichWithFrontmatterRatings(page: PageData): PageData {
     const filePath = getFilePath(page.path);
     if (!fs.existsSync(filePath)) return page;
     const content = fs.readFileSync(filePath, 'utf-8');
-    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    const fmMatch = content.match(FRONTMATTER_RE);
     if (!fmMatch) return page;
     const fm = fmMatch[1];
     const ratingsMatch = fm.match(/^ratings:\s*\n((?:\s+\w+:\s*[\d.]+\n?)*)/m);
@@ -274,7 +275,7 @@ export function buildObjectivityContext(page: PageData, analysis: AnalysisResult
     parts.push('');
   }
 
-  const objectivityIssues = (analysis as Record<string, unknown>).objectivityIssues as string[] | undefined;
+  const objectivityIssues = analysis.objectivityIssues;
   if (objectivityIssues && objectivityIssues.length > 0) {
     if (parts.length === 0) parts.push('## Objectivity Issues Found in Analysis');
     else parts.push('### Specific Issues Identified');

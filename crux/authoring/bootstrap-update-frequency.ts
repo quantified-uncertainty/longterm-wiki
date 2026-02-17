@@ -25,6 +25,7 @@ import { fileURLToPath } from 'url';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parse as parseYaml } from 'yaml';
+import { FRONTMATTER_RE } from '../lib/patterns.ts';
 
 // ---------------------------------------------------------------------------
 // Config
@@ -54,7 +55,7 @@ function insertUpdateFrequency(content: string, frequency: number): string {
   const fmMatch: RegExpMatchArray | null = content.match(/^(---\n)([\s\S]*?)(\n---)/);
   if (!fmMatch) return content;
 
-  const yaml: string = fmMatch[2];
+  const yaml: string = fmMatch[2]; // Uses capture variant of frontmatter pattern
   const lines: string[] = yaml.split('\n');
 
   // Find best insertion point: after lastEdited, readerImportance, or at end of top-level fields
@@ -102,7 +103,7 @@ async function main(): Promise<void> {
 
   // Override parseFrontmatter with proper yaml import
   function parseFm(content: string): Record<string, unknown> {
-    const match: RegExpMatchArray | null = content.match(/^---\n([\s\S]*?)\n---/);
+    const match: RegExpMatchArray | null = content.match(FRONTMATTER_RE);
     if (!match) return {};
     try {
       return (parseYaml(match[1]) as Record<string, unknown>) || {};

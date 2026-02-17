@@ -13,6 +13,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { loadDatabase, loadPathRegistry, DATA_DIR_ABS, type Entity } from '../content-types.ts';
+import { NUMERIC_ID_RE, ENTITY_LINK_RE } from '../patterns.ts';
 
 const DATA_DIR = DATA_DIR_ABS;
 
@@ -38,7 +39,7 @@ function loadIdRegistry(): Record<string, string> {
 
 /** Resolve a numeric ID (E35) to its slug, or return the ID unchanged */
 function resolveNumericId(id: string): string {
-  if (/^E\d+$/.test(id)) {
+  if (NUMERIC_ID_RE.test(id)) {
     const registry = loadIdRegistry();
     return registry[id] || id;
   }
@@ -191,9 +192,7 @@ export const componentRefsRule = createRule({
 
     // Check EntityLink references (skip for internal docs)
     if (!isInternalDoc) {
-      const entityLinkRegex = /<EntityLink\s+id=["']([^"']+)["']/g;
-      let match: RegExpExecArray | null;
-      while ((match = entityLinkRegex.exec(body)) !== null) {
+      for (const match of body.matchAll(ENTITY_LINK_RE)) {
         const rawId = match[1];
         const id = resolveNumericId(rawId);
         const lineNum = body.slice(0, match.index).split('\n').length;

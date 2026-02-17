@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 import type { DeployPhaseContext, ValidationPhaseContext } from './types.ts';
+import { ENTITY_LINK_RE, NUMERIC_ID_RE, FOOTNOTE_REF_RE, FOOTNOTE_DEF_RE } from '../../lib/patterns.ts';
 
 interface IdRegistry {
   _nextId: number;
@@ -42,7 +43,7 @@ export function convertSlugsToNumericIds(content: string, ROOT: string): { conte
   const result = content.replace(
     /(<EntityLink\s+[^>]*?)id="([^"]+)"/g,
     (_match, prefix, id) => {
-      if (/^E\d+$/i.test(id)) return _match; // already numeric
+      if (NUMERIC_ID_RE.test(id)) return _match; // already numeric
       if (slugToNumeric[id]) {
         converted++;
         return `${prefix}id="${slugToNumeric[id]}"`;
@@ -55,7 +56,7 @@ export function convertSlugsToNumericIds(content: string, ROOT: string): { conte
   const result2 = result.replace(
     /entityId="([^"]+)"/g,
     (_match, id) => {
-      if (/^E\d+$/i.test(id)) return _match;
+      if (NUMERIC_ID_RE.test(id)) return _match;
       if (slugToNumeric[id]) {
         converted++;
         return `entityId="${slugToNumeric[id]}"`;
@@ -153,10 +154,8 @@ export function validateCrossLinks(filePath: string): CrossLinkResult {
   const content = fs.readFileSync(filePath, 'utf-8');
 
   // Count EntityLinks
-  const entityLinkPattern = /<EntityLink\s+id="([^"]+)"/g;
   const outboundIds: string[] = [];
-  let match: RegExpExecArray | null;
-  while ((match = entityLinkPattern.exec(content)) !== null) {
+  for (const match of content.matchAll(ENTITY_LINK_RE)) {
     outboundIds.push(match[1]);
   }
 
@@ -168,8 +167,8 @@ export function validateCrossLinks(filePath: string): CrossLinkResult {
   }
 
   // Check for broken footnote references
-  const footnoteRefs = content.match(/\[\^\d+\]/g) || [];
-  const footnoteDefinitions = content.match(/^\[\^\d+\]:/gm) || [];
+  const footnoteRefs = content.match(FOOTNOTE_REF_RE) || [];
+  const footnoteDefinitions = content.match(FOOTNOTE_DEF_RE) || [];
   const refCount = new Set(footnoteRefs.map(r => r.match(/\d+/)![0])).size;
   const defCount = new Set(footnoteDefinitions.map(d => d.match(/\d+/)![0])).size;
 

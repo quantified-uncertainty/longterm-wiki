@@ -13,6 +13,7 @@ import {
   countTables,
   countVisuals,
 } from './visual-detection.ts';
+import { stripFrontmatter } from './patterns.ts';
 
 export type { VisualCounts } from './visual-detection.ts';
 export { countVisuals, countDiagrams, countTables } from './visual-detection.ts';
@@ -59,7 +60,7 @@ export interface QualityDiscrepancy {
  */
 export function extractMetrics(content: string, filePath: string = '', contentFormat: ContentFormat = 'article'): ContentMetrics {
   // Remove frontmatter for analysis
-  const bodyContent = content.replace(/^---\n[\s\S]*?\n---\n?/, '');
+  const bodyContent = stripFrontmatter(content);
 
   // Remove import statements
   const contentNoImports = bodyContent.replace(/^import\s+.*$/gm, '');

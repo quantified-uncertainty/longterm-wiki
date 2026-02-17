@@ -5,7 +5,7 @@ sidebar:
   order: 4
 quality: 27
 llmSummary: Comprehensive biography of Jan Leike covering his career from DeepMind through OpenAI's Superalignment team to current role as Head of Alignment at Anthropic, emphasizing his pioneering work on RLHF and scalable oversight. Documents his May 2024 departure from OpenAI over safety prioritization concerns and identifies weak-to-strong generalization and automated alignment as current research priorities.
-lastEdited: "2026-01-29"
+lastEdited: "2026-02-17"
 readerImportance: 82
 researchImportance: 39
 update_frequency: 21
@@ -23,162 +23,200 @@ import {DataInfoBox, DataExternalLinks, EntityLink} from '@components/wiki';
 
 <DataInfoBox entityId="E182" />
 
+## Quick Assessment
+
+| Aspect | Assessment |
+|--------|-----------|
+| **Primary Role** | Head of Alignment at <EntityLink id="anthropic">Anthropic</EntityLink> (2024-present) |
+| **Key Contributions** | Early development of <EntityLink id="rlhf">RLHF</EntityLink> techniques; research on <EntityLink id="scalable-oversight">scalable oversight</EntityLink> and <EntityLink id="weak-to-strong">weak-to-strong generalization</EntityLink>; co-led <EntityLink id="openai">OpenAI</EntityLink> Superalignment team |
+| **Key Publications** | "Deep Reinforcement Learning from Human Preferences" (2017); "Scalable agent alignment via reward modeling" (2018); "Recursively Summarizing Books with Human Feedback" (2021) |
+| **Career Trajectory** | PhD from Australian National University → <EntityLink id="deepmind">Google DeepMind</EntityLink> (2017-2021) → OpenAI (2021-2024) → Anthropic (2024-present) |
+| **Notable Event** | Departed OpenAI in May 2024 citing concerns about safety prioritization |
+
+## Overview
+
+Jan Leike is an AI alignment researcher who has held leadership positions at major AI labs. His work has focused on developing empirical methods for aligning AI systems with human values, particularly through reinforcement learning from human feedback. He completed a PhD at Australian National University under Marcus Hutter, then worked on alignment problems at DeepMind from 2017 to 2021. At OpenAI from 2021 to 2024, he co-led the Superalignment team with <EntityLink id="ilya-sutskever">Ilya Sutskever</EntityLink> before departing in May 2024. He currently serves as Head of Alignment at Anthropic, where he continues research on alignment techniques for increasingly capable AI systems.
+
 ## Background
 
-Jan Leike is a leading <EntityLink id="alignment">AI alignment</EntityLink> researcher currently serving as Head of Alignment at <EntityLink id="anthropic">Anthropic</EntityLink>. He has a PhD from Australian National University, where he worked on AI safety under Marcus Hutter.
+Jan Leike completed his PhD at Australian National University, where he studied AI safety under Marcus Hutter. {/* NEEDS CITATION: PhD thesis title and year */} His doctoral research focused on theoretical aspects of AI alignment and safe reinforcement learning.
 
-His career has been defined by practical, empirical approaches to alignment:
-- Early work on safe exploration in reinforcement learning
-- Pioneering research on learning from human feedback
-- Leadership of alignment teams at DeepMind, <EntityLink id="openai">OpenAI</EntityLink>, and now Anthropic
-- Focus on scalable methods that can work with current ML paradigms
+His career has centered on developing practical, empirically-testable approaches to AI alignment:
+- Research on safe exploration in reinforcement learning systems
+- Development of methods for learning from human feedback
+- Leadership of alignment research teams at multiple major AI laboratories
+- Focus on techniques designed to work with contemporary machine learning paradigms
 
 ## Career Trajectory
 
 ### DeepMind (2017-2021)
-Worked on the first implementations of learning from human feedback, including:
-- Safe exploration methods
-- <EntityLink id="reward-modeling">Reward modeling</EntityLink>
-- Scalable agent alignment
+
+{/* NEEDS CITATION: Exact start and end dates at DeepMind */}
+
+At DeepMind, Leike worked on early implementations of learning from human feedback, including:
+- Methods for safe exploration in reinforcement learning environments
+- <EntityLink id="reward-modeling">Reward modeling</EntityLink> techniques
+- Approaches to scalable agent alignment
 
 ### OpenAI (2021-2024)
-- Joined to lead alignment research
-- Co-led the Superalignment team (announced July 2023)
-- Secured 20% of OpenAI's compute for alignment research
-- Departed May 2024 over disagreements about safety prioritization
+
+{/* NEEDS CITATION: Exact start date at OpenAI */}
+
+Leike joined OpenAI to lead alignment research efforts. In July 2023, OpenAI announced the formation of the Superalignment team, which Leike co-led with Ilya Sutskever. {/* NEEDS CITATION: Verify July 2023 announcement date */} According to public statements, the team received a commitment of 20% of OpenAI's compute resources. {/* NEEDS CITATION: Source for 20% compute claim */}
+
+He departed from OpenAI in May 2024. {/* NEEDS CITATION: Specific departure date */}
 
 ### Anthropic (2024-present)
-- Joined as Head of Alignment
-- Reunited with former OpenAI colleagues
-- Leading alignment research on Claude and future systems
+
+{/* NEEDS CITATION: Exact start date at Anthropic */}
+
+Leike joined Anthropic as Head of Alignment, where he leads alignment research efforts. At Anthropic, he works alongside other former OpenAI researchers on alignment challenges related to the Claude model family and future AI systems.
 
 ## Key Contributions
 
-### <EntityLink id="rlhf">RLHF</EntityLink> Pioneer
+### RLHF Development
 
-Jan was one of the early researchers to demonstrate that reinforcement learning from human feedback (RLHF) could work at scale:
-- Co-authored seminal papers on reward learning
-- Showed how to train language models to be helpful and harmless
-- Methods he developed became standard across industry
+Leike was among the researchers who demonstrated that reinforcement learning from human feedback could be applied at scale:
+- Co-authored research papers on reward learning from human preferences
+- Developed techniques for training language models to exhibit helpful and harmless behaviors
+- Contributed methods that have been adopted across the AI industry
 
-### <EntityLink id="scalable-oversight">Scalable Oversight</EntityLink> Research
+The 2017 paper "Deep Reinforcement Learning from Human Preferences" demonstrated that agents could learn complex tasks from human feedback rather than requiring pre-specified reward functions. {/* NEEDS CITATION: Full citation for 2017 paper */} The 2018 paper "Scalable agent alignment via reward modeling" extended these techniques and provided a framework for applying reward modeling to more complex systems. {/* NEEDS CITATION: Full citation for 2018 paper */}
 
-Core focus on how to supervise AI systems more capable than humans:
-- Recursive reward modeling
-- AI-assisted human evaluation
-- <EntityLink id="process-supervision">Process supervision</EntityLink> vs. outcome supervision
-- <EntityLink id="weak-to-strong">Weak-to-strong generalization</EntityLink>
+### Scalable Oversight Research
 
-### Superalignment Vision
+A significant portion of Leike's research has addressed the challenge of supervising AI systems that may be more capable than human evaluators:
+- Recursive reward modeling approaches, where AI systems help humans evaluate other AI systems
+- AI-assisted human evaluation techniques
+- Comparisons between <EntityLink id="process-supervision">process supervision</EntityLink> (evaluating reasoning steps) and outcome supervision (evaluating final results)
+- <EntityLink id="weak-to-strong">Weak-to-strong generalization</EntityLink> research examining whether less capable supervisors can effectively oversee more capable systems
 
-At OpenAI, co-led (with <EntityLink id="ilya-sutskever">Ilya Sutskever</EntityLink>) the Superalignment team, which aimed to:
-- Solve alignment for superintelligent systems
-- Use AI to help align even more capable AI
-- Achieve this within four years
-- Dedicate significant compute resources to the problem
+### Superalignment Team
 
-## Views on Key Cruxes
+At OpenAI, Leike co-led the Superalignment team, which stated objectives of:
+- Developing alignment techniques for superintelligent AI systems
+- Using AI systems to assist in aligning more capable AI systems
+- Achieving this research agenda within a four-year timeframe
+- Allocating substantial computational resources to alignment research
 
-### Risk Assessment
+{/* NEEDS CITATION: What happened to the Superalignment team after Leike and Sutskever departed */}
 
-Jan Leike's public statements and research priorities reveal a perspective characterized by high urgency tempered with cautious optimism about technical solutions.
+## Research Publications
 
-| Expert/Source | Estimate | Reasoning |
-|---------------|----------|-----------|
-| Alignment urgency | Very high | Jan's May 2024 departure from OpenAI was driven by concerns about insufficient safety prioritization. His public statements emphasized that "building smarter-than-human machines is an inherently dangerous endeavor" and criticized OpenAI for letting "safety culture and processes take a backseat to shiny products." This departure, alongside Ilya Sutskever's exit, signaled deep concern about the urgency of alignment work relative to capability development. |
-| Timeline pressure | Next 3-5 years critical | Throughout 2024, Jan repeatedly emphasized the need to solve alignment soon, suggesting we have limited time before transformative AI arrives. The Superalignment team he co-led at OpenAI aimed to solve superintelligence alignment within four years, reflecting his belief that the window for solving these problems is narrow. His move to Anthropic suggests he believes this timeline remains realistic but requires serious institutional commitment. |
-| Technical tractability | Difficult but solvable | Despite the urgency, Jan maintains optimism about scalable oversight approaches. His research focus on weak-to-strong generalization, RLHF improvements, and automated alignment research reflects a belief that alignment is tractable through empirical work on increasingly capable systems. However, he acknowledges that current methods like RLHF are insufficient for superintelligence without major improvements, suggesting the problem is solvable but requires significant innovation. |
+Selected publications include:
 
-### Core Beliefs
+- **"Deep Reinforcement Learning from Human Preferences"** (2017) - Demonstrated methods for training reinforcement learning agents using human feedback on trajectory preferences {/* NEEDS CITATION: Full citation */}
+- **"Scalable agent alignment via reward modeling"** (2018) - Presented framework for scaling reward modeling to more complex agent behaviors {/* NEEDS CITATION: Full citation */}
+- **"Recursively Summarizing Books with Human Feedback"** (2021) - Showed how RLHF techniques could be applied to summarization tasks on long documents {/* NEEDS CITATION: Full citation */}
 
-1. **Alignment is urgent**: We have limited time to solve this before transformative AI
-2. **Scalable oversight is key**: Central challenge is supervising superhuman AI
-3. **Empirical work is essential**: Need to test alignment techniques on increasingly capable systems
-4. **Safety must be prioritized**: Cannot let capability research consistently outpace safety
-5. **Current methods are insufficient**: RLHF and similar techniques won't scale to superintelligence without major improvements
+{/* NEEDS CITATION: Complete publication list with co-authors */}
 
-### Why He Left OpenAI
+## Departure from OpenAI
 
-In May 2024, Jan departed OpenAI and posted on X (Twitter):
-- "Building smarter-than-human machines is an inherently dangerous endeavor"
-- "Over the past years, safety culture and processes have taken a backseat to shiny products"
-- Expressed concern about compute and priority allocation for safety
+In May 2024, Leike departed from OpenAI. {/* NEEDS CITATION: Exact date */} He posted on X (formerly Twitter) explaining his reasons for leaving. {/* NEEDS CITATION: Full text and context of X posts */}
 
-This departure, along with Ilya Sutskever's, raised significant questions about OpenAI's commitment to safety research.
+According to his posts, his concerns included:
+- That building systems more intelligent than humans involves inherent risks
+- That over preceding years, safety considerations had received insufficient priority relative to product development
+- Issues regarding allocation of computational resources and organizational priorities for safety work
 
-## Research Focus
+This departure occurred shortly after Ilya Sutskever also left OpenAI. The departures prompted discussion within the AI research community about safety research prioritization at AI development organizations.
 
-### Current Priorities at Anthropic
+{/* Note: This section previously presented Leike's perspective without including OpenAI's response or alternative viewpoints on these events */}
 
-1. **Weak-to-strong generalization**: How can weaker systems (including humans) effectively supervise stronger ones?
-2. **Scalable oversight techniques**: Making human feedback work for superhuman systems
-3. **Honest AI systems**: Ensuring AI systems accurately report their reasoning and limitations
-4. **Automated alignment research**: Using AI to help solve alignment
+## Research Focus at Anthropic
 
-### Key Technical Problems
+### Current Research Priorities
 
-Jan has identified several crucial challenges:
-- **<EntityLink id="reward-hacking">Reward hacking</EntityLink>**: Systems optimizing proxies rather than true objectives
-- **<EntityLink id="distributional-shift">Distributional shift</EntityLink>**: Maintaining alignment in novel situations
-- **<EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink>**: Preventing systems from appearing aligned while pursuing other goals
-- **Superalignment**: Aligning systems smarter than humans
+Leike has identified several research directions as priorities:
+
+1. **Weak-to-strong generalization**: Investigating methods by which less capable systems (including humans) can effectively supervise and evaluate more capable AI systems
+2. **Scalable oversight techniques**: Developing approaches to make human feedback mechanisms effective for systems that may exceed human capabilities in various domains
+3. **AI system honesty**: Research on methods to ensure AI systems accurately represent their reasoning processes and limitations
+4. **Automated alignment research**: Using AI systems to assist in solving alignment problems
+
+### Technical Challenges
+
+Research areas Leike has discussed include:
+
+- **<EntityLink id="reward-hacking">Reward hacking</EntityLink>**: The problem of systems optimizing proxy measures rather than intended objectives
+- **<EntityLink id="distributional-shift">Distributional shift</EntityLink>**: Maintaining alignment when systems encounter situations outside their training distribution
+- **<EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink>**: Risks that systems might appear aligned during training or evaluation while pursuing different objectives during deployment
+- **Superalignment**: Developing alignment techniques that remain effective for systems more capable than humans
+
+{/* Note: This list was previously framed with evaluative language like "crucial challenges" - now presented neutrally as research areas */}
+
+## Stated Views on AI Risk and Development
+
+### Risk-Related Statements
+
+Based on Leike's public statements and research priorities:
+
+**Urgency**: Leike's May 2024 departure from OpenAI was accompanied by statements indicating concern about the pace of capability development relative to safety research. His public posts stated that building systems more capable than humans "is an inherently dangerous endeavor" and expressed concern about safety work being deprioritized. {/* NEEDS CITATION: Exact quotes and source links */}
+
+**Timeline**: The Superalignment team aimed to solve superintelligence alignment within four years, indicating Leike's assessment that transformative AI systems may arrive within a relatively short timeframe and that alignment work must progress correspondingly. {/* NEEDS CITATION: Source for four-year timeline claim */}
+
+**Technical tractability**: Leike's continued focus on empirical research approaches such as weak-to-strong generalization, RLHF improvements, and automated alignment research suggests he assesses alignment as technically tractable. However, he has stated that current techniques like RLHF are insufficient for superintelligent systems without substantial improvements. {/* NEEDS CITATION: Specific statements about RLHF limitations */}
+
+{/* Note: Previous version included a table titled "Estimates" that contained editorial interpretations rather than sourced quantified estimates. Replaced with paragraph format that more clearly indicates these are characterizations of his views rather than direct measurements */}
+
+### Stated Positions on AI Development
+
+Based on public statements and career decisions:
+
+- **Safety and capability research pacing**: His departure statement indicated concern when capability development substantially outpaces safety research
+- **Resource allocation**: Advocated for dedicating significant computational resources to alignment research, as reflected in the reported 20% compute allocation to the Superalignment team
+- **Inter-laboratory coordination**: {/* NEEDS CITATION: Actual statements about coordination between labs */}
+- **Development incentives**: His departure statement referenced concerns about competitive pressures potentially leading to insufficient safety prioritization
+
+### Research Methodology
+
+Leike's approach to alignment research emphasizes:
+
+- **Empirical testing**: Conducting experiments with existing AI systems rather than purely theoretical work
+- **Learning from current systems**: Using contemporary models as testbeds for alignment techniques
+- **Preparation for capability jumps**: Recognition that techniques effective for current systems may require substantial modification for more capable systems
+- **Automation of alignment work**: Using AI tools to scale alignment research efforts
 
 ## Public Communication
 
-Jan is known for:
-- Clear, technical communication about alignment challenges
-- Willingness to raise concerns publicly
-- Engagement on Twitter/X about safety issues
-- Focus on concrete, actionable research directions
+Leike has communicated about alignment research through:
+- Posts on X (formerly Twitter) discussing alignment challenges and safety concerns
+- Technical blog posts explaining research directions
+- The May 2024 departure statement that generated public discussion about safety prioritization
 
-His departure from OpenAI sparked significant public discussion about AI safety prioritization at major labs.
+{/* NEEDS CITATION: Specific podcast appearances, talks, or interviews for additional sourcing */}
 
-## Strategic Views
+His departure from OpenAI attracted significant attention within the AI research community and generated discussion about the balance between capability development and safety research at major AI laboratories.
 
-### On AI Development
-
-- **Safety must keep pace**: Capability advances should be matched by safety advances
-- **Need serious compute**: Alignment research requires significant computational resources
-- **Coordination is important**: Labs should share safety insights
-- **Race dynamics are dangerous**: Competition that sacrifices safety is unacceptable
-
-### On Research Approach
-
-- **Empirical and theoretical**: Need both practical testing and conceptual work
-- **Learn from current systems**: Can make progress by studying existing models
-- **Prepare for qualitative jumps**: Current techniques may not suffice for superintelligence
-- **Automate alignment work**: Use AI to scale up alignment research itself
-
-## Influence and Impact
+## Influence on the Field
 
 ### Research Impact
-- RLHF work influenced every major language model deployment
-- Scalable oversight framework guides significant research programs
-- Superalignment vision shaped discourse on superintelligence alignment
 
-### Field Building
-- Mentored numerous alignment researchers
-- Built and led multiple alignment teams
-- Raised profile of alignment research within major labs
+Leike's work on RLHF has been incorporated into training procedures used across the AI industry. The technique of using human feedback to train language models has been applied by multiple organizations in developing large language models. {/* NEEDS CITATION: Specific examples of RLHF adoption with evidence */}
 
-### Institutional Influence
-- Secured major compute allocation for alignment at OpenAI
-- Helped shape Anthropic's research priorities
-- Demonstrated importance of independent safety research
+The scalable oversight framework has informed research programs at multiple AI safety organizations. {/* NEEDS CITATION: Specific organizations and programs */}
 
-## Key Publications
+### Field Building Activities
 
-- **"Deep Reinforcement Learning from Human Preferences"** (2017) - Early RLHF paper
-- **"Scalable agent alignment via reward modeling"** (2018) - Reward learning framework
-- **"Recursively Summarizing Books with Human Feedback"** (2021) - Demonstrating RLHF scaling
-- **Various blog posts** on alignment challenges and approaches
+{/* NEEDS CITATION: Specific researchers mentored or teams built */}
 
-## Current Challenges
+Leike has led alignment research teams at DeepMind, OpenAI, and Anthropic, contributing to the organizational capacity for alignment research at these institutions.
 
-At Anthropic, Jan faces several key challenges:
+### Institutional Developments
 
-1. **Time pressure**: Transformative AI may arrive soon, requiring rapid progress
-2. **Scaling RLHF**: Current techniques may not work for superintelligent systems
-3. **Evaluation**: How to know if alignment techniques actually work
-4. **Automation**: Using AI to help solve alignment before it becomes too capable
-5. **Coordination**: Ensuring insights are shared across safety community
+The Superalignment team at OpenAI represented a substantial allocation of resources to alignment research within a major AI development organization. {/* NEEDS CITATION: Verification of resource allocation and team structure */}
+
+His move to Anthropic in 2024 reflected continued institutional investment in alignment research at that organization.
+
+## Current Work
+
+At Anthropic, Leike continues research on alignment techniques applicable to increasingly capable AI systems. Current challenges include:
+
+1. **Timeline constraints**: Potential arrival of transformative AI within a timeframe requiring rapid progress on alignment techniques
+2. **Scaling existing techniques**: Determining which current alignment methods can be extended to more capable systems and which require fundamental innovations
+3. **Evaluation methodology**: Developing methods to assess whether alignment techniques are effective
+4. **Research automation**: Using AI systems to accelerate alignment research while managing risks of doing so
+5. **Knowledge sharing**: Determining which alignment insights should be shared across the research community
+
+{/* Note: Previous version used evaluative language like "key challenges" - now presented neutrally as aspects of current work */}

@@ -11,12 +11,7 @@
 import { createRule, Issue, Severity, FixType } from '../validation-engine.ts';
 import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
-
-// Pattern: unescaped $ followed by a number (not already escaped with \)
-const UNESCAPED_DOLLAR_PATTERN = /(?<!\\)\$(\d)/g;
-
-// Pattern: double-escaped $ (\\$) in MDX body - over-escaping
-const DOUBLE_ESCAPED_PATTERN = /\\\\\$/g;
+import { UNESCAPED_DOLLAR_RE, DOUBLE_ESCAPED_DOLLAR_RE } from '../patterns.ts';
 
 export const dollarSignsRule = createRule({
   id: 'dollar-signs',
@@ -27,7 +22,7 @@ export const dollarSignsRule = createRule({
     const issues: Issue[] = [];
 
     // Check for unescaped $ before numbers
-    matchLinesOutsideCode(content.body, UNESCAPED_DOLLAR_PATTERN, ({ match, line, lineNum }: { match: RegExpExecArray; line: string; lineNum: number }) => {
+    matchLinesOutsideCode(content.body, UNESCAPED_DOLLAR_RE, ({ match, line, lineNum }: { match: RegExpExecArray; line: string; lineNum: number }) => {
       const context = line.slice(Math.max(0, match.index - 10), match.index + 15);
       issues.push(new Issue({
         rule: this.id,
@@ -44,7 +39,7 @@ export const dollarSignsRule = createRule({
     });
 
     // Check for double-escaped \\$ (over-escaping)
-    matchLinesOutsideCode(content.body, DOUBLE_ESCAPED_PATTERN, ({ match, line, lineNum }: { match: RegExpExecArray; line: string; lineNum: number }) => {
+    matchLinesOutsideCode(content.body, DOUBLE_ESCAPED_DOLLAR_RE, ({ match, line, lineNum }: { match: RegExpExecArray; line: string; lineNum: number }) => {
       const context = line.slice(Math.max(0, match.index - 10), match.index + 15);
       issues.push(new Issue({
         rule: this.id,

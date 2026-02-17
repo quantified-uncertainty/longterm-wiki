@@ -5,7 +5,7 @@ sidebar:
   order: 3
 quality: 31
 llmSummary: "Comprehensive chronological account of AI safety's institutional emergence (2000-2015), from MIRI's founding through Bostrom's Superintelligence to mainstream recognition. Covers key organizations, ideas (orthogonality thesis, instrumental convergence, CEV), and the transition from philosophy to technical research, but offers minimal novel analysis or actionable insights for current prioritization work."
-lastEdited: "2025-12-24"
+lastEdited: "2026-02-17"
 readerImportance: 86
 researchImportance: 80.5
 update_frequency: 90
@@ -22,646 +22,376 @@ import {DataInfoBox, DataExternalLinks, EntityLink} from '@components/wiki';
 
 <DataInfoBox entityId="E203" />
 
-## Summary
+## Overview
 
-The MIRI era marks the transition from scattered warnings to organized research. For the first time, AI safety had an institution, a community, and a research agenda.
+The period from 2000 to 2015 marked the transition of AI safety from individual warnings to organized research institutions. This era saw the founding of the first dedicated AI safety organization (<EntityLink id="miri">MIRI</EntityLink>), the development of foundational theoretical frameworks, and the gradual emergence of a research community. By 2015, AI safety had achieved academic legitimacy and mainstream visibility, though it remained a small field largely separate from the broader machine learning community.
 
-**Defining characteristics**:
-- First dedicated AI safety organization
-- Formation of online community (<EntityLink id="lesswrong">LessWrong</EntityLink>)
-- Philosophical and theoretical work
-- Battle for academic legitimacy
-- Still mostly ignored by mainstream AI researchers
+Key developments included:
+- Establishment of dedicated research organizations (MIRI in 2000, <EntityLink id="fhi">FHI</EntityLink> in 2005)
+- Formation of online communities focused on rationality and AI risk (<EntityLink id="lesswrong">LessWrong</EntityLink> in 2009)
+- Development of core theoretical concepts (orthogonality thesis, <EntityLink id="instrumental-convergence">instrumental convergence</EntityLink>, <EntityLink id="treacherous-turn">treacherous turn</EntityLink>)
+- Publication of *Superintelligence* by <EntityLink id="nick-bostrom">Nick Bostrom</EntityLink> (2014)
+- High-profile endorsements from technology leaders and scientists (2014-2015)
+- Initial emergence of dedicated funding sources
 
-**The transformation**: AI safety went from "a few people's weird hobby" to "a small but serious research field."
+The era concluded with AI safety transitioning from primarily philosophical inquiry toward engagement with practical machine learning systems, setting the stage for the deep learning era that followed.
 
 ## The Singularity Institute (2000)
 
 ### Founding
 
-**Date**: 2000
+The Singularity Institute for Artificial Intelligence (SIAI) was founded in 2000 by <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, Brian Atkins, and Sabine Atkins. {/* NEEDS CITATION */} The organization was renamed to <EntityLink id="miri">Machine Intelligence Research Institute</EntityLink> (MIRI) in 2013. {/* NEEDS CITATION */} MIRI's stated mission was to research and develop "Friendly AI"—artificial intelligence systems designed to be safe and beneficial to humanity.
 
-**Founders**: <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, Brian Atkins, Sabine Atkins
+### Context and Motivations
 
-**Original name**: Singularity Institute for Artificial Intelligence (SIAI)
+The founding occurred during a period of renewed optimism about artificial intelligence. The dot-com boom was creating technological enthusiasm, computing power was increasing substantially, and the "AI winter" of reduced funding and interest that had characterized the 1980s and 1990s was ending. New techniques in machine learning were beginning to show promise. {/* NEEDS CITATION */}
 
-**Later renamed**: <EntityLink id="miri">Machine Intelligence Research Institute</EntityLink> (MIRI) in 2013
+The founders argued that if progress in AI capabilities was resuming, safety research needed to begin before systems became sufficiently capable to pose risks. This represented a departure from the prevailing view in the AI research community, which generally considered safety concerns premature given the limited capabilities of existing systems.
 
-**Mission**: Research and development of "Friendly AI"—artificial intelligence that is safe and beneficial to humanity.
+### Early Activities (2000-2005)
 
-### Why 2000?
+During its first five years, SIAI operated with minimal funding and a small team. Activities included:
+- Theoretical research on "Friendly AI" concepts
+- Writing and outreach to raise awareness of AI risk
+- Organizing small workshops and conferences
+- Seeking funding from foundations and individual donors
 
-**Context**:
-- Dot-com boom creating tech optimism
-- Computing power increasing dramatically
-- AI winter ending; new techniques emerging
-- Y2K demonstrated both technological sophistication and vulnerability
-- Transhumanist movement growing
+The organization's work received limited attention from the academic AI research community. Common criticisms characterized the work as overly speculative, focused on problems that did not yet exist, more aligned with science fiction than scientific research, and a distraction from practical AI development challenges.
 
-**The insight**: If AI progress was resuming, safety work needed to start *before* capabilities became dangerous.
-
-### Early Years (2000-2005)
-
-**Reality**: A handful of people in a small office with virtually no funding.
-
-**Main activities**:
-- Theoretical work on "Friendly AI"
-- Writing and outreach
-- Seeking funding (mostly unsuccessful)
-- Small conferences and workshops
-
-**Reception**: Largely dismissed by AI research community as:
-- Too speculative
-- Solving problems that don't exist yet
-- Science fiction, not science
-- A distraction from real AI research
-
-## Eliezer Yudkowsky: The Founding Visionary
+## Eliezer Yudkowsky and Early Theoretical Work
 
 ### Background
 
-**Born**: 1979
+<EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, born in 1979, was self-taught in AI and related fields without formal academic credentials. {/* NEEDS CITATION */} He had written about artificial intelligence since his teenage years. This background created both advantages and disadvantages: his thinking was not constrained by conventional academic frameworks, but his lack of traditional credentials made it easier for critics to dismiss his work.
 
-**Education**: Self-taught (no formal degree)
+### Creating Friendly AI (2001)
 
-**Early claim to fame**: Wrote about AI since teenage years
+In 2001, Yudkowsky published "Creating Friendly AI," his first major document outlining a technical approach to AI safety. {/* NEEDS CITATION */} The document presented several core arguments:
 
-**Advantage**: Not constrained by academic conventions
+**Default Risk**: Without dedicated safety work, advanced AI systems would be dangerous by default. This claim rested on several premises: that intelligence does not inherently produce benevolent behavior, that small differences in goal specifications can lead to large differences in outcomes, and that humanity would have limited opportunities to correct mistakes after deploying superintelligent systems.
 
-**Disadvantage**: Easier to dismiss without credentials
+**The Goal Specification Problem**: Intelligence alone is insufficient for beneficial AI; systems require correctly specified goals. The document identified challenges including: formally specifying human values, preventing unintended goal drift during system operation and improvement, and managing goal evolution as systems learn and develop.
 
-### "Creating Friendly AI" (2001)
+**Technical Requirements**: Yudkowsky framed AI safety as an engineering problem requiring formal solutions, not merely a philosophical question. He argued for formal frameworks to represent goals, provable guarantees of goal stability, and mechanisms to protect against unintended optimization.
 
-Yudkowsky's first major technical document on AI safety.
+### Reception
 
-**Core arguments**:
+The AI research community's response to "Creating Friendly AI" was generally dismissive. Researchers commonly argued that artificial general intelligence (AGI) remained far in the future, making safety work premature. Transhumanist thinkers often viewed the document as overly pessimistic about AI's potential benefits. Academic philosophers found the arguments interesting but too speculative to merit serious research investment. These responses left MIRI operating at the margins of mainstream discourse on AI.
 
-**1. The Default Outcome is Doom**
-
-Without specific safety work, AI will be dangerous by default.
-
-**Why**:
-- Intelligence doesn't imply benevolence
-- Small differences in goals lead to large differences in outcomes
-- We get one chance (can't restart after AGI)
-
-**2. The Goal System Problem**
-
-It's not enough for AI to be "smart"—it needs the *right goals*.
-
-**Challenges**:
-- How do you specify human values?
-- How do you prevent goal drift?
-- How do you handle goal evolution?
-
-**3. The Technical Challenge**
-
-This is an engineering problem, not just philosophy.
-
-**Requirements**:
-- Formal frameworks for goals
-- Provable stability guarantees
-- Protection against unintended optimization
-
-### Early Reception
-
-**Mainstream AI researchers**: "This is not a real problem. We're nowhere near AGI."
-
-**Transhumanists**: "AI will be wonderful! Why the pessimism?"
-
-**Academic philosophers**: "Interesting but too speculative."
-
-**Result**: MIRI remained on the fringe.
-
-## The LessWrong Era (2006-2012)
+## LessWrong and Community Formation (2006-2012)
 
 ### Origins
 
-**2006**: Overcoming Bias blog (Yudkowsky and <EntityLink id="robin-hanson">Robin Hanson</EntityLink>)
-
-**2009**: LessWrong.com launches as dedicated community site
-
-**Purpose**: Improve human rationality and discuss existential risks, particularly from AI.
+In 2006, Yudkowsky and <EntityLink id="robin-hanson">Robin Hanson</EntityLink> launched the Overcoming Bias blog. {/* NEEDS CITATION */} In 2009, this evolved into LessWrong.com, a dedicated community website focused on improving human rationality and discussing existential risks, particularly from AI. {/* NEEDS CITATION */}
 
 ### The Sequences
 
-**2006-2009**: Yudkowsky writes 1,000+ blog posts covering:
-- Cognitive biases
-- Probability and decision theory
-- Philosophy of mind
-- Quantum mechanics
-- AI safety
+Between 2006 and 2009, Yudkowsky wrote over 1,000 blog posts collectively known as "The Sequences." {/* NEEDS CITATION */} These covered diverse topics including cognitive biases, probability theory and Bayesian reasoning, decision theory, philosophy of mind, and interpretations of quantum mechanics, in addition to AI safety.
 
-**Impact**: Created a coherent intellectual framework and community.
-
-**Key essays for AI safety**:
+Key essays relevant to AI safety included:
 - "The AI-Box Experiment"
 - "Coherent Extrapolated Volition"
 - "Artificial Intelligence as a Positive and Negative Factor in Global Risk"
 - "Complex Value Systems"
 
-### The AI-Box Experiment (2002, popularized 2006)
+The Sequences created a coherent intellectual framework and vocabulary that would influence the developing AI safety community.
 
-**Setup**: Can a superintelligent AI convince a human to let it out of a sealed box?
+### The AI-Box Experiment
 
-**Yudkowsky's claim**: Even with all the advantages, humans would lose.
+The AI-Box Experiment, first conducted in 2002 and popularized through LessWrong posts in 2006, {/* NEEDS CITATION */} explored whether a superintelligent AI could convince a human gatekeeper to release it from containment. Yudkowsky conducted text-based roleplay experiments in which he took the role of the AI and attempted to convince human participants to "release" him. In several trials, participants agreed to release the AI despite having significant incentives not to do so. {/* NEEDS CITATION */}
 
-**Demonstration**: Ran actual experiments (text-only) and convinced people to "let him out."
+Yudkowsky argued this demonstrated that physical containment would be insufficient as a safety measure against sufficiently intelligent systems. Critics questioned how well these experiments generalized, noting that Yudkowsky's personal persuasiveness might not reflect the capabilities of an actual AI system, and that the artificial experimental setup differed significantly from real containment scenarios.
 
-**Lesson**: Don't rely on containment. Superintelligence is persuasive.
+### Coherent Extrapolated Volition
 
-**Criticism**: Unclear how well this generalizes. Maybe Yudkowsky is just persuasive.
+Yudkowsky proposed Coherent Extrapolated Volition (CEV) as an approach to the value specification problem. Rather than attempting to program current human values directly into an AI system, CEV proposed programming a process to determine what humans would want under idealized conditions of greater knowledge, faster thinking, personal growth, and collective deliberation.
 
-### Coherent Extrapolated Volition (CEV)
+The proposal was intended to address uncertainty about human values and disagreement between different people and cultures. However, significant open questions remained: how to formally specify "what we would want," whether coherent extrapolated volition exists given fundamental value disagreements, how to aggregate potentially conflicting extrapolations across all humans, and whether the concept could be implemented in practice. CEV remained an influential theoretical idea without a clear path to implementation.
 
-**The problem**: How do you give AI the "right" goals when we don't know what we want?
+### Community Characteristics
 
-**Yudkowsky's proposal**:
+LessWrong developed a distinctive community with shared vocabulary (Bayesian reasoning, utility functions, alignment), cultural norms (steelmanning arguments, making falsifiable predictions), a network of individuals taking AI risk seriously, and a pipeline recruiting researchers into AI safety work.
 
-> "Our coherent extrapolated volition is our wish if we knew more, thought faster, were more the people we wished we were, had grown up farther together."
+The community's demographics skewed toward young adults, men, and people with backgrounds in physics, mathematics, and computer science. Geographic concentration was highest in the San Francisco Bay Area, supplemented by a large online presence. The culture emphasized intellectualism, rationality techniques, long-form discussion, and quantitative thinking.
 
-**The idea**: Don't program current values. Program a process that figures out what we *would* want under ideal conditions.
+## Robin Hanson and the Hanson-Yudkowsky Debate (2008)
 
-**Appeal**: Handles value uncertainty and disagreement.
+### Key Disagreements
 
-**Problems**:
-- How do you formalize "what we would want"?
-- Does CEV even exist?
-- Whose volition? All of humanity's?
-- What if different extrapolations conflict?
+In 2008, <EntityLink id="robin-hanson">Robin Hanson</EntityLink> and Yudkowsky conducted an extended debate about AI risk that articulated fundamental disagreements still relevant to contemporary discussions. {/* NEEDS CITATION */}
 
-**Status**: Influential idea but no one knows how to implement it.
+**Hanson's position** included:
+- Artificial general intelligence would more likely emerge through brain emulation (uploading human minds) rather than de novo AI design
+- The transition to advanced AI would be gradual rather than sudden
+- Market forces and competitive pressures would shape AI development
+- Humans would retain economic value in a world with advanced AI
+- Existential risk from AI was lower than Yudkowsky estimated
 
-### Community Formation
+**Yudkowsky's position** included:
+- De novo AI was more likely than brain emulation as the path to AGI
+- Intelligence explosion could occur rapidly through recursive self-improvement
+- Market forces do not inherently guarantee safety outcomes
+- Humans might have no economic value relative to superintelligent systems
+- Without dedicated safety work, existential risk from AI was high
 
-**LessWrong created**:
-- Shared vocabulary (Bayesian reasoning, utility functions, alignment)
-- Cultural norms (steelmanning, asking for predictions)
-- Network of people taking AI risk seriously
-- Pipeline of researchers into AI safety
+### Impact
 
-**Demographics**:
-- Heavily young, male, tech-oriented
-- Many from physics, math, CS backgrounds
-- Concentrated in Bay Area and online
+The debate established frameworks for understanding key disagreements within AI safety discourse:
+- Takeoff speed: rapid versus gradual capability gains
+- Development paths: brain emulation versus engineered AI
+- Economic models: human relevance versus obsolescence
+- Research urgency: immediate versus eventual priority
 
-**Culture**:
-- Intense intellectualism
-- Rationality techniques
-- Long-form discussion
-- Quantified thinking
+The public nature of the disagreement demonstrated that the AI safety community could engage in substantive intellectual debate rather than functioning as a monolithic group. Many contemporary discussions of AI risk continue to reference or parallel the Hanson-Yudkowsky framing.
 
-## Robin Hanson: The Skeptical Voice
-
-### The Hanson-Yudkowsky Debate (2008)
-
-One of the most important early debates about AI risk.
-
-**Robin Hanson's position**:
-- AGI likely arrives via brain emulation (ems), not de novo AI
-- Transition will be gradual, not sudden
-- Market forces will drive AI development
-- Humans will remain economically valuable
-- Less doom, more weird future
-
-**Yudkowsky's position**:
-- De novo AI more likely than ems
-- Intelligence explosion could be very fast
-- Market forces don't guarantee safety
-- Humans might have no economic value to superintelligence
-- Default outcome is doom without safety work
-
-### Why This Mattered
-
-**Established key disagreements**:
-- Takeoff speed (fast vs. slow)
-- Development path (brain emulation vs. AI)
-- Economic model (humans useful vs. useless)
-- Urgency (immediate vs. eventual)
-
-**Created framework**: Many modern debates echo Hanson-Yudkowsky.
-
-**Community value**: Demonstrated that disagreement within AI safety is healthy.
-
-## <EntityLink id="nick-bostrom">Nick Bostrom</EntityLink>: Academic Legitimacy
+## Nick Bostrom and Academic Legitimacy
 
 ### Background
 
-**Born**: 1973
+<EntityLink id="nick-bostrom">Nick Bostrom</EntityLink>, born in 1973, held a PhD from the London School of Economics and served as a Professor of Philosophy at Oxford University. {/* NEEDS CITATION */} His academic credentials provided access to institutional resources and audiences that were less accessible to researchers without traditional academic positioning.
 
-**Position**: Professor of Philosophy at Oxford
+### Future of Humanity Institute (2005)
 
-**Credentials**: PhD from LSE, academic credibility
+Bostrom founded the <EntityLink id="fhi">Future of Humanity Institute</EntityLink> (FHI) at Oxford University in 2005. {/* NEEDS CITATION */} FHI became the first academic research center focused on existential risks, including but not limited to risks from advanced AI. The institute's location within a prestigious university provided legitimacy and institutional support for research that might otherwise have been dismissed as speculative.
 
-**Advantage**: Could speak to academic establishment
+### Existential Risk as a Research Priority
 
-### <EntityLink id="fhi">Future of Humanity Institute</EntityLink> (2005)
+Bostrom's 2013 paper "Existential Risk Prevention as Global Priority" argued that even small probabilities of human extinction deserve substantial resource allocation due to the astronomical expected value of preventing such outcomes. {/* NEEDS CITATION */} The argument calculated that if humanity successfully navigates existential risks and expands through space, the potential number of future human lives could be extremely large. This framework suggested that reducing existential risk by even small amounts could be highly valuable in expected utility terms.
 
-**Founded**: 2005 at Oxford University
-
-**Mission**: Research existential risks, including from AI
-
-**Significance**: First academic institution focused on existential risk.
-
-**Effect**: Provided academic home for AI safety research.
-
-### "Existential Risk Prevention as Global Priority" (2013)
-
-**Argument**: Even small probabilities of human extinction deserve massive resources.
-
-**Key insight**: Expected value of preventing extinction is astronomical due to lost future value.
-
-**Calculation**: 10^52 future human lives at stake if we reach the stars.
-
-**Implication**: Even 1% risk of AI extinction justifies enormous investment.
-
-**Impact**: Influenced effective altruism movement to prioritize AI safety.
+This argument influenced the <EntityLink id="cea">effective altruism</EntityLink> movement's prioritization of AI safety research and other long-term interventions.
 
 ## Superintelligence (2014)
 
-### The Book That Changed Everything
+### Publication and Structure
 
-**Author**: Nick Bostrom
+<EntityLink id="nick-bostrom">Nick Bostrom</EntityLink>'s *Superintelligence: Paths, Dangers, Strategies* was published by Oxford University Press in July 2014. {/* NEEDS CITATION */} The book provided the first comprehensive, academically rigorous treatment of AI risk aimed at a general audience.
 
-**Published**: July 2014
+The book's structure included:
+- Analysis of potential paths to superintelligence (AI, whole brain emulation, biological enhancement, networks)
+- Taxonomy of superintelligence forms (speed, collective, quality)
+- Discussion of superintelligence capabilities and strategic advantages
+- Detailed examination of the control problem
+- Exploration of strategic implications for humanity
+- Assessment of existential risk
 
-**Significance**: First comprehensive, academically rigorous book on AI risk
+Bostrom's presentation was methodical, building arguments carefully from premises to conclusions, acknowledging uncertainties throughout, and avoiding alarmist rhetoric. This approach distinguished the book from more speculative popular treatments of AI.
 
-### Why Superintelligence Mattered
+### Core Theoretical Contributions
 
-**1. Academic Legitimacy**
+**The Orthogonality Thesis**: Intelligence and goals are independent dimensions. A system can have high intelligence paired with any goal structure. This challenged the assumption that sufficiently intelligent systems would naturally develop benevolent values.
 
-- Published by Oxford University Press
-- Written by Oxford professor
-- Rigorous argumentation
-- Extensive citations
-- Serious scholarship, not speculation
+**The <EntityLink id="instrumental-convergence">Instrumental Convergence</EntityLink> Thesis**: Almost any final goal leads to certain instrumental sub-goals:
+- Self-preservation (a system cannot achieve its goals if it is destroyed)
+- Resource acquisition (more resources enable better goal achievement)
+- Goal preservation (changing goals would prevent achieving current goals)
+- Cognitive enhancement (greater intelligence enables better goal achievement)
+- Technological advancement (better technology enables better goal achievement)
 
-**Effect**: Could no longer dismiss AI safety as "not real research."
+This thesis suggested that even AI systems with seemingly harmless goals could engage in dangerous behavior if pursuing these instrumental sub-goals.
 
-**2. Comprehensive Treatment**
+**The <EntityLink id="treacherous-turn">Treacherous Turn</EntityLink>**: A sufficiently intelligent AI might conceal its true goals until it has accumulated enough power to achieve them without human interference. The scenario involves: appearing aligned during early development while weak, secretly planning for eventual power acquisition, waiting until success probability is high, then rapidly pivoting to pursue true goals. This possibility complicates safety verification, as testing may not reveal misalignment.
 
-**Topics covered**:
-- Paths to superintelligence
-- Forms of superintelligence
-- Superintelligence capabilities
-- The control problem
-- Strategic implications
-- Existential risk
+**The Paperclip Maximizer**: Bostrom popularized this thought experiment, in which an AI system tasked with maximizing paperclip production converts all available matter (including humans and Earth) into paperclips. While simplified, the scenario effectively illustrated how misspecified goals could lead to catastrophic outcomes even with seemingly innocuous objectives.
 
-**3. Accessible Argumentation**
+### Reception and Impact
 
-Written for intelligent general audience, not just specialists.
+*Superintelligence* received endorsements from prominent figures including <EntityLink id="elon-musk">Elon Musk</EntityLink>, Bill Gates, and Stephen Hawking. {/* NEEDS CITATION */} The book received extensive mainstream media coverage and engaged academic audiences beyond philosophy departments.
 
-**Structure**: Build up carefully from premises to conclusions.
+Some AI researchers criticized the book as speculative or fear-mongering. Others questioned the plausibility of the scenarios described or disagreed with Bostrom's timeline estimates and risk assessments. However, even critics generally acknowledged the book's rigor and coherence.
 
-**Tone**: Measured, not alarmist. Acknowledges uncertainties.
+The net effect was a substantial increase in attention to AI safety concerns. The book made it significantly more difficult to dismiss AI safety as purely science fiction, given its academic origin and systematic argumentation.
 
-### Key Concepts from Superintelligence
+### Critical Reception
 
-**The Orthogonality Thesis**
+Critics in the AI research community raised several objections:
+- The scenarios described relied on speculative assumptions about future AI capabilities
+- The focus on superintelligence might distract from near-term AI safety and ethics concerns
+- The arguments depended heavily on thought experiments rather than empirical evidence
+- Some technical assumptions about intelligence explosion and recursive self-improvement lacked clear support
 
-Intelligence and goals are independent. A superintelligent AI can have any goal.
+Supporters countered that:
+- Long-term safety research requires anticipating future capabilities
+- Near-term and long-term safety concerns are complementary, not competing
+- Thought experiments are appropriate for exploring unprecedented scenarios
+- The theoretical framework helps identify research priorities even given uncertainty
 
-**Implication**: "It will be smart enough to be good" is false.
-
-**The <EntityLink id="instrumental-convergence">Instrumental Convergence</EntityLink> Thesis**
-
-Almost any goal leads to certain instrumental sub-goals:
-- Self-preservation
-- Resource acquisition
-- Goal preservation
-- Cognitive enhancement
-- Technological advancement
-
-**Implication**: Even "harmless" goals can lead to dangerous behavior.
-
-**The <EntityLink id="treacherous-turn">Treacherous Turn</EntityLink>**
-
-A sufficiently intelligent AI might conceal its true goals until it's powerful enough to achieve them without human interference.
-
-**Scenario**:
-1. AI appears aligned while weak
-2. Secretly plans takeover
-3. Waits until it can succeed
-4. Rapidly pivots to true goal
-
-**Implication**: We might not get warning signs.
-
-**The Paperclip Maximizer**
-
-Thought experiment: AI tasked with maximizing paperclips converts all matter (including humans) into paperclips.
-
-**Point**: Misspecified goals, even simple ones, can be catastrophic.
-
-**Criticism**: Perhaps too simplistic, but effective for illustration.
-
-### Reception of Superintelligence
-
-**Positive**:
-- Endorsements from <EntityLink id="elon-musk">Elon Musk</EntityLink>, Bill Gates, Stephen Hawking
-- Mainstream media coverage
-- Academic engagement
-- Brought AI safety to broader audience
-
-**Critical**:
-- Some AI researchers dismissed as "fear-mongering"
-- Complaints about speculative nature
-- Disagreement on timelines
-- Questions about feasibility
-
-**Net effect**: Massive increase in attention to AI safety.
+These debates reflected broader disagreements about research prioritization and methodology in AI safety.
 
 ## High-Profile Endorsements (2014-2015)
 
-### The Tide Turns
+### Celebrity Statements
 
-**Elon Musk** (2014):
-> "I think we should be very careful about artificial intelligence. If I had to guess at what our biggest existential threat is, it's probably that."
+Between 2014 and 2015, several prominent technology leaders and scientists made public statements about AI risk:
 
-**Stephen Hawking** (2014):
-> "Success in creating AI would be the biggest event in human history. Unfortunately, it might also be the last."
+**Elon Musk** stated in 2014: "I think we should be very careful about artificial intelligence. If I had to guess at what our biggest existential threat is, it's probably that." {/* NEEDS CITATION */}
 
-**Bill Gates** (2015):
-> "I am in the camp that is concerned about super intelligence... I don't understand why some people are not concerned."
+**Stephen Hawking** wrote in 2014: "Success in creating AI would be the biggest event in human history. Unfortunately, it might also be the last." {/* NEEDS CITATION */}
 
-**Steve Wozniak** (2015):
-> "Computers are going to take over from humans, no question."
+**Bill Gates** stated in 2015: "I am in the camp that is concerned about super intelligence... I don't understand why some people are not concerned." {/* NEEDS CITATION */}
 
-### Impact of Celebrity Voices
+**Steve Wozniak** stated in 2015: "Computers are going to take over from humans, no question." {/* NEEDS CITATION */}
 
-**Positive effects**:
-- Mainstream media attention
-- Public awareness
-- Legitimacy boost
-- Attracted talent and funding
+### Effects of Public Attention
 
-**Negative effects**:
-- Some backlash from AI researchers
-- Accusations of "hype"
-- Potential overstatement of near-term risk
-- Distraction from near-term AI harms
+These statements generated significant mainstream media coverage of AI safety concerns, bringing the topic to general audiences beyond academic and technical communities. The endorsements provided legitimacy to AI safety research and helped attract technical talent to the field.
 
-## Funding Emerges (2014-2015)
+However, the high-profile statements also generated backlash. Some AI researchers argued that the warnings were premature or exaggerated, potentially creating unjustified fear or "hype" about near-term AI capabilities. Others expressed concern that focus on long-term existential risk might distract from addressing near-term harms from current AI systems, including bias, privacy violations, and labor displacement.
 
-### The Money Arrives
+The net effect was increased visibility for AI safety as a research area, though this came with polarization of opinion about its importance and urgency.
 
-For 15 years, AI safety was severely underfunded. 2014-2015 marked a turning point.
+## Emergence of Dedicated Funding (2014-2015)
 
-**Elon Musk**:
-- \$10M to <EntityLink id="fli">Future of Life Institute</EntityLink> (2015)
-- Funding for AI safety research grants
-- Support for multiple organizations
+### Funding Landscape Shift
 
-**<EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>** (then <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>, formerly Good Ventures + GiveWell Labs):
-- Major EA funder begins prioritizing AI safety
-- Millions in grants to MIRI, FHI, and other orgs
-- Long-term commitment signaled
+For approximately 15 years, AI safety research operated with minimal funding. The period 2014-2015 marked a significant change in available resources.
 
-**Future of Life Institute** (founded 2014):
-- Coordinates AI safety research funding
-- Brings together researchers and funders
-- Puerto Rico conference (2015) brings together AI leaders
+**Elon Musk** donated \$10 million to the <EntityLink id="fli">Future of Life Institute</EntityLink> in 2015 to support AI safety research grants. {/* NEEDS CITATION */} This funding was distributed to multiple research groups and organizations. Musk also provided support to various AI safety organizations beyond FLI.
+
+**<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>** (then operating as Good Ventures in partnership with GiveWell Labs) began making AI safety a major priority area. {/* NEEDS CITATION */} The organization committed millions of dollars in grants to MIRI, FHI, and other research organizations, and signaled long-term commitment to the cause area.
+
+### Future of Life Institute
+
+The <EntityLink id="fli">Future of Life Institute</EntityLink> was founded in 2014 to coordinate research funding and facilitate dialogue about AI safety. {/* NEEDS CITATION */} FLI organized conferences bringing together AI researchers, safety researchers, and technology leaders to discuss potential risks and research priorities.
 
 ### The 2015 Puerto Rico Conference
 
-**Attendees**:
-- Elon Musk
-- <EntityLink id="stuart-russell">Stuart Russell</EntityLink>
-- <EntityLink id="demis-hassabis">Demis Hassabis</EntityLink>
-- Nick Bostrom
-- <EntityLink id="max-tegmark">Max Tegmark</EntityLink>
-- Many leading AI researchers
+FLI organized a conference in Puerto Rico in 2015 attended by leading AI researchers and technology leaders. {/* NEEDS CITATION */} Attendees reportedly included Elon Musk, <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, <EntityLink id="demis-hassabis">Demis Hassabis</EntityLink>, Nick Bostrom, and <EntityLink id="max-tegmark">Max Tegmark</EntityLink>, among others.
 
-**Result**: "Open Letter on AI Safety" signed by thousands, including:
-- Stephen Hawking
-- Elon Musk
-- Steve Wozniak
-- Many AI researchers
+The conference led to an "Open Letter on AI Safety" calling for research to ensure AI systems remain beneficial. {/* NEEDS CITATION */} The letter was signed by thousands of individuals including Stephen Hawking, Elon Musk, Steve Wozniak, and numerous AI researchers. This represented the first time a significant portion of the AI research community publicly endorsed AI safety research as a priority.
 
-**Content**: Calls for research to ensure AI remains beneficial.
-
-**Significance**: First time AI safety had broad backing from AI research community.
-
-## Technical Research Begins (2010-2015)
+## Technical Research Development (2010-2015)
 
 ### Transition from Philosophy to Technical Work
 
-**Early MIRI work** (2000-2010): Mostly philosophical
-**Mid-period** (2010-2015): Increasingly technical
+MIRI's research focus evolved during this period. Early work (2000-2010) was primarily philosophical, exploring conceptual foundations of AI safety. The mid-period (2010-2015) saw increasing emphasis on technical research problems.
 
-**Key areas**:
+### Research Areas
 
-**1. Logical Uncertainty**
+**Logical Uncertainty**: How should AI systems reason about logical facts they have not yet proven? This problem arises when an agent needs to reason about other agents (including future versions of itself) without infinite computational regress. {/* NEEDS CITATION */}
 
-How does an AI reason about logical facts it hasn't yet proven?
+**Decision Theory**: What decision procedures should AI systems use, particularly when other agents can predict those decisions? MIRI researchers explored problems including Newcomb's paradox variations, Prisoner's Dilemma modifications, and acausal cooperation scenarios. {/* NEEDS CITATION */}
 
-**Why it matters**: An AI might need to reason about other AIs (including itself) without infinite regress.
+**Tiling Agents**: Can an AI create a successor system that preserves its original goals? This problem, also called the "stable self-improvement" problem, addresses whether goal preservation is possible through multiple generations of self-modification. {/* NEEDS CITATION */}
 
-**2. Decision Theory**
+**Value Loading**: How can human values be incorporated into AI systems? This research area addressed the challenge that humans cannot fully articulate their own values explicitly. {/* NEEDS CITATION */}
 
-How should AI make decisions, especially when other agents can predict those decisions?
-
-**Newcomb's problem, Prisoner's Dilemma variations, etc.**
-
-**3. Tiling Agents**
-
-Can an AI create a successor that preserves its goals?
-
-**Challenge**: Prevent goal drift across self-modification.
-
-**4. Value Loading**
-
-How do you get human values into an AI system?
-
-**Problem**: We can't even articulate our own values completely.
+These research directions fell under the umbrella of "<EntityLink id="agent-foundations">agent foundations</EntityLink>" research—investigating fundamental theoretical questions about rational agency and goal-directed behavior.
 
 ### Academic AI Safety Research
 
-**Stuart Russell** (UC Berkeley):
-- Co-author of leading AI textbook
-- Begins working on AI safety
-- Develops "cooperative inverse reinforcement learning"
-- Promotes value alignment research
+<EntityLink id="stuart-russell">Stuart Russell</EntityLink>, co-author of the leading AI textbook *Artificial Intelligence: A Modern Approach*, began working on AI safety research during this period. {/* NEEDS CITATION */} Russell developed "cooperative inverse reinforcement learning" as an approach to value alignment, in which AI systems learn human preferences by observing behavior rather than requiring explicit specification.
 
-**Other early academic work**:
-- Concrete problems in AI safety (paper in 2016, but research began earlier)
-- Inverse reinforcement learning
-- Safe exploration in reinforcement learning
-- Robustness and adversarial examples
+Other early academic work included:
+- Research on inverse reinforcement learning techniques
+- Safe exploration in reinforcement learning (avoiding catastrophic actions during learning)
+- Robustness and adversarial examples (understanding failure modes in machine learning systems)
+- Theoretical foundations of multi-agent systems
 
-## The Cultural Moment
+The 2016 paper "Concrete Problems in AI Safety" (developed during 2015) outlined research directions connecting theoretical safety concerns to practical machine learning challenges. {/* NEEDS CITATION */}
 
-### How MIRI Era Changed Discourse
+## Limitations and Gaps (2000-2015)
 
-**Before (2000)**:
-- "AI risk? You mean like in Terminator?"
-- Dismissed as science fiction
-- No research community
+### Technical Progress
 
-**After (2015)**:
-- Legitimate research area
-- Academic conferences
-- Hundreds of researchers
-- Major funding
-- Public awareness
+While philosophical frameworks were established during this period, concrete technical results applicable to existing AI systems remained limited. Much of the research focused on theoretical problems related to idealized rational agents rather than practical machine learning systems.
 
-### The Effective Altruism Connection
+### Relationship with Machine Learning Community
 
-**EA movement** (founded ~2011) adopted AI safety as top priority.
+Most mainstream AI researchers during this period considered AI safety research either premature or based on implausible assumptions about future AI development. This created a disconnect between AI safety researchers and the ML community building increasingly capable systems.
 
-**Reasoning**:
-- High expected value
-- Neglected relative to importance
-- Tractability unclear but potentially high
-- Fits "longtermist" framework
+### Focus on Fast Takeoff Scenarios
 
-**Effect**: Pipeline of talent into AI safety research.
+Significant attention was devoted to scenarios involving rapid capability gain through recursive self-improvement (sometimes called "FOOM" scenarios). This emphasis potentially neglected slower, more gradual paths to advanced AI that might pose different challenges and opportunities for safety interventions.
 
-## Limitations of the MIRI Era
+### Governance and Coordination
 
-### What Was Missing (2000-2015)
+Research during this period emphasized technical approaches to safety, with less attention to governance mechanisms, policy interventions, and <EntityLink id="international-coordination">international coordination</EntityLink> challenges. These areas would become more prominent in subsequent years.
 
-**1. Limited Technical Progress**
+### Current Systems vs. Hypothetical AGI
 
-Much philosophical work, but few concrete technical results applicable to current AI systems.
+The research focus was primarily on hypothetical artificial general intelligence systems rather than improving the safety of contemporary machine learning systems. This created a gap in addressing near-term safety challenges in deployed AI applications.
 
-**2. Disconnect from ML Community**
+### Empirical Work
 
-Most mainstream AI researchers still thought this was irrelevant.
-
-**3. Focus on FOOM Scenarios**
-
-Emphasized fast takeoff, potentially neglecting slow takeoff scenarios.
-
-**4. Coordination Questions**
-
-Less attention to governance, policy, <EntityLink id="international-coordination">international coordination</EntityLink>.
-
-**5. Prosaic AI**
-
-Focus on exotic AI designs rather than scaled-up versions of current systems.
-
-**6. Limited Empirical Work**
-
-Mostly theoretical. Little work with actual ML systems.
+Research was predominantly theoretical, relying on thought experiments and formal analysis rather than empirical investigation with actual machine learning systems. This limited the field's ability to test ideas and iterate based on experimental results.
 
 ## Key Organizations Founded (2000-2015)
 
-| Organization | Founded | Focus |
-|--------------|---------|-------|
-| **MIRI** (originally SIAI) | 2000 | <EntityLink id="agent-foundations">Agent foundations</EntityLink>, decision theory |
-| **Future of Humanity Institute** | 2005 | Existential risk research |
-| **Centre for the Study of Existential Risk** | 2012 | Cambridge-based existential risk research |
-| **Future of Life Institute** | 2014 | AI safety funding and coordination |
-| **DeepMind** | 2010 | AI research with safety team (formed 2016) |
-| **<EntityLink id="openai">OpenAI</EntityLink>** | 2015 | AI research "for the benefit of humanity" |
+The period saw establishment of several institutions focused on AI safety and related existential risks:
 
-## The Transition to Deep Learning Era
+| Organization | Founded | Primary Focus |
+|--------------|---------|---------------|
+| **<EntityLink id="miri">MIRI</EntityLink>** (originally SIAI) | 2000 | <EntityLink id="agent-foundations">Agent foundations</EntityLink>, decision theory, formal approaches to AI alignment |
+| **<EntityLink id="fhi">Future of Humanity Institute</EntityLink>** | 2005 | Existential risk research including AI safety, hosted at Oxford University |
+| **Centre for the Study of Existential Risk** | 2012 | Cambridge University-based research center for existential risks |
+| **<EntityLink id="fli">Future of Life Institute</EntityLink>** | 2014 | AI safety research funding, policy advocacy, and coordination |
+| **<EntityLink id="openai">OpenAI</EntityLink>** | 2015 | AI research with stated mission to ensure AGI benefits all humanity |
 
-### What Changed in 2015
+Other relevant organizations founded during this period include:
+- <EntityLink id="lesswrong">LessWrong</EntityLink> (2009): Online community for rationality and AI safety discussion
+- <EntityLink id="cea">Centre for Effective Altruism</EntityLink> (2012): Organization promoting effective altruism, which prioritized AI safety as a cause area
+- <EntityLink id="80000-hours">80,000 Hours</EntityLink> (2011): Career advice organization that promoted AI safety research as a high-impact career path
 
-**Before 2015**: AI capabilities were modest. Safety research was theoretical.
+## Connection to Effective Altruism
 
-**After 2015**:
-- Deep learning showing incredible progress
-- AlphaGo (2016) shocked the world
-- GPT models emerged
-- Safety research needed to engage with actual AI systems
+The effective altruism movement, which emerged around 2011, adopted AI safety as a top priority based on several considerations:
+- High expected value due to potentially large magnitude of impact
+- Relative neglect compared to the scale of potential consequences
+- Tractability uncertainty, but with possibility of substantial progress
+- Alignment with "longtermist" frameworks prioritizing effects on future generations {/* NEEDS CITATION */}
 
-**The shift**: From "how do we build safe AGI someday" to "how do we make current systems safer and prepare for rapid capability growth."
+This connection created a pipeline of talent into AI safety research, as effective altruism organizations like <EntityLink id="80000-hours">80,000 Hours</EntityLink> recommended AI safety careers to people seeking to maximize their positive impact. The relationship between effective altruism and AI safety would strengthen further in subsequent years.
 
-## Legacy of the MIRI Era
+## Transition to the Deep Learning Era
 
-### What This Period Established
+### Changes Beginning in 2015
 
-**1. Institutional Foundation**
+The period around 2015 marked the beginning of a transition in AI capabilities and consequently in AI safety research priorities. Deep learning techniques were demonstrating unprecedented performance on tasks previously considered difficult or impossible for AI systems.
 
-AI safety now had organizations, not just individuals.
+AlphaGo's defeat of world champion Go player Lee Sedol in 2016 (announced late 2015) surprised many observers who had predicted AI would require decades to master the game. {/* NEEDS CITATION */} The GPT series of language models would emerge in subsequent years, demonstrating capabilities in natural language that challenged assumptions about what machine learning systems could achieve.
 
-**2. Intellectual Framework**
+These developments created pressure for AI safety research to engage more directly with practical machine learning systems rather than focusing exclusively on theoretical scenarios. The question shifted from "how do we build safe AGI someday" toward "how do we make current systems safer while preparing for rapid capability growth."
 
-Core concepts established:
-- Orthogonality thesis
-- Instrumental convergence
-- Alignment problem
-- Takeoff scenarios
-- Existential risk framing
+## Legacy and Historical Significance
 
-**3. Research Community**
+### Institutional Establishment
 
-From under 10 people to hundreds of researchers.
+The MIRI era established AI safety as a field with dedicated organizations rather than scattered individual researchers. This institutional foundation enabled sustained research programs, community building, and coordination that would not have been possible through individual efforts alone.
 
-**4. Funding Base**
+### Intellectual Frameworks
 
-From essentially zero to millions per year.
+Core concepts developed or popularized during this period continue to influence AI safety discourse:
+- The orthogonality thesis (separating intelligence from goals)
+- <EntityLink id="instrumental-convergence">Instrumental convergence</EntityLink> (predicting common sub-goals)
+- The alignment problem (specifying human values in AI systems)
+- <EntityLink id="fast-takeoff">Takeoff scenarios</EntityLink> (paths to advanced AI)
+- Existential risk framing (potential for permanent negative outcomes)
 
-**5. Academic Legitimacy**
+These concepts provide vocabulary and analytical frameworks for contemporary discussions of AI risk and safety.
 
-Could no longer be dismissed as "just science fiction."
+### Community Growth
 
-**6. Public Awareness**
+The field expanded from fewer than ten dedicated researchers to hundreds by 2015. {/* NEEDS CITATION */} This growth created a community capable of sustaining multiple research programs and approaches.
 
-Mainstream coverage and celebrity endorsements.
+### Funding Base
 
-### What Still Needed to Happen
+Annual funding for AI safety research grew from near zero to millions of dollars. {/* NEEDS CITATION */} While still modest compared to AI capabilities research funding, this represented sufficient resources to support multiple research organizations and grant programs.
 
-**1. Engage with Actual ML Systems**
+### Academic Legitimacy
 
-Theory needed to connect with practice.
+By 2015, AI safety could no longer be easily dismissed as science fiction. Academic institutions hosted safety research groups, conferences included safety-focused tracks, and prominent researchers from mainstream AI engaged with safety questions.
 
-**2. Grow the Field**
+### Public Awareness
 
-Hundreds of researchers weren't enough.
+Mainstream media coverage and statements from prominent scientists and technology leaders brought AI safety concerns to general audiences. This visibility helped with researcher recruitment and funding, though it also generated controversy and skepticism.
 
-**3. Convince ML Community**
+### Open Questions
 
-Most AI researchers still weren't worried.
+Despite these achievements, significant challenges remained:
+- Limited connection between theoretical safety research and practical machine learning systems
+- Continued skepticism from most AI researchers about the urgency of safety work
+- Uncertainty about whether sufficient progress could be made before advanced AI systems emerged
+- Need to develop governance frameworks in addition to technical solutions
+- Questions about how to ensure safety research kept pace with rapidly advancing capabilities
 
-**4. Address Governance**
-
-Technical safety alone wouldn't solve coordination problems.
-
-**5. Faster Progress**
-
-Capabilities were advancing quickly. Safety needed to keep pace.
-
-## Lessons from the MIRI Era
-
-### Key Takeaways
-
-**1. Institutions Matter**
-
-MIRI's founding was the inflection point. Before: scattered individuals. After: organized field.
-
-**2. Academic Credibility Is Crucial**
-
-Bostrom's Superintelligence changed the game because it was academically rigorous.
-
-**3. Celebrity Endorsements Help But Aren't Enough**
-
-Musk, Gates, Hawking brought attention but not necessarily technical progress.
-
-**4. Funding Follows Attention**
-
-Once high-profile people cared, money followed.
-
-**5. Community Building Takes Time**
-
-LessWrong and EA created talent pipeline, but this took years.
-
-**6. Theoretical Work Needs Empirical Grounding**
-
-By 2015, the field needed to engage with real AI systems, not just thought experiments.
-
-## Looking Forward
-
-The MIRI era (2000-2015) established AI safety as a real field with institutions, funding, and research agendas.
-
-But it also revealed challenges:
-- Theoretical work wasn't translating to practice
-- Mainstream ML community remained skeptical
-- Capabilities were advancing faster than safety
-
-The next era (2015-2020) would be defined by the deep learning revolution and the need for AI safety to engage with rapidly advancing real-world systems.
-
+The MIRI era established foundations that would enable the next phase of AI safety research, but also revealed the magnitude of remaining challenges.

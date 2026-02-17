@@ -8,8 +8,7 @@
  */
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
-
-const NUMERIC_ID_RE = /^E\d+$/;
+import { NUMERIC_ID_RE } from '../patterns.ts';
 
 export const numericIdIntegrityRule = {
   id: 'numeric-id-integrity',

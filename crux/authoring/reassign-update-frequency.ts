@@ -24,11 +24,12 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { relative } from 'path';
 import { fileURLToPath } from 'url';
-import Anthropic from '@anthropic-ai/sdk';
-import { getApiKey } from '../lib/api-keys.ts';
+import type Anthropic from '@anthropic-ai/sdk';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
-import { parseFrontmatter as parseFm } from '../lib/mdx-utils.ts';
+import { createLlmClient, extractText, MODELS } from '../lib/llm.ts';
+import { parseFrontmatter } from '../lib/mdx-utils.ts';
+import { stripFrontmatter } from '../lib/patterns.ts';
 
 // ---------------------------------------------------------------------------
 // Config
@@ -235,14 +236,9 @@ function ruleBasedClassify(page: PageData): ClassificationResult | null {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function parseFrontmatter(content: string): Record<string, unknown> {
-  return parseFm(content);
-}
-
 function getFirstParagraph(content: string): string {
-  const match = content.match(/^---\n[\s\S]*?\n---\n([\s\S]*)$/);
-  if (!match) return '';
-  const body = match[1];
+  const body = stripFrontmatter(content);
+  if (!body) return '';
   const lines = body.split('\n');
   const paragraph: string[] = [];
   let inParagraph = false;
@@ -322,14 +318,13 @@ Return ONLY: {"frequency": N, "reason": "5 words max"}`;
 
   try {
     const response = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
+      model: MODELS.haiku,
       max_tokens: 60,
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const block = response.content[0];
-    if (!block || block.type !== 'text') throw new Error('No text block in response');
-    const text = block.text.trim();
+    const text = extractText(response).trim();
+    if (!text) throw new Error('No text block in response');
     const jsonMatch = text.match(/\{[\s\S]*?\}/);
     if (!jsonMatch) throw new Error(`No JSON: ${text}`);
 
@@ -360,7 +355,7 @@ async function main(): Promise<void> {
   const apply: boolean = args.includes('--apply');
   const verbose: boolean = args.includes('--verbose');
 
-  const client = new Anthropic({ apiKey: getApiKey('ANTHROPIC_API_KEY') });
+  const client = createLlmClient();
 
   // Collect all pages that have update_frequency
   const files = findMdxFiles(CONTENT_DIR);
