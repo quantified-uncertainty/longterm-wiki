@@ -15,7 +15,6 @@ permissions:
   contents: write
   pull-requests: write
   actions: read
-  id-token: write
 
 # One fix attempt at a time per PR to avoid conflicting pushes
 concurrency:
@@ -51,11 +50,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Count recent autofix commits to prevent infinite loops.
-          # If the last 3 commits are all autofixes, bail out.
-          recent_autofixes=$(git log --oneline -3 --format="%s" | grep -c "\[ci-autofix\]" || true)
-          if [ "$recent_autofixes" -ge 2 ]; then
-            echo "Too many consecutive autofix attempts — stopping to avoid infinite loop."
+          # Count ALL autofix commits since branch diverged from main.
+          # Checking only the last N commits can miss autofixes if normal
+          # commits land in between, allowing infinite fix loops.
+          autofix_count=$(git log --oneline origin/main..HEAD --format="%s" | grep -c "\[ci-autofix\]" || true)
+          echo "Autofix commits on this branch: $autofix_count"
+          if [ "$autofix_count" -ge 2 ]; then
+            echo "Too many autofix attempts ($autofix_count) on this branch — stopping to avoid infinite loop."
             echo "should_fix=false" >> "$GITHUB_OUTPUT"
           else
             echo "should_fix=true" >> "$GITHUB_OUTPUT"

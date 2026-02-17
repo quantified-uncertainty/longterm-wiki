@@ -497,6 +497,13 @@ if (remaining.ok && remaining.output.trim()) {
 git("commit", "-m", `Merge main into ${PR_BRANCH} (auto-resolved conflicts)\n\nConflicts in ${resolved} file(s) were resolved automatically by the Claude-powered conflict resolver.`);
 console.log("Merge committed successfully.");
 
+// ── Step 5: Push (unless --no-push) ───────────────────────────────────
+
+if (process.argv.includes("--no-push")) {
+  console.log("\n--no-push flag set — skipping push. Merge committed locally.");
+  process.exit(0);
+}
+
 // Push with retry — the branch may have been updated concurrently
 let pushOk = false;
 for (let attempt = 1; attempt <= 3; attempt++) {

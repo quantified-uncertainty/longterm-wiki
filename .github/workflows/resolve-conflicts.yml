@@ -81,7 +81,7 @@ jobs:
     needs: find-conflicted-prs
     if: needs.find-conflicted-prs.outputs.has_conflicts == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     strategy:
       matrix: ${{ fromJson(needs.find-conflicted-prs.outputs.matrix) }}
       max-parallel: 1 # Resolve one at a time to avoid push races
@@ -101,13 +101,50 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Resolve conflicts
+      - name: Resolve conflicts (merge + commit, no push yet)
         id: resolve
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PR_BRANCH: ${{ matrix.branch }}
           PR_NUMBER: ${{ matrix.number }}
-        run: node .github/scripts/resolve-conflicts.mjs
+        run: node .github/scripts/resolve-conflicts.mjs --no-push
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate resolved code
+        id: validate
+        run: |
+          # Run the CI-blocking validation gate to catch broken resolutions
+          # before pushing. This prevents the conflict resolver from pushing
+          # code that immediately fails CI.
+          echo "Running post-resolution validation gate..."
+          if pnpm crux validate gate 2>&1; then
+            echo "Validation passed — safe to push."
+            echo "valid=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Post-resolution validation failed — conflict resolution may have introduced errors."
+            echo "valid=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+      - name: Push resolved merge
+        env:
+          PR_BRANCH: ${{ matrix.branch }}
+        run: |
+          # Push with retry for transient failures
+          for attempt in 1 2 3; do
+            if git push origin "$PR_BRANCH"; then
+              echo "Pushed successfully."
+              exit 0
+            fi
+            echo "Push attempt $attempt failed — retrying in $((attempt * 2))s..."
+            sleep $((attempt * 2))
+          done
+          echo "::error::Push failed after 3 attempts"
+          exit 1
 
       - name: Post comment on PR
         if: success()
