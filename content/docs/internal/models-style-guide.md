@@ -18,7 +18,7 @@ ratings:
 
 This guide defines the standards for analytical models in LongtermWiki. Models should maximize **information density** while remaining accessible.
 
-**Prerequisite**: All model pages must follow the [Common Writing Principles](/internal/common-writing-principles/) — epistemic honesty, language neutrality, and analytical tone. The **objectivity** rating dimension measures this. For model pages with cost-effectiveness estimates, this is especially critical: always use ranges, show deflators, and include "Why These Numbers Might Be Wrong" sections.
+**Prerequisite**: All model pages must follow the [Common Writing Principles](/wiki/E726) — epistemic honesty, language neutrality, and analytical tone. The **objectivity** rating dimension measures this. For model pages with cost-effectiveness estimates, this is especially critical: always use ranges, show deflators, and include "Why These Numbers Might Be Wrong" sections.
 
 ## Core Principles
 
@@ -266,7 +266,7 @@ Every diagram needs a paragraph explaining what it illustrates and key insights.
 Short sections (< 100 words) should be merged or expanded.
 
 ### 7. Insider Language and False Certainty
-"EA organizations should fund this" → Describe specific orgs, use analytical framing. "True Cost: \$500K" → "Est. cost: \$300K-1M". See [Common Writing Principles](/internal/common-writing-principles/).
+"EA organizations should fund this" → Describe specific orgs, use analytical framing. "True Cost: \$500K" → "Est. cost: \$300K-1M". See [Common Writing Principles](/wiki/E726).
 
 ---
 

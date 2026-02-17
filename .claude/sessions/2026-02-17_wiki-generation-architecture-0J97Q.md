@@ -11,5 +11,5 @@
 
 **Learnings/notes:**
 - 8 React dashboard pages under `/internal/` (suggested-pages, updates, page-changes, facts, importance-rankings, similarity, interventions, proposals) have no entity IDs and remain at `/internal/` routes
-- Many MDX content files still contain `/internal/` links — these redirect correctly but could be updated to `/wiki/E<id>` in a follow-up
+- Batch-updated 92 `/internal/` links across 20 MDX files to `/wiki/E<id>` canonical URLs; 6 remaining links correctly reference React dashboard pages
 - The `InternalSidebar` component is now unused (replaced by `WikiSidebar` + `getInternalNav()`) but left in place

@@ -17,7 +17,7 @@ ratings:
   completeness: 6
   completeness_reasoning: "Comprehensive view of infrastructure state and future work, well-organized with clear status indicators"
 ---
-This file tracks future infrastructure improvements and project priorities. For content-specific tasks, see the [Enhancement Queue](/internal/enhancement-queue/).
+This file tracks future infrastructure improvements and project priorities. For content-specific tasks, see the [Enhancement Queue](/wiki/E761).
 
 ## Current State (January 2026)
 

@@ -61,7 +61,7 @@ Each entity stores its `numericId` directly in its source file (YAML `numericId:
 
 ### Entity Types (24 canonical + aliases)
 
-Entities are the primary data objects. Each has a `type` field from a controlled vocabulary of **24 canonical types**, plus legacy aliases for backward compatibility. See [Entity Type Reference](/internal/schema/entities/) for full details.
+Entities are the primary data objects. Each has a `type` field from a controlled vocabulary of **24 canonical types**, plus legacy aliases for backward compatibility. See [Entity Type Reference](/wiki/E752) for full details.
 
 **Core groupings:**
 
@@ -88,8 +88,8 @@ The build script merges both sources into the final database.
 
 ## Schema Sections
 
-- **[Entity Type Reference](/internal/schema/entities/)** — Every entity type with its fields, enums, and usage
-- **[Diagrams](/internal/schema/diagrams/)** — Visual ER diagrams, class diagrams, and relationship maps
+- **[Entity Type Reference](/wiki/E752)** — Every entity type with its fields, enums, and usage
+- **[Diagrams](/wiki/E751)** — Visual ER diagrams, class diagrams, and relationship maps
 - **[Fact Dashboard](/internal/facts/)** — Browse canonical facts by entity
 
 ## Validation
@@ -132,4 +132,4 @@ Every entity shares these base fields:
 }
 ```
 
-See [Entity Type Reference](/internal/schema/entities/) for type-specific fields like `severity`, `likelihood`, `orgType`, `positions`, etc.
+See [Entity Type Reference](/wiki/E752) for type-specific fields like `severity`, `likelihood`, `orgType`, `positions`, etc.

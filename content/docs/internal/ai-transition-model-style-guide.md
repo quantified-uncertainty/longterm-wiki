@@ -19,7 +19,7 @@ ratings:
 
 The AI Transition Model (ATM) is a structured framework for understanding AI development trajectories. ATM pages differ from regular knowledge base content—they follow a specific schema and use YAML as the source of truth.
 
-**Prerequisite**: All ATM pages must follow the [Common Writing Principles](/internal/common-writing-principles/) — epistemic honesty, language neutrality, and analytical tone. The **objectivity** rating dimension measures this.
+**Prerequisite**: All ATM pages must follow the [Common Writing Principles](/wiki/E726) — epistemic honesty, language neutrality, and analytical tone. The **objectivity** rating dimension measures this.
 
 ## Page Type Detection
 

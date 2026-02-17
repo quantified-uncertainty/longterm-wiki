@@ -12,28 +12,28 @@ This section contains internal documentation for maintaining and contributing to
 
 ## Getting Started
 
-- [About This Wiki](/internal/about-this-wiki/) - Comprehensive overview of how the wiki works, technical architecture, and content organization
+- [About This Wiki](/wiki/E755) - Comprehensive overview of how the wiki works, technical architecture, and content organization
 
 ## Automation and Tools
 
-- [Automation Tools](/internal/automation-tools/) - Complete reference for all scripts and CLI workflows
-- [Content Database](/internal/content-database/) - SQLite-based system for indexing and AI summaries
+- [Automation Tools](/wiki/E757) - Complete reference for all scripts and CLI workflows
+- [Content Database](/wiki/E759) - SQLite-based system for indexing and AI summaries
 
 ## Style Guides
 
-- [Knowledge Base Style Guide](/internal/knowledge-base/) - Guidelines for risk and response pages (kb-2.0)
-- [Model Style Guide](/internal/models/) - Guidelines for analytical model pages
-- [Mermaid Diagrams](/internal/mermaid-diagrams/) - How to create diagrams
+- [Knowledge Base Style Guide](/wiki/E763) - Guidelines for risk and response pages (kb-2.0)
+- [Model Style Guide](/wiki/E737) - Guidelines for analytical model pages
+- [Mermaid Diagrams](/wiki/E735) - How to create diagrams
 
 ## Project Management
 
-- [Enhancement Queue](/internal/enhancement-queue/) - Track content enhancement progress across all page types
-- [Project Roadmap](/internal/project-roadmap/) - Future work, infrastructure improvements, and tracking
+- [Enhancement Queue](/wiki/E761) - Track content enhancement progress across all page types
+- [Project Roadmap](/wiki/E810) - Future work, infrastructure improvements, and tracking
 
 ## Technical Reports
 
-- [Internal Reports](/internal/reports/) - Technical research and design decisions
-  - [Causal Diagram Visualization](/internal/reports/causal-diagram-visualization/) - Tools, literature, and best practices
+- [Internal Reports](/wiki/E780) - Technical research and design decisions
+  - [Causal Diagram Visualization](/wiki/E743) - Tools, literature, and best practices
 
 ---
 
@@ -55,4 +55,4 @@ npm run build:data
 npm run dev
 ```
 
-See [Automation Tools](/internal/automation-tools/) for complete command reference.
+See [Automation Tools](/wiki/E757) for complete command reference.
