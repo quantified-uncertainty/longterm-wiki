@@ -33,6 +33,9 @@ Check for:
 6. **Tables**: Properly formatted markdown tables
 7. **Components**: Imports match usage
 8. **Objectivity**: No evaluative adjectives ("remarkable", "unprecedented"), no "represents a [judgment]" framing, no evaluative table labels ("Concerning", "Weak"), competing perspectives given equal depth, opinions attributed to specific actors
+9. **Section duplication**: Flag if two sections cover substantially the same topic (e.g., an org described under both "## Organization Name" and "## Organization Programs"). Also flag if the same fact/quote/statistic is repeated in multiple sections.
+10. **Structure (person pages)**: Person pages must have "## Quick Assessment" (summary table) and "## Overview" (narrative intro) before "## Background". Flag if missing.
+11. **Bare URLs**: Flag any URLs in prose not wrapped in markdown link syntax (e.g., bare "example.com" instead of "[example.com](https://example.com)")
 
 Output a JSON review:
 {

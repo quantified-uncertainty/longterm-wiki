@@ -31,10 +31,11 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   const entityLookupCount = entityLookup.split('\n').filter(Boolean).length;
   log('improve', `  Found ${entityLookupCount} relevant entities for lookup`);
 
+  const tier = options.tier || 'standard';
   const prompt = IMPROVE_PROMPT({
     page, filePath, importPath, directions,
     analysis, research, objectivityContext,
-    currentContent, entityLookup,
+    currentContent, entityLookup, tier,
   });
 
   const result = await runAgent(prompt, {

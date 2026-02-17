@@ -105,7 +105,7 @@ Options:
   --directions "..."   Specific improvement directions
   --tier <tier>        polish ($2-3), standard ($5-8), deep ($10-15), or triage (auto)
   --apply              Apply changes directly (don't just preview)
-  --grade              Run grade-content.ts after applying (requires --apply)
+  --no-grade           Skip auto-grading after apply (grading runs by default)
   --triage             Run news-check triage only (no improvement)
   --list               List pages needing improvement
   --limit N            Limit list results (default: 20)
@@ -161,7 +161,7 @@ Examples:
     tier: (opts.tier as string) || 'standard',
     directions: (opts.directions as string) || '',
     dryRun: !opts.apply,
-    grade: !!(opts.grade && opts.apply)
+    grade: opts['no-grade'] ? false : undefined
   });
 }
 

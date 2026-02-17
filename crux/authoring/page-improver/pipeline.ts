@@ -185,8 +185,8 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
         : `Improved (${tier})`,
     });
 
-    // Run grading if requested
-    if (options.grade) {
+    // Auto-grade after applying changes (default: on; skip with grade: false)
+    if (options.grade !== false) {
       console.log('\nRunning grade-content.ts...');
       try {
         execSync(`${NODE_TSX} crux/authoring/grade-content.ts --page "${page.id}" --apply`, {
@@ -222,6 +222,9 @@ function logBiographicalWarnings(content: string, page: PageData, tier: string):
     { pattern: /\b(?:joined|left|departed)\b.*\b(?:in|since)\s+\d{4}\b/gi, label: 'employment dates' },
     { pattern: /\bPhD|Ph\.D\.|doctorate|master's|bachelor's|degree\b.*\b(?:from|at)\s+[A-Z]/gi, label: 'education claims' },
     { pattern: /\b(?:founded|co-founded|established)\b.*\b(?:in|circa)\s+\d{4}\b/gi, label: 'founding dates' },
+    { pattern: /\b(?:co-authored|coauthored|authored|published|wrote)\b.*(?:with\s+[A-Z]|\b\d{4}\b)/gi, label: 'publication/co-authorship claims' },
+    { pattern: /\bcited\s+(?:over\s+)?\d[\d,]*\s+times\b/gi, label: 'citation count claims' },
+    { pattern: /\bover\s+\d[\d,]*\s+(?:publications|papers|articles)\b/gi, label: 'publication count claims' },
   ];
   let bioWarnings = 0;
   const lines = content.split('\n');

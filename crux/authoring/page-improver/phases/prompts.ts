@@ -16,10 +16,15 @@ interface ImprovePromptArgs {
   objectivityContext: string;
   currentContent: string;
   entityLookup: string;
+  tier: string;
 }
 
 export function IMPROVE_PROMPT(args: ImprovePromptArgs): string {
-  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup } = args;
+  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, tier } = args;
+
+  const isPolish = tier === 'polish';
+  const isPersonPage = page.path?.includes('/people/') ?? false;
+  const isOrgPage = page.path?.includes('/organizations/') ?? false;
 
   return `Improve this wiki page based on the analysis and research.
 
@@ -45,6 +50,26 @@ ${currentContent}
 
 ## Improvement Instructions
 
+### Content Preservation (CRITICAL)
+You are EDITING an existing page, not rewriting it from scratch. Your output must preserve:
+- **ALL existing sections** — do not drop, merge, or summarize away existing sections
+- **ALL existing footnotes and citations** — keep every [^N] reference and its definition
+- **ALL existing EntityLinks** — keep every <EntityLink> tag
+- **ALL existing data tables** — keep every markdown table
+- **Specific details** — dates, numbers, names, quotes must be preserved verbatim
+- **Word count**: Your output should be AT LEAST as long as the input. If the current page is 3000 words, your output must be ≥3000 words.
+
+Do NOT summarize, condense, or "streamline" existing content. Add to it. If a section is too long, leave it as-is rather than cutting it.
+${isPolish ? `
+### Polish Tier Rules (NO RESEARCH AVAILABLE)
+This is a polish-tier improvement — you have NO new research sources. Therefore:
+- **DO NOT add new footnote citations** — you have no research to cite. Any new [^N] citations you add would be fabricated.
+- **DO NOT invent or fabricate citation sources** — citations like "Based on statements in blog posts" or "According to presentations" without specific URLs are hallucinated.
+- **KEEP all existing citations exactly as they are** — do not renumber, modify, or remove existing footnotes.
+- You MAY fix formatting, improve prose clarity, add EntityLinks, fix escaping, and restructure sections.
+- You MAY add factual context from the existing content (moving info between sections, adding transitions).
+- If you cannot verify a claim, flag it with <!-- NEEDS CITATION --> rather than inventing a source.
+` : ''}
 Make targeted improvements based on the analysis and directions. Follow these guidelines:
 
 ### Wiki Conventions
@@ -122,6 +147,39 @@ People and organizations are VERY sensitive to inaccuracies. Real people read th
   - WRONG: "Prominent AI researcher" for someone who is a forecaster — use accurate role descriptions
   - WRONG: "forfeited equity" when it was "tried to forfeit but equity wasn't taken away" — get details right
   - WRONG: Sections like "Other Research Contributions" that pad with low-value content — prefer focused accuracy
+
+### Required Page Structure
+${isPersonPage ? `
+**Person pages MUST include these sections in order:**
+1. **Quick Assessment** (right after frontmatter/imports/DataInfoBox) — a summary table:
+   \`\`\`
+   ## Quick Assessment
+
+   | Aspect | Assessment |
+   |--------|-----------|
+   | **Primary Role** | [Current role/title and affiliation] |
+   | **Key Contributions** | [1-2 sentence summary of major contributions] |
+   | **Key Publications** | [Most important publications with dates] |
+   | **Institutional Affiliation** | [Current employer/institution] |
+   | **Influence on AI Safety** | [How their work relates to AI safety, if applicable] |
+   \`\`\`
+   Adapt the rows to fit the person — not all rows apply to every person. Use EntityLinks where appropriate.
+   If a Quick Assessment table already exists, keep and improve it rather than removing it.
+
+2. **Overview** — a 1-3 paragraph narrative introduction summarizing the person's significance and key achievements. This is NOT the same as "Background" — Overview is a high-level summary, Background covers career details.
+
+3. **Background** / **Professional Background** — career history, education, positions held.
+
+4. Additional sections as appropriate (Key Contributions, Positions and Views, Criticism, etc.)
+` : isOrgPage ? `
+**Organization pages MUST include an Overview section** as the first content section (after imports/DataInfoBox). The Overview should be a 1-3 paragraph narrative summary of the organization's mission, significance, and key activities.
+` : `
+**All pages should include an Overview section** as the first content section when the page is long enough to warrant one (>500 words). The Overview should be a concise narrative summary.
+`}
+If the page currently starts with "## Background" but has no "## Overview", add an Overview section BEFORE Background. Do not rename Background to Overview — they serve different purposes.
+
+### Bare URLs
+Convert any bare URLs in prose (like \`neelnanda.io\` or \`https://example.com\`) to markdown links: \`[neelnanda.io](https://neelnanda.io)\`. URLs inside footnote definitions and existing markdown links should be left as-is.
 
 ### Related Pages (DO NOT INCLUDE)
 Do NOT include "## Related Pages", "## See Also", or "## Related Content" sections.
